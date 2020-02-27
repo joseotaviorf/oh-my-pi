@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timedelta
 
 import bietlejuice.jobs.base.new_base_etl as utils
@@ -42,7 +43,8 @@ from qa_python_utils.aws.athena import AthenaClient
 
 logger = QuintoAndarLogger("bi-supply-demand-etl")
 
-env.set_airflow_var_to_local_env("BI_DW", "BI_ODS", "EBDB", "GODFATHER")
+env.set_airflow_var_to_local_env("BI_DW", "BI_ODS", "EBDB", "GODFATHER", "DATA_ACC_AWS_ACCESS_KEY_ID",
+                                 "DATA_ACC_AWS_SECRET_ACCESS_KEY")
 bucket = env.get_airflow_env_var("bi-datalake-s3-bucket")
 
 MAIN_DAG_NAME = "bi-supply-demand-etl"
@@ -125,7 +127,9 @@ def create_table_in_db_from_datalake(table_name, query_params, **kwargs):
     file_path = "{}/{}{}.sql".format(
         DATALAKE_QUERIES_DIR, kwargs.get("file_path", ""), table_name
     )
-    athena_client = AthenaClient(bucket)
+    data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
+    data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
+    athena_client = AthenaClient(bucket, data_acc_aws_access_key_id, data_acc_aws_secret_access_key)
 
     # executing methods
     df = athena_client.execute_file_query_and_return_dataframe(

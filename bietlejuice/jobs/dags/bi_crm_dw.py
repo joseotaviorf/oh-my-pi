@@ -12,7 +12,7 @@ from bietlejuice.jobs.dags.util import xcom as xcom
 from bietlejuice.jobs.etl.crm.tasks import CRMTasksFactory, CRMTasksTableEnum
 
 # env vars
-env.set_airflow_var_to_local_env('BI_DW')
+env.set_airflow_var_to_local_env('BI_DW', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
 S3_BUCKET = env.get_airflow_env_var('bi-datalake-s3-bucket')
 MONGO_CLIENT_URI = env.get_airflow_env_var('MONGODB_CRM_URI')
 

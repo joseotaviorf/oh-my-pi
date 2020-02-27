@@ -1,4 +1,5 @@
 import petl
+import os
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import QuintoAndarLogger
 
@@ -49,7 +50,9 @@ class Marketing(object):
         self.execution_date = execution_date
         self.account = account
         self.partition_date = self.execution_date.strftime('%Y-%m-%d')
-        self.athena_client = AthenaClient(self.s3_bucket)
+        data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
+        data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
+        self.athena_client = AthenaClient(self.s3_bucket, data_acc_aws_access_key_id, data_acc_aws_secret_access_key)
         self.integration = integration
         self.raw_query_path = 'marketing/{integration}/raw_to_clean'.format(
             integration=self.integration)

@@ -15,7 +15,7 @@ MAIN_SCHEDULE_INTERVAL = '@once'
 
 logger = QuintoAndarLogger(MAIN_DAG_NAME)
 
-env.set_airflow_var_to_local_env('EBDB')
+env.set_airflow_var_to_local_env('EBDB', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
 
 reprocess_leads_variant = env.get_airflow_env_var('reprocess_leads_variant')
 

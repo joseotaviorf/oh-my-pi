@@ -16,8 +16,11 @@ from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 from bietlejuice.jobs.dags import DATALAKE_QUERIES_DIR, DW_QUERIES_DIR
 
-env.set_airflow_var_to_local_env('BI_DW')
-athena = AthenaClient('5a-datalake')
+env.set_airflow_var_to_local_env('BI_DW', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
+bucket = env.get_airflow_env_var("bi-datalake-s3-bucket")
+data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
+data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
+athena = AthenaClient(bucket, data_acc_aws_access_key_id, data_acc_aws_secret_access_key)
 logger = QuintoAndarLogger('bi-doorman-data')
 CARTO_PATH = 'carto'
 CARTO_CREDENTIALS = json.loads(env.get_airflow_env_var('CARTO_CREDENTIALS'))

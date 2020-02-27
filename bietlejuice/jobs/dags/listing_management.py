@@ -24,7 +24,7 @@ MAIN_SCHEDULE_INTERVAL = '30 6 * * *'
 
 env.set_airflow_var_to_local_env(
     'AWS_SECRET_ACCESS_KEY', 'AWS_DEFAULT_REGION', 'AWS_ACCESS_KEY_ID',
-    'AWS_REGION', 'AWS_ENDPOINT_URL')
+    'AWS_REGION', 'AWS_ENDPOINT_URL', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
 
 DATALAKE_BUCKET = env.get_airflow_env_var('bi-datalake-s3-bucket')
 SKYNET_BUCKET = env.get_airflow_env_var('SKYNET_BUCKET')
@@ -44,7 +44,9 @@ TRAINING_PATH = 'listing-mgmt/training'
 PREDICTIONS_PATH = 'listing-mgmt/data/predictions/dt={}'
 
 logger = QuintoAndarLogger(MAIN_DAG_NAME)
-athena = AthenaClient(DATALAKE_BUCKET)
+data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
+data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
+athena = AthenaClient(DATALAKE_BUCKET, data_acc_aws_access_key_id, data_acc_aws_secret_access_key)
 
 
 @logger

@@ -10,7 +10,7 @@ MAIN_DAG_NAME = 'offer-predictor-logs'
 MAIN_START_DATE = datetime(2019, 2, 26)
 MAIN_SCHEDULE_INTERVAL = '0 3 * * *'  # 3am UTC every day
 
-env.set_airflow_var_to_local_env('ES_LOGS__HOSTNAME')
+env.set_airflow_var_to_local_env('ES_LOGS__HOSTNAME', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
 
 config = {
     'ES_LOGS__HOSTNAME': os.getenv('ES_LOGS__HOSTNAME'),

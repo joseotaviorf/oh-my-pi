@@ -1,5 +1,5 @@
 from datetime import datetime
-
+import os
 from airflow.models import DAG
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
@@ -11,7 +11,7 @@ from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags import DATALAKE_QUERIES_DIR, SOURCE_QUERIES_DIR
 
 # env vars
-env.set_airflow_var_to_local_env('PHOTOS_MATCHER')
+env.set_airflow_var_to_local_env('PHOTOS_MATCHER', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 MAIN_DAG_ID = 'bi-photos-matcher'
@@ -43,7 +43,9 @@ def extract_data_from_matcher(table_name, ds, **kwargs):
 
 def upload_data_to_matcher(table_name, ds, **kwargs):
     # extract data from athena, save to external db
-    athena = AthenaClient(s3_bucket)
+    data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
+    data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
+    athena = AthenaClient(s3_bucket, data_acc_aws_access_key_id, data_acc_aws_secret_access_key)
     query = BaseETL.get_query_from_file_name('{}/photos_matcher/{}.sql'.format(DATALAKE_QUERIES_DIR, table_name))
 
     logger.info('m=upload_data_to_matcher, table_name={}, msg=Reading data from datalake'.format(table_name))

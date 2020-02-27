@@ -1,4 +1,5 @@
 import json
+import os
 from datetime import datetime
 
 import bietlejuice.jobs.base.new_base_etl as utils
@@ -13,7 +14,8 @@ from bietlejuice.jobs.wrappers.GoogleDrive import GoogleSheets
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 
-env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB')
+env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'DATA_ACC_AWS_ACCESS_KEY_ID',
+                                 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
 
 # global vars
 logger = QuintoAndarLogger('AffiliateCostsDAG')
@@ -27,7 +29,9 @@ MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('30 10 * * *')
 
 
 def load_google_sheet_files_to_datalake(files):
-    athena_client = AthenaClient(s3_bucket)
+    data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
+    data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
+    athena_client = AthenaClient(s3_bucket, data_acc_aws_access_key_id, data_acc_aws_secret_access_key)
     gs = GoogleSheets(s3_bucket=s3_bucket, google_s_a_credentials=GOOGLE_S_A_CREDENTIALS,
                       google_api_scope=GOOGLE_API_SCOPE)
     for file in files:

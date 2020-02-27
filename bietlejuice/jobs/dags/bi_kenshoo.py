@@ -1,4 +1,5 @@
 import json
+import os
 from datetime import datetime
 from os import listdir
 from os.path import isfile, join
@@ -15,7 +16,7 @@ from qa_python_utils.aws.athena import AthenaClient
 # env vars
 SFTP_AUTH = json.loads(env.get_airflow_env_var('kenshoo-sftp-authorization'))
 S3_BUCKET = env.get_airflow_env_var('bi-datalake-s3-bucket')
-env.set_airflow_var_to_local_env('BI_DW')
+env.set_airflow_var_to_local_env('BI_DW', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
 
 # global vars
 MAIN_DAG_ID = 'bi-kenshoo'
@@ -42,9 +43,10 @@ def execute_athena_query(query_filename, ds, file_name, use_query_params, **kwar
     kenshoo = Kenshoo(
         execution_date=ds
     )
-
+    data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
+    data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
     # using dependency injection instead of coupling classes
-    athena_client = AthenaClient(S3_BUCKET)
+    athena_client = AthenaClient(S3_BUCKET, data_acc_aws_access_key_id, data_acc_aws_secret_access_key)
     kenshoo.save_file_from_athena_query_execution(query_filename=query_filename, athena_client=athena_client,
                                                   file_name=file_name,
                                                   query_params=dict(

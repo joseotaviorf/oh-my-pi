@@ -12,7 +12,7 @@ from bietlejuice.jobs.dags import DW_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
 
 # env vars
-env.set_airflow_var_to_local_env('BI_DW')
+env.set_airflow_var_to_local_env('BI_DW', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 

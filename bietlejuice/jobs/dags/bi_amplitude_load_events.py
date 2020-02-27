@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-
+import os
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
@@ -40,7 +40,10 @@ def load_amplitude_clean(**kwargs):
 
 @logger(exclude='kwargs')
 def athena_execute_file_query_and_wait_for_results(filename, execution_date, bucket_folder_path, **kwargs):
-    a = AthenaClient(s3_bucket=s3_bucket)
+    data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
+    data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
+    a = AthenaClient(s3_bucket=s3_bucket, data_acc_aws_access_key_id=data_acc_aws_access_key_id,
+                     data_acc_aws_secret_access_key=data_acc_aws_secret_access_key)
 
     bucket_folder_path = bucket_folder_path.format(
         dt=str(execution_date.strftime('%Y-%m-%d'))) if '{dt}' in bucket_folder_path else bucket_folder_path

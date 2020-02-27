@@ -9,7 +9,7 @@ from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.house_status_history import HouseStatusHistory, HouseStatusFullHistory
 
 # env vars
-env.set_airflow_var_to_local_env('BI_ODS', 'EBDB')
+env.set_airflow_var_to_local_env('BI_ODS', 'EBDB', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 MAIN_DAG_ID = 'bi-house-status-history'

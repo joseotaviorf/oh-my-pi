@@ -1,5 +1,6 @@
 import json
 import re
+import os
 from datetime import datetime
 from gzip import GzipFile
 from io import BytesIO
@@ -27,7 +28,9 @@ class AutodialerETL(object):
     def __init__(self, mongo_client_uri, bucket_name, document_type_enum, execution_date=None):
         self.s3_bucket = bucket_name
         self.execution_date = execution_date
-        self.athena_client = AthenaClient(self.s3_bucket)
+        data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
+        data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
+        self.athena_client = AthenaClient(self.s3_bucket, data_acc_aws_access_key_id, data_acc_aws_secret_access_key)
         self.document_type_enum = document_type_enum
         self.document_type = document_type_enum.value
 

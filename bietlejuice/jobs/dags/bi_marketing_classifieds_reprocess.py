@@ -15,7 +15,7 @@ MAIN_START_DATE = datetime(2019, 4, 2, 0, 0, 0)
 MAIN_END_DATE = datetime(2019, 8, 1, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 0 * * *')
 
-env.set_airflow_var_to_local_env('BI_DW')
+env.set_airflow_var_to_local_env('BI_DW', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
 S3_BUCKET = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 GOOGLE_S_A_CREDENTIALS = json.loads(

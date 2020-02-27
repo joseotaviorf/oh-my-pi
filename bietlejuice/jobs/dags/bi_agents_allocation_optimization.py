@@ -1,4 +1,5 @@
 import json
+import os
 from datetime import datetime
 
 import airflow.utils.helpers as airflow_helpers
@@ -47,7 +48,9 @@ def add_new_table_partition(ds, schema, table_name, bucket_folder_path, partitio
         'm=add_new_table_partition, ds={}, schema={}, table_name={}, bucket_folder_path={}, partition_name={}'.format(
             ds, schema, table_name, bucket_folder_path, partition_name))
 
-    athena_client = AthenaClient(s3_bucket)
+    data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
+    data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
+    athena_client = AthenaClient(s3_bucket, data_acc_aws_access_key_id, data_acc_aws_secret_access_key)
     athena_client.upsert_single_partition(
         bucket_folder_path='{}/hekima/{}/historical'.format(s3_bucket, bucket_folder_path),
         database=schema,

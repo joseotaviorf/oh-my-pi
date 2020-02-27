@@ -8,13 +8,15 @@ from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.elasticsearch import YellowPagesLogsFetcher
 from qa_python_utils.aws.athena import AthenaClient
 
-athena = AthenaClient('5a-datalake')
+env.set_airflow_var_to_local_env('ES_LOGS__HOSTNAME', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
+bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
+data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
+data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
+athena = AthenaClient(bucket, data_acc_aws_access_key_id, data_acc_aws_secret_access_key)
 
 MAIN_DAG_NAME = 'yellow-pages-logs'
 MAIN_START_DATE = datetime(2019, 11, 20)
 MAIN_SCHEDULE_INTERVAL = '0 3 * * *'  # 3am UTC every day
-
-env.set_airflow_var_to_local_env('ES_LOGS__HOSTNAME')
 
 config = {
     'es_extractor': YellowPagesLogsFetcher(

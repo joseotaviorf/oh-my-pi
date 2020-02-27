@@ -5,7 +5,7 @@ from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl import DW_QUERIES_DIR
 
-env.set_airflow_var_to_local_env('BI_DW')
+env.set_airflow_var_to_local_env('BI_DW', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
 
 MAIN_DAG_ID = 'bi-affiliate-category-segmentation'
 MAIN_START_DATE = datetime(2019, 6, 1)

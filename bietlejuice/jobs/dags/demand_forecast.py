@@ -22,7 +22,7 @@ bucket_dl = env.get_airflow_env_var('bi-datalake-s3-bucket')  # comment for test
 # bucket_ds = '5a-data-science'
 # bucket_dl = '5a-datalake'
 
-env.set_airflow_var_to_local_env('BI_DW')
+env.set_airflow_var_to_local_env('BI_DW', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
 
 MAIN_DAG_NAME = 'bi-demand-forecast'
 MAIN_START_DATE = datetime(2018, 3, 20)

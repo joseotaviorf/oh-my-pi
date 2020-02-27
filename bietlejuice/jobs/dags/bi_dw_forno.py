@@ -11,7 +11,9 @@ from bietlejuice.jobs.wrappers.redshift import RedshiftClient, RedshiftStatusEnu
 env.set_airflow_var_to_local_env(
     'AWS_SECRET_ACCESS_KEY',
     'AWS_ACCESS_KEY_ID',
-    'AWS_DEFAULT_REGION'
+    'AWS_DEFAULT_REGION',
+    'DATA_ACC_AWS_ACCESS_KEY_ID',
+    'DATA_ACC_AWS_SECRET_ACCESS_KEY'
 )
 
 DW_PROD_ID = env.get_airflow_env_var('DW_PROD_ID')

@@ -6,7 +6,7 @@ from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.agents.agent_model import Agent
 
-env.set_airflow_var_to_local_env('BI_ODS', 'EBDB')
+env.set_airflow_var_to_local_env('BI_ODS', 'EBDB', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
 bucket_datalake = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 

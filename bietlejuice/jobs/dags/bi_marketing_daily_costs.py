@@ -9,7 +9,7 @@ from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl import DW_QUERIES_DIR
 from qa_python_utils import QuintoAndarLogger
 
-env.set_airflow_var_to_local_env('BI_DW')
+env.set_airflow_var_to_local_env('BI_DW', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
 
 MAIN_DAG_NAME = 'bi-marketing-daily-costs'
 MAIN_START_DATE = datetime(2019, 1, 1)

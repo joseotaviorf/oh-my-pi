@@ -1,4 +1,5 @@
 import json
+import os
 from collections import OrderedDict
 from datetime import datetime
 
@@ -22,7 +23,7 @@ MAIN_START_DATE = datetime(2019, 1, 1)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('*/3 * * * *')
 
 # env vars
-env.set_airflow_var_to_local_env('EBDB')
+env.set_airflow_var_to_local_env('EBDB', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
 mongo_client_uri = env.get_airflow_env_var('MONGODB_CRM_URI')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
@@ -115,7 +116,9 @@ def send_data_to_s3(ebdb_filename, ustasks_filename, sort_direction):
         ('sort_direction', str),
         ('analyst', str)
     ])
-    athena_client = AthenaClient(s3_bucket)
+    data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
+    data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
+    athena_client = AthenaClient(s3_bucket, data_acc_aws_access_key_id, data_acc_aws_secret_access_key)
     athena_client.create_parquet_from_df(
         key=key,
         df=merged_df,

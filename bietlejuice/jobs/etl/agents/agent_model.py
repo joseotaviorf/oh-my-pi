@@ -1,4 +1,5 @@
 import re
+import os
 from datetime import datetime
 
 import petl
@@ -244,7 +245,9 @@ class Agent(object):
 
     @logger
     def get_datalake_data_from_filequery(self, file_name):
-        a = AthenaClient(s3_bucket=self.bucket_datalake)
+        data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
+        data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
+        a = AthenaClient(self.bucket_datalake, data_acc_aws_access_key_id, data_acc_aws_secret_access_key)
         df = a.execute_file_query_and_return_dataframe(
             filename='{}/agent/{}.sql'.format(DATALAKE_QUERIES_DIR, file_name))
         return petl.fromdataframe(df)

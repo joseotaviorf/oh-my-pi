@@ -37,14 +37,18 @@ EMBEDDINGS_PATH = 'listing2vec/embeddings/dt={}'
 COLD_PATH = 'listing2vec/cold/dt={}'
 
 logger = QuintoAndarLogger(MAIN_DAG_NAME)
-athena = AthenaClient(DATALAKE_BUCKET)
 
 env.set_airflow_var_to_local_env(
     'AWS_SECRET_ACCESS_KEY',
     'AWS_ACCESS_KEY_ID',
     'AWS_DEFAULT_REGION',
     'KAFKA_BOOTSTRAP_SERVERS',
+    'DATA_ACC_AWS_ACCESS_KEY_ID',
+    'DATA_ACC_AWS_SECRET_ACCESS_KEY'
 )
+data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
+data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
+athena = AthenaClient(DATALAKE_BUCKET, data_acc_aws_access_key_id, data_acc_aws_secret_access_key)
 
 
 def build_raw_data(**kwargs):

@@ -17,7 +17,7 @@ BI_LINKEDIN_CAMPAIGNS_DAG_NAME = 'bi-linkedin-campaigns'
 MAIN_START_DATE = datetime(2019, 8, 1, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 6,9 * * *')
 
-env.set_airflow_var_to_local_env('BI_DW')
+env.set_airflow_var_to_local_env('BI_DW', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
 S3_BUCKET = env.get_airflow_env_var('bi-datalake-s3-bucket')
 AUTH = dict()
 AUTH['API_KEY'] = env.get_airflow_env_var('LINKEDIN_SECRETS_API_KEY')

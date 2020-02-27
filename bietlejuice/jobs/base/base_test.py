@@ -1,3 +1,4 @@
+import os
 from itertools import combinations
 
 from qa_python_utils import QuintoAndarLogger
@@ -29,7 +30,10 @@ class BaseTest(object):
             return None
 
         if from_athena:
-            return AthenaClient('5a-datalake').execute_query_and_return_dataframe(query)
+            data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
+            data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
+            return AthenaClient('5a-datalake', data_acc_aws_access_key_id, data_acc_aws_secret_access_key)\
+                .execute_query_and_return_dataframe(query)
 
         return BaseETL.from_db_query(
             db_enum=enum_db,

@@ -1,5 +1,5 @@
 from datetime import datetime
-
+import os
 from airflow import DAG
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
@@ -9,9 +9,11 @@ from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from bietlejuice.jobs.dags import DATALAKE_QUERIES_DIR, DW_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
 
-env.set_airflow_var_to_local_env('BI_DW')
+env.set_airflow_var_to_local_env('BI_DW', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
-athena = AthenaClient('5a-datalake')
+data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
+data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
+athena = AthenaClient(bucket, data_acc_aws_access_key_id, data_acc_aws_secret_access_key)
 
 logger = QuintoAndarLogger('bi-agents-availability')
 
