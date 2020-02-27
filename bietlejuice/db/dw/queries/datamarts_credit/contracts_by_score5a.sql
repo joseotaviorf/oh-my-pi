@@ -30,7 +30,7 @@ select
 from dim_contract dc
 join fact_listing_rent_flows fd
     on dc.sk_contract = fd.sk_contract
-join datalake_raw.sortinghat_proposal sp
+join datalake_sorting_hat_clean_prod.proposal sp
     on sp.id = fd.sk_proposal
 where dc.status in ('Ativo', 'Finalizado')
 group by 1

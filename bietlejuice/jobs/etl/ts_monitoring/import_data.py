@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 
+from bietlejuice.jobs.base.base_etl import BaseETL
+from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR
 from helpers import find_best_subset
 from variables import col_float
 from variables import variables_of_property
@@ -58,10 +60,11 @@ def import_sortinghat_proposal(client):
     :param client: athena client
     :return:dataframe
     """
-    sql_proposal_sh = '''
-        SELECT *
-        FROM datalake_raw.sortinghat_proposal proposal
-        '''
+
+    sql_proposal_sh = BaseETL.get_query_from_file_name(
+        '{}/sortinghat/proposal.sql'.format(DATALAKE_QUERIES_DIR)
+    )
+
     df_proposal_sh = client.execute_query_and_return_dataframe(sql_proposal_sh)
 
     # rename
@@ -113,11 +116,11 @@ def import_sortinghat_proponent(client):
     :param client: athena client
     :return:dataframe
     """
-    sql_proponent_sh = '''
-        SELECT
-        *
-        FROM datalake_raw.sortinghat_proponent proponent
-        '''
+
+    sql_proponent_sh = BaseETL.get_query_from_file_name(
+        '{}/sortinghat/proponent.sql'.format(DATALAKE_QUERIES_DIR)
+    )
+
     df_proponent_sh = client.execute_query_and_return_dataframe(sql_proponent_sh)
 
     # proposal_id to float

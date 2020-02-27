@@ -1,3 +1,3 @@
 select count(*)
-from datalake_raw.sortinghat_proposal_version
+from datalake_sorting_hat_clean_prod.proposal_version
 ;

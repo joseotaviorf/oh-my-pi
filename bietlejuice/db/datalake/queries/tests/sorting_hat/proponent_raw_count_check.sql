@@ -1,3 +1,3 @@
 select count(*)
-from datalake_raw.sortinghat_proponent
+from datalake_sorting_hat_clean_prod.proponent
 ;

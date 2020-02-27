@@ -1,3 +1,3 @@
 select count(*)
-from datalake_raw.sortinghat_external_score
+from datalake_sorting_hat_clean_prod.external_score
 ;
