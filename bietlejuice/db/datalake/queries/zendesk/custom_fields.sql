@@ -12,12 +12,13 @@ last_updated_ticket_fields as (
 parse_fields as (
     select tf.id_ticket,
         f1.field,
-        regexp_extract(f1.field, '{{\\?"id\\?":"?(\d+)"?', 1) as id_field,
-        nullif(regexp_extract(f1.field, '"value\\?":\\?"?#?([^\\?"|}}]+)', 1), 'null') as value
+        json_extract_scalar(f1.field, '$.id') as id_field,
+        json_extract(f1.field, '$.value') as value
     from tickets_filter tf
     inner join last_updated_ticket l
         on tf.id_ticket=l.id_ticket
-    cross join unnest(regexp_extract_all(tf.custom_fields, '{{[^}}]+[^,]+[^{{]+}}')) as f1(field)
+    cross join unnest(regexp_extract_all(tf.custom_fields, '{(.*?)}')) as f1(field)
+    where regexp_like(json_format(json_extract(f1.field, '$.value')), '\"?null\"?') = false
 )
 select
     f.id_ticket,
