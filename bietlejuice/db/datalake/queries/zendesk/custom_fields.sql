@@ -17,7 +17,7 @@ parse_fields as (
     from tickets_filter tf
     inner join last_updated_ticket l
         on tf.id_ticket=l.id_ticket
-    cross join unnest(regexp_extract_all(tf.custom_fields, '{(.*?)}')) as f1(field)
+    cross join unnest(regexp_extract_all(tf.custom_fields, '{{(.*?)}}')) as f1(field)
     where regexp_like(json_format(json_extract(f1.field, '$.value')), '\"?null\"?') = false
 )
 select
