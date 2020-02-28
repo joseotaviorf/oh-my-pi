@@ -1,4 +1,6 @@
 import json
+
+from datetime import datetime
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.consumers.db_consumers.db_consumer import DBConsumer
@@ -98,7 +100,16 @@ class MongoConsumer(DBConsumer):
         # convert  bson -> json_string -> dict
         data = json.loads(bson_dumps(documents, json_options=RELAXED_JSON_OPTIONS))
         converted_data = self.__convert_columns_to_string_type(data)
-        return self.spark_client.create_dataframe(converted_data)
+
+        try:
+            df = self.spark_client.create_dataframe(converted_data)
+        except ValueError:
+            logger.warning(
+                "m=__convert_bson_documents_to_spark_dataframe, msg=Spark DataFrame is empty"
+            )
+            df = None
+
+        return df
 
     @logger(exclude_return=True)
     def get_data_from_table(self, table_name):
@@ -141,8 +152,12 @@ class MongoConsumer(DBConsumer):
                     "$and": [
                         {
                             column_name: {
-                                "$gte": {"$date": start_date},
-                                "$lte": {"$date": end_date},
+                                "$gte": datetime.strptime(
+                                    start_date, "%Y-%m-%dT%H:%M:%SZ"
+                                ),
+                                "$lte": datetime.strptime(
+                                    end_date, "%Y-%m-%dT%H:%M:%SZ"
+                                ),
                             }
                         }
                     ]
