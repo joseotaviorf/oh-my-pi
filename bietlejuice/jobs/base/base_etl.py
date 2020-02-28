@@ -374,8 +374,9 @@ class BaseETL(object):
         for column in df_columns:
             max_length = column['max_length']
             if max_length > 65536:
-                raise ValueError('m=create_table_from_dataframe, table_name={}, msg=dataframe has a column '
-                                 'with very long text string'.format(table_name))
+                raise ValueError('m=create_table_from_dataframe, table_name={}, column={}, '
+                                 'size={}, msg=dataframe has a column with very long '
+                                 'text string'.format(table_name, column['name'], column['max_length']))
             elif max_length > 256:
                 max_length = max_length + (max_length % 8)  # round to multiples of eight
                 length_text = '({})'.format(max_length)
