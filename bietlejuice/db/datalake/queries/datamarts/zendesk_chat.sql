@@ -75,7 +75,6 @@ chat_zendesk as (
 	  		when (hour(c.ts_created - interval '3' hour) < bh.start_hour
 	  			and hour(c.ts_created - interval '3' hour) >= bh.final_hour) then 0
 		end as chat_on_schedule,
-		c.visitor,
    		json_extract_scalar(c.visitor, '$.phone') as visitor_phone
 	from datalake_zendesk_clean_prod.chats as c
 		left join datalake_raw.gsheets_department_channel as gdc
@@ -123,7 +122,6 @@ select distinct
 	    when (cast(json_extract(c.response_time, '$.first') as double)/60) > 15 then 0
 	    else null
 	end sla_achieved_15biz_min,
-	c.visitor,
 	c.visitor_phone
 from chat_zendesk as c
 	left join chat_engagements as ce
