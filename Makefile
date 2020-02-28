@@ -1,3 +1,19 @@
+############# DOCKER commands ########################
+
+.PHONY: create-docker-environment-python2
+create-docker-environment-python2:
+	@chmod +x start.sh
+	@sudo docker-compose up --build -d --force-recreate
+	@sudo docker image prune -f
+
+.PHONY: restart-docker-environment-python2
+restart-docker-environment-python2:
+	@sudo docker-compose up --build -d
+
+.PHONY: kill-docker-environment-python2
+kill-docker-environment-python2:
+	@sudo docker-compose down
+
 ############# PYTHON2 commands #######################
 
 .PHONY: environment-python2

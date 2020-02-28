@@ -123,3 +123,5 @@ metastore_db/
 
 # Airflow
 airflow/*
+airflow-webserver.pid
+unittests.cfg
