@@ -181,7 +181,6 @@ where n_rent between 2 and 29 and n_condominium < 30 and number_street is not nu
     and number_street is not null
 group by 1,2,3,4
 )
-
 ,  base_external_crawler as (
  select
  	cr.lat,
@@ -272,17 +271,27 @@ select
     trim(dhl.house_lng) as house_lng, 
     trim(dhl.house_number) as house_number,
     count(case when fhlf.sk_conversion_date > '0' then 0 end) as converted_leads,
-    count(0) leads, 
+    count(0) leads
+from datalake_clean.ods_fact_house_listing_flows fhlf
+join datalake_clean.ods_dim_house_listing  dhl on dhl.sk_house_listing = fhlf.sk_house_listing
+join datalake_clean.ods_dim_date dd on fhlf.sk_lead_date = dd.sk_date
+where try_cast(dd."date" as date) > current_date - interval '120' day and trim(dhl.house_lat) != '' and trim(dhl.house_lng) != ''
+group by 1,2,3
+) 
+, doormen as (
+select 
+    trim(dhl.house_lat) as house_lat,
+    trim(dhl.house_lng) as house_lng,
+    trim(dhl.house_number) as house_number,
     count(case when dud.sk_user_affiliate > '0' then 0 end) doormen,
     array_agg(distinct du.telefone_principal) as telephone,
     array_agg(distinct du.nome) as name,
     array_agg(distinct du.email) as email
 from datalake_clean.ods_fact_house_listing_flows fhlf
-join datalake_clean.ods_dim_house_listing  dhl on dhl.sk_house_listing = fhlf.sk_house_listing
-join datalake_clean.ods_dim_date dd on fhlf.sk_lead_date = dd.sk_date
-left join datalake_clean.ods_dim_user_doorman dud on dud.sk_user_affiliate = fhlf.sk_user_lead_affiliate
-left join datalake_clean.ods_dim_user du on du.sk_user = dud.sk_user_affiliate
-where try_cast(dd."date" as date) > current_date - interval '120' day and trim(dhl.house_lat) != '' and trim(dhl.house_lng) != ''
+join datalake_clean.ods_dim_house_listing dhl on dhl.sk_house_listing = fhlf.sk_house_listing
+join datalake_clean.ods_dim_user_doorman dud on dud.sk_user_affiliate = fhlf.sk_user_lead_affiliate
+join datalake_clean.ods_dim_user du on du.sk_user = dud.sk_user_affiliate
+where du.dadosafiliado_ativo = '1'
 group by 1,2,3
 )
 , base_interna as (
@@ -303,10 +312,10 @@ select
     a.key_location,
     l.converted_leads,
     l.leads,
-    l.doormen,
-    l.name,
-    l.telephone,
-    l.email
+    d.doormen,
+    d.name,
+    d.telephone,
+    d.email
 from leads as l 
 join amenities a on l.house_lat = a.house_lat 
                        and l.house_lng = a.house_lng 
@@ -314,6 +323,9 @@ join amenities a on l.house_lat = a.house_lat
 join ongoing o on l.house_lat = o.house_lat 
                        and l.house_lng = o.house_lng
                        and l.house_number = o.house_number
+left join doormen d on l.house_lat = d.house_lat
+                       and l.house_lng = d.house_lng
+                       and l.house_number = d.house_number                       
 )
 select
  	bec.lat as lat,
