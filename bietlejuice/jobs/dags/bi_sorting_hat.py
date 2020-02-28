@@ -2,7 +2,7 @@ from datetime import datetime
 
 from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
-from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
+# from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.sorting_hat import unit_tests
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.sorting_hat import SortingHat
@@ -128,12 +128,12 @@ screening_result_task = BaseDAG.build_python_operator(
 #     use_query_param=True
 # )
 
-proponent_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=unit_tests_sub_dag,
-    sub_dag_name='proponent_unit_tests',
-    entity='proponent'
-)
+# proponent_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
+#     dag=main_dag,
+#     sub_dag_func=unit_tests_sub_dag,
+#     sub_dag_name='proponent_unit_tests',
+#     entity='proponent'
+# )
 
 # proposal_version_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
 #     dag=main_dag,
@@ -143,22 +143,17 @@ proponent_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
 #     use_query_param=True
 # )
 
-external_score_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=unit_tests_sub_dag,
-    sub_dag_name='external_score_unit_tests',
-    entity='external_score',
-    use_query_param=True
-)
+# external_score_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
+#     dag=main_dag,
+#     sub_dag_func=unit_tests_sub_dag,
+#     sub_dag_name='external_score_unit_tests',
+#     entity='external_score',
+#     use_query_param=True
+# )
 
-screening_result_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=unit_tests_sub_dag,
-    sub_dag_name='screening_result_unit_tests',
-    entity='screening_result'
-)
-
-# flow
-proponent_task >> proponent_unit_tests_dag
-external_score_task >> external_score_unit_tests_dag
-screening_result_task >> screening_result_unit_tests_dag
+# screening_result_unit_tests_dag = BaseSubDag.get_sub_dag_operator(
+#     dag=main_dag,
+#     sub_dag_func=unit_tests_sub_dag,
+#     sub_dag_name='screening_result_unit_tests',
+#     entity='screening_result'
+# )
