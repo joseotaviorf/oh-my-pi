@@ -8,6 +8,8 @@ from bietlejuice.jobs.etl.zendesk.ticket_metrics import ZendeskTicketMetrics
 from bietlejuice.jobs.etl.zendesk.fact_tickets import ZendeskFactTickets
 from bietlejuice.jobs.etl.zendesk.dim_ticket import ZendeskDimTicket
 from bietlejuice.jobs.etl.zendesk.dim_zendesk_user import ZendeskDimUser
+from bietlejuice.jobs.etl.zendesk.fact_ticket_contact_types import ZendeskFactTicketContactTypes
+from bietlejuice.jobs.etl.zendesk.fact_ticket_tags import ZendeskFactTicketTags
 from bietlejuice.jobs.etl.zendesk.zendesk import Zendesk
 from bietlejuice.jobs.etl.zendesk.table_enum import ZendeskTableEnum
 from bietlejuice.jobs.etl.zendesk.factory import ZendeskFactory

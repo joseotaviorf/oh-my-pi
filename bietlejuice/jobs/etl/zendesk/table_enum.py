@@ -12,3 +12,5 @@ class ZendeskTableEnum(Enum):
     FACT_TICKETS = 'fact_tickets'
     DIM_TICKET = 'dim_ticket'
     DIM_ZENDESK_USER = 'dim_zendesk_user'
+    FACT_TICKET_TAGS = 'fact_ticket_tags'
+    FACT_TICKET_CONTACT_TYPES = 'fact_ticket_contact_types'
