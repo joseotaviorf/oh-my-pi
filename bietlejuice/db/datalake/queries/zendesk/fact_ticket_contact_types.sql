@@ -4,7 +4,7 @@ with filtered_custom_fields AS (
     field,
     replace(regexp_extract(field, '^.*='), '=', '') as id_field,
     replace(replace(replace(replace(regexp_extract(field, '\=(.*)'), '=', ''), '[', ''), ']', ''), '"', '') as contact_type_tag
-  FROM zendesk_custom_fields zcf
+  FROM datalake_clean.zendesk_custom_fields zcf
   CROSS JOIN UNNEST(
       split(zcf.custom_fields, ',')
   ) AS f(field)
