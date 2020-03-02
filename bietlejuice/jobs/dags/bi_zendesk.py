@@ -221,20 +221,6 @@ dim_zendesk_user_sub_dag = BaseSubDag.get_sub_dag_operator(
     class_=ZendeskTableEnum.DIM_ZENDESK_USER
 )
 
-fact_ticket_tags = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_name='fact_ticket_tags',
-    sub_dag_func=sub_dag_dw,
-    class_=ZendeskTableEnum.FACT_TICKET_TAGS
-)
-
-fact_ticket_contact_types = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_name='fact_ticket_contact_types',
-    sub_dag_func=sub_dag_dw,
-    class_=ZendeskTableEnum.FACT_TICKET_CONTACT_TYPES
-)
-
 zendesk_custom_fields_sub_dag.set_upstream([tickets_sub_dag, ticket_fields_sub_dag])
 dim_ticket_sub_dag.set_upstream([tickets_sub_dag, groups_sub_dag, ticket_fields_sub_dag])
 fact_tickets_sub_dag.set_upstream([tickets_sub_dag, ticket_metrics_sub_dag, ticket_fields_sub_dag])
