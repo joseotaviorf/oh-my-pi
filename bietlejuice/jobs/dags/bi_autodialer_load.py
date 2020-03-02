@@ -46,7 +46,8 @@ def autodialer_sub_dag(sub_dag_name, document_type_enum):
         python_callable=execute_method,
         op_kwargs={'document_type_enum': document_type_enum,
                    'method': 'move_data_to_raw'},
-        execution_timeout=timedelta(hours=6)
+        execution_timeout=timedelta(hours=6),
+        retries=3
     )
 
     clean_task = BaseDAG.build_python_operator(
@@ -55,7 +56,8 @@ def autodialer_sub_dag(sub_dag_name, document_type_enum):
         python_callable=execute_method,
         op_kwargs={'document_type_enum': document_type_enum,
                    'method': 'move_data_to_clean'},
-        execution_timeout=timedelta(hours=6)
+        execution_timeout=timedelta(hours=6),
+        retries=3
     )
 
     raw_task >> clean_task
@@ -77,7 +79,8 @@ task_references = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=autodialer_sub_dag,
     sub_dag_name=AutodialerEnum.TASK_REFERENCES.value,
-    document_type_enum=AutodialerEnum.TASK_REFERENCES
+    document_type_enum=AutodialerEnum.TASK_REFERENCES,
+    retries=3
 )
 
 task_reference_inbound_events = BaseSubDag.get_sub_dag_operator(
@@ -85,7 +88,8 @@ task_reference_inbound_events = BaseSubDag.get_sub_dag_operator(
     sub_dag_func=autodialer_sub_dag,
     sub_dag_name=AutodialerEnum.TASK_REFERENCE_INBOUND_EVENTS.value,
     document_type_enum=AutodialerEnum.TASK_REFERENCE_INBOUND_EVENTS,
-    execution_timeout=timedelta(hours=6)
+    execution_timeout=timedelta(hours=6),
+    retries=3
 )
 
 task_reference_outbound_events = BaseSubDag.get_sub_dag_operator(
@@ -93,5 +97,6 @@ task_reference_outbound_events = BaseSubDag.get_sub_dag_operator(
     sub_dag_func=autodialer_sub_dag,
     sub_dag_name=AutodialerEnum.TASK_REFERENCE_OUTBOUND_EVENTS.value,
     document_type_enum=AutodialerEnum.TASK_REFERENCE_OUTBOUND_EVENTS,
-    execution_timeout=timedelta(hours=6)
+    execution_timeout=timedelta(hours=6),
+    retries=3
 )
