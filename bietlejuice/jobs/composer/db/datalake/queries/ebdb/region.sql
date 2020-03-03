@@ -7,7 +7,8 @@ SELECT
     mr.id AS id_macro,
     mr.nome AS macro_name,
     c.id AS id_city,
-    c.nome AS city_name
+    c.nome AS city_name,
+    r.regiaoPai_id as id_parent_region
 FROM
     datalake_ebdb_raw.regiao r
     LEFT JOIN datalake_ebdb_raw.regiao mr ON
