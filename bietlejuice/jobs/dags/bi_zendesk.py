@@ -224,6 +224,6 @@ dim_zendesk_user_sub_dag = BaseSubDag.get_sub_dag_operator(
 zendesk_custom_fields_sub_dag.set_upstream([tickets_sub_dag, ticket_fields_sub_dag])
 dim_ticket_sub_dag.set_upstream([tickets_sub_dag, groups_sub_dag, ticket_fields_sub_dag])
 fact_tickets_sub_dag.set_upstream([tickets_sub_dag, ticket_metrics_sub_dag, ticket_fields_sub_dag])
-fact_ticket_tags_sub_dag.set_upstream(zendesk_custom_fields_sub_dag)
-fact_ticket_contact_types_sub_dag.set_upstream(zendesk_custom_fields_sub_dag)
+fact_ticket_tags_sub_dag.set_upstream([tickets_sub_dag])
+fact_ticket_contact_types_sub_dag.set_upstream([zendesk_custom_fields_sub_dag])
 dim_zendesk_user_sub_dag.set_upstream([users_sub_dag])
