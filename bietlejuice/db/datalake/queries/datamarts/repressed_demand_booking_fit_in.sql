@@ -62,7 +62,7 @@ date_series as (
   from
     datalake_clean.ods_dim_date dd
   where
-    date(week_start) between date_trunc('week',current_date - interval '2' month) and current_date
+	date(date) >= date('2019-01-01') and date(week_start) <= current_date - interval '1' day
     and date != ''
 ),
 regions as (
