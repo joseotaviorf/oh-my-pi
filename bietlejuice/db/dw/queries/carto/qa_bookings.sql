@@ -19,4 +19,4 @@ from fact_listing_rent_flows rf
 		on rf.sk_house_listing = hl.sk_house_listing
 	join dim_date dd
 		on dd.sk_date = rf.sk_visit_date
-		and dd.date > '2019-05-01'
+		and dd.date >= current_date - interval '180 day'
