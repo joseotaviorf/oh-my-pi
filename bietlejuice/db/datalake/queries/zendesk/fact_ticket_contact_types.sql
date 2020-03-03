@@ -27,7 +27,10 @@ SELECT
   distinct fcf.id_ticket as sk_ticket,
   fcf.contact_type_tag,
   case when cp.has_valid_prefix = 1 then upper(split_part(fcf.contact_type_tag,'_', 1)) else 'OTHER' end as client_taxonomy,
-  case when cp.has_valid_prefix = 1 then upper(split_part(fcf.contact_type_tag,'_', 2)) else 'OTHER' end as category_taxonomy,
+  case
+    when (cp.has_valid_prefix = 1 and length(split_part(fcf.contact_type_tag,'_', 2)) <= 2) then upper(split_part(fcf.contact_type_tag,'_', 2)) 
+    else 'OTHER' 
+  end as category_taxonomy,
   fcf.ts_updated,
   now() as ts_load
 FROM filtered_custom_fields fcf
