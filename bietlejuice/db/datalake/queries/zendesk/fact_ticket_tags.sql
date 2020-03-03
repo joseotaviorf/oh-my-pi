@@ -1,7 +1,7 @@
 with tickets_filter as (
 	select distinct * from datalake_clean.zendesk_tickets t
 	where (t.ticket_via<>'api' or (t.ticket_via='api' and t.tags not like '%hsm%'))
-  and dt_extracted = '{execution_date}'
+  and dt_extracted = '{extraction_date}'
 )
 SELECT
   distinct tf.id_ticket as sk_ticket,

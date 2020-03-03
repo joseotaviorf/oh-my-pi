@@ -15,7 +15,7 @@ from bietlejuice.jobs.composer.loaders import S3Loader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_ebdb_into_datalake"
-TABLE_BLOCK_LIST = ["REVCHANGES"]
+TABLE_BLOCK_LIST = ["REVCHANGES", "_UsuarioRevisionEntity_new"]
 VIEW_ALLOW_LIST = ["MapRegiao"]
 
 # todo: check this value and argument the choice
@@ -27,6 +27,19 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 Relation = collections.namedtuple("Relation", ["name", "size"])
+
+
+@logger
+def validate_table(t):
+    if (
+        t.table_name
+        and t.size
+        and t.table_name not in TABLE_BLOCK_LIST
+        and "tmp_" not in t.table_name
+    ):
+        logger.info("m=Table {} is valid and can be loaded!".format(t.table_name))
+        return True
+    return False
 
 
 @logger
@@ -70,9 +83,7 @@ if __name__ == "__main__":
 
     tables = mysql_consumer.get_table_names_and_sizes().collect()
     rels = [
-        Relation(name=t.table_name, size=t.size)
-        for t in tables
-        if t.table_name not in TABLE_BLOCK_LIST and t.table_name and t.size
+        Relation(name=t.table_name, size=t.size) for t in tables if validate_table(t)
     ]
 
     rels.extend([Relation(name=view_name, size=1) for view_name in VIEW_ALLOW_LIST])
