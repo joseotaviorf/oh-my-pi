@@ -535,6 +535,13 @@ fact_lead_task_contact_flows_task = BaseDAG.build_python_operator(
     },
 )
 
+dw_fact_listing_sale_flows = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id="DW_fact_listing_sale_flows",
+    python_callable=load_dim_from_ods_to_dw,
+    op_kwargs={"dim_name": "listing_sale_flows", "is_fact": True, "bucket": bucket, "schema_dest": "sale"},
+)
+
 # flow
 lead_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag, sub_dag_func=lead_sub_dag, sub_dag_name="Lead"
@@ -719,6 +726,15 @@ dw_fact_giraffe_house_listing_flows.set_upstream(
         house_dag,
         condo_dag,
         ods_house_listing_flows,
+    ]
+)
+
+dw_fact_listing_sale_flows.set_upstream(
+    [
+        ods_house_rent_flow,
+        booking_dag,
+        reservation_dag,
+        house_dag,
     ]
 )
 
