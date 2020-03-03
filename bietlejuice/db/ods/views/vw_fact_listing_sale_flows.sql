@@ -1,4 +1,6 @@
-with _reservation as ( 
+drop view if exists vw_fact_listing_sale_flows;
+create or replace view vw_fact_listing_sale_flows as
+with _reservation as (
 	with max_ids as (
 		select
 			house_id,
@@ -135,6 +137,7 @@ select
 	sk_user_agent,
 	sk_client,
 	sk_visit,
+	sk_agent_review_rating_date,
 	flg_visit_completed,
 	flg_visit_performed,
 	flg_visit_created_from_app,
@@ -143,7 +146,6 @@ select
 	days_booking_created_to_visit,
 	days_user_created_to_visit,
 	days_house_listing_to_visit,
-	sk_agent_review_rating_date,
 	funnel_step,
 	case
 		when funnel_step = 'visit_completed' then cancellation_reason
