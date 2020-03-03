@@ -539,7 +539,13 @@ dw_fact_listing_sale_flows = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id="DW_fact_listing_sale_flows",
     python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={"dim_name": "listing_sale_flows", "is_fact": True, "bucket": bucket, "schema_dest": "sale"},
+    op_kwargs={
+        "dim_name": "listing_sale_flows",
+        "is_fact": True,
+        "bucket": bucket,
+        "schema_dest": "sale",
+        "insert_dummy": False,
+    },
 )
 
 # flow
