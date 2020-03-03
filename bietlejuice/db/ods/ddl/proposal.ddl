@@ -28,6 +28,7 @@ create table if not exists proposal (
   credit_analysis_last_init_date timestamp,
   credit_analysis_first_end_date timestamp,
   credit_analysis_last_end_date timestamp,
+  credit_approved_last_date timestamp,
   tenant_first_doc_complete_date timestamp,
   tenant_last_doc_complete_date timestamp,
   doc_reused integer,

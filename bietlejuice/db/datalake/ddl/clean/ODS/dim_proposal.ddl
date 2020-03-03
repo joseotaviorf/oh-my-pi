@@ -27,6 +27,7 @@ create external table if not exists datalake_clean.ods_dim_proposal (
   dt_credit_analysis_first_end string,
   dt_credit_analysis_last_end string,
   dt_credit_analysis_end string,
+  dt_credit_last_approved string,
   dt_tenant_first_doc_complete string,
   dt_tenant_last_doc_complete string,
   dt_tenant_doc_complete string,

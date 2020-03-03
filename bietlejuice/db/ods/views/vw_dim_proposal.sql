@@ -116,6 +116,7 @@ select
     else
       p.credit_analysis_last_end_date
   end as dt_credit_analysis_end,
+  p.credit_approved_last_date as dt_credit_last_approved,
   p.tenant_first_doc_complete_date as dt_tenant_first_doc_complete,
   p.tenant_last_doc_complete_date as dt_tenant_last_doc_complete,
   p.tenant_last_doc_complete_date as dt_tenant_doc_complete,

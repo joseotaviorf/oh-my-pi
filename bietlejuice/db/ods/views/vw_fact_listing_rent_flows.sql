@@ -100,16 +100,8 @@ _fact as (
         coalesce(to_char(vdp.dt_credit_analysis_last_end, 'YYYYMMDD')::integer, -1)  as sk_credit_analysis_last_end_date,
         coalesce(to_char(vdp.dt_credit_analysis_end, 'YYYYMMDD')::integer, -1) as sk_credit_analysis_end_date,
         vdp.dt_credit_analysis_end,
-        case
-            when vdp.status_sortinghat = 'APPROVED' or vdp.status_doc_tenant = 'Aprovado'
-                then coalesce(to_char(vdp.dt_credit_analysis_end, 'YYYYMMDD')::integer, -1)
-            else -1
-        end as sk_credit_analysis_approved_date,
-        case
-            when vdp.status_sortinghat = 'APPROVED' or vdp.status_doc_tenant = 'Aprovado'
-                then vdp.dt_credit_analysis_end
-            else null::timestamp
-        end as dt_credit_analysis_approved,
+        coalesce(to_char(vdp.dt_credit_last_approved, 'YYYYMMDD')::integer, -1) as sk_credit_analysis_approved_date,
+        vdp.dt_credit_last_approved as dt_credit_analysis_approved,
         coalesce(to_char(vdp.dt_tenant_first_doc_complete, 'YYYYMMDD')::integer, -1) as sk_tenant_first_doc_complete_date,
         coalesce(to_char(vdp.dt_tenant_last_doc_complete, 'YYYYMMDD')::integer, -1) as sk_tenant_last_doc_complete_date,
         coalesce(to_char(vdp.dt_tenant_doc_complete, 'YYYYMMDD')::integer, -1) as sk_tenant_doc_complete_date,

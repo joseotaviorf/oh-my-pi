@@ -27,6 +27,7 @@ create table if not exists staging.dim_proposal (
   dt_credit_analysis_first_end timestamp,
   dt_credit_analysis_last_end timestamp,
   dt_credit_analysis_end timestamp,
+  dt_credit_last_approved timestamp,
   dt_tenant_first_doc_complete timestamp,
   dt_tenant_last_doc_complete timestamp,
   dt_tenant_doc_complete timestamp,

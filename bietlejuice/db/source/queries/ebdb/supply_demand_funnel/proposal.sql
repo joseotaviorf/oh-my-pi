@@ -27,6 +27,7 @@ select
   aud_analysis.credit_analysis_last_init_date,
   aud_analysis.credit_analysis_first_end_date,
   aud_analysis.credit_analysis_last_end_date,
+  aud_analysis.credit_approved_last_date,
   aud_analysis.tenant_first_doc_complete_date,
   aud_analysis.tenant_last_doc_complete_date,
   coalesce(aud_analysis.doc_reused, 0) as doc_reused,
@@ -67,9 +68,12 @@ left join (
     max(
       if(p_aud.statusDocumentacaoInq = 'AnaliseCredito', from_unixtime(ure.`timestamp` / 1000), null)
     ) as tenant_last_doc_complete_date,
-		if(date_format(min(from_unixtime(ure.`timestamp` / 1000)), '%Y-%m-%d %H') != date_format(min(p_aud.dataDocumentosEnviados), '%Y-%m-%d %H'),
-		     max(ure.motivo is null or ure.motivo like '[AUTO] used previous tenant%'), 0) as doc_reused,
-	  min(from_unixtime(ure.`timestamp` / 1000)) as added_rev_doc_row
+    if(date_format(min(from_unixtime(ure.`timestamp` / 1000)), '%Y-%m-%d %H') != date_format(min(p_aud.dataDocumentosEnviados), '%Y-%m-%d %H'),
+         max(ure.motivo is null or ure.motivo like '[AUTO] used previous tenant%'), 0) as doc_reused,
+	min(from_unixtime(ure.`timestamp` / 1000)) as added_rev_doc_row,
+	max(
+      if(p_aud.statusDocumentacaoInq = 'Aprovado', from_unixtime(ure.`timestamp` / 1000), null)
+    ) as credit_approved_last_date
 	from Proposta_AUD p_aud
 	join UsuarioRevisionEntity ure
 		on p_aud.REV = ure.id
