@@ -139,6 +139,6 @@ SELECT
     predictedPrice AS predicted_price,
     salePrice AS sale_price,
     forRent AS is_for_rent,
-    forSale AS if_for_sale
+    forSale AS is_for_sale
 FROM
     datalake_ebdb_raw.`imovel_aud`
