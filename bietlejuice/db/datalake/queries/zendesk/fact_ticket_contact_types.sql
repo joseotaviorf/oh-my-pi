@@ -14,6 +14,7 @@ with filtered_custom_fields AS (
 check_prefix as (
   SELECT
     id_ticket,
+    contact_type_tag,
     case
         when
           upper(split_part(contact_type_tag,'_',1)) in ('IQ', 'PP', 'CR', 'FT', 'VT', 'CD', 'AF', 'PO', 'PS')
@@ -30,5 +31,5 @@ SELECT
   fcf.ts_updated,
   now() as ts_load
 FROM filtered_custom_fields fcf
-JOIN check_prefix cp on fcf.id_ticket = cp.id_ticket
+JOIN check_prefix cp on fcf.contact_type_tag = cp.contact_type_tag AND fcf.id_ticket = cp.id_ticket
 WHERE id_field IS NOT NULL
