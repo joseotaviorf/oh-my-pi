@@ -15,7 +15,7 @@ class CartoApi(object):
         self.CARTO_CREDENTIALS = credentials_json
         self.CARTO_API_KEY = self.CARTO_CREDENTIALS['api_key']
         self.BASE_URL = self.CARTO_CREDENTIALS['base_url']
-        self.ASYNC_CALLS_WAIT_TIME = 3
+        self.ASYNC_CALLS_WAIT_TIME = 5
         self.RUN_SQL_STATUSES = {'success': ['done'],
                                  'failed': ['failed', 'canceled', 'unknown'],
                                  'running': ['pending', 'running', 'not started']}
@@ -46,12 +46,15 @@ class CartoApi(object):
         data = json.dumps({'query': sql})
         post_response = requests.post(url, headers={'Content-Type': 'application/json'}, data=data)
         post_response_json = json.loads(post_response.content)
+        if 'job_id' not in post_response_json:
+            raise ValueError(('m=run_sql, msg=error running SQL on CARTO, API returned an error, sql={}, e={}'.format(sql, post_response_json)))
         status_url = '{}/{}?api_key={}'.format(self.BASE_URL + 'v2/sql/job', post_response_json['job_id'], self.CARTO_API_KEY)
         response_status = 'not started'
         while response_status in self.RUN_SQL_STATUSES['running']:
             response = requests.get(status_url)
             status_response_json = json.loads(response.content)
             response_status = status_response_json['status']
+            logger.info('m=run_sql, msg=CARTO API still running, response_state={}'.format(response_status))
             if response_status in self.RUN_SQL_STATUSES['running']:
                 time.sleep(self.ASYNC_CALLS_WAIT_TIME)
         logger.info('m=run_sql, msg=CARTO API responded, response={}'.format(response.content))
@@ -95,12 +98,15 @@ class CartoApi(object):
         file = open(gzip_file_path, 'rb')
         response = requests.post(url, files={'file': file})
         post_response_json = json.loads(response.content)
+        if post_response_json['success'] is not True:
+            raise ValueError('m=import_file, msg=error importing file to CARTO, file={}, e={}'.format(file_path, post_response_json))
         status_url = '{}{}?api_key={}'.format(self.BASE_URL + 'v1/imports/', post_response_json['item_queue_id'], self.CARTO_API_KEY)
         response_state = 'not started'
-        while response_state in self.RUN_SQL_STATUSES['running']:
+        while response_state in self.IMPORT_FILE_STATUSES['running']:
             response = requests.get(status_url)
             status_response_json = json.loads(response.content)
             response_state = status_response_json['state']
+            logger.info('m=import_file, msg=CARTO API still running, response_state={}'.format(response_state))
             if response_state in self.IMPORT_FILE_STATUSES['running']:
                 time.sleep(self.ASYNC_CALLS_WAIT_TIME)
         if response_state not in self.IMPORT_FILE_STATUSES['success']:
