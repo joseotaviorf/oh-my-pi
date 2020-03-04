@@ -109,5 +109,5 @@ for task in tasks:
         python_callable=load_data_and_upload_to_carto,
         op_kwargs=task,
         provide_context=True,
-        execution_timeout=timedelta(minutes=5)
+        execution_timeout=timedelta(hours=1)
     )
