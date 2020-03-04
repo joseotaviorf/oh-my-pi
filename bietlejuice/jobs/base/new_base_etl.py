@@ -97,6 +97,7 @@ def load_dim_from_ods_to_dw(dim_name, bucket, insert_dummy=True, is_fact=False, 
                             schema_source='public', schema_dest='public'):
     table_name = ('vw_fact_{}' if is_fact else 'vw_dim_{}').format(dim_name)
     table_name_dest = ('fact_{}' if is_fact else 'dim_{}').format(dim_name)
+    path_with_schema = (dim_name if schema_source == 'public' else '{}_{}'.format(schema_source, dim_name))
 
     if pre_command is not None:
         BaseETL.execute_command(
@@ -110,7 +111,7 @@ def load_dim_from_ods_to_dw(dim_name, bucket, insert_dummy=True, is_fact=False, 
         enum_db_source=EnumDB.BI_ODS,
         enum_db_dest=EnumDB.BI_DW,
         append=False,
-        bucket_name='{}/clean/ods/{}'.format(bucket, dim_name),
+        bucket_name='{}/clean/ods/{}'.format(bucket, path_with_schema),
         process_name=dim_name
     )
     if insert_dummy:

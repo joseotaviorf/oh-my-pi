@@ -501,15 +501,17 @@ dw_fact_house_listing_flows = BaseDAG.build_python_operator(
     },
 )
 
-dw_fact_giraffe_house_listing_flows = BaseDAG.build_python_operator(
+dw_sale_fact_listing_flows = BaseDAG.build_python_operator(
     dag=main_dag,
-    task_id="DW_Fact_Giraffe_House_Listing_Flows",
+    task_id="DW_Sale_Fact_Listing_Flows",
     python_callable=load_dim_from_ods_to_dw,
     op_kwargs={
-        "dim_name": "giraffe_house_listing_flows",
+        "dim_name": "listing_flows",
         "is_fact": True,
         "bucket": bucket,
         "insert_dummy": False,
+        "schema_source": "sale",
+        "schema_dest": "sale",
     },
 )
 
@@ -723,7 +725,7 @@ dw_fact_house_listing_flows.set_upstream(
     ]
 )
 
-dw_fact_giraffe_house_listing_flows.set_upstream(
+dw_sale_fact_listing_flows.set_upstream(
     [
         lead_dag,
         photo_job_dag,

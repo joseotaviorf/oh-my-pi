@@ -1,6 +1,6 @@
-drop table public.fact_giraffe_house_listing_flows;
+drop table sale.fact_listing_flows;
 
-create table public.fact_giraffe_house_listing_flows (
+create table sale.fact_listing_flows (
 	sk_house_listing_flow bigint NOT NULL,
 	sk_condo bigint,
 	sk_lead integer,

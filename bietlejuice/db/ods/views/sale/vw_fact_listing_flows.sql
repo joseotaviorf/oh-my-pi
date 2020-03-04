@@ -1,5 +1,5 @@
-drop view if exists vw_fact_giraffe_house_listing_flows;
-create or replace view vw_fact_giraffe_house_listing_flows as
+drop view if exists sale.vw_fact_listing_flows;
+create or replace view sale.vw_fact_listing_flows as
 with legacy_doorman as (
   select 
     porteiros_legado."Status" as status,
@@ -43,11 +43,11 @@ base_photo_tasks as (
     max((task_type = 'AgendarJobDeFotografo')::integer)::boolean as has_job_photo,
     max((task_type = 'FupFoto')::integer)::boolean as has_fup_photo
   from crm.photo_tasks pt
-  left join photo_job pj 
+  left join public.photo_job pj
     on pt.origin_id = pj.id
-  left join house h
+  left join public.house h
     on h.id = pj.imovel_id
-  left join house h_direct
+  left join public.house h_direct
     on h_direct.id = pt.origin_id
   where coalesce(h.id, h_direct.id) is not null
   group by 1
@@ -66,7 +66,7 @@ base_leads as (
         then ( select rl.id_origin_lead from reprocessed_lead rl where rl.id = lead.id)
       else NULL::bigint
     end as old_lead_id
-  from lead
+  from public.lead
 ), 
 rep_leads as (
   select bl.lead_id,
@@ -90,7 +90,7 @@ fact_with_reproc as (
       l.usuario_que_indicou_id,
       l.affiliate_type
     from reprocessed_lead rl
-    join lead l 
+    join public.lead l
       on l.id = rl.id_origin_lead
   ),
   lbc as (
@@ -156,20 +156,20 @@ fact_with_reproc as (
             coalesce(rl.affiliate_type, l.affiliate_type) = 'B2BPartner'
             or coalesce(b2b_prime.id_lead, b2b_prime_draft.id_lead) is not null
             , false) as is_b2b
-    from fact_house_listing_flows fhlf
-    left join lead l
+    from public.fact_house_listing_flows fhlf
+    left join public.lead l
       on l.id = fhlf.lead_id
     left join reproc_leads rl
       on rl.id = fhlf.lead_id
-    left join house h
+    left join public.house h
       on h.id = fhlf.imovel_id
     left join (
 	  select
 	    lc.id_lead
-	  from lead_conversion lc
-	  join house h
+	  from public.lead_conversion lc
+	  join public.house h
 		on lc.id_house = h.id
-	  join partner_agent pa
+	  join public.partner_agent pa
 		on h.usuario_id = pa.user_id
 	  group by 1
     ) b2b_prime
@@ -177,21 +177,21 @@ fact_with_reproc as (
     left join (
 	  select
 	    l.id as id_lead
-	  from lead l
-	  join usuario u_b2b
+	  from public.lead l
+	  join public.usuario u_b2b
 		on u_b2b.telefone_principal = l.telefone_anunciante
-	  join partner_agent pa_b2b
+	  join public.partner_agent pa_b2b
 		on pa_b2b.user_id = u_b2b.id
 	  where l.origem = 'OwnerPWA'
 	  group by 1
     ) b2b_prime_draft
       on b2b_prime_draft.id_lead = l.id
-	left join house_listing hl
+	left join public.house_listing hl
       on hl.id_house = fhlf.imovel_id
         and hl.version = 0
     left join lbc
       on lbc.id_house = h.id
-    left join lead_sales_company lsc
+    left join public.lead_sales_company lsc
       on lsc.id_lead = l.id
     where
       lbc.is_for_sale
@@ -277,8 +277,8 @@ leads_b2b as (
   select distinct
     l.id as id_lead,
     pa_b2b_online.partner_id as online_partner_id
-  from lead l
-  left join partner_agent pa_b2b_online 
+  from public.lead l
+  left join public.partner_agent pa_b2b_online
     on pa_b2b_online.user_id = l.usuario_que_indicou_id
   where pa_b2b_online.partner_id is not null
 ), 
@@ -287,13 +287,13 @@ lead_city_region as (
     select 
       region.id as id_region,
       regexp_replace(remove_accentuation(lower(region.nome)), '[^a-z]+', '', 'g') as formatted_city
-    from region
+    from public.region
     where region.nivel = 'Cidade'
   )
   select 
     l.id,
     r.id_region
-  from lead l
+  from public.lead l
   join city_region r 
     on r.formatted_city = regexp_replace(remove_accentuation(lower(l.cidade)), '[^a-z]+', '', 'g')
 ), 
@@ -404,9 +404,9 @@ potential_listings as (
     on f.imovel_id = bpt.house_id
   left join rep_leads bl 
     on bl.lead_id = f.lead_id
-  left join house h 
+  left join public.house h
     on f.imovel_id = h.id
-  left join usuario us_cad 
+  left join public.usuario us_cad
     on us_cad.id = h.usuario_que_cadastrou_id 
       and us_cad.email ~~ '%@hargos.com.br'
   left join staging.dim_region dr 
@@ -415,15 +415,15 @@ potential_listings as (
     on coalesce(f.region_id, '-1'::integer) = '-1'::integer and f.lead_id = lcr.id
   left join leads_b2b l_b2b 
     on l_b2b.id_lead = f.lead_id
-  left join partner_agent pa_b2b_prime 
+  left join public.partner_agent pa_b2b_prime
     on h.usuario_id = pa_b2b_prime.user_id
-  left join usuario u
+  left join public.usuario u
 	on coalesce(f.affiliate_id, f.origin_lead_usuario_que_indicou_id::integer, '-1'::integer) = u.id
-  left join user_doorman us_d
+  left join public.user_doorman us_d
     on us_d.id_dados_afiliado = u.dados_afiliado_id
-  left join user_affiliate ua
+  left join public.user_affiliate ua
     on ua.id = u.dados_afiliado_id
-  left join house_listing hl_version_zero
+  left join public.house_listing hl_version_zero
   	on hl_version_zero.id_house = f.imovel_id
   	  and hl_version_zero.version = 0
 ), 
