@@ -1,5 +1,5 @@
-drop table if exists datalake_clean.ods_fact_listing_sale_flows;
-create external table datalake_clean.ods_fact_listing_sale_flows (
+drop table if exists datalake_clean.ods_sale_fact_listing_sale_flows;
+create external table datalake_clean.ods_sale_fact_listing_sale_flows (
   ods_id string,
   sk_house_listing string,
   sk_house_first_listing_date string,
@@ -32,7 +32,7 @@ with serdeproperties (
   'separatorChar' = ',',
   'quoteChar' = '\"'
 )
-location 's3://5a-datalake/clean/ods/listing_sale_flows'
+location 's3://5a-datalake/clean/ods/sale_listing_sale_flows'
 tblproperties (
   'skip.header.line.count' = '1'
 );

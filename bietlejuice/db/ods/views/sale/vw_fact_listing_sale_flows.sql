@@ -1,5 +1,5 @@
-drop view if exists vw_fact_listing_sale_flows;
-create or replace view vw_fact_listing_sale_flows as
+drop view if exists sale.vw_fact_listing_sale_flows;
+create or replace view sale.vw_fact_listing_sale_flows as
 with _reservation as (
 	with max_ids as (
 		select
@@ -8,7 +8,7 @@ with _reservation as (
 			max(id) as id,
 			count(1) as reservation_attempts
 		from
-			reservation
+			public.reservation
 		group by
 			1, 2
 	)
@@ -19,7 +19,7 @@ with _reservation as (
 		r1.tenant_id as id_tenant,
 		mi.reservation_attempts as reservation_attempts
 	from
-		reservation r1
+		public.reservation r1
 	join max_ids mi on
 		r1.id = mi.id 
 ),
@@ -67,20 +67,20 @@ _fact as (
 		end as cancellation_reason,
 		now()::timestamp as ts_load
 	from
-		house_rent_flow hrf
-	join vw_dim_house_listing vdh on
+		public.house_rent_flow hrf
+	join public.vw_dim_house_listing vdh on
 		vdh.id_house = hrf.id_house
 		and coalesce(hrf.dt_rent_flow_created, '1900-01-01') between coalesce(vdh.ts_listing_version_start, '1900-01-01') and coalesce(vdh.ts_listing_version_end, now())
 		and vdh.is_for_sale::int::boolean
-	join house h on
+	join public.house h on
 		h.id = hrf.id_house
-	left join agent_review ar on
+	left join public.agent_review ar on
 		hrf.id_booking = ar.id_booking
 	left join _reservation rs on
 		hrf.id_house = rs.id_house
 		and hrf.id_client = id_tenant
 		and rs.created_at between coalesce(vdh.ts_listing_version_start, '1900-01-01') and coalesce(vdh.ts_listing_version_end, now())
-	left join booking b on
+	left join public.booking b on
 		b.id = hrf.id_booking
 	where
 		b.visit_intent = 'SALE'
