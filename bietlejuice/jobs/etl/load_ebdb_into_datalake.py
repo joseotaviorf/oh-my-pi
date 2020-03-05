@@ -123,7 +123,7 @@ class EBDBDatalake(object):
 
         for table_info in table_infos:
             df = self.athena_client.execute_query_and_return_dataframe(
-                'select * from datalake_raw.ebdb_{}'.format(table_info['original_name']))
+                'select * from datalake_ebdb_clean_prod.{}'.format(table_info['original_name']))
 
             self.athena_client.create_parquet_from_df(
                 key='clean/ebdb/{0}/{0}.parq'.format(table_info['new_name']),

@@ -18,25 +18,25 @@ def import_ebdb_proposta(client):
     # query made with akira and translated into presto
     sql_proposta_ebdb = '''
     select
-        a.id as proposal_id,
-      p.imovel_id,
+      a.id_proposal as proposal_id,
+      p.id_house,
 
       -- dates
-        p.dataaprovacao as date_approval_5a,
-        p.dataproposta as date_agreement, -- date the agreement is reached.
+        p.ts_approved as date_approval_5a,
+        p.ts_proposal as date_agreement, -- date the agreement is reached.
         -- (continued) the offer is accepted. documentation is not yet sent. exactly the same as criadoem in proposta
-      -- p.dataparamudanca as date_mudanca, -- is always null. ignore
-        from_unixtime(cast(r.timestamp as bigint)/1000) as date_start_of_analysis,
+      -- p.ts_to_scheduling as date_mudanca, -- is always null. ignore
+        from_unixtime(cast(r.ts_revision as bigint)/1000) as date_start_of_analysis,
 
-        p.statusDocumentacaoInq,
-        (from_unixtime(cast(r.timestamp as bigint)/1000) - interval '2' hour) >= date('2018-02-01') as screened_by_5a
+        p.tenant_documentation_status,
+        (from_unixtime(cast(r.ts_revision as bigint)/1000) - interval '2' hour) >= date('2018-02-01') as screened_by_5a
 
-    from datalake_raw.ebdb_proposta p
-    join datalake_raw.ebdb_proposta_AUD a on a.id = p.id -- inner join by default
-    join datalake_raw.ebdb_usuariorevisionentity r on a.REV = r.id
+    from datalake_ebdb_clean_prod.proposal p
+    join datalake_ebdb_clean_prod.proposal_aud a on a.id_proposal = p.id -- inner join by default
+    join datalake_ebdb_clean_prod.user_revision_entity r on a.rev = r.id
     where
-        a.statusDocumentacaoInq_MOD = '1' and
-        a.statusDocumentacaoInq = 'AnaliseCredito'
+        a.mod_tenant_documentation_status = '1' and
+        a.tenant_documentation_status = 'AnaliseCredito'
     '''
 
     df_proposta_ebdb = client.execute_query_and_return_dataframe(sql_proposta_ebdb)
@@ -219,31 +219,31 @@ def import_ebdb_contrato_aud(client):
     # query made with akira and translated into presto
     sql_contrato_ebdb = '''
     select
-      (from_unixtime(cast(r.timestamp as bigint)/1000) - interval '2' hour) as date_change,
-      ca.id as contract_id,
-      c.proposta_id as proposal_id,
-      ca.imovel_id,
+      (from_unixtime(cast(r.ts_revision as bigint)/1000) - interval '2' hour) as date_change,
+      ca.id_contract as contract_id,
+      c.id_offer as proposal_id,
+      ca.id_house,
       ca.status,
-      c.criadoem as date_creation, -- creation of the line in the table
-      ca.dataassinado as date_signature, -- signature of the contract
-      ca.datainicio as date_beginning, -- date the tenant can move in and we start to charge
-      ca.datafimcontratoprevisto as date_fim_previsto, -- normal date of end of contract.
+      c.ts_created as date_creation, -- creation of the line in the table
+      ca.ts_signed as date_signature, -- signature of the contract
+      ca.dt_started as date_beginning, -- date the tenant can move in and we start to charge
+      ca.ts_contract_expected_end as date_fim_previsto, -- normal date of end of contract.
       -- (continued) always signature + 30m unless 2nd signature
-      ca.datarescisaoprevista as date_rescisao_prevista, -- date in the future at which the contract will be stopped
-      ca.datarescisao as date_rescisao, -- end of the contract that has already ended
-      ca.diamescobranca,
-      ca.garantia,
-      ca.valoraluguel,
-      c.cidade,
-      ca.contractversion_id
-    from datalake_raw.ebdb_contrato_aud ca
-    join datalake_raw.ebdb_usuariorevisionentity r on ca.REV = r.id
-    join datalake_raw.ebdb_contrato c on c.id=ca.id
-    -- where ca.garantia='SeguroFairfax' -- to determine this field they look if the beginning of the
+      ca.ts_expected_termination as date_rescisao_prevista, -- date in the future at which the contract will be stopped
+      ca.dt_termination as date_rescisao, -- end of the contract that has already ended
+      ca.billing_day_of_month,
+      ca.guarantee_type,
+      ca.rent,
+      c.city,
+      ca.id_contract_version
+    from datalake_ebdb_clean_prod.contract_aud ca
+    join datalake_ebdb_clean_prod.user_revision_entity r on ca.rev = r.id
+    join datalake_ebdb_clean_prod.contract c on c.id=ca.id_contract
+    -- where ca.guarantee_type='SeguroFairfax' -- to determine this field they look if the beginning of the
     -- negociation was before feb
     -- we need to remove this condition because it could be that we end up deciding a
     -- proposition where we initially 'promised' it would be covered by cardif
-    where c.proposta_id is not null and c.proposta_id!=''
+    where c.id_offer is not null and c.id_offer != ''
     '''
     df_contrato_ebdb = client.execute_query_and_return_dataframe(sql_contrato_ebdb)
 
@@ -272,27 +272,27 @@ def import_ebdb_contrato(client):
     sql_contrato_ebdb = '''
     select
       c.id as contract_id,
-      c.proposta_id as proposal_id,
-      c.imovel_id,
+      c.id_offer as proposal_id,
+      c.id_house,
       c.status,
-      c.criadoem as date_creation, -- creation of the line in the table
-      c.dataassinado as date_signature, -- signature of the contract
-      c.datainicio as date_beginning, -- date the tenant can move in and we start to charge
-      c.datafimcontratoprevisto date_fim_previsto, -- normal date of end of contract.
+      c.ts_created as date_creation, -- creation of the line in the table
+      c.ts_signed as date_signature, -- signature of the contract
+      c.dt_started as date_beginning, -- date the tenant can move in and we start to charge
+      c.ts_contract_expected_end date_fim_previsto, -- normal date of end of contract.
       -- (continued) always signature + 30m unless 2nd signature
-      c.datarescisaoprevista date_rescisao_prevista, -- date in the future at which the contract will be stopped
-      c.datarescisao date_rescisao, -- end of the contract that has already ended
-      c.diamescobranca,
-      c.garantia,
-      c.valoraluguel,
-      c.cidade,
-      c.contractversion_id
-    from datalake_raw.ebdb_contrato c
-    -- where ca.garantia='SeguroFairfax' -- to determine this field they look if the beginning of the
+      c.ts_expected_termination date_rescisao_prevista, -- date in the future at which the contract will be stopped
+      c.dt_termination date_rescisao, -- end of the contract that has already ended
+      c.billing_day_of_month,
+      c.guarantee_type,
+      c.rent,
+      c.city,
+      c.id_contract_version
+    from datalake_ebdb_clean_prod.contract c
+    -- where ca.guarantee_type='SeguroFairfax' -- to determine this field they look if the beginning of the
     -- negociation was before feb
     -- we need to remove this condition because it could be that we end up deciding a
     -- proposition where we initially 'promised' it would be covered by cardif
-    where c.proposta_id is not null and c.proposta_id!=''
+    where c.id_offer is not null
     '''
     df_contrato_ebdb = client.execute_query_and_return_dataframe(sql_contrato_ebdb)
 
