@@ -730,6 +730,14 @@ user_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     clean_table="user",
 )
 
+user_aud_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="user_aud",
+    sub_dag_func=create_clean_tables_sub_dag,
+    source=SOURCE,
+    clean_table="user_aud",
+)
+
 entrance_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag,
     sub_dag_name="entrance",
@@ -985,6 +993,7 @@ ebdb_to_datalake_raw_task >> [
     partner_sub_dag_task,
     partner_agent_sub_dag_task,
     user_sub_dag_task,
+    user_aud_sub_dag_task,
     entrance_sub_dag_task,
     doorman_affiliate_data_sub_dag_task,
     doorman_affiliate_occupation_sub_dag_task,
