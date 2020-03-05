@@ -97,6 +97,7 @@ select
   end as b2b_prime_type,
   c.ts_analyst_annulment_input,
   c.contract_version as version,
+  c.is_ongoing_contract,
   now() as ts_load
 from contract c
 left join b2b_info bi

@@ -36,6 +36,7 @@ create table dim_contract (
   b2b_prime_type varchar,
   ts_analyst_annulment_input timestamp,
   version varchar,
+  is_ongoing_contract boolean,
   ts_load timestamp
 )
 ;

@@ -93,6 +93,18 @@ contract_analyst_date as (
     on edc.contract_id = c.id
   where edc.rn = 1
     and edc.ts_analista is not null
+),
+ongoing_contracts as (
+	select
+		id,
+		case when status in ('Ativo','Finalizado')
+				and type <> 'DealOnly'
+				and current_date >= date(coalesce(coalesce(ts_signed,dt_started),dt_entered))
+				and (current_date < dt_termination or dt_termination is null)
+				then true
+			else false end as is_ongoing_contract
+	from datalake_ebdb_clean_prod.contract
+	where dt_termination < current_date or dt_termination is null
 )
 select
   c.id,
@@ -128,7 +140,8 @@ select
   c.proposta_id as id_proposal,
   c.imovel_id as id_house,
   cad.ts_analyst_annulment_input,
-  regexp_extract(cv.versiondisplaycontract,'^v[^_]+') as contract_version
+  regexp_extract(cv.versiondisplaycontract,'^v[^_]+') as contract_version,
+  coalesce(oc.is_ongoing_contract,false) as is_ongoing_contract
 from datalake_ebdb_raw_prod.contrato c
 left join contract_cancellation_reasons ccr
   on ccr.id = c.id
@@ -138,4 +151,6 @@ left join contract_analyst_date cad
 	on cad.id = c.id
 left join datalake_ebdb_raw_prod.contractversion cv
 	on c.contractversion_id = cv.id
+left join ongoing_contracts oc
+	on c.id = oc.id
 ;
