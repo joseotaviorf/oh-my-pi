@@ -4,7 +4,7 @@ with filtered_custom_fields AS (
     cast(zcf.dt_extracted as timestamp with time zone) as ts_updated,
     field,
     replace(regexp_extract(field, '^.*='), '=', '') as id_field,
-    replace(replace(replace(replace(regexp_extract(field, '\=(.*)'), '=', ''), '[', ''), ']', ''), '"', '') as contact_type_tag
+    regexp_extract(field, '^[^=]+=\[?"(.*)?"\]?$', 1) as contact_type_tag
   FROM datalake_clean.zendesk_custom_fields zcf
   CROSS JOIN UNNEST(
       split(zcf.custom_fields, ',')
