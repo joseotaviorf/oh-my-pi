@@ -51,7 +51,7 @@ class MongoConsumer(DBConsumer):
         :param collection_name: The name of the collection
         :return: The estimated value for the size
         """
-        query = {"collstats": collection_name, "scale": 1048576}
+        query = {"collstats": collection_name, "scale": 1024}
         collection_size = self.mongo_client.run(query)["size"]
 
         return collection_size

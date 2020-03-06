@@ -1,12 +1,13 @@
 -- Some fields are JSON strings. We're using REGEX because it's not possible to use get_json_object because of the special characters.
 
 select
-    regexp_extract(_id, '(\\w+\\d+)', 1) as _id,    -- format: {"$oid": "5b9ffb4da939ee6a2c873276"}
+    -- format: {{"$oid": "5b9ffb4da939ee6a2c873276"}}
+    regexp_extract(_id, '(\\w+\\d+)', 1) as _id,
     boolean(active) as is_active,
     business_context,
     cloudsearch_criteria,
-    date(created_at) as dt_alert_triggered,
-    date,
+    timestamp(created_at) as ts_created,
+    date(date) as dt_alert_triggered,
     days,
     device_id as id_device,
     filters,
@@ -16,21 +17,28 @@ select
     houses_ids as ids_houses,
     houses_sent, 
     boolean(is_auto_scheduling_possible) as is_auto_scheduling_possible,
-    cast(regexp_extract(lastActivation, '(\\d{4}-\\d{2}-\\d{2}\\w{1}\\d{2}:\\d{2}:\\d{2})', 0) as timestamp) as ts_last_activation,     -- format {"$date": "2019-05-01T10:00:00Z" }
-    cast(regexp_extract(last_day_sent, '(\\d{4}-\\d{2}-\\d{2}\\w{1}\\d{2}:\\d{2}:\\d{2})', 0) as timestamp) as ts_last_day_sent,        -- format {"$date": "2019-05-01T10:00:00Z" }
+    -- format {{"$date": "2019-05-01T10:00:00Z" }}
+    cast(regexp_extract(lastActivation, '(\\d{{4}}-\\d{{2}}-\\d{{2}}\\w{{1}}\\d{{2}}:\\d{{2}}:\\d{{2}})', 1) as timestamp) as ts_last_activation,
+    -- format {{"$date": "2019-05-01T10:00:00Z" }}
+    cast(regexp_extract(last_day_sent, '(\\d{{4}}-\\d{{2}}-\\d{{2}}\\w{{1}}\\d{{2}}:\\d{{2}}:\\d{{2}})', 1) as timestamp) as ts_last_day_sent,
     timestamp(last_email_run) as ts_last_email_run,
     lead_id as id_lead,
     name,
     notifications_sent_agent,
-    regexp_extract(profile_id, '(\\w+\\d+)', 0) as id_profile,  -- format: {"$oid": "5b9ffb4da939ee6a2c873276"}
+    -- format: {{"$oid": "5b9ffb4da939ee6a2c873276"}}
+    regexp_extract(profile_id, '(\\w+\\d+)', 0) as id_profile,
     push_user_id as id_push_user,
     quintoandar_id as id_quintoandar,
     results, 
     source,
     type,
-    cast(regexp_extract(updated_at, '(\\d+(-\\d+(-\\d+\\w+(:\\d+(:\\d+(.\\w+))))))', 0) as timestamp ) as ts_updated,       -- format {"$date": "2019-05-01T10:00:00Z" }
+    -- format {{"$date": "2019-05-01T10:00:00Z" }}
+    timestamp(updated_at) as ts_updated,
     user_id as id_user,
     visit_code,
-    cast(regexp_extract(visit_day_time, '(\\d+(-\\d+(-\\d+\\w+(:\\d+(:\\d+(.\\w+))))))', 0) as timestamp) as ts_visited     -- format {"$date": "2019-05-01T10:00:00Z" }
+    -- format {{"$date": "2019-05-01T10:00:00Z" }}
+    cast(regexp_extract(visit_day_time, '(\\d{{4}}-\\d{{2}}-\\d{{2}}\\w{{1}}\\d{{2}}:\\d{{2}}:\\d{{2}})', 1) as timestamp) as ts_visited
 from
     datalake_cidade_alerta_raw.alert
+where
+    year={year} and month={month} and day={day}

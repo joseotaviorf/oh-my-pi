@@ -12,21 +12,22 @@ from bietlejuice.jobs.composer.consumers.db_consumers import MongoConsumer
 from bietlejuice.jobs.composer.loaders import S3Loader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
+from bietlejuice.jobs.composer.dags.cidade_alerta import (
+    SOURCE,
+    BLOCK_TABLES,
+    INCREMENTAL_TABLES,
+)
 
-
-JOB_NAME = "load_cidade_alerta_into_datalake_raw"
+JOB_NAME = "load_full_tables_into_datalake_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
-
-BLOCK_LIST = ["audit", "messages_broadcast", "messages", "messages_routing"]
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
     args = parser.parse_args()
     environment = args.env
-    source = "cidade_alerta"
 
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
@@ -42,24 +43,27 @@ if __name__ == "__main__":
     mongo_consumer = MongoConsumer(mongo_client, spark_client)
 
     tables = mongo_consumer.get_table_names_and_sizes().collect()
-    db_info = DatalakeMetastoreService.get_db_info(environment, source)
+    db_info = DatalakeMetastoreService.get_db_info(environment, SOURCE)
     metastore_service = SparkMetastoreService(spark_client)
     loader = S3Loader(metastore_service)
 
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
     metastore_service.create_database(db_info["db_raw_databricks"])
 
-    for table in tables:
-        table_name = table.table_name.replace(".", "_")
+    BLOCK_LIST = BLOCK_TABLES + INCREMENTAL_TABLES
 
-        if table_name not in BLOCK_LIST:
-            df = mongo_consumer.get_data_from_table(table_name)
+    for table in tables:
+
+        # there are different tables between forno and prod environments
+        if table.table_name not in BLOCK_LIST and table.size > 0:
+            df = mongo_consumer.get_data_from_table(table.table_name)
             df = SparkDataFrameService().input(df).optimize_partition(200000).output()
 
             loader.load_full_table(
                 df=df,
                 database_name=db_info["db_raw_databricks"],
-                table_name=table_name.lower(),
+                table_name=table.table_name,
                 format=SparkTableStorageFormat.DEFAULT_RAW,
                 database_location=db_info["db_raw_path"],
+                schema_merging=True,
             )
