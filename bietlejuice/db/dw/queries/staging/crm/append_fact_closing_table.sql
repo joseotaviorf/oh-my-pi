@@ -16,6 +16,7 @@ select
   ts_task_action_end,
   task_action_type,
   task_user_action_resolve_hours,
+  sk_offer,
   sk_proposal,
   sk_contract,
   sk_house_listing,

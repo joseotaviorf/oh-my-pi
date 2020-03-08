@@ -5,7 +5,7 @@ SELECT
     observacao AS observation,
     valorAluguel AS rent,
     status,
-    proposta_id AS id_offer,
+    proposta_id AS id_proposal,
     numImovel AS house_number,
     criadoEm AS ts_created,
     diaMesCobranca AS billing_day_of_month,
