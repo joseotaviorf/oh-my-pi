@@ -162,6 +162,7 @@ _fact as (
     left join vw_dim_booking vdb
         on vdb.sk_booking = hrf.id_booking
     where vdh.is_for_rent::int::boolean
+        and coalesce(vdb.visit_intent, '') <> 'SALE'
 ),
 base as (
 	select
