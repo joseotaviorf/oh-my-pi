@@ -151,6 +151,10 @@ class MarketingSubDag(BaseSubDag):
 
     @logger
     def build_dim_tasks(self, dag):
+        """
+        It is important to filter the execution date in queries feeding dimensions.
+        This ensures that only the most recent values are being loaded and avoid duplicates.
+        """
         tasks = []
         for table in self.dim_tables:
             tasks.append(BaseDAG.build_python_operator(

@@ -6,4 +6,7 @@ SELECT distinct
     account_name,
     account_currency,
     current_timestamp as ts_load
-FROM datalake_clean.marketing_rtb_sub_campaigns
+FROM
+    datalake_clean.marketing_rtb_sub_campaigns
+WHERE
+    dt_created  = '{date}'
