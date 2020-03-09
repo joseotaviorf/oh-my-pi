@@ -10,27 +10,6 @@ last_updated_ticket as (
 last_updated_ticket_fields as (
 	select id_ticket_fields, max(ts_updated) as ts_last_updated from datalake_clean.zendesk_ticket_fields group by 1
 ),
-custom_fields as (
-    with parse_fields as (
-		select tf.id_ticket,
-	        f1.field,
-	        regexp_extract(f1.field, '{{\\?"id\\?":"?(\d+)"?', 1) as id_field,
-	        nullif(regexp_extract(f1.field, '"value\\?":\\?"?#?([^\\?"|}}]+)', 1), 'null') as value
-	    from tickets_filter tf
-        inner join last_updated_ticket l
-            on tf.id_ticket=l.id_ticket
-	    cross join unnest(regexp_extract_all(tf.custom_fields, '{{[^}}]+[^,]+[^{{]+}}')) as f1(field)
-	)
-	select f.id_ticket,
-        map_agg(tf.raw_title, f.value) as cols
-    from parse_fields f
-    inner join last_updated_ticket_fields l
-       on l.id_ticket_fields = f.id_field
-    inner join datalake_clean.zendesk_ticket_fields tf
-       on l.id_ticket_fields = tf.id_ticket_fields and l.ts_last_updated=tf.ts_updated 
-    where f.value is not null
-    group by 1
-),
 contract as (
     select
         cast(coalesce(fl.sk_house_listing, '-1') as bigint) as sk_house_listing,
@@ -119,8 +98,12 @@ tickets as (
         cast(t.id_ticket as bigint) as sk_ticket,
         -- id_contract and id_house may be filled with string (filled wrong)
         -- id_house may be filled with id_house or short_id_house
-        if(length(c.cols['Código do Imóvel']) < 9, 892700000 + try_cast(c.cols['Código do Imóvel'] as bigint), try_cast(c.cols['Código do Imóvel'] as bigint)) as id_house,
-        try_cast(c.cols['Código do Contrato'] as bigint) as id_contract,
+        if(
+            length(json_extract_scalar(cast(c.custom_fields as json), '$["Código do Imóvel"]')) < 9,
+            892700000 + try_cast(json_extract_scalar(cast(c.custom_fields as json), '$["Código do Imóvel"]') as bigint),
+            try_cast(json_extract_scalar(cast(c.custom_fields as json), '$["Código do Imóvel"]') as bigint)
+        ) as id_house,
+        try_cast(json_extract_scalar(cast(c.custom_fields as json), '$["Código do Contrato"]') as bigint) as id_contract,
         tm.*,
         coalesce(cast(t.id_requester as bigint), -1) as sk_zendesk_requester_user,
         coalesce(cast(t.id_submitter as bigint), -1) as sk_zendesk_submitter_user,
@@ -146,7 +129,7 @@ tickets as (
         on t.id_ticket = lt.id_ticket and t.ts_updated=lt.ts_last_updated
     left join ticket_metrics tm
         on t.id_ticket=tm.id_ticket
-    left join custom_fields c 
+    left join datalake_clean.zendesk_custom_fields c 
     on c.id_ticket=t.id_ticket
 )
 select
