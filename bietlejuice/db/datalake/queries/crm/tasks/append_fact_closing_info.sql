@@ -5,7 +5,7 @@
     coalesce(ec.id, epc.id, -1) as sk_contract,
     coalesce(epi.id_user, eci.id_user, -1) as sk_house_owner,
     coalesce(ep.id_proponent, ec.id_user, -1) as sk_tenant,
-    cast(coalesce(eo.sk_offer, '-1') as bigint) as sk_offer
+    cast(coalesce(eo.sk_offer, feo.sk_offer, '-1') as bigint) as sk_offer
   from tasks t
   join datalake_clean.crm_tasks ct
     on t.sk_task = trim(ct.id)
