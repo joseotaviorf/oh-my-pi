@@ -58,7 +58,7 @@ newbiz_listings AS (
         nlv.ts_opted_in,
         nlv.ts_opted_out,
         MIN(DATE(fpj.sk_date_photos_uploaded)) 	AS date_job_photos_uploaded,
-        MIN(DATE(ei.atualizadoem))              AS date_photos_uploaded,
+        MIN(DATE(ei.ts_updated))              AS date_photos_uploaded,
         CASE
             WHEN date_job_photos_uploaded IS NULL
             THEN date_photos_uploaded
