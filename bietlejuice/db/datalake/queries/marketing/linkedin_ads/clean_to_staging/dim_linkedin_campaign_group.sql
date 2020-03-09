@@ -5,4 +5,7 @@ select distinct
     id_account,
     account_name,
     current_timestamp as ts_load
-from datalake_clean.marketing_linkedin_campaign_groups;
+from
+    datalake_clean.marketing_linkedin_campaign_groups
+where
+    dt_created = '{date}';

@@ -7,4 +7,7 @@ select distinct
     locale_country,
     locale_language,
     current_timestamp as ts_load
-from datalake_clean.marketing_linkedin_campaigns;
+from
+    datalake_clean.marketing_linkedin_campaigns
+where
+    dt_created = '{date}';
