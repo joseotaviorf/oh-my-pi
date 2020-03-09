@@ -82,7 +82,7 @@ newbiz_listings AS (
      AND fpj.creation_origin != 'Teste'
      AND fpj.job_status = 'Publicado'
      AND fpj.sk_date_photos_uploaded != '-1'
-     AND DATE(fpj.sk_date_photos_uploaded) >= DATEADD(DAY, -7, nlv.optedinat) -- OriginalsReno optedin can be done 7days before photo upload 
+     AND DATE(fpj.sk_date_photos_uploaded) >= DATEADD(DAY, -7, nlv.ts_opted_in) -- OriginalsReno optedin can be done 7days before photo upload 
      AND DATE(fpj.sk_date_photos_uploaded) > dhl.ts_publication
     LEFT JOIN datalake_ebdb_clean_prod.image ei
       ON ei.id_house = dhl.id_house

@@ -181,6 +181,7 @@ blocked_houses as (
       and mod_status = true
   where
     status = 'BLOCKED'
+    )
 ),
 suspended_houses as (
 --Filter status=suspenso after define 'init' and 'end'
@@ -201,6 +202,7 @@ suspended_houses as (
       and mod_status = true
   where
     status = 'suspenso'
+    )
 ),
 encaixes_clean as (
 select
