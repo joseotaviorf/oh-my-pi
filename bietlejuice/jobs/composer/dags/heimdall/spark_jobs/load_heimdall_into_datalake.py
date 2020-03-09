@@ -21,8 +21,10 @@ logger = QuintoAndarLogger(JOB_NAME)
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
+    parser.add_argument("datalake_bucket")
     args = parser.parse_args()
     environment = args.env
+    datalake_bucket = args.datalake_bucket
     source = "heimdall"
 
     base_dbutils = BaseDBUtils()
@@ -39,7 +41,7 @@ if __name__ == "__main__":
     mongo_consumer = MongoConsumer(mongo_client, spark_client)
     tables = mongo_consumer.get_table_names_and_sizes().collect()
 
-    db_info = DatalakeMetastoreService.get_db_info(environment, source)
+    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     spark_metastore_service = SparkMetastoreService(spark_client)
     loader = S3Loader(spark_metastore_service)
 

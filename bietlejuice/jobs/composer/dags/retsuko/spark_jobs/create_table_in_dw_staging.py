@@ -2,7 +2,7 @@ import logging
 from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
+from bietlejuice.jobs.composer.base.db import DWMetastoreService
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
@@ -22,15 +22,17 @@ logger = QuintoAndarLogger(JOB_NAME)
 if __name__ == "__main__":
 
     parser = ArgumentParser(description=JOB_NAME)
+    parser.add_argument("dw_bucket", type=str, help="dw bucket")
     parser.add_argument("table_name", type=str, help="table name that will be created")
     parser.add_argument("environment", type=str, help="forno/prod values")
 
     args = parser.parse_args()
 
+    dw_bucket = args.dw_bucket
     table_name = args.table_name
     environment = args.environment
 
-    dw_info = DatalakeMetastoreService.get_dw_info(environment, DW_SCHEMA)
+    dw_info = DWMetastoreService.get_dw_info(environment, DW_SCHEMA, dw_bucket)
 
     spark_client = SparkClient()
     spark_metastore_service = SparkMetastoreService(spark_client)

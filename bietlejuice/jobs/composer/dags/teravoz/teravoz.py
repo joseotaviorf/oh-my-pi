@@ -17,6 +17,7 @@ MAIN_START_DATE = datetime(2019, 7, 12, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
 
 ENV = Variable.get("environment")
+DATALAKE_BUCKET = Variable.get("datalake_bucket")
 ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
 
 # s3 vars
@@ -72,7 +73,7 @@ def raw_tasks(sub_dag_name, local_dag):
                 "python_file": "{}/load_{}_into_datalake_raw.py".format(
                     SPARK_JOBS_PATH, SOURCE
                 ),
-                "parameters": [sub_dag_name, "{{ ds }}", ENV],
+                "parameters": [sub_dag_name, "{{ ds }}", ENV, DATALAKE_BUCKET],
             }
         },
     )
@@ -89,7 +90,7 @@ def clean_tasks(sub_dag_name, local_dag):
         json={
             "spark_python_task": {
                 "python_file": "{}/load_data_to_clean.py".format(SPARK_JOBS_PATH),
-                "parameters": [sub_dag_name, "{{ ds }}", ENV],
+                "parameters": [sub_dag_name, "{{ ds }}", ENV, DATALAKE_BUCKET],
             }
         },
     )
@@ -100,7 +101,7 @@ def clean_tasks(sub_dag_name, local_dag):
         json={
             "spark_python_task": {
                 "python_file": "{}/create_external_table.py".format(SPARK_JOBS_PATH),
-                "parameters": [sub_dag_name, "{{ ds }}", ENV],
+                "parameters": [sub_dag_name, "{{ ds }}", ENV, DATALAKE_BUCKET],
             }
         },
     )

@@ -21,6 +21,7 @@ if __name__ == "__main__":
     # Gets arguments passed by Airflow task
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
+    parser.add_argument("datalake_bucket")
     parser.add_argument("source")
     parser.add_argument("table_name")
     parser.add_argument("storage")
@@ -28,12 +29,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     env = args.env
+    datalake_bucket = args.datalake_bucket
     source = args.source
     table_name = args.table_name
     storage = args.storage
 
     # setup
-    db_info = DatalakeMetastoreService.get_db_info(env, source)
+    db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
     db_databricks = db_info["db_{}_databricks".format(storage)]
     db_athena = db_info["db_{}_athena".format(storage)]
     db_path = db_info["db_{}_path".format(storage)]

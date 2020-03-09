@@ -37,6 +37,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("execution_date", type=str, help="execution date in str format")
     parser.add_argument("environment", type=str, help="forno/prod values")
+    parser.add_argument("datalake_bucket")
 
     args = parser.parse_args()
 
@@ -50,6 +51,7 @@ if __name__ == "__main__":
     execution_date = args.execution_date
     endpoint_name = args.endpoint_name
     environment = args.environment
+    datalake_bucket = args.datalake_bucket
 
     # start Spark Session
     base_dbutils = BaseDBUtils()
@@ -77,7 +79,9 @@ if __name__ == "__main__":
     df = teravoz_consumer.request_api_and_get_dataframe(endpoint_name)
     table_name = endpoint_name.replace("-", "_")
 
-    datalake_info = DatalakeMetastoreService().get_db_info(environment, "teravoz")
+    datalake_info = DatalakeMetastoreService.get_db_info(
+        environment, "teravoz", datalake_bucket
+    )
 
     spark_metastore_service = SparkMetastoreService(spark_client)
 

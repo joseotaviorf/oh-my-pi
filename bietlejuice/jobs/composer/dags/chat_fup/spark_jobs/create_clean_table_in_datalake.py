@@ -26,11 +26,13 @@ if __name__ == "__main__":
     # args passed by Airflow task
     parser.add_argument("table_name", type=str, help="table name that will be created")
     parser.add_argument("environment", type=str, help="forno/prod values")
+    parser.add_argument("datalake_bucket")
 
     args = parser.parse_args()
 
     table_name = args.table_name
     environment = args.environment
+    datalake_bucket = args.datalake_bucket
 
     # get query to create table
     query = FileService.get_query_from_file_name(
@@ -38,7 +40,7 @@ if __name__ == "__main__":
     )
 
     # get pattern schemas
-    db_info = DatalakeMetastoreService().get_db_info(environment, SOURCE)
+    db_info = DatalakeMetastoreService.get_db_info(environment, SOURCE, datalake_bucket)
 
     spark_client = SparkClient()
 

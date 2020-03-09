@@ -24,6 +24,7 @@ if __name__ == "__main__":
     parser.add_argument("file_name", type=str, help="file name is equal table name")
     parser.add_argument("execution_date", type=str, help="execution date in str format")
     parser.add_argument("environment", type=str, help="forno/prod values")
+    parser.add_argument("datalake_bucket")
     args = parser.parse_args()
 
     logger.info(
@@ -34,9 +35,10 @@ if __name__ == "__main__":
     execution_date = args.execution_date
     table_name = file_name = args.file_name.replace("-", "_")
     environment = args.environment
+    datalake_bucket = args.datalake_bucket
     source = "zendesk"
 
-    db_info = DatalakeMetastoreService.get_db_info(environment, source)
+    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
 
     spark_client = SparkClient()
     conn_config = {"db": db_info["db_raw_databricks"]}

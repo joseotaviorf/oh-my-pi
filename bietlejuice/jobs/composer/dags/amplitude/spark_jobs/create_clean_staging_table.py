@@ -17,6 +17,7 @@ logger = QuintoAndarLogger("create_clean_staging_table")
 parser = ArgumentParser(description="create_clean_staging_table")
 parser.add_argument("execution_date")
 parser.add_argument("env")
+parser.add_argument("datalake_bucket")
 parser.add_argument("source")
 parser.add_argument("source_table_name")
 parser.add_argument("--partition_by", nargs="+", dest="partition_by", required=False)
@@ -26,6 +27,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     execution_date = args.execution_date
     env = args.env
+    datalake_bucket = args.datalake_bucket
     source = args.source
     source_table_name = args.source_table_name
     partition_by = args.partition_by
@@ -41,7 +43,7 @@ if __name__ == "__main__":
     year, month, day = date.year, date.month, date.day
 
     # setup
-    db_info = DatalakeMetastoreService.get_db_info(env, source)
+    db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
     spark_client = SparkClient()
     dataframe_service = SparkDataFrameService()
     metastore_service = SparkMetastoreService(spark_client)

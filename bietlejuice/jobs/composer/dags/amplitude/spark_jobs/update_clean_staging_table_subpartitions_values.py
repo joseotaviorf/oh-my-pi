@@ -17,6 +17,7 @@ logger = QuintoAndarLogger("update_clean_staging_subpartitions_values_table.")
 parser = ArgumentParser(description="update_clean_staging_subpartitions_values_table")
 parser.add_argument("execution_date")
 parser.add_argument("env")
+parser.add_argument("datalake_bucket")
 parser.add_argument("source")
 parser.add_argument("source_table_name")
 parser.add_argument("--subpartitions", nargs="+", dest="subpartitions", required=False)
@@ -26,6 +27,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     execution_date = args.execution_date
     env = args.env
+    datalake_bucket = args.datalake_bucket
     source = args.source
     source_table_name = args.source_table_name
     subpartitions = args.subpartitions
@@ -41,7 +43,7 @@ if __name__ == "__main__":
     year, month, day = date.year, date.month, date.day
 
     # setup
-    db_info = DatalakeMetastoreService.get_db_info(env, source)
+    db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
     spark_client = SparkClient()
     metastore_service = SparkMetastoreService(spark_client)
     loader = S3Loader(metastore_service)

@@ -28,11 +28,13 @@ if __name__ == "__main__":
         "table_name", type=str, help="table name that will be created in Athena"
     )
     parser.add_argument("env", type=str, help="forno/prod values")
+    parser.add_argument("datalake_bucket")
     parser.add_argument("execution_date", type=str, help="Execution date DAG")
 
     args = parser.parse_args()
 
     environment = args.env
+    datalake_bucket = args.datalake_bucket
     table_name = args.table_name
     execution_date = args.execution_date
 
@@ -51,7 +53,7 @@ if __name__ == "__main__":
     )
     partition_cols = list(partitions.keys())
 
-    db_info = DatalakeMetastoreService.get_db_info(environment, SOURCE)
+    db_info = DatalakeMetastoreService.get_db_info(environment, SOURCE, datalake_bucket)
 
     athena_metastore_service = AthenaMetastoreService(AthenaClient())
 

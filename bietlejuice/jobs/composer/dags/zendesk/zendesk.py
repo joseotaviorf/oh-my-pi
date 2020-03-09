@@ -20,6 +20,7 @@ DEPARTMENTS = "departments"
 DEPARTMENTS_WITH_PREFIX = f"{CHATS}_{DEPARTMENTS}"
 
 ENV = Variable.get("environment")
+DATALAKE_BUCKET = Variable.get("datalake_bucket")
 ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
 
 # s3 vars
@@ -65,7 +66,7 @@ def create_departments_sub_dag(sub_dag_name):
                 "python_file": "{}/load_zendesk_departments_into_datalake_raw.py".format(
                     SPARK_JOBS_PATH
                 ),
-                "parameters": [DEPARTMENTS, "{{ ds }}", ENV],
+                "parameters": [DEPARTMENTS, "{{ ds }}", ENV, DATALAKE_BUCKET],
             }
         },
     )
@@ -76,7 +77,7 @@ def create_departments_sub_dag(sub_dag_name):
         json={
             "spark_python_task": {
                 "python_file": "{}/create_external_tables.py".format(SPARK_JOBS_PATH),
-                "parameters": [ENV, "clean", DEPARTMENTS_WITH_PREFIX],
+                "parameters": [ENV, DATALAKE_BUCKET, "clean", DEPARTMENTS_WITH_PREFIX],
             }
         },
     )
@@ -89,7 +90,12 @@ def create_departments_sub_dag(sub_dag_name):
                 "python_file": "{}/load_departments_data_to_clean.py".format(
                     SPARK_JOBS_PATH
                 ),
-                "parameters": [DEPARTMENTS_WITH_PREFIX, "{{ ds }}", ENV],
+                "parameters": [
+                    DEPARTMENTS_WITH_PREFIX,
+                    "{{ ds }}",
+                    ENV,
+                    DATALAKE_BUCKET,
+                ],
             }
         },
     )
@@ -121,6 +127,7 @@ def create_chats_sub_dag(sub_dag_name, days_interval_start, days_interval_end):
                     days_interval_start,
                     days_interval_end,
                     ENV,
+                    DATALAKE_BUCKET,
                 ],
             }
         },
@@ -138,6 +145,7 @@ def create_chats_sub_dag(sub_dag_name, days_interval_start, days_interval_end):
                     days_interval_start,
                     days_interval_end,
                     ENV,
+                    DATALAKE_BUCKET,
                 ],
             }
         },
@@ -149,7 +157,7 @@ def create_chats_sub_dag(sub_dag_name, days_interval_start, days_interval_end):
         json={
             "spark_python_task": {
                 "python_file": "{}/create_external_tables.py".format(SPARK_JOBS_PATH),
-                "parameters": [ENV, "clean", CHATS, "--partition_by"]
+                "parameters": [ENV, DATALAKE_BUCKET, "clean", CHATS, "--partition_by"]
                 + DEFAULT_PARTITION_BY,
             }
         },

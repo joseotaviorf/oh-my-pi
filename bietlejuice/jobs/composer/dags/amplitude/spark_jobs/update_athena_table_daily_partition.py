@@ -19,6 +19,7 @@ logger = QuintoAndarLogger("update_athena_table_daily_partition")
 parser = ArgumentParser(description="update_athena_table_daily_partition")
 parser.add_argument("execution_date")
 parser.add_argument("env")
+parser.add_argument("datalake_bucket")
 parser.add_argument("source")
 parser.add_argument("table_name")
 parser.add_argument("stage")
@@ -27,6 +28,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     execution_date = args.execution_date
     env = args.env
+    datalake_bucket = args.datalake_bucket
     source = args.source
     table_name = args.table_name
     stage = args.stage
@@ -42,7 +44,7 @@ if __name__ == "__main__":
     year, month, day = date.year, date.month, date.day
 
     # setup
-    db_info = DatalakeMetastoreService.get_db_info(env, source)
+    db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
     spark_metastore_service = SparkMetastoreService(SparkClient())
     athena_metastore_service = AthenaMetastoreService(AthenaClient())
 

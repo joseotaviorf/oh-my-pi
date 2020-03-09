@@ -18,6 +18,7 @@ logger = QuintoAndarLogger("create_clean_table_in_datalake")
 parser = ArgumentParser(description="create_clean_table_in_datalake")
 parser.add_argument("table_name")
 parser.add_argument("env")
+parser.add_argument("datalake_bucket")
 parser.add_argument("source")
 parser.add_argument("schema")
 
@@ -25,10 +26,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
     table_name = args.table_name
     env = args.env
+    datalake_bucket = args.datalake_bucket
     source = args.source
     schema = args.schema
 
-    db_info = DatalakeMetastoreService.get_db_info(env, source)
+    db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
     spark_client = SparkClient()
 
     # todo: use DatabricksConsumer to read data

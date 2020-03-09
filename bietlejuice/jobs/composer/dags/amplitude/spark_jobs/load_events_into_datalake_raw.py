@@ -30,11 +30,13 @@ spark, sqlContext = BaseSparkContext.spark, BaseSparkContext.sqlContext
 parser = ArgumentParser(description="load_events_into_datalake_raw")
 parser.add_argument("execution_date")
 parser.add_argument("env")
+parser.add_argument("datalake_bucket")
 
 if __name__ == "__main__":
     args = parser.parse_args()
     execution_date = args.execution_date
     env = args.env
+    datalake_bucket = args.datalake_bucket
 
     start_date = datetime.strptime(execution_date, "%Y-%m-%d")
     end_date = start_date + timedelta(hours=23)
@@ -44,7 +46,7 @@ if __name__ == "__main__":
     keys = json.loads(dbutils.secrets.get("quintoandar", "ENV_AMPLITUDE"))
 
     source = "amplitude"
-    db_info = DatalakeMetastoreService.get_db_info(env, source)
+    db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
     spark_client = SparkClient()
     amplitude_events = AmplitudeEvents(spark_client)
     dataframe_service = SparkDataFrameService()

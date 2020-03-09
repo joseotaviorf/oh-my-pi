@@ -45,6 +45,7 @@ pipeline_config = FileService.get_dict_from_yaml_file(config_file_path).get(
     "pipeline", {}
 )
 
+DW_BUCKET = Variable.get("dw_bucket")
 DW_SCHEMA = "datamarts"
 
 
@@ -96,7 +97,7 @@ def build_entity_subdag(subdag_name, entity_name, entity_pipeline):
         json={
             "spark_python_task": {
                 "python_file": f"{SPARK_JOBS_PATH}create_datamart_table_in_datalake.py",
-                "parameters": [ENV, DW_SCHEMA, schema, table, sql_file],
+                "parameters": [ENV, DW_BUCKET, DW_SCHEMA, schema, table, sql_file],
             }
         },
     )
@@ -107,7 +108,7 @@ def build_entity_subdag(subdag_name, entity_name, entity_pipeline):
         json={
             "spark_python_task": {
                 "python_file": f"{SPARK_JOBS_PATH}load_datamart_table_into_redshift.py",
-                "parameters": [ENV, SPECTRUM_IAM_ROLE, DW_SCHEMA, table],
+                "parameters": [ENV, DW_BUCKET, SPECTRUM_IAM_ROLE, DW_SCHEMA, table],
             }
         },
     )

@@ -16,6 +16,7 @@ from bietlejuice.jobs.composer.services.file_service import FileService
 DAG_ID = "godfather"
 FULL_DAG_ID = f"bietlejuice.{DAG_ID}"
 ENV = Variable.get("environment")
+DATALAKE_BUCKET = Variable.get("datalake_bucket")
 
 local_tz = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2019, 10, 1, 0, 0, 0, tzinfo=local_tz)
@@ -80,7 +81,7 @@ def create_raw_tables_sub_dag_tasks(
         json={
             "spark_python_task": {
                 "python_file": LOAD_DB_SCHEMA_INTO_DATALAKE_RAW_FILE_PATH,
-                "parameters": [ENV, source, schema],
+                "parameters": [ENV, DATALAKE_BUCKET, source, schema],
             }
         },
     )
@@ -91,7 +92,7 @@ def create_raw_tables_sub_dag_tasks(
         json={
             "spark_python_task": {
                 "python_file": CREATE_EXTERNAL_TABLES_FILE_PATH,
-                "parameters": [ENV, "raw", SOURCE, schema, "--all"],
+                "parameters": [ENV, DATALAKE_BUCKET, "raw", SOURCE, schema, "--all"],
             }
         },
     )
@@ -126,7 +127,7 @@ def build_table_sub_dag(
         json={
             "spark_python_task": {
                 "python_file": CREATE_CLEAN_TABLE_IN_DATA_LAKE_PATH,
-                "parameters": [table_name, env, source, schema],
+                "parameters": [table_name, env, DATALAKE_BUCKET, source, schema],
             }
         },
     )
@@ -139,6 +140,7 @@ def build_table_sub_dag(
                 "python_file": CREATE_EXTERNAL_TABLES_FILE_PATH,
                 "parameters": [
                     env,
+                    DATALAKE_BUCKET,
                     "clean",
                     source,
                     schema,

@@ -13,6 +13,7 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
 SOURCE = "firestore"
 DAG_ID = "bietlejuice.{}".format(SOURCE)
 ENV = Variable.get("environment")
+DATALAKE_BUCKET = Variable.get("datalake_bucket")
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2019, 1, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
@@ -55,7 +56,14 @@ def create_collection_sub_dag(
                 "python_file": "{}/load_firestore_into_datalake.py".format(
                     SPARK_JOBS_PATH
                 ),
-                "parameters": [ENV, SOURCE, "{{ ds }}", table, date_field],
+                "parameters": [
+                    ENV,
+                    DATALAKE_BUCKET,
+                    SOURCE,
+                    "{{ ds }}",
+                    table,
+                    date_field,
+                ],
             }
         },
     )
@@ -66,7 +74,7 @@ def create_collection_sub_dag(
         json={
             "spark_python_task": {
                 "python_file": "{}/create_external_table.py".format(SPARK_JOBS_PATH),
-                "parameters": [ENV, SOURCE, table, "raw"],
+                "parameters": [ENV, DATALAKE_BUCKET, SOURCE, table, "raw"],
             }
         },
     )

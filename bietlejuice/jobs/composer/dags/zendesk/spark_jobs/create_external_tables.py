@@ -19,6 +19,7 @@ logger = QuintoAndarLogger(JOB_NAME)
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env", type=str, help="forno/prod values")
+    parser.add_argument("datalake_bucket")
     parser.add_argument("storage", type=str, help="raw/clean values")
     parser.add_argument("table_name", type=str, help="table name")
     parser.add_argument(
@@ -30,12 +31,13 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     environment = args.env
+    datalake_bucket = args.datalake_bucket
     storage = args.storage
     table_name = args.table_name.replace("-", "_")
     partition_cols = args.partition_by
     source = "zendesk"
 
-    db_info = DatalakeMetastoreService.get_db_info(environment, source)
+    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     spark_db = db_info["db_" + storage + "_databricks"]
     athena_db = db_info["db_" + storage + "_athena"]
 

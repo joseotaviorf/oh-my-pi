@@ -14,6 +14,7 @@ from bietlejuice.jobs.composer.services import FileService
 SOURCE = "terminator"
 DAG_ID = "bietlejuice.{}".format(SOURCE)
 ENV = Variable.get("environment")
+DATALAKE_BUCKET = Variable.get("datalake_bucket")
 
 local_tz = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 1, 1, 0, 0, 0, tzinfo=local_tz)
@@ -67,7 +68,7 @@ def build_table_sub_dag(
         json={
             "spark_python_task": {
                 "python_file": CREATE_CLEAN_TABLE_IN_DATA_LAKE_PATH,
-                "parameters": [table_name, env, source, schema],
+                "parameters": [table_name, env, DATALAKE_BUCKET, source, schema],
             }
         },
     )
@@ -80,6 +81,7 @@ def build_table_sub_dag(
                 "python_file": CREATE_EXTERNAL_TABLES_FILE_PATH,
                 "parameters": [
                     env,
+                    DATALAKE_BUCKET,
                     "clean",
                     source,
                     schema,
@@ -121,7 +123,7 @@ load_data_to_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": LOAD_DATA_TO_RAW_FILE_PATH,
-            "parameters": [ENV],
+            "parameters": [ENV, DATALAKE_BUCKET],
         }
     },
 )

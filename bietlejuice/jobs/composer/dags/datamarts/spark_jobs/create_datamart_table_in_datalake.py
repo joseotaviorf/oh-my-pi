@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService, DB_SQL_PATH
+from bietlejuice.jobs.composer.base.db import DB_SQL_PATH, DWMetastoreService
 from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
 from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
@@ -19,6 +19,7 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 parser = ArgumentParser(description=JOB_NAME)
 parser.add_argument("env")
+parser.add_argument("dw_bucket")
 parser.add_argument("dw_schema")
 parser.add_argument("schema")
 parser.add_argument("table")
@@ -27,6 +28,7 @@ parser.add_argument("sql_file")
 if __name__ == "__main__":
     args = parser.parse_args()
     env = args.env
+    dw_bucket = args.dw_bucket
     dw_schema = args.dw_schema
     schema = args.schema
     table = args.table
@@ -44,7 +46,7 @@ if __name__ == "__main__":
     dm_table_df = databricks_consumer.get_data_from_query(s3_query)
     dm_table_df = SparkDataFrameService(dm_table_df).optimize_partition(250000).output()
 
-    dw_db_info = DatalakeMetastoreService.get_dw_info(env, dw_schema)
+    dw_db_info = DWMetastoreService.get_dw_info(env, dw_schema, dw_bucket)
     metastore_service = SparkMetastoreService(spark_client)
     metastore_service.create_database(dw_db_info["dw_schema_databricks"])
 

@@ -32,6 +32,7 @@ if __name__ == "__main__":
     parser.add_argument("file_name", type=str, help="file name is equal table name")
     parser.add_argument("execution_date", type=str, help="execution date in str format")
     parser.add_argument("environment", type=str, help="forno/prod values")
+    parser.add_argument("datalake_bucket")
 
     args = parser.parse_args()
 
@@ -43,6 +44,7 @@ if __name__ == "__main__":
     execution_date = args.execution_date
     table_name = file_name = args.file_name.replace("-", "_")
     environment = args.environment
+    datalake_bucket = args.datalake_bucket
 
     athena_client = AthenaClient()
 
@@ -61,7 +63,9 @@ if __name__ == "__main__":
         QUERIES_TERAVOZ_DATALAKE_PATH + "/" + table_name + ".sql"
     )
 
-    datalake_info = DatalakeMetastoreService().get_db_info(environment, SOURCE)
+    datalake_info = DatalakeMetastoreService.get_db_info(
+        environment, SOURCE, datalake_bucket
+    )
 
     conn_config = {"db": datalake_info["db_raw_databricks"]}
     databricks_consumer = DatabricksConsumer(conn_config, SparkClient())

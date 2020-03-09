@@ -69,8 +69,10 @@ def load_relation_into_datalake(args):
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
+    parser.add_argument("datalake_bucket")
     args = parser.parse_args()
     environment = args.env
+    datalake_bucket = args.datalake_bucket
     source = "ebdb"
 
     base_dbutils = BaseDBUtils()
@@ -88,7 +90,7 @@ if __name__ == "__main__":
 
     rels.extend([Relation(name=view_name, size=1) for view_name in VIEW_ALLOW_LIST])
 
-    db_info = DatalakeMetastoreService.get_db_info(environment, source)
+    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     metastore_service = SparkMetastoreService(SparkClient())
     loader = S3Loader(metastore_service)
 

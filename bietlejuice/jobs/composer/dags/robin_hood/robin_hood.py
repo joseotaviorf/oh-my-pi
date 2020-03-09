@@ -15,6 +15,7 @@ from bietlejuice.jobs.composer.services import FileService
 
 DAG_ID = f"bietlejuice.{SOURCE}"
 ENV = Variable.get("environment")
+DATALAKE_BUCKET = Variable.get("datalake_bucket")
 
 # databricks config
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
@@ -64,7 +65,7 @@ def clean_tasks(sub_dag_name, table_name, slugged_table_name):
         json={
             "spark_python_task": {
                 "python_file": SPARK_JOBS_PATH + "create_clean_table_in_datalake.py",
-                "parameters": [table_name, ENV],
+                "parameters": [table_name, ENV, DATALAKE_BUCKET],
             }
         },
     )
@@ -75,7 +76,7 @@ def clean_tasks(sub_dag_name, table_name, slugged_table_name):
         json={
             "spark_python_task": {
                 "python_file": SPARK_JOBS_PATH + "create_clean_external_table.py",
-                "parameters": [table_name, ENV],
+                "parameters": [table_name, ENV, DATALAKE_BUCKET],
             }
         },
     )
@@ -118,7 +119,7 @@ robin_hood_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": SPARK_JOBS_PATH + "load_robin_hood_into_datalake.py",
-            "parameters": [ENV],
+            "parameters": [ENV, DATALAKE_BUCKET],
         }
     },
 )

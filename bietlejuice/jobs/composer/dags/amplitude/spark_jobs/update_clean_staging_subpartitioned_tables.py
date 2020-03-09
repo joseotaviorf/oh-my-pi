@@ -19,6 +19,7 @@ logger = QuintoAndarLogger("update_clean_staging_subpartitioned_tables")
 parser = ArgumentParser(description="update_clean_staging_subpartitioned_tables")
 parser.add_argument("execution_date")
 parser.add_argument("env")
+parser.add_argument("datalake_bucket")
 parser.add_argument("source")
 parser.add_argument("--spark", action="store_true", dest="spark_flag")
 parser.add_argument("--athena", action="store_true", dest="athena_flag")
@@ -54,6 +55,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     execution_date = args.execution_date
     env = args.env
+    datalake_bucket = args.datalake_bucket
     source = args.source
     spark_flag = args.spark_flag
     athena_flag = args.athena_flag
@@ -69,7 +71,7 @@ if __name__ == "__main__":
     year, month, day = date.year, date.month, date.day
 
     # setup
-    db_info = DatalakeMetastoreService.get_db_info(env, source)
+    db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
     spark_client = SparkClient()
     spark_metastore_service = SparkMetastoreService(spark_client)
 

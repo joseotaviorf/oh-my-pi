@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
+from bietlejuice.jobs.composer.base.db import DWMetastoreService
 from bietlejuice.jobs.composer.base.db import QUERIES_DATALAKE_PATH
 from bietlejuice.jobs.composer.services import FileService
 from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat
@@ -18,6 +18,7 @@ logger = QuintoAndarLogger("create_dw_table_in_datalake")
 
 parser = ArgumentParser(description="create_dw_table_in_datalake")
 parser.add_argument("table_name")
+parser.add_argument("dw_bucket")
 parser.add_argument("schema")
 parser.add_argument("env")
 
@@ -27,6 +28,7 @@ if __name__ == "__main__":
     # args
     args = parser.parse_args()
     table_name = args.table_name
+    dw_bucket = args.dw_bucket
     schema = args.schema
     env = args.env
 
@@ -39,7 +41,7 @@ if __name__ == "__main__":
         query = FileService.get_query_from_file_name(query_path)
 
     # setup
-    db_info = DatalakeMetastoreService.get_dw_info(env, schema)
+    db_info = DWMetastoreService.get_dw_info(env, schema, dw_bucket)
     spark_client = SparkClient()
     metastore_service = SparkMetastoreService(spark_client)
     loader = S3Loader(metastore_service)

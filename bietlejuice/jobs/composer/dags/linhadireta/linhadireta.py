@@ -13,6 +13,7 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG
 
 DAG_ID = "linhadireta"
 ENV = Variable.get("environment")
+DATALAKE_BUCKET = Variable.get("datalake_bucket")
 
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 
@@ -62,7 +63,7 @@ linhadireta_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": LOAD_LINHADIRETA_INTO_DATALAKE_RAW_FILE_PATH,
-            "parameters": [ENV],
+            "parameters": [ENV, DATALAKE_BUCKET],
         }
     },
 )
@@ -73,7 +74,7 @@ create_raw_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": CREATE_RAW_EXTERNAL_TABLES_FILE_PATH,
-            "parameters": [ENV],
+            "parameters": [ENV, DATALAKE_BUCKET],
         }
     },
 )

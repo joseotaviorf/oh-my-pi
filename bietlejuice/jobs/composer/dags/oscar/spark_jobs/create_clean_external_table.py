@@ -25,10 +25,12 @@ if __name__ == "__main__":
         "table_name", type=str, help="table name that will be created in Athena"
     )
     parser.add_argument("env", type=str, help="forno/prod values")
+    parser.add_argument("datalake_bucket")
 
     args = parser.parse_args()
 
     environment = args.env
+    datalake_bucket = args.datalake_bucket
     table_name = args.table_name
 
     logger.info(
@@ -36,7 +38,7 @@ if __name__ == "__main__":
         "msg=print args spark jobs params"
     )
 
-    db_info = DatalakeMetastoreService.get_db_info(environment, SOURCE)
+    db_info = DatalakeMetastoreService.get_db_info(environment, SOURCE, datalake_bucket)
     athena_metastore_service = AthenaMetastoreService(AthenaClient())
 
     logger.info("m=__main__, msg=Creating Athena database if not exists...")

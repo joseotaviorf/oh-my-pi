@@ -18,6 +18,7 @@ from bietlejuice.jobs.composer.services import FileService
 
 DAG_ID = f"bietlejuice.{SOURCE}"
 ENV = Variable.get("environment")
+DATALAKE_BUCKET = Variable.get("datalake_bucket")
 
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 
@@ -79,7 +80,7 @@ def clean_full_tasks(sub_dag_name, table_name, slugged_table_name):
             "spark_python_task": {
                 "python_file": SPARK_JOBS_PATH
                 + "create_clean_full_table_in_datalake.py",
-                "parameters": [table_name, ENV],
+                "parameters": [table_name, ENV, DATALAKE_BUCKET],
             }
         },
     )
@@ -90,7 +91,7 @@ def clean_full_tasks(sub_dag_name, table_name, slugged_table_name):
         json={
             "spark_python_task": {
                 "python_file": SPARK_JOBS_PATH + "create_clean_external_full_table.py",
-                "parameters": [table_name, ENV],
+                "parameters": [table_name, ENV, DATALAKE_BUCKET],
             }
         },
     )
@@ -116,7 +117,7 @@ def clean_incremental_tasks(sub_dag_name, table_name, slugged_table_name):
             "spark_python_task": {
                 "python_file": SPARK_JOBS_PATH
                 + "create_clean_incremental_table_in_datalake.py",
-                "parameters": [table_name, ENV, "{{ ds }}"],
+                "parameters": [table_name, ENV, DATALAKE_BUCKET, "{{ ds }}"],
             }
         },
     )
@@ -128,7 +129,7 @@ def clean_incremental_tasks(sub_dag_name, table_name, slugged_table_name):
             "spark_python_task": {
                 "python_file": SPARK_JOBS_PATH
                 + "create_clean_external_incremental_table.py",
-                "parameters": [table_name, ENV, "{{ ds }}"],
+                "parameters": [table_name, ENV, DATALAKE_BUCKET, "{{ ds }}"],
             }
         },
     )
@@ -190,7 +191,7 @@ load_full_tables_into_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator
     json={
         "spark_python_task": {
             "python_file": SPARK_JOBS_PATH + "load_full_tables_into_datalake_raw.py",
-            "parameters": [ENV],
+            "parameters": [ENV, DATALAKE_BUCKET],
         }
     },
 )
@@ -202,7 +203,7 @@ load_incremental_tables_into_datalake_raw_task = QuintoAndarDatabricksSubmitRunO
         "spark_python_task": {
             "python_file": SPARK_JOBS_PATH
             + "load_incremental_tables_into_datalake_raw.py",
-            "parameters": [ENV, "{{ ds }}"],
+            "parameters": [ENV, DATALAKE_BUCKET, "{{ ds }}"],
         }
     },
 )

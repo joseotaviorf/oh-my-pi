@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 import boto3
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.db import DatabaseEnum, DatalakeMetastoreService
+from bietlejuice.jobs.composer.base.db import DatabaseEnum, DWMetastoreService
 from bietlejuice.jobs.composer.services import S3Service
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils
 from bietlejuice.jobs.composer.clients.db_clients import PostgresClient, SparkClient
@@ -23,6 +23,7 @@ if base_dbutils.get_dbutils() is not None:
 parser = ArgumentParser(description=JOB_NAME)
 parser.add_argument("spectrum_iam_role")
 parser.add_argument("table_name")
+parser.add_argument("dw_bucket")
 parser.add_argument("dw_schema")
 parser.add_argument("env")
 
@@ -48,9 +49,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
     spectrum_iam_role = args.spectrum_iam_role
     table_name = args.table_name
+    dw_bucket = args.dw_bucket
     dw_schema = args.dw_schema
     env = args.env
-    dw_info = DatalakeMetastoreService.get_dw_info(env, dw_schema)
+    dw_info = DWMetastoreService.get_dw_info(env, dw_schema, dw_bucket)
 
     logger.info(
         "m=__main__, table_name={}, dw_schema={}, env={}, msg=Job execution "

@@ -13,6 +13,7 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG
 
 DAG_ID = "bietlejuice.tenant_booking_review"
 ENV = Variable.get("environment")
+DW_BUCKET = Variable.get("dw_bucket")
 SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
 
 # s3 vars
@@ -66,7 +67,7 @@ datalake_clean_to_dw_staging_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": SPARK_JOBS_PATH + "create_dw_table_in_datalake.py",
-            "parameters": [TABLE_NAME, "staging", ENV],
+            "parameters": [TABLE_NAME, DW_BUCKET, "staging", ENV],
         }
     },
 )
@@ -77,7 +78,7 @@ dw_staging_to_dw_public_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": SPARK_JOBS_PATH + "create_dw_table_in_datalake.py",
-            "parameters": [TABLE_NAME, "public", ENV],
+            "parameters": [TABLE_NAME, DW_BUCKET, "public", ENV],
         }
     },
 )
@@ -88,7 +89,13 @@ dw_public_to_redshift_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": SPARK_JOBS_PATH + "load_dw_table_into_redshift.py",
-            "parameters": [SPECTRUM_IAM_ROLE, f"dim_{TABLE_NAME}", "public", ENV],
+            "parameters": [
+                SPECTRUM_IAM_ROLE,
+                f"dim_{TABLE_NAME}",
+                DW_BUCKET,
+                "public",
+                ENV,
+            ],
         }
     },
 )

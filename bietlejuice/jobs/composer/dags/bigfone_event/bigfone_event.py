@@ -21,6 +21,7 @@ MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
 
 
 ENV = Variable.get("environment")
+DATALAKE_BUCKET = Variable.get("datalake_bucket")
 
 # s3 vars
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
@@ -69,7 +70,7 @@ load_event_table_to_raw_task = QuintoAndarDatabricksSubmitRunOperator(
             "python_file": "{}/load_event_table_into_datalake_raw.py".format(
                 SPARK_JOBS_PATH
             ),
-            "parameters": ["{{ ds }}", ENV],
+            "parameters": ["{{ ds }}", ENV, DATALAKE_BUCKET],
         }
     },
 )
@@ -82,7 +83,7 @@ load_event_table_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
             "python_file": "{}/load_event_table_into_datalake_clean.py".format(
                 SPARK_JOBS_PATH
             ),
-            "parameters": ["{{ ds }}", ENV],
+            "parameters": ["{{ ds }}", ENV, DATALAKE_BUCKET],
         }
     },
 )
@@ -95,7 +96,7 @@ create_clean_partition_task = QuintoAndarDatabricksSubmitRunOperator(
             "python_file": "{}/create_partition_on_events_table.py".format(
                 SPARK_JOBS_PATH
             ),
-            "parameters": ["{{ ds }}", ENV],
+            "parameters": ["{{ ds }}", ENV, DATALAKE_BUCKET],
         }
     },
 )

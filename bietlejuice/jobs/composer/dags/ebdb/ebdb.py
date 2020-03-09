@@ -22,6 +22,8 @@ MAIN_SCHEDULE_INTERVAL = "0 22 * * *"
 # Job params
 SOURCE = "ebdb"
 DW_SCHEMA = "public_spark"
+DW_BUCKET = Variable.get("dw_bucket")
+DATALAKE_BUCKET = Variable.get("datalake_bucket")
 
 # s3 path setup
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
@@ -55,7 +57,7 @@ def create_clean_table_in_datalake_task(local_dag, table_name, source, env, dag_
         json={
             "spark_python_task": {
                 "python_file": SPARK_JOBS_PATH + "create_clean_table_in_datalake.py",
-                "parameters": [table_name, source, env, dag_name],
+                "parameters": [table_name, source, env, DATALAKE_BUCKET, dag_name],
             }
         },
     )
@@ -70,7 +72,7 @@ def create_dw_table_in_datalake_task(local_dag, table_name, schema, env, dag_nam
         json={
             "spark_python_task": {
                 "python_file": SPARK_JOBS_PATH + "create_dw_table_in_datalake.py",
-                "parameters": [table_name, schema, env, dag_name],
+                "parameters": [table_name, DW_BUCKET, schema, env, dag_name],
             }
         },
     )
@@ -85,7 +87,7 @@ def load_dw_table_into_redshift_task(local_dag, table_name, schema, env):
         json={
             "spark_python_task": {
                 "python_file": SPARK_JOBS_PATH + "load_dw_table_into_redshift.py",
-                "parameters": [SPECTRUM_IAM_ROLE, table_name, schema, env],
+                "parameters": [SPECTRUM_IAM_ROLE, table_name, DW_BUCKET, schema, env],
             }
         },
     )
@@ -190,7 +192,7 @@ ebdb_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": SPARK_JOBS_PATH + "load_ebdb_into_datalake.py",
-            "parameters": [ENV],
+            "parameters": [ENV, DATALAKE_BUCKET],
         }
     },
 )

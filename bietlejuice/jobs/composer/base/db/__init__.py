@@ -7,6 +7,7 @@ from bietlejuice.jobs.composer.base.db.database_enum import (
 from bietlejuice.jobs.composer.base.db.datalake_metastore_service import (
     DatalakeMetastoreService,
 )
+from bietlejuice.jobs.composer.base.db.dw_metastore_service import DWMetastoreService
 
 DB_SQL_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../db")
 

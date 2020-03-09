@@ -27,6 +27,7 @@ if __name__ == "__main__":
     # Get arguments passed by Airflow task
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
+    parser.add_argument("datalake_bucket")
     parser.add_argument("source")
     parser.add_argument("execution_date")
     parser.add_argument("table_name")
@@ -35,6 +36,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     environment = args.env
+    datalake_bucket = args.datalake_bucket
     source = args.source
     execution_date = args.execution_date
     table_name = args.table_name
@@ -91,7 +93,7 @@ if __name__ == "__main__":
             df = df.withColumn(field.name, df[field.name].cast("string"))
 
     # Loads data into S3 incrementally
-    db_info = DatalakeMetastoreService.get_db_info(environment, source)
+    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
     spark_metastore_service.create_database(database_name)
 

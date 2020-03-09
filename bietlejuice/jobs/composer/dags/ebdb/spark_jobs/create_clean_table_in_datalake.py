@@ -19,6 +19,7 @@ parser = ArgumentParser(description="create_clean_table_in_datalake")
 parser.add_argument("table_name")
 parser.add_argument("source")
 parser.add_argument("env")
+parser.add_argument("datalake_bucket")
 parser.add_argument("dag_name")
 
 if __name__ == "__main__":
@@ -27,13 +28,14 @@ if __name__ == "__main__":
     table_name = args.table_name
     source = args.source
     env = args.env
+    datalake_bucket = args.datalake_bucket
     dag_name = args.dag_name
 
     query_path = QUERIES_DATALAKE_PATH + dag_name + "/{}.sql".format(table_name)
     query = FileService.get_query_from_file_name(query_path)
 
     # setup
-    db_info = DatalakeMetastoreService.get_db_info(env, source)
+    db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
     spark_client = SparkClient()
     metastore_service = SparkMetastoreService(spark_client)
     loader = S3Loader(metastore_service)

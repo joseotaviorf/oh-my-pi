@@ -24,12 +24,14 @@ if base_dbutils.get_dbutils() is not None:
 
 parser = ArgumentParser(description=JOB_NAME)
 parser.add_argument("env")
+parser.add_argument("datalake_bucket")
 parser.add_argument("source")
 parser.add_argument("schema")
 
 if __name__ == "__main__":
     args = parser.parse_args()
     environment = args.env
+    datalake_bucket = args.datalake_bucket
     source = args.source
     schema = args.schema
 
@@ -42,7 +44,7 @@ if __name__ == "__main__":
     postgres_consumer = PostgresConsumer(conn_config, spark_client)
     postgres_consumer.conn_config["schema"] = schema
 
-    db_info = DatalakeMetastoreService.get_db_info(environment, source)
+    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     metastore_service = SparkMetastoreService(spark_client)
     loader = S3Loader(metastore_service)
 

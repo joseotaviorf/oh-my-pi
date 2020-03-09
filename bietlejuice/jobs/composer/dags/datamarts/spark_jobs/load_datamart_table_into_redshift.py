@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 import boto3
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService, DatabaseEnum
+from bietlejuice.jobs.composer.base.db import DWMetastoreService, DatabaseEnum
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient, PostgresClient
 from bietlejuice.jobs.composer.consumers.db_consumers import (
@@ -55,6 +55,7 @@ def validate_load(spark_schema, redshift_schema, table_name):
 
 parser = ArgumentParser(description=JOB_NAME)
 parser.add_argument("env")
+parser.add_argument("dw_bucket")
 parser.add_argument("spectrum_iam_role")
 parser.add_argument("dw_schema")
 parser.add_argument("table_name")
@@ -62,6 +63,7 @@ parser.add_argument("table_name")
 if __name__ == "__main__":
     args = parser.parse_args()
     env = args.env
+    dw_bucket = args.dw_bucket
     spectrum_iam_role = args.spectrum_iam_role
     dw_schema = args.dw_schema
     table_name = args.table_name
@@ -72,7 +74,7 @@ if __name__ == "__main__":
     )
 
     s3_client = S3Service(boto3.resource("s3"))
-    dw_info = DatalakeMetastoreService.get_dw_info(env, dw_schema)
+    dw_info = DWMetastoreService.get_dw_info(env, dw_schema, dw_bucket)
     redshift_conn = json.loads(dbutils.secrets.get("quintoandar", DatabaseEnum.DW))
     redshift_client = PostgresClient(
         dbname=redshift_conn["db"],

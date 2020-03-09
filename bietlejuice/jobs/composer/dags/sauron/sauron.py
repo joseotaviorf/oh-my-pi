@@ -19,6 +19,7 @@ MAIN_START_DATE = datetime(2019, 10, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "30 1 * * *"
 
 ENV = Variable.get("environment")
+DATALAKE_BUCKET = Variable.get("datalake_bucket")
 SOURCE = "sauron"
 schema = "public"
 
@@ -84,7 +85,7 @@ def build_table_sub_dag(
         json={
             "spark_python_task": {
                 "python_file": CREATE_CLEAN_TABLES_IN_DATALAKE_FILE_PATH,
-                "parameters": [table_name, DAG_ID, env, DAG_ID],
+                "parameters": [table_name, DAG_ID, env, DATALAKE_BUCKET, DAG_ID],
             }
         },
     )
@@ -97,6 +98,7 @@ def build_table_sub_dag(
                 "python_file": CREATE_EXTERNAL_TABLES_FILE_PATH,
                 "parameters": [
                     env,
+                    DATALAKE_BUCKET,
                     "clean",
                     source,
                     schema,
@@ -124,7 +126,7 @@ sauron_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": LOAD_SAURON_INTO_DATALAKE_RAW_FILE_PATH,
-            "parameters": [ENV],
+            "parameters": [ENV, DATALAKE_BUCKET],
         }
     },
 )

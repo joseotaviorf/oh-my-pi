@@ -24,6 +24,7 @@ MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
 DAG_ID = f"bietlejuice.{SOURCE}"
 ENV = Variable.get("environment")
 SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
+DW_BUCKET = Variable.get("dw_bucket")
 
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
@@ -68,7 +69,7 @@ def dw_tasks(sub_dag_name, table_name, slugged_table_name):
         json={
             "spark_python_task": {
                 "python_file": SPARK_JOBS_PATH + "create_table_in_dw_staging.py",
-                "parameters": [table_name, ENV],
+                "parameters": [DW_BUCKET, table_name, ENV],
             }
         },
     )
@@ -79,7 +80,7 @@ def dw_tasks(sub_dag_name, table_name, slugged_table_name):
         json={
             "spark_python_task": {
                 "python_file": SPARK_JOBS_PATH + "create_table_in_dw.py",
-                "parameters": [table_name, ENV],
+                "parameters": [DW_BUCKET, table_name, ENV],
             }
         },
     )
@@ -90,7 +91,7 @@ def dw_tasks(sub_dag_name, table_name, slugged_table_name):
         json={
             "spark_python_task": {
                 "python_file": SPARK_JOBS_PATH + "load_dw_table_into_redshift.py",
-                "parameters": [table_name, ENV, SPECTRUM_IAM_ROLE],
+                "parameters": [DW_BUCKET, table_name, ENV, SPECTRUM_IAM_ROLE],
             }
         },
     )

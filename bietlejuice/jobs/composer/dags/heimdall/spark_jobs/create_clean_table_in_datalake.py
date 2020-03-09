@@ -18,6 +18,7 @@ logger = QuintoAndarLogger("create_clean_table_in_datalake")
 parser = ArgumentParser(description="create_clean_table_in_datalake")
 parser.add_argument("source")
 parser.add_argument("env")
+parser.add_argument("datalake_bucket")
 parser.add_argument("dag_name")
 
 if __name__ == "__main__":
@@ -25,6 +26,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     source = args.source
     env = args.env
+    datalake_bucket = args.datalake_bucket
     dag_name = args.dag_name
     table_name = "activity"
 
@@ -32,7 +34,7 @@ if __name__ == "__main__":
     query = FileService.get_query_from_file_name(query_path)
 
     # setup
-    db_info = DatalakeMetastoreService.get_db_info(env, source)
+    db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
     spark_client = SparkClient()
     metastore_service = SparkMetastoreService(spark_client)
     loader = S3Loader(metastore_service)

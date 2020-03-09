@@ -31,6 +31,7 @@ if __name__ == "__main__":
     # args passed by Airflow task
     parser.add_argument("execution_date", type=str, help="execution date in str format")
     parser.add_argument("environment", type=str, help="forno/prod values")
+    parser.add_argument("datalake_bucket")
 
     args = parser.parse_args()
 
@@ -41,6 +42,7 @@ if __name__ == "__main__":
 
     execution_date = args.execution_date
     environment = args.environment
+    datalake_bucket = args.datalake_bucket
     table_name = "event"
 
     dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
@@ -73,7 +75,9 @@ if __name__ == "__main__":
     consumer = PostgresConsumer(conn_config, spark_client)
     event_table_data = consumer.get_data_from_query(query.format(**query_filter))
 
-    datalake_info = DatalakeMetastoreService().get_db_info(environment, SOURCE)
+    datalake_info = DatalakeMetastoreService.get_db_info(
+        environment, SOURCE, datalake_bucket
+    )
 
     metastore_service = SparkMetastoreService(spark_client)
 

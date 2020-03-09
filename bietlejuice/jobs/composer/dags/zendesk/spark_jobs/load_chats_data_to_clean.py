@@ -31,6 +31,7 @@ if __name__ == "__main__":
         "days_interval_end", type=str, help="end interval of days to reprocess"
     )
     parser.add_argument("environment", type=str, help="forno/prod values")
+    parser.add_argument("datalake_bucket")
     args = parser.parse_args()
 
     logger.info(
@@ -43,10 +44,11 @@ if __name__ == "__main__":
     days_interval_start = int(args.days_interval_start)
     days_interval_end = int(args.days_interval_end)
     environment = args.environment
+    datalake_bucket = args.datalake_bucket
     source = "zendesk"
     partition = ["year", "month", "day"]
 
-    db_info = DatalakeMetastoreService.get_db_info(environment, source)
+    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
 
     spark_client = SparkClient()
     conn_config = {"db": db_info["db_raw_databricks"]}

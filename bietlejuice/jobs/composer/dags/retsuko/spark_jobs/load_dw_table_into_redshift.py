@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 import boto3
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.db import DatabaseEnum, DatalakeMetastoreService
+from bietlejuice.jobs.composer.base.db import DatabaseEnum, DWMetastoreService
 from bietlejuice.jobs.composer.services import S3Service
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils
 from bietlejuice.jobs.composer.clients.db_clients import PostgresClient, SparkClient
@@ -21,7 +21,7 @@ logger = QuintoAndarLogger(JOB_NAME)
 if __name__ == "__main__":
 
     parser = ArgumentParser(description=JOB_NAME)
-
+    parser.add_argument("dw_bucket", type=str, help="dw bucket")
     parser.add_argument(
         "table_name", type=str, help="table name that will be created in Redshift"
     )
@@ -33,6 +33,7 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
+    dw_bucket = args.dw_bucket
     table_name = args.table_name
     env = args.env
     spectrum_iam_role = args.spectrum_iam_role
@@ -42,7 +43,7 @@ if __name__ == "__main__":
         "started".format(table_name, DW_SCHEMA, env)
     )
 
-    dw_info = DatalakeMetastoreService.get_dw_info(env, DW_SCHEMA)
+    dw_info = DWMetastoreService.get_dw_info(env, DW_SCHEMA, dw_bucket)
 
     s3_client = S3Service(boto3.resource("s3"))
     spark_metastore_service = SparkMetastoreService(SparkClient())

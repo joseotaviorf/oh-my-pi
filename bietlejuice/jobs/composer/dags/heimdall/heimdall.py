@@ -12,6 +12,7 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG
 
 DAG_ID = "heimdall"
 ENV = Variable.get("environment")
+DATALAKE_BUCKET = Variable.get("datalake_bucket")
 
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 
@@ -73,7 +74,7 @@ heimdall_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": LOAD_HEIMDALL_INTO_DATALAKE_RAW_FILE_PATH,
-            "parameters": [ENV],
+            "parameters": [ENV, DATALAKE_BUCKET],
         }
     },
 )
@@ -84,7 +85,7 @@ create_raw_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": CREATE_RAW_EXTERNAL_TABLES_FILE_PATH,
-            "parameters": [ENV],
+            "parameters": [ENV, DATALAKE_BUCKET],
         }
     },
 )
@@ -95,7 +96,7 @@ create_clean_table_in_datalake = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": CREATE_CLEAN_TABLE_FILE_PATH,
-            "parameters": ["heimdall", ENV, DAG_ID],
+            "parameters": ["heimdall", ENV, DATALAKE_BUCKET, DAG_ID],
         }
     },
 )

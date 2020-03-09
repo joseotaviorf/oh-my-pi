@@ -18,11 +18,13 @@ logger = QuintoAndarLogger(JOB_NAME)
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
+    parser.add_argument("datalake_bucket")
     args = parser.parse_args()
     environment = args.env
+    datalake_bucket = args.datalake_bucket
     source = "heimdall"
 
-    db_info = DatalakeMetastoreService.get_db_info(environment, source)
+    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
 
     spark_metastore_service = SparkMetastoreService(SparkClient())
     table_names = spark_metastore_service.get_table_names(

@@ -13,7 +13,6 @@ from bietlejuice.jobs.composer.loaders import S3Loader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
 from bietlejuice.jobs.composer.dags.cidade_alerta import (
-    SOURCE,
     BLOCK_TABLES,
     INCREMENTAL_TABLES,
 )
@@ -26,8 +25,11 @@ logger = QuintoAndarLogger(JOB_NAME)
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
+    parser.add_argument("datalake_bucket")
     args = parser.parse_args()
     environment = args.env
+    datalake_bucket = args.datalake_bucket
+    source = "cidade_alerta"
 
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
@@ -43,7 +45,7 @@ if __name__ == "__main__":
     mongo_consumer = MongoConsumer(mongo_client, spark_client)
 
     tables = mongo_consumer.get_table_names_and_sizes().collect()
-    db_info = DatalakeMetastoreService.get_db_info(environment, SOURCE)
+    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     metastore_service = SparkMetastoreService(spark_client)
     loader = S3Loader(metastore_service)
 

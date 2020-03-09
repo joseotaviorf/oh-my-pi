@@ -13,6 +13,7 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG
 
 DAG_ID = "docx"
 ENV = Variable.get("environment")
+DATALAKE_BUCKET = Variable.get("datalake_bucket")
 ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
 
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
@@ -70,7 +71,7 @@ docx_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": LOAD_DOCX_INTO_DATALAKE_RAW_FILE_PATH,
-            "parameters": [ENV],
+            "parameters": [ENV, DATALAKE_BUCKET],
         }
     },
 )
@@ -81,7 +82,7 @@ create_raw_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": CREATE_RAW_EXTERNAL_TABLES_FILE_PATH,
-            "parameters": [ENV],
+            "parameters": [ENV, DATALAKE_BUCKET],
         }
     },
 )

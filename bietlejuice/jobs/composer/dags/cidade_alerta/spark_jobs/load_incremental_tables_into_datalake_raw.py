@@ -28,10 +28,12 @@ if __name__ == "__main__":
 
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env", type=str, help="forno/prod environment")
+    parser.add_argument("datalake_bucket")
     parser.add_argument("execution_date", type=str, help="DAG execution date")
 
     args = parser.parse_args()
     environment = args.env
+    datalake_bucket = args.datalake_bucket
     execution_date = args.execution_date
 
     dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
@@ -50,7 +52,7 @@ if __name__ == "__main__":
     spark_client = SparkClient()
     mongo_consumer = MongoConsumer(mongo_client, spark_client)
 
-    db_info = DatalakeMetastoreService.get_db_info(environment, SOURCE)
+    db_info = DatalakeMetastoreService.get_db_info(environment, SOURCE, datalake_bucket)
     spark_metastore_service = SparkMetastoreService(spark_client)
     loader = S3Loader(spark_metastore_service)
 

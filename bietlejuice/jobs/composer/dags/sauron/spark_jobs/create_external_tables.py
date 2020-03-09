@@ -20,6 +20,7 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 parser = ArgumentParser(description=JOB_NAME)
 parser.add_argument("env")
+parser.add_argument("datalake_bucket")
 parser.add_argument("datalake_layer")
 parser.add_argument("source")
 parser.add_argument("schema")
@@ -38,7 +39,7 @@ def get_tables(all, tables):
         )
 
     if all:
-        db_info = DatalakeMetastoreService.get_db_info(env, source)
+        db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
         db_databricks = db_info[f"db_{datalake_layer}_databricks"]
         spark_metastore_service = SparkMetastoreService(SparkClient())
         tables = spark_metastore_service.get_table_names(
@@ -53,7 +54,7 @@ def create_external_table(args):
     athena_ms_service, spark_ms_service, datalake_layer, table_name = args
 
     # get table metadata
-    db_info = DatalakeMetastoreService.get_db_info(env, source)
+    db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
     db_path = db_info[f"db_{datalake_layer}_path"]
     db_athena = db_info[f"db_{datalake_layer}_athena"]
     db_databricks = db_info[f"db_{datalake_layer}_databricks"]
@@ -76,6 +77,7 @@ def create_external_table(args):
 if __name__ == "__main__":
     args = parser.parse_args()
     env = args.env
+    datalake_bucket = args.datalake_bucket
     datalake_layer = args.datalake_layer
     source = args.source
     schema = args.schema

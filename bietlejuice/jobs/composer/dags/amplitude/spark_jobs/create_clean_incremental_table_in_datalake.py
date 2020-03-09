@@ -19,6 +19,7 @@ logger = QuintoAndarLogger("create_clean_incremental_table_in_datalake")
 parser = ArgumentParser(description="create_clean_incremental_table_in_datalake")
 parser.add_argument("execution_date")
 parser.add_argument("env")
+parser.add_argument("datalake_bucket")
 parser.add_argument("source")
 parser.add_argument("table_name")
 parser.add_argument("--partition_by", nargs="+", dest="partition_by", required=False)
@@ -28,6 +29,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     execution_date = args.execution_date
     env = args.env
+    datalake_bucket = args.datalake_bucket
     source = args.source
     table_name = args.table_name
     partition_cols = args.partition_by
@@ -42,7 +44,7 @@ if __name__ == "__main__":
     year, month, day = date.year, date.month, date.day
 
     # setup
-    db_info = DatalakeMetastoreService.get_db_info(env, source)
+    db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
     spark_client = SparkClient()
     metastore_service = SparkMetastoreService(spark_client)
     s3_loader = S3Loader(metastore_service)

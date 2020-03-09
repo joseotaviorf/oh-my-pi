@@ -20,8 +20,10 @@ logger = QuintoAndarLogger(JOB_NAME)
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
+    parser.add_argument("datalake_bucket")
     args = parser.parse_args()
     environment = args.env
+    datalake_bucket = args.datalake_bucket
     source = "terminator"
 
     base_dbutils = BaseDBUtils()
@@ -35,7 +37,7 @@ if __name__ == "__main__":
     spark_client = SparkClient()
     postgres_consumer = PostgresConsumer(conn_config, spark_client)
 
-    db_info = DatalakeMetastoreService.get_db_info(environment, source)
+    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
 
     metastore_service = SparkMetastoreService(spark_client)

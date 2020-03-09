@@ -3,18 +3,16 @@ from bietlejuice.jobs.composer.base.airflow import Environment
 
 class DatalakeMetastoreService:
     @staticmethod
-    def get_db_info(env, source):
+    def get_db_info(env, source, bucket):
         Environment.validate_env(env)
 
         # TODO: Forno is under new AWS accounts, then use new structure
         # Prod is temporarily under old AWS account and will be migrated soon, then this
         # if clause should be removed
         if env == Environment.FORNO:
-            bucket = f"datalake.s3.{env}.data.quintoandar.com.br"
             schema_suffix = ""
         else:
             schema_suffix = f"_{env}"
-            bucket = f"5a-datalake-{env}"
 
         spark_db_infos = {
             "db_raw_databricks": f"datalake_{source}_raw",
@@ -38,33 +36,4 @@ class DatalakeMetastoreService:
         db_infos.update(spark_db_infos)
         db_infos.update(athena_db_infos)
         db_infos.update(s3_infos)
-        return db_infos
-
-    @staticmethod
-    def get_dw_info(env, schema):
-        Environment.validate_env(env)
-
-        # TODO: Forno is under new AWS accounts, then use new structure
-        # Prod is temporarily under old AWS account and will be migrated soon, then this
-        # if clause should be removed
-        if env == Environment.FORNO:
-            bucket = f"dw.s3.{env}.data.quintoandar.com.br"
-        else:
-            bucket = f"5a-dw-{env}"
-
-        dw_bucket = {"dw_bucket": bucket}
-        spark_db_infos = {
-            "dw_staging_databricks": f"dw_{schema}_staging",
-            "dw_schema_databricks": f"dw_{schema}",
-        }
-        s3_infos = {
-            "dw_staging_path": f"s3://{bucket}/staging/{schema}/",
-            "dw_schema_path": f"s3://{bucket}/{schema}/",
-        }
-
-        db_infos = {}
-        db_infos.update(dw_bucket)
-        db_infos.update(spark_db_infos)
-        db_infos.update(s3_infos)
-
         return db_infos

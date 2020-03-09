@@ -35,6 +35,7 @@ if __name__ == "__main__":
     # Get arguments passed by Airflow task
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("environment")
+    parser.add_argument("datalake_bucket")
     parser.add_argument("source")
     parser.add_argument("table_name")
     parser.add_argument("storage")
@@ -42,6 +43,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     environment = args.env
+    datalake_bucket = args.datalake_bucket
     source = args.source
     table_name = args.table_name
     storage = args.storage
@@ -63,7 +65,7 @@ if __name__ == "__main__":
     loader = S3Loader(spark_metastore_service)
 
     # DB Info
-    db_info = DatalakeMetastoreService.get_db_info(environment, source)
+    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     db_databricks = db_info["db_{}_databricks".format(storage)]
     db_athena = db_info["db_{}_athena".format(storage)]
     db_path = db_info["db_{}_path".format(storage)]

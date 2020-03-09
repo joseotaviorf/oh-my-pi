@@ -22,8 +22,10 @@ BLOCK_LIST = ["pg_stat_statements", "flyway_schema_history"]
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
+    parser.add_argument("datalake_bucket")
     args = parser.parse_args()
     environment = args.env
+    datalake_bucket = args.datalake_bucket
 
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
@@ -35,7 +37,7 @@ if __name__ == "__main__":
     postgres_consumer = PostgresConsumer(conn_config, spark_client)
 
     tables = postgres_consumer.get_table_names_and_sizes().collect()
-    db_info = DatalakeMetastoreService.get_db_info(environment, SOURCE)
+    db_info = DatalakeMetastoreService.get_db_info(environment, SOURCE, datalake_bucket)
     metastore_service = SparkMetastoreService(spark_client)
 
     # create database if not exists

@@ -43,6 +43,7 @@ if __name__ == "__main__":
     # args passed by Airflow task
     parser.add_argument("execution_date", type=str, help="execution date in str format")
     parser.add_argument("environment", type=str, help="forno/prod values")
+    parser.add_argument("datalake_bucket")
 
     args = parser.parse_args()
 
@@ -54,9 +55,12 @@ if __name__ == "__main__":
 
     execution_date = args.execution_date
     environment = args.environment
+    datalake_bucket = args.datalake_bucket
     table_name = "events"
 
-    datalake_info = DatalakeMetastoreService().get_db_info(environment, SOURCE)
+    datalake_info = DatalakeMetastoreService.get_db_info(
+        environment, SOURCE, datalake_bucket
+    )
     dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
 
     query = FileService.get_query_from_file_name(
