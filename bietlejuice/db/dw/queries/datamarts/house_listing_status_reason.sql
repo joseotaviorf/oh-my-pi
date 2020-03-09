@@ -1,22 +1,22 @@
 with
 status_reason as (
 select
-    im.id as id_house,
+    im.id_house,
     im.status,
-    im.suspensionreason,
-    im.unpublishedreason,
+    im.suspension_reason,
+    im.unpublished_reason,
     case
-	    when ((im.suspensionreason is not null or im.suspensionreason != '') and im.status = 'suspenso') then im.suspensionreason
-	    when ((im.unpublishedreason is not null or im.unpublishedreason != '') and im.status = 'despublicado') then im.unpublishedreason
+	    when ((im.suspension_reason is not null or im.suspension_reason != '') and im.status = 'suspenso') then im.suspension_reason
+	    when ((im.unpublished_reason is not null or im.unpublished_reason != '') and im.status = 'despublicado') then im.unpublished_reason
 	    else 'unknown'
 		end status_reason,
-    rev.motivo as status_reason_2,
-    date(timestamp 'epoch' + (cast(rev.timestamp as bigint)/1000)* interval '1 second') as date_change_suspension_reason
-from datalake_raw.ebdb_imovel_aud im
-join datalake_raw.ebdb_usuariorevisionentity rev on im.rev=rev.id
+    rev.reason as status_reason_2,
+    date(timestamp 'epoch' + (cast(rev.ts_revision as bigint)/1000)* interval '1 second') as date_change_suspension_reason
+from datalake_ebdb_clean_prod.house_aud im
+join datalake_ebdb_clean_prod.user_revision_entity rev on im.rev=rev.id
 where
-	(suspensionreason_mod = 1 and im.status = 'suspenso')
-	or (unpublishedreason_mod = 1 and im.status = 'despublicado')
+	(mod_suspension_reason = 1 and im.status = 'suspenso')
+	or (mod_unpublished_reason = 1 and im.status = 'despublicado')
 ),
 aux_query as
 (select

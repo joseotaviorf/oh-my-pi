@@ -18,7 +18,7 @@ reviews as (
 ),
 reviews_by_house as (
   select
-      booking.imovel_id as id_house,
+      booking.id_house as id_house,
       round(avg(reviews.painting), 2) as painting,
       round(avg(reviews.costbenefit), 2) as costbenefit,
       round(avg(reviews.listingfidelity), 2) as listingfidelity,
@@ -29,8 +29,8 @@ reviews_by_house as (
       round(avg(reviews.indoorsilence), 2) as indoorsilence,
       count(*) as number_of_reviews
   from reviews
-  join datalake_raw.ebdb_agendamento as booking on reviews.visit_code = booking.codigo
-  where coalesce(booking.imovel_id, '') != ''
+  join datalake_ebdb_clean_prod.booking as booking on reviews.visit_code = booking.code
+  where booking.id_house is not null
   group by 1
 ),
 house_info as (
@@ -69,4 +69,4 @@ select
   end as reviews_average,
   r.number_of_reviews
 from reviews_by_house r
-left join house_info hi on hi.id_house = r.id_house
+left join house_info hi on hi.id_house = cast(r.id_house as varchar)

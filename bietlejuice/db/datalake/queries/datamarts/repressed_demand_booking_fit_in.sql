@@ -169,16 +169,16 @@ blocked_houses as (
   from
     (
     select
-      imovel_id as house_id,
+      id_house as house_id,
       status,
-      from_unixtime(cast(timestamp as bigint)/ 1000) as init,
-      coalesce(from_unixtime(cast(lead(timestamp) over (partition by imovel_id order by timestamp)as bigint)/ 1000),
+      from_unixtime(cast(ts_revision as bigint)/ 1000) as init,
+      coalesce(from_unixtime(cast(lead(ts_revision) over (partition by id_house order by ts_revision)as bigint)/ 1000),
       current_date) as "end"
     from
-      datalake_raw.ebdb_housevisitstatus_aud vs
-    join datalake_raw.ebdb_usuariorevisionentity r on
-      vs.REV = r.id
-      and status_mod = '1' )
+      datalake_ebdb_clean_prod.house_visit_status_aud vs
+    join datalake_ebdb_clean_prod.user_revision_entity r on
+      vs.rev = r.id
+      and mod_status = true
   where
     status = 'BLOCKED'
 ),
@@ -189,18 +189,16 @@ suspended_houses as (
   from
     (
     select
-      i.id as house_id,
+      i.id_house as house_id,
       status,
-      from_unixtime(cast(timestamp as bigint)/ 1000) as init,
-      coalesce(from_unixtime(cast(lead(timestamp) over (partition by i.id
-    order by
-      timestamp)as bigint)/ 1000),
+      from_unixtime(cast(ts_revision as bigint)/ 1000) as init,
+      coalesce(from_unixtime(cast(lead(ts_revision) over (partition by i.id_house order by ts_revision) as bigint)/ 1000),
       current_date) as "end"
     from
-      datalake_raw.ebdb_imovel_aud i
-    join datalake_raw.ebdb_usuariorevisionentity r on
+      datalake_ebdb_clean_prod.house_aud i
+    join datalake_ebdb_clean_prod.user_revision_entity r on
       i.rev = r.id
-      and status_mod = '1' )
+      and mod_status = true
   where
     status = 'suspenso'
 ),
@@ -258,10 +256,10 @@ left join house_available_hours hs
     	and cast(hs.day_of_week as bigint) = dow(t.target_date)
         and event_date between hs.available_started_date and coalesce(hs.available_ended_date, (date_add('day',2,current_date)))
 left join blocked_houses bh on
-  (t.house_id = bh.house_id
+  (t.house_id = cast(bh.house_id as varchar)
   and t.event_date between bh.init and bh."end")
 left join suspended_houses sh on
-  (t.house_id = sh.house_id
+  (t.house_id = cast(sh.house_id as varchar)
   and t.event_date between sh.init and sh."end")
   group by 1,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),

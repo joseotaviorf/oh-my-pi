@@ -23,35 +23,34 @@ mailing_list_updated as (
 base as (
     SELECT
         l.id,
-        l.criadoEm,
+        l.ts_created as criadoEm,
         fhl.mkt_origin  as "canal",
-        l.cidade,
+        l.city as cidade,
         dr.city_group   as "city_group",
         dr.name         as "region_name",
-        l.cep,
-        l.endereco,
-        l.numero,
-        l.complemento,
-        l.nomeAnunciante,
-        l.telefoneAnunciante,
-        l.telefoneAnuncianteDois,
-        l.telefoneAnuncianteTres,
-        l.proprietarioLead_id,
+        l.zip_code as cep,
+        l.address as endereco,
+        l.house_number as numero,
+        l.complement as complemento,
+        l.advertiser_name as nomeAnunciante,
+        l.advertiser_phone as telefoneAnunciante,
+        l.advertiser_second_phone as telefoneAnuncianteDois,
+        l.advertiser_third_phone telefoneAnuncianteTres,
+        l.id_lead_owner as proprietarioLead_id,
         l.reason,
         l.status,
         t.score_factor,
         cast(substr(eventdate, 1, 19) as timestamp)                         as ts_call,
-        concat('https://user.quintoandar.com.br/lead/', l.id, '/converter') as "url_admin"
+        concat('https://user.quintoandar.com.br/lead/', cast(l.id as varchar), '/converter') as "url_admin"
     FROM datalake_clean.autodialer_task_reference_inbound_event_histories events
     LEFT JOIN tasks_updated t on t.id = events.task_id
-    LEFT JOIN datalake_raw.ebdb_lead l on l.id = t.id_origin
-    LEFT JOIN datalake_clean.ods_fact_house_listing_flows fhl on fhl.sk_lead = l.id
+    LEFT JOIN datalake_ebdb_clean_prod.lead l on cast(l.id as varchar) = t.id_origin
+    LEFT JOIN datalake_clean.ods_fact_house_listing_flows fhl on fhl.sk_lead = cast(l.id as varchar)
     JOIN datalake_clean.autodialer_task_references r on r.task_id = t.id
     JOIN mailing_list_updated m on m.codigo = r.task_id
     LEFT JOIN datalake_clean.ods_dim_region dr on dr.sk_region = fhl.sk_region
     WHERE taskReferenceEventOrigin = 'WEB_HOOK_BEFORE_NOTIFICATION'
-        AND cast(substr(l.criadoEm, 1, 10) as date) >= CURRENT_DATE - interval '120' day
-        AND l.criadoEm <> ''
+        AND date(l.ts_created) >= CURRENT_DATE - interval '120' day
         AND reason = 'OWNER_WONT_ANSWER_PHONE'
         AND status = 'Prospeccao'
 ),
