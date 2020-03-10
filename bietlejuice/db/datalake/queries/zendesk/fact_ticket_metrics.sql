@@ -13,7 +13,7 @@ parse_fields as (
 ),
 fields_map as (
     select f.id,
-        map_agg(cf.raw_title, f.value) as custom_fields
+        map_agg(cf.raw_title, f.value) as cols
     from parse_fields f
     left join datalake_clean.zendesk_ticket_fields_xplenty cf
        on cf.id = f.field_id
@@ -60,7 +60,7 @@ tickets as (
 	left join fields_map c
 	    on c.id = t.id
 	left join datalake_clean.ods_dim_house_listing dhl
-	     on json_extract_scalar(cast(c.custom_fields as json), '$["Código do Imóvel"]') = dhl.short_id_house
+	     on c.cols['Código do Imóvel'] = dhl.short_id_house
 	        and cast(from_iso8601_timestamp(t.created_at) as timestamp)
 	        between cast(regexp_extract(dhl.ts_listing_version_start, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp)
 	         and (case
@@ -69,7 +69,7 @@ tickets as (
 	                else cast(regexp_extract(dhl.ts_listing_version_end, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp)
 	              end)
 	left join datalake_clean.ods_dim_contract dc
-	    on json_extract_scalar(cast(c.custom_fields as json), '$["Código do Imóvel"]') = dc.sk_contract
+	    on c.cols['Código do Contrato'] = dc.sk_contract
 ),
 contract as (
     select

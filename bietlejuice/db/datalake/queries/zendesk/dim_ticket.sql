@@ -19,6 +19,25 @@ groups as (
     inner join last_updated_group ge
     on ge.id_group = g.id_group and ge.ts_updated = g.ts_updated
     group by 1,2,3
+),
+custom_fields as (
+    with parse_fields as (
+		select tf.id_ticket,
+	        f1.field,
+	        regexp_replace(json_format(json_extract(f1.field, '$.id')), '^"|"$', '') as id_field,
+                regexp_replace(json_format(json_extract(f1.field, '$.value')), '^"|"$', '') as value
+	    from tickets_filter tf
+        inner join last_updated_ticket l
+            on tf.id_ticket=l.id_ticket
+	    cross join unnest(regexp_extract_all(tf.custom_fields, '{{[^}}]+[^,]+[^{{]+}}')) as f1(field)
+	)
+	select f.id_ticket,
+        map_agg(cf.raw_title, f.value) as cols
+    from parse_fields f
+    inner join datalake_clean.zendesk_ticket_fields cf
+       on cf.id_ticket_fields = f.id_field
+    where f.value != 'null'
+    group by 1
 )
 select
     cast(t.id_ticket as bigint) as sk_ticket,
@@ -37,12 +56,12 @@ select
     t.tags,
     t.status,
     coalesce(cast(t.is_public as boolean), false) as has_public_comments,
-    cast(c.custom_fields as json) as custom_fields,
+    json_format(cast(c.cols as JSON)) as custom_fields,
     cast(json_extract(t.satisfaction_rating,'$.score') as varchar) as score,
     cast(json_extract(t.satisfaction_rating,'$.reason') as varchar) as reason,
     cast(json_extract(t.satisfaction_rating,'$.comment') as varchar) as comment,
-    json_extract_scalar(cast(c.custom_fields as json), '$["Tipo de Solicitação"]')  as request_type,
-    json_extract_scalar(cast(c.custom_fields as json), '$["Tipo de Cliente"]') as client_type,
+    c.cols['Tipo de Solicitação'] as request_type,
+    c.cols['Tipo de Cliente'] as client_type,
     cast(t.ts_created as timestamp with time zone) as ts_created,
     cast(t.ts_created_local as timestamp with time zone) as ts_created_local,
     cast(t.ts_updated as timestamp with time zone) as ts_updated,
@@ -57,5 +76,5 @@ inner join tickets_filter t
 on te.id_ticket = t.id_ticket and te.ts_updated = t.ts_updated
 left join groups g
 on t.id_group = g.id_group
-left join datalake_clean.zendesk_custom_fields c
-on t.id_ticket = c.id_ticket
+left join custom_fields c
+on t.id_ticket = c.id_ticket;
