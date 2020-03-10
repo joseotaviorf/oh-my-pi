@@ -143,11 +143,11 @@ users_discarded_per_day as (
 ),
 bookings as (
 	select
-	a.imovel_id as house_id,
-	a.visitante_id,
-	min(date(cast(case when criadoem != '' then criadoem end as timestamp))) as first_booking
-	from datalake_raw.ebdb_agendamento a
-	where a.tipo = 'Visita'
+	a.id_house as house_id,
+	a.id_visitor,
+	min(date(ts_created)) as first_booking
+	from datalake_ebdb_clean_prod.booking a
+	where a.type = 'Visita'
 	group by 1, 2
 ),
 users_bookings_per_day as (
@@ -155,21 +155,21 @@ users_bookings_per_day as (
 	lv.sk_house_listing,
 	b.house_id,
 	date(b.first_booking) as booking_date,
-	count(b.visitante_id) as count_unique_visitors
+	count(b.id_visitor) as count_unique_visitors
 	from bookings b
-	join listing_versions lv on lv.house_id = b.house_id
+	join listing_versions lv on lv.house_id = cast(b.house_id as varchar)
 		and lv.publication_date <= b.first_booking
 		and coalesce(lv.max_version_time, now()) >= b.first_booking
 	group by 1, 2, 3
 ),
 visits as (
 	select
-	a.imovel_id as house_id,
-	a.visitante_id,
-	min(date(case when data != '' then data end)) as first_visit
-	from datalake_raw.ebdb_agendamento a
-	where a.tipo = 'Visita'
-	and a.fupVisita in ('VaiNegociar','Talvez','NaoGostou','VisitouSozinho')
+	a.id_house as house_id,
+	a.id_visitor,
+	min(dt_visit) as first_visit
+	from datalake_ebdb_clean_prod.booking a
+	where a.type = 'Visita'
+	and a.is_visit_completed
 	group by 1, 2
 ),
 users_visits_per_day as (
@@ -177,32 +177,32 @@ users_visits_per_day as (
 	lv.sk_house_listing,
 	v.house_id,
 	date(v.first_visit) as visit_date,
-	count(v.visitante_id) as count_unique_visitors
+	count(v.id_visitor) as count_unique_visitors
 	from visits v
-	join listing_versions lv on lv.house_id = v.house_id
+	join listing_versions lv on cast(lv.house_id as bigint) = v.house_id
 		and lv.publication_date <= v.first_visit
 		and coalesce(lv.max_version_time, now()) >= v.first_visit
 	group by 1, 2, 3
 ),
 offers_merge as ( -- list combinations of imovel, user and offer dates
 	select
-	imovel_id as imovel_id,
-	usuario_id as user_id,
-	date(cast(case when criadoem != '' then criadoem end as timestamp)) as offer_date
-	from datalake_raw.ebdb_preproposta
+	id_house,
+	id_user,
+	date(ts_created) as offer_date
+	from datalake_ebdb_clean_prod.pre_proposal
 	group by 1, 2, 3
 		union all
 	select
-	house_id as imovel_id,
-	client_id as user_id,
-	date(cast(case when criadoem != '' then criadoem end as timestamp)) as offer_date
-	from datalake_raw.ebdb_offer
+	id_house,
+	id_client as id_user,
+	date(cast(case when ts_created != null then ts_created end as timestamp)) as offer_date
+	from datalake_ebdb_clean_prod.offer
 	group by 1, 2, 3
 ),
 offers as ( -- for each imovel and each user, what is the date of first offer
 	select 
-	om.imovel_id as house_id,
-	user_id,
+	om.id_house,
+	id_user,
 	min(om.offer_date) as first_offer
 	from offers_merge om
 	group by 1, 2	
@@ -210,48 +210,48 @@ offers as ( -- for each imovel and each user, what is the date of first offer
 users_offers_per_day as ( -- for each apartment and each date, how many first offers are there
 	select
 	lv.sk_house_listing,
-	o.house_id,
+	o.id_house,
 	date(o.first_offer) as offer_date,
-	count(o.user_id) as count_unique_offerers
+	count(o.id_user) as count_unique_offerers
 	from offers o
-	join listing_versions lv on lv.house_id = o.house_id
+	join listing_versions lv on lv.house_id = cast(o.id_house as varchar)
 		and lv.publication_date <= o.first_offer
 		and coalesce(lv.max_version_time, now()) >= o.first_offer
 	group by 1, 2, 3
 ),
 offer_analysis_date as ( -- one line per offer and per status with the date it was first accepted/rejected
   select
-    oa.id,
+    oa.id_offer,
     oa.status,
-    min(cast(from_unixtime(cast(ure.timestamp as double) / 1000) as timestamp)) as _date
-  from datalake_raw.ebdb_offer_aud oa
-  join datalake_raw.ebdb_usuariorevisionentity ure
+    min(cast(from_unixtime(cast(ure.ts_revision as double) / 1000) as timestamp)) as _date
+  from datalake_ebdb_clean_prod.offer_aud oa
+  join datalake_ebdb_clean_prod.user_revision_entity ure
     on oa.rev = ure.id
-  where oa.status_MOD = '1'
+  where oa.MOD_status = true
     and oa.status in ('Aprovada', 'Rejeitada') 
   group by 1, 2
 ),
 offers_accepted_merge as ( -- list combinations of imovel, user and offer accepted dates
 	select
-    imovel_id as imovel_id,
-    usuario_id as user_id,
-    date(cast(case when dataaprovacao != '' then dataaprovacao end as timestamp)) as offer_accepted_date
-    from datalake_raw.ebdb_preproposta
-    where dataaprovacao != ''
+    id_house,
+    id_user,
+    date(cast(case when ts_approved != null then ts_approved end as timestamp)) as offer_accepted_date
+    from datalake_ebdb_clean_prod.pre_proposal
+    where ts_approved != null
     -- group by 1, 2, 3
 		union all
 	select
-	eo.house_id as imovel_id,
-	eo.client_id as user_id,
+	id_house,
+	id_client,
 	oad._date as offer_accepted_date
-	from datalake_raw.ebdb_offer eo
-    join offer_analysis_date oad on eo.id=oad.id and oad.status='Aprovada'
+	from datalake_ebdb_clean_prod.offer eo
+    join offer_analysis_date oad on eo.id=oad.id_offer and oad.status='Aprovada'
 	-- group by 1, 2, 3
 ),
 offers_accepted as ( -- for each imovel and each user, what is the date of first offer accepted
 	select 
-	oam.imovel_id as house_id,
-	user_id,
+	oam.id_house,
+	id_user,
 	min(oam.offer_accepted_date) as first_offer_accepted
 	from offers_accepted_merge oam
 	group by 1, 2	
@@ -259,11 +259,11 @@ offers_accepted as ( -- for each imovel and each user, what is the date of first
 users_offers_accepted_per_day as ( -- for each apartment and each date, how many first offers accepted are there?
 	select
 	lv.sk_house_listing,
-	oa.house_id,
+	oa.id_house,
 	date(oa.first_offer_accepted) as offer_accepted_date,
-	count(oa.user_id) as count_unique_offerers_accepted
+	count(oa.id_user) as count_unique_offerers_accepted
 	from offers_accepted oa
-	join listing_versions lv on lv.house_id = oa.house_id
+	join listing_versions lv on lv.house_id = cast(oa.id_house as varchar)
 		and lv.publication_date <= oa.first_offer_accepted
 		and coalesce(lv.max_version_time, now()) >= oa.first_offer_accepted
 	group by 1, 2, 3
@@ -324,24 +324,24 @@ lv_date_series as (
 ),
 imovel_status_rev as (
 	select 
-	cast(from_unixtime(cast(ure.timestamp as bigint) / 1000) as timestamp) as rev_ts,
-	date(cast(from_unixtime(cast(ure.timestamp as bigint) / 1000) as timestamp)) as rev_date,
+	cast(from_unixtime(cast(ure.ts_revision as bigint) / 1000) as timestamp) as rev_ts,
+	date(cast(from_unixtime(cast(ure.ts_revision as bigint) / 1000) as timestamp)) as rev_date,
 	ia.rev,
 	lv.sk_house_listing,
-	ia.status_mod = '1' as status_mod,
-	ia.aluguel_mod = '1' as aluguel_mod,
-	ia.iptu_mod = '1' as iptu_mod,
-	ia.condominio_mod = '1' as condominio_mod,
+	ia.mod_status,
+	ia.mod_rent,
+	ia.mod_iptu,
+	ia.mod_condo,
 	ia.status,
-	case when ia.valortotal = '' then NULL else cast(ia.valortotal as bigint) end as valor_total,
-	case when ia.aluguel = '' then NULL else cast(ia.aluguel as bigint) end as aluguel,
-	case when ia.condominio = '' then NULL else cast(ia.condominio as bigint) end as condominio,
-	case when ia.iptu = '' then NULL else cast(ia.iptu as bigint) end as iptu
-	from datalake_raw.ebdb_imovel_aud ia
-	join datalake_raw.ebdb_usuario_revision_entity ure on ure.id=ia.rev
-	join listing_versions lv on lv.house_id = ia.id 
-		and lv.publication_date <= cast(from_unixtime(cast(ure.timestamp as bigint) / 1000) as timestamp)
-		and coalesce(lv.max_version_time, now()) >= cast(from_unixtime(cast(ure.timestamp as bigint) / 1000) as timestamp)
+	case when ia.total_value is null then NULL else cast(ia.total_value as bigint) end as total_value,
+	case when ia.rent is null then NULL else cast(ia.rent as bigint) end as rent,
+	case when ia.condo is null then NULL else cast(ia.condo as bigint) end as condo,
+	case when ia.iptu is null then NULL else cast(ia.iptu as bigint) end as iptu
+	from datalake_ebdb_clean_prod.house_aud ia
+	join datalake_ebdb_clean_prod.user_revision_entity ure on ure.id=ia.rev
+	join listing_versions lv on lv.house_id = cast(ia.id_house as varchar) 
+		and lv.publication_date <= cast(from_unixtime(cast(ure.ts_revision as bigint) / 1000) as timestamp)
+		and coalesce(lv.max_version_time, now()) >= cast(from_unixtime(cast(ure.ts_revision as bigint) / 1000) as timestamp)
 ),
 imovel_max_rev_day as (
 	select
@@ -355,18 +355,18 @@ imovel_status_per_day as (
 	select 
 	date(isr.rev_ts) as rev_date,
 	isr.sk_house_listing,
-	max(isr.status_mod) as status_mod,
-	max(isr.aluguel_mod) as aluguel_mod,
-	max(isr.iptu_mod) as iptu_mod,
-	max(isr.condominio_mod) as condominio_mod,
+	max(isr.mod_status) as status_mod,
+	max(isr.mod_rent) as aluguel_mod,
+	max(isr.mod_iptu) as iptu_mod,
+	max(isr.mod_condo) as condominio_mod,
 	-- case when (max(isr.status_mod) or max(isr.status) != 'publicado') then 'other' else 'publicado' end as status,
 	max(isr_l.status) as last_status_day,
 	-- avg(isr.aluguel) as avg_aluguel,
 	-- avg(isr.valor_total) as avg_valortotal,
 	-- avg(isr.condominio) as avg_condominio,
 	-- avg(isr.iptu) as avg_iptu,
-	max(isr_l.aluguel) as last_aluguel,
-	max(isr_l.valor_total) as last_valortotal
+	max(isr_l.rent) as last_aluguel,
+	max(isr_l.total_value) as last_valortotal
 	-- max(isr_l.condominio) as last_condominio,
 	-- max(isr_l.iptu) as last_iptu
 	from imovel_status_rev isr

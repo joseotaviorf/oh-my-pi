@@ -13,11 +13,11 @@ with listing_versions as (
 contract_signed as (
 	select
 	lv.sk_house_listing,
-	min(date(cast(case when c.dataassinado != '' then c.dataassinado end as timestamp))) as contract_signed
-	from datalake_raw.ebdb_contrato c
-	join listing_versions lv on lv.id_house = cast(c.imovel_id as bigint)
-		and lv.publication_date <= cast(case when c.dataassinado != '' then c.dataassinado end as timestamp)
-		and coalesce(lv.max_version_time, now()) >= cast(case when c.dataassinado != '' then c.dataassinado end as timestamp)
+	min(date(c.ts_signed)) as contract_signed
+	from datalake_ebdb_clean_prod.contract c
+	join listing_versions lv on lv.id_house = cast(c.id_house as bigint)
+		and lv.publication_date <= cast(case when c.ts_signed is not null then c.ts_signed end as timestamp)
+		and coalesce(lv.max_version_time, now()) >= cast(case when c.ts_signed is not null then c.ts_signed end as timestamp)
 	 	and c.status in ('Finalizado','Ativo')
 	group by 1
 )
