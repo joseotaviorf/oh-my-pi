@@ -22,7 +22,7 @@
   left join datalake_ebdb_clean_prod.proposal offer_prop
     on offer_prop.id_offer = eof.id
   left join datalake_ebdb_clean_prod.contract offer_contract
-    on offer_prop.id = offer_contract.id_offer
+    on offer_prop.id = offer_contract.id_proposal
   left join datalake_ebdb_clean_prod.rent_flow eo
     on trim(ct.origin) = 'FluxoLocacao'
         and try_cast(try_cast(ct.id_origin as decimal) as bigint) = eo.id
