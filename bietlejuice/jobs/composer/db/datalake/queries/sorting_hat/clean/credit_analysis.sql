@@ -4,12 +4,12 @@ SELECT
     updated_at AS ts_updated,
     level,
     type,
-    should_interview AS is_should_interview,
+    should_interview,
     result,
     rejection_motive,
     comment,
     analyst_name,
-    analyst_main_id AS id_analyst_main,
+    analyst_main_id AS id_analyst,
     proposal_id AS id_proposal
 FROM
     datalake_sorting_hat_raw.`creditanalysis`
