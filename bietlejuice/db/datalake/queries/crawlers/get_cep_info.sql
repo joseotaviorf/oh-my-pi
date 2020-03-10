@@ -9,14 +9,14 @@ with input_ceps as (
 ),
 ebdb_ceps as (
     select
-        tplogradouro,
-        logradouro,
-        bairro,
-        cidade,
-        estado,
-        replace(cep, '-', '') as cepp
+        house_address_street_type as tplogradouro,
+        house_address_street as logradouro,
+        neighborhood as bairro,
+        city as cidade,
+        state as estado,
+        replace(zip_code, '-', '') as cepp
     from
-        datalake_raw.ebdb_cep
+        datalake_ebdb_clean_prod.cep
 )
 select c1.cep, c2.*
 from input_ceps c1

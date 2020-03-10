@@ -1,23 +1,23 @@
 with exclusives as (
     select distinct
         i.id,
-        cast(i.aluguel as double) as rent,
+        cast(i.rent as double) as rent,
         cast(i.lat as double) as lat,
         cast(i.lng as double) as lng,
-        cast(i.condominio as double) as condo,
-        cast(i.areatotal as bigint) as area,
-        cast(i.numeroQuartos as smallint) as bedrooms,
-        cast(if(i.firstpublication <> '', i.firstpublication) as timestamp) as firstpublication,
-        u.nome name,
-        u.telefonePrincipal as phone_number,
+        cast(i.condo as double) as condo,
+        cast(i.total_area as bigint) as area,
+        cast(i.bedrooms as smallint) as bedrooms,
+        i.dt_first_publication as firstpublication,
+        u.name,
+        u.main_phone as phone_number,
         u.email as email
-    from datalake_raw.ebdb_imovel i
-    join datalake_raw.ebdb_usuario u on u.id = i.usuario_id
-    join datalake_raw.ebdb_specialcondition sc
-        on sc.imovel_id = i.id
-    where (sc.optedOutAt is null or sc.optedOutat = '')
+    from datalake_ebdb_clean_prod.house i
+    join datalake_ebdb_clean_prod.user u on u.id = i.id_user
+    join datalake_ebdb_clean_prod.special_condition sc
+        on sc.id_house = i.id
+    where sc.ts_opted_out is null
         and i.status = 'publicado'
-        and sc.specialConditionType = 'Exclusivity'
+        and sc.special_condition_type = 'Exclusivity'
 ),
 crawled as (
     select distinct

@@ -4,13 +4,13 @@ radius AS (
 ),
 images AS (
   SELECT
-    i.imovel_id,
-    i.nome
-  FROM datalake_raw.ebdb_imagem i
-  WHERE TRY(CAST(i.ordem AS INTEGER)) <= 40  -- no more than 40 images per listing
-    AND NOT regexp_like(LOWER(i.legenda), 'churrasqueira|comum|condominio|condomínio|externa|externo|festa|festas|futebol|garagem|gourmet|jardim|piscina|playground|quadra|quintal|salão|sauna|skate|social|spa|subsolo')
+    i.id_house,
+    i.name
+  FROM datalake_ebdb_clean_prod.image i
+  WHERE i.sequence <= 40  -- no more than 40 images per listing
+    AND NOT regexp_like(LOWER(i.subtitle), 'churrasqueira|comum|condominio|condomínio|externa|externo|festa|festas|futebol|garagem|gourmet|jardim|piscina|playground|quadra|quintal|salão|sauna|skate|social|spa|subsolo')
     -- remove photos from external areas which will not help identify the apartment interior
-  ORDER BY i.imovel_id, i.ordem ASC
+  ORDER BY i.id_house, i.sequence ASC
 ),
 matches AS (
   SELECT
@@ -28,9 +28,9 @@ quintoandar_listings AS (
          l.house_lng,
          l.house_bedrooms,
          regexp_extract(trim(house_number), '\d+$') AS extracted_house_number,
-         array_agg(i.nome) AS photos
+         array_agg(i.name) AS photos
   FROM datalake_clean.ods_dim_house_listing l
-  LEFT JOIN images i ON l.id_house = i.imovel_id
+  LEFT JOIN images i ON cast(l.id_house as bigint) = i.id_house
   WHERE status IN ('publicado') AND is_last_version = 'True'
     AND COALESCE(house_lat, '') != '' AND COALESCE(house_lng, '') != ''
     AND COALESCE(
