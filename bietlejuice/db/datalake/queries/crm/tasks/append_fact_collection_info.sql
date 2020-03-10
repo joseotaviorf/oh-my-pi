@@ -2,16 +2,16 @@
   select
     t.*,
     cast(coalesce(dc.sk_contract, '-1') as bigint) as sk_contract,
-    cast(coalesce(eo.id, '-1') as bigint) as sk_rent_flow
+    coalesce(eo.id, -1) as sk_rent_flow
   from tasks t
   join datalake_clean.crm_tasks ct
     on t.sk_task = trim(ct.id)
   left join datalake_clean.ods_dim_contract dc
     on trim(ct.origin) = 'Contrato'
-      and cast(cast(ct.id_origin as decimal) as bigint) = try(cast(dc.sk_contract as bigint))
-  left join datalake_raw.ebdb_fluxolocacao eo
+      and try_cast(try_cast(ct.id_origin as decimal) as bigint) = try(cast(dc.sk_contract as bigint))
+  left join datalake_ebdb_clean_prod.rent_flow eo
     on trim(ct.origin) = 'FluxoLocacao'
-        and cast(cast(ct.id_origin as decimal) as bigint) = try(cast(eo.id as bigint))
+        and try_cast(try_cast(ct.id_origin as decimal) as bigint) = eo.id
 ),
 contract_house_listing as (
   select

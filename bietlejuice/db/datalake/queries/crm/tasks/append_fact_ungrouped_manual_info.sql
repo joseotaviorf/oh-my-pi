@@ -2,30 +2,30 @@
   select
     t.*,
     cast(coalesce(dc.sk_contract, '-1') as bigint) as sk_contract,
-    cast(coalesce(eo.id, '-1') as bigint) as sk_rent_flow
+    coalesce(eo.id, -1) as sk_rent_flow
   from tasks t
   join datalake_clean.crm_tasks ct
     on t.sk_task = trim(ct.id)
   left join datalake_clean.ods_dim_contract dc
     on trim(ct.origin) = 'Contrato'
       and try_cast(try_cast(ct.id_origin as decimal) as bigint) = try_cast(dc.sk_contract as bigint)
-  left join datalake_raw.ebdb_preproposta epp
+  left join datalake_ebdb_clean_prod.pre_proposal epp
     on trim(ct.origin) = 'PreProposta'
-        and try_cast(try_cast(ct.id_origin as decimal) as bigint) = try_cast(epp.id as bigint)
-  left join datalake_raw.ebdb_proposta ep
-    on epp.id = ep.preproposta_id
-  left join datalake_raw.ebdb_contrato ec
-    on ep.id = ec.proposta_id
-  left join datalake_raw.ebdb_offer eof
+        and try_cast(try_cast(ct.id_origin as decimal) as bigint) = epp.id
+  left join datalake_ebdb_clean_prod.proposal ep
+    on epp.id = ep.id_pre_proposal
+  left join datalake_ebdb_clean_prod.contract ec
+    on ep.id = ec.id_proposal
+  left join datalake_ebdb_clean_prod.offer eof
     on trim(ct.origin) = 'Offer'
-        and try_cast(try_cast(ct.id_origin as decimal) as bigint) = try_cast(eof.godfatherid as bigint)
-  left join datalake_raw.ebdb_proposta offer_prop
-    on offer_prop.offer_id = eof.id
-  left join datalake_raw.ebdb_contrato offer_contract
-    on try_cast(offer_prop.id as bigint) = try_cast(offer_contract.proposta_id as bigint)
-  left join datalake_raw.ebdb_fluxolocacao eo
+        and try_cast(try_cast(ct.id_origin as decimal) as bigint) = eof.id_godfather
+  left join datalake_ebdb_clean_prod.proposal offer_prop
+    on offer_prop.id_offer = eof.id
+  left join datalake_ebdb_clean_prod.contract offer_contract
+    on offer_prop.id = offer_contract.id_offer
+  left join datalake_ebdb_clean_prod.rent_flow eo
     on trim(ct.origin) = 'FluxoLocacao'
-        and try_cast(try_cast(ct.id_origin as decimal) as bigint) = try_cast(eo.id as bigint)
+        and try_cast(try_cast(ct.id_origin as decimal) as bigint) = eo.id
 ),
 contract_house_listing as (
   select

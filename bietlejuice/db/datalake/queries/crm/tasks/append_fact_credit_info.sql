@@ -1,17 +1,17 @@
 , proposals as (
   select
     t.*,
-    cast(coalesce(ep.id, '-1') as bigint) as sk_proposal,
-    cast(coalesce(epi.usuario_id, '-1') as bigint) as sk_house_owner,
-    cast(coalesce(ep.proponente_id, '-1') as bigint) as sk_proponent
+    coalesce(ep.id, -1) as sk_proposal,
+    coalesce(epi.id_user, -1) as sk_house_owner,
+    coalesce(ep.id_proponent, -1) as sk_proponent
   from tasks t
   join datalake_clean.crm_tasks ct
     on t.sk_task = trim(ct.id)
-  left join datalake_raw.ebdb_proposta ep
+  left join datalake_ebdb_clean_prod.proposal ep
     on trim(ct.origin) = 'Proposta'
-      and cast(cast(ct.id_origin as decimal) as bigint) = try(cast(ep.id as bigint))
-  left join datalake_raw.ebdb_imovel epi
-    on epi.id = ep.imovel_id
+      and cast(cast(ct.id_origin as decimal) as bigint) = ep.id
+  left join datalake_ebdb_clean_prod.house epi
+    on epi.id = ep.id_house
 ),
 proposal_house_listing as (
   select
