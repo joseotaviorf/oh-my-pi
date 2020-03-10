@@ -50,11 +50,11 @@ SELECT
     coalesce((mlc.active = 'Y'), false) as is_mailing_active,
     coalesce((mlc.estado = 'P'), false) as is_mailing_paused,
     now() as ts_load
-FROM datalake_raw.ebdb_lead l
-JOIN tasks_updated t on t.id_origin = l.id
+FROM datalake_ebdb_clean_prod.lead l
+JOIN tasks_updated t on t.id_origin = cast(l.id as varchar)
 LEFT JOIN datalake_clean.autodialer_task_references r on r.task_id = t.id
 LEFT JOIN mailing_list_updated_max m1 on m1.codigo = r.task_id
 LEFT JOIN mailing_list_updated_min m2 on m2.codigo = r.task_id
 LEFT JOIN first_call events on events.task_id = t.id
-LEFT JOIN datalake_raw.autodialer_mailing_list_conf mlc on mlc.id = m1.easy_disc_mailing_conf_id
-WHERE cast(coalesce(NULLIF(l.forrent, ''), '1') as boolean)
+LEFT JOIN datalake_raw.autodialer_mailing_list_conf mlc on mlc.id = m1.easy_disc_mailing_conf_id    -- Not renaming because we're using select * to mailing_list_updated_max because it's large
+WHERE coalesce(has_processed, true) != false
