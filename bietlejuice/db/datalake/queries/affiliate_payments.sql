@@ -1,18 +1,18 @@
 select
-	occ.id,
-	occ.tipo,
-	occ.valor,
-	occ.imovel_id,
-	cc.id as conta_corrente_id,
-	occ.dataCriacao as creation_date,
-	occ.paymentDate as payment_date
+	at.id,
+	at.type as tipo,
+	at.value as valor,
+	at.id_house as imovel_id,
+	a.id as conta_corrente_id,
+	at.ts_created as creation_date,
+	at.ts_payment as payment_date
 from
-	datalake_clean.ebdb_operacao_conta_corrente occ
+	datalake_ebdb_clean_prod.account_transaction at
 left join
-	datalake_clean.ebdb_conta_corrente cc
-	on trim(occ.contacorrente_id) = trim(cc.id)
+	datalake_ebdb_clean_prod.account a
+	on at.id_account = a.id
 where
-	trim(occ.tipo) in (
+	trim(at.type) in (
 		'valorFixoPorIndicacaoDeImovel',
 		'porcentagemPorIndicacaoDeImovel'
 	)
