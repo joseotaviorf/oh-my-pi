@@ -11,8 +11,7 @@ class BaseDAG:
         "retry_delay": timedelta(minutes=3),
         "max_retry_delay": timedelta(minutes=3),
     }
-
-    EXECUTION_TIMEOUT = timedelta(hours=3)
+    EXECUTION_TIMEOUT = timedelta(hours=2)
 
     @staticmethod
     def build_dag(
