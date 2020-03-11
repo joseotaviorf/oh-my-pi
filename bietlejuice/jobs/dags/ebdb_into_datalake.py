@@ -52,7 +52,8 @@ move = BaseDAG.build_python_operator(
     provide_context=True,
     python_callable=move_ebdb_to_datalake,
     dag=dag,
-    execution_timeout=timedelta(hours=10)
+    execution_timeout=timedelta(hours=10),
+    retries=0
 )
 
 create_raw = BaseDAG.build_python_operator(
