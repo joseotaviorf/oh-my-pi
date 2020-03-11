@@ -25,6 +25,7 @@ CREATE TABLE staging.dim_lead (
   lng NUMERIC(10,7),
   condominio INTEGER,
   iptu INTEGER,
+  ub_page_variant VARCHAR(255),
   reason VARCHAR(255),
   reason_detail VARCHAR(255),
   status VARCHAR(255),

@@ -23,6 +23,7 @@ select distinct
   l.lng,
   l.condominio,
   l.iptu,
+  l.unbouncePageVariant as ub_page_variant,
   coalesce(lr.reason, l.reason) as reason,
   -- Consider Old and New reasons
   lr.reason_detail as reason_detail,

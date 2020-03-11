@@ -26,6 +26,7 @@ create or replace view vw_dim_lead as
   l.lng,
   l.condominio,
   l.iptu,
+  l.ub_page_variant,
   l.reason,
   l.reason_detail,
   l.status,

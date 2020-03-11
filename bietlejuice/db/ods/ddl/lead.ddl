@@ -24,6 +24,7 @@ create table if not exists lead (
   lng numeric(10,7),
   condominio integer,
   iptu integer,
+  ub_page_variant varchar(255),
   reason varchar(255),
   reason_detail varchar(255),
   status varchar(255),

@@ -26,6 +26,7 @@ create external table if not exists datalake_clean.ods_dim_lead (
   lng string,
   condominio string,
   iptu string,
+  ub_page_variant string,
   reason string,
   reason_detail string,
   status string,
