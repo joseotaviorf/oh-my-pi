@@ -17,8 +17,12 @@ with contract_user as (
 	left join datalake_ebdb_clean.lead l
 		on l.id = lc.id_converted_lead
 	    and l.affiliate_type = 'B2BPartner'
+	left join datalake_ebdb_clean.affiliate_data ad
+        on ad.id = l.id_affiliate_has_indicated
+    left join datalake_ebdb_clean.user ua
+        on ad.id=ua.id_affiliates
 	left join datalake_ebdb_clean.partner_agent pa_b2b_online
-	  on pa_b2b_online.id_user = l.id_agent_has_indicated
+	  on pa_b2b_online.id_user = ua.id
 )  
 select
 	e.id_external as sk_invoice_entry,
