@@ -7,7 +7,7 @@ with visit_information as
 		FROM_UNIXTIME(ure.ts_revision/1000) as dt,
 		case
 			when rev_type=0 then 'add'
-			when rev_type=1 then 'delete'
+			when rev_type=2 then 'delete'
 			else 'mod'
 		end as rev_type
 	from
