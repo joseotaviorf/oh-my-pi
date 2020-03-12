@@ -5,7 +5,7 @@ with tickets_filter as (
 )
 SELECT
   distinct tf.id_ticket as sk_ticket,
-  regexp_extract(t.tag, '\w+') as ticket_tag,
+  regexp_replace(t.tag, '[\["\]]') as ticket_tag,
   cast(tf.ts_updated as timestamp with time zone) as ts_updated,
   now() as ts_load
 from tickets_filter tf
