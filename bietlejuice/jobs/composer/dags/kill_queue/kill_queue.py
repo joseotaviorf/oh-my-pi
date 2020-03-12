@@ -15,6 +15,7 @@ from bietlejuice.jobs.composer.services import FileService
 DAG_ID = f"bietlejuice.{SOURCE}"
 ENV = Variable.get("environment")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
+ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
 
 # databricks config
@@ -80,7 +81,12 @@ def clean_tasks(sub_dag_name, table_name, slugged_table_name):
         json={
             "spark_python_task": {
                 "python_file": SPARK_JOBS_PATH + "create_clean_external_tables.py",
-                "parameters": [table_name, ENV, DATALAKE_BUCKET],
+                "parameters": [
+                    table_name,
+                    ENV,
+                    DATALAKE_BUCKET,
+                    ATHENA_QUERY_RESULT_LOCATION,
+                ],
             }
         },
     )

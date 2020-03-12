@@ -15,6 +15,7 @@ SOURCE = "terminator"
 DAG_ID = "bietlejuice.{}".format(SOURCE)
 ENV = Variable.get("environment")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
+ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 
 local_tz = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 1, 1, 0, 0, 0, tzinfo=local_tz)
@@ -82,6 +83,7 @@ def build_table_sub_dag(
                 "parameters": [
                     env,
                     DATALAKE_BUCKET,
+                    ATHENA_QUERY_RESULT_LOCATION,
                     "clean",
                     source,
                     schema,

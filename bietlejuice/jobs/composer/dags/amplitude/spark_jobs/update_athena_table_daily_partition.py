@@ -20,6 +20,7 @@ parser = ArgumentParser(description="update_athena_table_daily_partition")
 parser.add_argument("execution_date")
 parser.add_argument("env")
 parser.add_argument("datalake_bucket")
+parser.add_argument("athena_query_result_location")
 parser.add_argument("source")
 parser.add_argument("table_name")
 parser.add_argument("stage")
@@ -29,6 +30,7 @@ if __name__ == "__main__":
     execution_date = args.execution_date
     env = args.env
     datalake_bucket = args.datalake_bucket
+    athena_query_result_location = args.athena_query_result_location
     source = args.source
     table_name = args.table_name
     stage = args.stage
@@ -46,7 +48,9 @@ if __name__ == "__main__":
     # setup
     db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
     spark_metastore_service = SparkMetastoreService(SparkClient())
-    athena_metastore_service = AthenaMetastoreService(AthenaClient())
+    athena_metastore_service = AthenaMetastoreService(
+        AthenaClient(athena_query_result_location)
+    )
 
     # get table metadata
     db_databricks = db_info["db_{}_databricks".format(stage)]

@@ -19,9 +19,11 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
+    parser.add_argument("athena_query_result_location")
     args = parser.parse_args()
     environment = args.env
     datalake_bucket = args.datalake_bucket
+    athena_query_result_location = args.athena_query_result_location
     source = "heimdall"
 
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
@@ -33,7 +35,9 @@ if __name__ == "__main__":
 
     logger.info("m=__main__, msg=Creating raw external tables...")
     athena_db = db_info["db_raw_athena"]
-    athena_metastore_service = AthenaMetastoreService(AthenaClient())
+    athena_metastore_service = AthenaMetastoreService(
+        AthenaClient(athena_query_result_location)
+    )
     for table_name in table_names:
         table_schema = spark_metastore_service.get_table_schema(
             database_name=db_info["db_raw_databricks"], table_name=table_name

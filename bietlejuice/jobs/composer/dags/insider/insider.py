@@ -15,6 +15,7 @@ from bietlejuice.jobs.composer.services import FileService
 DAG_ID = f"bietlejuice.{SOURCE}"
 ENV = Variable.get("environment")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
+ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 
 # databricks config
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
@@ -75,7 +76,12 @@ def clean_tasks(sub_dag_name, table_name, slugged_table_name):
         json={
             "spark_python_task": {
                 "python_file": SPARK_JOBS_PATH + "create_clean_external_table.py",
-                "parameters": [table_name, ENV, DATALAKE_BUCKET],
+                "parameters": [
+                    table_name,
+                    ENV,
+                    DATALAKE_BUCKET,
+                    ATHENA_QUERY_RESULT_LOCATION,
+                ],
             }
         },
     )
@@ -129,7 +135,7 @@ create_raw_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": SPARK_JOBS_PATH + "create_raw_external_tables.py",
-            "parameters": [ENV, DATALAKE_BUCKET],
+            "parameters": [ENV, DATALAKE_BUCKET, ATHENA_QUERY_RESULT_LOCATION],
         }
     },
 )

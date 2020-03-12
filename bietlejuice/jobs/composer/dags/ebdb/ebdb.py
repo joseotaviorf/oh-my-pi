@@ -14,6 +14,7 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
 DAG_ID = "ebdb"
 FULL_DAG_ID = "bietlejuice.{}".format(DAG_ID)
 ENV = Variable.get("environment")
+ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz)
@@ -100,7 +101,13 @@ def create_all_external_tables_task(local_dag, env, datalake_layer, source):
         json={
             "spark_python_task": {
                 "python_file": SPARK_JOBS_PATH + "create_external_tables.py",
-                "parameters": [env, datalake_layer, source, "--all"],
+                "parameters": [
+                    env,
+                    ATHENA_QUERY_RESULT_LOCATION,
+                    datalake_layer,
+                    source,
+                    "--all",
+                ],
             }
         },
     )
@@ -113,7 +120,14 @@ def create_external_tables_task(local_dag, env, datalake_layer, source, tables):
         json={
             "spark_python_task": {
                 "python_file": SPARK_JOBS_PATH + "create_external_tables.py",
-                "parameters": [env, datalake_layer, source, "--tables"] + tables,
+                "parameters": [
+                    env,
+                    ATHENA_QUERY_RESULT_LOCATION,
+                    datalake_layer,
+                    source,
+                    "--tables",
+                ]
+                + tables,
             }
         },
     )

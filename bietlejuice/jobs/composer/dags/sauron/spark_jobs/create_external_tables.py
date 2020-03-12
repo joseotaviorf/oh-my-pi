@@ -21,6 +21,7 @@ logger = QuintoAndarLogger(JOB_NAME)
 parser = ArgumentParser(description=JOB_NAME)
 parser.add_argument("env")
 parser.add_argument("datalake_bucket")
+parser.add_argument("athena_query_result_location")
 parser.add_argument("datalake_layer")
 parser.add_argument("source")
 parser.add_argument("schema")
@@ -78,6 +79,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     env = args.env
     datalake_bucket = args.datalake_bucket
+    athena_query_result_location = args.athena_query_result_location
     datalake_layer = args.datalake_layer
     source = args.source
     schema = args.schema
@@ -91,7 +93,9 @@ if __name__ == "__main__":
 
     tables = get_tables(all, tables)
 
-    athena_ms_service = AthenaMetastoreService(AthenaClient())
+    athena_ms_service = AthenaMetastoreService(
+        AthenaClient(athena_query_result_location)
+    )
     spark_ms_service = SparkMetastoreService(SparkClient())
     format_options = getattr(
         TableStorageFormat, "DEFAULT_{}".format(datalake_layer.upper())

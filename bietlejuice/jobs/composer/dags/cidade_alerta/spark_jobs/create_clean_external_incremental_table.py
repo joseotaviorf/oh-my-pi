@@ -29,12 +29,14 @@ if __name__ == "__main__":
     )
     parser.add_argument("env", type=str, help="forno/prod values")
     parser.add_argument("datalake_bucket")
+    parser.add_argument("athena_query_result_location")
     parser.add_argument("execution_date", type=str, help="Execution date DAG")
 
     args = parser.parse_args()
 
     environment = args.env
     datalake_bucket = args.datalake_bucket
+    athena_query_result_location = args.athena_query_result_location
     table_name = args.table_name
     execution_date = args.execution_date
 
@@ -55,7 +57,9 @@ if __name__ == "__main__":
 
     db_info = DatalakeMetastoreService.get_db_info(environment, SOURCE, datalake_bucket)
 
-    athena_metastore_service = AthenaMetastoreService(AthenaClient())
+    athena_metastore_service = AthenaMetastoreService(
+        AthenaClient(athena_query_result_location)
+    )
 
     logger.info("m=__main__, msg=Creating Athena database if not exists...")
     athena_metastore_service.create_database(db_info["db_clean_athena"])

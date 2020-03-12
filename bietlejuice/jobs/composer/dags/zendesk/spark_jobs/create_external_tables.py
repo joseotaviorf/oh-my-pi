@@ -20,6 +20,7 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env", type=str, help="forno/prod values")
     parser.add_argument("datalake_bucket")
+    parser.add_argument("athena_query_result_location")
     parser.add_argument("storage", type=str, help="raw/clean values")
     parser.add_argument("table_name", type=str, help="table name")
     parser.add_argument(
@@ -32,6 +33,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     environment = args.env
     datalake_bucket = args.datalake_bucket
+    athena_query_result_location = args.athena_query_result_location
     storage = args.storage
     table_name = args.table_name.replace("-", "_")
     partition_cols = args.partition_by
@@ -41,7 +43,7 @@ if __name__ == "__main__":
     spark_db = db_info["db_" + storage + "_databricks"]
     athena_db = db_info["db_" + storage + "_athena"]
 
-    athena_client = AthenaClient()
+    athena_client = AthenaClient(athena_query_result_location)
     athena_metastore_service = AthenaMetastoreService(athena_client)
     athena_metastore_service.create_database(athena_db)
 

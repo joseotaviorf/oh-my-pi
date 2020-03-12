@@ -25,6 +25,7 @@ if __name__ == "__main__":
     parser.add_argument("execution_date", type=str, help="execution date in str format")
     parser.add_argument("environment", type=str, help="forno/prod values")
     parser.add_argument("datalake_bucket")
+    parser.add_argument("athena_query_result_location")
 
     args = parser.parse_args()
 
@@ -40,12 +41,15 @@ if __name__ == "__main__":
     table_name = args.table_name.replace("-", "_")
     environment = args.environment
     datalake_bucket = args.datalake_bucket
+    athena_query_result_location = args.athena_query_result_location
 
     db_info = DatalakeMetastoreService.get_db_info(
         environment, "teravoz", datalake_bucket
     )
 
-    athena_metastore_service = AthenaMetastoreService(AthenaClient())
+    athena_metastore_service = AthenaMetastoreService(
+        AthenaClient(athena_query_result_location)
+    )
     athena_metastore_service.create_database(db_info["db_clean_athena"])
 
     # create external table and add partition

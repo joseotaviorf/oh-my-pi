@@ -17,6 +17,7 @@ DAG_ID = "godfather"
 FULL_DAG_ID = f"bietlejuice.{DAG_ID}"
 ENV = Variable.get("environment")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
+ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 
 local_tz = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2019, 10, 1, 0, 0, 0, tzinfo=local_tz)
@@ -92,7 +93,15 @@ def create_raw_tables_sub_dag_tasks(
         json={
             "spark_python_task": {
                 "python_file": CREATE_EXTERNAL_TABLES_FILE_PATH,
-                "parameters": [ENV, DATALAKE_BUCKET, "raw", SOURCE, schema, "--all"],
+                "parameters": [
+                    ENV,
+                    DATALAKE_BUCKET,
+                    ATHENA_QUERY_RESULT_LOCATION,
+                    "raw",
+                    SOURCE,
+                    schema,
+                    "--all",
+                ],
             }
         },
     )
@@ -141,6 +150,7 @@ def build_table_sub_dag(
                 "parameters": [
                     env,
                     DATALAKE_BUCKET,
+                    ATHENA_QUERY_RESULT_LOCATION,
                     "clean",
                     source,
                     schema,

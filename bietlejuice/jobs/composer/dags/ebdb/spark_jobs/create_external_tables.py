@@ -19,6 +19,7 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 parser = ArgumentParser(description=JOB_NAME)
 parser.add_argument("env")
+parser.add_argument("athena_query_result_location")
 parser.add_argument("datalake_layer")
 parser.add_argument("source")
 parser.add_argument("--tables", nargs="+", dest="tables", required=False)
@@ -41,6 +42,7 @@ def create_external_table(args):
 if __name__ == "__main__":
     args = parser.parse_args()
     env = args.env
+    athena_query_result_location = args.athena_query_result_location
     datalake_layer = args.datalake_layer
     source = args.source
     tables = args.tables
@@ -50,7 +52,9 @@ if __name__ == "__main__":
         "m=__main__, env={}, datalake_layer={}, source={}, tables={}, all={}, "
         "msg=Job execution started".format(env, datalake_layer, source, tables, all)
     )
-    athena_metastore_service = AthenaMetastoreService(AthenaClient())
+    athena_metastore_service = AthenaMetastoreService(
+        AthenaClient(athena_query_result_location)
+    )
     transformer = Transformer(env, source, athena_metastore_service)
     if not all and not tables:
         logger.warning(

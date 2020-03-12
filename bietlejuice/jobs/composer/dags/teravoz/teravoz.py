@@ -18,6 +18,7 @@ MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
 
 ENV = Variable.get("environment")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
+ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
 
 # s3 vars
@@ -90,7 +91,13 @@ def clean_tasks(sub_dag_name, local_dag):
         json={
             "spark_python_task": {
                 "python_file": "{}/load_data_to_clean.py".format(SPARK_JOBS_PATH),
-                "parameters": [sub_dag_name, "{{ ds }}", ENV, DATALAKE_BUCKET],
+                "parameters": [
+                    sub_dag_name,
+                    "{{ ds }}",
+                    ENV,
+                    DATALAKE_BUCKET,
+                    ATHENA_QUERY_RESULT_LOCATION,
+                ],
             }
         },
     )
@@ -101,7 +108,13 @@ def clean_tasks(sub_dag_name, local_dag):
         json={
             "spark_python_task": {
                 "python_file": "{}/create_external_table.py".format(SPARK_JOBS_PATH),
-                "parameters": [sub_dag_name, "{{ ds }}", ENV, DATALAKE_BUCKET],
+                "parameters": [
+                    sub_dag_name,
+                    "{{ ds }}",
+                    ENV,
+                    DATALAKE_BUCKET,
+                    ATHENA_QUERY_RESULT_LOCATION,
+                ],
             }
         },
     )

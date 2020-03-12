@@ -20,6 +20,7 @@ MAIN_SCHEDULE_INTERVAL = "30 1 * * *"
 
 ENV = Variable.get("environment")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
+ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 SOURCE = "sauron"
 schema = "public"
 
@@ -99,6 +100,7 @@ def build_table_sub_dag(
                 "parameters": [
                     env,
                     DATALAKE_BUCKET,
+                    ATHENA_QUERY_RESULT_LOCATION,
                     "clean",
                     source,
                     schema,

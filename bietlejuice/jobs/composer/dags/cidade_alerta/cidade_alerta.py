@@ -19,6 +19,7 @@ from bietlejuice.jobs.composer.services import FileService
 DAG_ID = f"bietlejuice.{SOURCE}"
 ENV = Variable.get("environment")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
+ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 
@@ -91,7 +92,12 @@ def clean_full_tasks(sub_dag_name, table_name, slugged_table_name):
         json={
             "spark_python_task": {
                 "python_file": SPARK_JOBS_PATH + "create_clean_external_full_table.py",
-                "parameters": [table_name, ENV, DATALAKE_BUCKET],
+                "parameters": [
+                    table_name,
+                    ENV,
+                    DATALAKE_BUCKET,
+                    ATHENA_QUERY_RESULT_LOCATION,
+                ],
             }
         },
     )
@@ -129,7 +135,13 @@ def clean_incremental_tasks(sub_dag_name, table_name, slugged_table_name):
             "spark_python_task": {
                 "python_file": SPARK_JOBS_PATH
                 + "create_clean_external_incremental_table.py",
-                "parameters": [table_name, ENV, DATALAKE_BUCKET, "{{ ds }}"],
+                "parameters": [
+                    table_name,
+                    ENV,
+                    DATALAKE_BUCKET,
+                    ATHENA_QUERY_RESULT_LOCATION,
+                    "{{ ds }}",
+                ],
             }
         },
     )

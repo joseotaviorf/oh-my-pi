@@ -44,6 +44,7 @@ if __name__ == "__main__":
     parser.add_argument("execution_date", type=str, help="execution date in str format")
     parser.add_argument("environment", type=str, help="forno/prod values")
     parser.add_argument("datalake_bucket")
+    parser.add_argument("athena_query_result_location")
 
     args = parser.parse_args()
 
@@ -56,6 +57,7 @@ if __name__ == "__main__":
     execution_date = args.execution_date
     environment = args.environment
     datalake_bucket = args.datalake_bucket
+    athena_query_result_location = args.athena_query_result_location
     table_name = "events"
 
     datalake_info = DatalakeMetastoreService.get_db_info(
@@ -80,7 +82,7 @@ if __name__ == "__main__":
         )
     )
 
-    athena_client = AthenaClient()
+    athena_client = AthenaClient(athena_query_result_location)
     athena_metastore_service = AthenaMetastoreService(athena_client)
 
     with Pool(NB_THREADS) as p:

@@ -22,6 +22,7 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
+    parser.add_argument("athena_query_result_location")
     parser.add_argument("source")
     parser.add_argument("table_name")
     parser.add_argument("storage")
@@ -30,6 +31,7 @@ if __name__ == "__main__":
 
     env = args.env
     datalake_bucket = args.datalake_bucket
+    athena_query_result_location = args.athena_query_result_location
     source = args.source
     table_name = args.table_name
     storage = args.storage
@@ -40,7 +42,9 @@ if __name__ == "__main__":
     db_athena = db_info["db_{}_athena".format(storage)]
     db_path = db_info["db_{}_path".format(storage)]
 
-    athena_metastore_service = AthenaMetastoreService(AthenaClient())
+    athena_metastore_service = AthenaMetastoreService(
+        AthenaClient(athena_query_result_location)
+    )
     spark_metastore_service = SparkMetastoreService(SparkClient())
 
     # Creates external table

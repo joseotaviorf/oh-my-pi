@@ -25,6 +25,7 @@ parser = ArgumentParser(description="create_clean_staging_subpartitioned_tables"
 parser.add_argument("execution_date")
 parser.add_argument("env")
 parser.add_argument("datalake_bucket")
+parser.add_argument("athena_query_result_location")
 parser.add_argument("source")
 parser.add_argument("source_table_name")
 parser.add_argument("--spark", action="store_true", dest="spark_flag")
@@ -111,6 +112,7 @@ if __name__ == "__main__":
     execution_date = args.execution_date
     env = args.env
     datalake_bucket = args.datalake_bucket
+    athena_query_result_location = args.athena_query_result_location
     source = args.source
     source_table_name = args.source_table_name
     spark_flag = args.spark_flag
@@ -141,7 +143,9 @@ if __name__ == "__main__":
         + "clean_staging/clean_staging_subpartitioned_table_template.ddl"
     )
 
-    athena_metastore_service = AthenaMetastoreService(AthenaClient())
+    athena_metastore_service = AthenaMetastoreService(
+        AthenaClient(athena_query_result_location)
+    )
 
     # get subpartitions values
     subpartitions_values = sqlContext.table(

@@ -20,6 +20,7 @@ DAG_ID = f"bietlejuice.{SOURCE}"
 ENV = Variable.get("environment")
 DW_BUCKET = Variable.get("dw_bucket")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
+ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
 
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
@@ -80,7 +81,12 @@ def clean_tasks(sub_dag_name, table_name, slugged_table_name):
         json={
             "spark_python_task": {
                 "python_file": SPARK_JOBS_PATH + "create_clean_external_table.py",
-                "parameters": [table_name, ENV, DATALAKE_BUCKET],
+                "parameters": [
+                    table_name,
+                    ENV,
+                    DATALAKE_BUCKET,
+                    ATHENA_QUERY_RESULT_LOCATION,
+                ],
             }
         },
     )

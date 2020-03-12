@@ -14,7 +14,7 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG
 DAG_ID = "wololo"
 ENV = Variable.get("environment")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
-
+ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 
 LOAD_WOLOLO_INTO_DATALAKE_RAW_FILE_PATH = (
@@ -76,7 +76,7 @@ create_raw_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": CREATE_RAW_EXTERNAL_TABLES_FILE_PATH,
-            "parameters": [ENV, DATALAKE_BUCKET],
+            "parameters": [ENV, DATALAKE_BUCKET, ATHENA_QUERY_RESULT_LOCATION],
         }
     },
 )

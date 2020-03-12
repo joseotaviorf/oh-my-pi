@@ -14,6 +14,7 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG
 DAG_ID = "bietlejuice.amplitude"
 ENV = Variable.get("environment")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
+ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2019, 1, 1, 0, 0, 0, tzinfo=local_tz)
 MAIN_SCHEDULE_INTERVAL = "30 23 * * *"
@@ -126,6 +127,7 @@ update_clean_events_daily_partition_athena_task = QuintoAndarDatabricksSubmitRun
                 "{{ ds }}",
                 ENV,
                 DATALAKE_BUCKET,
+                ATHENA_QUERY_RESULT_LOCATION,
                 "amplitude",
                 "events",
                 "clean",
@@ -164,6 +166,7 @@ update_clean_staging_subpartitions_values_task = QuintoAndarDatabricksSubmitRunO
                 "{{ ds }}",
                 ENV,
                 DATALAKE_BUCKET,
+                ATHENA_QUERY_RESULT_LOCATION,
                 "amplitude",
                 "events",
                 "--subpartitions",
@@ -183,6 +186,7 @@ create_clean_staging_subpartitioned_tables_spark_task = QuintoAndarDatabricksSub
                 "{{ ds }}",
                 ENV,
                 DATALAKE_BUCKET,
+                ATHENA_QUERY_RESULT_LOCATION,
                 "amplitude",
                 "events",
                 "--spark",
@@ -201,6 +205,7 @@ create_clean_staging_subpartitioned_tables_athena_task = QuintoAndarDatabricksSu
                 "{{ ds }}",
                 ENV,
                 DATALAKE_BUCKET,
+                ATHENA_QUERY_RESULT_LOCATION,
                 "amplitude",
                 "events",
                 "--athena",
