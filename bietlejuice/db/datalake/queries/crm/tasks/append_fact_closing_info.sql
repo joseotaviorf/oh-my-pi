@@ -67,7 +67,8 @@ select distinct
   coalesce(proposal.sk_house_listing, contract.sk_house_listing, offer.sk_house_listing, -1) as sk_house_listing,
   coalesce(contract.sk_house_owner, proposal.sk_house_owner, offer.sk_house_owner, pc.sk_house_owner,-1) as sk_house_owner,
   coalesce(contract.sk_tenant, proposal.sk_tenant, offer.sk_tenant, pc.sk_tenant, -1) as sk_tenant,
-  coalesce(contract.sk_proponent, proposal.sk_proponent, offer.sk_proponent, -1) as sk_proponent
+  coalesce(contract.sk_proponent, proposal.sk_proponent, offer.sk_proponent, -1) as sk_proponent,
+  pc.dt_partition
 from proposals_contracts pc
 left join contract_proposal_house_listing proposal
  on pc.sk_proposal = proposal.sk_proposal
