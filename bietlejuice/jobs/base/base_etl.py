@@ -487,7 +487,7 @@ class BaseETL(object):
                 print 'm=bulk_insert_from_s3_to_dw, msg=committing transaction'
                 con.commit()
         except Exception as e:
-            print 'm=bulk_insert_from_s3_to_dw, e={}, msg=An exception occurred'.format(e)
+            raise Exception('m=bulk_insert_from_s3_to_dw, e={}, msg=An exception occurred'.format(e))
         finally:
             if not conn:
                 print 'm=bulk_insert_from_s3_to_dw, msg=closing connection'
