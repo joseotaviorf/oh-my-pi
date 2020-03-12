@@ -1,11 +1,11 @@
 , proposals_contracts as (
   select
     t.*,
-    coalesce(ep.id, ec.id_proposal, -1) as sk_proposal,
-    coalesce(ec.id, epc.id, -1) as sk_contract,
-    coalesce(epi.id_user, eci.id_user, -1) as sk_house_owner,
-    coalesce(ep.id_proponent, ec.id_user, -1) as sk_tenant,
-    cast(coalesce(eo.sk_offer, feo.sk_offer, '-1') as bigint) as sk_offer
+    coalesce(ep.id, ec.id_proposal) as sk_proposal,
+    coalesce(ec.id, epc.id) as sk_contract,
+    coalesce(epi.id_user, eci.id_user) as sk_house_owner,
+    coalesce(ep.id_proponent, ec.id_user) as sk_tenant,
+    cast(coalesce(eo.sk_offer, feo.sk_offer) as bigint) as sk_offer
   from tasks t
   join datalake_clean.crm_tasks ct
     on t.sk_task = trim(ct.id)
