@@ -98,38 +98,14 @@ def class_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    delete_staging_fact_entries_task = BaseDAG.build_python_operator(
-        task_id='delete_staging_fact_entries',
-        python_callable=exec_factory_method,
-        dag=local_dag,
-        provide_context=True,
-        op_kwargs={
-            'class_': kwargs['class_'],
-            'method': 'delete_staging_fact_entries'
-        }
-    )
-
-    delete_staging_dim_entries_task = BaseDAG.build_python_operator(
-        task_id='delete_staging_dim_entries',
-        python_callable=exec_factory_method,
-        dag=local_dag,
-        provide_context=True,
-        op_kwargs={
-            'class_': kwargs['class_'],
-            'method': 'delete_staging_dim_entries'
-        }
-    )
-
     airflow_helpers.chain(
         move_dim_to_staging_task,
         append_dim_to_dw_task,
-        delete_staging_dim_entries_task
     )
 
     airflow_helpers.chain(
         move_fact_to_staging_task,
         append_fact_to_dw_task,
-        delete_staging_fact_entries_task
     )
 
     return local_dag
