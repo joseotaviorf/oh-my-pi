@@ -12,8 +12,9 @@ env.set_airflow_var_to_local_env('BI_DW', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_AC
 S3_BUCKET = env.get_airflow_env_var('bi-datalake-s3-bucket')
 MONGO_CLIENT_URI = env.get_airflow_env_var('MONGODB_CRM_URI')
 
-MAIN_DAG_ID = 'bi-crm-closing-reprocess-2'
-MAIN_START_DATE = datetime(2019, 6, 1)
+MAIN_DAG_ID = 'bi-crm-closing-reprocess-old-dates'
+MAIN_START_DATE = datetime(2015, 1, 1)
+MAIN_END_DATE = datetime(2019, 6, 1)
 MAIN_SCHEDULE_INTERVAL = '0 8 * * *'
 
 
@@ -38,6 +39,7 @@ main_dag = DAG(
         'depends_on_past': False
     },
     start_date=MAIN_START_DATE,
+    end_date=MAIN_END_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
     max_active_runs=1,
     orientation='TB',
