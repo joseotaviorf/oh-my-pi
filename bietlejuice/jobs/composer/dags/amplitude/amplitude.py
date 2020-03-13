@@ -166,7 +166,6 @@ update_clean_staging_subpartitions_values_task = QuintoAndarDatabricksSubmitRunO
                 "{{ ds }}",
                 ENV,
                 DATALAKE_BUCKET,
-                ATHENA_QUERY_RESULT_LOCATION,
                 "amplitude",
                 "events",
                 "--subpartitions",
@@ -220,7 +219,14 @@ update_clean_staging_subpartitioned_tables_spark_task = QuintoAndarDatabricksSub
     json={
         "spark_python_task": {
             "python_file": UPDATE_CLEAN_STAGING_SUBPARTITIONED_TABLES_FILE_PATH,
-            "parameters": ["{{ ds }}", ENV, DATALAKE_BUCKET, "amplitude", "--spark"],
+            "parameters": [
+                "{{ ds }}",
+                ENV,
+                DATALAKE_BUCKET,
+                ATHENA_QUERY_RESULT_LOCATION,
+                "amplitude",
+                "--spark",
+            ],
         }
     },
 )
@@ -231,7 +237,14 @@ update_clean_staging_subpartitioned_tables_athena_task = QuintoAndarDatabricksSu
     json={
         "spark_python_task": {
             "python_file": UPDATE_CLEAN_STAGING_SUBPARTITIONED_TABLES_FILE_PATH,
-            "parameters": ["{{ ds }}", ENV, DATALAKE_BUCKET, "amplitude", "--athena"],
+            "parameters": [
+                "{{ ds }}",
+                ENV,
+                DATALAKE_BUCKET,
+                ATHENA_QUERY_RESULT_LOCATION,
+                "amplitude",
+                "--athena",
+            ],
         }
     },
 )
