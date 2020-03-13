@@ -1,0 +1,75 @@
+version: '3.7'
+
+services:
+  redis:
+    image: redis:5.0.5
+    ports:
+      - "6379:6379"
+    networks:
+      - airflow_postgres_py3
+
+  postgres_airflow_py3:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - /home/PostgreSQL/airflow_py3:/var/lib/postgresql/data
+    networks:
+      - airflow_postgres_py3
+
+  airflow_python3:
+    image: base
+    build:
+      context: ..
+      dockerfile: airflow-py3.Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - /home/<USER>/.aws:/root/.aws
+      - /home/<USER>/<BIETLEJUICE_FOLDER>:/bi-etl-ejuice
+    depends_on:
+      - postgres_airflow_py3
+    networks:
+      - airflow_postgres_py3
+
+  worker_1:
+    image: base
+    restart: always
+    environment:
+      - C_FORCE_ROOT=true
+    depends_on:
+      - postgres_airflow_py3
+    volumes:
+      - /home/<USER>/<BIETLEJUICE_FOLDER>/bietlejuice/jobs/composer/dags:/bi-etl-ejuice/bietlejuice/jobs/composer/dags
+    entrypoint: airflow worker -cn worker_1
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f /bi-etl-ejuice/airflow_python3/airflow-worker.pid ]"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    networks:
+      - airflow_postgres_py3
+
+  worker_2:
+    image: base
+    restart: always
+    environment:
+      - C_FORCE_ROOT=true
+    depends_on:
+      - postgres_airflow_py3
+    volumes:
+      - /home/<USER>/<BIETLEJUICE_FOLDER>/bietlejuice/jobs/composer/dags:/bi-etl-ejuice/bietlejuice/jobs/composer/dags
+    entrypoint: airflow worker -cn worker_2
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f /bi-etl-ejuice/airflow_python3/airflow-worker.pid ]"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    networks:
+      - airflow_postgres_py3
+
+networks:
+  airflow_postgres_py3:
+    driver: bridge

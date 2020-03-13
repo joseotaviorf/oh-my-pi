@@ -3,16 +3,40 @@
 .PHONY: create-docker-environment-python2
 create-docker-environment-python2:
 	@chmod +x start.sh
-	@sudo docker-compose up --build -d --force-recreate
+	@sudo docker-compose -f docker/docker-compose.py2.yml up --build -d --force-recreate
 	@sudo docker image prune -f
 
 .PHONY: restart-docker-environment-python2
 restart-docker-environment-python2:
-	@sudo docker-compose up --build -d
+	@sudo docker-compose -f docker/docker-compose.py2.yml up --build -d
 
 .PHONY: kill-docker-environment-python2
 kill-docker-environment-python2:
-	@sudo docker-compose down
+	@sudo docker-compose -f docker/docker-compose.py2.yml down
+
+.PHONY: create-docker-environment-python3
+create-docker-environment-python3:
+	@chmod +x start.sh
+	@sudo docker-compose -f docker/docker-compose.py3.yml up -d --build --force-recreate
+	@sudo docker image prune -f
+
+.PHONY: restart-docker-environment-python3
+restart-docker-environment-python3:
+	@sudo docker-compose -f docker/docker-compose.py3.yml up -d --build
+
+.PHONY: kill-docker-environment-python3
+kill-docker-environment-python3:
+	@sudo docker-compose -f docker/docker-compose.py3.yml down
+
+.PHONY: build-local-whl
+build-local-whl:
+	@python3 scripts/upload_local_spark_jobs_to_s3.py
+	@python3 -m setup3 sdist bdist_wheel
+	@python3 scripts/upload_local_whl_to_s3.py
+
+.PHONY: upload-local-spark-jobs-to-s3
+upload-local-spark-jobs-to-s3:
+	@python3 scripts/upload_local_spark_jobs_to_s3.py databricks.s3.forno.data.quintoandar.com.br
 
 ############# PYTHON2 commands #######################
 

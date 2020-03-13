@@ -125,3 +125,7 @@ metastore_db/
 airflow/*
 airflow-webserver.pid
 unittests.cfg
+build/
+dist/
+airflow_python3/logs/*
+airflow_python3/plugins/*

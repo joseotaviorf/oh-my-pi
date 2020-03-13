@@ -1,0 +1,16 @@
+{
+  "envs": [
+    {
+      "conn_id": "databricks_default",
+      "conn_type": "databricks",
+      "host": "dbc-eea99378-83b2.cloud.databricks.com",
+      "login": null,
+      "password": null,
+      "extra": [
+        {
+        "token": "<DATABRICKS_TOKEN>"
+        }
+      ]
+    }
+  ]
+}
