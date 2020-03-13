@@ -199,7 +199,8 @@ with
         buz.brl_paid_amount,
         buz.brl_fine_amount,
         buz.brl_one_day_interest,
-        buz.brl_charged_interest
+        buz.brl_charged_interest,
+        now() as ts_load
     from generate_key key
     join business_rules buz
     on key.primary_key=buz.primary_key
