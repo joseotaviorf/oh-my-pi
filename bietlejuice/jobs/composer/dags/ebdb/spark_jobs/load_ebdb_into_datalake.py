@@ -17,6 +17,7 @@ from bietlejuice.jobs.composer.services.metastore_services import SparkMetastore
 JOB_NAME = "load_ebdb_into_datalake"
 TABLE_BLOCK_LIST = ["REVCHANGES", "_UsuarioRevisionEntity_new"]
 VIEW_ALLOW_LIST = ["MapRegiao"]
+BLOCK_LIST = ["PoligonoRegiao"]
 
 # todo: check this value and argument the choice
 PARTITION_SIZE = 512
@@ -85,7 +86,9 @@ if __name__ == "__main__":
 
     tables = mysql_consumer.get_table_names_and_sizes().collect()
     rels = [
-        Relation(name=t.table_name, size=t.size) for t in tables if validate_table(t)
+        Relation(name=t.table_name, size=t.size)
+        for t in tables
+        if validate_table(t) and t.table_name not in BLOCK_LIST
     ]
 
     rels.extend([Relation(name=view_name, size=1) for view_name in VIEW_ALLOW_LIST])

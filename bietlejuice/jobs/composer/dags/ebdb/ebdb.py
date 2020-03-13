@@ -211,6 +211,17 @@ ebdb_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
+polygon_region_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
+    task_id="polygon_region_to_datalake_raw",
+    json={
+        "spark_python_task": {
+            "python_file": SPARK_JOBS_PATH + "load_query_table_in_datalake.py",
+            "parameters": [ENV, DATALAKE_BUCKET, "poligonoregiao", SOURCE],
+        }
+    },
+)
+
 create_raw_external_tables_task = create_all_external_tables_task(
     dag, ENV, "raw", "ebdb"
 )
@@ -943,6 +954,8 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 )
 # tasks dependencies
 create_cluster_task >> ebdb_to_datalake_raw_task
+create_cluster_task >> polygon_region_to_datalake_raw_task
+polygon_region_to_datalake_raw_task >> polygon_region_sub_dag_task >> terminate_cluster_task
 ebdb_to_datalake_raw_task >> [
     create_raw_external_tables_task,
     condo_sub_dag_task,
@@ -986,7 +999,6 @@ ebdb_to_datalake_raw_task >> [
     local_sub_dag_task,
     occupant_type_sub_dag_task,
     device_sub_dag_task,
-    polygon_region_sub_dag_task,
     sales_rep_sub_dag_task,
     pre_proposal_sub_dag_task,
     pre_proposal_aud_sub_dag_task,
