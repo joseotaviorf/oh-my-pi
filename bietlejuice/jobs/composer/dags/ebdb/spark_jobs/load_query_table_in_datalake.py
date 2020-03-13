@@ -49,14 +49,14 @@ if __name__ == "__main__":
     mysql_consumer = MySqlConsumer(conn_config, SparkClient())
 
     # create database if not exists
-    metastore_service.create_database(db_info["db_clean_databricks"])
+    metastore_service.create_database(db_info["db_raw_databricks"])
     df = mysql_consumer.get_data_from_query(query, table_name=table_name)
 
     # load
     loader.load_full_table(
         df=df,
-        database_name=db_info["db_clean_databricks"],
+        database_name=db_info["db_raw_databricks"],
         table_name=table_name,
-        format=SparkTableStorageFormat.DEFAULT_CLEAN,
-        database_location=db_info["db_clean_path"],
+        format=SparkTableStorageFormat.DEFAULT_RAW,
+        database_location=db_info["db_raw_path"],
     )
