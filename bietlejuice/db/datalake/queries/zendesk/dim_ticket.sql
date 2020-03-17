@@ -10,6 +10,16 @@ last_updated_ticket as (
 last_updated_group as (
     select id_group, max(ts_updated) as ts_updated from datalake_clean.zendesk_groups group by 1
 ),
+custom_field_ids as (
+  select
+    c.id_ticket,
+    cast(c.custom_fields as json) as custom_fields,
+    nullif(regexp_extract(custom_fields, '[^,]*Tipo de Solicitação[^,]*?="([^,]+)\"\,?', 1), 'null') as request_type,
+    nullif(regexp_extract(custom_fields, '[^,]*Tipo de Cliente[^,]*?="([^,]+)\"\,?', 1), 'null') as client_type
+  from datalake_clean.zendesk_custom_fields c
+  inner join last_updated_ticket lt
+    on c.id_ticket = lt.id_ticket and cast(c.dt_extracted as date)=cast(cast(lt.ts_updated as timestamp) as date)
+),
 groups as (
     select
         g.id_group,
@@ -19,25 +29,6 @@ groups as (
     inner join last_updated_group ge
     on ge.id_group = g.id_group and ge.ts_updated = g.ts_updated
     group by 1,2,3
-),
-custom_fields as (
-    with parse_fields as (
-		select tf.id_ticket,
-	        f1.field,
-	        regexp_replace(json_format(json_extract(f1.field, '$.id')), '^"|"$', '') as id_field,
-                regexp_replace(json_format(json_extract(f1.field, '$.value')), '^"|"$', '') as value
-	    from tickets_filter tf
-        inner join last_updated_ticket l
-            on tf.id_ticket=l.id_ticket
-	    cross join unnest(regexp_extract_all(tf.custom_fields, '{{[^}}]+[^,]+[^{{]+}}')) as f1(field)
-	)
-	select f.id_ticket,
-        map_agg(cf.raw_title, f.value) as cols
-    from parse_fields f
-    inner join datalake_clean.zendesk_ticket_fields cf
-       on cf.id_ticket_fields = f.id_field
-    where f.value != 'null'
-    group by 1
 )
 select
     cast(t.id_ticket as bigint) as sk_ticket,
@@ -56,12 +47,10 @@ select
     t.tags,
     t.status,
     coalesce(cast(t.is_public as boolean), false) as has_public_comments,
-    json_format(cast(c.cols as JSON)) as custom_fields,
     cast(json_extract(t.satisfaction_rating,'$.score') as varchar) as score,
     cast(json_extract(t.satisfaction_rating,'$.reason') as varchar) as reason,
     cast(json_extract(t.satisfaction_rating,'$.comment') as varchar) as comment,
-    c.cols['Tipo de Solicitação'] as request_type,
-    c.cols['Tipo de Cliente'] as client_type,
+    cfi.*,
     cast(t.ts_created as timestamp with time zone) as ts_created,
     cast(t.ts_created_local as timestamp with time zone) as ts_created_local,
     cast(t.ts_updated as timestamp with time zone) as ts_updated,
@@ -76,5 +65,5 @@ inner join tickets_filter t
 on te.id_ticket = t.id_ticket and te.ts_updated = t.ts_updated
 left join groups g
 on t.id_group = g.id_group
-left join custom_fields c
-on t.id_ticket = c.id_ticket;
+left join custom_field_ids cfi
+on t.id_ticket = cfi.id_ticket

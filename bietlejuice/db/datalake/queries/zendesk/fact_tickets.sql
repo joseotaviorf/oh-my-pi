@@ -10,27 +10,6 @@ last_updated_ticket as (
 last_updated_ticket_fields as (
 	select id_ticket_fields, max(ts_updated) as ts_last_updated from datalake_clean.zendesk_ticket_fields group by 1
 ),
-custom_fields as (
-    with parse_fields as (
-		select tf.id_ticket,
-	        f1.field,
-	        regexp_extract(f1.field, '{{\\?"id\\?":"?(\d+)"?', 1) as id_field,
-	        nullif(regexp_extract(f1.field, '"value\\?":\\?"?#?([^\\?"|}}]+)', 1), 'null') as value
-	    from tickets_filter tf
-        inner join last_updated_ticket l
-            on tf.id_ticket=l.id_ticket
-	    cross join unnest(regexp_extract_all(tf.custom_fields, '{{[^}}]+[^,]+[^{{]+}}')) as f1(field)
-	)
-	select f.id_ticket,
-        map_agg(tf.raw_title, f.value) as cols
-    from parse_fields f
-    inner join last_updated_ticket_fields l
-       on l.id_ticket_fields = f.id_field
-    inner join datalake_clean.zendesk_ticket_fields tf
-       on l.id_ticket_fields = tf.id_ticket_fields and l.ts_last_updated=tf.ts_updated 
-    where f.value is not null
-    group by 1
-),
 contract as (
     select
         cast(coalesce(fl.sk_house_listing, '-1') as bigint) as sk_house_listing,
@@ -61,6 +40,19 @@ house as (
     where
         fhl.sk_owner != '-1'
     group by 1,2,3,4,5,6
+),
+custom_field_ids as (
+  select
+    c.id_ticket,
+    if(
+        length(regexp_extract(custom_fields, '[^,]*Código do Imóvel[^,]*?="([^,]+)\"\,?', 1)) < 9,
+        892700000 + try_cast(regexp_extract(custom_fields, '[^,]*Código do Imóvel[^,]*?="([^,]+)\"\,?', 1) as bigint), 
+        try_cast(regexp_extract(custom_fields, '[^,]*Código do Imóvel[^,]*?="([^,]+)\"\,?', 1) as bigint)
+    ) as id_house,
+    try_cast(regexp_extract(custom_fields, '[^,]*Código do Contrato[^,]*?="([^,]+)\"\,?', 1) as bigint) as id_contract
+  from datalake_clean.zendesk_custom_fields c
+  inner join last_updated_ticket lt
+    on c.id_ticket = lt.id_ticket and cast(c.dt_extracted as date)=cast(cast(lt.ts_last_updated as timestamp) as date)
 ),
 ticket_metrics as (
     with row_n as (
@@ -119,8 +111,7 @@ tickets as (
         cast(t.id_ticket as bigint) as sk_ticket,
         -- id_contract and id_house may be filled with string (filled wrong)
         -- id_house may be filled with id_house or short_id_house
-        if(length(c.cols['Código do Imóvel']) < 9, 892700000 + try_cast(c.cols['Código do Imóvel'] as bigint), try_cast(c.cols['Código do Imóvel'] as bigint)) as id_house,
-        try_cast(c.cols['Código do Contrato'] as bigint) as id_contract,
+        cfi.*,
         tm.*,
         coalesce(cast(t.id_requester as bigint), -1) as sk_zendesk_requester_user,
         coalesce(cast(t.id_submitter as bigint), -1) as sk_zendesk_submitter_user,
@@ -146,8 +137,8 @@ tickets as (
         on t.id_ticket = lt.id_ticket and t.ts_updated=lt.ts_last_updated
     left join ticket_metrics tm
         on t.id_ticket=tm.id_ticket
-    left join custom_fields c 
-    on c.id_ticket=t.id_ticket
+    left join custom_field_ids cfi
+        on t.id_ticket = cfi.id_ticket
 )
 select
     sk_ticket,
