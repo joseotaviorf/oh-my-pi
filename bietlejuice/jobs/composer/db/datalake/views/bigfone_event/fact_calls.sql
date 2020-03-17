@@ -281,6 +281,108 @@ with
     agent_ringing_events as (
         select distinct id_call from datalake_bigfone_clean_prod.agent_ringing_events
         where dt_event >= date('2019-09-01')
+    ),
+    abandoned_queue as (
+        select
+            id_call,
+            queue_number,
+            ts_created,
+            ts_created_local
+        from datalake_bigfone_clean_prod.call_queue_abandon_events
+        where dt_event >= date('2019-09-01')
+        group by 1,2,3,4
+    ),
+    call_ring_events as (
+        select
+            min(id) as id,
+            id_call,
+            agent_email,
+            ts_created,
+            ts_created_local
+        from datalake_bigfone_clean_prod.agent_ringing_events
+        where dt_event >= date('2019-09-01')
+        group by 2,3,4,5
+    ),
+    agent_ring_events as (
+        select
+            ring.id_call,
+            ring.agent_email,
+            ring.ts_created_local as ts_min_local
+        from call_ring_events ring
+        inner join agent_entered_events ae
+        on ae.id_call = ring.id_call
+            and ae.ts_created > ring.ts_created
+        group by 1,2,3
+    ),
+    ring_summary as (
+        select
+            are.id_call,
+            are.agent_email,
+            min(are.ts_min_local) as ts_min_local
+        from agent_ring_events are
+        group by 1,2
+    ),
+    call_context_data as (
+        select
+            id_call,
+            json_extract_scalar(metadata, '$.direction') as call_direction
+        from call_events
+        where event='call.standby' 
+            or event='call.new' 
+            or event='call.waiting'
+            or event='call.ongoing'
+            or event='call.finished'
+        group by 1,2
+    ),
+    last_queue_for_agent as (
+        select distinct
+            wti.id_call,
+            max(wti.ts_created_wait_event_local) as ts_created_wait_event_local, 
+            max(rs.ts_min_local) as ts_min_local
+        from wait_time_interactions wti
+        inner join agent_entered_events ae
+            on wti.id_call = ae.id_call 
+        inner join ring_summary rs 
+            on rs.id_call = wti.id_call 
+            and rs.agent_email = ae.agent_email
+        group by 1
+    ),
+    last_queued_calls as (
+        select distinct
+            c.id_call,
+            (aq.id_call is not null) as is_call_abandoned_in_queue,
+            coalesce(a.unique_agents_per_call>0, false) as is_call_answered_by_agent,
+            a.unique_agents_per_call,
+            wti.queue_number,
+            wti.ts_created_wait_event_local,
+            rs.ts_min_local
+        from calls c
+        inner join agents a 
+            on c.id_call = a.id_call 
+        left join wait_time_interactions wti
+            on wti.id_call = c.id_call
+        left join abandoned_queue aq 
+            on wti.id_call = aq.id_call 
+            and wti.queue_number = aq.queue_number
+               inner join agent_entered_events ae
+            on wti.id_call = ae.id_call 
+        inner join ring_summary rs 
+            on rs.id_call = wti.id_call 
+    ), 
+    distinct_agent_totals as (
+        select distinct 
+            lq.id_call,
+            lq.unique_agents_per_call
+        from last_queued_calls lq
+        join call_context_data cdc
+            on cdc.id_call = lq.id_call
+        join last_queue_for_agent lqfa
+            on lqfa.id_call = lq.id_call
+        where cdc.call_direction = 'inbound' 
+        and lq.is_call_answered_by_agent = true 
+        and lq.is_call_abandoned_in_queue = false
+        and lq.ts_created_wait_event_local = lqfa.ts_created_wait_event_local
+        and lq.ts_min_local = lqfa.ts_min_local
     )
 select
     c.id_call as sk_call,
@@ -318,6 +420,8 @@ select
     ura.ts_last_ura_event_local as ts_ura_left_local,
     a.ts_created_min as ts_first_call_answered,
     a.ts_created_min_local as ts_first_call_answered_local,
+    coalesce(dat.unique_agents_per_call = 1, False) as is_call_ended_and_answered_by_one_agent,
+    coalesce(dat.unique_agents_per_call > 1, False) as is_call_ended_and_answered_by_multiple_agents,
     c.ts_created_min as ts_started,
     c.ts_created_min_local as ts_started_local,
     csat.ts_started as ts_csat_answered,
@@ -347,4 +451,6 @@ left join (select distinct id_call from waiting_events) wait
     on c.id_call=wait.id_call
 left join agent_ringing_events ring
     on c.id_call=ring.id_call
+left join distinct_agent_totals dat
+    on c.id_call=dat.id_call
 ;
