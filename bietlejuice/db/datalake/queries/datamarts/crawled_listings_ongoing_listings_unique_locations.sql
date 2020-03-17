@@ -136,9 +136,9 @@ qa_subregions AS (
          r.region_code,
          r.city_name,
          r.city_group,
-         ST_POLYGON(pr.poligono) as geometry
-  FROM datalake_raw.ebdb_poligonoregiao AS pr
-  JOIN datalake_clean.ods_dim_region AS r ON r.sk_region = pr.regiao_id
+         ST_POLYGON(pr.polygon) as geometry
+  FROM datalake_ebdb_clean_prod.polygon_region AS pr
+  JOIN datalake_clean.ods_dim_region AS r ON cast(r.sk_region as bigint) = pr.id_region
   WHERE r.level = 'SubRegiao'
 )
 SELECT

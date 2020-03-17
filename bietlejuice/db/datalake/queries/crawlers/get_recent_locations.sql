@@ -37,8 +37,8 @@ with listings as (
   from locations loc
   join listings lis
     on loc.id = lis.id and loc.ws = lis.ws
-  join datalake_raw.ebdb_poligonoregiao pr
-    on ST_Contains(ST_Polygon(pr.poligono), ST_Point(loc.longitude, loc.latitude))
+  join datalake_ebdb_clean_prod.polygon_region pr
+    on ST_Contains(ST_Polygon(pr.polygon), ST_Point(loc.longitude, loc.latitude))
   left join datalake_raw.street_type st
     on strpos(replace(loc.street, ' ', ''), upper(replace(st.prefix, ' ', ''))) = 1
       and st.city = 'sp'

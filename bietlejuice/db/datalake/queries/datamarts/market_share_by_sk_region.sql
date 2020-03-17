@@ -17,9 +17,9 @@ SELECT
   r.name
   ,r.sk_region
   ,r.city_name
-  ,ST_Polygon(p.poligono) AS the_geom
+  ,ST_Polygon(p.polygon) AS the_geom
 FROM datalake_clean.ods_dim_region r
-LEFT JOIN datalake_raw.ebdb_poligonoregiao p ON r.sk_region = p.regiao_id
+LEFT JOIN datalake_ebdb_clean_prod.polygon_region p ON cast(r.sk_region as bigint) = p.id_region
 WHERE level = 'SubRegiao'
 )
 /*Census 2010 data grouped in 250m hexagons*/
@@ -52,7 +52,7 @@ SELECT
 FROM datalake_clean.ods_dim_house_listing AS dhl
 JOIN datalake_clean.ods_fact_house_listings f ON dhl.sk_house_listing = f.sk_house_listing
 JOIN qa_subregions r ON r.sk_region = f.sk_region
-LEFT JOIN datalake_raw.ebdb_poligonoregiao p ON r.sk_region = p.regiao_id
+LEFT JOIN datalake_ebdb_clean_prod.polygon_region p ON cast(r.sk_region as bigint) = p.id_region
 WHERE house_status = 'publicado'
 AND substring(dhl.sk_house_listing,10,12) <> '000' AND r.sk_region is not null AND (dhl.house_type='Apartamento' OR dhl.house_type='StudioOuKitchenette') AND dhl.is_for_rent='True'
 GROUP BY 1,2,3

@@ -35,9 +35,9 @@ discarded_leads AS (
   GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 subregions AS (
-	SELECT r.*, p.poligono AS geometry
+	SELECT r.*, p.polygon AS geometry
 	FROM datalake_clean.ods_dim_region r
-	JOIN datalake_raw.ebdb_poligonoregiao p ON r.sk_region = p.regiao_id
+	JOIN datalake_ebdb_clean_prod.polygon_region p ON cast(r.sk_region as bigint) = p.id_region
 	WHERE level = 'SubRegiao'
 ),
 discarded_leads_subregions AS (

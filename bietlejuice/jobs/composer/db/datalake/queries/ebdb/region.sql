@@ -15,5 +15,3 @@ FROM
         mr.id = r.regiaoPai_id
     LEFT JOIN datalake_ebdb_raw.regiao c ON
         c.id = mr.regiaoPai_id
-WHERE
-    r.nivel IN ('SubRegiao', 'Cidade')

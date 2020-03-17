@@ -1,18 +1,18 @@
 select
-    r.id as id,
-    r.nome as region,
-    c.nome as city,
-    pr.poligono as poly
+    r.id_region as id,
+    r.name as region,
+    c.name as city,
+    pr.polygon as poly
 from
-    datalake_raw.ebdb_poligonoregiao pr
+    datalake_ebdb_clean_prod.polygon_region pr
 join
-    datalake_raw.ebdb_regiao r
-    on r.id = pr.regiao_id
+    datalake_ebdb_clean_prod.region r
+    on r.id_region = pr.id_region
 join
-    datalake_raw.ebdb_regiao m
-    on m.id = r.regiaopai_id
+    datalake_ebdb_clean_prod.region m
+    on m.id_region = r.id_parent_region
 join
-    datalake_raw.ebdb_regiao c
-    on c.id = m.regiaopai_id
+    datalake_ebdb_clean_prod.region c
+    on c.id_region = m.id_parent_region
 where
-    r.nivel = 'SubRegiao'
+    r.level = 'SubRegiao'

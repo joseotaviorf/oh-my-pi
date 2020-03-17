@@ -106,9 +106,9 @@ group by
 , poligonos as (
 	SELECT 
 		r.*,
-		p.poligono AS geometry
+		p.polygon AS geometry
 	FROM datalake_clean.ods_dim_region r
-	LEFT JOIN datalake_raw.ebdb_poligonoregiao p ON r.sk_region = p.regiao_id
+	LEFT JOIN datalake_ebdb_clean_prod.polygon_region p ON cast(r.sk_region as bigint) = p.id_region
 	WHERE level = 'SubRegiao'
 )
 , cnpj_regions as (

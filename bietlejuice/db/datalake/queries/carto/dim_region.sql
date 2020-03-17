@@ -22,8 +22,8 @@ SELECT
    r.dt_timestamp,
    r.dt_first_property_created,
    r.dt_first_booking,
-   p.poligono,
+   p.polygon as poligono,
    CURRENT_TIMESTAMP AS carto_ts_load
 FROM datalake_clean.ods_dim_region r
-LEFT JOIN datalake_raw.ebdb_poligonoregiao p ON r.sk_region = p.regiao_id
+LEFT JOIN datalake_ebdb_clean_prod.polygon_region p ON cast(r.sk_region as bigint) = p.id_region
 WHERE level = 'SubRegiao'
