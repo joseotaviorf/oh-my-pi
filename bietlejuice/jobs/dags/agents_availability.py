@@ -96,14 +96,12 @@ def load_agents_signed_contracts():
         encoding='utf-8'
     )
 
-    BaseETL.to_db(
-        db_enum=EnumDB.BI_DW,
-        data_table=data_table,
-        table_name=entity,
-        encoding='utf-8',
-        append=False,
-        schema='agent'
-    )
+    # load
+    BaseETL.bulk_insert(table=data_table,
+                        table_name='agent.{}'.format(entity),
+                        db_enum=EnumDB.BI_DW,
+                        append=False,
+                        encoding='utf-8')
 
 
 # create DAG definition
