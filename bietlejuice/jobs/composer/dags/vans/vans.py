@@ -7,14 +7,22 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
 
-from bietlejuice.jobs.composer.dags.vans import SOURCE
+from bietlejuice.jobs.composer.dags.vans import (
+    SOURCE,
+    QUERIES_VANS_DATALAKE_PATH,
+    DW_SCHEMA,
+)
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
 from bietlejuice.jobs.composer.services import FileService
 
 DAG_ID = f"bietlejuice.{SOURCE}"
+
 ENV = Variable.get("environment")
+DW_BUCKET = Variable.get("dw_bucket")
+
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
+SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
 ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
 
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
@@ -99,24 +107,73 @@ def clean_tasks(sub_dag_name, table_name, slugged_table_name):
     return sub_dag
 
 
-def build_clean_subdags(prev_task, next_task):
-    # create subdag for each clean table
-    file_list = FileService.list_raw_to_clean_sql_files(SOURCE, "")
+def dw_tasks(sub_dag_name, table_name, slugged_table_name):
 
-    if file_list:
-        for file_name in file_list:
-            file_name = FileService.remove_file_extension(file_name)
-            slugged_table_name = file_name.replace("_", "-")
-            table_sub_dag = BaseSubDAG.get_sub_dag_operator(
-                dag=dag,
-                sub_dag_name=f"load-{slugged_table_name}-to-datalake-clean",
-                sub_dag_func=clean_tasks,
-                table_name=file_name,
-                slugged_table_name=slugged_table_name,
-            )
-            prev_task >> table_sub_dag >> next_task
-    else:
-        prev_task >> next_task
+    sub_dag = BaseSubDAG(
+        sub_dag_name=sub_dag_name,
+        dag_name=DAG_ID,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+    )._build_local_dag()
+
+    create_table_in_dw_staging = QuintoAndarDatabricksSubmitRunOperator(
+        dag=sub_dag,
+        task_id=f"load-{slugged_table_name}-into-dw-{DW_SCHEMA}-staging",
+        json={
+            "spark_python_task": {
+                "python_file": SPARK_JOBS_PATH + "create_table_in_dw_staging.py",
+                "parameters": [DW_BUCKET, table_name, ENV],
+            }
+        },
+    )
+
+    create_table_in_dw = QuintoAndarDatabricksSubmitRunOperator(
+        dag=sub_dag,
+        task_id=f"load-{slugged_table_name}-into-dw-{DW_SCHEMA}",
+        json={
+            "spark_python_task": {
+                "python_file": SPARK_JOBS_PATH + "create_table_in_dw.py",
+                "parameters": [DW_BUCKET, table_name, ENV],
+            }
+        },
+    )
+
+    load_dw_table_into_redshift = QuintoAndarDatabricksSubmitRunOperator(
+        dag=sub_dag,
+        task_id=f"load-{slugged_table_name}-into-redshift",
+        json={
+            "spark_python_task": {
+                "python_file": SPARK_JOBS_PATH + "load_dw_table_into_redshift.py",
+                "parameters": [DW_BUCKET, table_name, ENV, SPECTRUM_IAM_ROLE],
+            }
+        },
+    )
+
+    create_table_in_dw_staging >> create_table_in_dw >> load_dw_table_into_redshift
+
+    return sub_dag
+
+
+def build_subdags(stage):
+    # create subdag for each table
+    file_list = FileService.list_files(f"{QUERIES_VANS_DATALAKE_PATH}/{stage}")
+    subdags = {}
+
+    for file_name in file_list:
+        file_name = FileService.remove_file_extension(file_name)
+        slugged_table_name = file_name.replace("_", "-")
+        table_sub_dag = BaseSubDAG.get_sub_dag_operator(
+            dag=dag,
+            sub_dag_name=f"load-{slugged_table_name}-to-{stage}",
+            sub_dag_func=eval(f"{stage}_tasks"),
+            table_name=file_name,
+            slugged_table_name=slugged_table_name,
+        )
+        subdags[file_name] = table_sub_dag
+
+    # subdags is a dict where the keys are table or file names
+    # and the values are corresponding subdag objects
+    return subdags
 
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
@@ -137,12 +194,40 @@ vans_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-create_cluster_task >> vans_to_datalake_raw_task
+clean_sub_dags = build_subdags("clean")
+dw_sub_dags = build_subdags("dw")
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-build_clean_subdags(
-    prev_task=vans_to_datalake_raw_task, next_task=terminate_cluster_task
-)
+create_cluster_task >> vans_to_datalake_raw_task
+vans_to_datalake_raw_task >> list(clean_sub_dags.values())
+
+# fact_banking_file_payment dependencies
+[
+    clean_sub_dags["boleto"],
+    clean_sub_dags["payment"],
+    clean_sub_dags["payment_boleto"],
+] >> dw_sub_dags["fact_banking_file_payments"]
+
+# dim_occurrence_code dependencies
+[
+    clean_sub_dags["boleto"],
+    clean_sub_dags["payment"],
+    clean_sub_dags["payment_boleto"],
+] >> dw_sub_dags["dim_occurrence_code"]
+
+# dim_banking_file_payment dependencies
+[
+    clean_sub_dags.pop("boleto"),
+    clean_sub_dags.pop("payment"),
+    clean_sub_dags.pop("payment_boleto"),
+    clean_sub_dags.pop("bank_boleto"),
+    clean_sub_dags.pop("bank"),
+    clean_sub_dags.pop("bank_payment"),
+] >> dw_sub_dags["dim_banking_file_payment"]
+
+# look out! the clean sub dags no longer have the dependency instances
+list(clean_sub_dags.values()) >> terminate_cluster_task
+list(dw_sub_dags.values()) >> terminate_cluster_task
