@@ -21,6 +21,7 @@ parser = ArgumentParser(description=JOB_NAME)
 parser.add_argument("env")
 parser.add_argument("athena_query_result_location")
 parser.add_argument("datalake_layer")
+parser.add_argument("bucket")
 parser.add_argument("source")
 parser.add_argument("--tables", nargs="+", dest="tables", required=False)
 parser.add_argument(
@@ -44,6 +45,7 @@ if __name__ == "__main__":
     env = args.env
     athena_query_result_location = args.athena_query_result_location
     datalake_layer = args.datalake_layer
+    bucket = args.bucket
     source = args.source
     tables = args.tables
     all = args.all
@@ -55,7 +57,7 @@ if __name__ == "__main__":
     athena_metastore_service = AthenaMetastoreService(
         AthenaClient(athena_query_result_location)
     )
-    transformer = Transformer(env, source, athena_metastore_service)
+    transformer = Transformer(env, source, bucket, athena_metastore_service)
     if not all and not tables:
         logger.warning(
             "m=__main__, msg=No tables or all flag passed, nothing to do.".format(

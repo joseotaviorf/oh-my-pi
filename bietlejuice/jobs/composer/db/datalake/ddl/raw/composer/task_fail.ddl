@@ -1,4 +1,4 @@
-CREATE EXTERNAL TABLE `datalake_composer_raw_{ENV}.task_fail`
+CREATE EXTERNAL TABLE IF NOT EXISTS `{DATABASE}.task_fail`
 (
   `id` int,
   `task_id` string,
@@ -10,5 +10,5 @@ CREATE EXTERNAL TABLE `datalake_composer_raw_{ENV}.task_fail`
 )
 ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'
 LOCATION
-'s3://5a-datalake-{ENV}/raw/composer/task_fail'
+'s3://{BUCKET}/raw/composer/task_fail'
 ;

@@ -8,7 +8,7 @@ from airflow.operators.quintoandar_athena import (
 )
 from airflow.operators.quintoandar_transfer_data import QuintoAndarMySqlToS3Operator
 
-from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
+from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG, Environment
 from bietlejuice.jobs.composer.base.db import DATALAKE_SQL_DIR
 from bietlejuice.jobs.composer.services import FileService
 
@@ -17,7 +17,8 @@ ENV = Variable.get("environment")
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 START_DATE = datetime(2019, 8, 21, 0, 0, 0, tzinfo=LOCAL_TZ)
 SCHEDULE_INTERVAL = "0 8 * * *"
-S3_BUCKET = "5a-datalake-{}".format(ENV)
+S3_BUCKET = Variable.get("datalake_bucket")
+
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -51,13 +52,19 @@ def move_data_subdag(subdag_name, table_name):
         mysql_conn_id="airflow_db",
     )
 
+    if ENV == Environment.FORNO:
+        schema_suffix = ""
+    else:
+        schema_suffix = f"_{ENV}"
+    database = f"datalake_composer_raw{schema_suffix}"
+
     ddl_query_raw = FileService.get_query_from_file_name(
         "{}/ddl/raw/composer/{}.ddl".format(DATALAKE_SQL_DIR, table_name)
-    ).format(ENV=ENV)
+    ).format(BUCKET=S3_BUCKET, DATABASE=database)
     create_athena_raw_table_task = QuintoAndarCreateAthenaExternalTableOperator(
         dag=local_dag,
         task_id="create-athena-raw-table",
-        database="datalake_composer_raw_{}".format(ENV),
+        database=database,
         table=table_name,
         ddl_query=ddl_query_raw,
         output_location="s3://{}/query_results/".format(S3_BUCKET),

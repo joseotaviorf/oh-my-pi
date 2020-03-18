@@ -105,6 +105,7 @@ def create_all_external_tables_task(local_dag, env, datalake_layer, source):
                     env,
                     ATHENA_QUERY_RESULT_LOCATION,
                     datalake_layer,
+                    DATALAKE_BUCKET,
                     source,
                     "--all",
                 ],
@@ -124,6 +125,7 @@ def create_external_tables_task(local_dag, env, datalake_layer, source, tables):
                     env,
                     ATHENA_QUERY_RESULT_LOCATION,
                     datalake_layer,
+                    DATALAKE_BUCKET,
                     source,
                     "--tables",
                 ]

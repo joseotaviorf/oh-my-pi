@@ -1,4 +1,4 @@
-CREATE EXTERNAL TABLE `datalake_composer_raw_{ENV}.dag_run`
+CREATE EXTERNAL TABLE IF NOT EXISTS `{DATABASE}.dag_run`
 (
   `id` int,
   `dag_id` string,
@@ -12,5 +12,5 @@ CREATE EXTERNAL TABLE `datalake_composer_raw_{ENV}.dag_run`
 )
 ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'
 LOCATION
-'s3://5a-datalake-{ENV}/raw/composer/dag_run'
+'s3://{BUCKET}/raw/composer/dag_run'
 ;

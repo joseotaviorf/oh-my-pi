@@ -9,8 +9,8 @@ logger = QuintoAndarLogger("TeravozTransformer")
 
 class TeravozTransformer(Transformer):
     @logger
-    def __init__(self, env, athena_metastore_service):
-        super().__init__(env, "teravoz", athena_metastore_service)
+    def __init__(self, env, bucket, athena_metastore_service):
+        super().__init__(env, "teravoz", bucket, athena_metastore_service)
         self.env = env
 
     @logger

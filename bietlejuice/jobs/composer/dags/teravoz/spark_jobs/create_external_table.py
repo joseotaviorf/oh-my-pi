@@ -40,6 +40,7 @@ if __name__ == "__main__":
     execution_date = args.execution_date
     table_name = args.table_name.replace("-", "_")
     environment = args.environment
+    bucket = args.datalake_bucket
     datalake_bucket = args.datalake_bucket
     athena_query_result_location = args.athena_query_result_location
 
@@ -53,7 +54,7 @@ if __name__ == "__main__":
     athena_metastore_service.create_database(db_info["db_clean_athena"])
 
     # create external table and add partition
-    transformer = TeravozTransformer(environment, athena_metastore_service)
+    transformer = TeravozTransformer(environment, bucket, athena_metastore_service)
 
     transformer.create_athena_table(
         datalake_layer=datalake_layer, table_name=table_name

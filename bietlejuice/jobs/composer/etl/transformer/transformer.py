@@ -17,20 +17,19 @@ spark = BaseSparkContext.spark
 
 class Transformer:
     @logger
-    def __init__(self, env, source, athena_metastore_service):
+    def __init__(self, env, source, bucket, athena_metastore_service):
         self.env = env
         self.source = source
+        self.bucket = bucket
         self.athena_metastore_service = athena_metastore_service
 
         # Forno is under new AWS accounts, then use new structure
         # Prod is temporarily under old AWS account and will be migrated soon, then this
         # if clause should be removed
         if self.env == Environment.FORNO:
-            self.bucket = f"datalake.s3.{env}.data.quintoandar.com.br"
             self.schema_suffix = ""
         else:
             self.schema_suffix = f"_{env}"
-            self.bucket = f"5a-datalake-{env}"
 
     @logger
     def _get_athena_schema(self, datalake_layer):
