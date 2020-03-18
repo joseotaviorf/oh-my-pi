@@ -1,100 +1,100 @@
 with
     weekly_schedule_prev as (
         select distinct
-            cast(hsa.atualizadoem as timestamp) as dt_update,
-            agente_id as agent_id,
-            diadasemana as dow,
+            hsa.ts_updated as dt_update,
+            id_agent as agent_id,
+            day_of_week as dow,
             value as available_slot,
-            dat.tipos as agent_type,
+            dat.types as agent_type,
             key as slot_number
         from
-            datalake_raw.ebdb_horariosemanalagente_aud hsa
-            join datalake_raw.ebdb_dadosagente_tipos dat
-                on hsa.agente_id = dat.dadosagente_id
+            datalake_ebdb_clean_prod.agent_weekly_hours_aud hsa
+            join datalake_ebdb_clean_prod.agent_data_types dat
+                on hsa.id_agent = dat.id_agent_data
             cross join unnest(
                 sequence(0,47),
                 array[
-                    horarios_disponivel08as09,horarios_disponivel08as09,horarios_disponivel08as09,horarios_disponivel08as09,
-                    horarios_disponivel09as10,horarios_disponivel09as10,horarios_disponivel09as10,horarios_disponivel09as10,
-                    horarios_disponivel10as11,horarios_disponivel10as11,horarios_disponivel10as11,horarios_disponivel10as11,
-                    horarios_disponivel11as12,horarios_disponivel11as12,horarios_disponivel11as12,horarios_disponivel11as12,
-                    horarios_disponivel12as13,horarios_disponivel12as13,horarios_disponivel12as13,horarios_disponivel12as13,
-                    horarios_disponivel13as14,horarios_disponivel13as14,horarios_disponivel13as14,horarios_disponivel13as14,
-                    horarios_disponivel14as15,horarios_disponivel14as15,horarios_disponivel14as15,horarios_disponivel14as15,
-                    horarios_disponivel15as16,horarios_disponivel15as16,horarios_disponivel15as16,horarios_disponivel15as16,
-                    horarios_disponivel16as17,horarios_disponivel16as17,horarios_disponivel16as17,horarios_disponivel16as17,
-                    horarios_disponivel17as18,horarios_disponivel17as18,horarios_disponivel17as18,horarios_disponivel17as18,
-                    horarios_disponivel18as19,horarios_disponivel18as19,horarios_disponivel18as19,horarios_disponivel18as19,
-                    horarios_disponivel19as20,horarios_disponivel19as20,horarios_disponivel19as20,horarios_disponivel19as20
+                    has_hours_between_08_and_09_available,has_hours_between_08_and_09_available,has_hours_between_08_and_09_available,has_hours_between_08_and_09_available,
+                    has_hours_between_09_and_10_available,has_hours_between_09_and_10_available,has_hours_between_09_and_10_available,has_hours_between_09_and_10_available,
+                    has_hours_between_10_and_11_available,has_hours_between_10_and_11_available,has_hours_between_10_and_11_available,has_hours_between_10_and_11_available,
+                    has_hours_between_11_and_12_available,has_hours_between_11_and_12_available,has_hours_between_11_and_12_available,has_hours_between_11_and_12_available,
+                    has_hours_between_12_and_13_available,has_hours_between_12_and_13_available,has_hours_between_12_and_13_available,has_hours_between_12_and_13_available,
+                    has_hours_between_13_and_14_available,has_hours_between_13_and_14_available,has_hours_between_13_and_14_available,has_hours_between_13_and_14_available,
+                    has_hours_between_14_and_15_available,has_hours_between_14_and_15_available,has_hours_between_14_and_15_available,has_hours_between_14_and_15_available,
+                    has_hours_between_15_and_16_available,has_hours_between_15_and_16_available,has_hours_between_15_and_16_available,has_hours_between_15_and_16_available,
+                    has_hours_between_16_and_17_available,has_hours_between_16_and_17_available,has_hours_between_16_and_17_available,has_hours_between_16_and_17_available,
+                    has_hours_between_17_and_18_available,has_hours_between_17_and_18_available,has_hours_between_17_and_18_available,has_hours_between_17_and_18_available,
+                    has_hours_between_18_and_19_available,has_hours_between_18_and_19_available,has_hours_between_18_and_19_available,has_hours_between_18_and_19_available,
+                    has_hours_between_19_and_20_available,has_hours_between_19_and_20_available,has_hours_between_19_and_20_available,has_hours_between_19_and_20_available
                 ]
             ) as t(key, value)
     ),
     specific_schedule as (
         select distinct
-            agente_id as agent_id,
-            max(cast(nullif(trim(atualizadoem),'') as timestamp)) over (partition by agente_id, "data", key)  as dt_update,
-            max_by(folga, cast(nullif(trim(atualizadoem),'') as timestamp)) over (partition by agente_id, "data", key) as folga,
-            date_add('minute',15 * key, date_add('hour',8, cast(cast(nullif(trim("data"),'') as date) as timestamp))) as slot_dt,
+            id_agent as agent_id,
+            max(ts_updated) over (partition by id_agent, "dt_agent_specific_hour", key)  as dt_update,
+            max_by(is_off_work, ts_updated) over (partition by id_agent, "dt_agent_specific_hour", key) as folga,
+            date_add('minute',15 * key, date_add('hour',8, cast("dt_agent_specific_hour" as timestamp))) as slot_dt,
             key as slot_number,
-            max_by(value, cast(nullif(trim(atualizadoem),'') as timestamp)) over (partition by agente_id, "data", key) as available_slot
+            max_by(value, ts_updated) over (partition by id_agent, "dt_agent_specific_hour", key) as available_slot
         from
-            datalake_raw.ebdb_horarioespecificoagente_aud
+            datalake_ebdb_clean_prod.agent_specific_hour_aud 
             cross join unnest(
                 sequence(0,47),
                 array[
-                    disponivel08as09,disponivel08as09,disponivel08as09,disponivel08as09,
-                    disponivel09as10,disponivel09as10,disponivel09as10,disponivel09as10,
-                    disponivel10as11,disponivel10as11,disponivel10as11,disponivel10as11,
-                    disponivel11as12,disponivel11as12,disponivel11as12,disponivel11as12,
-                    disponivel12as13,disponivel12as13,disponivel12as13,disponivel12as13,
-                    disponivel13as14,disponivel13as14,disponivel13as14,disponivel13as14,
-                    disponivel14as15,disponivel14as15,disponivel14as15,disponivel14as15,
-                    disponivel15as16,disponivel15as16,disponivel15as16,disponivel15as16,
-                    disponivel16as17,disponivel16as17,disponivel16as17,disponivel16as17,
-                    disponivel17as18,disponivel17as18,disponivel17as18,disponivel17as18,
-                    disponivel18as19,disponivel18as19,disponivel18as19,disponivel18as19,
-                    disponivel19as20,disponivel19as20,disponivel19as20,disponivel19as20
+                    is_available_between_08_and_09,is_available_between_08_and_09,is_available_between_08_and_09,is_available_between_08_and_09,
+                    is_available_between_09_and_10,is_available_between_09_and_10,is_available_between_09_and_10,is_available_between_09_and_10,
+                    is_available_between_10_and_11,is_available_between_10_and_11,is_available_between_10_and_11,is_available_between_10_and_11,
+                    is_available_between_11_and_12,is_available_between_11_and_12,is_available_between_11_and_12,is_available_between_11_and_12,
+                    is_available_between_12_and_13,is_available_between_12_and_13,is_available_between_12_and_13,is_available_between_12_and_13,
+                    is_available_between_13_and_14,is_available_between_13_and_14,is_available_between_13_and_14,is_available_between_13_and_14,
+                    is_available_between_14_and_15,is_available_between_14_and_15,is_available_between_14_and_15,is_available_between_14_and_15,
+                    is_available_between_15_and_16,is_available_between_15_and_16,is_available_between_15_and_16,is_available_between_15_and_16,
+                    is_available_between_16_and_17,is_available_between_16_and_17,is_available_between_16_and_17,is_available_between_16_and_17,
+                    is_available_between_17_and_18,is_available_between_17_and_18,is_available_between_17_and_18,is_available_between_17_and_18,
+                    is_available_between_18_and_19,is_available_between_18_and_19,is_available_between_18_and_19,is_available_between_18_and_19,
+                    is_available_between_19_and_20,is_available_between_19_and_20,is_available_between_19_and_20,is_available_between_19_and_20
                 ]
             ) as t(key, value)
     ),
     visits as (
-        select distinct a.agente_id as agent_id,
-            vo.nome,
-            date_add('minute',15 * cast(a.slotdia AS integer), date_add('hour',8, cast(cast(nullif(trim(a."data"),'') AS date) AS timestamp))) AS slot_dt
+        select distinct a.id_agent as agent_id,
+            vo.name,
+            date_add('minute',15 * a.slot_day, date_add('hour',8, cast(a.dt_visit as timestamp))) as slot_dt
         from
-            datalake_raw.ebdb_agendamento a
-            left join datalake_raw.ebdb_agendamento_aud aa
+            datalake_ebdb_clean_prod.booking a
+            left join datalake_ebdb_clean_prod.booking_aud aa
                 on aa.id = a.id
-                and aa.revtype='0'
-            left join datalake_raw.ebdb_visitaorigem vo
-                on vo.id = aa.origemultimaatualizacao_id
+                and aa.rev_type=0
+            left join datalake_ebdb_clean_prod.visit_origin vo
+                on vo.id = aa.id_last_update_origin
         where
-            a.fupvisita in ('Talvez', 'NaoGostou', 'VaiNegociar', 'VisitouSozinho')
-            and a.tipo = 'Visita'
-            and cast(nullif(trim(a."data"),'') AS date) >= date'2019-01-01'
+            a.visit_fup in ('Talvez', 'NaoGostou', 'VaiNegociar', 'VisitouSozinho')
+            and a.type = 'Visita'
+            and a.dt_visit >= date'2019-01-01'
     ),
     active_history_mod as (
         select distinct
-            from_unixtime(cast(ure."timestamp" as bigint)/1000) as dt_status,
-            coalesce(lag(ativo) over (partition by da.id order by cast(rev as bigint))<>ativo,true) as status_mod,
+            from_unixtime(ure.ts_revision/1000) as dt_status,
+            coalesce(lag(is_active) over (partition by da.id order by cast(rev as bigint))<>is_active,true) as status_mod,
             da.id,
-            da.ativo as status
+            da.is_active as status
         from
-            datalake_raw.ebdb_dadosagente_aud da
-            left join datalake_raw.ebdb_usuario_revision_entity ure
+            datalake_ebdb_clean_prod.agent_data_aud da
+            left join datalake_ebdb_clean_prod.user_revision_entity ure
                 on da.rev = ure.id
     ),
     planner_active as (
         select
-            u.dadosagente_id as agent_id,
+            u.id_agent as agent_id,
             date(available_date) as dt_active,
             count(distinct(region_name)) as _count
         from
             datalake_raw.agents_schedule a
-            left join datalake_raw.ebdb_usuario u
-                on u.id = a.agent_user_id
+            left join datalake_ebdb_clean_prod.user u
+                on u.id = cast(a.agent_user_id as bigint)
         group by
-            u.dadosagente_id,
+            u.id_agent,
             available_date
     ),
     ss_visits as (
@@ -104,7 +104,7 @@ with
         from
             visits
         where
-            nome in ('Inquilinos', 'SelfServiceWeb')
+            name in ('Inquilinos', 'SelfServiceWeb')
     ),
     full_visits as (
         select distinct
@@ -198,17 +198,17 @@ with
             bs.slot_number,
             bs.available_slot as original_slot,
             case
-                when ss.folga = '1' and ss.available_slot <> bs.available_slot then '0'
-                when ss.available_slot is not null and ss.available_slot <> bs.available_slot then ss.available_slot
-                else bs.available_slot
+                when ss.folga = true and ss.available_slot <> bs.available_slot then '0'
+                when ss.available_slot is not null and ss.available_slot <> bs.available_slot then cast(ss.available_slot as varchar)
+                else cast(bs.available_slot as varchar)
             end as available_slot,
             case
-                when ss.folga = '1' and ss.available_slot <> bs.available_slot then 'day off'
+                when ss.folga = true and ss.available_slot <> bs.available_slot then 'day off'
                 when ss.available_slot is not null and ss.available_slot <> bs.available_slot then 'specific'
                 else null
             end as last_change_reason,
             case
-                when ss.folga = '1' and ss.available_slot <> bs.available_slot then true
+                when ss.folga = true and ss.available_slot <> bs.available_slot then true
                 when ss.available_slot is not null and ss.available_slot <> bs.available_slot then true
                 else false
             end as specific_update
@@ -333,4 +333,4 @@ from
         and pa.dt_active = date(vu.slot_dt)
 where
     date(vu.slot_dt) between date('{dt}') and date('{dt}') + interval '21' day
-    and ah.status = '1';
+    and ah.status = true;
