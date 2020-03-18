@@ -111,7 +111,8 @@ tickets as (
         cast(t.id_ticket as bigint) as sk_ticket,
         -- id_contract and id_house may be filled with string (filled wrong)
         -- id_house may be filled with id_house or short_id_house
-        cfi.*,
+        cfi.id_house,
+        cfi.id_contract,
         tm.*,
         coalesce(cast(t.id_requester as bigint), -1) as sk_zendesk_requester_user,
         coalesce(cast(t.id_submitter as bigint), -1) as sk_zendesk_submitter_user,
