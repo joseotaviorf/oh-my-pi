@@ -22,7 +22,9 @@ SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
 
 # cluster setup
 LOGS_OUTPUT_PATH = f"s3://{S3_BUCKET}/logs/jobs/{SOURCE}"
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
+CLUSTER_DESCRIPTION = Variable.get(
+    "databricks_memory_optimized_cluster", deserialize_json=True
+)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 LIBRARIES_DESCRIPTION = Variable.get(
     "bietlejuice_default_libraries", deserialize_json=True
@@ -37,7 +39,7 @@ main_dag = DAG(
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
-    start_date=datetime(2020, 3, 8, 0, 0, 0, tzinfo=sp_tz),
+    start_date=datetime(2020, 3, 16, 0, 0, 0, tzinfo=sp_tz),
     schedule_interval="0 0 * * *",
     max_active_runs=1,
     catchup=False,
@@ -56,12 +58,13 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 )
 
 load_raw_sub_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="load-tables-to-datalake-raw",
+    task_id="load-incremental-tables-to-data-lake-raw",
     dag=main_dag,
     json={
         "spark_python_task": {
-            "python_file": SPARK_JOBS_PATH + "load_db_schema_into_datalake.py",
-            "parameters": [ENV, DATA_LAKE_BUCKET, SOURCE],
+            "python_file": SPARK_JOBS_PATH
+            + "load_incremental_tables_into_data_lake_raw.py",
+            "parameters": [ENV, SOURCE, DATA_LAKE_BUCKET, "{{ ds }}"],
         }
     },
 )
