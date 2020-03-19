@@ -311,9 +311,9 @@ select
     vu.slot_dt,
     vu.dow,
     vu.slot_number,
-    vu.ss_available_slot,
-    vu.available_slot,
-    vu.available_slot_24h,
+    cast(vu.ss_available_slot as integer) as ss_available_slot,
+    cast(vu.available_slot as integer) as available_slot,
+    cast(vu.available_slot_24h as integer) as available_slot_24h,
     vu.specific_update,
     vu.time_window_update,
     vu.visit_update,
@@ -322,7 +322,7 @@ select
     vu.last_change_reason,
     cast(ah.status as integer) as history_status,
     case when pa._count > 0 then '1' else '0' end as planner_status,
-    vu.specific_slot
+    cast(vu.specific_slot as integer) as specific_slot
 from
     visits_updates vu
     left join active_history ah
