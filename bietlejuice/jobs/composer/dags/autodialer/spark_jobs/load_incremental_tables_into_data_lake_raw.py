@@ -19,14 +19,9 @@ JOB_NAME = "load_incremental_tables_into_datalake_raw"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-INCREMENTAL_TABLES = [
-    "taskReferenceInboundEventHistories",
-    "taskReferenceOutboundHistory",
-    "taskReferences",
-]
+INCREMENTAL_TABLES = ["taskReferenceInboundEventHistories", "taskReferences"]
 INCREMENTAL_COLUMNS_MAPPING = {
     "taskReferenceInboundEventHistories": "updatedAt",
-    "taskReferenceOutboundHistory": "updatedAt",
     "taskReferences": "updatedDate",
 }
 
@@ -75,7 +70,7 @@ if __name__ == "__main__":
             df = (
                 SparkDataFrameService()
                 .input(df)
-                .optimize_partition(200000)
+                .optimize_partition(10000)
                 .create_year_month_day_columns_from_date(dt_execution)
                 .output()
             )
