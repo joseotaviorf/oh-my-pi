@@ -1,0 +1,4 @@
+from bietlejuice.jobs.composer.base.db import QUERIES_DATALAKE_PATH
+
+SOURCE = "linhadireta"
+QUERIES_LINHADIRETA_DATALAKE_PATH = QUERIES_DATALAKE_PATH + SOURCE

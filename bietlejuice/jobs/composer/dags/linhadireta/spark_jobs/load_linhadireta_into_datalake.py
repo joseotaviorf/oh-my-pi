@@ -10,6 +10,7 @@ from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import PostgresConsumer
 from bietlejuice.jobs.composer.loaders import S3Loader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
+from bietlejuice.jobs.composer.dags.linhadireta import SOURCE
 
 JOB_NAME = "load_linhadireta_into_datalake"
 WHITE_LIST = ["User", "User_chats", "Chat", "Chat_users"]
@@ -24,7 +25,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     environment = args.env
     datalake_bucket = args.datalake_bucket
-    source = "linhadireta"
 
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     postgres_consumer = PostgresConsumer(conn_config, spark_client)
 
     tables = postgres_consumer.get_table_names_and_sizes().collect()
-    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
+    db_info = DatalakeMetastoreService.get_db_info(environment, SOURCE, datalake_bucket)
     metastore_service = SparkMetastoreService(spark_client)
     loader = S3Loader(metastore_service)
 
