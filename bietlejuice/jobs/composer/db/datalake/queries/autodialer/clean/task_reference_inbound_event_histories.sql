@@ -4,7 +4,7 @@ with exploded_events as (
     regexp_extract(taskid, '\\"(\\w+)\\"', 1) as id_task,
     explode_outer(from_json(inboundevents, 'array<string>')) as events_json,
     cast(regexp_extract(createdat, '(\\d{{4}}-\\d{{2}}-\\d{{2}}\\w{{1}}\\d{{2}}:\\d{{2}}:\\d{{2}})', 1) as timestamp) as ts_created,
-    cast(updatedat as timestamp) as ts_updated,
+    cast(regexp_extract(updatedat, '(\\d{{4}}-\\d{{2}}-\\d{{2}}\\w{{1}}\\d{{2}}:\\d{{2}}:\\d{{2}})', 1) as timestamp) as ts_updated,
     year,
     month,
     day

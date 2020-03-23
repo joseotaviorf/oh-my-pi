@@ -78,7 +78,7 @@ if __name__ == "__main__":
             s3_loader.load_incremental_table(
                 df=df,
                 database_name=db_info["db_raw_databricks"],
-                table_name=table_name,
+                table_name=table_name.lower(),
                 format_options=SparkTableStorageFormat.DEFAULT_RAW,
                 database_location=db_info["db_raw_path"],
                 partition_cols=partition_cols,
@@ -87,7 +87,7 @@ if __name__ == "__main__":
 
             spark_metastore_service.create_new_partitions_from_df(
                 database_name=db_info["db_raw_databricks"],
-                table_name=table_name,
+                table_name=table_name.lower(),
                 df=df,
                 partition_cols=partition_cols,
             )
