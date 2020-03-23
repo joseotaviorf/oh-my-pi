@@ -20,6 +20,9 @@ from enum_db import EnumDB
 from petl.io.db import create_table
 from unidecode import unidecode
 
+data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
+data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
+
 
 class BaseETL(object):
     def __init__(self, *args, **kwargs):
@@ -352,7 +355,10 @@ class BaseETL(object):
     @classmethod
     def copy_file_between_s3_buckets(cls, bucket_source, bucket_destination,
                                      full_filename_source, full_filename_dest):
-        s3 = boto3.resource('s3')
+        if data_acc_aws_access_key_id is not None and data_acc_aws_secret_access_key is not None:
+            s3 = boto3.resource('s3', aws_access_key_id=data_acc_aws_access_key_id, aws_secret_access_key=data_acc_aws_secret_access_key)
+        else:
+            s3 = boto3.resource('s3')
         copy_source = {
             'Bucket': bucket_source,
             'Key': full_filename_source
@@ -516,8 +522,10 @@ class BaseETL(object):
                     bucket_folder_path = bucket_arr[0]
                     folder = '/'.join(bucket_arr[1:])
                     filename = '{}/{}'.format(folder, filename)
-
-            s3 = boto3.client('s3')
+            if data_acc_aws_access_key_id is not None and data_acc_aws_secret_access_key is not None:
+                s3 = boto3.client('s3', aws_access_key_id=data_acc_aws_access_key_id, aws_secret_access_key=data_acc_aws_secret_access_key)
+            else:
+                s3 = boto3.client('s3')
             s3.upload_file(tmp_fn, bucket_folder_path, filename)
         except Exception as ex:
             log(ex)
@@ -543,8 +551,11 @@ class BaseETL(object):
     def obj_to_s3(cls, obj_io, bucket, file_path):
         if not obj_io or not bucket or not file_path:
             return
+        if data_acc_aws_access_key_id is not None and data_acc_aws_secret_access_key is not None:
+            s3 = boto3.resource('s3', aws_access_key_id=data_acc_aws_access_key_id, aws_secret_access_key=data_acc_aws_secret_access_key)
+        else:
+            s3 = boto3.resource('s3')
 
-        s3 = boto3.resource('s3')
         s3.Bucket(bucket).put_object(Body=obj_io.getvalue(), Key=file_path)
 
     @classmethod
@@ -570,7 +581,11 @@ class BaseETL(object):
 
     @staticmethod
     def delete_file_s3(bucket_name, fn):
-        s3 = boto3.resource('s3')
+        if data_acc_aws_access_key_id is not None and data_acc_aws_secret_access_key is not None:
+            s3 = boto3.resource('s3', aws_access_key_id=data_acc_aws_access_key_id, aws_secret_access_key=data_acc_aws_secret_access_key)
+        else:
+            s3 = boto3.resource('s3')
+
         bucket = s3.Bucket(bucket_name)
         bucket.delete_objects(
             Delete={
@@ -666,7 +681,10 @@ class BaseETL(object):
     def csv_to_s3(cls, data, bucket, filename):
         csv_buffer = BytesIO()
         data.to_csv(csv_buffer, index=False, encoding='utf8')
-        s3 = boto3.resource('s3')
+        if data_acc_aws_access_key_id is not None and data_acc_aws_secret_access_key is not None:
+            s3 = boto3.resource('s3', aws_access_key_id=data_acc_aws_access_key_id, aws_secret_access_key=data_acc_aws_secret_access_key)
+        else:
+            s3 = boto3.resource('s3')
         s3.Bucket(bucket).put_object(
             Body=csv_buffer.getvalue(),
             Key=filename
