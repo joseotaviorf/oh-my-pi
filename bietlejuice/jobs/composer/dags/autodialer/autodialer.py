@@ -26,7 +26,7 @@ MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 S3_BUCKET = Variable.get("databricks_s3_bucket")
 DATA_LAKE_BUCKET = Variable.get("datalake_bucket")
-
+ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
 
 # cluster setup
@@ -46,10 +46,12 @@ def build_table_sub_dag(
     env,
     source,
     data_lake_bucket,
+    athena_query_result_location,
     table_name,
     main_dag_id,
     main_schedule_interval,
     main_start_date,
+    spark_jobs_path,
 ):
     table_sub_dag = BaseSubDAG(
         sub_dag_name=sub_dag_name,
@@ -57,23 +59,40 @@ def build_table_sub_dag(
         schedule_interval=main_schedule_interval,
         start_date=main_start_date,
     )._build_local_dag()
+
     slugged_table_name = table_name.replace("_", "-")
 
-    QuintoAndarDatabricksSubmitRunOperator(
+    clean_table_task = QuintoAndarDatabricksSubmitRunOperator(
         dag=table_sub_dag,
         task_id=f"create-clean-{slugged_table_name}-in-data-lake",
         json={
             "spark_python_task": {
-                "python_file": SPARK_JOBS_PATH
+                "python_file": spark_jobs_path
                 + "load_incremental_tables_into_data_lake_clean.py",
                 "parameters": [table_name, env, data_lake_bucket, source, "{{ ds }}"],
             }
         },
     )
-
-    # TODO: create_clean_external_tables_task
-    #  clean_table_task >> create_clean_external_tables_task
-
+    create_clean_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=table_sub_dag,
+        task_id=f"create-{slugged_table_name}-clean-external-table",
+        json={
+            "spark_python_task": {
+                "python_file": spark_jobs_path + "create_external_incremental_table.py",
+                "parameters": [
+                    env,
+                    data_lake_bucket,
+                    athena_query_result_location,
+                    "clean",
+                    source,
+                    "{{ ds }}",
+                    "--tables",
+                    f"{table_name}",
+                ],
+            }
+        },
+    )
+    clean_table_task >> create_clean_external_tables_task
     return table_sub_dag
 
 
@@ -91,6 +110,77 @@ main_dag = DAG(
     catchup=False,
 )
 
+# Create tables task builder
+
+
+def build_raw_sub_dag_tasks(
+    sub_dag_name,
+    env,
+    datalake_bucket,
+    athena_query_result_location,
+    datalake_layer,
+    source,
+    full_dag_id,
+    schedule_interval,
+    start_date,
+    spark_jobs_path,
+):
+    """
+    Returns SubDagOperator with its respective dags and subtasks, namely, QuintoAndarDatabricksSubmitRunOperator
+    which responsible to create tables in Athena Metastore, as well as, add the partitions when necessary
+    :param sub_dag_name: name to identify sub dag name
+    :param env: run time env
+    :param datalake_bucket: path to datalake_bucket
+    :param athena_query_result_location: path to query results in datalake
+    :param datalake_layer: clean/raw/... layer
+    :param source: integration source
+    :param full_dag_id: full name of parent dag
+    :param schedule_interval: schedule interval to subdag
+    :param start_date: start date to subdag
+    :param spark_jobs_path: path to spark job files
+    :return: return a SUBDAG operator object with its respective dags and tasks
+    """
+    local_raw_sub_dag = BaseSubDAG(
+        sub_dag_name=sub_dag_name,
+        dag_name=full_dag_id,
+        schedule_interval=schedule_interval,
+        start_date=start_date,
+    )._build_local_dag()
+
+    create_external_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        task_id="create-{}-incremental-external-tables".format(datalake_layer),
+        dag=local_raw_sub_dag,
+        json={
+            "spark_python_task": {
+                "python_file": spark_jobs_path + "create_external_incremental_table.py",
+                "parameters": [
+                    env,
+                    datalake_bucket,
+                    athena_query_result_location,
+                    datalake_layer,
+                    source,
+                    "{{ ds }}",
+                    "--all",
+                ],
+            }
+        },
+    )
+
+    load_raw_table = QuintoAndarDatabricksSubmitRunOperator(
+        task_id="load-incremental-tables-to-data-lake-raw",
+        dag=local_raw_sub_dag,
+        json={
+            "spark_python_task": {
+                "python_file": spark_jobs_path
+                + "load_incremental_tables_into_data_lake_raw.py",
+                "parameters": [env, source, datalake_bucket, "{{ ds }}"],
+            }
+        },
+    )
+    load_raw_table >> create_external_table_task
+    return local_raw_sub_dag
+
+
 # Tasks definition
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=main_dag,
@@ -104,16 +194,20 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 )
 
 # Create Raw and Clean tasks
-load_raw_sub_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="load-incremental-tables-to-data-lake-raw",
+
+create_raw_sub_tasks = BaseSubDAG.get_sub_dag_operator(
     dag=main_dag,
-    json={
-        "spark_python_task": {
-            "python_file": SPARK_JOBS_PATH
-            + "load_incremental_tables_into_data_lake_raw.py",
-            "parameters": [ENV, SOURCE, DATA_LAKE_BUCKET, "{{ ds }}"],
-        }
-    },
+    sub_dag_func=build_raw_sub_dag_tasks,
+    sub_dag_name=f"load-raw-tables",
+    env=ENV,
+    datalake_bucket=DATA_LAKE_BUCKET,
+    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
+    datalake_layer="raw",
+    source=SOURCE,
+    full_dag_id=DAG_ID,
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    start_date=MAIN_START_DATE,
+    spark_jobs_path=SPARK_JOBS_PATH,
 )
 
 file_list = FileService.list_raw_to_clean_sql_files(SOURCE)
@@ -122,18 +216,23 @@ for file_name in file_list:
     slugged_file_name = file_name.replace("_", "-")
     table_sub_dag = BaseSubDAG.get_sub_dag_operator(
         dag=main_dag,
-        sub_dag_name=f"load-{slugged_file_name}",
+        sub_dag_name=f"load-clean-{slugged_file_name}",
         sub_dag_func=build_table_sub_dag,
         env=ENV,
         source=SOURCE,
         data_lake_bucket=DATALAKE_BUCKET,
+        athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
         table_name=file_name,
         main_dag_id=DAG_ID,
         main_schedule_interval=MAIN_SCHEDULE_INTERVAL,
         main_start_date=MAIN_START_DATE,
+        spark_jobs_path=SPARK_JOBS_PATH,
     )
-    load_raw_sub_task >> table_sub_dag >> terminate_cluster_task
 
-create_cluster_task >> load_raw_sub_task
+    create_raw_sub_tasks >> table_sub_dag >> terminate_cluster_task
+
+create_cluster_task >> create_raw_sub_tasks
+
+
 if not file_list:
-    load_raw_sub_task >> terminate_cluster_task
+    create_raw_sub_tasks >> terminate_cluster_task
