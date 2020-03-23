@@ -160,11 +160,79 @@ select
          Contrato
      ) C
      on U.id = C.usuario_id
+    left join
+     (
+        select
+    		id_user,
+    		case when active_contracts > 0 then true else false end as has_active_contracts
+    	from
+    	(
+    		select
+    			id_user,
+    			count(case when status = 'Ativo' then id_contract end) as active_contracts
+    		from
+    		(
+    			select
+    				distinct id_user,
+    				id_contract,
+    				status
+    			from
+    			(
+    				select
+    					id_client as id_user,
+    					id_contract,
+    					status
+    				from
+    				(
+    				-- all users that are tenants with a contract
+    					select
+    						c.id as id_contract,
+    						c.status,
+    						rf.cliente_id as id_client
+    					from Contrato c
+    					join FluxoLocacao rf
+    						on c.imovel_id = rf.imovel_id
+    						and c.usuario_id = rf.cliente_id
+    				) contract_client
+    				union all
+    				select
+    					id_owner as id_user,
+    					id_contract,
+    					status
+    				from
+    				(
+    				-- all users that are property owners with a contract
+    					select
+    						c.id as id_contract,
+    						c.status,
+    						coalesce(h.usuario_id, pa_b2b_online.user_id,pa_b2b_prime.user_id, -1) as id_owner
+    					from Contrato c
+    					join Imovel h
+    						on c.imovel_id = h.id
+    					left join PartnerAgent pa_b2b_prime
+    						on h.usuario_id = pa_b2b_prime.user_id
+    					left join ConversaoLead lc
+    						on lc.imovel_id = h.id
+    					left join Lead l
+    						on l.id = lc.leadconvertido_id
+    					    and l.affiliatetype = 'B2BPartner'
+    					left join PartnerAgent pa_b2b_online
+    					  on pa_b2b_online.user_id = l.afiliadoqueindicou_id
+    				)
+    				contract_owner
+    			) contract_users -- all users with a contract
+    		) distinct_contract_users
+    		group by 1
+    	)
+    	user_contract
+     ) ac
+     on U.id = ac.id_user
     group by
       U.id,
       I.usuario_id is not null,
       D.usuario_id is not null,
-      C.usuario_id is not null
+      C.usuario_id is not null, -- column "inquilino", represents if user is a tenant
+      5
   ) u_c
   on u_c.id = u.id
   left join
