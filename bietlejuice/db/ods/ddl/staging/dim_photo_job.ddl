@@ -8,6 +8,7 @@ create table staging.dim_photo_job (
 	creation_origin varchar(20),
 	flexible_schedule int,
     is_same_day_upload boolean,
+    is_anticipated boolean,
 	dt_photographer_accepted datetime,
 	dt_job_created datetime,
 	dt_job_issued datetime,

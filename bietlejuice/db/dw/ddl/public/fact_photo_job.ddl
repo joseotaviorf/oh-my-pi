@@ -11,6 +11,7 @@ create table public.fact_photo_job(
   creation_origin varchar(255),
   flexible_schedule int8,
   is_same_day_upload boolean,
+  is_anticipated boolean,
   flg_job_on_time boolean,
   sk_date_photographer_accepted int8,
   sk_date_job_created int8,

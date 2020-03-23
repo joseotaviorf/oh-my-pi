@@ -7,6 +7,7 @@ create table if not exists photo_job (
 	flexible_schedule integer,
     same_day_upload integer,
     job_on_time integer,
+    job_anticipated integer,
 	dt_photographer_accepted timestamp,
 	dt_job_created timestamp,
 	dt_job_issued timestamp,

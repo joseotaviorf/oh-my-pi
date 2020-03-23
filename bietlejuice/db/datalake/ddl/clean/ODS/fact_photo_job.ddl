@@ -10,6 +10,7 @@ create external table datalake_clean.ods_fact_photo_job (
   creation_origin string,
   flexible_schedule string,
   is_same_day_upload string,
+  is_anticipated string,
   flg_job_on_time string,
   sk_date_photographer_accepted string,
   sk_date_job_created string,

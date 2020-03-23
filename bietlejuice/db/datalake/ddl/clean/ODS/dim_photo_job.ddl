@@ -8,6 +8,7 @@ create external table if not exists datalake_clean.ods_dim_photo_job (
 	creation_origin string,
 	flexible_schedule string,
 	is_same_day_upload string,
+	is_anticipated string,
 	dt_photographer_accepted string,
 	dt_job_created string,
 	dt_job_issued string,

@@ -17,6 +17,7 @@ select
 	j1.creation_origin,
 	j1.flexible_schedule,
 	j1.same_day_upload::boolean as is_same_day_upload,
+	j1.job_anticipated::boolean as is_anticipated,
 	j1.dt_photographer_accepted,
 	j1.dt_job_created,
 	j1.dt_job_issued,

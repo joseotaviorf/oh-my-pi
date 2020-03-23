@@ -22,6 +22,8 @@ select
       coalesce((f.dataUploadFotos <= date(coalesce(f.dataInicioSessao, f.dataAgendamento)) + interval '1' day + interval '8' hour), false) as same_day_upload,
       -- job_on_time applies to any upload until 8 AM (5AM - due to UTC diff) of the next day after the photo shoot scheduled date
       coalesce((f.dataUploadFotos <= date(f.dataAgendamento) + interval '1' day + interval '8' hour), false) as job_on_time,
+      -- job anticipated applies to any photo job uploaded on D-1 or earlier in relation to its scheduled date
+      coalesce((date_format(f.dataUploadFotos,'%Y-%m-%d') < date_format(date(f.dataAgendamento),'%Y-%m-%d')), false) as job_anticipated,
       f.dataAceitoFotografo as dt_photographer_accepted,
       f.dataCriacao as dt_job_created,
       f.dataJobPedido as dt_job_issued,
