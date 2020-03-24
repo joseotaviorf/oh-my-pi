@@ -22,9 +22,6 @@ DATABRICKS_S3_BUCKET = Variable.get("databricks_s3_bucket")
 LOAD_LINHADIRETA_INTO_DATALAKE_RAW_FILE_PATH = (
     S3_PREFIX + f"/spark_jobs/{SOURCE}/load_linhadireta_into_datalake.py"
 )
-CREATE_RAW_EXTERNAL_TABLES_FILE_PATH = (
-    S3_PREFIX + f"/spark_jobs/{SOURCE}/create_raw_external_tables.py"
-)
 CREATE_CLEAN_TABLE_IN_DATALAKE_FILE_PATH = (
     S3_PREFIX + f"/spark_jobs/{SOURCE}/create_clean_table_in_datalake.py"
 )
@@ -140,21 +137,10 @@ linhadireta_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-create_raw_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="create-raw-external-tables",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": CREATE_RAW_EXTERNAL_TABLES_FILE_PATH,
-            "parameters": [ENV, DATALAKE_BUCKET, ATHENA_QUERY_RESULT_LOCATION],
-        }
-    },
-)
-
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
 
-create_cluster_task >> linhadireta_to_datalake_raw_task >> create_raw_external_tables_task
+create_cluster_task >> linhadireta_to_datalake_raw_task
 build_clean_subdags(linhadireta_to_datalake_raw_task, terminate_cluster_task)
