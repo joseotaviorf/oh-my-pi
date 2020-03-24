@@ -17,6 +17,7 @@ create external table datalake_clean.crm_tasks (
   description string,
   phase string,
   ts_silenced_until string,
+  ts_analyst_started string,
   id_house string,
   subject string,
   tags string,
