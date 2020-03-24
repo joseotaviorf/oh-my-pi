@@ -36,9 +36,9 @@ task_reference_inbound_event_histories as (
     group by 1
   )
   select
-    id_task,
-    event_date,
-    task_reference_event_origin
+    t.id_task,
+    t.event_date,
+    t.task_reference_event_origin
   from datalake_autodialer_clean_prod.task_reference_inbound_event_histories t
   join task_reference_inbound_event_histories_last_update trlu
     on trlu.id_task = t.id_task and trlu.max_ts_updated = t.ts_updated
