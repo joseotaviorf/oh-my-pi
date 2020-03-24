@@ -6,12 +6,16 @@ CREATE EXTERNAL TABLE datalake_raw.marketing_manual_shared_costs (
   campaign_name string, 
   city_group string,
   cost string,
+  cost_share_desktop string,
+  cost_share_mobile string,
+  cost_share_other string,
   dt string,
   mkt_business string, 
   mkt_channel string, 
   mkt_medium string, 
   mkt_origin string, 
   mkt_source string, 
+  side string,
   utm_content string, 
   utm_term string
 )
