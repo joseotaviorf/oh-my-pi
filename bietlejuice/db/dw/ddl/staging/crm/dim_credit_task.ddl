@@ -6,6 +6,7 @@ create table if not exists staging.dim_credit_task (
   ts_start timestamp,
   ts_completed timestamp,
   ts_silenced_until timestamp,
+  ts_analyst_started timestamp,
   hours_task_start_to_completed numeric(14,2),
   version numeric(14,2),
   origin varchar,
