@@ -54,7 +54,7 @@ select
       uc.nome as user_cancel_name,
       uc.email as user_cancel_email,
       case
-        when  f.status != "Cancelado" then null
+        when  f.status != 'Cancelado' then null
         when uc.dadosFotografo_id is not null and uc.dadosVendedor_id is not null then 'Teste'
         when uc.dadosFotografo_id is not null then 'Fotografo'
         when uc.dadosVendedor_id is not null then 'InsideSales'
