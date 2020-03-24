@@ -66,10 +66,8 @@ join public.dim_lead l
   on l.sk_lead = t_range.sk_lead
 left join tasks_updated t
   on t.id_origin = t_range.sk_lead
-left join datalake_clean.autodialer_task_references r
-  on r.task_id = t.id
 left join mailing_list_updated m
-  on m.codigo = r.task_id
+  on m.codigo = t.id
 where dt.sk_date > 20180101 and dt.date < getdate()
       and trim(coalesce(l.cidade,'')) <> 'Outra cidade'
       and trim(coalesce(l.bairro,'')) <> 'Outro bairro'

@@ -20,6 +20,29 @@ mailing_list_updated as (
     FROM datalake_raw.autodialer_mailing_list m
     JOIN max_id_hosanna mh on mh.codigo = m.codigo AND mh.max_id = m.id
 ),
+task_references as (
+  select
+    id_task,
+    max(ts_updated) as max_ts_updated
+  from datalake_autodialer_clean_prod.task_references
+  group by 1
+),
+task_reference_inbound_event_histories as (
+  with task_reference_inbound_event_histories_last_update as (
+    select
+      id_task,
+      max(ts_updated) as max_ts_updated
+    from datalake_autodialer_clean_prod.task_reference_inbound_event_histories
+    group by 1
+  )
+  select
+    id_task,
+    event_date,
+    task_reference_event_origin
+  from datalake_autodialer_clean_prod.task_reference_inbound_event_histories t
+  join task_reference_inbound_event_histories_last_update trlu
+    on trlu.id_task = t.id_task and trlu.max_ts_updated = t.ts_updated
+),
 base as (
     SELECT
         l.id,
@@ -40,16 +63,16 @@ base as (
         l.reason,
         l.status,
         t.score_factor,
-        cast(substr(eventdate, 1, 19) as timestamp)                         as ts_call,
+        events.event_date as ts_call,
         concat('https://user.quintoandar.com.br/lead/', cast(l.id as varchar), '/converter') as "url_admin"
-    FROM datalake_clean.autodialer_task_reference_inbound_event_histories events
-    LEFT JOIN tasks_updated t on t.id = events.task_id
+    FROM task_reference_inbound_event_histories events
+    LEFT JOIN tasks_updated t on t.id = events.id_task
     LEFT JOIN datalake_ebdb_clean_prod.lead l on cast(l.id as varchar) = t.id_origin
     LEFT JOIN datalake_clean.ods_fact_house_listing_flows fhl on fhl.sk_lead = cast(l.id as varchar)
-    JOIN datalake_clean.autodialer_task_references r on r.task_id = t.id
-    JOIN mailing_list_updated m on m.codigo = r.task_id
+    JOIN task_references r on r.id_task = t.id
+    JOIN mailing_list_updated m on m.codigo = r.id_task
     LEFT JOIN datalake_clean.ods_dim_region dr on dr.sk_region = fhl.sk_region
-    WHERE taskReferenceEventOrigin = 'WEB_HOOK_BEFORE_NOTIFICATION'
+    WHERE events.task_reference_event_origin = 'WEB_HOOK_BEFORE_NOTIFICATION'
         AND date(l.ts_created) >= CURRENT_DATE - interval '120' day
         AND reason = 'OWNER_WONT_ANSWER_PHONE'
         AND status = 'Prospeccao'
