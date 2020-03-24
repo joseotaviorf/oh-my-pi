@@ -31,7 +31,7 @@ create external table if not exists datalake_clean.ods_dim_photo_job (
 	photographer_email string,
 	dt_photographer_start string,
 	photographer_contract_type string,
-	job_problem_reason string,
+	photographer_problem_reason string,
 	cancel_reason string,
 	cancel_reason_detailed string,
 	user_cancel_dt string,
@@ -40,7 +40,6 @@ create external table if not exists datalake_clean.ods_dim_photo_job (
 	user_cancel_email string,
 	user_cancel_type string,
 	rescheduled string,
-	job_scheduling_reason string,
 	creation_to_scheduling_diff_minutes string,
 	creation_to_scheduling_diff_hours string,
 	creation_to_scheduling_diff_days string

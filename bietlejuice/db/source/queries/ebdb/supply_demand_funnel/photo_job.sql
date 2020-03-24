@@ -46,14 +46,15 @@ select
       af.email as photographer_email,
       df.criadoEm as dt_photographer_start,
       f.tipoContrato as photographer_contract_type,
-      f.problema as job_problem_reason,
-      ure.motivo as cancel_reason,
+      f.problema as photographer_problem_reason,
+      coalesce(f.motivoAlteracao, h.photoShootSchedulingReason) as cancel_reason,
       f.textoMotivoCancelamento as cancel_reason_detailed,
       FROM_UNIXTIME(ure.timestamp/1000) as user_cancel_dt,
       uc.id as user_cancel_id,
       uc.nome as user_cancel_name,
       uc.email as user_cancel_email,
       case
+        when  f.status != "Cancelado" then null
         when uc.dadosFotografo_id is not null and uc.dadosVendedor_id is not null then 'Teste'
         when uc.dadosFotografo_id is not null then 'Fotografo'
         when uc.dadosVendedor_id is not null then 'InsideSales'
@@ -65,7 +66,6 @@ select
         when creator.dadosVendedor_id is not null then creator.id
         else null
       end as rep_id,
-      h.photoShootSchedulingReason as job_scheduling_reason,
       TIMESTAMPDIFF(
         MINUTE,
         f.dataCriacao,
@@ -92,7 +92,7 @@ select
       )/1440,1) as creation_to_scheduling_days
     from JobFotografo f
     left join
-        (select id, min(REV) as REV from JobFotografo_AUD where status in ('ComProblema', 'Cancelado') and status_MOD = 1 group by id) f_cancel_revision
+        (select id, max(REV) as REV from JobFotografo_AUD where status in ('ComProblema', 'Cancelado') and status_MOD = 1 group by id) f_cancel_revision
         on f_cancel_revision.id = f.id
         and f.status in ('Cancelado','ComProblema')
     left join

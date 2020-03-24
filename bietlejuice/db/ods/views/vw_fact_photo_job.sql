@@ -40,7 +40,7 @@ select
 	j1.key_withdraw,
 	j1.key_comments::varchar(100) as key_comments,
 	j1.photographer_contract_type,
-	j1.job_problem_reason,
+	j1.photographer_problem_reason,
 	j1.cancel_reason::varchar(100) as cancel_reason,
 	(j2.id is not null) as rescheduled,
 	j1.user_cancel_type,

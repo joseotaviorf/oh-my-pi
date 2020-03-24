@@ -30,7 +30,7 @@ create table if not exists photo_job (
 	photographer_email varchar(255),
 	dt_photographer_start timestamp,
 	photographer_contract_type varchar(255),
-	job_problem_reason varchar(255),
+	photographer_problem_reason varchar(255),
 	cancel_reason text,
 	cancel_reason_detailed text,
 	user_cancel_dt timestamp,
@@ -39,7 +39,6 @@ create table if not exists photo_job (
 	user_cancel_email varchar(255),
 	user_cancel_type varchar(255),
 	rep_id bigint,
-    job_scheduling_reason varchar(255),
 	creation_to_scheduling_diff_minutes decimal(10,1),
 	creation_to_scheduling_diff_hours decimal(10,1),
 	creation_to_scheduling_diff_days decimal(10,1)

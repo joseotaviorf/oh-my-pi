@@ -32,7 +32,7 @@ create table public.fact_photo_job(
   key_withdraw varchar(255),
   key_comments varchar(255),
   photographer_contract_type varchar(255),
-  job_problem_reason varchar(255),
+  photographer_problem_reason varchar(255),
   cancel_reason varchar(255),
   rescheduled boolean,
   user_cancel_type varchar(255),

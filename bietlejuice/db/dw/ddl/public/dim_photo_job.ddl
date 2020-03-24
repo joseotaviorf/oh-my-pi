@@ -31,7 +31,7 @@ create table public.dim_photo_job (
 	photographer_email varchar(255),
 	dt_photographer_start datetime,
 	photographer_contract_type varchar(255),
-	job_problem_reason varchar(255),
+	photographer_problem_reason varchar(255),
 	cancel_reason varchar(255),
 	cancel_reason_detailed varchar(512),
 	user_cancel_dt datetime,
@@ -40,7 +40,6 @@ create table public.dim_photo_job (
 	user_cancel_email varchar(255),
 	user_cancel_type varchar(255),
 	rescheduled boolean,
-	job_scheduling_reason varchar(255),
 	creation_to_scheduling_diff_minutes decimal(10,1),
 	creation_to_scheduling_diff_hours decimal(10,1),
 	creation_to_scheduling_diff_days decimal(10,1)

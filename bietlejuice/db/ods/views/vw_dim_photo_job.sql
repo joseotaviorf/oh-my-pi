@@ -40,7 +40,7 @@ select
 	j1.photographer_email,
 	j1.dt_photographer_start,
 	j1.photographer_contract_type,
-	j1.job_problem_reason,
+	j1.photographer_problem_reason,
 	j1.cancel_reason::varchar(100) as cancel_reason,
 	j1.cancel_reason_detailed::varchar(400) as cancel_reason_detailed,
 	j1.user_cancel_dt,
@@ -49,7 +49,6 @@ select
 	j1.user_cancel_email,
 	j1.user_cancel_type,
 	(j2.id is not null) as rescheduled,
-	j1.job_scheduling_reason,
 	j1.creation_to_scheduling_diff_minutes,
 	j1.creation_to_scheduling_diff_hours,
 	j1.creation_to_scheduling_diff_days
