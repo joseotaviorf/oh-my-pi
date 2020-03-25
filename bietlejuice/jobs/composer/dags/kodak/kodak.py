@@ -1,0 +1,140 @@
+from datetime import datetime
+import pendulum
+
+from airflow.models import DAG, Variable
+from airflow.operators.quintoandar_databricks import (
+    QuintoAndarDatabricksCreateClusterOperator,
+    QuintoAndarDatabricksTerminateClusterOperator,
+    QuintoAndarDatabricksSubmitRunOperator,
+)
+from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
+from bietlejuice.jobs.composer.services import FileService
+
+SOURCE = "kodak"
+DAG_ID = f"bietlejuice.{SOURCE}"
+ENV = Variable.get("environment")
+DATALAKE_BUCKET = Variable.get("datalake_bucket")
+ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
+
+# databricks config
+LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
+    Variable.get("databricks_s3_bucket"), DAG_ID
+)
+CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
+CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+LIBRARIES_DESCRIPTION = Variable.get(
+    "bietlejuice_default_libraries", deserialize_json=True
+)
+
+# bietlejuice paths
+S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
+SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
+
+# dag params
+LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
+MAIN_START_DATE = datetime(2020, 3, 19, 0, 0, 0, tzinfo=LOCAL_TZ)
+MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
+
+dag = DAG(
+    dag_id=DAG_ID,
+    default_args={
+        "owner": BaseDAG.DEFAULT_OWNER,
+        "wait_for_downstream": False,
+        "depends_on_past": False,
+    },
+    start_date=MAIN_START_DATE,
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    max_active_runs=1,
+    catchup=False,
+)
+
+
+def clean_tasks(sub_dag_name, table_name, slugged_table_name):
+
+    sub_dag = BaseSubDAG(
+        sub_dag_name=sub_dag_name,
+        dag_name=DAG_ID,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+    )._build_local_dag()
+
+    load_clean_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=sub_dag,
+        task_id=f"create-clean-{slugged_table_name}-in-data-lake",
+        json={
+            "spark_python_task": {
+                "python_file": SPARK_JOBS_PATH + "create_clean_table_in_datalake.py",
+                "parameters": [table_name, ENV, DATALAKE_BUCKET, SOURCE],
+            }
+        },
+    )
+
+    create_external_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=sub_dag,
+        task_id=f"create-clean-external-{slugged_table_name}-table",
+        json={
+            "spark_python_task": {
+                "python_file": SPARK_JOBS_PATH + "create_clean_external_table.py",
+                "parameters": [
+                    table_name,
+                    ENV,
+                    DATALAKE_BUCKET,
+                    ATHENA_QUERY_RESULT_LOCATION,
+                    SOURCE,
+                ],
+            }
+        },
+    )
+
+    load_clean_table_task >> create_external_table_task
+
+    return sub_dag
+
+
+def build_clean_subdags(prev_task, next_task):
+    # create subdag for each clean table
+    file_list = FileService.list_raw_to_clean_sql_files(SOURCE)
+
+    if file_list:
+        for file_name in file_list:
+            file_name = FileService.remove_file_extension(file_name)
+            slugged_table_name = file_name.replace("_", "-")
+            table_sub_dag = BaseSubDAG.get_sub_dag_operator(
+                dag=dag,
+                sub_dag_name=f"load-{slugged_table_name}-to-datalake-clean",
+                sub_dag_func=clean_tasks,
+                table_name=file_name,
+                slugged_table_name=slugged_table_name,
+            )
+            prev_task >> table_sub_dag >> next_task
+    else:
+        prev_task >> next_task
+
+
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=CLUSTER_DESCRIPTION,
+    libraries=LIBRARIES_DESCRIPTION,
+)
+
+kodak_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="kodak-to-datalake-raw",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": SPARK_JOBS_PATH + "load_kodak_into_datalake.py",
+            "parameters": [ENV, DATALAKE_BUCKET, SOURCE],
+        }
+    },
+)
+
+create_cluster_task >> kodak_to_datalake_raw_task
+
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    dag=dag, task_id="terminate-cluster"
+)
+
+build_clean_subdags(
+    prev_task=kodak_to_datalake_raw_task, next_task=terminate_cluster_task
+)
