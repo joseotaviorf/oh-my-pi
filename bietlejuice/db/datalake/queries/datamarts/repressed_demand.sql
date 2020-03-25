@@ -47,8 +47,8 @@ with house_available_hours as (
 		hours_available_18to19,
 		hours_available_19to20
 	from house_available
-),
-date_series as (
+)
+, date_series as (
 	select
 		date(date) as date,
 		cast(week_day as integer) as week_day,
@@ -62,8 +62,8 @@ date_series as (
 	from datalake_clean.ods_dim_date dd
 	where date(date) >= date('2019-01-01') and date(week_start) <= current_date - interval '1' day
 		and date != ''
-),
-regions as (
+)
+, regions as (
 	select distinct
 		dr.id as region_id,
 		dr.region_code,
@@ -71,12 +71,12 @@ regions as (
 		dr.city_name
 	from datalake_clean.ods_dim_region dr
 	where dr.region_code != '-1'
-),
-slot_series as (
+)
+, slot_series as (
 	select slot 
 	from unnest(sequence(0, 100)) seq (slot)
-),
-dimensions as (
+)
+, dimensions as (
 	select
 	r.region_id,
 	r.region_code,
@@ -110,16 +110,31 @@ dimensions as (
 	from regions r
       cross join date_series ds
       cross join slot_series ss
-),
-encaixe_to_booking as (
+)
+, encaixe_to_booking as (
 	select distinct
 		id_visitor as user_id,
         id_property as house_id
 	from datalake_clean.ods_dim_booking
 	where type = 'Visita'
 		and visit_intent = 'RENT'
-),
-encaixes_raw as (
+)
+, booking_for_sale as (
+	select distinct
+		id_visitor as user_id,
+        id_property as house_id,
+        cast(slot_dia as bigint) as slot_dia,
+        dt_scheduling,
+        date(date_parse(dt_scheduling, '%Y-%m-%d %H:%i:%s')) as visit_date,
+        visit_intent,
+        status
+	from datalake_clean.ods_dim_booking
+	where type = 'Visita'
+		and visit_intent = 'SALE'
+		and (status = 'Realizado' OR status = 'Marcado' OR            
+                    (status = 'Cancelado' and date(date_parse(dt_scheduling, '%Y-%m-%d %H:%i:%s')) = try_cast(try_cast(substring(dt_cancel,1,19) as timestamp) as date)))
+)
+, encaixes_raw as (
     select
         evt.ts_event as event_date,
         trim(evt.id_user) as user_id,
@@ -133,8 +148,8 @@ encaixes_raw as (
     left join encaixe_to_booking etb on etb.user_id = trim(evt.id_user) and etb.house_id = trim(coalesce(evt.ep_house_id, ''))
     where cast(evt.year as varchar) || '-' || lpad(cast(evt.month as varchar), 2 , '0') >= '2019-01'
     	and cast(json_extract(event_properties, '$.business_context') as varchar) != 'sale'
-),
-encaixes_temp as (
+)
+, encaixes_temp as (
 	select distinct
 		encaixe_realizado,
 		user_id,
@@ -150,8 +165,8 @@ encaixes_temp as (
     where enc.rank_enc = 1
     	and enc.user_id != ''
         and i.regiao_id is not null
-),
-blocked_houses as (
+)
+, blocked_houses as (
 	select 
 		*
 	from (
@@ -164,8 +179,8 @@ blocked_houses as (
             join datalake_ebdb_raw_prod.usuariorevisionentity r on vs.REV = r.id and status_mod = true
       	)
   where status = 'BLOCKED'
-),
-suspended_houses as (
+)
+, suspended_houses as (
 	select
 		*
     from (
@@ -180,13 +195,13 @@ suspended_houses as (
       			and status_mod = true
       	)
   where status = 'suspenso'
-),
-encaixes_clean as (
+)
+, encaixes_clean as (
 	select
     	region_id,
         target_date,
         slot,
-        slot_share_encaixe,
+        slot_share_encaixe, 
         case when encaixe_realizado = 0 and (t.event_date between bh.init and bh."end") and bh.status = 'BLOCKED' then slot_share_encaixe end as slot_share_nao_realizados_por_bloqueio,
       	case when encaixe_realizado = 0 and (t.event_date between sh.init and sh."end") and sh.status = 'suspenso' then slot_share_encaixe end as slot_share_nao_realizados_por_suspensao,
       	case when encaixe_realizado = 0 and (((t.event_date between sh.init and sh."end") and sh.status = 'suspenso') or ((t.event_date between bh.init and bh."end") and bh.status = 'BLOCKED')) then slot_share_encaixe end as slot_share_nao_realizados_por_bloqueio_suspensao,
@@ -218,12 +233,12 @@ encaixes_clean as (
                     or (cast(slot as bigint) between 32 and 35 and hs.hours_available_16to17 = false)
 					or (cast(slot as bigint) between 36 and 39 and hs.hours_available_17to18 = false)
 					or (cast(slot as bigint) between 40 and 43 and hs.hours_available_18to19 = false)))
-		then slot_share_encaixe
-        end as slot_share_nao_realizados_por_bloqueio_suspensao_agenda,
+		then slot_share_encaixe end as slot_share_nao_realizados_por_bloqueio_suspensao_agenda,
         cast(hs.hours_available_08to09 as bigint) + cast(hs.hours_available_09to10 as bigint) + cast(hs.hours_available_10to11 as bigint) +
         cast(hs.hours_available_11to12 as bigint) + cast(hs.hours_available_12to13 as bigint) + cast(hs.hours_available_13to14 as bigint) +
         cast(hs.hours_available_14to15 as bigint) + cast(hs.hours_available_15to16 as bigint) + cast(hs.hours_available_16to17 as bigint) +
-		cast(hs.hours_available_17to18 as bigint) + cast(hs.hours_available_18to19 as bigint) as slots_disponiveis_target_date
+		cast(hs.hours_available_17to18 as bigint) + cast(hs.hours_available_18to19 as bigint) as slots_disponiveis_target_date,
+		case when encaixe_realizado = 0 and visit_intent = 'SALE' then slot_share_encaixe else null end as slot_share_ocupado_por_visita_sale--NOVIDADE!! NOVIDADE!! NOVIDADE!! NOVIDADE!! NOVIDADE!!
 	from encaixes_temp t
     left join house_available_hours hs
     	on cast(t.house_id as bigint) = hs.id_house
@@ -235,8 +250,12 @@ encaixes_clean as (
 	left join suspended_houses sh
     	on (cast(t.house_id as bigint) = sh.house_id
 		and t.event_date between sh.init and sh."end")
-),
-encaixes_agg as (
+	left join booking_for_sale bfs
+		on cast(t.house_id as bigint) = cast(bfs.house_id as bigint)
+		and t.target_date = bfs.visit_date
+		and t.slot = bfs.slot_dia
+)
+, encaixes_agg as (
 	select
 		region_id,
         target_date,
@@ -249,11 +268,13 @@ encaixes_agg as (
         sum(slot_share_nao_realizados_por_suspensao) as share_encaixes_nao_realizados_por_suspensao,
         sum(slot_share_nao_realizados_por_bloqueio_suspensao) as share_encaixes_nao_realizados_por_bloqueio_suspensao,
         sum(slot_share_nao_realizados_por_bloqueio_suspensao_agenda) as share_encaixes_nao_realizados_por_bloqueio_suspensao_agenda,
-        sum(case when slots_disponiveis_target_date = 0 then slot_share_encaixe end) as encaixes_em_imovel_sem_slot_disponivel_target_date
+        sum(case when slots_disponiveis_target_date = 0 then slot_share_encaixe end) as encaixes_em_imovel_sem_slot_disponivel_target_date,
+        sum(slot_share_ocupado_por_visita_sale) as share_encaixes_nao_realizados_por_visita_sale,
+        sum(coalesce(slot_share_encaixe_nao_realizado,0) - (coalesce(slot_share_nao_realizados_por_bloqueio_suspensao_agenda,0) + coalesce(slot_share_ocupado_por_visita_sale,0))) as share_encaixes_nao_realizados_por_agent
 	from encaixes_clean
     group by 1, 2, 3
-),
-bookings_raw as (
+)
+, bookings_raw as (
 	select
 		bk.id_visitor as user_id,
        	bk.id_property as house_id,
@@ -265,8 +286,8 @@ bookings_raw as (
   	join datalake_ebdb_raw_prod.imovel i on i.id = cast(bk.id_property as bigint)
   	where type = 'Visita'
 		and visit_intent = 'RENT'
-),
-bookings_clean as (
+)
+, bookings_clean as (
 	select
     	region_id,
         visit_date,
@@ -296,7 +317,9 @@ select
     sum(enc.share_encaixes_nao_realizados_por_suspensao) as sum_encaixes_nao_realizados_por_suspensao,
     sum(enc.share_encaixes_nao_realizados_por_bloqueio_suspensao) as sum_encaixes_nao_realizados_por_bloqueio_suspensao,
     sum(enc.share_encaixes_nao_realizados_por_bloqueio_suspensao_agenda) as sum_encaixes_nao_realizados_por_bloqueio_suspensao_agenda,
-    sum(enc.encaixes_em_imovel_sem_slot_disponivel_target_date) as sum_encaixes_em_imovel_sem_slot_disponivel_target_date
+    sum(enc.encaixes_em_imovel_sem_slot_disponivel_target_date) as sum_encaixes_em_imovel_sem_slot_disponivel_target_date,
+    sum(enc.share_encaixes_nao_realizados_por_visita_sale) as sum_encaixes_nao_realizados_por_visita_sale,
+	sum(enc.share_encaixes_nao_realizados_por_agent) as sum_encaixes_nao_realizados_por_agent
 from dimensions d
 left join bookings_clean bk
 	on bk.region_id = cast(d.region_id as bigint)
@@ -310,3 +333,4 @@ where true
     and faixa is not null
     and coalesce(bk.slot, enc.slot) is not null
 group by 1, 2, 3, 4, 5, 6, 7, 8
+

@@ -125,6 +125,20 @@ encaixe_to_booking as (
     type = 'Visita'
 	and visit_intent = 'RENT'
 ),
+booking_for_sale as (
+	select distinct
+		id_visitor as user_id,
+        id_property as house_id,
+        cast(slot_dia as bigint) as slot_dia,
+        dt_scheduling,
+        date(date_parse(dt_scheduling, '%Y-%m-%d %H:%i:%s')) as visit_date,
+        visit_intent,
+        status
+	from datalake_clean.ods_dim_booking
+	where type = 'Visita'
+		and visit_intent = 'SALE'and (status = 'Realizado' OR status = 'Marcado' OR            
+                    (status = 'Cancelado' and date(date_parse(dt_scheduling, '%Y-%m-%d %H:%i:%s')) = try_cast(try_cast(substring(dt_cancel,1,19) as timestamp) as date)))
+),
 encaixes_raw as (
   select
     evt.ts_event as event_date,
@@ -250,7 +264,8 @@ select
   cast(hs.hours_available_08to09 as bigint) + cast(hs.hours_available_09to10 as bigint) + cast(hs.hours_available_10to11 as bigint) +
   cast(hs.hours_available_11to12 as bigint) + cast(hs.hours_available_12to13 as bigint) + cast(hs.hours_available_13to14 as bigint) +
   cast(hs.hours_available_14to15 as bigint) + cast(hs.hours_available_15to16 as bigint) + cast(hs.hours_available_16to17 as bigint) +
-  cast(hs.hours_available_17to18 as bigint) + cast(hs.hours_available_18to19 as bigint) as slots_disponiveis_target_date
+  cast(hs.hours_available_17to18 as bigint) + cast(hs.hours_available_18to19 as bigint) as slots_disponiveis_target_date,
+  case when encaixe_realizado = 0 and visit_intent = 'SALE' then slot_share_encaixe else null end as slot_share_ocupado_por_visita_sale
 from
   encaixes_temp t
 left join house_available_hours hs 
@@ -263,7 +278,12 @@ left join blocked_houses bh on
 left join suspended_houses sh on
   (t.house_id = cast(sh.house_id as varchar)
   and t.event_date between sh.init and sh."end")
-  group by 1,3,4,5,6,7,8,9,10,11,12,13,14,15
+left join booking_for_sale bfs
+	on cast(t.house_id as bigint) = cast(bfs.house_id as bigint)
+	and cast(t.user_id as bigint) = cast(bfs.user_id as bigint)
+ 	and t.target_date = bfs.visit_date
+	and t.slot = bfs.slot_dia
+group by 1,3,4,5,6,7,8,9,10,11,12,13,14,15,16
 ),
 encaixes_agg as (
   select
@@ -281,8 +301,10 @@ encaixes_agg as (
     sum(slot_share_nao_realizados_por_suspensao) as share_encaixes_nao_realizados_por_suspensao,
     sum(slot_share_nao_realizados_por_bloqueio_suspensao) as share_encaixes_nao_realizados_por_bloqueio_suspensao,
     sum(slot_share_nao_realizados_por_bloqueio_suspensao_agenda) as share_encaixes_nao_realizados_por_bloqueio_suspensao_agenda,
-    sum(case when slots_disponiveis_target_date = 0 then slot_share_encaixe end) as encaixes_em_imovel_sem_slot_disponivel_target_date
-  from
+    sum(case when slots_disponiveis_target_date = 0 then slot_share_encaixe end) as encaixes_em_imovel_sem_slot_disponivel_target_date,
+    sum(slot_share_ocupado_por_visita_sale) as share_encaixes_nao_realizados_por_visita_sale,
+    sum(coalesce(slot_share_encaixe_nao_realizado,0) - (coalesce(slot_share_nao_realizados_por_bloqueio_suspensao_agenda,0) + coalesce(slot_share_ocupado_por_visita_sale,0))) as share_encaixes_nao_realizados_por_agent
+from
     encaixes_clean
   group by 1,2,3,4,5,6
 )
@@ -307,7 +329,9 @@ encaixes_agg as (
     enc.share_encaixes_nao_realizados_por_suspensao as sum_encaixes_nao_realizados_por_suspensao,
     enc.share_encaixes_nao_realizados_por_bloqueio_suspensao as sum_encaixes_nao_realizados_por_bloqueio_suspensao,
     enc.share_encaixes_nao_realizados_por_bloqueio_suspensao_agenda as sum_encaixes_nao_realizados_por_bloqueio_suspensao_agenda,
-    enc.encaixes_em_imovel_sem_slot_disponivel_target_date as sum_encaixes_em_imovel_sem_slot_disponivel_target_date
+    enc.encaixes_em_imovel_sem_slot_disponivel_target_date as sum_encaixes_em_imovel_sem_slot_disponivel_target_date,
+    enc.share_encaixes_nao_realizados_por_visita_sale as sum_encaixes_nao_relizados_por_visita_sale,
+	enc.share_encaixes_nao_realizados_por_agent as sum_encaixes_nao_realizados_por_agent
   from
     encaixes_agg enc
   left join dimensions d on
