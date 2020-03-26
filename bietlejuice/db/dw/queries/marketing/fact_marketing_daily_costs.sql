@@ -525,6 +525,56 @@ taxonomy_by_platform as (
 	) as s(i, mkt_platform)
 ),
 cost_taxonomy as (
+with manual_shared_costs as (
+    SELECT
+        NULL AS origin,
+        to_char(NULLIF(dt, '')::date, 'yyyyMMdd')::integer as sk_date,
+        NULLIF(account_name, '') AS account_name,
+        NULLIF(campaign_name, '') AS campaign_name,
+        NULLIF(city_group, '') AS cost_city_group,
+        NULL AS city_campaign_mapping_rule,
+        NULL AS campaign_city_matched,
+        CASE
+          when lower(NULLIF(campaign_name, '')) like '%calc%' then 'Calculator'
+          else 'Other'
+        end campaign_origin_aquisition,
+        'Inbound' AS mkt_category,
+        'Self-Service' AS mkt_flow,
+        'Full Self-Service' AS mkt_completion,
+        NULLIF(mkt_origin, '') AS mkt_origin,
+        NULLIF(mkt_channel, '') AS mkt_channel,
+        NULLIF(mkt_medium, '') AS mkt_medium,
+        NULLIF(mkt_source, '') AS mkt_source,
+        NULLIF(s.mkt_platform, '') AS mkt_platform,
+        CASE WHEN  (coalesce(cast(nullif(cost_share_mobile, '') as numeric(10,2)), 0) +
+        			coalesce(cast(nullif(cost_share_desktop, '') as numeric(10,2)), 0) +
+        			coalesce(cast(nullif(cost_share_other, '') as numeric(10,2)), 0)) = 1 THEN
+        			CASE WHEN s.mkt_platform = 'Mobile' THEN
+        				coalesce(cast(nullif(cost_share_mobile, '') as numeric(10,2)), 0)
+        			WHEN s.mkt_platform = 'Desktop' THEN
+        				coalesce(cast(nullif(cost_share_desktop, '') as numeric(10,2)), 0)
+        			WHEN s.mkt_platform = 'Other' THEN
+        				coalesce(cast(nullif(cost_share_other, '') as numeric(10,2)), 0)
+        			END
+        	ELSE
+        		CASE WHEN s.mkt_platform = 'Mobile' THEN 1 ELSE 0 END
+        	END
+          AS fator_custo,
+        NULLIF(campaign_name, '') AS utm_campaign,
+        NULLIF(utm_term, '') AS utm_term,
+        NULLIF(utm_content, '') AS utm_content,
+        CAST(NULLIF(cost, '') as numeric(16,4)) * fator_custo AS cost,
+        NULLIF(side, '') AS side
+    FROM
+        datalake_raw.marketing_manual_shared_costs
+    cross join (
+	 select 1, 'Desktop'
+	 union all
+	 select 2, 'Mobile'
+	 union all
+	 select 3, 'Other'
+	) as s(i, mkt_platform)
+)
 	select
 		cf.origin,
 		cf.sk_date,
@@ -579,9 +629,7 @@ cost_taxonomy as (
 			 when campaign_city in ('fln', 'florianopolis') then 'Florianópolis'
 			 when campaign_city in ('bsb', 'brasilia') then 'Brasília'
 		end as campaign_city_matched,
-		-- defining final city_group
-	    coalesce(cost_city_group,city_campaign_mapping_rule, campaign_city_matched,'Not Mapped') as city_group_final,
-      tp.campaign_origin_aquisition,
+		tp.campaign_origin_aquisition,
 	    tp.mkt_category,
 	    tp.mkt_flow,
 	    tp.mkt_completion,
@@ -632,13 +680,21 @@ cost_taxonomy as (
 				and cf.fact_cost = tp.fact_cost
 				and cf.origin = tp.origin
         and cf.campaign_origin_aquisition = tp.campaign_origin_aquisition
+    -- Append manual costs
+    union
+    SELECT
+        *
+    FROM manual_shared_costs
+	WHERE cost > 0
 ),
 kenshoo as (
 	select
 		ct.sk_date,
 		ct.side as funnel_side,
 		tp.account_name as account_name,
-		ct.city_group_final as city_group,
+		cost_city_group,
+        city_campaign_mapping_rule,
+        campaign_city_matched,
 		tp.mkt_category,
 		tp.mkt_flow,
 		tp.mkt_completion,
@@ -659,13 +715,16 @@ kenshoo as (
 			on tp.origin = 'kenshoo'
 			and tp.side = ct.side
       and tp.campaign_origin_aquisition = ct.campaign_origin_aquisition
-)
+),
+final_costs as (
 select
     sk_date,
     side as funnel_side,
     account_name,
     campaign_name,
-    city_group_final as city_group,
+    cost_city_group,
+    city_campaign_mapping_rule,
+    campaign_city_matched,
     mkt_category,
     mkt_flow,
     mkt_completion,
@@ -686,7 +745,9 @@ select
     funnel_side,
     account_name,
     null as campaign_name,
-	city_group,
+	cost_city_group,
+    city_campaign_mapping_rule,
+    campaign_city_matched,
     mkt_category,
     mkt_flow,
     mkt_completion,
@@ -701,4 +762,30 @@ select
     sum(cost) as cost,
     getdate() as ts_load
 from kenshoo
-group by 1,2,3,5,6,7,8,10,11,12,13
+group by 1,2,3,5,6,7,8,9,10,12,13,14,15
+)
+SELECT
+    sk_date,
+    funnel_side,
+    account_name,
+    campaign_name,
+	-- consolidating final city_group
+	COALESCE(cost_city_group,
+	    city_campaign_mapping_rule,
+	    campaign_city_matched,
+	    'Not Mapped') AS city_group_final,
+	mkt_category,
+    mkt_flow,
+    mkt_completion,
+    mkt_origin,
+    mkt_channel,
+    mkt_medium,
+    mkt_source,
+    mkt_platform,
+    utm_campaign,
+    utm_term,
+    utm_content,
+    cost,
+    ts_load
+FROM
+    final_costs
