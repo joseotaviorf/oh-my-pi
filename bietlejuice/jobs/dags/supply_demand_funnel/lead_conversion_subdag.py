@@ -34,7 +34,7 @@ class LeadConversionSubDag(DimSubDag):
         query = BaseETL.get_query_from_file_name(file_name=file_path)
         query = query.format(max_extraction_date=str(execution_date))
 
-        utils.extract_query_dim_from_ebdb_to_ods(dim_name=self.ods_stg_table_name, bucket=DimSubDag.S3_BUCKET,
+        utils.extract_query_dim_from_ebdb_to_ods(dim_name=self.ods_stg_table_name, bucket=self.bucket,
                                                  command=query)
 
     @logger

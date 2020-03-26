@@ -51,7 +51,7 @@ class HouseSubDag(DimSubDag):
         query = query.format(str(execution_date))
 
         utils.extract_query_dim_from_ebdb_to_ods(dim_name=table_name,
-                                                 bucket=DimSubDag.S3_BUCKET,
+                                                 bucket=self.bucket,
                                                  command=query)
 
     @logger
@@ -79,7 +79,7 @@ class HouseSubDag(DimSubDag):
             op_kwargs={
                 'table_name': 'affiliate_payments',
                 'file_name': 'affiliate_payments.sql',
-                'bucket': DimSubDag.S3_BUCKET
+                'bucket': self.bucket
             }
         )
 
@@ -91,7 +91,7 @@ class HouseSubDag(DimSubDag):
                 'dim_name': 'rental_flow',
                 'table_name': 'FluxoLocacao',
                 'copy_to_clean': False,
-                'bucket': DimSubDag.S3_BUCKET
+                'bucket': self.bucket
             }
         )
 
@@ -102,7 +102,7 @@ class HouseSubDag(DimSubDag):
             op_kwargs={
                 'table_name': 'house_listing',
                 'file_name': 'house/house_listing.sql',
-                'bucket': DimSubDag.S3_BUCKET
+                'bucket': self.bucket
             }
         )
 
@@ -121,7 +121,7 @@ class HouseSubDag(DimSubDag):
             python_callable=utils.load_dim_from_staging_to_dw,
             op_kwargs={
                 'dim_name': 'house_listing',
-                'bucket': DimSubDag.S3_BUCKET
+                'bucket': self.bucket
             }
         )
 

@@ -13,6 +13,7 @@ from bietlejuice.jobs.dags.supply_demand_funnel.dim_subdag import DimSubDag
 from bietlejuice.jobs.dags.util import environment as env
 
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
+looker_bucket = env.get_airflow_env_var('looker_bucket')
 GOOGLE_S_A_CREDENTIALS = json.loads(env.get_airflow_env_var('GOOGLE_SERVICE_ACCOUNT_CREDENTIALS'))
 GOOGLE_API_SCOPE = env.get_airflow_env_var('GOOGLE_API_SCOPE')
 GOOGLE_SHEETS_FILES = json.loads(env.get_airflow_env_var('BI_AUX_REGIAO_GOOGLE_SHEETS_FILES'))
@@ -69,7 +70,7 @@ class RegionSubDag(DimSubDag):
                 'dim_name': 'agent_region',
                 'table_name': 'DadosAgente_Regiao',
                 'copy_to_clean': False,
-                'bucket': DimSubDag.S3_BUCKET
+                'bucket': self.bucket
             },
             trigger_rule='all_done'
         )
@@ -80,7 +81,7 @@ class RegionSubDag(DimSubDag):
             python_callable=self.__extract_query_dim_from_ebdb_to_ods,
             op_kwargs={
                 'dim_name': 'region',
-                'bucket': DimSubDag.S3_BUCKET
+                'bucket': self.bucket
             },
             trigger_rule='all_done'
         )
@@ -134,7 +135,7 @@ class RegionSubDag(DimSubDag):
             python_callable=utils.load_dim_from_staging_to_dw,
             op_kwargs={
                 'dim_name': 'region',
-                'bucket': DimSubDag.S3_BUCKET
+                'bucket': self.bucket
             }
         )
 
@@ -166,7 +167,7 @@ class RegionSubDag(DimSubDag):
 
         query = BaseETL.get_query_from_file_name(file_name=file_path)
         utils.extract_query_dim_from_ebdb_to_ods(dim_name=dim,
-                                                 bucket=DimSubDag.S3_BUCKET,
+                                                 bucket=self.bucket,
                                                  command=query,
                                                  table_name=None)
 
@@ -199,7 +200,7 @@ class RegionSubDag(DimSubDag):
 
         filename = '{}.topojson'.format(subregion_polygons_filename_prefix)
         dir_path = '/tmp'
-        bucket_folder_path_prefix = '5a-looker/subregion_polygons'
+        bucket_folder_path_prefix = '{}/subregion_polygons'.format(looker_bucket)
         today = datetime.now().date()
 
         BaseETL.file_to_s3(

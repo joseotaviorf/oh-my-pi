@@ -48,7 +48,7 @@ class LeadSubDag(DimSubDag):
         query = str(BaseETL.get_query_from_file_name(file_name=file_path))
         query = query.format(str(kwargs.get('execution_date')))
 
-        utils.extract_query_dim_from_ebdb_to_ods(dim_name=dim_name, bucket=DimSubDag.S3_BUCKET, command=query,
+        utils.extract_query_dim_from_ebdb_to_ods(dim_name=dim_name, bucket=self.bucket, command=query,
                                                  table_name=None)
 
     @logger
@@ -60,7 +60,7 @@ class LeadSubDag(DimSubDag):
             op_kwargs={
                 'table_name': 'lead_sales_company',
                 'file_name': 'wololo/lead_sales_company.sql',
-                'bucket': DimSubDag.S3_BUCKET
+                'bucket': self.bucket
             }
         )
 
@@ -80,7 +80,7 @@ class LeadSubDag(DimSubDag):
             op_kwargs={
                 'table_name': 'lead_score_factor',
                 'file_name': 'lead/lead_score_factor.sql',
-                'bucket': DimSubDag.S3_BUCKET
+                'bucket': self.bucket
             }
         )
 
@@ -91,7 +91,7 @@ class LeadSubDag(DimSubDag):
             op_kwargs={
                 'table_name': 'lead_origin',
                 'file_name': 'lead_origin.sql',
-                'bucket': DimSubDag.S3_BUCKET
+                'bucket': self.bucket
             },
             retries=8
         )
@@ -101,7 +101,7 @@ class LeadSubDag(DimSubDag):
             task_id='ODS_lead_first_event_tracking_task',
             python_callable=utils.materialize_view_ods,
             op_kwargs={
-                'bucket': DimSubDag.S3_BUCKET,
+                'bucket': self.bucket,
                 'view_name': 'lead_first_event_tracking'
             }
         )
@@ -134,7 +134,7 @@ class LeadSubDag(DimSubDag):
             python_callable=utils.load_dim_from_staging_to_dw,
             op_kwargs={
                 'dim_name': 'lead',
-                'bucket': DimSubDag.S3_BUCKET
+                'bucket': self.bucket
             }
         )
 

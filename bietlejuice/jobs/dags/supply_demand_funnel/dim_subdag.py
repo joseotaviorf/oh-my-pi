@@ -9,8 +9,6 @@ logger = QuintoAndarLogger('DimSubDag')
 
 
 class DimSubDag(BaseSubDag):
-    S3_BUCKET = '5a-datalake'
-
     def __init__(self, bucket, sub_dag_name, dag_name, schedule_interval, start_date, table_name,
                  ods_stg_table_name):
         super(DimSubDag, self).__init__(bucket, sub_dag_name, dag_name, schedule_interval, start_date, table_name)

@@ -45,7 +45,7 @@ class ContractSubDag(DimSubDag):
             op_kwargs={
                 'table_name': 'contract',
                 'file_name': 'contract/contract.sql',
-                'bucket': DimSubDag.S3_BUCKET
+                'bucket': self.bucket
             }
         )
         staging_dim_contract_task = BaseDAG.build_python_operator(
@@ -63,7 +63,7 @@ class ContractSubDag(DimSubDag):
             python_callable=utils.load_dim_from_staging_to_dw,
             op_kwargs={
                 'dim_name': 'contract',
-                'bucket': DimSubDag.S3_BUCKET
+                'bucket': self.bucket
             }
         )
 

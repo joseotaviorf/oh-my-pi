@@ -37,7 +37,7 @@ class SpecialConditionSubDag(DimSubDag):
 
         utils.extract_query_dim_from_ebdb_to_ods(
             dim_name=table_name,
-            bucket=DimSubDag.S3_BUCKET,
+            bucket=self.bucket,
             command=query
         )
 

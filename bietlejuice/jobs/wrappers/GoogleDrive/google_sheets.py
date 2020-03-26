@@ -50,7 +50,7 @@ class GoogleSheets(object):
 
             if athena_client:
                 GoogleSheets._create_athena_table(df=df_gsheets, schema_name='datalake_raw', schema_folder='raw',
-                                                  table_name=google_sheets_file['s3_path'], athena_client=athena_client)
+                                                  table_name=google_sheets_file['s3_path'], bucket=self.s3_bucket, athena_client=athena_client)
 
         if enumdb_destination == EnumDB.BI_ODS:
             GoogleSheets._move_df_to_ods(df=df_gsheets, table_name=google_sheets_file['s3_path'], schema='gsheets',
@@ -158,7 +158,7 @@ class GoogleSheets(object):
 
     @staticmethod
     @logger(exclude='df')
-    def _create_athena_table(df, schema_name, schema_folder, table_name, athena_client):
+    def _create_athena_table(df, schema_name, schema_folder, table_name, bucket, athena_client):
         columns_definition = GoogleSheets._get_df_columns_definition(df)
 
         logger.info(
@@ -174,7 +174,8 @@ class GoogleSheets(object):
                 'schema_name': schema_name,
                 'schema_folder': schema_folder,
                 'table_name': table_name,
-                'columns': columns_definition
+                'columns': columns_definition,
+                'bucket': bucket
             }
         )
 

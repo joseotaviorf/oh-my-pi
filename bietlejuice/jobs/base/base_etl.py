@@ -512,10 +512,12 @@ class BaseETL(object):
     @classmethod
     def file_to_s3(cls, filename, dir_path='/tmp', bucket_folder_path=None):
         tmp_fn = '{}/{}'.format(dir_path, filename)
+        tmp_bucket = 'bi-etl-ejuice-tmpfiles'
+
         try:
             if not bucket_folder_path:
                 bucket_folder_path = os.environ['s3-tmpfiles'] if os.environ.get(
-                    's3-tmpfiles') else 'bi-etl-ejuice-tmpfiles'
+                    's3-tmpfiles') else tmp_bucket
             else:
                 bucket_arr = bucket_folder_path.split('/')
                 if len(bucket_arr) > 1:

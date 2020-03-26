@@ -12,8 +12,6 @@ logger = QuintoAndarLogger('OfferSubDag')
 
 
 class OfferSubDag(DimSubDag):
-    S3_BUCKET = '5a-datalake'
-
     def __init__(self, bucket, sub_dag_name, dag_name, schedule_interval, start_date):
         super(OfferSubDag, self).__init__(
             bucket=bucket,
@@ -53,19 +51,18 @@ class OfferSubDag(DimSubDag):
         query = BaseETL.get_query_from_file_name(file_name=file_path)
         query = query.format(str(exec_date))
 
-        utils.extract_query_dim_from_ebdb_to_ods(dim_name=dim, bucket=DimSubDag.S3_BUCKET, command=query,
+        utils.extract_query_dim_from_ebdb_to_ods(dim_name=dim, bucket=self.bucket, command=query,
                                                  table_name=None)
 
     @logger
     def __build_data_tasks(self, dag):
-
         offer_to_ods_task = BaseDAG.build_python_operator(
             task_id='offer_to_ods',
             dag=dag,
             python_callable=utils.load_athena_query_to_ods,
             op_kwargs={
                 'dim_name': 'offer',
-                'bucket': DimSubDag.S3_BUCKET,
+                'bucket': self.bucket,
                 'fname': 'offer'
             }
 
@@ -86,7 +83,7 @@ class OfferSubDag(DimSubDag):
                 'dim_name': 'pre_proposal_AUD',
                 'table_name': 'PreProposta_AUD',
                 'copy_to_clean': False,
-                'bucket': DimSubDag.S3_BUCKET
+                'bucket': self.bucket
             }
         )
 
@@ -107,7 +104,7 @@ class OfferSubDag(DimSubDag):
             python_callable=utils.load_dim_from_staging_to_dw,
             op_kwargs={
                 'dim_name': 'offer',
-                'bucket': DimSubDag.S3_BUCKET
+                'bucket': self.bucket
             }
         )
 

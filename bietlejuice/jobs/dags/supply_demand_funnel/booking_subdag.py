@@ -48,7 +48,7 @@ class BookingSubDag(DimSubDag):
         query = BaseETL.get_query_from_file_name(file_name=file_path)
         query = query.format(str(exec_date))
 
-        utils.extract_query_dim_from_ebdb_to_ods(dim_name=dim, bucket=DimSubDag.S3_BUCKET, command=query,
+        utils.extract_query_dim_from_ebdb_to_ods(dim_name=dim, bucket=self.bucket, command=query,
                                                  table_name=None)
 
     @logger
@@ -67,7 +67,7 @@ class BookingSubDag(DimSubDag):
             op_kwargs={
                 'table_name': 'booking_media_sources',
                 'file_name': 'extract_booking_media_sources.sql',
-                'bucket': DimSubDag.S3_BUCKET
+                'bucket': self.bucket
             }
         )
 
@@ -88,7 +88,7 @@ class BookingSubDag(DimSubDag):
             python_callable=utils.load_dim_from_staging_to_dw,
             op_kwargs={
                 'dim_name': 'booking',
-                'bucket': DimSubDag.S3_BUCKET
+                'bucket': self.bucket
             }
         )
 

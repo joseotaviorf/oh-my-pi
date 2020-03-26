@@ -46,7 +46,7 @@ class BankAccountSubDag(DimSubDag):
                 'dim_name': self.ods_stg_table_name,
                 'table_name': self.table_name,
                 'copy_to_clean': False,
-                'bucket': DimSubDag.S3_BUCKET
+                'bucket': self.bucket
             }
         )
 
@@ -67,7 +67,7 @@ class BankAccountSubDag(DimSubDag):
             python_callable=utils.load_dim_from_staging_to_dw,
             op_kwargs={
                 'dim_name': self.ods_stg_table_name,
-                'bucket': DimSubDag.S3_BUCKET,
+                'bucket': self.bucket,
                 'schema_dest': 'bank'
             }
         )

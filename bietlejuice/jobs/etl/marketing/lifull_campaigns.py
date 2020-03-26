@@ -33,8 +33,7 @@ class LifullCampaigns(Marketing):
             command=['scrapy', 'crawl', 'trovit',
                      '-a', 'start_date={}'.format(start_date),
                      '-a', 'end_date={}'.format(start_date),
-                     '-o', 's3://5a-datalake/raw/marketing/lifull_campaigns/acc={}/dt={}/data.gz'.format('default',
-                                                                                                         start_date)]
+                     '-o', 's3://{}/raw/marketing/lifull_campaigns/acc={}/dt={}/data.gz'.format(self.s3_bucket, 'default', start_date)]
         )
 
         while not (batch_client.get_job_info_by_id(r.get('jobId')).get('status') in ('SUCCEEDED', 'FAILED')):
