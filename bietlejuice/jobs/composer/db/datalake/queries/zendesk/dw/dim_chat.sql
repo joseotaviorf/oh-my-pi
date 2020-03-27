@@ -1,5 +1,13 @@
+-- partition chats
+with filtered_chats as (
+	select
+		*
+	from datalake_zendesk_clean.chats
+	where
+  		year={year} and month={month} and day={day}
+),
 -- get only the most recent chat loaded
-with chat_max_date as (
+chat_max_date as (
 	select 
 		id,
         max(
@@ -9,7 +17,7 @@ with chat_max_date as (
             lpad(string(day), 2, '0')
            )
         ) as ts_load -- YYYYMMDD format
-	from {db}.chats
+	from filtered_chats
 	group by 1
 ),
 -- create base table for chats (no rules applied)
@@ -26,7 +34,7 @@ chats as (
 		c.ts_ended,
 		from_utc_timestamp(c.ts_ended, 'GMT-3') as ts_ended_local,
 		c.ts_updated
-	from {db}.chats c 
+	from filtered_chats c 
 	inner join chat_max_date m 
 		on c.id = m.id
 		and m.ts_load = concat(
