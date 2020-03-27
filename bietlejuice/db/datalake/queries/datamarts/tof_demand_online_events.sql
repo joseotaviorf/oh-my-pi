@@ -49,7 +49,7 @@ select
 	case when trim(event_type) = 'pilot_cw_button_clicked' then 1 else 0 end as button_clicked,
 	case when trim(event_type) = 'piloto_cw_dialog_viewed' then 1 else 0 end as dialog_viewed, 
 	case when trim(event_type) = 'piloto_cw_message_sent' then 1 else 0 end as message_sent,
-    case when trim(event_type) = 'piloto_cw_message_sent' then substr(regexp_extract(replace(regexp_replace(json_extract_scalar(event_properties, '$["message_content"]'),'\n',' '),'''',' '),'(?<=(([0-9]{9}))).*'),4) else null end as talk_to_agent_message_content
+    case when trim(event_type) = 'piloto_cw_message_sent' then substr(regexp_extract(replace(regexp_replace(json_extract_scalar(event_properties, '$["message_content"]'),'\n',' '),'''',' '),'(?<=(([0-9]{{9}}))).*'),4) else null end as talk_to_agent_message_content
 from datalake_amplitude_clean_prod.events ev
 left join last_version_listings lvl
   on trim(json_extract_scalar(ev.event_properties, '$["house_id"]'))  = lvl.id_house
