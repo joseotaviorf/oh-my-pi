@@ -12,13 +12,14 @@ from decimal import Decimal
 from functools import partial
 from io import BytesIO
 from logging import info as log
-
+from os.path import exists
 import boto3
 import petl
 from db_factory import DBFactory
 from enum_db import EnumDB
 from petl.io.db import create_table
 from unidecode import unidecode
+import yaml
 
 data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
 data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
@@ -711,3 +712,37 @@ class BaseETL(object):
             encoding='UTF-8',
             append=append
         )
+
+    @staticmethod
+    def get_dict_from_yaml_file(file_path):
+        if not exists(file_path):
+            raise RuntimeError(
+                "m=get_dict_from_yaml_file, file_path={}, msg=File not found in the specified path".format(file_path)
+            )
+
+        with open(file_path, "r") as stream:
+            try:
+                response = yaml.safe_load(stream)
+            except yaml.YAMLError as ex:
+                print(
+                    "m=get_dict_from_yaml_file, file_path={}, msg=YAML content cannot be parsed, e={}".format(
+                        file_path,
+                        ex)
+                )
+                raise ex
+        return response or {}
+
+    @staticmethod
+    def validate_dict_keys(dict_object, required_fields):
+        """
+        This method validates if dict has all the required keys
+        :param dict_object: config_dict to be validated
+        :param required_fields: fields that are required in the config_dict
+        :return: return config_dict if it has all required fields, otherwise raise KeyError exception.
+        """
+        fields = set(dict_object.keys())
+        if set(required_fields).difference(fields):
+            raise KeyError("""m=get_validated_config, required_fields={},  msg=required,
+                please verify yaml fields""".format(required_fields)
+                           )
+        return True
