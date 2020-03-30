@@ -6,6 +6,8 @@ CREATE TABLE public.listing_business_context (
   "status" VARCHAR(255),
   "status_reason" VARCHAR(255),
   "ts_created" TIMESTAMP,
-  "ts_updated" TIMESTAMP
+  "ts_updated" TIMESTAMP,
+  "ts_first_listing" TIMESTAMP,
+  "ts_last_listing" TIMESTAMP
 )
 WITH (oids = false);
