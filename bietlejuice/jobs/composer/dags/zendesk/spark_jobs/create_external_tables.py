@@ -21,7 +21,7 @@ if __name__ == "__main__":
     parser.add_argument("env", type=str, help="forno/prod values")
     parser.add_argument("datalake_bucket")
     parser.add_argument("athena_query_result_location")
-    parser.add_argument("storage", type=str, help="raw/clean values")
+    parser.add_argument("storage", type=str, help="raw/clean/enrich values")
     parser.add_argument("table_name", type=str, help="table name")
     parser.add_argument(
         "--partition_by",

@@ -17,18 +17,21 @@ class DatalakeMetastoreService:
         spark_db_infos = {
             "db_raw_databricks": f"datalake_{source}_raw",
             "db_clean_databricks": f"datalake_{source}_clean",
+            "db_enrich_databricks": f"datalake_{source}",
             "db_clean_staging_databricks": f"datalake_{source}_clean_staging",
         }
 
         athena_db_infos = {
             "db_raw_athena": f"datalake_{source}_raw{schema_suffix}",
             "db_clean_athena": f"datalake_{source}_clean{schema_suffix}",
+            "db_enrich_athena": f"datalake_{source}{schema_suffix}",
             "db_clean_staging_athena": f"datalake_{source}_clean_staging{schema_suffix}",
         }
 
         s3_infos = {
             "db_raw_path": f"s3://{bucket}/raw/{source}/",
             "db_clean_path": f"s3://{bucket}/clean/{source}/",
+            "db_enrich_path": f"s3://{bucket}/enrich/{source}/",
             "db_clean_staging_path": f"s3://{bucket}/clean_staging/{source}/",
         }
 

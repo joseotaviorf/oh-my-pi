@@ -44,7 +44,7 @@ if __name__ == "__main__":
     conn_config = {"db": db_info["db_raw_databricks"]}
     databricks_consumer = DatabricksConsumer(conn_config, spark_client)
 
-    query_path = QUERIES_DATALAKE_PATH + source + "/{}.sql".format(table_name)
+    query_path = QUERIES_DATALAKE_PATH + source + f"/clean/{table_name}.sql"
     query = FileService.get_query_from_file_name(query_path).format(
         db=db_info["db_raw_databricks"]
     )

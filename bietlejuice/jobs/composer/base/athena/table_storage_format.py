@@ -6,6 +6,7 @@ class TableStorageFormat:
     }
     DEFAULT_RAW = JSON
     DEFAULT_CLEAN = PARQUET
+    DEFAULT_ENRICH = PARQUET
     DEFAULT_CLEAN_STAGING = PARQUET
 
     @classmethod
@@ -14,7 +15,7 @@ class TableStorageFormat:
 
     @classmethod
     def get_valid_storages(cls):
-        return ["raw", "clean", "clean_staging"]
+        return ["raw", "clean", "enrich", "clean_staging"]
 
     @classmethod
     def get_storage(cls, storage):
@@ -26,5 +27,6 @@ class TableStorageFormat:
         return {
             "raw": cls.DEFAULT_RAW,
             "clean": cls.DEFAULT_CLEAN,
+            "enrich": cls.DEFAULT_ENRICH,
             "clean_staging": cls.DEFAULT_CLEAN_STAGING,
         }.get(storage)

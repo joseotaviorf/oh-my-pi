@@ -1,1 +1,4 @@
 CHATS = "chats"
+DEPARTMENTS = "departments"
+DEPARTMENTS_WITH_PREFIX = f"{CHATS}_{DEPARTMENTS}"
+CHAT_ENGAGEMENTS = "chat_engagements"
