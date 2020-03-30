@@ -30,11 +30,11 @@ select
 		when (dt_opportunity is not null and dt_first_listing is null and photo_job_status in ('Agendado','Iniciado','Novo')) then 'PhotoJobScheduled'
 		when (dt_opportunity is not null and dt_first_listing is null and photo_job_status = 'Cancelado') then coalesce(photo_job_reason, 'CancelledPhotoJob')
 		when (dt_opportunity is not null and dt_first_listing is null) then coalesce(photo_job_reason, 'CancelledPhotoJob')
-		when (dt_opportunity is null and dt_qualified is not null and lead_status = 'Descartado') then coalesce(lead_reason, 'DiscardedLead')
+		when (dt_opportunity is null and dt_qualified is not null and lead_status = 'Descartado') then 'DiscardedQualified'
 		when (dt_opportunity is null and dt_qualified is not null and lead_status = 'Convertido') then 'NoPhotoJob'
 		when (dt_opportunity is null and dt_qualified is not null and conversao_id is not null) then 'NoPhotoJob'
-		when (dt_opportunity is null and lead_reason in ('ProprietarioAvaliando', 'ProprietarioNaoAtende', 'ProprietarioVaiAnunciar')) then 'OnHold'
-		when (dt_qualified is null and lead_status = 'Descartado') then coalesce(lead_reason, 'DiscardedLead')
+		when (dt_opportunity is null and lead_reason = 'EmProspeccao') then 'OnHold'
+		when (dt_qualified is null and lead_status = 'Descartado') then 'DiscardedProspect'
 		when (dt_qualified is null and lead_status = 'Novo' and cidade = 'Outra cidade') then 'NaoProcessadoArea'
 		when (dt_qualified is null and lead_status = 'Novo') then 'NaoProcessado'
 		when (flow = 'Lead Flow' and dt_qualified is null) then 'NaoProcessado'
@@ -89,9 +89,10 @@ from
 		base.dt_conversion,
 		case
 			when (
-						base.lead_status = 'Descartado'
-						and coalesce(jf.dataCriacao, jf.dataAgendamento, jf.dataAceitoFotografo, jf.dataUploadFotos) is null
-						and base.lead_reason not in ('ProprietarioRecusou', 'Exclusivo', 'ProblemaEntrada'))
+				base.lead_status = 'Descartado'
+				and coalesce(jf.dataCriacao, jf.dataAgendamento, jf.dataAceitoFotografo, jf.dataUploadFotos) is null
+				and ( (base.lead_reason = 'ProprietarioRecusou' and base.reason = 'OWNER_DIDNT_LISTEN_TO_PITCH') OR 
+					(base.lead_reason != 'ProprietarioRecusou') ) )
 				then null
 			else base.dt_qualified
 		end as dt_qualified,
@@ -114,6 +115,7 @@ from
 			null as lead_id,
 			null as lead_status,
 			null as lead_reason,
+			null as reason,
 			null as conversao_id,
 			case
 				when (i.usuarioQueCadastrou_id=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
@@ -189,6 +191,7 @@ from
       l.id as lead_id,
       l.status as lead_status,
       l.lead_reason as lead_reason,
+      l.reason,
       cl.id as conversao_id,
       case
         when rep.id is not null then rep.id
@@ -209,7 +212,7 @@ from
       case -- when excluded by specific reasons we count the lead as a qualified lead, even if its discarded
         when cl.leadConvertido_id is not null
           then coalesce(cl.criadoEm, cl.dataConversao, from_unixtime(ure.timestamp/1000))
-        when l.lead_reason in ('ProprietarioRecusou', 'Exclusivo', 'ProblemaEntrada')
+        when l.lead_reason = 'ProprietarioRecusou' and l.reason != 'OWNER_DIDNT_LISTEN_TO_PITCH'
           then coalesce(from_unixtime(dure.timestamp/1000), from_unixtime(ure.timestamp/1000))
       end as dt_qualified,
       from_unixtime(dure.timestamp/1000) as dt_discarded,
@@ -387,6 +390,7 @@ from
 			null as lead_id,
 			null as lead_status,
 			null as lead_reason,
+			null as reason,
 			cl.id as conversao_id,
 			i.usuarioQueCadastrou_id as rep_id,
 			null as affiliate_id,
