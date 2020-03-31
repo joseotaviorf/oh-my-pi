@@ -26,12 +26,13 @@ logger = QuintoAndarLogger(MAIN_DAG_NAME)
 
 
 @logger
-def load_marketing_daily_costs_rules(yaml_path, schema, sharing_rules_table):
+def load_marketing_daily_costs_rules(yaml_path, schema, dw_queries_path, sharing_rules_table):
     """
     This method loads marketing costs rules on specified DW schema
-    :param sharing_rules_table: sharing rules table name
     :param yaml_path: path to yaml file with rules
     :param schema: the DW schema, e.g: public, staging.
+    :param dw_queries_path: path to DW queries dir
+    :param sharing_rules_table: sharing rules table name
     """
     logger.info(
         """m=load_marketing_daily_costs_rules, file_path={}, msg=Reading YAML rules file""".format(
@@ -55,7 +56,9 @@ def load_marketing_daily_costs_rules(yaml_path, schema, sharing_rules_table):
             logger.info("m=load_marketing_daily_costs_rules, msg=Getting {} config".format(rule_id))
             if BaseETL.validate_dict_keys(config, required_fields=["query", "funnel_side"]):
                 merge_rules.append("union all select * from {}".format(rule_id))
-                rule_query = BaseETL.get_query_from_file_name(file_name=config.get("query"))
+                rule_query = BaseETL.get_query_from_file_name(
+                    file_name="{}/{}".format(dw_queries_path, config.get("query"))
+                )
                 rule_cte = """{rule} as (
                                     with {rule}_raw as ({rule_query})
                                         select
@@ -143,7 +146,8 @@ load_rules_marketing_daily_costs_task = BaseDAG.build_python_operator(
     op_kwargs={
         "yaml_path": YAML_PATH,
         "sharing_rules_table": SHARING_RULES_TABLE,
-        "schema": "staging",
+        "dw_queries_path": DW_QUERIES_DIR,
+        "schema": "staging"
     },
 )
 
