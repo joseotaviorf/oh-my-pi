@@ -39,6 +39,15 @@ tasks as (
     from datalake_clean.crm_tasks ct
     where __WHERE_CLAUSE__
     group by 1
+  ),
+  min_analyst_started as (
+    select
+      id,
+      min(json_extract_scalar(sl.started_entry, '$.date')) as min_ts_analyst_started
+    from datalake_clean.crm_tasks ct
+    cross join unnest(cast(json_extract(task_entry, '$.startedAt') as array(json))) as sl (started_entry)
+    where __WHERE_CLAUSE__
+    group by 1
   )
   select distinct
     cast(ct.id as varchar) as sk_task,
@@ -47,6 +56,7 @@ tasks as (
     cast(regexp_extract(trim(ct.ts_start), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as ts_start,
     cast(regexp_extract(trim(coalesce(tr.ts_action, ct.ts_completed)), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as ts_completed,
     cast(regexp_extract(trim(ct.ts_silenced_until), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as ts_silenced_until,
+    cast(regexp_extract(trim(mas.min_ts_analyst_started), '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', 1) as timestamp) as ts_analyst_started,
     round(date_diff('minute', cast(regexp_extract(ct.ts_start, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp),
                               cast(regexp_extract(coalesce(tr.ts_action, ct.ts_completed), '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp)
         ) / 60., 2) as hours_task_start_to_completed,
@@ -67,5 +77,7 @@ tasks as (
     on trim(ct.type) = cw.task_type
   left join tasks_resolution tr
     on tr.id = ct.id
+  left join min_analyst_started mas
+    on mas.id = ct.id
   where __WHERE_CLAUSE__
 )
