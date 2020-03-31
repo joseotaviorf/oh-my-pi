@@ -150,7 +150,7 @@ class GoogleSheets(object):
                 df=df,
                 table_name='{}."{}"'.format(schema, table_name),
                 append=False,
-                encoding='LATIN1'
+                encoding='UTF-8'
             )
         except Exception as e:
             raise RuntimeError('m=_move_df_to_ods, table_name={0}, schema={1}, error={2}, '
