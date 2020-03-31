@@ -12,7 +12,7 @@ left join fact_house_listings fhl
   on fhl.sk_contract = dc.sk_contract
 left join dim_house_listing dhl
   on dhl.sk_house_listing = fhl.sk_house_listing
-where (dc.dt_annulment < current_date OR dc.dt_annulment is null) -- we know we may have future dates for dt_annulment
+where dd.date < current_date -- we know we may have future dates for dt_annulment and we need to filter future dates
   and dc.status in ('Ativo','Finalizado') -- consider only contracts that are active or were active and ended
   and dd.date = dd.month_end
   and dhl.is_b2b = True
@@ -35,7 +35,7 @@ left join dim_house_listing dhl
 where dc.status in ('Ativo', 'Finalizado') -- consider only contracts that are active or were active at a given period
   and dd.date = dd.month_end -- only look last day of the month
   and date(coalesce(dc.dt_start, dc.dt_entrance)) < current_date -- we know we may have future dates for dt_start
-  and (dc.dt_annulment < current_date OR dc.dt_annulment is null) -- we know we may have future dates for dt_annulment
+  and dd.date < current_date -- we know we may have future dates for dt_annulment and we need to filter future dates
   and type <> 'DealOnly'
   and dhl.is_b2b = True
 group by 1, 2, 3

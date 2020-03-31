@@ -7,7 +7,7 @@ join dim_date dd
   on dd.date between date(coalesce(coalesce(dc.ts_signature,dc.dt_start),dc.dt_entrance)) and (coalesce(dc.dt_annulment, CURRENT_DATE) - 1)
 left join fact_house_listings hl
   on dc.sk_contract = hl.sk_contract
-where (dc.dt_annulment < current_date OR dc.dt_annulment is null) -- we know we may have future dates for dt_annulment
+where dd.date < current_date -- we know we may have future dates for dt_annulment and we need to filter future dates
   and dc.status in ('Ativo','Finalizado') -- consider only contracts that are active or were active and ended
   and dd.weekday_name = 'Sunday'
   and type <> 'DealOnly' -- this type of contract should only be considered for new contracts signed
