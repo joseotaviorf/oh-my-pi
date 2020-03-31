@@ -45,8 +45,9 @@ tasks as (
       id,
       min(json_extract_scalar(sl.started_entry, '$.date')) as min_ts_analyst_started
     from datalake_clean.crm_tasks ct
-    cross join unnest(cast(json_extract(task_entry, '$.startedAt') as array(json))) as sl (started_entry)
+    cross join unnest(cast(json_parse(analyst_started_list) as array(json))) as sl (started_entry)
     where __WHERE_CLAUSE__
+      and json_format(analyst_started_list) != '[]' -- avoid analysing empty arrays
     group by 1
   )
   select distinct
