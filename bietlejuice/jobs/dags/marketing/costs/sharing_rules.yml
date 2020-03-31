@@ -1,3 +1,7 @@
 fhls01:
   query: bietlejuice/db/dw/queries/marketing/costs/fhls01.sql
   funnel_side: demand
+
+D001D:
+  query: marketing/costs/d001d.sql
+  funnel_side: demand
