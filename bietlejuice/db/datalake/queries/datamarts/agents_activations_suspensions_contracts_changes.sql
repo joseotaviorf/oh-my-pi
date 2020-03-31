@@ -7,7 +7,8 @@ with raw as(
         LAG(ativo) OVER (PARTITION BY id ORDER BY rev ASC) as previous_ativo,
         CASE WHEN workcontract_id != LAG(workcontract_id) over (partition by id order by rev asc) THEN true END as changed_workcontract,
         CASE WHEN ativo != LAG(ativo) over (partition by id order by rev asc) THEN true END as changed_activated,
-        rev
+        rev,
+        REVTYPE
     from datalake_ebdb_raw_prod.DadosAgente_AUD
 ),
 
@@ -24,11 +25,11 @@ base as(
         date_format(from_unixtime(revision.timestamp/1000),'%Y-%m-%dT%H:%i:%sZ') as date,
     
         CASE
+            WHEN REVTYPE=0 or (changed_activated = true and previous_ativo != true and ativo = true) THEN 'ACTIVATED'
             WHEN changed_workcontract = true and workcontract_id=6 THEN 'SUSPENDED'
             WHEN changed_workcontract = true and previous_workcontract_id=6 THEN 'UNSUSPENDED'
-            WHEN changed_workcontract = true and workcontract_id!=6 and previous_workcontract_id!=6 THEN 'ALTERED_CONTRACT'
-            WHEN changed_activated = true and previous_ativo != true and ativo = true THEN 'ACTIVATED'
             WHEN changed_activated = true and previous_ativo != false and ativo = false  THEN 'DEACTIVATED'
+            WHEN changed_workcontract = true and workcontract_id!=6 and previous_workcontract_id!=6 THEN 'ALTERED_CONTRACT'
         END as action
     
     from raw
