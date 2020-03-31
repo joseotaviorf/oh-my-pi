@@ -5,8 +5,6 @@ CREATE TABLE IF NOT EXISTS marketing.fact_linkedin_daily_cost_attributions(
   sk_campaign_group                             VARCHAR(100),
   sk_date                                       INTEGER,
   total_cost                                    DOUBLE PRECISION,
-  action_clicks                                 INTEGER,
-  ad_unit_clicks                                INTEGER,
   card_clicks                                   INTEGER,
   card_impressions                              INTEGER,
   clicks                                        INTEGER,
