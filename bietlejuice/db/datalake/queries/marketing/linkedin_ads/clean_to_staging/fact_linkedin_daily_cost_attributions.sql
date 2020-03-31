@@ -5,8 +5,6 @@ select * from (
         cgr.id as sk_campaign_group,
         cast(date_format(cast(stats.dt_created as date), '%Y%m%d') as integer) as sk_date,
         cost_in_local_currency as total_cost,
-        action_clicks,
-        ad_unit_clicks,
         card_clicks,
         card_impressions,
         clicks,
