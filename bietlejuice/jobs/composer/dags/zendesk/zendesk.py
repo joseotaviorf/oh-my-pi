@@ -2,21 +2,27 @@ from datetime import datetime
 import pendulum
 from airflow.models import DAG
 from airflow.models import Variable
+import airflow.utils.helpers as airflow_helpers
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
+from bietlejuice.jobs.composer.services import FileService
 from bietlejuice.jobs.composer.dags.zendesk import (
     CHATS,
     DEPARTMENTS,
     DEPARTMENTS_WITH_PREFIX,
     CHAT_ENGAGEMENTS,
+    QUERIES_ZENDESK_DATALAKE_PATH,
+    DW_SCHEMA,
+    SOURCE,
 )
 
+
 # dag params
-DAG_ID = "bietlejuice.zendesk"
+DAG_ID = f"bietlejuice.{SOURCE}"
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2019, 11, 1, 0, 0, 0, tzinfo=local_tz)
 MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
@@ -30,11 +36,13 @@ DATABRICKS_S3_BUCKET = Variable.get("databricks_s3_bucket")
 
 # s3 vars
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
+DW_BUCKET = Variable.get("dw_bucket")
+SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
 
 LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_S3_BUCKET}/logs/jobs/{DAG_ID}"
 
 # spark_jobs path
-SPARK_JOBS_PATH = S3_PREFIX + "/spark_jobs/zendesk"
+SPARK_JOBS_PATH = S3_PREFIX + f"/spark_jobs/{SOURCE}"
 
 # cluster params
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
@@ -51,6 +59,19 @@ CUSTOM_LIBRARIES = [
     },
 ]
 LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
+
+dag = DAG(
+    dag_id=DAG_ID,
+    default_args={
+        "owner": BaseDAG.DEFAULT_OWNER,
+        "wait_for_downstream": False,
+        "depends_on_past": False,
+    },
+    start_date=MAIN_START_DATE,
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    max_active_runs=1,
+    catchup=False,
+)
 
 
 def create_departments_sub_dag(sub_dag_name):
@@ -233,18 +254,77 @@ def create_chats_sub_dag(sub_dag_name, days_interval_start, days_interval_end):
     return local_dag
 
 
-dag = DAG(
-    dag_id=DAG_ID,
-    default_args={
-        "owner": BaseDAG.DEFAULT_OWNER,
-        "wait_for_downstream": False,
-        "depends_on_past": False,
-    },
-    start_date=MAIN_START_DATE,
-    schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    max_active_runs=1,
-    catchup=False,
-)
+def dw_tasks(sub_dag_name, table_name, slugged_table_name, loading_mode):
+
+    sub_dag = BaseSubDAG(
+        sub_dag_name=sub_dag_name,
+        dag_name=DAG_ID,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+    )._build_local_dag()
+
+    create_table_in_dw_staging = QuintoAndarDatabricksSubmitRunOperator(
+        dag=sub_dag,
+        task_id=f"load-{loading_mode}-{slugged_table_name}-into-dw-{DW_SCHEMA}-staging",
+        json={
+            "spark_python_task": {
+                "python_file": f"{SPARK_JOBS_PATH}/load_{loading_mode}_data_to_staging.py",
+                "parameters": [DW_BUCKET, table_name, ENV],
+            }
+        },
+    )
+
+    create_table_in_dw = QuintoAndarDatabricksSubmitRunOperator(
+        dag=sub_dag,
+        task_id=f"load-{loading_mode}-{slugged_table_name}-into-dw-{DW_SCHEMA}",
+        json={
+            "spark_python_task": {
+                "python_file": f"{SPARK_JOBS_PATH}/load_{loading_mode}_table_to_dw.py",
+                "parameters": [DW_BUCKET, table_name, ENV],
+            }
+        },
+    )
+
+    load_dw_table_into_redshift = QuintoAndarDatabricksSubmitRunOperator(
+        dag=sub_dag,
+        task_id=f"load-{loading_mode}-{slugged_table_name}-into-redshift",
+        json={
+            "spark_python_task": {
+                "python_file": f"{SPARK_JOBS_PATH}/load_{loading_mode}_table_to_redshift.py",
+                "parameters": [DW_BUCKET, table_name, ENV, SPECTRUM_IAM_ROLE],
+            }
+        },
+    )
+
+    create_table_in_dw_staging >> create_table_in_dw >> load_dw_table_into_redshift
+
+    return sub_dag
+
+
+def build_sub_dags(target_layer, loading_mode):
+    # create subdag for each table
+    file_list = FileService.list_files(
+        f"{QUERIES_ZENDESK_DATALAKE_PATH}/{target_layer}/{loading_mode}/"
+    )
+    subdags = {}
+
+    for file_name in file_list:
+        file_name = FileService.remove_file_extension(file_name)
+        slugged_table_name = file_name.replace("_", "-")
+        table_sub_dag = BaseSubDAG.get_sub_dag_operator(
+            dag=dag,
+            sub_dag_name=f"load-{slugged_table_name}-to-{target_layer}",
+            sub_dag_func=eval(f"{target_layer}_tasks"),
+            table_name=file_name,
+            slugged_table_name=slugged_table_name,
+            loading_mode=loading_mode,
+        )
+        subdags[file_name] = table_sub_dag
+
+    # subdags is a dict where the keys are table or file names
+    # and the values are corresponding subdag objects
+    return subdags
+
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
@@ -287,6 +367,18 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-create_cluster_task >> create_sub_dag_task_chats_d1_task >> create_sub_dag_task_chats_d2_to_d7_task >> create_sub_dag_task_chat_engagements_task
-create_sub_dag_task_chat_engagements_task >> terminate_cluster_task
-create_cluster_task >> create_sub_dag_task_departments_task >> terminate_cluster_task
+dw_full_tables_sub_dag = build_sub_dags(target_layer="dw", loading_mode="full")
+
+# incremental flow
+airflow_helpers.chain(
+    create_cluster_task,
+    create_sub_dag_task_chats_d1_task,
+    create_sub_dag_task_chats_d2_to_d7_task,
+    create_sub_dag_task_chat_engagements_task,
+    terminate_cluster_task,
+)
+
+# full flow
+create_cluster_task >> create_sub_dag_task_departments_task >> list(
+    dw_full_tables_sub_dag.values()
+) >> terminate_cluster_task
