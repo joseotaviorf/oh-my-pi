@@ -6,7 +6,7 @@ with raw as(
         LAG(workcontract_id) over (partition by id order by rev asc) as previous_workcontract_id,
         LAG(ativo) OVER (PARTITION BY id ORDER BY rev ASC) as previous_ativo,
         CASE WHEN workcontract_id != LAG(workcontract_id) over (partition by id order by rev asc) THEN true END as changed_workcontract,
-        CASE WHEN ativo != LAG(ativo) over (partition by id order by rev asc) THEN true END as changed_activated,
+        CASE WHEN ativo <> CASE WHEN LAG(ativo) OVER (PARTITION BY id ORDER BY rev ASC) is null THEN false else LAG(ativo) OVER (PARTITION BY id ORDER BY rev ASC) END THEN true END as changed_activated,
         rev,
         REVTYPE
     from datalake_ebdb_raw_prod.DadosAgente_AUD
