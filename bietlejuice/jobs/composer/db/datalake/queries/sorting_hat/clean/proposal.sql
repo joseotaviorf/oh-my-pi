@@ -1,6 +1,6 @@
 select
     id,
-    imovel_id as house_id,
+    imovel_id as id_house,
     analysis_date as dt_analyzed,
     score_5A,
     score_5A_best_subset,

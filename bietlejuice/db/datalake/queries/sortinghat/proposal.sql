@@ -1,6 +1,6 @@
 SELECT
     id,
-    house_id,
+    id_house as house_id,
     date(dt_analyzed) as analysis_date,
     score_5A,
     score_5A_best_subset,
