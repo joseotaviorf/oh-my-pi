@@ -6,6 +6,7 @@ from airflow.models import DAG
 from airflow.operators.dagrun_operator import TriggerDagRunOperator
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
+from bietlejuice.jobs.base.base_test import BaseTest
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl import DW_QUERIES_DIR
 from bietlejuice.jobs.wrappers.GoogleDrive import GoogleSheets
@@ -54,7 +55,7 @@ def load_marketing_daily_costs_rules(yaml_path, schema, dw_queries_path, sharing
     try:
         for rule_id, config in sharing_rules.items():
             logger.info("m=load_marketing_daily_costs_rules, msg=Getting {} config".format(rule_id))
-            if BaseETL.validate_dict_keys(config, required_fields=["query", "funnel_side"]):
+            if validate_config(config, required_fields=["query", "funnel_side"]):
                 merge_rules.append("union all select * from {}".format(rule_id))
                 rule_query = BaseETL.get_query_from_file_name(
                     file_name="{}/{}".format(dw_queries_path, config.get("query"))
@@ -91,6 +92,13 @@ def load_marketing_daily_costs_rules(yaml_path, schema, dw_queries_path, sharing
     except Exception as error:
         raise RuntimeError("""m=load_marketing_daily_costs_rules, msg=Error while loading YAML rules into DW,
             exception_name={},exception_message={}""".format(type(error).__name__, error))
+
+
+def validate_config(config, required_fields):
+    return all(
+        [BaseTest.validate_dict_keys(config, required_fields=required_fields),
+            BaseTest.validate_dict_values(config, fields=required_fields)]
+    )
 
 
 def load_google_sheet_files_to_datalake(files):

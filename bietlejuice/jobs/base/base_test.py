@@ -128,3 +128,36 @@ class BaseTest(object):
         return BaseETL.get_query_from_file_name(
             source['file_path']) if 'file_path' in source else \
             'select count(*) from {}.{}'.format(source['schema'], source['table_name'])
+
+    @staticmethod
+    def validate_dict_keys(dict_object, required_fields):
+        """
+        This method validates if dict has all the required keys
+        :param dict_object: config_dict to be validated
+        :param required_fields: fields that are required in the config_dict
+        :return: return config_dict if it has all required fields, otherwise raise KeyError exception.
+        """
+        fields = set(dict_object.keys())
+        if set(required_fields).difference(fields):
+            raise KeyError(
+                """m=validate_dict_keys, required_fields={}, msg=missing required fields,
+                please verify all fields""".format(required_fields)
+            )
+        return True
+
+    @staticmethod
+    def validate_dict_values(dict_object, fields):
+        """
+        This method validates if all fileds have valid values (i.e., not None or Empty)
+        :param dict_object: config_dict to be validated
+        :param fields: fields list which values needs to be validated. It's assumed that fields of
+        this list exist in dict object
+        """
+        has_values = [
+            True if (dict_object[field] is not None and dict_object[field] != "") else False for field in fields
+        ]
+        if not all(has_values):
+            raise KeyError(
+                """m=validate_dict_values,  dict={}, msg=missing values in dict, please verify it""".format(dict_object)
+            )
+        return True

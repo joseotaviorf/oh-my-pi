@@ -731,18 +731,3 @@ class BaseETL(object):
                 )
                 raise ex
         return response or {}
-
-    @staticmethod
-    def validate_dict_keys(dict_object, required_fields):
-        """
-        This method validates if dict has all the required keys
-        :param dict_object: config_dict to be validated
-        :param required_fields: fields that are required in the config_dict
-        :return: return config_dict if it has all required fields, otherwise raise KeyError exception.
-        """
-        fields = set(dict_object.keys())
-        if set(required_fields).difference(fields):
-            raise KeyError("""m=get_validated_config, required_fields={},  msg=required,
-                please verify yaml fields""".format(required_fields)
-                           )
-        return True
