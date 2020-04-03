@@ -4,7 +4,7 @@ SELECT
     updated_at AS ts_updated,
     level,
     type,
-    should_interview,
+    should_interview as is_a_potential_interview,
     result,
     rejection_motive,
     comment,

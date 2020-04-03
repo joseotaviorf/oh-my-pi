@@ -1,7 +1,7 @@
 select
     id,
     imovel_id as id_house,
-    analysis_date as dt_analyzed,
+    analysis_date as ts_analyzed,
     score_5A,
     score_5A_best_subset,
     score_cardif,
@@ -28,10 +28,10 @@ select
     home_insurance_value,
     risk_level,
     risk_level_best_subset,
-    process_date as dt_processed,
-    home_exclusive_5A,
-    home_last_published_at as dt_home_last_published,
-    bypass_pre_analysis,
+    process_date as ts_processed,
+    home_exclusive_5A as is_home_exclusive_5A,
+    home_last_published_at as ts_home_last_published,
+    bypass_pre_analysis as has_bypassed_pre_analysis,
     pre_analysis_result,
     pre_analysis_reason
 from datalake_sorting_hat_raw.proposal

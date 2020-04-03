@@ -1,7 +1,7 @@
 SELECT
     id,
     id_house as house_id,
-    date(dt_analyzed) as analysis_date,
+    date(ts_analyzed) as analysis_date,
     score_5A,
     score_5A_best_subset,
     score_cardif,
@@ -29,9 +29,9 @@ SELECT
     risk_level,
     risk_level_best_subset,
     date(dt_processed) as process_date,
-    home_exclusive_5A,
-    dt_home_last_published,
-    bypass_pre_analysis,
+    is_home_exclusive_5A as home_exclusive_5A,
+    ts_home_last_published as dt_home_last_published,
+    has_bypassed_pre_analysis as bypass_pre_analysis,
     pre_analysis_result,
     pre_analysis_reason
 FROM datalake_sorting_hat_clean_prod.proposal proposal
