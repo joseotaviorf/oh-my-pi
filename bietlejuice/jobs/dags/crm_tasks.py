@@ -216,7 +216,7 @@ def extract_manual_tasks(_uri, dt=None):
     df['id_task_opener'] = \
         pd.to_numeric(df['id_task_opener'], errors='coerce').where(pd.notnull(df['id_task_opener']), None)
     df['id_assignee'] = \
-        pd.to_numeric(df['id_assignee'], errors='coerce', downcast='integer').where(pd.notnull(df['id_assignee']), None)
+        pd.to_numeric(df['id_assignee'], errors='coerce').where(pd.notnull(df['id_assignee']), None)
     df['id_original_assignee'] = \
         pd.to_numeric(df['id_original_assignee'], errors='coerce').where(pd.notnull(df['id_original_assignee']), None)
     df['sk_date_created'] = df['dt_created'].apply(lambda x: x.strftime('%Y%m%d') if not pd.isnull(x) else '')
@@ -253,7 +253,7 @@ def load_manual_tasks(_uri, table_name, _bucket, schema_name='crm'):
         encoding='utf-8',
         append=False,
         bucket_name='{}/raw/crm/{}'.format(_bucket, table_name),
-        int_columns=['id_task_opener', 'id_original_assignee']
+        int_columns=['id_task_opener', 'id_original_assignee', 'id_assignee']
     )
     logger.info('m=load_manual_tasks, msg=saved to db')
 
