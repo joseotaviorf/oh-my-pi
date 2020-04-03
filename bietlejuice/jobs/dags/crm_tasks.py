@@ -215,6 +215,8 @@ def extract_manual_tasks(_uri, dt=None):
     df = pd.DataFrame(tasks)
     df['id_task_opener'] = \
         pd.to_numeric(df['id_task_opener'], errors='coerce').where(pd.notnull(df['id_task_opener']), None)
+    df['id_assignee'] = \
+        pd.to_numeric(df['id_assignee'], errors='coerce', downcast='integer').where(pd.notnull(df['id_assignee']), None)
     df['id_original_assignee'] = \
         pd.to_numeric(df['id_original_assignee'], errors='coerce').where(pd.notnull(df['id_original_assignee']), None)
     df['sk_date_created'] = df['dt_created'].apply(lambda x: x.strftime('%Y%m%d') if not pd.isnull(x) else '')
