@@ -39,21 +39,21 @@ class SparkClient(DBClient):
         self.conn.sql(command)
 
     @logger
-    def get_data_from_external_source(self, format, options):
+    def get_data_from_external_source(self, format, options, path=None):
         """
         Gets data from an external source with spark.
         :param format: The format of the connection (e.g. jdbc, mongo)
         :param options: Spark options to read the data (e.g. url, user, pwd)
+        :param path: optional string or a list of string for file-system backed data sources.
         :return: A Spark DataFrame
         """
+        if not isinstance(format, str):
+            raise ValueError("format needs to be a string with the desired read format")
+        if not isinstance(options, dict):
+            raise ValueError("options needs to be a dict with the setup configurations")
         # todo: check if the session needs to be closed at the end. Right now,
         #  the session is never closed explicitly.
-        stmt = self.conn.read.format(format)
-        for op, val in options.items():
-            stmt = stmt.option(op, val)
-        df = stmt.load()
-
-        return df
+        return self.conn.read.format(format).options(**options).load(path=path)
 
     @logger(exclude="data")
     def create_dataframe(
