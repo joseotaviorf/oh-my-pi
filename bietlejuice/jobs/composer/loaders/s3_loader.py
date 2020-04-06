@@ -117,6 +117,7 @@ class S3Loader:
         :type schema_merging: bool
         :param options: all other string options
         :type options: keyworded, variable-length argument list
+        :return: DataframeWriter
         """
 
         if not df:
@@ -188,3 +189,5 @@ class S3Loader:
                 s3_path, partition_cols
             )
         )
+
+        return mod_df

@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import Mock
 from bietlejuice.jobs.composer.loaders.spark_metastore_loader import SparkMetastoreLoader
+from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 from bietlejuice.jobs.composer.loaders.s3_loader import S3Loader
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 
@@ -24,4 +25,6 @@ def mocked_metastore_loader():
 
 @pytest.fixture()
 def mocked_s3_loader():
-    return S3Loader(metastore_service='mock')
+    spark_client = SparkClient()
+    metastore_service = SparkMetastoreService(spark_client)
+    return S3Loader(metastore_service=SparkMetastoreService(spark_client))
