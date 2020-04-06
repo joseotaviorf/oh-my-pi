@@ -50,6 +50,7 @@ class S3Loader:
         :type partitions: list
         :param options: all other string options
         :type options: keyworded, variable-length argument list
+        :return: DataframeWriter
         """
         if not df:
             raise ValueError("m=load_full_table, msg=Spark DataFrame is empty")
@@ -73,6 +74,7 @@ class S3Loader:
             "m=load_full_table, table={}.{}, s3_path={}, "
             "msg=loaded table into S3.".format(database_name, table_name, s3_path)
         )
+        return mod_df
 
     @logger(exclude="df")
     def load_incremental_table(
