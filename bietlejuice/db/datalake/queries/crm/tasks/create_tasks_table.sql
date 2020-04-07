@@ -34,6 +34,8 @@ select
                 json_extract(task_entry, '$.fase')) 
       as varchar) as phase,
   cast(json_extract(task_entry, '$.silenciadaAte') as varchar) as ts_silenced_until,
+  -- since we don't have a corresponding SQL VARCHAR value, we need to serializes the input to JSON and then to VARCHAR
+  json_format(json_extract(task_entry, '$.startedAt')) as analyst_started_list,
   cast(coalesce(json_extract(task_entry, '$.metadata.imovelId'),
                 json_extract(task_entry, '$.imovelId'),
                 json_extract(task_entry, '$.metadata.imovel.id'))
