@@ -129,3 +129,4 @@ build/
 dist/
 airflow_python3/logs/*
 airflow_python3/plugins/*
+logs/

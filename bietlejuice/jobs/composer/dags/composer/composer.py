@@ -15,7 +15,7 @@ from bietlejuice.jobs.composer.services import FileService
 DAG_ID = "bietlejuice.composer"
 ENV = Variable.get("environment")
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
-START_DATE = datetime(2019, 8, 21, 0, 0, 0, tzinfo=LOCAL_TZ)
+MAIN_START_DATE = datetime(2019, 8, 21, 0, 0, 0, tzinfo=LOCAL_TZ)
 SCHEDULE_INTERVAL = "0 8 * * *"
 S3_BUCKET = Variable.get("datalake_bucket")
 
@@ -27,10 +27,9 @@ dag = DAG(
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
-    start_date=START_DATE,
+    start_date=MAIN_START_DATE,
     schedule_interval=SCHEDULE_INTERVAL,
     max_active_runs=1,
-    catchup=False,
 )
 
 
@@ -39,7 +38,7 @@ def move_data_subdag(subdag_name, table_name):
         sub_dag_name=subdag_name,
         dag_name=DAG_ID,
         schedule_interval=SCHEDULE_INTERVAL,
-        start_date=START_DATE,
+        start_date=MAIN_START_DATE,
     )._build_local_dag()
 
     move_data_to_datalake_task = QuintoAndarMySqlToS3Operator(
