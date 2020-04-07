@@ -1,9 +1,9 @@
 drop table if exists zendesk.dim_chat;
 create table if not exists zendesk.dim_chat (
     sk_chat varchar(30),
-    tags varchar(1200),
+    tags varchar(5000),
     started_by varchar(20),
-    visitor_phone varchar(20),
+    visitor_phone varchar(500),
     status varchar(30),
     is_retained_by_bot boolean,
     is_missed boolean,
