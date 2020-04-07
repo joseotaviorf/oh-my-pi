@@ -38,7 +38,7 @@ if __name__ == "__main__":
     spark_metastore_service = SparkMetastoreService(spark_client)
 
     query = FileService.get_query_from_file_name(
-        QUERIES_ZENDESK_DATALAKE_PATH + "/dw/full/" + table_name + ".sql"
+        QUERIES_ZENDESK_DATALAKE_PATH + "/dw/" + table_name + ".sql"
     )
 
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")

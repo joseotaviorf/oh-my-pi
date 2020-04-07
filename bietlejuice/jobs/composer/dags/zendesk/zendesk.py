@@ -2,7 +2,6 @@ from datetime import datetime
 import pendulum
 from airflow.models import DAG
 from airflow.models import Variable
-import airflow.utils.helpers as airflow_helpers
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
@@ -253,7 +252,7 @@ def create_chats_sub_dag(sub_dag_name, days_interval_start, days_interval_end):
     return local_dag
 
 
-def dw_tasks(sub_dag_name, table_name, slugged_table_name, loading_mode):
+def dw_tasks(sub_dag_name, table_name, slugged_table_name):
 
     sub_dag = BaseSubDAG(
         sub_dag_name=sub_dag_name,
@@ -264,10 +263,10 @@ def dw_tasks(sub_dag_name, table_name, slugged_table_name, loading_mode):
 
     create_table_in_dw_staging = QuintoAndarDatabricksSubmitRunOperator(
         dag=sub_dag,
-        task_id=f"load-{loading_mode}-{slugged_table_name}-into-dw-{DW_SCHEMA}-staging",
+        task_id=f"load-{slugged_table_name}-into-dw-{DW_SCHEMA}-staging",
         json={
             "spark_python_task": {
-                "python_file": f"{SPARK_JOBS_PATH}/load_{loading_mode}_data_to_staging.py",
+                "python_file": f"{SPARK_JOBS_PATH}/load_full_data_to_staging.py",
                 "parameters": [DW_BUCKET, table_name, ENV],
             }
         },
@@ -275,10 +274,10 @@ def dw_tasks(sub_dag_name, table_name, slugged_table_name, loading_mode):
 
     create_table_in_dw = QuintoAndarDatabricksSubmitRunOperator(
         dag=sub_dag,
-        task_id=f"load-{loading_mode}-{slugged_table_name}-into-dw-{DW_SCHEMA}",
+        task_id=f"load-{slugged_table_name}-into-dw-{DW_SCHEMA}",
         json={
             "spark_python_task": {
-                "python_file": f"{SPARK_JOBS_PATH}/load_{loading_mode}_table_to_dw.py",
+                "python_file": f"{SPARK_JOBS_PATH}/load_full_table_to_dw.py",
                 "parameters": [DW_BUCKET, table_name, ENV],
             }
         },
@@ -286,10 +285,10 @@ def dw_tasks(sub_dag_name, table_name, slugged_table_name, loading_mode):
 
     load_dw_table_into_redshift = QuintoAndarDatabricksSubmitRunOperator(
         dag=sub_dag,
-        task_id=f"load-{loading_mode}-{slugged_table_name}-into-redshift",
+        task_id=f"load-{slugged_table_name}-into-redshift",
         json={
             "spark_python_task": {
-                "python_file": f"{SPARK_JOBS_PATH}/load_{loading_mode}_table_to_redshift.py",
+                "python_file": f"{SPARK_JOBS_PATH}/load_full_table_to_redshift.py",
                 "parameters": [DW_BUCKET, table_name, ENV, SPECTRUM_IAM_ROLE],
             }
         },
@@ -300,10 +299,10 @@ def dw_tasks(sub_dag_name, table_name, slugged_table_name, loading_mode):
     return sub_dag
 
 
-def build_sub_dags(target_layer, loading_mode):
+def build_sub_dags(target_layer):
     # create subdag for each table
     file_list = FileService.list_files(
-        f"{QUERIES_ZENDESK_DATALAKE_PATH}/{target_layer}/{loading_mode}/"
+        f"{QUERIES_ZENDESK_DATALAKE_PATH}/{target_layer}/"
     )
     subdags = {}
 
@@ -316,7 +315,6 @@ def build_sub_dags(target_layer, loading_mode):
             sub_dag_func=eval(f"{target_layer}_tasks"),
             table_name=file_name,
             slugged_table_name=slugged_table_name,
-            loading_mode=loading_mode,
         )
         subdags[file_name] = table_sub_dag
 
@@ -366,18 +364,24 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-dw_full_tables_sub_dag = build_sub_dags(target_layer="dw", loading_mode="full")
+dw_full_tables_sub_dag = build_sub_dags(target_layer="dw")
+
 
 # incremental flow
-airflow_helpers.chain(
-    create_cluster_task,
+create_cluster_task >> [
     create_sub_dag_task_chats_d1_task,
-    create_sub_dag_task_chats_d2_to_d7_task,
+    create_sub_dag_task_departments_task,
+]
+create_sub_dag_task_chats_d1_task >> create_sub_dag_task_chats_d2_to_d7_task >> [
     create_sub_dag_task_chat_engagements_task,
-    terminate_cluster_task,
-)
-
-# full flow
-create_cluster_task >> create_sub_dag_task_departments_task >> list(
-    dw_full_tables_sub_dag.values()
-) >> terminate_cluster_task
+    dw_full_tables_sub_dag["dim_chat"],
+]
+create_sub_dag_task_departments_task >> [
+    dw_full_tables_sub_dag["dim_chat_department"],
+    dw_full_tables_sub_dag["dim_chat_engagement"],
+]
+create_sub_dag_task_chat_engagements_task >> [
+    dw_full_tables_sub_dag["dim_chat_engagement"],
+    dw_full_tables_sub_dag["fact_chat_engagements"],
+]
+list(dw_full_tables_sub_dag.values()) >> terminate_cluster_task

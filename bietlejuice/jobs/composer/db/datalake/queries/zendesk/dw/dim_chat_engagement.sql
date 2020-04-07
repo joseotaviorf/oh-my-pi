@@ -3,8 +3,9 @@ with filtered_chats as (
 	select
 		*
 	from datalake_zendesk.chat_engagements
-	where
-  		year={year} and month={month} and day={day}
+	-- temp full loading
+	-- where
+  	-- 	year={year} and month={month} and day={day}
 ),
 chat_engagement_max_date as (
 	select 
@@ -44,7 +45,7 @@ chat_engagements as (
 	group by 1,2,3,4,5,6,7,8
 )
 select
-	regexp_extract(ce.id,'\\d{{4}}\\.958463\\.(\\w+\\.\\w+)',1) as sk_chat_engagement, --Create key by removing string prefix (year/month + default constant '958463')
+	coalesce(nullif(regexp_extract(ce.id, '[^.]+.\\w+$', 0),''),'-1') as sk_chat_engagement, --Create key by removing string prefix
 	ce.started_by,
 	ce.ts_started_utc as ts_started,
 	ce.ts_started_local,

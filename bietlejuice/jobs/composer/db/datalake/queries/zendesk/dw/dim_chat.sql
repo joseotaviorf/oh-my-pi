@@ -3,8 +3,9 @@ with filtered_chats as (
 	select
 		*
 	from datalake_zendesk_clean.chats
-	where
-  		year={year} and month={month} and day={day}
+	-- temp full loading
+	-- where
+  	-- 	year={year} and month={month} and day={day}
 ),
 -- get only the most recent chat loaded
 chat_max_date as (
@@ -62,10 +63,11 @@ statuses as (
     from business_rules b
 )
 select
-	regexp_extract(c.id, '[^.]+$', 0) as sk_chat, --Create key by removing string prefix (year/month + default constant '958463') 
+	coalesce(nullif(regexp_extract(c.id,'[^.]+$', 0),''),'-1') as sk_chat, --Create key by removing string prefix (year/month + default constant '958463') 
 	c.tags,
 	c.started_by,
 	nullif(get_json_object(c.visitor, '$.phone'),'') as visitor_phone,
+	s.status,
 	s.is_retained_by_bot,
 	s.is_missed,
 	c.is_proactive,
@@ -74,7 +76,6 @@ select
 	c.ts_ended,
 	c.ts_ended_local,
 	c.ts_updated,
-    s.status,
 	now() as ts_load
 from chats c
 inner join statuses s

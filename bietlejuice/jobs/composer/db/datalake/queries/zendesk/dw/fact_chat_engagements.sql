@@ -3,8 +3,9 @@ with filtered_chats as (
 	select
 		*
 	from datalake_zendesk.chat_engagements
-	where
-  		year={year} and month={month} and day={day}
+	-- temp full loading
+	-- where
+  	-- 	year={year} and month={month} and day={day}
 ),
 chat_engagement_max_date as (
 	select 
@@ -49,10 +50,10 @@ calculate_first_last as (
 	group by 1
 )
 select
-	regexp_extract(ce.id,'\\d{{4}}\\.958463\\.(\\w+\\.\\w+)',1) as sk_chat_engagement, --Create key by removing string prefix (year/month + default constant '958463')
-	coalesce(regexp_extract(ce.id_chat, '[^.]+$', 0),'-1') as sk_chat, --Create key getting everything after final '.'
-	coalesce(ce.id_department,-1) as sk_engagement_department,
-	coalesce(ce.id_agent,-1) as sk_zendesk_agent,
+	coalesce(nullif(regexp_extract(ce.id, '[^.]+.\\w+$', 0),''),'-1') as sk_chat_engagement, --Create key by removing string prefix
+	coalesce(nullif(regexp_extract(ce.id_chat, '[^.]+$', 0),''),'-1') as sk_chat, --Create key getting everything after final '.'
+	coalesce(cast(ce.id_department as bigint), -1) as sk_engagement_department,
+	coalesce(cast(ce.id_agent as bigint), -1) as sk_zendesk_agent,
 	cast(date_format(ce.ts_started_utc, 'yyyyMMdd') as bigint) as sk_engagement_started_date,
 	cast(date_format(ce.ts_started_local,'yyyyMMdd') as bigint) as sk_engagement_started_date_local,
 	case when ce.ts_started_utc = fl.ts_first_chat_engagement then true else false end as is_first_engagement_in_chat,
