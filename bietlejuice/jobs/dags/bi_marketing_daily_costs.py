@@ -1,7 +1,6 @@
 import json
 from datetime import datetime
 
-import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from airflow.operators.dagrun_operator import TriggerDagRunOperator
 from bietlejuice.jobs.base.base_dag import BaseDAG
@@ -12,22 +11,33 @@ from bietlejuice.jobs.etl import DW_QUERIES_DIR
 from bietlejuice.jobs.wrappers.GoogleDrive import GoogleSheets
 from qa_python_utils import QuintoAndarLogger
 
-env.set_airflow_var_to_local_env('BI_DW', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
+# Credentials setup
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
-GOOGLE_S_A_CREDENTIALS = json.loads(env.get_airflow_env_var('GOOGLE_SERVICE_ACCOUNT_CREDENTIALS'))
+env.set_airflow_var_to_local_env('BI_DW', 'DATA_ACC_AWS_ACCESS_KEY_ID',
+                                 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
+GOOGLE_S_A_CREDENTIALS = json.loads(
+    env.get_airflow_env_var('GOOGLE_SERVICE_ACCOUNT_CREDENTIALS'))
 GOOGLE_API_SCOPE = env.get_airflow_env_var('GOOGLE_API_SCOPE')
-GOOGLE_SHEETS_FILES = json.loads(env.get_airflow_env_var('MARKETING_GOOGLE_SHEETS_FILES'))
+
+# Files setup
+COST_SHARE_FILES = json.loads(
+    env.get_airflow_env_var('MARKETING_COST_SHARE_GSHEETS_FILES'))
+AUX_COST_SHARE_FILES = json.loads(
+    env.get_airflow_env_var('MARKETING_AUX_COST_SHARE_GSHEETS_FILES'))
+YAML_PATH = env.get_airflow_env_var("MARKETING_COSTS_SHARING_RULES_PATH")
+SHARING_RULES_TABLE = "sharing_rules_marketing_daily_costs"
+
+# DAG setup
 MAIN_DAG_NAME = 'bi-marketing-daily-costs'
 MAIN_START_DATE = datetime(2019, 1, 1)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule("0 1,7,13,19 * * *")
-YAML_PATH = env.get_airflow_env_var("MARKETING_COSTS_SHARING_RULES_PATH")
-SHARING_RULES_TABLE = "sharing_rules_marketing_daily_costs"
 
 logger = QuintoAndarLogger(MAIN_DAG_NAME)
 
 
 @logger
-def load_marketing_daily_costs_rules(yaml_path, schema, dw_queries_path, sharing_rules_table):
+def load_marketing_daily_costs_rules(yaml_path, schema, dw_queries_path,
+                                     sharing_rules_table):
     """
     This method loads marketing costs rules on specified DW schema
     :param yaml_path: path to yaml file with rules
@@ -54,11 +64,15 @@ def load_marketing_daily_costs_rules(yaml_path, schema, dw_queries_path, sharing
 
     try:
         for rule_id, config in sharing_rules.items():
-            logger.info("m=load_marketing_daily_costs_rules, msg=Getting {} config".format(rule_id))
-            if validate_config(config, required_fields=["query", "funnel_side"]):
+            logger.info(
+                "m=load_marketing_daily_costs_rules, msg=Getting {} config".format(
+                    rule_id))
+            if validate_config(config,
+                               required_fields=["query", "funnel_side"]):
                 merge_rules.append("union all select * from {}".format(rule_id))
                 rule_query = BaseETL.get_query_from_file_name(
-                    file_name="{}/{}".format(dw_queries_path, config.get("query"))
+                    file_name="{}/{}".format(dw_queries_path,
+                                             config.get("query"))
                 )
                 rule_cte = """{rule} as (
                                     with {rule}_raw as ({rule_query})
@@ -78,9 +92,11 @@ def load_marketing_daily_costs_rules(yaml_path, schema, dw_queries_path, sharing
             rules_query = "{ctes} {merge_rules}".format(
                 ctes=",".join(ctes), merge_rules=" ".join(merge_rules)
             )
-            logger.info("m=load_marketing_daily_costs_rules, msg=Parsing CTE rules query done")
+            logger.info(
+                "m=load_marketing_daily_costs_rules, msg=Parsing CTE rules query done")
 
-            rules_table = BaseETL.from_db_query(db_enum=EnumDB.BI_DW, query=rules_query)
+            rules_table = BaseETL.from_db_query(db_enum=EnumDB.BI_DW,
+                                                query=rules_query)
 
             BaseETL.bulk_insert(
                 table=rules_table,
@@ -91,44 +107,15 @@ def load_marketing_daily_costs_rules(yaml_path, schema, dw_queries_path, sharing
             )
     except Exception as error:
         raise RuntimeError("""m=load_marketing_daily_costs_rules, msg=Error while loading YAML rules into DW,
-            exception_name={},exception_message={}""".format(type(error).__name__, error))
+            exception_name={},exception_message={}""".format(
+            type(error).__name__, error))
 
 
 def validate_config(config, required_fields):
     return all(
         [BaseTest.validate_dict_keys(config, required_fields=required_fields),
-            BaseTest.validate_dict_values(config, fields=required_fields)]
+         BaseTest.validate_dict_values(config, fields=required_fields)]
     )
-
-
-def load_google_sheet_files_to_datalake(files):
-    gs = GoogleSheets(
-        s3_bucket=s3_bucket,
-        google_s_a_credentials=GOOGLE_S_A_CREDENTIALS,
-        google_api_scope=GOOGLE_API_SCOPE,
-    )
-    for file in files:
-        gs.move_sheets_data_to_destination(
-            google_sheets_file=file,
-            enumdb_destination=EnumDB.QuintoAndar_datalake,
-            csv=True,
-        )
-
-
-# create DAG definition
-main_dag = DAG(
-    dag_id=MAIN_DAG_NAME,
-    description="ETL Pipeline for unifying marketing costs from various sources",
-    default_args={
-        "owner": BaseDAG.DEFAULT_OWNER,
-        "wait_for_downstream": False,
-        "depends_on_past": False,
-    },
-    start_date=MAIN_START_DATE,
-    schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    max_active_runs=1,
-    catchup=False,
-)
 
 
 def move_file_query_data_to_dw(schema, file_name):
@@ -147,9 +134,38 @@ def move_file_query_data_to_dw(schema, file_name):
     )
 
 
-load_rules_marketing_daily_costs_task = BaseDAG.build_python_operator(
+def load_google_sheet_files_to_datalake(files):
+    gs = GoogleSheets(
+        s3_bucket=s3_bucket,
+        google_s_a_credentials=GOOGLE_S_A_CREDENTIALS,
+        google_api_scope=GOOGLE_API_SCOPE,
+    )
+    for file in files:
+        gs.move_sheets_data_to_destination(
+            google_sheets_file=file,
+            enumdb_destination=EnumDB.QuintoAndar_datalake,
+            csv=True,
+        )
+
+
+# DAG definition
+main_dag = DAG(
+    dag_id=MAIN_DAG_NAME,
+    description="ETL Pipeline for unifying marketing costs from various sources",
+    default_args={
+        "owner": BaseDAG.DEFAULT_OWNER,
+        "wait_for_downstream": False,
+        "depends_on_past": False,
+    },
+    start_date=MAIN_START_DATE,
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    max_active_runs=1,
+    catchup=False,
+)
+
+load_cost_share_rules_into_dw_task = BaseDAG.build_python_operator(
     dag=main_dag,
-    task_id="load_rules_marketing_daily_costs_to_dw",
+    task_id="load_cost_share_rules_into_dw",
     python_callable=load_marketing_daily_costs_rules,
     op_kwargs={
         "yaml_path": YAML_PATH,
@@ -163,14 +179,23 @@ load_shared_manual_costs_to_datalake_task = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id="load_shared_manual_costs_to_datalake",
     python_callable=load_google_sheet_files_to_datalake,
-    op_kwargs={"files": GOOGLE_SHEETS_FILES["files"]},
+    op_kwargs={"files": COST_SHARE_FILES["files"]},
+)
+
+load_aux_cost_share_files_into_datalake_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='load_aux_cost_share_files_into_datalake',
+    python_callable=load_google_sheet_files_to_datalake,
+    op_kwargs={"files": AUX_COST_SHARE_FILES["aux_files"]}
+
 )
 
 load_fact_marketing_daily_costs_task = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id="load_fact_marketing_daily_costs",
     python_callable=move_file_query_data_to_dw,
-    op_kwargs={"schema": "marketing", "file_name": "fact_marketing_daily_costs"},
+    op_kwargs={"schema": "marketing",
+               "file_name": "fact_marketing_daily_costs"},
 )
 
 # trigger bi-marketing-funnels-conversions after all tasks have been successfully completed
@@ -181,9 +206,10 @@ trigger_bi_marketing_funnels_conversions_task = TriggerDagRunOperator(
     execution_date="{{ execution_date }}",
 )
 
-airflow_helpers.chain(
-    load_rules_marketing_daily_costs_task,
+load_fact_marketing_daily_costs_task.set_upstream([
+    load_cost_share_rules_into_dw_task,
     load_shared_manual_costs_to_datalake_task,
-    load_fact_marketing_daily_costs_task,
-    trigger_bi_marketing_funnels_conversions_task,
-)
+    load_aux_cost_share_files_into_datalake_task
+])
+
+load_fact_marketing_daily_costs_task >> trigger_bi_marketing_funnels_conversions_task
