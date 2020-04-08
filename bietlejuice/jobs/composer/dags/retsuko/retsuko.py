@@ -39,7 +39,7 @@ LIBRARIES_DESCRIPTION = Variable.get(
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 1, 25, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 8 * * *"
 
 dag = DAG(
     dag_id=DAG_ID,

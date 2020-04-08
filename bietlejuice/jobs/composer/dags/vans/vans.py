@@ -50,7 +50,7 @@ SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
 # dag params
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2019, 10, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "30 1 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 8 * * *"
 
 dag = DAG(
     dag_id=DAG_ID,

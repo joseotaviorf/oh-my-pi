@@ -19,7 +19,7 @@ from bietlejuice.jobs.composer.services import FileService
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 2, 20, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
+MAIN_SCHEDULE_INTERVAL = "30 8 * * *"
 
 DAG_ID = f"bietlejuice.{SOURCE}"
 ENV = Variable.get("environment")
