@@ -563,7 +563,7 @@ with manual_shared_costs as (
         NULLIF(campaign_name, '') AS utm_campaign,
         NULLIF(utm_term, '') AS utm_term,
         NULLIF(utm_content, '') AS utm_content,
-        CAST(NULLIF(cost, '') as numeric(16,4)) * fator_custo AS cost,
+        CAST(NULLIF(replace(cost, ',', ''), '') as numeric(16,4)) * fator_custo AS cost,
         NULLIF(side, '') AS side
     FROM
         datalake_raw.marketing_manual_shared_costs
