@@ -28,7 +28,7 @@ create table sortinghat.proposal_version (
   home_type varchar,
   home_zipcode varchar,
   drive_id varchar,
-  rejection_motive varchar,
+  reason varchar,
   home_insurance_value numeric(14,4),
   risk_level varchar,
   risk_level_best_subset varchar,

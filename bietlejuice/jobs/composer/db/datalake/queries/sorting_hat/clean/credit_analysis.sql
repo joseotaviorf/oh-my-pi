@@ -6,7 +6,7 @@ SELECT
     type,
     should_interview as is_a_potential_interview,
     result,
-    rejection_motive,
+    reason,
     comment,
     analyst_name,
     analyst_main_id AS id_analyst,

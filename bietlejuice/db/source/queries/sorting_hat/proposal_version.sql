@@ -27,7 +27,7 @@ select
   home_type,
   home_zipcode,
   drive_id,
-  rejection_motive,
+  reason,
   home_insurance_value,
   risk_level,
   risk_level_best_subset,

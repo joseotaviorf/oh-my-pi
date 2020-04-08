@@ -28,7 +28,7 @@ create external table datalake_raw.sortinghat_proposal_version (
   home_type string,
   home_zipcode string,
   drive_id string,
-  rejection_motive string,
+  reason string,
   home_insurance_value string,
   risk_level string,
   risk_level_best_subset string,
