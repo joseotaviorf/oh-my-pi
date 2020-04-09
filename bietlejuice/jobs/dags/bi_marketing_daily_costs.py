@@ -9,7 +9,7 @@ from qa_python_utils import QuintoAndarLogger
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from bietlejuice.jobs.base.base_test import BaseTest
-from bietlejuice.jobs.composer.clients.db_clients import AthenaClient
+from qa_python_utils.aws.athena import AthenaClient
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl import DW_QUERIES_DIR
 from bietlejuice.jobs.wrappers.GoogleDrive import GoogleSheets
