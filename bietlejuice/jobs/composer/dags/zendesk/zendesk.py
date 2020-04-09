@@ -44,7 +44,9 @@ LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_S3_BUCKET}/logs/jobs/{DAG_ID}"
 SPARK_JOBS_PATH = S3_PREFIX + f"/spark_jobs/{SOURCE}"
 
 # cluster params
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
+CLUSTER_DESCRIPTION = Variable.get(
+    "databricks_memory_optimized_cluster", deserialize_json=True
+)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 
 # databricks libraries
