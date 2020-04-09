@@ -1,18 +1,21 @@
 import json
+import os
 from datetime import datetime
 
 from airflow.models import DAG
 from airflow.operators.dagrun_operator import TriggerDagRunOperator
+from qa_python_utils import QuintoAndarLogger
+
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from bietlejuice.jobs.base.base_test import BaseTest
+from bietlejuice.jobs.composer.clients.db_clients import AthenaClient
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl import DW_QUERIES_DIR
 from bietlejuice.jobs.wrappers.GoogleDrive import GoogleSheets
-from qa_python_utils import QuintoAndarLogger
 
 # Credentials setup
-s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
+S3_BUCKET = env.get_airflow_env_var('bi-datalake-s3-bucket')
 env.set_airflow_var_to_local_env('BI_DW', 'DATA_ACC_AWS_ACCESS_KEY_ID',
                                  'DATA_ACC_AWS_SECRET_ACCESS_KEY')
 GOOGLE_S_A_CREDENTIALS = json.loads(
@@ -134,9 +137,23 @@ def move_file_query_data_to_dw(schema, file_name):
     )
 
 
-def load_google_sheet_files_to_datalake(files):
+def load_google_sheet_files_to_datalake(files, create_athena_table=None):
+    """
+    Loads all shared cost files into the data lake. If create_athena_table is
+    True, then also creates its tables on Athena
+
+    :param files: the files list to be loaded in the data lake
+    :param create_athena_table: toggle to create table on Athena automatically
+    """
+    athena_client = None
+    if create_athena_table:
+        aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
+        aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
+        athena_client = AthenaClient(S3_BUCKET, aws_access_key_id,
+                                     aws_secret_access_key)
+
     gs = GoogleSheets(
-        s3_bucket=s3_bucket,
+        s3_bucket=S3_BUCKET,
         google_s_a_credentials=GOOGLE_S_A_CREDENTIALS,
         google_api_scope=GOOGLE_API_SCOPE,
     )
@@ -144,6 +161,7 @@ def load_google_sheet_files_to_datalake(files):
         gs.move_sheets_data_to_destination(
             google_sheets_file=file,
             enumdb_destination=EnumDB.QuintoAndar_datalake,
+            athena_client=athena_client,
             csv=True,
         )
 
@@ -186,7 +204,8 @@ load_aux_cost_share_files_into_datalake_task = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='load_aux_cost_share_files_into_datalake',
     python_callable=load_google_sheet_files_to_datalake,
-    op_kwargs={"files": AUX_COST_SHARE_FILES["aux_files"]}
+    op_kwargs={"files": AUX_COST_SHARE_FILES["aux_files"],
+               "create_athena_table": True}
 
 )
 
