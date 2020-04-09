@@ -6,3 +6,5 @@ venv
 jobs/dags
 jobs/etl
 terraform
+airflow_python3/logs
+logs
