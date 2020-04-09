@@ -162,7 +162,6 @@ def load_google_sheet_files_to_datalake(files, create_athena_table=None):
             google_sheets_file=file,
             enumdb_destination=EnumDB.QuintoAndar_datalake,
             athena_client=athena_client,
-            csv=True,
         )
 
 
