@@ -26,7 +26,8 @@ class ZendeskCustomFields(Zendesk):
     def move_to_clean(self, class_, bucket_type):
         r_cols = OrderedDict([
             ('id_ticket', str),
-            ('custom_fields', str)
+            ('custom_fields', str),
+            ('ts_updated', str)
         ])
 
         self._move_to_clean_partitioned(
