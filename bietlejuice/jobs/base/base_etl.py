@@ -469,6 +469,12 @@ class BaseETL(object):
         # TODO: FIX THIS -> if env = forno, we got a postgres database, so COPY command is not equal
         try:
             if not append:
+                print('m=bulk_insert_from_s3_to_dw, table_name={}, msg=killing locks'.format(table_name))
+                kill_locks = """
+                    call terminate_locks_for_table('{table}')
+                """.format(table=table_name.split('.')[1])
+                con.cursor().execute(kill_locks)
+
                 print 'm=bulk_insert_from_s3_to_dw, table_name={}, msg=truncating table'.format(table_name)
                 con.cursor().execute('truncate table {};'.format(table_name))
             if enum_db_dest == EnumDB.BI_DW and not eval(str(forno)):
