@@ -32,4 +32,4 @@ from datalake_amplitude_clean_prod.events ev
 left join last_version_listings lvl
   on trim(json_extract_scalar(ev.event_properties, '$["house_id"]'))  = lvl.id_house
   and ts_event between ts_listing_version_start and (coalesce(ts_listing_version_end,current_timestamp) - interval '1' second)
-where date(ts_event) >= date('2020-03-18')
+where date(ts_event) >= date('2020-03-18') and (event_type = 'offer_submitted' OR event_type like '%cw%' or event_type = 'listing_page_viewed')	
