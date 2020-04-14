@@ -1,7 +1,7 @@
-fhls01:
-  query: marketing/costs/fhls01.sql
+d000d:
+  query: marketing/costs/d000d.sql
   funnel_side: demand
 
-D001D:
+d001d:
   query: marketing/costs/d001d.sql
   funnel_side: demand
