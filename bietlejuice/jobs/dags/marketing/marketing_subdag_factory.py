@@ -1,5 +1,3 @@
-from bietlejuice.jobs.dags.marketing.marketing_classifieds_costs_subdag import \
-    MarketingClassifiedsCostsSubDag
 from bietlejuice.jobs.dags.marketing.marketing_criteo_campaigns_subdag import \
     MarketingCriteoCampaignsSubDag
 from bietlejuice.jobs.dags.marketing.marketing_facebook_ads_subdag import \
@@ -53,7 +51,6 @@ class MarketingSubDagFactory(object):
             MarketingEnum.FACEBOOK_ADS: MarketingFacebookAdsSubDag,
             MarketingEnum.CRITEO: MarketingCriteoCampaignsSubDag,
             MarketingEnum.RTB: MarketingRtbCampaignsSubDag,
-            MarketingEnum.CLASSIFIEDS_COSTS: MarketingClassifiedsCostsSubDag,
             MarketingEnum.TWITTER: MarketingTwitterCampaignsSubDag,
             MarketingEnum.LINKEDIN: MarketingLinkedInCampaignsSubDag,
             MarketingEnum.LIFULL: MarketingLifullCampaignsSubDag

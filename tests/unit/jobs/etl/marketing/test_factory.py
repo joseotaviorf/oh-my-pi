@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import pytest
-from bietlejuice.jobs.etl.marketing import FacebookAds, GoogleAds, ClassifiedsCosts, \
+from bietlejuice.jobs.etl.marketing import FacebookAds, GoogleAds, \
     CriteoCampaigns, RtbCampaigns, TwitterCampaigns, LifullCampaigns
 from bietlejuice.jobs.etl.marketing.marketing_enum import MarketingEnum
 
@@ -10,7 +10,6 @@ class TestMarketingFactory(object):
     @pytest.mark.parametrize('class_, expected',
                              [(MarketingEnum.FACEBOOK_ADS, FacebookAds),
                               (MarketingEnum.GOOGLE_ADS, GoogleAds),
-                              (MarketingEnum.CLASSIFIEDS_COSTS, ClassifiedsCosts),
                               (MarketingEnum.CRITEO, CriteoCampaigns),
                               (MarketingEnum.RTB, RtbCampaigns),
                               (MarketingEnum.TWITTER, TwitterCampaigns),
@@ -22,8 +21,7 @@ class TestMarketingFactory(object):
                 'access_token_secret': 'access_token_secret',
                 'client_id': 'client_id', 'client_secret': 'client_secret',
                 'user': 'user'}
-        extra_configs = {
-            'side': ''} if class_ == MarketingEnum.CLASSIFIEDS_COSTS else {}
+        extra_configs = {}
 
         # act
         result = factory.factory(class_, 's3_bucket', datetime(2018, 1, 1), auth, 'acc',
@@ -37,8 +35,6 @@ class TestMarketingFactory(object):
                              [(MarketingEnum.FACEBOOK_ADS, FacebookAds,
                                datetime(2017, 12, 31)),
                               (MarketingEnum.GOOGLE_ADS, GoogleAds,
-                               datetime(2017, 12, 31)),
-                              (MarketingEnum.CLASSIFIEDS_COSTS, ClassifiedsCosts,
                                datetime(2017, 12, 31)),
                               (MarketingEnum.CRITEO, CriteoCampaigns,
                                datetime(2017, 12, 31)),

@@ -29,8 +29,6 @@ class Marketing(object):
         'dim_criteo_campaign': 'sk_criteo_campaign',
         'fact_rtb_daily_cost_attributions': 'sk_sub_campaign',
         'dim_rtb_sub_campaign': 'sk_sub_campaign',
-        'dim_classified': 'sk_classified',
-        'fact_classified_daily_cost_attributions': 'sk_classified',
         'dim_trovit_campaign': 'sk_trovit_campaign',
         'fact_trovit_daily_cost_attributions': 'sk_trovit_campaign',
         'dim_mitula_campaign': 'sk_mitula_campaign',

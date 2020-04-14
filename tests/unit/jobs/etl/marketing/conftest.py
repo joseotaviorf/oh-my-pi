@@ -2,8 +2,7 @@ from datetime import datetime
 
 import pytest
 
-from bietlejuice.jobs.etl.marketing import CriteoCampaigns, RtbCampaigns, \
-    ClassifiedsCosts
+from bietlejuice.jobs.etl.marketing import CriteoCampaigns, RtbCampaigns
 from bietlejuice.jobs.etl.marketing import FacebookAds
 from bietlejuice.jobs.etl.marketing import GoogleAds
 from bietlejuice.jobs.etl.marketing import LifullCampaigns
@@ -102,19 +101,6 @@ def rtb_campaigns():
             "client_id": "client_id",
             "client_secret": "client_secret"
         }
-    )
-
-
-@pytest.fixture
-def classifieds_costs():
-    return ClassifiedsCosts(
-        s3_bucket=S3_BUCKET,
-        execution_date=EXECUTION_DATE,
-        auth={
-            "GSA_CREDENTIALS": "GSA_CREDENTIALS",
-            "GOOGLE_API_SCOPE": "GOOGLE_API_SCOPE"
-        },
-        extra_configs={'side': 'side'}
     )
 
 
