@@ -100,6 +100,9 @@ def load_marketing_daily_costs_rules(yaml_path, schema, dw_queries_path,
 
             rules_table = BaseETL.from_db_query(db_enum=EnumDB.BI_DW,
                                                 query=rules_query)
+            if len(rules_table) == 0:
+                raise RuntimeError("""m=load_marketing_daily_costs_rules,
+                    query={}, msg=Rules table is empty, please verify the query """).format(rules_query)
 
             BaseETL.bulk_insert(
                 table=rules_table,
