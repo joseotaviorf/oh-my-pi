@@ -21,4 +21,4 @@ join datalake_clean.crm_tasks tasks
     on ct.sk_task = tasks.id
       and cast(ct.ts_partition as varchar) = tasks.dt
 left join datalake_heimdall_clean_prod.activity activity
-     on json_extract_scalar(activity.id, '$.oid') = json_extract_scalar(tasks.metadata, '$.estadoId')
+     on activity.id = json_extract_scalar(tasks.metadata, '$.estadoId')
