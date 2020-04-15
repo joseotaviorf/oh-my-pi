@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import pendulum
+import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -17,15 +18,7 @@ ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 
-LOAD_HEIMDALL_INTO_DATALAKE_RAW_FILE_PATH = (
-    S3_PREFIX + "/spark_jobs/{}/load_heimdall_into_datalake.py".format(DAG_ID)
-)
-CREATE_RAW_EXTERNAL_TABLES_FILE_PATH = (
-    S3_PREFIX + "/spark_jobs/{}/create_raw_external_tables.py".format(DAG_ID)
-)
-CREATE_CLEAN_TABLE_FILE_PATH = (
-    S3_PREFIX + "/spark_jobs/{}/create_clean_table_in_datalake.py".format(DAG_ID)
-)
+SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{DAG_ID}/"
 
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
     Variable.get("databricks_s3_bucket"), DAG_ID
@@ -72,7 +65,7 @@ heimdall_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     dag=dag,
     json={
         "spark_python_task": {
-            "python_file": LOAD_HEIMDALL_INTO_DATALAKE_RAW_FILE_PATH,
+            "python_file": SPARK_JOBS_PATH + "load_heimdall_into_datalake.py",
             "parameters": [ENV, DATALAKE_BUCKET],
         }
     },
@@ -83,7 +76,7 @@ create_raw_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
     dag=dag,
     json={
         "spark_python_task": {
-            "python_file": CREATE_RAW_EXTERNAL_TABLES_FILE_PATH,
+            "python_file": SPARK_JOBS_PATH + "create_raw_external_tables.py",
             "parameters": [ENV, DATALAKE_BUCKET, ATHENA_QUERY_RESULT_LOCATION],
         }
     },
@@ -94,8 +87,19 @@ create_clean_table_in_datalake = QuintoAndarDatabricksSubmitRunOperator(
     dag=dag,
     json={
         "spark_python_task": {
-            "python_file": CREATE_CLEAN_TABLE_FILE_PATH,
+            "python_file": SPARK_JOBS_PATH + "create_clean_table_in_datalake.py",
             "parameters": ["heimdall", ENV, DATALAKE_BUCKET, DAG_ID],
+        }
+    },
+)
+
+create_clean_external_table_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="create-clean-external-table",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": SPARK_JOBS_PATH + "create_clean_external_table.py",
+            "parameters": [ENV, DATALAKE_BUCKET, ATHENA_QUERY_RESULT_LOCATION],
         }
     },
 )
@@ -104,7 +108,11 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-create_cluster_task >> heimdall_to_datalake_raw_task >> [
+airflow_helpers.chain(
+    create_cluster_task,
+    heimdall_to_datalake_raw_task,
     create_raw_external_tables_task,
     create_clean_table_in_datalake,
-] >> terminate_cluster_task
+    create_clean_external_table_task,
+    terminate_cluster_task,
+)
