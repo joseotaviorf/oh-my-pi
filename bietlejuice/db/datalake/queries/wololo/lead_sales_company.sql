@@ -26,7 +26,7 @@ select
     lr.id_lead,
     sales_company,
     last_change_company_time as ts_sales_company_sent,
-    rank() over (partition by lr.id_lead order by lr.rev desc) as rnk_lead
+    row_number() over (partition by lr.id_lead order by lr.rev desc) as rnk_lead
 from lead_revision lr
      join last_change_company lcc
         on lr.id_lead = lcc.id_lead
