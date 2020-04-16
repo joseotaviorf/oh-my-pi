@@ -8,7 +8,7 @@ from bietlejuice.jobs.composer.base.db import DatabaseEnum, DatalakeMetastoreSer
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import PostgresConsumer
-from bietlejuice.jobs.composer.loaders import S3Loader
+from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_data_to_raw"
@@ -39,11 +39,13 @@ if __name__ == "__main__":
 
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
+    format_options = SparkTableStorageFormat.DEFAULT_RAW
+    database_location = db_info["db_raw_path"]
 
     metastore_service = SparkMetastoreService(spark_client)
     metastore_service.create_database(database_name)
-    loader = S3Loader(metastore_service)
-
+    loader = S3Loader()
+    spark_metastore_loader = SparkMetastoreLoader(metastore_service)
     tables = postgres_consumer.get_table_names_and_sizes().collect()
     for table in tables:
         if table.table_name not in BLACK_LIST:
@@ -52,6 +54,13 @@ if __name__ == "__main__":
                 df=df,
                 database_name=database_name,
                 table_name=table.table_name.lower(),
-                format=SparkTableStorageFormat.DEFAULT_RAW,
-                database_location=db_info["db_raw_path"],
+                format_options=format_options,
+                database_location=database_location,
+            )
+            spark_metastore_loader.save_as_table(
+                df,
+                database_name,
+                table.table_name.lower(),
+                format_options,
+                database_location,
             )

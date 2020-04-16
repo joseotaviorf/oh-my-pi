@@ -12,7 +12,7 @@ from bietlejuice.jobs.composer.consumers.api_consumers.zendesk import (
 )
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
-from bietlejuice.jobs.composer.loaders import S3Loader
+from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 from bietlejuice.jobs.composer.dags.zendesk import CHATS as CHATS_PREFIX
 
@@ -73,17 +73,23 @@ if __name__ == "__main__":
 
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
+    format_options = SparkTableStorageFormat.DEFAULT_RAW
+    database_location = db_info["db_raw_path"]
 
     spark_client = SparkClient()
     spark_metastore_service = SparkMetastoreService(spark_client)
     spark_metastore_service.create_database(database_name)
 
-    loader = S3Loader(spark_metastore_service)
-
+    loader = S3Loader()
+    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+    table_name = f"{CHATS_PREFIX}_{endpoint_name}"
     loader.load_full_table(
         df=df,
         database_name=database_name,
-        table_name=f"{CHATS_PREFIX}_{endpoint_name}",
-        format=SparkTableStorageFormat.DEFAULT_RAW,
-        database_location=db_info["db_raw_path"],
+        table_name=table_name,
+        format_options=format_options,
+        database_location=database_location,
+    )
+    spark_metastore_loader.save_as_table(
+        df, database_name, table_name, format_options, database_location
     )

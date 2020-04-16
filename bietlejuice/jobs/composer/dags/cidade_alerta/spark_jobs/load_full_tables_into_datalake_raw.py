@@ -9,7 +9,7 @@ from bietlejuice.jobs.composer.base.db import DatabaseEnum
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient, MongoClient
 from bietlejuice.jobs.composer.consumers.db_consumers import MongoConsumer
-from bietlejuice.jobs.composer.loaders import S3Loader
+from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
 from bietlejuice.jobs.composer.dags.cidade_alerta import (
@@ -47,10 +47,14 @@ if __name__ == "__main__":
     tables = mongo_consumer.get_table_names_and_sizes().collect()
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     metastore_service = SparkMetastoreService(spark_client)
-    loader = S3Loader(metastore_service)
+    loader = S3Loader()
+    spark_metastore_loader = SparkMetastoreLoader(metastore_service)
 
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
-    metastore_service.create_database(db_info["db_raw_databricks"])
+    database_name = db_info["db_raw_databricks"]
+    format_options = SparkTableStorageFormat.DEFAULT_RAW
+    database_location = db_info["db_raw_path"]
+    metastore_service.create_database(database_name)
 
     BLOCK_LIST = BLOCK_TABLES + INCREMENTAL_TABLES
 
@@ -63,9 +67,13 @@ if __name__ == "__main__":
 
             loader.load_full_table(
                 df=df,
-                database_name=db_info["db_raw_databricks"],
+                database_name=database_name,
                 table_name=table.table_name,
-                format=SparkTableStorageFormat.DEFAULT_RAW,
-                database_location=db_info["db_raw_path"],
+                format_options=format_options,
+                database_location=database_location,
                 schema_merging=True,
+            )
+
+            spark_metastore_loader.save_as_table(
+                df, database_name, table.table_name, format_options, database_location
             )

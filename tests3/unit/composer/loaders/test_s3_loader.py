@@ -1,17 +1,16 @@
 import pytest
-from pyspark.sql import DataFrameWriter
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 
 
 class TestS3Loader:
     @pytest.mark.parametrize(
-        "format, database_location, partitions, options",
+        "format_options, database_location, partitions, options",
         [
             ("csv", "path/to/file", [], {"maxRecordsPerFile": 5})
         ],
     )
     def test_load_full_table(
-        self, format, database_location, partitions, options, mocked_df, mocked_s3_loader
+        self, format_options, database_location, partitions, options, mocked_write_df, s3_loader
     ):
         # arrange
         database_name = "default"
@@ -20,32 +19,32 @@ class TestS3Loader:
         name = '{}.{}'.format(database_name, table_name)
 
         # act
-        result_df_writer = mocked_s3_loader.load_full_table(mocked_df, database_name, table_name, format, database_location, partitions, **options)
+        s3_loader.load_full_table(mocked_write_df, database_name, table_name, format_options, database_location, partitions)
 
         # then
-        assert type(result_df_writer) is DataFrameWriter
+        mocked_write_df.write.mode("overwrite").format(format).option(**options).save.assert_called_with(path=path)
 
     @pytest.mark.parametrize(
-        "database_name, table_name, format, database_location, partitions, options",
+        "database_name, table_name, format_options, database_location, partitions, options",
         [
             ("ebdb", "house", "csv", "path/to/file", [], {"maxRecordsPerFile": 5})
         ],
     )
-    def test_load_full_table_with_invalid_df(self, database_name, table_name, format, database_location, partitions, options, mocked_s3_loader):
+    def test_load_full_table_with_invalid_df(self, database_name, table_name, format_options, database_location, partitions, options, s3_loader):
         # arrange
         df = None
 
         with pytest.raises(ValueError):
-            mocked_s3_loader.load_full_table(df, database_name, table_name, format, database_location, partitions, **options)
+            s3_loader.load_full_table(df, database_name, table_name, format_options, database_location, partitions, **options)
 
     @pytest.mark.parametrize(
-        "format, database_location, partitions, options",
+        "format_options, database_location, partitions, options",
         [
             ("csv", "path/to/file", [], {"maxRecordsPerFile": 5})
         ],
     )
     def test_load_incremental_table(
-        self, format, database_location, partitions, options, mocked_df, mocked_s3_loader
+        self, format_options, database_location, partitions, options, mocked_write_df, s3_loader
     ):
         # arrange
         spark = BaseSparkContext.spark
@@ -56,20 +55,20 @@ class TestS3Loader:
         name = '{}.{}'.format(database_name, table_name)
 
         # act
-        result_df_writer = mocked_s3_loader.load_incremental_table(mocked_df, database_name, table_name, format, database_location, partitions, **options)
+        s3_loader.load_incremental_table(mocked_write_df, database_name, table_name, format_options, database_location, partitions)
 
         # then
-        assert type(result_df_writer) is DataFrameWriter
+        mocked_write_df.write.mode("overwrite").format(format).option(**options).partitionBy(*partitions).save.assert_called_with(path=path)
 
     @pytest.mark.parametrize(
-        "database_name, table_name, format, database_location, partitions, options",
+        "database_name, table_name, format_options, database_location, partitions, options",
         [
             ("ebdb", "house", "csv", "path/to/file", [], {"maxRecordsPerFile": 5})
         ],
     )
-    def test_load_incremental_table_with_invalid_df(self, database_name, table_name, format, database_location, partitions, options, mocked_s3_loader):
+    def test_load_incremental_table_with_invalid_df(self, database_name, table_name, format_options, database_location, partitions, options, s3_loader):
         # arrange
         df = None
 
         with pytest.raises(ValueError):
-            mocked_s3_loader.load_incremental_table(df, database_name, table_name, format, database_location, partitions, **options)
+            s3_loader.load_incremental_table(df, database_name, table_name, format_options, database_location, partitions, **options)

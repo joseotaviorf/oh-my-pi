@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.spark import sqlContext, SparkTableStorageFormat
-from bietlejuice.jobs.composer.loaders import S3Loader
+from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
@@ -48,7 +48,8 @@ if __name__ == "__main__":
     dataframe_service = SparkDataFrameService()
     metastore_service = SparkMetastoreService(spark_client)
 
-    loader = S3Loader(metastore_service)
+    loader = S3Loader()
+    spark_metastore_loader = SparkMetastoreLoader(metastore_service)
 
     # create df
     df = sqlContext.table(
@@ -60,21 +61,29 @@ if __name__ == "__main__":
         .optimize_partitions_by_partition_columns(partition_by)
         .output()
     )
-
     # load df
     # TODO: this method will create a table in metastore in the first execution,
     #  but this table will never be used. The best would be have a method that
     #  only writes the files, but this needs to be discussed yet. For now it's
     #  not a big deal
+    database_name = db_info["db_clean_staging_databricks"]
+    format_options = SparkTableStorageFormat.DEFAULT_CLEAN
+    database_location = db_info["db_clean_staging_path"]
+    # load df
     loader.load_incremental_table(
         df=df_partitioned,
-        database_name=db_info["db_clean_staging_databricks"],
+        database_name=database_name,
         table_name=source_table_name,
-        format_options=SparkTableStorageFormat.DEFAULT_CLEAN,
-        database_location=db_info["db_clean_staging_path"],
+        format_options=format_options,
+        database_location=database_location,
         partition_cols=partition_by,
     )
-
-    metastore_service.refresh_table(
-        db_info["db_clean_staging_databricks"], source_table_name
+    spark_metastore_loader.save_as_table(
+        df,
+        database_name,
+        source_table_name,
+        format_options,
+        database_location,
+        partition_by,
     )
+    metastore_service.refresh_table(database_name, source_table_name)

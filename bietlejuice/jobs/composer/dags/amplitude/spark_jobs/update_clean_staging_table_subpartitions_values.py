@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.spark import sqlContext, SparkTableStorageFormat
-from bietlejuice.jobs.composer.loaders import S3Loader
+from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
@@ -46,11 +46,8 @@ if __name__ == "__main__":
     db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
     spark_client = SparkClient()
     metastore_service = SparkMetastoreService(spark_client)
-    loader = S3Loader(metastore_service)
-
-    # create database if not exists
-    database_name = db_info["db_clean_staging_databricks"]
-    metastore_service.create_database(database_name)
+    loader = S3Loader()
+    spark_metastore_loader = SparkMetastoreLoader(metastore_service)
 
     # create daily unique subpartitions values table
     df = (
@@ -63,12 +60,21 @@ if __name__ == "__main__":
     )
 
     table_name = "subpartitions_values"
+    database_name = db_info["db_clean_staging_databricks"]
+    format_options = SparkTableStorageFormat.DEFAULT_CLEAN
+    database_location = db_info["db_clean_staging_path"]
+    # create database if not exists
+    metastore_service.create_database(database_name)
+
     loader.load_full_table(
         df=df,
         database_name=database_name,
         table_name=table_name,
-        format=SparkTableStorageFormat.DEFAULT_CLEAN,
-        database_location=db_info["db_clean_staging_path"],
+        format_options=format_options,
+        database_location=database_location,
     )
 
+    spark_metastore_loader.save_as_table(
+        df, database_name, table_name, format_options, database_location
+    )
     metastore_service.refresh_table(db_info["db_clean_staging_databricks"], table_name)

@@ -16,7 +16,7 @@ from bietlejuice.jobs.composer.services.metastore_services import SparkMetastore
 from bietlejuice.jobs.composer.clients.db_clients import AthenaClient
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer
-from bietlejuice.jobs.composer.loaders import S3Loader
+from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 
 DATABRICKS_SCOPE = "quintoandar"
 
@@ -76,28 +76,38 @@ if __name__ == "__main__":
     spark_metastore_service = SparkMetastoreService(SparkClient())
 
     # create database if not exists
-    spark_metastore_service.create_database(datalake_info["db_clean_databricks"])
+    database_name = datalake_info["db_clean_databricks"]
+    format_options = SparkTableStorageFormat.DEFAULT_CLEAN
+    database_location = datalake_info["db_clean_path"]
+    spark_metastore_service.create_database(database_name)
 
     # loaders
-    loader = S3Loader(spark_metastore_service)
+    loader = S3Loader()
+    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+
     loader.load_incremental_table(
         df=df,
-        database_name=datalake_info["db_clean_databricks"],
+        database_name=database_name,
         table_name=table_name,
-        format_options=SparkTableStorageFormat.DEFAULT_CLEAN,
-        database_location=datalake_info["db_clean_path"],
+        format_options=format_options,
+        database_location=database_location,
         partition_cols=partitions_cols,
+    )
+    spark_metastore_loader.save_as_table(
+        df,
+        database_name,
+        table_name,
+        format_options,
+        database_location,
+        partitions_cols,
         schema_merging=True,
     )
-
     # create partition into spark table
     spark_metastore_service.create_new_partitions_from_df(
-        database_name=datalake_info["db_clean_databricks"],
+        database_name=database_name,
         table_name=table_name,
         df=df,
         partition_cols=partitions_cols,
     )
 
-    spark_metastore_service.refresh_table(
-        datalake_info["db_clean_databricks"], table_name
-    )
+    spark_metastore_service.refresh_table(database_name, table_name)

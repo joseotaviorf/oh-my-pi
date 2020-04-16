@@ -10,7 +10,7 @@ from bietlejuice.jobs.composer.base.spark import BaseDBUtils, SparkTableStorageF
 from bietlejuice.jobs.composer.base.db import DatabaseEnum, DatalakeMetastoreService
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import FirestoreConsumer
-from bietlejuice.jobs.composer.loaders import S3Loader
+from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.base.spark.spark_dataframe_service import (
     SparkDataFrameService,
 )
@@ -56,7 +56,8 @@ if __name__ == "__main__":
     # Sets S3 Loader
     spark_client = SparkClient()
     spark_metastore_service = SparkMetastoreService(spark_client)
-    loader = S3Loader(spark_metastore_service)
+    loader = S3Loader()
+    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
     # Creates query filter
     start_date = datetime.strptime(execution_date, "%Y-%m-%d")
@@ -95,18 +96,28 @@ if __name__ == "__main__":
     # Loads data into S3 incrementally
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
+    format_options = SparkTableStorageFormat.DEFAULT_RAW
+    database_location = db_info["db_raw_path"]
     spark_metastore_service.create_database(database_name)
 
     loader.load_incremental_table(
         df=df,
         database_name=database_name,
         table_name=table_name,
-        format_options=SparkTableStorageFormat.DEFAULT_RAW,
-        database_location=db_info["db_raw_path"],
+        format_options=format_options,
+        database_location=database_location,
         partition_cols=partition_cols,
-        schema_merging=True,
     )
 
+    spark_metastore_loader.save_as_table(
+        df,
+        database_name,
+        table_name,
+        format_options,
+        database_location,
+        partition_cols,
+        schema_merging=True,
+    )
     spark_metastore_service.create_new_partitions_from_df(
         database_name=database_name,
         table_name=table_name,

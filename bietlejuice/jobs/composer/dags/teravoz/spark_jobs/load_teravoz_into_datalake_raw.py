@@ -17,7 +17,7 @@ from bietlejuice.jobs.composer.consumers.api_consumers.teravoz import (
     TeravozFactoryConsumer,
 )
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
-from bietlejuice.jobs.composer.loaders import S3Loader
+from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 
 
 DATABRICKS_SCOPE = "quintoandar"
@@ -97,26 +97,35 @@ if __name__ == "__main__":
     df = SparkDataFrameService(df).create_columns_from_dict(partitions).output()
 
     # create database if not exists
-    spark_metastore_service.create_database(datalake_info["db_raw_databricks"])
+    database_name = datalake_info["db_raw_databricks"]
+    format_options = SparkTableStorageFormat.DEFAULT_RAW
+    database_location = datalake_info["db_raw_path"]
+    spark_metastore_service.create_database(database_name)
 
     # loaders
-    loader = S3Loader(spark_metastore_service)
+    loader = S3Loader()
+    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
     loader.load_incremental_table(
         df=df,
-        database_name=datalake_info["db_raw_databricks"],
+        database_name=database_name,
         table_name=table_name,
-        format_options=SparkTableStorageFormat.DEFAULT_RAW,
-        database_location=datalake_info["db_raw_path"],
+        format_options=format_options,
+        database_location=database_location,
         partition_cols=partitions_cols,
+    )
+    spark_metastore_loader.save_as_table(
+        df,
+        database_name,
+        table_name,
+        format_options,
+        database_location,
+        partitions_cols,
         schema_merging=True,
     )
-
     spark_metastore_service.create_new_partitions_from_df(
-        database_name=datalake_info["db_raw_databricks"],
+        database_name=database_name,
         table_name=table_name,
         df=df,
         partition_cols=partitions_cols,
     )
-    spark_metastore_service.refresh_table(
-        datalake_info["db_raw_databricks"], table_name
-    )
+    spark_metastore_service.refresh_table(database_name, table_name)

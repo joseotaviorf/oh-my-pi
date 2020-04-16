@@ -8,7 +8,7 @@ from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
 from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer
-from bietlejuice.jobs.composer.loaders import S3Loader
+from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.services.file_service import FileService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
@@ -48,13 +48,21 @@ if __name__ == "__main__":
 
     dw_db_info = DWMetastoreService.get_dw_info(env, dw_schema, dw_bucket)
     metastore_service = SparkMetastoreService(spark_client)
-    metastore_service.create_database(dw_db_info["dw_schema_databricks"])
+    database_name = dw_db_info["dw_schema_databricks"]
+    format_options = SparkTableStorageFormat.DEFAULT_DW
+    database_location = dw_db_info["dw_schema_path"]
+    metastore_service.create_database(database_name)
 
-    loader = S3Loader(metastore_service)
+    loader = S3Loader()
+    spark_metastore_loader = SparkMetastoreLoader(metastore_service)
     loader.load_full_table(
         df=dm_table_df,
-        database_name=dw_db_info["dw_schema_databricks"],
+        database_name=database_name,
         table_name=table,
-        format=SparkTableStorageFormat.DEFAULT_DW,
-        database_location=dw_db_info["dw_schema_path"],
+        format_options=format_options,
+        database_location=database_location,
+    )
+
+    spark_metastore_loader.save_as_table(
+        dm_table_df, database_name, table, format_options, database_location
     )

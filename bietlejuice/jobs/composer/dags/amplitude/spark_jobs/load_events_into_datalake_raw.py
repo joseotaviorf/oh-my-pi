@@ -14,7 +14,7 @@ from bietlejuice.jobs.composer.base.spark import (
 from bietlejuice.jobs.composer.clients.api_clients import AmplitudeClient
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
-from bietlejuice.jobs.composer.loaders import S3Loader
+from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
@@ -51,7 +51,8 @@ if __name__ == "__main__":
     amplitude_events = AmplitudeEvents(spark_client)
     dataframe_service = SparkDataFrameService()
     metastore_service = SparkMetastoreService(spark_client)
-    s3_loader = S3Loader(metastore_service)
+    s3_loader = S3Loader()
+    spark_metastore_loader = SparkMetastoreLoader(metastore_service)
     database_name = db_info["db_raw_databricks"]
     table_name = "events"
     partition_cols = ["year", "month", "day", "app"]
@@ -70,16 +71,26 @@ if __name__ == "__main__":
         amplitude_export_api = AmplitudeClient(key["app_key"], key["secret_key"])
         logger.info("m=load_events_into_datalake_raw, get_files_from_extract_api")
         file_from_api = amplitude_export_api.get_event_data_files(start, end)
-
         if file_from_api:
             df = amplitude_events.create_raw_events_df(file_from_api, dataframe_service)
+            format_options = SparkTableStorageFormat.DEFAULT_RAW
+            database_location = db_info["db_raw_path"]
             s3_loader.load_incremental_table(
                 df=df,
-                database_name=db_info["db_raw_databricks"],
+                database_name=database_name,
                 table_name=table_name,
-                format_options=SparkTableStorageFormat.DEFAULT_RAW,
-                database_location=db_info["db_raw_path"],
+                format_options=format_options,
+                database_location=database_location,
                 partition_cols=partition_cols,
+            )
+
+            spark_metastore_loader.save_as_table(
+                df,
+                database_name,
+                table_name,
+                format_options,
+                database_location,
+                partition_cols,
                 schema_merging=True,
             )
             metastore_service.create_new_partitions_from_df(
