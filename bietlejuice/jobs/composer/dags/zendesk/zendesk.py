@@ -376,13 +376,16 @@ create_cluster_task >> [
 create_sub_dag_task_chats_d1_task >> create_sub_dag_task_chats_d2_to_d7_task >> [
     create_sub_dag_task_chat_engagements_task,
     dw_full_tables_sub_dag["dim_chat"],
+    dw_full_tables_sub_dag["fact_chats"],
 ]
 create_sub_dag_task_departments_task >> [
     dw_full_tables_sub_dag["dim_chat_department"],
     dw_full_tables_sub_dag["dim_chat_engagement"],
+    dw_full_tables_sub_dag["fact_chats"],
 ]
 create_sub_dag_task_chat_engagements_task >> [
     dw_full_tables_sub_dag["dim_chat_engagement"],
     dw_full_tables_sub_dag["fact_chat_engagements"],
+    dw_full_tables_sub_dag["fact_chats"],
 ]
 list(dw_full_tables_sub_dag.values()) >> terminate_cluster_task
