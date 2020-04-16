@@ -10,7 +10,7 @@ from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
-from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders import S3Loader
 from bietlejuice.jobs.composer.base.spark import (
     SparkTableStorageFormat,
     SparkDataFrameService,
@@ -66,8 +66,8 @@ if __name__ == "__main__":
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
     spark_metastore_service.create_database(db_info["db_clean_databricks"])
 
-    loader = S3Loader()
-    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+    loader = S3Loader(SparkMetastoreService(spark_client))
+
     if df is None:
         logger.warning("m=__main__, msg=no incremental data to process here")
         sys.exit()
@@ -79,32 +79,22 @@ if __name__ == "__main__":
         .create_columns_from_dict(partitions)
         .output()
     )
-    database_name = db_info["db_clean_databricks"]
-    format_options = SparkTableStorageFormat.DEFAULT_CLEAN
-    database_location = db_info["db_clean_path"]
+
     loader.load_incremental_table(
         df=df,
-        database_name=database_name,
+        database_name=db_info["db_clean_databricks"],
         table_name=table_name,
-        format_options=format_options,
-        database_location=database_location,
+        format_options=SparkTableStorageFormat.DEFAULT_CLEAN,
+        database_location=db_info["db_clean_path"],
         partition_cols=partition_cols,
-    )
-
-    spark_metastore_loader.save_as_table(
-        df,
-        database_name,
-        table_name,
-        format_options,
-        database_location,
-        partition_cols,
         schema_merging=True,
     )
+
     spark_metastore_service.create_new_partitions_from_df(
-        database_name=database_name,
+        database_name=db_info["db_clean_databricks"],
         table_name=table_name,
         df=df,
         partition_cols=partition_cols,
     )
 
-    spark_metastore_service.refresh_table(database_name, table_name)
+    spark_metastore_service.refresh_table(db_info["db_clean_databricks"], table_name)

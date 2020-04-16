@@ -11,7 +11,7 @@ from bietlejuice.jobs.composer.base.db import DatabaseEnum, DatalakeMetastoreSer
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import MySqlConsumer
-from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders import S3Loader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_ebdb_into_datalake"
@@ -48,25 +48,18 @@ def load_relation_into_datalake(args):
     """
     Loads tables and views into datalake
     """
-    loader, spark_metastore_loader, consumer, rel, db_info = args
+    loader, consumer, rel, db_info = args
     num_partitions = int(math.ceil(float(rel.size) / PARTITION_SIZE))
     if num_partitions > 1:
         df = consumer.get_data_from_table_in_parallel(rel.name, num_partitions)
     else:
         df = consumer.get_data_from_table(rel.name)
-    database_name = db_info["db_raw_databricks"]
-    format_options = SparkTableStorageFormat.DEFAULT_RAW
-    database_location = db_info["db_raw_path"]
     loader.load_full_table(
         df=df,
-        database_name=database_name,
+        database_name=db_info["db_raw_databricks"],
         table_name=rel.name.lower(),
-        format_options=format_options,
-        database_location=database_location,
-    )
-
-    spark_metastore_loader.save_as_table(
-        df, database_name, rel.name.lower(), format_options, database_location
+        format=SparkTableStorageFormat.DEFAULT_RAW,
+        database_location=db_info["db_raw_path"],
     )
     logger.info(
         "m=load_relation_into_datalake, relation={}, msg=Finished loading "
@@ -102,8 +95,7 @@ if __name__ == "__main__":
 
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     metastore_service = SparkMetastoreService(SparkClient())
-    loader = S3Loader()
-    spark_metastore_loader = SparkMetastoreLoader(metastore_service)
+    loader = S3Loader(metastore_service)
 
     # create database if not exists
     metastore_service.create_database(db_info["db_raw_databricks"])
@@ -111,8 +103,5 @@ if __name__ == "__main__":
     with Pool(NB_THREADS) as p:
         p.map(
             load_relation_into_datalake,
-            [
-                (loader, spark_metastore_loader, mysql_consumer, rel, db_info)
-                for rel in rels
-            ],
+            [(loader, mysql_consumer, rel, db_info) for rel in rels],
         )

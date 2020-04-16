@@ -3,54 +3,47 @@ import pytest
 
 class TestSparkMetastoreLoader:
     @pytest.mark.parametrize(
-        "format_options, mode, database_name, table_name, database_location",
+        "format, mode, option",
         [
-            ("parquet", "append", "", "test", "local/path"),
-            ("csv", "overwrite", "house", "real", "s3://path"),
+            ("csv", "overwrite", ("maxRecordsPerFile", 5))
         ],
     )
     def test_save_as_table(
-        self, format_options, mode, database_name, table_name, database_location, mocked_write_df, metastore_loader
+        self, format, mode, option, mocked_spark_df_writer, mocked_metastore_loader
     ):
-        # given
-        s3_path = database_location + table_name
-        name = "{}.{}".format(database_name, table_name)
-        partitions = []
-
-        # when
-        metastore_loader.save_as_table(
-            df=mocked_write_df,
-            database_name=database_name,
-            table_name=table_name,
-            format_options=format_options,
-            database_location=database_location
-        )
-
-        # then
-        mocked_write_df.write.mode("ignore").format(format_options).option("path", s3_path).saveAsTable.assert_called_with(name)
-
-    @pytest.mark.parametrize(
-        "database_name, table_name, format_options, database_location", [(None, "table", None, None), ("database", None, None, None), ("database", 123, None, None)],
-    )
-    def test_save_as_table_invalid_params(self, database_name, table_name, format_options, database_location, mocked_write_df, metastore_loader):
-        # act and assert
-        with pytest.raises(ValueError):
-            metastore_loader.save_as_table(mocked_write_df, database_name, table_name, format_options, database_location)
-
-    def test_save_as_table_with_invalid_df(self, metastore_loader):
         # arrange
         database_name = "default"
         table_name = "test_table"
-        format_options = "overwrite"
-        database_location = "path/to/file"
+        name = '{}.{}'.format(database_name, table_name)
 
+        # when
+        mocked_df_writer = mocked_spark_df_writer.write.mode(mode).format(format).option(option[0], option[1])
+        mocked_metastore_loader.save_as_table(
+            df=mocked_df_writer,
+            database_name=database_name,
+            table_name=table_name
+        )
+
+        # then
+        mocked_df_writer.saveAsTable.assert_called_with(name)
+
+    @pytest.mark.parametrize(
+        "database_name, table_name", [(None, "table"), ("database", None), ("database", 123)],
+    )
+    def test_save_as_table_invalid_params(self, database_name, table_name, mocked_df, mocked_metastore_loader):
+        # act and assert
+        with pytest.raises(ValueError):
+            mocked_metastore_loader.save_as_table(mocked_df, database_name, table_name)
+
+    def test_save_as_table_with_invalid_df(self, mocked_metastore_loader):
+        # arrange
+        database_name = "default"
+        table_name = "test_table"
         df = None
 
         with pytest.raises(ValueError):
-            metastore_loader.save_as_table(
+            mocked_metastore_loader.save_as_table(
                 df=df,
                 database_name=database_name,
                 table_name=table_name,
-                format_options=format_options,
-                database_location=database_location
             )

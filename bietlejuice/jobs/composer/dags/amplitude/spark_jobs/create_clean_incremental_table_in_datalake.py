@@ -9,7 +9,7 @@ from bietlejuice.jobs.composer.base.db import QUERIES_DATALAKE_PATH
 from bietlejuice.jobs.composer.services import FileService
 from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
-from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders import S3Loader
 from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
@@ -47,8 +47,7 @@ if __name__ == "__main__":
     db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
     spark_client = SparkClient()
     metastore_service = SparkMetastoreService(spark_client)
-    s3_loader = S3Loader()
-    spark_metastore_loader = SparkMetastoreLoader(metastore_service)
+    s3_loader = S3Loader(metastore_service)
 
     query_path = QUERIES_DATALAKE_PATH + source + "/{}.sql".format(table_name)
     query = FileService.get_query_from_file_name(query_path).format(
@@ -60,21 +59,14 @@ if __name__ == "__main__":
     df = spark_client.get_records(query)
     df = SparkDataFrameService(df).optimize_partition(250000).output()
 
-    database_name = db_info["db_clean_databricks"]
-    format_options = SparkTableStorageFormat.DEFAULT_CLEAN
-    database_location = db_info["db_clean_path"]
     # load df
     s3_loader.load_incremental_table(
         df=df,
-        database_name=database_name,
+        database_name=db_info["db_clean_databricks"],
         table_name=table_name,
-        format_options=format_options,
-        database_location=database_location,
+        format_options=SparkTableStorageFormat.DEFAULT_CLEAN,
+        database_location=db_info["db_clean_path"],
         partition_cols=partition_cols,
-    )
-
-    spark_metastore_loader.save_as_table(
-        df, database_name, table_name, format_options, database_location, partition_cols
     )
 
     # add new partition

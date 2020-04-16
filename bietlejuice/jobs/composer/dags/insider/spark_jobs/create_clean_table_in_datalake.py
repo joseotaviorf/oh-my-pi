@@ -6,7 +6,7 @@ from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
-from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders import S3Loader
 from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat
 from bietlejuice.jobs.composer.dags.insider import SOURCE, QUERIES_INSIDER_DATALAKE_PATH
 from bietlejuice.jobs.composer.services import FileService
@@ -50,21 +50,14 @@ if __name__ == "__main__":
     spark_metastore_service = SparkMetastoreService(spark_client)
 
     # create database if not exists
-    database_name = db_info["db_clean_databricks"]
-    format_options = SparkTableStorageFormat.DEFAULT_CLEAN
-    database_location = db_info["db_clean_path"]
-    spark_metastore_service.create_database(database_name)
+    spark_metastore_service.create_database(db_info["db_clean_databricks"])
 
     # load full data file in s3 and map into Spark Metastore
-    loader = S3Loader()
-    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+    loader = S3Loader(SparkMetastoreService(spark_client))
     loader.load_full_table(
         df=df,
-        database_name=database_name,
-        table_name=table_name,
-        format_options=format_options,
-        database_location=database_location,
-    )
-    spark_metastore_loader.save_as_table(
-        df, database_name, table_name, format_options, database_location
+        database_name=db_info["db_clean_databricks"],
+        table_name=f"{table_name}",
+        format=SparkTableStorageFormat.DEFAULT_CLEAN,
+        database_location=db_info["db_clean_path"],
     )

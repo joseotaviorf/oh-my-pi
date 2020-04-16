@@ -9,7 +9,7 @@ from bietlejuice.jobs.composer.base.db import DatabaseEnum, DatalakeMetastoreSer
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import PostgresConsumer
-from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders import S3Loader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_sauron_into_datalake"
@@ -39,29 +39,18 @@ if __name__ == "__main__":
     tables = postgres_consumer.get_table_names_and_sizes().collect()
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     metastore_service = SparkMetastoreService(spark_client)
-    loader = S3Loader()
-    spark_metastore_loader = SparkMetastoreLoader(metastore_service)
+    loader = S3Loader(metastore_service)
 
     for table in tables:
         table_name = table.table_name.lower()
         if not table_name.startswith(RESTRICTED_NAMES) and not bool(
             re.search(r"(\d+)$", table_name)
         ):
-            database_name = db_info["db_raw_databricks"]
-            format_options = SparkTableStorageFormat.DEFAULT_RAW
-            database_location = db_info["db_raw_path"]
             df = postgres_consumer.get_data_from_table(table.table_name)
             loader.load_full_table(
                 df=df,
-                database_name=database_name,
+                database_name=db_info["db_raw_databricks"],
                 table_name=table.table_name.lower(),
-                format_options=format_options,
-                database_location=database_location,
-            )
-            spark_metastore_loader.save_as_table(
-                df,
-                database_name,
-                table.table_name.lower(),
-                format_options,
-                database_location,
+                format=SparkTableStorageFormat.DEFAULT_RAW,
+                database_location=db_info["db_raw_path"],
             )

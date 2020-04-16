@@ -13,7 +13,7 @@ from bietlejuice.jobs.composer.dags.bigfone_event import (
     QUERIES_BIGFONE_EVENT_DATALAKE_PATH,
 )
 from bietlejuice.jobs.composer.dags.bigfone_event.spark_jobs import SOURCE
-from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders import S3Loader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_event_table_into_datalake_clean"
@@ -71,31 +71,20 @@ if __name__ == "__main__":
 
     # create database if not exists
     database_name = datalake_info["db_clean_databricks"]
-    format_options = SparkTableStorageFormat.DEFAULT_CLEAN
-    database_location = datalake_info["db_clean_path"]
     metastore_service.create_database(database_name)
 
     # loaders
-    s3_loader = S3Loader()
-    spark_metastore_loader = SparkMetastoreLoader(metastore_service)
+    s3_loader = S3Loader(metastore_service)
     s3_loader.load_incremental_table(
         df=event_table_data,
-        database_name=database_name,
+        database_name=datalake_info["db_clean_databricks"],
         table_name=table_name,
-        format_options=format_options,
-        database_location=database_location,
+        format_options=SparkTableStorageFormat.DEFAULT_CLEAN,
+        database_location=datalake_info["db_clean_path"],
         partition_cols=partition_cols,
-    )
-
-    spark_metastore_loader.save_as_table(
-        event_table_data,
-        database_name,
-        table_name,
-        format_options,
-        database_location,
-        partition_cols,
         schema_merging=True,
     )
+
     # create partition into spark table
     metastore_service.create_new_partitions_from_df(
         database_name=database_name,

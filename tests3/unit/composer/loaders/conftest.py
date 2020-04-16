@@ -7,20 +7,24 @@ from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 
 
 @pytest.fixture()
-def mocked_write_df():
+def mocked_spark_df_writer():
     mock = Mock()
-    mock.dataframe = mock
-    mock.write = mock
     return mock
 
 
 @pytest.fixture()
-def metastore_loader():
+def mocked_df():
     spark_client = SparkClient()
-    metastore_service = SparkMetastoreService(spark_client)
-    return SparkMetastoreLoader(metastore_service)
+    return spark_client.create_dataframe([{"col1": "value", "col2": 123}])
 
 
 @pytest.fixture()
-def s3_loader():
-    return S3Loader()
+def mocked_metastore_loader():
+    return SparkMetastoreLoader
+
+
+@pytest.fixture()
+def mocked_s3_loader():
+    spark_client = SparkClient()
+    metastore_service = SparkMetastoreService(spark_client)
+    return S3Loader(metastore_service=SparkMetastoreService(spark_client))
