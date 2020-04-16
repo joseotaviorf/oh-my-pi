@@ -177,22 +177,6 @@ where dc.status = 'Finalizado'
       and coalesce(ts_analyst_annulment_input,dc.dt_annulment) < current_date
 group by 1, 2, 3, 4, 5
 ),
-bookers as (
-select
-    dd.date as booking_created_date,
-    fhl.sk_partner,
-    rf.sk_region,
-    count(distinct rf.sk_client) as bookers_daily
-from fact_listing_rent_flows rf
-inner join dim_date dd
-  on rf.sk_booking_created_date = dd.sk_date
-left join dim_house_listing dhl
-  on dhl.sk_house_listing = rf.sk_house_listing
-left join fact_house_listings fhl
-  on fhl.sk_house_listing = dhl.sk_house_listing
-where dhl.is_b2b = True
-group by 1, 2, 3
-),
 new_bookers as (
 	with
 	first_booking as (
@@ -280,9 +264,9 @@ group by 1, 2, 3
 daily_metrics as (
 select
 	distinct
-	coalesce(ocont.date,orent.date,nrent.rental_date,ncont.contract_signed_date,nfl.first_listing_date,er.date_date, erc.date_date, rr.rental_date, olist.date, bk.booking_created_date, nbk.first_booking_created_date) as date_date,
-	coalesce(ocont.sk_partner,orent.sk_partner,nrent.sk_partner,ncont.sk_partner,nfl.sk_partner, er.sk_partner,erc.sk_partner,rr.sk_partner, olist.sk_partner, bk.sk_partner, nbk.sk_partner) as sk_partner,
-	coalesce(ocont.sk_region,orent.sk_region,nrent.sk_region,ncont.sk_region,nfl.sk_region,er.sk_region, erc.sk_region, rr.sk_region, olist.sk_region, bk.sk_region, nbk.sk_region) as sk_region,
+	coalesce(ocont.date,orent.date,nrent.rental_date,ncont.contract_signed_date,nfl.first_listing_date,er.date_date, erc.date_date, rr.rental_date, olist.date, nbk.first_booking_created_date) as date_date,
+	coalesce(ocont.sk_partner,orent.sk_partner,nrent.sk_partner,ncont.sk_partner,nfl.sk_partner, er.sk_partner,erc.sk_partner,rr.sk_partner, olist.sk_partner, nbk.sk_partner) as sk_partner,
+	coalesce(ocont.sk_region,orent.sk_region,nrent.sk_region,ncont.sk_region,nfl.sk_region,er.sk_region, erc.sk_region, rr.sk_region, olist.sk_region, nbk.sk_region) as sk_region,
 	ocont.ongoing_contracts_daily,
 	orent.ongoing_rentals_daily,
 	nrent.new_rentals_daily,
@@ -292,7 +276,6 @@ select
 	er.ended_rentals_daily,
 	erc.ended_rentals_confirmed_daily,
 	olist.ongoing_listings_daily,
-	bk.bookers_daily,
 	nbk.new_bookers_daily
 from ongoing_contracts_daily ocont
 full outer join ongoing_rentals_daily orent
@@ -311,10 +294,28 @@ full outer join ended_rentals_confirmed erc
   on ocont.date = erc.date_date and ocont.sk_region = erc.sk_region and ocont.sk_partner = erc.sk_partner
 full outer join ongoing_listings_daily olist
   on ocont.date = olist.date and ocont.sk_region = olist.sk_region and ocont.sk_partner = olist.sk_partner
-full outer join bookers bk
-  on ocont.date = bk.booking_created_date and ocont.sk_region = bk.sk_region and ocont.sk_partner = bk.sk_partner
 full outer join new_bookers nbk
   on ocont.date = nbk.first_booking_created_date and ocont.sk_region = nbk.sk_region and ocont.sk_partner = nbk.sk_partner
+),
+bookers as (
+select
+    dd.date as booking_created_date,
+    fhl.sk_partner,
+    dr.regional,
+	dr.city_group,
+	dr.city_name,
+    count(distinct rf.sk_client) as bookers_daily
+from fact_listing_rent_flows rf
+inner join dim_date dd
+  on rf.sk_booking_created_date = dd.sk_date
+left join dim_house_listing dhl
+  on dhl.sk_house_listing = rf.sk_house_listing
+left join fact_house_listings fhl
+  on fhl.sk_house_listing = dhl.sk_house_listing
+left join dim_region dr
+  on dr.sk_region = rf.sk_region
+where dhl.is_b2b = True
+group by 1, 2, 3, 4, 5
 )
 select
 	dm.date_date,
@@ -331,9 +332,11 @@ select
 	sum(dm.ended_rentals_daily) as ended_rentals,
 	sum(dm.ended_rentals_confirmed_daily) as ended_rentals_confirmed_daily,
 	sum(dm.ongoing_listings_daily) as ongoing_listings_daily,
-	sum(dm.bookers_daily) as bookers_daily,
+	sum(b.bookers_daily) as bookers_daily,
 	sum(dm.new_bookers_daily) as new_bookers_daily
 from daily_metrics dm
 left join dim_region dr
   using(sk_region)
+left join bookers b
+  on b.booking_created_date = dm.date_date and b.sk_partner = dm.sk_partner and b.city_name = dr.city_name
 group by 1, 2, 3, 4, 5;

@@ -135,22 +135,6 @@ where dc.status = 'Finalizado'
       and dhl.is_b2b = True
 group by 1, 2, 3
 ),
-bookers as (
-select
-    date_trunc('month',dd.date) as booking_created_month,
-    fhl.sk_partner,
-    rf.sk_region,
-    count(distinct rf.sk_client) as bookers_monthly
-from fact_listing_rent_flows rf
-left join dim_date dd
-  on rf.sk_booking_created_date = dd.sk_date
-left join dim_house_listing dhl
-  on dhl.sk_house_listing = rf.sk_house_listing
-left join fact_house_listings fhl
-  on fhl.sk_house_listing = dhl.sk_house_listing
-where dhl.is_b2b = True
-group by 1, 2, 3
-),
 ended_rentals_confirmed as (
 select
 	date_trunc('month',coalesce(dc.ts_analyst_annulment_input,dc.dt_annulment)) as month_date,
@@ -251,9 +235,9 @@ group by 1, 2, 3
 ),
 monthly_metrics as (
 select
-	distinct coalesce(ocont.month_start,orent.month_start,nrent.rental_month_start,ncont.contract_month_start,nfl.first_listing_month_start,er.month_date,erc.month_date,rr.rental_month_start,olist.month_start,bk.booking_created_month,nbk.first_booking_created_month) as month_date,
-	coalesce(ocont.sk_region,orent.sk_region,nrent.sk_region,ncont.sk_region,nfl.sk_region, er.sk_region,erc.sk_region,rr.sk_region, olist.sk_region, bk.sk_region, nbk.sk_region) as sk_region,
-	coalesce(ocont.sk_partner,orent.sk_partner,nrent.sk_partner,ncont.sk_partner,nfl.sk_partner, er.sk_partner,erc.sk_partner,rr.sk_partner, olist.sk_partner, bk.sk_partner, nbk.sk_partner) as sk_partner,
+	distinct coalesce(ocont.month_start,orent.month_start,nrent.rental_month_start,ncont.contract_month_start,nfl.first_listing_month_start,er.month_date,erc.month_date,rr.rental_month_start,olist.month_start,nbk.first_booking_created_month) as month_date,
+	coalesce(ocont.sk_region,orent.sk_region,nrent.sk_region,ncont.sk_region,nfl.sk_region, er.sk_region,erc.sk_region,rr.sk_region, olist.sk_region, nbk.sk_region) as sk_region,
+	coalesce(ocont.sk_partner,orent.sk_partner,nrent.sk_partner,ncont.sk_partner,nfl.sk_partner, er.sk_partner,erc.sk_partner,rr.sk_partner, olist.sk_partner, nbk.sk_partner) as sk_partner,
 	ocont.ongoing_contracts_monthly,
 	orent.ongoing_rentals_monthly,
 	nrent.new_rentals_monthly,
@@ -263,7 +247,6 @@ select
 	er.ended_rentals_monthly,
 	erc.ended_rentals_confirmed_monthly,
 	olist.ongoing_listings_monthly,
-	bk.bookers_monthly,
 	nbk.new_bookers_monthly
 from ongoing_contracts_monthly ocont
 full outer join ongoing_rentals_monthly orent
@@ -282,13 +265,31 @@ full outer join ended_rentals_confirmed erc
   on ocont.month_start = erc.month_date and ocont.sk_region = erc.sk_region and ocont.sk_partner = erc.sk_partner
 full outer join ongoing_listings_monthly olist
   on ocont.month_start = olist.month_start and ocont.sk_region = olist.sk_region and ocont.sk_partner = olist.sk_partner
-full outer join bookers bk
-  on ocont.month_start = bk.booking_created_month and ocont.sk_region = bk.sk_region and ocont.sk_partner = bk.sk_partner
 full outer join new_bookers nbk
   on ocont.month_start = nbk.first_booking_created_month and ocont.sk_region = nbk.sk_region and ocont.sk_partner = nbk.sk_partner
+),
+bookers as (
+select
+    date_trunc('month',dd.date) as booking_created_month,
+    fhl.sk_partner,
+    dr.regional,
+	dr.city_group,
+	dr.city_name,
+    count(distinct rf.sk_client) as bookers_monthly
+from fact_listing_rent_flows rf
+left join dim_date dd
+  on rf.sk_booking_created_date = dd.sk_date
+left join dim_house_listing dhl
+  on dhl.sk_house_listing = rf.sk_house_listing
+left join fact_house_listings fhl
+  on fhl.sk_house_listing = dhl.sk_house_listing
+left join dim_region dr
+  on dr.sk_region = rf.sk_region
+where dhl.is_b2b = True
+group by 1, 2, 3, 4, 5
 )
 select
-	dm.month_date,
+	date(dm.month_date) as month_date,
 	dm.sk_partner,
 	dr.regional,
 	dr.city_group,
@@ -302,9 +303,11 @@ select
 	sum(dm.ended_rentals_monthly) as ended_rentals_monthly,
 	sum(dm.ended_rentals_confirmed_monthly) as ended_rentals_confirmed_monthly,
 	sum(dm.ongoing_listings_monthly) as ongoing_listings_monthly,
-	sum(dm.bookers_monthly) as bookers_monthly,
+	sum(b.bookers_monthly) as bookers_monthly,
 	sum(dm.new_bookers_monthly) as new_bookers_monthly
 from monthly_metrics dm
 left join dim_region dr
   using(sk_region)
+left join bookers b
+  on b.booking_created_month = dm.month_date and b.city_name = dr.city_name
 group by 1, 2, 3, 4, 5;

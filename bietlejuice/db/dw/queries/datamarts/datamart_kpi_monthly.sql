@@ -106,16 +106,6 @@ where dc.status = 'Finalizado'
       and dc.dt_annulment < current_date
 group by 1, 2
 ),
-bookers as (
-select
-    date_trunc('month',dd.date) as booking_created_month,
-    rf.sk_region,
-    count(distinct rf.sk_client) as bookers_monthly
-from fact_listing_rent_flows rf
-left join dim_date dd
-  on rf.sk_booking_created_date = dd.sk_date
-group by 1, 2
-),
 ended_rentals_confirmed as (
 select
 	date_trunc('month',coalesce(dc.ts_analyst_annulment_input,dc.dt_annulment)) as month_date,
@@ -201,8 +191,8 @@ group by 1, 2
 ),
 monthly_metrics as (
 select
-	distinct coalesce(ocont.month_start,orent.month_start,nrent.rental_month_start,ncont.contract_month_start,nfl.first_listing_month_start,er.month_date,erc.month_date,rr.rental_month_start,olist.month_start,bk.booking_created_month,nbk.first_booking_created_month) as month_date,
-	coalesce(ocont.sk_region,orent.sk_region,nrent.sk_region,ncont.sk_region,nfl.sk_region, er.sk_region,erc.sk_region,rr.sk_region, olist.sk_region, bk.sk_region, nbk.sk_region) as sk_region,
+	distinct coalesce(ocont.month_start,orent.month_start,nrent.rental_month_start,ncont.contract_month_start,nfl.first_listing_month_start,er.month_date,erc.month_date,rr.rental_month_start,olist.month_start,nbk.first_booking_created_month) as month_date,
+	coalesce(ocont.sk_region,orent.sk_region,nrent.sk_region,ncont.sk_region,nfl.sk_region, er.sk_region,erc.sk_region,rr.sk_region, olist.sk_region, nbk.sk_region) as sk_region,
 	ocont.ongoing_contracts_monthly,
 	orent.ongoing_rentals_monthly,
 	nrent.new_rentals_monthly,
@@ -212,7 +202,6 @@ select
 	er.ended_rentals_monthly,
 	erc.ended_rentals_confirmed_monthly,
 	olist.ongoing_listings_monthly,
-	bk.bookers_monthly,
 	nbk.new_bookers_monthly
 from ongoing_contracts_monthly ocont
 full outer join ongoing_rentals_monthly orent
@@ -231,13 +220,25 @@ full outer join ended_rentals_confirmed erc
   on ocont.month_start = erc.month_date and ocont.sk_region = erc.sk_region
 full outer join ongoing_listings_monthly olist
   on ocont.month_start = olist.month_start and ocont.sk_region = olist.sk_region
-full outer join bookers bk
-  on ocont.month_start = bk.booking_created_month and ocont.sk_region = bk.sk_region
 full outer join new_bookers nbk
   on ocont.month_start = nbk.first_booking_created_month and ocont.sk_region = nbk.sk_region
+),
+bookers as (
+select
+    date_trunc('month',dd.date) as booking_created_month,
+    dr.regional,
+	dr.city_group,
+	dr.city_name,
+    count(distinct rf.sk_client) as bookers_monthly
+from fact_listing_rent_flows rf
+left join dim_date dd
+  on rf.sk_booking_created_date = dd.sk_date
+left join dim_region dr
+  on dr.sk_region = rf.sk_region
+group by 1, 2, 3, 4
 )
 select
-	dm.month_date,
+	date(dm.month_date) as month_date,
 	dr.regional,
 	dr.city_group,
 	dr.city_name,
@@ -250,9 +251,11 @@ select
 	sum(dm.ended_rentals_monthly) as ended_rentals_monthly,
 	sum(dm.ended_rentals_confirmed_monthly) as ended_rentals_confirmed_monthly,
 	sum(dm.ongoing_listings_monthly) as ongoing_listings_monthly,
-	sum(dm.bookers_monthly) as bookers_monthly,
+	sum(b.bookers_monthly) as bookers_monthly,
 	sum(dm.new_bookers_monthly) as new_bookers_monthly
 from monthly_metrics dm
 left join dim_region dr
   using(sk_region)
+left join bookers b
+  on b.booking_created_month = dm.month_date and dr.city_name = b.city_name
 group by 1, 2, 3, 4;
