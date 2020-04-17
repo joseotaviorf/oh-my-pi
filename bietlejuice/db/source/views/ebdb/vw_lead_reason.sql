@@ -3,6 +3,8 @@ drop view ebdb.vw_lead_reason;
 create view ebdb.vw_lead_reason AS
 select CONVERT('CONTACT_ON_BLOCK_LIST' USING utf8) as reason_detail, CONVERT('Blocklist' USING utf8) as reason
 union all
+select 'OWNER_DIDNT_WANT_RECEIVE_CALL', 'Blocklist'
+union all
 select 'CONTACT_KNOW_OWNER', 'Contato'
 union all
 select 'CONTACT_WASNT_THE_HOUSE_OWNER', 'Contato'
