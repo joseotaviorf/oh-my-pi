@@ -29,5 +29,6 @@ select
   reagendadode_mod as mod_id_rescheduled_booking,
   checkinstatus_mod as mod_checkin_status,
   atendente_id as id_attendant,
-  origemultimaatualizacao_id as id_last_update_origin
+  origemultimaatualizacao_id as id_last_update_origin,
+  tipo as type
 from datalake_ebdb_raw.Agendamento_AUD
