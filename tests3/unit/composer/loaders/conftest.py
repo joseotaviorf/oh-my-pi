@@ -1,30 +1,25 @@
 import pytest
 from unittest.mock import Mock
 from bietlejuice.jobs.composer.loaders.spark_metastore_loader import SparkMetastoreLoader
-from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 from bietlejuice.jobs.composer.loaders.s3_loader import S3Loader
-from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 
 
 @pytest.fixture()
-def mocked_spark_df_writer():
+def mocked_write_df():
     mock = Mock()
+    mock.dataframe = mock
+    mock.write = mock
     return mock
 
 
 @pytest.fixture()
-def mocked_df():
-    spark_client = SparkClient()
-    return spark_client.create_dataframe([{"col1": "value", "col2": 123}])
+def metastore_loader():
+    mock = Mock()
+    attrs = {"get_table_names.return_value": []}
+    mock.configure_mock(**attrs)
+    return SparkMetastoreLoader(mock)
 
 
 @pytest.fixture()
-def mocked_metastore_loader():
-    return SparkMetastoreLoader
-
-
-@pytest.fixture()
-def mocked_s3_loader():
-    spark_client = SparkClient()
-    metastore_service = SparkMetastoreService(spark_client)
-    return S3Loader(metastore_service=SparkMetastoreService(spark_client))
+def s3_loader():
+    return S3Loader()

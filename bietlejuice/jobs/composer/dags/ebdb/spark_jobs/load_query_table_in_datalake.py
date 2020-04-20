@@ -10,7 +10,7 @@ from bietlejuice.jobs.composer.services import FileService
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import MySqlConsumer
-from bietlejuice.jobs.composer.loaders import S3Loader
+from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
@@ -38,7 +38,8 @@ if __name__ == "__main__":
     # setup
     db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
     metastore_service = SparkMetastoreService(SparkClient())
-    loader = S3Loader(metastore_service)
+    s3_loader = S3Loader()
+    spark_metastore_loader = SparkMetastoreLoader(metastore_service)
 
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
@@ -49,14 +50,21 @@ if __name__ == "__main__":
     mysql_consumer = MySqlConsumer(conn_config, SparkClient())
 
     # create database if not exists
-    metastore_service.create_database(db_info["db_raw_databricks"])
+    database_name = db_info["db_raw_databricks"]
+    format_options = SparkTableStorageFormat.DEFAULT_RAW
+    database_location = db_info["db_raw_path"]
+    metastore_service.create_database(database_name)
     df = mysql_consumer.get_data_from_query(query, table_name=table_name)
 
     # load
-    loader.load_full_table(
+    s3_loader.load_full_table(
         df=df,
-        database_name=db_info["db_raw_databricks"],
+        database_name=database_name,
         table_name=table_name,
-        format=SparkTableStorageFormat.DEFAULT_RAW,
-        database_location=db_info["db_raw_path"],
+        format_options=format_options,
+        database_location=database_location,
+    )
+
+    spark_metastore_loader.update_metastore(
+        df, database_name, table_name, format_options, database_location
     )

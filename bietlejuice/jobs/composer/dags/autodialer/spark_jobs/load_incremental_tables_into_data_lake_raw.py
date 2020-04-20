@@ -10,7 +10,7 @@ from bietlejuice.jobs.composer.base.db import DatabaseEnum
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient, MongoClient
 from bietlejuice.jobs.composer.consumers.db_consumers import MongoConsumer
-from bietlejuice.jobs.composer.loaders import S3Loader
+from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
 
@@ -58,7 +58,8 @@ if __name__ == "__main__":
     spark_metastore_service.create_database(db_info["db_raw_databricks"])
 
     partition_cols = ["year", "month", "day"]
-    s3_loader = S3Loader(spark_metastore_service)
+    s3_loader = S3Loader()
+    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
     for table_name in INCREMENTAL_TABLES:
 
         df = mongo_consumer.get_incremental_data_from_table(
@@ -74,19 +75,28 @@ if __name__ == "__main__":
                 .create_year_month_day_columns_from_date(dt_execution)
                 .output()
             )
-
+            database_name = db_info["db_raw_databricks"]
+            format_options = SparkTableStorageFormat.DEFAULT_RAW
+            database_location = db_info["db_raw_path"]
             s3_loader.load_incremental_table(
                 df=df,
-                database_name=db_info["db_raw_databricks"],
+                database_name=database_name,
                 table_name=table_name.lower(),
-                format_options=SparkTableStorageFormat.DEFAULT_RAW,
-                database_location=db_info["db_raw_path"],
+                format_options=format_options,
+                database_location=database_location,
                 partition_cols=partition_cols,
-                schema_merging=True,
+            )
+            spark_metastore_loader.update_metastore(
+                df,
+                database_name,
+                table_name,
+                format_options,
+                database_location,
+                partition_cols,
             )
 
             spark_metastore_service.create_new_partitions_from_df(
-                database_name=db_info["db_raw_databricks"],
+                database_name=database_name,
                 table_name=table_name.lower(),
                 df=df,
                 partition_cols=partition_cols,

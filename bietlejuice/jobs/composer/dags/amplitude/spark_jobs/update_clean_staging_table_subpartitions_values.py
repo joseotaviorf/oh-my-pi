@@ -46,11 +46,7 @@ if __name__ == "__main__":
     db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
     spark_client = SparkClient()
     metastore_service = SparkMetastoreService(spark_client)
-    loader = S3Loader(metastore_service)
-
-    # create database if not exists
-    database_name = db_info["db_clean_staging_databricks"]
-    metastore_service.create_database(database_name)
+    s3_loader = S3Loader()
 
     # create daily unique subpartitions values table
     df = (
@@ -63,12 +59,20 @@ if __name__ == "__main__":
     )
 
     table_name = "subpartitions_values"
-    loader.load_full_table(
+    database_name = db_info["db_clean_staging_databricks"]
+    format_options = SparkTableStorageFormat.DEFAULT_CLEAN
+    database_location = db_info["db_clean_staging_path"]
+    # create database if not exists
+    metastore_service.create_database(database_name)
+
+    # this spark job only saves the files in S3, it does not call SparkMetastoreLoader to update metastore
+    # it is the same behaviour as before S3Loader refactoring
+    s3_loader.load_full_table(
         df=df,
         database_name=database_name,
         table_name=table_name,
-        format=SparkTableStorageFormat.DEFAULT_CLEAN,
-        database_location=db_info["db_clean_staging_path"],
+        format_options=format_options,
+        database_location=database_location,
     )
 
     metastore_service.refresh_table(db_info["db_clean_staging_databricks"], table_name)

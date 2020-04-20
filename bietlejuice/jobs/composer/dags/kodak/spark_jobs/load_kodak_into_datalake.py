@@ -8,7 +8,7 @@ from bietlejuice.jobs.composer.base.db import DatabaseEnum, DatalakeMetastoreSer
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import PostgresConsumer
-from bietlejuice.jobs.composer.loaders import S3Loader
+from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_kodak_into_datalake"
@@ -46,17 +46,24 @@ if __name__ == "__main__":
     metastore_service = SparkMetastoreService(spark_client)
 
     # create database if not exists
-    metastore_service.create_database(db_info["db_raw_databricks"])
+    database_name = db_info["db_raw_databricks"]
+    format_options = SparkTableStorageFormat.DEFAULT_RAW
+    database_location = db_info["db_raw_path"]
+    metastore_service.create_database(database_name)
 
-    loader = S3Loader(metastore_service)
+    s3_loader = S3Loader()
+    spark_metastore_loader = SparkMetastoreLoader(metastore_service)
 
     for table_name in ALLOW_LIST:
         df = postgres_consumer.get_data_from_table(table_name)
         # the table names in the datalake must be lowercase
-        loader.load_full_table(
+        s3_loader.load_full_table(
             df=df,
-            database_name=db_info["db_raw_databricks"],
+            database_name=database_name,
             table_name=table_name.lower(),
-            format=SparkTableStorageFormat.DEFAULT_RAW,
-            database_location=db_info["db_raw_path"],
+            format_options=format_options,
+            database_location=database_location,
+        )
+        spark_metastore_loader.update_metastore(
+            df, database_name, table_name.lower(), format_options, database_location
         )

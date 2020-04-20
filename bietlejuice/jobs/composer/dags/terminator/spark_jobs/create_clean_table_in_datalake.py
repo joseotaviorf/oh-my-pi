@@ -9,7 +9,7 @@ from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer
 from bietlejuice.jobs.composer.services.file_service import FileService
 from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
-from bietlejuice.jobs.composer.loaders import S3Loader
+from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
@@ -39,18 +39,23 @@ if __name__ == "__main__":
     spark_metastore_service = SparkMetastoreService(spark_client)
 
     database_name = db_info["db_clean_databricks"]
+    format_options = SparkTableStorageFormat.DEFAULT_CLEAN
+    database_location = db_info["db_clean_path"]
     spark_metastore_service.create_database(database_name)
-    s3_loader = S3Loader(spark_metastore_service)
 
     conn_config = {"db": db_info["db_raw_databricks"]}
     databricks_consumer = DatabricksConsumer(conn_config, spark_client)
     df = databricks_consumer.get_data_from_query(raw_to_clean_query)
 
-    loader = S3Loader(SparkMetastoreService(spark_client))
-    loader.load_full_table(
+    s3_loader = S3Loader()
+    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+    s3_loader.load_full_table(
         df=df,
-        database_name=db_info["db_clean_databricks"],
-        table_name=f"{table_name}",
-        format=SparkTableStorageFormat.DEFAULT_CLEAN,
-        database_location=db_info["db_clean_path"],
+        database_name=database_name,
+        table_name=table_name,
+        format_options=format_options,
+        database_location=database_location,
+    )
+    spark_metastore_loader.update_metastore(
+        df, database_name, table_name, format_options, database_location
     )

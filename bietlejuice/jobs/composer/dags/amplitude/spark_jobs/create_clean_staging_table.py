@@ -47,8 +47,7 @@ if __name__ == "__main__":
     spark_client = SparkClient()
     dataframe_service = SparkDataFrameService()
     metastore_service = SparkMetastoreService(spark_client)
-
-    loader = S3Loader(metastore_service)
+    s3_loader = S3Loader()
 
     # create df
     df = sqlContext.table(
@@ -60,21 +59,19 @@ if __name__ == "__main__":
         .optimize_partitions_by_partition_columns(partition_by)
         .output()
     )
-
     # load df
-    # TODO: this method will create a table in metastore in the first execution,
-    #  but this table will never be used. The best would be have a method that
-    #  only writes the files, but this needs to be discussed yet. For now it's
-    #  not a big deal
-    loader.load_incremental_table(
+    # this spark job only saves the files in S3, it does not call SparkMetastoreLoader to update metastore
+    # it is the same behaviour as before S3Loader refactoring
+    database_name = db_info["db_clean_staging_databricks"]
+    format_options = SparkTableStorageFormat.DEFAULT_CLEAN
+    database_location = db_info["db_clean_staging_path"]
+    # load df
+    s3_loader.load_incremental_table(
         df=df_partitioned,
-        database_name=db_info["db_clean_staging_databricks"],
+        database_name=database_name,
         table_name=source_table_name,
-        format_options=SparkTableStorageFormat.DEFAULT_CLEAN,
-        database_location=db_info["db_clean_staging_path"],
+        format_options=format_options,
+        database_location=database_location,
         partition_cols=partition_by,
     )
-
-    metastore_service.refresh_table(
-        db_info["db_clean_staging_databricks"], source_table_name
-    )
+    metastore_service.refresh_table(database_name, source_table_name)
