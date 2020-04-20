@@ -28,6 +28,7 @@ create table if not exists dim_lead (
   ub_page_variant varchar(255),
   reason varchar(255),
   reason_detail varchar(255),
+  conversion_possibility varchar(255),
   status varchar(255),
   processado smallint,
   origem varchar(255),
