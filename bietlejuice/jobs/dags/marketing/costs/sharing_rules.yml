@@ -5,6 +5,10 @@ d000d:
 d001d:
   query: marketing/costs/d001d.sql
   funnel_side: demand
+  
+a002a:
+  query: marketing/costs/a002a.sql
+  funnel_side: affiliates
 
 a003a:
   query: marketing/costs/a003a.sql
