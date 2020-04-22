@@ -62,7 +62,7 @@ dim_distinct as (
 select
 	d.sk_date,
 	d.city_group,
-	coalesce(s.share,0)
+	coalesce(s.share,0) as share
 from
 	dim_distinct d
 	join share s
