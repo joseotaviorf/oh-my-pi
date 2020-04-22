@@ -89,7 +89,7 @@ if __name__ == "__main__":
             spark_metastore_loader.update_metastore(
                 df,
                 database_name,
-                table_name,
+                table_name.lower(),
                 format_options,
                 database_location,
                 partition_cols,
