@@ -32,6 +32,7 @@ create table staging.dim_photo_job (
 	dt_photographer_start datetime,
 	photographer_contract_type varchar(255),
 	photographer_problem_reason varchar(255),
+	user_sender_type varchar(255),
 	cancel_reason varchar(255),
 	cancel_reason_detailed varchar(512),
 	user_cancel_dt datetime,

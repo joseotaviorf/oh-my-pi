@@ -31,6 +31,7 @@ create table if not exists photo_job (
 	dt_photographer_start timestamp,
 	photographer_contract_type varchar(255),
 	photographer_problem_reason varchar(255),
+	user_sender_type varchar(255),
 	cancel_reason text,
 	cancel_reason_detailed text,
 	user_cancel_dt timestamp,

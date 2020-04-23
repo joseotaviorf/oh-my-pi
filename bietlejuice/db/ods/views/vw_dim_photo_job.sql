@@ -41,6 +41,7 @@ select
 	j1.dt_photographer_start,
 	j1.photographer_contract_type,
 	j1.photographer_problem_reason,
+	j1.user_sender_type,
 	j1.cancel_reason::varchar(100) as cancel_reason,
 	j1.cancel_reason_detailed::varchar(400) as cancel_reason_detailed,
 	j1.user_cancel_dt,

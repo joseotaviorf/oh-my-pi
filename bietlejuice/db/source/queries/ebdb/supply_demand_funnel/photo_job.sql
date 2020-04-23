@@ -47,6 +47,7 @@ select
       df.criadoEm as dt_photographer_start,
       f.tipoContrato as photographer_contract_type,
       f.problema as photographer_problem_reason,
+      f.photoSender as user_sender_type,
       coalesce(f.motivoAlteracao, h.photoShootSchedulingReason) as cancel_reason,
       f.textoMotivoCancelamento as cancel_reason_detailed,
       FROM_UNIXTIME(ure.timestamp/1000) as user_cancel_dt,
