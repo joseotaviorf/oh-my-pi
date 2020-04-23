@@ -720,7 +720,7 @@ kenshoo_raw as (
         null::VARCHAR(256) as utm_campaign,
         null::VARCHAR(256) as utm_term,
         null::VARCHAR(256) as utm_content,
-        (ct.cost * cast(k.rate as numeric) * tp.fator_custo)::numeric(12,4) as cost
+        (ct.cost * cast(k.rate as float) * tp.fator_custo)::numeric(12,4) as cost
     from cost_taxonomy ct
     join datalake_raw.gsheets_marketing_kenshoo_configuration k
         on	ct.mkt_source = k.mkt_source
