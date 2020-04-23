@@ -6,25 +6,7 @@
 *       defined in each specific CTE.
 */
 
-with cities_share_by_ol as (
-    select distinct
-        dd.sk_date,
-        dr.city_group,
-        (dense_rank() over (partition by dd.sk_date, dr.city_group order by fhs.sk_house_listing) +
-            dense_rank() over (partition by dd.sk_date, dr.city_group order by fhs.sk_house_listing desc) - 1) /
-        (dense_rank() over (partition by dd.sk_date order by fhs.sk_house_listing) +
-            dense_rank() over (partition by dd.sk_date order by fhs.sk_house_listing desc) - 1)::float as share
-    from dim_date dd
-    join fact_house_listing_status fhs
-        on dd.sk_date between fhs.sk_status_start_date and coalesce(nullif(fhs.sk_status_end_date, -1), to_char(current_date - 1, 'YYYYMMDD')::bigint)
-        and fhs.status_history = 'publicado'
-        and fhs.sk_status_start_date != -1
-    join dim_region dr
-        on dr.sk_region = fhs.sk_region
-        and city_group is not null
-    where dd.sk_date between 20180101 and cast(TO_CHAR(getdate() -1, 'YYYYMMDD') as integer)
-),
-manual_google_costs as (
+with manual_google_costs as (
     with t_prep as (
         select
           replace(replace(lower(f_remove_accentuation(account_name)), ' - ', '_'), ' ', '_') as prep_account_name,
@@ -200,18 +182,16 @@ campaigns_full as (
       'facebook'  as origin,
       'fact_facebook_daily_cost_attributions' as fact_cost,
       df.campaign_name,
-      coalesce(
-          ashare.city_group,
-          lower(SPLIT_PART(df.campaign_name, '.', 4))) as campaign_city,
+      lower(SPLIT_PART(df.campaign_name, '.', 4)) as campaign_city,
       df.account_name,
       lower(df.campaign_name) as campaign_name_l,
       lower(df.account_name) as account_name_l,
       df.campaign_name as utm_campaign,
       df.adset_name as utm_term,
       df.ad_name as utm_content,
-      ff.desktop_spend * coalesce(ashare.share, 1) as desktop_cost,
-      ff.mobile_spend * coalesce(ashare.share, 1) as mobile_cost,
-      ff.other_spend * coalesce(ashare.share, 1) as other_cost,
+      ff.desktop_spend as desktop_cost,
+      ff.mobile_spend as mobile_cost,
+      ff.other_spend as other_cost,
       null as total_cost
     from marketing.fact_facebook_daily_cost_attributions ff
     join marketing.dim_facebook_ad df
@@ -219,14 +199,6 @@ campaigns_full as (
     left join fb_hist_list_affiliates hl
         on hl.sk_date = ff.sk_date
         and df.campaign_name = hl.campaign_name
-    -- Applying share for affiliates national campaigns
-    join dim_date dd
-      on dd.sk_date = ff.sk_date
-    left join marketing.affiliates_national_campaigns_share ashare
-          on lower(df.campaign_name) similar to '%(p\.brasil|ia\-campanha|px\.)%'
-          and ashare.tracking_source = 'facebook'
-          -- use previous month share
-          and ashare.year_month = cast(to_char(dd.last_month, 'YYYYMM') as integer)
     where ff.sk_date >= 20180101
         -- Filter out affiliate_costs of national-campaigns with manual-historic costs
         and hl.sk_date is null
@@ -237,35 +209,26 @@ campaigns_full as (
       'google' as origin,
       'fact_google_daily_cost_attributions' as fact_cost,
       gcc.campaign_name,
-      coalesce(ashare.city_group,
-              lower(case when SPLIT_PART(gcc.campaign_name, '.', 2) ~ '^[0-9]+$' then
-                  SPLIT_PART(gcc.campaign_name, '.', 3)
-                  else
-                  SPLIT_PART(gcc.campaign_name, '.', 2)
-                  end))
-              as campaign_city,
+      lower(case when SPLIT_PART(gcc.campaign_name, '.', 2) ~ '^[0-9]+$' then
+          SPLIT_PART(gcc.campaign_name, '.', 3)
+          else
+          SPLIT_PART(gcc.campaign_name, '.', 2)
+          end)
+      as campaign_city,
       gcc.account_name,
       lower(gcc.campaign_name) as campaign_name_l,
       lower(gcc.account_name) as account_name_l,
       cast(gcc.utm_campaign as varchar) as utm_campaign,
       cast(gcc.utm_term as varchar) as utm_term,
       cast(gcc.utm_content as varchar) as utm_content,
-      gcc.desktop_cost * coalesce(ashare.share, 1) as desktop_cost,
-      gcc.mobile_cost * coalesce(ashare.share, 1) as mobile_cost,
+      gcc.desktop_cost as desktop_cost,
+      gcc.mobile_cost as mobile_cost,
       null as other_cost,
       null as total_cost
     from google_consolidated_cost gcc
     left join gg_hist_list_affiliates hl
         on hl.sk_date = gcc.sk_date
         and gcc.campaign_name = hl.campaign_name
-    -- Applying share for affiliates national campaigns
-    join dim_date dd
-      on dd.sk_date = gcc.sk_date
-    left join marketing.affiliates_national_campaigns_share ashare
-          on lower(gcc.campaign_name) similar to '%(ia\_affiliates\_nacional|px\.)%'
-          and ashare.tracking_source = 'google'
-          -- use previous month share
-          and ashare.year_month = cast(to_char(dd.last_month, 'YYYYMM') as integer)
     where
           -- Filter out affiliate_costs of national-campaigns with manual-historic costs
         hl.sk_date is null
@@ -277,82 +240,29 @@ campaigns_full as (
         affiliates_cost
   UNION
     --TROVIT
-    (
-    -- selects costs from each cities, mapping campaigns to use OL share
-    with trovit_city_costs as (
-        select
-            ftc.sk_date,
-            dtc.campaign_name,
-            dtc.campaign_name as utm_campaign,
-            case
-                when lower(dtc.campaign_name) like '%campinas%' then 'Campinas'
-                when lower(dtc.campaign_name) like '%s_o_paulo%' or lower(dtc.campaign_name) like '%sp detailed%' then 'RMSP'
-                when lower(dtc.campaign_name) like 'sp %' then 'RMSP'
-                when lower(dtc.campaign_name) like '%all cities%' then 'RMSP'
-                when lower(dtc.campaign_name) like '%rmsp%' then 'RMSP'
-                when lower(dtc.campaign_name) like '%guarulhos%' then 'RMSP'
-                when lower(dtc.campaign_name) like '%abc%' then 'RMSP'
-                when lower(dtc.campaign_name) like '%barueri%' then 'RMSP'
-                when lower(dtc.campaign_name) like '%osasco%' then 'RMSP'
-                when lower(dtc.campaign_name) like '%jundia%' then 'RMSP'
-                when lower(dtc.campaign_name) like '%santo_andr%' then 'RMSP'
-                when lower(dtc.campaign_name) like '%s_o_bernardo%' then 'RMSP'
-                when lower(dtc.campaign_name) like '%s_o_caetano%' then 'RMSP'
-                when lower(dtc.campaign_name) like '%rio_de_janeiro%' then 'Rio de Janeiro'
-                when lower(dtc.campaign_name) like '%niter_i%' then 'Rio de Janeiro'
-                when lower(dtc.campaign_name) like '%bh%' or lower(dtc.campaign_name) like '%belo%h%' then 'Belo Horizonte'
-                when lower(dtc.campaign_name) like '%minas_gerais%' then 'Belo Horizonte'
-                when lower(dtc.campaign_name) like '%goi_nia%' or lower(dtc.campaign_name) like '%goi_s%' then 'Goiânia'
-                when lower(dtc.campaign_name) like '%bras_lia%' or lower(dtc.campaign_name) like '%distrito_federal%' then 'Brasília'
-                when lower(dtc.campaign_name) like '%porto%alegre%' then 'Porto Alegre'
-                when lower(dtc.campaign_name) like '%curitiba%' or lower(dtc.campaign_name) like '%paran_%' then 'Curitiba'
-                when lower(dtc.campaign_name) like '%florian_polis%' or lower(dtc.campaign_name) like '%santa_catarina%' then 'Florianópolis'
-                else 'SHARE_BY_OL_CITIES'
-            end as city_group,
-            ftc.desktop_cost as desktop_cost,
-            ftc.mobile_cost as mobile_cost
-        from marketing.fact_trovit_daily_cost_attributions ftc
-        left join marketing.dim_trovit_campaign dtc
-            on ftc.sk_trovit_campaign = dtc.sk_trovit_campaign
-        where ftc.sk_date >= 20180101
-    ),
-    -- adds OL share to the campaigns not mapped from campaign name
-    trovit_share_by_ol_cities as (
-        select
-            tcc.sk_date,
-            tcc.campaign_name,
-            tcc.campaign_name as utm_campaign,
-            csol.city_group as city_group,
-            tcc.desktop_cost * csol.share  as desktop_cost,
-            tcc.mobile_cost * csol.share as mobile_cost
-        from trovit_city_costs as tcc
-        join cities_share_by_ol csol
-            on tcc.sk_date = csol.sk_date
-        where tcc.city_group = 'SHARE_BY_OL_CITIES'
-    )
-    -- merges campaigns with city mapped and from OL (not mapped)
     select
-        sk_date,
+        ftc.sk_date,
         'trovit' as origin,
         'fact_trovit_daily_cost_attributions' as fact_cost,
-        campaign_name,
+        dtc.campaign_name,
         null as campaign_city,
         null as account_name,
-        city_group as campaign_name_l,
+        lower(dtc.campaign_name) as campaign_name_l,
         null as account_name_l,
-        utm_campaign,
+        dtc.campaign_name as utm_campaign,
         null as utm_term,
         null as utm_content,
-        desktop_cost,
-        mobile_cost,
+        ftc.desktop_cost as desktop_cost,
+        ftc.mobile_cost as mobile_cost,
         null as other_cost,
         null as total_cost
-    from (
-        select * from trovit_city_costs where city_group != 'SHARE_BY_OL_CITIES'
-        union all
-        select * from trovit_share_by_ol_cities
-    )
-  )
+    from
+        marketing.fact_trovit_daily_cost_attributions ftc
+    left join
+        marketing.dim_trovit_campaign dtc
+            on ftc.sk_trovit_campaign = dtc.sk_trovit_campaign
+    where
+        ftc.sk_date >= 20180101
   UNION
     -- MITULA
     select
@@ -362,21 +272,19 @@ campaigns_full as (
         campaign_name,
         null as campaign_city,
         null as account_name,
-        csol.city_group as campaign_name_l,
+        lower(campaign_name) as campaign_name_l,
         null as account_name_l,
         campaign_name as utm_campaign,
         null as utm_term,
         null as utm_content,
-        fm.desktop_cost * csol.share as desktop_cost,
-        fm.mobile_cost * csol.share as mobile_cost,
+        fm.desktop_cost as desktop_cost,
+        fm.mobile_cost as mobile_cost,
         null as other_cost,
         null as total_cost
     from
         marketing.fact_mitula_daily_cost_attributions fm
     join marketing.dim_mitula_campaign dm
         on fm.sk_mitula_campaign = dm.sk_mitula_campaign
-    join cities_share_by_ol csol
-        on fm.sk_date = csol.sk_date
     where fm.sk_date >= 20180101
   UNION
     -- CRITEO
@@ -757,7 +665,6 @@ cost_taxonomy as (
         *
     FROM name_convention_shared_costs
     WHERE cost > 0
-
 ),
 kenshoo as (
 	select
