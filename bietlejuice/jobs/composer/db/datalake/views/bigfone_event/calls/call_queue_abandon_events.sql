@@ -3,7 +3,7 @@ create or replace view datalake_bigfone_clean_prod.call_queue_abandon_events as
 select
     id,
     id_call,
-    cast(json_extract_scalar(metadata, '$.queue') as smallint) as queue_number,
+    try_cast(json_extract_scalar(metadata, '$.queue') as smallint) as queue_number,
     ts_created,
     ts_created_local,
     ts_received,
