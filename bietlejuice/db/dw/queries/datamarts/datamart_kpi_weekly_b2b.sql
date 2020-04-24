@@ -263,6 +263,124 @@ select
 from daily_published_listings_adjusted
 group by 1, 2, 3
 ),
+listing_to_contract_signed as (
+with
+sums as (
+select
+	date(date_trunc('week',dhl.ts_publication)) as publication_week,
+	fhl.sk_partner,
+	dr.regional,
+	dr.city_group,
+	dr.city_name,
+	count(distinct dhl.sk_house_listing) as total_listings,
+	count(distinct fhl.sk_contract) as new_contracts_signed
+from dim_house_listing dhl
+left join fact_house_listings fhl
+  on fhl.sk_house_listing = dhl.sk_house_listing
+left join dim_region dr
+  on dr.sk_region = fhl.sk_region
+where dhl.ts_publication >= 0 and dhl.is_b2b = True
+group by 1,2,3,4,5
+)
+select
+	publication_week,
+	sk_partner,
+	regional,
+	city_group,
+	city_name,
+	new_contracts_signed/total_listings::float as listing_to_contract_signed_weekly
+from sums
+),
+visits_booked_per_ongoing_listings as (
+with ongoing_listings as (
+	with
+	daily_published_listings as (
+	select
+	    f.sk_house_listing,
+	    f.status_history,
+	    d.date,
+	    d.week_start,
+	    d.weekday_name,
+	    d.month_start,
+	    d.month_end,
+	    row_number() over(partition by f.sk_house_listing, d.date order by f.ts_status_start desc) as order_status -- daily order status
+	from fact_house_listing_status f
+	join dim_date d
+	  on d.sk_date between nullif(f.sk_status_start_date,-1) and coalesce(to_char(to_date(nullif(sk_status_end_date,-1),'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, to_char(current_date -1, 'YYYYMMDD')::bigint)
+	left join dim_house_listing dhl
+	  on dhl.sk_house_listing = f.sk_house_listing
+	where f.status_history = 'publicado' -- consider only published status
+	  and dhl.is_b2b = True
+	  and substring(f.sk_house_listing,10,12) <> '000' -- consider only listings that already started publication
+	),
+	daily_published_listings_adjusted as (
+	select
+	    fhs.sk_house_listing,
+	    fhs.date,
+	    fhs.week_start,
+	    fhs.weekday_name,
+	    fhs.month_start,
+	    fhs.month_end,
+	    fhs.order_status,
+	    fhs.status_history,
+	    fhl.sk_partner,
+	    dr.regional,
+	    dr.city_group,
+	    dr.city_name
+	from daily_published_listings fhs
+	left join fact_house_listings fhl
+	  on fhs.sk_house_listing = fhl.sk_house_listing
+	left join dim_region dr
+	  on fhl.sk_region = dr.sk_region
+	where fhs.order_status = 1
+	  and dr.city_group is not null
+	  and fhs.weekday_name = 'Sunday' -- filter that indicates it will be grouped by week
+	)
+	select
+	    week_start,
+	    sk_partner,
+	    regional,
+	    city_group,
+	    city_name,
+	    count(distinct sk_house_listing) as ongoing_listings
+	from daily_published_listings_adjusted
+	group by 1, 2, 3, 4, 5
+),
+visits_booked as (
+    select
+	dd.week_start,
+	fhl.sk_partner,
+	dr.regional,
+	dr.city_group,
+	dr.city_name,
+	count(distinct case when (rf.sk_booking_created_date  > 0) then rf.sk_booking  else null end) as visits_booked
+	from fact_listing_rent_flows rf
+	join dim_booking db
+		on db.sk_booking = rf.sk_booking
+	join dim_date dd
+		on dd.sk_date = rf.sk_booking_created_date
+	left join dim_region dr
+		on dr.sk_region = rf.sk_region
+	left join fact_house_listings fhl
+	  on fhl.sk_house_listing = rf.sk_house_listing
+	left join dim_house_listing dhl
+	  on dhl.sk_house_listing = rf.sk_house_listing
+	where dr.city_group is not null and dhl.is_b2b = True
+	group by 1, 2, 3, 4, 5
+)
+select
+	vb.week_start,
+	vb.sk_partner,
+	vb.regional,
+	vb.city_group,
+	vb.city_name,
+	sum(vb.visits_booked)/sum(ol.ongoing_listings)::float as vb_ol
+from visits_booked vb
+left join ongoing_listings ol
+	on ol.week_start = vb.week_start and ol.city_name = vb.city_name and ol.sk_partner = vb.sk_partner
+where vb.week_start is not null
+group by 1,2,3,4,5
+),
 weekly_metrics as (
 select
 	distinct coalesce(ocont.week_start,orent.week_start,nrent.rental_week_start,ncont.contract_week_start,nfl.first_listing_week_start,rr.rental_week_start, er.week_date, erc.week_date, olist.week_start, nbk.first_booking_created_week) as week_date,
@@ -303,8 +421,8 @@ select
     date_trunc('week',dd.date) as booking_created_week,
     fhl.sk_partner,
     dr.regional,
-	dr.city_group,
-	dr.city_name,
+  	dr.city_group,
+	  dr.city_name,
     count(distinct rf.sk_client) as bookers_weekly
 from fact_listing_rent_flows rf
 left join dim_date dd
@@ -319,11 +437,11 @@ where dhl.is_b2b = True
 group by 1, 2, 3, 4, 5
 )
 select
-	date(dm.week_date) as week_date,
-	dm.sk_partner,
-	dr.regional,
-	dr.city_group,
-	dr.city_name,
+	date(coalesce(dm.week_date,b.booking_created_week,l2cs.publication_week,vb_ol.week_start)) as week_date,
+	coalesce(dm.sk_partner,b.sk_partner,l2cs.sk_partner,vb_ol.sk_partner) as sk_partner,
+	coalesce(dr.regional,b.regional,l2cs.regional,vb_ol.regional) as regional,
+	coalesce(dr.city_group,b.city_group,l2cs.city_group,vb_ol.city_group) as city_group,
+	coalesce(dr.city_name,b.city_name,l2cs.city_name,vb_ol.city_name) as city_name,
 	sum(dm.ongoing_contracts_weekly) as ongoing_contracts_weekly,
 	sum(dm.ongoing_rentals_weekly) as ongoing_rentals_weekly,
 	sum(dm.new_rentals_weekly) as new_rentals_weekly,
@@ -333,11 +451,17 @@ select
 	sum(dm.ended_rentals_weekly) as ended_rentals_weekly,
 	sum(dm.ended_rentals_confirmed_weekly) as ended_rentals_confirmed_weekly,
 	sum(dm.ongoing_listings_weekly) as ongoing_listings_weekly,
-	sum(b.bookers_weekly) as bookers_weekly,
+	b.bookers_weekly as bookers_weekly,
+	l2cs.listing_to_contract_signed_weekly,
+	vb_ol.vb_ol as visits_booked_per_ongoing_listings_weekly,
 	sum(dm.new_bookers_weekly) as new_bookers_weekly
 from weekly_metrics dm
 left join dim_region dr
   using(sk_region)
-left join bookers b
-  on b.booking_created_week = dm.week_date and dr.city_name = b.city_name
-group by 1, 2, 3, 4, 5;
+full outer join bookers b
+  on b.booking_created_week = dm.week_date and dr.city_name = b.city_name and dm.sk_partner = b.sk_partner
+full outer join listing_to_contract_signed l2cs
+  on l2cs.publication_week = dm.week_date and dr.city_name = l2cs.city_name and dm.sk_partner = l2cs.sk_partner
+full outer join visits_booked_per_ongoing_listings vb_ol
+  on vb_ol.week_start = dm.week_date and dr.city_name = vb_ol.city_name and dm.sk_partner = vb_ol.sk_partner
+group by 1, 2, 3, 4, 5, 15, 16, 17;

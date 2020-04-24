@@ -213,6 +213,110 @@ select
 from daily_published_listings_adjusted
 group by 1, 2
 ),
+listing_to_contract_signed as (
+with
+sums as (
+select
+	date(dhl.ts_publication) as publication_date,
+	dr.regional,
+	dr.city_group,
+    dr.city_name,
+	count(distinct dhl.sk_house_listing) as total_listings,
+	count(distinct fhl.sk_contract) as new_contracts_signed
+from dim_house_listing dhl
+left join fact_house_listings fhl
+  on fhl.sk_house_listing = dhl.sk_house_listing
+left join dim_region dr
+  on dr.sk_region = fhl.sk_region
+where dhl.ts_publication >= 0
+group by 1,2,3,4
+)
+select
+	publication_date,
+	regional,
+	city_group,
+	city_name,
+	new_contracts_signed/total_listings::float as listing_to_contract_signed_daily
+from sums
+),
+visits_booked_per_ongoing_listings as (
+with
+ongoing_listings as (
+	with
+	daily_published_listings as (
+	select
+	    f.sk_house_listing,
+	    f.status_history,
+	    d.date,
+	    d.week_start,
+	    d.weekday_name,
+	    d.month_start,
+	    d.month_end,
+	    row_number() over(partition by f.sk_house_listing, d.date order by f.ts_status_start desc) as order_status -- daily order status
+	from fact_house_listing_status f
+	join dim_date d
+	  on d.sk_date between nullif(f.sk_status_start_date,-1) and coalesce(to_char(to_date(nullif(sk_status_end_date,-1),'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, to_char(current_date -1, 'YYYYMMDD')::bigint)
+	where f.status_history = 'publicado' -- consider only published status
+	  and substring(sk_house_listing,10,12) <> '000' -- consider only listings that already started publication
+	),
+	daily_published_listings_adjusted as (
+	select
+	    fhs.sk_house_listing,
+	    fhs.date,
+	    fhs.week_start,
+	    fhs.weekday_name,
+	    fhs.month_start,
+	    fhs.month_end,
+	    fhs.order_status,
+	    fhs.status_history,
+	    dr.regional,
+	    dr.city_group,
+	    dr.city_name
+	from daily_published_listings fhs
+	left join fact_house_listings fhl
+	  on fhs.sk_house_listing = fhl.sk_house_listing
+	left join dim_region dr
+	  on fhl.sk_region = dr.sk_region
+	where fhs.order_status = 1
+	  and dr.city_group is not null
+	)
+	select
+	    date,
+	    regional,
+	    city_group,
+	    city_name,
+	    count(distinct sk_house_listing) as ongoing_listings
+	from daily_published_listings_adjusted
+	group by 1,2,3,4
+),
+visits_booked as (
+    select
+	dd.date,
+	dr.regional,
+	dr.city_group,
+	dr.city_name,
+	count(distinct case when (rf.sk_booking_created_date  > 0) then rf.sk_booking  else null end) as visits_booked
+	from fact_listing_rent_flows rf
+	join dim_booking db
+		on db.sk_booking = rf.sk_booking
+	join dim_date dd
+		on dd.sk_date = rf.sk_booking_created_date
+	left join dim_region dr
+		on dr.sk_region = rf.sk_region
+	where dr.city_group is not null
+	group by 1, 2, 3, 4
+)
+select
+	vb.date,
+	vb.regional,
+	vb.city_group,
+	vb.city_name,
+	vb.visits_booked/ol.ongoing_listings::float as vb_ol
+from visits_booked vb
+left join ongoing_listings ol
+	on ol.date = vb.date and ol.city_name = vb.city_name
+where vb.date is not null
+),
 daily_metrics as (
 select
 	distinct
@@ -263,10 +367,10 @@ left join dim_region dr
 group by 1, 2, 3, 4
 )
 select
-	dm.date_date,
-	dr.regional,
-	dr.city_group,
-	dr.city_name,
+	coalesce(dm.date_date,b.booking_created_date,l2cs.publication_date,vb_ol.date) as date_date,
+	coalesce(dr.regional,b.regional,l2cs.regional,vb_ol.regional) as regional,
+	coalesce(dr.city_group,b.city_group,l2cs.city_group,vb_ol.city_group) as city_group,
+	coalesce(dr.city_name,b.city_name,l2cs.city_name,vb_ol.city_name) as city_name,
 	sum(dm.ongoing_contracts_daily) as ongoing_contracts_daily,
 	sum(dm.ongoing_rentals_daily) as ongoing_rentals_daily,
 	sum(dm.new_rentals_daily) as new_rentals,
@@ -276,11 +380,17 @@ select
 	sum(dm.ended_rentals_daily) as ended_rentals,
 	sum(dm.ended_rentals_confirmed_daily) as ended_rentals_confirmed_daily,
 	sum(dm.ongoing_listings_daily) as ongoing_listings_daily,
-	sum(b.bookers_daily) as bookers_daily,
+	b.bookers_daily as bookers_daily,
+	l2cs.listing_to_contract_signed_daily,
+	vb_ol.vb_ol as visits_booked_per_ongoing_listings_daily,
 	sum(dm.new_bookers_daily) as new_bookers_daily
 from daily_metrics dm
 left join dim_region dr
   using(sk_region)
-left join bookers b
+full outer join bookers b
   on b.booking_created_date = dm.date_date and b.city_name = dr.city_name
-group by 1, 2, 3, 4;
+full outer join listing_to_contract_signed l2cs
+  on l2cs.publication_date = dm.date_date and l2cs.city_name = dr.city_name
+full outer join visits_booked_per_ongoing_listings vb_ol
+  on vb_ol.date = dm.date_date and vb_ol.city_name = dr.city_name
+group by 1, 2, 3, 4, 14, 15, 16;
