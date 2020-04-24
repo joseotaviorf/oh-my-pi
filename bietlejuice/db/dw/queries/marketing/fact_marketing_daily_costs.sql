@@ -657,28 +657,8 @@ cost_taxonomy as (
                 end
             else total_cost
         end * cast(coalesce(tp.fator_custo, '0') as numeric(3,2)) as cost,
-        case
-            -- cases with supply and demand costs in the same account
-            when cf.origin in ('google', 'facebook', 'trovit') then
-                    case
-                        when ((coalesce(cf.account_name_l,'') like '%supply%' or coalesce(cf.account_name_l,'') like '%display%')
-                                and coalesce(cf.account_name_l,'') != 'supply_affiliates')
-                                OR
-                                -- abbreviation rule
-                                (SPLIT_PART(cf.campaign_name, '.', 2) = 'S'
-                                    or SPLIT_PART(cf.campaign_name, '.', 1) = '0'
-                                    or SPLIT_PART(cf.campaign_name, '_', 1) = '0') then 'supply'
-                        when (coalesce(cf.account_name,'') not like '%supply%'
-                                and coalesce(cf.account_name, '') not like '%display%'
-                                and coalesce(cf.account_name, '') not like '%indica_ai%')
-                                OR
-                             (SPLIT_PART(cf.campaign_name, '.', 2) = 'D'
-                             or SPLIT_PART(cf.campaign_name, '.', 1) in ('1','2','3','4')
-                             or SPLIT_PART(cf.campaign_name, '_', 1) in ('1','2','3','4')) then 'demand'
-                        else tp.side
-                    end
-            else tp.side
-            end as side
+        -- Funnel side is extracted from taxonomy
+        tp.side
     from campaigns_full cf
         left join datalake_raw.gsheets_marketing_cost_campaign_city as mccc
             on lower(mccc.campaign_name) = cf.campaign_name_l
