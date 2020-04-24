@@ -712,7 +712,7 @@ kenshoo_raw as (
         tp.mkt_category,
         tp.mkt_flow,
         tp.mkt_completion,
-        null::VARCHAR(256) as mkt_origin,
+        tp.mkt_origin,
         tp.mkt_channel,
         tp.mkt_medium,
         tp.mkt_source,
