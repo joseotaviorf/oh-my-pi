@@ -36,6 +36,7 @@ def submit_vr(**kwargs):
         job_name='crawl-vivareal',
         job_queue='crawling-houses',
         job_definition='crawling-houses:10',
+        vcpus=8,
         memory=64000,
         command=['./crawlers/vivareal_crawler.py', '--listing_date', execution_date, '--states'] + states
     )
