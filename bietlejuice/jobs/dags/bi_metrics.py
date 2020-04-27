@@ -1,7 +1,6 @@
 import os
 import boto3
 from datetime import datetime
-from pathlib import Path
 import shutil
 
 from airflow.models import DAG
@@ -18,7 +17,7 @@ data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
 data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
 
 MAIN_DAG_ID = 'bi-metrics'
-MAIN_START_DATE = datetime(2020, 04, 19)
+MAIN_START_DATE = datetime(2020, 4, 19)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 9 * * *')
 
 METRICS_SCHEMA = 'metrics'
@@ -39,7 +38,7 @@ def copy_data_metrics_repo_sqls(**kwargs):
     if os.path.isdir(REPO_FOLDER):
         # cleanup folder to remove old files
         shutil.rmtree(REPO_FOLDER)
-    Path(REPO_FOLDER).mkdir(parents=True)
+    os.makedirs(REPO_FOLDER)
     for object in [x for x in objects if x['Key'].endswith('.sql')]:
         file_name = os.path.split(object['Key'])[1]
         # download sql files
@@ -101,7 +100,7 @@ copy_repo_sqls_task = BaseDAG.build_python_operator(
 
 # create metrics tasks
 tasks = []
-for path in [p for p in Path(REPO_FOLDER).rglob('*.sql')]:
+for path in [p for p in os.listdir(REPO_FOLDER) if p.endswith('.sql')]:
     task = create_task(
         dag=main_dag,
         python_callable=create_metric_from_dw,
