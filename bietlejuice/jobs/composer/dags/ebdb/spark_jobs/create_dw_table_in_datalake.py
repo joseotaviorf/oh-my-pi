@@ -31,7 +31,7 @@ if __name__ == "__main__":
     env = args.env
     dag_name = args.dag_name
 
-    query_path = QUERIES_DATALAKE_PATH + dag_name + "/{}.sql".format(table_name)
+    query_path = f"{QUERIES_DATALAKE_PATH}{dag_name}/dw/{table_name}.sql"
     query = FileService.get_query_from_file_name(query_path)
 
     # setup

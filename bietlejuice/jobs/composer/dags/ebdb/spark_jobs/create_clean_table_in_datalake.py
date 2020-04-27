@@ -21,6 +21,7 @@ parser.add_argument("source")
 parser.add_argument("env")
 parser.add_argument("datalake_bucket")
 parser.add_argument("dag_name")
+parser.add_argument("datalake_layer")
 
 if __name__ == "__main__":
     # args
@@ -30,8 +31,9 @@ if __name__ == "__main__":
     env = args.env
     datalake_bucket = args.datalake_bucket
     dag_name = args.dag_name
+    datalake_layer = args.datalake_layer
 
-    query_path = QUERIES_DATALAKE_PATH + dag_name + "/{}.sql".format(table_name)
+    query_path = f"{QUERIES_DATALAKE_PATH}/{dag_name}/{datalake_layer}/{table_name}.sql"
     query = FileService.get_query_from_file_name(query_path)
 
     # setup
