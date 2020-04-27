@@ -5,7 +5,7 @@ with tickets_filter as (
 	and t.dt_extracted='{extraction_date}'
 ),
 last_updated_ticket as (
-    select id_ticket, max(ts_updated) as ts_updated from tickets_filter group by 1
+    select id_ticket, max(ts_updated) as ts_last_updated from tickets_filter group by 1
 ),
 last_updated_group as (
     select id_group, max(ts_updated) as ts_updated from datalake_clean.zendesk_groups group by 1
@@ -18,7 +18,7 @@ custom_field_ids as (
     nullif(regexp_extract(custom_fields, '[^,]*Tipo de Cliente[^,]*?="([^,]+)\"\,?', 1), 'null') as client_type
   from datalake_clean.zendesk_custom_fields c
   inner join last_updated_ticket lt
-    on c.id_ticket = lt.id_ticket and cast(c.dt_extracted as date)=cast(cast(lt.ts_updated as timestamp) as date)
+        on c.id_ticket = lt.id_ticket and date(cast(c.ts_updated as timestamp))=date(cast(lt.ts_last_updated as timestamp))
 ),
 groups as (
     select
@@ -64,7 +64,7 @@ select
     now() as ts_load
 from last_updated_ticket te
 inner join tickets_filter t
-on te.id_ticket = t.id_ticket and te.ts_updated = t.ts_updated
+on te.id_ticket = t.id_ticket and te.ts_last_updated = t.ts_updated
 left join groups g
 on t.id_group = g.id_group
 left join custom_field_ids cfi

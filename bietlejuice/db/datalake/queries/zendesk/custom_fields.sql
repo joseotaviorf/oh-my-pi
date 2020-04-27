@@ -19,7 +19,7 @@ parse_fields as (
 select
     f.id_ticket,
     map_agg(tf.raw_title, f.value) as custom_fields,
-    f.ts_updated
+    cast(l.ts_last_updated as timestamp) as ts_updated
 from parse_fields f
 inner join last_updated_ticket_fields l
 on l.id_ticket_fields = f.id_field

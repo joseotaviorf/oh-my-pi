@@ -7,9 +7,6 @@ with tickets_filter as (
 last_updated_ticket as (
     select id_ticket, max(ts_updated) as ts_last_updated from tickets_filter group by 1
 ),
-last_updated_ticket_fields as (
-	select id_ticket_fields, max(ts_updated) as ts_last_updated from datalake_clean.zendesk_ticket_fields group by 1
-),
 contract as (
     select
         cast(coalesce(fl.sk_house_listing, '-1') as bigint) as sk_house_listing,
@@ -52,7 +49,7 @@ custom_field_ids as (
     try_cast(regexp_extract(custom_fields, '[^,]*Código do Contrato[^,]*?="([^,]+)\"\,?', 1) as bigint) as id_contract
   from datalake_clean.zendesk_custom_fields c
   inner join last_updated_ticket lt
-    on c.id_ticket = lt.id_ticket and cast(c.dt_extracted as date)=cast(cast(lt.ts_last_updated as timestamp) as date)
+    on c.id_ticket = lt.id_ticket and date(cast(c.ts_updated as timestamp))=date(cast(lt.ts_last_updated as timestamp))
 ),
 ticket_metrics as (
     with row_n as (
