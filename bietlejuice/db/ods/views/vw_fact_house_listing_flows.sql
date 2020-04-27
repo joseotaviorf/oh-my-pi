@@ -157,7 +157,7 @@ fact_with_reproc as (
             or coalesce(pa_b2b.id, b2b_prime_draft.id_lead) is not null
             , false) as is_b2b,
       b2b_prime_draft.partner_id,
-      rl.affiliate_type
+      coalesce(rl.affiliate_type, l.affiliate_type) as affiliate_type
     from fact_house_listing_flows fhlf
     left join lead l
       on l.id = fhlf.lead_id
