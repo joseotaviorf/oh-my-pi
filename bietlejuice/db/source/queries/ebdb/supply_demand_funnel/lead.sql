@@ -36,7 +36,7 @@ select distinct
   pl.id as id_lead_owner,
   pl.nome as proprietario_nome,
   pl.email as proprietario_email,
-  da.affiliateType as affiliate_type,
+  l.affiliateType as affiliate_type,
   da.inicioAtuacao as dados_afiliado_inicio_atuacao,
   da.cidadeAtuacao as dados_afiliado_cidade_atuacao,
   l.region_id,

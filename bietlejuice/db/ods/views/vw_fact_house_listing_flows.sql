@@ -156,7 +156,8 @@ fact_with_reproc as (
             coalesce(rl.affiliate_type, l.affiliate_type) = 'B2BPartner'
             or coalesce(pa_b2b.id, b2b_prime_draft.id_lead) is not null
             , false) as is_b2b,
-      b2b_prime_draft.partner_id
+      b2b_prime_draft.partner_id,
+      rl.affiliate_type
     from fact_house_listing_flows fhlf
     left join lead l
       on l.id = fhlf.lead_id
@@ -238,7 +239,8 @@ fact_with_reproc as (
     acquisition_channels.origin_lead_usuario_que_indicou_id,
     acquisition_channels.acquisition_channel_rep !~~ 'Reprocessed%' as is_not_reprocessed,
     acquisition_channels.is_b2b,
-    acquisition_channels.partner_id
+    acquisition_channels.partner_id,
+    acquisition_channels.affiliate_type
   from acquisition_channels
 ),
 acquisitions as (
@@ -383,9 +385,7 @@ potential_listings as (
     	else 'Other'
     end as lead_referring_category,
     us_d.subscriptionSource as subscription_source,
-    case when ua.affiliateType = 'Doorman' and u.dados_agente_id is not null then 'Doorman & Agent'
-		 when u.dados_agente_id is not null then 'Agent'
-		 else ua.affiliateType end as affiliate_type
+    f.affiliate_type
   from fact_with_reproc f
   left join lead_first_event_tracking lfet
     on lfet.id_lead = f.lead_id
