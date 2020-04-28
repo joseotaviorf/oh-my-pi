@@ -37,7 +37,7 @@ create or replace view vw_dim_lead as
 					'OWNER_CONSIDERED_ADMINISTRATION_FEE_TOO_HIGH','OWNER_CONSIDERED_BROKERAGE_FEE_TOO_HIGH') then 'Curto Prazo'
 		when l.reason_detail in ('SEASONAL_RENT','ONLY_PART_OF_THE_HOUSE_WAS_AVAILABLE_FOR_RENTING','ISSUES_WITH_HOUSE_DOCUMENTATION','HOUSE_UNDER_MAJOR_RENOVATION','HOUSE_ALREADY_RENTED',
 					'OWNER_GAVE_UP_RENTING','OWNER_DISAGREE_CHARGES_PAYMENTS','OWNER_DIDNT_LISTEN_TO_PITCH') then 'Longo Prazo'
-		end as conversion_possibility,
+		end as deadline_of_new_contact,
   l.status,
   l.processado,
   l.origem,

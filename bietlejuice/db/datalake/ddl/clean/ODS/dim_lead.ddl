@@ -29,7 +29,7 @@ create external table if not exists datalake_clean.ods_dim_lead (
   ub_page_variant string,
   reason string,
   reason_detail string,
-  conversion_possibility string,
+  deadline_of_new_contact string,
   status string,
   processado string,
   origem string,

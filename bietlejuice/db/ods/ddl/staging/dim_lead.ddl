@@ -28,7 +28,7 @@ CREATE TABLE staging.dim_lead (
   ub_page_variant VARCHAR(255),
   reason VARCHAR(255),
   reason_detail VARCHAR(255),
-  conversion_possibility VARCHAR(255),
+  deadline_of_new_contact VARCHAR(255),
   status VARCHAR(255),
   processado SMALLINT,
   origem VARCHAR(255),
