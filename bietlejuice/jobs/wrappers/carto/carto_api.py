@@ -98,7 +98,7 @@ class CartoApi(object):
         file = open(gzip_file_path, 'rb')
         response = requests.post(url, files={'file': file})
         post_response_json = json.loads(response.content)
-        if post_response_json['success'] is not True:
+        if post_response_json.get("success", False) is not True:
             raise ValueError('m=import_file, msg=error importing file to CARTO, file={}, e={}'.format(file_path, post_response_json))
         status_url = '{}{}?api_key={}'.format(self.BASE_URL + 'v1/imports/', post_response_json['item_queue_id'], self.CARTO_API_KEY)
         response_state = 'not started'
