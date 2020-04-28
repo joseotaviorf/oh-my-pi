@@ -25,6 +25,7 @@ class DatabaseEnum:
     TERMINATOR = "TERMINATOR_DB"
     VANS = "VANS_DB"
     WOLOLO = "WOLOLO"
+    WALL_STREET = "WALL_STREET_DB"
 
 
 class DatabaseTypeEnum:
