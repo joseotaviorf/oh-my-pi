@@ -11,6 +11,7 @@ SELECT
     finalized_at as ts_finalized,
     cast(tags as string) as tags,
     first_user_interaction_at as ts_first_user_interaction,
+    first_other_user_interaction_at as ts_first_other_user_interaction,
     cast(last_contexts as string) as last_contexts
 FROM
     datalake_linhadireta_raw.chat
