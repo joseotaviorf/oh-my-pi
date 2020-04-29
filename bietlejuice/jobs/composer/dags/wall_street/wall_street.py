@@ -8,7 +8,8 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 
-from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
+from bietlejuice.jobs.composer.services import FileService
 
 # DAG params
 SOURCE = "wall_street"
@@ -29,6 +30,7 @@ LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
     Variable.get("databricks_s3_bucket"), SOURCE
 )
 ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
+ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 
 # cluster params
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
@@ -57,6 +59,67 @@ dag = DAG(
 )
 
 
+def clean_tasks(sub_dag_name, table_name, slugged_table_name):
+    sub_dag = BaseSubDAG(
+        sub_dag_name=sub_dag_name,
+        dag_name=DAG_ID,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+    )._build_local_dag()
+
+    load_clean_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=sub_dag,
+        task_id=f"create-clean-{slugged_table_name}-in-data-lake",
+        json={
+            "spark_python_task": {
+                "python_file": SPARK_JOBS_PATH + "create_clean_table_in_datalake.py",
+                "parameters": [table_name, ENV, DATALAKE_BUCKET, SOURCE],
+            }
+        },
+    )
+
+    create_external_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=sub_dag,
+        task_id=f"create-clean-external-{slugged_table_name}-table",
+        json={
+            "spark_python_task": {
+                "python_file": SPARK_JOBS_PATH + "create_clean_external_tables.py",
+                "parameters": [
+                    table_name,
+                    ENV,
+                    DATALAKE_BUCKET,
+                    ATHENA_QUERY_RESULT_LOCATION,
+                    SOURCE,
+                ],
+            }
+        },
+    )
+
+    load_clean_table_task >> create_external_table_task
+
+    return sub_dag
+
+
+def build_clean_subdags(prev_task, next_task):
+    # create subdag for each clean table
+    file_list = FileService.list_raw_to_clean_sql_files(SOURCE)
+
+    if file_list:
+        for file_name in file_list:
+            file_name = FileService.remove_file_extension(file_name)
+            slugged_table_name = file_name.replace("_", "-")
+            table_sub_dag = BaseSubDAG.get_sub_dag_operator(
+                dag=dag,
+                sub_dag_name=f"load-{slugged_table_name}-to-datalake-clean",
+                sub_dag_func=clean_tasks,
+                table_name=file_name,
+                slugged_table_name=slugged_table_name,
+            )
+            prev_task >> table_sub_dag >> next_task
+    else:
+        prev_task >> next_task
+
+
 load_tables_into_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id="load-tables-to-datalake-raw",
     dag=dag,
@@ -81,4 +144,5 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-create_cluster_task >> load_tables_into_datalake_raw_task >> terminate_cluster_task
+create_cluster_task >> load_tables_into_datalake_raw_task
+build_clean_subdags(load_tables_into_datalake_raw_task, terminate_cluster_task)
