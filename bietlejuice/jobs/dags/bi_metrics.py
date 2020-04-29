@@ -41,17 +41,13 @@ def read_data_metrics_repo_and_return_sqls():
 
 @logger
 def create_metric_from_dw(table_name, query, **kwargs):
-    logger.info('m=create_metric_from_dw, table_name={}, msg=Dropping table'.format(table_name))
-    BaseETL.execute_command(
-        command='drop table if exists {}.{}'.format(METRICS_SCHEMA, table_name),
-        db_enum=EnumDB.BI_DW,
-        encoding='utf-8',
-        commit=False
-    )
+    drop_table_sql = 'drop table if exists {}.{}'.format(METRICS_SCHEMA, table_name)
+    create_table_sql = 'create table {}.{} as ({})'.format(METRICS_SCHEMA, table_name, query.replace(';', ''))
+    transaction_sql = 'begin;\n {};\n {};\n commit;'.format(drop_table_sql, create_table_sql)
 
-    logger.info('m=create_metric_from_dw, table_name={}, query={}, msg=Creating table'.format(table_name, query))
+    logger.info('m=create_metric_from_dw, table_name={}, sql={}, msg=Dropping and creating new table'.format(table_name, transaction_sql))
     BaseETL.execute_command(
-        command='create table {}.{} as ({})'.format(METRICS_SCHEMA, table_name, query.replace(';', '')),
+        command=transaction_sql,
         db_enum=EnumDB.BI_DW,
         encoding='utf-8',
         commit=True
