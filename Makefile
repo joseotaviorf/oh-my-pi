@@ -92,7 +92,7 @@ requirements-python3:
 
 .PHONY: requirements-test-python3
 requirements-test-python3:
-	@python -m pip install -r requirements3_test.txt
+	@python -m pip install -r requirements3_test.txt  --extra-index-url https://quintoandar.github.io/python-package-server/
 
 .PHONY: requirements-lint-python3
 requirements-lint-python3:
@@ -123,7 +123,15 @@ unit-tests-python3:
 	@echo "Automated Tests"
 	@echo "=========="
 	@echo ""
-	@python -m pytest --cov=bietlejuice/jobs/composer --cov-fail-under=10 --cov-config .coveragerc tests3
+	@python -m pytest --cov=bietlejuice/jobs/composer --cov-fail-under=10 --cov-config .coveragerc tests3/unit/
+
+.PHONY: files-validation-python3
+files-validation-python3:
+	@echo ""
+	@echo "Validation Files Tests"
+	@echo "=========="
+	@echo ""
+	@python -m pytest tests3/files_validation/
 
 ############# common commands #######################
 
