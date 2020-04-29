@@ -14,7 +14,7 @@ custom_field_ids as (
     select
         c.id_ticket,
         c.custom_fields,
-        cast(json_extract(c.custom_fields,'$["31542008"]') as varchar) as request_type,
+        cast(coalesce(json_extract(c.custom_fields,'$["31542008"]'),json_extract(c.custom_fields,'$["360030297872"]')) as varchar) as request_type,
         cast(json_extract(c.custom_fields,'$["46785608"]') as varchar) as client_type
     from datalake_clean.zendesk_custom_fields c
         inner join last_updated_ticket lt
