@@ -7,6 +7,7 @@ SELECT
     campo5 as is_fifth_field,
     temCaracteristica as has_characteristic,
     imovel_id as id_house,
+    instalacao_id as id_condo_amenities,
     atualizadoEm as ts_updated,
     criadoEm as ts_created
 FROM
