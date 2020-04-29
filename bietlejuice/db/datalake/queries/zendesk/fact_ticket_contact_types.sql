@@ -1,9 +1,8 @@
 with filtered_custom_fields AS (
   SELECT
     zcf.id_ticket,
-    field,
-    replace(regexp_extract(field, '^.*='), '=', '') as id_field,
-    regexp_extract(field, '^[^=]+=\[?"(.*)?"\]?$', 1) as contact_type_tag,
+    regexp_extract(field, '^[^:]+:') as id_field,
+    regexp_extract(field, '^[^:]+:\[?"(.*)?"\]?$', 1) as contact_type_tag,
     cast(max(ts_updated) as timestamp with time zone) as ts_updated
   FROM datalake_clean.zendesk_custom_fields zcf
   CROSS JOIN UNNEST(
@@ -11,8 +10,8 @@ with filtered_custom_fields AS (
   ) AS f(field)
   WHERE
     dt_extracted = '{extraction_date}' 
-    and field LIKE '%Motivo de contato%'
-  GROUP BY 1,2,3,4
+    and field LIKE '%360017352951%' or field LIKE '%360015841211%'
+  GROUP BY 1,2,3
 ),
 check_prefix as (
   SELECT

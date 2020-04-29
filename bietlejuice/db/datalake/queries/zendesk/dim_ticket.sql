@@ -11,13 +11,13 @@ last_updated_group as (
     select id_group, max(ts_updated) as ts_updated from datalake_clean.zendesk_groups group by 1
 ),
 custom_field_ids as (
-  select
-    c.id_ticket,
-    cast(c.custom_fields as json) as custom_fields,
-    nullif(regexp_extract(custom_fields, '[^,]*Tipo de Solicitação[^,]*?="([^,]+)\"\,?', 1), 'null') as request_type,
-    nullif(regexp_extract(custom_fields, '[^,]*Tipo de Cliente[^,]*?="([^,]+)\"\,?', 1), 'null') as client_type
-  from datalake_clean.zendesk_custom_fields c
-  inner join last_updated_ticket lt
+    select
+        c.id_ticket,
+        c.custom_fields,
+        cast(json_extract(c.custom_fields,'$["31542008"]') as varchar) as request_type,
+        cast(json_extract(c.custom_fields,'$["46785608"]') as varchar) as client_type
+    from datalake_clean.zendesk_custom_fields c
+        inner join last_updated_ticket lt
         on c.id_ticket = lt.id_ticket and date(cast(c.ts_updated as timestamp))=date(cast(lt.ts_last_updated as timestamp))
 ),
 groups as (
