@@ -56,7 +56,8 @@ select
         when m.id is null then 'Not in mailing list'
         else 'Active in mailing list' end as mailing_list_status,
     count(distinct t_range.sk_lead) as tasks_open,
-    city_group
+    city_group,
+    current_timestamp as ts_load
 from dim_date dt
 join t_range
   on dt.sk_date between t_range.dt_inicio_pros and t_range.dt_fim_pros

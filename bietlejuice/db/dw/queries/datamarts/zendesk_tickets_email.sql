@@ -1,4 +1,4 @@
-select 
+select
 	dt.sk_ticket,
 	dt.ts_created_local,
 	ft.ts_solved_local,
@@ -7,7 +7,7 @@ select
 	trunc(ft.ts_solved_local) as dt_solved_local,
 	trunc(ft.ts_closed_local) as dt_closed_local,
 	case when ft.ts_solved_local is not null then 1 else 0 end as is_solved,
-	case 
+	case
 		when ft.ts_solved_local is null then 'not_solved'
 		when datediff(hour,dt.ts_created_local, ft.ts_solved_local) between 0 and 1 then 'one_hour'
 		when datediff(hour,dt.ts_created_local, ft.ts_solved_local) between 1 and 24 then 'one_day'
@@ -29,7 +29,7 @@ select
     case when cast(ft.minutes_first_reply_time_business as float)/60.0 <= 6 then 1 else 0 end as sla_achieved_6biz_hr,
     cast(ft.minutes_requester_wait_time_business as float)/60.0 as hours_requester_wait_time_business,
     case when ft.replies > 0 then ((1.0*ft.minutes_requester_wait_time_business/60)/ft.replies) end as requester_wait_time_per_reply,
-    case 
+    case
 	    when dt.tags ilike '%resolve_ticket_acompanhamento%' or
         	dt.tags ilike '%fechado_automaticamente_noreply%' or
         	dt.tags ilike '%redirecionado_atendimento_2%' or
@@ -40,10 +40,10 @@ select
         	dt.tags ilike '%call_contato_ativo%' or
         	dt.tags ilike '%resolve_ticket_acompanhamento%' or
         	dt.tags ilike '%redirecionado_adm_v1%'
-        	then 1 
-    	else 0 
+        	then 1
+    	else 0
 	end as has_exclude_tags,
-	case 
+	case
 	    when dt.tags ilike '%resolve_ticket_acompanhamento%' or
         	dt.tags ilike '%fechado_automaticamente_noreply%' or
         	dt.tags ilike '%redirecionado_atendimento_2%' or
@@ -53,14 +53,15 @@ select
         	dt.tags ilike '%call_contato_ativo%' or
         	dt.tags ilike '%resolve_ticket_acompanhamento%' or
         	dt.tags ilike '%redirecionado_adm_v1%'
-        	then 1 
-    	else 0 
+        	then 1
+    	else 0
 	end as has_retention_tags,
-	case 
-	    when dt.tags ilike '%closed_by_merge%' 	then 1 
-    	else 0 
+	case
+	    when dt.tags ilike '%closed_by_merge%' 	then 1
+    	else 0
 	end as has_merged_tags,
-    	dt.tags
+	dt.tags,
+	current_timestamp as ts_load
 from zendesk.fact_tickets as ft
 	join zendesk.dim_ticket as dt
 		on dt.sk_ticket = ft.sk_ticket
@@ -68,6 +69,6 @@ from zendesk.fact_tickets as ft
 		on ft.sk_zendesk_submitter_user = dzu.sk_zendesk_user
 	left join datalake_raw.gsheets_department_channel as gdc
 		on dt.group_name = gdc.aux_canal
-	left join datalake_raw.gsheets_agents_control ac 
+	left join datalake_raw.gsheets_agents_control ac
 	    on ac.assignee_id = ft.sk_zendesk_assignee_user
 where dt.channel in ('email', 'form_faq', 'web')

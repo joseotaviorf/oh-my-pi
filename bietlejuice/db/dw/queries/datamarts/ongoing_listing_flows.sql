@@ -266,7 +266,8 @@ select
 	sum(coalesce(wf.al_other_listings,0)) as other_listings,
 	sum(coalesce(wf.ol_next_week,0)) as ol_next_week,
 	wf.next_week_start,
-  sum(coalesce(wf.ol_suspended_in_negotiation, 0)) as ol_suspended_in_negotiation
+  sum(coalesce(wf.ol_suspended_in_negotiation, 0)) as ol_suspended_in_negotiation,
+  current_timestamp as ts_load
 from week_flows wf
 where wf.week_start < date_trunc('week',current_date) - interval '1 week'
 group by
@@ -277,5 +278,3 @@ group by
   wf.next_week_start
 order by
   wf.week_start desc
-
-

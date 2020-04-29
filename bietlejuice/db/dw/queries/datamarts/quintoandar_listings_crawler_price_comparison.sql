@@ -42,5 +42,6 @@ quintoandar_join_crawled AS
   JOIN datamarts.crawled_listings_last_30_days AS c ON m.id_crawled_listing = c.id_crawled_listing
 )
 SELECT
-  *
+  *,
+  current_timestamp as ts_load
 FROM quintoandar_join_crawled

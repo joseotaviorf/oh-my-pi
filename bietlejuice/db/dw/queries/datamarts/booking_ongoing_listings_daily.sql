@@ -36,7 +36,7 @@ select
     dr.region_code,
     dr.name as neighborhood,
     date(date_trunc('week', dhl.ts_publication)) as week_start_publication,
-    case 
+    case
         when dhl.house_bedrooms in (0,1) then 1
         when dhl.house_bedrooms = 2 then 2
         when dhl.house_bedrooms = 3 then 3
@@ -50,9 +50,9 @@ left join fact_house_listings fhl
   on fhs.sk_house_listing = fhl.sk_house_listing
 left join dim_region dr
   on fhl.sk_region = dr.sk_region
-left join dim_house_listing dhl 
+left join dim_house_listing dhl
   on fhs.sk_house_listing = dhl.sk_house_listing
-left join dim_partner dp 
+left join dim_partner dp
   on dp.sk_partner = fhl.sk_partner
 where fhs.order_status = 1
   and dr.city_group is not null
@@ -165,7 +165,7 @@ results as (
 		vb.house_bedrooms = ol.house_bedrooms and
 		vb.is_b2b = ol.is_b2b and
 		vb.sk_partner = ol.sk_partner and
-		vb.trade_name = ol.trade_name 
+		vb.trade_name = ol.trade_name
 	full join listing_page_views lpv on
 	    	lpv.city_group = ol.city_group and
 	    	lpv.city = ol.city and
@@ -180,5 +180,8 @@ results as (
 		lpv.trade_name = ol.trade_name
 	order by 5, 6, 1, 2, 3, 4, 7, 8, 9, 10, 11
 )
-select * from results
+select
+  *,
+  current_timestamp as ts_load
+from results
 ;

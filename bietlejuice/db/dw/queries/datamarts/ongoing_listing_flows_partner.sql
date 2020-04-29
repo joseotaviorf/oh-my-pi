@@ -221,7 +221,8 @@ select
 	sum(coalesce(wf.al_suspended_to_published,0)) as suspended_to_published,
 	sum(coalesce(wf.al_other_listings,0)) as other_listings,
 	sum(coalesce(wf.ol_next_week,0)) as ol_next_week,
-	wf.next_week_start
+	wf.next_week_start,
+  current_timestamp as ts_load
 from week_flows wf
 where wf.week_start < date_trunc('week',current_date) - interval '1 week'
 group by 1,2,14

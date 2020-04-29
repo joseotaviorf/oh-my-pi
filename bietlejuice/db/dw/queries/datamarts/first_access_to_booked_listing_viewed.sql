@@ -183,7 +183,8 @@ select
 	ntile(100) over(order by datediff(second, ts_first_session_pos_publ, ts_first_listing_page_view) asc) as pctl_all,
 	ntile(100) over(partition by city_group order by datediff(second, ts_first_session_pos_publ, ts_first_listing_page_view) asc) as pctl_city_group,
 	ntile(100) over(partition by is_users_first_booking order by datediff(second, ts_first_session_pos_publ, ts_first_listing_page_view) asc) as pctl_all_first_bk,
-	ntile(100) over(partition by is_users_first_booking, city_group order by datediff(second, ts_first_session_pos_publ, ts_first_listing_page_view) asc) as pctl_all_first_bk_city_group
+	ntile(100) over(partition by is_users_first_booking, city_group order by datediff(second, ts_first_session_pos_publ, ts_first_listing_page_view) asc) as pctl_all_first_bk_city_group,
+	current_timestamp as ts_load
 from user_sessions_during_publication_enriched
 where ts_session_start_proxy = ts_first_session_pos_publ
 ;

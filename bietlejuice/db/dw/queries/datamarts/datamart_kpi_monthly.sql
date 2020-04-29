@@ -358,7 +358,8 @@ select
 	b.bookers_monthly as bookers_monthly,
 	l2cs.listing_to_contract_signed_monthly,
 	vb_ol.vb_ol as visits_booked_per_ongoing_listings_monthly,
-	sum(dm.new_bookers_monthly) as new_bookers_monthly
+	sum(dm.new_bookers_monthly) as new_bookers_monthly,
+  current_timestamp as ts_load
 from monthly_metrics dm
 left join dim_region dr
   using(sk_region)

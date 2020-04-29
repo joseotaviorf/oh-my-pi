@@ -144,7 +144,8 @@ SELECT
 	coalesce(ol.is_b2b, coalesce(vb.is_b2b, lpv.is_b2b)) as "is_b2b",
 	ongoing_listings,
 	visits_booked,
-	listing_page_views
+	listing_page_views,
+	current_timestamp as ts_load
 FROM ol
 FULL JOIN vb ON
     vb.city_group = ol.city_group and

@@ -425,13 +425,13 @@ total as (
 	from demand_union_published t
 		left join house_status_per_day hs
 			on t.sk_house_listing = hs.sk_house_listing and t.date = hs.date
-), 
+),
 union_total as (
 select
 	*
 from total
 union all
-select 
+select
 	cast(aldh.date as date),
 	cast(aldh.sk_client as bigint),
 	cast(aldh.sk_house_listing as bigint),
@@ -450,5 +450,7 @@ select
 from datalake_raw.datamart_available_listings_users_demand_historic aldh
 order by 1,3
 )
-select *
+select
+	*,
+	current_timestamp as ts_load
 from union_total

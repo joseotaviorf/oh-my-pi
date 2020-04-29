@@ -97,7 +97,8 @@ SELECT
   ROUND(average_days_house_listing_to_contract_signed) AS average_days_house_listing_to_contract_signed,
   ROUND((average_days_house_listing_to_contract_signed - average_days_house_listing_to_contract_signed_error), 0)::VARCHAR || '-' || ROUND((average_days_house_listing_to_contract_signed + average_days_house_listing_to_contract_signed_error), 0)::VARCHAR AS average_days_house_listing_to_contract_signed_interval,
   ROUND(average_days_house_listing_to_contract_signed_error, 2) AS average_days_house_listing_to_contract_signed_error,
-  median_days_house_listing_to_contract_signed AS median_days_house_listing_to_contract_signed
+  median_days_house_listing_to_contract_signed AS median_days_house_listing_to_contract_signed,
+  current_timestamp as ts_load
 FROM all_regions r
 LEFT JOIN liquidity_metrics l ON r.city_group = l.city_group AND r.sk_region = l.sk_region AND r.house_bedrooms_category = l.house_bedrooms_category
 WHERE

@@ -660,5 +660,8 @@ from union_all
 group by "date", city_group, 3, 4, 5
 order by "date", city_group, 3, 4, 5
 )
-select * from agg_all
+select
+	*,
+	current_timestamp as ts_load
+from agg_all
 ;

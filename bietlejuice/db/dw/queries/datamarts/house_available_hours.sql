@@ -8,7 +8,7 @@ imovel_aud as (
 			on hou.rev = ure.id
 ),
 house_available as (
-	select 
+	select
 		ia.imovel_id as id_house,
 		ia.date_time as available_started_date,
 		lead(date_time) over(partition by imovel_id, diadasemana order by rev) as available_ended_date,
@@ -27,7 +27,7 @@ house_available as (
 		horarios_disponivel19as20 as hours_available_19to20
 	from imovel_aud ia
 )
-select 
+select
 	id_house,
 	to_char(available_started_date, 'YYYYMMDD')::bigint as sk_available_started_date,
 	to_char(available_ended_date, 'YYYYMMDD')::bigint as sk_available_ended_date,
@@ -45,6 +45,6 @@ select
 	hours_available_16to17,
 	hours_available_17to18,
 	hours_available_18to19,
-	hours_available_19to20
-	from house_available
-	
+	hours_available_19to20,
+	current_timestamp as ts_load
+from house_available

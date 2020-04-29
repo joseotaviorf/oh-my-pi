@@ -4,6 +4,7 @@ SELECT
     channel,
     medium,
     cast(opportunity_target as numeric(10,2)) as opportunity_target,
-    cast(listing_target as numeric(10,2)) as listing_target
+    cast(listing_target as numeric(10,2)) as listing_target,
+    current_timestamp as ts_load
 FROM
     datalake_raw.weekly_targets

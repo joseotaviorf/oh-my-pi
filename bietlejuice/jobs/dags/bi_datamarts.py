@@ -31,17 +31,13 @@ logger = QuintoAndarLogger(MAIN_DAG_ID)
 def create_datamart_from_dw(table_name, **kwargs):
     query = BaseETL.get_query_from_file_name('{}/{}/{}.sql'.format(DW_QUERIES_DIR, DATAMARTS_SCHEMA, table_name))
 
-    logger.info('m=create_datamart_from_dw, table_name={}, msg=Dropping table'.format(table_name))
-    BaseETL.execute_command(
-        command='drop table if exists {}.{}'.format(DATAMARTS_SCHEMA, table_name),
-        db_enum=EnumDB.BI_DW,
-        encoding='utf-8',
-        commit=True
-    )
+    drop_table_sql = 'drop table if exists {}.{}'.format(DATAMARTS_SCHEMA, table_name)
+    create_table_sql = 'create table {}.{} as ({})'.format(DATAMARTS_SCHEMA, table_name, query.replace(';', ''))
+    transaction_sql = 'begin;\n {};\n {};\n commit;'.format(drop_table_sql, create_table_sql)
 
-    logger.info('m=create_datamart_from_dw, table_name={}, msg=Creating table'.format(table_name))
+    logger.info('m=create_datamart_from_dw, table_name={}, sql={}, msg=Dropping and creating new table'.format(table_name, transaction_sql))
     BaseETL.execute_command(
-        command='create table {}.{} as ({})'.format(DATAMARTS_SCHEMA, table_name, query.replace(';', '')),
+        command=transaction_sql,
         db_enum=EnumDB.BI_DW,
         encoding='utf-8',
         commit=True
@@ -54,6 +50,13 @@ def create_datamart_from_athena(table_name, **kwargs):
     athena = AthenaClient(s3_bucket, data_acc_aws_access_key_id, data_acc_aws_secret_access_key)
     query = BaseETL.get_query_from_file_name('{}/{}/{}.sql'.format(DATALAKE_QUERIES_DIR, DATAMARTS_SCHEMA, table_name))
 
+    logger.info('m=create_datamart_from_athena, table_name={}, msg=Reading data'.format(table_name))
+    execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
+    df = athena.execute_query_and_return_dataframe(
+        sql=query,
+        query_params={'dt': execution_date}
+    )
+
     logger.info('m=create_datamart_from_athena, table_name={}, msg=Dropping table'.format(table_name))
     BaseETL.execute_command(
         command='drop table if exists {}.{}'.format(DATAMARTS_SCHEMA, table_name),
@@ -62,12 +65,10 @@ def create_datamart_from_athena(table_name, **kwargs):
         commit=True
     )
 
-    logger.info('m=create_datamart_from_athena, table_name={}, msg=Reading data'.format(table_name))
-    execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
-    df = athena.execute_query_and_return_dataframe(
-        sql=query,
-        query_params={'dt': execution_date}
-    )
+    if df.empty:
+        raise ValueError('table_name={}, msg=Query returned zero rows'.format(table_name))
+    if 'ts_load' not in df.columns.values:
+        df['ts_load'] = datetime.now()
 
     logger.info('m=create_datamart_from_athena, table_name={}, msg=Creating table in datamart'.format(table_name))
     BaseETL.create_table_from_dataframe(
@@ -75,6 +76,7 @@ def create_datamart_from_athena(table_name, **kwargs):
         df=df,
         table_name='{}.{}'.format(DATAMARTS_SCHEMA, table_name),
         encoding='utf-8',
+        commit=True
     )
 
     logger.info('m=create_datamart_from_athena, table_name={}, msg=Writing data to datamart'.format(table_name))
@@ -83,7 +85,8 @@ def create_datamart_from_athena(table_name, **kwargs):
         df=df,
         table_name='{}.{}'.format(DATAMARTS_SCHEMA, table_name),
         encoding='utf-8',
-        append=False
+        append=False,
+        commit=True
     )
 
 

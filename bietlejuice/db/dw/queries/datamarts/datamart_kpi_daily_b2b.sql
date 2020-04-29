@@ -452,7 +452,8 @@ select
 	b.bookers_daily as bookers_daily,
 	l2cs.listing_to_contract_signed_daily,
 	vb_ol.vb_ol as visits_booked_per_ongoing_listings_daily,
-	sum(dm.new_bookers_daily) as new_bookers_daily
+	sum(dm.new_bookers_daily) as new_bookers_daily,
+  current_timestamp as ts_load
 from daily_metrics dm
 left join dim_region dr
   using(sk_region)

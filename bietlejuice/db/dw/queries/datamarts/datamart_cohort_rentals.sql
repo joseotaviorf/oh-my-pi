@@ -189,7 +189,8 @@ select
 	fcr.avg_value_rent_first_rentals,
 	fcaf.avg_admin_fee_first_rentals,
 	rr_rent.avg_value_rent_re_rentals,
-	rr_af.avg_admin_fee_re_rentals
+	rr_af.avg_admin_fee_re_rentals,
+	current_timestamp as ts_load
 from all_first_rentals fr
 left join all_re_rentals rr
   on fr.city_group = rr.city_group

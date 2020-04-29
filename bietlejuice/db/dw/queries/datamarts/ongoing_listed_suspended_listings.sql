@@ -39,6 +39,7 @@ select
 	weeks_since_publication,
 	status_history,
 	case when status_history = 'suspenso' then status_change_reason	else null end as status_change_reason,
-	sk_house_listing
+	sk_house_listing,
+  current_timestamp as ts_load
 from daily_published_suspended_listings_adjusted
 ;

@@ -3,12 +3,12 @@
  */
 with old_compensation_by_visit as (
 --	get total visits performed by agent on visit cohort
-	select 
+	select
 		rf.sk_user_agent,
 		dd.month_start as compensation_month,
 		count(distinct case when flg_visit_performed = 1 then sk_booking end) as visits_performed
 	from fact_listing_rent_flows rf
-		join dim_region dr	
+		join dim_region dr
 			on dr.sk_region = rf.sk_region
 		join dim_date dd
 			on dd.sk_date = rf.sk_visit_date
@@ -19,12 +19,12 @@ with old_compensation_by_visit as (
 ),
 old_compensation_by_contract as (
 -- get total contracts signed by agent visit on contract signed cohort
-	select 
+	select
 		rf.sk_user_agent,
 		dd.month_start as compensation_month,
 		sum(dc.rent) as contracts_signed
 	from fact_listing_rent_flows rf
-		join dim_region dr	
+		join dim_region dr
 			on dr.sk_region = rf.sk_region
 		join dim_date dd
 			on dd.sk_date = rf.sk_contract_signed_date
@@ -126,7 +126,7 @@ agent_contracts as (
 		    month_hours_opened,
 		    region_code,
 		    row_number() over (partition by agent_id, month_hours_opened order by hours_opened desc) as rnk_hours
-		from agent_hours_opened 
+		from agent_hours_opened
 		where region_code != -1
 	),
 	agent_hours as (
@@ -155,7 +155,7 @@ agent_contracts as (
 				and rf.sk_contract_signed_date > 0
 			join dim_contract dc
 				on rf.sk_contract = dc.sk_contract
-		group by 1, 2	
+		group by 1, 2
 	),
 	compensation_by_hour as (
 	-- aggregate compensation by hours opened and contracts signed
@@ -163,7 +163,7 @@ agent_contracts as (
 			ah.agent_id,
 			ah.month_hours_opened as compensation_month,
 			'Hour' as compensation_type,
-			case 
+			case
 				when ah.hours_opened > 80 then 2500
 				when ah.hours_opened > 40 then 1200
 				else 0
@@ -173,17 +173,17 @@ agent_contracts as (
 				on ah.agent_id = cs.agent_id
 				and ah.month_hours_opened = cs.contract_signed_month
 			join datalake_raw.gsheets_agents_hourly_compensation ch
-				on trim(ah.region_code) = trim(ch.region_code)			
+				on trim(ah.region_code) = trim(ch.region_code)
 				and ah.month_hours_opened between ch.dt_init and ch.dt_end
+	),
+	results as (
+		select * from compensation_by_commission
+		union all
+		select * from compensation_by_hour
+		union all
+		select * from old_compensation
 	)
 select
-  *
-from compensation_by_commission
-union all
-select
-  *
-from compensation_by_hour
-union all
-select
-    *
-from old_compensation
+	*,
+	current_timestamp as ts_load
+from results

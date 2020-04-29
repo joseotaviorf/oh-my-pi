@@ -49,7 +49,8 @@ select
 	status_reason_2 as status_reason_motive,
 	sk_status_start_date,
 	sk_status_end_date,
-	ts_load
+	ts_load,
+  current_timestamp as ts_load
 from aux_query
 where rn = 1
 ;
