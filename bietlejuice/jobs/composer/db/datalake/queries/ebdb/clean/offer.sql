@@ -14,5 +14,11 @@ SELECT
   turn,
   rejectionReason as rejection_reason,
   criadoEm as ts_created,
-  atualizadoEm as ts_updated
-FROM datalake_ebdb_raw.Offer
+  atualizadoEm as ts_updated,
+  iteration,
+  expirationDate as ts_expirated,
+  type,
+  godfatherUpdatedAt as ts_updated_godfather,
+  residentName as resident_name,
+  firestoreId_unique as is_id_firestore_unique
+FROM datalake_ebdb_raw.offer
