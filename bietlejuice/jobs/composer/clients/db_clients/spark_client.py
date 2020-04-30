@@ -11,8 +11,9 @@ class SparkClient(DBClient):
     Run commands, return query results and reads data from external systems with Spark.
     """
 
-    def __init__(self):
+    def __init__(self, session_params=None):
         self._session = None
+        self.session_params = session_params
 
     @property
     def conn(self):
@@ -21,7 +22,11 @@ class SparkClient(DBClient):
         :return: SparkSession
         """
         if not self._session:
-            self._session = SparkSession.builder.getOrCreate()
+            session_builder = SparkSession.builder
+            if self.session_params:
+                for param, val in self.session_params.items():
+                    session_builder.config(param, val)
+            self._session = session_builder.getOrCreate()
         return self._session
 
     @logger
