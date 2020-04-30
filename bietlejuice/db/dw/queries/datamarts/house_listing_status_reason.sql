@@ -15,8 +15,8 @@ select
 from datalake_ebdb_clean_prod.house_aud im
 join datalake_ebdb_clean_prod.user_revision_entity rev on im.rev=rev.id
 where
-	(mod_suspension_reason = 1 and im.status = 'suspenso')
-	or (mod_unpublished_reason = 1 and im.status = 'despublicado')
+	(mod_suspension_reason = true and im.status = 'suspenso')
+	or (mod_unpublished_reason = true and im.status = 'despublicado')
 ),
 aux_query as
 (select
@@ -27,7 +27,6 @@ aux_query as
 	sr.status_reason_2,
 	fh.sk_status_start_date,
 	fh.sk_status_end_date,
-	fh.ts_load,
 	row_number() over (partition by hl.id_house, fh.status_history, sr.status, fh.sk_status_start_date order by hl.id_house) as rn
 from fact_house_listing_status fh
 left join dim_house_listing hl
@@ -49,8 +48,7 @@ select
 	status_reason_2 as status_reason_motive,
 	sk_status_start_date,
 	sk_status_end_date,
-	ts_load,
-  current_timestamp as ts_load
+  	current_timestamp as ts_load
 from aux_query
 where rn = 1
 ;
