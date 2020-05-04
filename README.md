@@ -89,8 +89,8 @@ Obs.: From now on the current repo (`bi-etl-ejuice`) will be referred to as $BIE
     
 #### 2. Change variables value
 
-In files local_connection.json, airflow-py3.Dockerfile and docker-compose.py3.yml, you need to replace the following three placeholder
-by each correspond value:
+In files local_connection.json, airflow-py3.Dockerfile and docker-compose.py3.yml, you need to replace each 
+of the following three placeholders by their corresponding values:
     
     - <USER>
     - <GITHUB_TOKEN>

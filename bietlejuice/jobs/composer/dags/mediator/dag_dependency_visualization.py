@@ -3,7 +3,8 @@ from airflow.models import DAG
 from airflow.operators.dummy_operator import DummyOperator
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.airflow import BaseDAG, DEPENDENCIES_FILE_PATH
+from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.dags import COMPOSER_DAGS_PATH
 from bietlejuice.jobs.composer.services import FileService
 
 logger = QuintoAndarLogger("dag_dependency_visualization")
@@ -52,7 +53,8 @@ dag = DAG(
     schedule_interval=None,
 )
 
-dependencies = get_dependencies_from_file(DEPENDENCIES_FILE_PATH)
+dependencies_file_path = COMPOSER_DAGS_PATH + "/dependencies.yaml"
+dependencies = get_dependencies_from_file(dependencies_file_path)
 task_dict = {}
 
 for dependent_dag_name in dependencies:
