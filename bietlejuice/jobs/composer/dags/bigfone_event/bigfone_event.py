@@ -27,10 +27,6 @@ MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
 
 ENV = Variable.get("environment")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
-DATALAKE_OLD_BUCKET = Variable.get("datalake_old_bucket")
-ZENDESK_TICKETS_CUSTOM_FIELDS_S3_PATH = (
-    f"s3://{DATALAKE_OLD_BUCKET}/clean/zendesk/custom_fields"
-)
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 
 # s3 vars
@@ -187,34 +183,11 @@ create_clean_partition_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-zendesk_tickets_custom_fields_to_metastore_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="zendesk-tickets-custom-fields-to-metastore",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": "{}/load_zendesk_tickets_custom_fields_into_metastore.py".format(
-                SPARK_JOBS_PATH
-            ),
-            "parameters": [
-                "{{ ds }}",
-                "datalake_clean",
-                "zendesk_custom_fields",
-                "dt_extracted",
-                ZENDESK_TICKETS_CUSTOM_FIELDS_S3_PATH,
-                "parquet",
-                '{"spark.sql.parquet.binaryAsString": "true"}',
-            ],
-        }
-    },
-)
-
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
 enrich_sub_dags = build_subdags("enrich")
-
-create_cluster_task >> zendesk_tickets_custom_fields_to_metastore_task >> terminate_cluster_task
 
 airflow_helpers.chain(
     create_cluster_task,
