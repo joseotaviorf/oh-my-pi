@@ -46,7 +46,11 @@ Docs:
 """
 
 sensor_task = QuintoAndarShortCircuitExternalSensor(
-    dag=mediator_dag, task_id="short-circuit", dependencies=dependencies_dict
+    dag=mediator_dag,
+    task_id="short-circuit",
+    dependencies=dependencies_dict,
+    allow_rerun=False,
+    retries=0,
 )
 
 trigger_dependent_dags_list = []
