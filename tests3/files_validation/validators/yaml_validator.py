@@ -21,6 +21,8 @@ class YamlValidator(BaseValidator):
         Executes the validator method passed by the user
         :return: a boolean indicating the result of the validation
         """
+        if self.validator_args is None:
+            return validation_method(self.yaml)
         return validation_method(self.yaml, self.validator_args)
 
     def read_file(self):
@@ -50,4 +52,72 @@ class YamlValidator(BaseValidator):
                     )
                 )
                 return False
+        return True
+
+    @logger
+    def is_cyclic(self, dic, key, visited_keys, path):
+        """
+        Validates if graph defined by dict has any cycle
+
+        :param dic: dictionary containing DAG dependencies
+        :param key: dictionary's key that is being visited at the moment
+        :param visited_keys: list of all the keys visited so far
+        :param path: list of keys visited before the current one
+
+        :return: True if graph has cycle. False if it doesn't.
+        """
+        if key in path:
+            logger.error(
+                "m=is_cyclic, msg=The dependencies between the DAGs {} are cyclical. "
+                "Please, verify the yaml file".format(path)
+            )
+            return True
+
+        local_path = path[:]  # avoids manipulating the same object
+        local_path.append(key)
+
+        for dependency in dic[key]:
+            if dic.get(dependency) is not None \
+                    and dependency not in visited_keys \
+                    and self.is_cyclic(dic, dependency, visited_keys, local_path):
+                return True
+
+        if key not in visited_keys:
+            visited_keys.append(key)
+        return False
+
+    def validate_cyclic_dependency(self, dic):
+        """
+        Validates if graph defined by dict has any cycle through is_cyclic() method
+
+        :param dic: dictionary containing DAG dependencies
+        :return: True if graph has cycle. False if it doesn't.
+        """
+        visited_keys = []
+        for key in dic:
+            if key not in visited_keys and self.is_cyclic(dic, key, visited_keys, []):
+                return False
+        return True
+
+    @staticmethod
+    @logger
+    def validate_list_dependencies(dic):
+        """
+        Validates if all the dependencies are lists of strings
+
+        :param dic: dictionary containing DAG dependencies
+        :return: True if all the dependencies are lists of strings. False otherwise.
+        """
+        for key in dic:
+            if not isinstance(dic[key], list):
+                logger.error(
+                    "m=validate_list_dependencies, msg=The dependencies of the DAG {} should be a list".format(key)
+                )
+                return False
+            for value in dic[key]:
+                if not isinstance(value, str):
+                    logger.error(
+                        "m=validate_list_dependencies, msg=The dependencies of the DAG {} should be a list".format(key)
+                    )
+                    return False
         return True

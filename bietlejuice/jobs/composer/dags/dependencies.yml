@@ -1,12 +1,12 @@
-# Define the dependencies among DAGs here in the format `dependent: dependency`
-# Example:
-#  dependencies:
-#    bietlejuice.dummy_b:
-#      - bietlejuice.dummy_a:dummy-sensor
-#    bietlejuice.dummy_c:
-#      - bietlejuice.dummy_a
-#      - bietlejuice.dummy_b
-#    bietlejuice.dummy_d:
-#      - bietlejuice.dummy_a
-#      - bietlejuice.dummy_b:dummy-operator
-#      - bietlejuice.dummy_e.dummy-subdag
+# Define the dependencies among DAGs here in the following format:
+#  dependent_dag_id_A:
+#    - dag_dependency_id_B[:task_dependency_id_1]
+#    - dag_dependency_id_C[:task_dependency_id_2]
+#  dependent_dag_id_B:
+#    - dag_dependency_id_D[:task_dependency_id_3]
+
+bietlejuice.tenant_booking_review:
+  - bietlejuice.ebdb:load-visit
+  - bietlejuice.ebdb:load-booking
+  - bietlejuice.insider:load-review-feature-to-datalake-clean
+  - bietlejuice.insider:load-review-to-datalake-clean

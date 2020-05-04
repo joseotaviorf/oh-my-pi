@@ -19,11 +19,11 @@ class TestSqlFileValidators:
             )
         ],
     )
-    def test_validate_sql_columns(self, query_content, required_columns, SQLValidatorMock):
+    def test_validate_sql_columns(self, query_content, required_columns, sql_validator_mock):
         """
         Tests if validate_sql_columns returns True given correct query compared with required columns
         """
-        assert SQLValidatorMock.validate_sql_columns(query_content, required_columns)
+        assert sql_validator_mock.validate_sql_columns(query_content, required_columns)
 
     @pytest.mark.parametrize(
         "query_content, required_columns",
@@ -39,8 +39,8 @@ class TestSqlFileValidators:
             )
         ]
     )
-    def test_wrong_sql_columns(self, query_content, required_columns, SQLValidatorMock):
+    def test_wrong_sql_columns(self, query_content, required_columns, sql_validator_mock):
         """
         Tests if validate_sql_columns returns False given wrong query compared with required columns
         """
-        assert SQLValidatorMock.validate_sql_columns(query_content, required_columns) is False
+        assert sql_validator_mock.validate_sql_columns(query_content, required_columns) is False
