@@ -13,6 +13,7 @@ import airflow.utils.helpers as airflow_helpers
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
 from bietlejuice.jobs.composer.dags.bigfone_event import (
     DAG_NAME,
+    DW_SCHEMA,
     QUERIES_BIGFONE_EVENT_DATALAKE_PATH,
 )
 
@@ -27,6 +28,9 @@ MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
 
 ENV = Variable.get("environment")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
+DATALAKE_OLD_BUCKET = Variable.get("datalake_old_bucket")
+DW_BUCKET = Variable.get("dw_bucket")
+SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 
 # s3 vars
@@ -110,7 +114,55 @@ def enrich_tasks(sub_dag_name, table_name, slugged_table_name):
     return sub_dag
 
 
+def dw_tasks(sub_dag_name, table_name, slugged_table_name):
+
+    sub_dag = BaseSubDAG(
+        sub_dag_name=sub_dag_name,
+        dag_name=DAG_ID,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+    )._build_local_dag()
+
+    create_table_in_dw_staging = QuintoAndarDatabricksSubmitRunOperator(
+        dag=sub_dag,
+        task_id=f"load-{slugged_table_name}-into-dw-{DW_SCHEMA}-staging",
+        json={
+            "spark_python_task": {
+                "python_file": f"{SPARK_JOBS_PATH}/create_table_in_dw_staging.py",
+                "parameters": [DW_BUCKET, table_name, ENV],
+            }
+        },
+    )
+
+    create_table_in_dw = QuintoAndarDatabricksSubmitRunOperator(
+        dag=sub_dag,
+        task_id=f"load-{slugged_table_name}-into-dw-{DW_SCHEMA}",
+        json={
+            "spark_python_task": {
+                "python_file": f"{SPARK_JOBS_PATH}/create_table_in_dw.py",
+                "parameters": [DW_BUCKET, table_name, ENV],
+            }
+        },
+    )
+
+    load_dw_table_into_redshift = QuintoAndarDatabricksSubmitRunOperator(
+        dag=sub_dag,
+        task_id=f"load-{slugged_table_name}-into-redshift",
+        json={
+            "spark_python_task": {
+                "python_file": f"{SPARK_JOBS_PATH}/load_dw_table_into_redshift.py",
+                "parameters": [DW_BUCKET, table_name, ENV, SPECTRUM_IAM_ROLE],
+            }
+        },
+    )
+
+    create_table_in_dw_staging >> create_table_in_dw >> load_dw_table_into_redshift
+
+    return sub_dag
+
+
 def build_subdags(layer):
+    # create subdag for each table
     file_list = FileService.list_files(f"{QUERIES_BIGFONE_EVENT_DATALAKE_PATH}/{layer}")
     subdags = {}
 
@@ -188,6 +240,7 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 )
 
 enrich_sub_dags = build_subdags("enrich")
+dw_sub_dags = build_subdags("dw")
 
 airflow_helpers.chain(
     create_cluster_task,
@@ -195,5 +248,10 @@ airflow_helpers.chain(
     load_event_table_to_clean_task,
     create_clean_partition_task,
 )
+create_clean_partition_task >> list(enrich_sub_dags.values())
 
-create_clean_partition_task >> list(enrich_sub_dags.values()) >> terminate_cluster_task
+# fact_call_ura_paths dependency
+[enrich_sub_dags.pop("call_ura_events")] >> dw_sub_dags["fact_call_ura_paths"]
+
+list(enrich_sub_dags.values()) >> terminate_cluster_task
+list(dw_sub_dags.values()) >> terminate_cluster_task

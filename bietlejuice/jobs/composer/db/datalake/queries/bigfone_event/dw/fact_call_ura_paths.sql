@@ -28,16 +28,17 @@ ura_interactions as (
 )
 select
     u.id_call as sk_call,
-    u.id as sk_flow_step,
+    cast(u.id as bigint) as sk_flow_step,
     u.dt_event as sk_started,
     cast(date_format(u.ts_created, 'YYYYMMdd') as bigint) as sk_call_date,
     cast(date_format(u.ts_created_local, 'YYYYMMdd') as bigint) as sk_call_date_local,
     u.ura_step as flow_step_name,
     u.name as ura_step_name,
     u.digit_selection as option_answered,
-    unix_timestamp(u2.ts_created_next_ura_step_event) - unix_timestamp(u2.ts_created_ura_step_event) as seconds_ura_step_duration,
+    cast(unix_timestamp(u2.ts_created_next_ura_step_event) - unix_timestamp(u2.ts_created_ura_step_event) as integer) as seconds_ura_step_duration,
     u.ts_created,
-    u.ts_created_local
+    u.ts_created_local,
+    now() as ts_load
 from ura u
 inner join ura_interactions u2
 on u.id=u2.id
