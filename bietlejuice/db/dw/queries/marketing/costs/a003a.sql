@@ -33,24 +33,6 @@ t_row_count as ( --contagem de prospects
         and city_group is not null
     group by 1,2,3,4
 ),
-temp as ( --Calculo do share por mes
-	select distinct
-	    year_month,
-	    last_year_month,
-	    city_group,
-	    (sum(row_count) over (PARTITION by year_month, city_group)::float
-	    /
-		sum(row_count) over (PARTITION by year_month)::float
-	   	) as current_share
-	from t_row_count
-	where sk_date>=20190101
-),
-share as (
-	select
-		*,
-		lead(current_share,1) over (partition by city_group order by year_month desc) as share --pegando o share do ultimo mês
-	from temp
-),
 dim_distinct as (
 	select distinct
 	 	dd.sk_date,
@@ -58,6 +40,29 @@ dim_distinct as (
 	 	dr.city_group
 	from
 	 	dim_date dd, dim_region dr
+	where
+	    dd.date < current_date
+),
+temp as ( --Calculo do share por mes
+	select distinct
+	    ddt.year_month,
+	    ddt.city_group,
+	    (sum(row_count) over (PARTITION by ddt.year_month, ddt.city_group)::float
+	    /
+		sum(row_count) over (PARTITION by ddt.year_month)::float
+	   	) as current_share
+	from
+		dim_distinct ddt
+		left join t_row_count t
+			on ddt.year_month = t.year_month
+			and ddt.city_group = t.city_group
+	where ddt.sk_date>=20190101
+),
+share as (
+	select
+		*,
+		lead(current_share,1) over (partition by city_group order by year_month desc) as share --pegando o share do ultimo mês
+	from temp
 )
 select
 	d.sk_date,
