@@ -235,7 +235,8 @@ select
     coalesce(aq.ts_created, cf.ts_created) as ts_call_abandoned_in_queue,
     coalesce(aq.ts_created_local, cf.ts_created_local) as ts_call_abandoned_in_queue_local,
     wti.ts_created_next_wait_event as ts_queue_left,
-    wti.ts_created_next_wait_event_local as ts_queue_left_local
+    wti.ts_created_next_wait_event_local as ts_queue_left_local,
+    now() as ts_load
 from calls c
 inner join wait_time_interactions wti 
 on c.id_call=wti.id_call
