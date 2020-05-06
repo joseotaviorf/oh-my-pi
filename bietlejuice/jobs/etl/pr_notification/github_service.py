@@ -24,6 +24,7 @@ class GithubService(object):
 
         if github_response.status_code != 200:
             raise RuntimeError(
-                'm=_get_json_response, status_code={}, '.format(github_response.status_code, github_response.json()))
+                'm=_get_json_response, status_code={}, msg=Error accessing the Github '
+                'API'.format(github_response.status_code, github_response.json()))
 
         return github_response.json()

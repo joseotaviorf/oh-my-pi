@@ -51,8 +51,11 @@ class GithubPullRequests(GithubService):
         json_response = self.get_json_response(self.graphql_query)
         repo = json_response['data']['repositoryOwner']['repository']
         if repo is None:
+            api_msg_error = 'No error message was received from API'
+            if 'errors' in json_response:
+                api_msg_error = ', '.join([error['message'] for error in json_response['errors']])
             raise RuntimeError(
-                'm=extract_pull_requests, repository={}, msg=no data for repository'.format(self.repo_name))
+                'm=extract_pull_requests, repository={}, msg={}'.format(self.repo_name, api_msg_error))
 
         for prs in repo['pullRequests']['edges']:
             _title = prs['node']['title'].encode('ascii', 'ignore').decode('ascii')  # removing non-ascii chars
