@@ -252,6 +252,11 @@ create_clean_partition_task >> list(enrich_sub_dags.values())
 
 # fact_call_ura_paths dependency
 [enrich_sub_dags.pop("call_ura_events")] >> dw_sub_dags["fact_call_ura_paths"]
+[
+    enrich_sub_dags.pop("call_context_data"),
+    enrich_sub_dags.pop("call_recording_available_events"),
+    enrich_sub_dags.pop("dialed_phone"),
+] >> dw_sub_dags["dim_call"]
 
 list(enrich_sub_dags.values()) >> terminate_cluster_task
 list(dw_sub_dags.values()) >> terminate_cluster_task

@@ -56,7 +56,8 @@ select
     end as caller_phone_number,
     ccd.incoming_phone_number as external_phone_number,
     dp.phone as user_dialed_phone_number,
-    cr.recording_url as recording_url
+    cr.recording_url as recording_url,
+    now() as ts_load
 from calls c
     left join call_context_data ccd
     on c.id_call=ccd.id_call
@@ -64,4 +65,3 @@ from calls c
     on c.id_call=cr.id_call
     left join dialed_phone dp
     on c.id_call=dp.id_call
-;
