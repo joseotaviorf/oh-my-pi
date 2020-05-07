@@ -35,6 +35,7 @@ from bietlejuice.jobs.dags.supply_demand_funnel import (
     InspectionSubDag,
     LeadConversionSubDag,
     SpecialConditionSubDag,
+    ListingFlowsSubDag,
 )
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
@@ -415,6 +416,17 @@ def special_condition_sub_dag(sub_dag_name):
     return sub_dag.build_special_condition()
 
 
+def listing_flows_sub_dag(sub_dag_name):
+    sub_dag = ListingFlowsSubDag(
+        bucket=bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+    )
+    return sub_dag.build_listing_flows()
+
+
 ods_house_rent_flow = BaseDAG.build_python_operator(
     task_id="ODS_house_rent_flow",
     dag=main_dag,
@@ -487,18 +499,6 @@ ods_house_listing_flows = BaseDAG.build_python_operator(
     python_callable=extract_query_dim_from_ebdb_to_ods,
     execution_timeout=timedelta(hours=7),
     op_kwargs={"table_name": "fact_house_listing_flows"},
-)
-
-dw_fact_house_listing_flows = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id="DW_Fact_House_Listing_Flows",
-    python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={
-        "dim_name": "house_listing_flows",
-        "is_fact": True,
-        "bucket": bucket,
-        "insert_dummy": False,
-    },
 )
 
 dw_sale_fact_listing_flows = BaseDAG.build_python_operator(
@@ -642,6 +642,10 @@ special_condition_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_name="SpecialCondition",
 )
 
+listing_flows_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag, sub_dag_func=listing_flows_sub_dag, sub_dag_name="ListingFlows"
+)
+
 xcom_fact_listing_rent_flows = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id="XCom_fact_listing_rent_flows",
@@ -714,7 +718,7 @@ fact_house_listings.set_upstream(
 )
 
 # new 'supply' flow
-dw_fact_house_listing_flows.set_upstream(
+listing_flows_dag.set_upstream(
     [
         lead_dag,
         photo_job_dag,
@@ -755,12 +759,12 @@ inspection_dag >> fact_inspection_bookings_task
 
 trigger_bi_growth_dag_task.set_upstream(
     [
-        dw_fact_house_listing_flows,
+        listing_flows_dag,
         fact_house_listings,
         fact_listing_rent_flows,
         dw_fact_house_listing_status_task,
     ]
 )
 trigger_bi_crm_dw_dag_task.set_upstream(
-    [dw_fact_house_listing_flows, fact_house_listings, fact_listing_rent_flows]
+    [listing_flows_dag, fact_house_listings, fact_listing_rent_flows]
 )

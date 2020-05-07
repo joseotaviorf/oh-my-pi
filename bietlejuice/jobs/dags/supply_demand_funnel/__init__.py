@@ -20,3 +20,4 @@ from bietlejuice.jobs.dags.supply_demand_funnel.reservation_subdag import Reserv
 from bietlejuice.jobs.dags.supply_demand_funnel.special_condition_subdag import SpecialConditionSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.user_subdag import UserSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.visit_subdag import VisitSubDag
+from bietlejuice.jobs.dags.supply_demand_funnel.listing_flows_subdag import ListingFlowsSubDag
