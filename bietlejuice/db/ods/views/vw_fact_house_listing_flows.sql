@@ -223,7 +223,11 @@ potential_listings as (
     	else 'Other'
     end as lead_referring_category,
     us_d.subscriptionSource as subscription_source,
-    f.affiliate_type
+    coalesce(f.affiliate_type,
+            case when ua.affiliateType = 'Doorman' and u.dados_agente_id is not null then 'Doorman & Agent'
+            when u.dados_agente_id is not null then 'Agent'
+            else ua.affiliateType
+            end) as affiliate_type
   from listing_flows_with_reprocessed_leads f
   left join lead_first_event_tracking lfet
     on lfet.id_lead = f.lead_id
