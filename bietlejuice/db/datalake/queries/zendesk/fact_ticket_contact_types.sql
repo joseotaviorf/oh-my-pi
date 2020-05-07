@@ -29,11 +29,11 @@ SELECT
   distinct fcf.id_ticket as sk_ticket,  
   coalesce(cast(date_format(fcf.ts_updated, '%Y%m%d') as integer), -1) as sk_updated,
   fcf.contact_type_tag,
-  case when cp.has_valid_prefix = 1 then upper(split_part(fcf.contact_type_tag,'_', 1)) else 'OTHER' end as client_taxonomy,
+  case when cp.has_valid_prefix = 1 then upper(split_part(fcf.contact_type_tag,'_', 1)) end as client_taxonomy,
   case
     when (cp.has_valid_prefix = 1 and length(split_part(fcf.contact_type_tag,'_', 2)) <= 2) then upper(split_part(fcf.contact_type_tag,'_', 2)) 
-    else 'OTHER' 
   end as category_taxonomy,
+  has_valid_prefix as is_contact_type_taxonomy,
   fcf.ts_updated,
   now() as ts_load
 FROM filtered_custom_fields fcf
