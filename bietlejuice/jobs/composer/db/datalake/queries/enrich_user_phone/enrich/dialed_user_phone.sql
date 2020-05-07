@@ -1,11 +1,13 @@
 with
-incoming_phone as (
+dialed_phone as (
     select
         id_call,
-        incoming_phone_number
-    from datalake_bigfone.incoming_phone
+        phone,
+        year,
+        month,
+        day
+    from datalake_bigfone.dialed_phone
     where year={year} and month={month} and day={day}
-    group by 1,2
 ),
 ebdb_main_phone as (
     select
@@ -41,15 +43,18 @@ ebdb_old_phone as (
 )
 select
     max(coalesce(mp.id, sp.id, bp.id, op.id)) as id_user,
-    incoming.id_call
-from incoming_phone incoming
+    dial.id_call,
+    dial.year,
+    dial.month,
+    dial.day
+from dialed_phone dial
 left join ebdb_main_phone mp
-    on incoming.incoming_phone_number=mp.main_phone
+    on dial.phone=mp.main_phone
 left join ebdb_secondary_phone sp
-    on incoming.incoming_phone_number=sp.secondary_phone
+    on dial.phone=sp.secondary_phone
 left join ebdb_business_phone bp
-    on incoming.incoming_phone_number=bp.business_phone
+    on dial.phone=bp.business_phone
 left join ebdb_old_phone op
-    on incoming.incoming_phone_number=op.old_phone
+    on dial.phone=op.old_phone
 where coalesce(mp.id, sp.id, bp.id, op.id) is not null
-group by 2
+group by 2,3,4,5
