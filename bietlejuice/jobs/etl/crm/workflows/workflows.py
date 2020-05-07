@@ -5,12 +5,14 @@ import os
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils import QuintoAndarLogger
 from botocore.exceptions import ClientError
+from collections import OrderedDict
 from pymongo import MongoClient
 from gzip import GzipFile
 from io import BytesIO
 
-from bietlejuice.jobs.base.new_base_etl import BaseETL
 from bietlejuice.jobs.etl.crm.tasks.unidecode_handler import UnidecodeHandler
+from bietlejuice.jobs.base.new_base_etl import BaseETL
+from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR
 
 logger = QuintoAndarLogger("CRMWorkflows")
 
@@ -18,6 +20,7 @@ logger = QuintoAndarLogger("CRMWorkflows")
 class CRMWorkflows(object):
     BUCKET_FOLDER_SUFFIXES = "crm/workflows"
     S3_FILE_NAME = "data"
+    TABLE_PARTITION_PARAM = "__PARTITION_DATE__"
 
     @logger(exclude="mongo_client_uri")
     def __init__(self, s3_bucket, execution_date, mongo_client_uri=None):
@@ -104,6 +107,32 @@ class CRMWorkflows(object):
         )
 
     @logger
+    def move_worflows_to_clean(self, sql_file_name="create_workflows_table.sql"):
+        _cols = OrderedDict(
+            [
+                ("id", str),
+                ("states", str),
+                ("id_workflow_definition", str),
+                ("workflow_definition_version", str),
+                ("id_flow", str),
+                ("ts_start", str),
+                ("ts_updated", str),
+                ("status", str),
+                ("transitions", str),
+                ("v", str),
+                ("ts_end", str),
+                ("context", str),
+            ]
+        )
+
+        self._move_to_clean(
+            bucket_folder_suffix=CRMWorkflows.BUCKET_FOLDER_SUFFIXES,
+            sql_file_name=sql_file_name,
+            r_cols=_cols,
+            c_cols=_cols
+        )
+
+    @logger
     def __add_incremental_constraints(self):
         return {
             "updated": {
@@ -171,4 +200,34 @@ class CRMWorkflows(object):
             table=table_name,
             partition_name=partition_name,
             partition_value=self.partition_date,
+        )
+
+    @logger
+    def _move_to_clean(
+            self,
+            bucket_folder_suffix,
+            sql_file_name,
+            r_cols,
+            c_cols,
+            queries_folder_suffix=None
+    ):
+        key = "clean/{}/dt={}/{}.parq".format(
+            bucket_folder_suffix, self.partition_date, CRMWorkflows.S3_FILE_NAME
+        )
+
+        query = BaseETL.get_query_from_file_name(
+            "{}/{}/{}".format(
+                DATALAKE_QUERIES_DIR,
+                bucket_folder_suffix
+                if queries_folder_suffix is None
+                else queries_folder_suffix,
+                sql_file_name
+            )
+        )
+
+        self.athena_client.create_parquet_from_query(
+            key=key,
+            query=query.replace(CRMWorkflows.TABLE_PARTITION_PARAM, self.partition_date),
+            raw_columns=r_cols,
+            clean_columns=c_cols
         )

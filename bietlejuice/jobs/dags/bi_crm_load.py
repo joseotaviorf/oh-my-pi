@@ -82,13 +82,23 @@ def workflows_data_existence_check(bucket_type, **kwargs):
 
 
 def upsert_workflows_partition(bucket_type, **kwargs):
-    crm_workgroups = CRMWorkflows(
+    crm_workflows = CRMWorkflows(
         s3_bucket=s3_bucket,
         mongo_client_uri=mongo_client_uri,
         execution_date=kwargs['execution_date']
     )
 
-    crm_workgroups.upsert_workflows_partition(bucket_type)
+    crm_workflows.upsert_workflows_partition(bucket_type)
+
+
+def move_workflows_to_clean(**kwargs):
+    crm_workflows = CRMWorkflows(
+        s3_bucket=s3_bucket,
+        mongo_client_uri=mongo_client_uri,
+        execution_date=kwargs['execution_date']
+    )
+
+    crm_workflows.move_worflows_to_clean()
 
 
 def extract_and_load_workgroups_data(**kwargs):
@@ -225,21 +235,41 @@ def workflows_sub_dag(sub_dag_name, **kwargs):
         task_id='check_data_existence',
         python_callable=workflows_data_existence_check,
         dag=local_dag,
+        provide_context=True,
         op_kwargs={
             'bucket_type': 'raw'
         }
     )
 
     upsert_workflows_partition_task = BaseDAG.build_python_operator(
-        task_id='upsert_workflows_partition',
+        task_id='upsert_workflows_raw_partition',
         python_callable=upsert_workflows_partition,
         dag=local_dag,
+        provide_context=True,
         op_kwargs={
             'bucket_type': 'raw'
         }
     )
 
+    move_workflows_to_clean_task = BaseDAG.build_python_operator(
+        task_id='move_workflows_to_clean',
+        python_callable=move_workflows_to_clean,
+        dag=local_dag,
+        provide_context=True
+    )
+
+    upsert_workflows_clean_partitions_task = BaseDAG.build_python_operator(
+        task_id='upsert_workflows_clean_partition',
+        python_callable=upsert_workflows_partition,
+        dag=local_dag,
+        provide_context=True,
+        op_kwargs={
+            'bucket_type': 'clean'
+        }
+    )
+
     extract_and_load_workgroups_task >> check_data_existence >> upsert_workflows_partition_task
+    check_data_existence >> move_workflows_to_clean_task >> upsert_workflows_clean_partitions_task
 
     return local_dag
 
