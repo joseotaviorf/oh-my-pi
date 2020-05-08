@@ -50,92 +50,25 @@ with
         from last_updated_tickets
         group by 2
     ),
-    incoming_phone as (
-        select
-            id_call,
-            get_json_object(metadata, '$.their_number') as incoming_phone_number
-        from call_events
-        where event='call.new'
-        group by 1,2
-    ),
-    -- gets the user dialed phone (open column values for typing)
-    dialed_phone as (
-      select
-          id_call,
-          get_json_object(metadata, '$.data') as dialed_phone
-      from call_events
-      where
-          event='call.data-provided'
-          and get_json_object(metadata, '$.tag')='dialed_phone'
-          and length(get_json_object(metadata, '$.data'))>=8  -- valid phone size
-      group by 1,2
-    ),
-    -- the max(id) was used to users table from EBDB because a user can have the same phone in the same column.
-    -- returns the most recent user
-    -- the phones received by the Teravoz don't have the prefix +55.
-    ebdb_main_phone as (
-        select
-            max(id) as id,
-            replace(main_phone,'+55') as main_phone
-        from datalake_ebdb_clean.user
-        where main_phone is not null
-        group by 2
-    ),
-    ebdb_secondary_phone as (
-        select
-            max(id) as id,
-            replace(secondary_phone,'+55') as secondary_phone
-        from datalake_ebdb_clean.user
-        where secondary_phone is not null
-        group by 2
-    ),
-    ebdb_business_phone as (
-        select
-            max(id) as id,
-            replace(business_phone,'+55') as business_phone
-        from datalake_ebdb_clean.user
-        where business_phone is not null
-        group by 2
-    ),
-    ebdb_old_phone as (
-        select
-            max(id) as id,
-            replace(old_phone,'+55') as old_phone
-        from datalake_ebdb_clean.user
-        where old_phone is not null
-        group by 2
-    ),
     incoming_user_phone as (
         select
-            max(coalesce(mp.id, sp.id, bp.id, op.id)) as id_user,
-            incoming.id_call
-        from incoming_phone incoming
-        left join ebdb_main_phone mp
-            on incoming.incoming_phone_number=mp.main_phone
-        left join ebdb_secondary_phone sp
-            on incoming.incoming_phone_number=sp.secondary_phone
-        left join ebdb_business_phone bp
-            on incoming.incoming_phone_number=bp.business_phone
-        left join ebdb_old_phone op
-            on incoming.incoming_phone_number=op.old_phone
-        where coalesce(mp.id, sp.id, bp.id, op.id) is not null
-        group by 2
+            id_user,
+            id_call
+        from datalake_user_phone.incoming_user_phone
+        where date(concat(cast(year as varchar(4)), '-',
+                      cast(month as varchar(2)), '-',
+                      cast(day as varchar(2)))) >= date('2019-09-01')
+        group by 1,2
     ),
     dialed_user_phone as (
         select
-            max(coalesce(mp.id, sp.id, bp.id, op.id)) as id_user,
-            dial.id_call
-        from dialed_phone dial
-        left join ebdb_main_phone mp
-            on dial.dialed_phone=mp.main_phone
-        left join ebdb_secondary_phone sp
-            on dial.dialed_phone=sp.secondary_phone
-        left join ebdb_business_phone bp
-            on dial.dialed_phone=bp.business_phone
-        left join ebdb_old_phone op
-            on dial.dialed_phone=op.old_phone
-        where coalesce(mp.id, sp.id, bp.id, op.id) is not null
-        group by 2
+            id_user,
+            id_call
+        from datalake_user_phone.dialed_user_phone
+        where date(concat(cast(year as varchar(4)), '-',
+                      cast(month as varchar(2)), '-',
+                      cast(day as varchar(2)))) >= date('2019-09-01')
+        group by 1,2
     ),
     agent_entered_events as (
         select
@@ -197,11 +130,8 @@ with
             id_call,
             ts_created,
             ts_created_local
-        from call_events
-        where
-            event='actor.entered'
-            or event='call.finished'
-            or event='call.queue-abandon'
+        from datalake_bigfone.call_waiting_next_events
+        where dt_event >= date('2019-09-01')
         group by 2,3,4
     ),
     -- wait_time_interactions = time diff between the next riging, queue-abandon or finished event immediately after 'call_waiting' event and 'call_waiting' event
@@ -308,13 +238,9 @@ with
     call_context_data as (
         select
             id_call,
-            get_json_object(metadata, '$.direction') as call_direction
-        from call_events
-        where event='call.standby'
-            or event='call.new'
-            or event='call.waiting'
-            or event='call.ongoing'
-            or event='call.finished'
+            call_direction
+        from datalake_bigfone.call_context_data
+        where dt_event >= date('2019-09-01')
         group by 1,2
     ),
     last_queue_for_agent as (
