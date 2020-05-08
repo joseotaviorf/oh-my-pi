@@ -5,6 +5,7 @@ create table if not exists staging.zendesk_fact_ticket_contact_types (
     contact_type_tag varchar(75),
     client_taxonomy varchar(5),
     category_taxonomy varchar(5),
+    is_contact_type_taxonomy boolean,
     ts_updated timestamp,
     ts_load timestamp
 );
