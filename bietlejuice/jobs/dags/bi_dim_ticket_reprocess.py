@@ -7,7 +7,7 @@ from bietlejuice.jobs.dags.util import environment as env
 
 from bietlejuice.jobs.etl.zendesk import ZendeskTableEnum, ZendeskFactory
 
-MAIN_DAG_ID = 'bi-dim-ticket-reprocess'
+MAIN_DAG_ID = 'bi-dim-ticket-reprocessing'
 MAIN_START_DATE = datetime(2019, 4, 8, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = '0 8 * * *'
 
@@ -80,13 +80,6 @@ def sub_dag_dw(sub_dag_name, **kwargs):
     move_to_staging_task >> move_to_prod_task
     return local_dag
 
-
-fact_tickets_sub_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_name='fact_tickets',
-    sub_dag_func=sub_dag_dw,
-    class_=ZendeskTableEnum.FACT_TICKETS
-)
 
 dim_ticket_sub_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,

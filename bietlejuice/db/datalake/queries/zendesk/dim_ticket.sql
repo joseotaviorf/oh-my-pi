@@ -7,18 +7,43 @@ with tickets_filter as (
 last_updated_ticket as (
     select id_ticket, max(ts_updated) as ts_last_updated from tickets_filter group by 1
 ),
+last_updated_ticket_fields as (	
+  select id_ticket_fields, max(ts_updated) as ts_last_updated from datalake_clean.zendesk_ticket_fields group by 1	
+),
 last_updated_group as (
     select id_group, max(ts_updated) as ts_updated from datalake_clean.zendesk_groups group by 1
+),
+parse_fields as (
+  select c.id_ticket,
+    replace(replace(regexp_extract(cf.field, '([^:]+)'), '"', ''), '"', '') as id_field,
+    replace(regexp_extract(cf.field, '[^:]*$'), '"', '') as value,
+    c.ts_updated
+    from datalake_clean.zendesk_custom_fields c
+    CROSS JOIN UNNEST(SPLIT(c.custom_fields,',')) AS cf (field)
+    inner join last_updated_ticket lt
+    on c.id_ticket = lt.id_ticket and c.ts_updated=lt.ts_last_updated
+),
+transformed_custom_fields as (
+    select
+      f.id_ticket,
+      cast(map_agg(tf.raw_title, f.value) as json) as custom_fields,
+      f.ts_updated
+    from parse_fields f
+    inner join last_updated_ticket_fields l
+    on l.id_ticket_fields = f.id_field
+    inner join datalake_clean.zendesk_ticket_fields tf
+    on l.id_ticket_fields = tf.id_ticket_fields and l.ts_last_updated=tf.ts_updated
+    group by 1,3
 ),
 custom_field_ids as (
     select
         c.id_ticket,
         c.custom_fields,
-        cast(coalesce(json_extract(c.custom_fields,'$["31542008"]'),json_extract(c.custom_fields,'$["360030297872"]')) as varchar) as request_type,
-        cast(json_extract(c.custom_fields,'$["46785608"]') as varchar) as client_type
-    from datalake_clean.zendesk_custom_fields c
+        cast(json_extract(c.custom_fields,'$["Tipo de Solicitação"]') as varchar) as request_type,
+        cast(json_extract(c.custom_fields,'$["Tipo de Cliente"]') as varchar) as client_type
+    from transformed_custom_fields c
         inner join last_updated_ticket lt
-        on c.id_ticket = lt.id_ticket and date(cast(c.ts_updated as timestamp))=date(cast(lt.ts_last_updated as timestamp))
+        on c.id_ticket = lt.id_ticket and c.ts_updated=lt.ts_last_updated
 ),
 groups as (
     select
