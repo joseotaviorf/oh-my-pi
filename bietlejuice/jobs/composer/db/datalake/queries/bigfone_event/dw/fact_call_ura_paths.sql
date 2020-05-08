@@ -29,7 +29,7 @@ ura_interactions as (
 select
     u.id_call as sk_call,
     cast(u.id as bigint) as sk_flow_step,
-    u.dt_event as sk_started,
+    cast(date_format(u.dt_event, 'YYYYMMdd') as bigint) as sk_started,
     cast(date_format(u.ts_created, 'YYYYMMdd') as bigint) as sk_call_date,
     cast(date_format(u.ts_created_local, 'YYYYMMdd') as bigint) as sk_call_date_local,
     u.ura_step as flow_step_name,

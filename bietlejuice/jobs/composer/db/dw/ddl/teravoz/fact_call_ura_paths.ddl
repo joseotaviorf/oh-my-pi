@@ -2,7 +2,7 @@ drop table if exists teravoz.fact_call_ura_paths;
 create table if not exists teravoz.fact_call_ura_paths (
     sk_call varchar(30),
     sk_flow_step bigint,
-    sk_started date,
+    sk_started bigint,
     sk_call_date bigint,
     sk_call_date_local bigint,
     flow_step_name varchar(20),
