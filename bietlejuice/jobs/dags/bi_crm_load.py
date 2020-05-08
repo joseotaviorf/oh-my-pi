@@ -268,8 +268,13 @@ def workflows_sub_dag(sub_dag_name, **kwargs):
         }
     )
 
-    extract_and_load_workgroups_task >> check_data_existence >> upsert_workflows_partition_task
-    check_data_existence >> move_workflows_to_clean_task >> upsert_workflows_clean_partitions_task
+    airflow_helpers.chain(
+        extract_and_load_workgroups_task,
+        check_data_existence,
+        upsert_workflows_partition_task,
+        move_workflows_to_clean_task,
+        upsert_workflows_clean_partitions_task
+    )
 
     return local_dag
 
