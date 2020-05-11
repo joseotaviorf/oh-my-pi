@@ -3,135 +3,35 @@ clone:
     image: plugins/git
 
 pipeline:
+#  =======================================================================
+# =============================== PYTHON 2 ===============================
+#  =======================================================================
   check-style-python2:
-    group: tests
+    group: ec2-tests
     image: python:2.7.12
     commands:
-      - make requirements-lint-python2
-      - make check-style-python2
-    when:
-      event: push
-
-  check-style-python3:
-    group: tests
-    image: python:3.6.7
-    commands:
-      - make requirements-lint-python3
-      - make check-style-python3
+      - apt-get update
+      - apt-get install -y git > /dev/null
+      - chmod +x scripts/execute_python2_steps.sh
+      - bash scripts/execute_python2_steps.sh "make requirements-lint-python2" "make check-style-python2"
     when:
       event: push
 
   unit-tests-python2:
-    group: tests
+    group: ec2-tests
     image: python:2.7.12
     commands:
       - export AIRFLOW_GPL_UNIDECODE=yes
       - export AWS_DEFAULT_REGION=us-east-1
-      - make requirements-python2
-      - make unit-tests-python2
-      - make cov-badge
+      - apt-get update
+      - apt-get install -y git > /dev/null
+      - chmod +x scripts/execute_python2_steps.sh
+      - bash scripts/execute_python2_steps.sh "make requirements-python2" "make unit-tests-python2" "make cov-badge"
     when:
       event: push
-
-  files-validation-python3:
-    group: tests
-    image: python:3.6.7
-    pull: true
-    commands:
-      - make requirements-test-python3
-      - make files-validation-python3
-    when:
-      event: push
-
-  unit-tests-python3:
-    group: tests
-    image: quintoandar/pyspark:0.1
-    pull: true
-    commands:
-      - export AIRFLOW_GPL_UNIDECODE=yes
-      - export AWS_DEFAULT_REGION=us-east-1
-      - make requirements-python3
-      - make unit-tests-python3
-    when:
-      event: push
-
-  publish-coverage:
-    image: plugins/s3
-    pull: true
-    acl: public-read
-    bucket: 5a-coverage
-    source: badge-lines.svg
-    target: /bi-etl-ejuice
-    content_type: image/svg+xml
-    cache_control: no-cache
-    when:
-      event: push
-      branch: [ master ]
-
-  make-package-python3:
-    image: python:3.6.7
-    commands:
-      - make package-python3
-    when:
-      event: [ push, tag ]
-      branch: [ master, forno ]
-
-  prepare-release-python3-forno:
-    image: alpine:3.10
-    commands:
-      - find . -wholename "./dist/bi_etl_ejuice-*-py3-none-any.whl" -exec mv '{}' ./dist/bi_etl_ejuice-forno-py3-none-any.whl \;
-    when:
-      event: push
-      branch: forno
-
-  prepare-release-python3-prod:
-    image: alpine:3.10
-    commands:
-      - find . -wholename "./dist/bi_etl_ejuice-*-py3-none-any.whl" -exec cp '{}' ./dist/bi_etl_ejuice-latest-py3-none-any.whl \;
-    when:
-      event: [ push, tag ]
-      branch: master
-
-  export-releases-to-s3-prod:
-    image: plugins/s3
-    pull: true
-    bucket: 5a-artifacts
-    source: dist/*.whl
-    target: bi-etl-ejuice/
-    strip_prefix: dist/
-    acl: bucket-owner-full-control
-    cache_control: no-cache
-    when:
-      event: [ push, tag ]
-      branch: master
-
-  export-releases-to-s3-new-prod-account:
-    image: plugins/s3
-    pull: true
-    bucket: artifacts.s3.data.quintoandar.com.br
-    source: dist/*.whl
-    target: bi-etl-ejuice/
-    strip_prefix: dist/
-    acl: bucket-owner-full-control
-    cache_control: no-cache
-    when:
-      event: [ push, tag ]
-      branch: master
-
-  export-releases-to-s3-forno:
-    image: plugins/s3
-    pull: true
-    bucket: artifacts.s3.forno.data.quintoandar.com.br
-    source: dist/*.whl
-    target: bi-etl-ejuice/
-    strip_prefix: dist/
-    acl: bucket-owner-full-control
-    cache_control: no-cache
-    when:
-      event: [ push, tag ]
-      branch: forno
 
   export-github-credentials-ec2:
+    group: ec2-export
     image: python:2.7.12
     commands:
       - echo $${GITHUB_ACCESS_TOKEN} > githubcredentials.txt
@@ -143,6 +43,7 @@ pipeline:
       branch: [ forno, master ]
 
   install-dependencies-ec2-forno:
+    group: ec2-install
     image: drillster/drone-rsync
     hosts: [ ssh.airflow.forno.quintoandar.com.br ]
     user: airflow
@@ -169,6 +70,7 @@ pipeline:
       branch: [ forno ]
 
   install-dependencies-ec2-prod:
+    group: ec2-install
     image: drillster/drone-rsync
     hosts: [ ssh.airflow.quintoandar.com.br ]
     user: airflow
@@ -193,7 +95,7 @@ pipeline:
       branch: [ master ]
 
   load-jobs-ec2-forno:
-    group: updated_jobs
+    group: ec2-updated_jobs
     image: drillster/drone-rsync
     hosts: [ ssh.airflow.forno.quintoandar.com.br ]
     user: airflow
@@ -208,7 +110,7 @@ pipeline:
       branch: [ forno ]
 
   load-jobs-ec2-prod:
-    group: updated_jobs
+    group: ec2-updated_jobs
     image: drillster/drone-rsync
     hosts: [ ssh.airflow.quintoandar.com.br ]
     user: airflow
@@ -223,7 +125,7 @@ pipeline:
       branch: [ master ]
 
   load-plugins-ec2-forno:
-    group: updated_jobs
+    group: ec2-updated_jobs
     image: drillster/drone-rsync
     hosts: [ ssh.airflow.forno.quintoandar.com.br ]
     user: airflow
@@ -237,7 +139,7 @@ pipeline:
       branch: [ forno ]
 
   load-plugins-ec2-prod:
-    group: updated_jobs
+    group: ec2-updated_jobs
     image: drillster/drone-rsync
     hosts: [ ssh.airflow.quintoandar.com.br ]
     user: airflow
@@ -250,8 +152,118 @@ pipeline:
       event: push
       branch: [ master ]
 
+#  =======================================================================
+# =============================== PYTHON 3 ===============================
+#  =======================================================================
+
+  check-style-python3:
+    group: tests
+    image: python:3.6.7
+    commands:
+      - apt-get update
+      - apt-get install -y git > /dev/null
+      - chmod +x scripts/execute_python3_steps.sh
+      - bash scripts/execute_python3_steps.sh "make requirements-lint-python3" "make check-style-python3"
+    when:
+      event: push
+
+  files-validation-python3:
+    group: tests
+    image: python:3.6.7
+    pull: true
+    commands:
+      - apt-get update
+      - apt-get install -y git > /dev/null
+      - chmod +x scripts/execute_python3_steps.sh
+      - bash scripts/execute_python3_steps.sh "make requirements-test-python3" "make files-validation-python3"
+    when:
+      event: push
+
+  unit-tests-python3:
+    group: tests
+    image: quintoandar/pyspark:0.1
+    pull: true
+    commands:
+      - export AIRFLOW_GPL_UNIDECODE=yes
+      - export AWS_DEFAULT_REGION=us-east-1
+      - apt-get update
+      - apt-get install -y git > /dev/null
+      - chmod +x scripts/execute_python3_steps.sh
+      - bash scripts/execute_python3_steps.sh "make requirements-python3" "make unit-tests-python3"
+    when:
+      event: push
+
+  make-package-python3:
+    group: package
+    image: python:3.6.7
+    commands:
+      - make package-python3
+    when:
+      event: [ push, tag ]
+      branch: [ master, forno ]
+
+  prepare-release-python3-forno:
+    group: release
+    image: alpine:3.10
+    commands:
+      - find . -wholename "./dist/bi_etl_ejuice-*-py3-none-any.whl" -exec mv '{}' ./dist/bi_etl_ejuice-forno-py3-none-any.whl \;
+    when:
+      event: push
+      branch: forno
+
+  prepare-release-python3-prod:
+    group: release
+    image: alpine:3.10
+    commands:
+      - find . -wholename "./dist/bi_etl_ejuice-*-py3-none-any.whl" -exec cp '{}' ./dist/bi_etl_ejuice-latest-py3-none-any.whl \;
+    when:
+      event: [ push, tag ]
+      branch: master
+
+  export-releases-to-s3-prod:
+    group: export
+    image: plugins/s3
+    pull: true
+    bucket: 5a-artifacts
+    source: dist/*.whl
+    target: bi-etl-ejuice/
+    strip_prefix: dist/
+    acl: bucket-owner-full-control
+    cache_control: no-cache
+    when:
+      event: [ push, tag ]
+      branch: master
+
+  export-releases-to-s3-new-prod-account:
+    group: export
+    image: plugins/s3
+    pull: true
+    bucket: artifacts.s3.data.quintoandar.com.br
+    source: dist/*.whl
+    target: bi-etl-ejuice/
+    strip_prefix: dist/
+    acl: bucket-owner-full-control
+    cache_control: no-cache
+    when:
+      event: [ push, tag ]
+      branch: master
+
+  export-releases-to-s3-forno:
+    group: export
+    image: plugins/s3
+    pull: true
+    bucket: artifacts.s3.forno.data.quintoandar.com.br
+    source: dist/*.whl
+    target: bi-etl-ejuice/
+    strip_prefix: dist/
+    acl: bucket-owner-full-control
+    cache_control: no-cache
+    when:
+      event: [ push, tag ]
+      branch: forno
+
   load-dags-composer-forno:
-    group: updated_jobs
+    group: update_jobs
     image: quintoandar/drone-gcs-sync
     pull: true
     bucket: us-east4-airflow-forno-90eedca3-bucket
@@ -267,7 +279,7 @@ pipeline:
       branch: [ forno ]
 
   load-dags-composer-prod:
-    group: updated_jobs
+    group: update_jobs
     image: quintoandar/drone-gcs-sync
     pull: true
     bucket: us-east4-airflow-prod-6fc58ef2-bucket
@@ -283,7 +295,7 @@ pipeline:
       branch: [ master ]
 
   load-spark-jobs-s3-forno:
-    group: updated_jobs
+    group: update_jobs
     image: python:3.6.7
     commands:
       - pip install boto3==1.9.159
@@ -293,7 +305,7 @@ pipeline:
       branch: forno
 
   load-spark-jobs-s3-new-forno-account:
-    group: updated_jobs
+    group: update_jobs
     image: python:3.6.7
     commands:
       - pip install boto3==1.9.159
@@ -303,7 +315,7 @@ pipeline:
       branch: forno
 
   load-spark-jobs-s3-prod:
-    group: updated_jobs
+    group: update_jobs
     image: python:3.6.7
     commands:
       - pip install boto3==1.9.159
@@ -313,7 +325,7 @@ pipeline:
       branch: master
 
   load-spark-jobs-s3-new-prod-account:
-    group: updated_jobs
+    group: update_jobs
     image: python:3.6.7
     commands:
       - pip install boto3==1.9.159
@@ -322,7 +334,25 @@ pipeline:
       event: push
       branch: master
 
+#  =======================================================================
+# =============================== Common ===============================
+#  =======================================================================
+  publish-coverage:
+    group: common-coverage
+    image: plugins/s3
+    pull: true
+    acl: public-read
+    bucket: 5a-coverage
+    source: badge-lines.svg
+    target: /bi-etl-ejuice
+    content_type: image/svg+xml
+    cache_control: no-cache
+    when:
+      event: push
+      branch: [ master ]
+
   sonar-preview:
+    group: common-sonar
     image: quintoandar/sonar-scanner
     pull: true
     commands:
@@ -346,6 +376,7 @@ pipeline:
       branch: [ master ]
 
   sonar-report:
+    group: common-sonar
     image: quintoandar/sonar-scanner
     pull: true
     commands:
@@ -368,6 +399,7 @@ pipeline:
       branch: [ master ]
 
   schemaspy:
+    group: common-schemaspy
     image: quintoandar/drone-schemaspy:v1.1.0
     pull: true
     commands:

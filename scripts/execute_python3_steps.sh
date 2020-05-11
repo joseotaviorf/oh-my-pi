@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# bietlejuice/db/dw/queries/marketing/costs/ and bietlejuice/jobs/dags/marketing/costs/sharing_rules.yml
+# temporary added until python2->3 full migration
+CHANGED_PATHS=$(git diff-tree --no-commit-id --name-only -r HEAD..HEAD~1 | grep 'bietlejuice/jobs/composer\|tests3\|requirements3\|setup3\|bietlejuice/db/dw/queries/marketing/costs/\|bietlejuice/jobs/dags/marketing/costs/sharing_rules.yml')
+if [ ${#CHANGED_PATHS} -eq 0 ]; then
+  echo "===== No changes in Composer files! Skipping! ===== "
+  exit 0
+else
+  echo "Changes in Composer files detected! Executing step..."
+  $1 # command 1
+  $2 # command 2
+fi
