@@ -131,13 +131,13 @@ _fact as (
 		vdo.rejection_reason as dimoff_cancellation_reason,
         vdp.rejection_reason as dimprop_cancellation_reason
     from house_rent_flow hrf
-    join vw_dim_house_listing vdh
+    join staging.dim_house_listing vdh
         on vdh.id_house = hrf.id_house
             and coalesce(hrf.dt_rent_flow_created, '1900-01-01') between coalesce(vdh.ts_listing_version_start, '1900-01-01')
                                                   and coalesce(vdh.ts_listing_version_end, now())
     left join vw_fact_house_listings vfhl
         on vfhl.sk_house_listing = vdh.sk_house_listing
-    left join vw_dim_offer vdo
+    left join staging.dim_offer vdo
         on vdo.sk_offer = case
                             when hrf.id_offer > 0
                               then (hrf.id_offer * 100) + 2
@@ -148,9 +148,9 @@ _fact as (
       and vdo.sk_offer != -1
     left join pre_proposal pp
         on hrf.id_pre_proposal = pp.id
-    left join vw_dim_proposal vdp
+    left join staging.dim_proposal vdp
         on hrf.id_proposal = vdp.id_proposal
-    left join vw_dim_contract c
+    left join staging.dim_contract c
         on hrf.id_contract = c.id_contract
     left join agent_review ar
         on hrf.id_booking = ar.id_booking
@@ -159,7 +159,7 @@ _fact as (
         and hrf.id_client = id_tenant
         and vdo.status = 'Aprovada'
         and rs.created_at between coalesce(vdh.ts_listing_version_start, '1900-01-01') and coalesce(vdh.ts_listing_version_end, now())
-    left join vw_dim_booking vdb
+    left join staging.dim_booking vdb
         on vdb.sk_booking = hrf.id_booking
     where vdh.is_for_rent::int::boolean
         and coalesce(vdb.visit_intent, '') <> 'SALE'

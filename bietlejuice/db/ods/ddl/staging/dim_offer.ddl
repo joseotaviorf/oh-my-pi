@@ -7,7 +7,7 @@ create table staging.dim_offer (
   last_offered_rent integer,
   original_rent integer,
   original_condo integer,
-  dt_approved timestamp,
+  dt_analysis timestamp,
   editing varchar(255),
   status varchar(255),
   id_user integer,
