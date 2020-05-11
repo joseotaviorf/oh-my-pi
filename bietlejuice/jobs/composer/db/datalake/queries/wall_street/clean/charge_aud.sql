@@ -9,5 +9,7 @@ select
     externalId as id_external,
     lastUpdate as ts_updated,
     acquireChargeStatus as acquire_charge_status,
-    acquireAuthCode as acquire_auth_code
+    acquireAuthCode as acquire_auth_code,
+    acquireNsu as acquire_nsu,
+    acquireTid as id_acquire_transaction
 from datalake_wall_street_raw.charge_aud

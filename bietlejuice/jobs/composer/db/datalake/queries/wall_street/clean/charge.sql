@@ -11,5 +11,7 @@ select
     store_id as id_store,
     acquireChargeStatus as acquire_charge_status,
     installments, 
-    acquireAuthCode as acquire_auth_code
+    acquireAuthCode as acquire_auth_code,
+    acquireNsu as acquire_nsu,
+    acquireTid as id_acquire_transaction
 from datalake_wall_street_raw.charge
