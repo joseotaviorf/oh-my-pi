@@ -12,7 +12,7 @@ share as (
 	FROM
 		datalake_raw.gsheets_marketing_affiliates_targets_replanning atr
 		join dim_date dd
-			on date(atr.date)= dd.date
+			on date(NULLIF(atr.date, ''))= dd.date
 	),
 dim_distinct as (
 	select distinct
