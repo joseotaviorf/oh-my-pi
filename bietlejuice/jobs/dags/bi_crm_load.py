@@ -11,6 +11,7 @@ from bietlejuice.jobs.etl.crm.task_titles import CRMTaskTitles
 from bietlejuice.jobs.etl.crm.tasks import CRMTasks
 from bietlejuice.jobs.etl.crm.workgroups import CRMWorkgroups
 from bietlejuice.jobs.etl.crm.workflows import CRMWorkflows
+from bietlejuice.jobs.etl.crm.task_status_histories import CRMTaskStatusHistories
 
 # ---------------------------------------------------------------
 # ---------------------------------------------------------------
@@ -99,6 +100,36 @@ def move_workflows_to_clean(**kwargs):
     )
 
     crm_workflows.move_worflows_to_clean()
+
+
+def extract_and_load_task_status_histories_data(**kwargs):
+    crm_task_status_histories = CRMTaskStatusHistories(
+        s3_bucket=s3_bucket,
+        mongo_client_uri=mongo_client_uri,
+        execution_date=kwargs['execution_date']
+    )
+
+    crm_task_status_histories.extract_and_load_data()
+
+
+def task_status_histories_data_existence_check(bucket_type, **kwargs):
+    crm_task_status_histories = CRMTaskStatusHistories(
+        s3_bucket=s3_bucket,
+        mongo_client_uri=mongo_client_uri,
+        execution_date=kwargs['execution_date']
+    )
+
+    return crm_task_status_histories.data_existence_check(bucket_type)
+
+
+def upsert_task_status_histories_partition(bucket_type, **kwargs):
+    crm_task_status_histories = CRMTaskStatusHistories(
+        s3_bucket=s3_bucket,
+        mongo_client_uri=mongo_client_uri,
+        execution_date=kwargs['execution_date']
+    )
+
+    crm_task_status_histories.upsert_task_status_histories_partition(bucket_type)
 
 
 def extract_and_load_workgroups_data(**kwargs):
@@ -224,8 +255,8 @@ def workflows_sub_dag(sub_dag_name, **kwargs):
         start_date=MAIN_START_DATE
     )._build_local_dag()
 
-    extract_and_load_workgroups_task = BaseDAG.build_python_operator(
-        task_id='extract_and_load_workgroups',
+    extract_and_load_workflows_task = BaseDAG.build_python_operator(
+        task_id='extract_and_load_workflows',
         python_callable=extract_and_load_workflows_data,
         dag=local_dag,
         provide_context=True
@@ -269,11 +300,56 @@ def workflows_sub_dag(sub_dag_name, **kwargs):
     )
 
     airflow_helpers.chain(
-        extract_and_load_workgroups_task,
+        extract_and_load_workflows_task,
         check_data_existence,
         upsert_workflows_partition_task,
         move_workflows_to_clean_task,
         upsert_workflows_clean_partitions_task
+    )
+
+    return local_dag
+
+
+def task_status_histories_sub_dag(sub_dag_name, **kwargs):
+    local_dag = BaseSubDag(
+        bucket=s3_bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_ID,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE
+    )._build_local_dag()
+
+    extract_and_load_task_status_histories_task = BaseDAG.build_python_operator(
+        task_id='extract_and_load_task_status_histories',
+        python_callable=extract_and_load_task_status_histories_data,
+        dag=local_dag,
+        provide_context=True
+    )
+
+    check_data_existence = BaseDAG.build_python_operator(
+        task_id='check_data_existence',
+        python_callable=task_status_histories_data_existence_check,
+        dag=local_dag,
+        provide_context=True,
+        op_kwargs={
+            'bucket_type': 'raw'
+        }
+    )
+
+    upsert_task_status_histories_partition_task = BaseDAG.build_python_operator(
+        task_id='upsert_task_status_histories_raw_partition',
+        python_callable=upsert_task_status_histories_partition,
+        dag=local_dag,
+        provide_context=True,
+        op_kwargs={
+            'bucket_type': 'raw'
+        }
+    )
+
+    airflow_helpers.chain(
+        extract_and_load_task_status_histories_task,
+        check_data_existence,
+        upsert_task_status_histories_partition_task,
     )
 
     return local_dag
@@ -418,6 +494,13 @@ workflows_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='workflows',
     sub_dag_func=workflows_sub_dag,
+    provide_context=True
+)
+
+task_status_histories_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='task_status_histories',
+    sub_dag_func=task_status_histories_sub_dag,
     provide_context=True
 )
 
