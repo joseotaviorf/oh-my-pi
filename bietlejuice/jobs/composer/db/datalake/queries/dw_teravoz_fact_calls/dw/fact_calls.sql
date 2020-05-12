@@ -22,11 +22,11 @@ with
         select
             id_ticket,
             -- the value "360020220412" correspond to column id that contains the id_call value.
-            get_json_object(custom_fields, '$["360020220412"]') as id_call,
+            get_json_object(custom_fields, '$.360020220412') as id_call,
             ts_updated
         from datalake_clean.zendesk_custom_fields
         where ts_updated >= '2019-09-01'
-        and get_json_object(custom_fields, '$["360020220412"]') is not null
+        and get_json_object(custom_fields, '$.360020220412') <> ''
     ),
     -- The table called zendesk_tickets repeats the same ticket for different dates.
     -- But the last update = max(ts_updated) contains the latest values.
