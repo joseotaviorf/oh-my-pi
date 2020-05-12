@@ -3,7 +3,7 @@ select
     name as full_name,
     phone_number,
     email,
-    cpf as id_personal_document,
+    cpf as personal_document,
     case when cpf rlike '([0-9]{3})(.)([0-9]{3})(.)([0-9]{3})(-)([0-9]{2})' then 'CPF'
 		  when cpf rlike '([0-9]{2})(.)([0-9]{3})(.)([0-9]{3})(\/)([0-9]{4})(-)([0-9]{2})' then 'CNPJ' 
 		else null end as personal_document_type,
@@ -22,12 +22,9 @@ select
       when current_situation = 'Proprio' then 'own'
 		else current_situation end as current_house_situation,
     has_contributed_to_current_house,
-    case when gender = 'Feminino' then 'feminine' 
-		  when gender = 'Masculino' then 'masculine'
-		  else gender
-		end as gender,
+    replace(lower(cp.gender), 'o', 'e') as gender,
     marital_status,
-    id_estado as id_state,
+    id_estado as state_code,
     dt_birth,
     ts_created,
     ts_updated,
