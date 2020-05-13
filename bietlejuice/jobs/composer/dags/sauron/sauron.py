@@ -40,11 +40,13 @@ LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
     Variable.get("databricks_s3_bucket"), DAG_ID
 )
 
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
+CLUSTER_DESCRIPTION = Variable.get(
+    "databricks_bietlejuice_sauron", deserialize_json=True
+)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 
 LIBRARIES_DESCRIPTION = Variable.get(
-    "databricks_bietlejuice_sauron", deserialize_json=True
+    "bietlejuice_default_libraries", deserialize_json=True
 )
 
 
@@ -152,4 +154,5 @@ for file_name in file_list:
         main_start_date=MAIN_START_DATE,
     )
     sauron_to_datalake_raw_task >> clean_table >> terminate_cluster_task
+
 create_cluster_task >> sauron_to_datalake_raw_task
