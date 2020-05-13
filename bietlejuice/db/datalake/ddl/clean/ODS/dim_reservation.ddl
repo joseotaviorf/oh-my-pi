@@ -7,6 +7,7 @@ create external table if not exists datalake_clean.ods_dim_reservation(
   version        string,
   attempt        string,
   status         string,
+  cancellation_reason         string,
   value          string,
   is_ongoing     string,
 )

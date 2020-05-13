@@ -8,6 +8,7 @@ SELECT
   version,
   attempt,
   status,
+  cancellation_reason,
   value,
   is_ongoing
 FROM public.reservation;
