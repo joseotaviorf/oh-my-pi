@@ -44,7 +44,7 @@ CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_jso
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 
 LIBRARIES_DESCRIPTION = Variable.get(
-    "bietlejuice_default_libraries", deserialize_json=True
+    "databricks_bietlejuice_sauron", deserialize_json=True
 )
 
 
