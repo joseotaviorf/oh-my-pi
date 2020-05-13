@@ -8,9 +8,11 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
 
-from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
 
 # ENV params setup
+from bietlejuice.jobs.composer.services import FileService
+
 ENV = Variable.get("environment")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 
@@ -75,4 +77,96 @@ load_raw_table = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-create_cluster_task >> load_raw_table >> terminate_cluster_task
+
+def build_table_clean_sub_dag(
+    sub_dag_name,
+    env,
+    source,
+    data_lake_bucket,
+    athena_query_result_location,
+    table_name,
+    main_dag_id,
+    main_schedule_interval,
+    main_start_date,
+    spark_jobs_path,
+):
+    table_sub_dag = BaseSubDAG(
+        sub_dag_name=sub_dag_name,
+        dag_name=main_dag_id,
+        schedule_interval=main_schedule_interval,
+        start_date=main_start_date,
+    )._build_local_dag()
+
+    slugged_table_name = table_name.replace("_", "-")
+
+    clean_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=table_sub_dag,
+        task_id=f"create-{slugged_table_name}-in-data-lake-clean",
+        json={
+            "spark_python_task": {
+                "python_file": spark_jobs_path
+                + "load_incremental_to_datalake_layer.py",
+                "parameters": [
+                    env,
+                    source,
+                    data_lake_bucket,
+                    "clean",
+                    table_name,
+                    "{{ ds }}",
+                ],
+            }
+        },
+    )
+
+    create_clean_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=table_sub_dag,
+        task_id=f"create-{slugged_table_name}-clean-external-table",
+        json={
+            "spark_python_task": {
+                "python_file": spark_jobs_path + "create_external_tables.py",
+                "parameters": [
+                    env,
+                    data_lake_bucket,
+                    athena_query_result_location,
+                    "clean",
+                    source,
+                    "{{ ds }}",
+                    table_name,
+                ],
+            }
+        },
+    )
+
+    clean_table_task >> create_clean_external_tables_task
+    return table_sub_dag
+
+
+# Create clean tasks from clean SQLs
+clean_sub_dags_list = []
+file_list = FileService.list_raw_to_clean_sql_files(SOURCE)
+for file_name in file_list:
+    file_name = FileService.remove_file_extension(file_name)
+    slugged_file_name = file_name.replace("_", "-")
+    table_sub_dag = BaseSubDAG.get_sub_dag_operator(
+        dag=main_dag,
+        sub_dag_name=f"load-{slugged_file_name}-to-clean",
+        sub_dag_func=build_table_clean_sub_dag,
+        env=ENV,
+        source=SOURCE,
+        data_lake_bucket=DATALAKE_BUCKET,
+        athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
+        table_name=file_name,
+        main_dag_id=DAG_ID,
+        main_schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        main_start_date=MAIN_START_DATE,
+        spark_jobs_path=SPARK_JOBS_PATH,
+    )
+    clean_sub_dags_list.append(table_sub_dag)
+
+create_cluster_task >> load_raw_table
+
+if clean_sub_dags_list:
+    load_raw_table.set_downstream(clean_sub_dags_list)
+    clean_sub_dags_list >> terminate_cluster_task
+else:
+    load_raw_table >> terminate_cluster_task
