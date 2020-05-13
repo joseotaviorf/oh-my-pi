@@ -11,7 +11,10 @@ from bietlejuice.jobs.composer.dags.bigfone_event import (
 )
 from bietlejuice.jobs.composer.dags.bigfone_event.spark_jobs import SOURCE
 from bietlejuice.jobs.composer.services import FileService
-from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat
+from bietlejuice.jobs.composer.base.spark import (
+    SparkTableStorageFormat,
+    SparkDataFrameService,
+)
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer
 from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
@@ -70,6 +73,8 @@ if __name__ == "__main__":
     spark_client = SparkClient()
     databricks_consumer = DatabricksConsumer(conn_config, spark_client)
     df = databricks_consumer.get_data_from_query(query)
+
+    df = SparkDataFrameService(df).optimize_partition(250000).output()
 
     database_name = db_info["db_" + target_layer + "_databricks"]
     format_options = SparkTableStorageFormat.get_storage(target_layer)
