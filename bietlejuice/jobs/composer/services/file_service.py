@@ -62,17 +62,18 @@ class FileService:
 
     @staticmethod
     @logger
-    def list_raw_to_clean_sql_files(source, schema=None):
+    def list_layer_sql_files(source, layer, schema=None):
         """
         Return the SQL files used to move table from raw to clean for given
          schema
 
         :param source: the source's directory name on db directory. E.g:
          autodialer, godfather, oscar.
+        :param layer: the data lake layer
         :param schema: Source schema name
         :return: Tables SQL files list
         """
-        raw_to_clean_path = f"{QUERIES_DATALAKE_PATH}{source}/clean"
+        raw_to_clean_path = f"{QUERIES_DATALAKE_PATH}{source}/{layer}"
         if schema:
             raw_to_clean_path = f"{raw_to_clean_path}/{schema}"
 

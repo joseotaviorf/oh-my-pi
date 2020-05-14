@@ -143,7 +143,7 @@ def build_table_clean_sub_dag(
 
 # Create clean tasks from clean SQLs
 clean_sub_dags_list = []
-file_list = FileService.list_raw_to_clean_sql_files(SOURCE)
+file_list = FileService.list_layer_sql_files(SOURCE, "clean")
 for file_name in file_list:
     file_name = FileService.remove_file_extension(file_name)
     slugged_file_name = file_name.replace("_", "-")

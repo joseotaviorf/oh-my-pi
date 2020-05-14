@@ -90,7 +90,7 @@ def clean_tasks(sub_dag_name, table_name, slugged_table_name):
 
 def build_clean_subdags(prev_task, next_task):
     # create subdag for each clean table
-    file_list = FileService.list_raw_to_clean_sql_files(SOURCE)
+    file_list = FileService.list_layer_sql_files(SOURCE, "clean")
 
     if file_list:
         for file_name in file_list:

@@ -206,7 +206,7 @@ create_raw_sub_tasks = BaseSubDAG.get_sub_dag_operator(
     spark_jobs_path=SPARK_JOBS_PATH,
 )
 
-file_list = FileService.list_raw_to_clean_sql_files(SOURCE)
+file_list = FileService.list_layer_sql_files(SOURCE, "clean")
 for file_name in file_list:
     file_name = FileService.remove_file_extension(file_name)
     slugged_file_name = file_name.replace("_", "-")

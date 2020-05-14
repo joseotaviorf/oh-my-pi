@@ -137,7 +137,7 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-file_list = FileService.list_raw_to_clean_sql_files(SOURCE, schema)
+file_list = FileService.list_layer_sql_files(SOURCE, "clean", schema)
 for file_name in file_list:
     file_name = FileService.remove_file_extension(file_name)
     slugged_file_name = file_name.replace("_", "-")
