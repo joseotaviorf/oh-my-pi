@@ -51,7 +51,7 @@ class CRMWorkflows(object):
             self.s3_resource = boto3.resource("s3")
 
     @logger
-    def extract_and_load_data(self, batch_size=10000):
+    def extract_and_load_data(self, batch_size=10000, **kwargs):
         incremental_filter = self.__add_incremental_constraints()
 
         db = self.mongo_client.tasks
@@ -72,7 +72,7 @@ class CRMWorkflows(object):
         )
 
     @logger
-    def data_existence_check(self, bucket_type):
+    def data_existence_check(self, bucket_type, **kwargs):
         if bucket_type not in ("raw", "clean"):
             logger.error(
                 "m=data_existence_check, bucket_type={}, msg=invalid bucket type".format(
@@ -99,7 +99,7 @@ class CRMWorkflows(object):
         return True
 
     @logger
-    def upsert_workflows_partition(self, bucket_type):
+    def upsert_partition(self, bucket_type, **kwargs):
         self._upsert_partition(
             bucket_type=bucket_type,
             bucket_folder_suffix=CRMWorkflows.BUCKET_FOLDER_SUFFIXES,
@@ -107,7 +107,7 @@ class CRMWorkflows(object):
         )
 
     @logger
-    def move_worflows_to_clean(self, sql_file_name="create_workflows_table.sql"):
+    def move_to_clean(self, sql_file_name="create_workflows_table.sql", **kwargs):
         _cols = OrderedDict(
             [
                 ("id", str),

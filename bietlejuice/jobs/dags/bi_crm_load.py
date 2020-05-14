@@ -62,74 +62,24 @@ def extract_and_load_tasks_data(**kwargs):
     crm_tasks.extract_and_load_data()
 
 
-def extract_and_load_workflows_data(**kwargs):
-    crm_workflows = CRMWorkflows(
+def exec_workflows_method(method, **kwargs):
+    crm = CRMWorkflows(
         s3_bucket=s3_bucket,
         mongo_client_uri=mongo_client_uri,
         execution_date=kwargs['execution_date']
     )
 
-    crm_workflows.extract_and_load_data()
+    getattr(crm, method)(**kwargs)
 
 
-def workflows_data_existence_check(bucket_type, **kwargs):
-    crm_workflows = CRMWorkflows(
+def exec_task_status_histories_method(method, **kwargs):
+    crm = CRMTaskStatusHistories(
         s3_bucket=s3_bucket,
         mongo_client_uri=mongo_client_uri,
         execution_date=kwargs['execution_date']
     )
 
-    return crm_workflows.data_existence_check(bucket_type)
-
-
-def upsert_workflows_partition(bucket_type, **kwargs):
-    crm_workflows = CRMWorkflows(
-        s3_bucket=s3_bucket,
-        mongo_client_uri=mongo_client_uri,
-        execution_date=kwargs['execution_date']
-    )
-
-    crm_workflows.upsert_workflows_partition(bucket_type)
-
-
-def move_workflows_to_clean(**kwargs):
-    crm_workflows = CRMWorkflows(
-        s3_bucket=s3_bucket,
-        mongo_client_uri=mongo_client_uri,
-        execution_date=kwargs['execution_date']
-    )
-
-    crm_workflows.move_worflows_to_clean()
-
-
-def extract_and_load_task_status_histories_data(**kwargs):
-    crm_task_status_histories = CRMTaskStatusHistories(
-        s3_bucket=s3_bucket,
-        mongo_client_uri=mongo_client_uri,
-        execution_date=kwargs['execution_date']
-    )
-
-    crm_task_status_histories.extract_and_load_data()
-
-
-def task_status_histories_data_existence_check(bucket_type, **kwargs):
-    crm_task_status_histories = CRMTaskStatusHistories(
-        s3_bucket=s3_bucket,
-        mongo_client_uri=mongo_client_uri,
-        execution_date=kwargs['execution_date']
-    )
-
-    return crm_task_status_histories.data_existence_check(bucket_type)
-
-
-def upsert_task_status_histories_partition(bucket_type, **kwargs):
-    crm_task_status_histories = CRMTaskStatusHistories(
-        s3_bucket=s3_bucket,
-        mongo_client_uri=mongo_client_uri,
-        execution_date=kwargs['execution_date']
-    )
-
-    crm_task_status_histories.upsert_task_status_histories_partition(bucket_type)
+    getattr(crm, method)(**kwargs)
 
 
 def extract_and_load_workgroups_data(**kwargs):
@@ -246,7 +196,7 @@ def task_titles_sub_dag(sub_dag_name, **kwargs):
     return local_dag
 
 
-def workflows_sub_dag(sub_dag_name, **kwargs):
+def incremental_sub_dag(sub_dag_name, python_method, **kwargs):
     local_dag = BaseSubDag(
         bucket=s3_bucket,
         sub_dag_name=sub_dag_name,
@@ -255,101 +205,65 @@ def workflows_sub_dag(sub_dag_name, **kwargs):
         start_date=MAIN_START_DATE
     )._build_local_dag()
 
-    extract_and_load_workflows_task = BaseDAG.build_python_operator(
-        task_id='extract_and_load_workflows',
-        python_callable=extract_and_load_workflows_data,
+    extract_and_load_task = BaseDAG.build_python_operator(
+        task_id='extract_and_load',
+        python_callable=python_method,
         dag=local_dag,
-        provide_context=True
+        provide_context=True,
+        op_kwargs={
+            'method': 'extract_and_load_data'
+        }
     )
 
     check_data_existence = BaseDAG.build_python_operator(
         task_id='check_data_existence',
-        python_callable=workflows_data_existence_check,
+        python_callable=python_method,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            'bucket_type': 'raw'
+            'bucket_type': 'raw',
+            'method': 'data_existence_check'
         }
     )
 
-    upsert_workflows_partition_task = BaseDAG.build_python_operator(
-        task_id='upsert_workflows_raw_partition',
-        python_callable=upsert_workflows_partition,
+    upsert_partition_task = BaseDAG.build_python_operator(
+        task_id='upsert_raw_partition',
+        python_callable=python_method,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            'bucket_type': 'raw'
+            'bucket_type': 'raw',
+            'method': 'upsert_partition'
         }
     )
 
-    move_workflows_to_clean_task = BaseDAG.build_python_operator(
-        task_id='move_workflows_to_clean',
-        python_callable=move_workflows_to_clean,
-        dag=local_dag,
-        provide_context=True
-    )
-
-    upsert_workflows_clean_partitions_task = BaseDAG.build_python_operator(
-        task_id='upsert_workflows_clean_partition',
-        python_callable=upsert_workflows_partition,
+    move_to_clean_task = BaseDAG.build_python_operator(
+        task_id='move_to_clean',
+        python_callable=python_method,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            'bucket_type': 'clean'
+            'method': 'move_to_clean'
         }
     )
 
-    airflow_helpers.chain(
-        extract_and_load_workflows_task,
-        check_data_existence,
-        upsert_workflows_partition_task,
-        move_workflows_to_clean_task,
-        upsert_workflows_clean_partitions_task
-    )
-
-    return local_dag
-
-
-def task_status_histories_sub_dag(sub_dag_name, **kwargs):
-    local_dag = BaseSubDag(
-        bucket=s3_bucket,
-        sub_dag_name=sub_dag_name,
-        dag_name=MAIN_DAG_ID,
-        schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        start_date=MAIN_START_DATE
-    )._build_local_dag()
-
-    extract_and_load_task_status_histories_task = BaseDAG.build_python_operator(
-        task_id='extract_and_load_task_status_histories',
-        python_callable=extract_and_load_task_status_histories_data,
-        dag=local_dag,
-        provide_context=True
-    )
-
-    check_data_existence = BaseDAG.build_python_operator(
-        task_id='check_data_existence',
-        python_callable=task_status_histories_data_existence_check,
+    upsert_clean_partitions_task = BaseDAG.build_python_operator(
+        task_id='upsert_clean_partition',
+        python_callable=python_method,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            'bucket_type': 'raw'
-        }
-    )
-
-    upsert_task_status_histories_partition_task = BaseDAG.build_python_operator(
-        task_id='upsert_task_status_histories_raw_partition',
-        python_callable=upsert_task_status_histories_partition,
-        dag=local_dag,
-        provide_context=True,
-        op_kwargs={
-            'bucket_type': 'raw'
+            'bucket_type': 'clean',
+            'method': 'upsert_partition'
         }
     )
 
     airflow_helpers.chain(
-        extract_and_load_task_status_histories_task,
+        extract_and_load_task,
         check_data_existence,
-        upsert_task_status_histories_partition_task,
+        upsert_partition_task,
+        move_to_clean_task,
+        upsert_clean_partitions_task
     )
 
     return local_dag
@@ -493,15 +407,17 @@ xcom_crm_load_task = BaseDAG.build_python_operator(
 workflows_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='workflows',
-    sub_dag_func=workflows_sub_dag,
+    python_method=exec_workflows_method,
+    sub_dag_func=incremental_sub_dag,
     provide_context=True
 )
 
 task_status_histories_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='task_status_histories',
-    sub_dag_func=task_status_histories_sub_dag,
-    provide_context=True
+    python_method=exec_task_status_histories_method,
+    sub_dag_func=incremental_sub_dag,
+    provide_context=True,
 )
 
 # flow

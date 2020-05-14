@@ -5,12 +5,14 @@ import os
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils import QuintoAndarLogger
 from botocore.exceptions import ClientError
+from collections import OrderedDict
 from pymongo import MongoClient
 from gzip import GzipFile
 from io import BytesIO
 
 from bietlejuice.jobs.etl.crm.tasks.unidecode_handler import UnidecodeHandler
 from bietlejuice.jobs.base.new_base_etl import BaseETL
+from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR
 
 logger = QuintoAndarLogger("CRMTaskStatusHistories")
 
@@ -18,6 +20,7 @@ logger = QuintoAndarLogger("CRMTaskStatusHistories")
 class CRMTaskStatusHistories(object):
     BUCKET_FOLDER_SUFFIXES = "crm/task_status_histories"
     S3_FILE_NAME = "data"
+    TABLE_PARTITION_PARAM = "__PARTITION_DATE__"
 
     @logger
     def __init__(self, s3_bucket, execution_date, mongo_client_uri=None):
@@ -48,7 +51,7 @@ class CRMTaskStatusHistories(object):
             self.s3_resource = boto3.resource("s3")
 
     @logger
-    def extract_and_load_data(self, batch_size=10000):
+    def extract_and_load_data(self, batch_size=10000, **kwargs):
         incremental_filter = self.__add_incremental_constraints()
 
         db = self.mongo_client.tasks
@@ -69,7 +72,7 @@ class CRMTaskStatusHistories(object):
         )
 
     @logger
-    def data_existence_check(self, bucket_type):
+    def data_existence_check(self, bucket_type, **kwargs):
         if bucket_type not in ("raw", "clean"):
             logger.error(
                 "m=data_existence_check, bucket_type={}, msg=invalid bucket type".format(
@@ -96,11 +99,28 @@ class CRMTaskStatusHistories(object):
         return True
 
     @logger
-    def upsert_task_status_histories_partition(self, bucket_type):
+    def upsert_partition(self, bucket_type, **kwargs):
         self._upsert_partition(
             bucket_type=bucket_type,
             bucket_folder_suffix=CRMTaskStatusHistories.BUCKET_FOLDER_SUFFIXES,
             table_name="crm_task_status_histories",
+        )
+
+    @logger
+    def move_to_clean(self, sql_file_name="create_task_status_histories_table.sql", **kwargs):
+        _cols = OrderedDict(
+            [
+                ("id", str),
+                ("v", str),
+                ("histories", str)
+            ]
+        )
+
+        self._move_to_clean(
+            bucket_folder_suffix=CRMTaskStatusHistories.BUCKET_FOLDER_SUFFIXES,
+            sql_file_name=sql_file_name,
+            r_cols=_cols,
+            c_cols=_cols
         )
 
     @logger
@@ -175,4 +195,34 @@ class CRMTaskStatusHistories(object):
             table=table_name,
             partition_name=partition_name,
             partition_value=self.partition_date,
+        )
+
+    @logger
+    def _move_to_clean(
+            self,
+            bucket_folder_suffix,
+            sql_file_name,
+            r_cols,
+            c_cols,
+            queries_folder_suffix=None
+    ):
+        key = "clean/{}/dt={}/{}.parq".format(
+            bucket_folder_suffix, self.partition_date, CRMTaskStatusHistories.S3_FILE_NAME
+        )
+
+        query = BaseETL.get_query_from_file_name(
+            "{}/{}/{}".format(
+                DATALAKE_QUERIES_DIR,
+                bucket_folder_suffix
+                if queries_folder_suffix is None
+                else queries_folder_suffix,
+                sql_file_name
+            )
+        )
+
+        self.athena_client.create_parquet_from_query(
+            key=key,
+            query=query.replace(CRMTaskStatusHistories.TABLE_PARTITION_PARAM, self.partition_date),
+            raw_columns=r_cols,
+            clean_columns=c_cols
         )
