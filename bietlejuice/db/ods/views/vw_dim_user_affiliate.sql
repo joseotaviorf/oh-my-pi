@@ -12,6 +12,7 @@ with vistorias as (
  select
  	ua.id as sk_user_affiliate,
  	ua.id as id_user_affiliate,
+ 	ua.indicadoPor_id as sk_user_indicated_by,
 	ua.inicioAtuacao as ts_joined_program,
 	ua.ativo as is_active,
 	ua.atualizadoEm as ts_updated,
@@ -83,6 +84,7 @@ left join
 select
 	aff_cityreg.sk_user_affiliate,
 	aff_cityreg.id_user_affiliate,
+	aff_cityreg.sk_user_indicated_by,
 	aff_cityreg.ts_joined_program,
 	aff_cityreg.is_active,
 	aff_cityreg.ts_updated,

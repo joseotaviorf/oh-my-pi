@@ -3,6 +3,7 @@ DROP TABLE staging.dim_user_affiliate;
 CREATE TABLE staging.dim_user_affiliate (
     sk_user_affiliate BIGINT NOT NULL,
     id_user_affiliate BIGINT,
+    sk_user_indicated_by BIGINT,
     ts_joined_program TIMESTAMP,
     is_active BOOLEAN,
     ts_updated TIMESTAMP,
