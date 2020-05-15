@@ -40,6 +40,112 @@ LIBRARIES_DESCRIPTION = Variable.get(
     "bietlejuice_default_libraries", deserialize_json=True
 )
 
+
+# Helper functions
+def build_table_sub_dag(sub_dag_name, table_name, layer, dag_configs):
+    table_sub_dag = BaseSubDAG(
+        sub_dag_name=sub_dag_name,
+        dag_name=dag_configs.get("main_dag_id"),
+        schedule_interval=dag_configs.get("main_schedule_interval"),
+        start_date=dag_configs.get("main_start_date"),
+    )._build_local_dag()
+
+    slugged_table_name = table_name.replace("_", "-")
+
+    layer_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=table_sub_dag,
+        task_id=f"create-{slugged_table_name}-in-data-lake-{layer}",
+        json={
+            "spark_python_task": {
+                "python_file": dag_configs.get("spark_jobs_path")
+                + "load_incremental_to_datalake_layer.py",
+                "parameters": [
+                    dag_configs.get("env"),
+                    dag_configs.get("source"),
+                    dag_configs.get("data_lake_bucket"),
+                    layer,
+                    "{{ ds }}",
+                    table_name,
+                ],
+            }
+        },
+    )
+
+    create_layer_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=table_sub_dag,
+        task_id=f"create-{slugged_table_name}-{layer}-external-table",
+        json={
+            "spark_python_task": {
+                "python_file": dag_configs.get("spark_jobs_path")
+                + "create_external_tables.py",
+                "parameters": [
+                    dag_configs.get("env"),
+                    dag_configs.get("source"),
+                    dag_configs.get("data_lake_bucket"),
+                    dag_configs.get("athena_query_result_location"),
+                    layer,
+                    "{{ ds }}",
+                    table_name,
+                ],
+            }
+        },
+    )
+
+    layer_table_task >> create_layer_external_tables_task
+    return table_sub_dag
+
+
+def build_entity_transformation_tasks(upstream_task, dag_configs):
+    """
+    Builds the clean -> (self)enrich flow for each entity based on source and
+        layer SQL files
+    :param upstream_task:
+    :return: the last tasks to be set the downstream dependencies if necessary
+    """
+
+    last_entities_tasks_list = []
+    clean_files_list = FileService.list_layer_sql_files(
+        dag_configs.get("source"), "clean"
+    )
+    for file_name in clean_files_list:
+        file_name = FileService.remove_file_extension(file_name)
+        slugged_file_name = file_name.replace("_", "-")
+
+        clean_task = BaseSubDAG.get_sub_dag_operator(
+            dag=main_dag,
+            sub_dag_func=build_table_sub_dag,
+            sub_dag_name=f"load-{slugged_file_name}-to-clean",
+            table_name=file_name,
+            layer="clean",
+            dag_configs=dag_configs,
+        )
+
+        enrich_task = None
+        if FileService.layer_table_sql_file_exists(
+            dag_configs.get("source"), "enrich", file_name
+        ):
+            enrich_task = BaseSubDAG.get_sub_dag_operator(
+                dag=main_dag,
+                sub_dag_func=build_table_sub_dag,
+                sub_dag_name=f"load-{slugged_file_name}-to-enrich",
+                table_name=file_name,
+                layer="enrich",
+                dag_configs=dag_configs,
+            )
+
+        upstream_task >> clean_task
+
+        if enrich_task:
+            table_last_task = enrich_task
+            clean_task >> enrich_task
+        else:
+            table_last_task = clean_task
+
+        last_entities_tasks_list.append(table_last_task)
+
+    return last_entities_tasks_list
+
+
 # DAG definition
 main_dag = DAG(
     dag_id=DAG_ID,
@@ -52,7 +158,6 @@ main_dag = DAG(
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
 )
 
-# Tasks definition
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=main_dag,
     task_id="create-cluster",
@@ -64,7 +169,6 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=main_dag, task_id="terminate-cluster"
 )
 
-# Create Raw tasks
 load_raw_table = QuintoAndarDatabricksSubmitRunOperator(
     task_id="load-tables-to-data-lake-raw",
     dag=main_dag,
@@ -77,96 +181,20 @@ load_raw_table = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
+last_tasks_list = build_entity_transformation_tasks(
+    upstream_task=load_raw_table,
+    dag_configs={
+        "env": ENV,
+        "source": SOURCE,
+        "data_lake_bucket": DATALAKE_BUCKET,
+        "athena_query_result_location": ATHENA_QUERY_RESULT_LOCATION,
+        "main_dag_id": DAG_ID,
+        "main_schedule_interval": MAIN_SCHEDULE_INTERVAL,
+        "main_start_date": MAIN_START_DATE,
+        "spark_jobs_path": SPARK_JOBS_PATH,
+    },
+)
 
-def build_table_clean_sub_dag(
-    sub_dag_name,
-    env,
-    source,
-    data_lake_bucket,
-    athena_query_result_location,
-    table_name,
-    main_dag_id,
-    main_schedule_interval,
-    main_start_date,
-    spark_jobs_path,
-):
-    table_sub_dag = BaseSubDAG(
-        sub_dag_name=sub_dag_name,
-        dag_name=main_dag_id,
-        schedule_interval=main_schedule_interval,
-        start_date=main_start_date,
-    )._build_local_dag()
-
-    slugged_table_name = table_name.replace("_", "-")
-
-    clean_table_task = QuintoAndarDatabricksSubmitRunOperator(
-        dag=table_sub_dag,
-        task_id=f"create-{slugged_table_name}-in-data-lake-clean",
-        json={
-            "spark_python_task": {
-                "python_file": spark_jobs_path
-                + "load_incremental_to_datalake_layer.py",
-                "parameters": [
-                    env,
-                    source,
-                    data_lake_bucket,
-                    "clean",
-                    table_name,
-                    "{{ ds }}",
-                ],
-            }
-        },
-    )
-
-    create_clean_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
-        dag=table_sub_dag,
-        task_id=f"create-{slugged_table_name}-clean-external-table",
-        json={
-            "spark_python_task": {
-                "python_file": spark_jobs_path + "create_external_tables.py",
-                "parameters": [
-                    env,
-                    data_lake_bucket,
-                    athena_query_result_location,
-                    "clean",
-                    source,
-                    "{{ ds }}",
-                    table_name,
-                ],
-            }
-        },
-    )
-
-    clean_table_task >> create_clean_external_tables_task
-    return table_sub_dag
-
-
-# Create clean tasks from clean SQLs
-clean_sub_dags_list = []
-file_list = FileService.list_layer_sql_files(SOURCE, "clean")
-for file_name in file_list:
-    file_name = FileService.remove_file_extension(file_name)
-    slugged_file_name = file_name.replace("_", "-")
-    table_sub_dag = BaseSubDAG.get_sub_dag_operator(
-        dag=main_dag,
-        sub_dag_name=f"load-{slugged_file_name}-to-clean",
-        sub_dag_func=build_table_clean_sub_dag,
-        env=ENV,
-        source=SOURCE,
-        data_lake_bucket=DATALAKE_BUCKET,
-        athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
-        table_name=file_name,
-        main_dag_id=DAG_ID,
-        main_schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        main_start_date=MAIN_START_DATE,
-        spark_jobs_path=SPARK_JOBS_PATH,
-    )
-    clean_sub_dags_list.append(table_sub_dag)
-
+# Dependencies
 create_cluster_task >> load_raw_table
-
-if clean_sub_dags_list:
-    load_raw_table.set_downstream(clean_sub_dags_list)
-    clean_sub_dags_list >> terminate_cluster_task
-else:
-    load_raw_table >> terminate_cluster_task
+terminate_cluster_task.set_upstream(last_tasks_list)

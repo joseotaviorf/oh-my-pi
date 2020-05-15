@@ -27,16 +27,16 @@ if __name__ == "__main__":
     parser.add_argument(
         "target_layer", type=str, help="the data lake layer to save data to"
     )
-    parser.add_argument("table_name", type=str, help="table name")
     parser.add_argument("execution_date", type=str, help="execution date in str format")
+    parser.add_argument("table_name", type=str, help="table name")
     args = parser.parse_args()
 
     env = args.environment
     source = args.source
     dl_bucket = args.datalake_bucket
     target_layer = args.target_layer
-    table_name = args.table_name
     execution_date = args.execution_date
+    table_name = args.table_name
 
     db_info = DatalakeMetastoreService.get_db_info(env, source, dl_bucket)
     database_name = db_info["db_" + target_layer + "_databricks"]

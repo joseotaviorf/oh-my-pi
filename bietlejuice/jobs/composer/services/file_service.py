@@ -81,6 +81,20 @@ class FileService:
 
     @staticmethod
     @logger
+    def layer_table_sql_file_exists(source, layer, file_name, schema=None):
+        """
+        Checks for existence of enrichment query file for given source and schema
+
+        :return: boolean
+        """
+        layer_queries_path = f"{QUERIES_DATALAKE_PATH}{source}/{layer}"
+        if schema:
+            layer_queries_path = f"{layer_queries_path}/{schema}"
+
+        return isfile(f"{layer_queries_path}/{file_name}.sql")
+
+    @staticmethod
+    @logger
     def table_dim_query_exists(source, schema, table_name):
         """
         Checks for existence of query file for given source and schema

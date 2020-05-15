@@ -24,20 +24,20 @@ if __name__ == "__main__":
 
     # args passed by Airflow task
     parser.add_argument("env", type=str, help="forno/prod values")
+    parser.add_argument("source", type=str, help="Source")
     parser.add_argument("datalake_bucket")
     parser.add_argument("athena_query_result_location")
     parser.add_argument("datalake_layer", type=str, help="Datalake Layer [raw|clean]")
-    parser.add_argument("source", type=str, help="Source")
     parser.add_argument("execution_date", type=str, help="Execution date DAG")
     parser.add_argument("table_name", type=str, help="table name")
 
     args = parser.parse_args()
 
     env = args.env
+    source = args.source
     dl_bucket = args.datalake_bucket
     athena_qrslt_loc = args.athena_query_result_location
     dl_layer = args.datalake_layer
-    source = args.source
     execution_date = args.execution_date
     table_name = args.table_name
 
