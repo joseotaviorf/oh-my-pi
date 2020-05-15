@@ -1,6 +1,6 @@
 select
     _id as id,
-    userId as id_user,
+    nullif(userId, 'null') as id_user,
     status,
     extraInfo as extra_info,
     from_json(sentNotifications, 'array<string>') as sent_notifications,
