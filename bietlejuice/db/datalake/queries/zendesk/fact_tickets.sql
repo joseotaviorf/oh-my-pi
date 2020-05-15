@@ -39,7 +39,7 @@ house as (
     group by 1,2,3,4,5,6
 ),
 custom_field_ids as (
-    select
+      select
         c.id_ticket,
         if(
             length(try_cast(json_extract(c.custom_fields, '$["31646438"]') as varchar)) < 9,
@@ -49,7 +49,7 @@ custom_field_ids as (
         try_cast(json_extract(c.custom_fields, '$["114096515211"]') as bigint) as id_contract
     from datalake_clean.zendesk_custom_fields c
     inner join last_updated_ticket lt
-        on c.id_ticket = lt.id_ticket and date(cast(c.ts_updated as timestamp))=date(cast(lt.ts_last_updated as timestamp))
+        on c.id_ticket = lt.id_ticket and c.ts_updated=lt.ts_last_updated
 ),
 ticket_metrics as (
     with row_n as (
