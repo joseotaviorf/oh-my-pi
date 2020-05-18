@@ -40,7 +40,7 @@ custom_field_ids as (
         c.id_ticket,
         c.custom_fields,
         cast(json_extract(c.custom_fields,'$["Tipo de Solicitação"]') as varchar) as request_type,
-        cast(json_extract(c.custom_fields,'$["Tipo de Cliente"]') as varchar) as client_type
+        replace(cast(json_extract(c.custom_fields,'$["Tipo de Cliente"]') as varchar), '}', '') as client_type
     from transformed_custom_fields c
         inner join last_updated_ticket lt
         on c.id_ticket = lt.id_ticket and c.ts_updated=lt.ts_last_updated
