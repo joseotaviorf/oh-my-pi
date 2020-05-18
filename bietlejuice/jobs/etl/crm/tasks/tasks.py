@@ -95,7 +95,7 @@ class CRMTasks(object):
 
     # instance methods
     @logger
-    def data_existence_check(self, bucket_type):
+    def data_existence_check(self, bucket_type, **kwargs):
         if bucket_type not in ("raw", "clean"):
             logger.error(
                 "m=data_existence_check, bucket_type={}, msg=invalid bucket type".format(
@@ -134,7 +134,7 @@ class CRMTasks(object):
         }
 
     @logger
-    def extract_and_load_data(self, fields_projection=None, batch_size=10000):
+    def extract_and_load_data(self, fields_projection=None, batch_size=10000, **kwargs):
         incremental_filter = self.__add_incremental_constraints()
 
         db = self.mongo_client.tasks
@@ -222,7 +222,7 @@ class CRMTasks(object):
         logger.info("m=_save_to_s3, msg={} rows saved".format(total_count))
 
     @logger
-    def upsert_tasks_partition(self, bucket_type):
+    def upsert_tasks_partition(self, bucket_type, **kwargs):
         self._upsert_partition(
             bucket_type=bucket_type,
             bucket_folder_suffix=CRMTasks.BUCKET_FOLDER_SUFFIXES["tasks"],
@@ -230,7 +230,7 @@ class CRMTasks(object):
         )
 
     @logger
-    def upsert_tasks_resolution_partition(self, bucket_type):
+    def upsert_tasks_resolution_partition(self, bucket_type, **kwargs):
         self._upsert_partition(
             bucket_type=bucket_type,
             bucket_folder_suffix=CRMTasks.BUCKET_FOLDER_SUFFIXES["resolution"],
@@ -265,7 +265,7 @@ class CRMTasks(object):
         )
 
     @logger
-    def move_tasks_to_clean(self, sql_file_name="create_tasks_table.sql"):
+    def move_tasks_to_clean(self, sql_file_name="create_tasks_table.sql", **kwargs):
         _cols = OrderedDict(
             [
                 ("score_factor", str),
@@ -315,7 +315,7 @@ class CRMTasks(object):
 
     @logger
     def move_tasks_resolution_to_clean(
-        self, sql_file_name="create_tasks_resolution_table.sql"
+        self, sql_file_name="create_tasks_resolution_table.sql", **kwargs
     ):
         _cols = OrderedDict(
             [

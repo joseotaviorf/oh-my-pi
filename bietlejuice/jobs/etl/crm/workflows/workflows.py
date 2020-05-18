@@ -90,7 +90,6 @@ class CRMWorkflows(object):
 
         try:
             self.s3_resource.Object(self.s3_bucket, file_path).load()
-            logger.info("m=data_existence_check, m=checked data")
         except ClientError as e:
             if e.response["Error"]["Code"] == "404":
                 return False  # file does not exist

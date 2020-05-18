@@ -32,36 +32,6 @@ MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 0 * * *')
 
 
 # functions
-def data_existence_check(bucket_type, **kwargs):
-    crm_tasks = CRMTasks(
-        s3_bucket=s3_bucket,
-        mongo_client_uri=mongo_client_uri,
-        execution_date=kwargs['execution_date']
-    )
-
-    return crm_tasks.data_existence_check(bucket_type)
-
-
-def upsert_partition(bucket_type, method, **kwargs):
-    crm_tasks = CRMTasks(
-        s3_bucket=s3_bucket,
-        mongo_client_uri=mongo_client_uri,
-        execution_date=kwargs['execution_date']
-    )
-
-    getattr(crm_tasks, method)(bucket_type)
-
-
-def extract_and_load_tasks_data(**kwargs):
-    crm_tasks = CRMTasks(
-        s3_bucket=s3_bucket,
-        mongo_client_uri=mongo_client_uri,
-        execution_date=kwargs['execution_date']
-    )
-
-    crm_tasks.extract_and_load_data()
-
-
 def exec_workflows_method(method, **kwargs):
     crm = CRMWorkflows(
         s3_bucket=s3_bucket,
@@ -82,40 +52,22 @@ def exec_task_status_histories_method(method, **kwargs):
     getattr(crm, method)(**kwargs)
 
 
-def extract_and_load_workgroups_data(**kwargs):
-    crm_workgroups = CRMWorkgroups(
+def exec_workgroups_method(method, **kwargs):
+    crm = CRMWorkgroups(
         s3_bucket=s3_bucket,
         mongo_client_uri=mongo_client_uri
     )
 
-    crm_workgroups.extract_and_load_data()
+    getattr(crm, method)()
 
 
-def move_workgroups_to_clean(**kwargs):
-    crm_workgroups = CRMWorkgroups(
+def exec_task_titles_method(method, **kwargs):
+    crm = CRMTaskTitles(
         s3_bucket=s3_bucket,
         mongo_client_uri=mongo_client_uri
     )
 
-    crm_workgroups.move_workgroups_to_clean()
-
-
-def extract_and_load_task_titles_data(**kwargs):
-    crm_task_titles = CRMTaskTitles(
-        s3_bucket=s3_bucket,
-        mongo_client_uri=mongo_client_uri
-    )
-
-    crm_task_titles.extract_and_load_data()
-
-
-def move_task_titles_to_clean(**kwargs):
-    crm_task_titles = CRMTaskTitles(
-        s3_bucket=s3_bucket,
-        mongo_client_uri=mongo_client_uri
-    )
-
-    crm_task_titles.move_task_titles_to_clean()
+    getattr(crm, method)()
 
 
 def exec_crm_method(method, **kwargs):
@@ -125,7 +77,7 @@ def exec_crm_method(method, **kwargs):
         execution_date=kwargs['execution_date']
     )
 
-    getattr(crm_tasks, method)()
+    getattr(crm_tasks, method)(**kwargs)
 
 
 # dags
@@ -144,7 +96,7 @@ main_dag = DAG(
 )
 
 
-def workgroups_sub_dag(sub_dag_name, **kwargs):
+def full_load_sub_dag(sub_dag_name, python_exec, python_method, **kwargs):
     local_dag = BaseSubDag(
         bucket=s3_bucket,
         sub_dag_name=sub_dag_name,
@@ -153,50 +105,30 @@ def workgroups_sub_dag(sub_dag_name, **kwargs):
         start_date=MAIN_START_DATE
     )._build_local_dag()
 
-    extract_and_load_workgroups_task = BaseDAG.build_python_operator(
-        task_id='extract_and_load_workgroups',
-        python_callable=extract_and_load_workgroups_data,
-        dag=local_dag
+    extract_and_load_raw_tasks = BaseDAG.build_python_operator(
+        task_id='extract_and_load_raw_data',
+        dag=local_dag,
+        python_callable=python_exec,
+        op_kwargs={
+            'method': python_method['extract_and_load']
+        }
     )
 
-    move_workgroups_to_clean_task = BaseDAG.build_python_operator(
-        task_id='move_workgroups_to_clean',
-        python_callable=move_workgroups_to_clean,
-        dag=local_dag
+    move_to_clean_task = BaseDAG.build_python_operator(
+        task_id='move_to_clean',
+        dag=local_dag,
+        python_callable=python_exec,
+        op_kwargs={
+            'method': python_method['move_to_clean']
+        }
     )
 
-    extract_and_load_workgroups_task >> move_workgroups_to_clean_task
+    extract_and_load_raw_tasks >> move_to_clean_task
 
     return local_dag
 
 
-def task_titles_sub_dag(sub_dag_name, **kwargs):
-    local_dag = BaseSubDag(
-        bucket=s3_bucket,
-        sub_dag_name=sub_dag_name,
-        dag_name=MAIN_DAG_ID,
-        schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        start_date=MAIN_START_DATE
-    )._build_local_dag()
-
-    extract_and_load_task_titles_task = BaseDAG.build_python_operator(
-        task_id='extract_and_load_task_titles',
-        python_callable=extract_and_load_task_titles_data,
-        dag=local_dag
-    )
-
-    move_task_titles_to_clean_task = BaseDAG.build_python_operator(
-        task_id='move_task_titles_to_clean',
-        python_callable=move_task_titles_to_clean,
-        dag=local_dag
-    )
-
-    extract_and_load_task_titles_task >> move_task_titles_to_clean_task
-
-    return local_dag
-
-
-def incremental_sub_dag(sub_dag_name, python_method, **kwargs):
+def incremental_raw_sub_dag(sub_dag_name, python_exec, python_method,**kwargs):
     local_dag = BaseSubDag(
         bucket=s3_bucket,
         sub_dag_name=sub_dag_name,
@@ -207,54 +139,33 @@ def incremental_sub_dag(sub_dag_name, python_method, **kwargs):
 
     extract_and_load_task = BaseDAG.build_python_operator(
         task_id='extract_and_load',
-        python_callable=python_method,
+        python_callable=python_exec,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
-            'method': 'extract_and_load_data'
+            'method': python_method['extract_and_load_data']
         }
     )
 
-    check_data_existence = BaseDAG.build_python_operator(
+    check_data_existence = ShortCircuitOperator(
         task_id='check_data_existence',
-        python_callable=python_method,
+        python_callable=python_exec,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
             'bucket_type': 'raw',
-            'method': 'data_existence_check'
+            'method': python_method['data_existence_check']
         }
     )
 
     upsert_partition_task = BaseDAG.build_python_operator(
         task_id='upsert_raw_partition',
-        python_callable=python_method,
+        python_callable=python_exec,
         dag=local_dag,
         provide_context=True,
         op_kwargs={
             'bucket_type': 'raw',
-            'method': 'upsert_partition'
-        }
-    )
-
-    move_to_clean_task = BaseDAG.build_python_operator(
-        task_id='move_to_clean',
-        python_callable=python_method,
-        dag=local_dag,
-        provide_context=True,
-        op_kwargs={
-            'method': 'move_to_clean'
-        }
-    )
-
-    upsert_clean_partitions_task = BaseDAG.build_python_operator(
-        task_id='upsert_clean_partition',
-        python_callable=python_method,
-        dag=local_dag,
-        provide_context=True,
-        op_kwargs={
-            'bucket_type': 'clean',
-            'method': 'upsert_partition'
+            'method': python_method['upsert_partition']
         }
     )
 
@@ -262,79 +173,45 @@ def incremental_sub_dag(sub_dag_name, python_method, **kwargs):
         extract_and_load_task,
         check_data_existence,
         upsert_partition_task,
+    )
+
+    return local_dag
+
+
+def incremental_clean_sub_dag(sub_dag_name, python_exec, python_method, **kwargs):
+    local_dag = BaseSubDag(
+        bucket=s3_bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_ID,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE
+    )._build_local_dag()
+
+    move_to_clean_task = BaseDAG.build_python_operator(
+        task_id='move_to_clean',
+        python_callable=python_exec,
+        dag=local_dag,
+        provide_context=True,
+        op_kwargs={
+            'method': python_method['move_to_clean']
+        }
+    )
+
+    upsert_clean_partitions_task = BaseDAG.build_python_operator(
+        task_id='upsert_clean_partition',
+        python_callable=python_exec,
+        dag=local_dag,
+        provide_context=True,
+        op_kwargs={
+            'bucket_type': 'clean',
+            'method': python_method['upsert_clean_partition']
+        }
+    )
+
+    airflow_helpers.chain(
         move_to_clean_task,
         upsert_clean_partitions_task
     )
-
-    return local_dag
-
-
-def clean_tasks_sub_dag(sub_dag_name, **kwargs):
-    local_dag = BaseSubDag(
-        bucket=s3_bucket,
-        sub_dag_name=sub_dag_name,
-        dag_name=MAIN_DAG_ID,
-        schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        start_date=MAIN_START_DATE
-    )._build_local_dag()
-
-    move_tasks_to_clean_task = BaseDAG.build_python_operator(
-        task_id='move_tasks_to_clean',
-        python_callable=exec_crm_method,
-        dag=local_dag,
-        provide_context=True,
-        op_kwargs={
-            'method': 'move_tasks_to_clean'
-        }
-    )
-
-    upsert_tasks_clean_partition_task = BaseDAG.build_python_operator(
-        task_id='upsert_tasks_clean_partition',
-        python_callable=upsert_partition,
-        dag=local_dag,
-        provide_context=True,
-        op_kwargs={
-            'bucket_type': 'clean',
-            'method': 'upsert_tasks_partition'
-        }
-    )
-
-    move_tasks_to_clean_task >> upsert_tasks_clean_partition_task
-
-    return local_dag
-
-
-def clean_task_resolution_sub_dag(sub_dag_name, **kwargs):
-    local_dag = BaseSubDag(
-        bucket=s3_bucket,
-        sub_dag_name=sub_dag_name,
-        dag_name=MAIN_DAG_ID,
-        schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        start_date=MAIN_START_DATE
-    )._build_local_dag()
-
-    move_tasks_resolution_to_clean_task = BaseDAG.build_python_operator(
-        task_id='move_tasks_resolution_to_clean',
-        python_callable=exec_crm_method,
-        dag=local_dag,
-        provide_context=True,
-        op_kwargs={
-            'method': 'move_tasks_resolution_to_clean'
-        }
-    )
-
-    upsert_tasks_resolution_clean_partition_task = BaseDAG.build_python_operator(
-        task_id='upsert_tasks_resolution_clean_partition',
-        python_callable=upsert_partition,
-        dag=local_dag,
-        provide_context=True,
-        op_kwargs={
-            'bucket_type': 'clean',
-            'method': 'upsert_tasks_resolution_partition'
-        }
-    )
-
-    move_tasks_resolution_to_clean_task >> upsert_tasks_resolution_clean_partition_task
 
     return local_dag
 
@@ -345,56 +222,112 @@ def xcom_crm_load(**kwargs):
 
 
 # operators
-extract_and_load_tasks_task = BaseDAG.build_python_operator(
-    task_id='extract_and_load_tasks',
-    python_callable=extract_and_load_tasks_data,
+tasks_raw_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
+    sub_dag_name='incremental_load_raw_tasks',
+    python_exec=exec_crm_method,
+    python_method={
+        'extract_and_load_data': 'extract_and_load_data',
+        'data_existence_check': 'data_existence_check',
+        'upsert_partition': 'upsert_tasks_partition'
+    },
+    sub_dag_func=incremental_raw_sub_dag,
     provide_context=True
 )
 
-data_existence_check_task = ShortCircuitOperator(
-    task_id='data_existence_check',
-    python_callable=data_existence_check,
+tasks_clean_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    provide_context=True,
-    op_kwargs={
-        'bucket_type': 'raw'
-    }
-)
-
-upsert_raw_partition_task = BaseDAG.build_python_operator(
-    task_id='upsert_raw_partition',
-    python_callable=upsert_partition,
-    dag=main_dag,
-    provide_context=True,
-    op_kwargs={
-        'bucket_type': 'raw',
-        'method': 'upsert_tasks_partition'
-    }
+    sub_dag_name='incremental_load_clean_tasks',
+    python_exec=exec_crm_method,
+    python_method={
+        'move_to_clean': 'move_tasks_to_clean',
+        'upsert_clean_partition': 'upsert_tasks_partition'
+    },
+    sub_dag_func=incremental_clean_sub_dag,
+    provide=True
 )
 
 workgroups_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_name='workgroups',
-    sub_dag_func=workgroups_sub_dag,
+    sub_dag_name='full_load_workgroups',
+    python_exec=exec_workgroups_method,
+    python_method={
+        'extract_and_load': 'extract_and_load_data',
+        'move_to_clean': 'move_workgroups_to_clean'
+    },
+    sub_dag_func=full_load_sub_dag
 )
 
 task_titles_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_name='task_titles',
-    sub_dag_func=task_titles_sub_dag,
-)
-
-clean_tasks_sub_dag_task = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_name='create_clean_tasks_table',
-    sub_dag_func=clean_tasks_sub_dag,
+    sub_dag_name='full_load_task_titles',
+    python_exec=exec_task_titles_method,
+    python_method={
+        'extract_and_load': 'extract_and_load_data',
+        'move_to_clean': 'move_task_titles_to_clean'
+    },
+    sub_dag_func=full_load_sub_dag
 )
 
 clean_tasks_resolution_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_name='create_clean_tasks_resolution_table',
-    sub_dag_func=clean_task_resolution_sub_dag,
+    sub_dag_name='incremental_load_clean_tasks_resolution_table',
+    python_exec=exec_crm_method,
+    python_method={
+        'move_to_clean': 'move_tasks_resolution_to_clean',
+        'upsert_clean_partition': 'upsert_tasks_resolution_partition'
+    },
+    sub_dag_func=incremental_clean_sub_dag,
+)
+
+workflows_raw_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='incremental_load_raw_workflows',
+    python_exec=exec_workflows_method,
+    python_method={
+        'extract_and_load_data': 'extract_and_load_data',
+        'data_existence_check': 'data_existence_check',
+        'upsert_partition': 'upsert_partition'
+    },
+    sub_dag_func=incremental_raw_sub_dag,
+    provide_context=True
+)
+
+workflows_clean_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='incremental_load_clean_workflows',
+    python_exec=exec_workflows_method,
+    python_method={
+        'move_to_clean': 'move_to_clean',
+        'upsert_clean_partition': 'upsert_partition'
+    },
+    sub_dag_func=incremental_clean_sub_dag,
+    provide_context=True
+)
+
+task_status_histories_raw_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='incremental_load_raw_task_status_histories',
+    python_exec=exec_task_status_histories_method,
+    python_method={
+        'extract_and_load_data': 'extract_and_load_data',
+        'data_existence_check': 'data_existence_check',
+        'upsert_partition': 'upsert_partition'
+    },
+    sub_dag_func=incremental_raw_sub_dag,
+    provide_context=True,
+)
+
+task_status_histories_clean_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='incremental_load_clean_task_status_histories',
+    python_exec=exec_task_status_histories_method,
+    python_method={
+        'move_to_clean': 'move_to_clean',
+        'upsert_clean_partition': 'upsert_partition'
+    },
+    sub_dag_func=incremental_clean_sub_dag,
+    provide_context=True,
 )
 
 xcom_crm_load_task = BaseDAG.build_python_operator(
@@ -404,32 +337,13 @@ xcom_crm_load_task = BaseDAG.build_python_operator(
     provide_context=True,
 )
 
-workflows_sub_dag_task = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_name='workflows',
-    python_method=exec_workflows_method,
-    sub_dag_func=incremental_sub_dag,
-    provide_context=True
-)
-
-task_status_histories_sub_dag_task = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_name='task_status_histories',
-    python_method=exec_task_status_histories_method,
-    sub_dag_func=incremental_sub_dag,
-    provide_context=True,
-)
-
 # flow
-airflow_helpers.chain(
-    extract_and_load_tasks_task,
-    data_existence_check_task,
-    upsert_raw_partition_task,
-    clean_tasks_sub_dag_task,
-    clean_tasks_resolution_sub_dag_task,
-    [workgroups_sub_dag_task, task_titles_sub_dag_task]
-)
+tasks_raw_sub_dag_task >> tasks_clean_sub_dag_task >> clean_tasks_resolution_sub_dag_task
+workflows_raw_sub_dag_task >> workflows_clean_sub_dag_task
+task_status_histories_raw_sub_dag_task >> task_status_histories_clean_sub_dag_task
 
-xcom_crm_load_task.set_upstream([workgroups_sub_dag_task, task_titles_sub_dag_task])
+xcom_crm_load_task.set_upstream([clean_tasks_resolution_sub_dag_task,
+                                 workgroups_sub_dag_task,
+                                 task_titles_sub_dag_task])
 
 # TODO: add unit tests
