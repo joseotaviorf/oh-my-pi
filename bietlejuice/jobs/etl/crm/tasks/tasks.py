@@ -1,19 +1,19 @@
-import boto3
 import json
 import os
 from abc import abstractmethod
-from botocore.exceptions import ClientError
 from collections import OrderedDict
 from gzip import GzipFile
 from io import BytesIO
-from pymongo import MongoClient
-from qa_python_utils import QuintoAndarLogger
-from qa_python_utils.aws.athena import AthenaClient
 
+import boto3
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.base.new_base_etl import BaseETL
 from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR, DW_QUERIES_DIR
 from bietlejuice.jobs.etl.crm.tasks.unidecode_handler import UnidecodeHandler
+from botocore.exceptions import ClientError
+from pymongo import MongoClient
+from qa_python_utils import QuintoAndarLogger
+from qa_python_utils.aws.athena import AthenaClient
 
 logger = QuintoAndarLogger("CRMTasks")
 
@@ -94,7 +94,7 @@ class CRMTasks(object):
         )
 
     # instance methods
-    @logger
+    @logger(exclude='kwargs')
     def data_existence_check(self, bucket_type, **kwargs):
         if bucket_type not in ("raw", "clean"):
             logger.error(
@@ -109,6 +109,12 @@ class CRMTasks(object):
             CRMTasks.BUCKET_FOLDER_SUFFIXES["tasks"],
             self.partition_date,
             CRMTasks.S3_FILE_NAME,
+        )
+
+        logger.info(
+            "m=data_existence_check, file_path={}, msg=Searching for file".format(
+                file_path
+            )
         )
 
         try:
@@ -239,12 +245,12 @@ class CRMTasks(object):
 
     @logger
     def _upsert_partition(
-        self,
-        bucket_type,
-        bucket_folder_suffix,
-        table_name,
-        database_prefix="datalake",
-        partition_name="dt",
+            self,
+            bucket_type,
+            bucket_folder_suffix,
+            table_name,
+            database_prefix="datalake",
+            partition_name="dt",
     ):
         if bucket_type not in ("raw", "clean"):
             logger.error(
@@ -315,7 +321,7 @@ class CRMTasks(object):
 
     @logger
     def move_tasks_resolution_to_clean(
-        self, sql_file_name="create_tasks_resolution_table.sql", **kwargs
+            self, sql_file_name="create_tasks_resolution_table.sql", **kwargs
     ):
         _cols = OrderedDict(
             [
@@ -374,12 +380,12 @@ class CRMTasks(object):
 
     @logger(exclude=["r_cols", "c_cols"])
     def _move_to_clean(
-        self,
-        bucket_folder_suffix,
-        sql_file_name,
-        r_cols,
-        c_cols,
-        queries_folder_suffix=None,
+            self,
+            bucket_folder_suffix,
+            sql_file_name,
+            r_cols,
+            c_cols,
+            queries_folder_suffix=None,
     ):
         key = "clean/{}/dt={}/{}.parq".format(
             bucket_folder_suffix, self.partition_date, CRMTasks.S3_FILE_NAME
@@ -404,12 +410,12 @@ class CRMTasks(object):
 
     @logger
     def _move_to_staging(
-        self,
-        table_name,
-        queues,
-        query_filename,
-        manual_task_workgroups,
-        append_query_filename=None,
+            self,
+            table_name,
+            queues,
+            query_filename,
+            manual_task_workgroups,
+            append_query_filename=None,
     ):
         query = BaseETL.get_query_from_file_name(
             "{}/{}/{}".format(
@@ -479,12 +485,12 @@ class CRMTasks(object):
         )
 
     def _move_dim_to_staging(
-        self,
-        table_name,
-        queues=None,
-        query_filename="create_staging_dim_table.sql",
-        manual_task_workgroups=None,
-        append_query_filename="append_dim_default_info.sql",
+            self,
+            table_name,
+            queues=None,
+            query_filename="create_staging_dim_table.sql",
+            manual_task_workgroups=None,
+            append_query_filename="append_dim_default_info.sql",
     ):
         self._move_to_staging(
             table_name=table_name,
@@ -496,12 +502,12 @@ class CRMTasks(object):
 
     @logger
     def _move_fact_to_staging(
-        self,
-        table_name,
-        queues=None,
-        query_filename="create_staging_fact_table.sql",
-        manual_task_workgroups=None,
-        append_query_filename="append_fact_default_info.sql",
+            self,
+            table_name,
+            queues=None,
+            query_filename="create_staging_fact_table.sql",
+            manual_task_workgroups=None,
+            append_query_filename="append_fact_default_info.sql",
     ):
         self._move_to_staging(
             table_name=table_name,
@@ -513,7 +519,7 @@ class CRMTasks(object):
 
     @logger
     def _append_fact_to_dw(
-        self, table_name, query_filename="append_fact_default_table.sql"
+            self, table_name, query_filename="append_fact_default_table.sql"
     ):
         self.__append_to_dw(
             schema=CRMTasks.SCHEMA_NAMES["prod"],
