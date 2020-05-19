@@ -67,9 +67,6 @@ cte_keywords as (
         (COALESCE(mobile_devices_keywords.total_cost, 0) + COALESCE(tablet_devices_keywords.total_cost, 0)) as mobile_cost,
         COALESCE(computer_devices_keywords.total_cost, 0) as desktop_cost,
         (COALESCE(mobile_devices_keywords.total_cost, 0) + COALESCE(tablet_devices_keywords.total_cost, 0) + COALESCE(computer_devices_keywords.total_cost, 0)) as total_cost,
-        COALESCE(mobile_devices_keywords.impressions, 0)  as mobile_impressions,
-        COALESCE(tablet_devices_keywords.impressions, 0)  as tablet_impressions,
-        COALESCE(computer_devices_keywords.impressions, 0)  as desktop_impressions,
         (COALESCE(mobile_devices_keywords.impressions, 0) + COALESCE(tablet_devices_keywords.impressions, 0) + COALESCE(computer_devices_keywords.impressions, 0)) as impressions,
         COALESCE(computer_devices_keywords.search_impression_share, 0)             as desktop_search_impression_share,
         COALESCE(mobile_devices_keywords.search_impression_share, 0)               as mobile_search_impression_share,
@@ -116,9 +113,6 @@ final_cte_keywords as (
         cte_keywords.mobile_cost,
         cte_keywords.desktop_cost,
         cte_keywords.total_cost,
-        cte_keywords.mobile_impressions,
-        cte_keywords.tablet_impressions,
-        cte_keywords.desktop_impressions,
         cte_keywords.impressions,
         -- Search Impression Share is the impressions we've received on the Search Network divided by the
         -- estimated number of impressions we were eligible to receive. Value ranging from 0 to 100.
