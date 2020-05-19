@@ -39,7 +39,7 @@ def exec_workflows_method(method, **kwargs):
         execution_date=kwargs['execution_date']
     )
 
-    getattr(crm, method)(**kwargs)
+    return getattr(crm, method)(**kwargs)
 
 
 def exec_task_status_histories_method(method, **kwargs):
@@ -49,7 +49,7 @@ def exec_task_status_histories_method(method, **kwargs):
         execution_date=kwargs['execution_date']
     )
 
-    getattr(crm, method)(**kwargs)
+    return getattr(crm, method)(**kwargs)
 
 
 def exec_workgroups_method(method, **kwargs):
@@ -77,7 +77,7 @@ def exec_crm_method(method, **kwargs):
         execution_date=kwargs['execution_date']
     )
 
-    getattr(crm_tasks, method)(**kwargs)
+    return getattr(crm_tasks, method)(**kwargs)
 
 
 # dags
