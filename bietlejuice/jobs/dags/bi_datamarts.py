@@ -19,7 +19,7 @@ s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 MAIN_DAG_ID = 'bi-datamarts'
 MAIN_START_DATE = datetime(2018, 8, 22)
-MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 9 * * *')
+MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('30 7 * * *')
 
 DATAMARTS_SCHEMA = 'datamarts'
 
@@ -34,6 +34,12 @@ def create_datamart_from_dw(table_name, **kwargs):
     drop_table_sql = 'drop table if exists {}.{}'.format(DATAMARTS_SCHEMA, table_name)
     create_table_sql = 'create table {}.{} as ({})'.format(DATAMARTS_SCHEMA, table_name, query.replace(';', ''))
     transaction_sql = 'begin;\n {};\n {};\n commit;'.format(drop_table_sql, create_table_sql)
+
+    dw_conn = BaseETL.get_connection(db_enum=EnumDB.BI_DW, encoding='utf-8')
+    BaseETL.kill_locks_for_table(
+        conn=dw_conn,
+        table_name='{}.{}'.format(DATAMARTS_SCHEMA, table_name)
+    )
 
     logger.info('m=create_datamart_from_dw, table_name={}, sql={}, msg=Dropping and creating new table'.format(table_name, transaction_sql))
     BaseETL.execute_command(
@@ -90,12 +96,13 @@ def create_datamart_from_athena(table_name, **kwargs):
     )
 
 
-def create_task(dag, queries_dir, python_callable, db, table_name, file_name):
-    task = BaseDAG.build_python_operator(
+def create_task(dag, python_callable, db, table_name, pool):
+    BaseDAG.build_python_operator(
         dag=dag,
         task_id='{}_{}'.format(db, table_name),
         provide_context=True,
         python_callable=python_callable,
+        pool=pool,
         op_kwargs={'table_name': table_name}
     )
 
@@ -132,8 +139,18 @@ main_dag = DAG(
 
 # operators
 operators = [
-    {'queries_dir': DW_QUERIES_DIR, 'python_callable': create_datamart_from_dw, 'db': 'dw'},
-    {'queries_dir': DATALAKE_QUERIES_DIR, 'python_callable': create_datamart_from_athena, 'db': 'athena'}
+    {
+        'queries_dir': DW_QUERIES_DIR,
+        'python_callable': create_datamart_from_dw,
+        'db': 'dw',
+        'pool': 'redshift_connections'
+    },
+    {
+        'queries_dir': DATALAKE_QUERIES_DIR,
+        'python_callable': create_datamart_from_athena,
+        'db': 'athena',
+        'pool': 'athena_connections'
+    }
 ]
 
 queries = []
@@ -151,7 +168,8 @@ for operator in operators:
             'python_callable': operator['python_callable'],
             'db': operator['db'],
             'table_name': table_name,
-            'file_name': file_name
+            'file_name': file_name,
+            'pool': operator['pool']
         }
         if file_name.endswith('.sql'):
             queries.append(file_dict)
@@ -162,11 +180,10 @@ for operator in operators:
 for query in queries:
     create_task(
         dag=main_dag,
-        queries_dir=query['queries_dir'],
         python_callable=query['python_callable'],
         db=query['db'],
         table_name=query['table_name'],
-        file_name=query['file_name']
+        pool=query['pool']
     )
 
 # configure tasks

@@ -43,13 +43,15 @@ class BaseDAG(object):
                               retries=OPERATOR_RETRIES['retries'],
                               retry_delay=OPERATOR_RETRIES['retry_delay'],
                               max_retry_delay=OPERATOR_RETRIES['max_retry_delay'],
-                              trigger_rule='all_success'):
+                              trigger_rule='all_success',
+                              pool=None):
         return PythonOperator(
             dag=dag,
             task_id=task_id,
             python_callable=python_callable,
             op_kwargs=op_kwargs,
             provide_context=provide_context,
+            pool=pool,
             execution_timeout=execution_timeout,
             retries=retries,
             retry_delay=retry_delay,
