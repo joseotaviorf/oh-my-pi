@@ -25,7 +25,9 @@ SPARK_JOBS_PATH = S3_PREFIX + "/spark_jobs/tenant_booking_review/"
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
     Variable.get("databricks_s3_bucket"), DAG_ID
 )
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
+CLUSTER_DESCRIPTION = Variable.get(
+    "databricks_bietlejuice_tenant_booking_review", deserialize_json=True
+)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 LIBRARIES_DESCRIPTION = Variable.get(
     "bietlejuice_default_libraries", deserialize_json=True
