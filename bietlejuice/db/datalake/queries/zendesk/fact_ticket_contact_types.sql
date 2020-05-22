@@ -1,17 +1,14 @@
 with filtered_custom_fields AS (
   SELECT
-    zcf.id_ticket,
-    regexp_extract(field, '^[^:]+:') as id_field,
-    regexp_extract(field, '^[^:]+:\[?"(.*)?"\]?$', 1) as contact_type_tag,
-    cast(max(ts_updated) as timestamp with time zone) as ts_updated
-  FROM datalake_clean.zendesk_custom_fields zcf
-  CROSS JOIN UNNEST(
-    split(zcf.custom_fields, ',')
-  ) AS f(field)
-  WHERE
-    dt_extracted = '{extraction_date}' 
-    and field LIKE '%360017352951%' or field LIKE '%360015841211%'
-  GROUP BY 1,2,3
+      zcf.id_ticket,
+      replace(replace(replace(field, '"', ''), '[', ''), ']', '')  as contact_type_tag,
+      cast(max(ts_updated) as timestamp with time zone) as ts_updated
+    FROM datalake_clean.zendesk_custom_fields zcf
+    CROSS JOIN UNNEST(
+      split(json_format(json_extract(zcf.custom_fields, '$.360017352951')), ',')
+    ) AS f(field)
+    where dt_extracted = '{extraction_date}'
+    GROUP BY 1,2
 ),
 check_prefix as (
   SELECT
@@ -38,4 +35,3 @@ SELECT
   now() as ts_load
 FROM filtered_custom_fields fcf
 JOIN check_prefix cp on fcf.contact_type_tag = cp.contact_type_tag AND fcf.id_ticket = cp.id_ticket
-WHERE id_field IS NOT NULL
