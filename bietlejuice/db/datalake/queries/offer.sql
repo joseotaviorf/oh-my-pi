@@ -51,13 +51,13 @@ firestore_offers as (
     go_firestore.ts_first_sent,
     go_firestore.ts_last_sent,
     go_firestore.type as distinct_type,
-    fo.instantOffer
+    null as instantOffer
   from offer_firestore
   join datalake_godfather_clean_prod.business_offer go_firestore
     on go_firestore.id = godfatherid
-  left join datalake_firestore_raw_prod.offers fo
-    on go_firestore.id_firestore = fo.firestore_id
-  group by 1, 2, 3, 4, 5, 6,7
+--  left join datalake_firestore_raw_prod.offers fo
+--    on go_firestore.id_firestore = fo.firestore_id
+  group by 1, 2, 3, 4, 5, 6
 )
 select distinct
   eo.id,
