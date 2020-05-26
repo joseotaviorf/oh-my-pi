@@ -22,7 +22,7 @@ select
       when current_situation = 'Proprio' then 'own'
 		else current_situation end as current_house_situation,
     has_contributed_to_current_house,
-    replace(lower(cp.gender), 'o', 'e') as gender,
+    replace(lower(gender), 'o', 'e') as gender,
     marital_status,
     id_estado as state_code,
     dt_birth,
