@@ -31,6 +31,7 @@ select
       f.dataAgendamento as dt_job_scheduled,
       f.dataUploadFotos as dt_photos_uploaded,
       f.atualizadoEm as dt_updated,
+      FROM_UNIXTIME(ureP.timestamp/1000) as dt_problem_reported,
       f.instrucoesAgendamento as scheduling_instructions,
       f.nomeContatoSessaoFotos as photo_shoot_contact_name,
       f.emailSessaoFotos as photo_shoot_email,
@@ -93,14 +94,18 @@ select
       )/1440,1) as creation_to_scheduling_days
     from JobFotografo f
     left join
-        (select id, max(REV) as REV from JobFotografo_AUD where status in ('ComProblema', 'Cancelado') and status_MOD = 1 group by id) f_cancel_revision
+        (select id, max(REV) as REV from JobFotografo_AUD where status in ('Cancelado') and status_MOD = 1 group by id) f_cancel_revision
         on f_cancel_revision.id = f.id
-        and f.status in ('Cancelado','ComProblema')
+        and f.status in ('Cancelado')
+    left join
+        (select id, max(REV) as REV from JobFotografo_AUD where status in ('ComProblema') and status_MOD = 1 group by id) f_problem_revision
+        on f_problem_revision.id = f.id
     left join
         (select id, max(REV) as REV from JobFotografo_AUD where status = 'ComProblema' group by id) comp
         on comp.id = f.id
         and f.status = 'Cancelado'
     left join UsuarioRevisionEntity ure on ure.id = f_cancel_revision.REV
+    left join UsuarioRevisionEntity ureP on ureP.id = f_problem_revision.REV
     left join Usuario uc on uc.id = ure.usuario_id
     left join Usuario af on af.dadosFotografo_id = f.dadosFotografo_id
     left join DadosFotografo df on df.id = f.dadosFotografo_id

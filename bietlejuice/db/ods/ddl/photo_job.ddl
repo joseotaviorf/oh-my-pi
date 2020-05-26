@@ -15,6 +15,7 @@ create table if not exists photo_job (
 	dt_job_scheduled timestamp,
 	dt_photos_uploaded timestamp,
 	dt_updated timestamp,
+	dt_problem_reported timestamp,
 	scheduling_instructions text,
 	photo_shoot_contact_name varchar(255),
 	photo_shoot_email varchar(255),

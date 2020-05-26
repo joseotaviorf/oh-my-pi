@@ -16,6 +16,7 @@ create table public.dim_photo_job (
 	dt_job_scheduled datetime,
 	dt_photos_uploaded datetime,
 	dt_updated datetime,
+	dt_problem_reported datetime,
 	scheduling_instructions varchar,
 	photo_shoot_contact_name varchar(255),
 	photo_shoot_email varchar(255),

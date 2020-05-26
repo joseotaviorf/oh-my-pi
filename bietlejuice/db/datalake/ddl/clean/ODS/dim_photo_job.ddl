@@ -16,6 +16,7 @@ create external table if not exists datalake_clean.ods_dim_photo_job (
 	dt_job_scheduled string,
 	dt_photos_uploaded string,
 	dt_updated string,
+	dt_problem_reported string,
 	scheduling_instructions string,
 	photo_shoot_contact_name string,
 	photo_shoot_email string,

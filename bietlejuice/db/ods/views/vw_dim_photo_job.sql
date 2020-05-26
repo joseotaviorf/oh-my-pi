@@ -25,6 +25,7 @@ select
 	j1.dt_job_scheduled,
 	j1.dt_photos_uploaded,
 	j1.dt_updated,
+	j1.dt_problem_reported,
 	j1.scheduling_instructions::varchar(100) as scheduling_instructions,
 	j1.photo_shoot_contact_name,
 	j1.photo_shoot_email,
