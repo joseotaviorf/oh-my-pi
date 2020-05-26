@@ -24,6 +24,7 @@ create table staging.dim_offer (
   last_rent_offered_by_tenant decimal(18,4),
   last_rent_offered_by_owner decimal(18,4),
   rejection_reason varchar(255),
-  type varchar(255)
+  type varchar(255),
+  is_instant_offer boolean
 )
 ;

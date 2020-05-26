@@ -25,5 +25,6 @@ create table if not exists offer (
   first_rent_offered_by_tenant numeric(18,4),
   first_rent_offered_by_owner numeric(18,4),
   last_rent_offered_by_tenant numeric(18,4),
-  last_rent_offered_by_owner numeric(18,4)
+  last_rent_offered_by_owner numeric(18,4),
+  is_instant_offer boolean
 );

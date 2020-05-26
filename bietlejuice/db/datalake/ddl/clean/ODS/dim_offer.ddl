@@ -24,7 +24,8 @@ create external table if not exists datalake_clean.ods_dim_offer (
   last_rent_offered_by_tenant string,
   last_rent_offered_by_owner string,
   rejection_reason string,
-  type string
+  type string,
+  is_instant_offer string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 with serdeproperties (

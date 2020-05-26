@@ -50,11 +50,14 @@ firestore_offers as (
     go_firestore.id,
     go_firestore.ts_first_sent,
     go_firestore.ts_last_sent,
-    go_firestore.type as distinct_type
+    go_firestore.type as distinct_type,
+    fo.instantOffer
   from offer_firestore
   join datalake_godfather_clean_prod.business_offer go_firestore
     on go_firestore.id = godfatherid
-  group by 1, 2, 3, 4, 5, 6
+  left join datalake_firestore_raw_prod.offers fo
+    on go_firestore.id_firestore = fo.firestore_id
+  group by 1, 2, 3, 4, 5, 6,7
 )
 select distinct
   eo.id,
@@ -83,7 +86,8 @@ select distinct
   rvo.first_rent_offered_by_tenant,
   rvo.first_rent_offered_by_owner,
   rvo.last_rent_offered_by_tenant,
-  rvo.last_rent_offered_by_owner
+  rvo.last_rent_offered_by_owner,
+  case when go_firestore.instantOffer = 'true' then true else false end as is_instant_offer
 from datalake_ebdb_raw_prod.offer eo
 left join datalake_godfather_clean_prod.business_offer go_godfather
   on eo.godfatherid = try_cast(go_godfather.id as bigint)

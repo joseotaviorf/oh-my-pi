@@ -51,7 +51,8 @@ old_pre_proposal as (
       last_rent_value_tenant as last_rent_offered_by_tenant,
       last_rent_value_landlord as last_rent_offered_by_owner,
       p.rejection_reason,
-      'Other'::varchar as type
+      'Other'::varchar as type,
+      false as is_instant_offer
     from
       pre_proposal p
     left join pp_aud
@@ -83,7 +84,8 @@ new_offer as (
       last_rent_offered_by_tenant,
       last_rent_offered_by_owner,
       rejection_reason,
-	    type
+	  type,
+	  is_instant_offer
    from offer
    window w as (partition by id)
 )
