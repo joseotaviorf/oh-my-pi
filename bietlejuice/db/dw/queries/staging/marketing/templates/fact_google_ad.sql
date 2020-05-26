@@ -64,6 +64,9 @@ cte_ads as (
         (COALESCE(mobile_devices_ads.total_cost, 0) + COALESCE(tablet_devices_ads.total_cost, 0)) as mobile_cost,
         COALESCE(computer_devices_ads.total_cost, 0) as desktop_cost,
         (COALESCE(mobile_devices_ads.total_cost, 0) + COALESCE(tablet_devices_ads.total_cost, 0) + COALESCE(computer_devices_ads.total_cost, 0)) as total_cost,
+        COALESCE(mobile_devices_ads.impressions, 0) as mobile_impressions,
+        COALESCE(tablet_devices_ads.impressions, 0) as tablet_impressions,
+        COALESCE(computer_devices_ads.impressions, 0) as desktop_impressions,
         (COALESCE(mobile_devices_ads.impressions, 0) + COALESCE(tablet_devices_ads.impressions, 0) + COALESCE(computer_devices_ads.impressions, 0)) as impressions,
         COALESCE(computer_devices_ads.absolute_top_impression_percentage, 0)    as desktop_absolute_top_impression_percentage,
         COALESCE(mobile_devices_ads.absolute_top_impression_percentage, 0)      as mobile_absolute_top_impression_percentage,
@@ -107,6 +110,9 @@ final_cte_ads as (
         cte_ads.mobile_cost,
         cte_ads.desktop_cost,
         cte_ads.total_cost,
+        cte_ads.mobile_impressions,
+        cte_ads.tablet_impressions,
+        cte_ads.desktop_impressions,
         cte_ads.impressions,
         -- Search Impression Share is the impressions we've received on the Search Network divided by the
         -- estimated number of impressions we were eligible to receive. Value ranging from 0 to 100.
