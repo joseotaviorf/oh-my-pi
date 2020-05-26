@@ -18,7 +18,10 @@ logger = QuintoAndarLogger("CRMTaskStatusHistories")
 
 
 class CRMTaskStatusHistories(object):
-    BUCKET_FOLDER_SUFFIXES = "crm/task_status_histories"
+    BUCKET_FOLDER_SUFFIXES = {
+        "task_status": "crm/task_status_histories",
+        "resolution": "crm/task_resolution_history"
+    }
     S3_FILE_NAME = "data"
     TABLE_PARTITION_PARAM = "__PARTITION_DATE__"
 
@@ -83,7 +86,7 @@ class CRMTaskStatusHistories(object):
 
         file_path = "{}/{}/dt={}/{}.gz".format(
             bucket_type,
-            CRMTaskStatusHistories.BUCKET_FOLDER_SUFFIXES,
+            CRMTaskStatusHistories.BUCKET_FOLDER_SUFFIXES["task_status"],
             self.partition_date,
             CRMTaskStatusHistories.S3_FILE_NAME
         )
@@ -102,7 +105,7 @@ class CRMTaskStatusHistories(object):
     def upsert_partition(self, bucket_type, **kwargs):
         self._upsert_partition(
             bucket_type=bucket_type,
-            bucket_folder_suffix=CRMTaskStatusHistories.BUCKET_FOLDER_SUFFIXES,
+            bucket_folder_suffix=CRMTaskStatusHistories.BUCKET_FOLDER_SUFFIXES["task_status"],
             table_name="crm_task_status_histories",
         )
 
@@ -117,10 +120,77 @@ class CRMTaskStatusHistories(object):
         )
 
         self._move_to_clean(
-            bucket_folder_suffix=CRMTaskStatusHistories.BUCKET_FOLDER_SUFFIXES,
+            bucket_folder_suffix=CRMTaskStatusHistories.BUCKET_FOLDER_SUFFIXES["task_status"],
             sql_file_name=sql_file_name,
             r_cols=_cols,
             c_cols=_cols
+        )
+
+    @logger
+    def move_tasks_resolution_history_to_clean(
+            self, sql_file_name="create_task_resolution_history_table.sql", **kwargs
+    ):
+        _cols = OrderedDict(
+            [
+                ("score_factor", str),
+                ("id_rent_flow", str),
+                ("histories", str),
+                ("ts_start", str),
+                ("receiver_name", str),
+                ("ts_completed", str),
+                ("comment", str),
+                ("id_origin", str),
+                ("id_assignee", str),
+                ("score", str),
+                ("origin", str),
+                ("ts_visit", str),
+                ("type", str),
+                ("receiver_type", str),
+                ("description", str),
+                ("phase", str),
+                ("ts_silenced_until", str),
+                ("analyst_started_list", str),
+                ("id_house", str),
+                ("subject", str),
+                ("tags", str),
+                ("id_opened_by", str),
+                ("id_tenant", str),
+                ("ts_created", str),
+                ("id_negotiation", str),
+                ("ts_origin", str),
+                ("id_manager", str),
+                ("ts_fup", str),
+                ("visit_fup", str),
+                ("metadata", str),
+                ("v", str),
+                ("id_owner", str),
+                ("id_receiver", str),
+                ("id_action", str),
+                ("id_task", str),
+                ("resolved", str),
+                ("ts_action", str),
+                ("status", str),
+                ("ts_task_user_start", str),
+                ("ts_task_user_end", str),
+                ("task_user_type", str),
+                ("task_user_resolve_hours", str),
+            ]
+        )
+
+        self._move_to_clean(
+            bucket_folder_suffix=CRMTaskStatusHistories.BUCKET_FOLDER_SUFFIXES["resolution"],
+            queries_folder_suffix=CRMTaskStatusHistories.BUCKET_FOLDER_SUFFIXES["task_status"],
+            sql_file_name=sql_file_name,
+            r_cols=_cols,
+            c_cols=_cols,
+        )
+
+    @logger
+    def upsert_tasks_resolution_history_partition(self, bucket_type, **kwargs):
+        self._upsert_partition(
+            bucket_type=bucket_type,
+            bucket_folder_suffix=CRMTaskStatusHistories.BUCKET_FOLDER_SUFFIXES["resolution"],
+            table_name="crm_task_resolution_history",
         )
 
     @logger
@@ -153,7 +223,7 @@ class CRMTaskStatusHistories(object):
                 fp.write("\n")
 
         file_suffix = "raw/{}/dt={}/{}.gz".format(
-            CRMTaskStatusHistories.BUCKET_FOLDER_SUFFIXES,
+            CRMTaskStatusHistories.BUCKET_FOLDER_SUFFIXES["task_status"],
             self.partition_date,
             CRMTaskStatusHistories.S3_FILE_NAME,
         )
