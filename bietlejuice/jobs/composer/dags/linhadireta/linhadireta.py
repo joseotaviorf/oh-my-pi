@@ -31,7 +31,9 @@ CREATE_CLEAN_EXTERNAL_TABLES_FILE_PATH = (
 
 LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_S3_BUCKET}/logs/jobs/{SOURCE}"
 
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
+CLUSTER_DESCRIPTION = Variable.get(
+    "databricks_bietlejuice_linha_direta", deserialize_json=True
+)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 
 LIBRARIES_DESCRIPTION = Variable.get(
