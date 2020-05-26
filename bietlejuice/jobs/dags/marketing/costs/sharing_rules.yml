@@ -29,3 +29,7 @@ d006d:
 d007d:
   query: marketing/costs/d007d.sql
   funnel_side: demand
+
+d008d:
+  query: marketing/costs/d008d.sql
+  funnel_side: demand
