@@ -25,7 +25,22 @@ create external table if not exists datalake_clean.ods_dim_offer (
   last_rent_offered_by_owner string,
   rejection_reason string,
   type string,
-  is_instant_offer string
+  is_instant_offer string,
+  app_type string,
+  utm_source string,
+  utm_medium string,
+  utm_campaign string,
+  utm_content string,
+  utm_term string,
+  flg_branded string,
+  mkt_category string,
+  mkt_flow string,
+  mkt_completion string,
+  mkt_origin string,
+  mkt_channel string,
+  mkt_medium string,
+  mkt_source string,
+  mkt_platform string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 with serdeproperties (

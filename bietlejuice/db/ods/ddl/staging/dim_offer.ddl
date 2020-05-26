@@ -25,6 +25,21 @@ create table staging.dim_offer (
   last_rent_offered_by_owner decimal(18,4),
   rejection_reason varchar(255),
   type varchar(255),
-  is_instant_offer boolean
+  is_instant_offer boolean,
+  app_type varchar(255),
+  utm_source varchar(255),
+  utm_medium varchar(255),
+  utm_campaign varchar(2000),
+  utm_content varchar(255),
+  utm_term varchar(255),
+  flg_branded boolean,
+  mkt_category varchar(255),
+  mkt_flow varchar(255),
+  mkt_completion varchar(255),
+  mkt_origin varchar(255),
+  mkt_channel varchar(255),
+  mkt_medium varchar(255),
+  mkt_source varchar(255),
+  mkt_platform varchar(255)
 )
 ;
