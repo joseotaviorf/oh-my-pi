@@ -41,6 +41,7 @@ house as (
 custom_field_ids as (
       select
         c.id_ticket,
+        cast(json_extract(c.custom_fields,'$["46785608"]') as varchar) as client_type,
         if(
             length(try_cast(json_extract(c.custom_fields, '$["31646438"]') as varchar)) < 9,
             892700000 + try_cast(json_extract(c.custom_fields, '$["31646438"]') as bigint), 
@@ -48,8 +49,7 @@ custom_field_ids as (
         ) as id_house,
         try_cast(json_extract(c.custom_fields, '$["114096515211"]') as bigint) as id_contract
     from datalake_clean.zendesk_custom_fields c
-    inner join last_updated_ticket lt
-        on c.id_ticket = lt.id_ticket and c.ts_updated=lt.ts_last_updated
+    where c.dt_extracted = '{extraction_date}'
 ),
 ticket_metrics as (
     with row_n as (
@@ -110,7 +110,9 @@ tickets as (
         -- id_house may be filled with id_house or short_id_house
         cfi.id_house,
         cfi.id_contract,
+        cfi.client_type, -- included to enable sk_owner and sk_client relationship
         tm.*,
+        t.tags, -- included to enable sk_user relationship model
         coalesce(cast(t.id_requester as bigint), -1) as sk_zendesk_requester_user,
         coalesce(cast(t.id_submitter as bigint), -1) as sk_zendesk_submitter_user,
         coalesce(cast(t.id_assignee as bigint), -1) as sk_zendesk_assignee_user,
@@ -137,13 +139,126 @@ tickets as (
         on t.id_ticket=tm.id_ticket
     left join custom_field_ids cfi
         on t.id_ticket = cfi.id_ticket
+),
+-- modeling sk_user from phone and email of Zendesk's requester user
+user_email as (
+	select
+		id_user,
+		'email' as channel,
+		email as user_contact
+	from datalake_ebdb_clean_prod.user_aud
+	where mod_email = true
+		and email is not null
+	group by 1,2,3
+),
+user_alternative_email as (
+	select
+		id_user,
+		'email' as channel,
+		alternative_email as user_contact
+	from datalake_ebdb_clean_prod.user_aud
+	where mod_alternative_email = true
+		and alternative_email is not null
+	group by 1,2,3
+),
+user_main_phone as (
+	select
+		id_user,
+		'phone' as channel,
+		regexp_replace(main_phone,'(\D+)','') as user_contact
+	from datalake_ebdb_clean_prod.user_aud
+	where mod_main_phone = true
+		and main_phone is not null
+	group by 1,2,3
+),
+user_secondary_phone as (
+	select
+		id_user,
+		'phone' as channel,
+		regexp_replace(secondary_phone,'(\D+)','') as user_contact
+	from datalake_ebdb_clean_prod.user_aud
+	where mod_secondary_phone = true
+		and secondary_phone is not null
+	group by 1,2,3
+),
+all_user_contacts as (
+	select * from user_email
+	union
+	select * from user_alternative_email
+	union
+	select * from user_main_phone
+	union
+	select * from user_secondary_phone
+),
+-- avoid repeated contacts to obtain an 1:1 relation between contact and user (ex: phone numbers might be reused by other people)
+user_contacts as (
+	select
+		user_contact,
+		channel,
+		max(id_user) as id_user
+	from all_user_contacts
+	group by 1,2
+),
+last_zendesk_user as (
+    select 
+        id_user, 
+        max(ts_updated) as ts_last_updated
+    from 
+        datalake_clean.zendesk_users 
+    group by 1
+),
+distinct_zendesk_users as (
+    select 
+        cast(du.id_user as bigint) as sk_zendesk_user,
+        du.email,
+        regexp_replace(du.phone,'(\D+)','') as phone
+    from datalake_clean.zendesk_users du
+    inner join last_zendesk_user lu
+    on du.id_user=lu.id_user
+       and du.ts_updated=lu.ts_last_updated
+),
+ebdb_user as (
+	select
+        zu.sk_zendesk_user,
+		coalesce(uc_email.id_user, uc_phone.id_user) as sk_user
+	from distinct_zendesk_users zu
+	left join user_contacts uc_phone
+		on uc_phone.user_contact = zu.phone
+		and uc_phone.channel = 'phone'
+	left join user_contacts uc_email
+		on uc_email.user_contact = zu.email
+		and uc_email.channel = 'email'
+    group by 1,2
+),
+-- evaluate funnel keys from each ticket according to business rules
+ticket_funnel_keys as (
+	select
+		t.sk_ticket,
+		coalesce(dc.sk_house_listing, dhl.sk_house_listing) as sk_house_listing,
+	    dc.sk_contract  as sk_contract,
+	    bu.sk_user as sk_user,
+	    -- tickets will only have a valid client key according to its corresponding client type
+	    case when t.client_type = 'inquilino' then dc.sk_client end as sk_client,
+	    case when t.client_type in ('proprietário','imobiliária_b2b') then coalesce(dc.sk_owner, dhl.sk_owner) end as sk_owner
+	from tickets t
+	left join contract dc
+	    on t.id_contract = dc.sk_contract
+	left join house dhl
+		on t.id_house = dhl.id_house
+	    and str_created_date between
+	        (case when dhl.version = 1 then least(coalesce(dhl.dt_listing_version_start, t.str_created_date), t.str_created_date)
+	        else dhl.dt_listing_version_start end)
+	        and date_format(coalesce(cast(dhl.dt_listing_version_end as timestamp), now())  - interval '1' day,'%Y-%m-%d')
+	left join ebdb_user bu
+		on bu.sk_zendesk_user = t.sk_zendesk_requester_user
 )
 select
-    sk_ticket,
-    coalesce(dc.sk_house_listing, dhl.sk_house_listing, -1) as sk_house_listing,
-    coalesce(dc.sk_contract, -1)  as sk_contract,
-    coalesce(dc.sk_client, -1)  as sk_client,
-    coalesce(dc.sk_owner, dhl.sk_owner, -1)  as sk_owner,
+    t.sk_ticket,
+    coalesce(fk.sk_house_listing, -1) as sk_house_listing,
+    coalesce(fk.sk_contract, -1)  as sk_contract,
+    coalesce(fk.sk_user, fk.sk_client, fk.sk_owner, -1) as sk_user,
+    coalesce(fk.sk_client, -1) as sk_client,
+    coalesce(fk.sk_owner, -1) as sk_owner,
     t.sk_zendesk_requester_user,
     t.sk_zendesk_submitter_user,
     t.sk_zendesk_assignee_user,
@@ -186,11 +301,5 @@ select
     t.ts_closed_local,
     now() as ts_load
 from tickets t
-left join house dhl
-	on t.id_house = dhl.id_house
-    and str_created_date between 
-        (case when dhl.version = 1 then least(coalesce(dhl.dt_listing_version_start, t.str_created_date), t.str_created_date)
-        else dhl.dt_listing_version_start end)
-        and date_format(coalesce(cast(dhl.dt_listing_version_end as timestamp), now())  - interval '1' day,'%Y-%m-%d')     
-left join contract dc
-    on id_contract = dc.sk_contract;
+inner join ticket_funnel_keys fk
+	on t.sk_ticket = fk.sk_ticket
