@@ -136,7 +136,7 @@ def create_external_tables_task(local_dag, env, datalake_layer, source, tables):
     )
 
 
-def create_clean_and_dim_tables_sub_dag(sub_dag_name, dw_schema, dim_table):
+def dw_tasks(sub_dag_name, table_name, slugged_table_name):
     local_dag = BaseSubDAG(
         sub_dag_name=sub_dag_name,
         dag_name=FULL_DAG_ID,
@@ -144,10 +144,10 @@ def create_clean_and_dim_tables_sub_dag(sub_dag_name, dw_schema, dim_table):
         start_date=MAIN_START_DATE,
     )._build_local_dag()
     dim_table_task = create_dw_table_in_datalake_task(
-        local_dag, dim_table, dw_schema, ENV, DAG_ID
+        local_dag, table_name, DW_SCHEMA, ENV, DAG_ID
     )
     load_dim_table_task = load_dw_table_into_redshift_task(
-        local_dag, dim_table, dw_schema, ENV
+        local_dag, table_name, DW_SCHEMA, ENV
     )
 
     dim_table_task >> load_dim_table_task
@@ -155,20 +155,12 @@ def create_clean_and_dim_tables_sub_dag(sub_dag_name, dw_schema, dim_table):
     return local_dag
 
 
-def build_table_sub_dag(
-    sub_dag_name,
-    env,
-    source,
-    table_name,
-    main_dag_id,
-    main_schedule_interval,
-    main_start_date,
-):
+def clean_tasks(sub_dag_name, table_name, slugged_table_name):
     table_sub_dag = BaseSubDAG(
         sub_dag_name=sub_dag_name,
-        dag_name=main_dag_id,
-        schedule_interval=main_schedule_interval,
-        start_date=main_start_date,
+        dag_name=FULL_DAG_ID,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
     )._build_local_dag()
     slugged_table_name = table_name.replace("_", "-")
 
@@ -180,8 +172,8 @@ def build_table_sub_dag(
                 "python_file": CREATE_CLEAN_TABLE_IN_DATA_LAKE_PATH,
                 "parameters": [
                     table_name,
-                    source,
-                    env,
+                    SOURCE,
+                    ENV,
                     DATALAKE_BUCKET,
                     DAG_ID,
                     "clean",
@@ -198,11 +190,11 @@ def build_table_sub_dag(
             "spark_python_task": {
                 "python_file": CREATE_EXTERNAL_TABLES_FILE_PATH,
                 "parameters": [
-                    env,
+                    ENV,
                     ATHENA_QUERY_RESULT_LOCATION,
                     "clean",
                     DATALAKE_BUCKET,
-                    source,
+                    SOURCE,
                     "--tables",
                 ]
                 + [table_name],
@@ -252,9 +244,30 @@ def create_raw_tables_sub_dag_tasks(
             }
         },
     )
-
     load_tables_into_datalake_task >> create_external_tables_task
     return local_raw_sub_dag
+
+
+def build_subdags(stage):
+    # create subdag for each table
+    file_list = FileService.list_layer_sql_files(SOURCE, stage)
+    subdags = {}
+
+    for file_name in file_list:
+        file_name = FileService.remove_file_extension(file_name)
+        slugged_file_name = file_name.replace("_", "-")
+        table_sub_dag = BaseSubDAG.get_sub_dag_operator(
+            dag=dag,
+            sub_dag_name=f"load-{slugged_file_name}",
+            sub_dag_func=eval(f"{stage}_tasks"),
+            table_name=file_name,
+            slugged_table_name=slugged_file_name,
+        )
+        subdags[file_name] = table_sub_dag
+
+    # subdags is a dict where the keys are table or file names
+    # and the values are corresponding subdag objects
+    return subdags
 
 
 # tasks and subdags definitions
@@ -276,38 +289,6 @@ polygon_region_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-condo_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag,
-    sub_dag_name="dim_condo",
-    sub_dag_func=create_clean_and_dim_tables_sub_dag,
-    dw_schema=DW_SCHEMA,
-    dim_table="dim_condo",
-)
-
-region_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag,
-    sub_dag_name="dim_region",
-    sub_dag_func=create_clean_and_dim_tables_sub_dag,
-    dw_schema=DW_SCHEMA,
-    dim_table="dim_region",
-)
-
-visit_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag,
-    sub_dag_name="dim_visit",
-    sub_dag_func=create_clean_and_dim_tables_sub_dag,
-    dw_schema=DW_SCHEMA,
-    dim_table="dim_visit",
-)
-
-inspection_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag,
-    sub_dag_name="dim_inspection",
-    sub_dag_func=create_clean_and_dim_tables_sub_dag,
-    dw_schema=DW_SCHEMA,
-    dim_table="dim_inspection",
-)
-
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
@@ -322,38 +303,34 @@ load_raw_sub_dag = BaseSubDAG.get_sub_dag_operator(
     start_date=MAIN_START_DATE,
 )
 
-file_list = FileService.list_layer_sql_files(SOURCE, "clean")
-for file_name in file_list:
-    file_name = FileService.remove_file_extension(file_name)
-    slugged_file_name = file_name.replace("_", "-")
-    table_sub_dag = BaseSubDAG.get_sub_dag_operator(
-        dag=dag,
-        sub_dag_name=f"load-{slugged_file_name}",
-        sub_dag_func=build_table_sub_dag,
-        env=ENV,
-        source=SOURCE,
-        table_name=file_name,
-        main_dag_id=FULL_DAG_ID,
-        main_schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        main_start_date=MAIN_START_DATE,
-    )
+clean_sub_dags = build_subdags("clean")
+dw_sub_dags = build_subdags("dw")
 
-    # this statement is necessary cuz polygon_region needs to run an specific query to raw schema
-    if slugged_file_name == "polygon-region":
-        polygon_region_to_datalake_raw_task >> table_sub_dag
-    elif slugged_file_name == "condo":
-        table_sub_dag >> condo_sub_dag_task
-    elif slugged_file_name == "region":
-        table_sub_dag >> region_sub_dag_task
-    elif slugged_file_name == "visit":
-        table_sub_dag >> visit_sub_dag_task
-    elif slugged_file_name == "inspection":
-        table_sub_dag >> inspection_sub_dag_task
-    load_raw_sub_dag >> table_sub_dag >> terminate_cluster_task
 create_cluster_task >> [load_raw_sub_dag, polygon_region_to_datalake_raw_task]
+load_raw_sub_dag >> list(clean_sub_dags.values())
+
+polygon_region_to_datalake_raw_task >> clean_sub_dags["polygon_region"]
+clean_sub_dags.pop("proponent_proposal") >> [
+    dw_sub_dags["dim_proposal_person"],
+    dw_sub_dags["fact_proposal_people"],
+]
+
+clean_sub_dags.pop("proposal") >> dw_sub_dags["fact_proposal_people"]
+
+clean_sub_dags.pop("user") >> [
+    dw_sub_dags["fact_contract_people"],
+    dw_sub_dags["fact_proposal_people"],
+]
+
 [
-    condo_sub_dag_task,
-    region_sub_dag_task,
-    visit_sub_dag_task,
-    inspection_sub_dag_task,
-] >> terminate_cluster_task
+    clean_sub_dags.pop("contract"),
+    clean_sub_dags.pop("contract_person"),
+    clean_sub_dags.pop("rent_flow"),
+    clean_sub_dags.pop("house"),
+    clean_sub_dags.pop("partner_agent"),
+    clean_sub_dags.pop("conversion_lead"),
+    clean_sub_dags.pop("lead"),
+] >> dw_sub_dags["dim_contract_person"], dw_sub_dags["fact_contract_people"]
+
+list(clean_sub_dags.values()) >> terminate_cluster_task
+list(dw_sub_dags.values()) >> terminate_cluster_task
