@@ -29,10 +29,9 @@ class Task_(DummyOperator):
 
 @logger
 def get_dependencies_from_file(file_path):
-    dic = FileService.get_dict_from_yaml_file(file_path)
-    dependencies = dic.get("dependencies", {})
+    dependencies_dict = FileService.get_dict_from_yaml_file(file_path)
 
-    return dependencies
+    return dependencies_dict
 
 
 def build_operator(dep_name, dag):
