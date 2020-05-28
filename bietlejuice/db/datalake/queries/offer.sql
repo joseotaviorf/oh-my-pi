@@ -43,6 +43,20 @@ firestore_offers as (
     left join datalake_godfather_clean_prod.business_offer go_firestore
       on eo.firestoreid = go_firestore.id_firestore
         and eo.godfatherid is null
+  ),
+  instantoffer_firestore as (
+    with ranking_offers as (
+      select distinct
+        firestore_id,
+        instantOffer,
+        rank() over (PARTITION BY firestore_id order by lastsentdate desc) as ranking
+      from datalake_firestore_raw_prod.offers fo
+      where status not in ('Draft','DismissedDraft'))
+    select
+      firestore_id,
+      instantOffer
+    from ranking_offers
+    where ranking = 1
   )
   select
     offer_firestore.id_offer,
@@ -51,13 +65,13 @@ firestore_offers as (
     go_firestore.ts_first_sent,
     go_firestore.ts_last_sent,
     go_firestore.type as distinct_type,
-    null as instantOffer
+    fo.instantOffer
   from offer_firestore
   join datalake_godfather_clean_prod.business_offer go_firestore
     on go_firestore.id = godfatherid
---  left join datalake_firestore_raw_prod.offers fo
---    on go_firestore.id_firestore = fo.firestore_id
-  group by 1, 2, 3, 4, 5, 6
+  left join instantoffer_firestore fo
+    on go_firestore.id_firestore = fo.firestore_id
+  group by 1, 2, 3, 4, 5, 6, 7
 )
 select distinct
   eo.id,
