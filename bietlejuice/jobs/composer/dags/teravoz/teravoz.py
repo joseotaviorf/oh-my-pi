@@ -189,47 +189,11 @@ calls_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
 queues_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag, sub_dag_name="queues", sub_dag_func=sub_dag
 )
-peers_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, sub_dag_name="peers", sub_dag_func=sub_dag
-)
-ddrs_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, sub_dag_name="ddrs", sub_dag_func=sub_dag
-)
-report_agent_performance_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, sub_dag_name="report-agent-performance", sub_dag_func=raw_sub_dag
-)
-report_queue_stats_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, sub_dag_name="report-queue-stats", sub_dag_func=sub_dag
-)
-report_agent_status_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, sub_dag_name="report-agent-status", sub_dag_func=raw_sub_dag
-)
-report_agents_per_queue_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, sub_dag_name="report-agents-queue-metrics", sub_dag_func=clean_sub_dag
-)
+
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-create_cluster_task.set_downstream(
-    [calls_sub_dag_task, queues_sub_dag_task, peers_sub_dag_task, ddrs_sub_dag_task]
-)
-queues_sub_dag_task.set_downstream(
-    [
-        report_agent_performance_sub_dag_task,
-        report_queue_stats_sub_dag_task,
-        report_agent_status_sub_dag_task,
-    ]
-)
-report_agents_per_queue_sub_dag_task.set_upstream(
-    [report_agent_performance_sub_dag_task, report_agent_status_sub_dag_task]
-)
-terminate_cluster_task.set_upstream(
-    [
-        calls_sub_dag_task,
-        report_queue_stats_sub_dag_task,
-        report_agents_per_queue_sub_dag_task,
-        peers_sub_dag_task,
-        ddrs_sub_dag_task,
-    ]
-)
+create_cluster_task.set_downstream([calls_sub_dag_task, queues_sub_dag_task])
+
+terminate_cluster_task.set_upstream([calls_sub_dag_task, queues_sub_dag_task])
