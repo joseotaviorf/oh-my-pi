@@ -1,5 +1,4 @@
 ############# DOCKER commands ########################
-
 .PHONY: create-docker-environment-python2
 create-docker-environment-python2:
 	@chmod +x start.sh

@@ -413,8 +413,8 @@ You can enable some extra features like an _Auto Refresh_ button on the DAG's pa
 
 ```
 |-- .terraform                     < todo: add short desc. >
-|-- airflow_python2                < todo: add short desc. >
-|-- dockerfile                     < todo: add short desc. >
+|-- airflow_python2                Airflow configuration for python2
+|-- airflow_python3                Airflow configuration for python3
 |-- bietlejuice                    < todo: add short desc. >
     |-- db                         < todo: add short desc. > 
         |-- datalake               < todo: add short desc. >             
@@ -443,17 +443,16 @@ You can enable some extra features like an _Auto Refresh_ button on the DAG's pa
         |-- sensors                < todo: add short desc. >         
         |-- wrappers               < todo: add short desc. >             
 |-- databricks_dag_template        < todo: add short desc. >
+|-- docker                         All files to build a container (Airflow and Composer) 
 |-- plugins                        < todo: add short desc. >
-|-- scripts                        < todo: add short desc. >
+|-- scripts                        Some scripts used in CI/CD pipelines and docker local
 |-- tests                          < todo: add short desc. >
 |-- tests3                         < todo: add short desc. >
 |-- util                           < todo: add short desc. >
 |-- .coveragerc                    < todo: add short desc. >
-|-- .dockerignore                  < todo: add short desc. >
+|-- .dockerignore                  Specify files and folder that should be ignored by the Docker client when generating a build context
 |-- .drone.yml                     < todo: add short desc. >
 |-- .gitignore                     < todo: add short desc. >
-|-- docker-compose.yml             < todo: add short desc. >
-|-- Dockerfile                     < todo: add short desc. >
 |-- Makefile                       < todo: add short desc. >
 |-- MANIFEST.in                    < todo: add short desc. >
 |-- README.md                      < todo: add short desc. >
@@ -466,5 +465,6 @@ You can enable some extra features like an _Auto Refresh_ button on the DAG's pa
 |-- setup.py                       < todo: add short desc. >
 |-- setup3.cfg                     < todo: add short desc. >
 |-- setup3.py                      < todo: add short desc. >
+|-- start.sh                       Script to up all Airflow services
 |-- variables.json                 < todo: add short desc. >
 ```

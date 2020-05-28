@@ -9,13 +9,12 @@ services:
       POSTGRES_PASSWORD: postgres
     volumes:
       - /home/PostgreSQL:/var/lib/postgresql/data
-    networks:
-      - airflow_postgres
+    network_mode: host
 
   airflow_python2:
     build:
-      context: .
-      dockerfile: airflow-py2.Dockerfile
+      context: ..
+      dockerfile: docker/airflow-py2.Dockerfile
     ports:
       - "8080:8080"
     volumes:
@@ -23,9 +22,4 @@ services:
       - /home/<USER>/<BIETLEJUICE_FOLDER>:/bi-etl-ejuice
     depends_on:
       - postgres_airflow
-    networks:
-      - airflow_postgres
-
-networks:
-  airflow_postgres:
-    driver: bridge
+    network_mode: host
