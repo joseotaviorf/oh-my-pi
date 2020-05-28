@@ -35,9 +35,9 @@ select
 		else -1 
 	end as sk_contract_user,
 	coalesce (h.id_region, -1) as sk_region,
-	coalesce(cast(date_format(e.ts_created, 'YYYYMMdd') as int), -1) as sk_created_date,
-	coalesce(cast(date_format(i.ts_due, 'YYYYMMdd') as int), -1) as sk_due_date,
-	coalesce(cast(date_format(i.ts_paid, 'YYYYMMdd') as int), -1) as sk_paid_date,
+	coalesce(cast(date_format(e.ts_created, 'yyyyMMdd') as int), -1) as sk_created_date,
+	coalesce(cast(date_format(i.ts_due, 'yyyyMMdd') as int), -1) as sk_due_date,
+	coalesce(cast(date_format(i.ts_paid, 'yyyyMMdd') as int), -1) as sk_paid_date,
 	case 
         when af.type = 'contract' and at.type <> 'contract' then -1.0*e.amount
 		else e.amount

@@ -157,12 +157,12 @@ with
             coalesce(payee_document, -1) as sk_transfer_payee_user,
             coalesce(payee_name, -1) as sk_account_payable_corporate_user,
             coalesce(has_payee_savings_acc, false) as is_payee_savings_acc,
-            coalesce(cast(date_format(ts_created, 'YYYYMMdd') as int), -1) as sk_created_date,
-            coalesce(cast(date_format(ts_issued, 'YYYYMMdd') as int), -1) as sk_issued_date,
-            coalesce(cast(date_format(ts_updated, 'YYYYMMdd') as int), -1) as sk_updated_date,
-            coalesce(cast(date_format(dt_due, 'YYYYMMdd') as int), -1) as sk_due_date,
-            coalesce(cast(date_format(dt_fine_due, 'YYYYMMdd') as int), -1) as sk_fine_due_date,
-            coalesce(cast(date_format(dt_paid, 'YYYYMMdd') as int), -1) as sk_paid_date,
+            coalesce(cast(date_format(ts_created, 'yyyyMMdd') as int), -1) as sk_created_date,
+            coalesce(cast(date_format(ts_issued, 'yyyyMMdd') as int), -1) as sk_issued_date,
+            coalesce(cast(date_format(ts_updated, 'yyyyMMdd') as int), -1) as sk_updated_date,
+            coalesce(cast(date_format(dt_due, 'yyyyMMdd') as int), -1) as sk_due_date,
+            coalesce(cast(date_format(dt_fine_due, 'yyyyMMdd') as int), -1) as sk_fine_due_date,
+            coalesce(cast(date_format(dt_paid, 'yyyyMMdd') as int), -1) as sk_paid_date,
             case 
                 when type = 'charge' then due_amount
                 when type = 'transfer' then (-1)*due_amount
