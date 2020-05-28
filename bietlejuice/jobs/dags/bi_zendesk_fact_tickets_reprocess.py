@@ -6,20 +6,22 @@ from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
 from bietlejuice.jobs.dags.util import environment as env
 
 from bietlejuice.jobs.etl.zendesk import ZendeskTableEnum, ZendeskFactory
+import airflow.utils.helpers as airflow_helpers
 
-MAIN_DAG_ID = 'bi-dim-ticket-reprocessing'
-MAIN_START_DATE = datetime(2019, 4, 8, 0, 0, 0)
-MAIN_SCHEDULE_INTERVAL = '0 8 * * *'
+MAIN_DAG_ID = 'bi-zendesk-fact-tickets-reprocess'
+MAIN_START_DATE = datetime(2020, 1, 18, 0, 0, 0)
+MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 10 * * *')
 
 env.set_airflow_var_to_local_env('BI_DW', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
+# dags
 main_dag = DAG(
     dag_id=MAIN_DAG_ID,
     default_args={
         'owner': BaseDAG.DEFAULT_OWNER,
         'wait_for_downstream': False,
-        'depends_on_past': False,
+        'depends_on_past': False
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
@@ -81,9 +83,9 @@ def sub_dag_dw(sub_dag_name, **kwargs):
     return local_dag
 
 
-dim_ticket_sub_dag = BaseSubDag.get_sub_dag_operator(
+fact_tickets_sub_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_name='dim_ticket',
+    sub_dag_name='fact_tickets',
     sub_dag_func=sub_dag_dw,
-    class_=ZendeskTableEnum.DIM_TICKET
+    class_=ZendeskTableEnum.FACT_TICKETS
 )
