@@ -141,6 +141,8 @@ class CRMTaskStatusHistories(object):
                 ("comment", str),
                 ("id_origin", str),
                 ("id_assignee", str),
+                ("id_user_action", str),
+                ("action_user_name", str),
                 ("score", str),
                 ("origin", str),
                 ("ts_visit", str),

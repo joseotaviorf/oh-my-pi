@@ -35,22 +35,33 @@ select distinct
     tasks.id_receiver,
     tasks.id,
     tasks.resolved,
-    regexp_extract_all(histories.histories, '{[^}]+[^,]+[^{]+}') as histories_array
+    regexp_extract_all(histories.histories, '{[^}]+[^,]+[^{]+}') as histories_array,
+    regexp_extract_all(tasks.actions, '{[^}]+[^,]+[^{]+}') as action_array
 from datalake_clean.crm_tasks tasks
 join datalake_clean.crm_task_status_histories histories
    on tasks.id = histories.id
 where cardinality(regexp_extract_all(histories.histories, '{[^}]+[^,]+[^{]+}')) <= 500
 and tasks.dt = '__PARTITION_DATE__'
 ),
-actions as (
+history as (
   select
     ct.*,
-    cast(json_extract(a.action, '$._id') as varchar) as id_action,
-    cast(json_extract(a.action, '$.status') as varchar) as status,
-    cast(regexp_extract(json_format(json_extract(a.action, '$.date')), '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp) as ts_action,
-    replace(json_format(json_extract(a.action, '$.action')), '"') as action_type
+    cast(json_extract(a.history, '$._id') as varchar) as id_action,
+    cast(json_extract(a.history, '$.status') as varchar) as status,
+    cast(regexp_extract(json_format(json_extract(a.history, '$.date')), '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp) as ts_action,
+    replace(json_format(json_extract(a.history, '$.type')), '"') as action_type
   from actions_prev ct
-  cross join unnest(histories_array) as a (action)
+  cross join unnest(histories_array) as a (history)
+),
+actions as (
+  select
+    history.*,
+    replace(json_format(json_extract(a.action, '$.userName')), '"') as action_user_name,
+    json_format(json_extract(a.action, '$.userId')) as id_user_action
+  from actions_prev ct
+  cross join unnest(action_array) as a (action)
+  join history
+    on history.id = ct.id
 )
 select
   score_factor,
@@ -62,6 +73,8 @@ select
   "comment",
   id_origin,
   id_assignee,
+  id_user_action,
+  action_user_name,
   score,
   origin,
   ts_visit,
@@ -94,6 +107,7 @@ select
   lag(ts_action) over (partition by id order by ts_action) as ts_task_user_start,
   ts_action as ts_task_user_end,
   action_type as task_user_type,
-  round(date_diff('second', lag(ts_action) over (partition by id order by ts_action), ts_action) / 3600.0, 1) as task_user_resolve_hours
+  if(action_user_name is null, null,
+    round(date_diff('second', lag(ts_action) over (partition by id order by ts_action), ts_action) / 3600.0, 1)) as task_user_resolve_hours
 from actions
 ;

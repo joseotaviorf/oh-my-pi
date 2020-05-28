@@ -9,6 +9,8 @@ create external table if not exists datalake_clean.crm_task_resolution_history (
   comment string,
   id_origin string,
   id_assignee string,
+  id_user_action string,
+  action_user_name string,
   score string,
   origin string,
   ts_visit string,
