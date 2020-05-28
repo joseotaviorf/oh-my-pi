@@ -49,7 +49,7 @@ history as (
     cast(json_extract(a.history, '$._id') as varchar) as id_action,
     cast(json_extract(a.history, '$.status') as varchar) as status,
     cast(regexp_extract(json_format(json_extract(a.history, '$.date')), '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}') as timestamp) as ts_action,
-    replace(json_format(json_extract(a.history, '$.type')), '"') as action_type
+    replace(json_format(json_extract(a.history, '$.action')), '"') as action_type
   from actions_prev ct
   cross join unnest(histories_array) as a (history)
 ),
