@@ -7,33 +7,61 @@ with tickets_filter as (
 last_updated_ticket as (
     select id_ticket, max(ts_updated) as ts_last_updated from tickets_filter group by 1
 ),
-last_updated_ticket_fields as (	
-  select id_ticket_fields, max(ts_updated) as ts_last_updated from datalake_clean.zendesk_ticket_fields group by 1	
+distinct_groups as (
+    with last_updated_group as ( 
+        select 
+            id_group, 
+            max(ts_updated) as ts_last_updated 
+        from datalake_clean.zendesk_groups 
+        group by 1
+    )
+    select
+        g.id_group,
+        g.name,
+        g.url_group
+    from datalake_clean.zendesk_groups g
+    inner join last_updated_group ge
+    on ge.id_group = g.id_group and ge.ts_last_updated = g.ts_updated
+    group by 1,2,3
 ),
-last_updated_group as (
-    select id_group, max(ts_updated) as ts_updated from datalake_clean.zendesk_groups group by 1
+distinct_ticket_fields as (	
+    with last_updated_ticket_field as (
+        select
+            id_ticket_fields,
+            max(ts_updated) as ts_last_updated
+        from datalake_clean.zendesk_ticket_fields
+        group by 1
+    )
+    select 
+        cf.id_ticket_fields, 
+        cf.raw_title
+    from datalake_clean.zendesk_ticket_fields cf
+    inner join last_updated_ticket_field ltf
+    on cf.id_ticket_fields=ltf.id_ticket_fields and cf.ts_updated=ltf.ts_last_updated
+    group by 1,2
+),
+custom_fields_filter as (
+    select 
+        id_ticket, 
+        custom_fields
+    from datalake_clean.zendesk_custom_fields
+    where dt_extracted='{extraction_date}'
 ),
 parse_fields as (
   select c.id_ticket,
     replace(replace(regexp_extract(cf.field, '([^:]+)'), '"', ''), '"', '') as id_field,
-    replace(regexp_extract(cf.field, '[^:]*$'), '"', '') as value,
-    c.ts_updated
-    from datalake_clean.zendesk_custom_fields c
+    replace(regexp_extract(cf.field, '[^:]*$'), '"', '') as value
+    from custom_fields_filter c
     CROSS JOIN UNNEST(SPLIT(c.custom_fields,',')) AS cf (field)
-    inner join last_updated_ticket lt
-    on c.id_ticket = lt.id_ticket and c.ts_updated=lt.ts_last_updated
 ),
 transformed_custom_fields as (
     select
       f.id_ticket,
-      cast(map_agg(tf.raw_title, f.value) as json) as custom_fields,
-      f.ts_updated
+      cast(map_agg(tf.raw_title, f.value) as json) as custom_fields
     from parse_fields f
-    inner join last_updated_ticket_fields l
-    on l.id_ticket_fields = f.id_field
-    inner join datalake_clean.zendesk_ticket_fields tf
-    on l.id_ticket_fields = tf.id_ticket_fields and l.ts_last_updated=tf.ts_updated
-    group by 1,3
+    inner join distinct_ticket_fields tf
+    on f.id_field = tf.id_ticket_fields
+    group by 1
 ),
 custom_field_ids as (
     select
@@ -42,18 +70,6 @@ custom_field_ids as (
         cast(json_extract(c.custom_fields,'$["Tipo de Solicitação"]') as varchar) as request_type,
         replace(cast(json_extract(c.custom_fields,'$["Tipo de Cliente"]') as varchar), '}}', '') as client_type
     from transformed_custom_fields c
-        inner join last_updated_ticket lt
-        on c.id_ticket = lt.id_ticket and c.ts_updated=lt.ts_last_updated
-),
-groups as (
-    select
-        g.id_group,
-        g.name,
-        g.url_group
-    from datalake_clean.zendesk_groups g
-    inner join last_updated_group ge
-    on ge.id_group = g.id_group and ge.ts_updated = g.ts_updated
-    group by 1,2,3
 )
 select
     cast(t.id_ticket as bigint) as sk_ticket,
@@ -90,7 +106,7 @@ select
 from last_updated_ticket te
 inner join tickets_filter t
 on te.id_ticket = t.id_ticket and te.ts_last_updated = t.ts_updated
-left join groups g
+left join distinct_groups g
 on t.id_group = g.id_group
 left join custom_field_ids cfi
 on t.id_ticket = cfi.id_ticket
