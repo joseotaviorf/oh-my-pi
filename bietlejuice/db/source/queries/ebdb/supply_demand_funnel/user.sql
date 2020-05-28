@@ -116,7 +116,7 @@ select
   (
     select
       U.id,
-      I.isProp as tem_imovel,
+      I.usuario_id is not NULL as tem_imovel,
       D.usuario_id is not null as tem_app_inquilino,
       C.usuario_id is not null as tem_contrato_ativo,
       (
@@ -124,22 +124,19 @@ select
         and U.dadosFotografo_id is null
         and U.dadosVendedor_id is null
         and U.dadosAgente_id is null
-        and not I.isProp
+        and I.usuario_id is NULL
       ) or  C.usuario_id is not null as inquilino
     from
      Usuario U
     left join
      Agendamento a
       on a.visitante_id = U.id
-    left join
+     left join
      (
        select
-         I.usuario_id,
-         count(I.usuario_id)>0 as isProp
+         distinct usuario_id
        from
-         Imovel I
-       group by
-         I.usuario_id
+         Imovel
      ) I
      on U.id = I.usuario_id
     left join
