@@ -87,7 +87,7 @@ events as(
         cast(json_extract_scalar(event_properties, '$["agent_id"]') as integer) as agent_id,
         cast(json_extract_scalar(event_properties, '$["tenant_id"]') as integer) as tenant_id,
         min(nullif(substr(cast(ts_event as varchar),1,19),'')) as first_message_ts,
-        array_join(array_agg(trim(substr(regexp_extract(replace(regexp_replace(json_extract_scalar(event_properties, '$["message_content"]'),'\n',' '),'''',' '),'(?<=(([0-9]{{9}}))).*'),3))),' + ') as message,
+        array_join(array_agg(trim(substr(regexp_extract(replace(regexp_replace(json_extract_scalar(event_properties, '$["message_content"]'),'\n',' '),'''',' '),'(?<=(([0-9]{9}))).*'),3))),' + ') as message,
         count(*) as count_messages
     from datalake_amplitude_clean_prod.events
     where event_type = 'piloto_cw_message_sent'

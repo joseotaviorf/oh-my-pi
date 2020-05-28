@@ -57,11 +57,7 @@ def create_datamart_from_athena(table_name, **kwargs):
     query = BaseETL.get_query_from_file_name('{}/{}/{}.sql'.format(DATALAKE_QUERIES_DIR, DATAMARTS_SCHEMA, table_name))
 
     logger.info('m=create_datamart_from_athena, table_name={}, msg=Reading data'.format(table_name))
-    execution_date = kwargs['execution_date'].strftime('%Y-%m-%d')
-    df = athena.execute_query_and_return_dataframe(
-        sql=query,
-        query_params={'dt': execution_date}
-    )
+    df = athena.execute_query_and_return_dataframe(sql=query)
 
     logger.info('m=create_datamart_from_athena, table_name={}, msg=Dropping table'.format(table_name))
     BaseETL.execute_command(

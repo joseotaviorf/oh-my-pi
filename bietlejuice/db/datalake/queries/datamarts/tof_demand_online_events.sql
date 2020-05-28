@@ -21,7 +21,7 @@ select
 	case when trim(event_type) = 'pilot_cw_button_clicked' then 1 else 0 end as talk_to_agent_button_clicked,
 	case when trim(event_type) = 'piloto_cw_dialog_viewed' then 1 else 0 end as talk_to_agent_dialog_viewed,
 	case when trim(event_type) = 'piloto_cw_message_sent' then 1 else 0 end as talk_to_agent_message_sent,
-  case when trim(event_type) = 'piloto_cw_message_sent' then substr(regexp_extract(replace(regexp_replace(json_extract_scalar(event_properties, '$["message_content"]'),'\n',' '),'''',' '),'(?<=(([0-9]{{9}}))).*'),4) else null end as talk_to_agent_message_content,
+  case when trim(event_type) = 'piloto_cw_message_sent' then substr(regexp_extract(replace(regexp_replace(json_extract_scalar(event_properties, '$["message_content"]'),'\n',' '),'''',' '),'(?<=(([0-9]{9}))).*'),4) else null end as talk_to_agent_message_content,
   case when trim(event_type) = 'offer_submitted' then 1 else 0 end as offer_submitted,
   cast(json_extract_scalar(user_properties, '$.utm_source') as varchar) as utm_source,
 	cast(json_extract_scalar(user_properties, '$.utm_medium') as varchar) as utm_medium,
