@@ -71,6 +71,8 @@ The pipelines that currently run on the Airflow EC2 are being migrated and will 
  
  Commands for common steps are defined on a [Makefile](https://en.wikipedia.org/wiki/Makefile) according the python versions 2 and 3 (Ex.: `make environment-python2` and `make environment-python3`). Please refer to the Makefile at the project root to check the existing commands.
 
+ Obs: when you're using `python 2 - Docker` and change to `python 3 - Docker` or vice-versa, sometimes the webserver will brake. A quick solution is clear cache from localhost page in your browser.
+
 ### Local Setup python 3 - Docker
 
 The Airflow - python3 will run in your machine and at Databricks, thereby we can simulate the forno environment.
