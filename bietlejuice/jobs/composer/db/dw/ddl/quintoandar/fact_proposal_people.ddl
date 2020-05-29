@@ -1,5 +1,5 @@
-drop table if exists fact_proposal_people;
-create table fact_proposal_people (
+drop table if exists quintoandar.fact_proposal_people;
+create table quintoandar.fact_proposal_people (
   id bigint,
   cpf varchar,
   sk_proponent bigint,

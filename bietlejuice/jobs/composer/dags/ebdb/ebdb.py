@@ -23,7 +23,7 @@ MAIN_SCHEDULE_INTERVAL = "0 22 * * *"
 
 # Job params
 SOURCE = "ebdb"
-DW_SCHEMA = "public_spark"
+DW_SCHEMA = "quintoandar"
 DW_BUCKET = Variable.get("dw_bucket")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 

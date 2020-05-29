@@ -68,8 +68,8 @@ def dw_tasks(sub_dag_name, table_name, slugged_table_name):
         task_id=f"load-{slugged_table_name}-into-dw-{DW_SCHEMA}-staging",
         json={
             "spark_python_task": {
-                "python_file": SPARK_JOBS_PATH + "create_table_in_dw.py",
-                "parameters": [DW_BUCKET, table_name, "staging", ENV],
+                "python_file": SPARK_JOBS_PATH + "create_table_in_dw_staging.py",
+                "parameters": [DW_BUCKET, table_name, ENV],
             }
         },
     )
@@ -80,7 +80,7 @@ def dw_tasks(sub_dag_name, table_name, slugged_table_name):
         json={
             "spark_python_task": {
                 "python_file": SPARK_JOBS_PATH + "create_table_in_dw.py",
-                "parameters": [DW_BUCKET, table_name, "public", ENV],
+                "parameters": [DW_BUCKET, table_name, ENV],
             }
         },
     )

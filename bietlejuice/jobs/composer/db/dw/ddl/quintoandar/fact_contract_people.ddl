@@ -1,5 +1,5 @@
-drop table if exists fact_contract_people;
-create table fact_contract_people (
+drop table if exists quintoandar.fact_contract_people;
+create table quintoandar.fact_contract_people (
   id bigint,
   cpf varchar,
   sk_user bigint,

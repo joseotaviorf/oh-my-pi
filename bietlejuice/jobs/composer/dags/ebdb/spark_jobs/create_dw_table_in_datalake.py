@@ -50,6 +50,7 @@ if __name__ == "__main__":
     database_name = db_info["dw_schema_databricks"]
     format_options = SparkTableStorageFormat.DEFAULT_DW
     database_location = db_info["dw_schema_path"]
+    metastore_service.create_database(database_name)
 
     s3_loader.load_full_table(
         df=df,

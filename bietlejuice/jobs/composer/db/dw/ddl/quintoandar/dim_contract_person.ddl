@@ -1,5 +1,5 @@
-drop table if exists dim_contract_person;
-create table dim_contract_person (
+drop table if exists quintoandar.dim_contract_person;
+create table quintoandar.dim_contract_person (
   sk_contract_person bigint primary key,
   full_name varchar,
   phone_number varchar,

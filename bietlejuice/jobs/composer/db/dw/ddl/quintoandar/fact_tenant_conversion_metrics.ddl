@@ -1,5 +1,5 @@
-drop table if exists public.fact_tenant_conversion_metrics;
-create table public.fact_tenant_conversion_metrics (
+drop table if exists quintoandar.fact_tenant_conversion_metrics;
+create table quintoandar.fact_tenant_conversion_metrics (
   sk_user bigint primary key,
   sk_first_booking_date bigint,
   sk_first_visit_date bigint,
