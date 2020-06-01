@@ -36,7 +36,6 @@ LIBRARIES_DESCRIPTION = Variable.get(
 # dag params
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz)
-MAIN_SCHEDULE_INTERVAL = "30 2 * * *"
 TABLE_NAME = "tenant_booking_review"
 
 dag = DAG(
@@ -47,7 +46,7 @@ dag = DAG(
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    schedule_interval=None,
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
