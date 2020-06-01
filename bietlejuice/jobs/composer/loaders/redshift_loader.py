@@ -50,6 +50,20 @@ class RedshiftLoader:
         )
 
     @logger
+    def _kill_locks_for_table(self, table_name, schema="public"):
+        """
+        Method to kill locks for the provided table using a database procedure (i.e.
+        `terminate_locks_for_table`)
+        :param table_name: table name which locks need to be killed
+        :type table_name: str
+        :param schema: schema's table name, `public` if not provided
+        :type schema: str
+        """
+        kill_locks = f"call terminate_locks_for_table('{schema}', '{table_name}')"
+
+        self.redshift_client.run(kill_locks)
+
+    @logger
     def load_table_from_metastore(
         self,
         metastore_service,
@@ -58,6 +72,7 @@ class RedshiftLoader:
         target_schema,
         target_table_name,
         overwrite,
+        kill_table_locks=True,
     ):
         """
         Loads the data from a table on a Metastore into a table in Redshift.
@@ -76,6 +91,8 @@ class RedshiftLoader:
         :param overwrite: option to perform a delete on the table before loading the
         data
         :type overwrite: bool
+        :param kill_table_locks: if `True` table locks will be killed
+        :type kill_table_locks: bool
         :return: None
         """
         now = datetime.now()
@@ -96,6 +113,12 @@ class RedshiftLoader:
         command = self._create_copy_command(
             target_schema, target_table_name, manifest_path
         )
+
+        if kill_table_locks:
+            self._kill_locks_for_table(
+                table_name=target_table_name, schema=target_schema
+            )
+
         if overwrite:
             self.redshift_client.run(
                 "DELETE FROM {}.{}".format(target_schema, target_table_name)
