@@ -128,7 +128,7 @@ def full_load_sub_dag(sub_dag_name, python_exec, python_method, **kwargs):
     return local_dag
 
 
-def incremental_raw_sub_dag(sub_dag_name, python_exec, python_method,**kwargs):
+def incremental_raw_sub_dag(sub_dag_name, python_exec, python_method, **kwargs):
     local_dag = BaseSubDag(
         bucket=s3_bucket,
         sub_dag_name=sub_dag_name,
@@ -349,7 +349,8 @@ xcom_crm_load_task = BaseDAG.build_python_operator(
 )
 
 # flow
-tasks_raw_sub_dag_task >> tasks_clean_sub_dag_task >> clean_tasks_resolution_sub_dag_task
+tasks_raw_sub_dag_task >> tasks_clean_sub_dag_task >> [clean_tasks_resolution_sub_dag_task,
+                                                       clean_task_resolution_history_sub_dag_task]
 workflows_raw_sub_dag_task >> workflows_clean_sub_dag_task
 
 airflow_helpers.chain(
