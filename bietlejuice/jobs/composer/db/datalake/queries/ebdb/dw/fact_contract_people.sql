@@ -167,8 +167,8 @@ base_doc_aux as (
           from distinct_contract_users
           group by 1
 )select
-	cp.id,
-	cp.cpf,
+	cp.id as sk_contract_person,
+	cp.cpf as sk_personal_document,
 	coalesce(cp.id_user,-1) as sk_user,
 	c.id as sk_contract,
 	coalesce(cast(date_format(cp.dt_birth, 'yyyyMMdd') as bigint), -1) as sk_birth_date,

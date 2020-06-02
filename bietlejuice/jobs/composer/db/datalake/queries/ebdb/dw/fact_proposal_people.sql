@@ -128,8 +128,8 @@ first_last_proposal as (
     group by 1
 )
 select 
-    pp.id,
-    pp.cpf,
+    pp.id as sk_proposal_person,
+    pp.cpf as sk_personal_document,
     coalesce(u.id,-1) as sk_proponent,
     pp.id_proposal as sk_proposal,
     coalesce(cast(date_format(pp.dt_birth, 'yyyyMMdd') as bigint), -1) as sk_birth_date,

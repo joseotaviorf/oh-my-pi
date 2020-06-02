@@ -1,7 +1,7 @@
 drop table if exists quintoandar.fact_contract_people;
 create table quintoandar.fact_contract_people (
-  id bigint,
-  cpf varchar,
+  sk_contract_person bigint,
+  sk_personal_document varchar,
   sk_user bigint,
   sk_contract bigint,
   sk_birth_date bigint,
