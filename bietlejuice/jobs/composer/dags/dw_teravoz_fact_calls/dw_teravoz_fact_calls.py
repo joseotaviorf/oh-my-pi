@@ -38,7 +38,7 @@ LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
 )
 
 CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_memory_optimized_cluster", deserialize_json=True
+    "databricks_bietlejuice_dw_teravoz_fact_calls", deserialize_json=True
 )
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 
