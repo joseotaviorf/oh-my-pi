@@ -16,7 +16,7 @@ with fact as  (
 		sum(coalesce(cost,0)) as cost
 	from marketing.fact_marketing_daily_costs mkt
 	join public.dim_date dd on dd.sk_date =  mkt.sk_date
-	where funnel_side = 'supply'
+	where funnel_side in ('supply','affiliates')
 	group by 1,2,3,4,5,6,7,8,9,10,11,12,13
 ),
 s_cube as (
