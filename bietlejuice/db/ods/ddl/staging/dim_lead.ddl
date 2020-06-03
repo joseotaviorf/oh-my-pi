@@ -32,6 +32,7 @@ CREATE TABLE staging.dim_lead (
   status VARCHAR(255),
   processado SMALLINT,
   origem VARCHAR(255),
+  is_enriched_data BOOLEAN,
   external_id VARCHAR(255),
   mencionar INTEGER,
   automatically_discarded INTEGER,

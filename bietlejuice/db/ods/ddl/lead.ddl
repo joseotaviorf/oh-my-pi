@@ -30,6 +30,7 @@ create table if not exists lead (
   status varchar(255),
   processado smallint,
   origem varchar(255),
+  is_enriched_data smallint,
   external_id varchar(255),
   mencionar integer,
   automatically_discarded integer,
@@ -57,4 +58,3 @@ create unique index lead_id_idx on lead (id);
 CREATE INDEX lead_usuario_que_indicou_id_idx ON public."lead" (usuario_que_indicou_id);
 CREATE INDEX lead_telefone_anunciante_idx ON public."lead" (telefone_anunciante);
 CREATE INDEX lead_cidade_idx ON public."lead" (cidade);
-

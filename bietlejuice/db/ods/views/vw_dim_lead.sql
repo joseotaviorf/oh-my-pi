@@ -41,6 +41,7 @@ create or replace view vw_dim_lead as
   l.status,
   l.processado,
   l.origem,
+  l.is_enriched_data::integer::boolean as is_enriched_data,
   l.external_id,
   l.mencionar,
   l.automatically_discarded,

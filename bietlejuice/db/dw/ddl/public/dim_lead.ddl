@@ -33,6 +33,7 @@ create table if not exists dim_lead
  ,status varchar(255)   encode lzo
  ,processado smallint   encode az64
  ,origem varchar(255)   encode lzo
+ ,is_enriched_data boolean
  ,external_id varchar(255)   encode lzo
  ,mencionar integer   encode az64
  ,automatically_discarded integer   encode az64

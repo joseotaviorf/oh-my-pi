@@ -33,6 +33,7 @@ create external table if not exists datalake_clean.ods_dim_lead (
   status string,
   processado string,
   origem string,
+  is_enriched_data string,
   external_id string,
   mencionar string,
   automatically_discarded string,

@@ -30,6 +30,7 @@ select distinct
   l.status,
   l.processado,
   l.origem,
+  l.isEnrichedData+0 as is_enriched_data,
   l.externalId as external_id,
   l.mencionar+0 as mencionar,
   l.automaticallyDiscarded+0 as automatically_discarded,
