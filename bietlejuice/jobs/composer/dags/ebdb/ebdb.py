@@ -43,9 +43,9 @@ LOAD_DB_SCHEMA_INTO_DATALAKE_RAW_FILE_PATH = (
 )
 
 # cluster params
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
+CLUSTER_DESCRIPTION = Variable.get("databricks_ebdb_cluster", deserialize_json=True)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
-CLUSTER_DESCRIPTION["num_workers"] = 6
+
 
 # cluster libraries
 DEFAULT_LIBRARIES = Variable.get("bietlejuice_default_libraries", deserialize_json=True)
