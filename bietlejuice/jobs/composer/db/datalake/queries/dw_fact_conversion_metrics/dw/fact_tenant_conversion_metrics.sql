@@ -197,7 +197,7 @@ select
     coalesce(cast(date_format(ud.first_visit_date, 'yyyyMMdd') as integer), -1) as sk_first_visit_date,
     coalesce(cast(date_format(om.first_offer_sent_date, 'yyyyMMdd') as integer), -1) as sk_first_offer_sent_date,
     coalesce(cast(date_format(ud.first_proposal_accepted_date, 'yyyyMMdd') as integer), -1) as sk_first_proposal_accepted_date,
-    coalesce(cast(date_format(ud.first_signed_contract, 'yyyyMMdd') as integer), -1) as sk_first_signed_contract_date,
+    coalesce(cast(date_format(ud.first_signed_contract, 'yyyyMMdd') as integer), -1) as sk_first_contract_signed_date,
     coalesce(bm.visits_booked,0) as visits_booked,
     coalesce(bm.visits_realized,0) as visits_realized,
     coalesce(bm.visits_expected_to_happen,0) as visits_expected_to_happen,

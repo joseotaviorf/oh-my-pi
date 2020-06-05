@@ -5,7 +5,7 @@ create table quintoandar.fact_tenant_conversion_metrics (
   sk_first_visit_date bigint,
   sk_first_offer_sent_date bigint,
   sk_first_proposal_accepted_date bigint,
-  sk_first_signed_contract_date bigint,
+  sk_first_contract_signed_date bigint,
   visits_booked bigint,
   visits_realized bigint,
   visits_expected_to_happen bigint,

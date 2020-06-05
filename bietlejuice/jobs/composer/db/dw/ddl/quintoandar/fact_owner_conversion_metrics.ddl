@@ -4,9 +4,9 @@ create table quintoandar.fact_owner_conversion_metrics (
   sk_first_listing_date bigint,
   sk_first_booking_date bigint,
   sk_first_visit_date bigint,
-  sk_first_offer_sent_date bigint,
+  sk_first_offer_received_date bigint,
   sk_first_proposal_accepted_date bigint,
-  sk_first_signed_contract_date bigint,
+  sk_first_contract_signed_date bigint,
   houses_registered bigint,
   houses_registered_for_rent bigint,
   houses_registered_for_sale bigint,
@@ -16,7 +16,7 @@ create table quintoandar.fact_owner_conversion_metrics (
   visits_booked bigint,
   visits_realized bigint,
   visits_expected_to_happen bigint,
-  offers_sent bigint,
+  offers_received bigint,
   offers_approved bigint,
   offers_rejected bigint,
   offers_negotiating bigint,
@@ -30,6 +30,7 @@ create table quintoandar.fact_owner_conversion_metrics (
   has_visits_to_happen boolean,
   is_negotiating_offers boolean,
   has_contracts_to_sign boolean,
+  has_ongoing_contracts boolean,
   ts_load timestamp
 )
 ;

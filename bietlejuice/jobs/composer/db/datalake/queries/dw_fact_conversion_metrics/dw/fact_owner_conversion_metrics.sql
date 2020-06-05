@@ -335,7 +335,7 @@ listing_etl as (
 		ts_last_de_publication
 	from house_listing_plain
 	)
-	select * from house_listing_full
+	select * from house_listshowing_full
 ),
 -- get all listings from each corresponding owner
 listing_owner as (
@@ -369,9 +369,9 @@ select
 	coalesce(cast(date_format(lm.first_listing_date, 'yyyyMMdd') as integer), -1) as sk_first_listing_date,
 	coalesce(cast(date_format(ud.first_booking_date, 'yyyyMMdd') as integer), -1) as sk_first_booking_date,
 	coalesce(cast(date_format(ud.first_visit_date, 'yyyyMMdd') as integer), -1) as sk_first_visit_date,
-	coalesce(cast(date_format(om.first_offer_sent_date, 'yyyyMMdd') as integer), -1) as sk_first_offer_sent_date,
+	coalesce(cast(date_format(om.first_offer_sent_date, 'yyyyMMdd') as integer), -1) as sk_first_offer_received_date,
 	coalesce(cast(date_format(ud.first_proposal_accepted_date, 'yyyyMMdd') as integer), -1) as sk_first_proposal_accepted_date,
-	coalesce(cast(date_format(ud.first_signed_contract, 'yyyyMMdd') as integer), -1) as sk_first_signed_contract_date,
+	coalesce(cast(date_format(ud.first_signed_contract, 'yyyyMMdd') as integer), -1) as sk_first_contract_signed_date,
 	coalesce(hm.houses_registered,0) as houses_registered,
 	coalesce(hm.houses_registered_for_rent,0) as houses_registered_for_rent,
 	coalesce(hm.houses_registered_for_sale,0) as houses_registered_for_sale,
@@ -381,7 +381,7 @@ select
 	coalesce(bm.visits_booked,0) as visits_booked,
 	coalesce(bm.visits_realized,0) as visits_realized,
 	coalesce(bm.visits_expected_to_happen,0) as visits_expected_to_happen,
-	coalesce(om.offers_sent,0) as offers_sent,
+	coalesce(om.offers_sent,0) as offers_received,
 	coalesce(om.offers_approved,0) as offers_approved,
 	coalesce(om.offers_rejected,0) as offers_rejected,
 	coalesce(om.offers_negotiating,0) as offers_negotiating,
@@ -395,6 +395,7 @@ select
 	coalesce(bm.visits_expected_to_happen > 0,false) as has_visits_to_happen,
 	coalesce(om.offers_negotiating > 0,false) as is_negotiating_offers,
 	coalesce(cm.contracts_to_be_signed > 0,false) as has_contracts_to_sign,
+	coalesce(oo.has_ongoing_contract, false) as has_ongoing_contracts,
     now() as ts_load
 from filter_owner_users u
 inner join user_dates ud 
@@ -409,3 +410,5 @@ left join offer_metrics om
 	on om.id = u.id
 left join contract_metrics cm 
 	on cm.id_user = u.id
+left join owner_ongoing oo
+	on oo.sk_owner = u.id
