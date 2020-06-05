@@ -335,7 +335,7 @@ listing_etl as (
 		ts_last_de_publication
 	from house_listing_plain
 	)
-	select * from house_listshowing_full
+	select * from house_listing_full
 ),
 -- get all listings from each corresponding owner
 listing_owner as (
