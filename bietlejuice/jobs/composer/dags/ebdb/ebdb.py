@@ -303,6 +303,12 @@ load_raw_sub_dag = BaseSubDAG.get_sub_dag_operator(
     start_date=MAIN_START_DATE,
 )
 
+
+def cross_downstream(from_tasks, to_tasks):
+    for task in from_tasks:
+        task.set_downstream(to_tasks)
+
+
 clean_sub_dags = build_subdags("clean")
 dw_sub_dags = build_subdags("dw")
 
@@ -322,15 +328,18 @@ clean_sub_dags.pop("user") >> [
     dw_sub_dags["fact_proposal_people"],
 ]
 
-[
-    clean_sub_dags.pop("contract"),
-    clean_sub_dags.pop("contract_person"),
-    clean_sub_dags.pop("rent_flow"),
-    clean_sub_dags.pop("house"),
-    clean_sub_dags.pop("partner_agent"),
-    clean_sub_dags.pop("conversion_lead"),
-    clean_sub_dags.pop("lead"),
-] >> dw_sub_dags["dim_contract_person"], dw_sub_dags["fact_contract_people"]
+cross_downstream(
+    [
+        clean_sub_dags.pop("contract"),
+        clean_sub_dags.pop("contract_person"),
+        clean_sub_dags.pop("rent_flow"),
+        clean_sub_dags.pop("house"),
+        clean_sub_dags.pop("partner_agent"),
+        clean_sub_dags.pop("conversion_lead"),
+        clean_sub_dags.pop("lead"),
+    ],
+    [dw_sub_dags["dim_contract_person"], dw_sub_dags["fact_contract_people"]],
+)
 
 list(clean_sub_dags.values()) >> terminate_cluster_task
 list(dw_sub_dags.values()) >> terminate_cluster_task
