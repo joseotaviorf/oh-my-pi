@@ -22,6 +22,7 @@ create table public.fact_photo_job(
   sk_date_updated int8,
   sk_date_photographer_start int8,
   sk_date_user_cancel int8,
+  sk_date_problem_reported int8,
   photo_shoot_contact_name varchar(255),
   photo_shoot_email varchar(255),
   photo_shoot_phone varchar(255),

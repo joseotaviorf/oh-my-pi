@@ -21,6 +21,7 @@ create external table datalake_clean.ods_fact_photo_job (
   sk_date_updated string,
   sk_date_photographer_start string,
   sk_date_user_cancel string,
+  sk_date_problem_reported string,
   photo_shoot_contact_name string,
   photo_shoot_email string,
   photo_shoot_phone string,

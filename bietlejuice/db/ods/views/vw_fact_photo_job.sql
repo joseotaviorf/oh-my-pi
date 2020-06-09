@@ -30,6 +30,7 @@ select
 	coalesce(to_char(j1.dt_updated::date,'YYYYMMDD')::integer, -1) as sk_date_updated,
 	coalesce(to_char(j1.dt_photographer_start::date,'YYYYMMDD')::integer, -1) as sk_date_photographer_start,
 	coalesce(to_char(j1.user_cancel_dt::date,'YYYYMMDD')::integer, -1) as sk_date_user_cancel,
+	coalesce(to_char(j1.dt_problem_reported::date,'YYYYMMDD')::integer, -1) as sk_date_problem_reported,
 	j1.photo_shoot_contact_name,
 	j1.photo_shoot_email,
 	j1.photo_shoot_phone,
