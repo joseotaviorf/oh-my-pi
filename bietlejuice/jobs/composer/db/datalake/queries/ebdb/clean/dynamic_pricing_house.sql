@@ -5,7 +5,6 @@ select
   initialRent as initial_rent,
   lastPriceUpdate as dt_last_price_updated,
   dynamicPricingParameterId as id_dynamic_pricing_parameter,
-  active as is_active,
   criadoEm as ts_created,
   atualizadoEm as ts_updated,
   status,

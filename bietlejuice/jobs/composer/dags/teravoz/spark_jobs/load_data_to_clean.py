@@ -100,6 +100,7 @@ if __name__ == "__main__":
         format_options,
         database_location,
         partitions_cols,
+        force_recreate=False,
     )
     # create partition into spark table
     spark_metastore_service.create_new_partitions_from_df(

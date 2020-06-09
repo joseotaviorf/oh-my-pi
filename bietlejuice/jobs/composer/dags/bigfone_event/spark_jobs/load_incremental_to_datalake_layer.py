@@ -91,7 +91,13 @@ if __name__ == "__main__":
 
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
     spark_metastore_loader.update_metastore(
-        df, database_name, table_name, format_options, database_location, partition_cols
+        df,
+        database_name,
+        table_name,
+        format_options,
+        database_location,
+        partition_cols,
+        force_recreate=False,
     )
 
     spark_metastore_service.create_new_partitions_from_df(

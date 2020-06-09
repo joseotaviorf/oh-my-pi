@@ -91,6 +91,7 @@ if __name__ == "__main__":
                 format_options,
                 database_location,
                 partition_cols,
+                force_recreate=False,
             )
             metastore_service.create_new_partitions_from_df(
                 database_name, table_name, df, partition_cols, parallelism=8

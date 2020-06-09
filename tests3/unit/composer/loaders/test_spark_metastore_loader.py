@@ -1,4 +1,9 @@
+from collections import OrderedDict
+
 import pytest
+from mock import patch
+
+from bietlejuice.jobs.composer.services.schema_service import SchemaService
 
 
 class TestSparkMetastoreLoader:
@@ -9,13 +14,17 @@ class TestSparkMetastoreLoader:
             ("csv", "overwrite", "house", "real", "s3://path"),
         ],
     )
-    def test_save_as_table(
-        self, format_options, mode, database_name, table_name, database_location, mocked_write_df, metastore_loader
+    @patch.object(SchemaService, "get_schema_from_dataframe")
+    def test_update_metastore(
+        self, mocked_schema_service, format_options, mode, database_name, table_name, database_location, mocked_write_df, metastore_loader,
     ):
         # given
         s3_path = database_location + table_name
-        name = "{}.{}".format(database_name, table_name)
         partitions = []
+        df_schema = OrderedDict({"col": "string"})
+
+        mocked_schema_service.return_value = df_schema
+        metastore_loader.schema_service.get_schema_from_dataframe = mocked_schema_service
 
         # when
         metastore_loader.update_metastore(
@@ -27,17 +36,17 @@ class TestSparkMetastoreLoader:
         )
 
         # then
-        mocked_write_df.write.mode("ignore").format(format_options).option("path", s3_path).saveAsTable.assert_called_with(name)
+        metastore_loader.metastore_service.create_external_table.assert_called_with(database_name, table_name, s3_path, df_schema, partitions, format_options)
 
     @pytest.mark.parametrize(
         "database_name, table_name, format_options, database_location", [(None, "table", None, None), ("database", None, None, None), ("database", 123, None, None)],
     )
-    def test_save_as_table_invalid_params(self, database_name, table_name, format_options, database_location, mocked_write_df, metastore_loader):
+    def test_update_metastore_with_invalid_params(self, database_name, table_name, format_options, database_location, mocked_write_df, metastore_loader):
         # act and assert
         with pytest.raises(ValueError):
             metastore_loader.update_metastore(mocked_write_df, database_name, table_name, format_options, database_location)
 
-    def test_save_as_table_with_invalid_df(self, metastore_loader):
+    def test_update_metastore_with_invalid_df(self, metastore_loader):
         # arrange
         database_name = "default"
         table_name = "test_table"

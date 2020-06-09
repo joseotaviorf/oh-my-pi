@@ -1,5 +1,7 @@
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.jobs.composer.services.schema_service import SchemaService
+
 logger = QuintoAndarLogger("SparkMetastoreLoader")
 
 
@@ -13,6 +15,7 @@ class SparkMetastoreLoader:
 
     def __init__(self, metastore_service):
         self.metastore_service = metastore_service
+        self.schema_service = SchemaService
 
     def update_metastore(
         self,
@@ -22,6 +25,7 @@ class SparkMetastoreLoader:
         format_options,
         database_location,
         partitions=[],
+        force_recreate=True,
     ):
         """
         Saves the schema of the Spark Dataframe as a table in metastore.
@@ -40,6 +44,8 @@ class SparkMetastoreLoader:
         :type database_location: str
         :param partitions: names of partitioning columns
         :type partitions: list
+        :param force_recreate: indicates if it must force table recreation in metastore
+        :type force_recreate: bool
         :return: None
         """
 
@@ -60,8 +66,9 @@ class SparkMetastoreLoader:
 
         s3_path = database_location + table_name
 
-        # if table already exists, it merges dataframe schema with table schema if they are different
-        if self.is_table_in_metastore(database_name, table_name):
+        # if it mustn't force table recreation and table already exists,
+        # it merges dataframe schema with table schema if they are different
+        if not force_recreate and self.is_table_in_metastore(database_name, table_name):
             logger.info(
                 "m=update_metastore, db={}, table={}, msg=existing table in metastore, "
                 "checking if it needs to be merged with dataframe schema".format(
@@ -91,8 +98,10 @@ class SparkMetastoreLoader:
                 )
         else:
             logger.info(
-                "m=update_metastore, db={}, table={}, msg=table is not in metastore, "
-                "creating it with dataframe schema".format(database_name, table_name)
+                "m=update_metastore, db={}, table={}, msg=table is not in metastore "
+                "or we are forcing table recreation: creating it with dataframe schema".format(
+                    database_name, table_name
+                )
             )
             self.create_table(
                 database_name, table_name, df, s3_path, format_options, partitions
@@ -127,15 +136,13 @@ class SparkMetastoreLoader:
         if partitions:
             self.metastore_service.repair_table_partitions(database_name, table_name)
 
-    @staticmethod
     def create_table(
-        database_name, table_name, df, s3_path, format_options, partitions
+        self, database_name, table_name, df, s3_path, format_options, partitions
     ):
-        name = "{}.{}".format(database_name, table_name)
-        df_writer = (
-            df.write.mode("ignore").format(format_options).option("path", s3_path)
+        df_schema = self.schema_service.get_schema_from_dataframe(df)
+        self.metastore_service.drop_table(database_name, table_name)
+        self.metastore_service.create_external_table(
+            database_name, table_name, s3_path, df_schema, partitions, format_options
         )
         if partitions:
-            df_writer = df_writer.partitionBy(*partitions)
-
-        df_writer.saveAsTable(name)
+            self.metastore_service.repair_table_partitions(database_name, table_name)

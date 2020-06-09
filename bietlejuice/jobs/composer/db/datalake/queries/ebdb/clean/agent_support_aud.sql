@@ -8,8 +8,6 @@ select
     agent_id_mod as mod_id_agent,
     listing_id as id_listing,
     listing_id_mod as mod_id_listing,
-    house_id as id_house,
-    house_id_mod as mod_id_house,
     status,
     status_mod as mod_status,
     agent_comment,
