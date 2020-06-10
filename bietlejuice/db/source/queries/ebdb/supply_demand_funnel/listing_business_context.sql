@@ -25,8 +25,8 @@ LEFT JOIN
       imovelid, 
       lbcaud.businessContext, 
       lbcaud.status, 
-      CASE WHEN businessContext = 'RENT' THEN COALESCE(from_unixtime(cast(ure.timestamp as bigint)/1000), NULL) ELSE NULL END AS ts_opt_out_rent,
-      CASE WHEN businessContext = 'SALE' THEN COALESCE(from_unixtime(cast(ure.timestamp as bigint)/1000), NULL) ELSE NULL END AS ts_opt_out_sale
+      CASE WHEN businessContext = 'RENT' THEN COALESCE(from_unixtime(ure.timestamp/1000), NULL) ELSE NULL END AS ts_opt_out_rent,
+      CASE WHEN businessContext = 'SALE' THEN COALESCE(from_unixtime(ure.timestamp/1000), NULL) ELSE NULL END AS ts_opt_out_sale
   FROM 
       ListingBusinessContext_AUD lbcaud
   JOIN UsuarioRevisionEntity ure 
