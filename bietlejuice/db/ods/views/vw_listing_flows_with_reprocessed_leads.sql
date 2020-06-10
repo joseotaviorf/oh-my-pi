@@ -79,7 +79,7 @@ acquisition_channels as (
             , false) as is_b2b,
         b2b_prime_draft.partner_id,
         coalesce(rl.affiliate_type, l.affiliate_type) as affiliate_type,
-        coalesce(rl.lead_agent_id, l.lead_agent_id,'') <> '' as is_agent_referral
+        coalesce(rl.lead_agent_id, l.lead_agent_id) is not null as is_agent_referral
     from fact_house_listing_flows fhlf
     left join lead l
         on l.id = fhlf.lead_id
