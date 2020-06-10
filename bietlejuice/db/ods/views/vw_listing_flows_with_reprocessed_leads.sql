@@ -7,6 +7,7 @@ with reproc_leads as (
         l.origem,
         l.tipo,
         l.usuario_que_indicou_id,
+        l.lead_agent_id,
         l.affiliate_type
     from
         reprocessed_lead rl
@@ -77,7 +78,8 @@ acquisition_channels as (
             or coalesce(pa_b2b.id, b2b_prime_draft.id_lead) is not null
             , false) as is_b2b,
         b2b_prime_draft.partner_id,
-        coalesce(rl.affiliate_type, l.affiliate_type) as affiliate_type
+        coalesce(rl.affiliate_type, l.affiliate_type) as affiliate_type,
+        coalesce(rl.lead_agent_id, l.lead_agent_id,'') <> '' as is_agent_referral
     from fact_house_listing_flows fhlf
     left join lead l
         on l.id = fhlf.lead_id
@@ -162,6 +164,7 @@ select
     acquisition_channels.acquisition_channel_rep !~~ 'Reprocessed%' as is_not_reprocessed,
     acquisition_channels.is_b2b,
     acquisition_channels.partner_id,
-    acquisition_channels.affiliate_type
+    acquisition_channels.affiliate_type,
+    acquisition_channels.is_agent_referral
 from
     acquisition_channels;

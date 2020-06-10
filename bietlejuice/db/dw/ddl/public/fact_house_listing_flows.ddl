@@ -66,6 +66,7 @@ create table if not exists fact_house_listing_flows
  ,is_call_center boolean
  ,is_lead_reprocessed boolean
  ,affiliate_type varchar(512)   encode lzo
+ ,is_agent_referral boolean
  ,lead_referring_domain varchar(512)   encode lzo
  ,lead_referring_category varchar(512)   encode lzo
  ,subscription_source varchar(512)   encode lzo

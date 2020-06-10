@@ -227,7 +227,8 @@ potential_listings as (
             case when ua.affiliateType = 'Doorman' and u.dados_agente_id is not null then 'Doorman & Agent'
             when u.dados_agente_id is not null then 'Agent'
             else ua.affiliateType
-            end) as affiliate_type
+            end) as affiliate_type,
+    f.is_agent_referral
   from listing_flows_with_reprocessed_leads f
   left join lead_first_event_tracking lfet
     on lfet.id_lead = f.lead_id
@@ -423,6 +424,7 @@ select
   atax.is_call_center,
   atax.reprocessed_flg as is_lead_reprocessed,
   atax.affiliate_type,
+  atax.is_agent_referral,
   atax.lead_referring_domain,
   atax.lead_referring_category,
   atax.subscription_source,

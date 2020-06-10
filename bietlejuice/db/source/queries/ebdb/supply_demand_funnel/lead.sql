@@ -51,7 +51,8 @@ select distinct
   coalesce(infosExtras like '%source=b2b_%', 0) as flg_b2b,
   l.salePrice as sale_price,
   coalesce(l.forRent+0, 1) as is_for_rent,
-  l.forSale+0 as is_for_sale
+  l.forSale+0 as is_for_sale,
+  l.dadosAgente_id as lead_agent_id
 from
   Lead l
 left join

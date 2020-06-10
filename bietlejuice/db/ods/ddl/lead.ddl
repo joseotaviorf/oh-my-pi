@@ -51,7 +51,8 @@ create table if not exists lead (
   flg_b2b boolean,
   sale_price bigint,
   is_for_rent smallint,
-  is_for_sale smallint
+  is_for_sale smallint,
+  lead_agent_id bigint
 );
 
 create unique index lead_id_idx on lead (id);
