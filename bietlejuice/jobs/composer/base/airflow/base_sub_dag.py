@@ -1,10 +1,7 @@
 from airflow.executors.celery_executor import CeleryExecutor
 from airflow.operators.subdag_operator import SubDagOperator
-from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
-
-logger = QuintoAndarLogger("BaseSubDAG")
 
 
 class BaseSubDAG(object):
@@ -12,14 +9,12 @@ class BaseSubDAG(object):
     Base class for building the sub-dag flow.
     """
 
-    @logger
     def __init__(self, sub_dag_name, dag_name, schedule_interval, start_date):
         self.sub_dag_name = sub_dag_name
         self.dag_name = dag_name
         self.schedule_interval = schedule_interval
         self.start_date = start_date
 
-    @logger
     def _build_local_dag(self):  # Todo: make public method
         """
         Builds a subdag with its default parameters
@@ -34,7 +29,6 @@ class BaseSubDAG(object):
         return local_dag
 
     @staticmethod
-    @logger
     def get_sub_dag_operator(dag, sub_dag_name, sub_dag_func, **kwargs):
         """
         Gets a sub-dag operator.

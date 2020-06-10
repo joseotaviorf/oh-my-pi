@@ -46,7 +46,6 @@ class FileService:
         return response or {}
 
     @staticmethod
-    @logger
     def list_files(path):
         """
         Return the files that are inside the path
@@ -61,7 +60,6 @@ class FileService:
         return listdir(path)
 
     @staticmethod
-    @logger
     def list_layer_sql_files(source, layer, schema=None):
         """
         Return the SQL files used to move table from raw to clean for given
