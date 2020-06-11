@@ -175,7 +175,7 @@ touchpoints as (
     evt.id_session,
     evt.utm_source || '/' || evt.utm_medium as utm_source_medium,
     evt.utm_source || '/' || evt.utm_medium || '/' ||
-    (case when evt.utm_campaign like '%branded%' then 'true'
+    (case when evt.utm_campaign like '%branded%' and lower(evt.utm_campaign) not like '%non-branded%' then 'true'
     when evt.utm_campaign like '%institucional%' then 'true'
     else 'false' end)
     as utm_source_medium_branded,

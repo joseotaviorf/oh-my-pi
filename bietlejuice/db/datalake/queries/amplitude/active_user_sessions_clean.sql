@@ -10,7 +10,7 @@ select
 	aaus.utm_source,
 	aaus.utm_medium,
 	aaus.utm_campaign,
-	case when lower(aaus.utm_campaign) like '%branded%' then 'Branded'
+	case when lower(aaus.utm_campaign) like '%branded%' and lower(aaus.utm_campaign) not like '%non-branded%' then 'Branded'
 		 when lower(aaus.utm_campaign) like '%institucional%' then 'Branded'
 		 else 'Outro' end as branded,
 	aaus.utm_content,

@@ -59,7 +59,7 @@ base_leads as (
     lead.origem as lead_origin,
     lead.utm_source,
     lead.utm_medium,
-    coalesce(lower(btrim(lead.utm_campaign)) ~* '(institucional)|(branded)', false) as branded_lead,
+    coalesce(lower(btrim(lead.utm_campaign)) ~* '(institucional)|(branded)' and lower(btrim(lead.utm_campaign)) !~* '(non-branded)', false) as branded_lead,
     lead.codigo_imobiliaria is not null OR lead.flg_b2b as b2b_lead,
     case
       when lead.origem = 'Reprocessado' 
@@ -367,7 +367,7 @@ potential_listings as (
     case when lfet.id_lead is not null then lfet.tracking_source else bl.utm_source end as utm_source,
     case when lfet.id_lead is not null then lfet.tracking_medium else bl.utm_medium end as utm_medium,
     lfet.tracking_platform,
-    coalesce(lower(btrim(lfet.tracking_campaign)) ~* '(institucional)|(branded)',
+    coalesce(lower(btrim(lfet.tracking_campaign)) ~* '(institucional)|(branded)' and lower(btrim(lfet.tracking_campaign)) !~* '(non-branded)',
              bl.branded_lead) as is_branded,
     (bl.b2b_lead or f.is_b2b) as is_b2b, -- Using business rules for both constraints of old b2b and new one
     bl.reprocessed_flg,

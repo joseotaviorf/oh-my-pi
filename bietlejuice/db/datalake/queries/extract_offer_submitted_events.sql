@@ -12,8 +12,9 @@ select
     cast(json_extract_scalar(user_properties, '$.utm_content') as varchar) as utm_content,
     cast(json_extract_scalar(user_properties, '$.utm_term') as varchar) as utm_term,
     case
-        when UPPER(cast(json_extract_scalar(user_properties, '$.utm_campaign') as varchar)) like '%BRANDED%'
-            or UPPER(cast(json_extract_scalar(user_properties, '$.utm_campaign') as varchar)) like '%INSTITUCIONAL%'
+        when (UPPER(cast(json_extract_scalar(user_properties, '$.utm_campaign') as varchar)) like '%BRANDED%'
+            or UPPER(cast(json_extract_scalar(user_properties, '$.utm_campaign') as varchar)) like '%INSTITUCIONAL%')
+            and lower(cast(json_extract_scalar(user_properties, '$.utm_campaign') as varchar)) like '%non-branded%'
             then 'Branded'
         else 'Outro'
     end as branded
