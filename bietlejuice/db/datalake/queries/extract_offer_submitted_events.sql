@@ -14,7 +14,7 @@ select
     case
         when (UPPER(cast(json_extract_scalar(user_properties, '$.utm_campaign') as varchar)) like '%BRANDED%'
             or UPPER(cast(json_extract_scalar(user_properties, '$.utm_campaign') as varchar)) like '%INSTITUCIONAL%')
-            and lower(cast(json_extract_scalar(user_properties, '$.utm_campaign') as varchar)) like '%non-branded%'
+            and lower(cast(json_extract_scalar(user_properties, '$.utm_campaign') as varchar)) NOT like '%non-branded%'
             then 'Branded'
         else 'Outro'
     end as branded
