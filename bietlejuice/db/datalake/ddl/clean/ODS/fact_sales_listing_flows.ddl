@@ -66,6 +66,7 @@ create external table datalake_clean.ods_sale_fact_listing_flows (
 	is_callcenter string,
 	is_lead_reprocessed string,
 	affiliate_type string,
+	is_agent_referral string,
 	lead_referring_domain string,
 	lead_referring_category string,
 	subscription_source string,

@@ -66,6 +66,7 @@ create table sale.fact_listing_flows (
 	is_call_center boolean,
 	is_lead_reprocessed boolean,
 	affiliate_type varchar(512),
+	is_agent_referral boolean,
 	lead_referring_domain varchar(512),
 	lead_referring_category varchar(512),
 	subscription_source varchar(512),
