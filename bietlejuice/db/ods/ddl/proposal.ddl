@@ -33,5 +33,13 @@ create table if not exists proposal (
   tenant_last_doc_complete_date timestamp,
   doc_reused integer,
   ts_processed timestamp,
-  rejection_reason varchar
+  rejection_reason varchar,
+  credit_evaluation_first_init_date timestamp,
+  credit_evaluation_last_init_date timestamp,
+  credit_evaluation_negative_first_date timestamp,
+  credit_evaluation_negative_last_date timestamp,
+  doc_analysis_first_approved_date timestamp,
+  doc_analysis_last_approved_date timestamp,
+  doc_analysis_first_rejected_date timestamp,
+  doc_analysis_last_rejected_date timestamp
 );
