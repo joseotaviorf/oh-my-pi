@@ -38,14 +38,14 @@ select
   aud_status.ts_processed,
   p.rejectionReason as rejection_reason,
   -- New dates related to credit evaluation
-  aud_status.credit_evaluation_first_init_date,
-  aud_status.credit_evaluation_last_init_date,
-  aud_status.credit_evaluation_negative_first_date,
-  aud_status.credit_evaluation_negative_last_date,
-  aud_status.doc_analysis_first_approved_date,
-  aud_status.doc_analysis_last_approved_date,
-  aud_status.doc_analysis_first_rejected_date,
-  aud_status.doc_analysis_last_rejected_date
+  aud_analysis.credit_evaluation_first_init_date,
+  aud_analysis.credit_evaluation_last_init_date,
+  aud_analysis.credit_evaluation_negative_first_date,
+  aud_analysis.credit_evaluation_negative_last_date,
+  aud_analysis.doc_analysis_first_approved_date,
+  aud_analysis.doc_analysis_last_approved_date,
+  aud_analysis.doc_analysis_first_rejected_date,
+  aud_analysis.doc_analysis_last_rejected_date
 from
   Proposta p
 left join (
