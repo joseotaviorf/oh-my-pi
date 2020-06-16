@@ -185,6 +185,7 @@ class CRMTaskStatusHistories(object):
             sql_file_name=sql_file_name,
             r_cols=_cols,
             c_cols=_cols,
+            row_group_offsets=1000
         )
 
     @logger
@@ -276,7 +277,8 @@ class CRMTaskStatusHistories(object):
             sql_file_name,
             r_cols,
             c_cols,
-            queries_folder_suffix=None
+            queries_folder_suffix=None,
+            row_group_offsets=500000
     ):
         key = "clean/{}/dt={}/{}.parq".format(
             bucket_folder_suffix, self.partition_date, CRMTaskStatusHistories.S3_FILE_NAME
@@ -296,5 +298,6 @@ class CRMTaskStatusHistories(object):
             key=key,
             query=query.replace(CRMTaskStatusHistories.TABLE_PARTITION_PARAM, self.partition_date),
             raw_columns=r_cols,
-            clean_columns=c_cols
+            clean_columns=c_cols,
+            row_group_offsets=row_group_offsets
         )
