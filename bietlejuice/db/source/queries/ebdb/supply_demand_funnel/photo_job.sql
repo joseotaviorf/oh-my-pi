@@ -1,11 +1,7 @@
 select
       f.id,
       f.imovel_id,
-      case
-        when f.status = 'Cancelado' and comp.id is not null
-        then 'ComProblema'
-        else f.status
-      end as job_status,
+      f.status as job_status,
       case
         when creator.dadosFotografo_id is not null and creator.dadosVendedor_id is not null then 'Teste'
         when creator.dadosFotografo_id is not null then 'Fotografo'
@@ -100,10 +96,6 @@ select
     left join
         (select id, max(REV) as REV from JobFotografo_AUD where status in ('ComProblema') and status_MOD = 1 group by id) f_problem_revision
         on f_problem_revision.id = f.id
-    left join
-        (select id, max(REV) as REV from JobFotografo_AUD where status = 'ComProblema' group by id) comp
-        on comp.id = f.id
-        and f.status = 'Cancelado'
     left join UsuarioRevisionEntity ure on ure.id = f_cancel_revision.REV
     left join UsuarioRevisionEntity ureP on ureP.id = f_problem_revision.REV
     left join Usuario uc on uc.id = ure.usuario_id
