@@ -157,6 +157,9 @@ SELECT
     sale.mkt_channel,
     sale.mkt_medium,
     sale.mkt_source,
+    sale.mkt_completion,
+    sale.sk_user_lead_affiliate,
+    sale.sk_user_house_registrant,
     CASE
 	    WHEN lower(dl.utm_campaign) ~ '.*(sale|girafa|vender).*' OR sale.sk_user_lead_affiliate in (912255, 360754, 1711931) 
 	        THEN 'Sale'
