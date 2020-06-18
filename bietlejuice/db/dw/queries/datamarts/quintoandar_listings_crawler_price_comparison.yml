@@ -1,5 +1,0 @@
-# Config for quintoandar_listings_crawler_price_comparison
----
-streams:
-  - direction: 'upstream'
-    task_ids: ['dw_crawled_listings_last_30_days']
