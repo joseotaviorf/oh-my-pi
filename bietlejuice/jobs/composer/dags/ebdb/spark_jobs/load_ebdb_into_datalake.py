@@ -16,7 +16,7 @@ from bietlejuice.jobs.composer.services.metastore_services import SparkMetastore
 
 JOB_NAME = "load_ebdb_into_datalake"
 TABLE_BLOCK_LIST = ["REVCHANGES", "_UsuarioRevisionEntity_new"]
-VIEW_ALLOW_LIST = ["MapRegiao"]
+VIEW_ALLOW_LIST = ["MapRegiao", "vw_lead_reason"]
 BLOCK_LIST = ["PoligonoRegiao"]
 
 # todo: check this value and argument the choice
