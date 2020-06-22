@@ -68,7 +68,7 @@ _fact as (
 		now()::timestamp as ts_load
 	from
 		public.house_rent_flow hrf
-	join public.vw_dim_house_listing vdh on
+	join staging.dim_house_listing vdh on
 		vdh.id_house = hrf.id_house
 		and coalesce(hrf.dt_rent_flow_created, '1900-01-01') between coalesce(vdh.ts_listing_version_start, '1900-01-01') and coalesce(vdh.ts_listing_version_end, now())
 		and vdh.is_for_sale::int::boolean

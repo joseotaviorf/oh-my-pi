@@ -48,7 +48,7 @@ select distinct
 	city_group,
 	cast(city_ddd as varchar) as ddd,
 	regional
-from public.vw_dim_region
+from staging.dim_region
 WHERE level = 'Cidade'
 ),
 region_city as (
@@ -56,7 +56,7 @@ select distinct
 	city_name,
 	city_group,
 	regional
-from public.vw_dim_region
+from staging.dim_region
 WHERE level = 'Cidade'
 ), affiliate_mkt_city_group as (
 select

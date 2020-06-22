@@ -30,8 +30,8 @@ _fact as (
         vdh.ts_listing_version_start as dt_house_listing,
         coalesce(to_char(vdh.ts_last_de_publication, 'YYYYMMDD')::integer, -1) as sk_house_listing_de_publication_date,
         coalesce(to_char(min(vdo.dt_created) over (partition by hrf.id_house), 'YYYYMMDD')::integer, -1) as sk_house_listing_first_offer_submitted_date,
-        coalesce(vfhl.sk_region, -1) as sk_region,
-        coalesce(vfhl.sk_condo, -1) as sk_condo,
+        coalesce(h.regiao_id, -1) as sk_region,
+        coalesce(h.condo_id, -1) as sk_condo,
         coalesce(hrf.id_rent_flow, -1) as sk_rent_flow,
         coalesce(hrf.id_booking, -1) as sk_booking,
         coalesce(to_char(hrf.dt_booking_created, 'YYYYMMDD')::integer, -1) as sk_booking_created_date,
@@ -143,8 +143,8 @@ _fact as (
         on vdh.id_house = hrf.id_house
             and coalesce(hrf.dt_rent_flow_created, '1900-01-01') between coalesce(vdh.ts_listing_version_start, '1900-01-01')
                                                   and coalesce(vdh.ts_listing_version_end, now())
-    left join vw_fact_house_listings vfhl
-        on vfhl.sk_house_listing = vdh.sk_house_listing
+    left join public.house h
+        on vdh.id_house = h.id
     left join staging.dim_offer vdo
         on vdo.sk_offer = case
                             when hrf.id_offer > 0

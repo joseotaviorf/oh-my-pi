@@ -70,6 +70,7 @@ left join lead l
     and l.affiliate_type = 'B2BPartner'
 left join partner_agent pa_b2b_online
   on pa_b2b_online.user_id = l.usuario_que_indicou_id
+-- selecting from a view instead of a CTE just to make code clearer
 left join vw_stranded_house_listings st
   on hl.id_house_listing = st.sk_house_listing
 where

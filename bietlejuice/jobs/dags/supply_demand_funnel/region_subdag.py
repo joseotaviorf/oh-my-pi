@@ -50,7 +50,7 @@ class RegionSubDag(DimSubDag):
 
         tests_tasks = self.build_tests_tasks(region_dag)
 
-        save_polygons_geojson_to_local.set_upstream([region, polygon_region])
+        save_polygons_geojson_to_local.set_upstream([dim_region, polygon_region])
         airflow_helpers.chain(save_polygons_geojson_to_local,
                               convert_polygons_geojson_to_topojson,
                               upload_polygons_topojson_to_s3)

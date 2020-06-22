@@ -2,7 +2,7 @@ with subregions as (
 	select
 		r.sk_region as sk_region,
 		p.poligono as poligono
-	from vw_dim_region r
+	from staging.dim_region r
 	left join polygon_region p
 		on p.regiao_id = r.id
 	where r.level = 'SubRegiao'
