@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS agent_region_group;
 CREATE TABLE agent_region_group (
   "dt" DATE NOT NULL,
   "dadosagente_id" bigint NOT NULL,
-  "regioes" VARCHAR NOT NULL,
+  "regioes" VARCHAR(2056) NOT NULL,
   "area" VARCHAR NULL,
   "secondary_area" VARCHAR NULL,
   "area_deprecated" VARCHAR NULL,
