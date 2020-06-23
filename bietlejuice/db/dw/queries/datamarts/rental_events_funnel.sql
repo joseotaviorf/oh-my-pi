@@ -1,4 +1,23 @@
 with
+-- temp solution to include credit evaluation positive date step
+credit_ep as (
+	with
+	order_evalutaion as (
+	select
+	    *,
+	    row_number() over(partition by proposal_id order by updated_at desc) as rn_last
+	from datalake_docx_raw_prod.credit_evaluation
+	where status <> 'PROCESSING'
+	)
+	select
+	    proposal_id,
+	    min(case when result in ('PRE_APPROVED','REGULAR') then updated_at end) as credit_evaluation_positive_first_date,
+	    max(case when result in ('PRE_APPROVED','REGULAR') then updated_at end) as credit_evaluation_positive_last_date,
+	    min(case when rn_last = 1 then result end) as result_last,
+	    count(distinct id) as number_evaluations
+	from order_evalutaion
+	group by 1
+),
 lead_ as (
 select
 	dd."date",
@@ -18,7 +37,10 @@ select
   null::bigint as visits_completed,
   null::bigint as offer_submitted,
   null::bigint as offer_approved,
+  null::bigint as credit_evaluation_init,
+  null::bigint as credit_evaluation_positive,
   null::bigint as doc_sent,
+  null::bigint as doc_approved,
   null::bigint as doc_completed,
   null::bigint as credit_processed,
   null::bigint as credit_approved,
@@ -53,7 +75,10 @@ select
   null::bigint as visits_completed,
   null::bigint as offer_submitted,
   null::bigint as offer_approved,
+  null::bigint as credit_evaluation_init,
+  null::bigint as credit_evaluation_positive,
   null::bigint as doc_sent,
+  null::bigint as doc_approved,
   null::bigint as doc_completed,
   null::bigint as credit_processed,
   null::bigint as credit_approved,
@@ -88,7 +113,10 @@ select
   null::bigint as visits_completed,
   null::bigint as offer_submitted,
   null::bigint as offer_approved,
+  null::bigint as credit_evaluation_init,
+  null::bigint as credit_evaluation_positive,
   null::bigint as doc_sent,
+  null::bigint as doc_approved,
   null::bigint as doc_completed,
   null::bigint as credit_processed,
   null::bigint as credit_approved,
@@ -123,7 +151,10 @@ select
   null::bigint as visits_completed,
   null::bigint as offer_submitted,
   null::bigint as offer_approved,
+  null::bigint as credit_evaluation_init,
+  null::bigint as credit_evaluation_positive,
   null::bigint as doc_sent,
+  null::bigint as doc_approved,
   null::bigint as doc_completed,
   null::bigint as credit_processed,
   null::bigint as credit_approved,
@@ -158,7 +189,10 @@ select
   null::bigint as visits_completed,
   null::bigint as offer_submitted,
   null::bigint as offer_approved,
+  null::bigint as credit_evaluation_init,
+  null::bigint as credit_evaluation_positive,
   null::bigint as doc_sent,
+  null::bigint as doc_approved,
   null::bigint as doc_completed,
   null::bigint as credit_processed,
   null::bigint as credit_approved,
@@ -193,7 +227,10 @@ select
   null::bigint as visits_completed,
   null::bigint as offer_submitted,
   null::bigint as offer_approved,
+  null::bigint as credit_evaluation_init,
+  null::bigint as credit_evaluation_positive,
   null::bigint as doc_sent,
+  null::bigint as doc_approved,
   null::bigint as doc_completed,
   null::bigint as credit_processed,
   null::bigint as credit_approved,
@@ -203,12 +240,10 @@ select
 from dim_date dd
 join datamarts.talk_to_agent tta
   on date(tta.first_message_ts) = dd.date
-join fact_listing_rent_flows rf
-  on tta.sk_house_listing = rf.sk_house_listing
 join dim_house_listing dhl
-  on rf.sk_house_listing = dhl.sk_house_listing
-left join dim_region dr
-  on rf.sk_region = dr.sk_region
+  on tta.sk_house_listing = dhl.sk_house_listing
+left join (select distinct city_group, region_code from dim_region) dr
+  on tta.region_code = dr.region_code
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
 group by 1, 2, 3, 4, 5, 6
 ),
@@ -231,7 +266,10 @@ select
   null::bigint as visits_completed,
   null::bigint as offer_submitted,
   null::bigint as offer_approved,
+  null::bigint as credit_evaluation_init,
+  null::bigint as credit_evaluation_positive,
   null::bigint as doc_sent,
+  null::bigint as doc_approved,
   null::bigint as doc_completed,
   null::bigint as credit_processed,
   null::bigint as credit_approved,
@@ -269,7 +307,10 @@ select
   null::bigint as visits_completed,
   null::bigint as offer_submitted,
   null::bigint as offer_approved,
+  null::bigint as credit_evaluation_init,
+  null::bigint as credit_evaluation_positive,
   null::bigint as doc_sent,
+  null::bigint as doc_approved,
   null::bigint as doc_completed,
   null::bigint as credit_processed,
   null::bigint as credit_approved,
@@ -308,7 +349,10 @@ select
   count(distinct rf.sk_booking) as visits_completed,
   null::bigint as offer_submitted,
   null::bigint as offer_approved,
+  null::bigint as credit_evaluation_init,
+  null::bigint as credit_evaluation_positive,
   null::bigint as doc_sent,
+  null::bigint as doc_approved,
   null::bigint as doc_completed,
   null::bigint as credit_processed,
   null::bigint as credit_approved,
@@ -347,7 +391,10 @@ select
   null::bigint as visits_completed,
   count(distinct rf.sk_offer) as offer_submitted,
   null::bigint as offer_approved,
+  null::bigint as credit_evaluation_init,
+  null::bigint as credit_evaluation_positive,
   null::bigint as doc_sent,
+  null::bigint as doc_approved,
   null::bigint as doc_completed,
   null::bigint as credit_processed,
   null::bigint as credit_approved,
@@ -386,7 +433,10 @@ select
   null::bigint as visits_completed,
   null::bigint as offer_submitted,
   count(distinct rf.sk_offer) as offer_approved,
+  null::bigint as credit_evaluation_init,
+  null::bigint as credit_evaluation_positive,
   null::bigint as doc_sent,
+  null::bigint as doc_approved,
   null::bigint as doc_completed,
   null::bigint as credit_processed,
   null::bigint as credit_approved,
@@ -397,6 +447,93 @@ from dim_date dd
 join fact_listing_rent_flows rf
   on dd.sk_date = rf.sk_offer_approved_date
   and rf.sk_offer_approved_date > 0
+join dim_house_listing dhl
+  on rf.sk_house_listing = dhl.sk_house_listing
+left join dim_offer dof
+  on rf.sk_offer = dof.sk_offer
+left join dim_region dr
+  on rf.sk_region = dr.sk_region
+where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
+group by 1, 2, 3, 4, 5, 6
+),
+credit_evaluation_init as(
+select
+  dd."date",
+  dd.sk_date,
+  dr.city_group,
+  dhl.is_b2b,
+  null as supply_channel,
+  dof.mkt_medium as demand_channel,
+  null::bigint as leads,
+  null::bigint as prospects,
+  null::bigint as qualifieds,
+  null::bigint as opportunities,
+  null::bigint as first_listings,
+  null::bigint as messages_sent_tta,
+  null::bigint as registered_agent_supports,
+  null::bigint as visits_booked,
+  null::bigint as visits_completed,
+  null::bigint as offer_submitted,
+  null::bigint as offer_approved,
+  count(distinct rf.sk_offer) as credit_evaluation_init,
+  null::bigint as credit_evaluation_positive,
+  null::bigint as doc_sent,
+  null::bigint as doc_approved,
+  null::bigint as doc_completed,
+  null::bigint as credit_processed,
+  null::bigint as credit_approved,
+  null::bigint as contract_created,
+  null::bigint as contract_signed,
+  null::bigint  as contract_ended
+from dim_date dd
+join fact_listing_rent_flows rf
+  on dd.sk_date = rf.sk_first_credit_evaluation_init
+  and rf.sk_first_credit_evaluation_init > 0
+join dim_house_listing dhl
+  on rf.sk_house_listing = dhl.sk_house_listing
+left join dim_offer dof
+  on rf.sk_offer = dof.sk_offer
+left join dim_region dr
+  on rf.sk_region = dr.sk_region
+where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
+group by 1, 2, 3, 4, 5, 6
+),
+credit_evaluation_positive as(
+select
+  dd."date",
+  dd.sk_date,
+  dr.city_group,
+  dhl.is_b2b,
+  null as supply_channel,
+  dof.mkt_medium as demand_channel,
+  null::bigint as leads,
+  null::bigint as prospects,
+  null::bigint as qualifieds,
+  null::bigint as opportunities,
+  null::bigint as first_listings,
+  null::bigint as messages_sent_tta,
+  null::bigint as registered_agent_supports,
+  null::bigint as visits_booked,
+  null::bigint as visits_completed,
+  null::bigint as offer_submitted,
+  null::bigint as offer_approved,
+  null::bigint as credit_evaluation_init,
+  count(distinct rf.sk_offer) as credit_evaluation_positive,
+  null::bigint as doc_sent,
+  null::bigint as doc_approved,
+  null::bigint as doc_completed,
+  null::bigint as credit_processed,
+  null::bigint as credit_approved,
+  null::bigint as contract_created,
+  null::bigint as contract_signed,
+  null::bigint  as contract_ended
+from dim_date dd
+join (select rf.sk_house_listing, rf.sk_region, rf.sk_offer, coalesce(to_char(cast(ep.credit_evaluation_positive_last_date as timestamp), 'YYYYMMDD')::integer, -1) as sk_last_credit_evaluation_positive
+		from fact_listing_rent_flows rf
+        join credit_ep ep
+         on rf.sk_proposal = ep.proposal_id) rf
+  on dd.sk_date = rf.sk_last_credit_evaluation_positive
+  and rf.sk_last_credit_evaluation_positive > 0
 join dim_house_listing dhl
   on rf.sk_house_listing = dhl.sk_house_listing
 left join dim_offer dof
@@ -425,7 +562,10 @@ select
   null::bigint as visits_completed,
   null::bigint as offer_submitted,
   null::bigint as offer_approved,
+  null::bigint as credit_evaluation_init,
+  null::bigint as credit_evaluation_positive,
   count(distinct rf.sk_offer) as doc_sent,
+  null::bigint as doc_approved,
   null::bigint as doc_completed,
   null::bigint as credit_processed,
   null::bigint as credit_approved,
@@ -436,6 +576,48 @@ from dim_date dd
 join fact_listing_rent_flows rf
   on dd.sk_date = rf.sk_tenant_first_doc_sent_date
   and rf.sk_tenant_first_doc_sent_date > 0
+join dim_house_listing dhl
+  on rf.sk_house_listing = dhl.sk_house_listing
+left join dim_offer dof
+  on rf.sk_offer = dof.sk_offer
+left join dim_region dr
+  on rf.sk_region = dr.sk_region
+where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
+group by 1, 2, 3, 4, 5, 6
+),
+doc_approved as(
+select
+  dd."date",
+  dd.sk_date,
+  dr.city_group,
+  dhl.is_b2b,
+  null as supply_channel,
+  dof.mkt_medium as demand_channel,
+  null::bigint as leads,
+  null::bigint as prospects,
+  null::bigint as qualifieds,
+  null::bigint as opportunities,
+  null::bigint as first_listings,
+  null::bigint as messages_sent_tta,
+  null::bigint as registered_agent_supports,
+  null::bigint as visits_booked,
+  null::bigint as visits_completed,
+  null::bigint as offer_submitted,
+  null::bigint as offer_approved,
+  null::bigint as credit_evaluation_init,
+  null::bigint as credit_evaluation_positive,
+  null::bigint as doc_sent,
+  count(distinct rf.sk_offer) as doc_approved,
+  null::bigint as doc_completed,
+  null::bigint as credit_processed,
+  null::bigint as credit_approved,
+  null::bigint as contract_created,
+  null::bigint as contract_signed,
+  null::bigint  as contract_ended
+from dim_date dd
+join fact_listing_rent_flows rf
+  on dd.sk_date = rf.sk_last_doc_analysis_approved
+  and rf.sk_last_doc_analysis_approved > 0
 join dim_house_listing dhl
   on rf.sk_house_listing = dhl.sk_house_listing
 left join dim_offer dof
@@ -464,7 +646,10 @@ select
   null::bigint as visits_completed,
   null::bigint as offer_submitted,
   null::bigint as offer_approved,
+  null::bigint as credit_evaluation_init,
+  null::bigint as credit_evaluation_positive,
   null::bigint as doc_sent,
+  null::bigint as doc_approved,
   count(distinct rf.sk_offer) as doc_completed,
   null::bigint as credit_processed,
   null::bigint as credit_approved,
@@ -503,7 +688,10 @@ select
   null::bigint as visits_completed,
   null::bigint as offer_submitted,
   null::bigint as offer_approved,
+  null::bigint as credit_evaluation_init,
+  null::bigint as credit_evaluation_positive,
   null::bigint as doc_sent,
+  null::bigint as doc_approved,
   null::bigint as doc_completed,
   count(distinct rf.sk_offer) as credit_processed,
   null::bigint as credit_approved,
@@ -542,7 +730,10 @@ select
   null::bigint as visits_completed,
   null::bigint as offer_submitted,
   null::bigint as offer_approved,
+  null::bigint as credit_evaluation_init,
+  null::bigint as credit_evaluation_positive,
   null::bigint as doc_sent,
+  null::bigint as doc_approved,
   null::bigint as doc_completed,
   null::bigint as credit_processed,
   count(distinct rf.sk_offer) as credit_approved,
@@ -581,7 +772,10 @@ select
   null::bigint as visits_completed,
   null::bigint as offer_submitted,
   null::bigint as offer_approved,
+  null::bigint as credit_evaluation_init,
+  null::bigint as credit_evaluation_positive,
   null::bigint as doc_sent,
+  null::bigint as doc_approved,
   null::bigint as doc_completed,
   null::bigint as credit_processed,
   null::bigint as credit_approved,
@@ -620,7 +814,10 @@ select
   null::bigint as visits_completed,
   null::bigint as offer_submitted,
   null::bigint as offer_approved,
+  null::bigint as credit_evaluation_init,
+  null::bigint as credit_evaluation_positive,
   null::bigint as doc_sent,
+  null::bigint as doc_approved,
   null::bigint as doc_completed,
   null::bigint as credit_processed,
   null::bigint as credit_approved,
@@ -659,7 +856,10 @@ select
   null::bigint as visits_completed,
   null::bigint as offer_submitted,
   null::bigint as offer_approved,
+  null::bigint as credit_evaluation_init,
+  null::bigint as credit_evaluation_positive,
   null::bigint as doc_sent,
+  null::bigint as doc_approved,
   null::bigint as doc_completed,
   null::bigint as credit_processed,
   null::bigint as credit_approved,
@@ -702,7 +902,13 @@ union_all as (
 	union all
 	select * from offer_approved
 	union all
+	select * from credit_evaluation_init
+	union all
+	select * from credit_evaluation_positive
+	union all
 	select * from doc_sent
+	union all
+	select * from doc_approved
 	union all
 	select * from doc_completed
 	union all
@@ -734,7 +940,10 @@ select
   ua.visits_completed,
   ua.offer_submitted,
   ua.offer_approved,
+  ua.credit_evaluation_init,
+  ua.credit_evaluation_positive,
   ua.doc_sent,
+  ua.doc_approved,
   ua.doc_completed,
   ua.credit_processed,
   ua.credit_approved,
@@ -745,8 +954,7 @@ from union_all ua
 right join dim_date dd
   on ua.sk_date = dd.sk_date
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date
-),
-agg_all as (
+)
 select
 	"date",
 	city_group,
@@ -765,19 +973,16 @@ select
   sum(visits_completed) as visits_completed,
   sum(offer_submitted) as offer_submitted,
   sum(offer_approved) as offer_approved,
+  sum(coalesce(credit_evaluation_init,0)) as credit_evaluation_init,
+  sum(coalesce(credit_evaluation_positive,0)) as credit_evaluation_positive,
   sum(doc_sent) as doc_sent,
+  sum(coalesce(doc_approved,0)) as doc_approved,
   sum(doc_completed) as doc_completed,
   sum(credit_processed) as credit_processed,
   sum(credit_approved) as credit_approved,
   sum(contract_created) as contract_created,
   sum(contract_signed) as contract_signed,
-  sum(contract_ended) as contract_ended
+  sum(contract_ended) as contract_ended,
+  current_timestamp as ts_load
 from union_all
 group by "date", city_group, 3, 4, 5
-order by "date"desc , city_group, 3, 4, 5
-)
-select
-	*,
-	current_timestamp as ts_load
-from agg_all
-;

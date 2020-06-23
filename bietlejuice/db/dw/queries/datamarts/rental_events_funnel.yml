@@ -1,0 +1,5 @@
+# Config for rental_events_funnel
+---
+streams:
+  - direction: 'upstream'
+    task_ids: ['athena_talk_to_agent']
