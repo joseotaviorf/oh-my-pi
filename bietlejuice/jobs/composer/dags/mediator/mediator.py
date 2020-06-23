@@ -1,9 +1,9 @@
 from datetime import datetime, date
 
 from airflow.models import DAG, Variable
-from airflow.operators.dagrun_operator import TriggerDagRunOperator
 from airflow.operators.quintoandar_dag_mediator import (
     QuintoAndarShortCircuitExternalSensor,
+    QuintoAndarCustomTriggerDagOperator,
 )
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
@@ -77,12 +77,8 @@ sensor_task = QuintoAndarShortCircuitExternalSensor(
 
 trigger_dependent_dags_list = []
 for dependent_dag_id in dependencies_dict.keys():
-    task_id = dependent_dag_id.replace(".", "-").replace("_", "-")
-    trigger_dependent_dag_id_task = TriggerDagRunOperator(
-        dag=mediator_dag,
-        task_id=f"trigger-{task_id}-dag",
-        trigger_dag_id=dependent_dag_id,
-        execution_date="{{ execution_date }}",  # the DAG execution date
+    trigger_dependent_dag_id_task = QuintoAndarCustomTriggerDagOperator(
+        dag=mediator_dag, dependent_dag_id=dependent_dag_id
     )
     trigger_dependent_dags_list.append(trigger_dependent_dag_id_task)
 
