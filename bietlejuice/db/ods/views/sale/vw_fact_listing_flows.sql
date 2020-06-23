@@ -444,6 +444,7 @@ taxonomy as (
     lead_tracking_source,
     affiliate_type,
     lead_referring_category,
+    is_agent_referral::integer::boolean as is_agent_referral,
     is_branded::integer::boolean as is_branded,
     is_ops_direct_register::integer::boolean as is_ops_direct_register,
     mkt_origin,
@@ -511,6 +512,7 @@ left join taxonomy t
     and coalesce(pl.lead_referring_category, '') = coalesce(t.lead_referring_category, '')
     and coalesce(pl.is_branded, false) = coalesce(t.is_branded, false)
     and coalesce(pl.is_ops_direct_register, false) = coalesce(t.is_ops_direct_register, false)
+    and coalesce(pl.is_agent_referral, false) = coalesce(t.is_agent_referral, false)
 ),
 applied_taxonomy_flow as (
     select

@@ -1,6 +1,7 @@
 drop table if exists gsheets.taxonomy_growth;
 create table gsheets.taxonomy_growth (
     affiliate_type varchar(255),
+    is_agent_referral varchar(255),
     is_branded varchar(255),
     is_ops_direct_register varchar(255),
     lead_origin varchar(255),

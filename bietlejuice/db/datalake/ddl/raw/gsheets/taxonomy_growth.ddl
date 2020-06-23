@@ -1,17 +1,18 @@
 drop table if exists datalake_raw.gsheets_taxonomy_growth;
 
 create external table datalake_raw.gsheets_taxonomy_growth (
-    affiliate_type string,
-    is_branded string,
-    is_ops_direct_register string,
+    lead_type string,
     lead_origin string,
-    lead_referring_category string,
     lead_tracking_medium string,
     lead_tracking_source string,
-    lead_type string,
+    affiliate_type string,
+    is_agent_referral string,
+    lead_referring_category string,
+    is_branded string,
+    is_ops_direct_register string,
+    mkt_origin string,
     mkt_channel string,
     mkt_medium string,
-    mkt_origin string,
     mkt_source string
 )
 row format serde 'org.openx.data.jsonserde.JsonSerDe'

@@ -6,6 +6,7 @@ create external table datalake_raw.taxonomy_growth (
     lead_tracking_medium string,
     lead_tracking_source string,
     affiliate_type string,
+    is_agent_referral string,
     lead_referring_category string,
     is_branded string,
     is_ops_direct_register string,
