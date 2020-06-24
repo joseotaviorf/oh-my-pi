@@ -47,7 +47,7 @@ select
     verified as is_verified,
     cast(from_iso8601_timestamp(last_login_at) as varchar) as ts_last_login,
     cast(from_iso8601_timestamp(created_at) as varchar) as ts_created,
-    ts_created_local,
+    cast(ts_created_local as varchar) as ts_created_local,
     cast(from_iso8601_timestamp(updated_at) as varchar) as ts_updated,
     cast(now() as varchar) as ts_load
 from stitch_data
