@@ -68,7 +68,8 @@ with house_available_hours as (
 		dr.id as region_id,
 		dr.region_code,
 		dr.city_group,
-		dr.city_name
+		dr.city_name,
+		dr.name as neighborhood
 	from datalake_clean.ods_dim_region dr
 	where dr.region_code != '-1'
 )
@@ -82,6 +83,7 @@ with house_available_hours as (
 	r.region_code,
 	r.city_name,
 	r.city_group as city_group,
+	r.neighborhood,
 	ds.date,
 	ds.week_start,
 	ss.slot,
@@ -306,6 +308,7 @@ select
 	d.region_code,
     d.city_name,
     d.city_group as city_group,
+    d.neighborhood,
     cast(d.date as timestamp) as date,
     d.week_start,
     d.slot,
@@ -334,4 +337,4 @@ left join encaixes_agg enc
     and enc.slot = d.slot
     and faixa is not null
     and coalesce(bk.slot, enc.slot) is not null
-group by 1, 2, 3, 4, 5, 6, 7, 8
+group by 1, 2, 3, 4, 5, 6, 7, 8, 9
