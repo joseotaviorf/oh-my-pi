@@ -1,0 +1,61 @@
+import logging
+from argparse import ArgumentParser
+
+from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.jobs.composer.base.db import (
+    QUERIES_DATALAKE_PATH,
+    DatalakeMetastoreService,
+)
+from bietlejuice.jobs.composer.pipeline.enrich_table_pipeline import EnrichTablePipeline
+
+JOB_NAME = "enrich_table"
+
+logging.getLogger("py4j").setLevel(logging.ERROR)
+logger = QuintoAndarLogger(JOB_NAME)
+
+if __name__ == "__main__":
+
+    parser = ArgumentParser(description=JOB_NAME)
+    parser.add_argument("env", type=str, help="forno/prod values")
+    parser.add_argument("datalake_bucket", type=str, help="datalake bucket")
+    parser.add_argument("layer", type=str, help="clean/enrich values to save data to")
+    parser.add_argument(
+        "database_base_name",
+        type=str,
+        help="base name for database, e.g. 'source' for raw/clean layer and 'source' and/or 'context' for enrich layer",
+    )
+    parser.add_argument(
+        "relative_query_path",
+        type=str,
+        help="relative query path for sql file to create table",
+    )
+    parser.add_argument("table_name", type=str, help="table name that will be created")
+
+    args = parser.parse_args()
+
+    env = args.env
+    datalake_bucket = args.datalake_bucket
+    layer = args.layer
+    database_base_name = args.database_base_name
+    relative_query_path = args.relative_query_path
+    table_name = args.table_name
+
+    logger.info(
+        f"m={JOB_NAME}, env={env}, datalake_bucket={datalake_bucket}, layer={layer}, "
+        + f"database_base_name={database_base_name}, relative_query_path={relative_query_path}, "
+        + f"table_name={table_name},  msg=Job execution started"
+    )
+
+    database_name, database_location, athena_database_name = DatalakeMetastoreService.get_layer_info(
+        env, database_base_name, datalake_bucket, layer
+    )
+
+    query_path = (
+        f"{QUERIES_DATALAKE_PATH}{relative_query_path}/{layer}/{table_name}.sql"
+    )
+
+    enrich_table_pipeline = EnrichTablePipeline(
+        database_name, table_name, database_location, query_path
+    )
+    enrich_table_pipeline.run()

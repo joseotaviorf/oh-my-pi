@@ -40,3 +40,21 @@ class DatalakeMetastoreService:
         db_infos.update(athena_db_infos)
         db_infos.update(s3_infos)
         return db_infos
+
+    @staticmethod
+    def get_layer_info(env, source, bucket, layer):
+        """
+        Return specified layer info
+        :param env: forno or prod environments
+        :param source: source or context name in metastore
+        :param bucket: datalake bucket in S3
+        :param layer: raw, clean, enrich or clean_staging layers
+        :return: specified layer info
+        """
+        db_info = DatalakeMetastoreService.get_db_info(env, source, bucket)
+
+        database_name = db_info["db_" + layer + "_databricks"]
+        database_location = db_info["db_" + layer + "_path"]
+        athena_database_name = db_info["db_" + layer + "_athena"]
+
+        return database_name, database_location, athena_database_name
