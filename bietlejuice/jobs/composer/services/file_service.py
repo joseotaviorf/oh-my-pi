@@ -62,8 +62,7 @@ class FileService:
     @staticmethod
     def list_layer_sql_files(source, layer, schema=None):
         """
-        Return the SQL files used to move table from raw to clean for given
-         schema
+        Return the SQL files for a given layer and schema (if specified)
 
         :param source: the source's directory name on db directory. E.g:
          autodialer, godfather, oscar.
@@ -76,6 +75,21 @@ class FileService:
             raw_to_clean_path = f"{raw_to_clean_path}/{schema}"
 
         return FileService.list_files(raw_to_clean_path)
+
+    @staticmethod
+    def list_sql_files_without_extension_from_layer(source, layer, schema=None):
+        """
+        Return the SQL files without extension for a given layer and schema (if specified)
+
+        :param source: the database base name for the table
+        :param layer: the data lake layer
+        :param schema: Source schema name
+        :return: Tables SQL files list without extension
+        """
+        files = []
+        for file in FileService.list_layer_sql_files(source, layer, schema):
+            files.append(FileService.remove_file_extension(file))
+        return files
 
     @staticmethod
     @logger

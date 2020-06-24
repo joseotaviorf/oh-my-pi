@@ -1,3 +1,5 @@
+from abc import abstractmethod
+
 from airflow.executors.celery_executor import CeleryExecutor
 from airflow.operators.subdag_operator import SubDagOperator
 
@@ -42,3 +44,37 @@ class BaseSubDAG(object):
             dag=dag,
             executor=CeleryExecutor(),
         )
+
+    def build_subdags_from_sql_files(self, dag, file_list, layer):
+        """
+        Return a subdag for each table in a specified file list containing table's sqls
+        :param dag: main dag to attach subdag to
+        :param file_list: list of files containing sql queries for each table
+        :param layer: layer that table belongs to
+        :return: a list of table name/subdag created
+        """
+        subdags = {}
+        for file_name in file_list:
+            slugged_table_name = file_name.replace("_", "-")
+            table_sub_dag = BaseSubDAG.get_sub_dag_operator(
+                dag=dag,
+                sub_dag_name=f"load-{slugged_table_name}-to-{layer}",
+                sub_dag_func=self.build_subdag,
+                table_name=file_name,
+                slugged_table_name=slugged_table_name,
+            )
+            subdags[file_name] = table_sub_dag
+
+        return subdags
+
+    @abstractmethod
+    def build_subdag(self, sub_dag_name, table_name, slugged_table_name):
+        """
+        Create the subdag following logic for each concrete class.
+        It must be implemented in each concrete class.
+        :param sub_dag_name: subdag name
+        :param table_name: table name for the subdag
+        :param slugged_table_name: slugged table name for the subdag
+        :return: the subdag created
+        """
+        raise NotImplementedError()
