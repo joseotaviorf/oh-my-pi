@@ -383,21 +383,3 @@ pipeline:
     when:
       event: push
       branch: [ master ]
-
-  schemaspy:
-    group: common-schemaspy
-    image: quintoandar/drone-schemaspy:v1.1.0
-    pull: true
-    commands:
-      - apt-get update
-      - apt-get install -y git > /dev/null
-      - chmod +x scripts/execute_schemaspy.sh
-      - bash scripts/execute_schemaspy.sh
-    secrets:
-      - source: dw_db_password_prod
-        target: DB_PASSWORD
-      - source: dw_db_user_prod
-        target: DB_USER
-    when:
-      branch: master
-      event: push
