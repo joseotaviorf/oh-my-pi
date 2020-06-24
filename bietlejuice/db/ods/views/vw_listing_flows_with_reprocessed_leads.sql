@@ -92,7 +92,7 @@ acquisition_channels as (
     left join (
         select
             l.id as id_lead,
-            max(pa_b2b.user_id) as partner_id
+            max(pa_b2b.partner_id) as partner_id
         from
             lead l
         join usuario u_b2b
