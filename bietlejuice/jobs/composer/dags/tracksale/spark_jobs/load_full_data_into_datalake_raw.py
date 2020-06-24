@@ -1,0 +1,100 @@
+import json
+import logging
+from argparse import ArgumentParser
+
+from quintoandar_logger import QuintoAndarLogger
+from quintoandar_tracksale_api_client.clients import TracksaleClient
+from quintoandar_tracksale_api_client.consumers import CONSUMERS
+
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient
+from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
+from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
+from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
+from bietlejuice.jobs.composer.base.api.api_enum import ApiEnum
+from bietlejuice.jobs.composer.base.spark import (
+    BaseDBUtils,
+    SparkTableStorageFormat,
+    SparkDataFrameService,
+)
+
+DATABRICKS_SCOPE = "quintoandar"
+JOB_NAME = "load_full_data_into_datalake_raw"
+
+logging.getLogger("py4j").setLevel(logging.ERROR)
+logger = QuintoAndarLogger(JOB_NAME)
+
+
+def get_api_response(token, endpoint_name):
+
+    tracksale_client = TracksaleClient(api_token=token)
+    consumer_instance = CONSUMERS[endpoint_name](tracksale_client)
+    api_response = consumer_instance.sync()
+
+    return api_response
+
+
+if __name__ == "__main__":
+
+    parser = ArgumentParser(description=JOB_NAME)
+
+    parser.add_argument("environment", help="forno/prod values")
+    parser.add_argument("source", help="name of the API")
+    parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
+    parser.add_argument("execution_date", help="execution date in str format")
+    parser.add_argument("endpoint_name", help="endpoint to call the API")
+
+    args = parser.parse_args()
+
+    environment = args.environment
+    source = args.source
+    datalake_bucket = args.datalake_bucket
+    endpoint_name = args.endpoint_name
+
+    logger.info(
+        f"m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket}, "
+        f"endpoint_name={endpoint_name}, msg=Starting spark job..."
+    )
+
+    base_dbutils = BaseDBUtils()
+    if base_dbutils.get_dbutils() is not None:
+        dbutils = base_dbutils.get_dbutils()
+
+    json_credentials = dbutils.secrets.get(
+        scope=DATABRICKS_SCOPE, key=ApiEnum.TRACKSALE
+    )
+    credentials = json.loads(json_credentials)
+    api_response = get_api_response(credentials["token"], endpoint_name)
+
+    spark_client = SparkClient()
+    df = spark_client.create_dataframe(api_response)
+    df = (
+        SparkDataFrameService()
+        .input(df)
+        .convert_array_type_to_json()
+        .optimize_partition(200000)
+        .output()
+    )
+
+    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
+    metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_loader = SparkMetastoreLoader(metastore_service)
+    s3_loader = S3Loader()
+
+    database_name = db_info["db_raw_databricks"]
+    format_options = SparkTableStorageFormat.DEFAULT_RAW
+    database_location = db_info["db_raw_path"]
+
+    logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
+    metastore_service.create_database(database_name)
+
+    s3_loader.load_full_table(
+        df=df,
+        database_name=database_name,
+        table_name=endpoint_name,
+        format_options=format_options,
+        database_location=database_location,
+    )
+
+    spark_metastore_loader.update_metastore(
+        df, database_name, endpoint_name, format_options, database_location
+    )
