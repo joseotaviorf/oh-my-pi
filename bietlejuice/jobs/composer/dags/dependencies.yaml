@@ -13,3 +13,6 @@ bietlejuice.tenant_booking_review:
 
 bietlejuice.dw_banking:
   - bietlejuice.ebdb:load-bank
+  - bietlejuice.ebdb:load-account
+  - bietlejuice.ebdb:load-account-transaction
+  - bietlejuice.ebdb:load-user
