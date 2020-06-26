@@ -38,6 +38,7 @@ class LoadTableToDWPipeline(AbstractPipeline):
         databricks_consumer = DatabricksConsumer(conn_config, spark_client)
 
         df = self.get_data(databricks_consumer, self.table_name)
+        df = self.add_default_row(spark_client, df)
 
         s3_loader = S3Loader()
         s3_loader.load_full_table(
@@ -67,3 +68,14 @@ class LoadTableToDWPipeline(AbstractPipeline):
         :return: dataframe data
         """
         raise NotImplementedError()
+
+    def add_default_row(self, spark_client, dataframe):
+        """
+        Adds default row into dataframe following specific layer logic (staging or final schema)
+        If it is not overwritten in child classes it assumes default behavior and returns the same dataframe passed
+        as parameter.
+        :param spark_client: client to manipulate dataframe data
+        :param dataframe: the dataframe to be processed
+        :return: processed dataframe
+        """
+        return dataframe
