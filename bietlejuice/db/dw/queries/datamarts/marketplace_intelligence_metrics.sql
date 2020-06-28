@@ -2,7 +2,7 @@ with
 daily_published_listings as (
   select
       f.sk_house_listing,
-      substring(f.sk_house_listing,10,12) as sk_house,
+      substring(f.sk_house_listing,1,9) as sk_house,
       f.status_history,
       date(f.sk_status_start_date) as status_start_date,
       f.status_change_reason,
