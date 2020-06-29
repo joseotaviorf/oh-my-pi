@@ -1,5 +1,0 @@
-# Config for offer_attribution_conversion_paths_demand
----
-streams:
-  - direction: 'upstream'
-    task_ids: ['athena_schedule_page_viewed_events', 'athena_search_results_page_viewed_events', 'athena_home_page_viewed_events', 'athena_listing_page_viewed_events', 'athena_offer_submitted_aux']
