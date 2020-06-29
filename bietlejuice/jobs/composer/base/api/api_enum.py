@@ -1,2 +1,3 @@
-class ApiEnum:
+class APIEnum:
     TRACKSALE = "TRACKSALE_API"
+    JIRA = "JIRA_API"
