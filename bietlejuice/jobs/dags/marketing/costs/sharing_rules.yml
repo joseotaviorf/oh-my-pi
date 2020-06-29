@@ -33,3 +33,7 @@ d007d:
 d008d:
   query: marketing/costs/d008d.sql
   funnel_side: demand
+
+a009a:
+  query: marketing/costs/a009a.sql
+  funnel_side: affiliates
