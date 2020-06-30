@@ -1,215 +1,77 @@
 with
--- temp solution to include credit evaluation positive date step
-credit_ep as (
+rent_flows_adap as (
+-- adpating rent_flows output so we can add tta events and the category of each flow
 	with
-	order_evalutaion as (
+	tta_complete as (
 	select
-	    proposal_id,
-	    updated_at,
-	    result,
-	    id,
-	    row_number() over(partition by proposal_id order by updated_at desc) as rn_last
-	from datalake_docx_raw_prod.credit_evaluation
-	where status <> 'PROCESSING'
+		sk_house_listing,
+		tenant_id as sk_client,
+		agent_id,
+		region_code,
+		date(first_message_ts) as first_message_date,
+		date(first_attendance_ts) as first_attendance_date
+	from datamarts.talk_to_agent
 	)
 	select
-	    proposal_id,
-	    min(case when result in ('PRE_APPROVED','REGULAR') then updated_at end) as credit_evaluation_positive_first_date,
-	    max(case when result in ('PRE_APPROVED','REGULAR') then updated_at end) as credit_evaluation_positive_last_date,
-	    min(case when rn_last = 1 then result end) as result_last,
-	    count(distinct id) as number_evaluations
-	from order_evalutaion
-	group by 1
+	    rf.sk_rent_flow,
+	    rf.sk_house_listing,
+	    rf.sk_client,
+	    rf.sk_region,
+	    tta_c.region_code,
+	    rf.sk_visit_date,
+	    rf.flg_visit_completed,
+	    rf.sk_proposal,
+	    rf.sk_contract_annulment_date,
+	    rf.sk_booking,
+	    rf.sk_booking_created_date,
+	    rf.sk_offer,
+	    rf.sk_offer_submitted_date,
+	    rf.sk_offer_approved_date,
+	    rf.sk_first_credit_evaluation_init,
+	    rf.sk_tenant_first_doc_sent_date,
+	    rf.sk_last_doc_analysis_approved,
+	    rf.sk_credit_analysis_init_date,
+	    rf.sk_credit_analysis_end_date,
+	    rf.sk_credit_analysis_approved_date,
+	    rf.sk_contract,
+	    rf.sk_contract_created_date,
+	    rf.sk_contract_signed_date,
+	    fdf.funnel_flow,
+	    fdf.funnel_first_touchpoint,
+	    fdf.had_flow_visit,
+	    fdf.had_flow_direct,
+	    fdf.had_flow_tta,
+	    fdf.flow_type,
+	    tta_c.first_message_date,
+	    tta_c.first_attendance_date,
+	    tta_c.sk_house_listing || tta_c.sk_client || tta_c.agent_id as tta_id
+	from fact_listing_rent_flows rf
+	left join datamarts.funnel_demand_flows fdf
+	  on rf.sk_rent_flow = fdf.sk_rent_flow
+	full outer join tta_complete tta_c
+	  on rf.sk_house_listing = tta_c.sk_house_listing
+	  and rf.sk_client = tta_c.sk_client
 ),
-lead_ as (
+order_evalutaion as (
+-- temp solution to include credit evaluation positive date step		
 select
-	dd."date",
-	dd.sk_date,
-	dr.city_group,
-	null::boolean as is_b2b,
-	case when fhlf.mkt_origin = 'Owner PWA' then fhlf.mkt_origin||'-'||fhlf.mkt_channel else fhlf.mkt_origin end as supply_channel,
-	null as demand_channel,
-  count(fhlf.sk_lead_date) as leads,
-	null::bigint as prospects, -- this count is done on the prospect date because not all listings come from a lead, and maybe one lead brings multiple house listings
-	null::bigint as qualifieds,
-	null::bigint as opportunities,
-	null::bigint as first_listings,
-	null::bigint as messages_sent_tta,
-	null::bigint as registered_agent_supports,
-	null::bigint as visits_booked,
-  null::bigint as visits_completed,
-  null::bigint as offer_submitted,
-  null::bigint as offer_approved,
-  null::bigint as credit_evaluation_init,
-  null::bigint as credit_evaluation_positive,
-  null::bigint as doc_sent,
-  null::bigint as doc_approved,
-  null::bigint as doc_completed,
-  null::bigint as credit_processed,
-  null::bigint as credit_approved,
-  null::bigint as contract_created,
-  null::bigint as contract_signed,
-  null::bigint  as contract_ended
-from dim_date dd
-join fact_house_listing_flows fhlf
-  on dd.sk_date = fhlf.sk_lead_date
-  and fhlf.sk_lead_date > 0
-left join dim_region dr
-  on dr.sk_region = fhlf.sk_region
-where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 year ago
-group by 1, 2, 3, 4, 5, 6
+    proposal_id,
+    updated_at,
+    result,
+    id,
+    row_number() over(partition by proposal_id order by updated_at desc) as rn_last
+from datalake_docx_raw_prod.credit_evaluation
+where status <> 'PROCESSING'
 ),
-prospect as (
+credit_ep as (
 select
-	dd."date",
-	dd.sk_date,
-	dr.city_group,
-	null::boolean as is_b2b,
-	case when fhlf.mkt_origin = 'Owner PWA' then fhlf.mkt_origin||'-'||fhlf.mkt_channel else fhlf.mkt_origin end as supply_channel,
-	null as demand_channel,
-  null::bigint as leads,
-	count(fhlf.sk_prospect_date) as prospects, -- this count is done on the prospect date because not all listings come from a lead, and maybe one lead brings multiple house listings
-	null::bigint as qualifieds,
-	null::bigint as opportunities,
-	null::bigint as first_listings,
-	null::bigint as messages_sent_tta,
-	null::bigint as registered_agent_supports,
-	null::bigint as visits_booked,
-  null::bigint as visits_completed,
-  null::bigint as offer_submitted,
-  null::bigint as offer_approved,
-  null::bigint as credit_evaluation_init,
-  null::bigint as credit_evaluation_positive,
-  null::bigint as doc_sent,
-  null::bigint as doc_approved,
-  null::bigint as doc_completed,
-  null::bigint as credit_processed,
-  null::bigint as credit_approved,
-  null::bigint as contract_created,
-  null::bigint as contract_signed,
-  null::bigint  as contract_ended
-from dim_date dd
-join fact_house_listing_flows fhlf
-  on dd.sk_date = fhlf.sk_prospect_date
-  and fhlf.sk_prospect_date > 0
-left join dim_region dr
-  on dr.sk_region = fhlf.sk_region
-where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 year ago
-group by 1, 2, 3, 4, 5, 6
-),
-qualified as (
-select
-	dd."date",
-	dd.sk_date,
-	dr.city_group,
-	null::boolean as is_b2b,
-	case when fhlf.mkt_origin = 'Owner PWA' then fhlf.mkt_origin||'-'||fhlf.mkt_channel else fhlf.mkt_origin end as supply_channel,
-	null as demand_channel,
-  null::bigint as leads,
-	null::bigint as prospects,
-	count(fhlf.sk_qualified_date) as qualifieds, -- this count is done on the qualified date because not all listings come from a lead, and maybe one lead brings multiple house listings
-	null::bigint as opportunities,
-	null::bigint as first_listings,
-	null::bigint as messages_sent_tta,
-	null::bigint as registered_agent_supports,
-	null::bigint as visits_booked,
-  null::bigint as visits_completed,
-  null::bigint as offer_submitted,
-  null::bigint as offer_approved,
-  null::bigint as credit_evaluation_init,
-  null::bigint as credit_evaluation_positive,
-  null::bigint as doc_sent,
-  null::bigint as doc_approved,
-  null::bigint as doc_completed,
-  null::bigint as credit_processed,
-  null::bigint as credit_approved,
-  null::bigint as contract_created,
-  null::bigint as contract_signed,
-  null::bigint  as contract_ended
-from dim_date dd
-join fact_house_listing_flows fhlf
-  on dd.sk_date = fhlf.sk_qualified_date
-  and fhlf.sk_qualified_date > 0
-left join dim_region dr
-  on dr.sk_region = fhlf.sk_region
-where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 year ago
-group by 1, 2, 3, 4, 5, 6
-),
-opportunity as (
-select
-	dd."date",
-	dd.sk_date,
-	dr.city_group,
-	null::boolean as is_b2b,
-	case when fhlf.mkt_origin = 'Owner PWA' then fhlf.mkt_origin||'-'||fhlf.mkt_channel else fhlf.mkt_origin end as supply_channel,
-	null as demand_channel,
-  null::bigint as leads,
-	null::bigint as prospects,
-	null::bigint as qualifieds,
-	count(distinct fhlf.sk_house_listing) as opportunities,
-	null::bigint as first_listings,
-	null::bigint as messages_sent_tta,
-	null::bigint as registered_agent_supports,
-	null::bigint as visits_booked,
-  null::bigint as visits_completed,
-  null::bigint as offer_submitted,
-  null::bigint as offer_approved,
-  null::bigint as credit_evaluation_init,
-  null::bigint as credit_evaluation_positive,
-  null::bigint as doc_sent,
-  null::bigint as doc_approved,
-  null::bigint as doc_completed,
-  null::bigint as credit_processed,
-  null::bigint as credit_approved,
-  null::bigint as contract_created,
-  null::bigint as contract_signed,
-  null::bigint  as contract_ended
-from dim_date dd
-join fact_house_listing_flows fhlf
-  on dd.sk_date = fhlf.sk_opportunity_date
-  and fhlf.sk_opportunity_date > 0
-left join dim_region dr
-  on dr.sk_region = fhlf.sk_region
-where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
-),
-listing as (
-select
-	dd."date",
-	dd.sk_date,
-	dr.city_group,
-	null::boolean as is_b2b,
-	case when fhlf.mkt_origin = 'Owner PWA' then fhlf.mkt_origin||'-'||fhlf.mkt_channel else fhlf.mkt_origin end as supply_channel,
-	null as demand_channel,
-  null::bigint as leads,
-	null::bigint as prospects,
-	null::bigint as qualifieds,
-	null::bigint as opportunities,
-	count(fhlf.sk_first_listing_date) as first_listings,
-	null::bigint as messages_sent_tta,
-	null::bigint as registered_agent_supports,
-	null::bigint as visits_booked,
-  null::bigint as visits_completed,
-  null::bigint as offer_submitted,
-  null::bigint as offer_approved,
-  null::bigint as credit_evaluation_init,
-  null::bigint as credit_evaluation_positive,
-  null::bigint as doc_sent,
-  null::bigint as doc_approved,
-  null::bigint as doc_completed,
-  null::bigint as credit_processed,
-  null::bigint as credit_approved,
-  null::bigint as contract_created,
-  null::bigint as contract_signed,
-  null::bigint  as contract_ended
-from dim_date dd
-join fact_house_listing_flows fhlf
-  on dd.sk_date = fhlf.sk_first_listing_date
-  and fhlf.sk_first_listing_date > 0
-left join dim_region dr
-  on dr.sk_region = fhlf.sk_region
-where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+    proposal_id,
+    min(case when result in ('PRE_APPROVED','REGULAR') then updated_at end) as credit_evaluation_positive_first_date,
+    max(case when result in ('PRE_APPROVED','REGULAR') then updated_at end) as credit_evaluation_positive_last_date,
+    min(case when rn_last = 1 then result end) as result_last,
+    count(distinct id) as number_evaluations
+from order_evalutaion
+group by 1
 ),
 messages_sent as (
 select
@@ -217,14 +79,14 @@ select
   dd.sk_date,
   dr.city_group,
   dhl.is_b2b,
-  null as supply_channel,
+  rf.funnel_flow,
+  rf.funnel_first_touchpoint,
+  rf.had_flow_visit,
+  rf.had_flow_direct,
+  rf.had_flow_tta,
+  rf.flow_type,
   'Other' as demand_channel,
-  null::bigint as leads,
-  null::bigint as prospects,
-  null::bigint as qualifieds,
-  null::bigint as opportunities,
-  null::bigint as first_listings,
-  count(distinct (tta.agent_id || tta.tenant_id || tta.sk_house_listing)) as messages_sent_tta,
+  count(distinct rf.tta_id) as messages_sent_tta,
   null::bigint as registered_agent_supports,
   null::bigint as visits_booked,
   null::bigint as visits_completed,
@@ -241,14 +103,14 @@ select
   null::bigint as contract_signed,
   null::bigint  as contract_ended
 from dim_date dd
-join datamarts.talk_to_agent tta
-  on date(tta.first_message_ts) = dd.date
+join rent_flows_adap rf
+  on date(rf.first_message_date) = dd.date
 join dim_house_listing dhl
-  on tta.sk_house_listing = dhl.sk_house_listing
+  on rf.sk_house_listing = dhl.sk_house_listing
 left join (select distinct city_group, region_code from dim_region) dr
-  on tta.region_code = dr.region_code
+  on rf.region_code = dr.region_code
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
 agent_supports as (
 select
@@ -256,15 +118,15 @@ select
   dd.sk_date,
   dr.city_group,
   dhl.is_b2b,
-  null as supply_channel,
+  rf.funnel_flow,
+  rf.funnel_first_touchpoint,
+  rf.had_flow_visit,
+  rf.had_flow_direct,
+  rf.had_flow_tta,
+  rf.flow_type,
   'Other' as demand_channel,
-  null::bigint as leads,
-  null::bigint as prospects,
-  null::bigint as qualifieds,
-  null::bigint as opportunities,
-  null::bigint as first_listings,
   null::bigint as messages_sent_tta,
-  count(distinct (tta.agent_id || tta.tenant_id || tta.sk_house_listing)) as registered_agent_supports,
+  count(distinct rf.tta_id) as registered_agent_supports,
   null::bigint as visits_booked,
   null::bigint as visits_completed,
   null::bigint as offer_submitted,
@@ -280,16 +142,14 @@ select
   null::bigint as contract_signed,
   null::bigint  as contract_ended
 from dim_date dd
-join datamarts.talk_to_agent tta
-  on date(tta.first_attendance_ts) = dd.date
-join fact_listing_rent_flows rf
-  on tta.sk_house_listing = rf.sk_house_listing
+join rent_flows_adap rf
+  on date(rf.first_attendance_date) = dd.date
 join dim_house_listing dhl
   on rf.sk_house_listing = dhl.sk_house_listing
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
 visits_booked as (
 select
@@ -297,13 +157,13 @@ select
   dd.sk_date,
   dr.city_group,
   dhl.is_b2b,
-  null as supply_channel,
+  rf.funnel_flow,
+  rf.funnel_first_touchpoint,
+  rf.had_flow_visit,
+  rf.had_flow_direct,
+  rf.had_flow_tta,
+  rf.flow_type,
   db.mkt_channel as demand_channel,
-  null::bigint as leads,
-  null::bigint as prospects,
-  null::bigint as qualifieds,
-  null::bigint as opportunities,
-  null::bigint as first_listings,
   null::bigint as messages_sent_tta,
   null::bigint as registered_agent_supports,
   count(distinct rf.sk_booking) as visits_booked,
@@ -321,7 +181,7 @@ select
   null::bigint as contract_signed,
   null::bigint  as contract_ended
 from dim_date dd
-join fact_listing_rent_flows rf
+join rent_flows_adap rf
   on dd.sk_date = rf.sk_booking_created_date
   and rf.sk_booking_created_date > 0
 join dim_house_listing dhl
@@ -331,7 +191,7 @@ left join dim_booking db
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
 visits_completed as (
 select
@@ -339,13 +199,13 @@ select
   dd.sk_date,
   dr.city_group,
   dhl.is_b2b,
-  null as supply_channel,
+  rf.funnel_flow,
+  rf.funnel_first_touchpoint,
+  rf.had_flow_visit,
+  rf.had_flow_direct,
+  rf.had_flow_tta,
+  rf.flow_type,
   db.mkt_channel as demand_channel,
-  null::bigint as leads,
-  null::bigint as prospects,
-  null::bigint as qualifieds,
-  null::bigint as opportunities,
-  null::bigint as first_listings,
   null::bigint as messages_sent_tta,
   null::bigint as registered_agent_supports,
   null::bigint as visits_booked,
@@ -363,7 +223,7 @@ select
   null::bigint as contract_signed,
   null::bigint  as contract_ended
 from dim_date dd
-join fact_listing_rent_flows rf
+join rent_flows_adap rf
   on dd.sk_date = rf.sk_visit_date
   and rf.sk_visit_date > 0 and rf.flg_visit_completed = 1
 join dim_house_listing dhl
@@ -373,7 +233,7 @@ left join dim_booking db
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
 offer_submitted as (
 select
@@ -381,13 +241,13 @@ select
   dd.sk_date,
   dr.city_group,
   dhl.is_b2b,
-  null as supply_channel,
+  rf.funnel_flow,
+  rf.funnel_first_touchpoint,
+  rf.had_flow_visit,
+  rf.had_flow_direct,
+  rf.had_flow_tta,
+  rf.flow_type,
   dof.mkt_medium as demand_channel,
-  null::bigint as leads,
-  null::bigint as prospects,
-  null::bigint as qualifieds,
-  null::bigint as opportunities,
-  null::bigint as first_listings,
   null::bigint as messages_sent_tta,
   null::bigint as registered_agent_supports,
   null::bigint as visits_booked,
@@ -405,7 +265,7 @@ select
   null::bigint as contract_signed,
   null::bigint  as contract_ended
 from dim_date dd
-join fact_listing_rent_flows rf
+join rent_flows_adap rf
   on dd.sk_date = rf.sk_offer_submitted_date
   and rf.sk_offer_submitted_date > 0
 join dim_house_listing dhl
@@ -415,7 +275,7 @@ left join dim_offer dof
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date"between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
 offer_approved as(
 select
@@ -423,13 +283,13 @@ select
   dd.sk_date,
   dr.city_group,
   dhl.is_b2b,
-  null as supply_channel,
+  rf.funnel_flow,
+  rf.funnel_first_touchpoint,
+  rf.had_flow_visit,
+  rf.had_flow_direct,
+  rf.had_flow_tta,
+  rf.flow_type,
   dof.mkt_medium as demand_channel,
-  null::bigint as leads,
-  null::bigint as prospects,
-  null::bigint as qualifieds,
-  null::bigint as opportunities,
-  null::bigint as first_listings,
   null::bigint as messages_sent_tta,
   null::bigint as registered_agent_supports,
   null::bigint as visits_booked,
@@ -447,7 +307,7 @@ select
   null::bigint as contract_signed,
   null::bigint  as contract_ended
 from dim_date dd
-join fact_listing_rent_flows rf
+join rent_flows_adap rf
   on dd.sk_date = rf.sk_offer_approved_date
   and rf.sk_offer_approved_date > 0
 join dim_house_listing dhl
@@ -457,7 +317,7 @@ left join dim_offer dof
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
 credit_evaluation_init as(
 select
@@ -465,13 +325,13 @@ select
   dd.sk_date,
   dr.city_group,
   dhl.is_b2b,
-  null as supply_channel,
+  rf.funnel_flow,
+  rf.funnel_first_touchpoint,
+  rf.had_flow_visit,
+  rf.had_flow_direct,
+  rf.had_flow_tta,
+  rf.flow_type,
   dof.mkt_medium as demand_channel,
-  null::bigint as leads,
-  null::bigint as prospects,
-  null::bigint as qualifieds,
-  null::bigint as opportunities,
-  null::bigint as first_listings,
   null::bigint as messages_sent_tta,
   null::bigint as registered_agent_supports,
   null::bigint as visits_booked,
@@ -489,7 +349,7 @@ select
   null::bigint as contract_signed,
   null::bigint  as contract_ended
 from dim_date dd
-join fact_listing_rent_flows rf
+join rent_flows_adap rf
   on dd.sk_date = rf.sk_first_credit_evaluation_init
   and rf.sk_first_credit_evaluation_init > 0
 join dim_house_listing dhl
@@ -499,7 +359,7 @@ left join dim_offer dof
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
 credit_evaluation_positive as(
 select
@@ -507,13 +367,13 @@ select
   dd.sk_date,
   dr.city_group,
   dhl.is_b2b,
-  null as supply_channel,
+  rf.funnel_flow,
+  rf.funnel_first_touchpoint,
+  rf.had_flow_visit,
+  rf.had_flow_direct,
+  rf.had_flow_tta,
+  rf.flow_type,
   dof.mkt_medium as demand_channel,
-  null::bigint as leads,
-  null::bigint as prospects,
-  null::bigint as qualifieds,
-  null::bigint as opportunities,
-  null::bigint as first_listings,
   null::bigint as messages_sent_tta,
   null::bigint as registered_agent_supports,
   null::bigint as visits_booked,
@@ -531,8 +391,17 @@ select
   null::bigint as contract_signed,
   null::bigint  as contract_ended
 from dim_date dd
-join (select rf.sk_house_listing, rf.sk_region, rf.sk_offer, coalesce(to_char(cast(ep.credit_evaluation_positive_last_date as timestamp), 'YYYYMMDD')::integer, -1) as sk_last_credit_evaluation_positive
-		from fact_listing_rent_flows rf
+join (select rf.sk_house_listing,
+			 rf.sk_region,
+			 rf.funnel_flow,
+		     rf.funnel_first_touchpoint,
+		     rf.had_flow_visit,
+		     rf.had_flow_direct,
+		     rf.had_flow_tta,
+		     rf.flow_type,
+		     rf.sk_offer,
+		     coalesce(to_char(cast(ep.credit_evaluation_positive_last_date as timestamp), 'YYYYMMDD')::integer, -1) as sk_last_credit_evaluation_positive
+		from rent_flows_adap rf
         join credit_ep ep
          on rf.sk_proposal = ep.proposal_id) rf
   on dd.sk_date = rf.sk_last_credit_evaluation_positive
@@ -544,7 +413,7 @@ left join dim_offer dof
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
 doc_sent as(
 select
@@ -552,13 +421,13 @@ select
   dd.sk_date,
   dr.city_group,
   dhl.is_b2b,
-  null as supply_channel,
+  rf.funnel_flow,
+  rf.funnel_first_touchpoint,
+  rf.had_flow_visit,
+  rf.had_flow_direct,
+  rf.had_flow_tta,
+  rf.flow_type,
   dof.mkt_medium as demand_channel,
-  null::bigint as leads,
-  null::bigint as prospects,
-  null::bigint as qualifieds,
-  null::bigint as opportunities,
-  null::bigint as first_listings,
   null::bigint as messages_sent_tta,
   null::bigint as registered_agent_supports,
   null::bigint as visits_booked,
@@ -576,7 +445,7 @@ select
   null::bigint as contract_signed,
   null::bigint  as contract_ended
 from dim_date dd
-join fact_listing_rent_flows rf
+join rent_flows_adap rf
   on dd.sk_date = rf.sk_tenant_first_doc_sent_date
   and rf.sk_tenant_first_doc_sent_date > 0
 join dim_house_listing dhl
@@ -586,7 +455,7 @@ left join dim_offer dof
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
 doc_approved as(
 select
@@ -594,13 +463,13 @@ select
   dd.sk_date,
   dr.city_group,
   dhl.is_b2b,
-  null as supply_channel,
+  rf.funnel_flow,
+  rf.funnel_first_touchpoint,
+  rf.had_flow_visit,
+  rf.had_flow_direct,
+  rf.had_flow_tta,
+  rf.flow_type,
   dof.mkt_medium as demand_channel,
-  null::bigint as leads,
-  null::bigint as prospects,
-  null::bigint as qualifieds,
-  null::bigint as opportunities,
-  null::bigint as first_listings,
   null::bigint as messages_sent_tta,
   null::bigint as registered_agent_supports,
   null::bigint as visits_booked,
@@ -618,7 +487,7 @@ select
   null::bigint as contract_signed,
   null::bigint  as contract_ended
 from dim_date dd
-join fact_listing_rent_flows rf
+join rent_flows_adap rf
   on dd.sk_date = rf.sk_last_doc_analysis_approved
   and rf.sk_last_doc_analysis_approved > 0
 join dim_house_listing dhl
@@ -628,7 +497,7 @@ left join dim_offer dof
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
 doc_completed as(
 select
@@ -636,13 +505,13 @@ select
   dd.sk_date,
   dr.city_group,
   dhl.is_b2b,
-  null as supply_channel,
+  rf.funnel_flow,
+  rf.funnel_first_touchpoint,
+  rf.had_flow_visit,
+  rf.had_flow_direct,
+  rf.had_flow_tta,
+  rf.flow_type,
   dof.mkt_medium as demand_channel,
-  null::bigint as leads,
-  null::bigint as prospects,
-  null::bigint as qualifieds,
-  null::bigint as opportunities,
-  null::bigint as first_listings,
   null::bigint as messages_sent_tta,
   null::bigint as registered_agent_supports,
   null::bigint as visits_booked,
@@ -660,7 +529,7 @@ select
   null::bigint as contract_signed,
   null::bigint  as contract_ended
 from dim_date dd
-join fact_listing_rent_flows rf
+join rent_flows_adap rf
   on dd.sk_date = rf.sk_credit_analysis_init_date
   and rf.sk_credit_analysis_init_date > 0
 join dim_house_listing dhl
@@ -670,7 +539,7 @@ left join dim_offer dof
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
 credit_processed as(
 select
@@ -678,13 +547,13 @@ select
   dd.sk_date,
   dr.city_group,
   dhl.is_b2b,
-  null as supply_channel,
+  rf.funnel_flow,
+  rf.funnel_first_touchpoint,
+  rf.had_flow_visit,
+  rf.had_flow_direct,
+  rf.had_flow_tta,
+  rf.flow_type,
   dof.mkt_medium as demand_channel,
-  null::bigint as leads,
-  null::bigint as prospects,
-  null::bigint as qualifieds,
-  null::bigint as opportunities,
-  null::bigint as first_listings,
   null::bigint as messages_sent_tta,
   null::bigint as registered_agent_supports,
   null::bigint as visits_booked,
@@ -702,7 +571,7 @@ select
   null::bigint as contract_signed,
   null::bigint  as contract_ended
 from dim_date dd
-join fact_listing_rent_flows rf
+join rent_flows_adap rf
   on dd.sk_date = rf.sk_credit_analysis_end_date
   and rf.sk_credit_analysis_end_date > 0
 join dim_house_listing dhl
@@ -712,7 +581,7 @@ left join dim_offer dof
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
 credit_approved as(
 select
@@ -720,13 +589,13 @@ select
   dd.sk_date,
   dr.city_group,
   dhl.is_b2b,
-  null as supply_channel,
+  rf.funnel_flow,
+  rf.funnel_first_touchpoint,
+  rf.had_flow_visit,
+  rf.had_flow_direct,
+  rf.had_flow_tta,
+  rf.flow_type,
   dof.mkt_medium as demand_channel,
-  null::bigint as leads,
-  null::bigint as prospects,
-  null::bigint as qualifieds,
-  null::bigint as opportunities,
-  null::bigint as first_listings,
   null::bigint as messages_sent_tta,
   null::bigint as registered_agent_supports,
   null::bigint as visits_booked,
@@ -744,7 +613,7 @@ select
   null::bigint as contract_signed,
   null::bigint  as contract_ended
 from dim_date dd
-join fact_listing_rent_flows rf
+join rent_flows_adap rf
   on dd.sk_date = rf.sk_credit_analysis_approved_date
   and rf.sk_credit_analysis_approved_date > 0
 join dim_house_listing dhl
@@ -754,7 +623,7 @@ left join dim_offer dof
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
 contract_created as (
 select
@@ -762,13 +631,13 @@ select
   dd.sk_date,
   dr.city_group,
   dhl.is_b2b,
-  null as supply_channel,
+  rf.funnel_flow,
+  rf.funnel_first_touchpoint,
+  rf.had_flow_visit,
+  rf.had_flow_direct,
+  rf.had_flow_tta,
+  rf.flow_type,
   dof.mkt_medium as demand_channel,
-  null::bigint as leads,
-  null::bigint as prospects,
-  null::bigint as qualifieds,
-  null::bigint as opportunities,
-  null::bigint as first_listings,
   null::bigint as messages_sent_tta,
   null::bigint as registered_agent_supports,
   null::bigint as visits_booked,
@@ -786,7 +655,7 @@ select
   null::bigint as contract_signed,
   null::bigint  as contract_ended
 from dim_date dd
-join fact_listing_rent_flows rf
+join rent_flows_adap rf
   on dd.sk_date = rf.sk_contract_created_date
   and rf.sk_contract_created_date > 0
 join dim_house_listing dhl
@@ -796,7 +665,7 @@ left join dim_offer dof
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
 contract_signed as (
 select
@@ -804,13 +673,13 @@ select
   dd.sk_date,
   dr.city_group,
   dhl.is_b2b,
-  null as supply_channel,
+  rf.funnel_flow,
+  rf.funnel_first_touchpoint,
+  rf.had_flow_visit,
+  rf.had_flow_direct,
+  rf.had_flow_tta,
+  rf.flow_type,
   dof.mkt_medium as demand_channel,
-  null::bigint as leads,
-  null::bigint as prospects,
-  null::bigint as qualifieds,
-  null::bigint as opportunities,
-  null::bigint as first_listings,
   null::bigint as visits_booked,
   null::bigint as messages_sent_tta,
   null::bigint as registered_agent_supports,
@@ -828,7 +697,7 @@ select
   count(distinct rf.sk_contract) as contract_signed,
   null::bigint  as contract_ended
 from dim_date dd
-join fact_listing_rent_flows rf
+join rent_flows_adap rf
   on dd.sk_date = rf.sk_contract_signed_date
   and rf.sk_contract_signed_date > 0
 join dim_house_listing dhl
@@ -838,7 +707,7 @@ left join dim_offer dof
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
 contract_ended as (
 select
@@ -846,13 +715,13 @@ select
   dd.sk_date,
   dr.city_group,
   dhl.is_b2b,
-  null as supply_channel,
+  rf.funnel_flow,
+  rf.funnel_first_touchpoint,
+  rf.had_flow_visit,
+  rf.had_flow_direct,
+  rf.had_flow_tta,
+  rf.flow_type,
   dof.mkt_medium as demand_channel,
-  null::bigint as leads,
-  null::bigint as prospects,
-  null::bigint as qualifieds,
-  null::bigint as opportunities,
-  null::bigint as first_listings,
   null::bigint as messages_sent_tta,
   null::bigint as registered_agent_supports,
   null::bigint as visits_booked,
@@ -870,7 +739,7 @@ select
   null::bigint as contract_signed,
   count(distinct rf.sk_contract) as contract_ended
 from dim_date dd
-join fact_listing_rent_flows rf
+join rent_flows_adap rf
   on dd.sk_date = rf.sk_contract_annulment_date
   and rf.sk_contract_signed_date > 0 and rf.sk_contract_annulment_date > 0
 join dim_house_listing dhl
@@ -880,19 +749,9 @@ left join dim_offer dof
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 ),
 union_all as (
-  select * from lead_
-	union all
-	select * from prospect
-	union all
-	select * from qualified
-	union all
-	select * from opportunity
-	union all
-	select * from listing
-	union all
 	select * from messages_sent
 	union all
 	select * from agent_supports
@@ -927,16 +786,16 @@ union_all as (
 ),
 union_all_date as (
 select
-	dd."date",
-	ua.city_group,
+  dd."date",
+  ua.city_group,
   ua.is_b2b,
-  ua.supply_channel,
+  ua.funnel_flow,
+  ua.funnel_first_touchpoint,
+  ua.had_flow_visit,
+  ua.had_flow_direct,
+  ua.had_flow_tta,
+  ua.flow_type,
   ua.demand_channel,
-  ua.leads,
-  ua.prospects,
-  ua.qualifieds,
-  ua.opportunities,
-  ua.first_listings,
   ua.messages_sent_tta,
   ua.registered_agent_supports,
   ua.visits_booked,
@@ -959,17 +818,17 @@ right join dim_date dd
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date
 )
 select
-	"date",
-	city_group,
-	supply_channel,
-    case when demand_channel in ('Not Mapped', 'Other') or demand_channel is null then 'Other'
-         else demand_channel end as demand_channel,
+  "date",
+  city_group,
+  funnel_flow,
+  funnel_first_touchpoint,
+  had_flow_visit,
+  had_flow_direct,
+  had_flow_tta,
+  flow_type,
+  case when demand_channel in ('Not Mapped', 'Other') or demand_channel is null then 'Other'
+       else demand_channel end as demand_channel,
   is_b2b as is_b2b_demand,
-  sum(leads) as leads,
-  sum(prospects) as prospects,
-  sum(qualifieds) as qualifieds,
-  sum(opportunities) as opportunities,
-  sum(first_listings) as first_listings,
   sum(messages_sent_tta) as messages_sent_tta,
   sum(registered_agent_supports) as registered_agent_supports,
   sum(visits_booked) as visits_booked,
@@ -988,4 +847,4 @@ select
   sum(contract_ended) as contract_ended,
   current_timestamp as ts_load
 from union_all
-group by "date", city_group, 3, 4, 5
+group by "date", city_group, 3, 4, 5, 6, 7, 8, 9, 10
