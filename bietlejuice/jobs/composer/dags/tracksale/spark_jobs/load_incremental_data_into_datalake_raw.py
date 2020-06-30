@@ -14,7 +14,7 @@ from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.services.json_service import JsonService
 from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
-from bietlejuice.jobs.composer.base.api.api_enum import ApiEnum
+from bietlejuice.jobs.composer.base.api.api_enum import APIEnum
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
@@ -68,7 +68,7 @@ if __name__ == "__main__":
         dbutils = base_dbutils.get_dbutils()
 
     json_credentials = dbutils.secrets.get(
-        scope=DATABRICKS_SCOPE, key=ApiEnum.TRACKSALE
+        scope=DATABRICKS_SCOPE, key=APIEnum.TRACKSALE
     )
     credentials = json.loads(json_credentials)
     spark_client = SparkClient()
