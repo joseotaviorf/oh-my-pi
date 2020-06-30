@@ -1,5 +1,6 @@
 import json
 import logging
+import sys
 
 from argparse import ArgumentParser
 from datetime import datetime
@@ -73,9 +74,12 @@ if __name__ == "__main__":
     credentials = json.loads(json_credentials)
     spark_client = SparkClient()
     api_response = get_api_response(credentials["token"], endpoint_name, api_params)
-
-    # transform array and json types to string
     json_data = JsonService.transform_json_list_terms(api_response)
+
+    if not json_data:
+        logger.warning("m=__main__, msg=no incremental data to process here")
+        sys.exit()
+
     df = spark_client.create_dataframe(json_data)
 
     dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
