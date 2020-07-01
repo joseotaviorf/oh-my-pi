@@ -1,5 +1,4 @@
 import logging
-import sys
 
 from argparse import ArgumentParser
 from collections import OrderedDict
@@ -77,37 +76,34 @@ if __name__ == "__main__":
     s3_loader = S3Loader()
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
-    if df is None:
-        logger.warning("m=__main__, msg=no incremental data to process here")
-        sys.exit()
+    if df:
+        df = SparkDataFrameService().input(df).optimize_partition(200000).output()
 
-    df = SparkDataFrameService().input(df).optimize_partition(200000).output()
+        database_name = db_info["db_clean_databricks"]
+        format_options = SparkTableStorageFormat.DEFAULT_CLEAN
+        database_location = db_info["db_clean_path"]
 
-    database_name = db_info["db_clean_databricks"]
-    format_options = SparkTableStorageFormat.DEFAULT_CLEAN
-    database_location = db_info["db_clean_path"]
-
-    s3_loader.load_incremental_table(
-        df=df,
-        database_name=database_name,
-        table_name=table_name,
-        format_options=format_options,
-        database_location=database_location,
-        partition_cols=partition_cols,
-    )
-    spark_metastore_loader.update_metastore(
-        df,
-        database_name,
-        table_name,
-        format_options,
-        database_location,
-        partition_cols,
-        force_recreate=False,
-    )
-    spark_metastore_service.create_new_partitions_from_df(
-        database_name=database_name,
-        table_name=table_name,
-        df=df,
-        partition_cols=partition_cols,
-    )
-    spark_metastore_service.refresh_table(database_name, table_name)
+        s3_loader.load_incremental_table(
+            df=df,
+            database_name=database_name,
+            table_name=table_name,
+            format_options=format_options,
+            database_location=database_location,
+            partition_cols=partition_cols,
+        )
+        spark_metastore_loader.update_metastore(
+            df,
+            database_name,
+            table_name,
+            format_options,
+            database_location,
+            partition_cols,
+            force_recreate=False,
+        )
+        spark_metastore_service.create_new_partitions_from_df(
+            database_name=database_name,
+            table_name=table_name,
+            df=df,
+            partition_cols=partition_cols,
+        )
+        spark_metastore_service.refresh_table(database_name, table_name)
