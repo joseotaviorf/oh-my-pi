@@ -39,6 +39,9 @@ with
     from fact fhs
     left join fact_house_listings fhl
       on fhs.sk_house_listing = fhl.sk_house_listing
+    left join dim_region dr
+      on dr.sk_region = fhl.sk_region
+    where coalesce(dr.city_group, dr.city_name) is not null
    ),
     OL as (
     select
@@ -108,6 +111,9 @@ with
     from fact_AL fhsal
     left join fact_house_listings fhl
       on fhsal.sk_house_listing = fhl.sk_house_listing
+    left join dim_region dr
+      on dr.sk_region = fhl.sk_region
+    where coalesce(dr.city_group, dr.city_name) is not null
     )
     select
         faal.week_start as week_start_al,
@@ -155,7 +161,6 @@ select
     count(distinct sk_house_listing_alo) as listings_alo
 from OL_AL_week
 group by 1,2,3,4,5,6,7,8,9
-order by 1,2
 ),
 week_flows as (
 -- Query to build the calculation base for ongoing listing flow by week.
@@ -204,7 +209,6 @@ select
 	date(least(week_start_ol,(week_start_al - interval '1 week')) + interval '1 week') as next_week_start
 from ol_flows
 group by 1,2,16
-order by 1 desc, 16 desc
 )
 select
 -- Query to calculate the ongoing listing flow by week.
@@ -226,4 +230,3 @@ select
 from week_flows wf
 where wf.week_start < date_trunc('week',current_date) - interval '1 week'
 group by 1,2,14
-order by 1 desc
