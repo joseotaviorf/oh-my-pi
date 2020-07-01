@@ -57,7 +57,7 @@ def create_endpoint_sub_dag(sub_dag_name, endpoint_name, extraction_type):
         start_date=MAIN_START_DATE,
     )._build_local_dag()
 
-    QuintoAndarDatabricksSubmitRunOperator(
+    load_to_raw_task = QuintoAndarDatabricksSubmitRunOperator(
         task_id=f"load-{endpoint_name}-to-raw",
         dag=endpoint_sub_dag,
         json={
@@ -69,6 +69,38 @@ def create_endpoint_sub_dag(sub_dag_name, endpoint_name, extraction_type):
         },
     )
 
+    load_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
+        task_id=f"load-{endpoint_name}-to-clean",
+        dag=endpoint_sub_dag,
+        json={
+            "spark_python_task": {
+                "python_file": SPARK_JOBS_PATH
+                + f"load_{extraction_type}_data_into_datalake_clean.py",
+                "parameters": [ENV, SOURCE, DATALAKE_BUCKET, "{{ ds }}", endpoint_name],
+            }
+        },
+    )
+
+    create_clean_external_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        task_id=f"create-{endpoint_name}-clean-external-table",
+        dag=endpoint_sub_dag,
+        json={
+            "spark_python_task": {
+                "python_file": SPARK_JOBS_PATH
+                + f"create_{extraction_type}_external_table.py",
+                "parameters": [
+                    ENV,
+                    SOURCE,
+                    DATALAKE_BUCKET,
+                    ATHENA_QUERY_RESULT_LOCATION,
+                    "{{ ds }}",
+                    endpoint_name,
+                ],
+            }
+        },
+    )
+
+    load_to_raw_task >> load_to_clean_task >> create_clean_external_table_task
     return endpoint_sub_dag
 
 
