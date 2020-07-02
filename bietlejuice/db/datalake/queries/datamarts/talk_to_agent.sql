@@ -89,17 +89,6 @@ house_properties as(
         on cast(nullif(r.id,'') as bigint)=h.id_region
 ),
 
--- Sales Agents (this determines business context)
-sales_agents as(
-    select distinct id_agent,
-        cast(u.id as integer) as id
-    from datalake_ebdb_clean_prod.booking a 
-    join datalake_clean.ods_dim_user u
-        on id_agent = cast(nullif(u.dados_agente_id,'') as bigint)
-    where a.business_context = 'SALE'
-        and id_agent is not null
-),
-
 -- Events (current registry for every Talk to Agent started)
 events as(
     select 
@@ -158,8 +147,10 @@ left join datalake_clean.ods_dim_user u
 left join house_properties h 
     on cast(h.sk_house_listing as integer) = e.house_id
 
-left join sales_agents sa
-    on sa.id=e.agent_id
+-- identifies the agent context with the booleans columns in user dimension: is_sale_agent
+left join datalake_clean.ods_dim_user sa
+    on e.agent_id = cast(sa.id as integer) 
+    and sa.is_sale_agent = 'True'
 
 -- version of the moment the tenant has sent the message
 join datalake_clean.ods_dim_house_listing m
