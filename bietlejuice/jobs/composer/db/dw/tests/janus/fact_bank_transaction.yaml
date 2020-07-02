@@ -1,6 +1,6 @@
 # Migration file for fact_bank_transaction
 dw_schema: bank
-columns-mapping:
+columns_mapping:
  - ods_column: sk_bank_account
    new_column_type: bigint
  - ods_column: sk_bank
