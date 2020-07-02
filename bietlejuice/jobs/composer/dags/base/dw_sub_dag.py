@@ -18,7 +18,7 @@ class DWSubDAG(BaseSubDAG):
         dw_bucket,
         dw_schema,
         relative_query_path,
-        spark_job_paths,
+        spark_job_path,
         spectrum_iam_role,
         schedule_interval=None,
     ):
@@ -30,7 +30,7 @@ class DWSubDAG(BaseSubDAG):
         :param dw_schema: dw schema name
         :param relative_query_path: relative query path from default queries path containing sql file for the table
         to be created
-        :param spark_job_paths: paths for spark jobs used in subdag tasks
+        :param spark_job_path: paths for spark jobs used in subdag tasks
         :param spectrum_iam_role: spectrum iam role to copy table files to Redshift
         :param schedule_interval: schedule interval
         """
@@ -40,21 +40,13 @@ class DWSubDAG(BaseSubDAG):
         self.dw_bucket = dw_bucket
         self.dw_schema = dw_schema
         self.relative_query_path = relative_query_path
-        self.spark_job_paths = spark_job_paths
+        self.spark_job_path = spark_job_path
         self.spectrum_iam_role = spectrum_iam_role
         self.schedule_interval = schedule_interval
 
-    def build_subdag(self, sub_dag_name, table_name, slugged_table_name):
-        """
-        Create a subdag containing 3 tasks:
-        1. load table to staging metastore database using a sql query
-        2. load table from staging metastore database to schema metastore database
-        3. load table to Redshift copying files from schema database in S3
-        :param sub_dag_name: subdag name
-        :param table_name: table name to be created
-        :param slugged_table_name: slugged table name for subdag
-        :return: the subdag created
-        """
+    def build_subdag(
+        self, sub_dag_name, table_name, slugged_table_name, test_ods_migration
+    ):
         sub_dag = BaseSubDAG(
             sub_dag_name=sub_dag_name,
             dag_name=self.dag_id,
@@ -67,7 +59,7 @@ class DWSubDAG(BaseSubDAG):
             task_id=f"load-{slugged_table_name}-into-dw-{self.dw_schema}-staging",
             json={
                 "spark_python_task": {
-                    "python_file": f"{self.spark_job_paths}/load_table_to_dw_staging_schema.py",
+                    "python_file": f"{self.spark_job_path}/load_table_to_dw_staging_schema.py",
                     "parameters": [
                         self.env,
                         self.dw_bucket,
@@ -84,7 +76,7 @@ class DWSubDAG(BaseSubDAG):
             task_id=f"load-{slugged_table_name}-into-dw-{self.dw_schema}",
             json={
                 "spark_python_task": {
-                    "python_file": f"{self.spark_job_paths}/load_table_to_dw_final_schema.py",
+                    "python_file": f"{self.spark_job_path}/load_table_to_dw_final_schema.py",
                     "parameters": [
                         self.env,
                         self.dw_bucket,
@@ -100,7 +92,7 @@ class DWSubDAG(BaseSubDAG):
             task_id=f"load-{slugged_table_name}-into-redshift",
             json={
                 "spark_python_task": {
-                    "python_file": f"{self.spark_job_paths}/load_table_to_redshift.py",
+                    "python_file": f"{self.spark_job_path}/load_table_to_redshift.py",
                     "parameters": [
                         self.env,
                         self.spectrum_iam_role,
@@ -112,6 +104,21 @@ class DWSubDAG(BaseSubDAG):
             },
         )
 
-        load_table_to_dw_staging_schema >> load_table_to_dw_final_schema >> load_table_to_redshift
+        if test_ods_migration:
+            test_entity_ods_migration = QuintoAndarDatabricksSubmitRunOperator(
+                dag=sub_dag,
+                task_id=f"test-{self.dw_schema}-{slugged_table_name}-ods-migration",
+                json={
+                    "spark_python_task": {
+                        "python_file": f"{self.spark_job_path}/test_ods_migration.py",
+                        "parameters": [self.env, table_name, "{{ ds }}"],
+                    }
+                },
+            )
+            load_table_to_dw_staging_schema >> test_entity_ods_migration >> load_table_to_dw_final_schema
+        else:
+            load_table_to_dw_staging_schema >> load_table_to_dw_final_schema
+
+        load_table_to_dw_final_schema >> load_table_to_redshift
 
         return sub_dag

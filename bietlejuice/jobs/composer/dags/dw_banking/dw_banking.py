@@ -63,12 +63,14 @@ dw_sub_dag = DWSubDAG(
     dw_bucket=DW_BUCKET,
     dw_schema=DW_SCHEMA,
     relative_query_path=DAG_NAME,
-    spark_job_paths=SPARK_JOBS_PATH,
+    spark_job_path=SPARK_JOBS_PATH,
     spectrum_iam_role=SPECTRUM_IAM_ROLE,
 )
 file_list = FileService.list_sql_files_without_extension_from_layer(DAG_NAME, "dw")
 
-dw_sub_dags = dw_sub_dag.build_subdags_from_sql_files(dag, file_list, "dw")
+dw_sub_dags = dw_sub_dag.build_subdags_from_sql_files(
+    dag=dag, file_list=file_list, layer="dw", test_ods_migration=True
+)
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
