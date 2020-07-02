@@ -1,8 +1,6 @@
 pipeline:
-  # TODO: After ODS migration we should replace the datalake_ebdb_clean Visit and
-  # Booking by dim_booking and dim_visit
-  attribution-conversion-paths-demand:
+  offer-attribution-conversion-paths-demand:
     dw:
-      sql_file: dw/queries/datamarts/attribution_conversion_paths_demand.sql
-      table: attribution_conversion_paths_demand
+      sql_file: dw/queries/datamarts/offer_attribution_conversion_paths_demand.sql
+      table: offer_attribution_conversion_paths_demand
       schema: datamarts
