@@ -92,7 +92,7 @@ class OdsMigrationValidation:
             conn_config={"db": "default"}, spark_client=SparkClient()
         )
         return databricks_consumer.get_data_from_query(
-            janus_query.format(schema="dw_janus")
+            janus_query.format(schema="dw_janus_staging")
         )
 
     def _get_dw_data(self, dw_query):

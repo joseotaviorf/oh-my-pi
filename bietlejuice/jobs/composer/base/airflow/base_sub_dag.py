@@ -53,6 +53,7 @@ class BaseSubDAG(object):
         :param dag: main dag to attach subdag to
         :param file_list: list of files containing sql queries for each table
         :param layer: layer that table belongs to
+        :param test_ods_migration: If true, adds a migration test task
         :return: a list of table name/subdag created
         """
         subdags = {}
