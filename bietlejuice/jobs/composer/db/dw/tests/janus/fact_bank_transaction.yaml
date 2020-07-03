@@ -10,3 +10,4 @@ columns_mapping:
  - ods_column: sk_transaction
    new_column: sk_transaction_date
    new_column_type: bigint
+base_date_column: ts_updated
