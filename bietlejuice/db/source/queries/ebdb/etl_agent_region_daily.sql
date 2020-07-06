@@ -1,9 +1,12 @@
-SELECT a.DadosAgente_id as DadosAgente_id,
-        a.regioes_id as regiao_id,
-        FROM_UNIXTIME(floor(b.timestamp/1000)) as dt,
-        a.REVTYPE
-    FROM DadosAgente_Regiao_AUD a
-    JOIN UsuarioRevisionEntity b
-         ON a.rev = b.id
-    WHERE FROM_UNIXTIME(floor(b.timestamp/1000))
-          BETWEEN DATE(TIMESTAMP('{}')) AND DATE(TIMESTAMP('{}'))
+SELECT DISTINCT DadosAgente_id, regiao_id,dt, REVTYPE FROM (
+     SELECT a.DadosAgente_id as DadosAgente_id,
+               a.regioes_id as regiao_id,
+               FROM_UNIXTIME(floor(b.timestamp/1000)) as dt,
+               a.REVTYPE
+          FROM DadosAgente_Regiao_AUD a
+          JOIN UsuarioRevisionEntity b
+               ON a.rev = b.id
+          WHERE FROM_UNIXTIME(floor(b.timestamp/1000))
+                    BETWEEN DATE(TIMESTAMP('{}')) AND DATE(TIMESTAMP('{}'))
+) AS agent_region_daily
+     
