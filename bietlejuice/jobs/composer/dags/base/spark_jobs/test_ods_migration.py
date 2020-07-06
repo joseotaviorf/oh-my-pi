@@ -30,10 +30,15 @@ if base_dbutils.get_dbutils() is not None:
 
 class OdsMigrationValidation:
 
-    DEFAULT_THRESHOLD = 0.1
     DEFAULT_SAMPLE_SIZE_MONTHS = 1
 
-    def __init__(self, table_name, execution_date, migration_metadata):
+    def __init__(self, tests_threshold, table_name, execution_date, migration_metadata):
+        self.count_test_min_assert_threshold = tests_threshold.get(
+            "count_test_min_assert", 1.0
+        )
+        self.content_test_max_error_threshold = tests_threshold.get(
+            "content_test_max_error", 0.1
+        )
         self.table_name = table_name
         self.execution_date = pd.to_datetime(execution_date)
         self.dw_schema = migration_metadata.get("dw_schema")
@@ -65,7 +70,27 @@ class OdsMigrationValidation:
             f"m=validate_counts, janus_result_count={janus_result_count}, "
             f"dw_result_count={dw_result_count}, msg=Validating counts."
         )
-        assert janus_result_count == dw_result_count
+
+        min_count = min(janus_result_count, dw_result_count)
+        max_count = max(janus_result_count, dw_result_count)
+        assertion_percentage = min_count / max_count
+
+        if assertion_percentage < self.count_test_min_assert_threshold:
+            raise AssertionError(
+                "m=validate_counts, "
+                f"assertion_percentage={assertion_percentage}, "
+                f"minimum_assertion_threshold={self.count_test_min_assert_threshold}, "
+                "msg=The count matching percentage of table in Janus and in DW "
+                "is smaller than the permitted threshold."
+            )
+
+        logger.info(
+            f"m=validate_counts, assertion_percentage={assertion_percentage}, "
+            f"minimum_assertion_threshold={self.count_test_min_assert_threshold}, "
+            "msg=The counts matching percentage is valid."
+        )
+
+        assert True
 
     def validate_content(self):
         """
@@ -129,17 +154,17 @@ class OdsMigrationValidation:
         df_errors = df_all.filter(col("test_control") == "ERROR")
 
         error_percentage = df_errors.count() / df_all.count()
-        if error_percentage > self.DEFAULT_THRESHOLD:
+        if error_percentage > self.content_test_max_error_threshold:
             raise AssertionError(
                 "m=assert_dfs_are_equal "
                 f"error_percentage={error_percentage}, "
-                f"acceptable_threshold={self.DEFAULT_THRESHOLD}, "
+                f"acceptable_threshold={self.content_test_max_error_threshold}, "
                 "msg=The data from table in Janus and in DW are divergent."
             )
 
         logger.info(
             f"m=assert_dfs_are_equal error_percentage={error_percentage}, "
-            f"acceptable_threshold={self.DEFAULT_THRESHOLD}, msg=The "
+            f"acceptable_threshold={self.content_test_max_error_threshold}, msg=The "
             f"contents are valid."
         )
 
@@ -162,6 +187,7 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
     parser.add_argument("table_name")
+    parser.add_argument("tests_threshold")
     parser.add_argument("execution_date")
 
     args = parser.parse_args()
@@ -174,6 +200,7 @@ if __name__ == "__main__":
     test_file_path = f"{BASE_ODS_MIGRATION_TEST_FILES}{args.table_name}.yaml"
     migration_metadata = FileService.get_dict_from_yaml_file(test_file_path)
     migration_validation = OdsMigrationValidation(
+        tests_threshold=args.tests_threshold,
         table_name=args.table_name,
         execution_date=args.execution_date,
         migration_metadata=migration_metadata,

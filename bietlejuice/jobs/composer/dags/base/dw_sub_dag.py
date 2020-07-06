@@ -1,3 +1,4 @@
+from airflow.models import Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
@@ -114,7 +115,12 @@ class DWSubDAG(BaseSubDAG):
                 json={
                     "spark_python_task": {
                         "python_file": f"{self.spark_job_path}/test_ods_migration.py",
-                        "parameters": [self.env, table_name, "{{ ds }}"],
+                        "parameters": [
+                            self.env,
+                            table_name,
+                            Variable.get("ODS_MIGRATION_TESTS_THRESHOLD"),
+                            "{{ ds }}",
+                        ],
                     }
                 },
             )
