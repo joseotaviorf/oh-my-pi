@@ -1,6 +1,5 @@
 from datetime import datetime
 
-import airflow.utils.helpers as airflow_helpers
 import pendulum
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
@@ -8,33 +7,31 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
 )
+import airflow.utils.helpers as airflow_helpers
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.base.pipeline import LayerEnum
+from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
+from bietlejuice.jobs.composer.services import FileService
 
-DAG_ID = "docx"
+
+SOURCE = "docx"
+
+# airflow vars
 ENV = Variable.get("environment")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
-
+DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 
-LOAD_DOCX_INTO_DATALAKE_RAW_FILE_PATH = (
-    S3_PREFIX + "/spark_jobs/{}/load_docx_into_datalake.py".format(DAG_ID)
-)
-CREATE_RAW_EXTERNAL_TABLES_FILE_PATH = (
-    S3_PREFIX + "/spark_jobs/{}/create_raw_external_tables.py".format(DAG_ID)
-)
-
-LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
-    Variable.get("databricks_s3_bucket"), DAG_ID
-)
-
+# spark and databricks vars
+SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/"
+LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{SOURCE}"
 CLUSTER_DESCRIPTION = Variable.get(
     "databricks_minimum_resources_cluster", deserialize_json=True
 )
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
-
 DEFAULT_LIBRARIES = Variable.get("bietlejuice_default_libraries", deserialize_json=True)
 CUSTOM_LIBRARIES = [
     {
@@ -43,13 +40,14 @@ CUSTOM_LIBRARIES = [
 ]
 LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
 
+# DAG vars
+DAG_ID = f"bietlejuice.{SOURCE}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 6 * * *"
 
-
 dag = DAG(
-    dag_id="bietlejuice.{}".format(DAG_ID),
+    dag_id=DAG_ID,
     default_args={
         "owner": BaseDAG.DEFAULT_OWNER,
         "wait_for_downstream": False,
@@ -71,30 +69,49 @@ docx_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     dag=dag,
     json={
         "spark_python_task": {
-            "python_file": LOAD_DOCX_INTO_DATALAKE_RAW_FILE_PATH,
+            "python_file": f"{SPARK_JOB_PATH}/{SOURCE}/load_docx_into_datalake.py",
             "parameters": [ENV, DATALAKE_BUCKET],
         }
     },
 )
 
+# temp
 create_raw_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id="create-raw-external-tables",
     dag=dag,
     json={
         "spark_python_task": {
-            "python_file": CREATE_RAW_EXTERNAL_TABLES_FILE_PATH,
+            "python_file": f"{SPARK_JOB_PATH}/{SOURCE}/create_raw_external_tables.py",
             "parameters": [ENV, DATALAKE_BUCKET, ATHENA_QUERY_RESULT_LOCATION],
         }
     },
 )
 
+clean_sub_dag = DatalakeSubDAG(
+    dag_id=DAG_ID,
+    start_date=MAIN_START_DATE,
+    env=ENV,
+    datalake_bucket=DATALAKE_BUCKET,
+    layer=LayerEnum.CLEAN,
+    database_base_name=SOURCE,
+    relative_query_path=SOURCE,
+    spark_job_paths=f"{SPARK_JOB_PATH}/base",
+    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
+)
+file_list = FileService.list_sql_files_without_extension_from_layer(
+    SOURCE, LayerEnum.CLEAN.value
+)
+clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(dag, file_list)
+
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
+create_cluster_task >> docx_to_datalake_raw_task >> list(
+    clean_sub_dags.values()
+) >> terminate_cluster_task
+
+# temp
 airflow_helpers.chain(
-    create_cluster_task,
-    docx_to_datalake_raw_task,
-    create_raw_external_tables_task,
-    terminate_cluster_task,
+    docx_to_datalake_raw_task, create_raw_external_tables_task, terminate_cluster_task
 )

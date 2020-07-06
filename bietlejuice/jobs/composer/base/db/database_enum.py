@@ -4,7 +4,7 @@ class DatabaseEnum:
     CHAT_FUP = "CHAT_FUP_DB"
     CIDADE_ALERTA = "CIDADE_ALERTA_DB"
     DARKRUM = "ENV_DARKRUM"
-    DOCX = "ENV_DOCX"
+    DOCX = "DOCX_DB"
     DW = "ENV_DW"
     EBDB = "EBDB_DB"
     FIRESTORE = "FIRESTORE_DB"
