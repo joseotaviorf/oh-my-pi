@@ -27,16 +27,18 @@ class GoogleSheets(object):
 
         gsheets = GoogleSheetsClient(self.google_s_a_credentials, self.google_api_scope)
 
-        df_gsheets = gsheets.get_dataframe_from_sheet(sheet_name=google_sheets_file['sheetName'],
+        df_gsheets_raw = gsheets.get_dataframe_from_sheet(sheet_name=google_sheets_file['sheetName'],
                                                       sheet_id=google_sheets_file['sheetId'])
-        if df_gsheets is None:
+        if df_gsheets_raw is None:
             raise ValueError(
                 "m=move_sheets_data_to_destination, sheet_id={}, sheet_name={}, "
                 "msg=no data found in google sheets.".format(
                     google_sheets_file['sheetId'], google_sheets_file['sheetName']))
 
-        snake_case_columns = self._to_snake_case_columns(df_gsheets.columns)
-        df_gsheets.rename(columns=snake_case_columns, inplace=True)
+        snake_case_columns = self._to_snake_case_columns(df_gsheets_raw.columns)
+        df_gsheets_raw.rename(columns=snake_case_columns, inplace=True)
+
+        df_gsheets = self._exclude_empty_column_labels(df_gsheets_raw)
 
         if enumdb_destination == EnumDB.QuintoAndar_datalake:
             self._move_df_to_datalake(
@@ -71,6 +73,15 @@ class GoogleSheets(object):
             new_columns.update({old_column: new_column})
 
         return new_columns
+
+    @staticmethod
+    @logger
+    def _exclude_empty_column_labels(df):
+        """
+        Exclude columns with empty labels
+        """
+        select_labels_not_empty = list(filter (lambda column: column.strip() != '', df.columns))
+        return df[select_labels_not_empty]
 
     @logger(exclude='df')
     def _move_df_to_datalake(self, df, table_name, file_path=None, csv=False, date_versioning=False):
