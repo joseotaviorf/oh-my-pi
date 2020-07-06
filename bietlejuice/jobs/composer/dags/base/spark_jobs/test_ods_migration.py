@@ -197,10 +197,11 @@ if __name__ == "__main__":
         f"execution_date={args.execution_date}, msg=Job execution started."
     )
 
+    tests_threshold = json.loads(args.tests_threshold)
     test_file_path = f"{BASE_ODS_MIGRATION_TEST_FILES}{args.table_name}.yaml"
     migration_metadata = FileService.get_dict_from_yaml_file(test_file_path)
     migration_validation = OdsMigrationValidation(
-        tests_threshold=args.tests_threshold,
+        tests_threshold=tests_threshold,
         table_name=args.table_name,
         execution_date=args.execution_date,
         migration_metadata=migration_metadata,
