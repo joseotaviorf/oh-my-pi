@@ -1,0 +1,12 @@
+select
+    id,
+    id_proposal,
+    id_house,
+    id_user,
+    reason,
+    result,
+    status,
+    ts_created,
+    ts_updated
+from
+    datalake_docx_clean_prod.credit_evaluation;

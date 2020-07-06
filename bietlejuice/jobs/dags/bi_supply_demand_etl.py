@@ -551,6 +551,17 @@ dw_sale_fact_listing_sale_flows = BaseDAG.build_python_operator(
     },
 )
 
+ods_credit_evaluation_task = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id="ODS_credit_evaluation",
+    python_callable=create_table_in_db_from_datalake,
+    op_kwargs={
+        "table_name": "credit_evaluation",
+        "query_params": None,
+        "enum_db": EnumDB.BI_ODS,
+    },
+)
+
 # flow
 lead_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag, sub_dag_func=lead_sub_dag, sub_dag_name="Lead"
@@ -756,6 +767,8 @@ user_dag.set_downstream([bank_dag, bank_account_dag])
 bank_transaction_dag.set_upstream([bank_dag, bank_account_dag])
 
 inspection_dag >> fact_inspection_bookings_task
+
+ods_credit_evaluation_task >> proposal_dag
 
 trigger_bi_growth_dag_task.set_upstream(
     [
