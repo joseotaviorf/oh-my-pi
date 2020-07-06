@@ -13,6 +13,8 @@ select
     priceChangesOccurred as price_changes_occurred,
     priceChangesOccurred_MOD as mod_price_changes_occurred,
     enabled as is_enabled,
-    enabled_MOD as mod_is_enabled
+    enabled_MOD as mod_is_enabled,
+    operationmode as operation_mode,
+    operationmode_mod as mod_operation_mode
 from
     datalake_ebdb_raw.dynamicpricinghouse_aud

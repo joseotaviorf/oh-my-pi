@@ -9,5 +9,6 @@ select
   atualizadoEm as ts_updated,
   status,
   priceChangesOccurred as occurred_price_changes,
-  enabled as is_enabled
+  enabled as is_enabled,
+  operationmode as operation_mode
 from datalake_ebdb_raw.dynamicpricinghouse
