@@ -6,8 +6,10 @@ SELECT
     created_at AS ts_created,
     updated_at AS ts_updated,
     status,
-    canceled_at as ts_canceled,
-    vacancy_date as dt_vacancy,
-    source
+    canceled_at AS ts_canceled,
+    vacancy_date AS dt_vacancy,
+    source,
+    requested_by,
+    exit_inspection_id AS id_exit_inspection
 FROM
     datalake_terminator_raw.termination
