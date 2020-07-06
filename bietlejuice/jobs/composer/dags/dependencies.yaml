@@ -16,3 +16,7 @@ bietlejuice.dw_banking:
   - bietlejuice.ebdb:load-account
   - bietlejuice.ebdb:load-account-transaction
   - bietlejuice.ebdb:load-user
+
+bietlejuice.enrich_kill_queue_reservation:
+  - bietlejuice.kill_queue:load-house-to-datalake-clean
+  - bietlejuice.kill_queue:load-reservation-to-datalake-clean
