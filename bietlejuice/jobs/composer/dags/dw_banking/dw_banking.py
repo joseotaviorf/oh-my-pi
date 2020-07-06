@@ -11,6 +11,7 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.dags.base.dw_sub_dag import DWSubDAG
 from bietlejuice.jobs.composer.services import FileService
 
+
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 2, 20, 0, 0, 0, tzinfo=LOCAL_TZ)
 
@@ -67,10 +68,10 @@ dw_sub_dag = DWSubDAG(
     spectrum_iam_role=SPECTRUM_IAM_ROLE,
 )
 file_list = FileService.list_sql_files_without_extension_from_layer(DAG_NAME, "dw")
-
 dw_sub_dags = dw_sub_dag.build_subdags_from_sql_files(
-    dag=dag, file_list=file_list, layer="dw", test_ods_migration=True
+    dag, file_list, test_ods_migration=True
 )
+
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"

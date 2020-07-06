@@ -3,6 +3,7 @@ from airflow.operators.quintoandar_databricks import (
 )
 
 from bietlejuice.jobs.composer.base.airflow import BaseSubDAG
+from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 
 
 class DWSubDAG(BaseSubDAG):
@@ -43,6 +44,7 @@ class DWSubDAG(BaseSubDAG):
         self.spark_job_path = spark_job_path
         self.spectrum_iam_role = spectrum_iam_role
         self.schedule_interval = schedule_interval
+        self.layer = LayerEnum.DW
 
     def build_subdag(
         self, sub_dag_name, table_name, slugged_table_name, test_ods_migration
@@ -52,6 +54,7 @@ class DWSubDAG(BaseSubDAG):
             dag_name=self.dag_id,
             schedule_interval=self.schedule_interval,
             start_date=self.start_date,
+            layer=self.layer,
         )._build_local_dag()
 
         load_table_to_dw_staging_schema = QuintoAndarDatabricksSubmitRunOperator(

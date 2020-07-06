@@ -4,6 +4,7 @@ from airflow.executors.celery_executor import CeleryExecutor
 from airflow.operators.subdag_operator import SubDagOperator
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 
 
 class BaseSubDAG(object):
@@ -11,11 +12,20 @@ class BaseSubDAG(object):
     Base class for building the sub-dag flow.
     """
 
-    def __init__(self, sub_dag_name, dag_name, schedule_interval, start_date):
+    # To do: Refactor spark jobs to set layer param and remove None value
+    def __init__(
+        self, sub_dag_name, dag_name, schedule_interval, start_date, layer=None
+    ):
         self.sub_dag_name = sub_dag_name
         self.dag_name = dag_name
         self.schedule_interval = schedule_interval
         self.start_date = start_date
+
+        # To do: after refactor, remove "if layer".
+        if layer and not LayerEnum.is_layer_valid(layer):
+            raise ValueError(f"m=__init__, layer={layer}, msg=The layer is invalid.")
+
+        self.layer = layer
 
     def _build_local_dag(self):  # Todo: make public method
         """
@@ -23,7 +33,7 @@ class BaseSubDAG(object):
         :return: the new subdag
         """
         local_dag = BaseDAG.build_dag(
-            "{}.{}".format(self.dag_name, self.sub_dag_name),
+            f"{self.dag_name}.{self.sub_dag_name}",
             schedule_interval=self.schedule_interval,
             start_date=self.start_date,
         )
@@ -45,9 +55,7 @@ class BaseSubDAG(object):
             executor=CeleryExecutor(),
         )
 
-    def build_subdags_from_sql_files(
-        self, dag, file_list, layer, test_ods_migration=False
-    ):
+    def build_subdags_from_sql_files(self, dag, file_list, test_ods_migration=False):
         """
         Return a subdag for each table in a specified file list containing table's sqls
         :param dag: main dag to attach subdag to
@@ -61,7 +69,7 @@ class BaseSubDAG(object):
             slugged_table_name = file_name.replace("_", "-")
             table_sub_dag = BaseSubDAG.get_sub_dag_operator(
                 dag=dag,
-                sub_dag_name=f"load-{slugged_table_name}-to-{layer}",
+                sub_dag_name=f"load-{slugged_table_name}-to-{self.layer.value}",
                 sub_dag_func=self.build_subdag,
                 table_name=file_name,
                 slugged_table_name=slugged_table_name,
@@ -72,7 +80,9 @@ class BaseSubDAG(object):
         return subdags
 
     @abstractmethod
-    def build_subdag(self, sub_dag_name, table_name, slugged_table_name):
+    def build_subdag(
+        self, sub_dag_name, table_name, slugged_table_name, test_ods_migration
+    ):
         """
         Create the subdag following logic for each concrete class.
         It must be implemented in each concrete class.

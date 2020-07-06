@@ -28,7 +28,7 @@ class LoadTableToDWPipeline(AbstractPipeline):
 
     def run(self):
         """
-        Execute logic to load DW model to metastore
+        Creates the table in spark metastore based in the query from query_path
         """
         spark_client = SparkClient()
         spark_metastore_service = SparkMetastoreService(spark_client)

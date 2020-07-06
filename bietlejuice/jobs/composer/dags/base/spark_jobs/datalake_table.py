@@ -7,9 +7,11 @@ from bietlejuice.jobs.composer.base.db import (
     QUERIES_DATALAKE_PATH,
     DatalakeMetastoreService,
 )
-from bietlejuice.jobs.composer.pipeline.enrich_table_pipeline import EnrichTablePipeline
+from bietlejuice.jobs.composer.pipeline.datalake_table_pipeline import (
+    DatalakeTablePipeline,
+)
 
-JOB_NAME = "enrich_table"
+JOB_NAME = "datalake_table"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -55,7 +57,7 @@ if __name__ == "__main__":
         f"{QUERIES_DATALAKE_PATH}{relative_query_path}/{layer}/{table_name}.sql"
     )
 
-    enrich_table_pipeline = EnrichTablePipeline(
-        database_name, table_name, database_location, query_path
+    datalake_table_pipeline = DatalakeTablePipeline(
+        database_name, table_name, database_location, layer, query_path
     )
-    enrich_table_pipeline.run()
+    datalake_table_pipeline.run()

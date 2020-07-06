@@ -3,11 +3,12 @@ from airflow.operators.quintoandar_databricks import (
 )
 
 from bietlejuice.jobs.composer.base.airflow import BaseSubDAG
+from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 
 
-class EnrichSubDAG(BaseSubDAG):
+class DatalakeSubDAG(BaseSubDAG):
     """
-    Responsible for creating a subdag to load a enriched table to metastore (Spark and Athena)
+    Responsible for creating a subdag to load a table to metastore (Spark and Athena)
     """
 
     def __init__(
@@ -17,6 +18,7 @@ class EnrichSubDAG(BaseSubDAG):
         env,
         datalake_bucket,
         database_base_name,
+        layer,
         relative_query_path,
         spark_job_paths,
         athena_query_result_location,
@@ -26,6 +28,7 @@ class EnrichSubDAG(BaseSubDAG):
         :param dag_id: main dag id to attach subdag to
         :param start_date: start date
         :param env: forno or prod environments
+        :param layer: LayerEnum.ENRICH or LayerEnum.CLEAN values
         :param datalake_bucket: datalake bucket in S3
         :param database_base_name: database base name for the table database
         :param relative_query_path: relative query path from default queries path containing sql file for the table
@@ -44,14 +47,22 @@ class EnrichSubDAG(BaseSubDAG):
         self.athena_query_result_location = athena_query_result_location
         self.schedule_interval = schedule_interval
 
-    def build_subdag(self, sub_dag_name, table_name, slugged_table_name):
+        if layer not in [LayerEnum.CLEAN, LayerEnum.ENRICH]:
+            raise ValueError(f"m=__init__, layer={layer}, msg=The layer is invalid.")
+
+        self.layer = layer
+
+    def build_subdag(
+        self, sub_dag_name, table_name, slugged_table_name, test_ods_migration=False
+    ):
         """
         Create a subdag containing 2 tasks:
-        1. load table to enriched metastore database using a sql query
+        1. load table to metastore database using a sql query
         2. create a external table in Athena using metastore created before
         :param sub_dag_name: subdag name
         :param table_name: table name to be created
         :param slugged_table_name: slugged table name for subdag
+        :param test_ods_migration: just to be compatible with the base class
         :return: the subdag created
         """
         sub_dag = BaseSubDAG(
@@ -59,18 +70,19 @@ class EnrichSubDAG(BaseSubDAG):
             dag_name=self.dag_id,
             schedule_interval=self.schedule_interval,
             start_date=self.start_date,
+            layer=self.layer,
         )._build_local_dag()
 
-        enrich_table = QuintoAndarDatabricksSubmitRunOperator(
-            task_id=f"enrich-{slugged_table_name}",
+        datalake_table = QuintoAndarDatabricksSubmitRunOperator(
+            task_id=f"{self.layer.value}-{slugged_table_name}",
             dag=sub_dag,
             json={
                 "spark_python_task": {
-                    "python_file": f"{self.spark_job_paths}/enrich_table.py",
+                    "python_file": f"{self.spark_job_paths}/datalake_table.py",
                     "parameters": [
                         self.env,
                         self.datalake_bucket,
-                        "enrich",
+                        self.layer.value,
                         self.database_base_name,
                         self.relative_query_path,
                         table_name,
@@ -81,7 +93,7 @@ class EnrichSubDAG(BaseSubDAG):
 
         create_external_table = QuintoAndarDatabricksSubmitRunOperator(
             dag=sub_dag,
-            task_id=f"create-enrich-{slugged_table_name}-external-table",
+            task_id=f"create-{self.layer.value}-{slugged_table_name}-external-table",
             json={
                 "spark_python_task": {
                     "python_file": f"{self.spark_job_paths}/create_external_table.py",
@@ -89,7 +101,7 @@ class EnrichSubDAG(BaseSubDAG):
                         self.env,
                         self.datalake_bucket,
                         self.athena_query_result_location,
-                        "enrich",
+                        self.layer.value,
                         self.database_base_name,
                         table_name,
                     ],
@@ -97,6 +109,6 @@ class EnrichSubDAG(BaseSubDAG):
             },
         )
 
-        enrich_table >> create_external_table
+        datalake_table >> create_external_table
 
         return sub_dag

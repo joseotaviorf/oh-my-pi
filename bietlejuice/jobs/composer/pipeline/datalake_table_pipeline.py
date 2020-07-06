@@ -7,12 +7,12 @@ from bietlejuice.jobs.composer.services import FileService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 
-class EnrichTablePipeline(AbstractPipeline):
+class DatalakeTablePipeline(AbstractPipeline):
     """
-    Class to create a enriched table in spark metastore from a specified query.
+    Class to create a table in spark metastore from a specified query.
     """
 
-    def __init__(self, database_name, table_name, database_location, query_path):
+    def __init__(self, database_name, table_name, database_location, layer, query_path):
         """
         :param database_name: database name to create the enriched table
         :param table_name: table name
@@ -22,11 +22,13 @@ class EnrichTablePipeline(AbstractPipeline):
         self.database_name = database_name
         self.table_name = table_name
         self.database_location = database_location
+        self.layer = layer
         self.query_path = query_path
 
     def run(self):
         """
-        Execute logic to create the enriched table in spark metastore
+        Creates the table in spark metastore based in the query from query_path
+        and according to the layer set
         """
         spark_client = SparkClient()
         spark_metastore_service = SparkMetastoreService(spark_client)
@@ -38,7 +40,7 @@ class EnrichTablePipeline(AbstractPipeline):
         query = FileService.get_query_from_file_name(self.query_path)
         df = databricks_consumer.get_data_from_query(query)
 
-        format_options = SparkTableStorageFormat.get_storage("enrich")
+        format_options = SparkTableStorageFormat.get_storage(self.layer)
         s3_loader = S3Loader()
         s3_loader.load_full_table(
             df,
