@@ -144,42 +144,46 @@ tickets as (
 user_email as (
 	select
 		id_user,
+		cpf,
 		'email' as channel,
 		email as user_contact
 	from datalake_ebdb_clean_prod.user_aud
 	where mod_email = true
 		and email is not null
-	group by 1,2,3
+	group by 1,2,3,4
 ),
 user_alternative_email as (
 	select
 		id_user,
+		cpf,
 		'email' as channel,
 		alternative_email as user_contact
 	from datalake_ebdb_clean_prod.user_aud
 	where mod_alternative_email = true
 		and alternative_email is not null
-	group by 1,2,3
+	group by 1,2,3,4
 ),
 user_main_phone as (
 	select
 		id_user,
+		cpf,
 		'phone' as channel,
 		regexp_replace(main_phone,'(\D+)','') as user_contact
 	from datalake_ebdb_clean_prod.user_aud
 	where mod_main_phone = true
 		and main_phone is not null
-	group by 1,2,3
+	group by 1,2,3,4
 ),
 user_secondary_phone as (
 	select
 		id_user,
+		cpf,
 		'phone' as channel,
 		regexp_replace(secondary_phone,'(\D+)','') as user_contact
 	from datalake_ebdb_clean_prod.user_aud
 	where mod_secondary_phone = true
 		and secondary_phone is not null
-	group by 1,2,3
+	group by 1,2,3,4
 ),
 all_user_contacts as (
 	select * from user_email
@@ -195,8 +199,79 @@ user_contacts as (
 	select
 		user_contact,
 		channel,
+		max(cpf) as cpf,
 		max(id_user) as id_user
 	from all_user_contacts
+	group by 1,2
+),
+contract_people_email as (
+	select
+		cpf,
+		'email' as channel,
+		email as people_contact
+	from datalake_ebdb_clean_prod.contract_person_aud
+	where cpf is not null
+		and email is not null
+	group by 1,2,3
+),
+contract_people_phone_number as (
+	select
+		cpf,
+		'phone' as channel,
+		replace(regexp_replace(phone_number,'(\D+)',''),'+','') as people_contact
+	from datalake_ebdb_clean_prod.contract_person_aud
+	where cpf is not null
+		and phone_number is not null
+	group by 1,2,3
+),
+contract_people_secondary_phone as (
+	select
+		cpf,
+		'phone' as channel,
+		replace(regexp_replace(secondary_phone,'(\D+)',''),'+','') as people_contact
+	from datalake_ebdb_clean_prod.contract_person_aud
+	where cpf is not null
+		and secondary_phone is not null
+	group by 1,2,3
+),
+proposal_people_email as (
+	select
+		cpf,
+		'email' as channel,
+		email as people_contact
+	from datalake_ebdb_clean_prod.proponent_proposal_aud
+	where cpf is not null
+		and email is not null
+	group by 1,2,3
+),
+proposal_people_phone_number as (
+	select
+		cpf,
+		'phone' as channel,
+		regexp_replace(phone_number,'(\D+)','') as people_contact
+	from datalake_ebdb_clean_prod.proponent_proposal_aud
+	where cpf is not null
+		and phone_number is not null
+	group by 1,2,3
+),
+all_people_contacts as (
+	select * from contract_people_email
+	union
+	select * from contract_people_phone_number
+	union
+	select * from contract_people_secondary_phone
+	union
+	select * from proposal_people_email
+	union
+	select * from proposal_people_phone_number
+),
+-- avoid repeated contacts to obtain an 1:1 relation between contact and person (ex: phone numbers might be reused by other people)
+people_contacts as (
+	select
+		people_contact,
+		channel,
+		max(cpf) as cpf
+	from all_people_contacts
 	group by 1,2
 ),
 last_zendesk_user as (
@@ -220,7 +295,8 @@ distinct_zendesk_users as (
 ebdb_user as (
 	select
         zu.sk_zendesk_user,
-		coalesce(uc_email.id_user, uc_phone.id_user) as sk_user
+		coalesce(uc_email.id_user, uc_phone.id_user) as sk_user,
+		coalesce(uc_email.cpf,uc_phone.cpf,cp_phone.cpf,cp_email.cpf) as sk_personal_document
 	from distinct_zendesk_users zu
 	left join user_contacts uc_phone
 		on uc_phone.user_contact = zu.phone
@@ -228,7 +304,13 @@ ebdb_user as (
 	left join user_contacts uc_email
 		on uc_email.user_contact = zu.email
 		and uc_email.channel = 'email'
-    group by 1,2
+	left join people_contacts cp_phone
+		on cp_phone.people_contact = zu.phone
+		and cp_phone.channel = 'phone'
+	left join people_contacts cp_email
+		on cp_email.people_contact = zu.email
+		and cp_email.channel = 'email'
+    group by 1,2,3
 ),
 -- evaluate funnel keys from each ticket according to business rules
 ticket_funnel_keys as (
@@ -237,6 +319,7 @@ ticket_funnel_keys as (
 		coalesce(dc.sk_house_listing, dhl.sk_house_listing) as sk_house_listing,
 	    dc.sk_contract  as sk_contract,
 	    bu.sk_user as sk_user,
+	    bu.sk_personal_document,
 	    -- tickets will only have a valid client key according to its corresponding client type
 	    case when t.client_type = 'inquilino' then dc.sk_client end as sk_client,
 	    case when t.client_type in ('proprietário','imobiliária_b2b') then coalesce(dc.sk_owner, dhl.sk_owner) end as sk_owner
@@ -257,6 +340,7 @@ select
     coalesce(fk.sk_house_listing, -1) as sk_house_listing,
     coalesce(fk.sk_contract, -1)  as sk_contract,
     coalesce(fk.sk_user, fk.sk_client, fk.sk_owner, -1) as sk_user,
+    fk.sk_personal_document,
     coalesce(fk.sk_client, -1) as sk_client,
     coalesce(fk.sk_owner, -1) as sk_owner,
     t.sk_zendesk_requester_user,

@@ -4,6 +4,7 @@ create table if not exists zendesk.fact_tickets (
     sk_house_listing bigint,
     sk_contract bigint,
     sk_user bigint,
+    sk_personal_document varchar(30),
     sk_client bigint,
     sk_owner bigint,
     sk_zendesk_requester_user bigint,
