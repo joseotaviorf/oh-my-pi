@@ -22,10 +22,10 @@ class ListingFlowsSubDag(BaseSubDag):
     def build_listing_flows(self):
         listing_flows_dag = self._build_local_dag()
 
-        ods_listing_flows_with_reprocessed_leads_task, \
+        ods_listing_flows_with_reprocessed_leads_task, ods_potential_listings_task, \
             dw_fact_house_listing_flows = self.__build_data_tasks(listing_flows_dag)
 
-        ods_listing_flows_with_reprocessed_leads_task >> dw_fact_house_listing_flows
+        ods_listing_flows_with_reprocessed_leads_task >> ods_potential_listings_task >> dw_fact_house_listing_flows
 
         return listing_flows_dag
 
@@ -41,6 +41,16 @@ class ListingFlowsSubDag(BaseSubDag):
             }
         )
 
+        ods_potential_listings_task = BaseDAG.build_python_operator(
+            dag=dag,
+            task_id='ODS_potential_listings',
+            python_callable=utils.materialize_view_ods,
+            op_kwargs={
+                'bucket': self.bucket,
+                'view_name': 'potential_listings'
+            }
+        )
+
         dw_fact_house_listing_flows = BaseDAG.build_python_operator(
             dag=dag,
             task_id="DW_Fact_House_Listing_Flows",
@@ -53,4 +63,4 @@ class ListingFlowsSubDag(BaseSubDag):
             }
         )
 
-        return ods_listing_flows_with_reprocessed_leads_task, dw_fact_house_listing_flows
+        return ods_listing_flows_with_reprocessed_leads_task, ods_potential_listings_task, dw_fact_house_listing_flows
