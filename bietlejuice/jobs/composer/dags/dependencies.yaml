@@ -20,3 +20,6 @@ bietlejuice.dw_banking:
 bietlejuice.enrich_kill_queue:
   - bietlejuice.kill_queue:load-house-to-datalake-clean
   - bietlejuice.kill_queue:load-reservation-to-datalake-clean
+
+bietlejuice.dw_reservation:
+  - bietlejuice.enrich_kill_queue
