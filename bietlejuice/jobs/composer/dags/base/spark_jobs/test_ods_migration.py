@@ -139,10 +139,18 @@ class OdsMigrationValidation:
         return start_date, end_date
 
     def _assert_dfs(self, df_janus, df_dw):
-        df_dw_with_new_names = self._update_dw_df_columns_names(df_dw)
-        df_all = df_janus.unionByName(df_dw_with_new_names)
+        df_dw = self._update_dw_df_columns_names(df_dw)
+        df_dw = self._convert_all_df_columns_to_string(df_dw)
 
-        df_janus = df_janus.drop("ts_load")
+        df_janus = self._remove_janus_df_new_columns(df_janus)
+        df_janus = self._convert_all_df_columns_to_string(df_janus)
+
+        df_all = df_janus.unionByName(df_dw)
+
+        # remove ts_load since it will always differ
+        if "ts_load" in df_janus.columns:
+            df_janus = df_janus.drop("ts_load")
+
         new_columns = df_janus.columns
 
         window = Window.partitionBy(new_columns).rowsBetween(-sys.maxsize, sys.maxsize)
@@ -153,20 +161,27 @@ class OdsMigrationValidation:
 
         df_errors = df_all.filter(col("test_control") == "ERROR")
 
-        error_percentage = df_errors.count() / df_all.count()
-        if error_percentage > self.content_test_max_error_threshold:
-            raise AssertionError(
-                "m=assert_dfs_are_equal "
-                f"error_percentage={error_percentage}, "
-                f"acceptable_threshold={self.content_test_max_error_threshold}, "
-                "msg=The data from table in Janus and in DW are divergent."
+        if df_all.count() == 0:
+            logger.info(
+                "m=assert_dfs_are_equal, "
+                f"acceptable_threshold={self.content_test_max_error_threshold}, msg=The "
+                "dataframes are empty."
             )
+        else:
+            error_percentage = df_errors.count() / df_all.count()
+            if error_percentage > self.content_test_max_error_threshold:
+                raise AssertionError(
+                    "m=assert_dfs_are_equal "
+                    f"error_percentage={error_percentage}, "
+                    f"acceptable_threshold={self.content_test_max_error_threshold}, "
+                    "msg=The data from table in Janus and in DW are divergent."
+                )
 
-        logger.info(
-            f"m=assert_dfs_are_equal error_percentage={error_percentage}, "
-            f"acceptable_threshold={self.content_test_max_error_threshold}, msg=The "
-            f"contents are valid."
-        )
+            logger.info(
+                f"m=assert_dfs_are_equal error_percentage={error_percentage}, "
+                f"acceptable_threshold={self.content_test_max_error_threshold}, msg=The "
+                f"contents are valid."
+            )
 
         assert True
 
@@ -177,10 +192,30 @@ class OdsMigrationValidation:
         """
         for col_map in self.columns_mapping:
             new_col_name = col_map.get("new_column")
-            if new_col_name:
+            if new_col_name and col_map.get("ods_column"):
                 df_dw = df_dw.withColumn(new_col_name, col(col_map["ods_column"]))
                 df_dw = df_dw.drop(col_map["ods_column"])
         return df_dw
+
+    def _remove_janus_df_new_columns(self, df):
+        """
+        Remove from janus' data frame the columns added in the migration process.
+        """
+        for col_map in self.columns_mapping:
+            new_col_name = col_map.get("new_column")
+            if new_col_name and not col_map.get("ods_column"):
+                df = df.drop(new_col_name)
+        return df
+
+    @staticmethod
+    def _convert_all_df_columns_to_string(df):
+        """
+        In order to union data frames we must match columns names and types;
+        Converts every column of a data frame to string.
+        """
+        for cur_column in df.columns:
+            df = df.withColumn(cur_column, col(cur_column).cast("string"))
+        return df
 
 
 if __name__ == "__main__":
