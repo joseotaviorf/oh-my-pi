@@ -62,3 +62,8 @@ class BaseDAG:
             retry_delay=retry_delay,
             max_retry_delay=max_retry_delay,
         )
+
+    @staticmethod
+    def set_dependencies_in_sequence(sequence_list, from_list, to_list):
+        for item in sequence_list:
+            from_list[item].set_downstream(to_list[item])

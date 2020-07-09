@@ -67,9 +67,10 @@ class BaseSubDAG(object):
         subdags = {}
         for file_name in file_list:
             slugged_table_name = file_name.replace("_", "-")
+            slugged_layer = self.layer.value.replace("_", "-")
             table_sub_dag = BaseSubDAG.get_sub_dag_operator(
                 dag=dag,
-                sub_dag_name=f"load-{slugged_table_name}-to-{self.layer.value}",
+                sub_dag_name=f"load-{slugged_table_name}-to-{slugged_layer}",
                 sub_dag_func=self.build_subdag,
                 table_name=file_name,
                 slugged_table_name=slugged_table_name,

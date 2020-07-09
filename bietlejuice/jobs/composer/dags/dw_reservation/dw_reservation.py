@@ -8,6 +8,7 @@ from airflow.operators.quintoandar_databricks import (
 )
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.dags.base.dw_staging_sub_dag import DWStagingSubDAG
 from bietlejuice.jobs.composer.dags.base.dw_sub_dag import DWSubDAG
 from bietlejuice.jobs.composer.services import FileService
 from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
@@ -58,6 +59,16 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     libraries=LIBRARIES_DESCRIPTION,
 )
 
+dw_staging_sub_dag = DWStagingSubDAG(
+    dag_id=DAG_ID,
+    start_date=MAIN_START_DATE,
+    env=ENV,
+    dw_bucket=DW_BUCKET,
+    dw_schema=DW_SCHEMA,
+    relative_query_path=DAG_NAME,
+    spark_job_path=SPARK_JOBS_PATH,
+)
+
 dw_sub_dag = DWSubDAG(
     dag_id=DAG_ID,
     start_date=MAIN_START_DATE,
@@ -68,16 +79,23 @@ dw_sub_dag = DWSubDAG(
     spark_job_path=SPARK_JOBS_PATH,
     spectrum_iam_role=SPECTRUM_IAM_ROLE,
 )
+
 file_list = FileService.list_sql_files_without_extension_from_layer(
     DAG_NAME, LayerEnum.DW.value
 )
-dw_sub_dags = dw_sub_dag.build_subdags_from_sql_files(
+
+dw_staging_sub_dags = dw_staging_sub_dag.build_subdags_from_sql_files(
     dag, file_list, test_ods_migration=True
 )
 
+dw_sub_dags = dw_sub_dag.build_subdags_from_sql_files(dag, file_list)
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-create_cluster_task >> list(dw_sub_dags.values()) >> terminate_cluster_task
+BaseDAG.set_dependencies_in_sequence(file_list, dw_staging_sub_dags, dw_sub_dags)
+
+create_cluster_task >> list(dw_staging_sub_dags.values())
+
+list(dw_sub_dags.values()) >> terminate_cluster_task

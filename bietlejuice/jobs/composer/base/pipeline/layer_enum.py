@@ -6,7 +6,7 @@ class LayerEnum(Enum):
     CLEAN = "clean"
     CLEAN_STAGING = "clean_staging"
     ENRICH = "enrich"
-    STAGING = "staging"
+    DW_STAGING = "dw_staging"
     DW = "dw"
 
     @classmethod
