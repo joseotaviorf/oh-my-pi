@@ -192,10 +192,39 @@ class OdsMigrationValidation:
         """
         for col_map in self.columns_mapping:
             new_col_name = col_map.get("new_column")
-            if new_col_name and col_map.get("ods_column"):
-                df_dw = df_dw.withColumn(new_col_name, col(col_map["ods_column"]))
-                df_dw = df_dw.drop(col_map["ods_column"])
+            ods_col_name = col_map.get("ods_column")
+            new_type = col_map.get("new_column_type")
+            # renaming column
+            if self._is_column_renamed(
+                ods_col_name=ods_col_name, new_col_name=new_col_name
+            ):
+                df_dw = df_dw.withColumn(new_col_name, col(ods_col_name))
+                df_dw = df_dw.drop(ods_col_name)
+            # retyping column
+            if new_type:
+                new_type = self._map_redshift_to_spark_data_type(new_type)
+                if self._is_column_renamed(
+                    ods_col_name=ods_col_name, new_col_name=new_col_name
+                ):
+                    df_dw = df_dw.withColumn(
+                        new_col_name, col(new_col_name).cast(new_type)
+                    )
+                # if retyped column
+                elif self._is_column_name_kept(
+                    ods_col_name=ods_col_name, new_col_name=new_col_name
+                ):
+                    df_dw = df_dw.withColumn(
+                        ods_col_name, col(ods_col_name).cast(new_type)
+                    )
         return df_dw
+
+    @staticmethod
+    def _is_column_renamed(ods_col_name, new_col_name):
+        return new_col_name and ods_col_name
+
+    @staticmethod
+    def _is_column_name_kept(ods_col_name, new_col_name):
+        return ods_col_name and not new_col_name
 
     def _remove_janus_df_new_columns(self, df):
         """
@@ -216,6 +245,28 @@ class OdsMigrationValidation:
         for cur_column in df.columns:
             df = df.withColumn(cur_column, col(cur_column).cast("string"))
         return df
+
+    @staticmethod
+    def _map_redshift_to_spark_data_type(new_type):
+        """
+        Maps the conversion of data-type between Redshift (input) and Pyspark (output)
+        """
+        new_type = new_type.lower()
+        if new_type in ("smallint", "bigint", "date"):
+            return new_type
+        elif new_type.startswith("int"):
+            return "int"
+        # timestamp; timestamptz; timestamp with/out time zone
+        elif new_type.startswith("timestamp"):
+            return "timestamp"
+        elif new_type in ("bool", "boolean"):
+            return "boolean"
+        elif new_type.startswith(tuple(["decimal", "double", "real", "numeric"])):
+            return "double"
+        elif new_type.startswith(tuple(["varchar", "char"])):
+            return "string"
+        else:
+            raise TypeError("Unsupported Spark type: " + new_type)
 
 
 if __name__ == "__main__":
