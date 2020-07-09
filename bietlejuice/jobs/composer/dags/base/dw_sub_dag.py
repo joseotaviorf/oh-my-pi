@@ -50,6 +50,23 @@ class DWSubDAG(BaseSubDAG):
     def build_subdag(
         self, sub_dag_name, table_name, slugged_table_name, test_ods_migration
     ):
+        """
+        Create a subdag containing the tasks:
+        . load_table_to_dw_staging_schema: load table to staging schema in S3
+           using a sql query
+        . validate_entity: applies quality checks in the table loaded to the
+           staging schema
+        . test_entity_ods_migration: optionally adds a test task to validate
+           the ODS migration of this entity
+        . load_table_to_dw_final_schema: load table from staging metastore
+           database to final schema in s3
+        . load_table_to_redshift: load table to Redshift copying files from
+           final schema database in S3
+        :param sub_dag_name: subdag name
+        :param table_name: table name to be created
+        :param slugged_table_name: slugged table name for subdag
+        :return: the subdag created
+        """
         sub_dag = BaseSubDAG(
             sub_dag_name=sub_dag_name,
             dag_name=self.dag_id,
@@ -71,6 +88,17 @@ class DWSubDAG(BaseSubDAG):
                         self.relative_query_path,
                         table_name,
                     ],
+                }
+            },
+        )
+
+        emptiness_test = QuintoAndarDatabricksSubmitRunOperator(
+            dag=sub_dag,
+            task_id=f"test-{slugged_table_name}-emptiness",
+            json={
+                "spark_python_task": {
+                    "python_file": f"{self.spark_job_path}/emptiness_test.py",
+                    "parameters": [self.dw_schema, table_name],
                 }
             },
         )
@@ -124,9 +152,12 @@ class DWSubDAG(BaseSubDAG):
                     }
                 },
             )
-            load_table_to_dw_staging_schema >> test_entity_ods_migration >> load_table_to_dw_final_schema
+            load_table_to_dw_staging_schema.set_downstream([emptiness_test])
+            test_entity_ods_migration.set_upstream([emptiness_test])
+            test_entity_ods_migration >> load_table_to_dw_final_schema
         else:
-            load_table_to_dw_staging_schema >> load_table_to_dw_final_schema
+            load_table_to_dw_staging_schema.set_downstream([emptiness_test])
+            load_table_to_dw_final_schema.set_upstream([emptiness_test])
 
         load_table_to_dw_final_schema >> load_table_to_redshift
 
