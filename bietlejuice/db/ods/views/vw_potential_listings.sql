@@ -61,12 +61,11 @@ base_leads as (
     lead.utm_medium,
     coalesce(lower(btrim(lead.utm_campaign)) ~* '(institucional)|(branded)' and lower(btrim(lead.utm_campaign)) !~* '(non-branded)', false) as branded_lead,
     lead.codigo_imobiliaria is not null OR lead.flg_b2b as b2b_lead,
-    case
-      when lead.origem = 'Reprocessado'
-        then ( select rl.id_origin_lead from reprocessed_lead rl where rl.id = lead.id)
-      else NULL::bigint
-    end as old_lead_id
-  from lead
+  	rl.id_origin_lead as old_lead_id
+    from lead
+    left join reprocessed_lead rl
+  	  on rl.id = lead.id
+  		and lead.origem = 'Reprocessado'
 ),
 rep_leads as (
   select bl.lead_id,
@@ -80,6 +79,7 @@ rep_leads as (
     from base_leads bl
     left join base_leads old_bl
       on old_bl.lead_id = bl.old_lead_id
+        and bl.lead_origin = 'Reprocessado'
 ),
 acquisitions as (
   select
