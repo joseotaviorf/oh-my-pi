@@ -103,6 +103,17 @@ class DWSubDAG(BaseSubDAG):
             },
         )
 
+        duplicity_test = QuintoAndarDatabricksSubmitRunOperator(
+            dag=sub_dag,
+            task_id=f"test-{slugged_table_name}-duplicity",
+            json={
+                "spark_python_task": {
+                    "python_file": f"{self.spark_job_path}/duplicity_test.py",
+                    "parameters": [self.dw_schema, table_name],
+                }
+            },
+        )
+
         load_table_to_dw_final_schema = QuintoAndarDatabricksSubmitRunOperator(
             dag=sub_dag,
             task_id=f"load-{slugged_table_name}-into-dw-{self.dw_schema}",
@@ -152,13 +163,10 @@ class DWSubDAG(BaseSubDAG):
                     }
                 },
             )
-            load_table_to_dw_staging_schema.set_downstream([emptiness_test])
-            test_entity_ods_migration.set_upstream([emptiness_test])
-            test_entity_ods_migration >> load_table_to_dw_final_schema
-        else:
-            load_table_to_dw_staging_schema.set_downstream([emptiness_test])
-            load_table_to_dw_final_schema.set_upstream([emptiness_test])
+            load_table_to_dw_staging_schema >> test_entity_ods_migration >> load_table_to_dw_final_schema
 
+        load_table_to_dw_staging_schema.set_downstream([duplicity_test, emptiness_test])
+        load_table_to_dw_final_schema.set_upstream([duplicity_test, emptiness_test])
         load_table_to_dw_final_schema >> load_table_to_redshift
 
         return sub_dag
