@@ -14,6 +14,7 @@ SELECT
     transaction_id AS id_transaction,
     end_transaction_id AS id_end_transaction,
     operation_type,
+    category,
     created_at_mod AS mod_ts_created,
     updated_at_mod AS mod_ts_updated,
     level_mod AS mod_level,
@@ -24,6 +25,7 @@ SELECT
     comment_mod AS mod_comment,
     analyst_name_mod AS mod_analyst_name,
     analyst_main_id_mod AS mod_id_analyst,
-    proposal_id_mod AS mod_id_proposal
+    proposal_id_mod AS mod_id_proposal,
+    category_mod as mod_category
 FROM
     datalake_sorting_hat_raw.`creditanalysis_version`

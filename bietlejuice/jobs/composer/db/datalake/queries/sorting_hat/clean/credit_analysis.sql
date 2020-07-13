@@ -10,6 +10,7 @@ SELECT
     comment,
     analyst_name,
     analyst_main_id AS id_analyst,
-    proposal_id AS id_proposal
+    proposal_id AS id_proposal,
+    category
 FROM
     datalake_sorting_hat_raw.`creditanalysis`
