@@ -66,12 +66,26 @@ with house_available_hours as (
 , regions as (
 	select distinct
 		dr.id as region_id,
-		dr.region_code,
+		case 
+		    when dr.region_code = 'SPO 01' then 'SPO 01 FS' 
+		    when dr.region_code = 'SPO 02' then 'SPO 02 FS' 
+		    when dr.region_code = 'SPO 03' then 'SPO 02 FS' 
+		    when dr.region_code = 'SPO 04' then 'SPO 03 FS' 
+		    when dr.region_code = 'SPO 05' then 'SPO 04 FS' 
+		    when dr.region_code = 'SPO 06' then 'SPO 05 FS' 
+		    when dr.region_code = 'SPO 07' then 'SPO 05 FS' 
+		    when dr.region_code = 'SPO 08' then 'SPO 04 FS' 
+		    when dr.region_code = 'SPO 09' then 'SPO 06 FS' 
+		    when dr.region_code = 'SPO 10' then 'SPO 01 FS' 
+		    when dr.region_code = 'SPO 11' then 'SPO 06 FS' 
+		    else NULL 
+		end as region_code,
 		dr.city_group,
 		dr.city_name,
 		dr.name as neighborhood
 	from datalake_clean.ods_dim_region dr
 	where dr.region_code != '-1'
+	    and dr.city_name = 'São Paulo'
 )
 , slot_series as (
 	select slot 
