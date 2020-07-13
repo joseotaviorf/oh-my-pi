@@ -131,6 +131,8 @@ bookings as (
                     when s.reason_enum = 'CANCELED_BY_TENANT_NOT_RENTING' then 'Tenant'
                     when s.reason_enum = 'CANCELED_BY_TENANT_NOT_RENTING_BY_5A' then 'Tenant'
                     when s.reason_enum = 'CANCELED_BY_TENANT_OTHER_REASON' then 'Tenant'
+                    when s.reason_enum = 'CANCELED_OWNER_CONSEQUENCE_MANAGEMENT_REACTION_DUE_VISIT_CANCELATION' then 'Consequence Management'
+                    when s.reason_enum = 'CANCELED_OWNER_CONSEQUENCE_MANAGEMENT_REACTION_DUE_NO_SHOW' then 'Consequence Management'
                     else 'Unknown'
                 end
 	    end as cancellation_reason_category,
