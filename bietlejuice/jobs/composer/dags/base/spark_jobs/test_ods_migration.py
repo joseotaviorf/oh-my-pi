@@ -252,7 +252,7 @@ class OdsMigrationValidation:
         Maps the conversion of data-type between Redshift (input) and Pyspark (output)
         """
         new_type = new_type.lower()
-        if new_type in ("smallint", "bigint", "date"):
+        if new_type in ("smallint", "bigint", "date", "float"):
             return new_type
         elif new_type.startswith("int"):
             return "int"
