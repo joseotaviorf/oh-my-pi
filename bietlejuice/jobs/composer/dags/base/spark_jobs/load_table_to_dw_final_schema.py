@@ -4,9 +4,8 @@ from argparse import ArgumentParser
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.db import DWMetastoreService
-from bietlejuice.jobs.composer.pipeline.load_table_to_dw_final_schema_pipeline import (
-    LoadTableToDWFinalSchemaPipeline,
-)
+from bietlejuice.jobs.composer.base.pipeline import LayerEnum
+from bietlejuice.jobs.composer.pipeline import TableLoaderPipeline
 
 JOB_NAME = "load_table_to_dw_final_schema"
 
@@ -41,10 +40,13 @@ if __name__ == "__main__":
         env, dw_schema, dw_bucket, "staging"
     )
 
-    load_table_to_dw_final_schema_pipeline = LoadTableToDWFinalSchemaPipeline(
+    query = f"SELECT * FROM {database_name_staging}.{table_name}"
+
+    table_loader_pipeline = TableLoaderPipeline(
         schema_database_name,
         table_name,
         schema_database_location,
-        database_name_staging,
+        LayerEnum.DW.value,
+        query,
     )
-    load_table_to_dw_final_schema_pipeline.run()
+    table_loader_pipeline.run()

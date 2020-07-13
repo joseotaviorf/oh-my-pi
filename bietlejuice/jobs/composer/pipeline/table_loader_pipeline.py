@@ -3,32 +3,30 @@ from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer
 from bietlejuice.jobs.composer.loaders import SparkMetastoreLoader, S3Loader
 from bietlejuice.jobs.composer.pipeline.abstract_pipeline import AbstractPipeline
-from bietlejuice.jobs.composer.services import FileService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 
-class DatalakeTablePipeline(AbstractPipeline):
+class TableLoaderPipeline(AbstractPipeline):
     """
     Class to create a table in spark metastore from a specified query.
     """
 
-    def __init__(self, database_name, table_name, database_location, layer, query_path):
+    def __init__(self, database_name, table_name, database_location, layer, query):
         """
         :param database_name: database name to create the enriched table
         :param table_name: table name
         :param database_location: database location in S3
-        :param query_path: query path for specified table query
+        :param query: query for specified table
         """
         self.database_name = database_name
         self.table_name = table_name
         self.database_location = database_location
         self.layer = layer
-        self.query_path = query_path
+        self.query = query
 
     def run(self):
         """
-        Creates the table in spark metastore based in the query from query_path
-        and according to the layer set
+        Creates the table in spark metastore based in the query and according to the layer set
         """
         spark_client = SparkClient()
         spark_metastore_service = SparkMetastoreService(spark_client)
@@ -37,8 +35,7 @@ class DatalakeTablePipeline(AbstractPipeline):
         conn_config = {"db": self.database_name}
         databricks_consumer = DatabricksConsumer(conn_config, spark_client)
 
-        query = FileService.get_query_from_file_name(self.query_path)
-        df = databricks_consumer.get_data_from_query(query)
+        df = databricks_consumer.get_data_from_query(self.query)
 
         format_options = SparkTableStorageFormat.get_storage(self.layer)
         s3_loader = S3Loader()

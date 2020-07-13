@@ -73,12 +73,12 @@ class DatalakeSubDAG(BaseSubDAG):
             layer=self.layer,
         )._build_local_dag()
 
-        datalake_table = QuintoAndarDatabricksSubmitRunOperator(
-            task_id=f"{self.layer.value}-{slugged_table_name}",
+        load_table = QuintoAndarDatabricksSubmitRunOperator(
+            task_id=f"load-{self.layer.value}-{slugged_table_name}",
             dag=sub_dag,
             json={
                 "spark_python_task": {
-                    "python_file": f"{self.spark_job_paths}/datalake_table.py",
+                    "python_file": f"{self.spark_job_paths}/load_table.py",
                     "parameters": [
                         self.env,
                         self.datalake_bucket,
@@ -109,6 +109,6 @@ class DatalakeSubDAG(BaseSubDAG):
             },
         )
 
-        datalake_table >> create_external_table
+        load_table >> create_external_table
 
         return sub_dag

@@ -14,7 +14,7 @@ class SparkTableStorageFormat:
 
     @classmethod
     def get_valid_storages(cls):
-        return ["raw", "clean", "enrich", "clean_staging"]
+        return ["raw", "clean", "enrich", "clean_staging", "dw_staging", "dw"]
 
     @classmethod
     def get_storage(cls, storage):
@@ -28,4 +28,6 @@ class SparkTableStorageFormat:
             "clean": cls.DEFAULT_CLEAN,
             "enrich": cls.DEFAULT_ENRICH,
             "clean_staging": cls.DEFAULT_CLEAN_STAGING,
+            "dw_staging": cls.DEFAULT_DW_STAGING,
+            "dw": cls.DEFAULT_DW,
         }.get(storage)
