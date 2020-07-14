@@ -23,3 +23,8 @@ bietlejuice.enrich_kill_queue:
 
 bietlejuice.dw_reservation:
   - bietlejuice.enrich_kill_queue
+
+bietlejuice.enrich_ebdb_smart_price:
+  - bietlejuice.ebdb:load-house-aud
+  - bietlejuice.ebdb:load-dynamic-pricing-house-aud
+  - bietlejuice.ebdb:load-user-revision-entity
