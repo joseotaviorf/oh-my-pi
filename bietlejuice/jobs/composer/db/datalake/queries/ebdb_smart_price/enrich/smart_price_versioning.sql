@@ -172,7 +172,7 @@ smp_aud as (
         dpa.rev,
         dpa.id_dynamic_pricing_parameter,
         dpa.status,
-        from_unixtime(cast(ure.ts_revision as bigint)/1000) as date_time
+        cast(from_unixtime(cast(ure.ts_revision as bigint)/1000) as timestamp) as date_time
     from
         datalake_ebdb_clean.dynamic_pricing_house_aud  dpa
     join
