@@ -84,6 +84,7 @@ select
 	max(ts_updated) as credit_evaluation_last_date,
 	count(distinct id) as number_evaluations
 from public.credit_evaluation
+where status = 'FINISHED'
 group by 1
 ),
 credit_evaluation as (
