@@ -28,3 +28,6 @@ bietlejuice.enrich_ebdb_smart_price:
   - bietlejuice.ebdb:load-house-aud
   - bietlejuice.ebdb:load-dynamic-pricing-house-aud
   - bietlejuice.ebdb:load-user-revision-entity
+
+bietlejuice.enrich_amplitude_visit:
+  - bietlejuice.amplitude
