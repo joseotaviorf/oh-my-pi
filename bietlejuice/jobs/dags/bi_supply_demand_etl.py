@@ -36,6 +36,7 @@ from bietlejuice.jobs.dags.supply_demand_funnel import (
     LeadConversionSubDag,
     SpecialConditionSubDag,
     ListingFlowsSubDag,
+    SalesListingFlowsSubDag
 )
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
@@ -427,6 +428,17 @@ def listing_flows_sub_dag(sub_dag_name):
     return sub_dag.build_listing_flows()
 
 
+def sales_listing_flows_sub_dag(sub_dag_name):
+    sub_dag = SalesListingFlowsSubDag(
+        bucket=bucket,
+        sub_dag_name=sub_dag_name,
+        dag_name=MAIN_DAG_NAME,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+    )
+    return sub_dag.build_sales_listing_flows()
+
+
 ods_house_rent_flow = BaseDAG.build_python_operator(
     task_id="ODS_house_rent_flow",
     dag=main_dag,
@@ -499,20 +511,6 @@ ods_house_listing_flows = BaseDAG.build_python_operator(
     python_callable=extract_query_dim_from_ebdb_to_ods,
     execution_timeout=timedelta(hours=7),
     op_kwargs={"table_name": "fact_house_listing_flows"},
-)
-
-dw_sale_fact_listing_flows = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id="DW_Sale_Fact_Listing_Flows",
-    python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={
-        "dim_name": "listing_flows",
-        "is_fact": True,
-        "bucket": bucket,
-        "insert_dummy": False,
-        "schema_source": "sale",
-        "schema_dest": "sale",
-    },
 )
 
 dw_rent_flow_taxonomy_task = BaseDAG.build_python_operator(
@@ -657,6 +655,10 @@ listing_flows_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag, sub_dag_func=listing_flows_sub_dag, sub_dag_name="ListingFlows"
 )
 
+dw_sale_fact_listing_flows_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag, sub_dag_func=sales_listing_flows_sub_dag, sub_dag_name="SalesListingFlows"
+)
+
 xcom_fact_listing_rent_flows = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id="XCom_fact_listing_rent_flows",
@@ -741,7 +743,7 @@ listing_flows_dag.set_upstream(
     ]
 )
 
-dw_sale_fact_listing_flows.set_upstream(
+dw_sale_fact_listing_flows_dag.set_upstream(
     [
         lead_dag,
         photo_job_dag,
