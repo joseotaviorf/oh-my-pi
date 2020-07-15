@@ -94,6 +94,7 @@ class DWStagingSubDAG(BaseSubDAG):
             },
         )
 
+        test_tasks = [duplicity_test, emptiness_test]
         if test_ods_migration:
             test_entity_ods_migration = QuintoAndarDatabricksSubmitRunOperator(
                 dag=sub_dag,
@@ -110,8 +111,32 @@ class DWStagingSubDAG(BaseSubDAG):
                     }
                 },
             )
-            load_table_to_dw_staging_schema >> test_entity_ods_migration
+            test_tasks.append(test_entity_ods_migration)
 
-        load_table_to_dw_staging_schema.set_downstream([duplicity_test, emptiness_test])
+        if self.is_dim(table_name):
+            add_default_row_to_dim = QuintoAndarDatabricksSubmitRunOperator(
+                dag=sub_dag,
+                task_id=f"add-default-row-to-{slugged_table_name}",
+                json={
+                    "spark_python_task": {
+                        "python_file": f"{self.spark_job_path}/add_default_row_to_dim.py",
+                        "parameters": [
+                            self.env,
+                            self.dw_bucket,
+                            self.dw_schema,
+                            self.layer.value,
+                            table_name,
+                        ],
+                    }
+                },
+            )
+            load_table_to_dw_staging_schema.set_downstream(add_default_row_to_dim)
+            add_default_row_to_dim.set_downstream(test_tasks)
+        else:
+            load_table_to_dw_staging_schema.set_downstream(test_tasks)
 
         return sub_dag
+
+    @staticmethod
+    def is_dim(table_name):
+        return table_name.startswith("dim_")
