@@ -77,3 +77,6 @@ create table public.potential_listings (
       house_usuario_que_cadastrou_id integer
 );
 
+CREATE INDEX pot_list_lead_id_idx ON public.potential_listings USING btree (lead_id);
+CREATE INDEX pot_list_region_id_idx ON public.potential_listings USING btree (region_id);
+CREATE INDEX pot_list_usuario_que_cadast_id_idx ON public.potential_listings USING btree (house_usuario_que_cadastrou_id);

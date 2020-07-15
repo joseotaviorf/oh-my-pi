@@ -60,12 +60,23 @@ base_leads as (
     lead.utm_source,
     lead.utm_medium,
     coalesce(lower(btrim(lead.utm_campaign)) ~* '(institucional)|(branded)' and lower(btrim(lead.utm_campaign)) !~* '(non-branded)', false) as branded_lead,
+    lead.codigo_imobiliaria is not null OR lead.flg_b2b as b2b_lead
+    from lead
+),
+base_leads_reproc as (
+  select
+    lead.id as lead_id,
+    lead.tipo as lead_type,
+    lead.origem as lead_origin,
+    lead.utm_source,
+    lead.utm_medium,
+    coalesce(lower(btrim(lead.utm_campaign)) ~* '(institucional)|(branded)' and lower(btrim(lead.utm_campaign)) !~* '(non-branded)', false) as branded_lead,
     lead.codigo_imobiliaria is not null OR lead.flg_b2b as b2b_lead,
   	rl.id_origin_lead as old_lead_id
     from lead
-    left join reprocessed_lead rl
+    join reprocessed_lead rl
   	  on rl.id = lead.id
-  		and lead.origem = 'Reprocessado'
+    where lead.origem = 'Reprocessado'
 ),
 rep_leads as (
   select bl.lead_id,
@@ -77,9 +88,8 @@ rep_leads as (
     coalesce(old_bl.b2b_lead, bl.b2b_lead) as b2b_lead,
     coalesce(bl.lead_origin = 'Reprocessado', false) as reprocessed_flg
     from base_leads bl
-    left join base_leads old_bl
-      on old_bl.lead_id = bl.old_lead_id
-        and bl.lead_origin = 'Reprocessado'
+    left join base_leads_reproc old_bl
+      on old_bl.old_lead_id = bl.lead_id
 ),
 acquisitions as (
   select
