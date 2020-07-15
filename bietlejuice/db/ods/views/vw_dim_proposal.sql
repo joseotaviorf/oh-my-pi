@@ -75,6 +75,28 @@ sortinghat_prop as (
     coalesce(version_analysis_date, analysis_date) as first_analysis_date
   from sortinghat_prop_prev
   where rn = 1
+),
+credit_evaluation_order as (
+select
+	id_proposal,
+	min(case when "result" in ('PRE_APPROVED','REGULAR') then ts_updated end) as credit_evaluation_positive_first_date,
+	max(case when "result" in ('PRE_APPROVED','REGULAR') then ts_updated end) as credit_evaluation_positive_last_date,
+	max(ts_updated) as credit_evaluation_last_date,
+	count(distinct id) as number_evaluations
+from public.credit_evaluation
+group by 1
+),
+credit_evaluation as (
+select
+    ceo.id_proposal,
+    ceo.credit_evaluation_positive_first_date,
+    ceo.credit_evaluation_positive_last_date,
+    ce."result" as result_last,
+    ceo.number_evaluations
+from credit_evaluation_order ceo
+join public.credit_evaluation ce
+  on ceo.id_proposal = ce.id_proposal
+  and ceo.credit_evaluation_last_date = ce.ts_updated
 )
 select
   p.id as sk_proposal,
@@ -122,6 +144,8 @@ select
   p.tenant_last_doc_complete_date as dt_tenant_doc_complete,
   p.credit_evaluation_first_init_date as dt_first_credit_evaluation_init,
   p.credit_evaluation_last_init_date as dt_last_credit_evaluation_init,
+  ce.credit_evaluation_positive_first_date as dt_first_credit_evaluation_positive,
+  ce.credit_evaluation_positive_last_date as dt_last_credit_evaluation_positive,
   p.credit_evaluation_negative_first_date as dt_first_credit_evaluation_negative,
   p.credit_evaluation_negative_last_date as dt_last_credit_evaluation_negative,
   p.doc_analysis_first_approved_date as dt_first_doc_analysis_approved,
@@ -129,6 +153,8 @@ select
   p.doc_analysis_first_rejected_date as dt_first_doc_analysis_rejected,
   p.doc_analysis_last_rejected_date as dt_last_doc_analysis_rejected,
   nullif(shp.status, '') as status_sortinghat,
+  nullif(ce.result_last, '') as result_credit_evaluation,
+  ce.number_evaluations as credit_evaluation_count,
   doc_reused as flg_doc_reused,
   p.ts_processed,
   p.rejection_reason,
@@ -136,4 +162,6 @@ select
 from proposal p
 left join sortinghat_prop shp
   on shp.id = p.id
+left join credit_evaluation ce
+  on p.id = ce.id_proposal
 ;
