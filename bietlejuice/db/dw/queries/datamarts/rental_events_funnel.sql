@@ -28,8 +28,13 @@ select
 	dr.city_group,
 	null::boolean as is_b2b,
 	case when fhlf.mkt_origin = 'Owner PWA' then fhlf.mkt_origin||'-'||fhlf.mkt_channel else fhlf.mkt_origin end as supply_channel,
+	CASE
+	    WHEN fhlf.mkt_origin = 'B2B' then fhlf.mkt_origin
+	    WHEN fhlf.mkt_completion = 'Full Self-Service' then 'FSS'
+	    ELSE 'IS'
+		END AS lead_context,
 	null as demand_channel,
-  count(fhlf.sk_lead_date) as leads,
+  	count(fhlf.sk_lead_date) as leads,
 	null::bigint as prospects, -- this count is done on the prospect date because not all listings come from a lead, and maybe one lead brings multiple house listings
 	null::bigint as qualifieds,
 	null::bigint as opportunities,
@@ -57,7 +62,7 @@ join fact_house_listing_flows fhlf
 left join dim_region dr
   on dr.sk_region = fhlf.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 year ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7
 ),
 prospect as (
 select
@@ -66,6 +71,11 @@ select
 	dr.city_group,
 	null::boolean as is_b2b,
 	case when fhlf.mkt_origin = 'Owner PWA' then fhlf.mkt_origin||'-'||fhlf.mkt_channel else fhlf.mkt_origin end as supply_channel,
+	CASE
+	    WHEN fhlf.mkt_origin = 'B2B' then fhlf.mkt_origin
+	    WHEN fhlf.mkt_completion = 'Full Self-Service' then 'FSS'
+	    ELSE 'IS'
+		END AS lead_context,
 	null as demand_channel,
   null::bigint as leads,
 	count(fhlf.sk_prospect_date) as prospects, -- this count is done on the prospect date because not all listings come from a lead, and maybe one lead brings multiple house listings
@@ -95,7 +105,7 @@ join fact_house_listing_flows fhlf
 left join dim_region dr
   on dr.sk_region = fhlf.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 year ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7
 ),
 qualified as (
 select
@@ -104,6 +114,11 @@ select
 	dr.city_group,
 	null::boolean as is_b2b,
 	case when fhlf.mkt_origin = 'Owner PWA' then fhlf.mkt_origin||'-'||fhlf.mkt_channel else fhlf.mkt_origin end as supply_channel,
+	CASE
+	    WHEN fhlf.mkt_origin = 'B2B' then fhlf.mkt_origin
+	    WHEN fhlf.mkt_completion = 'Full Self-Service' then 'FSS'
+	    ELSE 'IS'
+		END AS lead_context,
 	null as demand_channel,
   null::bigint as leads,
 	null::bigint as prospects,
@@ -133,7 +148,7 @@ join fact_house_listing_flows fhlf
 left join dim_region dr
   on dr.sk_region = fhlf.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 year ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7
 ),
 opportunity as (
 select
@@ -142,6 +157,11 @@ select
 	dr.city_group,
 	null::boolean as is_b2b,
 	case when fhlf.mkt_origin = 'Owner PWA' then fhlf.mkt_origin||'-'||fhlf.mkt_channel else fhlf.mkt_origin end as supply_channel,
+	CASE
+	    WHEN fhlf.mkt_origin = 'B2B' then fhlf.mkt_origin
+	    WHEN fhlf.mkt_completion = 'Full Self-Service' then 'FSS'
+	    ELSE 'IS'
+		END AS lead_context,
 	null as demand_channel,
   null::bigint as leads,
 	null::bigint as prospects,
@@ -171,7 +191,7 @@ join fact_house_listing_flows fhlf
 left join dim_region dr
   on dr.sk_region = fhlf.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7
 ),
 listing as (
 select
@@ -180,6 +200,11 @@ select
 	dr.city_group,
 	null::boolean as is_b2b,
 	case when fhlf.mkt_origin = 'Owner PWA' then fhlf.mkt_origin||'-'||fhlf.mkt_channel else fhlf.mkt_origin end as supply_channel,
+	CASE
+	    WHEN fhlf.mkt_origin = 'B2B' then fhlf.mkt_origin
+	    WHEN fhlf.mkt_completion = 'Full Self-Service' then 'FSS'
+	    ELSE 'IS'
+		END AS lead_context,
 	null as demand_channel,
   null::bigint as leads,
 	null::bigint as prospects,
@@ -209,7 +234,7 @@ join fact_house_listing_flows fhlf
 left join dim_region dr
   on dr.sk_region = fhlf.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7
 ),
 messages_sent as (
 select
@@ -218,6 +243,7 @@ select
   dr.city_group,
   dhl.is_b2b,
   null as supply_channel,
+  null AS lead_context,
   'Other' as demand_channel,
   null::bigint as leads,
   null::bigint as prospects,
@@ -248,7 +274,7 @@ join dim_house_listing dhl
 left join (select distinct city_group, region_code from dim_region) dr
   on tta.region_code = dr.region_code
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7
 ),
 agent_supports as (
 select
@@ -257,6 +283,7 @@ select
   dr.city_group,
   dhl.is_b2b,
   null as supply_channel,
+  null AS lead_context,
   'Other' as demand_channel,
   null::bigint as leads,
   null::bigint as prospects,
@@ -289,7 +316,7 @@ join dim_house_listing dhl
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7
 ),
 visits_booked as (
 select
@@ -298,6 +325,7 @@ select
   dr.city_group,
   dhl.is_b2b,
   null as supply_channel,
+  null AS lead_context,
   db.mkt_channel as demand_channel,
   null::bigint as leads,
   null::bigint as prospects,
@@ -331,7 +359,7 @@ left join dim_booking db
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7
 ),
 visits_completed as (
 select
@@ -340,6 +368,7 @@ select
   dr.city_group,
   dhl.is_b2b,
   null as supply_channel,
+  null AS lead_context,
   db.mkt_channel as demand_channel,
   null::bigint as leads,
   null::bigint as prospects,
@@ -373,7 +402,7 @@ left join dim_booking db
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7
 ),
 offer_submitted as (
 select
@@ -382,6 +411,7 @@ select
   dr.city_group,
   dhl.is_b2b,
   null as supply_channel,
+  null AS lead_context,
   dof.mkt_medium as demand_channel,
   null::bigint as leads,
   null::bigint as prospects,
@@ -415,7 +445,7 @@ left join dim_offer dof
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date"between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7
 ),
 offer_approved as(
 select
@@ -424,6 +454,7 @@ select
   dr.city_group,
   dhl.is_b2b,
   null as supply_channel,
+  null AS lead_context,
   dof.mkt_medium as demand_channel,
   null::bigint as leads,
   null::bigint as prospects,
@@ -457,7 +488,7 @@ left join dim_offer dof
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7
 ),
 credit_evaluation_init as(
 select
@@ -466,6 +497,7 @@ select
   dr.city_group,
   dhl.is_b2b,
   null as supply_channel,
+  null AS lead_context,
   dof.mkt_medium as demand_channel,
   null::bigint as leads,
   null::bigint as prospects,
@@ -499,7 +531,7 @@ left join dim_offer dof
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7
 ),
 credit_evaluation_positive as(
 select
@@ -508,6 +540,7 @@ select
   dr.city_group,
   dhl.is_b2b,
   null as supply_channel,
+  null AS lead_context,
   dof.mkt_medium as demand_channel,
   null::bigint as leads,
   null::bigint as prospects,
@@ -544,7 +577,7 @@ left join dim_offer dof
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7
 ),
 doc_sent as(
 select
@@ -553,6 +586,7 @@ select
   dr.city_group,
   dhl.is_b2b,
   null as supply_channel,
+  null AS lead_context,
   dof.mkt_medium as demand_channel,
   null::bigint as leads,
   null::bigint as prospects,
@@ -586,7 +620,7 @@ left join dim_offer dof
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7
 ),
 doc_approved as(
 select
@@ -595,6 +629,7 @@ select
   dr.city_group,
   dhl.is_b2b,
   null as supply_channel,
+  null AS lead_context,
   dof.mkt_medium as demand_channel,
   null::bigint as leads,
   null::bigint as prospects,
@@ -628,7 +663,7 @@ left join dim_offer dof
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7
 ),
 doc_completed as(
 select
@@ -637,6 +672,7 @@ select
   dr.city_group,
   dhl.is_b2b,
   null as supply_channel,
+  null AS lead_context,
   dof.mkt_medium as demand_channel,
   null::bigint as leads,
   null::bigint as prospects,
@@ -670,7 +706,7 @@ left join dim_offer dof
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7
 ),
 credit_processed as(
 select
@@ -679,6 +715,7 @@ select
   dr.city_group,
   dhl.is_b2b,
   null as supply_channel,
+  null AS lead_context,
   dof.mkt_medium as demand_channel,
   null::bigint as leads,
   null::bigint as prospects,
@@ -712,7 +749,7 @@ left join dim_offer dof
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7
 ),
 credit_approved as(
 select
@@ -721,6 +758,7 @@ select
   dr.city_group,
   dhl.is_b2b,
   null as supply_channel,
+  null AS lead_context,
   dof.mkt_medium as demand_channel,
   null::bigint as leads,
   null::bigint as prospects,
@@ -754,7 +792,7 @@ left join dim_offer dof
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7
 ),
 contract_created as (
 select
@@ -763,6 +801,7 @@ select
   dr.city_group,
   dhl.is_b2b,
   null as supply_channel,
+  null AS lead_context,
   dof.mkt_medium as demand_channel,
   null::bigint as leads,
   null::bigint as prospects,
@@ -796,7 +835,7 @@ left join dim_offer dof
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7
 ),
 contract_signed as (
 select
@@ -805,6 +844,7 @@ select
   dr.city_group,
   dhl.is_b2b,
   null as supply_channel,
+  null AS lead_context,
   dof.mkt_medium as demand_channel,
   null::bigint as leads,
   null::bigint as prospects,
@@ -838,7 +878,7 @@ left join dim_offer dof
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7
 ),
 contract_ended as (
 select
@@ -847,6 +887,7 @@ select
   dr.city_group,
   dhl.is_b2b,
   null as supply_channel,
+  null AS lead_context,
   dof.mkt_medium as demand_channel,
   null::bigint as leads,
   null::bigint as prospects,
@@ -880,7 +921,7 @@ left join dim_offer dof
 left join dim_region dr
   on rf.sk_region = dr.sk_region
 where dd."date" between date_trunc('year',current_date) - interval '4 year' and current_date -- filter data from 4 years ago
-group by 1, 2, 3, 4, 5, 6
+group by 1, 2, 3, 4, 5, 6, 7
 ),
 union_all as (
   select * from lead_
@@ -931,6 +972,7 @@ select
 	ua.city_group,
   ua.is_b2b,
   ua.supply_channel,
+  ua.lead_context,
   ua.demand_channel,
   ua.leads,
   ua.prospects,
@@ -962,6 +1004,7 @@ select
 	"date",
 	city_group,
 	supply_channel,
+	lead_context,
     case when demand_channel in ('Not Mapped', 'Other') or demand_channel is null then 'Other'
          else demand_channel end as demand_channel,
   is_b2b as is_b2b_demand,
@@ -988,4 +1031,4 @@ select
   sum(contract_ended) as contract_ended,
   current_timestamp as ts_load
 from union_all
-group by "date", city_group, 3, 4, 5
+group by "date", city_group, 3, 4, 5, 6;
