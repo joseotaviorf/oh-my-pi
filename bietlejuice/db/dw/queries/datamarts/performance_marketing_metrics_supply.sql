@@ -2,7 +2,7 @@ with
 leads as (
 	select
 		nullif(f.sk_lead_date, -1) sk_date,
-		coalesce(dr.city_group, '') city_group,
+		coalesce(dr.city_group, 'Not Mapped') city_group,
 		coalesce(f.mkt_origin,'') mkt_origin,
 		coalesce(f.mkt_channel,'') mkt_channel,
 		coalesce(f.mkt_medium,'') mkt_medium,
@@ -24,7 +24,7 @@ leads as (
 prospects as (
 	select
 		nullif(f.sk_prospect_date, -1) sk_date,
-		coalesce(dr.city_group, '') city_group,
+		coalesce(dr.city_group, 'Not Mapped') city_group,
 		coalesce(f.mkt_origin,'') mkt_origin,
 		coalesce(f.mkt_channel,'') mkt_channel,
 		coalesce(f.mkt_medium,'') mkt_medium,
@@ -46,7 +46,7 @@ prospects as (
 qualifieds as (
 	select
 		nullif(f.sk_qualified_date, -1) sk_date,
-		coalesce(dr.city_group, '') city_group,
+		coalesce(dr.city_group, 'Not Mapped') city_group,
 		coalesce(f.mkt_origin,'') mkt_origin,
 		coalesce(f.mkt_channel,'') mkt_channel,
 		coalesce(f.mkt_medium,'') mkt_medium,
@@ -68,7 +68,7 @@ qualifieds as (
 opportunities as (
 	select
 		nullif(f.sk_opportunity_date, -1) sk_date,
-		coalesce(dr.city_group, '') city_group,
+		coalesce(dr.city_group, 'Not Mapped') city_group,
 		coalesce(f.mkt_origin,'') mkt_origin,
 		coalesce(f.mkt_channel,'') mkt_channel,
 		coalesce(f.mkt_medium,'') mkt_medium,
@@ -90,7 +90,7 @@ opportunities as (
 listings as (
 	select
 		nullif(f.sk_first_listing_date, -1) sk_date,
-		coalesce(dr.city_group, '') city_group,
+		coalesce(dr.city_group, 'Not Mapped') city_group,
 		coalesce(f.mkt_origin,'') mkt_origin,
 		coalesce(f.mkt_channel,'') mkt_channel,
 		coalesce(f.mkt_medium,'') mkt_medium,
@@ -171,7 +171,7 @@ results as ( --coincident funnel
 costs as (
 	select
 		date(nullif(mkt.sk_date, -1)) date,
-		coalesce(mkt.city_group, '') city_group,
+		coalesce(mkt.city_group, 'Not Mapped') city_group,
 		coalesce(mkt.mkt_origin,'') mkt_origin,
 		coalesce(mkt.mkt_channel,'') mkt_channel,
 		coalesce(mkt.mkt_medium,'') mkt_medium,
@@ -189,7 +189,7 @@ costs as (
 targets as (
 	select
 		date(nullif(str.date,'')) as date,
-		nullif(str.city_group,'')::varchar as city_group,
+		coalesce(nullif(str.city_group,''),'Not Mapped')::varchar as city_group,
 		nullif(str.mkt_origin,'')::varchar as mkt_origin,
 		nullif(str.mkt_channel,'')::varchar as mkt_channel,
 		'' as mkt_medium,
