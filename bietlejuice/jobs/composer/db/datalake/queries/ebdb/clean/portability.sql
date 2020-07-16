@@ -28,9 +28,9 @@ SELECT
     houseAddress_estado_id AS id_state,
     region_id AS id_region,
     tenant_id AS id_tenant,
-    contractFinalDate AS dt_final_contract,
+    contractFinalDate AS dt_contract_ended,
     contractObservations AS contract_observations,
-    contractStartDate AS dt_start_contract,
+    contractStartDate AS dt_contract_started,
     ownerType AS owner_type
 FROM
     datalake_ebdb_raw.Portability
