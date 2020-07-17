@@ -330,7 +330,7 @@ from
     enc.share_encaixes_nao_realizados_por_bloqueio_suspensao as sum_encaixes_nao_realizados_por_bloqueio_suspensao,
     enc.share_encaixes_nao_realizados_por_bloqueio_suspensao_agenda as sum_encaixes_nao_realizados_por_bloqueio_suspensao_agenda,
     enc.encaixes_em_imovel_sem_slot_disponivel_target_date as sum_encaixes_em_imovel_sem_slot_disponivel_target_date,
-    enc.share_encaixes_nao_realizados_por_visita_sale as sum_encaixes_nao_relizados_por_visita_sale,
+    enc.share_encaixes_nao_realizados_por_visita_sale as sum_encaixes_nao_realizados_por_visita_sale,
 	enc.share_encaixes_nao_realizados_por_agent as sum_encaixes_nao_realizados_por_agent
   from
     encaixes_agg enc
