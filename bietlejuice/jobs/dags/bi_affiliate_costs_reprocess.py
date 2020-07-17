@@ -49,6 +49,3 @@ ods_fact_affiliate_daily_engagement_cost_task = BaseDAG.build_python_operator(
                'table_name': 'affiliate_daily_engagement_cost',
                'date_column': 'dt_cost'}
 )
-
-
-ods_fact_affiliate_daily_engagement_cost_task >> dw_fact_affiliate_daily_engagement_cost_task
