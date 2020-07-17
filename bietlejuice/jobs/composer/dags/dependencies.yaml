@@ -31,3 +31,6 @@ bietlejuice.enrich_ebdb_smart_price:
 
 bietlejuice.enrich_amplitude_visit:
   - bietlejuice.amplitude
+
+bietlejuice.enrich_ebdb_listing:
+  - bietlejuice.ebdb:load-portability
