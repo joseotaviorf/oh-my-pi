@@ -34,3 +34,7 @@ bietlejuice.enrich_amplitude_visit:
 
 bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb:load-portability
+
+bietlejuice.dw_visit:
+  - bietlejuice.ebdb:load-visit
+
