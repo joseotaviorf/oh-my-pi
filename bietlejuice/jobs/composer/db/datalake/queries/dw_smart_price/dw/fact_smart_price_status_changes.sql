@@ -1,7 +1,6 @@
 select
     smp.id_smart_price as sk_smart_price,
     smp.id_house_listing as sk_house_listing,
-    smp.id_house as sk_house,
     cast(date_format(smp.ts_start_status, 'yMMdd') as bigint) as sk_status_started_date,
     cast(date_format(smp.ts_end_status, 'yMMdd') as bigint) as sk_status_ended_date,
     smp.status,
