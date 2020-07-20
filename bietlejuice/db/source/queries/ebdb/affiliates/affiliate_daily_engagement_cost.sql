@@ -30,7 +30,7 @@ join
 where
 	occ.tipo in ('valorFixoPorIndicacaoDeImovel',
 		'porcentagemPorIndicacaoDeImovel')
-	and occ.dataCriacao = date('{str_date}')
+	and date(occ.dataCriacao) = date('{str_date}')
 group by
 	1, 2, 3, 4, 5, 6, 7
 
@@ -88,7 +88,7 @@ from
 		where
 			occ.tipo in ('valorFixoPorIndicacaoDeImovel',
 			'porcentagemPorIndicacaoDeImovel')
-			and occ.dataCriacao = date('{str_date}')
+			and date(occ.dataCriacao) = date('{str_date}')
 		group by
 			1, 2, 3, 4, 5, 6
 		) resf

@@ -15,7 +15,7 @@ env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'EBDB', 'DATA_ACC_AWS_ACCESS
 # global vars
 logger = QuintoAndarLogger('AffiliateCostsDAG')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
-MAIN_DAG_ID = 'bi-affiliate-costs-reprocess'
+MAIN_DAG_ID = 'bi-affiliate-costs-reprocessing'
 MAIN_START_DATE = datetime(2020, 1, 1)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('30 10 * * *')
 
