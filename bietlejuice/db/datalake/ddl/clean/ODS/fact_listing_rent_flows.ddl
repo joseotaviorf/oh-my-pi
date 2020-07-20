@@ -49,6 +49,8 @@ create external table datalake_clean.ods_fact_listing_rent_flows (
   sk_credit_analysis_approved_date string,
   sk_first_credit_evaluation_init string,
   sk_last_credit_evaluation_init string,
+  sk_first_credit_evaluation_positive string,
+  sk_last_credit_evaluation_positive string,
   sk_first_credit_evaluation_negative string,
   sk_last_credit_evaluation_negative string,
   sk_first_doc_analysis_approved string,
