@@ -58,7 +58,7 @@ class OdsMigrationValidation:
         base_query = "select count(1) from {schema}." + self.table_name
         if self.date_column:
             execution_date = self.execution_date.strftime("%Y-%m-%d %H:%M:%S")
-            base_query += f" where {self.date_column} < '{execution_date}'"
+            base_query += " where {date_column}" + f" < '{execution_date}'"
 
         df_janus = self._get_janus_data(base_query)
         janus_result_count = df_janus.collect()[0][0]
@@ -103,7 +103,7 @@ class OdsMigrationValidation:
         if self.date_column:
             start_date, end_date = self._calculate_date_range()
             base_query += (
-                f" where {self.date_column} between '{start_date}' and '{end_date}'"
+                " where {date_column}" + f" between '{start_date}' and '{end_date}'"
             )
 
         df_janus = self._get_janus_data(base_query)
@@ -112,22 +112,39 @@ class OdsMigrationValidation:
         logger.info("m=validate_content, msg=Validating contents.")
         self._assert_dfs(df_janus, df_dw)
 
+    def _get_ods_column(self, new_col_name):
+        for col_map in self.columns_mapping:
+            if new_col_name == col_map.get("new_column"):
+                return col_map.get("ods_column")
+        return new_col_name
+
     def _get_janus_data(self, janus_query):
         databricks_consumer = DatabricksConsumer(
             conn_config={"db": "default"}, spark_client=SparkClient()
         )
-        return databricks_consumer.get_data_from_query(
-            janus_query.format(schema="dw_janus_staging")
-        )
+        if self.date_column:
+            janus_query = janus_query.format(
+                schema="dw_janus_staging", date_column=self.date_column
+            )
+        else:
+            janus_query = janus_query.format(schema="dw_janus_staging")
+
+        return databricks_consumer.get_data_from_query(janus_query)
 
     def _get_dw_data(self, dw_query):
         redshift_conn = json.loads(dbutils.secrets.get("quintoandar", DatabaseEnum.DW))
         postgres_consumer = PostgresConsumer(
             conn_config=redshift_conn, spark_client=SparkClient()
         )
-        return postgres_consumer.get_data_from_query(
-            dw_query.format(schema=self.dw_schema)
-        )
+        if self.date_column:
+            dw_query = dw_query.format(
+                schema=self.dw_schema,
+                date_column=self._get_ods_column(self.date_column),
+            )
+        else:
+            dw_query = dw_query.format(schema=self.dw_schema)
+
+        return postgres_consumer.get_data_from_query(dw_query)
 
     def _calculate_date_range(self):
         end_date = self.execution_date
