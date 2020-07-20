@@ -83,18 +83,7 @@ class DWStagingSubDAG(BaseSubDAG):
             },
         )
 
-        duplicity_test = QuintoAndarDatabricksSubmitRunOperator(
-            dag=sub_dag,
-            task_id=f"test-{slugged_table_name}-duplicity",
-            json={
-                "spark_python_task": {
-                    "python_file": f"{self.spark_job_path}/duplicity_test.py",
-                    "parameters": [self.dw_schema, table_name],
-                }
-            },
-        )
-
-        test_tasks = [duplicity_test, emptiness_test]
+        test_tasks = [emptiness_test]
         if test_ods_migration:
             test_entity_ods_migration = QuintoAndarDatabricksSubmitRunOperator(
                 dag=sub_dag,
