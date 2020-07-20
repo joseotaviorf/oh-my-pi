@@ -13,6 +13,6 @@ create table quintoandar.dim_smart_price (
     days_threshold integer,
     visits_days_threshold integer,
     ts_first_activation timestamp,
-    ts_last_deactivation timestamp
+    ts_last_deactivation timestamp,
     ts_load timestamp
 );
