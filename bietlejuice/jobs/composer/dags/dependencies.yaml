@@ -34,6 +34,9 @@ bietlejuice.enrich_amplitude_visit:
 
 bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb:load-portability
+  - bietlejuice.ebdb:load-listing-business-context
+  - bietlejuice.ebdb:load-listing-business-context-aud
+  - bietlejuice.ebdb:load-user-revision-entity
 
 bietlejuice.dw_visit:
   - bietlejuice.ebdb:load-visit
