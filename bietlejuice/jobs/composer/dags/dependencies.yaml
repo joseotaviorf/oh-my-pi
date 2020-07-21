@@ -41,3 +41,7 @@ bietlejuice.enrich_ebdb_listing:
 bietlejuice.dw_visit:
   - bietlejuice.ebdb:load-visit
 
+bietlejuice:dw_smart_price:
+  - bietlejuice.enrich_ebdb_smart_price
+  - bietlejuice.ebdb:load-dynamic-pricing-house
+  - bietlejuice.ebdb:load-dynamic_pricing_parameters
