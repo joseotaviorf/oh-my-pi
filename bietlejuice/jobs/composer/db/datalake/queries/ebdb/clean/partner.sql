@@ -16,6 +16,7 @@ SELECT
     neighborhood,
     city,
     state_id AS id_state,
-    tradeName AS trade_name
+    tradeName AS trade_name,
+    type
 FROM
     datalake_ebdb_raw.`Partner`
