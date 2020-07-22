@@ -90,6 +90,7 @@ rep_leads as (
     from base_leads bl
     left join base_leads_reproc old_bl
       on old_bl.old_lead_id = bl.lead_id
+    group by 1,2,3,4,5,6,7,8
 ),
 acquisitions as (
   select
