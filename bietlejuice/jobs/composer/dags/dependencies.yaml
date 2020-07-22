@@ -37,6 +37,21 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb:load-listing-business-context
   - bietlejuice.ebdb:load-listing-business-context-aud
   - bietlejuice.ebdb:load-user-revision-entity
+  - bietlejuice.ebdb:load-house
+  - bietlejuice.ebdb:load-house-aud
+  - bietlejuice.ebdb:load-house-special-condition
+  - bietlejuice.ebdb:load-special-condition
+  - bietlejuice.ebdb:load-house-visit-information
+  - bietlejuice.ebdb:load-state
+  - bietlejuice.ebdb:load-map-region
+  - bietlejuice.ebdb:load-condo
+  - bietlejuice.ebdb:load-local
+  - bietlejuice.ebdb:load-access-type
+  - bietlejuice.ebdb:load-occupant-type
+  - bietlejuice.ebdb:load-key-type
+  - bietlejuice.ebdb:load-access-authorization-type
+  - bietlejuice.ebdb:load-restriction-type
+  - bietlejuice.ebdb:load-house-registration-status
 
 bietlejuice.enrich_ebdb_customer_contact_identification:
   - bietlejuice.ebdb:load-user
