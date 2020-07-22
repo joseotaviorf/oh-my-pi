@@ -38,6 +38,12 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb:load-listing-business-context-aud
   - bietlejuice.ebdb:load-user-revision-entity
 
+bietlejuice.enrich_ebdb_customer_contact_identification:
+  - bietlejuice.ebdb:load-user
+  - bietlejuice.ebdb:load-user-aud
+  - bietlejuice.ebdb:load-contract-person-aud
+  - bietlejuice.ebdb:load-proponent-proposal-aud
+
 bietlejuice.dw_visit:
   - bietlejuice.ebdb:load-visit
 
