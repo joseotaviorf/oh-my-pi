@@ -213,7 +213,7 @@ select
   coalesce(visit_info.is_owner_joinning, false) as is_owner_joinning,
   coalesce(visit_info.is_quintoandar_authorized, false) as is_quintoandar_authorized,
   coalesce(visit_info.need_owner_authorization, false) as need_owner_authorization,
-  coalesce(visit_info.is_key_box, false) as has_key_box
+  coalesce(visit_info.has_key_box, false) as has_key_box
 from
   datalake_ebdb_clean.house h
 left join
