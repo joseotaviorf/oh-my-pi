@@ -25,12 +25,10 @@ class AmplitudeClient:
             r.raise_for_status()
             file_stream = io.BytesIO(r.content)
         except requests.exceptions.RequestException as e:
-            logger.error(
-                "m=get_event_data_files, Response: {0}, Status Code: {1}".format(
+            raise Exception(
+                "m=get_event_data_files, response={0}, status_code={1}, msg=An exception occurred".format(
                     e.response.content, e.response.status_code
                 )
             )
-            # todo: check if we want to raise an error here
-            # raise e
 
         return file_stream
