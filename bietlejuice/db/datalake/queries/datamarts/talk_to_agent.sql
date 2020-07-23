@@ -42,6 +42,7 @@ tta_taxonomy as (
         	coalesce(cast(evt.id_user as integer), -1) as tenant,
             json_extract_scalar(user_properties, '$["utm_source"]') as utm_source,
         	json_extract_scalar(user_properties, '$["utm_medium"]') as utm_medium,
+        	json_extract_scalar(user_properties, '$["utm_campaign"]') as utm_campaign,
         	case when (UPPER(json_extract_scalar(user_properties, '$["utm_campaign"]')) like '%BRANDED%'
         					or UPPER(json_extract_scalar(user_properties, '$["utm_campaign"]')) like '%INSTITUCIONAL%')
         					and UPPER(json_extract_scalar(user_properties, '$["utm_campaign"]')) not like '%NON-BRANDED%'
@@ -70,6 +71,7 @@ tta_taxonomy as (
     	td.mkt_medium,
     	td.mkt_source,
     	td.mkt_platform,
+    	tta.utm_campaign,
     	tta.event_timestamp,
     	row_number() over(
     					partition by tta.house, tta.tenant, tta.agent
@@ -230,7 +232,8 @@ select
 	coalesce(mkt.mkt_channel, 'Not Mapped') as mkt_channel,
 	coalesce(mkt.mkt_medium, 'Not Mapped') as mkt_medium,
 	coalesce(mkt.mkt_source, 'Not Mapped') as mkt_source,
-	coalesce(mkt.mkt_platform, 'Not Mapped') as mkt_platform
+	coalesce(mkt.mkt_platform, 'Not Mapped') as mkt_platform,
+	coalesce(mkt.utm_campaign, '') as utm_campaign
 
 from events e
 
@@ -267,6 +270,6 @@ join tta_taxonomy mkt
 
 
 -- validator
---select count(*) as total_tta, count(case when attended=true then 1 end) as total_attended, count(case when bookings_by_agent>0 then 1 end) as bookings_by_agent,count(case when attendances_by_agent>0 then 1 end) as attendances_by_agent  from final 
+--select count(*) as total_tta, count(case when attended=true then 1 end) as total_attended, count(case when bookings_by_agent>0 then 1 end) as bookings_by_agent,count(case when attendances_by_agent>0 then 1 end) as attendances_by_agent  from final
 
 select * from final order by first_message_ts desc
