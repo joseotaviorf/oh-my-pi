@@ -41,6 +41,7 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb:load-house-aud
   - bietlejuice.ebdb:load-house-special-condition
   - bietlejuice.ebdb:load-special-condition
+  - bietlejuice.ebdb:load-special-condition-aud
   - bietlejuice.ebdb:load-house-visit-information
   - bietlejuice.ebdb:load-state
   - bietlejuice.ebdb:load-map-region
