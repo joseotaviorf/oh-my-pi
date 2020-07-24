@@ -14,6 +14,7 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG
 DAG_ID = "bietlejuice.amplitude"
 ENV = Variable.get("environment")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
+AMPLITUDE_ACCOUNTS_BLOCK_LIST = Variable.get("amplitude_accounts_block_list")
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2019, 1, 1, 0, 0, 0, tzinfo=local_tz)
@@ -87,7 +88,12 @@ events_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": LOAD_EVENTS_INTO_DATALAKE_RAW_FILE_PATH,
-            "parameters": ["{{ ds }}", ENV, DATALAKE_BUCKET],
+            "parameters": [
+                "{{ ds }}",
+                ENV,
+                DATALAKE_BUCKET,
+                AMPLITUDE_ACCOUNTS_BLOCK_LIST,
+            ],
         }
     },
 )
