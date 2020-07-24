@@ -103,5 +103,4 @@ SELECT
     COUNT(DISTINCT CASE WHEN status_change_reason IS null THEN sk_house_listing END) AS other_status_change_reason
 FROM al_week_status_region alw
 WHERE week_start < DATE_TRUNC('week',CURRENT_DATE) - INTERVAL '1 week' AND week_start >= '2019-07-01'
-GROUP BY week_start, city_group, status_week_start, status_next_week, next_week_start, time_in_status
-ORDER BY week_start DESC, city_group, time_in_status, status_week_start, status_next_week;
+GROUP BY week_start, city_group, status_week_start, status_next_week, next_week_start, time_in_status;
