@@ -1,8 +1,9 @@
 import boto3
-import datetime
 import logging
 import re
 
+from datetime import datetime, timedelta
+from unidecode import unidecode
 from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
@@ -67,15 +68,19 @@ REPORT_SCHEMAS = {
     "keywords_performance_report": [
         "ExternalCustomerId",
         "AdGroupId",
-        "AdGroupName" "CampaignId",
+        "AdGroupName",
+        "CampaignId",
         "CampaignName",
         "Clicks",
         "Cost",
         "Date",
         "Device",
-        "Id" "Impressions",
-        "KeywordMatchType" "Labels",
-        "Criteria" "AccountDescriptiveName",
+        "Id",
+        "Impressions",
+        "KeywordMatchType",
+        "Labels",
+        "Criteria",
+        "AccountDescriptiveName",
         "AbsoluteTopImpressionPercentage",
         "SearchImpressionShare",
     ],
@@ -86,7 +91,8 @@ FULL_FILE_PATH_LENGTH = 8
 def format_account_name(account_name):
     alphanumeric_account_name = re.sub(r"[^\w\s]", "", account_name)
     snake_cased_account_name = re.sub(r"\s+", "_", alphanumeric_account_name)
-    return snake_cased_account_name.lower()
+    no_accents_account_name = unidecode(snake_cased_account_name)
+    return no_accents_account_name.lower()
 
 
 def split_str(str, split_condition):
@@ -98,8 +104,13 @@ def get_date(str):
 
 
 def format_date(date):
-    formatted_date = datetime.datetime.strptime(date, "%d-%m-%Y").strftime("%Y-%m-%d")
+    formatted_date = datetime.strptime(date, "%d-%m-%Y").strftime("%Y-%m-%d")
     return formatted_date
+
+
+def get_yesterdays_date(date):
+    yesterdays_date = datetime.strptime(date, "%Y-%m-%d").date() - timedelta(days=1)
+    return yesterdays_date
 
 
 def filter_for_full_file_paths(file_paths):
@@ -109,9 +120,15 @@ def filter_for_full_file_paths(file_paths):
     return filtered_file_paths
 
 
+def file_is_from_yesterday(file_path, execution_date):
+    formatted_date = format_date(get_date(file_path))
+    yesterdays_date = get_yesterdays_date(execution_date)
+    return formatted_date == str(yesterdays_date)
+
+
 def filter_for_execution_date(file_paths, execution_date):
     filtered_file_paths = [
-        x for x in file_paths if format_date(get_date(x)) == execution_date
+        x for x in file_paths if file_is_from_yesterday(x, execution_date)
     ]
     return filtered_file_paths
 
@@ -168,39 +185,38 @@ if __name__ == "__main__":
         "msg=print args spark jobs params"
     )
 
+    s3_source_file_format = "csv"
+    spark_client = SparkClient()
+    spark_metastore_service = SparkMetastoreService(spark_client)
 
-s3_source_file_format = "csv"
-spark_client = SparkClient()
-spark_metastore_service = SparkMetastoreService(spark_client)
+    s3_consumer = S3Consumer(spark_client)
+    s3_service = S3Service(boto3.resource("s3"))
+    s3_loader = S3Loader()
 
-s3_consumer = S3Consumer(spark_client)
-s3_service = S3Service(boto3.resource("s3"))
-s3_loader = S3Loader()
-
-s3_source_raw_file_paths = s3_service.list_objects(s3_file_path_source)
-s3_source_full_file_paths = filter_for_full_file_paths(s3_source_raw_file_paths)
-s3_source_file_paths = filter_for_execution_date(
-    s3_source_full_file_paths, execution_date
-)
-s3_target_files_with_path = list()
-
-for s3_source_file_path in s3_source_file_paths:
-    csv_s3_file = s3_consumer.get_data_from_file(
-        s3_source_file_path, s3_source_file_format
+    s3_source_raw_file_paths = s3_service.list_objects(s3_file_path_source)
+    s3_source_full_file_paths = filter_for_full_file_paths(s3_source_raw_file_paths)
+    s3_source_file_paths = filter_for_execution_date(
+        s3_source_full_file_paths, execution_date
     )
-    report_type = get_report_type(s3_source_file_path)
-    csv_s3_file_with_schema = add_schema_to_csv(
-        csv_s3_file, s3_source_file_path, report_type
-    )
-    s3_target_database_location, s3_target_table_name = build_target_file_path(
-        csv_s3_file_with_schema, s3_source_file_path, report_type
-    )
+    csv_options = {"header": True}
 
-    format_options = SparkTableStorageFormat.DEFAULT_RAW
-    s3_loader.load_full_table(
-        df=csv_s3_file_with_schema,
-        database_name=SOURCE,
-        table_name=s3_target_table_name,
-        database_location=s3_target_database_location,
-        format_options=format_options,
-    )
+    for s3_source_file_path in s3_source_file_paths:
+        csv_s3_file = s3_consumer.get_data_from_file(
+            s3_source_file_path, s3_source_file_format, options=csv_options
+        )
+        report_type = get_report_type(s3_source_file_path)
+        csv_s3_file_with_schema = add_schema_to_csv(
+            csv_s3_file, s3_source_file_path, report_type
+        )
+        s3_target_database_location, s3_target_table_name = build_target_file_path(
+            csv_s3_file_with_schema, s3_source_file_path, report_type
+        )
+
+        format_options = SparkTableStorageFormat.DEFAULT_RAW
+        s3_loader.load_full_table(
+            df=csv_s3_file_with_schema,
+            database_name=SOURCE,
+            table_name=s3_target_table_name,
+            database_location=s3_target_database_location,
+            format_options=format_options,
+        )
