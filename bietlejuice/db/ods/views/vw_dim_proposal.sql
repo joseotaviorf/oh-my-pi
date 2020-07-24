@@ -165,4 +165,6 @@ left join sortinghat_prop shp
   on shp.id = p.id
 left join credit_evaluation ce
   on p.id = ce.id_proposal
+-- TO DO: Temporary fix. Waiting on DAs to reshape the rule and treat duplicated values with same ts_updated and different status
+where sk_proposal != 416634
 ;
