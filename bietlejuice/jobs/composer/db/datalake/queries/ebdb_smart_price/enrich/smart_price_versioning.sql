@@ -94,14 +94,33 @@ house_status_version_publications as (
         max(first_publication_change_version) over (partition by id_house order by rev rows unbounded preceding) as publication_version_date
     from house_status_version_first_publi
 ),
-house_status_version_order as (
+house_status_version_order_null_publi_date as (
 --------------------------------------------------------------------------------------------------------
--- Define order version based on publication dates                                                      --
+-- Define order version based on null publication dates                                                    --
 --------------------------------------------------------------------------------------------------------
     select
         *,
-        case when publication_version_date is null then 0 else dense_rank() over(partition by id_house order by publication_version_date) end as order_version
+        0 as order_version
     from house_status_version_publications
+    where publication_version_date is null
+),
+house_status_version_order_not_null_publi_date as (
+--------------------------------------------------------------------------------------------------------
+-- Define order version based on non null publication dates                                                    --
+--------------------------------------------------------------------------------------------------------
+    select
+        *,
+        dense_rank() over(partition by id_house order by publication_version_date) as order_version
+    from house_status_version_publications
+    where publication_version_date is not null
+),
+house_status_version_order as (
+--------------------------------------------------------------------------------------------------------
+-- Define order version as union all both above                                                   --
+--------------------------------------------------------------------------------------------------------
+    select * from house_status_version_order_null_publi_date
+    union all
+    select * from house_status_version_order_not_null_publi_date
 ),
 max_status_order as (
 --------------------------------------------------------------------------------------------------------
@@ -178,8 +197,7 @@ smp_aud as (
     join
         datalake_ebdb_clean.user_revision_entity ure
             on ure.id = dpa.rev
-    where
-        mod_status = true
+            and mod_status = true
 ),
 house_smp_status as (
     select
@@ -197,8 +215,7 @@ house_smp_status as (
         house_listing_full hlf
             on hlf.id_house = smp.id_house
             and smp.date_time between coalesce(hlf.ts_listing_version_start, cast('1900-01-01' as timestamp)) and coalesce(hlf.ts_listing_version_end, now())
-    where
-        smp.date_time is not null
+            and smp.date_time is not null
 ),
 base as (
     select
@@ -210,7 +227,9 @@ base as (
         status,
         lag(status) over (partition by id_house_listing order by ts_start_status) previous_status,
         ts_start_status,
-        ts_end_status
+        ts_end_status,
+        -- TODO: Remove fixed_mod_status column after bugs in the table dynamic_pricing_house_aud are fixed
+        coalesce(lag(status) over (partition by id_house order by coalesce(id_dynamic_pricing, rev_dynamic_pricing_house_aud)), '') != status as fixed_mod_status
     from
         house_smp_status
     where
@@ -230,6 +249,9 @@ version_status as (
         case when status = 'ACTIVE' and coalesce(previous_status,'abracadabra') != 'PAUSED' then dense_rank() over (partition by id_house_listing, status order by ts_start_status) end as version_inactive
     from
         base
+    -- TODO: Remove this filter after bugs in the table dynamic_pricing_house_aud are fixed
+    where
+        fixed_mod_status = true
 ),
 version_for_all as (
     select

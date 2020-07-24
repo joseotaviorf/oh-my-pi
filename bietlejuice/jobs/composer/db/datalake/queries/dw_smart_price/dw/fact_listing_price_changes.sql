@@ -66,14 +66,33 @@ select
     next_status_change_time
 from house_status_version_first_publi
 ),
+house_status_version_order_null_publi_date as (
+--------------------------------------------------------------------------------------------------------
+-- Define order version based on null publication dates                                                    --
+--------------------------------------------------------------------------------------------------------
+    select
+        *,
+        0 as order_version
+    from house_status_version_publications
+    where publication_version_date is null
+),
+house_status_version_order_not_null_publi_date as (
+--------------------------------------------------------------------------------------------------------
+-- Define order version based on non null publication dates                                                    --
+--------------------------------------------------------------------------------------------------------
+    select
+        *,
+        dense_rank() over(partition by id_house order by publication_version_date) as order_version
+    from house_status_version_publications
+    where publication_version_date is not null
+),
 house_status_version_order as (
-select
-    id_house,
-    publication_version_date,
-    next_status_change_time,
-    order_status,
-    case when publication_version_date is null then 0 else dense_rank() over(partition by id_house order by publication_version_date) end as order_version
-from house_status_version_publications
+--------------------------------------------------------------------------------------------------------
+-- Define order version as union all both above                                                   --
+--------------------------------------------------------------------------------------------------------
+    select * from house_status_version_order_null_publi_date
+    union all
+    select * from house_status_version_order_not_null_publi_date
 ),
 max_status_order as (
         select
