@@ -11,7 +11,7 @@ with listing_page_viewed as (
   -- Joining merge users table to identify cross-device conversions
   left join datalake_raw.amplitude_merge_users_170698 amu
     on damcs.id_amplitude = amu.amplitude_id
-  where date(cast(year as varchar) || '-' || cast(month as varchar) || '-' || cast(day as varchar)) >= current_date - interval '11' month
+  where date(cast(year as varchar) || '-' || cast(month as varchar) || '-' || cast(day as varchar)) >= current_date - interval '9' month
   group by 2,3,4,5,6
 ),
 home_page_viewed as (
@@ -27,7 +27,7 @@ home_page_viewed as (
   -- Joining merge users table to identify cross-device conversions
   left join datalake_raw.amplitude_merge_users_170698 amu
     on damcs.id_amplitude = amu.amplitude_id
-  where date(cast(year as varchar) || '-' || cast(month as varchar) || '-' || cast(day as varchar)) >= current_date - interval '11' month
+  where date(cast(year as varchar) || '-' || cast(month as varchar) || '-' || cast(day as varchar)) >= current_date - interval '9' month
   group by 2,3,4,5,6
 ),
 search_results_page_viewed as (
@@ -43,7 +43,7 @@ search_results_page_viewed as (
   -- Joining merge users table to identify cross-device conversions
   left join datalake_raw.amplitude_merge_users_170698 amu
     on damcs.id_amplitude = amu.amplitude_id
-  where date(cast(year as varchar) || '-' || cast(month as varchar) || '-' || cast(day as varchar)) >= current_date - interval '11' month
+  where date(cast(year as varchar) || '-' || cast(month as varchar) || '-' || cast(day as varchar)) >= current_date - interval '9' month
   group by 2,3,4,5,6
 ),
 schedule_page_viewed as (
@@ -59,7 +59,7 @@ schedule_page_viewed as (
   -- Joining merge users table to identify cross-device conversions
   left join datalake_raw.amplitude_merge_users_170698 amu
     on damcs.id_amplitude = amu.amplitude_id
-  where date(cast(year as varchar) || '-' || cast(month as varchar) || '-' || cast(day as varchar)) >= current_date - interval '11' month
+  where date(cast(year as varchar) || '-' || cast(month as varchar) || '-' || cast(day as varchar)) >= current_date - interval '9' month
   group by 2,3,4,5,6
 ),
 contract_docusign_signed_aux as (
@@ -202,5 +202,5 @@ select
   cast(array_join(array_agg(utm_source_medium_branded), '; ') as varchar(20000)) as path_utm_source_medium_branded
 from touchpoints
 where conversion_time >= current_date - interval '3' month
-  and date_diff('month', session_start_time, conversion_time) <= 8
+  and date_diff('month', session_start_time, conversion_time) <= 6
 group by 1, 2,3
