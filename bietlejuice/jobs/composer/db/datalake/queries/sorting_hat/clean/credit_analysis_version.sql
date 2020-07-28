@@ -26,6 +26,10 @@ SELECT
     analyst_name_mod AS mod_analyst_name,
     analyst_main_id_mod AS mod_id_analyst,
     proposal_id_mod AS mod_id_proposal,
-    category_mod as mod_category
+    category_mod as mod_category,
+    automatic_rejection_reason,
+    automatic_rejection_reason_mod AS mod_automatic_rejection_reason,
+    bypass,
+    bypass_mod AS mod_bypass
 FROM
     datalake_sorting_hat_raw.`creditanalysis_version`
