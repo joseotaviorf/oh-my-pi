@@ -1,5 +1,5 @@
 SELECT
-    id
+    id,
     invoice_id as id_invoice,
     contract_id as id_contract,
     promo_fee_id as id_promo_fee,
