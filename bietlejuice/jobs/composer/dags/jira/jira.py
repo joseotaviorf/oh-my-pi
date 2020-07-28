@@ -45,7 +45,10 @@ CUSTOM_LIBRARIES = [
 LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
 
 # Job params
-JOB_PARAMS = [{"endpoint_name": "projects", "extraction_type": "full"}]
+JOB_PARAMS = [
+    {"endpoint_name": "projects", "extraction_type": "full"},
+    {"endpoint_name": "issues", "extraction_type": "incremental"},
+]
 
 
 # Task builders
