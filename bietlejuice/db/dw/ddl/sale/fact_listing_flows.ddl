@@ -13,7 +13,6 @@ create table sale.fact_listing_flows (
 	sk_user_first_task_assignee integer,
 	sk_user_last_task_assignee integer,
 	sk_region integer,
-	sk_first_region integer,
 	sk_city integer,
 	sk_partner integer,
 	sk_lead_date integer,
@@ -79,5 +78,8 @@ create table sale.fact_listing_flows (
 	mkt_platform varchar(255),
 	mkt_medium varchar(255),
 	mkt_source varchar(255),
+	ts_opt_out_sale timestamp,
+	lead_context_origin varchar(255),
+	listing_rent_status varchar(255),
 	ts_load timestamp default getdate()
 )

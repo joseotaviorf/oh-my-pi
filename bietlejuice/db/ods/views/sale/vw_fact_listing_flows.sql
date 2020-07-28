@@ -147,7 +147,6 @@ select
   atax.sk_user_first_task_assignee,
   atax.sk_user_last_task_assignee,
   atax.sk_region,
-  atax.sk_first_region,
   atax.sk_city,
   atax.sk_partner,
   atax.sk_lead_date,
@@ -221,5 +220,8 @@ select
   atax.mkt_platform,
   atax.mkt_medium,
   atax.mkt_source,
+  atax.ts_opt_out_sale,
+  atax.lead_context_origin,
+  atax.listing_rent_status,
   atax.ts_load
 from applied_taxonomy_flow atax
