@@ -12,7 +12,7 @@ from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_docx_into_datalake"
-BLACK_LIST = ["flyway_schema_history"]
+BLOCK_LIST = ["flyway_schema_history"]
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     metastore_service.create_database(database_name)
 
     for table in tables:
-        if table.table_name not in BLACK_LIST:
+        if table.table_name not in BLOCK_LIST:
             df = consumer.get_data_from_table(table.table_name)
             # the table names in the datalake must be lowercase
             s3_loader.load_full_table(

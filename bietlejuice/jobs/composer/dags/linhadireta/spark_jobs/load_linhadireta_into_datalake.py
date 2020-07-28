@@ -13,7 +13,7 @@ from bietlejuice.jobs.composer.services.metastore_services import SparkMetastore
 from bietlejuice.jobs.composer.dags.linhadireta import SOURCE
 
 JOB_NAME = "load_linhadireta_into_datalake"
-WHITE_LIST = ["User", "User_chats", "Chat", "Chat_users"]
+ALLOW_LIST = ["User", "User_chats", "Chat", "Chat_users"]
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     spark_metastore_loader = SparkMetastoreLoader(metastore_service)
 
     for table in tables:
-        if table.table_name in WHITE_LIST:
+        if table.table_name in ALLOW_LIST:
             df = postgres_consumer.get_data_from_table(table.table_name)
             # the table names in the datalake must be lowercase
             database_name = db_info["db_raw_databricks"]

@@ -12,7 +12,7 @@ from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_data_to_raw"
-BLACK_LIST = ["flyway_schema_history"]
+BLOCK_LIST = ["flyway_schema_history"]
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -48,7 +48,7 @@ if __name__ == "__main__":
     spark_metastore_loader = SparkMetastoreLoader(metastore_service)
     tables = postgres_consumer.get_table_names_and_sizes().collect()
     for table in tables:
-        if table.table_name not in BLACK_LIST:
+        if table.table_name not in BLOCK_LIST:
             df = postgres_consumer.get_data_from_table(table.table_name)
             s3_loader.load_full_table(
                 df=df,

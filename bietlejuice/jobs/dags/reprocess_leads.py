@@ -69,13 +69,13 @@ def reprocess_leads(variant):
             reasons=contact_options.get('reasons'))
 
         logger.info('m=reprocess_leads, msg=filtering out already contacted phone numbers.')
-        blacklist = set()
+        block_list = set()
         for c_phone in [c for c in processed.columns if c.startswith('telefoneAnunciante')]:
             contacted = processed.merge(contacts, left_on=c_phone, right_on='phone', how='left')
             indicator = ((contacted.contacted == 1) & (contacted.contact_time >= contacted.atualizadoEm))
-            blacklist |= set(contacted.loc[indicator, 'id'].tolist())
+            block_list |= set(contacted.loc[indicator, 'id'].tolist())
 
-        processed = processed[~processed.id.isin(list(blacklist))]
+        processed = processed[~processed.id.isin(list(block_list))]
 
     if check_coverage:
         region_id = processed.apply(lambda row: processor.check_coverage(row.lat, row.lng), axis=1)
