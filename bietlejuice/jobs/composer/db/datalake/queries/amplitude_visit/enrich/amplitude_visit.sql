@@ -31,13 +31,34 @@ select
   id_app,
   id_visit,
   app_type,
-  media_source,
+  coalesce(media_source, 'Unknown') as media_source,
   adjust_network,
   utm_source,
   utm_campaign,
   utm_medium,
   utm_content,
   utm_term,
+  coalesce(
+    (
+      (
+        UPPER(utm_campaign) like '%BRANDED%'
+        or UPPER(utm_campaign) like '%INSTITUCIONAL%'
+      )
+      and lower(utm_campaign) not like '%non-branded%'
+    ), false
+  ) as is_branded,
+  -- temporary column to join with taxonomy,
+  -- it can be replaced by the usage of previous column but
+  -- some refactoring will be needed in demand taxonomy
+  case when
+    (
+      UPPER(utm_campaign) like '%BRANDED%'
+      or UPPER(utm_campaign) like '%INSTITUCIONAL%'
+    )
+    and lower(utm_campaign) not like '%non-branded%'
+    then 'Branded'
+    else 'Outro'
+  end as branded,
   ts_event
 from
   cross_platform
