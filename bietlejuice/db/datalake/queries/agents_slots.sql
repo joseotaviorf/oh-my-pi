@@ -60,7 +60,7 @@ with
     visits as (
         select distinct a.id_agent as agent_id,
             vo.name,
-            date_add('minute',15 * a.slot_day, date_add('hour',8, cast(a.dt_visit as timestamp))) as slot_dt
+            date_add('minute',15 * a.slot_day, date_add('hour',8, cast(a.dt_booking as timestamp))) as slot_dt
         from
             datalake_ebdb_clean_prod.booking a
             left join datalake_ebdb_clean_prod.booking_aud aa

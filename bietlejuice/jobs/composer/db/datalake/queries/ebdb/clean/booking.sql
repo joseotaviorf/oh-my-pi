@@ -30,7 +30,7 @@ select
   informeinquilinopendente as is_tenant_notification_pending,
   confirmado as is_confirmed,
   permitirconflito as is_conflict_allowed,
-  data as dt_visit,
+  data as dt_booking,
   proxnotfup as ts_next_not_fup,
   datafupvisita as ts_visit_fup,
   avisadoentrouemnegociacao as ts_negotiation_start_notified,
