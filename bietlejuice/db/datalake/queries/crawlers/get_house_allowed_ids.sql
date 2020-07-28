@@ -1,17 +1,11 @@
 select
-    r.id_region as id
+    r.id
 from
-    datalake_ebdb_clean_prod.region r
-join
-    datalake_ebdb_clean_prod.region m
-    on m.id_region = r.id_parent_region
-join
-    datalake_ebdb_clean_prod.region c
-    on c.id_region = m.id_parent_region
+    datalake_ebdb_region_prod.region r
 where
     r.level = 'SubRegiao'
     and(
-        c.name in(
+        r.city_name in(
             'São Bernardo do Campo',
             'São Caetano do Sul',
             'Santo André',
@@ -20,7 +14,7 @@ where
             'Osasco'
         )
         or(
-            c.name = 'São Paulo'
+            r.city_name = 'São Paulo'
             and r.name in(
                 'Vila Mariana',
                 'Ipiranga',
@@ -40,6 +34,6 @@ where
             )
         )
         or(
-            c.name = 'Belo Horizonte'
+            r.city_name = 'Belo Horizonte'
         )
     )

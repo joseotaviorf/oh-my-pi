@@ -1,3 +1,3 @@
-select distinct id_region as id
+select distinct id
 from datalake_ebdb_clean_prod.region
 ;

@@ -1,12 +1,11 @@
 WITH qa_subregions AS (
-  SELECT r.id_region as sk_region,
+  SELECT r.id as sk_region,
          r.name as region,
-         c.name as city,
+         r.city_name as city,
          ST_Polygon(pr.polygon) as the_geom
   FROM  datalake_ebdb_clean_prod.polygon_region AS pr
-  JOIN  datalake_ebdb_clean_prod.region AS r ON r.id_region = pr.id_region
-  JOIN  datalake_ebdb_clean_prod.region AS m ON m.id_region = r.id_parent_region
-  JOIN  datalake_ebdb_clean_prod.region AS c ON c.id_region = m.id_parent_region
+  JOIN  datalake_ebdb_region_prod.region AS r
+    ON r.id = pr.id_region
   WHERE r.level = 'SubRegiao'
 ),
 census_stats_250m_hex_grid AS (
