@@ -67,3 +67,6 @@ bietlejuice.dw_smart_price:
   - bietlejuice.enrich_ebdb_smart_price
   - bietlejuice.ebdb:load-dynamic-pricing-house
   - bietlejuice.ebdb:load-dynamic-pricing-parameters
+
+bietlejuice.enrich_ebdb_region:
+  - bietlejuice.ebdb:load-region
