@@ -77,4 +77,12 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
+dependency_sub_dags = [enrich_sub_dags.pop("house_status_version_order")]
+dependent_sub_dags = [
+    enrich_sub_dags.pop("house_listing"),
+    enrich_sub_dags.pop("house_listing_status"),
+]
+BaseDAG.cross_downstream(dependency_sub_dags, dependent_sub_dags)
+create_cluster_task >> dependency_sub_dags
+dependent_sub_dags >> terminate_cluster_task
 create_cluster_task >> list(enrich_sub_dags.values()) >> terminate_cluster_task

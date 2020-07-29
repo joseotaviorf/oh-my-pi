@@ -5,7 +5,7 @@ with house_aud as (
 -- (status_MOD = 1 may not work sometimes)                                                            --
 --------------------------------------------------------------------------------------------------------
     select
-        from_unixtime(cast(rev.ts_revision as bigint)/1000) as revision_time,
+        cast(from_unixtime(cast(rev.ts_revision as bigint)/1000) as timestamp) as revision_time,
         cast(from_unixtime(cast(rev.ts_revision as bigint)/1000) as date) as status_date,
         rev.id_user,
         rev.reason,
@@ -22,107 +22,6 @@ with house_aud as (
     inner join datalake_ebdb_clean.user_revision_entity rev
         on rev.id = h.rev
 ),
-house_status_history as (
---------------------------------------------------------------------------------------------------------
--- Create status_history: for each house show all status changes, with start and end of each status   --
---------------------------------------------------------------------------------------------------------
-    select
-        id_house,
-        rev,
-        mod_status,
-        max(dt_first_publication) over(partition by id_house) as ts_first_publication,
-        revision_time as ts_status_changed,
-        status as status_history,
-        lead(revision_time) over(partition by id_house order by rev) as next_status_change_time,
-        row_number() over(partition by id_house order by rev) as order_status
-    from house_aud
-    where (status <> previous_status or previous_status is null)
-),
-house_new_status_new_date as (
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- Create column to identify how long the house is in the status unpublished                                                                                           --
--- We will use this column to check if a new version will be created to this house (a new version will be created when the house is unpublished for 12 weeks or more)  --
--- Since we will count from the day it turns 12 weeks, there's no need to extract 1 day from the end_date in date_diff                                                 --
--- Since we are using date_diff, we are considering the whole part of the number, so if the difference is 83.7, it won't consider as recovered                         --
--- For the older houses there are cases of status_history blank, so we have to input status_history = 'publicado' (this happens to status from 2015)                   --
--- In these cases of status_history_blank we also update the status changed date to the first_publication_date                                                         --
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    select
-        *,
-        case when status_history = 'despublicado' then datediff(cast(coalesce(next_status_change_time, now()) as date), cast(ts_status_changed as date)) end as days_unpublished,
-        case when status_history is null then 'publicado' else status_history end as new_status_history,
-        case when status_history is null then ts_first_publication else ts_status_changed end as new_ts_status_changed,
-        max(order_status) over(partition by id_house) as max_order_status
-    from house_status_history
-),
-house_status_version_changes as (
---------------------------------------------------------------------------------------------------------
--- Create column to identify moments where house changed status would create a new version/listing    --
--- The moments are: when there is a status rented or a status unpublished with days_unpublished >= 84 --
--- With a cumulative sum we can identify when a new change of status happens                          --
---------------------------------------------------------------------------------------------------------
-    select
-        *,
-        case when new_status_history = 'alugado' or
-                  (new_status_history = 'despublicado' and days_unpublished >= 84) then 1
-             else 0 end as events_change_version,
-        case when new_status_history = 'alugado' or
-                  (new_status_history = 'despublicado' and days_unpublished >= 84) then new_status_history
-             end as events_change_status,
-        sum(case when new_status_history = 'alugado' or
-                      (new_status_history = 'despublicado' and days_unpublished >= 84) then 1
-                 else 0 end) over (partition by id_house order by rev rows unbounded preceding) as sum_events_change_version
-    from house_new_status_new_date h_new
-),
-house_status_version_first_publi as (
-------------------------------------------------------------------------------------------------------------------------------------
--- Although a rented status is a trigger to a new version, the new version will only starts when there is a new published status  --
--- The rented status will still be a part of previous status and the new published status will be the start of the new version    --
-------------------------------------------------------------------------------------------------------------------------------------
-    select
-        *,
-        min(case when new_status_history = 'publicado' then new_ts_status_changed
-                 end) over(partition by id_house, sum_events_change_version order by rev) as first_publication_change_version
-    from house_status_version_changes
-),
-house_status_version_publications as (
-------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- The rented status will still be a part of previous status, and so will be all status different from published after rental                                   --
--- All versions begin with a date from published status, without a published status there will not be a version_start_date                                      --
-------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    select
-        *,
-        max(first_publication_change_version) over (partition by id_house order by rev rows unbounded preceding) as publication_version_date
-    from house_status_version_first_publi
-),
-house_status_version_order_null_publi_date as (
---------------------------------------------------------------------------------------------------------
--- Define order version based on null publication dates                                                    --
---------------------------------------------------------------------------------------------------------
-    select
-        *,
-        0 as order_version
-    from house_status_version_publications
-    where publication_version_date is null
-),
-house_status_version_order_not_null_publi_date as (
---------------------------------------------------------------------------------------------------------
--- Define order version based on non null publication dates                                                    --
---------------------------------------------------------------------------------------------------------
-    select
-        *,
-        dense_rank() over(partition by id_house order by publication_version_date) as order_version
-    from house_status_version_publications
-    where publication_version_date is not null
-),
-house_status_version_order as (
---------------------------------------------------------------------------------------------------------
--- Define order version as union all both above                                                   --
---------------------------------------------------------------------------------------------------------
-    select * from house_status_version_order_null_publi_date
-    union all
-    select * from house_status_version_order_not_null_publi_date
-),
 max_status_order as (
 --------------------------------------------------------------------------------------------------------
 -- Identify the last status to each version                                                           --
@@ -131,7 +30,7 @@ max_status_order as (
         id_house,
         order_version,
         max(order_status) as max_order_status
-    from house_status_version_order
+    from datalake_ebdb_listing.house_status_version_order
     group by id_house, order_version
 ),
 house_status_version_last_status as (
@@ -139,13 +38,13 @@ house_status_version_last_status as (
         hs_vo.*,
         max(
         case
-            when hs_vo.new_status_history = 'despublicado'
-            then new_ts_status_changed
+            when hs_vo.status_history_new = 'despublicado'
+            then ts_status_changed_new
         end
         ) over(partition by hs_vo.id_house, hs_vo.order_version) as ts_last_unpublished,
-        case when ms_o.max_order_status is not null then hs_vo.new_status_history end as last_status,
+        case when ms_o.max_order_status is not null then hs_vo.status_history_new end as last_status,
         max(hs_vo.order_status) over(partition by hs_vo.id_house, hs_vo.order_version) as max_order_status_version
-    from house_status_version_order hs_vo
+    from datalake_ebdb_listing.house_status_version_order hs_vo
     left join max_status_order ms_o
         on hs_vo.id_house = ms_o.id_house
         and hs_vo.order_version = ms_o.order_version
@@ -179,7 +78,7 @@ house_listing_plain as (
         max(ts_status_changed) as ts_status_changed,
         max(hs_v.last_status) as status,
         min(cast(hs_v.publication_version_date as timestamp)) as ts_listing_version_start,
-        max(coalesce(hs_v.next_status_change_time, cast('2200-01-01 12:00:00' as timestamp))) as ts_listing_version_end
+        max(coalesce(hs_v.ts_status_changed_next, cast('2200-01-01 12:00:00' as timestamp))) as ts_listing_version_end
     from  house_status_version_last_status hs_v
     left join status_change_version sc_v
         on hs_v.id_house = sc_v.id_house

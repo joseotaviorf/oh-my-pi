@@ -67,3 +67,8 @@ class BaseDAG:
     def set_dependencies_in_sequence(sequence_list, from_list, to_list):
         for item in sequence_list:
             from_list[item].set_downstream(to_list[item])
+
+    @staticmethod
+    def cross_downstream(from_tasks, to_tasks):
+        for task in from_tasks:
+            task.set_downstream(to_tasks)
