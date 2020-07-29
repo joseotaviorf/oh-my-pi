@@ -71,7 +71,7 @@ with
         where
             a.visit_fup in ('Talvez', 'NaoGostou', 'VaiNegociar', 'VisitouSozinho')
             and a.type = 'Visita'
-            and a.dt_visit >= date'2019-01-01'
+            and a.dt_booking >= date'2019-01-01'
     ),
     active_history_mod as (
         select distinct
