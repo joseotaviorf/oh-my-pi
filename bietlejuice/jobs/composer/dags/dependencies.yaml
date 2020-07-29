@@ -60,6 +60,10 @@ bietlejuice.enrich_ebdb_customer_contact_identification:
   - bietlejuice.ebdb:load-contract-person-aud
   - bietlejuice.ebdb:load-proponent-proposal-aud
 
+bietlejuice.enrich_tracksale:
+  - bietlejuice.tracksale:dispatch
+  - bietlejuice.tracksale:answer
+
 bietlejuice.dw_visit:
   - bietlejuice.ebdb:load-visit
 
