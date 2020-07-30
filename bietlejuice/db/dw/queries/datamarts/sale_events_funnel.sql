@@ -3,6 +3,7 @@ sale_listing_flows_adjust AS (
 SELECT
 	sk_lead_date,
 	sk_lead,
+	sk_first_contact_date,
 	sk_prospect_date,
 	sk_qualified_date,
 	sk_opportunity_date,
@@ -14,13 +15,13 @@ SELECT
 	     WHEN mkt_completion = 'Full Self-Service' THEN 'FSS'
 	     ELSE 'IS'
 	END AS lead_context,
-	CASE WHEN mkt_campaign_context = 'Organic' THEN 'Branded'
-         ELSE mkt_campaign_context
+	CASE WHEN lead_context_origin = 'Organic' THEN 'Branded'
+         ELSE lead_context_origin
 	END AS mkt_campaign_context,
 	CASE WHEN mkt_channel IN ('CRM/Notification','Backend','Branding','Other') THEN 'Paid'
          ELSE 'Non Paid'
 	END AS mkt_type
-FROM datamarts.temp_sale_supply_funnel
+FROM sale.fact_listing_flows
 ),
 monday_adjusted AS (
 -- treat data from Monday gsheets
@@ -126,7 +127,7 @@ LEFT JOIN datamarts.demand_sale_flows dsf
 ),
 lead_ AS (
 SELECT
-	slf.sk_lead_date AS date_,
+	slf.sk_lead_date AS base_date,
    	slf.lead_context,
    	slf.mkt_campaign_context,
    	slf.mkt_origin,
@@ -137,6 +138,7 @@ SELECT
 	NULL AS origin_after_offer,
    	COUNT(slf.sk_lead_date) AS leads,
    	NULL::BIGINT AS prospects,
+   	NULL::BIGINT AS first_contacts,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
 	NULL::BIGINT AS first_listings,
@@ -160,7 +162,7 @@ GROUP BY 1,2,3,4,5,6,7,8,9
 ),
 prospect AS (
 SELECT
-	slf.sk_prospect_date AS date_,
+	slf.sk_prospect_date AS base_date,
    	slf.lead_context,
    	slf.mkt_campaign_context,
    	slf.mkt_origin,
@@ -171,6 +173,7 @@ SELECT
 	NULL AS origin_after_offer,
    	NULL::BIGINT AS leads,
    	COUNT(slf.sk_prospect_date) AS prospects,
+   	NULL::BIGINT AS first_contacts,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
 	NULL::BIGINT AS first_listings,
@@ -192,9 +195,44 @@ FROM sale_listing_flows_adjust AS slf
 WHERE slf.sk_prospect_date > 0
 GROUP BY 1,2,3,4,5,6,7,8,9
 ),
+first_contacts AS (
+SELECT
+	slf.sk_prospect_date AS base_date,
+   	slf.lead_context,
+   	slf.mkt_campaign_context,
+   	slf.mkt_origin,
+   	slf.mkt_channel,
+   	slf.mkt_type,
+   	NULL AS first_origin_demand,
+	NULL AS origin_before_offer,
+	NULL AS origin_after_offer,
+   	NULL::BIGINT AS leads,
+   	NULL::BIGINT AS prospects,
+   	COUNT(slf.sk_first_contact_date) AS first_contacts,
+	NULL::BIGINT AS qualifieds,
+	NULL::BIGINT AS opportunities,
+	NULL::BIGINT AS first_listings,
+	NULL::BIGINT AS tta_started,
+	NULL::BIGINT AS tta_completed,
+	NULL::BIGINT AS visits_booked,
+	NULL::BIGINT AS visits_completed,
+	NULL::BIGINT AS offers_submitted,
+	NULL::BIGINT AS offers_accepted,
+	NULL::BIGINT AS ccv_signed,
+	NULL::BIGINT AS diligence_sent,
+	NULL::BIGINT AS diligence_accepted,
+	NULL::BIGINT AS credit_sent,
+	NULL::BIGINT AS credit_approved,
+	NULL::BIGINT AS payment_concluded,
+	NULL::BIGINT AS matricula_atualizada,
+	NULL::BIGINT AS entrega_chave
+FROM sale_listing_flows_adjust AS slf
+WHERE slf.sk_first_contact_date > 0
+GROUP BY 1,2,3,4,5,6,7,8,9
+),
 qualified AS (
 SELECT
-   	slf.sk_qualified_date AS date_,
+   	slf.sk_qualified_date AS base_date,
    	slf.lead_context,
    	slf.mkt_campaign_context,
    	slf.mkt_origin,
@@ -205,6 +243,7 @@ SELECT
 	NULL AS origin_after_offer,
    	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
+	NULL::BIGINT AS first_contacts,
 	COUNT(slf.sk_qualified_date) AS qualifieds,
 	NULL::BIGINT AS opportunities,
 	NULL::BIGINT AS first_listings,
@@ -228,7 +267,7 @@ GROUP BY 1,2,3,4,5,6,7,8,9
 ),
 opportunity AS (
 SELECT
-   	slf.sk_opportunity_date AS date_,
+   	slf.sk_opportunity_date AS base_date,
    	slf.lead_context,
    	slf.mkt_campaign_context,
    	slf.mkt_origin,
@@ -239,6 +278,7 @@ SELECT
 	NULL AS origin_after_offer,
    	NULL::BIGINT AS leads,
    	NULL::BIGINT AS prospects,
+   	NULL::BIGINT AS first_contacts,
 	NULL::BIGINT AS qualifieds,
 	COUNT(DISTINCT slf.sk_house_listing) AS opportunities,
 	NULL::BIGINT AS first_listings,
@@ -262,7 +302,7 @@ GROUP BY 1,2,3,4,5,6,7,8,9
 ),
 first_listing AS (
 SELECT
-   	slf.sk_first_listing_date AS date_,
+   	slf.sk_first_listing_date AS base_date,
    	slf.lead_context,
    	slf.mkt_campaign_context,
    	slf.mkt_origin,
@@ -273,6 +313,7 @@ SELECT
 	NULL AS origin_after_offer,
    	NULL::BIGINT AS leads,
    	NULL::BIGINT AS prospects,
+   	NULL::BIGINT AS first_contacts,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
 	COUNT(DISTINCT slf.sk_house_listing) AS first_listings,
@@ -296,7 +337,7 @@ GROUP BY 1,2,3,4,5,6,7,8,9
 ),
 tta_sent AS (
 SELECT
-   	REPLACE(DATE(tta_started),'-','')::INTEGER AS date_,
+   	REPLACE(DATE(tta_started),'-','')::INTEGER AS base_date,
 	NULL AS lead_context,
    	NULL AS mkt_campaign_context,
    	NULL AS mkt_origin,
@@ -307,6 +348,7 @@ SELECT
 	higher_intent_after_offer AS origin_after_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
+	NULL::BIGINT AS first_contacts,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
 	NULL::BIGINT AS first_listings,
@@ -329,7 +371,7 @@ GROUP BY 1,2,3,4,5,6,7,8,9
 ),
 tta_completed AS (
 SELECT
-	REPLACE(DATE(tta_completed),'-','')::INTEGER AS date_,
+	REPLACE(DATE(tta_completed),'-','')::INTEGER AS base_date,
 	NULL AS lead_context,
    	NULL AS mkt_campaign_context,
    	NULL AS mkt_origin,
@@ -340,6 +382,7 @@ SELECT
 	higher_intent_after_offer AS origin_after_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
+	NULL::BIGINT AS first_contacts,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
 	NULL::BIGINT AS first_listings,
@@ -362,7 +405,7 @@ GROUP BY 1,2,3,4,5,6,7,8,9
 ),
 visits_booked AS (
 SELECT
-	REPLACE(DATE(dt_created),'-','')::INTEGER AS date_,
+	REPLACE(DATE(dt_created),'-','')::INTEGER AS base_date,
 	NULL AS lead_context,
    	NULL AS mkt_campaign_context,
    	NULL AS mkt_origin,
@@ -373,6 +416,7 @@ SELECT
 	higher_intent_after_offer AS origin_after_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
+	NULL::BIGINT AS first_contacts,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
 	NULL::BIGINT AS first_listings,
@@ -395,7 +439,7 @@ GROUP BY 1,2,3,4,5,6,7,8,9
 ),
 visits_completed AS (
 SELECT
-	REPLACE(DATE(dt_completed),'-','')::INTEGER AS date_,
+	REPLACE(DATE(dt_completed),'-','')::INTEGER AS base_date,
 	NULL AS lead_context,
    	NULL AS mkt_campaign_context,
    	NULL AS mkt_origin,
@@ -406,6 +450,7 @@ SELECT
 	higher_intent_after_offer AS origin_after_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
+	NULL::BIGINT AS first_contacts,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
 	NULL::BIGINT AS first_listings,
@@ -428,7 +473,7 @@ GROUP BY 1,2,3,4,5,6,7,8,9
 ),
 offers_sent AS (
 SELECT
-	REPLACE(DATE(dt_offer_sent),'-','')::INTEGER AS date_,
+	REPLACE(DATE(dt_offer_sent),'-','')::INTEGER AS base_date,
 	NULL AS lead_context,
    	NULL AS mkt_campaign_context,
    	NULL AS mkt_origin,
@@ -439,6 +484,7 @@ SELECT
 	higher_intent_after_offer AS origin_after_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
+	NULL::BIGINT AS first_contacts,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
 	NULL::BIGINT AS first_listings,
@@ -461,7 +507,7 @@ GROUP BY 1,2,3,4,5,6,7,8,9
 ),
 offers_accepted AS (
 SELECT
-	REPLACE(DATE(dt_offer_accepted),'-','')::INTEGER AS date_,
+	REPLACE(DATE(dt_offer_accepted),'-','')::INTEGER AS base_date,
 	NULL AS lead_context,
    	NULL AS mkt_campaign_context,
    	NULL AS mkt_origin,
@@ -472,6 +518,7 @@ SELECT
 	higher_intent_after_offer AS origin_after_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
+	NULL::BIGINT AS first_contacts,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
 	NULL::BIGINT AS first_listings,
@@ -494,7 +541,7 @@ GROUP BY 1,2,3,4,5,6,7,8,9
 ),
 ccv_signed AS (
 SELECT
-	REPLACE(DATE(dt_ccv_signed),'-','')::INTEGER AS date_,
+	REPLACE(DATE(dt_ccv_signed),'-','')::INTEGER AS base_date,
 	NULL AS lead_context,
    	NULL AS mkt_campaign_context,
    	NULL AS mkt_origin,
@@ -505,6 +552,7 @@ SELECT
 	higher_intent_after_offer AS origin_after_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
+	NULL::BIGINT AS first_contacts,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
 	NULL::BIGINT AS first_listings,
@@ -527,7 +575,7 @@ GROUP BY 1,2,3,4,5,6,7,8,9
 ),
 diligence_sent AS (
 SELECT
-	REPLACE(DATE(dt_diligence_started),'-','')::INTEGER AS date_,
+	REPLACE(DATE(dt_diligence_started),'-','')::INTEGER AS base_date,
 	NULL AS lead_context,
    	NULL AS mkt_campaign_context,
    	NULL AS mkt_origin,
@@ -538,6 +586,7 @@ SELECT
 	higher_intent_after_offer AS origin_after_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
+	NULL::BIGINT AS first_contacts,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
 	NULL::BIGINT AS first_listings,
@@ -560,7 +609,7 @@ GROUP BY 1,2,3,4,5,6,7,8,9
 ),
 diligence_accepted AS (
 SELECT
-	REPLACE(DATE(dt_diligence_approved),'-','')::INTEGER AS date_,
+	REPLACE(DATE(dt_diligence_approved),'-','')::INTEGER AS base_date,
 	NULL AS lead_context,
    	NULL AS mkt_campaign_context,
    	NULL AS mkt_origin,
@@ -571,6 +620,7 @@ SELECT
 	higher_intent_after_offer AS origin_after_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
+	NULL::BIGINT AS first_contacts,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
 	NULL::BIGINT AS first_listings,
@@ -593,7 +643,7 @@ GROUP BY 1,2,3,4,5,6,7,8,9
 ),
 credit_sent AS (
 SELECT
-	REPLACE(DATE(dt_credit_started),'-','')::INTEGER AS date_,
+	REPLACE(DATE(dt_credit_started),'-','')::INTEGER AS base_date,
 	NULL AS lead_context,
    	NULL AS mkt_campaign_context,
    	NULL AS mkt_origin,
@@ -604,6 +654,7 @@ SELECT
 	higher_intent_after_offer AS origin_after_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
+	NULL::BIGINT AS first_contacts,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
 	NULL::BIGINT AS first_listings,
@@ -626,7 +677,7 @@ GROUP BY 1,2,3,4,5,6,7,8,9
 ),
 credit_approved AS (
 SELECT
-	REPLACE(DATE(dt_credit_approved),'-','')::INTEGER AS date_,
+	REPLACE(DATE(dt_credit_approved),'-','')::INTEGER AS base_date,
 	NULL AS lead_context,
    	NULL AS mkt_campaign_context,
    	NULL AS mkt_origin,
@@ -637,6 +688,7 @@ SELECT
 	higher_intent_after_offer AS origin_after_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
+	NULL::BIGINT AS first_contacts,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
 	NULL::BIGINT AS first_listings,
@@ -659,7 +711,7 @@ GROUP BY 1,2,3,4,5,6,7,8,9
 ),
 payment_concluded AS (
 SELECT
-	REPLACE(DATE(dt_payment_concluded),'-','')::INTEGER AS date_,
+	REPLACE(DATE(dt_payment_concluded),'-','')::INTEGER AS base_date,
 	NULL AS lead_context,
    	NULL AS mkt_campaign_context,
    	NULL AS mkt_origin,
@@ -670,6 +722,7 @@ SELECT
 	higher_intent_after_offer AS origin_after_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
+	NULL::BIGINT AS first_contacts,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
 	NULL::BIGINT AS first_listings,
@@ -692,7 +745,7 @@ GROUP BY 1,2,3,4,5,6,7,8,9
 ),
 matricula_atualizada AS (
 SELECT
-	REPLACE(DATE(dt_matricula_atualizada),'-','')::INTEGER AS date_,
+	REPLACE(DATE(dt_matricula_atualizada),'-','')::INTEGER AS base_date,
 	NULL AS lead_context,
    	NULL AS mkt_campaign_context,
    	NULL AS mkt_origin,
@@ -703,6 +756,7 @@ SELECT
 	higher_intent_after_offer AS origin_after_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
+	NULL::BIGINT AS first_contacts,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
 	NULL::BIGINT AS first_listings,
@@ -725,7 +779,7 @@ GROUP BY 1,2,3,4,5,6,7,8,9
 ),
 entrega_chave AS (
 SELECT
-	REPLACE(DATE(dt_entrega_chaves),'-','')::INTEGER AS date_,
+	REPLACE(DATE(dt_entrega_chaves),'-','')::INTEGER AS base_date,
 	NULL AS lead_context,
    	NULL AS mkt_campaign_context,
    	NULL AS mkt_origin,
@@ -736,6 +790,7 @@ SELECT
 	higher_intent_after_offer AS origin_after_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
+	NULL::BIGINT AS first_contacts,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
 	NULL::BIGINT AS first_listings,
@@ -760,6 +815,8 @@ union_all AS (
 SELECT * FROM lead_
 	UNION ALL
 	SELECT * FROM prospect
+	UNION ALL
+	SELECT * FROM first_contacts
 	UNION ALL
 	SELECT * FROM qualified
 	UNION ALL
@@ -811,6 +868,7 @@ SELECT
 	ua.origin_after_offer,
 	ua.leads,
 	ua.prospects,
+	ua.first_contacts,
 	ua.qualifieds,
 	ua.opportunities,
 	ua.first_listings,
@@ -830,7 +888,7 @@ SELECT
 	ua.entrega_chave
 FROM union_all ua
 RIGHT JOIN dim_date dd
-  ON ua.date_ = dd.sk_date
+  ON ua.base_date = dd.sk_date
 WHERE dd.date BETWEEN '2020-01-01' AND current_date
 )
 SELECT
@@ -848,6 +906,7 @@ SELECT
 	origin_after_offer,
 	SUM(leads) AS leads,
    	SUM(prospects) AS prospects,
+   	SUM(first_contacts) AS first_contacts,
 	SUM(qualifieds) AS qualifieds,
 	SUM(opportunities) AS opportunities,
 	SUM(first_listings) AS first_listings,
