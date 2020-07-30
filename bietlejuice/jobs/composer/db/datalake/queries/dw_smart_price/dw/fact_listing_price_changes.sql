@@ -173,14 +173,14 @@ select
     reason
 from price_changes_aud pca
 join house_listing_full hlf on hlf.id_house = pca.sk_house and pca.date_time between coalesce(hlf.ts_listing_version_start, cast('1900-01-01' as timestamp)) and coalesce(hlf.ts_listing_version_end, now())
-left join smp_version spv on pca.sk_house = spv.id_house and pca.date_time between spv.ts_start_smp and spv.ts_end_smp
+left join smp_version spv on hlf.id_house_listing = spv.id_house_listing and pca.date_time between spv.ts_start_smp and spv.ts_end_smp
 where pca.sk_house is not null and pca.true_mod_pred = true
 )
 select
-    id_smart_price as sk_smart_price,
+    coalesce(id_smart_price,-1) as sk_smart_price,
     id_house_listing as sk_house_listing,
     cast(date_format(ts_started_status, 'yyyyMMdd') as bigint) as sk_price_started_date,
-    cast(date_format(ts_ended_status,'yyyyMMdd') as bigint) as sk_price_ended_date,
+    coalesce(cast(date_format(ts_ended_status,'yyyyMMdd') as bigint),-1) as sk_price_ended_date,
     is_enabled as is_smart_pricing_enabled, 
     reason as price_change_reason,
     rent,

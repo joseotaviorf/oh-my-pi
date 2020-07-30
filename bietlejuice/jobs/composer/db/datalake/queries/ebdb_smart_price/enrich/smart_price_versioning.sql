@@ -191,7 +191,9 @@ smp_aud as (
         dpa.rev,
         dpa.id_dynamic_pricing_parameter,
         dpa.status,
-        cast(from_unixtime(cast(ure.ts_revision as bigint)/1000) as timestamp) as date_time
+        cast(from_unixtime(cast(ure.ts_revision as bigint)/1000) as timestamp) as date_time,
+        -- TODO: Remove fixed_mod_status column after bugs in the table dynamic_pricing_house_aud are fixed
+        coalesce(lag(status) over (partition by id_house order by dpa.rev), '') != status as fixed_mod_status
     from
         datalake_ebdb_clean.dynamic_pricing_house_aud  dpa
     join
@@ -216,6 +218,8 @@ house_smp_status as (
             on hlf.id_house = smp.id_house
             and smp.date_time between coalesce(hlf.ts_listing_version_start, cast('1900-01-01' as timestamp)) and coalesce(hlf.ts_listing_version_end, now())
             and smp.date_time is not null
+            -- TODO: Remove fixed_mod_status column after bugs in the table dynamic_pricing_house_aud are fixed
+            and fixed_mod_status = true
 ),
 base as (
     select
@@ -227,9 +231,7 @@ base as (
         status,
         lag(status) over (partition by id_house_listing order by ts_start_status) previous_status,
         ts_start_status,
-        ts_end_status,
-        -- TODO: Remove fixed_mod_status column after bugs in the table dynamic_pricing_house_aud are fixed
-        coalesce(lag(status) over (partition by id_house order by coalesce(id_dynamic_pricing, rev_dynamic_pricing_house_aud)), '') != status as fixed_mod_status
+        ts_end_status
     from
         house_smp_status
     where
@@ -249,9 +251,6 @@ version_status as (
         case when status = 'ACTIVE' and coalesce(previous_status,'abracadabra') != 'PAUSED' then dense_rank() over (partition by id_house_listing, status order by ts_start_status) end as version_inactive
     from
         base
-    -- TODO: Remove this filter after bugs in the table dynamic_pricing_house_aud are fixed
-    where
-        fixed_mod_status = true
 ),
 version_for_all as (
     select
