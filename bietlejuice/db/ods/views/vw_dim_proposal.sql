@@ -98,6 +98,8 @@ from credit_evaluation_order ceo
 join public.credit_evaluation ce
   on ceo.id_proposal = ce.id_proposal
   and ceo.credit_evaluation_last_date = ce.ts_updated
+-- TO DO: Temporary fix to remove duplicate rows
+group by 1,2,3,4,5
 )
 select
   p.id as sk_proposal,
@@ -166,5 +168,5 @@ left join sortinghat_prop shp
 left join credit_evaluation ce
   on p.id = ce.id_proposal
 -- TO DO: Temporary fix. Waiting on DAs to reshape the rule and treat duplicated values with same ts_updated and different status
-where sk_proposal != 416634
+where p.id != 416634
 ;
