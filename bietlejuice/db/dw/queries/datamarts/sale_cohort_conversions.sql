@@ -4,6 +4,7 @@ SELECT
 	sk_lead_date,
 	sk_lead,
 	sk_prospect_date,
+	sk_first_contact_date,
 	sk_qualified_date,
 	sk_opportunity_date,
 	sk_first_listing_date,
@@ -14,13 +15,13 @@ SELECT
 	     WHEN mkt_completion = 'Full Self-Service' THEN 'FSS'
 	     ELSE 'IS'
 	END AS lead_context,
-	CASE WHEN mkt_campaign_context = 'Organic' THEN 'Branded'
-         ELSE mkt_campaign_context
+	CASE WHEN lead_context_origin = 'Organic' THEN 'Branded'
+         ELSE lead_context_origin
 	END AS mkt_campaign_context,
 	CASE WHEN mkt_channel IN ('CRM/Notification','Backend','Branding','Other') THEN 'Paid'
          ELSE 'Non Paid'
 	END AS mkt_type
-FROM datamarts.temp_sale_supply_funnel
+FROM sale.fact_listing_flows
 ),
 monday_adjusted AS (
 -- treat data from Monday gsheets
@@ -85,15 +86,75 @@ LEFT JOIN datamarts.demand_sale_flows dsf
   ON sde.id_buyer = dsf.id_buyer
   AND sde.id_house = dsf.id_house
 ),
+p2fc AS (
+SELECT
+   	slf.sk_prospect_date AS base_date,
+   	slf.lead_context,
+   	slf.mkt_campaign_context,
+   	slf.mkt_origin,
+  	slf.mkt_channel,
+   	slf.mkt_type,
+   	NULL AS first_origin_demand,
+   	NULL AS origin_before_offer,
+   	NULL AS origin_after_offer,
+   	CASE WHEN datediff('week',DATE_TRUNC('week',DATE(slf.sk_prospect_date)),DATE_TRUNC('week',DATE(NULLIF(slf.sk_first_contact_date,-1)))) < 5
+		THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(slf.sk_prospect_date)),DATE_TRUNC('week',DATE(NULLIF(slf.sk_first_contact_date,-1))))
+		WHEN datediff('week',DATE_TRUNC('week',DATE(slf.sk_prospect_date)),DATE_TRUNC('week',DATE(NULLIF(slf.sk_first_contact_date,-1)))) >= 5
+		THEN 'W5+'
+   	END AS weeks_conversion,
+   	COUNT(slf.sk_prospect_date) AS p2fc,
+   	NULL::BIGINT AS fc2q,
+   	NULL::BIGINT AS p2q,
+	NULL::BIGINT AS q2o,
+	NULL::BIGINT AS o2fl,
+	NULL::BIGINT AS vb2vc,
+	NULL::BIGINT AS vc2os,
+	NULL::BIGINT AS vb2os,
+	NULL::BIGINT AS os2oa,
+	NULL::BIGINT AS oa2ccv
+FROM sale_listing_flows_adjust AS slf
+WHERE slf.sk_prospect_date > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10
+),
+fc2q AS (
+SELECT
+	slf.sk_first_contact_date AS base_date,
+   	slf.lead_context,
+   	slf.mkt_campaign_context,
+   	slf.mkt_origin,
+  	slf.mkt_channel,
+   	slf.mkt_type,
+   	NULL AS first_origin_demand,
+	NULL AS origin_before_offer,
+	NULL AS origin_after_offer,
+	CASE WHEN datediff('week',DATE_TRUNC('week',DATE(slf.sk_first_contact_date)),DATE_TRUNC('week',DATE(NULLIF(slf.sk_qualified_date,-1)))) < 5
+			  THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(slf.sk_first_contact_date)),DATE_TRUNC('week',DATE(NULLIF(slf.sk_qualified_date,-1))))
+	     WHEN datediff('week',DATE_TRUNC('week',DATE(slf.sk_first_contact_date)),DATE_TRUNC('week',DATE(NULLIF(slf.sk_qualified_date,-1)))) >= 5
+	     	  THEN 'W5+'
+	END AS weeks_conversion,
+   	NULL::BIGINT AS p2fc,
+   	COUNT(slf.sk_first_contact_date) AS fc2q,
+   	NULL::BIGINT AS p2q,
+	NULL::BIGINT AS q2o,
+	NULL::BIGINT AS o2fl,
+	NULL::BIGINT AS vb2vc,
+	NULL::BIGINT AS vc2os,
+	NULL::BIGINT AS vb2os,
+	NULL::BIGINT AS os2oa,
+	NULL::BIGINT AS oa2ccv
+FROM sale_listing_flows_adjust AS slf
+WHERE slf.sk_first_contact_date > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10
+),
 p2q AS (
 SELECT
-	slf.sk_prospect_date AS date_,
-    slf.lead_context,
-    slf.mkt_campaign_context,
-    slf.mkt_origin,
-    slf.mkt_channel,
-    slf.mkt_type,
-    NULL AS first_origin_demand,
+	slf.sk_prospect_date AS base_date,
+   	slf.lead_context,
+   	slf.mkt_campaign_context,
+   	slf.mkt_origin,
+   	slf.mkt_channel,
+   	slf.mkt_type,
+   	NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
 	CASE WHEN datediff('week',DATE_TRUNC('week',DATE(slf.sk_prospect_date)),DATE_TRUNC('week',DATE(NULLIF(slf.sk_qualified_date,-1)))) < 5
@@ -101,7 +162,9 @@ SELECT
 	     WHEN datediff('week',DATE_TRUNC('week',DATE(slf.sk_prospect_date)),DATE_TRUNC('week',DATE(NULLIF(slf.sk_qualified_date,-1)))) >= 5
 	     	  THEN 'W5+'
 	END AS weeks_conversion,
-    COUNT(slf.sk_prospect_date) AS p2q,
+	NULL::BIGINT AS p2fc,
+   	NULL::BIGINT AS fc2q,
+   	COUNT(slf.sk_prospect_date) AS p2q,
 	NULL::BIGINT AS q2o,
 	NULL::BIGINT AS o2fl,
 	NULL::BIGINT AS vb2vc,
@@ -115,13 +178,13 @@ GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 q2o AS (
 SELECT
-	slf.sk_qualified_date AS date_,
-    slf.lead_context,
-    slf.mkt_campaign_context,
-    slf.mkt_origin,
-    slf.mkt_channel,
-    slf.mkt_type,
-    NULL AS first_origin_demand,
+	slf.sk_qualified_date AS base_date,
+   	slf.lead_context,
+   	slf.mkt_campaign_context,
+   	slf.mkt_origin,
+   	slf.mkt_channel,
+   	slf.mkt_type,
+   	NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
 	CASE WHEN datediff('week',DATE_TRUNC('week',DATE(slf.sk_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(slf.sk_opportunity_date,-1)))) < 5
@@ -129,7 +192,9 @@ SELECT
 	     WHEN datediff('week',DATE_TRUNC('week',DATE(slf.sk_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(slf.sk_opportunity_date,-1)))) >= 5
 	     	  THEN 'W5+'
 	END AS weeks_conversion,
-    NULL::BIGINT AS p2q,
+	NULL::BIGINT AS p2fc,
+   	NULL::BIGINT AS fc2q,
+   	NULL::BIGINT AS p2q,
 	COUNT(slf.sk_qualified_date) AS q2o,
 	NULL::BIGINT AS o2fl,
 	NULL::BIGINT AS vb2vc,
@@ -143,13 +208,13 @@ GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 o2fl AS (
 SELECT
-	slf.sk_opportunity_date AS date_,
-    slf.lead_context,
-    slf.mkt_campaign_context,
-    slf.mkt_origin,
-    slf.mkt_channel,
-    slf.mkt_type,
-    NULL AS first_origin_demand,
+	slf.sk_opportunity_date AS base_date,
+   	slf.lead_context,
+   	slf.mkt_campaign_context,
+   	slf.mkt_origin,
+   	slf.mkt_channel,
+   	slf.mkt_type,
+   	NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
 	CASE WHEN datediff('week',DATE_TRUNC('week',DATE(slf.sk_opportunity_date)),DATE_TRUNC('week',DATE(NULLIF(slf.sk_first_listing_date,-1)))) < 5
@@ -157,7 +222,9 @@ SELECT
 	     WHEN datediff('week',DATE_TRUNC('week',DATE(slf.sk_opportunity_date)),DATE_TRUNC('week',DATE(NULLIF(slf.sk_first_listing_date,-1)))) >= 5
 	     	  THEN 'W5+'
 	END AS weeks_conversion,
-    NULL::BIGINT AS p2q,
+	NULL::BIGINT AS p2fc,
+   	NULL::BIGINT AS fc2q,
+   	NULL::BIGINT AS p2q,
 	NULL::BIGINT AS q2o,
 	COUNT(slf.sk_opportunity_date) AS o2fl,
 	NULL::BIGINT AS vb2vc,
@@ -171,13 +238,13 @@ GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 vb2vc AS (
 SELECT
-	REPLACE(DATE(dt_created),'-','')::INTEGER AS date_,
-    NULL AS lead_context,
-    NULL AS mkt_campaign_context,
-    NULL AS mkt_origin,
-    NULL AS mkt_channel,
-    NULL AS mkt_type,
-    first_touchpoint AS first_origin_demand,
+	REPLACE(DATE(dt_created),'-','')::INTEGER AS base_date,
+   	NULL AS lead_context,
+   	NULL AS mkt_campaign_context,
+   	NULL AS mkt_origin,
+   	NULL AS mkt_channel,
+   	NULL AS mkt_type,
+   	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	CASE WHEN datediff('week',DATE_TRUNC('week',DATE(dt_created)),DATE_TRUNC('week',DATE(dt_completed))) < 5
@@ -185,7 +252,9 @@ SELECT
 	     WHEN datediff('week',DATE_TRUNC('week',DATE(dt_created)),DATE_TRUNC('week',DATE(dt_completed))) >= 5
 	     	  THEN 'W5+'
 	END AS weeks_conversion,
-    NULL::BIGINT AS p2q,
+	NULL::BIGINT AS p2fc,
+   	NULL::BIGINT AS fc2q,
+   	NULL::BIGINT AS p2q,
 	NULL::BIGINT AS q2o,
 	NULL::BIGINT AS o2fl,
 	COUNT(DISTINCT sk_booking) AS vb2vc,
@@ -198,13 +267,13 @@ GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 vc2os AS (
 SELECT
-	REPLACE(DATE(dt_completed),'-','')::INTEGER AS date_,
-    NULL AS lead_context,
-    NULL AS mkt_campaign_context,
-    NULL AS mkt_origin,
-    NULL AS mkt_channel,
-    NULL AS mkt_type,
-    first_touchpoint AS first_origin_demand,
+	REPLACE(DATE(dt_completed),'-','')::INTEGER AS base_date,
+   	NULL AS lead_context,
+   	NULL AS mkt_campaign_context,
+   	NULL AS mkt_origin,
+   	NULL AS mkt_channel,
+   	NULL AS mkt_type,
+   	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	CASE WHEN datediff('week',DATE_TRUNC('week',DATE(dt_completed)),DATE_TRUNC('week',DATE(dt_offer_sent))) < 5
@@ -212,7 +281,9 @@ SELECT
 	     WHEN datediff('week',DATE_TRUNC('week',DATE(dt_completed)),DATE_TRUNC('week',DATE(dt_offer_sent))) >= 5
 	     	  THEN 'W5+'
 	END AS weeks_conversion,
-    NULL::BIGINT AS p2q,
+	NULL::BIGINT AS p2fc,
+   	NULL::BIGINT AS fc2q,
+   	NULL::BIGINT AS p2q,
 	NULL::BIGINT AS q2o,
 	NULL::BIGINT AS o2fl,
 	NULL::BIGINT AS vb2vc,
@@ -225,13 +296,13 @@ GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 vb2os AS (
 SELECT
-	REPLACE(DATE(dt_created),'-','')::INTEGER AS date_,
-    NULL AS lead_context,
-    NULL AS mkt_campaign_context,
-    NULL AS mkt_origin,
-    NULL AS mkt_channel,
-    NULL AS mkt_type,
-    first_touchpoint AS first_origin_demand,
+	REPLACE(DATE(dt_created),'-','')::INTEGER AS base_date,
+   	NULL AS lead_context,
+   	NULL AS mkt_campaign_context,
+   	NULL AS mkt_origin,
+   	NULL AS mkt_channel,
+   	NULL AS mkt_type,
+   	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	CASE WHEN datediff('week',DATE_TRUNC('week',DATE(dt_created)),DATE_TRUNC('week',DATE(dt_offer_sent))) < 5
@@ -239,7 +310,9 @@ SELECT
 	     WHEN datediff('week',DATE_TRUNC('week',DATE(dt_created)),DATE_TRUNC('week',DATE(dt_offer_sent))) >= 5
 	     	  THEN 'W5+'
 	END AS weeks_conversion,
-    NULL::BIGINT AS p2q,
+	NULL::BIGINT AS p2fc,
+   	NULL::BIGINT AS fc2q,
+   	NULL::BIGINT AS p2q,
 	NULL::BIGINT AS q2o,
 	NULL::BIGINT AS o2fl,
 	NULL::BIGINT AS vb2vc,
@@ -252,13 +325,13 @@ GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 os2oa AS (
 SELECT
-	REPLACE(DATE(dt_offer_sent),'-','')::INTEGER AS date_,
-    NULL AS lead_context,
-    NULL AS mkt_campaign_context,
-    NULL AS mkt_origin,
-    NULL AS mkt_channel,
-    NULL AS mkt_type,
-    first_touchpoint AS first_origin_demand,
+	REPLACE(DATE(dt_offer_sent),'-','')::INTEGER AS base_date,
+   	NULL AS lead_context,
+   	NULL AS mkt_campaign_context,
+   	NULL AS mkt_origin,
+   	NULL AS mkt_channel,
+   	NULL AS mkt_type,
+   	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	CASE WHEN datediff('week',DATE_TRUNC('week',DATE(dt_offer_sent)),DATE_TRUNC('week',DATE(dt_offer_accepted))) < 5
@@ -266,7 +339,9 @@ SELECT
 	     WHEN datediff('week',DATE_TRUNC('week',DATE(dt_offer_sent)),DATE_TRUNC('week',DATE(dt_offer_accepted))) >= 5
 	     	  THEN 'W5+'
 	END AS weeks_conversion,
-    NULL::BIGINT AS p2q,
+	NULL::BIGINT AS p2fc,
+   	NULL::BIGINT AS fc2q,
+   	NULL::BIGINT AS p2q,
 	NULL::BIGINT AS q2o,
 	NULL::BIGINT AS o2fl,
 	NULL::BIGINT AS vb2vc,
@@ -279,13 +354,13 @@ GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 oa2ccv AS (
 SELECT
-	REPLACE(DATE(dt_offer_accepted),'-','')::INTEGER AS date_,
-    NULL AS lead_context,
-    NULL AS mkt_campaign_context,
-    NULL AS mkt_origin,
-    NULL AS mkt_channel,
-    NULL AS mkt_type,
-    first_touchpoint AS first_origin_demand,
+	REPLACE(DATE(dt_offer_accepted),'-','')::INTEGER AS base_date,
+   	NULL AS lead_context,
+   	NULL AS mkt_campaign_context,
+   	NULL AS mkt_origin,
+   	NULL AS mkt_channel,
+   	NULL AS mkt_type,
+   	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	CASE WHEN datediff('week',DATE_TRUNC('week',DATE(dt_offer_accepted)),DATE_TRUNC('week',DATE(dt_ccv_signed))) < 5
@@ -293,7 +368,9 @@ SELECT
 	     WHEN datediff('week',DATE_TRUNC('week',DATE(dt_offer_accepted)),DATE_TRUNC('week',DATE(dt_ccv_signed))) >= 5
 	     	  THEN 'W5+'
 	END AS weeks_conversion,
-    NULL::BIGINT AS p2q,
+	NULL::BIGINT AS p2fc,
+   	NULL::BIGINT AS fc2q,
+   	NULL::BIGINT AS p2q,
 	NULL::BIGINT AS q2o,
 	NULL::BIGINT AS o2fl,
 	NULL::BIGINT AS vb2vc,
@@ -305,7 +382,11 @@ FROM sale_demand_classification
 GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 union_all AS (
-  SELECT * FROM p2q
+SELECT * FROM p2fc
+	UNION ALL
+	SELECT * FROM fc2q
+	UNION ALL
+	SELECT * FROM p2q
 	UNION ALL
 	SELECT * FROM q2o
 	UNION ALL
@@ -336,6 +417,8 @@ SELECT
 	ua.origin_before_offer,
 	ua.origin_after_offer,
 	ua.weeks_conversion,
+	ua.p2fc,
+	ua.fc2q,
 	ua.p2q,
 	ua.q2o,
 	ua.o2fl,
@@ -346,7 +429,7 @@ SELECT
 	ua.oa2ccv
 FROM union_all ua
 RIGHT JOIN dim_date dd
-  ON ua.date_ = dd.sk_date
+  ON ua.base_date = dd.sk_date
 WHERE dd.date BETWEEN '2020-01-01' AND current_date
 )
 SELECT
@@ -363,14 +446,16 @@ SELECT
 	origin_before_offer,
 	origin_after_offer,
 	weeks_conversion,
+	SUM(p2fc) AS p2fc,
+	SUM(fc2q) AS fc2q,
 	SUM(p2q) AS p2q,
-    SUM(q2o) AS q2o,
+   	SUM(q2o) AS q2o,
 	SUM(o2fl) AS o2fl,
 	SUM(vb2vc) AS vb2vc,
 	SUM(vc2os) AS vc2os,
 	SUM(vb2os) AS vb2os,
 	SUM(os2oa) AS os2oa,
-	sum(oa2ccv) AS oa2ccv,
+	SUM(oa2ccv) AS oa2ccv,
 	current_timestamp AS ts_load
 FROM union_all_date
 GROUP BY week_start,
