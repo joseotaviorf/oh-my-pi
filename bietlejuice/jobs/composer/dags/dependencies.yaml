@@ -74,3 +74,16 @@ bietlejuice.dw_smart_price:
 
 bietlejuice.enrich_ebdb_region:
   - bietlejuice.ebdb:load-region
+
+bietlejuice.enrich_booking:
+  - bietlejuice.ebdb:load-booking
+  - bietlejuice.ebdb:load-booking-aud
+  - bietlejuice.ebdb:load-follow-up-details
+  - bietlejuice.ebdb:load-entrance
+  - bietlejuice.ebdb:load-booking-status-change
+  - bietlejuice.ebdb:load-appointment-change-reason-category
+  - bietlejuice.ebdb:load-user-revision-entity
+  - bietlejuice.ebdb:load-visit
+  - bietlejuice.ebdb:load-visit-origin
+  - bietlejuice.ebdb:load-visitor
+  # TODO: Add gsheets after migrated to composer
