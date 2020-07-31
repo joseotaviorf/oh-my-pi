@@ -115,7 +115,7 @@ def extract_tasks(_uri, id_column, task_types, dt=None):
                 if 'metadata' in action:
                     if 'key' in action['metadata']:
                         if action['metadata']['key'] == '/assigneeId':
-                            if first_rep_id is None:
+                            if first_rep_id is None and 'oldValue' in action:
                                 first_rep_id = action['metadata']['oldValue']
 
         if first_rep_id is None:
