@@ -1,6 +1,7 @@
 pipeline:
-  offer-attribution-conversion-paths-demand:
-    dw:
-      sql_file: dw/queries/datamarts/offer_attribution_conversion_paths_demand.sql
-      table: offer_attribution_conversion_paths_demand
-      schema: datamarts
+  # ! KEEP THIS COMMENTED AS A TEMPLATE UNTIL WE HAVE A DATAMART IN THIS FLOW
+  # offer-attribution-conversion-paths-demand:
+  #   dw:
+  #     sql_file: dw/queries/datamarts/offer_attribution_conversion_paths_demand.sql
+  #     table: offer_attribution_conversion_paths_demand
+  #     schema: datamarts
