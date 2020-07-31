@@ -1,0 +1,5 @@
+# Config for performance_marketing_metrics_demand
+---
+streams:
+  - direction: 'upstream'
+    task_ids: ['athena_talk_to_agent']
