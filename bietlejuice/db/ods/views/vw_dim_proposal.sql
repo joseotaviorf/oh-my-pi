@@ -81,7 +81,8 @@ select
 	id_proposal,
 	min(case when "result" in ('PRE_APPROVED','REGULAR') then ts_updated end) as credit_evaluation_positive_first_date,
 	max(case when "result" in ('PRE_APPROVED','REGULAR') then ts_updated end) as credit_evaluation_positive_last_date,
-	max(ts_updated) as credit_evaluation_last_date,
+	max(ts_updated) as credit_evaluation_last_updated_date,
+	max(ts_created) as credit_evaluation_last_created_date,
 	count(distinct id) as number_evaluations
 from public.credit_evaluation
 where status = 'FINISHED'
@@ -97,9 +98,8 @@ select
 from credit_evaluation_order ceo
 join public.credit_evaluation ce
   on ceo.id_proposal = ce.id_proposal
-  and ceo.credit_evaluation_last_date = ce.ts_updated
--- TO DO: Temporary fix to remove duplicate rows
-group by 1,2,3,4,5
+    and ceo.credit_evaluation_last_updated_date = ce.ts_updated
+    and ceo.credit_evaluation_last_created_date = ce.ts_created
 )
 select
   p.id as sk_proposal,
@@ -167,6 +167,4 @@ left join sortinghat_prop shp
   on shp.id = p.id
 left join credit_evaluation ce
   on p.id = ce.id_proposal
--- TO DO: Temporary fix. Waiting on DAs to reshape the rule and treat duplicated values with same ts_updated and different status
-where p.id != 416634
 ;
