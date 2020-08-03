@@ -24,7 +24,6 @@ select
   slotdia as slot_day,
   fupvisita as visit_fup,
   tipo as type,
-  fupVisita in ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho') as is_visit_completed,
   agentefixo as is_agent_fixed,
   comentariofupvisita as visit_fup_comment,
   informeinquilinopendente as is_tenant_notification_pending,

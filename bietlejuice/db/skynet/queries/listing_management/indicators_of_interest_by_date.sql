@@ -164,12 +164,14 @@ users_bookings_per_day as (
 ),
 visits as (
 	select
-	a.id_house as house_id,
-	a.id_visitor,
-	min(dt_booking) as first_visit
-	from datalake_ebdb_clean_prod.booking a
-	where a.type = 'Visita'
-	and a.is_visit_completed
+	  a.id_house as house_id,
+	  a.id_visitor,
+	  min(dt_booking) as first_visit
+	from
+	  datalake_booking_prod.booking a
+	where
+	  a.type = 'Visita'
+	  and a.is_visit_completed
 	group by 1, 2
 ),
 users_visits_per_day as (
