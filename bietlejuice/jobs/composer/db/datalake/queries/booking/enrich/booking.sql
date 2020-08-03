@@ -221,7 +221,7 @@ base_booking as (
     (b.type = 'Vistoria') as is_inspection,
     (b.type = 'Visita') as is_visit,
     (b.type = 'SessaoFotos') as is_photo_session,
-    (b.visit_fup in ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho')) as is_visit_completed,
+    coalesce(b.visit_fup in ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho'), false) as is_visit_completed,
     -- is a reschedule from another booking
     (b.id_rescheduled_booking is not null) as is_via_reschedule,
     -- was rescheduled to another booking

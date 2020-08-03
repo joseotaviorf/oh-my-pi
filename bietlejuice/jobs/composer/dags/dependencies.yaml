@@ -87,3 +87,8 @@ bietlejuice.enrich_booking:
   - bietlejuice.ebdb:load-visit-origin
   - bietlejuice.ebdb:load-visitor
   # TODO: Add gsheets after migrated to composer
+
+bietlejuice.dw_booking:
+  - bietlejuice.enrich_booking
+  - bietlejuice.ebdb:load-visit
+  - bietlejuice.enrich_amplitude_visit
