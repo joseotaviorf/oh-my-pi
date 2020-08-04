@@ -21,13 +21,11 @@ begin
 
 	EXECUTE 'call grant_permissions_to_group(\'' || schema_name ||'\', \'data_heroes\');';
 	EXECUTE 'call grant_permissions_to_group(\'' || schema_name ||'\', \'general\');';
+	EXECUTE 'call grant_permissions_to_group(\'' || schema_name ||'\', \'metabase\');';
 
 	EXECUTE 'call grant_permissions_to_user(\'' || schema_name ||'\', \'looker_full\');';
 	EXECUTE 'call grant_permissions_to_user(\'' || schema_name ||'\', \'looker_general\');';
 	EXECUTE 'call grant_permissions_to_user(\'' || schema_name ||'\', \'looker_marketing\');';
-	EXECUTE 'call grant_permissions_to_user(\'' || schema_name ||'\', \'metabase_general\');';
-	EXECUTE 'call grant_permissions_to_user(\'' || schema_name ||'\', \'metabase_full\');';
-	EXECUTE 'call grant_permissions_to_user(\'' || schema_name ||'\', \'metabase_marketing\');';
 
 	raise info 'All permissions granted on schema %;', schema_name;
 end;
