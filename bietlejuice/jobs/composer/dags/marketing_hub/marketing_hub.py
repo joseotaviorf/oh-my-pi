@@ -33,7 +33,7 @@ MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz)
 MAIN_SCHEDULE_INTERVAL = "15 7 * * *"
 
 GOOGLE_ADS_SOURCE_PATH = f"s3://{S3_MARKETING_PATH}/google-reports"
-GOOGLE_ADS_TARGET_PATH = f"s3://{S3_PATH}/raw/marketing/google_ads"
+GOOGLE_ADS_TARGET_PATH = f"s3://{S3_PATH}/raw/marketing_hub/google_ads"
 
 dag = DAG(
     dag_id=DAG_ID,

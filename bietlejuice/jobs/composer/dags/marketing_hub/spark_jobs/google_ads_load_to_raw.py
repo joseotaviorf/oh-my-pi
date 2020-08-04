@@ -12,9 +12,10 @@ from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.s3_consumer import S3Consumer
 from bietlejuice.jobs.composer.dags.marketing_hub import SOURCE
-from bietlejuice.jobs.composer.loaders import S3Loader
+from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 from bietlejuice.jobs.composer.services import S3Service
+from pyspark.sql.functions import lit
 
 JOB_NAME = "google_ads_load_to_raw"
 logging.getLogger("py4j").setLevel(logging.ERROR)
@@ -47,6 +48,7 @@ REPORT_SCHEMAS = {
         "ImageCreativeName",
         "AccountDescriptiveName",
         "AbsoluteTopImpressionPercentage",
+        "ReportType",
     ],
     "campaigns_performance_report": [
         "ExternalCustomerId",
@@ -64,6 +66,7 @@ REPORT_SCHEMAS = {
         "Year",
         "AbsoluteTopImpressionPercentage",
         "SearchImpressionShare",
+        "ReportType",
     ],
     "keywords_performance_report": [
         "ExternalCustomerId",
@@ -83,6 +86,7 @@ REPORT_SCHEMAS = {
         "AccountDescriptiveName",
         "AbsoluteTopImpressionPercentage",
         "SearchImpressionShare",
+        "ReportType",
     ],
 }
 FULL_FILE_PATH_LENGTH = 8
@@ -163,6 +167,11 @@ def fix_report_type(report_type):
     return REPORT_TYPES[report_type] if report_type in REPORT_TYPES else report_type
 
 
+def enrich_csv(csv_file, report_type):
+    enriched_csv = csv_file.withColumn("ReportType", lit(report_type))
+    return enriched_csv
+
+
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
 
@@ -192,6 +201,7 @@ if __name__ == "__main__":
     s3_consumer = S3Consumer(spark_client)
     s3_service = S3Service(boto3.resource("s3"))
     s3_loader = S3Loader()
+    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
     s3_source_raw_file_paths = s3_service.list_objects(s3_file_path_source)
     s3_source_full_file_paths = filter_for_full_file_paths(s3_source_raw_file_paths)
@@ -205,8 +215,9 @@ if __name__ == "__main__":
             s3_source_file_path, s3_source_file_format, options=csv_options
         )
         report_type = get_report_type(s3_source_file_path)
+        enriched_csv_file = enrich_csv(csv_s3_file, report_type)
         csv_s3_file_with_schema = add_schema_to_csv(
-            csv_s3_file, s3_source_file_path, report_type
+            enriched_csv_file, s3_source_file_path, report_type
         )
         s3_target_database_location, s3_target_table_name = build_target_file_path(
             csv_s3_file_with_schema, s3_source_file_path, report_type
@@ -219,4 +230,11 @@ if __name__ == "__main__":
             table_name=s3_target_table_name,
             database_location=s3_target_database_location,
             format_options=format_options,
+        )
+        spark_metastore_loader.update_metastore(
+            csv_s3_file_with_schema,
+            SOURCE,
+            s3_target_table_name,
+            format_options,
+            s3_target_database_location,
         )
