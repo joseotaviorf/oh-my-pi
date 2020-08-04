@@ -208,7 +208,7 @@ base_booking as (
     ) as ts_first_canceled,
     cast(b.dt_booking as timestamp)
       + ((b.slot_day * 15 / 60)+8) * interval 1 hours
-      + (b.slot_day * 15 % 60) * interval 1 minutes
+      + abs(b.slot_day * 15 % 60) * interval 1 minutes
     as ts_booking_local_tz,
     from_utc_timestamp(b.ts_created, 'Brazil/East') as ts_created_local_tz,
     from_utc_timestamp(b.ts_visit_fup, 'Brazil/East') as ts_visit_follow_up_local_tz,
