@@ -176,5 +176,8 @@ def build_tasks_dependency(create_cluster_task, terminate_cluster_task):
             entity_task >> terminate_cluster_task
 
 
-build_tasks()
-build_tasks_dependency(create_cluster_task, terminate_cluster_task)
+if pipeline_config and pipeline_config.items():
+    build_tasks()
+    build_tasks_dependency(create_cluster_task, terminate_cluster_task)
+else:
+    create_cluster_task >> terminate_cluster_task
