@@ -73,4 +73,8 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-create_cluster_task >> list(enrich_sub_dags.values()) >> terminate_cluster_task
+answer_sub_dag = enrich_sub_dags.pop("answer")
+dispatch_sub_dag = enrich_sub_dags.pop("dispatch")
+create_cluster_task >> [answer_sub_dag, dispatch_sub_dag]
+dispatch_sub_dag >> enrich_sub_dags["nps_customer_conversions"]
+answer_sub_dag >> list(enrich_sub_dags.values()) >> terminate_cluster_task
