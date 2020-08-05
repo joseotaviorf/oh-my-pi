@@ -12,6 +12,11 @@ WITH answers AS (
 		type,
 		status,
 		nps_answer,
+		CASE
+		    WHEN nps_answer <= 6 THEN 'detractor'
+		    WHEN nps_answer <= 8 THEN 'passive'
+		    WHEN nps_answer <= 10 THEN 'promoter'
+		    END AS score_category,
 		last_nps_answer,
 		nps_comment,
 		justifications,
@@ -47,6 +52,7 @@ SELECT
 	a.type,
 	a.status,
 	a.nps_answer,
+	a.score_category,
 	a.last_nps_answer,
 	a.nps_comment,
 	a.justifications,
