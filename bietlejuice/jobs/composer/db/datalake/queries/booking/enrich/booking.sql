@@ -36,7 +36,10 @@ canceled_date as (
   )
   select
     mcd.id_booking,
-    cast(from_unixtime(ure.ts_revision/1000) as timestamp) as ts_first_canceled
+    -- TODO [ODS] check if milliseconds is really needed for this column
+    cast(from_unixtime(ure.ts_revision/1000) as timestamp)
+      + (ure.ts_revision % 1000) * interval 1 milliseconds
+    as ts_first_canceled
   from min_canceled_date mcd
   join datalake_ebdb_clean.user_revision_entity ure
     on ure.id = mcd.rev_canceled
