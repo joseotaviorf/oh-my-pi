@@ -3,6 +3,7 @@ SELECT
     dataParaMudanca AS ts_to_scheduling,
     dataProposta AS ts_proposal,
     garantia AS guarantee,
+    garantiaPagaEm as ts_guarantee_paid,
     motivacao AS motivation,
     propostaAluguel AS rent_proposal,
     status,
