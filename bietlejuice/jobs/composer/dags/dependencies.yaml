@@ -64,6 +64,14 @@ bietlejuice.enrich_tracksale:
   - bietlejuice.tracksale:dispatch
   - bietlejuice.tracksale:answer
 
+bietlejuice.enrich_nps_answer_drivers:
+  - bietlejuice.enrich_tracksale:load-answer-to-enrich
+  - bietlejuice.ebdb:load-house
+  - bietlejuice.ebdb:load-booking
+  - bietlejuice.ebdb:load-offer
+  - bietlejuice.ebdb:load-contract
+  - bietlejuice.enrich_ebdb_listing:load-house-listing-to-enrich
+
 bietlejuice.dw_visit:
   - bietlejuice.ebdb:load-visit
 
