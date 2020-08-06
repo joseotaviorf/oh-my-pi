@@ -23,7 +23,8 @@ class CRMTasksInspection(CRMTasks):
         'PrimeiraAnaliseVistoriaSaida',
         'EnviarPrimeiroResultadoSaida',
         'SegundaAnaliseVistoriaSaida',
-        'EnviarSegundoResultadoSaida'
+        'EnviarSegundoResultadoSaida',
+        'AnaliseVistoriaSaida'
     ]
 
     MANUAL_TASK_WORKGROUP_IDS = [
