@@ -72,8 +72,9 @@ bietlejuice.dw_smart_price:
   - bietlejuice.ebdb:load-dynamic-pricing-house
   - bietlejuice.ebdb:load-dynamic-pricing-parameters
 
-bietlejuice.enrich_ebdb_region:
+bietlejuice.enrich_region:
   - bietlejuice.ebdb:load-region
+  # TODO [ODS] Add gsheets after migrated to composer
 
 bietlejuice.enrich_booking:
   - bietlejuice.ebdb:load-booking

@@ -15,7 +15,7 @@ from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 7, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
 
-CONTEXT = "ebdb_region"
+CONTEXT = "region"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = Variable.get("environment")
