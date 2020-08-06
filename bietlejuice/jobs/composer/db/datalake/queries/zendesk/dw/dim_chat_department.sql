@@ -3,6 +3,6 @@ select
 	name,
 	description,
 	is_enabled,
-	members,
+	left(members, 2000) as members,
 	now() as ts_load
 from datalake_zendesk_clean.chats_departments

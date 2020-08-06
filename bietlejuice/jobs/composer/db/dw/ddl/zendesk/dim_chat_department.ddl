@@ -4,6 +4,6 @@ create table if not exists zendesk.dim_chat_department (
     name varchar(255),
     description varchar(500),
     is_enabled boolean,
-    members varchar(1500),
+    members varchar(2000),
     ts_load timestamp    
 )
