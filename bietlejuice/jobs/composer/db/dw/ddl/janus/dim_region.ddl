@@ -18,7 +18,7 @@ create table if not exists janus.dim_region (
   regional varchar,
   regional_deprecated varchar,
   tier integer,
-  dt_first_booking timestamp,
+  dt_first_booking date,
   ts_first_house_created timestamp,
   ts_created timestamp without time zone,
   ts_updated timestamp without time zone,
