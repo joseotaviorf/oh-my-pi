@@ -1,0 +1,24 @@
+# Migration file for dim_region
+dw_schema: public
+columns_mapping:
+  - ods_column: sk_region
+    new_column_type: bigint
+  - ods_column: id
+    new_column: id_region
+    new_column_type: bigint
+  - ods_column: macro_id
+    new_column: id_macro_region
+    new_column_type: bigint
+  - ods_column: macro_name
+    new_column: macro_region_name
+  - ods_column: city_id
+    new_column: id_city
+    new_column_type: bigint
+  - ods_column: dt_first_property_created
+    new_column: ts_first_house_created
+  - ods_column: dt_created
+    new_column: ts_created
+  - ods_column: dt_updated
+    new_column: ts_updated
+  - ods_column: dt_timestamp
+    new_column: ts_load

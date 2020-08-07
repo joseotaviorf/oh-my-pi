@@ -95,9 +95,14 @@ bietlejuice.enrich_booking:
   - bietlejuice.ebdb:load-visit
   - bietlejuice.ebdb:load-visit-origin
   - bietlejuice.ebdb:load-visitor
-  # TODO: Add gsheets after migrated to composer
+  # TODO [ODS] Add gsheets after migrated to composer
 
 bietlejuice.dw_booking:
   - bietlejuice.enrich_booking
   - bietlejuice.ebdb:load-visit
   - bietlejuice.enrich_amplitude_visit
+
+bietlejuice.dw_region:
+  - bietlejuice.enrich_region
+  - bietlejuice.enrich_booking
+  - bietlejuice.enrich_ebdb_listing:load-house-to-enrich
