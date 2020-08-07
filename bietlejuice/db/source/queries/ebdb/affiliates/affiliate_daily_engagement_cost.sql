@@ -12,7 +12,8 @@ select
 		else coalesce(l.affiliateType, 'N/A')
 	end 														as affiliate_type,
 	occ.tipo 													as commission_type,
-	sum(occ.valor) 												as value_brl
+	sum(occ.valor) 												as value_brl,
+	timestamp('{str_date}')										as ts_load
 from
 	OperacaoContaCorrente occ
 left join
@@ -50,7 +51,8 @@ select
 		else coalesce(da.affiliateType, 'N/A')
 	end 															as affiliate_type,
 	'comissaoSobreAfiliadoIndicado' 								as commission_type,
-	sum(res.value_brl * 0.1) 										as value_brl
+	sum(res.value_brl * 0.1) 										as value_brl,
+	timestamp('{str_date}')											as ts_load
 from
 	(
 	select

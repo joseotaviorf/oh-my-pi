@@ -8,5 +8,6 @@ create table public.affiliate_daily_engagement_cost (
       sk_user_agent integer,
       affiliate_type varchar(64),
       commission_type varchar(64),
-      value_brl decimal(10,2)
+      value_brl decimal(10,2),
+      ts_load timestamp
 );

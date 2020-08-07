@@ -85,7 +85,7 @@ ods_fact_affiliate_daily_engagement_cost_task = BaseDAG.build_python_operator(
     python_callable=affiliate_extract_query_from_ebdb_to_ods,
     op_kwargs={'schema': 'public',
                'table_name': 'affiliate_daily_engagement_cost',
-               'date_column': 'dt_cost'}
+               'date_column': 'ts_load'}
 )
 
 dw_fact_affiliate_daily_engagement_cost_task = BaseDAG.build_python_operator(
