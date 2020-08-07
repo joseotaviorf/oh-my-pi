@@ -90,14 +90,14 @@ SELECT
 		AND type_name = 'USER'))
 		AND (RG >0
 		OR CNH >0
-		OR RNE >1)
+		OR RNE >0)
 		AND PERSONAL_DATA >0
 		AND BILLING_ADDRESS >0
 		AND BANK_DATA >0 THEN 'MAIN_OWNER_COMPLETE'
 	WHEN ref_name = 'PERSON_REPRESENTATIVE'
 		AND (RG >0
 		OR CNH >0
-		OR RNE >1)
+		OR RNE >0)
 		AND PERSONAL_DATA >0
 		AND BILLING_ADDRESS >0
 		AND BANK_DATA >0 THEN 'PERSON_REPRESENTATIVE_COMPLETE'
@@ -115,51 +115,51 @@ SELECT
 	WHEN ref_name = 'MULTIPLE_OWNER'
 		AND (RG >0
 		OR CNH >0
-		OR RNE >1)
+		OR RNE >0)
 		AND PERSONAL_DATA >0
 		AND BILLING_ADDRESS >0
 		AND BANK_DATA >0 THEN 'MAIN_MULTIPLE_OWNER_COMPLETE'
 	WHEN ref_name = 'MULTIPLE_OWNER'
 		AND (RG >0
 		OR CNH >0
-		OR RNE >1)
+		OR RNE >0)
 		AND PERSONAL_DATA >0
 		AND BILLING_ADDRESS >0
 		AND BANK_DATA IS NULL THEN 'MULTIPLE_OWNER_COMPLETE'
 	ELSE 'not_complete'
-	END AS part_docs, 
-	parts_count, 
+	END AS part_docs,
+	parts_count,
 	ts_target_folder_created,
-	ts_source_folder_created, 
-	ts_first_doc_created, 
-	ts_last_doc_created, 
-	SUM(CASE WHEN (ref_name = 'MAIN_OWNER' OR (ref_name = 'OWNER' AND type_name = 'USER')) AND (RG >0 OR CNH >0 OR RNE >1) AND PERSONAL_DATA >0 AND BILLING_ADDRESS >0 AND BANK_DATA >0 THEN 1 END) AS MAIN_OWNER_COMPLETE, 
-	SUM(CASE WHEN ref_name = 'PERSON_REPRESENTATIVE' AND (RG >0 OR CNH >0 OR RNE >1) AND PERSONAL_DATA >0 AND BILLING_ADDRESS >0 AND BANK_DATA >0 THEN 1 END) AS PERSON_REPRESENTATIVE_COMPLETE, 
-	SUM(CASE WHEN ref_name = 'COMPANY_REPRESENTATIVE' AND RG >0 AND PERSONAL_DATA >0 AND BILLING_ADDRESS >0 AND BANK_DATA >0 THEN 1 END) AS COMPANY_REPRESENTATIVE_COMPLETE, 
-	SUM(CASE WHEN ((ref_name = 'OWNER' AND type_name = 'PERSON') OR (ref_name = 'OWNER' AND type_name = 'COMPANY')) AND REPRESENTED_DATA >0 AND POWER_OF_ATTORNEY >0 THEN 1 END) AS OWNER_REP_COMPLETE, 
-	SUM(CASE WHEN ref_name = 'MULTIPLE_OWNER' AND (RG >0 OR CNH >0 OR RNE >1) AND PERSONAL_DATA >0 AND BILLING_ADDRESS >0 AND BANK_DATA >0 THEN 1 END) AS MAIN_MULTIPLE_OWNER_COMPLETE, 
-	SUM(CASE WHEN ref_name = 'MULTIPLE_OWNER' AND (RG >0 OR CNH >0 OR RNE >1) AND PERSONAL_DATA >0 AND BILLING_ADDRESS >0 AND BANK_DATA IS NULL THEN 1 END) AS MULTIPLE_OWNER_COMPLETE
+	ts_source_folder_created,
+	ts_first_doc_created,
+	ts_last_doc_created,
+	SUM(CASE WHEN (ref_name = 'MAIN_OWNER' OR (ref_name = 'OWNER' AND type_name = 'USER')) AND (RG >0 OR CNH >0 OR RNE >0) AND PERSONAL_DATA >0 AND BILLING_ADDRESS >0 AND BANK_DATA >0 THEN 1 ELSE 0 END) AS MAIN_OWNER_COMPLETE,
+	SUM(CASE WHEN ref_name = 'PERSON_REPRESENTATIVE' AND (RG >0 OR CNH >0 OR RNE >0) AND PERSONAL_DATA >0 AND BILLING_ADDRESS >0 AND BANK_DATA >0 THEN 1 ELSE 0 END) AS PERSON_REPRESENTATIVE_COMPLETE,
+	SUM(CASE WHEN ref_name = 'COMPANY_REPRESENTATIVE' AND RG >0 AND PERSONAL_DATA >0 AND BILLING_ADDRESS >0 AND BANK_DATA >0 THEN 1 ELSE 0 END) AS COMPANY_REPRESENTATIVE_COMPLETE,
+	SUM(CASE WHEN ((ref_name = 'OWNER' AND type_name = 'PERSON') OR (ref_name = 'OWNER' AND type_name = 'COMPANY')) AND REPRESENTED_DATA >0 AND POWER_OF_ATTORNEY >0 THEN 1 ELSE 0 END) AS OWNER_REP_COMPLETE,
+	SUM(CASE WHEN ref_name = 'MULTIPLE_OWNER' AND (RG >0 OR CNH >0 OR RNE >0) AND PERSONAL_DATA >0 AND BILLING_ADDRESS >0 AND BANK_DATA > 0 THEN 1 ELSE 0 END) AS MAIN_MULTIPLE_OWNER_COMPLETE,
+	SUM(CASE WHEN ref_name = 'MULTIPLE_OWNER' AND (RG >0 OR CNH >0 OR RNE >0) AND PERSONAL_DATA >0 AND BILLING_ADDRESS >0 AND BANK_DATA =0 THEN 1 ELSE 0 END) AS MULTIPLE_OWNER_COMPLETE
 FROM docs d
-INNER JOIN parts_count pc 
+INNER JOIN parts_count pc
 	ON pc.house_id = d.house_id
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
 ), parts_completion AS (
 SELECT
-	d.house_id, 
-	house_owner_type, 
-	parts_count, 
-	MIN(ts_source_folder_created) AS first_folder_created, 
-	SUM(MAIN_OWNER_COMPLETE) AS MAIN_OWNER_COMPLETE, 
-	SUM(PERSON_REPRESENTATIVE_COMPLETE) AS PERSON_REPRESENTATIVE_COMPLETE, 
-	SUM(COMPANY_REPRESENTATIVE_COMPLETE) AS COMPANY_REPRESENTATIVE_COMPLETE, 
-	SUM(OWNER_REP_COMPLETE) AS OWNER_REP_COMPLETE, 
-	SUM(MAIN_MULTIPLE_OWNER_COMPLETE) AS MAIN_MULTIPLE_OWNER_COMPLETE, 
+	d.house_id,
+	house_owner_type,
+	parts_count,
+	MIN(ts_source_folder_created) AS first_folder_created,
+	SUM(MAIN_OWNER_COMPLETE) AS MAIN_OWNER_COMPLETE,
+	SUM(PERSON_REPRESENTATIVE_COMPLETE) AS PERSON_REPRESENTATIVE_COMPLETE,
+	SUM(COMPANY_REPRESENTATIVE_COMPLETE) AS COMPANY_REPRESENTATIVE_COMPLETE,
+	SUM(OWNER_REP_COMPLETE) AS OWNER_REP_COMPLETE,
+	SUM(MAIN_MULTIPLE_OWNER_COMPLETE) AS MAIN_MULTIPLE_OWNER_COMPLETE,
 	SUM(MULTIPLE_OWNER_COMPLETE) AS MULTIPLE_OWNER_COMPLETE
 FROM docs_complete d
-GROUP BY 1, 2, 3 
+GROUP BY 1, 2, 3
 ), houses_complete AS (
 SELECT
-	house_id, 
+	house_id,
 	house_owner_type,
 	CASE WHEN pc.house_owner_type = 'single_owner'
 			AND pc.MAIN_OWNER_COMPLETE = 1 THEN 'single_owner_complete'
@@ -174,7 +174,7 @@ SELECT
 			AND pc.MULTIPLE_OWNER_COMPLETE = parts_count-1 THEN 'multiple_complete'
 	ELSE 'not_complete'
 	END AS docs_complete
-FROM parts_completion pc 
+FROM parts_completion pc
 ), single_docs AS (
 SELECT
 	house_id,
@@ -184,38 +184,81 @@ SELECT
 	document_name,
 	ts_document_created,
 	type_name
-FROM documents 
+FROM documents
 ), person_id AS (
 SELECT
-	d.part_folder_id, 
+	d.part_folder_id,
 	person_id
 FROM single_docs d
-WHERE person_id <> '-1' 
+WHERE person_id <> '-1'
 GROUP BY 1, 2)
+,listings AS (
 SELECT
-	pi.person_id AS sk_personal_document,
+	hl.id_house,
+	hl.sk_house_listing,
+	hl.ts_publication AS ts_listing_publication,
+	hl.status,
+	hl.version,
+	MIN(dd.date) AS dt_first_offer_approved
+FROM dim_house_listing hl
+INNER JOIN fact_listing_rent_flows rf
+	ON hl.sk_house_listing = rf.sk_house_listing
+INNER JOIN dim_date dd
+	ON dd.sk_date = rf.sk_offer_approved_date
+GROUP BY 1,2,3,4,5
+),docs_started AS (
+SELECT
+	pid.person_id,
+	d.house_folder_id,
+	d.house_id,
+	d.part_folder_id,
+	d.user_id,
+	sd.document_id,
+	d.house_owner_type,
+	d.client_type,
+	sd.document_name,
+	h.docs_complete,
+	d.part_docs,
+	d.parts_count,
+	d.ts_target_folder_created,
+	d.ts_source_folder_created,
+	d.ts_first_doc_created,
+	d.ts_last_doc_created,
+	sd.ts_document_created
+FROM docs_complete d
+INNER JOIN houses_complete h
+ 	ON h.house_id = d.house_id
+INNER  JOIN single_docs sd
+	ON sd.house_id = h.house_id
+	AND sd.part_folder_id = d.part_folder_id
+LEFT JOIN person_id pid
+	ON pid.part_folder_id = sd.part_folder_id)
+SELECT
+	l.sk_house_listing,
+	coalesce(d.person_id, '-1') AS sk_personal_document,
+	coalesce(d.user_id, '-1') AS sk_user,
+	l.id_house,
+	l.version AS listing_version,
+	l.status AS listing_status,
 	d.house_folder_id AS id_house_folder,
-	d.house_id AS id_house,
 	d.part_folder_id AS id_part_folder,
-	d.user_id AS id_user,
-	sd.document_id AS id_document,
+	d.document_id AS id_document,
 	d.house_owner_type AS house_ownership_type,
 	d.client_type,
-	sd.document_name AS document_type,
-	(h.docs_complete != 'not_complete')::boolean as is_house_documents_complete,
-	(d.part_docs != 'not_complete')::boolean as is_part_folder_complete,
-	d.parts_count AS people_count,
+	d.document_name AS document_type,
+	(d.ts_target_folder_created IS NOT NULL) AS is_house_documentation_started,
+	(d.docs_complete != 'not_complete') AS is_house_documentation_complete,
+	(d.part_docs != 'not_complete') AS is_part_folder_complete,
+	(l.dt_first_offer_approved IS NOT NULL) AS has_house_offer_approved,
+	d.parts_count AS number_of_parts,
+	l.dt_first_offer_approved,
+	l.ts_listing_publication,
 	d.ts_target_folder_created AS ts_house_folder_created,
 	d.ts_source_folder_created AS ts_part_folder_created,
 	d.ts_first_doc_created,
 	d.ts_last_doc_created,
-	sd.ts_document_created,
+	d.ts_document_created,
 	current_timestamp as ts_load
-FROM docs_complete d
-INNER JOIN houses_complete h 
- 	ON h.house_id = d.house_id
-INNER JOIN single_docs sd 
-	ON sd.house_id = h.house_id
-	AND sd.part_folder_id = d.part_folder_id
-INNER JOIN person_id pi 
-	ON pi.part_folder_id = sd.part_folder_id
+FROM listings l
+LEFT JOIN docs_started d
+	ON l.id_house=d.house_id
