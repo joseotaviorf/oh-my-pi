@@ -14,7 +14,7 @@ today_date = datetime.now().date()
 
 logger = QuintoAndarLogger('AffiliateCostsDAG')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
-MAIN_DAG_ID = 'bi-affiliate-costs-reprocessing'
+MAIN_DAG_ID = 'bi-affiliate-costs-bug-reprocessing'
 MAIN_START_DATE = datetime(2019, 10, 14)
 MAIN_END_DATE = datetime.combine(today_date, time.min)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('30 10 * * *')
