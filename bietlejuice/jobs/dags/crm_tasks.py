@@ -88,6 +88,8 @@ def extract_tasks(_uri, id_column, task_types, dt=None):
         if count % 1000 == 0:
             logger.info('m=extract_tasks, total_loaded={}'.format(count))
         task_status = 'Open'
+        if row['_id'] == '56d9a6b1544b0d22004af7b3':
+            continue
         task_id = row['_id']
         rep_id = row['assigneeId']
         origem_id = row['origemId']
