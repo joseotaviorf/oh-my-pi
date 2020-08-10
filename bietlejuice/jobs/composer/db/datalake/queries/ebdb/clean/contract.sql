@@ -49,7 +49,7 @@ SELECT
     endereco AS address,
     numero AS number,
     estado_id AS id_state,
-    dataFimContratoPrevisto AS ts_contract_expected_end,
+    dataFimContratoPrevisto AS ts_contract_expected_end, -- TODO [ODS] rename col to dt_contract_expected_end
     dataRescisao AS dt_termination,
     -- bank columns repeated, so I put 'data' in column name
     dadosBanco_agencia AS bank_data_agency,
