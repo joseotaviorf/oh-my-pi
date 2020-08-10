@@ -211,7 +211,7 @@ select
   hl.sale_price,
   hl.is_for_rent,
   hl.is_for_sale,
-  hl.has_instant_offer_enabled
+  hl.has_instant_offer_enabled,
   now() as ts_load
 from house_listings hl
 left join b2b_info bi
