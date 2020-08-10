@@ -9,5 +9,6 @@ create table if not exists tracksale.dim_nps_campaign (
     customer_type varchar(30),
     partner_name varchar(30),
     metric_group varchar(30),
-    ts_created timestamp
+    ts_created timestamp,
+    ts_load timestamp
 )
