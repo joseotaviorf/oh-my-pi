@@ -91,11 +91,11 @@ def extract_tasks(_uri, id_column, task_types, dt=None):
         if row['_id'] == '56d9a6b1544b0d22004af7b3':
             continue
         task_id = row['_id']
-        rep_id = row['assigneeId']
-        origem_id = row['origemId']
+        rep_id = row.get('assigneeId', -1)
+        origem_id = row.get('origemId', -1)
         number_of_reschedules = 0
-        dt_created = row['dataInicio']
-        t_type = row['type']
+        dt_created = row.get('dataInicio')
+        t_type = row.get('type')
         dt_closed = None
         first_rep_id = None
 
@@ -121,7 +121,7 @@ def extract_tasks(_uri, id_column, task_types, dt=None):
                                 first_rep_id = action['metadata']['oldValue']
 
         if first_rep_id is None:
-            first_rep_id = row['assigneeId']
+            first_rep_id = row.get('assigneeId', -1)
 
         task = {
             "task_id": task_id,
@@ -185,9 +185,9 @@ def extract_manual_tasks(_uri, dt=None):
             logger.info('m=extract_conversion_tasks, total_loaded={}'.format(count))
 
         task_id = row['_id']
-        assignee_id = row['assigneeId']
-        dt_created = row['dataInicio']
-        task_done = row['resolvida']
+        assignee_id = row.get('assigneeId', -1)
+        dt_created = row.get('dataInicio')
+        task_done = row.get('resolvida')
         task_opener_id = row.get('openedById', None)
         workgroup_id = row['metadata'].get('workgroupId', None)
         original_assignee_id = row['metadata'].get('assigneeId', None)
