@@ -9,11 +9,12 @@ from airflow.operators.quintoandar_databricks import (
 )
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
-from bietlejuice.jobs.composer.dags.marketing_hub import SOURCE
 
-DAG_ID = "bietlejuice.marketing_hub"
+SOURCE = "marketing_hub"
+DAG_ID = f"bietlejuice.{SOURCE}"
+ENV = Variable.get("environment")
 
-S3_PATH = Variable.get("datalake_old_bucket")
+DATALAKE_BUCKET = Variable.get("datalake_old_bucket")
 S3_MARKETING_PATH = Variable.get("datalake_marketing_bucket")
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
@@ -33,7 +34,7 @@ MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz)
 MAIN_SCHEDULE_INTERVAL = "15 7 * * *"
 
 GOOGLE_ADS_SOURCE_PATH = f"s3://{S3_MARKETING_PATH}/google-reports"
-GOOGLE_ADS_TARGET_PATH = f"s3://{S3_PATH}/raw/marketing_hub/google_ads"
+GOOGLE_ADS_TARGET_PATH = f"s3://{DATALAKE_BUCKET}/raw/marketing_hub/google_ads"
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -63,7 +64,13 @@ google_ads_load_to_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": SPARK_JOBS_PATH + "google_ads_load_to_raw.py",
-            "parameters": [GOOGLE_ADS_SOURCE_PATH, GOOGLE_ADS_TARGET_PATH, "{{ ds }}"],
+            "parameters": [
+                GOOGLE_ADS_SOURCE_PATH,
+                GOOGLE_ADS_TARGET_PATH,
+                DATALAKE_BUCKET,
+                ENV,
+                "{{ ds }}",
+            ],
         }
     },
 )
