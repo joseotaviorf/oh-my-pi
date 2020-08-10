@@ -68,6 +68,7 @@ create table if not exists dim_house_listing
  ,sale_price bigint   encode lzo
  ,is_for_rent boolean
  ,is_for_sale boolean
+ ,has_instant_offer_enabled boolean
  ,ts_load timestamp without time zone   encode lzo
  ,primary key (sk_house_listing)
 )

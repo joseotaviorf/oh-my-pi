@@ -213,7 +213,8 @@ select
   coalesce(visit_info.is_owner_joinning, false) as is_owner_joinning,
   coalesce(visit_info.is_quintoandar_authorized, false) as is_quintoandar_authorized,
   coalesce(visit_info.need_owner_authorization, false) as need_owner_authorization,
-  coalesce(visit_info.has_key_box, false) as has_key_box
+  coalesce(visit_info.has_key_box, false) as has_key_box,
+  coalesce(io.is_enabled, false) as has_instant_offer_enabled
 from
   datalake_ebdb_clean.house h
 left join
@@ -254,3 +255,5 @@ left join house_aud
 	on house_aud.id_house = h.id
 left join datalake_ebdb_clean.user_revision_entity ure
 	on house_aud.rev = ure.id
+left join datalake_ebdb_clean.instant_offer io
+    on h.id = io.id_house

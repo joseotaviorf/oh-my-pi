@@ -67,6 +67,7 @@ create table staging.dim_house_listing (
   sale_price bigint,
   is_for_rent boolean,
   is_for_sale boolean,
+  has_instant_offer_enabled boolean,
   ts_load timestamp
 ) with oids
 ;

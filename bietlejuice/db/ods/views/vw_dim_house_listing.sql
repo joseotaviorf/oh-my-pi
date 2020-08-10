@@ -132,7 +132,8 @@ house_listings as (
        when lbc.id_house is null then true -- When house is not in listing_business_context, it is for rent
        else coalesce(lbc.is_for_rent, false)
     end as is_for_rent,
-    coalesce(lbc.is_for_sale, false) as is_for_sale
+    coalesce(lbc.is_for_sale, false) as is_for_sale,
+    h.has_instant_offer_enabled
   from house h
   join house_listing hl
     on hl.id_house = h.id
@@ -210,6 +211,7 @@ select
   hl.sale_price,
   hl.is_for_rent,
   hl.is_for_sale,
+  hl.has_instant_offer_enabled
   now() as ts_load
 from house_listings hl
 left join b2b_info bi

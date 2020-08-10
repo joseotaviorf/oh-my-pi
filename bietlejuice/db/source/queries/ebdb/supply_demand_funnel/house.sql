@@ -177,7 +177,8 @@ select
   rt.name as visit_restriction,
   i.predictedPrice as predicted_price,
   hrs.registrationAbandonedReason as registration_abandoned_reason,
-  salePrice as sale_price
+  salePrice as sale_price,
+  coalesce(io.enabled, false) as has_instant_offer_enabled
 from
   Imovel i
 left join
@@ -266,6 +267,10 @@ left join RestrictionType rt
 -- abandoned reason
 left join HouseRegistrationStatus hrs
   on hrs.house_id = i.id
+
+-- instant_offer enabled
+left join InstantOffer io
+  on io.house_id = i.id
 
 where DATE(coalesce(i.dataCriacao, '1900-01-01 00:00:00')) <= DATE('{}')
 ;

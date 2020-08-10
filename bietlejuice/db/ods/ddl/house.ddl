@@ -127,7 +127,8 @@ create table public.house (
   visit_restriction varchar(255),
   predicted_price numeric(14,2),
   registration_abandoned_reason varchar(255),
-  sale_price bigint
+  sale_price bigint,
+  has_instant_offer_enabled boolean
 );
 
 create unique index house_id_idx on house (id);
