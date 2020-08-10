@@ -43,6 +43,8 @@ tta_taxonomy as (
             json_extract_scalar(user_properties, '$["utm_source"]') as utm_source,
         	json_extract_scalar(user_properties, '$["utm_medium"]') as utm_medium,
         	json_extract_scalar(user_properties, '$["utm_campaign"]') as utm_campaign,
+        	json_extract_scalar(user_properties, '$["utm_term"]') as utm_term,
+        	json_extract_scalar(user_properties, '$["utm_content"]') as utm_content,
         	case when (UPPER(json_extract_scalar(user_properties, '$["utm_campaign"]')) like '%BRANDED%'
         					or UPPER(json_extract_scalar(user_properties, '$["utm_campaign"]')) like '%INSTITUCIONAL%')
         					and UPPER(json_extract_scalar(user_properties, '$["utm_campaign"]')) not like '%NON-BRANDED%'
@@ -72,6 +74,8 @@ tta_taxonomy as (
     	td.mkt_source,
     	td.mkt_platform,
     	tta.utm_campaign,
+    	tta.utm_term,
+    	tta.utm_content,
     	tta.event_timestamp,
     	row_number() over(
     					partition by tta.house, tta.tenant, tta.agent
@@ -233,7 +237,9 @@ select
 	coalesce(mkt.mkt_medium, 'Not Mapped') as mkt_medium,
 	coalesce(mkt.mkt_source, 'Not Mapped') as mkt_source,
 	coalesce(mkt.mkt_platform, 'Not Mapped') as mkt_platform,
-	coalesce(mkt.utm_campaign, '') as utm_campaign
+	coalesce(mkt.utm_campaign, '') as utm_campaign,
+	coalesce(mkt.utm_term, '') as utm_term,
+	coalesce(mkt.utm_content, '') as utm_content
 
 from events e
 
