@@ -102,6 +102,13 @@ bietlejuice.dw_booking:
   - bietlejuice.ebdb:load-visit
   - bietlejuice.enrich_amplitude_visit
 
+bietlejuice.enrich_ebdb_proposal:
+  - bietlejuice.ebdb:load-pre-proposal
+  - bietlejuice.ebdb:load-pre-proposal-aud
+  - bietlejuice.ebdb:load-user-revision-entity
+  - bietlejuice.ebdb:load-pre-proposal-condition
+  - bietlejuice.ebdb:load-proposal-condition
+
 bietlejuice.enrich_ebdb_contract:
   - bietlejuice.ebdb:load-contract
   - bietlejuice.ebdb:load-contract-aud
