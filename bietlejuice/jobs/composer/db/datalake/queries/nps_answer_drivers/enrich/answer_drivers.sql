@@ -1,11 +1,4 @@
-WITH campaign_step AS (
-	SELECT
-		id_answer,
-		tag_value AS campaign_step
-	FROM datalake_tracksale.answer_tags
-	WHERE tag_name = 'Etapa'
-),
-house_contract_tags AS (
+WITH house_contract_tags AS (
 	SELECT
                 id_answer,
                 ts_answer_sent,
@@ -119,15 +112,12 @@ ebdb_contract AS (
 )
 SELECT 
 	a.id AS id_answer,
-	cs.campaign_step,
 	el.id_house_listing,
 	eb.id_booking,
 	cd.id_tta,
 	eo.id_offer_context,
 	ec.id_contract
 FROM datalake_tracksale.answer a
-LEFT JOIN campaign_step cs 
-	ON cs.id_answer = a.id
 LEFT JOIN combined_drivers cd 
 	ON cd.id_answer = a.id
 LEFT JOIN ebdb_listing el 
@@ -138,4 +128,4 @@ LEFT JOIN ebdb_offer eo
 	ON eo.id_answer = cd.id_answer
 LEFT JOIN ebdb_contract ec 
 	ON ec.id_answer = cd.id_answer
-WHERE COALESCE(cs.campaign_step, el.id_house_listing, eb.id_booking, cd.id_tta, eo.id_offer_context, ec.id_contract) IS NOT NULL
+WHERE COALESCE(el.id_house_listing, eb.id_booking, cd.id_tta, eo.id_offer_context, ec.id_contract) IS NOT NULL
