@@ -1,27 +1,30 @@
 WITH
 sale_listing_flows_adjust AS (
 SELECT
-	sk_lead_date,
-	sk_lead,
-	sk_first_contact_date,
-	sk_prospect_date,
-	sk_qualified_date,
-	sk_opportunity_date,
-	sk_first_listing_date,
-	sk_house_listing,
-	mkt_origin,
-	mkt_channel,
-	CASE WHEN mkt_origin = 'B2B' THEN mkt_origin
-	     WHEN mkt_completion = 'Full Self-Service' THEN 'FSS'
+	lf.sk_lead_date,
+	lf.sk_lead,
+	lf.sk_first_contact_date,
+	lf.sk_prospect_date,
+	lf.sk_qualified_date,
+	lf.sk_opportunity_date,
+	lf.sk_first_listing_date,
+	lf.sk_house_listing,
+	lf.mkt_origin,
+	lf.mkt_channel,
+	CASE WHEN lf.mkt_origin = 'B2B' THEN mkt_origin
+	     WHEN lf.mkt_completion = 'Full Self-Service' THEN 'FSS'
 	     ELSE 'IS'
 	END AS lead_context,
-	CASE WHEN lead_context_origin = 'Organic' THEN 'Branded'
+	CASE WHEN lf.lead_context_origin = 'Organic' THEN 'Branded'
          ELSE lead_context_origin
 	END AS mkt_campaign_context,
-	CASE WHEN mkt_channel IN ('CRM/Notification','Backend','Branding','Other') THEN 'Paid'
+	CASE WHEN lf.mkt_channel IN ('CRM/Notification','Backend','Branding','Other') THEN 'Paid'
          ELSE 'Non Paid'
-	END AS mkt_type
-FROM sale.fact_listing_flows
+	END AS mkt_type,
+	CASE WHEN dr.city_group NOT IN ('RMSP', 'Rio de Janeiro') THEN NULL ELSE dr.city_group END AS city_group
+FROM sale.fact_listing_flows lf
+LEFT JOIN dim_region dr
+  ON dr.sk_region = lf.sk_region
 ),
 monday_adjusted AS (
 -- treat data from Monday gsheets
@@ -100,6 +103,7 @@ sale_demand_classification AS (
 SELECT
 	sde.id_buyer,
 	sde.id_house,
+	lf.city_group,
 	sde.dt_offer_sent,
 	sde.dt_offer_accepted,
 	sde.dt_ccv_signed,
@@ -124,21 +128,24 @@ FROM sale_demand_events sde
 LEFT JOIN datamarts.demand_sale_flows dsf
   ON sde.id_buyer = dsf.id_buyer
   AND sde.id_house = dsf.id_house
+LEFT JOIN sale_listing_flows_adjust lf
+  ON substring(lf.sk_house_listing,1,9) = sde.id_house
 ),
 lead_ AS (
 SELECT
 	slf.sk_lead_date AS base_date,
-   	slf.lead_context,
-   	slf.mkt_campaign_context,
-   	slf.mkt_origin,
-   	slf.mkt_channel,
-   	slf.mkt_type,
+	slf.city_group,
+   slf.lead_context,
+   slf.mkt_campaign_context,
+   slf.mkt_origin,
+   slf.mkt_channel,
+   slf.mkt_type,
 	NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
-   	COUNT(slf.sk_lead_date) AS leads,
-   	NULL::BIGINT AS prospects,
-   	NULL::BIGINT AS first_contacts,
+   COUNT(slf.sk_lead_date) AS leads,
+   NULL::BIGINT AS prospects,
+   NULL::BIGINT AS first_contacts,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
 	NULL::BIGINT AS first_listings,
@@ -158,22 +165,23 @@ SELECT
 	NULL::BIGINT AS entrega_chave
 FROM sale_listing_flows_adjust AS slf
 WHERE slf.sk_lead_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9
+GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 prospect AS (
 SELECT
 	slf.sk_prospect_date AS base_date,
-   	slf.lead_context,
-   	slf.mkt_campaign_context,
-   	slf.mkt_origin,
-   	slf.mkt_channel,
-   	slf.mkt_type,
-   	NULL AS first_origin_demand,
+	slf.city_group,
+   slf.lead_context,
+   slf.mkt_campaign_context,
+   slf.mkt_origin,
+   slf.mkt_channel,
+   slf.mkt_type,
+   NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
-   	NULL::BIGINT AS leads,
-   	COUNT(slf.sk_prospect_date) AS prospects,
-   	NULL::BIGINT AS first_contacts,
+   NULL::BIGINT AS leads,
+   COUNT(slf.sk_prospect_date) AS prospects,
+   NULL::BIGINT AS first_contacts,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
 	NULL::BIGINT AS first_listings,
@@ -193,22 +201,23 @@ SELECT
 	NULL::BIGINT AS entrega_chave
 FROM sale_listing_flows_adjust AS slf
 WHERE slf.sk_prospect_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9
+GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 first_contacts AS (
 SELECT
 	slf.sk_prospect_date AS base_date,
-   	slf.lead_context,
-   	slf.mkt_campaign_context,
-   	slf.mkt_origin,
-   	slf.mkt_channel,
-   	slf.mkt_type,
-   	NULL AS first_origin_demand,
+	slf.city_group,
+   slf.lead_context,
+   slf.mkt_campaign_context,
+   slf.mkt_origin,
+   slf.mkt_channel,
+   slf.mkt_type,
+   NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
-   	NULL::BIGINT AS leads,
-   	NULL::BIGINT AS prospects,
-   	COUNT(slf.sk_first_contact_date) AS first_contacts,
+   NULL::BIGINT AS leads,
+   NULL::BIGINT AS prospects,
+   COUNT(slf.sk_first_contact_date) AS first_contacts,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
 	NULL::BIGINT AS first_listings,
@@ -228,20 +237,21 @@ SELECT
 	NULL::BIGINT AS entrega_chave
 FROM sale_listing_flows_adjust AS slf
 WHERE slf.sk_first_contact_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9
+GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 qualified AS (
 SELECT
-   	slf.sk_qualified_date AS base_date,
-   	slf.lead_context,
-   	slf.mkt_campaign_context,
-   	slf.mkt_origin,
-   	slf.mkt_channel,
-   	slf.mkt_type,
-   	NULL AS first_origin_demand,
+   slf.sk_qualified_date AS base_date,
+   slf.city_group,
+   slf.lead_context,
+   slf.mkt_campaign_context,
+   slf.mkt_origin,
+   slf.mkt_channel,
+   slf.mkt_type,
+   NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
-   	NULL::BIGINT AS leads,
+   NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
 	COUNT(slf.sk_qualified_date) AS qualifieds,
@@ -263,22 +273,23 @@ SELECT
 	NULL::BIGINT AS entrega_chave
 FROM sale_listing_flows_adjust AS slf
 WHERE slf.sk_qualified_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9
+GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 opportunity AS (
 SELECT
-   	slf.sk_opportunity_date AS base_date,
-   	slf.lead_context,
-   	slf.mkt_campaign_context,
-   	slf.mkt_origin,
-   	slf.mkt_channel,
-   	slf.mkt_type,
-   	NULL AS first_origin_demand,
+   slf.sk_opportunity_date AS base_date,
+   slf.city_group,
+   slf.lead_context,
+   slf.mkt_campaign_context,
+   slf.mkt_origin,
+   slf.mkt_channel,
+   slf.mkt_type,
+   NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
-   	NULL::BIGINT AS leads,
-   	NULL::BIGINT AS prospects,
-   	NULL::BIGINT AS first_contacts,
+   NULL::BIGINT AS leads,
+   NULL::BIGINT AS prospects,
+   NULL::BIGINT AS first_contacts,
 	NULL::BIGINT AS qualifieds,
 	COUNT(DISTINCT slf.sk_house_listing) AS opportunities,
 	NULL::BIGINT AS first_listings,
@@ -298,22 +309,23 @@ SELECT
 	NULL::BIGINT AS entrega_chave
 FROM sale_listing_flows_adjust AS slf
 WHERE slf.sk_opportunity_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9
+GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 first_listing AS (
 SELECT
-   	slf.sk_first_listing_date AS base_date,
-   	slf.lead_context,
-   	slf.mkt_campaign_context,
-   	slf.mkt_origin,
-   	slf.mkt_channel,
+   slf.sk_first_listing_date AS base_date,
+   slf.city_group,
+   slf.lead_context,
+   slf.mkt_campaign_context,
+   slf.mkt_origin,
+   slf.mkt_channel,
 	slf.mkt_type,
-   	NULL AS first_origin_demand,
+   NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
-   	NULL::BIGINT AS leads,
-   	NULL::BIGINT AS prospects,
-   	NULL::BIGINT AS first_contacts,
+   NULL::BIGINT AS leads,
+   NULL::BIGINT AS prospects,
+   NULL::BIGINT AS first_contacts,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
 	COUNT(DISTINCT slf.sk_house_listing) AS first_listings,
@@ -323,7 +335,7 @@ SELECT
 	NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
 	NULL::BIGINT AS offers_accepted,
-   	NULL::BIGINT AS ccv_signed,
+   NULL::BIGINT AS ccv_signed,
 	NULL::BIGINT AS diligence_sent,
 	NULL::BIGINT AS diligence_accepted,
 	NULL::BIGINT AS credit_sent,
@@ -333,16 +345,17 @@ SELECT
 	NULL::BIGINT AS entrega_chave
 FROM sale_listing_flows_adjust AS slf
 WHERE slf.sk_first_listing_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9
+GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 tta_sent AS (
 SELECT
-   	REPLACE(DATE(tta_started),'-','')::INTEGER AS base_date,
+   REPLACE(DATE(tta_started),'-','')::INTEGER AS base_date,
+   city_group,
 	NULL AS lead_context,
-   	NULL AS mkt_campaign_context,
-   	NULL AS mkt_origin,
-   	NULL AS mkt_channel,
-   	NULL AS mkt_type,
+   NULL AS mkt_campaign_context,
+   NULL AS mkt_origin,
+   NULL AS mkt_channel,
+   NULL AS mkt_type,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -355,7 +368,7 @@ SELECT
 	COUNT(DISTINCT tta_id) AS tta_started,
 	NULL::BIGINT AS tta_completed,
 	NULL::BIGINT AS visits_booked,
-   	NULL::BIGINT AS visits_completed,
+   NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
@@ -367,16 +380,18 @@ SELECT
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
-GROUP BY 1,2,3,4,5,6,7,8,9
+WHERE DATE(tta_started) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 tta_completed AS (
 SELECT
 	REPLACE(DATE(tta_completed),'-','')::INTEGER AS base_date,
+	city_group,
 	NULL AS lead_context,
-   	NULL AS mkt_campaign_context,
-   	NULL AS mkt_origin,
-   	NULL AS mkt_channel,
-   	NULL AS mkt_type,
+   NULL AS mkt_campaign_context,
+   NULL AS mkt_origin,
+   NULL AS mkt_channel,
+   NULL AS mkt_type,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -389,7 +404,7 @@ SELECT
 	NULL::BIGINT AS tta_started,
 	COUNT(DISTINCT tta_id) AS tta_completed,
 	NULL::BIGINT AS visits_booked,
-   	NULL::BIGINT AS visits_completed,
+   NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
@@ -401,15 +416,17 @@ SELECT
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
-GROUP BY 1,2,3,4,5,6,7,8,9
+WHERE DATE(tta_started) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 visits_booked AS (
 SELECT
 	REPLACE(DATE(dt_created),'-','')::INTEGER AS base_date,
+	city_group,
 	NULL AS lead_context,
-   	NULL AS mkt_campaign_context,
-   	NULL AS mkt_origin,
-   	NULL AS mkt_channel,
+   NULL AS mkt_campaign_context,
+   NULL AS mkt_origin,
+   NULL AS mkt_channel,
 	NULL AS mkt_type,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
@@ -423,7 +440,7 @@ SELECT
 	NULL::BIGINT AS tta_started,
 	NULL::BIGINT AS tta_completed,
 	COUNT(DISTINCT sk_booking) AS visits_booked,
-   	NULL::BIGINT AS visits_completed,
+   NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
@@ -435,16 +452,18 @@ SELECT
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
-GROUP BY 1,2,3,4,5,6,7,8,9
+WHERE DATE(dt_created) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 visits_completed AS (
 SELECT
 	REPLACE(DATE(dt_completed),'-','')::INTEGER AS base_date,
+	city_group,
 	NULL AS lead_context,
-   	NULL AS mkt_campaign_context,
-   	NULL AS mkt_origin,
-   	NULL AS mkt_channel,
-   	NULL AS mkt_type,
+   NULL AS mkt_campaign_context,
+   NULL AS mkt_origin,
+   NULL AS mkt_channel,
+   NULL AS mkt_type,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -457,7 +476,7 @@ SELECT
 	NULL::BIGINT AS tta_started,
 	NULL::BIGINT AS tta_completed,
 	NULL::BIGINT AS visits_booked,
-   	COUNT(DISTINCT sk_booking) AS visits_completed,
+   COUNT(DISTINCT sk_booking) AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
@@ -469,16 +488,18 @@ SELECT
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
-GROUP BY 1,2,3,4,5,6,7,8,9
+WHERE DATE(dt_completed) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 offers_sent AS (
 SELECT
 	REPLACE(DATE(dt_offer_sent),'-','')::INTEGER AS base_date,
+	city_group,
 	NULL AS lead_context,
-   	NULL AS mkt_campaign_context,
-   	NULL AS mkt_origin,
-   	NULL AS mkt_channel,
-   	NULL AS mkt_type,
+   NULL AS mkt_campaign_context,
+   NULL AS mkt_origin,
+   NULL AS mkt_channel,
+   NULL AS mkt_type,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -491,7 +512,7 @@ SELECT
 	NULL::BIGINT AS tta_started,
 	NULL::BIGINT AS tta_completed,
 	NULL::BIGINT AS visits_booked,
-   	NULL::BIGINT AS visits_completed,
+   NULL::BIGINT AS visits_completed,
 	COUNT(DISTINCT id_offer) AS offers_submitted,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
@@ -503,16 +524,18 @@ SELECT
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
-GROUP BY 1,2,3,4,5,6,7,8,9
+WHERE DATE(dt_offer_sent) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 offers_accepted AS (
 SELECT
 	REPLACE(DATE(dt_offer_accepted),'-','')::INTEGER AS base_date,
+	city_group,
 	NULL AS lead_context,
-   	NULL AS mkt_campaign_context,
-   	NULL AS mkt_origin,
-   	NULL AS mkt_channel,
-   	NULL AS mkt_type,
+   NULL AS mkt_campaign_context,
+   NULL AS mkt_origin,
+   NULL AS mkt_channel,
+   NULL AS mkt_type,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -525,7 +548,7 @@ SELECT
 	NULL::BIGINT AS tta_started,
 	NULL::BIGINT AS tta_completed,
 	NULL::BIGINT AS visits_booked,
-   	NULL::BIGINT AS visits_completed,
+   NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
 	COUNT(DISTINCT id_offer) AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
@@ -537,14 +560,16 @@ SELECT
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
-GROUP BY 1,2,3,4,5,6,7,8,9
+WHERE DATE(dt_offer_accepted) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 ccv_signed AS (
 SELECT
 	REPLACE(DATE(dt_ccv_signed),'-','')::INTEGER AS base_date,
+	city_group,
 	NULL AS lead_context,
-   	NULL AS mkt_campaign_context,
-   	NULL AS mkt_origin,
+   NULL AS mkt_campaign_context,
+   NULL AS mkt_origin,
 	NULL AS mkt_channel,
 	NULL AS mkt_type,
 	first_touchpoint AS first_origin_demand,
@@ -559,7 +584,7 @@ SELECT
 	NULL::BIGINT AS tta_started,
 	NULL::BIGINT AS tta_completed,
 	NULL::BIGINT AS visits_booked,
-   	NULL::BIGINT AS visits_completed,
+   NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
 	NULL::BIGINT AS offers_accepted,
 	COUNT(DISTINCT id_offer) AS ccv_signed,
@@ -571,14 +596,16 @@ SELECT
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
-GROUP BY 1,2,3,4,5,6,7,8,9
+WHERE DATE(dt_ccv_signed) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 diligence_sent AS (
 SELECT
 	REPLACE(DATE(dt_diligence_started),'-','')::INTEGER AS base_date,
+	city_group,
 	NULL AS lead_context,
-   	NULL AS mkt_campaign_context,
-   	NULL AS mkt_origin,
+   NULL AS mkt_campaign_context,
+   NULL AS mkt_origin,
 	NULL AS mkt_channel,
 	NULL AS mkt_type,
 	first_touchpoint AS first_origin_demand,
@@ -593,7 +620,7 @@ SELECT
 	NULL::BIGINT AS tta_started,
 	NULL::BIGINT AS tta_completed,
 	NULL::BIGINT AS visits_booked,
-   	NULL::BIGINT AS visits_completed,
+   NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
@@ -605,14 +632,16 @@ SELECT
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
-GROUP BY 1,2,3,4,5,6,7,8,9
+WHERE DATE(dt_diligence_started) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 diligence_accepted AS (
 SELECT
 	REPLACE(DATE(dt_diligence_approved),'-','')::INTEGER AS base_date,
+	city_group,
 	NULL AS lead_context,
-   	NULL AS mkt_campaign_context,
-   	NULL AS mkt_origin,
+   NULL AS mkt_campaign_context,
+   NULL AS mkt_origin,
 	NULL AS mkt_channel,
 	NULL AS mkt_type,
 	first_touchpoint AS first_origin_demand,
@@ -627,7 +656,7 @@ SELECT
 	NULL::BIGINT AS tta_started,
 	NULL::BIGINT AS tta_completed,
 	NULL::BIGINT AS visits_booked,
-   	NULL::BIGINT AS visits_completed,
+   NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
@@ -639,14 +668,16 @@ SELECT
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
-GROUP BY 1,2,3,4,5,6,7,8,9
+WHERE DATE(dt_diligence_approved) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 credit_sent AS (
 SELECT
 	REPLACE(DATE(dt_credit_started),'-','')::INTEGER AS base_date,
+	city_group,
 	NULL AS lead_context,
-   	NULL AS mkt_campaign_context,
-   	NULL AS mkt_origin,
+   NULL AS mkt_campaign_context,
+   NULL AS mkt_origin,
 	NULL AS mkt_channel,
 	NULL AS mkt_type,
 	first_touchpoint AS first_origin_demand,
@@ -661,7 +692,7 @@ SELECT
 	NULL::BIGINT AS tta_started,
 	NULL::BIGINT AS tta_completed,
 	NULL::BIGINT AS visits_booked,
-   	NULL::BIGINT AS visits_completed,
+   NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
@@ -673,14 +704,16 @@ SELECT
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
-GROUP BY 1,2,3,4,5,6,7,8,9
+WHERE DATE(dt_credit_started) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 credit_approved AS (
 SELECT
 	REPLACE(DATE(dt_credit_approved),'-','')::INTEGER AS base_date,
+	city_group,
 	NULL AS lead_context,
-   	NULL AS mkt_campaign_context,
-   	NULL AS mkt_origin,
+   NULL AS mkt_campaign_context,
+   NULL AS mkt_origin,
 	NULL AS mkt_channel,
 	NULL AS mkt_type,
 	first_touchpoint AS first_origin_demand,
@@ -695,7 +728,7 @@ SELECT
 	NULL::BIGINT AS tta_started,
 	NULL::BIGINT AS tta_completed,
 	NULL::BIGINT AS visits_booked,
-   	NULL::BIGINT AS visits_completed,
+   NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
@@ -707,14 +740,16 @@ SELECT
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
-GROUP BY 1,2,3,4,5,6,7,8,9
+WHERE DATE(dt_credit_approved) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 payment_concluded AS (
 SELECT
 	REPLACE(DATE(dt_payment_concluded),'-','')::INTEGER AS base_date,
+	city_group,
 	NULL AS lead_context,
-   	NULL AS mkt_campaign_context,
-   	NULL AS mkt_origin,
+   NULL AS mkt_campaign_context,
+   NULL AS mkt_origin,
 	NULL AS mkt_channel,
 	NULL AS mkt_type,
 	first_touchpoint AS first_origin_demand,
@@ -729,7 +764,7 @@ SELECT
 	NULL::BIGINT AS tta_started,
 	NULL::BIGINT AS tta_completed,
 	NULL::BIGINT AS visits_booked,
-   	NULL::BIGINT AS visits_completed,
+   NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
@@ -741,14 +776,16 @@ SELECT
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
-GROUP BY 1,2,3,4,5,6,7,8,9
+WHERE DATE(dt_payment_concluded) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 matricula_atualizada AS (
 SELECT
 	REPLACE(DATE(dt_matricula_atualizada),'-','')::INTEGER AS base_date,
+	city_group,
 	NULL AS lead_context,
-   	NULL AS mkt_campaign_context,
-   	NULL AS mkt_origin,
+   NULL AS mkt_campaign_context,
+   NULL AS mkt_origin,
 	NULL AS mkt_channel,
 	NULL AS mkt_type,
 	first_touchpoint AS first_origin_demand,
@@ -763,7 +800,7 @@ SELECT
 	NULL::BIGINT AS tta_started,
 	NULL::BIGINT AS tta_completed,
 	NULL::BIGINT AS visits_booked,
-   	NULL::BIGINT AS visits_completed,
+   NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
@@ -775,14 +812,16 @@ SELECT
 	COUNT(DISTINCT id_offer) AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
-GROUP BY 1,2,3,4,5,6,7,8,9
+WHERE DATE(dt_matricula_atualizada) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 entrega_chave AS (
 SELECT
 	REPLACE(DATE(dt_entrega_chaves),'-','')::INTEGER AS base_date,
+	city_group,
 	NULL AS lead_context,
-   	NULL AS mkt_campaign_context,
-   	NULL AS mkt_origin,
+   NULL AS mkt_campaign_context,
+   NULL AS mkt_origin,
 	NULL AS mkt_channel,
 	NULL AS mkt_type,
 	first_touchpoint AS first_origin_demand,
@@ -809,7 +848,8 @@ SELECT
 	NULL::BIGINT AS matricula_atualizada,
 	COUNT(DISTINCT id_offer) AS entrega_chave
 FROM sale_demand_classification
-GROUP BY 1,2,3,4,5,6,7,8,9
+WHERE DATE(dt_entrega_chaves) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10
 ),
 union_all AS (
 SELECT * FROM lead_
@@ -858,6 +898,7 @@ SELECT
 	dd.date,
 	dd.month,
 	dd.quarter,
+	ua.city_group,
 	ua.lead_context,
 	ua.mkt_campaign_context,
 	ua.mkt_origin,
@@ -896,6 +937,7 @@ SELECT
 	date,
 	month,
 	quarter,
+	city_group,
 	lead_context,
 	mkt_campaign_context,
 	mkt_origin,
@@ -905,8 +947,8 @@ SELECT
 	origin_before_offer,
 	origin_after_offer,
 	SUM(leads) AS leads,
-   	SUM(prospects) AS prospects,
-   	SUM(first_contacts) AS first_contacts,
+   SUM(prospects) AS prospects,
+   SUM(first_contacts) AS first_contacts,
 	SUM(qualifieds) AS qualifieds,
 	SUM(opportunities) AS opportunities,
 	SUM(first_listings) AS first_listings,
@@ -930,6 +972,7 @@ GROUP BY week_start,
 	 date,
 	 month,
 	 quarter,
+	 city_group,
 	 lead_context,
 	 mkt_campaign_context,
 	 mkt_origin,
