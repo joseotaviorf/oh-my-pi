@@ -39,6 +39,8 @@ select
             and dpa.mod_status = true
             then 'dunno'
     end as status_change_reason,
+    dpa.is_enabled as is_enabled,
+    dpa.operation_mode as operation_mode,
     datediff(ts_end_status, ts_start_status) as days_in_status,
     smp.ts_start_status as ts_status_started,
     smp.ts_end_status as ts_status_ended,

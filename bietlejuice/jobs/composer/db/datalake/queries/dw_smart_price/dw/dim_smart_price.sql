@@ -14,6 +14,7 @@ cte_status_is_enabled as(
         smp.id_dynamic_pricing_parameter,
         smp.status,
         dpa.is_enabled,
+        dpa.operation_mode,
         row_number() over(partition by smp.id_smart_price order by smp.ts_start_status desc) ranking
     from
         datalake_ebdb_smart_price.smart_price_versioning smp
@@ -28,7 +29,8 @@ cte_last_status_is_enabled as (
         id_house,
         id_dynamic_pricing_parameter,
         status,
-        is_enabled
+        is_enabled,
+        operation_mode
     from
         cte_status_is_enabled
     where
@@ -38,6 +40,7 @@ select
     fla.id_smart_price as sk_smart_price,
     fla.id_smart_price,
     lsie.is_enabled,
+    lsie.operation_mode,
     lsie.status as status,
     dph.status as house_last_status,
     dph.min_rent as house_min_rent,

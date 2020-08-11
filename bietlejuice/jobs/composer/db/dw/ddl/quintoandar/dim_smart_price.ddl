@@ -3,6 +3,7 @@ create table quintoandar.dim_smart_price (
     sk_smart_price bigint,
     id_smart_price bigint,
     is_enabled boolean,
+    operation_mode varchar,
     status varchar,
     house_last_status varchar,
     house_min_rent integer,
