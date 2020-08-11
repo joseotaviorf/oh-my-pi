@@ -82,10 +82,10 @@ contract_analyst_annulment_date as (
 contract_metrics(
     select
       id as id_contract,
-      status in ('Minuta','PreAssinaturas') as contracts_to_be_signed,
-      status in ('Ativo','Finalizado') as has_been_active,
-      status = 'Cancelado' as is_cancelled,
-      status = 'Finalizado' as is_terminated,
+      status in ('Minuta','PreAssinaturas') as is_waiting_to_be_signed,
+      status in ('Ativo','Finalizado') as is_active_or_ended,
+      status = 'Cancelado' as is_canceled,
+      status = 'Finalizado' as is_ended,
       type = 'FullService' as is_full_service,
       type = 'DealOnly' as is_deal_only
     from datalake_ebdb_clean.contract
@@ -94,7 +94,7 @@ ongoing_contracts as (
     select
       c.id as id_contract,
       case
-        when cm.has_been_active
+        when cm.is_active_or_ended
           and not cm.is_deal_only
           and current_date >= date(coalesce(coalesce(c.ts_signed, c.dt_started), c.dt_entered))
           and (current_date < c.dt_termination or c.dt_termination is null)
@@ -129,10 +129,10 @@ select
   c.status_closing,
   regexp_extract(cv.version_display_contract, '^v[^_]+', 0) as contract_version,
   coalesce(oc.is_ongoing_contract, false) as is_ongoing_contract,
-  cm.contracts_to_be_signed,
-  cm.has_been_active,
-  cm.is_cancelled,
-  cm.is_terminated,
+  cm.is_waiting_to_be_signed,
+  cm.is_active_or_ended,
+  cm.is_canceled,
+  cm.is_ended,
   cm.is_full_service,
   cm.is_deal_only,
   fc.monthly_administration_fee,
