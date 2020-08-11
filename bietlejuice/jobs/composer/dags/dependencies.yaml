@@ -4,12 +4,8 @@
 #    - dag_dependency_id_C[:task_dependency_id_2]
 #  dependent_dag_id_B:
 #    - dag_dependency_id_D[:task_dependency_id_3]
-
-bietlejuice.tenant_booking_review:
-  - bietlejuice.ebdb:load-visit
-  - bietlejuice.ebdb:load-booking
-  - bietlejuice.insider:load-review-feature-to-datalake-clean
-  - bietlejuice.insider:load-review-to-datalake-clean
+#
+# Place the dependencies sorted alphabetically
 
 bietlejuice.dw_banking:
   - bietlejuice.ebdb:load-bank
@@ -17,20 +13,55 @@ bietlejuice.dw_banking:
   - bietlejuice.ebdb:load-account-transaction
   - bietlejuice.ebdb:load-user
 
-bietlejuice.enrich_kill_queue:
-  - bietlejuice.kill_queue:load-house-to-datalake-clean
-  - bietlejuice.kill_queue:load-reservation-to-datalake-clean
+bietlejuice.dw_booking:
+  - bietlejuice.enrich_booking
+  - bietlejuice.ebdb:load-visit
+  - bietlejuice.enrich_amplitude_visit
+
+bietlejuice.dw_region:
+  - bietlejuice.enrich_region
+  - bietlejuice.enrich_booking
+  - bietlejuice.enrich_ebdb_listing:load-house-to-enrich
 
 bietlejuice.dw_reservation:
   - bietlejuice.enrich_kill_queue
 
-bietlejuice.enrich_ebdb_smart_price:
-  - bietlejuice.ebdb:load-house-aud
-  - bietlejuice.ebdb:load-dynamic-pricing-house-aud
-  - bietlejuice.ebdb:load-user-revision-entity
+bietlejuice.dw_smart_price:
+  - bietlejuice.enrich_ebdb_smart_price
+  - bietlejuice.ebdb:load-dynamic-pricing-house
+  - bietlejuice.ebdb:load-dynamic-pricing-parameters
+
+bietlejuice.dw_visit:
+  - bietlejuice.ebdb:load-visit
 
 bietlejuice.enrich_amplitude_visit:
   - bietlejuice.amplitude
+
+bietlejuice.enrich_booking:
+  - bietlejuice.ebdb:load-booking
+  - bietlejuice.ebdb:load-booking-aud
+  - bietlejuice.ebdb:load-follow-up-details
+  - bietlejuice.ebdb:load-entrance
+  - bietlejuice.ebdb:load-booking-status-change
+  - bietlejuice.ebdb:load-appointment-change-reason-category
+  - bietlejuice.ebdb:load-user-revision-entity
+  - bietlejuice.ebdb:load-visit
+  - bietlejuice.ebdb:load-visit-origin
+  - bietlejuice.ebdb:load-visitor
+  # TODO [ODS] Add gsheets after migrated to composer
+
+bietlejuice.enrich_ebdb_contract:
+  - bietlejuice.ebdb:load-contract
+  - bietlejuice.ebdb:load-contract-aud
+  - bietlejuice.ebdb:load-user-revision-entity
+  - bietlejuice.ebdb:load-contract-version
+  - bietlejuice.ebdb:load-full-contract
+
+bietlejuice.enrich_ebdb_customer_contact_identification:
+  - bietlejuice.ebdb:load-user
+  - bietlejuice.ebdb:load-user-aud
+  - bietlejuice.ebdb:load-contract-person-aud
+  - bietlejuice.ebdb:load-proponent-proposal-aud
 
 bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb:load-portability
@@ -54,15 +85,21 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb:load-restriction-type
   - bietlejuice.ebdb:load-house-registration-status
 
-bietlejuice.enrich_ebdb_customer_contact_identification:
-  - bietlejuice.ebdb:load-user
-  - bietlejuice.ebdb:load-user-aud
-  - bietlejuice.ebdb:load-contract-person-aud
-  - bietlejuice.ebdb:load-proponent-proposal-aud
+bietlejuice.enrich_ebdb_smart_price:
+  - bietlejuice.ebdb:load-house-aud
+  - bietlejuice.ebdb:load-dynamic-pricing-house-aud
+  - bietlejuice.ebdb:load-user-revision-entity
 
-bietlejuice.enrich_tracksale:
-  - bietlejuice.tracksale:dispatch
-  - bietlejuice.tracksale:answer
+bietlejuice.enrich_ebdb_proposal:
+  - bietlejuice.ebdb:load-pre-proposal
+  - bietlejuice.ebdb:load-pre-proposal-aud
+  - bietlejuice.ebdb:load-user-revision-entity
+  - bietlejuice.ebdb:load-pre-proposal-condition
+  - bietlejuice.ebdb:load-proposal-condition
+
+bietlejuice.enrich_kill_queue:
+  - bietlejuice.kill_queue:load-house-to-datalake-clean
+  - bietlejuice.kill_queue:load-reservation-to-datalake-clean
 
 bietlejuice.enrich_nps_answer_drivers:
   - bietlejuice.enrich_tracksale:load-answer-to-enrich
@@ -72,43 +109,6 @@ bietlejuice.enrich_nps_answer_drivers:
   - bietlejuice.ebdb:load-contract
   - bietlejuice.enrich_ebdb_listing:load-house-listing-to-enrich
 
-bietlejuice.dw_visit:
-  - bietlejuice.ebdb:load-visit
-
-bietlejuice.dw_smart_price:
-  - bietlejuice.enrich_ebdb_smart_price
-  - bietlejuice.ebdb:load-dynamic-pricing-house
-  - bietlejuice.ebdb:load-dynamic-pricing-parameters
-
-bietlejuice.enrich_region:
-  - bietlejuice.ebdb:load-region
-  # TODO [ODS] Add gsheets after migrated to composer
-
-bietlejuice.enrich_booking:
-  - bietlejuice.ebdb:load-booking
-  - bietlejuice.ebdb:load-booking-aud
-  - bietlejuice.ebdb:load-follow-up-details
-  - bietlejuice.ebdb:load-entrance
-  - bietlejuice.ebdb:load-booking-status-change
-  - bietlejuice.ebdb:load-appointment-change-reason-category
-  - bietlejuice.ebdb:load-user-revision-entity
-  - bietlejuice.ebdb:load-visit
-  - bietlejuice.ebdb:load-visit-origin
-  - bietlejuice.ebdb:load-visitor
-  # TODO [ODS] Add gsheets after migrated to composer
-
-bietlejuice.dw_booking:
-  - bietlejuice.enrich_booking
-  - bietlejuice.ebdb:load-visit
-  - bietlejuice.enrich_amplitude_visit
-
-bietlejuice.enrich_ebdb_proposal:
-  - bietlejuice.ebdb:load-pre-proposal
-  - bietlejuice.ebdb:load-pre-proposal-aud
-  - bietlejuice.ebdb:load-user-revision-entity
-  - bietlejuice.ebdb:load-pre-proposal-condition
-  - bietlejuice.ebdb:load-proposal-condition
-
 bietlejuice.enrich_proposal:
   - bietlejuice.ebdb:load-proposal
   - bietlejuice.ebdb:load-proposal-aud
@@ -116,14 +116,17 @@ bietlejuice.enrich_proposal:
   - bietlejuice.sorting_hat:load-proposal-to-datalake-clean
   - bietlejuice.sorting_hat:load-proposal-version-to-datalake-clean
 
-bietlejuice.enrich_ebdb_contract:
-  - bietlejuice.ebdb:load-contract
-  - bietlejuice.ebdb:load-contract-aud
-  - bietlejuice.ebdb:load-user-revision-entity
-  - bietlejuice.ebdb:load-contract-version
-  - bietlejuice.ebdb:load-full-contract
+bietlejuice.enrich_region:
+  - bietlejuice.ebdb:load-region
+  # TODO [ODS] Add gsheets after migrated to composer
 
-bietlejuice.dw_region:
-  - bietlejuice.enrich_region
-  - bietlejuice.enrich_booking
-  - bietlejuice.enrich_ebdb_listing:load-house-to-enrich
+bietlejuice.enrich_tracksale:
+  - bietlejuice.tracksale:dispatch
+  - bietlejuice.tracksale:answer
+
+bietlejuice.tenant_booking_review:
+  - bietlejuice.ebdb:load-visit
+  - bietlejuice.ebdb:load-booking
+  - bietlejuice.insider:load-review-feature-to-datalake-clean
+  - bietlejuice.insider:load-review-to-datalake-clean
+  - bietlejuice.enrich_amplitude_visit
