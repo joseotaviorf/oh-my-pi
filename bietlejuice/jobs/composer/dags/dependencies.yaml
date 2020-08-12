@@ -111,6 +111,10 @@ bietlejuice.enrich_ebdb_smart_price:
   - bietlejuice.ebdb:load-dynamic-pricing-house-aud
   - bietlejuice.ebdb:load-user-revision-entity
 
+bietlejuice.enrich_ebdb_user:
+  - bietlejuice.ebdb:load-affiliate-data
+  - bietlejuice.ebdb:load-user
+
 bietlejuice.enrich_kill_queue:
   - bietlejuice.kill_queue:load-house-to-datalake-clean
   - bietlejuice.kill_queue:load-reservation-to-datalake-clean
