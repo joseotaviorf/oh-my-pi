@@ -53,6 +53,9 @@ bietlejuice.enrich_booking:
   - bietlejuice.ebdb:load-visitor
   # TODO [ODS] Add gsheets after migrated to composer
 
+bietlejuice.enrich_docx:
+  - bietlejuice.docx:load-credit-evaluation-to-clean
+
 bietlejuice.enrich_ebdb_contract:
   - bietlejuice.ebdb:load-contract
   - bietlejuice.ebdb:load-contract-aud
