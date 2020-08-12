@@ -1,6 +1,6 @@
 drop table if exists tracksale.dim_nps_campaign;
 create table if not exists tracksale.dim_nps_campaign (
-    sk_nps_campaign bigint,
+    sk_nps_campaign bigint primary key,
     name varchar(100),
     main_channel varchar(10),
     business_context varchar(20),
@@ -12,3 +12,4 @@ create table if not exists tracksale.dim_nps_campaign (
     ts_created timestamp,
     ts_load timestamp
 )
+

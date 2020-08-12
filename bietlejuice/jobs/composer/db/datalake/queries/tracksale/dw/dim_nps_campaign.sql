@@ -11,4 +11,3 @@ SELECT
 	ts_created,
 	current_timestamp AS ts_load
 FROM datalake_tracksale_clean.campaign
-

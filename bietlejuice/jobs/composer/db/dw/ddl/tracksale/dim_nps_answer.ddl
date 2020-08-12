@@ -1,6 +1,6 @@
 drop table if exists tracksale.dim_nps_answer;
 create table if not exists tracksale.dim_nps_answer (
-    sk_nps_answer bigint,
+    sk_nps_answer bigint primary_key,
     campaign_step varchar(50),
     score_category varchar(20),
     comment varchar(20000),
