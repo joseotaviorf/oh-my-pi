@@ -140,15 +140,14 @@ leads_b2b as (
     coalesce(btf.rep_id, '-1'::integer) as sk_user_first_task_assignee,
     coalesce(btl.rep_id, '-1'::integer) as sk_user_last_task_assignee,
     coalesce(f.region_id, '-1'::integer) as sk_region,
-    coalesce(f.first_region_id, '-1'::integer) as sk_first_region,
     coalesce(dr.city_id, '-1'::integer) as id_city,
     coalesce(pa_b2b_prime.partner_id, l_b2b.online_partner_id, f.partner_id, '-1'::integer::bigint) as sk_partner,
     coalesce(to_char(f.dt_lead::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_lead_date,
     coalesce(to_char(f.dt_prospect::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_prospect_date,
-    coalesce(to_char(btf.dt_created::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_first_task_created_date,
-    coalesce(to_char(btf.dt_closed::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_first_task_closed_date,
-    coalesce(to_char(btl.dt_created::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_last_task_created_date,
-    coalesce(to_char(btl.dt_closed::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_last_task_closed_date,
+    coalesce(to_char(CASE WHEN btf.dt_created < f.dt_lead THEN f.dt_lead ELSE btf.dt_created END::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_first_task_created_date,
+    coalesce(to_char(CASE WHEN btf.dt_closed < f.dt_lead THEN f.dt_lead ELSE btf.dt_closed END::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_first_task_closed_date,
+    coalesce(to_char(CASE WHEN btl.dt_created < f.dt_lead THEN f.dt_lead ELSE btl.dt_created END::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_last_task_created_date,
+    coalesce(to_char(CASE WHEN btl.dt_closed < f.dt_lead THEN f.dt_lead ELSE btl.dt_closed END::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_last_task_closed_date,
     coalesce(to_char(f.dt_first_contact::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_first_contact_date,
     coalesce(to_char(f.dt_conversion::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_conversion_date,
     coalesce(to_char(f.dt_qualified::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_qualified_date,
@@ -166,6 +165,7 @@ leads_b2b as (
       when f.dt_first_listing is not null then 'listing'
       when f.dt_opportunity is not null then 'opportunity'
       when f.dt_qualified is not null then 'qualified'
+      when f.dt_first_contact is not null then 'first contact'
       when f.dt_prospect is not null then 'prospect'
       when f.dt_lead is not null then 'lead'
       else NULL
@@ -221,7 +221,10 @@ leads_b2b as (
     coalesce(f.affiliate_id, f.origin_lead_usuario_que_indicou_id::integer, '-1'::integer) as affiliate_id,
     f.is_agent_referral,
     coalesce(f.region_id, -1) as region_id,
-    h.usuario_que_cadastrou_id as house_usuario_que_cadastrou_id
+    h.usuario_que_cadastrou_id as house_usuario_que_cadastrou_id,
+    f.dt_opt_out_rent as ts_opt_out_rent,
+    f.lead_context_origin,
+    f.listing_sale_status
   from listing_flows_with_reprocessed_leads f
   left join lead_first_event_tracking lfet
     on lfet.id_lead = f.lead_id
