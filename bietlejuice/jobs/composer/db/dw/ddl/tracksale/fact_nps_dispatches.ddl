@@ -1,0 +1,23 @@
+drop table if exists tracksale.fact_nps_dispatches;
+create table if not exists tracksale.fact_nps_dispatches (
+    sk_nps_dispatch varchar(500) primary key,
+    sk_nps_dispatch_lot varchar(20),
+    sk_nps_campaign integer,
+    sk_nps_customer varchar(200),
+    sk_user bigint,
+    sk_personal_document varchar(25),
+    sk_nps_answer bigint,
+    sk_house_listing bigint,
+    sk_booking bigint,
+    sk_tta varchar(50),
+    sk_offer bigint,
+    sk_contract bigint,
+    sk_sent_date bigint,
+    sk_answered_date bigint,
+    score bigint,
+    minutes_response_time decimal(27,2),
+    is_pending_survey boolean,
+    is_answered boolean,
+    has_comment boolean,
+    ts_load timestamp
+)
