@@ -91,7 +91,7 @@ contract_people_secondary_phones AS (
 	SELECT
 		cpf,
 		'phone' AS channel,
-		REPLACE(REGEXP_REPLACE(secondary_phone,'(\D+)',''),'+','') AS customer_contact
+		REPLACE(REGEXP_REPLACE(secondary_phone,'(\\D+)',''),'+','') AS customer_contact
 	FROM datalake_ebdb_clean.contract_person_aud
 	WHERE cpf IS NOT NULL
 		AND secondary_phone IS NOT NULL
@@ -111,7 +111,7 @@ proposal_people_phone_numbers AS (
 	SELECT
 		cpf,
 		'phone' AS channel,
-		REGEXP_REPLACE(phone_number,'(\D+)','') AS customer_contact
+		REGEXP_REPLACE(phone_number,'(\\D+)','') AS customer_contact
 	FROM datalake_ebdb_clean.proponent_proposal_aud
 	WHERE cpf IS NOT NULL
 		AND phone_number IS NOT NULL
@@ -139,6 +139,12 @@ person_contacts AS (
 	WHERE customer_contact != ''
 	GROUP BY 1,2,3
 )
-SELECT * FROM user_full_contacts
-UNION
-SELECT * FROM person_contacts
+SELECT
+	COALESCE(ufc.customer_contact,pc.customer_contact) AS customer_contact,
+	COALESCE(ufc.channel, pc.channel) AS channel,
+	MAX(ufc.id_user) AS id_user,
+	MAX(COALESCE(ufc.cpf, pc.cpf)) AS cpf
+FROM user_full_contacts ufc
+FULL JOIN person_contacts pc
+	ON ufc.customer_contact = pc.customer_contact
+GROUP BY 1,2
