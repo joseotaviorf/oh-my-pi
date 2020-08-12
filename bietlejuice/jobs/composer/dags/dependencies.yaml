@@ -31,7 +31,7 @@ bietlejuice.dw_smart_price:
   - bietlejuice.ebdb:load-dynamic-pricing-house
   - bietlejuice.ebdb:load-dynamic-pricing-parameters
   
-bietlejuice:dw_tracksale:
+bietlejuice.dw_tracksale:
   - bietlejuice.enrich_tracksale
   - bietlejuice.enrich_nps_answer_drivers
   - bietlejuice.enrich_ebdb_customer_contact_identification
