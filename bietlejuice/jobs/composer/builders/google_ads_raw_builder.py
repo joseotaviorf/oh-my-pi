@@ -1,0 +1,231 @@
+from datetime import datetime, timedelta
+from unidecode import unidecode
+import re
+from pyspark.sql.functions import lit
+
+from quintoandar_logger import QuintoAndarLogger
+
+logger = QuintoAndarLogger("GoogleAdsRawBuilder")
+
+REPORT_TYPES = {
+    "ad_performance_report": "ads_performance_report",
+    "campaign_performance_report": "campaigns_performance_report",
+    "keywords_performance_report": "keywords_performance_report",
+}
+
+REPORT_SCHEMAS = {
+    "ads_performance_report": [
+        "ExternalCustomerId",
+        "AdGroupId",
+        "AdGroupName",
+        "AdType",
+        "CampaignId",
+        "CampaignName",
+        "Clicks",
+        "Cost",
+        "Date",
+        "Description",
+        "Description1",
+        "Description2",
+        "Device",
+        "DisplayUrl",
+        "Id",
+        "Impressions",
+        "ImageCreativeName",
+        "AccountDescriptiveName",
+        "AbsoluteTopImpressionPercentage",
+        "ReportType",
+        "acc",
+        "campaign_name",
+        "dt",
+    ],
+    "campaigns_performance_report": [
+        "ExternalCustomerId",
+        "CampaignId",
+        "CampaignName",
+        "Clicks",
+        "Cost",
+        "Date",
+        "Device",
+        "Impressions",
+        "AccountDescriptiveName",
+        "Month",
+        "Labels",
+        "Week",
+        "Year",
+        "AbsoluteTopImpressionPercentage",
+        "SearchImpressionShare",
+        "ReportType",
+        "acc",
+        "campaign_name",
+        "dt",
+    ],
+    "keywords_performance_report": [
+        "ExternalCustomerId",
+        "AdGroupId",
+        "AdGroupName",
+        "CampaignId",
+        "CampaignName",
+        "Clicks",
+        "Cost",
+        "Date",
+        "Device",
+        "Id",
+        "Impressions",
+        "KeywordMatchType",
+        "Labels",
+        "Criteria",
+        "AccountDescriptiveName",
+        "AbsoluteTopImpressionPercentage",
+        "SearchImpressionShare",
+        "ReportType",
+        "acc",
+        "campaign_name",
+        "dt",
+    ],
+}
+FULL_FILE_PATH_LENGTH = 8
+PARTITION_COLUMNS = ["ReportType", "acc", "campaign_name", "dt"]
+
+
+class GoogleAdsRawBuilder:
+    @logger
+    def __init__(self, s3_consumer, s3_service, execution_date):
+        self.s3_consumer = s3_consumer
+        self.s3_service = s3_service
+        self.s3_source_file_format = "csv"
+        self.execution_date = execution_date
+
+    def __get_formatted_account_name(self, raw_account_name):
+        account_name = self.__format_account_name(raw_account_name)
+        return account_name
+
+    def __format_account_name(self, account_name):
+        alphanumeric_account_name = re.sub(r"[^\w\s]", "", account_name)
+        snake_cased_account_name = re.sub(r"\s+", "_", alphanumeric_account_name)
+        no_accents_account_name = unidecode(snake_cased_account_name)
+        return no_accents_account_name.lower()
+
+    def __get_formatted_campaign_name(self, raw_campaign_name):
+        campaign_name = self.__format_campaign_name(raw_campaign_name)
+        return campaign_name
+
+    def __format_campaign_name(self, campaign_name):
+        snake_cased_campaign_name = campaign_name.replace(".", "_")
+        no_accents_campaign_name = unidecode(snake_cased_campaign_name)
+        return no_accents_campaign_name.lower()
+
+    def __split_str(self, str, split_condition):
+        return [x for x in str.split(split_condition) if x != ""]
+
+    def __get_date(self, str):
+        return re.search("dt=(.*?)/", str).group(1)
+
+    def __format_date(self, date):
+        formatted_date = datetime.strptime(date, "%d-%m-%Y").strftime("%Y-%m-%d")
+        return formatted_date
+
+    def __get_yesterdays_date(self, date):
+        yesterdays_date = datetime.strptime(date, "%Y-%m-%d").date() - timedelta(days=1)
+        return yesterdays_date
+
+    def __filter_for_full_file_paths(self, file_paths):
+        filtered_file_paths = [
+            x
+            for x in file_paths
+            if len(self.__split_str(x, "/")) >= FULL_FILE_PATH_LENGTH
+        ]
+        return filtered_file_paths
+
+    def __file_is_from_yesterday(self, file_path, execution_date):
+        todays_date = self.__get_date(file_path)
+        formatted_date = self.__format_date(todays_date)
+        yesterdays_date = self.__get_yesterdays_date(execution_date)
+        return formatted_date == str(yesterdays_date)
+
+    def __filter_for_execution_date(self, file_paths):
+        filtered_file_paths = [
+            x
+            for x in file_paths
+            if self.__file_is_from_yesterday(x, self.execution_date)
+        ]
+        return filtered_file_paths
+
+    def __add_schema_to_csv(self, csv_file, s3_source_file_path, report_type):
+        report_schema = REPORT_SCHEMAS[report_type]
+        csv_file = csv_file.toDF(*report_schema)
+        return csv_file
+
+    def __convert_csv_to_json(self, csv_file):
+        json_file = csv_file.toJSON()
+        return json_file
+
+    def __fix_report_type(self, report_type):
+        return REPORT_TYPES[report_type] if report_type in REPORT_TYPES else report_type
+
+    def __add_partition_columns_to_csv(self, csv_file, partitions_tuple):
+        enriched_csv = csv_file
+        for name, value in partitions_tuple:
+            enriched_csv = self.__add_column_to_csv(enriched_csv, name, value)
+        return enriched_csv
+
+    def __add_column_to_csv(self, csv_file, name, value):
+        enriched_csv_file = csv_file.withColumn(name, lit(value))
+        return enriched_csv_file
+
+    def __merge_lists(self, list1, list2):
+        merged_list = tuple(zip(list1, list2))
+        return merged_list
+
+    def __enrich_csv(self, csv_s3_file, s3_source_file_path, report_type):
+        partition_values = self.__get_partition_information(
+            csv_s3_file, s3_source_file_path
+        )
+        partition_values.insert(0, report_type)
+        partitions_tuple = self.__merge_lists(PARTITION_COLUMNS, partition_values)
+        csv_s3_file_with_partition_columns = self.__add_partition_columns_to_csv(
+            csv_s3_file, partitions_tuple
+        )
+        return csv_s3_file_with_partition_columns
+
+    def __get_partition_information(self, csv_file, s3_file_path):
+        account_name = self.__get_formatted_account_name(csv_file.first().Account)
+        campaign_name = self.__get_formatted_campaign_name(csv_file.first().Campaign)
+        dt = self.__get_date(s3_file_path)
+        return [account_name, campaign_name, dt]
+
+    def build_enriched_csv(self, s3_source_file_path, report_type):
+        csv_options = {"header": True}
+        csv_s3_file = self.s3_consumer.get_data_from_file(
+            s3_source_file_path, self.s3_source_file_format, options=csv_options
+        )
+        enriched_csv_file = self.__enrich_csv(
+            csv_s3_file, s3_source_file_path, report_type
+        )
+        csv_s3_file_with_schema = self.__add_schema_to_csv(
+            enriched_csv_file, s3_source_file_path, report_type
+        )
+        return csv_s3_file_with_schema
+
+    def build_file_paths(self, s3_file_path_source):
+        s3_source_raw_file_paths = self.s3_service.list_objects(s3_file_path_source)
+        s3_source_full_file_paths = self.__filter_for_full_file_paths(
+            s3_source_raw_file_paths
+        )
+        s3_source_file_paths = self.__filter_for_execution_date(
+            s3_source_full_file_paths
+        )
+        return s3_source_file_paths
+
+    def build_report_type(self, s3_path):
+        raw_report_type = re.search("report=(.*?)/", s3_path).group(1).lower()
+        parsed_report_type = self.__fix_report_type(raw_report_type)
+        return parsed_report_type
+
+    def build_target_file_path(self, s3_file, s3_file_path_target, report_type):
+        account_name = s3_file.first().acc
+        campaign_name = s3_file.first().campaign_name
+        dt = s3_file.first().dt
+        database_location = f"{s3_file_path_target}/{report_type}/acc={account_name}/campaign_name={campaign_name}/"
+        table_name = f"dt={dt}"
+        return database_location, table_name
