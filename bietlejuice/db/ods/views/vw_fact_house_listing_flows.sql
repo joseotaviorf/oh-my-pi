@@ -220,8 +220,5 @@ select
   atax.mkt_platform,
   atax.mkt_medium,
   atax.mkt_source,
-  atax.lead_context_origin,
-  atax.listing_sale_status,
-  atax.ts_opt_out_rent as ts_opted_out_rent,
   atax.ts_load
 from applied_taxonomy_flow atax

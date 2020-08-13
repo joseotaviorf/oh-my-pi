@@ -48,10 +48,7 @@ create table public.listing_flows_with_reprocessed_leads (
 	is_b2b boolean,
 	partner_id bigint,
 	affiliate_type character varying(255) DEFAULT NULL::character varying,
-	is_agent_referral boolean,
-	dt_opt_out_rent timestamp,
-	lead_context_origin varchar(255),
-	listing_sale_status varchar(255)
+	is_agent_referral boolean
 );
 
 CREATE INDEX reproc_leads_lead_id_idx ON public.listing_flows_with_reprocessed_leads USING btree (lead_id);
