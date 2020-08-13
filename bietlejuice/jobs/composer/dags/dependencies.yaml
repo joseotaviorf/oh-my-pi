@@ -113,6 +113,8 @@ bietlejuice.enrich_ebdb_smart_price:
 
 bietlejuice.enrich_ebdb_user:
   - bietlejuice.ebdb:load-affiliate-data
+  - bietlejuice.ebdb:load-agent-data
+  - bietlejuice.ebdb:load-agent-data-business-contexts-served
   - bietlejuice.ebdb:load-user
 
 bietlejuice.enrich_kill_queue:
