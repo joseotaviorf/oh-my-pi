@@ -21,4 +21,5 @@ from bietlejuice.jobs.dags.supply_demand_funnel.special_condition_subdag import 
 from bietlejuice.jobs.dags.supply_demand_funnel.user_subdag import UserSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.visit_subdag import VisitSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.listing_flows_subdag import ListingFlowsSubDag
+from bietlejuice.jobs.dags.supply_demand_funnel.listing_flows_temp_subdag import ListingFlowsTempSubDag
 from bietlejuice.jobs.dags.supply_demand_funnel.sales_listing_flows_subdag import SalesListingFlowsSubDag

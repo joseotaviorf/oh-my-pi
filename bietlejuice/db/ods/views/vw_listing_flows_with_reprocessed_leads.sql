@@ -22,6 +22,20 @@ lbc as (
         listing_business_context
     group by 1
 ),
+b2b_prime_draft as (
+    select
+        l.id as id_lead,
+        max(pa_b2b.partner_id) as partner_id
+    from
+        lead l
+    join usuario u_b2b
+        on u_b2b.telefone_principal = l.telefone_anunciante
+    join partner_agent pa_b2b
+        on pa_b2b.user_id = u_b2b.id
+    where
+        l.origem = 'OwnerPWA'
+    group by 1
+),
 acquisition_channels as (
     select
         fhlf.id,
@@ -88,20 +102,7 @@ acquisition_channels as (
         on h.id = fhlf.imovel_id
     left join partner_agent pa_b2b
         on pa_b2b.user_id = h.usuario_id
-    left join (
-        select
-            l.id as id_lead,
-            max(pa_b2b.partner_id) as partner_id
-        from
-            lead l
-        join usuario u_b2b
-            on u_b2b.telefone_principal = l.telefone_anunciante
-        join partner_agent pa_b2b
-            on pa_b2b.user_id = u_b2b.id
-        where
-            l.origem = 'OwnerPWA'
-        group by 1
-    ) b2b_prime_draft
+    left join b2b_prime_draft
         on b2b_prime_draft.id_lead = l.id
     left join house_listing hl
         on hl.id_house = fhlf.imovel_id
