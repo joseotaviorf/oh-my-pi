@@ -115,9 +115,15 @@ bietlejuice.enrich_ebdb_user:
   - bietlejuice.ebdb:load-affiliate-data
   - bietlejuice.ebdb:load-agent-data
   - bietlejuice.ebdb:load-agent-data-business-contexts-served
-  - bietlejuice.ebdb:load-user
+  - bietlejuice.ebdb:load-contract
+  - bietlejuice.ebdb:load-device
   - bietlejuice.ebdb:load-doorman-affiliate-data
   - bietlejuice.ebdb:load-doorman-affiliate-occupation
+  - bietlejuice.ebdb:load-house
+  - bietlejuice.ebdb:load-proposal
+  - bietlejuice.ebdb:load-proposal-aud
+  - bietlejuice.ebdb:load-user
+  - bietlejuice.ebdb:load-user-revision-entity
 
 bietlejuice.enrich_kill_queue:
   - bietlejuice.kill_queue:load-house-to-datalake-clean

@@ -7,4 +7,4 @@ select
     ,criadoEm as ts_created
     ,preferenciaPagamento as payment_preference
 from
-    datalake_ebdb_raw.dadosfotografo
+    datalake_ebdb_raw.dadosfotografo -- TODO [ODS] Rename this table from photographer to PhotographerData on clean
