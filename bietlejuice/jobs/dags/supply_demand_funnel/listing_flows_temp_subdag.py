@@ -19,7 +19,7 @@ class ListingFlowsTempSubDag(BaseSubDag):
         )
 
     @logger
-    def build_listing_flows(self):
+    def build_listing_flows_temp(self):
         listing_flows_temp_dag = self._build_local_dag()
 
         ods_listing_flows_with_reprocessed_leads_task, ods_potential_listings_task, \
