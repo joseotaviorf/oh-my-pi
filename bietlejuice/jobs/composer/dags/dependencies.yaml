@@ -116,6 +116,8 @@ bietlejuice.enrich_ebdb_user:
   - bietlejuice.ebdb:load-agent-data
   - bietlejuice.ebdb:load-agent-data-business-contexts-served
   - bietlejuice.ebdb:load-user
+  - bietlejuice.ebdb:load-doorman-affiliate-data
+  - bietlejuice.ebdb:load-doorman-affiliate-occupation
 
 bietlejuice.enrich_kill_queue:
   - bietlejuice.kill_queue:load-house-to-datalake-clean
