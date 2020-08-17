@@ -23,12 +23,12 @@ services:
     image: base
     build:
       context: ..
-      dockerfile: airflow-py3.Dockerfile
+      dockerfile: docker/airflow-py3.Dockerfile
     ports:
       - "8080:8080"
     volumes:
       - /home/<USER>/.aws:/root/.aws
-      - /home/<USER>/<BIETLEJUICE_FOLDER>:/bi-etl-ejuice
+      - /home/<USER>/<BIETLEJUICE_FOLDER>/bietlejuice:/bi-etl-ejuice/bietlejuice
     depends_on:
       - postgres_airflow_py3
     networks:
@@ -40,7 +40,7 @@ services:
     environment:
       - C_FORCE_ROOT=true
     depends_on:
-      - postgres_airflow_py3
+      - airflow_python3
     volumes:
       - /home/<USER>/<BIETLEJUICE_FOLDER>/bietlejuice/jobs/composer/dags:/bi-etl-ejuice/bietlejuice/jobs/composer/dags
     entrypoint: airflow worker -cn worker_1
@@ -58,7 +58,7 @@ services:
     environment:
       - C_FORCE_ROOT=true
     depends_on:
-      - postgres_airflow_py3
+      - airflow_python3
     volumes:
       - /home/<USER>/<BIETLEJUICE_FOLDER>/bietlejuice/jobs/composer/dags:/bi-etl-ejuice/bietlejuice/jobs/composer/dags
     entrypoint: airflow worker -cn worker_2

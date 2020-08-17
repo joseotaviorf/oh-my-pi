@@ -1,6 +1,10 @@
+#!/bin/bash
 export > /export
 
+cd /bi-etl-ejuice
+
 airflow initdb >&2
-# python3 setup.py develop 2>&1 | tee -a /setup.log
+
+airflow variables -i /bi-etl-ejuice/airflow_python3/local_env.json
 airflow scheduler >&2 &
 airflow webserver >&2

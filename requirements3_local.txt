@@ -77,13 +77,12 @@ tzlocal==1.5.1
 unidecode==1.1.1
 unicodecsv==0.14.1
 urllib3==1.25.2
-Werkzeug==0.15.3
+Werkzeug==0.14.1
 whichcraft==0.6.0
 WTForms==2.2.1
 zope.deprecation==4.4.0
 quintoandar-teravoz-client==0.1.5
 quintoandar-zendesk-client==0.1.1
-quintoandar-tracksale-api-client==0.2.0
 quintoandar-jira-api-client==0.1.0
 firebase_admin==3.0.0
 flower==0.9.3

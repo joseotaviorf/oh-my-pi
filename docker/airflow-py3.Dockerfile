@@ -7,7 +7,7 @@ WORKDIR /bi-etl-ejuice
 ARG AIRFLOW_VERSION=1.10.3
 ENV PYTHONIOENCODING=utf-8 \
     AIRFLOW_HOME=/bi-etl-ejuice/airflow_python3 \
-    PYTHONPATH="${PYTHONPATH}:/${AIRFLOW_HOME}/config" \
+    PYTHONPATH=":/bi-etl-ejuice" \
     SLUGIFY_USES_TEXT_UNIDECODE=yes \
     AIRFLOW_GPL_UNIDECODE=yes
 
@@ -35,12 +35,13 @@ COPY requirements3_local.txt .
 RUN python3 -m pip install --upgrade pip && \
     git config --global url.https://<GITHUB_TOKEN>:@github.com/.insteadOf https://github.com/ && \
     pip install -r requirements3_local.txt --extra-index-url https://quintoandar.github.io/python-package-server/ && \
+    pip install quintoandar-tracksale-api-client==0.2.0 --extra-index-url https://quintoandar.github.io/python-package-server/ --no-deps && \
     git clone https://github.com/quintoandar/airflow-plugins.git && \
     locale-gen --purge pt_BR.UTF-8
 
 COPY . .
 
 RUN chmod +x start.sh && \
-    /bin/bash -c 'cp -R /bi-etl-ejuice/airflow-plugins/quintoandar_airflow_plugins/* /bi-etl-ejuice/airflow_python3/plugins && rm -R /bi-etl-ejuice/airflow-plugins'
+    /bin/bash -c 'mkdir /bi-etl-ejuice/airflow_python3/plugins && cp -R /bi-etl-ejuice/airflow-plugins/quintoandar_airflow_plugins/* /bi-etl-ejuice/airflow_python3/plugins && rm -R /bi-etl-ejuice/airflow-plugins'
 
-ENTRYPOINT /bi-etl-ejuice/start.sh
+ENTRYPOINT ["/bin/bash", "-c", "/bi-etl-ejuice/start.sh"]
