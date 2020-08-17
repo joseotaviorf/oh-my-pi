@@ -64,7 +64,6 @@ customer_keys AS (
         AND cci_e.channel = 'email'    
      GROUP BY 1
 )
-
 SELECT
      cc.id_dispatch AS sk_nps_dispatch,
      cc.id_dispatch_lot AS sk_nps_dispatch_lot,
