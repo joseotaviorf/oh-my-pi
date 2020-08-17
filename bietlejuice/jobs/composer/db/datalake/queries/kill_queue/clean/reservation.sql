@@ -11,6 +11,9 @@ SELECT
     house_id as id_house,
     mundipagg_token,
     is_ongoing,
-    cancellation_reason
+    cancellation_reason,
+    last_charge_status,
+    tenant_refund_percentage,
+    installments
 FROM
     datalake_kill_queue_raw.reservation
