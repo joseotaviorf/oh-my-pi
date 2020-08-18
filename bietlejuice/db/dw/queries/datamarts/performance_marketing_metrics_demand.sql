@@ -1,354 +1,287 @@
 WITH
---------------------------------------------------------------------------------------------------------------------
--- Query bookings, offers and talk to agent full history to rank events, users and rent_flows as new or recurrent --
---------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------
+-- Query bookings, offers and talk to agent full history --
+-----------------------------------------------------------
 booking AS (
-    SELECT
-        flrf.sk_client,
-        a.id_property,
-        flrf.sk_region,
-        a.mkt_origin,
-        a.mkt_channel,
-        a.mkt_medium,
-        a.mkt_source,
-        a.utm_campaign,
-        a.dt_created,
-        a.sk_booking,
-        ROW_NUMBER() OVER(PARTITION BY sk_client
-                          ORDER BY a.dt_created) AS rk_booking
-    FROM
-        dim_booking a
-    join fact_listing_rent_Flows flrf
-        using(sk_booking)
-    WHERE
-        a.sk_booking > 0
-        AND a.visit_intent = 'RENT'
-        AND a.type = 'Visita'
+	SELECT
+		flrf.sk_client,
+		a.id_property AS id_house,
+		flrf.sk_region,
+		a.mkt_origin,
+		a.mkt_channel,
+		a.mkt_medium,
+		a.mkt_source,
+		a.utm_campaign,
+		a.utm_term,
+		a.utm_content,
+		a.dt_created AS ts_event,
+		'Booking' AS flow_event
+	FROM
+		dim_booking a
+	join fact_listing_rent_Flows flrf
+	using(sk_booking)
+	WHERE
+		a.sk_booking > 0
+		AND a.visit_intent = 'RENT'
+		AND a.type = 'Visita'
+		AND a.dt_created IS NOT NULL
 ),
 offer AS (
-    SELECT
-        flrf.sk_client,
-        a.id_property,
-        flrf.sk_region,
-        a.mkt_origin,
-        a.mkt_channel,
-        a.mkt_medium,
-        a.mkt_source,
-        a.utm_campaign,
-        a.dt_first_sent,
-        a.sk_offer,
-        ROW_NUMBER() OVER(PARTITION BY sk_client
-                          ORDER BY a.dt_created) AS rk_offer
-    FROM
-        dim_offer AS a
-    JOIN fact_listing_rent_flows AS flrf
-        USING(sk_offer)
-    WHERE
-        a.sk_offer > 0
+	SELECT
+		flrf.sk_client,
+		a.id_property AS id_house,
+		flrf.sk_region,
+		a.mkt_origin,
+		a.mkt_channel,
+		a.mkt_medium,
+		a.mkt_source,
+		a.utm_campaign,
+		a.utm_term,
+		a.utm_content,
+		a.dt_first_sent AS ts_event,
+		'Offer' AS flow_event
+	FROM
+		dim_offer AS a
+	JOIN fact_listing_rent_flows AS flrf
+	USING(sk_offer)
+	WHERE
+		a.sk_offer > 0
+		AND a.dt_first_sent IS NOT NULL
 ),
 talk_to_agent AS (
 	SELECT
-	    tenant_id::int AS sk_client,
-	    house_id::int,
-	    fhl.sk_region,
-	    a.mkt_origin,
-	    a.mkt_channel,
-	    a.mkt_medium,
-	    a.mkt_source,
-	    a.utm_campaign,
-        a.first_message_ts::timestamp,
-        a.sk_house_listing || a.tenant_id || a.agent_id AS sk_tta,
-		ROW_NUMBER() OVER(PARTITION BY sk_client
-		                  ORDER BY first_message_ts) AS rk_tta
+		tenant_id::INT AS sk_client,
+		house_id::INT AS id_house,
+		fhl.sk_region,
+		a.mkt_origin,
+		a.mkt_channel,
+		a.mkt_medium,
+		a.mkt_source,
+		a.utm_campaign,
+		a.utm_term,
+		a.utm_content,
+		a.first_message_ts::timestamp AS ts_event,
+		'Talk to Agent' AS flow_event
 	FROM
-	    datamarts.talk_to_agent AS a
-    JOIN fact_house_listings AS fhl
-        ON a.sk_house_listing = fhl.sk_house_listing
-    WHERE
-        a.business_context = 'RENT'
+		datamarts.talk_to_agent AS a
+	JOIN fact_house_listings AS fhl
+		ON a.sk_house_listing = fhl.sk_house_listing
+	WHERE
+		a.business_context = 'RENT'
+		AND a.first_message_ts IS NOT NULL
 ),
 ----------------------------------------------------------------------------------------------------------------------
 -- Merge activation events (offer, booking and talk to agent) and order them by user and rent_flows (user || house) --
 ----------------------------------------------------------------------------------------------------------------------
 rent_flows_raw AS (
-    SELECT
-    	evt.*,
-    	dr.city_group,
-        ROW_NUMBER() OVER(PARTITION BY evt.client, evt.id_house
-                          ORDER BY evt.ts_event) AS rk_rf,
-        ROW_NUMBER() OVER(PARTITION BY evt.client
-                          ORDER BY evt.ts_event) AS rk_tp
-    FROM (
-    	SELECT
-	        DATE(b.dt_created) AS dt_event,
-	        b.dt_created AS ts_event,
-	        b.sk_client AS client,
-	        b.id_property AS id_house,
-	        b.sk_region,
-	        b.mkt_origin AS mkt_origin,
-	        b.mkt_channel AS mkt_channel,
-	        b.mkt_medium AS mkt_medium,
-	        b.mkt_source AS mkt_source,
-	        b.utm_campaign AS utm_campaign,
-	        'Booking' AS event_type,
-	        b.sk_booking,
-	        b.rk_booking,
-	        NULL AS sk_offer,
-	        NULL AS rk_offer,
-	        NULL AS sk_tta,
-	        NULL AS rk_tta
-	    FROM booking AS b
+	SELECT
+		evt.*,
+		DATE(evt.ts_event) AS dt_event,
+		dr.city_group,
+		evt.sk_client || '_' || evt.id_house as sk_rf,
+		ROW_NUMBER() OVER(PARTITION BY evt.sk_client, evt.id_house
+							ORDER BY evt.ts_event) AS rent_flow_order,
+		ROW_NUMBER() OVER(PARTITION BY evt.sk_client
+							ORDER BY evt.ts_event) AS tenant_prospect_order
+	FROM (
+		SELECT
+			b.*
+		FROM booking AS b
 
-	    UNION ALL
+		UNION ALL
 
-	    SELECT
-			DATE(o.dt_first_sent) AS dt_event,
-			o.dt_first_sent AS ts_event,
-			o.sk_client AS client,
-			o.id_property AS id_house,
-			o.sk_region,
-			o.mkt_origin AS mkt_origin,
-			o.mkt_channel AS mkt_channel,
-			o.mkt_medium AS mkt_medium,
-			o.mkt_source AS mkt_source,
-			o.utm_campaign AS utm_campaign,
-			'Offer' AS event_type,
-			NULL AS sk_booking,
-			NULL AS rk_booking,
-			o.sk_offer,
-			o.rk_offer,
-			NULL AS sk_tta,
-			NULL AS rk_tta
-	    FROM offer AS o
+		SELECT
+			o.*
+		FROM offer AS o
 
-	    UNION ALL
+		UNION ALL
 
-	   	SELECT
-		    DATE(tta.first_message_ts) AS dt_event,
-		    tta.first_message_ts AS ts_event,
-		    tta.sk_client AS client,
-		    tta.house_id AS id_house,
-		    tta.sk_region,
-		    tta.mkt_origin AS mkt_origin,
-		    tta.mkt_channel AS mkt_channel,
-		    tta.mkt_medium AS mkt_medium,
-		    tta.mkt_source AS mkt_source,
-		    tta.utm_campaign AS utm_campaign,
-		    'Talk to Agent' AS event_type,
-		    NULL AS sk_booking,
-		    NULL AS rk_booking,
-		    NULL AS sk_offer,
-		    NULL AS rk_offer,
-		    tta.sk_tta,
-		    tta.rk_tta
-	    FROM talk_to_agent AS tta
-    ) AS evt
-    JOIN dim_region AS dr
-        ON evt.sk_region = dr.sk_region
+		SELECT
+			tta.*
+		FROM talk_to_agent AS tta
+	) AS evt
+	JOIN dim_region AS dr
+		ON evt.sk_region = dr.sk_region
 ),
------------------------------------------------------------------------------------
--- Consolidate new rent_flows, new tenant prospects, new events and total events --
------------------------------------------------------------------------------------
-rent_flows AS (
-    SELECT
-        rf.dt_event,
-        rf.event_type,
-        rf.city_group,
-        rf.mkt_origin,
-        rf.mkt_channel,
-        rf.mkt_medium,
-        rf.mkt_source,
-        rf.utm_campaign,
-	    '' as campaign_name,
-        COUNT(DISTINCT CASE WHEN rf.rk_rf = 1 THEN rf.client || rf.id_house ELSE NULL END) AS new_rent_flows,
-        COUNT(DISTINCT CASE WHEN rf.rk_tp = 1 THEN rf.client ELSE NULL END) AS new_tenant_prospects,
-        COUNT(DISTINCT rf.client) AS tenant_prospects,
-        COUNT(DISTINCT rf.sk_booking) AS visits_booked,
-        COUNT(DISTINCT CASE WHEN rf.rk_booking = 1 THEN rf.sk_booking ELSE NULL END) AS first_bookings,
-        COUNT(DISTINCT rf.sk_offer) AS offer_sent,
-        COUNT(DISTINCT CASE WHEN rf.rk_offer = 1 THEN rf.sk_offer ELSE NULL END) AS first_offer_sent,
-        COUNT(DISTINCT rf.sk_tta) AS talk_to_agent,
-        COUNT(DISTINCT CASE WHEN rf.rk_tta = 1 THEN rf.sk_tta ELSE NULL END) AS first_talk_to_agent
-    FROM
-        rent_flows_raw rf
-    WHERE
-        rf.dt_event >= current_date - interval '12 month'
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
+----------------------------------
+-- Query the rent bottom funnel --
+----------------------------------
+rental_funnel AS (
+	SELECT DISTINCT
+		flrf.sk_client,
+		SUBSTRING(flrf.sk_house_listing, 1, 9) AS id_house,
+		NULLIF(flrf.sk_booking, -1) AS sk_booking,
+		NULLIF(flrf.sk_offer, -1) AS sk_offer,
+		NULLIF(flrf.sk_proposal, -1) AS sk_proposal,
+		NULLIF(flrf.sk_contract, -1) AS sk_contract,
+		dd_bc.date AS dt_booking_created,
+		flrf.flg_visit_completed,
+		dd_os.date AS dt_offer_submitted,
+		dd_oa.date AS dt_offer_approved,
+		dd_ds.date AS dt_tenant_first_doc_sent,
+		dd_ca.date AS dt_credit_analysis_approved,
+		dd_cs.date AS dt_contract_signed
+	FROM
+		fact_listing_rent_flows AS flrf
+	JOIN dim_date AS dd_bc
+		ON flrf.sk_booking_created_date = dd_bc.sk_date
+	JOIN dim_date AS dd_os
+		ON flrf.sk_offer_submitted_date = dd_os.sk_date
+	JOIN dim_date AS dd_oa
+		ON flrf.sk_offer_approved_date = dd_oa.sk_date
+	JOIN dim_date AS dd_ds
+		ON flrf.sk_tenant_first_doc_sent_date = dd_ds.sk_date
+	JOIN dim_date AS dd_ca
+		ON flrf.sk_credit_analysis_approved_date = dd_ca.sk_date
+	JOIN dim_date AS dd_cs
+		ON flrf.sk_contract_signed_date = dd_cs.sk_date
+	WHERE
+		COALESCE(dd_bc.date, dd_os.date) > 0
 ),
--------------------------------------------------------------------------------------------------
--- Query Performance Marketing Investment for Rental Demand costs (mkt_origin = 'Tenants PWA') --
--------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+-- Join the rent bottom funnel in the first rent flow cohort and introduce 0s for UNION --
+------------------------------------------------------------------------------------------
+fact_rent_flows AS (
+	SELECT
+		rf.dt_event,
+		rf.city_group,
+		rf.flow_event,
+		rf.mkt_origin,
+		rf.mkt_channel,
+		rf.mkt_medium,
+		rf.mkt_source,
+		rf.utm_campaign,
+		rf.utm_term,
+		rf.utm_content,
+		''::TEXT AS campaign_name,
+		rf.sk_rf,
+		rf.sk_client,
+		rf.id_house,
+		rf.rent_flow_order,
+		rf.tenant_prospect_order,
+		frf.sk_booking,
+		frf.sk_offer,
+		frf.sk_proposal,
+		frf.sk_contract,
+		frf.dt_booking_created,
+		frf.flg_visit_completed,
+		frf.dt_offer_submitted,
+		frf.dt_offer_approved,
+		frf.dt_tenant_first_doc_sent,
+		frf.dt_credit_analysis_approved,
+		frf.dt_contract_signed,
+		0.0 AS marketing_cost,
+		0.0 AS new_rent_flows_target,
+		0.0 AS new_tenant_prospects_target,
+		0.0 AS budget
+	FROM
+		rent_flows_raw AS rf
+	LEFT JOIN rental_funnel AS frf
+		ON rf.sk_client = frf.sk_client
+		AND rf.id_house = rf.id_house
+		AND rf.rent_flow_order = 1
+),
+-------------------------------------------------------------------------------------------------------------------------------
+-- Query Performance Marketing Investment for Rental Demand costs (mkt_origin = 'Tenants PWA') and introduce NULLs for UNION --
+-------------------------------------------------------------------------------------------------------------------------------
 demand_daily_spent AS (
-    SELECT
-        dd.date,
-        co.city_group,
-        '' AS event_type,
-        co.mkt_origin,
-        co.mkt_channel,
-        co.mkt_medium,
-        co.mkt_source,
-	    '' as utm_campaign,
-        campaign_name,
-        SUM(co.cost::FLOAT) AS spent
-    FROM
-        marketing.fact_marketing_daily_costs AS co
-    JOIN dim_date dd
-        ON dd.sk_date = co.sk_date
-    WHERE
-        co.mkt_origin = 'Tenants PWA'
-        AND dd.date >= current_date - interval '12 month'
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
+	SELECT
+		dd.date AS dt_event,
+		co.city_group,
+		''::TEXT AS flow_event,
+		co.mkt_origin,
+		co.mkt_channel,
+		co.mkt_medium,
+		co.mkt_source,
+		''::TEXT AS utm_campaign,
+		co.utm_term,
+		co.utm_content,
+		co.campaign_name,
+		NULL AS sk_rf,
+		NULL::INT AS sk_client,
+		NULL::INT AS id_house,
+		NULL::INT AS rent_flow_order,
+		NULL::INT AS tenant_prospect_order,
+		NULL::INT AS sk_booking,
+		NULL::INT AS sk_offer,
+		NULL::INT AS sk_proposal,
+		NULL::INT AS sk_contract,
+		NULL::DATE AS dt_booking_created,
+		NULL::BOOL AS flg_visit_completed,
+		NULL::DATE AS dt_offer_submitted,
+		NULL::DATE AS dt_offer_approved,
+		NULL::DATE AS dt_tenant_first_doc_sent,
+		NULL::DATE AS dt_credit_analysis_approved,
+		NULL::DATE AS dt_contract_signed,
+		SUM(co.cost::FLOAT) AS marketing_cost,
+		0.0 AS new_rent_flows_target,
+		0.0 AS new_tenant_prospects_target,
+		0.0 AS budget
+	FROM
+		marketing.fact_marketing_daily_costs AS co
+	JOIN dim_date AS dd
+		ON dd.sk_date = co.sk_date
+	WHERE
+		co.mkt_origin = 'Tenants PWA'
+		AND dd.date >= CURRENT_DATE - INTERVAL '12 MONTH'
+	GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,29,30,31
 ),
--------------------------------------------------------
--- Query Performance Marketing Rental Demand targets --
--------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- Query Performance Marketing Rental Demand targets and introduce NULLs for UNION --
+-------------------------------------------------------------------------------------
 demand_daily_targets AS (
-    SELECT
-        str.date::date,
-        str.city_group,
-        '' AS event_type,
-        'Tenants PWA' AS mkt_origin,
-        str.mkt_channel,
-        str.mkt_medium,
-        '' AS mkt_source,
-        '' AS utm_campaign,
-        '' AS campaign_name,
-        SUM(NULLIF(budget,'')) AS budget,
-        SUM(NULLIF(visits_booked_target, '')) AS visits_booked_target,
-        SUM(NULLIF(offer_sent_target, '')) AS offer_sent_target,
-        SUM(NULLIF(first_offer_sent_target, '')) AS first_offer_sent_target,
-        SUM(NULLIF(new_rent_flows_target, '')) AS new_rent_flows_target,
-        SUM(NULLIF(new_tenant_prospects_target, '')) AS new_tenant_prospects_target
-    FROM
-        datalake_raw.gsheets_demand_targets_replanning AS str
-    WHERE
-        str.date::DATE >= current_date - interval '12 month'
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
-),
------------------------
--- Concat all tables --
------------------------
-base as (
-    SELECT
-    	rf.dt_event,
-    	rf.city_group,
-    	rf.event_type,
-    	rf.mkt_origin,
-    	rf.mkt_channel,
-    	rf.mkt_medium,
-    	rf.mkt_source,
-    	rf.utm_campaign,
-    	rf.campaign_name,
-        rf.visits_booked,
-        rf.first_bookings,
-        rf.offer_sent,
-        rf.first_offer_sent,
-        rf.talk_to_agent,
-        rf.first_talk_to_agent,
-        rf.new_rent_flows,
-        rf.new_tenant_prospects,
-        rf.tenant_prospects,
-        0.0 AS spent,
-        0.0 AS visits_booked_target,
-        0.0 AS offer_sent_target,
-        0.0 AS first_offer_sent_target,
-        0.0 AS new_rent_flows_target,
-        0.0 AS new_tenant_prospects_target,
-        0.0 AS budget
-    FROM
-        rent_flows AS rf
-
-    UNION ALL
-
-    SELECT
-    	dds.date,
-    	dds.city_group,
-    	dds.event_type,
-    	dds.mkt_origin,
-    	dds.mkt_channel,
-    	dds.mkt_medium,
-    	dds.mkt_source,
-    	dds.utm_campaign,
-    	dds.campaign_name,
-        0.0 AS visits_booked,
-        0.0 AS first_bookings,
-        0.0 AS offer_sent,
-        0.0 AS first_offer_sent,
-        0.0 AS talk_to_agent,
-        0.0 AS first_talk_to_agent,
-        0.0 AS new_rent_flows,
-        0.0 AS new_tenant_prospects,
-        0.0 AS tenant_prospects,
-        dds.spent,
-        0.0 AS visits_booked_target,
-        0.0 AS offer_sent_target,
-        0.0 AS first_offer_sent_target,
-        0.0 AS new_rent_flows_target,
-        0.0 AS new_tenant_prospects_target,
-        0.0 AS budget
-    FROM
-        demand_daily_spent AS dds
-
-    UNION ALL
-
-    SELECT
-    	ddt.date,
-    	ddt.city_group,
-    	ddt.event_type,
-    	ddt.mkt_origin,
-    	ddt.mkt_channel,
-    	ddt.mkt_medium,
-    	ddt.mkt_source,
-    	ddt.utm_campaign,
-    	ddt.campaign_name,
-        0.0 AS visits_booked,
-        0.0 AS first_bookings,
-        0.0 AS offer_sent,
-        0.0 AS first_offer_sent,
-        0.0 AS talk_to_agent,
-        0.0 AS first_talk_to_agent,
-        0.0 AS new_rent_flows,
-        0.0 AS new_tenant_prospects,
-        0.0 AS tenant_prospects,
-        0.0 AS spent,
-        ddt.visits_booked_target,
-        ddt.offer_sent_target,
-        ddt.first_offer_sent_target,
-        ddt.new_rent_flows_target,
-        ddt.new_tenant_prospects_target,
-        ddt.budget
-    FROM
-        demand_daily_targets AS ddt
+	SELECT
+		NULLIF(str.date, '')::date AS dt_event,
+		NULLIF(str.city_group, '') AS city_group,
+		'' AS flow_event,
+		'Tenants PWA' AS mkt_origin,
+		NULLIF(str.mkt_channel, '') AS mkt_channel,
+		NULLIF(str.mkt_medium, '') AS mkt_medium,
+		''::TEXT AS mkt_source,
+		''::TEXT AS utm_campaign,
+		''::TEXT AS utm_term,
+		''::TEXT AS utm_content,
+		''::TEXT AS campaign_name,
+		NULL AS sk_rf,
+		NULL::INT AS sk_client,
+		NULL::INT AS id_house,
+		NULL::INT AS rent_flow_order,
+		NULL::INT AS tenant_prospect_order,
+		NULL::INT AS sk_booking,
+		NULL::INT AS sk_offer,
+		NULL::INT AS sk_proposal,
+		NULL::INT AS sk_contract,
+		NULL::DATE AS dt_booking_created,
+		NULL::BOOL AS flg_visit_completed,
+		NULL::DATE AS dt_offer_submitted,
+		NULL::DATE AS dt_offer_approved,
+		NULL::DATE AS dt_tenant_first_doc_sent,
+		NULL::DATE AS dt_credit_analysis_approved,
+		NULL::DATE AS dt_contract_signed,
+		0.0 AS marketing_cost,
+		NULLIF(str.new_rent_flows_target, '')::FLOAT AS new_rent_flows_target,
+		NULLIF(str.new_tenant_prospects_target, '')::FLOAT AS new_tenant_prospects_target,
+		NULLIF(str.budget, '')::FLOAT AS budget
+	FROM
+		datalake_raw.gsheets_demand_targets_replanning AS str
+	WHERE
+		NULLIF(str.date, '')::date >= CURRENT_dATE - INTERVAL '12 MONTH'
 )
------------------------------------------------------
--- Group everything to avoid duplicated dimensions --
------------------------------------------------------
 SELECT
-    b.dt_event,
-    b.city_group,
-    b.event_type,
-    b.mkt_origin,
-    b.mkt_channel,
-    b.mkt_medium,
-    b.mkt_source,
-    b.utm_campaign,
-    b.campaign_name,
-    SUM(b.visits_booked) AS visits_booked,
-    SUM(b.first_bookings) AS first_bookings,
-    SUM(b.offer_sent) AS offer_sent,
-    SUM(b.first_offer_sent) AS first_offer_sent,
-    SUM(b.talk_to_agent) AS talk_to_agent,
-    SUM(b.first_talk_to_agent) AS first_talk_to_agent,
-    SUM(b.new_rent_flows) AS new_rent_flows,
-    SUM(b.new_tenant_prospects) AS new_tenant_prospects,
-    SUM(b.tenant_prospects) AS tenant_prospects,
-    SUM(b.spent) AS spent,
-    SUM(b.visits_booked_target) AS visits_booked_target,
-    SUM(b.offer_sent_target) AS offer_sent_target,
-    SUM(b.first_offer_sent_target) AS first_offer_sent_target,
-    SUM(b.new_rent_flows_target) AS new_rent_flows_target,
-    SUM(b.new_tenant_prospects_target) AS new_tenant_prospects_target,
-    SUM(b.budget) AS budget
+	rf.*
 FROM
-	base AS b
-GROUP BY 1,2,3,4,5,6,7,8,9
+	fact_rent_flows AS rf
+
+UNION ALL
+
+SELECT
+	dds.*
+FROM
+	demand_daily_spent AS dds
+
+UNION ALL
+
+SELECT
+	ddt.*
+FROM
+	demand_daily_targets AS ddt
