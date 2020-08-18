@@ -12,7 +12,8 @@ SELECT
 	    WHEN fhlf.mkt_completion = 'Full Self-Service' THEN 'FSS'
 	    ELSE 'IS'
 		END AS lead_context,
-	null AS demand_channel,
+	null AS demand_mkt_channel,
+	null AS demand_mkt_medium,
   	COUNT(fhlf.sk_lead_date) AS leads,
 	NULL::BIGINT AS prospects, -- this count IS done ON the prospect date because not all listings come FROM a lead, AND maybe one lead brings multiple house listings
 	NULL::BIGINT AS qualifieds,
@@ -41,7 +42,7 @@ JOIN fact_house_listing_flows fhlf
 LEFT JOIN dim_region dr
   ON dr.sk_region = fhlf.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 year ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
 ),
 prospect AS (
 SELECT
@@ -56,7 +57,8 @@ SELECT
 	    WHEN fhlf.mkt_completion = 'Full Self-Service' THEN 'FSS'
 	    ELSE 'IS'
 		END AS lead_context,
-	null AS demand_channel,
+	null AS demand_mkt_channel,
+	null AS demand_mkt_medium,
   	NULL::BIGINT AS leads,
 	COUNT(fhlf.sk_prospect_date) AS prospects, -- this count IS done ON the prospect date because not all listings come FROM a lead, AND maybe one lead brings multiple house listings
 	NULL::BIGINT AS qualifieds,
@@ -85,7 +87,7 @@ JOIN fact_house_listing_flows fhlf
 LEFT JOIN dim_region dr
   ON dr.sk_region = fhlf.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 year ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
 ),
 qualified AS (
 SELECT
@@ -100,7 +102,8 @@ SELECT
 	    WHEN fhlf.mkt_completion = 'Full Self-Service' THEN 'FSS'
 	    ELSE 'IS'
 		END AS lead_context,
-	null AS demand_channel,
+	null AS demand_mkt_channel,
+	null AS demand_mkt_medium,
   	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	COUNT(fhlf.sk_qualified_date) AS qualifieds, -- this count IS done ON the qualified date because not all listings come FROM a lead, AND maybe one lead brings multiple house listings
@@ -129,7 +132,7 @@ JOIN fact_house_listing_flows fhlf
 LEFT JOIN dim_region dr
   ON dr.sk_region = fhlf.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 year ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
 ),
 opportunity AS (
 SELECT
@@ -144,7 +147,8 @@ SELECT
 	    WHEN fhlf.mkt_completion = 'Full Self-Service' THEN 'FSS'
 	    ELSE 'IS'
 		END AS lead_context,
-	null AS demand_channel,
+	null AS demand_mkt_channel,
+	null AS demand_mkt_medium,
   	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS qualifieds,
@@ -173,7 +177,7 @@ JOIN fact_house_listing_flows fhlf
 LEFT JOIN dim_region dr
   ON dr.sk_region = fhlf.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
 ),
 listing AS (
 SELECT
@@ -188,7 +192,8 @@ SELECT
 	    WHEN fhlf.mkt_completion = 'Full Self-Service' THEN 'FSS'
 	    ELSE 'IS'
 		END AS lead_context,
-	null AS demand_channel,
+	null AS demand_mkt_channel,
+	null AS demand_mkt_medium,
   	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS qualifieds,
@@ -217,7 +222,7 @@ JOIN fact_house_listing_flows fhlf
 LEFT JOIN dim_region dr
   ON dr.sk_region = fhlf.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
 ),
 messages_sent AS (
 SELECT
@@ -228,7 +233,8 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
-  'Other' AS demand_channel,
+  'Other' AS demand_mkt_channel,
+  'Other' AS demand_mkt_medium,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -258,7 +264,7 @@ JOIN dim_house_listing dhl
 LEFT JOIN (SELECT distinct city_group, region_code FROM dim_region) dr
   ON tta.region_code = dr.region_code
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
 ),
 agent_supports AS (
 SELECT
@@ -269,7 +275,8 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
-  'Other' AS demand_channel,
+  'Other' AS demand_mkt_channel,
+  'Other' AS demand_mkt_medium,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -301,7 +308,7 @@ JOIN dim_house_listing dhl
 LEFT JOIN dim_region dr
   ON rf.sk_region = dr.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
 ),
 visits_booked AS (
 SELECT
@@ -312,7 +319,8 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
-  db.mkt_channel AS demand_channel,
+  db.mkt_channel AS demand_mkt_channel,
+  db.mkt_medium AS demand_mkt_medium,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -345,7 +353,7 @@ LEFT JOIN dim_booking db
 LEFT JOIN dim_region dr
   ON rf.sk_region = dr.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
 ),
 visits_completed AS (
 SELECT
@@ -356,7 +364,8 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
-  db.mkt_channel AS demand_channel,
+  db.mkt_channel AS demand_mkt_channel,
+  db.mkt_medium AS demand_mkt_medium,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -389,7 +398,7 @@ LEFT JOIN dim_booking db
 LEFT JOIN dim_region dr
   ON rf.sk_region = dr.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
 ),
 offer_submitted AS (
 SELECT
@@ -400,7 +409,8 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
-  dof.mkt_medium AS demand_channel,
+  dof.mkt_channel AS demand_mkt_channel,
+  dof.mkt_medium AS demand_mkt_medium,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -433,7 +443,7 @@ LEFT JOIN dim_offer dof
 LEFT JOIN dim_region dr
   ON rf.sk_region = dr.sk_region
 WHERE dd."date"between DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
 ),
 offer_approved AS(
 SELECT
@@ -444,7 +454,8 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
-  dof.mkt_medium AS demand_channel,
+  dof.mkt_channel AS demand_mkt_channel,
+  dof.mkt_medium AS demand_mkt_medium,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -477,7 +488,7 @@ LEFT JOIN dim_offer dof
 LEFT JOIN dim_region dr
   ON rf.sk_region = dr.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
 ),
 credit_evaluation_init AS(
 SELECT
@@ -488,7 +499,8 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
-  dof.mkt_medium AS demand_channel,
+  dof.mkt_channel AS demand_mkt_channel,
+  dof.mkt_medium AS demand_mkt_medium,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -521,7 +533,7 @@ LEFT JOIN dim_offer dof
 LEFT JOIN dim_region dr
   ON rf.sk_region = dr.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
 ),
 credit_evaluation_positive AS(
 SELECT
@@ -532,7 +544,8 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
-  dof.mkt_medium AS demand_channel,
+  dof.mkt_channel AS demand_mkt_channel,
+  dof.mkt_medium AS demand_mkt_medium,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -565,7 +578,7 @@ LEFT JOIN dim_offer dof
 LEFT JOIN dim_region dr
   ON rf.sk_region = dr.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
 ),
 doc_sent AS(
 SELECT
@@ -576,7 +589,8 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
-  dof.mkt_medium AS demand_channel,
+  dof.mkt_channel AS demand_mkt_channel,
+  dof.mkt_medium AS demand_mkt_medium,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -609,7 +623,7 @@ LEFT JOIN dim_offer dof
 LEFT JOIN dim_region dr
   ON rf.sk_region = dr.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
 ),
 doc_approved AS(
 SELECT
@@ -620,7 +634,8 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
-  dof.mkt_medium AS demand_channel,
+  dof.mkt_channel AS demand_mkt_channel,
+  dof.mkt_medium AS demand_mkt_medium,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -653,7 +668,7 @@ LEFT JOIN dim_offer dof
 LEFT JOIN dim_region dr
   ON rf.sk_region = dr.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
 ),
 doc_completed AS(
 SELECT
@@ -664,7 +679,8 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
-  dof.mkt_medium AS demand_channel,
+  dof.mkt_channel AS demand_mkt_channel,
+  dof.mkt_medium AS demand_mkt_medium,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -697,7 +713,7 @@ LEFT JOIN dim_offer dof
 LEFT JOIN dim_region dr
   ON rf.sk_region = dr.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
 ),
 credit_processed AS(
 SELECT
@@ -708,7 +724,8 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
-  dof.mkt_medium AS demand_channel,
+  dof.mkt_channel AS demand_mkt_channel,
+  dof.mkt_medium AS demand_mkt_medium,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -741,7 +758,7 @@ LEFT JOIN dim_offer dof
 LEFT JOIN dim_region dr
   ON rf.sk_region = dr.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
 ),
 credit_approved AS(
 SELECT
@@ -752,7 +769,8 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
-  dof.mkt_medium AS demand_channel,
+  dof.mkt_channel AS demand_mkt_channel,
+  dof.mkt_medium AS demand_mkt_medium,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -785,7 +803,7 @@ LEFT JOIN dim_offer dof
 LEFT JOIN dim_region dr
   ON rf.sk_region = dr.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
 ),
 contract_created AS (
 SELECT
@@ -796,7 +814,8 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
-  dof.mkt_medium AS demand_channel,
+  dof.mkt_channel AS demand_mkt_channel,
+  dof.mkt_medium AS demand_mkt_medium,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -829,7 +848,7 @@ LEFT JOIN dim_offer dof
 LEFT JOIN dim_region dr
   ON rf.sk_region = dr.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
 ),
 contract_signed AS (
 SELECT
@@ -840,7 +859,8 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
-  dof.mkt_medium AS demand_channel,
+  dof.mkt_channel AS demand_mkt_channel,
+  dof.mkt_medium AS demand_mkt_medium,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -873,7 +893,7 @@ LEFT JOIN dim_offer dof
 LEFT JOIN dim_region dr
   ON rf.sk_region = dr.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
 ),
 contract_ended AS (
 SELECT
@@ -884,7 +904,8 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
-  dof.mkt_medium AS demand_channel,
+  dof.mkt_channel AS demand_mkt_channel,
+  dof.mkt_medium AS demand_mkt_medium,
   NULL::BIGINT AS leads,
   NULL::BIGINT AS prospects,
   NULL::BIGINT AS qualifieds,
@@ -917,7 +938,7 @@ LEFT JOIN dim_offer dof
 LEFT JOIN dim_region dr
   ON rf.sk_region = dr.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
 ),
 union_all AS (
   SELECT * FROM lead_
@@ -970,7 +991,8 @@ SELECT
   ua.supply_mkt_origin,
   ua.supply_mkt_channel,
   ua.lead_context,
-  ua.demand_channel,
+  ua.demand_mkt_channel,
+  ua.demand_mkt_medium,
   ua.leads,
   ua.prospects,
   ua.qualifieds,
@@ -1003,10 +1025,15 @@ SELECT
 	supply_mkt_origin,
   	CASE WHEN supply_mkt_origin = 'Owner PWA' THEN supply_mkt_channel
   	   when supply_mkt_origin != 'Owner PWA' THEN supply_mkt_origin
-  	   END AS supply_mkt_channel,
+  	   END AS supply_mkt_origin_detailed,
   	lead_context,
-    CASE WHEN demand_channel in ('Not Mapped', 'Other') or demand_channel IS NULL THEN 'Other'
-         ELSE demand_channel END AS demand_channel,
+    CASE WHEN demand_mkt_channel in ('Not Mapped', 'Other') or demand_mkt_channel IS NULL THEN 'Other'
+         ELSE demand_mkt_channel END AS demand_mkt_channel,
+    case when demand_mkt_channel in ('Not Mapped', 'Other') or demand_mkt_channel is null then 'Other'
+	     when demand_mkt_channel in ('Online Classifieds','Agents') then demand_mkt_channel
+	     when demand_mkt_medium in ('SEO branded', 'SEO non-branded') then 'SEO'
+	     else demand_mkt_medium
+	end as demand_mkt_channel_detailed,
   is_b2b AS is_b2b_demand,
   SUM(leads) AS leads,
   SUM(prospects) AS prospects,
@@ -1031,4 +1058,4 @@ SELECT
   SUM(contract_ended) AS contract_ended,
   current_timestamp AS ts_load
 FROM union_all
-GROUP BY "date", city_group, 3, 4, 5, 6, 7;
+GROUP BY "date", city_group, 3, 4, 5, 6, 7, 8;
