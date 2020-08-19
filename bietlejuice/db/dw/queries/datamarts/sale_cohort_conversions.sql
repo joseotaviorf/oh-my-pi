@@ -34,7 +34,7 @@ SELECT
 	NULLIF(mo.id_imovel, '')::BIGINT AS id_house,
 	NULLIF(mo.id_buyer, '')::BIGINT AS id_user,
 	CASE WHEN forma_pagamento IN ('À vista + FGTS', 'À vista') THEN 'À vista'
-		 WHEN forma_pagamento IN ('Financiado', 'Financiado por fora') THEN 'Financiado'
+		 WHEN forma_pagamento IN ('Financiado', 'Financiado por fora', 'À vista, Financiado') THEN 'Financiado'
 		 ELSE forma_pagamento
 	END AS form_of_payment,
 	TO_DATE(SUBSTRING(NULLIF(mo.data_proposta, ''),1,10), 'yyyy-mm-dd') AS dt_offer_sent,
@@ -66,6 +66,14 @@ FROM dim_booking db
 WHERE db.visit_intent = 'SALE'
   AND db.type = 'Visita'
 ),
+sale_demand_region AS (
+SELECT
+	dsf.id_house,
+	dr.city_group
+FROM datamarts.demand_sale_flows dsf
+JOIN dim_region dr
+  ON dr.sk_region = dsf.sk_region
+),
 sale_demand_events AS (
 SELECT
 	COALESCE(offers.id_user, db.id_visitor) AS id_buyer,
@@ -94,7 +102,7 @@ sale_demand_classification AS (
 SELECT
 	sde.id_buyer,
 	sde.id_house,
-	lf.city_group,
+	sdr.city_group,
 	sde.form_of_payment,
 	sde.dt_offer_sent,
 	sde.dt_offer_accepted,
@@ -118,8 +126,8 @@ FROM sale_demand_events sde
 LEFT JOIN datamarts.demand_sale_flows dsf
   ON sde.id_buyer = dsf.id_buyer
   AND sde.id_house = dsf.id_house
-LEFT JOIN sale_listing_flows_adjust lf
-  ON substring(lf.sk_house_listing,1,9) = sde.id_house
+LEFT JOIN sale_demand_region sdr
+  ON sdr.id_house = sde.id_house
 ),
 p2fc AS (
 SELECT
@@ -128,7 +136,7 @@ SELECT
    slf.lead_context,
    slf.mkt_campaign_context,
    slf.mkt_origin,
-  	slf.mkt_channel,
+   slf.mkt_channel,
    slf.mkt_type,
    NULL AS first_origin_demand,
    NULL AS origin_before_offer,
@@ -159,12 +167,12 @@ fc2q AS (
 SELECT
 	slf.sk_first_contact_date AS base_date,
 	slf.city_group,
-   slf.lead_context,
-   slf.mkt_campaign_context,
-   slf.mkt_origin,
+    slf.lead_context,
+    slf.mkt_campaign_context,
+    slf.mkt_origin,
   	slf.mkt_channel,
-   slf.mkt_type,
-   NULL AS first_origin_demand,
+    slf.mkt_type,
+    NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
 	NULL AS form_of_payment,
@@ -173,9 +181,9 @@ SELECT
 	     WHEN datediff('week',DATE_TRUNC('week',DATE(slf.sk_first_contact_date)),DATE_TRUNC('week',DATE(NULLIF(slf.sk_qualified_date,-1)))) >= 20
 	     	  THEN 'W20+'
 	END AS weeks_conversion,
-   NULL::BIGINT AS p2fc,
-   COUNT(slf.sk_first_contact_date) AS fc2q,
-   NULL::BIGINT AS p2q,
+    NULL::BIGINT AS p2fc,
+    COUNT(slf.sk_first_contact_date) AS fc2q,
+    NULL::BIGINT AS p2q,
 	NULL::BIGINT AS q2o,
 	NULL::BIGINT AS o2fl,
 	NULL::BIGINT AS vb2vc,
@@ -489,7 +497,7 @@ SELECT
 	NULL::BIGINT AS vb2os,
 	NULL::BIGINT AS os2oa,
 	NULL::BIGINT AS oa2ccv,
-	COUNT(dt_ccv_signed) AS ccv2ma,
+	COUNT(DISTINCT id_offer) AS ccv2ma,
 	NULL::BIGINT AS ccv2pc
 FROM sale_demand_classification
 WHERE DATE(dt_ccv_signed) > 0
@@ -524,7 +532,7 @@ SELECT
 	NULL::BIGINT AS os2oa,
 	NULL::BIGINT AS oa2ccv,
 	NULL::BIGINT AS ccv2ma,
-	COUNT(dt_ccv_signed) AS ccv2pc
+	COUNT(DISTINCT id_offer) AS ccv2pc
 FROM sale_demand_classification
 WHERE DATE(dt_ccv_signed) > 0
 GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12

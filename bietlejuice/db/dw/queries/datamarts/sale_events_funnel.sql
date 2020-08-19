@@ -33,6 +33,10 @@ SELECT
 	mo.id_buyer||'_'||mo.id_imovel AS sale_flow,
 	NULLIF(mo.id_imovel, '')::BIGINT AS id_house,
 	NULLIF(mo.id_buyer, '')::BIGINT AS id_user,
+	CASE WHEN forma_pagamento IN ('À vista + FGTS', 'À vista') THEN 'À vista'
+		 WHEN forma_pagamento IN ('Financiado', 'Financiado por fora', 'À vista, Financiado') THEN 'Financiado'
+		 ELSE forma_pagamento
+	END AS form_of_payment,
 	TO_DATE(SUBSTRING(NULLIF(mo.data_proposta, ''),1,10), 'yyyy-mm-dd') AS dt_offer_sent,
 	TO_DATE(SUBSTRING(NULLIF(mo.data_aceite_proposta, ''),1,10), 'yyyy-mm-dd') AS dt_offer_accepted,
 	TO_DATE(SUBSTRING(NULLIF(mo.data_assinatura_ccv, ''),1,10), 'yyyy-mm-dd') AS dt_ccv_signed,
@@ -72,10 +76,19 @@ SELECT
 FROM datamarts.talk_to_agent tta
 WHERE tta.business_context = 'SALE'
 ),
+sale_demand_region AS (
+SELECT
+	dsf.id_house,
+	dr.city_group
+FROM datamarts.demand_sale_flows dsf
+JOIN dim_region dr
+  ON dr.sk_region = dsf.sk_region
+),
 sale_demand_events AS (
 SELECT
 	COALESCE(offers.id_user, db.id_visitor, tta.tenant_id::BIGINT) AS id_buyer,
 	COALESCE(offers.id_house, db.id_property, tta.house_id::BIGINT) AS id_house,
+	offers.form_of_payment,
 	offers.dt_offer_sent,
 	offers.dt_offer_accepted,
 	offers.dt_ccv_signed,
@@ -103,7 +116,8 @@ sale_demand_classification AS (
 SELECT
 	sde.id_buyer,
 	sde.id_house,
-	lf.city_group,
+	sdr.city_group,
+	sde.form_of_payment,
 	sde.dt_offer_sent,
 	sde.dt_offer_accepted,
 	sde.dt_ccv_signed,
@@ -128,8 +142,8 @@ FROM sale_demand_events sde
 LEFT JOIN datamarts.demand_sale_flows dsf
   ON sde.id_buyer = dsf.id_buyer
   AND sde.id_house = dsf.id_house
-LEFT JOIN sale_listing_flows_adjust lf
-  ON substring(lf.sk_house_listing,1,9) = sde.id_house
+LEFT JOIN sale_demand_region sdr
+  ON sdr.id_house = sde.id_house
 ),
 lead_ AS (
 SELECT
@@ -143,6 +157,7 @@ SELECT
 	NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
+	NULL AS form_of_payment,
    COUNT(slf.sk_lead_date) AS leads,
    NULL::BIGINT AS prospects,
    NULL::BIGINT AS first_contacts,
@@ -165,7 +180,7 @@ SELECT
 	NULL::BIGINT AS entrega_chave
 FROM sale_listing_flows_adjust AS slf
 WHERE slf.sk_lead_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 ),
 prospect AS (
 SELECT
@@ -179,6 +194,7 @@ SELECT
    NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
+	 NULL AS form_of_payment,
    NULL::BIGINT AS leads,
    COUNT(slf.sk_prospect_date) AS prospects,
    NULL::BIGINT AS first_contacts,
@@ -201,7 +217,7 @@ SELECT
 	NULL::BIGINT AS entrega_chave
 FROM sale_listing_flows_adjust AS slf
 WHERE slf.sk_prospect_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 ),
 first_contacts AS (
 SELECT
@@ -215,6 +231,7 @@ SELECT
    NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
+	 NULL AS form_of_payment,
    NULL::BIGINT AS leads,
    NULL::BIGINT AS prospects,
    COUNT(slf.sk_first_contact_date) AS first_contacts,
@@ -237,7 +254,7 @@ SELECT
 	NULL::BIGINT AS entrega_chave
 FROM sale_listing_flows_adjust AS slf
 WHERE slf.sk_first_contact_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 ),
 qualified AS (
 SELECT
@@ -251,6 +268,7 @@ SELECT
    NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
+	 NULL AS form_of_payment,
    NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -273,7 +291,7 @@ SELECT
 	NULL::BIGINT AS entrega_chave
 FROM sale_listing_flows_adjust AS slf
 WHERE slf.sk_qualified_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 ),
 opportunity AS (
 SELECT
@@ -287,6 +305,7 @@ SELECT
    NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
+	 NULL AS form_of_payment,
    NULL::BIGINT AS leads,
    NULL::BIGINT AS prospects,
    NULL::BIGINT AS first_contacts,
@@ -309,7 +328,7 @@ SELECT
 	NULL::BIGINT AS entrega_chave
 FROM sale_listing_flows_adjust AS slf
 WHERE slf.sk_opportunity_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 ),
 first_listing AS (
 SELECT
@@ -323,6 +342,7 @@ SELECT
    NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
+	 NULL AS form_of_payment,
    NULL::BIGINT AS leads,
    NULL::BIGINT AS prospects,
    NULL::BIGINT AS first_contacts,
@@ -345,7 +365,7 @@ SELECT
 	NULL::BIGINT AS entrega_chave
 FROM sale_listing_flows_adjust AS slf
 WHERE slf.sk_first_listing_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 ),
 tta_sent AS (
 SELECT
@@ -359,6 +379,7 @@ SELECT
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
+	 NULL AS form_of_payment,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -381,7 +402,7 @@ SELECT
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
 WHERE DATE(tta_started) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 ),
 tta_completed AS (
 SELECT
@@ -395,6 +416,7 @@ SELECT
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
+	 NULL AS form_of_payment,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -417,7 +439,7 @@ SELECT
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
 WHERE DATE(tta_started) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 ),
 visits_booked AS (
 SELECT
@@ -431,6 +453,7 @@ SELECT
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
+	 NULL AS form_of_payment,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -453,7 +476,7 @@ SELECT
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
 WHERE DATE(dt_created) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 ),
 visits_completed AS (
 SELECT
@@ -467,6 +490,7 @@ SELECT
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
+	 NULL AS form_of_payment,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -489,7 +513,7 @@ SELECT
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
 WHERE DATE(dt_completed) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 ),
 offers_sent AS (
 SELECT
@@ -503,6 +527,7 @@ SELECT
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
+	form_of_payment,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -512,7 +537,7 @@ SELECT
 	NULL::BIGINT AS tta_started,
 	NULL::BIGINT AS tta_completed,
 	NULL::BIGINT AS visits_booked,
-   NULL::BIGINT AS visits_completed,
+    NULL::BIGINT AS visits_completed,
 	COUNT(DISTINCT id_offer) AS offers_submitted,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
@@ -525,7 +550,7 @@ SELECT
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
 WHERE DATE(dt_offer_sent) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 ),
 offers_accepted AS (
 SELECT
@@ -539,6 +564,7 @@ SELECT
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
+	form_of_payment,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -561,7 +587,7 @@ SELECT
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
 WHERE DATE(dt_offer_accepted) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 ),
 ccv_signed AS (
 SELECT
@@ -575,6 +601,7 @@ SELECT
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
+	form_of_payment,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -597,7 +624,7 @@ SELECT
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
 WHERE DATE(dt_ccv_signed) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 ),
 diligence_sent AS (
 SELECT
@@ -611,6 +638,7 @@ SELECT
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
+	form_of_payment,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -633,7 +661,7 @@ SELECT
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
 WHERE DATE(dt_diligence_started) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 ),
 diligence_accepted AS (
 SELECT
@@ -647,6 +675,7 @@ SELECT
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
+	form_of_payment,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -669,7 +698,7 @@ SELECT
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
 WHERE DATE(dt_diligence_approved) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 ),
 credit_sent AS (
 SELECT
@@ -683,6 +712,7 @@ SELECT
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
+	form_of_payment,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -705,7 +735,7 @@ SELECT
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
 WHERE DATE(dt_credit_started) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 ),
 credit_approved AS (
 SELECT
@@ -719,6 +749,7 @@ SELECT
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
+	form_of_payment,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -741,7 +772,7 @@ SELECT
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
 WHERE DATE(dt_credit_approved) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 ),
 payment_concluded AS (
 SELECT
@@ -755,6 +786,7 @@ SELECT
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
+	form_of_payment,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -777,7 +809,7 @@ SELECT
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
 WHERE DATE(dt_payment_concluded) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 ),
 matricula_atualizada AS (
 SELECT
@@ -791,6 +823,7 @@ SELECT
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
+	form_of_payment,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -813,7 +846,7 @@ SELECT
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
 WHERE DATE(dt_matricula_atualizada) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 ),
 entrega_chave AS (
 SELECT
@@ -827,6 +860,7 @@ SELECT
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
+	form_of_payment,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -849,7 +883,7 @@ SELECT
 	COUNT(DISTINCT id_offer) AS entrega_chave
 FROM sale_demand_classification
 WHERE DATE(dt_entrega_chaves) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 ),
 union_all AS (
 SELECT * FROM lead_
@@ -907,6 +941,7 @@ SELECT
 	ua.first_origin_demand,
 	ua.origin_before_offer,
 	ua.origin_after_offer,
+	ua.form_of_payment,
 	ua.leads,
 	ua.prospects,
 	ua.first_contacts,
@@ -946,6 +981,7 @@ SELECT
 	first_origin_demand,
 	origin_before_offer,
 	origin_after_offer,
+	form_of_payment,
 	SUM(leads) AS leads,
    SUM(prospects) AS prospects,
    SUM(first_contacts) AS first_contacts,
@@ -980,4 +1016,5 @@ GROUP BY week_start,
 	 mkt_type,
 	 first_origin_demand,
 	 origin_before_offer,
-	 origin_after_offer;
+	 origin_after_offer,
+	 form_of_payment;
