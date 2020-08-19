@@ -1,5 +1,5 @@
-drop view if exists vw_agents_schedule;
-create view vw_agents_schedule as
+--drop view if exists vw_agents_schedule;
+--create view vw_agents_schedule as
 SELECT
   row_number,
   agent_user_id,

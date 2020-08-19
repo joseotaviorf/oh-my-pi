@@ -1,5 +1,5 @@
-drop view if exists vw_dim_contract;
-create or replace view vw_dim_contract as
+--drop view if exists vw_dim_contract;
+--create or replace view vw_dim_contract as
 with b2b_info as (
   select distinct
     c.id as id_contract,

@@ -1,5 +1,5 @@
-drop view if exists vw_imovel_agent_comission_slot;
-create or replace view vw_imovel_agent_comission_slot as
+--drop view if exists vw_imovel_agent_comission_slot;
+--create or replace view vw_imovel_agent_comission_slot as
 with published as
 (
   select

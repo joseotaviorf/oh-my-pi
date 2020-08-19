@@ -1,5 +1,5 @@
-drop view if exists vw_fact_inspection_bookings;
-create or replace view vw_fact_inspection_bookings as
+--drop view if exists vw_fact_inspection_bookings;
+--create or replace view vw_fact_inspection_bookings as
 with inspection_booking_retries as (
   select
     insp.id,

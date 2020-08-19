@@ -1,5 +1,5 @@
-drop view if exists sale.vw_fact_listing_sale_flows;
-create or replace view sale.vw_fact_listing_sale_flows as
+--drop view if exists sale.vw_fact_listing_sale_flows;
+--create or replace view sale.vw_fact_listing_sale_flows as
 with _reservation as (
 	with max_ids as (
 		select

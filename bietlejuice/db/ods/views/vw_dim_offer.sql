@@ -1,5 +1,5 @@
-drop view if exists vw_dim_offer;
-create or replace view vw_dim_offer as
+--drop view if exists vw_dim_offer;
+--create or replace view vw_dim_offer as
 with pp_aud as (
     select distinct
 		p.id,

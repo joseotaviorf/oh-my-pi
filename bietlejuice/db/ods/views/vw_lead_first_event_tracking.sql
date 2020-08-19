@@ -1,6 +1,5 @@
-drop view if exists vw_lead_first_event_tracking;
-
-create view vw_lead_first_event_tracking as
+--drop view if exists vw_lead_first_event_tracking;
+--create view vw_lead_first_event_tracking as
 with t_union as (
 	select
 		lo_external_id.*,

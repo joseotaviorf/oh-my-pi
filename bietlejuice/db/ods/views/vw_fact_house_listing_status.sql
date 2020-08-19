@@ -1,5 +1,5 @@
-drop view if exists vw_fact_house_listing_status;
-create or replace view vw_fact_house_listing_status as
+--drop view if exists vw_fact_house_listing_status;
+--create or replace view vw_fact_house_listing_status as
 with lbc as (
     select id_house,
 	   max((business_context = 'SALE')::integer)::boolean as is_for_sale,

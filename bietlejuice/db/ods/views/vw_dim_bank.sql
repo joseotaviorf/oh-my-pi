@@ -1,7 +1,5 @@
-drop view if exists vw_dim_bank;
-
-create view vw_dim_bank
-as
+--drop view if exists vw_dim_bank;
+--create view vw_dim_bank as
 select
   id as sk_bank,
   id as id_bank,

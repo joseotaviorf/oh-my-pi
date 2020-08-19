@@ -1,6 +1,5 @@
-drop view if exists vw_imovel_status_history_position_by_day;
-create view vw_imovel_status_history_position_by_day
-as
+--drop view if exists vw_imovel_status_history_position_by_day;
+--create view vw_imovel_status_history_position_by_day as
 select
 	id,
     date,

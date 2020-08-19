@@ -1,6 +1,5 @@
-DROP VIEW if exists public.vw_dim_user_doorman;
-
-CREATE VIEW public.vw_dim_user_doorman as
+--DROP VIEW if exists public.vw_dim_user_doorman;
+--CREATE VIEW public.vw_dim_user_doorman as
     select
         id as sk_user_doorman,
         id as id_user_doorman,

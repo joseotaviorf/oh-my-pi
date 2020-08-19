@@ -1,5 +1,5 @@
-drop view if exists vw_dim_rent_flow_taxonomy;
-create view vw_dim_rent_flow_taxonomy as
+--drop view if exists vw_dim_rent_flow_taxonomy;
+--create view vw_dim_rent_flow_taxonomy as
 select
 	cast(id as bigint) as sk_rent_flow_taxonomy,
 	cast(id as bigint) as id_rent_flow_taxonomy,

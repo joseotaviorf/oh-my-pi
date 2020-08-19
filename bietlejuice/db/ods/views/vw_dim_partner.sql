@@ -1,5 +1,5 @@
-drop view if exists vw_dim_partner;
-create or replace view vw_dim_partner as
+--drop view if exists vw_dim_partner;
+--create or replace view vw_dim_partner as
 SELECT
   id as sk_partner,
   id as id_partner,

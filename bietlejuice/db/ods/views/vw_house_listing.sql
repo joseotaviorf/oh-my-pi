@@ -1,5 +1,5 @@
-drop view if exists vw_house_listing;
-create or replace view vw_house_listing as
+--drop view if exists vw_house_listing;
+--create or replace view vw_house_listing as
 with filt as (
   select
 	id,

@@ -1,5 +1,5 @@
-drop view if exists vw_dim_proposal;
-create or replace view vw_dim_proposal as
+--drop view if exists vw_dim_proposal;
+--create or replace view vw_dim_proposal as
 with sortinghat_prop_prev as (
 	select
 		p.id,

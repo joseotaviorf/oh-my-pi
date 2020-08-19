@@ -1,5 +1,5 @@
-drop view if exists vw_agent_region;
-create view vw_agent_region as
+--drop view if exists vw_agent_region;
+--create view vw_agent_region as
 select
     date_part('year', coalesce(b."criadoEm", b.data)) as year,
     date_part('month', coalesce(b."criadoEm", b.data)) as month,

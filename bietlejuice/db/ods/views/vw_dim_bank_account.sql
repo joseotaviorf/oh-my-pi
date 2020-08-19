@@ -1,7 +1,5 @@
-drop view if exists vw_dim_bank_account;
-
-create view vw_dim_bank_account
-as
+--drop view if exists vw_dim_bank_account;
+--create view vw_dim_bank_account as
 select
   u.contacorrente_id as sk_bank_account,
   u.contacorrente_id as id_bank_account,

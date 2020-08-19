@@ -1,6 +1,5 @@
-drop view if exists vw_fact_photo_job;
-create or replace view vw_fact_photo_job
-as
+--drop view if exists vw_fact_photo_job;
+--create or replace view vw_fact_photo_job as
 with base_jobs as (
 	select
 		*,

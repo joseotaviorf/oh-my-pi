@@ -1,5 +1,5 @@
-drop view if exists vw_dim_inspection;
-create or replace view vw_dim_inspection as
+--drop view if exists vw_dim_inspection;
+--create or replace view vw_dim_inspection as
 select
   id as sk_inspection,
   id as id_inspection,

@@ -1,6 +1,5 @@
-drop view if exists vw_dim_user;
-create or replace view vw_dim_user
-as
+--drop view if exists vw_dim_user;
+--create or replace view vw_dim_user as
 SELECT
   u.id as sk_user,
   u.id,

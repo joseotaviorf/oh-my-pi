@@ -1,7 +1,5 @@
-drop view if exists vw_fact_bank_transaction;
-
-create view vw_fact_bank_transaction
-as
+--drop view if exists vw_fact_bank_transaction;
+--create view vw_fact_bank_transaction as
 select
 	bt.id as sk_bank_transaction,
 	bt."dataOperacao" as ts_transaction,

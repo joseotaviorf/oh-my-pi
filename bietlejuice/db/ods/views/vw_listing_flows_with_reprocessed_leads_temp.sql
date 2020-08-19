@@ -1,6 +1,5 @@
-drop view if exists vw_listing_flows_with_reprocessed_leads_temp;
-
-create or replace view vw_listing_flows_with_reprocessed_leads_temp as
+--drop view if exists vw_listing_flows_with_reprocessed_leads_temp;
+--create or replace view vw_listing_flows_with_reprocessed_leads_temp as
 with reproc_leads as (
     select
         rl.id,

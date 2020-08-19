@@ -1,5 +1,5 @@
-DROP VIEW IF EXISTS vw_dim_region;
-CREATE OR REPLACE VIEW vw_dim_region as
+--DROP VIEW IF EXISTS vw_dim_region;
+--CREATE OR REPLACE VIEW vw_dim_region as
 SELECT
   r.id as sk_region,
   coalesce(r.id, ar.id) as id,

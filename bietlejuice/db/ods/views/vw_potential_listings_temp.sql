@@ -1,5 +1,5 @@
-drop view if exists vw_potential_listings_temp;
-create or replace view vw_potential_listings_temp as
+--drop view if exists vw_potential_listings_temp;
+--create or replace view vw_potential_listings_temp as
 with legacy_doorman as (
   select
     porteiros_legado."Status" as status,

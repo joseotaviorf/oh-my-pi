@@ -1,5 +1,5 @@
-drop view if exists vw_stranded_house_listings;
-create or replace view vw_stranded_house_listings as
+--drop view if exists vw_stranded_house_listings;
+--create or replace view vw_stranded_house_listings as
 with
 status_all as (
 --select all status from each listing, calculate date_to_be_stranded using publication_date and find in which status was the stranded date

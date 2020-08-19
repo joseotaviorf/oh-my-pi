@@ -1,5 +1,5 @@
-drop view if exists vw_fact_house_listing_flows_temp;
-create or replace view vw_fact_house_listing_flows_temp as
+--drop view if exists vw_fact_house_listing_flows_temp;
+--create or replace view vw_fact_house_listing_flows_temp as
 with lead_city_region as (
   with city_region as (
     select

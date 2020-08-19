@@ -1,5 +1,5 @@
-drop view if exists vw_dim_house_listing;
-create or replace view vw_dim_house_listing as
+--drop view if exists vw_dim_house_listing;
+--create or replace view vw_dim_house_listing as
 with b2b_info as (
   select distinct
     h.id as id_house,

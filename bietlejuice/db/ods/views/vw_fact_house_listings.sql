@@ -1,5 +1,5 @@
-drop view if exists vw_fact_house_listings;
-create or replace view vw_fact_house_listings as
+--drop view if exists vw_fact_house_listings;
+--create or replace view vw_fact_house_listings as
 with house_listing_contracts as (
   with latest_contract as (
     select

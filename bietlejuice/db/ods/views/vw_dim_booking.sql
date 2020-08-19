@@ -1,5 +1,5 @@
-drop view if exists vw_dim_booking;
-create or replace view vw_dim_booking as
+--drop view if exists vw_dim_booking;
+--create or replace view vw_dim_booking as
 with bms as (
     select
         row_number() over(partition by bms.visita_id order by bms.event_time) as rn,

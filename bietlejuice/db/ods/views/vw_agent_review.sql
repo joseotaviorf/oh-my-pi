@@ -1,6 +1,5 @@
-DROP VIEW IF EXISTS vw_dim_agent_review;
-CREATE VIEW vw_dim_agent_review
-AS
+--DROP VIEW IF EXISTS vw_dim_agent_review;
+--CREATE VIEW vw_dim_agent_review AS
 SELECT
     id_booking AS sk_agentreview,
 	id_booking,

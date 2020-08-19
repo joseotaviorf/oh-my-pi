@@ -1,6 +1,5 @@
-DROP VIEW if exists public.vw_dim_user_affiliate;
-
-CREATE VIEW public.vw_dim_user_affiliate as
+--DROP VIEW if exists public.vw_dim_user_affiliate;
+--CREATE VIEW public.vw_dim_user_affiliate as
 with vistorias as (
  select
  		distinct b.agente_id

@@ -1,5 +1,5 @@
-drop view if exists vw_dim_lead;
-create or replace view vw_dim_lead as
+--drop view if exists vw_dim_lead;
+--create or replace view vw_dim_lead as
  select distinct
   l.id as sk_lead,
   l.id,
