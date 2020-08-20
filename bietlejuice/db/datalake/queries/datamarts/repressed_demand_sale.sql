@@ -78,6 +78,17 @@ with house_available_hours as (
 		    when dr.region_code = 'SPO 09' then 'SPO 06 FS' 
 		    when dr.region_code = 'SPO 10' then 'SPO 01 FS' 
 		    when dr.region_code = 'SPO 11' then 'SPO 06 FS' 
+		    when dr.region_code = 'RIO 01' then 'RIO 01 FS' 
+		    when dr.region_code = 'RIO 02' then 'RIO 02 FS' 
+		    when dr.region_code = 'RIO 03' then 'RIO 03 FS' 
+		    when dr.region_code = 'RIO 04' then 'RIO 04 FS' 
+		    when dr.region_code = 'RIO 05' then 'RIO 05 FS' 
+		    when dr.region_code = 'RIO 06' then 'RIO 05 FS' 
+		    when dr.region_code = 'RIO 07' then 'RIO 07 FS'
+		    when dr.region_code = 'RIO 08' then 'RIO 06 FS' 
+		    when dr.region_code = 'RIO 09' then 'RIO 08 FS' 
+		    when dr.region_code = 'RIO 10' then 'RIO 07 FS'
+		    when dr.region_code = 'RIO 11' then 'RIO 09 FS'
 		    else NULL 
 		end as region_code,
 		dr.city_group,
@@ -85,7 +96,7 @@ with house_available_hours as (
 		dr.name as neighborhood
 	from datalake_clean.ods_dim_region dr
 	where dr.region_code != '-1'
-	    and dr.city_name = 'São Paulo'
+	    and dr.city_name IN ('São Paulo', 'Rio de Janeiro')
 )
 , slot_series as (
 	select slot 
