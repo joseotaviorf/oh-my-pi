@@ -3,7 +3,7 @@ select
   session_id as id_session,
   message_id as id_message,
   message_payload,
-  dialogflow_response,
+  bot_response,
   user_phone,
   year_month,
   created_at as ts_created,
