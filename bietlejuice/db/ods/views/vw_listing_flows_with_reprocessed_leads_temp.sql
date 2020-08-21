@@ -78,6 +78,19 @@ first_job AS
 FROM photo_job
 WHERE creation_origin <> 'Prop'
 GROUP by imovel_id),
+b2b_prime_draft AS (
+    select
+        l.id as id_lead,
+        max(pa_b2b.partner_id) as partner_id
+    from
+        lead l
+    join usuario u_b2b
+        on u_b2b.telefone_principal = l.telefone_anunciante
+    join partner_agent pa_b2b
+        on pa_b2b.user_id = u_b2b.id
+    where
+        l.origem = 'OwnerPWA'
+    group by 1),
 acquisition_channels as (
     select
         fhlf.id,
@@ -110,7 +123,7 @@ acquisition_channels as (
         end as dt_first_contact,
         fhlf.dt_conversion,
         case 
-           when (coalesce(l.reason_detail, l.reason) = 'ProprietarioRecusou' and l.reason != 'OWNER_DIDNT_LISTEN_TO_PITCH' and fhlf.conversao_id IS NULL) then fhlf.dt_qualified
+           when (coalesce(lr.reason, l.reason) = 'ProprietarioRecusou' and l.reason != 'OWNER_DIDNT_LISTEN_TO_PITCH' and fhlf.conversao_id IS NULL) then fhlf.dt_qualified
            else lbc.dt_qualified_rent 
         end as dt_qualified,
         case
@@ -146,7 +159,7 @@ acquisition_channels as (
         coalesce(rl.affiliate_type, l.affiliate_type) as affiliate_type,
         coalesce(rl.lead_agent_id, l.lead_agent_id) is not null as is_agent_referral,
         l.status as lead_status,
-        coalesce(l.reason_detail, l.reason) as lead_reason,
+        coalesce(lr.reason, l.reason) AS lead_reason,
         l.cidade,
         pj.job_status as photo_job_status,
         pj.photographer_problem_reason as photo_job_reason,
@@ -166,26 +179,15 @@ acquisition_channels as (
     from fact_house_listing_flows fhlf
     left join lead l
         on l.id = fhlf.lead_id
+    left join vw_lead_reason lr
+        on l.reason = lr.reason_detail
     left join reproc_leads rl
         on rl.id = fhlf.lead_id
     left join house h
         on h.id = fhlf.imovel_id
     left join partner_agent pa_b2b
         on pa_b2b.user_id = h.usuario_id
-    left join (
-        select
-            l.id as id_lead,
-            max(pa_b2b.partner_id) as partner_id
-        from
-            lead l
-        join usuario u_b2b
-            on u_b2b.telefone_principal = l.telefone_anunciante
-        join partner_agent pa_b2b
-            on pa_b2b.user_id = u_b2b.id
-        where
-            l.origem = 'OwnerPWA'
-        group by 1
-    ) b2b_prime_draft
+    left join b2b_prime_draft
         on b2b_prime_draft.id_lead = l.id
     left join house_listing hl
         on hl.id_house = fhlf.imovel_id

@@ -1,21 +1,6 @@
 --drop view if exists vw_fact_house_listing_flows_temp;
 --create or replace view vw_fact_house_listing_flows_temp as
-with lead_city_region as (
-  with city_region as (
-    select
-      region.id as id_region,
-      regexp_replace(remove_accentuation(lower(region.nome)), '[^a-z]+', '', 'g') as formatted_city
-    from region
-    where region.nivel = 'Cidade'
-  )
-  select
-    l.id,
-    r.id_region
-  from lead l
-  join city_region r
-    on r.formatted_city = regexp_replace(remove_accentuation(lower(l.cidade)), '[^a-z]+', '', 'g')
-),
-potential_listings_enrich as (
+with potential_listings_enrich as (
     select
         p.*,
         coalesce(p.id_city, lcr.id_region, '-1'::integer) as sk_city,
