@@ -103,13 +103,13 @@ class RtbCampaigns(Marketing):
 
     def _enrich_stats(self, stats, account):
         if stats:
-            enriched_stats = stats
-            for stat in enriched_stats:
-                stat['account_hash'] = account['hash']
-                stat['account_name'] = account['name']
-                stat['account_currency'] = account['currency']
-                stat['account_status'] = account['status']
-            return enriched_stats
+            FIELDS_TO_ENRICH = ['hash', 'name', 'currency', 'status']
+            for stat in stats:
+                for field in FIELDS_TO_ENRICH:
+                    field_name = 'account_' + field
+                    stat[field_name] = ''
+                    if field in account:
+                        stat[field_name] = account[field]
         return stats
 
     @logger(exclude='raw_data')
