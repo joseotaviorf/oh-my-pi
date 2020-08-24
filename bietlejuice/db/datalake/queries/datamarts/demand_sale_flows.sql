@@ -186,9 +186,9 @@ with taxonomy_demand as (
 		cast(a.id_visitor as integer) as id_user,
 		cast(a.id_property as integer) as id_house,
 		min(date_parse(nullif(a.dt_created, ''), '%Y-%m-%d %H:%i:%s')) as ts_first_booking_created,
-		min(case when status = 'Realizado' then date_parse(nullif(a.dt_scheduling, ''), '%Y-%m-%d %H:%i:%s') end) as ts_first_visit_completed,
+		min(case when a.visit_follow_up = 'VaiNegociar' then date_parse(nullif(a.dt_scheduling, ''), '%Y-%m-%d %H:%i:%s') end) as ts_first_visit_completed,
 		count(distinct a.id_booking) as nbr_bookings,
-		count(distinct case when status = 'Realizado' then a.id_booking end) as nbr_visits_completed
+		count(distinct case when a.visit_follow_up = 'VaiNegociar' then a.id_booking end) as nbr_visits_completed
 	from datalake_clean.ods_dim_booking a
 	where
 		a.visit_intent = 'SALE'
