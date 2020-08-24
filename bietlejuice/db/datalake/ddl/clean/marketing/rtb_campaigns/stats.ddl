@@ -15,11 +15,7 @@ CREATE EXTERNAL TABLE datalake_clean.marketing_rtb_stats (
   ecps string,
   ecc string,
   roas string,
-  conversions_value string,
-  account_name string,
-  account_hash string,
-  account_status string,
-  account_currency string
+  conversions_value string
 )
 PARTITIONED BY (
   acc string,

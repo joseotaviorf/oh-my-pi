@@ -68,20 +68,16 @@ class RtbCampaigns(Marketing):
 
     @logger(exclude='account')
     def _fetch_and_save_stats(self, account):
-        stats_list = self._get_stats(account)
+        stats_list = self._get_stats(account['hash'])
         self._save_to_s3(account['hash'], self.S3_STATS_FOLDER, stats_list)
 
     @logger
-    def _get_stats(self, account):
-        if 'hash' not in account:
-            raise ValueError("m=_get_stats, msg=account has no hash and therefore no data!")
-
-        advertiser_hash = account['hash']
+    def _get_stats(self, advertiser_hash):
         stats = self.rtb_client.get_rtb_stats(advertiser_hash,
                                               self.execution_date.strftime('%Y-%m-%d'),
                                               self.execution_date.strftime('%Y-%m-%d'),
                                               ['day', 'deviceType', 'subcampaign'])
-        enriched_stats = self._enrich_stats(stats, account)
+
         # dpa values are not included in above request
         dpa_stats = self.rtb_client.get_dpa_campaign_stats(
             advertiser_hash,
@@ -92,25 +88,7 @@ class RtbCampaigns(Marketing):
         for item in dpa_stats:
             item[u'deviceType'] = 'MOBILE'
 
-        if isinstance(dpa_stats, dict):
-            if dpa_stats:
-                return enriched_stats + [dpa_stats]  # dpa_stats is a dict and is not empty
-            else:
-                return enriched_stats                # dpa_stats is an empty dict
-
-        return enriched_stats + dpa_stats            # dpa_stats is a list
-
-
-    def _enrich_stats(self, stats, account):
-        if stats:
-            FIELDS_TO_ENRICH = ['hash', 'name', 'currency', 'status']
-            for stat in stats:
-                for field in FIELDS_TO_ENRICH:
-                    field_name = 'account_' + field
-                    stat[field_name] = ''
-                    if field in account:
-                        stat[field_name] = account[field]
-        return stats
+        return stats + dpa_stats
 
     @logger(exclude='raw_data')
     def _save_to_s3(self, id_account, entity_name, raw_data):
@@ -157,11 +135,7 @@ class RtbCampaigns(Marketing):
             ('ecps', str),
             ('ecc', str),
             ('roas', str),
-            ('conversions_value', str),
-            ('account_status', str),
-            ('account_hash', str),
-            ('account_name', str),
-            ('account_currency', str)
+            ('conversions_value', str)
         ])
 
         self._move_to_clean(
