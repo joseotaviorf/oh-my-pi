@@ -9,6 +9,9 @@ from airflow.operators.quintoandar_databricks import (
 )
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
+from bietlejuice.jobs.composer.base.pipeline import LayerEnum
+from bietlejuice.jobs.composer.services import FileService
 
 SOURCE = "marketing_hub"
 DAG_ID = f"bietlejuice.{SOURCE}"
@@ -18,6 +21,8 @@ DATALAKE_BUCKET = Variable.get("datalake_old_bucket")
 S3_MARKETING_PATH = Variable.get("datalake_marketing_bucket")
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
+BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
+ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
     Variable.get("databricks_s3_bucket"), DAG_ID
@@ -75,4 +80,42 @@ google_ads_load_to_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-create_cluster_task >> google_ads_load_to_raw_task >> terminate_cluster_task
+try:
+    media_names = FileService.list_layer_sql_files(SOURCE, "")
+except RuntimeError:
+    raise RuntimeError(
+        f"m=marketing_hub stage=clean, dag_id={DAG_ID}, msg=There's no media in query folder"
+    )
+
+for media_name in media_names:
+
+    media_layer = f"{media_name}/{LayerEnum.CLEAN.value}"
+
+    sql_file_list = FileService.list_sql_files_without_extension_from_layer(
+        SOURCE, media_layer
+    )
+
+    clean_sub_dag = DatalakeSubDAG(
+        dag_id=DAG_ID,
+        env=ENV,
+        datalake_bucket=DATALAKE_BUCKET,
+        layer=LayerEnum.CLEAN,
+        database_base_name=SOURCE,
+        relative_query_path=f"{SOURCE}/{media_name}",
+        spark_job_paths=BASE_SPARK_JOBS_PATH,
+        athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
+        start_date=MAIN_START_DATE,
+    )
+
+    clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(
+        dag,
+        sql_file_list,
+        is_incremental=True,
+        partitions=["report_type", "acc", "campaign_name", "str_created_at"],
+    )
+
+    google_ads_load_to_raw_task >> list(
+        clean_sub_dags.values()
+    ) >> terminate_cluster_task
+
+create_cluster_task >> google_ads_load_to_raw_task
