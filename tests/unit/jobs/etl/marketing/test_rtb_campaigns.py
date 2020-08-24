@@ -80,8 +80,7 @@ class TestRTBCampaigns(object):
         # arrange
         # campaigns_list = []
         account_hash = 'xpto123'
-        account = {'hash': account_hash, 'name': mock.ANY, 'currency': mock.ANY,
-                   'status': mock.ANY}
+        account = {'hash': account_hash, 'name': mock.ANY, 'currency': mock.ANY, 'status': mock.ANY}
 
         mock_rtb_client = Mock()
         mock_rtb_client.get_advertiser_campaigns.return_value = campaigns_list
@@ -104,7 +103,8 @@ class TestRTBCampaigns(object):
                                    mock__save_to_s3, rtb_campaigns):
         # arrange
         mock__get_stats.return_value = [{'foo': 'bar'}]
-        account = {'hash': 'xpto123'}
+        account_hash = 'xpto123'
+        account = {'hash': account_hash, 'name': mock.ANY, 'currency': mock.ANY, 'status': mock.ANY}
 
         # act
         rtb_campaigns._fetch_and_save_stats(account)
@@ -116,7 +116,8 @@ class TestRTBCampaigns(object):
 
     @pytest.mark.parametrize('stats, dpa_stats, expected_stats', [
         ([], [], []),
-        ([{'subcampaign': mock.ANY, 'subcampaignhash': mock.ANY, 'deviceType': mock.ANY,
+        (
+        [   {'subcampaign': mock.ANY, 'subcampaignhash': mock.ANY, 'deviceType': mock.ANY,
            'day': mock.ANY, 'impsCount': mock.ANY, 'clicksCount': mock.ANY,
            'campaignCost': mock.ANY, 'conversionsCount': mock.ANY,
            'conversionsValue': mock.ANY, 'cr': mock.ANY, 'ctr': mock.ANY,
@@ -133,28 +134,41 @@ class TestRTBCampaigns(object):
               'clicksCount': mock.ANY, 'campaignCost': mock.ANY,
               'conversionsCount': mock.ANY, 'conversionsValue': mock.ANY,
               'cr': mock.ANY, 'ctr': mock.ANY, 'ecc': mock.ANY, 'cpc': mock.ANY,
-              'roas': mock.ANY, 'ecps': mock.ANY},
+              'roas': mock.ANY, 'ecps': mock.ANY, 'account_status': mock.ANY,
+              'account_hash': mock.ANY, 'account_name': mock.ANY,
+              'account_currency': mock.ANY},
              {'deviceType': 'MOBILE', 'impsCount': mock.ANY, 'clicksCount': mock.ANY,
               'ctr': mock.ANY, 'campaignCost': mock.ANY, 'conversionsCount': mock.ANY,
               'conversionsRate': mock.ANY, 'cpc': mock.ANY, 'ecc': mock.ANY,
               'roas': mock.ANY, 'ecps': mock.ANY, 'conversionsValue': mock.ANY,
-              'day': mock.ANY}]),
+              'day': mock.ANY,  'account_status': mock.ANY, 'account_hash': mock.ANY,
+              'account_name': mock.ANY, 'account_currency': mock.ANY}]),
     ])
-    def test__get_stats_with_empty_response(self, stats, dpa_stats, expected_stats,
+    def test__get_stats_with_empty_response(self, stats, enriched_stats, dpa_stats, expected_stats,
                                             rtb_campaigns):
         # arrange
         mock_rtb_client = Mock()
         mock_rtb_client.get_rtb_stats.return_value = stats
+        mock_rtb_client.get_enriched_stats.return_value = enriched_stats
         mock_rtb_client.get_dpa_campaign_stats.return_value = dpa_stats
         rtb_campaigns.rtb_client = mock_rtb_client
+        account = {'hash': mock.ANY, 'name': mock.ANY, 'currency': mock.ANY,
+                   'status': mock.ANY}
 
         # act
-        stats = rtb_campaigns._get_stats(mock.ANY)
+        stats = rtb_campaigns._get_stats(account)
 
         # assert
         assert stats == expected_stats
         rtb_campaigns.rtb_client.get_rtb_stats.assert_called_once()
+        rtb_campaigns.rtb_client.get_enriched_stats.assert_called_once()
         rtb_campaigns.rtb_client.get_dpa_campaign_stats.assert_called_once()
+
+    def test__get_stats_with_no_account_hash(self, rtb_campaigns):
+        account = {'name': mock.ANY, 'currency': mock.ANY, 'status': mock.ANY}
+        # act & assert
+        with pytest.raises(ValueError):
+            rtb_campaigns._get_stats(account=account)
 
     @mock.patch.object(BaseETL, 'obj_to_s3')
     def test__save_to_s3_with_empty_data(self, mock__obj_to_s3, rtb_campaigns):
@@ -205,7 +219,11 @@ class TestRTBCampaigns(object):
             ('ecps', str),
             ('ecc', str),
             ('roas', str),
-            ('conversions_value', str)
+            ('conversions_value', str),
+            ('account_status', str),
+            ('account_hash', str),
+            ('account_name', str),
+            ('account_currency', str)
         ])
 
         # act
