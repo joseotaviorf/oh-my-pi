@@ -114,6 +114,12 @@ class TestRTBCampaigns(object):
                                                  rtb_campaigns.S3_STATS_FOLDER,
                                                  [{'foo': 'bar'}])
 
+    def test__fetch_and_save_stats_no_account_hash(self, rtb_campaigns):
+        account = {'name': mock.ANY, 'currency': mock.ANY, 'status': mock.ANY}
+        # act & assert
+        with pytest.raises(ValueError):
+            rtb_campaigns._fetch_and_save_stats(account=account)
+
     @pytest.mark.parametrize('stats, dpa_stats, expected_stats', [
         ([], [], []),
         ([{'subcampaign': mock.ANY, 'subcampaignhash': mock.ANY, 'deviceType': mock.ANY,
