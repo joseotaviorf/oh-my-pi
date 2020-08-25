@@ -28,6 +28,7 @@ rent_flows_adap as (
 	    rf.sk_offer_submitted_date,
 	    rf.sk_offer_approved_date,
 	    rf.sk_first_credit_evaluation_init,
+	    rf.sk_first_credit_evaluation_positive,
 	    rf.sk_tenant_first_doc_sent_date,
 	    rf.sk_last_doc_analysis_approved,
 	    rf.sk_credit_analysis_init_date,
@@ -51,27 +52,6 @@ rent_flows_adap as (
 	full outer join tta_complete tta_c
 	  on rf.sk_house_listing = tta_c.sk_house_listing
 	  and rf.sk_client = tta_c.sk_client
-),
-order_evalutaion as (
--- temp solution to include credit evaluation positive date step		
-select
-    proposal_id,
-    updated_at,
-    result,
-    id,
-    row_number() over(partition by proposal_id order by updated_at desc) as rn_last
-from datalake_docx_raw_prod.credit_evaluation
-where status <> 'PROCESSING'
-),
-credit_ep as (
-select
-    proposal_id,
-    min(case when result in ('PRE_APPROVED','REGULAR') then updated_at end) as credit_evaluation_positive_first_date,
-    max(case when result in ('PRE_APPROVED','REGULAR') then updated_at end) as credit_evaluation_positive_last_date,
-    min(case when rn_last = 1 then result end) as result_last,
-    count(distinct id) as number_evaluations
-from order_evalutaion
-group by 1
 ),
 messages_sent as (
 select
@@ -391,21 +371,9 @@ select
   null::bigint as contract_signed,
   null::bigint  as contract_ended
 from dim_date dd
-join (select rf.sk_house_listing,
-			 rf.sk_region,
-			 rf.funnel_flow,
-		     rf.funnel_first_touchpoint,
-		     rf.had_flow_visit,
-		     rf.had_flow_direct,
-		     rf.had_flow_tta,
-		     rf.flow_type,
-		     rf.sk_offer,
-		     coalesce(to_char(cast(ep.credit_evaluation_positive_last_date as timestamp), 'YYYYMMDD')::integer, -1) as sk_last_credit_evaluation_positive
-		from rent_flows_adap rf
-        join credit_ep ep
-         on rf.sk_proposal = ep.proposal_id) rf
-  on dd.sk_date = rf.sk_last_credit_evaluation_positive
-  and rf.sk_last_credit_evaluation_positive > 0
+join rent_flows_adap rf
+  on dd.sk_date = rf.sk_first_credit_evaluation_positive
+  and rf.sk_first_credit_evaluation_positive > 0
 join dim_house_listing dhl
   on rf.sk_house_listing = dhl.sk_house_listing
 left join dim_offer dof

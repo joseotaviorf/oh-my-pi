@@ -569,8 +569,8 @@ SELECT
   NULL::BIGINT  AS contract_ended
 FROM dim_date dd
 JOIN fact_listing_rent_flows rf
-  ON dd.sk_date = rf.sk_last_credit_evaluation_positive
-  AND rf.sk_last_credit_evaluation_positive > 0
+  ON dd.sk_date = rf.sk_first_credit_evaluation_positive
+  AND rf.sk_first_credit_evaluation_positive > 0
 JOIN dim_house_listing dhl
   ON rf.sk_house_listing = dhl.sk_house_listing
 LEFT JOIN dim_offer dof
