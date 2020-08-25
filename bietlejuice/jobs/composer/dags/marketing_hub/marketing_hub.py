@@ -111,7 +111,7 @@ for media_name in media_names:
         dag,
         sql_file_list,
         is_incremental=True,
-        partitions=["report_type", "acc", "campaign_name", "str_created_at"],
+        partitions=["report_type", "acc", "campaign_name", "load_date"],
     )
 
     google_ads_load_to_raw_task >> list(
