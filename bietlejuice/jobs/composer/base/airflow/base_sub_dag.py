@@ -55,7 +55,9 @@ class BaseSubDAG(object):
             executor=CeleryExecutor(),
         )
 
-    def build_subdags_from_sql_files(self, dag, file_list, test_ods_migration=False):
+    def build_subdags_from_sql_files(
+        self, dag, file_list, test_ods_migration=False, **kwargs
+    ):
         """
         Return a subdag for each table in a specified file list containing table's sqls
         :param dag: main dag to attach subdag to
@@ -75,6 +77,7 @@ class BaseSubDAG(object):
                 table_name=file_name,
                 slugged_table_name=slugged_table_name,
                 test_ods_migration=test_ods_migration,
+                **kwargs,
             )
             subdags[file_name] = table_sub_dag
 

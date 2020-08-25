@@ -1,5 +1,7 @@
 import logging
+import json
 from argparse import ArgumentParser
+
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.athena import TableStorageFormat
@@ -28,6 +30,8 @@ if __name__ == "__main__":
         help="base name for database, e.g. 'source' for raw/clean layer and 'source' and/or 'context' for enrich layer",
     )
     parser.add_argument("table_name", type=str, help="table name")
+    parser.add_argument("partitions")
+    parser.add_argument("is_incremental")
 
     args = parser.parse_args()
     env = args.env
@@ -36,23 +40,32 @@ if __name__ == "__main__":
     layer = args.layer
     database_base_name = args.database_base_name
     table_name = args.table_name
+    is_incremental = args.is_incremental == "True"
+    partitions = json.loads(args.partitions.replace("'", '"'))
 
     logger.info(
         f"m={JOB_NAME}, env={env}, datalake_bucket={datalake_bucket}, "
         + f"athena_query_result_location={athena_query_result_location}, layer={layer}, "
         + f"database_base_name={database_base_name}, table_name={table_name}, msg=Job execution started"
     )
-    spark_database_name, database_location, athena_database_name = DatalakeMetastoreService.get_layer_info(
+
+    (
+        spark_database_name,
+        database_location,
+        athena_database_name,
+    ) = DatalakeMetastoreService.get_layer_info(
         env, database_base_name, datalake_bucket, layer
     )
     format_options = TableStorageFormat.get_storage(layer)
 
     create_external_table_pipeline = CreateExternalTablePipeline(
-        athena_query_result_location,
-        athena_database_name,
-        table_name,
-        database_location,
-        format_options,
-        spark_database_name,
+        athena_query_result_location=athena_query_result_location,
+        athena_database_name=athena_database_name,
+        table_name=table_name,
+        database_location=database_location,
+        format_options=format_options,
+        spark_database_name=spark_database_name,
+        partitions=partitions,
+        is_incremental=is_incremental,
     )
     create_external_table_pipeline.run()

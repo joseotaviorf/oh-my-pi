@@ -1,5 +1,8 @@
 import logging
+import json
+from collections import OrderedDict
 from argparse import ArgumentParser
+from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -26,12 +29,16 @@ if __name__ == "__main__":
         type=str,
         help="base name for database, e.g. 'source' for raw/clean layer and 'source' and/or 'context' for enrich layer",
     )
+    parser.add_argument("target_database_base_name")
     parser.add_argument(
         "relative_query_path",
         type=str,
         help="relative query path for sql file to create table",
     )
     parser.add_argument("table_name", type=str, help="table name that will be created")
+    parser.add_argument("partitions")
+    parser.add_argument("execution_date")
+    parser.add_argument("is_incremental")
 
     args = parser.parse_args()
 
@@ -41,6 +48,10 @@ if __name__ == "__main__":
     database_base_name = args.database_base_name
     relative_query_path = args.relative_query_path
     table_name = args.table_name
+    execution_date = args.execution_date
+    is_incremental = args.is_incremental == "True"
+    target_database_base_name = args.target_database_base_name
+    partitions = json.loads(args.partitions.replace("'", '"'))
 
     logger.info(
         f"m={JOB_NAME}, env={env}, datalake_bucket={datalake_bucket}, layer={layer}, "
@@ -48,8 +59,29 @@ if __name__ == "__main__":
         + f"table_name={table_name},  msg=Job execution started"
     )
 
-    database_name, database_location, athena_database_name = DatalakeMetastoreService.get_layer_info(
+    dt_datetime = datetime.strptime(execution_date, "%Y-%m-%d")
+    dt_dict = OrderedDict(
+        [
+            ("year", dt_datetime.year),
+            ("month", dt_datetime.month),
+            ("day", dt_datetime.day),
+        ]
+    )
+
+    (
+        database_name,
+        database_location,
+        athena_database_name,
+    ) = DatalakeMetastoreService.get_layer_info(
         env, database_base_name, datalake_bucket, layer
+    )
+
+    (
+        target_database_name,
+        target_database_location,
+        target_athena_database_name,
+    ) = DatalakeMetastoreService.get_layer_info(
+        env, target_database_base_name, datalake_bucket, layer
     )
 
     query = FileService.get_query_from_file_name(
@@ -57,6 +89,15 @@ if __name__ == "__main__":
     )
 
     table_loader_pipeline = TableLoaderPipeline(
-        database_name, table_name, database_location, layer, query
+        database_name=database_name,
+        table_name=table_name,
+        database_location=database_location,
+        layer=layer,
+        query=query,
+        partitions=partitions,
+        query_template_params=dt_dict,
+        is_incremental=is_incremental,
+        target_database_name=target_database_name,
+        target_database_location=target_database_location,
     )
     table_loader_pipeline.run()
