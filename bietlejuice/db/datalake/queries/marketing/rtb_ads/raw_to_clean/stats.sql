@@ -14,9 +14,9 @@ select
   ecc,
   roas,
   conversionsvalue as conversions_value,
-  account_name string,
-  account_hash string,
-  account_status string,
-  account_currency string
+  account_name,
+  account_hash,
+  account_status,
+  account_currency
 from datalake_raw.marketing_rtb_stats
 where dt='{date}' and acc='{account}'

@@ -164,9 +164,9 @@ class RtbCampaigns(Marketing):
             ('ecc', str),
             ('roas', str),
             ('conversions_value', str),
-            ('account_status', str),
-            ('account_hash', str),
             ('account_name', str),
+            ('account_hash', str),
+            ('account_status', str),
             ('account_currency', str)
         ])
 
