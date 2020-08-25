@@ -88,7 +88,13 @@ class RtbCampaigns(Marketing):
         for item in dpa_stats:
             item[u'deviceType'] = 'MOBILE'
 
-        return stats + dpa_stats
+        if isinstance(dpa_stats, dict):
+            if dpa_stats:
+                return stats + [dpa_stats]  # dpa_stats is a dict and is not empty
+            else:
+                return stats                # dpa_stats is an empty dict
+
+        return stats + dpa_stats            # dpa_stats is a list
 
     @logger(exclude='raw_data')
     def _save_to_s3(self, id_account, entity_name, raw_data):
