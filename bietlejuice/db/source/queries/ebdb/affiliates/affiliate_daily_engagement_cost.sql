@@ -1,6 +1,6 @@
 -- INDICAÇÕES DE IMÓVEL
 select
-	date_format(substring(occ.dataOperacao, 1, 10), '%Y-%m-%d') as cost_date,
+	date_format(substring(occ.dataOperacao, 1, 10), '%Y-%m-%d') as dt_cost,
 	cast(u.id as SIGNED) 										as sk_user,
 	cast(i.regiao_id as SIGNED) 								as sk_region,
 	u.dadosAfiliado_id 											as sk_user_affiliate,
@@ -30,7 +30,8 @@ join
 		l.id = cl.leadConvertido_id
 where
 	occ.tipo in ('valorFixoPorIndicacaoDeImovel',
-		'porcentagemPorIndicacaoDeImovel')
+		'porcentagemPorIndicacaoDeImovel',
+		'comissaoUnicaSobreAfiliadoIndicado')
 	and date(occ.dataCriacao) = date('{str_date}')
 group by
 	1, 2, 3, 4, 5, 6, 7
@@ -39,7 +40,7 @@ union all
 
 -- MEMBER GET MEMBER
 select
-	date_format(substring(res.date_operation, 1, 10), '%Y-%m-%d') 	as cost_date,
+	date_format(substring(res.date_operation, 1, 10), '%Y-%m-%d') 	as dt_cost,
 	cast(res.user_id as SIGNED) 									as sk_user,
 	cast(res.region_id as SIGNED) 									as sk_region,
 	res.dadosafiliado_id 											as sk_user_affiliate,

@@ -50,7 +50,7 @@ select
 		else 0 end
 		) as commission_rent,
 	sum(case
-		when commission_type = 'comissaoSobreAfiliadoIndicado' then fa.value_brl
+		when commission_type in ('comissaoSobreAfiliadoIndicado', 'comissaoUnicaSobreAfiliadoIndicado') then fa.value_brl
 		else 0 end
 		) as commission_mgm
 from marketing.fact_affiliate_daily_engagement_cost fa
