@@ -24,6 +24,10 @@ CREATE TABLE staging.dim_user_affiliate (
     tracking_country VARCHAR(255),
     tracking_state VARCHAR(255),
     tracking_city VARCHAR(255),
+    mkt_origin VARCHAR(255),
+    mkt_channel VARCHAR(255),
+    mkt_medium VARCHAR(255),
+    mkt_source VARCHAR(255),
     ts_load TIMESTAMP
 )
 WITH (oids = false);

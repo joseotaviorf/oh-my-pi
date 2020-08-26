@@ -23,5 +23,9 @@ create table public.dim_user_affiliate (
     tracking_country varchar(255),
     tracking_state varchar(255),
     tracking_city varchar(255),
+    mkt_origin varchar(255),
+    mkt_channel varchar(255),
+    mkt_medium varchar(255),
+    mkt_source varchar(255),
     ts_load timestamp without time zone
 );
