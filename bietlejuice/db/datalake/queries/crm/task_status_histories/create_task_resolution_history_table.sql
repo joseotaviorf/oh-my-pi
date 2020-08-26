@@ -52,8 +52,8 @@ history as (
 	select distinct
 		*,
 		json_extract_scalar(a.action, '$._id') as id_action,
-		json_extract_scalar(a.action, '$.userId') as id_user_action,
-		json_extract_scalar(a.action, '$.userName') as action_user_name,
+		json_extract_scalar(a.action, '$.actionUserId') as id_user_action,
+		json_extract_scalar(a.action, '$.actionUserName') as action_user_name,
 		json_extract_scalar(a.action, '$.action') as action_type,
 		json_extract_scalar(a.action, '$.reason') as action_reason,
 		json_extract_scalar(a.action, '$.status') as task_status,
