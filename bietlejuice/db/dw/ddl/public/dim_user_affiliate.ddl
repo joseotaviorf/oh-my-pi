@@ -1,6 +1,7 @@
 drop table if exists dim_user_affiliate;
 create table public.dim_user_affiliate (
     sk_user_affiliate bigint primary key,
+    sk_user bigint,
     id_user_affiliate bigint,
     sk_user_indicated_by bigint,
     ts_joined_program timestamp,
