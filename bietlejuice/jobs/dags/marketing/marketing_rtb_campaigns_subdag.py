@@ -20,8 +20,7 @@ class MarketingRtbCampaignsSubDag(MarketingSubDag):
                                                           integration)
         self.dim_tables = ["dim_rtb_sub_campaign"]
         self.fact_tables = ["fact_rtb_daily_cost_attributions"]
-        self.tables = [RtbCampaigns.CAMPAIGNS_TABLE_NAME,
-                       RtbCampaigns.STATS_TABLE_NAME]
+        self.tables = [RtbCampaigns.STATS_TABLE_NAME]
 
     @logger
     def build_clean_tasks(self, dag):
