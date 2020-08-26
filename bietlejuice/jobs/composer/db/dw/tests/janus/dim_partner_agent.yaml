@@ -1,0 +1,6 @@
+# Migration file for dim_partner_agent
+dw_schema: public
+columns_mapping:
+  - ods_column: status_partner_agent
+    new_column: status
+base_date_column: ts_created
