@@ -26,10 +26,8 @@ class TestRTBCampaigns(object):
         mock_get_accounts.assert_called_once_with()
 
     @mock.patch.object(RtbCampaigns, 'get_accounts')
-    @mock.patch.object(RtbCampaigns, '_fetch_and_save_campaigns')
     @mock.patch.object(RtbCampaigns, '_fetch_and_save_stats')
     def test_move_rtb_campaigns_to_raw(self, mock__fetch_and_save_stats,
-                                       mock__fetch_and_save_campaigns,
                                        mock_get_accounts, rtb_campaigns):
         # arrange
         mock_get_accounts.return_value = ['xpto']
@@ -40,7 +38,6 @@ class TestRTBCampaigns(object):
         # assert
         mock_get_accounts.assert_called_once_with()
         mock__fetch_and_save_stats.assert_called_once_with('xpto')
-        mock__fetch_and_save_campaigns.assert_called_once_with('xpto')
 
     @pytest.mark.parametrize('fetched_acounts, expected_accounts', [
         ([], []),
@@ -59,43 +56,6 @@ class TestRTBCampaigns(object):
         # assert
         rtb_campaigns.rtb_client.get_advertisers.assert_called_once_with()
         assert accounts == expected_accounts
-
-    @pytest.mark.parametrize('campaigns_list, campaigns_list_to_save', [
-        ([], []),
-        ([{'status': mock.ANY, 'hash': mock.ANY, 'name': mock.ANY,
-           'iseditable': mock.ANY, 'ratecardid': mock.ANY, 'updatedat': mock.ANY,
-           'placement': mock.ANY, 'creativeIds': mock.ANY}],
-         [{'status': mock.ANY, 'hash': mock.ANY, 'name': mock.ANY,
-           'iseditable': mock.ANY, 'ratecardid': mock.ANY, 'updatedat': mock.ANY,
-           'placement': mock.ANY, 'account_status': mock.ANY,
-           'account_hash': mock.ANY, 'account_name': mock.ANY,
-           'account_currency': mock.ANY}
-          ])
-    ])
-    @mock.patch.object(RtbCampaigns, '_save_to_s3')
-    def test_fetch_and_save_campaigns(self, mock__save_to_s3,
-                                      campaigns_list,
-                                      campaigns_list_to_save,
-                                      rtb_campaigns):
-        # arrange
-        # campaigns_list = []
-        account_hash = 'xpto123'
-        account = {'hash': account_hash, 'name': mock.ANY, 'currency': mock.ANY,
-                   'status': mock.ANY}
-
-        mock_rtb_client = Mock()
-        mock_rtb_client.get_advertiser_campaigns.return_value = campaigns_list
-        rtb_campaigns.rtb_client = mock_rtb_client
-
-        # act
-        rtb_campaigns._fetch_and_save_campaigns(account)
-
-        # assert
-        rtb_campaigns.rtb_client.get_advertiser_campaigns.assert_called_once_with(
-            account_hash)
-        mock__save_to_s3.assert_called_once_with(account_hash,
-                                                 rtb_campaigns.S3_CAMPAIGNS_FOLDER,
-                                                 campaigns_list_to_save)
 
     @mock.patch.object(RtbCampaigns, '_save_to_s3')
     @mock.patch.object(RtbCampaigns, '_get_stats')
@@ -221,35 +181,6 @@ class TestRTBCampaigns(object):
         mock__move_to_clean.assert_called_once()
         mock__move_to_clean.assert_called_once_with(
             table_name='marketing_rtb_stats',
-            sql_file_name=raw_table_query_file,
-            r_cols=c_cols,
-            c_cols=c_cols)
-
-    @mock.patch.object(RtbCampaigns, '_move_to_clean')
-    def test_move_rtb_sub_campaigns_to_clean(self, mock__move_to_clean, rtb_campaigns):
-        # arrange
-        raw_table_query_file = 'campaigns.sql'
-        c_cols = OrderedDict([
-            ('hash', str),
-            ('name', str),
-            ('status', str),
-            ('is_editable', str),
-            ('rate_card_id', str),
-            ('updated_at', str),
-            ('account_status', str),
-            ('placement', str),
-            ('account_hash', str),
-            ('account_name', str),
-            ('account_currency', str)
-        ])
-
-        # act
-        rtb_campaigns.move_rtb_sub_campaigns_to_clean()
-
-        # assert
-        mock__move_to_clean.assert_called_once()
-        mock__move_to_clean.assert_called_once_with(
-            table_name='marketing_rtb_sub_campaigns',
             sql_file_name=raw_table_query_file,
             r_cols=c_cols,
             c_cols=c_cols)

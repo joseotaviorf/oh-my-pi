@@ -16,7 +16,6 @@ logger = QuintoAndarLogger('RtbCampaigns')
 
 
 class RtbCampaigns(Marketing):
-    CAMPAIGNS_TABLE_NAME = "rtb_sub_campaigns"
     STATS_TABLE_NAME = "rtb_stats"
     INTEGRATION = 'rtb_ads'
     S3_DATA_LAKE_RAW_RTB_PATH = 'raw/marketing/{}'.format(INTEGRATION)
@@ -28,13 +27,11 @@ class RtbCampaigns(Marketing):
         self.client_id = auth['client_id']
         self.client_secret = auth['client_secret']
         self.S3_STATS_FOLDER = 'stats'
-        self.S3_CAMPAIGNS_FOLDER = 'campaigns'
         self.rtb_client = ReportsApiSession(self.client_id, self.client_secret)
 
     @logger
     def move_rtb_campaigns_to_raw(self):
         for acc in self.get_accounts():
-            self._fetch_and_save_campaigns(acc)
             self._fetch_and_save_stats(acc)
 
     @logger
@@ -45,26 +42,6 @@ class RtbCampaigns(Marketing):
             return []
 
         return accounts
-
-    @logger(exclude='account')
-    def _fetch_and_save_campaigns(self, account):
-        campaigns_list = self.rtb_client.get_advertiser_campaigns(account['hash'])
-        campaigns_list = self.del_cols(['creativeIds'], campaigns_list)
-
-        for stat in campaigns_list:
-            stat['account_hash'] = account['hash']
-            stat['account_name'] = account['name']
-            stat['account_currency'] = account['currency']
-            stat['account_status'] = account['status']
-
-        self._save_to_s3(account['hash'], self.S3_CAMPAIGNS_FOLDER, campaigns_list)
-
-    @logger(exclude=['cols_list', 'dict_list'])
-    def del_cols(self, cols_list, dict_list):
-        for c in cols_list:
-            for d in dict_list:
-                del (d[c])
-        return dict_list
 
     @logger(exclude='account')
     def _fetch_and_save_stats(self, account):
@@ -173,29 +150,6 @@ class RtbCampaigns(Marketing):
         self._move_to_clean(
             table_name='marketing_' + self.STATS_TABLE_NAME,
             sql_file_name='stats.sql',
-            r_cols=c_cols,
-            c_cols=c_cols
-        )
-
-    @logger
-    def move_rtb_sub_campaigns_to_clean(self):
-        c_cols = OrderedDict([
-            ('hash', str),
-            ('name', str),
-            ('status', str),
-            ('is_editable', str),
-            ('rate_card_id', str),
-            ('updated_at', str),
-            ('account_status', str),
-            ('placement', str),
-            ('account_hash', str),
-            ('account_name', str),
-            ('account_currency', str)
-        ])
-
-        self._move_to_clean(
-            table_name='marketing_' + self.CAMPAIGNS_TABLE_NAME,
-            sql_file_name='campaigns.sql',
             r_cols=c_cols,
             c_cols=c_cols
         )
