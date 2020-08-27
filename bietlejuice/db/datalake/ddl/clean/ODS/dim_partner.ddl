@@ -8,6 +8,7 @@ create external table if not exists datalake_clean.ods_dim_partner (
     email string,
     cnpj string,
     creci string,
+    type string,
     ts_joined_partnership string,
     ts_updated string,
     ts_created string,

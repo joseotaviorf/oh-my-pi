@@ -5,6 +5,7 @@ create external table if not exists datalake_clean.ods_dim_partner_agent (
     status_partner_agent string, 
     id_user string,
     id_partner string,
+    type string,
     ts_updated string,
     ts_created string,
     ts_load string

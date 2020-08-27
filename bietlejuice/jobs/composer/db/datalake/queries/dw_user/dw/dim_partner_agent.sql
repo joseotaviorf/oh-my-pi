@@ -4,6 +4,7 @@ select
     id_user,
     id_partner,
     status,
+    type,
     ts_created,
     ts_updated,
     now() as ts_load

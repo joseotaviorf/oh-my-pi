@@ -9,6 +9,7 @@ SELECT
   email,
   cnpj,
   creci,
+  type,
   ts_joined_partnership,
   ts_updated,
   ts_created,

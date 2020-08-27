@@ -8,6 +8,7 @@ create table dim_partner (
     email varchar(255) DEFAULT NULL,
     cnpj varchar(255)  DEFAULT NULL,
     creci varchar(255) DEFAULT NULL,
+    type varchar(255) DEFAULT NULL,
     ts_joined_partnership timestamp,
     ts_updated timestamp,
     ts_created timestamp,

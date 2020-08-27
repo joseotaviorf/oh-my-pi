@@ -5,6 +5,7 @@ SELECT
    p.email,
    p.cnpj,
    p.creci,
+   p.type,
    p.partnershipStartsAt AS ts_joined_partnership,
    p.atualizadoEm AS ts_updated,
    p.criadoEm AS ts_created,

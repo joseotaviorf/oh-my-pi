@@ -4,6 +4,7 @@ create table if not exists partner_agent (
     status varchar(255),
     partner_id bigint,
     user_id bigint,
+    type varchar,
     ts_updated timestamp,
     ts_created timestamp
 );

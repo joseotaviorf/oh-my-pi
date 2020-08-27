@@ -8,6 +8,7 @@ create table staging.dim_partner (
     email varchar,
     cnpj varchar,
     creci varchar,
+    type varchar,
     ts_joined_partnership timestamp,
     ts_updated timestamp,
     ts_created timestamp,

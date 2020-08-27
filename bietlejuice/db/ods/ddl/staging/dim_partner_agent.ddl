@@ -5,6 +5,7 @@ create table dim_partner_agent (
     status_partner_agent varchar, 
     id_user bigint,
     id_partner bigint,
+    type varchar,
     ts_updated timestamp,
     ts_created timestamp,
     ts_load timestamp

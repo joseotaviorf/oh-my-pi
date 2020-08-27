@@ -5,6 +5,7 @@ create table janus.dim_partner_agent (
     id_user bigint,
     id_partner bigint,
     status varchar,
+    type varchar,
     ts_created timestamp,
     ts_updated timestamp,
     ts_load timestamp

@@ -6,6 +6,7 @@ SELECT
     status as status_partner_agent, -- activate or deactivate relationship Partner <> User 
     user_id as id_user,
     partner_id as id_partner,
+    type,
     ts_updated, 
     ts_created,
     now()::timestamp as ts_load
