@@ -1,4 +1,5 @@
 import logging
+import json
 from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
@@ -25,6 +26,7 @@ if __name__ == "__main__":
         help="relative query path for sql file to create table",
     )
     parser.add_argument("table_name", type=str, help="table name that will be created")
+    parser.add_argument("spark_params", type=str, help="parameters to pass to spark")
 
     args = parser.parse_args()
 
@@ -33,6 +35,7 @@ if __name__ == "__main__":
     dw_schema = args.dw_schema
     relative_query_path = args.relative_query_path
     table_name = args.table_name
+    spark_params = json.loads(args.spark_params)
 
     logger.info(
         f"m={JOB_NAME}, env={env}, dw_bucket={dw_bucket},  dw_schema={dw_schema}, "
@@ -48,10 +51,11 @@ if __name__ == "__main__":
     )
 
     table_loader_pipeline = TableLoaderPipeline(
-        schema_database_name,
-        table_name,
-        schema_database_location,
-        LayerEnum.DW_STAGING.value,
-        query,
+        database_name=schema_database_name,
+        table_name=table_name,
+        database_location=schema_database_location,
+        layer=LayerEnum.DW_STAGING.value,
+        query=query,
+        spark_params=spark_params,
     )
     table_loader_pipeline.run()

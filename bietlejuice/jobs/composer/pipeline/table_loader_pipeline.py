@@ -4,6 +4,9 @@ from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer
 from bietlejuice.jobs.composer.loaders import SparkMetastoreLoader, S3Loader
 from bietlejuice.jobs.composer.pipeline.abstract_pipeline import AbstractPipeline
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
+from bietlejuice.jobs.composer.services.spark_services.spark_configurator_service import (
+    SparkConfiguratorService,
+)
 
 
 class TableLoaderPipeline(AbstractPipeline):
@@ -23,6 +26,7 @@ class TableLoaderPipeline(AbstractPipeline):
         is_incremental=False,
         target_database_name=None,
         target_database_location=None,
+        spark_params=None,
     ):
         """
         :param database_name: database name to create the enriched table
@@ -44,12 +48,19 @@ class TableLoaderPipeline(AbstractPipeline):
         self.target_database_name = target_database_name or database_name
         self.target_database_location = target_database_location or database_location
         self.partitions = partitions or []
+        self.spark_params = spark_params
 
     def run(self):
         """
         Creates the table in spark metastore based in the query and according to the layer set
         """
         spark_client = SparkClient()
+
+        if self.spark_params:
+            spark_configurator_service = SparkConfiguratorService(
+                spark_client, self.spark_params
+            )
+            spark_configurator_service.configure_spark_session()
 
         spark_metastore_service = SparkMetastoreService(spark_client)
         spark_metastore_service.create_database(self.target_database_name)

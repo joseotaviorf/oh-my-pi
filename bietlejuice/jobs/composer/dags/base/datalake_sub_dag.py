@@ -24,6 +24,7 @@ class DatalakeSubDAG(BaseSubDAG):
         athena_query_result_location,
         schedule_interval=None,
         target_database_base_name=None,
+        spark_params={},
     ):
         """
         :param dag_id: main dag id to attach subdag to
@@ -53,6 +54,7 @@ class DatalakeSubDAG(BaseSubDAG):
             if target_database_base_name
             else database_base_name
         )
+        self.spark_params = spark_params
 
         if layer not in [LayerEnum.CLEAN, LayerEnum.ENRICH]:
             raise ValueError(f"m=__init__, layer={layer}, msg=The layer is invalid.")
@@ -108,6 +110,7 @@ class DatalakeSubDAG(BaseSubDAG):
                         str(partitions),
                         "{{ ds }}",
                         is_incremental,
+                        str(self.spark_params),
                     ],
                 }
             },

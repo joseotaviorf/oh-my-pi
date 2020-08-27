@@ -39,6 +39,7 @@ if __name__ == "__main__":
     parser.add_argument("partitions")
     parser.add_argument("execution_date")
     parser.add_argument("is_incremental")
+    parser.add_argument("spark_params", type=str, help="parameters to pass to spark")
 
     args = parser.parse_args()
 
@@ -52,6 +53,7 @@ if __name__ == "__main__":
     is_incremental = args.is_incremental == "True"
     target_database_base_name = args.target_database_base_name
     partitions = json.loads(args.partitions.replace("'", '"'))
+    spark_params = json.loads(args.spark_params)
 
     logger.info(
         f"m={JOB_NAME}, env={env}, datalake_bucket={datalake_bucket}, layer={layer}, "
@@ -99,5 +101,6 @@ if __name__ == "__main__":
         is_incremental=is_incremental,
         target_database_name=target_database_name,
         target_database_location=target_database_location,
+        spark_params=spark_params,
     )
     table_loader_pipeline.run()
