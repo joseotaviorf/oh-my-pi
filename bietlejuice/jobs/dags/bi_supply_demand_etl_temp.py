@@ -28,7 +28,7 @@ bucket = env.get_airflow_env_var("bi-datalake-s3-bucket")
 
 MAIN_DAG_NAME = "bi-supply-demand-temp-etl"
 MAIN_START_DATE = datetime(2020, 8, 10, 0, 0, 0)
-MAIN_SCHEDULE_INTERVAL = "1 3 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 13 * * *"
 
 # create main DAG definition
 main_dag = BaseDAG.build_dag(
