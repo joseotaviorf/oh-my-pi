@@ -12,7 +12,9 @@ class CRMTasksClosing(CRMTasks):
         'AprovarMinuta',
         'FollowUpAssinaturas',
         'EnviarContratoViaEmail',
-        'AnalisarDocumentacaoProprietario'
+        'AnalisarDocumentacaoProprietario',
+        'AlinhamentoComPP',
+        'VerificacaoComIQ'
     ]
 
     MANUAL_TASK_WORKGROUP_IDS = [
