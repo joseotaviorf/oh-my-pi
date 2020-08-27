@@ -138,6 +138,7 @@ contract_users as (
 user_agg_contracts as (
     select
         id_user,
+        max(id) as id_max,
         min(id_contract) as id_first_contract,
         max(id_contract) as id_last_contract
     from datalake_ebdb_clean.contract_person
@@ -146,6 +147,7 @@ user_agg_contracts as (
 cpf_agg_contracts as (
     select
         cpf,
+        max(id) as id_max,
         min(id_contract) as id_first_contract,
         max(id_contract) as id_last_contract
     from datalake_ebdb_clean.contract_person
@@ -175,14 +177,16 @@ select
     (cp.id_contract = coalesce(uag.id_last_contract,cag.id_last_contract)) as is_last_contract,
     current_timestamp as ts_load
 from datalake_ebdb_clean.contract_person cp
-left join datalake_ebdb_clean.user u 
+left join datalake_ebdb_clean.user u
     on u.id = cp.id_user
     and cp.id_user is not null
-left join contract_users cu 
+left join contract_users cu
     on cu.id_contract = cp.id_contract
-left join user_agg_contracts uag 
+left join user_agg_contracts uag
     on uag.id_user = cp.id_user
-left join cpf_agg_contracts cag 
+    and uag.id_max = cp.id -- prevent duplicated contract and cp in various ids
+left join cpf_agg_contracts cag
     on cag.cpf = cp.cpf
-left join cpf_validator cv 
+    and cag.id_max = cp.id -- prevent duplicated contract and cp in various ids
+left join cpf_validator cv
     on cp.id = cv.id
