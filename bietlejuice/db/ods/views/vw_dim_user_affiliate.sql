@@ -146,12 +146,12 @@ applied_taxonomy AS (
 	FROM
 		aff_citygrp_with_region acg
 		JOIN staging.dim_user du
-			ON du.dados_afiliado_id = dua.sk_user_affiliate
+			ON du.dados_afiliado_id = acg.sk_user_affiliate
 		LEFT JOIN taxonomy tax 
-			ON COALESCE(tax.affiliate_type, '') = COALESCE(dua.type, '')
-			AND COALESCE(tax.tracking_medium, '') = COALESCE(dua.tracking_medium, '')
-			AND COALESCE(tax.tracking_source, '') = COALESCE(dua.tracking_source, '')
-			AND COALESCE(tax.tracking_campaign, '') = COALESCE(dua.tracking_campaign, '')
+			ON COALESCE(tax.affiliate_type, '') = COALESCE(acg.type, '')
+			AND COALESCE(tax.tracking_medium, '') = COALESCE(acg.tracking_medium, '')
+			AND COALESCE(tax.tracking_source, '') = COALESCE(acg.tracking_source, '')
+			AND COALESCE(tax.tracking_campaign, '') = COALESCE(acg.tracking_campaign, '')
 )
 SELECT
 	atax.sk_user_affiliate,
