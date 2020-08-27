@@ -121,7 +121,7 @@ select
   p."criadoEm" as dt_created,
   p."atualizadoEm" as dt_updated,
   now()::timestamp as dt_timestamp,
-  p.tenant_first_doc_sent as dt_tenant_first_document_sent,
+  date(p.tenant_first_doc_sent) as dt_tenant_first_document_sent,
   tenant_auto_first_doc_sent as dt_tenant_auto_first_doc_sent,
   p.credit_analysis_first_init_date as dt_credit_analysis_first_init,
   p.credit_analysis_last_init_date as dt_credit_analysis_last_init,

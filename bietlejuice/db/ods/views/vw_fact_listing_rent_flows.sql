@@ -72,7 +72,7 @@ _fact as (
         coalesce(to_char(vdp.dt_tenant_auto_first_doc_sent, 'YYYYMMDD')::integer, -1) as sk_tenant_auto_first_doc_sent_date,
         vdp.dt_tenant_first_document_sent as dt_tenant_manual_first_doc_sent,
         vdp.dt_tenant_auto_first_doc_sent,
-        coalesce(vdp.dt_tenant_auto_first_doc_sent, dt_tenant_first_document_sent) as dt_tenant_first_doc_sent,
+        dt_tenant_first_document_sent as dt_tenant_first_doc_sent,
         dt_owner_document_sent as dt_owner_document_sent,
         case
             when vdp.status in ('Aprovada', 'Rejeitada')

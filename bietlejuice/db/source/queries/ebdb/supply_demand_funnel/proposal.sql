@@ -87,8 +87,7 @@ left join (
     max(
       if(p_aud.statusDocumentacaoInq = 'AnaliseCredito', from_unixtime(ure.`timestamp` / 1000), null)
     ) as tenant_last_doc_complete_date,
-    if(date_format(min(from_unixtime(ure.`timestamp` / 1000)), '%Y-%m-%d %H') != date_format(min(p_aud.dataDocumentosEnviados), '%Y-%m-%d %H'),
-         max(ure.motivo is null or ure.motivo like '[AUTO] used previous tenant%'), 0) as doc_reused,
+    coalesce(isTenantAutomaticSubmission, false) as doc_reused,
 	min(from_unixtime(ure.`timestamp` / 1000)) as added_rev_doc_row,
     -- New column to consider credit evaluation step
     -- New column to consider credit evaluation started

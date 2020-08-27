@@ -9,6 +9,7 @@ revisions as (
         p_aud.status,
         p_aud.mod_status,
         p_aud.rejection_reason,
+        p_aud.is_tenant_auto_submission,
         ure.id,
         cast(from_unixtime(ure.ts_revision/1000) as timestamp) as ts_revision,
         ure.reason
@@ -40,8 +41,7 @@ aud_analysis as (
         max(if(r.tenant_documentation_status = 'Aprovado', r.ts_revision, null)) as ts_credit_approved_last,
         min(if(r.tenant_documentation_status = 'AnaliseCredito', r.ts_revision, null)) as ts_tenant_first_doc_complete,
         max(if(r.tenant_documentation_status = 'AnaliseCredito', r.ts_revision, null)) as ts_tenant_last_doc_complete,
-        if(date_format(min(r.ts_revision), 'yyyy-MM-dd HH:mm:ss') != date_format(min(r.ts_documentation_sent), 'yyyy-MM-dd HH:mm:ss'),
-             max(r.reason is null or r.reason like '[AUTO] used previous tenant%'), false) as is_doc_reused,
+        max(coalesce(r.is_tenant_auto_submission, false)) as is_doc_reused,
         min(r.ts_revision) as added_rev_doc_row,
         min(
           case when r.ts_revision > date('2020-06-07')
