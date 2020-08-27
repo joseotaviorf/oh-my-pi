@@ -8,6 +8,7 @@ create table janus.dim_partner (
     email varchar(255),
     cnpj varchar(255),
     creci varchar(255),
+    type varchar(255),
     ts_partnership_started timestamp,
     ts_created timestamp,
     ts_updated timestamp,
