@@ -178,7 +178,7 @@ fact_rent_flows AS (
 		rent_flows_raw AS rf
 	LEFT JOIN rental_funnel AS frf
 		ON rf.sk_client = frf.sk_client
-		AND rf.id_house = rf.id_house
+		AND rf.id_house = frf.id_house
 		AND rf.rent_flow_order = 1
 ),
 -------------------------------------------------------------------------------------------------------------------------------
