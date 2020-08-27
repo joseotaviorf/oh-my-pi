@@ -105,6 +105,9 @@ def apply_migration_changes(yaml_as_dict, dw_dict):
         dw_dict[column_definition.get('new_column',
                                       column_definition.get('ods_column'))] = \
             column_definition.get('new_column_type', ods_type)
+        # deleting removed columns in migration
+        dw_dict.pop(None, None)
+
     return dw_dict
 
 

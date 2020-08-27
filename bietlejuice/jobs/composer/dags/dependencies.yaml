@@ -18,6 +18,12 @@ bietlejuice.dw_booking:
   - bietlejuice.ebdb:load-visit
   - bietlejuice.enrich_amplitude_visit
 
+bietlejuice.dw_proposal:
+  - bietlejuice.enrich_proposal:load-proposal-to-enrich
+  - bietlejuice.enrich_docx:load-credit-evaluation-to-enrich
+  - bietlejuice.sorting_hat:load-proposal-to-datalake-clean
+  - bietlejuice.sorting_hat:load-proposal-version-to-datalake-clean
+
 bietlejuice.dw_region:
   - bietlejuice.enrich_region
   - bietlejuice.enrich_booking

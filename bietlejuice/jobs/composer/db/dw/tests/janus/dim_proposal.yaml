@@ -1,0 +1,116 @@
+# Migration file for dim_proposal
+dw_schema: public
+columns_mapping:
+  - ods_column: dt_proposal
+    new_column: ts_proposal
+    new_column_type: timestamp
+  - ods_column: dt_proposal_approved
+    new_column: ts_approved
+    new_column_type: timestamp
+  - ods_column: tenant_document_sent
+    new_column: has_tenant_sent_documentation
+    new_column_type: boolean
+  - ods_column: dt_tenant_document_sent
+    new_column: ts_tenant_documentation_sent
+    new_column_type: timestamp
+  - ods_column: owner_document_sent
+    new_column: has_owner_sent_documentation
+    new_column_type: boolean
+  - ods_column: dt_owner_document_sent
+    new_column: ts_owner_documentation_sent
+    new_column_type: timestamp
+  - ods_column: tenant_contract_accepted
+    new_column: has_tenant_accepted_contract
+    new_column_type: boolean
+  - ods_column: owner_contract_accepted
+    new_column: has_owner_accepted_contract
+    new_column_type: boolean
+  - ods_column: status_doc_tenant
+    new_column: tenant_documentation_status
+  - ods_column: status_doc_owner
+    new_column: owner_documentation_status
+  - ods_column: dt_created
+    new_column: ts_created
+    new_column_type: timestamp
+  - ods_column: dt_updated
+    new_column: ts_updated
+    new_column_type: timestamp
+  - ods_column: dt_tenant_first_document_sent
+    new_column: ts_tenant_first_doc_sent
+    new_column_type: timestamp
+  - ods_column: dt_tenant_auto_first_doc_sent
+    new_column: ts_tenant_auto_first_doc_sent
+    new_column_type: timestamp
+  - ods_column: dt_credit_analysis_first_init
+    new_column: ts_credit_analysis_first_init
+    new_column_type: timestamp
+  - ods_column: dt_credit_analysis_init
+    new_column: ts_credit_analysis_last_init
+    new_column_type: timestamp
+  - ods_column: dt_credit_analysis_first_end
+    new_column: ts_credit_analysis_first_end
+    new_column_type: timestamp
+  - ods_column: dt_credit_analysis_end
+    new_column: ts_credit_analysis_last_end
+    new_column_type: timestamp
+  - ods_column: dt_credit_last_approved
+    new_column: ts_credit_approved_last
+    new_column_type: timestamp
+  - ods_column: dt_tenant_first_doc_complete
+    new_column: ts_tenant_first_doc_complete
+    new_column_type: timestamp
+  - ods_column: dt_tenant_last_doc_complete
+    new_column: ts_tenant_last_doc_complete
+    new_column_type: timestamp
+  - ods_column: dt_first_credit_evaluation_init
+    new_column: ts_credit_evaluation_first_init
+    new_column_type: timestamp
+  - ods_column: dt_last_credit_evaluation_init
+    new_column: ts_credit_evaluation_last_init
+    new_column_type: timestamp
+  - ods_column: dt_first_credit_evaluation_negative
+    new_column: ts_credit_evaluation_first_negative
+    new_column_type: timestamp
+  - ods_column: dt_last_credit_evaluation_negative
+    new_column: ts_credit_evaluation_last_negative
+    new_column_type: timestamp
+  - ods_column: dt_first_doc_analysis_approved
+    new_column: ts_doc_analysis_first_approved
+    new_column_type: timestamp
+  - ods_column: dt_last_doc_analysis_approved
+    new_column: ts_doc_analysis_last_approved
+    new_column_type: timestamp
+  - ods_column: dt_first_doc_analysis_rejected
+    new_column: ts_doc_analysis_first_rejected
+    new_column_type: timestamp
+  - ods_column: dt_last_doc_analysis_rejected
+    new_column: ts_doc_analysis_last_rejected
+    new_column_type: timestamp
+  - ods_column: flg_doc_reused
+    new_column: is_doc_reused
+    new_column_type: boolean
+  - ods_column: dt_first_credit_evaluation_positive
+    new_column: ts_proposal_first_credit_evaluation_positive
+    new_column_type: timestamp
+  - ods_column: dt_last_credit_evaluation_positive
+    new_column: ts_proposal_last_credit_evaluation_positive
+    new_column_type: timestamp
+  - ods_column: status_sortinghat
+    new_column: sorting_hat_proposal_status
+  - ods_column: tenant_document_sent_count
+    new_column: tenant_documentation_sent_count
+  - ods_column: result_credit_evaluation
+    new_column: result_last_credit_evaluation
+  - new_column: rejection_reason
+    new_column_type: varchar(255)
+  # removing columns that already has a similar
+  - ods_column: dt_credit_analysis_last_init
+    new_column:
+  - ods_column: dt_credit_analysis_last_end
+    new_column:
+  - ods_column: dt_timestamp
+    new_column:
+  - ods_column: dt_tenant_doc_complete
+    new_column:
+base_date_column: ts_created
+sample_size_months: 6
