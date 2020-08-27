@@ -3,7 +3,7 @@ radius AS (
   -- here we define our tolerance radius of out of area leads, in km
   SELECT 1.0 AS "radius_km"
 ),
-with user_affiliate as (
+user_affiliate as (
   SELECT
     u.dados_afiliado_id,
     u.sk_user
