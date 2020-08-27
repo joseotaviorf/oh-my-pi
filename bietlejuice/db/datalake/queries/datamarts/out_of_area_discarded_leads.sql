@@ -3,6 +3,15 @@ radius AS (
   -- here we define our tolerance radius of out of area leads, in km
   SELECT 1.0 AS "radius_km"
 ),
+with user_affiliate as (
+  SELECT
+    u.dados_afiliado_id,
+    u.sk_user
+  FROM datalake_clean.ods_dim_user AS u
+  JOIN datalake_clean.ods_dim_user_affiliate AS a
+    ON u.dados_afiliado_id = a.sk_user_affiliate
+    and u.dados_afiliado_id is not null
+),
 discarded_leads AS (
   SELECT
     dim_date_lead.date AS "date_lead",
@@ -23,11 +32,11 @@ discarded_leads AS (
     fact_house_listing_flows.mkt_channel AS "mkt_channel",
     fact_house_listing_flows.mkt_medium AS "mkt_medium",
     fact_house_listing_flows.lead_type AS "lead_type",
-    dim_user_affiliate.dados_afiliado_id AS "dados_afiliado_id"
+    user_affiliate.dados_afiliado_id AS "dados_afiliado_id"
   FROM datalake_clean.ods_fact_house_listing_flows AS fact_house_listing_flows
   LEFT JOIN datalake_clean.ods_dim_lead AS dim_lead ON fact_house_listing_flows.sk_lead = dim_lead.sk_lead
   LEFT JOIN datalake_clean.ods_dim_region AS dim_region ON dim_region.sk_region = fact_house_listing_flows.sk_region
-  FULL OUTER JOIN (SELECT u.*, a.* FROM datalake_clean.ods_dim_user AS u JOIN datalake_clean.ods_dim_user_affiliate AS a ON u.dados_afiliado_id = a.sk_user_affiliate WHERE u.dados_afiliado_id is not null) AS dim_user_affiliate ON fact_house_listing_flows.sk_user_lead_affiliate = dim_user_affiliate.sk_user
+  FULL OUTER JOIN user_affiliate ON fact_house_listing_flows.sk_user_lead_affiliate = user_affiliate.sk_user
   LEFT JOIN datalake_clean.ods_dim_date AS dim_date_lead ON dim_date_lead.sk_date = fact_house_listing_flows.sk_lead_date
   WHERE (dim_lead.reason = 'ForaArea') AND (dim_lead.status = 'Descartado')
     AND TRY(DATE(dim_date_lead.date))  >= CURRENT_DATE - INTERVAL '30' day
