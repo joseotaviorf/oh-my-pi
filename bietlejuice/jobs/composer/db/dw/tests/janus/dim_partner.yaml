@@ -1,0 +1,6 @@
+# Migration file for dim_partner
+dw_schema: public
+columns_mapping:
+  - ods_column: ts_joined_partnership
+    new_column: ts_partnership_started
+base_date_column: ts_created

@@ -43,6 +43,7 @@ bietlejuice.dw_tracksale:
   - bietlejuice.enrich_ebdb_customer_contact_identification
 
 bietlejuice.dw_user:
+  - bietlejuice.ebdb:load-partner
   - bietlejuice.ebdb:load-partner-agent
 
 bietlejuice.dw_visit:
