@@ -10,7 +10,10 @@ class PubSubSubscriberSyncPullConsumer:
 
     @logger
     def __init__(self, pubsub_client):
-        self.__pubsub_client = pubsub_client
+        if not pubsub_client:
+            raise ValueError("m=__init__, msg=pubsub_client cannot be empty")
+
+        self._pubsub_client = pubsub_client
 
     @logger(exclude_return=True)
     def get_messages(self, max_messages=DEFAULT_MAX_MESSAGES_PER_REQUEST):
@@ -20,7 +23,7 @@ class PubSubSubscriberSyncPullConsumer:
         @return messages: list with content of the messages in json format
         @return ack_ids: list of the messages' acknowledgement ids
         """
-        response = self.__pubsub_client.request_messages(max_messages=max_messages)
+        response = self._pubsub_client.request_messages(max_messages=max_messages)
         ack_ids = []
         messages = []
 

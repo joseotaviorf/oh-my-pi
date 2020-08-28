@@ -3,5 +3,5 @@ pytest-cov==2.7.1
 pytest-html==1.22.0
 coverage-badge==1.0.1
 PyYAML==5.1
-google-cloud-pubsub==1.7.0
 quintoandar-logger==0.4.0
+google-cloud-pubsub==1.7.0
