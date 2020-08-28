@@ -153,7 +153,7 @@ bietlejuice.enrich_nps_answer_drivers:
 bietlejuice.enrich_proposal:
   - bietlejuice.ebdb:load-proposal
   - bietlejuice.ebdb:load-proposal-aud
-  - bietlejuice.ebdb:load-user-revision-entity
+  - bietlejuice.enrich_ebdb_user_revision_entity:load-user-revision-entity-to-enrich
   - bietlejuice.sorting_hat:load-proposal-to-datalake-clean
   - bietlejuice.sorting_hat:load-proposal-version-to-datalake-clean
 

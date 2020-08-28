@@ -11,10 +11,10 @@ revisions as (
         p_aud.rejection_reason,
         p_aud.is_tenant_auto_submission,
         ure.id,
-        cast(from_unixtime(ure.ts_revision/1000) as timestamp) as ts_revision,
+        ure.ts_revision,
         ure.reason
     from datalake_ebdb_clean.proposal_aud p_aud
-    join datalake_ebdb_clean.user_revision_entity ure
+    join datalake_ebdb_user_revision_entity.user_revision_entity ure
         on p_aud.rev = ure.id
 ),
 aud_analysis as (

@@ -157,6 +157,7 @@ class OdsMigrationValidation:
 
     def _assert_dfs(self, df_janus, df_dw):
         df_dw = self._update_dw_df_columns_names(df_dw)
+        df_dw = self._remove_dw_df_removed_columns(df_dw)
         df_dw = self._convert_all_df_columns_to_string(df_dw)
 
         df_janus = self._remove_janus_df_new_columns(df_janus)
@@ -242,6 +243,16 @@ class OdsMigrationValidation:
     @staticmethod
     def _is_column_name_kept(ods_col_name, new_col_name):
         return ods_col_name and not new_col_name
+
+    def _remove_dw_df_removed_columns(self, df):
+        """
+        Remove from dw data frame the columns removed in the migration process.
+        """
+        for col_map in self.columns_mapping:
+            ods_col_name = col_map.get("ods_column")
+            if ods_col_name and not col_map.get("new_column"):
+                df = df.drop(ods_col_name)
+        return df
 
     def _remove_janus_df_new_columns(self, df):
         """

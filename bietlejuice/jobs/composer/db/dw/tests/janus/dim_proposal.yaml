@@ -101,7 +101,7 @@ columns_mapping:
     new_column: tenant_documentation_sent_count
   - ods_column: result_credit_evaluation
     new_column: result_last_credit_evaluation
-  - new_column: rejection_reason
+  - ods_column: rejection_reason
     new_column_type: varchar(255)
   # removing columns that already has a similar
   - ods_column: dt_credit_analysis_last_init
