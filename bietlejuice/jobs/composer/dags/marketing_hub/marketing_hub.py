@@ -17,7 +17,7 @@ SOURCE = "marketing_hub"
 DAG_ID = f"bietlejuice.{SOURCE}"
 ENV = Variable.get("environment")
 
-DATALAKE_BUCKET = Variable.get("datalake_old_bucket")
+DATALAKE_BUCKET = Variable.get("datalake_bucket")
 S3_MARKETING_PATH = Variable.get("datalake_marketing_bucket")
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
