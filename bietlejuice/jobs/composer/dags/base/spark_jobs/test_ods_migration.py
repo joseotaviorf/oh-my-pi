@@ -250,7 +250,11 @@ class OdsMigrationValidation:
         """
         for col_map in self.columns_mapping:
             ods_col_name = col_map.get("ods_column")
-            if ods_col_name and not col_map.get("new_column"):
+            if (
+                ods_col_name
+                and not col_map.get("new_column")
+                and not col_map.get("new_column_type")
+            ):
                 df = df.drop(ods_col_name)
         return df
 
