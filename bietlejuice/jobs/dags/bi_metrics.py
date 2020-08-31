@@ -59,6 +59,7 @@ def create_task(dag, python_callable, db, table_name, query):
         dag=dag,
         task_id='{}_{}'.format(db, table_name),
         provide_context=True,
+        pool='redshift_bi_metrics_pool',
         python_callable=python_callable,
         op_kwargs={'table_name': table_name, 'query': query}
     )

@@ -45,6 +45,7 @@ def create_task_to_load_in_datalake(file):
     return BaseDAG.build_python_operator(
         dag=dag,
         task_id='load_{}_to_datalake'.format(file['s3_path']),
+        pool='google_sheets_pool',
         python_callable=load_google_sheet_files_to_datalake,
         op_kwargs={'file': file}
     )
@@ -54,6 +55,7 @@ def create_task_to_load_in_ods(file):
     return BaseDAG.build_python_operator(
         dag=dag,
         task_id='load_{}_to_ods'.format(file['s3_path']),
+        pool='google_sheets_pool',
         python_callable=load_google_sheet_files_to_ods,
         op_kwargs={'file': file}
     )
