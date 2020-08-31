@@ -11,7 +11,8 @@ create table public.potential_listings (
  ,sk_user_lead_affiliate integer   
  ,sk_user_first_task_assignee integer   
  ,sk_user_last_task_assignee integer   
- ,sk_region integer    
+ ,sk_region integer
+ ,sk_first_region integer
  ,id_city integer
  ,sk_partner integer,
     sk_lead_date integer,

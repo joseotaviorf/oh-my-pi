@@ -147,6 +147,7 @@ select
   atax.sk_user_first_task_assignee,
   atax.sk_user_last_task_assignee,
   atax.sk_region,
+  atax.sk_first_region,
   atax.sk_city,
   atax.sk_partner,
   atax.sk_lead_date,

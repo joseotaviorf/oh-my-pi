@@ -140,6 +140,7 @@ leads_b2b as (
     coalesce(btf.rep_id, '-1'::integer) as sk_user_first_task_assignee,
     coalesce(btl.rep_id, '-1'::integer) as sk_user_last_task_assignee,
     coalesce(f.region_id, '-1'::integer) as sk_region,
+    coalesce(f.first_region_id, '-1'::integer) as sk_first_region,
     coalesce(dr.city_id, '-1'::integer) as id_city,
     coalesce(pa_b2b_prime.partner_id, l_b2b.online_partner_id, f.partner_id, '-1'::integer::bigint) as sk_partner,
     coalesce(to_char(f.dt_lead::date::timestamp with time zone, 'YYYYMMDD')::integer, '-1'::integer) as sk_lead_date,

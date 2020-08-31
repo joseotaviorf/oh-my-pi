@@ -13,6 +13,7 @@ create table if not exists fact_house_listing_flows
  ,sk_user_first_task_assignee integer   encode lzo
  ,sk_user_last_task_assignee integer   encode lzo
  ,sk_region integer   encode lzo
+ ,sk_first_region integer   encode lzo
  ,sk_city integer   encode lzo
  ,sk_partner integer   encode lzo
  ,sk_lead_date integer   encode lzo

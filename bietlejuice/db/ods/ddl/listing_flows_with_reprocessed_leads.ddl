@@ -10,6 +10,7 @@ create table public.listing_flows_with_reprocessed_leads (
 	isales_registrant_id integer,
 	affiliate_id integer,
 	region_id integer,
+	first_region_id integer,
 	dt_lead timestamp without time zone,
 	dt_prospect timestamp without time zone,
 	dt_first_contact timestamp without time zone,
