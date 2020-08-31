@@ -88,3 +88,5 @@ firebase_admin==3.0.0
 flower==0.9.3
 redis==3.4.1
 mysqlclient
+setuptools==40.8.0
+pip==18.1
