@@ -88,3 +88,4 @@ quintoandar-jira-api-client==0.1.0
 celery==4.3.0
 firebase_admin==3.0.0
 google-cloud-pubsub==1.7.0
+setuptools==39.0.1
