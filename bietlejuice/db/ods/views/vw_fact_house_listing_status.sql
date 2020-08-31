@@ -18,6 +18,12 @@ select
   hls.ts_status_end,
   hls.status_history,
   left(hls.status_change_reason, 5000) as status_change_reason,
+  coalesce(
+      -- get max ts per id_house_listing per day
+      max(hls.ts_status_start) over(
+	    partition by hls.id_house_listing, cast(hls.ts_status_start as date)
+      ) = hls.ts_status_start,
+    false) as is_last_status_of_day,
   now()::timestamp as ts_load
 from house_listing_status hls
 join house_listing hl

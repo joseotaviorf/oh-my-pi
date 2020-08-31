@@ -9,5 +9,6 @@ create table if not exists fact_house_listing_status (
   ts_status_end timestamp,
   status_history varchar,
   status_change_reason varchar(5000),
+  is_last_status_of_day boolean,
   ts_load timestamp
 );

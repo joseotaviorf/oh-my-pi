@@ -9,6 +9,7 @@ create external table if not exists datalake_clean.ods_fact_house_listing_status
   ts_status_end string,
   status_history string,
   status_change_reason string,
+  is_last_status_of_day string,
   ts_load string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
