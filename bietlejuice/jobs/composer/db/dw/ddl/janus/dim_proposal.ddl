@@ -1,7 +1,7 @@
 drop table if exists janus.dim_proposal;
 create table janus.dim_proposal (
-  sk_proposal integer primary key,
-  id_proposal integer,
+  sk_proposal bigint primary key,
+  id_proposal bigint,
   guarantee varchar(50),
   status varchar(50),
   tenant_documentation_status varchar(50),
@@ -10,8 +10,8 @@ create table janus.dim_proposal (
   result_last_credit_evaluation varchar(50),
   sorting_hat_proposal_status varchar(50),
   renting_proposal_value double precision,
-  tenant_documentation_sent_count integer,
-  credit_evaluation_count integer,
+  tenant_documentation_sent_count bigint,
+  credit_evaluation_count bigint,
   has_tenant_sent_documentation boolean,
   has_tenant_accepted_contract boolean,
   has_owner_accepted_contract boolean,

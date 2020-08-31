@@ -1,6 +1,10 @@
 # Migration file for dim_proposal
 dw_schema: public
 columns_mapping:
+  - ods_column: sk_proposal
+    new_column_type: bigint
+  - ods_column: id_proposal
+    new_column_type: bigint
   - ods_column: dt_proposal
     new_column: ts_proposal
     new_column_type: timestamp
@@ -99,6 +103,9 @@ columns_mapping:
     new_column: sorting_hat_proposal_status
   - ods_column: tenant_document_sent_count
     new_column: tenant_documentation_sent_count
+    new_column_type: bigint
+  - ods_column: credit_evaluation_count
+    new_column_type: bigint
   - ods_column: result_credit_evaluation
     new_column: result_last_credit_evaluation
   - ods_column: rejection_reason
