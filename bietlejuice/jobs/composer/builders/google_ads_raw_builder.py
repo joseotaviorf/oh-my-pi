@@ -194,18 +194,24 @@ class GoogleAdsRawBuilder:
         dt = self.__get_date(s3_file_path)
         return [account_name, campaign_name, dt]
 
+    def __check_validity_of_csv(self, csv_file):
+        return bool(csv_file and csv_file.first())
+
     def build_enriched_csv(self, s3_source_file_path, report_type):
         csv_options = {"header": True}
         csv_s3_file = self.s3_consumer.get_data_from_file(
             s3_source_file_path, self.s3_source_file_format, options=csv_options
         )
-        enriched_csv_file = self.__enrich_csv(
-            csv_s3_file, s3_source_file_path, report_type
-        )
-        csv_s3_file_with_schema = self.__add_schema_to_csv(
-            enriched_csv_file, s3_source_file_path, report_type
-        )
-        return csv_s3_file_with_schema
+        is_valid_csv = self.__check_validity_of_csv(csv_s3_file)
+        if is_valid_csv:
+            enriched_csv_file = self.__enrich_csv(
+                csv_s3_file, s3_source_file_path, report_type
+            )
+            csv_s3_file_with_schema = self.__add_schema_to_csv(
+                enriched_csv_file, s3_source_file_path, report_type
+            )
+            return csv_s3_file_with_schema
+        return None
 
     def build_file_paths(self, s3_file_path_source):
         s3_source_raw_file_paths = self.s3_service.list_objects(s3_file_path_source)
