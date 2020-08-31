@@ -170,7 +170,7 @@ pipeline:
 
   check-style-python3:
     group: tests
-    image: python:3.6.7
+    image: python:3.7.3
     commands:
       - apt-get update
       - apt-get install -y git > /dev/null
@@ -181,7 +181,7 @@ pipeline:
 
   files-validation-python3:
     group: tests
-    image: python:3.6.7
+    image: python:3.7.3
     pull: true
     commands:
       - apt-get update
@@ -207,7 +207,7 @@ pipeline:
 
   make-package-python3:
     group: package
-    image: python:3.6.7
+    image: python:3.7.3
     commands:
       - make package-python3
     when:
@@ -308,7 +308,7 @@ pipeline:
 
   load-spark-jobs-s3-forno:
     group: update_jobs
-    image: python:3.6.7
+    image: python:3.7.3
     commands:
       - pip install boto3==1.9.159
       - python scripts/upload_spark_jobs_to_s3.py 5a-databricks-forno
@@ -318,7 +318,7 @@ pipeline:
 
   load-spark-jobs-s3-new-forno-account:
     group: update_jobs
-    image: python:3.6.7
+    image: python:3.7.3
     commands:
       - pip install boto3==1.9.159
       - python scripts/upload_spark_jobs_to_s3.py databricks.s3.forno.data.quintoandar.com.br
@@ -328,7 +328,7 @@ pipeline:
 
   load-spark-jobs-s3-prod:
     group: update_jobs
-    image: python:3.6.7
+    image: python:3.7.3
     commands:
       - pip install boto3==1.9.159
       - python scripts/upload_spark_jobs_to_s3.py 5a-databricks
@@ -338,7 +338,7 @@ pipeline:
 
   load-spark-jobs-s3-new-prod-account:
     group: update_jobs
-    image: python:3.6.7
+    image: python:3.7.3
     commands:
       - pip install boto3==1.9.159
       - python scripts/upload_spark_jobs_to_s3.py databricks.s3.data.quintoandar.com.br

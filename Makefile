@@ -79,8 +79,8 @@ unit-tests-python2:
 
 .PHONY: environment-python3
 environment-python3:
-	@pyenv install -s 3.6.7
-	@pyenv virtualenv 3.6.7 bi-etl-ejuice-python3
+	@pyenv install -s 3.7.3
+	@pyenv virtualenv 3.7.3 bi-etl-ejuice-python3
 	@pyenv local bi-etl-ejuice-python3
 
 .PHONY: requirements-python3
