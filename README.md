@@ -63,7 +63,7 @@ Repository with implementation of Airflow DAGs.
 
 We currently have two independent environments in this repo, one for our legacy Airflow that lives on an [EC2](https://airflow.quintoandar.com.br/admin/) and the other for the a managed Airflow on [Google Cloud Platform (GCP)](http://composer.quintoandar.com.br).
 
-The jobs running on the first environment have been implemented with Python 2.6 and run inside the Airflow EC2 (Airflow is the orchestrator and executor at the same time). On the other hand, the second environment defines pipelines implemented with Python 3.6, using Spark to manipulate the data, and letting Airflow only the responsibility of orchestrating them.
+The jobs running on the first environment have been implemented with Python 2.6 and run inside the Airflow EC2 (Airflow is the orchestrator and executor at the same time). On the other hand, the second environment defines pipelines implemented with Python 3.7, using Spark to manipulate the data, and letting Airflow only the responsibility of orchestrating them.
 
 The pipelines that currently run on the Airflow EC2 are being migrated and will be discontinued soon. The reason is that Python 2 lost the community support and the limitations to scale the pipelines with parallel processing. The new DAGs should be written according to the new structure (check composer folder). For more information regarding the repo structure look at [Folders Structure](#folders-structure) topic.
 
