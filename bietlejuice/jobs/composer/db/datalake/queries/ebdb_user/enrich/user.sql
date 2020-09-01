@@ -3,13 +3,13 @@ with proponent_document_dates as (
           p.id_proponent,
           min(if(p.ts_documentation_sent is not null, p.ts_documentation_sent, null)) as ts_first_document_sent,
           max(if(p.ts_documentation_sent is not null, p.ts_documentation_sent, null)) as ts_last_document_sent,
-          FROM_UNIXTIME(min(if(p_aud.tenant_documentation_status = 'AnaliseCredito', ure.ts_revision, null)/1000)) as ts_first_sent_to_insurance
+          min(if(p_aud.tenant_documentation_status = 'AnaliseCredito', ure.ts_revision, null)) as ts_first_sent_to_insurance
         from
           datalake_ebdb_clean.proposal p
         left join datalake_ebdb_clean.proposal_aud p_aud
            on p_aud.id_proposal = p.id
         join
-          datalake_ebdb_clean.user_revision_entity ure
+          datalake_ebdb_user_revision_entity.user_revision_entity ure
           on ure.id = p_aud.rev
         group by
           p.id_proponent
@@ -63,6 +63,8 @@ select
     u.id_photographer,
     u.id_sales_rep,
     u.id_affiliates,
+    u.id_bank,
+    u.id_state,
     u.cpf,
     u.rg,
     u.gender,
@@ -90,7 +92,11 @@ select
     ui.is_tenant,
     u.is_active,
     u.is_blocked,
-    u.dt_birth,
+    case
+      when date_format(u.dt_birth, 'y') < 100 then u.dt_birth + interval 1900 years
+      when date_format(u.dt_birth, 'y') < 1000 then u.dt_birth + interval 1000 years
+      else u.dt_birth
+    end as dt_birth,
     u.ts_click_anuncie,
     pdd.ts_first_document_sent,
     pdd.ts_last_document_sent,

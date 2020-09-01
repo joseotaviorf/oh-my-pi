@@ -18,6 +18,7 @@ with first_operation_start (
 select
     ad.id,
     ad.id_indicated_by,
+    ad.id_doorman_affiliate_data,
     ad.is_active,
     (ad.id_doorman_affiliate_data is not null) as is_doorman_affiliate,
     ad.origin,
@@ -29,6 +30,7 @@ select
     ad.creci_number,
     coalesce(ad.operation_city, dad.work_city) as work_city,
     ad.last_week_balance_communication,
+    dad.ts_joined as ts_doorman_joined,
     coalesce(fos.ts_operation_start, ad.ts_operation_start) as ts_first_operation_start,
     ad.ts_operation_start,
     ad.ts_created,
