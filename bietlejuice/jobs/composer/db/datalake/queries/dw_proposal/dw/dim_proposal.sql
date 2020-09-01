@@ -50,7 +50,7 @@ select
   p.ts_updated,
   p.ts_documentation_sent as ts_tenant_documentation_sent,
   p.ts_owner_documentation_sent,
-  p.ts_tenant_first_doc_sent,
+  date_trunc('day', p.ts_tenant_first_doc_sent) as ts_tenant_first_doc_sent,
   p.ts_tenant_auto_first_doc_sent,
   p.ts_credit_analysis_first_init,
   p.ts_credit_analysis_last_init,
