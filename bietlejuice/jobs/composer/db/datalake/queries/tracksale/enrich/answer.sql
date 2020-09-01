@@ -29,7 +29,8 @@ WITH answers AS (
 		ts_deadline,
 		ts_reminder,
 		ts_dispatch,
-		ts_answer_sent,
+		ts_answer_sent as ts_answer_sent_utc,
+		from_utc_timestamp(ts_answer_sent, 'America/Sao_Paulo') as ts_answer_sent_local,
 		DATE(CONCAT(CAST(year AS VARCHAR(4)), '-', CAST(month AS VARCHAR(2)), '-', CAST(day AS VARCHAR(2)))) AS dt_updated
 	FROM datalake_tracksale_clean.answer
 ),
@@ -66,7 +67,8 @@ SELECT
 	a.ts_deadline,
 	a.ts_reminder,
 	a.ts_dispatch,
-	a.ts_answer_sent,
+	a.ts_answer_sent_utc,
+	a.ts_answer_sent_local,
 	a.dt_updated
 FROM answers a
 INNER JOIN last_updated_answers lua
