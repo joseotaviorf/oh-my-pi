@@ -11,9 +11,11 @@ SELECT
 	lf.sk_house_listing,
 	lf.mkt_origin,
 	lf.mkt_channel,
-	CASE WHEN lf.mkt_origin = 'B2B' THEN mkt_origin
-	     WHEN lf.mkt_completion = 'Full Self-Service' THEN 'FSS'
-	     ELSE 'IS'
+	CASE
+	    WHEN lf.mkt_origin = 'B2B' then lf.mkt_origin
+	    WHEN lf.mkt_completion = 'Full Self-Service' then 'FSS'
+	    WHEN (dl.sales_company = 'ACTION_LINE' and has_isales_intervention = true) OR (dl.sales_company = 'ATENTO' and has_isales_intervention = true) then 'OUT'
+	    else 'ISS'
 	END AS lead_context,
 	CASE WHEN lf.lead_context_origin = 'Organic' THEN 'Branded'
          ELSE lead_context_origin
@@ -23,6 +25,8 @@ SELECT
 	END AS mkt_type,
 	CASE WHEN dr.city_group NOT IN ('RMSP', 'Rio de Janeiro') THEN NULL ELSE dr.city_group END AS city_group
 FROM sale.fact_listing_flows lf
+LEFT JOIN dim_lead dl
+  ON dl.sk_lead = lf.sk_lead
 LEFT JOIN dim_region dr
   ON dr.sk_region = lf.sk_region
 ),
@@ -615,7 +619,7 @@ SELECT
 	SUM(p2fc) AS p2fc,
 	SUM(fc2q) AS fc2q,
 	SUM(p2q) AS p2q,
-   SUM(q2o) AS q2o,
+   	SUM(q2o) AS q2o,
 	SUM(o2fl) AS o2fl,
 	SUM(vb2vc) AS vb2vc,
 	SUM(vc2os) AS vc2os,
