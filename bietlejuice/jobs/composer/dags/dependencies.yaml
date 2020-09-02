@@ -165,6 +165,10 @@ bietlejuice.enrich_tracksale:
   - bietlejuice.tracksale:dispatch
   - bietlejuice.tracksale:answer
 
+bietlejuice.regions_polygon:
+  - bietlejuice.enrich_region:load-region-to-enrich
+  - bietlejuice.ebdb:load-polygon-region
+
 bietlejuice.tenant_booking_review:
   - bietlejuice.ebdb:load-visit
   - bietlejuice.ebdb:load-booking
