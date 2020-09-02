@@ -45,7 +45,8 @@ user_information as (
           and house_ids.id_user is NULL
         ) or  contract_ids.id_user is not null
       ) as is_tenant,
-      (u.id_photographer is not null) as is_photographer
+      (u.id_photographer is not null) as is_photographer,
+      substring(user.main_phone, 4, 2) as main_phone_ddd
     from datalake_ebdb_clean.user user
     left join distinct_id_user_from_house house_ids
       on house_ids.id_user = user.id
@@ -80,6 +81,7 @@ select
     u.city,
     u.zip_code,
     u.main_phone,
+    u.main_phone_ddd,
     u.bank_agency,
     u.bank_account,
     u.bank_cpf_cnpj,
