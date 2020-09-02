@@ -44,7 +44,8 @@ user_information as (
           and user.id_agent_rep is null
           and house_ids.id_user is NULL
         ) or  contract_ids.id_user is not null
-      ) as is_tenant
+      ) as is_tenant,
+      (u.id_photographer is not null) as is_photographer
     from datalake_ebdb_clean.user user
     left join distinct_id_user_from_house house_ids
       on house_ids.id_user = user.id
@@ -90,6 +91,7 @@ select
     ui.has_tenant_app,
     ui.has_active_contract,
     ui.is_tenant,
+    u.is_photographer,
     u.is_active,
     u.is_blocked,
     case
