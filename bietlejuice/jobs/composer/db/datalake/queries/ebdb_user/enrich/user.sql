@@ -45,7 +45,7 @@ user_information as (
           and house_ids.id_user is NULL
         ) or  contract_ids.id_user is not null
       ) as is_tenant,
-      (u.id_photographer is not null) as is_photographer,
+      (user.id_photographer is not null) as is_photographer,
       substring(user.main_phone, 4, 2) as main_phone_ddd
     from datalake_ebdb_clean.user user
     left join distinct_id_user_from_house house_ids
@@ -54,7 +54,7 @@ user_information as (
       on device_ids.id_user = user.id
     left join distinct_id_user_from_contract contract_ids
       on contract_ids.id_user = user.id
-    group by 1, 2, 3, 4, 5
+    group by 1, 2, 3, 4, 5, 6, 7
 )
 select
     u.id,
@@ -81,7 +81,7 @@ select
     u.city,
     u.zip_code,
     u.main_phone,
-    u.main_phone_ddd,
+    ui.main_phone_ddd,
     u.bank_agency,
     u.bank_account,
     u.bank_cpf_cnpj,
@@ -93,7 +93,7 @@ select
     ui.has_tenant_app,
     ui.has_active_contract,
     ui.is_tenant,
-    u.is_photographer,
+    ui.is_photographer,
     u.is_active,
     u.is_blocked,
     case
