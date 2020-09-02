@@ -45,6 +45,7 @@ bietlejuice.dw_tracksale:
 bietlejuice.dw_user:
   - bietlejuice.ebdb:load-partner
   - bietlejuice.ebdb:load-partner-agent
+  - bietlejuice.enrich_ebdb_user:load-user-doorman-to-enrich
 
 bietlejuice.dw_visit:
   - bietlejuice.ebdb:load-visit
