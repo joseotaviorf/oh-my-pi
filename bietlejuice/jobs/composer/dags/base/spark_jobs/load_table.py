@@ -1,6 +1,5 @@
 import logging
 import json
-from collections import OrderedDict
 from argparse import ArgumentParser
 from datetime import datetime
 
@@ -40,6 +39,11 @@ if __name__ == "__main__":
     parser.add_argument("execution_date")
     parser.add_argument("is_incremental")
     parser.add_argument("spark_params", type=str, help="parameters to pass to spark")
+    parser.add_argument(
+        "additional_query_template_params",
+        type=str,
+        help="additional query parameters not including date params",
+    )
 
     args = parser.parse_args()
 
@@ -53,6 +57,9 @@ if __name__ == "__main__":
     is_incremental = args.is_incremental == "True"
     target_database_base_name = args.target_database_base_name
     partitions = json.loads(args.partitions.replace("'", '"'))
+    query_template_params = json.loads(
+        args.additional_query_template_params.replace("'", '"')
+    )
     spark_params = json.loads(args.spark_params)
 
     logger.info(
@@ -62,13 +69,14 @@ if __name__ == "__main__":
     )
 
     dt_datetime = datetime.strptime(execution_date, "%Y-%m-%d")
-    dt_dict = OrderedDict(
+    dt_dict = dict(
         [
             ("year", dt_datetime.year),
             ("month", dt_datetime.month),
             ("day", dt_datetime.day),
         ]
     )
+    query_template_params.update(dt_dict)
 
     (
         database_name,
@@ -97,7 +105,7 @@ if __name__ == "__main__":
         layer=layer,
         query=query,
         partitions=partitions,
-        query_template_params=dt_dict,
+        query_template_params=query_template_params,
         is_incremental=is_incremental,
         target_database_name=target_database_name,
         target_database_location=target_database_location,

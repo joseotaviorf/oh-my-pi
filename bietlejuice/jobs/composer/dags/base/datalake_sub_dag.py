@@ -69,6 +69,7 @@ class DatalakeSubDAG(BaseSubDAG):
         test_ods_migration=False,
         partitions=None,
         is_incremental=False,
+        extra_query_template_params=None,
     ):
         """
         Create a subdag containing 2 tasks:
@@ -84,6 +85,7 @@ class DatalakeSubDAG(BaseSubDAG):
         """
 
         partitions = partitions or []
+        extra_query_template_params = extra_query_template_params or {}
 
         sub_dag = BaseSubDAG(
             sub_dag_name=sub_dag_name,
@@ -111,6 +113,7 @@ class DatalakeSubDAG(BaseSubDAG):
                         "{{ ds }}",
                         is_incremental,
                         str(self.spark_params),
+                        str(extra_query_template_params),
                     ],
                 }
             },
