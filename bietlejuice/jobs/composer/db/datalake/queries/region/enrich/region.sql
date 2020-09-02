@@ -4,6 +4,7 @@ select
     coalesce(r.name, ar.neighbourhood) as name,
     mr.id AS id_macro_region,
     mr.name AS macro_region_name,
+    (r.level = 'Cidade') as is_city,
     c.id AS id_city,
     coalesce(ar.city, c.name) as city_name,
     ar.city_group,
