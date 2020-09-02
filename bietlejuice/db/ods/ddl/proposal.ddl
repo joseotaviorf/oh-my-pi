@@ -41,5 +41,7 @@ create table if not exists proposal (
   doc_analysis_first_approved_date timestamp,
   doc_analysis_last_approved_date timestamp,
   doc_analysis_first_rejected_date timestamp,
-  doc_analysis_last_rejected_date timestamp
+  doc_analysis_last_rejected_date timestamp,
+  guarantee_date timestamp,
+  "garantiaPagaEm" timestamp
 );

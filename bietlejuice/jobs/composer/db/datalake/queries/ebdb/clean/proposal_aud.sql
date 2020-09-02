@@ -44,6 +44,8 @@ SELECT
     isTenantAutomaticSubmission AS is_tenant_auto_submission,
     isTenantAutomaticSubmission_MOD AS mod_is_tenant_auto_submission,
     bypassPreAnalysis AS is_pre_analyze,
-    bypassPreAnalysis_MOD AS mod_is_pre_analyze
+    bypassPreAnalysis_MOD AS mod_is_pre_analyze,
+    garantia AS guarantee,
+    garantia_MOD AS mod_guarantee
 FROM
     datalake_ebdb_raw.proposta_aud

@@ -45,7 +45,10 @@ select
   aud_analysis.doc_analysis_first_approved_date,
   aud_analysis.doc_analysis_last_approved_date,
   aud_analysis.doc_analysis_first_rejected_date,
-  aud_analysis.doc_analysis_last_rejected_date
+  aud_analysis.doc_analysis_last_rejected_date,
+  -- New dates related to new guarantee flow
+  aud_guarantee.guarantee_date,
+  p.garantiaPagaEm
 from
   Proposta p
 left join (
@@ -88,7 +91,7 @@ left join (
       if(p_aud.statusDocumentacaoInq = 'AnaliseCredito', from_unixtime(ure.`timestamp` / 1000), null)
     ) as tenant_last_doc_complete_date,
     coalesce(isTenantAutomaticSubmission, false) as doc_reused,
-	min(from_unixtime(ure.`timestamp` / 1000)) as added_rev_doc_row,
+    min(from_unixtime(ure.`timestamp` / 1000)) as added_rev_doc_row,
     -- New column to consider credit evaluation step
     -- New column to consider credit evaluation started
     min(
@@ -177,4 +180,16 @@ left join (
     group by 1
 ) aud_status
   on aud_status.id_aud = p.id
+left join (
+    select
+      p_aud.id as id_aud,
+      min(from_unixtime(ure.`timestamp` / 1000)) as guarantee_date
+    from Proposta_AUD p_aud
+    join UsuarioRevisionEntity ure
+      on p_aud.REV = ure.id
+      where p_aud.garantia_MOD = 1
+        and p_aud.garantia = 'RentalGuarantee'
+    group by 1
+) aud_guarantee
+  on aud_guarantee.id_aud = p.id
 where date(coalesce(p.criadoEm, '1900-01-01 00:00:00')) <= date('{}')

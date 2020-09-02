@@ -54,10 +54,12 @@ create table if not exists fact_listing_rent_flows
  ,sk_last_credit_evaluation_positive bigint encode az64
  ,sk_first_credit_evaluation_negative bigint   encode az64
  ,sk_last_credit_evaluation_negative bigint   encode az64
+ ,sk_guarantee_date bigint encode az64
  ,sk_first_doc_analysis_approved bigint   encode az64
  ,sk_last_doc_analysis_approved bigint   encode az64
  ,sk_first_doc_analysis_rejected bigint   encode az64
  ,sk_last_doc_analysis_rejected bigint   encode az64
+ ,sk_guarantee_paid_date bigint encode az64
  ,flg_visit_completed boolean
  ,flg_visit_performed boolean
  ,flg_visit_created_from_app boolean

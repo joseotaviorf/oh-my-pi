@@ -37,10 +37,12 @@ create table janus.dim_proposal (
   ts_credit_evaluation_last_init timestamp,
   ts_credit_evaluation_first_negative timestamp,
   ts_credit_evaluation_last_negative timestamp,
+  ts_guarantee timestamp,
   ts_doc_analysis_first_approved timestamp,
   ts_doc_analysis_last_approved timestamp,
   ts_doc_analysis_first_rejected timestamp,
   ts_doc_analysis_last_rejected timestamp,
+  ts_guarantee_paid timestamp,
   ts_proposal_first_credit_evaluation_positive timestamp,
   ts_proposal_last_credit_evaluation_positive timestamp,
   ts_load timestamp

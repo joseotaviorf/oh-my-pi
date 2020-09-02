@@ -63,10 +63,12 @@ select
   p.ts_credit_evaluation_last_init,
   p.ts_credit_evaluation_first_negative,
   p.ts_credit_evaluation_last_negative,
+  p.ts_guarantee,
   p.ts_doc_analysis_first_approved,
   p.ts_doc_analysis_last_approved,
   p.ts_doc_analysis_first_rejected,
   p.ts_doc_analysis_last_rejected,
+  p.ts_guarantee_paid,
   ce.ts_proposal_first_credit_evaluation_positive,
   ce.ts_proposal_last_credit_evaluation_positive,
   now() as ts_load

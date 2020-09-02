@@ -10,6 +10,8 @@ revisions as (
         p_aud.mod_status,
         p_aud.rejection_reason,
         p_aud.is_tenant_auto_submission,
+        p_aud.guarantee,
+        p_aud.mod_guarantee,
         ure.id,
         ure.ts_revision,
         ure.reason
@@ -95,6 +97,16 @@ aud_status as (
     where r.mod_status and r.status in ('Aprovada', 'Rejeitada')
     group by 1
 ),
+aud_guarantee as (
+    select
+        r.id_proposal as id_aud,
+        min(r.ts_revision) as ts_processed
+    from revisions r
+    where
+      r.mod_guarantee
+      and r.guarantee = 'RentalGuarantee'
+    group by 1
+),
 sortinghat_proposal as (
     with sortinghat_proposal_prev as (
         select
@@ -164,14 +176,18 @@ select
     aud_analysis.ts_credit_evaluation_last_init,
     aud_analysis.ts_credit_evaluation_first_negative,
     aud_analysis.ts_credit_evaluation_last_negative,
+    aud_guarantee.ts_processed as ts_guarantee,
     aud_analysis.ts_doc_analysis_first_approved,
     aud_analysis.ts_doc_analysis_last_approved,
     aud_analysis.ts_doc_analysis_first_rejected,
-    aud_analysis.ts_doc_analysis_last_rejected
+    aud_analysis.ts_doc_analysis_last_rejected,
+    p.ts_guarantee_paid
 from datalake_ebdb_clean.proposal p
 left join aud_analysis
     on aud_analysis.id_aud = p.id
 left join aud_status
     on aud_status.id_aud = p.id
+left join aud_guarantee
+    on aud_guarantee.id_aud = p.id
 left join sortinghat_proposal shp
         on shp.id = p.id
