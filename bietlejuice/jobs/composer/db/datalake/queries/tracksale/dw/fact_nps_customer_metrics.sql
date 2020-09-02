@@ -14,8 +14,7 @@ WITH customer_conversions AS (
 		 a.last_nps_answer,
 		 a.nps_comment,
 		 ROUND(a.seconds_spent_answering/60.0,2) AS minutes_spent_answering,
-		 d.ts_created,
-		 a.ts_answer_sent
+		 d.ts_created
 	FROM datalake_tracksale.customer_conversions cc
 	INNER JOIN datalake_tracksale.dispatch d
 		ON cc.id_dispatch_lot = d.id

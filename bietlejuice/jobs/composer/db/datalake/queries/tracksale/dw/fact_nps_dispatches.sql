@@ -10,7 +10,7 @@ WITH customer_conversions AS (
          a.nps_comment,
          ROUND(a.seconds_spent_answering/60.0,2) AS minutes_spent_answering,
          d.ts_created,
-         a.ts_answer_sent
+         a.ts_answer_sent_local
     FROM datalake_tracksale.customer_conversions cc
     INNER JOIN datalake_tracksale.dispatch d
         ON cc.id_dispatch_lot = d.id
@@ -78,7 +78,7 @@ SELECT
      COALESCE(ad.id_offer_context, -1) AS sk_offer,
      COALESCE(ad.id_contract, -1) AS sk_contract,
      COALESCE(CAST(date_format(cc.ts_created, 'yyyyMMdd') AS BIGINT), -1) AS sk_sent_date,
-     COALESCE(CAST(date_format(cc.ts_answer_sent, 'yyyyMMdd') AS BIGINT), -1) AS sk_answered_date,
+     COALESCE(CAST(date_format(cc.ts_answer_sent_local, 'yyyyMMdd') AS BIGINT), -1) AS sk_answered_date,
      cc.nps_answer AS score,
      minutes_spent_answering AS minutes_response_time,
      cc.status <> 'Finalizado' AS is_pending_survey,
