@@ -46,6 +46,19 @@ bietlejuice.dw_user:
   - bietlejuice.ebdb:load-partner
   - bietlejuice.ebdb:load-partner-agent
   - bietlejuice.enrich_ebdb_user:load-user-doorman-to-enrich
+  - bietlejuice.ebdb:load-visit
+  - bietlejuice.ebdb:load-rent-flow
+  - bietlejuice.ebdb:load-pre-proposal
+  - bietlejuice.ebdb:load-proposal
+  - bietlejuice.ebdb:load-contract
+  - bietlejuice.ebdb:load-state
+  - bietlejuice.ebdb:load-bank
+  - bietlejuice.ebdb:load-photographer
+  - bietlejuice.ebdb:load-sales-rep
+  - bietlejuice.enrich_booking:load-booking-to-enrich
+  - bietlejuice.enrich_ebdb_user:load-user-to-enrich
+  - bietlejuice.enrich_ebdb_user:load-agent-data-to-enrich
+  - bietlejuice.enrich_ebdb_user:load-affiliate-data-to-enrich
 
 bietlejuice.dw_user_affiliate:
   - bietlejuice.enrich_amplitude_user:load-user-affiliate-origin-to-enrich

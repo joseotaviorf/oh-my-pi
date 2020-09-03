@@ -38,7 +38,7 @@ def extract_column_info(lines):
         clean_line = re.sub('(^\s*,|,\s*$| primary key,*\s*$)',  # remove commas
                             '',
                             line.strip())  # trim
-        clean_lines.append(clean_line.strip())
+        clean_lines.append(clean_line.strip().lower())
 
     return clean_lines
 

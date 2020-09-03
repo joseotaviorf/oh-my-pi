@@ -85,6 +85,7 @@ select
     u.bank_agency,
     u.bank_account,
     u.bank_cpf_cnpj,
+    -- TODO [ODS] rename to bank_person_name
     u.bank_name,
     u.bank_another_holder,
     u.bank_account_type,

@@ -38,6 +38,7 @@ SELECT
     dadosBancarios_agencia AS bank_agency,
     dadosBancarios_contaCorrente AS bank_account,
     dadosBancarios_cpfOuCnpj AS bank_cpf_cnpj,
+    -- TODO [ODS] rename to bank_person_name
     dadosBancarios_nome AS bank_name,
     dadosBancarios_outroTitular AS bank_another_holder,
     dadosBancarios_tipoConta AS bank_account_type,
