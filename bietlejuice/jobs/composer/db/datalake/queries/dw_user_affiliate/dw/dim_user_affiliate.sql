@@ -36,7 +36,7 @@ with affiliates_full as (
 region_ddd as (
 	select
 	    distinct city_group,
-		cast(city_ddd as string) as ddd,
+		city_ddd as ddd,
 		regional
 	from
 		datalake_region.region
@@ -96,14 +96,14 @@ aff_city_group_with_region as (
 ),
 taxonomy as (
 	select
-		cast(nullif(affiliate_type, '') as string) affiliate_type,
-		cast(nullif(tracking_medium, '') as string) tracking_medium,
-		cast(nullif(tracking_source, '') as string) tracking_source,
-		cast(nullif(tracking_campaign, '') as string) tracking_campaign,
-		cast(nullif(mkt_origin, '') as string) mkt_origin,
-		cast(nullif(mkt_channel, '') as string) mkt_channel,
-		cast(nullif(mkt_medium, '') as string) mkt_medium,
-		cast(nullif(mkt_source, '') as string) mkt_source
+		affiliate_type,
+		tracking_medium,
+		tracking_source,
+		tracking_campaign,
+		mkt_origin,
+		mkt_channel,
+		mkt_medium,
+		mkt_source
 	from
 		datalake_raw.gsheets_taxonomy_affiliates
 ),
