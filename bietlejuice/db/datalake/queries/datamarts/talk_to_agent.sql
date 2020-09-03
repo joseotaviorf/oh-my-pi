@@ -106,6 +106,10 @@ bookings_agent_tenant as(
     where db.dt_created > '2020-03-01' --After feature has started
         and db.first_update_source='Corretores' --Bookings created by Agents
 
+        and u.id <> ''
+        and id_visitor <> ''
+        and id_property <> ''
+
         --considering also "Agendamentos" when the Agent schedule a Visit
         --and date_trunc('day',cast(db.dt_created as timestamp))=date_trunc('day',cast(db.dt_scheduling as timestamp)) --Bookings registered by Agents = they have the same created and scheduling day
 
