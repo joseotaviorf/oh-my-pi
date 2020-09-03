@@ -156,7 +156,7 @@ select
   p.doc_analysis_last_approved_date as dt_last_doc_analysis_approved,
   p.doc_analysis_first_rejected_date as dt_first_doc_analysis_rejected,
   p.doc_analysis_last_rejected_date as dt_last_doc_analysis_rejected,
-  p.garantiaPagaEm as dt_guarantee_paid,
+  p."garantiaPagaEm" as dt_guarantee_paid,
   nullif(shp.status, '') as status_sortinghat,
   nullif(ce.result_last, '') as result_credit_evaluation,
   ce.number_evaluations as credit_evaluation_count,
