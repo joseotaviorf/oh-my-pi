@@ -47,6 +47,14 @@ bietlejuice.dw_user:
   - bietlejuice.ebdb:load-partner-agent
   - bietlejuice.enrich_ebdb_user:load-user-doorman-to-enrich
 
+bietlejuice.dw_user_affiliate:
+  - bietlejuice.enrich_amplitude_user:load-user-affiliate-origin-to-enrich
+  - bietlejuice.enrich_ebdb_user:load-affiliate-data-to-enrich
+  - bietlejuice.enrich_ebdb_user:load-user-to-enrich
+  - bietlejuice.enrich_ebdb_user:load-agent-data-to-enrich
+  - bietlejuice.enrich_region:load-region-to-enrich
+  # TODO [ODS] Add gsheets_taxonomy_affiliates after migrated to composer
+
 bietlejuice.dw_visit:
   - bietlejuice.ebdb:load-visit
 
