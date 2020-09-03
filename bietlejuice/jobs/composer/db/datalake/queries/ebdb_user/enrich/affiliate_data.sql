@@ -23,7 +23,7 @@ select
     (ad.id_doorman_affiliate_data is not null) as is_doorman_affiliate,
     ad.origin,
     case when ad.affiliate_type = 'Doorman' and u.id_agent is not null then 'Doorman & Agent'
-         when u.id_affiliates is not null then 'Agent'
+         when u.id_agent is not null then 'Agent'
          else ad.affiliate_type
     end as affiliate_type,
     ad.payment_preference,
