@@ -2,17 +2,17 @@ with amplitude_affiliate_tracking as(
 	with amplitude_events as (
     SELECT
         id_user,
-        coalesce(get_json_object(user_properties, '$.utm_source'), '') as utm_source,
-        coalesce(get_json_object(user_properties, '$.utm_medium'), '') as utm_medium,
-        coalesce(get_json_object(user_properties, '$.utm_campaign'), '') as utm_campaign,
-        lower(regexp_replace(coalesce(get_json_object(user_properties, '$.utm_campaign'), ''), '[^\\w]+|_', '')) as utm_campaign_cleaned,
-        coalesce(get_json_object(user_properties, '$.utm_content'), '') as utm_content,
-        coalesce(get_json_object(user_properties, '$.utm_term'), '') as utm_term,
-        coalesce(get_json_object(user_properties, '$.platform'), '') as platform,
-        coalesce(device_type, '') as device_type,
-        coalesce(country, '') as country,
-        coalesce(region, '') as region,
-        coalesce(city, '') as city,
+        get_json_object(user_properties, '$.utm_source') as utm_source,
+        get_json_object(user_properties, '$.utm_medium') as utm_medium,
+        get_json_object(user_properties, '$.utm_campaign') as utm_campaign,
+        lower(regexp_replace(get_json_object(user_properties, '$.utm_campaign'), '[^\\w]+|_', '')) as utm_campaign_cleaned,
+        get_json_object(user_properties, '$.utm_content') as utm_content,
+        get_json_object(user_properties, '$.utm_term') as utm_term,
+        get_json_object(user_properties, '$.platform') as platform,
+        device_type as device_type,
+        country as country,
+        region as region,
+        city as city,
         ts_client_event,
         ts_event
     FROM datalake_amplitude_clean.events
