@@ -79,11 +79,11 @@ if __name__ == "__main__":
         df = spark_client.create_dataframe(json_data)
 
         dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
+        df = df.coalesce(1)
         df = (
             SparkDataFrameService()
             .input(df)
             .create_year_month_day_columns_from_date(dt_execution)
-            .optimize_partition(200000)
             .output()
         )
 

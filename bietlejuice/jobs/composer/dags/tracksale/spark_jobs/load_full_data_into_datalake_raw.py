@@ -67,13 +67,7 @@ if __name__ == "__main__":
 
     spark_client = SparkClient()
     df = spark_client.create_dataframe(api_response)
-    df = (
-        SparkDataFrameService()
-        .input(df)
-        .convert_array_type_to_json()
-        .optimize_partition(200000)
-        .output()
-    )
+    df = SparkDataFrameService().input(df).convert_array_type_to_json().output()
 
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     metastore_service = SparkMetastoreService(spark_client)
