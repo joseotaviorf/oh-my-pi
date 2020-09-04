@@ -77,7 +77,7 @@ aff_city_group_with_region as (
 		nullif(aff_city_region.tracking_medium, '') as tracking_medium,
 		nullif(aff_city_region.tracking_campaign, '') as tracking_campaign,
 		nullif(aff_city_region.tracking_content, '') as tracking_content,
-		nullif(aff_city_region.tracking_term as tracking_term,
+		nullif(aff_city_region.tracking_term, '') as tracking_term,
 		aff_city_region.tracking_platform,
 		aff_city_region.tracking_device_type,
 		aff_city_region.tracking_country,
