@@ -31,7 +31,8 @@ INNER JOIN datalake_docx_raw_prod.folder sf
 INNER JOIN datalake_docx_raw_prod.folder_type sft 
 	ON sf.folder_type_id = sft.id
 INNER JOIN datalake_docx_raw_prod.folder tf 
-	ON fr.target_folder_id = tf.id 
+	ON fr.target_folder_id = tf.id
+WHERE frt.name NOT IN ('PROPONENT_TENANT','RESIDENT')
 ), docs AS (
 SELECT
 	house_folder_id, 
