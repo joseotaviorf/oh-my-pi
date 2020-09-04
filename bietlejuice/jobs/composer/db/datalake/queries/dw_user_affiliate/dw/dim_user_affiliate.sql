@@ -96,14 +96,14 @@ aff_city_group_with_region as (
 ),
 taxonomy as (
 	select
-		affiliate_type,
-		tracking_medium,
-		tracking_source,
-		tracking_campaign,
-		mkt_origin,
-		mkt_channel,
-		mkt_medium,
-		mkt_source
+		nullif(affiliate_type, '') as affiliate_type,
+		nullif(tracking_medium, '') as tracking_medium,
+		nullif(tracking_source, '') as  tracking_source,
+		nullif(tracking_campaign, '') as tracking_campaign,
+		nullif(mkt_origin, '') as mkt_origin,
+		nullif(mkt_channel, '') as mkt_channel,
+		nullif(mkt_medium, '') as mkt_medium,
+		nullif(mkt_source, '') as mkt_source
 	from
 		datalake_raw.gsheets_taxonomy_affiliates
 ),
