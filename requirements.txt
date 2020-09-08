@@ -80,6 +80,6 @@ xmltodict==0.10.2
 snakebite==2.11.0
 rtbhouse-sdk==4.1.0
 sshtunnel==0.1.4
-twitter-ads==6.1.0
+twitter-ads==7.0.1
 configparser==3.5.0b2
 git+git://github.com/quintoandar/python-utils.git@v0.4.1 # must be the last to be installed
