@@ -1,140 +1,125 @@
 --drop view if exists vw_fact_house_listing_flows;
 --create or replace view vw_fact_house_listing_flows as
-with lead_city_region as (
-  with city_region as (
-    select
-      region.id as id_region,
-      regexp_replace(remove_accentuation(lower(region.nome)), '[^a-z]+', '', 'g') as formatted_city
-    from region
-    where region.nivel = 'Cidade'
-  )
-  select
-    l.id,
-    r.id_region
-  from lead l
-  join city_region r
-    on r.formatted_city = regexp_replace(remove_accentuation(lower(l.cidade)), '[^a-z]+', '', 'g')
-),
-potential_listings_enrich as (
-    select
+WITH potential_listings_enrich AS (
+    SELECT
         p.*,
-        coalesce(p.id_city, lcr.id_region, '-1'::integer) as sk_city,
-        us_cad.id is not null as is_call_center,
-        us_d.subscriptionSource as subscription_source,
-        coalesce(p.listing_flows_affiliate_type,
-            case when ua.affiliateType = 'Doorman' and u.dados_agente_id is not null then 'Doorman & Agent'
-                 when u.dados_agente_id is not null then 'Agent'
-                 else ua.affiliateType
-            end) as affiliate_type
-    from potential_listings p
-    left join usuario us_cad
-      on us_cad.id = p.house_usuario_que_cadastrou_id
-        and us_cad.email ~~ '%@hargos.com.br'
-    left join usuario u
-   	  on u.id = p.affiliate_id
-    left join user_doorman us_d
-      on us_d.id_dados_afiliado = u.dados_afiliado_id
-    left join user_affiliate ua
-      on ua.id = u.dados_afiliado_id
-    left join lead_city_region lcr
-      on p.region_id = -1 and p.lead_id = lcr.id
+        COALESCE(p.id_city, lcr.id_region, '-1'::INTEGER) AS sk_city,
+        us_cad.id IS NOT NULL AS is_call_center,
+        us_d.subscriptionSource AS subscription_source,
+        COALESCE(p.listing_flows_affiliate_type,
+            CASE WHEN ua.affiliateType = 'Doorman' AND u.dados_agente_id IS NOT NULL THEN 'Doorman & Agent'
+                 WHEN u.dados_agente_id IS NOT NULL THEN 'Agent'
+                 ELSE ua.affiliateType
+            END) AS affiliate_type
+    FROM potential_listings AS p
+    LEFT JOIN usuario AS us_cad
+      ON us_cad.id = p.house_usuario_que_cadastrou_id
+        AND us_cad.email ~~ '%@hargos.com.br'
+    LEFT JOIN usuario AS u
+      ON u.id = p.affiliate_id
+    LEFT JOIN user_doorman AS us_d
+      ON us_d.id_dados_afiliado = u.dados_afiliado_id
+    LEFT JOIN user_affiliate AS ua
+      ON ua.id = u.dados_afiliado_id
+    LEFT JOIN lead_city_region AS lcr
+      ON p.region_id = -1 AND p.lead_id = lcr.id_lead
 ),
-taxonomy as (
-  select
-    distinct
+taxonomy AS (
+  SELECT
+    DISTINCT
     lead_type,
     lead_origin,
     lead_tracking_medium,
     lead_tracking_source,
     affiliate_type,
     lead_referring_category,
-    is_agent_referral::integer::boolean as is_agent_referral,
-    is_branded::integer::boolean as is_branded,
-    is_ops_direct_register::integer::boolean as is_ops_direct_register,
+    is_agent_referral::INTEGER::BOOLEAN AS is_agent_referral,
+    is_branded::INTEGER::BOOLEAN AS is_branded,
+    is_ops_direct_register::INTEGER::BOOLEAN AS is_ops_direct_register,
     mkt_origin,
     mkt_channel,
     mkt_medium,
     mkt_source
-  from
+  FROM
     gsheets.taxonomy_growth
-  where
-    coalesce(mkt_medium, '') <> 'Doorman User'
-    and mkt_origin <> 'B2B'
+  WHERE
+    COALESCE(mkt_medium, '') <> 'Doorman User'
+    AND mkt_origin <> 'B2B'
 ),
-applied_taxonomy as (
-select
+applied_taxonomy AS (
+SELECT
   pl.*,
-  case
-    when pl.is_branded then 'Branded'
-    else 'Other'
-  end as mkt_branded,
-  case
-    when pl.is_b2b then 'B2B'
-    when pl.affiliate_type = 'Doorman' then 'Doorman'
-    when t.mkt_origin is null then 'Other'
-    else t.mkt_origin
-  end as mkt_origin,
-  case
-    when pl.is_b2b then null
-    when pl.affiliate_type = 'Doorman' then 'Envio'
-    when t.mkt_origin is null then 'Not Mapped'
-    else t.mkt_channel
-  end as mkt_channel,
-  case
-    when t.mkt_origin is null then 'Not Mapped'
-    when pl.tracking_platform = 'web_mobile' then 'Web Mobile'
-    when pl.tracking_platform = 'web_desktop' then 'Web Desktop'
-    else 'Not Mapped'
-  end as mkt_platform,
-  case
-    when pl.is_b2b then null
-    when pl.affiliate_type = 'Doorman' then 'Doorman User'
-    when t.mkt_origin is null then 'Not Mapped'
-    else t.mkt_medium
-  end as mkt_medium,
-  case
-    when pl.is_b2b then null
-    when pl.affiliate_type = 'Doorman' then (
-        case
-            when COALESCE(pl.subscription_source, '') in ('', 'Desconhecida')   then 'Cadastro Orgânico'
-            when pl.subscription_source = 'LeadOutbound'                        then 'Captação Call Center'
-            when pl.subscription_source = 'Trade'                               then 'Captação Offline'
-            else t.mkt_source
-        end
+  CASE
+    WHEN pl.is_branded THEN 'Branded'
+    ELSE 'Other'
+  END AS mkt_branded,
+  CASE
+    WHEN pl.is_b2b THEN 'B2B'
+    WHEN pl.affiliate_type = 'Doorman' THEN 'Doorman'
+    WHEN t.mkt_origin IS NULL THEN 'Other'
+    ELSE t.mkt_origin
+  END AS mkt_origin,
+  CASE
+    WHEN pl.is_b2b THEN NULL
+    WHEN pl.affiliate_type = 'Doorman' THEN 'Envio'
+    WHEN t.mkt_origin IS NULL THEN 'Not Mapped'
+    ELSE t.mkt_channel
+  END AS mkt_channel,
+  CASE
+    WHEN t.mkt_origin IS NULL THEN 'Not Mapped'
+    WHEN pl.tracking_platform = 'web_mobile' THEN 'Web Mobile'
+    WHEN pl.tracking_platform = 'web_desktop' THEN 'Web Desktop'
+    ELSE 'Not Mapped'
+  END AS mkt_platform,
+  CASE
+    WHEN pl.is_b2b THEN NULL
+    WHEN pl.affiliate_type = 'Doorman' THEN 'Doorman User'
+    WHEN t.mkt_origin IS NULL THEN 'Not Mapped'
+    ELSE t.mkt_medium
+  END AS mkt_medium,
+  CASE
+    WHEN pl.is_b2b THEN NULL
+    WHEN pl.affiliate_type = 'Doorman' THEN (
+        CASE
+            WHEN COALESCE(pl.subscription_source, '') IN ('', 'Desconhecida')   THEN 'Cadastro Orgânico'
+            WHEN pl.subscription_source = 'LeadOutbound'                        THEN 'Captação Call Center'
+            WHEN pl.subscription_source = 'Trade'                               THEN 'Captação Offline'
+            ELSE t.mkt_source
+        END
     )
-    when t.mkt_origin is null then 'Not Mapped'
-    else t.mkt_source
-  end as mkt_source,
-  now() as ts_load
-from potential_listings_enrich pl
-left join taxonomy t
-  on coalesce(pl.lead_type, '') = coalesce(t.lead_type, '')
-    and coalesce(pl.lead_origin, '') = coalesce(t.lead_origin, '')
-    and coalesce(pl.utm_source, '') = coalesce(t.lead_tracking_source, '')
-    and coalesce(pl.utm_medium, '') = coalesce(t.lead_tracking_medium, '')
-    and coalesce(pl.affiliate_type, '') = coalesce(t.affiliate_type, '')
-    and coalesce(pl.lead_referring_category, '') = coalesce(t.lead_referring_category, '')
-    and coalesce(pl.is_branded, false) = coalesce(t.is_branded, false)
-    and coalesce(pl.is_ops_direct_register, false) = coalesce(t.is_ops_direct_register, false)
-    and coalesce(pl.is_agent_referral, false) = coalesce(t.is_agent_referral, false)
+    WHEN t.mkt_origin IS NULL THEN 'Not Mapped'
+    ELSE t.mkt_source
+  END AS mkt_source,
+  NOW() AS ts_load
+FROM potential_listings_enrich AS pl
+LEFT JOIN taxonomy AS t
+  ON COALESCE(pl.lead_type, '') = COALESCE(t.lead_type, '')
+    AND COALESCE(pl.lead_origin, '') = COALESCE(t.lead_origin, '')
+    AND COALESCE(pl.utm_source, '') = COALESCE(t.lead_tracking_source, '')
+    AND COALESCE(pl.utm_medium, '') = COALESCE(t.lead_tracking_medium, '')
+    AND COALESCE(pl.affiliate_type, '') = COALESCE(t.affiliate_type, '')
+    AND COALESCE(pl.lead_referring_category, '') = COALESCE(t.lead_referring_category, '')
+    AND COALESCE(pl.is_branded, FALSE) = COALESCE(t.is_branded, FALSE)
+    AND COALESCE(pl.is_ops_direct_register, false) = COALESCE(t.is_ops_direct_register, FALSE)
+    AND COALESCE(pl.is_agent_referral, FALSE) = COALESCE(t.is_agent_referral, FALSE)
 ),
-applied_taxonomy_flow as (
-    select
+applied_taxonomy_flow AS (
+    SELECT
         *,
-        case
-             when lead_type = 'Proparceria'                                                 then 'Non Self-Service'
-             when lead_type = 'Marketing' and lead_origin in ('Facebook', 'Reprocessado')   then 'Non Self-Service'
-             when is_ops_direct_register                                                        then 'Non Self-Service'
-             when lead_origin = 'Landing'                                                   then 'Non Self-Service'
-             when mkt_origin in ('Owner PWA', 'Price Calculator')                           then 'Self-Service'
-             when mkt_origin in ('Indica Aí - Agents', 'Indica Aí - General')
-                  and mkt_source = 'Direct Referral'                                        then 'Self-Service'
-             when mkt_origin in ('Other', 'Not Mapped')                                     then mkt_origin
-             else 'Non Self-Service'
-        end as mkt_flow
-    from  applied_taxonomy
+        CASE
+             WHEN lead_type = 'Proparceria'                                                 THEN 'Non Self-Service'
+             WHEN lead_type = 'Marketing' AND lead_origin IN ('Facebook', 'Reprocessado')   THEN 'Non Self-Service'
+             WHEN is_ops_direct_register                                                    THEN 'Non Self-Service'
+             WHEN lead_origin = 'Landing'                                                   THEN 'Non Self-Service'
+             WHEN mkt_origin IN ('Owner PWA', 'Price Calculator')                           THEN 'Self-Service'
+             WHEN mkt_origin IN ('Indica Aí - Agents', 'Indica Aí - General')
+                  AND mkt_source = 'Direct Referral'                                        THEN 'Self-Service'
+             WHEN mkt_origin IN ('Other', 'Not Mapped')                                     THEN mkt_origin
+             ELSE 'Non Self-Service'
+        END AS mkt_flow
+    FROM  applied_taxonomy
 )
-select
+SELECT
   atax.sk_house_listing_flow,
   atax.sk_condo,
   atax.sk_lead,
@@ -147,7 +132,6 @@ select
   atax.sk_user_first_task_assignee,
   atax.sk_user_last_task_assignee,
   atax.sk_region,
-  atax.sk_first_region,
   atax.sk_city,
   atax.sk_partner,
   atax.sk_lead_date,
@@ -186,9 +170,9 @@ select
   atax.first_isales_intervention,
   atax.lead_type,
   atax.lead_origin,
-  atax.utm_source as lead_tracking_source,
-  atax.utm_medium as lead_tracking_medium,
-  atax.tracking_platform as lead_tracking_platform,
+  atax.utm_source AS lead_tracking_source,
+  atax.utm_medium AS lead_tracking_medium,
+  atax.tracking_platform AS lead_tracking_platform,
   atax.is_branded,
   atax.is_b2b,
   atax.is_doorman,
@@ -198,28 +182,31 @@ select
   atax.has_isales_intervention,
   atax.has_fup_photo_task,
   atax.is_call_center,
-  atax.reprocessed_flg as is_lead_reprocessed,
+  atax.reprocessed_flg AS is_lead_reprocessed,
   atax.affiliate_type,
   atax.is_agent_referral,
   atax.lead_referring_domain,
   atax.lead_referring_category,
   atax.subscription_source,
   atax.mkt_branded,
-  case when atax.mkt_flow = 'Self-Service' then 'Outbound'
-       when atax.mkt_flow = 'Non Self-Service' and atax.lead_origin in ('App', 'Crawling', 'Form', 'Planilha') then 'Outbound'
-       when atax.mkt_flow = 'Non Self-Service' and atax.lead_origin in ('Facebook', 'Landing', 'OwnerPWA', 'Price Suggestion') then 'Inbound'
-       when atax.mkt_flow = 'Not Mapped' then 'Not Mapped'
-       else 'Other' end as mkt_category,
+  CASE WHEN atax.mkt_flow = 'Self-Service' THEN 'Outbound'
+       WHEN atax.mkt_flow = 'Non Self-Service' AND atax.lead_origin IN ('App', 'Crawling', 'Form', 'Planilha') THEN 'Outbound'
+       WHEN atax.mkt_flow = 'Non Self-Service' AND atax.lead_origin IN ('Facebook', 'Landing', 'OwnerPWA', 'Price Suggestion') THEN 'Inbound'
+       WHEN atax.mkt_flow = 'Not Mapped' THEN 'Not Mapped'
+       ELSE 'Other' END AS mkt_category,
   atax.mkt_flow,
-  case when atax.mkt_flow = 'Non Self-Service' then 'Non Self-Service'
-       when atax.mkt_flow = 'Self-Service' and not atax.has_isales_intervention then 'Full Self-Service'
-       when atax.mkt_flow = 'Self-Service' and atax.has_isales_intervention then 'Recovered Self-Service'
-       when atax.mkt_flow in ('Not Mapped', 'Other') then atax.mkt_flow
-       else 'Not Mapped' end as mkt_completion,
+  CASE WHEN atax.mkt_flow = 'Non Self-Service' THEN 'Non Self-Service'
+       WHEN atax.mkt_flow = 'Self-Service' AND not atax.has_isales_intervention THEN 'Full Self-Service'
+       WHEN atax.mkt_flow = 'Self-Service' AND atax.has_isales_intervention THEN 'Recovered Self-Service'
+       WHEN atax.mkt_flow IN ('Not Mapped', 'Other') THEN atax.mkt_flow
+       ELSE 'Not Mapped' END AS mkt_completion,
   atax.mkt_origin,
   atax.mkt_channel,
   atax.mkt_platform,
   atax.mkt_medium,
   atax.mkt_source,
+  atax.lead_context_origin,
+  atax.listing_sale_status,
+  atax.ts_opted_out_rent,
   atax.ts_load
-from applied_taxonomy_flow atax
+FROM applied_taxonomy_flow AS atax;

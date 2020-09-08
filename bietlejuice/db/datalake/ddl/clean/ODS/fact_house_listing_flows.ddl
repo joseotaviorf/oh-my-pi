@@ -13,7 +13,6 @@ create external table datalake_clean.ods_fact_house_listing_flows (
 	sk_user_first_task_assignee string,
 	sk_user_last_task_assignee string,
 	sk_region string,
-	sk_first_region string,
 	sk_city string,
 	sk_partner string,
 	sk_lead_date string,
@@ -79,6 +78,9 @@ create external table datalake_clean.ods_fact_house_listing_flows (
 	mkt_platform string,
 	mkt_medium string,
 	mkt_source string,
+	lead_context_origin string,
+	listing_sale_status string,
+	ts_opted_out_rent string,
 	ts_load string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
