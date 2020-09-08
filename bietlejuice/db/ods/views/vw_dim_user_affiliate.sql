@@ -128,10 +128,10 @@ taxonomy AS(
 		NULLIF(tracking_medium, '')::VARCHAR tracking_medium,
 		NULLIF(tracking_source, '')::VARCHAR tracking_source,
 		NULLIF(tracking_campaign, '')::VARCHAR tracking_campaign,
-		NULLIF(mkt_origin, '')::VARCHAR mkt_origin,
-		NULLIF(mkt_channel, '')::VARCHAR mkt_channel,
-		NULLIF(mkt_medium, '')::VARCHAR mkt_medium,
-		NULLIF(mkt_source, '')::VARCHAR mkt_source
+		COALESCE(mkt_origin, '')::VARCHAR mkt_origin,
+		COALESCE(mkt_channel, '')::VARCHAR mkt_channel,
+		COALESCE(mkt_medium, '')::VARCHAR mkt_medium,
+		COALESCE(mkt_source, '')::VARCHAR mkt_source
 	FROM
 		gsheets.taxonomy_affiliates
 ),

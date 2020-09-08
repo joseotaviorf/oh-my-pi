@@ -100,10 +100,10 @@ taxonomy as (
 		tracking_medium,
 		tracking_source,
 		tracking_campaign,
-		nullif(mkt_origin, '') as mkt_origin,
-		nullif(mkt_channel, '') as mkt_channel,
-		nullif(mkt_medium, '') as mkt_medium,
-		nullif(mkt_source, '') as mkt_source
+		COALESCE(mkt_origin, '') as mkt_origin,
+		COALESCE(mkt_channel, '') as mkt_channel,
+		COALESCE(mkt_medium, '') as mkt_medium,
+		COALESCE(mkt_source, '') as mkt_source
 	from
 		datalake_raw.gsheets_taxonomy_affiliates
 ),
