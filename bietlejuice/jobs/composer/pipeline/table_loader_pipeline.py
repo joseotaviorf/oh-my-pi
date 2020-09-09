@@ -56,14 +56,17 @@ class TableLoaderPipeline(AbstractPipeline):
         """
         spark_client = SparkClient()
 
+        databases_to_be_created = [self.target_database_name, self.database_name]
+
+        spark_metastore_service = SparkMetastoreService(spark_client)
+        for database in databases_to_be_created:
+            spark_metastore_service.create_database(database)
+
         if self.spark_params:
             spark_configurator_service = SparkConfiguratorService(
                 spark_client, self.spark_params
             )
             spark_configurator_service.configure_spark_session()
-
-        spark_metastore_service = SparkMetastoreService(spark_client)
-        spark_metastore_service.create_database(self.target_database_name)
 
         conn_config = {"db": self.database_name}
         databricks_consumer = DatabricksConsumer(conn_config, spark_client)

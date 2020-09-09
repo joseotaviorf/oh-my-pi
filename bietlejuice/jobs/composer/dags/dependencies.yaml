@@ -190,6 +190,9 @@ bietlejuice.enrich_tracksale:
   - bietlejuice.tracksale:dispatch
   - bietlejuice.tracksale:answer
 
+bietlejuice.marketing_costs:
+  - bietlejuice.marketing_hub
+
 bietlejuice.regions_polygon:
   - bietlejuice.enrich_region:load-region-to-enrich
   - bietlejuice.ebdb:load-polygon-region
@@ -199,3 +202,4 @@ bietlejuice.tenant_booking_review:
   - bietlejuice.ebdb:load-booking
   - bietlejuice.insider:load-review-feature-to-datalake-clean
   - bietlejuice.insider:load-review-to-datalake-clean
+
