@@ -4,7 +4,7 @@ select
     vistoriador_id as id_user_inspector,
     contrato_id as id_contract,
     schedule_id as id_booking,
-    ref_id as id_ref,
+    bigint(ref_id) as id_ref,
     finalReportPdfId as id_final_report_pdf,
     status,
     comentario as comment,
