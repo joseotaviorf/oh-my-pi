@@ -53,7 +53,7 @@ with merge_marketing_hub_with_xplenty as (
 )
 
 select
-    concat(id_account, '-', id_campaign, '-', campaign_name) as id,
+    concat(id_external_customer, '-', id_campaign, '-', campaign_name) as id,
     *
 from
     merge_marketing_hub_with_xplenty

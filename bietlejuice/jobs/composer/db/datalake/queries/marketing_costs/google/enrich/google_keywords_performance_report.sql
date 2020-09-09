@@ -2,7 +2,7 @@ with merge_marketing_hub_with_xplenty as (
     select distinct
         bigint(keyword_id) as id,
         bigint(account_id) as id_external_customer,
-        bigint(adgroup_id) as id_adgroup,
+        bigint(adgroup_id) as id_ad_group,
         bigint(campaign_id) as id_campaign,
         campaign_name,
         adgroup_name as ad_group_name,
@@ -57,7 +57,7 @@ with merge_marketing_hub_with_xplenty as (
 )
 
 select
-    concat(id_account, '-', id_keyword, '-', campaign_name) as id,
+    concat(id_external_customer, '-', id, '-', campaign_name) as id,
     *
 from
     merge_marketing_hub_with_xplenty
