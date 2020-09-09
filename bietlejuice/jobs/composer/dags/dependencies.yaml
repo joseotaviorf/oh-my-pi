@@ -134,6 +134,10 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb:load-restriction-type
   - bietlejuice.ebdb:load-house-registration-status
 
+bietlejuice.enrich_ebdb_listing_jobs:
+  - bietlejuice.ebdb:load-inspection
+  - bietlejuice.ebdb:load-inspection-item
+
 bietlejuice.enrich_ebdb_proposal:
   - bietlejuice.ebdb:load-pre-proposal
   - bietlejuice.ebdb:load-pre-proposal-aud
