@@ -2,7 +2,7 @@
   select
     t.*,
     coalesce(ec.id, ev.id_contract, -1) as sk_contract,
-    coalesce(ev.id_inspection, -1) as sk_inspection
+    coalesce(ev.id, -1) as sk_inspection
   from tasks t
   join datalake_clean.crm_tasks ct
     on t.sk_task = trim(ct.id)
@@ -11,7 +11,7 @@
       and try_cast(try_cast(ct.id_origin as decimal) as bigint) = ec.id
   left join datalake_ebdb_clean_prod.inspection ev
     on trim(ct.origin) = 'Vistoria'
-      and try_cast(try_cast(ct.id_origin as decimal) as bigint) = ev.id_inspection
+      and try_cast(try_cast(ct.id_origin as decimal) as bigint) = ev.id
 ),
 contract_house_listing as (
   select

@@ -14,7 +14,7 @@
         and try_cast(try_cast(ct.id_origin as decimal) as bigint) = eo.id
   left join datalake_ebdb_clean_prod.inspection ev
     on trim(ct.origin) = 'Vistoria'
-        and try_cast(try_cast(ct.id_origin as decimal) as bigint) = ev.id_inspection
+        and try_cast(try_cast(ct.id_origin as decimal) as bigint) = ev.id
 ),
 contract_house_listing as (
   select
