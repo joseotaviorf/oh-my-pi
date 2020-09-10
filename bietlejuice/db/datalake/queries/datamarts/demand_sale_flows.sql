@@ -43,6 +43,8 @@ with taxonomy_demand as (
         	json_extract_scalar(user_properties, '$["utm_source"]') as utm_source,
     		json_extract_scalar(user_properties, '$["utm_medium"]') as utm_medium,
     		json_extract_scalar(user_properties, '$["utm_campaign"]') as utm_campaign,
+    		json_extract_scalar(user_properties, '$["utm_term"]') as utm_term,
+    		json_extract_scalar(user_properties, '$["utm_content"]') as utm_content,
     		case 
     	    		when (UPPER(json_extract_scalar(user_properties, '$["utm_campaign"]')) like '%BRANDED%'
     			or UPPER(json_extract_scalar(user_properties, '$["utm_campaign"]')) like '%INSTITUCIONAL%')
@@ -67,6 +69,8 @@ with taxonomy_demand as (
         	json_extract_scalar(user_properties, '$["utm_source"]') as utm_source,
     		json_extract_scalar(user_properties, '$["utm_medium"]') as utm_medium,
     		json_extract_scalar(user_properties, '$["utm_campaign"]') as utm_campaign,
+    		json_extract_scalar(user_properties, '$["utm_term"]') as utm_term,
+    		json_extract_scalar(user_properties, '$["utm_content"]') as utm_content,
     		case 
     	    		when (UPPER(json_extract_scalar(user_properties, '$["utm_campaign"]')) like '%BRANDED%'
     			or UPPER(json_extract_scalar(user_properties, '$["utm_campaign"]')) like '%INSTITUCIONAL%')
@@ -107,6 +111,8 @@ with taxonomy_demand as (
 	    td.mkt_source,
 	    td.mkt_platform,
 	    evt.utm_campaign,
+	    evt.utm_term,
+	    evt.utm_content,
 		evt.event_timestamp
 	from events_raw_offer evt
 	left join taxonomy_demand td
@@ -130,6 +136,8 @@ with taxonomy_demand as (
 	    td.mkt_source,
 	    td.mkt_platform,
 	    evt.utm_campaign,
+	    evt.utm_term,
+	    evt.utm_content,
 		evt.event_timestamp
 	from events_raw_tta evt
 	left join taxonomy_demand td
@@ -153,6 +161,8 @@ with taxonomy_demand as (
 	    a.mkt_source,
 	    a.mkt_platform,
 	    a.utm_campaign,
+	    a.utm_term,
+	    a.utm_content,
 	    date_parse(nullif(a.dt_created, ''), '%Y-%m-%d %H:%i:%s') as event_timestamp
 	from datalake_clean.ods_dim_booking a
 	where
@@ -175,6 +185,8 @@ with taxonomy_demand as (
 	    sf.mkt_source,
 	    sf.mkt_platform,
 	    sf.utm_campaign,
+	    sf.utm_term,
+	    sf.utm_content,
 	    sf.event_timestamp,
 	    row_number() over(partition by sf.sale_flow order by sf.event_timestamp) as flow_order
 	from sf_events sf
@@ -546,6 +558,8 @@ select
 	coalesce(mkt.utm_source, '') as utm_source,
 	coalesce(mkt.utm_medium, '') as utm_medium,
 	coalesce(mkt.utm_campaign, '') as utm_campaign,
+	coalesce(mkt.utm_term, '') as utm_term,
+	coalesce(mkt.utm_content, '') as utm_content,
 	coalesce(mkt.flg_branded, False) as flg_branded,
 	case
 	    when (lower(mkt.utm_campaign) like '%sale%'
