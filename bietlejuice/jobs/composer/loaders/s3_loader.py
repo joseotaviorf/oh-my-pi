@@ -145,7 +145,14 @@ class S3Loader:
 
     @logger(exclude="df")
     def load_df(
-        self, df, s3_path, format_options, partitions, is_incremental, **options
+        self,
+        df,
+        s3_path,
+        format_options,
+        partitions,
+        is_incremental,
+        write_mode="overwrite",
+        **options
     ):
         """
         Loads the content of an Spark DataFrame into a table in S3 overwriting the
@@ -164,11 +171,15 @@ class S3Loader:
         :param df: a dataframe
         :type df: SparkDataFrame
         :param s3_path: path where the table will be put or updated i.e. database_location + table_name
-        :type df: string
+        :type s3_path: string
         :param format_options: the file format used to save
         :type format_options: str
         :param partitions: names of partitioning columns
         :type partitions: list
+        :param is_incremental: flag that indicates if load is part of an incremental pipeline
+        :type is_incremental: bool
+        :param write_mode: specifies how to handle existing data if present (e.g. "append" or "overwrite")
+        :type write_mode: str
         :param options: all other string options
         :type options: keyworded, variable-length argument list
         """
@@ -191,7 +202,7 @@ class S3Loader:
                 )
 
         df_writer = (
-            df.write.mode("overwrite")
+            df.write.mode(write_mode)
             .format(format_options)
             .option("maxRecordsPerFile", self.MAX_RECORDS_PER_FILE)
         )
