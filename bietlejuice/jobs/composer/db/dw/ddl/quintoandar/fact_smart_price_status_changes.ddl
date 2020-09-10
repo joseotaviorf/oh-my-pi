@@ -6,10 +6,12 @@ create table quintoandar.fact_smart_price_status_changes (
     sk_status_ended_date bigint,
     status varchar,
     status_change_reason varchar,
-    is_enabled boolean,
     operation_mode varchar,
+    is_enabled boolean,
     days_in_status integer,
     ts_status_started timestamp,
     ts_status_ended timestamp,
     ts_load timestamp
 );
+
+ALTER TABLE quintoandar.fact_smart_price_status_changes owner to airflow;
