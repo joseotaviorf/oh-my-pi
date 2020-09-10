@@ -111,14 +111,11 @@ def apply_migration_changes(yaml_as_dict, dw_dict):
     return dw_dict
 
 
-print('Checking git differences...')
-output = get_git_diff()
-
-if not re.findall(INCLUDE_PATHS, output):
-    print('Skipping DDL comparison check...')
-else:
-    print('Running DDL comparison check...')
-    # fetch all files in new schema
+def compare_ddls():
+    """
+    Compares all DDLs from janus to its respective table in prod
+    :return: None
+    """
     for file_name in os.listdir('{}/../{}'.format(ABS_PATH, BASE_JANUS_DDLS)):
         print('Opening janus file...')
         table_name = file_name.split('.')[-2]
@@ -152,3 +149,15 @@ else:
                              .format(table_schema, table_name))
         print('table={}, msg=Validation success! DDLs matching according to migration '
               'file!'.format(table_name))
+
+
+if __name__ == '__main__':
+    print('Checking git differences...')
+    git_diffs = get_git_diff()
+
+    if not re.findall(INCLUDE_PATHS, git_diffs):
+        print('Skipping DDL comparison check...')
+    else:
+        print('Running DDL comparison check...')
+        # fetch all files in new schema
+        compare_ddls()
