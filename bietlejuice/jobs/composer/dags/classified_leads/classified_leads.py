@@ -8,6 +8,9 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
+from bietlejuice.jobs.composer.services import FileService
+from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 
 
 SOURCE = "classified_leads"
@@ -19,6 +22,7 @@ ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
 DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
+SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base"
 
 # spark and databricks vars
 SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/"
@@ -70,4 +74,24 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-create_cluster_task >> classified_leads_to_datalake_raw_task >> terminate_cluster_task
+clean_sub_dag = DatalakeSubDAG(
+    dag_id=DAG_ID,
+    start_date=MAIN_START_DATE,
+    env=ENV,
+    datalake_bucket=DATALAKE_BUCKET,
+    database_base_name=SOURCE,
+    relative_query_path=SOURCE,
+    spark_job_paths=SPARK_JOBS_PATH,
+    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
+    layer=LayerEnum.CLEAN,
+)
+
+file_list = FileService.list_sql_files_without_extension_from_layer(
+    SOURCE, LayerEnum.CLEAN.value
+)
+
+clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(dag, file_list)
+
+create_cluster_task >> classified_leads_to_datalake_raw_task >> list(
+    clean_sub_dags.values()
+) >> terminate_cluster_task
