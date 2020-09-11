@@ -183,9 +183,6 @@ def clean_sub_dag(sub_dag_name):
     return local_dag
 
 
-calls_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-    dag=dag, sub_dag_name="calls", sub_dag_func=sub_dag
-)
 queues_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
     dag=dag, sub_dag_name="queues", sub_dag_func=sub_dag
 )
@@ -194,6 +191,4 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-create_cluster_task.set_downstream([calls_sub_dag_task, queues_sub_dag_task])
-
-terminate_cluster_task.set_upstream([calls_sub_dag_task, queues_sub_dag_task])
+create_cluster_task >> queues_sub_dag_task >> terminate_cluster_task
