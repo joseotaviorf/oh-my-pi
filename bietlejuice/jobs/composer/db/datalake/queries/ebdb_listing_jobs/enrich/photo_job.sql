@@ -30,7 +30,7 @@ with cancellation_info as (
         user.id as id_user_who_canceled,
         user.name as user_who_canceled_name,
         user.email as user_who_canceled_email,
-        coalesce(f.reason_of_change, cr.photo_shoot_schedule_reason) as cancellation_reason,
+        coalesce(pj.reason_of_change, cr.photo_shoot_schedule_reason) as cancellation_reason,
         ure.ts_revision
     from datalake_ebdb_clean.photographer_job pj
     left join cancelled_jobs_max_rev cjmr
