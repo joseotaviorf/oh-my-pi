@@ -135,8 +135,14 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb:load-house-registration-status
 
 bietlejuice.enrich_ebdb_listing_jobs:
+  - bietlejuice.ebdb:load-house-registration-status-aud
   - bietlejuice.ebdb:load-inspection
   - bietlejuice.ebdb:load-inspection-item
+  - bietlejuice.ebdb:load-photographer
+  - bietlejuice.ebdb:load-photographer-job
+  - bietlejuice.ebdb:load-photographer-job-aud
+  - bietlejuice.ebdb:load-user
+  - bietlejuice.enrich_ebdb_user_revision_entity
 
 bietlejuice.enrich_ebdb_proposal:
   - bietlejuice.ebdb:load-pre-proposal

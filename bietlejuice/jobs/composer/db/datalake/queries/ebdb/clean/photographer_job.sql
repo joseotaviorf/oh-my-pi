@@ -11,6 +11,7 @@ select
   nomecontatosessaofotos as photo_session_contact_name,
   photoSender as photo_sender_user_type,
   status,
+  motivoAlteracao as reason_of_change,
   motivocancelamentojob as cancellation_reason,
   textomotivocancelamento as cancellation_reason_text,
   scorecorretude as correctness_score,
