@@ -117,11 +117,15 @@ if __name__ == "__main__":
     s3_loader = S3Loader()
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
-    while True:
+    subscription_is_empty = False
+    while not subscription_is_empty:
         messages, ack_ids = get_messages_in_chunks(pubsub_consumer)
 
         if not messages:
             break
+
+        if len(messages) < CHUNK_SIZE:
+            subscription_is_empty = True
 
         messages = JsonService.transform_json_list_terms(messages)
         df = spark_client.create_dataframe(messages)
