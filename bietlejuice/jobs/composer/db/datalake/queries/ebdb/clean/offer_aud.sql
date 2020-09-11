@@ -12,14 +12,14 @@ SELECT
   originalIptu as original_iptu,
   originalRent as original_rent,
   rent,
-  "status",
+  status,
   turn,
   expirationDate as ts_expiration,
   iteration,
   rejectionReason as rejection_reason,
   status_MOD as MOD_status,
   turn_MOD as MOD_turn,
-  "type",
+  type,
   godfatherUpdatedAt as ts_godfather_updated,
   residentName as resident_name
 FROM datalake_ebdb_raw.Offer_AUD

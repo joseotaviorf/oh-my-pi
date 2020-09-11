@@ -10,7 +10,7 @@ SELECT
   originalIptu as original_iptu,
   originalRent as original_rent,
   rent,
-  "status",
+  status,
   turn,
   rejectionReason as rejection_reason,
   criadoEm as ts_created,
