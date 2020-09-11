@@ -8,6 +8,9 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
+from bietlejuice.jobs.composer.base.pipeline import LayerEnum
+from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
+from bietlejuice.jobs.composer.services import FileService
 
 # variable definitions
 SOURCE = "firestore"
@@ -23,6 +26,7 @@ MAIN_SCHEDULE_INTERVAL = "30 3 * * *"
 # s3 paths setup
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 SPARK_JOBS_PATH = "{}/spark_jobs/{}/".format(S3_PREFIX, SOURCE)
+BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
     Variable.get("databricks_s3_bucket"), DAG_ID
 )
@@ -118,6 +122,26 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
+clean_sub_dag = DatalakeSubDAG(
+    dag_id=DAG_ID,
+    env=ENV,
+    datalake_bucket=DATALAKE_BUCKET,
+    layer=LayerEnum.CLEAN,
+    database_base_name=SOURCE,
+    relative_query_path=SOURCE,
+    spark_job_paths=BASE_SPARK_JOBS_PATH,
+    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
+    start_date=MAIN_START_DATE,
+)
+
+file_list = FileService.list_sql_files_without_extension_from_layer(
+    SOURCE, LayerEnum.CLEAN.value
+)
+
+clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(
+    dag, file_list, is_incremental=True, partitions=["year", "month", "day"]
+)
+
 # Create Raw Tasks
 for collection, date_field in SOURCE_COLLECTIONS.items():
     collection_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
@@ -130,4 +154,6 @@ for collection, date_field in SOURCE_COLLECTIONS.items():
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
         start_date=MAIN_START_DATE,
     )
-    create_cluster_task >> collection_sub_dag_task >> terminate_cluster_task
+    create_cluster_task >> collection_sub_dag_task >> clean_sub_dags.pop(
+        collection
+    ) >> terminate_cluster_task
