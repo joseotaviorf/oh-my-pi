@@ -185,6 +185,13 @@ bietlejuice.enrich_nps_answer_drivers:
   - bietlejuice.ebdb:load-contract
   - bietlejuice.enrich_ebdb_listing:load-house-listing-to-enrich
 
+bietlejuice.enrich_offer:
+  - bietlejuice.ebdb:load-offer
+  - bietlejuice.ebdb:load-offer-aud
+  - bietlejuice.enrich_ebdb_user_revision_entity:load-user-revision-entity-to-enrich
+  - bietlejuice.godfather:load-business-offer
+  - bietlejuice.firestore:load-offers-to-clean
+
 bietlejuice.enrich_proposal:
   - bietlejuice.ebdb:load-proposal
   - bietlejuice.ebdb:load-proposal-aud
