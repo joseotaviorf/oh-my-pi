@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from unidecode import unidecode
 import re
 from pyspark.sql.functions import lit
@@ -118,16 +118,16 @@ class GoogleAdsRawBuilder:
     def __split_str(self, str, split_condition):
         return [x for x in str.split(split_condition) if x != ""]
 
-    def __get_date(self, str):
+    def __get__path_date(self, str):
         return re.search("dt=(.*?)/", str).group(1)
 
-    def __format_date(self, date):
+    def __format_path_date(self, date):
         formatted_date = datetime.strptime(date, "%d-%m-%Y").strftime("%Y-%m-%d")
         return formatted_date
 
-    def __get_yesterdays_date(self, date):
-        yesterdays_date = datetime.strptime(date, "%Y-%m-%d").date() - timedelta(days=1)
-        return yesterdays_date
+    def __parse_execution_date(self, date):
+        parsed_date = datetime.strptime(date, "%Y-%m-%d").date()
+        return parsed_date
 
     def __filter_for_full_file_paths(self, file_paths):
         filtered_file_paths = [
@@ -137,17 +137,15 @@ class GoogleAdsRawBuilder:
         ]
         return filtered_file_paths
 
-    def __file_is_from_yesterday(self, file_path, execution_date):
-        todays_date = self.__get_date(file_path)
-        formatted_date = self.__format_date(todays_date)
-        yesterdays_date = self.__get_yesterdays_date(execution_date)
-        return formatted_date == str(yesterdays_date)
+    def __file_is_from_today(self, file_path, execution_date):
+        path_date = self.__get__path_date(file_path)
+        formatted_path_date = self.__format_path_date(path_date)
+        parsed_execution_date = self.__parse_execution_date(execution_date)
+        return formatted_path_date == str(parsed_execution_date)
 
     def __filter_for_execution_date(self, file_paths):
         filtered_file_paths = [
-            x
-            for x in file_paths
-            if self.__file_is_from_yesterday(x, self.execution_date)
+            x for x in file_paths if self.__file_is_from_today(x, self.execution_date)
         ]
         return filtered_file_paths
 
@@ -191,7 +189,7 @@ class GoogleAdsRawBuilder:
     def __get_partition_information(self, csv_file, s3_file_path):
         account_name = self.__get_formatted_account_name(csv_file.first().Account)
         campaign_name = self.__get_formatted_campaign_name(csv_file.first().Campaign)
-        dt = self.__get_date(s3_file_path)
+        dt = self.__get__path_date(s3_file_path)
         return [account_name, campaign_name, dt]
 
     def __check_validity_of_csv(self, csv_file):
