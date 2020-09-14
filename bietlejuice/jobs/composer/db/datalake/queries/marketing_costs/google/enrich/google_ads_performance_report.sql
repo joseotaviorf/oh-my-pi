@@ -17,7 +17,7 @@ with merge_marketing_hub_with_xplenty as (
         image_creative_name as account_descriptive_name,
         account_name,
         float(absolute_top_impression_percentage) as absolute_top_impression_percentage,
-        null as report_type,
+        'ads_performance_report' as report_type,
         acc,
         campaign_name,
         date as load_date,

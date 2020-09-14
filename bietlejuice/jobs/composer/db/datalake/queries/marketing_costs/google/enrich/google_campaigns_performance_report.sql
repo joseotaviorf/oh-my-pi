@@ -14,7 +14,7 @@ with merge_marketing_hub_with_xplenty as (
         labels,
         float(absolute_top_impression_percentage) as absolute_top_impression_percentage,
         null as search_impression_share,
-        null as report_type,
+        'campaigns_performance_report' as report_type,
         acc,
         date as load_date,
         date(dt_created) as dt_created,
