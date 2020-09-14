@@ -25,7 +25,7 @@ SELECT
     rejection_reason,
     code,
     ts_approved,
-    ts_expirated,
+    ts_expired,
     ts_visualized,
     mod_ts_visualized,
     has_rental_accepted,

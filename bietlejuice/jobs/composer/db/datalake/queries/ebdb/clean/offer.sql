@@ -16,7 +16,7 @@ SELECT
   criadoEm as ts_created,
   atualizadoEm as ts_updated,
   iteration,
-  expirationDate as ts_expirated,
+  expirationDate as ts_expired,
   type,
   godfatherUpdatedAt as ts_updated_godfather,
   residentName as resident_name,

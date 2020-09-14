@@ -20,7 +20,7 @@ SELECT
     condominioOriginal AS original_condo,
     iptuOriginal AS original_iptu,
     homeOwnerInsuranceOriginalValue AS original_home_insurance,
-    expirationDate AS ts_expirated,
+    expirationDate AS ts_expired,
     lastEdicaoUpdateDate AS ts_last_edition_updated,
     rejectionReason AS rejection_reason,
     code,
