@@ -47,7 +47,11 @@ SUBSCRIPTIONS = [
     {
         "subscription_id": "domainSaleOffer-audit-data-engineering-subscription",
         "table_name": "sale_offer",
-    }
+    },
+    {
+        "subscription_id": "mondayBoard-audit-data-engineering-subscription",
+        "table_name": "monday",
+    },
 ]
 
 
