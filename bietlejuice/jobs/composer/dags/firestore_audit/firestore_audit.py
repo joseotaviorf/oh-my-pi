@@ -9,7 +9,9 @@ from airflow.operators.quintoandar_databricks import (
 )
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
-
+from bietlejuice.jobs.composer.base.pipeline import LayerEnum
+from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
+from bietlejuice.jobs.composer.services import FileService
 
 # ENV setup
 ENV = Variable.get("environment")
@@ -27,6 +29,8 @@ S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
 LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{DAG_ID}"
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{DAG_ID}/"
+BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
+ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 
 # cluster setup
 CLUSTER_DESCRIPTION = Variable.get(
@@ -73,6 +77,25 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     libraries=LIBRARIES_DESCRIPTION,
 )
 
+clean_sub_dag = DatalakeSubDAG(
+    dag_id=f"bietlejuice.{DAG_ID}",
+    start_date=MAIN_START_DATE,
+    env=ENV,
+    datalake_bucket=DATALAKE_BUCKET,
+    layer=LayerEnum.CLEAN,
+    database_base_name=SOURCE,
+    relative_query_path=DAG_ID,
+    spark_job_paths=BASE_SPARK_JOBS_PATH,
+    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
+)
+
+file_list = FileService.list_sql_files_without_extension_from_layer(
+    DAG_ID, LayerEnum.CLEAN.value
+)
+clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(
+    dag, file_list, is_incremental=True, partitions=["year", "month", "day"]
+)
+
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
@@ -80,10 +103,10 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 # Creating sub dags
 for subscription in SUBSCRIPTIONS:
 
-    # TODO: Migrate this logic to a separate function when we have the Clean Spark Job (use Jira DAG as template)
+    slugged_table_name = subscription["table_name"].replace("_", "-")
 
     load_to_raw_task = QuintoAndarDatabricksSubmitRunOperator(
-        task_id=f"load-{subscription['table_name']}-into-raw",
+        task_id=f"load-{slugged_table_name}-into-raw",
         dag=dag,
         json={
             "spark_python_task": {
@@ -100,4 +123,7 @@ for subscription in SUBSCRIPTIONS:
             }
         },
     )
-    create_cluster_task >> load_to_raw_task >> terminate_cluster_task
+
+    create_cluster_task >> load_to_raw_task >> clean_sub_dags.pop(
+        subscription["table_name"]
+    ) >> terminate_cluster_task
