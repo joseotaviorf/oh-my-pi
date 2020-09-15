@@ -3,7 +3,7 @@ create table if not exists tracksale.fact_nps_dispatches (
     sk_nps_dispatch varchar(500) primary key,
     sk_nps_dispatch_lot varchar(20),
     sk_nps_campaign integer,
-    sk_nps_customer varchar(200),
+    sk_nps_customer varchar(300),
     sk_user bigint,
     sk_personal_document varchar(25),
     sk_nps_answer bigint,

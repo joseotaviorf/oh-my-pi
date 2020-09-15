@@ -1,6 +1,6 @@
 drop table if exists tracksale.fact_nps_customer_metrics;
 create table if not exists tracksale.fact_nps_customer_metrics (
-    sk_nps_customer varchar(200) primary key,
+    sk_nps_customer varchar(300) primary key,
 	sk_user bigint,
 	sk_personal_document varchar(25),
 	last_shift_type varchar(50),
