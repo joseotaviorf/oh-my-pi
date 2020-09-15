@@ -22,7 +22,7 @@ with merge_marketing_hub_with_xplenty as (
     from 
         datalake_xplenty_raw.google_campaigns_performance_report
     where
-        date = date('{year}-{month}-{day}')
+        dt_created = date('{year}-{month}-{day}')
 
     union all
 

@@ -3,7 +3,7 @@ SELECT
     bigint(externalcustomerid) as id_external_customer,
     bigint(adgroupid) as id_ad_group,
     bigint(campaignid) as id_campaign,
-    campaignname as campaign_name,
+    campaign_name,
     adgroupname as ad_group_name,
     smallint(clicks) as clicks,
     double(cost) as cost,
@@ -23,4 +23,4 @@ SELECT
 FROM 
     datalake_marketing_hub_raw.keywords_performance_report
 WHERE
-    date = date('{year}-{month}-{day}')
+    from_unixtime(to_unix_timestamp(dt, 'dd-MM-yyyy'), 'yyyy-MM-dd') = date('{year}-{month}-{day}')
