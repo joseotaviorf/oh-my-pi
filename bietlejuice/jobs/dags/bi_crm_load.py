@@ -316,6 +316,17 @@ workflows_clean_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     provide_context=True
 )
 
+clean_workflow_transitions_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_name='incremental_load_clean_workflow_transitions_table',
+    python_exec=exec_workflows_method,
+    python_method={
+        'move_to_clean': 'move_workflow_transitions_to_clean',
+        'upsert_clean_partition': 'upsert_workflow_transitions_partition'
+    },
+    sub_dag_func=incremental_clean_sub_dag,
+)
+
 task_status_histories_raw_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_name='incremental_load_raw_task_status_histories',
@@ -351,7 +362,7 @@ xcom_crm_load_task = BaseDAG.build_python_operator(
 # flow
 tasks_raw_sub_dag_task >> tasks_clean_sub_dag_task >> [clean_tasks_resolution_sub_dag_task,
                                                        clean_task_resolution_history_sub_dag_task]
-workflows_raw_sub_dag_task >> workflows_clean_sub_dag_task
+workflows_raw_sub_dag_task >> workflows_clean_sub_dag_task >> clean_workflow_transitions_sub_dag_task
 
 airflow_helpers.chain(
     task_status_histories_raw_sub_dag_task,
@@ -360,6 +371,7 @@ airflow_helpers.chain(
 )
 
 xcom_crm_load_task.set_upstream([clean_tasks_resolution_sub_dag_task,
+                                 clean_workflow_transitions_sub_dag_task,
                                  workgroups_sub_dag_task,
                                  task_titles_sub_dag_task])
 

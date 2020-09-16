@@ -18,7 +18,10 @@ logger = QuintoAndarLogger("CRMWorkflows")
 
 
 class CRMWorkflows(object):
-    BUCKET_FOLDER_SUFFIXES = "crm/workflows"
+    BUCKET_FOLDER_SUFFIXES = {
+        "workflows": "crm/workflows",
+        "workflow_transitions": "crm/workflow_transitions"
+    }
     S3_FILE_NAME = "data"
     TABLE_PARTITION_PARAM = "__PARTITION_DATE__"
 
@@ -83,7 +86,7 @@ class CRMWorkflows(object):
 
         file_path = "{}/{}/dt={}/{}.gz".format(
             bucket_type,
-            CRMWorkflows.BUCKET_FOLDER_SUFFIXES,
+            CRMWorkflows.BUCKET_FOLDER_SUFFIXES["workflows"],
             self.partition_date,
             CRMWorkflows.S3_FILE_NAME
         )
@@ -91,19 +94,11 @@ class CRMWorkflows(object):
         try:
             self.s3_resource.Object(self.s3_bucket, file_path).load()
         except ClientError as e:
-            if e.response["Error"]["Code"] == "404":
+            if e.response["Error"]["Code"] in ["404", "403"]:
                 return False  # file does not exist
             raise  # something else had gone wrong
 
         return True
-
-    @logger
-    def upsert_partition(self, bucket_type, **kwargs):
-        self._upsert_partition(
-            bucket_type=bucket_type,
-            bucket_folder_suffix=CRMWorkflows.BUCKET_FOLDER_SUFFIXES,
-            table_name="crm_workflows",
-        )
 
     @logger
     def move_to_clean(self, sql_file_name="create_workflows_table.sql", **kwargs):
@@ -125,10 +120,51 @@ class CRMWorkflows(object):
         )
 
         self._move_to_clean(
-            bucket_folder_suffix=CRMWorkflows.BUCKET_FOLDER_SUFFIXES,
+            bucket_folder_suffix=CRMWorkflows.BUCKET_FOLDER_SUFFIXES["workflows"],
             sql_file_name=sql_file_name,
             r_cols=_cols,
             c_cols=_cols
+        )
+
+    @logger
+    def upsert_partition(self, bucket_type, **kwargs):
+        self._upsert_partition(
+            bucket_type=bucket_type,
+            bucket_folder_suffix=CRMWorkflows.BUCKET_FOLDER_SUFFIXES["workflows"],
+            table_name="crm_workflows",
+        )
+
+    @logger
+    def move_workflow_transitions_to_clean(self, sql_file_name="create_workflow_transitions_table.sql", **kwargs):
+        _cols = OrderedDict(
+            [
+                ("id", str),
+                ("id_workflow", str),
+                ("id_task_from", str),
+                ("id_task_to", str),
+                ("assignment_method", str),
+                ("definition_task_from", str),
+                ("definition_task_to", str),
+                ("is_end_of_workflow", bool),
+                ("context", str),
+                ("ts_transitioned", str)
+            ]
+        )
+
+        self._move_to_clean(
+            bucket_folder_suffix=CRMWorkflows.BUCKET_FOLDER_SUFFIXES["workflow_transitions"],
+            queries_folder_suffix=CRMWorkflows.BUCKET_FOLDER_SUFFIXES["workflows"],
+            sql_file_name=sql_file_name,
+            r_cols=_cols,
+            c_cols=_cols
+        )
+
+    @logger
+    def upsert_workflow_transitions_partition(self, bucket_type, **kwargs):
+        self._upsert_partition(
+            bucket_type=bucket_type,
+            bucket_folder_suffix=CRMWorkflows.BUCKET_FOLDER_SUFFIXES["workflow_transitions"],
+            table_name="workflow_transitions",
         )
 
     @logger
@@ -157,7 +193,7 @@ class CRMWorkflows(object):
                 fp.write("\n")
 
         file_suffix = "raw/{}/dt={}/{}.gz".format(
-            CRMWorkflows.BUCKET_FOLDER_SUFFIXES,
+            CRMWorkflows.BUCKET_FOLDER_SUFFIXES["workflows"],
             self.partition_date,
             CRMWorkflows.S3_FILE_NAME,
         )
