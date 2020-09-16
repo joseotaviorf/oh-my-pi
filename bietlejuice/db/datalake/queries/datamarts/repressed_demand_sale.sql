@@ -89,14 +89,12 @@ with house_available_hours as (
 		    when dr.region_code = 'RIO 09' then 'RIO 08 FS' 
 		    when dr.region_code = 'RIO 10' then 'RIO 07 FS'
 		    when dr.region_code = 'RIO 11' then 'RIO 09 FS'
-		    else NULL 
+		    else dr.region_code 
 		end as region_code,
 		dr.city_group,
-		dr.city_name,
-		dr.name as neighborhood
+		dr.city_name
 	from datalake_clean.ods_dim_region dr
 	where dr.region_code != '-1'
-	    and dr.city_name IN ('São Paulo', 'Rio de Janeiro')
 )
 , slot_series as (
 	select slot 
@@ -108,7 +106,6 @@ with house_available_hours as (
 	r.region_code,
 	r.city_name,
 	r.city_group as city_group,
-	r.neighborhood,
 	ds.date,
 	ds.week_start,
 	ss.slot,
@@ -333,7 +330,6 @@ select
 	d.region_code,
     d.city_name,
     d.city_group as city_group,
-    d.neighborhood,
     cast(d.date as timestamp) as date,
     d.week_start,
     d.slot,
@@ -362,4 +358,4 @@ left join encaixes_agg enc
     and enc.slot = d.slot
     and faixa is not null
     and coalesce(bk.slot, enc.slot) is not null
-group by 1, 2, 3, 4, 5, 6, 7, 8, 9
+group by 1, 2, 3, 4, 5, 6, 7, 8
