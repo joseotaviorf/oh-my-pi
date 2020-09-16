@@ -4,7 +4,7 @@ with merge_marketing_hub_with_xplenty as (
         bigint(account_id) as id_external_customer,
         bigint(adgroup_id) as id_ad_group,
         bigint(campaign_id) as id_campaign,
-        campaign_name,
+        replace(lcase(campaign_name), '.', '_') as campaign_name,
         adgroup_name as ad_group_name,
         smallint(clicks) as clicks,
         double(cost) as cost,

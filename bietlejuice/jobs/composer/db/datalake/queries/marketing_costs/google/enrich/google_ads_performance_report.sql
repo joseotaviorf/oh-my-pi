@@ -19,7 +19,7 @@ with merge_marketing_hub_with_xplenty as (
         float(absolute_top_impression_percentage) as absolute_top_impression_percentage,
         'ads_performance_report' as report_type,
         acc,
-        campaign_name,
+        replace(lcase(campaign_name), '.', '_') as campaign_name,
         date as load_date,
         date(dt_created) as dt_created,
         date(date) as dt_load
