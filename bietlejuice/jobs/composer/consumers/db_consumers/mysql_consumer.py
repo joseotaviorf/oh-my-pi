@@ -183,9 +183,14 @@ class MySqlConsumer(DBConsumer):
                 k.table_schema and t.table_name = k.table_name
                 left JOIN information_schema.STATISTICS s
                 on s.TABLE_NAME = t.TABLE_NAME and s.COLUMN_NAME = k.COLUMN_NAME
+                join information_schema.COLUMNS c
+                on c.TABLE_SCHEMA = t.TABLE_SCHEMA
+                and c.TABLE_NAME = t.TABLE_NAME
+                and c.COLUMN_NAME = k.COLUMN_NAME
             WHERE
                 s.INDEX_NAME = 'PRIMARY'
                 AND t.constraint_type='PRIMARY KEY'
+                AND c.DATA_TYPE <> 'varchar'
                 AND t.table_schema='{db}'
                 AND t.table_name = '{table}'
             GROUP by
