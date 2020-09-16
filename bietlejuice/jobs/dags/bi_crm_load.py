@@ -325,6 +325,7 @@ clean_workflow_transitions_sub_dag_task = BaseSubDag.get_sub_dag_operator(
         'upsert_clean_partition': 'upsert_workflow_transitions_partition'
     },
     sub_dag_func=incremental_clean_sub_dag,
+    provide_context=True,
 )
 
 task_status_histories_raw_sub_dag_task = BaseSubDag.get_sub_dag_operator(
