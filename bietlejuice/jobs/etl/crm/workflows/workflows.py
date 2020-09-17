@@ -164,7 +164,7 @@ class CRMWorkflows(object):
         self._upsert_partition(
             bucket_type=bucket_type,
             bucket_folder_suffix=CRMWorkflows.BUCKET_FOLDER_SUFFIXES["workflow_transitions"],
-            table_name="workflow_transitions",
+            table_name="crm_workflow_transitions",
         )
 
     @logger
