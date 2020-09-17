@@ -40,7 +40,7 @@ select
     coalesce(cast(date_format(ad.ts_doorman_joined, 'yyyyMMdd') as bigint), -1) as sk_doorman_joined_date,
     u.id as id_user,
     u.id_agent,
-    u.id_photographer,
+    u.id_photographer_data,
     u.id_sales_rep,
     u.id_affiliates as id_affiliate,
     u.id_facebook,
@@ -123,8 +123,8 @@ left join datalake_ebdb_user.agent_data ag
     on ag.id = u.id_agent
 left join datalake_ebdb_clean.bank b
     on b.id = u.id_bank
-left join datalake_ebdb_clean.photographer p
-    on p.id = u.id_photographer
+left join datalake_ebdb_clean.photographer_data p
+    on p.id = u.id_photographer_data
 left join datalake_ebdb_clean.sales_rep sr
     on sr.id = u.id_sales_rep
 left join datalake_ebdb_user.affiliate_data ad

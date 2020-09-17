@@ -25,7 +25,7 @@ with cancellation_info as (
     select
         pj.id as id_photographer_job,
         ure.id as id_revision,
-        user.id_photographer, -- TODO [ODS] this column should be called id_photographer_data
+        user.id_photographer_data,
         user.id_sales_rep,
         user.id as id_user_who_canceled,
         user.name as user_who_canceled_name,
@@ -66,8 +66,8 @@ photographer_data as (
         user.email as photographer_email,
         pd.ts_created as dt_photographer_started
     from datalake_ebdb_clean.user
-    left join datalake_ebdb_clean.photographer pd -- TODO [ODS] this table should be called photographer_data
-        on pd.id = user.id_photographer
+    left join datalake_ebdb_clean.photographer_data pd
+        on pd.id = user.id_photographer_data
 ),
 job_creator_info as (
     with jobs_min_rev as (
@@ -80,7 +80,7 @@ job_creator_info as (
     select
         jmr.id_photographer_job,
         creator.id as id_user,
-        creator.id_photographer,
+        creator.id_photographer_data,
         creator.id_sales_rep,
         creator.email
     from jobs_min_rev jmr
@@ -116,8 +116,8 @@ select
         cancellation_info.user_who_canceled_name,
         cancellation_info.user_who_canceled_email,
         case
-            when job_creator_info.id_photographer is not null and job_creator_info.id_sales_rep is not null then 'Teste'
-            when job_creator_info.id_photographer is not null then 'Fotografo'
+            when job_creator_info.id_photographer_data is not null and job_creator_info.id_sales_rep is not null then 'Teste'
+            when job_creator_info.id_photographer_data is not null then 'Fotografo'
             when job_creator_info.id_sales_rep is not null then 'InsideSales_internal'
             when job_creator_info.email like '%actionline%' then 'InsideSales_external'
             when job_creator_info.email like '%quintoandar%' then 'Admin'
@@ -125,8 +125,8 @@ select
         end as creation_origin,
         case
             when f.status != 'Cancelado' then null
-            when cancellation_info.id_photographer is not null and cancellation_info.id_sales_rep is not null then 'Teste'
-            when cancellation_info.id_photographer is not null then 'Fotografo'
+            when cancellation_info.id_photographer_data is not null and cancellation_info.id_sales_rep is not null then 'Teste'
+            when cancellation_info.id_photographer_data is not null then 'Fotografo'
             when job_creator_info.id_sales_rep is not null then 'InsideSales_internal'
             when job_creator_info.email like '%actionline%' then 'InsideSales_external'
             when cancellation_info.user_who_canceled_email like '%quintoandar%' then 'Admin'
@@ -172,6 +172,6 @@ select
     left join problems_info
         on problems_info.id_photographer_job = f.id
     left join photographer_data
-        on id_photographer_data = f.id_photographer
+        on id_photographer_data = f.id_photographer_data
     left join job_creator_info
         on job_creator_info.id_photographer_job = f.id

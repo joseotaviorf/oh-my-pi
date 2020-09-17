@@ -39,13 +39,13 @@ user_information as (
       (
         (
           user.id_affiliates is null
-          and user.id_photographer is null
+          and user.id_photographer_data is null
           and user.id_sales_rep is null
           and user.id_agent_rep is null
           and house_ids.id_user is NULL
         ) or  contract_ids.id_user is not null
       ) as is_tenant,
-      (user.id_photographer is not null) as is_photographer,
+      (user.id_photographer_data is not null) as is_photographer,
       substring(user.main_phone, 4, 2) as main_phone_ddd
     from datalake_ebdb_clean.user user
     left join distinct_id_user_from_house house_ids
@@ -62,7 +62,7 @@ select
     u.id_linkedin,
     u.id_google,
     u.id_agent,
-    u.id_photographer,
+    u.id_photographer_data,
     u.id_sales_rep,
     u.id_affiliates,
     u.id_bank,

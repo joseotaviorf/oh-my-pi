@@ -4,7 +4,7 @@ create table janus.dim_user (
   sk_doorman_joined_date bigint,
   id_user bigint,
   id_agent bigint,
-  id_photographer bigint,
+  id_photographer_data bigint,
   id_sales_rep bigint,
   id_affiliate bigint,
   id_facebook varchar(255),

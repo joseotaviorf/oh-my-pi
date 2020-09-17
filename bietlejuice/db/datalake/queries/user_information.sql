@@ -59,7 +59,7 @@ users_prev as (
     coalesce(uc.admin_type, up.admin_type) as admin_type,
     coalesce(uc.is_blocked, up.is_blocked) as is_blocked,
     coalesce(uc.id_agent_rep, up.id_agent_rep) as id_agent_rep,
-    coalesce(uc.id_photographer, up.id_photographer) as id_photographer,
+    coalesce(uc.id_photographer_data, up.id_photographer_data) as id_photographer_data,
     coalesce(uc.id_affiliates, up.id_affiliates) as id_affiliates,
     coalesce(uc.id_sales_rep, up.id_sales_rep) as id_sales_rep
     from contract_person cp
@@ -131,8 +131,8 @@ users as (
     left join datalake_ebdb_clean_prod.house h
     on h.id_user = up.id
         and h.status != 'excluido'
-    left join datalake_ebdb_clean_prod.photographer pd
-    on pd.id = up.id_photographer
+    left join datalake_ebdb_clean_prod.photographer_data pd
+    on pd.id = up.id_photographer_data
         and pd.is_active = 'true'
     left join datalake_ebdb_clean_prod.affiliate_data ad
     on ad.id = up.id_affiliates

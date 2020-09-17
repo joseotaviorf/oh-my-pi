@@ -54,7 +54,7 @@ SELECT
     enviadoAppECardiffEm AS ts_app_ecardiff_sent,
     googleId AS id_google,
     accountKitId AS id_account_kit,
-    dadosFotografo_id AS id_photographer,
+    dadosFotografo_id AS id_photographer_data,
     dadosVendedor_id AS id_sales_rep,
     dadosAgente_id AS id_agent_rep,
     dadosAfiliado_id AS id_affiliates,

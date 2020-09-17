@@ -98,7 +98,7 @@ columns_mapping:
     new_column: id_agent
     new_column_type: bigint
   - ods_column: dados_fotografo_id
-    new_column: id_photographer
+    new_column: id_photographer_data
     new_column_type: bigint
   - ods_column: dados_vendedor_id
     new_column: id_sales_rep

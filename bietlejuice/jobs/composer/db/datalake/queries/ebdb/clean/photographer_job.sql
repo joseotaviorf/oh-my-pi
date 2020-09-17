@@ -1,6 +1,6 @@
 select
   id,
-  dadosfotografo_id as id_photographer,
+  dadosfotografo_id as id_photographer_data,
   imovel_id as id_house,
   origincreation_id as id_origin_creation,
   reservadopara_id as id_reserved_for,
