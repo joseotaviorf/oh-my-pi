@@ -172,6 +172,6 @@ select
     left join problems_info
         on problems_info.id_photographer_job = f.id
     left join photographer_data
-        on id_photographer_data = f.id_photographer_data
+        on photographer_data.id_photographer_data = f.id_photographer_data
     left join job_creator_info
         on job_creator_info.id_photographer_job = f.id
