@@ -145,7 +145,7 @@ class CRMWorkflows(object):
                 ("assignment_method", str),
                 ("definition_task_from", str),
                 ("definition_task_to", str),
-                ("is_end_of_workflow", bool),
+                ("is_end_of_workflow", str),
                 ("context", str),
                 ("ts_transitioned", str)
             ]
