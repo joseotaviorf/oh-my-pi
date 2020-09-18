@@ -53,7 +53,7 @@ bietlejuice.dw_user:
   - bietlejuice.ebdb:load-contract
   - bietlejuice.ebdb:load-state
   - bietlejuice.ebdb:load-bank
-  - bietlejuice.ebdb:load-photographer
+  - bietlejuice.ebdb:load-photographer-data
   - bietlejuice.ebdb:load-sales-rep
   - bietlejuice.enrich_booking:load-booking-to-enrich
   - bietlejuice.enrich_ebdb_user:load-user-to-enrich
@@ -138,7 +138,7 @@ bietlejuice.enrich_ebdb_listing_jobs:
   - bietlejuice.ebdb:load-house-registration-status-aud
   - bietlejuice.ebdb:load-inspection
   - bietlejuice.ebdb:load-inspection-item
-  - bietlejuice.ebdb:load-photographer
+  - bietlejuice.ebdb:load-photographer-data
   - bietlejuice.ebdb:load-photographer-job
   - bietlejuice.ebdb:load-photographer-job-aud
   - bietlejuice.ebdb:load-user
