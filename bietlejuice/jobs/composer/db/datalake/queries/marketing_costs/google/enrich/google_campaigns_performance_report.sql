@@ -2,7 +2,7 @@ with merge_marketing_hub_with_xplenty as (
     select distinct
         bigint(account_id) as id_external_customer,
         bigint(campaign_id) as id_campaign,
-        replace(lcase(campaign_name), '.', '_') as campaign_name,
+        campaign_name,
         smallint(clicks) as clicks,
         double(cost) as cost,
         tinyint(month) as month,

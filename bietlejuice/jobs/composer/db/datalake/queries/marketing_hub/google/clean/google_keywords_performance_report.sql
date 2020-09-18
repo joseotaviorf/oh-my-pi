@@ -3,7 +3,7 @@ SELECT
     bigint(externalcustomerid) as id_external_customer,
     bigint(adgroupid) as id_ad_group,
     bigint(campaignid) as id_campaign,
-    campaign_name,
+    campaignname as campaign_name,
     adgroupname as ad_group_name,
     smallint(clicks) as clicks,
     double(cost) as cost,

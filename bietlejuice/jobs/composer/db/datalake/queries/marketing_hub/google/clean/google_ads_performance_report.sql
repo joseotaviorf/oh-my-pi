@@ -5,7 +5,7 @@ SELECT
     bigint(campaignid) as id_campaign,
     adgroupname as ad_group_name,
     adtype as ad_type,
-    campaign_name,
+    campaignname as campaign_name,
     smallint(clicks) as clicks,
     double(cost) as cost,
     description,

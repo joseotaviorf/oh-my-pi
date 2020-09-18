@@ -57,7 +57,6 @@ REPORT_SCHEMAS = {
         "SearchImpressionShare",
         "ReportType",
         "acc",
-        "campaign_name",
         "dt",
     ],
     "keywords_performance_report": [
@@ -80,12 +79,11 @@ REPORT_SCHEMAS = {
         "SearchImpressionShare",
         "ReportType",
         "acc",
-        "campaign_name",
         "dt",
     ],
 }
 FULL_FILE_PATH_LENGTH = 8
-PARTITION_COLUMNS = ["ReportType", "acc", "campaign_name", "dt"]
+PARTITION_COLUMNS = ["ReportType", "acc", "dt"]
 
 
 class GoogleAdsRawBuilder:
@@ -105,15 +103,6 @@ class GoogleAdsRawBuilder:
         snake_cased_account_name = re.sub(r"\s+", "_", alphanumeric_account_name)
         no_accents_account_name = unidecode(snake_cased_account_name)
         return no_accents_account_name.lower()
-
-    def __get_formatted_campaign_name(self, raw_campaign_name):
-        campaign_name = self.__format_campaign_name(raw_campaign_name)
-        return campaign_name
-
-    def __format_campaign_name(self, campaign_name):
-        snake_cased_campaign_name = campaign_name.replace(".", "_")
-        no_accents_campaign_name = unidecode(snake_cased_campaign_name)
-        return no_accents_campaign_name.lower()
 
     def __split_str(self, str, split_condition):
         return [x for x in str.split(split_condition) if x != ""]
@@ -188,9 +177,8 @@ class GoogleAdsRawBuilder:
 
     def __get_partition_information(self, csv_file, s3_file_path):
         account_name = self.__get_formatted_account_name(csv_file.first().Account)
-        campaign_name = self.__get_formatted_campaign_name(csv_file.first().Campaign)
         dt = self.__get__path_date(s3_file_path)
-        return [account_name, campaign_name, dt]
+        return [account_name, dt]
 
     def __check_validity_of_csv(self, csv_file):
         return bool(csv_file and csv_file.first())
@@ -228,8 +216,7 @@ class GoogleAdsRawBuilder:
 
     def build_target_file_path(self, s3_file, s3_file_path_target, report_type):
         account_name = s3_file.first().acc
-        campaign_name = s3_file.first().campaign_name
         dt = s3_file.first().dt
-        database_location = f"{s3_file_path_target}/{report_type}/acc={account_name}/campaign_name={campaign_name}/"
+        database_location = f"{s3_file_path_target}/{report_type}/acc={account_name}/"
         table_name = f"dt={dt}"
         return database_location, table_name

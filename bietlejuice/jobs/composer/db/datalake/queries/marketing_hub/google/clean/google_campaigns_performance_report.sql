@@ -1,7 +1,7 @@
 SELECT
     bigint(externalcustomerid) as id_external_customer,
     bigint(campaignid) as id_campaign,
-    campaign_name,
+    campaignname as campaign_name,
     smallint(clicks) as clicks,
     double(cost) as cost,
     tinyint(month) as month,

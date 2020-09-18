@@ -91,10 +91,7 @@ for media_name in media_names:
     )
 
     enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(
-        dag,
-        sql_file_list,
-        is_incremental=True,
-        partitions=["report_type", "acc", "campaign_name", "load_date"],
+        dag, sql_file_list, is_incremental=True, partitions=["acc", "load_date"]
     )
 
 create_cluster_task >> list(enrich_sub_dags.values()) >> terminate_cluster_task
