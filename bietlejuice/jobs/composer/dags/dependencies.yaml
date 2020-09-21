@@ -173,6 +173,9 @@ bietlejuice.enrich_ebdb_user:
 bietlejuice.enrich_ebdb_user_revision_entity:
   - bietlejuice.ebdb:load-user-revision-entity
 
+bietlejuice.enrich_firestore_audit:
+  - bietlejuice.firestore_audit
+
 bietlejuice.enrich_kill_queue:
   - bietlejuice.kill_queue:load-house-to-datalake-clean
   - bietlejuice.kill_queue:load-reservation-to-datalake-clean
