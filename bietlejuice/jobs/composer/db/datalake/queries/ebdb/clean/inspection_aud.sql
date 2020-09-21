@@ -1,5 +1,5 @@
 SELECT
-    id as id_ispection,
+    id as id_inspection,
     contrato_id as id_contract,
     imovel_id as id_house,
     bigint(ref_id) as id_ref,
