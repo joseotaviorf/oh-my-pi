@@ -207,7 +207,7 @@ bietlejuice.enrich_tracksale:
   - bietlejuice.tracksale:dispatch
   - bietlejuice.tracksale:answer
 
-bietlejuice.marketing_costs:
+bietlejuice.enrich_marketing_costs:
   - bietlejuice.marketing_hub
 
 bietlejuice.regions_polygon:

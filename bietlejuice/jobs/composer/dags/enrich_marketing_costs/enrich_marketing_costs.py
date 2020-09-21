@@ -54,6 +54,7 @@ dag = DAG(
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
+    schedule_interval=None,
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
