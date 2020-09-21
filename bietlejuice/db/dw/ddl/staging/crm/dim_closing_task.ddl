@@ -11,7 +11,7 @@ create table if not exists staging.dim_closing_task (
   origin varchar,
   type varchar,
   is_task_auto_completed boolean,
-  description varchar(5000),
+  description varchar(10000),
   subject varchar(100),
   titles varchar,
   workgroups varchar,
