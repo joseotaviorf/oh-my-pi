@@ -216,34 +216,34 @@ criteo_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
     class_=MarketingEnum.CRITEO,
 )
 
-# rtb_raw_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=raw_sub_dag,
-#     sub_dag_name='rtb-load-to-raw',
-#     class_=MarketingEnum.RTB
-# )
-#
-# rtb_clean_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=clean_sub_dag,
-#     sub_dag_name='rtb-raw-to-clean',
-#     class_=MarketingEnum.RTB,
-#     accounts='default'
-# )
-#
-# rtb_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=load_to_staging_sub_dag,
-#     sub_dag_name='rtb-load-to-staging',
-#     class_=MarketingEnum.RTB,
-# )
-#
-# rtb_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
-#     dag=main_dag,
-#     sub_dag_func=load_to_dw_sub_dag,
-#     sub_dag_name='rtb-load-to-dw',
-#     class_=MarketingEnum.RTB,
-# )
+rtb_raw_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=raw_sub_dag,
+    sub_dag_name='rtb-load-to-raw',
+    class_=MarketingEnum.RTB
+)
+
+rtb_clean_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=clean_sub_dag,
+    sub_dag_name='rtb-raw-to-clean',
+    class_=MarketingEnum.RTB,
+    accounts='default'
+)
+
+rtb_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=load_to_staging_sub_dag,
+    sub_dag_name='rtb-load-to-staging',
+    class_=MarketingEnum.RTB,
+)
+
+rtb_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
+    dag=main_dag,
+    sub_dag_func=load_to_dw_sub_dag,
+    sub_dag_name='rtb-load-to-dw',
+    class_=MarketingEnum.RTB,
+)
 
 lifull_raw_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
@@ -286,10 +286,10 @@ airflow_helpers.chain(criteo_raw_dag,
                       criteo_clean_dag,
                       criteo_load_to_staging_dag,
                       criteo_load_to_dw_dag)
-# airflow_helpers.chain(rtb_raw_dag,
-#                       rtb_clean_dag,
-#                       rtb_load_to_staging_dag,
-#                       rtb_load_to_dw_dag)
+airflow_helpers.chain(rtb_raw_dag,
+                      rtb_clean_dag,
+                      rtb_load_to_staging_dag,
+                      rtb_load_to_dw_dag)
 airflow_helpers.chain(lifull_raw_dag,
                       lifull_clean_dag,
                       lifull_load_to_staging_dag,
