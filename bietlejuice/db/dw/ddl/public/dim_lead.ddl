@@ -8,7 +8,7 @@ create table if not exists dim_lead
  ,captado_em date   encode az64
  ,cep varchar(9)   encode lzo
  ,cidade varchar(200)   encode lzo
- ,complemento varchar(200)   encode lzo
+ ,complemento varchar(500)   encode lzo
  ,endereco varchar(200)   encode lzo
  ,nome_anunciante varchar(255)   encode lzo
  ,numero varchar(200)   encode lzo
