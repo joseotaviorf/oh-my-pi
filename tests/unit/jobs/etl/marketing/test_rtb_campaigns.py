@@ -72,7 +72,7 @@ class TestRTBCampaigns(object):
         # assert
         mock__save_to_s3.assert_called_once_with('xpto123',
                                                  rtb_campaigns.S3_STATS_FOLDER,
-                                                 [{'foo': 'bar'}])
+                                                 [{'account_hash': 'xpto123', 'foo': 'bar', 'deviceType': 'MOBILE'}])
 
     def test__fetch_and_save_stats_no_account_hash(self, rtb_campaigns):
         account = {'name': mock.ANY, 'currency': mock.ANY, 'status': mock.ANY}
@@ -80,38 +80,29 @@ class TestRTBCampaigns(object):
         with pytest.raises(ValueError):
             rtb_campaigns._fetch_and_save_stats(account=account)
 
-    @pytest.mark.parametrize('stats, dpa_stats, expected_stats', [
-        ([], [], []),
+    @pytest.mark.parametrize('stats, expected_stats', [
+        ([], []),
         ([{'subcampaign': mock.ANY, 'subcampaignhash': mock.ANY, 'deviceType': mock.ANY,
            'day': mock.ANY, 'impsCount': mock.ANY, 'clicksCount': mock.ANY,
            'campaignCost': mock.ANY, 'conversionsCount': mock.ANY,
            'conversionsValue': mock.ANY, 'cr': mock.ANY, 'ctr': mock.ANY,
            'ecc': mock.ANY, 'cpc': mock.ANY, 'roas': mock.ANY, 'ecps': mock.ANY}],
          [
-             {'impsCount': mock.ANY, 'clicksCount': mock.ANY, 'ctr': mock.ANY,
-              'campaignCost': mock.ANY, 'conversionsCount': mock.ANY,
-              'conversionsRate': mock.ANY, 'cpc': mock.ANY, 'ecc': mock.ANY,
-              'roas': mock.ANY, 'ecps': mock.ANY, 'conversionsValue': mock.ANY,
-              'day': mock.ANY}],
-         [
              {'subcampaign': mock.ANY, 'subcampaignhash': mock.ANY,
               'deviceType': mock.ANY, 'day': mock.ANY, 'impsCount': mock.ANY,
               'clicksCount': mock.ANY, 'campaignCost': mock.ANY,
               'conversionsCount': mock.ANY, 'conversionsValue': mock.ANY,
               'cr': mock.ANY, 'ctr': mock.ANY, 'ecc': mock.ANY, 'cpc': mock.ANY,
-              'roas': mock.ANY, 'ecps': mock.ANY},
-             {'deviceType': 'MOBILE', 'impsCount': mock.ANY, 'clicksCount': mock.ANY,
-              'ctr': mock.ANY, 'campaignCost': mock.ANY, 'conversionsCount': mock.ANY,
-              'conversionsRate': mock.ANY, 'cpc': mock.ANY, 'ecc': mock.ANY,
-              'roas': mock.ANY, 'ecps': mock.ANY, 'conversionsValue': mock.ANY,
-              'day': mock.ANY}]),
+              'roas': mock.ANY, 'ecps': mock.ANY, 'account_hash': mock.ANY,
+              'account_name': mock.ANY, 'account_status': mock.ANY,
+              'account_currency': mock.ANY},
+             ]),
     ])
     def test__get_stats_with_empty_response(self, stats, dpa_stats, expected_stats,
                                             rtb_campaigns):
         # arrange
         mock_rtb_client = Mock()
         mock_rtb_client.get_rtb_stats.return_value = stats
-        mock_rtb_client.get_dpa_campaign_stats.return_value = dpa_stats
         rtb_campaigns.rtb_client = mock_rtb_client
 
         # act
@@ -120,7 +111,6 @@ class TestRTBCampaigns(object):
         # assert
         assert stats == expected_stats
         rtb_campaigns.rtb_client.get_rtb_stats.assert_called_once()
-        rtb_campaigns.rtb_client.get_dpa_campaign_stats.assert_called_once()
 
     @mock.patch.object(BaseETL, 'obj_to_s3')
     def test__save_to_s3_with_empty_data(self, mock__obj_to_s3, rtb_campaigns):
@@ -171,7 +161,11 @@ class TestRTBCampaigns(object):
             ('ecps', str),
             ('ecc', str),
             ('roas', str),
-            ('conversions_value', str)
+            ('conversions_value', str),
+            ('account_name', str),
+            ('account_hash', str),
+            ('account_status', str),
+            ('account_currency', str)
         ])
 
         # act
