@@ -1,0 +1,5 @@
+# Config for marketing_campaigns_costs_and_volumes
+---
+streams:
+  - direction: 'upstream'
+    task_ids: ['athena_talk_to_agent', 'athena_demand_sale_flows']
