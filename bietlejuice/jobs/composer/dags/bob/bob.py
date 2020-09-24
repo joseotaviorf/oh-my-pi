@@ -8,6 +8,9 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.base.pipeline import LayerEnum
+from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
+from bietlejuice.jobs.composer.services import FileService
 
 SOURCE = "bob"
 
@@ -23,9 +26,10 @@ LOAD_BOB_INTO_DATALAKE_RAW_FILE_PATH = (
 )
 
 # spark and databricks vars
+SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{SOURCE}"
 CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_minimum_resources_cluster", deserialize_json=True
+    "databricks_bietlejuice_bob_cluster", deserialize_json=True
 )
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 DEFAULT_LIBRARIES = Variable.get("bietlejuice_default_libraries", deserialize_json=True)
@@ -68,8 +72,28 @@ bob_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
+clean_sub_dag = DatalakeSubDAG(
+    dag_id=DAG_ID,
+    start_date=MAIN_START_DATE,
+    env=ENV,
+    datalake_bucket=DATALAKE_BUCKET,
+    layer=LayerEnum.CLEAN,
+    database_base_name=SOURCE,
+    relative_query_path=SOURCE,
+    spark_job_paths=SPARK_JOBS_PATH,
+    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
+)
+
+file_list = FileService.list_sql_files_without_extension_from_layer(
+    SOURCE, LayerEnum.CLEAN.value
+)
+
+clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(dag, file_list)
+
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-create_cluster_task >> bob_to_datalake_raw_task >> terminate_cluster_task
+create_cluster_task >> bob_to_datalake_raw_task >> list(
+    clean_sub_dags.values()
+) >> terminate_cluster_task

@@ -12,7 +12,7 @@ from bietlejuice.jobs.composer.services.metastore_services import SparkMetastore
 
 SOURCE = "bob"
 JOB_NAME = "load_bob_into_datalake"
-BLOCK_LIST = ["flyway_schema_history", "change_owner_control"]
+BLOCK_LIST = ["change_owner_control", "flyway_schema_history", "pg_stat_statements"]
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
