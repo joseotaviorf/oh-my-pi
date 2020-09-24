@@ -20,6 +20,7 @@ with merge_marketing_hub_with_xplenty as (
         'ads_performance_report' as report_type,
         acc,
         campaign_name,
+        (campaign_name like 'ZEBRA%') as is_test_campaign,
         date as load_date,
         date(dt_created) as dt_created,
         date(date) as dt_load
@@ -51,6 +52,7 @@ with merge_marketing_hub_with_xplenty as (
         report_type,
         acc,
         campaign_name,
+        (campaign_name like 'ZEBRA%') as is_test_campaign,
         load_date,
         dt_created,
         dt_load
