@@ -18,9 +18,6 @@ bietlejuice.dw_booking:
   - bietlejuice.ebdb:load-visit
   - bietlejuice.enrich_amplitude_visit
 
-bietlejuice.dw_marketing_costs:
-  - bietlejuice.enrich_marketing_costs
-
 bietlejuice.dw_proposal:
   - bietlejuice.enrich_proposal:load-proposal-to-enrich
   - bietlejuice.enrich_docx:load-credit-evaluation-to-enrich
