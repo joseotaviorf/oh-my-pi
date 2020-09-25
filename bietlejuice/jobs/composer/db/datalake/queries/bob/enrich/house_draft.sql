@@ -1,0 +1,55 @@
+WITH first_administrator_informations AS (
+  SELECT
+    id AS id_house_draft, 
+    FROM_JSON(GET_JSON_OBJECT(administrators, '$.list'), 'array<string>')[0] AS first_administrator_informations
+  FROM datalake_bob_clean.house_draft
+)
+SELECT
+    id, 
+    id_client_side,
+    id_original_lead,
+    GET_JSON_OBJECT(first_administrator_informations, '$.mainId') AS id_main_administrator,
+    registrar,
+    owners AS owners_informations,
+    access AS house_access_informations, 
+    administrators AS administrators_informations,
+    NULLIF(GET_JSON_OBJECT(first_administrator_informations, '$.name'), '') AS main_administrator_name,
+    NULLIF(GET_JSON_OBJECT(first_administrator_informations, '$.email'), '') AS main_administrator_email,
+    NULLIF(GET_JSON_OBJECT(first_administrator_informations, '$.phone'), '') AS main_administrator_phone_number,    
+    GET_JSON_OBJECT(details, '$.appliances') AS house_appliances,
+    NULLIF(GET_JSON_OBJECT(details, '$.description'), '') AS house_description,
+    GET_JSON_OBJECT(details, '$.frontDoorType') AS front_door_type,
+    GET_JSON_OBJECT(details, '$.installations') AS installations,
+    GET_JSON_OBJECT(details, '$.accessibilityItems') AS acessibility_items,
+    GET_JSON_OBJECT(details, '$.movingAvailability.daysToVacate') AS days_to_vacate,
+    GET_JSON_OBJECT(details, '$.movingAvailability.availabilityType') AS availability_type,
+    GET_JSON_OBJECT(details, '$.movingAvailability.awaitingAvailabilityReason') AS awaiting_availability_reason,
+    NULLIF(GET_JSON_OBJECT(details, '$.movingAvailability.awaitingAvailabilityCustomReason'), '') AS awaiting_availability_custom_reason,
+    GET_JSON_OBJECT(pricing, '$.rent') AS rent_price,
+    GET_JSON_OBJECT(pricing, '$.salePrice') AS sale_price,
+    GET_JSON_OBJECT(pricing, '$.condoPrice') AS condo_price,
+    NULLIF(GET_JSON_OBJECT(pricing, '$.iptuList'), '[]') AS iptu_installment_informations,
+    GET_JSON_OBJECT(pricing, '$.customAdmFee') AS custom_administration_fee,
+    NULLIF(GET_JSON_OBJECT(pricing, '$.specialConditions'), '[]') AS special_conditions,
+    GET_JSON_OBJECT(blueprint, '$.suites') AS suites,
+    GET_JSON_OBJECT(blueprint, '$.garages') AS garages,
+    NULLIF(GET_JSON_OBJECT(blueprint, '$.garageDescription'), '') AS garages_description,
+    GET_JSON_OBJECT(blueprint, '$.bedrooms') AS bedrooms,
+    GET_JSON_OBJECT(blueprint, '$.bathrooms') AS bathrooms,
+    GET_JSON_OBJECT(blueprint, '$.houseType') AS house_type,
+    GET_JSON_OBJECT(blueprint, '$.totalArea') AS total_area,
+    GET_JSON_OBJECT(business_context, '$.businessContextType') AS business_context_type,
+    status,
+    type,
+    CAST(GET_JSON_OBJECT(details, '$.isFurnished') AS BOOLEAN) AS is_furnished,
+    CAST(GET_JSON_OBJECT(details, '$.isPenthouse') AS BOOLEAN) AS is_penthouse,
+    CAST(GET_JSON_OBJECT(details, '$.isPetFriendly') AS BOOLEAN) AS is_pet_friendly,
+    CAST(GET_JSON_OBJECT(pricing, '$.hasCondo') AS BOOLEAN) AS has_condo,
+    CAST(GET_JSON_OBJECT(pricing, '$.iptuNotPaid') AS BOOLEAN) AS has_iptu_not_paid,
+    CAST(GET_JSON_OBJECT(pricing, '$.acceptInstantOffer') AS BOOLEAN) AS is_accepting_instant_offer,
+    CAST(GET_JSON_OBJECT(details, '$.movingAvailability.movingDate') AS TIMESTAMP) AS ts_moved_out,
+    ts_created,
+    ts_updated
+FROM datalake_bob_clean.house_draft hd 
+LEFT JOIN first_administrator_informations fai
+    ON fai.id_house_draft = hd.id
