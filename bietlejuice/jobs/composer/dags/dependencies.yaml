@@ -83,6 +83,9 @@ bietlejuice.enrich_amplitude_user:
 bietlejuice.enrich_amplitude_visit:
   - bietlejuice.amplitude
 
+bietlejuice.enrich_bob:
+  - bietlejuice.bob
+
 bietlejuice.enrich_booking:
   - bietlejuice.ebdb:load-booking
   - bietlejuice.ebdb:load-booking-aud
