@@ -242,7 +242,7 @@ costs_targets_results_combined AS (
   -- Supply ForSale Funnel Targets --
   -----------------------------------
   SELECT
-    TO_CHAR(DATE(NULLIF(str.date, '')), 'YYYYMMDD') AS sk_date,
+    TO_CHAR(DATE(NULLIF(str.date, '')), 'YYYYMMDD')::INT AS sk_date,
     COALESCE(NULLIF(str.city_group, ''),'Not Mapped')::TEXT AS city_group,
     NULLIF(str.mkt_origin, '')::TEXT as mkt_origin,
     CASE str.mkt_origin
@@ -279,7 +279,7 @@ costs_targets_results_combined AS (
   -- Supply ForSale Cost Targets --
   ---------------------------------
   SELECT
-    TO_CHAR(DATE(NULLIF(ct.date, '')), 'YYYYMMDD') AS sk_date,
+    TO_CHAR(DATE(NULLIF(ct.date, '')), 'YYYYMMDD')::INT AS sk_date,
     COALESCE(NULLIF(ct.city_group, ''),'Not Mapped')::TEXT AS city_group,
     CASE 
       WHEN ct.planning_mkt_level3 = 'PWA - Paid'
