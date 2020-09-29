@@ -7,6 +7,7 @@ WITH clean_table_common as (
         acc as account_name,
         labels,
         is_test_campaign,
+        report_type,
         load_date
     FROM 
         datalake_marketing_costs.google_campaigns_performance_report

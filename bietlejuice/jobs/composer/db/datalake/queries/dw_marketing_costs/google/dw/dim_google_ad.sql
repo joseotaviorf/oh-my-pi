@@ -8,6 +8,7 @@ WITH clean_table_common as (
         account_descriptive_name,
         ad_type,
         is_test_campaign,
+        report_type,
         load_date
     FROM 
         datalake_marketing_costs.google_ads_performance_report
