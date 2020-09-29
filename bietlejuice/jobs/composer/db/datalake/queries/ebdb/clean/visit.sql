@@ -8,7 +8,7 @@ SELECT
     numeroSlots AS slot_count,
     tipo AS type,
     agenteFixo AS is_fixed_agent,
-    realEstateAgentRating_id AS id_real_state_agent_rating,
+    realEstateAgentRating_id AS id_real_estate_agent_rating,
     status,
     bookingType AS booking_type,
     visitante_id AS id_visitor,

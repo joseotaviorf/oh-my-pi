@@ -1,5 +1,5 @@
 SELECT
-    id as id_real_state_agent_fee,
+    id as id_real_estate_agent_fee,
     agent_id as id_agent,
     contract_id as id_contract,
     rev,
