@@ -25,6 +25,11 @@ if __name__ == "__main__":
     environment = args.env
     datalake_bucket = args.datalake_bucket
 
+    logger.info(
+        f"m=__main__, environment={environment}, datalake_bucket={datalake_bucket}, "
+        "msg=Starting spark job..."
+    )
+
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
