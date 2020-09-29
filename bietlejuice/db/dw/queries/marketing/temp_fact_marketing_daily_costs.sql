@@ -347,17 +347,17 @@ campaigns_full as (
                 drt.campaign_name as utm_campaign,
                 null::varchar(512) as utm_term,
                 null::varchar(512) as utm_content,
-                sum(coalesce(case when device = 'Desktop' then cost end, 0)) as desktop_cost,
-                sum(coalesce(case when device = 'Mobile' then cost end, 0)) as mobile_cost,
-                sum(coalesce(case when device = 'Other' then cost end, 0)) as other_cost,
-                null::numeric(16,4) as total_cost,
+                null::numeric(16,4) as desktop_cost,
+                null::numeric(16,4) as mobile_cost,
+                null::numeric(16,4) as other_cost,
+                sum(cost) as total_cost,
                 null as report_type,
                 null as ad_type
             from marketing.fact_rtb_daily_cost_attributions frt
             left join marketing.dim_rtb_sub_campaign drt
                 on frt.sk_sub_campaign = drt.sk_sub_campaign
             where frt.sk_date >= 20180101
-            group by 1,2,3,4,5,6,7,8,9,10,11
+            group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17
         -- TWITTER
         UNION
             select
