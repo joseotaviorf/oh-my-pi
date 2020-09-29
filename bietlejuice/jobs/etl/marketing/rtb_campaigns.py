@@ -50,9 +50,7 @@ class RtbCampaigns(Marketing):
         advertiser_hash = account['hash']
 
         stats_list = self._get_stats(advertiser_hash)
-        dpa_stats_list = self._get_dpa_stats(advertiser_hash)
-        combined_stats_list = self._combine_stats(stats_list, dpa_stats_list)
-        enriched_stats_list = self._enrich_stats(combined_stats_list, account)
+        enriched_stats_list = self._enrich_stats(stats_list, account)
         self._save_to_s3(advertiser_hash, self.S3_STATS_FOLDER, enriched_stats_list)
 
     @logger
@@ -60,29 +58,9 @@ class RtbCampaigns(Marketing):
         stats = self.rtb_client.get_rtb_stats(advertiser_hash,
                                               self.execution_date.strftime('%Y-%m-%d'),
                                               self.execution_date.strftime('%Y-%m-%d'),
-                                              ['day', 'deviceType', 'subcampaign'])
+                                              ['day', 'subcampaign'],
+                                              include_dpa=True)
         return stats
-
-    def _get_dpa_stats(self, advertiser_hash):
-        dpa_stats = self.rtb_client.get_dpa_campaign_stats(
-            advertiser_hash,
-            self.execution_date.strftime('%Y-%m-%d'),
-            self.execution_date.strftime('%Y-%m-%d'),
-            ['day'])
-
-        for item in dpa_stats:
-            item[u'deviceType'] = 'MOBILE'
-
-        return dpa_stats
-
-    def _combine_stats(self, stats, dpa_stats):
-        if isinstance(dpa_stats, dict):
-            if dpa_stats:
-                return stats + [dpa_stats]  # dpa_stats is a dict and is not empty
-            else:
-                return stats                # dpa_stats is an empty dict
-
-        return stats + dpa_stats            # dpa_stats is a list
 
     def _enrich_stats(self, stats, account):
         if stats:
@@ -90,7 +68,6 @@ class RtbCampaigns(Marketing):
             for stat in stats:
                 for field in FIELDS_TO_ENRICH:
                     field_name = 'account_' + field
-                    stat[field_name] = ''
                     if field in account:
                         stat[field_name] = account[field]
         return stats
@@ -129,7 +106,6 @@ class RtbCampaigns(Marketing):
             ('sub_campaign', str),
             ('sub_campaign_hash', str),
             ('cost_attribution_date', str),
-            ('device_type', str),
             ('impressions_count', str),
             ('clicks_count', str),
             ('ctr', str),

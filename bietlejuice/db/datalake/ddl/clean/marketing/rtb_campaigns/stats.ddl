@@ -4,7 +4,6 @@ CREATE EXTERNAL TABLE datalake_clean.marketing_rtb_stats (
   sub_campaign string,
   sub_campaign_hash string,
   cost_attribution_date string,
-  device_type string,
   impressions_count string,
   clicks_count string,
   ctr string,

@@ -15,11 +15,6 @@ FROM (
     SELECT
         sta.sub_campaign_hash as sk_sub_campaign,
         cast(date_format(cast(sta.cost_attribution_date as date), '%Y%m%d') as integer) as sk_date,
-        case when upper(sta.device_type)='PC' then 'Desktop'
-                when upper(sta.device_type)='UNKNOWN' then 'Other'
-                when sta.device_type is not null and sta.device_type <> '' then 'Mobile'
-                else 'Other'
-            end as device,
         sta.account_currency as currency,
         cast(cast(sta.clicks_count as double)as integer) as clicks,
         cast(sta.impressions_count as double) as impressions,

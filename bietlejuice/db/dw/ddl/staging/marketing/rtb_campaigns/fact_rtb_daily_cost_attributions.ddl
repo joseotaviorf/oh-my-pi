@@ -2,7 +2,6 @@ DROP TABLE if EXISTS staging.fact_rtb_daily_cost_attributions;
 CREATE TABLE if NOT EXISTS staging.fact_rtb_daily_cost_attributions (
     sk_sub_campaign varchar,
     sk_date INTEGER,
-    device VARCHAR(50),
     currency VARCHAR(100),
     clicks INTEGER,
     impressions DOUBLE PRECISION,

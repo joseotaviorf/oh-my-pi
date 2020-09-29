@@ -2,7 +2,6 @@ select
   subcampaign as sub_campaign,
   coalesce(subcampaignhash, 'kwKe') as sub_campaign_hash,
   cast("day" as date) as cost_attribution_date,
-  devicetype as device_type,
   impscount as impressions_count,
   clickscount as clicks_count,
   ctr,
