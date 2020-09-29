@@ -57,6 +57,8 @@ create table if not exists dim_house_listing
  ,is_b2b boolean
  ,b2b_type varchar(256)   encode lzo
  ,b2b_prime_type varchar(256)   encode lzo
+ ,is_autonomous_agent boolean
+ ,sk_autonomous_agent bigint  encode lzo
  ,is_originals_active boolean
  ,last_originals_type varchar(256)   encode lzo
  ,dt_last_originals_opted_in date   encode lzo

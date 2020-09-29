@@ -56,6 +56,8 @@ create table staging.dim_house_listing (
   is_b2b boolean,
   b2b_type varchar,
   b2b_prime_type varchar,
+  is_autonomous_agent boolean,
+  sk_autonomous_agent bigint,
   is_originals_active boolean,
   last_originals_type varchar,
   dt_last_originals_opted_in date,

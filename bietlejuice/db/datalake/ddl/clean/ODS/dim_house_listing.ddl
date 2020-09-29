@@ -56,6 +56,8 @@ create external table if not exists datalake_clean.ods_dim_house_listing (
   is_b2b string,
   b2b_type string,
   b2b_prime_type string,
+  is_autonomous_agent string,
+  sk_autonomous_agent string,
   is_originals_active string,
   last_originals_type string,
   dt_last_originals_opted_in string,

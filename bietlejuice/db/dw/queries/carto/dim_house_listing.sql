@@ -57,6 +57,8 @@ SELECT
 	is_b2b,
 	b2b_type,
 	b2b_prime_type,
+	is_autonomous_agent,
+	sk_autonomous_agent,
 	is_originals_active,
 	last_originals_type,
 	dt_last_originals_opted_in,

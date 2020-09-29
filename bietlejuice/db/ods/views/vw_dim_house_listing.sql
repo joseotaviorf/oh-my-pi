@@ -3,6 +3,7 @@
 with b2b_info as (
   select distinct
     h.id as id_house,
+    hl.id_house_listing,
     -- although these rules are replicated from vw_dim_lead, it would require much work to centralize with ODS right now
     -- TODO: after moving everything to our data lake, we can centralize rules like these ones
     coalesce(coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner' 
@@ -54,6 +55,29 @@ house_portability as (
     join portability por
         on por.id_house = hl.id_house and por.owner_type = 'B2B'
     where por.ts_created between coalesce(hl.ts_listing_version_start, '1900-01-01 00:00:00') and coalesce(hl.ts_listing_version_end, now())
+),
+autonomous_agent_info as ( 
+SELECT
+	h.id as id_house,
+	hl.id_house_listing as sk_house_listing,
+	pa.user_id as sk_partner_agent,
+	pa.partner_id as sk_partner
+FROM
+	partner_agent pa
+JOIN partner dp ON
+	pa.partner_id = dp.id
+JOIN house h ON
+	pa.user_id = h.usuario_que_cadastrou_id
+LEFT JOIN house_listing hl ON
+	h.id = hl.id_house
+LEFT JOIN listing_business_context lbc ON
+	lbc.id_house = h.id
+WHERE
+	lbc.business_context <> 'SALE'
+	AND dp.type = 'AUTONOMOUS_AGENT'
+	AND dp.id <> '257' -- Test User
+	AND h.data_criacao >= pa.ts_created --This rule might change when we start to considering migration
+	AND h.external_id IS NOT NULL --This rule might change when we start to considering migration
 ),
 house_listings as (
   with lbc as (
@@ -200,6 +224,8 @@ select
       when hp.id_house_listing is not null then 'portability'
       else bi.b2b_prime_type
   end as b2b_prime_type,
+  coalesce(aa_info.sk_partner_agent is not null, false) as is_autonomous_agent,
+  coalesce(aa_info.sk_partner_agent,-1) as sk_autonomous_agent,
   hl.is_originals_active,
   hl.last_originals_type,
   hl.dt_last_originals_opted_in,
@@ -215,7 +241,9 @@ select
   now() as ts_load
 from house_listings hl
 left join b2b_info bi
-  on bi.id_house = hl.id_house
+  on bi.id_house_listing = hl.sk_house_listing
 left join house_portability hp
     on hp.id_house_listing = hl.sk_house_listing
+left join autonomous_agent_info aa_info
+	on aa_info.sk_house_listing = hl.sk_house_listing
 ;
