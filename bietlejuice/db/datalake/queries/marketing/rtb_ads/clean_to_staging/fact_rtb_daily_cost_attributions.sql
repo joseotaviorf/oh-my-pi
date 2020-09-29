@@ -1,7 +1,6 @@
 SELECT
     sk_sub_campaign,
     sk_date,
-    device,
     currency,
     clicks,
     impressions,
