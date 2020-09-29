@@ -14,7 +14,7 @@ WITH clean_table_common as (
         datalake_marketing_costs.google_keywords_performance_report
     WHERE
         dt_load = '{year}-{month}-{day}'
-    group by 2,3,4,5,6,7,8,9
+    group by 2,3,4,5,6,7,8,9,10
 )
 SELECT 
     clean_table_common.*,
