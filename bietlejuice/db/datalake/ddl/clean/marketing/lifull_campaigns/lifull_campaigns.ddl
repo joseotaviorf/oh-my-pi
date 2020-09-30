@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS datalake_clean.marketing_lifull_campaigns;
 CREATE EXTERNAL TABLE datalake_clean.marketing_lifull_campaigns(
   `id`              string,
   `name`            string,
+  `account_name`    string,
   `clicks`          string,
   `desktop_cost`    string,
   `mobile_cost`     string,

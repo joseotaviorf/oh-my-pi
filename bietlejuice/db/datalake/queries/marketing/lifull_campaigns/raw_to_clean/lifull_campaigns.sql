@@ -1,6 +1,7 @@
 SELECT
   id,
   name,
+  account_name,
   clicks,
   desktop_cost,
   mobile_cost,

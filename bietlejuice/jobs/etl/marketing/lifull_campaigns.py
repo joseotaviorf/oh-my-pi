@@ -24,7 +24,7 @@ class LifullCampaigns(Marketing):
         start_date = self.execution_date.strftime(
             '%Y-%m-%d')
         batch_client = BatchClient()
-        job_name = 'scrap-trovit-data'  # TODO Rename crawler
+        job_name = 'scrap-trovit-data'
         job_queue = 'scrap-marketing-data'
         r = batch_client.start_batch_job(
             job_name=job_name,
