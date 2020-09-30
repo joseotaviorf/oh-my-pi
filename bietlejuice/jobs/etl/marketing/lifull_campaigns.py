@@ -35,7 +35,7 @@ class LifullCampaigns(Marketing):
                     '-a', 'end_date={}'.format(start_date),
                     '-a', 'account_id={}'.format(self.account[0]),
                     '-a', 'account_name={}'.format(self.account[1]),
-                    '-o', 's3://{}/raw/marketing/lifull_campaigns/acc={}/dt={}/data.gz'.format(self.s3_bucket, self.account[1], start_date)]
+                    '-o', 's3://{}/raw/marketing/lifull_campaigns/acc={}/dt={}/data.gz'.format(self.s3_bucket, self.account[0], start_date)]
         )
 
         while not (batch_client.get_job_info_by_id(r.get('jobId')).get('status') in ('SUCCEEDED', 'FAILED')):
@@ -71,11 +71,12 @@ class LifullCampaigns(Marketing):
 
     @logger(exclude=['r_cols', 'c_cols'])
     def _move_to_clean(self, table_name, sql_file_name, group_name, r_cols, c_cols=None, validate_data=False):
+        acc_partition = self.account[0]
         key = 'clean/marketing/{integration}/{table_name}/acc={acc_partition}/group_name={group_name}/' \
               'dt_created={date_partition}/{file_name}.parquet' \
             .format(integration=self.integration,
                     table_name=table_name,
-                    acc_partition=self.account[1],
+                    acc_partition=acc_partition,
                     group_name=group_name,
                     date_partition=self.partition_date,
                     file_name=self.partition_date
@@ -90,12 +91,12 @@ class LifullCampaigns(Marketing):
         self.athena_client.add_partition(
             database=self.database,
             table_name=table_name,
-            partition="dt='{dt}', acc='{acc}'".format(dt=self.partition_date, acc=self.account)
+            partition="dt='{dt}', acc='{acc}'".format(dt=self.partition_date, acc=acc_partition)
         )
 
         self.athena_client.create_parquet_from_query(
             key=key,
-            query=query.format(date=self.partition_date, account=self.account, group_name=group_name),
+            query=query.format(date=self.partition_date, account=acc_partition, group_name=group_name),
             raw_columns=r_cols,
             clean_columns=c_cols
         )
@@ -104,7 +105,7 @@ class LifullCampaigns(Marketing):
             database='datalake_clean',
             table_name=table_name,
             partition="dt_created='{dt}', acc='{acc}', group_name='{group_name}'".format(dt=self.partition_date,
-                                                                                         acc=self.account,
+                                                                                         acc=acc_partition,
                                                                                          group_name=group_name)
         )
 
