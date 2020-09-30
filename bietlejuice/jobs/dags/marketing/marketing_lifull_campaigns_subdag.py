@@ -23,10 +23,11 @@ class MarketingLifullCampaignsSubDag(MarketingSubDag):
 
     @logger
     def build_raw_tasks(self, dag):
-        for account in self.accounts:
+        for business_context in self.accounts:
+            account = self.accounts[business_context]
             BaseDAG.build_python_operator(
                 dag=dag,
-                task_id='{}-{}'.format(self.class_.value, account[1]),
+                task_id='{}-{}'.format(self.class_.value, business_context),
                 python_callable=self.transfer_files_to_raw,
                 provide_context=True,
                 op_kwargs={
@@ -50,11 +51,12 @@ class MarketingLifullCampaignsSubDag(MarketingSubDag):
 
     @logger
     def build_clean_tasks(self, dag):
-        for account in self.accounts:
+        for business_context in self.accounts:
+            account = self.accounts[business_context]
             for curr_group_name in self.group_names:
                 BaseDAG.build_python_operator(
                     dag=dag,
-                    task_id='{}_{}_{}_task'.format(self.class_.value, curr_group_name, account[1]),
+                    task_id='{}_{}_{}_task'.format(self.class_.value, curr_group_name, business_context),
                     python_callable=self._transfer_files_to_clean,
                     provide_context=True,
                     op_kwargs={

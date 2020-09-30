@@ -65,7 +65,7 @@ def raw_sub_dag(sub_dag_name, class_, accounts):
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
         start_date=MAIN_START_DATE,
         accounts=accounts,
-        auth=auth[class_],
+        auth=auth[class_]
     )
 
     return sub_dag.build_tasks('raw')

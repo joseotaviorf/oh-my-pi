@@ -35,7 +35,7 @@ class LifullCampaigns(Marketing):
                     '-a', 'end_date={}'.format(start_date),
                     '-a', 'account_id={}'.format(self.account[0]),
                     '-a', 'account_name={}'.format(self.account[1]),
-                    '-o', 's3://{}/raw/marketing/lifull_campaigns/acc={}/dt={}/data.gz'.format(self.s3_bucket, 'default', start_date)]
+                    '-o', 's3://{}/raw/marketing/lifull_campaigns/acc={}/dt={}/data.gz'.format(self.s3_bucket, self.account[1], start_date)]
         )
 
         while not (batch_client.get_job_info_by_id(r.get('jobId')).get('status') in ('SUCCEEDED', 'FAILED')):
@@ -75,7 +75,7 @@ class LifullCampaigns(Marketing):
               'dt_created={date_partition}/{file_name}.parquet' \
             .format(integration=self.integration,
                     table_name=table_name,
-                    acc_partition=self.account,
+                    acc_partition=self.account[1],
                     group_name=group_name,
                     date_partition=self.partition_date,
                     file_name=self.partition_date
