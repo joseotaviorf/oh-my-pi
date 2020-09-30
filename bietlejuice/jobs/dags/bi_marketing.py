@@ -56,7 +56,7 @@ main_dag = DAG(
 )
 
 
-def raw_sub_dag(sub_dag_name, class_):
+def raw_sub_dag(sub_dag_name, class_, accounts):
     sub_dag = MarketingSubDagFactory.factory(
         class_=class_,
         bucket=s3_bucket,
