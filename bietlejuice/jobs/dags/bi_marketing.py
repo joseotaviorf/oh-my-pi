@@ -193,6 +193,7 @@ criteo_raw_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_func=raw_sub_dag,
     sub_dag_name='criteo-load-to-raw',
     class_=MarketingEnum.CRITEO,
+    accounts='default'
 )
 
 criteo_clean_dag = BaseSubDag.get_sub_dag_operator(
@@ -221,7 +222,8 @@ rtb_raw_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=raw_sub_dag,
     sub_dag_name='rtb-load-to-raw',
-    class_=MarketingEnum.RTB
+    class_=MarketingEnum.RTB,
+    accounts='default'
 )
 
 rtb_clean_dag = BaseSubDag.get_sub_dag_operator(

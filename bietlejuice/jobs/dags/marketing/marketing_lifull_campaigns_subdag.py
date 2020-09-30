@@ -14,8 +14,8 @@ class MarketingLifullCampaignsSubDag(MarketingSubDag):
                                                              sub_dag_name,
                                                              dag_name,
                                                              schedule_interval,
-                                                             start_date, end_date, auth,
-                                                             'lifull_campaigns')
+                                                             start_date, auth, end_date,
+                                                             accounts=accounts)
         self.dim_tables = [['dim_mitula_campaign'], ['dim_trovit_campaign']]
         self.fact_tables = [['fact_mitula_daily_cost_attributions'], ['fact_trovit_daily_cost_attributions']]
         self.datalake_tables = ['marketing_lifull_campaigns']
@@ -26,7 +26,7 @@ class MarketingLifullCampaignsSubDag(MarketingSubDag):
         for account in self.accounts:
             BaseDAG.build_python_operator(
                 dag=dag,
-                task_id='{}-{}'.format(self.class_.value, account.get('account_id')),
+                task_id='{}-{}'.format(self.class_.value, account[1]),
                 python_callable=self.transfer_files_to_raw,
                 provide_context=True,
                 op_kwargs={
@@ -54,7 +54,7 @@ class MarketingLifullCampaignsSubDag(MarketingSubDag):
             for curr_group_name in self.group_names:
                 BaseDAG.build_python_operator(
                     dag=dag,
-                    task_id='{}_{}_{}_task'.format(self.class_.value, curr_group_name, account.get('account_name')),
+                    task_id='{}_{}_{}_task'.format(self.class_.value, curr_group_name, account[1]),
                     python_callable=self._transfer_files_to_clean,
                     provide_context=True,
                     op_kwargs={

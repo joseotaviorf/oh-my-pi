@@ -24,7 +24,7 @@ class LifullCampaigns(Marketing):
         start_date = self.execution_date.strftime(
             '%Y-%m-%d')
         batch_client = BatchClient()
-        job_name = 'scrap-trovit-data-{}'.format(self.account.get('account_name'))
+        job_name = 'scrap-trovit-data-{}'.format(self.account[1])
         job_queue = 'scrap-marketing-data'
         r = batch_client.start_batch_job(
             job_name=job_name,
@@ -33,8 +33,8 @@ class LifullCampaigns(Marketing):
             command=['scrapy', 'crawl', 'trovit',
                     '-a', 'start_date={}'.format(start_date),
                     '-a', 'end_date={}'.format(start_date),
-                    '-a', 'account_id={}'.format(self.account.get('account_id')),
-                    '-a', 'account_name={}'.format(self.account.get('account_name')),
+                    '-a', 'account_id={}'.format(self.account[0]),
+                    '-a', 'account_name={}'.format(self.account[1]),
                     '-o', 's3://{}/raw/marketing/lifull_campaigns/acc={}/dt={}/data.gz'.format(self.s3_bucket, 'default', start_date)]
         )
 
