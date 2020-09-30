@@ -27,7 +27,6 @@ class MarketingLifullCampaignsSubDag(MarketingSubDag):
             BaseDAG.build_python_operator(
                 dag=dag,
                 task_id='{}-{}'.format(self.class_.value, account.get('account_id')),
-                task_id='{}_task'.format(),
                 python_callable=self.transfer_files_to_raw,
                 provide_context=True,
                 op_kwargs={
