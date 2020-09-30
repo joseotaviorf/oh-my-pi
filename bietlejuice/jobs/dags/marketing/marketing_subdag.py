@@ -93,6 +93,7 @@ class MarketingSubDag(BaseSubDag):
             provide_context=True,
             op_kwargs={
                 'bucket': self.bucket,
+                'account': None,
                 'extra_configs': self.extra_configs
             }
         )
