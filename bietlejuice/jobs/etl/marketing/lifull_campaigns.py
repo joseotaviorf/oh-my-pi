@@ -51,6 +51,7 @@ class LifullCampaigns(Marketing):
         r_cols = OrderedDict([
             ('id', str),
             ('name', str),
+            ('account_name', str),
             ('clicks', str),
             ('desktop_cost', str),
             ('mobile_cost', str),
