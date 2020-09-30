@@ -21,6 +21,22 @@ class MarketingLifullCampaignsSubDag(MarketingSubDag):
         self.datalake_tables = ['marketing_lifull_campaigns']
         self.group_names = ['trovit', 'mitula']
 
+    @logger
+    def build_raw_tasks(self, dag):
+        for account in self.accounts:
+            BaseDAG.build_python_operator(
+                dag=dag,
+                task_id='{}-{}'.format(self.class_.value, account.get('account_id')),
+                task_id='{}_task'.format(),
+                python_callable=self.transfer_files_to_raw,
+                provide_context=True,
+                op_kwargs={
+                    'bucket': self.bucket,
+                    'account': account,
+                    'extra_configs': self.extra_configs
+                }
+            )
+
     def _transfer_files_to_clean(self, bucket, account, datalake_table, group_name, **kwargs):
         marketing_class = MarketingFactory.factory(
             class_=self.class_,
@@ -35,19 +51,20 @@ class MarketingLifullCampaignsSubDag(MarketingSubDag):
 
     @logger
     def build_clean_tasks(self, dag):
-        for curr_group_name in self.group_names:
-            BaseDAG.build_python_operator(
-                dag=dag,
-                task_id='{}_{}_task'.format(self.class_.value, curr_group_name),
-                python_callable=self._transfer_files_to_clean,
-                provide_context=True,
-                op_kwargs={
-                    'bucket': self.bucket,
-                    'datalake_table': self.datalake_tables[0],
-                    'account': 'default',
-                    'group_name': curr_group_name
-                }
-            )
+        for account in self.accounts:
+            for curr_group_name in self.group_names:
+                BaseDAG.build_python_operator(
+                    dag=dag,
+                    task_id='{}_{}_{}_task'.format(self.class_.value, curr_group_name, account.get('account_name')),
+                    python_callable=self._transfer_files_to_clean,
+                    provide_context=True,
+                    op_kwargs={
+                        'bucket': self.bucket,
+                        'datalake_table': self.datalake_tables[0],
+                        'account': account,
+                        'group_name': curr_group_name
+                    }
+                )
 
     @logger
     def build_staging_tasks(self, dag):

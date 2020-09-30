@@ -38,7 +38,7 @@ data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY'
 athena_client = AthenaClient(s3_bucket, data_acc_aws_access_key_id, data_acc_aws_secret_access_key)
 
 FACEBOOK_ADS_ACCOUNTS = accounts['facebook_ads']
-
+LIFULL_CAMPAIGNS_ACCOUNTS = accounts['lifull_campaigns']
 GOOGLE_ADS_ACCOUNTS = accounts['google_ads']
 
 # dags
@@ -64,7 +64,8 @@ def raw_sub_dag(sub_dag_name, class_):
         dag_name=MAIN_DAG_NAME,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
         start_date=MAIN_START_DATE,
-        auth=auth[class_]
+        accounts=accounts,
+        auth=auth[class_],
     )
 
     return sub_dag.build_tasks('raw')
@@ -249,7 +250,8 @@ lifull_raw_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=raw_sub_dag,
     sub_dag_name='lifull-load-to-raw',
-    class_=MarketingEnum.LIFULL
+    class_=MarketingEnum.LIFULL,
+    accounts=LIFULL_CAMPAIGNS_ACCOUNTS
 )
 
 lifull_clean_dag = BaseSubDag.get_sub_dag_operator(
@@ -257,7 +259,7 @@ lifull_clean_dag = BaseSubDag.get_sub_dag_operator(
     sub_dag_func=clean_sub_dag,
     sub_dag_name='lifull-raw-to-clean',
     class_=MarketingEnum.LIFULL,
-    accounts='default'
+    accounts=LIFULL_CAMPAIGNS_ACCOUNTS
 )
 
 lifull_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(

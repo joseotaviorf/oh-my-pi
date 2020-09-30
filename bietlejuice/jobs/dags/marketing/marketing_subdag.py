@@ -22,13 +22,14 @@ class MarketingSubDag(BaseSubDag):
         self.auth = auth
         self.extra_configs = extra_configs
 
-    def transfer_files_to_raw(self, bucket, extra_configs, **kwargs):
+    def transfer_files_to_raw(self, bucket, account, extra_configs, **kwargs):
         logger('m=transfer_files_to_raw, bucket={}'.format(bucket))
         marketing_class = MarketingFactory.factory(
             class_=self.class_,
             s3_bucket=bucket,
             execution_date=self._get_execution_date(kwargs.get('execution_date')),
             auth=self.auth,
+            account=account,
             extra_configs=extra_configs
         )
         getattr(marketing_class, 'move_{}_to_raw'.format(self.class_.value))()
