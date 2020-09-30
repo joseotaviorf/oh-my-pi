@@ -16,7 +16,7 @@ WITH
         load_date
     from datalake_marketing_costs.google_ads_performance_report
     where device = 'Computers'
-        and dt_load = date('{year}-{month}-{day}')
+        and load_date = date('{year}-{month}-{day}')
     group by 1,2,3,4,5,6,11,12
 ),
 mobile_devices_ads as (
@@ -35,7 +35,7 @@ mobile_devices_ads as (
         load_date
     from datalake_marketing_costs.google_ads_performance_report
     where device = 'Mobile devices with full browsers'
-        and dt_load = date('{year}-{month}-{day}')
+        and load_date = date('{year}-{month}-{day}')
     group by 1,2,3,4,5,6,11,12
 ),
 tablet_devices_ads as (
@@ -54,7 +54,7 @@ tablet_devices_ads as (
         load_date
     from datalake_marketing_costs.google_ads_performance_report
     where device = 'Tablets with full browsers'
-        and dt_load = date('{year}-{month}-{day}')
+        and load_date = date('{year}-{month}-{day}')
     group by 1,2,3,4,5,6,11,12
 ),
 cte_ads as (
@@ -105,7 +105,7 @@ LEFT JOIN tablet_devices_ads
         AND tablet_devices_ads.id_ad = google_table.id_ad
         AND tablet_devices_ads.dt_load = google_table.dt_load
 WHERE
-    google_table.dt_load = date('{year}-{month}-{day}')
+    google_table.load_date = date('{year}-{month}-{day}')
 ),
 final_cte_ads as (
     select distinct
@@ -169,7 +169,7 @@ computer_devices_keywords as (
         load_date
     FROM datalake_marketing_costs.google_keywords_performance_report
     WHERE device = 'Computers'
-        AND dt_load = date('{year}-{month}-{day}')
+        AND load_date = date('{year}-{month}-{day}')
     GROUP BY 1,2,3,4,5,6,12,13
 ),
 mobile_devices_keywords as (
@@ -188,7 +188,7 @@ mobile_devices_keywords as (
         load_date
     FROM datalake_marketing_costs.google_keywords_performance_report
     WHERE device = 'Mobile devices with full browsers'
-        AND dt_load = date('{year}-{month}-{day}')
+        AND load_date = date('{year}-{month}-{day}')
     GROUP BY 1,2,3,4,5,6,12,13
 ),
 tablet_devices_keywords as (
@@ -207,7 +207,7 @@ tablet_devices_keywords as (
         load_date
     FROM datalake_marketing_costs.google_keywords_performance_report
     WHERE device = 'Tablets with full browsers'
-        AND dt_load = date('{year}-{month}-{day}')
+        AND load_date = date('{year}-{month}-{day}')
     GROUP BY 1,2,3,4,5,6,12,13
 ),
 cte_keywords as (
@@ -259,7 +259,7 @@ LEFT JOIN tablet_devices_keywords
         AND tablet_devices_keywords.id_ad_group = google_table.id_ad_group
         AND tablet_devices_keywords.id_keyword = google_table.id_keyword
         AND tablet_devices_keywords.dt_load = google_table.dt_load
-WHERE google_table.dt_load = date('{year}-{month}-{day}')
+WHERE google_table.load_date = date('{year}-{month}-{day}')
 ),
 final_cte_keywords as (
     SELECT distinct
@@ -322,7 +322,7 @@ computer_devices_campaigns as (
         load_date
     FROM datalake_marketing_costs.google_campaigns_performance_report
     WHERE device = 'Computers'
-        AND dt_load = date('{year}-{month}-{day}')
+        AND load_date = date('{year}-{month}-{day}')
     GROUP BY 1,2,3,4,10,11
 ),
 mobile_devices_campaigns as (
@@ -339,7 +339,7 @@ mobile_devices_campaigns as (
         load_date
     FROM datalake_marketing_costs.google_campaigns_performance_report
     WHERE device = 'Mobile devices with full browsers'
-        AND dt_load = date('{year}-{month}-{day}')
+        AND load_date = date('{year}-{month}-{day}')
     GROUP BY 1,2,3,4,10,11
 ),
 tablet_devices_campaigns as (
@@ -356,7 +356,7 @@ tablet_devices_campaigns as (
         load_date
     FROM datalake_marketing_costs.google_campaigns_performance_report
     WHERE device = 'Tablets with full browsers'
-        AND dt_load = date('{year}-{month}-{day}')
+        AND load_date = date('{year}-{month}-{day}')
     GROUP BY 1,2,3,4,10,11
 ),
 cte_campaigns as (
@@ -399,7 +399,7 @@ LEFT JOIN tablet_devices_campaigns
         AND tablet_devices_campaigns.id_campaign = google_table.id_campaign
         AND tablet_devices_campaigns.dt_load = google_table.dt_load
 WHERE
-    google_table.dt_load = date('{year}-{month}-{day}')
+    google_table.load_date = date('{year}-{month}-{day}')
 ),
 final_cte_campaigns as (
     SELECT distinct

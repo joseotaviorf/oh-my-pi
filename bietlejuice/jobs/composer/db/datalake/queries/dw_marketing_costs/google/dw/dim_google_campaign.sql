@@ -12,7 +12,7 @@ WITH clean_table_common as (
     FROM 
         datalake_marketing_costs.google_campaigns_performance_report
     WHERE
-        dt_load = '{year}-{month}-{day}'
+        load_date = date('{year}-{month}-{day}')
     group by 2,3,4,5,6,7,8,9
 )
 SELECT clean_table_common.*,
