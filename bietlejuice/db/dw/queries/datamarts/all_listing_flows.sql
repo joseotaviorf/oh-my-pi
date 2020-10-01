@@ -29,7 +29,7 @@ SELECT
 FROM fact_house_listing_status f
 join dim_house_listing dhl
   ON dhl.sk_house_listing = f.sk_house_listing
-WHERE (dhl.is_last_version = true AND dhl.version > 0) AND (f.ts_status_end is null OR f.ts_status_end >= '2019-07-01') AND DATE_TRUNC('week',f.ts_status_start) >= '2019-01-01'
+ where dhl.version > 0
 ), all_listings_date AS (
 SELECT DISTINCT
     al.sk_house_listing,
@@ -41,7 +41,7 @@ SELECT DISTINCT
 	max(al.ts_status_start) OVER(PARTITION BY al.sk_house_listing, d.week_start) AS last_status_start
 FROM dim_date d
 join all_listings al
-   ON d.date >= al.dt_status_start AND d.date <= al.dt_status_end
+   ON d.date >= al.dt_status_start AND d.date < al.dt_status_end
 WHERE d.week_start < DATE_TRUNC('week', CURRENT_DATE)
 ), al_week AS (
 SELECT
