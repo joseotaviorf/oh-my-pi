@@ -5,5 +5,5 @@ select
     account_name,
     current_timestamp as ts_load
 from datalake_clean.marketing_lifull_campaigns
-where dt_created  = '{date}' and acc = '{account}'
+where dt_created  = '{date}'
 AND LOWER(group_name) = 'mitula'

@@ -112,8 +112,7 @@ class LifullCampaigns(Marketing):
     @logger
     def load_to_staging(self, dw_table_name):
         query = self._load_table(dw_table_name)
-
-        query = query.format(date=self.partition_date, account='default')
+        query = query.format(date=self.partition_date)
         logger.info("m=load_to_staging, query={}".format(query))
         self._load_to_staging(dw_table_name, query)
 
