@@ -7,5 +7,5 @@ select
     cast(total_cost as numeric(10,2)) as total_cost,
     current_timestamp as ts_load
 from datalake_clean.marketing_lifull_campaigns
-WHERE dt_created  = '{date}' and acc = '{account}'
+WHERE dt_created  = '{date}'
 AND LOWER(group_name) = 'trovit'
