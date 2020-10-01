@@ -28,6 +28,15 @@ costs_targets_results_combined AS (
     dl.utm_campaign,
     dl.utm_content,
     dl.utm_term,
+	  CASE
+	      WHEN LOWER(dl.utm_campaign) ~ '(sale|girafa|vender)' OR f.sk_user_lead_affiliate in (912255, 360754, 1711931, 2257503)
+	          THEN 'Sale'
+	      WHEN f.mkt_origin IN ('Indica Aí - Agents', 'Doorman', 'Indica Aí - General') OR LOWER(dl.utm_campaign) ~ '%hybrid%'
+	          THEN 'Hybrid'
+        WHEN ((dl.utm_campaign IS NULL OR dl.utm_campaign = '') AND LOWER(f.mkt_channel) NOT LIKE '%paid%') OR (LOWER(dl.utm_campaign) LIKE '%branded%' AND LOWER(dl.utm_campaign) NOT LIKE '%non-branded%')
+	          THEN 'Organic'
+	     ELSE 'Rental'
+	  END AS campaign_context,
     COUNT(DISTINCT CASE WHEN sk_lead_date > 0 THEN f.sk_house_listing_flow ELSE NULL END) AS leads,
     COUNT(DISTINCT CASE WHEN sk_prospect_date > 0 THEN f.sk_house_listing_flow ELSE NULL END) AS prospects,
     COUNT(DISTINCT CASE WHEN sk_qualified_date > 0 THEN f.sk_house_listing_flow ELSE NULL END) AS qualifieds,
@@ -51,10 +60,10 @@ costs_targets_results_combined AS (
     LEFT JOIN listings_rental AS lr
       ON SUBSTRING(f.sk_house_listing, 1, 9) = lr.id_house
       AND dd.month_start = lr.month_start
-  GROUP BY 1,2,3,4,5,6,7,8,9
-  
+  GROUP BY 1,2,3,4,5,6,7,8,9,10
+
   UNION ALL
-  
+
   -----------------------------------------
   -- Supply ForSale Marketing Investment --
   -----------------------------------------
@@ -68,6 +77,15 @@ costs_targets_results_combined AS (
     mkt.utm_campaign,
     mkt.utm_content,
     mkt.utm_term,
+    CASE
+        WHEN LOWER(mkt.utm_campaign) ~ '(sale|girafa|vender)'
+            THEN 'Sale'
+        WHEN mkt.mkt_origin IN ('Indica Aí - Agents', 'Doorman', 'Indica Aí - General') OR LOWER(mkt.utm_campaign) ~ '%hybrid%'
+            THEN 'Hybrid'
+	    WHEN ((mkt.utm_campaign IS NULL OR mkt.utm_campaign = '') AND LOWER(mkt.mkt_channel) NOT LIKE '%paid%') OR (LOWER(mkt.utm_campaign) LIKE '%branded%' and LOWER(mkt.utm_campaign) NOT LIKE '%non-branded%')
+            THEN 'Organic'
+       ELSE 'Rental'
+    END AS campaign_context,
     COUNT(NULL) AS leads,
     COUNT(NULL) AS prospects,
     COUNT(NULL) AS qualifieds,
@@ -84,10 +102,10 @@ costs_targets_results_combined AS (
     marketing.fact_marketing_daily_costs mkt
   WHERE
       mkt.mkt_origin IN ('Price Calculator - Sale', 'Owner PWA - Sale')
-  GROUP BY 1,2,3,4,5,6,7,8,9
-  
+  GROUP BY 1,2,3,4,5,6,7,8,9,10
+
   UNION ALL
-  
+
   -----------------------------------
   -- Supply ForSale Funnel Targets --
   -----------------------------------
@@ -105,6 +123,7 @@ costs_targets_results_combined AS (
     NULL::TEXT AS utm_campaign,
     NULL::TEXT AS utm_content,
     NULL::TEXT AS utm_term,
+    NULL::TEXT AS campaign_context,
     COUNT(NULL) AS leads,
     COUNT(NULL) AS prospects,
     COUNT(NULL) AS qualifieds,
@@ -119,19 +138,19 @@ costs_targets_results_combined AS (
     SUM(0::FLOAT) AS budget
   FROM
     datalake_raw.gsheets_sale_supply_targets AS str
-  WHERE 
+  WHERE
     mkt_origin != 'All'
-  GROUP BY 1,2,3,4,5,6,7,8,9
-  
+  GROUP BY 1,2,3,4,5,6,7,8,9,10
+
   UNION ALL
-  
+
   ---------------------------------
   -- Supply ForSale Cost Targets --
   ---------------------------------
   SELECT
     DATE(NULLIF(ct.date, '')) AS lead_date,
     COALESCE(NULLIF(ct.city_group, ''), 'Not Mapped')::TEXT AS city_group,
-    CASE 
+    CASE
       WHEN ct.planning_mkt_level3 = 'PWA - Paid'
         THEN 'Owner PWA'
       ELSE ct.planning_mkt_level3
@@ -142,6 +161,7 @@ costs_targets_results_combined AS (
     NULL::TEXT AS utm_campaign,
     NULL::TEXT AS utm_content,
     NULL::TEXT AS utm_term,
+    NULL::TEXT AS campaign_context,
     COUNT(NULL) AS leads,
     COUNT(NULL) AS prospects,
     COUNT(NULL) AS qualifieds,
@@ -159,7 +179,7 @@ costs_targets_results_combined AS (
     business = 'Sales'
     AND planning_mkt_level1 = 'Supply'
     AND planning_mkt_level2 = 'Landlords'
-  GROUP BY 1,2,3,4,5,6,7,8,9
+  GROUP BY 1,2,3,4,5,6,7,8,9,10
 )
 SELECT
   lead_date,
@@ -171,6 +191,7 @@ SELECT
   utm_campaign,
   utm_content,
   utm_term,
+  campaign_context,
   SUM(leads) AS leads,
   SUM(prospects) AS prospects,
   SUM(qualifieds) AS qualifieds,
@@ -184,4 +205,4 @@ SELECT
   SUM(first_listings_target) AS first_listings_target,
   SUM(budget) AS budget
 FROM costs_targets_results_combined
-GROUP BY 1,2,3,4,5,6,7,8,9
+GROUP BY 1,2,3,4,5,6,7,8,9,10
