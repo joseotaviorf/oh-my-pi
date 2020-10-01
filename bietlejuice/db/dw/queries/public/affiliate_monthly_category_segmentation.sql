@@ -71,7 +71,7 @@ WITH date_month_range as (
         ON dt_prospect.sk_date = fhl.sk_prospect_date
     LEFT JOIN dim_date dt_listing
         ON dt_listing.sk_date = fhl.sk_first_listing_date
-    WHERE duaf.type = 'Standard' -- This is the only affiliate type that we analyze segmentation
+    WHERE duaf.type IN ('Standard', 'Agent')
     GROUP BY 1,2,3,4,5,6,7,8,9
 ), ratios AS (
     SELECT
