@@ -36,6 +36,7 @@ create external table if not exists datalake_clean.crm_task_resolution_history (
     task_user_resolve_hours string,
     ts_action string,
     ts_previous_action string,
+    ts_next_action string,
     ts_created string,
     ts_start string,
     ts_completed string,

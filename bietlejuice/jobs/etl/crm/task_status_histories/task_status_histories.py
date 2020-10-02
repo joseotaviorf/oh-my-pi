@@ -168,6 +168,7 @@ class CRMTaskStatusHistories(object):
                 ("task_user_resolve_hours", str),
                 ("ts_action", str),
                 ("ts_previous_action", str),
+                ("ts_next_action", str),
                 ("ts_created", str),
                 ("ts_start", str),
                 ("ts_completed", str),
