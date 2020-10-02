@@ -248,7 +248,7 @@ with house_available_hours as (
                 	or (cast(slot as bigint) between 40 and 43 and hs.hours_available_18to19 = false))
         then slot_share_encaixe
         end as slot_share_nao_realizados_por_agenda,
-      	case when encaixe_realizado = 0 and (((t.event_date between sh.init and sh."end") and sh.status = 'suspenso') or ((t.event_date between bh.init and bh."end") and bh.status = 'BLOCKED')
+      	case when encaixe_realizado = 0 and (((t.event_date between sh.init and sh."end") and sh.status = 'SUSPENDED') or ((t.event_date between bh.init and bh."end") and bh.status = 'BLOCKED')
 					or ((cast(slot as bigint) between  0 and  3 and hs.hours_available_08to09 = false)
                     or (cast(slot as bigint) between  4 and  7 and hs.hours_available_08to09 = false)
                     or (cast(slot as bigint) between  8 and 11 and hs.hours_available_10to11 = false)
