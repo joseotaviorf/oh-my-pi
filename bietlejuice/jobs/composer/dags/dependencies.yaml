@@ -208,6 +208,9 @@ bietlejuice.enrich_proposal:
   - bietlejuice.sorting_hat:load-proposal-to-datalake-clean
   - bietlejuice.sorting_hat:load-proposal-version-to-datalake-clean
 
+bietlejuice.enrich_quinto_messenger:
+  - bietlejuice.quinto_messenger
+
 bietlejuice.enrich_region:
   - bietlejuice.ebdb:load-region
   # TODO [ODS] Add gsheets after migrated to composer
