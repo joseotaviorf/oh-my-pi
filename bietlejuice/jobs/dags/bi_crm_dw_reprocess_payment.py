@@ -1,14 +1,10 @@
-import logging
 from datetime import datetime
 
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
-from bietlejuice.jobs.base.new_base_etl import BaseETL, EnumDB
-from bietlejuice.jobs.dags import DW_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
-from bietlejuice.jobs.dags.util import xcom as xcom
 from bietlejuice.jobs.etl.crm.tasks import CRMTasksFactory, CRMTasksTableEnum
 
 # env vars
@@ -16,8 +12,8 @@ env.set_airflow_var_to_local_env('BI_DW', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_AC
 S3_BUCKET = env.get_airflow_env_var('bi-datalake-s3-bucket')
 MONGO_CLIENT_URI = env.get_airflow_env_var('MONGODB_CRM_URI')
 
-MAIN_DAG_ID = 'bi-crm-dw-reprocess-closing'
-MAIN_START_DATE = datetime(2020, 4, 1)
+MAIN_DAG_ID = 'bi-crm-dw-reprocess-payment'
+MAIN_START_DATE = datetime(2020, 5, 1)
 MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
 
 
@@ -139,12 +135,11 @@ def class_sub_dag(sub_dag_name, **kwargs):
     return local_dag
 
 
-
-tasks_closing_sub_dag_task = BaseSubDag.get_sub_dag_operator(
+tasks_payment_sub_dag_task = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
-    sub_dag_name='tasks_closing',
+    sub_dag_name='tasks_payment',
     sub_dag_func=class_sub_dag,
-    class_=CRMTasksTableEnum.CLOSING
+    class_=CRMTasksTableEnum.PAYMENT
 )
 
 
