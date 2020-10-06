@@ -56,6 +56,10 @@ SUBSCRIPTIONS = [
         "subscription_id": "mondayBoard-audit-data-engineering-subscription",
         "table_name": "monday",
     },
+    {
+        "subscription_id": "offers-audit-data-engineering-subscription",
+        "table_name": "rent_offer",
+    },
 ]
 
 
