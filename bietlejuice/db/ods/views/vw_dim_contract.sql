@@ -6,26 +6,26 @@ with b2b_info as (
     -- although these rules are replicated from vw_dim_lead, it would require much work to centralize with ODS right now
     -- TODO: after moving everything to our data lake, we can centralize rules like these ones
     coalesce(coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner'
-      or pa_b2b.id is not null
+      or (pa_b2b.id is not null AND p_b2b.type = 'PRIME')
       , false) as is_b2b,
     case
       when coalesce(lo.affiliate_type, l.affiliate_type) = 'B2BPartner'
        then 'online'
-      when pa_b2b.id is not null
+      when (pa_b2b.id is not null AND p_b2b.type = 'PRIME')
        then 'prime'
     end as b2b_type,
     case
     -- because a lead can have both 'affiliate_type' = 'B2BPartner' and 'partner_agent.id' not null and we need to
     -- prioritize the first type (online), the following check must be done
-      when pa_b2b.id is not null and coalesce(lo.affiliate_type, l.affiliate_type, '') != 'B2BPartner'
+      when pa_b2b.id is not null AND p_b2b.type = 'PRIME' and coalesce(lo.affiliate_type, l.affiliate_type, '') != 'B2BPartner'
         then
           case
-            when pj.id is null and h.first_publication is not null
-              then 'advanced_negotiation'
-            when h.external_id is null or h.external_id ~ '^([a-zA-Z0-9]+-){4}[a-zA-Z0-9]+$'
-              then 'standard'
-            when h.external_id is not null
-              then 'batch'
+                when pj.id is null and h.first_publication is not null
+                  then 'advanced_negotiation'
+                when h.external_id is null or h.external_id ~ '^([a-zA-Z0-9]+-){4}[a-zA-Z0-9]+$'
+                  then 'standard'
+                when h.external_id is not null
+                  then 'batch'
           end
     end as b2b_prime_type
   from contract c
@@ -41,8 +41,10 @@ with b2b_info as (
     on lo.id = rl.id_origin_lead
   left join partner_agent pa_b2b
 	  on pa_b2b.user_id = h.usuario_id
+ left join partner p_b2b
+    on p_b2b.id = pa_b2b.partner_id
   left join house_listing hl
-    on h.id = hl.id_house
+    on h.id = hl.id_house and c.ts_created between hl.ts_listing_version_start and hl.ts_listing_version_end
   left join photo_job pj
     on pj.imovel_id = h.id
     and pj.dt_job_created between hl.ts_listing_version_start and hl.ts_listing_version_end

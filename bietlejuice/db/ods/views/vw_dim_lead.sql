@@ -111,6 +111,9 @@ LEFT join (
 	    on lc.id_house = h.id
 	join partner_agent pa
 	    on h.usuario_id = pa.user_id
+	left join partner p_b2b
+    	on p_b2b.id = pa.partner_id
+    where p_b2b."type" = 'PRIME'
 ) lead_b2b
 	on lead_b2b.id = l.id
 left join (
@@ -121,7 +124,9 @@ left join (
 		on u_b2b.telefone_principal = l.telefone_anunciante
 	join partner_agent pa_b2b
 		on pa_b2b.user_id = u_b2b.id
-	where l.origem = 'OwnerPWA'
+	left join partner p_b2b
+    	on p_b2b.id = pa_b2b.partner_id
+	where l.origem = 'OwnerPWA' and p_b2b.type = 'PRIME'
 	group by 1
 ) b2b_prime_draft
   on b2b_prime_draft.id_lead = l.id

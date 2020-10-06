@@ -18,53 +18,53 @@ lbc AS (
      MAX((business_context = 'SALE')::INTEGER)::BOOLEAN AS is_for_sale,
      MAX((business_context = 'RENT')::INTEGER)::BOOLEAN AS is_for_rent,
      MAX(
-        CASE 
+        CASE
           WHEN lbc.business_context = 'SALE' THEN lbc.status
           END
       )
      AS status_sale,
      MAX(
-        CASE 
+        CASE
           WHEN lbc.business_context = 'RENT' THEN lbc.status
           END)
      AS status_rent,
      MAX(
-        CASE 
+        CASE
           WHEN lbc.business_context = 'SALE' THEN lbc.ts_created
           END)
      AS dt_qualified_sale,
      MAX(
-        CASE 
+        CASE
           WHEN lbc.business_context = 'RENT' THEN lbc.ts_created
           END)
      AS dt_qualified_rent,
      MAX(
-        CASE 
+        CASE
           WHEN lbc.business_context = 'SALE' THEN lbc.ts_first_listing
           END)
      AS dt_first_listing_sale,
      MAX(
-        CASE 
+        CASE
           WHEN lbc.business_context = 'RENT' THEN lbc.ts_first_listing
           END)
      AS dt_first_listing_rent,
      MAX(
-        CASE 
+        CASE
           WHEN lbc.business_context = 'SALE' THEN lbc.ts_opt_out_sale
           END)
      AS dt_opt_out_sale,
      MAX(
-        CASE 
+        CASE
           WHEN lbc.business_context = 'RENT' THEN lbc.ts_opt_out_rent
           END)
      AS dt_opt_out_rent,
      MAX(
-        CASE 
+        CASE
           WHEN lbc.business_context = 'SALE' THEN lbc.user_listing_registrant_sale
           END)
      AS user_registrant_sale,
      MAX(
-        CASE 
+        CASE
           WHEN lbc.business_context = 'RENT' THEN lbc.user_listing_registrant_rent
           END)
      AS user_registrant_rent
@@ -73,7 +73,7 @@ lbc AS (
     group by 1
 ),
 first_job AS (
-    SELECT 
+    SELECT
         imovel_id,
         min(id) AS id_job
     FROM photo_job
@@ -90,9 +90,17 @@ b2b_prime_draft AS (
         ON u_b2b.telefone_principal = l.telefone_anunciante
     JOIN partner_agent AS pa_b2b
         ON pa_b2b.user_id = u_b2b.id
-    WHERE
-        l.origem = 'OwnerPWA'
+   	left join partner p_b2b
+    	on p_b2b.id = pa_b2b.partner_id
+	where l.origem = 'OwnerPWA' and p_b2b.type = 'PRIME'
     group by 1
+),
+pa_b2b as (
+	select pa.*
+	from partner_agent pa
+    left join partner p_b2b
+    	on p_b2b.id = pa.partner_id
+    where p_b2b."type" = 'PRIME'
 ),
 acquisition_channels AS (
     SELECT
@@ -125,9 +133,9 @@ acquisition_channels AS (
             ELSE lbc.dt_qualified_rent
         END AS dt_first_contact,
         fhlf.dt_conversion,
-        CASE 
+        CASE
             WHEN (COALESCE(lr.reason, l.reason) = 'ProprietarioRecusou' AND l.reason != 'OWNER_DIDNT_LISTEN_TO_PITCH' AND fhlf.conversao_id IS NULL) THEN fhlf.dt_qualified
-            ELSE lbc.dt_qualified_rent 
+            ELSE lbc.dt_qualified_rent
         END AS dt_qualified,
         CASE
             WHEN (lbc.dt_opt_out_rent < fhlf.dt_opportunity AND lbc.status_rent = 'OPTED_OUT')
@@ -167,13 +175,13 @@ acquisition_channels AS (
         pj.job_status AS photo_job_status,
         pj.photographer_problem_reason AS photo_job_reason,
         lbc.dt_opt_out_rent,
-        CASE 
+        CASE
             WHEN l.is_for_sale::INT::BOOLEAN AND l.is_for_rent::INT::BOOLEAN THEN 'Hybrid'
             WHEN l.is_for_rent::INT::BOOLEAN THEN 'Only Rent'
             WHEN l.is_for_sale::INT::BOOLEAN THEN 'Only Sale'
             ELSE 'Organic'
         END AS lead_context_origin,
-        CASE 
+        CASE
             WHEN lbc.status_sale IS NULL THEN 'Not Qualified Yet'
             WHEN lbc.status_sale = 'EDITING' THEN 'Editing'
             WHEN lbc.status_sale = 'OPTED_OUT' THEN 'Opted Out'
@@ -188,7 +196,7 @@ acquisition_channels AS (
         ON rl.id = fhlf.lead_id
     LEFT JOIN house AS h
         ON h.id = fhlf.imovel_id
-    LEFT JOIN partner_agent AS pa_b2b
+    LEFT JOIN pa_b2b
         ON pa_b2b.user_id = h.usuario_id
     LEFT JOIN b2b_prime_draft
         ON b2b_prime_draft.id_lead = l.id
@@ -199,7 +207,7 @@ acquisition_channels AS (
         ON lbc.id_house = h.id
     LEFT JOIN lead_sales_company AS lsc
         ON lsc.id_lead = l.id
-    LEFT JOIN public.usuario AS u 
+    LEFT JOIN public.usuario AS u
         ON u.id = lbc.user_registrant_rent
     LEFT JOIN public.photo_job AS pj
         ON fhlf.photo_job_id = pj.id
@@ -276,7 +284,7 @@ SELECT
       DATE_PART('minute', dt_first_contact - dt_prospect)) / 60.)::NUMERIC(14,2) AS hours_prospect_to_first_contact,
     ((DATE_PART('day', dt_opportunity - dt_qualified) * 1440 +
       DATE_PART('hour', dt_opportunity - dt_qualified) * 60 +
-      DATE_PART('minute', dt_opportunity - dt_qualified)) / 60.)::NUMERIC(14,2) AS hours_qualified_to_opportunity,    
+      DATE_PART('minute', dt_opportunity - dt_qualified)) / 60.)::NUMERIC(14,2) AS hours_qualified_to_opportunity,
     ((DATE_PART('day', dt_first_listing - dt_opportunity) * 1440 +
       DATE_PART('hour', dt_first_listing - dt_opportunity) * 60 +
       DATE_PART('minute', dt_first_listing - dt_opportunity)) / 60.)::NUMERIC(14,2) AS hours_opportunity_to_listing,
@@ -285,7 +293,7 @@ SELECT
       DATE_PART('minute', dt_first_listing - dt_lead)) / 60.)::NUMERIC(14,2) AS hours_lead_to_listing,
     ((DATE_PART('day', dt_prospect - dt_lead) * 1440 +
       DATE_PART('hour', dt_prospect - dt_lead) * 60 +
-      DATE_PART('minute', dt_prospect - dt_lead)) / 1440.)::NUMERIC(14,2) AS days_lead_to_prospect,    
+      DATE_PART('minute', dt_prospect - dt_lead)) / 1440.)::NUMERIC(14,2) AS days_lead_to_prospect,
     ((DATE_PART('day', dt_qualified - dt_prospect) * 1440 +
       DATE_PART('hour', dt_qualified - dt_prospect) * 60 +
       DATE_PART('minute', dt_qualified - dt_prospect)) / 1440.)::NUMERIC(14,2) AS days_prospect_to_qualified,
@@ -304,14 +312,14 @@ SELECT
     ((DATE_PART('day', dt_first_listing - dt_lead) * 1440 +
       DATE_PART('hour', dt_first_listing - dt_lead) * 60 +
       DATE_PART('minute', dt_first_listing - dt_lead)) / 1440.)::NUMERIC(14,2) AS days_lead_to_listing,
-    CASE 
-      WHEN (dt_conversion IS NULL AND dt_discarded IS NULL) THEN NULL 
+    CASE
+      WHEN (dt_conversion IS NULL AND dt_discarded IS NULL) THEN NULL
       ELSE
-        ((DATE_PART('day', LEAST(COALESCE(dt_conversion, dt_discarded + INTERVAL '1 DAY'), 
+        ((DATE_PART('day', LEAST(COALESCE(dt_conversion, dt_discarded + INTERVAL '1 DAY'),
             COALESCE(dt_discarded, dt_conversion + INTERVAL '1 DAY')) - dt_lead) * 1440 +
-        DATE_PART('hour', LEAST(COALESCE(dt_conversion, dt_discarded + INTERVAL '1 DAY'), 
+        DATE_PART('hour', LEAST(COALESCE(dt_conversion, dt_discarded + INTERVAL '1 DAY'),
             COALESCE(dt_discarded, dt_conversion + INTERVAL '1 DAY')) - dt_lead) * 60 +
-        DATE_PART('minute', LEAST(COALESCE(dt_conversion, dt_discarded + INTERVAL '1 DAY'), 
+        DATE_PART('minute', LEAST(COALESCE(dt_conversion, dt_discarded + INTERVAL '1 DAY'),
             COALESCE(dt_discarded, dt_conversion + INTERVAL '1 DAY')) - dt_lead)) / 1440.)::NUMERIC(14,2)
     END AS days_lead_to_processing,
     acquisition_channels.acquisition_channel_rep,
