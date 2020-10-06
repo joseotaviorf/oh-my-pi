@@ -10,7 +10,9 @@ class CRMTasksPayment(CRMTasks):
         'BuscarPrimeiroBoleto',
         'PedidoDeReembolso',
         'ConfirmarBoletoCondominio',
-        'PedidoDeReembolsoInquilino'
+        'PedidoDeReembolsoInquilino',
+        'PedidoDeReembolsoInquilinoCondominio',
+        'AceiteDaAntecipacaoAluguel'
     ]
 
     MANUAL_TASK_WORKGROUP_IDS = [
