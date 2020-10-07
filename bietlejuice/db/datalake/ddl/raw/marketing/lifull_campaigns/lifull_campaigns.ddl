@@ -5,6 +5,7 @@ CREATE EXTERNAL TABLE datalake_raw.marketing_lifull_campaigns(
   `name`         string,
   `account_name` string,
   `clicks`       string,
+  `conversions`  string,
   `desktop_cost` string,
   `mobile_cost`  string,
   `total_cost`   string,

@@ -3,6 +3,7 @@ SELECT
   name,
   account_name,
   clicks,
+  conversions,
   desktop_cost,
   mobile_cost,
   total_cost,
