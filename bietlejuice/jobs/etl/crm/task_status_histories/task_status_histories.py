@@ -7,12 +7,14 @@ from qa_python_utils import QuintoAndarLogger
 from botocore.exceptions import ClientError
 from collections import OrderedDict
 from pymongo import MongoClient
+from abc import abstractmethod
 from gzip import GzipFile
 from io import BytesIO
 
 from bietlejuice.jobs.etl.crm.tasks.unidecode_handler import UnidecodeHandler
+from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.base.new_base_etl import BaseETL
-from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR
+from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR, DW_QUERIES_DIR
 
 logger = QuintoAndarLogger("CRMTaskStatusHistories")
 
@@ -24,6 +26,7 @@ class CRMTaskStatusHistories(object):
     }
     S3_FILE_NAME = "data"
     TABLE_PARTITION_PARAM = "__PARTITION_DATE__"
+    SCHEMA_NAMES = {"staging": "staging", "prod": "crm"}
 
     @logger
     def __init__(self, s3_bucket, execution_date, mongo_client_uri=None):
@@ -52,6 +55,34 @@ class CRMTaskStatusHistories(object):
             )
         else:
             self.s3_resource = boto3.resource("s3")
+
+    @abstractmethod
+    def move_fact_to_staging(self):
+        raise NotImplementedError("m=move_fact_to_staging, msg=method not implemented")
+
+    @abstractmethod
+    def move_dim_to_staging(self):
+        raise NotImplementedError("m=move_dim_to_staging, msg=method not implemented")
+
+    @abstractmethod
+    def append_fact_to_dw(self):
+        raise NotImplementedError("m=append_fact_to_dw, msg=method not implemented")
+
+    @abstractmethod
+    def append_dim_to_dw(self):
+        raise NotImplementedError("m=append_dim_to_dw, msg=method not implemented")
+
+    @abstractmethod
+    def delete_staging_fact_entries(self):
+        raise NotImplementedError(
+            "m=delete_staging_fact_entries, msg=method not implemented"
+        )
+
+    @abstractmethod
+    def delete_staging_dim_entries(self):
+        raise NotImplementedError(
+            "m=delete_staging_dim_entries, msg=method not implemented"
+        )
 
     @logger
     def extract_and_load_data(self, batch_size=10000, **kwargs):
@@ -300,4 +331,217 @@ class CRMTaskStatusHistories(object):
             raw_columns=r_cols,
             clean_columns=c_cols,
             row_group_offsets=row_group_offsets
+        )
+
+    def _move_dim_to_staging(
+            self,
+            table_name,
+            queues=None,
+            query_filename="create_staging_dim_history_table.sql",
+            manual_task_workgroups=None,
+            append_query_filename="append_dim_default_info.sql",
+    ):
+        self._move_to_staging(
+            table_name=table_name,
+            queues=queues,
+            query_filename=query_filename,
+            manual_task_workgroups=manual_task_workgroups,
+            append_query_filename=append_query_filename,
+        )
+
+    @logger
+    def _move_fact_to_staging(
+            self,
+            table_name,
+            queues=None,
+            query_filename="create_staging_fact_history_table.sql",
+            manual_task_workgroups=None,
+            append_query_filename="append_fact_default_info.sql",
+    ):
+        self._move_to_staging(
+            table_name=table_name,
+            queues=queues,
+            query_filename=query_filename,
+            manual_task_workgroups=manual_task_workgroups,
+            append_query_filename=append_query_filename,
+        )
+
+    @logger
+    def _move_to_staging(
+            self,
+            table_name,
+            queues,
+            query_filename,
+            manual_task_workgroups,
+            append_query_filename=None,
+    ):
+        query = BaseETL.get_query_from_file_name(
+            "{}/{}/{}".format(
+                DATALAKE_QUERIES_DIR,
+                CRMTaskStatusHistories.BUCKET_FOLDER_SUFFIXES["task_status"],
+                query_filename,
+            )
+        )
+
+        # This section appends a series of filters on the types of tasks, considering if they are manual or not
+        if queues is None:
+            where_clause = """(trim(ct.type) = 'Manual' """
+
+            if manual_task_workgroups:
+                where_clause += """and regexp_extract(ct.metadata, 'workgroupId":"([^"]+)', 1) in ('{manual_workgroups}'))""".format(
+                    manual_workgroups="', '".join(
+                        workgroup for workgroup in manual_task_workgroups
+                    )
+                )
+            else:
+                where_clause += """and ct.metadata not like '%workgroupId%')"""
+        else:
+            where_clause = "trim(ct.type) in ('{types}')".format(
+                types="', '".join(queue for queue in queues)
+            )
+
+            if manual_task_workgroups:
+                where_clause = """({previous_clause} or (trim(ct.type) = 'Manual' and regexp_extract(ct.metadata, 'workgroupId":"([^"]+)', 1) in ('{manual_workgroups}')))""".format(
+                    previous_clause=where_clause,
+                    manual_workgroups="', '".join(
+                        workgroup for workgroup in manual_task_workgroups
+                    ),
+                )
+
+        empty = CRMTaskStatusHistories._is_table_empty(
+            schema=CRMTaskStatusHistories.SCHEMA_NAMES["prod"], table_name=table_name
+        )
+        if not empty:
+            where_clause = """{previous_clause} and dt = '{dt_partition}'""".format(
+                previous_clause=where_clause, dt_partition=self.partition_date
+            )
+
+        final_query = query.replace("__WHERE_CLAUSE__", where_clause)
+
+        if append_query_filename is not None:
+            append_query = BaseETL.get_query_from_file_name(
+                "{}/{}/{}".format(
+                    DATALAKE_QUERIES_DIR,
+                    CRMTaskStatusHistories.BUCKET_FOLDER_SUFFIXES["task_status"],
+                    append_query_filename,
+                )
+            )
+            final_query = "{}\n{}".format(final_query, append_query)
+
+        df = self.athena_client.execute_query_and_return_dataframe(final_query)
+
+        logger.info(
+            "m=_move_to_staging, table_name={}, msg=sending df to DW staging".format(
+                table_name
+            )
+        )
+        BaseETL.dataframe_to_db(
+            df=df,
+            table_name="{}.{}".format(CRMTaskStatusHistories.SCHEMA_NAMES["staging"], table_name),
+            enum_db=EnumDB.BI_DW,
+            encoding="utf-8",
+            append=False,
+        )
+
+    @logger
+    def _append_dim_to_dw(self, table_name, query_filename="append_dim_table.sql"):
+        self.__append_to_dw(
+            schema=CRMTaskStatusHistories.SCHEMA_NAMES["prod"],
+            table_name=table_name,
+            query_filename=query_filename,
+        )
+
+    @logger
+    def _append_fact_to_dw(
+            self, table_name, query_filename="append_fact_default_table.sql"
+    ):
+        self.__append_to_dw(
+            schema=CRMTaskStatusHistories.SCHEMA_NAMES["prod"],
+            table_name=table_name,
+            query_filename=query_filename,
+        )
+
+    @logger
+    def __append_to_dw(self, schema, table_name, query_filename):
+        upsert_query = BaseETL.get_query_from_file_name(
+            "{}/staging/crm/{}".format(DW_QUERIES_DIR, query_filename)
+        )
+
+        empty = CRMTaskStatusHistories._is_table_empty(
+            schema=CRMTaskStatusHistories.SCHEMA_NAMES["prod"], table_name=table_name
+        )
+        if empty:
+            logger.info(
+                "m=__append_to_dw, schema={}, table_name={}, msg=table already empty".format(
+                    CRMTaskStatusHistories.SCHEMA_NAMES["prod"], table_name
+                )
+            )
+        else:
+            deletion_query = BaseETL.get_query_from_file_name(
+                file_name="{}/crm/delete_old_entries.sql".format(DW_QUERIES_DIR)
+            )
+
+            logger.info(
+                "m=__append_to_dw, schema={}, table_name={}, msg=deleting old entries".format(
+                    CRMTaskStatusHistories.SCHEMA_NAMES["prod"], table_name
+                )
+            )
+            BaseETL.execute_command(
+                command=deletion_query.format(
+                    table_name=table_name, partition_date=self.partition_date
+                ),
+                db_enum=EnumDB.BI_DW,
+                encoding="utf-8",
+                commit=True,
+            )
+
+            upsert_query = "{}\n where dt_partition = '{}';".format(
+                upsert_query, self.partition_date
+            )
+
+        self.__append_into_dw(
+            upsert_query=upsert_query.format(table_name=table_name),
+            schema=schema,
+            table_name=table_name,
+        )
+
+    @logger
+    def __append_into_dw(self, upsert_query, schema, table_name):
+        logger.info(
+            "m=__append_into_dw, schema={}, table_name={}, msg=getting data from DW".format(
+                schema, table_name
+            )
+        )
+        table_data = BaseETL.from_db_query(
+            db_enum=EnumDB.BI_DW, query=upsert_query, encoding="utf-8",
+        )
+
+        logger.info(
+            "__upsert_into_dw, schema={}, table_name={}, msg=bulk inserting...".format(
+                schema, table_name
+            )
+        )
+
+        BaseETL.bulk_insert(
+            table=table_data,
+            table_name="{}.{}".format(schema, table_name),
+            db_enum=EnumDB.BI_DW,
+            encoding="utf-8",
+        )
+
+    @staticmethod
+    @logger
+    def _is_table_empty(schema, table_name):
+        result = BaseETL.from_db_query(
+            db_enum=EnumDB.BI_DW,
+            query="select 1 from {}.{} limit 1".format(schema, table_name),
+        )
+        return len(result) == 1
+
+    @logger
+    def _delete_staging_entries(self, table_name):
+        BaseETL.truncate_table(
+            db_enum=EnumDB.BI_DW,
+            schema=CRMTaskStatusHistories.SCHEMA_NAMES["staging"],
+            table_name=table_name,
         )

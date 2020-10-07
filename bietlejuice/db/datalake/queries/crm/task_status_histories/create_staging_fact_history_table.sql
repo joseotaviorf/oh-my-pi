@@ -18,7 +18,7 @@ actions as (
         coalesce(try(cast(try(cast(ct.id_user_action as decimal)) as bigint)), -1) as sk_user_action,
         coalesce(try(cast(replace(regexp_extract(try(cast(ct.ts_start as varchar)), '\d{4}-\d{2}-\d{2}'), '-', '') as bigint)), -1) as sk_start_date,
         coalesce(try(cast(replace(regexp_extract(try(cast(ct.ts_action as varchar)), '\d{4}-\d{2}-\d{2}'), '-', '') as bigint)), -1) as sk_action_date,
-        coalesce(try(cast(replace(regexp_extract(try(cast(ct.ts_previous_action as varchar)), '\d{4}-\d{2}-\d{2}'), '-', '') as bigint)), -1) as sk_task_user_start_date,
+        coalesce(try(cast(replace(regexp_extract(try(cast(ct.ts_next_action as varchar)), '\d{4}-\d{2}-\d{2}'), '-', '') as bigint)), -1) as sk_next_action_date,
         coalesce(try(cast(replace(regexp_extract(try(cast(ct.ts_completed as varchar)), '\d{4}-\d{2}-\d{2}'), '-', '') as bigint)), -1) as sk_completed_date,
         ct.action_user_name,
         ct.action_type,
@@ -27,11 +27,12 @@ actions as (
         coalesce(
             cast(ct.task_user_resolve_hours as double),
             round(date_diff('second',
-                cast(lag(ct.ts_action) over (partition by ct.id_task order by ct.ts_action) as timestamp),
-                cast(ct.ts_action as timestamp))/3600.0, 1)
+                cast(ct.ts_action as timestamp),
+                cast(lead(ct.ts_action) over (partition by ct.id_task order by ct.ts_action) as timestamp)
+            )/3600.0, 1)
         ) as task_user_resolve_hours,
         ct.ts_action,
-        ct.ts_previous_action,
+        ct.ts_next_action,
         cast(ct.dt as date) as dt_partition
     from
         datalake_clean.crm_task_resolution_history ct
@@ -47,11 +48,11 @@ most_recent_completed_task_by_user as (
     select
         a.sk_task,
         a.sk_user_action,
-        a.sk_task_user_start_date,
+        a.sk_next_action_date,
         a.sk_action_date,
         a.action_type,
-        a.task_user_resolve_hours
-        a.ts_previous_action,
+        a.task_user_resolve_hours,
+        a.ts_next_action,
         a.ts_action,
         row_number() over (partition by a.sk_task, a.sk_user_action order by a.ts_action desc) as ranking
     from
@@ -78,18 +79,16 @@ tasks as (
         a.sk_user_action,
         a.sk_start_date,
         a.sk_completed_date,
+        coalesce(mrbu.sk_next_action_date, a.sk_next_action_date) as sk_next_action_date,
         coalesce(mrbu.sk_action_date, a.sk_action_date) as sk_action_date,
-        coalesce(mrbu.sk_task_user_start_date, a.sk_task_user_start_date) as sk_task_user_start_date,
-        coalesce(mrbu.sk_action_date, a.sk_action_date) as sk_task_user_end_date,
         a.action_user_name,
         a.action_type,
         a.action_reason,
         a.task_status,
         round(date_diff('second', csa.ts_created_task, csa.ts_started_task)/60.0, 1) as minutes_task_created_to_started,
         coalesce(mrbu.task_user_resolve_hours, a.task_user_resolve_hours) as task_user_resolve_hours,
+        coalesce(mrbu.ts_next_action, a.ts_next_action) as ts_next_action,
         coalesce(mrbu.ts_action, a.ts_action) as ts_action,
-        coalesce(mrbu.ts_previous_action, a.ts_previous_action) as ts_task_user_start,
-        coalesce(mrbu.ts_action, a.ts_action) as ts_task_user_end,
         a.dt_partition
     from
         actions a
@@ -105,6 +104,6 @@ tasks as (
     where
         -- due to a bug in CRM, the status REALIZE might have no user attached to it
         -- that scenario should only be possible with the RESOLVE status.
-        not(a.sk_user_action = -1 and t.action_type = 'REALIZE')
+        not(a.sk_user_action = -1 and a.action_type = 'REALIZE')
 )
 -- append data mart specific CTEs in order to populate its fact table (sqls: append_fact_{data mart})

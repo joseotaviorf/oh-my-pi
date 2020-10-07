@@ -1,11 +1,11 @@
 from qa_python_utils import QuintoAndarLogger
 
-from bietlejuice.jobs.etl.crm.tasks.tasks import CRMTasks
+from bietlejuice.jobs.etl.crm.task_status_histories.task_status_histories import CRMTaskStatusHistories
 
 logger = QuintoAndarLogger('CRMTasksClosing')
 
 
-class CRMTasksClosing(CRMTasks):
+class CRMTasksClosing(CRMTaskStatusHistories):
     QUEUES = [
         'FrontEnd',
         'CriarMinuta',
