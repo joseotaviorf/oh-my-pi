@@ -1,34 +1,49 @@
-with events_filter as (
-    select * from datalake_bigfone_raw.event
-    where provider='teravoz' and year={year} and month={month} and day={day}
+WITH events_filter AS (
+    SELECT
+        id,
+        metadata,
+        provider,
+        event,
+        event_timestamp,
+        received_timestamp,
+        year,
+        month,
+        day
+    FROM datalake_bigfone_raw.event
+    WHERE
+        provider IN ('teravoz','twilio') 
+        AND year = {year} 
+        AND month = {month} 
+        AND day = {day}
 ),
 -- we need to do this filter because there is a Teravoz bug that generates service.command 
 -- or/and recording.available events with wrong call id (Teravoz internal control call id).
-lonely_events as (
-    select 
-        count(get_json_object(metadata, '$.call_id')) as count_call_id, 
-        get_json_object(metadata, '$.call_id') as call_id 
-    from events_filter
-    where
-      event='service.command' or event='recording.available'
-    group by 2
+lonely_events AS (
+    SELECT 
+        COUNT(GET_JSON_OBJECT(metadata, '$.call_id')) AS count_call_id, 
+        GET_JSON_OBJECT(metadata, '$.call_id') AS call_id 
+    FROM events_filter
+    WHERE
+        provider = 'teravoz' 
+        AND (event = 'service.command' OR event = 'recording.available')
+    GROUP BY 2
     -- Teravoz can generate 2 events with the same wrong call_id (recording and service) 
-    having count_call_id <= 2
+    HAVING count_call_id <= 2
 )
-select 
-    bigint(events.id) as id,
-    events.event as event,
-    get_json_object(events.metadata, '$.call_id') as id_call,
-    events.metadata as metadata,
-    to_timestamp(events.event_timestamp, 'yyyy-MM-dd HH:mm:ss') as ts_created,
-    to_timestamp(from_utc_timestamp(events.event_timestamp, 'Brazil/East'), 'yyyy-MM-dd HH:mm:ss') as ts_created_local,
-    to_timestamp(events.received_timestamp, 'yyyy-MM-dd HH:mm:ss') as ts_received,
-    to_timestamp(from_utc_timestamp(events.received_timestamp, 'Brazil/East'), 'yyyy-MM-dd HH:mm:ss') as ts_received_local,
-    events.year as year,
-    events.month as month,
-    events.day as day  
-from events_filter events
-left join lonely_events lonely
-on lonely.call_id=get_json_object(events.metadata, '$.call_id')
-where 
-    lonely.call_id is null
+SELECT 
+    BIGINT(events.id) AS id,
+    events.event AS event,
+    GET_JSON_OBJECT(events.metadata, '$.call_id') AS id_call,
+    events.metadata AS metadata,
+    TO_TIMESTAMP(events.event_timestamp, 'yyyy-MM-dd HH:mm:ss') AS ts_created,
+    TO_TIMESTAMP(FROM_UTC_TIMESTAMP(events.event_timestamp, 'Brazil/East'), 'yyyy-MM-dd HH:mm:ss') AS ts_created_local,
+    TO_TIMESTAMP(events.received_timestamp, 'yyyy-MM-dd HH:mm:ss') AS ts_received,
+    TO_TIMESTAMP(FROM_UTC_TIMESTAMP(events.received_timestamp, 'Brazil/East'), 'yyyy-MM-dd HH:mm:ss') AS ts_received_local,
+    events.year AS year,
+    events.month AS month,
+    events.day AS day  
+FROM events_filter events
+LEFT JOIN lonely_events lonely
+    ON lonely.call_id = GET_JSON_OBJECT(events.metadata, '$.call_id')
+WHERE 
+    lonely.call_id IS NULL
