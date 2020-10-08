@@ -16,7 +16,7 @@ driver_tags AS (
 		CAST((CASE WHEN at1.tag_value = 'booking' THEN at2.tag_value END) AS BIGINT) AS id_booking,
 		CASE WHEN at1.tag_value = 'talk to agent' THEN at2.tag_value END AS id_tta,
 		CAST((CASE WHEN at1.tag_value = 'offer' THEN at2.tag_value END) AS BIGINT) AS id_offer_context, -- this comes in Tracksale as sk_offer rather than id_offer from EBDB
-		CAST((CASE WHEN at1.tag_value IN ('contract', 'sk_contract') THEN at2.tag_value END) AS BIGINT) AS id_contract
+		CAST((CASE WHEN at1.tag_value IN ('contract', 'sk_contract', 'id_contract') THEN at2.tag_value END) AS BIGINT) AS id_contract
 	FROM datalake_tracksale.answer_tags at1
 	INNER JOIN datalake_tracksale.answer_tags at2
 		ON at1.id_answer = at2.id_answer
