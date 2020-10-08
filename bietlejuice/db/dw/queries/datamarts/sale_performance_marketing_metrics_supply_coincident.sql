@@ -31,7 +31,7 @@ costs_targets_results_combined AS (
 	  CASE
 	      WHEN LOWER(dl.utm_campaign) ~ '(sale|girafa|vender)' OR f.sk_user_lead_affiliate in (912255, 360754, 1711931, 2257503)
 	          THEN 'Sale'
-	      WHEN f.mkt_origin IN ('Indica Aí - Agents', 'Doorman', 'Indica Aí - General') OR LOWER(dl.utm_campaign) ~ '%hybrid%'
+	      WHEN f.mkt_origin IN ('Indica Aí - Agents', 'Doorman', 'Indica Aí - General') OR LOWER(dl.utm_campaign) LIKE '%hybrid%'
 	          THEN 'Hybrid'
         WHEN ((dl.utm_campaign IS NULL OR dl.utm_campaign = '') AND LOWER(f.mkt_channel) NOT LIKE '%paid%') OR (LOWER(dl.utm_campaign) LIKE '%branded%' AND LOWER(dl.utm_campaign) NOT LIKE '%non-branded%')
 	          THEN 'Organic'
@@ -77,7 +77,7 @@ costs_targets_results_combined AS (
 	  CASE
 	      WHEN LOWER(dl.utm_campaign) ~ '(sale|girafa|vender)' OR f.sk_user_lead_affiliate in (912255, 360754, 1711931, 2257503)
 	          THEN 'Sale'
-	      WHEN f.mkt_origin IN ('Indica Aí - Agents', 'Doorman', 'Indica Aí - General') OR LOWER(dl.utm_campaign) ~ '%hybrid%'
+	      WHEN f.mkt_origin IN ('Indica Aí - Agents', 'Doorman', 'Indica Aí - General') OR LOWER(dl.utm_campaign) LIKE '%hybrid%'
 	          THEN 'Hybrid'
         WHEN ((dl.utm_campaign IS NULL OR dl.utm_campaign = '') AND LOWER(f.mkt_channel) NOT LIKE '%paid%') OR (LOWER(dl.utm_campaign) LIKE '%branded%' AND LOWER(dl.utm_campaign) NOT LIKE '%non-branded%')
 	          THEN 'Organic'
@@ -123,7 +123,7 @@ costs_targets_results_combined AS (
 	  CASE
 	      WHEN LOWER(dl.utm_campaign) ~ '(sale|girafa|vender)' OR f.sk_user_lead_affiliate in (912255, 360754, 1711931, 2257503)
 	          THEN 'Sale'
-	      WHEN f.mkt_origin IN ('Indica Aí - Agents', 'Doorman', 'Indica Aí - General') OR LOWER(dl.utm_campaign) ~ '%hybrid%'
+	      WHEN f.mkt_origin IN ('Indica Aí - Agents', 'Doorman', 'Indica Aí - General') OR LOWER(dl.utm_campaign) LIKE '%hybrid%'
 	          THEN 'Hybrid'
         WHEN ((dl.utm_campaign IS NULL OR dl.utm_campaign = '') AND LOWER(f.mkt_channel) NOT LIKE '%paid%') OR (LOWER(dl.utm_campaign) LIKE '%branded%' AND LOWER(dl.utm_campaign) NOT LIKE '%non-branded%')
 	          THEN 'Organic'
@@ -169,7 +169,7 @@ costs_targets_results_combined AS (
 	  CASE
 	      WHEN LOWER(dl.utm_campaign) ~ '(sale|girafa|vender)' OR f.sk_user_lead_affiliate in (912255, 360754, 1711931, 2257503)
 	          THEN 'Sale'
-	      WHEN f.mkt_origin IN ('Indica Aí - Agents', 'Doorman', 'Indica Aí - General') OR LOWER(dl.utm_campaign) ~ '%hybrid%'
+	      WHEN f.mkt_origin IN ('Indica Aí - Agents', 'Doorman', 'Indica Aí - General') OR LOWER(dl.utm_campaign) LIKE '%hybrid%'
 	          THEN 'Hybrid'
         WHEN ((dl.utm_campaign IS NULL OR dl.utm_campaign = '') AND LOWER(f.mkt_channel) NOT LIKE '%paid%') OR (LOWER(dl.utm_campaign) LIKE '%branded%' AND LOWER(dl.utm_campaign) NOT LIKE '%non-branded%')
 	          THEN 'Organic'
@@ -215,7 +215,7 @@ costs_targets_results_combined AS (
 	  CASE
 	      WHEN LOWER(dl.utm_campaign) ~ '(sale|girafa|vender)' OR f.sk_user_lead_affiliate in (912255, 360754, 1711931, 2257503)
 	          THEN 'Sale'
-	      WHEN f.mkt_origin IN ('Indica Aí - Agents', 'Doorman', 'Indica Aí - General') OR LOWER(dl.utm_campaign) ~ '%hybrid%'
+	      WHEN f.mkt_origin IN ('Indica Aí - Agents', 'Doorman', 'Indica Aí - General') OR LOWER(dl.utm_campaign) LIKE '%hybrid%'
 	          THEN 'Hybrid'
         WHEN ((dl.utm_campaign IS NULL OR dl.utm_campaign = '') AND LOWER(f.mkt_channel) NOT LIKE '%paid%') OR (LOWER(dl.utm_campaign) LIKE '%branded%' AND LOWER(dl.utm_campaign) NOT LIKE '%non-branded%')
 	          THEN 'Organic'
@@ -266,7 +266,7 @@ costs_targets_results_combined AS (
 	  CASE
 	      WHEN LOWER(mkt.utm_campaign) ~ '(sale|girafa|vender)'
 	          THEN 'Sale'
-	      WHEN mkt.mkt_origin IN ('Indica Aí - Agents', 'Doorman', 'Indica Aí - General') OR LOWER(mkt.utm_campaign) ~ '%hybrid%'
+	      WHEN mkt.mkt_origin IN ('Indica Aí - Agents', 'Doorman', 'Indica Aí - General') OR LOWER(mkt.utm_campaign) LIKE '%hybrid%'
 	          THEN 'Hybrid'
 	    WHEN ((mkt.utm_campaign IS NULL OR mkt.utm_campaign = '') AND LOWER(mkt.mkt_channel) NOT LIKE '%paid%') OR (LOWER(mkt.utm_campaign) LIKE '%branded%' and LOWER(mkt.utm_campaign) NOT LIKE '%non-branded%')
 	          THEN 'Organic'
