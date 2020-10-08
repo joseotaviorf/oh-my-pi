@@ -72,10 +72,8 @@ with google_consolidated_cost as (
         case when m.sk_date is not null then m.mobile_cost
             else g.mobile_cost end
             as mobile_cost,
-        case when m.sk_date is not null then g.report_type end
-            as report_type,
-        case when m.sk_date is not null then g.ad_type end
-            as ad_type
+        g.report_type as report_type,
+        g.ad_type as ad_type
     from t_google g
     full outer join manual_google_costs m
         on m.sk_date = g.sk_date
