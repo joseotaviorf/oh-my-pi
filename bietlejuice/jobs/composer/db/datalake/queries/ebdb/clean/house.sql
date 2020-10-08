@@ -12,6 +12,7 @@ SELECT
     condominio AS condo,
     dataConstrucao AS dt_built,
     dataParaMudar AS dt_moving_in,
+    anoConstrucao as construction_year,
     descricaoImovel AS house_description,
     detalhesMobilia AS furnishing_details,
     elevador AS has_elevator,

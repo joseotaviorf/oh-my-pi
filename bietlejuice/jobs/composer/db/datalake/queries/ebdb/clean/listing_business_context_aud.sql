@@ -10,6 +10,8 @@ select
   shortUrl_mod as mod_short_url,
   status,
   status_mod as mod_status,
+  closingStatus as status_closing,
+  closingStatus_mod as mod_status_closing,
   imovelId as id_house,
   selectedAction as selected_action,
   selectedAction_mod as mod_selected_action,

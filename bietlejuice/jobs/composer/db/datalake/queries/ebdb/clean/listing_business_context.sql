@@ -4,6 +4,7 @@ select
   businessContext as business_context,
   status,
   statusReason as status_reason,
+  closingStatus as status_closing,
   criadoEm as ts_created,
   atualizadoEm as ts_updated,
   firstPublicationDate as ts_first_publication,
