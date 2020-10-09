@@ -13,7 +13,7 @@ from bietlejuice.jobs.etl.marketing.marketing_enum import MarketingEnum
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import QuintoAndarLogger
 
-MAIN_DAG_NAME = 'bi-marketing-costs'
+MAIN_DAG_NAME = 'bi-lifull-reprocess'
 MAIN_START_DATE = datetime(2018, 12, 10, 2, 0, 0)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('30 0,5,8,16 * * *')
 
