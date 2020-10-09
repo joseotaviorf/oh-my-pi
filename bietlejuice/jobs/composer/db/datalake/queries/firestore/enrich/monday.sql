@@ -1,9 +1,17 @@
+WITH last_update AS (
+SELECT
+    GET_JSON_OBJECT(updated_message, '$.offerId') AS id_offer,
+    MAX(ts_updated) AS ts_last_updated
+FROM datalake_firestore_clean.monday
+GROUP BY 1
+),
+monday_audit AS (
 SELECT
   GET_JSON_OBJECT(updated_message, '$.offerId') AS id_offer,
   CAST(GET_JSON_OBJECT(updated_message, '$.texto90.value') AS BIGINT) AS id_buyer,
   CAST(GET_JSON_OBJECT(updated_message, '$.texto1.value') AS BIGINT) AS id_house,
-  CAST(GET_JSON_OBJECT(updated_message, '$.pessoas1.value') AS BIGINT) AS id_closing_specialist,
-  CAST(GET_JSON_OBJECT(updated_message, '$.pessoas.value') AS BIGINT) AS id_consultant,
+  CAST(REGEXP_EXTRACT(GET_JSON_OBJECT(updated_message, '$.pessoas1.value'), '(\\w+)') AS BIGINT) AS id_closing_specialist,
+  CAST(REGEXP_EXTRACT(GET_JSON_OBJECT(updated_message, '$.pessoas.value'), '(\\w+)') AS BIGINT) AS id_consultant,
   CAST(GET_JSON_OBJECT(updated_message, '$.text1.value') AS BIGINT) AS id_agent,
   CAST(GET_JSON_OBJECT(updated_message, '$.text5.value') AS BIGINT) AS id_fifty_agent,
   CAST(REGEXP_EXTRACT(GET_JSON_OBJECT(updated_message, '$.lista_suspensa.value'), '(\\w+)') AS BIGINT) AS real_estate_register_office_number,
@@ -20,7 +28,7 @@ SELECT
   CAST(GET_JSON_OBJECT(updated_message, '$.fgts____.value') AS FLOAT) AS payment_entry_amount,
   CAST(GET_JSON_OBJECT(updated_message, '$.entrada.value') AS FLOAT) AS value_in_cash,
   GET_JSON_OBJECT(updated_message, '$.texto41.value') AS financing_bank,
-  GET_JSON_OBJECT(updated_message, '$.grupo.id') AS status,
+  GET_JSON_OBJECT(updated_message, '$.group.title') AS status,
   GET_JSON_OBJECT(updated_message, '$.status_de_negocia__o.value') AS offer_status,
   GET_JSON_OBJECT(updated_message, '$.status88.value') AS bank_analysis_status,
   GET_JSON_OBJECT(updated_message, '$.an_lise_de_cr_dito.value') AS credit_status, 
@@ -35,7 +43,7 @@ SELECT
   GET_JSON_OBJECT(updated_message, '$.disparo_nps.value') AS sale_agreement_cancellation_reason,
   GET_JSON_OBJECT(updated_message, '$.motivo_de_descarte2.value') AS drop_reason_before_acceptance,
   GET_JSON_OBJECT(updated_message, '$.motivo_de_descarte_pr_.value') AS drop_reason_after_acceptance,
-  GET_JSON_OBJECT(updated_message, '$.motivos_de_descarte__dm_.value') AS drop_reason,
+  CAST(REGEXP_EXTRACT(GET_JSON_OBJECT(updated_message, '$.motivos_de_descarte__dm_.value'), '(\\w+)') AS BIGINT) AS drop_reason,
   GET_JSON_OBJECT(updated_message, '$.status47.value') AS house_occupant,
   GET_JSON_OBJECT(updated_message, '$.status_12.value') AS land_tenure,
   COALESCE(CAST(GET_JSON_OBJECT(updated_message, '$.iq_morando_.value') AS BOOLEAN), FALSE) AS has_seller_debt_payments,
@@ -61,5 +69,13 @@ SELECT
   CAST(GET_JSON_OBJECT(updated_message, '$.data91.value') AS DATE) AS dt_house_registry_ended,
   CAST(GET_JSON_OBJECT(updated_message, '$.data09.value') AS DATE) AS dt_sale_transacton_paid,
   CAST(GET_JSON_OBJECT(updated_message, '$.data29.value') AS DATE) AS dt_sale_key_delivered,
-  CAST(GET_JSON_OBJECT(updated_message, '$.data26.value') AS DATE) AS dt_kit_delivered
+  CAST(GET_JSON_OBJECT(updated_message, '$.data26.value') AS DATE) AS dt_kit_delivered,
+  ts_updated
 FROM datalake_firestore_clean.monday
+)
+SELECT
+  moa.*
+FROM monday_audit moa
+INNER JOIN last_update lup 
+  ON moa.id_offer = lup.id_offer
+  AND moa.ts_updated = lup.ts_last_updated

@@ -1,3 +1,11 @@
+WITH last_update AS (
+SELECT 
+    GET_JSON_OBJECT(updated_message, '$.id') AS id,
+    MAX(ts_updated) AS ts_last_updated
+FROM datalake_firestore_clean.sale_offer
+GROUP BY 1
+),
+sale_offer_audit AS (
 SELECT
     GET_JSON_OBJECT(updated_message, '$.id') AS id,
     CAST(GET_JSON_OBJECT(updated_message, '$.submitterId') AS BIGINT) AS id_buyer,
@@ -27,5 +35,12 @@ SELECT
     COALESCE(CAST(GET_JSON_OBJECT(updated_message, '$.paymentOptions.fgts') AS BOOLEAN), FALSE) AS has_used_fgts_in_payment,
     DATE(GET_JSON_OBJECT(updated_message, '$.tenantLeaveDate')) AS dt_tenant_left,
     CAST(CAST(GET_JSON_OBJECT(updated_message, '$.createdAt._seconds') AS BIGINT) AS TIMESTAMP) AS ts_created,   
-    CAST(CAST(GET_JSON_OBJECT(updated_message, '$.changedAt._seconds') AS BIGINT) AS TIMESTAMP) AS ts_updated
+    ts_updated
 FROM datalake_firestore_clean.sale_offer
+)
+SELECT
+    soa.*
+FROM sale_offer_audit soa
+INNER JOIN last_update lup
+    ON soa.id = lup.id 
+    AND soa.ts_updated = lup.ts_last_updated

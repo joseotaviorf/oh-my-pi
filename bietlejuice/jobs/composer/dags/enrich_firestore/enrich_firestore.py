@@ -15,7 +15,7 @@ from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 8, 29, 0, 0, 0, tzinfo=LOCAL_TZ)
 
-CONTEXT = "firestore_audit"
+CONTEXT = "firestore"
 DAG_ID = f"bietlejuice.enrich_{CONTEXT}"
 ENV = Variable.get("environment")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
