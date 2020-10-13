@@ -36,7 +36,6 @@ REPORT_SCHEMAS = {
         "AbsoluteTopImpressionPercentage",
         "ReportType",
         "acc",
-        "campaign_name",
         "dt",
     ],
     "campaigns_performance_report": [
