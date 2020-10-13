@@ -10,7 +10,7 @@ select
 	dhl.listing_category_start,
 	rf.days_house_listing_to_contract_signed,
 	dc.ts_signature,
-	coalesce(date(replace(replace(dc.dt_start,'0019','2019'),'2009','2019')), dc.dt_entrance) as dt_start,
+	coalesce(date(replace(replace(replace(dc.dt_start,'0019','2019'),'2009','2019'),'0020','2020')), dc.dt_entrance) as dt_start,
 	dc.dt_annulment,
 	dc.status,
 	dc.rent as value_rent,
@@ -216,4 +216,4 @@ left join all_re_rental_adm_fee rr_af
   on fr.city_group = rr_af.city_group
   and fr.contract_start_month = rr_af.contract_start_month
   and fr.months_after_first_contract = rr_af.months_after_first_contract
-order by 1, 2 desc, 3
+order by 1, 2 desc, 3;
