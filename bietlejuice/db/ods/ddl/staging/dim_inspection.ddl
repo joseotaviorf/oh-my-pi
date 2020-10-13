@@ -3,6 +3,7 @@ create table if not exists staging.dim_inspection (
   sk_inspection bigint,
   id_inspection bigint,
   type varchar(255),
+  mode varchar(255),
   status varchar(255),
   ts_created timestamp,
   ts_expired timestamp,

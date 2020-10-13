@@ -19,6 +19,7 @@ select
     v.id_ref,
     v.id_final_report_pdf,
     v.status,
+    v.mode,
     v.comment,
     v.hash,
     v.browser_tenant_approval,

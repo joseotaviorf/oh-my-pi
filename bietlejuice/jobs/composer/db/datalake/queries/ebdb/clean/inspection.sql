@@ -18,6 +18,7 @@ select
     soAprovacaoInquilino as os_tenant_approval,
     soAprovacaoProprietario as os_owner_approval,
     tipo as type,
+    mode,
     shortRevisarInq as short_review_tenant,
     shortRevisarProp as short_review_owner,
     lastReportSent as last_report_sent,

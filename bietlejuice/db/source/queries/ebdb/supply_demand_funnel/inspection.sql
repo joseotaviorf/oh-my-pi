@@ -24,6 +24,7 @@ select
 	v.expiraEm as ts_expired,
 	v.ref_id as id_ref,
 	v.tipo as "type",
+	v.mode,
 	v.shortRevisarInq as short_review_tenant,
 	v.shortRevisarProp as short_review_owner,
 	v.finalReportPdfId as id_final_report_pdf,

@@ -3,6 +3,7 @@ create table if not exists dim_inspection (
   sk_inspection bigint primary key,
   id_inspection bigint,
   type varchar,
+  mode varchar,
   status varchar,
   ts_created timestamp,
   ts_expired timestamp,

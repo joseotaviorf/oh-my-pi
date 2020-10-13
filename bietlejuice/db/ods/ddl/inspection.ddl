@@ -25,6 +25,7 @@ create table if not exists inspection (
   ts_expired timestamp,
   id_ref varchar(255),
   "type" varchar(255),
+  "mode" varchar(255),
   short_review_tenant varchar(255),
   short_review_owner varchar(255),
   id_final_report_pdf varchar(255),

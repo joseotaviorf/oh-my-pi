@@ -4,6 +4,7 @@ select
   id as sk_inspection,
   id as id_inspection,
   type,
+  mode,
   status,
   ts_created,
   ts_expired,
