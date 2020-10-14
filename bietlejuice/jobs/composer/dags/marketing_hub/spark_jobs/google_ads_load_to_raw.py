@@ -66,7 +66,7 @@ if __name__ == "__main__":
     metastore_database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
     metastore_database_location = f"{database_location}{MEDIA}/"
-    partition_cols = ["acc", "campaign_name", "dt"]
+    partition_cols = ["acc", "dt"]
 
     for s3_source_file_path in s3_source_file_paths:
 
