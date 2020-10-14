@@ -45,7 +45,7 @@ house_status_and_dimensions AS (
       CASE
          WHEN dhl.house_bedrooms <= 1 THEN 1
          WHEN dhl.house_bedrooms >= 4 THEN 4
-          ELSE dhl.house_bedrooms
+         ELSE dhl.house_bedrooms
       END AS house_bedrooms,
       dhl.is_b2b,
       dp.sk_partner,
@@ -246,4 +246,3 @@ SELECT
    CURRENT_TIMESTAMP AS ts_load
 FROM
    results
-LIMIT 10
