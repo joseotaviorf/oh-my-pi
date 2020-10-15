@@ -1,119 +1,154 @@
 --drop view if exists vw_sales_listing_flows_with_reprocessed_leads;
 --create or replace view vw_sales_listing_flows_with_reprocessed_leads as
-with reproc_leads as (
-    select 
+WITH reproc_leads AS (
+    SELECT 
       rl.id,
       l.origem,
       l.tipo,
       l.usuario_que_indicou_id,
       l.lead_agent_id,
       l.affiliate_type
-    from reprocessed_lead rl
-    join public.lead l
-      on l.id = rl.id_origin_lead
+    FROM reprocessed_lead rl
+    JOIN public.lead l
+      ON l.id = rl.id_origin_lead
   ),
-  lbc as (
-    select id_house,
-     max((business_context = 'SALE')::integer)::boolean as is_for_sale,
-     max((business_context = 'RENT')::integer)::boolean as is_for_rent,
-     max(
-        case 
-          when lbc.business_context = 'SALE' then lbc.status
-          end)
-     as status_sale,
-     max(
-        case 
-          when lbc.business_context = 'RENT' then lbc.status
-          end)
-     as status_rent,
-     max(
-        case 
-          when lbc.business_context = 'SALE' then lbc.ts_created
-          end)
-     as dt_qualified_sale,
-     max(
-        case 
-          when lbc.business_context = 'RENT' then lbc.ts_created
-          end)
-     as dt_qualified_rent,
-     max(
-        case 
-          when lbc.business_context = 'SALE' then lbc.ts_first_listing
-          end)
-     as dt_first_listing_sale,
-     max(
-        case 
-          when lbc.business_context = 'RENT' then lbc.ts_first_listing
-          end)
-     as dt_first_listing_rent,
-     max(
-        case 
-          when lbc.business_context = 'SALE' then lbc.ts_opt_out_sale
-          end)
-     as dt_opt_out_sale,
-     max(
-        case 
-          when lbc.business_context = 'RENT' then lbc.ts_opt_out_rent
-          end)
-     as dt_opt_out_rent,
-     max(
-        case 
-          when lbc.business_context = 'SALE' then lbc.user_listing_registrant_sale
-          end)
-     as user_registrant_sale,
-     max(
-        case 
-          when lbc.business_context = 'RENT' then lbc.user_listing_registrant_rent
-          end)
-     as user_registrant_rent
-    from
+  lbc AS (
+    SELECT id_house,
+     MAX((business_context = 'SALE')::INTEGER)::BOOLEAN AS is_for_sale,
+     MAX((business_context = 'RENT')::INTEGER)::BOOLEAN AS is_for_rent,
+     MAX(
+        CASE
+          WHEN lbc.business_context = 'SALE' THEN lbc.status
+          END)
+     AS status_sale,
+     MAX(
+        CASE
+          WHEN lbc.business_context = 'RENT' THEN lbc.status
+          END)
+     AS status_rent,
+     MAX(
+        CASE
+          WHEN lbc.business_context = 'SALE' THEN lbc.ts_created
+          END)
+     AS dt_qualified_sale,
+     MAX(
+        CASE
+          WHEN lbc.business_context = 'RENT' THEN lbc.ts_created
+          END)
+     AS dt_qualified_rent,
+     MAX(
+        CASE
+          WHEN lbc.business_context = 'SALE' THEN lbc.ts_first_listing
+          END)
+     AS dt_first_listing_sale,
+     MAX(
+        CASE
+          WHEN lbc.business_context = 'RENT' THEN lbc.ts_first_listing
+          END)
+     AS dt_first_listing_rent,
+     MAX(
+        CASE
+          WHEN lbc.business_context = 'SALE' THEN lbc.ts_opt_out_sale
+          END)
+     AS dt_opt_out_sale,
+     MAX(
+        CASE
+          WHEN lbc.business_context = 'RENT' THEN lbc.ts_opt_out_rent
+          END)
+     AS dt_opt_out_rent,
+     MAX(
+        CASE
+          WHEN lbc.business_context = 'SALE' THEN lbc.user_listing_registrant_sale
+          END)
+     AS user_registrant_sale,
+     MAX(
+        CASE
+          WHEN lbc.business_context = 'RENT' THEN lbc.user_listing_registrant_rent
+          END)
+     AS user_registrant_rent
+    FROM
        listing_business_context lbc
-    group by 1
+    GROUP BY 1
   ),
-  acquisition_channels as (
-    select 
+  first_job AS (
+    SELECT
+     imovel_id,
+     MIN(id) AS id_job
+    FROM photo_job
+    WHERE 
+     creation_origin <> 'Prop'
+    GROUP by imovel_id
+  ),
+  b2b_prime_draft AS (
+    SELECT
+     l.id AS id_lead,
+     MAX(pa_b2b.partner_id) AS partner_id
+    FROM
+     lead AS l
+    JOIN usuario AS u_b2b
+     ON u_b2b.telefone_principal = l.telefone_anunciante
+    JOIN partner_agent AS pa_b2b
+     ON pa_b2b.user_id = u_b2b.id
+    LEFT JOIN partner p_b2b
+     ON p_b2b.id = pa_b2b.partner_id
+    WHERE 
+     l.origem = 'OwnerPWA' 
+     AND p_b2b.type = 'PRIME'
+    GROUP BY 1
+  ),
+  pa_b2b AS (
+    SELECT 
+      pa.*
+    FROM partner_agent pa
+    LEFT JOIN partner p_b2b
+      ON p_b2b.id = pa.partner_id
+    WHERE 
+      p_b2b."type" = 'PRIME'
+  ),
+  acquisition_channels AS (
+    SELECT 
       fhlf.id,
       fhlf.lead_id,
       fhlf.conversao_id,
       fhlf.photo_job_id,
       fhlf.imovel_id,
-      case
-            when (lbc.user_registrant_sale = h.usuario_id and u.tipo_admin = 'Normal' and u.email not like '%quintoandar%')
-            then NULL
-        else COALESCE(lbc.user_registrant_sale, fhlf.rep_id)
-      end as rep_id,
+      CASE
+          WHEN (lbc.user_registrant_sale = h.usuario_id AND u.tipo_admin = 'Normal' AND (u.email NOT LIKE '%quintoandar%' OR u.email NOT LIKE '%actionline%'))
+          THEN fpj.rep_id
+          ELSE lbc.user_registrant_sale
+      END AS rep_id,
       fhlf.isales_registrant_id,
       fhlf.affiliate_id,
       fhlf.region_id,
-      case
-          when l.is_for_sale::int::boolean
-          then fhlf.dt_lead
-          else lbc.dt_qualified_sale
-      end as dt_lead,
-      case
-          when l.is_for_sale::int::boolean
-          then fhlf.dt_prospect
-          else lbc.dt_qualified_sale
-      end as dt_prospect,
-      case
-          when l.is_for_sale::int::boolean
-          then fhlf.dt_first_contact
-          else lbc.dt_qualified_sale
-      end as dt_first_contact,
+      CASE
+          WHEN l.is_for_sale::INT::BOOLEAN
+          THEN fhlf.dt_lead
+          ELSE lbc.dt_qualified_sale
+      END AS dt_lead,
+      CASE
+          WHEN l.is_for_sale::INT::BOOLEAN
+          THEN fhlf.dt_prospect
+          ELSE lbc.dt_qualified_sale
+      END AS dt_prospect,
+      CASE
+          WHEN l.is_for_sale::INT::BOOLEAN
+          THEN fhlf.dt_first_contact
+          ELSE lbc.dt_qualified_sale
+      END AS dt_first_contact,
       fhlf.dt_conversion,
-      case 
-         when (coalesce(l.reason_detail, l.reason) = 'ProprietarioRecusou' and l.reason != 'OWNER_DIDNT_LISTEN_TO_PITCH' and fhlf.conversao_id IS NULL) then fhlf.dt_qualified
-         else lbc.dt_qualified_sale 
-      end as dt_qualified,
-      case
-         when (lbc.dt_opt_out_sale < fhlf.dt_opportunity and lbc.status_sale = 'OPTED_OUT')
-         then null
-         when (fhlf.dt_opportunity >= lbc.dt_qualified_sale and (lbc.dt_first_listing_sale is null or fhlf.dt_opportunity <= lbc.dt_first_listing_sale))
-         then fhlf.dt_opportunity
-         when lbc.dt_first_listing_sale is not null
-         then lbc.dt_first_listing_sale
-      end as dt_opportunity,
-      lbc.dt_first_listing_sale as dt_first_listing,
+      CASE
+         WHEN (COALESCE(lr.reason, l.reason) = 'ProprietarioRecusou' AND l.reason != 'OWNER_DIDNT_LISTEN_TO_PITCH' AND fhlf.conversao_id IS NULL) THEN fhlf.dt_qualified
+         ELSE lbc.dt_qualified_sale 
+      END AS dt_qualified,
+      CASE
+         WHEN (lbc.dt_opt_out_sale < fhlf.dt_opportunity AND lbc.status_sale = 'OPTED_OUT')
+         THEN NULL
+         WHEN (fhlf.dt_opportunity >= lbc.dt_qualified_sale AND (lbc.dt_first_listing_sale IS NULL or fhlf.dt_opportunity <= lbc.dt_first_listing_sale))
+         THEN fhlf.dt_opportunity
+         WHEN lbc.dt_first_listing_sale IS NOT NULL
+         THEN lbc.dt_first_listing_sale
+      END AS dt_opportunity,
+      lbc.dt_first_listing_sale AS dt_first_listing,
       fhlf.dt_discarded,
       lsc.ts_sales_company_sent,
       fhlf.user_id_lead_first_discarder,
@@ -123,83 +158,70 @@ with reproc_leads as (
       fhlf.acquisition_method,
       fhlf.acquisition_channel,
       fhlf.acquisition_source,
-      case
-        when l.origem = 'Reprocessado' and rl.origem = 'Landing' then 'Reprocessed Landing'
-        when l.origem = 'Reprocessado' and rl.tipo = 'Afiliado' then 'Reprocessed Affiliate'
-        when l.origem = 'Reprocessado' then 'Reprocessed Others'
-        else fhlf.acquisition_channel
-      end as acquisition_channel_rep,
-      rl.usuario_que_indicou_id as origin_lead_usuario_que_indicou_id,
-      coalesce(
-            coalesce(rl.affiliate_type, l.affiliate_type) = 'B2BPartner'
-            or coalesce(b2b_prime.id_lead, b2b_prime_draft.id_lead) is not null
-            , false) as is_b2b,
-      coalesce(rl.affiliate_type, l.affiliate_type) as affiliate_type,
-      coalesce(rl.lead_agent_id, l.lead_agent_id) is not null as is_agent_referral,
-      l.status as lead_status,
-      coalesce(l.reason_detail, l.reason) as lead_reason,
+      CASE
+        WHEN l.origem = 'Reprocessado' AND rl.origem = 'Landing' THEN 'Reprocessed Landing'
+        WHEN l.origem = 'Reprocessado' AND rl.tipo = 'Afiliado' THEN 'Reprocessed Affiliate'
+        WHEN l.origem = 'Reprocessado' THEN 'Reprocessed Others'
+        ELSE fhlf.acquisition_channel
+      END AS acquisition_channel_rep,
+      rl.usuario_que_indicou_id AS origin_lead_usuario_que_indicou_id,
+      COALESCE(
+            COALESCE(rl.affiliate_type, l.affiliate_type) = 'B2BPartner'
+            OR COALESCE(pa_b2b.id, b2b_prime_draft.id_lead) IS NOT NULL
+            , false) AS is_b2b,
+      COALESCE(rl.affiliate_type, l.affiliate_type) AS affiliate_type,
+      COALESCE(rl.lead_agent_id, l.lead_agent_id) IS NOT NULL AS is_agent_referral,
+      l.status AS lead_status,
+      COALESCE(l.reason_detail, l.reason) AS lead_reason,
       l.cidade,
-      pj.job_status as photo_job_status,
-      pj.photographer_problem_reason as photo_job_reason,
+      pj.job_status AS photo_job_status,
+      pj.photographer_problem_reason AS photo_job_reason,
       lbc.dt_opt_out_sale,
-      case 
-         when l.is_for_sale::int::boolean and l.is_for_rent::int::boolean then 'Hybrid'
-         when l.is_for_rent::int::boolean then 'Only Rent'
-         when l.is_for_sale::int::boolean then 'Only Sale'
-         else 'Organic'
-      end as lead_context_origin,
-      case 
-         when lbc.status_rent is null then 'Not Qualified Yet'
-         when lbc.status_rent = 'EDITING' then 'Editing'
-         when lbc.status_rent = 'OPTED_OUT' then 'Opted Out'
-         else 'Once Published'
-      end as listing_rent_status
-    from public.fact_house_listing_flows fhlf
-    left join public.lead l
-      on l.id = fhlf.lead_id
-    left join reproc_leads rl
-      on rl.id = fhlf.lead_id
-    left join public.house h
-      on h.id = fhlf.imovel_id
-    left join (
-	  select
-	    lc.id_lead
-	  from public.lead_conversion lc
-	  join public.house h
-		on lc.id_house = h.id
-	  join public.partner_agent pa
-		on h.usuario_id = pa.user_id
-	  group by 1
-    ) b2b_prime
-	  on b2b_prime.id_lead = l.id
-    left join (
-	  select
-	    l.id as id_lead
-	  from public.lead l
-	  join public.usuario u_b2b
-		on u_b2b.telefone_principal = l.telefone_anunciante
-	  join public.partner_agent pa_b2b
-		on pa_b2b.user_id = u_b2b.id
-	  where l.origem = 'OwnerPWA'
-	  group by 1
-    ) b2b_prime_draft
-      on b2b_prime_draft.id_lead = l.id
-	left join public.house_listing hl
-      on hl.id_house = fhlf.imovel_id
-        and hl.version = 0
-    left join lbc
-      on lbc.id_house = h.id
-    left join public.lead_sales_company lsc
-      on lsc.id_lead = l.id
-    left join public.usuario u 
-        on u.id = lbc.user_registrant_rent
-    left join public.photo_job pj
-        on fhlf.photo_job_id = pj.id
-    where
+      CASE
+         WHEN l.is_for_sale::INT::BOOLEAN AND l.is_for_rent::INT::BOOLEAN THEN 'Hybrid'
+         WHEN l.is_for_rent::INT::BOOLEAN THEN 'Only Rent'
+         WHEN l.is_for_sale::INT::BOOLEAN THEN 'Only Sale'
+         ELSE 'Organic'
+      END AS lead_context_origin,
+      CASE
+         WHEN lbc.status_rent IS NULL THEN 'Not Qualified Yet'
+         WHEN lbc.status_rent = 'EDITING' THEN 'Editing'
+         WHEN lbc.status_rent = 'OPTED_OUT' THEN 'Opted Out'
+         ELSE 'Once Published'
+      END AS listing_rent_status
+    FROM public.fact_house_listing_flows fhlf
+    LEFT JOIN public.lead l
+      ON l.id = fhlf.lead_id
+    LEFT JOIN public.vw_lead_reason AS lr
+      ON l.reason = lr.reason_detail
+    LEFT JOIN reproc_leads rl
+      ON rl.id = fhlf.lead_id
+    LEFT JOIN public.house h
+      ON h.id = fhlf.imovel_id
+    LEFT JOIN pa_b2b
+      ON pa_b2b.user_id = h.usuario_id
+    LEFT JOIN b2b_prime_draft
+      ON b2b_prime_draft.id_lead = l.id
+    LEFT JOIN public.house_listing hl
+      ON hl.id_house = fhlf.imovel_id
+      AND hl.version = 0
+    LEFT JOIN lbc
+      ON lbc.id_house = h.id
+    LEFT JOIN public.lead_sales_company lsc
+      ON lsc.id_lead = l.id
+    LEFT JOIN public.usuario u 
+      ON u.id = lbc.user_registrant_rent
+    LEFT JOIN public.photo_job pj
+      ON fhlf.photo_job_id = pj.id
+    LEFT JOIN first_job
+      ON first_job.imovel_id = h.id
+    LEFT JOIN photo_job AS fpj
+      ON first_job.id_job = fpj.id
+    WHERE
       lbc.is_for_sale
-      or l.is_for_sale::int::boolean
+      OR l.is_for_sale::INT::BOOLEAN
   )
-  select
+  SELECT
     acquisition_channels.id,
     acquisition_channels.lead_id,
     acquisition_channels.conversao_id,
@@ -225,82 +247,82 @@ with reproc_leads as (
     acquisition_channels.acquisition_method,
     acquisition_channels.acquisition_channel,
     acquisition_channels.acquisition_source,
-    case
-        when (dt_first_listing is not null) then 'Listed'
-        when (dt_opportunity is not null and dt_first_listing is null) and photo_job_status in ('FotosTiradas','Completado', 'NaoListado') then 'NotListedYet'
-        when (dt_opportunity is not null and dt_opt_out_sale >= dt_opportunity and dt_first_listing is null) and photo_job_status in ('FotosTiradas','Completado', 'NaoListado') then 'OptedOut Opportunity'
-        when (dt_opportunity is not null and dt_first_listing is null and photo_job_status in ('Agendado','Iniciado','Novo')) then 'PhotoJobScheduled'
-        when (dt_opportunity is not null and dt_first_listing is null and photo_job_status = 'Cancelado') then coalesce(photo_job_reason, 'CancelledPhotoJob')
-        when (dt_opportunity is not null and dt_first_listing is null) then coalesce(photo_job_reason, 'CancelledPhotoJob')
-        when (dt_opportunity is null and dt_qualified is not null and lead_status = 'Descartado') then 'DiscardedQualified'
-        when (dt_opportunity is null and dt_qualified is not null and lead_status = 'Convertido') then 'NoPhotoJob'
-        when (dt_opportunity is null and dt_qualified is not null and conversao_id is not null) then 'NoPhotoJob'
-        when (dt_opportunity is null and dt_qualified is not null and dt_opt_out_sale >= dt_qualified) then 'OptedOut Qualified'
-        when (dt_opportunity is null and lead_reason = 'EmProspeccao') then 'OnHold'
-        when (dt_qualified is null and lead_status = 'Descartado') then 'DiscardedProspect'
-        when (dt_qualified is null and lead_status = 'Novo' and cidade = 'Outra cidade') then 'NaoProcessadoArea'
-        when (dt_qualified is null and lead_status = 'Novo') then 'NaoProcessado'
-        when (flow = 'Lead Flow' and dt_qualified is null) then 'NaoProcessado'
-        when (lead_status = 'Convertido' and conversao_id is null) then 'BrokenLeadFlow'
-        when (flow = 'Lead Flow' and dt_prospect is null and lead_status is null) then 'DiscardedLead'
-        when (flow = 'Self-Service Flow' and dt_prospect is not null and dt_qualified is null) then 'TermsNotAccepted'
-        when (flow = 'Self-Service Flow' and dt_qualified is not null and dt_opportunity is null) then 'NoPhotoJob'
-        when (flow = 'Organic Flow' and dt_prospect is not null and dt_qualified is null) then 'UnfinishedForm'
-        when (flow = 'Organic Flow' and dt_qualified is not null and dt_opportunity is null) then 'NoPhotoJob'
-        else 'NotMapped'
-    end as funnel_step,
-    ((date_part('hour', dt_prospect - dt_lead) * 60 +
-      date_part('minute', dt_prospect - dt_lead)) / 60.)::numeric(14,2) as hours_lead_to_prospect,
-    ((date_part('hour', dt_qualified - dt_prospect) * 60 +
-      date_part('minute', dt_qualified - dt_prospect)) / 60.)::numeric(14,2) as hours_prospect_to_qualified,
-    ((date_part('hour', dt_first_contact - dt_lead) * 60 +
-      date_part('minute', dt_first_contact - dt_lead)) / 60.)::numeric(14,2) as hours_lead_to_first_contact,
-    ((date_part('hour', dt_first_contact - dt_prospect) * 60 +
-      date_part('minute', dt_first_contact - dt_prospect)) / 60.)::numeric(14,2) as hours_prospect_to_first_contact,
-    ((date_part('hour', dt_opportunity - dt_qualified) * 60 +
-      date_part('minute', dt_opportunity - dt_qualified)) / 60.)::numeric(14,2) as hours_qualified_to_opportunity,    
-    ((date_part('hour', dt_first_listing - dt_opportunity) * 60 +
-      date_part('minute', dt_first_listing - dt_opportunity)) / 60.)::numeric(14,2) as hours_opportunity_to_listing,
-    ((date_part('hour', dt_first_listing - dt_lead) * 60 +
-      date_part('minute', dt_first_listing - dt_lead)) / 60.)::numeric(14,2) as hours_lead_to_listing,
-    ((date_part('day', dt_prospect - dt_lead) * 1440 +
-      date_part('hour', dt_prospect - dt_lead) * 60 +
-      date_part('minute', dt_prospect - dt_lead)) / 1440.)::numeric(14,2) as days_lead_to_prospect,    
-    ((date_part('day', dt_qualified - dt_prospect) * 1440 +
-      date_part('hour', dt_qualified - dt_prospect) * 60 +
-      date_part('minute', dt_qualified - dt_prospect)) / 1440.)::numeric(14,2) as days_prospect_to_qualified,
-    ((date_part('day', dt_first_contact - dt_lead) * 1440 +
-      date_part('hour', dt_first_contact - dt_lead) * 60 +
-      date_part('minute', dt_first_contact - dt_lead)) / 1440.)::numeric(14,2) as days_lead_to_first_contact,
-    ((date_part('day', dt_first_contact - dt_prospect) * 1440 +
-      date_part('hour', dt_first_contact - dt_prospect) * 60 +
-      date_part('minute', dt_first_contact - dt_prospect)) / 1440.)::numeric(14,2) as days_prospect_to_first_contact,
-    ((date_part('day', dt_opportunity - dt_qualified) * 1440 +
-      date_part('hour', dt_opportunity - dt_qualified) * 60 +
-      date_part('minute', dt_opportunity - dt_qualified)) / 1440.)::numeric(14,2) as days_qualified_to_opportunity,
-    ((date_part('day', dt_first_listing - dt_opportunity) * 1440 +
-      date_part('hour', dt_first_listing - dt_opportunity) * 60 +
-      date_part('minute', dt_first_listing - dt_opportunity)) / 1440.)::numeric(14,2) as days_opportunity_to_listing,
-    ((date_part('day', dt_first_listing - dt_lead) * 1440 +
-      date_part('hour', dt_first_listing - dt_lead) * 60 +
-      date_part('minute', dt_first_listing - dt_lead)) / 1440.)::numeric(14,2) as days_lead_to_listing,
-    case 
-      when (dt_conversion is null and dt_discarded is null) then null 
-      else
-        ((date_part('day', least(coalesce(dt_conversion, dt_discarded + INTERVAL '1 DAY'), 
-            coalesce(dt_discarded, dt_conversion + INTERVAL '1 DAY')) - dt_lead) * 1440 +
-        date_part('hour', least(coalesce(dt_conversion, dt_discarded + INTERVAL '1 DAY'), 
-            coalesce(dt_discarded, dt_conversion + INTERVAL '1 DAY')) - dt_lead) * 60 +
-        date_part('minute', least(coalesce(dt_conversion, dt_discarded + INTERVAL '1 DAY'), 
-            coalesce(dt_discarded, dt_conversion + INTERVAL '1 DAY')) - dt_lead)) / 1440.)::numeric(14,2)
-    end as days_lead_to_processing,
+    CASE
+        WHEN (dt_first_listing IS NOT NULL) THEN 'Listed'
+        WHEN (dt_opportunity IS NOT NULL AND dt_first_listing IS NULL) AND photo_job_status in ('FotosTiradas','Completado', 'NaoListado') THEN 'NotListedYet'
+        WHEN (dt_opportunity IS NOT NULL AND dt_opt_out_sale >= dt_opportunity AND dt_first_listing IS NULL) AND photo_job_status in ('FotosTiradas','Completado', 'NaoListado') THEN 'OptedOut Opportunity'
+        WHEN (dt_opportunity IS NOT NULL AND dt_first_listing IS NULL AND photo_job_status in ('Agendado','Iniciado','Novo')) THEN 'PhotoJobScheduled'
+        WHEN (dt_opportunity IS NOT NULL AND dt_first_listing IS NULL AND photo_job_status = 'Cancelado') THEN COALESCE(photo_job_reason, 'CancelledPhotoJob')
+        WHEN (dt_opportunity IS NOT NULL AND dt_first_listing IS NULL) THEN COALESCE(photo_job_reason, 'CancelledPhotoJob')
+        WHEN (dt_opportunity IS NULL AND dt_qualified IS NOT NULL AND lead_status = 'Descartado') THEN 'DiscardedQualified'
+        WHEN (dt_opportunity IS NULL AND dt_qualified IS NOT NULL AND lead_status = 'Convertido') THEN 'NoPhotoJob'
+        WHEN (dt_opportunity IS NULL AND dt_qualified IS NOT NULL AND conversao_id IS NOT NULL) THEN 'NoPhotoJob'
+        WHEN (dt_opportunity IS NULL AND dt_qualified IS NOT NULL AND dt_opt_out_sale >= dt_qualified) THEN 'OptedOut Qualified'
+        WHEN (dt_opportunity IS NULL AND lead_reason = 'EmProspeccao') THEN 'OnHold'
+        WHEN (dt_qualified IS NULL AND lead_status = 'Descartado') THEN 'DiscardedProspect'
+        WHEN (dt_qualified IS NULL AND lead_status = 'Novo' AND cidade = 'Outra cidade') THEN 'NaoProcessadoArea'
+        WHEN (dt_qualified IS NULL AND lead_status = 'Novo') THEN 'NaoProcessado'
+        WHEN (flow = 'Lead Flow' AND dt_qualified IS NULL) THEN 'NaoProcessado'
+        WHEN (lead_status = 'Convertido' AND conversao_id IS NULL) THEN 'BrokenLeadFlow'
+        WHEN (flow = 'Lead Flow' AND dt_prospect IS NULL AND lead_status IS NULL) THEN 'DiscardedLead'
+        WHEN (flow = 'Self-Service Flow' AND dt_prospect IS NOT NULL AND dt_qualified IS NULL) THEN 'TermsNotAccepted'
+        WHEN (flow = 'Self-Service Flow' AND dt_qualified IS NOT NULL AND dt_opportunity IS NULL) THEN 'NoPhotoJob'
+        WHEN (flow = 'Organic Flow' AND dt_prospect IS NOT NULL AND dt_qualified IS NULL) THEN 'UnfinishedForm'
+        WHEN (flow = 'Organic Flow' AND dt_qualified IS NOT NULL AND dt_opportunity IS NULL) THEN 'NoPhotoJob'
+        ELSE 'NotMapped'
+    END AS funnel_step,
+    ((DATE_PART('hour', dt_prospect - dt_lead) * 60 +
+      DATE_PART('minute', dt_prospect - dt_lead)) / 60.)::NUMERIC(14,2) AS hours_lead_to_prospect,
+    ((DATE_PART('hour', dt_qualified - dt_prospect) * 60 +
+      DATE_PART('minute', dt_qualified - dt_prospect)) / 60.)::NUMERIC(14,2) AS hours_prospect_to_qualified,
+    ((DATE_PART('hour', dt_first_contact - dt_lead) * 60 +
+      DATE_PART('minute', dt_first_contact - dt_lead)) / 60.)::NUMERIC(14,2) AS hours_lead_to_first_contact,
+    ((DATE_PART('hour', dt_first_contact - dt_prospect) * 60 +
+      DATE_PART('minute', dt_first_contact - dt_prospect)) / 60.)::NUMERIC(14,2) AS hours_prospect_to_first_contact,
+    ((DATE_PART('hour', dt_opportunity - dt_qualified) * 60 +
+      DATE_PART('minute', dt_opportunity - dt_qualified)) / 60.)::NUMERIC(14,2) AS hours_qualified_to_opportunity,    
+    ((DATE_PART('hour', dt_first_listing - dt_opportunity) * 60 +
+      DATE_PART('minute', dt_first_listing - dt_opportunity)) / 60.)::NUMERIC(14,2) AS hours_opportunity_to_listing,
+    ((DATE_PART('hour', dt_first_listing - dt_lead) * 60 +
+      DATE_PART('minute', dt_first_listing - dt_lead)) / 60.)::NUMERIC(14,2) AS hours_lead_to_listing,
+    ((DATE_PART('day', dt_prospect - dt_lead) * 1440 +
+      DATE_PART('hour', dt_prospect - dt_lead) * 60 +
+      DATE_PART('minute', dt_prospect - dt_lead)) / 1440.)::NUMERIC(14,2) AS days_lead_to_prospect,    
+    ((DATE_PART('day', dt_qualified - dt_prospect) * 1440 +
+      DATE_PART('hour', dt_qualified - dt_prospect) * 60 +
+      DATE_PART('minute', dt_qualified - dt_prospect)) / 1440.)::NUMERIC(14,2) AS days_prospect_to_qualified,
+    ((DATE_PART('day', dt_first_contact - dt_lead) * 1440 +
+      DATE_PART('hour', dt_first_contact - dt_lead) * 60 +
+      DATE_PART('minute', dt_first_contact - dt_lead)) / 1440.)::NUMERIC(14,2) AS days_lead_to_first_contact,
+    ((DATE_PART('day', dt_first_contact - dt_prospect) * 1440 +
+      DATE_PART('hour', dt_first_contact - dt_prospect) * 60 +
+      DATE_PART('minute', dt_first_contact - dt_prospect)) / 1440.)::NUMERIC(14,2) AS days_prospect_to_first_contact,
+    ((DATE_PART('day', dt_opportunity - dt_qualified) * 1440 +
+      DATE_PART('hour', dt_opportunity - dt_qualified) * 60 +
+      DATE_PART('minute', dt_opportunity - dt_qualified)) / 1440.)::NUMERIC(14,2) AS days_qualified_to_opportunity,
+    ((DATE_PART('day', dt_first_listing - dt_opportunity) * 1440 +
+      DATE_PART('hour', dt_first_listing - dt_opportunity) * 60 +
+      DATE_PART('minute', dt_first_listing - dt_opportunity)) / 1440.)::NUMERIC(14,2) AS days_opportunity_to_listing,
+    ((DATE_PART('day', dt_first_listing - dt_lead) * 1440 +
+      DATE_PART('hour', dt_first_listing - dt_lead) * 60 +
+      DATE_PART('minute', dt_first_listing - dt_lead)) / 1440.)::NUMERIC(14,2) AS days_lead_to_listing,
+    CASE
+      WHEN (dt_conversion IS NULL AND dt_discarded IS NULL) THEN NULL 
+      ELSE
+        ((DATE_PART('day', LEAST(COALESCE(dt_conversion, dt_discarded + INTERVAL '1 DAY'), 
+            COALESCE(dt_discarded, dt_conversion + INTERVAL '1 DAY')) - dt_lead) * 1440 +
+        DATE_PART('hour', LEAST(COALESCE(dt_conversion, dt_discarded + INTERVAL '1 DAY'), 
+            COALESCE(dt_discarded, dt_conversion + INTERVAL '1 DAY')) - dt_lead) * 60 +
+        DATE_PART('minute', LEAST(COALESCE(dt_conversion, dt_discarded + INTERVAL '1 DAY'), 
+            COALESCE(dt_discarded, dt_conversion + INTERVAL '1 DAY')) - dt_lead)) / 1440.)::NUMERIC(14,2)
+    END AS days_lead_to_processing,
     acquisition_channels.acquisition_channel_rep,
     acquisition_channels.origin_lead_usuario_que_indicou_id,
-    acquisition_channels.acquisition_channel_rep !~~ 'Reprocessed%' as is_not_reprocessed,
+    acquisition_channels.acquisition_channel_rep !~~ 'Reprocessed%' AS is_not_reprocessed,
     acquisition_channels.is_b2b,
     acquisition_channels.affiliate_type,
     acquisition_channels.is_agent_referral,
     acquisition_channels.dt_opt_out_sale,
     acquisition_channels.lead_context_origin,
     acquisition_channels.listing_rent_status
-  from acquisition_channels
+  FROM acquisition_channels
