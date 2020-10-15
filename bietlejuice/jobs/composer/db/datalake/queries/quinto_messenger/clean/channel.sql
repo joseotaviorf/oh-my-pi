@@ -2,6 +2,7 @@ SELECT
     id,
     channel_id AS id_external,
     source_id AS id_source,
+    source_uuid AS id_source_unique,
     channel_status,
     channel_attributes,
     channel_resource,
