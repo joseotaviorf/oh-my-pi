@@ -44,8 +44,8 @@ answers AS (
 	FROM datalake_tracksale.answer
 	WHERE 
 		COALESCE(email, '') != ''
-		AND COALESCE(phone, '') != ''
-		AND COALESCE(name, '') != ''
+		OR COALESCE(phone, '') != ''
+		OR COALESCE(name, '') != ''
 ),
 -- consider only the last answer for each customer in a dispatch
 last_dispatch_answers AS (
