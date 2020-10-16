@@ -13,9 +13,9 @@ from bietlejuice.jobs.etl.marketing.marketing_enum import MarketingEnum
 from qa_python_utils.aws.athena import AthenaClient
 from qa_python_utils.default_logger import QuintoAndarLogger
 
-MAIN_DAG_NAME = 'bi-lifull-reprocess-2020'
-MAIN_START_DATE = datetime(2020, 1, 1, 2, 0, 0)
-MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('30 0,5,8,16 * * *')
+MAIN_DAG_NAME = 'bi-lifull-reprocess'
+MAIN_START_DATE = datetime(2019, 1, 1, 2, 0, 0)
+MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('30 10 * * *')
 
 env.set_airflow_var_to_local_env('BI_DW', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
 
