@@ -7,8 +7,8 @@ from bietlejuice.jobs.dags.util import environment as env
 
 from bietlejuice.jobs.etl.zendesk import ZendeskTableEnum, ZendeskFactory
 
-MAIN_DAG_ID = 'bi-zendesk-fact-tickets-reprocessing-cpf'
-MAIN_START_DATE = datetime(2019, 4, 8, 0, 0, 0)
+MAIN_DAG_ID = 'bi-zendesk-fact-tickets-reprocessing'
+MAIN_START_DATE = datetime(2020, 8, 21, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('0 4 * * *')
 
 env.set_airflow_var_to_local_env('BI_DW', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
