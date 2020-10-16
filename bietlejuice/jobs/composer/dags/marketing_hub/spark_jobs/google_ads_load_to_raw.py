@@ -84,12 +84,13 @@ if __name__ == "__main__":
                     enriched_csv_file, s3_file_path_target, report_type
                 )
                 format_options = SparkTableStorageFormat.DEFAULT_RAW
-                s3_loader.load_full_table(
+                s3_loader.load_df(
                     df=enriched_csv_file,
-                    database_name=SOURCE,
-                    table_name=s3_target_table_name,
-                    database_location=s3_target_database_location,
+                    s3_path=s3_target_database_location + s3_target_table_name,
                     format_options=format_options,
+                    partitions=None,
+                    is_incremental=False,
+                    write_mode="append",
                 )
                 spark_metastore_loader.update_metastore(
                     df=enriched_csv_file,
