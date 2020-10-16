@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pendulum
 from airflow.models import DAG, Variable
@@ -131,6 +131,7 @@ sauron_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
             "parameters": [ENV, DATALAKE_BUCKET],
         }
     },
+    execution_timeout=timedelta(hours=3),
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
