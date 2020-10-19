@@ -173,13 +173,14 @@ class Marketing(object):
             encoding='utf-8',
         )
 
-        BaseETL.bulk_insert(
-            table=table_data,
-            table_name='{}.{}'.format(Marketing.SCHEMA_NAMES['staging'], dw_table_name),
-            db_enum=EnumDB.BI_DW,
-            encoding='utf-8',
-            commit=True,
-        )
+        if table_data is not None:
+            BaseETL.bulk_insert(
+                table=table_data,
+                table_name='{}.{}'.format(Marketing.SCHEMA_NAMES['staging'], dw_table_name),
+                db_enum=EnumDB.BI_DW,
+                encoding='utf-8',
+                commit=True,
+            )
 
     @logger
     def _load_to_prod(self, table_name):
