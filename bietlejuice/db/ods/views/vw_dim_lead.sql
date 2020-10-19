@@ -27,6 +27,7 @@
   l.condominio,
   l.iptu,
   l.ub_page_variant,
+  l.ub_page_name,
   l.reason,
   l.reason_detail,
   case

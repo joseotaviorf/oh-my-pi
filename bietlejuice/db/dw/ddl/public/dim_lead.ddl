@@ -27,6 +27,7 @@ create table if not exists dim_lead
  ,condominio integer   encode az64
  ,iptu integer   encode az64
  ,ub_page_variant varchar(255)   encode lzo
+ ,ub_page_name varchar(255)   encode lzo
  ,reason varchar(255)   encode lzo
  ,reason_detail varchar(255)   encode lzo
  ,deadline_of_new_contact varchar(255)   encode lzo

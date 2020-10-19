@@ -26,6 +26,7 @@ CREATE TABLE staging.dim_lead (
   condominio INTEGER,
   iptu INTEGER,
   ub_page_variant VARCHAR(255),
+  ub_page_name VARCHAR(255),
   reason VARCHAR(255),
   reason_detail VARCHAR(255),
   deadline_of_new_contact VARCHAR(255),

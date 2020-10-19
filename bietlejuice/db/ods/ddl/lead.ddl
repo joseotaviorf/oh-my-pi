@@ -25,6 +25,7 @@ create table if not exists lead (
   condominio integer,
   iptu integer,
   ub_page_variant varchar(255),
+  ub_page_name varchar(255),
   reason varchar(255),
   reason_detail varchar(255),
   status varchar(255),
