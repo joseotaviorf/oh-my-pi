@@ -20,7 +20,8 @@ with google_consolidated_cost as (
                 as utm_term,
             cast(dga.id_ad as varchar) as utm_content,
             fg.desktop_cost,
-            fg.mobile_cost
+            fg.mobile_cost,
+            fg.total_cost
         from marketing_costs.fact_google_daily_cost_attributions fg
             left join marketing_costs.dim_google_keyword dgk
                 on dgk.sk_keyword = fg.sk_keyword
@@ -72,6 +73,7 @@ with google_consolidated_cost as (
         case when m.sk_date is not null then m.mobile_cost
             else g.mobile_cost end
             as mobile_cost,
+        g.total_cost,
         g.report_type as report_type,
         g.ad_type as ad_type
     from t_google g
@@ -236,7 +238,7 @@ campaigns_full as (
             gcc.desktop_cost as desktop_cost,
             gcc.mobile_cost as mobile_cost,
             null::numeric(16,4) as other_cost,
-            null::numeric(16,4) as total_cost,
+            gcc.total_cost::numeric(16,4) as total_cost,
             gcc.report_type,
             gcc.ad_type
             from google_consolidated_cost gcc
@@ -664,15 +666,15 @@ cost_taxonomy as (
              when campaign_city in ('fln', 'florianopolis') then 'Florianópolis'
              when campaign_city in ('bsb', 'brasilia') then 'Brasília'
         end as campaign_city_matched,
-        tp.campaign_origin_aquisition,
-        tp.mkt_category,
-        tp.mkt_flow,
-        tp.mkt_completion,
-        tp.mkt_origin,
-        tp.mkt_channel,
-        tp.mkt_medium,
-        tp.mkt_source,
-        tp.mkt_platform,
+        coalesce(tp.campaign_origin_aquisition, 'Not Mapped') as campaign_origin_aquisition,
+        coalesce(tp.mkt_category, 'Not Mapped') as mkt_category,
+        coalesce(tp.mkt_flow, 'Not Mapped') as mkt_flow,
+        coalesce(tp.mkt_completion, 'Not Mapped') as mkt_completion,
+        coalesce(tp.mkt_origin, 'Not Mapped') as mkt_origin,
+        coalesce(tp.mkt_channel, 'Not Mapped') as mkt_channel,
+        coalesce(tp.mkt_medium, 'Not Mapped') as mkt_medium,
+        coalesce(tp.mkt_source, 'Not Mapped') as mkt_source,
+        coalesce(tp.mkt_platform, 'Not Mapped') as mkt_platform,
         tp.fator_custo,
         cf.utm_campaign,
         cf.utm_term,
@@ -686,7 +688,7 @@ cost_taxonomy as (
             else total_cost
         end * cast(coalesce(tp.fator_custo, '0') as numeric(3,2)) as cost,
         -- Funnel side is extracted from taxonomy
-        tp.side
+        coalesce(tp.side, 'Not Mapped') as side
     from campaigns_full cf
         left join datalake_raw.gsheets_marketing_cost_campaign_city as mccc
             on lower(mccc.campaign_name) = cf.campaign_name_l
