@@ -2,6 +2,7 @@ WITH channels AS (
 	SELECT
 		id_external,
 		id_source,
+		id_source_unique,
 		channel_status,
 		channel_attributes,
 		channel_resource,
@@ -21,6 +22,7 @@ last_extracted_channels AS (
 SELECT
 	c.id_external AS id_channel,
 	c.id_source,
+	c.id_source_unique AS id_conversation,
 	c.source,
 	GET_JSON_OBJECT(c.channel_attributes,'$.channel_type') AS channel_type,
 	c.channel_status,
@@ -28,7 +30,6 @@ SELECT
 	REGEXP_EXTRACT(GET_JSON_OBJECT(c.channel_attributes,'$.twilioNumber'),'(\\w+:)(.+)',2) AS twilio_phone_number,
 	REGEXP_EXTRACT(GET_JSON_OBJECT(c.channel_attributes,'$.serviceNumber'),'(\\w+:)(.+)',2) AS service_phone_number,
 	CAST(GET_JSON_OBJECT(c.channel_attributes,'$.forwarding') AS BOOLEAN) AS is_forwarded,
-	CAST(GET_JSON_OBJECT(c.channel_attributes,'$.long_lived') AS BOOLEAN) AS is_long_lived,
 	CAST(GET_JSON_OBJECT(c.channel_resource,'$.messages_count') AS INT) AS number_of_messages,
 	CAST(GET_JSON_OBJECT(c.channel_resource,'$.members_count') AS INT) AS number_of_members,
 	c.ts_created,
