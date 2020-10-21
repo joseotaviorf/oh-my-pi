@@ -52,45 +52,34 @@ base_photo_tasks AS (
   WHERE COALESCE(h.id, h_direct.id) IS NOT NULL
   GROUP BY 1
 ),
-base_leads AS (
-  SELECT
-    lead.id AS lead_id,
-    lead.tipo AS lead_type,
-    lead.origem AS lead_origin,
+base_leads as (
+  select
+    lead.id as lead_id,
+    lead.tipo as lead_type,
+    lead.origem as lead_origin,
     lead.utm_source,
     lead.utm_medium,
-    COALESCE(LOWER(BTRIM(lead.utm_campaign)) ~* '(institucional)|(branded)' AND LOWER(BTRIM(lead.utm_campaign)) !~* '(non-branded)', false) AS branded_lead,
-    lead.codigo_imobiliaria IS NOT NULL OR lead.flg_b2b AS b2b_lead
-    FROM lead
-),
-base_leads_reproc AS (
-  SELECT
-    lead.id AS lead_id,
-    lead.tipo AS lead_type,
-    lead.origem AS lead_origin,
-    lead.utm_source,
-    lead.utm_medium,
-    COALESCE(LOWER(BTRIM(lead.utm_campaign)) ~* '(institucional)|(branded)' AND LOWER(BTRIM(lead.utm_campaign)) !~* '(non-branded)', false) AS branded_lead,
-    lead.codigo_imobiliaria IS NOT NULL OR lead.flg_b2b AS b2b_lead,
-    rl.id_origin_lead AS old_lead_id
-    FROM lead
-    JOIN reprocessed_lead AS rl
-      ON rl.id = lead.id
-    WHERE lead.origem = 'Reprocessado'
+    coalesce(lower(btrim(lead.utm_campaign)) ~* '(institucional)|(branded)' and lower(btrim(lead.utm_campaign)) !~* '(non-branded)', false) as branded_lead,
+    lead.codigo_imobiliaria is not null OR lead.flg_b2b as b2b_lead,
+    case when lead.origem = 'Reprocessado'
+    	then rl.id_origin_lead
+    	else null
+    end as old_lead_id
+  from lead
+  	left join reprocessed_lead rl on rl.id = lead.id
 ),
 rep_leads AS (
-  SELECT bl.lead_id,
-    COALESCE(old_bl.lead_type, bl.lead_type) AS lead_type,
-    COALESCE(old_bl.lead_origin, bl.lead_origin) AS lead_origin,
-    COALESCE(old_bl.utm_source, bl.utm_source) AS utm_source,
-    COALESCE(old_bl.utm_medium, bl.utm_medium) AS utm_medium,
-    COALESCE(old_bl.branded_lead, bl.branded_lead) AS branded_lead,
-    COALESCE(old_bl.b2b_lead, bl.b2b_lead) AS b2b_lead,
-    COALESCE(bl.lead_origin = 'Reprocessado', false) AS reprocessed_flg
-    FROM base_leads AS bl
-    LEFT JOIN base_leads_reproc AS old_bl
-      ON old_bl.old_lead_id = bl.lead_id
-    GROUP BY 1,2,3,4,5,6,7,8
+  select bl.lead_id,
+    coalesce(old_bl.lead_type, bl.lead_type) as lead_type,
+    coalesce(old_bl.lead_origin, bl.lead_origin) as lead_origin,
+    coalesce(old_bl.utm_source, bl.utm_source) as utm_source,
+    coalesce(old_bl.utm_medium, bl.utm_medium) as utm_medium,
+    coalesce(old_bl.branded_lead, bl.branded_lead) as branded_lead,
+    coalesce(old_bl.b2b_lead, bl.b2b_lead) as b2b_lead,
+    coalesce(bl.lead_origin = 'Reprocessado', false) as reprocessed_flg
+    from base_leads bl
+    left join base_leads old_bl
+      on old_bl.lead_id = bl.old_lead_id
 ),
 acquisitions AS (
   SELECT
