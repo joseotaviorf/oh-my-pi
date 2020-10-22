@@ -72,27 +72,27 @@ media_names = FileService.list_layer_sql_files(TARGET, "")
 
 for media_name in media_names:
 
-    media_layer = f"{media_name}/{LayerEnum.ENRICH.value}"
+    layers = FileService.list_layer_sql_files(TARGET, media_name)
 
-    sql_file_list = FileService.list_sql_files_without_extension_from_layer(
-        TARGET, media_layer
-    )
-
-    enrich_sub_dag = DatalakeSubDAG(
-        dag_id=DAG_ID,
-        env=ENV,
-        datalake_bucket=DATALAKE_BUCKET,
-        layer=LayerEnum.ENRICH,
-        database_base_name=SOURCE,
-        target_database_base_name=TARGET,
-        relative_query_path=f"{TARGET}/{media_name}",
-        spark_job_paths=BASE_SPARK_JOBS_PATH,
-        athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
-        start_date=MAIN_START_DATE,
-    )
-
-    enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(
-        dag, sql_file_list, is_incremental=True, partitions=["acc", "load_date"]
-    )
+    if LayerEnum.ENRICH.value in layers:
+        enrich_layer = f"{media_name}/{LayerEnum.ENRICH.value}"
+        sql_file_list = FileService.list_sql_files_without_extension_from_layer(
+            TARGET, enrich_layer
+        )
+        enrich_sub_dag = DatalakeSubDAG(
+            dag_id=DAG_ID,
+            env=ENV,
+            datalake_bucket=DATALAKE_BUCKET,
+            layer=LayerEnum.ENRICH,
+            database_base_name=SOURCE,
+            target_database_base_name=TARGET,
+            relative_query_path=f"{TARGET}/{media_name}",
+            spark_job_paths=BASE_SPARK_JOBS_PATH,
+            athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
+            start_date=MAIN_START_DATE,
+        )
+        enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(
+            dag, sql_file_list, is_incremental=True, partitions=["acc", "load_date"]
+        )
 
 create_cluster_task >> list(enrich_sub_dags.values()) >> terminate_cluster_task
