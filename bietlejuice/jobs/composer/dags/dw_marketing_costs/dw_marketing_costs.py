@@ -9,7 +9,7 @@ from airflow.operators.quintoandar_databricks import (
 from airflow.operators.dummy_operator import DummyOperator
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
-from bietlejuice.jobs.composer.dags.dw_marketing_costs.sub_dag.incremental_dw_sub_dag import (
+from bietlejuice.jobs.composer.dags.base.incremental_dw_sub_dag import (
     IncrementalDWSubDAG,
 )
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
