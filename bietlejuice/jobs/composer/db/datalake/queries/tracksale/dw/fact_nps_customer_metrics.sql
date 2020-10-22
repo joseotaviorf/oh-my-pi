@@ -1,26 +1,20 @@
 WITH customer_conversions AS (
 	SELECT
-		 cc.id_customer,
-		 cc.id_dispatch,
-		 cc.id_answer,
-		 d.status,
-		 a.score_category,
-		 CASE
-			WHEN a.last_nps_answer <= 6 THEN 'detractor'
-			WHEN a.last_nps_answer <= 8 THEN 'passive'
-			WHEN a.last_nps_answer <= 10 THEN 'promoter'
-			END AS last_score_category,
-		 a.nps_answer,
-		 a.last_nps_answer,
-		 a.nps_comment,
-		 ROUND(a.seconds_spent_answering/60.0,2) AS minutes_spent_answering,
-		 d.ts_created
+		cc.id_customer,
+		cc.id_dispatch,
+		cc.id_answer,
+		d.status,
+		a.score_category,
+		a.nps_answer,
+		a.nps_comment,
+		ROUND(a.seconds_spent_answering/60.0,2) AS minutes_spent_answering,
+		d.ts_created
 	FROM datalake_tracksale.customer_conversions cc
 	INNER JOIN datalake_tracksale.dispatch d
 		ON cc.id_dispatch_lot = d.id
 	LEFT JOIN datalake_tracksale.answer a
-		 ON cc.id_answer = a.id
-	WHERE cc.id_customer != '' -- filter out dispatches from unidentified customers
+		ON cc.id_answer = a.id
+	WHERE cc.id_customer != '' -- filter out dispatches FROM unidentified customers
 ),
 customer_metrics AS (
 	SELECT
@@ -59,6 +53,43 @@ conversion_metrics AS (
 		ts_first_dispatched
 	FROM customer_metrics
 ),
+last_category AS (
+	SELECT
+		cc.id_customer,
+		cc.nps_answer AS last_score,
+		cc.score_category AS last_category
+	FROM customer_conversions cc
+	INNER JOIN customer_metrics cm
+		ON cm.id_last_answer = cc.id_answer
+),
+second_last_answer AS (
+	SELECT
+		cc.id_customer,
+		max(cc.id_answer) AS id_second_last_answer
+	FROM customer_conversions cc
+	LEFT JOIN customer_metrics cm
+		ON cm.id_customer = cc.id_customer
+	WHERE cc.id_answer < cm.id_last_answer
+	GROUP BY 1
+),
+second_last_category AS (
+	SELECT
+		cc.id_customer,
+		cc.score_category AS second_last_category
+	FROM customer_conversions cc
+	INNER JOIN second_last_answer sla
+		ON sla.id_second_last_answer = cc.id_answer
+),
+last_shift AS (
+	SELECT
+		lc.id_customer,
+		lc.last_score,
+		CONCAT(slc.second_last_category,CONCAT(':',lc.last_category)) AS last_shift_type
+	FROM last_category lc
+	INNER JOIN second_last_category slc
+		ON slc.id_customer = lc.id_customer
+	WHERE lc.last_category != slc.second_last_category
+),
 answer_keys AS (
 	SELECT
 		id_answer,
@@ -89,42 +120,41 @@ ebdb_cpf AS (
 	GROUP BY 1,2
 ),
 customer_keys AS (
-    SELECT
-        cc.id_customer,
-        MAX(COALESCE(eu.id_user,cci_e.id_user, cci_p.id_user)) AS id_user,
-        MAX(COALESCE(ec.cpf,cci_e.cpf,cci_p.cpf)) AS cpf
-    FROM datalake_tracksale.customer_conversions cc
-    LEFT JOIN ebdb_user eu
-        ON eu.id_answer = cc.id_answer
-    LEFT JOIN ebdb_cpf ec
-        ON ec.id_answer = cc.id_answer
-    LEFT JOIN datalake_ebdb_customer_contact_identification.customer_contact_identification cci_p
-        ON cci_p.customer_contact = cc.customer_phone
-        AND cci_p.channel = 'phone'
-    LEFT JOIN datalake_ebdb_customer_contact_identification.customer_contact_identification cci_e
+	SELECT
+		cc.id_customer,
+		MAX(COALESCE(eu.id_user,cci_e.id_user, cci_p.id_user)) AS id_user,
+		MAX(COALESCE(ec.cpf,cci_e.cpf,cci_p.cpf)) AS cpf
+	FROM datalake_tracksale.customer_conversions cc
+	LEFT JOIN ebdb_user eu
+		ON eu.id_answer = cc.id_answer
+	LEFT JOIN ebdb_cpf ec
+		ON ec.id_answer = cc.id_answer
+	LEFT JOIN datalake_ebdb_customer_contact_identification.customer_contact_identification cci_p
+		ON cci_p.customer_contact = cc.customer_phone
+		AND cci_p.channel = 'phone'
+	LEFT JOIN datalake_ebdb_customer_contact_identification.customer_contact_identification cci_e
 		ON cci_e.customer_contact = cc.customer_email
-        AND cci_e.channel = 'email'
-    GROUP BY 1
+		AND cci_e.channel = 'email'
+	GROUP BY 1
 )
 SELECT
 	cm.id_customer AS sk_nps_customer,
 	COALESCE(ck.id_user,-1) AS sk_user,
 	ck.cpf AS sk_personal_document,
-	CONCAT(cc.last_score_category,':',cc.score_category) AS last_shift_type,
+	ls.last_shift_type,
 	cm.total_dispatches,
 	cm.total_answers,
 	cm.answer_rate,
 	cm.comment_rate,
 	cm.avg_score,
-	cc.nps_answer AS last_score,
+	ls.last_score,
 	cm.overall_nps,
 	cm.avg_minutes_response_time,
 	cm.has_pending_survey,
 	cm.dt_last_dispatched,
-	current_timestamp as ts_load
+	current_timestamp AS ts_load
 FROM conversion_metrics cm
 LEFT JOIN customer_keys ck
 	ON ck.id_customer = cm.id_customer
-LEFT JOIN customer_conversions cc
-    ON cc.id_customer = cm.id_customer
-    AND cc.id_answer = cm.id_last_answer
+LEFT JOIN last_shift ls
+	ON ls.id_customer = cm.id_customer
