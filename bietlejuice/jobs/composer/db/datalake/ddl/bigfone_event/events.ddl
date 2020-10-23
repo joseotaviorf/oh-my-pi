@@ -10,8 +10,8 @@ create external table if not exists datalake_bigfone_clean_prod.events (
 )
 partitioned by (
     year smallint,
-    month tinyint,
-    day tinyint,
+    month smallint,
+    day smallint,
     event string
 )
 stored as parquet
