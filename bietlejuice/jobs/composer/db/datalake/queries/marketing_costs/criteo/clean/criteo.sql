@@ -11,6 +11,7 @@ SELECT
     currency,
     INT(impressions),
     DOUBLE(revenue),
+    `Cost Attribution Date` as dt_cost_attribution,
     year,
     month,
     day

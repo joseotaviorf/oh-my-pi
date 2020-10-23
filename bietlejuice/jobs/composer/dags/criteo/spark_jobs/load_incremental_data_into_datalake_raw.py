@@ -47,6 +47,7 @@ def get_api_response(accounts, execution_date):
             ],
             "format": "json",
             "timezone": "GMT",
+            "currency": "BRL",
         }
         data = json.dumps(body)
 
@@ -93,7 +94,7 @@ if __name__ == "__main__":
 
     if api_response:
         df = spark_client.create_dataframe(api_response)
-
+        df = df.withColumnRenamed("Day", "Cost Attribution Date")
         dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
         df = df.coalesce(1)
         df = (
