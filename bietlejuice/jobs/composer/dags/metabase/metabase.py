@@ -33,7 +33,7 @@ MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
 
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 
-# every table to be loaded must be here, with its db name and extraction type
+# every table to be loaded must be here, with its SQL file name and extraction type
 JOBS_EXTRACTION_TYPE = [
     {"table_name": "core_user", "extraction_type": "incremental"},
     {"table_name": "metabase_database", "extraction_type": "incremental"},
@@ -43,7 +43,7 @@ JOBS_EXTRACTION_TYPE = [
     {"table_name": "pulse_channel", "extraction_type": "incremental"},
     {"table_name": "report_card", "extraction_type": "incremental"},
     {"table_name": "report_dashboard", "extraction_type": "incremental"},
-    {"table_name": "report_dashboardcard", "extraction_type": "incremental"},
+    {"table_name": "report_dashboard_card", "extraction_type": "incremental"},
     {"table_name": "collection", "extraction_type": "full"},
     {"table_name": "pulse_card", "extraction_type": "full"},
     {"table_name": "pulse_channel_recipient", "extraction_type": "full"},
