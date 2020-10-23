@@ -66,18 +66,47 @@ def create_tables_sub_dag(sub_dag_name, table_name, extraction_type):
 
     slugged_table_name = table_name.replace("_", "-")
 
-    QuintoAndarDatabricksSubmitRunOperator(
+    load_to_raw_task = QuintoAndarDatabricksSubmitRunOperator(
         task_id=f"load-{slugged_table_name}-to-raw",
         dag=tables_sub_dag,
         json={
             "spark_python_task": {
-                "python_file": SPARK_JOBS_PATH
-                + f"load_{extraction_type}_data_into_datalake_raw.py",
+                "python_file": f"{SPARK_JOBS_PATH}load_{extraction_type}_data_into_datalake_raw.py",
                 "parameters": [ENV, SOURCE, DATALAKE_BUCKET, "{{ ds }}", table_name],
             }
         },
     )
 
+    load_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
+        task_id=f"load-{slugged_table_name}-to-clean",
+        dag=tables_sub_dag,
+        json={
+            "spark_python_task": {
+                "python_file": f"{SPARK_JOBS_PATH}load_{extraction_type}_data_into_datalake_clean.py",
+                "parameters": [ENV, SOURCE, DATALAKE_BUCKET, "{{ ds }}", table_name],
+            }
+        },
+    )
+
+    create_clean_external_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        task_id=f"create-{slugged_table_name}-clean-external-table",
+        dag=tables_sub_dag,
+        json={
+            "spark_python_task": {
+                "python_file": f"{SPARK_JOBS_PATH}create_external_table.py",
+                "parameters": [
+                    ENV,
+                    SOURCE,
+                    DATALAKE_BUCKET,
+                    ATHENA_QUERY_RESULT_LOCATION,
+                    "{{ ds }}",
+                    table_name,
+                ],
+            }
+        },
+    )
+
+    load_to_raw_task >> load_to_clean_task >> create_clean_external_table_task
     return tables_sub_dag
 
 
