@@ -54,15 +54,17 @@ if __name__ == "__main__":
     database_location = db_info["db_clean_path"]
 
     logger.info("m=__main__, msg=Creating Athena database if not exists...")
-    athena_metastore_service.create_database(db_info["db_clean_athena"])
+    athena_metastore_service.create_database(database_name)
 
     spark_metastore_service = SparkMetastoreService(SparkClient())
     logger.info(f"m=__main__, msg=Creating clean {table_name} external table...")
 
-    table_schema = spark_metastore_service.get_table_schema(database_name, table_name)
+    table_schema = spark_metastore_service.get_table_schema(
+        database_name=db_info["db_clean_databricks"], table_name=table_name
+    )
 
     if extraction_type == "full":
-        athena_metastore_service.drop_table(db_info["db_clean_athena"], table_name)
+        athena_metastore_service.drop_table(database_name, table_name)
 
         athena_metastore_service.create_external_table(
             database_name=database_name,
