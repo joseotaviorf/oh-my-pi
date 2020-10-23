@@ -22,7 +22,9 @@ S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 # spark and databricks vars
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
 LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{SOURCE}"
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
+CLUSTER_DESCRIPTION = Variable.get(
+    "databricks_bietlejuice_metabase_cluster", deserialize_json=True
+)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 
 # dag vars
@@ -101,6 +103,7 @@ def create_tables_sub_dag(sub_dag_name, table_name, extraction_type):
                     ATHENA_QUERY_RESULT_LOCATION,
                     "{{ ds }}",
                     table_name,
+                    extraction_type,
                 ],
             }
         },
