@@ -478,8 +478,8 @@ branding_costs AS (
         mkt_medium,
         mkt_source,
         utm_campaign,
-        SUM(cost::FLOAT) AS cost_fr,
-        0::FLOAT AS cost_fs
+        SUM(CASE WHEN lower(trim(business_context)) = 'rent' THEN cost::FLOAT ELSE 0::FLOAT END) AS cost_fr,
+        SUM(CASE WHEN lower(trim(business_context)) = 'sale' THEN cost::FLOAT ELSE 0::FLOAT END) AS cost_fs
     FROM datalake_raw.gsheets_offline_and_branding_marketing_costs
     WHERE
         sk_date >= 20190101
