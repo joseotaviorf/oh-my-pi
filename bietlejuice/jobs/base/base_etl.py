@@ -448,16 +448,6 @@ class BaseETL(object):
                                           table_name, append, commit, encoding, f, conn)
 
     @classmethod
-    def kill_locks_for_table(cls, conn, table_name):
-        print 'm=kill_locks_for_table, table_name={}, msg=killing locks'.format(table_name)
-        table_splitted = table_name.split('.')
-        schema = 'public' if len(table_splitted) == 1 else table_splitted[0]
-        table = table_splitted[0] if len(table_splitted) == 1 else table_splitted[1]
-
-        kill_locks = """call terminate_locks_for_table('{schema}', '{table}')""".format(schema=schema, table=table)
-        conn.cursor().execute(kill_locks)
-
-    @classmethod
     def bulk_insert_from_s3_to_dw(cls, bucket_name, filename, enum_db_dest, table_name,
                                   append=True, commit=True, encoding='LATIN1', f_cursor=None, conn=None):
         aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
@@ -479,9 +469,6 @@ class BaseETL(object):
         # TODO: FIX THIS -> if env = forno, we got a postgres database, so COPY command is not equal
         try:
             if not append:
-                if enum_db_dest == EnumDB.BI_DW and not eval(str(forno)):
-                    cls.kill_locks_for_table(con, table_name)
-
                 print 'm=bulk_insert_from_s3_to_dw, table_name={}, msg=truncating table'.format(table_name)
                 con.cursor().execute('truncate table {};'.format(table_name))
             if enum_db_dest == EnumDB.BI_DW and not eval(str(forno)):
