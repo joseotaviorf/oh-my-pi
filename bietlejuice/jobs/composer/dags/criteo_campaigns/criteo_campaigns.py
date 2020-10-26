@@ -18,7 +18,7 @@ ACCOUNTS = Variable.get("criteo_accounts")
 
 # DAG params setup
 SOURCE = "marketing_costs"
-MEDIA = "criteo"
+MEDIA = "criteo_campaigns"
 DAG_ID = f"bietlejuice.{MEDIA}"
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2019, 6, 1, 0, 0, 0, tzinfo=local_tz)
@@ -29,7 +29,7 @@ ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-LOAD_CRITEO_INTO_DATALAKE_RAW_FILE_PATH = (
+LOAD_CRITEO_CAMPAIGNS_INTO_DATALAKE_RAW_FILE_PATH = (
     S3_PREFIX + f"/spark_jobs/{MEDIA}/load_incremental_data_into_datalake_raw.py"
 )
 DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
@@ -65,12 +65,12 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     libraries=CUSTOM_LIBRARIES,
 )
 
-criteo_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="criteo-to-datalake-raw",
+criteo_campaigns_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="criteo-campaigns-to-datalake-raw",
     dag=dag,
     json={
         "spark_python_task": {
-            "python_file": LOAD_CRITEO_INTO_DATALAKE_RAW_FILE_PATH,
+            "python_file": LOAD_CRITEO_CAMPAIGNS_INTO_DATALAKE_RAW_FILE_PATH,
             "parameters": [ENV, SOURCE, MEDIA, DATALAKE_BUCKET, ACCOUNTS, "{{ ds }}"],
         }
     },
@@ -100,6 +100,6 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-create_cluster_task >> criteo_to_datalake_raw_task >> list(
+create_cluster_task >> criteo_campaigns_to_datalake_raw_task >> list(
     clean_sub_dags.values()
 ) >> terminate_cluster_task

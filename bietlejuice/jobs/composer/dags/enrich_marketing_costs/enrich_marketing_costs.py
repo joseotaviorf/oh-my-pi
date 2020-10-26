@@ -13,6 +13,11 @@ from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.services import FileService
 
+PARTITION_COLS = {
+    "google": ["acc", "load_date"],
+    "criteo_campaigns": ["year", "month", "day"],
+}
+
 SOURCE = "marketing_hub"
 TARGET = "marketing_costs"
 DAG_ID = f"bietlejuice.enrich_{TARGET}"
@@ -92,7 +97,10 @@ for media_name in media_names:
             start_date=MAIN_START_DATE,
         )
         enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(
-            dag, sql_file_list, is_incremental=True, partitions=["acc", "load_date"]
+            dag,
+            sql_file_list,
+            is_incremental=True,
+            partitions=PARTITION_COLS[media_name],
         )
 
 create_cluster_task >> list(enrich_sub_dags.values()) >> terminate_cluster_task
