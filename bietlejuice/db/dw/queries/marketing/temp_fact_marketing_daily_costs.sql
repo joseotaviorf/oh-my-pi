@@ -683,7 +683,10 @@ cost_taxonomy as (
                 case when tp.mkt_platform = 'Mobile' then mobile_cost
                      when tp.mkt_platform = 'Desktop' then desktop_cost
                      when tp.mkt_platform = 'Other' then other_cost
-                     when tp.mkt_platform is null and total_cost is null then mobile_cost + desktop_cost + other_cost
+                     when tp.mkt_platform is null and total_cost is null 
+                        then coalesce(mobile_cost, 0) + 
+                             coalesce(desktop_cost, 0) + 
+                             coalesce(other_cost, 0)
                 end
             else total_cost
         end * cast(coalesce(tp.fator_custo, '1') as numeric(3,2)) as cost,
