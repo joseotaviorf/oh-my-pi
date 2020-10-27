@@ -3,6 +3,7 @@ create external table if not exists datalake_bigfone_clean_prod.events (
     id bigint,
     id_call string,
     metadata string,
+    provider string,
     ts_created timestamp,
     ts_created_local timestamp,
     ts_received timestamp,
