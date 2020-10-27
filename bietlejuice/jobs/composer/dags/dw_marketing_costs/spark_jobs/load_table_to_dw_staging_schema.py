@@ -7,7 +7,7 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.db import QUERIES_DATALAKE_PATH, DWMetastoreService
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
-from bietlejuice.jobs.composer.pipeline import TableLoaderPipeline
+from bietlejuice.jobs.composer.pipeline import IncrementalTableLoaderPipeline
 from bietlejuice.jobs.composer.services import FileService
 
 JOB_NAME = "load_table_to_dw_staging_schema"
@@ -67,7 +67,7 @@ if __name__ == "__main__":
         f"{QUERIES_DATALAKE_PATH}{relative_query_path}/dw/{table_name}.sql"
     )
 
-    table_loader_pipeline = TableLoaderPipeline(
+    table_loader_pipeline = IncrementalTableLoaderPipeline(
         database_name=schema_database_name,
         table_name=table_name,
         database_location=schema_database_location,
@@ -76,6 +76,5 @@ if __name__ == "__main__":
         spark_params=spark_params,
         partitions=partitions,
         query_template_params=query_template_params,
-        is_incremental=is_incremental,
     )
     table_loader_pipeline.run()

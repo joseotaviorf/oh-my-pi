@@ -5,7 +5,7 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.db import DWMetastoreService
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
-from bietlejuice.jobs.composer.pipeline import TableLoaderPipeline
+from bietlejuice.jobs.composer.pipeline import FullTableLoaderPipeline
 
 JOB_NAME = "load_table_to_dw_final_schema"
 
@@ -42,7 +42,7 @@ if __name__ == "__main__":
 
     query = f"SELECT * FROM {database_name_staging}.{table_name}"
 
-    table_loader_pipeline = TableLoaderPipeline(
+    table_loader_pipeline = FullTableLoaderPipeline(
         schema_database_name,
         table_name,
         schema_database_location,
