@@ -73,7 +73,6 @@ with google_consolidated_cost as (
         case when m.sk_date is not null then m.mobile_cost
             else g.mobile_cost end
             as mobile_cost,
-        g.total_cost,
         g.report_type as report_type,
         g.ad_type as ad_type
     from t_google g
@@ -238,7 +237,7 @@ campaigns_full as (
             gcc.desktop_cost as desktop_cost,
             gcc.mobile_cost as mobile_cost,
             null::numeric(16,4) as other_cost,
-            gcc.total_cost::numeric(16,4) as total_cost,
+            null::numeric(16,4) as total_cost,
             gcc.report_type,
             gcc.ad_type
             from google_consolidated_cost gcc
@@ -684,9 +683,10 @@ cost_taxonomy as (
                 case when tp.mkt_platform = 'Mobile' then mobile_cost
                      when tp.mkt_platform = 'Desktop' then desktop_cost
                      when tp.mkt_platform = 'Other' then other_cost
+                     when tp.mkt_platform is null and total_cost is null then mobile_cost + desktop_cost + other_cost
                 end
             else total_cost
-        end * cast(coalesce(tp.fator_custo, '0') as numeric(3,2)) as cost,
+        end * cast(coalesce(tp.fator_custo, '1') as numeric(3,2)) as cost,
         -- Funnel side is extracted from taxonomy
         coalesce(tp.side, 'Not Mapped') as side
     from campaigns_full cf
