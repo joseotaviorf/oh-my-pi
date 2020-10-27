@@ -95,12 +95,14 @@ class DatalakeSubDAG(BaseSubDAG):
             layer=self.layer,
         )._build_local_dag()
 
+        load_table_mode = "incremental" if is_incremental else "full"
+
         load_table = QuintoAndarDatabricksSubmitRunOperator(
             task_id=f"load-{self.layer.value}-{slugged_table_name}",
             dag=sub_dag,
             json={
                 "spark_python_task": {
-                    "python_file": f"{self.spark_job_paths}/load_table.py",
+                    "python_file": f"{self.spark_job_paths}/load_table_{load_table_mode}.py",
                     "parameters": [
                         self.env,
                         self.datalake_bucket,
@@ -111,7 +113,6 @@ class DatalakeSubDAG(BaseSubDAG):
                         table_name,
                         str(partitions),
                         "{{ ds }}",
-                        is_incremental,
                         str(self.spark_params),
                         str(extra_query_template_params),
                     ],

@@ -9,8 +9,11 @@ from bietlejuice.jobs.composer.base.db import (
     QUERIES_DATALAKE_PATH,
     DatalakeMetastoreService,
 )
-from bietlejuice.jobs.composer.pipeline.table_loader_pipeline import TableLoaderPipeline
+
 from bietlejuice.jobs.composer.services import FileService
+from bietlejuice.jobs.composer.pipeline.incremental_table_loader_pipeline import (
+    IncrementalTableLoaderPipeline,
+)
 
 JOB_NAME = "load_table"
 
@@ -37,7 +40,6 @@ if __name__ == "__main__":
     parser.add_argument("table_name", type=str, help="table name that will be created")
     parser.add_argument("partitions")
     parser.add_argument("execution_date")
-    parser.add_argument("is_incremental")
     parser.add_argument("spark_params", type=str, help="parameters to pass to spark")
     parser.add_argument(
         "additional_query_template_params",
@@ -54,7 +56,6 @@ if __name__ == "__main__":
     relative_query_path = args.relative_query_path
     table_name = args.table_name
     execution_date = args.execution_date
-    is_incremental = args.is_incremental == "True"
     target_database_base_name = args.target_database_base_name
     partitions = json.loads(args.partitions.replace("'", '"'))
     query_template_params = json.loads(
@@ -98,7 +99,7 @@ if __name__ == "__main__":
         f"{QUERIES_DATALAKE_PATH}{relative_query_path}/{layer}/{table_name}.sql"
     )
 
-    table_loader_pipeline = TableLoaderPipeline(
+    table_loader_pipeline = IncrementalTableLoaderPipeline(
         database_name=database_name,
         table_name=table_name,
         database_location=database_location,
@@ -106,7 +107,6 @@ if __name__ == "__main__":
         query=query,
         partitions=partitions,
         query_template_params=query_template_params,
-        is_incremental=is_incremental,
         target_database_name=target_database_name,
         target_database_location=target_database_location,
         spark_params=spark_params,
