@@ -26,8 +26,8 @@ dispatch_customers AS (
 	FROM clean_unnested_dispatches
 	WHERE 
 		COALESCE(customer_email, '') != ''
-		AND COALESCE(customer_phone, '') != ''
-		AND COALESCE(customer_name, '') != ''
+		OR COALESCE(customer_phone, '') != ''
+		OR COALESCE(customer_name, '') != ''
 	GROUP BY 1,2,3,4,5
 ),
 answers AS (
