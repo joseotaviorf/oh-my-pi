@@ -11,6 +11,7 @@ create table if not exists staging.zendesk_fact_tickets (
     sk_zendesk_submitter_user bigint,
     sk_zendesk_assignee_user bigint,
     sk_session bigint,
+    sk_call varchar(50),
     sk_created_date integer,
     sk_created_date_local integer,
     sk_solved_date integer,

@@ -48,7 +48,8 @@ custom_field_ids as (
             try_cast(json_extract(c.custom_fields, '$["31646438"]') as bigint)
         ) as id_house,
         try_cast(json_extract(c.custom_fields, '$["114096515211"]') as bigint) as id_contract,
-        try_cast(json_extract(c.custom_fields, '$["360034234371"]') as bigint) as id_session  --Sauron
+        try_cast(json_extract(c.custom_fields, '$["360034234371"]') as bigint) as id_session,  --Sauron
+        try_cast(json_extract(c.custom_fields, '$["360020220412"]') as varchar) as id_call -- bigfone
     from datalake_clean.zendesk_custom_fields c
     where c.dt_extracted = '{extraction_date}'
 ),
@@ -112,6 +113,7 @@ tickets as (
         cfi.id_house,
         cfi.id_contract,
         cfi.id_session,
+        cfi.id_call,
         cfi.client_type, -- included to enable sk_owner and sk_client relationship
         tm.*,
         t.tags, -- included to enable sk_user relationship model
@@ -209,6 +211,7 @@ select
     t.sk_zendesk_submitter_user,
     t.sk_zendesk_assignee_user,
     coalesce(t.id_session, -1) as sk_session,
+    coalesce(t.id_call, '-1') as sk_call,
     coalesce(cast(date_format(t.ts_created, '%Y%m%d') as integer), -1) as sk_created_date,
     coalesce(cast(date_format(t.ts_created_local, '%Y%m%d') as integer), -1) as sk_created_date_local,
     coalesce(cast(date_format(t.ts_solved, '%Y%m%d') as integer), -1) as sk_solved_date,
