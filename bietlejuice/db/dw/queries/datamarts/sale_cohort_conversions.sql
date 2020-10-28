@@ -45,13 +45,18 @@ SELECT
 	TO_DATE(SUBSTRING(NULLIF(mo.data_aceite_proposta, ''),1,10), 'yyyy-mm-dd') AS dt_offer_accepted,
 	TO_DATE(SUBSTRING(NULLIF(mo.data_assinatura_ccv, ''),1,10), 'yyyy-mm-dd') AS dt_ccv_signed,
 	TO_DATE(SUBSTRING(NULLIF(mo.data_descarte, ''),1,10), 'yyyy-mm-dd') AS dt_offer_rejected,
-	TO_DATE(SUBSTRING(NULLIF(mo.diligencia_inicio, ''),1,10), 'yyyy-mm-dd') AS dt_diligence_started,
-	TO_DATE(SUBSTRING(NULLIF(mo.diligencia_retorno_buyer_seller, ''),1,10), 'yyyy-mm-dd') AS dt_diligence_approved,
+	TO_DATE(SUBSTRING(NULLIF(mo.diligencia_inicio, ''),1,10), 'yyyy-mm-dd') AS dt_diligence_started_legaut,
+	TO_DATE(SUBSTRING(NULLIF(mo.dd_retorno_legaut, ''),1,10), 'yyyy-mm-dd') AS dt_diligence_ended_legaut,
+	TO_DATE(SUBSTRING(NULLIF(mo.diligencia_retorno_buyer_seller, ''),1,10), 'yyyy-mm-dd') AS dt_diligence_ended,
+	TO_DATE(SUBSTRING(NULLIF(mo.dd_inicio_legal, ''),1,10), 'yyyy-mm-dd') AS dt_diligence_started_legal,
+	TO_DATE(SUBSTRING(NULLIF(mo.dd_fim_legal, ''),1,10), 'yyyy-mm-dd') AS dt_diligence_ended_legal,
 	TO_DATE(SUBSTRING(NULLIF(mo.credito_inicio, ''),1,10), 'yyyy-mm-dd') AS dt_credit_started,
 	TO_DATE(SUBSTRING(NULLIF(mo.credito_fim, ''),1,10), 'yyyy-mm-dd') AS dt_credit_approved,
 	TO_DATE(SUBSTRING(NULLIF(mo.data_pagto_seller, ''),1,10), 'yyyy-mm-dd') AS dt_payment_concluded,
 	TO_DATE(SUBSTRING(NULLIF(mo.cri_fim, ''),1,10), 'yyyy-mm-dd') AS dt_matricula_atualizada,
 	TO_DATE(SUBSTRING(NULLIF(mo.data_chaves_buyer, ''),1,10), 'yyyy-mm-dd') AS dt_entrega_chaves,
+	TO_DATE(SUBSTRING(NULLIF(mo.finan_inicio, ''),1,10), 'yyyy-mm-dd') AS dt_finan_started,
+	TO_DATE(SUBSTRING(NULLIF(mo.finan_fim, ''),1,10), 'yyyy-mm-dd') AS dt_finan_ended,
 	motivo_descarte_pre AS offer_rejection_reason,
 	motivo_descarte_pos AS offer_accepted_drop_reason,
 	NULLIF(mo.valor_anuncio,'')::FLOAT AS sale_listing_price,
@@ -88,13 +93,18 @@ SELECT
 	offers.dt_offer_accepted,
 	offers.dt_ccv_signed,
 	offers.dt_offer_rejected,
-	offers.dt_diligence_started,
-	offers.dt_diligence_approved,
+	offers.dt_diligence_started_legaut,
+	offers.dt_diligence_ended_legaut,
+	offers.dt_diligence_ended,
+	offers.dt_diligence_started_legal,
+	offers.dt_diligence_ended_legal,
 	offers.dt_credit_started,
 	offers.dt_credit_approved,
 	offers.dt_payment_concluded,
 	offers.dt_matricula_atualizada,
 	offers.dt_entrega_chaves,
+	offers.dt_finan_started,
+	offers.dt_finan_ended,
 	db.sk_booking,
 	db.dt_created,
 	db.dt_completed
@@ -112,13 +122,18 @@ SELECT
 	sde.dt_offer_accepted,
 	sde.dt_ccv_signed,
 	sde.dt_offer_rejected,
-	sde.dt_diligence_started,
-	sde.dt_diligence_approved,
+	sde.dt_diligence_started_legaut,
+	sde.dt_diligence_ended_legaut,
+	sde.dt_diligence_ended,
+	sde.dt_diligence_started_legal,
+	sde.dt_diligence_ended_legal,
 	sde.dt_credit_started,
 	sde.dt_credit_approved,
 	sde.dt_payment_concluded,
 	sde.dt_matricula_atualizada,
 	sde.dt_entrega_chaves,
+	sde.dt_finan_started,
+	sde.dt_finan_ended,
 	sde.id_offer,
 	sde.sk_booking,
 	sde.dt_created,
@@ -161,6 +176,15 @@ SELECT
 	NULL::BIGINT AS vb2os,
 	NULL::BIGINT AS os2oa,
 	NULL::BIGINT AS oa2ccv,
+	NULL::BIGINT AS ccv2lts,
+	NULL::BIGINT AS lts2lte,
+	NULL::BIGINT AS lte2lrs,
+	NULL::BIGINT AS lrs2lre,
+	NULL::BIGINT AS lre2de,
+	NULL::BIGINT AS ccv2credstart,
+	NULL::BIGINT AS credstart2credsent,
+	NULL::BIGINT AS credsent2finstart,
+	NULL::BIGINT AS finstart2finended,
 	NULL::BIGINT AS ccv2ma,
 	NULL::BIGINT AS ccv2pc
 FROM sale_listing_flows_adjust AS slf
@@ -195,6 +219,15 @@ SELECT
 	NULL::BIGINT AS vb2os,
 	NULL::BIGINT AS os2oa,
 	NULL::BIGINT AS oa2ccv,
+	NULL::BIGINT AS ccv2lts,
+	NULL::BIGINT AS lts2lte,
+	NULL::BIGINT AS lte2lrs,
+	NULL::BIGINT AS lrs2lre,
+	NULL::BIGINT AS lre2de,
+	NULL::BIGINT AS ccv2credstart,
+	NULL::BIGINT AS credstart2credsent,
+	NULL::BIGINT AS credsent2finstart,
+	NULL::BIGINT AS finstart2finended,
 	NULL::BIGINT AS ccv2ma,
 	NULL::BIGINT AS ccv2pc
 FROM sale_listing_flows_adjust AS slf
@@ -229,6 +262,15 @@ SELECT
 	NULL::BIGINT AS vb2os,
 	NULL::BIGINT AS os2oa,
 	NULL::BIGINT AS oa2ccv,
+	NULL::BIGINT AS ccv2lts,
+	NULL::BIGINT AS lts2lte,
+	NULL::BIGINT AS lte2lrs,
+	NULL::BIGINT AS lrs2lre,
+	NULL::BIGINT AS lre2de,
+	NULL::BIGINT AS ccv2credstart,
+	NULL::BIGINT AS credstart2credsent,
+	NULL::BIGINT AS credsent2finstart,
+	NULL::BIGINT AS finstart2finended,
 	NULL::BIGINT AS ccv2ma,
 	NULL::BIGINT AS ccv2pc
 FROM sale_listing_flows_adjust AS slf
@@ -263,6 +305,15 @@ SELECT
 	NULL::BIGINT AS vb2os,
 	NULL::BIGINT AS os2oa,
 	NULL::BIGINT AS oa2ccv,
+	NULL::BIGINT AS ccv2lts,
+	NULL::BIGINT AS lts2lte,
+	NULL::BIGINT AS lte2lrs,
+	NULL::BIGINT AS lrs2lre,
+	NULL::BIGINT AS lre2de,
+	NULL::BIGINT AS ccv2credstart,
+	NULL::BIGINT AS credstart2credsent,
+	NULL::BIGINT AS credsent2finstart,
+	NULL::BIGINT AS finstart2finended,
 	NULL::BIGINT AS ccv2ma,
 	NULL::BIGINT AS ccv2pc
 FROM sale_listing_flows_adjust AS slf
@@ -297,6 +348,15 @@ SELECT
 	NULL::BIGINT AS vb2os,
 	NULL::BIGINT AS os2oa,
 	NULL::BIGINT AS oa2ccv,
+	NULL::BIGINT AS ccv2lts,
+	NULL::BIGINT AS lts2lte,
+	NULL::BIGINT AS lte2lrs,
+	NULL::BIGINT AS lrs2lre,
+	NULL::BIGINT AS lre2de,
+	NULL::BIGINT AS ccv2credstart,
+	NULL::BIGINT AS credstart2credsent,
+	NULL::BIGINT AS credsent2finstart,
+	NULL::BIGINT AS finstart2finended,
 	NULL::BIGINT AS ccv2ma,
 	NULL::BIGINT AS ccv2pc
 FROM sale_listing_flows_adjust AS slf
@@ -331,6 +391,15 @@ SELECT
 	NULL::BIGINT AS vb2os,
 	NULL::BIGINT AS os2oa,
 	NULL::BIGINT AS oa2ccv,
+	NULL::BIGINT AS ccv2lts,
+	NULL::BIGINT AS lts2lte,
+	NULL::BIGINT AS lte2lrs,
+	NULL::BIGINT AS lrs2lre,
+	NULL::BIGINT AS lre2de,
+	NULL::BIGINT AS ccv2credstart,
+	NULL::BIGINT AS credstart2credsent,
+	NULL::BIGINT AS credsent2finstart,
+	NULL::BIGINT AS finstart2finended,
 	NULL::BIGINT AS ccv2ma,
 	NULL::BIGINT AS ccv2pc
 FROM sale_demand_classification
@@ -365,6 +434,15 @@ SELECT
 	NULL::BIGINT AS vb2os,
 	NULL::BIGINT AS os2oa,
 	NULL::BIGINT AS oa2ccv,
+	NULL::BIGINT AS ccv2lts,
+	NULL::BIGINT AS lts2lte,
+	NULL::BIGINT AS lte2lrs,
+	NULL::BIGINT AS lrs2lre,
+	NULL::BIGINT AS lre2de,
+	NULL::BIGINT AS ccv2credstart,
+	NULL::BIGINT AS credstart2credsent,
+	NULL::BIGINT AS credsent2finstart,
+	NULL::BIGINT AS finstart2finended,
 	NULL::BIGINT AS ccv2ma,
 	NULL::BIGINT AS ccv2pc
 FROM sale_demand_classification
@@ -399,6 +477,15 @@ SELECT
 	COUNT(DISTINCT sk_booking) AS vb2os,
 	NULL::BIGINT AS os2oa,
 	NULL::BIGINT AS oa2ccv,
+	NULL::BIGINT AS ccv2lts,
+	NULL::BIGINT AS lts2lte,
+	NULL::BIGINT AS lte2lrs,
+	NULL::BIGINT AS lrs2lre,
+	NULL::BIGINT AS lre2de,
+	NULL::BIGINT AS ccv2credstart,
+	NULL::BIGINT AS credstart2credsent,
+	NULL::BIGINT AS credsent2finstart,
+	NULL::BIGINT AS finstart2finended,
 	NULL::BIGINT AS ccv2ma,
 	NULL::BIGINT AS ccv2pc
 FROM sale_demand_classification
@@ -433,6 +520,15 @@ SELECT
 	NULL::BIGINT AS vb2os,
 	COUNT(DISTINCT id_offer) AS os2oa,
 	NULL::BIGINT AS oa2ccv,
+	NULL::BIGINT AS ccv2lts,
+	NULL::BIGINT AS lts2lte,
+	NULL::BIGINT AS lte2lrs,
+	NULL::BIGINT AS lrs2lre,
+	NULL::BIGINT AS lre2de,
+	NULL::BIGINT AS ccv2credstart,
+	NULL::BIGINT AS credstart2credsent,
+	NULL::BIGINT AS credsent2finstart,
+	NULL::BIGINT AS finstart2finended,
 	NULL::BIGINT AS ccv2ma,
 	NULL::BIGINT AS ccv2pc
 FROM sale_demand_classification
@@ -467,10 +563,406 @@ SELECT
 	NULL::BIGINT AS vb2os,
 	NULL::BIGINT AS os2oa,
 	COUNT(DISTINCT id_offer) AS oa2ccv,
+	NULL::BIGINT AS ccv2lts,
+	NULL::BIGINT AS lts2lte,
+	NULL::BIGINT AS lte2lrs,
+	NULL::BIGINT AS lrs2lre,
+	NULL::BIGINT AS lre2de,
+	NULL::BIGINT AS ccv2credstart,
+	NULL::BIGINT AS credstart2credsent,
+	NULL::BIGINT AS credsent2finstart,
+	NULL::BIGINT AS finstart2finended,
 	NULL::BIGINT AS ccv2ma,
 	NULL::BIGINT AS ccv2pc
 FROM sale_demand_classification
 WHERE date(dt_offer_accepted) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
+),
+ccv2lts AS (
+SELECT
+	REPLACE(DATE(dt_ccv_signed),'-','')::INTEGER AS base_date,
+	city_group,
+   NULL AS lead_context,
+   NULL AS mkt_campaign_context,
+   NULL AS mkt_origin,
+   NULL AS mkt_channel,
+   NULL AS mkt_type,
+   first_touchpoint AS first_origin_demand,
+	higher_intent_before_offer AS origin_before_offer,
+	higher_intent_after_offer AS origin_after_offer,
+	form_of_payment,
+	CASE WHEN datediff('week',DATE_TRUNC('week',DATE(dt_ccv_signed)),DATE_TRUNC('week',DATE(dt_diligence_started_legaut))) < 20
+			  THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(dt_ccv_signed)),DATE_TRUNC('week',DATE(dt_diligence_started_legaut)))
+	     WHEN datediff('week',DATE_TRUNC('week',DATE(dt_ccv_signed)),DATE_TRUNC('week',DATE(dt_diligence_started_legaut))) >= 20
+	     	  THEN 'W20+'
+	END AS weeks_conversion,
+	NULL::BIGINT AS p2fc,
+   NULL::BIGINT AS fc2q,
+   NULL::BIGINT AS p2q,
+	NULL::BIGINT AS q2o,
+	NULL::BIGINT AS o2fl,
+	NULL::BIGINT AS vb2vc,
+	NULL::BIGINT AS vc2os,
+	NULL::BIGINT AS vb2os,
+	NULL::BIGINT AS os2oa,
+	NULL::BIGINT AS oa2ccv,
+	COUNT(DISTINCT id_offer) AS ccv2lts,
+	NULL::BIGINT AS lts2lte,
+	NULL::BIGINT AS lte2lrs,
+	NULL::BIGINT AS lrs2lre,
+	NULL::BIGINT AS lre2de,
+	NULL::BIGINT AS ccv2credstart,
+	NULL::BIGINT AS credstart2credsent,
+	NULL::BIGINT AS credsent2finstart,
+	NULL::BIGINT AS finstart2finended,
+	NULL::BIGINT AS ccv2ma,
+	NULL::BIGINT AS ccv2pc
+FROM sale_demand_classification
+WHERE DATE(dt_ccv_signed) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
+),
+lts2lte AS (
+SELECT
+	REPLACE(DATE(dt_diligence_started_legaut),'-','')::INTEGER AS base_date,
+	city_group,
+   NULL AS lead_context,
+   NULL AS mkt_campaign_context,
+   NULL AS mkt_origin,
+   NULL AS mkt_channel,
+   NULL AS mkt_type,
+   first_touchpoint AS first_origin_demand,
+	higher_intent_before_offer AS origin_before_offer,
+	higher_intent_after_offer AS origin_after_offer,
+	form_of_payment,
+	CASE WHEN datediff('week',DATE_TRUNC('week',DATE(dt_diligence_started_legaut)),DATE_TRUNC('week',DATE(dt_diligence_ended_legaut))) < 20
+			  THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(dt_diligence_started_legaut)),DATE_TRUNC('week',DATE(dt_diligence_ended_legaut)))
+	     WHEN datediff('week',DATE_TRUNC('week',DATE(dt_diligence_started_legaut)),DATE_TRUNC('week',DATE(dt_diligence_ended_legaut))) >= 20
+	     	  THEN 'W20+'
+	END AS weeks_conversion,
+	NULL::BIGINT AS p2fc,
+   NULL::BIGINT AS fc2q,
+   NULL::BIGINT AS p2q,
+	NULL::BIGINT AS q2o,
+	NULL::BIGINT AS o2fl,
+	NULL::BIGINT AS vb2vc,
+	NULL::BIGINT AS vc2os,
+	NULL::BIGINT AS vb2os,
+	NULL::BIGINT AS os2oa,
+	NULL::BIGINT AS oa2ccv,
+	NULL::BIGINT AS ccv2lts,
+	COUNT(DISTINCT id_offer) AS lts2lte,
+	NULL::BIGINT AS lte2lrs,
+	NULL::BIGINT AS lrs2lre,
+	NULL::BIGINT AS lre2de,
+	NULL::BIGINT AS ccv2credstart,
+	NULL::BIGINT AS credstart2credsent,
+	NULL::BIGINT AS credsent2finstart,
+	NULL::BIGINT AS finstart2finended,
+	NULL::BIGINT AS ccv2ma,
+	NULL::BIGINT AS ccv2pc
+FROM sale_demand_classification
+WHERE DATE(dt_diligence_started_legaut) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
+),
+lte2lrs AS (
+SELECT
+	REPLACE(DATE(dt_diligence_ended_legaut),'-','')::INTEGER AS base_date,
+	city_group,
+   NULL AS lead_context,
+   NULL AS mkt_campaign_context,
+   NULL AS mkt_origin,
+   NULL AS mkt_channel,
+   NULL AS mkt_type,
+   first_touchpoint AS first_origin_demand,
+	higher_intent_before_offer AS origin_before_offer,
+	higher_intent_after_offer AS origin_after_offer,
+	NULL AS form_of_payment,
+	CASE WHEN datediff('week',DATE_TRUNC('week',DATE(dt_diligence_ended_legaut)),DATE_TRUNC('week',DATE(dt_diligence_started_legal))) < 20
+			  THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(dt_diligence_ended_legaut)),DATE_TRUNC('week',DATE(dt_diligence_started_legal)))
+	     WHEN datediff('week',DATE_TRUNC('week',DATE(dt_diligence_ended_legaut)),DATE_TRUNC('week',DATE(dt_diligence_started_legal))) >= 20
+	     	  THEN 'W20+'
+	END AS weeks_conversion,
+	NULL::BIGINT AS p2fc,
+   NULL::BIGINT AS fc2q,
+   NULL::BIGINT AS p2q,
+	NULL::BIGINT AS q2o,
+	NULL::BIGINT AS o2fl,
+	NULL::BIGINT AS vb2vc,
+	NULL::BIGINT AS vc2os,
+	NULL::BIGINT AS vb2os,
+	NULL::BIGINT AS os2oa,
+	NULL::BIGINT AS oa2ccv,
+	NULL::BIGINT AS ccv2lts,
+	NULL::BIGINT AS lts2lte,
+    COUNT(DISTINCT sk_booking) AS lte2lrs,
+	NULL::BIGINT AS lrs2lre,
+	NULL::BIGINT AS lre2de,
+	NULL::BIGINT AS ccv2credstart,
+	NULL::BIGINT AS credstart2credsent,
+	NULL::BIGINT AS credsent2finstart,
+	NULL::BIGINT AS finstart2finended,
+	NULL::BIGINT AS ccv2ma,
+	NULL::BIGINT AS ccv2pc
+FROM sale_demand_classification
+WHERE date(dt_diligence_ended_legaut) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
+),
+lrs2lre AS (
+SELECT
+	REPLACE(DATE(dt_diligence_started_legal),'-','')::INTEGER AS base_date,
+	city_group,
+   NULL AS lead_context,
+   NULL AS mkt_campaign_context,
+   NULL AS mkt_origin,
+   NULL AS mkt_channel,
+   NULL AS mkt_type,
+   first_touchpoint AS first_origin_demand,
+	higher_intent_before_offer AS origin_before_offer,
+	higher_intent_after_offer AS origin_after_offer,
+	NULL AS form_of_payment,
+	CASE WHEN datediff('week',DATE_TRUNC('week',DATE(dt_diligence_started_legal)),DATE_TRUNC('week',DATE(dt_diligence_ended_legal))) < 20
+			  THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(dt_diligence_started_legal)),DATE_TRUNC('week',DATE(dt_diligence_ended_legal)))
+	     WHEN datediff('week',DATE_TRUNC('week',DATE(dt_diligence_started_legal)),DATE_TRUNC('week',DATE(dt_diligence_ended_legal))) >= 20
+	     	  THEN 'W20+'
+	END AS weeks_conversion,
+	NULL::BIGINT AS p2fc,
+   NULL::BIGINT AS fc2q,
+   NULL::BIGINT AS p2q,
+	NULL::BIGINT AS q2o,
+	NULL::BIGINT AS o2fl,
+	NULL::BIGINT AS vb2vc,
+	NULL::BIGINT AS vc2os,
+	NULL::BIGINT AS vb2os,
+	NULL::BIGINT AS os2oa,
+	NULL::BIGINT AS oa2ccv,
+	NULL::BIGINT AS ccv2lts,
+	NULL::BIGINT AS lts2lte,
+    NULL::BIGINT AS lte2lrs,
+	COUNT(DISTINCT sk_booking) AS lrs2lre,
+	NULL::BIGINT AS lre2de,
+	NULL::BIGINT AS ccv2credstart,
+	NULL::BIGINT AS credstart2credsent,
+	NULL::BIGINT AS credsent2finstart,
+	NULL::BIGINT AS finstart2finended,
+	NULL::BIGINT AS ccv2ma,
+	NULL::BIGINT AS ccv2pc
+FROM sale_demand_classification
+WHERE date(dt_diligence_started_legal) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
+),
+lre2de AS (
+SELECT
+	REPLACE(DATE(dt_diligence_ended_legal),'-','')::INTEGER AS base_date,
+	city_group,
+   NULL AS lead_context,
+   NULL AS mkt_campaign_context,
+   NULL AS mkt_origin,
+   NULL AS mkt_channel,
+   NULL AS mkt_type,
+   first_touchpoint AS first_origin_demand,
+	higher_intent_before_offer AS origin_before_offer,
+	higher_intent_after_offer AS origin_after_offer,
+	NULL AS form_of_payment,
+	CASE WHEN datediff('week',DATE_TRUNC('week',DATE(dt_diligence_ended_legal)),DATE_TRUNC('week',DATE(dt_diligence_ended))) < 20
+			  THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(dt_diligence_ended_legal)),DATE_TRUNC('week',DATE(dt_diligence_ended)))
+	     WHEN datediff('week',DATE_TRUNC('week',DATE(dt_diligence_ended_legal)),DATE_TRUNC('week',DATE(dt_diligence_ended))) >= 20
+	     	  THEN 'W20+'
+	END AS weeks_conversion,
+	NULL::BIGINT AS p2fc,
+   NULL::BIGINT AS fc2q,
+   NULL::BIGINT AS p2q,
+	NULL::BIGINT AS q2o,
+	NULL::BIGINT AS o2fl,
+	NULL::BIGINT AS vb2vc,
+	NULL::BIGINT AS vc2os,
+	NULL::BIGINT AS vb2os,
+	NULL::BIGINT AS os2oa,
+	NULL::BIGINT AS oa2ccv,
+	NULL::BIGINT AS ccv2lts,
+	NULL::BIGINT AS lts2lte,
+    NULL::BIGINT AS lte2lrs,
+	NULL::BIGINT AS lrs2lre,
+	COUNT(DISTINCT sk_booking) AS lre2de,
+	NULL::BIGINT AS ccv2credstart,
+	NULL::BIGINT AS credstart2credsent,
+	NULL::BIGINT AS credsent2finstart,
+	NULL::BIGINT AS finstart2finended,
+	NULL::BIGINT AS ccv2ma,
+	NULL::BIGINT AS ccv2pc
+FROM sale_demand_classification
+WHERE date(dt_diligence_ended_legal) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
+),
+ccv2credstart AS (
+SELECT
+	REPLACE(DATE(dt_ccv_signed),'-','')::INTEGER AS base_date,
+	city_group,
+   NULL AS lead_context,
+   NULL AS mkt_campaign_context,
+   NULL AS mkt_origin,
+   NULL AS mkt_channel,
+   NULL AS mkt_type,
+   first_touchpoint AS first_origin_demand,
+	higher_intent_before_offer AS origin_before_offer,
+	higher_intent_after_offer AS origin_after_offer,
+	NULL AS form_of_payment,
+	CASE WHEN datediff('week',DATE_TRUNC('week',DATE(dt_ccv_signed)),DATE_TRUNC('week',DATE(dt_credit_started))) < 20
+			  THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(dt_ccv_signed)),DATE_TRUNC('week',DATE(dt_credit_started)))
+	     WHEN datediff('week',DATE_TRUNC('week',DATE(dt_ccv_signed)),DATE_TRUNC('week',DATE(dt_credit_started))) >= 20
+	     	  THEN 'W20+'
+	END AS weeks_conversion,
+	NULL::BIGINT AS p2fc,
+   NULL::BIGINT AS fc2q,
+   NULL::BIGINT AS p2q,
+	NULL::BIGINT AS q2o,
+	NULL::BIGINT AS o2fl,
+	NULL::BIGINT AS vb2vc,
+	NULL::BIGINT AS vc2os,
+	NULL::BIGINT AS vb2os,
+	NULL::BIGINT AS os2oa,
+	NULL::BIGINT AS oa2ccv,
+	NULL::BIGINT AS ccv2lts,
+	NULL::BIGINT AS lts2lte,
+    NULL::BIGINT AS lte2lrs,
+	NULL::BIGINT AS lrs2lre,
+	NULL::BIGINT AS lre2de,
+	COUNT(DISTINCT sk_booking) AS ccv2credstart,
+	NULL::BIGINT AS credstart2credsent,
+	NULL::BIGINT AS credsent2finstart,
+	NULL::BIGINT AS finstart2finended,
+	NULL::BIGINT AS ccv2ma,
+	NULL::BIGINT AS ccv2pc
+FROM sale_demand_classification
+WHERE date(dt_ccv_signed) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
+),
+credstart2credsent AS (
+SELECT
+	REPLACE(DATE(dt_credit_started),'-','')::INTEGER AS base_date,
+	city_group,
+   NULL AS lead_context,
+   NULL AS mkt_campaign_context,
+   NULL AS mkt_origin,
+   NULL AS mkt_channel,
+   NULL AS mkt_type,
+   first_touchpoint AS first_origin_demand,
+	higher_intent_before_offer AS origin_before_offer,
+	higher_intent_after_offer AS origin_after_offer,
+	NULL AS form_of_payment,
+	CASE WHEN datediff('week',DATE_TRUNC('week',DATE(dt_credit_started)),DATE_TRUNC('week',DATE(dt_credit_approved))) < 20
+			  THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(dt_credit_started)),DATE_TRUNC('week',DATE(dt_credit_approved)))
+	     WHEN datediff('week',DATE_TRUNC('week',DATE(dt_credit_started)),DATE_TRUNC('week',DATE(dt_credit_approved))) >= 20
+	     	  THEN 'W20+'
+	END AS weeks_conversion,
+	NULL::BIGINT AS p2fc,
+   NULL::BIGINT AS fc2q,
+   NULL::BIGINT AS p2q,
+	NULL::BIGINT AS q2o,
+	NULL::BIGINT AS o2fl,
+	NULL::BIGINT AS vb2vc,
+	NULL::BIGINT AS vc2os,
+	NULL::BIGINT AS vb2os,
+	NULL::BIGINT AS os2oa,
+	NULL::BIGINT AS oa2ccv,
+	NULL::BIGINT AS ccv2lts,
+	NULL::BIGINT AS lts2lte,
+    NULL::BIGINT AS lte2lrs,
+	NULL::BIGINT AS lrs2lre,
+	NULL::BIGINT AS lre2de,
+	NULL::BIGINT AS ccv2credstart,
+	COUNT(DISTINCT sk_booking) AS credstart2credsent,
+	NULL::BIGINT AS credsent2finstart,
+	NULL::BIGINT AS finstart2finended,
+	NULL::BIGINT AS ccv2ma,
+	NULL::BIGINT AS ccv2pc
+FROM sale_demand_classification
+WHERE date(dt_credit_started) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
+),
+credsent2finstart AS (
+SELECT
+	REPLACE(DATE(dt_credit_approved),'-','')::INTEGER AS base_date,
+	city_group,
+   NULL AS lead_context,
+   NULL AS mkt_campaign_context,
+   NULL AS mkt_origin,
+   NULL AS mkt_channel,
+   NULL AS mkt_type,
+   first_touchpoint AS first_origin_demand,
+	higher_intent_before_offer AS origin_before_offer,
+	higher_intent_after_offer AS origin_after_offer,
+	NULL AS form_of_payment,
+	CASE WHEN datediff('week',DATE_TRUNC('week',DATE(dt_credit_approved)),DATE_TRUNC('week',DATE(dt_finan_started))) < 20
+			  THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(dt_credit_approved)),DATE_TRUNC('week',DATE(dt_finan_started)))
+	     WHEN datediff('week',DATE_TRUNC('week',DATE(dt_credit_approved)),DATE_TRUNC('week',DATE(dt_finan_started))) >= 20
+	     	  THEN 'W20+'
+	END AS weeks_conversion,
+	NULL::BIGINT AS p2fc,
+   NULL::BIGINT AS fc2q,
+   NULL::BIGINT AS p2q,
+	NULL::BIGINT AS q2o,
+	NULL::BIGINT AS o2fl,
+	NULL::BIGINT AS vb2vc,
+	NULL::BIGINT AS vc2os,
+	NULL::BIGINT AS vb2os,
+	NULL::BIGINT AS os2oa,
+	NULL::BIGINT AS oa2ccv,
+	NULL::BIGINT AS ccv2lts,
+	NULL::BIGINT AS lts2lte,
+    NULL::BIGINT AS lte2lrs,
+	NULL::BIGINT AS lrs2lre,
+	NULL::BIGINT AS lre2de,
+	NULL::BIGINT AS ccv2credstart,
+	NULL::BIGINT AS credstart2credsent,
+	COUNT(DISTINCT sk_booking) AS credsent2finstart,
+	NULL::BIGINT AS finstart2finended,
+	NULL::BIGINT AS ccv2ma,
+	NULL::BIGINT AS ccv2pc
+FROM sale_demand_classification
+WHERE date(dt_credit_approved) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
+),
+finstart2finended AS (
+SELECT
+	REPLACE(DATE(dt_finan_started),'-','')::INTEGER AS base_date,
+	city_group,
+   NULL AS lead_context,
+   NULL AS mkt_campaign_context,
+   NULL AS mkt_origin,
+   NULL AS mkt_channel,
+   NULL AS mkt_type,
+   first_touchpoint AS first_origin_demand,
+	higher_intent_before_offer AS origin_before_offer,
+	higher_intent_after_offer AS origin_after_offer,
+	NULL AS form_of_payment,
+	CASE WHEN datediff('week',DATE_TRUNC('week',DATE(dt_finan_started)),DATE_TRUNC('week',DATE(dt_finan_ended))) < 20
+			  THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(dt_finan_started)),DATE_TRUNC('week',DATE(dt_finan_ended)))
+	     WHEN datediff('week',DATE_TRUNC('week',DATE(dt_finan_started)),DATE_TRUNC('week',DATE(dt_finan_ended))) >= 20
+	     	  THEN 'W20+'
+	END AS weeks_conversion,
+	NULL::BIGINT AS p2fc,
+   NULL::BIGINT AS fc2q,
+   NULL::BIGINT AS p2q,
+	NULL::BIGINT AS q2o,
+	NULL::BIGINT AS o2fl,
+	NULL::BIGINT AS vb2vc,
+	NULL::BIGINT AS vc2os,
+	NULL::BIGINT AS vb2os,
+	NULL::BIGINT AS os2oa,
+	NULL::BIGINT AS oa2ccv,
+	NULL::BIGINT AS ccv2lts,
+	NULL::BIGINT AS lts2lte,
+    NULL::BIGINT AS lte2lrs,
+	NULL::BIGINT AS lrs2lre,
+	NULL::BIGINT AS lre2de,
+	NULL::BIGINT AS ccv2credstart,
+	NULL::BIGINT AS credstart2credsent,
+	NULL::BIGINT AS credsent2finstart,
+	COUNT(DISTINCT sk_booking) finstart2finended,
+	NULL::BIGINT AS ccv2ma,
+	NULL::BIGINT AS ccv2pc
+FROM sale_demand_classification
+WHERE date(dt_finan_started) > 0
 GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
 ),
 ccv2ma AS (
@@ -501,6 +993,15 @@ SELECT
 	NULL::BIGINT AS vb2os,
 	NULL::BIGINT AS os2oa,
 	NULL::BIGINT AS oa2ccv,
+	NULL::BIGINT AS ccv2lts,
+	NULL::BIGINT AS lts2lte,
+    NULL::BIGINT AS lte2lrs,
+	NULL::BIGINT AS lrs2lre,
+	NULL::BIGINT AS lre2de,
+	NULL::BIGINT AS ccv2credstart,
+	NULL::BIGINT AS credstart2credsent,
+	NULL::BIGINT AS credsent2finstart,
+	NULL::BIGINT AS finstart2finended,
 	COUNT(DISTINCT id_offer) AS ccv2ma,
 	NULL::BIGINT AS ccv2pc
 FROM sale_demand_classification
@@ -535,6 +1036,15 @@ SELECT
 	NULL::BIGINT AS vb2os,
 	NULL::BIGINT AS os2oa,
 	NULL::BIGINT AS oa2ccv,
+	NULL::BIGINT AS ccv2lts,
+	NULL::BIGINT AS lts2lte,
+    NULL::BIGINT AS lte2lrs,
+	NULL::BIGINT AS lrs2lre,
+	NULL::BIGINT AS lre2de,
+	NULL::BIGINT AS ccv2credstart,
+	NULL::BIGINT AS credstart2credsent,
+	NULL::BIGINT AS credsent2finstart,
+	NULL::BIGINT AS finstart2finended,
 	NULL::BIGINT AS ccv2ma,
 	COUNT(DISTINCT id_offer) AS ccv2pc
 FROM sale_demand_classification
@@ -561,6 +1071,24 @@ SELECT * FROM p2fc
 	SELECT * FROM os2oa
 	UNION ALL
 	SELECT * FROM oa2ccv
+	UNION ALL
+	SELECT * FROM ccv2lts
+	UNION ALL
+	SELECT * FROM lts2lte
+    UNION ALL
+	SELECT * FROM lte2lrs
+	UNION ALL
+	SELECT * FROM lrs2lre
+	UNION ALL
+	SELECT * FROM lre2de
+	UNION ALL
+	SELECT * FROM ccv2credstart
+	UNION ALL
+	SELECT * FROM credstart2credsent
+	UNION ALL
+	SELECT * FROM credsent2finstart
+	UNION ALL
+	SELECT * FROM finstart2finended
 	UNION ALL
 	SELECT * FROM ccv2ma
 	UNION ALL
@@ -593,6 +1121,15 @@ SELECT
 	ua.vb2os,
 	ua.os2oa,
 	ua.oa2ccv,
+	ua.ccv2lts,
+	ua.lts2lte,
+    ua.lte2lrs,
+	ua.lrs2lre,
+	ua.lre2de,
+	ua.ccv2credstart,
+	ua.credstart2credsent,
+	ua.credsent2finstart,
+	ua.finstart2finended,
 	ua.ccv2ma,
 	ua.ccv2pc
 FROM union_all ua
@@ -626,6 +1163,15 @@ SELECT
 	SUM(vb2os) AS vb2os,
 	SUM(os2oa) AS os2oa,
 	SUM(oa2ccv) AS oa2ccv,
+	SUM(ccv2lts) AS ccv2lts,
+	SUM(lts2lte) AS lts2lte,
+    SUM(lte2lrs) AS lte2lrs,
+	SUM(lrs2lre) AS lrs2lre,
+	SUM(lre2de) AS lre2de,
+	SUM(ccv2credstart) AS ccv2credstart,
+	SUM(credstart2credsent) AS credstart2credsent,
+	SUM(credsent2finstart) AS credsent2finstart,
+	SUM(finstart2finended) AS finstart2finended,
 	sum(ccv2ma) AS ccv2ma,
 	sum(ccv2pc) AS ccv2pc,
 	current_timestamp AS ts_load
