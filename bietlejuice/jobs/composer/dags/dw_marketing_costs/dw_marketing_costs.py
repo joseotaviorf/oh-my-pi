@@ -15,6 +15,7 @@ from bietlejuice.jobs.composer.dags.base.incremental_dw_sub_dag import (
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.services import FileService
 
+DW_STANDARD_DAGS = ["criteo_campaigns"]
 DW_SCHEMA = "marketing_costs"
 TARGET = "dw_marketing_costs"
 DAG_ID = f"bietlejuice.{TARGET}"
@@ -45,6 +46,17 @@ LIBRARIES_DESCRIPTION = Variable.get(
 local_tz = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz)
 
+MEDIA_DAG_PARAMETERS = {
+    "google": {
+        "partitions": ["load_date"],
+        "dw_query_filters": {"load_date": "date('{year}-{month}-{day}')"},
+    },
+    "criteo_campaigns": {
+        "partitions": ["year", "month", "day"],
+        "dw_query_filters": {"year": "{year}", "month": "{month}", "day": "{day}"},
+    },
+}
+
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
@@ -69,8 +81,29 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 
 media_names = FileService.list_layer_sql_files(TARGET, "")
 
-for media_name in media_names:
 
+def build_task_pipeline(media_name):
+    if media_name in DW_STANDARD_DAGS:
+        create_cluster_task >> list(
+            dw_staging_sub_dags.values()
+        ) >> terminate_cluster_task
+
+    else:
+        join = DummyOperator(task_id="join", dag=dag, trigger_rule="none_failed")
+
+        dims_sub_dags = []
+        facts_sub_dags = []
+        for key, value in dw_staging_sub_dags.items():
+            if "fact" in key:
+                facts_sub_dags.append(value)
+            else:
+                dims_sub_dags.append(value)
+
+        create_cluster_task >> dims_sub_dags >> join >> facts_sub_dags >> terminate_cluster_task
+
+
+for media_name in media_names:
+    dag_params = MEDIA_DAG_PARAMETERS[media_name]
     dw_staging_file_list = FileService.list_sql_files_without_extension_from_layer(
         TARGET, f"{media_name}/{LayerEnum.DW.value}"
     )
@@ -89,19 +122,9 @@ for media_name in media_names:
         dag,
         dw_staging_file_list,
         test_ods_migration=False,
-        partitions=["load_date"],
-        dw_query_filters={"load_date": "date('{year}-{month}-{day}')"},
+        partitions=dag_params["partitions"],
+        dw_query_filters=dag_params["dw_query_filters"],
         spectrum_iam_role=SPECTRUM_IAM_ROLE,
     )
 
-join = DummyOperator(task_id="join", dag=dag, trigger_rule="none_failed")
-
-dims_sub_dags = []
-facts_sub_dags = []
-for key, value in dw_staging_sub_dags.items():
-    if "fact" in key:
-        facts_sub_dags.append(value)
-    else:
-        dims_sub_dags.append(value)
-
-create_cluster_task >> dims_sub_dags >> join >> facts_sub_dags >> terminate_cluster_task
+    build_task_pipeline(media_name)
