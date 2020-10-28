@@ -120,7 +120,7 @@ if __name__ == "__main__":
         spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
         s3_loader.load_df(
             df=df,
-            s3_path=f"{database_location}{table_name}",
+            s3_path=f"{database_name}/{table_name}",
             format_options=format_options,
             partitions=partition_cols,
             is_incremental=True,

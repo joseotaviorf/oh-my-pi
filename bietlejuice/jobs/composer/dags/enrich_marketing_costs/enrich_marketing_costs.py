@@ -13,12 +13,6 @@ from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.services import FileService
 
-PARTITION_COLS = {
-    "google": ["acc", "load_date"],
-    "criteo_campaigns": ["year", "month", "day"],
-}
-
-MARKETING_HUB_MEDIAS = ["google"]
 SOURCE = "marketing_hub"
 TARGET = "marketing_costs"
 DAG_ID = f"bietlejuice.enrich_{TARGET}"
@@ -52,13 +46,6 @@ MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz)
     ENV, TARGET, DATALAKE_BUCKET, LayerEnum.ENRICH.value
 )
 
-
-def get_database_name(media_name):
-    if media_name in MARKETING_HUB_MEDIAS:
-        return SOURCE
-    return TARGET
-
-
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
@@ -88,7 +75,6 @@ for media_name in media_names:
     layers = FileService.list_layer_sql_files(TARGET, media_name)
 
     if LayerEnum.ENRICH.value in layers:
-        database_base_name = get_database_name(media_name)
         enrich_layer = f"{media_name}/{LayerEnum.ENRICH.value}"
         sql_file_list = FileService.list_sql_files_without_extension_from_layer(
             TARGET, enrich_layer
@@ -98,7 +84,7 @@ for media_name in media_names:
             env=ENV,
             datalake_bucket=DATALAKE_BUCKET,
             layer=LayerEnum.ENRICH,
-            database_base_name=database_base_name,
+            database_base_name=SOURCE,
             target_database_base_name=TARGET,
             relative_query_path=f"{TARGET}/{media_name}",
             spark_job_paths=BASE_SPARK_JOBS_PATH,
@@ -106,10 +92,7 @@ for media_name in media_names:
             start_date=MAIN_START_DATE,
         )
         enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(
-            dag,
-            sql_file_list,
-            is_incremental=True,
-            partitions=PARTITION_COLS[media_name],
+            dag, sql_file_list, is_incremental=True, partitions=["acc", "load_date"]
         )
 
-        create_cluster_task >> list(enrich_sub_dags.values()) >> terminate_cluster_task
+create_cluster_task >> list(enrich_sub_dags.values()) >> terminate_cluster_task
