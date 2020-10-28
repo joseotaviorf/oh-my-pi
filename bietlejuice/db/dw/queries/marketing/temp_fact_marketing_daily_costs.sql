@@ -310,28 +310,28 @@ campaigns_full as (
             where fm.sk_date >= 20180101
         -- CRITEO
         UNION
-            select
+            SELECT
                 fct.sk_date,
-                'criteo'::varchar as origin,
-                'fact_criteo_daily_cost_attributions'::varchar as fact_cost,
+                'criteo'::varchar AS origin,
+                'fact_criteo_daily_cost_attributions'::varchar AS fact_cost,
                 dct.campaign_name,
-                null::varchar as campaign_city,
-                null::varchar(512) as account_name,
-                lower(dct.campaign_name) as campaign_name_l,
-                null::varchar(512) as account_name_l,
-                dct.campaign_name as utm_campaign,
-                null::varchar(512) as utm_term,
-                null::varchar(512) as utm_content,
-                null::numeric(16,4) as desktop_cost,
-                null::numeric(16,4) as mobile_cost,
-                null::numeric(16,4) as other_cost,
-                fct.cost as total_cost,
+                null AS campaign_city,
+                advertiser_name AS account_name,
+                lower(dct.campaign_name) AS campaign_name_l,
+                lower(advertiser_name) AS account_name_l,
+                dct.campaign_name AS utm_campaign,
+                null::varchar(512) AS utm_term,
+                null::varchar(512) AS utm_content,
+                null::numeric(16,4) AS desktop_cost,
+                null::numeric(16,4) AS mobile_cost,
+                null::numeric(16,4) AS other_cost,
+                fct.cost AS total_cost,
                 null as report_type,
                 null as ad_type
-            from marketing.fact_criteo_daily_cost_attributions fct
-            left join marketing.dim_criteo_campaign dct
-            on fct.sk_criteo_campaign = dct.sk_criteo_campaign
-            where fct.sk_date >= 20180101
+            FROM marketing_costs.fact_criteo_daily_cost_attributions fct
+                LEFT JOIN marketing_costs.dim_criteo_campaign dct
+                ON fct.sk_criteo_campaign = dct.sk_criteo_campaign
+            WHERE fct.sk_date >= 20180101
         -- RTB
         UNION
             select
