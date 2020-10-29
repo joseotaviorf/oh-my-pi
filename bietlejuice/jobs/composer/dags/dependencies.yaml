@@ -221,6 +221,7 @@ bietlejuice.enrich_tracksale:
 
 bietlejuice.enrich_marketing_costs:
   - bietlejuice.marketing_hub
+  - bietlejuice.criteo_campaigns:load-criteo-campaigns-to-clean
 
 bietlejuice.regions_polygon:
   - bietlejuice.enrich_region:load-region-to-enrich

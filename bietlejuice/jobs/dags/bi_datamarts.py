@@ -36,10 +36,6 @@ def create_datamart_from_dw(table_name, **kwargs):
     transaction_sql = 'begin;\n {};\n {};\n commit;'.format(drop_table_sql, create_table_sql)
 
     dw_conn = BaseETL.get_connection(db_enum=EnumDB.BI_DW, encoding='utf-8')
-    BaseETL.kill_locks_for_table(
-        conn=dw_conn,
-        table_name='{}.{}'.format(DATAMARTS_SCHEMA, table_name)
-    )
 
     logger.info('m=create_datamart_from_dw, table_name={}, sql={}, msg=Dropping and creating new table'.format(table_name, transaction_sql))
     BaseETL.execute_command(

@@ -15,6 +15,6 @@ SELECT
     year,
     month,
     day
-FROM datalake_marketing_costs_raw.criteo
+FROM datalake_marketing_costs_raw.criteo_campaigns
 WHERE
     year={year} and month={month} and day={day}

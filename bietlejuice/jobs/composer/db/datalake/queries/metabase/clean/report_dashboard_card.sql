@@ -14,7 +14,7 @@ SELECT
     month,
     day
 FROM
-    datalake_metabase_raw.report_dashboardcard
+    datalake_metabase_raw.report_dashboard_card
 WHERE
     year = {year}
     AND month = {month}
