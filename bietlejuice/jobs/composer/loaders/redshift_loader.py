@@ -54,6 +54,8 @@ class RedshiftLoader:
         """
         Method to kill locks for the provided table using a database procedure (i.e.
         `terminate_locks_for_table`)
+        This method needs to be ran as superuser or executor of processes that created the lock.
+
         :param table_name: table name which locks need to be killed
         :type table_name: str
         :param schema: schema's table name, `public` if not provided
@@ -72,7 +74,7 @@ class RedshiftLoader:
         target_schema,
         target_table_name,
         overwrite,
-        kill_table_locks=True,
+        kill_table_locks=False,
     ):
         """
         Loads the data from a table on a Metastore into a table in Redshift.
