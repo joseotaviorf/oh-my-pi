@@ -39,7 +39,38 @@ SELECT
 FROM datalake_firestore_clean.sale_offer
 )
 SELECT
-    soa.*
+    soa.id,
+    concat(soa.id_buyer,'_',soa.id_house) AS id_sale_flow,
+    soa.id_buyer,
+    soa.id_house,
+    soa.id_owner,
+    soa.id_monday_user_last_revision,
+    soa.brokerage_fee,
+    soa.deed_price,
+    soa.earnest_value,
+    soa.fgts_value,
+    soa.financing_value,
+    soa.itbi_price,
+    soa.first_price_offered_by_buyer,
+    soa.sale_price,
+    soa.registry_price,
+    soa.planned_payment_method,
+    COALESCE(soa.last_price_offered_by_buyer,soa.first_price_offered_by_buyer) AS last_price_offered_by_buyer,
+    soa.current_payment_method,
+    soa.credit_status,
+    soa.payment_entry_amount,
+    soa.payment_type,
+    soa.status,
+    soa.status_closing,
+    soa.status_reason,
+    soa.turn,
+    (soa.sale_price - soa.first_price_offered_by_buyer)/NULLIF(soa.sale_price,0) AS first_discount_proposed,
+    (soa.sale_price - soa.last_price_offered_by_buyer)/NULLIF(soa.sale_price,0) AS last_discount_proposed,
+    COALESCE(soa.has_used_negotiation_chat,FALSE) AS has_used_negotiation_chat,
+    COALESCE(soa.has_used_fgts_in_payment,FALSE) AS has_used_fgts_in_payment,
+    soa.dt_tenant_left,
+    soa.ts_created,
+    soa.ts_updated
 FROM sale_offer_audit soa
 INNER JOIN last_update lup
     ON soa.id = lup.id 
