@@ -143,7 +143,6 @@ if __name__ == "__main__":
             s3_path=database_location + table_name,
             format_options=format_options,
             partitions=partition_cols,
-            is_incremental=False,
             write_mode="append",
         )
 

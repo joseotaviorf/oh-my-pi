@@ -17,7 +17,6 @@ class IncrementalTableLoaderPipeline(TableLoaderPipeline):
             format_options=format_options,
             s3_path=self.target_database_location + self.table_name,
             partitions=self.partitions,
-            is_incremental=True,
         )
 
         spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)

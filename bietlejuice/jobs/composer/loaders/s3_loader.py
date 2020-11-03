@@ -145,14 +145,7 @@ class S3Loader:
 
     @logger(exclude="df")
     def load_df(
-        self,
-        df,
-        s3_path,
-        format_options,
-        partitions,
-        is_incremental,
-        write_mode="overwrite",
-        **options
+        self, df, s3_path, format_options, partitions, write_mode="overwrite", **options
     ):
         """
         Loads the content of an Spark DataFrame into a table in S3 overwriting the
@@ -187,19 +180,17 @@ class S3Loader:
         if not df:
             raise ValueError("m=load_file, msg=Spark DataFrame is empty")
 
-        if is_incremental:
-            # check spark conf
-            spark = BaseSparkContext.spark
-            partition_overwrite_mode = spark.conf.get(
-                "spark.sql.sources.partitionOverwriteMode"
-            ).lower()
-            if partition_overwrite_mode != "dynamic":
-                raise RuntimeError(
-                    "m=load_file, spark.sql.sources.partitionOverwriteMode={}, "
-                    "msg=partitionOverwriteMode have to be configured to 'dynamic'".format(
-                        partition_overwrite_mode
-                    )
+        # check spark conf
+        spark = BaseSparkContext.spark
+        partition_overwrite_mode = spark.conf.get(
+            "spark.sql.sources.partitionOverwriteMode"
+        ).lower()
+        if partition_overwrite_mode != "dynamic":
+            logger.info(
+                "m=load_file, spark.sql.sources.partitionOverwriteMode={}, msg=partitionOverwriteMode have to be configured to 'dynamic'".format(
+                    partition_overwrite_mode
                 )
+            )
 
         df_writer = (
             df.write.mode(write_mode)

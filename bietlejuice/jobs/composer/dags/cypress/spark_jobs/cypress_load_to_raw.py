@@ -84,7 +84,6 @@ if __name__ == "__main__":
                         s3_path=s3_target_database_location + s3_target_table_name,
                         format_options=format_options,
                         partitions=None,
-                        is_incremental=False,
                         write_mode="append",
                     )
                     spark_metastore_loader.update_metastore(

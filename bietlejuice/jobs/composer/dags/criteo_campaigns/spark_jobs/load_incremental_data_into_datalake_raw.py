@@ -123,7 +123,6 @@ if __name__ == "__main__":
             s3_path=f"{database_location}{table_name}",
             format_options=format_options,
             partitions=partition_cols,
-            is_incremental=True,
         )
         spark_metastore_loader.update_metastore(
             df,
