@@ -68,6 +68,7 @@ dag = DAG(
     start_date=datetime(2019, 9, 7, 0, 0, 0),
     schedule_interval='30 9 * * *',
     max_active_runs=1,
+    concurrency=3,
     catchup=False
 )
 
