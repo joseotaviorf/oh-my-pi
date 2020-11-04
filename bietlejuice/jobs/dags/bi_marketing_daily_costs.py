@@ -33,7 +33,7 @@ SHARING_RULES_TABLE = "sharing_rules_marketing_daily_costs"
 # DAG setup
 MAIN_DAG_NAME = 'bi-marketing-daily-costs'
 MAIN_START_DATE = datetime(2019, 1, 1)
-MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule("0 1,6,8,10,17 * * *")
+MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule("0 1,6,9,11,17 * * *")
 
 logger = QuintoAndarLogger(MAIN_DAG_NAME)
 
@@ -242,4 +242,9 @@ load_fact_marketing_daily_costs_task.set_upstream([
     load_shared_manual_costs_to_datalake_task
 ])
 
-load_fact_marketing_daily_costs_task >> load_temp_fact_marketing_daily_costs_task >> trigger_bi_marketing_funnels_conversions_task
+load_temp_fact_marketing_daily_costs_task.set_upstream([
+    load_cost_share_rules_into_dw_task,
+    load_shared_manual_costs_to_datalake_task
+])
+
+load_fact_marketing_daily_costs_task  >> trigger_bi_marketing_funnels_conversions_task
