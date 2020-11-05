@@ -35,6 +35,12 @@ bietlejuice.dw_region:
 bietlejuice.dw_reservation:
   - bietlejuice.enrich_kill_queue
 
+bietlejuice.dw_sale_offers:
+  - bietlejuice.amplitude
+  - bietlejuice.ebdb:load-house
+  - bietlejuice.enrich_offer:load-sale-offer-to-enrich
+  # TODO [ODS] Add gsheets after migrated to composer
+
 bietlejuice.dw_smart_price:
   - bietlejuice.enrich_ebdb_smart_price
   - bietlejuice.ebdb:load-dynamic-pricing-house
