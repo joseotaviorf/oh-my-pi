@@ -51,7 +51,7 @@ class PostgresConsumer(DBConsumer):
     @logger
     def get_table_names_and_sizes(self):
         """
-        Gets the table names and sizes of a PostgreSql database.
+        Gets the table names and sizes in MB of a PostgreSql database.
         :return: A Spark DataFrame with cols: table_name and size
         """
         query = """

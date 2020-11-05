@@ -40,7 +40,10 @@ if __name__ == "__main__":
     s3_loader = S3Loader()
     spark_metastore_loader = SparkMetastoreLoader(metastore_service)
     for table in tables:
-        df = postgres_consumer.get_data_from_table(table.table_name)
+        concurrent_tasks = spark_client._session.sparkContext.defaultParallelism * 2
+        df = postgres_consumer.get_data_from_table_in_parallel(
+            table.table_name, concurrent_tasks
+        )
         database_name = db_info["db_raw_databricks"]
         format_options = SparkTableStorageFormat.DEFAULT_RAW
         database_location = db_info["db_raw_path"]
