@@ -3,7 +3,7 @@ SELECT
 	GET_JSON_OBJECT(metadata,'$.event_data.Sid') AS id_event,
 	GET_JSON_OBJECT(metadata,'$.event_data.TaskSid') AS id_task,
 	GET_JSON_OBJECT(metadata,'$.event_data.TaskQueueSid') AS id_task_queue,
-	GET_JSON_OBJECT(metadata,'$.event_data.TransTo') AS id_task_queue_transed,
+	GET_JSON_OBJECT(metadata,'$.event_data.TransferTo') AS id_task_queue_transfered,
 	GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.call_sid') AS id_call,
 	COALESCE(GET_JSON_OBJECT(metadata,'$.event_data.WorkerSid'),
 		GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.worker_sid')) AS id_agent,
@@ -24,5 +24,5 @@ SELECT
 	CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.waiting_time') AS INT) AS seconds_waiting_time,
 	ts_created_local,
 	ts_received_local,
-	TO_TIMESTAMP(GET_JSON_OBJECT(metadata,'$.event_data.TransStarted')) AS ts_trans_started
+	TO_TIMESTAMP(GET_JSON_OBJECT(metadata,'$.event_data.TransferStarted')) AS ts_transfer_started
 FROM datalake_bigfone.twilio_flex_events
