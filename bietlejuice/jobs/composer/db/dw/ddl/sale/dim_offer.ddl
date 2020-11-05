@@ -29,3 +29,4 @@ CREATE TABLE sale.dim_offer (
 	ts_updated TIMESTAMP,
 	ts_load TIMESTAMP
 );
+ALTER TABLE sale.dim_offer OWNER TO airflow;

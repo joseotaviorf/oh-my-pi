@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS sale.dim_sale_agreeement;
-CREATE TABLE sale.dim_sale_agreeement (
+DROP TABLE IF EXISTS sale.dim_sale_agreement;
+CREATE TABLE sale.dim_sale_agreement (
 	sk_offer VARCHAR PRIMARY KEY,
 	sale_agreement_status VARCHAR,
 	sale_agreement_cancellation_reason VARCHAR,
@@ -15,3 +15,4 @@ CREATE TABLE sale.dim_sale_agreeement (
 	ts_sale_transacton_paid TIMESTAMP,
 	ts_load TIMESTAMP
 );
+ALTER TABLE sale.dim_sale_agreement OWNER TO airflow;

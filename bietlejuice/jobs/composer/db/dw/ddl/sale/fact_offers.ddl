@@ -35,3 +35,4 @@ CREATE TABLE sale.fact_offers (
 	hours_visit_completed_to_offer SMALLINT,
 	ts_load TIMESTAMP
 );
+ALTER TABLE sale.fact_offers OWNER TO airflow;
