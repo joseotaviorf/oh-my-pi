@@ -1,5 +1,6 @@
 SELECT
     uuid as id,
+    test_execution_id as id_test_execution,
     _timeout as timeout,
     afterHooks as after_hooks,
     beforeHooks as before_hooks,

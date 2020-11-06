@@ -81,10 +81,10 @@ class CypressRawBuilder:
 
     def __get_suites_data(self, df):
         results = df.select(explode("results"))
-        suites = results.select(explode("col.suites"))
-        suites = suites.select("col.*")
+        suites = results.select(explode("col.suites"), "col.uuid")
+        suites = suites.withColumnRenamed("col.uuid", "test_execution_id")
+        suites = suites.select("col.*", "test_execution_id")
         suites = self.__append_partition_data(suites)
-        return suites
 
     def parse_json_data(self, df):
         suites = self.__get_suites_data(df)

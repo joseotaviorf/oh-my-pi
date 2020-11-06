@@ -15,6 +15,7 @@ SELECT
     state,
     timedOut as has_timed_out,
     title,
+    COALESCE(GET_JSON_OBJECT(context, '$.value'), 0) as retry_count,
     pwa,
     dt
 FROM datalake_cypress_raw.tests
