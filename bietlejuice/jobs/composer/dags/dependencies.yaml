@@ -111,6 +111,13 @@ bietlejuice.enrich_booking:
   - bietlejuice.ebdb:load-visitor
   # TODO [ODS] Add gsheets after migrated to composer
 
+bietlejuice.enrich_sale_flows:
+  - bietlejuice.amplitude
+  - bietlejuice.ebdb:load-house
+  - bietlejuice.enrich_booking
+  - bietlejuice.enrich_ebdb_listing:load-listing-business-context-to-enrich
+  - bietlejuice.enrich_offer:load-sale-offer-to-enrich
+
 bietlejuice.enrich_docx:
   - bietlejuice.docx:load-credit-evaluation-to-clean
 
@@ -243,4 +250,3 @@ bietlejuice.tenant_booking_review:
   - bietlejuice.ebdb:load-booking
   - bietlejuice.insider:load-review-feature-to-datalake-clean
   - bietlejuice.insider:load-review-to-datalake-clean
-
