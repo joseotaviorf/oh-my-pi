@@ -188,7 +188,12 @@ class PostgresConsumer(DBConsumer):
                     pg_class.relnamespace = pg_namespace.oid AND
                     pg_attribute.attrelid = pg_class.oid AND
                     pg_attribute.attnum = any(pg_index.indkey) AND
-                    indisprimary
+                    indisprimary AND
+                    lower(
+                        format_type(
+                            pg_attribute.atttypid, pg_attribute.atttypmod
+                        )
+                    ) NOT LIKE '%character varying%'
                 ORDER BY
                     cardinality DESC
             """.format(
