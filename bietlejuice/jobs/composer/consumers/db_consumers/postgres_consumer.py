@@ -193,7 +193,8 @@ class PostgresConsumer(DBConsumer):
                         format_type(
                             pg_attribute.atttypid, pg_attribute.atttypmod
                         )
-                    ) NOT LIKE '%character varying%'
+                    ) NOT LIKE '%character varying%' AND
+                    reltuples > 0.0
                 ORDER BY
                     cardinality DESC
             """.format(
