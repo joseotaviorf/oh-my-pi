@@ -4,6 +4,9 @@ WITH event_steps AS (
 		id_event,
 		EXPLODE(SPLIT(steps,'},')) as step
 	FROM datalake_bigfone.twilio_ivr_events
+	WHERE year = {year}
+        AND month = {month}
+        AND day = {day}
 )
 SELECT
 	id,

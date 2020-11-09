@@ -26,3 +26,6 @@ SELECT
 	ts_received_local,
 	TO_TIMESTAMP(GET_JSON_OBJECT(metadata,'$.event_data.TransferStarted')) AS ts_transfer_started
 FROM datalake_bigfone.twilio_flex_events
+WHERE year = {year}
+	AND month = {month}
+	AND day = {day}

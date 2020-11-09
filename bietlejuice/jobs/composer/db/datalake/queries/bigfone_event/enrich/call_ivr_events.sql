@@ -15,3 +15,6 @@ SELECT
 	ts_created_local,
 	ts_received_local
 FROM datalake_bigfone.twilio_ivr_events
+WHERE year = {year}
+	AND month = {month}
+	AND day = {day}

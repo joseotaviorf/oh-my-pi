@@ -4,6 +4,9 @@ WITH last_location_events AS (
 		MAX(id_event) AS id_last_event
 	FROM datalake_bigfone.call_flex_events
 	WHERE GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.from_city') IS NOT NULL
+		AND year = {year}
+		AND month = {month}
+		AND day = {day}
 	GROUP BY 1
 )
 SELECT
@@ -14,3 +17,6 @@ SELECT
 FROM datalake_bigfone.call_flex_events cfe
 INNER JOIN last_location_events lle
 	ON cfe.id_event = lle.id_last_event
+WHERE cfe.year = {year}
+	AND cfe.month = {month}
+	AND cfe.day = {day}
