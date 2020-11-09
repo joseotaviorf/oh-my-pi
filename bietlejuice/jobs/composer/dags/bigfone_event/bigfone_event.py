@@ -248,15 +248,29 @@ airflow_helpers.chain(
     load_event_table_to_clean_task,
     create_clean_partition_task,
 )
-create_clean_partition_task >> list(enrich_sub_dags.values())
 
 # fact_call_ura_paths dependency
-[enrich_sub_dags.pop("call_ura_events")] >> dw_sub_dags["fact_call_ura_paths"]
-[
+create_clean_partition_task >> enrich_sub_dags.pop("call_ura_events") >> dw_sub_dags[
+    "fact_call_ura_paths"
+]
+create_clean_partition_task >> [
     enrich_sub_dags.pop("call_context_data"),
     enrich_sub_dags.pop("call_recording_available_events"),
     enrich_sub_dags.pop("dialed_phone"),
 ] >> dw_sub_dags["dim_call"]
 
+create_clean_partition_task >> enrich_sub_dags.pop(
+    "twilio_flex_events"
+) >> enrich_sub_dags.pop("call_flex_events") >> [
+    enrich_sub_dags.pop("call_agents"),
+    enrich_sub_dags.pop("inbound_call_locations"),
+] >> terminate_cluster_task
+
+create_clean_partition_task >> enrich_sub_dags.pop("twilio_ivr_events") >> [
+    enrich_sub_dags.pop("call_ivr_events"),
+    enrich_sub_dags.pop("call_ivr_paths"),
+] >> terminate_cluster_task
+
+create_clean_partition_task >> list(enrich_sub_dags.values())
 list(enrich_sub_dags.values()) >> terminate_cluster_task
 list(dw_sub_dags.values()) >> terminate_cluster_task
