@@ -13,7 +13,10 @@ SELECT
 	CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.csat-1') AS INT) AS csat_1,
 	CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.csat-2') AS INT) AS csat_2,
 	ts_created_local,
-	ts_received_local
+	ts_received_local,
+	year,
+	month,
+	day
 FROM datalake_bigfone.twilio_ivr_events
 WHERE year = {year}
 	AND month = {month}

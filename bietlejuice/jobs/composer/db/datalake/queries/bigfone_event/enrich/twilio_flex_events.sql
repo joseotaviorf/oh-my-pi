@@ -4,7 +4,10 @@ SELECT
 	event,
 	metadata,
 	ts_created_local,
-	ts_received_local
+	ts_received_local,
+	year,
+	month,
+	day
 FROM datalake_bigfone_clean.events
 WHERE provider = 'twilio'
 	AND GET_JSON_OBJECT(metadata,'$.event_data.WorkflowName') = 'Assign to Anyone'

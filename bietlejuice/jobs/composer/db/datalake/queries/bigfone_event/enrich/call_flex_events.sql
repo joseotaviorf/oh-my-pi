@@ -24,7 +24,10 @@ SELECT
 	CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.waiting_time') AS INT) AS seconds_waiting_time,
 	ts_created_local,
 	ts_received_local,
-	TO_TIMESTAMP(GET_JSON_OBJECT(metadata,'$.event_data.TransferStarted')) AS ts_transfer_started
+	TO_TIMESTAMP(GET_JSON_OBJECT(metadata,'$.event_data.TransferStarted')) AS ts_transfer_started,
+	year,
+	month,
+	day
 FROM datalake_bigfone.twilio_flex_events
 WHERE year = {year}
 	AND month = {month}
