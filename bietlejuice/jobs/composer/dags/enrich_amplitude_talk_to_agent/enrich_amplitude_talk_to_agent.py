@@ -12,6 +12,9 @@ from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
 from bietlejuice.jobs.composer.services import FileService
 from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 
+# This DAG had been turned off since TTA flow does not exist anymore, so we no longer receive updated data.
+# However, this table is still used on Sale modeling and we can not delete it!
+
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 7, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
 
