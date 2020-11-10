@@ -223,7 +223,7 @@ demand_daily_spent AS (
 		ON dd.sk_date = co.sk_date
 	WHERE
 		co.mkt_origin = 'Tenants PWA'
-		AND dd.date >= CURRENT_DATE - INTERVAL '12 MONTH'
+		AND dd.date >= DATE('2018-01-01')
 	GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,29,30,31
 ),
 -------------------------------------------------------------------------------------
@@ -265,7 +265,7 @@ demand_daily_targets AS (
 	FROM
 		datalake_raw.gsheets_demand_targets_replanning AS str
 	WHERE
-		NULLIF(str.date, '')::date >= CURRENT_dATE - INTERVAL '12 MONTH'
+		NULLIF(str.date, '')::date >= DATE('2018-01-01')
 )
 SELECT
 	rf.*
