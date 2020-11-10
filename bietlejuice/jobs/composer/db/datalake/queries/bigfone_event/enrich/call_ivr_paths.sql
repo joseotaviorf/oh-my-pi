@@ -2,7 +2,7 @@ WITH event_steps AS (
 	SELECT
 		id,
 		id_event,
-		EXPLODE(SPLIT(steps,'},')) as step,
+		EXPLODE(SPLIT(steps,'}},')) as step,
 		year,
         month,
         day
