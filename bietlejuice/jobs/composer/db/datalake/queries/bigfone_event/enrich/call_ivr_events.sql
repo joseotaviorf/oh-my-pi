@@ -9,6 +9,8 @@ SELECT
 	GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.to') AS to_number,
 	event AS event_type,
 	GET_JSON_OBJECT(metadata,'$.event_data.TaskCanceledReason') AS task_cancelation_reason,
+	GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.steps') AS steps,
+	metadata,
 	CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskPriority') AS INT) AS task_priority,
 	CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.csat-1') AS INT) AS csat_1,
 	CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.csat-2') AS INT) AS csat_2,

@@ -20,6 +20,7 @@ SELECT
 	GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.comment') AS comment,
 	CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.hasWrapup') AS BOOLEAN) AS has_wrapup,
 	CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.hasCsat') AS BOOLEAN) AS has_csat,
+	metadata,
 	CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskPriority') AS INT) AS task_priority,
 	CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.waiting_time') AS INT) AS seconds_waiting_time,
 	ts_created_local,
