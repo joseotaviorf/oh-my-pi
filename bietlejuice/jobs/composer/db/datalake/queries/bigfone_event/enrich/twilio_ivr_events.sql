@@ -3,6 +3,7 @@ SELECT
 	GET_JSON_OBJECT(metadata,'$.event_data.Sid') AS id_event,
 	event,
 	metadata,
+	GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.steps') AS steps,
 	ts_created_local,
 	ts_received_local,
 	year,

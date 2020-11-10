@@ -11,7 +11,7 @@ WITH last_agent_events AS (
 		AND year = {year}
 		AND month = {month}
 		AND day = {day}
-	GROUP BY 1
+	GROUP BY 1,3,4,5
 )
 SELECT
 	lae.id_agent,
