@@ -83,6 +83,7 @@ whichcraft==0.6.0
 WTForms==2.2.1
 zope.deprecation==4.4.0
 quintoandar-criteo-api-client==0.1.0
+quintoandar-linkedin-client==1.0.2
 quintoandar-teravoz-client==0.1.5
 quintoandar-zendesk-client==0.1.1
 quintoandar-tracksale-api-client==0.2.0
