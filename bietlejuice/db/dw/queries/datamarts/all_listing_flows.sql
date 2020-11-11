@@ -5,7 +5,7 @@ SELECT
 	CASE WHEN status_history NOT IN ('alugado', 'despublicado', 'suspenso', 'publicado') THEN 'outros'
         ELSE status_history END status_history_v2,
 	case
-        	when status_history = 'despublicado' and lower(status_change_reason) like '%rescisao%' then 'ended_rental'
+        	when status_history = 'despublicado' and (lower(status_change_reason) like '%rescisao%' or lower(status_change_reason) like '%rescisão%') then 'ended_rental'
 	     	when status_history = 'despublicado' and (lower(status_change_reason) like '%contato%'
 	     		or lower(status_change_reason) like '%não atende%')then 'no_contact'
 	     	when status_history = 'despublicado' and lower(status_change_reason) like '%vend%' then 'sale'
@@ -58,7 +58,7 @@ SELECT
     COALESCE(alw_ws.sk_house_listing, alw_nws.sk_house_listing) AS sk_house_listing,
     alw_ws.status_history AS status_week_start,
     alw_nws.status_history AS status_next_week,
-    alw_ws.status_change_reason,
+    alw_nws.status_change_reason as next_status_change_reason,
     CASE WHEN alw_ws.status_history IN ('despublicado', 'suspenso') then alw_ws.time_in_status END AS time_in_status,
 	DATE(COALESCE(alw_ws.week_start,(COALESCE(alw_ws.next_week_start, alw_nws.week_start) - INTERVAL '1 week'))) AS week_start,
     COALESCE(alw_ws.next_week_start, alw_nws.week_start) AS next_week_start
@@ -71,7 +71,7 @@ SELECT
     dr.city_group,
     alw.status_week_start,
     alw.status_next_week,
-    alw.status_change_reason,
+    alw.next_status_change_reason,
     alw.time_in_status,
     alw.week_start,
     alw.next_week_start
@@ -90,17 +90,17 @@ SELECT
     city_group,
     time_in_status,
     COUNT(DISTINCT sk_house_listing) AS total_listings,
-    COUNT(DISTINCT CASE WHEN status_change_reason = 'ended_rental' THEN sk_house_listing END) AS ended_rental,
-    COUNT(DISTINCT CASE WHEN status_change_reason = 'no_contact' THEN sk_house_listing END) AS no_contact,
-    COUNT(DISTINCT CASE WHEN status_change_reason = 'sale' THEN sk_house_listing END) AS sale,
-    COUNT(DISTINCT CASE WHEN status_change_reason = 'business_model' THEN sk_house_listing END) AS business_model,
-    COUNT(DISTINCT CASE WHEN status_change_reason = 'consequence_mngmt' THEN sk_house_listing END) AS consequence_mngmt,
-    COUNT(DISTINCT CASE WHEN status_change_reason = 'rented_elsewhere' THEN sk_house_listing END) AS rented_elsewhere,
-    COUNT(DISTINCT CASE WHEN status_change_reason = 'reservation' THEN sk_house_listing END) AS reservation,
-    COUNT(DISTINCT CASE WHEN status_change_reason = 'minuta' THEN sk_house_listing END) AS minuta,
-    COUNT(DISTINCT CASE WHEN status_change_reason = 'by_owner' THEN sk_house_listing END) AS by_owner,
-    COUNT(DISTINCT CASE WHEN status_change_reason = 'suspended_in_negotiation' THEN sk_house_listing END) AS suspended_in_negotiation,
-    COUNT(DISTINCT CASE WHEN status_change_reason IS null THEN sk_house_listing END) AS other_status_change_reason
+    COUNT(DISTINCT CASE WHEN next_status_change_reason = 'ended_rental' THEN sk_house_listing END) AS ended_rental,
+    COUNT(DISTINCT CASE WHEN next_status_change_reason = 'no_contact' THEN sk_house_listing END) AS no_contact,
+    COUNT(DISTINCT CASE WHEN next_status_change_reason = 'sale' THEN sk_house_listing END) AS sale,
+    COUNT(DISTINCT CASE WHEN next_status_change_reason = 'business_model' THEN sk_house_listing END) AS business_model,
+    COUNT(DISTINCT CASE WHEN next_status_change_reason = 'consequence_mngmt' THEN sk_house_listing END) AS consequence_mngmt,
+    COUNT(DISTINCT CASE WHEN next_status_change_reason = 'rented_elsewhere' THEN sk_house_listing END) AS rented_elsewhere,
+    COUNT(DISTINCT CASE WHEN next_status_change_reason = 'reservation' THEN sk_house_listing END) AS reservation,
+    COUNT(DISTINCT CASE WHEN next_status_change_reason = 'minuta' THEN sk_house_listing END) AS minuta,
+    COUNT(DISTINCT CASE WHEN next_status_change_reason = 'by_owner' THEN sk_house_listing END) AS by_owner,
+    COUNT(DISTINCT CASE WHEN next_status_change_reason = 'suspended_in_negotiation' THEN sk_house_listing END) AS suspended_in_negotiation,
+    COUNT(DISTINCT CASE WHEN next_status_change_reason IS null THEN sk_house_listing END) AS other_status_change_reason
 FROM al_week_status_region alw
 WHERE week_start < DATE_TRUNC('week',CURRENT_DATE) - INTERVAL '1 week' AND week_start >= '2019-07-01'
 GROUP BY week_start, city_group, status_week_start, status_next_week, next_week_start, time_in_status;
