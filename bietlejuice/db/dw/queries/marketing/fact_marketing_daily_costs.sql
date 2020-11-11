@@ -308,9 +308,7 @@ campaigns_full as (
                 null::numeric(16,4) AS desktop_cost,
                 null::numeric(16,4) AS mobile_cost,
                 null::numeric(16,4) AS other_cost,
-                fct.cost AS total_cost,
-                null as report_type,
-                null as ad_type
+                fct.cost AS total_cost
             FROM marketing_costs.fact_criteo_daily_cost_attributions fct
                 LEFT JOIN marketing_costs.dim_criteo_campaign dct
                 ON fct.sk_criteo_campaign = dct.sk_criteo_campaign
