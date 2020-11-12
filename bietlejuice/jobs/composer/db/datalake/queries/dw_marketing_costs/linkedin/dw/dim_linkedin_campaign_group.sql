@@ -1,8 +1,8 @@
 SELECT DISTINCT
     id AS sk_campaign_group,
     id AS id_campaign_group,
-    name AS campaign_group_name,
     id_account,
+    name AS campaign_group_name,
     account_name,
     year,
     month,

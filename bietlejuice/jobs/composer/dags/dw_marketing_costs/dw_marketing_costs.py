@@ -15,7 +15,7 @@ from bietlejuice.jobs.composer.dags.base.incremental_dw_sub_dag import (
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.services import FileService
 
-DW_STANDARD_DAGS = ["criteo_campaigns"]
+DW_STANDARD_DAGS = ["criteo_campaigns", "linkedin"]
 DW_SCHEMA = "marketing_costs"
 TARGET = "dw_marketing_costs"
 DAG_ID = f"bietlejuice.{TARGET}"
