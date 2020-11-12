@@ -93,7 +93,9 @@ def build_task_pipeline(media_name):
         ) >> terminate_cluster_task
 
     else:
-        join = DummyOperator(task_id="join", dag=dag, trigger_rule="none_failed")
+        join = DummyOperator(
+            task_id=f"join_{media_name}", dag=dag, trigger_rule="none_failed"
+        )
 
         dims_sub_dags = []
         facts_sub_dags = []

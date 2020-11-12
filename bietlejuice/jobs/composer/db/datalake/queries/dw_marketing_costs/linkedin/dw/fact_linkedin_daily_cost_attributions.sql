@@ -4,9 +4,9 @@ SELECT
     cgr.id AS sk_campaign_group,
     CAST(
       CONCAT(
-        string(year),
-        lpad(string(month), 2, '0'),
-        lpad(string(day), 2, '0')
+        string(stats.year),
+        lpad(string(stats.month), 2, '0'),
+        lpad(string(stats.day), 2, '0')
       )
     AS integer) AS sk_date,
     cost_in_local_currency AS total_cost,
@@ -46,3 +46,4 @@ FROM datalake_marketing_costs_clean.linkedin_creatives_stats stats
         AND cgr.year = cam.year
         AND cgr.month = cam.month
         AND cgr.day = cam.day
+WHERE stats.year = '{year}' AND stats.month = '{month}' AND stats.day = '{day}'
