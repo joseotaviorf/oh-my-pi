@@ -20,6 +20,7 @@ bietlejuice.dw_booking:
 
 bietlejuice.dw_marketing_costs:
   - bietlejuice.enrich_marketing_costs
+  - bietlejuice.linkedin
 
 bietlejuice.dw_proposal:
   - bietlejuice.enrich_proposal:load-proposal-to-enrich

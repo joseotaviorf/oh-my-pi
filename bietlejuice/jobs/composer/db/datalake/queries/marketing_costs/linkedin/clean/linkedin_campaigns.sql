@@ -1,8 +1,8 @@
 SELECT
     id,
-    name,
     campaign_group_id AS id_campaign_group,
     account_id AS id_account,
+    name,
     cost_type,
     daily_budget_amount AS daily_cost,
     daily_budget_currencyCode AS daily_currency_code,
