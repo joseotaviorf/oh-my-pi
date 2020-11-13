@@ -405,10 +405,10 @@ campaigns_full as (
                 sum(total_cost) as total_cost,
                 null as report_type,
                 null as ad_type
-            from marketing.fact_linkedin_daily_cost_attributions fli
-            join marketing.dim_linkedin_campaign dlc
+            from marketing_costs.fact_linkedin_daily_cost_attributions fli
+            join marketing_costs.dim_linkedin_campaign dlc
                 on dlc.sk_campaign = fli.sk_campaign
-            join marketing.dim_linkedin_campaign_group dlcc
+            join marketing_costs.dim_linkedin_campaign_group dlcc
                 on dlcc.sk_campaign_group = fli.sk_campaign_group
             group by 1,2,3,4,5,6,7,8,9,10,11
 
