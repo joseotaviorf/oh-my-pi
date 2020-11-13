@@ -9,6 +9,7 @@ create table if not exists fact_house_listings
  ,sk_condo bigint   encode lzo
  ,sk_user_partner_agent bigint   encode lzo
  ,sk_partner bigint   encode lzo
+ ,sk_autonomous_agent bigint   encode lzo
  ,sk_stranded_date bigint   encode lzo
  ,days_listing_to_contract_signed integer   encode lzo
  ,days_listing_to_depublication integer   encode lzo
@@ -21,3 +22,5 @@ create table if not exists fact_house_listings
 diststyle key
 distkey (sk_house_listing)
 ;
+
+ALTER TABLE public.fact_house_listings OWNER TO airflow;

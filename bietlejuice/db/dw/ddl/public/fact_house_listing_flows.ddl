@@ -15,6 +15,7 @@ create table if not exists fact_house_listing_flows
  sk_region integer   encode lzo,
  sk_city integer   encode lzo,
  sk_partner integer   encode lzo,
+ sk_autonomous_agent integer   encode lzo,
  sk_lead_date integer   encode lzo,
  sk_sales_company_lead_sent_date integer   encode lzo,
  sk_prospect_date integer   encode lzo,
@@ -56,6 +57,7 @@ create table if not exists fact_house_listing_flows
  lead_tracking_platform varchar(255)   encode lzo,
  is_branded boolean,
  is_b2b boolean,
+ is_autonomous_agent boolean,
  is_doorman boolean,
  is_isales_direct_register boolean,
  is_cx_direct_register boolean,
@@ -86,3 +88,5 @@ create table if not exists fact_house_listing_flows
 diststyle key
 distkey (sk_lead)
 ;
+
+ALTER TABLE public.fact_house_listing_flows OWNER TO airflow;

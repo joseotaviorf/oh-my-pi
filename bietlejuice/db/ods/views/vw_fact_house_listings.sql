@@ -34,6 +34,25 @@ lbc as (
     from
        listing_business_context
     group by 1
+),
+autonomous_agent_info as (
+SELECT DISTINCT
+	h.id as id_house,
+	pa.user_id as sk_autonomous_agent
+FROM
+	partner_agent pa
+JOIN partner dp ON
+	pa.partner_id = dp.id
+JOIN house h ON
+	pa.user_id = h.usuario_que_cadastrou_id
+LEFT JOIN listing_business_context lbc ON
+	lbc.id_house = h.id
+WHERE
+	lbc.business_context <> 'SALE'
+	AND dp.type = 'AUTONOMOUS_AGENT'
+	AND dp.id <> '257' -- Test User
+	AND h.data_criacao >= pa.ts_created --This rule might change when we start to considering migration
+	AND h.external_id IS NOT NULL --This rule might change when we start to considering migration
 )
 select
   hl.id_house_listing as sk_house_listing,
@@ -44,6 +63,7 @@ select
   coalesce(cd.id, -1) as sk_condo,
   coalesce(pa_b2b_online.user_id, pa_b2b_prime.user_id, -1) as sk_user_partner_agent,
   coalesce(pa_b2b_online.partner_id, pa_b2b_prime.partner_id, -1) as sk_partner,
+  coalesce(aa_info.sk_autonomous_agent,-1) as sk_autonomous_agent,
   coalesce(to_char(st.stranded_date,'YYYYMMDD')::bigint,-1) as sk_stranded_date,
   date_part('day', hlc.ts_contract_signed - hl.ts_listing_version_start)::integer as days_listing_to_contract_signed,
   date_part('day', hl.ts_last_de_publication - hl.ts_listing_version_start)::integer as days_listing_to_depublication,
@@ -73,6 +93,8 @@ left join partner_agent pa_b2b_online
 -- selecting from a view instead of a CTE just to make code clearer
 left join vw_stranded_house_listings st
   on hl.id_house_listing = st.sk_house_listing
+left join autonomous_agent_info aa_info
+  on aa_info.id_house = h.id
 where
   lbc.id_house is null
   or lbc.is_for_rent

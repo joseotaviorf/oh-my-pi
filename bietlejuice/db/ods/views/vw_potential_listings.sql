@@ -116,8 +116,19 @@ leads_b2b AS (
   LEFT JOIN partner_agent AS pa_b2b_online
     ON pa_b2b_online.user_id = l.usuario_que_indicou_id
   WHERE pa_b2b_online.partner_id IS NOT NULL
+),
+autonomous_agent_info AS (
+SELECT
+	pa.user_id AS sk_autonomous_agent,
+	pa.ts_created
+FROM partner_agent AS pa
+JOIN partner AS dp
+	ON pa.partner_id = dp.id
+	AND dp.type = 'AUTONOMOUS_AGENT'
+	AND dp.id <> '257' -- Test User
 )
-    SELECT f.id AS sk_house_listing_flow,
+SELECT
+    f.id AS sk_house_listing_flow,
     COALESCE(h.condo_id, '-1'::INTEGER::BIGINT) AS sk_condo,
     COALESCE(f.lead_id, '-1'::INTEGER) AS sk_lead,
     COALESCE(f.conversao_id, '-1'::INTEGER) AS sk_lead_conversion,
@@ -131,26 +142,27 @@ leads_b2b AS (
     COALESCE(f.region_id, '-1'::INTEGER) AS sk_region,
     COALESCE(dr.city_id, '-1'::INTEGER) AS id_city,
     COALESCE(pa_b2b_prime.partner_id, l_b2b.online_partner_id, f.partner_id, '-1'::INTEGER::BIGINT) AS sk_partner,
+    COALESCE(aa_info.sk_autonomous_agent, -1) AS sk_autonomous_agent,
     COALESCE(TO_CHAR(f.dt_lead::DATE::TIMESTAMP WITH TIME ZONE, 'YYYYMMDD')::INTEGER, '-1'::INTEGER) AS sk_lead_date,
     COALESCE(TO_CHAR(f.dt_prospect::DATE::TIMESTAMP WITH TIME ZONE, 'YYYYMMDD')::INTEGER, '-1'::INTEGER) AS sk_prospect_date,
-    COALESCE(TO_CHAR(CASE 
-                                    WHEN btf.dt_created < f.dt_lead THEN f.dt_lead 
-                                    ELSE btf.dt_created 
+    COALESCE(TO_CHAR(CASE
+                                    WHEN btf.dt_created < f.dt_lead THEN f.dt_lead
+                                    ELSE btf.dt_created
                                 END::DATE::TIMESTAMP WITH TIME ZONE, 'YYYYMMDD')::INTEGER, '-1'::INTEGER
      ) AS sk_first_task_created_date,
-    COALESCE(TO_CHAR(CASE 
-                                    WHEN btf.dt_closed < f.dt_lead THEN f.dt_lead 
-                                    ELSE btf.dt_closed 
+    COALESCE(TO_CHAR(CASE
+                                    WHEN btf.dt_closed < f.dt_lead THEN f.dt_lead
+                                    ELSE btf.dt_closed
                                 END::DATE::TIMESTAMP WITH TIME ZONE, 'YYYYMMDD')::INTEGER, '-1'::INTEGER
      ) AS sk_first_task_closed_date,
-    COALESCE(TO_CHAR(CASE 
-                                    WHEN btl.dt_created < f.dt_lead THEN f.dt_lead 
-                                    ELSE btl.dt_created 
+    COALESCE(TO_CHAR(CASE
+                                    WHEN btl.dt_created < f.dt_lead THEN f.dt_lead
+                                    ELSE btl.dt_created
                                 END::DATE::TIMESTAMP WITH TIME ZONE, 'YYYYMMDD')::INTEGER, '-1'::INTEGER
      ) AS sk_last_task_created_date,
-    COALESCE(TO_CHAR(CASE 
-                                    WHEN btl.dt_closed < f.dt_lead THEN f.dt_lead 
-                                    ELSE btl.dt_closed 
+    COALESCE(TO_CHAR(CASE
+                                    WHEN btl.dt_closed < f.dt_lead THEN f.dt_lead
+                                    ELSE btl.dt_closed
                                 END::DATE::TIMESTAMP WITH TIME ZONE, 'YYYYMMDD')::INTEGER, '-1'::INTEGER
      ) AS sk_last_task_closed_date,
     COALESCE(TO_CHAR(f.dt_first_contact::DATE::TIMESTAMP WITH TIME ZONE, 'YYYYMMDD')::INTEGER, '-1'::INTEGER) AS sk_first_contact_date,
@@ -205,6 +217,7 @@ leads_b2b AS (
     COALESCE(LOWER(BTRIM(lfet.tracking_campaign)) ~* '(institucional)|(branded)' AND LOWER(BTRIM(lfet.tracking_campaign)) !~* '(non-branded)',
              bl.branded_lead) AS is_branded,
     f.is_b2b,
+    COALESCE(aa_info.sk_autonomous_agent IS NOT NULL, FALSE) AS is_autonomous_agent,
     bl.reprocessed_flg,
     a.is_doorman,
     f.acquisition_channel_rep = 'Inside Sales' AS is_isales_direct_register,
@@ -253,5 +266,8 @@ leads_b2b AS (
     ON h.usuario_id = pa_b2b_prime.user_id
   LEFT JOIN house_listing AS hl_version_zero
     ON hl_version_zero.id_house = f.imovel_id
-      AND hl_version_zero.version = 0
-
+    AND hl_version_zero.version = 0
+  LEFT JOIN autonomous_agent_info AS aa_info
+    ON aa_info.sk_autonomous_agent = h.usuario_que_cadastrou_id
+    AND h.data_criacao >= aa_info.ts_created --This rule might change when we start to considering migration
+    AND h.external_id IS NOT NULL --This rule might change when we start to considering migration
