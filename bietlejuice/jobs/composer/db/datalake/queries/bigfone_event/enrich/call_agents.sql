@@ -3,6 +3,8 @@ WITH last_agent_events AS (
 		COALESCE(GET_JSON_OBJECT(metadata,'$.event_data.WorkerSid'),
 			GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.worker_sid')) AS id_agent,
 		MAX(id_event) AS id_last_event,
+		MIN(ts_created_local) AS ts_first_event,
+        	MAX(ts_created_local) AS ts_last_event,
 		year,
 		month,
 		day
@@ -11,7 +13,7 @@ WITH last_agent_events AS (
 		AND year = {year}
 		AND month = {month}
 		AND day = {day}
-	GROUP BY 1,3,4,5
+	GROUP BY 1,5,6,7
 )
 SELECT
 	lae.id_agent,
@@ -19,6 +21,8 @@ SELECT
 	GET_JSON_OBJECT(cfe.metadata,'$.event_data.WorkerAttributes.full_name') as full_name,
 	GET_JSON_OBJECT(cfe.metadata,'$.event_data.WorkerAttributes.location') as location,
 	GET_JSON_OBJECT(cfe.metadata,'$.event_data.WorkerAttributes.routing.skills') as skills,
+	lae.ts_first_event,
+	lae.ts_last_event,
 	lae.year,
 	lae.month,
 	lae.day
