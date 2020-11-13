@@ -231,6 +231,11 @@ bietlejuice.enrich_region:
   - bietlejuice.ebdb:load-region
   # TODO [ODS] Add gsheets after migrated to composer
 
+bietlejuice.enrich_retsuko:
+  - bietlejuice.retsuko:load-account-to-clean
+  - bietlejuice.retsuko:load-entry-to-clean
+  - bietlejuice.retsuko:load-invoice-to-clean
+
 bietlejuice.enrich_tracksale:
   - bietlejuice.tracksale:dispatch
   - bietlejuice.tracksale:answer
