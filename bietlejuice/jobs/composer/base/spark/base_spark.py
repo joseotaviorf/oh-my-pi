@@ -42,12 +42,40 @@ class BaseDBUtils:
         running discover_partition_values_in_path('s3://bucket/table/', dbutils)
         will return ['a', 'b', 'c']
         """
-        return [
-            unquote(file_info.name.split("=")[1][:-1])
-            for file_info in dbutils.fs.ls(path)
+        partitions = [
+            unquote(directory.split("=")[1])
+            for directory in self.discover_directories_in_path(path, dbutils)
             # filter only directories with names in partition format
-            if file_info.isDir() and re.search(r".+\=.+", file_info.name)
+            if re.search(r".+\=.+", directory)
         ]
+        return partitions
+
+    @logger(exclude_return=True)
+    def discover_directories_in_path(self, path, dbutils):
+        """
+        Function to discover directories within a given s3 path
+
+        Parameters:
+        path: s3 valid path
+        dbutils: databricks dbutils object
+
+        Return:
+        List of directory names found in the given path
+
+        Example:
+        In a path with the following folders:
+            's3://bucket/table/a',
+            's3://bucket/table/b',
+            's3://bucket/table/c'
+        running discover_directories_in_path('s3://bucket/table/', dbutils)
+        will return ['a', 'b', 'c']
+        """
+        directories = [
+            directory.name[:-1]
+            for directory in dbutils.fs.ls(path)
+            if directory.isDir()
+        ]
+        return directories
 
 
 class BaseSparkContext:
