@@ -17,6 +17,7 @@ class CypressRawBuilder:
         self.s3_source_file_format = "json"
         self.execution_date = execution_date
         self.pwa_name = None
+        self.test_execution_id = None
 
     def flatten(self, schema, prefix=None):
         fields = []
@@ -81,9 +82,9 @@ class CypressRawBuilder:
 
     def __get_suites_data(self, df):
         results = df.select(explode("results"))
-        suites = results.select(explode("col.suites"), "col.uuid")
-        suites = suites.withColumnRenamed("col.uuid", "test_execution_id")
-        suites = suites.select("col.*", "test_execution_id")
+        suites = results.select(explode("col.suites"))
+        suites = suites.select("col.*")
+        suites = suites.withColumn("test_execution_id", lit(self.test_execution_id))
         suites = self.__append_partition_data(suites)
         return suites
 
@@ -94,7 +95,9 @@ class CypressRawBuilder:
         return suites, tests
 
     def get_json_data(self, s3_source_file_path):
-        self.pwa_name = s3_source_file_path.split("/")[3]
+        split_path = s3_source_file_path.split("/")
+        self.pwa_name = split_path[3]
+        self.test_execution_id = split_path[5]
         json_s3_file = (
             spark.read.option("multiLine", True)
             .option("mode", "PERMISSIVE")
