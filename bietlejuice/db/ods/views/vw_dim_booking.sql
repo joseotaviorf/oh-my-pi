@@ -68,6 +68,9 @@ bookings as (
 	    s."fupVisita" is not null
 	      and s."fupVisita" in ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho')
 	    as confirmed,
+	    s."fupVisita" is not null
+	      and agent_missing_reason = 'Absent'
+	    as performed,
 	    s.encerrado as closed,
 	    nullif(s."fupVisita", '') as visit_follow_up,
 	    s."dataFupVisita" as dt_visit_follow_up,
@@ -81,6 +84,8 @@ bookings as (
 	    s.status,
 	    s."slotDia" as slot_dia,
 	    s.reason::varchar(200) as reason,
+	    s.is_visit_created_from_app,
+	    s.is_visit_last_updated_from_app,
 	    case
             when s.status = 'Cancelado' then s.reason_enum
         end as cancellation_reason,
@@ -213,6 +218,7 @@ select
 	b.visit_intent,
 	b.type,
 	b.confirmed,
+	b.performed,
 	b.closed,
 	b.visit_follow_up,
 	b.dt_visit_follow_up,
@@ -266,6 +272,8 @@ select
     TIMEZONE('UTC', b.dt_created) at time zone 'Brazil/East' as ts_created_local,
     TIMEZONE('UTC', b.dt_visit_follow_up) at time zone 'Brazil/East' as ts_visit_follow_up_local,
     -- Columns used in demand taxonomy
+    b.is_visit_created_from_app,
+    b.is_visit_last_updated_from_app,
     b.branded = 'Branded' as flg_branded,
     b.flg_via_reschedule,
     -- Demand taxonomy

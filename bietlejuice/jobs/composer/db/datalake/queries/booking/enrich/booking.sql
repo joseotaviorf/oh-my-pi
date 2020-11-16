@@ -47,6 +47,10 @@ canceled_date as (
 visit_origin as (
   select
     v.id as id_visit,
+    v.id_real_estate_agent_rating,
+    v.code,
+    vo_create.is_app as visit_created_from_app,
+    vo_update.is_app as visit_last_updated_from_app,
     vo_update.name as last_update_source,
     vo_create.name as first_update_source
   from datalake_ebdb_clean.visit v
@@ -111,6 +115,11 @@ base_booking as (
     b.id_agent,
     b.id_attendant,
     b.id_rent_flow,
+    if(b.business_context = 'SALE', 
+      concat(b.id_visitor, '_', b.id_house), 
+      null
+    ) as id_sale_flow,
+    vo.id_real_estate_agent_rating,
     b.dt_booking,
     b.status,
     b.business_context as visit_intent,
@@ -120,6 +129,9 @@ base_booking as (
     b.checkin_status,
     vo.last_update_source,
     vo.first_update_source,
+    (vo.visit_created_from_app is not null) as is_visit_created_from_app,
+    (vo.visit_last_updated_from_app is not null) as is_visit_last_updated_from_app,
+    vo.code,
     replace(sc.reason, '\n', '') as last_status_change_reason,
     sc.reason_enum as last_status_change_reason_enum,
     sc.reason_category as last_status_change_reason_category,
@@ -225,6 +237,7 @@ base_booking as (
     (b.type = 'Visita') as is_visit,
     (b.type = 'SessaoFotos') as is_photo_session,
     coalesce(b.visit_fup in ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho'), false) as is_visit_completed,
+    coalesce(b.visit_fup is not null and vab.agent_absence_reason = 'Absent', false) as is_visit_performed,
     -- is a reschedule from another booking
     (b.id_rescheduled_booking is not null) as is_via_reschedule,
     -- was rescheduled to another booking
@@ -274,6 +287,9 @@ select
       'Reschedule_Agent'
       ) then 'Reschedule'
     else bb.cancellation_reason_category
-  end as responsible
+  end as responsible,
+  datediff(from_utc_timestamp(bb.ts_first_canceled, 'Brazil/East'), bb.ts_created_local_tz) as days_visit_booked_to_visit_cancelled,
+  if(is_visit_completed, datediff(bb.ts_booking_local_tz, bb.ts_created_local_tz), null)
+   as days_visit_booked_to_visit_completed 
 from
   base_booking bb

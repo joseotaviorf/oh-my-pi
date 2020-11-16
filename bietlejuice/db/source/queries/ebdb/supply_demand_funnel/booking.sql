@@ -22,11 +22,13 @@ select
   replace(m.motivo, '\n', '') as reason,
   ap.name as reason_category,
   vo_update.nome as last_update_source,
+  vo_update.isApp as is_visit_last_updated_from_app,
   case
   	when cast(FROM_UNIXTIME(rcanc.`timestamp`/1000) as date) > a.data then null
   	else FROM_UNIXTIME(rcanc.`timestamp`/1000)
   end as cancel_timestamp,
   vo_create.nome as first_update_source,
+  vo_create.isApp as is_visit_created_from_app,
   fup.inquilinoCompareceu as visitor_arrived,
   fup.motivoInquilino as visitor_missing_reason,
   fup.agenteCompareceu as agent_arrived,

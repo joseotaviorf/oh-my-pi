@@ -12,6 +12,9 @@ columns_mapping:
   - ods_column: confirmed
     new_column: is_visit_completed
     new_column_type: boolean
+  - ods_column: performed
+    new_column: is_visit_performed
+    new_column_type: boolean
   - ods_column: closed
     new_column: is_closed
     new_column_type: boolean

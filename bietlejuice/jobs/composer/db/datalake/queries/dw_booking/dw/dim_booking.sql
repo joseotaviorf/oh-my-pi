@@ -47,6 +47,7 @@ select
     b.visit_intent,
     b.type,
     b.is_visit_completed,
+    b.is_visit_performed,
     b.is_closed,
     b.has_reschedule,
     b.is_via_reschedule,
@@ -56,6 +57,8 @@ select
     -- TODO [ODS] review this rule
     coalesce(b.has_owner_arrived, true) as has_owner_arrived,
     b.is_entrance_successful,
+    b.is_visit_created_from_app,
+    b.is_visit_last_updated_from_app,
     b.visit_fup,
     b.status,
     b.slot_day,
@@ -111,3 +114,4 @@ left join taxonomy_demand td
     and lower(coalesce(td.branded, '')) = lower(coalesce(src.branded, 'Outro'))
     and lower(coalesce(td.first_update_source, '')) = lower(coalesce(b.first_update_source, ''))
     and coalesce(td.flg_via_reschedule, false) = coalesce(b.is_via_reschedule, false)
+    
