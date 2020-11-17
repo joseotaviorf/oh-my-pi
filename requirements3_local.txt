@@ -82,6 +82,7 @@ Werkzeug==0.14.1
 whichcraft==0.6.0
 WTForms==2.2.1
 zope.deprecation==4.4.0
+quintoandar-facebook-api-client==0.1.2
 quintoandar-criteo-api-client==0.1.0
 quintoandar-linkedin-client==1.0.2
 quintoandar-teravoz-client==0.1.5
