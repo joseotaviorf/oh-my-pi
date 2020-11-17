@@ -83,4 +83,4 @@ rtbhouse-sdk==5.0.0
 sshtunnel==0.1.4
 twitter-ads==7.0.1
 configparser==3.5.0b2
-git+git://github.com/quintoandar/python-utils.git@v0.4.1 # must be the last to be installed
+git+git://github.com/quintoandar/python-utils.git@v0.4.2 # must be the last to be installed
