@@ -68,8 +68,8 @@ bookings as (
 	    s."fupVisita" is not null
 	      and s."fupVisita" in ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho')
 	    as confirmed,
-	    s."fupVisita" is not null
-	      and agent_missing_reason = 'Absent'
+	    coalesce(s."fupVisita" is not null
+	      and agent_missing_reason = 'Absent', false)
 	    as performed,
 	    s.encerrado as closed,
 	    nullif(s."fupVisita", '') as visit_follow_up,
