@@ -49,8 +49,8 @@ visit_origin as (
     v.id as id_visit,
     v.id_real_estate_agent_rating,
     v.code,
-    vo_create.is_app as visit_created_from_app,
-    vo_update.is_app as visit_last_updated_from_app,
+    vo_create.is_app as is_visit_created_from_app,
+    vo_update.is_app as is_visit_last_updated_from_app,
     vo_update.name as last_update_source,
     vo_create.name as first_update_source
   from datalake_ebdb_clean.visit v
@@ -129,8 +129,8 @@ base_booking as (
     b.checkin_status,
     vo.last_update_source,
     vo.first_update_source,
-    (vo.visit_created_from_app is not null) as is_visit_created_from_app,
-    (vo.visit_last_updated_from_app is not null) as is_visit_last_updated_from_app,
+    vo.is_visit_created_from_app,
+    vo.is_visit_last_updated_from_app,
     vo.code,
     replace(sc.reason, '\n', '') as last_status_change_reason,
     sc.reason_enum as last_status_change_reason_enum,
