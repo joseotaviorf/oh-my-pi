@@ -26,7 +26,7 @@ MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
 
 # s3 paths setup
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
-ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
+ARTIFACTS_S3_BUCKET = Variable.get("artifacts_default_bucket")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 LOAD_FACEBOOK_CAMPAIGNS_INTO_DATALAKE_RAW_FILE_PATH = (
