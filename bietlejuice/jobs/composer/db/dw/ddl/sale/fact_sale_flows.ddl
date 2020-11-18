@@ -15,7 +15,7 @@ CREATE TABLE sale.fact_sale_flows (
   sk_first_offer_accepted_date BIGINT,
   sk_first_offer_dismissed_date BIGINT,
   sk_sale_agreement_created_date BIGINT,
-  sk_dt_sale_agreement_signed_date BIGINT,
+  sk_sale_agreement_signed_date BIGINT,
   sk_sale_agreement_cancelled_date BIGINT,
   sk_house_registry_ended_date BIGINT,
   --

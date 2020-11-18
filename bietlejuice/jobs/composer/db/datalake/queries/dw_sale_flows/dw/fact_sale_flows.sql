@@ -122,7 +122,7 @@ SELECT
   COALESCE(CAST(REPLACE(SUBSTRING(sf.dt_first_offer_accepted,1, 10),'-','') AS BIGINT), -1) AS sk_first_offer_accepted_date,
   COALESCE(CAST(REPLACE(SUBSTRING(sf.dt_first_offer_dismissed,1, 10),'-','') AS BIGINT), -1) AS sk_first_offer_dismissed_date,
   COALESCE(CAST(REPLACE(SUBSTRING(sf.dt_sale_agreement_created,1, 10),'-','') AS BIGINT), -1) AS sk_sale_agreement_created_date,
-  COALESCE(CAST(REPLACE(SUBSTRING(sf.dt_sale_agreement_signed,1, 10),'-','') AS BIGINT), -1) AS sk_dt_sale_agreement_signed_date,
+  COALESCE(CAST(REPLACE(SUBSTRING(sf.dt_sale_agreement_signed,1, 10),'-','') AS BIGINT), -1) AS sk_sale_agreement_signed_date,
   COALESCE(CAST(REPLACE(SUBSTRING(sf.dt_sale_agreement_cancelled,1, 10),'-','') AS BIGINT), -1) AS sk_sale_agreement_cancelled_date,
   COALESCE(CAST(REPLACE(SUBSTRING(sf.dt_house_registry_ended,1, 10),'-','') AS BIGINT), -1) AS sk_house_registry_ended_date,
   --
