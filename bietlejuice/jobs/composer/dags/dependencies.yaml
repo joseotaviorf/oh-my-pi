@@ -51,6 +51,13 @@ bietlejuice.dw_sale_offers:
   - bietlejuice.enrich_offer:load-sale-offer-to-enrich
   # TODO [ODS] Add gsheets after migrated to composer
 
+bietlejuice.dw_sale_visits:
+  - bietlejuice.ebdb:load-house
+  - bietlejuice.ebdb:load-real-estate-agent-rating
+  - bietlejuice.enrich_booking:load-booking-to-enrich
+  - bietlejuice.enrich_offer:load-sale-offer-to-enrich
+  - bietlejuice.insider:load-review-to-datalake-clean
+
 bietlejuice.dw_smart_price:
   - bietlejuice.enrich_ebdb_smart_price
   - bietlejuice.ebdb:load-dynamic-pricing-house
