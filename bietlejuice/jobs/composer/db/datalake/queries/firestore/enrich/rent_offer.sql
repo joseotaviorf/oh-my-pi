@@ -1,9 +1,9 @@
 WITH last_update AS (
 SELECT
     id AS id_firestore,
-    MAX(ts_updated) AS ts_last_updated
+    ts_updated AS ts_updated_message,
+    ROW_NUMBER() OVER(PARTITION BY id ORDER BY ts_updated DESC) AS ranking_last_updated_message
 FROM datalake_firestore_clean.rent_offer
-GROUP BY 1
 ),
 rent_offer_audit AS (
 SELECT
@@ -33,18 +33,52 @@ SELECT
     BOOLEAN(GET_JSON_OBJECT(updated_message, '$.hasDraftTopics')) AS has_draft_topics,
     BOOLEAN(GET_JSON_OBJECT(updated_message, '$.instantOffer')) AS is_instant_offer,
     BOOLEAN(GET_JSON_OBJECT(updated_message, '$.visualized')) AS is_visualized,
-    TIMESTAMP(BIGINT(GET_JSON_OBJECT(updated_message, '$.firstSentAt._seconds'))) AS ts_first_sent,
-    TIMESTAMP(BIGINT(GET_JSON_OBJECT(updated_message, '$.lastSentDate._seconds'))) AS ts_last_sent,
-    TIMESTAMP(BIGINT(GET_JSON_OBJECT(updated_message, '$.deadline._seconds'))) AS ts_deadline,
-    TIMESTAMP(BIGINT(GET_JSON_OBJECT(updated_message, '$.visualizedAt._seconds'))) AS ts_visualized,
-    TIMESTAMP(BIGINT(GET_JSON_OBJECT(updated_message, '$.createdDate._seconds'))) AS ts_created,
-    ts_updated
+    TIMESTAMP(BIGINT(COALESCE(GET_JSON_OBJECT(updated_message, '$.firstSentAt._seconds'), GET_JSON_OBJECT(updated_message, '$.firstSentAt[*]._seconds')))) AS ts_first_sent,
+    TIMESTAMP(BIGINT(COALESCE(GET_JSON_OBJECT(updated_message, '$.lastSentDate._seconds'), GET_JSON_OBJECT(updated_message, '$.lastSentDate[*]._seconds')))) AS ts_last_sent,
+    TIMESTAMP(BIGINT(COALESCE(GET_JSON_OBJECT(updated_message, '$.deadline._seconds'), GET_JSON_OBJECT(updated_message, '$.deadline[*]._seconds')))) AS ts_deadline,
+    TIMESTAMP(BIGINT(COALESCE(GET_JSON_OBJECT(updated_message, '$.visualizedAt._seconds'), GET_JSON_OBJECT(updated_message, '$.visualizedAt[*]._seconds')))) AS ts_visualized,
+    TIMESTAMP(BIGINT(COALESCE(GET_JSON_OBJECT(updated_message, '$.createdDate._seconds'), GET_JSON_OBJECT(updated_message, '$.createdDate[*]._seconds')))) AS ts_created,
+    TIMESTAMP(BIGINT(COALESCE(GET_JSON_OBJECT(updated_message, '$.updated._seconds'), GET_JSON_OBJECT(updated_message, '$.updated[*]._seconds')))) AS ts_updated,
+    ts_updated AS ts_updated_message
 FROM datalake_firestore_clean.rent_offer
 )
 
 SELECT
-  roa.*
+  roa.id_firestore,
+  roa.id_house,
+  roa.id_owner,
+  roa.id_partner,
+  roa.id_tenant,
+  roa.id_owner_string,
+  roa.id_tenant_string,
+  roa.code,
+  roa.comment,
+  roa.house,
+  roa.iteration,
+  roa.last_proposed_rent,
+  roa.last_proposed_rent_draft,
+  roa.origin_offer,
+  roa.original_rent,
+  roa.original_total,
+  roa.rejection_reason,
+  roa.rejection_reason_description,
+  roa.resident,
+  roa.status,
+  roa.turn,
+  roa.type,
+  roa.tenant_service_fee,
+  roa.has_draft_topics,
+  roa.is_instant_offer,
+  roa.is_visualized,
+  roa.ts_first_sent,
+  roa.ts_last_sent,
+  roa.ts_deadline,
+  roa.ts_visualized,
+  roa.ts_created,
+  roa.ts_updated,
+  NOW() AS ts_load
 FROM rent_offer_audit roa
 INNER JOIN last_update lup
     ON roa.id_firestore = lup.id_firestore
-    AND roa.ts_updated = lup.ts_last_updated
+    AND roa.ts_updated_message = lup.ts_updated_message
+    AND lup.ranking_last_updated_message = 1
