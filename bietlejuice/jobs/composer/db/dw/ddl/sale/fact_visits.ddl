@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS sale.fact_visits;
 CREATE TABLE sale.fact_visits (
-	sk_booking VARCHAR PRIMARY KEY,
+	sk_booking BIGINT PRIMARY KEY,
 	sk_sale_flow VARCHAR,
 	sk_house BIGINT,
 	sk_region BIGINT,
@@ -8,7 +8,7 @@ CREATE TABLE sale.fact_visits (
 	sk_buyer BIGINT,
 	sk_seller BIGINT,
 	sk_visit BIGINT,
-	sk_offer BIGINT,
+	sk_offer VARCHAR,
 	sk_agent_booking_review BIGINT,
 	sk_buyer_booking_review BIGINT,
 	sk_booking_created_date BIGINT,
@@ -18,8 +18,8 @@ CREATE TABLE sale.fact_visits (
 	sk_visit_follow_up_date BIGINT,
 	sk_agent_review_rating_date BIGINT,
 	sk_buyer_review_rating_date BIGINT,
-	days_visit_booked_to_visit_cancelled BIGINT,
-	days_visit_booked_to_visit_completed BIGINT,
+	days_visit_booked_to_visit_cancelled INTEGER,
+	days_visit_booked_to_visit_completed INTEGER,
 	ts_load TIMESTAMP
 );
 ALTER TABLE sale.fact_visits OWNER TO airflow;
