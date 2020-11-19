@@ -12,7 +12,7 @@ SELECT
     analyst_main_id AS id_analyst,
     proposal_id AS id_proposal,
     category,
-    automatic_rejection_reason,
+    automatic_decision_reason,
     bypass
 FROM
     datalake_sorting_hat_raw.`creditanalysis`

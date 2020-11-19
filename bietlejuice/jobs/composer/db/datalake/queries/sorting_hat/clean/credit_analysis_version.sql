@@ -27,8 +27,8 @@ SELECT
     analyst_main_id_mod AS mod_id_analyst,
     proposal_id_mod AS mod_id_proposal,
     category_mod as mod_category,
-    automatic_rejection_reason,
-    automatic_rejection_reason_mod AS mod_automatic_rejection_reason,
+    automatic_decision_reason,
+    automatic_decision_reason_mod AS mod_automatic_decision_reason,
     bypass,
     bypass_mod AS mod_bypass
 FROM
