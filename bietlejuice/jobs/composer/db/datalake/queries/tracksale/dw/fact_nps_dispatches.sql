@@ -1,6 +1,6 @@
 WITH customer_conversions AS (
     SELECT
-         cc.id_customer,
+         COALESCE(cc.id_customer,-1) AS id_customer,
          cc.id_dispatch,
          cc.id_dispatch_lot,
          cc.id_answer,
@@ -62,14 +62,15 @@ customer_keys AS (
         AND cci_p.channel = 'phone'
      LEFT JOIN datalake_ebdb_customer_contact_identification.customer_contact_identification cci_e
         ON cci_e.customer_contact = cc.customer_email
-        AND cci_e.channel = 'email'    
+        AND cci_e.channel = 'email'
+     WHERE COALESCE(cc.id_customer,-1) > 0
      GROUP BY 1
 )
 SELECT
-     cc.id_dispatch AS sk_nps_dispatch,
-     cc.id_dispatch_lot AS sk_nps_dispatch_lot,
-     cc.id_campaign AS sk_nps_campaign,
-     cc.id_customer AS sk_nps_customer,
+     COALESCE(cc.id_dispatch,-1) AS sk_nps_dispatch,
+     COALESCE(cc.id_dispatch_lot,-1) AS sk_nps_dispatch_lot,
+     COALESCE(cc.id_campaign,-1) AS sk_nps_campaign,
+     COALESCE(cc.id_customer,-1) AS sk_nps_customer,
      COALESCE(ck.id_user,-1) AS sk_user,
      COALESCE(ck.cpf, -1) AS sk_personal_document,
      COALESCE(cc.id_answer, -1) AS sk_nps_answer,
