@@ -91,8 +91,8 @@ SELECT
 	dc.customer_email,
 	dc.customer_phone,
 	ac.id_answer,
-	dc.id_customer != '' AS is_customer_identified
-FROM answer_customers ac
+	COALESCE(dc.id_customer != '',false) AS is_customer_identified
+FROM all_answers ac
 FULL JOIN dispatch_customers dc
 	ON dc.id_dispatch = ac.id_dispatch
 	AND dc.id_customer = ac.id_customer
