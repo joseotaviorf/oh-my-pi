@@ -5,5 +5,6 @@ create table if not exists tracksale.dim_nps_answer (
     score_category varchar(20),
     comment varchar(20000),
     ts_answered timestamp,
+    is_customer_identified boolean,
     ts_load timestamp
 )

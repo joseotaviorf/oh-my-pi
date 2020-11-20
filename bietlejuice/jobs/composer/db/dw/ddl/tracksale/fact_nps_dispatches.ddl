@@ -19,5 +19,6 @@ create table if not exists tracksale.fact_nps_dispatches (
     is_pending_survey boolean,
     is_answered boolean,
     has_comment boolean,
+    is_customer_identified boolean,
     ts_load timestamp
 )
