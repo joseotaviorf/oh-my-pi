@@ -18,11 +18,17 @@ dispatch_customers AS (
 		customer_name,
 		customer_email,
 		customer_phone,
-		IF(CONCAT(
+		CASE WHEN CONCAT(
                   COALESCE(customer_email,''),
                   COALESCE(customer_phone,''),
                   COALESCE(customer_name,'')
-                  ),'','-1') AS id_customer
+                  ) = '' THEN '-1'
+		ELSE CONCAT(
+		  COALESCE(customer_email,''),
+		  COALESCE(customer_phone,''),
+		  COALESCE(customer_name,'')
+		  )
+		END AS id_customer
 	FROM clean_unnested_dispatches
 	GROUP BY 1,2,3,4,5
 ),
@@ -30,11 +36,17 @@ answers AS (
 	SELECT
 		id AS id_answer,
 		lot_code AS id_dispatch,
-		IF(CONCAT(
+		CASE WHEN CONCAT(
                   COALESCE(LOWER(email),''),
                   COALESCE(REGEXP_REPLACE(phone,'\\D+',''),''),
                   COALESCE(LOWER(name),'')
-                  ),'','-1') AS id_customer,
+                  ) = '' THEN '-1'
+		ELSE CONCAT(
+                  COALESCE(LOWER(email),''),
+                  COALESCE(REGEXP_REPLACE(phone,'\\D+',''),''),
+                  COALESCE(LOWER(name),'')
+                  )
+		END AS id_customer,
 		email,
 		phone
 	FROM datalake_tracksale.answer
