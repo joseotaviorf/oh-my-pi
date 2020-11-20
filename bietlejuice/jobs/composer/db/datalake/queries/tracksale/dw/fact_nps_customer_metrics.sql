@@ -14,7 +14,7 @@ WITH customer_conversions AS (
 		ON cc.id_dispatch_lot = d.id
 	LEFT JOIN datalake_tracksale.answer a
 		ON cc.id_answer = a.id
-	WHERE cc.id_customer != '' -- filter out dispatches FROM unidentified customers
+	WHERE cc.id_customer != '-1' -- filter out dispatches FROM unidentified customers
 ),
 customer_metrics AS (
 	SELECT

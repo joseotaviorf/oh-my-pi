@@ -4,6 +4,7 @@ WITH customer_conversions AS (
          cc.id_dispatch,
          cc.id_dispatch_lot,
          cc.id_answer,
+         cc.is_customer_identified,
          d.status,
          d.id_campaign,
          a.nps_answer,
@@ -84,6 +85,7 @@ SELECT
      cc.status <> 'Finalizado' AS is_pending_survey,
      cc.id_answer IS NOT NULL AS is_answered,
      cc.nps_comment IS NOT NULL AS has_comment,
+     cc.is_customer_identified,
      current_timestamp as ts_load
 FROM customer_conversions cc
 LEFT JOIN customer_keys ck 

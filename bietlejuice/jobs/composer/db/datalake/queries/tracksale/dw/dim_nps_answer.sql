@@ -4,6 +4,7 @@ SELECT
 	a.score_category,
 	a.nps_comment AS comment,
 	a.ts_answer_sent_local AS ts_answered,
+	cc.is_customer_identified,
 	current_timestamp AS ts_load
 FROM datalake_tracksale.answer a
 INNER JOIN datalake_tracksale.customer_conversions cc
