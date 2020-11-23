@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import pendulum
 
 from airflow.models import DAG, Variable
@@ -78,6 +78,7 @@ google_ads_load_to_raw_task = QuintoAndarDatabricksSubmitRunOperator(
             ],
         }
     },
+    execution_timeout=timedelta(hours=3),
 )
 
 try:
