@@ -141,9 +141,9 @@ SELECT
 	cast(replace(opportunities,',','') as float) as opportunity,
 	cast(replace(first_listings,',','') as float) as first_listing
 FROM supply_targets
-where date_trunc('month', cast(replace(date,'-','') as date)) < date_trunc('month', current_date)
+where date_trunc('month', cast(replace(date,'-','') as date)) <= date_trunc('month', current_date)
 ), past_targets as (
-select 
+select
 	week_start,
 	city_group,
 	mkt_channel,
@@ -212,21 +212,21 @@ select distinct
 	coalesce(g.mkt_channel, d.mkt_channel) as mkt_channel,
 	coalesce(g.mkt_origin, d.mkt_origin) as mkt_origin,
 	coalesce(g.lead_context, d.lead_context) as lead_context,
-	case when date_trunc('month', coalesce(g.date, d.date)) < date_trunc('month', current_date) then g.prospect
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.pp_total_week != 0 and td.diff_pp != 0 then td.diff_pp * coalesce(wm.pp_calculado,0)/wm.pp_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.pp_total_week = 0 and td.diff_pp != 0 then td.diff_pp
+	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.prospect
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.pp_total_week != 0 and td.diff_pp != 0 then td.diff_pp * coalesce(wm.pp_calculado,0)/wm.pp_total_week::float
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.pp_total_week = 0 and td.diff_pp != 0 then td.diff_pp
 			else d.prospect end as prospect,
-	case when date_trunc('month', coalesce(g.date, d.date)) < date_trunc('month', current_date) then g.qualified
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.ql_total_week != 0 and td.diff_ql != 0 then td.diff_ql * coalesce(wm.ql_calculado,0)/wm.ql_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.ql_total_week = 0 and td.diff_ql != 0 then td.diff_ql
+	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.qualified
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.ql_total_week != 0 and td.diff_ql != 0 then td.diff_ql * coalesce(wm.ql_calculado,0)/wm.ql_total_week::float
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.ql_total_week = 0 and td.diff_ql != 0 then td.diff_ql
 			else d.qualified end as qualified,
-	case when date_trunc('month', coalesce(g.date, d.date)) < date_trunc('month', current_date) then g.opportunity
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.op_total_week != 0 and td.diff_op != 0 then td.diff_op * coalesce(wm.op_calculado,0)/wm.op_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.op_total_week = 0 and td.diff_op != 0 then td.diff_op
+	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.opportunity
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.op_total_week != 0 and td.diff_op != 0 then td.diff_op * coalesce(wm.op_calculado,0)/wm.op_total_week::float
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.op_total_week = 0 and td.diff_op != 0 then td.diff_op
 			else d.opportunity end as opportunity,
-	case when date_trunc('month', coalesce(g.date, d.date)) < date_trunc('month', current_date) then g.first_listing
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.fl_total_week != 0 and td.diff_fl != 0 then td.diff_fl * coalesce(wm.fl_calculado,0)/wm.fl_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.fl_total_week = 0 and td.diff_fl != 0 then td.diff_fl
+	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.first_listing
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.fl_total_week != 0 and td.diff_fl != 0 then td.diff_fl * coalesce(wm.fl_calculado,0)/wm.fl_total_week::float
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.fl_total_week = 0 and td.diff_fl != 0 then td.diff_fl
 			else d.first_listing end as first_listing
 from daily_target_shares d
 full outer join gsheets_supply_target_adjusted g

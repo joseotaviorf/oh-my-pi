@@ -215,9 +215,9 @@ SELECT
 	cast(replace(contracts_signed,',','') as float) as contract_signed,
 	cast(replace(new_tenant_prospects,',','') as float) as new_tenant_prospect
 FROM demand_targets
-where date_trunc('month', cast(replace(date,'-','') as date)) < date_trunc('month', current_date)
+where date_trunc('month', cast(replace(date,'-','') as date)) <= date_trunc('month', current_date)
 ), past_targets as (
-select 
+select
 	week_start,
 	city_group,
 	demand_channel_type,
@@ -322,45 +322,45 @@ select distinct
 	coalesce(g.demand_channel, d.demand_channel) as demand_channel,
 	coalesce(g.funnel_first_touchpoint, d.funnel_first_touchpoint) as funnel_first_touchpoint,
 	coalesce(g.guarantee, d.guarantee) as guarantee,
-	case when date_trunc('month', coalesce(g.date, d.date)) < date_trunc('month', current_date) then g.visit_booked
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.vb_total_week != 0 and td.diff_vb != 0 then td.diff_vb * coalesce(wm.vb_calculado,0)/wm.vb_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.vb_total_week = 0 and td.diff_vb != 0 then td.diff_vb
+	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.visit_booked
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.vb_total_week != 0 and td.diff_vb != 0 then td.diff_vb * coalesce(wm.vb_calculado,0)/wm.vb_total_week::float
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.vb_total_week = 0 and td.diff_vb != 0 then td.diff_vb
 			else d.visit_booked end as visit_booked,
-	case when date_trunc('month', coalesce(g.date, d.date)) < date_trunc('month', current_date) then g.visit_completed
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.vc_total_week != 0 and td.diff_vc != 0 then td.diff_vc * coalesce(wm.vc_calculado,0)/wm.vc_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.vc_total_week = 0 and td.diff_vc != 0 then td.diff_vc
+	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.visit_completed
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.vc_total_week != 0 and td.diff_vc != 0 then td.diff_vc * coalesce(wm.vc_calculado,0)/wm.vc_total_week::float
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.vc_total_week = 0 and td.diff_vc != 0 then td.diff_vc
 			else d.visit_completed end as visit_completed,
-	case when date_trunc('month', coalesce(g.date, d.date)) < date_trunc('month', current_date) then g.offer_submitted
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.os_total_week != 0 and td.diff_os != 0 then td.diff_os * coalesce(wm.os_calculado,0)/wm.os_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.os_total_week = 0 and td.diff_os != 0 then td.diff_os
+	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.offer_submitted
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.os_total_week != 0 and td.diff_os != 0 then td.diff_os * coalesce(wm.os_calculado,0)/wm.os_total_week::float
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.os_total_week = 0 and td.diff_os != 0 then td.diff_os
 			else d.offer_submitted end as offer_submitted,
-	case when date_trunc('month', coalesce(g.date, d.date)) < date_trunc('month', current_date) then g.offer_accepted
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.oa_total_week != 0 and td.diff_oa != 0 then td.diff_oa * coalesce(wm.oa_calculado,0)/wm.oa_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.oa_total_week = 0 and td.diff_oa != 0 then td.diff_oa
+	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.offer_accepted
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.oa_total_week != 0 and td.diff_oa != 0 then td.diff_oa * coalesce(wm.oa_calculado,0)/wm.oa_total_week::float
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.oa_total_week = 0 and td.diff_oa != 0 then td.diff_oa
 			else d.offer_accepted end as offer_accepted,
-	case when date_trunc('month', coalesce(g.date, d.date)) < date_trunc('month', current_date) then g.credit_evaluation_init
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.cei_total_week != 0 and td.diff_cei != 0 then td.diff_cei * coalesce(wm.cei_calculado,0)/wm.cei_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.cei_total_week = 0 and td.diff_cei != 0 then td.diff_cei
+	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.credit_evaluation_init
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.cei_total_week != 0 and td.diff_cei != 0 then td.diff_cei * coalesce(wm.cei_calculado,0)/wm.cei_total_week::float
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.cei_total_week = 0 and td.diff_cei != 0 then td.diff_cei
 			else d.credit_evaluation_init end as credit_evaluation_init,
-	case when date_trunc('month', coalesce(g.date, d.date)) < date_trunc('month', current_date) then g.credit_evaluation_positive
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.cep_total_week != 0 and td.diff_cep != 0 then td.diff_cep * coalesce(wm.cep_calculado,0)/wm.cep_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.cep_total_week = 0 and td.diff_cep != 0 then td.diff_cep
+	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.credit_evaluation_positive
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.cep_total_week != 0 and td.diff_cep != 0 then td.diff_cep * coalesce(wm.cep_calculado,0)/wm.cep_total_week::float
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.cep_total_week = 0 and td.diff_cep != 0 then td.diff_cep
 			else d.credit_evaluation_positive end as credit_evaluation_positive,
-	case when date_trunc('month', coalesce(g.date, d.date)) < date_trunc('month', current_date) then g.document_sent
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.ds_total_week != 0 and td.diff_ds != 0 then td.diff_ds * coalesce(wm.ds_calculado,0)/wm.ds_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.ds_total_week = 0 and td.diff_ds != 0 then td.diff_ds
+	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.document_sent
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.ds_total_week != 0 and td.diff_ds != 0 then td.diff_ds * coalesce(wm.ds_calculado,0)/wm.ds_total_week::float
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.ds_total_week = 0 and td.diff_ds != 0 then td.diff_ds
 			else d.document_sent end as document_sent,
-	case when date_trunc('month', coalesce(g.date, d.date)) < date_trunc('month', current_date) then g.credit_approved
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.ca_total_week != 0 and td.diff_ca != 0 then td.diff_ca * coalesce(wm.ca_calculado,0)/wm.ca_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.ca_total_week = 0 and td.diff_ca != 0 then td.diff_ca
+	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.credit_approved
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.ca_total_week != 0 and td.diff_ca != 0 then td.diff_ca * coalesce(wm.ca_calculado,0)/wm.ca_total_week::float
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.ca_total_week = 0 and td.diff_ca != 0 then td.diff_ca
 			else d.credit_approved end as credit_approved,
-	case when date_trunc('month', coalesce(g.date, d.date)) < date_trunc('month', current_date) then g.contract_signed
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.cs_total_week != 0 and td.diff_cs != 0 then td.diff_cs * coalesce(wm.cs_calculado,0)/wm.cs_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.cs_total_week = 0 and td.diff_cs != 0 then td.diff_cs
+	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.contract_signed
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.cs_total_week != 0 and td.diff_cs != 0 then td.diff_cs * coalesce(wm.cs_calculado,0)/wm.cs_total_week::float
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.cs_total_week = 0 and td.diff_cs != 0 then td.diff_cs
 			else d.contract_signed end as contract_signed,
-	case when date_trunc('month', coalesce(g.date, d.date)) < date_trunc('month', current_date) then g.new_tenant_prospect
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.ntp_total_week != 0 and td.diff_ntp != 0 then td.diff_ntp * coalesce(wm.ntp_calculado,0)/wm.ntp_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) >= date_trunc('month', current_date) and wm.ntp_total_week = 0 and td.diff_ntp != 0 then td.diff_ntp
+	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.new_tenant_prospect
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.ntp_total_week != 0 and td.diff_ntp != 0 then td.diff_ntp * coalesce(wm.ntp_calculado,0)/wm.ntp_total_week::float
+			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.ntp_total_week = 0 and td.diff_ntp != 0 then td.diff_ntp
 			else d.new_tenant_prospect end as new_tenant_prospect
 from daily_target_shares d
 full outer join gsheets_demand_target_adjusted g
@@ -385,7 +385,7 @@ left join calculated_targets_week_month wm
     and wm.demand_channel_type = d.demand_channel_type
     and wm.demand_channel = d.demand_channel
     and wm.funnel_first_touchpoint = d.funnel_first_touchpoint
-    and wm.guarantee = d.guarantee 
+    and wm.guarantee = d.guarantee
 ), negative_targets as (
 select
 	date,
@@ -403,7 +403,7 @@ select
 from daily_target_shares_adjusted
 group by 1,2
 )
-select 
+select
 	dt.date,
 	dt.week_start,
 	dt.city_group,
@@ -423,5 +423,5 @@ select
 	case when new_tenant_prospect <= 0 then 0 else new_tenant_prospect + coalesce(nt.ntp_negative,0) * new_tenant_prospect/(sum(case when new_tenant_prospect > 0 then new_tenant_prospect end) over(partition by dt.date, dt.demand_channel_type)) end as new_tenant_prospect
 from daily_target_shares_adjusted dt
 left join negative_targets nt
-  on dt.date = nt.date 
+  on dt.date = nt.date
     and dt.demand_channel_type = nt.demand_channel_type;
