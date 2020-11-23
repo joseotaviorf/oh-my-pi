@@ -12,6 +12,7 @@ select
     int(impressions) as impressions,
     int(inline_link_clicks) as inline_link_clicks,
     int(reach) as reach,
+    int(spend) as spend,
     smallint({year}) as year,
     tinyint({month}) as month,
     tinyint({day}) as day,
