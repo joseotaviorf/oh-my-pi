@@ -63,7 +63,7 @@ customer_keys AS (
      LEFT JOIN datalake_ebdb_customer_contact_identification.customer_contact_identification cci_e
         ON cci_e.customer_contact = cc.customer_email
         AND cci_e.channel = 'email'
-     WHERE COALESCE(cc.id_customer,-1) > 0
+     WHERE cc.id_customer IS NOT NULL
      GROUP BY 1
 )
 SELECT
