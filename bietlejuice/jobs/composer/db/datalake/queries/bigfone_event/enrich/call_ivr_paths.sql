@@ -3,10 +3,11 @@ WITH event_steps AS (
 		id,
 		id_event,
 		GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.callSid') AS id_call,
+		GET_JSON_OBJECT(metadata,'$.event_data.TaskSid') AS id_task,
 		EXPLODE(SPLIT(steps,'}},')) as step,
 		year,
-        	month,
-        	day
+		month,
+		day
 	FROM datalake_bigfone.twilio_ivr_events
 	WHERE steps IS NOT NULL
 		AND year = {year}
@@ -17,6 +18,7 @@ SELECT
 	id,
 	id_event,
 	id_call,
+	id_task,
 	REGEXP_EXTRACT(step,'([A-Za-z0-9_]+)',1) AS step_name,
 	REGEXP_EXTRACT(step,'("event":")(\\w+)',2) AS event_type,
 	CAST(REGEXP_EXTRACT(step,'("digits":")(\\d+)',2) AS INT) AS digits,
