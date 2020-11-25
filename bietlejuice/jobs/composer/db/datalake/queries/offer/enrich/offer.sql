@@ -74,19 +74,11 @@ firestore_offers as (
         and offer.id_godfather is null
   ),
   instant_offer_firestore as (
-    with offers_ranked as (
       select distinct
         id_firestore,
-        is_instant_offer,
-        rank() over (partition by id_firestore order by ts_last_sent desc) as ranking
-      from datalake_firestore_clean.offers fo
+        is_instant_offer
+      from datalake_firestore.rent_offer fo
       where status not in ('Draft','DismissedDraft')
-    )
-    select
-      id_firestore,
-      is_instant_offer
-    from offers_ranked
-    where ranking = 1
   )
   select distinct
     o_firestore.id_offer,

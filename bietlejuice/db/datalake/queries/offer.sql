@@ -45,18 +45,11 @@ firestore_offers as (
         and eo.godfatherid is null
   ),
   instantoffer_firestore as (
-    with ranking_offers as (
-      select distinct
-        firestore_id,
-        instantOffer,
-        rank() over (PARTITION BY firestore_id order by lastsentdate desc) as ranking
-      from datalake_firestore_raw_prod.offers fo
-      where status not in ('Draft','DismissedDraft'))
-    select
-      firestore_id,
-      instantOffer
-    from ranking_offers
-    where ranking = 1
+      select
+        id_firestore,
+        is_instant_offer
+      from datalake_firestore_prod.rent_offer fo
+      where status not in ('Draft','DismissedDraft')
   )
   select
     offer_firestore.id_offer,
@@ -65,12 +58,12 @@ firestore_offers as (
     go_firestore.ts_first_sent,
     go_firestore.ts_last_sent,
     go_firestore.type as distinct_type,
-    fo.instantOffer
+    fo.is_instant_offer
   from offer_firestore
   join datalake_godfather_clean_prod.business_offer go_firestore
     on go_firestore.id = godfatherid
   left join instantoffer_firestore fo
-    on go_firestore.id_firestore = fo.firestore_id
+    on go_firestore.id_firestore = fo.id_firestore
   group by 1, 2, 3, 4, 5, 6, 7
 )
 select distinct
@@ -101,7 +94,7 @@ select distinct
   rvo.first_rent_offered_by_owner,
   rvo.last_rent_offered_by_tenant,
   rvo.last_rent_offered_by_owner,
-  case when go_firestore.instantOffer = 'true' then true else false end as is_instant_offer
+  coalesce(go_firestore.is_instant_offer, false) as is_instant_offer
 from datalake_ebdb_raw_prod.offer eo
 left join datalake_godfather_clean_prod.business_offer go_godfather
   on eo.godfatherid = try_cast(go_godfather.id as bigint)

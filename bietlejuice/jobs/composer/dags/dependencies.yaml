@@ -229,8 +229,7 @@ bietlejuice.enrich_offer:
   - bietlejuice.ebdb:load-offer-aud
   - bietlejuice.enrich_booking
   - bietlejuice.enrich_ebdb_user_revision_entity:load-user-revision-entity-to-enrich
-  - bietlejuice.enrich_firestore
-  - bietlejuice.firestore:load-offers-to-clean
+  - bietlejuice.enrich_firestore:load-rent-offer-to-enrich
   - bietlejuice.godfather:load-business-offer
 
 bietlejuice.enrich_proposal:

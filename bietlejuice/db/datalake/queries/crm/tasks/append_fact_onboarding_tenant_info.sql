@@ -1,10 +1,10 @@
 , offers as (
   select
-     o.firestore_id,
+     o.id_firestore,
      max(oe.id) as id
-  from datalake_firestore_raw_prod.offers o
+  from datalake_firestore_prod.rent_offer o
   left join datalake_ebdb_raw_prod.offer oe
-      on o.firestore_id = oe.firestoreid
+      on o.id_firestore = oe.firestoreid
   group by 1
 )
 , contracts as (
@@ -25,7 +25,7 @@
       and cast(try_cast(ct.id_origin as decimal) as bigint) = try(cast(ev.id as bigint))
   left join offers o
       on trim(ct.origin) = 'Offer'
-      and o.firestore_id = ct.id_origin
+      and o.id_firestore = ct.id_origin
   left join datalake_ebdb_raw_prod.proposta p
       on o.id = p.offer_id
   left join datalake_ebdb_raw_prod.contrato co
