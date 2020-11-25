@@ -9,12 +9,16 @@ from airflow.operators.quintoandar_databricks import (
 )
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.base.pipeline import LayerEnum
+from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
+from bietlejuice.jobs.composer.services import FileService
 
 
 ENV = Variable.get("environment")
 
 SOURCE = "braze"
-DAG_ID = f"{SOURCE}_events"
+DAG_NAME = f"{SOURCE}_events"
+DAG_ID = f"bietlejuice.{DAG_NAME}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 11, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "30 0 * * *"
@@ -25,12 +29,12 @@ DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 BRAZE_BUCKET = Variable.get("braze_bucket")
 
-LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{DAG_ID}"
+LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{DAG_NAME}"
 BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{DAG_ID}"
+SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{DAG_NAME}"
 
 CLUSTER_DESCRIPTION = Variable.get(
-    f"databricks_bietlejuice_{DAG_ID}_cluster", deserialize_json=True
+    f"databricks_bietlejuice_{DAG_NAME}_cluster", deserialize_json=True
 )
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 
@@ -39,7 +43,7 @@ APP_GROUPS = ["owners", "tenants"]
 
 
 dag = DAG(
-    dag_id=f"bietlejuice.{DAG_ID}",
+    dag_id=DAG_ID,
     default_args={
         "owner": BaseDAG.DEFAULT_OWNER,
         "wait_for_downstream": False,
@@ -55,6 +59,29 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
+)
+
+clean_sub_dag = DatalakeSubDAG(
+    dag_id=DAG_ID,
+    start_date=MAIN_START_DATE,
+    env=ENV,
+    datalake_bucket=DATALAKE_BUCKET,
+    layer=LayerEnum.CLEAN,
+    database_base_name=SOURCE,
+    relative_query_path=DAG_NAME,
+    spark_job_paths=BASE_SPARK_JOBS_PATH,
+    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
+)
+
+file_list = FileService.list_sql_files_without_extension_from_layer(
+    DAG_NAME, LayerEnum.CLEAN.value
+)
+
+clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(
+    dag,
+    file_list,
+    is_incremental=True,
+    partitions=["event_type", "year", "month", "day"],
 )
 
 # Creating sub dags
@@ -78,4 +105,6 @@ for app_group in APP_GROUPS:
         },
     )
 
-    create_cluster_task >> load_to_raw_task >> terminate_cluster_task
+    create_cluster_task >> load_to_raw_task >> clean_sub_dags.pop(
+        f"events_{app_group}"
+    ) >> terminate_cluster_task
