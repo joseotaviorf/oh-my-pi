@@ -34,7 +34,10 @@ with google_consolidated_cost as (
         where dgk.is_test_campaign is not true
         and dga.is_test_campaign is not true
         and dgc.is_test_campaign is not true
-        and (gtatf.flag <> 'other' or gtatf.flag is null)
+        and (gtatf.flag <> 'other' 
+            or gtatf.flag is null 
+            or (dga.account_name = 'quintoandar_sao_paulo' and fg.sk_date < 20201118)
+            )
     ),
     manual_google_costs as (
         with t_prep as (
