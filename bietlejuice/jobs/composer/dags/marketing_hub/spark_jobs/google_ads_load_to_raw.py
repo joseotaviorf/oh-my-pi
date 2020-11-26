@@ -1,6 +1,6 @@
 import boto3
 import logging
-
+from multiprocessing.dummy import Pool as ThreadPool
 from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
@@ -21,6 +21,80 @@ MEDIA = "google_ads"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+
+
+def load_file(s3_source_file_path):
+
+    try:
+        report_type, enriched_csv_file = enrich_csv(s3_source_file_path)
+
+        if bool(enriched_csv_file):
+            (
+                s3_target_database_location,
+                s3_target_table_name,
+            ) = google_ads_raw_builder.build_target_file_path(
+                enriched_csv_file, s3_file_path_target, report_type
+            )
+
+            load_df(
+                enriched_csv_file, s3_target_database_location, s3_target_table_name
+            )
+
+            update_metastore(enriched_csv_file, report_type, partition_cols)
+
+    except Exception as e:
+        logger.info(
+            f"m={JOB_NAME}, path={s3_source_file_path} error={e}"
+            "msg=no data for this acc on this dt!"
+        )
+
+
+def enrich_csv(s3_source_file_path):
+    report_type = google_ads_raw_builder.build_report_type(s3_source_file_path)
+    enriched_csv_file = google_ads_raw_builder.build_enriched_csv(
+        s3_source_file_path, report_type
+    )
+    return (report_type, enriched_csv_file)
+
+
+def load_df(df, s3_target_database_location, s3_target_table_name):
+    format_options = SparkTableStorageFormat.DEFAULT_RAW
+    s3_loader.load_df(
+        df=df,
+        s3_path=s3_target_database_location + s3_target_table_name,
+        format_options=format_options,
+        partitions=None,
+        write_mode="append",
+    )
+
+
+def update_metastore(df, report_type, partition_cols):
+    format_options = SparkTableStorageFormat.DEFAULT_RAW
+    spark_metastore_loader.update_metastore(
+        df=df,
+        database_name=metastore_database_name,
+        table_name=report_type,
+        format_options=format_options,
+        database_location=metastore_database_location,
+        partitions=partition_cols,
+        force_recreate=False,
+    )
+    spark_metastore_service.create_new_partitions_from_df(
+        database_name=metastore_database_name,
+        table_name=report_type,
+        df=df,
+        partition_cols=partition_cols,
+        parallelism=8,
+    )
+    spark_metastore_service.refresh_table(metastore_database_name, report_type)
+
+
+def load_files_parallel(s3_source_file_paths):
+    pool = ThreadPool(32)
+    pool.map(load_file, s3_source_file_paths)
+    pool.close()
+    pool.join()
+    return
 
 
 if __name__ == "__main__":
@@ -68,51 +142,4 @@ if __name__ == "__main__":
     metastore_database_location = f"{database_location}{MEDIA}/"
     partition_cols = ["acc", "dt"]
 
-    for s3_source_file_path in s3_source_file_paths:
-
-        try:
-            report_type = google_ads_raw_builder.build_report_type(s3_source_file_path)
-            enriched_csv_file = google_ads_raw_builder.build_enriched_csv(
-                s3_source_file_path, report_type
-            )
-
-            if bool(enriched_csv_file):
-                (
-                    s3_target_database_location,
-                    s3_target_table_name,
-                ) = google_ads_raw_builder.build_target_file_path(
-                    enriched_csv_file, s3_file_path_target, report_type
-                )
-                format_options = SparkTableStorageFormat.DEFAULT_RAW
-                s3_loader.load_df(
-                    df=enriched_csv_file,
-                    s3_path=s3_target_database_location + s3_target_table_name,
-                    format_options=format_options,
-                    partitions=None,
-                    write_mode="append",
-                )
-                spark_metastore_loader.update_metastore(
-                    df=enriched_csv_file,
-                    database_name=metastore_database_name,
-                    table_name=report_type,
-                    format_options=format_options,
-                    database_location=metastore_database_location,
-                    partitions=partition_cols,
-                    force_recreate=False,
-                )
-                spark_metastore_service.create_new_partitions_from_df(
-                    database_name=metastore_database_name,
-                    table_name=report_type,
-                    df=enriched_csv_file,
-                    partition_cols=partition_cols,
-                    parallelism=8,
-                )
-                spark_metastore_service.refresh_table(
-                    metastore_database_name, report_type
-                )
-
-        except Exception as e:
-            logger.info(
-                f"m={JOB_NAME}, path={s3_source_file_path} error={e}"
-                "msg=no data for this acc on this dt!"
-            )
+    load_files_parallel(s3_source_file_paths)
