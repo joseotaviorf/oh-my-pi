@@ -10,5 +10,7 @@ select
   status,
   priceChangesOccurred as occurred_price_changes,
   enabled as is_enabled,
-  operationmode as operation_mode
+  operationmode as operation_mode,
+  origin,
+  prepublicationrentprobability as pre_publication_rent_probability
 from datalake_ebdb_raw.dynamicpricinghouse

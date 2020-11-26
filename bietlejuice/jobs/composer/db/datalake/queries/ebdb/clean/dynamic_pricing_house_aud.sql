@@ -15,6 +15,10 @@ select
     enabled as is_enabled,
     enabled_MOD as mod_is_enabled,
     operationmode as operation_mode,
-    operationmode_mod as mod_operation_mode
+    operationmode_mod as mod_operation_mode,
+    origin,
+    origin_mod as mod_origin,
+    prepublicationrentprobability as pre_publication_rent_probability,
+    prepublicationrentprobability_mod as mod_pre_publication_rent_probability
 from
     datalake_ebdb_raw.dynamicpricinghouse_aud
