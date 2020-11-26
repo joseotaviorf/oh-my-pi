@@ -32,6 +32,7 @@ SELECT
 	CAST(GET_JSON_OBJECT(c.channel_attributes,'$.forwarding') AS BOOLEAN) AS is_forwarded,
 	CAST(GET_JSON_OBJECT(c.channel_resource,'$.messages_count') AS INT) AS number_of_messages,
 	CAST(GET_JSON_OBJECT(c.channel_resource,'$.members_count') AS INT) AS number_of_members,
+	UNIX_TIMESTAMP(c.ts_updated) - UNIX_TIMESTAMP(c.ts_created) AS seconds_duration,
 	c.ts_created,
 	c.ts_updated
 FROM channels c
