@@ -7,26 +7,41 @@ with holidays_by_city_name as (
 		coalesce(nullif(lh.city_group, ''), dr.city_group) as city_group,
 		coalesce(nullif(lh.city_name, ''), dr.city_name) as city_name,
 		coalesce(max(cast(replace(cs.share,',','') as float)), 0) as share_city_name,
-		case when dd.is_brz_holiday = 'Holiday' or nullif(lh.city_group, '') is not null then cast(replace(hs.prospect,',','') as float)
+		CASE
+			WHEN dd.is_brz_holiday = 'Holiday'
+			OR NULLIF(lh.city_group, '') IS NOT NULL
+			OR NULLIF(lh.short_region_name, '') IS NOT NULL THEN CAST(REPLACE(hs.prospect,',','') AS FLOAT)
 			 else null end as prospect_share_holiday,
-		case when dd.is_brz_holiday = 'Holiday' or nullif(lh.city_group, '') is not null then cast(replace(hs.qualified,',','') as float)
+		CASE
+			WHEN dd.is_brz_holiday = 'Holiday' 
+			OR NULLIF(lh.city_group, '') IS NOT NULL
+			OR NULLIF(lh.short_region_name, '') IS NOT NULL THEN CAST(REPLACE(hs.qualified,',','') AS FLOAT)
 			 else null end as qualified_share_holiday,
-		case when dd.is_brz_holiday = 'Holiday' or nullif(lh.city_group, '') is not null then cast(replace(hs.opportunity,',','') as float)
+		CASE
+			WHEN dd.is_brz_holiday = 'Holiday' 
+			OR NULLIF(lh.city_group, '') IS NOT NULL
+			OR NULLIF(lh.short_region_name, '') IS NOT NULL THEN CAST(REPLACE(hs.opportunity,',','') AS FLOAT)
 			 else null end as opportunity_share_holiday,
-		case when dd.is_brz_holiday = 'Holiday' or nullif(lh.city_group, '') is not null then cast(replace(hs.first_listings,',','') as float)
+		CASE
+			WHEN dd.is_brz_holiday = 'Holiday' 
+			OR NULLIF(lh.city_group, '') IS NOT NULL
+			OR NULLIF(lh.short_region_name, '') IS NOT NULL THEN CAST(REPLACE(hs.first_listings,',','') AS FLOAT)
 			 else null end as first_listings_share_holiday
 	from dim_date dd
 	cross join dim_region dr
 	left join datalake_raw.gsheets_local_holidays lh
-	  on dd.date = cast(replace(lh.date,'-','') as date) and (lh.short_region_name = dr.short_region_name or lh.city_group = dr.city_group)  
+	  ON dd.date = DATE(REPLACE(lh.date,'-','')
+	  AND (lh.short_region_name = dr.short_region_name
+	  	OR lh.city_group = dr.city_group)
 	left join datalake_raw.gsheets_city_share cs
 	  on coalesce(nullif(lh.city_name, ''), dr.city_name) = nullif(cs.city_name, '')
 	left join datalake_raw.gsheets_weekday_holiday_share hs
-	  on hs.weekday_name = dd.weekday_name 
+	  ON hs.weekday_name = dd.weekday_name
 	where dd.date between '2018-12-31' and current_date + interval '6 months'
 	group by dd.date,
 		dd.week_start,
 		lh.city_group,
+		lh.short_region_name,
 		dr.city_group,
 		lh.city_name,
 		dr.city_name,

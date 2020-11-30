@@ -7,32 +7,56 @@ with holidays_by_city_name as (
 		coalesce(nullif(lh.city_group, ''), dr.city_group) as city_group,
 		coalesce(nullif(lh.city_name, ''), dr.city_name) as city_name,
 		coalesce(max(cast(replace(cs.share,',','') as float)), 0) as share_city_name,
-		case when dd.is_brz_holiday = 'Holiday' or nullif(lh.city_group, '') is not null then cast(replace(hs.visit_booked,',','') as float)
+		CASE
+			WHEN dd.is_brz_holiday = 'Holiday' 
+			OR NULLIF(lh.city_group, '') IS NOT NULL
+			OR NULLIF(lh.short_region_name, '') IS NOT NULL THEN CAST(REPLACE(hs.visit_booked,',','') AS FLOAT)
 			 else null end as visit_booked_share_holiday,
-		case when dd.is_brz_holiday = 'Holiday' or nullif(lh.city_group, '') is not null then cast(replace(hs.visit_completed,',','') as float)
+		CASE
+			WHEN dd.is_brz_holiday = 'Holiday' 
+			OR NULLIF(lh.city_group, '') IS NOT NULL
+			OR NULLIF(lh.short_region_name, '') IS NOT NULL THEN CAST(REPLACE(hs.visit_completed,',','') AS FLOAT)
 			 else null end as visit_completed_share_holiday,
-		case when dd.is_brz_holiday = 'Holiday' or nullif(lh.city_group, '') is not null then cast(replace(hs.offer_submitted,',','') as float)
+		CASE
+			WHEN dd.is_brz_holiday = 'Holiday' 
+			OR NULLIF(lh.city_group, '') IS NOT NULL
+			OR NULLIF(lh.short_region_name, '') IS NOT NULL THEN CAST(REPLACE(hs.offer_submitted,',','') AS FLOAT)
 			 else null end as offer_submitted_share_holiday,
-		case when dd.is_brz_holiday = 'Holiday' or nullif(lh.city_group, '') is not null then cast(replace(hs.offer_accepted,',','') as float)
+		CASE
+			WHEN dd.is_brz_holiday = 'Holiday' 
+			OR NULLIF(lh.city_group, '') IS NOT NULL
+			OR NULLIF(lh.short_region_name, '') IS NOT NULL THEN CAST(REPLACE(hs.offer_accepted,',','') AS FLOAT)
 			 else null end as offer_accepted_share_holiday,
-		case when dd.is_brz_holiday = 'Holiday' or nullif(lh.city_group, '') is not null then cast(replace(hs.document_sent,',','') as float)
+		CASE
+			WHEN dd.is_brz_holiday = 'Holiday' 
+			OR NULLIF(lh.city_group, '') IS NOT NULL
+			OR NULLIF(lh.short_region_name, '') IS NOT NULL THEN CAST(REPLACE(hs.document_sent,',','') AS FLOAT)
 			 else null end as document_sent_share_holiday,
-		case when dd.is_brz_holiday = 'Holiday' or nullif(lh.city_group, '') is not null then cast(replace(hs.credit_approved,',','') as float)
+		CASE
+			WHEN dd.is_brz_holiday = 'Holiday' 
+			OR NULLIF(lh.city_group, '') IS NOT NULL
+			OR NULLIF(lh.short_region_name, '') IS NOT NULL THEN CAST(REPLACE(hs.credit_approved,',','') AS FLOAT)
 			 else null end as credit_approved_share_holiday,
-		case when dd.is_brz_holiday = 'Holiday' or nullif(lh.city_group, '') is not null then cast(replace(hs.contract_signed,',','') as float)
+		CASE
+			WHEN dd.is_brz_holiday = 'Holiday'
+			OR NULLIF(lh.city_group, '') IS NOT NULL
+			OR NULLIF(lh.short_region_name, '') IS NOT NULL THEN CAST(REPLACE(hs.contract_signed,',','') AS FLOAT)
 			 else null end as contract_signed_share_holiday
 	from dim_date dd
 	cross join dim_region dr
 	left join datalake_raw.gsheets_local_holidays lh
-	  on dd.date = cast(replace(lh.date,'-','') as date) and (lh.short_region_name = dr.short_region_name or lh.city_group = dr.city_group)  
+	  ON dd.date = DATE(REPLACE(lh.date,'-','')
+	  AND (lh.short_region_name = dr.short_region_name
+	  	OR lh.city_group = dr.city_group)
 	left join datalake_raw.gsheets_city_share cs
 	  on coalesce(nullif(lh.city_name, ''), dr.city_name) = nullif(cs.city_name, '')
 	left join datalake_raw.gsheets_weekday_holiday_share hs
-	  on hs.weekday_name = dd.weekday_name 
+	  ON hs.weekday_name = dd.weekday_name
 	where dd.date between '2018-12-31' and current_date + interval '6 months'
 	group by dd.date,
 		dd.week_start,
 		lh.city_group,
+		lh.short_region_name,
 		dr.city_group,
 		lh.city_name,
 		dr.city_name,
@@ -424,4 +448,4 @@ select
 from daily_target_shares_adjusted dt
 left join negative_targets nt
   on dt.date = nt.date
-    and dt.demand_channel_type = nt.demand_channel_type;
+    AND dt.demand_channel_type = nt.demand_channel_type;
