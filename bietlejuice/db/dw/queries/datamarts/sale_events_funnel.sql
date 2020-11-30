@@ -30,38 +30,55 @@ LEFT JOIN dim_lead dl
 LEFT JOIN dim_region dr
   ON dr.sk_region = lf.sk_region
 ),
+payment_method_adjusted AS (
+-- data from datalake_firestore_prod.sale_offer
+SELECT
+    so.id,
+	so.id_house,
+	so.current_payment_method AS form_of_payment
+FROM datalake_firestore_prod.sale_offer so
+),
 monday_adjusted AS (
--- treat data from Monday gsheets
+-- data from datalake_firestore_prod.monday
+SELECT
+	mo.id_offer,
+	mo.id_buyer||'_'||mo.id_house AS sale_flow,
+	mo.id_house,
+	mo.id_buyer AS id_user,
+	mo.dt_submitted AS dt_offer_sent,
+	mo.dt_deal_qualified AS dt_deal_qualified,
+	mo.dt_accepted AS dt_offer_accepted,
+	mo.dt_sale_agreement_signed AS dt_ccv_signed,
+	mo.dt_offer_dismissed AS dt_offer_rejected,
+	mo.dt_legaut_analysis_started AS dt_diligence_started_legaut,
+	mo.dt_legaut_analysis_ended AS dt_diligence_ended_legaut,
+	mo.dt_legal_analysis_ended AS dt_diligence_ended,
+	mo.dt_legal_risk_started AS dt_diligence_started_legal,
+	mo.dt_legal_risk_ended AS dt_diligence_ended_legal,
+	mo.dt_credit_analysis_started AS dt_credit_started,
+	mo.dt_credit_analysis_ended AS dt_credit_approved,
+	mo.dt_sale_transacton_paid AS dt_payment_concluded,
+	mo.dt_notes_registry_ended AS dt_notes_registry_ended,
+	mo.dt_house_registry_ended AS dt_matricula_atualizada,
+	mo.dt_sale_key_delivered AS dt_entrega_chaves,
+	mo.dt_financing_started AS dt_finan_started,
+	mo.dt_financing_ended AS dt_finan_ended,
+	drop_reason_before_acceptance AS offer_rejection_reason,
+	drop_reason_after_acceptance AS offer_accepted_drop_reason,
+	mo.listing_sale_price AS sale_listing_price,
+	mo.price_offered_by_buyer AS buyer_offer_price,
+	(mo.listing_sale_price - mo.price_offered_by_buyer)/mo.listing_sale_price AS offer_discount
+FROM
+	datalake_firestore_prod.monday AS mo
+),
+monday_manual AS (
 SELECT
 	NULLIF(mo.name,'') AS id_offer,
-	mo.id_buyer||'_'||mo.id_imovel AS sale_flow,
-	NULLIF(mo.id_imovel, '')::BIGINT AS id_house,
-	NULLIF(mo.id_buyer, '')::BIGINT AS id_user,
-	CASE WHEN forma_pagamento IN ('À vista + FGTS', 'À vista') THEN 'À vista'
-		 WHEN forma_pagamento IN ('Financiado', 'Financiado por fora', 'À vista, Financiado') THEN 'Financiado'
-		 ELSE forma_pagamento
-	END AS form_of_payment,
-	TO_DATE(SUBSTRING(NULLIF(mo.data_proposta, ''),1,10), 'yyyy-mm-dd') AS dt_offer_sent,
-	TO_DATE(SUBSTRING(NULLIF(mo.data_aceite_proposta, ''),1,10), 'yyyy-mm-dd') AS dt_offer_accepted,
-	TO_DATE(SUBSTRING(NULLIF(mo.data_assinatura_ccv, ''),1,10), 'yyyy-mm-dd') AS dt_ccv_signed,
-	TO_DATE(SUBSTRING(NULLIF(mo.data_descarte, ''),1,10), 'yyyy-mm-dd') AS dt_offer_rejected,
-	TO_DATE(SUBSTRING(NULLIF(mo.diligencia_inicio, ''),1,10), 'yyyy-mm-dd') AS dt_diligence_started_legaut,
-	TO_DATE(SUBSTRING(NULLIF(mo.dd_retorno_legaut, ''),1,10), 'yyyy-mm-dd') AS dt_diligence_ended_legaut,
-	TO_DATE(SUBSTRING(NULLIF(mo.diligencia_retorno_buyer_seller, ''),1,10), 'yyyy-mm-dd') AS dt_diligence_ended,
-	TO_DATE(SUBSTRING(NULLIF(mo.dd_inicio_legal, ''),1,10), 'yyyy-mm-dd') AS dt_diligence_started_legal,
-	TO_DATE(SUBSTRING(NULLIF(mo.dd_fim_legal, ''),1,10), 'yyyy-mm-dd') AS dt_diligence_ended_legal,
-	TO_DATE(SUBSTRING(NULLIF(mo.credito_inicio, ''),1,10), 'yyyy-mm-dd') AS dt_credit_started,
-	TO_DATE(SUBSTRING(NULLIF(mo.credito_fim, ''),1,10), 'yyyy-mm-dd') AS dt_credit_approved,
-	TO_DATE(SUBSTRING(NULLIF(mo.data_pagto_seller, ''),1,10), 'yyyy-mm-dd') AS dt_payment_concluded,
-	TO_DATE(SUBSTRING(NULLIF(mo.cri_fim, ''),1,10), 'yyyy-mm-dd') AS dt_matricula_atualizada,
-	TO_DATE(SUBSTRING(NULLIF(mo.data_chaves_buyer, ''),1,10), 'yyyy-mm-dd') AS dt_entrega_chaves,
-	TO_DATE(SUBSTRING(NULLIF(mo.finan_inicio, ''),1,10), 'yyyy-mm-dd') AS dt_finan_started,
-	TO_DATE(SUBSTRING(NULLIF(mo.finan_fim, ''),1,10), 'yyyy-mm-dd') AS dt_finan_ended,
-	motivo_descarte_pre AS offer_rejection_reason,
-	motivo_descarte_pos AS offer_accepted_drop_reason,
-	NULLIF(mo.valor_anuncio,'')::FLOAT AS sale_listing_price,
-	NULLIF(mo.proposta_buyer,'')::FLOAT AS buyer_offer_price,
-	(NULLIF(mo.valor_anuncio,'')::FLOAT - NULLIF(mo.proposta_buyer,'')::FLOAT)/NULLIF(mo.valor_anuncio,'')::FLOAT AS offer_discount
+	TO_DATE(SUBSTRING(NULLIF(mo.data_assinatura_ccv, ''),1,10), 'yyyy-mm-dd') AS dt_ccv_signed_man,
+	TO_DATE(SUBSTRING(NULLIF(mo.diligencia_inicio, ''),1,10), 'yyyy-mm-dd') AS dt_diligence_started_legaut_man,
+	TO_DATE(SUBSTRING(NULLIF(mo.diligencia_retorno_buyer_seller, ''),1,10), 'yyyy-mm-dd') AS dt_diligence_ended_man,
+	TO_DATE(SUBSTRING(NULLIF(mo.credito_fim, ''),1,10), 'yyyy-mm-dd') AS dt_credit_approved_man,
+	TO_DATE(SUBSTRING(NULLIF(mo.data_chaves_buyer, ''),1,10), 'yyyy-mm-dd') AS dt_entrega_chaves_man
 FROM datalake_raw.gsheets_sale_offers_monday mo
 ),
 sale_bookings AS (
@@ -75,6 +92,54 @@ FROM dim_booking db
 WHERE db.visit_intent = 'SALE'
   AND db.type = 'Visita'
 ),
+sale_closing AS (
+    WITH fact_os AS (
+    SELECT
+        DATE_TRUNC('week', DATE(sk_offer_submitted_date)) AS week_start,
+        DATE(sk_offer_submitted_date) AS date,
+        sk_offer
+    FROM
+    	sale.fact_offers
+    WHERE
+    	sk_offer_submitted_date > 0
+    ),
+    fact_oa AS (
+    SELECT
+        DATE_TRUNCT('week', DATE(sk_offer_accepted_date)) AS week_start,
+        DATE(sk_offer_accepted_date) AS date,
+        sk_offer
+    FROM
+        sale.fact_offers
+    WHERE
+        sk_offer_accepted_date > 0
+    ),
+    fact_ccv AS (
+    SELECT
+        DATE_TRUNC('week', DATE(ts_sale_agreement_signed)) AS week_start,
+        DATE(ts_sale_agreement_signed) AS date,
+        sk_offer
+    FROM
+        sale.dim_sale_agreement
+    WHERE
+        ts_sale_agreement_signed IS NOT NULL
+    )
+SELECT
+    COALESCE(COALESCE(fact_os.sk_offer, fact_oa.sk_offer), fact_ccv.sk_offer) AS sk_offer,
+    MAX(fact_os.date) AS os_date,
+    MAX(fact_oa.date) AS oa_date,
+    MAX(fact_ccv.date) AS ccv_date
+FROM
+    fact_os
+FULL OUTER JOIN
+    fact_oa
+        ON fact_os.sk_offer = fact_oa.sk_offer
+        AND fact_os.date = fact_oa.date
+FULL OUTER JOIN
+    fact_ccv
+        ON fact_os.sk_offer = fact_ccv.sk_offer
+        AND fact_os.date = fact_ccv.date
+GROUP BY 1
+),
 sale_tta AS (
 SELECT
 	tta.house_id::BIGINT AS house_id,
@@ -87,21 +152,21 @@ WHERE tta.business_context = 'SALE'
 ),
 sale_demand_region AS (
 SELECT
-	dsf.id_house,
+	fsf.sk_house::VARCHAR AS id_house,
 	dr.city_group
-FROM datamarts.demand_sale_flows dsf
+FROM sale.fact_sale_flows fsf
 JOIN dim_region dr
-  ON dr.sk_region = dsf.sk_region
+  ON dr.sk_region = fsf.sk_region
 ),
 sale_demand_events AS (
 SELECT
 	COALESCE(offers.id_user, db.id_visitor, tta.tenant_id::BIGINT) AS id_buyer,
 	COALESCE(offers.id_house, db.id_property, tta.house_id::BIGINT) AS id_house,
-	offers.form_of_payment,
 	offers.dt_offer_sent,
+	offers.dt_deal_qualified,
 	offers.dt_offer_accepted,
 	offers.dt_ccv_signed,
-	offers.id_offer,
+	COALESCE(offers.id_offer,sc.sk_offer, mom.id_offer) AS id_offer,
 	offers.dt_diligence_started_legaut,
 	offers.dt_diligence_ended_legaut,
 	offers.dt_diligence_ended,
@@ -110,6 +175,7 @@ SELECT
 	offers.dt_credit_started,
 	offers.dt_credit_approved,
 	offers.dt_payment_concluded,
+	offers.dt_notes_registry_ended,
 	offers.dt_matricula_atualizada,
 	offers.dt_entrega_chaves,
 	offers.dt_finan_started,
@@ -119,22 +185,40 @@ SELECT
 	db.dt_completed,
 	tta.tta_id,
 	tta.first_message_ts::TIMESTAMP AS tta_started,
-	tta.first_attendance_ts::TIMESTAMP AS tta_completed
+	tta.first_attendance_ts::TIMESTAMP AS tta_completed,
+	sc.os_date,
+	sc.oa_date,
+	sc.ccv_date,
+	mom.dt_ccv_signed_man,
+	mom.dt_diligence_started_legaut_man,
+	mom.dt_diligence_ended_man,
+	mom.dt_credit_approved_man,
+	mom.dt_entrega_chaves_man
 FROM monday_adjusted offers
 FULL OUTER JOIN sale_bookings db
   ON (offers.id_house = db.id_property AND offers.id_user = db.id_visitor)
 FULL OUTER JOIN sale_tta tta
   ON (offers.id_house = tta.house_id AND offers.id_user = tta.tenant_id)
+FULL OUTER JOIN
+	sale_closing AS sc
+		ON offers.id_offer = sc.sk_offer
+FULL OUTER JOIN
+	monday_manual AS mom
+		ON offers.id_offer = mom.id_offer
 ),
 sale_demand_classification AS (
 SELECT
 	sde.id_buyer,
 	sde.id_house,
 	sdr.city_group,
-	sde.form_of_payment,
-	sde.dt_offer_sent,
-	sde.dt_offer_accepted,
-	sde.dt_ccv_signed,
+	pma.form_of_payment,
+	--sde.dt_offer_sent,
+	sde.os_date AS dt_offer_sent,
+	sde.dt_deal_qualified,
+	--sde.dt_offer_accepted,
+	--sde.dt_ccv_signed,
+	sde.oa_date AS dt_offer_accepted,
+	sde.dt_ccv_signed_man AS dt_ccv_signed,
 	sde.id_offer,
 	sde.sk_booking,
 	sde.dt_created,
@@ -142,44 +226,49 @@ SELECT
 	sde.tta_id,
 	sde.tta_started,
 	sde.tta_completed,
-	sde.dt_diligence_started_legaut,
+	sde.dt_diligence_started_legaut_man AS dt_diligence_started_legaut,
 	sde.dt_diligence_ended_legaut,
-	sde.dt_diligence_ended,
+	sde.dt_diligence_ended_man AS dt_diligence_ended,
 	sde.dt_diligence_started_legal,
 	sde.dt_diligence_ended_legal,
 	sde.dt_credit_started,
-	sde.dt_credit_approved,
+	sde.dt_credit_approved_man AS dt_credit_approved,
 	sde.dt_payment_concluded,
+	sde.dt_notes_registry_ended,
 	sde.dt_matricula_atualizada,
-	sde.dt_entrega_chaves,
+	sde.dt_entrega_chaves_man AS dt_entrega_chaves,
 	sde.dt_finan_started,
 	sde.dt_finan_ended,
-	dsf.first_event AS first_touchpoint,
-	dsf.higher_intent_before_offer,
-	dsf.higher_intent_after_offer
+	fsf.first_event AS first_touchpoint,
+	fsf.higher_intent_before_offer,
+	fsf.higher_intent_after_offer
 FROM sale_demand_events sde
-LEFT JOIN datamarts.demand_sale_flows dsf
-  ON sde.id_buyer = dsf.id_buyer
-  AND sde.id_house = dsf.id_house
+LEFT JOIN
+	sale.fact_sale_flows AS fsf
+		ON sde.id_buyer = fsf.sk_buyer::VARCHAR
+		AND sde.id_house = fsf.sk_house::VARCHAR
 LEFT JOIN sale_demand_region sdr
-  ON sdr.id_house = sde.id_house
+  ON sdr.id_house::VARCHAR = sde.id_house
+LEFT JOIN
+	payment_method_adjusted AS pma
+		ON pma.id = sde.id_offer
 ),
 lead_ AS (
 SELECT
 	slf.sk_lead_date AS base_date,
 	slf.city_group,
-   slf.lead_context,
-   slf.mkt_campaign_context,
-   slf.mkt_origin,
-   slf.mkt_channel,
-   slf.mkt_type,
+    slf.lead_context,
+    slf.mkt_campaign_context,
+    slf.mkt_origin,
+    slf.mkt_channel,
+    slf.mkt_type,
 	NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
 	NULL AS form_of_payment,
-   COUNT(slf.sk_lead_date) AS leads,
-   NULL::BIGINT AS prospects,
-   NULL::BIGINT AS first_contacts,
+    COUNT(slf.sk_lead_date) AS leads,
+    NULL::BIGINT AS prospects,
+    NULL::BIGINT AS first_contacts,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
 	NULL::BIGINT AS first_listings,
@@ -188,6 +277,7 @@ SELECT
 	NULL::BIGINT AS visits_booked,
 	NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
+	NULL::BIGINT AS deal_qualified,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
 	NULL::BIGINT AS diligence_started_legaut,
@@ -200,6 +290,7 @@ SELECT
 	NULL::BIGINT AS finan_started,
 	NULL::BIGINT AS finan_ended,
 	NULL::BIGINT AS payment_concluded,
+	NULL::BIGINT AS notes_registry_ended,
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_listing_flows_adjust AS slf
@@ -230,6 +321,7 @@ SELECT
 	NULL::BIGINT AS visits_booked,
 	NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
+	NULL::BIGINT AS deal_qualified,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
 	NULL::BIGINT AS diligence_started_legaut,
@@ -242,6 +334,7 @@ SELECT
 	NULL::BIGINT AS finan_started,
 	NULL::BIGINT AS finan_ended,
 	NULL::BIGINT AS payment_concluded,
+	NULL::BIGINT AS notes_registry_ended,
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_listing_flows_adjust AS slf
@@ -252,18 +345,18 @@ first_contacts AS (
 SELECT
 	slf.sk_prospect_date AS base_date,
 	slf.city_group,
-   slf.lead_context,
-   slf.mkt_campaign_context,
-   slf.mkt_origin,
-   slf.mkt_channel,
-   slf.mkt_type,
-   NULL AS first_origin_demand,
+    slf.lead_context,
+    slf.mkt_campaign_context,
+    slf.mkt_origin,
+    slf.mkt_channel,
+    slf.mkt_type,
+    NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
-	 NULL AS form_of_payment,
-   NULL::BIGINT AS leads,
-   NULL::BIGINT AS prospects,
-   COUNT(slf.sk_first_contact_date) AS first_contacts,
+	NULL AS form_of_payment,
+    NULL::BIGINT AS leads,
+    NULL::BIGINT AS prospects,
+    COUNT(slf.sk_first_contact_date) AS first_contacts,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
 	NULL::BIGINT AS first_listings,
@@ -272,6 +365,7 @@ SELECT
 	NULL::BIGINT AS visits_booked,
 	NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
+	NULL::BIGINT AS deal_qualified,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
 	NULL::BIGINT AS diligence_started_legaut,
@@ -284,6 +378,7 @@ SELECT
 	NULL::BIGINT AS finan_started,
 	NULL::BIGINT AS finan_ended,
 	NULL::BIGINT AS payment_concluded,
+	NULL::BIGINT AS notes_registry_ended,
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_listing_flows_adjust AS slf
@@ -300,9 +395,9 @@ SELECT
    slf.mkt_channel,
    slf.mkt_type,
    NULL AS first_origin_demand,
-	NULL AS origin_before_offer,
-	NULL AS origin_after_offer,
-	 NULL AS form_of_payment,
+   NULL AS origin_before_offer,
+   NULL AS origin_after_offer,
+   NULL AS form_of_payment,
    NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -314,6 +409,7 @@ SELECT
 	NULL::BIGINT AS visits_booked,
 	NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
+	NULL::BIGINT AS deal_qualified,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
 	NULL::BIGINT AS diligence_started_legaut,
@@ -326,6 +422,7 @@ SELECT
 	NULL::BIGINT AS finan_started,
 	NULL::BIGINT AS finan_ended,
 	NULL::BIGINT AS payment_concluded,
+	NULL::BIGINT AS notes_registry_ended,
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_listing_flows_adjust AS slf
@@ -356,6 +453,7 @@ SELECT
 	NULL::BIGINT AS visits_booked,
 	NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
+	NULL::BIGINT AS deal_qualified,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
 	NULL::BIGINT AS diligence_started_legaut,
@@ -368,6 +466,7 @@ SELECT
 	NULL::BIGINT AS finan_started,
 	NULL::BIGINT AS finan_ended,
 	NULL::BIGINT AS payment_concluded,
+	NULL::BIGINT AS notes_registry_ended,
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_listing_flows_adjust AS slf
@@ -398,8 +497,9 @@ SELECT
 	NULL::BIGINT AS visits_booked,
 	NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
+	NULL::BIGINT AS deal_qualified,
 	NULL::BIGINT AS offers_accepted,
-   NULL::BIGINT AS ccv_signed,
+    NULL::BIGINT AS ccv_signed,
 	NULL::BIGINT AS diligence_started_legaut,
 	NULL::BIGINT AS diligence_ended_legaut,
 	NULL::BIGINT AS diligence_ended,
@@ -410,6 +510,7 @@ SELECT
 	NULL::BIGINT AS finan_started,
 	NULL::BIGINT AS finan_ended,
 	NULL::BIGINT AS payment_concluded,
+	NULL::BIGINT AS notes_registry_ended,
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_listing_flows_adjust AS slf
@@ -438,8 +539,9 @@ SELECT
 	COUNT(DISTINCT tta_id) AS tta_started,
 	NULL::BIGINT AS tta_completed,
 	NULL::BIGINT AS visits_booked,
-   NULL::BIGINT AS visits_completed,
+    NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
+	NULL::BIGINT AS deal_qualified,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
 	NULL::BIGINT AS diligence_started_legaut,
@@ -452,6 +554,7 @@ SELECT
 	NULL::BIGINT AS finan_started,
 	NULL::BIGINT AS finan_ended,
 	NULL::BIGINT AS payment_concluded,
+	NULL::BIGINT AS notes_registry_ended,
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
@@ -482,6 +585,7 @@ SELECT
 	NULL::BIGINT AS visits_booked,
    NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
+	NULL::BIGINT AS deal_qualified,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
 	NULL::BIGINT AS diligence_started_legaut,
@@ -494,6 +598,7 @@ SELECT
 	NULL::BIGINT AS finan_started,
 	NULL::BIGINT AS finan_ended,
 	NULL::BIGINT AS payment_concluded,
+	NULL::BIGINT AS notes_registry_ended,
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
@@ -524,6 +629,7 @@ SELECT
 	COUNT(DISTINCT sk_booking) AS visits_booked,
    NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
+	NULL::BIGINT AS deal_qualified,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
 	NULL::BIGINT AS diligence_started_legaut,
@@ -536,6 +642,7 @@ SELECT
 	NULL::BIGINT AS finan_started,
 	NULL::BIGINT AS finan_ended,
 	NULL::BIGINT AS payment_concluded,
+	NULL::BIGINT AS notes_registry_ended,
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
@@ -566,6 +673,7 @@ SELECT
 	NULL::BIGINT AS visits_booked,
    COUNT(DISTINCT sk_booking) AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
+	NULL::BIGINT AS deal_qualified,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
 	NULL::BIGINT AS diligence_started_legaut,
@@ -578,6 +686,7 @@ SELECT
 	NULL::BIGINT AS finan_started,
 	NULL::BIGINT AS finan_ended,
 	NULL::BIGINT AS payment_concluded,
+	NULL::BIGINT AS notes_registry_ended,
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
@@ -608,6 +717,7 @@ SELECT
 	NULL::BIGINT AS visits_booked,
     NULL::BIGINT AS visits_completed,
 	COUNT(DISTINCT id_offer) AS offers_submitted,
+	NULL::BIGINT AS deal_qualified,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
 	NULL::BIGINT AS diligence_started_legaut,
@@ -620,10 +730,57 @@ SELECT
 	NULL::BIGINT AS finan_started,
 	NULL::BIGINT AS finan_ended,
 	NULL::BIGINT AS payment_concluded,
+	NULL::BIGINT AS notes_registry_ended,
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
 WHERE DATE(dt_offer_sent) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+),
+offers_deal_qualified AS (
+SELECT
+	REPLACE(DATE(dt_deal_qualified),'-','')::INTEGER AS base_date,
+	city_group,
+	NULL AS lead_context,
+   NULL AS mkt_campaign_context,
+   NULL AS mkt_origin,
+   NULL AS mkt_channel,
+   NULL AS mkt_type,
+	first_touchpoint AS first_origin_demand,
+	higher_intent_before_offer AS origin_before_offer,
+	higher_intent_after_offer AS origin_after_offer,
+	form_of_payment,
+	NULL::BIGINT AS leads,
+	NULL::BIGINT AS prospects,
+	NULL::BIGINT AS first_contacts,
+	NULL::BIGINT AS qualifieds,
+	NULL::BIGINT AS opportunities,
+	NULL::BIGINT AS first_listings,
+	NULL::BIGINT AS tta_started,
+	NULL::BIGINT AS tta_completed,
+	NULL::BIGINT AS visits_booked,
+   NULL::BIGINT AS visits_completed,
+	NULL::BIGINT AS offers_submitted,
+	COUNT(DISTINCT id_offer) AS deal_qualified,
+	NULL::BIGINT AS offers_accepted,
+	NULL::BIGINT AS ccv_signed,
+	NULL::BIGINT AS diligence_started_legaut,
+	NULL::BIGINT AS diligence_ended_legaut,
+	NULL::BIGINT AS diligence_ended,
+	NULL::BIGINT AS diligence_started_legal,
+	NULL::BIGINT AS diligence_ended_legal,
+	NULL::BIGINT AS credit_sent,
+	NULL::BIGINT AS credit_approved,
+	NULL::BIGINT AS finan_started,
+	NULL::BIGINT AS finan_ended,
+	NULL::BIGINT AS payment_concluded,
+	NULL::BIGINT AS notes_registry_ended,
+	NULL::BIGINT AS matricula_atualizada,
+	NULL::BIGINT AS entrega_chave
+FROM
+	sale_demand_classification
+WHERE
+	DATE(dt_deal_qualified) > 0
 GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 ),
 offers_accepted AS (
@@ -650,6 +807,7 @@ SELECT
 	NULL::BIGINT AS visits_booked,
    NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
+	NULL::BIGINT AS deal_qualified,
 	COUNT(DISTINCT id_offer) AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
 	NULL::BIGINT AS diligence_started_legaut,
@@ -662,6 +820,7 @@ SELECT
 	NULL::BIGINT AS finan_started,
 	NULL::BIGINT AS finan_ended,
 	NULL::BIGINT AS payment_concluded,
+	NULL::BIGINT AS notes_registry_ended,
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
@@ -692,6 +851,7 @@ SELECT
 	NULL::BIGINT AS visits_booked,
    NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
+	NULL::BIGINT AS deal_qualified,
 	NULL::BIGINT AS offers_accepted,
 	COUNT(DISTINCT id_offer) AS ccv_signed,
 	NULL::BIGINT AS diligence_started_legaut,
@@ -704,6 +864,7 @@ SELECT
 	NULL::BIGINT AS finan_started,
 	NULL::BIGINT AS finan_ended,
 	NULL::BIGINT AS payment_concluded,
+	NULL::BIGINT AS notes_registry_ended,
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
@@ -734,6 +895,7 @@ SELECT
 	NULL::BIGINT AS visits_booked,
    NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
+	NULL::BIGINT AS deal_qualified,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
 	COUNT(DISTINCT id_offer) AS diligence_started_legaut,
@@ -746,6 +908,7 @@ SELECT
 	NULL::BIGINT AS finan_started,
 	NULL::BIGINT AS finan_ended,
 	NULL::BIGINT AS payment_concluded,
+	NULL::BIGINT AS notes_registry_ended,
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
@@ -776,6 +939,7 @@ SELECT
 	NULL::BIGINT AS visits_booked,
    NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
+	NULL::BIGINT AS deal_qualified,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
 	NULL::BIGINT AS diligence_started_legaut,
@@ -788,6 +952,7 @@ SELECT
 	NULL::BIGINT AS finan_started,
 	NULL::BIGINT AS finan_ended,
 	NULL::BIGINT AS payment_concluded,
+	NULL::BIGINT AS notes_registry_ended,
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
@@ -818,9 +983,10 @@ SELECT
 	NULL::BIGINT AS visits_booked,
    NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
+	NULL::BIGINT AS deal_qualified,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
-   NULL::BIGINT AS diligence_started_legaut,
+	NULL::BIGINT AS diligence_started_legaut,
 	NULL::BIGINT AS diligence_ended_legaut,
 	COUNT(DISTINCT id_offer) AS diligence_ended,
 	NULL::BIGINT AS diligence_started_legal,
@@ -830,6 +996,7 @@ SELECT
 	NULL::BIGINT AS finan_started,
 	NULL::BIGINT AS finan_ended,
 	NULL::BIGINT AS payment_concluded,
+	NULL::BIGINT AS notes_registry_ended,
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
@@ -860,9 +1027,10 @@ SELECT
 	NULL::BIGINT AS visits_booked,
    NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
+	NULL::BIGINT AS deal_qualified,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
-   NULL::BIGINT AS diligence_started_legaut,
+	NULL::BIGINT AS diligence_started_legaut,
 	NULL::BIGINT AS diligence_ended_legaut,
 	NULL::BIGINT AS diligence_ended,
 	COUNT(DISTINCT id_offer) AS diligence_started_legal,
@@ -872,6 +1040,7 @@ SELECT
 	NULL::BIGINT AS finan_started,
 	NULL::BIGINT AS finan_ended,
 	NULL::BIGINT AS payment_concluded,
+	NULL::BIGINT AS notes_registry_ended,
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
@@ -902,9 +1071,10 @@ SELECT
 	NULL::BIGINT AS visits_booked,
    NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
+	NULL::BIGINT AS deal_qualified,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
-   NULL::BIGINT AS diligence_started_legaut,
+	NULL::BIGINT AS diligence_started_legaut,
 	NULL::BIGINT AS diligence_ended_legaut,
 	NULL::BIGINT AS diligence_ended,
 	NULL::BIGINT AS diligence_started_legal,
@@ -914,6 +1084,7 @@ SELECT
 	NULL::BIGINT AS finan_started,
 	NULL::BIGINT AS finan_ended,
 	NULL::BIGINT AS payment_concluded,
+	NULL::BIGINT AS notes_registry_ended,
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
@@ -944,6 +1115,7 @@ SELECT
 	NULL::BIGINT AS visits_booked,
    NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
+	NULL::BIGINT AS deal_qualified,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
 	NULL::BIGINT AS diligence_started_legaut,
@@ -956,6 +1128,7 @@ SELECT
 	NULL::BIGINT AS finan_started,
 	NULL::BIGINT AS finan_ended,
 	NULL::BIGINT AS payment_concluded,
+	NULL::BIGINT AS notes_registry_ended,
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
@@ -986,6 +1159,7 @@ SELECT
 	NULL::BIGINT AS visits_booked,
    NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
+	NULL::BIGINT AS deal_qualified,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
 	NULL::BIGINT AS diligence_started_legaut,
@@ -998,6 +1172,7 @@ SELECT
 	NULL::BIGINT AS finan_started,
 	NULL::BIGINT AS finan_ended,
 	NULL::BIGINT AS payment_concluded,
+	NULL::BIGINT AS notes_registry_ended,
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
@@ -1028,6 +1203,7 @@ SELECT
 	NULL::BIGINT AS visits_booked,
    NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
+	NULL::BIGINT AS deal_qualified,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
 	NULL::BIGINT AS diligence_started_legaut,
@@ -1040,6 +1216,7 @@ SELECT
 	COUNT(DISTINCT id_offer) AS finan_started,
 	NULL::BIGINT AS finan_ended,
 	NULL::BIGINT AS payment_concluded,
+	NULL::BIGINT AS notes_registry_ended,
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
@@ -1070,6 +1247,7 @@ SELECT
 	NULL::BIGINT AS visits_booked,
    NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
+	NULL::BIGINT AS deal_qualified,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
 	NULL::BIGINT AS diligence_started_legaut,
@@ -1082,10 +1260,57 @@ SELECT
 	NULL::BIGINT AS finan_started,
 	COUNT(DISTINCT id_offer) AS finan_ended,
 	NULL::BIGINT AS payment_concluded,
+	NULL::BIGINT AS notes_registry_ended,
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
 WHERE DATE(dt_finan_ended) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+),
+notes_registry_ended AS (
+SELECT
+	REPLACE(DATE(dt_notes_registry_ended),'-','')::INTEGER AS base_date,
+	city_group,
+	NULL AS lead_context,
+   NULL AS mkt_campaign_context,
+   NULL AS mkt_origin,
+	NULL AS mkt_channel,
+	NULL AS mkt_type,
+	first_touchpoint AS first_origin_demand,
+	higher_intent_before_offer AS origin_before_offer,
+	higher_intent_after_offer AS origin_after_offer,
+	form_of_payment,
+	NULL::BIGINT AS leads,
+	NULL::BIGINT AS prospects,
+	NULL::BIGINT AS first_contacts,
+	NULL::BIGINT AS qualifieds,
+	NULL::BIGINT AS opportunities,
+	NULL::BIGINT AS first_listings,
+	NULL::BIGINT AS tta_started,
+	NULL::BIGINT AS tta_completed,
+	NULL::BIGINT AS visits_booked,
+   NULL::BIGINT AS visits_completed,
+	NULL::BIGINT AS offers_submitted,
+	NULL::BIGINT AS deal_qualified,
+	NULL::BIGINT AS offers_accepted,
+	NULL::BIGINT AS ccv_signed,
+	NULL::BIGINT AS diligence_started_legaut,
+	NULL::BIGINT AS diligence_ended_legaut,
+	NULL::BIGINT AS diligence_ended,
+	NULL::BIGINT AS diligence_started_legal,
+	NULL::BIGINT AS diligence_ended_legal,
+	NULL::BIGINT AS credit_sent,
+	NULL::BIGINT AS credit_approved,
+	NULL::BIGINT AS finan_started,
+	NULL::BIGINT AS finan_ended,
+	NULL::BIGINT AS payment_concluded,
+	COUNT(DISTINCT id_offer) AS notes_registry_ended,
+	NULL::BIGINT AS matricula_atualizada,
+	NULL::BIGINT AS entrega_chave
+FROM
+	sale_demand_classification
+WHERE
+	DATE(dt_notes_registry_ended) > 0
 GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 ),
 payment_concluded AS (
@@ -1112,6 +1337,7 @@ SELECT
 	NULL::BIGINT AS visits_booked,
    NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
+	NULL::BIGINT AS deal_qualified,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
 	NULL::BIGINT AS diligence_started_legaut,
@@ -1124,6 +1350,7 @@ SELECT
 	NULL::BIGINT AS finan_started,
 	NULL::BIGINT AS finan_ended,
 	COUNT(DISTINCT id_offer) AS payment_concluded,
+	NULL::BIGINT AS notes_registry_ended,
 	NULL::BIGINT AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
@@ -1154,6 +1381,7 @@ SELECT
 	NULL::BIGINT AS visits_booked,
    NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
+	NULL::BIGINT AS deal_qualified,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
 	NULL::BIGINT AS diligence_started_legaut,
@@ -1166,6 +1394,7 @@ SELECT
 	NULL::BIGINT AS finan_started,
 	NULL::BIGINT AS finan_ended,
 	NULL::BIGINT AS payment_concluded,
+	NULL::BIGINT AS notes_registry_ended,
 	COUNT(DISTINCT id_offer) AS matricula_atualizada,
 	NULL::BIGINT AS entrega_chave
 FROM sale_demand_classification
@@ -1196,6 +1425,7 @@ SELECT
 	NULL::BIGINT AS visits_booked,
    	NULL::BIGINT AS visits_completed,
 	NULL::BIGINT AS offers_submitted,
+	NULL::BIGINT AS deal_qualified,
 	NULL::BIGINT AS offers_accepted,
 	NULL::BIGINT AS ccv_signed,
 	NULL::BIGINT AS diligence_started_legaut,
@@ -1208,6 +1438,7 @@ SELECT
 	NULL::BIGINT AS finan_started,
 	NULL::BIGINT AS finan_ended,
 	NULL::BIGINT AS payment_concluded,
+	NULL::BIGINT AS notes_registry_ended,
 	NULL::BIGINT AS matricula_atualizada,
 	COUNT(DISTINCT id_offer) AS entrega_chave
 FROM sale_demand_classification
@@ -1237,6 +1468,8 @@ SELECT * FROM lead_
 	UNION ALL
 	SELECT * FROM offers_sent
 	UNION ALL
+	SELECT * FROM offers_deal_qualified
+	UNION ALL
 	SELECT * FROM offers_accepted
 	UNION ALL
 	SELECT * FROM ccv_signed
@@ -1260,6 +1493,8 @@ SELECT * FROM lead_
 	SELECT * FROM finan_ended
 	UNION ALL
 	SELECT * FROM payment_concluded
+	UNION ALL
+	SELECT * FROM notes_registry_ended
 	UNION ALL
 	SELECT * FROM matricula_atualizada
 	UNION ALL
@@ -1292,6 +1527,7 @@ SELECT
 	ua.visits_booked,
 	ua.visits_completed,
 	ua.offers_submitted,
+	ua.deal_qualified,
 	ua.offers_accepted,
 	ua.ccv_signed,
 	ua.diligence_started_legaut,
@@ -1304,6 +1540,7 @@ SELECT
 	ua.finan_started,
 	ua.finan_ended,
 	ua.payment_concluded,
+	ua.notes_registry_ended,
 	ua.matricula_atualizada,
 	ua.entrega_chave
 FROM union_all ua
@@ -1327,8 +1564,8 @@ SELECT
 	origin_after_offer,
 	form_of_payment,
 	SUM(leads) AS leads,
-  SUM(prospects) AS prospects,
-  SUM(first_contacts) AS first_contacts,
+    SUM(prospects) AS prospects,
+    SUM(first_contacts) AS first_contacts,
 	SUM(qualifieds) AS qualifieds,
 	SUM(opportunities) AS opportunities,
 	SUM(first_listings) AS first_listings,
@@ -1337,18 +1574,20 @@ SELECT
 	SUM(visits_booked) AS visits_booked,
 	SUM(visits_completed) AS visits_completed,
 	SUM(offers_submitted) AS offer_submitted,
+	SUM(deal_qualified) AS deal_qualified,
 	SUM(offers_accepted) AS offer_accepted,
 	SUM(ccv_signed) AS ccv_signed,
 	SUM(diligence_started_legaut) AS diligence_started_legaut,
 	SUM(diligence_ended_legaut) AS diligence_ended_legaut,
+	SUM(diligence_ended) AS diligence_ended,
 	SUM(diligence_started_legal) AS diligence_started_legal,
 	SUM(diligence_ended_legal) AS diligence_ended_legal,
-	SUM(diligence_ended) AS diligence_ended,
 	SUM(credit_sent) AS credit_sent,
 	SUM(credit_approved) AS credit_approved,
 	SUM(finan_started) AS finan_started,
 	SUM(finan_ended) AS finan_ended,
 	SUM(payment_concluded) AS payment_concluded,
+	SUM(notes_registry_ended) AS notes_registry_ended,
 	SUM(matricula_atualizada) AS matricula_atualizada,
 	SUM(entrega_chave) AS entrega_chave,
 	current_timestamp AS ts_load
@@ -1366,4 +1605,4 @@ GROUP BY week_start,
 	 first_origin_demand,
 	 origin_before_offer,
 	 origin_after_offer,
-	 form_of_payment;
+	 form_of_payment
