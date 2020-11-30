@@ -363,28 +363,28 @@ campaigns_full as (
             group by 1,2,3,4,5,6,7,8,9,10,11
         -- LINKEDIN
         UNION
-            select
+            SELECT
                 fli.sk_date,
-                'linkedin'::varchar as origin,
-                'fact_linkedin_daily_cost_attributions'::varchar as fact_cost,
+                'linkedin'::varchar AS origin,
+                'fact_linkedin_daily_cost_attributions'::varchar AS fact_cost,
                 dlc.campaign_name,
-                null as campaign_city,
-                dlcc.account_name as account_name,
-                lower(dlc.campaign_name) as campaign_name_l,
-                lower(dlcc.account_name) as account_name_l,
+                null AS campaign_city,
+                dlcc.account_name AS account_name,
+                lower(dlc.campaign_name) AS campaign_name_l,
+                lower(dlcc.account_name) AS account_name_l,
                 dlc.campaign_name as utm_campaign,
-                null::varchar as utm_term,
-                null::varchar as utm_content,
-                null::numeric(16,4) as desktop_cost,
-                null::numeric(16,4) as mobile_cost,
-                null::numeric(16,4) as other_cost,
-                sum(total_cost) as total_cost
-            from marketing.fact_linkedin_daily_cost_attributions fli
-            join marketing.dim_linkedin_campaign dlc
-                on dlc.sk_campaign = fli.sk_campaign
-            join marketing.dim_linkedin_campaign_group dlcc
-                on dlcc.sk_campaign_group = fli.sk_campaign_group
-            group by 1,2,3,4,5,6,7,8,9,10,11
+                null::varchar AS utm_term,
+                null::varchar AS utm_content,
+                null::numeric(16,4) AS desktop_cost,
+                null::numeric(16,4) AS mobile_cost,
+                null::numeric(16,4) AS other_cost,
+                sum(total_cost) AS total_cost
+            FROM marketing_costs.fact_linkedin_daily_cost_attributions fli
+            JOIN marketing_costs.dim_linkedin_campaign dlc
+                ON dlc.sk_campaign = fli.sk_campaign
+            JOIN marketing_costs.dim_linkedin_campaign_group dlcc
+                ON dlcc.sk_campaign_group = fli.sk_campaign_group
+            GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 
       )
       SELECT NULLIF(REGEXP_SUBSTR(campaign_name,'^([[:alpha:]]\\d{3}[[:alpha:]])'), '')::varchar as rule_id, * FROM sources
