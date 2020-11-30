@@ -20,7 +20,7 @@ from bietlejuice.jobs.composer.services.metastore_services import SparkMetastore
 
 
 DATABRICKS_SCOPE = "quintoandar"
-JOB_NAME = "load_firestore_audit_into_raw"
+JOB_NAME = "load_firestore_into_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
