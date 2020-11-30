@@ -256,28 +256,6 @@ create_conversion_points_demand_daily_task = BaseDAG.build_python_operator(
                'sub_level': 'conversion_points_demand'}
 )
 
-# TODO: When migrating jobs to SPARK, also consider the following ones
-# taxonomy_demand_active_user_sessions_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
-#                                                                     materialize_growth_measure_table_from_datalake,
-#                                                                     'demand_active_user_sessions',
-#                                                                     'taxonomy')
-#
-# taxonomy_demand_active_users_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
-#                                                             materialize_growth_measure_table_from_datalake,
-#                                                             'demand_active_users',
-#                                                             'taxonomy')
-#
-# taxonomy_supply_active_user_sessions_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
-#                                                                     materialize_growth_measure_table_query,
-#                                                                     'supply_active_user_sessions',
-#                                                                     'taxonomy')
-#
-# taxonomy_supply_active_users_sub_dag = get_sub_dag_operator(sub_dag_func_taxonomy,
-#                                                             materialize_growth_measure_table_query,
-#                                                             'supply_active_users',
-#                                                             'taxonomy')
-
-
 create_conversion_points_supply_weekly_task = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='create_conversion_points_supply_weekly',
