@@ -1,12 +1,17 @@
-drop table if exists payment.dim_invoice;
-create table if not exists payment.dim_invoice (
-    sk_invoice bigint primary key,
-    invoice_frequency varchar(50),
-    payment_status varchar(50),
-    invoice_due_amount decimal(13,2),
-    ts_invoice_created timestamp,
-    dt_invoice_sent date,
-    dt_invoice_due date,
-    dt_invoice_paid date,
-    ts_load timestamp
-)
+DROP TABLE if exists payment.dim_invoice;
+CREATE TABLE if not exists payment.dim_invoice (
+    sk_invoice BIGINT primary key,
+    frequency VARCHAR(50),
+    payment_status VARCHAR(50),
+    user VARCHAR(50),
+    due_amount DECIMAL(13,2),
+    paid_amount DECIMAL(13,2),
+    accrual_year_month INT,
+    ts_created TIMESTAMP,
+    dt_sent DATE,
+    dt_due DATE,
+    dt_paid DATE,
+    ts_load TIMESTAMP
+);
+
+ALTER TABLE payment.dim_invoice OWNER TO airflow;

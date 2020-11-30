@@ -1,11 +1,16 @@
-select
-    id_external as sk_invoice,
-    replace(purpose, '-', ' ') as invoice_frequency,
-    coalesce(replace(status, '-', ' '), 'not invoiceable') as payment_status,
-    due_amount as invoice_due_amount,
-    ts_created as ts_invoice_created,
-    date(ts_sent) as dt_invoice_sent,
-    date(ts_due) as dt_invoice_due,
-    date(ts_paid) as dt_invoice_paid,
-    now() as ts_load
-from datalake_retsuko_clean.invoice
+SELECT 
+    il.id_invoice AS sk_invoice,
+    il.invoice_frequency AS frequency,
+    il.payment_status,
+    il.invoice_user AS user,
+    i.due_amount AS due_amount,
+    i.paid_amount AS paid_amount,   
+    i.accrual_year_month AS accrual_year_month,
+    i.ts_created AS ts_created,
+    DATE(il.ts_sent) AS dt_sent,
+    DATE(il.ts_due) AS dt_due,
+    DATE(il.ts_paid) AS dt_paid,
+    NOW() AS ts_load
+FROM datalake_retsuko.invoice il 
+LEFT JOIN datalake_retsuko_clean.invoice i 
+    ON il.id_invoice = i.id_external
