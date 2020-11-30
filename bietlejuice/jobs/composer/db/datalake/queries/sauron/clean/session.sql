@@ -1,4 +1,4 @@
-select
+SELECT
   id,
   agent,
   status,
@@ -13,5 +13,13 @@ select
   last_message_at as ts_last_message,
   first_message_at as ts_first_message,
   created_at as ts_created,
-  updated_at as ts_updated
-from datalake_sauron_raw.session
+  updated_at AS ts_updated,
+  year,
+  month,
+  day
+FROM
+  datalake_sauron_raw.session
+WHERE
+  year = {year}
+  AND month = {month}
+  AND day = {day}

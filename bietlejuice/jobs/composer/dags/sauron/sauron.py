@@ -1,57 +1,111 @@
-from datetime import datetime, timedelta
-
+from datetime import datetime
 import pendulum
+
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
 )
-
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
-from bietlejuice.jobs.composer.services.file_service import FileService
 
-DAG_ID = "sauron"
-FULL_DAG_ID = f"bietlejuice.{DAG_ID}"
+SOURCE = "sauron"
 
-LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
-MAIN_START_DATE = datetime(2019, 10, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "30 1 * * *"
-
+# airflow vars
 ENV = Variable.get("environment")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
-SOURCE = "sauron"
-schema = "public"
-
+ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
+DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 
-LOAD_SAURON_INTO_DATALAKE_RAW_FILE_PATH = (
-    S3_PREFIX + "/spark_jobs/{}/load_sauron_into_datalake.py".format(DAG_ID)
-)
-CREATE_CLEAN_TABLES_IN_DATALAKE_FILE_PATH = (
-    S3_PREFIX + "/spark_jobs/{}/create_clean_table_in_datalake.py".format(DAG_ID)
-)
-CREATE_EXTERNAL_TABLES_FILE_PATH = (
-    S3_PREFIX + "/spark_jobs/{}/create_external_tables.py".format(DAG_ID)
-)
-
-LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
-    Variable.get("databricks_s3_bucket"), DAG_ID
-)
-
+# spark and databricks vars
+SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
+LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{SOURCE}"
 CLUSTER_DESCRIPTION = Variable.get(
     "databricks_bietlejuice_sauron", deserialize_json=True
 )
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 
-LIBRARIES_DESCRIPTION = Variable.get(
-    "bietlejuice_default_libraries", deserialize_json=True
-)
+# dag vars
+DAG_ID = f"bietlejuice.{SOURCE}"
+LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
+MAIN_START_DATE = datetime(2020, 7, 27, 0, 0, 0, tzinfo=LOCAL_TZ)
+MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
+
+local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
+
+# every table to be loaded must be here, with its SQL file name and extraction type
+JOBS_EXTRACTION_TYPE = [
+    {"table_name": "active_sessions", "extraction_type": "incremental"},
+    {"table_name": "bot_outgoing_messages", "extraction_type": "incremental"},
+    {"table_name": "expired_sessions", "extraction_type": "incremental"},
+    {"table_name": "incoming_message_status", "extraction_type": "incremental"},
+    {"table_name": "incoming_messages", "extraction_type": "incremental"},
+    {"table_name": "session", "extraction_type": "incremental"},
+]
+
+# task builders
 
 
+def create_tables_sub_dag(sub_dag_name, table_name, extraction_type):
+    tables_sub_dag = BaseSubDAG(
+        sub_dag_name=sub_dag_name,
+        dag_name=DAG_ID,
+        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        start_date=MAIN_START_DATE,
+    )._build_local_dag()
+
+    slugged_table_name = table_name.replace("_", "-")
+
+    load_to_raw_task = QuintoAndarDatabricksSubmitRunOperator(
+        task_id=f"load-{slugged_table_name}-to-raw",
+        dag=tables_sub_dag,
+        json={
+            "spark_python_task": {
+                "python_file": f"{SPARK_JOBS_PATH}load_{extraction_type}_data_into_datalake_raw.py",
+                "parameters": [ENV, SOURCE, DATALAKE_BUCKET, "{{ ds }}", table_name],
+            }
+        },
+    )
+
+    load_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
+        task_id=f"load-{slugged_table_name}-to-clean",
+        dag=tables_sub_dag,
+        json={
+            "spark_python_task": {
+                "python_file": f"{SPARK_JOBS_PATH}load_{extraction_type}_data_into_datalake_clean.py",
+                "parameters": [ENV, SOURCE, DATALAKE_BUCKET, "{{ ds }}", table_name],
+            }
+        },
+    )
+
+    create_clean_external_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        task_id=f"create-{slugged_table_name}-clean-external-table",
+        dag=tables_sub_dag,
+        json={
+            "spark_python_task": {
+                "python_file": f"{SPARK_JOBS_PATH}create_external_table.py",
+                "parameters": [
+                    ENV,
+                    SOURCE,
+                    DATALAKE_BUCKET,
+                    ATHENA_QUERY_RESULT_LOCATION,
+                    "{{ ds }}",
+                    table_name,
+                    extraction_type,
+                ],
+            }
+        },
+    )
+
+    load_to_raw_task >> load_to_clean_task >> create_clean_external_table_task
+    return tables_sub_dag
+
+
+# dag definition
 dag = DAG(
-    dag_id=FULL_DAG_ID,
+    dag_id=DAG_ID,
     default_args={
         "owner": BaseDAG.DEFAULT_OWNER,
         "wait_for_downstream": False,
@@ -61,99 +115,21 @@ dag = DAG(
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
 )
 
-
-def build_table_sub_dag(
-    sub_dag_name,
-    env,
-    source,
-    schema,
-    table_name,
-    main_dag_id,
-    main_schedule_interval,
-    main_start_date,
-):
-    table_sub_dag = BaseSubDAG(
-        sub_dag_name=sub_dag_name,
-        dag_name=main_dag_id,
-        schedule_interval=main_schedule_interval,
-        start_date=main_start_date,
-    )._build_local_dag()
-    slugged_table_name = table_name.replace("_", "-")
-
-    clean_table_task = QuintoAndarDatabricksSubmitRunOperator(
-        dag=table_sub_dag,
-        task_id=f"create-clean-{slugged_table_name}-in-data-lake",
-        json={
-            "spark_python_task": {
-                "python_file": CREATE_CLEAN_TABLES_IN_DATALAKE_FILE_PATH,
-                "parameters": [table_name, DAG_ID, env, DATALAKE_BUCKET, DAG_ID],
-            }
-        },
-    )
-
-    create_clean_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
-        dag=table_sub_dag,
-        task_id=f"create-{slugged_table_name}-clean-external-table",
-        json={
-            "spark_python_task": {
-                "python_file": CREATE_EXTERNAL_TABLES_FILE_PATH,
-                "parameters": [
-                    env,
-                    DATALAKE_BUCKET,
-                    ATHENA_QUERY_RESULT_LOCATION,
-                    "clean",
-                    source,
-                    schema,
-                    "--tables",
-                    f"{table_name}",
-                ],
-            }
-        },
-    )
-
-    clean_table_task >> create_clean_external_tables_task
-    return table_sub_dag
-
-
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag,
-    task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=LIBRARIES_DESCRIPTION,
-)
-
-sauron_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="sauron-to-datalake-raw",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": LOAD_SAURON_INTO_DATALAKE_RAW_FILE_PATH,
-            "parameters": [ENV, DATALAKE_BUCKET],
-        }
-    },
-    execution_timeout=timedelta(hours=3),
+    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-file_list = FileService.list_layer_sql_files(SOURCE, "clean", schema)
-for file_name in file_list:
-    file_name = FileService.remove_file_extension(file_name)
-    slugged_file_name = file_name.replace("_", "-")
-    clean_table = BaseSubDAG.get_sub_dag_operator(
+# creating sub dags
+for job_extraction_type in JOBS_EXTRACTION_TYPE:
+    tables_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
         dag=dag,
-        sub_dag_name=f"load-{schema}-{slugged_file_name}",
-        sub_dag_func=build_table_sub_dag,
-        env=ENV,
-        source=SOURCE,
-        schema=schema,
-        table_name=file_name,
-        main_dag_id=FULL_DAG_ID,
-        main_schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        main_start_date=MAIN_START_DATE,
+        sub_dag_name=job_extraction_type["table_name"],
+        sub_dag_func=create_tables_sub_dag,
+        table_name=job_extraction_type["table_name"],
+        extraction_type=job_extraction_type["extraction_type"],
     )
-    sauron_to_datalake_raw_task >> clean_table >> terminate_cluster_task
-
-create_cluster_task >> sauron_to_datalake_raw_task
+    create_cluster_task >> tables_sub_dag_task >> terminate_cluster_task
