@@ -10,6 +10,7 @@ SELECT
     vacancy_date AS dt_vacancy,
     source,
     requested_by,
-    exit_inspection_id AS id_exit_inspection
+    exit_inspection_id AS id_exit_inspection,
+    feedback
 FROM
     datalake_terminator_raw.termination
