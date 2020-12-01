@@ -8,9 +8,9 @@ SELECT
     REPLACE(CONCAT_WS(',',COLLECT_LIST(TO_JSON(map(impression_device,reach)))), '},{', ',') AS reach,
     REPLACE(CONCAT_WS(',',COLLECT_LIST(TO_JSON(map(impression_device,inline_link_clicks)))), '},{', ',') AS inline_link_clicks,
     REPLACE(CONCAT_WS(',',COLLECT_LIST(TO_JSON(map(impression_device,spend)))), '},{', ',') AS spend,
-    year,
-    month,
-    day,
+    fi.year,
+    fi.month,
+    fi.day,
     dt_start,
     dt_stop
 FROM
@@ -22,8 +22,8 @@ JOIN
         AND fi.campaign_name = stg_dim.campaign_name
         AND fi.acc = stg_dim.account_name
 WHERE 
-    year = {year} 
-    AND month = {month} 
-    AND day = {day}
+    fi.year = {year} 
+    AND fi.month = {month} 
+    AND fi.day = {day}
 GROUP BY
     1,2,3,4,5,10,11,12,13,14
