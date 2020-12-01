@@ -1,62 +1,73 @@
-with proponent_document_dates as (
-    select
-          p.id_proponent,
-          min(if(p.ts_documentation_sent is not null, p.ts_documentation_sent, null)) as ts_first_document_sent,
-          max(if(p.ts_documentation_sent is not null, p.ts_documentation_sent, null)) as ts_last_document_sent,
-          min(if(p_aud.tenant_documentation_status = 'AnaliseCredito', ure.ts_revision, null)) as ts_first_sent_to_insurance
-        from
-          datalake_ebdb_clean.proposal p
-        left join datalake_ebdb_clean.proposal_aud p_aud
-           on p_aud.id_proposal = p.id
-        join
-          datalake_ebdb_user_revision_entity.user_revision_entity ure
-          on ure.id = p_aud.rev
-        group by
+WITH proponent_document_dates AS (
+    SELECT
+        p.id_proponent,
+        MIN(IF(p.ts_documentation_sent IS NOT NULL, p.ts_documentation_sent, NULL)) AS ts_first_document_sent,
+        MAX(IF(p.ts_documentation_sent IS NOT NULL, p.ts_documentation_sent, NULL)) AS ts_last_document_sent,
+        MIN(IF(p_aud.tenant_documentation_status = 'AnaliseCredito', ure.ts_revision, NULL)) AS ts_first_sent_to_insurance
+    FROM
+        datalake_ebdb_clean.proposal AS p
+    LEFT JOIN
+        datalake_ebdb_clean.proposal_aud AS p_aud
+            ON p_aud.id_proposal = p.id
+    JOIN
+        datalake_ebdb_user_revision_entity.user_revision_entity AS ure
+            ON ure.id = p_aud.rev
+    GROUP BY
           p.id_proponent
 ),
-user_information as (
-    with distinct_id_user_from_house as (
-      select
-        distinct id_user
-      from datalake_ebdb_clean.house
+user_information AS (
+    WITH distinct_id_user_from_house AS (
+        SELECT
+            DISTINCT id_user
+        FROM
+            datalake_ebdb_clean.house
     ),
-    distinct_id_user_from_device as (
-      select
-        distinct id_user
-      from datalake_ebdb_clean.device
-      where mobile_app = 'Inquilinos'
+    distinct_id_user_from_device AS (
+        SELECT
+            DISTINCT id_user
+        FROM
+            datalake_ebdb_clean.device
+        WHERE
+            mobile_app = 'Inquilinos'
     ),
-    distinct_id_user_from_contract as (
-      select
-        distinct id_user
-      from datalake_ebdb_clean.contract
+    distinct_id_user_from_contract AS (
+        SELECT
+            DISTINCT id_user
+        FROM
+            datalake_ebdb_clean.contract
     )
-    select
-      user.id as id_user,
-      (house_ids.id_user is not NULL) as has_house,
-      (device_ids.id_user is not NULL) as has_tenant_app,
-      (contract_ids.id_user is not NULL) as has_active_contract,
-      (
+    SELECT
+        user.id AS id_user,
+        (house_ids.id_user IS NOT NULL) AS has_house,
+        (device_ids.id_user IS NOT NULL) AS has_tenant_app,
+        (contract_ids.id_user IS NOT NULL) AS has_active_contract,
         (
-          user.id_affiliates is null
-          and user.id_photographer_data is null
-          and user.id_sales_rep is null
-          and user.id_agent_rep is null
-          and house_ids.id_user is NULL
-        ) or  contract_ids.id_user is not null
-      ) as is_tenant,
-      (user.id_photographer_data is not null) as is_photographer,
-      substring(user.main_phone, 4, 2) as main_phone_ddd
-    from datalake_ebdb_clean.user user
-    left join distinct_id_user_from_house house_ids
-      on house_ids.id_user = user.id
-    left join distinct_id_user_from_device device_ids
-      on device_ids.id_user = user.id
-    left join distinct_id_user_from_contract contract_ids
-      on contract_ids.id_user = user.id
-    group by 1, 2, 3, 4, 5, 6, 7
+          (
+            user.id_affiliates IS NULL
+            AND user.id_photographer_data IS NULL
+            AND user.id_sales_rep IS NULL
+            AND user.id_agent_rep IS NULL
+            AND house_ids.id_user IS NULL
+          )
+          OR contract_ids.id_user IS NOT NULL
+        ) AS is_tenant,
+        (user.id_photographer_data IS NOT NULL) AS is_photographer,
+        SUBSTRING(user.main_phone, 4, 2) AS main_phone_ddd
+    FROM
+        datalake_ebdb_clean.user user
+    LEFT JOIN
+        distinct_id_user_from_house AS house_ids
+            ON house_ids.id_user = user.id
+    LEFT JOIN
+        distinct_id_user_from_device AS device_ids
+            ON device_ids.id_user = user.id
+    LEFT JOIN
+        distinct_id_user_from_contract AS contract_ids
+            ON contract_ids.id_user = user.id
+    GROUP BY
+        1, 2, 3, 4, 5, 6, 7
 )
-select
+SELECT
     u.id,
     u.id_facebook,
     u.id_linkedin,
@@ -69,6 +80,10 @@ select
     u.id_state,
     u.cpf,
     u.rg,
+    CASE
+        WHEN u.cpf RLIKE '([0-9]{3})(.)([0-9]{3})(.)([0-9]{3})(-)([0-9]{2})' THEN 'CPF'
+        WHEN u.cpf RLIKE '([0-9]{2})(.)([0-9]{3})(.)([0-9]{3})(\/)([0-9]{4})(-)([0-9]{2})' THEN 'CNPJ'
+    END AS personal_document_type,
     u.gender,
     u.email,
     u.alternative_email,
@@ -97,19 +112,22 @@ select
     ui.is_photographer,
     u.is_active,
     u.is_blocked,
-    case
-      when date_format(u.dt_birth, 'y') < 100 then u.dt_birth + interval 1900 years
-      when date_format(u.dt_birth, 'y') < 1000 then u.dt_birth + interval 1000 years
-      else u.dt_birth
-    end as dt_birth,
+    CASE
+        WHEN DATE_FORMAT(u.dt_birth, 'y') < 100 THEN u.dt_birth + INTERVAL 1900 YEARS
+        WHEN DATE_FORMAT(u.dt_birth, 'y') < 1000 THEN u.dt_birth + INTERVAL 1000 YEARS
+        ELSE u.dt_birth
+    END AS dt_birth,
     u.ts_click_anuncie,
     pdd.ts_first_document_sent,
     pdd.ts_last_document_sent,
     pdd.ts_first_sent_to_insurance,
     u.ts_created,
     u.ts_updated
-from datalake_ebdb_clean.user u
-left join proponent_document_dates pdd
-    on pdd.id_proponent = u.id
-left join user_information ui
-    on ui.id_user = u.id
+FROM
+    datalake_ebdb_clean.user AS u
+LEFT JOIN
+    proponent_document_dates AS pdd
+        ON pdd.id_proponent = u.id
+LEFT JOIN
+    user_information AS ui
+        ON ui.id_user = u.id
