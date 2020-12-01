@@ -8,6 +8,9 @@ SELECT
     REPLACE(CONCAT_WS(',',COLLECT_LIST(TO_JSON(map(impression_device,reach)))), '},{', ',') AS reach,
     REPLACE(CONCAT_WS(',',COLLECT_LIST(TO_JSON(map(impression_device,inline_link_clicks)))), '},{', ',') AS inline_link_clicks,
     REPLACE(CONCAT_WS(',',COLLECT_LIST(TO_JSON(map(impression_device,spend)))), '},{', ',') AS spend,
+    year,
+    month,
+    day,
     dt_start,
     dt_stop
 FROM
@@ -23,4 +26,4 @@ WHERE
     AND month = {month} 
     AND day = {day}
 GROUP BY
-    1,2,3,4,5,10,11
+    1,2,3,4,5,10,11,12,13,14

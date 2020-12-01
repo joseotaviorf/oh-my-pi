@@ -5,11 +5,14 @@ WITH distinct_dims AS (
         adset_name,
         campaign_name,
         acc AS account_name,
-        is_test_campaign
+        is_test_campaign,
+        year,
+        month,
+        day
     FROM 
         datalake_marketing_costs.facebook_insights
     GROUP BY
-        2,3,4,5,6
+        2,3,4,5,6,7,8,9
 )
 
 SELECT
