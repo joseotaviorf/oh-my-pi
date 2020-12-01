@@ -105,7 +105,7 @@ sale_closing AS (
     ),
     fact_oa AS (
     SELECT
-        DATE_TRUNCT('week', DATE(sk_offer_accepted_date)) AS week_start,
+        DATE_TRUNC('week', DATE(sk_offer_accepted_date)) AS week_start,
         DATE(sk_offer_accepted_date) AS date,
         sk_offer
     FROM
