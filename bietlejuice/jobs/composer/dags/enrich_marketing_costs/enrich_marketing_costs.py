@@ -18,6 +18,7 @@ from bietlejuice.jobs.composer.dags.enrich_marketing_costs.facebook_sub_dag impo
     FacebookSubDAG,
 )
 
+
 PARTITION_COLS = {
     "google": ["acc", "load_date"],
     "criteo_campaigns": ["year", "month", "day"],
@@ -60,6 +61,8 @@ ACCOUNTS_NAME_MAPPING = json.loads(Variable.get("facebook_insights_account_names
 ) = DatalakeMetastoreService.get_layer_info(
     ENV, TARGET, DATALAKE_BUCKET, LayerEnum.ENRICH.value
 )
+
+EXECUTION_TIMEOUT_HOURS = 3
 
 
 def get_database_name(media_name):
@@ -113,6 +116,7 @@ for media_name in media_names:
             spark_job_paths=BASE_SPARK_JOBS_PATH,
             athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
             start_date=MAIN_START_DATE,
+            execution_timeout_hours=EXECUTION_TIMEOUT_HOURS,
         )
         enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(
             dag,
