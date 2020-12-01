@@ -12,23 +12,32 @@ with google_consolidated_cost as (
             fg.sk_date,
             coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name) as campaign_name,
             coalesce(dgk.account_name, dga.account_name, dgc.account_name) as account_name,
+            coalesce(dgk.report_type, dga.report_type, dgc.report_type) as report_type,
+            coalesce(gtatf.flag, 'other') as ad_type,
             case when fg.sk_keyword <> -1 then
                 dgk.keyword_name || '_' || lower(left(dgk.match_type, 1))
-                else cast(dga.adgroup_name as varchar) end
+                else cast(dga.ad_group_name as varchar) end
                 as utm_term,
-            cast(dga.ad_id as varchar) as utm_content,
+            cast(dga.id_ad as varchar) as utm_content,
             fg.desktop_cost,
-            fg.mobile_cost
-        from marketing.fact_google_daily_cost_attributions fg
-        left join marketing.dim_google_keyword dgk
-            on dgk.sk_keyword = fg.sk_keyword
-        left join marketing.dim_google_ad dga
-            on dga.sk_ad = fg.sk_ad
-        left join marketing.dim_google_campaign dgc
-            on dgc.sk_campaign = fg.sk_campaign
+            fg.mobile_cost,
+            fg.total_cost
+        from marketing_costs.fact_google_daily_cost_attributions fg
+            left join marketing_costs.dim_google_keyword dgk
+                on dgk.sk_keyword = fg.sk_keyword
+            left join marketing_costs.dim_google_ad dga
+                on dga.sk_ad = fg.sk_ad
+            left join marketing_costs.dim_google_campaign dgc
+                on dgc.sk_campaign = fg.sk_campaign
+            left join datalake_raw.gsheets_taxonomy_ad_type_flags gtatf 
+                on dga.ad_type = gtatf.ad_type 
         where dgk.is_test_campaign is not true
-          and dga.is_test_campaign is not true
-          and dgc.is_test_campaign is not true
+        and dga.is_test_campaign is not true
+        and dgc.is_test_campaign is not true
+        and (gtatf.flag <> 'other' 
+            or gtatf.flag is null 
+            or (dga.account_name = 'quintoandar_sao_paulo' and fg.sk_date < 20201118)
+            )
     ),
     manual_google_costs as (
         with t_prep as (
@@ -67,7 +76,9 @@ with google_consolidated_cost as (
             as desktop_cost,
         case when m.sk_date is not null then m.mobile_cost
             else g.mobile_cost end
-            as mobile_cost
+            as mobile_cost,
+        g.report_type as report_type,
+        g.ad_type as ad_type
     from t_google g
     full outer join manual_google_costs m
         on m.sk_date = g.sk_date
@@ -196,7 +207,9 @@ campaigns_full as (
                 ff.desktop_spend as desktop_cost,
                 ff.mobile_spend as mobile_cost,
                 ff.other_spend as other_cost,
-                null::numeric(16,4) as total_cost
+                null::numeric(16,4) as total_cost,
+                null as report_type,
+                null as ad_type
             from marketing.fact_facebook_daily_cost_attributions ff
                 join marketing.dim_facebook_ad df
                     on ff.sk_ad = df.sk_ad and df.is_test_campaign is not true
@@ -228,7 +241,9 @@ campaigns_full as (
             gcc.desktop_cost as desktop_cost,
             gcc.mobile_cost as mobile_cost,
             null::numeric(16,4) as other_cost,
-            null::numeric(16,4) as total_cost
+            null::numeric(16,4) as total_cost,
+            gcc.report_type,
+            gcc.ad_type
             from google_consolidated_cost gcc
             left join gg_hist_list_affiliates hl
                 on hl.sk_date = gcc.sk_date
@@ -239,7 +254,9 @@ campaigns_full as (
         -- FACEBOOK & GOOGLE AFFILIATES' HISTORIC COST
         UNION
             select
-                *
+                *,
+                null as report_type,
+                null as ad_type
             from
                 affiliates_cost
         --TROVIT
@@ -250,7 +267,7 @@ campaigns_full as (
                 'fact_trovit_daily_cost_attributions'::varchar as fact_cost,
                 dtc.campaign_name,
                 null::varchar as campaign_city,
-                account_name,
+                null::varchar(512) as account_name,
                 lower(dtc.campaign_name) as campaign_name_l,
                 null::varchar(512) as account_name_l,
                 dtc.campaign_name as utm_campaign,
@@ -259,7 +276,9 @@ campaigns_full as (
                 ftc.desktop_cost as desktop_cost,
                 ftc.mobile_cost as mobile_cost,
                 null::numeric(16,4) as other_cost,
-                null::numeric(16,4) as total_cost
+                null::numeric(16,4) as total_cost,
+                null as report_type,
+                null as ad_type
             from
                 marketing.fact_trovit_daily_cost_attributions ftc
             left join
@@ -276,7 +295,7 @@ campaigns_full as (
                 'fact_mitula_daily_cost_attributions'::varchar as fact_cost,
                 campaign_name,
                 null::varchar as campaign_city,
-                account_name,
+                null::varchar(512) as account_name,
                 lower(campaign_name) as campaign_name_l,
                 null::varchar(512) as account_name_l,
                 campaign_name as utm_campaign,
@@ -285,7 +304,9 @@ campaigns_full as (
                 fm.desktop_cost as desktop_cost,
                 fm.mobile_cost as mobile_cost,
                 null::numeric(16,4) as other_cost,
-                null::numeric(16,4) as total_cost
+                null::numeric(16,4) as total_cost,
+                null as report_type,
+                null as ad_type
             from
                 marketing.fact_mitula_daily_cost_attributions fm
             join marketing.dim_mitula_campaign dm
@@ -308,7 +329,9 @@ campaigns_full as (
                 null::numeric(16,4) AS desktop_cost,
                 null::numeric(16,4) AS mobile_cost,
                 null::numeric(16,4) AS other_cost,
-                fct.cost AS total_cost
+                fct.cost AS total_cost,
+                null as report_type,
+                null as ad_type
             FROM marketing_costs.fact_criteo_daily_cost_attributions fct
                 LEFT JOIN marketing_costs.dim_criteo_campaign dct
                 ON fct.sk_criteo_campaign = dct.sk_criteo_campaign
@@ -330,12 +353,14 @@ campaigns_full as (
                 null::numeric(16,4) as desktop_cost,
                 null::numeric(16,4) as mobile_cost,
                 null::numeric(16,4) as other_cost,
-                sum(cost) as total_cost
+                sum(cost) as total_cost,
+                null as report_type,
+                null as ad_type
             from marketing.fact_rtb_daily_cost_attributions frt
             left join marketing.dim_rtb_sub_campaign drt
                 on frt.sk_sub_campaign = drt.sk_sub_campaign
             where frt.sk_date >= 20180101
-            group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+            group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17
         -- TWITTER
         UNION
             select
@@ -353,7 +378,9 @@ campaigns_full as (
                 sum(desktop_cost) as desktop_cost,
                 sum(mobile_cost) as mobile_cost,
                 sum(other_cost) as other_cost,
-                null::numeric(16,4) as total_cost
+                null::numeric(16,4) as total_cost,
+                null as report_type,
+                null as ad_type
             from marketing.fact_twitter_daily_cost_attributions ftw
             join marketing.dim_twitter_campaign dtwc
                 on ftw.sk_campaign = dtwc.sk_campaign
@@ -373,18 +400,20 @@ campaigns_full as (
                 lower(dlc.campaign_name) AS campaign_name_l,
                 lower(dlcc.account_name) AS account_name_l,
                 dlc.campaign_name as utm_campaign,
-                null::varchar AS utm_term,
-                null::varchar AS utm_content,
-                null::numeric(16,4) AS desktop_cost,
-                null::numeric(16,4) AS mobile_cost,
-                null::numeric(16,4) AS other_cost,
-                sum(total_cost) AS total_cost
-            FROM marketing_costs.fact_linkedin_daily_cost_attributions fli
-            JOIN marketing_costs.dim_linkedin_campaign dlc
-                ON dlc.sk_campaign = fli.sk_campaign
-            JOIN marketing_costs.dim_linkedin_campaign_group dlcc
-                ON dlcc.sk_campaign_group = fli.sk_campaign_group
-            GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+                null::varchar as utm_term,
+                null::varchar as utm_content,
+                null::numeric(16,4) as desktop_cost,
+                null::numeric(16,4) as mobile_cost,
+                null::numeric(16,4) as other_cost,
+                sum(total_cost) as total_cost,
+                null as report_type,
+                null as ad_type
+            from marketing_costs.fact_linkedin_daily_cost_attributions fli
+            join marketing_costs.dim_linkedin_campaign dlc
+                on dlc.sk_campaign = fli.sk_campaign
+            join marketing_costs.dim_linkedin_campaign_group dlcc
+                on dlcc.sk_campaign_group = fli.sk_campaign_group
+            group by 1,2,3,4,5,6,7,8,9,10,11
 
       )
       SELECT NULLIF(REGEXP_SUBSTR(campaign_name,'^([[:alpha:]]\\d{3}[[:alpha:]])'), '')::varchar as rule_id, * FROM sources
@@ -409,7 +438,9 @@ campaigns_full as (
         -- Other Cost Shared
         sh.other_cost * coalesce(r.share, 1)  as other_cost,
         -- Total Cost Shared
-        sh.total_cost * coalesce(r.share, 1)  as total_cost
+        sh.total_cost * coalesce(r.share, 1)  as total_cost,
+        sh.report_type,
+        sh.ad_type
       FROM sources_to_be_shared sh
         LEFT JOIN staging.sharing_rules_marketing_daily_costs r
             ON sh.sk_date = r.sk_date
@@ -434,7 +465,9 @@ campaigns_full as (
     desktop_cost,
     mobile_cost,
     other_cost,
-    total_cost
+    total_cost,
+    report_type,
+    ad_type
   from shared_costs
 ),
 taxonomy_by_platform as (
@@ -442,7 +475,7 @@ taxonomy_by_platform as (
         txmc.*,
         s.mkt_platform,
         cast(coalesce(nullif(trim(SPLIT_PART(txmc.cost_factor, ';', s.i)), ''), '1.0') as float) as fator_custo
-        from datalake_raw.gsheets_taxonomy_mkt_cost txmc
+        from datalake_raw.gsheets_taxonomy_mkt_cost_new txmc
         cross join (
             select 1::integer, 'Desktop'::varchar
             union all
@@ -636,15 +669,15 @@ cost_taxonomy as (
              when campaign_city in ('fln', 'florianopolis') then 'Florianópolis'
              when campaign_city in ('bsb', 'brasilia') then 'Brasília'
         end as campaign_city_matched,
-        tp.campaign_origin_aquisition,
-        tp.mkt_category,
-        tp.mkt_flow,
-        tp.mkt_completion,
-        tp.mkt_origin,
-        tp.mkt_channel,
-        tp.mkt_medium,
-        tp.mkt_source,
-        tp.mkt_platform,
+        coalesce(tp.campaign_origin_aquisition, 'Not Mapped') as campaign_origin_aquisition,
+        coalesce(tp.mkt_category, 'Not Mapped') as mkt_category,
+        coalesce(tp.mkt_flow, 'Not Mapped') as mkt_flow,
+        coalesce(tp.mkt_completion, 'Not Mapped') as mkt_completion,
+        coalesce(tp.mkt_origin, 'Not Mapped') as mkt_origin,
+        coalesce(tp.mkt_channel, 'Not Mapped') as mkt_channel,
+        coalesce(tp.mkt_medium, 'Not Mapped') as mkt_medium,
+        coalesce(tp.mkt_source, 'Not Mapped') as mkt_source,
+        coalesce(tp.mkt_platform, 'Not Mapped') as mkt_platform,
         tp.fator_custo,
         cf.utm_campaign,
         cf.utm_term,
@@ -654,16 +687,22 @@ cost_taxonomy as (
                 case when tp.mkt_platform = 'Mobile' then mobile_cost
                      when tp.mkt_platform = 'Desktop' then desktop_cost
                      when tp.mkt_platform = 'Other' then other_cost
+                     when tp.mkt_platform is null and total_cost is null 
+                        then coalesce(mobile_cost, 0) + 
+                             coalesce(desktop_cost, 0) + 
+                             coalesce(other_cost, 0)
                 end
             else total_cost
-        end * cast(coalesce(tp.fator_custo, '0') as numeric(3,2)) as cost,
+        end * cast(coalesce(tp.fator_custo, '1') as numeric(3,2)) as cost,
         -- Funnel side is extracted from taxonomy
-        tp.side
+        coalesce(tp.side, 'Not Mapped') as side
     from campaigns_full cf
         left join datalake_raw.gsheets_marketing_cost_campaign_city as mccc
             on lower(mccc.campaign_name) = cf.campaign_name_l
         left join taxonomy_by_platform as tp
             on coalesce(cf.account_name, '') = coalesce(tp.account_name, '')
+                and coalesce(cf.report_type, '') = coalesce(tp.report_type, '')
+                and coalesce(cf.ad_type,'') = coalesce(tp.ad_type, '')
                 and cf.fact_cost = tp.fact_cost
                 and cf.origin = tp.origin
         and cf.campaign_origin_aquisition = tp.campaign_origin_aquisition
