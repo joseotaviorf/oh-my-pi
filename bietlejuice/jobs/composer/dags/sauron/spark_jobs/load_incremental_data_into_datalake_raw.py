@@ -68,7 +68,7 @@ if __name__ == "__main__":
     partition_cols = list(partitions.keys())
 
     # incremental load of a Postgres db type to our data lake with Spark
-    layer = LayerEnum.RAW
+    layer = LayerEnum.RAW.value
     raw_query = FileService().get_query_from_file_name(
         f"{QUERIES_DATALAKE_PATH}{source}/{layer}/{table_name}.sql"
     )

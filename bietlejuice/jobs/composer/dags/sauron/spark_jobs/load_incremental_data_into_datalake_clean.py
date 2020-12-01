@@ -57,7 +57,7 @@ if __name__ == "__main__":
     }
     partition_cols = list(partitions.keys())
 
-    layer = LayerEnum.CLEAN
+    layer = LayerEnum.CLEAN.value
     clean_query = FileService().get_query_from_file_name(
         f"{QUERIES_DATALAKE_PATH}{source}/{layer}/{table_name}.sql"
     )
