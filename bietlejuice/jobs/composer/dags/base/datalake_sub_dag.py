@@ -1,9 +1,13 @@
+from datetime import timedelta
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
 
 from bietlejuice.jobs.composer.base.airflow import BaseSubDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
+
+
+DEFAULT_EXECUTION_TIMEOUT_HOURS = 2
 
 
 class DatalakeSubDAG(BaseSubDAG):
@@ -25,6 +29,7 @@ class DatalakeSubDAG(BaseSubDAG):
         schedule_interval=None,
         target_database_base_name=None,
         spark_params={},
+        execution_timeout_hours=DEFAULT_EXECUTION_TIMEOUT_HOURS,
     ):
         """
         :param dag_id: main dag id to attach subdag to
@@ -55,6 +60,7 @@ class DatalakeSubDAG(BaseSubDAG):
             else database_base_name
         )
         self.spark_params = spark_params
+        self.execution_timeout_hours = execution_timeout_hours
 
         if layer not in [LayerEnum.CLEAN, LayerEnum.ENRICH]:
             raise ValueError(f"m=__init__, layer={layer}, msg=The layer is invalid.")
@@ -81,6 +87,7 @@ class DatalakeSubDAG(BaseSubDAG):
         :param test_ods_migration: just to be compatible with the base class
         :param partitions: list of columns to partition table
         :param is_incremental: if this table uses incremental load type
+        :param extra_query_template_params: filter parameters applied to the query besides year, month and day
         :return: the subdag created
         """
 
@@ -118,6 +125,7 @@ class DatalakeSubDAG(BaseSubDAG):
                     ],
                 }
             },
+            execution_timeout=timedelta(hours=self.execution_timeout_hours),
         )
 
         create_external_table = QuintoAndarDatabricksSubmitRunOperator(
@@ -138,6 +146,7 @@ class DatalakeSubDAG(BaseSubDAG):
                     ],
                 }
             },
+            execution_timeout=timedelta(hours=self.execution_timeout_hours),
         )
 
         load_table >> create_external_table
