@@ -1,44 +1,45 @@
-with share_local_holidays_by_city_group as (
-with holidays_by_city_name as (
-	select distinct
+WITH share_local_holidays_by_city_group AS (
+WITH holidays_by_city_name AS (
+	SELECT DISTINCT
 		dd.date,
 		dd.week_start,
-		coalesce(hs.weekday_name, dd.weekday_name) as weekday_name,
-		coalesce(nullif(lh.city_group, ''), dr.city_group) as city_group,
-		coalesce(nullif(lh.city_name, ''), dr.city_name) as city_name,
-		coalesce(max(cast(replace(cs.share,',','') as float)), 0) as share_city_name,
+		COALESCE(hs.weekday_name, dd.weekday_name) AS weekday_name,
+		NULLIF(hs.mkt_channel, '') AS mkt_channel,
+		COALESCE(NULLIF(lh.city_group, ''), dr.city_group) AS city_group,
+		COALESCE(NULLIF(lh.city_name, ''), dr.city_name) AS city_name,
+		COALESCE(MAX(CAST(REPLACE(cs.share,',','') AS FLOAT)), 0) AS share_city_name,
 		CASE
 			WHEN dd.is_brz_holiday = 'Holiday'
 			OR NULLIF(lh.city_group, '') IS NOT NULL
 			OR NULLIF(lh.short_region_name, '') IS NOT NULL THEN CAST(REPLACE(hs.prospect,',','') AS FLOAT)
-			 else null end as prospect_share_holiday,
+			 ELSE NULL END AS prospect_share_holiday,
 		CASE
 			WHEN dd.is_brz_holiday = 'Holiday' 
 			OR NULLIF(lh.city_group, '') IS NOT NULL
 			OR NULLIF(lh.short_region_name, '') IS NOT NULL THEN CAST(REPLACE(hs.qualified,',','') AS FLOAT)
-			 else null end as qualified_share_holiday,
+			 ELSE NULL END AS qualified_share_holiday,
 		CASE
 			WHEN dd.is_brz_holiday = 'Holiday' 
 			OR NULLIF(lh.city_group, '') IS NOT NULL
 			OR NULLIF(lh.short_region_name, '') IS NOT NULL THEN CAST(REPLACE(hs.opportunity,',','') AS FLOAT)
-			 else null end as opportunity_share_holiday,
+			 ELSE NULL END AS opportunity_share_holiday,
 		CASE
 			WHEN dd.is_brz_holiday = 'Holiday' 
 			OR NULLIF(lh.city_group, '') IS NOT NULL
 			OR NULLIF(lh.short_region_name, '') IS NOT NULL THEN CAST(REPLACE(hs.first_listings,',','') AS FLOAT)
-			 else null end as first_listings_share_holiday
-	from dim_date dd
-	cross join dim_region dr
-	left join datalake_raw.gsheets_local_holidays lh
-	  ON dd.date = DATE(REPLACE(lh.date,'-','')
+			 ELSE NULL END AS first_listings_share_holiday
+	FROM dim_date dd
+	CROSS JOIN dim_region dr
+	LEFT JOIN datalake_raw.gsheets_local_holidays lh
+	  ON dd.date = DATE(REPLACE(lh.date,'-',''))
 	  AND (lh.short_region_name = dr.short_region_name
 	  	OR lh.city_group = dr.city_group)
-	left join datalake_raw.gsheets_city_share cs
-	  on coalesce(nullif(lh.city_name, ''), dr.city_name) = nullif(cs.city_name, '')
-	left join datalake_raw.gsheets_weekday_holiday_share hs
+	LEFT JOIN datalake_raw.gsheets_city_share cs
+	  ON COALESCE(NULLIF(lh.city_name, ''), dr.city_name) = NULLIF(cs.city_name, '')
+	LEFT JOIN datalake_raw.gsheets_weekday_holiday_share_supply hs
 	  ON hs.weekday_name = dd.weekday_name
-	where dd.date between '2018-12-31' and current_date + interval '6 months'
-	group by dd.date,
+	WHERE dd.date BETWEEN '2018-12-31' AND CURRENT_DATE + INTERVAL '6 months'
+	GROUP BY dd.date,
 		dd.week_start,
 		lh.city_group,
 		lh.short_region_name,
@@ -48,6 +49,7 @@ with holidays_by_city_name as (
 		hs.weekday_name,
 		dd.weekday_name,
 		dd.is_brz_holiday,
+		hs.mkt_channel,
 		hs.prospect,
 		hs.qualified,
 		hs.opportunity,
@@ -57,59 +59,60 @@ with holidays_by_city_name as (
 		date,
 		week_start,
 		weekday_name,
+		mkt_channel,
 		city_group,
-		sum(share_city_name * coalesce(prospect_share_holiday,1)) as share_holiday_prospect,
-		sum(share_city_name * coalesce(qualified_share_holiday,1)) as share_holiday_qualified,
-		sum(share_city_name * coalesce(opportunity_share_holiday,1)) as share_holiday_opportunity,
-		sum(share_city_name * coalesce(first_listings_share_holiday,1)) as share_holiday_first_listings
-	from holidays_by_city_name
-	where city_group is not null
-	group by 1, 2, 3, 4
- ), final_shares as (
-select distinct
+		SUM(share_city_name * COALESCE(prospect_share_holiday,1)) AS share_holiday_prospect,
+		SUM(share_city_name * COALESCE(qualified_share_holiday,1)) AS share_holiday_qualified,
+		SUM(share_city_name * COALESCE(opportunity_share_holiday,1)) AS share_holiday_opportunity,
+		SUM(share_city_name * COALESCE(first_listings_share_holiday,1)) AS share_holiday_first_listings
+	FROM holidays_by_city_name
+	WHERE city_group IS NOT NULL
+	GROUP BY 1, 2, 3, 4, 5	
+), final_shares AS (
+SELECT DISTINCT
 	lhc.date,
 	lhc.week_start,
 	wscs.city_group,
 	wscs.mkt_channel,
 	wscs.lead_context,
-	cast(replace(wscs.prospect,',','') as float) as final_share_wo_holiday_prospect,
-	cast(replace(wscs.prospect,',','') as float) * lhc.share_holiday_prospect as final_share_prospect,
-	cast(replace(wscs.qualified,',','') as float) as final_share_wo_holiday_qualified,
-	cast(replace(wscs.qualified,',','') as float) * lhc.share_holiday_qualified as final_share_qualified,
-	cast(replace(wscs.opportunity,',','') as float) as final_share_wo_holiday_opportunity,
-	cast(replace(wscs.opportunity,',','') as float) * lhc.share_holiday_opportunity as final_share_opportunity,
-	cast(replace(wscs.first_listing,',','') as float) as final_share_wo_holiday_first_listings,
-	cast(replace(wscs.first_listing,',','') as float) * lhc.share_holiday_first_listings as final_share_first_listings
-from share_local_holidays_by_city_group lhc
-left join datalake_raw.gsheets_weekday_supply_channel_share wscs
-  on wscs.weekday = lhc.weekday_name and wscs.city_group = lhc.city_group 
-), diff_w_and_wo_holiday_share as (
-select
+	CAST(REPLACE(wscs.prospect,',','') AS FLOAT) AS final_share_wo_holiday_prospect,
+	CAST(REPLACE(wscs.prospect,',','') AS FLOAT) * lhc.share_holiday_prospect AS final_share_prospect,
+	CAST(REPLACE(wscs.qualified,',','') AS FLOAT) AS final_share_wo_holiday_qualified,
+	CAST(REPLACE(wscs.qualified,',','') AS FLOAT) * lhc.share_holiday_qualified AS final_share_qualified,
+	CAST(REPLACE(wscs.opportunity,',','') AS FLOAT) AS final_share_wo_holiday_opportunity,
+	CAST(REPLACE(wscs.opportunity,',','') AS FLOAT) * lhc.share_holiday_opportunity AS final_share_opportunity,
+	CAST(REPLACE(wscs.first_listing,',','') AS FLOAT) AS final_share_wo_holiday_first_listings,
+	CAST(REPLACE(wscs.first_listing,',','') AS FLOAT) * lhc.share_holiday_first_listings AS final_share_first_listings
+FROM share_local_holidays_by_city_group lhc
+LEFT JOIN datalake_raw.gsheets_weekday_supply_channel_share wscs
+  ON wscs.weekday = lhc.weekday_name AND wscs.city_group = lhc.city_group AND wscs.mkt_channel = lhc.mkt_channel
+), diff_w_and_wo_holiday_share AS (
+SELECT
 	fsh.date,
 	fsh.week_start,
 	fsh.city_group,
 	fsh.mkt_channel,
 	gwvs.mkt_origin,
 	fsh.lead_context,
-	sum(fsh.final_share_prospect * cast(replace(gwvs.prospect,',','') as float)) as prospect_1,
-	sum(fsh.final_share_prospect * cast(replace(gwvs.prospect,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.mkt_channel, gwvs.mkt_origin, fsh.lead_context) as total_prospect_daily,
-	sum(fsh.final_share_wo_holiday_prospect * cast(replace(gwvs.prospect,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.mkt_channel, gwvs.mkt_origin, fsh.lead_context) as total_prospect_daily_wo_holiday,
-	sum(fsh.final_share_qualified * cast(replace(gwvs.qualified,',','') as float)) as qualified_1,
-	sum(fsh.final_share_qualified * cast(replace(gwvs.qualified,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.mkt_channel, gwvs.mkt_origin, fsh.lead_context) as total_qualified_daily,
-	sum(fsh.final_share_wo_holiday_qualified * cast(replace(gwvs.qualified,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.mkt_channel, gwvs.mkt_origin, fsh.lead_context) as total_qualified_daily_wo_holiday,
-	sum(fsh.final_share_opportunity * cast(replace(gwvs.opportunity,',','') as float)) as opportunity_1,
-	sum(fsh.final_share_opportunity * cast(replace(gwvs.opportunity,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.mkt_channel, gwvs.mkt_origin, fsh.lead_context) as total_opportunity_daily,
-	sum(fsh.final_share_wo_holiday_opportunity * cast(replace(gwvs.opportunity,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.mkt_channel, gwvs.mkt_origin, fsh.lead_context) as total_opportunity_daily_wo_holiday,
-	sum(fsh.final_share_first_listings * cast(replace(gwvs.first_listing,',','') as float)) as first_listing_1,
-	sum(fsh.final_share_first_listings * cast(replace(gwvs.first_listing,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.mkt_channel, gwvs.mkt_origin, fsh.lead_context) as total_first_listing_daily,
-	sum(fsh.final_share_wo_holiday_first_listings * cast(replace(gwvs.first_listing,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.mkt_channel, gwvs.mkt_origin, fsh.lead_context) as total_first_listing_daily_wo_holiday
-from final_shares fsh
-join datalake_raw.gsheets_week_volumes_supply gwvs
-  on fsh.mkt_channel = gwvs.mkt_channel
-  	and fsh.lead_context = gwvs.lead_context
-  	and fsh.week_start = gwvs.week_start
-  	and fsh.city_group = gwvs.city_group
-group by 1,2,3,4,5,6,
+	SUM(fsh.final_share_prospect * CAST(REPLACE(gwvs.prospect,',','') AS FLOAT)) AS prospect_1,
+	SUM(fsh.final_share_prospect * CAST(REPLACE(gwvs.prospect,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.mkt_channel, gwvs.mkt_origin, fsh.lead_context) AS total_prospect_daily,
+	SUM(fsh.final_share_wo_holiday_prospect * CAST(REPLACE(gwvs.prospect,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.mkt_channel, gwvs.mkt_origin, fsh.lead_context) AS total_prospect_daily_wo_holiday,
+	SUM(fsh.final_share_qualified * CAST(REPLACE(gwvs.qualified,',','') AS FLOAT)) AS qualified_1,
+	SUM(fsh.final_share_qualified * CAST(REPLACE(gwvs.qualified,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.mkt_channel, gwvs.mkt_origin, fsh.lead_context) AS total_qualified_daily,
+	SUM(fsh.final_share_wo_holiday_qualified * CAST(REPLACE(gwvs.qualified,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.mkt_channel, gwvs.mkt_origin, fsh.lead_context) AS total_qualified_daily_wo_holiday,
+	SUM(fsh.final_share_opportunity * CAST(REPLACE(gwvs.opportunity,',','') AS FLOAT)) AS opportunity_1,
+	SUM(fsh.final_share_opportunity * CAST(REPLACE(gwvs.opportunity,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.mkt_channel, gwvs.mkt_origin, fsh.lead_context) AS total_opportunity_daily,
+	SUM(fsh.final_share_wo_holiday_opportunity * CAST(REPLACE(gwvs.opportunity,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.mkt_channel, gwvs.mkt_origin, fsh.lead_context) AS total_opportunity_daily_wo_holiday,
+	SUM(fsh.final_share_first_listings * CAST(REPLACE(gwvs.first_listing,',','') AS FLOAT)) AS first_listing_1,
+	SUM(fsh.final_share_first_listings * CAST(REPLACE(gwvs.first_listing,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.mkt_channel, gwvs.mkt_origin, fsh.lead_context) AS total_first_listing_daily,
+	SUM(fsh.final_share_wo_holiday_first_listings * CAST(REPLACE(gwvs.first_listing,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.mkt_channel, gwvs.mkt_origin, fsh.lead_context) AS total_first_listing_daily_wo_holiday
+FROM final_shares fsh
+JOIN datalake_raw.gsheets_week_volumes_supply gwvs
+  ON fsh.mkt_channel = gwvs.mkt_channel
+  	AND fsh.lead_context = gwvs.lead_context
+  	AND fsh.week_start = gwvs.week_start
+  	AND fsh.city_group = gwvs.city_group
+GROUP BY 1, 2, 3, 4, 5, 6,
 	fsh.final_share_prospect,
 	gwvs.prospect,
 	fsh.final_share_wo_holiday_prospect,
@@ -122,7 +125,7 @@ group by 1,2,3,4,5,6,
 	fsh.final_share_first_listings,
 	gwvs.first_listing,
 	fsh.final_share_wo_holiday_first_listings
-), daily_target_shares as (
+), daily_target_shares AS (
 SELECT 
 	date,
 	week_start,
@@ -130,78 +133,78 @@ SELECT
 	mkt_channel,
 	mkt_origin,
 	lead_context,
-	prospect_1 + case when total_prospect_daily > 0 then (total_prospect_daily_wo_holiday - total_prospect_daily) * prospect_1 / total_prospect_daily else 0 end as prospect,
-	qualified_1 + case when total_qualified_daily > 0 then (total_qualified_daily_wo_holiday - total_qualified_daily) * qualified_1 / total_qualified_daily else 0 end as qualified,
-	opportunity_1 + case when total_opportunity_daily > 0 then (total_opportunity_daily_wo_holiday - total_opportunity_daily) * opportunity_1 / total_opportunity_daily else 0 end as opportunity,
-	first_listing_1 + case when total_first_listing_daily > 0 then (total_first_listing_daily_wo_holiday - total_first_listing_daily) * first_listing_1 / total_first_listing_daily else 0 end as first_listing
-from diff_w_and_wo_holiday_share 
-), gsheets_supply_target_adjusted as (
-WITH
-supply_targets AS (
-	SELECT * FROM datalake_raw.gsheets_supply_targets_2021 
-    UNION ALL
-    	SELECT * FROM datalake_raw.gsheets_supply_targets_2020 
-    UNION ALL
-        SELECT * FROM datalake_raw.gsheets_supply_targets_2019
-)
+	prospect_1 + CASE WHEN total_prospect_daily > 0 THEN (total_prospect_daily_wo_holiday - total_prospect_daily) * prospect_1 / total_prospect_daily ELSE 0 END AS prospect,
+	qualified_1 + CASE WHEN total_qualified_daily > 0 THEN (total_qualified_daily_wo_holiday - total_qualified_daily) * qualified_1 / total_qualified_daily ELSE 0 END AS qualified,
+	opportunity_1 + CASE WHEN total_opportunity_daily > 0 THEN (total_opportunity_daily_wo_holiday - total_opportunity_daily) * opportunity_1 / total_opportunity_daily ELSE 0 END AS opportunity,
+	first_listing_1 + CASE WHEN total_first_listing_daily > 0 THEN (total_first_listing_daily_wo_holiday - total_first_listing_daily) * first_listing_1 / total_first_listing_daily ELSE 0 END AS first_listing
+FROM diff_w_and_wo_holiday_share 
+), gsheets_supply_target_adjusted AS (
+	WITH
+	supply_targets AS (
+		SELECT * FROM datalake_raw.gsheets_supply_targets_2021 
+	    UNION ALL
+	    	SELECT * FROM datalake_raw.gsheets_supply_targets_2020 
+	    UNION ALL
+	        SELECT * FROM datalake_raw.gsheets_supply_targets_2019
+	)
+	SELECT
+	  	CAST(REPLACE(date,'-','') AS date) AS date,
+		CAST(REPLACE(week_start,'-','') AS date) AS week_start,
+		NULLIF(city_group, '') AS city_group,
+		NULLIF(supply_channel, '') AS mkt_channel,
+		NULLIF(supply_origin, '') AS mkt_origin,
+		NULLIF(lead_context, '') AS lead_context,
+		CAST(REPLACE(prospects,',','') AS FLOAT) AS prospect,
+		CAST(REPLACE(qualifieds,',','') AS FLOAT) AS qualified,
+		CAST(REPLACE(opportunities,',','') AS FLOAT) AS opportunity,
+		CAST(REPLACE(first_listings,',','') AS FLOAT) AS first_listing
+	FROM supply_targets
+	WHERE DATE_TRUNC('month', CAST(REPLACE(date,'-','') AS date)) <= DATE_TRUNC('month', CURRENT_DATE)
+), past_targets AS (
 SELECT
-  	cast(replace(date,'-','') as date) as date,
-	cast(replace(week_start,'-','') as date) as week_start,
-	nullif(city_group, '') as city_group,
-	nullif(supply_channel, '') as mkt_channel,
-	nullif(supply_origin, '') as mkt_origin,
-	nullif(lead_context, '') as lead_context,
-	cast(replace(prospects,',','') as float) as prospect,
-	cast(replace(qualifieds,',','') as float) as qualified,
-	cast(replace(opportunities,',','') as float) as opportunity,
-	cast(replace(first_listings,',','') as float) as first_listing
-FROM supply_targets
-where date_trunc('month', cast(replace(date,'-','') as date)) <= date_trunc('month', current_date)
-), past_targets as (
-select
 	week_start,
 	city_group,
 	mkt_channel,
 	mkt_origin,
 	lead_context,
-	sum(prospect) as pp_congelado,
-	sum(qualified) as ql_congelado,
-	sum(opportunity) as op_congelado,
-	sum(first_listing) as fl_congelado
-from gsheets_supply_target_adjusted
-group by 1,2,3,4,5
-), calculated_targets as (
-select
+	SUM(prospect) AS pp_congelado,
+	SUM(qualified) AS ql_congelado,
+	SUM(opportunity) AS op_congelado,
+	SUM(first_listing) AS fl_congelado
+FROM gsheets_supply_target_adjusted
+GROUP BY 1, 2, 3, 4, 5
+), calculated_targets AS (
+SELECT
 	week_start,
 	city_group,
 	mkt_channel,
 	mkt_origin,
 	lead_context,
-	sum(prospect) as pp_calculado,
-	sum(qualified) as ql_calculado,
-	sum(opportunity) as op_calculado,
-	sum(first_listing) as fl_calculado
-from daily_target_shares
-group by 1,2,3,4,5
-), targets_diff as (
-select
+	SUM(prospect) AS pp_calculado,
+	SUM(qualified) AS ql_calculado,
+	SUM(opportunity) AS op_calculado,
+	SUM(first_listing) AS fl_calculado
+FROM daily_target_shares
+GROUP BY 1, 2, 3, 4, 5
+), targets_diff AS (
+SELECT
 	ct.week_start,
 	ct.city_group,
 	ct.mkt_channel,
 	ct.mkt_origin,
 	ct.lead_context,
-	coalesce(ct.pp_calculado,0) - coalesce(pt.pp_congelado,0) as diff_pp,
-	coalesce(ct.ql_calculado,0) - coalesce(pt.ql_congelado,0) as diff_ql,
-	coalesce(ct.op_calculado,0) - coalesce(pt.op_congelado,0) as diff_op,
-	coalesce(ct.fl_calculado,0) - coalesce(pt.fl_congelado,0) as diff_fl
-from calculated_targets ct
-left join past_targets pt
-  on ct.week_start = pt.week_start
-    and ct.city_group = pt.city_group
-	and ct.mkt_channel = pt.mkt_channel
-	and ct.mkt_origin = pt.mkt_origin
-	and ct.lead_context = pt.lead_context
-), calculated_targets_week_month as (
+	COALESCE(ct.pp_calculado,0) - COALESCE(pt.pp_congelado,0) AS diff_pp,
+	COALESCE(ct.ql_calculado,0) - COALESCE(pt.ql_congelado,0) AS diff_ql,
+	COALESCE(ct.op_calculado,0) - COALESCE(pt.op_congelado,0) AS diff_op,
+	COALESCE(ct.fl_calculado,0) - COALESCE(pt.fl_congelado,0) AS diff_fl
+FROM calculated_targets ct
+LEFT JOIN past_targets pt
+  ON ct.week_start = pt.week_start
+    AND ct.city_group = pt.city_group
+	AND ct.mkt_channel = pt.mkt_channel
+	AND ct.mkt_origin = pt.mkt_origin
+	AND ct.lead_context = pt.lead_context
+), calculated_targets_week_month AS (
 SELECT
 	date,
 	week_start,
@@ -209,82 +212,86 @@ SELECT
 	mkt_channel,
 	mkt_origin,
 	lead_context,
-	sum(prospect) as pp_calculado,
-	sum(case when date_trunc('month', date) >= date_trunc('month', current_date) then prospect else 0 end) over(partition by week_start, city_group, mkt_channel, mkt_origin, lead_context) as pp_total_week,
-	sum(qualified) as ql_calculado,
-	sum(case when date_trunc('month', date) >= date_trunc('month', current_date) then qualified else 0 end) over(partition by week_start, city_group, mkt_channel, mkt_origin, lead_context) as ql_total_week,
-	sum(opportunity) as op_calculado,
-	sum(case when date_trunc('month', date) >= date_trunc('month', current_date) then opportunity else 0 end) over(partition by week_start, city_group, mkt_channel, mkt_origin, lead_context) as op_total_week,
-	sum(first_listing) as fl_calculado,
-	sum(case when date_trunc('month', date) >= date_trunc('month', current_date) then first_listing else 0 end) over(partition by week_start, city_group, mkt_channel, mkt_origin, lead_context) as fl_total_week
-from daily_target_shares
-group by 1, 2, 3, 4, 5, 6, prospect, qualified, opportunity, first_listing
-), daily_target_shares_adjusted as (
-select distinct
-	coalesce(g.date, d.date) as date,
-	coalesce(g.week_start, d.week_start) as week_start,
-	coalesce(g.city_group, d.city_group) as city_group,
-	coalesce(g.mkt_channel, d.mkt_channel) as mkt_channel,
-	coalesce(g.mkt_origin, d.mkt_origin) as mkt_origin,
-	coalesce(g.lead_context, d.lead_context) as lead_context,
-	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.prospect
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.pp_total_week != 0 and td.diff_pp != 0 then td.diff_pp * coalesce(wm.pp_calculado,0)/wm.pp_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.pp_total_week = 0 and td.diff_pp != 0 then td.diff_pp
-			else d.prospect end as prospect,
-	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.qualified
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.ql_total_week != 0 and td.diff_ql != 0 then td.diff_ql * coalesce(wm.ql_calculado,0)/wm.ql_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.ql_total_week = 0 and td.diff_ql != 0 then td.diff_ql
-			else d.qualified end as qualified,
-	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.opportunity
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.op_total_week != 0 and td.diff_op != 0 then td.diff_op * coalesce(wm.op_calculado,0)/wm.op_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.op_total_week = 0 and td.diff_op != 0 then td.diff_op
-			else d.opportunity end as opportunity,
-	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.first_listing
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.fl_total_week != 0 and td.diff_fl != 0 then td.diff_fl * coalesce(wm.fl_calculado,0)/wm.fl_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.fl_total_week = 0 and td.diff_fl != 0 then td.diff_fl
-			else d.first_listing end as first_listing
-from daily_target_shares d
-full outer join gsheets_supply_target_adjusted g
-  on d.date = g.date
-	and d.week_start = g.week_start
-	and d.city_group = g.city_group
-	and d.mkt_channel = g.mkt_channel
-	and d.mkt_origin = g.mkt_origin
-	and d.lead_context = g.lead_context
-left join targets_diff td
-  on td.week_start = d.week_start
-    and d.city_group = td.city_group
-	and d.mkt_channel = td.mkt_channel
-	and d.mkt_origin = td.mkt_origin
-	and d.lead_context = td.lead_context
-left join calculated_targets_week_month wm
-  on wm.date = d.date
-    and wm.week_start = d.week_start
-    and wm.city_group = d.city_group
-    and wm.mkt_channel = d.mkt_channel
-    and wm.mkt_origin = d.mkt_origin
-    and wm.lead_context = d.lead_context
-), negative_targets as (
-select
+	SUM(prospect) AS pp_calculado,
+	SUM(CASE WHEN DATE_TRUNC('month', date) > DATE_TRUNC('month', CURRENT_DATE) THEN prospect ELSE 0 END) OVER(PARTITION BY week_start, city_group, mkt_channel, mkt_origin, lead_context) AS pp_total_week,
+	SUM(qualified) AS ql_calculado,
+	SUM(CASE WHEN DATE_TRUNC('month', date) > DATE_TRUNC('month', CURRENT_DATE) THEN qualified ELSE 0 END) OVER(PARTITION BY week_start, city_group, mkt_channel, mkt_origin, lead_context) AS ql_total_week,
+	SUM(opportunity) AS op_calculado,
+	SUM(CASE WHEN DATE_TRUNC('month', date) > DATE_TRUNC('month', CURRENT_DATE) THEN opportunity ELSE 0 END) OVER(PARTITION BY week_start, city_group, mkt_channel, mkt_origin, lead_context) AS op_total_week,
+	SUM(first_listing) AS fl_calculado,
+	SUM(CASE WHEN DATE_TRUNC('month', date) > DATE_TRUNC('month', CURRENT_DATE) THEN first_listing ELSE 0 END) OVER(PARTITION BY week_start, city_group, mkt_channel, mkt_origin, lead_context) AS fl_total_week
+FROM daily_target_shares
+GROUP BY 1, 2, 3, 4, 5, 6, prospect, qualified, opportunity, first_listing
+), daily_target_shares_adjusted AS (
+SELECT DISTINCT
+	COALESCE(g.date, d.date) AS date,
+	COALESCE(g.week_start, d.week_start) AS week_start,
+	COALESCE(g.city_group, d.city_group) AS city_group,
+	COALESCE(g.mkt_channel, d.mkt_channel) AS mkt_channel,
+	COALESCE(g.mkt_origin, d.mkt_origin) AS mkt_origin,
+	COALESCE(g.lead_context, d.lead_context) AS lead_context,
+	CASE 
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) <= DATE_TRUNC('month', CURRENT_DATE) THEN g.prospect
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.pp_total_week != 0 AND td.diff_pp != 0 THEN td.diff_pp * COALESCE(wm.pp_calculado,0)/wm.pp_total_week::FLOAT
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.pp_total_week = 0 AND td.diff_pp != 0 THEN td.diff_pp
+		 ELSE d.prospect END AS prospect,
+	CASE 
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) <= DATE_TRUNC('month', CURRENT_DATE) THEN g.qualified
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.ql_total_week != 0 AND td.diff_ql != 0 THEN td.diff_ql * COALESCE(wm.ql_calculado,0)/wm.ql_total_week::FLOAT
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.ql_total_week = 0 AND td.diff_ql != 0 THEN td.diff_ql
+		 ELSE d.qualified END AS qualified,
+	CASE 
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) <= DATE_TRUNC('month', CURRENT_DATE) THEN g.opportunity
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.op_total_week != 0 AND td.diff_op != 0 THEN td.diff_op * COALESCE(wm.op_calculado,0)/wm.op_total_week::FLOAT
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.op_total_week = 0 AND td.diff_op != 0 THEN td.diff_op
+		 ELSE d.opportunity END AS opportunity,
+	CASE 
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) <= DATE_TRUNC('month', CURRENT_DATE) THEN g.first_listing
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.fl_total_week != 0 AND td.diff_fl != 0 THEN td.diff_fl * COALESCE(wm.fl_calculado,0)/wm.fl_total_week::FLOAT
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.fl_total_week = 0 AND td.diff_fl != 0 THEN td.diff_fl
+		 ELSE d.first_listing END AS first_listing
+FROM daily_target_shares d
+FULL OUTER JOIN gsheets_supply_target_adjusted g
+  ON d.date = g.date
+	AND d.week_start = g.week_start
+	AND d.city_group = g.city_group
+	AND d.mkt_channel = g.mkt_channel
+	AND d.mkt_origin = g.mkt_origin
+	AND d.lead_context = g.lead_context
+LEFT JOIN targets_diff td
+  ON td.week_start = d.week_start
+    AND d.city_group = td.city_group
+	AND d.mkt_channel = td.mkt_channel
+	AND d.mkt_origin = td.mkt_origin
+	AND d.lead_context = td.lead_context
+LEFT JOIN calculated_targets_week_month wm
+  ON wm.date = d.date
+    AND wm.week_start = d.week_start
+    AND wm.city_group = d.city_group
+    AND wm.mkt_channel = d.mkt_channel
+    AND wm.mkt_origin = d.mkt_origin
+    AND wm.lead_context = d.lead_context
+), negative_targets AS (
+SELECT
 	date,
-	sum(case when prospect < 0 then prospect end) as pp_negative,
-	sum(case when qualified < 0 then qualified end) as ql_negative,
-	sum(case when opportunity < 0 then opportunity end) as op_negative,
-	sum(case when first_listing < 0 then first_listing end) as fl_negative
-from daily_target_shares_adjusted
-group by 1
+	SUM(CASE WHEN prospect < 0 THEN prospect END) AS pp_negative,
+	SUM(CASE WHEN qualified < 0 THEN qualified END) AS ql_negative,
+	SUM(CASE WHEN opportunity < 0 THEN opportunity END) AS op_negative,
+	SUM(CASE WHEN first_listing < 0 THEN first_listing END) AS fl_negative
+FROM daily_target_shares_adjusted
+GROUP BY 1
 )
-select
+SELECT
 	dt.date,
 	week_start,
 	city_group,
-	mkt_channel as supply_channel,
-	mkt_origin as supply_origin,
+	mkt_channel AS supply_channel,
+	mkt_origin AS supply_origin,
 	lead_context,
-	case when prospect <= 0 then 0 else prospect + coalesce(nt.pp_negative,0) * prospect/(sum(case when prospect > 0 then prospect end) over(partition by dt.date)) end as prospect,
-	case when qualified <= 0 then 0 else qualified + coalesce(nt.ql_negative,0) * qualified/(sum(case when qualified > 0 then qualified end) over(partition by dt.date)) end as qualified,
-	case when opportunity <= 0 then 0 else opportunity + coalesce(nt.op_negative,0) * opportunity/(sum(case when opportunity > 0 then opportunity end) over(partition by dt.date)) end as opportunity,
-	case when first_listing <= 0 then 0 else first_listing + coalesce(nt.fl_negative,0) * first_listing/(sum(case when first_listing > 0 then first_listing end) over(partition by dt.date)) end as first_listing
-from daily_target_shares_adjusted dt
-join negative_targets nt
-  on dt.date = nt.date;
+	CASE WHEN prospect <= 0 THEN 0 ELSE prospect + COALESCE(nt.pp_negative,0) * prospect/(SUM(CASE WHEN prospect > 0 THEN prospect END) OVER(PARTITION BY dt.date)) END AS prospect,
+	CASE WHEN qualified <= 0 THEN 0 ELSE qualified + COALESCE(nt.ql_negative,0) * qualified/(SUM(CASE WHEN qualified > 0 THEN qualified END) OVER(PARTITION BY dt.date)) END AS qualified,
+	CASE WHEN opportunity <= 0 THEN 0 ELSE opportunity + COALESCE(nt.op_negative,0) * opportunity/(SUM(CASE WHEN opportunity > 0 THEN opportunity END) OVER(PARTITION BY dt.date)) END AS opportunity,
+	CASE WHEN first_listing <= 0 THEN 0 ELSE first_listing + COALESCE(nt.fl_negative,0) * first_listing/(SUM(CASE WHEN first_listing > 0 THEN first_listing END) OVER(PARTITION BY dt.date)) END AS first_listing
+FROM daily_target_shares_adjusted dt
+JOIN negative_targets nt
+  ON dt.date = nt.date;

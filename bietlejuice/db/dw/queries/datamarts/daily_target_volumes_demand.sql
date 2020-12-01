@@ -1,59 +1,59 @@
-with share_local_holidays_by_city_group as (
-with holidays_by_city_name as (
-	select distinct
+WITH share_local_holidays_by_city_group AS (
+WITH holidays_by_city_name AS (
+	SELECT DISTINCT
 		dd.date,
 		dd.week_start,
-		coalesce(hs.weekday_name, dd.weekday_name) as weekday_name,
-		coalesce(nullif(lh.city_group, ''), dr.city_group) as city_group,
-		coalesce(nullif(lh.city_name, ''), dr.city_name) as city_name,
-		coalesce(max(cast(replace(cs.share,',','') as float)), 0) as share_city_name,
+		COALESCE(hs.weekday_name, dd.weekday_name) AS weekday_name,
+		COALESCE(NULLIF(lh.city_group, ''), dr.city_group) AS city_group,
+		COALESCE(NULLIF(lh.city_name, ''), dr.city_name) AS city_name,
+		COALESCE(MAX(CAST(REPLACE(cs.share,',','') AS FLOAT)), 0) AS share_city_name,
 		CASE
 			WHEN dd.is_brz_holiday = 'Holiday' 
 			OR NULLIF(lh.city_group, '') IS NOT NULL
 			OR NULLIF(lh.short_region_name, '') IS NOT NULL THEN CAST(REPLACE(hs.visit_booked,',','') AS FLOAT)
-			 else null end as visit_booked_share_holiday,
+			 ELSE NULL END AS visit_booked_share_holiday,
 		CASE
 			WHEN dd.is_brz_holiday = 'Holiday' 
 			OR NULLIF(lh.city_group, '') IS NOT NULL
 			OR NULLIF(lh.short_region_name, '') IS NOT NULL THEN CAST(REPLACE(hs.visit_completed,',','') AS FLOAT)
-			 else null end as visit_completed_share_holiday,
+			 ELSE NULL END AS visit_completed_share_holiday,
 		CASE
 			WHEN dd.is_brz_holiday = 'Holiday' 
 			OR NULLIF(lh.city_group, '') IS NOT NULL
 			OR NULLIF(lh.short_region_name, '') IS NOT NULL THEN CAST(REPLACE(hs.offer_submitted,',','') AS FLOAT)
-			 else null end as offer_submitted_share_holiday,
+			 ELSE NULL END AS offer_submitted_share_holiday,
 		CASE
 			WHEN dd.is_brz_holiday = 'Holiday' 
 			OR NULLIF(lh.city_group, '') IS NOT NULL
 			OR NULLIF(lh.short_region_name, '') IS NOT NULL THEN CAST(REPLACE(hs.offer_accepted,',','') AS FLOAT)
-			 else null end as offer_accepted_share_holiday,
+			 ELSE NULL END AS offer_accepted_share_holiday,
 		CASE
 			WHEN dd.is_brz_holiday = 'Holiday' 
 			OR NULLIF(lh.city_group, '') IS NOT NULL
 			OR NULLIF(lh.short_region_name, '') IS NOT NULL THEN CAST(REPLACE(hs.document_sent,',','') AS FLOAT)
-			 else null end as document_sent_share_holiday,
+			 ELSE NULL END AS document_sent_share_holiday,
 		CASE
 			WHEN dd.is_brz_holiday = 'Holiday' 
 			OR NULLIF(lh.city_group, '') IS NOT NULL
 			OR NULLIF(lh.short_region_name, '') IS NOT NULL THEN CAST(REPLACE(hs.credit_approved,',','') AS FLOAT)
-			 else null end as credit_approved_share_holiday,
+			 ELSE NULL END AS credit_approved_share_holiday,
 		CASE
 			WHEN dd.is_brz_holiday = 'Holiday'
 			OR NULLIF(lh.city_group, '') IS NOT NULL
 			OR NULLIF(lh.short_region_name, '') IS NOT NULL THEN CAST(REPLACE(hs.contract_signed,',','') AS FLOAT)
-			 else null end as contract_signed_share_holiday
-	from dim_date dd
-	cross join dim_region dr
-	left join datalake_raw.gsheets_local_holidays lh
-	  ON dd.date = DATE(REPLACE(lh.date,'-','')
+			 ELSE NULL END AS contract_signed_share_holiday
+	FROM dim_date dd
+	CROSS JOIN dim_region dr
+	LEFT JOIN datalake_raw.gsheets_local_holidays lh
+	  ON dd.date = DATE(REPLACE(lh.date,'-',''))
 	  AND (lh.short_region_name = dr.short_region_name
 	  	OR lh.city_group = dr.city_group)
-	left join datalake_raw.gsheets_city_share cs
-	  on coalesce(nullif(lh.city_name, ''), dr.city_name) = nullif(cs.city_name, '')
-	left join datalake_raw.gsheets_weekday_holiday_share hs
+	LEFT JOIN datalake_raw.gsheets_city_share cs
+	  ON COALESCE(NULLIF(lh.city_name, ''), dr.city_name) = NULLIF(cs.city_name, '')
+	LEFT JOIN datalake_raw.gsheets_weekday_holiday_share hs
 	  ON hs.weekday_name = dd.weekday_name
-	where dd.date between '2018-12-31' and current_date + interval '6 months'
-	group by dd.date,
+	WHERE dd.date BETWEEN '2018-12-31' AND CURRENT_DATE + INTERVAL '6 months'
+	GROUP BY dd.date,
 		dd.week_start,
 		lh.city_group,
 		lh.short_region_name,
@@ -76,49 +76,49 @@ with holidays_by_city_name as (
 		week_start,
 		weekday_name,
 		city_group,
-		sum(share_city_name * coalesce(visit_booked_share_holiday,1)) as share_holiday_visit_booked,
-		sum(share_city_name * coalesce(visit_completed_share_holiday,1)) as share_holiday_visit_completed,
-		sum(share_city_name * coalesce(offer_submitted_share_holiday,1)) as share_holiday_offer_submitted,
-		sum(share_city_name * coalesce(offer_accepted_share_holiday,1)) as share_holiday_offer_accepted,
-		sum(share_city_name * coalesce(document_sent_share_holiday,1)) as share_holiday_document_sent,
-		sum(share_city_name * coalesce(credit_approved_share_holiday,1)) as share_holiday_credit_approved,
-		sum(share_city_name * coalesce(contract_signed_share_holiday,1)) as share_holiday_contract_signed
-	from holidays_by_city_name
-	where city_group is not null
-	group by 1, 2, 3, 4
-), final_shares as (
-select distinct
+		SUM(share_city_name * COALESCE(visit_booked_share_holiday,1)) AS share_holiday_visit_booked,
+		SUM(share_city_name * COALESCE(visit_completed_share_holiday,1)) AS share_holiday_visit_completed,
+		SUM(share_city_name * COALESCE(offer_submitted_share_holiday,1)) AS share_holiday_offer_submitted,
+		SUM(share_city_name * COALESCE(offer_accepted_share_holiday,1)) AS share_holiday_offer_accepted,
+		SUM(share_city_name * COALESCE(document_sent_share_holiday,1)) AS share_holiday_document_sent,
+		SUM(share_city_name * COALESCE(credit_approved_share_holiday,1)) AS share_holiday_credit_approved,
+		SUM(share_city_name * COALESCE(contract_signed_share_holiday,1)) AS share_holiday_contract_signed
+	FROM holidays_by_city_name
+	WHERE city_group IS NOT NULL
+	GROUP BY 1, 2, 3, 4
+), final_shares AS (
+SELECT DISTINCT
 	lhc.date,
 	lhc.week_start,
 	wd.city_group,
 	wd.demand_channel_type,
 	dcs.demand_channel,
 	wd.funnel_first_touchpoint,
-	cast(replace(wd.visit_booked,',','') as float) * cast(replace(dcs.visit_booked,',','') as float) as final_share_wo_holiday_visits_booked,
-	cast(replace(wd.visit_booked,',','') as float) * lhc.share_holiday_visit_booked * cast(replace(dcs.visit_booked,',','') as float) as final_share_visits_booked,
-	cast(replace(wd.visit_completed,',','') as float) * cast(replace(dcs.visit_completed,',','') as float) as final_share_wo_holiday_visits_completed,
-	cast(replace(wd.visit_completed,',','') as float) * lhc.share_holiday_visit_completed * cast(replace(dcs.visit_completed,',','') as float) as final_share_visits_completed,
-	cast(replace(wd.offer_submitted,',','') as float) * cast(replace(dcs.offer_submitted,',','') as float) as final_share_wo_holiday_offer_submitted,
-	cast(replace(wd.offer_submitted,',','') as float) * lhc.share_holiday_offer_submitted * cast(replace(dcs.offer_submitted,',','') as float) as final_share_offer_submitted,
-	cast(replace(wd.offer_accepted,',','') as float) * cast(replace(dcs.offer_accepted,',','') as float) as final_share_wo_holiday_offer_accepted,
-	cast(replace(wd.offer_accepted,',','') as float) * lhc.share_holiday_offer_accepted * cast(replace(dcs.offer_accepted,',','') as float) as final_share_offer_accepted,
-	cast(replace(wd.credit_evaluation_init,',','') as float) * cast(replace(dcs.credit_evaluation_init,',','') as float) as final_share_wo_holiday_credit_evaluation_init,
-	cast(replace(wd.credit_evaluation_init,',','') as float) * lhc.share_holiday_offer_accepted * cast(replace(dcs.credit_evaluation_init,',','') as float) as final_share_credit_evaluation_init,
-	cast(replace(wd.credit_evaluation_positive,',','') as float) * cast(replace(dcs.credit_evaluation_positive,',','') as float) as final_share_wo_holiday_credit_evaluation_positive,
-	cast(replace(wd.credit_evaluation_positive,',','') as float) * lhc.share_holiday_offer_accepted * cast(replace(dcs.credit_evaluation_positive,',','') as float) as final_share_credit_evaluation_positive,
-	cast(replace(wd.document_sent,',','') as float) * cast(replace(dcs.document_sent,',','') as float) as final_share_wo_holiday_document_sent,
-	cast(replace(wd.document_sent,',','') as float) * lhc.share_holiday_document_sent * cast(replace(dcs.document_sent,',','') as float) as final_share_document_sent,
-	cast(replace(wd.credit_approved,',','') as float) * cast(replace(dcs.credit_approved,',','') as float) as final_share_wo_holiday_credit_approved,
-	cast(replace(wd.credit_approved,',','') as float) * lhc.share_holiday_credit_approved * cast(replace(dcs.credit_approved,',','') as float) as final_share_credit_approved,
-	cast(replace(wd.contract_signed,',','') as float) * cast(replace(dcs.contract_signed,',','') as float) as final_share_wo_holiday_contract_signed,
-	cast(replace(wd.contract_signed,',','') as float) * lhc.share_holiday_contract_signed * cast(replace(dcs.contract_signed,',','') as float) as final_share_contract_signed
-from share_local_holidays_by_city_group lhc
-left join datalake_raw.gsheets_weekday_demand_share wd
-  on wd.weekday_name = lhc.weekday_name and wd.city_group = lhc.city_group
-left join datalake_raw.gsheets_demand_channel_share dcs
-  on dcs.city_group = lhc.city_group and cast(replace(dcs.week_start,'-','') as date) = lhc.week_start
-), diff_w_and_wo_holiday_share as (
-select
+	CAST(REPLACE(wd.visit_booked,',','') AS FLOAT) * CAST(REPLACE(dcs.visit_booked,',','') AS FLOAT) AS final_share_wo_holiday_visits_booked,
+	CAST(REPLACE(wd.visit_booked,',','') AS FLOAT) * lhc.share_holiday_visit_booked * CAST(REPLACE(dcs.visit_booked,',','') AS FLOAT) AS final_share_visits_booked,
+	CAST(REPLACE(wd.visit_completed,',','') AS FLOAT) * CAST(REPLACE(dcs.visit_completed,',','') AS FLOAT) AS final_share_wo_holiday_visits_completed,
+	CAST(REPLACE(wd.visit_completed,',','') AS FLOAT) * lhc.share_holiday_visit_completed * CAST(REPLACE(dcs.visit_completed,',','') AS FLOAT) AS final_share_visits_completed,
+	CAST(REPLACE(wd.offer_submitted,',','') AS FLOAT) * CAST(REPLACE(dcs.offer_submitted,',','') AS FLOAT) AS final_share_wo_holiday_offer_submitted,
+	CAST(REPLACE(wd.offer_submitted,',','') AS FLOAT) * lhc.share_holiday_offer_submitted * CAST(REPLACE(dcs.offer_submitted,',','') AS FLOAT) AS final_share_offer_submitted,
+	CAST(REPLACE(wd.offer_accepted,',','') AS FLOAT) * CAST(REPLACE(dcs.offer_accepted,',','') AS FLOAT) AS final_share_wo_holiday_offer_accepted,
+	CAST(REPLACE(wd.offer_accepted,',','') AS FLOAT) * lhc.share_holiday_offer_accepted * CAST(REPLACE(dcs.offer_accepted,',','') AS FLOAT) AS final_share_offer_accepted,
+	CAST(REPLACE(wd.credit_evaluation_init,',','') AS FLOAT) * CAST(REPLACE(dcs.credit_evaluation_init,',','') AS FLOAT) AS final_share_wo_holiday_credit_evaluation_init,
+	CAST(REPLACE(wd.credit_evaluation_init,',','') AS FLOAT) * lhc.share_holiday_offer_accepted * CAST(REPLACE(dcs.credit_evaluation_init,',','') AS FLOAT) AS final_share_credit_evaluation_init,
+	CAST(REPLACE(wd.credit_evaluation_positive,',','') AS FLOAT) * CAST(REPLACE(dcs.credit_evaluation_positive,',','') AS FLOAT) AS final_share_wo_holiday_credit_evaluation_positive,
+	CAST(REPLACE(wd.credit_evaluation_positive,',','') AS FLOAT) * lhc.share_holiday_offer_accepted * CAST(REPLACE(dcs.credit_evaluation_positive,',','') AS FLOAT) AS final_share_credit_evaluation_positive,
+	CAST(REPLACE(wd.document_sent,',','') AS FLOAT) * CAST(REPLACE(dcs.document_sent,',','') AS FLOAT) AS final_share_wo_holiday_document_sent,
+	CAST(REPLACE(wd.document_sent,',','') AS FLOAT) * lhc.share_holiday_document_sent * CAST(REPLACE(dcs.document_sent,',','') AS FLOAT) AS final_share_document_sent,
+	CAST(REPLACE(wd.credit_approved,',','') AS FLOAT) * CAST(REPLACE(dcs.credit_approved,',','') AS FLOAT) AS final_share_wo_holiday_credit_approved,
+	CAST(REPLACE(wd.credit_approved,',','') AS FLOAT) * lhc.share_holiday_credit_approved * CAST(REPLACE(dcs.credit_approved,',','') AS FLOAT) AS final_share_credit_approved,
+	CAST(REPLACE(wd.contract_signed,',','') AS FLOAT) * CAST(REPLACE(dcs.contract_signed,',','') AS FLOAT) AS final_share_wo_holiday_contract_signed,
+	CAST(REPLACE(wd.contract_signed,',','') AS FLOAT) * lhc.share_holiday_contract_signed * CAST(REPLACE(dcs.contract_signed,',','') AS FLOAT) AS final_share_contract_signed
+FROM share_local_holidays_by_city_group lhc
+LEFT JOIN datalake_raw.gsheets_weekday_demand_share wd
+  ON wd.weekday_name = lhc.weekday_name AND wd.city_group = lhc.city_group
+LEFT JOIN datalake_raw.gsheets_demand_channel_share dcs
+  ON dcs.city_group = lhc.city_group AND CAST(REPLACE(dcs.week_start,'-','') AS date) = lhc.week_start
+), diff_w_and_wo_holiday_share AS (
+SELECT
 	fsh.date,
 	fsh.week_start,
 	fsh.city_group,
@@ -126,43 +126,43 @@ select
 	fsh.demand_channel,
 	wv.guarantee,
 	fsh.funnel_first_touchpoint,
-	sum(fsh.final_share_visits_booked * cast(replace(wv.visit_booked,',','') as float)) as visit_booked_1,
-	sum(fsh.final_share_visits_booked * cast(replace(wv.visit_booked,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) as total_visit_booked_daily,
-	sum(fsh.final_share_wo_holiday_visits_booked * cast(replace(wv.visit_booked,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) as total_visit_booked_daily_wo_holiday,
-	sum(fsh.final_share_visits_completed * cast(replace(wv.visit_completed,',','') as float)) as visit_completed_1,
-	sum(fsh.final_share_visits_completed * cast(replace(wv.visit_completed,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) as total_visit_completed_daily,
-	sum(fsh.final_share_wo_holiday_visits_completed * cast(replace(wv.visit_completed,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) as total_visit_completed_daily_wo_holiday,
-	sum(fsh.final_share_offer_submitted * cast(replace(wv.offer_submitted,',','') as float)) as offer_submitted_1,
-	sum(fsh.final_share_offer_submitted * cast(replace(wv.offer_submitted,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) as total_offer_submitted_daily,
-	sum(fsh.final_share_wo_holiday_offer_submitted * cast(replace(wv.offer_submitted,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) as total_offer_submitted_daily_wo_holiday,
-	sum(fsh.final_share_offer_accepted * cast(replace(wv.offer_accepted,',','') as float)) as offer_accepted_1,
-	sum(fsh.final_share_offer_accepted * cast(replace(wv.offer_accepted,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) as total_offer_accepted_daily,
-	sum(fsh.final_share_wo_holiday_offer_accepted * cast(replace(wv.offer_accepted,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) as total_offer_accepted_daily_wo_holiday,
-	sum(fsh.final_share_credit_evaluation_init * cast(replace(wv.credit_evaluation_init,',','') as float)) as credit_evaluation_init_1,
-	sum(fsh.final_share_credit_evaluation_init * cast(replace(wv.credit_evaluation_init,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) as total_credit_evaluation_init_daily,
-	sum(fsh.final_share_wo_holiday_credit_evaluation_init * cast(replace(wv.credit_evaluation_init,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) as total_credit_evaluation_init_daily_wo_holiday,
-	sum(fsh.final_share_credit_evaluation_positive * cast(replace(wv.credit_evaluation_positive,',','') as float)) as credit_evaluation_positive_1,
-	sum(fsh.final_share_credit_evaluation_positive * cast(replace(wv.credit_evaluation_positive,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) as total_credit_evaluation_positive_daily,
-	sum(fsh.final_share_wo_holiday_credit_evaluation_positive * cast(replace(wv.credit_evaluation_positive,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) as total_credit_evaluation_positive_daily_wo_holiday,
-	sum(fsh.final_share_document_sent * cast(replace(wv.document_sent,',','') as float)) as document_sent_1,
-	sum(fsh.final_share_document_sent * cast(replace(wv.document_sent,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) as total_document_sent_daily,
-	sum(fsh.final_share_wo_holiday_document_sent * cast(replace(wv.document_sent,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) as total_document_sent_daily_wo_holiday,
-	sum(fsh.final_share_credit_approved * cast(replace(wv.credit_approved,',','') as float)) as credit_approved_1,
-	sum(fsh.final_share_credit_approved * cast(replace(wv.credit_approved,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) as total_credit_approved_daily,
-	sum(fsh.final_share_wo_holiday_credit_approved * cast(replace(wv.credit_approved,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) as total_credit_approved_daily_wo_holiday,
-	sum(fsh.final_share_contract_signed * cast(replace(wv.contract_signed,',','') as float)) as contract_signed_1,
-	sum(fsh.final_share_contract_signed * cast(replace(wv.contract_signed,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) as total_contract_signed_daily,
-	sum(fsh.final_share_wo_holiday_contract_signed * cast(replace(wv.contract_signed,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) as total_contract_signed_daily_wo_holiday,
-	sum(fsh.final_share_visits_booked * cast(replace(wv.new_tenant_prospect,',','') as float)) as new_tenant_prospect_1,
-	sum(fsh.final_share_visits_booked * cast(replace(wv.new_tenant_prospect,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) as total_new_tenant_prospect_daily,
-	sum(fsh.final_share_wo_holiday_visits_booked * cast(replace(wv.new_tenant_prospect,',','') as float)) over(partition by fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) as total_new_tenant_prospect_daily_wo_holiday
-from final_shares fsh
-join datalake_raw.gsheets_week_volumes_demand wv
-  on fsh.city_group = wv.city_group
-  	and fsh.week_start = cast(replace(wv.week_start,'-','') as date)
-  	and fsh.demand_channel_type = wv.demand_channel_type
-  	and fsh.funnel_first_touchpoint = wv.funnel_first_touchpoint
-group by 1,2,3,4,5,6,7,
+	SUM(fsh.final_share_visits_booked * CAST(REPLACE(wv.visit_booked,',','') AS FLOAT)) AS visit_booked_1,
+	SUM(fsh.final_share_visits_booked * CAST(REPLACE(wv.visit_booked,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) AS total_visit_booked_daily,
+	SUM(fsh.final_share_wo_holiday_visits_booked * CAST(REPLACE(wv.visit_booked,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) AS total_visit_booked_daily_wo_holiday,
+	SUM(fsh.final_share_visits_completed * CAST(REPLACE(wv.visit_completed,',','') AS FLOAT)) AS visit_completed_1,
+	SUM(fsh.final_share_visits_completed * CAST(REPLACE(wv.visit_completed,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) AS total_visit_completed_daily,
+	SUM(fsh.final_share_wo_holiday_visits_completed * CAST(REPLACE(wv.visit_completed,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) AS total_visit_completed_daily_wo_holiday,
+	SUM(fsh.final_share_offer_submitted * CAST(REPLACE(wv.offer_submitted,',','') AS FLOAT)) AS offer_submitted_1,
+	SUM(fsh.final_share_offer_submitted * CAST(REPLACE(wv.offer_submitted,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) AS total_offer_submitted_daily,
+	SUM(fsh.final_share_wo_holiday_offer_submitted * CAST(REPLACE(wv.offer_submitted,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) AS total_offer_submitted_daily_wo_holiday,
+	SUM(fsh.final_share_offer_accepted * CAST(REPLACE(wv.offer_accepted,',','') AS FLOAT)) AS offer_accepted_1,
+	SUM(fsh.final_share_offer_accepted * CAST(REPLACE(wv.offer_accepted,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) AS total_offer_accepted_daily,
+	SUM(fsh.final_share_wo_holiday_offer_accepted * CAST(REPLACE(wv.offer_accepted,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) AS total_offer_accepted_daily_wo_holiday,
+	SUM(fsh.final_share_credit_evaluation_init * CAST(REPLACE(wv.credit_evaluation_init,',','') AS FLOAT)) AS credit_evaluation_init_1,
+	SUM(fsh.final_share_credit_evaluation_init * CAST(REPLACE(wv.credit_evaluation_init,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) AS total_credit_evaluation_init_daily,
+	SUM(fsh.final_share_wo_holiday_credit_evaluation_init * CAST(REPLACE(wv.credit_evaluation_init,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) AS total_credit_evaluation_init_daily_wo_holiday,
+	SUM(fsh.final_share_credit_evaluation_positive * CAST(REPLACE(wv.credit_evaluation_positive,',','') AS FLOAT)) AS credit_evaluation_positive_1,
+	SUM(fsh.final_share_credit_evaluation_positive * CAST(REPLACE(wv.credit_evaluation_positive,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) AS total_credit_evaluation_positive_daily,
+	SUM(fsh.final_share_wo_holiday_credit_evaluation_positive * CAST(REPLACE(wv.credit_evaluation_positive,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) AS total_credit_evaluation_positive_daily_wo_holiday,
+	SUM(fsh.final_share_document_sent * CAST(REPLACE(wv.document_sent,',','') AS FLOAT)) AS document_sent_1,
+	SUM(fsh.final_share_document_sent * CAST(REPLACE(wv.document_sent,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) AS total_document_sent_daily,
+	SUM(fsh.final_share_wo_holiday_document_sent * CAST(REPLACE(wv.document_sent,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) AS total_document_sent_daily_wo_holiday,
+	SUM(fsh.final_share_credit_approved * CAST(REPLACE(wv.credit_approved,',','') AS FLOAT)) AS credit_approved_1,
+	SUM(fsh.final_share_credit_approved * CAST(REPLACE(wv.credit_approved,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) AS total_credit_approved_daily,
+	SUM(fsh.final_share_wo_holiday_credit_approved * CAST(REPLACE(wv.credit_approved,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) AS total_credit_approved_daily_wo_holiday,
+	SUM(fsh.final_share_contract_signed * CAST(REPLACE(wv.contract_signed,',','') AS FLOAT)) AS contract_signed_1,
+	SUM(fsh.final_share_contract_signed * CAST(REPLACE(wv.contract_signed,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) AS total_contract_signed_daily,
+	SUM(fsh.final_share_wo_holiday_contract_signed * CAST(REPLACE(wv.contract_signed,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) AS total_contract_signed_daily_wo_holiday,
+	SUM(fsh.final_share_visits_booked * CAST(REPLACE(wv.new_tenant_prospect,',','') AS FLOAT)) AS new_tenant_prospect_1,
+	SUM(fsh.final_share_visits_booked * CAST(REPLACE(wv.new_tenant_prospect,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) AS total_new_tenant_prospect_daily,
+	SUM(fsh.final_share_wo_holiday_visits_booked * CAST(REPLACE(wv.new_tenant_prospect,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.demand_channel_type, fsh.demand_channel, fsh.funnel_first_touchpoint) AS total_new_tenant_prospect_daily_wo_holiday
+FROM final_shares fsh
+JOIN datalake_raw.gsheets_week_volumes_demand wv
+  ON fsh.city_group = wv.city_group
+  	AND fsh.week_start = CAST(REPLACE(wv.week_start,'-','') AS date)
+  	AND fsh.demand_channel_type = wv.demand_channel_type
+  	AND fsh.funnel_first_touchpoint = wv.funnel_first_touchpoint
+GROUP BY 1, 2, 3, 4, 5, 6, 7,
 	fsh.final_share_visits_booked,
 	wv.visit_booked,
 	fsh.final_share_wo_holiday_visits_booked,
@@ -191,7 +191,7 @@ group by 1,2,3,4,5,6,7,
 	wv.document_sent,
 	fsh.final_share_wo_holiday_document_sent,
 	wv.new_tenant_prospect
-), daily_target_shares as (
+), daily_target_shares AS (
 SELECT 
 	date,
 	week_start,
@@ -200,113 +200,113 @@ SELECT
 	demand_channel,
 	funnel_first_touchpoint,
 	guarantee,
-	visit_booked_1 + case when total_visit_booked_daily > 0 then (total_visit_booked_daily_wo_holiday - total_visit_booked_daily) * visit_booked_1 / total_visit_booked_daily else 0 end as visit_booked,
-	visit_completed_1 + case when total_visit_completed_daily > 0 then (total_visit_completed_daily_wo_holiday - total_visit_completed_daily) * visit_completed_1 / total_visit_completed_daily else 0 end as visit_completed,
-	offer_submitted_1 + case when total_offer_submitted_daily > 0 then (total_offer_submitted_daily_wo_holiday - total_offer_submitted_daily) * offer_submitted_1 / total_offer_submitted_daily else 0 end as offer_submitted,
-	offer_accepted_1 + case when total_offer_accepted_daily > 0 then (total_offer_accepted_daily_wo_holiday - total_offer_accepted_daily) * offer_accepted_1 / total_offer_accepted_daily else 0 end as offer_accepted,
-	credit_evaluation_init_1 + case when total_credit_evaluation_init_daily > 0 then (total_credit_evaluation_init_daily_wo_holiday - total_credit_evaluation_init_daily) * credit_evaluation_init_1 / total_credit_evaluation_init_daily else 0 end as credit_evaluation_init,
-	credit_evaluation_positive_1 + case when total_credit_evaluation_positive_daily > 0 then (total_credit_evaluation_positive_daily_wo_holiday - total_credit_evaluation_positive_daily) * credit_evaluation_positive_1 / total_credit_evaluation_positive_daily else 0 end as credit_evaluation_positive,
-	document_sent_1 + case when total_document_sent_daily > 0 then (total_document_sent_daily_wo_holiday - total_document_sent_daily) * document_sent_1 / total_document_sent_daily else 0 end as document_sent,
-	credit_approved_1 + case when total_credit_approved_daily > 0 then (total_credit_approved_daily_wo_holiday - total_credit_approved_daily) * credit_approved_1 / total_credit_approved_daily else 0 end as credit_approved,
-	contract_signed_1 + case when total_contract_signed_daily > 0 then (total_contract_signed_daily_wo_holiday - total_contract_signed_daily) * contract_signed_1 / total_contract_signed_daily else 0 end as contract_signed,
-	new_tenant_prospect_1 + case when total_new_tenant_prospect_daily > 0 then (total_new_tenant_prospect_daily_wo_holiday - total_new_tenant_prospect_daily) * new_tenant_prospect_1 / total_new_tenant_prospect_daily else 0 end as new_tenant_prospect
-from diff_w_and_wo_holiday_share 
-), gsheets_demand_target_adjusted as (
-WITH
-demand_targets AS (
-	SELECT * FROM datalake_raw.gsheets_demand_targets_2021 
-    UNION ALL
-	    SELECT * FROM datalake_raw.gsheets_demand_targets_2020 
-    UNION ALL
-        SELECT * FROM datalake_raw.gsheets_demand_targets_2019
-)
+	visit_booked_1 + CASE WHEN total_visit_booked_daily > 0 THEN (total_visit_booked_daily_wo_holiday - total_visit_booked_daily) * visit_booked_1 / total_visit_booked_daily ELSE 0 END AS visit_booked,
+	visit_completed_1 + CASE WHEN total_visit_completed_daily > 0 THEN (total_visit_completed_daily_wo_holiday - total_visit_completed_daily) * visit_completed_1 / total_visit_completed_daily ELSE 0 END AS visit_completed,
+	offer_submitted_1 + CASE WHEN total_offer_submitted_daily > 0 THEN (total_offer_submitted_daily_wo_holiday - total_offer_submitted_daily) * offer_submitted_1 / total_offer_submitted_daily ELSE 0 END AS offer_submitted,
+	offer_accepted_1 + CASE WHEN total_offer_accepted_daily > 0 THEN (total_offer_accepted_daily_wo_holiday - total_offer_accepted_daily) * offer_accepted_1 / total_offer_accepted_daily ELSE 0 END AS offer_accepted,
+	credit_evaluation_init_1 + CASE WHEN total_credit_evaluation_init_daily > 0 THEN (total_credit_evaluation_init_daily_wo_holiday - total_credit_evaluation_init_daily) * credit_evaluation_init_1 / total_credit_evaluation_init_daily ELSE 0 END AS credit_evaluation_init,
+	credit_evaluation_positive_1 + CASE WHEN total_credit_evaluation_positive_daily > 0 THEN (total_credit_evaluation_positive_daily_wo_holiday - total_credit_evaluation_positive_daily) * credit_evaluation_positive_1 / total_credit_evaluation_positive_daily ELSE 0 END AS credit_evaluation_positive,
+	document_sent_1 + CASE WHEN total_document_sent_daily > 0 THEN (total_document_sent_daily_wo_holiday - total_document_sent_daily) * document_sent_1 / total_document_sent_daily ELSE 0 END AS document_sent,
+	credit_approved_1 + CASE WHEN total_credit_approved_daily > 0 THEN (total_credit_approved_daily_wo_holiday - total_credit_approved_daily) * credit_approved_1 / total_credit_approved_daily ELSE 0 END AS credit_approved,
+	contract_signed_1 + CASE WHEN total_contract_signed_daily > 0 THEN (total_contract_signed_daily_wo_holiday - total_contract_signed_daily) * contract_signed_1 / total_contract_signed_daily ELSE 0 END AS contract_signed,
+	new_tenant_prospect_1 + CASE WHEN total_new_tenant_prospect_daily > 0 THEN (total_new_tenant_prospect_daily_wo_holiday - total_new_tenant_prospect_daily) * new_tenant_prospect_1 / total_new_tenant_prospect_daily ELSE 0 END AS new_tenant_prospect
+FROM diff_w_and_wo_holiday_share 
+), gsheets_demand_target_adjusted AS (
+	WITH
+	demand_targets AS (
+		SELECT * FROM datalake_raw.gsheets_demand_targets_2021 
+	    UNION ALL
+		    SELECT * FROM datalake_raw.gsheets_demand_targets_2020 
+	    UNION ALL
+	        SELECT * FROM datalake_raw.gsheets_demand_targets_2019
+	)
+	SELECT
+	    CAST(REPLACE(date,'-','') AS date) AS date,
+		CAST(REPLACE(week_start,'-','') AS date) AS week_start,
+		NULLIF(city_group, '') AS city_group,
+		NULLIF(demand_channel_type, '') AS demand_channel_type,
+		NULLIF(demand_channel, '') AS demand_channel,
+		NULLIF(funnel_origin, '') AS funnel_first_touchpoint,
+		NULLIF(guarantee, '') AS guarantee,
+		CAST(REPLACE(visits_booked,',','') AS FLOAT) AS visit_booked,
+		CAST(REPLACE(visits_completed,',','') AS FLOAT) AS visit_completed,
+		CAST(REPLACE(offer_sent,',','') AS FLOAT) AS offer_submitted,
+		CAST(REPLACE(offer_accepted,',','') AS FLOAT) AS offer_accepted,
+		CAST(REPLACE(evaluation_started,',','') AS FLOAT) AS credit_evaluation_init,
+		CAST(REPLACE(evaluation_positive,',','') AS FLOAT) AS credit_evaluation_positive,
+		CAST(REPLACE(doc_sent,',','') AS FLOAT) AS document_sent,
+		CAST(REPLACE(credit_approved,',','') AS FLOAT) credit_approved,
+		CAST(REPLACE(contracts_signed,',','') AS FLOAT) AS contract_signed,
+		CAST(REPLACE(new_tenant_prospects,',','') AS FLOAT) AS new_tenant_prospect
+	FROM demand_targets
+	WHERE DATE_TRUNC('month', CAST(REPLACE(date,'-','') AS date)) <= DATE_TRUNC('month', CURRENT_DATE)
+), past_targets AS (
 SELECT
-  cast(replace(date,'-','') as date) as date,
-	cast(replace(week_start,'-','') as date) as week_start,
-	nullif(city_group, '') as city_group,
-	nullif(demand_channel_type, '') as demand_channel_type,
-	nullif(demand_channel, '') as demand_channel,
-	nullif(funnel_origin, '') as funnel_first_touchpoint,
-	nullif(guarantee, '') as guarantee,
-	cast(replace(visits_booked,',','') as float) as visit_booked,
-	cast(replace(visits_completed,',','') as float) as visit_completed,
-	cast(replace(offer_sent,',','') as float) as offer_submitted,
-	cast(replace(offer_accepted,',','') as float) as offer_accepted,
-	cast(replace(evaluation_started,',','') as float) as credit_evaluation_init,
-	cast(replace(evaluation_positive,',','') as float) as credit_evaluation_positive,
-	cast(replace(doc_sent,',','') as float) as document_sent,
-	cast(replace(credit_approved,',','') as float) credit_approved,
-	cast(replace(contracts_signed,',','') as float) as contract_signed,
-	cast(replace(new_tenant_prospects,',','') as float) as new_tenant_prospect
-FROM demand_targets
-where date_trunc('month', cast(replace(date,'-','') as date)) <= date_trunc('month', current_date)
-), past_targets as (
-select
 	week_start,
 	city_group,
 	demand_channel_type,
 	demand_channel,
 	funnel_first_touchpoint,
 	guarantee,
-	sum(visit_booked) as vb_congelado,
-	sum(visit_completed) as vc_congelado,
-	sum(offer_submitted) as os_congelado,
-	sum(offer_accepted) as oa_congelado,
-	sum(credit_evaluation_init) as cei_congelado,
-	sum(credit_evaluation_positive) as cep_congelado,
-	sum(document_sent) as ds_congelado,
-	sum(credit_approved) as ca_congelado,
-	sum(contract_signed) as cs_congelado,
-	sum(new_tenant_prospect) as ntp_congelado
-from gsheets_demand_target_adjusted
-group by 1,2,3,4,5,6
-), calculated_targets as (
-select
+	SUM(visit_booked) AS vb_congelado,
+	SUM(visit_completed) AS vc_congelado,
+	SUM(offer_submitted) AS os_congelado,
+	SUM(offer_accepted) AS oa_congelado,
+	SUM(credit_evaluation_init) AS cei_congelado,
+	SUM(credit_evaluation_positive) AS cep_congelado,
+	SUM(document_sent) AS ds_congelado,
+	SUM(credit_approved) AS ca_congelado,
+	SUM(contract_signed) AS cs_congelado,
+	SUM(new_tenant_prospect) AS ntp_congelado
+FROM gsheets_demand_target_adjusted
+GROUP BY 1, 2, 3, 4, 5, 6
+), calculated_targets AS (
+SELECT
 	week_start,
 	city_group,
 	demand_channel_type,
 	demand_channel,
 	funnel_first_touchpoint,
 	guarantee,
-	sum(visit_booked) as vb_calculado,
-	sum(visit_completed) as vc_calculado,
-	sum(offer_submitted) as os_calculado,
-	sum(offer_accepted) as oa_calculado,
-	sum(credit_evaluation_init) as cei_calculado,
-	sum(credit_evaluation_positive) as cep_calculado,
-	sum(document_sent) as ds_calculado,
-	sum(credit_approved) as ca_calculado,
-	sum(contract_signed) as cs_calculado,
-	sum(new_tenant_prospect) as ntp_calculado
-from daily_target_shares
-group by 1,2,3,4,5,6
-), targets_diff as (
-select
+	SUM(visit_booked) AS vb_calculado,
+	SUM(visit_completed) AS vc_calculado,
+	SUM(offer_submitted) AS os_calculado,
+	SUM(offer_accepted) AS oa_calculado,
+	SUM(credit_evaluation_init) AS cei_calculado,
+	SUM(credit_evaluation_positive) AS cep_calculado,
+	SUM(document_sent) AS ds_calculado,
+	SUM(credit_approved) AS ca_calculado,
+	SUM(contract_signed) AS cs_calculado,
+	SUM(new_tenant_prospect) AS ntp_calculado
+FROM daily_target_shares
+GROUP BY 1, 2, 3, 4, 5, 6
+), targets_diff AS (
+SELECT
 	ct.week_start,
 	ct.city_group,
 	ct.demand_channel_type,
 	ct.demand_channel,
 	ct.funnel_first_touchpoint,
 	ct.guarantee,
-	coalesce(ct.vb_calculado,0) - coalesce(pt.vb_congelado,0) as diff_vb,
-	coalesce(ct.vc_calculado,0) - coalesce(pt.vc_congelado,0) as diff_vc,
-	coalesce(ct.os_calculado,0) - coalesce(pt.os_congelado,0) as diff_os,
-	coalesce(ct.oa_calculado,0) - coalesce(pt.oa_congelado,0) as diff_oa,
-	coalesce(ct.cei_calculado,0) - coalesce(pt.cei_congelado,0) as diff_cei,
-	coalesce(ct.cep_calculado,0) - coalesce(pt.cep_congelado,0) as diff_cep,
-	coalesce(ct.ds_calculado,0) - coalesce(pt.ds_congelado,0) as diff_ds,
-	coalesce(ct.ca_calculado,0) - coalesce(pt.ca_congelado,0) as diff_ca,
-	coalesce(ct.cs_calculado,0) - coalesce(pt.cs_congelado,0) as diff_cs,
-	coalesce(ct.ntp_calculado,0) - coalesce(pt.ntp_congelado,0) as diff_ntp
-from calculated_targets ct
-left join past_targets pt
-  on ct.week_start = pt.week_start
-    and ct.city_group = pt.city_group
-	and ct.demand_channel_type = pt.demand_channel_type
-	and ct.demand_channel = pt.demand_channel
-	and ct.funnel_first_touchpoint = pt.funnel_first_touchpoint
-	and ct.guarantee = pt.guarantee
-), calculated_targets_week_month as (
+	COALESCE(ct.vb_calculado,0) - COALESCE(pt.vb_congelado,0) AS diff_vb,
+	COALESCE(ct.vc_calculado,0) - COALESCE(pt.vc_congelado,0) AS diff_vc,
+	COALESCE(ct.os_calculado,0) - COALESCE(pt.os_congelado,0) AS diff_os,
+	COALESCE(ct.oa_calculado,0) - COALESCE(pt.oa_congelado,0) AS diff_oa,
+	COALESCE(ct.cei_calculado,0) - COALESCE(pt.cei_congelado,0) AS diff_cei,
+	COALESCE(ct.cep_calculado,0) - COALESCE(pt.cep_congelado,0) AS diff_cep,
+	COALESCE(ct.ds_calculado,0) - COALESCE(pt.ds_congelado,0) AS diff_ds,
+	COALESCE(ct.ca_calculado,0) - COALESCE(pt.ca_congelado,0) AS diff_ca,
+	COALESCE(ct.cs_calculado,0) - COALESCE(pt.cs_congelado,0) AS diff_cs,
+	COALESCE(ct.ntp_calculado,0) - COALESCE(pt.ntp_congelado,0) AS diff_ntp
+FROM calculated_targets ct
+LEFT JOIN past_targets pt
+  ON ct.week_start = pt.week_start
+    AND ct.city_group = pt.city_group
+	AND ct.demand_channel_type = pt.demand_channel_type
+	AND ct.demand_channel = pt.demand_channel
+	AND ct.funnel_first_touchpoint = pt.funnel_first_touchpoint
+	AND ct.guarantee = pt.guarantee
+), calculated_targets_week_month AS (
 SELECT
 	date,
 	week_start,
@@ -315,119 +315,129 @@ SELECT
 	demand_channel,
 	funnel_first_touchpoint,
 	guarantee,
-	visit_booked as vb_calculado,
-	sum(case when date_trunc('month', date) >= date_trunc('month', current_date) then visit_booked else 0 end) over(partition by week_start, city_group, demand_channel_type, demand_channel, funnel_first_touchpoint, guarantee) as vb_total_week,
-	sum(visit_completed) as vc_calculado,
-	sum(case when date_trunc('month', date) >= date_trunc('month', current_date) then visit_completed else 0 end) over(partition by week_start, city_group, demand_channel_type, demand_channel, funnel_first_touchpoint, guarantee) as vc_total_week,
-	sum(offer_submitted) as os_calculado,
-	sum(case when date_trunc('month', date) >= date_trunc('month', current_date) then offer_submitted else 0 end) over(partition by week_start, city_group, demand_channel_type, demand_channel, funnel_first_touchpoint, guarantee) as os_total_week,
-	sum(offer_accepted) as oa_calculado,
-	sum(case when date_trunc('month', date) >= date_trunc('month', current_date) then offer_accepted else 0 end) over(partition by week_start, city_group, demand_channel_type, demand_channel, funnel_first_touchpoint, guarantee) as oa_total_week,
-	sum(credit_evaluation_init) as cei_calculado,
-	sum(case when date_trunc('month', date) >= date_trunc('month', current_date) then credit_evaluation_init else 0 end) over(partition by week_start, city_group, demand_channel_type, demand_channel, funnel_first_touchpoint, guarantee) as cei_total_week,
-	sum(credit_evaluation_positive) as cep_calculado,
-	sum(case when date_trunc('month', date) >= date_trunc('month', current_date) then credit_evaluation_positive else 0 end) over(partition by week_start, city_group, demand_channel_type, demand_channel, funnel_first_touchpoint, guarantee) as cep_total_week,
-	sum(document_sent) as ds_calculado,
-	sum(case when date_trunc('month', date) >= date_trunc('month', current_date) then document_sent else 0 end) over(partition by week_start, city_group, demand_channel_type, demand_channel, funnel_first_touchpoint, guarantee) as ds_total_week,
-	sum(credit_approved) as ca_calculado,
-	sum(case when date_trunc('month', date) >= date_trunc('month', current_date) then credit_approved else 0 end) over(partition by week_start, city_group, demand_channel_type, demand_channel, funnel_first_touchpoint, guarantee) as ca_total_week,
-	sum(contract_signed) as cs_calculado,
-	sum(case when date_trunc('month', date) >= date_trunc('month', current_date) then contract_signed else 0 end) over(partition by week_start, city_group, demand_channel_type, demand_channel, funnel_first_touchpoint, guarantee) as cs_total_week,
-	sum(new_tenant_prospect) as ntp_calculado,
-	sum(case when date_trunc('month', date) >= date_trunc('month', current_date) then new_tenant_prospect else 0 end) over(partition by week_start, city_group, demand_channel_type, demand_channel, funnel_first_touchpoint, guarantee) as ntp_total_week
-from daily_target_shares
-group by 1, 2, 3, 4, 5, 6, 7, visit_booked, visit_completed, offer_submitted, offer_accepted, credit_evaluation_init, credit_evaluation_positive, document_sent, credit_approved, contract_signed, new_tenant_prospect
-), daily_target_shares_adjusted as (
-select distinct
-	coalesce(g.date, d.date) as date,
-	coalesce(g.week_start, d.week_start) as week_start,
-	coalesce(g.city_group, d.city_group) as city_group,
-	coalesce(g.demand_channel_type, d.demand_channel_type) as demand_channel_type,
-	coalesce(g.demand_channel, d.demand_channel) as demand_channel,
-	coalesce(g.funnel_first_touchpoint, d.funnel_first_touchpoint) as funnel_first_touchpoint,
-	coalesce(g.guarantee, d.guarantee) as guarantee,
-	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.visit_booked
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.vb_total_week != 0 and td.diff_vb != 0 then td.diff_vb * coalesce(wm.vb_calculado,0)/wm.vb_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.vb_total_week = 0 and td.diff_vb != 0 then td.diff_vb
-			else d.visit_booked end as visit_booked,
-	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.visit_completed
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.vc_total_week != 0 and td.diff_vc != 0 then td.diff_vc * coalesce(wm.vc_calculado,0)/wm.vc_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.vc_total_week = 0 and td.diff_vc != 0 then td.diff_vc
-			else d.visit_completed end as visit_completed,
-	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.offer_submitted
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.os_total_week != 0 and td.diff_os != 0 then td.diff_os * coalesce(wm.os_calculado,0)/wm.os_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.os_total_week = 0 and td.diff_os != 0 then td.diff_os
-			else d.offer_submitted end as offer_submitted,
-	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.offer_accepted
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.oa_total_week != 0 and td.diff_oa != 0 then td.diff_oa * coalesce(wm.oa_calculado,0)/wm.oa_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.oa_total_week = 0 and td.diff_oa != 0 then td.diff_oa
-			else d.offer_accepted end as offer_accepted,
-	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.credit_evaluation_init
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.cei_total_week != 0 and td.diff_cei != 0 then td.diff_cei * coalesce(wm.cei_calculado,0)/wm.cei_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.cei_total_week = 0 and td.diff_cei != 0 then td.diff_cei
-			else d.credit_evaluation_init end as credit_evaluation_init,
-	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.credit_evaluation_positive
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.cep_total_week != 0 and td.diff_cep != 0 then td.diff_cep * coalesce(wm.cep_calculado,0)/wm.cep_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.cep_total_week = 0 and td.diff_cep != 0 then td.diff_cep
-			else d.credit_evaluation_positive end as credit_evaluation_positive,
-	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.document_sent
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.ds_total_week != 0 and td.diff_ds != 0 then td.diff_ds * coalesce(wm.ds_calculado,0)/wm.ds_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.ds_total_week = 0 and td.diff_ds != 0 then td.diff_ds
-			else d.document_sent end as document_sent,
-	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.credit_approved
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.ca_total_week != 0 and td.diff_ca != 0 then td.diff_ca * coalesce(wm.ca_calculado,0)/wm.ca_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.ca_total_week = 0 and td.diff_ca != 0 then td.diff_ca
-			else d.credit_approved end as credit_approved,
-	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.contract_signed
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.cs_total_week != 0 and td.diff_cs != 0 then td.diff_cs * coalesce(wm.cs_calculado,0)/wm.cs_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.cs_total_week = 0 and td.diff_cs != 0 then td.diff_cs
-			else d.contract_signed end as contract_signed,
-	case when date_trunc('month', coalesce(g.date, d.date)) <= date_trunc('month', current_date) then g.new_tenant_prospect
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.ntp_total_week != 0 and td.diff_ntp != 0 then td.diff_ntp * coalesce(wm.ntp_calculado,0)/wm.ntp_total_week::float
-			when date_trunc('month', coalesce(g.date, d.date)) > date_trunc('month', current_date) and wm.ntp_total_week = 0 and td.diff_ntp != 0 then td.diff_ntp
-			else d.new_tenant_prospect end as new_tenant_prospect
-from daily_target_shares d
-full outer join gsheets_demand_target_adjusted g
-  on d.date = g.date
-	and d.week_start = g.week_start
-	and d.city_group = g.city_group
-	and d.demand_channel_type = g.demand_channel_type
-	and d.demand_channel = g.demand_channel
-	and d.funnel_first_touchpoint = g.funnel_first_touchpoint
-	and d.guarantee = g.guarantee
-left join targets_diff td
-  on td.week_start = d.week_start
-    and d.city_group = td.city_group
-	and d.demand_channel_type = td.demand_channel_type
-	and d.demand_channel = td.demand_channel
-	and d.funnel_first_touchpoint = td.funnel_first_touchpoint
-	and d.guarantee = td.guarantee
-left join calculated_targets_week_month wm
-  on wm.date = d.date
-    and wm.week_start = d.week_start
-    and wm.city_group = d.city_group
-    and wm.demand_channel_type = d.demand_channel_type
-    and wm.demand_channel = d.demand_channel
-    and wm.funnel_first_touchpoint = d.funnel_first_touchpoint
-    and wm.guarantee = d.guarantee
-), negative_targets as (
-select
+	visit_booked AS vb_calculado,
+	SUM(CASE WHEN DATE_TRUNC('month', date) > DATE_TRUNC('month', CURRENT_DATE) THEN visit_booked ELSE 0 END) OVER(PARTITION BY week_start, city_group, demand_channel_type, demand_channel, funnel_first_touchpoint, guarantee) AS vb_total_week,
+	SUM(visit_completed) AS vc_calculado,
+	SUM(CASE WHEN DATE_TRUNC('month', date) > DATE_TRUNC('month', CURRENT_DATE) THEN visit_completed ELSE 0 END) OVER(PARTITION BY week_start, city_group, demand_channel_type, demand_channel, funnel_first_touchpoint, guarantee) AS vc_total_week,
+	SUM(offer_submitted) AS os_calculado,
+	SUM(CASE WHEN DATE_TRUNC('month', date) > DATE_TRUNC('month', CURRENT_DATE) THEN offer_submitted ELSE 0 END) OVER(PARTITION BY week_start, city_group, demand_channel_type, demand_channel, funnel_first_touchpoint, guarantee) AS os_total_week,
+	SUM(offer_accepted) AS oa_calculado,
+	SUM(CASE WHEN DATE_TRUNC('month', date) > DATE_TRUNC('month', CURRENT_DATE) THEN offer_accepted ELSE 0 END) OVER(PARTITION BY week_start, city_group, demand_channel_type, demand_channel, funnel_first_touchpoint, guarantee) AS oa_total_week,
+	SUM(credit_evaluation_init) AS cei_calculado,
+	SUM(CASE WHEN DATE_TRUNC('month', date) > DATE_TRUNC('month', CURRENT_DATE) THEN credit_evaluation_init ELSE 0 END) OVER(PARTITION BY week_start, city_group, demand_channel_type, demand_channel, funnel_first_touchpoint, guarantee) AS cei_total_week,
+	SUM(credit_evaluation_positive) AS cep_calculado,
+	SUM(CASE WHEN DATE_TRUNC('month', date) > DATE_TRUNC('month', CURRENT_DATE) THEN credit_evaluation_positive ELSE 0 END) OVER(PARTITION BY week_start, city_group, demand_channel_type, demand_channel, funnel_first_touchpoint, guarantee) AS cep_total_week,
+	SUM(document_sent) AS ds_calculado,
+	SUM(CASE WHEN DATE_TRUNC('month', date) > DATE_TRUNC('month', CURRENT_DATE) THEN document_sent ELSE 0 END) OVER(PARTITION BY week_start, city_group, demand_channel_type, demand_channel, funnel_first_touchpoint, guarantee) AS ds_total_week,
+	SUM(credit_approved) AS ca_calculado,
+	SUM(CASE WHEN DATE_TRUNC('month', date) > DATE_TRUNC('month', CURRENT_DATE) THEN credit_approved ELSE 0 END) OVER(PARTITION BY week_start, city_group, demand_channel_type, demand_channel, funnel_first_touchpoint, guarantee) AS ca_total_week,
+	SUM(contract_signed) AS cs_calculado,
+	SUM(CASE WHEN DATE_TRUNC('month', date) > DATE_TRUNC('month', CURRENT_DATE) THEN contract_signed ELSE 0 END) OVER(PARTITION BY week_start, city_group, demand_channel_type, demand_channel, funnel_first_touchpoint, guarantee) AS cs_total_week,
+	SUM(new_tenant_prospect) AS ntp_calculado,
+	SUM(CASE WHEN DATE_TRUNC('month', date) > DATE_TRUNC('month', CURRENT_DATE) THEN new_tenant_prospect ELSE 0 END) OVER(PARTITION BY week_start, city_group, demand_channel_type, demand_channel, funnel_first_touchpoint, guarantee) AS ntp_total_week
+FROM daily_target_shares
+GROUP BY 1, 2, 3, 4, 5, 6, 7, visit_booked, visit_completed, offer_submitted, offer_accepted, credit_evaluation_init, credit_evaluation_positive, document_sent, credit_approved, contract_signed, new_tenant_prospect
+), daily_target_shares_adjusted AS (
+SELECT DISTINCT
+	COALESCE(g.date, d.date) AS date,
+	COALESCE(g.week_start, d.week_start) AS week_start,
+	COALESCE(g.city_group, d.city_group) AS city_group,
+	COALESCE(g.demand_channel_type, d.demand_channel_type) AS demand_channel_type,
+	COALESCE(g.demand_channel, d.demand_channel) AS demand_channel,
+	COALESCE(g.funnel_first_touchpoint, d.funnel_first_touchpoint) AS funnel_first_touchpoint,
+	COALESCE(g.guarantee, d.guarantee) AS guarantee,
+	CASE 
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) <= DATE_TRUNC('month', CURRENT_DATE) THEN g.visit_booked
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.vb_total_week != 0 AND td.diff_vb != 0 THEN td.diff_vb * COALESCE(wm.vb_calculado,0)/wm.vb_total_week::FLOAT
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.vb_total_week = 0 AND td.diff_vb != 0 THEN td.diff_vb
+		 ELSE d.visit_booked END AS visit_booked,
+	CASE 
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) <= DATE_TRUNC('month', CURRENT_DATE) THEN g.visit_completed
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.vc_total_week != 0 AND td.diff_vc != 0 THEN td.diff_vc * COALESCE(wm.vc_calculado,0)/wm.vc_total_week::FLOAT
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.vc_total_week = 0 AND td.diff_vc != 0 THEN td.diff_vc
+		 ELSE d.visit_completed END AS visit_completed,
+	CASE 
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) <= DATE_TRUNC('month', CURRENT_DATE) THEN g.offer_submitted
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.os_total_week != 0 AND td.diff_os != 0 THEN td.diff_os * COALESCE(wm.os_calculado,0)/wm.os_total_week::FLOAT
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.os_total_week = 0 AND td.diff_os != 0 THEN td.diff_os
+		 ELSE d.offer_submitted END AS offer_submitted,
+	CASE 
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) <= DATE_TRUNC('month', CURRENT_DATE) THEN g.offer_accepted
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.oa_total_week != 0 AND td.diff_oa != 0 THEN td.diff_oa * COALESCE(wm.oa_calculado,0)/wm.oa_total_week::FLOAT
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.oa_total_week = 0 AND td.diff_oa != 0 THEN td.diff_oa
+		 ELSE d.offer_accepted END AS offer_accepted,
+	CASE 
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) <= DATE_TRUNC('month', CURRENT_DATE) THEN g.credit_evaluation_init
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.cei_total_week != 0 AND td.diff_cei != 0 THEN td.diff_cei * COALESCE(wm.cei_calculado,0)/wm.cei_total_week::FLOAT
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.cei_total_week = 0 AND td.diff_cei != 0 THEN td.diff_cei
+		 ELSE d.credit_evaluation_init END AS credit_evaluation_init,
+	CASE 
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) <= DATE_TRUNC('month', CURRENT_DATE) THEN g.credit_evaluation_positive
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.cep_total_week != 0 AND td.diff_cep != 0 THEN td.diff_cep * COALESCE(wm.cep_calculado,0)/wm.cep_total_week::FLOAT
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.cep_total_week = 0 AND td.diff_cep != 0 THEN td.diff_cep
+		 ELSE d.credit_evaluation_positive END AS credit_evaluation_positive,
+	CASE 
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) <= DATE_TRUNC('month', CURRENT_DATE) THEN g.document_sent
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.ds_total_week != 0 AND td.diff_ds != 0 THEN td.diff_ds * COALESCE(wm.ds_calculado,0)/wm.ds_total_week::FLOAT
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.ds_total_week = 0 AND td.diff_ds != 0 THEN td.diff_ds
+		 ELSE d.document_sent END AS document_sent,
+	CASE 
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) <= DATE_TRUNC('month', CURRENT_DATE) THEN g.credit_approved
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.ca_total_week != 0 AND td.diff_ca != 0 THEN td.diff_ca * COALESCE(wm.ca_calculado,0)/wm.ca_total_week::FLOAT
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.ca_total_week = 0 AND td.diff_ca != 0 THEN td.diff_ca
+		 ELSE d.credit_approved END AS credit_approved,
+	CASE 
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) <= DATE_TRUNC('month', CURRENT_DATE) THEN g.contract_signed
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.cs_total_week != 0 AND td.diff_cs != 0 THEN td.diff_cs * COALESCE(wm.cs_calculado,0)/wm.cs_total_week::FLOAT
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.cs_total_week = 0 AND td.diff_cs != 0 THEN td.diff_cs
+		 ELSE d.contract_signed END AS contract_signed,
+	CASE 
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) <= DATE_TRUNC('month', CURRENT_DATE) THEN g.new_tenant_prospect
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.ntp_total_week != 0 AND td.diff_ntp != 0 THEN td.diff_ntp * COALESCE(wm.ntp_calculado,0)/wm.ntp_total_week::FLOAT
+		WHEN DATE_TRUNC('month', COALESCE(g.date, d.date)) > DATE_TRUNC('month', CURRENT_DATE) AND wm.ntp_total_week = 0 AND td.diff_ntp != 0 THEN td.diff_ntp
+		 ELSE d.new_tenant_prospect END AS new_tenant_prospect
+FROM daily_target_shares d
+FULL OUTER JOIN gsheets_demand_target_adjusted g
+  ON d.date = g.date
+	AND d.week_start = g.week_start
+	AND d.city_group = g.city_group
+	AND d.demand_channel_type = g.demand_channel_type
+	AND d.demand_channel = g.demand_channel
+	AND d.funnel_first_touchpoint = g.funnel_first_touchpoint
+	AND d.guarantee = g.guarantee
+LEFT JOIN targets_diff td
+  ON td.week_start = d.week_start
+    AND d.city_group = td.city_group
+	AND d.demand_channel_type = td.demand_channel_type
+	AND d.demand_channel = td.demand_channel
+	AND d.funnel_first_touchpoint = td.funnel_first_touchpoint
+	AND d.guarantee = td.guarantee
+LEFT JOIN calculated_targets_week_month wm
+  ON wm.date = d.date
+    AND wm.week_start = d.week_start
+    AND wm.city_group = d.city_group
+    AND wm.demand_channel_type = d.demand_channel_type
+    AND wm.demand_channel = d.demand_channel
+    AND wm.funnel_first_touchpoint = d.funnel_first_touchpoint
+    AND wm.guarantee = d.guarantee
+), negative_targets AS (
+SELECT
 	date,
 	demand_channel_type,
-	sum(case when visit_booked < 0 then visit_booked end) as vb_negative,
-	sum(case when visit_completed < 0 then visit_completed end) as vc_negative,
-	sum(case when offer_submitted < 0 then offer_submitted end) as os_negative,
-	sum(case when offer_accepted < 0 then offer_accepted end) as oa_negative,
-	sum(case when credit_evaluation_init < 0 then credit_evaluation_init end) as cei_negative,
-	sum(case when credit_evaluation_positive < 0 then credit_evaluation_positive end) as cep_negative,
-	sum(case when document_sent < 0 then document_sent end) as ds_negative,
-	sum(case when credit_approved < 0 then credit_approved end) as ca_negative,
-	sum(case when contract_signed < 0 then contract_signed end) as cs_negative,
-	sum(case when new_tenant_prospect < 0 then new_tenant_prospect end) as ntp_negative
-from daily_target_shares_adjusted
-group by 1,2
+	SUM(CASE WHEN visit_booked < 0 THEN visit_booked END) AS vb_negative,
+	SUM(CASE WHEN visit_completed < 0 THEN visit_completed END) AS vc_negative,
+	SUM(CASE WHEN offer_submitted < 0 THEN offer_submitted END) AS os_negative,
+	SUM(CASE WHEN offer_accepted < 0 THEN offer_accepted END) AS oa_negative,
+	SUM(CASE WHEN credit_evaluation_init < 0 THEN credit_evaluation_init END) AS cei_negative,
+	SUM(CASE WHEN credit_evaluation_positive < 0 THEN credit_evaluation_positive END) AS cep_negative,
+	SUM(CASE WHEN document_sent < 0 THEN document_sent END) AS ds_negative,
+	SUM(CASE WHEN credit_approved < 0 THEN credit_approved END) AS ca_negative,
+	SUM(CASE WHEN contract_signed < 0 THEN contract_signed END) AS cs_negative,
+	SUM(CASE WHEN new_tenant_prospect < 0 THEN new_tenant_prospect END) AS ntp_negative
+FROM daily_target_shares_adjusted
+GROUP BY 1, 2
 )
-select
+SELECT
 	dt.date,
 	dt.week_start,
 	dt.city_group,
@@ -435,17 +445,17 @@ select
 	dt.demand_channel,
 	dt.funnel_first_touchpoint,
 	dt.guarantee,
-	case when visit_booked <= 0 then 0 else visit_booked + (coalesce(nt.vb_negative,0) * visit_booked/(sum(case when visit_booked > 0 then visit_booked end) over(partition by dt.date, dt.demand_channel_type))) end as visit_booked,
-	case when visit_completed <= 0 then 0 else visit_completed + coalesce(nt.vc_negative,0) * visit_completed/(sum(case when visit_completed > 0 then visit_completed end) over(partition by dt.date, dt.demand_channel_type)) end as visit_completed,
-	case when offer_submitted <= 0 then 0 else offer_submitted + coalesce(nt.os_negative,0) * offer_submitted/(sum(case when offer_submitted > 0 then offer_submitted end) over(partition by dt.date, dt.demand_channel_type)) end as offer_submitted,
-	case when offer_accepted <= 0 then 0 else offer_accepted + coalesce(nt.oa_negative,0) * offer_accepted/(sum(case when offer_accepted > 0 then offer_accepted end) over(partition by dt.date, dt.demand_channel_type)) end as offer_accepted,
-	case when credit_evaluation_init <= 0 then 0 else credit_evaluation_init + coalesce(nt.cei_negative,0) * credit_evaluation_init/(sum(case when credit_evaluation_init > 0 then credit_evaluation_init end) over(partition by dt.date, dt.demand_channel_type)) end as credit_evaluation_init,
-	case when credit_evaluation_positive <= 0 then 0 else credit_evaluation_positive + coalesce(nt.cep_negative,0) * credit_evaluation_positive/(sum(case when credit_evaluation_positive > 0 then credit_evaluation_positive end ) over(partition by dt.date, dt.demand_channel_type)) end as credit_evaluation_positive,
-	case when document_sent <= 0 then 0 else document_sent + coalesce(nt.ds_negative,0) * document_sent/(sum(case when document_sent > 0 then document_sent end) over(partition by dt.date, dt.demand_channel_type)) end as document_sent,
-	case when credit_approved <= 0 then 0 else credit_approved + coalesce(nt.ca_negative,0) * credit_approved/(sum(case when credit_approved > 0 then credit_approved end ) over(partition by dt.date, dt.demand_channel_type)) end as credit_approved,
-	case when contract_signed <= 0 then 0 else contract_signed + coalesce(nt.cs_negative,0) * contract_signed/(sum(case when contract_signed > 0 then contract_signed end ) over(partition by dt.date, dt.demand_channel_type)) end as contract_signed,
-	case when new_tenant_prospect <= 0 then 0 else new_tenant_prospect + coalesce(nt.ntp_negative,0) * new_tenant_prospect/(sum(case when new_tenant_prospect > 0 then new_tenant_prospect end) over(partition by dt.date, dt.demand_channel_type)) end as new_tenant_prospect
-from daily_target_shares_adjusted dt
-left join negative_targets nt
-  on dt.date = nt.date
+	CASE WHEN visit_booked <= 0 THEN 0 ELSE visit_booked + (COALESCE(nt.vb_negative,0) * visit_booked/(SUM(CASE WHEN visit_booked > 0 THEN visit_booked END) OVER(PARTITION BY dt.date, dt.demand_channel_type))) END AS visit_booked,
+	CASE WHEN visit_completed <= 0 THEN 0 ELSE visit_completed + COALESCE(nt.vc_negative,0) * visit_completed/(SUM(CASE WHEN visit_completed > 0 THEN visit_completed END) OVER(PARTITION BY dt.date, dt.demand_channel_type)) END AS visit_completed,
+	CASE WHEN offer_submitted <= 0 THEN 0 ELSE offer_submitted + COALESCE(nt.os_negative,0) * offer_submitted/(SUM(CASE WHEN offer_submitted > 0 THEN offer_submitted END) OVER(PARTITION BY dt.date, dt.demand_channel_type)) END AS offer_submitted,
+	CASE WHEN offer_accepted <= 0 THEN 0 ELSE offer_accepted + COALESCE(nt.oa_negative,0) * offer_accepted/(SUM(CASE WHEN offer_accepted > 0 THEN offer_accepted END) OVER(PARTITION BY dt.date, dt.demand_channel_type)) END AS offer_accepted,
+	CASE WHEN credit_evaluation_init <= 0 THEN 0 ELSE credit_evaluation_init + COALESCE(nt.cei_negative,0) * credit_evaluation_init/(SUM(CASE WHEN credit_evaluation_init > 0 THEN credit_evaluation_init END) OVER(PARTITION BY dt.date, dt.demand_channel_type)) END AS credit_evaluation_init,
+	CASE WHEN credit_evaluation_positive <= 0 THEN 0 ELSE credit_evaluation_positive + COALESCE(nt.cep_negative,0) * credit_evaluation_positive/(SUM(CASE WHEN credit_evaluation_positive > 0 THEN credit_evaluation_positive END ) OVER(PARTITION BY dt.date, dt.demand_channel_type)) END AS credit_evaluation_positive,
+	CASE WHEN document_sent <= 0 THEN 0 ELSE document_sent + COALESCE(nt.ds_negative,0) * document_sent/(SUM(CASE WHEN document_sent > 0 THEN document_sent END) OVER(PARTITION BY dt.date, dt.demand_channel_type)) END AS document_sent,
+	CASE WHEN credit_approved <= 0 THEN 0 ELSE credit_approved + COALESCE(nt.ca_negative,0) * credit_approved/(SUM(CASE WHEN credit_approved > 0 THEN credit_approved END ) OVER(PARTITION BY dt.date, dt.demand_channel_type)) END AS credit_approved,
+	CASE WHEN contract_signed <= 0 THEN 0 ELSE contract_signed + COALESCE(nt.cs_negative,0) * contract_signed/(SUM(CASE WHEN contract_signed > 0 THEN contract_signed END ) OVER(PARTITION BY dt.date, dt.demand_channel_type)) END AS contract_signed,
+	CASE WHEN new_tenant_prospect <= 0 THEN 0 ELSE new_tenant_prospect + COALESCE(nt.ntp_negative,0) * new_tenant_prospect/(SUM(CASE WHEN new_tenant_prospect > 0 THEN new_tenant_prospect END) OVER(PARTITION BY dt.date, dt.demand_channel_type)) END AS new_tenant_prospect
+FROM daily_target_shares_adjusted dt
+LEFT JOIN negative_targets nt
+  ON dt.date = nt.date
     AND dt.demand_channel_type = nt.demand_channel_type;
