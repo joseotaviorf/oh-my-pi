@@ -3,7 +3,7 @@ CREATE TABLE if not exists payment.dim_invoice (
     sk_invoice BIGINT primary key,
     frequency VARCHAR(50),
     payment_status VARCHAR(50),
-    user VARCHAR(50),
+    "user" VARCHAR(50),
     due_amount DECIMAL(13,2),
     paid_amount DECIMAL(13,2),
     accrual_year_month INT,
