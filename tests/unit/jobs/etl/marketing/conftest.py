@@ -9,7 +9,6 @@ from bietlejuice.jobs.etl.marketing import LifullCampaigns
 from bietlejuice.jobs.etl.marketing import Marketing
 from bietlejuice.jobs.etl.marketing import TwitterCampaigns
 from bietlejuice.jobs.etl.marketing.factory import MarketingFactory
-from bietlejuice.jobs.etl.marketing.linkedin_campaigns import LinkedInCampaigns
 
 S3_BUCKET = 's3_bucket'
 EXECUTION_DATE = datetime(2018, 1, 1)
@@ -70,17 +69,6 @@ def twitter_campaigns():
               "access_token_secret": "access_token_secret"}
     )
 
-
-@pytest.fixture
-def linkedin_campaigns():
-    return LinkedInCampaigns(
-        s3_bucket=S3_BUCKET,
-        execution_date=EXECUTION_DATE,
-        auth={"API_KEY": "api_key",
-              "API_SECRET": "api_secret",
-              "REFRESH_TOKEN": "refresh_token"
-              }
-    )
 
 
 @pytest.fixture

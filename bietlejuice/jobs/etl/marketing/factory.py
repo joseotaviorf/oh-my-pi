@@ -3,7 +3,6 @@ from datetime import timedelta
 from bietlejuice.jobs.etl.marketing.facebook_ads import FacebookAds
 from bietlejuice.jobs.etl.marketing.google_ads import GoogleAds
 from bietlejuice.jobs.etl.marketing.lifull_campaigns import LifullCampaigns
-from bietlejuice.jobs.etl.marketing.linkedin_campaigns import LinkedInCampaigns
 from bietlejuice.jobs.etl.marketing.marketing_enum import MarketingEnum
 from bietlejuice.jobs.etl.marketing.rtb_campaigns import RtbCampaigns
 from bietlejuice.jobs.etl.marketing.twitter_campaigns import TwitterCampaigns
@@ -44,7 +43,6 @@ class MarketingFactory(object):
             MarketingEnum.FACEBOOK_ADS: FacebookAds,
             MarketingEnum.RTB: RtbCampaigns,
             MarketingEnum.TWITTER: TwitterCampaigns,
-            MarketingEnum.LINKEDIN: LinkedInCampaigns,
             MarketingEnum.LIFULL: LifullCampaigns
         }.get(class_)
 

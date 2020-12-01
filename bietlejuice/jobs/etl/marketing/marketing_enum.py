@@ -6,5 +6,4 @@ class MarketingEnum(Enum):
     FACEBOOK_ADS = 'facebook_ads'
     RTB = 'rtb_campaigns'
     TWITTER = 'twitter_ads'
-    LINKEDIN = 'linkedin_campaigns'
     LIFULL = 'lifull_campaigns'
