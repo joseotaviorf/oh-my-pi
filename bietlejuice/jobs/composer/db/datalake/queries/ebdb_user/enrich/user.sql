@@ -66,6 +66,42 @@ user_information AS (
             ON contract_ids.id_user = user.id
     GROUP BY
         1, 2, 3, 4, 5, 6, 7
+),
+user_state AS (
+    SELECT
+        id AS id_user,
+        CASE
+            WHEN id_state = 1 THEN 'AC'
+            WHEN id_state = 2 THEN 'AL'
+            WHEN id_state = 3 THEN 'AM'
+            WHEN id_state = 4 THEN 'AP'
+            WHEN id_state = 5 THEN 'BA'
+            WHEN id_state = 6 THEN 'CE'
+            WHEN id_state = 7 THEN 'DF'
+            WHEN id_state = 8 THEN 'ES'
+            WHEN id_state = 9 THEN 'GO'
+            WHEN id_state = 10 THEN 'MA'
+            WHEN id_state = 11 THEN 'MG'
+            WHEN id_state = 12 THEN 'MS'
+            WHEN id_state = 13 THEN 'MT'
+            WHEN id_state = 14 THEN 'PA'
+            WHEN id_state = 15 THEN 'PB'
+            WHEN id_state = 16 THEN 'PE'
+            WHEN id_state = 17 THEN 'PI'
+            WHEN id_state = 18 THEN 'PR'
+            WHEN id_state = 19 THEN 'RJ'
+            WHEN id_state = 20 THEN 'RN'
+            WHEN id_state = 21 THEN 'RR'
+            WHEN id_state = 21 THEN 'RO'
+            WHEN id_state = 23 THEN 'RS'
+            WHEN id_state = 24 THEN 'SC'
+            WHEN id_state = 25 THEN 'SE'
+            WHEN id_state = 26 THEN 'SP'
+            WHEN id_state = 27 THEN 'TO'
+            ELSE NULL
+        END AS uf
+    FROM
+        datalake_ebdb_clean.user 
 )
 SELECT
     u.id,
@@ -81,8 +117,8 @@ SELECT
     u.cpf,
     u.rg,
     CASE
-        WHEN u.cpf RLIKE '([0-9]{3})(.)([0-9]{3})(.)([0-9]{3})(-)([0-9]{2})' THEN 'CPF'
-        WHEN u.cpf RLIKE '([0-9]{2})(.)([0-9]{3})(.)([0-9]{3})(\/)([0-9]{4})(-)([0-9]{2})' THEN 'CNPJ'
+        WHEN u.cpf RLIKE '([0-9]{{3}})(.)([0-9]{{3}})(.)([0-9]{{3}})(-)([0-9]{{2}})' THEN 'CPF'
+        WHEN u.cpf RLIKE '([0-9]{{2}})(.)([0-9]{{3}})(.)([0-9]{{3}})(\/)([0-9]{{4}})(-)([0-9]{{2}})' THEN 'CNPJ'
     END AS personal_document_type,
     u.gender,
     u.email,
@@ -95,6 +131,7 @@ SELECT
     u.neighborhood,
     u.city,
     u.zip_code,
+    us.uf,
     u.main_phone,
     ui.main_phone_ddd,
     u.bank_agency,
@@ -131,3 +168,6 @@ LEFT JOIN
 LEFT JOIN
     user_information AS ui
         ON ui.id_user = u.id
+LEFT JOIN
+    user_state AS us
+        ON us.id_user = u.id
