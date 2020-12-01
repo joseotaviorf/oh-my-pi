@@ -1,8 +1,6 @@
 import mock
 import pytest
 
-from bietlejuice.jobs.dags.marketing.marketing_criteo_campaigns_subdag import \
-    MarketingCriteoCampaignsSubDag
 from bietlejuice.jobs.dags.marketing.marketing_facebook_ads_subdag import \
     MarketingFacebookAdsSubDag
 from bietlejuice.jobs.dags.marketing.marketing_google_ads_subdag import \
@@ -21,7 +19,6 @@ class TestMarketingSubdagFactory(object):
     @pytest.mark.parametrize('class_, expected', [
         (MarketingEnum.GOOGLE_ADS, MarketingGoogleAdsSubDag),
         (MarketingEnum.FACEBOOK_ADS, MarketingFacebookAdsSubDag),
-        (MarketingEnum.CRITEO, MarketingCriteoCampaignsSubDag),
         (MarketingEnum.RTB, MarketingRtbCampaignsSubDag),
         (MarketingEnum.TWITTER, MarketingTwitterCampaignsSubDag)
     ])

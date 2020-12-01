@@ -1,4 +1,3 @@
-from bietlejuice.jobs.etl.marketing.criteo_campaigns import CriteoCampaigns
 from bietlejuice.jobs.etl.marketing.facebook_ads import FacebookAds
 from bietlejuice.jobs.etl.marketing.google_ads import GoogleAds
 from bietlejuice.jobs.etl.marketing.lifull_campaigns import LifullCampaigns

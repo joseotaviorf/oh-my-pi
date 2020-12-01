@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pytest
 
-from bietlejuice.jobs.etl.marketing import CriteoCampaigns, RtbCampaigns
+from bietlejuice.jobs.etl.marketing import RtbCampaigns
 from bietlejuice.jobs.etl.marketing import FacebookAds
 from bietlejuice.jobs.etl.marketing import GoogleAds
 from bietlejuice.jobs.etl.marketing import LifullCampaigns
@@ -57,15 +57,6 @@ def mkt_acc_integration():
 @pytest.fixture(scope='session')
 def factory():
     return MarketingFactory()
-
-
-@pytest.fixture(scope='session')
-def criteo_campaigns():
-    return CriteoCampaigns(
-        s3_bucket=S3_BUCKET,
-        execution_date=EXECUTION_DATE,
-        auth=AUTH
-    )
 
 
 @pytest.fixture

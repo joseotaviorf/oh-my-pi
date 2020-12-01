@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pytest
 from bietlejuice.jobs.etl.marketing import FacebookAds, GoogleAds, \
-    CriteoCampaigns, RtbCampaigns, TwitterCampaigns, LifullCampaigns
+    RtbCampaigns, TwitterCampaigns, LifullCampaigns
 from bietlejuice.jobs.etl.marketing.marketing_enum import MarketingEnum
 
 
@@ -10,7 +10,6 @@ class TestMarketingFactory(object):
     @pytest.mark.parametrize('class_, expected',
                              [(MarketingEnum.FACEBOOK_ADS, FacebookAds),
                               (MarketingEnum.GOOGLE_ADS, GoogleAds),
-                              (MarketingEnum.CRITEO, CriteoCampaigns),
                               (MarketingEnum.RTB, RtbCampaigns),
                               (MarketingEnum.TWITTER, TwitterCampaigns),
                               (MarketingEnum.LIFULL, LifullCampaigns)])
@@ -35,8 +34,6 @@ class TestMarketingFactory(object):
                              [(MarketingEnum.FACEBOOK_ADS, FacebookAds,
                                datetime(2017, 12, 31)),
                               (MarketingEnum.GOOGLE_ADS, GoogleAds,
-                               datetime(2017, 12, 31)),
-                              (MarketingEnum.CRITEO, CriteoCampaigns,
                                datetime(2017, 12, 31)),
                               (MarketingEnum.RTB, RtbCampaigns, datetime(2017, 12, 31)),
                               (MarketingEnum.TWITTER, TwitterCampaigns,
