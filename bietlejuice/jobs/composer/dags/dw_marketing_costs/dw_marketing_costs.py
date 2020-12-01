@@ -59,6 +59,10 @@ MEDIA_DAG_PARAMETERS = {
         "partitions": ["year", "month", "day"],
         "dw_query_filters": {"year": "{year}", "month": "{month}", "day": "{day}"},
     },
+    "facebook_insights": {
+        "partitions": ["year", "month", "day"],
+        "dw_query_filters": {"year": "{year}", "month": "{month}", "day": "{day}"},
+    },
 }
 
 dag = DAG(
