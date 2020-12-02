@@ -11,7 +11,7 @@ SELECT
   month,
   day
 FROM
-  datalake_sauron_raw.incomingmessages
+  datalake_sauron_raw.incoming_messages
 WHERE
   year = {year}
   AND month = {month}

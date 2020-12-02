@@ -14,7 +14,7 @@ SELECT
   month,
   day
 FROM
-  datalake_sauron_raw.expiredsessions
+  datalake_sauron_raw.expired_sessions
 WHERE
   year = {year}
   AND month = {month}
