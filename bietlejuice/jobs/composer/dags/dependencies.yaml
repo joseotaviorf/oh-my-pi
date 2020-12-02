@@ -260,6 +260,9 @@ bietlejuice.enrich_marketing_costs:
   - bietlejuice.facebook_insights
   - bietlejuice.marketing_hub
 
+bietlejuice.enrich_terminator:
+  - bietlejuice.terminator
+
 bietlejuice.regions_polygon:
   - bietlejuice.enrich_region:load-region-to-enrich
   - bietlejuice.ebdb:load-polygon-region
