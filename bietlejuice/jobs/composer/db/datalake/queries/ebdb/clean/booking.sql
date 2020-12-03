@@ -16,6 +16,7 @@ select
   codigo as code,
   durationinslots as slots_duration,
   businesscontext as business_context,
+  intention as buyer_intention,
   checkinstatus as checkin_status,
   visitordatetime as visitor_id_date_slot,
   status,
