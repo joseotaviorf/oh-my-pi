@@ -1,0 +1,26 @@
+SELECT
+    id,
+    referenceid AS id_reference,
+    dimensionentity_id AS id_dimension_entity,
+    status,
+    address,
+    number,
+    additionaladdress AS additional_address,
+    neighborhood,
+    city,
+    zipcode AS zip_code,
+    saleprice AS sale_price,
+    rentprice AS rent_price,
+    condominium,
+    name,
+    phone,
+    phonesecondary AS phone_secondary,
+    phonetertiary AS phone_tertiary,
+    discardedbythirdparty AS is_discarded_by_third_party,
+    longtail AS is_long_tail,
+    whatsappoptedin AS is_whatsapp_opted_in,
+    forsale AS is_for_sale,
+    forrent AS is_for_rent,
+    exclusivityintent AS is_exclusivity_intent
+FROM
+    datalake_wololo_raw.prospect
