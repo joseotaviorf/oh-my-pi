@@ -19,7 +19,7 @@ bietlejuice.dw_booking:
   - bietlejuice.enrich_amplitude_visit
 
 bietlejuice.dw_marketing_costs:
-  - bietlejuice.enrich_marketing_costs
+  - bietlejuice.enrich_marketing_costs.load-google-keywords-performance-report-to-enrich:load-enrich-google-keywords-performance-report
   - bietlejuice.linkedin
 
 bietlejuice.dw_proposal:
