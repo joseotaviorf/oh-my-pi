@@ -1,10 +1,11 @@
-drop table if exists quinto_messenger.fact_tasks;
-create table if not exists quinto_messenger.fact_tasks (
-    sk_task varchar(100) primary key,
-    sk_chat varchar(100),
-    sk_quinto_messenger_agent bigint,
-    sk_created_date bigint,
-    is_forwarded boolean,
-    seconds_first_reply decimal(38,3),
-    task_number integer
+DROP TABLE IF EXISTS quinto_messenger.fact_tasks;
+CREATE TABLE IF NOT EXISTS quinto_messenger.fact_tasks (
+    sk_task VARCHAR(100) PRIMARY KEY,
+    sk_chat VARCHAR(100),
+    sk_quinto_messenger_agent BIGINT,
+    sk_created_date BIGINT,
+    is_forwarded BOOLEAN,
+    seconds_first_reply DECIMAL(38,3),
+    task_number INTEGER
 )
+ALTER TABLE quinto_messenger.fact_tasks OWNER TO airflow;

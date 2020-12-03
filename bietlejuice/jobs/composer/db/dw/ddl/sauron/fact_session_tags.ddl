@@ -1,5 +1,6 @@
-drop table if exists sauron.fact_session_tags;
-create table if not exists sauron.fact_session_tags (
-    sk_session bigint primary key,
-    tag varchar(50)
+DROP TABLE IF EXISTS sauron.fact_session_tags;
+CREATE TABLE IF NOT EXISTS sauron.fact_session_tags (
+    sk_session BIGINT PRIMARY KEY,
+    session_tag VARCHAR(50)
 )
+ALTER TABLE sauron.fact_session_tags OWNER TO airflow;

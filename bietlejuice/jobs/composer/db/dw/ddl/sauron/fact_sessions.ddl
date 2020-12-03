@@ -1,11 +1,12 @@
-drop table if exists sauron.fact_sessions;
-create table if not exists sauron.fact_sessions (
-	sk_nps_answer bigint primary key,
-	sk_session bigint,
-	sk_conversation varchar(100),
-	sk_user bigint,
-	sk_personal_document varchar(50),
-	sk_created_date bigint,
-	is_retained_by_BOT boolean,
-	minutes_duration decimal(38,3)
+DROP TABLE IF EXISTS sauron.fact_sessions;
+CREATE TABLE IF NOT EXISTS sauron.fact_sessions (
+	sk_nps_answer BIGINT PRIMARY KEY,
+	sk_session BIGINT,
+	sk_conversation VARCHAR(100),
+	sk_user BIGINT,
+	sk_personal_document VARCHAR(50),
+	sk_created_date BIGINT,
+	is_retained_by_bot BOOLEAN,
+	minutes_duration DECIMAL(38,3)
 )
+ALTER TABLE sauron.fact_sessions OWNER TO airflow;

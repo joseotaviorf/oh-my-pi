@@ -1,10 +1,11 @@
-drop table if exists quinto_messenger.dim_chat;
-create table if not exists quinto_messenger.dim_chat (
-    sk_chat varchar(100) primary key,
-    channel varchar(25),
-    customer_phone varchar(25),
-    status varchar(25),
-    is_forwarded boolean,
-    ts_created timestamp,
-    ts_updated timestamp
+DROP TABLE IF EXISTS quinto_messenger.dim_chat;
+CREATE TABLE IF NOT EXISTS quinto_messenger.dim_chat (
+    sk_chat VARCHAR(100) PRIMARY KEY,
+    channel VARCHAR(25),
+    customer_phone VARCHAR(25),
+    status VARCHAR(25),
+    is_forwarded BOOLEAN,
+    ts_created TIMESTAMP,
+    ts_updated TIMESTAMP
 )
+ALTER TABLE quinto_messenger.dim_chat OWNER TO airflow;

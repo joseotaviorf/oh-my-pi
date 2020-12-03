@@ -1,9 +1,10 @@
-drop table if exists quinto_messenger.dim_quinto_messenger_agent;
-create table if not exists quinto_messenger.dim_quinto_messenger_agent (
-    sk_quinto_messenger_agent bigint primary key,
-    name varchar(100),
-    email varchar(50),
-    location varchar(25),
-    skills varchar(200),
-    ts_updated timestamp
+DROP TABLE IF EXISTS quinto_messenger.dim_quinto_messenger_agent;
+CREATE TABLE IF NOT EXISTS quinto_messenger.dim_quinto_messenger_agent (
+    sk_quinto_messenger_agent BIGINT PRIMARY KEY,
+    name VARCHAR(100),
+    email VARCHAR(50),
+    location VARCHAR(25),
+    skills VARCHAR(200),
+    ts_updated TIMESTAMP
 )
+ALTER TABLE quinto_messenger.dim_quinto_messenger_agent OWNER TO airflow;
