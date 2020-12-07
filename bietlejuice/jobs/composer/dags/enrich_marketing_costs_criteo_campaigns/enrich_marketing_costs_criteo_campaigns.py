@@ -1,6 +1,5 @@
 from datetime import datetime
 import pendulum
-import json
 
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
@@ -14,20 +13,10 @@ from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.services import FileService
 
-from bietlejuice.jobs.composer.dags.enrich_marketing_costs.facebook_sub_dag import (
-    FacebookSubDAG,
-)
-
-
-PARTITION_COLS = {
-    "google": ["acc", "load_date"],
-    "facebook_insights": ["year", "month", "day"],
-}
-BLOCK_LIST = ["criteo_campaigns"]
-MARKETING_HUB_MEDIAS = ["google"]
-SOURCE = "marketing_hub"
+PARTITION_COLS = ["year", "month", "day"]
+MEDIA = "criteo_campaigns"
 TARGET = "marketing_costs"
-DAG_ID = f"bietlejuice.enrich_{TARGET}"
+DAG_ID = f"bietlejuice.enrich_{TARGET}_{MEDIA}"
 ENV = Variable.get("environment")
 
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
@@ -51,8 +40,6 @@ LIBRARIES_DESCRIPTION = Variable.get(
 local_tz = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz)
 
-ACCOUNTS_NAME_MAPPING = json.loads(Variable.get("facebook_insights_account_names"))
-
 (
     database_name,
     database_location,
@@ -62,13 +49,6 @@ ACCOUNTS_NAME_MAPPING = json.loads(Variable.get("facebook_insights_account_names
 )
 
 EXECUTION_TIMEOUT_HOURS = 3
-
-
-def get_database_name(media_name):
-    if media_name in MARKETING_HUB_MEDIAS:
-        return SOURCE
-    return TARGET
-
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -95,11 +75,10 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 media_names = FileService.list_layer_sql_files(TARGET, "")
 
 for media_name in media_names:
-    if media_name not in BLOCK_LIST:
-        layers = FileService.list_layer_sql_files(TARGET, media_name)
+    if media_name == MEDIA:
+        layers = FileService.list_layer_sql_files(TARGET, MEDIA)
 
         if LayerEnum.ENRICH.value in layers:
-            database_base_name = get_database_name(media_name)
             enrich_layer = f"{media_name}/{LayerEnum.ENRICH.value}"
             sql_file_list = FileService.list_sql_files_without_extension_from_layer(
                 TARGET, enrich_layer
@@ -109,7 +88,7 @@ for media_name in media_names:
                 env=ENV,
                 datalake_bucket=DATALAKE_BUCKET,
                 layer=LayerEnum.ENRICH,
-                database_base_name=database_base_name,
+                database_base_name=TARGET,
                 target_database_base_name=TARGET,
                 relative_query_path=f"{TARGET}/{media_name}",
                 spark_job_paths=BASE_SPARK_JOBS_PATH,
@@ -118,37 +97,9 @@ for media_name in media_names:
                 execution_timeout_hours=EXECUTION_TIMEOUT_HOURS,
             )
             enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(
-                dag,
-                sql_file_list,
-                is_incremental=True,
-                partitions=PARTITION_COLS[media_name],
+                dag, sql_file_list, is_incremental=True, partitions=PARTITION_COLS
             )
 
             create_cluster_task >> list(
                 enrich_sub_dags.values()
             ) >> terminate_cluster_task
-
-# Special Case (Facebook Insights)
-
-facebook_sub_dag_class = FacebookSubDAG(
-    dag_id=DAG_ID,
-    env=ENV,
-    datalake_bucket=DATALAKE_BUCKET,
-    database_base_name=database_base_name,
-    target_database_base_name=TARGET,
-    spark_job_paths=SPARK_JOBS_PATH,
-    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
-    start_date=MAIN_START_DATE,
-)
-
-facebook_sub_dag = facebook_sub_dag_class.get_sub_dag_operator(
-    dag=dag,
-    sub_dag_name="load-facebook-insights-to-enrich",
-    sub_dag_func=facebook_sub_dag_class.build_subdag,
-    table_name="facebook_insights",
-    slugged_table_name="facebook-insights",
-    accounts_name_mapping=ACCOUNTS_NAME_MAPPING,
-    partitions=PARTITION_COLS["facebook_insights"],
-)
-
-create_cluster_task >> facebook_sub_dag >> terminate_cluster_task

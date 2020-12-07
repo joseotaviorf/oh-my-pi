@@ -20,6 +20,11 @@ bietlejuice.dw_booking:
 
 bietlejuice.dw_marketing_costs:
   - bietlejuice.enrich_marketing_costs.load-google-keywords-performance-report-to-enrich:load-enrich-google-keywords-performance-report
+
+bietlejuice.dw_marketing_costs_criteo_campaigns:
+  - bietlejuice.enrich_marketing_costs_criteo_campaigns
+
+bietlejuice.dw_marketing_costs_linkedin:
   - bietlejuice.linkedin
 
 bietlejuice.dw_proposal:
@@ -256,9 +261,11 @@ bietlejuice.enrich_tracksale:
   - bietlejuice.tracksale:answer
 
 bietlejuice.enrich_marketing_costs:
-  - bietlejuice.criteo_campaigns:load-criteo-campaigns-to-clean
   - bietlejuice.facebook_insights
   - bietlejuice.marketing_hub
+
+bietlejuice.enrich_marketing_costs_criteo_campaigns:
+  - bietlejuice.criteo_campaigns:load-criteo-campaigns-to-clean
 
 bietlejuice.enrich_terminator:
   - bietlejuice.terminator
