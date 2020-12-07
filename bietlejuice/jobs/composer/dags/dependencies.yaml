@@ -24,6 +24,9 @@ bietlejuice.dw_marketing_costs:
 bietlejuice.dw_marketing_costs_criteo_campaigns:
   - bietlejuice.enrich_marketing_costs_criteo_campaigns
 
+bietlejuice.dw_marketing_costs_facebook_insights:
+  - bietlejuice.enrich_marketing_costs_facebook_insights
+
 bietlejuice.dw_marketing_costs_linkedin:
   - bietlejuice.linkedin
 
@@ -214,6 +217,9 @@ bietlejuice.enrich_ebdb_user:
 bietlejuice.enrich_ebdb_user_revision_entity:
   - bietlejuice.ebdb:load-user-revision-entity
 
+bietlejuice.enrich_marketing_costs_facebook_insights:
+  - bietlejuice.facebook_insights
+
 bietlejuice.enrich_firestore:
   - bietlejuice.firestore
 
@@ -261,7 +267,6 @@ bietlejuice.enrich_tracksale:
   - bietlejuice.tracksale:answer
 
 bietlejuice.enrich_marketing_costs:
-  - bietlejuice.facebook_insights
   - bietlejuice.marketing_hub
 
 bietlejuice.enrich_marketing_costs_criteo_campaigns:
