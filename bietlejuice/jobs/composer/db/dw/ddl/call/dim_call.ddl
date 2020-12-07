@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS twilio.dim_call;
-CREATE TABLE IF NOT EXISTS twilio.dim_call (
+DROP TABLE IF EXISTS call.dim_call;
+CREATE TABLE IF NOT EXISTS call.dim_call (
 	sk_call VARCHAR(50),
 	from_phone_number VARCHAR(20),
 	to_phone_number VARCHAR(20),
@@ -11,4 +11,4 @@ CREATE TABLE IF NOT EXISTS twilio.dim_call (
 	ts_csat_answered TIMESTAMP,
 	ts_ended TIMESTAMP
 );
-ALTER TABLE twilio.dim_call OWNER TO airflow; 
+ALTER TABLE call.dim_call OWNER TO airflow;
