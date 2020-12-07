@@ -14,7 +14,7 @@ from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.services import FileService
 
-from bietlejuice.jobs.composer.dags.enrich_marketing_costs.facebook_sub_dag import (
+from bietlejuice.jobs.composer.dags.enrich_marketing_costs_facebook_insights.facebook_sub_dag import (
     FacebookSubDAG,
 )
 
