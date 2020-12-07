@@ -591,7 +591,7 @@ cost_taxonomy as (
         mccc.city_group as cost_city_group,
         -- city via campaign_name full name written
         case
-            when campaign_name_l in ('Florianópolis', 'Curitiba', 'Goiânia', 'Rio de Janeiro', 'RMSP', 'Belo Horizonte', 'Brasília', 'Campinas', 'Porto Alegre')
+            when campaign_name_l in ('Florianópolis', 'Curitiba', 'Goiânia', 'Rio de Janeiro', 'RMSP', 'Belo Horizonte', 'Brasília', 'Campinas', 'Porto Alegre', 'Santos', 'Recife', 'Salvador')
                 then campaign_name_l
             when cf.campaign_name_l like '%campinas%' then 'Campinas'
             when cf.campaign_name_l like '%s_o_paulo%' or cf.campaign_name_l like '%sp detailed%' then 'RMSP'
@@ -621,10 +621,13 @@ cost_taxonomy as (
             when cf.campaign_name_l like '%cps%' then 'Campinas'
             when cf.campaign_name_l like '%bsb%' then 'Brasília'
             when cf.campaign_name_l like '%rj%' then 'Rio de Janeiro'
+            when cf.campaign_name_l like '%santos%' then 'Santos'
+            when cf.campaign_name_l like '%recife%' then 'Recife'
+            when cf.campaign_name_l like '%salvador%' then 'Salvador'
         end as city_campaign_mapping_rule,
         -- city via campaign_name name convention
         case
-             when campaign_city in ('Florianópolis', 'Curitiba', 'Goiânia', 'Rio de Janeiro', 'RMSP', 'Belo Horizonte', 'Brasília', 'Campinas', 'Porto Alegre')
+             when campaign_city in ('Florianópolis', 'Curitiba', 'Goiânia', 'Rio de Janeiro', 'RMSP', 'Belo Horizonte', 'Brasília', 'Campinas', 'Porto Alegre', 'Santos', 'Recife', 'Salvador')
                 then campaign_city
              when campaign_city = 'campinas' then 'Campinas'
              when campaign_city in ('sp', 'jui', 'santo_andre', 'guarulhos', 'osasco', 'sao_caetano', 'sao_bernardo', 'barueri', 'rmsp') then 'RMSP'
@@ -635,6 +638,9 @@ cost_taxonomy as (
              when campaign_city = 'curitiba' then 'Curitiba'
              when campaign_city in ('fln', 'florianopolis') then 'Florianópolis'
              when campaign_city in ('bsb', 'brasilia') then 'Brasília'
+             when campaign_city = 'santos' then 'Santos'
+             when campaign_city = 'recife' then 'Recife'
+             when campaign_city = 'salvador' then 'Salvador'
         end as campaign_city_matched,
         tp.campaign_origin_aquisition,
         tp.mkt_category,
