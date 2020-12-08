@@ -264,6 +264,7 @@ create_clean_partition_task >> enrich_sub_dags.pop(
 ) >> enrich_sub_dags.pop("call_flex_events") >> [
     enrich_sub_dags.pop("call_agents"),
     enrich_sub_dags.pop("inbound_call_locations"),
+    enrich_sub_dags.pop("call_flex_reservations"),
 ] >> terminate_cluster_task
 
 create_clean_partition_task >> enrich_sub_dags.pop("twilio_ivr_events") >> [
