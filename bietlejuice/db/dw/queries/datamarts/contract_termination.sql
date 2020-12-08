@@ -95,6 +95,7 @@ SELECT
   t.id AS sk_termination,
   t.id_contract AS sk_contract,
   COALESCE(i.id,-1) AS sk_last_inspection,
+  JSON_EXTRACT_PATH_TEXT(t.feedback, 'reason') AS reason,
   t.feedback,
   t.requested_by,
   t.status,
