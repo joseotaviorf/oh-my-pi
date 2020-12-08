@@ -1,6 +1,8 @@
 select
     cast(cast(id_house as string)||'00'||cast(order_version as string) as bigint) as id_house_listing,
+    id_house,
     id_region,
+    order_version as version,
     status_history_new as status_history,
     regexp_replace(reason, '\n', '') as status_change_reason,
     coalesce(
