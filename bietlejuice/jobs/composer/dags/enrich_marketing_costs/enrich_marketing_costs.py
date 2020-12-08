@@ -14,15 +14,8 @@ from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.services import FileService
 
-from bietlejuice.jobs.composer.dags.enrich_marketing_costs_facebook_insights.facebook_sub_dag import (
-    FacebookSubDAG,
-)
 
-
-PARTITION_COLS = {
-    "google": ["acc", "load_date"],
-    "facebook_insights": ["year", "month", "day"],
-}
+PARTITION_COLS = {"google": ["acc", "load_date"]}
 BLOCK_LIST = ["criteo_campaigns"]
 MARKETING_HUB_MEDIAS = ["google"]
 SOURCE = "marketing_hub"
@@ -127,28 +120,3 @@ for media_name in media_names:
             create_cluster_task >> list(
                 enrich_sub_dags.values()
             ) >> terminate_cluster_task
-
-# Special Case (Facebook Insights)
-
-facebook_sub_dag_class = FacebookSubDAG(
-    dag_id=DAG_ID,
-    env=ENV,
-    datalake_bucket=DATALAKE_BUCKET,
-    database_base_name=database_base_name,
-    target_database_base_name=TARGET,
-    spark_job_paths=SPARK_JOBS_PATH,
-    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
-    start_date=MAIN_START_DATE,
-)
-
-facebook_sub_dag = facebook_sub_dag_class.get_sub_dag_operator(
-    dag=dag,
-    sub_dag_name="load-facebook-insights-to-enrich",
-    sub_dag_func=facebook_sub_dag_class.build_subdag,
-    table_name="facebook_insights",
-    slugged_table_name="facebook-insights",
-    accounts_name_mapping=ACCOUNTS_NAME_MAPPING,
-    partitions=PARTITION_COLS["facebook_insights"],
-)
-
-create_cluster_task >> facebook_sub_dag >> terminate_cluster_task
