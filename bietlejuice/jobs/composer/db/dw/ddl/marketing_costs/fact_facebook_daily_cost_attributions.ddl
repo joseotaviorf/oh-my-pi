@@ -5,10 +5,10 @@ CREATE TABLE IF NOT EXISTS marketing_costs.fact_facebook_daily_cost_attributions
     id_account BIGINT,
     id_campaign BIGINT,
     id_adset BIGINT,
-    impressions VARCHAR,
-    reach VARCHAR,
-    inline_link_clicks VARCHAR,
-    spend VARCHAR,
+    impressions VARCHAR(512),
+    reach VARCHAR(512),
+    inline_link_clicks VARCHAR(512),
+    spend VARCHAR(512),
     dt_start DATE,
     dt_stop DATE
 );
