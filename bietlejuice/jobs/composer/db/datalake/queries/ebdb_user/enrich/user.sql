@@ -149,11 +149,11 @@ SELECT
     ui.is_photographer,
     u.is_active,
     u.is_blocked,
-    CASE
+    CAST(CASE
         WHEN DATE_FORMAT(u.dt_birth, 'y') < 100 THEN u.dt_birth + INTERVAL 1900 YEARS
         WHEN DATE_FORMAT(u.dt_birth, 'y') < 1000 THEN u.dt_birth + INTERVAL 1000 YEARS
         ELSE u.dt_birth
-    END AS dt_birth,
+    END AS DATE) AS dt_birth,
     u.ts_click_anuncie,
     pdd.ts_first_document_sent,
     pdd.ts_last_document_sent,

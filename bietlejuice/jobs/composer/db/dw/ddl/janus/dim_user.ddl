@@ -57,7 +57,7 @@ create table janus.dim_user (
   visits_booked integer,
   visits_realized integer,
   visits_expected_to_happen integer,
-  dt_birth timestamp,
+  dt_birth date,
   dt_first_visit date,
   dt_first_visit_confirmed date,
   ts_click_anuncie timestamp,

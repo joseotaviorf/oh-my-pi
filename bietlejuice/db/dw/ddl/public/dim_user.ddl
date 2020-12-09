@@ -9,7 +9,7 @@ CREATE TABLE dim_user (
   cidade varchar(255) DEFAULT NULL,
   complemento varchar(255) DEFAULT NULL,
   cpf varchar(255) DEFAULT NULL,
-  data_nascimento timestamp DEFAULT NULL,
+  data_nascimento DATE DEFAULT NULL,
   email varchar(255) DEFAULT NULL,
   email_alternativo varchar(255) DEFAULT NULL,
   endereco varchar(255) DEFAULT NULL,

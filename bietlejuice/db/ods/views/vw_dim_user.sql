@@ -9,11 +9,11 @@ SELECT
   cidade,
   complemento,
   cpf,
-  case
-      when date_part('year', data_nascimento) < 100 then data_nascimento + interval '1900 years' -- dateadd(year, 1900, data_nascimento)
-      when date_part('year', data_nascimento) < 1000 then data_nascimento + interval '1000 years' -- dateadd(year, 1000, data_nascimento)
-      else data_nascimento
-  end as data_nascimento,
+  CAST(CASE
+      WHEN DATE_PART('year', data_nascimento) < 100 THEN data_nascimento + INTERVAL '1900 years' -- dateadd(year, 1900, data_nascimento)
+      WHEN DATE_PART('year', data_nascimento) < 1000 THEN data_nascimento + INTERVAL '1000 years' -- dateadd(year, 1000, data_nascimento)
+      ELSE data_nascimento
+  END AS DATE) AS data_nascimento,
   email,
   email_alternativo,
   endereco,
