@@ -227,6 +227,16 @@ bietlejuice.enrich_kill_queue:
   - bietlejuice.kill_queue:load-house-to-datalake-clean
   - bietlejuice.kill_queue:load-reservation-to-datalake-clean
 
+bietlejuice.enrich_listing_owners:
+  - bietlejuice.ebdb:load-proposal
+  - bietlejuice.enrich_booking:load-booking-to-enrich
+  - bietlejuice.enrich_ebdb_contract:load-contract-to-enrich
+  - bietlejuice.enrich_ebdb_listing:load-listing-business-context-to-enrich
+  - bietlejuice.enrich_ebdb_listing:load-house-listing-status-to-enrich
+  - bietlejuice.enrich_ebdb_listing:load-house-to-enrich
+  - bietlejuice.enrich_kill_queue:load-reservation-to-enrich
+  - bietlejuice.enrich_offer:load-offer-to-enrich
+
 bietlejuice.enrich_nps_answer_drivers:
   - bietlejuice.enrich_tracksale:load-answer-to-enrich
   - bietlejuice.ebdb:load-house
