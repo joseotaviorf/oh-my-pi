@@ -1,0 +1,38 @@
+DROP TABLE IF EXISTS quintoandar.fact_listing_owners;
+CREATE TABLE quintoandar.fact_listing_owners (
+    sk_listing_owner BIGINT PRIMARY KEY,
+    sk_first_listing_registered_date INTEGER,
+    sk_first_booking_date INTEGER,
+    sk_first_visit_date INTEGER,
+    sk_first_offer_received_date INTEGER,
+    sk_first_offer_accepted_date INTEGER,
+    sk_first_contract_signed_date INTEGER,
+    sk_last_listing_registered_date INTEGER,
+    sk_last_booking_date INTEGER,
+    sk_last_visit_date INTEGER,
+    sk_last_offer_received_date INTEGER,
+    sk_last_offer_accepted_date INTEGER,
+    sk_last_contract_signed_date INTEGER,
+    properties_registered INTEGER,
+    listings_published INTEGER,
+    visits_booked INTEGER,
+    visits_received INTEGER,
+    visits_expected_to_happen INTEGER,
+    visits_cancelled INTEGER,
+    offers_received INTEGER,
+    offers_rejected INTEGER,
+    offers_negotiating INTEGER,
+    offers_accepted INTEGER,
+    proposals_rejected INTEGER,
+    proposals_approved INTEGER,
+    reservations_received INTEGER,
+    contracts_cancelled INTEGER,
+    contracts_to_be_signed INTEGER,
+    contracts_signed INTEGER,
+    contracts_annuled INTEGER,
+    ongoing_listings INTEGER,
+    ongoing_contracts INTEGER,
+    ts_load TIMESTAMP
+);
+
+ALTER TABLE quintoandar.fact_listing_owners OWNER TO airflow; 
