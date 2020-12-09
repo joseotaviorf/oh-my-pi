@@ -27,6 +27,7 @@ WITH reservations_events AS (
 ),
 call_flex_reservations AS (
     SELECT
+        re1.id_call,
         re1.id_task,
         re1.id_reservation,
         re1.id_agent,
@@ -59,7 +60,7 @@ call_flex_reservations AS (
             ON re1.id_task = re2.id_task
             AND re1.id_reservation = re2.id_reservation
             AND re2.queue_name IS NOT NULL
-    GROUP BY 1,2,3,4,5,11,12,13
+    GROUP BY 1,2,3,4,5,6,12,13,14
 ),
 answered_time_calculations AS (
     SELECT
@@ -81,6 +82,7 @@ answered_time_calculations AS (
             AND cr.is_answered
 )
 SELECT
+    cr.id_call,
     cr.id_task,
     cr.id_reservation,
     cr.id_agent,
@@ -103,4 +105,4 @@ LEFT JOIN
     answered_time_calculations AS atc
         ON cr.id_task = atc.id_task
         AND cr.id_reservation = atc.id_reservation
-GROUP BY 1,2,3,4,5,6,7,8,9,12,13,14,15,16
+GROUP BY 1,2,3,4,5,6,7,8,9,10,13,14,15,16,17
