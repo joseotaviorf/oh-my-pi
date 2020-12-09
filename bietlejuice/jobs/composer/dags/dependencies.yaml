@@ -18,6 +18,13 @@ bietlejuice.dw_booking:
   - bietlejuice.ebdb:load-visit
   - bietlejuice.enrich_amplitude_visit
 
+bietlejuice.dw_dim_listing_owner:
+  - bietlejuice.ebdb:load-partner-agent
+  - bietlejuice.ebdb:load-user-preferences
+  - bietlejuice.enrich_ebdb_listing:load-listing-business-context-to-enrich
+  - bietlejuice.enrich_ebdb_listing:load-house-to-enrich
+  - bietlejuice.enrich_ebdb_user:load-user-to-enrich
+
 bietlejuice.dw_marketing_costs:
   - bietlejuice.enrich_marketing_costs.load-google-keywords-performance-report-to-enrich:load-enrich-google-keywords-performance-report
 
