@@ -9,6 +9,9 @@ CREATE TABLE IF NOT EXISTS marketing_costs.fact_facebook_daily_cost_attributions
     reach VARCHAR(512),
     inline_link_clicks VARCHAR(512),
     spend VARCHAR(512),
+    spend_mobile DOUBLE,
+    spend_desktop DOUBLE,
+    spend_other DOUBLE,
     dt_start DATE,
     dt_stop DATE
 );

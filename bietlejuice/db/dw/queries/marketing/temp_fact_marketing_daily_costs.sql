@@ -98,11 +98,11 @@ formatted_historic_affiliates_national_campaigns_cost as (
 fb_hist_list_affiliates as (
     select
         distinct
-            ff.sk_date,
+            to_char(ff.dt_start::date, 'yyyyMMdd')::integer,
             df.campaign_name,
             hist.campaign
-    from marketing.fact_facebook_daily_cost_attributions ff
-    join marketing.dim_facebook_ad df
+    from marketing_costs.fact_facebook_daily_cost_attributions ff
+    join marketing_costs.dim_facebook_ad df
         on ff.sk_ad = df.sk_ad and df.is_test_campaign is not true
     join formatted_historic_affiliates_national_campaigns_cost hist
         on lower(df.campaign_name) = lower(hist.campaign)
@@ -114,7 +114,7 @@ facebook_info as (
         distinct
             campaign_name,
             account_name
-    from marketing.dim_facebook_ad
+    from marketing_costs.dim_facebook_ad
 ),
 gg_hist_list_affiliates as (
     select
@@ -193,7 +193,7 @@ campaigns_full as (
       WITH sources AS (
         -- FACEBOOK
             select
-                ff.sk_date,
+                to_char(ff.dt_start::date, 'yyyyMMdd')::integer as sk_date,
                 'facebook'::varchar  as origin,
                 'fact_facebook_daily_cost_attributions'::varchar as fact_cost,
                 df.campaign_name,
@@ -204,17 +204,17 @@ campaigns_full as (
                 df.campaign_name as utm_campaign,
                 df.adset_name as utm_term,
                 df.ad_name as utm_content,
-                ff.desktop_spend as desktop_cost,
-                ff.mobile_spend as mobile_cost,
-                ff.other_spend as other_cost,
+                ff.spend_desktop as desktop_cost,
+                ff.spend_mobile as mobile_cost,
+                ff.spend_other as other_cost,
                 null::numeric(16,4) as total_cost,
                 null as report_type,
                 null as ad_type
-            from marketing.fact_facebook_daily_cost_attributions ff
-                join marketing.dim_facebook_ad df
+            from marketing_costs.fact_facebook_daily_cost_attributions ff
+                join marketing_costs.dim_facebook_ad df
                     on ff.sk_ad = df.sk_ad and df.is_test_campaign is not true
                 left join fb_hist_list_affiliates hl
-                    on hl.sk_date = ff.sk_date
+                    on hl.sk_date = to_char(ff.dt_start::date, 'yyyyMMdd')::integer
                     and df.campaign_name = hl.campaign_name
             where ff.sk_date >= 20180101
             -- Filter out affiliate_costs of national-campaigns with manual-historic costs
