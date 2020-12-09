@@ -47,7 +47,7 @@ pycriteo==0.0.2
 PyDrive
 pymongo==3.5.1
 pymysql==0.8.0
-pyOpenSSL>=16.2.0
+pyOpenSSL==19.0.0
 pypd==1.0.0
 PySocks==1.6.4
 pyrsistent==0.16.0
