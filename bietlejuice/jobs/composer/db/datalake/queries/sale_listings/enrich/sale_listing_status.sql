@@ -14,4 +14,4 @@ SELECT
     ts_status_changed_new AS ts_status_started,
     ts_status_changed_next AS ts_status_ended
 FROM 
-    datalake_sale_listing.sale_status_version_order
+    datalake_sale_listings.sale_status_version_order
