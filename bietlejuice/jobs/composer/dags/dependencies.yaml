@@ -92,11 +92,16 @@ bietlejuice.dw_sale_visits:
   - bietlejuice.enrich_offer:load-sale-offer-to-enrich
   - bietlejuice.insider:load-review-to-datalake-clean
 
+bietlejuice.dw_sauron:
+  - bietlejuice.enrich_ebdb_customer_contact_identification
+  - bietlejuice.enrich_quinto_messenger:load-channel-to-enrich
+  - bietlejuice.enrich_sauron
+
 bietlejuice.dw_smart_price:
   - bietlejuice.enrich_ebdb_smart_price
   - bietlejuice.ebdb:load-dynamic-pricing-house
   - bietlejuice.ebdb:load-dynamic-pricing-parameters
-  
+
 bietlejuice.dw_tracksale:
   - bietlejuice.enrich_tracksale
   - bietlejuice.enrich_nps_answer_drivers
@@ -312,6 +317,9 @@ bietlejuice.enrich_sale_listings:
   - bietlejuice.ebdb:load-user-revision-entity
   - bietlejuice.enrich_ebdb_listing:load-listing-business-context-to-enrich
   - bietlejuice.enrich_ebdb_user_revision_entity:load-user-revision-entity-to-enrich
+
+bietlejuice.enrich_sauron:
+  - bietlejuice.sauron:session
 
 bietlejuice.enrich_terminator:
   - bietlejuice.terminator
