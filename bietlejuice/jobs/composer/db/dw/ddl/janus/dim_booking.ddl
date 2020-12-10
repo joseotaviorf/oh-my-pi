@@ -12,6 +12,7 @@ create table if not exists janus.dim_booking
   id_rent_flow bigint encode az64,
   id_rescheduled_booking bigint encode az64,
   visit_intent varchar(100) encode lzo,
+  buyer_intention varchar(100)   encode lzo,
   type varchar(255) encode lzo,
   is_visit_completed boolean,
   is_visit_performed boolean,

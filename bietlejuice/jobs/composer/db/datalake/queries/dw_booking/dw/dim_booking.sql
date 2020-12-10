@@ -45,6 +45,7 @@ select
     b.id_rent_flow,
     b.id_rescheduled_booking,
     b.visit_intent,
+    b.buyer_intention,
     b.type,
     b.is_visit_completed,
     b.is_visit_performed,

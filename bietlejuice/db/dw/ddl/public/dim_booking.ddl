@@ -6,6 +6,7 @@ create table if not exists dim_booking
  is_rescheduled boolean,
  dt_scheduling timestamp without time zone   encode az64,
  visit_intent varchar(100)   encode lzo,
+ buyer_intention varchar(100)   encode lzo,
  type varchar(255)   encode lzo,
  confirmed varchar(100)   encode lzo,
  performed varchar(100)   encode lzo,
