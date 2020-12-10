@@ -46,6 +46,10 @@ bietlejuice.dw_proposal:
   - bietlejuice.sorting_hat:load-proposal-to-datalake-clean
   - bietlejuice.sorting_hat:load-proposal-version-to-datalake-clean
 
+bietlejuice.dw_quinto_messenger:
+  - bietlejuice.enrich_ebdb_customer_contact_identification
+  - bietlejuice.enrich_quinto_messenger
+
 bietlejuice.dw_region:
   - bietlejuice.enrich_region
   - bietlejuice.enrich_booking
