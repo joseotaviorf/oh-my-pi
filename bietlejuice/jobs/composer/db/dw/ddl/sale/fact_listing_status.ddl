@@ -8,7 +8,7 @@ CREATE TABLE sale.fact_listing_status (
 	ts_status_started TIMESTAMP,
 	ts_status_ended TIMESTAMP,
 	status_history VARCHAR,
-	status_change_reason VARCHAR,
+	status_change_reason VARCHAR(2000),
 	is_last_status BOOLEAN,
 	ts_load TIMESTAMP
 );
