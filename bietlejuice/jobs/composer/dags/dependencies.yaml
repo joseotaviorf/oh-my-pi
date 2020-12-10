@@ -18,6 +18,9 @@ bietlejuice.dw_booking:
   - bietlejuice.ebdb:load-visit
   - bietlejuice.enrich_amplitude_visit
 
+bietlejuice.dw_call:
+  - bietlejuice.bigfone_event
+
 bietlejuice.dw_dim_listing_owner:
   - bietlejuice.ebdb:load-partner-agent
   - bietlejuice.ebdb:load-user-preferences
