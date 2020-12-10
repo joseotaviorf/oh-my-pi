@@ -19,7 +19,7 @@ not_published AS (
     ssvo.id_house, 
     SUM(DATEDIFF(ssvo.ts_status_changed_next, ssvo.ts_status_changed_new)) AS days_not_published 
   FROM 
-    datalake_sale_listing.sale_status_version_order AS ssvo 
+    datalake_sale_listings.sale_status_version_order AS ssvo
   JOIN 
     datalake_ebdb_clean.listing_business_context AS lbc
     ON ssvo.id_house = lbc.id_house 
@@ -61,7 +61,7 @@ SELECT
 FROM 
   listing_columns AS lc
 JOIN 
-  datalake_sale_listing.sale_status_version_order AS sls
+  datalake_sale_listings.sale_status_version_order AS sls
     ON lc.id_house = sls.id_house
 LEFT JOIN
   not_published AS np

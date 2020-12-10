@@ -16,7 +16,8 @@ LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 8, 29, 0, 0, 0, tzinfo=LOCAL_TZ)
 
 CONTEXT = "sale_listings"
-DAG_ID = f"bietlejuice.enrich_{CONTEXT}"
+DAG_NAME = f"enrich_{CONTEXT}"
+DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = Variable.get("environment")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
@@ -25,7 +26,9 @@ S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 LOGS_OUTPUT_PATH = f"s3://{Variable.get('databricks_s3_bucket')}/logs/jobs/{DAG_ID}"
 
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
+CLUSTER_DESCRIPTION = Variable.get(
+    f"databricks_bietlejuice_{DAG_NAME}_cluster", deserialize_json=True
+)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 
 dag = DAG(
