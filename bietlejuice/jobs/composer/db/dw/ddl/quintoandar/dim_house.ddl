@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS public.dim_house;
-CREATE TABLE public.dim_house (
+DROP TABLE IF EXISTS quintoandar.dim_house;
+CREATE TABLE quintoandar.dim_house (
     sk_house BIGINT PRIMARY KEY,
     id_short_house BIGINT,
     condo SMALLINT,
@@ -44,4 +44,4 @@ CREATE TABLE public.dim_house (
     ts_updated TIMESTAMP,
     ts_load TIMESTAMP
 )
-ALTER TABLE public.dim_house OWNER TO airflow;
+ALTER TABLE quintoandar.dim_house OWNER TO airflow;
