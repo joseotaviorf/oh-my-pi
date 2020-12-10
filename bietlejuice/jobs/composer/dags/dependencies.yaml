@@ -28,6 +28,9 @@ bietlejuice.dw_dim_listing_owner:
   - bietlejuice.enrich_ebdb_listing:load-house-to-enrich
   - bietlejuice.enrich_ebdb_user:load-user-to-enrich
 
+bietlejuice.dw_house:
+  - bietlejuice.enrich_ebdb_listing:load-house-to-enrich
+
 bietlejuice.dw_marketing_costs:
   - bietlejuice.enrich_marketing_costs.load-google-keywords-performance-report-to-enrich:load-enrich-google-keywords-performance-report
 
@@ -69,6 +72,12 @@ bietlejuice.dw_sale_flows:
   - bietlejuice.enrich_ebdb_listing:load-listing-business-context-to-enrich
   - bietlejuice.enrich_sale_flows:load-sale-flow-to-enrich
   # TODO [ODS] Add gsheets after migrated to composer
+
+bietlejuice.dw_sale_listings:
+  - bietlejuice.enrich_sale_listings
+  - bietlejuice.ebdb:load-house
+  - bietlejuice.ebdb:load-house-registration-status
+  - bietlejuice.enrich_ebdb_listing:load-listing-business-context-to-enrich
 
 bietlejuice.dw_sale_offers:
   - bietlejuice.amplitude
@@ -150,13 +159,6 @@ bietlejuice.enrich_booking:
   - bietlejuice.ebdb:load-visitor
   # TODO [ODS] Add gsheets after migrated to composer
 
-bietlejuice.enrich_sale_flows:
-  - bietlejuice.amplitude
-  - bietlejuice.ebdb:load-house
-  - bietlejuice.enrich_booking
-  - bietlejuice.enrich_ebdb_listing:load-listing-business-context-to-enrich
-  - bietlejuice.enrich_offer:load-sale-offer-to-enrich
-
 bietlejuice.enrich_docx:
   - bietlejuice.docx:load-credit-evaluation-to-clean
 
@@ -234,9 +236,6 @@ bietlejuice.enrich_ebdb_user:
 bietlejuice.enrich_ebdb_user_revision_entity:
   - bietlejuice.ebdb:load-user-revision-entity
 
-bietlejuice.enrich_marketing_costs_facebook_insights:
-  - bietlejuice.facebook_insights
-
 bietlejuice.enrich_firestore:
   - bietlejuice.firestore
 
@@ -253,6 +252,15 @@ bietlejuice.enrich_listing_owners:
   - bietlejuice.enrich_ebdb_listing:load-house-to-enrich
   - bietlejuice.enrich_kill_queue:load-reservation-to-enrich
   - bietlejuice.enrich_offer:load-offer-to-enrich
+
+bietlejuice.enrich_marketing_costs:
+  - bietlejuice.marketing_hub
+
+bietlejuice.enrich_marketing_costs_criteo_campaigns:
+  - bietlejuice.criteo_campaigns:load-criteo-campaigns-to-clean
+
+bietlejuice.enrich_marketing_costs_facebook_insights:
+  - bietlejuice.facebook_insights
 
 bietlejuice.enrich_nps_answer_drivers:
   - bietlejuice.enrich_tracksale:load-answer-to-enrich
@@ -289,18 +297,28 @@ bietlejuice.enrich_retsuko:
   - bietlejuice.retsuko:load-entry-to-clean
   - bietlejuice.retsuko:load-invoice-to-clean
 
-bietlejuice.enrich_tracksale:
-  - bietlejuice.tracksale:dispatch
-  - bietlejuice.tracksale:answer
+bietlejuice.enrich_sale_flows:
+  - bietlejuice.amplitude
+  - bietlejuice.ebdb:load-house
+  - bietlejuice.enrich_booking
+  - bietlejuice.enrich_ebdb_listing:load-listing-business-context-to-enrich
+  - bietlejuice.enrich_offer:load-sale-offer-to-enrich
 
-bietlejuice.enrich_marketing_costs:
-  - bietlejuice.marketing_hub
-
-bietlejuice.enrich_marketing_costs_criteo_campaigns:
-  - bietlejuice.criteo_campaigns:load-criteo-campaigns-to-clean
+bietlejuice.enrich_sale_listings:
+  - bietlejuice.ebdb:load-house
+  - bietlejuice.ebdb:load-house-aud
+  - bietlejuice.ebdb:load-listing-business-context
+  - bietlejuice.ebdb:load-listing-business-context-aud
+  - bietlejuice.ebdb:load-user-revision-entity
+  - bietlejuice.enrich_ebdb_listing:load-listing-business-context-to-enrich
+  - bietlejuice.enrich_ebdb_user_revision_entity:load-user-revision-entity-to-enrich
 
 bietlejuice.enrich_terminator:
   - bietlejuice.terminator
+
+bietlejuice.enrich_tracksale:
+  - bietlejuice.tracksale:dispatch
+  - bietlejuice.tracksale:answer
 
 bietlejuice.regions_polygon:
   - bietlejuice.enrich_region:load-region-to-enrich
