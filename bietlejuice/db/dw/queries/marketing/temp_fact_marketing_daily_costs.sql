@@ -98,7 +98,7 @@ formatted_historic_affiliates_national_campaigns_cost as (
 fb_hist_list_affiliates as (
     select
         distinct
-            to_char(ff.dt_start::date, 'yyyyMMdd')::integer,
+            to_char(ff.dt_start::date, 'yyyyMMdd')::integer as sk_date,
             df.campaign_name,
             hist.campaign
     from marketing_costs.fact_facebook_daily_cost_attributions ff
@@ -106,8 +106,8 @@ fb_hist_list_affiliates as (
         on ff.sk_ad = df.sk_ad and df.is_test_campaign is not true
     join formatted_historic_affiliates_national_campaigns_cost hist
         on lower(df.campaign_name) = lower(hist.campaign)
-        and ff.sk_date = hist.sk_cost_date
-    where ff.sk_date >= 20190101
+        and to_char(ff.dt_start::date, 'yyyyMMdd')::integer = hist.sk_cost_date
+    where to_char(ff.dt_start::date, 'yyyyMMdd')::integer >= 20190101
 ),
 facebook_info as (
     select
@@ -216,7 +216,7 @@ campaigns_full as (
                 left join fb_hist_list_affiliates hl
                     on hl.sk_date = to_char(ff.dt_start::date, 'yyyyMMdd')::integer
                     and df.campaign_name = hl.campaign_name
-            where ff.sk_date >= 20180101
+            where to_char(ff.dt_start::date, 'yyyyMMdd')::integer >= 20180101
             -- Filter out affiliate_costs of national-campaigns with manual-historic costs
             and hl.sk_date is null
         -- GOOGLE
