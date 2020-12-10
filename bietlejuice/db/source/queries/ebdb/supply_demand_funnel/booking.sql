@@ -3,6 +3,7 @@ select
   a.data,
   a.status,
   a.businesscontext as visit_intent,
+  a.intention as buyer_intention,
   a.tipo,
   a.confirmado,
   a.encerrado,

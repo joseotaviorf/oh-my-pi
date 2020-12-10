@@ -4,6 +4,7 @@ create table if not exists booking (
   data date not null,
   status varchar(255) NOT NULL,
   visit_intent varchar(100),
+  buyer_intention varchar(100),
   tipo varchar(255) NOT NULL,
   confirmado varchar(100),
   encerrado varchar(100),

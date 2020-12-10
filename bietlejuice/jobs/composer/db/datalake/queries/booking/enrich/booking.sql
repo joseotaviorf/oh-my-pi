@@ -123,6 +123,7 @@ base_booking as (
     b.dt_booking,
     b.status,
     b.business_context as visit_intent,
+    b.buyer_intention,
     b.type,
     b.visit_fup,
     b.slot_day,
