@@ -247,60 +247,34 @@ with taxonomy_demand as (
 		on ta.sale_flow = tm.sale_flow
 )
 -- Offers - first dates and counts
--- We get ts_offer_sent from amplitude event as we don't have timestamp in Monday gsheets. 
--- Also events in amplitude are set to UTC timezone (same as VB and TTA) and monday events are set to BRT timezone. So, we can't adjust while we don't have timestamps (temporary solution)
--- Treat data from Monday gsheets
-, treat_monday as (
-	select 
-		nullif(mo.name,'') as id_offer,
-		mo.id_buyer||'_'||mo.id_imovel as sale_flow,
-		cast(nullif(mo.id_imovel,'') as integer) as id_house,
-		cast(nullif(mo.id_buyer,'') as integer) as id_user,
-		date_parse(substring(nullif(mo.data_proposta, ''),1,10), '%Y-%m-%d') as dt_offer_sent,
-		date_parse(substring(nullif(mo.data_aceite_proposta, ''),1,10), '%Y-%m-%d') as dt_offer_accepted,
-		date_parse(substring(nullif(mo.data_assinatura_ccv, ''),1,10), '%Y-%m-%d') as dt_ccv_signed,
-		date_parse(substring(nullif(mo.data_descarte, ''),1,10), '%Y-%m-%d') as dt_offer_rejected,
-		date_parse(substring(nullif(mo.data_pagto_seller, ''),1,10), '%Y-%m-%d') as dt_payment_completed,
-		coalesce(CAST(REPLACE(SUBSTRING(nullif(mo.data_proposta,''), 1, 10), '-', '') as integer),-1) as sk_offer_sent_date,
-		coalesce(CAST(REPLACE(SUBSTRING(nullif(mo.data_aceite_proposta, ''), 1, 10), '-', '') as integer),-1) as sk_offer_accepted_date,
-		coalesce(CAST(REPLACE(SUBSTRING(nullif(mo.data_assinatura_ccv, ''), 1, 10), '-', '') as integer),-1) as sk_ccv_signed_date,
-		coalesce(CAST(REPLACE(SUBSTRING(nullif(mo.data_descarte, ''), 1, 10), '-', '') as integer),-1) as sk_offer_rejected_date,
-		coalesce(CAST(REPLACE(SUBSTRING(nullif(mo.data_pagto_seller, ''), 1, 10), '-', '') as integer),-1) as sk_payment_completed_date,
-		case when mo.grupo = 'CCV - Cancelado' then true else false end as flg_ccv_cancelled,
-		motivo_descarte_pre as offer_rejection_reason,
-		motivo_descarte_pos as offer_accepted_drop_reason,
-		status_proposta,
-		cast(nullif(mo.valor_anuncio, '') as integer) as sale_listing_price,
-		cast(nullif(mo.proposta_buyer, '') as integer) as buyer_offer_price,
-		cast(nullif(mo.valor_final, '') as integer) as sale_price_agreed,
-		case when mo.valor_anuncio ='' or mo.proposta_buyer ='' then null else (cast(mo.valor_anuncio as decimal) - cast(mo.proposta_buyer as decimal))*1.00/cast(mo.valor_anuncio as decimal) end as offer_discount
-	from datalake_raw.gsheets_sale_offers_monday mo  
+, monday as (
+	select
+		so.id as id_offer,
+		cast(so.id_buyer as varchar)||'_'||cast(so.id_house as varchar) as sale_flow,
+		so.id_house,
+		so.id_buyer as id_user,
+		so.ts_created as dt_offer_sent,
+		mo.dt_accepted as dt_offer_accepted,
+		mo.dt_sale_agreement_signed as dt_ccv_signed,
+		mo.dt_offer_dismissed as dt_offer_rejected,
+		mo.dt_sale_transacton_paid as dt_payment_completed,
+		coalesce(CAST(REPLACE(SUBSTRING(cast(so.ts_created as varchar), 1, 10), '-', '') as integer),-1) as sk_offer_sent_date,
+		coalesce(CAST(REPLACE(SUBSTRING(cast(mo.dt_accepted as varchar), 1, 10), '-', '') as integer),-1) as sk_offer_accepted_date,
+		coalesce(CAST(REPLACE(SUBSTRING(cast(mo.dt_sale_agreement_signed as varchar), 1, 10), '-', '') as integer),-1) as sk_ccv_signed_date,
+		coalesce(CAST(REPLACE(SUBSTRING(cast(mo.dt_offer_dismissed as varchar), 1, 10), '-', '') as integer),-1) as sk_offer_rejected_date,
+		coalesce(CAST(REPLACE(SUBSTRING(cast(mo.dt_sale_transacton_paid as varchar), 1, 10), '-', '') as integer),-1) as sk_payment_completed_date,
+		case when mo.status = 'CCV - Cancelado' then true else false end as flg_ccv_cancelled,
+		coalesce(cast(mo.drop_reason as varchar),mo.drop_reason_before_acceptance,mo.drop_reason_after_acceptance) as offer_rejection_reason,
+		mo.drop_reason_after_acceptance as offer_accepted_drop_reason,
+		mo.offer_status as status_proposta,
+		so.sale_price as sale_listing_price,
+		so.first_price_offered_by_buyer as buyer_offer_price,
+		mo.sale_price_agreed as sale_price_agreed,
+		(so.sale_price - so.first_price_offered_by_buyer)*1.00/nullif(so.sale_price,0) as offer_discount
+	from  datalake_firestore_prod.sale_offer so
+	left join datalake_firestore_prod.monday mo
+	    on so.id = mo.id_offer
 )
--- Remove duplicates (invalid offers) from Monday gsheets
-, fix_monday as (
-	select 
-	    tm.sale_flow,
-	    tm.id_house,
-	    tm.id_user,
-	    max(tm.dt_offer_accepted) as dt_offer_accepted,
-	    max(tm.dt_offer_rejected) as dt_offer_rejected,
-	    max(tm.dt_ccv_signed) as dt_ccv_signed,
-	    max(tm.dt_payment_completed) as dt_payment_completed,
-	    max(tm.sk_offer_accepted_date) as sk_offer_accepted_date,
-	    max(tm.sk_offer_rejected_date) as sk_offer_rejected_date,
-	    max(tm.sk_ccv_signed_date) as sk_ccv_signed_date,
-	    max(tm.sk_payment_completed_date) as sk_payment_completed_date,
-	    max(flg_ccv_cancelled) as flg_ccv_cancelled,
-	    max(tm.offer_rejection_reason) as offer_rejection_reason,
-	    max(tm.offer_accepted_drop_reason) as offer_accepted_drop_reason,
-	    max(tm.sale_listing_price) as sale_listing_price,
-	    max(tm.buyer_offer_price) as buyer_offer_price,
-	    max(tm.sale_price_agreed) as sale_price_agreed,
-	    max(tm.offer_discount) as offer_discount
-	from treat_monday tm
-	group by 1, 2, 3
-)
--- First We search the offer data from amplitude (less errors with id_users/nulls). Otherwise if there's an id_offer only present in Monday we bring monday data
 , offer_sent as (
 	select
 		coalesce(o.sale_flow, fm.sale_flow) as sale_flow,
@@ -309,7 +283,7 @@ with taxonomy_demand as (
 		coalesce(min(o.event_timestamp),min(fm.dt_offer_sent)) as ts_first_offer_sent,
 		count(distinct coalesce(o.id_offer, fm.id_offer)) as nbr_offers_sent
 	from events_raw_offer o
-	full outer join treat_monday fm
+	full outer join monday fm
 		on fm.id_offer = o.id_offer
 	group by 1, 2, 3
 )
@@ -580,7 +554,7 @@ select
 	coalesce(mkt.mkt_source, 'Not Mapped') as mkt_source,
 	coalesce(mkt.mkt_platform, 'Not Mapped') as mkt_platform														 
 from sale_flows b
-left join fix_monday fm
+left join monday fm
 	on fm.sale_flow = b.sale_flow
 left join buyer_offers bo 
 	on bo.sale_flow = b.sale_flow
