@@ -6,6 +6,6 @@ CREATE TABLE IF NOT EXISTS quinto_messenger.fact_chats (
     sk_personal_document VARCHAR(50),
     sk_created_date BIGINT,
     minutes_duration DECIMAL(38,3),
-    tasks INTEGER
+    tasks BIGINT
 )
 ALTER TABLE quinto_messenger.fact_chats OWNER TO airflow;
