@@ -39,4 +39,4 @@ FROM
 INNER JOIN
     last_updated_reservations lur
         ON lur.id_reservation = r.id_reservation
-        AND lur.dt_last_updated = r.dt_updated;
+        AND lur.dt_last_updated = r.dt_updated
