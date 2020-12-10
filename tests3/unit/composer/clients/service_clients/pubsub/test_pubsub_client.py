@@ -8,14 +8,11 @@ from bietlejuice.jobs.composer.clients.service_clients.pubsub.pubsub_sync_pull_c
 class TestPubsubClient:
     @pytest.mark.parametrize(
         "project_id, subscription_id",
-        [
-            (1, 2),
-            (None, "subscription_id"),
-            ("project_id", None),
-            (None, None)
-        ]
+        [(1, 2), (None, "subscription_id"), ("project_id", None), (None, None)],
     )
-    def test_constructor_fail_with_non_string_parameters(self, project_id, subscription_id):
+    def test_constructor_fail_with_non_string_parameters(
+        self, project_id, subscription_id
+    ):
         with pytest.raises(TypeError):
             assert PubSubSubscriberSyncPullClient(project_id, subscription_id)
 
@@ -25,7 +22,7 @@ class TestPubsubClient:
         subscription_path = "projects/project_id/subscriptions/subscription_id"
         mocked_client.subscription_path.return_value = subscription_path
 
-        # act 
+        # act
         return_get_subscription_path = pubsub_client._subscription_path
 
         # assert
@@ -33,21 +30,20 @@ class TestPubsubClient:
 
     @pytest.mark.parametrize(
         "session_initial_value, expected_return",
-        [
-            (None, "client_1"),
-            ("client_2", "client_2")
-        ]
+        [(None, "client_1"), ("client_2", "client_2")],
     )
     @mock.patch("google.cloud.pubsub_v1.SubscriberClient")
-    def test__client(self, mocked_client, pubsub_client, session_initial_value, expected_return):
+    def test__client(
+        self, mocked_client, pubsub_client, session_initial_value, expected_return
+    ):
         # arrange
         mocked_client.return_value = "client_1"
         pubsub_client._session = session_initial_value
 
         # act
-        return_client = pubsub_client._client 
+        return_client = pubsub_client._client
 
-        # assert 
+        # assert
         assert return_client == expected_return
 
     @mock.patch.object(PubSubSubscriberSyncPullClient, "_client")
@@ -59,7 +55,7 @@ class TestPubsubClient:
         # act
         return_request_messages = pubsub_client.request_messages(max_messages)
 
-        # assert 
+        # assert
         assert return_request_messages == "response"
 
     def test_request_messages_fail_invalid_type(self, pubsub_client):
@@ -73,7 +69,7 @@ class TestPubsubClient:
 
     def test_acknowledge_messages_fail_invalid_type(self, pubsub_client):
         with pytest.raises(TypeError):
-            assert pubsub_client.acknowledge_messages('ack_ids')
+            assert pubsub_client.acknowledge_messages("ack_ids")
 
     def test_acknowledge_messages_fail_with_empty_list(self, pubsub_client):
         with pytest.raises(ValueError):

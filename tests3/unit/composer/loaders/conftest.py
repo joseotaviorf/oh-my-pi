@@ -1,6 +1,8 @@
 import pytest
 from unittest.mock import Mock
-from bietlejuice.jobs.composer.loaders.spark_metastore_loader import SparkMetastoreLoader
+from bietlejuice.jobs.composer.loaders.spark_metastore_loader import (
+    SparkMetastoreLoader,
+)
 from bietlejuice.jobs.composer.loaders.s3_loader import S3Loader
 
 

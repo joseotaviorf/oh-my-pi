@@ -16,7 +16,15 @@ class TestSparkMetastoreLoader:
     )
     @patch.object(SchemaService, "get_schema_from_dataframe")
     def test_update_metastore(
-        self, mocked_schema_service, format_options, mode, database_name, table_name, database_location, mocked_write_df, metastore_loader,
+        self,
+        mocked_schema_service,
+        format_options,
+        mode,
+        database_name,
+        table_name,
+        database_location,
+        mocked_write_df,
+        metastore_loader,
     ):
         # given
         s3_path = database_location + table_name
@@ -24,7 +32,9 @@ class TestSparkMetastoreLoader:
         df_schema = OrderedDict({"col": "string"})
 
         mocked_schema_service.return_value = df_schema
-        metastore_loader.schema_service.get_schema_from_dataframe = mocked_schema_service
+        metastore_loader.schema_service.get_schema_from_dataframe = (
+            mocked_schema_service
+        )
 
         # when
         metastore_loader.update_metastore(
@@ -32,19 +42,40 @@ class TestSparkMetastoreLoader:
             database_name=database_name,
             table_name=table_name,
             format_options=format_options,
-            database_location=database_location
+            database_location=database_location,
         )
 
         # then
-        metastore_loader.metastore_service.create_external_table.assert_called_with(database_name, table_name, s3_path, df_schema, partitions, format_options)
+        metastore_loader.metastore_service.create_external_table.assert_called_with(
+            database_name, table_name, s3_path, df_schema, partitions, format_options
+        )
 
     @pytest.mark.parametrize(
-        "database_name, table_name, format_options, database_location", [(None, "table", None, None), ("database", None, None, None), ("database", 123, None, None)],
+        "database_name, table_name, format_options, database_location",
+        [
+            (None, "table", None, None),
+            ("database", None, None, None),
+            ("database", 123, None, None),
+        ],
     )
-    def test_update_metastore_with_invalid_params(self, database_name, table_name, format_options, database_location, mocked_write_df, metastore_loader):
+    def test_update_metastore_with_invalid_params(
+        self,
+        database_name,
+        table_name,
+        format_options,
+        database_location,
+        mocked_write_df,
+        metastore_loader,
+    ):
         # act and assert
         with pytest.raises(ValueError):
-            metastore_loader.update_metastore(mocked_write_df, database_name, table_name, format_options, database_location)
+            metastore_loader.update_metastore(
+                mocked_write_df,
+                database_name,
+                table_name,
+                format_options,
+                database_location,
+            )
 
     def test_update_metastore_with_invalid_df(self, metastore_loader):
         # arrange
@@ -61,5 +92,5 @@ class TestSparkMetastoreLoader:
                 database_name=database_name,
                 table_name=table_name,
                 format_options=format_options,
-                database_location=database_location
+                database_location=database_location,
             )

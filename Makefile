@@ -100,7 +100,7 @@ requirements-lint-python3:
 .PHONY: lint-python3
 ## run black to fix code style
 lint-python3:
-	@python -m black bietlejuice/jobs/composer/
+	@python -m black bietlejuice/jobs/composer/ tests3/unit/composer/
 
 .PHONY: check-style-python3
 ## check style with flake8 and black
@@ -109,8 +109,8 @@ check-style-python3:
 	@echo "Check Style"
 	@echo "=========="
 	@echo ""
-	@python -m black --check bietlejuice/jobs/composer/
-	@python -m flake8 --config=setup3.cfg bietlejuice/jobs/composer/
+	@python -m black --check bietlejuice/jobs/composer/ tests3/unit/composer/
+	@python -m flake8 --config=setup3.cfg bietlejuice/jobs/composer/ tests3/unit/composer/
 
 .PHONY: package-python3
 package-python3:

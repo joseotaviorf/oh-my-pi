@@ -17,7 +17,14 @@ class TestSparkClient:
             ("json", {"path": "path/to/file"}, None),
         ],
     )
-    def test_get_data_from_external_source(self, format, options, path, mocked_get_data_from_external_source, mocked_spark_client):
+    def test_get_data_from_external_source(
+        self,
+        format,
+        options,
+        path,
+        mocked_get_data_from_external_source,
+        mocked_spark_client,
+    ):
         # arrange
         data = mocked_spark_client.create_dataframe([{"col1": "value", "col2": 123}])
         rdd = data.rdd.map(tuple)
@@ -26,7 +33,9 @@ class TestSparkClient:
         mocked_spark_client._session = mocked_get_data_from_external_source
 
         # act
-        result_df = mocked_spark_client.get_data_from_external_source(format, options, path)
+        result_df = mocked_spark_client.get_data_from_external_source(
+            format, options, path
+        )
 
         # assert
         mocked_get_data_from_external_source.format.assert_called_once_with(format)
@@ -42,7 +51,14 @@ class TestSparkClient:
             ("json", {"path": "path/to/file"}, "path/to/file"),
         ],
     )
-    def test_get_data_from_external_source_with_path(self, format, options, path, mocked_get_data_from_external_source, mocked_spark_client):
+    def test_get_data_from_external_source_with_path(
+        self,
+        format,
+        options,
+        path,
+        mocked_get_data_from_external_source,
+        mocked_spark_client,
+    ):
         # arrange
         data = mocked_spark_client.create_dataframe([{"col1": "value", "col2": 123}])
         rdd = data.rdd.map(tuple)
@@ -51,7 +67,9 @@ class TestSparkClient:
         mocked_spark_client._session = mocked_get_data_from_external_source
 
         # act
-        result_df = mocked_spark_client.get_data_from_external_source(format, options, path)
+        result_df = mocked_spark_client.get_data_from_external_source(
+            format, options, path
+        )
 
         # assert
         mocked_get_data_from_external_source.format.assert_called_once_with(format)
@@ -59,20 +77,20 @@ class TestSparkClient:
         mocked_get_data_from_external_source.load.assert_called_once_with(path=path)
         assert target_df.collect() == result_df.collect()
 
-    @pytest.mark.parametrize(
-        "format, options",
-        [(None, {"path": "path/to/file"})],
-    )
-    def test_get_data_from_external_source_invalid_format(self, format, options, mocked_spark_client):
+    @pytest.mark.parametrize("format, options", [(None, {"path": "path/to/file"})])
+    def test_get_data_from_external_source_invalid_format(
+        self, format, options, mocked_spark_client
+    ):
         # act and assert
         with pytest.raises(ValueError):
             mocked_spark_client.get_data_from_external_source(format, options)
 
     @pytest.mark.parametrize(
-        "format, options",
-        [("parquet", ("csv", "not valid options"))],
+        "format, options", [("parquet", ("csv", "not valid options"))]
     )
-    def test_get_data_from_external_source_invalid_options(self, format, options, mocked_spark_client):
+    def test_get_data_from_external_source_invalid_options(
+        self, format, options, mocked_spark_client
+    ):
         # act and assert
         with pytest.raises(ValueError):
             mocked_spark_client.get_data_from_external_source(format, options)

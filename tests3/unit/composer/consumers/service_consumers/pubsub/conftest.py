@@ -19,8 +19,8 @@ class MockedReceivedMessage:
 
 class MockedPullResponse:
     def __init__(self):
-        mocked_received_message_1 = MockedReceivedMessage('1', 'value_1')
-        mocked_received_message_2 = MockedReceivedMessage('2', 'value_2')
+        mocked_received_message_1 = MockedReceivedMessage("1", "value_1")
+        mocked_received_message_2 = MockedReceivedMessage("2", "value_2")
         self.received_messages = [mocked_received_message_1, mocked_received_message_2]
 
 
