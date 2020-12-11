@@ -1,3 +1,10 @@
+"""
+DEPRECATED.
+
+This module is discontinued and shall be removed when Athena is migrated to Presto and Hive Metastore.
+"""
+
+
 class TableStorageFormat:
     JSON = {"format": "ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'"}
     PARQUET = {

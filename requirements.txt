@@ -1,3 +1,4 @@
+# Notice: Requirements for Airflow in EC2
 apache-airflow==1.10.2
 attrs==18.1.0
 Babel==2.7.0

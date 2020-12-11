@@ -1,3 +1,6 @@
+# Notice: Requirements for Spark jobs in Databricks.
+# These requirements are not used for Composer.
+# Composer requirements are set through Pypi Packages tab in GCP panel interface.
 alembic==0.9.10
 amqp==2.6.1
 apache-airflow==1.10.3
@@ -30,6 +33,7 @@ future==0.16.0
 gitdb2==2.0.5
 GitPython==2.1.11
 gunicorn==19.9.0
+hive-metastore-client==1.0.0
 idna==2.8
 iso8601==0.1.12
 itsdangerous==1.1.0

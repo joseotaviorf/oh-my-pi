@@ -119,10 +119,10 @@ package-python3:
 .PHONY: unit-tests-python3
 unit-tests-python3:
 	@echo ""
-	@echo "Automated Tests"
+	@echo "Unit Tests"
 	@echo "=========="
 	@echo ""
-	@python -m pytest --cov=bietlejuice/jobs/composer --cov-fail-under=10 --cov-config .coveragerc tests3/unit/
+	@python -m pytest -W ignore::DeprecationWarning --cov-config=.coveragerc --cov-report term --cov-report html:htmlcov --cov=bietlejuice/jobs/composer --cov-fail-under=33 tests3/unit/
 
 .PHONY: files-validation-python3
 files-validation-python3:
