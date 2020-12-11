@@ -1,9 +1,12 @@
-import pytest
 from unittest.mock import Mock
+
+import pytest
+
+from bietlejuice.jobs.composer.loaders.hive_metastore_loader import HiveMetastoreLoader
+from bietlejuice.jobs.composer.loaders.s3_loader import S3Loader
 from bietlejuice.jobs.composer.loaders.spark_metastore_loader import (
     SparkMetastoreLoader,
 )
-from bietlejuice.jobs.composer.loaders.s3_loader import S3Loader
 
 
 @pytest.fixture()
@@ -25,3 +28,8 @@ def metastore_loader():
 @pytest.fixture()
 def s3_loader():
     return S3Loader()
+
+
+@pytest.fixture()
+def hive_metastore_loader():
+    return HiveMetastoreLoader(metastore_service=Mock())

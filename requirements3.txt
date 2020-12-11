@@ -33,7 +33,7 @@ future==0.16.0
 gitdb2==2.0.5
 GitPython==2.1.11
 gunicorn==19.9.0
-hive-metastore-client==1.0.0
+hive-metastore-client==1.0.1
 idna==2.8
 iso8601==0.1.12
 itsdangerous==1.1.0
