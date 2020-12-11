@@ -8,7 +8,7 @@ class TestLayerEnum:
     @pytest.mark.parametrize(
         "layer, expected_return",
         [
-            ("raw", ""),  # todo
+            ("raw", TableStorageDescriptorEnum.RAW_FORMAT),
             ("clean", TableStorageDescriptorEnum.CLEAN_FORMAT),
             ("clean_staging", TableStorageDescriptorEnum.CLEAN_STAGING_FORMAT),
             ("enrich", TableStorageDescriptorEnum.ENRICH_FORMAT),
