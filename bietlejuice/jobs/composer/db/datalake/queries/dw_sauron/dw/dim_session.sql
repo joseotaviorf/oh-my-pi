@@ -4,7 +4,7 @@ SELECT
 	agent AS attendance,
 	department AS department_name,
 	customer_phone_formatted AS customer_phone,
-	customer_type,
+	customer_type AS user_type,
 	customer_flow_step AS flow_step,
 	status,
 	ts_created,

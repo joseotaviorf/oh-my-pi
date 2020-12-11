@@ -8,7 +8,6 @@ CREATE TABLE IF NOT EXISTS sauron.dim_session (
 	user_type VARCHAR(25),
 	flow_step VARCHAR(25),
 	status VARCHAR(20),
-	tags VARCHAR(100),
 	ts_created TIMESTAMP,
 	ts_first_message TIMESTAMP,
 	ts_updated TIMESTAMP

@@ -1,4 +1,4 @@
 SELECT
-	id AS sk_session,
-	EXPLODE(context) AS tag
+	id_session AS sk_session,
+	EXPLODE(customer_tags) AS tags
 FROM datalake_sauron.session
