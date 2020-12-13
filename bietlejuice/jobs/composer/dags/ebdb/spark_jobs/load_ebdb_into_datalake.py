@@ -89,10 +89,9 @@ if __name__ == "__main__":
 
     conn_config_json = dbutils.secrets.get(scope="quintoandar", key=DatabaseEnum.EBDB)
     conn_config = json.loads(conn_config_json)
-    mysql_consumer = MySqlConsumer(conn_config, SparkClient())
-
     # Fix incompatibility between mysql zero-datetime and spark
     conn_config.update({"params": {"zeroDateTimeBehavior": "convertToNull"}})
+    mysql_consumer = MySqlConsumer(conn_config, SparkClient())
 
     tables = mysql_consumer.get_table_names_and_sizes().collect()
     rels = [
