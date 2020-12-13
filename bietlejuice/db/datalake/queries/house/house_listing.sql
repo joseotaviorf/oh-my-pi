@@ -198,8 +198,7 @@ select
 	revision_time as ts_rent_price_changed,
 	aluguel as rent_price_history,
 	lead(revision_time) over(partition by id order by rev) as ts_next_rent_price_change,
-	row_number() over(partition by id order by rev) as order_rent_price,
-	max(revision_time) over(partition by id) as max_ts_rent_price_changed
+	row_number() over(partition by id order by rev) as order_rent_price
 from house_aud
 where (aluguel <> previous_rent_price or previous_rent_price is null)
 ),
@@ -215,10 +214,9 @@ select
 from house_listing_full hlf
 join house_rent_history rh
  on hlf.id_house = rh.id_house
- and ((rh.ts_rent_price_changed between hlf.ts_listing_version_start and coalesce(hlf.ts_listing_version_end - interval '1' second, current_timestamp))
-  -- TODO: remove OR condition and add to another LEFT JOIN
-  or (coalesce(rh.ts_next_rent_price_change,current_timestamp) between hlf.ts_listing_version_start and coalesce(hlf.ts_listing_version_end - interval '1' second, current_timestamp))
-  or (rh.max_ts_rent_price_changed <= hlf.ts_listing_version_start))
+ and rh.ts_rent_price_changed
+    between hlf.ts_listing_version_start
+            and coalesce(hlf.ts_listing_version_end - interval '1' second, current_timestamp)
 )
 select
 	id_house_listing,
