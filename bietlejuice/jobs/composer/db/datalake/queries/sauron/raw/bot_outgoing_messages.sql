@@ -6,6 +6,5 @@ SELECT
 FROM
     public."BotOutgoingMessages"
 WHERE
-    EXTRACT(year FROM updated_at) = {year}
-    AND EXTRACT(month FROM updated_at) = {month}
-    AND EXTRACT(day FROM updated_at) = {day}
+    updated_at >= DATE('{year}-{month}-{day}')
+    AND updated_at < DATE('{year}-{month}-{day}') + 1
