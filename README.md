@@ -226,7 +226,7 @@ $ make kill-docker-environment-python2
 
     Python 2.7.16
     [pyenv](https://github.com/pyenv/pyenv)
-    [virtualenv](https://virtualenv.pypa.io/en/latest/installation/)
+    [virtualenv](https://virtualenv.pypa.io/en/latest/installation.html)
 
 #### 1. Clone the project
 
