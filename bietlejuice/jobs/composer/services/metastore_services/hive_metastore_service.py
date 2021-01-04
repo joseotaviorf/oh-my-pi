@@ -3,6 +3,7 @@ from hive_metastore_client.builders import (
     StorageDescriptorBuilder,
     TableBuilder,
     ColumnBuilder,
+    DatabaseBuilder,
 )
 from quintoandar_logger import QuintoAndarLogger
 
@@ -108,7 +109,15 @@ class HiveMetastoreService(MetastoreService):
         return columns
 
     def create_database(self, database_name):
-        raise NotImplementedError("m=create_database, msg=method not implemented")
+        """
+        Creates the database in the Hive Metastore if it does not exist.
+
+        :param database_name: the new database name
+        :type database_name: str
+        """
+        with self.client as conn:
+            database = DatabaseBuilder(database_name).build()
+            conn.create_database_if_not_exists(database)
 
     def repair_table_partitions(self, database_name, table_name):
         raise NotImplementedError(

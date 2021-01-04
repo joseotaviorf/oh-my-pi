@@ -263,3 +263,30 @@ class TestHiveMetastoreService:
         mocked_open_conn.drop_columns_from_table.assert_called_once_with(
             database_name, table_name, columns
         )
+
+    @mock.patch(
+        "bietlejuice.jobs.composer.services.metastore_services.hive_metastore_service.DatabaseBuilder"
+    )
+    def test_create_database_if_not_exists(
+        self, mocked_database_builder, hive_metastore_service
+    ):
+        # arrange
+        db_name = "<db_name>"
+
+        mocked_db_obj = Mock()
+        mocked_database_builder.return_value = mocked_db_obj
+
+        # Mocking the conn inside with statement
+        mocked_open_conn = Mock()
+        mocked_client = Mock()
+        mocked_client.return_value = mocked_open_conn
+        hive_metastore_service._client.__enter__ = mocked_client
+
+        # act
+        hive_metastore_service.create_database(db_name)
+
+        # assert
+        mocked_database_builder.assert_called_once_with(db_name)
+        mocked_open_conn.create_database_if_not_exists.assert_called_once_with(
+            mocked_db_obj.build()
+        )
