@@ -119,7 +119,16 @@ class HiveMetastoreService(MetastoreService):
         raise NotImplementedError("m=drop_table, msg=method not implemented")
 
     def get_table_names(self, database_name, regex="*"):
-        raise NotImplementedError("m=get_table_names, msg=method not implemented")
+        """
+        Fetches the tables existent in the database.
+
+        :param database_name: the database name
+        :param regex: regex filter to apply in the table names
+        :return: list with table names
+        :rtype: List[str]
+        """
+        with self.client as conn:
+            return conn.get_all_tables(database_name)
 
     def get_table_description(self, database_name, table_name, formatted=False):
         raise NotImplementedError("m=get_table_description, msg=method not implemented")
@@ -176,3 +185,31 @@ class HiveMetastoreService(MetastoreService):
             columns[field_schema.name] = field_schema.type
 
         return columns
+
+    def add_columns_to_table(self, database_name, table_name, columns):
+        """
+        Add new columns in the metastore table.
+
+        :param database_name: the database name
+        :type database_name: str
+        :param table_name: the table name
+        :type table_name: str
+        :param columns: list with columns objects to be added
+        :type columns: List[FieldSchema]
+        """
+        with self.client as conn:
+            conn.add_columns_to_table(database_name, table_name, columns)
+
+    def drop_columns_from_table(self, database_name, table_name, columns):
+        """
+        Drops the columns in the metastore table.
+
+        :param database_name: the database name
+        :type database_name: str
+        :param table_name: the table name
+        :type table_name: str
+        :param columns: list with columns names to be deleted
+        :type columns: List[str]
+        """
+        with self.client as conn:
+            conn.drop_columns_from_table(database_name, table_name, columns)

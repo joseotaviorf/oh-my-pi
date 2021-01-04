@@ -7,7 +7,9 @@ class SchemaService:
         """
         Returns the dataframe's schema as a dict that specifies the name and type
         for each column (including partitioning columns).
+
         :param dataframe: dataframe to get schema from.
+        :type dataframe: pyspark.sql.DataFrame
         :return: OrderedDict with schema
         """
         schema_df = OrderedDict(
@@ -20,7 +22,9 @@ class SchemaService:
         """
         Returns the dataframe's schema as a string that specifies the name and type
         for each column (including partitioning columns).
+
         :param dataframe: dataframe to get schema from.
+        :type dataframe: pyspark.sql.DataFrame
         :return: DDL-formatted string , e.g: col1 string,col2 int,col3 bigint
         """
         schema_df = ""

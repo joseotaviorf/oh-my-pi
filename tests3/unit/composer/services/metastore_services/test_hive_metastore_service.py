@@ -148,6 +148,27 @@ class TestHiveMetastoreService:
         assert returned_value == mocked_schema
         mocked_open_conn.get_schema.assert_called_once_with(database_name, table_name)
 
+    def test_get_table_names(self, hive_metastore_service):
+        # arrange
+        database_name = "datalake_ebdb_clean_prod"
+        mocked_table_names = "<list of table names>"
+
+        # Mocking the conn inside with statement
+        mocked_open_conn = Mock()
+        mocked_open_conn.get_all_tables.return_value = mocked_table_names
+
+        mocked_client = Mock()
+        mocked_client.return_value = mocked_open_conn
+
+        hive_metastore_service._client.__enter__ = mocked_client
+
+        # act
+        returned_value = hive_metastore_service.get_table_names(database_name)
+
+        # assert
+        assert returned_value == mocked_table_names
+        mocked_open_conn.get_all_tables.assert_called_once_with(database_name)
+
     @mock.patch.object(HiveMetastoreService, "_get_columns_from_schema")
     @mock.patch.object(HiveMetastoreService, "get_table_schema")
     def test_get_table_columns(
@@ -198,3 +219,47 @@ class TestHiveMetastoreService:
 
         # assert
         assert returned_value == expected_return
+
+    def test_add_columns_to_table(self, hive_metastore_service):
+        # arrange
+        database_name = "datalake_ebdb_clean_prod"
+        table_name = "user"
+        columns = "<list of columns to add>"
+
+        # Mocking the conn inside with statement
+        mocked_open_conn = Mock()
+        mocked_client = Mock()
+        mocked_client.return_value = mocked_open_conn
+
+        hive_metastore_service._client.__enter__ = mocked_client
+
+        # act
+        hive_metastore_service.add_columns_to_table(database_name, table_name, columns)
+
+        # assert
+        mocked_open_conn.add_columns_to_table.assert_called_once_with(
+            database_name, table_name, columns
+        )
+
+    def test_drop_columns_from_table(self, hive_metastore_service):
+        # arrange
+        database_name = "datalake_ebdb_clean_prod"
+        table_name = "user"
+        columns = "<list of columns to remove>"
+
+        # Mocking the conn inside with statement
+        mocked_open_conn = Mock()
+        mocked_client = Mock()
+        mocked_client.return_value = mocked_open_conn
+
+        hive_metastore_service._client.__enter__ = mocked_client
+
+        # act
+        hive_metastore_service.drop_columns_from_table(
+            database_name, table_name, columns
+        )
+
+        # assert
+        mocked_open_conn.drop_columns_from_table.assert_called_once_with(
+            database_name, table_name, columns
+        )

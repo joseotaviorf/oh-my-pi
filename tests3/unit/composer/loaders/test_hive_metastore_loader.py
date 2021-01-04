@@ -2,7 +2,7 @@ from collections import OrderedDict
 from unittest import mock
 
 import pytest
-from thrift_files.libraries.thrift_hive_metastore_client.ttypes import FieldSchema
+from hive_metastore_client.builders import ColumnBuilder
 
 from bietlejuice.jobs.composer.loaders import HiveMetastoreLoader
 
@@ -32,7 +32,7 @@ class TestHiveMetastoreLoader:
         )
 
         # assert
-        assert returned_value == {"added": added_cols, "removed": removed_cols}
+        assert returned_value == (added_cols, removed_cols)
         hive_metastore_loader.hive_metastore_service.get_table_columns.assert_called_once_with(
             database_name, table_name
         )
@@ -51,7 +51,7 @@ class TestHiveMetastoreLoader:
             (
                 OrderedDict([("id", "int"), ("name", "string")]),
                 {"id": "int"},
-                ([FieldSchema(name="name", type="string", comment=None)], []),
+                ([ColumnBuilder(name="name", type="string", comment=None).build()], []),
             ),
             (
                 OrderedDict([("id", "int")]),
@@ -62,7 +62,7 @@ class TestHiveMetastoreLoader:
                 OrderedDict([("id", "int"), ("name", "string"), ("age", "int")]),
                 {"id": "int", "name": "string", "age": "string"},
                 (
-                    [FieldSchema(name="age", type="int", comment=None)],
+                    [ColumnBuilder(name="age", type="int", comment=None).build()],
                     ["age"],
                 ),  # col type changed: the col will be removed from hive and added again with the new type
             ),
@@ -78,3 +78,142 @@ class TestHiveMetastoreLoader:
 
         # assert
         assert returned_value == expected_value
+
+    def test__is_table_in_metastore(self, hive_metastore_loader):
+        # arrange
+        database_name = "datalake_ebdb_clean_prod"
+        table_name = "house"
+
+        mocked_hive_table_names = ["house", "house_aud"]
+        hive_metastore_loader.hive_metastore_service.get_table_names.return_value = (
+            mocked_hive_table_names
+        )
+
+        expected_value = True
+
+        # act
+        returned_value = hive_metastore_loader._is_table_in_metastore(
+            database_name, table_name
+        )
+
+        # assert
+        assert returned_value == expected_value
+        hive_metastore_loader.hive_metastore_service.get_table_names.assert_called_once_with(
+            database_name
+        )
+
+    def test_create_table(self, hive_metastore_loader):
+        # arrange
+        database_name = "datalake_ebdb_clean_prod"
+        table_name = "user"
+        table_schema = OrderedDict([("some_col_name", "type")])
+        table_location = "<table_location>"
+        partition_keys = "<partition_keys>"
+        format_info = "<format_options>"
+
+        # act
+        hive_metastore_loader.create_table(
+            database_name,
+            table_name,
+            table_location,
+            table_schema,
+            partition_keys,
+            format_info,
+        )
+
+        # assert
+        hive_metastore_loader.hive_metastore_service.create_external_table.assert_called_once_with(
+            database_name,
+            table_name,
+            table_location,
+            table_schema,
+            partition_keys,
+            format_info,
+        )
+
+    @mock.patch.object(HiveMetastoreLoader, "_is_table_in_metastore")
+    @mock.patch.object(HiveMetastoreLoader, "compare_table_schema")
+    def test_update_metastore_with_existing_table(
+        self,
+        mocked_compare_table_schema,
+        mocked__is_table_in_metastore,
+        hive_metastore_loader,
+    ):
+        # arrange
+        table_schema = "<table_schema>"
+        database_name = "<db_name>"
+        table_name = "<tb_name>"
+        format_info = "<format_info>"
+        database_location = "<location>"
+        source_schema = "<source schema>"
+        partition_keys = "<partition_keys>"
+
+        mocked__is_table_in_metastore.return_value = True
+
+        mocked_added_cols = [ColumnBuilder("col3", "string").build()]
+        mocked_removed_cols = ["col1", "col2"]
+        mocked_compare_table_schema.return_value = (
+            mocked_added_cols,
+            mocked_removed_cols,
+        )
+
+        # act
+        hive_metastore_loader.update_metastore(
+            database_name,
+            table_name,
+            database_location,
+            table_schema,
+            partition_keys,
+            format_info,
+            source_schema,
+        )
+
+        # assert
+        mocked__is_table_in_metastore.assert_called_once_with(database_name, table_name)
+        mocked_compare_table_schema.assert_called_once_with(
+            database_name, table_name, source_schema
+        )
+        hive_metastore_loader.hive_metastore_service.drop_columns_from_table.assert_called_once_with(
+            database_name, table_name, mocked_removed_cols
+        )
+        hive_metastore_loader.hive_metastore_service.add_columns_to_table.assert_called_once_with(
+            database_name, table_name, mocked_added_cols
+        )
+
+    @mock.patch.object(HiveMetastoreLoader, "_is_table_in_metastore")
+    @mock.patch.object(HiveMetastoreLoader, "create_table")
+    def test_update_metastore_with_new_table(
+        self, mocked_create_table, mocked__is_table_in_metastore, hive_metastore_loader
+    ):
+        # arrange
+        table_schema = "<table_schema>"
+        database_name = "<db_name>"
+        table_name = "<tb_name>"
+        format_info = "<format_info>"
+        database_location = "<location>"
+        source_schema = "<source schema>"
+        partition_keys = "<partition_keys>"
+
+        mocked__is_table_in_metastore.return_value = False
+
+        # act
+        hive_metastore_loader.update_metastore(
+            database_name,
+            table_name,
+            database_location,
+            table_schema,
+            partition_keys,
+            format_info,
+            source_schema,
+        )
+
+        # assert
+        mocked__is_table_in_metastore.assert_called_once_with(database_name, table_name)
+        mocked_create_table.assert_called_once_with(
+            database_name,
+            table_name,
+            database_location + table_name,
+            table_schema,
+            partition_keys,
+            format_info,
+        )
