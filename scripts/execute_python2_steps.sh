@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CHANGED_PATHS=$(git diff-tree --no-commit-id --name-only -r HEAD..HEAD~1 | grep 'bietlejuice/db\|bietlejuice/jobs/base\|bietlejuice/jobs/dags\|bietlejuice/jobs/etl\|tests\|requirements\|setup')
+CHANGED_PATHS=$(git diff-tree --no-commit-id --name-only -r HEAD..HEAD~1 | grep 'bietlejuice/db\|bietlejuice/jobs/base\|bietlejuice/jobs/dags\|bietlejuice/jobs/etl\|tests/\|requirements\|setup')
 if [ ${#CHANGED_PATHS} -eq 0 ]; then
   echo "===== No changes in Airflow EC2 files! Skipping! ===== "
   exit 0
