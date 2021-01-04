@@ -1,6 +1,7 @@
 from datetime import datetime
 import pendulum
 
+from airflow.utils.helpers import cross_downstream
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -75,7 +76,18 @@ media_names = FileService.list_layer_sql_files(TARGET, "")
 
 
 def build_task_pipeline(media_name):
-    create_cluster_task >> list(dw_staging_sub_dags.values()) >> terminate_cluster_task
+
+    dims_sub_dags = []
+    facts_sub_dags = []
+    for key, value in dw_staging_sub_dags.items():
+        if "fact" in key:
+            facts_sub_dags.append(value)
+        else:
+            dims_sub_dags.append(value)
+
+    create_cluster_task >> dims_sub_dags
+    cross_downstream(dims_sub_dags, facts_sub_dags)
+    facts_sub_dags >> terminate_cluster_task
 
 
 for media_name in media_names:
