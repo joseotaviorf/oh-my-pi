@@ -142,8 +142,20 @@ class HiveMetastoreService(MetastoreService):
     def get_table_description(self, database_name, table_name, formatted=False):
         raise NotImplementedError("m=get_table_description, msg=method not implemented")
 
-    def add_partitions(self, database_name, table_name, partitions):
-        raise NotImplementedError("m=add_partitions, msg=method not implemented")
+    def add_partitions_to_table(self, database_name, table_name, partition_list):
+        """
+        Add partitions to the Hive table.
+
+        :param database_name: the database name
+        :type database_name: str
+        :param table_name: the table name
+        :type table_name: str
+        :param partition_list: list of partitions to be added to the table
+        :type partition_list: List[Partition]
+        :return:
+        """
+        with self.client as conn:
+            conn.add_partitions_to_table(database_name, table_name, partition_list)
 
     def create_new_partitions_from_df(
         self, database_name, table_name, df, partition_cols, parallelism=1

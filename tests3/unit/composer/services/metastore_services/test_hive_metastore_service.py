@@ -3,6 +3,7 @@ from collections import OrderedDict
 import mock
 import pytest
 from hive_metastore_client.builders import ColumnBuilder
+from hive_metastore_client.builders import PartitionBuilder
 from mock import Mock
 
 from bietlejuice.jobs.composer.base.hive import TableStorageDescriptorEnum
@@ -289,4 +290,30 @@ class TestHiveMetastoreService:
         mocked_database_builder.assert_called_once_with(db_name)
         mocked_open_conn.create_database_if_not_exists.assert_called_once_with(
             mocked_db_obj.build()
+        )
+
+    def test_add_partitions_to_table(self, hive_metastore_service):
+        # arrange
+        database_name = "datalake_ebdb_clean_prod"
+        table_name = "user"
+        partition_list = [
+            PartitionBuilder(["2020", "12", "13"], database_name, table_name).build(),
+            PartitionBuilder(["2020", "12", "14"], database_name, table_name).build(),
+        ]
+
+        # Mocking the conn inside with statement
+        mocked_open_conn = Mock()
+        mocked_client = Mock()
+        mocked_client.return_value = mocked_open_conn
+
+        hive_metastore_service._client.__enter__ = mocked_client
+
+        # act
+        hive_metastore_service.add_partitions_to_table(
+            database_name, table_name, partition_list
+        )
+
+        # assert
+        mocked_open_conn.add_partitions_to_table.assert_called_once_with(
+            database_name, table_name, partition_list
         )

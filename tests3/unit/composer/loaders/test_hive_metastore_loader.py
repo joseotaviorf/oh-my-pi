@@ -3,6 +3,7 @@ from unittest import mock
 
 import pytest
 from hive_metastore_client.builders import ColumnBuilder
+from hive_metastore_client.builders import PartitionBuilder
 
 from bietlejuice.jobs.composer.loaders import HiveMetastoreLoader
 
@@ -217,3 +218,71 @@ class TestHiveMetastoreLoader:
             partition_keys,
             format_info,
         )
+
+    @mock.patch.object(PartitionBuilder, "build")
+    def test_add_partitions_to_table_without_partition(
+        self, mocked_partition_builder, hive_metastore_loader
+    ):
+        # arrange
+        database_name = "<db_name>"
+        table_name = "<table_name>"
+        partition_values_list = None
+
+        # act & assert
+        with pytest.raises(TypeError):
+            hive_metastore_loader.add_partitions_to_table(
+                database_name, table_name, partition_values_list
+            )
+
+        # assert
+        mocked_partition_builder.assert_not_called()
+
+    @mock.patch.object(PartitionBuilder, "build")
+    def test_add_partitions_to_table_with_empty_list(
+        self, mocked_partition_builder, hive_metastore_loader
+    ):
+        # arrange
+        database_name = "<db_name>"
+        table_name = "<table_name>"
+        partition_values_list = []
+
+        # act & assert
+        with pytest.raises(ValueError):
+            hive_metastore_loader.add_partitions_to_table(
+                database_name, table_name, partition_values_list
+            )
+
+        # assert
+        mocked_partition_builder.assert_not_called()
+
+    @pytest.mark.parametrize(
+        "partition_values_list, expected_builds, expected_calls",
+        [
+            [[["2020", "01", "30"], ["2020", "01", "31"]], 2, 1],
+            [[["2020", "01", "30"]], 1, 1],
+        ],
+    )
+    @mock.patch.object(PartitionBuilder, "build")
+    def test_add_partitions_to_table(
+        self,
+        mocked_partition_builder,
+        partition_values_list,
+        expected_builds,
+        expected_calls,
+        hive_metastore_loader,
+    ):
+        # arrange
+        database_name = "<db_name>"
+        table_name = "<table_name>"
+
+        # act
+        hive_metastore_loader.add_partitions_to_table(
+            database_name, table_name, partition_values_list
+        )
+
+        # assert
+        assert (
+            hive_metastore_loader.hive_metastore_service.add_partitions_to_table.call_count
+            == expected_calls
+        )
+        assert mocked_partition_builder.call_count == expected_builds

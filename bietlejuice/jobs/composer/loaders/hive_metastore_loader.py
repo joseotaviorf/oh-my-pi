@@ -1,4 +1,5 @@
 from hive_metastore_client.builders import ColumnBuilder
+from hive_metastore_client.builders import PartitionBuilder
 from quintoandar_logger import QuintoAndarLogger
 
 logger = QuintoAndarLogger("HiveMetastoreLoader")
@@ -125,7 +126,7 @@ class HiveMetastoreLoader:
         :param source_schema: columns to compare the table schema with
         :type source_schema: collections.OrderedDict
         """
-        partition_keys = partition_keys or {}
+        partition_keys = partition_keys or []
         table_s3_path = database_location + table_name
 
         if self._is_table_in_metastore(database_name, table_name):
@@ -204,4 +205,41 @@ class HiveMetastoreLoader:
             )
             self.hive_metastore_service.add_columns_to_table(
                 database_name, table_name, added_columns
+            )
+
+    def add_partitions_to_table(self, database_name, table_name, partition_values_list):
+        """
+        Add partitions value as new partitions to Hive table.
+
+        :param database_name: the database name
+        :type database_name: str
+        :param table_name: the table name
+        :type table_name: str
+        :param partition_values_list: values as a list, in the correct order, to be added as a new partition to the table
+        :type partition_values_list: List[List[str]]
+        :return: None
+        """
+        partition_list = []
+
+        for partition in partition_values_list:
+            partition_list.append(
+                PartitionBuilder(
+                    values=partition, db_name=database_name, table_name=table_name
+                ).build()
+            )
+
+        if partition_list:
+            self.hive_metastore_service.add_partitions_to_table(
+                database_name, table_name, partition_list
+            )
+
+            logger.info(
+                f"m=add_partitions_to_table, db={database_name}, table={table_name}, "
+                "msg=Successfully added partitions to table."
+            )
+        else:
+            raise ValueError(
+                f"m=add_partitions_to_table, db={database_name}, table={table_name}, "
+                f"partitions={partition_list}, "
+                "msg=Partitions must be informed."
             )
