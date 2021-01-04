@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS marketing_costs.fact_facebook_daily_cost_attributions;
 CREATE TABLE IF NOT EXISTS marketing_costs.fact_facebook_daily_cost_attributions (
-    sk_ad BIGINT,
+    sk_ad VARCHAR,
     id_ad BIGINT,
     id_account BIGINT,
     id_campaign BIGINT,

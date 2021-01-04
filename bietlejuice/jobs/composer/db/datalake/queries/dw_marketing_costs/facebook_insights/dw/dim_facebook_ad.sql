@@ -1,6 +1,6 @@
 WITH distinct_dims AS (
     SELECT 
-        FIRST(id_ad) AS sk_ad,
+        CONCAT(FIRST(id_ad), campaign_name) AS sk_ad,
         ad_name,
         adset_name,
         campaign_name,
