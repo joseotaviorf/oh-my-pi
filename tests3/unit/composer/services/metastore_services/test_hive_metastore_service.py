@@ -1,12 +1,12 @@
+from collections import OrderedDict
+
 import mock
 import pytest
+from hive_metastore_client.builders import ColumnBuilder
 from mock import Mock
-from thrift_files.libraries.thrift_hive_metastore_client.ttypes import FieldSchema
 
 from bietlejuice.jobs.composer.base.hive import TableStorageDescriptorEnum
-from bietlejuice.jobs.composer.services.metastore_services.hive_metastore_service import (
-    HiveMetastoreService,
-)
+from bietlejuice.jobs.composer.services.metastore_services import HiveMetastoreService
 
 
 class TestHiveMetastoreService:
@@ -105,14 +105,14 @@ class TestHiveMetastoreService:
         "table_columns, expected_return",
         [
             (
-                [("id", "int"), ("name", "string"), ("is_active", "bool")],
+                OrderedDict([("id", "int"), ("name", "string"), ("is_active", "bool")]),
                 [
-                    FieldSchema(name="id", type="int", comment=None),
-                    FieldSchema(name="name", type="string", comment=None),
-                    FieldSchema(name="is_active", type="bool", comment=None),
+                    ColumnBuilder(name="id", type="int", comment=None).build(),
+                    ColumnBuilder(name="name", type="string", comment=None).build(),
+                    ColumnBuilder(name="is_active", type="bool", comment=None).build(),
                 ],
             ),
-            ([], []),
+            (OrderedDict([]), []),
         ],
     )
     def test__build_columns_from_dict(
@@ -120,6 +120,81 @@ class TestHiveMetastoreService:
     ):
         # act
         returned_value = hive_metastore_service._build_columns_from_dict(table_columns)
+
+        # assert
+        assert returned_value == expected_return
+
+    def test_get_table_schema(self, hive_metastore_service):
+        # arrange
+        database_name = "datalake_ebdb_clean_prod"
+        table_name = "user"
+        mocked_schema = "<list of FieldSchema>"
+
+        # Mocking the conn inside with statement
+        mocked_open_conn = Mock()
+        mocked_open_conn.get_schema.return_value = mocked_schema
+
+        mocked_client = Mock()
+        mocked_client.return_value = mocked_open_conn
+
+        hive_metastore_service._client.__enter__ = mocked_client
+
+        # act
+        returned_value = hive_metastore_service.get_table_schema(
+            database_name, table_name
+        )
+
+        # assert
+        assert returned_value == mocked_schema
+        mocked_open_conn.get_schema.assert_called_once_with(database_name, table_name)
+
+    @mock.patch.object(HiveMetastoreService, "_get_columns_from_schema")
+    @mock.patch.object(HiveMetastoreService, "get_table_schema")
+    def test_get_table_columns(
+        self,
+        mocked_get_table_schema,
+        mocked__get_columns_from_schema,
+        hive_metastore_service,
+    ):
+        # arrange
+        database_name = "datalake_ebdb_clean_prod"
+        table_name = "contract"
+
+        mocked_table_schema = "<table schema>"
+        mocked_get_table_schema.return_value = mocked_table_schema
+
+        mocked_columns = "<columns dictionary>"
+        mocked__get_columns_from_schema.return_value = mocked_columns
+
+        # act
+        returned_value = hive_metastore_service.get_table_columns(
+            database_name, table_name
+        )
+
+        # assert
+        assert returned_value == mocked_columns
+        mocked_get_table_schema.assert_called_once_with(database_name, table_name)
+        mocked__get_columns_from_schema.assert_called_once_with(mocked_table_schema)
+
+    @pytest.mark.parametrize(
+        "table_schema, expected_return",
+        [
+            (
+                [
+                    ColumnBuilder(name="id", type="int", comment=None).build(),
+                    ColumnBuilder(name="name", type="string", comment=None).build(),
+                    ColumnBuilder(name="is_active", type="bool", comment=None).build(),
+                ],
+                {"id": "int", "name": "string", "is_active": "bool"},
+            ),
+            ([], {}),
+        ],
+    )
+    def test__get_columns_from_schema(
+        self, table_schema, expected_return, hive_metastore_service
+    ):
+        # act
+        returned_value = hive_metastore_service._get_columns_from_schema(table_schema)
 
         # assert
         assert returned_value == expected_return

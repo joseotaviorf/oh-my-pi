@@ -53,6 +53,7 @@ class SparkMetastoreService(MetastoreService):
         :param table_name: table name
         :type table_name: str
         :return: OrderedDict with col names as keys and col types as values
+        :rtype: collections.OrderedDict
         """
         df = super().get_table_description(database_name, table_name)
         df = df.select("col_name", "data_type").filter(col("col_name").rlike(r"^\w"))
