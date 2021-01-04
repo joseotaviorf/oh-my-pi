@@ -4,11 +4,11 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.athena import TableStorageFormat
 from bietlejuice.jobs.composer.base.db import DATALAKE_SQL_DIR
+from bietlejuice.jobs.composer.base.pipeline import EnvironmentEnum
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer
 
-from bietlejuice.jobs.composer.base.airflow import Environment
 
 logger = QuintoAndarLogger("Transformer")
 
@@ -26,7 +26,7 @@ class Transformer:
         # Forno is under new AWS accounts, then use new structure
         # Prod is temporarily under old AWS account and will be migrated soon, then this
         # if clause should be removed
-        if self.env == Environment.FORNO:
+        if self.env == EnvironmentEnum.FORNO:
             self.schema_suffix = ""
         else:
             self.schema_suffix = f"_{env}"

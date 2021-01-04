@@ -3,7 +3,6 @@
 # Composer requirements are set through Pypi Packages tab in GCP panel interface.
 alembic==0.9.10
 amqp==2.6.1
-apache-airflow==1.10.3
 arrow==0.14.4
 Babel==2.7.0
 binaryornot==0.4.4

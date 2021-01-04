@@ -8,8 +8,11 @@ from airflow.operators.quintoandar_athena import (
 )
 from airflow.operators.quintoandar_transfer_data import QuintoAndarMySqlToS3Operator
 
-from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG, Environment
+from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
 from bietlejuice.jobs.composer.base.db import DATALAKE_SQL_DIR
+from bietlejuice.jobs.composer.base.pipeline import (
+    EnvironmentEnum,
+)  # TODO Create an Airflow environment enum and use here
 from bietlejuice.jobs.composer.services import FileService
 
 DAG_ID = "bietlejuice.composer"
@@ -50,7 +53,7 @@ def move_data_subdag(subdag_name, table_name):
         mysql_conn_id="airflow_db",
     )
 
-    if ENV == Environment.FORNO:
+    if ENV == EnvironmentEnum.FORNO:
         schema_suffix = ""
     else:
         schema_suffix = f"_{ENV}"

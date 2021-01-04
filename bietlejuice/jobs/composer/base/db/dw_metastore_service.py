@@ -1,10 +1,10 @@
-from bietlejuice.jobs.composer.base.airflow import Environment
+from bietlejuice.jobs.composer.base.pipeline import EnvironmentEnum
 
 
 class DWMetastoreService:
     @staticmethod
     def get_dw_info(env, schema, bucket):
-        Environment.validate_env(env)
+        EnvironmentEnum.validate_env(env)
 
         dw_bucket = {"dw_bucket": bucket}
         spark_db_infos = {

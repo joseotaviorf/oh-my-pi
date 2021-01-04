@@ -1,15 +1,15 @@
-from bietlejuice.jobs.composer.base.airflow import Environment
+from bietlejuice.jobs.composer.base.pipeline import EnvironmentEnum
 
 
 class DatalakeMetastoreService:
     @staticmethod
     def get_db_info(env, source, bucket):
-        Environment.validate_env(env)
+        EnvironmentEnum.validate_env(env)
 
         # TODO: Forno is under new AWS accounts, then use new structure
         # Prod is temporarily under old AWS account and will be migrated soon, then this
         # if clause should be removed
-        if env == Environment.FORNO:
+        if env == EnvironmentEnum.FORNO:
             schema_suffix = ""
         else:
             schema_suffix = f"_{env}"
