@@ -92,3 +92,14 @@ class DatabricksConsumer(DBConsumer):
     def get_incremental_data_from_table(self, table_name, column_name, execution_date):
         # todo: implement me!
         raise NotImplementedError()
+
+    @logger
+    def get_partition_values_from_table(self, table_name):
+        """
+        Gets all the partitions created for the table
+        :return: A Spark DataFrame with default col partition
+        """
+        query = f"SHOW PARTITIONS {self.conn_config['db']}.{table_name}"
+        df = self.spark_client.get_records(query)
+
+        return df
