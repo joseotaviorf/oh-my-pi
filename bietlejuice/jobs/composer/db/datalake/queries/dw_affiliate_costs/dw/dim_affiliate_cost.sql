@@ -4,6 +4,7 @@ SELECT
     description,
     source_bill_item,
     commission_type,
+    cost_center_code,
     mkt_origin,
     now() as ts_load
 FROM
