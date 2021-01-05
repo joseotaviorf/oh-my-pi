@@ -27,7 +27,7 @@ DATALAKE_BUCKET = Variable.get("datalake_bucket")
 S3_MARKETING_PATH = Variable.get("datalake_marketing_bucket")
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/enrich_{TARGET}/"
+SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/enrich_{TARGET}_{MEDIA}/"
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
