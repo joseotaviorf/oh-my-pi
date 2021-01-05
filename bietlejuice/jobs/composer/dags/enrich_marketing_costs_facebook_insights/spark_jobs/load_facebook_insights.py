@@ -3,7 +3,7 @@ import json
 from argparse import ArgumentParser
 from datetime import datetime
 
-from pyspark.sql.functions import col, udf
+from pyspark.sql.functions import col, udf, concat, lit
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -96,8 +96,13 @@ if __name__ == "__main__":
 
     df = df.where("year={year} and month={month} and day={day}".format(**dt_dict))
 
-    df = df.withColumn("acc", map_account_id_to_name_udf(col("id_account")))
-    df = df.withColumn("is_test_campaign", col("acc").like("ZEBRA%"))
+    sk_ad = concat(col("id_ad"), lit("{year}-{month}-{day}"))
+
+    df = (
+        df.withColumn("acc", map_account_id_to_name_udf(col("id_account")))
+        .withColumn("is_test_campaign", col("acc").like("ZEBRA%"))
+        .withColumn("sk_ad", sk_ad)
+    )
 
     spark_metastore_service = SparkMetastoreService(spark_client)
     s3_loader = S3Loader()

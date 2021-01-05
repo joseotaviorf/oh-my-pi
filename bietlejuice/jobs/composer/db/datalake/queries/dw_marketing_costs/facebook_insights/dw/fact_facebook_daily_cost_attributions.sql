@@ -26,6 +26,9 @@ WITH fb_grouped_records AS (
         fi.year = {year}
         AND fi.month = {month}
         AND fi.day = {day}
+        AND stg_dim.year = {year}
+        AND stg_dim.month = {month}
+        AND stg_dim.day = {day}
     GROUP BY
         1,2,3,4,5,10,11,12,13,14
 )

@@ -1,6 +1,6 @@
 WITH distinct_dims AS (
     SELECT 
-        CONCAT(FIRST(id_ad), campaign_name) AS sk_ad,
+        sk_ad,
         ad_name,
         adset_name,
         campaign_name,
@@ -8,7 +8,8 @@ WITH distinct_dims AS (
         is_test_campaign,
         year,
         month,
-        day
+        day,
+        NOW() AS ts_load
     FROM 
         datalake_marketing_costs.facebook_insights
     WHERE
@@ -18,14 +19,3 @@ WITH distinct_dims AS (
     GROUP BY
         2,3,4,5,6,7,8,9
 )
-
-SELECT
-    distinct_dims.*,
-    NOW() AS ts_load
-FROM 
-    distinct_dims
-LEFT JOIN 
-    dw_marketing_costs_staging.dim_facebook_ad AS stg_dim
-        ON distinct_dims.sk_ad = stg_dim.sk_ad
-WHERE 
-    stg_dim.sk_ad IS NULL
