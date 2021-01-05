@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.db import DatabaseTypeEnum
@@ -212,6 +214,36 @@ class PostgresConsumer(DBConsumer):
         )
 
     @logger
-    def get_incremental_data_from_table(self, table_name, column_name, execution_date):
-        # todo: implement me!
-        raise NotImplementedError()
+    def get_incremental_data_from_table(
+        self, table_name, date_filter_column, date_filter_value
+    ):
+        """
+        Gets incremental data from table in a Postgres database.
+        The method expects a table and a date/timestamp column to make the filter.
+        :param table_name: Name of the table
+        :param date_filter_column: Name of the column to make the filter
+        :param date_filter_value: Value of the column
+        :return: A Spark DataFrame with the table data
+        """
+
+        dt_filter_value = datetime.strptime(date_filter_value, "%Y-%m-%d")
+        dt_filter_value_day_after = dt_filter_value + timedelta(days=1)
+
+        schema = self.conn_config["schema"]
+
+        # The query verifies if the value of the column is between start_date and end_date.
+        # Also, it handles when the column is a timestamp or/and string.
+        query = f"""
+            SELECT
+                *,
+                {dt_filter_value.year} AS year,
+                {dt_filter_value.month} AS month,
+                {dt_filter_value.day} AS day
+            FROM
+                "{schema}"."{table_name}"
+            WHERE
+                {date_filter_column} >= '{dt_filter_value}'
+                AND {date_filter_column} < '{dt_filter_value_day_after}'
+                """
+
+        return self.get_data_from_query(query)
