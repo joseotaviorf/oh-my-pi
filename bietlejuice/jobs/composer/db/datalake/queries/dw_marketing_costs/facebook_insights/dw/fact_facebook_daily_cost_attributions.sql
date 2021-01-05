@@ -1,6 +1,6 @@
 WITH fb_grouped_records AS (
     SELECT 
-        sk_ad,
+        stg_dim.sk_ad,
         id_ad,
         id_account,
         id_campaign,
