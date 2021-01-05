@@ -3,7 +3,8 @@ SELECT
     city_group,
     description,
     source_bill_item,
-    comission_type,
-    mkt_origin
+    commission_type,
+    mkt_origin,
+    now() as ts_load
 FROM
     datalake_robin_hood.affiliate_costs

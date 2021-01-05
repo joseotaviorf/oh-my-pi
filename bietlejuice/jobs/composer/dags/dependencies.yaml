@@ -7,6 +7,9 @@
 #
 # Place the dependencies sorted alphabetically
 
+bietlejuice.dw_affiliate_costs:
+  - bietlejuice.enrich_robin_hood
+
 bietlejuice.dw_banking:
   - bietlejuice.ebdb:load-bank
   - bietlejuice.ebdb:load-account
@@ -302,6 +305,11 @@ bietlejuice.enrich_retsuko:
   - bietlejuice.retsuko:load-account-to-clean
   - bietlejuice.retsuko:load-entry-to-clean
   - bietlejuice.retsuko:load-invoice-to-clean
+
+bietlejuice.enrich_robin_hood:
+  - bietlejuice.robin_hood:load-accounting-entry-to-datalake-clean
+  - bietlejuice.robin_hood:load-payee-to-datalake-clean
+  - bietlejuice.robin_hood:load-tax-to-datalake-clean
 
 bietlejuice.enrich_sale_flows:
   - bietlejuice.amplitude
