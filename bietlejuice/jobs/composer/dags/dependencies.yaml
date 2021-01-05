@@ -235,6 +235,7 @@ bietlejuice.enrich_ebdb_user:
   - bietlejuice.ebdb:load-house
   - bietlejuice.ebdb:load-proposal
   - bietlejuice.ebdb:load-proposal-aud
+  - bietlejuice.ebdb:load-sales-rep
   - bietlejuice.ebdb:load-user
   - bietlejuice.ebdb:load-user-revision-entity
 
