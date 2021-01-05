@@ -136,6 +136,9 @@ bietlejuice.dw_user_affiliate:
   - bietlejuice.enrich_region:load-region-to-enrich
   # TODO [ODS] Add gsheets_taxonomy_affiliates after migrated to composer
 
+bietlejuice.dw_user_sales_rep:
+  - bietlejuice.enrich_ebdb_user:load-user-sales-rep-to-enrich
+
 bietlejuice.dw_visit:
   - bietlejuice.ebdb:load-visit
 
