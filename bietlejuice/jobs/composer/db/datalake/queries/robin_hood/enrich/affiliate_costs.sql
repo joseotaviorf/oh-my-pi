@@ -42,7 +42,7 @@
 	        	ON ae.id_payee = p.id
         LEFT JOIN
 			datalake_robin_hood_clean.tax AS t
-            	ON p.id = t.payee_id
+            	ON p.id = t.id_payee
 	WHERE
 	    ae.description NOT LIKE '%que não foi enviada%'
 	    AND ae.source_bill_item IN
@@ -60,4 +60,4 @@
 	        'valorFixoPorVendaDeImovel')
 	    AND ae.dt_occurrence >= DATE('2020-01-01')
 	GROUP BY 1,2,3,4,5,6,7,8,9
-	ORDER BY sk_date_transaction ASC
+	ORDER BY dt_transaction ASC
