@@ -96,7 +96,7 @@ if __name__ == "__main__":
 
     df = df.where("year={year} and month={month} and day={day}".format(**dt_dict))
 
-    sk_ad = concat(col("id_ad"), lit("{year}-{month}-{day}"))
+    sk_ad = concat(col("id_ad"), lit("{year}-{month}-{day}".format(**dt_dict)))
 
     df = (
         df.withColumn("acc", map_account_id_to_name_udf(col("id_account")))
