@@ -73,7 +73,7 @@ class TestDataframeService:
         df = None
 
         # assert
-        with pytest.raises(ValueError) as ae:
+        with pytest.raises(ValueError):
             assert dataframe_service.input(df).convert_struct_type_to_json().output()
 
     @pytest.mark.parametrize(
@@ -107,7 +107,7 @@ class TestDataframeService:
     )
     def test_explode_json_column_invalid_params(self, df, dataframe_service):
         # assert
-        with pytest.raises(ValueError) as ae:
+        with pytest.raises(ValueError):
             assert dataframe_service.input(df).explode_json_column("json").output()
 
     @pytest.mark.parametrize(
@@ -132,7 +132,11 @@ class TestDataframeService:
         df = spark.read.json(sc.parallelize(data))
 
         # act
-        df = dataframe_service.input(df).create_year_month_day_columns_from_dataframe_column("date").output()
+        df = (
+            dataframe_service.input(df)
+            .create_year_month_day_columns_from_dataframe_column("date")
+            .output()
+        )
         result_cols = df.schema.fieldNames()
         row = df.collect()[0]
         result_values = [row["date"], row["year"], row["month"], row["day"]]
@@ -144,11 +148,7 @@ class TestDataframeService:
     @pytest.mark.parametrize(
         "data, expected_cols, expected_values",
         [
-            (
-                [{"test": "bla"}],
-                ["test", "year", "month", "day"],
-                ["bla", 2018, 11, 6],
-            ),
+            ([{"test": "bla"}], ["test", "year", "month", "day"], ["bla", 2018, 11, 6]),
             (
                 [{"test": "bla2"}],
                 ["test", "year", "month", "day"],
@@ -163,8 +163,13 @@ class TestDataframeService:
         df = spark.read.json(sc.parallelize(data))
 
         # act
-        df = dataframe_service.input(df).create_year_month_day_columns_from_date(
-            datetime.strptime("2018-11-06", "%Y-%m-%d")).output()
+        df = (
+            dataframe_service.input(df)
+            .create_year_month_day_columns_from_date(
+                datetime.strptime("2018-11-06", "%Y-%m-%d")
+            )
+            .output()
+        )
         result_cols = df.schema.fieldNames()
         row = df.collect()[0]
         result_values = [row["test"], row["year"], row["month"], row["day"]]

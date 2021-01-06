@@ -1,3 +1,10 @@
+"""
+DEPRECATED.
+
+This module is discontinued and shall be removed when Athena is migrated to Presto and Hive Metastore.
+The metastore_mapping.py is the new mapping file for Hive metastore.
+"""
+
 from bietlejuice.jobs.composer.base.pipeline import EnvironmentEnum
 
 
@@ -6,9 +13,9 @@ class DatalakeMetastoreService:
     def get_db_info(env, source, bucket):
         EnvironmentEnum.validate_env(env)
 
-        # TODO: Forno is under new AWS accounts, then use new structure
-        # Prod is temporarily under old AWS account and will be migrated soon, then this
-        # if clause should be removed
+        # TODO: Forno is under new AWS accounts, then it uses the new structure (without suffix).
+        #  Prod is temporarily under old AWS account and keeps the _prod suffix.
+        #  When migrations are finished this if clause should be removed.
         if env == EnvironmentEnum.FORNO:
             schema_suffix = ""
         else:
