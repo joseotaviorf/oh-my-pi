@@ -13,6 +13,7 @@ configparser==3.5.3
 cookiecutter==1.6.0
 croniter==0.3.30
 defusedxml==0.6.0
+deprecated==1.2.10
 dill==0.2.9
 docutils==0.14
 Flask==1.0.3
