@@ -1,19 +1,9 @@
-WITH task_events AS (
+WITH last_extracted_events AS (
 	SELECT
 		id_event,
-		id_task_external,
-		event_type,
-		event_payload,
-		ts_created,
-		ts_updated,
-		DATE(CONCAT(CAST(year AS VARCHAR(4)), '-', CAST(month AS VARCHAR(2)), '-', CAST(day AS VARCHAR(2)))) AS dt_extracted
-	FROM datalake_quinto_messenger_clean.task_event
-),
-last_extracted_events AS (
-	SELECT
-		id_event,
-		MAX(dt_extracted) AS dt_last_extracted
-	FROM task_events
+		MAX(DATE(CONCAT(CAST(te.year AS VARCHAR(4)), '-', CAST(te.month AS VARCHAR(2)), '-', CAST(te.day AS VARCHAR(2))))) AS dt_last_extracted
+	FROM
+		datalake_quinto_messenger_clean.task_event AS te
 	GROUP BY 1
 )
 SELECT
@@ -33,7 +23,8 @@ SELECT
 	CAST(GET_JSON_OBJECT(te.event_payload,'$.TaskPriority') AS INT) AS task_priority,
 	te.ts_created,
 	te.ts_updated
-FROM task_events te
+FROM
+	datalake_quinto_messenger_clean.task_event AS te
 INNER JOIN last_extracted_events lev
 	ON lev.id_event = te.id_event
-	AND lev.dt_last_extracted = te.dt_extracted
+	AND lev.dt_last_extracted = DATE(CONCAT(CAST(te.year AS VARCHAR(4)), '-', CAST(te.month AS VARCHAR(2)), '-', CAST(te.day AS VARCHAR(2))))

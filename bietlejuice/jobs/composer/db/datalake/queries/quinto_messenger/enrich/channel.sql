@@ -1,22 +1,9 @@
-WITH channels AS (
+WITH last_extracted_channels AS (
 	SELECT
 		id_external,
-		id_source,
-		id_source_unique,
-		channel_status,
-		channel_attributes,
-		channel_resource,
-		source,
-		ts_created,
-		ts_updated,
-		DATE(CONCAT(CAST(year AS VARCHAR(4)), '-', CAST(month AS VARCHAR(2)), '-', CAST(day AS VARCHAR(2)))) AS dt_extracted
-	FROM datalake_quinto_messenger_clean.channel
-),
-last_extracted_channels AS (
-	SELECT
-		id_external,
-		MAX(dt_extracted) AS dt_last_extracted
-	FROM channels
+		MAX(DATE(CONCAT(CAST(c.year AS VARCHAR(4)), '-', CAST(c.month AS VARCHAR(2)), '-', CAST(c.day AS VARCHAR(2))))) AS dt_last_extracted
+	FROM
+		datalake_quinto_messenger_clean.channel AS c
 	GROUP BY 1
 )
 SELECT
@@ -35,7 +22,8 @@ SELECT
 	UNIX_TIMESTAMP(c.ts_updated) - UNIX_TIMESTAMP(c.ts_created) AS seconds_duration,
 	c.ts_created,
 	c.ts_updated
-FROM channels c
+FROM
+	datalake_quinto_messenger_clean.channel AS c
 INNER JOIN last_extracted_channels lec
 	ON lec.id_external = c.id_external
-	AND lec.dt_last_extracted = c.dt_extracted
+	AND lec.dt_last_extracted = DATE(CONCAT(CAST(c.year AS VARCHAR(4)), '-', CAST(c.month AS VARCHAR(2)), '-', CAST(c.day AS VARCHAR(2))))

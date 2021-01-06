@@ -1,21 +1,9 @@
-WITH tasks AS (
+WITH last_extracted_tasks AS (
 	SELECT
 		id_external,
-		task_attributes,
-		id_channel_external,
-		task_status,
-		assigned_to,
-		seconds_to_first_response,
-		ts_created,
-		ts_updated,
-		DATE(CONCAT(CAST(year AS VARCHAR(4)), '-', CAST(month AS VARCHAR(2)), '-', CAST(day AS VARCHAR(2)))) AS dt_extracted
-	FROM datalake_quinto_messenger_clean.task
-),
-last_extracted_tasks AS (
-	SELECT
-		id_external,
-		MAX(dt_extracted) AS dt_last_extracted
-	FROM tasks
+		MAX(DATE(CONCAT(CAST(t.year AS VARCHAR(4)), '-', CAST(t.month AS VARCHAR(2)), '-', CAST(t.day AS VARCHAR(2))))) AS dt_last_extracted
+	FROM
+		datalake_quinto_messenger_clean.task AS t
 	GROUP BY 1
 )
 SELECT
@@ -41,7 +29,8 @@ SELECT
 	t.seconds_to_first_response,
 	t.ts_created,
 	t.ts_updated
-FROM tasks t
+FROM
+	datalake_quinto_messenger_clean.task AS t
 INNER JOIN last_extracted_tasks let
 	ON let.id_external = t.id_external
-	AND let.dt_last_extracted = t.dt_extracted
+	AND let.dt_last_extracted = DATE(CONCAT(CAST(t.year AS VARCHAR(4)), '-', CAST(t.month AS VARCHAR(2)), '-', CAST(t.day AS VARCHAR(2))))

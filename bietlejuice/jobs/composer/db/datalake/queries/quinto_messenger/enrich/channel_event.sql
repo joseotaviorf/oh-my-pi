@@ -1,19 +1,9 @@
-WITH channel_events AS (
+WITH last_extracted_events AS (
 	SELECT
 		id,
-		id_channel_external,
-		event_type,
-		event_payload,
-		ts_created,
-		ts_updated,
-		DATE(CONCAT(CAST(year AS VARCHAR(4)), '-', CAST(month AS VARCHAR(2)), '-', CAST(day AS VARCHAR(2)))) AS dt_extracted
-	FROM datalake_quinto_messenger_clean.channel_event
-),
-last_extracted_events AS (
-	SELECT
-		id,
-		MAX(dt_extracted) AS dt_last_extracted
-	FROM channel_events
+		MAX(DATE(CONCAT(CAST(ce.year AS VARCHAR(4)), '-', CAST(ce.month AS VARCHAR(2)), '-', CAST(ce.day AS VARCHAR(2))))) AS dt_last_extracted
+	FROM
+		datalake_quinto_messenger_clean.channel_event AS ce
 	GROUP BY 1
 )
 SELECT
@@ -23,14 +13,14 @@ SELECT
 	ce.event_type,
 	GET_JSON_OBJECT(ce.event_payload,'$.Source') AS source,
 	NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(ce.event_payload,'$.From'),'(\\w+:)(.+)',2),'') AS from_phone_number,
-	CASE 
-	        WHEN GET_JSON_OBJECT(ce.event_payload,'$.From') NOT RLIKE 'whatsapp:\\+\\d+' 
-	                THEN GET_JSON_OBJECT(ce.event_payload,'$.From')
+	CASE
+		WHEN GET_JSON_OBJECT(ce.event_payload,'$.From') NOT RLIKE 'whatsapp:\\+\\d+' THEN GET_JSON_OBJECT(ce.event_payload,'$.From')
 	END AS from_email,
 	CAST(GET_JSON_OBJECT(ce.event_payload,'$.Index') AS INT) AS message_index,
 	ce.ts_created,
 	ce.ts_updated
-FROM channel_events ce
+FROM
+	datalake_quinto_messenger_clean.channel_event AS ce
 INNER JOIN last_extracted_events lee
 	ON lee.id = ce.id
-	AND lee.dt_last_extracted = ce.dt_extracted
+	AND lee.dt_last_extracted = DATE(CONCAT(CAST(ce.year AS VARCHAR(4)), '-', CAST(ce.month AS VARCHAR(2)), '-', CAST(ce.day AS VARCHAR(2))))
