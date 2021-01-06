@@ -12,7 +12,7 @@ SELECT
 	lf.mkt_origin,
 	lf.mkt_channel,
 	CASE
-	    WHEN lf.mkt_origin = 'B2B' THEN lf.mkt_origin
+	    WHEN lf.mkt_origin = 'B2B' OR lf.mkt_origin = 'CR' THEN lf.mkt_origin
 	    WHEN lf.mkt_completion = 'Full Self-Service' THEN 'FSS'
 	    WHEN (dl.sales_company = 'ACTION_LINE' AND has_isales_intervention = TRUE) OR (dl.sales_company = 'ATENTO' AND has_isales_intervention = TRUE) THEN 'OUT'
 	    ELSE 'ISS'
@@ -1759,4 +1759,4 @@ GROUP BY week_start,
 	 first_origin_demand,
 	 origin_before_offer,
 	 origin_after_offer,
-	 form_of_payment
+	 form_of_payment;
