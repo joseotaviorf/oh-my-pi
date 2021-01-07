@@ -28,9 +28,7 @@ RAW_SPARK_JOB_PATH = (
     f"{S3_PREFIX}/spark_jobs/{SOURCE}/load_quinto_messenger_into_datalake.py"
 )
 LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{SOURCE}"
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_bietlejuice_quinto_messenger_cluster", deserialize_json=True
-)
+CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 LIBRARIES_DESCRIPTION = Variable.get(
     "bietlejuice_default_libraries", deserialize_json=True
