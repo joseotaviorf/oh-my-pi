@@ -237,7 +237,7 @@ demand_daily_targets AS (
 		'Tenants PWA' AS mkt_origin,
 		NULLIF(str.mkt_channel, '') AS mkt_channel,
 		NULLIF(str.mkt_medium, '') AS mkt_medium,
-		NULL::TEXT AS mkt_source,
+		NULLIF(str.mkt_source, '') AS mkt_source,
 		NULL::TEXT AS utm_campaign,
 		NULL::TEXT AS utm_term,
 		NULL::TEXT AS utm_content,
