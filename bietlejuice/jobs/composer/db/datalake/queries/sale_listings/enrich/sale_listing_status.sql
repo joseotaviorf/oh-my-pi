@@ -7,7 +7,7 @@ SELECT
     COALESCE(
       -- get max ts per id_house_listings per day
       MAX(ts_status_changed_new) OVER(
-        PARTITION BY id_house, order_version, CAST(ts_status_changed_new AS DATE)
+        PARTITION BY id_house
       ) = ts_status_changed_new,
     FALSE) AS is_last_status,
     ts_first_publication,

@@ -43,9 +43,21 @@ listing_columns AS (
       ON lbc.id_house = ld.id_house
   WHERE lbc.business_context = 'SALE'
   GROUP BY 1, 2, 3
+),
+sale_status_version_order AS (
+SELECT
+    BIGINT(STRING(id_house)||'00'||STRING(order_version)) AS id_sale_listing,
+    id_house,
+    COALESCE(
+      MAX(ts_status_changed_new) OVER(
+        PARTITION BY id_house
+      ) = ts_status_changed_new,
+    FALSE) AS is_last_status
+FROM 
+    datalake_sale_listings.sale_status_version_order
 )
 SELECT
-  BIGINT(STRING(sls.id_house)||'00'||STRING(sls.order_version)) AS id_sale_listing,
+  sls.id_sale_listing,
   lc.id_house,
   IF(lc.ts_last_depublication > lc.ts_last_publication,
     COALESCE(DATEDIFF(lc.ts_last_depublication, lc.ts_last_publication)),
@@ -61,8 +73,9 @@ SELECT
 FROM 
   listing_columns AS lc
 JOIN 
-  datalake_sale_listings.sale_status_version_order AS sls
+  sale_status_version_order AS sls
     ON lc.id_house = sls.id_house
+    AND sls.is_last_status
 LEFT JOIN
   not_published AS np
     ON np.id_house = lc.id_house
