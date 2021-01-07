@@ -251,6 +251,13 @@ bietlejuice.enrich_ebdb_user_revision_entity:
 bietlejuice.enrich_firestore:
   - bietlejuice.firestore
 
+bietlejuice.enrich_invoice:
+  - bietlejuice.ebdb:load-contract
+  - bietlejuice.retsuko:load-account-to-clean
+  - bietlejuice.retsuko:load-contract-to-clean
+  - bietlejuice.retsuko:load-entry-to-clean
+  - bietlejuice.retsuko:load-invoice-to-clean
+
 bietlejuice.enrich_kill_queue:
   - bietlejuice.kill_queue:load-house-to-datalake-clean
   - bietlejuice.kill_queue:load-reservation-to-datalake-clean
