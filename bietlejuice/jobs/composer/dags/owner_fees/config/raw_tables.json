@@ -1,0 +1,82 @@
+[
+   {
+     "table_name": "admin_fee_option",
+     "extraction_type": "incremental",
+     "date_filter_column": "updated_at"
+   },
+   {
+     "table_name": "admin_fee_option_aud",
+     "extraction_type": "incremental",
+     "date_filter_column": "updated_at"
+   },
+   {
+     "table_name": "charge_delay",
+     "extraction_type": "incremental",
+     "date_filter_column": "updated_at"
+   },
+   {
+     "table_name": "charge_delay_aud",
+     "extraction_type": "incremental",
+     "date_filter_column": "updated_at"
+   },
+   {
+     "table_name": "contract",
+     "extraction_type": "incremental",
+     "date_filter_column": "updated_at"
+   },
+   {
+     "table_name": "contract_aud",
+     "extraction_type": "full"
+   },
+   {
+     "table_name": "contract_brokerage_fee",
+     "extraction_type": "incremental",
+     "date_filter_column": "updated_at"
+   },
+   {
+     "table_name": "contract_brokerage_fee_aud",
+     "extraction_type": "full"
+   },
+   {
+     "table_name": "house",
+     "extraction_type": "incremental",
+     "date_filter_column": "updated_at"
+   },
+   {
+     "table_name": "house_aud",
+     "extraction_type": "incremental",
+     "date_filter_column": "updated_at"
+   },
+   {
+     "table_name": "house_brokerage_fee",
+     "extraction_type": "incremental",
+     "date_filter_column": "updated_at"
+   },
+   {
+     "table_name": "house_brokerage_fee_aud",
+     "extraction_type": "full"
+   },
+   {
+     "table_name": "installment_option",
+     "extraction_type": "incremental",
+     "date_filter_column": "updated_at"
+   },
+   {
+     "table_name": "installment_option_aud",
+     "extraction_type": "incremental",
+     "date_filter_column": "updated_at"
+   },
+   {
+     "table_name": "user_rev_info",
+     "extraction_type": "full"
+   },
+   {
+     "table_name": "users",
+     "extraction_type": "incremental",
+     "date_filter_column": "updated_at"
+   },
+   {
+     "table_name": "users_aud",
+     "extraction_type": "full"
+   }
+ ]

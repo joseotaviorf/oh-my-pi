@@ -1,0 +1,133 @@
+from datetime import datetime
+import os
+import pendulum
+import json
+
+from airflow.models import DAG, Variable
+from airflow.operators.quintoandar_databricks import (
+    QuintoAndarDatabricksCreateClusterOperator,
+    QuintoAndarDatabricksSubmitRunOperator,
+    QuintoAndarDatabricksTerminateClusterOperator,
+)
+from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.base.pipeline import LayerEnum
+from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
+from bietlejuice.jobs.composer.services import FileService
+
+
+SOURCE = "owner_fees"
+
+# airflow vars
+ENV = Variable.get("environment")
+DATALAKE_BUCKET = Variable.get("datalake_bucket")
+ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
+ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
+DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
+S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
+
+# spark and databricks vars
+CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
+BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
+SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
+LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{SOURCE}"
+CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+
+# dag vars
+DAG_ID = f"bietlejuice.{SOURCE}"
+LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
+MAIN_START_DATE = datetime(2020, 8, 10, 0, 0, 0, tzinfo=LOCAL_TZ)
+MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
+DAG_CONFIGS_PATH = f"{os.path.dirname(os.path.realpath(__file__))}/config"
+
+dag = DAG(
+    dag_id=DAG_ID,
+    default_args={
+        "owner": BaseDAG.DEFAULT_OWNER,
+        "wait_for_downstream": False,
+        "depends_on_past": False,
+    },
+    start_date=MAIN_START_DATE,
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+)
+
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
+    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+)
+
+# [BEGIN] Raw layer tasks
+
+with open(f"{DAG_CONFIGS_PATH}/raw_tables.json") as raw_tables_json:
+    raw_tables_cfg = json.load(raw_tables_json)
+
+raw_tasks = {}
+
+for table in raw_tables_cfg:
+    slugged_table_name = table["table_name"].replace("_", "-")
+    extraction_type = table["extraction_type"]
+
+    parameters = [ENV, SOURCE, DATALAKE_BUCKET, table["table_name"]]
+    if "date_filter_column" in list(table.keys()):
+        parameters.append(table["date_filter_column"])
+        parameters.append("{{ ds }}")
+    raw_task = QuintoAndarDatabricksSubmitRunOperator(
+        task_id=f"load-{extraction_type}-{slugged_table_name}-to-raw",
+        dag=dag,
+        json={
+            "spark_python_task": {
+                "python_file": f"{SPARK_JOBS_PATH}load_{extraction_type}_data_into_datalake_raw.py",
+                "parameters": parameters,
+            }
+        },
+    )
+    create_cluster_task >> raw_task
+    raw_tasks[table["table_name"]] = raw_task
+
+# [END] Raw layer sub dags
+
+# [BEGIN] Clean layer sub dags
+
+clean_sub_dag = DatalakeSubDAG(
+    dag_id=DAG_ID,
+    start_date=MAIN_START_DATE,
+    env=ENV,
+    datalake_bucket=DATALAKE_BUCKET,
+    layer=LayerEnum.CLEAN,
+    database_base_name=SOURCE,
+    relative_query_path=SOURCE,
+    spark_job_paths=BASE_SPARK_JOBS_PATH,
+    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
+)
+
+incr_sql_list = FileService.list_sql_files_without_extension_from_layer(
+    SOURCE, LayerEnum.CLEAN.value, schema="incremental"
+)
+
+incr_clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(
+    dag,
+    incr_sql_list,
+    is_incremental=True,
+    partitions=["year", "month", "day"],
+    schema="incremental",
+)
+
+full_sql_list = FileService.list_sql_files_without_extension_from_layer(
+    SOURCE, LayerEnum.CLEAN.value, schema="full"
+)
+
+full_clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(
+    dag, full_sql_list, is_incremental=False, schema="full"
+)
+
+clean_sub_dags_dict = {**incr_clean_sub_dags, **full_clean_sub_dags}
+
+# [END] Clean layer sub dags
+
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    dag=dag, task_id="terminate-cluster"
+)
+
+for table_name, raw_task in raw_tasks.items():
+    if clean_sub_dags_dict.get(table_name):
+        raw_task >> clean_sub_dags_dict.get(table_name) >> terminate_cluster_task
+    else:
+        raw_task >> terminate_cluster_task
