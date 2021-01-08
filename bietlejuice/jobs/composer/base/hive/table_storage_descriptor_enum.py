@@ -26,8 +26,8 @@ class TableStorageDescriptorEnum(Enum):
         """
         LayerEnum.validate_layer(layer)
         return {
-            LayerEnum.RAW.value: TableStorageDescriptorEnum.RAW_FORMAT,
-            LayerEnum.CLEAN.value: TableStorageDescriptorEnum.CLEAN_FORMAT,
-            LayerEnum.CLEAN_STAGING.value: TableStorageDescriptorEnum.CLEAN_STAGING_FORMAT,
-            LayerEnum.ENRICH.value: TableStorageDescriptorEnum.ENRICH_FORMAT,
+            LayerEnum.RAW.value: TableStorageDescriptorEnum.RAW_FORMAT.value,
+            LayerEnum.CLEAN.value: TableStorageDescriptorEnum.CLEAN_FORMAT.value,
+            LayerEnum.CLEAN_STAGING.value: TableStorageDescriptorEnum.CLEAN_STAGING_FORMAT.value,
+            LayerEnum.ENRICH.value: TableStorageDescriptorEnum.ENRICH_FORMAT.value,
         }.get(layer)

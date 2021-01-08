@@ -5,7 +5,7 @@ from quintoandar_logger import QuintoAndarLogger
 logger = QuintoAndarLogger("HiveMetastoreLoader")
 
 
-class HiveMetastoreLoader:
+class HiveMetastoreLoader:  # TODO: maybe this loader is misused and we could use the HiveMetastoreService instead
     """Loads Spark DataFrame schemas into Hive Metastore as a table."""
 
     def __init__(self, metastore_service):
@@ -45,7 +45,7 @@ class HiveMetastoreLoader:
         self,
         database_name,
         table_name,
-        s3_path,
+        table_location,
         table_schema,
         partition_keys,
         format_info,
@@ -57,9 +57,9 @@ class HiveMetastoreLoader:
         :type database_name: str
         :param table_name: the table name
         :type table_name: str
-        :param s3_path: s3 files path where the table data is located.
+        :param table_location: s3 path where the table files data are located.
          E.g: s3://some/path/
-        :type s3_path: str
+        :type table_location: str
         :param table_schema: an ordered dict containing the columns name and
          type (including partitioning columns).
         :type table_schema: collections.OrderedDict
@@ -83,12 +83,11 @@ class HiveMetastoreLoader:
         self.hive_metastore_service.create_external_table(
             database_name,
             table_name,
-            s3_path,
+            table_location,
             table_schema,
             partition_keys,
             format_info,
         )
-        # TODO: if partitions: implement "our" msck
 
     def update_metastore(
         self,
@@ -145,6 +144,7 @@ class HiveMetastoreLoader:
             f"m=update_metastore, db={database_name}, table={table_name}, "
             "msg=Successfully loaded table in metastore."
         )
+        # TODO: return a flag indicating if it was updated or created to implement add_partitions_values or 'msck'
 
     @staticmethod
     def _get_tables_difference(table_source, metastore_columns):

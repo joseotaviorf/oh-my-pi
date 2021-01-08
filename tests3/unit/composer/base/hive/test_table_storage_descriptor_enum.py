@@ -8,10 +8,10 @@ class TestLayerEnum:
     @pytest.mark.parametrize(
         "layer, expected_return",
         [
-            ("raw", TableStorageDescriptorEnum.RAW_FORMAT),
-            ("clean", TableStorageDescriptorEnum.CLEAN_FORMAT),
-            ("clean_staging", TableStorageDescriptorEnum.CLEAN_STAGING_FORMAT),
-            ("enrich", TableStorageDescriptorEnum.ENRICH_FORMAT),
+            ("raw", TableStorageDescriptorEnum.RAW_FORMAT.value),
+            ("clean", TableStorageDescriptorEnum.CLEAN_FORMAT.value),
+            ("clean_staging", TableStorageDescriptorEnum.CLEAN_STAGING_FORMAT.value),
+            ("enrich", TableStorageDescriptorEnum.ENRICH_FORMAT.value),
         ],
     )
     def test_from_layer_with_valid_layer(self, layer, expected_return):

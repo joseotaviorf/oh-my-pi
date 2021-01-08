@@ -1,4 +1,6 @@
 class DatabaseEnum:
+    # TODO REVIEW this Enum name. There are API and Database secrets here.
+    #  Maybe SourceEnum would be more appropriate now.
     ASTERISK = "ENV_ASTERISK"
     AUTODIALER = "ENV_AUTODIALER"
     BIGFONE = "BIGFONE_DB"
@@ -14,6 +16,7 @@ class DatabaseEnum:
     FIRESTORE = "FIRESTORE_DB"
     GODFATHER = "ENV_GODFATHER"
     HEIMDALL = "HEIMDALL_DB"
+    HIVE_METASTORE = "HIVE_METASTORE"
     INSIDER = "INSIDER_DB"
     JAIMINHO = "JAIMINHO_DB"
     KILLQUEUE = "ENV_KILLQUEUE"
