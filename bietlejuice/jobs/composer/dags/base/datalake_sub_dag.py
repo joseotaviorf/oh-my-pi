@@ -76,6 +76,7 @@ class DatalakeSubDAG(BaseSubDAG):
         partitions=None,
         is_incremental=False,
         extra_query_template_params=None,
+        schema="",
     ):
         """
         Create a subdag containing 2 tasks:
@@ -88,6 +89,7 @@ class DatalakeSubDAG(BaseSubDAG):
         :param partitions: list of columns to partition table
         :param is_incremental: if this table uses incremental load type
         :param extra_query_template_params: filter parameters applied to the query besides year, month and day
+        :param schema: table schema used in the query path
         :return: the subdag created
         """
 
@@ -122,6 +124,7 @@ class DatalakeSubDAG(BaseSubDAG):
                         "{{ ds }}",
                         str(self.spark_params),
                         str(extra_query_template_params),
+                        schema,
                     ],
                 }
             },

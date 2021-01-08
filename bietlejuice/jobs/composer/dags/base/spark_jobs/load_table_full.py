@@ -46,6 +46,11 @@ if __name__ == "__main__":
         type=str,
         help="additional query parameters not including date params",
     )
+    parser.add_argument(
+        "schema",
+        type=lambda arg: None if not arg else arg,
+        help="table schema used in the query path",
+    )
 
     args = parser.parse_args()
 
@@ -54,6 +59,7 @@ if __name__ == "__main__":
     layer = args.layer
     database_base_name = args.database_base_name
     relative_query_path = args.relative_query_path
+    schema = args.schema
     table_name = args.table_name
     execution_date = args.execution_date
     target_database_base_name = args.target_database_base_name
@@ -66,7 +72,7 @@ if __name__ == "__main__":
     logger.info(
         f"m={JOB_NAME}, env={env}, datalake_bucket={datalake_bucket}, layer={layer}, "
         + f"database_base_name={database_base_name}, relative_query_path={relative_query_path}, "
-        + f"table_name={table_name},  msg=Job execution started"
+        + f"table_name={table_name}, schema={schema}, msg=Job execution started"
     )
 
     dt_datetime = datetime.strptime(execution_date, "%Y-%m-%d")
@@ -95,9 +101,13 @@ if __name__ == "__main__":
         env, target_database_base_name, datalake_bucket, layer
     )
 
-    query = FileService.get_query_from_file_name(
-        f"{QUERIES_DATALAKE_PATH}{relative_query_path}/{layer}/{table_name}.sql"
+    query_path = (
+        f"{QUERIES_DATALAKE_PATH}{relative_query_path}/{layer}/{schema}/{table_name}.sql"
+        if schema
+        else f"{QUERIES_DATALAKE_PATH}{relative_query_path}/{layer}/{table_name}.sql"
     )
+
+    query = FileService.get_query_from_file_name(query_path)
 
     table_loader_pipeline = FullTableLoaderPipeline(
         database_name=database_name,
