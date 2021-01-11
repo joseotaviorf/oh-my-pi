@@ -54,7 +54,7 @@ WITH credit_holidays AS (
         inv.id_contract,
         inv.status,
         inv.paid_amount,
-        inv.ts_paid,
+        COALESCE(inv.ts_paid, CURRENT_DATE) AS ts_paid,
         inv.ts_created,
         inv.status,
         inv.due_amount,
@@ -139,9 +139,9 @@ SELECT
     inv.paid_amount,
     ROUND(DATEDIFF(CURRENT_DATE, rsk_cntrct.ts_signature)) AS day_of_contract,
     ROUND(MONTHS_BETWEEN(CURRENT_DATE, rsk_cntrct.ts_signature)) AS month_of_contract,
-    ROUND(DATEDIFF(COALESCE(inv.ts_due, CURRENT_DATE), rsk_cntrct.ts_signature)) AS invoice_day_relative_to_contract,
-    ROUND(MONTHS_BETWEEN(COALESCE(inv.ts_due, CURRENT_DATE), rsk_cntrct.ts_signature)) AS invoice_month_relative_to_contract,
-    DATEDIFF(COALESCE(inv.ts_paid, CURRENT_DATE), inv.ts_due) AS late_days,
+    ROUND(DATEDIFF(inv.ts_due, rsk_cntrct.ts_signature)) AS invoice_day_relative_to_contract,
+    ROUND(MONTHS_BETWEEN(inv.ts_due, rsk_cntrct.ts_signature)) AS invoice_month_relative_to_contract,
+    DATEDIFF(inv.ts_paid, inv.ts_due) AS late_days,
     (CASE
         WHEN DATEDIFF(inv.ts_paid, inv.ts_due) >= 10 THEN TRUE
     ELSE FALSE END) AS is_over_10,
@@ -181,6 +181,15 @@ SELECT
     (CASE
         WHEN DATEDIFF(inv.ts_paid, inv.ts_due) >= 120 THEN TRUE
     ELSE FALSE END) AS is_over_120,
+    (CASE
+        WHEN DATEDIFF(inv.ts_paid, inv.ts_due) >= 140 THEN TRUE
+    ELSE FALSE END) AS is_over_140,
+    (CASE
+        WHEN DATEDIFF(inv.ts_paid, inv.ts_due) >= 160 THEN TRUE
+    ELSE FALSE END) AS is_over_160,
+    (CASE
+        WHEN DATEDIFF(inv.ts_paid, inv.ts_due) >= 180 THEN TRUE
+    ELSE FALSE END) AS is_over_180,
     inv.accrual_year_month,
     inv.ts_due,
     COALESCE(inv.ts_paid, CURRENT_DATE) AS ts_paid,
