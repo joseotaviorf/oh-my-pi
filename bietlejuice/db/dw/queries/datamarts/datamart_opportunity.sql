@@ -11,8 +11,8 @@ with opportunities_base as(
         fhlf.sk_lead,
         case 
           when fhlf.mkt_completion = 'Full Self-Service' then 'FSS'
-          when fhlf.mkt_origin = 'B2B' then 'B2B' 
-          when (dl.sales_company = 'ACTION_LINE'  AND fhlf.has_isales_intervention is true) OR (dl.sales_company = 'ATENTO' AND fhlf.has_isales_intervention is true) then 'OUT' 
+          when fhlf.mkt_origin = 'B2B' then 'B2B'
+          WHEN dl.sales_company IN('ACTION_LINE', 'ALGAR', 'ATENTO') AND fhlf.has_isales_intervention IS TRUE THEN 'OUT'
           when fhlf.has_isales_intervention is true then 'ISS' 
           else 'UNK' 
         end as opp_origin

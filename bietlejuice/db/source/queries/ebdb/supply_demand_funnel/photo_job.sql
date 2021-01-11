@@ -6,7 +6,7 @@ select
         when creator.dadosFotografo_id is not null and creator.dadosVendedor_id is not null then 'Teste'
         when creator.dadosFotografo_id is not null then 'Fotografo'
         when creator.dadosVendedor_id is not null then 'InsideSales_internal'
-        when creator.email like ('%actionline%') then 'InsideSales_external'
+        when creator.email like ('%actionline%') or creator.email like ('%algar%') then 'InsideSales_external'
         when creator.email like ('%quintoandar%') then 'Admin'
         else 'Prop'
       end as creation_origin,
@@ -57,7 +57,7 @@ select
         when uc.dadosFotografo_id is not null and uc.dadosVendedor_id is not null then 'Teste'
         when uc.dadosFotografo_id is not null then 'Fotografo'
         when creator.dadosVendedor_id is not null then 'InsideSales_internal'
-        when creator.email like ('%actionline%') then 'InsideSales_external'
+        when creator.email like ('%actionline%') or creator.email like ('%algar%') then 'InsideSales_external'
         when uc.email like ('%quintoandar%') then 'Admin'
         when ure.id is null then null
         else 'Prop'

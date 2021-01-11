@@ -119,7 +119,7 @@ select
             when job_creator_info.id_photographer_data is not null and job_creator_info.id_sales_rep is not null then 'Teste'
             when job_creator_info.id_photographer_data is not null then 'Fotografo'
             when job_creator_info.id_sales_rep is not null then 'InsideSales_internal'
-            when job_creator_info.email like '%actionline%' then 'InsideSales_external'
+            when job_creator_info.email like '%actionline%' or job_creator_info.email like '%algar%' then 'InsideSales_external'
             when job_creator_info.email like '%quintoandar%' then 'Admin'
             else 'Prop'
         end as creation_origin,
@@ -128,7 +128,7 @@ select
             when cancellation_info.id_photographer_data is not null and cancellation_info.id_sales_rep is not null then 'Teste'
             when cancellation_info.id_photographer_data is not null then 'Fotografo'
             when job_creator_info.id_sales_rep is not null then 'InsideSales_internal'
-            when job_creator_info.email like '%actionline%' then 'InsideSales_external'
+            when job_creator_info.email like '%actionline%' or job_creator_info.email like '%algar%' then 'InsideSales_external'
             when cancellation_info.user_who_canceled_email like '%quintoandar%' then 'Admin'
             when cancellation_info.id_revision is null then null
             else 'Prop'
