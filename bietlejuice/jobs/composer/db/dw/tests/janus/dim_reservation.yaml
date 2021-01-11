@@ -5,6 +5,8 @@ columns_mapping:
    new_column_type: integer
  - ods_column: attempt
    new_column_type: integer
+ - ods_column: installments
+   new_column_type: integer
  - ods_column: is_ongoing
    new_column_type: boolean
  - new_column: ts_load
