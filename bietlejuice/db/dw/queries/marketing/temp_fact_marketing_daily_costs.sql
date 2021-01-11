@@ -108,6 +108,7 @@ fb_hist_list_affiliates as (
         on lower(df.campaign_name) = lower(hist.campaign)
         and to_char(ff.dt_start::date, 'yyyyMMdd')::integer = hist.sk_cost_date
     where to_char(ff.dt_start::date, 'yyyyMMdd')::integer >= 20190101
+        and df.campaign_name not like 'ZEBRA%'
 ),
 facebook_info as (
     select
@@ -217,8 +218,9 @@ campaigns_full as (
                     on hl.sk_date = to_char(ff.dt_start::date, 'yyyyMMdd')::integer
                     and df.campaign_name = hl.campaign_name
             where to_char(ff.dt_start::date, 'yyyyMMdd')::integer >= 20180101
+                and df.campaign_name not like 'ZEBRA%'
             -- Filter out affiliate_costs of national-campaigns with manual-historic costs
-            and hl.sk_date is null
+                and hl.sk_date is null
         -- GOOGLE
         UNION
             select
@@ -867,3 +869,14 @@ SELECT
     getdate() as ts_load
 FROM
     final_costs
+WHERE
+    mkt_source <> 'Facebook' or sk_date > 20201210
+
+UNION ALL
+
+SELECT
+    *
+FROM
+    marketing_costs.fact_marketing_daily_costs_old
+WHERE
+    mkt_source = 'Facebook'
