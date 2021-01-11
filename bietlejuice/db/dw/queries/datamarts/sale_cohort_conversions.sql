@@ -140,11 +140,11 @@ FROM
 FULL OUTER JOIN
     fact_oa
         ON fact_os.sk_offer = fact_oa.sk_offer
-        AND fact_os.date = fact_oa.date
+--        AND fact_os.date = fact_oa.date
 FULL OUTER JOIN
     fact_ccv
         ON fact_os.sk_offer = fact_ccv.sk_offer
-        AND fact_os.date = fact_ccv.date
+--        AND fact_os.date = fact_ccv.date
 GROUP BY 1, 2
 ),
 sale_demand_region AS (
@@ -1272,7 +1272,7 @@ SELECT
     higher_intent_before_offer AS origin_before_offer,
     higher_intent_after_offer AS origin_after_offer,
     NULL AS form_of_payment,
-    CASE 
+    CASE
 	WHEN datediff('week',DATE_TRUNC('week',DATE(dt_finan_started)),DATE_TRUNC('week',DATE(dt_finan_ended))) < 20
 	    THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(dt_finan_started)),DATE_TRUNC('week',DATE(dt_finan_ended)))
 	WHEN datediff('week',DATE_TRUNC('week',DATE(dt_finan_started)),DATE_TRUNC('week',DATE(dt_finan_ended))) >= 20
