@@ -12,5 +12,6 @@ create table if not exists reservation (
     house_id bigint,
     mundipagg_token varchar(255),
     is_ongoing integer,
-    cancellation_reason varchar(255)
+    cancellation_reason varchar(255),
+    installments integer
 );

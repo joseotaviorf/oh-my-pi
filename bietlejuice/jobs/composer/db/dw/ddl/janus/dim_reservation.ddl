@@ -7,6 +7,7 @@ create table janus.dim_reservation (
   status varchar(255),
   cancellation_reason varchar(255),
   value decimal(19, 2),
+  installments integer,
   is_ongoing boolean,
   ts_created timestamp,
   ts_updated timestamp,

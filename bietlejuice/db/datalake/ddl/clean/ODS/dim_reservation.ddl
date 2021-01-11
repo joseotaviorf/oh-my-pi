@@ -10,6 +10,7 @@ create external table if not exists datalake_clean.ods_dim_reservation(
   cancellation_reason         string,
   value          string,
   is_ongoing     string,
+  installments   string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde' with serdeproperties (
 'separatorChar' = ',',

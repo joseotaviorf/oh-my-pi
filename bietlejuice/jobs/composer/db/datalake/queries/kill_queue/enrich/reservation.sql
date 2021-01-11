@@ -9,6 +9,7 @@ SELECT
   r.value,
   r.mundipagg_token,
   r.cancellation_reason,
+  r.installments,
   cast(cast(r.is_ongoing as integer) as boolean) as is_ongoing,
   r.ts_created,
   r.ts_updated

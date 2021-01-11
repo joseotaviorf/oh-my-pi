@@ -12,8 +12,8 @@ SELECT
     mundipagg_token,
     is_ongoing,
     cancellation_reason,
+    cast(installments as integer) as installments,
     last_charge_status,
-    tenant_refund_percentage,
-    installments
+    tenant_refund_percentage
 FROM
     datalake_kill_queue_raw.reservation

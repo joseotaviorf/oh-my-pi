@@ -11,6 +11,7 @@ SELECT
   id_main as house_id,
   r.mundipagg_token,
   cast(r.is_ongoing as integer) as is_ongoing,
-  r.cancellation_reason
+  r.cancellation_reason,
+  r.installments
 FROM datalake_kill_queue_clean_prod.reservation r
 left join datalake_kill_queue_clean_prod.house h on r.id_house = h.id;

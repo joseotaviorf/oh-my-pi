@@ -11,5 +11,6 @@ status varchar(255),
 cancellation_reason varchar(255),
 value decimal(19, 2),
 is_ongoing int4,
+installments int4,
 CONSTRAINT dim_reservation_pkey PRIMARY KEY(sk_reservation)
 );

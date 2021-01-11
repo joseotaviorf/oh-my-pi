@@ -10,5 +10,6 @@ SELECT
   status,
   cancellation_reason,
   value,
-  is_ongoing
+  is_ongoing,
+  installments
 FROM public.reservation;
