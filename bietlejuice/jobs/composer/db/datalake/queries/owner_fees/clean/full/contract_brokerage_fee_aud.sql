@@ -6,9 +6,9 @@ SELECT
     rev,
     revtype AS rev_type,
     revend AS rev_end,
-    fee AS brokerage_fee,
-    premium_fee,
-    down_payment,
+    CAST(fee AS DECIMAL(10,2)) AS brokerage_fee,
+    CAST(premium_fee AS DECIMAL(10,2)) AS premium_fee,
+    CAST(down_payment AS DECIMAL(10,2)) AS down_payment,
     installment_number_mod AS mod_installment_number,
     premium_fee_mod AS mod_premium_fee
 FROM 
