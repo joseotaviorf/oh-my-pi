@@ -5,6 +5,7 @@ WITH
 booking AS (
 	SELECT
 		flrf.sk_client,
+		flrf.sk_house_listing,
 		a.id_property AS id_house,
 		flrf.sk_region,
 		a.mkt_origin,
@@ -29,6 +30,7 @@ booking AS (
 offer AS (
 	SELECT
 		flrf.sk_client,
+		flrf.sk_house_listing,
 		a.id_property AS id_house,
 		flrf.sk_region,
 		a.mkt_origin,
@@ -51,6 +53,7 @@ offer AS (
 talk_to_agent AS (
 	SELECT
 		tenant_id::INT AS sk_client,
+		a.sk_house_listing::BIGINT,
 		house_id::INT AS id_house,
 		fhl.sk_region,
 		a.mkt_origin,
@@ -109,6 +112,7 @@ rent_flows_raw AS (
 rental_funnel AS (
 	SELECT DISTINCT
 		flrf.sk_client,
+		flrf.sk_house_listing,
 		SUBSTRING(flrf.sk_house_listing, 1, 9) AS id_house,
 		NULLIF(flrf.sk_booking, -1) AS sk_booking,
 		NULLIF(flrf.sk_offer, -1) AS sk_offer,
@@ -156,6 +160,7 @@ fact_rent_flows AS (
 		NULL::TEXT AS campaign_name,
 		rf.sk_rf,
 		rf.sk_client,
+		rf.sk_house_listing,
 		rf.id_house,
 		rf.rent_flow_order,
 		rf.tenant_prospect_order,
@@ -199,6 +204,7 @@ demand_daily_spent AS (
 		co.campaign_name,
 		NULL AS sk_rf,
 		NULL::INT AS sk_client,
+		NULL::INT AS sk_house_listing,
 		NULL::INT AS id_house,
 		NULL::INT AS rent_flow_order,
 		NULL::INT AS tenant_prospect_order,
@@ -224,7 +230,8 @@ demand_daily_spent AS (
 	WHERE
 		co.mkt_origin = 'Tenants PWA'
 		AND dd.date >= DATE('2018-01-01')
-	GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,29,30,31
+		AND co.mkt_medium != 'Branding'
+	GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,30,31,32
 ),
 -------------------------------------------------------------------------------------
 -- Query Performance Marketing Rental Demand targets and introduce NULLs for UNION --
@@ -244,6 +251,7 @@ demand_daily_targets AS (
 		NULL::TEXT AS campaign_name,
 		NULL AS sk_rf,
 		NULL::INT AS sk_client,
+		NULL::INT AS sk_house_listing,
 		NULL::INT AS id_house,
 		NULL::INT AS rent_flow_order,
 		NULL::INT AS tenant_prospect_order,
