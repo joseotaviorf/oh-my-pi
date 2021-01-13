@@ -99,7 +99,8 @@ sale_closing AS (
         DATE_TRUNC('week', DATE(sk_offer_submitted_date)) AS week_start,
         DATE(sk_offer_submitted_date) AS date,
         sk_house,
-        sk_offer
+        sk_offer,
+        sk_buyer
     FROM
     	sale.fact_offers
     WHERE
@@ -110,7 +111,8 @@ sale_closing AS (
         DATE_TRUNC('week', DATE(sk_offer_accepted_date)) AS week_start,
         DATE(sk_offer_accepted_date) AS date,
         sk_house,
-        sk_offer
+        sk_offer,
+        sk_buyer
     FROM
         sale.fact_offers
     WHERE
@@ -129,6 +131,7 @@ sale_closing AS (
 SELECT
     COALESCE(COALESCE(fact_os.sk_offer, fact_oa.sk_offer), fact_ccv.sk_offer) AS sk_offer,
     COALESCE(fact_os.sk_house,fact_oa.sk_house) AS sk_house,
+    COALESCE(fact_os.sk_buyer,fact_oa.sk_buyer) AS sk_buyer,
     MAX(fact_os.date) AS os_date,
     MAX(fact_oa.date) AS oa_date,
     MAX(fact_ccv.date) AS ccv_date
@@ -142,7 +145,7 @@ FULL OUTER JOIN
     fact_ccv
         ON fact_os.sk_offer = fact_ccv.sk_offer
         AND fact_os.date = fact_ccv.date
-GROUP BY 1, 2
+GROUP BY 1, 2, 3
 ),
 sale_tta AS (
 SELECT
@@ -168,8 +171,8 @@ JOIN
 ),
 sale_demand_events AS (
 SELECT
-	COALESCE(offers.id_user, db.id_visitor, tta.tenant_id::BIGINT) AS id_buyer,
-	COALESCE(offers.id_house, db.id_property, tta.house_id::BIGINT, sc.sk_house) AS id_house,
+	COALESCE(offers.id_user, sc.sk_buyer, tta.tenant_id::BIGINT) AS id_buyer,
+	COALESCE(offers.id_house, sc.sk_house, tta.house_id::BIGINT, sc.sk_house) AS id_house,
 	offers.dt_offer_sent,
 	offers.dt_deal_qualified,
 	offers.dt_offer_accepted,
@@ -189,9 +192,6 @@ SELECT
 	offers.dt_entrega_chaves,
 	offers.dt_finan_started,
 	offers.dt_finan_ended,
-	db.sk_booking,
-	db.dt_created,
-	db.dt_completed,
 	tta.tta_id,
 	tta.first_message_ts::TIMESTAMP AS tta_started,
 	tta.first_attendance_ts::TIMESTAMP AS tta_completed,
@@ -200,9 +200,6 @@ SELECT
 	sc.ccv_date
 FROM
     monday_adjusted offers
-FULL OUTER JOIN
-    sale_bookings db
-        ON (offers.id_house = db.id_property AND offers.id_user = db.id_visitor)
 FULL OUTER JOIN
     sale_tta tta
         ON (offers.id_house = tta.house_id AND offers.id_user = tta.tenant_id)
@@ -224,9 +221,9 @@ SELECT
 	sde.oa_date AS dt_offer_accepted,
 	sde.ccv_date AS dt_ccv_signed,
 	sde.id_offer,
-	sde.sk_booking,
-	sde.dt_created,
-	sde.dt_completed,
+	db.sk_booking,
+	db.dt_created,
+	db.dt_completed,
 	sde.tta_id,
 	sde.tta_started,
 	sde.tta_completed,
@@ -249,6 +246,9 @@ SELECT
 	fsf.higher_intent_after_offer
 FROM
     sale_demand_events sde
+FULL OUTER JOIN
+    sale_bookings db
+        ON (sde.id_house = db.id_property AND sde.id_buyer = db.id_visitor)
 LEFT JOIN
 	sale.fact_sale_flows AS fsf
 		ON sde.id_buyer = fsf.sk_buyer::VARCHAR

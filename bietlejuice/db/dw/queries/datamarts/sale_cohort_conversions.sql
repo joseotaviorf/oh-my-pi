@@ -102,7 +102,8 @@ sale_closing AS (
         DATE_TRUNC('week', DATE(sk_offer_submitted_date)) AS week_start,
         DATE(sk_offer_submitted_date) AS date,
         sk_house,
-        sk_offer
+        sk_offer,
+        sk_buyer
     FROM
     	sale.fact_offers
     WHERE
@@ -113,7 +114,8 @@ sale_closing AS (
         DATE_TRUNC('week', DATE(sk_offer_accepted_date)) AS week_start,
         DATE(sk_offer_accepted_date) AS date,
         sk_house,
-        sk_offer
+        sk_offer,
+        sk_buyer
     FROM
         sale.fact_offers
     WHERE
@@ -132,6 +134,7 @@ sale_closing AS (
 SELECT
     COALESCE(COALESCE(fact_os.sk_offer, fact_oa.sk_offer), fact_ccv.sk_offer) AS sk_offer,
     COALESCE(fact_os.sk_house,fact_oa.sk_house) AS sk_house,
+    COALESCE(fact_os.sk_buyer,fact_oa.sk_buyer) AS sk_buyer,
     MAX(fact_os.date) AS os_date,
     MAX(fact_oa.date) AS oa_date,
     MAX(fact_ccv.date) AS ccv_date
@@ -145,7 +148,7 @@ FULL OUTER JOIN
     fact_ccv
         ON fact_os.sk_offer = fact_ccv.sk_offer
 --        AND fact_os.date = fact_ccv.date
-GROUP BY 1, 2
+GROUP BY 1, 2, 3
 ),
 sale_demand_region AS (
 SELECT
@@ -159,8 +162,8 @@ JOIN
 ),
 sale_demand_events AS (
 SELECT
-	COALESCE(offers.id_user, db.id_visitor) AS id_buyer,
-	COALESCE(offers.id_house, db.id_property) AS id_house,
+	COALESCE(offers.id_user, sc.sk_buyer) AS id_buyer,
+	COALESCE(offers.id_house, sc.sk_house) AS id_house,
 	COALESCE(offers.id_offer,sc.sk_offer) AS id_offer,
 	offers.dt_offer_sent,
 	offers.dt_deal_qualified,
@@ -180,25 +183,19 @@ SELECT
 	offers.dt_entrega_chaves,
 	offers.dt_finan_started,
 	offers.dt_finan_ended,
-	db.sk_booking,
-	db.dt_created,
-	db.dt_completed,
 	sc.os_date,
 	sc.oa_date,
 	sc.ccv_date
 FROM
     monday_adjusted offers
 FULL OUTER JOIN
-    sale_bookings db
-        ON (offers.id_house = db.id_property AND offers.id_user = db.id_visitor)
-FULL OUTER JOIN
     sale_closing sc
         ON offers.id_offer = sc.sk_offer
 ),
 sale_demand_classification AS (
 SELECT
-	sde.id_buyer,
-	sde.id_house,
+	COALESCE(sde.id_buyer, db.id_visitor) AS id_buyer,
+	COALESCE(sde.id_house, db.id_property) AS id_house,
 	sdr.city_group,
 	pma.form_of_payment,
 	sde.os_date AS dt_offer_sent,
@@ -220,14 +217,17 @@ SELECT
 	sde.dt_finan_started,
 	sde.dt_finan_ended,
 	sde.id_offer,
-	sde.sk_booking,
-	sde.dt_created,
-	sde.dt_completed,
+	db.sk_booking,
+	db.dt_created,
+	db.dt_completed,
 	fsf.first_event AS first_touchpoint,
 	fsf.higher_intent_before_offer,
 	fsf.higher_intent_after_offer
 FROM
     sale_demand_events sde
+FULL OUTER JOIN
+    sale_bookings db
+        ON (sde.id_house = db.id_property AND sde.id_buyer = db.id_visitor)
 LEFT JOIN
     sale.fact_sale_flows fsf
         ON sde.id_buyer = fsf.sk_buyer::VARCHAR
@@ -1139,7 +1139,7 @@ SELECT
 	NULL::BIGINT AS oa2ccv,
 	NULL::BIGINT AS ccv2lts,
 	NULL::BIGINT AS lts2lte,
-        NULL::BIGINT AS lte2lrs,
+    NULL::BIGINT AS lte2lrs,
 	NULL::BIGINT AS lrs2lre,
 	NULL::BIGINT AS lre2de,
 	COUNT(DISTINCT sk_booking) AS ccv2credstart,
@@ -1171,10 +1171,10 @@ SELECT
     higher_intent_after_offer AS origin_after_offer,
     NULL AS form_of_payment,
     CASE
-	 WHEN datediff('week',DATE_TRUNC('week',DATE(dt_credit_started)),DATE_TRUNC('week',DATE(dt_credit_approved))) < 20
-	     THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(dt_credit_started)),DATE_TRUNC('week',DATE(dt_credit_approved)))
-	 WHEN datediff('week',DATE_TRUNC('week',DATE(dt_credit_started)),DATE_TRUNC('week',DATE(dt_credit_approved))) >= 20
-	     THEN 'W20+'
+	    WHEN datediff('week',DATE_TRUNC('week',DATE(dt_credit_started)),DATE_TRUNC('week',DATE(dt_credit_approved))) < 20
+	        THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(dt_credit_started)),DATE_TRUNC('week',DATE(dt_credit_approved)))
+	    WHEN datediff('week',DATE_TRUNC('week',DATE(dt_credit_started)),DATE_TRUNC('week',DATE(dt_credit_approved))) >= 20
+	        THEN 'W20+'
     END AS weeks_conversion,
     NULL::BIGINT AS p2fc,
     NULL::BIGINT AS fc2q,
@@ -1222,10 +1222,10 @@ SELECT
     higher_intent_after_offer AS origin_after_offer,
     NULL AS form_of_payment,
     CASE
-	 WHEN datediff('week',DATE_TRUNC('week',DATE(dt_credit_approved)),DATE_TRUNC('week',DATE(dt_finan_started))) < 20
-	     THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(dt_credit_approved)),DATE_TRUNC('week',DATE(dt_finan_started)))
-	 WHEN datediff('week',DATE_TRUNC('week',DATE(dt_credit_approved)),DATE_TRUNC('week',DATE(dt_finan_started))) >= 20
-	     THEN 'W20+'
+	    WHEN datediff('week',DATE_TRUNC('week',DATE(dt_credit_approved)),DATE_TRUNC('week',DATE(dt_finan_started))) < 20
+	        THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(dt_credit_approved)),DATE_TRUNC('week',DATE(dt_finan_started)))
+	    WHEN datediff('week',DATE_TRUNC('week',DATE(dt_credit_approved)),DATE_TRUNC('week',DATE(dt_finan_started))) >= 20
+	        THEN 'W20+'
     END AS weeks_conversion,
     NULL::BIGINT AS p2fc,
     NULL::BIGINT AS fc2q,
@@ -1323,10 +1323,11 @@ SELECT
     higher_intent_before_offer AS origin_before_offer,
     higher_intent_after_offer AS origin_after_offer,
     form_of_payment,
-    CASE WHEN datediff('week',DATE_TRUNC('week',DATE(dt_ccv_signed)),DATE_TRUNC('week',DATE(dt_matricula_inicio))) < 20
-	          THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(dt_ccv_signed)),DATE_TRUNC('week',DATE(dt_matricula_inicio)))
-	     WHEN datediff('week',DATE_TRUNC('week',DATE(dt_ccv_signed)),DATE_TRUNC('week',DATE(dt_matricula_inicio))) >= 20
-	     	  THEN 'W20+'
+    CASE
+        WHEN datediff('week',DATE_TRUNC('week',DATE(dt_ccv_signed)),DATE_TRUNC('week',DATE(dt_matricula_inicio))) < 20
+	        THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(dt_ccv_signed)),DATE_TRUNC('week',DATE(dt_matricula_inicio)))
+	    WHEN datediff('week',DATE_TRUNC('week',DATE(dt_ccv_signed)),DATE_TRUNC('week',DATE(dt_matricula_inicio))) >= 20
+	        THEN 'W20+'
     END AS weeks_conversion,
     NULL::BIGINT AS p2fc,
     NULL::BIGINT AS fc2q,
@@ -1373,10 +1374,11 @@ SELECT
     higher_intent_before_offer AS origin_before_offer,
     higher_intent_after_offer AS origin_after_offer,
     form_of_payment,
-    CASE WHEN datediff('week',DATE_TRUNC('week',DATE(dt_matricula_inicio)),DATE_TRUNC('week',DATE(dt_matricula_atualizada))) < 20
-	     THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(dt_matricula_inicio)),DATE_TRUNC('week',DATE(dt_matricula_atualizada)))
-	 WHEN datediff('week',DATE_TRUNC('week',DATE(dt_matricula_inicio)),DATE_TRUNC('week',DATE(dt_matricula_atualizada))) >= 20
-	     THEN 'W20+'
+    CASE
+        WHEN datediff('week',DATE_TRUNC('week',DATE(dt_matricula_inicio)),DATE_TRUNC('week',DATE(dt_matricula_atualizada))) < 20
+	        THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(dt_matricula_inicio)),DATE_TRUNC('week',DATE(dt_matricula_atualizada)))
+	    WHEN datediff('week',DATE_TRUNC('week',DATE(dt_matricula_inicio)),DATE_TRUNC('week',DATE(dt_matricula_atualizada))) >= 20
+	        THEN 'W20+'
     END AS weeks_conversion,
     NULL::BIGINT AS p2fc,
     NULL::BIGINT AS fc2q,
@@ -1423,10 +1425,11 @@ SELECT
     higher_intent_before_offer AS origin_before_offer,
     higher_intent_after_offer AS origin_after_offer,
     form_of_payment,
-    CASE WHEN datediff('week',DATE_TRUNC('week',DATE(dt_ccv_signed)),DATE_TRUNC('week',DATE(dt_matricula_atualizada))) < 20
-	      THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(dt_ccv_signed)),DATE_TRUNC('week',DATE(dt_matricula_atualizada)))
-	 WHEN datediff('week',DATE_TRUNC('week',DATE(dt_ccv_signed)),DATE_TRUNC('week',DATE(dt_matricula_atualizada))) >= 20
-	      THEN 'W20+'
+    CASE
+        WHEN datediff('week',DATE_TRUNC('week',DATE(dt_ccv_signed)),DATE_TRUNC('week',DATE(dt_matricula_atualizada))) < 20
+	        THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(dt_ccv_signed)),DATE_TRUNC('week',DATE(dt_matricula_atualizada)))
+	    WHEN datediff('week',DATE_TRUNC('week',DATE(dt_ccv_signed)),DATE_TRUNC('week',DATE(dt_matricula_atualizada))) >= 20
+	        THEN 'W20+'
     END AS weeks_conversion,
     NULL::BIGINT AS p2fc,
     NULL::BIGINT AS fc2q,
@@ -1537,7 +1540,7 @@ SELECT * FROM p2fc
 	SELECT * FROM ccv2lts
 	UNION ALL
 	SELECT * FROM lts2lte
-        UNION ALL
+    UNION ALL
 	SELECT * FROM lte2lrs
 	UNION ALL
 	SELECT * FROM lrs2lre
@@ -1592,7 +1595,7 @@ SELECT
 	ua.oa2ccv,
 	ua.ccv2lts,
 	ua.lts2lte,
-        ua.lte2lrs,
+    ua.lte2lrs,
 	ua.lrs2lre,
 	ua.lre2de,
 	ua.ccv2credstart,
@@ -1643,7 +1646,7 @@ SELECT
 	SUM(oa2ccv) AS oa2ccv,
 	SUM(ccv2lts) AS ccv2lts,
 	SUM(lts2lte) AS lts2lte,
-        SUM(lte2lrs) AS lte2lrs,
+    SUM(lte2lrs) AS lte2lrs,
 	SUM(lrs2lre) AS lrs2lre,
 	SUM(lre2de) AS lre2de,
 	SUM(ccv2credstart) AS ccv2credstart,
