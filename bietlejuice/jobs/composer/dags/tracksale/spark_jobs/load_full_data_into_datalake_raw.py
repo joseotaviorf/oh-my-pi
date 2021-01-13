@@ -63,10 +63,15 @@ if __name__ == "__main__":
         scope=DATABRICKS_SCOPE, key=APIEnum.TRACKSALE
     )
     credentials = json.loads(json_credentials)
-    api_response = get_api_response(credentials["token"], endpoint_name)
+    api_response_raw = get_api_response(credentials["token"], endpoint_name)
+
+    # Currently, dispatch_limits field has all its values as None, so df can't infer the data type
+    for resp in api_response_raw:
+        if resp["dispatch_limits"]:
+            resp["dispatch_limits"] = json.dumps(resp.get("dispatch_limits"))
 
     spark_client = SparkClient()
-    df = spark_client.create_dataframe(api_response)
+    df = spark_client.create_dataframe(api_response_raw)
     df = SparkDataFrameService().input(df).convert_array_type_to_json().output()
 
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
