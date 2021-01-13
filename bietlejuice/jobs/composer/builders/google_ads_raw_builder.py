@@ -11,6 +11,7 @@ REPORT_TYPES = {
     "ad_performance_report": "ads_performance_report",
     "campaign_performance_report": "campaigns_performance_report",
     "keywords_performance_report": "keywords_performance_report",
+    "video_performance_report": "videos_performance_report",
 }
 
 REPORT_SCHEMAS = {
@@ -76,6 +77,22 @@ REPORT_SCHEMAS = {
         "AccountDescriptiveName",
         "AbsoluteTopImpressionPercentage",
         "SearchImpressionShare",
+        "ReportType",
+        "acc",
+        "dt",
+    ],
+    "videos_performance_report": [
+        "ExternalCustomerId",
+        "AdGroupID",
+        "AdGroup",
+        "CampaignID",
+        "Campaign",
+        "Clicks",
+        "Cost",
+        "Day",
+        "Device",
+        "Impressions",
+        "Account",
         "ReportType",
         "acc",
         "dt",
