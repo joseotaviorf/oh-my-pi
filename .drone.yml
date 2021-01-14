@@ -26,8 +26,7 @@ pipeline:
       - pip install -r requirements_ods_migration_test.txt
       - python scripts/compare_tables_ddl.py
     when:
-      event: [ pull_request, push ]
-      branch: master
+      event: push
 
   unit-tests-python2:
     group: ec2-tests
