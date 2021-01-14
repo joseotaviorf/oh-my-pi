@@ -93,6 +93,7 @@ REPORT_SCHEMAS = {
         "Device",
         "Impressions",
         "Account",
+        "VideoID",
         "ReportType",
         "acc",
         "dt",
