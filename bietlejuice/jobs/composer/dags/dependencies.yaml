@@ -46,6 +46,9 @@ bietlejuice.dw_marketing_costs_facebook_insights:
 bietlejuice.dw_marketing_costs_linkedin:
   - bietlejuice.linkedin
 
+bietlejuice.dw_marketing_costs_rtb_campaigns:
+  - bietlejuice.rtb_campaigns
+
 bietlejuice.dw_proposal:
   - bietlejuice.enrich_proposal:load-proposal-to-enrich
   - bietlejuice.enrich_docx:load-credit-evaluation-to-enrich
