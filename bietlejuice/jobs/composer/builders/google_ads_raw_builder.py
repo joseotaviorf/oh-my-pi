@@ -99,7 +99,6 @@ REPORT_SCHEMAS = {
         "dt",
     ],
 }
-FULL_FILE_PATH_LENGTH = 8
 PARTITION_COLUMNS = ["ReportType", "acc", "dt"]
 
 
@@ -136,11 +135,7 @@ class GoogleAdsRawBuilder:
         return parsed_date
 
     def __filter_for_full_file_paths(self, file_paths):
-        filtered_file_paths = [
-            x
-            for x in file_paths
-            if len(self.__split_str(x, "/")) >= FULL_FILE_PATH_LENGTH
-        ]
+        filtered_file_paths = [x for x in file_paths if x[-3:] == ".gz"]
         return filtered_file_paths
 
     def __file_is_from_today(self, file_path, execution_date):
