@@ -17,6 +17,6 @@ SELECT
 	dt_load,
 	dt_created
 FROM
-    datalake_marketing_hub_clean.videos_performance_report
+    datalake_marketing_hub_clean.google_videos_performance_report
 WHERE 
     load_date = DATE('{year}-{month}-{day}')
