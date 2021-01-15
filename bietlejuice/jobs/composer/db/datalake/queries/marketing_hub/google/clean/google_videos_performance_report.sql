@@ -11,6 +11,7 @@ SELECT
     Impressions AS impressions,
     Account AS account_descriptive_name,
     acc,
+    ReportType AS report_type,
     Day AS load_date,
     DATE(Day) AS dt_load,
     FROM_UNIXTIME(TO_UNIX_TIMESTAMP(dt, 'dd-MM-yyyy'), 'yyyy-MM-dd') AS dt_created

@@ -13,6 +13,7 @@ SELECT
 	impressions,
 	account_descriptive_name,
 	acc,
+	report_type,
 	load_date,
 	dt_load,
 	dt_created
