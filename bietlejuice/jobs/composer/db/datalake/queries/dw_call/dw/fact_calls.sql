@@ -6,7 +6,7 @@ WITH ivr_calls AS (
         UNIX_TIMESTAMP(MIN(ts_created_local)) AS ts_first_event_unix,
         UNIX_TIMESTAMP(MAX(ts_created_local)) AS ts_last_event_unix
     FROM
-        datalake_bigfone.call_ivr_events
+        datalake_bigfone_twilio.call_ivr_events
     GROUP BY 1,2
 ),
 initial_ivr_events AS (
@@ -15,9 +15,9 @@ initial_ivr_events AS (
         cie.id_call,
         UNIX_TIMESTAMP(MAX(ts_created)) - UNIX_TIMESTAMP(MIN(ts_created)) AS initial_ivr_time
     FROM
-      datalake_bigfone.call_ivr_paths cip
+      datalake_bigfone_twilio.call_ivr_paths cip
     JOIN
-        datalake_bigfone.call_ivr_events cie
+        datalake_bigfone_twilio.call_ivr_events cie
             ON cie.id = cip.id
     GROUP BY 1,2
 ),
@@ -37,7 +37,7 @@ flex_calls AS (
         MIN(UNIX_TIMESTAMP(ts_created_local)) AS ts_first_event_unix,
         MAX(UNIX_TIMESTAMP(ts_created_local)) AS ts_last_event_unix
     FROM
-        datalake_bigfone.call_flex_events cfe
+        datalake_bigfone_twilio.call_flex_events cfe
     WHERE
         event_type != 'task.updated'
     GROUP BY 1,2,3
@@ -57,7 +57,7 @@ call_metrics AS (
         MIN(ts_created) AS ts_first_reservation,
         MAX(ts_created) AS ts_last_reservation
     FROM
-        datalake_bigfone.call_flex_reservations
+        datalake_bigfone_twilio.call_flex_reservations
     GROUP BY 1,2
 ),
 last_reservation AS (
@@ -65,7 +65,7 @@ last_reservation AS (
         cfr.id_task,
         cfr.queue_name AS last_queue_name
     FROM
-        datalake_bigfone.call_flex_reservations cfr
+        datalake_bigfone_twilio.call_flex_reservations cfr
     JOIN
         call_metrics cm
             ON cfr.id_task = cm.id_task
@@ -78,7 +78,7 @@ first_reservation AS (
         cfr.seconds_wait_time AS first_wait_time,
         UNIX_TIMESTAMP(FROM_UTC_TIMESTAMP(cfr.ts_created, 'Brazil/East')) AS ts_first_reservation_unix
     FROM
-        datalake_bigfone.call_flex_reservations cfr
+        datalake_bigfone_twilio.call_flex_reservations cfr
     JOIN
         call_metrics cm
             ON cfr.id_task = cm.id_task
@@ -91,7 +91,7 @@ csat_events AS (
         MAX(csat_1) AS csat_1,
         MAX(csat_2) AS csat_2
     FROM
-        datalake_bigfone.call_ivr_events
+        datalake_bigfone_twilio.call_ivr_events
     WHERE
         COALESCE(csat_1, csat_2) IS NOT NULL
     GROUP BY 1,2

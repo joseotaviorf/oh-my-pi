@@ -5,7 +5,7 @@ WITH ivr_paths AS (
 		event_type,
 		digits AS answer,
 		ts_created AS ts_answered
-	FROM datalake_bigfone.call_ivr_paths
+	FROM datalake_bigfone_twilio.call_ivr_paths
 	WHERE event_type IN ('keypress','timeout')
 	GROUP BY 1,2,3,4,5
 ),

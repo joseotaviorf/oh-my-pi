@@ -6,7 +6,7 @@ WITH reservations AS (
         ts_ended,
         DATE(CONCAT(CAST(year AS VARCHAR(4)), '-', CAST(month AS VARCHAR(2)), '-', CAST(day AS VARCHAR(2)))) AS dt_updated
     FROM
-        datalake_bigfone.call_flex_reservations
+        datalake_bigfone_twilio.call_flex_reservations
 ),
 last_updated_reservations AS (
     SELECT

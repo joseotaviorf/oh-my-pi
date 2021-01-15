@@ -7,7 +7,7 @@ WITH ivr_events AS (
         MIN(ts_created_local) AS ts_first_event,
         MAX(ts_created_local) AS ts_last_event
     FROM
-        datalake_bigfone.call_ivr_events
+        datalake_bigfone_twilio.call_ivr_events
     GROUP BY 1,2,3
 ),
 flex_events AS (
@@ -20,7 +20,7 @@ flex_events AS (
         MIN(ts_created_local) AS ts_first_event,
         MAX(ts_created_local) AS ts_last_event
     FROM
-        datalake_bigfone.call_flex_events
+        datalake_bigfone_twilio.call_flex_events
     GROUP BY 1,2,3,4,5
 ),
 call_locations AS (
@@ -30,7 +30,7 @@ call_locations AS (
         from_state,
         from_country
     FROM
-        datalake_bigfone.inbound_call_locations
+        datalake_bigfone_twilio.inbound_call_locations
     GROUP BY 1,2,3,4
 ),
 csat_events AS (
@@ -38,7 +38,7 @@ csat_events AS (
         id_call,
         MIN(ts_created_local) AS ts_csat
     FROM
-        datalake_bigfone.call_ivr_events
+        datalake_bigfone_twilio.call_ivr_events
     WHERE
         csat_2 IS NOT NULL
     GROUP BY 1
