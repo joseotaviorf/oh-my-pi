@@ -440,11 +440,155 @@ final_cte_campaigns as (
     on dim.id_campaign = cte_campaigns.id_campaign
         and dim.account_name = cte_campaigns.acc
         and dim.campaign_name = cte_campaigns.campaign_name
-)
+),
+
 -- CAMPAIGNS END
+-- VIDEOS START
+
+computer_devices_videos AS (
+    SELECT 
+        id_video,
+        id_campaign,
+        id_external_customer,
+        id_ad_group,
+        campaign_name,
+        device,
+        sum(coalesce(cast(clicks AS INTEGER), 0)) AS total_clicks,
+        sum(coalesce(cast(cost AS FLOAT), 0)) / 1000000 AS total_cost,
+        sum(coalesce(cast(impressions AS INTEGER), 0)) AS impressions,
+        dt_load,
+        load_date
+    FROM datalake_marketing_costs.google_videos_performance_report
+    WHERE device = 'Computers'
+        AND load_date = DATE('{year}-{month}-{day}')
+    GROUP BY 1,2,3,4,5,6,10,11
+),
+mobile_devices_videos AS (
+    SELECT 
+        id_video,
+        id_campaign,
+        id_external_customer,
+        id_ad_group,
+        campaign_name,
+        device,
+        sum(coalesce(cast(clicks AS INTEGER), 0)) AS total_clicks,
+        sum(coalesce(cast(cost AS FLOAT), 0)) / 1000000 AS total_cost,
+        sum(coalesce(cast(impressions AS INTEGER), 0)) AS impressions,
+        dt_load,
+        load_date
+    FROM datalake_marketing_costs.google_videos_performance_report
+    WHERE device = 'Mobile devices with full browsers'
+        AND load_date = DATE('{year}-{month}-{day}')
+    GROUP BY 1,2,3,4,5,6,10,11
+),
+tablet_devices_videos AS (
+    SELECT 
+        id_video,
+        id_campaign,
+        id_external_customer,
+        id_ad_group,
+        campaign_name,
+        device,
+        sum(coalesce(cast(clicks AS INTEGER), 0)) AS total_clicks,
+        sum(coalesce(cast(cost AS FLOAT), 0)) / 1000000 AS total_cost,
+        sum(coalesce(cast(impressions AS INTEGER), 0)) AS impressions,
+        dt_load,
+        load_date
+    FROM datalake_marketing_costs.google_videos_performance_report
+    WHERE device = 'Tablets with full browsers'
+        AND load_date = DATE('{year}-{month}-{day}')
+    GROUP BY 1,2,3,4,5,6,10,11
+),
+cte_videos AS (
+    SELECT 
+        MIN(id) OVER (PARTITION BY google_table.id_video, google_table.id_external_customer, google_table.id_campaign, google_table.id_ad_group) AS id,
+        CAST(REPLACE(google_table.dt_load, '-', '') AS INTEGER) AS sk_date,
+        bigint(google_table.id_video),
+        google_table.id_external_customer,
+        google_table.id_campaign,
+        google_table.id_ad_group,
+        google_table.acc,
+        google_table.campaign_name,
+        google_table.ad_group_name,
+        COALESCE(mobile_devices_videos.total_clicks, 0) AS mobile_clicks,
+        COALESCE(tablet_devices_videos.total_clicks, 0) AS tablet_clicks,
+        COALESCE(computer_devices_videos.total_clicks, 0) AS computer_clicks,
+        (COALESCE(mobile_devices_videos.total_clicks, 0) + COALESCE(tablet_devices_videos.total_clicks, 0) + COALESCE(computer_devices_videos.total_clicks, 0)) AS total_clicks,
+        (COALESCE(mobile_devices_videos.total_cost, 0) + COALESCE(tablet_devices_videos.total_cost, 0)) AS mobile_cost,
+        COALESCE(computer_devices_videos.total_cost, 0) AS desktop_cost,
+        (COALESCE(mobile_devices_videos.total_cost, 0) + COALESCE(tablet_devices_videos.total_cost, 0) + COALESCE(computer_devices_videos.total_cost, 0)) AS total_cost,
+        COALESCE(mobile_devices_videos.impressions, 0) AS mobile_impressions,
+        COALESCE(tablet_devices_videos.impressions, 0) AS tablet_impressions,
+        COALESCE(computer_devices_videos.impressions, 0) AS desktop_impressions,
+        (COALESCE(mobile_devices_videos.impressions, 0) + COALESCE(tablet_devices_videos.impressions, 0) + COALESCE(computer_devices_videos.impressions, 0)) AS impressions,
+        google_table.acc,
+        google_table.load_date
+FROM datalake_marketing_costs.google_videos_performance_report google_table
+LEFT JOIN computer_devices_videos
+    ON computer_devices_videos.id_external_customer = google_table.id_external_customer
+        AND computer_devices_videos.id_campaign = google_table.id_campaign
+        AND computer_devices_videos.id_ad_group = google_table.id_ad_group
+        AND computer_devices_videos.id_video = google_table.id_video
+        AND computer_devices_videos.dt_load = google_table.dt_load
+LEFT JOIN mobile_devices_videos
+    ON mobile_devices_videos.id_external_customer = google_table.id_external_customer
+        AND mobile_devices_videos.id_campaign = google_table.id_campaign
+        AND mobile_devices_videos.id_ad_group = google_table.id_ad_group
+        AND mobile_devices_videos.id_video = google_table.id_video
+        AND mobile_devices_videos.dt_load = google_table.dt_load
+LEFT JOIN tablet_devices_videos
+    ON tablet_devices_videos.id_external_customer = google_table.id_external_customer
+        AND tablet_devices_videos.id_campaign = google_table.id_campaign
+        AND tablet_devices_videos.id_ad_group = google_table.id_ad_group
+        AND tablet_devices_videos.id_video = google_table.id_video
+        AND tablet_devices_videos.dt_load = google_table.dt_load
+WHERE
+    google_table.load_date = DATE('{year}-{month}-{day}')
+),
+final_cte_videos AS (
+SELECT DISTINCT
+    cte_videos.sk_date,
+    -1 AS sk_keyword,
+    dim.sk_video AS sk_video,
+    -1 AS sk_campaign,
+    cte_videos.id_video,
+    -1 AS keyword_id,
+    cte_videos.id_external_customer,
+    cte_videos.id_campaign,
+    cte_videos.id_ad_group,
+    cte_videos.mobile_clicks,
+    cte_videos.tablet_clicks,
+    cte_videos.computer_clicks,
+    cte_videos.total_clicks,
+    cte_videos.mobile_cost,
+    cte_videos.desktop_cost,
+    cte_videos.total_cost,
+    cte_videos.mobile_impressions,
+    cte_videos.tablet_impressions,
+    cte_videos.desktop_impressions,
+    cte_videos.impressions,
+    NULL AS desktop_search_impression_share,
+    NULL AS mobile_search_impression_share,
+    NULL AS tablet_search_impression_share,
+    NULL AS desktop_absolute_top_impression_percentage,
+    NULL AS mobile_absolute_top_impression_percentage,
+    NULL AS tablet_absolute_top_impression_percentage,
+    NOW() AS ts_load,
+    cte_videos.load_date
+FROM cte_videos
+LEFT JOIN dw_marketing_costs_staging.dim_google_video dim
+ON dim.id_video = cte_videos.id_video
+    AND dim.account_name = cte_videos.acc
+    AND dim.ad_group_name = cte_videos.ad_group_name
+    AND dim.campaign_name = cte_videos.campaign_name
+)
+
+-- VIDEOS END
 
 SELECT * FROM final_cte_keywords
-union all
+UNION ALL
 SELECT * FROM final_cte_ads
-union all
+UNION ALL
 SELECT * FROM final_cte_campaigns
+UNION ALL
+SELECT * FROM final_cte_videos
