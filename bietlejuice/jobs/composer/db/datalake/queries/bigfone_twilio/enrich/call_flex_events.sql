@@ -30,7 +30,11 @@ SELECT
 	year,
 	month,
 	day
-FROM datalake_bigfone.twilio_flex_events
-WHERE year = {year}
+FROM
+	datalake_bigfone_events.events
+WHERE
+	provider = 'twilio'
+	AND GET_JSON_OBJECT(metadata,'$.event_data.WorkflowName') = 'Assign to Anyone'
+	AND year = {year}
 	AND month = {month}
 	AND day = {day}

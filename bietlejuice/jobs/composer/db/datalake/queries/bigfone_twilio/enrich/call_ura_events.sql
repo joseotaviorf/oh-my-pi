@@ -1,5 +1,5 @@
 with data_provided_events as (
-    select * from datalake_bigfone_clean.events
+    select * from datalake_bigfone_events.events
     where event='call.data-provided'
 ),
 extract_ura_custom_keys_from_metadata as (

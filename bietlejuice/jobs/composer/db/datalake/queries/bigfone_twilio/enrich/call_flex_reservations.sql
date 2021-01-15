@@ -1,25 +1,30 @@
 WITH reservations_events AS (
     SELECT
-        id_call,
-        id_task,
-        id_reservation,
-        id_agent,
+        GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.call_sid') AS id_call,
+        GET_JSON_OBJECT(metadata,'$.event_data.TaskSid') AS id_task,
+        GET_JSON_OBJECT(metadata,'$.event_data.ReservationSid') AS id_reservation,
+        COALESCE(
+            GET_JSON_OBJECT(metadata,'$.event_data.WorkerSid'),
+            GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.worker_sid')
+        ) AS id_agent,
         CASE
-            WHEN event_type = 'reservation.created' THEN id_task_queue
+            WHEN event = 'reservation.created' THEN GET_JSON_OBJECT(metadata,'$.event_data.TaskQueueSid')
         END AS id_queue,
         CASE
-            WHEN event_type = 'reservation.created' THEN task_queue_name
+            WHEN event = 'reservation.created' THEN GET_JSON_OBJECT(metadata,'$.event_data.TaskQueueName')
         END AS queue_name,
-        event_type AS event,
+        event,
         GET_JSON_OBJECT(metadata, '$.event_data.Timestamp') AS ts_event_unix,
         year,
         month,
         day
     FROM
-        datalake_bigfone.call_flex_events
+        datalake_bigfone_events.events
     WHERE
-        event_type LIKE 'reservation.%'
-        AND id_reservation IS NOT NULL
+        provider = 'twilio'
+        AND GET_JSON_OBJECT(metadata,'$.event_data.WorkflowName') = 'Assign to Anyone'
+        AND event LIKE 'reservation.%'
+        AND GET_JSON_OBJECT(metadata,'$.event_data.ReservationSid') IS NOT NULL
         AND year = {year}
         AND month = {month}
         AND day = {day}

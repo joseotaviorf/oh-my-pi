@@ -11,8 +11,8 @@ from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 SOURCE = "bigfone"
-JOB_NAME = "load_bigfone_into_datalake"
-ALLOW_LIST = ["Call", "Queued"]
+JOB_NAME = "load_bigfone_event_into_datalake"
+ALLOW_LIST = ["Event"]
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -21,13 +21,18 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
+    parser.add_argument("execution_date")
     args = parser.parse_args()
     environment = args.env
     datalake_bucket = args.datalake_bucket
+    execution_date = args.execution_date
+    partition_cols = ["year", "month", "day"]
 
     logger.info(
-        f"m=__main__, environment={environment}, datalake_bucket={datalake_bucket}, "
-        "msg=Starting spark job..."
+        f"""
+            m=__main__, environment={environment}, datalake_bucket={datalake_bucket},
+            execution_date={execution_date}, msg=Starting spark job...
+        """
     )
 
     base_dbutils = BaseDBUtils()
@@ -49,25 +54,26 @@ if __name__ == "__main__":
 
     # create database if not exists
     database_name = db_info["db_raw_databricks"]
-    metastore_service.create_database(database_name)
     format_options = SparkTableStorageFormat.DEFAULT_RAW
     database_location = db_info["db_raw_path"]
+    metastore_service.create_database(database_name)
 
     for table in tables:
         if table.table_name in ALLOW_LIST:
-            df = postgres_consumer.get_data_from_table(table.table_name)
-            # the table names in the datalake must be lowercase
-            s3_loader.load_full_table(
+            df = postgres_consumer.get_incremental_data_from_table(
+                table.table_name, "event_timestamp", execution_date
+            )
+            s3_loader.load_incremental_table(
                 df=df,
                 database_name=database_name,
                 table_name=table.table_name.lower(),
                 format_options=format_options,
                 database_location=database_location,
+                partition_cols=partition_cols,
             )
-            spark_metastore_loader.update_metastore(
-                df,
-                database_name,
-                table.table_name.lower(),
-                format_options,
-                database_location,
+            # add new partition
+            database_name = db_info["db_clean_databricks"]
+            metastore_service.create_new_partitions_from_df(
+                database_name, table.table_name.lower(), df, partition_cols
             )
+            metastore_service.refresh_table(database_name, table.table_name.lower())

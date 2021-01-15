@@ -180,6 +180,12 @@ bietlejuice.enrich_amplitude_user:
 bietlejuice.enrich_amplitude_visit:
   - bietlejuice.amplitude
 
+bietlejuice.enrich_bigfone_events:
+  - bietlejuice.bigfone
+
+bietlejuice.enrich_bigfone_twilio:
+  - bietlejuice.enrich_bigfone_events
+
 bietlejuice.enrich_bob:
   - bietlejuice.bob
 

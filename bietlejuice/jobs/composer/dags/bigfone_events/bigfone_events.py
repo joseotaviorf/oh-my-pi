@@ -12,7 +12,7 @@ from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
 from bietlejuice.jobs.composer.services import FileService
 
-SOURCE = "bigfone"
+SOURCE = "bigfone_events"
 
 # airflow vars
 ENV = Variable.get("environment")
@@ -24,7 +24,9 @@ S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 
 # spark and databricks vars
 BASE_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/base/"
-RAW_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/load_bigfone_into_datalake.py"
+RAW_SPARK_JOB_PATH = (
+    f"{S3_PREFIX}/spark_jobs/{SOURCE}/load_bigfone_events_into_datalake.py"
+)
 LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{SOURCE}"
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
@@ -56,7 +58,7 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-bigfone_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
+bigfone_events_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id="bigfone-to-datalake-raw",
     dag=dag,
     json={
@@ -83,8 +85,10 @@ file_list = FileService.list_sql_files_without_extension_from_layer(
     SOURCE, LayerEnum.CLEAN.value
 )
 
-clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(dag, file_list)
+clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(
+    dag, file_list, is_incremental=True, partitions=["year", "month", "day"]
+)
 
-create_cluster_task >> bigfone_to_datalake_raw_task >> list(
+create_cluster_task >> bigfone_events_to_datalake_raw_task >> list(
     clean_sub_dags.values()
 ) >> terminate_cluster_task

@@ -9,7 +9,7 @@ SELECT
 	GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.to') AS to_number,
 	event AS event_type,
 	GET_JSON_OBJECT(metadata,'$.event_data.TaskCanceledReason') AS task_cancelation_reason,
-	steps,
+	GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.steps') AS steps,
 	metadata,
 	CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskPriority') AS INT) AS task_priority,
 	CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.csat-1') AS INT) AS csat_1,
@@ -19,7 +19,11 @@ SELECT
 	year,
 	month,
 	day
-FROM datalake_bigfone.twilio_ivr_events
-WHERE year = {year}
+FROM
+	datalake_bigfone_events.events
+WHERE
+	provider = 'twilio'
+	AND GET_JSON_OBJECT(metadata,'$.event_data.WorkflowName') = 'IVR Events'
+	AND year = {year}
 	AND month = {month}
 	AND day = {day}
