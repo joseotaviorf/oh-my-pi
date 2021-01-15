@@ -11,7 +11,6 @@ select
     main_channel,
     tags,
     questions,
-    dispatch_limits,
     cast(create_time as timestamp) as ts_created
 from
     datalake_tracksale_raw.campaign
