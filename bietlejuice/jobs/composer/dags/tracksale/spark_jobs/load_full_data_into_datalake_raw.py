@@ -67,7 +67,7 @@ if __name__ == "__main__":
 
     # Currently, dispatch_limits field has all its values as None, so df can't infer the data type
     for resp in api_response_raw:
-        if resp["dispatch_limits"]:
+        if "dispatch_limits" in api_response_raw:
             resp["dispatch_limits"] = json.dumps(resp.get("dispatch_limits"))
 
     spark_client = SparkClient()
