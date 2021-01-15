@@ -202,6 +202,10 @@ bietlejuice.enrich_booking:
   - bietlejuice.ebdb:load-visitor
   # TODO [ODS] Add gsheets after migrated to composer
 
+bietlejuice.enrich_braze_events:
+  - bietlejuice.braze_events:load-events-owners-to-clean
+  - bietlejuice.braze_events:load-events-tenants-to-clean
+
 bietlejuice.enrich_docx:
   - bietlejuice.docx:load-credit-evaluation-to-clean
 
