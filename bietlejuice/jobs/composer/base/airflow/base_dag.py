@@ -1,7 +1,12 @@
+from os import path
 from datetime import timedelta
+from quintoandar_logger import QuintoAndarLogger
 
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
+
+logger = QuintoAndarLogger("BaseDAG")
+COMPOSER_DAGS_PATH = path.abspath(path.join(__file__, "../../../dags"))
 
 
 class BaseDAG:
@@ -72,3 +77,17 @@ class BaseDAG:
     def cross_downstream(from_tasks, to_tasks):
         for task in from_tasks:
             task.set_downstream(to_tasks)
+
+    @staticmethod
+    def get_dag_doc(dag_name):
+        doc_md_string = ""
+        try:
+            doc_md_string = open(
+                f"{COMPOSER_DAGS_PATH}/{dag_name}/{dag_name}.md"
+            ).read()
+        except Exception as e:
+            logger.info(
+                f"m=get_dag_doc, msg=no documentation file found for {dag_name}, e={e}"
+            )
+        finally:
+            return doc_md_string

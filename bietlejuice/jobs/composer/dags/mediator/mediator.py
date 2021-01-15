@@ -53,17 +53,8 @@ mediator_dag = DAG(
     start_date=datetime(2020, 5, 8, 0, 0, 0),
     schedule_interval="0,30 * * * *",
 )
-mediator_dag.doc_md = """
-#### Mediator DAG
-This DAG checks for dependencies completion and triggers the dependents DAG in
-the pipeline.
-To force some temporary DAG skipping, use this [variable](/admin/variable/?flt1_0=MEDIATOR_SKIP_LIST)
 
-Docs:
-
-- [check-dependencies](https://github.com/quintoandar/airflow-plugins/blob/master/quintoandar_airflow_plugins/dag_mediator_plugin.md) sensor references
-- Mediator [directory](https://drive.google.com/drive/folders/1fIJBKVw4Jjojb9eLu8AHlzmFHBowRRGu) with docs and references
-"""
+mediator_dag.doc_md = BaseDAG.get_dag_doc("mediator")
 
 dependencies_dict = extract_dependencies()
 sensor_task = QuintoAndarShortCircuitExternalSensor(
