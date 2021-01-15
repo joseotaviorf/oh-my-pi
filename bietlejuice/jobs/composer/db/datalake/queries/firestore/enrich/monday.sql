@@ -11,7 +11,7 @@ SELECT
   CAST(GET_JSON_OBJECT(updated_message, '$.texto90.value') AS BIGINT) AS id_buyer,
   CAST(GET_JSON_OBJECT(updated_message, '$.texto1.value') AS BIGINT) AS id_house,
   CAST(REGEXP_EXTRACT(GET_JSON_OBJECT(updated_message, '$.pessoas1.value'), '(\\w+)') AS BIGINT) AS id_closing_specialist,
-  CAST(REGEXP_EXTRACT(GET_JSON_OBJECT(updated_message, '$.pessoas.value'), '(\\w+)') AS BIGINT) AS id_consultant,
+  GET_JSON_OBJECT(updated_message, '$.pessoas.value') AS id_consultant,
   CAST(GET_JSON_OBJECT(updated_message, '$.text1.value') AS BIGINT) AS id_agent,
   CAST(GET_JSON_OBJECT(updated_message, '$.text5.value') AS BIGINT) AS id_fifty_agent,
   CAST(REGEXP_EXTRACT(GET_JSON_OBJECT(updated_message, '$.lista_suspensa.value'), '(\\w+)') AS BIGINT) AS real_estate_register_office_number,
