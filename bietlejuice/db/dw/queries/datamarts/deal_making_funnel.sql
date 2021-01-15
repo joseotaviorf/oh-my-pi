@@ -1,9 +1,9 @@
 select distinct
-    dfm.id_offer,
+    so.id AS id_offer,
     --dfm.id_auto_generated, --AGUARDANDO COLUNA
-    dfm.id_house,
-    dfm.id_buyer,
-    concat(concat(dfm.id_buyer,'_'),dfm.id_house) as "sk_sale_flow",
+    so.id_house,
+    so.id_buyer,
+    concat(concat(so.id_buyer,'_'),so.id_house) as "sk_sale_flow",
     --dfm.id_consultant, -- ID DO PRIMEIRO ANALISTA A TRATAR A OFERTA, CORRETO É O ÚLTIMO
     regexp_replace(regexp_replace(cast(right(replace(dgm.consultor,', antonio.sader@quintoandar.com.br',''), len(replace(dgm.consultor,', antonio.sader@quintoandar.com.br','')) - charindex(', ', replace(dgm.consultor,', antonio.sader@quintoandar.com.br',''))) as varchar),' ',''),',','') as "consultant_gsheets",
     case -- id_consultant_adjusted
@@ -58,6 +58,7 @@ select distinct
         else 'ERRO' end as "name_consultant",
     dhl.house_city,
     dfm.status,
+    so.status AS status_offer_firestore,
     case -- status_type
         when dfm.status = 'Propostas em validação' then 'Ongoing'
         when dfm.status = 'Propostas Ongoing' then 'Ongoing'
@@ -236,6 +237,14 @@ select distinct
         when dfm.dt_offer_dismissed >= dt_deal_qualified_adjusted then 'pós_deal_quali'
         when dfm.dt_offer_dismissed >= dt_offer_submitted then 'pós_proposta_enviada'
         else 'ERRO' end as "descarte_etapa"
-from datalake_firestore_prod.monday dfm
-    left join dim_house_listing dhl on dfm.id_house = dhl.id_house
-    left join datalake_raw.gsheets_sale_offers_monday dgm on dgm.name = dfm.id_offer
+from 
+    datalake_firestore_prod.sale_offer so
+left join 
+    datalake_firestore_prod.monday dfm
+        on so.id = dfm.id_offer
+left join 
+    dim_house_listing dhl 
+        on dfm.id_house = dhl.id_house
+left join 
+    datalake_raw.gsheets_sale_offers_monday dgm 
+        on dgm.name = dfm.id_offer
