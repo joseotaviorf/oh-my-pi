@@ -1,5 +1,6 @@
 SELECT
     id_rh_accounting_entry AS sk_rh_accounting_entry,
+    id_payee as sk_payee,
     city_group,
     description,
     source_bill_item,
