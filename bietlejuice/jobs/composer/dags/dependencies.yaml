@@ -22,13 +22,7 @@ bietlejuice.dw_booking:
   - bietlejuice.enrich_amplitude_visit
 
 bietlejuice.dw_call:
-  - bietlejuice.enrich_bigfone_twilio:call-agents
-  - bietlejuice.enrich_bigfone_twilio:call-flex-events
-  - bietlejuice.enrich_bigfone_twilio:call-flex-reservations
-  - bietlejuice.enrich_bigfone_twilio:call-ivr-events
-  - bietlejuice.enrich_bigfone_twilio:call-ivr-paths
-  - bietlejuice.enrich_bigfone_twilio:call-ura-events
-  - bietlejuice.enrich_bigfone_twilio:inbound-call-locations
+  - bietlejuice.enrich_bigfone_twilio
 
 bietlejuice.dw_dim_listing_owner:
   - bietlejuice.ebdb:load-partner-agent
@@ -114,23 +108,6 @@ bietlejuice.dw_smart_price:
   - bietlejuice.ebdb:load-dynamic-pricing-house
   - bietlejuice.ebdb:load-dynamic-pricing-parameters
 
-bietlejuice.dw_teravoz:
-  - bietlejuice.datalake_user_phone.dialed_user_phone
-  - bietlejuice.datalake_user_phone.incoming_user_phone
-  - bietlejuice.enrich_bigfone_twilio:agent-entered-events
-  - bietlejuice.enrich_bigfone_twilio:agent-left-events
-  - bietlejuice.enrich_bigfone_twilio:agent-ringing-events
-  - bietlejuice.enrich_bigfone_twilio:call-context-data
-  - bietlejuice.enrich_bigfone_twilio:call-csat-events
-  - bietlejuice.enrich_bigfone_twilio:call-finished-events
-  - bietlejuice.enrich_bigfone_twilio:call-queue-abandon-events
-  - bietlejuice.enrich_bigfone_twilio:call-recording-available-events
-  - bietlejuice.enrich_bigfone_twilio:call-ura-events
-  - bietlejuice.enrich_bigfone_twilio:call-waiting-events
-  - bietlejuice.enrich_bigfone_twilio:call-waiting-next-events
-  - bietlejuice.enrich_bigfone_twilio:called-blind-transfer-events
-  - bietlejuice.enrich_bigfone_twilio:dialed-phone
-
 bietlejuice.dw_tracksale:
   - bietlejuice.enrich_tracksale
   - bietlejuice.enrich_nps_answer_drivers
@@ -181,7 +158,7 @@ bietlejuice.enrich_amplitude_visit:
   - bietlejuice.amplitude
 
 bietlejuice.enrich_bigfone_events:
-  - bietlejuice.bigfone
+  - bietlejuice.bigfone_events
 
 bietlejuice.enrich_bigfone_twilio:
   - bietlejuice.enrich_bigfone_events

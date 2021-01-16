@@ -62,7 +62,7 @@ bigfone_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": RAW_SPARK_JOB_PATH,
-            "parameters": [ENV, DATALAKE_BUCKET, "{{ ds }}"],
+            "parameters": [ENV, DATALAKE_BUCKET],
         }
     },
 )

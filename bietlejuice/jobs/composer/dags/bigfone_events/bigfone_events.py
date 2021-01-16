@@ -59,7 +59,7 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 )
 
 bigfone_events_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="bigfone-to-datalake-raw",
+    task_id="bigfone-events-to-datalake-raw",
     dag=dag,
     json={
         "spark_python_task": {

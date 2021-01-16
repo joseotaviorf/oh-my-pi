@@ -10,7 +10,7 @@ from bietlejuice.jobs.composer.consumers.db_consumers import PostgresConsumer
 from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
-SOURCE = "bigfone"
+SOURCE = "bigfone_events"
 JOB_NAME = "load_bigfone_event_into_datalake"
 ALLOW_LIST = ["Event"]
 
