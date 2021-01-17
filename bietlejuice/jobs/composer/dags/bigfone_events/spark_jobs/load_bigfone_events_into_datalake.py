@@ -72,7 +72,6 @@ if __name__ == "__main__":
                 partition_cols=partition_cols,
             )
             # add new partition
-            database_name = db_info["db_clean_databricks"]
             metastore_service.create_new_partitions_from_df(
                 database_name, table.table_name.lower(), df, partition_cols
             )
