@@ -10,9 +10,9 @@ with google_consolidated_cost as (
     with t_google as (
         select
             fg.sk_date,
-            coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name) as campaign_name,
-            coalesce(dgk.account_name, dga.account_name, dgc.account_name) as account_name,
-            coalesce(dgk.report_type, dga.report_type, dgc.report_type) as report_type,
+            coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name, dgv.campaign_name) as campaign_name,
+            coalesce(dgk.account_name, dga.account_name, dgc.account_name, dgv.account_name) as account_name,
+            coalesce(dgk.report_type, dga.report_type, dgc.report_type, dgv.report_type) as report_type,
             coalesce(gtatf.flag, 'other') as ad_type,
             case when fg.sk_keyword <> -1 then
                 dgk.keyword_name || '_' || lower(left(dgk.match_type, 1))
@@ -29,15 +29,17 @@ with google_consolidated_cost as (
                 on dga.sk_ad = fg.sk_ad
             left join marketing_costs.dim_google_campaign dgc
                 on dgc.sk_campaign = fg.sk_campaign
+            left join marketing_costs.dim_google_video dgv
+                on dgv.sk_video = fg.sk_video
             left join datalake_raw.gsheets_taxonomy_ad_type_flags gtatf 
                 on dga.ad_type = gtatf.ad_type 
         where dgk.is_test_campaign is not true
         and dga.is_test_campaign is not true
         and dgc.is_test_campaign is not true
-        and (gtatf.flag <> 'other' 
-            or gtatf.flag is null 
-            or (dga.account_name = 'quintoandar_sao_paulo' and fg.sk_date < 20201118)
-            )
+        and (gtatf.flag <> 'other' or gtatf.flag is null)
+        and substring(
+                coalesce(dgk.campaign_name, dga.campaign_name, dgc.campaign_name, dgv.campaign_name), 1, 5
+            ) <> 'ZEBRA'
     ),
     manual_google_costs as (
         with t_prep as (
@@ -108,7 +110,7 @@ fb_hist_list_affiliates as (
         on lower(df.campaign_name) = lower(hist.campaign)
         and to_char(ff.dt_start::date, 'yyyyMMdd')::integer = hist.sk_cost_date
     where to_char(ff.dt_start::date, 'yyyyMMdd')::integer >= 20190101
-        and df.campaign_name not like 'ZEBRA%'
+        and substring(df.campaign_name, 1, 5) <> 'ZEBRA'
 ),
 facebook_info as (
     select
@@ -218,7 +220,7 @@ campaigns_full as (
                     on hl.sk_date = to_char(ff.dt_start::date, 'yyyyMMdd')::integer
                     and df.campaign_name = hl.campaign_name
             where to_char(ff.dt_start::date, 'yyyyMMdd')::integer >= 20180101
-                and df.campaign_name not like 'ZEBRA%'
+                and substring(df.campaign_name, 1, 5) <> 'ZEBRA'
             -- Filter out affiliate_costs of national-campaigns with manual-historic costs
                 and hl.sk_date is null
         -- GOOGLE
@@ -535,6 +537,8 @@ cost_taxonomy as (
             union all
             select 3::integer, 'Other'::varchar
         ) as s(i, mkt_platform)
+        WHERE
+            lower(substring(NULLIF(campaign_name, ''), 1, 3)) <> 'dsa'
     ),
     name_convention_shared_costs as (
         with city_group_share_rules as (
@@ -656,6 +660,9 @@ cost_taxonomy as (
             when cf.campaign_name_l like '%cps%' then 'Campinas'
             when cf.campaign_name_l like '%bsb%' then 'Brasília'
             when cf.campaign_name_l like '%rj%' then 'Rio de Janeiro'
+            when cf.campaign_name_l like '%santos%' then 'Santos'
+            when cf.campaign_name_l like '%recife%' then 'Recife'
+            when cf.campaign_name_l like '%salvador%' then 'Salvador'
         end as city_campaign_mapping_rule,
         -- city via campaign_name name convention
         case
@@ -670,6 +677,9 @@ cost_taxonomy as (
              when campaign_city = 'curitiba' then 'Curitiba'
              when campaign_city in ('fln', 'florianopolis') then 'Florianópolis'
              when campaign_city in ('bsb', 'brasilia') then 'Brasília'
+             when campaign_city = 'santos' then 'Santos'
+             when campaign_city = 'recife' then 'Recife'
+             when campaign_city = 'salvador' then 'Salvador'
         end as campaign_city_matched,
         coalesce(tp.campaign_origin_aquisition, 'Not Mapped') as campaign_origin_aquisition,
         coalesce(tp.mkt_category, 'Not Mapped') as mkt_category,
@@ -866,17 +876,15 @@ SELECT
     utm_term,
     utm_content,
     cost,
-    getdate() as ts_load
+    getdate() AS ts_load
 FROM
     final_costs
 WHERE
-    mkt_source <> 'Facebook' or sk_date > 20201210
+    mkt_source NOT IN ('Facebook', 'Google')
+    OR (mkt_source = 'Google' AND sk_date > 20210117)
+    OR (mkt_source = 'Facebook' AND sk_date > 20201210)
 
 UNION ALL
-
-SELECT
-    *
-FROM
-    marketing_costs.fact_marketing_daily_costs_old
-WHERE
-    mkt_source = 'Facebook'
+SELECT * FROM marketing_costs.fact_marketing_daily_costs_old_facebook
+UNION ALL
+SELECT * FROM marketing_costs.fact_marketing_daily_costs_old_google

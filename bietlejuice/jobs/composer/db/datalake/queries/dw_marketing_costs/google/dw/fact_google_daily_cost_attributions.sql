@@ -506,7 +506,7 @@ cte_videos AS (
     SELECT 
         MIN(id) OVER (PARTITION BY google_table.id_video, google_table.id_external_customer, google_table.id_campaign, google_table.id_ad_group) AS id,
         CAST(REPLACE(google_table.dt_load, '-', '') AS INTEGER) AS sk_date,
-        bigint(google_table.id_video),
+        google_table.id_video,
         google_table.id_external_customer,
         google_table.id_campaign,
         google_table.id_ad_group,
