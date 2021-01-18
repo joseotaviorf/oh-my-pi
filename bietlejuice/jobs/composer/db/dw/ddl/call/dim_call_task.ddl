@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS call.dim_call_task (
     queue_name VARCHAR(100),
     ts_created TIMESTAMP,
     ts_ended TIMESTAMP,
-    dt_updated DATE
+    dt_updated DATE,
+    ts_load TIMESTAMP
 );
 ALTER TABLE call.dim_call_task OWNER TO airflow;

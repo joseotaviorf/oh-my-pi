@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS call.dim_call (
 	from_country VARCHAR(50),
 	ts_started TIMESTAMP,
 	ts_csat_answered TIMESTAMP,
-	ts_ended TIMESTAMP
+	ts_ended TIMESTAMP,
+  	ts_load TIMESTAMP
 );
 ALTER TABLE call.dim_call OWNER TO airflow;

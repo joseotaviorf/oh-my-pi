@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS call.fact_call_tasks (
     is_rejected BOOLEAN,
     seconds_duration DOUBLE PRECISION,
     seconds_wait_time DOUBLE PRECISION,
-    seconds_talk_time DOUBLE PRECISION
+    seconds_talk_time DOUBLE PRECISION,
+    ts_load TIMESTAMP
 );
 ALTER TABLE call.fact_call_tasks OWNER TO airflow;

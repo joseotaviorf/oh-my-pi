@@ -14,7 +14,8 @@ SELECT
 	ca.location,
 	ca.skills,
 	fle.ts_first_event AS ts_created,
-	fle.ts_last_event AS ts_updated
+	fle.ts_last_event AS ts_updated,
+	NOW() AS ts_load
 FROM
 	datalake_bigfone_twilio.call_agents ca
 INNER JOIN

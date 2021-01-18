@@ -21,7 +21,8 @@ SELECT
     queue_name,
     ts_created,
     ts_ended,
-    dt_updated
+    dt_updated,
+    NOW() AS ts_load
 FROM
     reservations r
 INNER JOIN

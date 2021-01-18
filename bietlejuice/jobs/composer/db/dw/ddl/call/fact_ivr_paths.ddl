@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS call.fact_ivr_paths (
 	answer INTEGER,
 	is_timeout BOOLEAN,
 	seconds_elapsed BIGINT,
-	ts_answered TIMESTAMP
+	ts_answered TIMESTAMP,
+  	ts_load TIMESTAMP
 );
 ALTER TABLE call.fact_ivr_paths OWNER TO airflow;

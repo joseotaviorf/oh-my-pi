@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS call.dim_call_agent (
 	location VARCHAR(25),
 	skills VARCHAR(2000),
 	ts_created TIMESTAMP,
-	ts_updated TIMESTAMP
+	ts_updated TIMESTAMP,
+  	ts_load TIMESTAMP
 );
 ALTER TABLE call.dim_call_agent OWNER TO airflow;

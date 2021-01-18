@@ -33,7 +33,8 @@ SELECT
     is_rejected,
     seconds_duration,
     seconds_wait_time,
-    seconds_talk_time
+    seconds_talk_time,
+    NOW() AS ts_load
 FROM
     reservations r
 INNER JOIN

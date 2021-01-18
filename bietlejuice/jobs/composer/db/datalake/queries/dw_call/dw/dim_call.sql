@@ -53,7 +53,8 @@ SELECT
     cl.from_country,
     COALESCE(ie.ts_first_event,fe.ts_first_event) AS ts_started,
     ce.ts_csat AS ts_csat_answered,
-    GREATEST(ie.ts_last_event,fe.ts_last_event) AS ts_ended
+    GREATEST(ie.ts_last_event,fe.ts_last_event) AS ts_ended,
+    NOW() AS ts_load
 FROM
     ivr_events ie
 FULL JOIN

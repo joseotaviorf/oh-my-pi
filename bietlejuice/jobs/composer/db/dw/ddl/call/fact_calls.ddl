@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS call.fact_calls (
     seconds_wrapup_time BIGINT,
     seconds_aht BIGINT,
     seconds_duration BIGINT,
-    csat_rating SMALLINT
+    csat_rating SMALLINT,
+    ts_load TIMESTAMP
 );
 ALTER TABLE call.fact_calls OWNER TO airflow;
