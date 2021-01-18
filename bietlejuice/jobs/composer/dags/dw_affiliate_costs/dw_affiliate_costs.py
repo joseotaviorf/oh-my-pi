@@ -45,9 +45,9 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=None,
-)
-dag.doc_md = BaseDAG.get_dag_doc(DAG_NAME).format(
-    chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
+    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
+        chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
+    ),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
