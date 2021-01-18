@@ -128,7 +128,7 @@ SELECT
     fc.ts_last_event_unix - fr.ts_first_reservation_unix AS seconds_aht,
     GREATEST(ic.ts_last_event_unix,fc.ts_last_event_unix) - COALESCE(ic.ts_first_event_unix,fc.ts_first_event_unix) AS seconds_duration,
     ce.csat_2 AS csat_rating,
-    GETDATE() AS ts_load
+    NOW() AS ts_load
 FROM
     ivr_calls ic
 FULL JOIN

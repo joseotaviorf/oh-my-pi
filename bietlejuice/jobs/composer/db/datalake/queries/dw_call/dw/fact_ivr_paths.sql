@@ -26,5 +26,5 @@ SELECT
 	event_type = 'timeout' AS is_timeout,
 	UNIX_TIMESTAMP(ts_answered) - UNIX_TIMESTAMP(ts_last_answered) AS seconds_elapsed,
 	CAST(ts_answered AS TIMESTAMP) AS ts_answered,
-	GETDATE() AS ts_load
+	NOW() AS ts_load
 FROM path_sequence
