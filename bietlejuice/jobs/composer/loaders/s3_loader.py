@@ -1,6 +1,7 @@
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
+from bietlejuice.jobs.composer.services.containers import Services
 
 logger = QuintoAndarLogger("S3Loader")
 
@@ -145,7 +146,14 @@ class S3Loader:
 
     @logger(exclude="df")
     def load_df(
-        self, df, s3_path, format_options, partitions, write_mode="overwrite", **options
+        self,
+        df,
+        s3_path,
+        format_options,
+        partitions=None,
+        write_mode="overwrite",
+        max_records_per_file=MAX_RECORDS_PER_FILE,
+        **options
     ):
         """
         Loads the content of an Spark DataFrame into a table in S3 overwriting the
@@ -169,10 +177,10 @@ class S3Loader:
         :type format_options: str
         :param partitions: names of partitioning columns
         :type partitions: list
-        :param is_incremental: flag that indicates if load is part of an incremental pipeline
-        :type is_incremental: bool
         :param write_mode: specifies how to handle existing data if present (e.g. "append" or "overwrite")
         :type write_mode: str
+        :param max_records_per_file: Maximum number of records an output file can have
+        :type max_records_per_file: int
         :param options: all other string options
         :type options: keyworded, variable-length argument list
         """
@@ -192,10 +200,12 @@ class S3Loader:
                 )
             )
 
+        df = self._optimize_dataframe_partitions(df, partitions, max_records_per_file)
+
         df_writer = (
             df.write.mode(write_mode)
             .format(format_options)
-            .option("maxRecordsPerFile", self.MAX_RECORDS_PER_FILE)
+            .option("maxRecordsPerFile", max_records_per_file)
         )
         if partitions:
             df_writer = df_writer.partitionBy(*partitions)
@@ -208,3 +218,15 @@ class S3Loader:
         logger.info(
             "m=load_df, s3_path={}, " "msg=loaded files into S3.".format(s3_path)
         )
+
+    @logger(exclude="df")
+    def _optimize_dataframe_partitions(self, df, partitions, max_records_per_file):
+
+        df_service = Services.spark_dataframe_service(df)
+
+        if partitions:
+            return df_service.optimize_partitions_by_partition_columns(
+                partitions
+            ).output()
+
+        return df_service.optimize_partition(max_records_per_file).output()
