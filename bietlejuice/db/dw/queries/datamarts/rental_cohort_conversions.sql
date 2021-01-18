@@ -16,10 +16,10 @@ SELECT
 	NULL AS demand_mkt_medium,
 	NULL AS first_touchpoint,
 	FALSE AS is_guarantee,
-	CASE WHEN datediff('week',DATE_TRUNC('week',DATE(fhlf.sk_lead_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_prospect_date,-1)))) < 20
+	CASE WHEN datediff('week',DATE_TRUNC('week',DATE(fhlf.sk_lead_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_prospect_date,-1)))) < 5
 	          THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(fhlf.sk_lead_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_prospect_date,-1))))
-	     WHEN datediff('week',DATE_TRUNC('week',DATE(fhlf.sk_lead_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_prospect_date,-1)))) >= 20
-	     	  THEN 'W20+'
+	     WHEN datediff('week',DATE_TRUNC('week',DATE(fhlf.sk_lead_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_prospect_date,-1)))) >= 5
+	     	  THEN 'W5+'
 	END AS weeks_conversion,
   	COUNT(fhlf.sk_lead_date) AS l2p,
 	NULL::BIGINT AS p2q,
@@ -71,10 +71,10 @@ SELECT
 	NULL AS demand_mkt_medium,
 	NULL AS first_touchpoint,
 	FALSE AS is_guarantee,
-	CASE WHEN datediff('week',DATE_TRUNC('week',DATE(fhlf.sk_prospect_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_qualified_date,-1)))) < 20
+	CASE WHEN datediff('week',DATE_TRUNC('week',DATE(fhlf.sk_prospect_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_qualified_date,-1)))) < 5
 	          THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(fhlf.sk_prospect_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_qualified_date,-1))))
-	     WHEN datediff('week',DATE_TRUNC('week',DATE(fhlf.sk_prospect_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_qualified_date,-1)))) >= 20
-	     	  THEN 'W20+'
+	     WHEN datediff('week',DATE_TRUNC('week',DATE(fhlf.sk_prospect_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_qualified_date,-1)))) >= 5
+	     	  THEN 'W5+'
 	END AS weeks_conversion,
   	NULL::BIGINT AS l2p,
 	COUNT(fhlf.sk_prospect_date) AS p2q, -- this count is done on the prospect date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
@@ -127,10 +127,10 @@ SELECT
 	NULL AS first_touchpoint,
 	FALSE AS is_guarantee,
 	CASE
-	     WHEN datediff('week',DATE_TRUNC('week',DATE(fhlf.sk_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_opportunity_date,-1)))) < 20
+	     WHEN datediff('week',DATE_TRUNC('week',DATE(fhlf.sk_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_opportunity_date,-1)))) < 5
 		  THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(fhlf.sk_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_opportunity_date,-1))))
-	     WHEN datediff('week',DATE_TRUNC('week',DATE(fhlf.sk_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_opportunity_date,-1)))) >= 20
-	     	  THEN 'W20+'
+	     WHEN datediff('week',DATE_TRUNC('week',DATE(fhlf.sk_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_opportunity_date,-1)))) >= 5
+	     	  THEN 'W5+'
 	END AS weeks_conversion,
   	NULL::BIGINT AS l2p,
 	NULL::BIGINT AS p2q,
@@ -183,10 +183,10 @@ SELECT
 	NULL AS first_touchpoint,
 	FALSE AS is_guarantee,
   	CASE
-	    WHEN datediff('week',DATE_TRUNC('week',DATE(fhlf.sk_opportunity_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_first_listing_date,-1)))) < 20
+	    WHEN datediff('week',DATE_TRUNC('week',DATE(fhlf.sk_opportunity_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_first_listing_date,-1)))) < 5
 	         THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(fhlf.sk_opportunity_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_first_listing_date,-1))))
-	    WHEN datediff('week',DATE_TRUNC('week',DATE(fhlf.sk_opportunity_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_first_listing_date,-1)))) >= 20
-	     	 THEN 'W20+'
+	    WHEN datediff('week',DATE_TRUNC('week',DATE(fhlf.sk_opportunity_date)),DATE_TRUNC('week',DATE(NULLIF(fhlf.sk_first_listing_date,-1)))) >= 5
+	     	 THEN 'W5+'
 	END AS weeks_conversion,
   	NULL::BIGINT AS l2p,
 	NULL::BIGINT AS p2q,
@@ -298,10 +298,10 @@ SELECT
   rf.funnel_first_touchpoint AS first_touchpoint,
   FALSE AS is_guarantee,
   CASE
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_booking_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_visit_date,-1)))) < 20
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_booking_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_visit_date,-1)))) < 5
 	   THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(rf.sk_booking_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_visit_date,-1))))
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_booking_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_visit_date,-1)))) >= 20
-	   THEN 'W20+'
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_booking_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_visit_date,-1)))) >= 5
+	   THEN 'W5+'
   END AS weeks_conversion,
   NULL::BIGINT AS l2p,
   NULL::BIGINT AS p2q,
@@ -347,10 +347,10 @@ SELECT
   rf.funnel_first_touchpoint AS first_touchpoint,
   FALSE AS is_guarantee,
   CASE
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_visit_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_offer_submitted_date,-1)))) < 20
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_visit_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_offer_submitted_date,-1)))) < 5
 	   THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(rf.sk_visit_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_offer_submitted_date,-1))))
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_visit_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_offer_submitted_date,-1)))) >= 20
-	   THEN 'W20+'
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_visit_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_offer_submitted_date,-1)))) >= 5
+	   THEN 'W5+'
   END AS weeks_conversion,
   NULL::BIGINT AS l2p,
   NULL::BIGINT AS p2q,
@@ -396,10 +396,10 @@ SELECT
   rf.funnel_first_touchpoint AS first_touchpoint,
   FALSE AS is_guarantee,
   CASE
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_offer_submitted_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_offer_approved_date,-1)))) < 20
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_offer_submitted_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_offer_approved_date,-1)))) < 5
            THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(rf.sk_offer_submitted_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_offer_approved_date,-1))))
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_offer_submitted_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_offer_approved_date,-1)))) >= 20
-	   THEN 'W20+'
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_offer_submitted_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_offer_approved_date,-1)))) >= 5
+	   THEN 'W5+'
   END AS weeks_conversion,
   NULL::BIGINT AS l2p,
   NULL::BIGINT AS p2q,
@@ -445,10 +445,10 @@ SELECT
   rf.funnel_first_touchpoint AS first_touchpoint,
   FALSE AS is_guarantee,
   CASE
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_offer_approved_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_first_credit_evaluation_init,-1)))) < 20
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_offer_approved_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_first_credit_evaluation_init,-1)))) < 5
            THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(rf.sk_offer_approved_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_first_credit_evaluation_init,-1))))
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_offer_approved_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_first_credit_evaluation_init,-1)))) >= 20
-	   THEN 'W20+'
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_offer_approved_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_first_credit_evaluation_init,-1)))) >= 5
+	   THEN 'W5+'
   END AS weeks_conversion,
   NULL::BIGINT AS l2p,
   NULL::BIGINT AS p2q,
@@ -494,10 +494,10 @@ SELECT
   rf.funnel_first_touchpoint AS first_touchpoint,
   rf.guarantee = 'RentalGuarantee' AS is_guarantee,
   CASE
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_first_credit_evaluation_init)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_first_credit_evaluation_positive,-1)))) < 20
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_first_credit_evaluation_init)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_first_credit_evaluation_positive,-1)))) < 5
 	   THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(rf.sk_first_credit_evaluation_init)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_first_credit_evaluation_positive,-1))))
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_first_credit_evaluation_init)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_first_credit_evaluation_positive,-1)))) >= 20
-	   THEN 'W20+'
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_first_credit_evaluation_init)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_first_credit_evaluation_positive,-1)))) >= 5
+	   THEN 'W5+'
   END AS weeks_conversion,
   NULL::BIGINT AS l2p,
   NULL::BIGINT AS p2q,
@@ -544,10 +544,10 @@ SELECT
   rf.funnel_first_touchpoint AS first_touchpoint,
   rf.guarantee = 'RentalGuarantee' AS is_guarantee,
   CASE
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_first_credit_evaluation_init)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_guarantee_date,-1)))) < 20
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_first_credit_evaluation_init)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_guarantee_date,-1)))) < 5
 	   THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(rf.sk_first_credit_evaluation_init)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_guarantee_date,-1))))
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_first_credit_evaluation_init)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_guarantee_date,-1)))) >= 20
-	   THEN 'W20+'
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_first_credit_evaluation_init)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_guarantee_date,-1)))) >= 5
+	   THEN 'W5+'
   END AS weeks_conversion,
   NULL::BIGINT AS l2p,
   NULL::BIGINT AS p2q,
@@ -594,10 +594,10 @@ SELECT
   rf.funnel_first_touchpoint AS first_touchpoint,
   rf.guarantee = 'RentalGuarantee' AS is_guarantee,
   CASE
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_first_credit_evaluation_positive)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1)))) < 20
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_first_credit_evaluation_positive)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1)))) < 5
            THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(rf.sk_first_credit_evaluation_positive)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1))))
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_first_credit_evaluation_positive)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1)))) >= 20
-	   THEN 'W20+'
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_first_credit_evaluation_positive)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1)))) >= 5
+	   THEN 'W5+'
   END AS weeks_conversion,
   NULL::BIGINT AS l2p,
   NULL::BIGINT AS p2q,
@@ -644,10 +644,10 @@ SELECT
   rf.funnel_first_touchpoint AS first_touchpoint,
   rf.guarantee = 'RentalGuarantee' AS is_guarantee,
   CASE
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_guarantee_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1)))) < 20
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_guarantee_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1)))) < 5
 	   THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(rf.sk_guarantee_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1))))
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_guarantee_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1)))) >= 20
-	   THEN 'W20+'
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_guarantee_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_tenant_first_doc_sent_date,-1)))) >= 5
+	   THEN 'W5+'
   END AS weeks_conversion,
   NULL::BIGINT AS l2p,
   NULL::BIGINT AS p2q,
@@ -694,10 +694,10 @@ SELECT
   rf.funnel_first_touchpoint AS first_touchpoint,
   rf.guarantee = 'RentalGuarantee' AS is_guarantee,
   CASE
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_tenant_first_doc_sent_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1)))) < 20
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_tenant_first_doc_sent_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1)))) < 5
 	   THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(rf.sk_tenant_first_doc_sent_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1))))
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_tenant_first_doc_sent_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1)))) >= 20
-	   THEN 'W20+'
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_tenant_first_doc_sent_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_credit_analysis_approved_date_adjust,-1)))) >= 5
+	   THEN 'W5+'
   END AS weeks_conversion,
   NULL::BIGINT AS l2p,
   NULL::BIGINT AS p2q,
@@ -743,10 +743,10 @@ SELECT
   rf.funnel_first_touchpoint AS first_touchpoint,
   rf.guarantee = 'RentalGuarantee' AS is_guarantee,
   CASE
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_credit_analysis_approved_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_created_date,-1)))) < 20
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_credit_analysis_approved_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_created_date,-1)))) < 5
 	   THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(rf.sk_credit_analysis_approved_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_created_date,-1))))
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_credit_analysis_approved_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_created_date,-1)))) >= 20
-	   THEN 'W20+'
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_credit_analysis_approved_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_created_date,-1)))) >= 5
+	   THEN 'W5+'
   END AS weeks_conversion,
   NULL::BIGINT AS l2p,
   NULL::BIGINT AS p2q,
@@ -793,10 +793,10 @@ SELECT
   rf.funnel_first_touchpoint AS first_touchpoint,
   rf.guarantee = 'RentalGuarantee' AS is_guarantee,
   CASE
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_credit_analysis_approved_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_guarantee_paid_date,-1)))) < 20
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_credit_analysis_approved_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_guarantee_paid_date,-1)))) < 5
 	   THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(rf.sk_credit_analysis_approved_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_guarantee_paid_date,-1))))
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_credit_analysis_approved_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_guarantee_paid_date,-1)))) >= 20
-	   THEN 'W20+'
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_credit_analysis_approved_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_guarantee_paid_date,-1)))) >= 5
+	   THEN 'W5+'
   END AS weeks_conversion,
   NULL::BIGINT AS l2p,
   NULL::BIGINT AS p2q,
@@ -843,10 +843,10 @@ SELECT
   rf.funnel_first_touchpoint AS first_touchpoint,
   rf.guarantee = 'RentalGuarantee' AS is_guarantee,
   CASE
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_guarantee_paid_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_created_date,-1)))) < 20
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_guarantee_paid_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_created_date,-1)))) < 5
 	   THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(rf.sk_guarantee_paid_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_created_date,-1))))
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_guarantee_paid_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_created_date,-1)))) >= 20
-	   THEN 'W20+'
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_guarantee_paid_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_created_date,-1)))) >= 5
+	   THEN 'W5+'
   END AS weeks_conversion,
   NULL::BIGINT AS l2p,
   NULL::BIGINT AS p2q,
@@ -893,10 +893,10 @@ SELECT
   rf.funnel_first_touchpoint AS first_touchpoint,
   rf.guarantee = 'RentalGuarantee' AS is_guarantee,
   CASE
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_credit_analysis_approved_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_signed_date,-1)))) < 20
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_credit_analysis_approved_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_signed_date,-1)))) < 5
            THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(rf.sk_credit_analysis_approved_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_signed_date,-1))))
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_credit_analysis_approved_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_signed_date,-1)))) >= 20
-	   THEN 'W20+'
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_credit_analysis_approved_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_signed_date,-1)))) >= 5
+	   THEN 'W5+'
   END AS weeks_conversion,
   NULL::BIGINT AS l2p,
   NULL::BIGINT AS p2q,
@@ -942,10 +942,10 @@ SELECT
   rf.funnel_first_touchpoint AS first_touchpoint,
   rf.guarantee = 'RentalGuarantee' AS is_guarantee,
   CASE
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_da_gp_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_signed_date,-1)))) < 20
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_da_gp_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_signed_date,-1)))) < 5
   	   THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(rf.sk_da_gp_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_signed_date,-1))))
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_da_gp_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_signed_date,-1)))) >= 20
-	   THEN 'W20+'
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_da_gp_date_adjust)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_signed_date,-1)))) >= 5
+	   THEN 'W5+'
   END AS weeks_conversion,
   NULL::BIGINT AS l2p,
   NULL::BIGINT AS p2q,
@@ -991,10 +991,10 @@ SELECT
   rf.funnel_first_touchpoint AS first_touchpoint,
   rf.guarantee = 'RentalGuarantee' AS is_guarantee,
   CASE
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_contract_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_signed_date,-1)))) < 20
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_contract_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_signed_date,-1)))) < 5
 	   THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(rf.sk_contract_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_signed_date,-1))))
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_contract_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_signed_date,-1)))) >= 20
-	   THEN 'W20+'
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_contract_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_signed_date,-1)))) >= 5
+	   THEN 'W5+'
   END AS weeks_conversion,
   NULL::BIGINT AS l2p,
   NULL::BIGINT AS p2q,
@@ -1040,10 +1040,10 @@ SELECT
   rf.funnel_first_touchpoint AS first_touchpoint,
   rf.guarantee = 'RentalGuarantee' AS is_guarantee,
   CASE
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_contract_signed_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_annulment_date,-1)))) < 20
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_contract_signed_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_annulment_date,-1)))) < 5
 	   THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(rf.sk_contract_signed_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_annulment_date,-1))))
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_contract_signed_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_annulment_date,-1)))) >= 20
-	   THEN 'W20+'
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_contract_signed_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_contract_annulment_date,-1)))) >= 5
+	   THEN 'W5+'
   END AS weeks_conversion,
   NULL::BIGINT AS l2p,
   NULL::BIGINT AS p2q,
