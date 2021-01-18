@@ -171,8 +171,8 @@ JOIN
 ),
 sale_demand_events AS (
 SELECT
-	COALESCE(offers.id_user, sc.sk_buyer, tta.tenant_id::BIGINT) AS id_buyer,
-	COALESCE(offers.id_house, sc.sk_house, tta.house_id::BIGINT, sc.sk_house) AS id_house,
+	COALESCE(offers.id_user, sc.sk_buyer, tta.tenant_id::BIGINT, db.id_visitor) AS id_buyer,
+	COALESCE(offers.id_house, sc.sk_house, tta.house_id::BIGINT, sc.sk_house, db.id_property) AS id_house,
 	offers.dt_offer_sent,
 	offers.dt_deal_qualified,
 	offers.dt_offer_accepted,
@@ -197,7 +197,10 @@ SELECT
 	tta.first_attendance_ts::TIMESTAMP AS tta_completed,
 	sc.os_date,
 	sc.oa_date,
-	sc.ccv_date
+	sc.ccv_date,
+	db.sk_booking,
+	db.dt_created,
+	db.dt_completed
 FROM
     monday_adjusted offers
 FULL OUTER JOIN
@@ -206,10 +209,13 @@ FULL OUTER JOIN
 FULL OUTER JOIN
 	sale_closing AS sc
 		ON offers.id_offer = sc.sk_offer
+FULL OUTER JOIN
+    sale_bookings db
+        ON (offers.id_house = db.id_property AND offers.id_user = db.id_visitor)
 ),
 sale_demand_classification AS (
 SELECT
-	sde.id_buyer,
+    sde.id_buyer,
 	sde.id_house,
 	sdr.city_group,
 	pma.form_of_payment,
@@ -221,9 +227,9 @@ SELECT
 	sde.oa_date AS dt_offer_accepted,
 	sde.ccv_date AS dt_ccv_signed,
 	sde.id_offer,
-	db.sk_booking,
-	db.dt_created,
-	db.dt_completed,
+	sde.sk_booking,
+	sde.dt_created,
+	sde.dt_completed,
 	sde.tta_id,
 	sde.tta_started,
 	sde.tta_completed,
@@ -246,9 +252,6 @@ SELECT
 	fsf.higher_intent_after_offer
 FROM
     sale_demand_events sde
-FULL OUTER JOIN
-    sale_bookings db
-        ON (sde.id_house = db.id_property AND sde.id_buyer = db.id_visitor)
 LEFT JOIN
 	sale.fact_sale_flows AS fsf
 		ON sde.id_buyer = fsf.sk_buyer::VARCHAR
