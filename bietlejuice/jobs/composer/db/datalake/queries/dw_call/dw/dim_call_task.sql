@@ -22,7 +22,7 @@ SELECT
     ts_created,
     ts_ended,
     dt_updated,
-    NOW() AS ts_load
+    GETDATE() AS ts_load
 FROM
     reservations r
 INNER JOIN

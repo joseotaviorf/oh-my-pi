@@ -34,7 +34,7 @@ SELECT
     seconds_duration,
     seconds_wait_time,
     seconds_talk_time,
-    NOW() AS ts_load
+    GETDATE() AS ts_load
 FROM
     reservations r
 INNER JOIN
