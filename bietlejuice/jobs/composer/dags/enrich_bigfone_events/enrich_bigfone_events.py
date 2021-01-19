@@ -61,7 +61,7 @@ file_list = FileService.list_sql_files_without_extension_from_layer(
 )
 
 enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(
-    dag, file_list, partitions=PARTITION_COLS
+    dag, file_list, partitions=PARTITION_COLS, is_incremental=True
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
