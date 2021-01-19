@@ -27,6 +27,7 @@ class IncrementalTableLoaderPipeline(TableLoaderPipeline):
             format_options=format_options,
             database_location=self.target_database_location,
             partitions=self.partitions,
+            force_recreate=False,
         )
 
         spark_metastore_service.create_new_partitions_from_df(
