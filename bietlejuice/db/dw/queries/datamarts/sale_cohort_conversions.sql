@@ -192,12 +192,10 @@ FULL OUTER JOIN
     sale_closing sc
         ON offers.id_offer = sc.sk_offer
 ),
-sale_demand_classification AS (
+sale_demand_events_complete AS (
 SELECT
-	COALESCE(sde.id_buyer, db.id_visitor) AS id_buyer,
+    COALESCE(sde.id_buyer, db.id_visitor) AS id_buyer,
 	COALESCE(sde.id_house, db.id_property) AS id_house,
-	sdr.city_group,
-	pma.form_of_payment,
 	sde.os_date AS dt_offer_sent,
 	sde.dt_deal_qualified,
 	sde.oa_date AS dt_offer_accepted,
@@ -219,25 +217,56 @@ SELECT
 	sde.id_offer,
 	db.sk_booking,
 	db.dt_created,
-	db.dt_completed,
-	fsf.first_event AS first_touchpoint,
-	fsf.higher_intent_before_offer,
-	fsf.higher_intent_after_offer
+	db.dt_completed
 FROM
     sale_demand_events sde
 FULL OUTER JOIN
     sale_bookings db
         ON (sde.id_house = db.id_property AND sde.id_buyer = db.id_visitor)
+),
+sale_demand_classification AS (
+SELECT
+    sdc.id_offer,
+    sdc.sk_booking,
+	sdc.id_buyer,
+	sdc.id_house,
+	sdr.city_group,
+	pma.form_of_payment,
+	sdc.dt_created,
+	sdc.dt_completed,
+	sdc.dt_offer_sent,
+	sdc.dt_deal_qualified,
+	sdc.dt_offer_accepted,
+	sdc.dt_ccv_signed,
+	sdc.dt_offer_rejected,
+	sdc.dt_diligence_started_legaut,
+	sdc.dt_diligence_ended_legaut,
+	sdc.dt_diligence_ended,
+	sdc.dt_diligence_started_legal,
+	sdc.dt_diligence_ended_legal,
+	sdc.dt_credit_started,
+	sdc.dt_credit_approved,
+	sdc.dt_payment_concluded,
+	sdc.dt_matricula_inicio,
+	sdc.dt_matricula_atualizada,
+	sdc.dt_entrega_chaves,
+	sdc.dt_finan_started,
+	sdc.dt_finan_ended,
+	fsf.first_event AS first_touchpoint,
+	fsf.higher_intent_before_offer,
+	fsf.higher_intent_after_offer
+FROM
+    sale_demand_events_complete sdc
 LEFT JOIN
     sale.fact_sale_flows fsf
-        ON sde.id_buyer = fsf.sk_buyer::VARCHAR
-        AND sde.id_house = fsf.sk_house::VARCHAR
+        ON sdc.id_buyer = fsf.sk_buyer::VARCHAR
+        AND sdc.id_house = fsf.sk_house::VARCHAR
 LEFT JOIN
     sale_demand_region sdr
-        ON sdr.id_house::VARCHAR = sde.id_house
+        ON sdr.id_house::VARCHAR = sdc.id_house
 LEFT JOIN
     payment_method_adjusted pma
-        ON pma.id = sde.id_offer
+        ON pma.id = sdc.id_offer
 ),
 p2fc AS (
 SELECT

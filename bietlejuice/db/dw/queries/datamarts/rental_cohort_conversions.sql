@@ -298,9 +298,9 @@ SELECT
   rf.funnel_first_touchpoint AS first_touchpoint,
   FALSE AS is_guarantee,
   CASE
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_booking_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_visit_date,-1)))) < 5
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_booking_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_visit_date,-1)))) < 5 and rf.flg_visit_completed
 	   THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(rf.sk_booking_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_visit_date,-1))))
-      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_booking_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_visit_date,-1)))) >= 5
+      WHEN datediff('week',DATE_TRUNC('week',DATE(rf.sk_booking_created_date)),DATE_TRUNC('week',DATE(NULLIF(rf.sk_visit_date,-1)))) >= 5 and rf.flg_visit_completed
 	   THEN 'W5+'
   END AS weeks_conversion,
   NULL::BIGINT AS l2p,
