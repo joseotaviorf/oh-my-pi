@@ -6,8 +6,7 @@
    },
    {
      "table_name": "admin_fee_option_aud",
-     "extraction_type": "incremental",
-     "date_filter_column": "updated_at"
+     "extraction_type": "full"
    },
    {
      "table_name": "charge_delay",
@@ -44,8 +43,7 @@
    },
    {
      "table_name": "house_aud",
-     "extraction_type": "incremental",
-     "date_filter_column": "updated_at"
+     "extraction_type": "full"
    },
    {
      "table_name": "house_brokerage_fee",
