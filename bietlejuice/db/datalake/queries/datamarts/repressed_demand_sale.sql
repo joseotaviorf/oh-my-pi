@@ -6,6 +6,8 @@ with house_available_hours as (
 		from datalake_ebdb_raw_prod.horariosemanalimovel_aud hou
 			join datalake_ebdb_clean_prod.user_revision_entity ure
 				on hou.rev = ure.id
+			join datalake_ebdb_clean_prod.listing_business_context lbc 
+	            ON hou.imovel_id = lbc.id_house AND business_context = 'SALE'
 	),
 	house_available as (
 		select
@@ -33,7 +35,7 @@ with house_available_hours as (
 		cast(replace(cast(date(available_ended_date) as varchar),'-','')as bigint) as sk_available_ended_date,
 		available_started_date,
 		available_ended_date,
-		day_of_week,
+		CAST(day_of_week AS BIGINT) AS day_of_week,
 		hours_available_08to09,
 		hours_available_09to10,
 		hours_available_10to11,
@@ -46,7 +48,7 @@ with house_available_hours as (
 		hours_available_17to18,
 		hours_available_18to19,
 		hours_available_19to20
-	from house_available
+	from house_available ha
 )
 , date_series as (
 	select
@@ -60,12 +62,12 @@ with house_available_hours as (
 			else 'Weekday' 
 		end as week_day_type
 	from datalake_clean.ods_dim_date dd
-	where date(date) >= date('2019-01-01') and date(week_start) <= current_date - interval '1' day
+	where date(date) >= date('2020-01-01') and date(week_start) <= current_date - interval '1' day
 		and date != ''
 )
 , regions as (
-	select distinct
-		dr.id as region_id,
+	select
+		CAST(dr.id AS BIGINT) as region_id,
 		case 
 		    when dr.region_code = 'SPO 01' then 'SPO 01 FS' 
 		    when dr.region_code = 'SPO 02' then 'SPO 02 FS' 
@@ -94,7 +96,9 @@ with house_available_hours as (
 		dr.city_group,
 		dr.city_name
 	from datalake_clean.ods_dim_region dr
-	where dr.region_code != '-1'
+	where 
+		dr.region_code != '-1'
+		and dr.city_name IN ('São Paulo', 'Rio de Janeiro', 'Guarulhos', 'São Caetano do Sul', 'Jundiaí', 'Osasco', 'Santo André', 'Niterói', 'São Bernardo do Campo', 'Barueri', 'Diadema')
 )
 , slot_series as (
 	select slot 
@@ -134,6 +138,8 @@ with house_available_hours as (
 	from regions r
       cross join date_series ds
       cross join slot_series ss
+    where
+        date >= current_date - interval '6' month
 )
 , encaixe_to_booking as (
 	select distinct
@@ -142,6 +148,7 @@ with house_available_hours as (
 	from datalake_clean.ods_dim_booking
 	where type = 'Visita'
 		and visit_intent = 'SALE'
+		and date(date_parse(dt_scheduling, '%Y-%m-%d %H:%i:%s')) >= date('2020-06-01')
 )
 , booking_for_rent as (
 	select distinct
@@ -155,14 +162,16 @@ with house_available_hours as (
 	from datalake_clean.ods_dim_booking
 	where type = 'Visita'
 		and visit_intent = 'RENT'
+		and id_visitor != ''
+		and date(date_parse(dt_scheduling, '%Y-%m-%d %H:%i:%s')) >= date('2020-06-01')
 		and (status = 'Realizado' OR status = 'Marcado' OR            
                     (status = 'Cancelado' and date(date_parse(dt_scheduling, '%Y-%m-%d %H:%i:%s')) = try_cast(try_cast(substring(dt_cancel,1,19) as timestamp) as date)))
 )
 , encaixes_raw as (
     select
         evt.ts_event as event_date,
-        trim(evt.id_user) as user_id,
-        trim(coalesce(evt.ep_house_id, null)) as house_id,
+        CAST(trim(evt.id_user) AS BIGINT) as user_id,
+        CAST(trim(evt.ep_house_id) AS BIGINT) as house_id,
         cast(date_parse(evt.ep_alert_target_date, '%a, %d %b %Y %T GMT') as date) as target_date,
         cast(trim(evt.ep_alert_slot_from) as double) alert_slot_from,
         cast(trim(evt.ep_alert_slot_to) as double) alert_slot_to,
@@ -170,24 +179,25 @@ with house_available_hours as (
         rank() over (partition by trim(evt.id_user), trim(coalesce(evt.ep_house_id, '')) order by evt.ts_event desc) as rank_enc
         from datalake_amplitude_clean_prod."170698_visit_hoursalert_confirmed_events" as evt
     left join encaixe_to_booking etb on etb.user_id = trim(evt.id_user) and etb.house_id = trim(coalesce(evt.ep_house_id, ''))
-    where cast(evt.year as varchar) || '-' || lpad(cast(evt.month as varchar), 2 , '0') >= '2019-01'
+    where cast(evt.year as varchar) || '-' || lpad(cast(evt.month as varchar), 2 , '0') >= '2020-06'
     	and cast(json_extract(event_properties, '$.business_context') as varchar) = 'sale'
 )
 , encaixes_temp as (
 	select distinct
-		encaixe_realizado,
-		user_id,
-		house_id,
+		enc.encaixe_realizado,
+		enc.user_id,
+		enc.house_id,
 		h.id_region as region_id,
-		target_date,
-		event_date,
-		slot,
+		enc.target_date,
+		enc.event_date,
+		ss.slot,
 		1 / cast(count(slot) over (partition by enc.user_id, enc.house_id, enc.target_date) as double) as slot_share_encaixe
 	from encaixes_raw enc
-	left join slot_series ss on ss.slot between enc.alert_slot_from and enc.alert_slot_to
-    join datalake_ebdb_clean_prod.house h on h.id = cast(enc.house_id as bigint)
+	join slot_series ss on ss.slot between enc.alert_slot_from and enc.alert_slot_to
+    join datalake_ebdb_clean_prod.house h on h.id = enc.house_id
     where enc.rank_enc = 1
-    	and enc.user_id != ''
+    	and enc.user_id is not null
+    	and enc.target_date is not null
         and h.id_region is not null
 )
 , blocked_houses as (
@@ -195,14 +205,14 @@ with house_available_hours as (
 		*
 	from (
 			select
-            	id_house as house_id,
+            	vs.id_house as house_id,
               	vs.status,
-              	from_unixtime(cast(r.ts_revision as bigint)/1000) as init,
-            	coalesce(from_unixtime(cast(lead(r.ts_revision) over (partition by id_house order by r.ts_revision)as bigint)/1000), current_date) as "end"
+              	r.ts_revision as init,
+            	coalesce(lead(r.ts_revision) over (partition by vs.id_house order by r.ts_revision), current_date) as "end"
           	from datalake_ebdb_clean_prod.house_visit_status_aud vs
-			join datalake_ebdb_clean_prod.user_revision_entity r on vs.REV = r.id and mod_status = true
-			join datalake_ebdb_raw_prod.listingbusinesscontext lbc on lbc.imovelid = vs.id_house
-			WHERE lbc.status <> 'EDITING' AND lbc.businessContext = 'SALE'
+			join datalake_ebdb_user_revision_entity_prod.user_revision_entity r on vs.REV = r.id and mod_status = true
+			join datalake_ebdb_clean_prod.listing_business_context lbc on lbc.id_house = vs.id_house
+			WHERE lbc.status <> 'EDITING' AND lbc.business_context = 'SALE'
       	)
   where status = 'BLOCKED'
 )
@@ -213,10 +223,10 @@ with house_available_hours as (
           	select
 				laud.imovelid as house_id,
 				laud.status,
-				from_unixtime(cast(r.ts_revision as bigint)/1000) as init,
-				coalesce(from_unixtime(cast(lead(r.ts_revision) over (partition by imovelid order by r.ts_revision)as bigint)/1000), current_date) as "end"
+				r.ts_revision as init,
+				coalesce(lead(r.ts_revision) over (partition by imovelid order by r.ts_revision), current_date) as "end"
 			  from datalake_ebdb_raw_prod.listingbusinesscontext_aud laud
-			  join datalake_ebdb_clean_prod.user_revision_entity r 
+			  join datalake_ebdb_user_revision_entity_prod.user_revision_entity r 
 				on laud.rev = r.id 
 				and laud.status_mod = '1'
 			WHERE laud.businessContext = 'SALE'
@@ -235,70 +245,71 @@ with house_available_hours as (
       	case when encaixe_realizado = 1 then slot_share_encaixe end as slot_share_encaixe_realizado,
       	case when encaixe_realizado = 0 then slot_share_encaixe end as slot_share_encaixe_nao_realizado,
       	case when encaixe_realizado = 0
-        	      and ((cast(slot as bigint) between  0 and  3 and hs.hours_available_08to09 = false)
-        	      	or (cast(slot as bigint) between  4 and  7 and hs.hours_available_09to10 = false)
-                    or (cast(slot as bigint) between  8 and 11 and hs.hours_available_10to11 = false)
-                    or (cast(slot as bigint) between 12 and 15 and hs.hours_available_11to12 = false)
-                    or (cast(slot as bigint) between 16 and 19 and hs.hours_available_12to13 = false)
-                    or (cast(slot as bigint) between 20 and 23 and hs.hours_available_13to14 = false)
-                    or (cast(slot as bigint) between 24 and 27 and hs.hours_available_14to15 = false)
-                    or (cast(slot as bigint) between 28 and 31 and hs.hours_available_15to16 = false)
-                    or (cast(slot as bigint) between 32 and 35 and hs.hours_available_16to17 = false)
-                	or (cast(slot as bigint) between 36 and 39 and hs.hours_available_17to18 = false)
-                	or (cast(slot as bigint) between 40 and 43 and hs.hours_available_18to19 = false))
-        then slot_share_encaixe
+        	     and ((slot between  0 and  3 and hs.hours_available_08to09 = false)
+        	      	or (slot between  4 and  7 and hs.hours_available_09to10 = false)
+                    or (slot between  8 and 11 and hs.hours_available_10to11 = false)
+                    or (slot between 12 and 15 and hs.hours_available_11to12 = false)
+                    or (slot between 16 and 19 and hs.hours_available_12to13 = false)
+                    or (slot between 20 and 23 and hs.hours_available_13to14 = false)
+                    or (slot between 24 and 27 and hs.hours_available_14to15 = false)
+                    or (slot between 28 and 31 and hs.hours_available_15to16 = false)
+                    or (slot between 32 and 35 and hs.hours_available_16to17 = false)
+                	or (slot between 36 and 39 and hs.hours_available_17to18 = false)
+                	or (slot between 40 and 43 and hs.hours_available_18to19 = false))
+            then slot_share_encaixe
         end as slot_share_nao_realizados_por_agenda,
-      	case when encaixe_realizado = 0 and (((t.event_date between sh.init and sh."end") and sh.status = 'SUSPENDED') or ((t.event_date between bh.init and bh."end") and bh.status = 'BLOCKED')
-					or ((cast(slot as bigint) between  0 and  3 and hs.hours_available_08to09 = false)
-                    or (cast(slot as bigint) between  4 and  7 and hs.hours_available_08to09 = false)
-                    or (cast(slot as bigint) between  8 and 11 and hs.hours_available_10to11 = false)
-                    or (cast(slot as bigint) between 12 and 15 and hs.hours_available_11to12 = false)
-                    or (cast(slot as bigint) between 16 and 19 and hs.hours_available_12to13 = false)
-                    or (cast(slot as bigint) between 20 and 23 and hs.hours_available_13to14 = false)
-                    or (cast(slot as bigint) between 24 and 27 and hs.hours_available_14to15 = false)
-                    or (cast(slot as bigint) between 28 and 31 and hs.hours_available_15to16 = false)
-                    or (cast(slot as bigint) between 32 and 35 and hs.hours_available_16to17 = false)
-					or (cast(slot as bigint) between 36 and 39 and hs.hours_available_17to18 = false)
-					or (cast(slot as bigint) between 40 and 43 and hs.hours_available_18to19 = false)))
+      	case when encaixe_realizado = 0 and (((t.event_date between sh.init and sh."end") and sh.status = 'suspenso') or ((t.event_date between bh.init and bh."end") and bh.status = 'BLOCKED')
+					or ((slot between  0 and  3 and hs.hours_available_08to09 = false)
+                    or (slot between  4 and  7 and hs.hours_available_09to10 = false)
+                    or (slot between  8 and 11 and hs.hours_available_10to11 = false)
+                    or (slot between 12 and 15 and hs.hours_available_11to12 = false)
+                    or (slot between 16 and 19 and hs.hours_available_12to13 = false)
+                    or (slot between 20 and 23 and hs.hours_available_13to14 = false)
+                    or (slot between 24 and 27 and hs.hours_available_14to15 = false)
+                    or (slot between 28 and 31 and hs.hours_available_15to16 = false)
+                    or (slot between 32 and 35 and hs.hours_available_16to17 = false)
+					or (slot between 36 and 39 and hs.hours_available_17to18 = false)
+					or (slot between 40 and 43 and hs.hours_available_18to19 = false)))
 		then slot_share_encaixe end as slot_share_nao_realizados_por_bloqueio_suspensao_agenda,
         cast(hs.hours_available_08to09 as bigint) + cast(hs.hours_available_09to10 as bigint) + cast(hs.hours_available_10to11 as bigint) +
         cast(hs.hours_available_11to12 as bigint) + cast(hs.hours_available_12to13 as bigint) + cast(hs.hours_available_13to14 as bigint) +
         cast(hs.hours_available_14to15 as bigint) + cast(hs.hours_available_15to16 as bigint) + cast(hs.hours_available_16to17 as bigint) +
 		cast(hs.hours_available_17to18 as bigint) + cast(hs.hours_available_18to19 as bigint) as slots_disponiveis_target_date,
-		case when encaixe_realizado = 0 and visit_intent = 'RENT' then slot_share_encaixe else null end as slot_share_ocupado_por_visita_rent
+        case when encaixe_realizado = 0 and visit_intent = 'RENT' then slot_share_encaixe else null end as slot_share_ocupado_por_visita_rent
 	from encaixes_temp t
     left join house_available_hours hs
-    	on cast(t.house_id as bigint) = hs.id_house
-        and cast(hs.day_of_week as bigint) = dow(t.target_date)
-        and t.event_date between hs.available_started_date and coalesce(hs.available_ended_date, (date_add('day',2,current_date)))
+    	on t.house_id = hs.id_house
+        and hs.day_of_week = dow(t.target_date)
+        and t.event_date between hs.available_started_date and coalesce(hs.available_ended_date, (date_add('day', 2, current_date)))
     left join blocked_houses bh
-		on (cast(t.house_id as bigint) = bh.house_id
-		and t.event_date between bh.init and bh."end")
+		on t.house_id = bh.house_id
+		and t.event_date between bh.init and bh."end"
 	left join suspended_houses sh
-    	on (cast(t.house_id as bigint) = sh.house_id
-		and t.event_date between sh.init and sh."end")
-	left join booking_for_rent bfr
-		on cast(t.house_id as bigint) = bfr.house_id
+    	on t.house_id = sh.house_id
+		and t.event_date between sh.init and sh."end"
+    left join booking_for_rent bfr
+		on t.house_id = bfr.house_id
 		and t.target_date = bfr.visit_date
 		and t.slot = bfr.slot_dia
+	where target_date >= current_date - interval '6' month
 )
 , encaixes_agg as (
 	select
-		region_id,
-        target_date,
-        slot,
-        sum(slot_share_encaixe) as share_encaixes_total,
-        sum(slot_share_encaixe_realizado) as share_encaixes_realizados,
-        sum(slot_share_encaixe_nao_realizado) as share_encaixes_nao_realizados,
-        sum(slot_share_nao_realizados_por_agenda) as share_encaixes_nao_realizados_por_agenda,
-        sum(slot_share_nao_realizados_por_bloqueio) as share_encaixes_nao_realizados_por_bloqueio,
-        sum(slot_share_nao_realizados_por_suspensao) as share_encaixes_nao_realizados_por_suspensao,
-        sum(slot_share_nao_realizados_por_bloqueio_suspensao) as share_encaixes_nao_realizados_por_bloqueio_suspensao,
-        sum(slot_share_nao_realizados_por_bloqueio_suspensao_agenda) as share_encaixes_nao_realizados_por_bloqueio_suspensao_agenda,
-        sum(case when slots_disponiveis_target_date = 0 then slot_share_encaixe end) as encaixes_em_imovel_sem_slot_disponivel_target_date,
-        sum(slot_share_ocupado_por_visita_rent) as share_encaixes_nao_realizados_por_visita_rent,
-        sum(coalesce(slot_share_encaixe_nao_realizado,0) - (coalesce(slot_share_nao_realizados_por_bloqueio_suspensao_agenda,0) + coalesce(slot_share_ocupado_por_visita_rent,0))) as share_encaixes_nao_realizados_por_agent
-	from encaixes_clean
+		ec.region_id,
+        ec.target_date,
+        ec.slot,
+        sum(ec.slot_share_encaixe) as share_encaixes_total,
+        sum(ec.slot_share_encaixe_realizado) as share_encaixes_realizados,
+        sum(ec.slot_share_encaixe_nao_realizado) as share_encaixes_nao_realizados,
+        sum(ec.slot_share_nao_realizados_por_agenda) as share_encaixes_nao_realizados_por_agenda,
+        sum(ec.slot_share_nao_realizados_por_bloqueio) as share_encaixes_nao_realizados_por_bloqueio,
+        sum(ec.slot_share_nao_realizados_por_suspensao) as share_encaixes_nao_realizados_por_suspensao,
+        sum(ec.slot_share_nao_realizados_por_bloqueio_suspensao) as share_encaixes_nao_realizados_por_bloqueio_suspensao,
+        sum(ec.slot_share_nao_realizados_por_bloqueio_suspensao_agenda) as share_encaixes_nao_realizados_por_bloqueio_suspensao_agenda,
+        sum(case when ec.slots_disponiveis_target_date = 0 then ec.slot_share_encaixe end) as encaixes_em_imovel_sem_slot_disponivel_target_date,
+        sum(ec.slot_share_ocupado_por_visita_rent) as share_encaixes_nao_realizados_por_visita_rent,
+        sum(coalesce(ec.slot_share_encaixe_nao_realizado,0) - (coalesce(ec.slot_share_nao_realizados_por_bloqueio_suspensao_agenda,0) + coalesce(ec.slot_share_ocupado_por_visita_rent,0))) as share_encaixes_nao_realizados_por_agent
+	from encaixes_clean ec
     group by 1, 2, 3
 )
 , bookings_raw as (
@@ -313,6 +324,7 @@ with house_available_hours as (
   	join datalake_ebdb_clean_prod.house h on h.id = cast(bk.id_property as bigint)
   	where bk.type = 'Visita'
 		and bk.visit_intent = 'SALE'
+		and date(date_parse(dt_scheduling, '%Y-%m-%d %H:%i:%s')) >= date('2020-06-01')
 )
 , bookings_clean as (
 	select
@@ -322,16 +334,16 @@ with house_available_hours as (
         count(distinct user_id || house_id) as unique_bookings
     from bookings_raw
     where rank_bkg = 1
-    	and user_id != ''
+    	and user_id is not null
         and region_id is not null
 	group by 1, 2, 3
 )
 select
 	d.region_code,
-    d.city_name,
     d.city_group as city_group,
-    cast(d.date as timestamp) as date,
+    d.city_name,
     d.week_start,
+    cast(d.date as timestamp) as date,
     d.slot,
     d.hour,
     d.faixa,
@@ -356,6 +368,6 @@ left join encaixes_agg enc
 	on enc.region_id = d.region_id
     and enc.target_date = d.date
     and enc.slot = d.slot
-    and faixa is not null
-    and coalesce(bk.slot, enc.slot) is not null
+where
+    faixa is not null
 group by 1, 2, 3, 4, 5, 6, 7, 8
