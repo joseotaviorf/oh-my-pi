@@ -1,7 +1,7 @@
 SELECT
     subcampaign AS sub_campaign,
     COALESCE(subcampaignhash, 'kwKe') AS sub_campaign_hash,
-    CAST("cost_attribution_date" AS DATE) AS cost_attribution_date,
+    CAST(cost_attribution_date AS DATE) AS cost_attribution_date,
     impscount AS impressions_count,
     clickscount AS clicks_count,
     ctr,
