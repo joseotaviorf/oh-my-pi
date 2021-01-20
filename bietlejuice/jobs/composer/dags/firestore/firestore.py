@@ -21,7 +21,7 @@ SOURCE = "firestore"
 DAG_ID = f"bietlejuice.{SOURCE}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 8, 29, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "30 3 * * *"
+MAIN_SCHEDULE_INTERVAL = "30 0 * * *"
 
 # s3 paths setup
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
