@@ -1,6 +1,6 @@
 SELECT
     sub_campaign_hash AS sk_sub_campaign,
-    CAST(DATE_FORMAT(CAST(cost_attribution_date AS DATE), '%Y%m%d') AS INTEGER) AS sk_date,
+    CAST(DATE_FORMAT(CAST(cost_attribution_date AS DATE), 'yyyyMMdd') AS INTEGER) AS sk_date,
     clicks_count as clicks,
     impressions_count as impressions,
     ctr,
