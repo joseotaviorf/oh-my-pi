@@ -216,7 +216,7 @@ class CRMTaskStatusHistories(object):
             sql_file_name=sql_file_name,
             r_cols=_cols,
             c_cols=_cols,
-            row_group_offsets=1000
+            row_group_offsets=500
         )
 
     @logger
