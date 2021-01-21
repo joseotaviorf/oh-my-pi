@@ -171,6 +171,7 @@ _fact as (
         and hrf.id_client = id_tenant
         and vdo.status = 'Aprovada'
         and rs.created_at between coalesce(vdh.ts_listing_version_start, '1900-01-01') and coalesce(vdh.ts_listing_version_end, now())
+        and rs.created_at between coalesce(vdo.dt_created, '1900-01-01') and coalesce(vdp.ts_processed, vdp.dt_updated)
     left join staging.dim_booking vdb
         on vdb.sk_booking = hrf.id_booking
     where vdh.is_for_rent::int::boolean
