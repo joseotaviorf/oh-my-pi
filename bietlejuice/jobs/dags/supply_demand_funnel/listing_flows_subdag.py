@@ -22,10 +22,23 @@ class ListingFlowsSubDag(BaseSubDag):
     def build_listing_flows(self):
         listing_flows_dag = self._build_local_dag()
 
-        ods_listing_flows_with_reprocessed_leads_task, ods_potential_listings_task, ods_lead_city_region_task, \
-            dw_fact_house_listing_flows = self.__build_data_tasks(listing_flows_dag)
+        (ods_listing_flows_with_reprocessed_leads_task,
+            ods_acquisitions_task,
+            ods_base_photo_tasks_task,
+            ods_rep_leads_task,
+            ods_rn_lead_task,
+            ods_potential_listings_task,
+            ods_lead_city_region_task,
+            dw_fact_house_listing_flows) = self.__build_data_tasks(listing_flows_dag)
 
-        ods_listing_flows_with_reprocessed_leads_task >> ods_potential_listings_task >> ods_lead_city_region_task >> dw_fact_house_listing_flows
+        ods_listing_flows_with_reprocessed_leads_task.set_downstream(ods_acquisitions_task, ods_rep_leads_task)
+        ods_potential_listings_task.set_upstream(
+            ods_rn_lead_task,
+            ods_base_photo_tasks_task,
+            ods_listing_flows_with_reprocessed_leads_task
+        )
+
+        dw_fact_house_listing_flows.set_upstream(ods_potential_listings_task, ods_lead_city_region_task)
 
         return listing_flows_dag
 
@@ -38,6 +51,46 @@ class ListingFlowsSubDag(BaseSubDag):
             op_kwargs={
                 'bucket': self.bucket,
                 'view_name': 'listing_flows_with_reprocessed_leads'
+            }
+        )
+
+        ods_acquisitions_task = BaseDAG.build_python_operator(
+            dag=dag,
+            task_id='ODS_acquisitions',
+            python_callable=utils.materialize_view_ods,
+            op_kwargs={
+                'bucket': self.bucket,
+                'view_name': 'acquisitions'
+            }
+        )
+
+        ods_base_photo_tasks_task = BaseDAG.build_python_operator(
+            dag=dag,
+            task_id='ODS_base_photo_tasks',
+            python_callable=utils.materialize_view_ods,
+            op_kwargs={
+                'bucket': self.bucket,
+                'view_name': 'base_photo_tasks'
+            }
+        )
+
+        ods_rep_leads_task = BaseDAG.build_python_operator(
+            dag=dag,
+            task_id='ODS_rep_leads',
+            python_callable=utils.materialize_view_ods,
+            op_kwargs={
+                'bucket': self.bucket,
+                'view_name': 'rep_leads'
+            }
+        )
+
+        ods_rn_lead_task = BaseDAG.build_python_operator(
+            dag=dag,
+            task_id='ODS_rn_lead',
+            python_callable=utils.materialize_view_ods,
+            op_kwargs={
+                'bucket': self.bucket,
+                'view_name': 'rn_lead'
             }
         )
 
@@ -73,4 +126,13 @@ class ListingFlowsSubDag(BaseSubDag):
             }
         )
 
-        return ods_listing_flows_with_reprocessed_leads_task, ods_potential_listings_task, ods_lead_city_region_task, dw_fact_house_listing_flows
+        return (
+            ods_listing_flows_with_reprocessed_leads_task,
+            ods_acquisitions_task,
+            ods_base_photo_tasks_task,
+            ods_rep_leads_task,
+            ods_rn_lead_task,
+            ods_potential_listings_task,
+            ods_lead_city_region_task,
+            dw_fact_house_listing_flows
+        )
