@@ -84,10 +84,13 @@ bietlejuice.dw_sale_listings:
   - bietlejuice.ebdb:load-house
   - bietlejuice.ebdb:load-house-registration-status
   - bietlejuice.enrich_ebdb_listing:load-listing-business-context-to-enrich
+  - bietlejuice.enrich_sale_listings:load-sale-listing-status-to-enrich
+  - bietlejuice.enrich_sale_listings:load-sale-listing-to-enrich
 
 bietlejuice.dw_sale_offers:
   - bietlejuice.amplitude
   - bietlejuice.ebdb:load-house
+  - bietlejuice.enrich_amplitude_offer:load-sale-offer-raw-events-to-enrich
   - bietlejuice.enrich_offer:load-sale-offer-to-enrich
   # TODO [ODS] Add gsheets after migrated to composer
 
@@ -303,7 +306,9 @@ bietlejuice.enrich_offer:
   - bietlejuice.ebdb:load-offer-aud
   - bietlejuice.enrich_booking
   - bietlejuice.enrich_ebdb_user_revision_entity:load-user-revision-entity-to-enrich
+  - bietlejuice.enrich_firestore:load-monday-to-enrich
   - bietlejuice.enrich_firestore:load-rent-offer-to-enrich
+  - bietlejuice.enrich_firestore:load-sale-offer-to-enrich
   - bietlejuice.godfather:load-business-offer
 
 bietlejuice.enrich_proposal:
