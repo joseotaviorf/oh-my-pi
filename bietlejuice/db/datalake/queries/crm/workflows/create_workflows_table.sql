@@ -3,6 +3,7 @@ with json_entries as (
         json_parse(workflows_entry) as workflows_entries,
         dt
     from datalake_raw.crm_workflows
+    where dt = '__PARTITION_DATE__'
 )
 select
     cast(json_extract(workflows_entries, '$._id') as varchar) as id,
@@ -19,5 +20,4 @@ select
     json_format(json_extract(workflows_entries, '$.context')) as context,
     dt
 from json_entries
-where dt = '__PARTITION_DATE__'
 ;

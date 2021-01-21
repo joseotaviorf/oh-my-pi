@@ -3,6 +3,7 @@ with json_entries as (
     json_parse(task_entry) as task_entry,
     dt
   from datalake_raw.crm_tasks
+  where dt = '__PARTITION_DATE__'
 )
 select
   cast(json_extract(task_entry, '$.scoreFactor') as varchar) as score_factor,
@@ -76,5 +77,4 @@ select
   cast(json_extract(task_entry, '$.resolvida') as varchar) as resolved,
   dt
 from json_entries
-where dt = '__PARTITION_DATE__'
 ;
