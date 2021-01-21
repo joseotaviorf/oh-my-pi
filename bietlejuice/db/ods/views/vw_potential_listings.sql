@@ -1,24 +1,7 @@
 --drop view if exists vw_potential_listings;
 --create or replace view vw_potential_listings as
-WITH legacy_doorman AS (
-  SELECT
-    porteiros_legado."Status" AS status,
-    892700000 + porteiros_legado."Cod Imóvel"::double precision::BIGINT AS imovel_id
-  FROM gsheets.porteiros_legado
-  WHERE (porteiros_legado."Status" IN ('Listing', 'Alugado', 'Foto', 'Foto com problema', 'Lead'))
-    AND porteiros_legado."Cod Imóvel" IS NOT NULL
-),
-rn_lead AS (
-    SELECT lead_tasks.rep_id,
-        lead_tasks.lead_id,
-        lead_tasks.dt_created,
-        lead_tasks.dt_closed,
-        ROW_NUMBER() OVER (PARTITION BY lead_tasks.lead_id ORDER BY lead_tasks.dt_created ASC) AS rn_first,
-        ROW_NUMBER() OVER (PARTITION BY lead_tasks.lead_id ORDER BY lead_tasks.dt_created DESC) AS rn_last
-    FROM crm.lead_tasks
-),
 -- first conversion task created for a lead
-base_lead_tasks_first AS (
+with base_lead_tasks_first AS (
     SELECT
         rn_lead.rep_id,
         rn_lead.lead_id,
@@ -37,83 +20,12 @@ base_lead_tasks_last AS (
   FROM rn_lead
   WHERE rn_last = 1
 ),
-base_photo_tasks AS (
-  SELECT distinct
-    COALESCE(h.id, h_direct.id)::INTEGER AS house_id,
-    MAX((task_type = 'AgendarJobDeFotografo')::INTEGER)::BOOLEAN AS has_job_photo,
-    MAX((task_type = 'FupFoto')::INTEGER)::BOOLEAN AS has_fup_photo
-  FROM crm.photo_tasks AS pt
-  LEFT JOIN photo_job AS pj
-    ON pt.origin_id = pj.id
-  LEFT JOIN house AS h
-    ON h.id = pj.imovel_id
-  LEFT JOIN house AS h_direct
-    ON h_direct.id = pt.origin_id
-  WHERE COALESCE(h.id, h_direct.id) IS NOT NULL
-  GROUP BY 1
-),
-base_leads as (
-  select
-    lead.id as lead_id,
-    lead.tipo as lead_type,
-    lead.origem as lead_origin,
-    lead.utm_source,
-    lead.utm_medium,
-    coalesce(lower(btrim(lead.utm_campaign)) ~* '(institucional)|(branded)' and lower(btrim(lead.utm_campaign)) !~* '(non-branded)', false) as branded_lead,
-    lead.codigo_imobiliaria is not null OR lead.flg_b2b as b2b_lead,
-    case when lead.origem = 'Reprocessado'
-    	then rl.id_origin_lead
-    	else null
-    end as old_lead_id
-  from lead
-  	left join reprocessed_lead rl on rl.id = lead.id
-),
-rep_leads AS (
-  select bl.lead_id,
-    coalesce(old_bl.lead_type, bl.lead_type) as lead_type,
-    coalesce(old_bl.lead_origin, bl.lead_origin) as lead_origin,
-    coalesce(old_bl.utm_source, bl.utm_source) as utm_source,
-    coalesce(old_bl.utm_medium, bl.utm_medium) as utm_medium,
-    coalesce(old_bl.branded_lead, bl.branded_lead) as branded_lead,
-    coalesce(old_bl.b2b_lead, bl.b2b_lead) as b2b_lead,
-    coalesce(bl.lead_origin = 'Reprocessado', false) as reprocessed_flg
-    from base_leads bl
-    left join base_leads old_bl
-      on old_bl.lead_id = bl.old_lead_id
-),
-acquisitions AS (
-  SELECT
-    f.id,
-    CASE
-      WHEN d.imovel_id IS NOT NULL AND f.is_not_reprocessed THEN 'Lead Flow'
-      ELSE f.flow
-    END AS flow,
-    CASE
-      WHEN d.imovel_id IS NOT NULL AND f.is_not_reprocessed THEN 'Non-Self Service'
-      ELSE f.acquisition_method
-    END AS acquisition_method,
-    CASE
-      WHEN d.imovel_id IS NOT NULL AND f.is_not_reprocessed THEN 'Doorman'
-      ELSE f.acquisition_channel_rep
-    END AS acquisition_channel,
-    CASE
-      WHEN d.imovel_id IS NOT NULL AND f.is_not_reprocessed THEN 'Doorman'
-      ELSE f.acquisition_source
-    END AS acquisition_source,
-    CASE
-      WHEN d.imovel_id IS NOT NULL AND f.is_not_reprocessed THEN true
-      ELSE f.acquisition_source = 'Doorman'
-    END AS is_doorman
-  FROM listing_flows_with_reprocessed_leads AS f
-  LEFT JOIN legacy_doorman AS d
-    ON f.imovel_id = d.imovel_id
-),
 leads_b2b AS (
   SELECT DISTINCT
     l.id AS id_lead,
     pa_b2b_online.partner_id AS online_partner_id
   FROM lead AS l
-  LEFT JOIN partner_agent AS pa_b2b_online
+  JOIN partner_agent AS pa_b2b_online
     ON pa_b2b_online.user_id = l.usuario_que_indicou_id
   WHERE pa_b2b_online.partner_id IS NOT NULL
 ),
