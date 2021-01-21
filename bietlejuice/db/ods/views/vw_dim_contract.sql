@@ -85,6 +85,7 @@ select
   c.monthly_administration_fee,
   c.condo,
   c.iptu,
+  c.tenant_service_fee,
   c.signature_type,
   c.closing_status,
   c.ts_created,

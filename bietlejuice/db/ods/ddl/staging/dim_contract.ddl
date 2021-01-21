@@ -25,6 +25,7 @@ create table staging.dim_contract (
   monthly_administration_fee numeric(5,4),
   condo numeric(14,2),
   iptu numeric(14,2),
+  tenant_service_fee numeric(5,2),
   signature_type varchar,
   closing_status varchar,
   ts_created timestamp,

@@ -83,6 +83,7 @@ SELECT
     contractVersion_id AS id_contract_version,
     dataRescisaoPrevista AS ts_expected_termination,
     fairfaxStartDate AS ts_fair_fax_started,
-    estateAgentBrokerageShare AS agent_brokerage_share
+    estateAgentBrokerageShare AS agent_brokerage_share,
+    tenantservicefee AS tenant_service_fee
 FROM
     datalake_ebdb_raw.`contrato`

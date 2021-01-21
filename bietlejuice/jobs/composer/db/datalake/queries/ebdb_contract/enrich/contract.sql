@@ -125,6 +125,7 @@ select
   c.fist_rent_comission_fee,
   c.condo_price,
   c.iptu,
+  c.tenant_service_fee,
   c.signature_type,
   c.status_closing,
   regexp_extract(cv.version_display_contract, '^v[^_]+', 0) as contract_version,

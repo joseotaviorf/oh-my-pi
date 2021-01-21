@@ -131,6 +131,7 @@ select
   cf.taxaAdministracaoMensal as monthly_administration_fee,
   c.valorCondominio as condo,
   c.iptu_valor as iptu,
+  c.tenant_service_fee as tenant_service_fee,
   c.tipoAssinatura as signature_type,
   c.statusClosing as closing_status,
   c.criadoEm as ts_created,
