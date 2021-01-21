@@ -153,6 +153,7 @@ class S3Loader:
         partitions=None,
         write_mode="overwrite",
         max_records_per_file=MAX_RECORDS_PER_FILE,
+        optimize_dataframe=True,
         **options
     ):
         """
@@ -199,8 +200,10 @@ class S3Loader:
                     partition_overwrite_mode
                 )
             )
-
-        df = self._optimize_dataframe_partitions(df, partitions, max_records_per_file)
+        if optimize_dataframe:
+            df = self._optimize_dataframe_partitions(
+                df, partitions, max_records_per_file
+            )
 
         df_writer = (
             df.write.mode(write_mode)
