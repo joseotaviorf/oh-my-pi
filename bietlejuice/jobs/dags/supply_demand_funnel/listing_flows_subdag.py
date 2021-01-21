@@ -31,14 +31,14 @@ class ListingFlowsSubDag(BaseSubDag):
             ods_lead_city_region_task,
             dw_fact_house_listing_flows) = self.__build_data_tasks(listing_flows_dag)
 
-        ods_listing_flows_with_reprocessed_leads_task.set_downstream(ods_acquisitions_task, ods_rep_leads_task)
-        ods_potential_listings_task.set_upstream(
+        ods_listing_flows_with_reprocessed_leads_task.set_downstream([ods_acquisitions_task, ods_rep_leads_task])
+        ods_potential_listings_task.set_upstream([
             ods_rn_lead_task,
             ods_base_photo_tasks_task,
             ods_listing_flows_with_reprocessed_leads_task
-        )
+        ])
 
-        dw_fact_house_listing_flows.set_upstream(ods_potential_listings_task, ods_lead_city_region_task)
+        dw_fact_house_listing_flows.set_upstream([ods_potential_listings_task, ods_lead_city_region_task])
 
         return listing_flows_dag
 
