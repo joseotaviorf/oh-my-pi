@@ -21,4 +21,4 @@ SELECT
         AND LOWER(utm_campaign) NOT LIKE '%non-branded%'), FALSE) AS is_branded,
     ts_event
 FROM
-    datalake_amplitude_clean.170698_sale_offer_form_accepted
+    datalake_amplitude_clean.170698_sale_offer_form_accepted_events
