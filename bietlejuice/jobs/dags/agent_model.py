@@ -144,14 +144,6 @@ def upd_agent_region(**kwargs):
                    date=exec_date)
 
 
-def create_agent_status_history():
-    table_name = 'agent_status_history'
-    ar = Agent(bucket_datalake)
-    rev_data = ar.get_datalake_data_from_filequery(file_name=table_name)
-    ar.move_data_to_destination(data=rev_data, enumdb=EnumDB.BI_DW,
-                                table_name=table_name, append=False, schema='agent')
-
-
 dag = DAG(
     dag_id='bi-load-agent_model',
     default_args={
@@ -274,12 +266,6 @@ update_agent_region_ods = BaseDAG.build_python_operator(
     provide_context=True,
     python_callable=upd_agent_region,
     op_kwargs=None
-)
-
-agent_status_history_task = BaseDAG.build_python_operator(
-    dag=dag,
-    task_id='agent_status_history_task',
-    python_callable=create_agent_status_history
 )
 
 update_agent_region_ods >> group_agent_region_ods >> load_group_agent_region_dw >> create_dim_agent_region_dw
