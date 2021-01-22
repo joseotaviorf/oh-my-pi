@@ -1,3 +1,15 @@
+WITH consultant_prep AS (
+SELECT 
+    id_offer,
+    CASE 
+        WHEN SPLIT_PART(REPLACE(id_consultant, ']', ''),',', 2) = '11422665'
+        THEN SPLIT_PART(REPLACE(id_consultant, '[', ''),',',1)
+        WHEN id_consultant NOT LIKE '%,%'
+        THEN REPLACE(REPLACE(id_consultant, ']', ''), '[', '')
+        ELSE SPLIT_PART(REPLACE(id_consultant, ']', ''),',', 2)
+    END AS id_consultant
+FROM datalake_firestore_prod.monday dfm
+)
 select distinct
     so.id AS id_offer,
     --dfm.id_auto_generated, --AGUARDANDO COLUNA
@@ -7,12 +19,12 @@ select distinct
     --dfm.id_consultant, -- ID DO PRIMEIRO ANALISTA A TRATAR A OFERTA, CORRETO É O ÚLTIMO
     regexp_replace(regexp_replace(cast(right(replace(dgm.consultor,', antonio.sader@quintoandar.com.br',''), len(replace(dgm.consultor,', antonio.sader@quintoandar.com.br','')) - charindex(', ', replace(dgm.consultor,', antonio.sader@quintoandar.com.br',''))) as varchar),' ',''),',','') as "consultant_gsheets",
     case -- id_consultant_adjusted
-        when dfm.id_consultant is null and consultant_gsheets = '' then ''
-        when dfm.id_consultant is null and consultant_gsheets is null then ''
-        when dfm.id_consultant = '12614540' and consultant_gsheets = '' then '12614540'
-        when dfm.id_consultant = '12041621' and consultant_gsheets = '' then '12041621'
-        when dfm.id_consultant = '11422663' and consultant_gsheets = '' then '11422663'
-        when dfm.id_consultant = '11422665' and consultant_gsheets = 'antonio.sader@quintoandar.com.br,' then '12614540'
+        when cp.id_consultant is null and consultant_gsheets = '' then ''
+        when cp.id_consultant is null and consultant_gsheets is null then ''
+        when cp.id_consultant = '12614540' and consultant_gsheets = '' then '12614540'
+        when cp.id_consultant = '12041621' and consultant_gsheets = '' then '12041621'
+        when cp.id_consultant = '11422663' and consultant_gsheets = '' then '11422663'
+        when cp.id_consultant = '11422665' and consultant_gsheets = 'antonio.sader@quintoandar.com.br,' then '12614540'
         when consultant_gsheets = 'dayse.susan@quintoandar.com.br' then '15520028'
         when consultant_gsheets = 'antonio.sader@quintoandar.com.br' then '11422665'
         when consultant_gsheets = 'ana.moraes@quintoandar.com.br' then '12114276'
@@ -33,7 +45,8 @@ select distinct
         when consultant_gsheets = 'mariana.alves@quintoandar.com.br' then '14832760'
         when consultant_gsheets = 'EmersondeSouzaMeneguel' then '15284501'
         --when dfm.id_consultant > 1 and consultant_gsheets = '' then dfm.id_consultant
-        else 'ERRO' end as "id_consultant_adjusted",
+        when COALESCE(cp.id_consultant, '') IS NULL then 'ERRO'
+        else cp.id_consultant end as "id_consultant_adjusted",
     case -- name_consultant
         when id_consultant_adjusted is null then null
         when id_consultant_adjusted = '15520028' then 'Dayse Susan'
@@ -242,6 +255,9 @@ from
 left join 
     datalake_firestore_prod.monday dfm
         on so.id = dfm.id_offer
+left join
+    consultant_prep cp
+        on dfm.id_offer = cp.id_offer
 left join 
     dim_house_listing dhl 
         on dfm.id_house = dhl.id_house
