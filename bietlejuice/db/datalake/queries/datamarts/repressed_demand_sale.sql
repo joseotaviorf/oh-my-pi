@@ -370,4 +370,5 @@ left join encaixes_agg enc
     and enc.slot = d.slot
 where
     faixa is not null
+    and coalesce(bk.slot, enc.slot) is not null
 group by 1, 2, 3, 4, 5, 6, 7, 8
