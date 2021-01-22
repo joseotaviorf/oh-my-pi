@@ -1,45 +1,42 @@
 WITH last_update AS (
 SELECT 
-    id,
+    GET_JSON_OBJECT(updated_message, '$.id') AS id,
     MAX(ts_updated) AS ts_last_updated
 FROM datalake_firestore_clean.sale_offer
 GROUP BY 1
 ),
-sale_offer AS (
+sale_offer_audit AS (
 SELECT
-    soa.id,
-    CAST(GET_JSON_OBJECT(soa.updated_message, '$.submitterId') AS BIGINT) AS id_buyer,
-    CAST(GET_JSON_OBJECT(soa.updated_message, '$.house.id') AS BIGINT) AS id_house,
-    CAST(GET_JSON_OBJECT(soa.updated_message, '$.house.ownerId') AS BIGINT) AS id_owner,
-    CAST(GET_JSON_OBJECT(soa.updated_message, '$.changedBy') AS BIGINT) AS id_monday_user_last_revision,
-    CAST(GET_JSON_OBJECT(soa.updated_message, '$.brokerageFee') AS FLOAT) AS brokerage_fee,
-    CAST(GET_JSON_OBJECT(soa.updated_message, '$.deedPrice') AS BIGINT) AS deed_price,
-    CAST(GET_JSON_OBJECT(soa.updated_message, '$.earnestValue') AS BIGINT) AS earnest_value,
-    CAST(GET_JSON_OBJECT(soa.updated_message, '$.fgtsValue') AS BIGINT) AS fgts_value,
-    CAST(GET_JSON_OBJECT(soa.updated_message, '$.financingValue') AS BIGINT) AS financing_value,
-    CAST(GET_JSON_OBJECT(soa.updated_message, '$.itbiPrice') AS BIGINT) AS itbi_price,
-    CAST(GET_JSON_OBJECT(soa.updated_message, '$.offerPrice') AS BIGINT) AS first_price_offered_by_buyer,
-    CAST(GET_JSON_OBJECT(soa.updated_message, '$.salePrice') AS BIGINT) AS sale_price,
-    CAST(GET_JSON_OBJECT(soa.updated_message, '$.registryPrice') AS BIGINT) AS registry_price,
-    GET_JSON_OBJECT(soa.updated_message, '$.paymentMethod') AS planned_payment_method,
-    CAST(GET_JSON_OBJECT(soa.updated_message, '$.updatedOfferPrice') AS BIGINT) AS last_price_offered_by_buyer,
-    GET_JSON_OBJECT(soa.updated_message, '$.paymentOptions.paymentMethod') AS current_payment_method,
-    GET_JSON_OBJECT(soa.updated_message, '$.paymentOptions.creditStatus') AS credit_status,
-    CAST(GET_JSON_OBJECT(soa.updated_message, '$.paymentOptions.entryAmount') AS BIGINT) AS payment_entry_amount,
-    GET_JSON_OBJECT(soa.updated_message, '$.paymentOptions.paymentType') AS payment_type,
-    GET_JSON_OBJECT(soa.updated_message, '$.status') AS status,
-    GET_JSON_OBJECT(soa.updated_message, '$.statusClosing') AS status_closing,
-    GET_JSON_OBJECT(soa.updated_message, '$.statusReason') AS status_reason,
-    GET_JSON_OBJECT(soa.updated_message, '$.turn') AS turn,
-    CAST(GET_JSON_OBJECT(soa.updated_message, '$.createNegotiationChat') AS BOOLEAN) AS has_used_negotiation_chat,
-    COALESCE(CAST(GET_JSON_OBJECT(soa.updated_message, '$.paymentOptions.fgts') AS BOOLEAN), FALSE) AS has_used_fgts_in_payment,
-    DATE(GET_JSON_OBJECT(soa.updated_message, '$.tenantLeaveDate')) AS dt_tenant_left,
-    CAST(CAST(GET_JSON_OBJECT(soa.updated_message, '$.createdAt._seconds') AS BIGINT) AS TIMESTAMP) AS ts_created,   
-    soa.ts_updated
-FROM datalake_firestore_clean.sale_offer soa
-INNER JOIN last_update lup
-    ON soa.id = lup.id 
-    AND soa.ts_updated = lup.ts_last_updated
+    GET_JSON_OBJECT(updated_message, '$.id') AS id,
+    CAST(GET_JSON_OBJECT(updated_message, '$.submitterId') AS BIGINT) AS id_buyer,
+    CAST(GET_JSON_OBJECT(updated_message, '$.house.id') AS BIGINT) AS id_house,
+    CAST(GET_JSON_OBJECT(updated_message, '$.house.ownerId') AS BIGINT) AS id_owner,
+    CAST(GET_JSON_OBJECT(updated_message, '$.changedBy') AS BIGINT) AS id_monday_user_last_revision,
+    CAST(GET_JSON_OBJECT(updated_message, '$.brokerageFee') AS FLOAT) AS brokerage_fee,
+    CAST(GET_JSON_OBJECT(updated_message, '$.deedPrice') AS BIGINT) AS deed_price,
+    CAST(GET_JSON_OBJECT(updated_message, '$.earnestValue') AS BIGINT) AS earnest_value,
+    CAST(GET_JSON_OBJECT(updated_message, '$.fgtsValue') AS BIGINT) AS fgts_value,
+    CAST(GET_JSON_OBJECT(updated_message, '$.financingValue') AS BIGINT) AS financing_value,
+    CAST(GET_JSON_OBJECT(updated_message, '$.itbiPrice') AS BIGINT) AS itbi_price,
+    CAST(GET_JSON_OBJECT(updated_message, '$.offerPrice') AS BIGINT) AS first_price_offered_by_buyer,
+    CAST(GET_JSON_OBJECT(updated_message, '$.salePrice') AS BIGINT) AS sale_price,
+    CAST(GET_JSON_OBJECT(updated_message, '$.registryPrice') AS BIGINT) AS registry_price,
+    GET_JSON_OBJECT(updated_message, '$.paymentMethod') AS planned_payment_method,
+    CAST(GET_JSON_OBJECT(updated_message, '$.updatedOfferPrice') AS BIGINT) AS last_price_offered_by_buyer,
+    GET_JSON_OBJECT(updated_message, '$.paymentOptions.paymentMethod') AS current_payment_method,
+    GET_JSON_OBJECT(updated_message, '$.paymentOptions.creditStatus') AS credit_status,
+    CAST(GET_JSON_OBJECT(updated_message, '$.paymentOptions.entryAmount') AS BIGINT) AS payment_entry_amount,
+    GET_JSON_OBJECT(updated_message, '$.paymentOptions.paymentType') AS payment_type,
+    GET_JSON_OBJECT(updated_message, '$.status') AS status,
+    GET_JSON_OBJECT(updated_message, '$.statusClosing') AS status_closing,
+    GET_JSON_OBJECT(updated_message, '$.statusReason') AS status_reason,
+    GET_JSON_OBJECT(updated_message, '$.turn') AS turn,
+    CAST(GET_JSON_OBJECT(updated_message, '$.createNegotiationChat') AS BOOLEAN) AS has_used_negotiation_chat,
+    COALESCE(CAST(GET_JSON_OBJECT(updated_message, '$.paymentOptions.fgts') AS BOOLEAN), FALSE) AS has_used_fgts_in_payment,
+    DATE(GET_JSON_OBJECT(updated_message, '$.tenantLeaveDate')) AS dt_tenant_left,
+    CAST(CAST(GET_JSON_OBJECT(updated_message, '$.createdAt._seconds') AS BIGINT) AS TIMESTAMP) AS ts_created,   
+    ts_updated
+FROM datalake_firestore_clean.sale_offer
 )
 SELECT
     soa.id,
@@ -73,6 +70,8 @@ SELECT
     COALESCE(soa.has_used_fgts_in_payment,FALSE) AS has_used_fgts_in_payment,
     soa.dt_tenant_left,
     soa.ts_created,
-    soa.ts_updated,
-    NOW() AS ts_load
-FROM sale_offer AS soa
+    soa.ts_updated
+FROM sale_offer_audit soa
+INNER JOIN last_update lup
+    ON soa.id = lup.id 
+    AND soa.ts_updated = lup.ts_last_updated
