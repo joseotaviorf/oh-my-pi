@@ -179,7 +179,8 @@ SELECT
   COALESCE(tx.mkt_channel,'Not Mapped') AS mkt_channel,
   COALESCE(tx.mkt_medium,'Not Mapped') AS mkt_medium,
   COALESCE(tx.mkt_source,'Not Mapped') AS mkt_source,
-  COALESCE(tx.mkt_platform,'Not Mapped') AS mkt_platform
+  COALESCE(tx.mkt_platform,'Not Mapped') AS mkt_platform,
+  NOW() AS ts_load
 FROM datalake_sale_flows.sale_flow sf
 LEFT JOIN sale_flow_taxonomy tx
   ON sf.id_sale_flow = tx.id_sale_flow

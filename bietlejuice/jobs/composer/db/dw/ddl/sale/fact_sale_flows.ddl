@@ -72,7 +72,8 @@ CREATE TABLE sale.fact_sale_flows (
   mkt_channel VARCHAR,
   mkt_medium VARCHAR,
   mkt_source VARCHAR,
-  mkt_platform VARCHAR
+  mkt_platform VARCHAR,
+  ts_load TIMESTAMP
   )
 ;
 
