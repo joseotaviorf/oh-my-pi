@@ -18,10 +18,12 @@ MAIN_START_DATE = datetime(2020, 11, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
 CONTEXT = "braze_events"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
+
 ENV = Variable.get("environment")
 SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/base"
@@ -40,6 +42,9 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=None,
+    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
+        chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
+    ),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
