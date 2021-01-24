@@ -80,7 +80,6 @@ bietlejuice.dw_sale_flows:
   # TODO [ODS] Add gsheets after migrated to composer
 
 bietlejuice.dw_sale_listings:
-  - bietlejuice.enrich_sale_listings
   - bietlejuice.ebdb:load-house
   - bietlejuice.ebdb:load-house-registration-status
   - bietlejuice.enrich_ebdb_listing:load-listing-business-context-to-enrich
