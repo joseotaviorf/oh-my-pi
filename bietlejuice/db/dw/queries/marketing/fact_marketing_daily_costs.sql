@@ -638,7 +638,8 @@ cost_taxonomy AS (
             'Other'::varchar) AS s (i,
             mkt_platform)
     WHERE
-        LOWER(SUBSTRING(NULLIF (campaign_name, ''), 1, 3)) <> 'dsa'),
+        mkt_source <> 'Google'
+        OR (mkt_source = 'Google' AND LOWER(SUBSTRING(campaign_name, 1, 3)) <> 'dsa')),
     name_convention_shared_costs AS (
         WITH city_group_share_rules AS (
             SELECT
