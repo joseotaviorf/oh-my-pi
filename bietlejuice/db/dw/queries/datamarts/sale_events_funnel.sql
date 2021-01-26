@@ -22,8 +22,11 @@ SELECT
 	    WHEN lf.lead_context_origin = 'Organic' THEN 'Branded'
         ELSE lead_context_origin
 	END AS mkt_campaign_context,
-	CASE WHEN lf.mkt_channel IN ('CRM/Notification','Backend','Branding','Other') THEN 'Paid'
-         ELSE 'Non Paid'
+	CASE
+	    WHEN lf.mkt_origin IN ('Indica Aí - Agents','Indica Aí - General', 'Price Calculator', 'B2B', 'CR', 'Doorman') THEN 'Paid'
+	    WHEN lf.mkt_origin IN ('Other', 'Backend') THEN 'Non Paid'
+        WHEN lf.mkt_channel IN ('CRM/Notification', 'LeadEnrichment', 'Organic') AND lf.mkt_origin = 'Owner PWA' THEN 'Non Paid'
+        WHEN lf.mkt_channel = 'Paid' AND lf.mkt_origin = 'Owner PWA' THEN 'Paid'
 	END AS mkt_type,
 	CASE
 	    WHEN dr.city_group NOT IN ('RMSP', 'Rio de Janeiro') THEN NULL ELSE dr.city_group
@@ -83,16 +86,16 @@ FROM
 ),
 sale_bookings AS (
 SELECT
-	db.id_property,
-	db.id_visitor,
-	db.sk_booking,
-	db.dt_created,
-	CASE WHEN db.status = 'Realizado' and db.visit_follow_up in ('VaiNegociar', 'NaoGostou', 'VisitouSozinho', 'Talvez') THEN db.dt_scheduling END AS dt_completed
+	fv.sk_house AS id_property,
+	fv.sk_buyer AS id_visitor,
+	fv.sk_booking,
+	dr.city_group,
+	DATE(NULLIF(fv.sk_booking_created_date,-1)) AS dt_created,
+	DATE(NULLIF(fv.sk_visit_completed_date,-1)) AS dt_completed
 FROM
-    dim_booking db
-WHERE
-    db.visit_intent = 'SALE'
-    AND db.type = 'Visita'
+    sale.fact_visits fv
+JOIN dim_region dr
+    ON fv.sk_region = dr.sk_region
 ),
 sale_closing AS (
     WITH fact_os AS (
@@ -141,11 +144,11 @@ FROM
 FULL OUTER JOIN
     fact_oa
         ON fact_os.sk_offer = fact_oa.sk_offer
-        AND fact_os.date = fact_oa.date
+        -- AND fact_os.date = fact_oa.date
 FULL OUTER JOIN
     fact_ccv
         ON fact_os.sk_offer = fact_ccv.sk_offer
-        AND fact_os.date = fact_ccv.date
+        -- AND fact_os.date = fact_ccv.date
 GROUP BY 1, 2, 3
 ),
 sale_tta AS (
@@ -172,12 +175,9 @@ JOIN
 ),
 sale_demand_events AS (
 SELECT
-	COALESCE(offers.id_user, sc.sk_buyer, tta.tenant_id::BIGINT, db.id_visitor) AS id_buyer,
-	COALESCE(offers.id_house, sc.sk_house, tta.house_id::BIGINT, sc.sk_house, db.id_property) AS id_house,
-	offers.dt_offer_sent,
+	COALESCE(offers.id_user, sc.sk_buyer, tta.tenant_id::BIGINT) AS id_buyer,
+	COALESCE(offers.id_house, sc.sk_house, tta.house_id::BIGINT, sc.sk_house) AS id_house,
 	offers.dt_deal_qualified,
-	offers.dt_offer_accepted,
-	offers.dt_ccv_signed,
 	COALESCE(offers.id_offer,sc.sk_offer) AS id_offer,
 	offers.dt_diligence_started_legaut,
 	offers.dt_diligence_ended_legaut,
@@ -199,10 +199,7 @@ SELECT
 	tta.first_attendance_ts::TIMESTAMP AS tta_completed,
 	sc.os_date,
 	sc.oa_date,
-	sc.ccv_date,
-	db.sk_booking,
-	db.dt_created,
-	db.dt_completed
+	sc.ccv_date
 FROM
     monday_adjusted offers
 FULL OUTER JOIN
@@ -211,30 +208,16 @@ FULL OUTER JOIN
 FULL OUTER JOIN
 	sale_closing AS sc
 		ON offers.id_offer = sc.sk_offer
-FULL OUTER JOIN
-    sale_bookings db
-        ON (offers.id_house = db.id_property AND offers.id_user = db.id_visitor)
 ),
-sale_demand_classification AS (
+sale_demand_events_complete AS (
 SELECT
-    sde.id_buyer,
-	sde.id_house,
-	sdr.city_group,
-	pma.form_of_payment,
-	--sde.dt_offer_sent,
+    COALESCE(sde.id_buyer, db.id_visitor) AS id_buyer,
+	COALESCE(sde.id_house, db.id_property) AS id_house,
+	sde.id_offer,
 	sde.os_date AS dt_offer_sent,
 	sde.dt_deal_qualified,
-	--sde.dt_offer_accepted,
-	--sde.dt_ccv_signed,
 	sde.oa_date AS dt_offer_accepted,
 	sde.ccv_date AS dt_ccv_signed,
-	sde.id_offer,
-	sde.sk_booking,
-	sde.dt_created,
-	sde.dt_completed,
-	sde.tta_id,
-	sde.tta_started,
-	sde.tta_completed,
 	sde.dt_diligence_started_legaut,
 	sde.dt_diligence_ended_legaut,
 	sde.dt_diligence_ended,
@@ -250,21 +233,66 @@ SELECT
 	sde.dt_entrega_chaves,
 	sde.dt_finan_started,
 	sde.dt_finan_ended,
+	sde.tta_id,
+	sde.tta_started,
+	sde.tta_completed,
+	db.sk_booking,
+	db.dt_created,
+	db.dt_completed,
+	db.city_group
+FROM
+    sale_demand_events sde
+FULL OUTER JOIN
+    sale_bookings db
+        ON (sde.id_house = db.id_property AND sde.id_buyer = db.id_visitor)
+),
+sale_demand_classification AS (
+SELECT
+    sdc.id_buyer,
+	sdc.id_house,
+	COALESCE(sdr.city_group,sdc.city_group) AS city_group,
+	pma.form_of_payment,
+	sdc.dt_offer_sent,
+	sdc.dt_deal_qualified,
+	sdc.dt_offer_accepted,
+	sdc.dt_ccv_signed,
+	sdc.id_offer,
+	sdc.sk_booking,
+	sdc.dt_created,
+	sdc.dt_completed,
+	sdc.tta_id,
+	sdc.tta_started,
+	sdc.tta_completed,
+	sdc.dt_diligence_started_legaut,
+	sdc.dt_diligence_ended_legaut,
+	sdc.dt_diligence_ended,
+	sdc.dt_diligence_started_legal,
+	sdc.dt_diligence_ended_legal,
+	sdc.dt_credit_started,
+	sdc.dt_credit_approved,
+	sdc.dt_payment_concluded,
+	sdc.dt_notes_registry_started,
+	sdc.dt_notes_registry_ended,
+	sdc.dt_matricula_inicio,
+	sdc.dt_matricula_atualizada,
+	sdc.dt_entrega_chaves,
+	sdc.dt_finan_started,
+	sdc.dt_finan_ended,
 	fsf.first_event AS first_touchpoint,
 	fsf.higher_intent_before_offer,
 	fsf.higher_intent_after_offer
 FROM
-    sale_demand_events sde
+    sale_demand_events_complete sdc
 LEFT JOIN
 	sale.fact_sale_flows AS fsf
-		ON sde.id_buyer = fsf.sk_buyer::VARCHAR
-		AND sde.id_house = fsf.sk_house::VARCHAR
+		ON sdc.id_buyer = fsf.sk_buyer::VARCHAR
+		AND sdc.id_house = fsf.sk_house::VARCHAR
 LEFT JOIN
     sale_demand_region sdr
-        ON sdr.id_house::VARCHAR = sde.id_house
+        ON sdr.id_house::VARCHAR = sdc.id_house
 LEFT JOIN
 	payment_method_adjusted AS pma
-		ON pma.id = sde.id_offer
+		ON pma.id = sdc.id_offer
 ),
 lead_ AS (
 SELECT

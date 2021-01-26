@@ -23,8 +23,10 @@ SELECT
             ELSE lead_context_origin
 	END AS mkt_campaign_context,
 	CASE
-	    WHEN lf.mkt_channel IN ('CRM/Notification','Backend','Branding','Other') THEN 'Paid'
-            ELSE 'Non Paid'
+	    WHEN lf.mkt_origin IN ('Indica Aí - Agents','Indica Aí - General', 'Price Calculator', 'B2B', 'CR', 'Doorman') THEN 'Paid'
+	    WHEN lf.mkt_origin IN ('Other', 'Backend') THEN 'Non Paid'
+        WHEN lf.mkt_channel IN ('CRM/Notification', 'LeadEnrichment', 'Organic') AND lf.mkt_origin = 'Owner PWA' THEN 'Non Paid'
+        WHEN lf.mkt_channel = 'Paid' AND lf.mkt_origin = 'Owner PWA' THEN 'Paid'
 	END AS mkt_type,
 	CASE
 	    WHEN dr.city_group NOT IN ('RMSP', 'Rio de Janeiro') THEN NULL ELSE dr.city_group
@@ -82,19 +84,16 @@ FROM
 ),
 sale_bookings AS (
 SELECT
-	db.id_property,
-	db.id_visitor,
-	db.sk_booking,
-	db.dt_created,
-	CASE
-		WHEN db.status = 'Realizado'
-		AND db.visit_follow_up = 'VaiNegociar' THEN db.dt_scheduling
-	END AS dt_completed
+	fv.sk_house AS id_property,
+	fv.sk_buyer AS id_visitor,
+	fv.sk_booking,
+	dr.city_group,
+	DATE(NULLIF(fv.sk_booking_created_date,-1)) AS dt_created,
+	DATE(NULLIF(fv.sk_visit_completed_date,-1)) AS dt_completed
 FROM
-    dim_booking db
-WHERE
-    db.visit_intent = 'SALE'
-        AND db.type = 'Visita'
+    sale.fact_visits fv
+JOIN dim_region dr
+    ON fv.sk_region = dr.sk_region
 ),
 sale_closing AS (
     WITH fact_os AS (
@@ -217,7 +216,8 @@ SELECT
 	sde.id_offer,
 	db.sk_booking,
 	db.dt_created,
-	db.dt_completed
+	db.dt_completed,
+	db.city_group
 FROM
     sale_demand_events sde
 FULL OUTER JOIN
@@ -230,7 +230,7 @@ SELECT
     sdc.sk_booking,
 	sdc.id_buyer,
 	sdc.id_house,
-	sdr.city_group,
+	COALESCE(sdc.city_group,sdr.city_group) AS city_group,
 	pma.form_of_payment,
 	sdc.dt_created,
 	sdc.dt_completed,
@@ -1705,3 +1705,4 @@ GROUP BY week_start,
 	 origin_after_offer,
 	 form_of_payment,
 	 weeks_conversion
+ORDER BY 2 DESC
