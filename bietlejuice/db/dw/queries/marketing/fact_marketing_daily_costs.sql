@@ -297,7 +297,7 @@ campaigns_full AS (
         'fact_trovit_daily_cost_attributions'::varchar AS fact_cost,
         dtc.campaign_name,
         NULL::varchar AS campaign_city,
-        NULL::varchar(512) AS account_name,
+        account_name,
         LOWER(dtc.campaign_name) AS campaign_name_l,
         NULL::varchar(512) AS account_name_l,
         dtc.campaign_name AS utm_campaign,
@@ -324,7 +324,7 @@ campaigns_full AS (
         'fact_mitula_daily_cost_attributions'::varchar AS fact_cost,
         campaign_name,
         NULL::varchar AS campaign_city,
-        NULL::varchar(512) AS account_name,
+        account_name,
         LOWER(campaign_name) AS campaign_name_l,
         NULL::varchar(512) AS account_name_l,
         campaign_name AS utm_campaign,
@@ -1050,7 +1050,7 @@ FROM
 WHERE
     mkt_source NOT IN ('Facebook', 'Google')
     OR (mkt_source = 'Google'
-        AND sk_date > 20210117)
+        AND sk_date > 20210116)
     OR (mkt_source = 'Facebook'
         AND sk_date > 20201210)
 UNION ALL
