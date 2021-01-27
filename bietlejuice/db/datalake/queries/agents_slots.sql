@@ -75,13 +75,13 @@ with
     ),
     active_history_mod as (
         select distinct
-            from_unixtime(ure.ts_revision/1000) as dt_status,
+            ure.ts_revision as dt_status,
             coalesce(lag(is_active) over (partition by da.id order by cast(rev as bigint))<>is_active,true) as status_mod,
             da.id,
             da.is_active as status
         from
             datalake_ebdb_clean_prod.agent_data_aud da
-            left join datalake_ebdb_clean_prod.user_revision_entity ure
+            left join datalake_ebdb_user_revision_entity_prod.user_revision_entity ure
                 on da.rev = ure.id
     ),
     planner_active as (
