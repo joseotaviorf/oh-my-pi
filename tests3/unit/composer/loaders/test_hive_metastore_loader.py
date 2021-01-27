@@ -35,7 +35,7 @@ class TestHiveMetastoreLoader:
         # assert
         assert returned_value == (added_cols, removed_cols)
         hive_metastore_loader.hive_metastore_service.get_table_columns.assert_called_once_with(
-            database_name, table_name
+            database_name, table_name, ignore_partition_keys=True
         )
         mocked__get_tables_difference.assert_called_once_with(
             source_columns, hive_table_columns

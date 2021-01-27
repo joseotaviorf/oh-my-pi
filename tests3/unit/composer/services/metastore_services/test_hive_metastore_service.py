@@ -125,6 +125,28 @@ class TestHiveMetastoreService:
         # assert
         assert returned_value == expected_return
 
+    def test_get_table(self, hive_metastore_service):
+        # arrange
+        database_name = "datalake_terminator_clean_prod"
+        table_name = "user"
+        mocked_table = Mock()
+
+        # Mocking the conn inside with statement
+        mocked_open_conn = Mock()
+        mocked_open_conn.get_table.return_value = mocked_table
+
+        mocked_client = Mock()
+        mocked_client.return_value = mocked_open_conn
+
+        hive_metastore_service._client.__enter__ = mocked_client
+
+        # act
+        returned_value = hive_metastore_service.get_table(database_name, table_name)
+
+        # assert
+        assert returned_value == mocked_table
+        mocked_open_conn.get_table.assert_called_once_with(database_name, table_name)
+
     def test_get_table_schema(self, hive_metastore_service):
         # arrange
         database_name = "datalake_ebdb_clean_prod"
@@ -170,23 +192,20 @@ class TestHiveMetastoreService:
         assert returned_value == mocked_table_names
         mocked_open_conn.get_all_tables.assert_called_once_with(database_name)
 
-    @mock.patch.object(HiveMetastoreService, "_get_columns_from_schema")
-    @mock.patch.object(HiveMetastoreService, "get_table_schema")
-    def test_get_table_columns(
-        self,
-        mocked_get_table_schema,
-        mocked__get_columns_from_schema,
-        hive_metastore_service,
+    @mock.patch.object(HiveMetastoreService, "_parse_field_schema")
+    @mock.patch.object(HiveMetastoreService, "get_table")
+    def test_get_table_columns_with_partition_keys(
+        self, mocked_get_table, mocked__parse_field_schema, hive_metastore_service
     ):
         # arrange
         database_name = "datalake_ebdb_clean_prod"
         table_name = "contract"
 
-        mocked_table_schema = "<table schema>"
-        mocked_get_table_schema.return_value = mocked_table_schema
+        mocked_table = Mock()
+        mocked_get_table.return_value = mocked_table
 
-        mocked_columns = "<columns dictionary>"
-        mocked__get_columns_from_schema.return_value = mocked_columns
+        mocked_columns = {"c1": "int", "c2": "string", "c3": "bool"}
+        mocked__parse_field_schema.return_value = mocked_columns
 
         # act
         returned_value = hive_metastore_service.get_table_columns(
@@ -195,8 +214,42 @@ class TestHiveMetastoreService:
 
         # assert
         assert returned_value == mocked_columns
-        mocked_get_table_schema.assert_called_once_with(database_name, table_name)
-        mocked__get_columns_from_schema.assert_called_once_with(mocked_table_schema)
+        mocked_get_table.assert_called_once_with(database_name, table_name)
+        mocked__parse_field_schema.assert_called_once_with(mocked_table.sd.cols)
+
+    @mock.patch.object(HiveMetastoreService, "_parse_field_schema")
+    @mock.patch.object(HiveMetastoreService, "get_table")
+    def test_get_table_columns_ignoring_partition_keys(
+        self, mocked_get_table, mocked__parse_field_schema, hive_metastore_service
+    ):
+        # arrange
+        database_name = "datalake_ebdb_clean_prod"
+        table_name = "contract"
+
+        mocked_table = Mock()
+        mocked_get_table.return_value = mocked_table
+
+        mocked_columns = {
+            "c1": "int",
+            "c2": "string",
+            "c3": "bool",
+            "pk1": "string",
+            "pk2": "string",
+        }
+        mocked_partition_keys = {"pk1": "string", "pk2": "string"}
+        mocked__parse_field_schema.side_effect = [mocked_columns, mocked_partition_keys]
+
+        # act
+        returned_value = hive_metastore_service.get_table_columns(
+            database_name, table_name, ignore_partition_keys=True
+        )
+
+        # assert
+        assert returned_value == {"c1": "int", "c2": "string", "c3": "bool"}
+        mocked_get_table.assert_called_once_with(database_name, table_name)
+        mocked__parse_field_schema.assert_has_calls(
+            [mock.call(mocked_table.sd.cols), mock.call(mocked_table.partitionKeys)]
+        )
 
     @pytest.mark.parametrize(
         "table_schema, expected_return",
@@ -216,7 +269,7 @@ class TestHiveMetastoreService:
         self, table_schema, expected_return, hive_metastore_service
     ):
         # act
-        returned_value = hive_metastore_service._get_columns_from_schema(table_schema)
+        returned_value = hive_metastore_service._parse_field_schema(table_schema)
 
         # assert
         assert returned_value == expected_return

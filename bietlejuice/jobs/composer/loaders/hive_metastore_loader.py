@@ -32,7 +32,7 @@ class HiveMetastoreLoader:  # TODO: maybe this loader is misused and we could us
         :rtype: List[FieldSchema], List[str]
         """
         hive_table_columns = self.hive_metastore_service.get_table_columns(
-            database_name, table_name
+            database_name, table_name, ignore_partition_keys=True
         )
 
         added_columns, removed_columns = self._get_tables_difference(

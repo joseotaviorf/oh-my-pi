@@ -164,9 +164,23 @@ class HiveMetastoreService(MetastoreService):
             "m=create_new_partitions_from_df, msg=method not implemented"
         )
 
+    def get_table(self, database_name, table_name):
+        """
+        Gets the table object from Hive Metastore.
+
+        :param database_name: database name of the table
+        :type database_name: str
+        :param table_name: table name
+        :type table_name: str
+        :return: the table object
+        :rtype: thrift_files.libraries.thrift_hive_metastore_client.ttypes.Table
+        """
+        with self.client as conn:
+            return conn.get_table(database_name, table_name)
+
     def get_table_schema(self, database_name, table_name):
         """
-        Gets the table schema in Hive Metastore.
+        Gets the table schema from Hive Metastore.
 
         :param database_name: database name of the table
         :type database_name: str
@@ -178,20 +192,30 @@ class HiveMetastoreService(MetastoreService):
         with self.client as conn:
             return conn.get_schema(database_name, table_name)
 
-    def get_table_columns(self, database_name, table_name):
+    def get_table_columns(self, database_name, table_name, ignore_partition_keys=False):
         """
         Fetches the table columns list from Hive Metastore.
 
         :param database_name: the database name of the table
+        :type database_name: str
         :param table_name: the table name
+        :type table_name: str
+        :param ignore_partition_keys: indicates if the partition keys should be
+         removed from the result set
+        :type ignore_partition_keys: bool
         :return: dictionary of columns types
         :rtype: Dict[str,str]
         """
-        table_schema = self.get_table_schema(database_name, table_name)
-        return self._get_columns_from_schema(table_schema)
+        table = self.get_table(database_name, table_name)
+        table_cols = self._parse_field_schema(table.sd.cols)
+        if ignore_partition_keys:
+            partition_keys = self._parse_field_schema(table.partitionKeys)
+            table_cols = set(table_cols.items()).difference(set(partition_keys.items()))
+
+        return dict(table_cols)
 
     @staticmethod
-    def _get_columns_from_schema(table_schema):
+    def _parse_field_schema(table_schema):
         """
         Turn FieldSchema list into a dictionary.
 
