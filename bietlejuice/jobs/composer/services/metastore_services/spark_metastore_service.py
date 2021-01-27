@@ -44,25 +44,64 @@ class SparkMetastoreService(MetastoreService):
 
         return res
 
+    @staticmethod
+    def _get_partition_keys_from_table_description(table_desc_df):
+        """
+        Gets the partition keys from the columns dataframe
+
+        :param table_desc_df: pyspark.sql.Dataframe
+        :return: OrderedDict with partition keys names and types in tuples
+        :rtype: collections.OrderedDict[(string, string)]
+        """
+        partition_keys = []
+        all_cols_list = table_desc_df.collect()
+        for index, item in enumerate(all_cols_list):
+            if item[0] == "# col_name":
+                partition_keys = all_cols_list[index + 1 :]
+                break
+
+        partition_keys = OrderedDict(
+            [(row["col_name"], row["data_type"].lower()) for row in partition_keys]
+        )
+
+        return partition_keys
+
     @logger
-    def get_table_schema(self, database_name, table_name):
+    def get_table_schema(self, database_name, table_name, ignore_partition_keys=False):
         """
         Gets the schema (columns' names and types) of a table
+
         :param database_name: database name
         :type database_name: str
         :param table_name: table name
         :type table_name: str
-        :return: OrderedDict with col names as keys and col types as values
-        :rtype: collections.OrderedDict
+        :param ignore_partition_keys: indicates if the partition keys should be
+         removed from the result set
+        :type ignore_partition_keys: bool
+        :return: OrderedDict with partition keys names and types in tuples
+        :rtype: collections.OrderedDict[(string, string)]
         """
-        df = super().get_table_description(database_name, table_name)
-        df = df.select("col_name", "data_type").filter(col("col_name").rlike(r"^\w"))
+        result_df = super().get_table_description(database_name, table_name)
 
-        res = OrderedDict(
-            [(row["col_name"], row["data_type"].lower()) for row in df.collect()]
+        partition_cols = []
+        if ignore_partition_keys:
+            partition_keys = self._get_partition_keys_from_table_description(result_df)
+            partition_cols = [col_name for col_name in partition_keys]
+
+        cols_list_df = (
+            result_df.select("col_name", "data_type")
+            .filter(col("col_name").rlike(r"^\w"))
+            .filter(~col("col_name").isin(partition_cols))
         )
 
-        return res
+        table_columns = OrderedDict(
+            [
+                (row["col_name"], row["data_type"].lower())
+                for row in cols_list_df.collect()
+            ]
+        )
+
+        return table_columns
 
     @logger
     def refresh_table(self, database_name, table_name):

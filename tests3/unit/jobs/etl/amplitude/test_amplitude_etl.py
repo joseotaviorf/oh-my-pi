@@ -5,10 +5,6 @@ from io import BytesIO
 
 from pyspark.sql.functions import to_json
 
-from bietlejuice.jobs.composer.base.spark import BaseSparkContext
-
-spark, sc = BaseSparkContext.spark, BaseSparkContext.sc
-
 
 class TestAmplitudeEvents:
     def test_create_raw_events_df(self, amplitude_events, dataframe_service):
@@ -46,13 +42,13 @@ class TestAmplitudeEvents:
         )
 
     def test_create_clean_events_df(
-        self, spark_sql_consumer, amplitude_events, dataframe_service
+        self, spark_context, spark_session, spark_sql_consumer, amplitude_events, dataframe_service
     ):
         # arrange
         data = [{"a": 1, "b": 2}]
         date = datetime(2019, 8, 22, 0, 0, 0, 0)
 
-        df = spark.read.json(sc.parallelize(data, 1))
+        df = spark_session.read.json(spark_context.parallelize(data, 1))
         spark_sql_consumer.set_query_result(df)
         expected_values = [date.year, date.month, date.day, "events"]
         spark_sql_consumer.query_expected_values(expected_values)
@@ -66,7 +62,7 @@ class TestAmplitudeEvents:
         assert type(result_df) == type(df)
 
     def test_create_filtered_clean_events_df(
-        self, spark_sql_consumer, amplitude_events, dataframe_service
+        self, spark_context, spark_session, spark_sql_consumer, amplitude_events, dataframe_service
     ):
         # arrange
         data = [
@@ -81,7 +77,7 @@ class TestAmplitudeEvents:
         date = datetime(2019, 8, 22, 0, 0, 0, 0)
         event_type = "listing_page_viewed"
 
-        df = spark.read.json(sc.parallelize(data, 1))
+        df = spark_session.read.json(spark_context.parallelize(data, 1))
         df = df.withColumn("event_properties", to_json(df["event_properties"]))
         df = df.withColumn("user_properties", to_json(df["user_properties"]))
 

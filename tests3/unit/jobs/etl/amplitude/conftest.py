@@ -1,8 +1,10 @@
 import pytest
+from pyspark import SparkContext
+from pyspark.sql import session
 
+from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.etl.amplitude import AmplitudeEvents
-from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
 
 
 class MockedSparkSqlConsumer:
@@ -42,3 +44,17 @@ def spark_sql_consumer():
 @pytest.fixture()
 def dataframe_service():
     return SparkDataFrameService()
+
+
+@pytest.fixture(scope='session')
+def spark_context():
+    spark_context = SparkContext.getOrCreate()
+    yield spark_context
+    spark_context.stop()
+
+
+@pytest.fixture(scope='session')
+def spark_session():
+    spark_context = SparkContext.getOrCreate()
+    yield session.SparkSession(spark_context)
+    spark_context.stop()
