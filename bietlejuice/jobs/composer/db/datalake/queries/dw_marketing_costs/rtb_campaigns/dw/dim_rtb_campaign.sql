@@ -1,5 +1,6 @@
 SELECT distinct
     sub_campaign_hash as sk_sub_campaign,
+    CAST(DATE_FORMAT(CAST(cost_attribution_date AS DATE), 'yyyyMMdd') AS INTEGER) AS sk_date,
     sub_campaign as campaign_name,
     account_hash,
     account_name,

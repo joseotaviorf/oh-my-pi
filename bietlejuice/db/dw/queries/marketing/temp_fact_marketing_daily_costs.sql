@@ -342,29 +342,30 @@ campaigns_full as (
             WHERE fct.sk_date >= 20180101
         -- RTB
         UNION
-            select
-                frt.sk_date,
-                'rtb'::varchar as origin,
-                'fact_rtb_daily_cost_attributions'::varchar as fact_cost,
-                drt.campaign_name,
-                null::varchar as campaign_city,
-                drt.account_name as account_name,
-                lower(drt.campaign_name) as campaign_name_l,
-                lower(drt.account_name) as account_name_l,
-                drt.campaign_name as utm_campaign,
-                null::varchar(512) as utm_term,
-                null::varchar(512) as utm_content,
-                null::numeric(16,4) as desktop_cost,
-                null::numeric(16,4) as mobile_cost,
-                null::numeric(16,4) as other_cost,
-                sum(cost) as total_cost,
-                null as report_type,
-                null as ad_type
-            from marketing.fact_rtb_daily_cost_attributions frt
-            left join marketing.dim_rtb_sub_campaign drt
-                on frt.sk_sub_campaign = drt.sk_sub_campaign
-            where frt.sk_date >= 20180101
-            group by 1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17
+        SELECT
+            frt.sk_date,
+            'rtb'::VARCHAR AS origin,
+            'fact_rtb_daily_cost_attributions'::VARCHAR AS fact_cost,
+            drt.campaign_name,
+            NULL::VARCHAR AS campaign_city,
+            drt.account_name AS account_name,
+            lower(drt.campaign_name) AS campaign_name_l,
+            lower(drt.account_name) AS account_name_l,
+            drt.campaign_name AS utm_campaign,
+            NULL::VARCHAR(512) AS utm_term,
+            NULL::VARCHAR(512) AS utm_content,
+            NULL::NUMERIC(16,4) AS desktop_cost,
+            NULL::NUMERIC(16,4) AS mobile_cost,
+            NULL::NUMERIC(16,4) AS other_cost,
+            sum(cost) AS total_cost,
+            NULL AS report_type,
+            NULL AS ad_type
+        FROM marketing_costs.fact_rtb_daily_cost_attributions frt
+            LEFT JOIN marketing_costs.dim_rtb_campaign drt
+            ON frt.sk_sub_campaign = drt.sk_sub_campaign
+            AND frt.sk_date = drt.sk_date
+        WHERE frt.sk_date >= 20180101
+        GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17
         -- TWITTER
         UNION
             select
