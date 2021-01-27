@@ -354,15 +354,39 @@ class TestHiveMetastoreService:
             mocked_db_obj.build()
         )
 
-    def test_add_partitions_to_table(self, hive_metastore_service):
+    @pytest.mark.parametrize(
+        "database_name, table_name, partition_list",
+        [
+            (
+                "my_db_name",
+                "user",
+                [
+                    PartitionBuilder(
+                        ["2020", "12", "13"], "my_db_name", "user"
+                    ).build(),
+                    PartitionBuilder(
+                        ["2020", "12", "14"], "my_db_name", "user"
+                    ).build(),
+                ],
+            ),
+            (
+                "my_db_name",
+                "house",
+                [
+                    PartitionBuilder(
+                        ["2020", "12", "13"], "my_db_name", "house"
+                    ).build(),
+                    PartitionBuilder(
+                        ["2020", "12", "14"], "my_db_name", "house"
+                    ).build(),
+                ],
+            ),
+        ],
+    )
+    def test_add_partitions_to_table(
+        self, database_name, table_name, partition_list, hive_metastore_service
+    ):
         # arrange
-        database_name = "datalake_ebdb_clean_prod"
-        table_name = "user"
-        partition_list = [
-            PartitionBuilder(["2020", "12", "13"], database_name, table_name).build(),
-            PartitionBuilder(["2020", "12", "14"], database_name, table_name).build(),
-        ]
-
         # Mocking the conn inside with statement
         mocked_open_conn = Mock()
         mocked_client = Mock()
@@ -376,6 +400,6 @@ class TestHiveMetastoreService:
         )
 
         # assert
-        mocked_open_conn.add_partitions_to_table.assert_called_once_with(
+        mocked_open_conn.add_partitions_if_not_exists.assert_called_once_with(
             database_name, table_name, partition_list
         )

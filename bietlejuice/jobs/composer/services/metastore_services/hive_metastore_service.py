@@ -152,10 +152,9 @@ class HiveMetastoreService(MetastoreService):
         :type table_name: str
         :param partition_list: list of partitions to be added to the table
         :type partition_list: List[Partition]
-        :return:
         """
         with self.client as conn:
-            conn.add_partitions_to_table(database_name, table_name, partition_list)
+            conn.add_partitions_if_not_exists(database_name, table_name, partition_list)
 
     def create_new_partitions_from_df(
         self, database_name, table_name, df, partition_cols, parallelism=1

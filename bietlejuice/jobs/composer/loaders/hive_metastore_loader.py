@@ -218,10 +218,16 @@ class HiveMetastoreLoader:
         :param partition_values_list: values as a list, in the correct order,
          to be added as a new partition to the table
         :type partition_values_list: List[List[str]]
-        :return: None
         """
-        partition_list = []
+        if not partition_values_list:
+            logger.info(
+                f"m=add_partitions_to_table, db={database_name}, table={table_name}, "
+                f"partition_values_list={partition_values_list}, "
+                "msg=No partitions informed."
+            )
+            return False
 
+        partition_list = []
         for partition in partition_values_list:
             partition_list.append(
                 PartitionBuilder(
@@ -229,18 +235,11 @@ class HiveMetastoreLoader:
                 ).build()
             )
 
-        if partition_list:
-            self.hive_metastore_service.add_partitions_to_table(
-                database_name, table_name, partition_list
-            )
+        self.hive_metastore_service.add_partitions_to_table(
+            database_name, table_name, partition_list
+        )
 
-            logger.info(
-                f"m=add_partitions_to_table, db={database_name}, table={table_name}, "
-                "msg=Successfully added partitions to table."
-            )
-        else:
-            raise ValueError(
-                f"m=add_partitions_to_table, db={database_name}, table={table_name}, "
-                f"partitions={partition_list}, "
-                "msg=Partitions must be informed."
-            )
+        logger.info(
+            f"m=add_partitions_to_table, db={database_name}, table={table_name}, "
+            f"partition_values_list={partition_values_list} msg=Successfully added partitions to table."
+        )

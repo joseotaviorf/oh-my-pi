@@ -219,47 +219,30 @@ class TestHiveMetastoreLoader:
             format_info,
         )
 
+    @pytest.mark.parametrize("partition_values_list", [None, [], False])
     @mock.patch.object(PartitionBuilder, "build")
     def test_add_partitions_to_table_without_partition(
-        self, mocked_partition_builder, hive_metastore_loader
+        self, mocked_partition_builder, partition_values_list, hive_metastore_loader
     ):
         # arrange
         database_name = "<db_name>"
         table_name = "<table_name>"
-        partition_values_list = None
 
-        # act & assert
-        with pytest.raises(TypeError):
-            hive_metastore_loader.add_partitions_to_table(
-                database_name, table_name, partition_values_list
-            )
+        # act
+        hive_metastore_loader.add_partitions_to_table(
+            database_name, table_name, partition_values_list
+        )
 
         # assert
         mocked_partition_builder.assert_not_called()
-
-    @mock.patch.object(PartitionBuilder, "build")
-    def test_add_partitions_to_table_with_empty_list(
-        self, mocked_partition_builder, hive_metastore_loader
-    ):
-        # arrange
-        database_name = "<db_name>"
-        table_name = "<table_name>"
-        partition_values_list = []
-
-        # act & assert
-        with pytest.raises(ValueError):
-            hive_metastore_loader.add_partitions_to_table(
-                database_name, table_name, partition_values_list
-            )
-
-        # assert
-        mocked_partition_builder.assert_not_called()
+        hive_metastore_loader.hive_metastore_service.add_partitions_to_table.assert_not_called()
 
     @pytest.mark.parametrize(
-        "partition_values_list, expected_builds, expected_calls",
+        "partition_values_list, expected_builds",
         [
-            [[["2020", "01", "30"], ["2020", "01", "31"]], 2, 1],
-            [[["2020", "01", "30"]], 1, 1],
+            ([["2020", "01", "30"], ["2020", "01", "31"]], 2),
+            ([["2020", "01", "30"], ["2020", "01", "31"]], 2),
+            ([["2020", "01", "30"]], 1),
         ],
     )
     @mock.patch.object(PartitionBuilder, "build")
@@ -268,7 +251,6 @@ class TestHiveMetastoreLoader:
         mocked_partition_builder,
         partition_values_list,
         expected_builds,
-        expected_calls,
         hive_metastore_loader,
     ):
         # arrange
@@ -281,8 +263,5 @@ class TestHiveMetastoreLoader:
         )
 
         # assert
-        assert (
-            hive_metastore_loader.hive_metastore_service.add_partitions_to_table.call_count
-            == expected_calls
-        )
+        hive_metastore_loader.hive_metastore_service.add_partitions_to_table.assert_called_once()
         assert mocked_partition_builder.call_count == expected_builds
