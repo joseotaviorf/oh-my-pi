@@ -16,6 +16,7 @@ class MetastoreExternalTablePipeline(AbstractPipeline):
         database_location,
         table_schema,
         partition_keys,
+        partition_values,
         format_info,
     ):
         """
@@ -40,6 +41,12 @@ class MetastoreExternalTablePipeline(AbstractPipeline):
         circumstances. Partitioned columns don't exist within the table data
         itself.
         :type partition_keys: List[Tuple(string, string)]
+        :param partition_values: A list containing lists of partitions values.
+        Each table can have multiple partitions, that work as a hierarchy, thus
+        the inner lists should contain those values in the correct hierarchy order.
+        The user may want to add multiple partitions values in a single call, then
+        the outer lists are just the collection of the inner ones.
+        :type partition_values: List[List[str]]
         :param format_info: one of TableStorageDescriptor valid layers format.
          This gives information about the table storage parameters.
          E.g. TableStorageDescriptor.RAW_FORMAT
@@ -51,6 +58,7 @@ class MetastoreExternalTablePipeline(AbstractPipeline):
         self.database_location = database_location
         self.table_schema = table_schema
         self.partition_keys = partition_keys
+        self.partition_values = partition_values
         self.format_info = format_info
 
     def run(self):
@@ -61,7 +69,8 @@ class MetastoreExternalTablePipeline(AbstractPipeline):
 
         hms_service.create_database(self.database_name)
 
-        HiveMetastoreLoader(hms_service).update_metastore(
+        hms_loader = HiveMetastoreLoader(hms_service)
+        hms_loader.update_metastore(
             database_name=self.database_name,
             table_name=self.table_name,
             database_location=self.database_location,
@@ -71,4 +80,8 @@ class MetastoreExternalTablePipeline(AbstractPipeline):
             source_schema=self.table_schema,
         )
 
-        # TODO: run add_partition_values(DF-326) or msck like
+        hms_loader.add_partitions_to_table(
+            database_name=self.database_name,
+            table_name=self.table_name,
+            partition_values_list=self.partition_values,
+        )

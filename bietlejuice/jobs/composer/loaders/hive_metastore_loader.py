@@ -1,11 +1,12 @@
 from hive_metastore_client.builders import ColumnBuilder
 from hive_metastore_client.builders import PartitionBuilder
+
 from quintoandar_logger import QuintoAndarLogger
 
 logger = QuintoAndarLogger("HiveMetastoreLoader")
 
 
-class HiveMetastoreLoader:  # TODO: maybe this loader is misused and we could use the HiveMetastoreService instead
+class HiveMetastoreLoader:
     """Loads Spark DataFrame schemas into Hive Metastore as a table."""
 
     def __init__(self, metastore_service):
@@ -128,7 +129,7 @@ class HiveMetastoreLoader:  # TODO: maybe this loader is misused and we could us
         partition_keys = partition_keys or []
         table_s3_path = database_location + table_name
 
-        if self._is_table_in_metastore(database_name, table_name):
+        if self.is_table_in_metastore(database_name, table_name):
             self._update_table_in_metastore(database_name, table_name, source_schema)
         else:
             self.create_table(
@@ -144,7 +145,6 @@ class HiveMetastoreLoader:  # TODO: maybe this loader is misused and we could us
             f"m=update_metastore, db={database_name}, table={table_name}, "
             "msg=Successfully loaded table in metastore."
         )
-        # TODO: return a flag indicating if it was updated or created to implement add_partitions_values or 'msck'
 
     @staticmethod
     def _get_tables_difference(table_source, metastore_columns):
@@ -172,7 +172,7 @@ class HiveMetastoreLoader:  # TODO: maybe this loader is misused and we could us
 
         return added_columns, removed_columns
 
-    def _is_table_in_metastore(self, database_name, table_name):
+    def is_table_in_metastore(self, database_name, table_name):
         """
         Checks whether table exists in Hive Metastore.
 
@@ -215,7 +215,8 @@ class HiveMetastoreLoader:  # TODO: maybe this loader is misused and we could us
         :type database_name: str
         :param table_name: the table name
         :type table_name: str
-        :param partition_values_list: values as a list, in the correct order, to be added as a new partition to the table
+        :param partition_values_list: values as a list, in the correct order,
+         to be added as a new partition to the table
         :type partition_values_list: List[List[str]]
         :return: None
         """

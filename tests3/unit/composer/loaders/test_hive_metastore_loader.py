@@ -80,7 +80,7 @@ class TestHiveMetastoreLoader:
         # assert
         assert returned_value == expected_value
 
-    def test__is_table_in_metastore(self, hive_metastore_loader):
+    def test_is_table_in_metastore(self, hive_metastore_loader):
         # arrange
         database_name = "datalake_ebdb_clean_prod"
         table_name = "house"
@@ -93,7 +93,7 @@ class TestHiveMetastoreLoader:
         expected_value = True
 
         # act
-        returned_value = hive_metastore_loader._is_table_in_metastore(
+        returned_value = hive_metastore_loader.is_table_in_metastore(
             database_name, table_name
         )
 
@@ -132,12 +132,12 @@ class TestHiveMetastoreLoader:
             format_info,
         )
 
-    @mock.patch.object(HiveMetastoreLoader, "_is_table_in_metastore")
+    @mock.patch.object(HiveMetastoreLoader, "is_table_in_metastore")
     @mock.patch.object(HiveMetastoreLoader, "compare_table_schema")
     def test_update_metastore_with_existing_table(
         self,
         mocked_compare_table_schema,
-        mocked__is_table_in_metastore,
+        mocked_is_table_in_metastore,
         hive_metastore_loader,
     ):
         # arrange
@@ -149,7 +149,7 @@ class TestHiveMetastoreLoader:
         source_schema = "<source schema>"
         partition_keys = "<partition_keys>"
 
-        mocked__is_table_in_metastore.return_value = True
+        mocked_is_table_in_metastore.return_value = True
 
         mocked_added_cols = [ColumnBuilder("col3", "string").build()]
         mocked_removed_cols = ["col1", "col2"]
@@ -170,7 +170,7 @@ class TestHiveMetastoreLoader:
         )
 
         # assert
-        mocked__is_table_in_metastore.assert_called_once_with(database_name, table_name)
+        mocked_is_table_in_metastore.assert_called_once_with(database_name, table_name)
         mocked_compare_table_schema.assert_called_once_with(
             database_name, table_name, source_schema
         )
@@ -181,10 +181,10 @@ class TestHiveMetastoreLoader:
             database_name, table_name, mocked_added_cols
         )
 
-    @mock.patch.object(HiveMetastoreLoader, "_is_table_in_metastore")
+    @mock.patch.object(HiveMetastoreLoader, "is_table_in_metastore")
     @mock.patch.object(HiveMetastoreLoader, "create_table")
     def test_update_metastore_with_new_table(
-        self, mocked_create_table, mocked__is_table_in_metastore, hive_metastore_loader
+        self, mocked_create_table, mocked_is_table_in_metastore, hive_metastore_loader
     ):
         # arrange
         table_schema = "<table_schema>"
@@ -195,7 +195,7 @@ class TestHiveMetastoreLoader:
         source_schema = "<source schema>"
         partition_keys = "<partition_keys>"
 
-        mocked__is_table_in_metastore.return_value = False
+        mocked_is_table_in_metastore.return_value = False
 
         # act
         hive_metastore_loader.update_metastore(
@@ -209,7 +209,7 @@ class TestHiveMetastoreLoader:
         )
 
         # assert
-        mocked__is_table_in_metastore.assert_called_once_with(database_name, table_name)
+        mocked_is_table_in_metastore.assert_called_once_with(database_name, table_name)
         mocked_create_table.assert_called_once_with(
             database_name,
             table_name,

@@ -44,8 +44,10 @@ class TestHiveMetastoreService:
         db_name = "ebdb"
         table_name = "user"
         table_location = ""
-        table_schema = ""
-        partition_cols = ""
+        table_schema = OrderedDict(
+            [("id", "int"), ("name", "string"), ("is_active", "bool")]
+        )
+        partition_cols = [("year", "string")]
         format_info = TableStorageDescriptorEnum.CLEAN_FORMAT.value
 
         mocked_cols_or_part_keys = Mock()
@@ -81,7 +83,7 @@ class TestHiveMetastoreService:
 
         # assert
         mocked__build_columns_from_dict.assert_has_calls(
-            [mock.call(table_schema), mock.call(partition_cols)]
+            [mock.call(table_schema.items()), mock.call(partition_cols)]
         )
         mocked_serde_info_builder.assert_called_once_with(
             serialization_lib=format_info.serde_lib
@@ -106,11 +108,18 @@ class TestHiveMetastoreService:
         "table_columns, expected_return",
         [
             (
-                OrderedDict([("id", "int"), ("name", "string"), ("is_active", "bool")]),
+                [("id", "int"), ("name", "string"), ("is_active", "bool")],
                 [
                     ColumnBuilder(name="id", type="int", comment=None).build(),
                     ColumnBuilder(name="name", type="string", comment=None).build(),
                     ColumnBuilder(name="is_active", type="bool", comment=None).build(),
+                ],
+            ),
+            (
+                OrderedDict([("id", "int"), ("name", "string")]).items(),
+                [
+                    ColumnBuilder(name="id", type="int", comment=None).build(),
+                    ColumnBuilder(name="name", type="string", comment=None).build(),
                 ],
             ),
             (OrderedDict([]), []),

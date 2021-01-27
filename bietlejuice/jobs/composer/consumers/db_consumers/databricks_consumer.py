@@ -97,6 +97,7 @@ class DatabricksConsumer(DBConsumer):
     def get_partition_values_from_table(self, table_name):
         """
         Gets all the partitions created for the table
+
         :return: A Spark DataFrame with default col partition
         """
         query = f"SHOW PARTITIONS {self.conn_config['db']}.{table_name}"

@@ -14,5 +14,6 @@ def metastore_external_table_pipeline():
         database_location=Mock(),
         table_schema=Mock(),
         partition_keys=Mock(),
+        partition_values=Mock(),
         format_info=Mock(),
     )

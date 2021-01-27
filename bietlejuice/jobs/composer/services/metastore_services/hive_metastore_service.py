@@ -54,19 +54,19 @@ class HiveMetastoreService(MetastoreService):
         :param table_schema: an ordered dict containing the columns name and
          type (including partitioning columns).
         :type table_schema: collections.OrderedDict
-        :param partition_cols: an ordered dict containing respectively the
+        :param partition_cols: a list of tuples containing respectively the
         columns name and type for the partition keys. A table can have one or
         more partitions keys. A separate data directory is created for each
         specified combination, which can improve query performance in some
         circumstances. Partitioned columns don't exist within the table data
         itself.
-        :type partition_cols: collections.OrderedDict
+        :type partition_cols: List[(string, string)]
         :param format_info: one of TableStorageDescriptor valid layers format.
         This gives information about the table storage parameters.
         :type format_info: bietlejuice.jobs.composer.base.hive.TableFormatInfo
         """
 
-        columns = self._build_columns_from_dict(table_schema)
+        columns = self._build_columns_from_dict(table_schema.items())
         partition_keys = self._build_columns_from_dict(partition_cols)
 
         serde_info = SerDeInfoBuilder(serialization_lib=format_info.serde_lib).build()
@@ -96,14 +96,14 @@ class HiveMetastoreService(MetastoreService):
         Transforms given table columns structure in the Hive Metastore Client
         expected object.
 
-        :param table_columns: an ordered dict containing the columns name and
+        :param table_columns: an list of tuples containing the columns name and
          type (including partitioning columns).
-        :type table_columns: collections.OrderedDict
+        :type table_columns: List[(string, string)]
         :return: columns list in the structure required by the Hive Metastore client
         :rtype: List[ColumnBuilder]
         """
         columns = []
-        for col_name, col_type in table_columns.items():
+        for col_name, col_type in table_columns:
             columns.append(ColumnBuilder(col_name, col_type).build())
 
         return columns

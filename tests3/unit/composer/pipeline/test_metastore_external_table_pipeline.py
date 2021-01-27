@@ -27,6 +27,7 @@ class TestMetastoreExternalTablePipeline:
         database_location = Mock()
         table_schema = Mock()
         partition_keys = Mock()
+        partition_values = Mock()
         format_info = Mock()
         metastore_external_table_pipeline.metastore_host = host
         metastore_external_table_pipeline.database_name = database_name
@@ -34,6 +35,7 @@ class TestMetastoreExternalTablePipeline:
         metastore_external_table_pipeline.database_location = database_location
         metastore_external_table_pipeline.table_schema = table_schema
         metastore_external_table_pipeline.partition_keys = partition_keys
+        metastore_external_table_pipeline.partition_values = partition_values
         metastore_external_table_pipeline.format_info = format_info
 
         hm_client = Mock()
@@ -61,4 +63,9 @@ class TestMetastoreExternalTablePipeline:
             partition_keys=partition_keys,
             format_info=format_info,
             source_schema=table_schema,
+        )
+        hm_loader.add_partitions_to_table.assert_called_once_with(
+            database_name=database_name,
+            table_name=table_name,
+            partition_values_list=partition_values,
         )
