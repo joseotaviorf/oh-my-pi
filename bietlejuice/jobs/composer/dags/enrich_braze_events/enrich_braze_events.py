@@ -15,6 +15,7 @@ from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 11, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
 
+PARTITION_COLS = ["event_type", "year", "month", "day"]
 CONTEXT = "braze_events"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
@@ -67,7 +68,9 @@ file_list = FileService.list_sql_files_without_extension_from_layer(
     CONTEXT, LayerEnum.ENRICH.value
 )
 
-enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(dag, file_list)
+enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(
+    dag, file_list, is_incremental=True, partitions=PARTITION_COLS
+)
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"

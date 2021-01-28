@@ -10,8 +10,14 @@ SELECT
     GET_JSON_OBJECT(event_info,'$.canvas_step_id') AS id_step_canvas,
     SPLIT(event_type, '\\.')[2] AS event_channel,
     event_type,
-    CAST(FROM_UNIXTIME(CAST(GET_JSON_OBJECT(event_info,'$.time') AS INTEGER)) AS TIMESTAMP) AS ts_event        
+    CAST(FROM_UNIXTIME(CAST(GET_JSON_OBJECT(event_info,'$.time') AS INTEGER)) AS TIMESTAMP) AS ts_event,
+    year,
+    month,
+    day        
 FROM
     datalake_braze_clean.events_tenants
 WHERE
     event_type != 'users.behaviors.subscriptiongroup.StateChange'
+    AND year = {year}
+    AND month = {month}
+    AND day = {day}
