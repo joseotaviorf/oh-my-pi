@@ -9,6 +9,7 @@ SELECT
     GET_JSON_OBJECT(event_info,'$.canvas_variation_id') AS id_variant_canvas,
     GET_JSON_OBJECT(event_info,'$.canvas_step_id') AS id_step_canvas,
     SPLIT(event_type, '\\.')[2] AS event_channel,
+    LOWER(SPLIT(event_type, '\\.')[3]) AS event_action,
     event_type,
     CAST(FROM_UNIXTIME(CAST(GET_JSON_OBJECT(event_info,'$.time') AS INTEGER)) AS TIMESTAMP) AS ts_event,
     year,
