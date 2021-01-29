@@ -14,6 +14,7 @@ create table if not exists tracksale.fact_nps_dispatches (
     sk_contract bigint,
     sk_sent_date bigint,
     sk_answered_date bigint,
+    dispatch_status varchar(255),
     score bigint,
     minutes_response_time decimal(27,2),
     is_pending_survey boolean,

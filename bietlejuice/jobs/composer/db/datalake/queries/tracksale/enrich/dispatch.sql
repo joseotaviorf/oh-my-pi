@@ -4,6 +4,7 @@ WITH dispatches AS (
 		JSON_TUPLE(campaign,'name','code'),
 		customers,
 		status,
+		EXPLODE(FROM_JSON(customers,'array<string>')) as customers_explode,
 		ts_created,
 		DATE(CONCAT(CAST(year AS VARCHAR(4)), '-', CAST(month AS VARCHAR(2)), '-', CAST(day AS VARCHAR(2)))) AS dt_updated
 	FROM datalake_tracksale_clean.dispatch
@@ -21,6 +22,7 @@ SELECT
 	d.c0 AS campaign_name,
 	d.customers,
 	d.status,
+	GET_JSON_OBJECT(d.customers_explode,'$.status') AS dispatch_status,
 	d.ts_created,
 	d.dt_updated
 FROM dispatches d
