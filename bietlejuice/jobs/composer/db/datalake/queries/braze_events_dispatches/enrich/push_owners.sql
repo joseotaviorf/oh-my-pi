@@ -1,0 +1,27 @@
+SELECT
+	eo.id_dispatch,
+	eo.id_user_braze,
+	send_owners.ts_event AS ts_push_sent,
+	open_owners.ts_event AS ts_push_opened,
+	bounce_owners.ts_event AS ts_push_bounced
+FROM
+	datalake_braze.events_owners AS eo
+LEFT JOIN
+	datalake_braze.events_owners AS send_owners
+		ON eo.id_dispatch = send_owners.id_dispatch
+		AND eo.id_braze = send_owners.id_braze
+		AND send_owners.event_type = 'users.messages.pushnotification.Send'
+LEFT JOIN
+	datalake_braze.events_owners AS open_owners
+		ON eo.id_dispatch = open_owners.id_dispatch
+		AND eo.id_braze = open_owners.id_braze
+		AND open_owners.event_type = 'users.messages.pushnotification.Open'
+LEFT JOIN
+	datalake_braze.events_owners AS bounce_owners
+		ON eo.id_dispatch = bounce_owners.id_dispatch
+		AND eo.id_braze = bounce_owners.id_braze
+		AND bounce_owners.event_type = 'users.messages.pushnotification.Bounce'
+WHERE
+	eo.event_channel = 'pushnotification'
+GROUP BY
+	1,2,3,4,5
