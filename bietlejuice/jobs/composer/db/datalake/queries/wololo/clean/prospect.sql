@@ -16,7 +16,6 @@ SELECT
     phone,
     phonesecondary AS phone_secondary,
     phonetertiary AS phone_tertiary,
-    discardedbythirdparty AS is_discarded_by_third_party,
     longtail AS is_long_tail,
     whatsappoptedin AS is_whatsapp_opted_in,
     forsale AS is_for_sale,
