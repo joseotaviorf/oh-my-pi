@@ -17,7 +17,8 @@ MAIN_START_DATE = datetime(2020, 11, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
 
 PARTITION_COLS = ["event_type", "event_channel", "year", "month", "day"]
 CONTEXT = "braze"
-DAG_NAME = f"enrich_{CONTEXT}"
+SOURCE = f"{CONTEXT}_events"
+DAG_NAME = f"enrich_{SOURCE}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 
 ENV = Variable.get("environment")
@@ -58,14 +59,14 @@ enrich_sub_dag = DatalakeSubDAG(
     env=ENV,
     datalake_bucket=DATALAKE_BUCKET,
     database_base_name=CONTEXT,
-    relative_query_path=CONTEXT,
+    relative_query_path=SOURCE,
     spark_job_paths=SPARK_JOB_PATH,
     athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
     layer=LayerEnum.ENRICH,
 )
 
 file_list = FileService.list_sql_files_without_extension_from_layer(
-    CONTEXT, LayerEnum.ENRICH.value
+    SOURCE, LayerEnum.ENRICH.value
 )
 
 enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(
