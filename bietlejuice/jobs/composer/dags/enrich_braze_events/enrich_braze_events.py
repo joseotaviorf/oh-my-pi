@@ -16,7 +16,7 @@ LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 11, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
 
 PARTITION_COLS = ["event_type", "event_channel", "year", "month", "day"]
-CONTEXT = "braze_events"
+CONTEXT = "braze"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 
