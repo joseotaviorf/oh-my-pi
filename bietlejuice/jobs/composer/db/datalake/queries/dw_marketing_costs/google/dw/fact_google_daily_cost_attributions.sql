@@ -11,13 +11,12 @@ WITH
         sum(coalesce(cast(clicks as integer), 0)) as total_clicks,
         sum(coalesce(cast(cost as float), 0)) / 1000000 as total_cost,
         sum(coalesce(cast(impressions as integer), 0)) as impressions,
-        max(coalesce(cast(absolute_top_impression_percentage as float), 0)) as absolute_top_impression_percentage,
         dt_load,
         load_date
     from datalake_marketing_costs.google_ads_performance_report
     where device = 'Computers'
         and load_date = date('{year}-{month}-{day}')
-    group by 1,2,3,4,5,6,11,12
+    group by 1,2,3,4,5,6,10,11
 ),
 mobile_devices_ads as (
     select 
@@ -30,13 +29,12 @@ mobile_devices_ads as (
         sum(coalesce(cast(clicks as integer), 0)) as total_clicks,
         sum(coalesce(cast(cost as float), 0)) / 1000000 as total_cost,
         sum(coalesce(cast(impressions as integer), 0)) as impressions,
-        max(coalesce(cast(absolute_top_impression_percentage as float), 0)) as absolute_top_impression_percentage,
         dt_load,
         load_date
     from datalake_marketing_costs.google_ads_performance_report
     where device = 'Mobile devices with full browsers'
         and load_date = date('{year}-{month}-{day}')
-    group by 1,2,3,4,5,6,11,12
+    group by 1,2,3,4,5,6,10,11
 ),
 tablet_devices_ads as (
     select 
@@ -49,13 +47,12 @@ tablet_devices_ads as (
         sum(coalesce(cast(clicks as integer), 0)) as total_clicks,
         sum(coalesce(cast(cost as float), 0)) / 1000000 as total_cost,
         sum(coalesce(cast(impressions as integer), 0)) as impressions,
-        max(coalesce(cast(absolute_top_impression_percentage as float), 0)) as absolute_top_impression_percentage,
         dt_load,
         load_date
     from datalake_marketing_costs.google_ads_performance_report
     where device = 'Tablets with full browsers'
         and load_date = date('{year}-{month}-{day}')
-    group by 1,2,3,4,5,6,11,12
+    group by 1,2,3,4,5,6,10,11
 ),
 cte_ads as (
     select 
@@ -80,9 +77,6 @@ cte_ads as (
         COALESCE(tablet_devices_ads.impressions, 0) as tablet_impressions,
         COALESCE(computer_devices_ads.impressions, 0) as desktop_impressions,
         (COALESCE(mobile_devices_ads.impressions, 0) + COALESCE(tablet_devices_ads.impressions, 0) + COALESCE(computer_devices_ads.impressions, 0)) as impressions,
-        COALESCE(computer_devices_ads.absolute_top_impression_percentage, 0)    as desktop_absolute_top_impression_percentage,
-        COALESCE(mobile_devices_ads.absolute_top_impression_percentage, 0)      as mobile_absolute_top_impression_percentage,
-        COALESCE(tablet_devices_ads.absolute_top_impression_percentage, 0)      as tablet_absolute_top_impression_percentage,
         google_table.acc,
         google_table.load_date
 FROM datalake_marketing_costs.google_ads_performance_report google_table
@@ -130,16 +124,6 @@ final_cte_ads as (
         cte_ads.tablet_impressions,
         cte_ads.desktop_impressions,
         cte_ads.impressions,
-        -- Search Impression Share is the impressions we've received on the Search Network divided by the
-        -- estimated number of impressions we were eligible to receive. Value ranging from 0 to 100.
-        cast(0 as float) as desktop_search_impression_share,
-        cast(0 as float) as mobile_search_impression_share,
-        cast(0 as float) as tablet_search_impression_share,
-        -- Absolute Top Impression Perc. is the percent of our ad impressions that are shown as the very
-        -- first ad above the organic search results. Value ranging from 0 to 1.
-        cte_ads.desktop_absolute_top_impression_percentage,
-        cte_ads.mobile_absolute_top_impression_percentage,
-        cte_ads.tablet_absolute_top_impression_percentage,
         now() as ts_load,
         cte_ads.load_date
     from cte_ads
@@ -155,7 +139,8 @@ final_cte_ads as (
 -- KEYWORDS START
 
 computer_devices_keywords as (
-    SELECT id_keyword,
+    SELECT 
+        id_keyword,
         id_campaign,
         id_external_customer,
         id_ad_group,
@@ -164,17 +149,16 @@ computer_devices_keywords as (
         SUM(COALESCE(cast(clicks as integer), 0)) as total_clicks,
         SUM(COALESCE(cast(cost as float), 0)) / 1000000 as total_cost,
         MAX(COALESCE(cast(impressions as integer), 0)) as impressions,
-        MAX(COALESCE(cast(search_impression_share as float), 0))            as search_impression_share,
-        MAX(COALESCE(cast(absolute_top_impression_percentage as float), 0)) as absolute_top_impression_percentage,
         dt_load,
         load_date
     FROM datalake_marketing_costs.google_keywords_performance_report
     WHERE device = 'Computers'
         AND load_date = date('{year}-{month}-{day}')
-    GROUP BY 1,2,3,4,5,6,12,13
+    GROUP BY 1,2,3,4,5,6,10,11
 ),
 mobile_devices_keywords as (
-    SELECT id_keyword,
+    SELECT 
+        id_keyword,
         id_campaign,
         id_external_customer,
         id_ad_group,
@@ -183,17 +167,16 @@ mobile_devices_keywords as (
         SUM(COALESCE(cast(clicks as integer), 0)) as total_clicks,
         SUM(COALESCE(cast(cost as float), 0)) / 1000000 as total_cost,
         MAX(COALESCE(cast(impressions as integer), 0)) as impressions,
-        MAX(COALESCE(cast(search_impression_share as float), 0))            as search_impression_share,
-        MAX(COALESCE(cast(absolute_top_impression_percentage as float), 0)) as absolute_top_impression_percentage,
         dt_load,
         load_date
     FROM datalake_marketing_costs.google_keywords_performance_report
     WHERE device = 'Mobile devices with full browsers'
         AND load_date = date('{year}-{month}-{day}')
-    GROUP BY 1,2,3,4,5,6,12,13
+    GROUP BY 1,2,3,4,5,6,10,11
 ),
 tablet_devices_keywords as (
-    SELECT id_keyword,
+    SELECT 
+        id_keyword,
         id_campaign,
         id_external_customer,
         id_ad_group,
@@ -202,14 +185,12 @@ tablet_devices_keywords as (
         SUM(COALESCE(cast(clicks as integer), 0)) as total_clicks,
         SUM(COALESCE(cast(cost as float), 0)) / 1000000 as total_cost,
         MAX(COALESCE(cast(impressions as integer), 0)) as impressions,
-        MAX(COALESCE(cast(search_impression_share as float), 0))            as search_impression_share,
-        MAX(COALESCE(cast(absolute_top_impression_percentage as float), 0)) as absolute_top_impression_percentage,
         dt_load,
         load_date
     FROM datalake_marketing_costs.google_keywords_performance_report
     WHERE device = 'Tablets with full browsers'
         AND load_date = date('{year}-{month}-{day}')
-    GROUP BY 1,2,3,4,5,6,12,13
+    GROUP BY 1,2,3,4,5,6,10,11
 ),
 cte_keywords as (
     SELECT min(id) over (PARTITION BY google_table.id_keyword, google_table.id_external_customer, google_table.id_campaign, google_table.id_ad_group) as id,
@@ -233,12 +214,6 @@ cte_keywords as (
         COALESCE(tablet_devices_keywords.impressions, 0)  as tablet_impressions,
         COALESCE(computer_devices_keywords.impressions, 0)  as desktop_impressions,
         (COALESCE(mobile_devices_keywords.impressions, 0) + COALESCE(tablet_devices_keywords.impressions, 0) + COALESCE(computer_devices_keywords.impressions, 0)) as impressions,
-        COALESCE(computer_devices_keywords.search_impression_share, 0)             as desktop_search_impression_share,
-        COALESCE(mobile_devices_keywords.search_impression_share, 0)               as mobile_search_impression_share,
-        COALESCE(tablet_devices_keywords.search_impression_share, 0)               as tablet_search_impression_share,
-        COALESCE(computer_devices_keywords.absolute_top_impression_percentage, 0)  as desktop_absolute_top_impression_percentage,
-        COALESCE(mobile_devices_keywords.absolute_top_impression_percentage, 0)    as mobile_absolute_top_impression_percentage,
-        COALESCE(tablet_devices_keywords.absolute_top_impression_percentage, 0)    as tablet_absolute_top_impression_percentage,
         google_table.acc,
         google_table.load_date
 FROM datalake_marketing_costs.google_keywords_performance_report google_table
@@ -285,16 +260,6 @@ final_cte_keywords as (
         cte_keywords.tablet_impressions,
         cte_keywords.desktop_impressions,
         cte_keywords.impressions,
-        -- Search Impression Share is the impressions we've received on the Search Network divided by the
-        -- estimated number of impressions we were eligible to receive. Value ranging from 0 to 100.
-        cte_keywords.desktop_search_impression_share,
-        cte_keywords.mobile_search_impression_share,
-        cte_keywords.tablet_search_impression_share,
-        -- Absolute Top Impression Perc. is the percent of our ad impressions that are shown as the very
-        -- first ad above the organic search results. Value ranging from 0 to 1.
-        cte_keywords.desktop_absolute_top_impression_percentage,
-        cte_keywords.mobile_absolute_top_impression_percentage,
-        cte_keywords.tablet_absolute_top_impression_percentage,
         now() as ts_load,
         cte_keywords.load_date
     from cte_keywords
@@ -318,48 +283,44 @@ computer_devices_campaigns as (
         SUM(COALESCE(cast(clicks as integer), 0)) as total_clicks,
         SUM(COALESCE(cast(cost as float), 0)) / 1000000 as total_cost,
         MAX(COALESCE(cast(impressions as integer), 0)) as impressions,
-        MAX(COALESCE(cast(search_impression_share as float), 0))            as search_impression_share,
-        MAX(COALESCE(cast(absolute_top_impression_percentage as float), 0)) as absolute_top_impression_percentage,
         dt_load,
         load_date
     FROM datalake_marketing_costs.google_campaigns_performance_report
     WHERE device = 'Computers'
         AND load_date = date('{year}-{month}-{day}')
-    GROUP BY 1,2,3,4,10,11
+    GROUP BY 1,2,3,4,8,9
 ),
 mobile_devices_campaigns as (
-    SELECT id_campaign,
+    SELECT 
+        id_campaign,
         id_external_customer,
         campaign_name,
         device,
         SUM(COALESCE(cast(clicks as integer), 0)) as total_clicks,
         SUM(COALESCE(cast(cost as float), 0)) / 1000000 as total_cost,
         MAX(COALESCE(cast(impressions as integer), 0)) as impressions,
-        MAX(COALESCE(cast(search_impression_share as float), 0))            as search_impression_share,
-        MAX(COALESCE(cast(absolute_top_impression_percentage as float), 0)) as absolute_top_impression_percentage,
         dt_load,
         load_date
     FROM datalake_marketing_costs.google_campaigns_performance_report
     WHERE device = 'Mobile devices with full browsers'
         AND load_date = date('{year}-{month}-{day}')
-    GROUP BY 1,2,3,4,10,11
+    GROUP BY 1,2,3,4,8,9
 ),
 tablet_devices_campaigns as (
-    SELECT id_campaign,
+    SELECT 
+        id_campaign,
         id_external_customer,
         campaign_name,
         device,
         SUM(COALESCE(cast(clicks as integer), 0)) as total_clicks,
         SUM(COALESCE(cast(cost as float), 0)) / 1000000 as total_cost,
         MAX(COALESCE(cast(impressions as integer), 0)) as impressions,
-        MAX(COALESCE(cast(search_impression_share as float), 0))            as search_impression_share,
-        MAX(COALESCE(cast(absolute_top_impression_percentage as float), 0)) as absolute_top_impression_percentage,
         dt_load,
         load_date
     FROM datalake_marketing_costs.google_campaigns_performance_report
     WHERE device = 'Tablets with full browsers'
         AND load_date = date('{year}-{month}-{day}')
-    GROUP BY 1,2,3,4,10,11
+    GROUP BY 1,2,3,4,8,9
 ),
 cte_campaigns as (
     SELECT min(id) over (PARTITION BY google_table.id_campaign, google_table.id_external_customer) as id,
@@ -379,12 +340,6 @@ cte_campaigns as (
         COALESCE(tablet_devices_campaigns.impressions, 0) as tablet_impressions,
         COALESCE(computer_devices_campaigns.impressions, 0) as desktop_impressions,
         (COALESCE(mobile_devices_campaigns.impressions, 0) + COALESCE(tablet_devices_campaigns.impressions, 0) + COALESCE(computer_devices_campaigns.impressions, 0)) as impressions,
-        COALESCE(computer_devices_campaigns.search_impression_share, 0)             as desktop_search_impression_share,
-        COALESCE(mobile_devices_campaigns.search_impression_share, 0)               as mobile_search_impression_share,
-        COALESCE(tablet_devices_campaigns.search_impression_share, 0)               as tablet_search_impression_share,
-        COALESCE(computer_devices_campaigns.absolute_top_impression_percentage, 0)  as desktop_absolute_top_impression_percentage,
-        COALESCE(mobile_devices_campaigns.absolute_top_impression_percentage, 0)    as mobile_absolute_top_impression_percentage,
-        COALESCE(tablet_devices_campaigns.absolute_top_impression_percentage, 0)    as tablet_absolute_top_impression_percentage,
         google_table.acc,
         google_table.load_date
 FROM datalake_marketing_costs.google_campaigns_performance_report google_table
@@ -426,16 +381,6 @@ final_cte_campaigns as (
         cte_campaigns.tablet_impressions,
         cte_campaigns.desktop_impressions,
         cte_campaigns.impressions,
-        -- Search Impression Share is the impressions we've received on the Search Network divided by the
-        -- estimated number of impressions we were eligible to receive. Value ranging from 0 to 100.
-        cte_campaigns.desktop_search_impression_share,
-        cte_campaigns.mobile_search_impression_share,
-        cte_campaigns.tablet_search_impression_share,
-        -- Absolute Top Impression Perc. is the percent of our ad impressions that are shown as the very
-        -- first ad above the organic search results. Value ranging from 0 to 1.
-        cte_campaigns.desktop_absolute_top_impression_percentage,
-        cte_campaigns.mobile_absolute_top_impression_percentage,
-        cte_campaigns.tablet_absolute_top_impression_percentage,
         now() as ts_load,
         cte_campaigns.load_date
     from cte_campaigns
@@ -571,12 +516,6 @@ SELECT DISTINCT
     cte_videos.tablet_impressions,
     cte_videos.desktop_impressions,
     cte_videos.impressions,
-    NULL AS desktop_search_impression_share,
-    NULL AS mobile_search_impression_share,
-    NULL AS tablet_search_impression_share,
-    NULL AS desktop_absolute_top_impression_percentage,
-    NULL AS mobile_absolute_top_impression_percentage,
-    NULL AS tablet_absolute_top_impression_percentage,
     NOW() AS ts_load,
     cte_videos.load_date
 FROM cte_videos

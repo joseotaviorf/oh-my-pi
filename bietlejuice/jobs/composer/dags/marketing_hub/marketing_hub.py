@@ -38,7 +38,7 @@ LIBRARIES_DESCRIPTION = Variable.get(
 
 local_tz = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz)
-MAIN_SCHEDULE_INTERVAL = "15 7 * * *"
+MAIN_SCHEDULE_INTERVAL = "15 4 * * *"
 
 GOOGLE_ADS_SOURCE_PATH = f"s3://{S3_MARKETING_PATH}/google-reports"
 GOOGLE_ADS_TARGET_PATH = f"s3://{DATALAKE_BUCKET}/raw/marketing_hub/google_ads"
