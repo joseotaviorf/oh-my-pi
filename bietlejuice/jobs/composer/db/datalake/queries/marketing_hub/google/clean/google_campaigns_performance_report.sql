@@ -11,10 +11,8 @@ SELECT
     int(impressions) as impressions,
     AccountDescriptiveName as account_descriptive_name,
     labels,
-    absolutetopimpressionpercentage as absolute_top_impression_percentage,
     reporttype as report_type,
     acc,
-    SearchImpressionShare as search_impression_share,
     date(date) as dt_load,
     date as load_date,
     from_unixtime(to_unix_timestamp(dt, 'dd-MM-yyyy'), 'yyyy-MM-dd') as dt_created

@@ -16,7 +16,6 @@ select
     impressions,
     image_creative_name AS account_descriptive_name,
     account_descriptive_name AS account_name,
-    absolute_top_impression_percentage,
     report_type,
     acc,
     campaign_name,

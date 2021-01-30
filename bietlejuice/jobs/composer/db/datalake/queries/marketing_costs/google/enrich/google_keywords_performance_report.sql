@@ -15,8 +15,6 @@ select
     labels,
     criteria,
     account_descriptive_name,
-    absolute_top_impression_percentage,
-    search_impression_share,
     report_type,
     acc,
     load_date,

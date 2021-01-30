@@ -16,7 +16,6 @@ SELECT
     int(impressions) as impressions,
     imagecreativename as image_creative_name,
     AccountDescriptiveName as account_descriptive_name,
-    float(AbsoluteTopImpressionPercentage) as absolute_top_impression_percentage,
     reporttype as report_type,
     acc,
     date(date) as dt_load,

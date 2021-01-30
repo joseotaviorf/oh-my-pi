@@ -13,8 +13,6 @@ select
     impressions,
     account_descriptive_name,
     labels,
-    absolute_top_impression_percentage,
-    search_impression_share,
     report_type,
     acc,
     load_date,

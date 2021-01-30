@@ -13,8 +13,6 @@ SELECT
     labels,
     criteria,
     AccountDescriptiveName as account_descriptive_name,
-    float(AbsoluteTopImpressionPercentage) as absolute_top_impression_percentage,
-    searchimpressionshare as search_impression_share,
     reporttype as report_type,
     acc,
     date(date) as dt_load,
