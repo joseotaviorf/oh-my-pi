@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS marketing_costs.fact_google_daily_cost_attributions (
 	sk_keyword VARCHAR,
 	sk_ad VARCHAR,
 	sk_campaign VARCHAR,
+	sk_video VARCHAR,
 	id_ad BIGINT,
 	id_keyword BIGINT,
 	id_external_customer BIGINT,
@@ -20,11 +21,5 @@ CREATE TABLE IF NOT EXISTS marketing_costs.fact_google_daily_cost_attributions (
 	tablet_impressions BIGINT,
 	desktop_impressions BIGINT,
 	impressions BIGINT,
-	desktop_search_impression_share FLOAT,
-	mobile_search_impression_share FLOAT,
-	tablet_search_impression_share FLOAT,
-	desktop_absolute_top_impression_percentage FLOAT,
-	mobile_absolute_top_impression_percentage FLOAT,
-	tablet_absolute_top_impression_percentage FLOAT,
 	ts_load TIMESTAMP
 );
