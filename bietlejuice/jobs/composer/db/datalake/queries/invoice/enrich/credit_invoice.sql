@@ -54,7 +54,7 @@ WITH credit_holidays AS (
         inv.id_contract,
         inv.status,
         inv.paid_amount,
-        COALESCE(inv.ts_paid, CURRENT_DATE) AS ts_paid,
+        inv.ts_paid,
         inv.ts_created,
         inv.status,
         inv.due_amount,
@@ -113,19 +113,13 @@ WITH credit_holidays AS (
     ON
         hl.month = MONTH(inv.ts_due)
         AND hl.day = DAY(inv.ts_due)
-    LEFT SEMI JOIN
-        datalake_retsuko_clean.entry ent
-    ON
-        inv.id = ent.id_invoice
-        AND (ent.bill_item = 'entry.bill-item/rental'
-            AND ent.description LIKE 'Aluguel%')
-        AND inv.due_amount < 0
     JOIN
         datalake_retsuko_clean.account AS acc
     ON
         inv.id_contract = acc.id_contract
     WHERE
         acc.type = 'tenant'
+        AND inv.due_amount < 0
 )
 SELECT
     inv.id,
@@ -137,62 +131,58 @@ SELECT
     inv.status,
     inv.due_amount,
     inv.paid_amount,
-    ROUND(DATEDIFF(CURRENT_DATE, rsk_cntrct.ts_signature)) AS day_of_contract,
-    ROUND(MONTHS_BETWEEN(CURRENT_DATE, rsk_cntrct.ts_signature)) AS month_of_contract,
-    ROUND(DATEDIFF(inv.ts_due, rsk_cntrct.ts_signature)) AS invoice_day_relative_to_contract,
-    ROUND(MONTHS_BETWEEN(inv.ts_due, rsk_cntrct.ts_signature)) AS invoice_month_relative_to_contract,
-    DATEDIFF(inv.ts_paid, inv.ts_due) AS late_days,
+    DATEDIFF(COALESCE(inv.ts_paid, CURRENT_DATE), inv.ts_due) AS late_days,
     (CASE
-        WHEN DATEDIFF(inv.ts_paid, inv.ts_due) >= 10 THEN TRUE
+        WHEN DATEDIFF(COALESCE(inv.ts_paid, CURRENT_DATE), inv.ts_due) >= 10 THEN TRUE
     ELSE FALSE END) AS is_over_10,
     (CASE
-        WHEN DATEDIFF(inv.ts_paid, inv.ts_due) >= 15 THEN TRUE
+        WHEN DATEDIFF(COALESCE(inv.ts_paid, CURRENT_DATE), inv.ts_due) >= 15 THEN TRUE
     ELSE FALSE END) AS is_over_15,
     (CASE
-        WHEN DATEDIFF(inv.ts_paid, inv.ts_due) >= 20 THEN TRUE
+        WHEN DATEDIFF(COALESCE(inv.ts_paid, CURRENT_DATE), inv.ts_due) >= 20 THEN TRUE
     ELSE FALSE END) AS is_over_20,
     (CASE
-        WHEN DATEDIFF(inv.ts_paid, inv.ts_due) >= 30 THEN TRUE
+        WHEN DATEDIFF(COALESCE(inv.ts_paid, CURRENT_DATE), inv.ts_due) >= 30 THEN TRUE
     ELSE FALSE END) AS is_over_30,
     (CASE
-        WHEN DATEDIFF(inv.ts_paid, inv.ts_due) >= 40 THEN TRUE
+        WHEN DATEDIFF(COALESCE(inv.ts_paid, CURRENT_DATE), inv.ts_due) >= 40 THEN TRUE
     ELSE FALSE END) AS is_over_40,
     (CASE
-        WHEN DATEDIFF(inv.ts_paid, inv.ts_due) >= 50 THEN TRUE
+        WHEN DATEDIFF(COALESCE(inv.ts_paid, CURRENT_DATE), inv.ts_due) >= 50 THEN TRUE
     ELSE FALSE END) AS is_over_50,
     (CASE
-        WHEN DATEDIFF(inv.ts_paid, inv.ts_due) >= 60 THEN TRUE
+        WHEN DATEDIFF(COALESCE(inv.ts_paid, CURRENT_DATE), inv.ts_due) >= 60 THEN TRUE
     ELSE FALSE END) AS is_over_60,
     (CASE
-        WHEN DATEDIFF(inv.ts_paid, inv.ts_due) >= 70 THEN TRUE
+        WHEN DATEDIFF(COALESCE(inv.ts_paid, CURRENT_DATE), inv.ts_due) >= 70 THEN TRUE
     ELSE FALSE END) AS is_over_70,
     (CASE
-        WHEN DATEDIFF(inv.ts_paid, inv.ts_due) >= 80 THEN TRUE
+        WHEN DATEDIFF(COALESCE(inv.ts_paid, CURRENT_DATE), inv.ts_due) >= 80 THEN TRUE
     ELSE FALSE END) AS is_over_80,
     (CASE
-        WHEN DATEDIFF(inv.ts_paid, inv.ts_due) >= 90 THEN TRUE
+        WHEN DATEDIFF(COALESCE(inv.ts_paid, CURRENT_DATE), inv.ts_due) >= 90 THEN TRUE
     ELSE FALSE END) AS is_over_90,
     (CASE
-        WHEN DATEDIFF(inv.ts_paid, inv.ts_due) >= 100 THEN TRUE
+        WHEN DATEDIFF(COALESCE(inv.ts_paid, CURRENT_DATE), inv.ts_due) >= 100 THEN TRUE
     ELSE FALSE END) AS is_over_100,
     (CASE
-        WHEN DATEDIFF(inv.ts_paid, inv.ts_due) >= 110 THEN TRUE
+        WHEN DATEDIFF(COALESCE(inv.ts_paid, CURRENT_DATE), inv.ts_due) >= 110 THEN TRUE
     ELSE FALSE END) AS is_over_110,
     (CASE
-        WHEN DATEDIFF(inv.ts_paid, inv.ts_due) >= 120 THEN TRUE
+        WHEN DATEDIFF(COALESCE(inv.ts_paid, CURRENT_DATE), inv.ts_due) >= 120 THEN TRUE
     ELSE FALSE END) AS is_over_120,
     (CASE
-        WHEN DATEDIFF(inv.ts_paid, inv.ts_due) >= 140 THEN TRUE
+        WHEN DATEDIFF(COALESCE(inv.ts_paid, CURRENT_DATE), inv.ts_due) >= 140 THEN TRUE
     ELSE FALSE END) AS is_over_140,
     (CASE
-        WHEN DATEDIFF(inv.ts_paid, inv.ts_due) >= 160 THEN TRUE
+        WHEN DATEDIFF(COALESCE(inv.ts_paid, CURRENT_DATE), inv.ts_due) >= 160 THEN TRUE
     ELSE FALSE END) AS is_over_160,
     (CASE
-        WHEN DATEDIFF(inv.ts_paid, inv.ts_due) >= 180 THEN TRUE
+        WHEN DATEDIFF(COALESCE(inv.ts_paid, CURRENT_DATE), inv.ts_due) >= 180 THEN TRUE
     ELSE FALSE END) AS is_over_180,
     inv.accrual_year_month,
     inv.ts_due,
-    COALESCE(inv.ts_paid, CURRENT_DATE) AS ts_paid,
+    inv.ts_paid,
     rsk_cntrct.ts_signature
 FROM
     invoices AS inv
