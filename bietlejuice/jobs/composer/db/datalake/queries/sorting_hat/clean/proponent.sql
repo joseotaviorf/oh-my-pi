@@ -3,6 +3,7 @@ select
     name,
     cpf,
     income_nature,
+    occupation_area,
     marital_status,
     gender,
     admission_date as dt_admitted,
