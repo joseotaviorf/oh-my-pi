@@ -83,7 +83,8 @@ if __name__ == "__main__":
     sheet_details = json.loads(args.sheet_details)
 
     base_dbutils = BaseDBUtils()
-    dbutils = base_dbutils.get_dbutils()
+    if base_dbutils.get_dbutils() is not None:
+        dbutils = base_dbutils.get_dbutils()
 
     credentials, scope = __get_auth(dbutils)
 
