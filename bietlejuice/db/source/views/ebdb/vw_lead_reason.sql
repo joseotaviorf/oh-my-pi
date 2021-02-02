@@ -39,9 +39,21 @@ select 'HOUSE_ALREADY_RENTED', 'ImovelIndisponivel'
 union all
 select 'HOUSE_ALREADY_SOLD', 'ImovelIndisponivel'
 union all
+select 'PROPERTY_IN_OFFPLANT', 'ImovelIndisponivel'
+union all
+select 'PROPERTY_IN_JUDICIAL_INVENTORY', 'ImovelIndisponivel'
+union all
 select 'HOUSE_ALREADY_PUBLISHED', 'Duplicado'
 union all
 select 'DUPLICATED_LEAD', 'Duplicado'
+union all
+select 'OWNER_GAVE_UP_SELLING', 'ProprietarioRecusou'
+union all
+select 'OWNER_DISAGREE_PAYMENT_TIMING', 'ProprietarioRecusou'
+union all
+select 'OWNER_DIDNT_SELECT_CONTEXT', 'ProprietarioRecusou'
+union all
+select 'OWNER_CONSIDERED_SALE_FEE_TOO_HIGH', 'ProprietarioRecusou'
 union all
 select 'HOUSE_UNDER_EXCLUSIVITY_CONTRACT', 'ProprietarioRecusou'
 union all
