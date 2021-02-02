@@ -79,7 +79,7 @@ answer_sub_dag = enrich_sub_dags.pop("answer")
 dispatch_sub_dag = enrich_sub_dags.pop("dispatch")
 independent_sub_dags = [
     enrich_sub_dags.pop("campaign"),
-    enrich_sub_dags.pop("dispatch_status"),
+    enrich_sub_dags.pop("dispatch_attributes"),
 ]
 
 create_cluster_task >> [answer_sub_dag, dispatch_sub_dag]
