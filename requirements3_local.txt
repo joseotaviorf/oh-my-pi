@@ -91,6 +91,7 @@ quintoandar-rtb-api-client==0.1.6
 quintoandar-teravoz-client==0.1.5
 quintoandar-zendesk-client==0.1.1
 quintoandar-jira-api-client==0.1.0
+quintoandar-chattermill-api-client==0.1.0
 firebase_admin==3.0.0
 flower==0.9.3
 redis==3.4.1
