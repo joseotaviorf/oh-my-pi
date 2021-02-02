@@ -75,3 +75,4 @@ FROM sale_offer_audit soa
 INNER JOIN last_update lup
     ON soa.id = lup.id 
     AND soa.ts_updated = lup.ts_last_updated
+WHERE soa.status <> 'DRAFT'
