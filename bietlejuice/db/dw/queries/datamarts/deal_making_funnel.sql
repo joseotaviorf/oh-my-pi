@@ -234,7 +234,7 @@ select distinct
         else 'ERRO' end as "deal_breaker",
     case when drop_category = 'Quali' then dfm.dt_offer_dismissed else null end as "dt_offer_dismissed_quali",
     case when drop_category = 'Não Quali' then dfm.dt_offer_dismissed else null end as "dt_offer_dismissed_naoquali",
-    dfm.dt_submitted as "dt_offer_submitted",
+    COALESCE(so.ts_created, dfm.dt_submitted) as "dt_offer_submitted",
     least(dfm.dt_deal_qualified,dt_offer_dismissed_quali,dfm.dt_accepted) as "dt_deal_qualified_adjusted",
     dfm.dt_accepted as "dt_offer_accepted",
     dfm.dt_sale_agreement_created,
