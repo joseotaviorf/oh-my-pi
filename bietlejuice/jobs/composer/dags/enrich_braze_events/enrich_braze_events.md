@@ -5,7 +5,7 @@
 This DAG creates the enriched tables events_owners and events_tenants, the first layer of enrichment from Braze Events DAG, by cleaning data and applying an event type filter.
 ​
 ### Execution​ Interval
-This DAG is trigged once per day via Mediator.
+This DAG is triggered once per day via Mediator.
 
 More information about run time [here]({chart_url}{dag_id})
 
@@ -18,7 +18,8 @@ This pipeline produces the following output table:
 ​
 ### Responsible Data Engineering Team
 ​
-For any questions or concerns about the DAG and its load, please contact the Data Integration Team.
+For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the 
+[DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
 ​
 ### Additional Information
 ​
