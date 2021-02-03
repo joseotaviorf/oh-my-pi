@@ -4,6 +4,8 @@ WITH customer_conversions AS (
          cc.id_dispatch,
          cc.id_dispatch_lot,
          cc.id_answer,
+         cc.customer_email,
+         cc.customer_phone,
          cc.is_customer_identified,
          d.status,
          d.id_campaign,
@@ -79,10 +81,13 @@ SELECT
      COALESCE(ad.id_tta, -1) AS sk_tta,
      COALESCE(ad.id_offer_context, -1) AS sk_offer,
      COALESCE(ad.id_contract, -1) AS sk_contract,
-     COALESCE(CAST(date_format(cc.ts_created, 'yyyyMMdd') AS BIGINT), -1) AS sk_sent_date,
+     COALESCE(CAST(date_format(cc.ts_created, 'yyyyMMdd') AS BIGINT), -1) AS sk_created_date,
+     COALESCE(CAST(date_format(da.dispatch_time, 'yyyyMMdd') AS BIGINT), -1) AS sk_sent_date,
      COALESCE(CAST(date_format(cc.ts_answer_sent_local, 'yyyyMMdd') AS BIGINT), -1) AS sk_answered_date,
      cc.nps_answer AS score,
      minutes_spent_answering AS minutes_response_time,
+     da.status AS dispatch_status,
+     da.survey_opened,
      cc.status <> 'Finalizado' AS is_pending_survey,
      cc.id_answer IS NOT NULL AS is_answered,
      cc.nps_comment IS NOT NULL AS has_comment,
@@ -93,3 +98,7 @@ LEFT JOIN customer_keys ck
      ON ck.id_customer = cc.id_customer
 LEFT JOIN datalake_nps_answer_drivers.answer_drivers ad
      ON cc.id_answer = ad.id_answer
+LEFT JOIN datalake_tracksale.dispatch_attributes da
+     ON cc.id_dispatch_lot = da.id
+     AND (cc.customer_email = da.email
+     OR cc.customer_phone = da.phone)
