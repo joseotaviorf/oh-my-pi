@@ -7,7 +7,7 @@ SELECT
     FLOAT(mobile_cost), 
     FLOAT(total_cost),
     INT(acc),
-    DATE(curr_dt),
+    DATE(curr_date) AS curr_dt,
     STRING(dt)
 FROM
     datalake_lifull_campaigns_raw.campaigns_report
