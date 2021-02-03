@@ -87,7 +87,7 @@ SELECT
      cc.nps_answer AS score,
      minutes_spent_answering AS minutes_response_time,
      da.status AS dispatch_status,
-     da.survey_opened,
+     COALESCE(da.survey_opened, FALSE) as is_survey_opened,
      cc.status <> 'Finalizado' AS is_pending_survey,
      cc.id_answer IS NOT NULL AS is_answered,
      cc.nps_comment IS NOT NULL AS has_comment,
