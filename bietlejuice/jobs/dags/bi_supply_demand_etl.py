@@ -439,6 +439,18 @@ def sales_listing_flows_sub_dag(sub_dag_name):
     return sub_dag.build_sales_listing_flows()
 
 
+amplitude_partner_taxonomy = BaseDAG.build_python_operator(
+    dag=main_dag,
+    task_id='ODS_amplitude_partner_taxonomy',
+    python_callable=utils.load_athena_file_query_to_ods,
+    op_kwargs={
+        "table_name": "amplitude_partner_taxonomy",
+        "file_name": "amplitude_partner_taxonomy.sql",
+        "bucket": bucket,
+    }
+)
+
+
 ods_house_rent_flow = BaseDAG.build_python_operator(
     task_id="ODS_house_rent_flow",
     dag=main_dag,
@@ -725,6 +737,7 @@ house_dag >> fact_photo_job
 ods_fact_house_listing_status_task >> dw_fact_house_listing_status_task
 
 photo_job_dag >> fact_photo_job
+amplitude_partner_taxonomy >> partner_dag
 
 fact_house_listings.set_upstream(
     [condo_dag, partner_dag, house_dag, partner_agent_dag, contract_dag]
