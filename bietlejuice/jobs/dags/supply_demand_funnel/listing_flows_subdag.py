@@ -64,7 +64,7 @@ class ListingFlowsSubDag(BaseSubDag):
         ods_listing_flows_with_reprocessed_leads_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='ODS_listing_flows_with_reprocessed_leads',
-            python_callable=utils.materialize_view_ods,
+            python_callable=utils.insert_into_table_from_view_ods,
             op_kwargs={
                 'bucket': self.bucket,
                 'view_name': 'listing_flows_with_reprocessed_leads'
@@ -74,7 +74,7 @@ class ListingFlowsSubDag(BaseSubDag):
         ods_acquisitions_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='ODS_acquisitions',
-            python_callable=utils.materialize_view_ods,
+            python_callable=utils.insert_into_table_from_view_ods,
             op_kwargs={
                 'bucket': self.bucket,
                 'view_name': 'acquisitions'
@@ -84,7 +84,7 @@ class ListingFlowsSubDag(BaseSubDag):
         ods_base_photo_tasks_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='ODS_base_photo_tasks',
-            python_callable=utils.materialize_view_ods,
+            python_callable=utils.insert_into_table_from_view_ods,
             op_kwargs={
                 'bucket': self.bucket,
                 'view_name': 'base_photo_tasks'
@@ -94,7 +94,7 @@ class ListingFlowsSubDag(BaseSubDag):
         ods_rn_lead_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='ODS_rn_lead',
-            python_callable=utils.materialize_view_ods,
+            python_callable=utils.insert_into_table_from_view_ods,
             op_kwargs={
                 'bucket': self.bucket,
                 'view_name': 'rn_lead'
@@ -104,7 +104,7 @@ class ListingFlowsSubDag(BaseSubDag):
         ods_potential_listings_lead_tasks_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='ODS_potential_listings_lead_tasks',
-            python_callable=utils.materialize_view_ods,
+            python_callable=utils.insert_into_table_from_view_ods,
             op_kwargs={
                 'bucket': self.bucket,
                 'view_name': 'potential_listings_lead_tasks'
@@ -114,7 +114,7 @@ class ListingFlowsSubDag(BaseSubDag):
         ods_rep_leads_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='ODS_rep_leads',
-            python_callable=utils.materialize_view_ods,
+            python_callable=utils.insert_into_table_from_view_ods,
             op_kwargs={
                 'bucket': self.bucket,
                 'view_name': 'rep_leads'
@@ -124,7 +124,7 @@ class ListingFlowsSubDag(BaseSubDag):
         ods_potential_listings_rep_leads_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='ODS_potential_listings_rep_leads',
-            python_callable=utils.materialize_view_ods,
+            python_callable=utils.insert_into_table_from_view_ods,
             op_kwargs={
                 'bucket': self.bucket,
                 'view_name': 'potential_listings_rep_leads'
@@ -134,7 +134,7 @@ class ListingFlowsSubDag(BaseSubDag):
         ods_potential_listings_house_b2b_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='ODS_potential_listings_house_b2b',
-            python_callable=utils.materialize_view_ods,
+            python_callable=utils.insert_into_table_from_view_ods,
             op_kwargs={
                 'bucket': self.bucket,
                 'view_name': 'potential_listings_house_b2b'
@@ -144,7 +144,7 @@ class ListingFlowsSubDag(BaseSubDag):
         ods_potential_listings_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='ODS_potential_listings',
-            python_callable=utils.materialize_view_ods,
+            python_callable=utils.insert_into_table_from_view_ods,
             op_kwargs={
                 'bucket': self.bucket,
                 'view_name': 'potential_listings'
@@ -154,7 +154,7 @@ class ListingFlowsSubDag(BaseSubDag):
         ods_lead_city_region_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='ODS_lead_city_region',
-            python_callable=utils.materialize_view_ods,
+            python_callable=utils.insert_into_table_from_view_ods,
             op_kwargs={
                 'bucket': self.bucket,
                 'view_name': 'lead_city_region'
