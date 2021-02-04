@@ -195,6 +195,22 @@ def materialize_view_ods(view_name, bucket, append=False):
     )
 
 
+def insert_into_table_from_view_ods(view_name):
+    print("Truncating table {}".format(view_name))
+    BaseETL.execute_command(
+        command='truncate {}'.format(view_name),
+        db_enum=EnumDB.BI_ODS,
+        commit=True
+    )
+
+    print("Inserting into {0} from vw_{0}".format(view_name))
+    BaseETL.execute_command(
+        command='insert into {0} select * from vw_{0}'.format(view_name),
+        db_enum=EnumDB.BI_ODS,
+        commit=True
+    )
+
+
 def load_athena_file_query_to_ods(table_name, file_name, bucket, append=False):
     data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
     data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
