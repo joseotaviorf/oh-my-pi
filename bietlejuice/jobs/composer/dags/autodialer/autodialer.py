@@ -17,10 +17,12 @@ DATALAKE_BUCKET = Variable.get("datalake_bucket")
 
 # DAG params setup
 SOURCE = "autodialer"
+DAG_NAME = "autodialer"
 DAG_ID = f"bietlejuice.{SOURCE}"
 sp_tz = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 3, 16, 0, 0, 0, tzinfo=sp_tz)
 MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 # S3 paths setup
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
@@ -106,6 +108,9 @@ main_dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
+        chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
+    ),
 )
 
 # Create tables task builder
