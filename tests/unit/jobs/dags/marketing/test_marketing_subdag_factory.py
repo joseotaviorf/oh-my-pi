@@ -17,7 +17,6 @@ class TestMarketingSubdagFactory(object):
     @pytest.mark.parametrize('class_, expected', [
         (MarketingEnum.GOOGLE_ADS, MarketingGoogleAdsSubDag),
         (MarketingEnum.FACEBOOK_ADS, MarketingFacebookAdsSubDag),
-        (MarketingEnum.RTB, MarketingRtbCampaignsSubDag),
         (MarketingEnum.TWITTER, MarketingTwitterCampaignsSubDag)
     ])
     def test_factory(self, class_, expected):

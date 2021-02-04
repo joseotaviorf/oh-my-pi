@@ -43,7 +43,6 @@ class MarketingSubDagFactory(object):
         return {
             MarketingEnum.GOOGLE_ADS: MarketingGoogleAdsSubDag,
             MarketingEnum.FACEBOOK_ADS: MarketingFacebookAdsSubDag,
-            MarketingEnum.RTB: MarketingRtbCampaignsSubDag,
             MarketingEnum.TWITTER: MarketingTwitterCampaignsSubDag,
             MarketingEnum.LIFULL: MarketingLifullCampaignsSubDag
         }.get(class_)

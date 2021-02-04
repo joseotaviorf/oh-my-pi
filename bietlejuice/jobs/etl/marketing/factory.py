@@ -40,7 +40,6 @@ class MarketingFactory(object):
         return {
             MarketingEnum.GOOGLE_ADS: GoogleAds,
             MarketingEnum.FACEBOOK_ADS: FacebookAds,
-            MarketingEnum.RTB: RtbCampaigns,
             MarketingEnum.TWITTER: TwitterCampaigns,
             MarketingEnum.LIFULL: LifullCampaigns
         }.get(class_)

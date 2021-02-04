@@ -2,7 +2,6 @@ from datetime import datetime
 
 import pytest
 
-from bietlejuice.jobs.etl.marketing import RtbCampaigns
 from bietlejuice.jobs.etl.marketing import FacebookAds
 from bietlejuice.jobs.etl.marketing import GoogleAds
 from bietlejuice.jobs.etl.marketing import LifullCampaigns
