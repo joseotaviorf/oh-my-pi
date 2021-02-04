@@ -13,7 +13,7 @@ SELECT
 	lf.mkt_channel,
 	dl.sales_company,
 	CASE
-	    WHEN lf.mkt_origin = 'B2B' OR lf.mkt_origin = 'CR' THEN lf.mkt_origin
+	    WHEN lf.mkt_origin = 'B2B' OR lf.mkt_origin = 'CIQ' THEN lf.mkt_origin
 	    WHEN lf.mkt_completion = 'Full Self-Service' THEN 'FSS'
 	    WHEN (dl.sales_company = 'ACTION_LINE' AND has_isales_intervention = TRUE) OR (dl.sales_company = 'ATENTO' AND has_isales_intervention = TRUE) THEN 'OUT'
 	    ELSE 'ISS'
@@ -23,7 +23,7 @@ SELECT
         ELSE lead_context_origin
 	END AS mkt_campaign_context,
 	CASE
-	    WHEN lf.mkt_origin IN ('Indica Aí - Agents','Indica Aí - General', 'Price Calculator', 'B2B', 'CR', 'Doorman') THEN 'Paid'
+	    WHEN lf.mkt_origin IN ('Indica Aí - Agents','Indica Aí - General', 'Price Calculator', 'B2B', 'CIQ', 'Doorman') THEN 'Paid'
 	    WHEN lf.mkt_origin IN ('Other', 'Backend') THEN 'Non Paid'
         WHEN lf.mkt_channel IN ('CRM/Notification', 'LeadEnrichment', 'Organic') AND lf.mkt_origin = 'Owner PWA' THEN 'Non Paid'
         WHEN lf.mkt_channel = 'Paid' AND lf.mkt_origin = 'Owner PWA' THEN 'Paid'

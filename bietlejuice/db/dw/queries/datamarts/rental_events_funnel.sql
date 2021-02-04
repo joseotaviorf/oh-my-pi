@@ -8,7 +8,7 @@ SELECT
 	fhlf.mkt_origin AS supply_mkt_origin,
 	fhlf.mkt_channel AS supply_mkt_channel,
 	CASE
-	    WHEN fhlf.mkt_origin = 'B2B' OR fhlf.mkt_origin = 'CR' THEN fhlf.mkt_origin
+	    WHEN fhlf.mkt_origin = 'B2B' OR fhlf.mkt_origin = 'CIQ' THEN fhlf.mkt_origin
 	    WHEN fhlf.mkt_completion = 'Full Self-Service' THEN 'FSS'
 	    ELSE 'IS'
 		END AS lead_context,
@@ -55,7 +55,7 @@ SELECT
 	fhlf.mkt_origin AS supply_mkt_origin,
 	fhlf.mkt_channel AS supply_mkt_channel,
 	CASE
-	    WHEN fhlf.mkt_origin = 'B2B' OR fhlf.mkt_origin = 'CR' THEN fhlf.mkt_origin
+	    WHEN fhlf.mkt_origin = 'B2B' OR fhlf.mkt_origin = 'CIQ' THEN fhlf.mkt_origin
 	    WHEN fhlf.mkt_completion = 'Full Self-Service' THEN 'FSS'
 	    ELSE 'IS'
 		END AS lead_context,
@@ -102,7 +102,7 @@ SELECT
 	fhlf.mkt_origin AS supply_mkt_origin,
 	fhlf.mkt_channel AS supply_mkt_channel,
 	CASE
-	    WHEN fhlf.mkt_origin = 'B2B' OR fhlf.mkt_origin = 'CR' THEN fhlf.mkt_origin
+	    WHEN fhlf.mkt_origin = 'B2B' OR fhlf.mkt_origin = 'CIQ' THEN fhlf.mkt_origin
 	    WHEN fhlf.mkt_completion = 'Full Self-Service' THEN 'FSS'
 	    ELSE 'IS'
 		END AS lead_context,
@@ -149,7 +149,7 @@ SELECT
 	fhlf.mkt_origin AS supply_mkt_origin,
 	fhlf.mkt_channel AS supply_mkt_channel,
 	CASE
-	    WHEN fhlf.mkt_origin = 'B2B' OR fhlf.mkt_origin = 'CR' THEN fhlf.mkt_origin
+	    WHEN fhlf.mkt_origin = 'B2B' OR fhlf.mkt_origin = 'CIQ' THEN fhlf.mkt_origin
 	    WHEN fhlf.mkt_completion = 'Full Self-Service' THEN 'FSS'
 	    ELSE 'IS'
 		END AS lead_context,
@@ -196,7 +196,7 @@ SELECT
 	fhlf.mkt_origin AS supply_mkt_origin,
 	fhlf.mkt_channel AS supply_mkt_channel,
 	CASE
-	    WHEN fhlf.mkt_origin = 'B2B' OR fhlf.mkt_origin = 'CR' THEN fhlf.mkt_origin
+	    WHEN fhlf.mkt_origin = 'B2B' OR fhlf.mkt_origin = 'CIQ' THEN fhlf.mkt_origin
 	    WHEN fhlf.mkt_completion = 'Full Self-Service' THEN 'FSS'
 	    ELSE 'IS'
 		END AS lead_context,
