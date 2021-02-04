@@ -43,8 +43,10 @@ def extract_skip_list():
 
 
 # Define tasks
+DAG_NAME = "mediator"
+DAG_ID = f"airflow.{DAG_NAME}"
 mediator_dag = DAG(
-    dag_id="airflow.mediator",
+    dag_id=DAG_ID,
     default_args={
         "owner": BaseDAG.DEFAULT_OWNER,
         "wait_for_downstream": False,
@@ -52,9 +54,10 @@ mediator_dag = DAG(
     },
     start_date=datetime(2020, 5, 8, 0, 0, 0),
     schedule_interval="0,30 * * * *",
+    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
+        chart_url=Variable.get("DOC_MD_BASE_URL"), dag_id=DAG_ID
+    ),
 )
-
-mediator_dag.doc_md = BaseDAG.get_dag_doc("mediator")
 
 dependencies_dict = extract_dependencies()
 sensor_task = QuintoAndarShortCircuitExternalSensor(
