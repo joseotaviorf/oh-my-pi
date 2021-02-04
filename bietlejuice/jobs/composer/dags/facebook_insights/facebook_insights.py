@@ -42,7 +42,7 @@ CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 CUSTOM_LIBRARIES = [
     {
         "whl": f"{ARTIFACTS_S3_BUCKET}/facebook-api-client-python/"
-        f"quintoandar_facebook_api_client-0.1.1-py2.py3-none-any.whl"
+        f"quintoandar_facebook_api_client-0.1.2-py2.py3-none-any.whl"
     }
 ]
 
