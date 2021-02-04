@@ -25,8 +25,6 @@ class Marketing(object):
         'fact_google_daily_cost_attributions': 'sk_keyword || sk_ad',
         'dim_facebook_ad': 'sk_ad',
         'fact_facebook_daily_cost_attributions': 'sk_ad',
-        'fact_rtb_daily_cost_attributions': 'sk_sub_campaign',
-        'dim_rtb_sub_campaign': 'sk_sub_campaign',
         'dim_trovit_campaign': 'sk_trovit_campaign',
         'fact_trovit_daily_cost_attributions': 'sk_trovit_campaign',
         'dim_mitula_campaign': 'sk_mitula_campaign',

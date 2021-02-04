@@ -375,49 +375,29 @@ campaigns_full AS (
     UNION
     SELECT
         frt.sk_date,
-        'rtb'::varchar AS origin,
-        'fact_rtb_daily_cost_attributions'::varchar AS fact_cost,
+        'rtb'::VARCHAR AS origin,
+        'fact_rtb_daily_cost_attributions'::VARCHAR AS fact_cost,
         drt.campaign_name,
-        NULL::varchar AS campaign_city,
+        NULL::VARCHAR AS campaign_city,
         drt.account_name AS account_name,
-        LOWER(drt.campaign_name) AS campaign_name_l,
-        LOWER(drt.account_name) AS account_name_l,
+        lower(drt.campaign_name) AS campaign_name_l,
+        lower(drt.account_name) AS account_name_l,
         drt.campaign_name AS utm_campaign,
-        NULL::varchar(512) AS utm_term,
-        NULL::varchar(512) AS utm_content,
-        NULL::numeric(16,
-            4) AS desktop_cost,
-        NULL::numeric(16,
-            4) AS mobile_cost,
-        NULL::numeric(16,
-            4) AS other_cost,
-        SUM(
-            COST) AS total_cost,
+        NULL::VARCHAR(512) AS utm_term,
+        NULL::VARCHAR(512) AS utm_content,
+        NULL::NUMERIC(16,4) AS desktop_cost,
+        NULL::NUMERIC(16,4) AS mobile_cost,
+        NULL::NUMERIC(16,4) AS other_cost,
+        sum(cost) AS total_cost,
         NULL AS report_type,
         NULL AS ad_type
-    FROM
-        marketing.fact_rtb_daily_cost_attributions frt
-        LEFT JOIN marketing.dim_rtb_sub_campaign drt ON frt.sk_sub_campaign = drt.sk_sub_campaign
-    WHERE
-        frt.sk_date >= 20180101
-    GROUP BY
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13,
-        14,
-        16,
-        17
-        -- TWITTER
+    FROM marketing_costs.fact_rtb_daily_cost_attributions frt
+        LEFT JOIN marketing_costs.dim_rtb_campaign drt
+        ON frt.sk_sub_campaign = drt.sk_sub_campaign
+        AND frt.sk_date = drt.sk_date
+    WHERE frt.sk_date >= 20180101
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17
+    -- TWITTER
     UNION
     SELECT
         ftw.sk_date,

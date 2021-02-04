@@ -70,19 +70,6 @@ def twitter_campaigns():
     )
 
 
-
-@pytest.fixture
-def rtb_campaigns():
-    return RtbCampaigns(
-        s3_bucket=S3_BUCKET,
-        execution_date=EXECUTION_DATE,
-        auth={
-            "client_id": "client_id",
-            "client_secret": "client_secret"
-        }
-    )
-
-
 @pytest.fixture
 def lifull_campaigns():
     return LifullCampaigns(

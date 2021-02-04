@@ -4,7 +4,6 @@ from bietlejuice.jobs.etl.marketing.facebook_ads import FacebookAds
 from bietlejuice.jobs.etl.marketing.google_ads import GoogleAds
 from bietlejuice.jobs.etl.marketing.lifull_campaigns import LifullCampaigns
 from bietlejuice.jobs.etl.marketing.marketing_enum import MarketingEnum
-from bietlejuice.jobs.etl.marketing.rtb_campaigns import RtbCampaigns
 from bietlejuice.jobs.etl.marketing.twitter_campaigns import TwitterCampaigns
 from qa_python_utils import QuintoAndarLogger
 

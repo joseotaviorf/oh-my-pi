@@ -80,7 +80,6 @@ win-inet-pton==1.0.1
 xlrd # lib to process xls files in s3 - old_etl
 xmltodict==0.10.2
 snakebite==2.11.0
-rtbhouse-sdk==5.0.0
 sshtunnel==0.1.4
 twitter-ads==7.0.1
 configparser==3.5.0b2

@@ -5,8 +5,6 @@ from bietlejuice.jobs.dags.marketing.marketing_facebook_ads_subdag import \
     MarketingFacebookAdsSubDag
 from bietlejuice.jobs.dags.marketing.marketing_google_ads_subdag import \
     MarketingGoogleAdsSubDag
-from bietlejuice.jobs.dags.marketing.marketing_rtb_campaigns_subdag import \
-    MarketingRtbCampaignsSubDag
 from bietlejuice.jobs.dags.marketing.marketing_subdag_factory import \
     MarketingSubDagFactory
 from bietlejuice.jobs.dags.marketing.marketing_twitter_campaigns_subdag import \
