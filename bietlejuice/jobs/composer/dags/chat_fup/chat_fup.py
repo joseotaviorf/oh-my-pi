@@ -8,14 +8,15 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
 
-from bietlejuice.jobs.composer.dags.chat_fup import SOURCE
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
 from bietlejuice.jobs.composer.services import FileService
 
-DAG_ID = f"bietlejuice.{SOURCE}"
+DAG_NAME = "chat_fup"
+DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = Variable.get("environment")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 # databricks config
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
@@ -31,7 +32,7 @@ LIBRARIES_DESCRIPTION = Variable.get(
 
 # bietlejuice paths
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
+SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{DAG_NAME}/"
 
 # dag params
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
@@ -47,6 +48,9 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
+        chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
+    ),
 )
 
 
@@ -92,7 +96,7 @@ def clean_tasks(sub_dag_name, table_name, slugged_table_name):
 
 def build_clean_subdags(prev_task, next_task):
     # create subdag for each clean table
-    file_list = FileService.list_layer_sql_files(SOURCE, "clean")
+    file_list = FileService.list_layer_sql_files(DAG_NAME, "clean")
 
     if file_list:
         for file_name in file_list:
