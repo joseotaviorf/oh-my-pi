@@ -13,10 +13,11 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
 from bietlejuice.jobs.composer.services import FileService
 
 # DAG params
-DAG_ID = "datamarts"
-FULL_DAG_ID = f"bietlejuice.{DAG_ID}"
+DAG_NAME = "datamarts"
+DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = Variable.get("environment")
 SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 local_tz = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 1, 15, 0, 0, 0, tzinfo=local_tz)
@@ -24,9 +25,9 @@ MAIN_SCHEDULE_INTERVAL = "0 9 * * *"
 
 # S3 paths setup
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{DAG_ID}/"
+SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{DAG_NAME}/"
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
-    Variable.get("databricks_s3_bucket"), DAG_ID
+    Variable.get("databricks_s3_bucket"), DAG_NAME
 )
 
 # cluster setup
@@ -39,7 +40,7 @@ LIBRARIES_DESCRIPTION = Variable.get(
 )
 
 config_file_path = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), f"{DAG_ID}.yml"
+    os.path.dirname(os.path.realpath(__file__)), f"{DAG_NAME}.yml"
 )
 pipeline_config = FileService.get_dict_from_yaml_file(config_file_path).get(
     "pipeline", {}
@@ -79,7 +80,7 @@ def get_option(task_configs, option_key):
 def build_entity_subdag(subdag_name, entity_name, entity_pipeline):
     entity_subdag = BaseSubDAG(
         sub_dag_name=subdag_name,
-        dag_name=FULL_DAG_ID,
+        dag_name=DAG_ID,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
         start_date=MAIN_START_DATE,
     )._build_local_dag()
@@ -88,7 +89,9 @@ def build_entity_subdag(subdag_name, entity_name, entity_pipeline):
 
     sql_file = get_option(entity_pipeline["dw"], "sql_file")
     table = get_option(entity_pipeline["dw"], "table")
-    schema = get_option(entity_pipeline["dw"], "schema")
+    schema = get_option(
+        entity_pipeline["dw"], "schema"
+    )  # TODO this value is not used in the job
 
     slugged_table_name = table.replace("_", "-")
     create_table_in_datalake_task = QuintoAndarDatabricksSubmitRunOperator(
@@ -120,7 +123,7 @@ def build_entity_subdag(subdag_name, entity_name, entity_pipeline):
 
 # DAG definition
 DAG = DAG(
-    dag_id=FULL_DAG_ID,
+    dag_id=DAG_ID,
     default_args={
         "owner": BaseDAG.DEFAULT_OWNER,
         "wait_for_downstream": False,
@@ -128,6 +131,9 @@ DAG = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
+        chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
+    ),
 )
 
 # Tasks definition
@@ -168,7 +174,6 @@ def build_tasks_dependency(create_cluster_task, terminate_cluster_task):
                 dep_task = DAG.task_dict[dep_entity_name]
                 entity_task.set_upstream(dep_task)
 
-    # TC
     dependencies_list = list(set(dependencies_list))
     for entity_name, entity_pipeline in pipeline_config.items():
         entity_task = DAG.task_dict[entity_name]

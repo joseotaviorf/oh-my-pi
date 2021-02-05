@@ -1,7 +1,7 @@
 pipeline:
-  # ! KEEP THIS COMMENTED AS A TEMPLATE UNTIL WE HAVE A DATAMART IN THIS FLOW
-  # offer-attribution-conversion-paths-demand:
+  ##<KEEP THIS COMMENTED AS A TEMPLATE>
+  # <task-name-like-attribution-conversion-paths>:
   #   dw:
-  #     sql_file: dw/queries/datamarts/offer_attribution_conversion_paths_demand.sql
-  #     table: offer_attribution_conversion_paths_demand
-  #     schema: datamarts
+  #     sql_file: <query-file E.g: dw/queries/datamarts/offer_attribution_conversion_paths_demand.sql>
+  #     table: <targe-table-name>
+  #     schema: <target-schema-name> # TODO this will always be `datamart` (for both datalake and dw). This var is not used anymore

@@ -30,7 +30,7 @@ if __name__ == "__main__":
     env = args.env
     dw_bucket = args.dw_bucket
     dw_schema = args.dw_schema
-    schema = args.schema
+    schema = args.schema  # TODO this schema is not used
     table = args.table
     sql_file = args.sql_file
 
