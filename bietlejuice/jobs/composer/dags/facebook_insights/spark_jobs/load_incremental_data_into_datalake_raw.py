@@ -7,9 +7,9 @@ from datetime import datetime
 from quintoandar_logger import QuintoAndarLogger
 from quintoandar_facebook_api_client.clients import FacebookClient
 
-from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat
+from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat, BaseDBUtils
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
-
+from bietlejuice.jobs.composer.base.api import APIEnum
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
@@ -23,15 +23,20 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 
 def build_facebook_client(auth):
-    fb_client = FacebookClient(auth["app_id"], auth["app_secret"], auth["access_token"])
+    fb_client = FacebookClient(auth["access_token"])
     return fb_client
 
 
-def get_data(auth, configs):
+def get_data(configs):
+    auth = configs.pop("auth")
     fb_client = build_facebook_client(auth)
-    configs.pop("auth")
     client_response = fb_client.get_data(**configs)
     return client_response
+
+
+def get_auth(dbutils):
+    configs = json.loads(dbutils.secrets.get(scope="quintoandar", key=APIEnum.FACEBOOK))
+    return configs
 
 
 if __name__ == "__main__":
@@ -42,7 +47,7 @@ if __name__ == "__main__":
     parser.add_argument("target", help="name of the target")
     parser.add_argument("media", help="name of the media")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
-    parser.add_argument("configs", help="accounts, credentials and some fetch configs")
+    parser.add_argument("accounts", help="accounts to fetch")
     parser.add_argument("execution_date", help="execution date in str format")
 
     args = parser.parse_args()
@@ -58,16 +63,22 @@ if __name__ == "__main__":
     target = args.target
     media = args.media
     datalake_bucket = args.datalake_bucket
-    configs = json.loads(args.configs)
-    auth = configs["auth"]
+    accounts = json.loads(args.accounts)
     execution_date = args.execution_date
     partition_cols = ["year", "month", "day"]
 
     spark_client = SparkClient()
 
-    configs["date"] = execution_date
+    base_dbutils = BaseDBUtils()
+    if base_dbutils.get_dbutils() is not None:
+        dbutils = base_dbutils.get_dbutils()
 
-    client_response = get_data(auth, configs)
+    configs = get_auth(dbutils)
+
+    configs["date"] = execution_date
+    configs["accounts"] = accounts
+
+    client_response = get_data(configs)
 
     df = spark_client.create_dataframe(client_response)
 

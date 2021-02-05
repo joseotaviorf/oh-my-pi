@@ -14,7 +14,7 @@ from bietlejuice.jobs.composer.services import FileService
 
 # ENV setup
 ENV = Variable.get("environment")
-CONFIGS = Variable.get("facebook_insights_configs")
+ACCOUNTS = Variable.get("FACEBOOK_ACCOUNTS")
 
 # DAG params setup
 SOURCE = "marketing_costs"
@@ -71,7 +71,7 @@ facebook_insights_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": LOAD_FACEBOOK_CAMPAIGNS_INTO_DATALAKE_RAW_FILE_PATH,
-            "parameters": [ENV, SOURCE, MEDIA, DATALAKE_BUCKET, CONFIGS, "{{ ds }}"],
+            "parameters": [ENV, SOURCE, MEDIA, DATALAKE_BUCKET, ACCOUNTS, "{{ ds }}"],
         }
     },
 )
