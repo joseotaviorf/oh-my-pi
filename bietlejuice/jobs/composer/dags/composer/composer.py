@@ -12,16 +12,19 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
 from bietlejuice.jobs.composer.base.db import DATALAKE_SQL_DIR
 from bietlejuice.jobs.composer.base.pipeline import (
     EnvironmentEnum,
-)  # TODO Create an Airflow environment enum and use here
+)  # TODO Create an Airflow environment enum and use here (instead of using Spark code)
 from bietlejuice.jobs.composer.services import FileService
 
-DAG_ID = "bietlejuice.composer"
-ENV = Variable.get("environment")
+DAG_NAME = "composer"
+DAG_ID = f"bietlejuice.{DAG_NAME}"
+
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2019, 8, 21, 0, 0, 0, tzinfo=LOCAL_TZ)
 SCHEDULE_INTERVAL = "0 8 * * *"
-S3_BUCKET = Variable.get("datalake_bucket")
 
+ENV = Variable.get("environment")
+S3_BUCKET = Variable.get("datalake_bucket")
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -32,6 +35,9 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=SCHEDULE_INTERVAL,
+    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
+        chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
+    ),
 )
 
 
