@@ -9,17 +9,18 @@ from airflow.operators.quintoandar_databricks import (
 )
 
 from bietlejuice.jobs.composer.dags.cidade_alerta import (
-    SOURCE,
     QUERIES_CIDADE_ALERTA_DATALAKE_PATH,
     INCREMENTAL_TABLES,
 )
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
 from bietlejuice.jobs.composer.services import FileService
 
-DAG_ID = f"bietlejuice.{SOURCE}"
+DAG_NAME = "cidade_alerta"
+DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = Variable.get("environment")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 
@@ -45,7 +46,7 @@ LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
 
 # bietlejuice paths
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
+SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{DAG_NAME}/"
 
 # dag params
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
@@ -61,6 +62,9 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
+        chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
+    ),
 )
 
 
