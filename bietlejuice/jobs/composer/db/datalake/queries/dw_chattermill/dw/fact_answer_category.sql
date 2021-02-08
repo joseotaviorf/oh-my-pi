@@ -1,12 +1,12 @@
 SELECT
   COALESCE(id_response_tag, -1) AS sk_answer_category,
   COALESCE(id, -1) AS sk_answer_classification,
-  COALESCE(id_response, -1) AS sk_answer,
-  COALESCE(id_tag_theme, -1) AS sk_category,
-  COALESCE(CAST(date_format(ts_created, 'yyyyMMdd') AS BIGINT), -1) AS sk_answer_classification_created_date,
-  COALESCE(CAST(date_format(ts_updated, 'yyyyMMdd') AS BIGINT), -1) AS sk_answer_classification_updated_date,
-  tag_sentiment AS sentiment,
-  score,
+  CAST(COALESCE(id_response, -1) AS INTEGER) AS sk_answer,
+  CAST(COALESCE(id_tag_theme, -1) AS INTEGER) AS sk_category,
+  COALESCE(CAST(DATE_FORMAT(ts_created, 'yyyyMMdd') AS INTEGER), -1) AS sk_answer_classification_created_date,
+  COALESCE(CAST(DATE_FORMAT(ts_updated, 'yyyyMMdd') AS INTEGER), -1) AS sk_answer_classification_updated_date,
+  CAST(tag_sentiment AS SMALLINT) AS sentiment,
+  CAST(score AS SMALLINT) AS score,
   original_comment,
   comment,
   current_timestamp AS ts_load
