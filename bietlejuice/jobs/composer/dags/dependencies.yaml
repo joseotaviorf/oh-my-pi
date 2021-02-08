@@ -190,6 +190,9 @@ bietlejuice.enrich_booking:
 bietlejuice.enrich_braze_events:
   - bietlejuice.braze_events
 
+bietlejuice.enrich_braze_events_dispatches:
+  - bietlejuice.enrich_braze_events
+
 bietlejuice.enrich_chattermill:
   - bietlejuice.chattermill:load-responses-to-clean
 
