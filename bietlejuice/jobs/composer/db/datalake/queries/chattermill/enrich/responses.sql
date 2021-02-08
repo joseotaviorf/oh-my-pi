@@ -20,6 +20,7 @@ WITH responses_explode AS (
       datalake_chattermill_clean.responses
 )
 SELECT
+  id_response||exploded_themes["id"] AS id_response_tag,
   id,
   id_response,
   exploded_themes["id"] AS id_tag_theme,
@@ -39,6 +40,7 @@ SELECT
   exploded_themes["name"] AS tag_name,
   exploded_themes["sentiment"] AS tag_sentiment,
   ts_created,
-  ts_updated
+  ts_updated,
+  current_timestamp AS ts_load
 FROM
   responses_explode
