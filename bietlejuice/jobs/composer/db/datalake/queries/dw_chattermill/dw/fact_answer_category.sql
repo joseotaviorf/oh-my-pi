@@ -1,6 +1,6 @@
 SELECT
-  COALESCE(id_response_tag, -1) AS sk_answer_category,
-  COALESCE(id, -1) AS sk_answer_classification,
+  CAST(COALESCE(id_response_tag, -1) AS BIGINT) AS sk_answer_category,
+  CAST(COALESCE(id, -1) AS BIGINT) AS sk_answer_classification,
   CAST(COALESCE(id_response, -1) AS INTEGER) AS sk_answer,
   CAST(COALESCE(id_tag_theme, -1) AS INTEGER) AS sk_category,
   COALESCE(CAST(DATE_FORMAT(ts_created, 'yyyyMMdd') AS INTEGER), -1) AS sk_answer_classification_created_date,
