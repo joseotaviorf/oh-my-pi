@@ -24,6 +24,9 @@ bietlejuice.dw_booking:
 bietlejuice.dw_call:
   - bietlejuice.enrich_bigfone_twilio
 
+bietlejuice.dw_chattermill:
+  - bietlejuice.enrich_chattermill:load-responses-to-enrich
+
 bietlejuice.dw_dim_listing_owner:
   - bietlejuice.ebdb:load-partner-agent
   - bietlejuice.ebdb:load-user-preferences
