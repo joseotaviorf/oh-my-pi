@@ -2,19 +2,26 @@
 
 ### Purpose
 
-This DAG brings Bob data, a new service developed by B2B (bob-o-construtor) for house registry and now it has been used by AA.
+This DAG brings Bob (bob-o-construtor) data, a service developed by B2B for house registry and now it has been used by AA (Autonomous Agents).
 
 ### Execution Interval
-This DAG is triggered once per day, starting by 1AM.
-
-More information about run time [here]({chart_url}{dag_id})
+This DAG is triggered daily. More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-This pipeline produces several tables: 
+This pipeline produces the following output tables in the clean layer: 
 
-- `events_owners` – Contains information about events owners.
-- `events_tenants` – Contains information about events tenants. 
+- `attribution_profess`
+- `attribution_profess_aud`
+- `house_draft`
+- `house_draft_aud`
+- `location`
+- `location_aud`
+- `registrar`
+- `registrar_aud`
+- `rev_info`
+- `submission_progress`
+- `submission_progress_aud`
 
 ### Responsible Data Engineering Team
 

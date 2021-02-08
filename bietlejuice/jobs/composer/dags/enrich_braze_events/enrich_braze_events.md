@@ -2,10 +2,10 @@
 ​
 ### Purpose
 ​
-This DAG creates the enriched tables events_owners and events_tenants, the first layer of enrichment from Braze Events DAG, by cleaning data and applying an event type filter.
+This DAG creates the enriched tables of the first layer of enrichment from Braze Events DAG, by cleaning data and applying an event type filter.
 ​
 ### Execution​ Interval
-This DAG is triggered once per day via Mediator.
+This DAG is triggered daily, via Mediator.
 
 More information about run time [here]({chart_url}{dag_id})
 
