@@ -29,7 +29,8 @@ SELECT
         WHEN lf.mkt_channel = 'Paid' AND lf.mkt_origin = 'Owner PWA' THEN 'Paid'
 	END AS mkt_type,
 	CASE
-	    WHEN dr.city_group NOT IN ('RMSP', 'Rio de Janeiro') THEN NULL ELSE dr.city_group
+	    WHEN dr.city_group NOT IN ('RMSP', 'Rio de Janeiro') THEN 'Out of coverage area'
+	    WHEN dr.city_group IN ('RMSP', 'Rio de Janeiro') THEN dr.city_group
 	END AS city_group
 FROM
     sale.fact_listing_flows lf
@@ -230,7 +231,10 @@ SELECT
     sdc.sk_booking,
 	sdc.id_buyer,
 	sdc.id_house,
-	COALESCE(sdc.city_group,sdr.city_group) AS city_group,
+	CASE 
+	    WHEN COALESCE(sdr.city_group,sdc.city_group) NOT IN ('RMSP', 'Rio de Janeiro') THEN 'Out of coverage area'
+	    WHEN COALESCE(sdr.city_group,sdc.city_group) IN ('RMSP', 'Rio de Janeiro') THEN COALESCE(sdr.city_group,sdc.city_group)
+	END AS city_group,
 	pma.form_of_payment,
 	sdc.dt_created,
 	sdc.dt_completed,
