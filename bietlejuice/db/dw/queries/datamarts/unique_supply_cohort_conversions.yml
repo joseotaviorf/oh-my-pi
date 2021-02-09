@@ -1,0 +1,5 @@
+# Config for unique_supply_cohort_conversions
+---
+streams:
+  - direction: 'upstream'
+    task_ids: ['dw_lead_listing_flows']

@@ -107,6 +107,8 @@ fact_sale AS (
 	SELECT
 	    ssf.sk_lead,
 		ssf.sk_house_listing,
+		ssf.sk_region,
+		ssf.sk_lead_date,
 	    ssf.sk_prospect_date,
 	    ssf.sk_qualified_date,
 	    ssf.sk_opportunity_date,
@@ -128,6 +130,8 @@ fact_rent AS (
 	SELECT
 	    hlf.sk_lead,
 		hlf.sk_house_listing,
+		hlf.sk_region,
+		hlf.sk_lead_date,
 	    hlf.sk_prospect_date,
 	    hlf.sk_qualified_date,
 	    hlf.sk_opportunity_date,
