@@ -34,6 +34,7 @@ RAW_SPARK_JOB_PATH = (
 DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
 LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{DAG_ID}"
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base"
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 # cluster setup
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
@@ -56,6 +57,7 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID),
 )
 
 
