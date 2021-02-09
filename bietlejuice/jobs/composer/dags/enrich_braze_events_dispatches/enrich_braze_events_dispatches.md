@@ -3,7 +3,6 @@
 ### Purpose
 ​
 This DAG creates the incremental enriched tables for dispatch events for both tenants and owners from Braze.
-Granularity: user-discharge campaign-variant-channel.
 ​
 ### Execution​ Interval
 This DAG is triggered once per day via Mediator, after enrich_braze_events DAG.
