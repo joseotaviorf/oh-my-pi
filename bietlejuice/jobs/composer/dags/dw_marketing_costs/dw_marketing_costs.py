@@ -15,7 +15,14 @@ from bietlejuice.jobs.composer.dags.base.incremental_dw_sub_dag import (
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.services import FileService
 
-BLOCK_LIST = ["criteo_campaigns", "linkedin", "facebook_insights", "rtb_campaigns"]
+BLOCK_LIST = [
+    "criteo_campaigns",
+    "linkedin",
+    "facebook_insights",
+    "rtb_campaigns",
+    "mitula",
+    "trovit",
+]
 DW_STANDARD_DAGS = []
 DW_SCHEMA = "marketing_costs"
 TARGET = "dw_marketing_costs"
