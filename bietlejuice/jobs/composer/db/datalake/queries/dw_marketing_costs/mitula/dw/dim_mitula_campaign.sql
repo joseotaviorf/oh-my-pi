@@ -6,4 +6,4 @@ SELECT
 FROM 
     datalake_mitula_clean.mitula_report
 WHERE 
-    AND DATE(dt) = DATE('{year}-{month}-{day}')
+    DATE(dt) = DATE('{year}-{month}-{day}')
