@@ -7,7 +7,10 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
 )
-from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
+from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.base.pipeline import LayerEnum
+from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
+from bietlejuice.jobs.composer.services import FileService
 
 SOURCE = "sauron"
 
@@ -18,14 +21,20 @@ ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
 DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
+
 
 # spark and databricks vars
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
+BASE_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/base/"
+RAW_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/load_sauron_into_datalake.py"
 LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{SOURCE}"
 CLUSTER_DESCRIPTION = Variable.get(
     "databricks_bietlejuice_sauron", deserialize_json=True
 )
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+LIBRARIES_DESCRIPTION = Variable.get(
+    "bietlejuice_default_libraries", deserialize_json=True
+)
 
 # dag vars
 DAG_ID = f"bietlejuice.{SOURCE}"
@@ -35,75 +44,6 @@ MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
 
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 
-# every table to be loaded must be here, with its SQL file name and extraction type
-JOBS_EXTRACTION_TYPE = [
-    {"table_name": "active_sessions", "extraction_type": "incremental"},
-    {"table_name": "bot_outgoing_messages", "extraction_type": "incremental"},
-    {"table_name": "expired_sessions", "extraction_type": "incremental"},
-    {"table_name": "incoming_message_status", "extraction_type": "incremental"},
-    {"table_name": "incoming_messages", "extraction_type": "incremental"},
-    {"table_name": "session", "extraction_type": "incremental"},
-]
-
-# task builders
-
-
-def create_tables_sub_dag(sub_dag_name, table_name, extraction_type):
-    tables_sub_dag = BaseSubDAG(
-        sub_dag_name=sub_dag_name,
-        dag_name=DAG_ID,
-        schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        start_date=MAIN_START_DATE,
-    )._build_local_dag()
-
-    slugged_table_name = table_name.replace("_", "-")
-
-    load_to_raw_task = QuintoAndarDatabricksSubmitRunOperator(
-        task_id=f"load-{slugged_table_name}-to-raw",
-        dag=tables_sub_dag,
-        json={
-            "spark_python_task": {
-                "python_file": f"{SPARK_JOBS_PATH}load_{extraction_type}_data_into_datalake_raw.py",
-                "parameters": [ENV, SOURCE, DATALAKE_BUCKET, "{{ ds }}", table_name],
-            }
-        },
-    )
-
-    load_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
-        task_id=f"load-{slugged_table_name}-to-clean",
-        dag=tables_sub_dag,
-        json={
-            "spark_python_task": {
-                "python_file": f"{SPARK_JOBS_PATH}load_{extraction_type}_data_into_datalake_clean.py",
-                "parameters": [ENV, SOURCE, DATALAKE_BUCKET, "{{ ds }}", table_name],
-            }
-        },
-    )
-
-    create_clean_external_table_task = QuintoAndarDatabricksSubmitRunOperator(
-        task_id=f"create-{slugged_table_name}-clean-external-table",
-        dag=tables_sub_dag,
-        json={
-            "spark_python_task": {
-                "python_file": f"{SPARK_JOBS_PATH}create_external_table.py",
-                "parameters": [
-                    ENV,
-                    SOURCE,
-                    DATALAKE_BUCKET,
-                    ATHENA_QUERY_RESULT_LOCATION,
-                    "{{ ds }}",
-                    table_name,
-                    extraction_type,
-                ],
-            }
-        },
-    )
-
-    load_to_raw_task >> load_to_clean_task >> create_clean_external_table_task
-    return tables_sub_dag
-
-
-# dag definition
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
@@ -113,23 +53,51 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=CLUSTER_DESCRIPTION,
+    libraries=LIBRARIES_DESCRIPTION,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-# creating sub dags
-for job_extraction_type in JOBS_EXTRACTION_TYPE:
-    tables_sub_dag_task = BaseSubDAG.get_sub_dag_operator(
-        dag=dag,
-        sub_dag_name=job_extraction_type["table_name"],
-        sub_dag_func=create_tables_sub_dag,
-        table_name=job_extraction_type["table_name"],
-        extraction_type=job_extraction_type["extraction_type"],
-    )
-    create_cluster_task >> tables_sub_dag_task >> terminate_cluster_task
+sauron_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="sauron-to-datalake-raw",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": RAW_SPARK_JOB_PATH,
+            "parameters": [ENV, DATALAKE_BUCKET, "{{ ds }}"],
+        }
+    },
+)
+
+clean_sub_dag = DatalakeSubDAG(
+    dag_id=DAG_ID,
+    start_date=MAIN_START_DATE,
+    env=ENV,
+    datalake_bucket=DATALAKE_BUCKET,
+    layer=LayerEnum.CLEAN,
+    database_base_name=SOURCE,
+    relative_query_path=SOURCE,
+    spark_job_paths=BASE_SPARK_JOB_PATH,
+    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
+)
+
+file_list = FileService.list_sql_files_without_extension_from_layer(
+    SOURCE, LayerEnum.CLEAN.value
+)
+
+clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(
+    dag, file_list, is_incremental=True, partitions=["year", "month", "day"]
+)
+
+create_cluster_task >> sauron_to_datalake_raw_task >> list(
+    clean_sub_dags.values()
+) >> terminate_cluster_task
