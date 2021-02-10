@@ -5,6 +5,9 @@ SELECT
     desktop_cost,
     mobile_cost,
     total_cost,
+    {year} as year,
+    {month} as month,
+    {day} as day,
     NOW() AS ts_load
 FROM
     datalake_trovit_clean.trovit_report
