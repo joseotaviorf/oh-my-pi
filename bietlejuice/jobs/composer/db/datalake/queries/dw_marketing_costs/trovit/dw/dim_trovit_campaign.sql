@@ -2,10 +2,10 @@ SELECT
     id AS sk_trovit_campaign,
     campaign_name,
     account_name,
-    {year} as year,
-    {month} as month,
-    {day} as day,
-    now() AS ts_load
+    {year} AS year,
+    {month} AS month,
+    {day} AS day,
+    NOW() AS ts_load
 FROM   
     datalake_trovit_clean.trovit_report
 WHERE
