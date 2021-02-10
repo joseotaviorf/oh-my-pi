@@ -65,7 +65,7 @@ tasks as (
     cast(ct.origin as varchar) as origin,
     cast(ct.type as varchar) as type,
     coalesce(tr.is_task_auto_completed, false) as is_task_auto_completed,
-    substr(json_format(json_extract(ct.metadata, '$.descricao')), 1, 5000) as description,
+    substr(json_format(json_extract(ct.metadata, '$.descricao')), 1, 4000) as description, -- the .csv file is probably generating encoding errors, so we needed to decrease the characters amount
     cast(ct.subject as varchar) as subject,
     array_distinct(array_agg(coalesce(regexp_extract(ct.metadata, 'assunto":"([^"]+)', 1), cw.title)) over (partition by ct.id)) as titles,
     array_distinct(array_agg(coalesce(regexp_extract(ct.metadata, 'workgroupId":"([^"]+)', 1), cw.id)) over (partition by ct.id)) as workgroups,
