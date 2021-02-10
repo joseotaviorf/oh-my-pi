@@ -187,3 +187,47 @@ class TestSparkMetastoreService:
 
         # assert
         assert returned_value == expected_return
+
+    @mock.patch.object(MetastoreService, "get_table_description")
+    @mock.patch.object(
+        SparkMetastoreService, "_get_partition_keys_from_table_description"
+    )
+    def test_get_table_partition_keys_names(
+        self,
+        mocked__get_partition_keys_from_table_description,
+        mocked_get_table_description,
+        sql_context,
+        spark_metastore_service,
+    ):
+        # arrange
+        database_name = "database_name"
+        table_name = "table_name"
+        mocked_result_df = sql_context.createDataFrame(
+            [
+                ("c1", "int", "bar"),
+                ("c2", "string", "bar"),
+                ("c3", "string", "bar"),
+                ("# Partition information", "", ""),
+                ("# col_name", "", ""),  # simulates the describe command in hive
+                ("p1", "string", "bar"),
+                ("p2", "string", "bar"),
+            ],
+            ["col_name", "data_type", "foo"],
+            verifySchema=False,
+        )
+        mocked_get_table_description.return_value = mocked_result_df
+        partition_keys = OrderedDict([("p1", "string"), ("p2", "string")])
+        mocked__get_partition_keys_from_table_description.return_value = partition_keys
+        expected_result = ["p1", "p2"]
+
+        # act
+        returned_value = spark_metastore_service.get_table_partition_keys_names(
+            database_name, table_name
+        )
+
+        # assert
+        mocked_get_table_description.assert_called_once_with(database_name, table_name)
+        mocked__get_partition_keys_from_table_description.assert_called_once_with(
+            mocked_result_df
+        )
+        assert returned_value == expected_result

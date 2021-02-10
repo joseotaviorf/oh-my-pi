@@ -110,17 +110,30 @@ def parse_args():
     )
     parser.add_argument("table_name", type=str, help="table name")
     parser.add_argument(
-        "partition_keys",
-        type=str,
-        help="the table partitions keys separated by comma. e.g. year,month,day",
-    )
-    parser.add_argument(
         "execution_date",
         type=str,
         help="the task execution date to infer the daily partition values",
     )
 
     return parser.parse_args()
+
+
+def get_hive_table_partition_keys_names(
+    metastore_host, hive_database_name, hive_table_name
+):
+    """
+    Retrieves partition keys names from Hive Metastore.
+
+    :param metastore_host: hive metastore hostname
+    :type metastore_host: str
+    :param hive_database_name: hive metastore database name
+    :type hive_database_name: str
+    :param hive_table_name: table name in hive metastore
+    :type hive_table_name: str
+    :rtype: List[str]
+    """
+    hms_client = HiveMetastoreClient(metastore_host)
+    return hms_client.get_partition_keys_names(hive_database_name, hive_table_name)
 
 
 if __name__ == "__main__":
@@ -130,19 +143,17 @@ if __name__ == "__main__":
     layer = args.layer
     database_base_name = args.database_base_name
     table_name = args.table_name
-    partition_keys = args.partition_keys.split(",")
     execution_date = args.execution_date
 
-    partition_keys = [(p_key, "string") for p_key in partition_keys]
-
+    # TODO: Make partitions dynamic by syncing spark metastore
     dt_datetime = datetime.strptime(execution_date, "%Y-%m-%d")
     partition_values = [dt_datetime.year, dt_datetime.month, dt_datetime.day]
 
     logger.info(
         f"m={JOB_NAME}, env={env}, datalake_bucket={data_lake_bucket}, "
         + f"layer={layer}, database_base_name={database_base_name}, "
-        f"table_name={table_name}, partition_keys={partition_keys},"
-        f"partition_values={partition_values}, msg=Job execution started."
+        f"table_name={table_name}, partition_values={partition_values},"
+        " msg=Job execution started."
     )
 
     dlmp = DataLakeMetastoreMapping(env, database_base_name, data_lake_bucket)
@@ -156,6 +167,9 @@ if __name__ == "__main__":
     spark_table_schema = spark_metastore_service.get_table_schema(
         databricks_database_name, table_name, ignore_partition_keys=True
     )
+    spark_metastore_table_partition_keys_names = spark_metastore_service.get_table_partition_keys_names(
+        database_name=database_base_name, table_name=table_name
+    )
 
     storage_descriptor_info = TableStorageDescriptorEnum.from_layer(layer)
 
@@ -165,7 +179,25 @@ if __name__ == "__main__":
     hm_confs_json = json.loads(hm_confs)
     hm_host = hm_confs_json["host"]
 
-    if not is_table_in_hive_metastore(hm_host, databricks_database_name, table_name):
+    if is_table_in_hive_metastore(hm_host, databricks_database_name, table_name):
+        hive_table_partition_keys_names = get_hive_table_partition_keys_names(
+            metastore_host=hm_host,
+            hive_database_name=databricks_database_name,
+            hive_table_name=table_name,
+        )
+
+        if (
+            hive_table_partition_keys_names
+            != spark_metastore_table_partition_keys_names
+        ):
+            raise ValueError(
+                f"m={JOB_NAME}, spark_partitions={spark_metastore_table_partition_keys_names},"
+                f" hive_partitions={hive_table_partition_keys_names},"
+                " msg=partitions in spark and hive metastores are not matching. You should recreate "
+                "the table in spark metastore if you are trying to change the partition keys of the table."
+            )
+    else:
+        # TODO: Make partitions dynamic by syncing spark metastore
         partition_values = get_all_table_partition_values(
             databricks_database_name, table_name
         )
@@ -176,7 +208,7 @@ if __name__ == "__main__":
         table_name=table_name,
         database_location=database_location,
         table_schema=spark_table_schema,
-        partition_keys=partition_keys,
+        partition_keys=spark_metastore_table_partition_keys_names,
         partition_values=partition_values,
         format_info=storage_descriptor_info,
     ).run()

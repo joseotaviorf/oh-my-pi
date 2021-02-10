@@ -104,6 +104,23 @@ class SparkMetastoreService(MetastoreService):
         return table_columns
 
     @logger
+    def get_table_partition_keys_names(self, database_name, table_name):
+        """
+        Gets the partition key's names of a table
+
+        :param database_name: database name
+        :type database_name: str
+        :param table_name: table name
+        :type table_name: str
+        :return: list of partition keys names
+        :rtype: List[str]
+        """
+        result_df = super().get_table_description(database_name, table_name)
+        partition_keys = self._get_partition_keys_from_table_description(result_df)
+
+        return [col_name for col_name in partition_keys]
+
+    @logger
     def refresh_table(self, database_name, table_name):
         """
         Refresh all cached entries associated with a table. If the table was
