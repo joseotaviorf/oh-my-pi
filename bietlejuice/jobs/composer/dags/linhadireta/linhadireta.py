@@ -30,6 +30,7 @@ CREATE_CLEAN_EXTERNAL_TABLES_FILE_PATH = (
 )
 
 LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_S3_BUCKET}/logs/jobs/{SOURCE}"
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 CLUSTER_DESCRIPTION = Variable.get(
     "databricks_bietlejuice_linha_direta", deserialize_json=True
@@ -56,6 +57,7 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID),
 )
 
 
