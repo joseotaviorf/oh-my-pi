@@ -10,19 +10,20 @@ More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 This pipeline produces, via full load:
+
 1. In datalake raw:
-- All tables available in source's database.
+    - All tables available in source's database.
 
 2. In datalake clean:
-- `contract` 
-- `inspection`
-- `inspection_aud` 
-- `member`
-- `negotiation` 
-- `negotiation_aud`
-- `termination` 
-- `termination_aud`
-- `termination_fee`
+    - `contract` 
+    - `inspection`
+    - `inspection_aud` 
+    - `member`
+    - `negotiation` 
+    - `negotiation_aud`
+    - `termination` 
+    - `termination_aud`
+    - `termination_fee`
 
 ### Responsible Data Engineering Team
 For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the 
