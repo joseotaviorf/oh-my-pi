@@ -7,7 +7,7 @@ SELECT
     cost,
     conversions_count,
     cr as conversions_rate,
-    cost / clicks AS cpc,
+    NULLIF(cost / clicks_count, 0) AS cpc,
     year,
     month,
     day,
