@@ -97,6 +97,7 @@ house_status_and_dimensions_book AS (
          ON dp.sk_partner = fhl.sk_partner
    WHERE fhs.order_status = 1
       AND dr.city_group IS NOT NULL
+      AND fhs.weekday_name = 'Sunday'
 ),
 ongoing_listings_wk_snapshot AS (
    -- returns for each week and dimension the sunday count/snapshot of publicated listings
@@ -120,7 +121,7 @@ bookings AS (
    -- returns number of bookings, independently of house status on booking_creation_date
    SELECT
       dr.city_group,
-       dr.city_name AS city,
+      dr.city_name AS city,
       dr.region_code,
       dr.name AS neighborhood,
       dd.week_start,
@@ -168,15 +169,13 @@ lpv_events AS (
     )
    SELECT
       id_house,
-      sk_event_dt,
-      event_dt,
       dd.week_start,
       COUNT(DISTINCT uuid) AS cnt_listing_page_view
    FROM
       amplitude AS amp
       INNER JOIN dim_date AS dd
          ON dd.sk_date = amp.sk_event_dt
-   GROUP BY 1,2,3,4
+   GROUP BY 1,2
 ),
 listing_page_views AS (
    -- returns number of listing_page_view events per house and date, independently of house status on event date
