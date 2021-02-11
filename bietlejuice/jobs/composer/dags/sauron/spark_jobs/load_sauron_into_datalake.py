@@ -78,5 +78,8 @@ if __name__ == "__main__":
                 partition_cols=partition_cols,
             )
             metastore_service.create_new_partitions_from_df(
-                database_name, table.table_name.lower(), df, partition_cols
+                database_name,
+                TABLE_MAPPING[table.table_name.lower()],
+                df,
+                partition_cols,
             )
