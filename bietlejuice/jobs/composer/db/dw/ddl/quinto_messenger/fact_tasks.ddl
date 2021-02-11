@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS quinto_messenger.fact_tasks (
     sk_created_date BIGINT,
     is_forwarded BOOLEAN,
     seconds_first_reply BIGINT,
-    task_number INTEGER
+    task_number INTEGER,
+    ts_load TIMESTAMP
 )
 ALTER TABLE quinto_messenger.fact_tasks OWNER TO airflow;

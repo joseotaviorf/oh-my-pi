@@ -21,7 +21,8 @@ SELECT
     ci.cpf AS sk_personal_document,
     COALESCE(CAST(date_format(c.ts_created, 'yyyyMMdd') AS BIGINT), -1) AS sk_created_date,
     c.seconds_duration/60.0 AS minutes_duration,
-    t.tasks
+    t.tasks,
+    NOW() AS ts_load
 FROM datalake_quinto_messenger.channel c
 LEFT JOIN tasks t
     ON t.id_channel = c.id_channel

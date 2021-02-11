@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS quinto_messenger.dim_task (
     contact_motivation VARCHAR(50),
     contact_theme VARCHAR(50),
     ts_created TIMESTAMP,
-    ts_updated TIMESTAMP
+    ts_updated TIMESTAMP,
+    ts_load TIMESTAMP
 )
 ALTER TABLE quinto_messenger.dim_task OWNER TO airflow;

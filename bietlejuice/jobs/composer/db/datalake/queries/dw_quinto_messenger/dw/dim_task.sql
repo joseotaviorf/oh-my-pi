@@ -16,7 +16,8 @@ SELECT
     t.contact_motivation_tag AS contact_motivation,
     t.contact_theme_tag AS contact_theme,
     t.ts_created,
-    t.ts_updated
+    t.ts_updated,
+    NOW() AS ts_load
 FROM datalake_quinto_messenger.task t
 LEFT JOIN completion_reason cr
     ON cr.id_task = t.id_task

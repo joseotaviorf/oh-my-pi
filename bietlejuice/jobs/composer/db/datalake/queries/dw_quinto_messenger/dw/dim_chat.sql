@@ -5,5 +5,6 @@ SELECT
     LOWER(channel_status) AS status,
     is_forwarded,
     ts_created,
-    ts_updated
+    ts_updated,
+    NOW() AS ts_load
 FROM datalake_quinto_messenger.channel

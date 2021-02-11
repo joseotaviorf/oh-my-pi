@@ -18,7 +18,8 @@ SELECT
     e.agent_email AS email,
     e.agent_location AS location,
     e.agent_skills AS skills,
-    MAX(le.ts_last_updated) AS ts_updated
+    MAX(le.ts_last_updated) AS ts_updated,
+    NOW() AS ts_load
 FROM datalake_quinto_messenger.task_event e
 INNER JOIN last_task_event_updates le
     ON e.agent_email = e.agent_email

@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS quinto_messenger.dim_quinto_messenger_agent (
     email VARCHAR(50),
     location VARCHAR(25),
     skills VARCHAR(200),
-    ts_updated TIMESTAMP
+    ts_updated TIMESTAMP,
+    ts_load TIMESTAMP
 )
 ALTER TABLE quinto_messenger.dim_quinto_messenger_agent OWNER TO airflow;
