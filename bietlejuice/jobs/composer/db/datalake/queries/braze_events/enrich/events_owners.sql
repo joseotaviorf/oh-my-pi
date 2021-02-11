@@ -27,7 +27,14 @@ SELECT
 FROM
     datalake_braze_clean.events_owners
 WHERE
-    event_type != 'users.behaviors.subscriptiongroup.StateChange'
+    event_type NOT IN(
+        'users.behaviors.subscriptiongroup.StateChange',
+        'users.behaviors.Uninstall',
+        'users.campaigns.Conversion',
+        'users.campaigns.EnrollInControl',
+        'users.canvas.Conversion',
+        'users.canvas.Entry'
+    )
     AND year = {year}
     AND month = {month}
     AND day = {day}
