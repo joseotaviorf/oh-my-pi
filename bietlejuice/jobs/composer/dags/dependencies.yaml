@@ -37,6 +37,20 @@ bietlejuice.dw_dim_listing_owner:
 bietlejuice.dw_house:
   - bietlejuice.enrich_ebdb_listing:load-house-to-enrich
 
+bietlejuice.dw_invoice_entries:
+  - bietlejuice.ebdb:load-affiliate-data
+  - bietlejuice.ebdb:load-contract
+  - bietlejuice.ebdb:load-conversion-lead
+  - bietlejuice.ebdb:load-house
+  - bietlejuice.ebdb:load-lead
+  - bietlejuice.ebdb:load-partner-agent
+  - bietlejuice.ebdb:load-rent-flow
+  - bietlejuice.ebdb:load-user
+  - bietlejuice.retsuko:load-account
+  - bietlejuice.retsuko:load-contract
+  - bietlejuice.retsuko:load-entry
+  - bietlejuice.retsuko:load-invoice
+
 bietlejuice.dw_marketing_costs:
   - bietlejuice.enrich_marketing_costs.load-google-keywords-performance-report-to-enrich:load-enrich-google-keywords-performance-report
 
