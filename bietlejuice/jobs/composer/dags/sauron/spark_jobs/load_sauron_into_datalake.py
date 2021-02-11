@@ -13,11 +13,11 @@ from bietlejuice.jobs.composer.services.metastore_services import SparkMetastore
 SOURCE = "sauron"
 JOB_NAME = "load_sauron_into_datalake"
 ALLOW_LIST = [
-    "active_sessions",
-    "bot_outgoing_messages",
-    "expired_sessions",
-    "incoming_message_status",
-    "incoming_messages",
+    "activesessions",
+    "botoutgoingmessages",
+    "expiredsessions",
+    "incomingmessagestatus",
+    "incomingmessages",
     "session",
 ]
 
