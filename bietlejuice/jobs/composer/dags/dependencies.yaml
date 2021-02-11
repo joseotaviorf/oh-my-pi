@@ -46,10 +46,10 @@ bietlejuice.dw_invoice_entries:
   - bietlejuice.ebdb:load-partner-agent
   - bietlejuice.ebdb:load-rent-flow
   - bietlejuice.ebdb:load-user
-  - bietlejuice.retsuko:load-account
-  - bietlejuice.retsuko:load-contract
-  - bietlejuice.retsuko:load-entry
-  - bietlejuice.retsuko:load-invoice
+  - bietlejuice.retsuko:load-account-to-clean
+  - bietlejuice.retsuko:load-contract-to-clean
+  - bietlejuice.retsuko:load-entry-to-clean
+  - bietlejuice.retsuko:load-invoice-to-clean
 
 bietlejuice.dw_marketing_costs:
   - bietlejuice.enrich_marketing_costs.load-google-keywords-performance-report-to-enrich:load-enrich-google-keywords-performance-report
