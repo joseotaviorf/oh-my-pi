@@ -14,7 +14,7 @@ SELECT
   month,
   day
 FROM
-  datalake_sauron_raw.active_sessions
+  datalake_sauron_raw.activesessions
 WHERE
   year = {year}
   AND month = {month}

@@ -12,14 +12,14 @@ from bietlejuice.jobs.composer.services.metastore_services import SparkMetastore
 
 SOURCE = "sauron"
 JOB_NAME = "load_sauron_into_datalake"
-TABLE_MAPPING = {
-    "activesessions": "active_sessions",
-    "botoutgoingmessages": "bot_outgoing_messages",
-    "expiredsessions": "expired_sessions",
-    "incomingmessagestatus": "incoming_message_status",
-    "incomingmessages": "incoming_messages",
-    "session": "session",
-}
+ALLOW_LIST = [
+    "activesessions",
+    "botoutgoingmessages",
+    "expiredsessions",
+    "incomingmessagestatus",
+    "incomingmessages",
+    "session",
+]
 
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
@@ -62,9 +62,8 @@ if __name__ == "__main__":
     database_location = db_info["db_raw_path"]
     metastore_service.create_database(database_name)
 
-    allow_list = TABLE_MAPPING.keys()
     for table in tables:
-        if table.table_name.lower() in allow_list:
+        if table.table_name.lower() in ALLOW_LIST:
             df = postgres_consumer.get_incremental_data_from_table(
                 table.table_name, "updated_at", execution_date
             )
@@ -72,14 +71,11 @@ if __name__ == "__main__":
             s3_loader.load_incremental_table(
                 df=df,
                 database_name=database_name,
-                table_name=TABLE_MAPPING[table.table_name.lower()],
+                table_name=table.table_name.lower(),
                 format_options=format_options,
                 database_location=database_location,
                 partition_cols=partition_cols,
             )
             metastore_service.create_new_partitions_from_df(
-                database_name,
-                TABLE_MAPPING[table.table_name.lower()],
-                df,
-                partition_cols,
+                database_name, table.table_name.lower(), df, partition_cols
             )
