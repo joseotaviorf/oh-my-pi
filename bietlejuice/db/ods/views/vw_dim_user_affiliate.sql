@@ -1,15 +1,6 @@
 -- DROP VIEW IF EXISTS public.vw_dim_user_affiliate;
 -- CREATE VIEW public.vw_dim_user_affiliate AS 
-WITH 
-vistorias AS (
-	SELECT
-		DISTINCT b.agente_id
-	FROM
-		booking b
-	WHERE
-		b.tipo = 'Vistoria' 
-),
-afiliados_full AS (
+WITH afiliados_full AS (
 	SELECT
 		ua.id AS sk_user_affiliate,
 		ua.id AS id_user_affiliate,
@@ -43,8 +34,6 @@ afiliados_full AS (
 			ON u.dados_afiliado_id = ua.id
 		LEFT JOIN user_affiliate_origin uao 
 			ON u.id = uao.user_id
-		LEFT JOIN vistorias v 
-			ON v.agente_id = ua.id 
 ),
 region_ddd AS (
 	SELECT DISTINCT 
