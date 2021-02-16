@@ -2,7 +2,6 @@ select
     id,
     parent_id as id_parent,
     lot_id as id_lot,
-    transaction_id as id_transaction,
     payee_id as id_payee,
     payee_account_id as id_payee_account,
     due_date as dt_due,
