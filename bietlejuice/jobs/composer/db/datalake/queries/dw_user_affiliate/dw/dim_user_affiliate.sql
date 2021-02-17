@@ -62,6 +62,7 @@ affiliate_mkt_city_group as (
 		on af_full.tracking_city = region_city.city_name
 	left join region_ddd
 		on af_full.main_phone_ddd = region_ddd.ddd
+		and region_ddd.city_group = region_city.city_group
 ),
 aff_city_group_with_region as (
 	select

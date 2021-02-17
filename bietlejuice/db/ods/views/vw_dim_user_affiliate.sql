@@ -80,6 +80,7 @@ affiliate_mkt_city_group AS (
 		ON af_mkt.tracking_city = region_city.city_name
 	LEFT JOIN region_ddd 
 		ON af_mkt.ddd_telefone = region_ddd.ddd
+		AND region_ddd.city_group = region_city.city_group
 ),
 aff_citygrp_with_region AS (
 	SELECT
