@@ -6,8 +6,11 @@ SELECT
 	dr.city_group,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
+	lf.mkt_completion AS supply_mkt_completion,
+	sales_company,
 	sourcing_ops,
 	context_lead AS context,
+	origin_table,
   	COUNT(lf.sk_lead_date) AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS qualifieds,
@@ -20,7 +23,7 @@ JOIN datamarts.lead_listing_flows lf
 LEFT JOIN dim_region dr
   ON dr.sk_region = lf.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 ),
 prospect AS (
 SELECT
@@ -29,8 +32,11 @@ SELECT
 	dr.city_group,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
+	lf.mkt_completion AS supply_mkt_completion,
+	sales_company,
 	sourcing_ops,
 	context_prospect AS context,
+	origin_table,
 	NULL::BIGINT AS leads,
 	COUNT(lf.sk_prospect_date) AS prospects, -- this count is done on the prospect date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
 	NULL::BIGINT AS qualifieds,
@@ -43,7 +49,7 @@ JOIN datamarts.lead_listing_flows lf
 LEFT JOIN dim_region dr
   ON dr.sk_region = lf.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 ),
 qualified AS (
 SELECT
@@ -52,8 +58,11 @@ SELECT
 	dr.city_group,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
+	lf.mkt_completion AS supply_mkt_completion,
+	sales_company,
 	sourcing_ops,
 	context_qualified AS context,
+	origin_table,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	COUNT(lf.sk_qualified_date) AS qualifieds, -- this count is done on the qualified date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
@@ -66,7 +75,7 @@ JOIN datamarts.lead_listing_flows lf
 LEFT JOIN dim_region dr
   ON dr.sk_region = lf.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 ),
 opportunity AS (
 SELECT
@@ -75,8 +84,11 @@ SELECT
 	dr.city_group,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
+	lf.mkt_completion AS supply_mkt_completion,
+	sales_company,
 	sourcing_ops,
 	context_opportunity AS context,
+	origin_table,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS qualifieds,
@@ -89,7 +101,7 @@ JOIN datamarts.lead_listing_flows lf
 LEFT JOIN dim_region dr
   ON dr.sk_region = lf.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 ),
 listing AS (
 SELECT
@@ -98,8 +110,11 @@ SELECT
 	dr.city_group,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
+	lf.mkt_completion AS supply_mkt_completion,
+	sales_company,
 	sourcing_ops,
 	context_first_listing AS context,
+	origin_table,
   	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS qualifieds,
@@ -112,7 +127,7 @@ JOIN datamarts.lead_listing_flows lf
 LEFT JOIN dim_region dr
   ON dr.sk_region = lf.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 ),
 union_all AS (
   SELECT * FROM lead_
@@ -131,8 +146,11 @@ SELECT
   ua.city_group,
   ua.supply_mkt_origin,
   ua.supply_mkt_channel,
+  ua.supply_mkt_completion,
+  ua.sales_company,
   ua.sourcing_ops,
   ua.context,
+  ua.origin_table,
   ua.leads,
   ua.prospects,
   ua.qualifieds,
@@ -150,13 +168,20 @@ SELECT
   	CASE WHEN supply_mkt_origin = 'Owner PWA' THEN supply_mkt_channel
   	   when supply_mkt_origin != 'Owner PWA' THEN supply_mkt_origin
   	   END AS supply_mkt_origin_detailed,
+  	CASE
+	    WHEN supply_mkt_origin = 'B2B' OR supply_mkt_origin = 'CIQ' THEN supply_mkt_origin
+	    WHEN supply_mkt_completion = 'Full Self-Service' THEN 'FSS'
+	    ELSE 'IS'
+		END AS lead_context,
+  	sales_company,
   	sourcing_ops,
   	context,
+  	origin_table,
     SUM(COALESCE(leads,0)) AS leads,
     SUM(COALESCE(prospects,0)) AS prospects,
     SUM(COALESCE(qualifieds,0)) AS qualifieds,
     SUM(COALESCE(opportunities,0)) AS opportunities,
     SUM(COALESCE(first_listings,0)) AS first_listings,
     current_timestamp AS ts_load
-FROM union_all
-GROUP BY "date", city_group, 3, 4, 5, 6;
+FROM union_all_date
+GROUP BY "date", city_group, 3, 4, 5, 6, 7, 8, 9;

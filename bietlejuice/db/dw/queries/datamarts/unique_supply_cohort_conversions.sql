@@ -6,6 +6,8 @@ SELECT
 	dr.city_group,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
+	lf.mkt_completion AS supply_mkt_completion,
+	sales_company,
 	sourcing_ops,
 	origin_table,
 	context_lead AS context_origin,
@@ -33,7 +35,7 @@ LEFT JOIN
         ON dr.sk_region = lf.sk_region
 WHERE
     dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 p2q AS (
 SELECT
@@ -42,6 +44,8 @@ SELECT
 	dr.city_group,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
+	lf.mkt_completion AS supply_mkt_completion,
+	sales_company,
 	sourcing_ops,
 	origin_table,
 	context_prospect AS context_origin,
@@ -69,7 +73,7 @@ LEFT JOIN
         ON dr.sk_region = lf.sk_region
 WHERE
     dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 q2opp AS (
 SELECT
@@ -78,6 +82,8 @@ SELECT
 	dr.city_group,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
+	lf.mkt_completion AS supply_mkt_completion,
+	sales_company,
 	sourcing_ops,
 	origin_table,
 	context_qualified AS context_origin,
@@ -105,7 +111,7 @@ LEFT JOIN
         ON dr.sk_region = lf.sk_region
 WHERE
     dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 opp2fl AS (
 SELECT
@@ -114,6 +120,8 @@ SELECT
 	dr.city_group,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
+	lf.mkt_completion AS supply_mkt_completion,
+	sales_company,
 	sourcing_ops,
 	origin_table,
 	context_opportunity AS context_origin,
@@ -141,7 +149,7 @@ LEFT JOIN
         ON dr.sk_region = lf.sk_region
 WHERE
     dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 union_all AS (
     SELECT * FROM l2p
@@ -158,6 +166,8 @@ SELECT
   ua.city_group,
   ua.supply_mkt_origin,
   ua.supply_mkt_channel,
+  ua.supply_mkt_completion,
+  ua.sales_company,
   ua.sourcing_ops,
   ua.origin_table,
   ua.context_origin,
@@ -183,6 +193,12 @@ SELECT
         WHEN supply_mkt_origin = 'Owner PWA' THEN supply_mkt_channel
         WHEN supply_mkt_origin != 'Owner PWA' THEN supply_mkt_origin
     END AS supply_mkt_origin_detailed,
+    CASE
+	    WHEN supply_mkt_origin = 'B2B' OR supply_mkt_origin = 'CIQ' THEN supply_mkt_origin
+	    WHEN supply_mkt_completion = 'Full Self-Service' THEN 'FSS'
+	    ELSE 'IS'
+		END AS lead_context,
+  	sales_company,
     sourcing_ops,
   	origin_table,
     context_origin,
@@ -194,5 +210,5 @@ SELECT
     SUM(COALESCE(opp2fl,0)) AS opp2fl,
     current_timestamp AS ts_load
 FROM
-    union_all
-GROUP BY "date", city_group, 3, 4, 5, 6, 7, 8, 9;
+    union_all_date
+GROUP BY "date", city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11;

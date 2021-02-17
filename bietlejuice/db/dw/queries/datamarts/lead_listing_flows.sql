@@ -40,7 +40,8 @@ source_ops_rent AS (
 	            ELSE NULL END AS opportunity_context,
 	        CASE WHEN hlf.sk_first_listing_date = ssf.sk_first_listing_date AND hlf.sk_first_listing_date > 0 THEN 'Hybrid'
 	            WHEN hlf.sk_first_listing_date > 0  THEN 'Rent'
-	            ELSE NULL END AS first_listing_context
+	            ELSE NULL END AS first_listing_context,
+	        COALESCE(du.sales_company, dl.sales_company) AS sales_company
 	FROM fact_house_listing_flows hlf
 	    JOIN dim_lead dl
 	        ON dl.sk_lead = hlf.sk_lead
@@ -92,7 +93,8 @@ source_ops_sale AS (
 	            ELSE NULL END AS opportunity_context,
 	        CASE WHEN hlf.sk_first_listing_date = ssf.sk_first_listing_date AND ssf.sk_first_listing_date > 0 THEN 'Hybrid'
 	            WHEN ssf.sk_first_listing_date > 0  THEN 'Sale'
-	            ELSE NULL END AS first_listing_context
+	            ELSE NULL END AS first_listing_context,
+	        COALESCE(du.sales_company, dl.sales_company) AS sales_company
 	FROM sale.fact_listing_flows ssf
 	    JOIN dim_lead dl
 	        ON dl.sk_lead = ssf.sk_lead
@@ -105,6 +107,7 @@ source_ops_sale AS (
 ),
 fact_sale AS (
 	SELECT
+	    ssf.sk_house_listing_flow,
 	    ssf.sk_lead,
 		ssf.sk_house_listing,
 		ssf.sk_region,
@@ -119,7 +122,9 @@ fact_sale AS (
 	    sor.opportunity_context AS context_opportunity,
 	    sor.first_listing_context AS context_first_listing,
 	    ssf.mkt_origin,
+	    ssf.mkt_completion,
 	    ssf.mkt_channel,
+	    sor.sales_company,
 	    sor.sourcing_ops,
 	    'Sale' AS origin_table
 	FROM sale.fact_listing_flows ssf
@@ -128,6 +133,7 @@ fact_sale AS (
 ),
 fact_rent AS (
 	SELECT
+	    hlf.sk_house_listing_flow,
 	    hlf.sk_lead,
 		hlf.sk_house_listing,
 		hlf.sk_region,
@@ -142,7 +148,9 @@ fact_rent AS (
 	    sor.opportunity_context AS context_opportunity,
 	    sor.first_listing_context AS context_first_listing,
 	    hlf.mkt_origin,
+	    hlf.mkt_completion,
 	    hlf.mkt_channel,
+	    sor.sales_company,
 	    sor.sourcing_ops,
 	    'Rent' AS origin_table
 	FROM fact_house_listing_flows hlf
