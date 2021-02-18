@@ -1,6 +1,6 @@
 SELECT
    p.id,
-   p.id_amplitude_device,
+   p.amplitudeDeviceId as id_amplitude_device,
    p.name,
    p.phone,
    p.email,
