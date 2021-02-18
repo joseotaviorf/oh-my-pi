@@ -1,6 +1,6 @@
 --drop view if exists vw_dim_partner;
 --create or replace view vw_dim_partner as
-SELECT
+SELECT DISTINCT
   p.id as sk_partner,
   p.id as id_partner,
   p.id_amplitude_device,
