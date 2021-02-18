@@ -73,6 +73,8 @@ SELECT
     dataRescisaoPrevista_MOD AS mod_ts_expected_termination,
     fairfaxStartDate AS ts_fair_fax_start,
     estateAgentBrokerageShare AS agent_brokerage_share,
-    estateAgentBrokerageShare_MOD AS mod_agent_brokerage_share
+    estateAgentBrokerageShare_MOD AS mod_agent_brokerage_share,
+    tenantServiceFee AS tenant_service_fee,
+    tenantServiceFee_MOD AS mod_tenant_service_fee
 FROM
     datalake_ebdb_raw.`contrato_aud`
