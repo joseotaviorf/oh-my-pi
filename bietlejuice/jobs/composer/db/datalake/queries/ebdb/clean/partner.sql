@@ -1,5 +1,6 @@
 SELECT
     id,
+    amplitudedeviceid as id_amplitude_device,
     atualizadoEm AS ts_updated,
     criadoEm AS ts_created,
     name,

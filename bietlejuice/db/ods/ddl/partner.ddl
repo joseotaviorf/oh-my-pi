@@ -1,6 +1,7 @@
 drop table if exists partner;
 create table if not exists partner (
     id bigint,
+    id_amplitude_device varchar,
     name varchar,
     phone varchar,
     email varchar,

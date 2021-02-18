@@ -2,6 +2,7 @@ drop table if exists staging.dim_partner;
 create table staging.dim_partner (
     sk_partner bigint,
     id_partner bigint,
+    id_amplitude_device varchar,
     name varchar,
     trade_name varchar,
     phone varchar,

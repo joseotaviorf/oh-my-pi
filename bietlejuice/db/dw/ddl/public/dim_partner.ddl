@@ -2,6 +2,7 @@ drop table if exists dim_partner;
 create table dim_partner (
     sk_partner bigint primary key,
     id_partner bigint,
+    id_amplitude_device varchar(255) DEFAULT NULL,
     name varchar(255)  DEFAULT NULL,
     trade_name varchar(255)  DEFAULT NULL,
     phone varchar(255) DEFAULT NULL,
