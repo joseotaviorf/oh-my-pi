@@ -13,17 +13,22 @@ This pipeline produces, via full load:
 
 1. In datalake raw:
     - All tables available in source's database.
+    
 
 2. In datalake clean:
+    - `attachment`
+    - `attachment_aud`
     - `contract` 
     - `inspection`
     - `inspection_aud` 
     - `member`
     - `negotiation` 
     - `negotiation_aud`
+    - `rev_info`
     - `termination` 
     - `termination_aud`
     - `termination_fee`
+    - `termination_fee_aud`
 
 ### Responsible Data Engineering Team
 For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the 
