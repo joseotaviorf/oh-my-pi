@@ -46,7 +46,7 @@ def get_api_response(accounts, execution_date):
                 "ECpc",
             ],
             "format": "json",
-            "timezone": "GMT",
+            "timezone": "BRT",
             "currency": "BRL",
         }
         data = json.dumps(body)
