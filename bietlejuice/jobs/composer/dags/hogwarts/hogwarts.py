@@ -57,7 +57,7 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 )
 
 hogwarts_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="quinto-messenger-to-datalake-raw",
+    task_id="hogwarts-to-datalake-raw",
     dag=dag,
     json={
         "spark_python_task": {

@@ -10,6 +10,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 ### Outputs
 
 We load the following tables into the datalake:
+
 1. In datalake raw:
 
     * document
