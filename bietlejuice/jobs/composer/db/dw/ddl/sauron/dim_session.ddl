@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS sauron.dim_session (
 	status VARCHAR(20),
 	ts_created TIMESTAMP,
 	ts_first_message TIMESTAMP,
-	ts_updated TIMESTAMP
+	ts_updated TIMESTAMP,
+	ts_load TIMESTAMP
 )
 ALTER TABLE sauron.dim_session OWNER TO airflow;

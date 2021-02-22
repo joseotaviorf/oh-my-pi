@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS sauron.fact_sessions (
 	sk_personal_document VARCHAR(50),
 	sk_created_date BIGINT,
 	is_retained_by_bot BOOLEAN,
-	minutes_duration DECIMAL(27,6)
+	minutes_duration DECIMAL(27,6),
+	ts_load TIMESTAMP
 )
 ALTER TABLE sauron.fact_sessions OWNER TO airflow;

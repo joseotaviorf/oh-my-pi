@@ -21,7 +21,8 @@ SELECT
 	ci.cpf AS sk_personal_document,
 	COALESCE(CAST(date_format(s.ts_created, 'yyyyMMdd') AS BIGINT), -1) AS sk_created_date,
 	c.id_source IS NULL AS is_retained_by_bot,
-	s.seconds_duration/60.0 AS minutes_duration
+	s.seconds_duration/60.0 AS minutes_duration,
+	NOW() AS ts_load
 FROM datalake_sauron.session s
 LEFT JOIN last_session_channel lsc
 	ON s.id_session = CAST(lsc.id_session AS bigint)

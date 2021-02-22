@@ -9,5 +9,6 @@ SELECT
 	status,
 	ts_created,
 	ts_first_message,
-	ts_updated
+	ts_updated,
+	NOW() AS ts_load
 FROM datalake_sauron.session
