@@ -15,7 +15,7 @@ from qa_python_utils.default_logger import QuintoAndarLogger
 
 MAIN_DAG_NAME = 'bi-marketing-costs'
 MAIN_START_DATE = datetime(2018, 12, 10, 2, 0, 0)
-MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('30 0,5,8,16 * * *')
+MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('30 5 * * *')
 
 env.set_airflow_var_to_local_env('BI_DW', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
 
@@ -24,8 +24,6 @@ accounts = json.loads(env.get_airflow_env_var('bi-marketing-accounts'))
 
 # API auth
 auth = {
-    MarketingEnum.FACEBOOK_ADS: None,
-    MarketingEnum.GOOGLE_ADS: None,
     MarketingEnum.LIFULL: None,
 }
 
@@ -35,9 +33,7 @@ data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
 data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
 athena_client = AthenaClient(s3_bucket, data_acc_aws_access_key_id, data_acc_aws_secret_access_key)
 
-FACEBOOK_ADS_ACCOUNTS = accounts['facebook_ads']
 LIFULL_CAMPAIGNS_ACCOUNTS = accounts['lifull_campaigns']
-GOOGLE_ADS_ACCOUNTS = accounts['google_ads']
 
 # dags
 main_dag = DAG(
@@ -126,66 +122,6 @@ def load_to_dw_sub_dag(sub_dag_name, class_):
     return sub_dag.build_tasks('dw')
 
 
-facebook_ads_clean_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=clean_sub_dag,
-    sub_dag_name="facebook-ads-raw-to-clean",
-    class_=MarketingEnum.FACEBOOK_ADS,
-    accounts=FACEBOOK_ADS_ACCOUNTS
-)
-
-facebook_ads_load_to_pre_staging_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=load_to_pre_staging_sub_dag,
-    sub_dag_name='facebook-ads-load-to-pre-staging',
-    class_=MarketingEnum.FACEBOOK_ADS,
-    accounts=FACEBOOK_ADS_ACCOUNTS
-)
-
-facebook_ads_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=load_to_staging_sub_dag,
-    sub_dag_name='facebook-ads-load-to-staging',
-    class_=MarketingEnum.FACEBOOK_ADS
-)
-
-facebook_ads_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=load_to_dw_sub_dag,
-    sub_dag_name='facebook-ads-load-to-dw',
-    class_=MarketingEnum.FACEBOOK_ADS
-)
-
-google_ads_clean_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=clean_sub_dag,
-    sub_dag_name='google-ads-raw-to-clean',
-    class_=MarketingEnum.GOOGLE_ADS,
-    accounts=GOOGLE_ADS_ACCOUNTS
-)
-
-google_ads_load_to_pre_staging_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=load_to_pre_staging_sub_dag,
-    sub_dag_name='google-ads-load-to-pre-staging',
-    class_=MarketingEnum.GOOGLE_ADS,
-    accounts=GOOGLE_ADS_ACCOUNTS
-)
-
-google_ads_load_to_staging_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=load_to_staging_sub_dag,
-    sub_dag_name='google-ads-load-to-staging',
-    class_=MarketingEnum.GOOGLE_ADS,
-)
-
-google_ads_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag,
-    sub_dag_func=load_to_dw_sub_dag,
-    sub_dag_name='google-ads-load-to-dw',
-    class_=MarketingEnum.GOOGLE_ADS,
-)
-
 lifull_raw_dag = BaseSubDag.get_sub_dag_operator(
     dag=main_dag,
     sub_dag_func=raw_sub_dag,
@@ -216,14 +152,6 @@ lifull_load_to_dw_dag = BaseSubDag.get_sub_dag_operator(
     class_=MarketingEnum.LIFULL
 )
 
-airflow_helpers.chain(google_ads_clean_dag,
-                      google_ads_load_to_pre_staging_dag,
-                      google_ads_load_to_staging_dag,
-                      google_ads_load_to_dw_dag)
-airflow_helpers.chain(facebook_ads_clean_dag,
-                      facebook_ads_load_to_pre_staging_dag,
-                      facebook_ads_load_to_staging_dag,
-                      facebook_ads_load_to_dw_dag)
 airflow_helpers.chain(lifull_raw_dag,
                       lifull_clean_dag,
                       lifull_load_to_staging_dag,

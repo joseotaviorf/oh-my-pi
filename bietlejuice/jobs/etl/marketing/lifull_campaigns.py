@@ -31,11 +31,11 @@ class LifullCampaigns(Marketing):
             job_queue=job_queue,
             job_definition='scrap-marketing-data:1',
             command=['scrapy', 'crawl', 'trovit',
-                    '-a', 'start_date={}'.format(start_date),
-                    '-a', 'end_date={}'.format(start_date),
-                    '-a', 'account_id={}'.format(self.account[0]),
-                    '-a', 'account_name={}'.format(self.account[1]),
-                    '-o', 's3://{}/raw/marketing/lifull_campaigns/acc={}/dt={}/data.gz'.format(self.s3_bucket, self.account[0], start_date)]
+                     '-a', 'start_date={}'.format(start_date),
+                     '-a', 'end_date={}'.format(start_date),
+                     '-a', 'account_id={}'.format(self.account[0]),
+                     '-a', 'account_name={}'.format(self.account[1]),
+                     '-o', 's3://{}/raw/marketing/lifull_campaigns/acc={}/dt={}/data.gz'.format(self.s3_bucket, self.account[0], start_date)]
         )
 
         while not (batch_client.get_job_info_by_id(r.get('jobId')).get('status') in ('SUCCEEDED', 'FAILED')):

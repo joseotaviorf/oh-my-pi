@@ -1,10 +1,7 @@
 from datetime import timedelta
 
-from bietlejuice.jobs.etl.marketing.facebook_ads import FacebookAds
-from bietlejuice.jobs.etl.marketing.google_ads import GoogleAds
 from bietlejuice.jobs.etl.marketing.lifull_campaigns import LifullCampaigns
 from bietlejuice.jobs.etl.marketing.marketing_enum import MarketingEnum
-from bietlejuice.jobs.etl.marketing.twitter_campaigns import TwitterCampaigns
 from qa_python_utils import QuintoAndarLogger
 
 logger = QuintoAndarLogger("MarketingFactory")
@@ -38,9 +35,6 @@ class MarketingFactory(object):
     @logger
     def __dispatch_dict(class_):
         return {
-            MarketingEnum.GOOGLE_ADS: GoogleAds,
-            MarketingEnum.FACEBOOK_ADS: FacebookAds,
-            MarketingEnum.TWITTER: TwitterCampaigns,
             MarketingEnum.LIFULL: LifullCampaigns
         }.get(class_)
 

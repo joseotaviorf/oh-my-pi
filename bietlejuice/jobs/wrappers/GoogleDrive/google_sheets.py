@@ -28,7 +28,7 @@ class GoogleSheets(object):
         gsheets = GoogleSheetsClient(self.google_s_a_credentials, self.google_api_scope)
 
         df_gsheets_raw = gsheets.get_dataframe_from_sheet(sheet_name=google_sheets_file['sheetName'],
-                                                      sheet_id=google_sheets_file['sheetId'])
+                                                          sheet_id=google_sheets_file['sheetId'])
         if df_gsheets_raw is None:
             raise ValueError(
                 "m=move_sheets_data_to_destination, sheet_id={}, sheet_name={}, "
@@ -80,7 +80,7 @@ class GoogleSheets(object):
         """
         Exclude columns with empty labels
         """
-        select_labels_not_empty = list(filter (lambda column: column.strip() != '', df.columns))
+        select_labels_not_empty = list(filter(lambda column: column.strip() != '', df.columns))
         return df[select_labels_not_empty]
 
     @logger(exclude='df')

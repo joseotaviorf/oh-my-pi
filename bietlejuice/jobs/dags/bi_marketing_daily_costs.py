@@ -247,4 +247,4 @@ load_temp_fact_marketing_daily_costs_task.set_upstream([
     load_shared_manual_costs_to_datalake_task
 ])
 
-load_fact_marketing_daily_costs_task  >> trigger_bi_marketing_funnels_conversions_task
+load_fact_marketing_daily_costs_task >> trigger_bi_marketing_funnels_conversions_task

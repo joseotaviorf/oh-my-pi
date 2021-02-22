@@ -19,20 +19,10 @@ class Marketing(object):
     }
 
     SK_FIELD_MAP = {
-        'dim_google_keyword': 'sk_keyword',
-        'dim_google_ad': 'sk_ad',
-        'dim_google_campaign': 'sk_campaign',
-        'fact_google_daily_cost_attributions': 'sk_keyword || sk_ad',
-        'dim_facebook_ad': 'sk_ad',
-        'fact_facebook_daily_cost_attributions': 'sk_ad',
         'dim_trovit_campaign': 'sk_trovit_campaign',
         'fact_trovit_daily_cost_attributions': 'sk_trovit_campaign',
         'dim_mitula_campaign': 'sk_mitula_campaign',
         'fact_mitula_daily_cost_attributions': 'sk_mitula_campaign',
-        'dim_twitter_ad': 'sk_ad',
-        'dim_twitter_ad_group': 'sk_ad_group',
-        'dim_twitter_campaign': 'sk_campaign',
-        'fact_twitter_daily_cost_attributions': 'sk_ad',
     }
 
     def __init__(self, s3_bucket, execution_date, integration=None, account=None):
