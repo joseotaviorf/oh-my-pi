@@ -124,6 +124,8 @@ select distinct
         when dfm.drop_reason = 114 then 'Seller - não aceita pagamento financiado'
         when dfm.drop_reason = 115 then 'Buyer - desconto maior do que 30%'
         when dfm.drop_reason = 116 then 'Buyer - pediu para desconsiderar a proposta'
+        when dfm.drop_reason = 117 then 'Buyer - Proposta aceita invalidada'
+        when dfm.drop_reason = 118 then 'Seller - Proposta aceita invalidada'
         else 'ERRO' end as "drop_reason_name",
     case -- drop_category
         when dfm.drop_reason is null and dt_offer_dismissed is null then ''
@@ -171,6 +173,8 @@ select distinct
         when drop_reason_name = 'Seller - não vai mais vender o imóvel' then 'Quali'
         when drop_reason_name = 'Buyer desistiu de comprar (esse imóvel)' then 'Quali'
         when drop_reason_name = 'Buyer Expirado - Ainda Procurando' then 'Quali'
+        when drop_reason_name = 'Buyer - Proposta aceita invalidada' then 'Não Quali'
+        when drop_reason_name = 'Seller - Proposta aceita invalidada' then 'Não Quali'
         else 'ERRO' end as "drop_category",
     case -- drop_subcategory
         when dfm.drop_reason is null and dt_offer_dismissed is null then ''
@@ -218,6 +222,8 @@ select distinct
         when drop_reason_name = 'Seller - não vai mais vender o imóvel' then 'SLA'
         when drop_reason_name = 'Buyer desistiu de comprar (esse imóvel)' then 'SLA'
         when drop_reason_name = 'Buyer Expirado - Ainda Procurando' then 'SLA'
+        when drop_reason_name = 'Buyer - Proposta aceita invalidada' then 'Baixo intent'
+        when drop_reason_name = 'Seller - Proposta aceita invalidada' then 'Baixo intent'
         else 'ERRO' end as "drop_subcategory",
    case -- deal_breaker
         when drop_reason is null and dt_offer_dismissed is null then ''
