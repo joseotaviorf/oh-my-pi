@@ -1,17 +1,13 @@
 from datetime import datetime
 
 import pytest
-from bietlejuice.jobs.etl.marketing import FacebookAds, GoogleAds, \
-    TwitterCampaigns, LifullCampaigns
+from bietlejuice.jobs.etl.marketing import LifullCampaigns
 from bietlejuice.jobs.etl.marketing.marketing_enum import MarketingEnum
 
 
 class TestMarketingFactory(object):
     @pytest.mark.parametrize('class_, expected',
-                             [(MarketingEnum.FACEBOOK_ADS, FacebookAds),
-                              (MarketingEnum.GOOGLE_ADS, GoogleAds),
-                              (MarketingEnum.TWITTER, TwitterCampaigns),
-                              (MarketingEnum.LIFULL, LifullCampaigns)])
+                             [(MarketingEnum.LIFULL, LifullCampaigns)])
     def test_factory(self, factory, class_, expected):
         # arrange
         auth = {'consumer_key': 'consumer_key', 'consumer_secret': 'consumer_secret',
@@ -30,13 +26,7 @@ class TestMarketingFactory(object):
         assert result.execution_date == datetime(2018, 1, 1)
 
     @pytest.mark.parametrize('_enum, expected_class,expected_date',
-                             [(MarketingEnum.FACEBOOK_ADS, FacebookAds,
-                               datetime(2017, 12, 31)),
-                              (MarketingEnum.GOOGLE_ADS, GoogleAds,
-                               datetime(2017, 12, 31)),
-                              (MarketingEnum.TWITTER, TwitterCampaigns,
-                               datetime(2017, 12, 31)),
-                              (MarketingEnum.LIFULL, LifullCampaigns,
+                             [(MarketingEnum.LIFULL, LifullCampaigns,
                                datetime(2017, 12, 31))
                               ])
     def test_factory_with_offset_day(self, factory, _enum, expected_class,

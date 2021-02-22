@@ -25,24 +25,6 @@ def marketing():
 
 
 @pytest.fixture(scope='session')
-def google_ads():
-    return GoogleAds(
-        S3_BUCKET,
-        EXECUTION_DATE,
-        None
-    )
-
-
-@pytest.fixture(scope='session')
-def facebook_ads():
-    return FacebookAds(
-        S3_BUCKET,
-        EXECUTION_DATE,
-        None
-    )
-
-
-@pytest.fixture(scope='session')
 def mkt_acc_integration():
     return Marketing(
         s3_bucket=S3_BUCKET,
@@ -55,18 +37,6 @@ def mkt_acc_integration():
 @pytest.fixture(scope='session')
 def factory():
     return MarketingFactory()
-
-
-@pytest.fixture
-def twitter_campaigns():
-    return TwitterCampaigns(
-        s3_bucket=S3_BUCKET,
-        execution_date=EXECUTION_DATE,
-        auth={"consumer_key": "consumer_key",
-              "consumer_secret": "consumer_secret",
-              "access_token": "access_token",
-              "access_token_secret": "access_token_secret"}
-    )
 
 
 @pytest.fixture
