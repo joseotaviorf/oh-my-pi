@@ -16,6 +16,8 @@ source_ops_rent AS (
 	    case
 	        WHEN hlf.mkt_origin = 'B2B' AND hlf.is_b2b = TRUE
 	            THEN 'B2B'
+	        WHEN hlf.mkt_origin = 'CIQ'
+	        	THEN 'CIQ'
 	        WHEN (hlf.mkt_completion = 'Full Self-Service' OR (hlf.has_isales_intervention = false)) AND (photo_job_by_isales < 1)
 	            THEN 'FSS'
 	        WHEN (hlf.mkt_completion = 'Full Self-Service' OR (hlf.has_isales_intervention = false)) AND photo_job_by_isales >= 1 AND sk_first_photo_job_date = hlf.sk_opportunity_date
@@ -69,6 +71,8 @@ source_ops_sale AS (
 	    case
 	        WHEN ssf.mkt_origin = 'B2B' AND ssf.is_b2b = TRUE
 	            THEN 'B2B'
+	        WHEN ssf.mkt_origin = 'CIQ'
+	        	THEN 'CIQ'
 	        WHEN (ssf.mkt_completion = 'Full Self-Service' OR (ssf.has_isales_intervention = false)) AND (photo_job_by_isales < 1)
 	            THEN 'FSS'
 	        WHEN (ssf.mkt_completion = 'Full Self-Service' OR (ssf.has_isales_intervention = false)) AND photo_job_by_isales >= 1 AND sk_first_photo_job_date = ssf.sk_opportunity_date

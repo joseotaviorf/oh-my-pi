@@ -175,6 +175,9 @@ SELECT
 		END AS lead_context,
   	sales_company,
   	sourcing_ops,
+  	CASE WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'Other') AND lead_context = 'FSS'
+    	THEN 'IS'
+    END AS lead_processing_operation,
   	context,
   	origin_table,
     SUM(COALESCE(leads,0)) AS leads,
@@ -184,4 +187,4 @@ SELECT
     SUM(COALESCE(first_listings,0)) AS first_listings,
     current_timestamp AS ts_load
 FROM union_all_date
-GROUP BY "date", city_group, 3, 4, 5, 6, 7, 8, 9;
+GROUP BY "date", city_group, 3, 4, 5, 6, 7, 8, 9, 10;

@@ -190,16 +190,23 @@ SELECT
     city_group,
     supply_mkt_origin,
     CASE
-        WHEN supply_mkt_origin = 'Owner PWA' THEN supply_mkt_channel
-        WHEN supply_mkt_origin != 'Owner PWA' THEN supply_mkt_origin
+        WHEN supply_mkt_origin = 'Owner PWA'
+        	THEN supply_mkt_channel
+        WHEN supply_mkt_origin != 'Owner PWA'
+        	THEN supply_mkt_origin
     END AS supply_mkt_origin_detailed,
     CASE
-	    WHEN supply_mkt_origin = 'B2B' OR supply_mkt_origin = 'CIQ' THEN supply_mkt_origin
-	    WHEN supply_mkt_completion = 'Full Self-Service' THEN 'FSS'
+	    WHEN supply_mkt_origin = 'B2B' OR supply_mkt_origin = 'CIQ'
+	    	THEN supply_mkt_origin
+	    WHEN supply_mkt_completion = 'Full Self-Service'
+	    	THEN 'FSS'
 	    ELSE 'IS'
-		END AS lead_context,
+	END AS lead_context,
   	sales_company,
     sourcing_ops,
+    CASE WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'Other') AND lead_context = 'FSS'
+    	THEN 'IS'
+    END AS lead_processing_operation,
   	origin_table,
     context_origin,
   	context_conversion,
@@ -211,4 +218,4 @@ SELECT
     current_timestamp AS ts_load
 FROM
     union_all_date
-GROUP BY "date", city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11;
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12;
