@@ -62,37 +62,13 @@ with house_available_hours as (
 			else 'Weekday' 
 		end as week_day_type
 	from datalake_clean.ods_dim_date dd
-	where date(date) >= date('2020-01-01') and date(week_start) <= current_date - interval '1' day
+	where date(date) >= date('2021-01-01') and date(week_start) <= current_date - interval '1' day
 		and date != ''
 )
 , regions as (
 	select
 		CAST(dr.id AS BIGINT) as region_id,
-		case 
-		    when dr.region_code = 'SPO 01' then 'SPO 01 FS' 
-		    when dr.region_code = 'SPO 02' then 'SPO 02 FS' 
-		    when dr.region_code = 'SPO 03' then 'SPO 02 FS' 
-		    when dr.region_code = 'SPO 04' then 'SPO 03 FS' 
-		    when dr.region_code = 'SPO 05' then 'SPO 04 FS' 
-		    when dr.region_code = 'SPO 06' then 'SPO 05 FS' 
-		    when dr.region_code = 'SPO 07' then 'SPO 05 FS' 
-		    when dr.region_code = 'SPO 08' then 'SPO 04 FS' 
-		    when dr.region_code = 'SPO 09' then 'SPO 06 FS' 
-		    when dr.region_code = 'SPO 10' then 'SPO 01 FS' 
-		    when dr.region_code = 'SPO 11' then 'SPO 06 FS' 
-		    when dr.region_code = 'RIO 01' then 'RIO 01 FS' 
-		    when dr.region_code = 'RIO 02' then 'RIO 02 FS' 
-		    when dr.region_code = 'RIO 03' then 'RIO 03 FS' 
-		    when dr.region_code = 'RIO 04' then 'RIO 04 FS' 
-		    when dr.region_code = 'RIO 05' then 'RIO 05 FS' 
-		    when dr.region_code = 'RIO 06' then 'RIO 05 FS' 
-		    when dr.region_code = 'RIO 07' then 'RIO 07 FS'
-		    when dr.region_code = 'RIO 08' then 'RIO 06 FS' 
-		    when dr.region_code = 'RIO 09' then 'RIO 08 FS' 
-		    when dr.region_code = 'RIO 10' then 'RIO 07 FS'
-		    when dr.region_code = 'RIO 11' then 'RIO 09 FS'
-		    else dr.region_code 
-		end as region_code,
+		dr.region_code,
 		dr.city_group,
 		dr.city_name
 	from datalake_clean.ods_dim_region dr
@@ -139,7 +115,7 @@ with house_available_hours as (
       cross join date_series ds
       cross join slot_series ss
     where
-        date >= current_date - interval '6' month
+        date >= date('2021-01-01')
 )
 , encaixe_to_booking as (
 	select distinct
@@ -148,7 +124,7 @@ with house_available_hours as (
 	from datalake_clean.ods_dim_booking
 	where type = 'Visita'
 		and visit_intent = 'SALE'
-		and date(date_parse(dt_scheduling, '%Y-%m-%d %H:%i:%s')) >= date('2020-06-01')
+		and date(date_parse(dt_scheduling, '%Y-%m-%d %H:%i:%s')) >= date('2021-01-01')
 )
 , booking_for_rent as (
 	select distinct
@@ -163,7 +139,7 @@ with house_available_hours as (
 	where type = 'Visita'
 		and visit_intent = 'RENT'
 		and id_visitor != ''
-		and date(date_parse(dt_scheduling, '%Y-%m-%d %H:%i:%s')) >= date('2020-06-01')
+		and date(date_parse(dt_scheduling, '%Y-%m-%d %H:%i:%s')) >= date('2021-01-01')
 		and (status = 'Realizado' OR status = 'Marcado' OR            
                     (status = 'Cancelado' and date(date_parse(dt_scheduling, '%Y-%m-%d %H:%i:%s')) = try_cast(try_cast(substring(dt_cancel,1,19) as timestamp) as date)))
 )
@@ -179,7 +155,7 @@ with house_available_hours as (
         rank() over (partition by trim(evt.id_user), trim(coalesce(evt.ep_house_id, '')) order by evt.ts_event desc) as rank_enc
         from datalake_amplitude_clean_prod."170698_visit_hoursalert_confirmed_events" as evt
     left join encaixe_to_booking etb on etb.user_id = trim(evt.id_user) and etb.house_id = trim(coalesce(evt.ep_house_id, ''))
-    where cast(evt.year as varchar) || '-' || lpad(cast(evt.month as varchar), 2 , '0') >= '2020-06'
+    where cast(evt.year as varchar) || '-' || lpad(cast(evt.month as varchar), 2 , '0') >= '2021-01'
     	and cast(json_extract(event_properties, '$.business_context') as varchar) = 'sale'
 )
 , encaixes_temp as (
@@ -291,7 +267,7 @@ with house_available_hours as (
 		on t.house_id = bfr.house_id
 		and t.target_date = bfr.visit_date
 		and t.slot = bfr.slot_dia
-	where target_date >= current_date - interval '6' month
+	where target_date >= date('2021-01-01')
 )
 , encaixes_agg as (
 	select
@@ -324,7 +300,7 @@ with house_available_hours as (
   	join datalake_ebdb_clean_prod.house h on h.id = cast(bk.id_property as bigint)
   	where bk.type = 'Visita'
 		and bk.visit_intent = 'SALE'
-		and date(date_parse(dt_scheduling, '%Y-%m-%d %H:%i:%s')) >= date('2020-06-01')
+		and date(date_parse(dt_scheduling, '%Y-%m-%d %H:%i:%s')) >= date('2021-01-01')
 )
 , bookings_clean as (
 	select
