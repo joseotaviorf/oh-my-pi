@@ -122,6 +122,7 @@ sale_flows AS (
     SELECT
         DATE(evt.ts_event) AS dt_event,
         dr.city_group,
+        evt.flow_event,
         evt.mkt_origin,
         evt.mkt_channel,
         evt.mkt_medium,
@@ -161,6 +162,7 @@ targets AS (
     SELECT
         bd.date::DATE,
         bd.city AS city_group,
+        NULL::TEXT AS flow_event,
         'Tenants PWA' AS mkt_origin,
         t.mkt_channel,
         bd.mkt_medium,
@@ -192,6 +194,7 @@ targets AS (
     SELECT
         bp.date::DATE,
         bp.city_group,
+        NULL::TEXT AS flow_event,
         'Tenants PWA' AS mkt_origin,
         t.mkt_channel,
         bp.mkt_medium,
@@ -221,6 +224,7 @@ targets AS (
     SELECT
         date::DATE,
         city_group,
+        NULL::TEXT AS flow_event,
         'Tenants PWA' AS mkt_origin,
         NULL::TEXT AS mkt_channel,
         NULL::TEXT AS mkt_medium,
@@ -252,6 +256,7 @@ investment AS (
     SELECT
         dd.date,
         city_group,
+        NULL::TEXT AS flow_event,
         'Tenants PWA' AS mkt_origin,
         mkt_channel,
         mkt_medium,
@@ -281,7 +286,7 @@ investment AS (
         co.mkt_origin = 'Tenants PWA - Sale'
         AND dd.date >= DATE('2020-01-01')
         AND co.mkt_medium != 'Branding'
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 )
 SELECT
     *
