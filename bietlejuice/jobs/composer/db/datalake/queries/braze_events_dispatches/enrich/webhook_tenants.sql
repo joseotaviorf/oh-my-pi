@@ -1,5 +1,5 @@
 SELECT
-	et.id_dispatch,
+	et.id_user_dispatch,
 	et.id_user_braze,
 	et.event_channel,
 	send_tenants.ts_event AS ts_webhook_sent,
@@ -10,7 +10,7 @@ FROM
 	datalake_braze.events_tenants AS et
 LEFT JOIN
 	datalake_braze.events_tenants send_tenants
-		ON et.id_user_braze = send_tenants.id_user_braze
+		ON et.id_user_dispatch = send_tenants.id_user_dispatch
 		AND send_tenants.event_type = 'users.messages.webhook.Send'
 WHERE
 	et.event_channel = 'webhook'

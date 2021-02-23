@@ -1,5 +1,5 @@
 SELECT
-	eo.id_dispatch,
+	eo.id_user_dispatch,
 	eo.id_user_braze,
 	eo.event_channel,
 	send_owners.ts_event AS ts_email_sent,
@@ -16,38 +16,31 @@ FROM
 	datalake_braze.events_owners AS eo
 LEFT JOIN
 	datalake_braze.events_owners AS send_owners
-		ON eo.id_dispatch = send_owners.id_dispatch
-		AND eo.id_user_braze = send_owners.id_user_braze
+		ON eo.id_user_dispatch = send_owners.id_user_dispatch
 		AND send_owners.event_type = 'users.messages.email.Send'
 LEFT JOIN
 	datalake_braze.events_owners AS delivery_owners
-		ON eo.id_dispatch = delivery_owners.id_dispatch
-		AND eo.id_user_braze = delivery_owners.id_user_braze
+		ON eo.id_user_dispatch = delivery_owners.id_user_dispatch
 		AND delivery_owners.event_type = 'users.messages.email.Delivery'
 LEFT JOIN
 	datalake_braze.events_owners AS open_owners
-		ON eo.id_dispatch = open_owners.id_dispatch
-		AND eo.id_user_braze = open_owners.id_user_braze
+		ON eo.id_user_dispatch = open_owners.id_user_dispatch
 		AND open_owners.event_type = 'users.messages.email.Open'
 LEFT JOIN
 	datalake_braze.events_owners AS click_owners
-		ON eo.id_dispatch = click_owners.id_dispatch
-		AND eo.id_user_braze = click_owners.id_user_braze
+		ON eo.id_user_dispatch = click_owners.id_user_dispatch
 		AND click_owners.event_type = 'users.messages.email.Click'
 LEFT JOIN
 	datalake_braze.events_owners AS bounce_owners
-		ON eo.id_dispatch = bounce_owners.id_dispatch
-		AND eo.id_user_braze = bounce_owners.id_user_braze
+		ON eo.id_user_dispatch = bounce_owners.id_user_dispatch
 		AND bounce_owners.event_type IN ('users.messages.email.Bounce', 'users.messages.email.SoftBounce')
 LEFT JOIN
 	datalake_braze.events_owners AS spam_owners
-		ON eo.id_dispatch = spam_owners.id_dispatch
-		AND eo.id_user_braze = spam_owners.id_user_braze
+		ON eo.id_user_dispatch = spam_owners.id_user_dispatch
 		AND spam_owners.event_type = 'users.messages.email.MarkAsSpam'
 LEFT JOIN
 	datalake_braze.events_owners AS unsubscribe_owners
-		ON eo.id_dispatch = unsubscribe_owners.id_dispatch
-		AND eo.id_user_braze = unsubscribe_owners.id_user_braze
+		ON eo.id_user_dispatch = unsubscribe_owners.id_user_dispatch
 		AND unsubscribe_owners.event_type = 'users.messages.email.Unsubscribe'
 WHERE
 	eo.event_channel = 'email'

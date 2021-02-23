@@ -1,5 +1,5 @@
 SELECT
-	et.id_dispatch,
+	et.id_user_dispatch,
 	et.id_user_braze,
 	et.event_channel,
 	send_tenants.ts_event AS ts_push_sent,
@@ -12,18 +12,15 @@ FROM
 	datalake_braze.events_tenants AS et
 LEFT JOIN
 	datalake_braze.events_tenants AS send_tenants
-		ON et.id_dispatch = send_tenants.id_dispatch
-		AND et.id_user_braze = send_tenants.id_user_braze
+		ON et.id_user_dispatch = send_tenants.id_user_dispatch
 		AND send_tenants.event_type = 'users.messages.pushnotification.Send'
 LEFT JOIN
 	datalake_braze.events_tenants AS open_tenants
-		ON et.id_dispatch = open_tenants.id_dispatch
-		AND et.id_user_braze = open_tenants.id_user_braze
+		ON et.id_user_dispatch = open_tenants.id_user_dispatch
 		AND open_tenants.event_type = 'users.messages.pushnotification.Open'
 LEFT JOIN
 	datalake_braze.events_tenants AS bounce_tenants
-		ON et.id_dispatch = bounce_tenants.id_dispatch
-		AND et.id_user_braze = bounce_tenants.id_user_braze
+		ON et.id_user_dispatch = bounce_tenants.id_user_dispatch
 		AND bounce_tenants.event_type = 'users.messages.pushnotification.Bounce'
 WHERE
 	et.event_channel = 'pushnotification'
