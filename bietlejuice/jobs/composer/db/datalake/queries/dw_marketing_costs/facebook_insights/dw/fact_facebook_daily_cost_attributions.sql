@@ -34,6 +34,7 @@ WITH fb_grouped_records AS (
 )
 
 SELECT
+    INT(DATE_FORMAT(DATE(dt_start), 'yyyyMMdd')) AS sk_date,
     sk_ad,
     id_ad,
     id_account,
@@ -54,6 +55,7 @@ SELECT
     month,
     day,
     dt_start,
-    dt_stop
+    dt_stop,
+    NOW() AS ts_load
 FROM
     fb_grouped_records
