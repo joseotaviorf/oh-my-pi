@@ -4,6 +4,7 @@ from unittest import mock
 import pytest
 from hive_metastore_client.builders import ColumnBuilder
 from hive_metastore_client.builders import PartitionBuilder
+from pytest import raises
 
 from bietlejuice.jobs.composer.loaders import HiveMetastoreLoader
 
@@ -132,12 +133,14 @@ class TestHiveMetastoreLoader:
             format_info,
         )
 
+    @mock.patch.object(HiveMetastoreLoader, "_check_partition_keys")
     @mock.patch.object(HiveMetastoreLoader, "is_table_in_metastore")
     @mock.patch.object(HiveMetastoreLoader, "compare_table_schema")
     def test_update_metastore_with_existing_table(
         self,
         mocked_compare_table_schema,
         mocked_is_table_in_metastore,
+        mocked__check_partition_keys,
         hive_metastore_loader,
     ):
         # arrange
@@ -265,3 +268,51 @@ class TestHiveMetastoreLoader:
         # assert
         hive_metastore_loader.hive_metastore_service.add_partitions_to_table.assert_called_once()
         assert mocked_partition_builder.call_count == expected_builds
+
+    def test_check_partition_keys_with_diverging_partitions(
+        self, hive_metastore_loader
+    ):
+        # arrange
+        database_name = "<database_name>"
+        table_name = "<table_name>"
+        source_table_partition_keys = [("bar", "string")]
+
+        hive_metastore_loader.hive_metastore_service.get_partition_keys_names.return_value = [
+            ("foo", "string")
+        ]
+
+        # assert
+        with raises(ValueError):
+            # act
+            hive_metastore_loader._check_partition_keys(
+                database_name, table_name, source_table_partition_keys
+            )
+
+        hive_metastore_loader.hive_metastore_service.get_partition_keys_names.assert_called_once_with(
+            database_name, table_name
+        )
+
+    def test_check_partition_keys_with_equal_partitions(self, hive_metastore_loader):
+        # arrange
+        database_name = "<database_name>"
+        table_name = "<table_name>"
+        source_table_partition_keys = [("foo", "string")]
+
+        hive_metastore_loader.hive_metastore_service.get_partition_keys_names.return_value = [
+            ("foo", "string")
+        ]
+
+        # assert
+        try:
+            # act
+            hive_metastore_loader._check_partition_keys(
+                database_name, table_name, source_table_partition_keys
+            )
+        except Exception as e:
+            assert False, (
+                "msg=The method _check_partition_keys raised an exception. It was supposed to run without "
+                f"exceptions though, exception=<{e}>"
+            )
+        hive_metastore_loader.hive_metastore_service.get_partition_keys_names.assert_called_once_with(
+            database_name, table_name
+        )

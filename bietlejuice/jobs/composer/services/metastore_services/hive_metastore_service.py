@@ -257,3 +257,14 @@ class HiveMetastoreService(MetastoreService):
         """
         with self.client as conn:
             conn.drop_columns_from_table(database_name, table_name, columns)
+
+    def get_partition_keys_names(self, database_name, table_name):
+        """
+        Gets the partition keys from Metastore table.
+
+        :param database_name: the database name
+        :param table_name: the table name
+        :rtype: List[str]
+        """
+        with self.client as conn:
+            return conn.get_partition_keys_names(database_name, table_name)

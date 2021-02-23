@@ -11,6 +11,19 @@ from bietlejuice.jobs.composer.services.metastore_services import HiveMetastoreS
 
 
 class TestHiveMetastoreService:
+    @staticmethod
+    def _mock_open_connection_helper(hive_metastore_service):
+        # Mocking the conn inside `with` statement
+        mocked_open_conn = Mock()
+
+        mocked_client = Mock()
+        mocked_client.return_value = mocked_open_conn
+
+        hive_metastore_service._client.__enter__ = mocked_client
+        hive_metastore_service._client.__exit__ = Mock()
+
+        return mocked_open_conn
+
     def test_client(self, hive_metastore_service):
         # arrange
         mocked_client = Mock()
@@ -63,13 +76,7 @@ class TestHiveMetastoreService:
         mocked_table = Mock()
         mocked_table_builder.return_value = mocked_table
 
-        # Mocking the conn inside with statement
-        mocked_open_conn = Mock()
-        mocked_client = Mock()
-        mocked_client.return_value = mocked_open_conn
-
-        hive_metastore_service._client.__enter__ = mocked_client
-        hive_metastore_service._client.__exit__ = Mock()
+        mocked_open_conn = self._mock_open_connection_helper(hive_metastore_service)
 
         # act
         hive_metastore_service.create_external_table(
@@ -140,14 +147,8 @@ class TestHiveMetastoreService:
         table_name = "user"
         mocked_table = Mock()
 
-        # Mocking the conn inside with statement
-        mocked_open_conn = Mock()
+        mocked_open_conn = self._mock_open_connection_helper(hive_metastore_service)
         mocked_open_conn.get_table.return_value = mocked_table
-
-        mocked_client = Mock()
-        mocked_client.return_value = mocked_open_conn
-
-        hive_metastore_service._client.__enter__ = mocked_client
 
         # act
         returned_value = hive_metastore_service.get_table(database_name, table_name)
@@ -162,14 +163,8 @@ class TestHiveMetastoreService:
         table_name = "user"
         mocked_schema = "<list of FieldSchema>"
 
-        # Mocking the conn inside with statement
-        mocked_open_conn = Mock()
+        mocked_open_conn = self._mock_open_connection_helper(hive_metastore_service)
         mocked_open_conn.get_schema.return_value = mocked_schema
-
-        mocked_client = Mock()
-        mocked_client.return_value = mocked_open_conn
-
-        hive_metastore_service._client.__enter__ = mocked_client
 
         # act
         returned_value = hive_metastore_service.get_table_schema(
@@ -185,14 +180,8 @@ class TestHiveMetastoreService:
         database_name = "datalake_ebdb_clean_prod"
         mocked_table_names = "<list of table names>"
 
-        # Mocking the conn inside with statement
-        mocked_open_conn = Mock()
+        mocked_open_conn = self._mock_open_connection_helper(hive_metastore_service)
         mocked_open_conn.get_all_tables.return_value = mocked_table_names
-
-        mocked_client = Mock()
-        mocked_client.return_value = mocked_open_conn
-
-        hive_metastore_service._client.__enter__ = mocked_client
 
         # act
         returned_value = hive_metastore_service.get_table_names(database_name)
@@ -289,12 +278,7 @@ class TestHiveMetastoreService:
         table_name = "user"
         columns = "<list of columns to add>"
 
-        # Mocking the conn inside with statement
-        mocked_open_conn = Mock()
-        mocked_client = Mock()
-        mocked_client.return_value = mocked_open_conn
-
-        hive_metastore_service._client.__enter__ = mocked_client
+        mocked_open_conn = self._mock_open_connection_helper(hive_metastore_service)
 
         # act
         hive_metastore_service.add_columns_to_table(database_name, table_name, columns)
@@ -310,12 +294,7 @@ class TestHiveMetastoreService:
         table_name = "user"
         columns = "<list of columns to remove>"
 
-        # Mocking the conn inside with statement
-        mocked_open_conn = Mock()
-        mocked_client = Mock()
-        mocked_client.return_value = mocked_open_conn
-
-        hive_metastore_service._client.__enter__ = mocked_client
+        mocked_open_conn = self._mock_open_connection_helper(hive_metastore_service)
 
         # act
         hive_metastore_service.drop_columns_from_table(
@@ -339,11 +318,7 @@ class TestHiveMetastoreService:
         mocked_db_obj = Mock()
         mocked_database_builder.return_value = mocked_db_obj
 
-        # Mocking the conn inside with statement
-        mocked_open_conn = Mock()
-        mocked_client = Mock()
-        mocked_client.return_value = mocked_open_conn
-        hive_metastore_service._client.__enter__ = mocked_client
+        mocked_open_conn = self._mock_open_connection_helper(hive_metastore_service)
 
         # act
         hive_metastore_service.create_database(db_name)
@@ -387,12 +362,7 @@ class TestHiveMetastoreService:
         self, database_name, table_name, partition_list, hive_metastore_service
     ):
         # arrange
-        # Mocking the conn inside with statement
-        mocked_open_conn = Mock()
-        mocked_client = Mock()
-        mocked_client.return_value = mocked_open_conn
-
-        hive_metastore_service._client.__enter__ = mocked_client
+        mocked_open_conn = self._mock_open_connection_helper(hive_metastore_service)
 
         # act
         hive_metastore_service.add_partitions_to_table(
@@ -402,4 +372,24 @@ class TestHiveMetastoreService:
         # assert
         mocked_open_conn.add_partitions_if_not_exists.assert_called_once_with(
             database_name, table_name, partition_list
+        )
+
+    def test_get_partition_keys_names(self, hive_metastore_service):
+        # arrange
+        database_name = "<database_name>"
+        table_name = "<table_name>"
+        mocked_partition_keys = ["a", "b", "c"]
+
+        mocked_open_conn = self._mock_open_connection_helper(hive_metastore_service)
+        mocked_open_conn.get_partition_keys_names.return_value = mocked_partition_keys
+
+        # act
+        returned_value = hive_metastore_service.get_partition_keys_names(
+            database_name, table_name
+        )
+
+        # assert
+        assert returned_value == mocked_partition_keys
+        mocked_open_conn.get_partition_keys_names.assert_called_once_with(
+            database_name, table_name
         )

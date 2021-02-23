@@ -130,6 +130,7 @@ class HiveMetastoreLoader:
         table_s3_path = database_location + table_name
 
         if self.is_table_in_metastore(database_name, table_name):
+            self._check_partition_keys(database_name, table_name, partition_keys)
             self._update_table_in_metastore(database_name, table_name, source_schema)
         else:
             self.create_table(
@@ -235,6 +236,7 @@ class HiveMetastoreLoader:
                 ).build()
             )
 
+        # TODO compare partitions values between Spark and Hive and drop/add the delta
         self.hive_metastore_service.add_partitions_to_table(
             database_name, table_name, partition_list
         )
@@ -243,3 +245,33 @@ class HiveMetastoreLoader:
             f"m=add_partitions_to_table, db={database_name}, table={table_name}, "
             f"partition_values_list={partition_values_list} msg=Successfully added partitions to table."
         )
+
+    def _check_partition_keys(
+        self, database_name, table_name, source_table_partition_keys
+    ):
+        """
+        Verifies if partition keys has changed in the Spark Metastore table.
+
+        Throws an error if partitions differs.
+
+        :param database_name: the metastore database name
+        :type database_name: str
+        :param table_name: the metastore table name
+        :type table_name: str
+        :param source_table_partition_keys: a list of tuples containing respectively the
+        columns name and type for the Spark metastore table partition keys.
+        :type source_table_partition_keys: List[Tuple(string, string)]
+        :rtype: None
+        :raises: ValueError
+        """
+        hive_table_partition_keys = self.hive_metastore_service.get_partition_keys_names(
+            database_name, table_name
+        )
+
+        if hive_table_partition_keys != source_table_partition_keys:
+            raise ValueError(
+                f"m=_check_partition_keys, spark_partitions={source_table_partition_keys},"
+                f" hive_partition_keys={hive_table_partition_keys}, msg=Partitions in Spark and Hive metastores are "
+                "not matching. You should recreate the table in Spark metastore if you are trying to change the "
+                "partition keys of the table."
+            )
