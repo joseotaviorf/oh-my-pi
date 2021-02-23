@@ -111,3 +111,7 @@ class MarketingLifullCampaignsSubDag(MarketingSubDag):
                     'dw_table': table,
                 }
             )
+    
+    @logger(exclude='execution_date')
+    def _get_execution_date(self, execution_date):
+        return execution_date
