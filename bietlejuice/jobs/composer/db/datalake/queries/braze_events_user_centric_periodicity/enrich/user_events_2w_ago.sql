@@ -104,9 +104,15 @@ SELECT
         AND event_action = 'delivery' THEN event_count
       ELSE 0
     END
-  ) AS total_sms_delivered_to
+  ) AS total_sms_delivered_to,
+  year,
+  month,
+  day
 FROM
     datalake_braze_user_centric.user_events_daily
 WHERE
     DATE_TRUNC('week',DATE(dt_event)) = DATE_TRUNC('week',DATE(CURRENT_DATE) - INTERVAL '14' DAY)
-GROUP by 1
+    AND year = {year}
+    AND month = {month}
+    AND day = {day}
+GROUP by 1, 17, 18, 19

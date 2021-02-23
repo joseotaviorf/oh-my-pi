@@ -216,6 +216,9 @@ bietlejuice.enrich_braze_events_dispatches:
 bietlejuice.enrich_braze_events_user_centric:
   - bietlejuice.enrich_braze_events
 
+bietlejuice.enrich_braze_events_user_centric_periodicity:
+  - bietlejuice.enrich_braze_events_user_centric:load-user-events-daily-to-enrich
+
 bietlejuice.enrich_chattermill:
   - bietlejuice.chattermill:load-responses-to-clean
 

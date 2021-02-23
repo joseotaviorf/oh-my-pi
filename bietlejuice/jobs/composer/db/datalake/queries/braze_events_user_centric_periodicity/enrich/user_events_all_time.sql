@@ -195,7 +195,14 @@ SELECT
         AND event_action = 'delivery' THEN dt_event
       ELSE NULL
     END
-  ) AS dt_last_sms_delivered_to
+  ) AS dt_last_sms_delivered_to,
+  year,
+  month,
+  day
 FROM
     datalake_braze_user_centric.user_events_daily
-GROUP BY 1
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}
+GROUP BY 1, 30, 31, 32
