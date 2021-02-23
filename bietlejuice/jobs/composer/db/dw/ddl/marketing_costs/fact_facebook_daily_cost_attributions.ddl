@@ -17,3 +17,4 @@ CREATE TABLE IF NOT EXISTS marketing_costs.fact_facebook_daily_cost_attributions
     dt_stop DATE,
     ts_load TIMESTAMP
 );
+ALTER TABLE marketing_costs.fact_facebook_daily_cost_attributions OWNER TO airflow;
