@@ -111,7 +111,8 @@ SELECT
 FROM
     datalake_braze_user_centric.user_events_daily
 WHERE
-    DATE_TRUNC('week',DATE(dt_event)) = DATE_TRUNC('week',DATE(CURRENT_DATE) - INTERVAL '21' DAY)
+    DATE_TRUNC('week', DATE(dt_event)) = DATE_TRUNC('week',
+      DATE(CONCAT(CAST(year AS VARCHAR(4)), '-', CAST(month AS VARCHAR(2)), '-', CAST(day AS VARCHAR(2)))) - INTERVAL '21' DAY)
     AND year = {year}
     AND month = {month}
     AND day = {day}
