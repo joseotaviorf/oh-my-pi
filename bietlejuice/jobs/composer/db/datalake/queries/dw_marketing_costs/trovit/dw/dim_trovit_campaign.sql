@@ -1,5 +1,5 @@
 SELECT
-    id AS sk_trovit_campaign,
+    BIGINT(string(id) || DATE_FORMAT(DATE(curr_dt), 'yyyyMMdd')) AS sk_trovit_campaign,
     campaign_name,
     account_name,
     {year} AS year,

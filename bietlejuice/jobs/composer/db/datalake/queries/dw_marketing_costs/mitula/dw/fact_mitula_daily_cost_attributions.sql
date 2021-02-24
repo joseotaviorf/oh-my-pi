@@ -1,5 +1,5 @@
 SELECT
-    id AS sk_mitula_campaign,
+    BIGINT(string(id) || DATE_FORMAT(DATE(curr_dt), 'yyyyMMdd')) AS sk_mitula_campaign,
     INT(DATE_FORMAT(DATE(curr_dt), 'yyyyMMdd')) AS sk_date,
     clicks,
     desktop_cost,
