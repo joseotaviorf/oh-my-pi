@@ -312,8 +312,8 @@ campaigns_full AS (
         NULL AS report_type,
         NULL AS ad_type
     FROM
-        marketing.fact_trovit_daily_cost_attributions ftc
-        LEFT JOIN marketing.dim_trovit_campaign dtc ON ftc.sk_trovit_campaign = dtc.sk_trovit_campaign
+        marketing_costs.fact_trovit_daily_cost_attributions ftc
+        LEFT JOIN marketing_costs.dim_trovit_campaign dtc ON ftc.sk_trovit_campaign = dtc.sk_trovit_campaign
     WHERE
         ftc.sk_date >= 20180101
         -- MITULA
@@ -339,8 +339,8 @@ campaigns_full AS (
         NULL AS report_type,
         NULL AS ad_type
     FROM
-        marketing.fact_mitula_daily_cost_attributions fm
-        JOIN marketing.dim_mitula_campaign dm ON fm.sk_mitula_campaign = dm.sk_mitula_campaign
+        marketing_costs.fact_mitula_daily_cost_attributions fm
+        JOIN marketing_costs.dim_mitula_campaign dm ON fm.sk_mitula_campaign = dm.sk_mitula_campaign
     WHERE
         fm.sk_date >= 20180101
         -- CRITEO
