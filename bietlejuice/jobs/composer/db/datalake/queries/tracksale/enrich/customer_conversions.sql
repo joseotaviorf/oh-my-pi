@@ -38,12 +38,12 @@ answers AS (
 		lot_code AS id_dispatch,
 		CASE WHEN CONCAT(
                   COALESCE(LOWER(email),''),
-                  COALESCE(REGEXP_REPLACE(phone,'\\D+',''),''),
+                  COALESCE(REGEXP_REPLACE(COALESCE(NULLIF(phone,''),alternative_phone),'\\D+',''),''),
                   COALESCE(LOWER(name),'')
                   ) = '' THEN '-1'
 		ELSE CONCAT(
                   COALESCE(LOWER(email),''),
-                  COALESCE(REGEXP_REPLACE(phone,'\\D+',''),''),
+                  COALESCE(REGEXP_REPLACE(COALESCE(NULLIF(phone,''),alternative_phone),'\\D+',''),''),
                   COALESCE(LOWER(name),'')
                   )
 		END AS id_customer,
