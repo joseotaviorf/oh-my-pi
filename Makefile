@@ -122,7 +122,7 @@ unit-tests-python3:
 	@echo "Unit Tests"
 	@echo "=========="
 	@echo ""
-	@python -m pytest -W ignore::DeprecationWarning --cov-config=.coveragerc --cov-report term --cov-report html:htmlcov --cov=bietlejuice/jobs/composer --cov-fail-under=32 tests3/unit/
+	@python -m pytest -W ignore::DeprecationWarning --cov-config=.coveragerc --cov-report term --cov-report html:htmlcov --cov=bietlejuice/jobs/composer --cov-fail-under=42 tests3/unit/
 
 .PHONY: files-validation-python3
 files-validation-python3:
