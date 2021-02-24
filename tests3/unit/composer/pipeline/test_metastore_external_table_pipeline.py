@@ -64,8 +64,8 @@ class TestMetastoreExternalTablePipeline:
             format_info=format_info,
             source_schema=table_schema,
         )
-        hm_loader.add_partitions_to_table.assert_called_once_with(
+        hm_loader.update_table_partitions.assert_called_once_with(
             database_name=database_name,
             table_name=table_name,
-            partition_values_list=partition_values,
+            partition_values=partition_values,
         )

@@ -148,24 +148,24 @@ class HiveMetastoreLoader:
         )
 
     @staticmethod
-    def _get_tables_difference(table_source, metastore_columns):
+    def _get_tables_difference(spark_table_columns, metastore_table_columns):
         """
-        Identifies the columns that were added and removed from the table source.
+        Identifies the columns that were added and removed from the table in Spark Metastore.
 
-        :param table_source: the most updated columns list from table source
-        :type table_source: collections.OrderedDict
-        :param metastore_columns: the columns list from table's data lake metastore
-        :type metastore_columns: Dict[str, str]
+        :param spark_table_columns: the most updated columns list from table in Spark Metastore
+        :type spark_table_columns: collections.OrderedDict
+        :param metastore_table_columns: the columns list from table's data lake metastore
+        :type metastore_table_columns: Dict[str, str]
         :return: a list with new columns and another list with the removed ones
         :rtype: List[FieldSchema], List[str]
         """
-        metastore_columns_names = list(metastore_columns.keys())
+        metastore_columns_names = list(metastore_table_columns.keys())
         removed_columns = metastore_columns_names
         added_columns = []
-        for col_name, col_type in table_source.items():
+        for col_name, col_type in spark_table_columns.items():
             if (
                 col_name in metastore_columns_names
-                and col_type == metastore_columns[col_name]
+                and col_type == metastore_table_columns[col_name]
             ):
                 removed_columns.remove(col_name)
             else:
@@ -208,9 +208,82 @@ class HiveMetastoreLoader:
                 database_name, table_name, added_columns
             )
 
+    def update_table_partitions(self, database_name, table_name, partition_values):
+        """
+        Updates partitions values of Hive table.
+
+        Compares the partitions values of the metastore table against the given
+         partitions list and performs one of the operations below based in
+         the delta:
+          - Adds new partitions in Hive table
+          - Drops the partitions from metastore table
+
+        :param database_name: the database name
+        :type database_name: str
+        :param table_name: the table name
+        :type table_name: str
+        :param partition_values: partition values as a list, in the correct order,
+         to be added as a new partition to the table
+        :type partition_values: List[List[str]]
+        """
+
+        metastore_part_values = self.hive_metastore_service.get_partition_values(
+            database_name, table_name
+        )
+        new_partitions, dropped_partitions = self._get_partitions_difference(
+            database_name, table_name, partition_values, metastore_part_values
+        )
+
+        if dropped_partitions:
+            logger.info(
+                f"m=update_table_partitions, db={database_name}, table={table_name}, "
+                f"dropped_partitions={dropped_partitions}, msg=Dropping partitions in Hive Metastore Table."
+            )
+            self.hive_metastore_service.drop_partitions_from_table(
+                database_name, table_name, dropped_partitions
+            )
+        if new_partitions:
+            logger.info(
+                f"m=update_table_partitions, db={database_name}, table={table_name}, "
+                f"new_partitions={new_partitions}, msg=Adding partitions in Hive Metastore table."
+            )
+            self.hive_metastore_service.add_partitions_to_table(
+                database_name, table_name, new_partitions
+            )
+
+    @staticmethod
+    def _get_partitions_difference(
+        database_name, table_name, spark_partition_values, metastore_partition_values
+    ):
+        """
+        Identifies the partitions that were added and removed from the table in Spark Metastore.
+
+        :param spark_partition_values: the most updated partitions values list from table in Spark Metastore
+        :type spark_partition_values: List[List[str]]
+        :param metastore_partition_values: the partitions values list from table's data lake metastore
+        :type metastore_partition_values: List[List[str]]
+        :return: a list with new partitions and another list with the removed ones
+        :rtype: List[str], List[str]
+        """
+        removed_partitions = metastore_partition_values[:]
+        added_partitions = []
+        for partition_values in spark_partition_values:
+            if partition_values in metastore_partition_values:
+                removed_partitions.remove(partition_values)
+            else:
+                added_partitions.append(
+                    PartitionBuilder(
+                        values=partition_values,
+                        db_name=database_name,
+                        table_name=table_name,
+                    ).build()
+                )
+
+        return added_partitions, removed_partitions
+
     def add_partitions_to_table(self, database_name, table_name, partition_values_list):
         """
-        Add partitions value as new partitions to Hive table.
+        Add partitions values as new partitions to Hive table.
 
         :param database_name: the database name
         :type database_name: str
@@ -219,14 +292,14 @@ class HiveMetastoreLoader:
         :param partition_values_list: values as a list, in the correct order,
          to be added as a new partition to the table
         :type partition_values_list: List[List[str]]
+        :raises: ValueError
         """
         if not partition_values_list:
-            logger.info(
+            raise ValueError(
                 f"m=add_partitions_to_table, db={database_name}, table={table_name}, "
                 f"partition_values_list={partition_values_list}, "
                 "msg=No partitions informed."
             )
-            return False
 
         partition_list = []
         for partition in partition_values_list:
@@ -236,7 +309,6 @@ class HiveMetastoreLoader:
                 ).build()
             )
 
-        # TODO compare partitions values between Spark and Hive and drop/add the delta
         self.hive_metastore_service.add_partitions_to_table(
             database_name, table_name, partition_list
         )
@@ -250,7 +322,7 @@ class HiveMetastoreLoader:
         self, database_name, table_name, source_table_partition_keys
     ):
         """
-        Verifies if partition keys has changed in the Spark Metastore table.
+        Verifies if partition keys of Spark Metastore and Hive Metastore tables match.
 
         Throws an error if partitions differs.
 

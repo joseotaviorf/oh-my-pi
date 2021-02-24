@@ -156,6 +156,20 @@ class HiveMetastoreService(MetastoreService):
         with self.client as conn:
             conn.add_partitions_if_not_exists(database_name, table_name, partition_list)
 
+    def drop_partitions_from_table(self, database_name, table_name, partition_list):
+        """
+        Drops the partitions values list from the metastore in bulk.
+
+        :param database_name: the database name
+        :type database_name: str
+        :param table_name: the table name
+        :type table_name: str
+        :param partition_list: partition values
+        :type partition_list: List[List[str]]
+        """
+        with self.client as conn:
+            conn.bulk_drop_partition(database_name, table_name, partition_list)
+
     def create_new_partitions_from_df(
         self, database_name, table_name, df, partition_cols, parallelism=1
     ):
@@ -268,3 +282,14 @@ class HiveMetastoreService(MetastoreService):
         """
         with self.client as conn:
             return conn.get_partition_keys_names(database_name, table_name)
+
+    def get_partition_values(self, database_name, table_name):
+        """
+       Gets the partition values from Metastore table.
+
+       :param database_name: the database name
+       :param table_name: the table name
+       :rtype: List[List[str]]
+       """
+        with self.client as conn:
+            return conn.get_partition_values(database_name, table_name)

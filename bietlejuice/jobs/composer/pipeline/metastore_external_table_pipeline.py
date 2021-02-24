@@ -80,8 +80,8 @@ class MetastoreExternalTablePipeline(AbstractPipeline):
             source_schema=self.table_schema,
         )
 
-        hms_loader.add_partitions_to_table(
+        hms_loader.update_table_partitions(
             database_name=self.database_name,
             table_name=self.table_name,
-            partition_values_list=self.partition_values,
+            partition_values=self.partition_values,
         )

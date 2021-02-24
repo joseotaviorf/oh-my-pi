@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from unittest import mock
+from unittest.mock import Mock
 
 import pytest
 from hive_metastore_client.builders import ColumnBuilder
@@ -133,6 +134,7 @@ class TestHiveMetastoreLoader:
             format_info,
         )
 
+    @mock.patch.object(HiveMetastoreLoader, "create_table")
     @mock.patch.object(HiveMetastoreLoader, "_check_partition_keys")
     @mock.patch.object(HiveMetastoreLoader, "is_table_in_metastore")
     @mock.patch.object(HiveMetastoreLoader, "compare_table_schema")
@@ -141,6 +143,7 @@ class TestHiveMetastoreLoader:
         mocked_compare_table_schema,
         mocked_is_table_in_metastore,
         mocked__check_partition_keys,
+        mocked_create_table,
         hive_metastore_loader,
     ):
         # arrange
@@ -173,6 +176,7 @@ class TestHiveMetastoreLoader:
         )
 
         # assert
+        mocked_create_table.assert_not_called()
         mocked_is_table_in_metastore.assert_called_once_with(database_name, table_name)
         mocked_compare_table_schema.assert_called_once_with(
             database_name, table_name, source_schema
@@ -184,10 +188,17 @@ class TestHiveMetastoreLoader:
             database_name, table_name, mocked_added_cols
         )
 
+    @mock.patch.object(HiveMetastoreLoader, "_check_partition_keys")
+    @mock.patch.object(HiveMetastoreLoader, "_update_table_in_metastore")
     @mock.patch.object(HiveMetastoreLoader, "is_table_in_metastore")
     @mock.patch.object(HiveMetastoreLoader, "create_table")
     def test_update_metastore_with_new_table(
-        self, mocked_create_table, mocked_is_table_in_metastore, hive_metastore_loader
+        self,
+        mocked_create_table,
+        mocked_is_table_in_metastore,
+        mocked__update_table_in_metastore,
+        mocked__check_partition_keys,
+        hive_metastore_loader,
     ):
         # arrange
         table_schema = "<table_schema>"
@@ -212,6 +223,8 @@ class TestHiveMetastoreLoader:
         )
 
         # assert
+        mocked__update_table_in_metastore.assert_not_called()
+        mocked__check_partition_keys.assert_not_called()
         mocked_is_table_in_metastore.assert_called_once_with(database_name, table_name)
         mocked_create_table.assert_called_once_with(
             database_name,
@@ -231,12 +244,13 @@ class TestHiveMetastoreLoader:
         database_name = "<db_name>"
         table_name = "<table_name>"
 
-        # act
-        hive_metastore_loader.add_partitions_to_table(
-            database_name, table_name, partition_values_list
-        )
-
         # assert
+        with raises(ValueError):
+            # act
+            hive_metastore_loader.add_partitions_to_table(
+                database_name, table_name, partition_values_list
+            )
+
         mocked_partition_builder.assert_not_called()
         hive_metastore_loader.hive_metastore_service.add_partitions_to_table.assert_not_called()
 
@@ -269,17 +283,166 @@ class TestHiveMetastoreLoader:
         hive_metastore_loader.hive_metastore_service.add_partitions_to_table.assert_called_once()
         assert mocked_partition_builder.call_count == expected_builds
 
-    def test_check_partition_keys_with_diverging_partitions(
-        self, hive_metastore_loader
+    @mock.patch.object(HiveMetastoreLoader, "_get_partitions_difference")
+    def test_update_table_partitions_with_partitions(
+        self, mocked__get_partitions_difference, hive_metastore_loader
     ):
         # arrange
         database_name = "<database_name>"
         table_name = "<table_name>"
-        source_table_partition_keys = [("bar", "string")]
+        partition_values = "<partition_values>"
 
-        hive_metastore_loader.hive_metastore_service.get_partition_keys_names.return_value = [
-            ("foo", "string")
-        ]
+        mocked_ms_part_values = Mock()
+        hive_metastore_loader.hive_metastore_service.get_partition_values.return_value = (
+            mocked_ms_part_values
+        )
+
+        added = [1, 2, 3]
+        dropped = [4, 5, 6]
+        mocked__get_partitions_difference.return_value = added, dropped
+
+        # act
+        hive_metastore_loader.update_table_partitions(
+            database_name, table_name, partition_values
+        )
+
+        # assert
+        hive_metastore_loader.hive_metastore_service.get_partition_values.assert_called_once_with(
+            database_name, table_name
+        )
+        mocked__get_partitions_difference.assert_called_once_with(
+            database_name, table_name, partition_values, mocked_ms_part_values
+        )
+        hive_metastore_loader.hive_metastore_service.drop_partitions_from_table.assert_called_once_with(
+            database_name, table_name, dropped
+        )
+        hive_metastore_loader.hive_metastore_service.add_partitions_to_table.assert_called_once_with(
+            database_name, table_name, added
+        )
+
+    @mock.patch.object(HiveMetastoreLoader, "_get_partitions_difference")
+    def test_update_table_partitions_without_partitions(
+        self, mocked__get_partitions_difference, hive_metastore_loader
+    ):
+        # arrange
+        database_name = "<database_name>"
+        table_name = "<table_name>"
+        partition_values = []
+
+        mocked_ms_part_values = []
+        hive_metastore_loader.hive_metastore_service.get_partition_values.return_value = (
+            mocked_ms_part_values
+        )
+
+        mocked__get_partitions_difference.return_value = [], []
+
+        # act
+        hive_metastore_loader.update_table_partitions(
+            database_name, table_name, partition_values
+        )
+
+        # assert
+        hive_metastore_loader.hive_metastore_service.get_partition_values.assert_called_once_with(
+            database_name, table_name
+        )
+        mocked__get_partitions_difference.assert_called_once_with(
+            database_name, table_name, partition_values, mocked_ms_part_values
+        )
+        hive_metastore_loader.hive_metastore_service.drop_partitions_from_table.assert_not_called()
+        hive_metastore_loader.hive_metastore_service.add_partitions_to_table.assert_not_called()
+
+    @pytest.mark.parametrize(
+        "spark_partition_values, metastore_partition_values, expected_added_partitions, expected_removed_partitions",
+        [
+            (  # Case 1 - added
+                [["2020", "1", "1"], ["2020", "1", "2"]],
+                [],
+                [
+                    PartitionBuilder(
+                        values=["2020", "1", "1"], db_name=mock.ANY, table_name=mock.ANY
+                    ).build(),
+                    PartitionBuilder(
+                        values=["2020", "1", "2"], db_name=mock.ANY, table_name=mock.ANY
+                    ).build(),
+                ],
+                [],
+            ),
+            (  # Case 2 - dropṕed
+                [["2020", "1", "1"]],
+                [["2020", "1", "1"], ["2020", "1", "2"]],
+                [],
+                [["2020", "1", "2"]],
+            ),
+            (  # Case 3 - added & dropped
+                [["2000", "2", "1"], ["2000", "2", "2"]],
+                [["1999", "10", "11"], ["1999", "10", "12"]],
+                [
+                    PartitionBuilder(
+                        values=["2000", "2", "1"], db_name=mock.ANY, table_name=mock.ANY
+                    ).build(),
+                    PartitionBuilder(
+                        values=["2000", "2", "2"], db_name=mock.ANY, table_name=mock.ANY
+                    ).build(),
+                ],
+                [["1999", "10", "11"], ["1999", "10", "12"]],
+            ),
+            (  # Case 4 - metastores synced
+                [["2001", "2", "1"], ["2001", "2", "2"]],
+                [["2001", "2", "1"], ["2001", "2", "2"]],
+                [],
+                [],
+            ),
+            ([], [], [], []),  # Case 5 - no partitions
+        ],
+    )
+    def test__get_partitions_difference(
+        self,
+        spark_partition_values,
+        metastore_partition_values,
+        expected_added_partitions,
+        expected_removed_partitions,
+        hive_metastore_loader,
+    ):
+        # act
+        added_partitions, removed_partitions = hive_metastore_loader._get_partitions_difference(
+            mock.ANY, mock.ANY, spark_partition_values, metastore_partition_values
+        )
+
+        # assert
+        assert added_partitions == expected_added_partitions
+        assert removed_partitions == expected_removed_partitions
+
+    def test__check_partition_keys_with_synced_metastores(self, hive_metastore_loader):
+        # arrange
+        database_name = "<database_name>"
+        table_name = "<table_name>"
+        source_table_partition_keys = ["key1", "key2", "key3", "key4"]
+
+        mocked_hive_pkeys = ["key1", "key2", "key3", "key4"]
+        hive_metastore_loader.hive_metastore_service.get_partition_keys_names.return_value = (
+            mocked_hive_pkeys
+        )
+
+        # act
+        hive_metastore_loader._check_partition_keys(
+            database_name, table_name, source_table_partition_keys
+        )
+
+        # assert
+        hive_metastore_loader.hive_metastore_service.get_partition_keys_names.assert_called_once_with(
+            database_name, table_name
+        )
+
+    def test__check_partition_keys_with_diverging_keys(self, hive_metastore_loader):
+        # arrange
+        database_name = "<database_name>"
+        table_name = "<table_name>"
+        source_table_partition_keys = ["key1", "key2", "key3", "key4"]
+
+        mocked_hive_pkeys = ["key1", "key2", "key3"]
+        hive_metastore_loader.hive_metastore_service.get_partition_keys_names.return_value = (
+            mocked_hive_pkeys
+        )
 
         # assert
         with raises(ValueError):
@@ -288,31 +451,6 @@ class TestHiveMetastoreLoader:
                 database_name, table_name, source_table_partition_keys
             )
 
-        hive_metastore_loader.hive_metastore_service.get_partition_keys_names.assert_called_once_with(
-            database_name, table_name
-        )
-
-    def test_check_partition_keys_with_equal_partitions(self, hive_metastore_loader):
-        # arrange
-        database_name = "<database_name>"
-        table_name = "<table_name>"
-        source_table_partition_keys = [("foo", "string")]
-
-        hive_metastore_loader.hive_metastore_service.get_partition_keys_names.return_value = [
-            ("foo", "string")
-        ]
-
-        # assert
-        try:
-            # act
-            hive_metastore_loader._check_partition_keys(
-                database_name, table_name, source_table_partition_keys
-            )
-        except Exception as e:
-            assert False, (
-                "msg=The method _check_partition_keys raised an exception. It was supposed to run without "
-                f"exceptions though, exception=<{e}>"
-            )
         hive_metastore_loader.hive_metastore_service.get_partition_keys_names.assert_called_once_with(
             database_name, table_name
         )

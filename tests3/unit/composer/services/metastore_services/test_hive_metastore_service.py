@@ -393,3 +393,41 @@ class TestHiveMetastoreService:
         mocked_open_conn.get_partition_keys_names.assert_called_once_with(
             database_name, table_name
         )
+
+    def test_get_partition_values(self, hive_metastore_service):
+        # arrange
+        database_name = "<database_name>"
+        table_name = "<table_name>"
+        mocked_partition_values = [["a"], ["b"], ["c"]]
+
+        mocked_open_conn = self._mock_open_connection_helper(hive_metastore_service)
+        mocked_open_conn.get_partition_values.return_value = mocked_partition_values
+
+        # act
+        returned_value = hive_metastore_service.get_partition_values(
+            database_name, table_name
+        )
+
+        # assert
+        assert returned_value == mocked_partition_values
+        mocked_open_conn.get_partition_values.assert_called_once_with(
+            database_name, table_name
+        )
+
+    def test_drop_partitions_from_table(self, hive_metastore_service):
+        # arrange
+        database_name = "<database_name>"
+        table_name = "<table_name>"
+        partition_list = Mock()
+
+        mocked_open_conn = self._mock_open_connection_helper(hive_metastore_service)
+
+        # act
+        hive_metastore_service.drop_partitions_from_table(
+            database_name, table_name, partition_list
+        )
+
+        # assert
+        mocked_open_conn.bulk_drop_partition.assert_called_once_with(
+            database_name, table_name, partition_list
+        )
