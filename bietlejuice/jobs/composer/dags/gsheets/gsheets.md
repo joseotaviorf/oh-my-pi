@@ -2,25 +2,26 @@
 ​
 ### Purpose
 ​
-This dag extracts data from Google Sheets files and put into datalake raw.
+This DAG extracts data from Google Sheets files.
 ​
-### Dag Dependencies
-None
-
-### Dependent Dags
-None
-
 ### Execution​ Interval
-This dag is trigged once per day 1 AM BRT.
+
+This DAG is trigged daily.
+
+More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 ​
-This pipeline produces all tables defined in gsheets_files.yaml
+This pipeline produces the following output tables:
+
+1. Data lake raw:
+    - All gsheets defined in `gsheets_files.yaml`
+
+2. Data lake clean:
+    - `marketing_manual_costs_google`
+    - `taxonomy_demand`
 ​
 ### Responsible Data Engineering Team
 ​
-For any questions or concerns, please contact the Data Marketing Team.  
-​
-### Major Changes (JIRA Tasks)
-​
-[DTM-610](https://quintoandar.atlassian.net/jira/software/projects/DTM/boards/417?selectedIssue=DTM-610)
+For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the 
+[DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).

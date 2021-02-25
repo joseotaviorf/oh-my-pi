@@ -12,6 +12,8 @@ from airflow.operators.quintoandar_databricks import (
 )
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
+from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.services import FileService
 
 # ENV setup
@@ -29,6 +31,7 @@ ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 ARTIFACTS_S3_BUCKET = Variable.get("artifacts_default_bucket")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
+SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/"
 LOAD_GSHEETS_INTO_DATALAKE_RAW_FILE_PATH = (
     S3_PREFIX + f"/spark_jobs/{SOURCE}/load_full_data_into_datalake_raw.py"
 )
@@ -65,6 +68,22 @@ dag = DAG(
     doc_md=BaseDAG.get_dag_doc(SOURCE),
 )
 
+clean_sub_dag = DatalakeSubDAG(
+    dag_id=DAG_ID,
+    start_date=MAIN_START_DATE,
+    env=ENV,
+    datalake_bucket=DATALAKE_BUCKET,
+    layer=LayerEnum.CLEAN,
+    database_base_name=SOURCE,
+    relative_query_path=SOURCE,
+    spark_job_paths=f"{SPARK_JOB_PATH}/base",
+    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
+)
+file_list = FileService.list_sql_files_without_extension_from_layer(
+    SOURCE, LayerEnum.CLEAN.value
+)
+clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(dag, file_list)
+
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
@@ -72,13 +91,15 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     libraries=CUSTOM_LIBRARIES,
 )
 
-gsheets_to_datalake_raw_tasks = []
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    dag=dag, task_id="terminate-cluster"
+)
 
 for TABLE_NAME, SHEET_DETAILS in GOOGLE_FILES.items():
 
     slugged_table_name = TABLE_NAME.replace("_", "-")
 
-    task = QuintoAndarDatabricksSubmitRunOperator(
+    gsheets_to_datalake_raw_tasks = QuintoAndarDatabricksSubmitRunOperator(
         task_id=f"gsheets-{slugged_table_name}-to-datalake-raw",
         dag=dag,
         json={
@@ -95,11 +116,6 @@ for TABLE_NAME, SHEET_DETAILS in GOOGLE_FILES.items():
         },
     )
 
-    gsheets_to_datalake_raw_tasks.append(task)
-
-
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-    dag=dag, task_id="terminate-cluster"
-)
-
-create_cluster_task >> gsheets_to_datalake_raw_tasks >> terminate_cluster_task
+    create_cluster_task >> gsheets_to_datalake_raw_tasks >> clean_sub_dags.pop(
+        TABLE_NAME
+    ) >> terminate_cluster_task
