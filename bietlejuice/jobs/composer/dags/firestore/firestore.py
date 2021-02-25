@@ -20,6 +20,7 @@ ENV = Variable.get("environment")
 SOURCE = "firestore"
 DAG_ID = f"bietlejuice.{SOURCE}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 MAIN_START_DATE = datetime(2020, 8, 29, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "30 0 * * *"
 
@@ -68,6 +69,7 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
