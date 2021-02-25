@@ -134,26 +134,49 @@ sale_flows AS (
         evt.sk_sale_flow,
         evt.sk_buyer,
         evt.sk_house,
+        ROW_NUMBER() OVER(PARTITION BY evt.sk_sale_flow
+                            ORDER BY evt.ts_event) AS sale_flow_order,
+        ROW_NUMBER() OVER(PARTITION BY evt.sk_buyer
+                            ORDER BY evt.ts_event) AS buyer_prospect_order
+    FROM
+        events AS evt
+        JOIN dim_region AS dr
+            USING(sk_region)
+),
+sale_flows_funnel_events AS (
+    SELECT
+        sf.dt_event,
+        sf.city_group,
+        sf.flow_event,
+        sf.mkt_origin,
+        sf.mkt_channel,
+        sf.mkt_medium,
+        sf.mkt_source,
+        sf.utm_campaign AS campaign_name,
+        sf.utm_campaign,
+        sf.utm_term,
+        sf.utm_content,
+        sf.sk_sale_flow,
+        sf.sk_buyer,
+        sf.sk_house,
         b.ts_event::DATE AS dt_booking_created,
         b.sk_booking,
         o.ts_event::DATE AS dt_offer_submitted,
         o.sk_offer,
-        ROW_NUMBER() OVER(PARTITION BY evt.sk_sale_flow
-                            ORDER BY evt.ts_event) AS sale_flow_order,
-        ROW_NUMBER() OVER(PARTITION BY evt.sk_buyer
-                            ORDER BY evt.ts_event) AS buyer_prospect_order,
+        sf.sale_flow_order,
+        sf.buyer_prospect_order,
         NULL::FLOAT AS budget,
         NULL::FLOAT AS new_buyer_prospects_target,
         NULL::FLOAT AS sale_flows_target,
         NULL::FLOAT AS marketing_cost
     FROM
-        events AS evt
-        JOIN dim_region AS dr
-            USING(sk_region)
+        sale_flows AS sf
         LEFT JOIN bookings AS b
-            USING(sk_sale_flow)
+            ON sf.sk_sale_flow = b.sk_sale_flow
+            AND sf.sale_flow_order = 1
         LEFT JOIN offers AS o
-            USING(sk_sale_flow)
+            ON sf.sk_sale_flow = o.sk_sale_flow
+            AND sf.sale_flow_order = 1
 ),
 --------------------------------------------------------------------------------------
 -- Query Performance Marketing ForSale Demand targets and introduce NULLs for UNION --
@@ -291,7 +314,7 @@ investment AS (
 SELECT
     *
 FROM
-    sale_flows
+    sale_flows_funnel_events
 UNION ALL
 SELECT
     *
