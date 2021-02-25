@@ -2,15 +2,21 @@
 
 ### Purpose
 
-This DAG brings Bob (bob-o-construtor) data, a service developed by B2B for house registry and now it has been used by AA (Autonomous Agents).
+This DAG brings [Bob (bob-o-construtor)](https://github.com/quintoandar/bob-o-construtor) data, a service developed by B2B for house registry and now it has been used by AA (Autonomous Agents).
 
 ### Execution Interval
-This DAG is triggered daily. More information about run time [here]({chart_url}{dag_id}).
+
+This DAG is triggered daily.
+
+More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-This pipeline produces the following output tables in the clean layer: 
+1. In datalake raw:
+    - All tables available in source's database, except for Operationals.
+    
 
+2. In datalake clean:
 - `attribution_profess`
 - `attribution_profess_aud`
 - `house_draft`
