@@ -176,11 +176,11 @@ SELECT
   	sales_company,
   	sourcing_ops,
   	CASE
-	    WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other') AND lead_context = 'FSS' THEN 'IS'
+    	WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other') AND lead_context IN ('FSS','IS') THEN 'IS'
 	    ELSE sourcing_ops
-    END AS lead_processing_operation,
-  	context,
-  	origin_table,
+    END AS lead_processing_operation
+    context,
+    origin_table,
     SUM(COALESCE(leads,0)) AS leads,
     SUM(COALESCE(prospects,0)) AS prospects,
     SUM(COALESCE(qualifieds,0)) AS qualifieds,
