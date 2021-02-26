@@ -1,3 +1,11 @@
+aux_regiao:
+    sheet_id: 1gh8S0xVQ9HsTs6EkvE0BcXvh5_cfaG3aUpIgrluqqlM
+    sheet_name: aux_regiao
+
+de_para_cancelamento:
+    sheet_id: 1Om2IjwtSPHfg4GRq2IPKGshHLBdXnP0bCMBPbOrh5fc
+    sheet_name: de_para_cancelamento
+
 marketing_manual_costs_google:    
     sheet_id: 1e1FoBoCN0XYH3vo8u0aZ-GocU453gkfDIasX0ivDonc
     sheet_name: Google Costs
