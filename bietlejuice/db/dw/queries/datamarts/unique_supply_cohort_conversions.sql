@@ -204,8 +204,9 @@ SELECT
 	END AS lead_context,
   	sales_company,
     sourcing_ops,
-    CASE WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'Other') AND lead_context = 'FSS'
-    	THEN 'IS'
+    CASE
+	    WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other') AND lead_context = 'FSS' THEN 'IS'
+	    ELSE sourcing_ops
     END AS lead_processing_operation,
   	origin_table,
     context_origin,
