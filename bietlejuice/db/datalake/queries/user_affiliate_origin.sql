@@ -1,6 +1,6 @@
 with amplitude_affiliate_tracking as(
 	with amplitude as (
-    SELECT
+    SELECT DISTINCT
         id_user as user_id,
         coalesce(cast(json_extract(user_properties, '$.utm_source') as varchar), '') as u_utm_source,
         coalesce(cast(json_extract(user_properties, '$.utm_medium') as varchar), '') as u_utm_medium,
