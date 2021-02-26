@@ -1,15 +1,19 @@
 aux_regiao:
     sheet_id: 1gh8S0xVQ9HsTs6EkvE0BcXvh5_cfaG3aUpIgrluqqlM
     sheet_name: aux_regiao
+    clean_table_name: auxiliary_region
 
 de_para_cancelamento:
     sheet_id: 1Om2IjwtSPHfg4GRq2IPKGshHLBdXnP0bCMBPbOrh5fc
     sheet_name: de_para_cancelamento
+    clean_table_name: from_to_cancellation
 
 marketing_manual_costs_google:    
     sheet_id: 1e1FoBoCN0XYH3vo8u0aZ-GocU453gkfDIasX0ivDonc
     sheet_name: Google Costs
+    clean_table_name: marketing_manual_costs_google
 
 taxonomy_demand:
     sheet_id: 11Cck3VVSt9TVt75ChvpU-mVwwfF7TNvUIXocG9vaHtw
     sheet_name: taxonomy_demand
+    clean_table_name: taxonomy_demand

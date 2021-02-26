@@ -117,5 +117,5 @@ for TABLE_NAME, SHEET_DETAILS in GOOGLE_FILES.items():
     )
 
     create_cluster_task >> gsheets_to_datalake_raw_tasks >> clean_sub_dags.pop(
-        TABLE_NAME
+        SHEET_DETAILS["clean_table_name"]
     ) >> terminate_cluster_task
