@@ -18,6 +18,8 @@ This pipeline produces the following output tables:
     - All gsheets defined in `gsheets_files.yaml`
 
 2. Data lake clean:
+    - `auxiliary_region`
+    - `from_to_cancellation`
     - `marketing_manual_costs_google`
     - `taxonomy_demand`
 ​
