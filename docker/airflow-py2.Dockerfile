@@ -29,9 +29,11 @@ RUN apt-get update && \
     git \
     locales
 
+ARG GITHUB_TOKEN
+
 # This step will be improve with a new step that get your github authentication from your machine.
 # Until there, let's use this primitive way :D
-RUN git config --global url.https://<GITHUB_TOKEN>:@github.com/.insteadOf https://github.com/ && \
+RUN git config --global url.https://${GITHUB_TOKEN}:@github.com/.insteadOf https://github.com/ && \
     python2 -m pip install --upgrade pip && \
     locale-gen --purge pt_BR.UTF-8
 

@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   postgres_airflow:
-    image: postgres
+    image: postgres:alpine
     ports:
       - "5432:5432"
     environment:
@@ -15,11 +15,13 @@ services:
     build:
       context: ..
       dockerfile: docker/airflow-py2.Dockerfile
+      args:
+         GITHUB_TOKEN: ${GITHUB_TOKEN}
     ports:
       - "8080:8080"
     volumes:
-      - /home/<USER>/.aws:/root/.aws
-      - /home/<USER>/<BIETLEJUICE_FOLDER>:/bi-etl-ejuice
+      - /home/${USERNAME}/.aws:/root/.aws
+      - ${PROJECT_PATH}/bietlejuice:/bi-etl-ejuice/bietlejuice
     depends_on:
       - postgres_airflow
     network_mode: host

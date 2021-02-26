@@ -1,8 +1,9 @@
 ############# DOCKER commands ########################
 .PHONY: create-docker-environment-python2
 create-docker-environment-python2:
+	@make create-docker-environment
 	@chmod +x start.sh
-	@sudo docker-compose -f docker/docker-compose.py2.yml up --build -d --force-recreate
+	@sudo docker-compose -f docker/docker-compose.py2.yml --env-file docker/.env up --build -d --force-recreate
 	@sudo docker image prune -f
 
 .PHONY: restart-docker-environment-python2
@@ -13,10 +14,21 @@ restart-docker-environment-python2:
 kill-docker-environment-python2:
 	@sudo docker-compose -f docker/docker-compose.py2.yml down
 
+
+.PHONY: create-docker-environment
+create-docker-environment:
+	@rm docker/.env || true
+	@touch docker/.env
+	@echo "GITHUB_TOKEN=${GITHUB_TOKEN}" >> docker/.env
+	@echo "PROJECT_PATH=${PROJECT_PATH}" >> docker/.env
+	@echo "USERNAME=${USERNAME}" >> docker/.env
+	@echo "DATABRICKS_TOKEN=${DATABRICKS_TOKEN}" >> docker/.env
+
 .PHONY: create-docker-environment-python3
 create-docker-environment-python3:
+	@make create-docker-environment
 	@chmod +x start.sh
-	@sudo docker-compose -f docker/docker-compose.py3.yml up -d --build --force-recreate
+	@sudo docker-compose -f docker/docker-compose.py3.yml --env-file docker/.env up -d --build --force-recreate
 	@sudo docker image prune -f
 
 .PHONY: restart-docker-environment-python3

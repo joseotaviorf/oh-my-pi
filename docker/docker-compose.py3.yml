@@ -2,14 +2,14 @@ version: '3.7'
 
 services:
   redis:
-    image: redis:5.0.5
+    image: redis:5.0.5-alpine
     ports:
       - "6379:6379"
     networks:
       - airflow_postgres_py3
 
   postgres_airflow_py3:
-    image: postgres
+    image: postgres:alpine
     ports:
       - "5432:5432"
     environment:
@@ -24,11 +24,13 @@ services:
     build:
       context: ..
       dockerfile: docker/airflow-py3.Dockerfile
+      args:
+         GITHUB_TOKEN: ${GITHUB_TOKEN}
     ports:
       - "8080:8080"
     volumes:
-      - /home/<USER>/.aws:/root/.aws
-      - /home/<USER>/<BIETLEJUICE_FOLDER>/bietlejuice:/bi-etl-ejuice/bietlejuice
+      - /home/${USERNAME}/.aws:/root/.aws
+      - ${PROJECT_PATH}/bietlejuice:/bi-etl-ejuice/bietlejuice
     depends_on:
       - postgres_airflow_py3
     networks:
@@ -42,7 +44,7 @@ services:
     depends_on:
       - airflow_python3
     volumes:
-      - /home/<USER>/<BIETLEJUICE_FOLDER>/bietlejuice/jobs/composer/dags:/bi-etl-ejuice/bietlejuice/jobs/composer/dags
+      - ${PROJECT_PATH}/bietlejuice/jobs/composer/dags:/bi-etl-ejuice/bietlejuice/jobs/composer/dags
     entrypoint: airflow worker -cn worker_1
     healthcheck:
       test: ["CMD-SHELL", "[ -f /bi-etl-ejuice/airflow_python3/airflow-worker.pid ]"]
@@ -60,7 +62,7 @@ services:
     depends_on:
       - airflow_python3
     volumes:
-      - /home/<USER>/<BIETLEJUICE_FOLDER>/bietlejuice/jobs/composer/dags:/bi-etl-ejuice/bietlejuice/jobs/composer/dags
+      - ${PROJECT_PATH}/bietlejuice/jobs/composer/dags:/bi-etl-ejuice/bietlejuice/jobs/composer/dags
     entrypoint: airflow worker -cn worker_2
     healthcheck:
       test: ["CMD-SHELL", "[ -f /bi-etl-ejuice/airflow_python3/airflow-worker.pid ]"]
