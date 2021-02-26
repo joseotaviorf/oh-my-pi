@@ -192,7 +192,7 @@ class TestSparkMetastoreService:
     @mock.patch.object(
         SparkMetastoreService, "_get_partition_keys_from_table_description"
     )
-    def test_get_table_partition_keys_names(
+    def test_get_table_partition_keys(
         self,
         mocked__get_partition_keys_from_table_description,
         mocked_get_table_description,
@@ -218,10 +218,10 @@ class TestSparkMetastoreService:
         mocked_get_table_description.return_value = mocked_result_df
         partition_keys = OrderedDict([("p1", "string"), ("p2", "string")])
         mocked__get_partition_keys_from_table_description.return_value = partition_keys
-        expected_result = ["p1", "p2"]
+        expected_result = [("p1", "string"), ("p2", "string")]
 
         # act
-        returned_value = spark_metastore_service.get_table_partition_keys_names(
+        returned_value = spark_metastore_service.get_table_partition_keys(
             database_name, table_name
         )
 

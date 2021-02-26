@@ -104,9 +104,9 @@ class SparkMetastoreService(MetastoreService):
         return table_columns
 
     @logger
-    def get_table_partition_keys_names(self, database_name, table_name):
+    def get_table_partition_keys(self, database_name, table_name):
         """
-        Gets the partition key's names of a table
+        Gets the partition key's names and types of a table
 
         :param database_name: database name
         :type database_name: str
@@ -118,7 +118,7 @@ class SparkMetastoreService(MetastoreService):
         result_df = super().get_table_description(database_name, table_name)
         partition_keys = self._get_partition_keys_from_table_description(result_df)
 
-        return [col_name for col_name in partition_keys]
+        return [(col_name, col_type) for col_name, col_type in partition_keys.items()]
 
     @logger
     def refresh_table(self, database_name, table_name):

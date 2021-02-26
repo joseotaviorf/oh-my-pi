@@ -88,7 +88,7 @@ class HiveMetastoreService(MetastoreService):
         ).build()
 
         with self.client as conn:
-            conn.create_table(table)
+            conn.create_external_table(table)
 
     @staticmethod
     def _build_columns_from_dict(table_columns):
@@ -168,7 +168,7 @@ class HiveMetastoreService(MetastoreService):
         :type partition_list: List[List[str]]
         """
         with self.client as conn:
-            conn.bulk_drop_partition(database_name, table_name, partition_list)
+            conn.bulk_drop_partitions(database_name, table_name, partition_list)
 
     def create_new_partitions_from_df(
         self, database_name, table_name, df, partition_cols, parallelism=1
@@ -272,9 +272,20 @@ class HiveMetastoreService(MetastoreService):
         with self.client as conn:
             conn.drop_columns_from_table(database_name, table_name, columns)
 
+    def get_partition_keys(self, database_name, table_name):
+        """
+        Gets the partition keys names and types from Metastore table.
+
+        :param database_name: the database name
+        :param table_name: the table name
+        :rtype: List[str]
+        """
+        with self.client as conn:
+            return conn.get_partition_keys(database_name, table_name)
+
     def get_partition_keys_names(self, database_name, table_name):
         """
-        Gets the partition keys from Metastore table.
+        Gets the partition keys names from Metastore table.
 
         :param database_name: the database name
         :param table_name: the table name
@@ -292,4 +303,4 @@ class HiveMetastoreService(MetastoreService):
        :rtype: List[List[str]]
        """
         with self.client as conn:
-            return conn.get_partition_values(database_name, table_name)
+            return conn.get_partition_values_from_table(database_name, table_name)

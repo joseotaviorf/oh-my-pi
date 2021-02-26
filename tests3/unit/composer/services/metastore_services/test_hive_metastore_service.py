@@ -109,7 +109,9 @@ class TestHiveMetastoreService:
             storage_descriptor=mocked_storage_desc.build(),
             partition_keys=mocked_cols_or_part_keys,
         )
-        mocked_open_conn.create_table.assert_called_once_with(mocked_table.build())
+        mocked_open_conn.create_external_table.assert_called_once_with(
+            mocked_table.build()
+        )
 
     @pytest.mark.parametrize(
         "table_columns, expected_return",
@@ -374,6 +376,26 @@ class TestHiveMetastoreService:
             database_name, table_name, partition_list
         )
 
+    def test_get_partition_keys(self, hive_metastore_service):
+        # arrange
+        database_name = "<database_name>"
+        table_name = "<table_name>"
+        mocked_partition_keys = [("a", "string"), ("c", "string"), ("c", "string")]
+
+        mocked_open_conn = self._mock_open_connection_helper(hive_metastore_service)
+        mocked_open_conn.get_partition_keys.return_value = mocked_partition_keys
+
+        # act
+        returned_value = hive_metastore_service.get_partition_keys(
+            database_name, table_name
+        )
+
+        # assert
+        assert returned_value == mocked_partition_keys
+        mocked_open_conn.get_partition_keys.assert_called_once_with(
+            database_name, table_name
+        )
+
     def test_get_partition_keys_names(self, hive_metastore_service):
         # arrange
         database_name = "<database_name>"
@@ -401,7 +423,9 @@ class TestHiveMetastoreService:
         mocked_partition_values = [["a"], ["b"], ["c"]]
 
         mocked_open_conn = self._mock_open_connection_helper(hive_metastore_service)
-        mocked_open_conn.get_partition_values.return_value = mocked_partition_values
+        mocked_open_conn.get_partition_values_from_table.return_value = (
+            mocked_partition_values
+        )
 
         # act
         returned_value = hive_metastore_service.get_partition_values(
@@ -410,7 +434,7 @@ class TestHiveMetastoreService:
 
         # assert
         assert returned_value == mocked_partition_values
-        mocked_open_conn.get_partition_values.assert_called_once_with(
+        mocked_open_conn.get_partition_values_from_table.assert_called_once_with(
             database_name, table_name
         )
 
@@ -428,6 +452,6 @@ class TestHiveMetastoreService:
         )
 
         # assert
-        mocked_open_conn.bulk_drop_partition.assert_called_once_with(
+        mocked_open_conn.bulk_drop_partitions.assert_called_once_with(
             database_name, table_name, partition_list
         )

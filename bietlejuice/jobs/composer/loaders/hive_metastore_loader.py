@@ -144,7 +144,7 @@ class HiveMetastoreLoader:
 
         logger.info(
             f"m=update_metastore, db={database_name}, table={table_name}, "
-            "msg=Successfully loaded table in metastore."
+            "msg=Successfully synchronized table in metastore."
         )
 
     @staticmethod
@@ -227,11 +227,21 @@ class HiveMetastoreLoader:
         :type partition_values: List[List[str]]
         """
 
+        logger.info(
+            f"m=update_table_partitions, db={database_name}, table={table_name}, "
+            f"msg=Updating table partition values."
+        )
+
         metastore_part_values = self.hive_metastore_service.get_partition_values(
             database_name, table_name
         )
         new_partitions, dropped_partitions = self._get_partitions_difference(
             database_name, table_name, partition_values, metastore_part_values
+        )
+
+        logger.info(
+            f"m=update_table_partitions, db={database_name}, table={table_name},"
+            f" partitions_to_add={len(new_partitions)} partitions, partitions_to_drop={len(dropped_partitions)} partitions"
         )
 
         if dropped_partitions:
@@ -281,43 +291,6 @@ class HiveMetastoreLoader:
 
         return added_partitions, removed_partitions
 
-    def add_partitions_to_table(self, database_name, table_name, partition_values_list):
-        """
-        Add partitions values as new partitions to Hive table.
-
-        :param database_name: the database name
-        :type database_name: str
-        :param table_name: the table name
-        :type table_name: str
-        :param partition_values_list: values as a list, in the correct order,
-         to be added as a new partition to the table
-        :type partition_values_list: List[List[str]]
-        :raises: ValueError
-        """
-        if not partition_values_list:
-            raise ValueError(
-                f"m=add_partitions_to_table, db={database_name}, table={table_name}, "
-                f"partition_values_list={partition_values_list}, "
-                "msg=No partitions informed."
-            )
-
-        partition_list = []
-        for partition in partition_values_list:
-            partition_list.append(
-                PartitionBuilder(
-                    values=partition, db_name=database_name, table_name=table_name
-                ).build()
-            )
-
-        self.hive_metastore_service.add_partitions_to_table(
-            database_name, table_name, partition_list
-        )
-
-        logger.info(
-            f"m=add_partitions_to_table, db={database_name}, table={table_name}, "
-            f"partition_values_list={partition_values_list} msg=Successfully added partitions to table."
-        )
-
     def _check_partition_keys(
         self, database_name, table_name, source_table_partition_keys
     ):
@@ -336,7 +309,7 @@ class HiveMetastoreLoader:
         :rtype: None
         :raises: ValueError
         """
-        hive_table_partition_keys = self.hive_metastore_service.get_partition_keys_names(
+        hive_table_partition_keys = self.hive_metastore_service.get_partition_keys(
             database_name, table_name
         )
 
