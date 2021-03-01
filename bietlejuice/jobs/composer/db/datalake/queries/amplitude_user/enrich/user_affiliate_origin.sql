@@ -1,6 +1,6 @@
 with amplitude_affiliate_tracking as(
 	with amplitude_events as (
-    SELECT
+    SELECT DISTINCT
         id_user,
         get_json_object(user_properties, '$.utm_source') as utm_source,
         get_json_object(user_properties, '$.utm_medium') as utm_medium,
