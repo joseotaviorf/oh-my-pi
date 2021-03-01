@@ -20,6 +20,7 @@ SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz)
 MAIN_SCHEDULE_INTERVAL = "0 22 * * *"
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 # Job params
 SOURCE = "ebdb"
@@ -68,6 +69,9 @@ dag = DAG(
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
     catchup=False,
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
+        chart_url=DOC_MD_BASE_URL, dag_id=FULL_DAG_ID
+    ),
 )
 
 
