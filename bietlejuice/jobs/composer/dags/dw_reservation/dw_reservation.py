@@ -24,6 +24,7 @@ DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = Variable.get("environment")
 SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
 DW_BUCKET = Variable.get("dw_bucket")
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base"
@@ -50,6 +51,9 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=None,
+    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
+        chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
+    ),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
