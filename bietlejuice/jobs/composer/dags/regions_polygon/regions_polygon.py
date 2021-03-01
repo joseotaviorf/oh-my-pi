@@ -23,6 +23,7 @@ LOOKER_BUCKET = Variable.get("looker_bucket")
 RELATIVE_FULL_QUERY_PATH = f"{DAG_NAME}/regions_polygon.sql"
 POLYGONS_FILE_OUTPUT_PATH = f"s3://{LOOKER_BUCKET}/subregion_polygons_new"
 POLYGONS_FILE_NAME = "5a_subregion_polygons.topojson"
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 
@@ -55,6 +56,9 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=None,
+    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
+        chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
+    ),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
