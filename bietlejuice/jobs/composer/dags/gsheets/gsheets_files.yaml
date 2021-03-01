@@ -17,3 +17,8 @@ taxonomy_demand:
     sheet_id: 11Cck3VVSt9TVt75ChvpU-mVwwfF7TNvUIXocG9vaHtw
     sheet_name: taxonomy_demand
     clean_table_name: taxonomy_demand
+
+reorganize_leads:
+    sheet_id: 1pzSkb4-utbj0y3jA5LjbP6D3MH-QnQ6snbzFBDKMKKY
+    sheet_name: leads
+    clean_table_name: reorganize_leads

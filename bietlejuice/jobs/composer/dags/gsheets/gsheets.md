@@ -22,6 +22,7 @@ This pipeline produces the following output tables:
     - `from_to_cancellation`
     - `marketing_manual_costs_google`
     - `taxonomy_demand`
+    - `reorganize_leads`
 ​
 ### Responsible Data Engineering Team
 ​
