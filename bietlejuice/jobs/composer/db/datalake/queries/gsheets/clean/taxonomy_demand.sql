@@ -13,7 +13,6 @@ SELECT
     source,
     platform,
     CAST(flg_via_reschedule AS INTEGER) AS flg_via_reschedule,
-    first_update_source,
-    NOW() AS ts_load
+    first_update_source
 FROM
     datalake_gsheets_raw.taxonomy_demand
