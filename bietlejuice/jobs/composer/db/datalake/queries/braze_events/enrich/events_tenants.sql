@@ -7,6 +7,10 @@ SELECT
                     CASE
                         WHEN event_type = 'users.messages.webhook.Send'
                         THEN CAST(FROM_UNIXTIME(CAST(GET_JSON_OBJECT(event_info,'$.time') AS INTEGER)) AS TIMESTAMP)
+                    END,
+                    CASE
+                        WHEN event_type = 'users.messages.inappmessage.Impression'
+                        THEN CAST(FROM_UNIXTIME(CAST(GET_JSON_OBJECT(event_info,'$.time') AS INTEGER)) AS TIMESTAMP)
                     END),
                 GET_JSON_OBJECT(event_info,'$.user_id')),
         'utf-8')) AS id_user_dispatch,
