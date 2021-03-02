@@ -36,10 +36,12 @@ LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{SOURCE}"
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 
 # dag vars
-DAG_ID = f"bietlejuice.{SOURCE}"
+DAG_NAME = SOURCE
+DAG_ID = f"bietlejuice.{DAG_NAME}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2020, 7, 27, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 
@@ -52,6 +54,9 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
+        chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
+    ),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
