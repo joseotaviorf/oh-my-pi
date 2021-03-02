@@ -53,10 +53,10 @@ marketing_costs_name_convention_shared_costs:
     sheet_name: rateio_name_convention
     clean_table_name: marketing_costs_name_convention_shared_costs
 
-marketing_costs_historical_national_affiliate_costs:
+marketing_costs_national_affiliate_historical_costs:
     sheet_id: 1mcTp6mmjNBpsaEiwn1ZepnhkyGozDEC5HAmVWeeArGA
     sheet_name: historic_national_costs
-    clean_table_name: marketing_costs_historical_national_affiliate_costs
+    clean_table_name: marketing_costs_national_affiliate_historical_costs
 
 marketing_costs_google_ad_type_flags:
     sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
