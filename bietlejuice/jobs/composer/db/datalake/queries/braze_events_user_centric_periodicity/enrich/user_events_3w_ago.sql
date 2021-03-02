@@ -3,28 +3,28 @@ SELECT
   SUM(
     CASE
       WHEN id_campaign IS NOT NULL
-        AND event_action = 'send' THEN event_count
+        AND event_action IN ('send','impression') THEN event_count
       ELSE 0
     END
   ) AS total_campaigns_sent_to,
   SUM(
     CASE
       WHEN id_canvas IS NOT NULL
-        AND event_action = 'send' THEN event_count
+        AND event_action IN ('send','impression') THEN event_count
       ELSE 0
     END
   ) AS total_canvases_sent_to,
   SUM(
     CASE
       WHEN user_type = 'tenant'
-        AND event_action = 'send' THEN event_count
+        AND event_action IN ('send','impression') THEN event_count
       ELSE 0
     END
   ) AS total_tenant_communications_sent_to,
   SUM(
     CASE
       WHEN user_type = 'owner'
-        AND event_action = 'send' THEN event_count
+        AND event_action IN ('send','impression') THEN event_count
       ELSE 0
     END
   ) AS total_owner_communications_sent_to,
