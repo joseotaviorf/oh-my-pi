@@ -28,6 +28,7 @@ S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 BRAZE_BUCKET = Variable.get("braze_bucket")
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{DAG_NAME}"
 BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
@@ -51,6 +52,9 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
+        chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
+    ),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
