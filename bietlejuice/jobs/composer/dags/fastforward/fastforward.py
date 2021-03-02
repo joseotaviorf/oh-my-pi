@@ -25,6 +25,7 @@ S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 LOAD_FASTFORWARD_INTO_DATALAKE_RAW_FILE_PATH = (
     S3_PREFIX + f"/spark_jobs/{SOURCE}/load_fastforward_into_datalake.py"
 )
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 # spark and databricks vars
 SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/"
@@ -58,6 +59,7 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID),
 )
 
 
