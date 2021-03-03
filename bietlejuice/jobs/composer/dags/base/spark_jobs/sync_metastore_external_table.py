@@ -29,6 +29,19 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
+def get_spark_metastore_table_names(database_name):
+    """
+    Query the Spark metastore to get all the table names for given database.
+
+    :param database_name: database name
+    :type database_name: str
+    :return: List[str]
+    """
+    databricks_consumer = DatabricksConsumer({"db": database_name}, SparkClient())
+    df_databricks_tables = databricks_consumer.get_table_names_and_sizes()
+    return [row.table_name for row in df_databricks_tables.collect()]
+
+
 def get_spark_metastore_table_partition_values(database_name, table_name):
     """
     Query the Spark metastore to get all the partitions values for given table.
@@ -92,11 +105,21 @@ def parse_args():
         help="base name of metastore database. I.e. the 'source' name for raw and clean layers, and the 'source' and/or"
         " 'context' name for enrich layer",
     )
-    parser.add_argument("table_name", type=str, help="table name")
     parser.add_argument(
-        "execution_date",
+        "--table-name",
         type=str,
-        help="the task execution date to infer the daily partition values",
+        dest="table_name",
+        required=False,
+        help="table name for single sync",
+    )
+    parser.add_argument(
+        "--all-tables",
+        nargs="?",
+        dest="all_tables",
+        required=False,
+        default=False,
+        const=True,
+        help="sync all tables from database",
     )
 
     return parser.parse_args()
@@ -122,12 +145,19 @@ if __name__ == "__main__":
     layer = args.layer
     source = args.source
     table_name = args.table_name
+    all_tables = args.all_tables
 
     logger.info(
         f"m={JOB_NAME}, env={env}, datalake_bucket={data_lake_bucket}, "
         f"layer={layer}, source={source}, "
-        f"table_name={table_name}, msg=Job execution started."
+        f"table_name={table_name}, all_tables={all_tables}, msg=Job execution started."
     )
+
+    if bool(table_name) == all_tables:
+        raise ValueError(
+            f"m={JOB_NAME}, table_name={table_name},"
+            f"all_tables={all_tables}, msg=Parameters table_name and all_tables are mutual exclusive."
+        )
 
     dl_ms_mapping = DataLakeMetastoreMapping(env, source, data_lake_bucket)
     (
@@ -136,32 +166,43 @@ if __name__ == "__main__":
         metastore_database_name,
     ) = dl_ms_mapping.get_data_lake_info_from_layer(layer)
 
-    spark_metastore_service = SparkMetastoreService(SparkClient())
-    spark_ms_table_columns = spark_metastore_service.get_table_schema(
-        databricks_database_name, table_name, ignore_partition_keys=True
-    )
-    spark_ms_table_partition_keys = spark_metastore_service.get_table_partition_keys(
-        database_name=databricks_database_name, table_name=table_name
-    )
+    table_names = []
 
-    spark_ms_table_partition_values = []
-    if spark_ms_table_partition_keys:
-        spark_ms_table_partition_values = get_spark_metastore_table_partition_values(
-            databricks_database_name, table_name
+    if all_tables:
+        table_names = get_spark_metastore_table_names(
+            database_name=databricks_database_name
+        )
+    else:
+        table_names.append(table_name)
+
+    for table in table_names:
+        spark_metastore_service = SparkMetastoreService(SparkClient())
+        spark_ms_table_columns = spark_metastore_service.get_table_schema(
+            databricks_database_name, table, ignore_partition_keys=True
+        )
+        spark_ms_table_partition_keys = spark_metastore_service.get_table_partition_keys(
+            database_name=databricks_database_name, table_name=table
         )
 
-    MetastoreExternalTablePipeline(
-        metastore_host=get_hive_metastore_host(),
-        database_name=metastore_database_name,
-        table_name=table_name,
-        database_location=database_location,
-        table_schema=spark_ms_table_columns,
-        partition_keys=spark_ms_table_partition_keys,
-        partition_values=spark_ms_table_partition_values,
-        format_info=TableStorageDescriptorEnum.from_layer(layer),
-    ).run()
+        spark_ms_table_partition_values = []
+        if spark_ms_table_partition_keys:
+            spark_ms_table_partition_values = get_spark_metastore_table_partition_values(
+                databricks_database_name, table
+            )
 
-    logger.info(
-        f"m={JOB_NAME}, env={env}, datalake_bucket={data_lake_bucket}, "
-        + f"layer={layer}, database_name={databricks_database_name}, table_name={table_name}, msg=Table synchronized."
-    )
+        MetastoreExternalTablePipeline(
+            metastore_host=get_hive_metastore_host(),
+            database_name=metastore_database_name,
+            table_name=table,
+            database_location=database_location,
+            table_schema=spark_ms_table_columns,
+            partition_keys=spark_ms_table_partition_keys,
+            partition_values=spark_ms_table_partition_values,
+            format_info=TableStorageDescriptorEnum.from_layer(layer),
+        ).run()
+
+        logger.info(
+            f"m={JOB_NAME}, env={env}, datalake_bucket={data_lake_bucket}, "
+            f"layer={layer}, database_base_name={databricks_database_name}, "
+            f"table_name={table}, msg=Table synchronized."
+        )

@@ -30,6 +30,7 @@ S3_BUCKET = Variable.get("databricks_s3_bucket")
 DATA_LAKE_BUCKET = Variable.get("datalake_bucket")
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
+BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 
 # cluster setup
 LOGS_OUTPUT_PATH = f"s3://{S3_BUCKET}/logs/jobs/{SOURCE}"
@@ -75,6 +76,7 @@ def build_table_sub_dag(
             }
         },
     )
+
     create_clean_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
         dag=table_sub_dag,
         task_id=f"create-{slugged_table_name}-clean-external-table",
@@ -94,7 +96,27 @@ def build_table_sub_dag(
             }
         },
     )
-    clean_table_task >> create_clean_external_tables_task
+
+    sync_metastore_external_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        task_id=f"sync-hive-metastore-table",
+        dag=table_sub_dag,
+        json={
+            "spark_python_task": {
+                "python_file": BASE_SPARK_JOBS_PATH
+                + "sync_metastore_external_table.py",
+                "parameters": [
+                    env,
+                    data_lake_bucket,
+                    "clean",
+                    source,
+                    "--table-name",
+                    table_name,
+                ],
+            }
+        },
+    )
+
+    clean_table_task >> create_clean_external_tables_task >> sync_metastore_external_table_task
     return table_sub_dag
 
 
@@ -213,6 +235,18 @@ create_raw_sub_tasks = BaseSubDAG.get_sub_dag_operator(
     spark_jobs_path=SPARK_JOBS_PATH,
 )
 
+sync_hive_metastore_raw_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="sync-hive-metastore-raw-tables",
+    dag=main_dag,
+    json={
+        "spark_python_task": {
+            "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_external_table.py",
+            "parameters": [ENV, DATA_LAKE_BUCKET, "raw", SOURCE, "--all-tables"],
+        }
+    },
+)
+
+
 file_list = FileService.list_layer_sql_files(SOURCE, "clean")
 for file_name in file_list:
     file_name = FileService.remove_file_extension(file_name)
@@ -234,7 +268,7 @@ for file_name in file_list:
 
     create_raw_sub_tasks >> table_sub_dag >> terminate_cluster_task
 
-create_cluster_task >> create_raw_sub_tasks
+create_cluster_task >> create_raw_sub_tasks >> sync_hive_metastore_raw_external_tables_task >> terminate_cluster_task
 
 
 if not file_list:
