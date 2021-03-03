@@ -205,7 +205,7 @@ bietlejuice.enrich_booking:
   - bietlejuice.ebdb:load-visit
   - bietlejuice.ebdb:load-visit-origin
   - bietlejuice.ebdb:load-visitor
-  # TODO [ODS] Add gsheets after migrated to composer
+  - bietlejuice.gsheets:load-from-to-cancellation-to-clean
 
 bietlejuice.enrich_braze_events:
   - bietlejuice.braze_events
