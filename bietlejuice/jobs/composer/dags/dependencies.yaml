@@ -361,7 +361,7 @@ bietlejuice.enrich_quinto_messenger:
 
 bietlejuice.enrich_region:
   - bietlejuice.ebdb:load-region
-  # TODO [ODS] Add gsheets after migrated to composer
+  - bietlejuice.gsheets:load-auxiliary-region-to-clean
 
 bietlejuice.enrich_retsuko:
   - bietlejuice.retsuko:load-account-to-clean
