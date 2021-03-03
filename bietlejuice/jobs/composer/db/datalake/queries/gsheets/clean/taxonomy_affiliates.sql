@@ -1,0 +1,11 @@
+SELECT
+    affiliate_type,
+    tracking_source,
+    tracking_medium,
+    tracking_campaign,
+    mkt_origin,
+    mkt_channel,
+    mkt_medium,
+    mkt_source
+FROM
+    datalake_gsheets_raw.taxonomy_affiliates

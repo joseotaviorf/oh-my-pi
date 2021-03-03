@@ -30,6 +30,7 @@ This pipeline produces the following output tables:
     - `marketing_costs_name_convention_shared_costs`
     - `marketing_manual_costs_google`
     - `reorganize_leads`
+    - `taxonomy_affiliates`
     - `taxonomy_demand`
 ### Responsible Data Engineering Team
 ​
