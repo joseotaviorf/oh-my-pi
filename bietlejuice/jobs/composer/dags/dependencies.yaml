@@ -100,7 +100,7 @@ bietlejuice.dw_sale_flows:
   - bietlejuice.enrich_booking:load-booking-to-enrich
   - bietlejuice.enrich_ebdb_listing:load-listing-business-context-to-enrich
   - bietlejuice.enrich_sale_flows:load-sale-flow-to-enrich
-  # TODO [ODS] Add gsheets after migrated to composer
+  - bietlejuice.gsheets:load-taxonomy-demand-to-clean
 
 bietlejuice.dw_sale_listings:
   - bietlejuice.ebdb:load-house
@@ -114,7 +114,7 @@ bietlejuice.dw_sale_offers:
   - bietlejuice.ebdb:load-house
   - bietlejuice.enrich_amplitude_offer:load-sale-offer-raw-events-to-enrich
   - bietlejuice.enrich_offer:load-sale-offer-to-enrich
-  # TODO [ODS] Add gsheets after migrated to composer
+  - bietlejuice.gsheets:load-taxonomy-demand-to-clean
 
 bietlejuice.dw_sale_visits:
   - bietlejuice.ebdb:load-house

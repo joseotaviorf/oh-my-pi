@@ -3,10 +3,11 @@ WITH taxonomy_demand AS (
 	WITH taxonomy_min_ids AS (
 		SELECT
 			MIN(id) AS id
-		FROM datalake_raw.gsheets_taxonomy_demand
+		FROM
+			datalake_gsheets_clean.taxonomy_demand
 		WHERE
 			first_update_source = 'Inquilinos'
-			AND flg_via_reschedule = '0'
+			AND flg_via_reschedule = 0
 		GROUP BY
 			LOWER(app_type),
 			LOWER(utm_source),
@@ -21,16 +22,18 @@ WITH taxonomy_demand AS (
 		td.utm_source,
 		td.utm_medium,
 		td.branded,
-		td.Category AS mkt_category,
-		td.Flow AS mkt_flow,
-		td.Completion AS mkt_completion,
-		td.Channel AS mkt_channel,
-		td.Medium AS mkt_medium,
-		td.Origin AS mkt_origin,
-		td.Source AS mkt_source,
-		td.Platform AS mkt_platform
-	FROM datalake_raw.gsheets_taxonomy_demand td
-	JOIN taxonomy_min_ids td_min
+		td.category AS mkt_category,
+		td.flow AS mkt_flow,
+		td.completion AS mkt_completion,
+		td.channel AS mkt_channel,
+		td.medium AS mkt_medium,
+		td.origin AS mkt_origin,
+		td.source AS mkt_source,
+		td.platform AS mkt_platform
+	FROM
+		datalake_gsheets_clean.taxonomy_demand AS td
+	JOIN
+		taxonomy_min_ids AS td_min
 		ON td.id = td_min.id
 ),
 offer_taxonomy AS (
@@ -49,12 +52,14 @@ offer_taxonomy AS (
 		td.mkt_source,
 		td.mkt_platform,
 		sor.branded = 'Branded' AS flg_branded
-	FROM datalake_amplitude_offer.sale_offer_raw_events sor
-	LEFT JOIN taxonomy_demand td
-		ON LOWER(COALESCE(td.app_type,'')) = LOWER(COALESCE(sor.app_type,''))
-		AND LOWER(COALESCE(td.utm_source,'')) = LOWER(COALESCE(sor.utm_source,''))
-		AND LOWER(COALESCE(td.utm_medium,'')) = LOWER(COALESCE(sor.utm_medium,''))
-		AND LOWER(COALESCE(td.branded,'')) = LOWER(COALESCE(sor.branded,''))
+	FROM
+		datalake_amplitude_offer.sale_offer_raw_events AS sor
+	LEFT JOIN
+		taxonomy_demand AS td
+			ON LOWER(COALESCE(td.app_type,'')) = LOWER(COALESCE(sor.app_type,''))
+			AND LOWER(COALESCE(td.utm_source,'')) = LOWER(COALESCE(sor.utm_source,''))
+			AND LOWER(COALESCE(td.utm_medium,'')) = LOWER(COALESCE(sor.utm_medium,''))
+			AND LOWER(COALESCE(td.branded,'')) = LOWER(COALESCE(sor.branded,''))
 )
 SELECT 
 	eso.id_offer AS sk_offer,
@@ -84,7 +89,9 @@ SELECT
 	eso.has_used_negotiation_chat,
 	eso.ts_offer_submitted,
 	eso.ts_updated,
-	now() AS ts_load
-FROM datalake_offer.sale_offer eso
-LEFT JOIN offer_taxonomy ot
-	ON eso.id_offer = ot.id_offer
+	NOW() AS ts_load
+FROM
+	datalake_offer.sale_offer AS eso
+LEFT JOIN
+	offer_taxonomy AS ot
+		ON eso.id_offer = ot.id_offer
