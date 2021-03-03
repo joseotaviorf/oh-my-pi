@@ -3,6 +3,7 @@ SELECT
     installments_number AS installments,
     monthly_interest AS monthly_interest_rate,
     option_bucket,
+    months_anticipated,
     valid_from AS ts_valid_from,
     valid_until AS ts_valid_until,
     created_at AS ts_created,
