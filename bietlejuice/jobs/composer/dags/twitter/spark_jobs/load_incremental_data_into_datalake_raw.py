@@ -99,7 +99,7 @@ if __name__ == "__main__":
         for page in table_data:
             aggregated_table_data += page
 
-        if not len(table_data):
+        if not len(aggregated_table_data):
             continue
 
         schema = generate_schema(aggregated_table_data)
