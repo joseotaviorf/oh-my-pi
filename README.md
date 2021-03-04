@@ -122,7 +122,9 @@ $ make create-docker-environment-python3
 Waiting some seconds, we could access the airflow UI by: `localhost:8080`
 
 
-**Important Note:** Not all dag dependencies are listed in the requirements3_local.txt due to requirements incompatibility (mainly quintoandar internal dependencies), if you want to test locally a dag that needs a quintoandar library installed you must add it manually to your requirements.
+**Important Notes:**
+1. Internal QuintoAndar's libs are not included in the local requirements by default, due to dependencies incompatibility. To use them locally for development purposes, include them in `requirements3_local_internal.txt`.
+2. Keep in mind that most of internal QuintoAndar's libs are used only in clusters for Spark jobs, not in Airflow's DAGs, so their dependencies are evaluated only at the job execution. To add them to the cluster creation, include their names in the file `requirements3.txt`.
 
 #### 4.Import application variables
 
