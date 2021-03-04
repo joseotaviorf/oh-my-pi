@@ -11,8 +11,7 @@ taxonomy AS (
     SELECT DISTINCT
         td.Origin as mkt_origin,
         td.Channel as mkt_channel,
-        td.Medium as mkt_medium,
-        td.Source as mkt_source
+        td.Medium as mkt_medium
     FROM
         datalake_raw.gsheets_taxonomy_demand AS td
 ),
@@ -187,7 +186,11 @@ targets AS (
         bd.city AS city_group,
         NULL::TEXT AS flow_event,
         'Tenants PWA' AS mkt_origin,
-        t.mkt_channel,
+        CASE
+            WHEN bd.mkt_medium = 'Not Mapped'
+                THEN 'Not Mapped'
+            ELSE t.mkt_channel
+        END AS mkt_channel,
         bd.mkt_medium,
         bd.mkt_source,
         NULL::TEXT AS campaign_name,
@@ -219,7 +222,11 @@ targets AS (
         bp.city_group,
         NULL::TEXT AS flow_event,
         'Tenants PWA' AS mkt_origin,
-        t.mkt_channel,
+        CASE
+            WHEN bp.mkt_medium = 'Not Mapped'
+                THEN 'Not Mapped'
+            ELSE t.mkt_channel
+        END AS mkt_channel,
         bp.mkt_medium,
         bp.mkt_source,
         NULL::TEXT AS campaign_name,
