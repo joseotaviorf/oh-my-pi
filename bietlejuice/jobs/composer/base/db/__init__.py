@@ -1,7 +1,7 @@
 import os
 
-from bietlejuice.jobs.composer.base.db.data_lake_metastore_mapping import (
-    DataLakeMetastoreMapping,
+from bietlejuice.jobs.composer.base.db.datalake_metastore_mapping import (
+    DatalakeMetastoreMapping,
 )
 from bietlejuice.jobs.composer.base.db.database_enum import (
     DatabaseEnum,

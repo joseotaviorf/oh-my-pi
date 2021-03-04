@@ -105,7 +105,6 @@ def build_table_sub_dag(
                 "python_file": BASE_SPARK_JOBS_PATH
                 + "sync_metastore_external_table.py",
                 "parameters": [
-                    env,
                     data_lake_bucket,
                     "clean",
                     source,
@@ -241,7 +240,7 @@ sync_hive_metastore_raw_external_tables_task = QuintoAndarDatabricksSubmitRunOpe
     json={
         "spark_python_task": {
             "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_external_table.py",
-            "parameters": [ENV, DATA_LAKE_BUCKET, "raw", SOURCE, "--all-tables"],
+            "parameters": [DATA_LAKE_BUCKET, "raw", SOURCE, "--all-tables"],
         }
     },
 )
