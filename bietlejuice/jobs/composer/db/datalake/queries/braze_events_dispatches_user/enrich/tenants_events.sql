@@ -25,9 +25,9 @@ SELECT DISTINCT
     sms_tenants.ts_sms_delivered,
     sms_tenants.ts_sms_rejected,
     sms_tenants.ts_sms_delivery_failed,
-    eo.year,
-    eo.month,
-    eo.day
+    et.year,
+    et.month,
+    et.day
 FROM
     datalake_braze.events_tenants AS et
 LEFT JOIN
