@@ -41,7 +41,7 @@ WITH consolidated_google_costs AS (
   formatted_manual_google_costs AS (
     WITH formatted_manual_costs AS (
         SELECT
-            REPLACE(REPLACE(REGEXP_REPLACE(LOWER(account_name), '\\P{ASCII}.*', ''), ' - ', '_'), ' ', '_') as formatted_account_name,
+            REPLACE(REPLACE(REGEXP_REPLACE(LOWER(account_name), '\\P{{ASCII}}.*', ''), ' - ', '_'), ' ', '_') as formatted_account_name,
             campaign_name,
             CAST(DATE_FORMAT(dt_cost, 'yyyyMMdd') AS BIGINT) AS sk_date,
             desktop_cost,
