@@ -1,10 +1,10 @@
 with house_available_hours as (
 	with imovel_aud as (
 		select
-	    	from_unixtime(cast(timestamp as bigint)/1000) as date_time,
+            cast(from_unixtime(cast(ts_revision as bigint)/1000) as timestamp) as date_time,
 			hou.*
 		from datalake_ebdb_raw_prod.horariosemanalimovel_aud hou
-			join datalake_ebdb_raw_prod.usuariorevisionentity ure
+			join datalake_ebdb_clean_prod.user_revision_entity ure
 				on hou.rev = ure.id
 	),
 	house_available as (
@@ -50,8 +50,8 @@ with house_available_hours as (
 ),
 date_series as (
   select
-    date(date) as date,
-    cast(week_day as integer) as week_day,
+    date as date,
+    week_day,
     weekday_name,
     week_start,
     case 
@@ -60,10 +60,9 @@ date_series as (
         else 'Weekday'
     end as week_day_type
   from
-    datalake_clean.ods_dim_date dd
-  where
-	date(date) >= date('2019-01-01') and date(week_start) <= current_date - interval '1' day
-    and date != ''
+    dim_date dd
+  where date >= current_date - interval '45 days' and week_start <= current_date - interval '1' day
+    and date is not null
 ),
 regions as (
   select
@@ -72,12 +71,25 @@ regions as (
     dr.city_group,
     dr.city_name
   from
-    datalake_clean.ods_dim_region dr
+    dim_region dr
   where
-    dr.region_code != '-1'
+    dr.region_code != -1
 ),
 slot_series as (
-	select slot from unnest(sequence(0,100)) seq (slot)
+	with slot_0_9 as (
+    select 0 as slot
+    union all select 1 as slot
+    union all select 2 as slot
+    union all select 3 as slot
+    union all select 4 as slot
+    union all select 5 as slot
+    union all select 6 as slot
+    union all select 7 as slot
+    union all select 8 as slot
+    union all select 9 as slot
+    )
+    select a.slot + b.slot * 10 as slot
+    from slot_0_9 a, slot_0_9 b
 ),
 dimensions as (
   select
@@ -120,62 +132,81 @@ encaixe_to_booking as (
     distinct id_visitor as user_id,
     id_property as house_id
   from
-    datalake_clean.ods_dim_booking
+    dim_booking
   where
     type = 'Visita'
 	and visit_intent = 'RENT'
+	and dt_scheduling >= current_date - interval '55 days'
 ),
 booking_for_sale as (
 	select distinct
 		id_visitor as user_id,
         id_property as house_id,
-        cast(slot_dia as bigint) as slot_dia,
+        slot_dia,
         dt_scheduling,
-        date(date_parse(dt_scheduling, '%Y-%m-%d %H:%i:%s')) as visit_date,
+        date(dt_scheduling) as visit_date,
         visit_intent,
         status
-	from datalake_clean.ods_dim_booking
+	from dim_booking
 	where type = 'Visita'
-		and visit_intent = 'SALE'and (status = 'Realizado' OR status = 'Marcado' OR            
-                    (status = 'Cancelado' and date(date_parse(dt_scheduling, '%Y-%m-%d %H:%i:%s')) = try_cast(try_cast(substring(dt_cancel,1,19) as timestamp) as date)))
+		and visit_intent = 'SALE'
+		and id_visitor is not null
+		and dt_scheduling >= current_date - interval '55 days'
+		and (status = 'Realizado' OR status = 'Marcado' OR
+                    (status = 'Cancelado' and date(dt_scheduling) = date(dt_cancel)))
+),
+visit_hoursalert_confirmed as (
+    select
+        trim(event_type) as event,
+        ts_event as event_date,
+        cast(id_user as bigint) as user_id,
+        cast(json_extract_path_text(event_properties, 'house_id') as bigint) as house_id,
+        cast(coalesce(json_extract_path_text(event_properties, 'alert_target_date'), '') as date) as target_date,
+        cast(coalesce(json_extract_path_text(event_properties, 'alert_slot_from'), '') as bigint) as alert_slot_from,
+        cast(coalesce(json_extract_path_text(event_properties, 'alert_slot_to'), '') as bigint) as alert_slot_to
+    from
+        datalake_amplitude_clean_prod.events
+    where
+        trim(event_type) = 'visit_hoursalert_confirmed'
+        and json_extract_path_text(event_properties, 'business_context') = 'rent'
+        and json_extract_path_text(event_properties, 'house_id') <> ''
+        and id_user <> ''
+        and ts_event >= current_date - interval '45 days'
 ),
 encaixes_raw as (
   select
-    evt.ts_event as event_date,
-  	trim(evt.id_user) as user_id,
-  	trim(coalesce(evt.ep_house_id, null)) as house_id,
-  	cast(date_parse(evt.ep_alert_target_date, '%a, %d %b %Y %T GMT') as date) as target_date,
-  	cast(trim(evt.ep_alert_slot_from) as double) alert_slot_from,
-  	cast(trim(evt.ep_alert_slot_to) as double) alert_slot_to,
+    evt.event_date,
+  	evt.user_id,
+    evt.house_id,
+    evt.target_date,
+    evt.alert_slot_from,
+    evt.alert_slot_to,
   	case when etb.user_id is not null then 1 else 0 end as encaixe_realizado,
- 	rank() over (partition by trim(evt.id_user), trim(coalesce(evt.ep_house_id, '')) order by evt.ts_event desc) as rank_enc
-  from datalake_amplitude_clean_prod."170698_visit_hoursalert_confirmed_events" evt
-     left join encaixe_to_booking etb on etb.user_id = trim(evt.id_user) and etb.house_id = trim(coalesce(evt.ep_house_id, ''))
-  where concat(cast(year as varchar), '-', cast(month as varchar)) >= '2019-08'
-  	and cast(json_extract(event_properties, '$.business_context') as varchar) != 'sale'
+ 	rank() over (partition by evt.user_id, evt.house_id order by evt.event_date desc) as rank_enc
+  from visit_hoursalert_confirmed evt
+  left join encaixe_to_booking etb
+    on etb.user_id = evt.user_id
+    and etb.house_id = evt.house_id
 ),
 encaixes_temp as (
   select distinct
     user_id,
     house_id,
-    r.*,
+    h.id_region as region_id,
     event_date,
     target_date,
     slot,
     encaixe_realizado,
-    1 / cast(count(slot) over (partition by enc.user_id,enc.house_id, enc.target_date) as double) as slot_share_encaixe
+    1.0 / cast(count(slot) over (partition by enc.user_id,enc.house_id, enc.target_date) as decimal) as slot_share_encaixe
   from
     encaixes_raw enc
-  left join slot_series ss on
-    ss.slot between enc.alert_slot_from and enc.alert_slot_to
-  join datalake_ebdb_raw_prod.imovel i on
-    i.id = cast(enc.house_id as bigint)
-  join regions r on
-    i.regiao_id = cast(r.region_id as bigint)
+  join slot_series ss on ss.slot between enc.alert_slot_from and enc.alert_slot_to
+  join datalake_ebdb_clean_prod.house h on h.id = enc.house_id
   where
     enc.rank_enc = 1
-    and enc.user_id != ''
-    and i.regiao_id is not null
+    and enc.user_id is not null
+    and enc.target_date is not null
+    and h.id_region is not null
 ),
 blocked_houses as (
   select
@@ -183,16 +214,13 @@ blocked_houses as (
   from
     (
     select
-      id_house as house_id,
-      status,
-      from_unixtime(cast(ts_revision as bigint)/ 1000) as init,
-      coalesce(from_unixtime(cast(lead(ts_revision) over (partition by id_house order by ts_revision)as bigint)/ 1000),
-      current_date) as "end"
-    from
-      datalake_ebdb_clean_prod.house_visit_status_aud vs
-    join datalake_ebdb_clean_prod.user_revision_entity r on
-      vs.rev = r.id
-      and mod_status = true
+      vs.id_house as house_id,
+      vs.status,
+      cast(from_unixtime(cast(r.ts_revision / 1000 as bigint)) as timestamp) as init,
+      coalesce(lead(cast(from_unixtime(cast(r.ts_revision / 1000 as bigint)) as timestamp)) over (partition by vs.id_house order by r.ts_revision), current_date) as "end"
+    from datalake_ebdb_clean_prod.house_visit_status_aud vs
+    join datalake_ebdb_clean_prod.user_revision_entity r
+      on vs.rev = r.id and mod_status = true
     )
   where
   status = 'BLOCKED'
@@ -204,16 +232,14 @@ suspended_houses as (
   from
     (
     select
-      i.id_house as house_id,
-      status,
-      from_unixtime(cast(ts_revision as bigint)/ 1000) as init,
-      coalesce(from_unixtime(cast(lead(ts_revision) over (partition by i.id_house order by ts_revision) as bigint)/ 1000),
-      current_date) as "end"
-    from
-      datalake_ebdb_clean_prod.house_aud i
-    join datalake_ebdb_clean_prod.user_revision_entity r on
-      i.rev = r.id
-      and mod_status = true
+        h.id_house as house_id,
+        h.status,
+        cast(from_unixtime(cast(r.ts_revision / 1000 as bigint)) as timestamp) as init,
+        coalesce(lead(cast(from_unixtime(cast(r.ts_revision / 1000 as bigint)) as timestamp)) over (partition by id_house order by r.ts_revision), current_date) as "end"
+    from datalake_ebdb_clean_prod.house_aud h
+    join datalake_ebdb_clean_prod.user_revision_entity r
+        on h.rev = r.id
+        and h.mod_status = true
     )
   where
   status = 'suspenso'
@@ -225,12 +251,13 @@ cant_find_another_agent as (
 		id_property as house_id,
 		cast(slot_dia as bigint) as slot_dia,
 		dt_scheduling,
-		date(date_parse(dt_scheduling, '%Y-%m-%d %H:%i:%s')) as visit_date,
+		date(dt_scheduling) as visit_date,
 		status
-	from datalake_clean.ods_dim_booking
+	from dim_booking
 		where type = 'Visita'
 			and status = 'Cancelado'
 			and cancellation_reason = 'CANCELED_CANT_FIND_ANOTHER_AGENT'
+			and date(dt_scheduling) >= current_date - interval '45 days'
 ),
 encaixes_clean as (
 select
@@ -285,7 +312,7 @@ from
   encaixes_temp t
 left join house_available_hours hs 
 	on cast(t.house_id as bigint) = hs.id_house
-    	and cast(hs.day_of_week as bigint) = dow(t.target_date)
+    	and cast(hs.day_of_week as bigint) = extract(dow from t.target_date)
         and event_date between hs.available_started_date and coalesce(hs.available_ended_date, (date_add('day',2,current_date)))
 left join blocked_houses bh on
   (t.house_id = cast(bh.house_id as varchar)
@@ -335,7 +362,7 @@ from
     event_date,
     target_date as visit_date,
     d.week_start,
-    cast(d.date as timestamp) + interval '8' hour + (interval '15' minute)* d.slot as visit_hour,
+    cast(d.date as timestamp) + interval '8 hours' + (interval '15 minutes') * d.slot as visit_hour,
     d.hour,
     d.faixa,
     enc.user_id,
@@ -357,5 +384,5 @@ from
     encaixes_agg enc
   left join dimensions d on
     enc.region_id = d.region_id
-    and enc.target_date = d."date"
+    and enc.target_date = d.date
     and enc.slot = d.slot
