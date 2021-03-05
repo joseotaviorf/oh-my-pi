@@ -68,31 +68,7 @@ with house_available_hours as (
 , regions as (
 	select
 		dr.id as region_id,
-		case 
-		    when dr.region_code = 'SPO 01' then 'SPO 01 FS' 
-		    when dr.region_code = 'SPO 02' then 'SPO 02 FS' 
-		    when dr.region_code = 'SPO 03' then 'SPO 02 FS' 
-		    when dr.region_code = 'SPO 04' then 'SPO 03 FS' 
-		    when dr.region_code = 'SPO 05' then 'SPO 04 FS' 
-		    when dr.region_code = 'SPO 06' then 'SPO 05 FS' 
-		    when dr.region_code = 'SPO 07' then 'SPO 05 FS' 
-		    when dr.region_code = 'SPO 08' then 'SPO 04 FS' 
-		    when dr.region_code = 'SPO 09' then 'SPO 06 FS' 
-		    when dr.region_code = 'SPO 10' then 'SPO 01 FS' 
-		    when dr.region_code = 'SPO 11' then 'SPO 06 FS' 
-		    when dr.region_code = 'RIO 01' then 'RIO 01 FS' 
-		    when dr.region_code = 'RIO 02' then 'RIO 02 FS' 
-		    when dr.region_code = 'RIO 03' then 'RIO 03 FS' 
-		    when dr.region_code = 'RIO 04' then 'RIO 04 FS' 
-		    when dr.region_code = 'RIO 05' then 'RIO 05 FS' 
-		    when dr.region_code = 'RIO 06' then 'RIO 05 FS' 
-		    when dr.region_code = 'RIO 07' then 'RIO 07 FS'
-		    when dr.region_code = 'RIO 08' then 'RIO 06 FS' 
-		    when dr.region_code = 'RIO 09' then 'RIO 08 FS' 
-		    when dr.region_code = 'RIO 10' then 'RIO 07 FS'
-		    when dr.region_code = 'RIO 11' then 'RIO 09 FS'
-		    else dr.region_code 
-		end as region_code,
+		dr.region_code,
 		dr.city_group,
 		dr.city_name
 	from dim_region dr
