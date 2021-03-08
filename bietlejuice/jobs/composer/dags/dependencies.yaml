@@ -20,6 +20,7 @@ bietlejuice.dw_booking:
   - bietlejuice.enrich_booking
   - bietlejuice.ebdb:load-visit
   - bietlejuice.enrich_amplitude_visit
+  - bietlejuice.gsheets:load-taxonomy-demand-to-clean
 
 bietlejuice.dw_call:
   - bietlejuice.enrich_bigfone_twilio
