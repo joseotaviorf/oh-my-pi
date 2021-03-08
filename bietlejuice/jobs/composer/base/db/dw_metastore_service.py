@@ -1,6 +1,14 @@
+from deprecated import deprecated
+
 from bietlejuice.jobs.composer.base.pipeline import EnvironmentEnum
 
 
+@deprecated(
+    reason="""
+This module is discontinued and shall be removed when Redshift is migrated to Presto and Hive Metastore.
+The datalake_metastore_mapping.py is the new mapping file for Hive metastore.
+"""
+)
 class DWMetastoreService:
     @staticmethod
     def get_dw_info(env, schema, bucket):

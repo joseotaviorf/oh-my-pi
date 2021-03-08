@@ -78,7 +78,7 @@ class SparkMetastoreService(MetastoreService):
         :param ignore_partition_keys: indicates if the partition keys should be
          removed from the result set
         :type ignore_partition_keys: bool
-        :return: OrderedDict with partition keys names and types in tuples
+        :return: dictionary with table columns names and types in tuples
         :rtype: collections.OrderedDict[(string, string)]
         """
         result_df = super().get_table_description(database_name, table_name)

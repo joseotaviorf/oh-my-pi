@@ -1,13 +1,14 @@
-"""
-DEPRECATED.
-
-This module is discontinued and shall be removed when Athena is migrated to Presto and Hive Metastore.
-The metastore_mapping.py is the new mapping file for Hive metastore.
-"""
+from deprecated import deprecated
 
 from bietlejuice.jobs.composer.base.pipeline import EnvironmentEnum
 
 
+@deprecated(
+    reason="""
+This module is discontinued and shall be removed when Athena is migrated to Presto and Hive Metastore.
+The datalake_metastore_mapping.py is the new mapping file for Hive metastore.
+"""
+)
 class DatalakeMetastoreService:
     @staticmethod
     def get_db_info(env, source, bucket):

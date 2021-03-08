@@ -19,14 +19,14 @@ class DatalakeMetastoreMapping:
 
         :rtype: dict
         """
-        database_info = {
+        database_name = {
             "db_raw_name": f"datalake_{self.source}_raw",
             "db_clean_name": f"datalake_{self.source}_clean",
             "db_enrich_name": f"datalake_{self.source}",
             "db_clean_staging_name": f"datalake_{self.source}_clean_staging",
         }
 
-        s3_files_info = {
+        s3_files_path = {
             "db_raw_path": f"s3a://{self.bucket}/raw/{self.source}/",
             "db_clean_path": f"s3a://{self.bucket}/clean/{self.source}/",
             "db_enrich_path": f"s3a://{self.bucket}/enrich/{self.source}/",
@@ -34,13 +34,13 @@ class DatalakeMetastoreMapping:
         }
 
         metastore_info = {}
-        metastore_info.update(database_info)
-        metastore_info.update(s3_files_info)
+        metastore_info.update(database_name)
+        metastore_info.update(s3_files_path)
         return metastore_info
 
     def get_datalake_info_from_layer(self, layer):
         """
-        Gets info for given layer.
+        Gets database info for given layer.
 
         :param layer: raw, clean, enrich or clean_staging layers
         :type layer: str

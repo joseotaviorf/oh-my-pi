@@ -9,13 +9,16 @@
 import json
 import logging
 from argparse import ArgumentParser
+from collections import OrderedDict
 
 from pyspark.sql.functions import split
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreMapping
 from bietlejuice.jobs.composer.base.db import DatabaseEnum
+from bietlejuice.jobs.composer.base.db.dw_metastore_mapping import DwMetastoreMapping
 from bietlejuice.jobs.composer.base.hive import TableStorageDescriptorEnum
+from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers.databricks_consumer import (
     DatabricksConsumer,
@@ -23,7 +26,7 @@ from bietlejuice.jobs.composer.consumers.db_consumers.databricks_consumer import
 from bietlejuice.jobs.composer.pipeline import MetastoreExternalTablePipeline
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
-JOB_NAME = "create_metastore_external_table"
+JOB_NAME = "sync_metastore_tables"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -89,17 +92,13 @@ def format_df_partition_values(df_partition_values):
 
 def parse_args():
     parser = ArgumentParser(description=JOB_NAME)
+    parser.add_argument("bucket", type=str, help="Data Lake or DW bucket")
+    parser.add_argument("layer_value", type=str, help="One of LayerEnum values")
     parser.add_argument(
-        "datalake_bucket", type=str, help="data lake bucket"
-    )  # TODO: this could be got from an enum, since we won't change frequently
-    parser.add_argument(
-        "layer", type=str, help="One of layer values: [raw|clean|enrich|dw]"
-    )
-    parser.add_argument(
-        "source",
+        "db_name_part",
         type=str,
-        help="base name of metastore database. I.e. the 'source' name for raw and clean layers, and the 'source' and/or"
-        " 'context' name for enrich layer",
+        help="The `source` name for raw and clean layers. The `source` and/or "
+        "`context` name for enrich layer. The `schema` for DW layer.",
     )
     parser.add_argument(
         "--table-name",
@@ -118,7 +117,14 @@ def parse_args():
         help="sync all tables from database",
     )
 
-    return parser.parse_args()
+    args = parser.parse_args()
+    _bucket = args.bucket
+    _layer_value = args.layer_value
+    _db_name_part = args.db_name_part
+    _table_name = args.table_name
+    _all_tables = args.all_tables
+
+    return _bucket, _layer_value, _db_name_part, _table_name, _all_tables
 
 
 def get_hive_metastore_host():
@@ -134,59 +140,125 @@ def get_hive_metastore_host():
     return hm_confs_json["host"]
 
 
+def get_metastores_metadata(_db_name_part, _bucket, _layer):
+    """
+    Gets the Spark and Hive metastores databases metadata for given layer.
+
+    :param _db_name_part: The `source` name for raw and clean layers. Or the
+     `source` and/or `context` name for enrich layer. The `schema` for DW layer.
+    :type _db_name_part: str
+    :param _bucket: Data Lake or DW bucket
+    :type _bucket: str
+    :param _layer: one of LayerEnum keys
+    :type _layer: LayerEnum
+    :return:
+    """
+    if layer == LayerEnum.DW.value:
+        dw_ms_mapping = DwMetastoreMapping(
+            schema=_db_name_part, bucket=_bucket
+        ).get_all_dw_info()
+
+        _spark_database_name = dw_ms_mapping["dw_schema_databricks"]
+        _database_location = dw_ms_mapping["dw_schema_path"]
+    else:
+        dl_ms_mapping = DatalakeMetastoreMapping(source=_db_name_part, bucket=_bucket)
+
+        (
+            _spark_database_name,
+            _database_location,
+        ) = dl_ms_mapping.get_datalake_info_from_layer(_layer)
+
+    return _spark_database_name, _database_location
+
+
+def validate_table_arguments(_table_name, _all_tables):
+    """
+    Verifies if the job is called exclusively for syncing a unique table or
+     all of them.
+
+    :param _table_name: the table to be synced
+    :type _table_name: str
+    :param _all_tables: flag indicating to sync all tables of giving database
+    :type _all_tables: bool (received as string though)
+    :raises: ValueError
+    """
+    if bool(_table_name) == _all_tables:
+        raise ValueError(
+            f"m={JOB_NAME}, table_name={_table_name},"
+            f"all_tables={_all_tables}, msg=Parameters table_name and all_tables are mutual exclusive."
+        )
+
+
+def set_columns_to_lower(table_schema):
+    """
+    Normalizes the Spark columns to lower case because the Spark metastore
+     saves the columns camel-cased (for raw tables) and the Hive metastore
+     saves it lower-cased.
+
+    :param table_schema: schema with columns and types
+    :type table_schema: collections.OrderedDict[(string, string)]
+    :return: dictionary with table columns names (lowered) and types in tuples
+    :rtype: collections.OrderedDict[(string, string)]
+    """
+    cleaned_schema = [(col.lower(), type) for col, type in table_schema.items()]
+    return OrderedDict(cleaned_schema)
+
+
+def get_spark_metastore_table_columns(_spark_database_name, _table):
+    """
+    Fetches the table columns names and types in Spark metastore.
+
+    :param _spark_database_name: target database
+    :param _table: target table
+    :return: dictionary with table columns names (lowered) and types in tuples
+    :rtype: collections.OrderedDict[(string, string)]
+    """
+    _spark_ms_table_columns = spark_metastore_service.get_table_schema(
+        _spark_database_name, _table, ignore_partition_keys=True
+    )
+    return set_columns_to_lower(_spark_ms_table_columns)
+
+
 if __name__ == "__main__":
-    args = parse_args()
-    data_lake_bucket = args.datalake_bucket
-    layer = args.layer
-    source = args.source
-    table_name = args.table_name
-    all_tables = args.all_tables
+    bucket, layer_value, db_name_part, table_name, all_tables = parse_args()
+    layer = LayerEnum(layer_value).value
 
     logger.info(
-        f"m={JOB_NAME}, datalake_bucket={data_lake_bucket}, "
-        f"layer={layer}, source={source}, "
+        f"m={JOB_NAME}, bucket={bucket}, "
+        f"layer={layer}, db_name_part={db_name_part}, "
         f"table_name={table_name}, all_tables={all_tables}, msg=Job execution started."
     )
 
-    if bool(table_name) == all_tables:
-        raise ValueError(
-            f"m={JOB_NAME}, table_name={table_name},"
-            f"all_tables={all_tables}, msg=Parameters table_name and all_tables are mutual exclusive."
-        )
+    validate_table_arguments(table_name, all_tables)
 
-    dl_ms_mapping = DatalakeMetastoreMapping(source, data_lake_bucket)
-    (
-        datalake_database_name,
-        database_location,
-    ) = dl_ms_mapping.get_datalake_info_from_layer(layer)
+    spark_database_name, database_location = get_metastores_metadata(
+        db_name_part, bucket, layer
+    )
 
     table_names = []
-
     if all_tables:
-        table_names = get_spark_metastore_table_names(
-            database_name=datalake_database_name
-        )
+        table_names = get_spark_metastore_table_names(database_name=spark_database_name)
     else:
         table_names.append(table_name)
 
     for table in table_names:
         spark_metastore_service = SparkMetastoreService(SparkClient())
-        spark_ms_table_columns = spark_metastore_service.get_table_schema(
-            datalake_database_name, table, ignore_partition_keys=True
+        spark_ms_table_columns = get_spark_metastore_table_columns(
+            spark_database_name, table
         )
         spark_ms_table_partition_keys = spark_metastore_service.get_table_partition_keys(
-            database_name=datalake_database_name, table_name=table
+            database_name=spark_database_name, table_name=table
         )
 
         spark_ms_table_partition_values = []
         if spark_ms_table_partition_keys:
             spark_ms_table_partition_values = get_spark_metastore_table_partition_values(
-                datalake_database_name, table
+                spark_database_name, table
             )
 
         MetastoreExternalTablePipeline(
             metastore_host=get_hive_metastore_host(),
-            database_name=datalake_database_name,
+            database_name=spark_database_name,
             table_name=table,
             database_location=database_location,
             table_schema=spark_ms_table_columns,
@@ -196,7 +268,7 @@ if __name__ == "__main__":
         ).run()
 
         logger.info(
-            f"m={JOB_NAME}, datalake_bucket={data_lake_bucket}, "
-            f"layer={layer}, database_base_name={datalake_database_name}, "
+            f"m={JOB_NAME}, bucket={bucket}, "
+            f"layer={layer}, database_name={spark_database_name}, "
             f"table_name={table}, msg=Table synchronized."
         )

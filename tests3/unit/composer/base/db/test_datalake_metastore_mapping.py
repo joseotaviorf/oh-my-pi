@@ -1,9 +1,6 @@
 from bietlejuice.jobs.composer.base.db.datalake_metastore_mapping import (
     DatalakeMetastoreMapping,
 )
-from bietlejuice.jobs.composer.base.spark import BaseSparkContext
-
-spark, sc = BaseSparkContext.spark, BaseSparkContext.sc
 
 
 class TestDatalakeMetastoreMapping:

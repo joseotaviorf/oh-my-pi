@@ -130,6 +130,11 @@ class HiveMetastoreLoader:
         table_s3_path = database_location + table_name
 
         if self.is_table_in_metastore(database_name, table_name):
+            logger.info(
+                f"m=update_metastore, db={database_name}, table={table_name}, "
+                "msg=Table already exists in metastore. Syncing with spark metastore."
+            )
+
             self._check_partition_keys(database_name, table_name, partition_keys)
             self._update_table_in_metastore(database_name, table_name, source_schema)
         else:
@@ -141,11 +146,6 @@ class HiveMetastoreLoader:
                 partition_keys,
                 format_info,
             )
-
-        logger.info(
-            f"m=update_metastore, db={database_name}, table={table_name}, "
-            "msg=Successfully synchronized table in metastore."
-        )
 
     @staticmethod
     def _get_tables_difference(spark_table_columns, metastore_table_columns):
@@ -186,8 +186,9 @@ class HiveMetastoreLoader:
     def _update_table_in_metastore(self, database_name, table_name, source_schema):
         logger.info(
             f"m=_update_table_in_metastore, db={database_name}, table={table_name}, "
-            "msg=Table already exists in metastore. Syncing with spark metastore."
+            "msg=Comparing table columns."
         )
+
         added_columns, removed_columns = self.compare_table_schema(
             database_name, table_name, source_schema
         )
@@ -229,7 +230,7 @@ class HiveMetastoreLoader:
 
         logger.info(
             f"m=update_table_partitions, db={database_name}, table={table_name}, "
-            f"msg=Updating table partition values."
+            f"msg=Checking table partition values."
         )
 
         metastore_part_values = self.hive_metastore_service.get_partition_values(
@@ -309,6 +310,11 @@ class HiveMetastoreLoader:
         :rtype: None
         :raises: ValueError
         """
+        logger.info(
+            f"m=_check_partition_keys, db={database_name}, table={table_name}, "
+            "msg=Checking partitions keys."
+        )
+
         hive_table_partition_keys = self.hive_metastore_service.get_partition_keys(
             database_name, table_name
         )
