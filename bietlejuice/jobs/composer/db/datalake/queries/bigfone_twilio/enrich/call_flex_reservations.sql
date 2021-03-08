@@ -99,8 +99,11 @@ SELECT
     ts_ended_unix - ts_created_unix AS seconds_duration,
     SUM(seconds_queue_time) AS seconds_wait_time,
     SUM(seconds_talk_time) AS seconds_talk_time,
-    CAST(FROM_UNIXTIME(ts_created_unix, 'yyyy-MM-dd HH:mm:ss') AS TIMESTAMP) ts_created,
-    CAST(FROM_UNIXTIME(ts_ended_unix, 'yyyy-MM-dd HH:mm:ss') AS TIMESTAMP) ts_ended,
+    CAST(FROM_UNIXTIME(ts_created_unix, 'yyyy-MM-dd HH:mm:ss') AS TIMESTAMP) AS ts_created,
+    FROM_UTC_TIMESTAMP(CAST(FROM_UNIXTIME(ts_created_unix, 'yyyy-MM-dd HH:mm:ss') AS TIMESTAMP), 'Brazil/East') AS ts_created_local,
+    CAST(FROM_UNIXTIME(ts_ended_unix, 'yyyy-MM-dd HH:mm:ss') AS TIMESTAMP) AS ts_ended,
+    FROM_UTC_TIMESTAMP(CAST(FROM_UNIXTIME(ts_ended_unix, 'yyyy-MM-dd HH:mm:ss') AS TIMESTAMP), 'Brazil/East') AS ts_ended_local,
+    ts_created_unix,
     year,
     month,
     day
@@ -110,4 +113,4 @@ LEFT JOIN
     answered_time_calculations AS atc
         ON cr.id_task = atc.id_task
         AND cr.id_reservation = atc.id_reservation
-GROUP BY 1,2,3,4,5,6,7,8,9,10,13,14,15,16,17
+GROUP BY 1,2,3,4,5,6,7,8,9,10,13,14,15,16,17,18,19,20

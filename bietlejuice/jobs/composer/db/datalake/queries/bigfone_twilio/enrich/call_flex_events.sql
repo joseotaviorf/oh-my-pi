@@ -11,6 +11,12 @@ SELECT
 	GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.TransInitiatingWorkerSid') AS id_agent_transferred,
 	NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.from'),'(sip:)?([0-9+]+)@?',2),'') AS from_number,
 	NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.outbound_to'),'(sip:)?([0-9+]+)@?',2),'') AS to_number,
+	CASE
+		WHEN GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.direction') = 'inbound' 
+			THEN REGEXP_REPLACE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.from'),'(sip:)?([0-9+]+)@?',2),''),'(^\\+?55)|(\\D*)','')
+		WHEN GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.direction') = 'outbound' 
+			THEN REGEXP_REPLACE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.outbound_to'),'(sip:)?([0-9+]+)@?',2),''),'(^\\+?55)|(\\D*)','')
+	END AS customer_phone,
 	GET_JSON_OBJECT(metadata,'$.event_data.WorkerName') AS agent_email,
 	GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.target') AS department_name,
 	GET_JSON_OBJECT(metadata,'$.event_data.TaskQueueName') AS task_queue_name,
@@ -27,6 +33,13 @@ SELECT
 	ts_created_local,
 	ts_received_local,
 	TO_TIMESTAMP(GET_JSON_OBJECT(metadata,'$.event_data.TransferStarted')) AS ts_transfer_started,
+	CASE
+		WHEN GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.direction') = 'inbound' AND event = 'task.wrapup' THEN ts_created_local
+	END AS ts_wrapup_event_local,
+	CASE
+		WHEN GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.direction') = 'inbound' AND event = 'task.wrapup' THEN UNIX_TIMESTAMP(ts_created_local)
+	END AS ts_wrapup_event_local_unix,
+	UNIX_TIMESTAMP(ts_created_local) AS ts_created_local_unix,
 	year,
 	month,
 	day

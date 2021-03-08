@@ -1,10 +1,10 @@
 WITH ivr_calls AS (
     SELECT
         id_call,
-        REGEXP_REPLACE(from_number,'(^\\+?55)|(\\D*)','') AS customer_phone,
+        customer_phone,
         MIN(id_task) AS id_task, -- workaround to filter 1 instance with duplicity
-        UNIX_TIMESTAMP(MIN(ts_created_local)) AS ts_first_event_unix,
-        UNIX_TIMESTAMP(MAX(ts_created_local)) AS ts_last_event_unix
+        MIN(ts_created_local_unix) AS ts_first_event_local_unix,
+        MAX(ts_created_local_unix) AS ts_last_event_local_unix
     FROM
         datalake_bigfone_twilio.call_ivr_events
     GROUP BY 1,2
@@ -25,17 +25,10 @@ flex_calls AS (
     SELECT
         id_call,
         id_task,
-        CASE
-            WHEN direction = 'inbound' THEN REGEXP_REPLACE(from_number,'(^\\+?55)|(\\D*)','')
-            WHEN direction = 'outbound' THEN REGEXP_REPLACE(to_number,'(^\\+?55)|(\\D*)','')
-        END AS customer_phone,
-        MAX(
-            CASE
-                WHEN direction = 'inbound' AND event_type = 'task.wrapup' THEN UNIX_TIMESTAMP(ts_created_local)
-            END
-        ) AS ts_wrapup_event_unix,
-        MIN(UNIX_TIMESTAMP(ts_created_local)) AS ts_first_event_unix,
-        MAX(UNIX_TIMESTAMP(ts_created_local)) AS ts_last_event_unix
+        customer_phone,
+        MAX(ts_wrapup_event_local_unix) AS ts_wrapup_event_local_unix,
+        MIN(ts_created_local_unix) AS ts_first_event_local_unix,
+        MAX(ts_created_local_unix) AS ts_last_event_local_unix
     FROM
         datalake_bigfone_twilio.call_flex_events cfe
     WHERE
@@ -76,7 +69,7 @@ first_reservation AS (
         cfr.id_task,
         cfr.queue_name AS first_queue_name,
         cfr.seconds_wait_time AS first_wait_time,
-        UNIX_TIMESTAMP(FROM_UTC_TIMESTAMP(cfr.ts_created, 'Brazil/East')) AS ts_first_reservation_unix
+        UNIX_TIMESTAMP(cfr.ts_created_local) AS ts_first_reservation_local_unix
     FROM
         datalake_bigfone_twilio.call_flex_reservations cfr
     JOIN
@@ -111,7 +104,7 @@ SELECT
     COALESCE(ic.id_call,fc.id_task) AS sk_call, -- only inbound calls have id_call, but all calls have id_task
     ci.id_user AS sk_user,
     ci.cpf AS sk_personal_document,
-    CAST(FROM_UNIXTIME(COALESCE(ic.ts_first_event_unix,fc.ts_first_event_unix), 'yyyyMMdd') AS BIGINT) AS sk_call_date,
+    CAST(FROM_UNIXTIME(COALESCE(ic.ts_first_event_local_unix,fc.ts_first_event_local_unix), 'yyyyMMdd') AS BIGINT) AS sk_call_date,
     lr.last_queue_name,
     cm.reservations IS NULL AS has_ended_in_ura,
     cm.reservations_accepted > 0 AS is_answered,
@@ -124,9 +117,9 @@ SELECT
     ie.initial_ivr_time AS seconds_ivr_time,
     cm.wait_time_flex AS seconds_total_wait_time,
     cm.talk_time AS seconds_total_talk_time,
-    fc.ts_last_event_unix - fc.ts_wrapup_event_unix AS seconds_wrapup_time,
-    fc.ts_last_event_unix - fr.ts_first_reservation_unix AS seconds_aht,
-    GREATEST(ic.ts_last_event_unix,fc.ts_last_event_unix) - COALESCE(ic.ts_first_event_unix,fc.ts_first_event_unix) AS seconds_duration,
+    fc.ts_last_event_local_unix - fc.ts_wrapup_event_local_unix AS seconds_wrapup_time,
+    fc.ts_last_event_local_unix - fr.ts_first_reservation_local_unix AS seconds_aht,
+    GREATEST(ic.ts_last_event_local_unix,fc.ts_last_event_local_unix) - COALESCE(ic.ts_first_event_local_unix,fc.ts_first_event_local_unix) AS seconds_duration,
     ce.csat_2 AS csat_rating,
     NOW() AS ts_load
 FROM

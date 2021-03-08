@@ -7,6 +7,7 @@ SELECT
 	GET_JSON_OBJECT(metadata,'$.event_data.TaskChannelSid') AS id_channel,
 	GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.from') AS from_number,
 	GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.to') AS to_number,
+	REGEXP_REPLACE(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.from'),'(^\\+?55)|(\\D*)','') AS customer_phone,
 	event AS event_type,
 	GET_JSON_OBJECT(metadata,'$.event_data.TaskCanceledReason') AS task_cancelation_reason,
 	GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.steps') AS steps,
@@ -16,6 +17,7 @@ SELECT
 	CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.csat-2') AS INT) AS csat_2,
 	ts_created_local,
 	ts_received_local,
+	UNIX_TIMESTAMP(ts_created_local) AS ts_created_local_unix,
 	year,
 	month,
 	day
