@@ -69,21 +69,21 @@ SELECT
         AND event_action = 'open' THEN event_count
       ELSE 0
     END
-  ) AS total_push_notifications_opened,
+  ) AS total_push_notification_opens,
   SUM(
     CASE
       WHEN event_channel = 'inappmessage'
       AND event_action = 'impression' THEN event_count
       ELSE 0
     END
-  ) AS total_inapp_messages_views,
+  ) AS total_inapp_message_views,
   SUM(
     CASE
       WHEN event_channel = 'inappmessage'
         AND event_action = 'click' THEN event_count
       ELSE 0
     END
-  ) AS total_inapp_messages_clicks,
+  ) AS total_inapp_message_clicks,
   SUM(
     CASE
       WHEN event_channel = 'webhook'
