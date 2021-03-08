@@ -1,15 +1,16 @@
 WITH completion_reason AS (
     SELECT
         id_task,
+        task_queue_name,
         task_completion_reason
     FROM datalake_quinto_messenger.task_event
     WHERE task_completion_reason IS NOT NULL
-    GROUP BY 1,2
+    GROUP BY 1, 2, 3
 )
 SELECT
     t.id_task AS sk_task,
     t.channel_type_internal AS channel,
-    t.ticket_group_name AS department,
+    cr.task_queue_name AS department,
     t.task_status AS status,
     cr.task_completion_reason AS completion_reason,
     t.customer_type_tag AS customer_type,
