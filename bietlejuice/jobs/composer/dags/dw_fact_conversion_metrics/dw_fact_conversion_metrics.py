@@ -20,6 +20,7 @@ from bietlejuice.jobs.composer.services import FileService
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 2, 20, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 5 * * *"
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 DAG_ID = f"bietlejuice.{SOURCE}"
 ENV = Variable.get("environment")
@@ -51,6 +52,7 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID),
 )
 
 
