@@ -63,6 +63,9 @@ filtered_events AS (
         THEN 'Branded'
         ELSE 'Outro'
     END AS branded,
+    year,
+    month,
+    day,
     CAST(ts_event AS DATE) AS dt_event
 FROM
     datalake_amplitude_page_viewed_events.schedule_search_listing_events
@@ -94,6 +97,9 @@ SELECT
     evt.utm_campaign,
     evt.utm_term,
     evt.utm_content,
+    year,
+    month,
+    day,
     evt.dt_event
 FROM
     filtered_events AS evt
