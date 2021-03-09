@@ -154,4 +154,23 @@ class DatalakeSubDAG(BaseSubDAG):
 
         load_table >> create_external_table
 
+        if self.is_hive_sync_turned_on_for_dag(self.dag_id):
+            sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+                dag=sub_dag,
+                task_id="sync-hive-metastore-table",
+                json={
+                    "spark_python_task": {
+                        "python_file": f"{self.spark_job_paths}/sync_metastore_tables.py",
+                        "parameters": [
+                            self.datalake_bucket,
+                            self.layer.value,
+                            self.target_database_base_name,
+                            "--table-name",
+                            table_name,
+                        ],
+                    }
+                },
+            )
+            load_table >> sync_metastore_table_task
+
         return sub_dag

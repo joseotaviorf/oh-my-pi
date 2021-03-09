@@ -26,6 +26,13 @@ class FileService:
     @staticmethod
     @logger
     def get_dict_from_yaml_file(file_path):
+        """
+        Given a file path, opens the file and returns the dictionary contained
+         in this file.
+
+        :param file_path: the full file path
+        :rtype: dict
+        """
         try:
             with open(file_path, "r") as stream:
                 try:

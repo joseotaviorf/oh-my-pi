@@ -14,6 +14,7 @@ class TableStorageDescriptorEnum(Enum):
     CLEAN_FORMAT = TableFormatInfo().parquet
     CLEAN_STAGING_FORMAT = TableFormatInfo().parquet
     ENRICH_FORMAT = TableFormatInfo().parquet
+    DW = TableFormatInfo().parquet
 
     @staticmethod
     def from_layer(layer):
@@ -30,4 +31,5 @@ class TableStorageDescriptorEnum(Enum):
             LayerEnum.CLEAN.value: TableStorageDescriptorEnum.CLEAN_FORMAT.value,
             LayerEnum.CLEAN_STAGING.value: TableStorageDescriptorEnum.CLEAN_STAGING_FORMAT.value,
             LayerEnum.ENRICH.value: TableStorageDescriptorEnum.ENRICH_FORMAT.value,
+            LayerEnum.DW.value: TableStorageDescriptorEnum.DW.value,
         }.get(layer)
