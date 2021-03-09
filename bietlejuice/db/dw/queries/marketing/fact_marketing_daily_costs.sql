@@ -724,7 +724,7 @@ cost_taxonomy AS (
             -- city via manual mapping
             mccc.city_group AS cost_city_group,
             -- city via campaign_name full name written
-            CASE WHEN campaign_name_l IN ('Florianópolis', 'Curitiba', 'Goiânia', 'Rio de Janeiro', 'RMSP', 'Belo Horizonte', 'Brasília', 'Campinas', 'Porto Alegre', 'Santos', 'Recife', 'Salvador') THEN
+            CASE WHEN campaign_name_l IN ('florianópolis', 'curitiba', 'goiânia', 'rio de janeiro', 'rmsp', 'belo horizonte', 'brasília', 'campinas', 'porto alegre', 'santos', 'recife', 'salvador', 'são josé dos campos', 'mogi das cruzes', 'vitória', 'itapecerica da serra') THEN
                 campaign_name_l
             WHEN cf.campaign_name_l LIKE '%campinas%' THEN
                 'Campinas'
@@ -752,6 +752,8 @@ cost_taxonomy AS (
             WHEN cf.campaign_name_l LIKE '%s_o_bernardo%' THEN
                 'RMSP'
             WHEN cf.campaign_name_l LIKE '%s_o_caetano%' THEN
+                'RMSP'
+            WHEN cf.campaign_name_l LIKE '%cotia%' THEN
                 'RMSP'
             WHEN cf.campaign_name_l LIKE '%rio%de%janeiro%' THEN
                 'Rio de Janeiro'
@@ -794,13 +796,22 @@ cost_taxonomy AS (
                 'Recife'
             WHEN cf.campaign_name_l LIKE '%salvador%' THEN
                 'Salvador'
+            WHEN cf.campaign_name_l LIKE '%sjc%' THEN
+                'São José dos Campos'
+            WHEN cf.campaign_name_l LIKE '%mogi%' THEN
+                'Mogi das Cruzes'
+            WHEN cf.campaign_name_l LIKE '%vit_ria%'
+                OR cf.campaign_name_l LIKE '%vix%'THEN
+                'Vitória'
+            WHEN cf.campaign_name_l LIKE '%itapecerica%' THEN
+                'Itapecerica da Serra'
             END AS city_campaign_mapping_rule,
             -- city via campaign_name name convention
-            CASE WHEN campaign_city IN ('Florianópolis', 'Curitiba', 'Goiânia', 'Rio de Janeiro', 'RMSP', 'Belo Horizonte', 'Brasília', 'Campinas', 'Porto Alegre', 'Santos', 'Recife', 'Salvador') THEN
+            CASE WHEN campaign_city IN ('Florianópolis', 'Curitiba', 'Goiânia', 'Rio de Janeiro', 'RMSP', 'Belo Horizonte', 'Brasília', 'Campinas', 'Porto Alegre', 'Santos', 'Recife', 'Salvador', 'São José dos Campos', 'Mogi das Cruzes', 'Vitória', 'Itapecerica da Serra') THEN
                 campaign_city
             WHEN campaign_city = 'campinas' THEN
                 'Campinas'
-            WHEN campaign_city IN ('sp', 'jui', 'santo_andre', 'guarulhos', 'osasco', 'sao_caetano', 'sao_bernardo', 'barueri', 'rmsp') THEN
+            WHEN campaign_city IN ('sp', 'jui', 'santo_andre', 'guarulhos', 'osasco', 'sao_caetano', 'sao_bernardo', 'barueri', 'rmsp', 'cotia') THEN
                 'RMSP'
             WHEN campaign_city IN ('rj', 'niteroi', 'rio_de_janeiro', 'rio') THEN
                 'Rio de Janeiro'
@@ -822,6 +833,14 @@ cost_taxonomy AS (
                 'Recife'
             WHEN campaign_city = 'salvador' THEN
                 'Salvador'
+            WHEN campaign_city IN ('sjc', 'sao_jose_dos_campos') THEN
+                'São José dos Campos'
+            WHEN campaign_city IN ('mogi', 'mogi_das_cruzes') THEN
+                'Mogi das Cruzes'
+            WHEN campaign_city IN ('vitoria', 'vix') THEN
+                'Vitória'
+            WHEN campaign_city IN ('itapecerica', 'itapecerica_da_serra') THEN
+                'Itapecerica da Serra'
             END AS campaign_city_matched,
             COALESCE(tp.campaign_origin_aquisition, 'Not Mapped') AS campaign_origin_aquisition,
             COALESCE(tp.mkt_category, 'Not Mapped') AS mkt_category,
