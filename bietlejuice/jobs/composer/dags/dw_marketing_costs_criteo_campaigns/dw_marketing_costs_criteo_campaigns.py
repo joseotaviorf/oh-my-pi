@@ -16,9 +16,11 @@ from bietlejuice.jobs.composer.services import FileService
 MEDIA = "criteo_campaigns"
 DW_SCHEMA = "marketing_costs"
 TARGET = "dw_marketing_costs"
-DAG_ID = f"bietlejuice.{TARGET}_{MEDIA}"
+SOURCE = f"{TARGET}_{MEDIA}"
+DAG_ID = f"bietlejuice.{SOURCE}"
 
 ENV = Variable.get("environment")
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 DW_BUCKET = Variable.get("dw_bucket")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 S3_MARKETING_PATH = Variable.get("datalake_marketing_bucket")
@@ -58,6 +60,7 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=None,
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
