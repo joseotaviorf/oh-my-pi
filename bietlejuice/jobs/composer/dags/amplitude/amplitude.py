@@ -11,7 +11,8 @@ from airflow.operators.quintoandar_databricks import (
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 
 # variable definitions
-DAG_ID = "bietlejuice.amplitude"
+DAG_NAME = "amplitude"
+DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = Variable.get("environment")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 AMPLITUDE_ACCOUNTS_BLOCK_LIST = Variable.get("amplitude_accounts_block_list")
@@ -21,6 +22,7 @@ MAIN_START_DATE = datetime(2019, 1, 1, 0, 0, 0, tzinfo=local_tz)
 MAIN_SCHEDULE_INTERVAL = "30 23 * * *"
 EVENT_TYPES = Variable.get("amplitude_event_types", deserialize_json=True)
 DEFAULT_PARTITION_BY = ["year", "month", "day"]
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 # s3 paths setup
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
@@ -72,6 +74,9 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
+        chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
+    ),
 )
 
 # tasks definition
