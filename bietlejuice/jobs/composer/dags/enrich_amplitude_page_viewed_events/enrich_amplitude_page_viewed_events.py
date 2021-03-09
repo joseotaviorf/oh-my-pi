@@ -40,6 +40,9 @@ LIBRARIES_DESCRIPTION = Variable.get(
     "bietlejuice_default_libraries", deserialize_json=True
 )
 
+incremental_tables = ["top_of_funnel_demand_users_interactions"]
+PARTITION_COLS = ["year", "month", "day"]
+
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
@@ -77,10 +80,22 @@ file_list = FileService.list_sql_files_without_extension_from_layer(
     CONTEXT, LayerEnum.ENRICH.value
 )
 
-enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(dag, file_list)
+file_list_filtered = [
+    file_name for file_name in file_list if file_name not in incremental_tables
+]
+
+enrich_sub_dags_full = enrich_sub_dag.build_subdags_from_sql_files(
+    dag, file_list_filtered
+)
+
+enrich_sub_dags_incremental = enrich_sub_dag.build_subdags_from_sql_files(
+    dag, incremental_tables, is_incremental=True, partitions=PARTITION_COLS
+)
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-create_cluster_task >> list(enrich_sub_dags.values()) >> terminate_cluster_task
+create_cluster_task >> (
+    list(enrich_sub_dags_full.values()) + list(enrich_sub_dags_incremental.values())
+) >> terminate_cluster_task

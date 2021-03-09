@@ -1,0 +1,58 @@
+DROP VIEW IF EXISTS datalake_amplitude_page_viewed_events.schedule_search_listing_events;
+CREATE OR REPLACE VIEW datalake_amplitude_page_viewed_events.schedule_search_listing_events AS
+SELECT  
+    id_house,
+    id_user,
+    id_device,
+    business_context,
+    utm_source,
+    utm_medium,
+    utm_campaign,
+    utm_term,
+    utm_content,
+    up_platform,
+    top5_house_id,
+    ts_event,
+    year,
+    month,
+    day
+FROM 
+    datalake_amplitude_clean.170698_schedule_page_viewed_events 
+UNION ALL
+SELECT  
+    id_house,
+    id_user,
+    id_device,
+    business_context,
+    utm_source,
+    utm_medium,
+    utm_campaign,
+    utm_term,
+    utm_content,
+    up_platform,
+    top5_house_id,
+    ts_event,
+    year,
+    month,
+    day
+FROM 
+    datalake_amplitude_clean.170698_search_page_viewed_events 
+UNION ALL
+SELECT      
+    id_house,
+    id_user,
+    id_device,
+    business_context,
+    utm_source,
+    utm_medium,
+    utm_campaign,
+    utm_term,
+    utm_content,
+    up_platform,
+    top5_house_id,
+    ts_event,
+    year,
+    month,
+    day
+FROM 
+    datalake_amplitude_clean.170698_listing_page_viewed_events
