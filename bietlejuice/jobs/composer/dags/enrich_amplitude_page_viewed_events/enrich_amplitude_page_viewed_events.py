@@ -19,6 +19,7 @@ CONTEXT = "amplitude_page_viewed_events"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = Variable.get("environment")
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
@@ -48,6 +49,9 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=None,
+    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
+        chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
+    ),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
