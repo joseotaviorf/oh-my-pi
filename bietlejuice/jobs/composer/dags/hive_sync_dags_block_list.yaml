@@ -1,6 +1,6 @@
-# Temporary file for controlling the turning on of Hive Metastore sync task for DAGs
-# For activating the task sync-hive-metastore-table for a DAG (that used DatalakeSubdag or DWSubdag)
-#  just remove the DAG from the list bellow.
+# Temporary file for controlling the turning on of the Hive Metastore sync task
+#   in the DAGs. For activating the task sync-hive-metastore-table for a DAG
+#  (that uses DatalakeSubdag or DWSubdag) remove the DAG from the list bellow.
 
 - bietlejuice.bigfone
 - bietlejuice.bigfone_events
@@ -97,5 +97,4 @@
 - bietlejuice.signatures
 - bietlejuice.terminator
 - bietlejuice.trovit
-- bietlejuice.wololo
 - bietlejuice.zendesk

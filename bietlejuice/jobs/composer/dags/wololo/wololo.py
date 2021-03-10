@@ -28,7 +28,7 @@ CREATE_RAW_EXTERNAL_TABLES_FILE_PATH = (
 )
 
 # spark and databricks vars
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
+BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{SOURCE}"
 CLUSTER_DESCRIPTION = Variable.get(
     "databricks_bietlejuice_wololo", deserialize_json=True
@@ -80,6 +80,22 @@ create_raw_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
+sync_metastore_tables_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="sync-hive-metastore-raw-tables",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_external_table.py",
+            "parameters": [
+                DATALAKE_BUCKET,
+                LayerEnum.RAW.value,
+                SOURCE,
+                "--all-tables",
+            ],
+        }
+    },
+)
+
 clean_sub_dag = DatalakeSubDAG(
     dag_id=DAG_ID,
     start_date=MAIN_START_DATE,
@@ -88,7 +104,7 @@ clean_sub_dag = DatalakeSubDAG(
     layer=LayerEnum.CLEAN,
     database_base_name=SOURCE,
     relative_query_path=SOURCE,
-    spark_job_paths=SPARK_JOBS_PATH,
+    spark_job_paths=BASE_SPARK_JOBS_PATH,
     athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
 )
 
@@ -102,7 +118,12 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-create_cluster_task >> wololo_to_datalake_raw_task >> create_raw_external_tables_task
-create_raw_external_tables_task >> list(
-    clean_sub_dags.values()
-) >> terminate_cluster_task
+create_cluster_task >> wololo_to_datalake_raw_task
+wololo_to_datalake_raw_task.set_downstream(
+    [
+        sync_metastore_tables_task,
+        create_raw_external_tables_task,
+        list(clean_sub_dags.values()),
+    ]
+)
+terminate_cluster_task.set_upstream(list(clean_sub_dags.values()))
