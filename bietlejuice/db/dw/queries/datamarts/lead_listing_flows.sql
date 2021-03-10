@@ -128,6 +128,8 @@ fact_sale AS (
 	    ssf.mkt_origin,
 	    ssf.mkt_completion,
 	    ssf.mkt_channel,
+	    ssf.mkt_source,
+	    ssf.mkt_medium,
 	    sor.sales_company,
 	    sor.sourcing_ops,
 	    'Sale' AS origin_table
@@ -154,6 +156,8 @@ fact_rent AS (
 	    hlf.mkt_origin,
 	    hlf.mkt_completion,
 	    hlf.mkt_channel,
+	    hlf.mkt_source,
+	    hlf.mkt_medium,
 	    sor.sales_company,
 	    sor.sourcing_ops,
 	    'Rent' AS origin_table
