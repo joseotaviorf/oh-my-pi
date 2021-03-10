@@ -11,17 +11,19 @@ from airflow.operators.quintoandar_databricks import (
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 
-DAG_ID = "heimdall"
+SOURCE = "heimdall"
+DAG_ID = f"bietlejuice.{SOURCE}"
 ENV = Variable.get("environment")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{DAG_ID}/"
+SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
 
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
-    Variable.get("databricks_s3_bucket"), DAG_ID
+    Variable.get("databricks_s3_bucket"), SOURCE
 )
 
 CLUSTER_DESCRIPTION = Variable.get(
@@ -45,7 +47,7 @@ MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "30 4 * * *"
 
 dag = DAG(
-    dag_id="bietlejuice.{}".format(DAG_ID),
+    dag_id=DAG_ID,
     default_args={
         "owner": BaseDAG.DEFAULT_OWNER,
         "wait_for_downstream": False,
@@ -53,6 +55,7 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
@@ -90,7 +93,7 @@ create_clean_table_in_datalake = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": SPARK_JOBS_PATH + "create_clean_table_in_datalake.py",
-            "parameters": ["heimdall", ENV, DATALAKE_BUCKET, DAG_ID],
+            "parameters": ["heimdall", ENV, DATALAKE_BUCKET, SOURCE],
         }
     },
 )
