@@ -16,6 +16,21 @@ More information about run time [here]({chart_url}{dag_id}).
 1. In datalake raw:
     - All tables which are available in the source's database.
 
+2. In datalake clean:
+    - `acquisition_misc_data`
+    - `address_aud`
+    - `address`
+    - `house_lead_aud`
+    - `house_lead`
+    - `lead_rejection_aud`
+    - `lead_rejection`
+    - `owner_aud`
+    - `owner`
+    - `phone`
+    - `rejection_history_collector_aud`
+    - `rejection_history_collector`
+    - `rejection_history_event_aud`
+    - `rejection_history_event`
 ### Responsible Data Engineering Team
 
 For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the
