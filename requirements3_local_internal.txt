@@ -1,1 +1,2 @@
 quintoandar-logger>=0.4.0
+hive-metastore-client==1.0.6

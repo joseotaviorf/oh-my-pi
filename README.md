@@ -359,6 +359,16 @@ You should be all set with the correct environment. Now you can use any of the f
     make check-style-python3
 ```
 
+ - Run unit tests using docker environment 
+```bash
+    make test-environment-python3
+```
+
+ - Run specific unit test using docker environment
+```bash
+    make build-test-environment-python3
+    docker run bietlejuice pytest <PATH_TO_TEST_FILE>
+```
 
 ### Improving local Airflow performance
 
