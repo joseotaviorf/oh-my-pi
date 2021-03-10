@@ -398,7 +398,7 @@ affiliates AS (
         city_group,
         business_context,
         mkt_origin,
-        sum(costs) as costs
+        SUM(costs) AS costs
     FROM base
     GROUP BY 1, 2, 3, 4
     ),
@@ -652,7 +652,7 @@ affiliates AS (
         CASE
             WHEN planning_mkt_level3  = 'PWA - Paid' THEN 'Paid'
             WHEN planning_mkt_level3 = 'Not Mapped' THEN 'Other'
-            WHEN planning_mkt_level3 = 'Autonomous Agent' THEN 'CIQ'
+            WHEN planning_mkt_level3 IN ('Autonomous Agent', 'Autonomuos Agent') THEN 'CIQ'
         ELSE planning_mkt_level3 END AS mkt_channel,
         NULL::TEXT AS mkt_medium,
         NULL::TEXT AS mkt_source,
@@ -685,12 +685,12 @@ SELECT
     CASE
         WHEN mkt_origin = 'Owner PWA' AND mkt_channel = 'LeadEnrichment' THEN 'Organic'
         WHEN mkt_origin = 'Owner PWA' THEN mkt_channel
-        WHEN mkt_origin  in ('PWA - Paid', 'Owner PWA - Sale') THEN 'Paid'
+        WHEN mkt_origin  IN ('PWA - Paid', 'Owner PWA - Sale') THEN 'Paid'
         WHEN mkt_origin = 'Not Mapped' THEN 'Other'
         WHEN mkt_origin = 'Doorman Sale' THEN 'Doorman'
         WHEN mkt_origin = 'Indica Aí - Agents Sale' THEN 'Indica Aí - Agents'
         WHEN mkt_origin = 'Indica Aí - General Sale' THEN 'Indica Aí - General'
-        WHEN mkt_origin in ('CR', 'Autonomous Agent') THEN 'CIQ'
+        WHEN mkt_origin IN ('CR', 'Autonomous Agent', 'Autonomuos Agent') THEN 'CIQ'
     ELSE mkt_origin
     END AS mkt_channel,
   mkt_medium,
