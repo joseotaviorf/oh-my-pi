@@ -144,12 +144,12 @@ SELECT
     LOWER(hist.campaign) AS campaign_name_l,
     LOWER(gi.account_name) AS account_name_l,
     hist.campaign AS utm_campaign,
-    NULL AS utm_term,
-    NULL AS utm_content,
+    CAST(NULL AS STRING) AS utm_term,
+    CAST(NULL AS STRING) AS utm_content,
     hist.cost AS desktop_cost,
-    NULL AS mobile_cost,
-    NULL AS other_cost,
-    NULL AS total_cost,
+    CAST(NULL AS DOUBLE) AS mobile_cost,
+    CAST(NULL AS DOUBLE) AS other_cost,
+    CAST(NULL AS DOUBLE) AS total_cost,
     hist.dt_cost
 FROM
     formatted_national_affiliate_historical_costs hist
