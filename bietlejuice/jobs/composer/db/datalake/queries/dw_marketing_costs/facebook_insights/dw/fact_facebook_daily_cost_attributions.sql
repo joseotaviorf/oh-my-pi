@@ -18,11 +18,8 @@ WITH fb_grouped_records AS (
         datalake_marketing_costs.facebook_insights AS fi
     JOIN
         dw_marketing_costs_staging.dim_facebook_ad AS stg_dim
-            ON fi.ad_name = stg_dim.ad_name
-            AND fi.adset_name = stg_dim.adset_name
-            AND fi.campaign_name = stg_dim.campaign_name
-            AND fi.acc = stg_dim.account_name
-    WHERE 
+            ON fi.sk_ad = stg_dim.sk_ad
+    WHERE
         fi.year = {year}
         AND fi.month = {month}
         AND fi.day = {day}
