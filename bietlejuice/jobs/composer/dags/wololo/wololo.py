@@ -120,10 +120,7 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 
 create_cluster_task >> wololo_to_datalake_raw_task
 wololo_to_datalake_raw_task.set_downstream(
-    [
-        sync_metastore_tables_task,
-        create_raw_external_tables_task,
-        list(clean_sub_dags.values()),
-    ]
+    [sync_metastore_tables_task, create_raw_external_tables_task]
 )
+wololo_to_datalake_raw_task >> list(clean_sub_dags.values())
 terminate_cluster_task.set_upstream(list(clean_sub_dags.values()))
