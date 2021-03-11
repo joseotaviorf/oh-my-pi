@@ -42,7 +42,7 @@ class IncrementalDWSubDAG(DWStagingSubDAG):
             task_id=f"load-{slugged_table_name}-into-dw-{self.dw_schema}-staging",
             json={
                 "spark_python_task": {
-                    "python_file": f"{self.spark_job_path}/load_incremental_table_to_dw_staging_schema.py",
+                    "python_file": f"{self.spark_job_path}load_incremental_table_to_dw_staging_schema.py",
                     "parameters": [
                         self.env,
                         self.dw_bucket,
@@ -63,7 +63,7 @@ class IncrementalDWSubDAG(DWStagingSubDAG):
             task_id=f"load-{slugged_table_name}-into-dw-{self.dw_schema}",
             json={
                 "spark_python_task": {
-                    "python_file": f"{self.spark_job_path}/load_incremental_table_to_dw_final_schema.py",
+                    "python_file": f"{self.spark_job_path}load_incremental_table_to_dw_final_schema.py",
                     "parameters": [
                         self.env,
                         self.dw_bucket,
@@ -82,7 +82,7 @@ class IncrementalDWSubDAG(DWStagingSubDAG):
             task_id=f"load-{slugged_table_name}-into-redshift",
             json={
                 "spark_python_task": {
-                    "python_file": f"{BASE_SPARK_JOBS_PATH}/load_table_to_redshift.py",
+                    "python_file": f"{BASE_SPARK_JOBS_PATH}load_table_to_redshift.py",
                     "parameters": [
                         self.env,
                         spectrum_iam_role,
