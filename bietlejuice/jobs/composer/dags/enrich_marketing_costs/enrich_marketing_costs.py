@@ -20,7 +20,9 @@ BLOCK_LIST = ["criteo_campaigns"]
 MARKETING_HUB_MEDIAS = ["google"]
 SOURCE = "marketing_hub"
 TARGET = "marketing_costs"
-DAG_ID = f"bietlejuice.enrich_{TARGET}"
+DAG_NAME = f"enrich_{TARGET}"
+DAG_ID = f"bietlejuice.{DAG_NAME}"
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 ENV = Variable.get("environment")
 
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
@@ -72,6 +74,9 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=None,
+    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
+        chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
+    ),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
