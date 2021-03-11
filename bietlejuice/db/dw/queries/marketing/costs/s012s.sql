@@ -12,3 +12,4 @@ FROM
 	JOIN dim_region dr
 		ON dd.date BETWEEN '2010-01-01' AND CURRENT_DATE
 		AND dr.city_group IN ('RMSP','Rio de Janeiro')
+GROUP BY 1,2,3
