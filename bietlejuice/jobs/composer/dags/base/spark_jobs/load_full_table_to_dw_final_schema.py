@@ -7,7 +7,7 @@ from bietlejuice.jobs.composer.base.db import DWMetastoreService
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.pipeline import FullTableLoaderPipeline
 
-JOB_NAME = "load_table_to_dw_final_schema"
+JOB_NAME = "load_full_table_to_dw_final_schema"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)

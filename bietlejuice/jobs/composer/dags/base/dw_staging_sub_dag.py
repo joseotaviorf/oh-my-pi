@@ -62,7 +62,7 @@ class DWStagingSubDAG(BaseSubDAG):
             task_id=f"load-{slugged_table_name}-into-dw-{self.dw_schema}-staging",
             json={
                 "spark_python_task": {
-                    "python_file": f"{self.spark_job_path}/load_table_to_dw_staging_schema.py",
+                    "python_file": f"{self.spark_job_path}/load_full_table_to_dw_staging_schema.py",
                     "parameters": [
                         self.env,
                         self.dw_bucket,

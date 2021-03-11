@@ -42,7 +42,7 @@ class IncrementalDWSubDAG(DWStagingSubDAG):
             task_id=f"load-{slugged_table_name}-into-dw-{self.dw_schema}-staging",
             json={
                 "spark_python_task": {
-                    "python_file": f"{self.spark_job_path}/load_table_to_dw_staging_schema.py",
+                    "python_file": f"{self.spark_job_path}/load_incremental_table_to_dw_staging_schema.py",
                     "parameters": [
                         self.env,
                         self.dw_bucket,
@@ -51,7 +51,6 @@ class IncrementalDWSubDAG(DWStagingSubDAG):
                         table_name,
                         str(partitions),
                         "{{ ds }}",
-                        "True",
                         json.dumps(extra_query_template_params),
                         str(self.spark_params),
                     ],
@@ -64,7 +63,7 @@ class IncrementalDWSubDAG(DWStagingSubDAG):
             task_id=f"load-{slugged_table_name}-into-dw-{self.dw_schema}",
             json={
                 "spark_python_task": {
-                    "python_file": f"{self.spark_job_path}/load_table_to_dw_final_schema.py",
+                    "python_file": f"{self.spark_job_path}/load_incremental_table_to_dw_final_schema.py",
                     "parameters": [
                         self.env,
                         self.dw_bucket,
@@ -72,7 +71,6 @@ class IncrementalDWSubDAG(DWStagingSubDAG):
                         table_name,
                         str(partitions),
                         "{{ ds }}",
-                        "True",
                         json.dumps(dw_query_filters),
                     ],
                 }
