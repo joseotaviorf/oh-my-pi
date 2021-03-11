@@ -20,6 +20,7 @@ ACCOUNTS = Variable.get("FACEBOOK_ACCOUNTS")
 SOURCE = "marketing_costs"
 MEDIA = "facebook_insights"
 DAG_ID = f"bietlejuice.{MEDIA}"
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2019, 6, 1, 0, 0, 0, tzinfo=local_tz)
 MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
@@ -55,6 +56,7 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    doc_md=BaseDAG.get_dag_doc(DAG_ID).format(chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID),
 )
 
 
