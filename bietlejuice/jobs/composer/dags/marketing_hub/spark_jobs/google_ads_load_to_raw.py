@@ -1,6 +1,5 @@
 import boto3
 import logging
-from multiprocessing.dummy import Pool as ThreadPool
 from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
@@ -13,6 +12,7 @@ from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 from bietlejuice.jobs.composer.services import S3Service
 from bietlejuice.jobs.composer.builders import GoogleAdsRawBuilder
+from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 
 
 JOB_NAME = "google_ads_load_to_raw"
@@ -22,104 +22,32 @@ MEDIA = "google_ads"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-
-def load_file(s3_source_file_path):
-
-    try:
-        report_type, enriched_csv_file = enrich_csv(s3_source_file_path)
-
-        if bool(enriched_csv_file):
-            (
-                s3_target_database_location,
-                s3_target_table_name,
-            ) = google_ads_raw_builder.build_target_file_path(
-                enriched_csv_file, s3_file_path_target, report_type
-            )
-
-            load_df(
-                enriched_csv_file, s3_target_database_location, s3_target_table_name
-            )
-
-            update_metastore(enriched_csv_file, report_type, partition_cols)
-
-    except Exception as e:
-        logger.info(
-            f"m={JOB_NAME}, path={s3_source_file_path} error={e}"
-            "msg=no data for this acc on this dt!"
-        )
-
-
-def enrich_csv(s3_source_file_path):
-    report_type = google_ads_raw_builder.build_report_type(s3_source_file_path)
-    enriched_csv_file = google_ads_raw_builder.build_enriched_csv(
-        s3_source_file_path, report_type
-    )
-    return (report_type, enriched_csv_file)
-
-
-def load_df(df, s3_target_database_location, s3_target_table_name):
-    format_options = SparkTableStorageFormat.DEFAULT_RAW
-    s3_loader.load_df(
-        df=df,
-        s3_path=s3_target_database_location + s3_target_table_name,
-        format_options=format_options,
-        partitions=None,
-        write_mode="append",
-    )
-
-
-def update_metastore(df, report_type, partition_cols):
-    format_options = SparkTableStorageFormat.DEFAULT_RAW
-    spark_metastore_loader.update_metastore(
-        df=df,
-        database_name=metastore_database_name,
-        table_name=report_type,
-        format_options=format_options,
-        database_location=metastore_database_location,
-        partitions=partition_cols,
-        force_recreate=False,
-    )
-    spark_metastore_service.create_new_partitions_from_df(
-        database_name=metastore_database_name,
-        table_name=report_type,
-        df=df,
-        partition_cols=partition_cols,
-        parallelism=8,
-    )
-    spark_metastore_service.refresh_table(metastore_database_name, report_type)
-
-
-def load_files_parallel(s3_source_file_paths):
-    pool = ThreadPool(32)
-    pool.map(load_file, s3_source_file_paths)
-    pool.close()
-    pool.join()
-    return
-
+REPORT_TYPES = {
+    "AD_PERFORMANCE_REPORT": "ads_performance_report",
+    "CAMPAIGN_PERFORMANCE_REPORT": "campaigns_performance_report",
+    "KEYWORDS_PERFORMANCE_REPORT": "keywords_performance_report",
+    "VIDEO_PERFORMANCE_REPORT": "videos_performance_report",
+}
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
 
-    parser.add_argument(
-        "source_path", type=str, help="source path where data will be taken from"
-    )
-    parser.add_argument(
-        "target_path", type=str, help="target path where data will be put"
-    )
-    parser.add_argument("datalake_bucket", type=str, help="needed to help get db info")
+    parser.add_argument("source_bucket", type=str, help="source bucket")
+    parser.add_argument("datalake_bucket", type=str, help="target bucket")
     parser.add_argument("env")
     parser.add_argument("execution_date")
 
     args = parser.parse_args()
 
-    s3_file_path_source = args.source_path
-    s3_file_path_target = args.target_path
+    source_bucket = args.source_bucket
     datalake_bucket = args.datalake_bucket
     env = args.env
     execution_date = args.execution_date
 
     logger.info(
-        f"m={JOB_NAME}, target_path={s3_file_path_target}, source_path={s3_file_path_source}"
+        f"m={JOB_NAME}, source_bucket={source_bucket}, "
+        f"datalake_bucket={datalake_bucket}, "
+        f"execution_date={execution_date}"
         "msg=print args spark jobs params"
     )
 
@@ -131,15 +59,38 @@ if __name__ == "__main__":
     s3_loader = S3Loader()
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
-    google_ads_raw_builder = GoogleAdsRawBuilder(
-        s3_consumer, s3_service, execution_date
-    )
-    s3_source_file_paths = google_ads_raw_builder.build_file_paths(s3_file_path_source)
+    builder = GoogleAdsRawBuilder(execution_date, source_bucket)
 
     db_info = DatalakeMetastoreService.get_db_info(env, SOURCE, datalake_bucket)
     metastore_database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
     metastore_database_location = f"{database_location}{MEDIA}/"
     partition_cols = ["acc", "dt"]
+    format_options = SparkTableStorageFormat.get_storage(LayerEnum.RAW.value)
 
-    load_files_parallel(s3_source_file_paths)
+    for report_raw, report in REPORT_TYPES.items():
+        df = builder.get_report_dataframe(report_raw)
+
+        s3_loader.load_df(
+            df=df,
+            format_options=format_options,
+            s3_path=metastore_database_location + report,
+            partitions=partition_cols,
+        )
+
+        spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+        spark_metastore_loader.update_metastore(
+            df=df,
+            database_name=metastore_database_name,
+            table_name=report,
+            format_options=format_options,
+            database_location=metastore_database_location,
+            partitions=partition_cols,
+        )
+
+        spark_metastore_service.create_new_partitions_from_df(
+            df=df,
+            database_name=metastore_database_name,
+            table_name=report,
+            partition_cols=partition_cols,
+        )
