@@ -41,15 +41,6 @@ LEFT JOIN
     dim_region dr
         ON dr.sk_region = lf.sk_region
 ),
-payment_method_adjusted AS (
--- data from datalake_firestore_prod.sale_offer
-SELECT
-    so.id,
-	so.id_house,
-	so.current_payment_method AS form_of_payment
-FROM
-    datalake_firestore_prod.sale_offer so
-),
 monday_adjusted AS (
 -- data from datalake_firestore_prod.monday
 SELECT
@@ -57,6 +48,12 @@ SELECT
 	mo.id_buyer||'_'||mo.id_house AS sale_flow,
 	mo.id_house,
 	mo.id_buyer AS id_user,
+	CASE
+	    WHEN mo.payment_method IN ('1', '7') THEN 'Financiado'
+	    WHEN mo.payment_method = '2' THEN 'À Vista'
+	    WHEN mo.payment_method = '3' THEN 'À Vista + FGTS'
+	    WHEN mo.payment_method = '4' THEN 'Financiado + FGTS'
+	END AS form_of_payment,
 	mo.dt_submitted AS dt_offer_sent,
 	mo.dt_deal_qualified AS dt_deal_qualified,
 	mo.dt_accepted AS dt_offer_accepted,
@@ -178,6 +175,7 @@ sale_demand_events AS (
 SELECT
 	COALESCE(offers.id_user, sc.sk_buyer, tta.tenant_id::BIGINT) AS id_buyer,
 	COALESCE(offers.id_house, sc.sk_house, tta.house_id::BIGINT, sc.sk_house) AS id_house,
+	offers.form_of_payment,
 	offers.dt_deal_qualified,
 	COALESCE(offers.id_offer,sc.sk_offer) AS id_offer,
 	offers.dt_diligence_started_legaut,
@@ -215,6 +213,7 @@ SELECT
     COALESCE(sde.id_buyer, db.id_visitor) AS id_buyer,
 	COALESCE(sde.id_house, db.id_property) AS id_house,
 	sde.id_offer,
+	sde.form_of_payment,
 	sde.os_date AS dt_offer_sent,
 	sde.dt_deal_qualified,
 	sde.oa_date AS dt_offer_accepted,
@@ -255,7 +254,7 @@ SELECT
 	    WHEN COALESCE(sdr.city_group,sdc.city_group) NOT IN ('RMSP', 'Rio de Janeiro') THEN 'Out of coverage area'
 	    WHEN COALESCE(sdr.city_group,sdc.city_group) IN ('RMSP', 'Rio de Janeiro') THEN COALESCE(sdr.city_group,sdc.city_group)
 	END AS city_group,
-	pma.form_of_payment,
+	sdc.form_of_payment,
 	sdc.dt_offer_sent,
 	sdc.dt_deal_qualified,
 	sdc.dt_offer_accepted,
@@ -294,9 +293,6 @@ LEFT JOIN
 LEFT JOIN
     sale_demand_region sdr
         ON sdr.id_house::VARCHAR = sdc.id_house
-LEFT JOIN
-	payment_method_adjusted AS pma
-		ON pma.id = sdc.id_offer
 ),
 lead_ AS (
 SELECT

@@ -41,15 +41,6 @@ LEFT JOIN
     dim_region dr
         ON dr.sk_region = lf.sk_region
 ),
-payment_method_adjusted AS (
--- data from datalake_firestore_prod.sale_offer
-SELECT
-    so.id,
-	so.id_house,
-	so.current_payment_method AS form_of_payment
-FROM
-    datalake_firestore_prod.sale_offer so
-),
 monday_adjusted AS (
 -- data from datalake_firestore_prod.monday
 SELECT
@@ -57,6 +48,12 @@ SELECT
 	mo.id_buyer||'_'||mo.id_house AS sale_flow,
 	mo.id_house,
 	mo.id_buyer AS id_user,
+	CASE
+	    WHEN mo.payment_method IN ('1', '7') THEN 'Financiado'
+	    WHEN mo.payment_method = '2' THEN 'À Vista'
+	    WHEN mo.payment_method = '3' THEN 'À Vista + FGTS'
+	    WHEN mo.payment_method = '4' THEN 'Financiado + FGTS'
+	END AS form_of_payment,
 	mo.dt_submitted AS dt_offer_sent,
 	mo.dt_deal_qualified AS dt_deal_qualified,
 	mo.dt_accepted AS dt_offer_accepted,
@@ -165,6 +162,7 @@ SELECT
 	COALESCE(offers.id_user, sc.sk_buyer) AS id_buyer,
 	COALESCE(offers.id_house, sc.sk_house) AS id_house,
 	COALESCE(offers.id_offer,sc.sk_offer) AS id_offer,
+	offers.form_of_payment,
 	offers.dt_offer_sent,
 	offers.dt_deal_qualified,
 	offers.dt_offer_accepted,
@@ -196,6 +194,7 @@ sale_demand_events_complete AS (
 SELECT
     COALESCE(sde.id_buyer, db.id_visitor) AS id_buyer,
 	COALESCE(sde.id_house, db.id_property) AS id_house,
+	sde.form_of_payment,
 	sde.os_date AS dt_offer_sent,
 	sde.dt_deal_qualified,
 	sde.oa_date AS dt_offer_accepted,
@@ -231,11 +230,11 @@ SELECT
     sdc.sk_booking,
 	sdc.id_buyer,
 	sdc.id_house,
-	CASE 
+	CASE
 	    WHEN COALESCE(sdr.city_group,sdc.city_group) NOT IN ('RMSP', 'Rio de Janeiro') THEN 'Out of coverage area'
 	    WHEN COALESCE(sdr.city_group,sdc.city_group) IN ('RMSP', 'Rio de Janeiro') THEN COALESCE(sdr.city_group,sdc.city_group)
 	END AS city_group,
-	pma.form_of_payment,
+	sdc.form_of_payment,
 	sdc.dt_created,
 	sdc.dt_completed,
 	sdc.dt_offer_sent,
@@ -268,9 +267,9 @@ LEFT JOIN
 LEFT JOIN
     sale_demand_region sdr
         ON sdr.id_house::VARCHAR = sdc.id_house
-LEFT JOIN
-    payment_method_adjusted pma
-        ON pma.id = sdc.id_offer
+-- LEFT JOIN
+--     payment_method_adjusted pma
+--         ON pma.id = sdc.id_offer
 ),
 p2fc AS (
 SELECT
@@ -297,8 +296,11 @@ SELECT
     NULL::BIGINT AS q2o,
     NULL::BIGINT AS o2fl,
     NULL::BIGINT AS vb2vc,
-    NULL::BIGINT AS vc2os,
     NULL::BIGINT AS vb2os,
+    NULL::BIGINT AS vb2oa,
+    NULL::BIGINT AS vb2ccv,
+    NULL::BIGINT AS vc2os,
+    NULL::BIGINT AS vc2oa,
     NULL::BIGINT AS os2oa,
     NULL::BIGINT AS os2dq,
     NULL::BIGINT AS dq2oa,
@@ -348,8 +350,11 @@ SELECT
     NULL::BIGINT AS q2o,
     NULL::BIGINT AS o2fl,
     NULL::BIGINT AS vb2vc,
-    NULL::BIGINT AS vc2os,
     NULL::BIGINT AS vb2os,
+    NULL::BIGINT AS vb2oa,
+    NULL::BIGINT AS vb2ccv,
+    NULL::BIGINT AS vc2os,
+    NULL::BIGINT AS vc2oa,
     NULL::BIGINT AS os2oa,
     NULL::BIGINT AS os2dq,
     NULL::BIGINT AS dq2oa,
@@ -399,8 +404,11 @@ SELECT
    NULL::BIGINT AS q2o,
    NULL::BIGINT AS o2fl,
    NULL::BIGINT AS vb2vc,
-   NULL::BIGINT AS vc2os,
    NULL::BIGINT AS vb2os,
+   NULL::BIGINT AS vb2oa,
+   NULL::BIGINT AS vb2ccv,
+   NULL::BIGINT AS vc2os,
+   NULL::BIGINT AS vc2oa,
    NULL::BIGINT AS os2oa,
    NULL::BIGINT AS os2dq,
    NULL::BIGINT AS dq2oa,
@@ -450,8 +458,11 @@ SELECT
    COUNT(slf.sk_qualified_date) AS q2o,
    NULL::BIGINT AS o2fl,
    NULL::BIGINT AS vb2vc,
-   NULL::BIGINT AS vc2os,
    NULL::BIGINT AS vb2os,
+   NULL::BIGINT AS vb2oa,
+   NULL::BIGINT AS vb2ccv,
+   NULL::BIGINT AS vc2os,
+   NULL::BIGINT AS vc2oa,
    NULL::BIGINT AS os2oa,
    NULL::BIGINT AS os2dq,
    NULL::BIGINT AS dq2oa,
@@ -501,8 +512,11 @@ SELECT
    NULL::BIGINT AS q2o,
    COUNT(slf.sk_opportunity_date) AS o2fl,
    NULL::BIGINT AS vb2vc,
-   NULL::BIGINT AS vc2os,
    NULL::BIGINT AS vb2os,
+   NULL::BIGINT AS vb2oa,
+   NULL::BIGINT AS vb2ccv,
+   NULL::BIGINT AS vc2os,
+   NULL::BIGINT AS vc2oa,
    NULL::BIGINT AS os2oa,
    NULL::BIGINT AS os2dq,
    NULL::BIGINT AS dq2oa,
@@ -552,8 +566,11 @@ SELECT
    NULL::BIGINT AS q2o,
    NULL::BIGINT AS o2fl,
    COUNT(DISTINCT sk_booking) AS vb2vc,
-   NULL::BIGINT AS vc2os,
    NULL::BIGINT AS vb2os,
+   NULL::BIGINT AS vb2oa,
+   NULL::BIGINT AS vb2ccv,
+   NULL::BIGINT AS vc2os,
+   NULL::BIGINT AS vc2oa,
    NULL::BIGINT AS os2oa,
    NULL::BIGINT AS os2dq,
    NULL::BIGINT AS dq2oa,
@@ -575,57 +592,6 @@ FROM
     sale_demand_classification
 WHERE
     date(dt_created) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13
-),
-vc2os AS (
-SELECT
-   REPLACE(DATE(dt_completed),'-','')::INTEGER AS base_date,
-   city_group,
-   NULL AS lead_context,
-   NULL AS mkt_campaign_context,
-   NULL AS mkt_origin,
-   NULL AS mkt_channel,
-   NULL AS mkt_type,
-   NULL AS sales_company,
-   first_touchpoint AS first_origin_demand,
-   higher_intent_before_offer AS origin_before_offer,
-   higher_intent_after_offer AS origin_after_offer,
-   NULL AS form_of_payment,
-   CASE
-       WHEN datediff('week',DATE_TRUNC('week',DATE(dt_completed)),DATE_TRUNC('week',DATE(dt_offer_sent))) < 20
-	        THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(dt_completed)),DATE_TRUNC('week',DATE(dt_offer_sent)))
-       WHEN datediff('week',DATE_TRUNC('week',DATE(dt_completed)),DATE_TRUNC('week',DATE(dt_offer_sent))) >= 20
-	        THEN 'W20+'
-   END AS weeks_conversion,
-   NULL::BIGINT AS p2fc,
-   NULL::BIGINT AS fc2q,
-   NULL::BIGINT AS p2q,
-   NULL::BIGINT AS q2o,
-   NULL::BIGINT AS o2fl,
-   NULL::BIGINT AS vb2vc,
-   COUNT(DISTINCT sk_booking) AS vc2os,
-   NULL::BIGINT AS vb2os,
-   NULL::BIGINT AS os2oa,
-   NULL::BIGINT AS os2dq,
-   NULL::BIGINT AS dq2oa,
-   NULL::BIGINT AS oa2ccv,
-   NULL::BIGINT AS ccv2lts,
-   NULL::BIGINT AS lts2lte,
-   NULL::BIGINT AS lte2lrs,
-   NULL::BIGINT AS lrs2lre,
-   NULL::BIGINT AS lre2de,
-   NULL::BIGINT AS ccv2credstart,
-   NULL::BIGINT AS credstart2credsent,
-   NULL::BIGINT AS credsent2finstart,
-   NULL::BIGINT AS finstart2finended,
-   NULL::BIGINT AS ccv2mi,
-   NULL::BIGINT AS mi2ma,
-   NULL::BIGINT AS ccv2ma,
-   NULL::BIGINT AS ccv2pc
-FROM
-    sale_demand_classification
-WHERE
-    date(dt_completed) > 0
 GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13
 ),
 vb2os AS (
@@ -654,8 +620,11 @@ SELECT
     NULL::BIGINT AS q2o,
     NULL::BIGINT AS o2fl,
     NULL::BIGINT AS vb2vc,
-    NULL::BIGINT AS vc2os,
     COUNT(DISTINCT sk_booking) AS vb2os,
+    NULL::BIGINT AS vb2oa,
+    NULL::BIGINT AS vb2ccv,
+    NULL::BIGINT AS vc2os,
+    NULL::BIGINT AS vc2oa,
     NULL::BIGINT AS os2oa,
     NULL::BIGINT AS os2dq,
     NULL::BIGINT AS dq2oa,
@@ -677,6 +646,222 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_created) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13
+),
+vb2oa AS (
+SELECT
+    REPLACE(DATE(dt_created),'-','')::INTEGER AS base_date,
+    city_group,
+    NULL AS lead_context,
+    NULL AS mkt_campaign_context,
+    NULL AS mkt_origin,
+    NULL AS mkt_channel,
+    NULL AS mkt_type,
+    NULL AS sales_company,
+    first_touchpoint AS first_origin_demand,
+    higher_intent_before_offer AS origin_before_offer,
+    higher_intent_after_offer AS origin_after_offer,
+    NULL AS form_of_payment,
+    CASE
+        WHEN datediff('week',DATE_TRUNC('week',DATE(dt_created)),DATE_TRUNC('week',DATE(dt_offer_accepted))) < 20
+	         THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(dt_created)),DATE_TRUNC('week',DATE(dt_offer_accepted)))
+	WHEN datediff('week',DATE_TRUNC('week',DATE(dt_created)),DATE_TRUNC('week',DATE(dt_offer_accepted))) >= 20
+	         THEN 'W20+'
+    END AS weeks_conversion,
+    NULL::BIGINT AS p2fc,
+    NULL::BIGINT AS fc2q,
+    NULL::BIGINT AS p2q,
+    NULL::BIGINT AS q2o,
+    NULL::BIGINT AS o2fl,
+    NULL::BIGINT AS vb2vc,
+    NULL::BIGINT AS vb2os,
+    COUNT(DISTINCT sk_booking) AS vb2oa,
+    NULL::BIGINT AS vb2ccv,
+    NULL::BIGINT AS vc2os,
+    NULL::BIGINT AS vc2oa,
+    NULL::BIGINT AS os2oa,
+    NULL::BIGINT AS os2dq,
+    NULL::BIGINT AS dq2oa,
+    NULL::BIGINT AS oa2ccv,
+    NULL::BIGINT AS ccv2lts,
+    NULL::BIGINT AS lts2lte,
+    NULL::BIGINT AS lte2lrs,
+    NULL::BIGINT AS lrs2lre,
+    NULL::BIGINT AS lre2de,
+    NULL::BIGINT AS ccv2credstart,
+    NULL::BIGINT AS credstart2credsent,
+    NULL::BIGINT AS credsent2finstart,
+    NULL::BIGINT AS finstart2finended,
+    NULL::BIGINT AS ccv2mi,
+    NULL::BIGINT AS mi2ma,
+    NULL::BIGINT AS ccv2ma,
+    NULL::BIGINT AS ccv2pc
+FROM
+    sale_demand_classification
+WHERE
+    DATE(dt_created) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13
+),
+vb2ccv AS (
+SELECT
+    REPLACE(DATE(dt_created),'-','')::INTEGER AS base_date,
+    city_group,
+    NULL AS lead_context,
+    NULL AS mkt_campaign_context,
+    NULL AS mkt_origin,
+    NULL AS mkt_channel,
+    NULL AS mkt_type,
+    NULL AS sales_company,
+    first_touchpoint AS first_origin_demand,
+    higher_intent_before_offer AS origin_before_offer,
+    higher_intent_after_offer AS origin_after_offer,
+    NULL AS form_of_payment,
+    CASE
+        WHEN datediff('week',DATE_TRUNC('week',DATE(dt_created)),DATE_TRUNC('week',DATE(dt_ccv_signed))) < 20
+	         THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(dt_created)),DATE_TRUNC('week',DATE(dt_ccv_signed)))
+	WHEN datediff('week',DATE_TRUNC('week',DATE(dt_created)),DATE_TRUNC('week',DATE(dt_ccv_signed))) >= 20
+	         THEN 'W20+'
+    END AS weeks_conversion,
+    NULL::BIGINT AS p2fc,
+    NULL::BIGINT AS fc2q,
+    NULL::BIGINT AS p2q,
+    NULL::BIGINT AS q2o,
+    NULL::BIGINT AS o2fl,
+    NULL::BIGINT AS vb2vc,
+    NULL::BIGINT AS vb2os,
+    NULL::BIGINT AS vb2oa,
+    COUNT(DISTINCT sk_booking) AS vb2ccv,
+    NULL::BIGINT AS vc2os,
+    NULL::BIGINT AS vc2oa,
+    NULL::BIGINT AS os2oa,
+    NULL::BIGINT AS os2dq,
+    NULL::BIGINT AS dq2oa,
+    NULL::BIGINT AS oa2ccv,
+    NULL::BIGINT AS ccv2lts,
+    NULL::BIGINT AS lts2lte,
+    NULL::BIGINT AS lte2lrs,
+    NULL::BIGINT AS lrs2lre,
+    NULL::BIGINT AS lre2de,
+    NULL::BIGINT AS ccv2credstart,
+    NULL::BIGINT AS credstart2credsent,
+    NULL::BIGINT AS credsent2finstart,
+    NULL::BIGINT AS finstart2finended,
+    NULL::BIGINT AS ccv2mi,
+    NULL::BIGINT AS mi2ma,
+    NULL::BIGINT AS ccv2ma,
+    NULL::BIGINT AS ccv2pc
+FROM
+    sale_demand_classification
+WHERE
+    DATE(dt_created) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13
+),
+vc2os AS (
+SELECT
+   REPLACE(DATE(dt_completed),'-','')::INTEGER AS base_date,
+   city_group,
+   NULL AS lead_context,
+   NULL AS mkt_campaign_context,
+   NULL AS mkt_origin,
+   NULL AS mkt_channel,
+   NULL AS mkt_type,
+   NULL AS sales_company,
+   first_touchpoint AS first_origin_demand,
+   higher_intent_before_offer AS origin_before_offer,
+   higher_intent_after_offer AS origin_after_offer,
+   NULL AS form_of_payment,
+   CASE
+       WHEN datediff('week',DATE_TRUNC('week',DATE(dt_completed)),DATE_TRUNC('week',DATE(dt_offer_sent))) < 20
+	        THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(dt_completed)),DATE_TRUNC('week',DATE(dt_offer_sent)))
+       WHEN datediff('week',DATE_TRUNC('week',DATE(dt_completed)),DATE_TRUNC('week',DATE(dt_offer_sent))) >= 20
+	        THEN 'W20+'
+   END AS weeks_conversion,
+   NULL::BIGINT AS p2fc,
+   NULL::BIGINT AS fc2q,
+   NULL::BIGINT AS p2q,
+   NULL::BIGINT AS q2o,
+   NULL::BIGINT AS o2fl,
+   NULL::BIGINT AS vb2vc,
+   NULL::BIGINT AS vb2os,
+   NULL::BIGINT AS vb2oa,
+   NULL::BIGINT AS vb2ccv,
+   COUNT(DISTINCT sk_booking) AS vc2os,
+   NULL::BIGINT AS vc2oa,
+   NULL::BIGINT AS os2oa,
+   NULL::BIGINT AS os2dq,
+   NULL::BIGINT AS dq2oa,
+   NULL::BIGINT AS oa2ccv,
+   NULL::BIGINT AS ccv2lts,
+   NULL::BIGINT AS lts2lte,
+   NULL::BIGINT AS lte2lrs,
+   NULL::BIGINT AS lrs2lre,
+   NULL::BIGINT AS lre2de,
+   NULL::BIGINT AS ccv2credstart,
+   NULL::BIGINT AS credstart2credsent,
+   NULL::BIGINT AS credsent2finstart,
+   NULL::BIGINT AS finstart2finended,
+   NULL::BIGINT AS ccv2mi,
+   NULL::BIGINT AS mi2ma,
+   NULL::BIGINT AS ccv2ma,
+   NULL::BIGINT AS ccv2pc
+FROM
+    sale_demand_classification
+WHERE
+    date(dt_completed) > 0
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13
+),
+vc2oa AS (
+SELECT
+   REPLACE(DATE(dt_completed),'-','')::INTEGER AS base_date,
+   city_group,
+   NULL AS lead_context,
+   NULL AS mkt_campaign_context,
+   NULL AS mkt_origin,
+   NULL AS mkt_channel,
+   NULL AS mkt_type,
+   NULL AS sales_company,
+   first_touchpoint AS first_origin_demand,
+   higher_intent_before_offer AS origin_before_offer,
+   higher_intent_after_offer AS origin_after_offer,
+   NULL AS form_of_payment,
+   CASE
+       WHEN datediff('week',DATE_TRUNC('week',DATE(dt_completed)),DATE_TRUNC('week',DATE(dt_offer_accepted))) < 20
+	        THEN 'W'||datediff('week',DATE_TRUNC('week',DATE(dt_completed)),DATE_TRUNC('week',DATE(dt_offer_accepted)))
+       WHEN datediff('week',DATE_TRUNC('week',DATE(dt_completed)),DATE_TRUNC('week',DATE(dt_offer_accepted))) >= 20
+	        THEN 'W20+'
+   END AS weeks_conversion,
+   NULL::BIGINT AS p2fc,
+   NULL::BIGINT AS fc2q,
+   NULL::BIGINT AS p2q,
+   NULL::BIGINT AS q2o,
+   NULL::BIGINT AS o2fl,
+   NULL::BIGINT AS vb2vc,
+   NULL::BIGINT AS vb2os,
+   NULL::BIGINT AS vb2oa,
+   NULL::BIGINT AS vb2ccv,
+   NULL::BIGINT AS vc2os,
+   COUNT(DISTINCT sk_booking) AS vc2oa,
+   NULL::BIGINT AS os2oa,
+   NULL::BIGINT AS os2dq,
+   NULL::BIGINT AS dq2oa,
+   NULL::BIGINT AS oa2ccv,
+   NULL::BIGINT AS ccv2lts,
+   NULL::BIGINT AS lts2lte,
+   NULL::BIGINT AS lte2lrs,
+   NULL::BIGINT AS lrs2lre,
+   NULL::BIGINT AS lre2de,
+   NULL::BIGINT AS ccv2credstart,
+   NULL::BIGINT AS credstart2credsent,
+   NULL::BIGINT AS credsent2finstart,
+   NULL::BIGINT AS finstart2finended,
+   NULL::BIGINT AS ccv2mi,
+   NULL::BIGINT AS mi2ma,
+   NULL::BIGINT AS ccv2ma,
+   NULL::BIGINT AS ccv2pc
+FROM
+    sale_demand_classification
+WHERE
+    date(dt_completed) > 0
 GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13
 ),
 os2oa AS (
@@ -705,8 +890,11 @@ SELECT
     NULL::BIGINT AS q2o,
     NULL::BIGINT AS o2fl,
     NULL::BIGINT AS vb2vc,
-    NULL::BIGINT AS vc2os,
     NULL::BIGINT AS vb2os,
+    NULL::BIGINT AS vb2oa,
+    NULL::BIGINT AS vb2ccv,
+    NULL::BIGINT AS vc2os,
+    NULL::BIGINT AS vc2oa,
     COUNT(DISTINCT id_offer) AS os2oa,
     NULL::BIGINT AS os2dq,
     NULL::BIGINT AS dq2oa,
@@ -756,8 +944,11 @@ SELECT
     NULL::BIGINT AS q2o,
     NULL::BIGINT AS o2fl,
     NULL::BIGINT AS vb2vc,
-    NULL::BIGINT AS vc2os,
     NULL::BIGINT AS vb2os,
+    NULL::BIGINT AS vb2oa,
+    NULL::BIGINT AS vb2ccv,
+    NULL::BIGINT AS vc2os,
+    NULL::BIGINT AS vc2oa,
     NULL::BIGINT AS os2oa,
     COUNT(DISTINCT id_offer) AS os2dq,
     NULL::BIGINT AS dq2oa,
@@ -807,8 +998,11 @@ SELECT
     NULL::BIGINT AS q2o,
     NULL::BIGINT AS o2fl,
     NULL::BIGINT AS vb2vc,
-    NULL::BIGINT AS vc2os,
     NULL::BIGINT AS vb2os,
+    NULL::BIGINT AS vb2oa,
+    NULL::BIGINT AS vb2ccv,
+    NULL::BIGINT AS vc2os,
+    NULL::BIGINT AS vc2oa,
     NULL::BIGINT AS os2oa,
     NULL::BIGINT  AS os2dq,
     COUNT(DISTINCT id_offer)AS dq2oa,
@@ -858,8 +1052,11 @@ SELECT
     NULL::BIGINT AS q2o,
     NULL::BIGINT AS o2fl,
     NULL::BIGINT AS vb2vc,
-    NULL::BIGINT AS vc2os,
     NULL::BIGINT AS vb2os,
+    NULL::BIGINT AS vb2oa,
+    NULL::BIGINT AS vb2ccv,
+    NULL::BIGINT AS vc2os,
+    NULL::BIGINT AS vc2oa,
     NULL::BIGINT AS os2oa,
     NULL::BIGINT AS os2dq,
     NULL::BIGINT AS dq2oa,
@@ -909,8 +1106,11 @@ SELECT
     NULL::BIGINT AS q2o,
     NULL::BIGINT AS o2fl,
     NULL::BIGINT AS vb2vc,
-    NULL::BIGINT AS vc2os,
     NULL::BIGINT AS vb2os,
+    NULL::BIGINT AS vb2oa,
+    NULL::BIGINT AS vb2ccv,
+    NULL::BIGINT AS vc2os,
+    NULL::BIGINT AS vc2oa,
     NULL::BIGINT AS os2oa,
     NULL::BIGINT AS os2dq,
     NULL::BIGINT AS dq2oa,
@@ -960,8 +1160,11 @@ SELECT
     NULL::BIGINT AS q2o,
     NULL::BIGINT AS o2fl,
     NULL::BIGINT AS vb2vc,
-    NULL::BIGINT AS vc2os,
     NULL::BIGINT AS vb2os,
+    NULL::BIGINT AS vb2oa,
+    NULL::BIGINT AS vb2ccv,
+    NULL::BIGINT AS vc2os,
+    NULL::BIGINT AS vc2oa,
     NULL::BIGINT AS os2oa,
     NULL::BIGINT AS os2dq,
     NULL::BIGINT AS dq2oa,
@@ -1011,8 +1214,11 @@ SELECT
     NULL::BIGINT AS q2o,
     NULL::BIGINT AS o2fl,
     NULL::BIGINT AS vb2vc,
-    NULL::BIGINT AS vc2os,
     NULL::BIGINT AS vb2os,
+    NULL::BIGINT AS vb2oa,
+    NULL::BIGINT AS vb2ccv,
+    NULL::BIGINT AS vc2os,
+    NULL::BIGINT AS vc2oa,
     NULL::BIGINT AS os2oa,
     NULL::BIGINT AS os2dq,
     NULL::BIGINT AS dq2oa,
@@ -1062,8 +1268,11 @@ SELECT
     NULL::BIGINT AS q2o,
     NULL::BIGINT AS o2fl,
     NULL::BIGINT AS vb2vc,
-    NULL::BIGINT AS vc2os,
     NULL::BIGINT AS vb2os,
+    NULL::BIGINT AS vb2oa,
+    NULL::BIGINT AS vb2ccv,
+    NULL::BIGINT AS vc2os,
+    NULL::BIGINT AS vc2oa,
     NULL::BIGINT AS os2oa,
     NULL::BIGINT AS os2dq,
     NULL::BIGINT AS dq2oa,
@@ -1113,8 +1322,11 @@ SELECT
     NULL::BIGINT AS q2o,
     NULL::BIGINT AS o2fl,
     NULL::BIGINT AS vb2vc,
-    NULL::BIGINT AS vc2os,
     NULL::BIGINT AS vb2os,
+    NULL::BIGINT AS vb2oa,
+    NULL::BIGINT AS vb2ccv,
+    NULL::BIGINT AS vc2os,
+    NULL::BIGINT AS vc2oa,
     NULL::BIGINT AS os2oa,
     NULL::BIGINT AS os2dq,
     NULL::BIGINT AS dq2oa,
@@ -1164,9 +1376,12 @@ SELECT
 	NULL::BIGINT AS q2o,
 	NULL::BIGINT AS o2fl,
 	NULL::BIGINT AS vb2vc,
-	NULL::BIGINT AS vc2os,
-	NULL::BIGINT AS os2oa,
 	NULL::BIGINT AS vb2os,
+    NULL::BIGINT AS vb2oa,
+    NULL::BIGINT AS vb2ccv,
+    NULL::BIGINT AS vc2os,
+    NULL::BIGINT AS vc2oa,
+	NULL::BIGINT AS os2oa,
 	NULL::BIGINT AS os2dq,
 	NULL::BIGINT AS dq2oa,
 	NULL::BIGINT AS oa2ccv,
@@ -1215,9 +1430,12 @@ SELECT
     NULL::BIGINT AS q2o,
     NULL::BIGINT AS o2fl,
     NULL::BIGINT AS vb2vc,
-    NULL::BIGINT AS vc2os,
-    NULL::BIGINT AS os2oa,
     NULL::BIGINT AS vb2os,
+    NULL::BIGINT AS vb2oa,
+    NULL::BIGINT AS vb2ccv,
+    NULL::BIGINT AS vc2os,
+    NULL::BIGINT AS vc2oa,
+    NULL::BIGINT AS os2oa,
     NULL::BIGINT AS os2dq,
     NULL::BIGINT AS dq2oa,
     NULL::BIGINT AS oa2ccv,
@@ -1266,8 +1484,11 @@ SELECT
     NULL::BIGINT AS q2o,
     NULL::BIGINT AS o2fl,
     NULL::BIGINT AS vb2vc,
-    NULL::BIGINT AS vc2os,
     NULL::BIGINT AS vb2os,
+    NULL::BIGINT AS vb2oa,
+    NULL::BIGINT AS vb2ccv,
+    NULL::BIGINT AS vc2os,
+    NULL::BIGINT AS vc2oa,
     NULL::BIGINT AS os2oa,
     NULL::BIGINT AS os2dq,
     NULL::BIGINT AS dq2oa,
@@ -1317,8 +1538,11 @@ SELECT
     NULL::BIGINT AS q2o,
     NULL::BIGINT AS o2fl,
     NULL::BIGINT AS vb2vc,
-    NULL::BIGINT AS vc2os,
     NULL::BIGINT AS vb2os,
+    NULL::BIGINT AS vb2oa,
+    NULL::BIGINT AS vb2ccv,
+    NULL::BIGINT AS vc2os,
+    NULL::BIGINT AS vc2oa,
     NULL::BIGINT AS os2oa,
     NULL::BIGINT AS os2dq,
     NULL::BIGINT AS dq2oa,
@@ -1368,8 +1592,11 @@ SELECT
     NULL::BIGINT AS q2o,
     NULL::BIGINT AS o2fl,
     NULL::BIGINT AS vb2vc,
-    NULL::BIGINT AS vc2os,
     NULL::BIGINT AS vb2os,
+    NULL::BIGINT AS vb2oa,
+    NULL::BIGINT AS vb2ccv,
+    NULL::BIGINT AS vc2os,
+    NULL::BIGINT AS vc2oa,
     NULL::BIGINT AS os2oa,
     NULL::BIGINT AS os2dq,
     NULL::BIGINT AS dq2oa,
@@ -1419,8 +1646,11 @@ SELECT
     NULL::BIGINT AS q2o,
     NULL::BIGINT AS o2fl,
     NULL::BIGINT AS vb2vc,
-    NULL::BIGINT AS vc2os,
     NULL::BIGINT AS vb2os,
+    NULL::BIGINT AS vb2oa,
+    NULL::BIGINT AS vb2ccv,
+    NULL::BIGINT AS vc2os,
+    NULL::BIGINT AS vc2oa,
     NULL::BIGINT AS os2oa,
     NULL::BIGINT AS os2dq,
     NULL::BIGINT AS dq2oa,
@@ -1470,8 +1700,11 @@ SELECT
     NULL::BIGINT AS q2o,
     NULL::BIGINT AS o2fl,
     NULL::BIGINT AS vb2vc,
-    NULL::BIGINT AS vc2os,
     NULL::BIGINT AS vb2os,
+    NULL::BIGINT AS vb2oa,
+    NULL::BIGINT AS vb2ccv,
+    NULL::BIGINT AS vc2os,
+    NULL::BIGINT AS vc2oa,
     NULL::BIGINT AS os2oa,
     NULL::BIGINT AS os2dq,
     NULL::BIGINT AS dq2oa,
@@ -1520,8 +1753,11 @@ SELECT
     NULL::BIGINT AS q2o,
     NULL::BIGINT AS o2fl,
     NULL::BIGINT AS vb2vc,
-    NULL::BIGINT AS vc2os,
     NULL::BIGINT AS vb2os,
+    NULL::BIGINT AS vb2oa,
+    NULL::BIGINT AS vb2ccv,
+    NULL::BIGINT AS vc2os,
+    NULL::BIGINT AS vc2oa,
     NULL::BIGINT AS os2oa,
     NULL::BIGINT AS os2dq,
     NULL::BIGINT AS dq2oa,
@@ -1558,9 +1794,15 @@ SELECT * FROM p2fc
 	UNION ALL
 	SELECT * FROM vb2vc
 	UNION ALL
+	SELECT * FROM vb2os
+	UNION ALL
+	SELECT * FROM vb2oa
+	UNION ALL
+	SELECT * FROM vb2ccv
+	UNION ALL
 	SELECT * FROM vc2os
 	UNION ALL
-	SELECT * FROM vb2os
+	SELECT * FROM vc2oa
 	UNION ALL
 	SELECT * FROM os2oa
 	UNION ALL
@@ -1620,8 +1862,11 @@ SELECT
 	ua.q2o,
 	ua.o2fl,
 	ua.vb2vc,
-	ua.vc2os,
 	ua.vb2os,
+	ua.vb2oa,
+	ua.vb2ccv,
+	ua.vc2os,
+	ua.vc2oa,
 	ua.os2oa,
 	ua.os2dq,
 	ua.dq2oa,
@@ -1671,8 +1916,11 @@ SELECT
    	SUM(q2o) AS q2o,
 	SUM(o2fl) AS o2fl,
 	SUM(vb2vc) AS vb2vc,
-	SUM(vc2os) AS vc2os,
 	SUM(vb2os) AS vb2os,
+	SUM(vb2oa) AS vb2oa,
+	SUM(vb2ccv) AS vb2ccv,
+	SUM(vc2os) AS vc2os,
+	SUM(vc2oa) AS vc2oa,
 	SUM(os2oa) AS os2oa,
 	SUM(os2dq) AS os2dq,
 	SUM(dq2oa) AS dq2oa,
