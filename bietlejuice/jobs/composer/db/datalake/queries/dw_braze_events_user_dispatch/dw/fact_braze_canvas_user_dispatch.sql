@@ -77,7 +77,7 @@ SELECT
 	MAX(ts_push_opened) AS ts_push_last_opened,
 	year,
 	month,
-	day,
+	day
 FROM 
 	datalake_braze_dispatches_user.tenants_events
 WHERE
