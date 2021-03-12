@@ -25,7 +25,6 @@ DATALAKE_BUCKET = Variable.get("datalake_bucket")
 S3_MARKETING_PATH = Variable.get("datalake_marketing_bucket")
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
-MARKETING_COSTS_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/dw_marketing_costs/"
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
 
@@ -96,7 +95,7 @@ dw_staging_sub_dag = IncrementalDWSubDAG(
     dw_bucket=DW_BUCKET,
     dw_schema=DW_SCHEMA,
     relative_query_path=f"{TARGET}/{media_name}",
-    spark_job_path=MARKETING_COSTS_SPARK_JOBS_PATH,
+    spark_job_path=BASE_SPARK_JOBS_PATH,
 )
 
 dw_staging_sub_dags = dw_staging_sub_dag.build_subdags_from_sql_files(
