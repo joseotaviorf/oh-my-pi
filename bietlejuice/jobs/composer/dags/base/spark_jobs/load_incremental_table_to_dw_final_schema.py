@@ -21,10 +21,10 @@ def build_query(query_filters, database_name_staging, table_name):
     if query_filters:
         filters = []
         for key, value in query_filters.items():
-            filters.append("{key} = {value}")
+            filters.append(f"{key} = {value}")
         where = "WHERE " + " AND ".join(filters)
 
-    query = f"SELECT * FROM {database_name_staging}.{table_name}{where}"
+    query = f"SELECT * FROM {database_name_staging}.{table_name} {where}"
 
     return query
 
