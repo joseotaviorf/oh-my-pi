@@ -23,7 +23,7 @@ DW_BUCKET = Variable.get("dw_bucket")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base"
+SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 
 SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
