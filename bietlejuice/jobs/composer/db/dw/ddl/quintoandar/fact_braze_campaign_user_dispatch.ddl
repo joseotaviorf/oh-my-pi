@@ -29,8 +29,6 @@ CREATE TABLE quintoandar.fact_braze_campaign_user_dispatch (
 	total_push_opened BIGINT,
 	ts_push_first_opened TIMESTAMP,
 	ts_push_last_opened TIMESTAMP,
-	year INTEGER,
- 	month INTEGER,
- 	day INTEGER
+	ts_load TIMESTAMP
 );
 ALTER TABLE quintoandar.fact_braze_campaign_user_dispatch OWNER TO airflow;

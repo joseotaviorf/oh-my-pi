@@ -29,6 +29,7 @@ SELECT
 	COUNT(DISTINCT ts_push_opened) AS total_push_opened,
 	MIN(ts_push_opened) AS ts_push_first_opened,
 	MAX(ts_push_opened) AS ts_push_last_opened,
+	NOW() AS ts_load,
 	year,
 	month,
 	day
@@ -75,6 +76,7 @@ SELECT
 	COUNT(DISTINCT ts_push_opened) AS total_push_opened,
 	MIN(ts_push_opened) AS ts_push_first_opened,
 	MAX(ts_push_opened) AS ts_push_last_opened,
+	NOW() AS ts_load,
 	year,
 	month,
 	day
