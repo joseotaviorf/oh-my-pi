@@ -4,7 +4,7 @@ CREATE TABLE quintoandar.fact_braze_canvas_user_dispatch (
 	sk_user_dispatch VARCHAR,
 	sk_canvas VARCHAR,
 	sk_variant_canvas VARCHAR,
-	sk_step_canvas VARCHAR
+	sk_step_canvas VARCHAR,
  	user_type VARCHAR,
 	event_channel VARCHAR,
 	ts_email_sent TIMESTAMP,
