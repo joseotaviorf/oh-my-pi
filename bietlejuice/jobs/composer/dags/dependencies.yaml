@@ -22,6 +22,9 @@ bietlejuice.dw_booking:
   - bietlejuice.enrich_amplitude_visit
   - bietlejuice.gsheets:load-taxonomy-demand-to-clean
 
+bietlejuice.dw_braze_events_user_dispatch:
+  - bietlejuice.enrich_braze_events_dispatches_user
+
 bietlejuice.dw_call:
   - bietlejuice.enrich_bigfone_twilio
 
