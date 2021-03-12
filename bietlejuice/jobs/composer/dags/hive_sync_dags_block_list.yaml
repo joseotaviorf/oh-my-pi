@@ -46,7 +46,6 @@
 - bietlejuice.enrich_bob
 - bietlejuice.enrich_booking
 - bietlejuice.enrich_braze_events
-- bietlejuice.enrich_braze_events_dispatches
 - bietlejuice.enrich_braze_events_user_centric
 - bietlejuice.enrich_braze_events_user_centric_periodicity
 - bietlejuice.enrich_chattermill
