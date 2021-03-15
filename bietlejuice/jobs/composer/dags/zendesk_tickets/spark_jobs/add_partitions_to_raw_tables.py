@@ -9,6 +9,7 @@ from bietlejuice.jobs.composer.services.metastore_services import SparkMetastore
 from bietlejuice.jobs.composer.services import S3Service
 
 SOURCE = "zendesk"
+NEW_SOURCE_NAME = "zendesk_tickets"
 JOB_NAME = "add_partitions_to_raw_tables"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
@@ -46,13 +47,14 @@ if __name__ == "__main__":
     s3_service = S3Service(boto3.resource("s3"))
 
     database_name = db_info["db_raw_databricks"]
+    database_name = database_name.replace(SOURCE, NEW_SOURCE_NAME)
     database_location = db_info["db_raw_path"]
 
     tables_list = TABLE_DB_MAPPING.keys()
     # as Stitch loads the data, we just add partition here
     for table in tables_list:
         partition_location = database_location.replace(
-            "zendesk", f"{TABLE_DB_MAPPING[table]}/{table}"
+            SOURCE, f"{TABLE_DB_MAPPING[table]}/{table}"
         )
         partitions = []
         for level in partition_cols:
