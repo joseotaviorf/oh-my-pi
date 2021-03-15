@@ -21,6 +21,9 @@ bietlejuice.dw_booking:
   - bietlejuice.ebdb:load-visit
   - bietlejuice.enrich_amplitude_visit
   - bietlejuice.gsheets:load-taxonomy-demand-to-clean
+  
+bietlejuice.dw_braze_events_user_centric:
+  - bietlejuice.enrich_braze_events_user_centric_periodicity
 
 bietlejuice.dw_braze_events_user_dispatch:
   - bietlejuice.enrich_braze_events_dispatches_user
