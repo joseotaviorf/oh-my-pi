@@ -13,7 +13,7 @@ from bietlejuice.jobs.composer.dags.base.incremental_dw_sub_dag import (
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.services import FileService
 
-DW_SCHEMA = "quintoandar"
+DW_SCHEMA = "braze"
 CONTEXT = "braze_events_user_centric"
 DAG_NAME = f"dw_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"

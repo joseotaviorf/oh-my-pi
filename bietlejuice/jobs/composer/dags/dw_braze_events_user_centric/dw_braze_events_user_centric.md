@@ -11,7 +11,7 @@ More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 ​
-This pipeline produces in DW, schema quintoandar, via incremental load:
+This pipeline produces in DW, schema `braze`, via incremental load:
     - `fact_braze_user_centric`
 ​
 ### Responsible Data Teams
