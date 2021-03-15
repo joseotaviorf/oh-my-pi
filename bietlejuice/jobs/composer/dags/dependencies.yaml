@@ -413,6 +413,9 @@ bietlejuice.enrich_tracksale:
 bietlejuice.enrich_zendesk_custom_fields:
   - bietlejuice.zendesk:tickets
 
+bietlejuice.enrich_zendesk_tickets:
+  - bietlejuice.enrich_zendesk_custom_fields:custom_fields
+
 bietlejuice.regions_polygon:
   - bietlejuice.enrich_region:load-region-to-enrich
   - bietlejuice.ebdb:load-polygon-region
