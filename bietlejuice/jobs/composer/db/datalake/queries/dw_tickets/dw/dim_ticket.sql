@@ -1,0 +1,28 @@
+SELECT
+    CAST(id_ticket AS BIGINT) AS sk_ticket,
+    subject,
+    description,
+    ticket_via,
+    channel,
+    group_name,
+    priority,
+    recipient,
+    tags,
+    status,
+    custom_fields,
+    score,
+    reason,
+    comment,
+    request_type,
+    client_type,
+    customer_type_tag,
+    contact_motivation_tag,
+    contact_theme_tag,
+    has_public_comments,
+    ts_created,
+    ts_created_local,
+    ts_updated,
+    ts_updated_local,
+    NOW() AS ts_load
+FROM
+    datalake_zendesk_tickets.ticket_funnel
