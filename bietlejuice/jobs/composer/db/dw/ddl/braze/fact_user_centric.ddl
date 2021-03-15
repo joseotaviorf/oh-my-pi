@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS quintoandar.fact_braze_user_centric;
-CREATE TABLE quintoandar.fact_braze_user_centric (
+DROP TABLE IF EXISTS braze.fact_user_centric;
+CREATE TABLE braze.fact_user_centric (
     sk_braze_user VARCHAR,
     total_campaigns_sent_to_this_week BIGINT,
     total_campaigns_sent_to_last_week BIGINT,
@@ -91,4 +91,4 @@ CREATE TABLE quintoandar.fact_braze_user_centric (
     dt_last_sms_delivered_to DATE,
     ts_load TIMESTAMP
 );
-ALTER TABLE quintoandar.fact_braze_user_centric OWNER TO airflow;
+ALTER TABLE braze.fact_user_centric OWNER TO airflow;

@@ -1,9 +1,10 @@
-DROP TABLE IF EXISTS quintoandar.fact_braze_campaign_user_dispatch;
-CREATE TABLE quintoandar.fact_braze_campaign_user_dispatch (
- 	sk_braze_user VARCHAR,
- 	sk_user_dispatch VARCHAR,
- 	sk_campaign VARCHAR,
- 	sk_variant_campaign VARCHAR,
+DROP TABLE IF EXISTS braze.fact_canvas_user_dispatch;
+CREATE TABLE braze.fact_canvas_user_dispatch (
+	sk_braze_user VARCHAR,
+	sk_user_dispatch VARCHAR,
+	sk_canvas VARCHAR,
+	sk_variant_canvas VARCHAR,
+	sk_step_canvas VARCHAR,
  	user_type VARCHAR,
 	event_channel VARCHAR,
 	ts_email_sent TIMESTAMP,
@@ -15,7 +16,7 @@ CREATE TABLE quintoandar.fact_braze_campaign_user_dispatch (
 	ts_push_bounced TIMESTAMP,
 	ts_sms_sent TIMESTAMP,
 	ts_sms_send_to_carried TIMESTAMP,
-	ts_sms_delivered TIMESTAMP,
+ 	ts_sms_delivered TIMESTAMP,
 	ts_sms_rejected TIMESTAMP,
 	ts_sms_delivery_failed TIMESTAMP,
 	ts_webhook_sent TIMESTAMP,
@@ -31,4 +32,4 @@ CREATE TABLE quintoandar.fact_braze_campaign_user_dispatch (
 	ts_push_last_opened TIMESTAMP,
 	ts_load TIMESTAMP
 );
-ALTER TABLE quintoandar.fact_braze_campaign_user_dispatch OWNER TO airflow;
+ALTER TABLE braze.fact_canvas_user_dispatch OWNER TO airflow;
