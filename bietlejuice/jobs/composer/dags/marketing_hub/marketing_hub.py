@@ -16,6 +16,7 @@ from bietlejuice.jobs.composer.services import FileService
 SOURCE = "marketing_hub"
 DAG_ID = f"bietlejuice.{SOURCE}"
 ENV = Variable.get("environment")
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 S3_MARKETING_BUCKET = Variable.get("datalake_marketing_bucket")
@@ -57,6 +58,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
     libraries=LIBRARIES_DESCRIPTION,
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID),
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
