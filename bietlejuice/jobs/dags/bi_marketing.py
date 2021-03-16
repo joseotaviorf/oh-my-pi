@@ -15,7 +15,7 @@ from qa_python_utils.default_logger import QuintoAndarLogger
 
 MAIN_DAG_NAME = 'bi-marketing-costs'
 MAIN_START_DATE = datetime(2018, 12, 10, 2, 0, 0)
-MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('30 5 * * *')
+MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule('30 1 * * *')
 
 env.set_airflow_var_to_local_env('BI_DW', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
 
