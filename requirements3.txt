@@ -86,6 +86,7 @@ Werkzeug==0.15.3
 whichcraft==0.6.0
 WTForms==2.2.1
 zope.deprecation==4.4.0
+quintoandar-braze-api-client==0.1.0
 quintoandar-criteo-api-client==0.1.0
 quintoandar-gsheets-api-client==0.1.0
 quintoandar-facebook-api-client==0.1.2
