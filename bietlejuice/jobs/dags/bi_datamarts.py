@@ -55,6 +55,11 @@ def create_datamart_from_athena(table_name, **kwargs):
     logger.info('m=create_datamart_from_athena, table_name={}, msg=Reading data'.format(table_name))
     df = athena.execute_query_and_return_dataframe(sql=query)
 
+    if df.empty:
+        raise ValueError('table_name={}, msg=Query returned zero rows'.format(table_name))
+    if 'ts_load' not in df.columns.values:
+        df['ts_load'] = datetime.now()
+
     logger.info('m=create_datamart_from_athena, table_name={}, msg=Dropping table'.format(table_name))
     BaseETL.execute_command(
         command='drop table if exists {}.{}'.format(DATAMARTS_SCHEMA, table_name),
@@ -62,11 +67,6 @@ def create_datamart_from_athena(table_name, **kwargs):
         encoding='utf-8',
         commit=True
     )
-
-    if df.empty:
-        raise ValueError('table_name={}, msg=Query returned zero rows'.format(table_name))
-    if 'ts_load' not in df.columns.values:
-        df['ts_load'] = datetime.now()
 
     logger.info('m=create_datamart_from_athena, table_name={}, msg=Creating table in datamart'.format(table_name))
     BaseETL.create_table_from_dataframe(

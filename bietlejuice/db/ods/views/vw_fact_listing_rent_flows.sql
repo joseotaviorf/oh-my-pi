@@ -175,7 +175,9 @@ _fact as (
     left join staging.dim_booking vdb
         on vdb.sk_booking = hrf.id_booking
     where vdh.is_for_rent::int::boolean
-        and coalesce(vdb.visit_intent, '') <> 'SALE'
+-- The OR condition is covering cases where the last booking, that resulted on a contract,
+-- had it's visit_intent marked as SALE, but resulted on a Rent contract.
+        AND (coalesce(vdb.visit_intent, '') <> 'SALE' OR (vdb.visit_intent = 'SALE' AND hrf.id_contract IS NOT NULL))
 ),
 base as (
 	select
