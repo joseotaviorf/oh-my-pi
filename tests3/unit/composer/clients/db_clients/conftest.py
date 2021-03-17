@@ -1,9 +1,9 @@
 import pytest
 from unittest.mock import Mock
-from bietlejuice.jobs.composer.clients.db_clients import SparkClient
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient, TrinoClient
 
 
-@pytest.fixture()
+@pytest.fixture
 def mocked_get_data_from_external_source():
     mock = Mock()
     attrs = {
@@ -16,6 +16,11 @@ def mocked_get_data_from_external_source():
     return mock
 
 
-@pytest.fixture()
+@pytest.fixture
 def mocked_spark_client():
     return SparkClient()
+
+
+@pytest.fixture
+def mocked_trino_client():
+    return TrinoClient(host="host", port=443, user="jose.silva")
