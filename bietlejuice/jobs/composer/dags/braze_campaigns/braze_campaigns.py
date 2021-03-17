@@ -25,7 +25,7 @@ MAIN_SCHEDULE_INTERVAL = "30 0 * * *"
 
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
+ARTIFACTS_S3_BUCKET = Variable.get("artifacts_default_bucket")
 DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
@@ -42,10 +42,7 @@ CUSTOM_LIBRARIES = [
         f"quintoandar_braze_api_client-0.1.0-py2.py3-none-any.whl"
     }
 ]
-DEFAULT_LIBRARIES = Variable.get("bietlejuice_default_libraries", deserialize_json=True)
-LIBRARIES = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
 
-# Names of app groups must match the directories created in Braze's S3 bucket
 APP_GROUPS = ["owners", "tenants"]
 ENDPOINTS = ["details", "analytics"]
 
@@ -67,7 +64,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=LIBRARIES,
+    libraries=CUSTOM_LIBRARIES,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
