@@ -81,9 +81,11 @@ if __name__ == "__main__":
     kwargs = {"id_values": id_list, "executor_type": "thread"}
 
     if endpoint == "analytics":
-        kwargs.update("length", 1)
+        kwargs.update({"length": 1})
 
     results = consumer.sync(**kwargs)
+    if endpoint == "analytics":
+        results = [item for sublist in results for item in sublist]
 
     df = spark_client.create_dataframe(results)
     if not df.rdd.isEmpty():
