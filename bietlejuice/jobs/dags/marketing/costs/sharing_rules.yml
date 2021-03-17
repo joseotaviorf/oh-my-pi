@@ -49,3 +49,7 @@ d011d:
 s012s:
   query: marketing/costs/s012s.sql
   funnel_side: social
+
+d013d:
+  query: marketing/costs/d013d.sql
+  funnel_side: demand
