@@ -11,7 +11,7 @@ To force the Mediator to skip a DAG temporarily, use the variable [MEDIATOR_SKIP
 
 ### Execution Interval
 
-Runs at minutes 0 and 30, each hour. More information about run time [here]({chart_url}{dag_id})
+Runs at every 15 minutes, starting at minute 0 of each hour. More information about run time [here]({chart_url}{dag_id}).
 
 ### Responsible Data Engineering Team
 
