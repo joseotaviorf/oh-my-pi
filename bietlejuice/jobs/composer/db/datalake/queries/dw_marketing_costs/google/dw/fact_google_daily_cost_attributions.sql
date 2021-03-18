@@ -133,7 +133,6 @@ final_cte_ads as (
         and dim.ad_group_name = cte_ads.ad_group_name
         and dim.campaign_name = cte_ads.campaign_name
         and dim.ad_type = cte_ads.ad_type
-        and dim.load_date = cte_ads.load_date
 ),
 
 -- ADS END
@@ -270,7 +269,6 @@ final_cte_keywords as (
         and dim.ad_group_name = cte_keywords.ad_group_name
         and dim.campaign_name = cte_keywords.campaign_name
         and dim.match_type = cte_keywords.match_type
-        and dim.load_date = cte_keywords.load_date
 ),
 
 -- KEYWORDS END
@@ -390,7 +388,6 @@ final_cte_campaigns as (
     on dim.id_campaign = cte_campaigns.id_campaign
         and dim.account_name = cte_campaigns.acc
         and dim.campaign_name = cte_campaigns.campaign_name
-        and dim.load_date = cte_campaigns.load_date
 ),
 
 -- CAMPAIGNS END
@@ -527,7 +524,6 @@ ON dim.id_video = cte_videos.id_video
     AND dim.account_name = cte_videos.acc
     AND dim.ad_group_name = cte_videos.ad_group_name
     AND dim.campaign_name = cte_videos.campaign_name
-    and dim.load_date = cte_videos.load_date
 )
 
 -- VIDEOS END

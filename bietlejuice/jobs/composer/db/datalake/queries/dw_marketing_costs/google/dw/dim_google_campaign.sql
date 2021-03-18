@@ -1,17 +1,23 @@
-SELECT
-    FIRST(id) AS sk_campaign,
-    id_external_customer,
-    id_campaign,
-    campaign_name,
-    acc AS account_name,
-    labels,
-    is_test_campaign,
-    report_type,
-    load_date,
-    NOW() AS ts_load
-FROM 
-    datalake_marketing_costs.google_campaigns_performance_report
-WHERE
-    load_date = DATE('{year}-{month}-{day}')
-GROUP BY 
-    2,3,4,5,6,7,8,9
+WITH clean_table_common as (
+    SELECT
+        first(id) as sk_campaign,
+        id_external_customer,
+        id_campaign,
+        campaign_name,
+        acc as account_name,
+        labels,
+        is_test_campaign,
+        report_type,
+        load_date
+    FROM 
+        datalake_marketing_costs.google_campaigns_performance_report
+    WHERE
+        load_date = date('{year}-{month}-{day}')
+    group by 2,3,4,5,6,7,8,9
+)
+SELECT clean_table_common.*,
+		now() as ts_load
+FROM clean_table_common
+left join dw_marketing_costs_staging.dim_google_campaign st_dim
+    on clean_table_common.sk_campaign = st_dim.sk_campaign
+where st_dim.sk_campaign is null
