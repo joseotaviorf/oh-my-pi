@@ -19,7 +19,9 @@ WITH clean_table_common AS (
 SELECT 
     clean_table_common.*,
     NOW() AS ts_load
-FROM clean_table_common
-LEFT JOIN dw_marketing_costs_staging.dim_google_video st_dim
-    ON clean_table_common.sk_video = st_dim.sk_video
-WHERE st_dim.sk_video IS NULL
+FROM 
+    clean_table_common
+    LEFT JOIN dw_marketing_costs.dim_google_video st_dim
+        ON clean_table_common.sk_video = st_dim.sk_video
+WHERE 
+    st_dim.sk_video IS NULL

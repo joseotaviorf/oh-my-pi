@@ -1,9 +1,9 @@
-WITH clean_table_common as (
+WITH clean_table_common AS (
     SELECT
-        first(id) as sk_keyword,
-        id_keyword as id_keyword,
-        criteria as keyword_name,
-        acc as account_name,
+        FIRST(id) AS sk_keyword,
+        id_keyword AS id_keyword,
+        criteria AS keyword_name,
+        acc AS account_name,
         campaign_name,
         ad_group_name,
         match_type,
@@ -13,14 +13,15 @@ WITH clean_table_common as (
     FROM 
         datalake_marketing_costs.google_keywords_performance_report
     WHERE
-        load_date = date('{year}-{month}-{day}')
-    group by 2,3,4,5,6,7,8,9,10
+        load_date = DATE('{year}-{month}-{day}')
+    GROUP BY 2,3,4,5,6,7,8,9,10
 )
 SELECT 
     clean_table_common.*,
-    now() as ts_load
+    NOW() AS ts_load
 FROM 
     clean_table_common
-left join dw_marketing_costs_staging.dim_google_keyword st_dim
-    on clean_table_common.sk_keyword = st_dim.sk_keyword
-where st_dim.sk_keyword is null
+    LEFT JOIN dw_marketing_costs.dim_google_keyword st_dim
+        ON clean_table_common.sk_keyword = st_dim.sk_keyword
+WHERE 
+    st_dim.sk_keyword IS NULL

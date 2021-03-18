@@ -1,10 +1,10 @@
-WITH clean_table_common as (
+WITH clean_table_common AS (
     SELECT
-        first(id) as sk_campaign,
+        FIRST(id) AS sk_campaign,
         id_external_customer,
         id_campaign,
         campaign_name,
-        acc as account_name,
+        acc AS account_name,
         labels,
         is_test_campaign,
         report_type,
@@ -12,12 +12,15 @@ WITH clean_table_common as (
     FROM 
         datalake_marketing_costs.google_campaigns_performance_report
     WHERE
-        load_date = date('{year}-{month}-{day}')
-    group by 2,3,4,5,6,7,8,9
+        load_date = DATE('{year}-{month}-{day}')
+    GROUP BY 2,3,4,5,6,7,8,9
 )
-SELECT clean_table_common.*,
-		now() as ts_load
-FROM clean_table_common
-left join dw_marketing_costs_staging.dim_google_campaign st_dim
-    on clean_table_common.sk_campaign = st_dim.sk_campaign
-where st_dim.sk_campaign is null
+SELECT 
+    clean_table_common.*,
+	NOW() AS ts_load
+FROM 
+    clean_table_common
+    LEFT JOIN dw_marketing_costs.dim_google_campaign st_dim
+        ON clean_table_common.sk_campaign = st_dim.sk_campaign
+WHERE 
+    st_dim.sk_campaign IS NULL
