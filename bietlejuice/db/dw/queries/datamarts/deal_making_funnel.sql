@@ -17,34 +17,12 @@ select distinct
     so.id_buyer,
     concat(concat(so.id_buyer,'_'),so.id_house) as "sk_sale_flow",
     --dfm.id_consultant, -- ID DO PRIMEIRO ANALISTA A TRATAR A OFERTA, CORRETO É O ÚLTIMO
-    regexp_replace(regexp_replace(cast(right(replace(dgm.consultor,', antonio.sader@quintoandar.com.br',''), len(replace(dgm.consultor,', antonio.sader@quintoandar.com.br','')) - charindex(', ', replace(dgm.consultor,', antonio.sader@quintoandar.com.br',''))) as varchar),' ',''),',','') as "consultant_gsheets",
     case -- id_consultant_adjusted
-        when cp.id_consultant is null and consultant_gsheets = '' then ''
-        when cp.id_consultant is null and consultant_gsheets is null then ''
-        when cp.id_consultant = '12614540' and consultant_gsheets = '' then '12614540'
-        when cp.id_consultant = '12041621' and consultant_gsheets = '' then '12041621'
-        when cp.id_consultant = '11422663' and consultant_gsheets = '' then '11422663'
-        when cp.id_consultant = '11422665' and consultant_gsheets = 'antonio.sader@quintoandar.com.br,' then '12614540'
-        when consultant_gsheets = 'dayse.susan@quintoandar.com.br' then '15520028'
-        when consultant_gsheets = 'antonio.sader@quintoandar.com.br' then '11422665'
-        when consultant_gsheets = 'ana.moraes@quintoandar.com.br' then '12114276'
-        when consultant_gsheets = 'gabriel.zucchini@quintoandar.com.br' then '15265928'
-        when consultant_gsheets = 'pedro.faria@quintoandar.com.br' then '15265915'
-        when consultant_gsheets = 'MoniqueGadelha' then '16209415'
-        when consultant_gsheets = 'renan.rocha@quintoandar.com.br' then '14832753'
-        when consultant_gsheets = 'anna.almeida@quintoandar.com.br' then '16243829'
-        when consultant_gsheets = 'thomas.silva@quintoandar.com.br' then '14610991'
-        when consultant_gsheets = 'TuaniDamaceno' then '15557400'
-        when consultant_gsheets = 'jessica.thayse@quintoandar.com.br' then '15265919'
-        when consultant_gsheets = 'ThiagoAraújo' then '15429031'
-        when consultant_gsheets = 'nataly.maciel@quintoandar.com.br' then '15265925'
-        when consultant_gsheets = 'pedro.santos@quintoandar.com.br' then '14832767'
-        when consultant_gsheets = 'mariana.boer@quintoandar.com.br' then '12614540'
-        when consultant_gsheets = 'bruna.araujo@quintoandar.com.br' then '12041621'
-        when consultant_gsheets = 'felipe.calegari@quintoandar.com.br' then '11422663'
-        when consultant_gsheets = 'mariana.alves@quintoandar.com.br' then '14832760'
-        when consultant_gsheets = 'EmersondeSouzaMeneguel' then '15284501'
-        --when dfm.id_consultant > 1 and consultant_gsheets = '' then dfm.id_consultant
+        when cp.id_consultant is null then ''
+        when cp.id_consultant = '12614540' then '12614540'
+        when cp.id_consultant = '12041621' then '12041621'
+        when cp.id_consultant = '11422663' then '11422663'
+        when cp.id_consultant = '11422665' then '12614540'
         when COALESCE(cp.id_consultant, '') IS NULL then 'ERRO'
         else cp.id_consultant end as "id_consultant_adjusted",
     case -- name_consultant
@@ -68,7 +46,24 @@ select distinct
         when id_consultant_adjusted = '11422663' then 'Felipe Calegari da Cunha'
         when id_consultant_adjusted = '14832760' then 'Mariana Montanha Alves'
         when id_consultant_adjusted = '15284501' then 'Emerson de Souza Meneguel'
-        else 'ERRO' end as "name_consultant",
+        when id_consultant_adjusted = '17469676' then 'Kaue Cavignato Lima'
+        when id_consultant_adjusted = '17329099' then 'Luiz Fernando Secco Bocayuva Cunha'
+        when id_consultant_adjusted = '17437477' then 'Mariana Passos'
+        when id_consultant_adjusted = '17328901' then 'Monique Freire Lourenço'
+        when id_consultant_adjusted = '17914796' then 'Elizangela Fernandes'
+        when id_consultant_adjusted = '18242764' then 'Augusto Vinicius de Barros'
+        when id_consultant_adjusted = '17940448' then 'Rafael Burckauser Ceschi'
+        when id_consultant_adjusted = '17940769' then 'Paulo Sérgio Pitondo'
+        when id_consultant_adjusted = '17940876' then 'Rafael Gonçalves de Freitas Lima'
+        when id_consultant_adjusted = '18257464' then 'Brenda Fernandes'
+        when id_consultant_adjusted = '14783782' then 'Jaquelinne de Jorge Bassi'
+        when id_consultant_adjusted = '17940623' then 'Beatriz Fonseca'
+        when id_consultant_adjusted = '18341985' then 'Nicolás Santana da Silva'
+        when id_consultant_adjusted = '19694893' then 'Karoline Barboza Costa'
+        when id_consultant_adjusted = '18341988' then 'Stella Batista Leal'
+        when id_consultant_adjusted = '20446112' then 'Gustavo Issa Ribeiro'
+        else 'ERRO'
+    end as "name_consultant",
     dhl.house_city,
     dfm.status,
     so.status AS status_offer_firestore,
@@ -267,6 +262,3 @@ left join
 left join 
     dim_house_listing dhl 
         on dfm.id_house = dhl.id_house
-left join 
-    datalake_raw.gsheets_sale_offers_monday dgm 
-        on dgm.name = dfm.id_offer
