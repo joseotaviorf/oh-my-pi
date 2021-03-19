@@ -27,7 +27,9 @@ DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 BASE_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 RAW_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/add_partitions_to_raw_tables.py"
 LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{SOURCE}"
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
+CLUSTER_DESCRIPTION = Variable.get(
+    "databricks_bietlejuice_zendesk_tickets", deserialize_json=True
+)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 
 # dag vars
