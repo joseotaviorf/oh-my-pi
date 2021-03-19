@@ -1,5 +1,5 @@
 SELECT
-    tf.id_ticket AS sk_ticket,
+    CAST(tf.id_ticket AS BIGINT) AS sk_ticket,
     tf_tag AS ticket_tag,
     tf.ts_updated,
     NOW() AS ts_load

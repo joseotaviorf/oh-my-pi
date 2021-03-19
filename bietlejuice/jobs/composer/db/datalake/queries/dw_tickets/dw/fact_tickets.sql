@@ -9,7 +9,7 @@ SELECT
     t.id_zendesk_requester_user AS sk_zendesk_requester_user,
     t.id_zendesk_submitter_user AS sk_zendesk_submitter_user,
     t.id_zendesk_assignee_user AS sk_zendesk_assignee_user,
-    COALESCE(t.id_session, -1) AS sk_session,
+    CAST(COALESCE(t.id_session, -1) AS BIGINT) AS sk_session,
     COALESCE(t.id_call, '-1') AS sk_call,
     COALESCE(CAST(DATE_FORMAT(t.ts_created, '%y%m%d') AS INTEGER), -1) AS sk_created_date,
     COALESCE(CAST(DATE_FORMAT(t.ts_created_local, '%y%m%d') AS INTEGER), -1) AS sk_created_date_local,
