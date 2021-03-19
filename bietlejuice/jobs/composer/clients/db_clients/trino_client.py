@@ -60,11 +60,12 @@ class TrinoClient(DBClient):
         with self.conn as conn:
             cur = conn.cursor()
             cur.execute(query, parameters)
+            result = cur.fetchall()
             logger.info(
-                f"m=get_records, records_returned={cur.rowcount}, msg=Query "
+                f"m=get_records, records_returned={len(result)}, msg=Query "
                 "execution succeeded."
             )
-            return cur.fetchall()
+            return result
 
     @logger
     def run(self, command, parameters=None):

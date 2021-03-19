@@ -1,0 +1,298 @@
+"""
+    Validates the synchronization between in-house metastore and Databricks metastore.
+
+    It will validate the table schema, partition keys, partition values count and table content count.
+    This job is temporary and will be removed after the sync implementation is finished for all tables.
+"""
+import json
+import logging
+from argparse import ArgumentParser
+
+from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.jobs.composer.base.db import DatabaseEnum
+from bietlejuice.jobs.composer.base.db import DatalakeMetastoreMapping
+from bietlejuice.jobs.composer.base.db.dw_metastore_mapping import DwMetastoreMapping
+from bietlejuice.jobs.composer.base.pipeline import LayerEnum
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient, TrinoClient
+from bietlejuice.jobs.composer.consumers.db_consumers.databricks_consumer import (
+    DatabricksConsumer,
+)
+from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
+
+JOB_NAME = "validate_sync_metastore_tables"
+
+logging.getLogger("py4j").setLevel(logging.ERROR)
+logger = QuintoAndarLogger(JOB_NAME)
+
+
+class MetastoreSyncValidation:
+    def __init__(self, database_name, table_name, trino_conn_config) -> None:
+        """
+        Constructor.
+
+        :param database_name: target database name
+        :param table_name: target table that will be validated
+        :param trino_conn_config: trino server configs
+        """
+        self.database_name = database_name
+        self.table_name = table_name
+        self.trino_client = TrinoClient(
+            trino_conn_config["host"],
+            trino_conn_config["port"],
+            trino_conn_config["user"],
+        )
+
+    def validate_table(self):
+        self.validate_schema_and_partition_keys()
+        self.validate_partition_values_count()
+        self.validate_content()
+
+    def validate_schema_and_partition_keys(self):
+        """
+        Gets and compares the table schema in Spark and In-house metastores.
+         The partition keys are included in the schema comparison.
+
+        :raises: AssertionError
+        """
+        spark_metastore_service = SparkMetastoreService(SparkClient())
+        spark_ms_table_columns = spark_metastore_service.get_table_schema(
+            self.database_name, self.table_name
+        )
+        self._validate_empty_table_schema(spark_ms_table_columns)
+
+        trino_table_schema = self.trino_client.get_records(
+            query=f"DESCRIBE {self.database_name}.{self.table_name}"
+        )
+        self._validate_empty_table_schema(trino_table_schema)
+        trino_table_schema = self._parse_trino_schema(trino_table_schema)
+
+        if not self._validate_table_schema_match(
+            spark_ms_table_columns, trino_table_schema
+        ):
+            raise AssertionError(
+                f"m={JOB_NAME}, database={self.database_name}, table={self.table_name}, "
+                "msg=The schema of the table in In-house Hive and Spark metastores are diverging."
+            )
+
+        logger.info(
+            f"m={JOB_NAME}, database={self.database_name}, table={self.table_name}, "
+            "msg=Table schemas and partition keys match."
+        )
+
+    def _validate_empty_table_schema(self, table_schema):
+        if not table_schema:
+            raise AssertionError(
+                f"m={JOB_NAME}, database={self.database_name}, table={self.table_name}, "
+                "msg=The tables have an empty schema in the metastores."
+            )
+
+    @staticmethod
+    def _parse_trino_schema(trino_table_schema):
+        """
+        Put the trino returned schema in a dict structure with the column
+         name as the key and the type as the value.
+
+        :param trino_table_schema: each column properties [name, type, comment]
+        :type trino_table_schema: List[List[str, str, str]]
+        :rtype: dict[str:str]
+        """
+        COLUMN_NAME = 0
+        COLUMN_TYPE = 1
+
+        columns = {}
+        for column in trino_table_schema:
+            columns[column[COLUMN_NAME]] = column[COLUMN_TYPE]
+
+        return columns
+
+    def _compare_tables_schema_length(self, spark_ms_table_columns, trino_table_schema):
+        """
+        Checks if tables have the same columns number
+
+        :param spark_ms_table_columns: the table columns in spark metastore
+        :type spark_ms_table_columns: collections.OrderedDict[(str, str)]
+        :param trino_table_schema: the table columns in in-house metastore
+        :type trino_table_schema: dict[str:str]
+        :rtype: bool
+        """
+        if len(spark_ms_table_columns) != len(trino_table_schema):
+            logger.error(
+                f"m={JOB_NAME}, database={self.database_name}, table={self.table_name}, "
+                f"spark_col_number={len(spark_ms_table_columns)} trino_col_numer={len(trino_table_schema)},"
+                " msg=The tables have different column count."
+            )
+            return False
+
+        return True
+
+    def _compare_tables_schema_columns(
+        self, spark_ms_table_columns, trino_table_schema
+    ):
+        """
+        Checks if each spark table column is present in the in-house metastore
+         and if the column type is the same, to validate the metastores
+         synchronization.
+
+        :param spark_ms_table_columns: the table columns in spark metastore
+        :type spark_ms_table_columns: collections.OrderedDict[(str, str)]
+        :param trino_table_schema: the table columns in in-house metastore
+        :type trino_table_schema: dict[str:str]
+        :rtype: bool
+        """
+        for col_name, col_type in spark_ms_table_columns.keys():
+            if (col_name not in trino_table_schema) or (
+                col_type != trino_table_schema[col_name]
+            ):
+                logger.error(
+                    f"m={JOB_NAME}, database={self.database_name}, table={self.table_name}, "
+                    f"column={col_name}, msg=The column diverges in both Metastore tables."
+                )
+                return False
+        return True
+
+    def _validate_table_schema_match(self, spark_ms_table_columns, trino_table_schema):
+        return self._compare_tables_schema_length(
+            spark_ms_table_columns, trino_table_schema
+        ) and self._compare_tables_schema_columns(
+            spark_ms_table_columns, trino_table_schema
+        )
+
+    def validate_partition_values_count(self):
+        pass
+
+    def validate_content(self):
+        pass
+
+
+def validate_table_arguments(_table_name, _all_tables):
+    """
+    Verifies if the job is called exclusively for validating the sync of a
+     unique table or all of them.
+
+    :param _table_name: the table to be validated
+    :type _table_name: str
+    :param _all_tables: flag indicating to validate all tables of giving database
+    :type _all_tables: bool (received as string though)
+    :raises: ValueError
+    """
+    if bool(_table_name) == _all_tables:
+        raise ValueError(
+            f"m={JOB_NAME}, table_name={_table_name},"
+            f"all_tables={_all_tables}, msg=Parameters table_name and all_tables are mutual exclusive."
+        )
+
+
+def get_database_name(_db_name_part, _layer):
+    """
+    Gets the Spark and In-house metastores databases metadata for given layer.
+
+    :param _db_name_part: The `source` name for raw and clean layers. Or the
+     `source` and/or `context` name for enrich layer. The `schema` for DW layer.
+    :type _db_name_part: str
+    :param _layer: one of LayerEnum values
+    :type _layer: str
+    :return:
+    """
+    if _layer == LayerEnum.DW.value:
+        dw_ms_mapping = DwMetastoreMapping(
+            schema=_db_name_part, bucket=""
+        ).get_all_dw_info()
+
+        _spark_database_name = dw_ms_mapping["dw_schema_databricks"]
+    else:
+        dl_ms_mapping = DatalakeMetastoreMapping(source=_db_name_part, bucket="")
+
+        _spark_database_name, _ = dl_ms_mapping.get_datalake_info_from_layer(_layer)
+
+    return _spark_database_name
+
+
+def get_spark_metastore_table_names(database_name):
+    """
+    Query the Spark metastore to get all the table names for given database.
+
+    :param database_name: database name
+    :type database_name: str
+    :return: List[str]
+    """
+    databricks_consumer = DatabricksConsumer({"db": database_name}, SparkClient())
+    df_databricks_tables = databricks_consumer.get_table_names_and_sizes()
+    return [row.table_name for row in df_databricks_tables.collect()]
+
+
+def get_trino_conn_conf():
+    """
+    Retrieves the Hive Metastore host stored in databricks secrets
+
+    :rtype: json
+    """
+    trino_confs = dbutils.secrets.get("quintoandar", DatabaseEnum.TRINO)  # noqa: F821
+    trino_confs_json = json.loads(trino_confs)
+    return trino_confs_json
+
+
+def parse_args():
+    parser = ArgumentParser(description=JOB_NAME)
+    parser.add_argument("layer_value", type=str, help="One of LayerEnum values")
+    parser.add_argument(
+        "db_name_part",
+        type=str,
+        help="The `source` name for raw and clean layers. The `source` and/or "
+        "`context` name for enrich layer. The `schema` for DW layer.",
+    )
+    parser.add_argument(
+        "--table-name",
+        type=str,
+        dest="table_name",
+        required=False,
+        help="table name for single sync",
+    )
+    parser.add_argument(
+        "--all-tables",
+        nargs="?",
+        dest="all_tables",
+        required=False,
+        default=False,
+        const=True,
+        help="sync all tables from database",
+    )
+
+    args = parser.parse_args()
+    _layer_value = args.layer_value
+    _db_name_part = args.db_name_part
+    _table_name = args.table_name
+    _all_tables = args.all_tables
+
+    validate_table_arguments(_table_name, _all_tables)
+    return _layer_value, _db_name_part, _table_name, _all_tables
+
+
+def start_spark_job():
+    """ Main method. """
+    layer_value, db_name_part, table_name, all_tables = parse_args()
+    layer = LayerEnum(layer_value).value
+
+    logger.info(
+        f"m={JOB_NAME} layer={layer}, db_name_part={db_name_part}, "
+        f"table_name={table_name}, all_tables={all_tables}, msg=Job execution started."
+    )
+
+    database_name = get_database_name(db_name_part, layer)
+
+    table_names = []
+    if all_tables:
+        table_names = get_spark_metastore_table_names(database_name=database_name)
+    else:
+        table_names.append(table_name)
+
+    for table in table_names:
+        MetastoreSyncValidation(
+            database_name, table, get_trino_conn_conf()
+        ).validate_table()
+
+    logger.info(f"m={JOB_NAME}, msg=Synchronization validations succeeded")
+
+
+if __name__ == "__main__":
+    start_spark_job()

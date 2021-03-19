@@ -149,11 +149,11 @@ def get_metastores_metadata(_db_name_part, _bucket, _layer):
     :type _db_name_part: str
     :param _bucket: Data Lake or DW bucket
     :type _bucket: str
-    :param _layer: one of LayerEnum keys
-    :type _layer: LayerEnum
+    :param _layer: one of LayerEnum values
+    :type _layer: str
     :return:
     """
-    if layer == LayerEnum.DW.value:
+    if _layer == LayerEnum.DW.value:
         dw_ms_mapping = DwMetastoreMapping(
             schema=_db_name_part, bucket=_bucket
         ).get_all_dw_info()
