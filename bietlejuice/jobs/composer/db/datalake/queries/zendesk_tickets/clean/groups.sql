@@ -1,26 +1,27 @@
-WITH stitch_data AS (
+WITH max_stitch_data AS (
     SELECT
-        *,
-        ROW_NUMBER() OVER (PARTITION BY id, dt ORDER BY updated_at DESC) AS last_updated
+        id,
+        MAX(CAST(updated_at AS TIMESTAMP)) AS max_updated_at
     FROM
         datalake_zendesk_tickets_raw.groups
-    WHERE
-        dt = '{year}-{month}-{day}'
+    GROUP BY 1
 )
 SELECT
-    id AS id_group,
-    url AS url_group,
-    name,
-    deleted AS is_deleted,
-    dt AS dt_extracted,
-    FROM_UTC_TIMESTAMP(CAST(created_at AS TIMESTAMP), 'Brazil/East') AS ts_created_local,
-    CAST(created_at AS TIMESTAMP) AS ts_created,
-    CAST(updated_at AS TIMESTAMP) AS ts_updated,
+    gp.id AS id_group,
+    gp.url AS url_group,
+    gp.name,
+    gp.deleted AS is_deleted,
+    gp.dt AS dt_extracted,
+    FROM_UTC_TIMESTAMP(CAST(gp.created_at AS TIMESTAMP), 'Brazil/East') AS ts_created_local,
+    CAST(gp.created_at AS TIMESTAMP) AS ts_created,
+    CAST(gp.updated_at AS TIMESTAMP) AS ts_updated,
     NOW() AS ts_load,
-    YEAR(CAST(dt AS DATE)) AS year,
-    MONTH(CAST(dt AS DATE)) AS month,
-    DAY(CAST(dt AS DATE)) AS day
+    YEAR(CAST(gp.updated_at AS DATE)) AS year,
+    MONTH(CAST(gp.updated_at AS DATE)) AS month,
+    DAY(CAST(gp.updated_at AS DATE)) AS day
 FROM
-    stitch_data
-WHERE
-    last_updated = 1
+    datalake_zendesk_tickets_raw.groups gp
+JOIN
+    max_stitch_data max_sd
+        ON max_sd.id = gp.id
+        AND max_sd.max_updated_at = CAST(gp.updated_at AS TIMESTAMP)
