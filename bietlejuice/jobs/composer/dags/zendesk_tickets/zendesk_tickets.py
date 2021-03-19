@@ -16,7 +16,7 @@ SOURCE = "zendesk_tickets"
 
 # airflow vars
 ENV = Variable.get("environment")
-DATALAKE_BUCKET = Variable.get("datalake_old_bucket")
+DATALAKE_BUCKET = Variable.get("datalake_bucket")
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
 DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
