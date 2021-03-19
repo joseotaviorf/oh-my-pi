@@ -184,7 +184,29 @@ class MetastoreSyncValidation:
         )
 
     def validate_content(self):
-        pass
+        databricks_consumer = DatabricksConsumer(
+            {"db": self.database_name}, SparkClient()
+        )
+        spark_table_count = databricks_consumer.get_data_from_query(
+            f"SELECT count(1) FROM {self.database_name}.{self.table_name}"
+        )
+        spark_table_count = spark_table_count.collect()[0][0]
+
+        trino_table_count = self.trino_client.get_records(
+            f"SELECT count(1) FROM {self.database_name}.{self.table_name}"
+        )
+        trino_table_count = trino_table_count[0][0]
+
+        if spark_table_count != trino_table_count:
+            raise AssertionError(
+                f"m={JOB_NAME}, database={self.database_name}, table={self.table_name}, msg=The partition values count "
+                "of table in In-house Hive and Spark metastores are diverging."
+            )
+
+        logger.info(
+            f"m={JOB_NAME}, database={self.database_name}, table={self.table_name}, "
+            "msg=Table counts match."
+        )
 
 
 def validate_table_arguments(_table_name, _all_tables):
