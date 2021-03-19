@@ -65,9 +65,7 @@ file_list = FileService.list_sql_files_without_extension_from_layer(
     CONTEXT, LayerEnum.ENRICH.value
 )
 
-enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(
-    dag, file_list, partitions=PARTITION_COLS, is_incremental=True
-)
+enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(dag, file_list)
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"

@@ -9,7 +9,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-We perform a incremental load of the following table into the datalake Clean.
+We perform a full load of the following table into the datalake Clean.
 
 - `group_memberships`
 - `groups`

@@ -11,9 +11,6 @@ WITH tickets_filter AS (
                 AND t.tags NOT LIKE '%hsm%'
             )
         )
-        AND t.year = '{year}'
-        AND t.month = '{month}'
-        AND t.day = '{day}'
 ),
 last_updated_ticket as (
     SELECT
@@ -76,10 +73,7 @@ transformed_custom_fields AS (
         distinct_ticket_fields tf
             ON REPLACE(cf.id_field, '"', '') = tf.id_ticket_fields
     WHERE
-        cf.year = '{year}'
-        AND cf.month = '{month}'
-        AND cf.day = '{day}'
-        AND tf.raw_title IN ('Tipo de Solicitação', 'Tipo de Cliente', 'Cliente Tag', 'Motivo Tag', 'Assunto Tag')
+        tf.raw_title IN ('Tipo de Solicitação', 'Tipo de Cliente', 'Cliente Tag', 'Motivo Tag', 'Assunto Tag')
     GROUP BY 1, 2, 3, 4
 )
 SELECT

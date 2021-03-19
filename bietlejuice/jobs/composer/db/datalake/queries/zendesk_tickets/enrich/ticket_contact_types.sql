@@ -7,9 +7,6 @@ WITH filtered_custom_fields AS (
         datalake_zendesk_custom_fields.custom_fields zcf
     WHERE
         zcf.id_field = "360017352951" -- Old contact type
-        AND zcf.year = '{year}'
-        AND zcf.month = '{month}'
-        AND zcf.day = '{day}'
     GROUP BY 1, 2
 ),
 check_prefix AS (

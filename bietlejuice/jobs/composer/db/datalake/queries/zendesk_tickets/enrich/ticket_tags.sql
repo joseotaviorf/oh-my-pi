@@ -18,6 +18,3 @@ WHERE
             AND t.tags NOT LIKE '%hsm%'
         )
     )
-    AND t.year = '{year}'
-    AND t.month = '{month}'
-    AND t.day = '{day}'

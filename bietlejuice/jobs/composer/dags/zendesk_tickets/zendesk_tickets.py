@@ -85,9 +85,7 @@ file_list = FileService.list_sql_files_without_extension_from_layer(
     SOURCE, LayerEnum.CLEAN.value
 )
 
-clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(
-    dag, file_list, is_incremental=True, partitions=["year", "month", "day"]
-)
+clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(dag, file_list)
 
 create_cluster_task >> zendesk_to_datalake_raw_task >> list(
     clean_sub_dags.values()

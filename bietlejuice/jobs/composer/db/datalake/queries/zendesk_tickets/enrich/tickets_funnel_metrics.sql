@@ -12,9 +12,6 @@ WITH tickets_filter AS (
                 AND ztc.tags NOT LIKE '%hsm%'
             )
         )
-        AND ztc.year = '{year}'
-        AND ztc.month = '{month}'
-        AND ztc.day = '{day}'
 ),
 last_updated_ticket AS (
     SELECT
@@ -80,9 +77,6 @@ custom_field_ids AS (
             AND cf_call.id_field = "360020220412" -- refers to id_call
     WHERE
         cf_client_type.value_field = "46785608" --refers to id_client_type
-        AND cf_client_type.year = '{year}'
-        AND cf_client_type.month = '{month}'
-        AND cf_client_type.day = '{day}'
 ),
 ticket_metrics AS (
     WITH row_n AS (

@@ -1,17 +1,9 @@
-WITH distinct_users AS (
-    SELECT
-        *
-    FROM
-        datalake_zendesk_tickets_clean.users
-    WHERE
-        dt_extracted = '{year}-{month}-{day}'
-),
-last_zendesk_user AS (
+WITH last_zendesk_user AS (
     SELECT
         id_user,
         MAX(ts_updated) AS ts_last_updated
     FROM
-        distinct_users
+        datalake_zendesk_tickets_clean.users
     GROUP BY 1
 )
 SELECT
@@ -33,7 +25,7 @@ SELECT
     du.ts_updated,
     NOW() AS ts_load
 FROM
-    distinct_users du
+    datalake_zendesk_tickets_clean.users du
 INNER JOIN
     last_zendesk_user lu
         ON du.id_user=lu.id_user
