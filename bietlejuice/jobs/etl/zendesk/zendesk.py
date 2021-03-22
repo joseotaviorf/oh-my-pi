@@ -35,17 +35,18 @@ class Zendesk(object):
         if bucket_type not in ('raw', 'clean'):
             raise ValueError('m=_upsert_single_partition, bucket_type={}, msg=invalid bucket type'.format(bucket_type))
 
-        self.athena_client.upsert_single_partition(
-            bucket_folder_path='{}/{}/{}/{}'.format(self.s3_bucket,
-                                                    bucket_type,
-                                                    # a different folder for each integration made in Stitch
-                                                    integration_name if bucket_type == 'raw' else 'zendesk',
-                                                    class_.value),
-            database='datalake_{}'.format(bucket_type),
-            table='zendesk_{}'.format(class_.value),
-            partition_name='dt_extracted' if bucket_type == 'clean' else 'dt',
-            partition_value=self.execution_date
-        )
+        if bucket_type != 'raw':
+            self.athena_client.upsert_single_partition(
+                bucket_folder_path='{}/{}/{}/{}'.format(self.s3_bucket,
+                                                        bucket_type,
+                                                        # a different folder for each integration made in Stitch
+                                                        integration_name if bucket_type == 'raw' else 'zendesk',
+                                                        class_.value),
+                database='datalake_{}'.format(bucket_type),
+                table='zendesk_{}'.format(class_.value),
+                partition_name='dt_extracted' if bucket_type == 'clean' else 'dt',
+                partition_value=self.execution_date
+            )
 
     def _move_to_clean_partitioned(self, class_, r_cols, c_cols):
 
