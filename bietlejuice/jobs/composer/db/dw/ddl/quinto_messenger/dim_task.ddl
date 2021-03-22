@@ -10,6 +10,12 @@ CREATE TABLE IF NOT EXISTS quinto_messenger.dim_task (
     contact_theme VARCHAR(50),
     ts_created TIMESTAMP,
     ts_updated TIMESTAMP,
+    ts_created_local TIMESTAMP,
+    ts_updated_local TIMESTAMP,
+    ts_twilio_created TIMESTAMP,
+    ts_twilio_updated TIMESTAMP,
+    ts_twilio_created_local TIMESTAMP,
+    ts_twilio_updated_local TIMESTAMP,
     ts_load TIMESTAMP
 )
 ALTER TABLE quinto_messenger.dim_task OWNER TO airflow;

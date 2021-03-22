@@ -28,7 +28,9 @@ SELECT
 	CAST(GET_JSON_OBJECT(task_attributes,'$.conversations.task_number') AS INT) as task_number,
 	t.seconds_to_first_response,
 	t.ts_created,
-	t.ts_updated
+	t.ts_updated,
+	FROM_UTC_TIMESTAMP(t.ts_created, 'America/Sao_Paulo') as ts_created_local,
+	FROM_UTC_TIMESTAMP(t.ts_updated, 'America/Sao_Paulo') as ts_updated_local
 FROM
 	datalake_quinto_messenger_clean.task AS t
 INNER JOIN last_extracted_tasks let
