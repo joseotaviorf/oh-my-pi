@@ -27,6 +27,12 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 
 class MetastoreSyncValidation:
+    SPARK_TO_TRINO_COLUMN_TYPE = {
+        "string": "varchar",
+        "int": "integer",
+        "timestamp": "timestamp(3)",
+    }
+
     def __init__(self, database_name, table_name, trino_conn_config) -> None:
         """
         Constructor.
@@ -140,9 +146,10 @@ class MetastoreSyncValidation:
         :type trino_table_schema: dict[str:str]
         :rtype: bool
         """
-        for col_name, col_type in spark_ms_table_columns.keys():
-            if (col_name not in trino_table_schema) or (
-                col_type != trino_table_schema[col_name]
+        for col_name, col_type in spark_ms_table_columns.items():
+            if (col_name not in trino_table_schema.keys()) or (
+                trino_table_schema[col_name]
+                != self._get_spark_to_trino_col_mapping(col_type)
             ):
                 logger.error(
                     f"m={JOB_NAME}, database={self.database_name}, table={self.table_name}, "
@@ -150,6 +157,20 @@ class MetastoreSyncValidation:
                 )
                 return False
         return True
+
+    def _get_spark_to_trino_col_mapping(self, col_type):
+        """
+        Fetches the spark to hive column type mapping. The columns in Hive
+         are created with different types.
+
+        :param col_type: str
+        :return: the column if it is the same in both metastores, or the
+         mapped type if they are different
+        """
+        if col_type in self.SPARK_TO_TRINO_COLUMN_TYPE.keys():
+            return self.SPARK_TO_TRINO_COLUMN_TYPE[col_type]
+
+        return col_type
 
     def _validate_table_schema_match(self, spark_ms_table_columns, trino_table_schema):
         return self._compare_tables_schema_length(
@@ -159,6 +180,17 @@ class MetastoreSyncValidation:
         )
 
     def validate_partition_values_count(self):
+        spark_metastore_service = SparkMetastoreService(SparkClient())
+        partition_keys = spark_metastore_service.get_table_partition_keys(
+            self.database_name, self.table_name
+        )
+        if not partition_keys:
+            logger.info(
+                f"m={JOB_NAME}, database={self.database_name}, table={self.table_name}, "
+                "msg=The table is not partitioned, skipping the partition values validation."
+            )
+            return
+
         databricks_consumer = DatabricksConsumer(
             {"db": self.database_name}, SparkClient()
         )
