@@ -53,11 +53,6 @@ marketing_manual_costs_google:
     sheet_name: Google Costs
     clean_table_name: marketing_manual_costs_google
 
-reorganize_leads:
-    sheet_id: 1pzSkb4-utbj0y3jA5LjbP6D3MH-QnQ6snbzFBDKMKKY
-    sheet_name: leads
-    clean_table_name: reorganize_leads
-
 taxonomy_affiliates:
     sheet_id: 1e3806Tog1avS6uVO6ACUqqcqRpwcJffDZhRvgE8A3V4
     sheet_name: taxonomy_affiliates
