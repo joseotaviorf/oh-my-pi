@@ -113,10 +113,6 @@ class BaseSubDAG(object):
         :param dag_id: the dag name
         :rtype: bool
         """
-        return (
-            False
-        )  # temporarily deactivated, due to communication problem between Databricks and Trino
-
         hive_sync_dags_block_list = (
             COMPOSER_DAGS_PATH + "/hive_sync_dags_block_list.yaml"
         )
