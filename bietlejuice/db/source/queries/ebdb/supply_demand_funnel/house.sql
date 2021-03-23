@@ -272,5 +272,7 @@ left join HouseRegistrationStatus hrs
 left join InstantOffer io
   on io.house_id = i.id
 
-where DATE(coalesce(i.dataCriacao, '1900-01-01 00:00:00')) <= DATE('{}')
+WHERE 
+  DATE(coalesce(i.dataCriacao, '1900-01-01 00:00:00')) <= DATE('{}')
+  AND i.id <> 892955945
 ;
