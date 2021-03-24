@@ -28,7 +28,8 @@ WITH task_status_histories AS (
         AND day = '{day}'
 )
 SELECT
-    history._id.oid AS id_action,
+    history._id.oid AS id,
+    id AS id_task,
     history.actionUserId AS id_user_action,
     history.assigneeId AS id_assignee,
     history.actionUserName AS action_user_name,
