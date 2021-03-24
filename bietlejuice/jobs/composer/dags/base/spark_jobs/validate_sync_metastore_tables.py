@@ -32,6 +32,7 @@ class MetastoreSyncValidation:
         "string": "varchar",
         "int": "integer",
         "timestamp": "timestamp(3)",
+        "array<map<string,string>>": "array(map(varchar, varchar))",
     }
 
     def __init__(self, database_name, table_name, trino_conn_config) -> None:
