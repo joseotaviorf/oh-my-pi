@@ -47,7 +47,7 @@ contract_house AS (
 ),
 custom_field_ids AS (
     SELECT
-        cf_client_type.id_ticket,
+        base.id_ticket,
         cf_client_type.value_field AS client_type,
         CASE
             WHEN LENGTH(CAST(cf_house.value_field AS STRING)) < 9
@@ -58,25 +58,27 @@ custom_field_ids AS (
         cf_session.value_field AS id_session,
         cf_call.value_field AS id_call
     FROM
-        datalake_zendesk_custom_fields.custom_fields cf_client_type
+        datalake_zendesk_custom_fields.custom_fields base
     LEFT JOIN
         datalake_zendesk_custom_fields.custom_fields cf_house
-            ON cf_client_type.id_ticket = cf_house.id_ticket
+            ON base.id_ticket = cf_house.id_ticket
             AND cf_house.id_field = "31646438" -- refers to id_house
     LEFT JOIN
         datalake_zendesk_custom_fields.custom_fields cf_contract
-            ON cf_client_type.id_ticket = cf_contract.id_ticket
+            ON base.id_ticket = cf_contract.id_ticket
             AND cf_contract.id_field = "114096515211" -- refers to id_contract
     LEFT JOIN
         datalake_zendesk_custom_fields.custom_fields cf_session --Sauron
-            ON cf_client_type.id_ticket = cf_session.id_ticket
+            ON base.id_ticket = cf_session.id_ticket
             AND cf_session.id_field = "360034234371" -- refers to id_session
     LEFT JOIN
         datalake_zendesk_custom_fields.custom_fields cf_call -- Bigfone
-            ON cf_client_type.id_ticket = cf_call.id_ticket
+            ON base.id_ticket = cf_call.id_ticket
             AND cf_call.id_field = "360020220412" -- refers to id_call
-    WHERE
-        cf_client_type.value_field = "46785608" --refers to id_client_type
+    LEFT JOIN
+        datalake_zendesk_custom_fields.custom_fields cf_client_type
+            ON base.id_ticket = cf_client_type.id_ticket
+            AND cf_client_type.id_field = "46785608" -- refers to id_client_type
 ),
 ticket_metrics AS (
     WITH row_n AS (
