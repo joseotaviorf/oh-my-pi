@@ -41,4 +41,4 @@ SELECT
 FROM
     exploded_transitions
 WHERE
-    DATE(transition.date.date) = '{year}-{month}-{day}'
+    DATE(transition.date.date) = DATE('{year}-{month}-{day}')

@@ -39,4 +39,4 @@ SELECT
 FROM
     exploded_actions
 WHERE
-    DATE(action.date.date) = '{year}-{month}-{day}'
+    DATE(action.date.date) = DATE('{year}-{month}-{day}')
