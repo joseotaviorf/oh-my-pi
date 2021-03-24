@@ -8,6 +8,7 @@ SELECT
     negociacaoId AS id_negotiation,
     gerenteId AS id_manager,
     proprietarioId AS id_owner,
+    destinatarioId AS id_receiver,
     __v AS version,
     actions,
     score,

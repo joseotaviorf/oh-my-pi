@@ -3,7 +3,7 @@ WITH cte_tasks AS(
     *,
     FROM_JSON(metadata,
       'fluxoLocacaoId STRING,
-      destinatario STRUCT<nome: STRING>, 
+      destinatario STRUCT<nome: STRING, id: STRING>, 
       comentario STRING,
       origem STRING,
       dataVisita STRING,
@@ -22,7 +22,8 @@ WITH cte_tasks AS(
       estadoId STRING,
       proprietarioId STRING,
       house STRUCT<proprietarioId: STRING>,
-      contrato STRUCT<imovel: STRUCT<proprietarioId: STRING>>'
+      contrato STRUCT<imovel: STRUCT<proprietarioId: STRING>>,
+      destinatarioId STRING'
     ) AS json_metadata
   FROM
     datalake_crm_clean.tasks
@@ -45,6 +46,11 @@ SELECT
       json_metadata.contrato.imovel.proprietarioId
     ) AS id_owner,
     id_opened_by,
+    COALESCE(
+      json_metadata.destinatarioId,
+      id_receiver,
+      json_metadata.destinatario.id
+    ) AS id_receiver,
     COALESCE(id_negotiation, json_metadata.negociacaoId) AS id_negotiation,
     COALESCE(id_tenant, json_metadata.inquilinoId) AS id_tenant,
     COALESCE(id_manager, json_metadata.gerenteId) AS id_manager,
