@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pendulum
 from airflow.models import DAG, Variable
@@ -57,6 +57,8 @@ CUSTOM_LIBRARIES = [
     }
 ]
 LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
+
+RAW_EXECUTION_TIMEOUT_HOURS = 3.5
 
 # dag definition
 dag = DAG(
@@ -228,6 +230,7 @@ def create_raw_tables_sub_dag_tasks(
                 "parameters": [ENV, DATALAKE_BUCKET],
             }
         },
+        execution_timeout=timedelta(hours=RAW_EXECUTION_TIMEOUT_HOURS),
     )
 
     create_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
