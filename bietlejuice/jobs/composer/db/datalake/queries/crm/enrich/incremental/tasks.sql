@@ -59,7 +59,7 @@ SELECT
     json_metadata.estadoId AS id_state,
     version,
     score_factor,
-    COALESCE(receiver_name,json_metadata.destinatario.nome) AS receiver_name,
+    REPLACE(COALESCE(receiver_name,json_metadata.destinatario.nome), ',', '') AS receiver_name,
     COALESCE(task_comment,json_metadata.comentario) AS task_comment,
     score,
     COALESCE(origin, json_metadata.origem) AS origin,
