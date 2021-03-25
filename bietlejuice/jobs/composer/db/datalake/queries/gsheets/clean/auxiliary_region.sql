@@ -10,6 +10,7 @@ SELECT
     CAST(DDD AS INTEGER) AS ddd,
     regional,
     regional_deprecated,
+    regional_inspection,
     CAST(tier AS INTEGER) AS tier
 FROM
     datalake_gsheets_raw.aux_regiao
