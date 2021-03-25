@@ -23,7 +23,9 @@ WITH task_status_histories AS (
     FROM
         datalake_crm_clean.task_status_histories
     WHERE
-        year = '{year}'
+        -- Filtering out bugged tasks with more than 500 actions
+        SIZE(FROM_JSON(history,'ARRAY<STRUCT<>>')) <= 500
+        AND year = '{year}'
         AND month = '{month}'
         AND day = '{day}'
 )
