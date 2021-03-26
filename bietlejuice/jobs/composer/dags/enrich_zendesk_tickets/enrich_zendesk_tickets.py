@@ -14,6 +14,7 @@ from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 8, 29, 0, 0, 0, tzinfo=LOCAL_TZ)
+EXECUTION_TIMEOUT_HOURS = 4
 PARTITION_COLS = ["year", "month", "day"]
 
 CONTEXT = "zendesk_tickets"
@@ -61,6 +62,7 @@ enrich_sub_dag = DatalakeSubDAG(
     spark_job_paths=BASE_SPARK_JOBS_PATH,
     athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
     layer=LayerEnum.ENRICH,
+    execution_timeout_hours=EXECUTION_TIMEOUT_HOURS,
 )
 
 file_list = FileService.list_sql_files_without_extension_from_layer(
