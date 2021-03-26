@@ -14,7 +14,7 @@ from bietlejuice.jobs.composer.dags.enrich_marketing_costs_sharing_rules.enrich_
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 
 SOURCE = "marketing_costs_sharing_rules"
-DAG_NAME = "enrich_{SOURCE}"
+DAG_NAME = f"enrich_{SOURCE}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = Variable.get("environment")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
