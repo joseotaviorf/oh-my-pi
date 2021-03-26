@@ -1,3 +1,8 @@
+aglomerados_subnormais_2010_limites:
+    sheet_id: 1fANN7TIDQt7qxQMKV-MbCJEJjqaUHjoowKm2UgnNHH0
+    sheet_name: AglomeradosSubnormais2010_Limites
+    clean_table_name: census_subnormal_crowding_areas
+
 aux_regiao:
     sheet_id: 1gh8S0xVQ9HsTs6EkvE0BcXvh5_cfaG3aUpIgrluqqlM
     sheet_name: aux_regiao
