@@ -11,7 +11,6 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.dags.enrich_marketing_costs_sharing_rules.enrich_marketing_costs_sharing_rules_subdag import (
     SharingRulesSubDag,
 )
-from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 
 SOURCE = "marketing_costs_sharing_rules"
 DAG_NAME = f"enrich_{SOURCE}"
@@ -64,7 +63,6 @@ enrich_sub_dag_class = SharingRulesSubDag(
     dag_id=DAG_ID,
     env=ENV,
     datalake_bucket=DATALAKE_BUCKET,
-    layer=LayerEnum.ENRICH,
     database_base_name=SOURCE,
     spark_job_paths=SPARK_JOBS_PATH,
     athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,

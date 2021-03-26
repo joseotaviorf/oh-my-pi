@@ -67,7 +67,7 @@ class SharingRulesSubDag(BaseSubDAG):
         """
 
         is_incremental = False
-        str_partitions = ""
+        str_partitions = "[]"
 
         sub_dag = BaseSubDAG(
             sub_dag_name=sub_dag_name,
