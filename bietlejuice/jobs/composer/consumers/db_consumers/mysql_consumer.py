@@ -190,7 +190,7 @@ class MySqlConsumer(DBConsumer):
             WHERE
                 s.INDEX_NAME = 'PRIMARY'
                 AND t.constraint_type='PRIMARY KEY'
-                AND c.DATA_TYPE <> 'varchar'
+                AND c.DATA_TYPE IN ('tinyint', 'mediumint', 'int', 'bigint', 'date', 'datetime', 'timestamp')
                 AND t.table_schema='{db}'
                 AND t.table_name = '{table}'
             GROUP by
