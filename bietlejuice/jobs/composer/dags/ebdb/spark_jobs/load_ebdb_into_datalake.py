@@ -27,7 +27,7 @@ NB_THREADS = 20
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-Relation = collections.namedtuple("Relation", ["name", "size"])
+Relation = collections.namedtuple("Relation", ["name", "size", "rows_count"])
 
 
 @logger
@@ -50,11 +50,13 @@ def load_relation_into_datalake(args):
     """
     s3_loader, spark_metastore_loader, consumer, rel, db_info, partition_columns = args
     num_partitions = int(math.ceil(float(rel.size) / PARTITION_SIZE))
+    max_records_per_file = s3_loader.MAX_RECORDS_PER_FILE
 
     if num_partitions > 1:
         df = consumer.get_data_from_table_in_parallel(
             rel.name, num_partitions, partition_columns
         )
+        max_records_per_file = int(math.ceil(float(rel.rows_count) / num_partitions))
     else:
         df = consumer.get_data_from_table(rel.name)
 
@@ -65,7 +67,8 @@ def load_relation_into_datalake(args):
         df=df,
         s3_path=database_location + rel.name.lower(),
         format_options=format_options,
-        max_records_per_file=int(math.ceil(float(rel.size) / num_partitions)),
+        max_records_per_file=max_records_per_file,
+        optimize_dataframe=False,
     )
 
     spark_metastore_loader.update_metastore(
@@ -98,7 +101,7 @@ if __name__ == "__main__":
 
     tables = mysql_consumer.get_table_names_and_sizes().collect()
     rels = [
-        Relation(name=t.table_name, size=t.size)
+        Relation(name=t.table_name, size=t.size, rows_count=t.rows_count)
         for t in tables
         if validate_table(t) and t.table_name not in BLOCK_LIST
     ]
