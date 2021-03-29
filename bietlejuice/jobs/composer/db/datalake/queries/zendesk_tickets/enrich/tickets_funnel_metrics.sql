@@ -1,28 +1,5 @@
-WITH tickets_filter AS (
+WITH contract_house AS (
     SELECT DISTINCT
-        *
-    FROM
-        datalake_zendesk_tickets_clean.tickets AS ztc
-    -- we don't track whatsapp notifications
-    WHERE
-        (
-            ztc.ticket_via <> 'api'
-            OR (
-                ztc.ticket_via = 'api'
-                AND ztc.tags NOT LIKE '%hsm%'
-            )
-        )
-),
-last_updated_ticket AS (
-    SELECT
-        id_ticket,
-        MAX(ts_updated) AS ts_last_updated
-    FROM
-        tickets_filter
-    GROUP BY 1
-),
-contract_house AS (
-    SELECT
         CAST(COALESCE(dhl.id_house_listing, '-1') AS BIGINT) AS id_house_listing,
         CAST(COALESCE(dc.id_user, '-1') AS BIGINT) AS id_client,
         CAST(COALESCE(dc.id, '-1') AS BIGINT) AS id_contract,
@@ -43,7 +20,6 @@ contract_house AS (
     LEFT JOIN
         datalake_ebdb_listing.house house
             ON house.id = fl.id_house
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
 ),
 custom_field_ids AS (
     SELECT
@@ -80,19 +56,16 @@ custom_field_ids AS (
             ON base.id_ticket = cf_client_type.id_ticket
             AND cf_client_type.id_field = "46785608" -- refers to id_client_type
 ),
-ticket_metrics AS (
-    WITH row_n AS (
-        SELECT
-            zctm.id_ticket,
-            -- it was necessary 2 columns, because there are other update fields,
-            -- so, WHEN ts_updated is duplicate, we get data WITH the last extraction
-            MAX(zctm.dt_extracted) AS ts_extracted,
-            MAX(zctm.ts_updated) AS ts_updated
-        FROM
-            datalake_zendesk_tickets_clean.ticket_metrics zctm
-        GROUP BY 1
-    )
+tickets AS (
     SELECT
+        t.id_ticket AS id_tckt,
+        -- id_contract AND id_house may be filled WITH string (filled wrong)
+        -- id_house may be filled WITH id_house OR short_id_house
+        cfi.id_house,
+        cfi.id_contract,
+        cfi.id_session,
+        cfi.id_call,
+        cfi.client_type, -- included to enable id_owner AND id_client relationship
         tm.id_ticket,
         CAST(tm.group_stations AS SMALLINT) AS total_group_stations,
         CAST(tm.assignee_stations AS SMALLINT) AS total_assignee_stations,
@@ -115,26 +88,7 @@ ticket_metrics AS (
         tm.ts_assigned AS ts_last_assigned,
         FROM_UTC_TIMESTAMP(tm.ts_assigned, 'Brazil/East') AS ts_last_assigned_local,
         tm.ts_solved AS ts_solved,
-        FROM_UTC_TIMESTAMP(tm.ts_solved, 'Brazil/East') AS ts_solved_local
-    FROM
-        row_n
-    INNER JOIN
-        datalake_zendesk_tickets_clean.ticket_metrics tm
-            ON row_n.id_ticket = tm.id_ticket
-            AND tm.dt_extracted=row_n.ts_extracted
-            AND tm.ts_updated=row_n.ts_updated
-),
-tickets AS (
-    SELECT
-        t.id_ticket AS id_tckt,
-        -- id_contract AND id_house may be filled WITH string (filled wrong)
-        -- id_house may be filled WITH id_house OR short_id_house
-        cfi.id_house,
-        cfi.id_contract,
-        cfi.id_session,
-        cfi.id_call,
-        cfi.client_type, -- included to enable id_owner AND id_client relationship
-        tm.*,
+        FROM_UTC_TIMESTAMP(tm.ts_solved, 'Brazil/East') AS ts_solved_local,
         t.tags, -- included to enable id_user relationship model
         COALESCE(CAST(t.id_requester AS BIGINT), -1) AS id_zendesk_requester_user,
         COALESCE(CAST(t.id_submitter AS BIGINT), -1) AS id_zendesk_submitter_user,
@@ -154,54 +108,57 @@ tickets AS (
         END AS ts_closed_local,
         t.ts_load AS ts_load
     FROM
-        last_updated_ticket lt
-    INNER JOIN
-        tickets_filter t
-            ON t.id_ticket = lt.id_ticket
-            AND t.ts_updated=lt.ts_last_updated
+        datalake_zendesk_tickets_clean.tickets t
     LEFT JOIN
-        ticket_metrics tm
+        datalake_zendesk_tickets_clean.ticket_metrics tm
             ON t.id_ticket=tm.id_ticket
     LEFT JOIN
         custom_field_ids cfi
             ON t.id_ticket = cfi.id_ticket
+    WHERE
+    (
+        t.ticket_via <> 'api'
+        OR (
+            t.ticket_via = 'api'
+            AND t.tags NOT LIKE '%hsm%'
+        )
+    )
 ),
-last_zendesk_user AS (
-    SELECT
-        id_user,
-        MAX(ts_updated) AS ts_last_updated
+distinct_customer_email AS (
+    SELECT DISTINCT
+        cci_e.id_user,
+        cci_e.customer_contact as email,
+        cci_e.cpf
     FROM
-        datalake_zendesk_tickets_clean.users
-    GROUP BY 1
-),
-distinct_zendesk_users AS (
-    SELECT
-        CAST(du.id_user AS BIGINT) AS id_zendesk_user,
-        du.email,
-        regexp_replace(du.phone,'(\D+)','') AS phone
-    FROM
-        datalake_zendesk_tickets_clean.users du
-    INNER JOIN
-        last_zendesk_user lu
-            ON du.id_user=lu.id_user
-            AND du.ts_updated=lu.ts_last_updated
-),
-customer_contacts AS (
-    SELECT
-        zu.id_zendesk_user,
-        MAX(COALESCE(cci_e.id_user, cci_p.id_user)) AS id_user,
-        MAX(COALESCE(cci_e.cpf,cci_p.cpf)) AS id_personal_document
-    FROM
-        distinct_zendesk_users zu
-    LEFT JOIN
-        datalake_ebdb_customer_contact_identification.customer_contact_identification cci_p
-            ON regexp_replace(cci_p.customer_contact,'(\D+)','') = zu.phone
-            AND cci_p.channel = 'phone'
-    LEFT JOIN
         datalake_ebdb_customer_contact_identification.customer_contact_identification cci_e
-            ON cci_e.customer_contact = zu.email
-            AND cci_e.channel = 'email'
-    GROUP BY 1
+    WHERE
+        cci_e.channel = 'email'
+),
+distinct_customer_phone AS (
+    SELECT DISTINCT
+        cci_p.id_user,
+        CASE
+            WHEN cci_p.customer_contact NOT LIKE '+%' AND LENGTH(REGEXP_REPLACE(cci_p.customer_contact, '\\D|^0+', '')) < 12
+                THEN CONCAT('55', REGEXP_REPLACE(cci_p.customer_contact, '\\D|^0+', ''))
+                ELSE REGEXP_REPLACE(cci_p.customer_contact, '\\D|^0+', '')
+        END AS phone,
+        cci_p.cpf
+    FROM
+        datalake_ebdb_customer_contact_identification.customer_contact_identification cci_p
+    WHERE
+        cci_p.channel  = 'phone'
+),
+zendesk_user_contact AS (
+    SELECT
+        CAST(zu.id_user AS BIGINT) AS id_zendesk_user,
+        CASE
+            WHEN zu.phone NOT LIKE '+%' AND LENGTH(REGEXP_REPLACE(zu.phone, '\\D|^0+', '')) < 12
+                THEN CONCAT('55', REGEXP_REPLACE(zu.phone, '\\D|^0+', ''))
+                ELSE REGEXP_REPLACE(zu.phone, '\\D|^0+', '')
+        END AS phone,
+        zu.email
+    FROM
+        datalake_zendesk_tickets_clean.users zu
 ),
 -- evaluate funnel keys FROM each ticket according to business rules
 ticket_funnel_keys AS (
@@ -209,8 +166,8 @@ ticket_funnel_keys AS (
         tck.id_tckt,
         cntt_hse.id_house_listing,
         cntt_hse.id_contract AS id_contract,
-        cc.id_user AS id_user,
-        cc.id_personal_document,
+        COALESCE(dc_e.id_user, dc_p.id_user) AS id_user,
+        COALESCE(dc_e.cpf, dc_p.cpf) AS id_personal_document,
         -- tickets will only have a valid client key according to its corresponding client type
         CASE
             WHEN tck.client_type = 'inquilino' THEN cntt_hse.id_client
@@ -224,15 +181,15 @@ ticket_funnel_keys AS (
         contract_house cntt_hse
             ON tck.id_house = cntt_hse.id_house
             AND tck.id_contract = cntt_hse.id_contract
-            AND str_created_date BETWEEN (
-                    CASE
-                        WHEN cntt_hse.version = 1 THEN LEAST(COALESCE(cntt_hse.dt_listing_version_start, tck.str_created_date), tck.str_created_date)
-                        ELSE cntt_hse.dt_listing_version_start
-                    END
-                ) AND DATE_FORMAT(COALESCE(CAST(cntt_hse.dt_listing_version_end AS TIMESTAMP), NOW())  - INTERVAL '1' DAY,'%Y-%m-%d')
     LEFT JOIN
-        customer_contacts cc
-            ON cc.id_zendesk_user = tck.id_zendesk_requester_user
+        zendesk_user_contact zuc
+            ON zuc.id_zendesk_user = tck.id_zendesk_requester_user
+    LEFT JOIN
+        distinct_customer_email dc_e
+            ON dc_e.email = zuc.email
+    LEFT JOIN
+        distinct_customer_phone dc_p
+            ON dc_p.phone = zuc.phone
 )
 SELECT
     t.id_tckt AS id_ticket,
