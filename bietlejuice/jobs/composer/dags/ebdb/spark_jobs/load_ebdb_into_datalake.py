@@ -106,7 +106,12 @@ if __name__ == "__main__":
         if validate_table(t) and t.table_name not in BLOCK_LIST
     ]
 
-    rels.extend([Relation(name=view_name, size=1) for view_name in VIEW_ALLOW_LIST])
+    rels.extend(
+        [
+            Relation(name=view_name, size=1, rows_count=0)
+            for view_name in VIEW_ALLOW_LIST
+        ]
+    )
     partition_columns = mysql_consumer.get_partition_columns_from_all_tables()
 
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
