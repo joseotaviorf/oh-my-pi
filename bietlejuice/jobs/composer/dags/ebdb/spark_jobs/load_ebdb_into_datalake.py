@@ -15,12 +15,12 @@ from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_ebdb_into_datalake"
-TABLE_BLOCK_LIST = ["REVCHANGES", "_UsuarioRevisionEntity_new"]
+TABLE_BLOCK_LIST = ["ENT_REVTYPE", "REVCHANGES", "_UsuarioRevisionEntity_new"]
 VIEW_ALLOW_LIST = ["MapRegiao", "vw_lead_reason"]
 BLOCK_LIST = ["PoligonoRegiao"]
 
 # todo: check this value and argument the choice
-PARTITION_SIZE = 512
+PARTITION_SIZE = 1024
 # todo: check this value and argument the choice
 NB_THREADS = 20
 
@@ -48,21 +48,24 @@ def load_relation_into_datalake(args):
     """
     Loads tables and views into datalake
     """
-    s3_loader, spark_metastore_loader, consumer, rel, db_info = args
+    s3_loader, spark_metastore_loader, consumer, rel, db_info, partition_columns = args
     num_partitions = int(math.ceil(float(rel.size) / PARTITION_SIZE))
+
     if num_partitions > 1:
-        df = consumer.get_data_from_table_in_parallel(rel.name, num_partitions)
+        df = consumer.get_data_from_table_in_parallel(
+            rel.name, num_partitions, partition_columns
+        )
     else:
         df = consumer.get_data_from_table(rel.name)
+
     database_name = db_info["db_raw_databricks"]
     format_options = SparkTableStorageFormat.DEFAULT_RAW
     database_location = db_info["db_raw_path"]
-    s3_loader.load_full_table(
+    s3_loader.load_df(
         df=df,
-        database_name=database_name,
-        table_name=rel.name.lower(),
+        s3_path=database_location + rel.name.lower(),
         format_options=format_options,
-        database_location=database_location,
+        max_records_per_file=int(math.ceil(float(rel.size) / num_partitions)),
     )
 
     spark_metastore_loader.update_metastore(
@@ -101,6 +104,7 @@ if __name__ == "__main__":
     ]
 
     rels.extend([Relation(name=view_name, size=1) for view_name in VIEW_ALLOW_LIST])
+    partition_columns = mysql_consumer.get_partition_columns_from_all_tables()
 
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     metastore_service = SparkMetastoreService(SparkClient())
@@ -114,7 +118,14 @@ if __name__ == "__main__":
         p.map(
             load_relation_into_datalake,
             [
-                (s3_loader, spark_metastore_loader, mysql_consumer, rel, db_info)
+                (
+                    s3_loader,
+                    spark_metastore_loader,
+                    mysql_consumer,
+                    rel,
+                    db_info,
+                    partition_columns,
+                )
                 for rel in rels
             ],
         )

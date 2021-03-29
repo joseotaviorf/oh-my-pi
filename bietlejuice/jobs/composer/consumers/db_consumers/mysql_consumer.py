@@ -89,16 +89,39 @@ class MySqlConsumer(DBConsumer):
         return df
 
     @logger
-    def get_data_from_table_in_parallel(self, table_name, concurrency):
+    def _get_partition_column_from_df(self, partitions_df, table_name):
+        """
+        Gets the column with highest cardinality from the partitions dataframe.
+        :param table_name: Name of the table
+        :param partitions_df: Data frame that contains all possible partitions for all database tables
+        :return: The column name for the best reading partitioning, None if there is no good candidate
+        """
+        column_df = (
+            partitions_df.filter(partitions_df.table_name == table_name)
+            .sort(partitions_df.cadinality.desc())
+            .first()
+        )
+        return column_df.column_name if column_df else None
+
+    @logger
+    def get_data_from_table_in_parallel(
+        self, table_name, concurrency, partitions_df=None
+    ):
         """
         Gets all data from a table in parallel in a MySql Database.
         :param table_name: Name of the table
         :param concurrency: Number of tasks that are launched to read the data
+        :param partitions_df: Optional data frame, that contains all possible partitions for all database tables
         :return: A Spark DataFrame with the table data
         """
         # todo: explain in the method doc the strategy to use when reading from a
         #  table in parallel
-        partition_column = self._get_partition_column_from_table(table_name)
+        if partitions_df:
+            partition_column = self._get_partition_column_from_df(
+                partitions_df, table_name
+            )
+        else:
+            partition_column = self._get_partition_column_from_table(table_name)
 
         if not partition_column:
             df = self.get_data_from_table(table_name)
@@ -190,7 +213,7 @@ class MySqlConsumer(DBConsumer):
             WHERE
                 s.INDEX_NAME = 'PRIMARY'
                 AND t.constraint_type='PRIMARY KEY'
-                AND c.DATA_TYPE IN ('tinyint', 'mediumint', 'int', 'bigint', 'date', 'datetime', 'timestamp')
+                AND c.DATA_TYPE IN ('int', 'bigint', 'date', 'datetime', 'timestamp')
                 AND t.table_schema='{db}'
                 AND t.table_name = '{table}'
             GROUP by
@@ -209,6 +232,58 @@ class MySqlConsumer(DBConsumer):
         logger.warning(
             "m=_get_partition_column_from_table, table={}, msg=Partition column "
             "to parallelize the table read was not found.".format(table_name)
+        )
+
+    def get_partition_columns_from_all_tables(self):
+        """
+        Tries to find good partition columns (a col with high cardinality) for all database tables.
+        :return: Dataframe with columns with higher cardinality for each database table.
+        """
+        query = """
+            SELECT
+                k.TABLE_NAME as table_name,
+                k.COLUMN_NAME as column_name,
+                k.CONSTRAINT_NAME,
+                s.`CARDINALITY` as cadinality
+            FROM
+                information_schema.table_constraints t
+            JOIN
+                information_schema.key_column_usage k
+                    ON t.constraint_name = k.constraint_name
+                    AND t.table_schema = k.table_schema
+                    AND t.table_name = k.table_name
+            LEFT JOIN
+                information_schema.STATISTICS s
+                    ON s.TABLE_NAME = t.TABLE_NAME
+                    AND s.COLUMN_NAME = k.COLUMN_NAME
+            JOIN
+                information_schema.COLUMNS c
+                    ON c.TABLE_SCHEMA = t.TABLE_SCHEMA
+                    AND c.TABLE_NAME = t.TABLE_NAME
+                    AND c.COLUMN_NAME = k.COLUMN_NAME
+            WHERE
+                s.INDEX_NAME = 'PRIMARY'
+                AND t.constraint_type='PRIMARY KEY'
+                AND c.DATA_TYPE IN ('int', 'bigint', 'date', 'datetime', 'timestamp')
+                AND t.table_schema='{db}'
+            GROUP by
+                k.TABLE_NAME,
+                k.CONSTRAINT_NAME,
+                s.`CARDINALITY`
+            ORDER by k.TABLE_NAME desc
+            """.format(
+            db=self.conn_config["db"]
+        )
+        df = self.get_data_from_query(query).select(
+            "table_name", "column_name", "cadinality"
+        )
+
+        if not df.rdd.isEmpty():
+            return df
+
+        logger.warning(
+            "m=get_partition_columns_from_all_tables, table={}, msg=Could not fetch "
+            "partition columns for all tables."
         )
 
     @logger
