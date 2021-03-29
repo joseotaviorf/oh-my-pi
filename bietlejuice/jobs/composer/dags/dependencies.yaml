@@ -420,6 +420,11 @@ bietlejuice.enrich_zendesk_custom_fields:
   - bietlejuice.zendesk_tickets
 
 bietlejuice.enrich_zendesk_tickets:
+  - bietlejuice.ebdb:load-contract
+  - bietlejuice.ebdb:load-rent-flow
+  - bietlejuice.enrich_ebdb_customer_contact_identification:load-customer-contact-identification-to-enrich
+  - bietlejuice.enrich_ebdb_listing:load-house-to-enrich
+  - bietlejuice.enrich_ebdb_listing:load-house-listing-to-enrich
   - bietlejuice.enrich_zendesk_custom_fields:load-custom-fields-to-enrich
 
 bietlejuice.regions_polygon:
