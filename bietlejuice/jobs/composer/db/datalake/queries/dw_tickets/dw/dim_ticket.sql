@@ -25,4 +25,4 @@ SELECT
     ts_updated_local,
     NOW() AS ts_load
 FROM
-    datalake_zendesk_tickets.ticket_funnel
+    datalake_zendesk_ticket_funnels.ticket_funnel

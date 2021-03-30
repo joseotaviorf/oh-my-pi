@@ -14,9 +14,9 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output table on Enrich layer:
 
 - `ticket_contact_types`
-- `ticket_funnel`
+- `ticket_measurements`
 - `ticket_tags`
-- `tickets_funnel_metrics`
+- `zendesk_users_contact`
 
 ### Responsible Data Team
 ​

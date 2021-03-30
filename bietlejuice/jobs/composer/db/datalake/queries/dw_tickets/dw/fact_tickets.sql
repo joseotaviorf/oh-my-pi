@@ -49,4 +49,4 @@ SELECT
     t.ts_closed_local,
     NOW() AS ts_load
 FROM
-    datalake_zendesk_tickets.tickets_funnel_metrics AS t
+    datalake_zendesk_ticket_funnels.tickets_funnel_metrics AS t
