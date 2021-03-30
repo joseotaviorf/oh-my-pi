@@ -7,6 +7,7 @@
 import json
 import logging
 from argparse import ArgumentParser
+import re
 
 import requests
 from quintoandar_logger import QuintoAndarLogger
@@ -32,7 +33,6 @@ class MetastoreSyncValidation:
         "string": "varchar",
         "int": "integer",
         "timestamp": "timestamp(3)",
-        "array<map<string,string>>": "array(map(varchar, varchar))",
     }
 
     def __init__(self, database_name, table_name, trino_conn_config) -> None:
@@ -160,8 +160,8 @@ class MetastoreSyncValidation:
         """
         for col_name, col_type in spark_ms_table_columns.items():
             if (col_name not in trino_table_schema.keys()) or (
-                trino_table_schema[col_name]
-                != self._get_spark_to_trino_col_mapping(col_type)
+                trino_table_schema[col_name].replace(" ", "")
+                != self._get_spark_to_trino_col_mapping(col_type).replace(" ", "")
             ):
                 logger.error(
                     f"m={JOB_NAME}, database={self.database_name}, table={self.table_name}, "
@@ -170,10 +170,9 @@ class MetastoreSyncValidation:
                 return False
         return True
 
-    def _get_spark_to_trino_col_mapping(self, col_type):
+    def _get_base_col_mapping(self, col_type):
         """
-        Fetches the spark to hive column type mapping. The columns in Hive
-         are created with different types.
+        Fetches the spark to hive column type mapping.
 
         :param col_type: str
         :return: the column if it is the same in both metastores, or the
@@ -183,6 +182,28 @@ class MetastoreSyncValidation:
             return self.SPARK_TO_TRINO_COLUMN_TYPE[col_type]
 
         return col_type
+
+    def _get_spark_to_trino_col_mapping(self, col_type):
+        """
+        The columns in Hive are created with different types from Spark.
+        It fetches the column provided, identify it is a struct, such as
+        map/array and apply the respective mapping.
+
+        :param col_type: str
+        :return: the column if it is the same in both metastores, or the
+         mapped type if they are different
+        """
+        # special treatment for array and map columns
+        if "array" in col_type or "map" in col_type:
+            col_type = col_type.replace("<", "(").replace(">", ")")
+            # splits by ',' '(' and ')', keeping delimiters
+            str_parts = re.split(r"([,|\(|\)])", col_type)
+            new_type = ""
+            for str_part in str_parts:
+                new_type += self._get_base_col_mapping(str_part)
+            return new_type
+        else:
+            return self._get_base_col_mapping(col_type)
 
     def _validate_table_schema_match(self, spark_ms_table_columns, trino_table_schema):
         return self._compare_tables_schema_length(
