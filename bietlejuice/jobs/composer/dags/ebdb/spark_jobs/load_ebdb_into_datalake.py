@@ -18,6 +18,12 @@ JOB_NAME = "load_ebdb_into_datalake"
 TABLE_BLOCK_LIST = ["ENT_REVTYPE", "REVCHANGES", "_UsuarioRevisionEntity_new"]
 VIEW_ALLOW_LIST = ["MapRegiao", "vw_lead_reason"]
 BLOCK_LIST = ["PoligonoRegiao"]
+SERIAL_TABLES_LIST = [
+    "Imovel_AUD",
+    "MudancaStatusAgendamento",
+    "AmenidadesInfo",
+    "Agendamento_AUD",
+]
 
 # todo: check this value and argument the choice
 PARTITION_SIZE = 1024
@@ -122,6 +128,21 @@ if __name__ == "__main__":
     # create database if not exists
     metastore_service.create_database(db_info["db_raw_databricks"])
 
+    for rel in rels:
+        if rel.name not in SERIAL_TABLES_LIST:
+            continue
+
+        load_relation_into_datalake(
+            (
+                s3_loader,
+                spark_metastore_loader,
+                mysql_consumer,
+                rel,
+                db_info,
+                partition_columns,
+            )
+        )
+
     with Pool(NB_THREADS) as p:
         p.map(
             load_relation_into_datalake,
@@ -135,5 +156,6 @@ if __name__ == "__main__":
                     partition_columns,
                 )
                 for rel in rels
+                if rel.name not in SERIAL_TABLES_LIST
             ],
         )
