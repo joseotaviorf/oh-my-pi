@@ -1,3 +1,11 @@
+# entry example:
+#
+# <raw_table_name>:
+#     sheet_id: <sheet_id>
+#     sheet_name: <sheet_name>
+#     clean_table_name: <clean_table_name>
+#     cron: 1,9,17 (optional and limited to 1,9 and 17)
+
 aglomerados_subnormais_2010_limites:
     sheet_id: 1fANN7TIDQt7qxQMKV-MbCJEJjqaUHjoowKm2UgnNHH0
     sheet_name: AglomeradosSubnormais2010_Limites
