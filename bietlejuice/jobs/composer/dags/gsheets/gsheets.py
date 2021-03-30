@@ -21,7 +21,7 @@ from bietlejuice.jobs.composer.services import FileService
 
 def check_run_hour(cron, local_tz):
     current_time = datetime.now(local_tz)
-    current_hour = current_time.hour - 3
+    current_hour = current_time.hour
     return str(current_hour) in cron.split(",")
 
 
@@ -33,7 +33,7 @@ SOURCE = "gsheets"
 DAG_ID = f"bietlejuice.{SOURCE}"
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2021, 1, 14, 0, 0, 0, tzinfo=local_tz)
-MAIN_SCHEDULE_INTERVAL = "0 4,12,20 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 6,14,22 * * *"
 
 # s3 paths setup
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
