@@ -45,6 +45,33 @@ class PostgresClient(DBClient):
                 return cur.fetchall()
 
     @logger
+    def drop_table(self, dw_schema, table_name, if_exists=False):
+        drop_table_sql = (
+            f"DROP TABLE {'IF EXISTS' if if_exists else ''} {dw_schema}.{table_name}"
+        )
+        with closing(self.conn) as conn:
+            with closing(conn.cursor()) as cur:
+                cur.execute(drop_table_sql)
+                conn.commit()
+
+        logger.info("m=drop_table, msg=query execution succeeded")
+
+    @logger
+    def create_table_from_select(self, dw_schema, table_name, query):
+        create_table_query = f"""
+            CREATE TABLE {dw_schema}.{table_name}
+            AS
+            {query}
+        """
+
+        with closing(self.conn) as conn:
+            with closing(conn.cursor()) as cur:
+                cur.execute(create_table_query)
+                conn.commit()
+
+        logger.info("m=create_table_from_select, msg=query execution succeeded")
+
+    @logger
     def run(self, command, autocommit=False, parameters=None):
         with closing(self.conn) as conn:
             conn.autocommit = autocommit

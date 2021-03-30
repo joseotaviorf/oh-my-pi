@@ -200,7 +200,7 @@ pipeline:
       - apt-get update
       - apt-get install -y git > /dev/null
       - chmod +x scripts/execute_python3_steps.sh
-      - bash scripts/execute_python3_steps.sh "make requirements-python3" "make unit-tests-python3"
+      - bash scripts/execute_python3_steps.sh "make requirements-test-python3" "make requirements-python3" "make unit-tests-python3"
     when:
       event: push
 

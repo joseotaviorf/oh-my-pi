@@ -7,6 +7,10 @@ from bietlejuice.jobs.composer.base.db.database_enum import (
     DatabaseEnum,
     DatabaseTypeEnum,
 )
+
+from bietlejuice.jobs.composer.base.db.database_client_factory import (
+    DatabaseClientFactory,
+)
 from bietlejuice.jobs.composer.base.db.datalake_metastore_service import (
     DatalakeMetastoreService,
 )

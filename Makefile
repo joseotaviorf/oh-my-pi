@@ -95,7 +95,6 @@ environment-python3:
 	@pyenv virtualenv 3.7.3 bi-etl-ejuice-python3
 	@pyenv local bi-etl-ejuice-python3
 
-
 .PHONY: build-test-environment-python3
 build-test-environment-python3:
 	@docker build --file docker/test-environment-py3.Dockerfile -t bietlejuice --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} .
@@ -108,7 +107,6 @@ test-environment-python3:
 .PHONY: requirements-python3
 requirements-python3:
 	@python -m pip install -U -r requirements3.txt --extra-index-url https://quintoandar.github.io/python-package-server/
-	@make requirements-test-python3
 	@make requirements-lint-python3
 
 .PHONY: requirements-test-python3

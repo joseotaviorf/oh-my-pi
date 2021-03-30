@@ -1,5 +1,7 @@
 import re
 
+from os import path, makedirs
+
 from quintoandar_logger import QuintoAndarLogger
 
 logger = QuintoAndarLogger("S3Service")
@@ -62,3 +64,50 @@ class S3Service:
                 Prefix=objects_filter + "/"
             )
         ]
+
+    @logger
+    def download_file(self, s3_file_path, folder_destination):
+        """
+        Donwload a file from s3 to a specific location.
+
+        :param s3_file_path: full path to the target s3 location, ex: "s3://bucket-name/path/to/file.txt"
+        :param folder_destination: path to the target folder where the s3 file will be saved"
+        :return: None
+        """
+        if not path.exists(folder_destination):
+            makedirs(folder_destination)
+
+        bucket_name, key = self._split_s3_path(s3_file_path)
+        filename = key.split("/")[-1]
+        self.s3_resource.Bucket(bucket_name).download_file(
+            key, f"{folder_destination}/{filename}"
+        )
+
+    @logger
+    def read_file(self, s3_file_path):
+        """
+        Read a file from s3 and return the file content.
+
+        :param s3_file_path: full path to the target s3 location, ex: "s3://bucket-name/path/to/file.txt"
+        :return: query string
+        """
+        bucket_name, key = self._split_s3_path(s3_file_path)
+        return (
+            self.s3_resource.Bucket(bucket_name)
+            .Object(key)
+            .get()["Body"]
+            .read()
+            .decode("utf-8")
+        )
+
+    @logger
+    def list_sql_files(self, s3_file_path):
+        """
+        List all sql files from a given s3 path
+
+        :param s3_file_path: full path to the target s3 location, ex: "s3://bucket-name/path/to/file.txt"
+        :return: list of sql files
+        """
+        return list(
+            filter(lambda x: x.endswith(".sql"), self.list_objects(s3_file_path))
+        )
