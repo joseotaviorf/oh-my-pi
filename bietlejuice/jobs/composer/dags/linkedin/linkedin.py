@@ -18,6 +18,7 @@ ENV = Variable.get("environment")
 API_KEY = Variable.get("linkedin_api_key")
 API_SECRET = Variable.get("linkedin_api_secret")
 REFRESH_TOKEN = Variable.get("linkedin_refresh_token")
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 AUTH = json.dumps(
     {"API_KEY": API_KEY, "API_SECRET": API_SECRET, "REFRESH_TOKEN": REFRESH_TOKEN}
 )
@@ -62,6 +63,7 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    doc_md=BaseDAG.get_dag_doc(MEDIA).format(chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID),
 )
 
 
