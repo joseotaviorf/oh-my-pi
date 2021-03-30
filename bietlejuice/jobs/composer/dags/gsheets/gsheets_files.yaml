@@ -66,6 +66,21 @@ marketing_manual_costs_google:
     sheet_name: Google Costs
     clean_table_name: marketing_manual_costs_google
 
+marketing_offline_manual_costs:
+    sheet_id: 1gneeE6l30lv4om6FBEUe23YGfbMCCNe8IwpbCRL6vXQ
+    sheet_name: offline_manual_costs
+    clean_table_name: marketing_offline_manual_costs
+
+marketing_offline_manual_share_city_group:
+    sheet_id: 1zUM7FIxpNXmnTsbWZoX1wV7S_C49XMO8Vo68ElSqipo
+    sheet_name: offline_manual_share_city_group
+    clean_table_name: marketing_offline_manual_share_city_group
+
+marketing_offline_manual_share_cost_center:
+    sheet_id: 1zUM7FIxpNXmnTsbWZoX1wV7S_C49XMO8Vo68ElSqipo
+    sheet_name: offline_manual_share_cost_center
+    clean_table_name: marketing_offline_manual_share_cost_center
+
 taxonomy_affiliates:
     sheet_id: 1e3806Tog1avS6uVO6ACUqqcqRpwcJffDZhRvgE8A3V4
     sheet_name: taxonomy_affiliates

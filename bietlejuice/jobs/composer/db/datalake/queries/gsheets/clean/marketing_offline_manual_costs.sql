@@ -1,0 +1,28 @@
+SELECT
+    id_rule_city_group_rent,
+    id_rule_city_group_sale,
+    email,
+    team,
+    entry_type,
+    INT(invoice_number),
+    cnpj,
+    vendor_name,
+    description,
+    campagin_name,
+    cost_category,
+    cost_subcategory,
+    action,
+    business_context,
+    FLOAT(cost) AS cost,
+    has_cost_center_share,
+    id_rule_cost_center,
+    has_city_group_share_1,
+    cost_center,
+    has_city_group_share_2,
+    city_group,
+    TIMESTAMP(ts_entry) AS ts_entry,
+    DATE(dt_invoice) AS dt_invoice,
+    DATE(dt_service_started) AS dt_service_started,
+    DATE(dt_service_ended) AS dt_service_ended
+FROM
+    datalake_gsheets_raw.marketing_offline_manual_costs
