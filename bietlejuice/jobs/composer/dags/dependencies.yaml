@@ -245,9 +245,12 @@ bietlejuice.enrich_docx:
 bietlejuice.enrich_ebdb_contract:
   - bietlejuice.ebdb:load-contract
   - bietlejuice.ebdb:load-contract-aud
-  - bietlejuice.ebdb:load-user-revision-entity
   - bietlejuice.ebdb:load-contract-version
   - bietlejuice.ebdb:load-full-contract
+  - bietlejuice.ebdb:load-rent-flow
+  - bietlejuice.ebdb:load-user-revision-entity
+  - bietlejuice.enrich_ebdb_listing:load-house-to-enrich
+  - bietlejuice.enrich_ebdb_listing:load-house-listing-to-enrich
 
 bietlejuice.enrich_ebdb_customer_contact_identification:
   - bietlejuice.ebdb:load-user
