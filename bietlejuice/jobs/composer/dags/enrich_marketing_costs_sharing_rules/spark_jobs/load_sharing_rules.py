@@ -27,14 +27,15 @@ cte_template = """
         '{rule}' as id_rule,
         id_date,
         city_group,
-        funnel_side,
+        {third_column},
         share
     from {rule}_raw )
 """
 
 
-def build_query(sql_file_list):
+def build_query(sql_file_list, rule_type):
 
+    third_column = "funnel_side" if rule_type == "online" else "center_cost"
     ctes = []
     union = []
     for query_path in sql_file_list:
@@ -44,7 +45,9 @@ def build_query(sql_file_list):
 
         rule_query = FileService.get_query_from_file_name(query_path)
 
-        rule_cte = cte_template.format(rule=rule_name, rule_query=rule_query)
+        rule_cte = cte_template.format(
+            rule=rule_name, rule_query=rule_query, third_column=third_column
+        )
         ctes.append(rule_cte)
         union.append(f"select * from {rule_name}")
 
@@ -105,7 +108,7 @@ if __name__ == "__main__":
             f"{rule_path}/{file_name}" for file_name in sql_file_list_raw
         ]
 
-        query = build_query(sql_file_list_paths)
+        query = build_query(sql_file_list_paths, rule_type)
 
         table_loader_pipeline = FullTableLoaderPipeline(
             database_name=database_name,
