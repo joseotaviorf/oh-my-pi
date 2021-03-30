@@ -30,6 +30,7 @@ SELECT
 	metadata,
 	CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskPriority') AS INT) AS task_priority,
 	CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.waiting_time') AS INT) AS seconds_waiting_time,
+	TO_UTC_TIMESTAMP(ts_created_local, 'Brazil/East') AS ts_created_utc,
 	ts_created_local,
 	ts_received_local,
 	TO_TIMESTAMP(GET_JSON_OBJECT(metadata,'$.event_data.TransferStarted')) AS ts_transfer_started,
