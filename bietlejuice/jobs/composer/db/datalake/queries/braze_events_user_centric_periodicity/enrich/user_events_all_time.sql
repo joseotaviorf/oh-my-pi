@@ -196,13 +196,11 @@ SELECT
       ELSE NULL
     END
   ) AS dt_last_sms_delivered_to,
-  year,
-  month,
-  day
+ {year} AS year,
+ {month} AS month,
+ {day} AS day
 FROM
     datalake_braze_user_centric.user_events_daily
 WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+    DATE(CONCAT(CAST(year AS VARCHAR(4)),'-',CAST(month AS VARCHAR(2)),'-',CAST(day AS VARCHAR(2)))) <= DATE('{year}-{month}-{day}')
 GROUP BY 1, 30, 31, 32
