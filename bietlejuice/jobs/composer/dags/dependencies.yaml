@@ -427,8 +427,8 @@ bietlejuice.enrich_zendesk_ticket_funnels:
   - bietlejuice.enrich_ebdb_contract:load-contract-house-to-enrich
   - bietlejuice.enrich_ebdb_customer_contact_identification:load-customer-contact-identification-to-enrich
   - bietlejuice.enrich_zendesk_custom_fields:load-custom-fields-to-enrich
-  - bietlejuice.enrich_zendesk_tickets:enrich_zendesk_tickets:ticket_measurements
-  - bietlejuice.enrich_zendesk_tickets:enrich_zendesk_tickets:zendesk_user_contact
+  - bietlejuice.enrich_zendesk_tickets:load-ticket-measurements-to-enrich
+  - bietlejuice.enrich_zendesk_tickets:load-zendesk-users-contact-to-enrich
 
 bietlejuice.enrich_zendesk_tickets:
   - bietlejuice.enrich_zendesk_custom_fields:load-custom-fields-to-enrich
