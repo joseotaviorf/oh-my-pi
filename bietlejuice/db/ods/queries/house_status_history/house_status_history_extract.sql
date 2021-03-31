@@ -45,8 +45,8 @@ select
 	i.codigoPromocao,
 	i.cotarSeguro,
 	i.valorTotal,
-	i.expirationDate,
-	i.firstPublication,
+	nullif(i.expirationDate, '0000-00-00 00:00:00') as expirationDate, -- due to a bug in Product, 0 timestamps are being created
+	nullif(i.firstPublication, '0000-00-00 00:00:00') as firstPublication, -- due to a bug in Product, 0 timestamps are being created
 	i.dadosCorretor_id,
 	i.notificacaoAnuncioIncompletoProprietario,
 	i.notificacaoAnuncioIncompletoAdmin,
@@ -67,9 +67,9 @@ select
 	i.coordenadasManuais,
 	i.iptuIncluso,
 	i.followUpProprietarioSubirFotos,
-	i.dataPrimeiroVerificado,
+	nullif(i.dataPrimeiroVerificado, '0000-00-00 00:00:00') as dataPrimeiroVerificado, -- due to a bug in Product, 0 timestamps are being created
 	i.tipoColisaoLead,
-	i.calculoPagamentoLeadCorretor,
+	nullif(i.calculoPagamentoLeadCorretor, '0000-00-00 00:00:00') as calculoPagamentoLeadCorretor, -- due to a bug in Product, 0 timestamps are being created
 	i.usuarioQueCadastrou_id,
 	i.nomeImagemCapa,
 	i.geoHash,
@@ -77,7 +77,7 @@ select
 	i.infosAdmin,
 	i.infosAdminInterna,
 	i.historicoAgendamentoFotos,
-	i.calculoPagamentoLeadAfiliado,
+	nullif(i.calculoPagamentoLeadAfiliado, '0000-00-00 00:00:00') as calculoPagamentoLeadAfiliado, -- due to a bug in Product, 0 timestamps are being created
 	i.possuiBanheiroServico,
 	i.possuiQuartoServico,
 	i.bairroPadrao,
@@ -95,31 +95,31 @@ select
 	i.emailPublicacaoProprietarioEnviado,
 	i.statusConversaoImovel,
 	i.matricula,
-	i.ultimoEmailDeConfirmacaoEnviado,
+	nullif(i.ultimoEmailDeConfirmacaoEnviado, '0000-00-00 00:00:00') as ultimoEmailDeConfirmacaoEnviado, -- due to a bug in Product, 0 timestamps are being created
 	i.latlng,
-	i.ultimoUpdateIndice,
+	nullif(i.ultimoUpdateIndice, '0000-00-00 00:00:00') as ultimoUpdateIndice, -- due to a bug in Product, 0 timestamps are being created
 	i.regiao_id,
 	i.titulo,
 	i.atualizadoEm,
 	i.condominioPai_id,
-	i.suspensoAte,
+	nullif(i.suspensoAte, '0000-00-00 00:00:00') as suspensoAte, -- due to a bug in Product, 0 timestamps are being created
 	i.estacaoMaisProxima_id,
 	i.externalId,
 	i.emNegociacao,
 	i.emNegociacaoExterna,
-	i.entrouEmNegociacaoExterna,
+	nullif(i.entrouEmNegociacaoExterna, '0000-00-00 00:00:00') as entrouEmNegociacaoExterna, -- due to a bug in Product, 0 timestamps are being created
 	i.motivoRecusaCardiff,
-	i.recaptadoEm,
+	nullif(i.recaptadoEm, '0000-00-00 00:00:00') as recaptadoEm, -- due to a bug in Product, 0 timestamps are being created
 	i.jobFotografoPendente,
 	i.requisitouFotosProfissionais,
 	i.latBkp,
 	i.lngBkp,
-	i.lastConfirmationAvailability,
+	nullif(i.lastConfirmationAvailability, '0000-00-00 00:00:00') as lastConfirmationAvailability, -- due to a bug in Product, 0 timestamps are being created
 	i.cartorio,
 	i.penalizationScore,
 	i.receberCopiaContratoPadrao,
 	i.rankScore,
-	i.ultimaPublicacao,
+	nullif(i.ultimaPublicacao, '0000-00-00 00:00:00') as ultimaPublicacao, -- due to a bug in Product, 0 timestamps are being created
 	i.confirmadoInformacoesVisita,
 	i.homeownersInsuranceValue,
 	i.infoPagamentoCondominio_id,

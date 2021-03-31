@@ -38,8 +38,8 @@ select
   i.codigoPromocao as codigo_promocao,
   i.cotarSeguro as cotar_seguro,
   i.valorTotal as valor_total,
-  i.expirationDate as expiration_date,
-  i.firstPublication as first_publication,
+  nullif(i.expirationDate, '0000-00-00 00:00:00') as expiration_date, -- due to a bug in Product, 0 timestamps are being created
+  nullif(i.firstPublication, '0000-00-00 00:00:00') as first_publication, -- due to a bug in Product, 0 timestamps are being created
   i.notificacaoAnuncioIncompletoProprietario as notificacao_anuncio_incompleto_proprietario,
   i.notificacaoAnuncioIncompletoAdmin as notificacao_anuncio_incompleto_admin,
   i.shortUrl as short_url,
@@ -58,16 +58,16 @@ select
   i.coordenadasManuais+0 as coordenadas_manuais,
   i.iptuIncluso+0 as iptu_incluso,
   i.followUpProprietarioSubirFotos+0 as followup_proprietario_subir_fotos,
-  i.dataPrimeiroVerificado as data_primeiro_verificado,
+  nullif(i.dataPrimeiroVerificado, '0000-00-00 00:00:00') as data_primeiro_verificado, -- due to a bug in Product, 0 timestamps are being created
   i.tipoColisaoLead as tipo_colisao_lead,
-  i.calculoPagamentoLeadCorretor  as calculo_pagamento_lead_corretor,
+  nullif(i.calculoPagamentoLeadCorretor, '0000-00-00 00:00:00') as calculo_pagamento_lead_corretor, -- due to a bug in Product, 0 timestamps are being created
   i.nomeImagemCapa as nome_imagem_capa,
   i.geoHash as geo_hash,
   i.tipoAnuncio as tipo_anuncio,
   i.infosAdmin as infos_admin,
   i.infosAdminInterna as infos_admin_interna,
   i.historicoAgendamentoFotos as historico_agendamento_fotos,
-  i.calculoPagamentoLeadAfiliado as calculo_pagamento_lead_afiliado,
+  nullif(i.calculoPagamentoLeadAfiliado, '0000-00-00 00:00:00') as calculo_pagamento_lead_afiliado, -- due to a bug in Product, 0 timestamps are being created
   i.possuiBanheiroServico+0 as possui_banheiro_servico,
   i.possuiQuartoServico+0 as possui_quarto_servico ,
   i.bairroPadrao as bairro_padrao,
@@ -79,25 +79,25 @@ select
   i.emailPublicacaoProprietarioEnviado+0	as email_publicacao_proprietario_enviado,
   i.statusConversaoImovel	as status_conversao_imovel,
   i.matricula	,
-  i.ultimoEmailDeConfirmacaoEnviado	as ultimo_email_de_confirmacao_enviado,
+  nullif(i.ultimoEmailDeConfirmacaoEnviado, '0000-00-00 00:00:00') as ultimo_email_de_confirmacao_enviado, -- due to a bug in Product, 0 timestamps are being created
   i.latlng,
-  i.ultimoUpdateIndice	as ultimo_update_indice,
+  nullif(i.ultimoUpdateIndice, '0000-00-00 00:00:00') as ultimo_update_indice, -- due to a bug in Product, 0 timestamps are being created
   i.titulo,
-  i.suspensoAte	as suspenso_ate,
+  nullif(i.suspensoAte, '0000-00-00 00:00:00') as suspenso_ate, -- due to a bug in Product, 0 timestamps are being created
   i.externalId	as external_id,
   i.emNegociacao as em_negociacao,
   i.emNegociacaoExterna	as em_negociacao_externa,
-  i.entrouEmNegociacaoExterna	as entrou_em_negociacao_externa,
+  nullif(i.entrouEmNegociacaoExterna, '0000-00-00 00:00:00') as entrou_em_negociacao_externa, -- due to a bug in Product, 0 timestamps are being created
   i.motivoRecusaCardiff	as motivo_recusa_cardiff,
-  i.recaptadoEm	as recaptado_em,
+  nullif(i.recaptadoEm, '0000-00-00 00:00:00') as recaptado_em, -- due to a bug in Product, 0 timestamps are being created
   i.jobFotografoPendente as job_fotografo_pendente,
   i.requisitouFotosProfissionais as requisitou_fotos_profissionais,
-  i.lastConfirmationAvailability	as last_confirmation_availability,
+  nullif(i.lastConfirmationAvailability, '0000-00-00 00:00:00') as last_confirmation_availability, -- due to a bug in Product, 0 timestamps are being created
   i.cartorio,
   i.penalizationScore	as penalization_score,
   i.receberCopiaContratoPadrao	as receber_copia_contrato_padrao,
   i.rankScore	as rank_score,
-  i.ultimaPublicacao	as ultima_publicacao,
+  nullif(i.ultimaPublicacao, '0000-00-00 00:00:00') as ultima_publicacao, -- due to a bug in Product, 0 timestamps are being created
   i.confirmadoInformacoesVisita+0	  as confirmado_informacoes_visita,
   e.abreviacao as estado_abreviacao,
   e.nome as estado_nome,
@@ -112,8 +112,8 @@ select
   coalesce(iv.estamos_liberados,0) as info_visita_estamos_liberados,
   coalesce(iv.prop_precisa_liberar,0) as info_visita_prop_precisa_liberar,
   coalesce(iv.chave_box_quintoandar,0) as info_visita_chave_box_quintoandar,
-  i.dataCriacao as data_criacao,
-  i.atualizadoEm as atualizado_em,
+  nullif(i.dataCriacao, '0000-00-00 00:00:00') as data_criacao, -- due to a bug in Product, 0 timestamps are being created
+  nullif(i.atualizadoEm, '0000-00-00 00:00:00') as atualizado_em, -- due to a bug in Product, 0 timestamps are being created
   i.usuarioQueCadastrou_id as usuario_que_cadastrou_id,
   i.announcedBy is not null or i.announcedBy_id is not null as imovel_v3,
   i.areaTotal as area_total,
