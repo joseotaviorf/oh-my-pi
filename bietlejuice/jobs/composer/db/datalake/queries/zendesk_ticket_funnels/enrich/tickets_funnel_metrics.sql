@@ -20,7 +20,7 @@ WITH ticket_funnel_keys AS (
             ON tck.id_house = cntt_hse.id_house
             AND tck.id_contract = cntt_hse.id_contract
     LEFT JOIN
-        datalake_zendesk_tickets.zendesk_user_contact zuc
+        datalake_zendesk_tickets.zendesk_users_contact zuc
             ON zuc.id_zendesk_user = tck.id_zendesk_requester_user
 )
 SELECT
