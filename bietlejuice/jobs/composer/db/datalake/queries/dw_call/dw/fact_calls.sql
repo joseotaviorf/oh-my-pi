@@ -101,7 +101,7 @@ customer_identification AS (
     GROUP BY 1
 )
 SELECT
-    COALESCE(ic.id_call,fc.id_task) AS sk_call, -- only inbound calls have id_call, but all calls have id_task
+    COALESCE(ic.id_call,fc.id_call,fc.id_task) AS sk_call, -- only inbound calls have id_call, but all calls have id_task
     ci.id_user AS sk_user,
     ci.cpf AS sk_personal_document,
     CAST(FROM_UNIXTIME(COALESCE(ic.ts_first_event_local_unix,fc.ts_first_event_local_unix), 'yyyyMMdd') AS BIGINT) AS sk_call_date,
