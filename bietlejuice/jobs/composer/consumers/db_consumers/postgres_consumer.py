@@ -215,7 +215,7 @@ class PostgresConsumer(DBConsumer):
 
     @logger
     def get_incremental_data_from_table(
-        self, table_name, date_filter_column, date_filter_value
+        self, table_name, date_filter_column, date_filter_value, is_unixtime_col=False
     ):
         """
         Gets incremental data from table in a Postgres database.
@@ -223,13 +223,29 @@ class PostgresConsumer(DBConsumer):
         :param table_name: Name of the table
         :param date_filter_column: Name of the column to make the filter
         :param date_filter_value: Value of the column
+        :param is_unixtime_col: Boolean to be seted True when the date_filter_column
+        has a unixtime date_filter_value.
         :return: A Spark DataFrame with the table data
         """
+
+        schema = self.conn_config["schema"]
 
         dt_filter_value = datetime.strptime(date_filter_value, "%Y-%m-%d")
         dt_filter_value_day_after = dt_filter_value + timedelta(days=1)
 
-        schema = self.conn_config["schema"]
+        if is_unixtime_col:
+            filter_value = int(dt_filter_value.timestamp())
+            filter_value_day_after = int(dt_filter_value_day_after.timestamp())
+            filter_enclosement = "{filter}"
+        else:
+            filter_value = dt_filter_value
+            filter_value_day_after = dt_filter_value_day_after
+            filter_enclosement = "'{filter}'"
+
+        query_filter_value = filter_enclosement.format(filter=filter_value)
+        query_filter_value_day_after = filter_enclosement.format(
+            filter=filter_value_day_after
+        )
 
         # The query verifies if the value of the column is between start_date and end_date.
         # Also, it handles when the column is a timestamp or/and string.
@@ -242,8 +258,8 @@ class PostgresConsumer(DBConsumer):
             FROM
                 "{schema}"."{table_name}"
             WHERE
-                {date_filter_column} >= '{dt_filter_value}'
-                AND {date_filter_column} < '{dt_filter_value_day_after}'
+                {date_filter_column} >= {query_filter_value}
+                AND {date_filter_column} < {query_filter_value_day_after}
                 """
 
         return self.get_data_from_query(query)
