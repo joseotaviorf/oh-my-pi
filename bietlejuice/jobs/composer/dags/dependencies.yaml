@@ -299,7 +299,7 @@ bietlejuice.enrich_ebdb_proposal:
   - bietlejuice.ebdb:create-clean-proposal-condition-in-data-lake
 
 bietlejuice.enrich_ebdb_smart_price:
-  - bietlejuice.ebdb:create-clean-house-aud-condition-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-dynamic-pricing-house-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
 
