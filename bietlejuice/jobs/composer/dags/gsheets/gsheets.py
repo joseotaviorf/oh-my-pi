@@ -1,7 +1,7 @@
 import os
 import pendulum
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from airflow.models import DAG
 from airflow.models import Variable
@@ -19,9 +19,11 @@ from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.services import FileService
 
 
-def check_run_hour(cron, local_tz):
-    current_time = datetime.now(local_tz)
-    current_hour = current_time.hour
+def check_run_hour(cron, ts):
+    ts_no_tz = ts[:-6]
+    current_time_utc = datetime.strptime(ts_no_tz, "%Y-%m-%dT%H:%M:%S")
+    current_time_brt = current_time_utc - timedelta(hours=3)
+    current_hour = current_time_brt.hour
     return str(current_hour) in cron.split(",")
 
 
@@ -114,7 +116,7 @@ for TABLE_NAME, SHEET_DETAILS in GOOGLE_FILES.items():
     skip_run_task = ShortCircuitOperator(
         task_id=f"check-hour-to-skip-{TABLE_NAME}",
         python_callable=check_run_hour,
-        op_kwargs={"cron": SHEET_DETAILS["cron"], "local_tz": local_tz},
+        op_kwargs={"cron": SHEET_DETAILS["cron"], "ts": "{{ts}}"},
     )
 
     gsheets_to_datalake_raw_tasks = QuintoAndarDatabricksSubmitRunOperator(
