@@ -4,7 +4,7 @@ SELECT
 	dd."date",
 	dd.sk_date,
 	dr.city_group,
-	NULL::BOOLEAN AS is_b2b,
+	NULL AS is_b2b,
 	fhlf.mkt_origin AS supply_mkt_origin,
 	fhlf.mkt_channel AS supply_mkt_channel,
 	CASE
@@ -51,7 +51,7 @@ SELECT
 	dd."date",
 	dd.sk_date,
 	dr.city_group,
-	NULL::BOOLEAN AS is_b2b,
+	NULL AS is_b2b,
 	fhlf.mkt_origin AS supply_mkt_origin,
 	fhlf.mkt_channel AS supply_mkt_channel,
 	CASE
@@ -98,7 +98,7 @@ SELECT
 	dd."date",
 	dd.sk_date,
 	dr.city_group,
-	NULL::BOOLEAN AS is_b2b,
+	NULL AS is_b2b,
 	fhlf.mkt_origin AS supply_mkt_origin,
 	fhlf.mkt_channel AS supply_mkt_channel,
 	CASE
@@ -145,7 +145,7 @@ SELECT
 	dd."date",
 	dd.sk_date,
 	dr.city_group,
-	NULL::BOOLEAN AS is_b2b,
+	NULL AS is_b2b,
 	fhlf.mkt_origin AS supply_mkt_origin,
 	fhlf.mkt_channel AS supply_mkt_channel,
 	CASE
@@ -192,7 +192,7 @@ SELECT
 	dd."date",
 	dd.sk_date,
 	dr.city_group,
-	NULL::BOOLEAN AS is_b2b,
+	NULL AS is_b2b,
 	fhlf.mkt_origin AS supply_mkt_origin,
 	fhlf.mkt_channel AS supply_mkt_channel,
 	CASE
@@ -239,7 +239,10 @@ SELECT
   dd."date",
   dd.sk_date,
   dr.city_group,
-  dhl.is_b2b,
+  CASE
+    WHEN dhl.is_b2b= TRUE THEN 'B2B'
+    WHEN dhl.is_b2b = FALSE THEN 'FALSE'
+  END AS is_b2b,
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
@@ -283,7 +286,10 @@ SELECT
   dd."date",
   dd.sk_date,
   dr.city_group,
-  dhl.is_b2b,
+  CASE
+    WHEN dhl.is_b2b= TRUE THEN 'B2B'
+    WHEN dhl.is_b2b = FALSE THEN 'FALSE'
+  END AS is_b2b,
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
@@ -358,7 +364,11 @@ SELECT
     fdf.had_flow_tta,
     fdf.flow_type,
     dp.guarantee,
-    dhl.is_b2b,
+    CASE
+        WHEN dhl.is_b2b = TRUE THEN 'B2B'
+        WHEN ciq.is_quintoandar_consultant = TRUE THEN 'CIQ'
+        WHEN dhl.is_b2b = FALSE OR ciq.is_quintoandar_consultant = FALSE THEN 'FALSE'
+    END AS is_b2b,
     dr.city_group,
     db.mkt_channel AS demand_mkt_channel_booking,
     db.mkt_medium AS demand_mkt_medium_booking,
@@ -377,6 +387,8 @@ LEFT JOIN dim_offer dof
   ON rf.sk_offer = dof.sk_offer
 LEFT JOIN datamarts.funnel_demand_flows fdf
   ON rf.sk_rent_flow = fdf.sk_rent_flow
+LEFT JOIN datamarts.quintoandar_consultant_listings ciq
+  ON rf.sk_house_listing = ciq.sk_house_listing
 ),
 visits_booked AS (
 SELECT
@@ -1074,4 +1086,4 @@ SELECT
     SUM(COALESCE(contract_ended,0)) AS contract_ended,
     current_timestamp AS ts_load
 FROM union_all
-GROUP BY "date", city_group, 3, 4, 5, 6, 7, 8, 9, 10;
+GROUP BY "date", city_group, 3, 4, 5, 6, 7, 8, 9, 10
