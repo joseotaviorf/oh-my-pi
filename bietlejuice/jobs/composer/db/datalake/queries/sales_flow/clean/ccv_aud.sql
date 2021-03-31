@@ -1,0 +1,30 @@
+SELECT
+    id,
+    sales_flow_id AS id_sales_flow,
+    house_id AS id_house,
+    signed_document_token, 
+    unsigned_document_token,
+    sale_value AS sale_price,
+    status,
+    rev,
+    revtype AS rev_type,
+    revend AS rev_end,
+    sales_flow_id_mod AS mod_id_sales_flow,
+    house_id_mod AS mod_id_house,
+    signed_document_token_mod AS mod_signed_document_token,
+    unsigned_document_token_mod AS mod_unsigned_document_token,
+    sale_value_mod AS mod_sale_price,
+    status_mod AS mod_status,
+    signed_at_mod AS mod_ts_signed,
+    signed_at AS ts_signed,
+    created_at AS ts_created,
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
+FROM
+    datalake_sales_flow_raw.ccv_aud
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}

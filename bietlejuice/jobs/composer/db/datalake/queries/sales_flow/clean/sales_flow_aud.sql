@@ -1,0 +1,26 @@
+SELECT
+    id,
+    buyer_id AS id_buyer,
+    seller_id AS id_seller,
+    house_id AS id_house,
+    monday_id AS id_monday,
+    status,
+    rev,
+    revtype AS rev_type,
+    revend AS rev_end,
+    buyer_id_mod AS mod_id_buyer,
+    seller_id_mod AS mod_id_seller,
+    house_id_mod AS mod_id_house,
+    monday_id_mod AS mod_id_monday,
+    status_mod AS mod_status,
+    created_at AS ts_created,
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
+FROM
+    datalake_sales_flow_raw.sales_flow_aud
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}
