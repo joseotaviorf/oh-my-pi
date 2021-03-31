@@ -23,6 +23,13 @@ SERIAL_TABLES_LIST = [
     "MudancaStatusAgendamento",
     "AmenidadesInfo",
     "Agendamento_AUD",
+    "Lead_AUD",
+    "Vistoria_AUD",
+    "FotoItemVistoria",
+    "MensagemSMS",
+    "PropostaProponente_AUD",
+    "FotoItemVistoria_AUD",
+    "Lead",
 ]
 
 # todo: check this value and argument the choice
