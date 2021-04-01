@@ -1,36 +1,16 @@
--- evaluate funnel keys FROM each ticket according to business rules
-WITH ticket_funnel_keys AS (
-    SELECT
-        tck.id_tckt,
-        cntt_hse.id_house_listing,
-        cntt_hse.id_contract AS id_contract,
-        zuc.id_user,
-        zuc.id_personal_document,
-        -- tickets will only have a valid client key according to its corresponding client type
-        CASE
-            WHEN tck.client_type = 'inquilino' THEN cntt_hse.id_client
-        END AS id_client,
-        CASE
-            WHEN tck.client_type IN ('proprietário','imobiliária_b2b') THEN cntt_hse.id_owner -- COALESCE(dc.id_owner, dhl.id_owner)
-        END AS id_owner
-    FROM
-        datalake_zendesk_tickets.ticket_measurements tck
-    LEFT JOIN
-        datalake_ebdb_contract.contract_house cntt_hse
-            ON tck.id_house = cntt_hse.id_house
-            AND tck.id_contract = cntt_hse.id_contract
-    LEFT JOIN
-        datalake_zendesk_tickets.zendesk_users_contact zuc
-            ON zuc.id_zendesk_user = tck.id_zendesk_requester_user
-)
-SELECT
-    t.id_tckt AS id_ticket,
-    fk.id_house_listing,
-    fk.id_contract,
-    fk.id_user,
-    fk.id_personal_document,
-    fk.id_client,
-    fk.id_owner,
+SELECT DISTINCT
+    t.id_ticket,
+    cntt_hse.id_house_listing,
+    cntt_hse.id_contract AS id_contract,
+    zuc.id_user,
+    zuc.id_personal_document,
+    -- tickets will only have a valid client key according to its corresponding client type
+    CASE
+        WHEN t.client_type = 'inquilino' THEN cntt_hse.id_client
+    END AS id_client,
+    CASE
+        WHEN t.client_type IN ('proprietário','imobiliária_b2b') THEN cntt_hse.id_owner -- COALESCE(dc.id_owner, dhl.id_owner)
+    END AS id_owner,
     t.id_zendesk_requester_user,
     t.id_zendesk_submitter_user,
     t.id_zendesk_assignee_user,
@@ -70,6 +50,10 @@ SELECT
     DAY(t.ts_updated) AS day
 FROM
     datalake_zendesk_tickets.ticket_measurements t
-INNER JOIN
-    ticket_funnel_keys fk
-        ON t.id_tckt = fk.id_tckt
+LEFT JOIN
+    datalake_ebdb_contract.contract_house cntt_hse
+        ON t.id_house = cntt_hse.id_house
+        AND t.id_contract = cntt_hse.id_contract
+LEFT JOIN
+    datalake_zendesk_tickets.zendesk_users_contact zuc
+        ON zuc.id_zendesk_user = t.id_zendesk_requester_user

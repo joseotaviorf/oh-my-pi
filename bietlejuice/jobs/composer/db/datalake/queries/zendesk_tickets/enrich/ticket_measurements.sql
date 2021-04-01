@@ -34,7 +34,7 @@ WITH custom_field_ids AS (
             AND cf_client_type.id_field = "46785608" -- refers to id_client_type
 )
 SELECT
-    t.id_ticket AS id_tckt,
+    t.id_ticket,
     -- id_contract AND id_house may be filled WITH string (filled wrong)
     -- id_house may be filled WITH id_house OR short_id_house
     cfi.id_house,
