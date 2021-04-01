@@ -21,6 +21,7 @@ from bietlejuice.jobs.composer.consumers.db_consumers.databricks_consumer import
     DatabricksConsumer,
 )
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
+from trino.exceptions import TrinoExternalError
 
 JOB_NAME = "validate_sync_metastore_tables"
 
@@ -261,10 +262,19 @@ class MetastoreSyncValidation:
         )
         spark_table_count = spark_table_count.collect()[0][0]
 
-        trino_table_count = self.trino_client.get_records(
-            f"SELECT count(1) FROM {self.database_name}.{self.table_name}"
-        )
-        trino_table_count = trino_table_count[0][0]
+        try:
+            trino_table_count = self.trino_client.get_records(
+                f"SELECT count(1) FROM {self.database_name}.{self.table_name}"
+            )
+            trino_table_count = trino_table_count[0][0]
+        except TrinoExternalError as e:
+            msg = (
+                f"database={self.database_name}, table={self.table_name}, "
+                f"msg=Error fetching data in Trino, {e.message}"
+            )
+            notify_error_in_slack(msg)
+            logger.error(f"m={JOB_NAME}, {msg}")
+            return False
 
         if spark_table_count != trino_table_count:
             msg = (
