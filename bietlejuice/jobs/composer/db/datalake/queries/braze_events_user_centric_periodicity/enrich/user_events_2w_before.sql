@@ -105,15 +105,11 @@ SELECT
       ELSE 0
     END
   ) AS total_sms_delivered_to,
-  year,
-  month,
-  day
+  {year} AS year,
+  {month} AS month,
+  {day} AS day
 FROM
     datalake_braze_user_centric.user_events_daily
 WHERE
-    DATE_TRUNC('week', DATE(dt_event)) = DATE_TRUNC('week',
-      DATE(CONCAT(CAST(year AS VARCHAR(4)), '-', CAST(month AS VARCHAR(2)), '-', CAST(day AS VARCHAR(2)))) - INTERVAL '14' DAY)
-    AND year = {year}
-    AND month = {month}
-    AND day = {day}
+    DATE_TRUNC('week', DATE(dt_event)) = DATE_TRUNC('week', DATE('{year}-{month}-{day}') - INTERVAL '14' DAY)
 GROUP by 1, 17, 18, 19
