@@ -33,8 +33,10 @@ This pipeline produces, in **datalake raw and clean**, tables via incremental lo
     - `users`
     - `users_aud`
 
-If you need to add a new table that does not have an `updated_at` column, you must update the raw spark job (load_incremental_sales_flow_into_datalake), adding the table and the column name (timestamp/date type)
-for the incremental load on the `COLUMN_MAPPING` dict, and then create the clean query. 
+If you need to add a new table that does not have an `updated_at` timestamp/date column, you must update the
+raw spark job (load_incremental_sales_flow_into_datalake), adding the raw table name and the respective unix
+timestamp column name for the incremental load on the `COLUMN_MAPPING` dict and also add the raw table name
+on the `UNIX_FORMAT_TABLES`. Then, create the incremental clean query. 
 
 ### Responsible Data Teams
 For any questions or concerns about this DAG and data, please contact the Data Engineering Team or
