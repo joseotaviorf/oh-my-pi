@@ -43,7 +43,9 @@ source_ops_rent AS (
 	        CASE WHEN hlf.sk_first_listing_date = ssf.sk_first_listing_date AND hlf.sk_first_listing_date > 0 THEN 'Hybrid'
 	            WHEN hlf.sk_first_listing_date > 0  THEN 'Rent'
 	            ELSE NULL END AS first_listing_context,
-	        COALESCE(du.sales_company, dl.sales_company) AS sales_company
+	        COALESCE(du.sales_company, dl.sales_company) AS sales_company,
+	        hlf.lead_origin,
+	        hlf.funnel_drop_reason
 	FROM fact_house_listing_flows hlf
 	    JOIN dim_lead dl
 	        ON dl.sk_lead = hlf.sk_lead
@@ -98,7 +100,9 @@ source_ops_sale AS (
 	        CASE WHEN hlf.sk_first_listing_date = ssf.sk_first_listing_date AND ssf.sk_first_listing_date > 0 THEN 'Hybrid'
 	            WHEN ssf.sk_first_listing_date > 0  THEN 'Sale'
 	            ELSE NULL END AS first_listing_context,
-	        COALESCE(du.sales_company, dl.sales_company) AS sales_company
+	        COALESCE(du.sales_company, dl.sales_company) AS sales_company,
+	        ssf.lead_origin,
+	        ssf.funnel_drop_reason
 	FROM sale.fact_listing_flows ssf
 	    JOIN dim_lead dl
 	        ON dl.sk_lead = ssf.sk_lead
@@ -132,6 +136,8 @@ fact_sale AS (
 	    ssf.mkt_medium,
 	    sor.sales_company,
 	    sor.sourcing_ops,
+	    ssf.lead_origin,
+	    ssf.funnel_drop_reason,
 	    'Sale' AS origin_table
 	FROM sale.fact_listing_flows ssf
 	JOIN source_ops_sale AS sor
@@ -160,6 +166,8 @@ fact_rent AS (
 	    hlf.mkt_medium,
 	    sor.sales_company,
 	    sor.sourcing_ops,
+	    hlf.lead_origin,
+	    hlf.funnel_drop_reason,
 	    'Rent' AS origin_table
 	FROM fact_house_listing_flows hlf
 	JOIN source_ops_rent AS sor

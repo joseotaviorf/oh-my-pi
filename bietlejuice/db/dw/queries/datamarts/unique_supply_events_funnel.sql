@@ -11,6 +11,8 @@ SELECT
 	sourcing_ops,
 	context_lead AS context,
 	origin_table,
+	lead_origin,
+	funnel_drop_reason,
   	COUNT(lf.sk_lead_date) AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS qualifieds,
@@ -23,7 +25,7 @@ JOIN datamarts.lead_listing_flows lf
 LEFT JOIN dim_region dr
   ON dr.sk_region = lf.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 prospect AS (
 SELECT
@@ -37,6 +39,8 @@ SELECT
 	sourcing_ops,
 	context_prospect AS context,
 	origin_table,
+	lead_origin,
+	funnel_drop_reason,
 	NULL::BIGINT AS leads,
 	COUNT(lf.sk_prospect_date) AS prospects, -- this count is done on the prospect date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
 	NULL::BIGINT AS qualifieds,
@@ -49,7 +53,7 @@ JOIN datamarts.lead_listing_flows lf
 LEFT JOIN dim_region dr
   ON dr.sk_region = lf.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 qualified AS (
 SELECT
@@ -63,6 +67,8 @@ SELECT
 	sourcing_ops,
 	context_qualified AS context,
 	origin_table,
+	lead_origin,
+	funnel_drop_reason,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	COUNT(lf.sk_qualified_date) AS qualifieds, -- this count is done on the qualified date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
@@ -75,7 +81,7 @@ JOIN datamarts.lead_listing_flows lf
 LEFT JOIN dim_region dr
   ON dr.sk_region = lf.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 opportunity AS (
 SELECT
@@ -89,6 +95,8 @@ SELECT
 	sourcing_ops,
 	context_opportunity AS context,
 	origin_table,
+	lead_origin,
+	funnel_drop_reason,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS qualifieds,
@@ -101,7 +109,7 @@ JOIN datamarts.lead_listing_flows lf
 LEFT JOIN dim_region dr
   ON dr.sk_region = lf.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 listing AS (
 SELECT
@@ -115,6 +123,8 @@ SELECT
 	sourcing_ops,
 	context_first_listing AS context,
 	origin_table,
+	lead_origin,
+	funnel_drop_reason,
   	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS qualifieds,
@@ -127,7 +137,7 @@ JOIN datamarts.lead_listing_flows lf
 LEFT JOIN dim_region dr
   ON dr.sk_region = lf.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 union_all AS (
   SELECT * FROM lead_
@@ -151,6 +161,8 @@ SELECT
   ua.sourcing_ops,
   ua.context,
   ua.origin_table,
+  ua.lead_origin,
+  ua.funnel_drop_reason,
   ua.leads,
   ua.prospects,
   ua.qualifieds,
@@ -181,6 +193,8 @@ SELECT
     END AS lead_processing_operation,
     context,
     origin_table,
+    lead_origin,
+    funnel_drop_reason,
     SUM(COALESCE(leads,0)) AS leads,
     SUM(COALESCE(prospects,0)) AS prospects,
     SUM(COALESCE(qualifieds,0)) AS qualifieds,
@@ -188,4 +202,4 @@ SELECT
     SUM(COALESCE(first_listings,0)) AS first_listings,
     current_timestamp AS ts_load
 FROM union_all_date
-GROUP BY "date", city_group, 3, 4, 5, 6, 7, 8, 9, 10;
+GROUP BY "date", city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12;

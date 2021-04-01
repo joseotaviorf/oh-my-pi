@@ -10,6 +10,8 @@ SELECT
 	sales_company,
 	sourcing_ops,
 	origin_table,
+	lead_origin,
+	funnel_drop_reason,
 	context_lead AS context_origin,
 	context_prospect AS context_conversion,
 	CASE
@@ -35,7 +37,7 @@ LEFT JOIN
         ON dr.sk_region = lf.sk_region
 WHERE
     dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
 ),
 p2q AS (
 SELECT
@@ -48,6 +50,8 @@ SELECT
 	sales_company,
 	sourcing_ops,
 	origin_table,
+	lead_origin,
+	funnel_drop_reason,
 	context_prospect AS context_origin,
 	context_qualified AS context_conversion,
 	CASE
@@ -73,7 +77,7 @@ LEFT JOIN
         ON dr.sk_region = lf.sk_region
 WHERE
     dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
 ),
 q2opp AS (
 SELECT
@@ -86,6 +90,8 @@ SELECT
 	sales_company,
 	sourcing_ops,
 	origin_table,
+	lead_origin,
+	funnel_drop_reason,
 	context_qualified AS context_origin,
 	context_opportunity AS context_conversion,
 	CASE
@@ -111,7 +117,7 @@ LEFT JOIN
         ON dr.sk_region = lf.sk_region
 WHERE
     dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
 ),
 opp2fl AS (
 SELECT
@@ -124,6 +130,8 @@ SELECT
 	sales_company,
 	sourcing_ops,
 	origin_table,
+	lead_origin,
+	funnel_drop_reason,
 	context_opportunity AS context_origin,
 	context_first_listing AS context_conversion,
   	CASE
@@ -149,7 +157,7 @@ LEFT JOIN
         ON dr.sk_region = lf.sk_region
 WHERE
     dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
 ),
 union_all AS (
     SELECT * FROM l2p
@@ -170,6 +178,8 @@ SELECT
   ua.sales_company,
   ua.sourcing_ops,
   ua.origin_table,
+  ua.lead_origin,
+  ua.funnel_drop_reason,
   ua.context_origin,
   ua.context_conversion,
   ua.weeks_conversion,
@@ -209,6 +219,8 @@ SELECT
 	ELSE sourcing_ops
     END AS lead_processing_operation,
     origin_table,
+    lead_origin,
+    funnel_drop_reason,
     context_origin,
     context_conversion,
     weeks_conversion AS weeks_conversion,
@@ -219,4 +231,4 @@ SELECT
     current_timestamp AS ts_load
 FROM
     union_all_date
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12;
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14;
