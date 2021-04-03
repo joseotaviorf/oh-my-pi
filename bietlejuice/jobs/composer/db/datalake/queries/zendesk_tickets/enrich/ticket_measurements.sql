@@ -42,7 +42,6 @@ SELECT
     cfi.id_session,
     cfi.id_call,
     cfi.client_type, -- included to enable id_owner AND id_client relationship
-    tm.id_ticket,
     CAST(tm.group_stations AS SMALLINT) AS total_group_stations,
     CAST(tm.assignee_stations AS SMALLINT) AS total_assignee_stations,
     tm.minutes_reply_calendar,
