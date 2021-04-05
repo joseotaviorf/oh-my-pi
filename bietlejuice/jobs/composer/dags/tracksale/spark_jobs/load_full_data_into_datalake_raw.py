@@ -42,6 +42,8 @@ if __name__ == "__main__":
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
     parser.add_argument("execution_date", help="execution date in str format")
     parser.add_argument("endpoint_name", help="endpoint to call the API")
+    parser.add_argument("campaign_column", help="campaign ID column name")
+    parser.add_argument("campaigns_to_block", help="campaigns to be blocked")
 
     args = parser.parse_args()
 
@@ -49,6 +51,9 @@ if __name__ == "__main__":
     source = args.source
     datalake_bucket = args.datalake_bucket
     endpoint_name = args.endpoint_name
+    campaign_column = args.campaign_column
+    campaign_column = campaign_column.split(".")
+    campaigns_to_block = args.campaigns_to_block
 
     logger.info(
         f"m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket}, "
@@ -72,6 +77,14 @@ if __name__ == "__main__":
 
     spark_client = SparkClient()
     df = spark_client.create_dataframe(api_response_raw)
+
+    if len(campaign_column) > 1:
+        df = df[
+            ~df[campaign_column[0]].getItem(campaign_column[1]).isin(campaigns_to_block)
+        ]
+    else:
+        df = df[~df[campaign_column[0]].isin(campaigns_to_block)]
+
     df = SparkDataFrameService().input(df).convert_array_type_to_json().output()
 
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)

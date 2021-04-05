@@ -44,6 +44,8 @@ if __name__ == "__main__":
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
     parser.add_argument("execution_date", help="execution date in str format")
     parser.add_argument("endpoint_name", help="endpoint to call the API")
+    parser.add_argument("campaign_column", help="campaign ID column name")
+    parser.add_argument("campaigns_to_block", help="campaigns to be blocked")
 
     args = parser.parse_args()
 
@@ -59,6 +61,9 @@ if __name__ == "__main__":
     execution_date = args.execution_date
     datalake_bucket = args.datalake_bucket
     endpoint_name = args.endpoint_name
+    campaign_column = args.campaign_column
+    campaign_column = campaign_column.split(".")
+    campaigns_to_block = args.campaigns_to_block
     partition_cols = ["year", "month", "day"]
 
     api_params = {"start_time": execution_date, "end_time": execution_date}
@@ -73,55 +78,66 @@ if __name__ == "__main__":
     credentials = json.loads(json_credentials)
     spark_client = SparkClient()
     api_response = get_api_response(credentials["token"], endpoint_name, api_params)
-    json_data = JsonService.transform_json_list_terms(api_response)
 
-    if json_data:
-        df = spark_client.create_dataframe(json_data)
-
-        dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
-        df = df.coalesce(1)
-        df = (
-            SparkDataFrameService()
-            .input(df)
-            .create_year_month_day_columns_from_date(dt_execution)
-            .output()
+    try:
+        df = spark_client.create_dataframe(api_response)
+    except ValueError:
+        df = spark_client.create_dataframe(
+            JsonService.transform_json_list_terms(api_response)
         )
 
-        datalake_info = DatalakeMetastoreService.get_db_info(
-            environment, source, datalake_bucket
-        )
-        spark_metastore_service = SparkMetastoreService(spark_client)
-        database_name = datalake_info["db_raw_databricks"]
-        spark_metastore_service.create_database(database_name)
+    dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
+    df = df.coalesce(1)
 
-        database_location = datalake_info["db_raw_path"]
-        format_options = SparkTableStorageFormat.DEFAULT_RAW
-        table_name = endpoint_name  # the table will have the same name as the endpoint
+    if len(campaign_column) > 1:
+        df = df[
+            ~df[campaign_column[0]].getItem(campaign_column[1]).isin(campaigns_to_block)
+        ]
+    else:
+        df = df[~df[campaign_column[0]].isin(campaigns_to_block)]
 
-        # loaders
-        s3_loader = S3Loader()
-        spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
-        s3_loader.load_incremental_table(
-            df=df,
-            database_name=database_name,
-            table_name=table_name,
-            format_options=format_options,
-            database_location=database_location,
-            partition_cols=partition_cols,
-        )
-        spark_metastore_loader.update_metastore(
-            df,
-            database_name,
-            table_name,
-            format_options,
-            database_location,
-            partition_cols,
-            force_recreate=False,
-        )
-        spark_metastore_service.create_new_partitions_from_df(
-            database_name=database_name,
-            table_name=table_name,
-            df=df,
-            partition_cols=partition_cols,
-        )
-        spark_metastore_service.refresh_table(database_name, table_name)
+    df = (
+        SparkDataFrameService()
+        .input(df)
+        .create_year_month_day_columns_from_date(dt_execution)
+        .output()
+    )
+
+    datalake_info = DatalakeMetastoreService.get_db_info(
+        environment, source, datalake_bucket
+    )
+    spark_metastore_service = SparkMetastoreService(spark_client)
+    database_name = datalake_info["db_raw_databricks"]
+    spark_metastore_service.create_database(database_name)
+
+    database_location = datalake_info["db_raw_path"]
+    format_options = SparkTableStorageFormat.DEFAULT_RAW
+    table_name = endpoint_name  # the table will have the same name as the endpoint
+
+    # loaders
+    s3_loader = S3Loader()
+    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+    s3_loader.load_incremental_table(
+        df=df,
+        database_name=database_name,
+        table_name=table_name,
+        format_options=format_options,
+        database_location=database_location,
+        partition_cols=partition_cols,
+    )
+    spark_metastore_loader.update_metastore(
+        df,
+        database_name,
+        table_name,
+        format_options,
+        database_location,
+        partition_cols,
+        force_recreate=False,
+    )
+    spark_metastore_service.create_new_partitions_from_df(
+        database_name=database_name,
+        table_name=table_name,
+        df=df,
+        partition_cols=partition_cols,
+    )
+    spark_metastore_service.refresh_table(database_name, table_name)

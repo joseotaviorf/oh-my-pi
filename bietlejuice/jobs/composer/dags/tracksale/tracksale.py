@@ -45,11 +45,23 @@ CUSTOM_LIBRARIES = [
 LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
 
 # Job params
-ENDPOINTS = {"answer": "incremental", "dispatch": "incremental", "campaign": "full"}
+ENDPOINTS = {"answer": "incremental", "campaign": "full", "dispatch": "incremental"}
+
+# If the column is a MapType, use a dot to set the path to the Campaign ID column
+CAMPAIGN_COLUMN = {
+    "answer": "campaign_code",
+    "campaign": "code",
+    "dispatch": "campaign.code",
+}
+
+# If more than one Campaing ID need to be blocked, separate them by comma
+CAMPAIGNS_TO_BLOCK = "248"
 
 
 # Task builders
-def create_endpoint_sub_dag(sub_dag_name, endpoint, ingestion, dag_configs):
+def create_endpoint_sub_dag(
+    sub_dag_name, endpoint, ingestion, dag_configs, campaign_column, campaigns_to_block
+):
     endpoint_sub_dag = BaseSubDAG(
         sub_dag_name=sub_dag_name,
         dag_name=dag_configs.get("main_dag_id"),
@@ -70,6 +82,8 @@ def create_endpoint_sub_dag(sub_dag_name, endpoint, ingestion, dag_configs):
                     dag_configs.get("datalake_bucket"),
                     "{{ ds }}",
                     endpoint,
+                    campaign_column,
+                    campaigns_to_block,
                 ],
             }
         },
@@ -151,6 +165,8 @@ for endpoint, ingestion in ENDPOINTS.items():
         sub_dag_func=create_endpoint_sub_dag,
         endpoint=endpoint,
         ingestion=ingestion,
+        campaign_column=CAMPAIGN_COLUMN[endpoint],
+        campaigns_to_block=CAMPAIGNS_TO_BLOCK,
         dag_configs={
             "env": ENV,
             "source": SOURCE,
