@@ -2,7 +2,7 @@
 ​
 ### Purpose
 ​
-This DAG creates the incremental models for Braze Events of user centered data. It's a periodic snapshot fact that joins snapshots of 5 different time windows (`all time`, `last week`, `this week`, `2 weeks ago` and `3 weeks ago`) each one stored in a distinct table. Their data is joined by their execution date, which takes the role as a snapshot date. The information is summarized in one single fact for easy comparison.
+This DAG creates the incremental models for Braze Events of user centered data. It's a periodic snapshot fact that joins snapshots of 5 different time windows (`same week`, `1 week before`, `2 weeks before`, `3 weeks before` and `all time before`) each one stored in a distinct table. Their data is joined by their execution date, which takes the role as a snapshot date. The information is summarized in one single fact for easy comparison.
 ​
 ### Execution​ Interval
 This DAG is triggered once per day via Mediator.
