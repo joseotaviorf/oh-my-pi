@@ -64,6 +64,7 @@ if __name__ == "__main__":
     campaign_column = args.campaign_column
     campaign_column = campaign_column.split(".")
     campaigns_to_block = args.campaigns_to_block
+    campaigns_to_block = list(map(int, campaigns_to_block.split(",")))
     partition_cols = ["year", "month", "day"]
 
     api_params = {"start_time": execution_date, "end_time": execution_date}
@@ -79,65 +80,69 @@ if __name__ == "__main__":
     spark_client = SparkClient()
     api_response = get_api_response(credentials["token"], endpoint_name, api_params)
 
-    try:
-        df = spark_client.create_dataframe(api_response)
-    except ValueError:
-        df = spark_client.create_dataframe(
-            JsonService.transform_json_list_terms(api_response)
+    if api_response:
+
+        try:
+            df = spark_client.create_dataframe(api_response)
+        except ValueError:
+            df = spark_client.create_dataframe(
+                JsonService.transform_json_list_terms(api_response)
+            )
+
+        dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
+        df = df.coalesce(1)
+
+        if len(campaign_column) > 1:
+            df = df[
+                ~df[campaign_column[0]]
+                .getItem(campaign_column[1])
+                .isin(campaigns_to_block)
+            ]
+        else:
+            df = df[~df[campaign_column[0]].isin(campaigns_to_block)]
+
+        df = (
+            SparkDataFrameService()
+            .input(df)
+            .create_year_month_day_columns_from_date(dt_execution)
+            .output()
         )
 
-    dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
-    df = df.coalesce(1)
+        datalake_info = DatalakeMetastoreService.get_db_info(
+            environment, source, datalake_bucket
+        )
+        spark_metastore_service = SparkMetastoreService(spark_client)
+        database_name = datalake_info["db_raw_databricks"]
+        spark_metastore_service.create_database(database_name)
 
-    if len(campaign_column) > 1:
-        df = df[
-            ~df[campaign_column[0]].getItem(campaign_column[1]).isin(campaigns_to_block)
-        ]
-    else:
-        df = df[~df[campaign_column[0]].isin(campaigns_to_block)]
+        database_location = datalake_info["db_raw_path"]
+        format_options = SparkTableStorageFormat.DEFAULT_RAW
+        table_name = endpoint_name  # the table will have the same name as the endpoint
 
-    df = (
-        SparkDataFrameService()
-        .input(df)
-        .create_year_month_day_columns_from_date(dt_execution)
-        .output()
-    )
-
-    datalake_info = DatalakeMetastoreService.get_db_info(
-        environment, source, datalake_bucket
-    )
-    spark_metastore_service = SparkMetastoreService(spark_client)
-    database_name = datalake_info["db_raw_databricks"]
-    spark_metastore_service.create_database(database_name)
-
-    database_location = datalake_info["db_raw_path"]
-    format_options = SparkTableStorageFormat.DEFAULT_RAW
-    table_name = endpoint_name  # the table will have the same name as the endpoint
-
-    # loaders
-    s3_loader = S3Loader()
-    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
-    s3_loader.load_incremental_table(
-        df=df,
-        database_name=database_name,
-        table_name=table_name,
-        format_options=format_options,
-        database_location=database_location,
-        partition_cols=partition_cols,
-    )
-    spark_metastore_loader.update_metastore(
-        df,
-        database_name,
-        table_name,
-        format_options,
-        database_location,
-        partition_cols,
-        force_recreate=False,
-    )
-    spark_metastore_service.create_new_partitions_from_df(
-        database_name=database_name,
-        table_name=table_name,
-        df=df,
-        partition_cols=partition_cols,
-    )
-    spark_metastore_service.refresh_table(database_name, table_name)
+        # loaders
+        s3_loader = S3Loader()
+        spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+        s3_loader.load_incremental_table(
+            df=df,
+            database_name=database_name,
+            table_name=table_name,
+            format_options=format_options,
+            database_location=database_location,
+            partition_cols=partition_cols,
+        )
+        spark_metastore_loader.update_metastore(
+            df,
+            database_name,
+            table_name,
+            format_options,
+            database_location,
+            partition_cols,
+            force_recreate=False,
+        )
+        spark_metastore_service.create_new_partitions_from_df(
+            database_name=database_name,
+            table_name=table_name,
+            df=df,
+            partition_cols=partition_cols,
+        )
+        spark_metastore_service.refresh_table(database_name, table_name)

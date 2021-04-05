@@ -54,6 +54,7 @@ if __name__ == "__main__":
     campaign_column = args.campaign_column
     campaign_column = campaign_column.split(".")
     campaigns_to_block = args.campaigns_to_block
+    campaigns_to_block = list(map(int, campaigns_to_block.split(",")))
 
     logger.info(
         f"m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket}, "
@@ -68,45 +69,53 @@ if __name__ == "__main__":
         scope=DATABRICKS_SCOPE, key=APIEnum.TRACKSALE
     )
     credentials = json.loads(json_credentials)
-    api_response_raw = get_api_response(credentials["token"], endpoint_name)
+    api_response = get_api_response(credentials["token"], endpoint_name)
 
-    # Currently, dispatch_limits field has all its values as None, so df can't infer the data type
-    for resp in api_response_raw:
-        if "dispatch_limits" in api_response_raw:
-            resp["dispatch_limits"] = json.dumps(resp.get("dispatch_limits"))
+    if api_response:
 
-    spark_client = SparkClient()
-    df = spark_client.create_dataframe(api_response_raw)
+        # Currently, dispatch_limits field has all its values as None, so df can't infer the data type
+        for resp in api_response:
+            if "dispatch_limits" in api_response:
+                resp["dispatch_limits"] = json.dumps(resp.get("dispatch_limits"))
 
-    if len(campaign_column) > 1:
-        df = df[
-            ~df[campaign_column[0]].getItem(campaign_column[1]).isin(campaigns_to_block)
-        ]
-    else:
-        df = df[~df[campaign_column[0]].isin(campaigns_to_block)]
+        spark_client = SparkClient()
+        df = spark_client.create_dataframe(api_response)
 
-    df = SparkDataFrameService().input(df).convert_array_type_to_json().output()
+        if len(campaign_column) > 1:
+            df = df[
+                ~df[campaign_column[0]]
+                .getItem(campaign_column[1])
+                .isin(campaigns_to_block)
+            ]
+        else:
+            df = df[~df[campaign_column[0]].isin(campaigns_to_block)]
 
-    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
-    metastore_service = SparkMetastoreService(spark_client)
-    spark_metastore_loader = SparkMetastoreLoader(metastore_service)
-    s3_loader = S3Loader()
+        df = SparkDataFrameService().input(df).convert_array_type_to_json().output()
 
-    database_name = db_info["db_raw_databricks"]
-    format_options = SparkTableStorageFormat.DEFAULT_RAW
-    database_location = db_info["db_raw_path"]
+        db_info = DatalakeMetastoreService.get_db_info(
+            environment, source, datalake_bucket
+        )
+        metastore_service = SparkMetastoreService(spark_client)
+        spark_metastore_loader = SparkMetastoreLoader(metastore_service)
+        s3_loader = S3Loader()
 
-    logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
-    metastore_service.create_database(database_name)
+        database_name = db_info["db_raw_databricks"]
+        format_options = SparkTableStorageFormat.DEFAULT_RAW
+        database_location = db_info["db_raw_path"]
 
-    s3_loader.load_full_table(
-        df=df,
-        database_name=database_name,
-        table_name=endpoint_name,
-        format_options=format_options,
-        database_location=database_location,
-    )
+        logger.info(
+            "m=__main__, msg=Creating database in Spark Metastore if not exists..."
+        )
+        metastore_service.create_database(database_name)
 
-    spark_metastore_loader.update_metastore(
-        df, database_name, endpoint_name, format_options, database_location
-    )
+        s3_loader.load_full_table(
+            df=df,
+            database_name=database_name,
+            table_name=endpoint_name,
+            format_options=format_options,
+            database_location=database_location,
+        )
+
+        spark_metastore_loader.update_metastore(
+            df, database_name, endpoint_name, format_options, database_location
+        )
