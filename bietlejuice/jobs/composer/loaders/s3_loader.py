@@ -23,7 +23,7 @@ class S3Loader:
         format_options,
         database_location,
         partitions=[],
-        **options
+        **options,
     ):
         """
         *This method will be deprecated soon, you should use load_df.
@@ -77,7 +77,7 @@ class S3Loader:
         format_options,
         database_location,
         partition_cols,
-        **options
+        **options,
     ):
         """
         *This method will be deprecated soon, you should use load_df.
@@ -154,7 +154,7 @@ class S3Loader:
         write_mode="overwrite",
         max_records_per_file=MAX_RECORDS_PER_FILE,
         optimize_dataframe=True,
-        **options
+        **options,
     ):
         """
         Loads the content of an Spark DataFrame into a table in S3 overwriting the

@@ -64,7 +64,7 @@ class TestS3Loader:
                 format_options,
                 database_location,
                 partitions,
-                **options
+                **options,
             )
 
     @pytest.mark.parametrize(
@@ -127,7 +127,7 @@ class TestS3Loader:
                 format_options,
                 database_location,
                 partitions,
-                **options
+                **options,
             )
 
     @mock.patch.object(S3Loader, "_optimize_dataframe_partitions")
@@ -165,7 +165,7 @@ class TestS3Loader:
             partitions,
             write_mode,
             max_records_per_file,
-            **options
+            **options,
         )
 
         # then
@@ -218,7 +218,7 @@ class TestS3Loader:
             partitions,
             write_mode,
             max_records_per_file,
-            **options
+            **options,
         )
 
         # then
