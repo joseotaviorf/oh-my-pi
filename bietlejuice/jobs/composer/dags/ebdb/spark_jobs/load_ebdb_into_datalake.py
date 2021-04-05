@@ -18,22 +18,11 @@ JOB_NAME = "load_ebdb_into_datalake"
 TABLE_BLOCK_LIST = ["ENT_REVTYPE", "REVCHANGES", "_UsuarioRevisionEntity_new"]
 VIEW_ALLOW_LIST = ["MapRegiao", "vw_lead_reason"]
 BLOCK_LIST = ["PoligonoRegiao"]
-SERIAL_TABLES_LIST = [
-    "Imovel_AUD",
-    "MudancaStatusAgendamento",
-    "AmenidadesInfo",
-    "Agendamento_AUD",
-    "Lead_AUD",
-    "Vistoria_AUD",
-    "FotoItemVistoria",
-    "MensagemSMS",
-    "PropostaProponente_AUD",
-    "FotoItemVistoria_AUD",
-    "Lead",
-]
 
 # todo: check this value and argument the choice
 PARTITION_SIZE = 1024
+# todo: check this value and argument the choice
+SIZE_THRESHOLD = PARTITION_SIZE * 10
 # todo: check this value and argument the choice
 NB_THREADS = 20
 
@@ -112,7 +101,22 @@ if __name__ == "__main__":
     conn_config.update({"params": {"zeroDateTimeBehavior": "convertToNull"}})
     mysql_consumer = MySqlConsumer(conn_config, SparkClient())
 
-    tables = mysql_consumer.get_table_names_and_sizes().collect()
+    tables_df = mysql_consumer.get_table_names_and_sizes()
+    tables = tables_df.collect()
+
+    serial_tables_df = (
+        tables_df.filter(
+            (tables_df.size > SIZE_THRESHOLD)
+            & (~tables_df.table_name.isin(TABLE_BLOCK_LIST))
+        )
+        .sort(tables_df.size.desc())
+        .collect()
+    )
+    serial_tables_list = [
+        Relation(name=t.table_name, size=t.size, rows_count=t.rows_count)
+        for t in serial_tables_df
+    ]
+
     rels = [
         Relation(name=t.table_name, size=t.size, rows_count=t.rows_count)
         for t in tables
@@ -135,10 +139,8 @@ if __name__ == "__main__":
     # create database if not exists
     metastore_service.create_database(db_info["db_raw_databricks"])
 
-    for rel in rels:
-        if rel.name not in SERIAL_TABLES_LIST:
-            continue
-
+    # Loading huge tables in sequential order
+    for rel in serial_tables_list:
         load_relation_into_datalake(
             (
                 s3_loader,
@@ -150,6 +152,7 @@ if __name__ == "__main__":
             )
         )
 
+    # Thread pool for small tables load
     with Pool(NB_THREADS) as p:
         p.map(
             load_relation_into_datalake,
@@ -163,6 +166,6 @@ if __name__ == "__main__":
                     partition_columns,
                 )
                 for rel in rels
-                if rel.name not in SERIAL_TABLES_LIST
+                if rel.name not in serial_tables_list
             ],
         )
