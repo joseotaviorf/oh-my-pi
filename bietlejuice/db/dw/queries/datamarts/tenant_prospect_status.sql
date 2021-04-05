@@ -67,8 +67,14 @@ contract_person AS (
         COALESCE(NULLIF(fcp.sk_user, -1), flrf.sk_client) AS sk_client,
         dr.city_group,
         dc.ts_signature,
+        dc.sk_contract,
         fcp.contract_role,
-        CAST(dt_annulment AS TIMESTAMP) AS ts_annulment
+        CAST(dt_annulment AS TIMESTAMP) AS ts_annulment,
+        ROW_NUMBER() OVER(PARTITION BY COALESCE(NULLIF(fcp.sk_user, -1), flrf.sk_client),
+                                       dc.sk_contract,
+                                       dr.city_group,
+                                       dc.ts_signature
+                          ORDER BY fcp.contract_role DESC) as cs_order
     FROM
         dim_contract AS dc
         JOIN fact_listing_rent_flows AS flrf
@@ -104,6 +110,8 @@ events_base AS (
         'contract signed as ' ||  contract_role AS event_type
     FROM
         contract_person
+    WHERE
+        cs_order = 1
 
     UNION ALL
 
@@ -129,7 +137,7 @@ churn_dates AS (
             WHEN event_type = 'contract ended' AND last_event LIKE 'contract signed%'
                 THEN ts_event
             WHEN event_type NOT LIKE 'contract%'
-                    AND DATEDIFF(DAY, ts_event, COALESCE(ts_next_event, CURRENT_DATE)) >= 35
+                    AND DATEDIFF(DAY, ts_event, COALESCE(ts_next_event, CURRENT_DATE)) > 35
                 THEN DATEADD(DAY, 35, ts_event)
         END AS ts_churn
     FROM
