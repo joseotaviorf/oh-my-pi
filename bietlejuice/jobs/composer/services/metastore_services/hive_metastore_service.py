@@ -69,7 +69,10 @@ class HiveMetastoreService(MetastoreService):
         columns = self._build_columns_from_dict(table_schema.items())
         partition_keys = self._build_columns_from_dict(partition_cols)
 
-        serde_info = SerDeInfoBuilder(serialization_lib=format_info.serde_lib).build()
+        serde_info = SerDeInfoBuilder(
+            serialization_lib=format_info.serde_lib,
+            parameters={"timestamp.formats": "yyyy-MM-dd'T'HH:mm:ss.SSSS'Z'"},
+        ).build()
 
         storage_descriptor = StorageDescriptorBuilder(
             columns=columns,
