@@ -112,7 +112,4 @@ FROM
     datalake_braze_user_centric.user_events_daily
 WHERE
     DATE_TRUNC('week', DATE(dt_event)) = DATE_TRUNC('week', DATE('{year}-{month}-{day}') - INTERVAL '21' DAY)
-    AND year = {year}
-    AND month = {month}
-    AND day = {day}
 GROUP by 1, 17, 18, 19
