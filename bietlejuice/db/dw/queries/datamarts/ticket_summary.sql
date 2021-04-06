@@ -152,7 +152,7 @@ last_event_completed_call AS (
         id_call,
         max(id) AS last_event
     FROM
-        datalake_bigfone_prod.call_flex_events
+        datalake_bigfone_twilio_prod.call_flex_events
     WHERE
         direction = 'inbound'
         AND event_type = 'task.completed'
@@ -170,7 +170,7 @@ csat_ticket_calls AS (
         c.department_name,
         dept.area_aux
     FROM
-        datalake_bigfone_prod.call_flex_events c
+        datalake_bigfone_twilio_prod.call_flex_events c
     INNER JOIN 
         last_event_completed_call le 
             ON le.id_call = c.id_call
@@ -189,7 +189,7 @@ csat_ticket_calls AS (
                 CAST(csat_2 AS INTEGER) AS csat,
                 min(ts_created_local) AS ts_first_call_event
             FROM
-                datalake_bigfone_prod.call_ivr_events
+                datalake_bigfone_twilio_prod.call_ivr_events
             GROUP BY 1, 2,3 
         ) cc 
             ON cc.id_call = c.id_call
