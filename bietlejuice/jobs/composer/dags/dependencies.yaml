@@ -354,6 +354,11 @@ bietlejuice.enrich_marketing_costs_criteo_campaigns:
 bietlejuice.enrich_marketing_costs_facebook_insights:
   - bietlejuice.facebook_insights
 
+bietlejuice.enrich_marketing_costs_offline:
+  - bietlejuice.gsheets:load-marketing-offline-manual-costs-to-clean
+  - bietlejuice.gsheets:load-marketing-offline-manual-share-city-group-to-clean
+  - bietlejuice.gsheets:load-marketing-offline-manual-share-cost-center-to-clean
+
 bietlejuice.enrich_nps_answer_drivers:
   - bietlejuice.enrich_tracksale:load-answer-to-enrich
   - bietlejuice.ebdb:create-clean-house-in-data-lake

@@ -16,7 +16,6 @@ from bietlejuice.jobs.composer.services import FileService
 
 
 PARTITION_COLS = {"google": ["acc", "load_date"]}
-BLOCK_LIST = ["criteo_campaigns"]
 MARKETING_HUB_MEDIAS = ["google"]
 SOURCE = "marketing_hub"
 TARGET = "marketing_costs"
@@ -90,38 +89,31 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-media_names = FileService.list_layer_sql_files(TARGET, "")
+media_name = "google"
 
-for media_name in media_names:
-    if media_name not in BLOCK_LIST:
-        layers = FileService.list_layer_sql_files(TARGET, media_name)
+layers = FileService.list_layer_sql_files(TARGET, media_name)
 
-        if LayerEnum.ENRICH.value in layers:
-            database_base_name = get_database_name(media_name)
-            enrich_layer = f"{media_name}/{LayerEnum.ENRICH.value}"
-            sql_file_list = FileService.list_sql_files_without_extension_from_layer(
-                TARGET, enrich_layer
-            )
-            enrich_sub_dag = DatalakeSubDAG(
-                dag_id=DAG_ID,
-                env=ENV,
-                datalake_bucket=DATALAKE_BUCKET,
-                layer=LayerEnum.ENRICH,
-                database_base_name=database_base_name,
-                target_database_base_name=TARGET,
-                relative_query_path=f"{TARGET}/{media_name}",
-                spark_job_paths=BASE_SPARK_JOBS_PATH,
-                athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
-                start_date=MAIN_START_DATE,
-                execution_timeout_hours=EXECUTION_TIMEOUT_HOURS,
-            )
-            enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(
-                dag,
-                sql_file_list,
-                is_incremental=True,
-                partitions=PARTITION_COLS[media_name],
-            )
+if LayerEnum.ENRICH.value in layers:
+    database_base_name = get_database_name(media_name)
+    enrich_layer = f"{media_name}/{LayerEnum.ENRICH.value}"
+    sql_file_list = FileService.list_sql_files_without_extension_from_layer(
+        TARGET, enrich_layer
+    )
+    enrich_sub_dag = DatalakeSubDAG(
+        dag_id=DAG_ID,
+        env=ENV,
+        datalake_bucket=DATALAKE_BUCKET,
+        layer=LayerEnum.ENRICH,
+        database_base_name=database_base_name,
+        target_database_base_name=TARGET,
+        relative_query_path=f"{TARGET}/{media_name}",
+        spark_job_paths=BASE_SPARK_JOBS_PATH,
+        athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
+        start_date=MAIN_START_DATE,
+        execution_timeout_hours=EXECUTION_TIMEOUT_HOURS,
+    )
+    enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(
+        dag, sql_file_list, is_incremental=True, partitions=PARTITION_COLS[media_name]
+    )
 
-            create_cluster_task >> list(
-                enrich_sub_dags.values()
-            ) >> terminate_cluster_task
+    create_cluster_task >> list(enrich_sub_dags.values()) >> terminate_cluster_task
