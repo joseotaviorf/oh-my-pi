@@ -88,6 +88,7 @@ SELECT
   MAX(ueat.dt_last_webhook_sent_to) AS dt_last_webhook_sent_to,
   MAX(ueat.dt_last_sms_sent_to) AS dt_last_sms_sent_to,
   MAX(ueat.dt_last_sms_delivered_to) AS dt_last_sms_delivered_to,
+  DATE(CONCAT(ueat.year,'-',ueat.month,'-',ueat.day)) AS dt_snapshot,
   NOW() AS ts_load,
   ueat.year,
   ueat.month,
@@ -122,4 +123,4 @@ WHERE
     ueat.year = {year}
     AND ueat.month = {month}
     AND ueat.day = {day}
-GROUP BY 1,91,92,93
+GROUP BY 1,92,93,94

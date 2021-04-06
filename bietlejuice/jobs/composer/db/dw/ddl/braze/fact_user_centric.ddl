@@ -89,6 +89,7 @@ CREATE TABLE braze.fact_user_centric (
     dt_last_webhook_sent_to DATE,
     dt_last_sms_sent_to DATE,
     dt_last_sms_delivered_to DATE,
+    dt_snapshot DATE,
     ts_load TIMESTAMP
 );
 ALTER TABLE braze.fact_user_centric OWNER TO airflow;
