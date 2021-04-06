@@ -82,7 +82,7 @@ sync_metastore_tables_task = QuintoAndarDatabricksSubmitRunOperator(
     dag=dag,
     json={
         "spark_python_task": {
-            "python_file": SPARK_JOBS_PATH + "/sync_metastore_external_table.py",
+            "python_file": SPARK_JOBS_PATH + "sync_metastore_tables.py",
             "parameters": [
                 DATALAKE_BUCKET,
                 LayerEnum.RAW.value,
@@ -98,7 +98,7 @@ validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id="validate-sync-hive-metastore-table",
     json={
         "spark_python_task": {
-            "python_file": SPARK_JOBS_PATH + "/validate_sync_metastore_tables.py",
+            "python_file": SPARK_JOBS_PATH + "validate_sync_metastore_tables.py",
             "parameters": [LayerEnum.RAW.value, DAG_NAME, "--all-tables"],
         }
     },

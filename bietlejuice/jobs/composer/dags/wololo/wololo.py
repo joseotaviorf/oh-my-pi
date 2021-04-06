@@ -85,13 +85,24 @@ sync_metastore_tables_task = QuintoAndarDatabricksSubmitRunOperator(
     dag=dag,
     json={
         "spark_python_task": {
-            "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_external_table.py",
+            "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables.py",
             "parameters": [
                 DATALAKE_BUCKET,
                 LayerEnum.RAW.value,
                 SOURCE,
                 "--all-tables",
             ],
+        }
+    },
+)
+
+validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
+    task_id="validate-sync-hive-metastore-table",
+    json={
+        "spark_python_task": {
+            "python_file": BASE_SPARK_JOBS_PATH + "validate_sync_metastore_tables.py",
+            "parameters": [LayerEnum.RAW.value, SOURCE, "--all-tables"],
         }
     },
 )
@@ -122,5 +133,6 @@ create_cluster_task >> wololo_to_datalake_raw_task
 wololo_to_datalake_raw_task.set_downstream(
     [sync_metastore_tables_task, create_raw_external_tables_task]
 )
+sync_metastore_tables_task >> validate_sync_metastore_table_task >> terminate_cluster_task
 wololo_to_datalake_raw_task >> list(clean_sub_dags.values())
 terminate_cluster_task.set_upstream(list(clean_sub_dags.values()))
