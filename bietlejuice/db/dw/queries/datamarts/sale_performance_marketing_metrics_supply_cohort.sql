@@ -173,7 +173,7 @@ costs_targets_results_combined AS (
     SUM(0::FLOAT) AS qualifieds_target,
     SUM(0::FLOAT) AS opportunities_target,
     SUM(0::FLOAT) AS first_listings_target,
-    SUM(NULLIF(ct.cost_target, '')::FLOAT) AS budget
+    SUM(NULLIF(ct.budget__mensal, '')::FLOAT) AS budget
   FROM datalake_raw.gsheets_costs_targets AS ct
   WHERE
     business = 'Sales'

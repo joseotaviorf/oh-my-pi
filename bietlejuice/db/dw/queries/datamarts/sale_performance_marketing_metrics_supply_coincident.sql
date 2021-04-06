@@ -692,7 +692,7 @@ UNION ALL
         SUM(0::FLOAT) AS qualifieds_target,
         SUM(0::FLOAT) AS opportunities_target,
         SUM(0::FLOAT) AS first_listings_target,
-        SUM(NULLIF((REPLACE(sct.cost_target,',','')),'')::FLOAT) AS budget
+        SUM(NULLIF((REPLACE(sct.budget__mensal,',','')),'')::FLOAT) AS budget
     FROM
         datalake_raw.gsheets_costs_targets sct
     WHERE planning_mkt_level1 = 'Supply'

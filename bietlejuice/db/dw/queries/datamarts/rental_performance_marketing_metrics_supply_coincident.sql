@@ -672,7 +672,7 @@ affiliates AS (
         SUM(0::FLOAT) AS qualifieds_target,
         SUM(0::FLOAT) AS opportunities_target,
         SUM(0::FLOAT) AS first_listings_target,
-        SUM(nullif((replace(sct.cost_target,',','')),'')::float) AS budget
+        SUM(nullif((replace(sct.budget__mensal,',','')),'')::float) AS budget
     FROM
         datalake_raw.gsheets_costs_targets sct
     WHERE planning_mkt_level1 = 'Supply'
