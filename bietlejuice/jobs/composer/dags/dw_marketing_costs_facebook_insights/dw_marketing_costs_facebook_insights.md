@@ -13,6 +13,8 @@ Currently, there are the following output tables for both our staging and dw lay
 
 - `fact_facebook_daily_cost_attributions`
 - `dim_facebook_ad`
+- `fact_facebook_social_costs`
+- `dim_facebook_social_costs`
 
 ### Responsible Data Team
 
