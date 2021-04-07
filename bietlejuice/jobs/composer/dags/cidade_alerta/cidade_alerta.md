@@ -11,14 +11,16 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-Produces the following output tables in the clean layer:
+Produces the following output tables in the raw and clean layer:
 
-- `alert`
-- `audit`
-- `highlights`
-- `profile`
+Via full load:
+    - `highlights`
+    - `profile`
 
-### Responsible Data Engineering Team
+Via incremental load:
+    - `alert`
+    - `audit`
 
-For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the 
-[DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
+### Responsible Data Team
+
+For any questions or concerns about this DAG, please contact the Data Engineering Team or the Data Analytics Team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
