@@ -30,6 +30,23 @@ WITH reservations_events AS (
         AND day = {day}
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 ),
+tasks_events AS (
+  SELECT
+      GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.call_sid') AS id_call,
+      GET_JSON_OBJECT(metadata,'$.event_data.TaskSid') AS id_task,
+      event,
+      GET_JSON_OBJECT(metadata, '$.event_data.Timestamp') AS ts_event_unix
+  FROM
+      datalake_bigfone_events.events
+  WHERE
+      provider = 'twilio'
+      AND GET_JSON_OBJECT(metadata,'$.event_data.WorkflowName') = 'Assign to Anyone'
+      AND event = 'task.created'
+      AND year = {year}
+      AND month = {month}
+      AND day = {day}
+  GROUP BY 1,2,3,4
+),
 call_flex_reservations AS (
     SELECT
         re1.id_call,
@@ -53,13 +70,16 @@ call_flex_reservations AS (
                 WHEN re1.event = 'reservation.rejected' THEN re1.id_reservation
             END
         ) > 0 AS is_rejected,
-        MIN(re1.ts_event_unix) AS ts_created_unix,
+        MIN(te.ts_event_unix) AS ts_created_unix,
         MAX(re1.ts_event_unix) AS ts_ended_unix,
         re1.year,
         re1.month,
         re1.day
     FROM
         reservations_events AS re1
+    INNER JOIN
+        tasks_events AS te
+            ON te.id_task = re1.id_task
     LEFT JOIN
         reservations_events AS re2
             ON re1.id_task = re2.id_task
@@ -72,11 +92,11 @@ answered_time_calculations AS (
         re.id_task,
         re.id_reservation,
         CASE
-            WHEN event = 'reservation.created' AND LEAD(event,1) OVER (PARTITION BY cr.id_task ORDER BY ts_event_unix) = 'reservation.accepted' THEN LEAD(ts_event_unix,1) OVER (PARTITION BY re.id_task ORDER BY ts_event_unix) - COALESCE(LAG(ts_event_unix,1) OVER (PARTITION BY re.id_task ORDER BY ts_event_unix),ts_event_unix)
-            WHEN event = 'reservation.created' AND LEAD(event,1) OVER (PARTITION BY re.id_task ORDER BY ts_event_unix) = 'reservation.completed' THEN LEAD(ts_event_unix,2) OVER (PARTITION BY re.id_task ORDER BY ts_event_unix) - ts_event_unix
+            WHEN te.event = 'task.created' AND LEAD(re.event,1) OVER (PARTITION BY re.id_task ORDER BY re.ts_event_unix) = 'reservation.accepted' THEN LEAD(re.ts_event_unix,1) OVER (PARTITION BY re.id_task ORDER BY re.ts_event_unix) - te.ts_event_unix
+            WHEN te.event = 'task.created' AND LEAD(re.event,1) OVER (PARTITION BY re.id_task ORDER BY re.ts_event_unix) = 'reservation.completed' THEN LEAD(re.ts_event_unix,2) OVER (PARTITION BY re.id_task ORDER BY re.ts_event_unix) - re.ts_event_unix
         END AS seconds_queue_time,
         CASE
-            WHEN event = 'reservation.accepted' THEN LEAD(ts_event_unix,1) OVER (PARTITION BY re.id_task ORDER BY ts_event_unix) - ts_event_unix
+            WHEN re.event = 'reservation.accepted' THEN LEAD(re.ts_event_unix,1) OVER (PARTITION BY re.id_task ORDER BY re.ts_event_unix) - re.ts_event_unix
         END AS seconds_talk_time
     FROM
         reservations_events re
@@ -85,6 +105,9 @@ answered_time_calculations AS (
             ON re.id_task = cr.id_task
             AND re.id_reservation = cr.id_reservation
             AND cr.is_answered
+    JOIN 
+        tasks_events te
+            ON te.id_task = re.id_task
 )
 SELECT
     cr.id_call,
