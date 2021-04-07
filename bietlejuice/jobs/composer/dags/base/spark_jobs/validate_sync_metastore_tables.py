@@ -160,13 +160,13 @@ class MetastoreSyncValidation:
         :rtype: bool
         """
         for col_name, col_type in spark_ms_table_columns.items():
-            if (col_name not in trino_table_schema.keys()) or (
-                trino_table_schema[col_name].replace(" ", "")
+            if (col_name.lower() not in trino_table_schema.keys()) or (
+                trino_table_schema[col_name.lower()].replace(" ", "")
                 != self._get_spark_to_trino_col_mapping(col_type).replace(" ", "")
             ):
                 logger.error(
                     f"m={JOB_NAME}, database={self.database_name}, table={self.table_name}, "
-                    f"column={col_name}, msg=The column diverges in both Metastore tables."
+                    f"column={col_name.lower()}, msg=The column diverges in both Metastore tables."
                 )
                 return False
         return True
