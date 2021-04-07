@@ -32,7 +32,8 @@ class MetastoreExternalTablePipeline(AbstractPipeline):
          E.g: s3://some/path/
         :type database_location: str
         :param table_schema: an ordered dict containing the columns name and
-         type (including partitioning columns).
+         type (including partitioning columns). This will be the schema of the
+         table in Hive.
         :type table_schema: collections.OrderedDict
         :param partition_keys: a list of tuples containing respectively the
         columns name and type for the partition keys. A table can have one or

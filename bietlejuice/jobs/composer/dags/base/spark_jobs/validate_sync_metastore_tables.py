@@ -76,6 +76,10 @@ class MetastoreSyncValidation:
             self.database_name, self.table_name
         )
         self._validate_empty_table_schema(spark_ms_table_columns)
+        if LayerEnum.RAW.value in self.database_name:
+            spark_ms_table_columns = self._set_timestamps_as_string(
+                spark_ms_table_columns
+            )
 
         trino_table_schema = self.trino_client.get_records(
             query=f"DESCRIBE {self.database_name}.{self.table_name}"
@@ -98,6 +102,30 @@ class MetastoreSyncValidation:
             "msg=Table schemas and partition keys match."
         )
         return True
+
+    @staticmethod
+    def _set_timestamps_as_string(_spark_ms_table_columns):
+        """
+        Forcefully set the timestamp columns to string.
+
+        Some json data in Spark Metastore raw tables are automatically interpreted
+         as timestamp and the date part is automatically extracted when we select data.
+         For example, for the raw data {"revision_date":"{\"$date\": \"2021-01-10T00:00:00.157Z\"}"}
+         the command `select revision_date from table_a` will return `2021-01-10T00:00:00.157Z`
+         instead of the full json content with the key `$date`.
+        The Hive Metastore does not automatically extract the date part for the timestamp columns
+          but raises a parse error instead.
+
+        :param _spark_ms_table_columns: the spark columns schema
+        :return: columns with timestamps as string
+        :rtype: collections.OrderedDict[(string, string)]
+        """
+        for col in _spark_ms_table_columns:
+            _spark_ms_table_columns[col] = _spark_ms_table_columns[col].replace(
+                "timestamp", "string"
+            )
+
+        return _spark_ms_table_columns
 
     def _validate_empty_table_schema(self, table_schema):
         if not table_schema:
