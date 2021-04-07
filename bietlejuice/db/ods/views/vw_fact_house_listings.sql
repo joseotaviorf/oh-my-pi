@@ -4,13 +4,14 @@ with house_listing_contracts as (
   with latest_contract as (
     select
     	hl.id_house_listing,
-    	max(c.id) as id_contract
+    	max(c.id) as id_contract,
+    	dense_rank() over (partition by hl.id_house order by hl.id_house_listing) as order_renting
    from house_listing hl
    join contract c
     on hl.id_house = c.id_house
     	and c.ts_created between coalesce(hl.ts_listing_version_start, '2000-01-01 00:00:00') and coalesce(hl.ts_listing_version_end, current_date)
     	  and c.status in ('Ativo', 'Finalizado')
-   group by 1
+   group by hl.id_house_listing, hl.id_house
   )
   select
     hl.id_house_listing,
@@ -20,7 +21,8 @@ with house_listing_contracts as (
     c.dt_annulment as dt_contract_annulment,
     lag(c.id,1) over (partition by hl.id_house order by hl.version) as id_prev_contract,
     lead(c.ts_signature,1) over (partition by hl.id_house order by hl.version) as ts_next_contract_signed,
-    count(c.id) over (partition by c.id_house) as nr_renting
+    count(c.id) over (partition by c.id_house) as nr_renting,
+    order_renting
   from house_listing hl
   left join latest_contract lc
   	on hl.id_house_listing = lc.id_house_listing
@@ -71,6 +73,7 @@ select
   date_part('day', hlc.ts_next_contract_signed - hl.ts_listing_version_end)::integer as days_relisting_to_re_rental,
   date_part('day', hlc.ts_next_contract_signed - hlc.dt_contract_annulment)::integer as days_ended_rental_to_re_rented,
   coalesce(hlc.nr_renting::smallint, 0) as nr_renting,
+  coalesce(hlc.order_renting::smallint, 0) as order_renting,
   now()::timestamp as ts_load
 from house h
 left join lbc

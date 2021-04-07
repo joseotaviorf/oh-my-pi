@@ -266,40 +266,70 @@ listing_special_conditions_dates as (
                 when fo.special_condition_type like '%Rent' then 'ioRent'
                 else fo.special_condition_type
               end)
+),
+house_listing AS (
+    select
+        hl.id_house_listing,
+        hl.id_house,
+        hl.version,
+        hl.status,
+        rent_last.rent,
+        hl.listing_category,
+        lsc_originals.special_condition_type as last_originals_type,
+        lsc_iorent.special_condition_type as last_iorent_type,
+        hl.version = max(hl.version) over (partition by hl.id_house) as is_last_version,
+        lsc_exclusivity.dt_first_opted_in is not null as is_exclusive,
+        ((lsc_originals.dt_last_opted_in is not null and lsc_originals.dt_last_opted_out is null)
+            or (lsc_originals.dt_last_opted_in > lsc_originals.dt_last_opted_out)) as is_originals_active,
+        ((lsc_iorent.dt_last_opted_in is not null and lsc_iorent.dt_last_opted_out is null)
+            or (lsc_iorent.dt_last_opted_in > lsc_iorent.dt_last_opted_out)) as is_iorent_active,
+        hl.ts_listing_version_start,
+        hl.ts_listing_version_end,
+        ts_last_unpublished,
+        lsc_exclusivity.dt_last_opted_in as dt_last_exclusive_opted_in,
+        lsc_exclusivity.dt_last_opted_out as dt_last_exclusive_opted_out,
+        lsc_originals.dt_last_opted_in as dt_last_originals_opted_in,
+        lsc_originals.dt_last_opted_out as dt_last_originals_opted_out,
+        lsc_iorent.dt_last_opted_in as dt_last_iorent_opted_in,
+        lsc_iorent.dt_last_opted_out as dt_last_iorent_opted_out
+    from house_listing_full hl
+    left join listing_special_conditions_dates lsc_originals
+        on hl.id_house_listing = lsc_originals.id_house_listing
+        and lsc_originals.special_condition_type like 'Originals%'
+    left join listing_special_conditions_dates lsc_exclusivity
+        on hl.id_house_listing = lsc_exclusivity.id_house_listing
+        and lsc_exclusivity.special_condition_type = 'Exclusivity'
+    left join listing_special_conditions_dates lsc_iorent
+        on hl.id_house_listing = lsc_iorent.id_house_listing
+        and lsc_iorent.special_condition_type like '%Rent'
+    left join listing_rent_last rent_last
+        on hl.id_house_listing = rent_last.id_house_listing
+),
+house_listing_latest_contracts AS (
+----------------------------------------------------------------------------------------------------------
+-- Include information related to contracts (including only active or ended contracts) for each listing --
+----------------------------------------------------------------------------------------------------------
+    select 
+      hl.id_house_listing,
+      max(c.id) as id_contract,
+      dense_rank() over (partition by hl.id_house order by hl.id_house_listing) as order_renting
+    from house_listing hl 
+    join datalake_ebdb_contract.contract c
+      on hl.id_house = c.id_house
+      and c.ts_signed between coalesce(hl.ts_listing_version_start, '2000-01-01 00:00:00') and coalesce(hl.ts_listing_version_end, current_date)
+      and c.status in ('Ativo', 'Finalizado')
+    group by 1, hl.id_house
 )
 select
-    hl.id_house_listing,
-    hl.id_house,
-    hl.version,
-    hl.status,
-    rent_last.rent,
-    hl.listing_category,
-    lsc_originals.special_condition_type as last_originals_type,
-    lsc_iorent.special_condition_type as last_iorent_type,
-    hl.version = max(hl.version) over (partition by hl.id_house) as is_last_version,
-    lsc_exclusivity.dt_first_opted_in is not null as is_exclusive,
-    ((lsc_originals.dt_last_opted_in is not null and lsc_originals.dt_last_opted_out is null)
-        or (lsc_originals.dt_last_opted_in > lsc_originals.dt_last_opted_out)) as is_originals_active,
-    ((lsc_iorent.dt_last_opted_in is not null and lsc_iorent.dt_last_opted_out is null)
-        or (lsc_iorent.dt_last_opted_in > lsc_iorent.dt_last_opted_out)) as is_iorent_active,
-    hl.ts_listing_version_start,
-    hl.ts_listing_version_end,
-    ts_last_unpublished,
-    lsc_exclusivity.dt_last_opted_in as dt_last_exclusive_opted_in,
-    lsc_exclusivity.dt_last_opted_out as dt_last_exclusive_opted_out,
-    lsc_originals.dt_last_opted_in as dt_last_originals_opted_in,
-    lsc_originals.dt_last_opted_out as dt_last_originals_opted_out,
-    lsc_iorent.dt_last_opted_in as dt_last_iorent_opted_in,
-    lsc_iorent.dt_last_opted_out as dt_last_iorent_opted_out
-from house_listing_full hl
-left join listing_special_conditions_dates lsc_originals
-    on hl.id_house_listing = lsc_originals.id_house_listing
-    and lsc_originals.special_condition_type like 'Originals%'
-left join listing_special_conditions_dates lsc_exclusivity
-    on hl.id_house_listing = lsc_exclusivity.id_house_listing
-    and lsc_exclusivity.special_condition_type = 'Exclusivity'
-left join listing_special_conditions_dates lsc_iorent
-    on hl.id_house_listing = lsc_iorent.id_house_listing
-    and lsc_iorent.special_condition_type like '%Rent'
-left join listing_rent_last rent_last
-    on hl.id_house_listing = rent_last.id_house_listing
+  hl.*,
+  hl_c.id_contract,
+  c.ts_signed as ts_contract_signed,
+  c.dt_termination as dt_contract_annulment,
+  lead(c.ts_signed,1) over (partition by hl.id_house order by hl.version) as ts_next_contract_signed,
+  count(c.id) over (partition by c.id_house) as nr_renting,
+  hl_c.order_renting
+from house_listing hl
+left join house_listing_latest_contracts hl_c
+  on hl.id_house_listing = hl_c.id_house_listing
+left join datalake_ebdb_contract.contract c
+  on hl_c.id_contract = c.id

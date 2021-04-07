@@ -17,6 +17,7 @@ create table if not exists fact_house_listings
  ,days_relisting_to_re_rental integer   encode lzo
  ,days_ended_rental_to_re_rented integer   encode lzo
  ,nr_renting smallint   encode lzo
+ ,order_renting smallint   encode lzo
  ,ts_load timestamp without time zone   encode lzo
 )
 diststyle key

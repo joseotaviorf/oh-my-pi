@@ -16,6 +16,7 @@ create external table if not exists datalake_clean.ods_fact_house_listings (
   days_relisting_to_re_rental string,
   days_ended_rental_to_re_rented string,
   nr_renting string,
+  order_renting string,
   ts_load string
 )
 row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
