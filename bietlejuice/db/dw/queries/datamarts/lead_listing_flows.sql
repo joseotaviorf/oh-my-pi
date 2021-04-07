@@ -120,6 +120,7 @@ fact_sale AS (
 		ssf.sk_house_listing,
 		ssf.sk_region,
 		ssf.sk_lead_date,
+		ssf.sk_first_contact_date,
 	    ssf.sk_prospect_date,
 	    ssf.sk_qualified_date,
 	    ssf.sk_opportunity_date,
@@ -138,6 +139,8 @@ fact_sale AS (
 	    sor.sourcing_ops,
 	    ssf.lead_origin,
 	    ssf.funnel_drop_reason,
+	    ssf.lead_context_origin,
+	    ssf.has_isales_intervention,
 	    'Sale' AS origin_table
 	FROM sale.fact_listing_flows ssf
 	JOIN source_ops_sale AS sor
@@ -150,6 +153,7 @@ fact_rent AS (
 		hlf.sk_house_listing,
 		hlf.sk_region,
 		hlf.sk_lead_date,
+		hlf.sk_first_contact_date,
 	    hlf.sk_prospect_date,
 	    hlf.sk_qualified_date,
 	    hlf.sk_opportunity_date,
@@ -168,6 +172,8 @@ fact_rent AS (
 	    sor.sourcing_ops,
 	    hlf.lead_origin,
 	    hlf.funnel_drop_reason,
+	    hlf.lead_context_origin,
+	    hlf.has_isales_intervention,
 	    'Rent' AS origin_table
 	FROM fact_house_listing_flows hlf
 	JOIN source_ops_rent AS sor
