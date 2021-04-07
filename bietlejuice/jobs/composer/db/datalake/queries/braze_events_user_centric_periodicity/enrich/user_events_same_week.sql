@@ -111,5 +111,5 @@ SELECT
 FROM
     datalake_braze_user_centric.user_events_daily
 WHERE
-    DATE_TRUNC('week', dt_event) = DATE_TRUNC('week', DATE('{year}-{month}-{day}'))
+    DATE(dt_event) BETWEEN DATE_TRUNC('week', DATE('{year}-{month}-{day}')) AND DATE('{year}-{month}-{day}')
 GROUP by 1, 17, 18, 19
