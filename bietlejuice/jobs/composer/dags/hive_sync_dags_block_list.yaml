@@ -2,7 +2,6 @@
 #   in the DAGs. For activating the task sync-hive-metastore-table for a DAG
 #  (that uses DatalakeSubdag or DWSubdag) remove the DAG from the list bellow.
 
-- bietlejuice.bigfone_events
 - bietlejuice.braze_events
 - bietlejuice.chattermill
 - bietlejuice.classified_leads
