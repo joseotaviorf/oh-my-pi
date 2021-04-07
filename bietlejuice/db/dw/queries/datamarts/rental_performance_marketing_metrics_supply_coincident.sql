@@ -256,6 +256,12 @@ affiliates AS (
         SELECT
             fc.sk_date,
             mkt_origin,
+            mkt_channel,
+            mkt_medium,
+            mkt_source,
+            utm_campaign,
+            utm_content,
+            utm_term,
             fc.city_group,
             CASE
                 WHEN fc.mkt_source IN ('Twilio', 'Movile') THEN 'Notification'
@@ -287,6 +293,12 @@ affiliates AS (
             SELECT
                 cc.sk_date,
                 cc.mkt_origin,
+                NULL::TEXT AS mkt_channel,
+                NULL::TEXT AS mkt_medium,
+                NULL::TEXT AS mkt_source,
+                NULL::TEXT AS utm_campaign,
+                NULL::TEXT AS utm_content,
+                NULL::TEXT AS utm_term,
                 cc.city_group,
                 cc.source,
                 CASE
@@ -297,7 +309,7 @@ affiliates AS (
             FROM
                 commission_costs cc
             WHERE cc.sk_date >= 20210125
-            GROUP BY 1,2,3,4,5
+            GROUP BY 1,2,3,4,5,6,7,8,9,10,11
     ),
     promo_bonus AS (
         SELECT
@@ -308,6 +320,12 @@ affiliates AS (
                 WHEN affiliate_type = 'Doorman' THEN 'Doorman'
                 ELSE affiliate_type
             END AS mkt_origin,
+            NULL::TEXT AS mkt_channel,
+            NULL::TEXT AS mkt_medium,
+            NULL::TEXT AS mkt_source,
+            NULL::TEXT AS utm_campaign,
+            NULL::TEXT AS utm_content,
+            NULL::TEXT AS utm_term,
             city_group,
             'Promo Bonus' AS source,
             'Rent' AS business_context,
@@ -316,7 +334,7 @@ affiliates AS (
             datamarts.performance_marketing_promotional_bonus_costs_daily
         WHERE final_bonus_rent > 0
         AND sk_date >= 20210208
-        GROUP BY 1,2,3,4,5
+        GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 
         UNION ALL
 
@@ -328,6 +346,12 @@ affiliates AS (
                 WHEN affiliate_type = 'Doorman' THEN 'Doorman'
                 ELSE affiliate_type
             END AS mkt_origin,
+            NULL::TEXT AS mkt_channel,
+            NULL::TEXT AS mkt_medium,
+            NULL::TEXT AS mkt_source,
+            NULL::TEXT AS utm_campaign,
+            NULL::TEXT AS utm_content,
+            NULL::TEXT AS utm_term,
             city_group,
             'Promo Bonus' AS source,
             'Sale' AS business_context,
@@ -336,27 +360,33 @@ affiliates AS (
             datamarts.performance_marketing_promotional_bonus_costs_daily
         WHERE final_bonus_sale > 0
         AND sk_date >= 20210208
-        GROUP BY 1,2,3,4,5
+        GROUP BY 1,2,3,4,5,6,7,8,9,10,11
     ),
     ia_fact_affiliate_transposed AS (
-        SELECT sk_date, mkt_origin,	city_group, 'Commission Listing' AS source, NULL AS business_context, commission_listing AS cost FROM marketing.fact_affiliate_daily_cost_attributions WHERE sk_date < 20210125
+        SELECT sk_date, mkt_origin, NULL::TEXT AS mkt_channel, NULL::TEXT AS mkt_medium, NULL::TEXT AS mkt_source, NULL::TEXT AS utm_campaign, NULL::TEXT AS utm_content, NULL::TEXT AS utm_term, city_group, 'Commission Listing' AS source, NULL AS business_context, commission_listing AS cost FROM marketing.fact_affiliate_daily_cost_attributions WHERE sk_date < 20210125
         UNION ALL
-        SELECT sk_date,	mkt_origin,	city_group, 'Commission Rent' AS source, NULL AS business_context, commission_rent AS cost FROM	marketing.fact_affiliate_daily_cost_attributions WHERE sk_date < 20210125
+        SELECT sk_date,	mkt_origin, NULL::TEXT AS mkt_channel, NULL::TEXT AS mkt_medium, NULL::TEXT AS mkt_source, NULL::TEXT AS utm_campaign, NULL::TEXT AS utm_content, NULL::TEXT AS utm_term, city_group, 'Commission Rent' AS source, NULL AS business_context, commission_rent AS cost FROM	marketing.fact_affiliate_daily_cost_attributions WHERE sk_date < 20210125
         UNION ALL
-        SELECT sk_date, mkt_origin, city_group, 'Commission MGM' AS source, NULL AS business_context, commission_mgm AS cost FROM marketing.fact_affiliate_daily_cost_attributions WHERE sk_date < 20210125
+        SELECT sk_date, mkt_origin, NULL::TEXT AS mkt_channel, NULL::TEXT AS mkt_medium, NULL::TEXT AS mkt_source, NULL::TEXT AS utm_campaign, NULL::TEXT AS utm_content, NULL::TEXT AS utm_term, city_group, 'Commission MGM' AS source, NULL AS business_context, commission_mgm AS cost FROM marketing.fact_affiliate_daily_cost_attributions WHERE sk_date < 20210125
         UNION ALL
-        SELECT sk_date, mkt_origin, city_group, 'Commission Tradecom' AS source, NULL AS business_context, commission_tradecom AS cost FROM marketing.fact_affiliate_daily_cost_attributions
+        SELECT sk_date, mkt_origin, NULL::TEXT AS mkt_channel, NULL::TEXT AS mkt_medium, NULL::TEXT AS mkt_source, NULL::TEXT AS utm_campaign, NULL::TEXT AS utm_content, NULL::TEXT AS utm_term, city_group, 'Commission Tradecom' AS source, NULL AS business_context, commission_tradecom AS cost FROM marketing.fact_affiliate_daily_cost_attributions
         UNION ALL
-        SELECT sk_date, mkt_origin, city_group, 'Promo Bonus' AS source, NULL AS business_context, promotional_bonus AS cost FROM marketing.fact_affiliate_daily_cost_attributions  WHERE sk_date < 20210208
+        SELECT sk_date, mkt_origin, NULL::TEXT AS mkt_channel, NULL::TEXT AS mkt_medium, NULL::TEXT AS mkt_source, NULL::TEXT AS utm_campaign, NULL::TEXT AS utm_content, NULL::TEXT AS utm_term, city_group, 'Promo Bonus' AS source, NULL AS business_context, promotional_bonus AS cost FROM marketing.fact_affiliate_daily_cost_attributions  WHERE sk_date < 20210208
         UNION ALL
-        SELECT sk_date,	mkt_origin,	city_group, 'Notification' AS source, NULL AS business_context, notification AS cost FROM marketing.fact_affiliate_daily_cost_attributions
+        SELECT sk_date,	mkt_origin, NULL::TEXT AS mkt_channel, NULL::TEXT AS mkt_medium, NULL::TEXT AS mkt_source, NULL::TEXT AS utm_campaign, NULL::TEXT AS utm_content, NULL::TEXT AS utm_term, city_group, 'Notification' AS source, NULL AS business_context, notification AS cost FROM marketing.fact_affiliate_daily_cost_attributions
         UNION ALL
-        SELECT sk_date, mkt_origin, city_group, 'Other' AS source, NULL AS business_context, other AS cost FROM marketing.fact_affiliate_daily_cost_attributions
+        SELECT sk_date, mkt_origin, NULL::TEXT AS mkt_channel, NULL::TEXT AS mkt_medium, NULL::TEXT AS mkt_source, NULL::TEXT AS utm_campaign, NULL::TEXT AS utm_content, NULL::TEXT AS utm_term, city_group, 'Other' AS source, NULL AS business_context, other AS cost FROM marketing.fact_affiliate_daily_cost_attributions
     ),
     ia_provisioned_costs AS (
         SELECT
             TO_CHAR(NULLIF(DATE,'')::DATE,'yyyymmdd')::BIGINT AS sk_date,
             NULLIF(cost_origin,'')::VARCHAR AS mkt_origin,
+            NULL::TEXT AS mkt_channel,
+            NULL::TEXT AS mkt_medium,
+            NULL::TEXT AS mkt_source,
+            NULL::TEXT AS utm_campaign,
+            NULL::TEXT AS utm_content,
+            NULL::TEXT AS utm_term,
             NULLIF(city_group,'')::VARCHAR AS city_group,
             NULLIF(cost_type,'')::VARCHAR AS source,
             NULL AS business_context,
@@ -379,6 +409,12 @@ affiliates AS (
     SELECT
         iac.sk_date,
         iac.mkt_origin,
+        iac.mkt_channel,
+        iac.mkt_medium,
+        iac.mkt_source,
+        iac.utm_campaign,
+        iac.utm_content,
+        iac.utm_term,
         iac.city_group,
         iac.source,
         iac.business_context,
@@ -390,7 +426,7 @@ affiliates AS (
     WHERE
         iac.cost IS NOT NULL
         AND dd.date < CURRENT_DATE
-    GROUP BY 1,2,3,4,5
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11
     HAVING costs>0
     )
     SELECT
@@ -398,27 +434,27 @@ affiliates AS (
         city_group,
         business_context,
         mkt_origin,
+        mkt_channel,
+        mkt_medium,
+        mkt_source,
+        utm_campaign,
+        utm_content,
+        utm_term,
         SUM(costs) AS costs
     FROM base
-    GROUP BY 1, 2, 3, 4
+    GROUP BY 1,2,3,4,5,6,7,8,9,10
     ),
     affiliates_sale_cost AS (
     SELECT
-        sk_date AS sk_date,
+        sk_date,
         city_group,
-        replace(mkt_origin,' Sale','') AS planning_mkt_level3,
-        CASE
-            WHEN mkt_origin  IN  ('PWA - Paid', 'Owner PWA - Sale') THEN 'Paid'
-            WHEN mkt_origin = 'Not Mapped' THEN 'Other'
-            WHEN mkt_origin = 'Doorman Sale' THEN 'Doorman'
-            WHEN mkt_origin = 'Indica Aí - Agents Sale' THEN 'Indica Aí - Agents'
-            WHEN mkt_origin = 'Indica Aí - General Sale' THEN 'Indica Aí - General'
-        ELSE mkt_origin END AS mkt_channel,
-        NULL::TEXT AS mkt_medium,
-        NULL::TEXT AS mkt_source,
-        NULL::TEXT AS utm_campaign,
-        NULL::TEXT AS utm_content,
-        NULL::TEXT AS utm_term,
+        replace(mkt_origin,' Sale','') AS mkt_origin,
+        mkt_channel,
+        mkt_medium,
+        mkt_source,
+        utm_campaign,
+        utm_content,
+        utm_term,
         NULL::TEXT AS campaign_context,
         'Sale' as business,
         COUNT(NULL) AS leads,
@@ -439,21 +475,15 @@ affiliates AS (
     ),
     supply_affiliates_cost AS (
     SELECT
-        sk_date AS sk_date,
+        sk_date,
         city_group,
-        mkt_origin AS planning_mkt_level3,
-        CASE
-            WHEN mkt_origin  IN ('PWA - Paid', 'Owner PWA - Sale') THEN 'Paid'
-            WHEN mkt_origin = 'Not Mapped' THEN 'Other'
-            WHEN mkt_origin = 'Doorman Sale' THEN 'Doorman'
-            WHEN mkt_origin = 'Indica Aí - Agents Sale' THEN 'Indica Aí - Agents'
-            WHEN mkt_origin = 'Indica Aí - General Sale' THEN 'Indica Aí - General'
-        ELSE mkt_origin END AS mkt_channel,
-        NULL::TEXT AS mkt_medium,
-        NULL::TEXT AS mkt_source,
-        NULL::TEXT AS utm_campaign,
-        NULL::TEXT AS utm_content,
-        NULL::TEXT AS utm_term,
+        mkt_origin,
+        mkt_channel,
+        mkt_medium,
+        mkt_source,
+        utm_campaign,
+        utm_content,
+        utm_term,
         NULL::TEXT AS campaign_context,
         'Rental' as business,
         COUNT(NULL) AS leads,
@@ -476,19 +506,13 @@ affiliates AS (
     SELECT
         dbt.sk_date AS sk_date,
         co.city_group,
-        CASE WHEN mkt_origin = 'Owner PWA' THEN 'PWA - '||mkt_channel ELSE mkt_origin END AS planning_mkt_level3,
-        CASE
-            WHEN mkt_origin  IN ('PWA - Paid', 'Owner PWA - Sale') THEN 'Paid'
-            WHEN mkt_origin = 'Not Mapped' THEN 'Other'
-            WHEN mkt_origin = 'Doorman Sale' THEN 'Doorman'
-            WHEN mkt_origin = 'Indica Aí - Agents Sale' THEN 'Indica Aí - Agents'
-            WHEN mkt_origin = 'Indica Aí - General Sale' THEN 'Indica Aí - General'
-        ELSE mkt_origin END AS mkt_channel,
-        NULL::TEXT AS mkt_medium,
-        NULL::TEXT AS mkt_source,
-        NULL::TEXT AS utm_campaign,
-        NULL::TEXT AS utm_content,
-        NULL::TEXT AS utm_term,
+        CASE WHEN co.mkt_origin = 'Owner PWA' THEN 'PWA - '||co.mkt_channel ELSE co.mkt_origin END AS mkt_origin,
+        co.mkt_channel AS mkt_channel,
+        co.mkt_medium AS mkt_medium,
+        co.mkt_source AS mkt_source,
+        co.utm_campaign AS utm_campaign,
+        co.utm_content AS utm_content,
+        co.utm_term AS utm_term,
         NULL::TEXT AS campaign_context,
         'Rental' AS business,
         COUNT(NULL) AS leads,
@@ -515,19 +539,13 @@ affiliates AS (
     SELECT
         dbt.sk_date AS sk_date,
         co.city_group AS city_group,
-        co.mkt_origin AS planning_mkt_level3,
-        CASE
-            WHEN mkt_origin  IN ('PWA - Paid', 'Owner PWA - Sale') THEN 'Paid'
-            WHEN mkt_origin = 'Not Mapped' THEN 'Other'
-            WHEN mkt_origin = 'Doorman Sale' THEN 'Doorman'
-            WHEN mkt_origin = 'Indica Aí - Agents Sale' THEN 'Indica Aí - Agents'
-            WHEN mkt_origin = 'Indica Aí - General Sale' THEN 'Indica Aí - General'
-        ELSE mkt_origin END AS mkt_channel,
-        NULL::TEXT AS mkt_medium,
-        NULL::TEXT AS mkt_source,
-        NULL::TEXT AS utm_campaign,
-        NULL::TEXT AS utm_content,
-        NULL::TEXT AS utm_term,
+        co.mkt_origin AS mkt_origin,
+        co.mkt_channel AS mkt_channel,
+        co.mkt_medium AS mkt_medium,
+        co.mkt_source AS mkt_source,
+        co.utm_campaign AS utm_campaign,
+        co.utm_content AS utm_content,
+        co.utm_term AS utm_term,
         NULL::TEXT AS campaign_context,
         'Sale' AS business,
         COUNT(NULL) AS leads,
@@ -552,19 +570,13 @@ affiliates AS (
     SELECT
         dbt.sk_date AS sk_date,
         co.city_group AS city_group,
-        co.mkt_origin AS planning_mkt_level3,
-        CASE
-            WHEN mkt_origin  IN ('PWA - Paid', 'Owner PWA - Sale') THEN 'Paid'
-            WHEN mkt_origin = 'Not Mapped' THEN 'Other'
-            WHEN mkt_origin = 'Doorman Sale' THEN 'Doorman'
-            WHEN mkt_origin = 'Indica Aí - Agents Sale' THEN 'Indica Aí - Agents'
-            WHEN mkt_origin = 'Indica Aí - General Sale' THEN 'Indica Aí - General'
-        ELSE mkt_origin END AS mkt_channel,
-        NULL::TEXT AS mkt_medium,
-        NULL::TEXT AS mkt_source,
-        NULL::TEXT AS utm_campaign,
-        NULL::TEXT AS utm_content,
-        NULL::TEXT AS utm_term,
+        co.mkt_origin AS mkt_origin,
+        co.mkt_channel AS mkt_channel,
+        co.mkt_medium AS mkt_medium,
+        co.mkt_source AS mkt_source,
+        co.utm_campaign AS utm_campaign,
+        co.utm_content AS utm_content,
+        co.utm_term AS utm_term,
         NULL::TEXT AS campaign_context,
         'Rental' AS business,
         COUNT(NULL) AS leads,
@@ -633,7 +645,6 @@ affiliates AS (
             SUM(0::FLOAT) AS budget
         FROM
     	    datamarts.daily_target_volumes_supply str
-        WHERE str.date < current_date - 1
     	GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 
   UNION ALL
@@ -679,9 +690,10 @@ affiliates AS (
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 )
 SELECT
-  date,
-  city_group,
-  mkt_origin,
+    date,
+    city_group,
+    mkt_origin,
+    mkt_channel,
     CASE
         WHEN mkt_origin = 'Owner PWA' AND mkt_channel = 'LeadEnrichment' THEN 'Organic'
         WHEN mkt_origin = 'Owner PWA' THEN mkt_channel
@@ -692,28 +704,28 @@ SELECT
         WHEN mkt_origin = 'Indica Aí - General Sale' THEN 'Indica Aí - General'
         WHEN mkt_origin IN ('CR', 'Autonomous Agent', 'Autonomuos Agent') THEN 'CIQ'
     ELSE mkt_origin
-    END AS mkt_channel,
-  mkt_medium,
-  mkt_source,
-  utm_campaign,
-  utm_content,
-  utm_term,
-  campaign_context,
-  business_context,
-  SUM(leads) AS leads,
-  SUM(prospects) AS prospects,
-  SUM(qualifieds) AS qualifieds,
-  SUM(opportunities) AS opportunities,
-  SUM(first_listings) AS first_listings,
-  SUM(hybrid_listings) AS hybrid_listings,
-  SUM(cost) AS cost,
-  SUM(prospects_target) AS prospects_target,
-  SUM(qualifieds_target) AS qualifieds_target,
-  SUM(opportunities_target) AS opportunities_target,
-  SUM(first_listings_target) AS first_listings_target,
-  SUM(budget) AS budget
+    END AS planning_mkt_channel,
+    mkt_medium,
+    mkt_source,
+    utm_campaign,
+    utm_content,
+    utm_term,
+    campaign_context,
+    business_context,
+    SUM(leads) AS leads,
+    SUM(prospects) AS prospects,
+    SUM(qualifieds) AS qualifieds,
+    SUM(opportunities) AS opportunities,
+    SUM(first_listings) AS first_listings,
+    SUM(hybrid_listings) AS hybrid_listings,
+    SUM(cost) AS cost,
+    SUM(prospects_target) AS prospects_target,
+    SUM(qualifieds_target) AS qualifieds_target,
+    SUM(opportunities_target) AS opportunities_target,
+    SUM(first_listings_target) AS first_listings_target,
+    SUM(budget) AS budget
 FROM costs_targets_results_combined
   JOIN dim_date AS dd
     USING(sk_date)
 WHERE business_context = 'Rental'
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
