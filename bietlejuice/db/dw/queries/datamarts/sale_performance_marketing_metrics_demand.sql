@@ -153,6 +153,18 @@ sale_flows_funnel_events AS (
         sf.mkt_source,
         sf.utm_campaign AS campaign_name,
         sf.utm_campaign,
+        CASE
+            WHEN LOWER(sf.utm_campaign) LIKE '%sale%'
+                    OR LOWER(sf.utm_campaign) LIKE '%girafa%'
+                    OR LOWER(sf.utm_campaign) LIKE '%vender%'
+                    OR LOWER(sf.utm_campaign) = 'whatsapp_s'
+                THEN 'Sale'
+            WHEN sf.utm_campaign IS NULL
+                    OR sf.utm_campaign = ''
+                    OR LOWER(sf.utm_campaign) LIKE '%branded%'
+                THEN 'Organic'
+            ELSE 'Rental'
+        END AS campaign_context,
         sf.utm_term,
         sf.utm_content,
         sf.sk_sale_flow,
@@ -195,6 +207,7 @@ targets AS (
         bd.mkt_source,
         NULL::TEXT AS campaign_name,
         NULL::TEXT AS utm_campaign,
+        'Sale' AS campaign_context,
         NULL::TEXT AS utm_term,
         NULL::TEXT AS utm_content,
         NULL::TEXT AS sk_sale_flow,
@@ -222,15 +235,12 @@ targets AS (
         bp.city_group,
         NULL::TEXT AS flow_event,
         'Tenants PWA' AS mkt_origin,
-        CASE
-            WHEN bp.mkt_medium = 'Not Mapped'
-                THEN 'Not Mapped'
-            ELSE t.mkt_channel
-        END AS mkt_channel,
+        bp.mkt_channel,
         bp.mkt_medium,
         bp.mkt_source,
         NULL::TEXT AS campaign_name,
         NULL::TEXT AS utm_campaign,
+        bp.context AS campaign_context,
         NULL::TEXT AS utm_term,
         NULL::TEXT AS utm_content,
         NULL::TEXT AS sk_sale_flow,
@@ -248,8 +258,6 @@ targets AS (
         NULL::FLOAT AS marketing_cost
     FROM
         datalake_raw.gsheets_sale_nbp_source_targets AS bp
-        LEFT JOIN taxonomy AS t
-            ON bp.mkt_medium = t.mkt_medium
     UNION ALL
     SELECT
         date::DATE,
@@ -261,6 +269,7 @@ targets AS (
         NULL::TEXT AS mkt_source,
         NULL::TEXT AS campaign_name,
         NULL::TEXT AS utm_campaign,
+        'Sale' AS campaign_context,
         NULL::TEXT AS utm_term,
         NULL::TEXT AS utm_content,
         NULL::TEXT AS sk_sale_flow,
@@ -293,6 +302,7 @@ investment AS (
         mkt_source,
         campaign_name,
         utm_campaign,
+        'Sale' AS campaign_context,
         utm_term,
         utm_content,
         NULL::TEXT AS sk_sale_flow,
