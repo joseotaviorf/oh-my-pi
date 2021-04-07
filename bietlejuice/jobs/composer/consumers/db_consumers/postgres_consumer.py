@@ -219,12 +219,13 @@ class PostgresConsumer(DBConsumer):
     ):
         """
         Gets incremental data from table in a Postgres database.
-        The method expects a table and a date/timestamp column to make the filter.
+        The method expects a table and a date/timestamp or unix timestamp
+        column to make the filter.
         :param table_name: Name of the table
         :param date_filter_column: Name of the column to make the filter
         :param date_filter_value: Value of the column
         :param is_unixtime_col: Boolean to be seted True when the date_filter_column
-        has a unixtime date_filter_value.
+        has a unix timestamp date_filter_value.
         :return: A Spark DataFrame with the table data
         """
 
