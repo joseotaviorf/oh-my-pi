@@ -1,7 +1,11 @@
 from datetime import datetime
+import json
+import os
 import pendulum
+
 from airflow.models import DAG
 from airflow.models import Variable
+
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -12,9 +16,9 @@ from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.services import FileService
 
+
 # ENV setup
 ENV = Variable.get("environment")
-ACCOUNTS = Variable.get("FACEBOOK_ACCOUNTS")
 
 # DAG params setup
 SOURCE = "marketing_costs"
@@ -47,6 +51,12 @@ CUSTOM_LIBRARIES = [
     }
 ]
 
+CONFIGS_YAML_PATH = os.path.join(
+    os.path.dirname(os.path.realpath(__file__)), "facebook_insights_config.yaml"
+)
+
+CONFIGS = FileService.get_dict_from_yaml_file(CONFIGS_YAML_PATH)
+
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
@@ -73,7 +83,36 @@ facebook_insights_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": LOAD_FACEBOOK_CAMPAIGNS_INTO_DATALAKE_RAW_FILE_PATH,
-            "parameters": [ENV, SOURCE, MEDIA, DATALAKE_BUCKET, ACCOUNTS, "{{ ds }}"],
+            "parameters": [
+                ENV,
+                SOURCE,
+                MEDIA,
+                DATALAKE_BUCKET,
+                json.dumps(CONFIGS["accounts"]["general"]),
+                json.dumps(CONFIGS["fields"]["general"]),
+                json.dumps(CONFIGS["breakdowns"]["general"]),
+                "{{ ds }}",
+            ],
+        }
+    },
+)
+
+social_account_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="facebook-insights-social-to-datalake-raw",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": LOAD_FACEBOOK_CAMPAIGNS_INTO_DATALAKE_RAW_FILE_PATH,
+            "parameters": [
+                ENV,
+                SOURCE,
+                "facebook_social_insights",
+                DATALAKE_BUCKET,
+                json.dumps(CONFIGS["accounts"]["social"]),
+                json.dumps(CONFIGS["fields"]["social"]),
+                json.dumps(CONFIGS["breakdowns"]["social"]),
+                "{{ ds }}",
+            ],
         }
     },
 )
@@ -102,6 +141,12 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
+
 create_cluster_task >> facebook_insights_to_datalake_raw_task >> list(
     clean_sub_dags.values()
-) >> terminate_cluster_task
+)
+create_cluster_task >> social_account_to_datalake_raw_task >> list(
+    clean_sub_dags.values()
+)
+
+list(clean_sub_dags.values()) >> terminate_cluster_task

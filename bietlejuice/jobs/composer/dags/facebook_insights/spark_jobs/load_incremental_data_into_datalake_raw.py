@@ -27,14 +27,13 @@ def build_facebook_client(auth):
     return fb_client
 
 
-def get_data(configs):
-    auth = configs.pop("auth")
+def get_data(configs, auth):
     fb_client = build_facebook_client(auth)
     client_response = fb_client.get_data(**configs)
     return client_response
 
 
-def get_auth(dbutils):
+def get_configs(dbutils):
     configs = json.loads(dbutils.secrets.get(scope="quintoandar", key=APIEnum.FACEBOOK))
     return configs
 
@@ -45,26 +44,30 @@ if __name__ == "__main__":
 
     parser.add_argument("environment", help="forno/prod values")
     parser.add_argument("target", help="name of the target")
-    parser.add_argument("media", help="name of the media")
+    parser.add_argument("context", help="name of the context")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
     parser.add_argument("accounts", help="accounts to fetch")
+    parser.add_argument("fields", help="fields to fetch")
+    parser.add_argument("breakdowns", help="granularity columns")
     parser.add_argument("execution_date", help="execution date in str format")
 
     args = parser.parse_args()
 
     logger.info(
         f"""
-            m={JOB_NAME}, environment={args.environment}, source={args.target}, media={args.media},
+            m={JOB_NAME}, environment={args.environment}, source={args.target}, context={args.context},
             execution_date={args.execution_date}, datalake_bucket={args.datalake_bucket}, msg=print spark jobs args"
         """
     )
 
     environment = args.environment
     target = args.target
-    media = args.media
+    context = args.context
     datalake_bucket = args.datalake_bucket
     accounts = json.loads(args.accounts)
     execution_date = args.execution_date
+    fields = json.loads(args.fields)
+    breakdowns = json.loads(args.breakdowns)
     partition_cols = ["year", "month", "day"]
 
     spark_client = SparkClient()
@@ -73,12 +76,15 @@ if __name__ == "__main__":
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
-    configs = get_auth(dbutils)
+    configs = get_configs(dbutils)
+    auth = configs.pop("auth")
 
     configs["date"] = execution_date
     configs["accounts"] = accounts
+    configs["fields"] = fields or []
+    configs["breakdowns"] = breakdowns or []
 
-    client_response = get_data(configs)
+    client_response = get_data(configs, auth)
 
     df = spark_client.create_dataframe(client_response)
 
@@ -99,7 +105,7 @@ if __name__ == "__main__":
 
     database_location = datalake_info["db_raw_path"]
     format_options = SparkTableStorageFormat.DEFAULT_RAW
-    table_name = media
+    table_name = context
 
     # loaders
     s3_loader = S3Loader()
