@@ -105,4 +105,17 @@ facebook_sub_dag = facebook_sub_dag_class.get_sub_dag_operator(
     partitions=PARTITION_COLS,
 )
 
-create_cluster_task >> facebook_sub_dag >> terminate_cluster_task
+facebook_social_sub_dag = facebook_sub_dag_class.get_sub_dag_operator(
+    dag=dag,
+    sub_dag_name="load-facebook-social-insights-to-enrich",
+    sub_dag_func=facebook_sub_dag_class.build_subdag,
+    table_name="facebook_social_insights",
+    slugged_table_name="facebook-social-insights",
+    accounts_name_mapping=ACCOUNTS_NAME_MAPPING,
+    partitions=PARTITION_COLS,
+)
+
+create_cluster_task >> [
+    facebook_sub_dag,
+    facebook_social_sub_dag,
+] >> terminate_cluster_task

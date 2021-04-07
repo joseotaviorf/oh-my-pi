@@ -17,6 +17,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 Currently, there are the following output tables in our enrich layer:
 
 - `facebook_insights`
+- `facebook_social_insights`
 
 ### Responsible Data Team
 

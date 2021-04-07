@@ -18,6 +18,10 @@ fields:
         "spend"
     ]
     social: [
+        "account_id",
+        "adset_id",
+        "ad_id",
+        "campaign_id",
         "impressions",
         "reach",
         "cpm",

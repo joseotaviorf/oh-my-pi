@@ -1,4 +1,8 @@
 SELECT
+    BIGINT(ad_id) as id_ad,
+    BIGINT(account_id) as id_account,
+    BIGINT(adset_id) as id_adset,
+    BIGINT(campaign_id) as id_campaign,
     ad_name,
     adset_name,
     campaign_name,
