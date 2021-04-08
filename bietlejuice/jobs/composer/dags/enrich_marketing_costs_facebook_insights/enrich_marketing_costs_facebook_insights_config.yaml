@@ -1,0 +1,24 @@
+---
+account_names:
+    "1023497688122195": "branding_digital"
+    "1626589680740974": "demand_acquisition"
+    "146777296312699": "demand_acquisition_sale"
+    "994644903935458": "demand_retargeting"
+    "455006745173996": "demand_retargeting_sale"
+    "159065008868035": "branding_quintoandar"
+    "994734287259853": "social"
+    "1791779007555373": "supply_affiliates"
+    "201111641091443": "indica_ai_retargeting"
+    "1260820603984552": "supply_landlords"
+    "517800565488302": "supply_landlords_sale"
+    "832880310585080": "supply_agents"
+    "2847775308769718": "quintoandar_meu_lugar"
+
+breakdowns:
+    general: [
+        "impression_device"
+    ]
+    social: [
+        "publisher_platform",
+        "platform_position"
+    ]

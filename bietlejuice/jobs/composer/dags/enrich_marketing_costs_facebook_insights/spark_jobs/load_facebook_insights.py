@@ -36,6 +36,9 @@ if __name__ == "__main__":
     )
     parser.add_argument("target_database_base_name")
     parser.add_argument("table_name", type=str, help="table name that will be created")
+    parser.add_argument(
+        "breakdowns", type=str, help="table granularity, list of columns in str"
+    )
     parser.add_argument("partitions")
     parser.add_argument(
         "accounts_name_mapping",
@@ -52,8 +55,9 @@ if __name__ == "__main__":
     table_name = args.table_name
     execution_date = args.execution_date
     target_database_base_name = args.target_database_base_name
-    partitions = json.loads(args.partitions.replace("'", '"'))
-    accounts_name_mapping = json.loads(args.accounts_name_mapping.replace("'", '"'))
+    breakdowns = json.loads(args.breakdowns)
+    partitions = json.loads(args.partitions)
+    accounts_name_mapping = json.loads(args.accounts_name_mapping)
 
     logger.info(
         f"""
@@ -96,7 +100,11 @@ if __name__ == "__main__":
 
     df = df.where("year={year} and month={month} and day={day}".format(**dt_dict))
 
-    sk_ad = concat(col("id_ad"), lit("{year}-{month}-{day}".format(**dt_dict)))
+    breakdown_cols = [col(breakdown) for breakdown in breakdowns]
+
+    sk_ad = concat(
+        col("id_ad"), lit("{year}-{month}-{day}".format(**dt_dict)), *breakdown_cols
+    )
 
     df = (
         df.withColumn("acc", map_account_id_to_name_udf(col("id_account")))

@@ -1,6 +1,6 @@
 from datetime import datetime
+import os
 import pendulum
-import json
 
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
@@ -11,6 +11,7 @@ from airflow.operators.quintoandar_databricks import (
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
+from bietlejuice.jobs.composer.services import FileService
 
 from bietlejuice.jobs.composer.dags.enrich_marketing_costs_facebook_insights.facebook_sub_dag import (
     FacebookSubDAG,
@@ -46,7 +47,14 @@ LIBRARIES_DESCRIPTION = Variable.get(
 local_tz = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz)
 
-ACCOUNTS_NAME_MAPPING = json.loads(Variable.get("facebook_insights_account_names"))
+CONFIGS_YAML_PATH = os.path.join(
+    os.path.dirname(os.path.realpath(__file__)),
+    "enrich_marketing_costs_facebook_insights_config.yaml",
+)
+
+CONFIGS = FileService.get_dict_from_yaml_file(CONFIGS_YAML_PATH)
+
+ACCOUNTS_NAME_MAPPING = CONFIGS["account_names"]
 
 (
     database_name,
@@ -103,6 +111,7 @@ facebook_sub_dag = facebook_sub_dag_class.get_sub_dag_operator(
     slugged_table_name="facebook-insights",
     accounts_name_mapping=ACCOUNTS_NAME_MAPPING,
     partitions=PARTITION_COLS,
+    breakdowns=CONFIGS["breakdowns"]["general"],
 )
 
 facebook_social_sub_dag = facebook_sub_dag_class.get_sub_dag_operator(
@@ -113,6 +122,7 @@ facebook_social_sub_dag = facebook_sub_dag_class.get_sub_dag_operator(
     slugged_table_name="facebook-social-insights",
     accounts_name_mapping=ACCOUNTS_NAME_MAPPING,
     partitions=PARTITION_COLS,
+    breakdowns=CONFIGS["breakdowns"]["social"],
 )
 
 create_cluster_task >> [

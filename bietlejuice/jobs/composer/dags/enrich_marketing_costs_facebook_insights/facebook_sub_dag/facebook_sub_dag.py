@@ -1,3 +1,5 @@
+import json
+
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
@@ -62,6 +64,7 @@ class FacebookSubDAG(BaseSubDAG):
         slugged_table_name,
         accounts_name_mapping,
         partitions=None,
+        breakdowns=None,
     ):
         """
         Create a subdag containing 2 tasks:
@@ -76,7 +79,10 @@ class FacebookSubDAG(BaseSubDAG):
         """
 
         partitions = partitions or []
-        str_partitions = str(partitions)
+        breakdowns = breakdowns or []
+        str_partitions = json.dumps(partitions)
+        str_breakdowns = json.dumps(breakdowns)
+        str_accounts_name_mapping = json.dumps(accounts_name_mapping)
         is_incremental = True
 
         sub_dag = BaseSubDAG(
@@ -99,8 +105,9 @@ class FacebookSubDAG(BaseSubDAG):
                         self.database_base_name,
                         self.target_database_base_name,
                         table_name,
+                        str_breakdowns,
                         str_partitions,
-                        str(accounts_name_mapping),
+                        str_accounts_name_mapping,
                         "{{ ds }}",
                     ],
                 }
