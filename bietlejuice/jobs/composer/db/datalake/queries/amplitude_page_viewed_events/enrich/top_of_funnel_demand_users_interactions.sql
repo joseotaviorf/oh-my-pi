@@ -85,10 +85,15 @@ dim_house AS (
 )
 SELECT
     evt.id_tof_user,
-    COALESCE(NULLIF(dr.city_group, ''), 'Not Mapped') AS city_group,
+    COALESCE(evt.id_house, -1) AS id_house,
+    COALESCE(dh.sk_region, -1) AS sk_region,
+    COALESCE(td.mkt_category, 'Not Mapped') AS mkt_category,
+    COALESCE(td.mkt_flow, 'Not Mapped') AS mkt_flow,
+    COALESCE(td.mkt_completion, 'Not Mapped') AS mkt_completion,
     COALESCE(td.mkt_channel, 'Not Mapped') AS mkt_channel,
     COALESCE(td.mkt_medium, 'Not Mapped') AS mkt_medium,
     COALESCE(td.mkt_source, 'Not Mapped') AS mkt_source,
+    COALESCE(td.mkt_platform, 'Not Mapped') AS mkt_platform,
     evt.business_context,
     evt.app_type,
     evt.utm_source,
@@ -105,8 +110,6 @@ FROM
     filtered_events AS evt
 LEFT JOIN dim_house AS dh
     ON evt.id_house = dh.id_house
-LEFT JOIN datalake_region.region AS dr
-    ON dh.sk_region = dr.id
 LEFT JOIN taxonomy_demand AS td
     ON LOWER(COALESCE(td.app_type, '')) = LOWER(COALESCE(evt.app_type, ''))
     AND LOWER(COALESCE(td.utm_source, '')) = LOWER(COALESCE(evt.utm_source, ''))
