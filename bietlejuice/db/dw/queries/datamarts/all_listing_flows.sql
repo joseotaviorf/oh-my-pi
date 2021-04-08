@@ -42,7 +42,7 @@ SELECT DISTINCT
 FROM dim_date d
 join all_listings al
    ON d.date >= al.dt_status_start AND d.date < al.dt_status_end
-WHERE d.week_start < DATE_TRUNC('week', CURRENT_DATE)
+WHERE d.week_start < DATE_TRUNC('week', CURRENT_DATE) + interval '1 week'
 ), al_week AS (
 SELECT
     aldr.sk_house_listing,
@@ -80,7 +80,7 @@ LEFT JOIN fact_house_listings fhl
   ON alw.sk_house_listing = fhl.sk_house_listing
 LEFT JOIN dim_region dr
   ON fhl.sk_region = dr.sk_region
-WHERE dr.city_group IS NOT NULL
+WHERE dr.city_group IS NOT NULL 
 )
 SELECT
     week_start,
