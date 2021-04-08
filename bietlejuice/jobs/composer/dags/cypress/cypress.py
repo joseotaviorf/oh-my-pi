@@ -2,6 +2,7 @@ from datetime import datetime
 import pendulum
 
 from airflow.models import DAG, Variable
+import airflow.utils.helpers as airflow_helpers
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -81,6 +82,33 @@ cypress_load_to_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
+sync_metastore_tables_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="sync-hive-metastore-raw-tables",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables.py",
+            "parameters": [
+                DATALAKE_BUCKET,
+                LayerEnum.RAW.value,
+                SOURCE,
+                "--all-tables",
+            ],
+        }
+    },
+)
+
+validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
+    task_id="validate-sync-hive-metastore-table",
+    json={
+        "spark_python_task": {
+            "python_file": BASE_SPARK_JOBS_PATH + "validate_sync_metastore_tables.py",
+            "parameters": [LayerEnum.RAW.value, SOURCE, "--all-tables"],
+        }
+    },
+)
+
 clean_sub_dag = DatalakeSubDAG(
     dag_id=DAG_ID,
     start_date=MAIN_START_DATE,
@@ -104,3 +132,10 @@ clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(
 create_cluster_task >> cypress_load_to_raw_task >> list(
     clean_sub_dags.values()
 ) >> terminate_cluster_task
+
+airflow_helpers.chain(
+    cypress_load_to_raw_task,
+    sync_metastore_tables_task,
+    validate_sync_metastore_table_task,
+    terminate_cluster_task,
+)
