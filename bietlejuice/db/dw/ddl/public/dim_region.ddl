@@ -17,6 +17,7 @@ create table if not exists dim_region (
   greater_region varchar,
   regional varchar,
   regional_deprecated varchar,
+  regional_inspection varchar,
   tier integer,
   dt_created timestamp without time zone,
   dt_updated timestamp without time zone,

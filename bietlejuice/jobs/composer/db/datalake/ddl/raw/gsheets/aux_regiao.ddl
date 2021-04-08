@@ -10,6 +10,7 @@ CREATE TABLE datalake_raw.gsheets_aux_regiao (
   region_code_inspector string,
   regional string,
   regional_deprecated string,
+  reginal_inspection string,
   state string,
   tier string)
 USING JSON

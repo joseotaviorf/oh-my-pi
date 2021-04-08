@@ -21,6 +21,7 @@ SELECT
     END AS greater_region,
     ar.regional,
     ar.regional_deprecated,
+    ar.regional_inspection,
     ar.tier,
     r.ts_created,
     r.ts_updated

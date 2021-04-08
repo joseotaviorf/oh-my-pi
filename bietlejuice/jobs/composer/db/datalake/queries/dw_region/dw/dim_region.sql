@@ -36,6 +36,7 @@ select
     r.greater_region,
     r.regional,
     r.regional_deprecated,
+    r.regional_inspection,
     r.tier,
     fb.dt_first_booking,
     fh.ts_first_house_created,

@@ -31,6 +31,7 @@ SELECT
   ar.regional as regional,
   ar.regional_deprecated as regional_depreacted,
   ar.tier,
+  ar.regional_inspection,
   r."criadaEm" as dt_created,
   r."atualizadoEm" as dt_updated,
   r.dt_timestamp::date as dt_timestamp,

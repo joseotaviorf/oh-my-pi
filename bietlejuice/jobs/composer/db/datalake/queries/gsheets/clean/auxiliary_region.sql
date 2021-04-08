@@ -12,5 +12,5 @@ SELECT
     regional_deprecated,
     regional_inspection,
     CAST(tier AS INTEGER) AS tier
-FROM
+FROM    
     datalake_gsheets_raw.aux_regiao
