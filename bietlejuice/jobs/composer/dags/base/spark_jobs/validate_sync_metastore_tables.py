@@ -83,7 +83,7 @@ class MetastoreSyncValidation:
             )
 
         trino_table_schema = self.trino_client.get_records(
-            query=f"DESCRIBE {self.database_name}.{self.table_name}"
+            query=f'DESCRIBE {self.database_name}."{self.table_name}"'
         )
         self._validate_empty_table_schema(trino_table_schema)
         trino_table_schema = self._parse_trino_schema(trino_table_schema)
@@ -293,7 +293,7 @@ class MetastoreSyncValidation:
 
         try:
             trino_table_count = self.trino_client.get_records(
-                f"SELECT count(1) FROM {self.database_name}.{self.table_name}"
+                f'SELECT count(1) FROM {self.database_name}."{self.table_name}"'
             )
             trino_table_count = trino_table_count[0][0]
         except TrinoExternalError as e:
