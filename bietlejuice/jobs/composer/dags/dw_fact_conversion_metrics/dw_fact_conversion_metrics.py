@@ -15,6 +15,7 @@ from bietlejuice.jobs.composer.dags.dw_fact_conversion_metrics import (
 )
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
+from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.services import FileService
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
@@ -29,6 +30,7 @@ DW_BUCKET = Variable.get("dw_bucket")
 
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
+BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
     Variable.get("databricks_s3_bucket"), SOURCE
@@ -98,7 +100,42 @@ def dw_tasks(sub_dag_name, table_name, slugged_table_name):
         },
     )
 
+    sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        task_id="sync-hive-metastore-table",
+        dag=sub_dag,
+        json={
+            "spark_python_task": {
+                "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables.py",
+                "parameters": [
+                    DW_BUCKET,
+                    LayerEnum.DW.value,
+                    DW_SCHEMA,
+                    "--table-name",
+                    table_name,
+                ],
+            }
+        },
+    )
+
+    validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=sub_dag,
+        task_id="validate-sync-hive-metastore-table",
+        json={
+            "spark_python_task": {
+                "python_file": BASE_SPARK_JOBS_PATH
+                + "validate_sync_metastore_tables.py",
+                "parameters": [
+                    LayerEnum.DW.value,
+                    DW_SCHEMA,
+                    "--table-name",
+                    table_name,
+                ],
+            }
+        },
+    )
+
     create_table_in_dw_staging >> create_table_in_dw >> load_dw_table_into_redshift
+    create_table_in_dw >> sync_metastore_table_task >> validate_sync_metastore_table_task
 
     return sub_dag
 
