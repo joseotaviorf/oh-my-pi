@@ -13,15 +13,18 @@ WITH exploded_actions AS (
                     date: STRUCT<date: TIMESTAMP>
                 >
             >'
-        )) AS action
+    )) AS action,
+    year,
+    month,
+    day
   FROM
       datalake_crm_clean.tasks
   WHERE
     -- Filtering out bugged tasks with more than 500 actions
     SIZE(FROM_JSON(actions,'ARRAY<STRUCT<>>')) <= 500
-    AND year = '{year}'
-    AND month = '{month}'
-    AND day = '{day}'
+    AND year = {year}
+    AND month = {month}
+    AND day = {day}
 )
 SELECT
     action._id.oid AS id,
@@ -33,9 +36,9 @@ SELECT
     action.metadata.oldValue AS metadata_old_value,
     action.notificationSource AS notification_source,
     action.date.date AS ts_action,
-    {year} AS year,
-    {month} AS month,
-    {day} AS day
+    year,
+    month,
+    day
 FROM
     exploded_actions
 WHERE
