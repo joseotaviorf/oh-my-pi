@@ -619,59 +619,18 @@ affiliates AS (
   -----------------------------------
   -- Supply ForRental Funnel Targets --
   -----------------------------------
-        SELECT
-            TO_CHAR(DATE(NULLIF(str.date, NULL)), 'YYYYMMDD')::INT AS sk_date,
-            COALESCE(NULLIF(str.city_group,''),'Not Mapped')::varchar AS city_group,
-            NULLIF(str.supply_origin,'')::varchar AS mkt_origin,
-            NULLIF(str.supply_channel,'')::varchar AS mkt_channel,
-            NULL::TEXT AS mkt_medium,
-            NULL::TEXT AS mkt_source,
-            NULL::TEXT AS utm_campaign,
-            NULL::TEXT AS utm_content,
-            NULL::TEXT AS utm_term,
-            NULL::TEXT AS campaign_context,
-            'Rental' AS business_context,
-            COUNT(NULL) AS leads,
-            COUNT(NULL) AS prospects,
-            COUNT(NULL) AS qualifieds,
-            COUNT(NULL) AS opportunities,
-            COUNT(NULL) AS first_listings,
-            COUNT(NULL) AS hybrid_listings,
-            SUM(0::FLOAT) AS cost,
-            SUM(NULLIF(str.prospect,'')::float) AS prospects_target,
-            SUM(NULLIF(str.qualified,'')::float) AS qualifieds_target,
-            SUM(NULLIF(str.opportunity,'')::float) AS opportunities_target,
-            SUM(NULLIF(str.first_listing,'')::float) AS first_listings_target,
-            SUM(0::FLOAT) AS budget
-        FROM
-    	    datamarts.daily_target_volumes_supply str
-    	GROUP BY 1,2,3,4,5,6,7,8,9,10,11
-
-  UNION ALL
-
-  ---------------------------------
-  -- Supply ForRental Cost Targets --
-  ---------------------------------
     SELECT
-        TO_CHAR(DATE(NULLIF(sct.date, NULL)), 'YYYYMMDD')::INT AS sk_date,
-        COALESCE(nullif(sct.city_group,''),'Not Mapped')::varchar AS city_group,
-        CASE
-            WHEN sct.planning_mkt_level3 = 'PWA - Paid'
-                THEN 'Owner PWA'
-            ELSE sct.planning_mkt_level3
-        END AS mkt_origin,
-        CASE
-            WHEN planning_mkt_level3  = 'PWA - Paid' THEN 'Paid'
-            WHEN planning_mkt_level3 = 'Not Mapped' THEN 'Other'
-            WHEN planning_mkt_level3 IN ('Autonomous Agent', 'Autonomuos Agent') THEN 'CIQ'
-        ELSE planning_mkt_level3 END AS mkt_channel,
-        NULL::TEXT AS mkt_medium,
-        NULL::TEXT AS mkt_source,
+        TO_CHAR(DATE(NULLIF(str.date, NULL)), 'YYYYMMDD')::INT AS sk_date,
+        COALESCE(NULLIF(str.city_group, ''),'Not Mapped')::TEXT AS city_group,
+        str.supply_origin AS mkt_origin,
+        str.supply_channel AS mkt_channel,
+        str.supply_medium AS mkt_medium,
+        str.supply_source AS mkt_source,
         NULL::TEXT AS utm_campaign,
         NULL::TEXT AS utm_content,
         NULL::TEXT AS utm_term,
-        campaign AS campaign_context,
-        business AS business_context,
+        'Rental' campaign_context,
+        'Rental' AS business_context,
         COUNT(NULL) AS leads,
         COUNT(NULL) AS prospects,
         COUNT(NULL) AS qualifieds,
@@ -679,14 +638,13 @@ affiliates AS (
         COUNT(NULL) AS first_listings,
         COUNT(NULL) AS hybrid_listings,
         SUM(0::FLOAT) AS cost,
-        SUM(0::FLOAT) AS prospects_target,
-        SUM(0::FLOAT) AS qualifieds_target,
+        SUM(NULLIF(str.prospects, '')::FLOAT) AS prospects_target,
+        SUM(NULLIF(str.qualifieds, '')::FLOAT) AS qualifieds_target,
         SUM(0::FLOAT) AS opportunities_target,
         SUM(0::FLOAT) AS first_listings_target,
-        SUM(nullif((replace(sct.budget__mensal,',','')),'')::float) AS budget
+        SUM(NULLIF(str.cost_per_source, '')::FLOAT) AS budget
     FROM
-        datalake_raw.gsheets_costs_targets sct
-    WHERE planning_mkt_level1 = 'Supply'
+        datalake_raw.gsheets_daily_target_supply_rental str
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 )
 SELECT
@@ -710,8 +668,14 @@ SELECT
     utm_campaign,
     utm_content,
     utm_term,
-    campaign_context,
-    business_context,
+    CASE
+        WHEN campaign_context = 'Rent' THEN 'Rental'
+        ELSE campaign_context
+    END AS campaign_context,
+    CASE
+        WHEN business_context = 'Rent' THEN 'Rental'
+        ELSE business_context
+    END AS business_context,
     SUM(leads) AS leads,
     SUM(prospects) AS prospects,
     SUM(qualifieds) AS qualifieds,
