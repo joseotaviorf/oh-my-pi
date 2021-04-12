@@ -14,6 +14,7 @@ WITH reservations_events AS (
             WHEN event = 'reservation.created' THEN GET_JSON_OBJECT(metadata,'$.event_data.TaskQueueName')
         END AS queue_name,
         event,
+        GET_JSON_OBJECT(metadata,'$.created_at') as ts_event,
         GET_JSON_OBJECT(metadata, '$.event_data.Timestamp') AS ts_event_unix,
         year,
         month,
@@ -28,14 +29,22 @@ WITH reservations_events AS (
         AND year = {year}
         AND month = {month}
         AND day = {day}
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
 ),
 tasks_events AS (
   SELECT
-      GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.call_sid') AS id_call,
-      GET_JSON_OBJECT(metadata,'$.event_data.TaskSid') AS id_task,
-      event,
-      GET_JSON_OBJECT(metadata, '$.event_data.Timestamp') AS ts_event_unix
+        GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.call_sid') AS id_call,
+        GET_JSON_OBJECT(metadata,'$.event_data.TaskSid') AS id_task,
+        NULL AS id_reservation,
+        NULL AS id_agent,
+        NULL AS id_queue,
+        NULL AS queue_name,
+        event,
+        GET_JSON_OBJECT(metadata,'$.created_at') as ts_event,
+        GET_JSON_OBJECT(metadata, '$.event_data.Timestamp') AS ts_event_unix,
+        year,
+        month,
+        day
   FROM
       datalake_bigfone_events.events
   WHERE
@@ -45,7 +54,7 @@ tasks_events AS (
       AND year = {year}
       AND month = {month}
       AND day = {day}
-  GROUP BY 1,2,3,4
+  GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
 ),
 call_flex_reservations AS (
     SELECT
