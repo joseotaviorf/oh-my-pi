@@ -61,8 +61,8 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-zendesk_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="zendesk-to-datalake-raw",
+create_partition_on_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="create-partition-on-datalake-raw",
     dag=dag,
     json={
         "spark_python_task": {
@@ -117,12 +117,12 @@ file_list = FileService.list_sql_files_without_extension_from_layer(
 
 clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(dag, file_list)
 
-create_cluster_task >> zendesk_to_datalake_raw_task >> list(
+create_cluster_task >> create_partition_on_datalake_raw_task >> list(
     clean_sub_dags.values()
 ) >> terminate_cluster_task
 
 airflow_helpers.chain(
-    zendesk_to_datalake_raw_task,
+    create_partition_on_datalake_raw_task,
     sync_metastore_tables_task,
     validate_sync_metastore_table_task,
     terminate_cluster_task,
