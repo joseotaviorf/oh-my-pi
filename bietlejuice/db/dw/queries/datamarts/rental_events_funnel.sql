@@ -12,6 +12,10 @@ SELECT
 	    WHEN fhlf.mkt_completion = 'Full Self-Service' THEN 'FSS'
 	    ELSE 'IS'
 		END AS lead_context,
+	CASE
+    	WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other') AND lead_context IN ('FSS','IS') THEN 'IS'
+	    ELSE sourcing_ops
+    END AS lead_processing_operation,
 	null AS demand_mkt_channel,
 	null AS demand_mkt_medium,
 	NULL AS first_touchpoint,
@@ -38,13 +42,14 @@ SELECT
   	NULL::BIGINT AS contract_signed,
   	NULL::BIGINT  AS contract_ended
 FROM dim_date dd
-JOIN fact_house_listing_flows fhlf
+JOIN datamarts.lead_listing_flows fhlf
   ON dd.sk_date = fhlf.sk_lead_date
   AND fhlf.sk_lead_date > 0
 LEFT JOIN dim_region dr
   ON dr.sk_region = fhlf.sk_region
-WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+WHERE origin_table = 'Rent'
+AND dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 prospect AS (
 SELECT
@@ -59,6 +64,10 @@ SELECT
 	    WHEN fhlf.mkt_completion = 'Full Self-Service' THEN 'FSS'
 	    ELSE 'IS'
 		END AS lead_context,
+	CASE
+    	WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other') AND lead_context IN ('FSS','IS') THEN 'IS'
+	    ELSE sourcing_ops
+    END AS lead_processing_operation,
 	null AS demand_mkt_channel,
 	null AS demand_mkt_medium,
 	NULL AS first_touchpoint,
@@ -85,13 +94,14 @@ SELECT
   	NULL::BIGINT AS contract_signed,
   	NULL::BIGINT  AS contract_ended
 FROM dim_date dd
-JOIN fact_house_listing_flows fhlf
+JOIN datamarts.lead_listing_flows fhlf
   ON dd.sk_date = fhlf.sk_prospect_date
   AND fhlf.sk_prospect_date > 0
 LEFT JOIN dim_region dr
   ON dr.sk_region = fhlf.sk_region
-WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+WHERE fhlf.origin_table = 'Rent'
+AND dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 qualified AS (
 SELECT
@@ -106,8 +116,12 @@ SELECT
 	    WHEN fhlf.mkt_completion = 'Full Self-Service' THEN 'FSS'
 	    ELSE 'IS'
 		END AS lead_context,
-	null AS demand_mkt_channel,
-	null AS demand_mkt_medium,
+	CASE
+    	WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other') AND lead_context IN ('FSS','IS') THEN 'IS'
+	    ELSE sourcing_ops
+    END AS lead_processing_operation,
+	NULL AS demand_mkt_channel,
+	NULL AS demand_mkt_medium,
 	NULL AS first_touchpoint,
 	FALSE AS is_guarantee,
   	NULL::BIGINT AS leads,
@@ -132,13 +146,14 @@ SELECT
   	NULL::BIGINT AS contract_signed,
   	NULL::BIGINT  AS contract_ended
 FROM dim_date dd
-JOIN fact_house_listing_flows fhlf
+JOIN datamarts.lead_listing_flows fhlf
   ON dd.sk_date = fhlf.sk_qualified_date
   AND fhlf.sk_qualified_date > 0
 LEFT JOIN dim_region dr
   ON dr.sk_region = fhlf.sk_region
-WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+WHERE fhlf.origin_table = 'Rent'
+AND dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 opportunity AS (
 SELECT
@@ -153,6 +168,10 @@ SELECT
 	    WHEN fhlf.mkt_completion = 'Full Self-Service' THEN 'FSS'
 	    ELSE 'IS'
 		END AS lead_context,
+	CASE
+    	WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other') AND lead_context IN ('FSS','IS') THEN 'IS'
+	    ELSE sourcing_ops
+    END AS lead_processing_operation,
 	null AS demand_mkt_channel,
 	null AS demand_mkt_medium,
 	NULL AS first_touchpoint,
@@ -179,13 +198,14 @@ SELECT
   	NULL::BIGINT AS contract_signed,
   	NULL::BIGINT  AS contract_ended
 FROM dim_date dd
-JOIN fact_house_listing_flows fhlf
+JOIN datamarts.lead_listing_flows fhlf
   ON dd.sk_date = fhlf.sk_opportunity_date
   AND fhlf.sk_opportunity_date > 0
 LEFT JOIN dim_region dr
   ON dr.sk_region = fhlf.sk_region
-WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+WHERE fhlf.origin_table = 'Rent'
+AND dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 listing AS (
 SELECT
@@ -200,6 +220,10 @@ SELECT
 	    WHEN fhlf.mkt_completion = 'Full Self-Service' THEN 'FSS'
 	    ELSE 'IS'
 		END AS lead_context,
+	CASE
+    	WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other') AND lead_context IN ('FSS','IS') THEN 'IS'
+	    ELSE sourcing_ops
+    END AS lead_processing_operation,
 	null AS demand_mkt_channel,
 	null AS demand_mkt_medium,
 	NULL AS first_touchpoint,
@@ -226,13 +250,14 @@ SELECT
   	NULL::BIGINT AS contract_signed,
   	NULL::BIGINT  AS contract_ended
 FROM dim_date dd
-JOIN fact_house_listing_flows fhlf
+JOIN datamarts.lead_listing_flows fhlf
   ON dd.sk_date = fhlf.sk_first_listing_date
   AND fhlf.sk_first_listing_date > 0
 LEFT JOIN dim_region dr
   ON dr.sk_region = fhlf.sk_region
-WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+WHERE fhlf.origin_table = 'Rent'
+AND dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 messages_sent AS (
 SELECT
@@ -246,6 +271,7 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
+  NULL AS lead_processing_operation,
   'Other' AS demand_mkt_channel,
   'Other' AS demand_mkt_medium,
   NULL AS first_touchpoint,
@@ -279,7 +305,7 @@ JOIN dim_house_listing dhl
 LEFT JOIN (SELECT distinct city_group, region_code FROM dim_region) dr
   ON tta.region_code = dr.region_code
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,12
 ),
 agent_supports AS (
 SELECT
@@ -293,6 +319,7 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
+  NULL AS lead_processing_operation,
   'Other' AS demand_mkt_channel,
   'Other' AS demand_mkt_medium,
   NULL AS first_touchpoint,
@@ -328,7 +355,7 @@ JOIN dim_house_listing dhl
 LEFT JOIN dim_region dr
   ON rf.sk_region = dr.sk_region
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 rent_flow_adjusted AS (
 SELECT
@@ -399,6 +426,7 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
+  NULL AS lead_processing_operation,
   rf.demand_mkt_channel_booking AS demand_mkt_channel,
   rf.demand_mkt_medium_booking AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
@@ -429,7 +457,7 @@ JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_booking_created_date
   AND rf.sk_booking_created_date > 0
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 visits_completed AS (
 SELECT
@@ -440,6 +468,7 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
+  NULL AS lead_processing_operation,
   rf.demand_mkt_channel_booking AS demand_mkt_channel,
   rf.demand_mkt_medium_booking AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
@@ -470,7 +499,7 @@ JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_visit_date
   AND rf.sk_visit_date > 0 AND rf.flg_visit_completed = 1
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 offer_submitted AS (
 SELECT
@@ -481,6 +510,7 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
+  NULL AS lead_processing_operation,
   rf.demand_mkt_channel_booking AS demand_mkt_channel,
   rf.demand_mkt_medium_booking AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
@@ -511,7 +541,7 @@ JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_offer_submitted_date
   AND rf.sk_offer_submitted_date > 0
 WHERE dd."date"between DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 offer_approved AS(
 SELECT
@@ -522,6 +552,7 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
+  NULL AS lead_processing_operation,
   rf.demand_mkt_channel_offer AS demand_mkt_channel,
   rf.demand_mkt_medium_offer AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
@@ -552,7 +583,7 @@ JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_offer_approved_date
   AND rf.sk_offer_approved_date > 0
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,12
 ),
 credit_evaluation_init AS(
 SELECT
@@ -563,6 +594,7 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
+  NULL AS lead_processing_operation,
   rf.demand_mkt_channel_offer AS demand_mkt_channel,
   rf.demand_mkt_medium_offer AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
@@ -593,7 +625,7 @@ JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_first_credit_evaluation_init
   AND rf.sk_first_credit_evaluation_init > 0
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 credit_evaluation_positive AS(
 SELECT
@@ -604,6 +636,7 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
+  NULL AS lead_processing_operation,
   rf.demand_mkt_channel_offer AS demand_mkt_channel,
   rf.demand_mkt_medium_offer AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
@@ -634,7 +667,7 @@ JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_first_credit_evaluation_positive
   AND rf.sk_first_credit_evaluation_positive > 0
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 guarantee_started AS(
 SELECT
@@ -645,6 +678,7 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
+  NULL AS lead_processing_operation,
   rf.demand_mkt_channel_offer AS demand_mkt_channel,
   rf.demand_mkt_medium_offer AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
@@ -675,7 +709,7 @@ JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_guarantee_date
   AND rf.sk_guarantee_date > 0
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 doc_sent AS(
 SELECT
@@ -686,6 +720,7 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
+  NULL AS lead_processing_operation,
   rf.demand_mkt_channel_offer AS demand_mkt_channel,
   rf.demand_mkt_medium_offer AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
@@ -716,7 +751,7 @@ JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_tenant_first_doc_sent_date
   AND rf.sk_tenant_first_doc_sent_date > 0
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 doc_approved AS(
 SELECT
@@ -727,6 +762,7 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
+  NULL AS lead_processing_operation,
   rf.demand_mkt_channel_offer AS demand_mkt_channel,
   rf.demand_mkt_medium_offer AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
@@ -757,7 +793,7 @@ JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_last_doc_analysis_approved
   AND rf.sk_last_doc_analysis_approved > 0
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 guarantee_paid AS(
 SELECT
@@ -768,6 +804,7 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
+  NULL AS lead_processing_operation,
   rf.demand_mkt_channel_offer AS demand_mkt_channel,
   rf.demand_mkt_medium_offer AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
@@ -798,7 +835,7 @@ JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_guarantee_paid_date
   AND rf.sk_guarantee_paid_date > 0
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 credit_approved AS(
 SELECT
@@ -809,6 +846,7 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
+  NULL AS lead_processing_operation,
   rf.demand_mkt_channel_offer AS demand_mkt_channel,
   rf.demand_mkt_medium_offer AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
@@ -839,7 +877,7 @@ JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_credit_analysis_approved_date
   AND rf.sk_credit_analysis_approved_date > 0
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 contract_created AS (
 SELECT
@@ -850,6 +888,7 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
+  NULL AS lead_processing_operation,
   rf.demand_mkt_channel_offer AS demand_mkt_channel,
   rf.demand_mkt_medium_offer AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
@@ -880,7 +919,7 @@ JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_contract_created_date
   AND rf.sk_contract_created_date > 0
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 contract_signed AS (
 SELECT
@@ -891,6 +930,7 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
+  NULL AS lead_processing_operation,
   rf.demand_mkt_channel_offer AS demand_mkt_channel,
   rf.demand_mkt_medium_offer AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
@@ -921,7 +961,7 @@ JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_contract_signed_date
   AND rf.sk_contract_signed_date > 0
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 contract_ended AS (
 SELECT
@@ -932,6 +972,7 @@ SELECT
   NULL AS supply_mkt_origin,
   NULL AS supply_mkt_channel,
   NULL AS lead_context,
+  NULL AS lead_processing_operation,
   rf.demand_mkt_channel_offer AS demand_mkt_channel,
   rf.demand_mkt_medium_offer AS demand_mkt_medium,
   rf.funnel_first_touchpoint AS first_touchpoint,
@@ -962,7 +1003,7 @@ JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_contract_annulment_date
   AND rf.sk_contract_signed_date > 0 AND rf.sk_contract_annulment_date > 0
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 union_all AS (
   SELECT * FROM lead_
@@ -1015,6 +1056,7 @@ SELECT
   ua.supply_mkt_origin,
   ua.supply_mkt_channel,
   ua.lead_context,
+  ua.lead_processing_operation,
   ua.demand_mkt_channel,
   ua.demand_mkt_medium,
   ua.first_touchpoint,
@@ -1053,6 +1095,7 @@ SELECT
   	   when supply_mkt_origin != 'Owner PWA' THEN supply_mkt_origin
   	   END AS supply_mkt_origin_detailed,
   	lead_context,
+  	lead_processing_operation,
     CASE WHEN demand_mkt_channel in ('Not Mapped', 'Other') or demand_mkt_channel IS NULL THEN 'Other'
          ELSE demand_mkt_channel END AS demand_mkt_channel,
     case when demand_mkt_channel in ('Not Mapped', 'Other') or demand_mkt_channel is null then 'Other'
@@ -1086,4 +1129,4 @@ SELECT
     SUM(COALESCE(contract_ended,0)) AS contract_ended,
     current_timestamp AS ts_load
 FROM union_all
-GROUP BY "date", city_group, 3, 4, 5, 6, 7, 8, 9, 10
+GROUP BY "date", city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11

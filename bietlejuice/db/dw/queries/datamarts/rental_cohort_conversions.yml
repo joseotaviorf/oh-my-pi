@@ -2,4 +2,4 @@
 ---
 streams:
   - direction: 'upstream'
-    task_ids: ['dw_funnel_demand_flows']
+    task_ids: ['dw_funnel_demand_flows', 'dw_lead_listing_flows']
