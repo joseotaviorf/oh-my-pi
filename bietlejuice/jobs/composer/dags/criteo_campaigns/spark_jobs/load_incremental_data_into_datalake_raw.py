@@ -7,11 +7,15 @@ from datetime import datetime
 from quintoandar_logger import QuintoAndarLogger
 from quintoandar_criteo_api_client.clients import CriteoClient
 
-from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 
-from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
+from bietlejuice.jobs.composer.base.spark import (
+    BaseDBUtils,
+    SparkTableStorageFormat,
+    SparkDataFrameService,
+)
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
+from bietlejuice.jobs.composer.base.api import APIEnum
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
@@ -69,7 +73,6 @@ if __name__ == "__main__":
     parser.add_argument("source", help="name of the source")
     parser.add_argument("media", help="name of the media")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
-    parser.add_argument("accounts", help="accounts w/ id and secret for api call")
     parser.add_argument("execution_date", help="execution date in str format")
 
     args = parser.parse_args()
@@ -81,11 +84,16 @@ if __name__ == "__main__":
         """
     )
 
+    base_dbutils = BaseDBUtils()
+    if base_dbutils.get_dbutils() is not None:
+        dbutils = base_dbutils.get_dbutils()
+
+    credentials = dbutils.secrets.get(scope="quintoandar", key=APIEnum.CRITEO)
+    accounts = json.loads(credentials)
     environment = args.environment
     source = args.source
     media = args.media
     datalake_bucket = args.datalake_bucket
-    accounts = json.loads(args.accounts)
     execution_date = args.execution_date
     partition_cols = ["year", "month", "day"]
 

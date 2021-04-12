@@ -14,7 +14,6 @@ from bietlejuice.jobs.composer.services import FileService
 
 # ENV setup
 ENV = Variable.get("environment")
-ACCOUNTS = Variable.get("criteo_accounts")
 
 # DAG params setup
 SOURCE = "marketing_costs"
@@ -73,7 +72,7 @@ criteo_campaigns_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": LOAD_CRITEO_CAMPAIGNS_INTO_DATALAKE_RAW_FILE_PATH,
-            "parameters": [ENV, SOURCE, MEDIA, DATALAKE_BUCKET, ACCOUNTS, "{{ ds }}"],
+            "parameters": [ENV, SOURCE, MEDIA, DATALAKE_BUCKET, "{{ ds }}"],
         }
     },
 )
