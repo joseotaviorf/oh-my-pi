@@ -90,3 +90,8 @@ taxonomy_demand:
     sheet_id: 11Cck3VVSt9TVt75ChvpU-mVwwfF7TNvUIXocG9vaHtw
     sheet_name: taxonomy_demand
     clean_table_name: taxonomy_demand
+
+vistoria_bugs:
+    sheet_id: 1-cuOGaxOf4hfqs1rhz6XUGv4y8r-0HbJv6YHGMRMkyc
+    sheet_name: vistoria_bugs
+    clean_table_name: inspection_bugs
