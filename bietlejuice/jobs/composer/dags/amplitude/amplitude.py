@@ -1,5 +1,6 @@
 from datetime import datetime
 import pendulum
+import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from airflow.models import Variable
 from airflow.operators.quintoandar_databricks import (
@@ -9,24 +10,29 @@ from airflow.operators.quintoandar_databricks import (
 )
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 
-# variable definitions
 DAG_NAME = "amplitude"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
+
 ENV = Variable.get("environment")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
-AMPLITUDE_ACCOUNTS_BLOCK_LIST = Variable.get("amplitude_accounts_block_list")
-ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
-local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
+
+local_tz = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2019, 1, 1, 0, 0, 0, tzinfo=local_tz)
 MAIN_SCHEDULE_INTERVAL = "30 23 * * *"
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
+
+AMPLITUDE_ACCOUNTS_BLOCK_LIST = Variable.get("amplitude_accounts_block_list")
+ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 EVENT_TYPES = Variable.get("amplitude_event_types", deserialize_json=True)
 DEFAULT_PARTITION_BY = ["year", "month", "day"]
-DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 # s3 paths setup
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-AMPLITUDE_SPARK_JOBS_PATH = "{}/spark_jobs/amplitude/".format(S3_PREFIX)
+AMPLITUDE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/amplitude/"
+BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
+
 LOAD_EVENTS_INTO_DATALAKE_RAW_FILE_PATH = (
     AMPLITUDE_SPARK_JOBS_PATH + "load_events_into_datalake_raw.py"
 )
@@ -63,7 +69,6 @@ LIBRARIES_DESCRIPTION = Variable.get(
     "bietlejuice_default_libraries", deserialize_json=True
 )
 
-
 # Dag definition
 dag = DAG(
     dag_id=DAG_ID,
@@ -79,7 +84,6 @@ dag = DAG(
     ),
 )
 
-# tasks definition
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
@@ -122,6 +126,33 @@ events_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
                 "--partition_by",
             ]
             + DEFAULT_PARTITION_BY,
+        }
+    },
+)
+
+sync_metastore_raw_tables_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="sync-hive-metastore-raw-tables",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables.py",
+            "parameters": [
+                DATALAKE_BUCKET,
+                LayerEnum.RAW.value,
+                DAG_NAME,
+                "--all-tables",
+            ],
+        }
+    },
+)
+
+validate_sync_metastore_raw_table_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
+    task_id="validate-sync-hive-metastore-table",
+    json={
+        "spark_python_task": {
+            "python_file": BASE_SPARK_JOBS_PATH + "validate_sync_metastore_tables.py",
+            "parameters": [LayerEnum.RAW.value, DAG_NAME, "--all-tables"],
         }
     },
 )
@@ -258,17 +289,38 @@ update_clean_staging_subpartitioned_tables_athena_task = QuintoAndarDatabricksSu
     },
 )
 
-# tasks dependencies definition
-create_cluster_task >> events_to_datalake_raw_task >> events_raw_to_clean_task
+airflow_helpers.chain(
+    create_cluster_task,
+    events_to_datalake_raw_task,
+    sync_metastore_raw_tables_task,
+    validate_sync_metastore_raw_table_task,
+    terminate_cluster_task,
+)
 
-events_raw_to_clean_task >> update_clean_events_daily_partition_athena_task
+airflow_helpers.chain(
+    events_to_datalake_raw_task,
+    events_raw_to_clean_task,
+    [
+        update_clean_events_daily_partition_athena_task,
+        update_clean_staging_subpartitions_values_task,
+        create_clean_staging_events_task,
+    ],
+)
+
 update_clean_events_daily_partition_athena_task >> terminate_cluster_task
-events_raw_to_clean_task >> [
-    create_clean_staging_events_task,
-    update_clean_staging_subpartitions_values_task,
-] >> create_clean_staging_subpartitioned_tables_spark_task
-create_clean_staging_subpartitioned_tables_spark_task >> [
+
+airflow_helpers.chain(
+    [create_clean_staging_events_task, update_clean_staging_subpartitions_values_task],
+    create_clean_staging_subpartitioned_tables_spark_task,
+    [
+        create_clean_staging_subpartitioned_tables_athena_task,
+        update_clean_staging_subpartitioned_tables_spark_task,
+    ],
+    terminate_cluster_task,
+)
+
+airflow_helpers.chain(
     create_clean_staging_subpartitioned_tables_athena_task,
-    update_clean_staging_subpartitioned_tables_spark_task,
-] >> terminate_cluster_task
-create_clean_staging_subpartitioned_tables_athena_task >> update_clean_staging_subpartitioned_tables_athena_task >> terminate_cluster_task
+    update_clean_staging_subpartitioned_tables_athena_task,
+    terminate_cluster_task,
+)
