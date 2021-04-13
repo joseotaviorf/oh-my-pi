@@ -86,49 +86,56 @@ if __name__ == "__main__":
 
     client_response = get_data(configs, auth)
 
-    df = spark_client.create_dataframe(client_response)
+    if len(client_response):
 
-    dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
-    df = (
-        SparkDataFrameService()
-        .input(df)
-        .create_year_month_day_columns_from_date(dt_execution)
-        .output()
-    )
+        df = spark_client.create_dataframe(client_response)
 
-    datalake_info = DatalakeMetastoreService.get_db_info(
-        environment, target, datalake_bucket
-    )
-    spark_metastore_service = SparkMetastoreService(spark_client)
-    database_name = datalake_info["db_raw_databricks"]
-    spark_metastore_service.create_database(database_name)
+        dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
+        df = (
+            SparkDataFrameService()
+            .input(df)
+            .create_year_month_day_columns_from_date(dt_execution)
+            .output()
+        )
 
-    database_location = datalake_info["db_raw_path"]
-    format_options = SparkTableStorageFormat.DEFAULT_RAW
-    table_name = context
+        datalake_info = DatalakeMetastoreService.get_db_info(
+            environment, target, datalake_bucket
+        )
+        spark_metastore_service = SparkMetastoreService(spark_client)
+        database_name = datalake_info["db_raw_databricks"]
+        spark_metastore_service.create_database(database_name)
 
-    # loaders
-    s3_loader = S3Loader()
-    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
-    s3_loader.load_df(
-        df=df,
-        s3_path=f"{database_location}{table_name}",
-        format_options=format_options,
-        partitions=partition_cols,
-    )
-    spark_metastore_loader.update_metastore(
-        df,
-        database_name,
-        table_name,
-        format_options,
-        database_location,
-        partition_cols,
-        force_recreate=False,
-    )
-    spark_metastore_service.create_new_partitions_from_df(
-        database_name=database_name,
-        table_name=table_name,
-        df=df,
-        partition_cols=partition_cols,
-    )
-    spark_metastore_service.refresh_table(database_name, table_name)
+        database_location = datalake_info["db_raw_path"]
+        format_options = SparkTableStorageFormat.DEFAULT_RAW
+        table_name = context
+
+        # loaders
+        s3_loader = S3Loader()
+        spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+        s3_loader.load_df(
+            df=df,
+            s3_path=f"{database_location}{table_name}",
+            format_options=format_options,
+            partitions=partition_cols,
+        )
+        spark_metastore_loader.update_metastore(
+            df,
+            database_name,
+            table_name,
+            format_options,
+            database_location,
+            partition_cols,
+            force_recreate=False,
+        )
+        spark_metastore_service.create_new_partitions_from_df(
+            database_name=database_name,
+            table_name=table_name,
+            df=df,
+            partition_cols=partition_cols,
+        )
+        spark_metastore_service.refresh_table(database_name, table_name)
+
+    else:
+        logger.info(
+            f"m={JOB_NAME}, environment={environment}, accounts: {accounts}, msg=no data"
+        )
