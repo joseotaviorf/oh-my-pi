@@ -62,7 +62,6 @@
 - bietlejuice.enrich_zendesk_custom_fields
 - bietlejuice.enrich_zendesk_tickets
 - bietlejuice.facebook_insights
-- bietlejuice.fastforward
 - bietlejuice.firestore
 - bietlejuice.gsheets
 - bietlejuice.linkedin

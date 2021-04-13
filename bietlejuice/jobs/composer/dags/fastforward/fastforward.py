@@ -1,6 +1,7 @@
 from datetime import datetime
 import pendulum
 
+import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -28,6 +29,7 @@ LOAD_FASTFORWARD_INTO_DATALAKE_RAW_FILE_PATH = (
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 # spark and databricks vars
+BASE_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/"
 LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{SOURCE}"
 CLUSTER_DESCRIPTION = Variable.get(
@@ -81,6 +83,33 @@ fastforward_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
+sync_metastore_tables_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="sync-hive-metastore-raw-tables",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": BASE_SPARK_JOB_PATH + "sync_metastore_tables.py",
+            "parameters": [
+                DATALAKE_BUCKET,
+                LayerEnum.RAW.value,
+                SOURCE,
+                "--all-tables",
+            ],
+        }
+    },
+)
+
+validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
+    task_id="validate-sync-hive-metastore-table",
+    json={
+        "spark_python_task": {
+            "python_file": BASE_SPARK_JOB_PATH + "validate_sync_metastore_tables.py",
+            "parameters": [LayerEnum.RAW.value, SOURCE, "--all-tables"],
+        }
+    },
+)
+
 clean_sub_dag = DatalakeSubDAG(
     dag_id=DAG_ID,
     start_date=MAIN_START_DATE,
@@ -104,3 +133,10 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 create_cluster_task >> fastforward_to_datalake_raw_task >> list(
     clean_sub_dags.values()
 ) >> terminate_cluster_task
+
+airflow_helpers.chain(
+    fastforward_to_datalake_raw_task,
+    sync_metastore_tables_task,
+    validate_sync_metastore_table_task,
+    terminate_cluster_task,
+)
