@@ -1,4 +1,4 @@
-# Config for sale_performance_marketing_metrics_demand
+# Config for rent_flow_interactions
 ---
 streams:
   - direction: 'upstream'
