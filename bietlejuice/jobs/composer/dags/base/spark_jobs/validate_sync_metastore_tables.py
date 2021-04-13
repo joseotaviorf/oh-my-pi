@@ -58,7 +58,7 @@ class MetastoreSyncValidation:
         if (
             self.validate_schema_and_partition_keys()
             and self.validate_partition_values_count()
-            and self.validate_content()
+            # and self.validate_content() # temporarily removed due to Trino issue with the count command
         ):
             logger.info(
                 f"m={JOB_NAME}, database={self.database_name}, table={self.table_name}, "
