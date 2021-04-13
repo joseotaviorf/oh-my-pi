@@ -41,6 +41,3 @@ FROM
 INNER JOIN
   datalake_crm.tasks_actions tac
     ON tsk.id = tac.id_task
-    AND tac.year={year}
-    AND tac.month={month}
-    AND tac.day={day}

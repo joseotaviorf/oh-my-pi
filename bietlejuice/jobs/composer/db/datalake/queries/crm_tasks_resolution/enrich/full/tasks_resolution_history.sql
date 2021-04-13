@@ -46,14 +46,11 @@ FROM
 INNER JOIN
     datalake_crm.task_status_histories tsh
         ON tsk.id = tsh.id_task
-        AND tsh.year={year}
-        AND tsh.month={month}
-        AND tsh.day={day}
 UNION ALL
 SELECT DISTINCT
     tsk.id AS id_task,
     tac.id AS id_action,
-    tac.id_user_analyst AS id_user_action,
+    tac.id_user_action,
     tsk.id_assignee,
     tsk.id_house,
     tsk.id_rent_flow,
@@ -66,7 +63,7 @@ SELECT DISTINCT
     tsk.id_receiver,
     NULL AS task_status,
     NULL AS action_reason,
-    tac.analyst_username AS action_user_name,
+    tac.action_user_name,
     tac.action_type,
     tsk.type,
     tsk.version,
@@ -98,6 +95,3 @@ FROM
 INNER JOIN
     datalake_crm.tasks_actions tac
         ON tsk.id=tac.id_task
-        AND tac.year={year}
-        AND tac.month={month}
-        AND tac.day={day}

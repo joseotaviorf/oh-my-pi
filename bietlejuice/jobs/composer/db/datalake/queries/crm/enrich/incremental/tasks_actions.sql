@@ -29,8 +29,8 @@ WITH exploded_actions AS (
 SELECT
     action._id.oid AS id,
     id AS id_task,
-    action.userId AS id_user_analyst,
-    REPLACE(action.userName,'"') AS analyst_username,
+    action.userId AS id_user_action,
+    REPLACE(action.userName,'"') AS action_user_name,
     REPLACE(action.type,'"') AS action_type,
     action.metadata.key AS metadata_key,
     action.metadata.oldValue AS metadata_old_value,
