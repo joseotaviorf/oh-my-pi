@@ -118,8 +118,17 @@ answered_time_calculations AS (
                 LEAD(ts_event_unix,1) OVER (PARTITION BY fe.id_task ORDER BY ts_event) - COALESCE(LAG(ts_event_unix,1) OVER (PARTITION BY fe.id_task ORDER BY ts_event),ts_event_unix)
             WHEN 
                 event = 'reservation.created' 
+                AND LEAD(event,1) OVER (PARTITION BY fe.id_task ORDER BY ts_event_unix) = 'reservation.accepted' 
+            THEN 
+                LEAD(ts_event_unix,1) OVER (PARTITION BY fe.id_task ORDER BY ts_event_unix) - COALESCE(LAG(ts_event_unix,1) OVER (PARTITION BY fe.id_task ORDER BY ts_event_unix),ts_event_unix)
+            WHEN 
+                event = 'reservation.created' 
+                AND LEAD(event,1) OVER (PARTITION BY fe.id_task ORDER BY ts_event) = 'reservation.completed' 
+            THEN 
+                LEAD(ts_event_unix,2) OVER (PARTITION BY fe.id_task ORDER BY ts_event) - ts_event_unix
+            WHEN 
+                event = 'reservation.created' 
                 AND LEAD(event,1) OVER (PARTITION BY fe.id_task ORDER BY ts_event_unix) = 'reservation.completed' 
-                AND LEAD(event,2) OVER (PARTITION BY fe.id_task ORDER BY ts_event_unix) = 'reservation.accepted' 
             THEN 
                 LEAD(ts_event_unix,2) OVER (PARTITION BY fe.id_task ORDER BY ts_event_unix) - ts_event_unix
         END AS seconds_queue_time,
