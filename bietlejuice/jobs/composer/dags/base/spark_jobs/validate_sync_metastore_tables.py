@@ -35,6 +35,7 @@ class MetastoreSyncValidation:
         "int": "integer",
         "timestamp": "timestamp(3)",
         "float": "real",
+        "struct": "row",
     }
 
     def __init__(self, database_name, table_name, trino_conn_config) -> None:
@@ -174,6 +175,19 @@ class MetastoreSyncValidation:
 
         return True
 
+    @staticmethod
+    def _remove_special_chars_from_column(column_value):
+        """
+        Removes special chars from column value.
+        Special chars being removed: space(" ") and colon (:)
+
+        :param column_value: value to be applied regexp replace
+        :type column_value: string
+        :return: formatted value
+        :rtype: string
+        """
+        return re.sub(" |:", "", column_value)
+
     def _compare_tables_schema_columns(
         self, spark_ms_table_columns, trino_table_schema
     ):
@@ -190,8 +204,12 @@ class MetastoreSyncValidation:
         """
         for col_name, col_type in spark_ms_table_columns.items():
             if (col_name.lower() not in trino_table_schema.keys()) or (
-                trino_table_schema[col_name.lower()].replace(" ", "")
-                != self._get_spark_to_trino_col_mapping(col_type).replace(" ", "")
+                self._remove_special_chars_from_column(
+                    trino_table_schema[col_name.lower()]
+                )
+                != self._remove_special_chars_from_column(
+                    self._get_spark_to_trino_col_mapping(col_type)
+                )
             ):
                 logger.error(
                     f"m={JOB_NAME}, database={self.database_name}, table={self.table_name}, "
