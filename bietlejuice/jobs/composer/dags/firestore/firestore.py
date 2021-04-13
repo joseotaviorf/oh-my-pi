@@ -29,8 +29,8 @@ DATALAKE_BUCKET = Variable.get("datalake_bucket")
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
 LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{SOURCE}"
+BASE_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
-BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 
 # cluster setup
@@ -84,7 +84,7 @@ clean_sub_dag = DatalakeSubDAG(
     layer=LayerEnum.CLEAN,
     database_base_name=SOURCE,
     relative_query_path=SOURCE,
-    spark_job_paths=BASE_SPARK_JOBS_PATH,
+    spark_job_paths=BASE_SPARK_JOB_PATH,
     athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
 )
 
@@ -102,7 +102,8 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 # Creating sub dags
 for subscription in SUBSCRIPTIONS:
 
-    slugged_table_name = subscription["table_name"].replace("_", "-")
+    table_name = subscription["table_name"]
+    slugged_table_name = table_name.replace("_", "-")
 
     load_to_raw_task = QuintoAndarDatabricksSubmitRunOperator(
         task_id=f"load-{slugged_table_name}-into-raw",
@@ -123,6 +124,37 @@ for subscription in SUBSCRIPTIONS:
         },
     )
 
+    sync_metastore_tables_task = QuintoAndarDatabricksSubmitRunOperator(
+        task_id="sync-hive-metastore-raw-tables",
+        dag=dag,
+        json={
+            "spark_python_task": {
+                "python_file": BASE_SPARK_JOB_PATH + "sync_metastore_tables.py",
+                "parameters": [
+                    DATALAKE_BUCKET,
+                    LayerEnum.RAW.value,
+                    SOURCE,
+                    "--table-name",
+                    table_name,
+                ],
+            }
+        },
+    )
+
+    validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=dag,
+        task_id="validate-sync-hive-metastore-table",
+        json={
+            "spark_python_task": {
+                "python_file": BASE_SPARK_JOB_PATH
+                + "validate_sync_metastore_tables.py",
+                "parameters": [LayerEnum.RAW.value, SOURCE, "--table-name", table_name],
+            }
+        },
+    )
+
     create_cluster_task >> load_to_raw_task >> clean_sub_dags.pop(
-        subscription["table_name"]
+        table_name
     ) >> terminate_cluster_task
+
+    load_to_raw_task >> sync_metastore_tables_task >> validate_sync_metastore_table_task >> terminate_cluster_task
