@@ -75,7 +75,7 @@ class GoogleSheets(object):
         return new_columns
 
     @staticmethod
-    @logger
+    @logger(exclude='df')
     def _exclude_empty_column_labels(df):
         """
         Exclude columns with empty labels
