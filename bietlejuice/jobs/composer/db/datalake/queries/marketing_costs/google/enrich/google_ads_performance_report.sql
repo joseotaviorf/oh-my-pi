@@ -1,6 +1,6 @@
-select
-    concat(id_external_customer, '-', id, '-', campaign_name) as id,
-    id as id_ad,
+SELECT
+    SHA2(CONCAT(id_external_customer, id, campaign_name, ad_group_name, device), 256) AS id,
+    id AS id_ad,
     id_external_customer,
     id_ad_group,
     id_campaign,
@@ -19,11 +19,11 @@ select
     report_type,
     acc,
     campaign_name,
-    (campaign_name like 'ZEBRA%') as is_test_campaign,
+    (campaign_name LIKE 'ZEBRA%') AS is_test_campaign,
     load_date,
     dt_created,
     dt_load
-from 
+FROM 
     datalake_marketing_hub_clean.google_ads_performance_report
-where
-    load_date = date('{year}-{month}-{day}')
+WHERE
+    load_date = DATE('{year}-{month}-{day}')

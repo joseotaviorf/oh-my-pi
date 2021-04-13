@@ -1,5 +1,5 @@
 SELECT
-	CONCAT(id_external_customer, '-', id_video, '-', campaign_name) AS id,
+	SHA2(CONCAT(id_external_customer, id_video, campaign_name, ad_group_name, device), 256) AS id,
 	id_video,
 	id_external_customer,
 	id_ad_group,
