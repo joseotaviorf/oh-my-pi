@@ -1,0 +1,15 @@
+---
+marketing_offline_manual_costs:
+    sheet_id: 1gneeE6l30lv4om6FBEUe23YGfbMCCNe8IwpbCRL6vXQ
+    sheet_name: offline_manual_costs
+    clean_table_name: marketing_offline_manual_costs
+
+marketing_offline_manual_share_city_group:
+    sheet_id: 1zUM7FIxpNXmnTsbWZoX1wV7S_C49XMO8Vo68ElSqipo
+    sheet_name: offline_manual_share_city_group
+    clean_table_name: marketing_offline_manual_share_city_group
+
+marketing_offline_manual_share_cost_center:
+    sheet_id: 1zUM7FIxpNXmnTsbWZoX1wV7S_C49XMO8Vo68ElSqipo
+    sheet_name: offline_manual_share_cost_center
+    clean_table_name: marketing_offline_manual_share_cost_center

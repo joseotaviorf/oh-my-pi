@@ -40,7 +40,7 @@ WITH offline_costs AS (
         cost_center,
         cost
     FROM
-        datalake_gsheets_clean.marketing_offline_manual_costs
+        datalake_marketing_offline_costs_clean.marketing_offline_manual_costs
 ),
 city_group_rules AS (
     SELECT
@@ -48,7 +48,7 @@ city_group_rules AS (
         city_group,
         share
     FROM
-        datalake_gsheets_clean.marketing_offline_manual_share_city_group
+        datalake_marketing_offline_costs_clean.marketing_offline_manual_share_city_group
 ),
 cost_center_rules AS (
     SELECT
@@ -57,7 +57,7 @@ cost_center_rules AS (
         cost_center_context,
         share
     FROM
-        datalake_gsheets_clean.marketing_offline_manual_share_cost_center
+        datalake_marketing_offline_costs_clean.marketing_offline_manual_share_cost_center
 ),
 date_range AS (
     SELECT 
@@ -69,7 +69,7 @@ date_range AS (
             )
         ) AS date
     FROM 
-      datalake_gsheets_clean.marketing_offline_manual_costs
+      datalake_marketing_offline_costs_clean.marketing_offline_manual_costs
 ),
 aux_invoice_daily_share AS (
     SELECT
@@ -139,7 +139,6 @@ apply_cost_center_share AS (
         ads.id_rule_cost_center,
         ads.city_group,
         COALESCE(ads.cost_center,ccr.cost_center) AS cost_center,
-        ccr.cost_center_context,
         ads.daily_cost*COALESCE(ccr.share,1) AS daily_cc_cost
     FROM
         apply_daily_share ads
@@ -172,19 +171,19 @@ apply_city_group_share AS (
         accs.id_rule_city_group_sale,
         accs.id_rule_cost_center,
         accs.cost_center,
-        accs.cost_center_context,
         COALESCE(accs.city_group,cgr_r.city_group,cgr_s.city_group) AS city_group,
         accs.daily_cc_cost*COALESCE(cgr_r.share,cgr_s.share,1) AS cost
     FROM
         apply_cost_center_share accs
         LEFT JOIN city_group_rules cgr_r
             ON accs.id_rule_city_group_rent = cgr_r.id_rule_city_group
-            AND accs.cost_center_context = 'rent'
+            AND LOWER(accs.cost_center) NOT LIKE '%sale%'
         LEFT JOIN city_group_rules cgr_s
             ON accs.id_rule_city_group_sale = cgr_s.id_rule_city_group
-            AND accs.cost_center_context = 'sale'
+            AND LOWER(accs.cost_center) LIKE '%sale%'
 )
 SELECT
+    MONOTONICALLY_INCREASING_ID() AS id,
     acgs.id_date,
     acgs.id_rule_city_group_rent,
     acgs.id_rule_city_group_sale,
@@ -204,7 +203,6 @@ SELECT
     acgs.has_city_group_share,
     acgs.has_cost_center_share,
     acgs.cost_center,
-    acgs.cost_center_context,
     acgs.city_group,
     acgs.cost,
     acgs.dt_entry,
