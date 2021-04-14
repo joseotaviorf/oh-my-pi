@@ -25,4 +25,4 @@ SELECT
     DATE(NULLIF(dt_service_started, '')) AS dt_service_started,
     DATE(NULLIF(dt_service_ended, '')) AS dt_service_ended
 FROM
-    datalake_gsheets_raw.marketing_offline_manual_costs
+    datalake_marketing_offline_costs_raw.marketing_offline_manual_costs

@@ -3,4 +3,4 @@ SELECT
     NULLIF(city_group, '') AS city_group,
     FLOAT(NULLIF(share, '')) AS share
 FROM
-    datalake_gsheets_raw.marketing_offline_manual_share_city_group
+    datalake_marketing_offline_costs_raw.marketing_offline_manual_share_city_group
