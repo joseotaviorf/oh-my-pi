@@ -20,6 +20,10 @@ This pipeline produces the following output table on enrich layer:
 - `call_flex_events`
 - `call_agents`
 
+### Disclaimer
+
+The logic of call_flex_reservations is highly dependent of the order of the events (now we are sorting using The unix timestamp and untie by the alphabetical of the event).Changing these event names may impact on the results of this table and consequently the whole call model
+
 ### Responsible Data Team
 ​
 For any questions or concerns about this DAG, please contact the Data Engineering or Data Analytics team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).

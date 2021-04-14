@@ -106,6 +106,9 @@ full_events AS (
     UNION ALL
     SELECT * FROM tasks_events
 ),
+-- The logic of the CTE below is highly dependent of the order of the events (now we are sorting using
+-- the unix timestamp and untie by the alphabetical of the event).
+-- Changing these event names may impact on the results of this CTE and consequently the whole call model
 answered_time_calculations AS (
     SELECT
         fe.id_task,
@@ -113,27 +116,17 @@ answered_time_calculations AS (
         CASE
             WHEN 
                 event = 'reservation.created' 
-                AND LEAD(event,1) OVER (PARTITION BY fe.id_task ORDER BY ts_event) = 'reservation.accepted' 
+                AND LEAD(event,1) OVER (PARTITION BY fe.id_task ORDER BY ts_event_unix, event DESC) = 'reservation.accepted' 
             THEN 
-                LEAD(ts_event_unix,1) OVER (PARTITION BY fe.id_task ORDER BY ts_event) - COALESCE(LAG(ts_event_unix,1) OVER (PARTITION BY fe.id_task ORDER BY ts_event),ts_event_unix)
+                LEAD(ts_event_unix,1) OVER (PARTITION BY fe.id_task ORDER BY ts_event_unix, event DESC) - COALESCE(LAG(ts_event_unix,1) OVER (PARTITION BY fe.id_task ORDER BY ts_event_unix, event DESC),ts_event_unix)
             WHEN 
                 event = 'reservation.created' 
-                AND LEAD(event,1) OVER (PARTITION BY fe.id_task ORDER BY ts_event_unix) = 'reservation.accepted' 
+                AND LEAD(event,1) OVER (PARTITION BY fe.id_task ORDER BY ts_event_unix, event DESC) = 'reservation.completed' 
             THEN 
-                LEAD(ts_event_unix,1) OVER (PARTITION BY fe.id_task ORDER BY ts_event_unix) - COALESCE(LAG(ts_event_unix,1) OVER (PARTITION BY fe.id_task ORDER BY ts_event_unix),ts_event_unix)
-            WHEN 
-                event = 'reservation.created' 
-                AND LEAD(event,1) OVER (PARTITION BY fe.id_task ORDER BY ts_event) = 'reservation.completed' 
-            THEN 
-                LEAD(ts_event_unix,2) OVER (PARTITION BY fe.id_task ORDER BY ts_event) - ts_event_unix
-            WHEN 
-                event = 'reservation.created' 
-                AND LEAD(event,1) OVER (PARTITION BY fe.id_task ORDER BY ts_event_unix) = 'reservation.completed' 
-            THEN 
-                LEAD(ts_event_unix,2) OVER (PARTITION BY fe.id_task ORDER BY ts_event_unix) - ts_event_unix
+                LEAD(ts_event_unix,2) OVER (PARTITION BY fe.id_task ORDER BY ts_event_unix, event DESC) - ts_event_unix
         END AS seconds_queue_time,
         CASE
-            WHEN event = 'reservation.accepted' THEN LEAD(ts_event_unix,1) OVER (PARTITION BY fe.id_task ORDER BY ts_event) - ts_event_unix
+            WHEN event = 'reservation.accepted' THEN LEAD(ts_event_unix,1) OVER (PARTITION BY fe.id_task ORDER BY ts_event_unix) - ts_event_unix
         END AS seconds_talk_time
     FROM
         full_events fe
