@@ -1,7 +1,7 @@
 WITH offline_costs AS (
     SELECT
         COALESCE(ts_entry,'') ||'-'|| COALESCE(email,'') ||'-'|| COALESCE(invoice_number,'') AS aux_key,
-        DATE(ts_entry) AS dt_entry,
+        ts_entry,
         email,
         team,
         entry_type,
@@ -12,7 +12,7 @@ WITH offline_costs AS (
         cnpj,
         vendor_name,
         description,
-        campagin_name,
+        campaign_name,
         cost_category,
         cost_subcategory,
         action,
@@ -54,7 +54,6 @@ cost_center_rules AS (
     SELECT
         id_rule_cost_center,
         cost_center,
-        cost_center_context,
         share
     FROM
         datalake_marketing_offline_costs_clean.marketing_offline_manual_share_cost_center
@@ -84,7 +83,7 @@ aux_invoice_daily_share AS (
 apply_daily_share AS (
     SELECT
         aids.dt_share,
-        oc.dt_entry,
+        oc.ts_entry,
         oc.email,
         oc.team,
         oc.entry_type,
@@ -95,7 +94,7 @@ apply_daily_share AS (
         oc.cnpj,
         oc.vendor_name,
         oc.description,
-        oc.campagin_name,
+        oc.campaign_name,
         oc.cost_category,
         oc.cost_subcategory,
         oc.action,
@@ -116,7 +115,7 @@ apply_daily_share AS (
 apply_cost_center_share AS (
     SELECT
         ads.dt_share,
-        ads.dt_entry,
+        ads.ts_entry,
         ads.email,
         ads.team,
         ads.entry_type,
@@ -127,7 +126,7 @@ apply_cost_center_share AS (
         ads.cnpj,
         ads.vendor_name,
         ads.description,
-        ads.campagin_name,
+        ads.campaign_name,
         ads.cost_category,
         ads.cost_subcategory,
         ads.action,
@@ -149,7 +148,7 @@ apply_city_group_share AS (
     SELECT
         INT(DATE_FORMAT(DATE(accs.dt_share), 'yyyyMMdd')) AS id_date,
         accs.dt_share,
-        accs.dt_entry,
+        accs.ts_entry,
         accs.email,
         accs.team,
         accs.entry_type,
@@ -160,7 +159,7 @@ apply_city_group_share AS (
         accs.cnpj,
         accs.vendor_name,
         accs.description,
-        accs.campagin_name,
+        accs.campaign_name,
         accs.cost_category,
         accs.cost_subcategory,
         accs.action,
@@ -195,7 +194,7 @@ SELECT
     acgs.cnpj,
     acgs.vendor_name,
     acgs.description,
-    acgs.campagin_name,
+    acgs.campaign_name,
     acgs.cost_category,
     acgs.cost_subcategory,
     acgs.action,
@@ -205,7 +204,7 @@ SELECT
     acgs.cost_center,
     acgs.city_group,
     acgs.cost,
-    acgs.dt_entry,
+    acgs.ts_entry,
     acgs.dt_invoice,
     acgs.dt_service_started,
     acgs.dt_service_ended
