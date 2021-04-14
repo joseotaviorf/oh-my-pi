@@ -12,7 +12,6 @@
 - bietlejuice.dw_reservation
 - bietlejuice.dw_teravoz
 - bietlejuice.dw_visit
-- bietlejuice.enrich_amplitude_partner_taxonomy
 - bietlejuice.enrich_amplitude_visit
 - bietlejuice.enrich_bigfone_events
 - bietlejuice.enrich_bigfone_twilio
