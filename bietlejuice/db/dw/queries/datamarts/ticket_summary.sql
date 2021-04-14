@@ -126,7 +126,7 @@ WITH sla AS (
                     zendesk.dim_ticket AS dt 
                         ON dt.sk_ticket = ft.sk_ticket
                 WHERE
-                    dt.channel IN ('email', 'form_faq', 'web')
+                    dt.channel IN ('email', 'form_faq', 'web', 'other')
                     -- and ft.ts_solved_local is not null
                     -- emails with the tags below are not new demands, therefore, they should not be considered
                     AND dt.tags NOT ILIKE '%resolve_ticket_acompanhamento%'
@@ -241,7 +241,7 @@ csat_email_base AS (
         END AS is_answered,
         CASE
             WHEN dt.score IN ('good') THEN 1
-            ELSE 0
+            WHEN dt.score IN ('bad') THEN 0
         END AS is_solved,
         CASE
             WHEN dt.score = 'good' THEN 5
@@ -321,8 +321,7 @@ csat AS (
         csat_ticket_calls cll 
             ON ft.sk_ticket = cll.sk_ticket
     WHERE
-        ft.sk_user <>-1
-        AND tk.ts_created_local >= DATE'2018-01-01'
+        tk.ts_created_local >= DATE'2018-01-01'
     GROUP BY 1,2,3,4,5,6,7,8,9 
 ) ,
 automatically_closed_emails AS (
@@ -525,9 +524,9 @@ tax AS (
         ft.sk_ticket AS "Ticket_Id",
         dt.channel AS Canal,
         gdc.dept AS Fila,
-        customer_type_tag AS Client,
-        contact_motivation_tag AS Motivation,
-        dt.contact_theme_tag AS Theme,
+        customer_type_tag AS client,
+        contact_motivation_tag AS motivation,
+        dt.contact_theme_tag AS theme,
         gdc.ticket_area AS Area,
         'new' AS taxonomy_version
     FROM
@@ -567,8 +566,10 @@ SELECT
 	tk.request_type,
 	tk.subject,
 	tk.group_name,
-	gdc.area_aux,
+	ta.ticket_area,
 	tax.theme,
+    tax.motivation,
+    tax.client AS customer,
 	CASE
 		WHEN tax.theme LIKE '%repair%'
 		OR tk.group_name LIKE '%[REP]%' THEN 'repair'
@@ -584,12 +585,76 @@ SELECT
 		ELSE tax.theme
 	END AS theme_tag_agg,
 	CASE
-		WHEN tk.group_name LIKE '%[PRE]%' THEN 'pre'
-		WHEN tk.group_name LIKE '%[ONB]%' THEN 'onboarding'
-		WHEN tk.group_name LIKE '%[OFF]%' THEN 'offboarding'
-		WHEN tk.group_name LIKE '%[POS]%' THEN 'ongoing'
-		ELSE NULL
-	END AS rental_process_step,
+        WHEN 
+            tk.group_name IN (
+                'Processo | Risk Tarefas [FRONT] [SALE] [BACK]','CLosing ForSale/ Financiamento bancário [CLO] [SALE] [BACK]','CX - Compra e Venda [CV]','Closing ForSale/An. de Crédito [CLO] [SALE] [BACK]'
+                ,'Closing ForSale/Buyer [CLO][SALE][FRONT]','Closing ForSale/Diligência [CLO][SALE][BACK]','Closing ForSale/Registro Cartório[CLO][SALE][BACK]','Closing ForSale/Seller [CLO][SALE][FRONT]'
+                ,'Closing ForSale/Tarefas [CLO] [SALE] [FRONT] [BACK]','Compra e Venda [CV] [BACK]','Consultores - Pré CCV [CV]','Deal Making','Especialistas - Pós CCV [CV]','Relacionamento com corretores - Compra e venda'
+            ) 
+        THEN 
+            'ForSale'
+        WHEN 
+            tk.group_name IN (
+                'Agendamento Fotos - FUP [IS]','Gestão de Consequências [IS]','Inside Sales - ActionLine [IS][OUT]','Inside Sales - Atento [IS][OUT]'
+                ,'Inside Sales - Compra e Venda [IS] [CV]','Inside Sales - Prioritário [IS]','Inside Sales [IS]','Listing Quality [FOTOS] [POS] [BACK]'
+            ) 
+        THEN 
+            'IS'
+        WHEN 
+            tk.group_name IN (
+                'Antecipação de Aluguel','B2B [B2B]','BizDev [B2B]','Cobranças [COL] [POS] [BACK]','Dados do PP [Closing_Estela]','Finalizados [COL] [POS] [BACK]'
+                ,'Key Account [B2B]','Labs Pré Vendas [LAB]','Labs Pós Vendas [LAB]'
+            ) 
+        THEN 
+            'Não é CX'
+        WHEN 
+            tk.group_name IN (
+                'CX Conta Comigo [POS] [BACK]','Casos Especiais [CE] [POS] [BACK]','Chat PP/IQ','Chat PP/IQ [ONB] [POS] [BACK]','Entrevistas UX','Loyalty [BACK] [POS]'
+                ,'Midias Ops [ONB] [POS] [FRONT]','Midias Ops [POS] [BACK]','Ouvidoria [CE] [POS] [BACK]','PROCON [CE] [POS] [BACK]','ReclameAqui [CE] [POS] [BACK]'
+                ,'Suporte ao Vistoriador [INS]','Vistoria atendimento interno [INS]'
+            ) 
+        THEN 
+            'Relacionamento'
+        WHEN 
+            tk.group_name IN (
+                'BACK [Propostas]','BACK [Visitas]','CX Anúncio e Visitas Misseds','CX Contratos [PRO] [PRE] [FRONT]','CX Documentação [PRO] [PRE] [FRONT]','CX PROPOSTAS [PRO] [PRE] [FRONT]'
+                ,'CX Partners Tarefas [PRE] [BACK]','CX Partners [PRE] [FRONT]','CX SOS Visitas [VIS] [PRE] [FRONT]','CX Suporte ao Parceiro [VIS] [PRE] [FRONT]','CX Visitas Tarefas [PRE][BACK]'
+                ,'CX Visitas N1 & N2 [VIS] [PRE] [FRONT] [OUT]','CX Visitas N3 [VIS] [PRE] [FRONT]','Captadores QuintoAndar [B2B] [PRE] [BACK]','Closing - Antecipação [CLO] [PRE] [BACK]'
+                ,'Closing - Front End 1 [CLO] [PRE] [BACK]','Closing - Front End 2 [CLO] [PRE] [BACK]','Closing - Front End 3 [CLO] [PRE] [BACK]','Closing - Front End 4 [CLO] [PRE] [BACK]','Closing - Portabilidade [CLO] [PRE] [BACK]'
+                ,'Closing - Repescagem [CLO] [PRE] [BACK]','Closing B2B [CLO] [PRE] [BACK]','Closing B2C [CLO] [PRE] [BACK]','Closing FUP (B2B) [CLO] [PRE] [BACK]','Closing FUP (B2C) [CLO] [PRE] [BACK]'
+                ,'Closing For Sale/ Pagamentos [CV] [PRE] [BACK]','Closing Front (B2B) [CLO] [PRE] [BACK]','Closing Front (B2C) [CLO] [PRE] [BACK]','Confirmação de Visitas [VIS] [PRE] [FRONT]','Credenciamento Corretores [AGE] [PRE]'
+                ,'Crises Field [AGE] [PRE]','E-mail PRÉ [SUP] [PRE] [BACK]','Gestão de Consequências PP [VIS] [PRE] [BACK]','IndicaAí Prestadores [REP]','Irent [VIS] [PRE] [BACK]'
+                ,'Lockbox [AGE] [PRE]','Relacionamento Fotógrafos [AGE] [PRE]','TESTE E-mail [PRE] [SUP] [BACK]','Visitas Tarefas [PRE][BACK]'
+            ) 
+        THEN 
+            'Pré-contrato'
+        WHEN 
+            tk.group_name IN (
+                'Aditivos - Ativo [REP] [POS] [FRONT]','Aditivos [REP] [POS] [BACK]','CX Entrada no imóvel [ONB] [POS] [FRONT]','CX Mediações [ONB] [POS] [BACK]','CX ONB/PAY Missed','Entrada no imóvel [ONB] [POS] [BACK]'
+                ,'Logística Chaves Onboarding [INS] [POS] [BACK]','Logística Onboarding [INS] [POS] [BACK]','Onboarding Payments','Onboarding Visitas [VIS] [PRE] [FRONT]','[Desativar] CX Entrada no imóvel N3 [POS] [FRONT] [ONB]'
+            ) 
+        THEN 
+            'Onboarding'
+        WHEN 
+            tk.group_name IN (
+                'CX Negociação de aluguel [PAY] [POS] [BACK]','CX ADM - IPTU','CX ADM - Urgente','CX ADM Tier 1 [PAY] [POS] [FRONT]','CX Durante a locação e Reparos [POS] [FRONT] [ATIVO]','CX Durante a locação e reparos [POS] [FRONT]'
+                ,'CX Imposto de Renda [PAY] [POS] [FRONT]','CX Negociação IGPM/IPCA [PAY] [POS] [BACK]','CX Pagamentos N1 [PAY] [POS] [FRONT]','CX Pagamentos N3 [PÓS] [FRONT] [PAY]','Lançamento - PP Paga [PAY] [POS] [BACK]'
+                ,'Negociação [PAY] [POS] [FRONT]','Pagamentos - Ativo Self Condo [PAY] [POS] [BACK]','Pagamentos - Check [PAY] [POS] [BACK]','Pagamentos - Contato Ativo [PAY] [POS] [BACK]','Pagamentos - Corretores [PAY] [POS] [BACK]'
+                ,'Pagamentos - Cross [PAY] [POS] [BACK]','Pagamentos - Faturas [PAY] [POS] [BACK]','Pagamentos - OFF [PAY] [POS] [BACK]','Pagamentos - Pagamentos V9 [PAY] [POS] [BACK]','Pagamentos - Prestadores Parceiros [PAY] [POS] [BACK]'
+                ,'Proteção 5A Parceiros [REP] [POS] [BACK]','Proteção QuintoAndar [OFF] [POS] [BACK]','Reparos [REP] [POS] [BACK]','[Desativar] CX IPTU [PAY] [POS] [FRONT]'
+            ) 
+        THEN 
+            'Ongoing'
+        WHEN 
+            tk.group_name IN (
+                'Agendamento Vistoria Saída [OFF] [POS] [BACK]','Agendamento Vistorias [ONB] [POS] [BACK]','CX Rescisão e Vistoria [OFF] [POS] [FRONT]','Emergencial Offboarding Chaves[Pos][BACK]','Evictions [COL][POS][BACK]'
+                ,'Log - Credenciamento [INS]','Logística Chaves Offboarding [INS] [POS] [BACK]','Logística Offboarding [INS] [POS] [BACK]','Novo Off - Reparos [POS] [BACK]','Piloto OFF 1 [OFF] [POS] [BACK]'
+                ,'Pré-Despejo [COL] [POS] [BACK]','Qualidade de Vistorias [OFF] [POS] [BACK]','Rescisão 1 [OFF] [POS] [BACK]','Rescisão 2 - B2B [OFF] [B2B]','Rescisão 2 [OFF] [POS] [BACK]'
+            ) 
+        THEN 
+            'Offboarding'
+        ELSE NULL
+    END AS rental_process_step,
 	tk.status,
 	ft.minutes_first_resolution_time_calendar,
 	ft.minutes_first_resolution_time_business,
@@ -615,6 +680,6 @@ LEFT JOIN
     csat 
         ON ft.sk_ticket = csat.sk_ticket
 LEFT JOIN 
-    datalake_raw.gsheets_department_channel AS gdc 
-        ON tk.group_name = gdc.aux_canal
+    tickets_areas AS ta 
+        ON ta.sk_ticket = ft.sk_ticket
 	-- where ft.sk_user<>-1
