@@ -17,9 +17,10 @@ Dumps the entire source database in raw and produces the following output tables
 - `campaigns` - Campaigns information for all accounts, partitioned by `account_id`, `year`, `month`, `day`
 - `campaign_stats` -  The daily campaigns stats, partitioned by `account_id`, `campaing_id`, `year`, `month`, `day`
 
-### Responsible Data Engineering Team
+### Responsible Data Teams
 
-For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the 
+For any questions or concerns about this DAG, please contact the Data Engineering Team or 
+the Data Analytics Team responsible listed in the 
 [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
 
 ### Additional Information
