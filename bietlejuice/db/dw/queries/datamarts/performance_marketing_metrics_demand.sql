@@ -1,7 +1,114 @@
 WITH
------------------------------
--- Query the bottom funnel --
------------------------------
+-----------------------------------------------------------
+-- Query bookings, offers and talk to agent full history --
+-----------------------------------------------------------
+booking AS (
+	SELECT
+		flrf.sk_client,
+		flrf.sk_house_listing,
+		a.id_property AS id_house,
+		flrf.sk_region,
+		a.mkt_origin,
+		a.mkt_channel,
+		a.mkt_medium,
+		a.mkt_source,
+		a.utm_campaign,
+		a.utm_term,
+		a.utm_content,
+		a.dt_created AS ts_event,
+		'Booking' AS flow_event
+	FROM
+		dim_booking a
+	join fact_listing_rent_Flows flrf
+	using(sk_booking)
+	WHERE
+		a.sk_booking > 0
+		AND a.visit_intent = 'RENT'
+		AND a.type = 'Visita'
+		AND a.dt_created IS NOT NULL
+),
+offer AS (
+	SELECT
+		flrf.sk_client,
+		flrf.sk_house_listing,
+		a.id_property AS id_house,
+		flrf.sk_region,
+		a.mkt_origin,
+		a.mkt_channel,
+		a.mkt_medium,
+		a.mkt_source,
+		a.utm_campaign,
+		a.utm_term,
+		a.utm_content,
+		a.dt_first_sent AS ts_event,
+		'Offer' AS flow_event
+	FROM
+		dim_offer AS a
+	JOIN fact_listing_rent_flows AS flrf
+	USING(sk_offer)
+	WHERE
+		a.sk_offer > 0
+		AND a.dt_first_sent IS NOT NULL
+),
+talk_to_agent AS (
+	SELECT
+		tenant_id::INT AS sk_client,
+		a.sk_house_listing::BIGINT,
+		house_id::INT AS id_house,
+		fhl.sk_region,
+		a.mkt_origin,
+		a.mkt_channel,
+		a.mkt_medium,
+		a.mkt_source,
+		a.utm_campaign,
+		a.utm_term,
+		a.utm_content,
+		a.first_message_ts::timestamp AS ts_event,
+		'Talk to Agent' AS flow_event
+	FROM
+		datamarts.talk_to_agent AS a
+	JOIN fact_house_listings AS fhl
+		ON a.sk_house_listing = fhl.sk_house_listing
+	WHERE
+		a.business_context = 'RENT'
+		AND a.first_message_ts IS NOT NULL
+),
+----------------------------------------------------------------------------------------------------------------------
+-- Merge activation events (offer, booking and talk to agent) and order them by user and rent_flows (user || house) --
+----------------------------------------------------------------------------------------------------------------------
+rent_flows_raw AS (
+	SELECT
+		evt.*,
+		DATE(evt.ts_event) AS dt_event,
+		dr.city_group,
+		evt.sk_client || '_' || evt.id_house as sk_rf,
+		ROW_NUMBER() OVER(PARTITION BY evt.sk_client, evt.id_house
+							ORDER BY evt.ts_event) AS rent_flow_order,
+		ROW_NUMBER() OVER(PARTITION BY evt.sk_client
+							ORDER BY evt.ts_event) AS tenant_prospect_order
+	FROM (
+		SELECT
+			b.*
+		FROM booking AS b
+
+		UNION ALL
+
+		SELECT
+			o.*
+		FROM offer AS o
+
+		UNION ALL
+
+		SELECT
+			tta.*
+		FROM talk_to_agent AS tta
+	) AS evt
+	JOIN dim_region AS dr
+		ON evt.sk_region = dr.sk_region
+),
+----------------------------------
+-- Query the rent bottom funnel --
+----------------------------------
 rental_funnel AS (
 	SELECT DISTINCT
 		flrf.sk_client,
@@ -20,28 +127,28 @@ rental_funnel AS (
 		dd_cs.date AS dt_contract_signed
 	FROM
 		fact_listing_rent_flows AS flrf
-	    JOIN dim_date AS dd_bc
-	    	ON flrf.sk_booking_created_date = dd_bc.sk_date
-	    JOIN dim_date AS dd_os
-	    	ON flrf.sk_offer_submitted_date = dd_os.sk_date
-	    JOIN dim_date AS dd_oa
-	    	ON flrf.sk_offer_approved_date = dd_oa.sk_date
-	    JOIN dim_date AS dd_ds
-	    	ON flrf.sk_tenant_first_doc_sent_date = dd_ds.sk_date
-	    JOIN dim_date AS dd_ca
-	    	ON flrf.sk_credit_analysis_approved_date = dd_ca.sk_date
-	    JOIN dim_date AS dd_cs
-	    	ON flrf.sk_contract_signed_date = dd_cs.sk_date
+	JOIN dim_date AS dd_bc
+		ON flrf.sk_booking_created_date = dd_bc.sk_date
+	JOIN dim_date AS dd_os
+		ON flrf.sk_offer_submitted_date = dd_os.sk_date
+	JOIN dim_date AS dd_oa
+		ON flrf.sk_offer_approved_date = dd_oa.sk_date
+	JOIN dim_date AS dd_ds
+		ON flrf.sk_tenant_first_doc_sent_date = dd_ds.sk_date
+	JOIN dim_date AS dd_ca
+		ON flrf.sk_credit_analysis_approved_date = dd_ca.sk_date
+	JOIN dim_date AS dd_cs
+		ON flrf.sk_contract_signed_date = dd_cs.sk_date
 	WHERE
 		COALESCE(dd_bc.date, dd_os.date) > 0
 ),
---------------------------------------------------------------------------------------
--- Join rent bottom funnel in the first rent flow cohort and introduce 0s for UNION --
---------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
+-- Join the rent bottom funnel in the first rent flow cohort and introduce 0s for UNION --
+------------------------------------------------------------------------------------------
 fact_rent_flows AS (
 	SELECT
 		rf.dt_event,
-		dr.city_group,
+		rf.city_group,
 		rf.flow_event,
 		rf.mkt_origin,
 		rf.mkt_channel,
@@ -73,13 +180,11 @@ fact_rent_flows AS (
 		0.0 AS new_tenant_prospects_target,
 		0.0 AS budget
 	FROM
-		datamarts.rent_flow_interactions AS rf
-		JOIN dim_region AS dr
-		    USING(sk_region)
-	    LEFT JOIN rental_funnel AS frf
-	    	ON rf.sk_client = frf.sk_client
-	    	AND rf.id_house = frf.id_house
-	    	AND rf.rent_flow_order = 1
+		rent_flows_raw AS rf
+	LEFT JOIN rental_funnel AS frf
+		ON rf.sk_client = frf.sk_client
+		AND rf.id_house = frf.id_house
+		AND rf.rent_flow_order = 1
 ),
 -------------------------------------------------------------------------------------------------------------------------------
 -- Query Performance Marketing Investment for Rental Demand costs (mkt_origin = 'Tenants PWA') and introduce NULLs for UNION --
@@ -120,8 +225,8 @@ demand_daily_spent AS (
 		0.0 AS budget
 	FROM
 		marketing.fact_marketing_daily_costs AS co
-	    JOIN dim_date AS dd
-	    	ON dd.sk_date = co.sk_date
+	JOIN dim_date AS dd
+		ON dd.sk_date = co.sk_date
 	WHERE
 		co.mkt_origin = 'Tenants PWA'
 		AND dd.date >= DATE('2018-01-01')

@@ -1,5 +1,0 @@
-# Config for rent_flow_interactions
----
-streams:
-  - direction: 'upstream'
-    task_ids: ['athena_talk_to_agent']

@@ -1,4 +1,4 @@
-# Config for sale_performance_marketing_metrics_demand
+# Config for performance_marketing_metrics_demand
 ---
 streams:
   - direction: 'upstream'

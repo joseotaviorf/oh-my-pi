@@ -1,4 +1,67 @@
 WITH
+-----------------------------------------------------------
+-- Query bookings, offers and talk to agent full history --
+-----------------------------------------------------------
+events AS (
+    SELECT
+        flrf.sk_client,
+        db.id_property AS id_house,
+        flrf.sk_region,
+        db.dt_created AS ts_event
+    FROM
+        dim_booking AS db
+        JOIN fact_listing_rent_Flows flrf
+            USING(sk_booking)
+    WHERE
+        db.sk_booking > 0
+        AND db.visit_intent = 'RENT'
+        AND db.type = 'Visita'
+        AND db.dt_created IS NOT NULL
+
+    UNION ALL
+
+    SELECT
+        flrf.sk_client,
+        o.id_property AS id_house,
+        flrf.sk_region,
+        o.dt_first_sent AS ts_event
+    FROM
+        dim_offer AS o
+        JOIN fact_listing_rent_flows AS flrf
+            USING(sk_offer)
+    WHERE
+        o.sk_offer > 0
+        AND o.dt_first_sent IS NOT NULL
+
+    UNION ALL
+
+    SELECT
+        tta.tenant_id::INT AS sk_client,
+        tta.house_id::INT AS id_house,
+        fhl.sk_region,
+        tta.first_message_ts::timestamp AS ts_event
+    FROM
+        datamarts.talk_to_agent AS tta
+        JOIN fact_house_listings AS fhl
+            ON tta.sk_house_listing = fhl.sk_house_listing
+    WHERE
+        tta.business_context = 'RENT'
+        AND tta.first_message_ts IS NOT NULL
+),
+----------------------------------------------------------------------------------------------------------------------
+-- Merge activation events (offer, booking and talk to agent) and order them by user and rent_flows (user || house) --
+----------------------------------------------------------------------------------------------------------------------
+rent_flows_raw AS (
+    SELECT
+        evt.*,
+        dr.city_group,
+        evt.sk_client || '_' || evt.id_house AS sk_rf,
+        ROW_NUMBER() OVER(PARTITION BY evt.sk_client, evt.id_house ORDER BY evt.ts_event) AS rent_flow_order
+    FROM
+        events AS evt
+        JOIN dim_region AS dr
+            ON evt.sk_region = dr.sk_region
+),
 contract_person AS (
     SELECT DISTINCT
         COALESCE(NULLIF(fcp.sk_user, -1), flrf.sk_client) AS sk_client,
@@ -27,16 +90,14 @@ contract_person AS (
 events_base AS (
     -- Rent Flows
     SELECT DISTINCT
-        rfi.sk_client,
-        dr.city_group,
-        rfi.ts_event,
+        sk_client,
+        city_group,
+        ts_event,
         'rent_flow' AS event_type
     FROM
-        datamarts.rent_flow_interactions as rfi
-        JOIN dim_region AS dr
-            USING(sk_region)
+        rent_flows_raw
     WHERE
-        rfi.rent_flow_order = 1
+        rent_flow_order = 1
     GROUP BY 1,2,3,4
 
     UNION ALL

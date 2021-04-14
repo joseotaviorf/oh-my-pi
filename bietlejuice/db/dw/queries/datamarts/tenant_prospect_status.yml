@@ -2,4 +2,4 @@
 ---
 streams:
   - direction: 'upstream'
-    task_ids: ['rent_flow_interactions']
+    task_ids: ['athena_talk_to_agent']
