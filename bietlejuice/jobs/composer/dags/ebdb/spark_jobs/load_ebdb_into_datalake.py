@@ -22,9 +22,9 @@ BLOCK_LIST = ["PoligonoRegiao"]
 # todo: check this value and argument the choice
 PARTITION_SIZE = 1024
 # todo: check this value and argument the choice
-SIZE_THRESHOLD = PARTITION_SIZE * 10
+SIZE_THRESHOLD = PARTITION_SIZE * 8
 # todo: check this value and argument the choice
-NB_THREADS = 20
+NB_THREADS = 15
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -166,6 +166,6 @@ if __name__ == "__main__":
                     partition_columns,
                 )
                 for rel in rels
-                if rel.name not in serial_tables_list
+                if rel.name not in [table.name for table in serial_tables_list]
             ],
         )
