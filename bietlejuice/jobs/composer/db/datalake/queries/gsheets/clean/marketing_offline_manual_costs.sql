@@ -8,7 +8,7 @@ SELECT
     NULLIF(cnpj, '') AS cnpj,
     NULLIF(vendor_name, '') AS vendor_name,
     NULLIF(description, '') AS description,
-    NULLIF(campagin_name, '') AS campagin_name,
+    NULLIF(campaign_name, '') AS campaign_name,
     NULLIF(cost_category, '') AS cost_category,
     NULLIF(cost_subcategory, '') AS cost_subcategory,
     NULLIF(action, '') AS action,
