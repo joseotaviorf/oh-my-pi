@@ -218,5 +218,6 @@ WHERE
     inv.original_due_date IS NOT NULL
     AND rsk_cntrct.ts_signature IS NOT NULL
     AND DATEDIFF(inv.original_due_date, rsk_cntrct.ts_signature) > 0
+    AND inv.status != 'canceled'
 ORDER BY
     inv.original_due_date ASC

@@ -198,5 +198,6 @@ WHERE
     inv.ts_due IS NOT NULL
     AND rsk_cntrct.ts_signature IS NOT NULL
     AND DATEDIFF(inv.ts_due, rsk_cntrct.ts_signature) > 0
+    AND inv.status != 'canceled'
 ORDER BY
     inv.ts_due ASC
