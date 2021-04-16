@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS call.fact_calls (
     seconds_aht BIGINT,
     seconds_duration BIGINT,
     csat_rating INTEGER,
+    is_scheduled BOOLEAN,
     ts_load TIMESTAMP
 );
-ALTER TABLE call.fact_calls OWNER TO airflow;
+ALTER TABLE call.fact_calls OWNER TO databricks;

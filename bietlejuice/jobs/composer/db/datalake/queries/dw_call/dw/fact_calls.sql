@@ -23,17 +23,19 @@ initial_ivr_events AS (
 ),
 flex_calls AS (
     SELECT
-        id_call,
-        id_task,
-        customer_phone,
-        MAX(ts_wrapup_event_local_unix) AS ts_wrapup_event_local_unix,
-        MIN(ts_created_local_unix) AS ts_first_event_local_unix,
-        MAX(ts_created_local_unix) AS ts_last_event_local_unix
+        cfe.id_call,
+        cfe.id_task,
+        cfe.customer_phone,
+        cfe.is_scheduled,
+        cfe.id_conversation,
+        MAX(cfe.ts_wrapup_event_local_unix) AS ts_wrapup_event_local_unix,
+        MIN(cfe.ts_created_local_unix) AS ts_first_event_local_unix,
+        MAX(cfe.ts_created_local_unix) AS ts_last_event_local_unix
     FROM
         datalake_bigfone_twilio.call_flex_events cfe
     WHERE
         event_type != 'task.updated'
-    GROUP BY 1,2,3
+    GROUP BY 1,2,3,4,5
 ),
 call_metrics AS (
     SELECT
@@ -101,7 +103,7 @@ customer_identification AS (
     GROUP BY 1
 )
 SELECT
-    COALESCE(ic.id_call,fc.id_call,fc.id_task) AS sk_call, -- only inbound calls have id_call, but all calls have id_task
+    COALESCE(ic.id_call, fc.id_call, fc.id_conversation, fc.id_task) AS sk_call, -- only inbound calls have id_call, but all calls have id_task
     ci.id_user AS sk_user,
     ci.cpf AS sk_personal_document,
     CAST(FROM_UNIXTIME(COALESCE(ic.ts_first_event_local_unix,fc.ts_first_event_local_unix), 'yyyyMMdd') AS BIGINT) AS sk_call_date,
@@ -121,6 +123,7 @@ SELECT
     fc.ts_last_event_local_unix - fr.ts_first_reservation_local_unix AS seconds_aht,
     GREATEST(ic.ts_last_event_local_unix,fc.ts_last_event_local_unix) - COALESCE(ic.ts_first_event_local_unix,fc.ts_first_event_local_unix) AS seconds_duration,
     ce.csat_2 AS csat_rating,
+    fc.is_scheduled,
     NOW() AS ts_load
 FROM
     ivr_calls ic

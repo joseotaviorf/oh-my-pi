@@ -7,9 +7,10 @@ CREATE TABLE IF NOT EXISTS call.dim_call (
 	from_city VARCHAR(50),
 	from_state VARCHAR(50),
 	from_country VARCHAR(50),
+	scheduling_source VARCHAR(50),
 	ts_started TIMESTAMP,
 	ts_csat_answered TIMESTAMP,
 	ts_ended TIMESTAMP,
   	ts_load TIMESTAMP
 );
-ALTER TABLE call.dim_call OWNER TO airflow;
+ALTER TABLE call.dim_call OWNER TO databricks;
