@@ -59,7 +59,7 @@ class MongoClient(DBClient):
         raise NotImplementedError()
 
     @logger(exclude_return=True)
-    def get_documents(self, mongo_collection, query, parameters=None):
+    def get_documents(self, mongo_collection, query, **kwargs):
         """
         Execute query in a specific Collection and return its result.
         :param mongo_collection: Name of the collection
@@ -69,10 +69,7 @@ class MongoClient(DBClient):
         """
         with self.conn as conn:
             collection = conn[self.db][mongo_collection]
-            if parameters is not None:
-                documents = collection.find(query, parameters)
-            else:
-                documents = collection.find(query)
+            documents = collection.find(query, **kwargs)
             logger.info(
                 f"m=get_documents, nb_documents={documents.count()}, msg=query execution succeeded"
             )

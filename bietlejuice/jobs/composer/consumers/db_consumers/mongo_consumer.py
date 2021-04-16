@@ -131,40 +131,56 @@ class MongoConsumer(DBConsumer):
     @logger(exclude_return=True)
     def get_incremental_data_from_table(self, table_name, column_name, execution_date):
         """
-        Gets incremental data from a collection in a Mongo Database.
-        The method expects a column table that contains a date to make the filter.
+        Gets incremental data from a collection of a Mongo database, applying
+        a given input date string as a filter in a given column or nested column.
+        The filter is agnostic to the column type: it will filter "datetime" type,
+        "%Y-%m-%dT%H:%m:%sZ" date string type or "%Y-%m-%d" date string type columns
+        for any date string input given.
         :param table_name: Name of the table
-        :param column_name: Name of the column to make the filter
-        :param execution_date: Value of the column
+        :param column_name: Name of the column to which the filter will be applied.
+            In case of a nested column, a dot (.) must be between the nest field and
+            the nested column.
+            e. g. "tasks.updated_at"
+        :param execution_date: Date filter value.
         :type execution_date: date str in format %Y-%m-%d
         :return: A Spark DataFrame with the table data
-        OBS: ALL fields are converted to string type
         """
-        start_date = execution_date + "T00:00:00Z"
-        end_date = execution_date + "T23:59:59Z"
+        # Validates the date string format:
+        execution_datetime = datetime.strptime(execution_date, "%Y-%m-%d")
 
-        # the query verifies if the value of the column is between start_date and end_date
-        # and handles when the column is a timestamp or/and string.
-        query = {
-            "$or": [
-                {"$and": [{column_name: {"$gte": start_date, "$lte": end_date}}]},
-                {
-                    "$and": [
-                        {
-                            column_name: {
-                                "$gte": datetime.strptime(
-                                    start_date, "%Y-%m-%dT%H:%M:%SZ"
-                                ),
-                                "$lte": datetime.strptime(
-                                    end_date, "%Y-%m-%dT%H:%M:%SZ"
-                                ),
-                            }
-                        }
-                    ]
-                },
-                {column_name: execution_date},
-            ]
-        }
+        # Validates if the date column exists in table:
+        single_record = self.get_record_sample(table_name, column_name)
+
+        # Verifies if the column is nested:
+        nest_value = None
+        if "." in column_name:
+            nest_field, nested_field = column_name.split(".")
+            nest_value = single_record.get(nest_field)
+            column_value = (
+                nest_value[0].get(nested_field)
+                if isinstance(nest_value, list)
+                else nest_value.get(nested_field)
+            )
+        else:
+            column_value = single_record.get(column_name)
+
+        # Verifies datatype of the date column:
+        if isinstance(column_value, datetime):
+            dt_start = execution_datetime.replace(hour=0, minute=0, second=0)
+            dt_end = execution_datetime.replace(hour=23, minute=59, second=59)
+        elif isinstance(column_value, str):
+            dt_start = f"{execution_date}T00:00:00Z"
+            dt_end = f"{execution_date}T23:59:59Z"
+
+        # Composes a query for a nested or an unnested column:
+        if isinstance(nest_value, list):
+            query = {
+                nest_field: {
+                    "$elemMatch": {nested_field: {"$gte": dt_start, "$lte": dt_end}}
+                }
+            }
+        else:
+            query = {column_name: {"$gte": dt_start, "$lte": dt_end}}
 
         df = self.get_data_from_query(table_name, query)
         return df
@@ -193,3 +209,27 @@ class MongoConsumer(DBConsumer):
         """
         )
         raise NotImplementedError()
+
+    @logger(exclude_return=True)
+    def get_record_sample(self, table_name, column_name=None):
+        """
+        Gets a record sample from a specific table. If a `column_name` is given,
+        the record returned is the first in which the column exists and is not null.
+        :param table_name: Name of the table where the column will be looked for
+        :param type: string
+        :param column_name: Name of the column used to find a record. If given, the record
+            returned will be the first in which the column exists and is not null.
+            In case of a nested column, a dot (.) must separate the array and the column.
+            e. g. "tasks.updated_at"
+        :param type: string
+        :return: dict
+        """
+        args = [{column_name: {"$exists": True, "$ne": None}}] if column_name else []
+        record_sample = self.mongo_client.conn[self.mongo_client.db][
+            table_name
+        ].find_one(*args)
+        if not record_sample:
+            raise KeyError(
+                f"There are no values for '{column_name}' in '{table_name}' table"
+            )
+        return record_sample
