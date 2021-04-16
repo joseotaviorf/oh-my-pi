@@ -38,6 +38,7 @@ WITH google_consolidated_cost AS (
         AND (gtatf.flag <> 'other'
             OR gtatf.flag IS NULL)
         AND COALESCE(dgk.campaign_name, '') NOT LIKE '%DISCOVERY%'
+        AND COALESCE(dga.campaign_name, '') NOT LIKE '%SMART%'
         AND SUBSTRING(COALESCE(dgk.campaign_name, dga.campaign_name, dgc.campaign_name, dgv.campaign_name), 1, 5) <> 'ZEBRA'),
     manual_google_costs AS (
         WITH t_prep AS (
