@@ -36,9 +36,9 @@ SELECT DISTINCT
   ts_origin,
   ts_fup,
   ts_action,
-  tsk.year,
-  tsk.month,
-  tsk.day
+  tac.year,
+  tac.month,
+  tac.day
 FROM
   datalake_crm.tasks tsk
 INNER JOIN
