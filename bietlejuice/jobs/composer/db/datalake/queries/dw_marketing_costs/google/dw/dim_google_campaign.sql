@@ -1,6 +1,6 @@
 WITH clean_table_common AS (
-    SELECT
-        FIRST(id) AS sk_campaign,
+    SELECT DISTINCT
+        id AS sk_campaign,
         id_external_customer,
         id_campaign,
         campaign_name,
@@ -13,7 +13,6 @@ WITH clean_table_common AS (
         datalake_marketing_costs.google_campaigns_performance_report
     WHERE
         load_date = DATE('{year}-{month}-{day}')
-    GROUP BY 2,3,4,5,6,7,8,9
 )
 SELECT 
     clean_table_common.*,

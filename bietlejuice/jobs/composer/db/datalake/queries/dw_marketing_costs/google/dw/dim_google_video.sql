@@ -1,6 +1,6 @@
 WITH clean_table_common AS (
-    SELECT
-        FIRST(id) AS sk_video,
+    SELECT DISTINCT
+        id AS sk_video,
         id_video,
         ad_group_name,
         campaign_name,
@@ -14,7 +14,6 @@ WITH clean_table_common AS (
         datalake_marketing_costs.google_videos_performance_report
     WHERE
         load_date = DATE('{year}-{month}-{day}')
-    GROUP BY 2,3,4,5,6,7,8,9,10
 )
 SELECT 
     clean_table_common.*,
