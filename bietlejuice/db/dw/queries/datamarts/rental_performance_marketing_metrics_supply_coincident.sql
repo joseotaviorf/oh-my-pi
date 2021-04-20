@@ -616,9 +616,9 @@ affiliates AS (
 
   UNION ALL
 
-  -----------------------------------
-  -- Supply ForRental Funnel Targets --
-  -----------------------------------
+  -------------------------------------------
+  -- Supply ForRental Funnel Targets - NEW --
+  -------------------------------------------
     SELECT
         TO_CHAR(DATE(NULLIF(str.date, NULL)), 'YYYYMMDD')::INT AS sk_date,
         COALESCE(NULLIF(str.city_group, ''),'Not Mapped')::TEXT AS city_group,
@@ -645,12 +645,92 @@ affiliates AS (
         SUM(NULLIF(str.cost_per_source, '')::FLOAT) AS budget
     FROM
         datalake_raw.gsheets_daily_target_supply_rental str
+    WHERE str.date >= '2021-04-01'
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+
+  UNION ALL
+
+  -------------------------------------------
+  -- Supply ForRental Funnel Targets - OLD --
+  -------------------------------------------
+    SELECT
+        TO_CHAR(DATE(NULLIF(str.date, NULL)), 'YYYYMMDD')::INT AS sk_date,
+        COALESCE(NULLIF(str.city_group,''),'Not Mapped')::varchar AS city_group,
+        NULLIF(str.supply_origin,'')::varchar AS mkt_origin,
+        NULLIF(str.supply_channel,'')::varchar AS mkt_channel,
+        NULL::TEXT AS mkt_medium,
+        NULL::TEXT AS mkt_source,
+        NULL::TEXT AS utm_campaign,
+        NULL::TEXT AS utm_content,
+        NULL::TEXT AS utm_term,
+        NULL::TEXT AS campaign_context,
+        'Rental' AS business_context,
+        COUNT(NULL) AS leads,
+        COUNT(NULL) AS prospects,
+        COUNT(NULL) AS qualifieds,
+        COUNT(NULL) AS opportunities,
+        COUNT(NULL) AS first_listings,
+        COUNT(NULL) AS hybrid_listings,
+        SUM(0::FLOAT) AS cost,
+        SUM(NULLIF(str.prospect,'')::float) AS prospects_target,
+        SUM(NULLIF(str.qualified,'')::float) AS qualifieds_target,
+        SUM(NULLIF(str.opportunity,'')::float) AS opportunities_target,
+        SUM(NULLIF(str.first_listing,'')::float) AS first_listings_target,
+        SUM(0::FLOAT) AS budget
+    FROM
+        datamarts.daily_target_volumes_supply str
+    WHERE str.date < '2021-04-01'
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+
+  UNION ALL
+  -----------------------------------------
+  -- Supply ForRental Cost Targets - OLD --
+  -----------------------------------------
+    SELECT
+        TO_CHAR(DATE(NULLIF(sct.date, NULL)), 'YYYYMMDD')::INT AS sk_date,
+        COALESCE(nullif(sct.city_group,''),'Not Mapped')::varchar AS city_group,
+        CASE
+            WHEN sct.planning_mkt_level3 = 'PWA - Paid'
+                THEN 'Owner PWA'
+            ELSE sct.planning_mkt_level3
+        END AS mkt_origin,
+        CASE
+            WHEN planning_mkt_level3  = 'PWA - Paid' THEN 'Paid'
+            WHEN planning_mkt_level3 = 'Not Mapped' THEN 'Other'
+            WHEN planning_mkt_level3 IN ('Autonomous Agent', 'Autonomuos Agent') THEN 'CIQ'
+        ELSE planning_mkt_level3 END AS mkt_channel,
+        NULL::TEXT AS mkt_medium,
+        NULL::TEXT AS mkt_source,
+        NULL::TEXT AS utm_campaign,
+        NULL::TEXT AS utm_content,
+        NULL::TEXT AS utm_term,
+        campaign AS campaign_context,
+        business AS business_context,
+        COUNT(NULL) AS leads,
+        COUNT(NULL) AS prospects,
+        COUNT(NULL) AS qualifieds,
+        COUNT(NULL) AS opportunities,
+        COUNT(NULL) AS first_listings,
+        COUNT(NULL) AS hybrid_listings,
+        SUM(0::FLOAT) AS cost,
+        SUM(0::FLOAT) AS prospects_target,
+        SUM(0::FLOAT) AS qualifieds_target,
+        SUM(0::FLOAT) AS opportunities_target,
+        SUM(0::FLOAT) AS first_listings_target,
+        SUM(nullif((replace(sct.budget__mensal,',','')),'')::float) AS budget
+    FROM
+        datalake_raw.gsheets_costs_targets sct
+    WHERE planning_mkt_level1 = 'Supply'
+        AND sct.date < '2021-04-01'
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 )
 SELECT
     date,
     city_group,
-    mkt_origin,
+    CASE
+        WHEN mkt_origin = 'PWA - Paid' THEN 'Owner PWA'
+        ELSE mkt_origin
+    END AS mkt_origin,
     mkt_channel,
     CASE
         WHEN mkt_origin = 'Owner PWA' AND mkt_channel = 'LeadEnrichment' THEN 'Organic'
@@ -661,7 +741,7 @@ SELECT
         WHEN mkt_origin = 'Indica Aí - Agents Sale' THEN 'Indica Aí - Agents'
         WHEN mkt_origin = 'Indica Aí - General Sale' THEN 'Indica Aí - General'
         WHEN mkt_origin IN ('CR', 'Autonomous Agent', 'Autonomuos Agent') THEN 'CIQ'
-    ELSE mkt_origin
+        ELSE mkt_origin
     END AS planning_mkt_channel,
     mkt_medium,
     mkt_source,
