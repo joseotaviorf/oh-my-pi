@@ -22,10 +22,26 @@ class SalesListingFlowsSubDag(BaseSubDag):
     def build_sales_listing_flows(self):
         sales_listing_flows_dag = self._build_local_dag()
 
-        ods_sales_listing_flows_with_reprocessed_leads_task, ods_sales_potential_listings_task, \
-            dw_sale_fact_listing_flows = self.__build_data_tasks(sales_listing_flows_dag)
+        (ods_sales_listing_flows_with_reprocessed_leads_task,
+            ods_sales_acquisitions_task,
+            ods_sales_base_photo_tasks_task,
+            ods_sales_leads_b2b_task,
+            ods_sales_rep_leads_task,
+            ods_sales_rn_lead_task,
+            ods_sales_potential_listings_task,
+            dw_sale_fact_listing_flows) = self.__build_data_tasks(sales_listing_flows_dag)
 
-        ods_sales_listing_flows_with_reprocessed_leads_task >> ods_sales_potential_listings_task >> dw_sale_fact_listing_flows
+        ods_sales_listing_flows_with_reprocessed_leads_task >> ods_sales_acquisitions_task
+
+        ods_sales_potential_listings_task.set_upstream([
+            ods_sales_acquisitions_task,
+            ods_sales_base_photo_tasks_task,
+            ods_sales_leads_b2b_task,
+            ods_sales_rep_leads_task,
+            ods_sales_rn_lead_task
+        ])
+
+        ods_sales_potential_listings_task >> dw_sale_fact_listing_flows
 
         return sales_listing_flows_dag
 
@@ -34,19 +50,62 @@ class SalesListingFlowsSubDag(BaseSubDag):
         ods_sales_listing_flows_with_reprocessed_leads_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='ODS_sales_listing_flows_with_reprocessed_leads',
-            python_callable=utils.materialize_view_ods,
+            python_callable=utils.insert_into_table_from_view_ods,
             op_kwargs={
-                'bucket': self.bucket,
                 'view_name': 'sales_listing_flows_with_reprocessed_leads'
+            }
+        )
+
+        ods_sales_acquisitions_task = BaseDAG.build_python_operator(
+            dag=dag,
+            task_id='ODS_sales_acquisitions',
+            python_callable=utils.insert_into_table_from_view_ods,
+            op_kwargs={
+                'view_name': 'sales_acquisitions'
+            }
+        )
+
+        ods_sales_base_photo_tasks_task = BaseDAG.build_python_operator(
+            dag=dag,
+            task_id='ODS_sales_base_photo_tasks',
+            python_callable=utils.insert_into_table_from_view_ods,
+            op_kwargs={
+                'view_name': 'sales_base_photo_tasks'
+            }
+        )
+
+        ods_sales_leads_b2b_task = BaseDAG.build_python_operator(
+            dag=dag,
+            task_id='ODS_sales_leads_b2b',
+            python_callable=utils.insert_into_table_from_view_ods,
+            op_kwargs={
+                'view_name': 'sales_leads_b2b'
+            }
+        )
+
+        ods_sales_rep_leads_task = BaseDAG.build_python_operator(
+            dag=dag,
+            task_id='ODS_sales_rep_leads',
+            python_callable=utils.insert_into_table_from_view_ods,
+            op_kwargs={
+                'view_name': 'sales_rep_leads'
+            }
+        )
+
+        ods_sales_rn_lead_task = BaseDAG.build_python_operator(
+            dag=dag,
+            task_id='ODS_sales_rn_lead',
+            python_callable=utils.insert_into_table_from_view_ods,
+            op_kwargs={
+                'view_name': 'sales_rn_lead'
             }
         )
 
         ods_sales_potential_listings_task = BaseDAG.build_python_operator(
             dag=dag,
             task_id='ODS_sales_potential_listings',
-            python_callable=utils.materialize_view_ods,
+            python_callable=utils.insert_into_table_from_view_ods,
             op_kwargs={
-                'bucket': self.bucket,
                 'view_name': 'sales_potential_listings'
             }
         )
@@ -65,4 +124,13 @@ class SalesListingFlowsSubDag(BaseSubDag):
             }
         )
 
-        return ods_sales_listing_flows_with_reprocessed_leads_task, ods_sales_potential_listings_task, dw_sale_fact_listing_flows
+        return (
+            ods_sales_listing_flows_with_reprocessed_leads_task,
+            ods_sales_acquisitions_task,
+            ods_sales_base_photo_tasks_task,
+            ods_sales_leads_b2b_task,
+            ods_sales_rep_leads_task,
+            ods_sales_rn_lead_task,
+            ods_sales_potential_listings_task,
+            dw_sale_fact_listing_flows
+        )
