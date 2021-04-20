@@ -164,9 +164,9 @@ with
     )
  select
     *,
-    percent_rank() over (partition by area, week_start order by vb2cs_14) as pct_region_visit_booked_to_contract_signed,
-    percent_rank() over (partition by area, week_start order by vb2cs_user_14) as pct_region_visit_booked_to_contract_signed_user,
-    percent_rank() over (partition by city_group, week_start order by vb2cs_14) as pct_city_group_visit_booked_to_contract_signed,
-    percent_rank() over (partition by city_group, week_start order by vb2cs_user_14) as pct_city_group_visit_booked_to_contract_signed_user
+    percent_rank() over (partition by area, week_start order by coalesce(vb2cs_14,0)) as pct_region_visit_booked_to_contract_signed,
+    percent_rank() over (partition by area, week_start order by coalesce(vb2cs_user_14,0)) as pct_region_visit_booked_to_contract_signed_user,
+    percent_rank() over (partition by city_group, week_start order by coalesce(vb2cs_14,0)) as pct_city_group_visit_booked_to_contract_signed,
+    percent_rank() over (partition by city_group, week_start order by coalesce(vb2cs_user_14,0)) as pct_city_group_visit_booked_to_contract_signed_user
  from agents_base
 where hours_available > 0
