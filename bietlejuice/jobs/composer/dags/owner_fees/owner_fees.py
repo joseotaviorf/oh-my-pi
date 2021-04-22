@@ -1,7 +1,6 @@
 from datetime import datetime
 import os
 import pendulum
-import json
 
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
@@ -38,7 +37,7 @@ DAG_ID = f"bietlejuice.{SOURCE}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2020, 8, 10, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
-DAG_CONFIGS_PATH = f"{os.path.dirname(os.path.realpath(__file__))}/config"
+CONFIGS_FILE_PATH = f"{os.path.dirname(os.path.realpath(__file__))}/owner_fees.config"
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -58,17 +57,16 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
 
 # [BEGIN] Raw layer tasks
 
-with open(f"{DAG_CONFIGS_PATH}/raw_tables.json") as raw_tables_json:
-    raw_tables_cfg = json.load(raw_tables_json)
+configs_file = FileService.get_dict_from_yaml_file(CONFIGS_FILE_PATH)
 
 raw_tasks = {}
 
-for table in raw_tables_cfg:
+for table in configs_file:
     slugged_table_name = table["table_name"].replace("_", "-")
     extraction_type = table["extraction_type"]
 
     parameters = [ENV, SOURCE, DATALAKE_BUCKET, table["table_name"]]
-    if "date_filter_column" in list(table.keys()):
+    if extraction_type == "incremental":
         parameters.append(table["date_filter_column"])
         parameters.append("{{ ds }}")
     raw_task = QuintoAndarDatabricksSubmitRunOperator(
