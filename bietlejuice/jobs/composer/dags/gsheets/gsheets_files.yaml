@@ -16,6 +16,16 @@ aux_regiao:
     sheet_name: aux_regiao
     clean_table_name: auxiliary_region
 
+csat_vistoria_entrada:
+    sheet_id: 1ZTI-1XhPJey4o0e0IVfOVEeTeoWr7Vd10u-1TEZfIcc
+    sheet_name: entrada
+    clean_table_name: entrance_inspection_csat
+
+csat_vistoria_saida:
+    sheet_id: 1ZTI-1XhPJey4o0e0IVfOVEeTeoWr7Vd10u-1TEZfIcc
+    sheet_name: saida
+    clean_table_name: exit_inspection_csat
+
 de_para_cancelamento:
     sheet_id: 1Om2IjwtSPHfg4GRq2IPKGshHLBdXnP0bCMBPbOrh5fc
     sheet_name: de_para_cancelamento
