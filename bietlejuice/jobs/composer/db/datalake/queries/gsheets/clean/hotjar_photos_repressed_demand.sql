@@ -6,4 +6,4 @@ SELECT
     comment,
     CAST(ts_answer_submitted AS TIMESTAMP) AS ts_answer_submitted
 FROM
-    datalake_gsheets_raw.hotjar_photos_repressed_demand
+    datalake_gsheets_raw.hotjar_demanda_reprimida_fotos
