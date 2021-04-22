@@ -90,6 +90,7 @@ SELECT
     COALESCE(td.mkt_category, 'Not Mapped') AS mkt_category,
     COALESCE(td.mkt_flow, 'Not Mapped') AS mkt_flow,
     COALESCE(td.mkt_completion, 'Not Mapped') AS mkt_completion,
+    COALESCE(td.mkt_origin, 'Not Mapped') AS mkt_origin,
     COALESCE(td.mkt_channel, 'Not Mapped') AS mkt_channel,
     COALESCE(td.mkt_medium, 'Not Mapped') AS mkt_medium,
     COALESCE(td.mkt_source, 'Not Mapped') AS mkt_source,
