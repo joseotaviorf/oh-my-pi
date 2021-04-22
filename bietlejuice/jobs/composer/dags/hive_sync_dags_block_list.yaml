@@ -15,7 +15,6 @@
 - bietlejuice.enrich_amplitude_visit
 - bietlejuice.enrich_bigfone_events
 - bietlejuice.enrich_bigfone_twilio
-- bietlejuice.enrich_braze_events
 - bietlejuice.enrich_braze_events_user_centric
 - bietlejuice.enrich_braze_events_user_centric_periodicity
 - bietlejuice.enrich_chattermill
