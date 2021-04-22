@@ -9,7 +9,7 @@ SELECT
     NULLIF(macrotag_2, '') AS macrotag_2,
     NULLIF(microtag_3, '') AS microtag_3,
     NULLIF(macrotag_3, '') AS macrotag_3,
-    NULLIF(descricao, '') AS description,
+    NULLIF(description, '') AS description,
     NULLIF(client_type, '') AS client_type,
     NULLIF(company, '') AS company,
     NULLIF(internal_observation, '') AS internal_observation,
