@@ -26,6 +26,8 @@ create table staging.dim_contract (
   condo numeric(14,2),
   iptu numeric(14,2),
   tenant_service_fee numeric(5,2),
+  is_tenant_service_fee_opt_out boolean,
+  ts_tenant_service_fee_opt_out timestamp,
   signature_type varchar,
   closing_status varchar,
   ts_created timestamp,

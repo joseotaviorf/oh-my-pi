@@ -26,6 +26,8 @@ create external table if not exists datalake_clean.ods_dim_contract (
   condo string,
   iptu string,
   tenant_service_fee string,
+  is_tenant_service_fee_opt_out boolean,
+  ts_tenant_service_fee_opt_out timestamp,
   signature_type string,
   closing_status string,
   ts_created string,

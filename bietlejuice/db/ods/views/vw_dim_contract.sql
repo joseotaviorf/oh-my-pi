@@ -86,6 +86,8 @@ select
   c.condo,
   c.iptu,
   c.tenant_service_fee,
+  c.is_tenant_service_fee_opt_out,
+  c.ts_tenant_service_fee_opt_out,
   c.signature_type,
   c.closing_status,
   c.ts_created,
