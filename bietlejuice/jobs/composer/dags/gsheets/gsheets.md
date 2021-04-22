@@ -21,16 +21,24 @@ This pipeline produces the following output tables:
 
 2. Data lake clean:
     - `auxiliary_region`
+    - `census_subnormal_crowding_areas`
+    - `entrance_inspection_csat`
+    - `exit_inspection_csat`
     - `from_to_cancellation`
+    - `hotjar_photos_repressed_demand`
+    - `inspection_bugs`
     - `marketing_costs_campaign_city`
     - `marketing_costs_full_taxonomy`
     - `marketing_costs_google_ad_type_flags`
-    - `marketing_costs_national_affiliate_historical_costs`
     - `marketing_costs_kenshoo_configuration`
     - `marketing_costs_manual_costs_google`
     - `marketing_costs_manual_shared_costs`
     - `marketing_costs_name_convention_shared_costs`
+    - `marketing_costs_national_affiliate_historical_costs`
     - `marketing_manual_costs_google`
+    - `marketing_offline_manual_costs`
+    - `marketing_offline_manual_share_city_group`
+    - `marketing_offline_manual_share_cost_center`
     - `taxonomy_affiliates`
     - `taxonomy_demand`
 
