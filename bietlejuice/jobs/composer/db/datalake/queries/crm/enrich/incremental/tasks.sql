@@ -2,8 +2,13 @@ WITH cte_tasks AS(
   SELECT 
     *,
     FROM_JSON(metadata,
-      'fluxoLocacaoId STRING,
-      destinatario STRUCT<nome: STRING, id: STRING>, 
+     'fluxoLocacaoId STRING,
+      destinatario STRUCT<
+        id: BIGINT,
+        label: STRING,
+        nome: STRING,
+        email: STRING
+      >, 
       comentario STRING,
       origem STRING,
       dataVisita STRING,
@@ -60,6 +65,7 @@ SELECT
     version,
     score_factor,
     REPLACE(COALESCE(receiver_name,json_metadata.destinatario.nome), ',', '') AS receiver_name,
+    json_metadata.destinatario.label AS receiver_label,
     COALESCE(task_comment,json_metadata.comentario) AS task_comment,
     score,
     COALESCE(origin, json_metadata.origem) AS origin,
