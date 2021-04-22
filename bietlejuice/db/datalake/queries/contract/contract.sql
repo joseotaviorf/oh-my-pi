@@ -109,14 +109,14 @@ ongoing_contracts as (
 tenant_service_fee_opt_out_info as (
   with contract_aud_join_rev as (
     select 
-      from_unixtime(cast(u.ts_revision as bigint)/1000) as date_time,
-      c_aud.id_contract as contract_id,
-      c_aud.tenant_service_fee as tenant_service_fee,
+      from_unixtime(cast(u.timestamp as bigint)/1000) as date_time, 
+      c_aud.id as contract_id,
+      c_aud.tenantservicefee as tenant_service_fee,
       c_aud.rev
-    from datalake_ebdb_clean_prod.contract_aud c_aud
-    join datalake_ebdb_clean_prod.user_revision_entity u
+    from datalake_ebdb_raw_prod.contrato_aud c_aud
+    join datalake_ebdb_raw_prod.usuariorevisionentity u
       on c_aud.rev = u.id
-    where c_aud.mod_tenant_service_fee = true
+    where c_aud.tenantservicefee_mod = true
 )
 , tenant_service_fee_history as (
     select distinct 
