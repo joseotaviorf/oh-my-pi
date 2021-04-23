@@ -112,8 +112,8 @@ tenant_service_fee_opt_out_info as (
       c_aud.id as contract_id,
       c_aud.tenantservicefee as tenant_service_fee,
       c_aud.rev
-    from datalake_ebdb_raw_prod.contrato_aud c_aud
-    join datalake_ebdb_raw_prod.usuariorevisionentity u
+    from datalake_ebdb_raw.contrato_aud c_aud
+    join datalake_ebdb_raw.usuariorevisionentity u
       on c_aud.rev = u.id
     where c_aud.tenantservicefee_mod = true
 )
