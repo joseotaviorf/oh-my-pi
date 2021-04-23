@@ -1,13 +1,18 @@
 """
     Validates the synchronization between in-house metastore and Databricks metastore.
 
-    It will validate the table schema, partition keys, partition values count and table content count.
-    This job is temporary and will be removed after the sync implementation is finished for all tables.
+    It will validate:
+        - table schema
+        - partition keys
+        - partition values count
+        - table content count (<<<deactivate temporarily>>>)
+
+    Obs.: This job is temporary and will be removed after the sync implementation is finished for all tables.
 """
 import json
 import logging
-from argparse import ArgumentParser
 import re
+from argparse import ArgumentParser
 
 import requests
 from quintoandar_logger import QuintoAndarLogger
@@ -16,94 +21,131 @@ from bietlejuice.jobs.composer.base.db import DatabaseEnum
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreMapping
 from bietlejuice.jobs.composer.base.db.dw_metastore_mapping import DwMetastoreMapping
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
+from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient, TrinoClient
 from bietlejuice.jobs.composer.consumers.db_consumers.databricks_consumer import (
     DatabricksConsumer,
 )
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
-from trino.exceptions import TrinoExternalError
 
 JOB_NAME = "validate_sync_metastore_tables"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
-logger = QuintoAndarLogger(JOB_NAME)
 
 
-class MetastoreSyncValidation:
-    SPARK_TO_TRINO_COLUMN_TYPE = {
-        "string": "varchar",
-        "int": "integer",
-        "timestamp": "timestamp(3)",
-        "float": "real",
-        "struct": "row",
-    }
-
-    def __init__(self, database_name, table_name, trino_conn_config) -> None:
-        """
-        Constructor.
-
-        :param database_name: target database name
-        :param table_name: target table that will be validated
-        :param trino_conn_config: trino server configs
-        :param slack_dae_webhook: webhook to post in DAE squad channel
-        """
-        self.database_name = database_name
+class SparkMetastoreHelper:
+    def __init__(
+        self, layer, db_name_part, table_name, all_tables, slack_webhook
+    ) -> None:
+        self.layer = layer
+        self.db_name_part = db_name_part
         self.table_name = table_name
-        self.trino_client = TrinoClient(
-            trino_conn_config["host"],
-            trino_conn_config["port"],
-            trino_conn_config["user"],
-        )
+        self.all_tables = all_tables
+        self.spark_database_name = self.get_spark_database_name()
+        self.spark_client = SparkClient()
+        self.spark_metastore_service = SparkMetastoreService(self.spark_client)
+        self.slack_webhook = slack_webhook
 
-    def validate_table(self):
-        if (
-            self.validate_schema_and_partition_keys()
-            and self.validate_partition_values_count()
-            # and self.validate_content() # temporarily removed due to Trino issue with the count command
-        ):
-            logger.info(
-                f"m={JOB_NAME}, database={self.database_name}, table={self.table_name}, "
-                f"msg=Table synchronization validation succeeded."
+    def get_spark_database_name(self):
+        """
+        Gets the Spark and In-house metastores databases metadata for given layer.
+
+        :return: the database name in Spark metastore
+        """
+        if self.layer == LayerEnum.DW.value:
+            dw_ms_mapping = DwMetastoreMapping(
+                schema=self.db_name_part, bucket=""
+            ).get_all_dw_info()
+
+            spark_database_name = dw_ms_mapping["dw_schema_databricks"]
+        else:
+            dl_ms_mapping = DatalakeMetastoreMapping(
+                source=self.db_name_part, bucket=""
             )
 
-    def validate_schema_and_partition_keys(self):
+            spark_database_name, _ = dl_ms_mapping.get_datalake_info_from_layer(
+                self.layer
+            )
+
+        return spark_database_name
+
+    def validate_table_arguments(self):
         """
-        Gets and compares the table schema in Spark and In-house metastores.
-         The partition keys are included in the schema comparison.
+        Verifies if the job is called exclusively for validating the sync of a
+         unique table or all of them.
 
         :rtype: bool
         """
-        spark_metastore_service = SparkMetastoreService(SparkClient())
-        spark_ms_table_columns = spark_metastore_service.get_table_schema(
-            self.database_name, self.table_name
-        )
-        self._validate_empty_table_schema(spark_ms_table_columns)
-        if LayerEnum.RAW.value in self.database_name:
-            spark_ms_table_columns = self._set_timestamps_as_string(
-                spark_ms_table_columns
-            )
-
-        trino_table_schema = self.trino_client.get_records(
-            query=f'DESCRIBE {self.database_name}."{self.table_name}"'
-        )
-        self._validate_empty_table_schema(trino_table_schema)
-        trino_table_schema = self._parse_trino_schema(trino_table_schema)
-
-        if not self._validate_table_schema_match(
-            spark_ms_table_columns, trino_table_schema
-        ):
+        if bool(self.table_name) == bool(self.all_tables):
             msg = (
-                f"database={self.database_name}, table={self.table_name}"
-                "\n\nMessage=The schema of the table in In-house Hive and Spark metastores are diverging."
+                ">*Message: `Parameters table_name and all_tables should be mutual exclusive.`*\n"
+                f">*_table_name_:* `{self.table_name}`\n"
+                f">*_all_tables_:* `{self.all_tables}`"
             )
-            notify_error_in_slack(msg)
+            notify_error_in_slack(self.slack_webhook, msg)
+            QuintoAndarLogger(JOB_NAME).error(f"m={JOB_NAME}, {msg}")
+
             return False
 
-        logger.info(
-            f"m={JOB_NAME}, database={self.database_name}, table={self.table_name}, "
-            "msg=Table schemas and partition keys match."
-        )
         return True
+
+    def get_table_names(self):
+        """
+        Returns the table names to be validated according to the job arguments.
+
+        If the argument `all_tables` was defined, them all tables of that database
+        will be returned, else the given argument `table_name` will be used as the
+        table.
+
+        :rtype: list
+        """
+        table_names = []
+        if self.all_tables:
+            table_names = self.get_spark_metastore_table_names()
+        else:
+            table_names.append(self.table_name)
+
+        return table_names
+
+    def get_spark_metastore_table_names(self):
+        """
+        Query the Spark metastore to get all the table names for given database.
+
+        :return: List[str]
+        """
+        databricks_consumer = DatabricksConsumer(
+            {"db": self.spark_database_name}, self.spark_client
+        )
+        df_databricks_tables = databricks_consumer.get_table_names_and_sizes()
+        return [row.table_name for row in df_databricks_tables.collect()]
+
+    def get_table_schema_with_partition_keys(self, table_name):
+        """
+        Gets the table schema in the Spark metastore.
+        The schema list contains the columns and the partition keys.
+
+        :param table_name: target table
+        :return: table columns and partition keys
+        :rtype: collections.OrderedDict[(string, string)]
+        """
+        spark_ms_table_schema = self.spark_metastore_service.get_table_schema(
+            self.spark_database_name, table_name
+        )
+        self._validate_empty_table_schema(table_name, spark_ms_table_schema)
+
+        if LayerEnum.RAW.value in self.spark_database_name:
+            spark_ms_table_schema = self._set_timestamps_as_string(
+                spark_ms_table_schema
+            )
+
+        return spark_ms_table_schema
+
+    def _validate_empty_table_schema(self, table_name, table_schema):
+        if not table_schema:
+            raise AssertionError(
+                f"m={JOB_NAME}, database={self.spark_database_name}, table={table_name}, "
+                "msg=The table has an empty schema in the Spark metastore."
+            )
 
     @staticmethod
     def _set_timestamps_as_string(_spark_ms_table_columns):
@@ -128,6 +170,166 @@ class MetastoreSyncValidation:
             )
 
         return _spark_ms_table_columns
+
+    def get_table_partition_values_count(self, table_name):
+        """
+        Gets the partition values count for the table in Spark metastore
+
+        :param table_name: target table name
+        :rtype: int
+        """
+        databricks_consumer = DatabricksConsumer(
+            {"db": self.spark_database_name}, self.spark_client
+        )
+        spark_partition_values = databricks_consumer.get_partition_values_from_table(
+            table_name=table_name
+        )
+
+        return len(spark_partition_values.collect())
+
+    def get_table_count(self, table_name):
+        """
+        Gets the table count in Spark metastore
+        :rtype: int
+        """
+        databricks_consumer = DatabricksConsumer(
+            {"db": self.spark_database_name}, self.spark_client
+        )
+        spark_table_count = databricks_consumer.get_data_from_query(
+            f"SELECT count(1) FROM {self.spark_database_name}.{table_name}"
+        )
+        return spark_table_count.collect()[0][0]
+
+    def get_all_tables_metadata(self):
+        """
+        Fetches all database tables metadata.
+        This metadata will be shared during the parallelized processing of table names RDD.
+
+        :return: table schema and partition information
+        :rtype: dict
+        """
+        tables_spark_metadata = dict()
+        for table_name in self.get_table_names():
+            spark_ms_table_schema = self.get_table_schema_with_partition_keys(
+                table_name
+            )
+            spark_msg_table_partition_keys = self.spark_metastore_service.get_table_partition_keys(
+                self.spark_database_name, table_name
+            )
+
+            spark_msg_table_partition_values_count = 0
+            if spark_msg_table_partition_keys:
+                spark_msg_table_partition_values_count = self.get_table_partition_values_count(
+                    table_name
+                )
+
+            # spark_table_count = self.get_table_count(table_name)
+
+            tables_spark_metadata[table_name] = dict()
+            tables_spark_metadata[table_name]["name"] = table_name
+            tables_spark_metadata[table_name]["schema"] = spark_ms_table_schema
+            tables_spark_metadata[table_name][
+                "partition_keys"
+            ] = spark_msg_table_partition_keys
+            tables_spark_metadata[table_name][
+                "partition_values_count"
+            ] = spark_msg_table_partition_values_count
+            # tables_spark_metadata[table_name]["rows_count"] = spark_table_count
+
+        return tables_spark_metadata
+
+
+class HiveMetastoreSyncValidation:
+    SPARK_TO_TRINO_COLUMN_TYPE = {
+        "string": "varchar",
+        "int": "integer",
+        "timestamp": "timestamp(3)",
+        "float": "real",
+        "struct": "row",
+    }
+
+    def __init__(self, database_name, trino_client, slack_webhook) -> None:
+        """
+        Constructor.
+
+        :param database_name: target database name
+        :param table_name: target table that will be validated
+        """
+        self.database_name = database_name
+        self.trino_client = trino_client
+        self.slack_webhook = slack_webhook
+        self.table_name = None
+
+    def validate_table(self, table_metadata):
+        self.table_name = table_metadata["name"]
+        if (
+            self.validate_schema_and_partition_keys(table_metadata["schema"])
+            and self.validate_partition_values_count(
+                table_metadata["partition_keys"],
+                table_metadata["partition_values_count"],
+            )
+            # temporarily removed due to Trino issue with the count command
+            # and self.validate_content_count(table_metadata["rows_count"])
+        ):
+            QuintoAndarLogger(JOB_NAME).info(
+                f"m={JOB_NAME}, database={self.database_name}, table={self.table_name}, "
+                f"msg=Table synchronization validation succeeded."
+            )
+
+    def validate_schema_and_partition_keys(self, spark_table_schema):
+        """
+        Gets and compares the table schema in Spark and In-house metastores.
+         The partition keys are included in the schema comparison.
+
+        :rtype: bool
+        """
+        trino_table_schema = self.execute_trino_query(
+            query=f'DESCRIBE {self.database_name}."{self.table_name}"'
+        )
+        if not trino_table_schema:
+            return False
+
+        self._validate_empty_table_schema(trino_table_schema)
+        trino_table_schema = self._parse_trino_schema(trino_table_schema)
+
+        if not self._validate_table_schema_match(
+            spark_table_schema, trino_table_schema
+        ):
+            msg = (
+                ">*Message: `The schema of the table in In-house Hive and Spark metastores are diverging.`*\n"
+                f">*Database:* `{self.database_name}`\n"
+                f">*Table:* `{self.table_name}`"
+            )
+            notify_error_in_slack(self.slack_webhook, msg)
+            return False
+
+        QuintoAndarLogger(JOB_NAME).info(
+            f"m={JOB_NAME}, database={self.database_name}, table={self.table_name}, "
+            "msg=Table schemas and partition keys match."
+        )
+        return True
+
+    def execute_trino_query(self, query):
+        """
+        Securely performs the Trino query.
+        In case of a Trino error, avoids the job to fail and logs the error message.
+
+        :type query: str
+        :return: the query result or False in case of error
+        :rtype: mixed
+        """
+        try:
+            return self.trino_client.get_records(query)
+        except Exception as e:
+            msg = (
+                f">*Message: `Error fetching data in Trino: {e.message}`*\n"
+                f">*Database:* `{self.database_name}`\n"
+                f">*Table:* `{self.table_name}`\n"
+                f">*Query:* `{query}`"
+            )
+            notify_error_in_slack(self.slack_webhook, msg)
+            QuintoAndarLogger(JOB_NAME).error(f"m={JOB_NAME}, {msg}")
+            return False
 
     def _validate_empty_table_schema(self, table_schema):
         if not table_schema:
@@ -166,7 +368,7 @@ class MetastoreSyncValidation:
         :rtype: bool
         """
         if len(spark_ms_table_columns) != len(trino_table_schema):
-            logger.error(
+            QuintoAndarLogger(JOB_NAME).error(
                 f"m={JOB_NAME}, database={self.database_name}, table={self.table_name}, "
                 f"spark_col_number={len(spark_ms_table_columns)} trino_col_numer={len(trino_table_schema)},"
                 " msg=The tables have different column count."
@@ -211,7 +413,7 @@ class MetastoreSyncValidation:
                     self._get_spark_to_trino_col_mapping(col_type)
                 )
             ):
-                logger.error(
+                QuintoAndarLogger(JOB_NAME).error(
                     f"m={JOB_NAME}, database={self.database_name}, table={self.table_name}, "
                     f"column={col_name.lower()}, msg=The column diverges in both Metastore tables."
                 )
@@ -260,144 +462,62 @@ class MetastoreSyncValidation:
             spark_ms_table_columns, trino_table_schema
         )
 
-    def validate_partition_values_count(self):
-        spark_metastore_service = SparkMetastoreService(SparkClient())
-        partition_keys = spark_metastore_service.get_table_partition_keys(
-            self.database_name, self.table_name
-        )
-        if not partition_keys:
-            logger.info(
+    def validate_partition_values_count(
+        self, spark_patition_keys, spark_partition_values_count
+    ):
+        if not spark_patition_keys:
+            QuintoAndarLogger(JOB_NAME).info(
                 f"m={JOB_NAME}, database={self.database_name}, table={self.table_name}, "
-                "msg=The table is not partitioned, skipping the partition values validation."
+                "msg=Skipping the partition values validation: the table is not partitioned."
             )
             return True
 
-        databricks_consumer = DatabricksConsumer(
-            {"db": self.database_name}, SparkClient()
+        trino_partition_values_count = self.execute_trino_query(
+            query=f'SELECT count(1) FROM {self.database_name}."{self.table_name}$partitions"'
         )
-        spark_partition_values = databricks_consumer.get_partition_values_from_table(
-            table_name=self.table_name
-        )
-        spark_partition_values_count = len(spark_partition_values.collect())
-
-        query = (
-            f'SELECT count(1) FROM {self.database_name}."{self.table_name}$partitions"'
-        )
-        trino_partition_values_count = self.trino_client.get_records(query)
+        if not trino_partition_values_count:
+            return False
 
         if spark_partition_values_count != trino_partition_values_count[0][0]:
             msg = (
-                f"database={self.database_name}, table={self.table_name}"
-                "\n\nMessage=The partition values count of the table in In-house Hive and Spark metastores are diverging."
+                ">*Message: `The partition values count of the table in In-house Hive and Spark metastores are diverging.`*\n"
+                f">*Database:* `{self.database_name}`\n"
+                f">*Table:* `{self.table_name}`"
             )
-            notify_error_in_slack(msg)
-            logger.error(f"m={JOB_NAME}, {msg}")
+            notify_error_in_slack(self.slack_webhook, msg)
+            QuintoAndarLogger(JOB_NAME).error(f"m={JOB_NAME}, {msg}")
             return False
 
-        logger.info(
+        QuintoAndarLogger(JOB_NAME).info(
             f"m={JOB_NAME}, database={self.database_name}, table={self.table_name}, "
             "msg=Table partitions values match."
         )
         return True
 
-    def validate_content(self):
-        databricks_consumer = DatabricksConsumer(
-            {"db": self.database_name}, SparkClient()
+    def validate_content_count(self, spark_table_count):
+        trino_table_count = self.execute_trino_query(
+            query=f'SELECT count(1) FROM {self.database_name}."{self.table_name}"'
         )
-        spark_table_count = databricks_consumer.get_data_from_query(
-            f"SELECT count(1) FROM {self.database_name}.{self.table_name}"
-        )
-        spark_table_count = spark_table_count.collect()[0][0]
-
-        try:
-            trino_table_count = self.trino_client.get_records(
-                f'SELECT count(1) FROM {self.database_name}."{self.table_name}"'
-            )
-            trino_table_count = trino_table_count[0][0]
-        except TrinoExternalError as e:
-            msg = (
-                f"database={self.database_name}, table={self.table_name}, "
-                f"msg=Error fetching data in Trino, {e.message}"
-            )
-            notify_error_in_slack(msg)
-            logger.error(f"m={JOB_NAME}, {msg}")
+        if not trino_table_count:
             return False
 
-        if spark_table_count != trino_table_count:
+        if spark_table_count != trino_table_count[0][0]:
             msg = (
-                f"database={self.database_name}, table={self.table_name}, trino_count={trino_table_count},"
-                f" spark_count={spark_table_count}\n\nMessage=The content of table in In-house Hive and Spark "
-                "metastores are diverging."
+                f">*Message: `The count of table in In-house Hive and Spark metastores are diverging.`*\n"
+                f">*Spark count:* `{spark_table_count}`\n"
+                f">*Trino count:* `{trino_table_count}`\n"
+                f">*Database:* `{self.database_name}`\n"
+                f">*Table:* `{self.table_name}`"
             )
-            notify_error_in_slack(msg)
-            logger.error(f"m={JOB_NAME}, {msg}")
+            notify_error_in_slack(self.slack_webhook, msg)
+            QuintoAndarLogger(JOB_NAME).error(f"m={JOB_NAME}, {msg}")
             return False
 
-        logger.info(
+        QuintoAndarLogger(JOB_NAME).info(
             f"m={JOB_NAME}, database={self.database_name}, table={self.table_name}, "
             "msg=Table counts match."
         )
         return True
-
-
-def validate_table_arguments(_table_name, _all_tables):
-    """
-    Verifies if the job is called exclusively for validating the sync of a
-     unique table or all of them.
-
-    :param _table_name: the table to be validated
-    :type _table_name: str
-    :param _all_tables: flag indicating to validate all tables of giving database
-    :type _all_tables: bool (received as string though)
-    :rtype: bool
-    """
-    if bool(_table_name) == bool(_all_tables):
-        msg = (
-            f"table_name={_table_name}, all_tables={_all_tables}"
-            "\n\nMessage=Parameters table_name and all_tables should be mutual exclusive."
-        )
-        notify_error_in_slack(msg)
-        logger.error(f"m={JOB_NAME}, {msg}")
-        return False
-    return True
-
-
-def get_database_name(_db_name_part, _layer):
-    """
-    Gets the Spark and In-house metastores databases metadata for given layer.
-
-    :param _db_name_part: The `source` name for raw and clean layers. Or the
-     `source` and/or `context` name for enrich layer. The `schema` for DW layer.
-    :type _db_name_part: str
-    :param _layer: one of LayerEnum values
-    :type _layer: str
-    :return:
-    """
-    if _layer == LayerEnum.DW.value:
-        dw_ms_mapping = DwMetastoreMapping(
-            schema=_db_name_part, bucket=""
-        ).get_all_dw_info()
-
-        _spark_database_name = dw_ms_mapping["dw_schema_databricks"]
-    else:
-        dl_ms_mapping = DatalakeMetastoreMapping(source=_db_name_part, bucket="")
-
-        _spark_database_name, _ = dl_ms_mapping.get_datalake_info_from_layer(_layer)
-
-    return _spark_database_name
-
-
-def get_spark_metastore_table_names(database_name):
-    """
-    Query the Spark metastore to get all the table names for given database.
-
-    :param database_name: database name
-    :type database_name: str
-    :return: List[str]
-    """
-    databricks_consumer = DatabricksConsumer({"db": database_name}, SparkClient())
-    df_databricks_tables = databricks_consumer.get_table_names_and_sizes()
-    return [row.table_name for row in df_databricks_tables.collect()]
 
 
 def get_trino_conn_conf():
@@ -420,21 +540,20 @@ def get_slack_dae_webhook():
     return dbutils.secrets.get("quintoandar", "SLACK_DAE_WEBHOOK")  # noqa: F821
 
 
-def notify_error_in_slack(msg):
+def notify_error_in_slack(slack_webhook, msg_log):
     """
     Alternative flow to post a message to squad-data-availability
 
-    :param msg: the error message
-    :type msg: str
+    :param msg_log: the error message
+    :type msg_log: str
     """
-    logger.error(f"m={JOB_NAME}, {msg}")
+    QuintoAndarLogger(JOB_NAME).error(f"m={JOB_NAME}, {msg_log}")
 
-    webhook = get_slack_dae_webhook()
-    if webhook:
+    if slack_webhook:
         requests.post(
-            webhook,
+            slack_webhook,
             json={
-                "text": f":alert: Job validate_sync_metastore_tables has failed.\n```{msg}```"
+                "text": f":warning: Job *_validate_sync_metastore_tables_* has failed.\n\n\n*Error log:*\n{msg_log}"
             },
         )
 
@@ -477,28 +596,39 @@ def parse_args():
 def start_spark_job():
     """ Main method. """
     layer_value, db_name_part, table_name, all_tables = parse_args()
-    if not validate_table_arguments(table_name, all_tables):
-        return False
-
     layer = LayerEnum(layer_value).value
 
-    logger.info(
+    QuintoAndarLogger(JOB_NAME).info(
         f"m={JOB_NAME} layer={layer}, db_name_part={db_name_part}, "
         f"table_name={table_name}, all_tables={all_tables}, msg=Job execution started."
     )
 
-    database_name = get_database_name(db_name_part, layer)
+    slack_webhook = get_slack_dae_webhook()
+    spark_ms = SparkMetastoreHelper(
+        layer, db_name_part, table_name, all_tables, slack_webhook
+    )
+    if not spark_ms.validate_table_arguments():
+        return False
 
-    table_names = []
-    if all_tables:
-        table_names = get_spark_metastore_table_names(database_name=database_name)
-    else:
-        table_names.append(table_name)
+    tables_metadata = spark_ms.get_all_tables_metadata()
+    spark_table_names = list(tables_metadata.keys())
 
-    for table in table_names:
-        MetastoreSyncValidation(
-            database_name, table, get_trino_conn_conf()
-        ).validate_table()
+    trino_conn_config = get_trino_conn_conf()
+    trino_client = TrinoClient(
+        trino_conn_config["host"], trino_conn_config["port"], trino_conn_config["user"]
+    )
+
+    hms_sync_validation = HiveMetastoreSyncValidation(
+        spark_ms.spark_database_name, trino_client, slack_webhook
+    )
+    tables_rdd = BaseSparkContext.sc.parallelize(spark_table_names)
+    tables_rdd.foreach(
+        lambda _table_name: hms_sync_validation.validate_table(
+            tables_metadata.get(_table_name)
+        )
+    )
+
+    QuintoAndarLogger(JOB_NAME).info(f"m={JOB_NAME}, msg=Validations finished.")
 
 
 if __name__ == "__main__":

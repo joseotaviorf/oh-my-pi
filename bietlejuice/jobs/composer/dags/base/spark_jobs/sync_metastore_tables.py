@@ -216,6 +216,13 @@ class SparkMetastoreHelper:
         return [row.table_name for row in df_databricks_tables.collect()]
 
     def get_all_tables_metadata(self):
+        """
+        Fetches all database tables metadata.
+        This metadata will be shared during the parallelized processing of table names RDD.
+
+        :return: table schema and partition information
+        :rtype: dict
+        """
         tables_spark_metadata = dict()
         for table_name in self.get_table_names():
             spark_ms_table_columns = self.get_spark_metastore_table_columns(table_name)
