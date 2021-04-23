@@ -10,6 +10,7 @@ SELECT
 	eso.earnest_value,
 	CAST(eso.dt_sale_agreement_signed AS TIMESTAMP) AS ts_sale_agreement_signed,
 	CAST(eso.dt_sale_agreement_cancelled AS TIMESTAMP) AS ts_sale_agreement_cancelled,
+	CAST(eso.dt_house_registry_started AS TIMESTAMP) AS ts_house_registry_started,
 	CAST(eso.dt_house_registry_ended AS TIMESTAMP) AS ts_house_registry_ended,
 	CAST(eso.dt_sale_transacton_paid AS TIMESTAMP) AS ts_sale_transacton_paid,
 	now() AS ts_load

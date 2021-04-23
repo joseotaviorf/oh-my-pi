@@ -11,6 +11,7 @@ CREATE TABLE sale.dim_sale_agreement (
 	earnest_value BIGINT,
 	ts_sale_agreement_signed TIMESTAMP,
 	ts_sale_agreement_cancelled TIMESTAMP,
+	ts_house_registry_started TIMESTAMP,
 	ts_house_registry_ended TIMESTAMP,
 	ts_sale_transacton_paid TIMESTAMP,
 	ts_load TIMESTAMP

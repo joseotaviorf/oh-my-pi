@@ -136,6 +136,7 @@ SELECT
   m.dt_sale_agreement_created,
   m.dt_sale_agreement_signed,
   m.dt_sale_agreement_cancelled,
+  m.dt_house_registry_started,
   m.dt_house_registry_ended,
   m.dt_sale_transacton_paid,
   so.ts_created AS ts_offer_submitted,
