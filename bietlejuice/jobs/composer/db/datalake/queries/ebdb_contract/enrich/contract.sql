@@ -108,25 +108,25 @@ ongoing_contracts as (
 tenant_service_fee_opt_out_info as (
   with contract_aud_join_rev as (
     select 
-      from_unixtime(cast(u.timestamp as bigint)/1000) as date_time, 
-      c_aud.id as contract_id,
-      c_aud.tenantservicefee as tenant_service_fee,
+      ure.ts_revision, 
+      c_aud.id_contract,
+      c_aud.tenant_service_fee as tenant_service_fee,
       c_aud.rev
-    from datalake_ebdb_raw.contrato_aud c_aud
-    join datalake_ebdb_raw.usuariorevisionentity u
-      on c_aud.rev = u.id
-    where c_aud.tenantservicefee_mod = true
+    from datalake_ebdb_clean.contract_aud c_aud
+    join datalake_ebdb_clean.user_revision_entity ure
+      on c_aud.rev = ure.id
+    where c_aud.mod_tenant_service_fee = true
 )
 , tenant_service_fee_history as (
     select distinct 
-      car.contract_id,
-      first_value(car.tenant_service_fee) over (partition by car.contract_id order by car.rev rows between unbounded preceding and unbounded following) as first_tenant_service_fee,
-      last_value(car.tenant_service_fee) over (partition by car.contract_id order by car.rev rows between unbounded preceding and unbounded following) as last_tenant_service_fee,
-      last_value(car.date_time) over (partition by car.contract_id order by car.rev rows between unbounded preceding and unbounded following) as dt_last_tenant_service_fee_change
+      car.id_contract,
+      first_value(car.tenant_service_fee) over (partition by car.id_contract order by car.rev rows between unbounded preceding and unbounded following) as first_tenant_service_fee,
+      last_value(car.tenant_service_fee) over (partition by car.id_contract order by car.rev rows between unbounded preceding and unbounded following) as last_tenant_service_fee,
+      last_value(car.ts_revision) over (partition by car.id_contract order by car.rev rows between unbounded preceding and unbounded following) as dt_last_tenant_service_fee_change
     from contract_aud_join_rev car
 )
     select 
-      sfh.contract_id,
+      sfh.id_contract,
       sfh.dt_last_tenant_service_fee_change
     from tenant_service_fee_history sfh
     where sfh.first_tenant_service_fee != 0
@@ -153,7 +153,7 @@ select
   c.condo_price,
   c.iptu,
   c.tenant_service_fee,
-  (sfo.contract_id is not null) as is_tenant_service_fee_opt_out,
+  (sfo.id_contract is not null) as is_tenant_service_fee_opt_out,
   dt_last_tenant_service_fee_change as ts_tenant_service_fee_opt_out,
   c.signature_type,
   c.status_closing,
@@ -191,4 +191,4 @@ left join datalake_ebdb_clean.contract_version cv
 left join datalake_ebdb_clean.full_contract fc
     on fc.id = c.id
 left join tenant_service_fee_opt_out_info as sfo 
-  on c.id = sfo.contract_id
+  on c.id = sfo.id_contract
