@@ -33,7 +33,7 @@ left join last_version_listings lvl
   on trim(json_extract_scalar(ev.event_properties, '$["house_id"]'))  = lvl.id_house
   and ts_event between ts_listing_version_start and (coalesce(ts_listing_version_end, current_timestamp) - interval '1' second)
 where
-	date(ts_event) >= current_date - interval '60' day
+	date(ts_event) >= current_date - interval '45' day
 	and trim(event_type) in (
 		'listing_page_viewed',
 		'pilot_cw_button_clicked',
