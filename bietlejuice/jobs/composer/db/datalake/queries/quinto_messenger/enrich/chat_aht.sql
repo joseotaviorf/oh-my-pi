@@ -1,3 +1,4 @@
+-- AHT stands for Average Handling Time
 WITH
 tasks_last_update AS (
     SELECT

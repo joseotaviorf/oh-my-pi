@@ -17,7 +17,7 @@ This pipeline produces the following output tables on enrich layer:
 - `task_event`
 - `channel`
 - `channel_event`
-- `chat_aht`
+- `chat_aht` (AHT stands for Average Handling Time)
 
 ### Responsible Data Team
 ​
