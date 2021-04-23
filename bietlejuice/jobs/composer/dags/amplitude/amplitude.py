@@ -91,6 +91,10 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     libraries=LIBRARIES_DESCRIPTION,
 )
 
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    dag=dag, task_id="terminate-cluster"
+)
+
 events_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id="events-to-datalake-raw",
     dag=dag,
@@ -103,29 +107,6 @@ events_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
                 DATALAKE_BUCKET,
                 AMPLITUDE_ACCOUNTS_BLOCK_LIST,
             ],
-        }
-    },
-)
-
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-    dag=dag, task_id="terminate-cluster"
-)
-
-events_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="events-raw-to-clean",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": EVENTS_RAW_TO_CLEAN_FILE_PATH,
-            "parameters": [
-                "{{ ds }}",
-                ENV,
-                DATALAKE_BUCKET,
-                "amplitude",
-                "events",
-                "--partition_by",
-            ]
-            + DEFAULT_PARTITION_BY,
         }
     },
 )
@@ -148,11 +129,57 @@ sync_metastore_raw_tables_task = QuintoAndarDatabricksSubmitRunOperator(
 
 validate_sync_metastore_raw_table_task = QuintoAndarDatabricksSubmitRunOperator(
     dag=dag,
-    task_id="validate-sync-hive-metastore-table",
+    task_id="validate-sync-hive-metastore-raw-tables",
     json={
         "spark_python_task": {
             "python_file": BASE_SPARK_JOBS_PATH + "validate_sync_metastore_tables.py",
             "parameters": [LayerEnum.RAW.value, DAG_NAME, "--all-tables"],
+        }
+    },
+)
+
+events_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="events-raw-to-clean",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": EVENTS_RAW_TO_CLEAN_FILE_PATH,
+            "parameters": [
+                "{{ ds }}",
+                ENV,
+                DATALAKE_BUCKET,
+                "amplitude",
+                "events",
+                "--partition_by",
+            ]
+            + DEFAULT_PARTITION_BY,
+        }
+    },
+)
+
+sync_metastore_clean_tables_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="sync-hive-metastore-clean-tables",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables.py",
+            "parameters": [
+                DATALAKE_BUCKET,
+                LayerEnum.CLEAN.value,
+                DAG_NAME,
+                "--all-tables",
+            ],
+        }
+    },
+)
+
+validate_sync_metastore_clean_table_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
+    task_id="validate-sync-hive-metastore-clean-tables",
+    json={
+        "spark_python_task": {
+            "python_file": BASE_SPARK_JOBS_PATH + "validate_sync_metastore_tables.py",
+            "parameters": [LayerEnum.CLEAN.value, DAG_NAME, "--all-tables"],
         }
     },
 )
@@ -271,6 +298,33 @@ update_clean_staging_subpartitioned_tables_spark_task = QuintoAndarDatabricksSub
     },
 )
 
+sync_metastore_clean_staging_tables_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="sync-hive-metastore-clean-staging-tables",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables.py",
+            "parameters": [
+                DATALAKE_BUCKET,
+                LayerEnum.CLEAN_STAGING.value,
+                DAG_NAME,
+                "--all-tables",
+            ],
+        }
+    },
+)
+
+validate_sync_metastore_clean_staging_table_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
+    task_id="validate-sync-hive-metastore-clean-staging-tables",
+    json={
+        "spark_python_task": {
+            "python_file": BASE_SPARK_JOBS_PATH + "validate_sync_metastore_tables.py",
+            "parameters": [LayerEnum.CLEAN_STAGING.value, DAG_NAME, "--all-tables"],
+        }
+    },
+)
+
 update_clean_staging_subpartitioned_tables_athena_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id="update-clean-staging-subpartitioned-tables-athena",
     dag=dag,
@@ -300,22 +354,39 @@ airflow_helpers.chain(
 airflow_helpers.chain(
     events_to_datalake_raw_task,
     events_raw_to_clean_task,
-    [
-        update_clean_events_daily_partition_athena_task,
-        update_clean_staging_subpartitions_values_task,
-        create_clean_staging_events_task,
-    ],
+    sync_metastore_clean_tables_task,
+    validate_sync_metastore_clean_table_task,
+    terminate_cluster_task,
 )
 
-update_clean_events_daily_partition_athena_task >> terminate_cluster_task
+airflow_helpers.chain(
+    events_raw_to_clean_task,
+    update_clean_events_daily_partition_athena_task,
+    terminate_cluster_task,
+)
 
 airflow_helpers.chain(
+    events_raw_to_clean_task,
     [create_clean_staging_events_task, update_clean_staging_subpartitions_values_task],
     create_clean_staging_subpartitioned_tables_spark_task,
     [
         create_clean_staging_subpartitioned_tables_athena_task,
         update_clean_staging_subpartitioned_tables_spark_task,
     ],
+    terminate_cluster_task,
+)
+
+airflow_helpers.chain(
+    update_clean_staging_subpartitioned_tables_spark_task,
+    sync_metastore_clean_staging_tables_task,
+    validate_sync_metastore_clean_staging_table_task,
+    terminate_cluster_task,
+)
+
+airflow_helpers.chain(
+    update_clean_staging_subpartitioned_tables_spark_task,
+    sync_metastore_clean_staging_tables_task,
+    validate_sync_metastore_clean_staging_table_task,
     terminate_cluster_task,
 )
 
