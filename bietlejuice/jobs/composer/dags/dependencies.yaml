@@ -240,9 +240,6 @@ bietlejuice.enrich_chattermill:
 bietlejuice.enrich_consolidated_marketing_costs:
   - bietlejuice.enrich_marketing_costs
 
-bietlejuice.enrich_credit_evers:
-  - bietlejuice.enrich_invoice
-
 bietlejuice.enrich_crm:
   - bietlejuice.crm
 
