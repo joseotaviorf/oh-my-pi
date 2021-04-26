@@ -21,7 +21,7 @@ bietlejuice.dw_booking:
   - bietlejuice.ebdb:create-clean-visit-in-data-lake
   - bietlejuice.enrich_amplitude_visit
   - bietlejuice.gsheets:load-taxonomy-demand-to-clean
-  
+
 bietlejuice.dw_braze_events_user_centric:
   - bietlejuice.enrich_braze_events_user_centric_periodicity
 
@@ -29,7 +29,12 @@ bietlejuice.dw_braze_events_user_dispatch:
   - bietlejuice.enrich_braze_events_dispatches_user
 
 bietlejuice.dw_call:
-  - bietlejuice.enrich_bigfone_twilio
+  - bietlejuice.enrich_bigfone_twilio:load-call-agents-to-enrich
+  - bietlejuice.enrich_bigfone_twilio:load-call-flex-events-to-enrich
+  - bietlejuice.enrich_bigfone_twilio:load-call-flex-reservations-to-enrich
+  - bietlejuice.enrich_bigfone_twilio:load-call-ivr-events-to-enrich
+  - bietlejuice.enrich_bigfone_twilio:load-call-ivr-paths-to-enrich
+  - bietlejuice.enrich_bigfone_twilio:load-inbound-call-locations-to-enrich
 
 bietlejuice.dw_chattermill:
   - bietlejuice.enrich_chattermill:load-responses-to-enrich
@@ -197,10 +202,10 @@ bietlejuice.enrich_amplitude_visit:
   - bietlejuice.amplitude
 
 bietlejuice.enrich_bigfone_events:
-  - bietlejuice.bigfone_events
+  - bietlejuice.bigfone_events:load-event-to-clean
 
 bietlejuice.enrich_bigfone_twilio:
-  - bietlejuice.enrich_bigfone_events
+  - bietlejuice.enrich_bigfone_events:load-events-to-enrich
 
 bietlejuice.enrich_bob:
   - bietlejuice.bob
@@ -389,7 +394,10 @@ bietlejuice.enrich_proposal:
   - bietlejuice.sorting_hat:load-proposal-version-to-datalake-clean
 
 bietlejuice.enrich_quinto_messenger:
-  - bietlejuice.quinto_messenger
+  - bietlejuice.quinto_messenger:load-channel-to-clean
+  - bietlejuice.quinto_messenger:load-channel-event-to-clean
+  - bietlejuice.quinto_messenger:load-task-to-clean
+  - bietlejuice.quinto_messenger:load-task-event-to-clean
 
 bietlejuice.enrich_region:
   - bietlejuice.ebdb:create-clean-region-in-data-lake
