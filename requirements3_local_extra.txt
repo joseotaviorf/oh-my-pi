@@ -19,5 +19,6 @@ pyspark==2.4.3
 requests>=2.22.0
 s3transfer==0.2.1
 smmap2==2.0.5
+trino==0.305.0
 unidecode==1.1.1
 whichcraft==0.6.0
