@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -215,7 +215,12 @@ class PostgresConsumer(DBConsumer):
 
     @logger
     def get_incremental_data_from_table(
-        self, table_name, date_filter_column, date_filter_value, is_unixtime_col=False
+        self,
+        table_name,
+        date_filter_column,
+        date_filter_value,
+        unixtime_measure=None,
+        partition_granularity="day",
     ):
         """
         Gets incremental data from table in a Postgres database.
@@ -224,43 +229,43 @@ class PostgresConsumer(DBConsumer):
         :param table_name: Name of the table
         :param date_filter_column: Name of the column to make the filter
         :param date_filter_value: Value of the column
-        :param is_unixtime_col: Boolean to be seted True when the date_filter_column
-        has a unix timestamp date_filter_value.
+        :param unixtime_measure: unix time measure to be seted as miliseconds or seconds
+        :param partition_granularity: Granularity which the date column will be
+        truncated to fetch the partition data - default value 'day'
         :return: A Spark DataFrame with the table data
         """
+
+        if partition_granularity not in ["day", "month", "year"]:
+            raise Exception(
+                "m=get_incremental_data_from_table, "
+                f"partition_granularity={partition_granularity}, "
+                "msg=Wrong truncate condition."
+            )
 
         schema = self.conn_config["schema"]
 
         dt_filter_value = datetime.strptime(date_filter_value, "%Y-%m-%d")
-        dt_filter_value_day_after = dt_filter_value + timedelta(days=1)
 
-        if is_unixtime_col:
-            filter_value = int(dt_filter_value.timestamp())
-            filter_value_day_after = int(dt_filter_value_day_after.timestamp())
-            filter_enclosement = "{filter}"
-        else:
-            filter_value = dt_filter_value
-            filter_value_day_after = dt_filter_value_day_after
-            filter_enclosement = "'{filter}'"
+        if unixtime_measure == "miliseconds":
+            date_filter_column = f"TO_TIMESTAMP({date_filter_column}/1000)"
+        elif unixtime_measure == "seconds":
+            date_filter_column = f"TO_TIMESTAMP({date_filter_column})"
 
-        query_filter_value = filter_enclosement.format(filter=filter_value)
-        query_filter_value_day_after = filter_enclosement.format(
-            filter=filter_value_day_after
+        filter_condition = (
+            f"DATE_TRUNC('{partition_granularity}',{date_filter_column}) = "
+            f"DATE_TRUNC('{partition_granularity}', DATE('{dt_filter_value}'))"
         )
 
-        # The query verifies if the value of the column is between start_date and end_date.
-        # Also, it handles when the column is a timestamp or/and string.
         query = f"""
             SELECT
                 *,
-                {dt_filter_value.year} AS year,
-                {dt_filter_value.month} AS month,
-                {dt_filter_value.day} AS day
+                EXTRACT(YEAR FROM {date_filter_column}) AS year,
+                EXTRACT(MONTH FROM {date_filter_column}) AS month,
+                EXTRACT(DAY FROM {date_filter_column}) AS day
             FROM
                 "{schema}"."{table_name}"
             WHERE
-                {date_filter_column} >= {query_filter_value}
-                AND {date_filter_column} < {query_filter_value_day_after}
-                """
+                {filter_condition}
+        """
 
         return self.get_data_from_query(query)

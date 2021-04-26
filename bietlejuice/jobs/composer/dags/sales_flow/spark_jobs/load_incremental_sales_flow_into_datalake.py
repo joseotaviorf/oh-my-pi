@@ -74,11 +74,14 @@ if __name__ == "__main__":
 
     for table in tables:
         if table.table_name not in BLOCK_LIST:
+            unixtime_measure = (
+                "miliseconds" if table.table_name in UNIX_FORMAT_TABLES else None
+            )
             df = postgres_consumer.get_incremental_data_from_table(
                 table.table_name,
                 COLUMN_MAPPING.get(table.table_name, "updated_at"),
                 execution_date,
-                is_unixtime_col=(table.table_name in UNIX_FORMAT_TABLES),
+                unixtime_measure=unixtime_measure,
             )
 
             table_name = table.table_name.lower()
