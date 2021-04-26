@@ -23,7 +23,7 @@ SELECT
     BOOLEAN(NULLIF(is_3_positive, '')) AS is_tag_3_positive,
     BOOLEAN(NULLIF(is_tag_ok, '')) AS is_tag_ok,
     BOOLEAN(NULLIF(is_repair_needed, '')) AS is_repair_needed,
-    TIMESTAMP(NULLIF(ts_utc_start_date, '')) AS ts_utc_started,
-    TIMESTAMP(NULLIF(ts_utc_submit_date, '')) AS ts_utc_submitted
+    TIMESTAMP(CONCAT(LEFT(NULLIF(ts_utc_start_date, ''),10),' ', RIGHT(NULLIF(ts_utc_start_date, ''),8)) ) AS ts_utc_started,
+    TIMESTAMP(CONCAT(LEFT(NULLIF(ts_utc_submit_date, ''),10),' ', RIGHT(NULLIF(ts_utc_submit_date, ''),8)) ) AS ts_utc_submitted
 FROM
-    datalake_gsheets_raw.csat_vistoria_saida
+    datalake_gsheets_raw.csat_vistoria_saida 
