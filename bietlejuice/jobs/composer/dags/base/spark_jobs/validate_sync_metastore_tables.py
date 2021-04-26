@@ -242,10 +242,14 @@ class SparkMetastoreHelper:
 class HiveMetastoreSyncValidation:
     SPARK_TO_TRINO_COLUMN_TYPE = {
         "string": "varchar",
+        "struct": "row",
         "int": "integer",
         "timestamp": "timestamp(3)",
         "float": "real",
-        "struct": "row",
+        "<": "(",
+        ">": ")",
+        ":": " ",
+        ",": ", ",
     }
 
     def __init__(self, database_name, trino_client, slack_webhook) -> None:
@@ -377,19 +381,6 @@ class HiveMetastoreSyncValidation:
 
         return True
 
-    @staticmethod
-    def _remove_special_chars_from_column(column_value):
-        """
-        Removes special chars from column value.
-        Special chars being removed: space(" ") and colon (:)
-
-        :param column_value: value to be applied regexp replace
-        :type column_value: string
-        :return: formatted value
-        :rtype: string
-        """
-        return re.sub(" |:", "", column_value)
-
     def _compare_tables_schema_columns(
         self, spark_ms_table_columns, trino_table_schema
     ):
@@ -406,12 +397,8 @@ class HiveMetastoreSyncValidation:
         """
         for col_name, col_type in spark_ms_table_columns.items():
             if (col_name.lower() not in trino_table_schema.keys()) or (
-                self._remove_special_chars_from_column(
-                    trino_table_schema[col_name.lower()]
-                )
-                != self._remove_special_chars_from_column(
-                    self._get_spark_to_trino_col_mapping(col_type)
-                )
+                trino_table_schema[col_name.lower()]
+                != self._get_spark_to_trino_col_mapping(col_type)
             ):
                 QuintoAndarLogger(JOB_NAME).error(
                     f"m={JOB_NAME}, database={self.database_name}, table={self.table_name}, "
@@ -444,14 +431,13 @@ class HiveMetastoreSyncValidation:
          mapped type if they are different
         """
         # special treatment for array and map columns
-        if "array" in col_type or "map" in col_type:
-            col_type = col_type.replace("<", "(").replace(">", ")")
-            # splits by ',' '(' and ')', keeping delimiters
-            str_parts = re.split(r"([,|\(|\)])", col_type)
-            new_type = ""
-            for str_part in str_parts:
-                new_type += self._get_base_col_mapping(str_part)
-            return new_type
+        if re.search("array|map|struct", col_type):
+            # splits keeping delimiters
+            col_type_parts = re.split(r"([\(|\)|,|<|>|:])", col_type)
+            new_col_type = ""
+            for part in col_type_parts:
+                new_col_type += self._get_base_col_mapping(part)
+            return new_col_type
         else:
             return self._get_base_col_mapping(col_type)
 
