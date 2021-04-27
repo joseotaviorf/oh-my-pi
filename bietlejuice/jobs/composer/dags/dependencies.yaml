@@ -245,6 +245,10 @@ bietlejuice.enrich_chattermill:
 bietlejuice.enrich_consolidated_marketing_costs:
   - bietlejuice.enrich_marketing_costs
 
+bietlejuice.enrich_credit_evers:
+  - bietlejuice.enrich_invoice:load-credit-invoice-original-due-date-to-enrich
+  - bietlejuice.enrich_invoice:load-credit-invoice-to-enrich
+
 bietlejuice.enrich_crm:
   - bietlejuice.crm
 

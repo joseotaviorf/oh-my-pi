@@ -18,6 +18,9 @@ MAIN_START_DATE = datetime(2021, 4, 22, 0, 0, 0, tzinfo=LOCAL_TZ)
 CONTEXT = "credit_evers"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
+
+PARTITION_COLS = ["dt_contract_updated"]
+
 ENV = Variable.get("environment")
 SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
@@ -68,7 +71,9 @@ file_list = FileService.list_sql_files_without_extension_from_layer(
     CONTEXT, LayerEnum.ENRICH.value
 )
 
-enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(dag, file_list)
+enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(
+    dag, file_list, is_incremental=True, partitions=PARTITION_COLS
+)
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"

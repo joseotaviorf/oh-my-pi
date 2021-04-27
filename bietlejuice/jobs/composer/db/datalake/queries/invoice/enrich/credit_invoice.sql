@@ -183,7 +183,8 @@ SELECT
     inv.accrual_year_month,
     inv.ts_due,
     inv.ts_paid,
-    rsk_cntrct.ts_signature
+    rsk_cntrct.ts_signature,
+    DATE(ebdb_cntrct.ts_updated) AS dt_contract_updated
 FROM
     invoices AS inv
 JOIN

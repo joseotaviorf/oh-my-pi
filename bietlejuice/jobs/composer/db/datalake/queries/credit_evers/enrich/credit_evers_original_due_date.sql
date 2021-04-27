@@ -33,11 +33,13 @@ WITH debtors_all_time AS (
     END AS invoice_over_number,
     due_amount,
     ts_signature,
-    ts_due
+    ts_due,
+    dt_contract_updated
   FROM
     datalake_invoice.credit_invoice_original_due_date
   WHERE
-    purpose IN ('monthly', 'onboarding')
+    dt_contract_updated = DATE('{year}-{month}-{day}')
+    AND purpose IN ('monthly', 'onboarding')
     AND (paid_amount IS NULL
       OR status <> 'divergent-payment'
         OR (status LIKE 'divergent-payment'
@@ -104,7 +106,8 @@ SELECT
       END
     )
     AS total_due_amount,
-    ts_signature
+    ts_signature,
+    dt_contract_updated
 FROM 
     debtors_all_time
 CROSS JOIN
@@ -112,7 +115,7 @@ CROSS JOIN
 CROSS JOIN
     ever_array AS ea
 GROUP BY
-    1,2,3,4,5,6,12
+    1,2,3,4,5,6,12,13
 HAVING 
     (is_ever = 0 
         AND (months_of_contract > ma.contract_mob_number)
