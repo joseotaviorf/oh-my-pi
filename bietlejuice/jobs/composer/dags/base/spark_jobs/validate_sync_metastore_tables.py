@@ -246,6 +246,7 @@ class HiveMetastoreSyncValidation:
         "int": "integer",
         "timestamp": "timestamp(3)",
         "float": "real",
+        "binary": "varbinary",
         "<": "(",
         ">": ")",
         ":": " ",
