@@ -14,7 +14,6 @@
 - bietlejuice.enrich_amplitude_visit
 - bietlejuice.enrich_bigfone_events
 - bietlejuice.enrich_bigfone_twilio
-- bietlejuice.enrich_ebdb_user
 - bietlejuice.enrich_marketing_costs_criteo_campaigns
 - bietlejuice.enrich_proposal
 - bietlejuice.enrich_region
