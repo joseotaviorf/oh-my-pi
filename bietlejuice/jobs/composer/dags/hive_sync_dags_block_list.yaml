@@ -18,7 +18,6 @@
 - bietlejuice.enrich_docx
 - bietlejuice.enrich_ebdb_customer_contact_identification
 - bietlejuice.enrich_ebdb_listing_jobs
-- bietlejuice.enrich_ebdb_smart_price
 - bietlejuice.enrich_ebdb_user
 - bietlejuice.enrich_ebdb_user_revision_entity
 - bietlejuice.enrich_invoice
