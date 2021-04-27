@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -215,6 +215,56 @@ class PostgresConsumer(DBConsumer):
 
     @logger
     def get_incremental_data_from_table(
+        self, table_name, date_filter_column, date_filter_value, is_unixtime_col=None
+    ):
+        """
+        Gets incremental data from table in a Postgres database.
+        The method expects a table and a date/timestamp or unix timestamp
+        column to make the filter.
+        :param table_name: Name of the table
+        :param date_filter_column: Name of the column to make the filter
+        :param date_filter_value: Value of the column
+        :param is_unixtime_col: Boolean to be seted True when the date_filter_column
+        has a unix timestamp date_filter_value.
+        :return: A Spark DataFrame with the table data
+        """
+
+        schema = self.conn_config["schema"]
+
+        dt_filter_value = datetime.strptime(date_filter_value, "%Y-%m-%d")
+        dt_filter_value_day_after = dt_filter_value + timedelta(days=1)
+
+        if is_unixtime_col:
+            filter_value = int(dt_filter_value.timestamp())
+            filter_value_day_after = int(dt_filter_value_day_after.timestamp())
+            filter_enclosement = "{filter}"
+        else:
+            filter_value = dt_filter_value
+            filter_value_day_after = dt_filter_value_day_after
+            filter_enclosement = "'{filter}'"
+
+        query_filter_value = filter_enclosement.format(filter=filter_value)
+        query_filter_value_day_after = filter_enclosement.format(
+            filter=filter_value_day_after
+        )
+
+        query = f"""
+            SELECT
+                *,
+                {dt_filter_value.year} AS year,
+                {dt_filter_value.month} AS month,
+                {dt_filter_value.day} AS day
+            FROM
+                "{schema}"."{table_name}"
+            WHERE
+                {date_filter_column} >= {query_filter_value}
+                AND {date_filter_column} < {query_filter_value_day_after}
+        """
+
+        return self.get_data_from_query(query)
+
+    @logger
+    def get_incremental_data_by_granularity_from_table(
         self,
         table_name,
         date_filter_column,
@@ -225,7 +275,8 @@ class PostgresConsumer(DBConsumer):
         """
         Gets incremental data from table in a Postgres database.
         The method expects a table and a date/timestamp or unix timestamp
-        column to make the filter.
+        column to make the filter. Disclaimer: This method doesn't make use from our
+        postgresql indexes
         :param table_name: Name of the table
         :param date_filter_column: Name of the column to make the filter
         :param date_filter_value: Value of the column

@@ -77,7 +77,7 @@ if __name__ == "__main__":
             unixtime_measure = (
                 "miliseconds" if table.table_name in UNIX_FORMAT_TABLES else None
             )
-            df = postgres_consumer.get_incremental_data_from_table(
+            df = postgres_consumer.get_incremental_data_by_granularity_from_table(
                 table.table_name,
                 COLUMN_MAPPING.get(table.table_name, "updated_at"),
                 execution_date,
