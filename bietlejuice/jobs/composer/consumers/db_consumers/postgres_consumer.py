@@ -252,16 +252,16 @@ class PostgresConsumer(DBConsumer):
             date_filter_column = f"TO_TIMESTAMP({date_filter_column})"
 
         filter_condition = (
-            f"DATE_TRUNC('{partition_granularity}',{date_filter_column}) = "
+            f"DATE_TRUNC('{partition_granularity}',DATE({date_filter_column})) = "
             f"DATE_TRUNC('{partition_granularity}', DATE('{dt_filter_value}'))"
         )
 
         query = f"""
             SELECT
                 *,
-                EXTRACT(YEAR FROM {date_filter_column}) AS year,
-                EXTRACT(MONTH FROM {date_filter_column}) AS month,
-                EXTRACT(DAY FROM {date_filter_column}) AS day
+                CAST(EXTRACT(YEAR FROM DATE({date_filter_column})) AS INT) AS year,
+                CAST(EXTRACT(MONTH FROM DATE({date_filter_column})) AS INT) AS month,
+                CAST(EXTRACT(DAY FROM DATE({date_filter_column})) AS INT) AS day
             FROM
                 "{schema}"."{table_name}"
             WHERE
