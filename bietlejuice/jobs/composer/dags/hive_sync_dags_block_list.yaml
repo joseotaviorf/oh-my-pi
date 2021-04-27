@@ -20,7 +20,6 @@
 - bietlejuice.enrich_ebdb_user
 - bietlejuice.enrich_invoice
 - bietlejuice.enrich_marketing_costs_criteo_campaigns
-- bietlejuice.enrich_offer
 - bietlejuice.enrich_proposal
 - bietlejuice.enrich_quinto_messenger
 - bietlejuice.enrich_region
