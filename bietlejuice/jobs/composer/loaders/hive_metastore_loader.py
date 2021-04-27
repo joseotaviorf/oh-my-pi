@@ -322,7 +322,7 @@ class HiveMetastoreLoader:
         if hive_table_partition_keys != source_table_partition_keys:
             raise ValueError(
                 f"m=_check_partition_keys, spark_partitions={source_table_partition_keys},"
-                f" hive_partition_keys={hive_table_partition_keys}, msg=Partitions in Spark and Hive metastores are "
-                "not matching. You should recreate the table in Spark metastore if you are trying to change the "
-                "partition keys of the table."
+                f" hive_partition_keys={hive_table_partition_keys}, msg=The partition keys in Spark and Hive metastores"
+                f" are not matching. Probably because the partition keys changed in Spark Metastore. First the table must be "
+                f"manually dropped in the in in-house metastore, so it will be recreated."
             )
