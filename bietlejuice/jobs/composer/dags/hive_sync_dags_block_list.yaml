@@ -15,7 +15,6 @@
 - bietlejuice.enrich_amplitude_visit
 - bietlejuice.enrich_bigfone_events
 - bietlejuice.enrich_bigfone_twilio
-- bietlejuice.enrich_docx
 - bietlejuice.enrich_ebdb_customer_contact_identification
 - bietlejuice.enrich_ebdb_listing_jobs
 - bietlejuice.enrich_ebdb_user
