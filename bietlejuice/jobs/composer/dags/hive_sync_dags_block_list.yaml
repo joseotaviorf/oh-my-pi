@@ -19,7 +19,6 @@
 - bietlejuice.enrich_ebdb_listing_jobs
 - bietlejuice.enrich_ebdb_user
 - bietlejuice.enrich_invoice
-- bietlejuice.enrich_listing_owners
 - bietlejuice.enrich_marketing_costs_criteo_campaigns
 - bietlejuice.enrich_offer
 - bietlejuice.enrich_proposal
