@@ -184,10 +184,10 @@ sale_flows_funnel_events AS (
         sale_flows AS sf
         LEFT JOIN bookings AS b
             ON sf.sk_sale_flow = b.sk_sale_flow
-            AND sf.sale_flow_order = 1
         LEFT JOIN offers AS o
             ON sf.sk_sale_flow = o.sk_sale_flow
-            AND sf.sale_flow_order = 1
+    WHERE
+        sale_flow_order = 1
 ),
 --------------------------------------------------------------------------------------
 -- Query Performance Marketing ForSale Demand targets and introduce NULLs for UNION --

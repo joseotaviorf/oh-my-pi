@@ -79,7 +79,8 @@ fact_rent_flows AS (
         LEFT JOIN rental_funnel AS frf
             ON rf.sk_client = frf.sk_client
             AND rf.id_house = frf.id_house
-            AND rf.rent_flow_order = 1
+    WHERE
+        rf.rent_flow_order = 1
 ),
 -------------------------------------------------------------------------------------------------------------------------------
 -- Query Performance Marketing Investment for Rental Demand costs (mkt_origin = 'Tenants PWA') and introduce NULLs for UNION --
