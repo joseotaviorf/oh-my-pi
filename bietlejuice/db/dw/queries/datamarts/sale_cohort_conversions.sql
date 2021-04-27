@@ -27,13 +27,13 @@ SELECT
 	END AS mkt_campaign_context,
 	CASE
 	    WHEN lf.mkt_origin IN ('Indica Aí - Agents','Indica Aí - General', 'Price Calculator', 'B2B', 'CIQ', 'Doorman') THEN 'Paid'
-	    WHEN lf.mkt_origin IN ('Other', 'Backend') THEN 'Non Paid'
+	    WHEN lf.mkt_origin IN ('Other', 'Backend','Inbound') THEN 'Non Paid'
         WHEN lf.mkt_channel IN ('CRM/Notification', 'LeadEnrichment', 'Organic') AND lf.mkt_origin = 'Owner PWA' THEN 'Non Paid'
         WHEN lf.mkt_channel = 'Paid' AND lf.mkt_origin = 'Owner PWA' THEN 'Paid'
 	END AS mkt_type,
 	CASE
-	    WHEN dr.city_group NOT IN ('RMSP', 'Rio de Janeiro') THEN 'Out of coverage area'
-	    WHEN dr.city_group IN ('RMSP', 'Rio de Janeiro') THEN dr.city_group
+	    WHEN dr.city_group NOT IN ('RMSP', 'Rio de Janeiro','Belo Horizonte') THEN 'Out of coverage area'
+	    WHEN dr.city_group IN ('RMSP', 'Rio de Janeiro','Belo Horizonte') THEN dr.city_group
 	END AS city_group
 FROM
     datamarts.lead_listing_flows lf
