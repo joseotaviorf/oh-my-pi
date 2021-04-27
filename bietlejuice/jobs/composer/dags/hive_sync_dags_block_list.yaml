@@ -23,7 +23,6 @@
 - bietlejuice.enrich_ebdb_user_revision_entity
 - bietlejuice.enrich_invoice
 - bietlejuice.enrich_listing_owners
-- bietlejuice.enrich_marketing_costs
 - bietlejuice.enrich_marketing_costs_criteo_campaigns
 - bietlejuice.enrich_nps_answer_drivers
 - bietlejuice.enrich_offer
