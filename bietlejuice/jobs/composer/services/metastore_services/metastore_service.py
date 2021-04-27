@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from multiprocessing.dummy import Pool
+from datetime import date, datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -121,7 +122,7 @@ class MetastoreService(ABC):
             part_section = ", ".join(
                 [
                     "{} = {}".format(k, v)
-                    if not isinstance(v, str)
+                    if not isinstance(v, (str, date, datetime))
                     else "{} = '{}'".format(k, v)
                     for k, v in partition.items()
                 ]
