@@ -10,6 +10,7 @@ from airflow.operators.quintoandar_databricks import (
 )
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
+from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.jobs.composer.services import FileService
 
 # DAG params
@@ -26,6 +27,7 @@ MAIN_SCHEDULE_INTERVAL = "0 9 * * *"
 # S3 paths setup
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{DAG_NAME}/"
+BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
     Variable.get("databricks_s3_bucket"), DAG_NAME
 )
@@ -116,6 +118,36 @@ def build_entity_subdag(subdag_name, entity_name, entity_pipeline):
         },
     )
 
+    sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        task_id=f"sync-hive-metastore-{slugged_table_name}-table",
+        dag=entity_subdag,
+        json={
+            "spark_python_task": {
+                "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables.py",
+                "parameters": [
+                    DW_BUCKET,
+                    LayerEnum.DW.value,
+                    DW_SCHEMA,
+                    "--table-name",
+                    table,
+                ],
+            }
+        },
+    )
+
+    validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=entity_subdag,
+        task_id=f"validate-sync-hive-metastore-{slugged_table_name}-table",
+        json={
+            "spark_python_task": {
+                "python_file": BASE_SPARK_JOBS_PATH
+                + "validate_sync_metastore_tables.py",
+                "parameters": [LayerEnum.DW.value, DW_SCHEMA, "--table-name", table],
+            }
+        },
+    )
+
+    create_table_in_datalake_task >> sync_metastore_table_task >> validate_sync_metastore_table_task
     create_table_in_datalake_task >> load_table_into_redshift_task
 
     return entity_subdag
