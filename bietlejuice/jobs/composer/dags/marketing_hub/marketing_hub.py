@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import pendulum
 
+import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -77,6 +78,33 @@ google_ads_load_to_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     execution_timeout=timedelta(hours=3),
 )
 
+sync_metastore_raw_tables_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="sync-hive-metastore-raw-tables",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables.py",
+            "parameters": [
+                DATALAKE_BUCKET,
+                LayerEnum.RAW.value,
+                SOURCE,
+                "--all-tables",
+            ],
+        }
+    },
+)
+
+validate_sync_metastore_raw_table_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
+    task_id="validate-sync-hive-metastore-table",
+    json={
+        "spark_python_task": {
+            "python_file": BASE_SPARK_JOBS_PATH + "validate_sync_metastore_tables.py",
+            "parameters": [LayerEnum.RAW.value, SOURCE, "--all-tables"],
+        }
+    },
+)
+
 try:
     media_names = FileService.list_layer_sql_files(SOURCE, "")
 except RuntimeError:
@@ -112,4 +140,10 @@ for media_name in media_names:
         clean_sub_dags.values()
     ) >> terminate_cluster_task
 
-create_cluster_task >> google_ads_load_to_raw_task
+airflow_helpers.chain(
+    create_cluster_task,
+    google_ads_load_to_raw_task,
+    sync_metastore_raw_tables_task,
+    validate_sync_metastore_raw_table_task,
+    terminate_cluster_task,
+)
