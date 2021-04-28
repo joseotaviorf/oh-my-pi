@@ -141,12 +141,12 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
+create_cluster_task >> facebook_insights_to_datalake_raw_task >> clean_sub_dags[
+    "facebook_insights"
+]
 
-create_cluster_task >> facebook_insights_to_datalake_raw_task >> list(
-    clean_sub_dags.values()
-)
-create_cluster_task >> social_account_to_datalake_raw_task >> list(
-    clean_sub_dags.values()
-)
+create_cluster_task >> social_account_to_datalake_raw_task >> clean_sub_dags[
+    "facebook_social_insights"
+]
 
 list(clean_sub_dags.values()) >> terminate_cluster_task
