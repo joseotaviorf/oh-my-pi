@@ -12,7 +12,8 @@ from bietlejuice.jobs.composer.services.metastore_services import SparkMetastore
 
 SOURCE = "bigfone"
 JOB_NAME = "load_bigfone_into_datalake"
-ALLOW_LIST = ["Call", "Queued"]
+ALLOW_LIST_FULL = ["Call", "Queued"]
+ALLOW_LIST_INCREMENTAL = ["Event"]
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -21,9 +22,12 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
+    parser.add_argument("execution_date")
     args = parser.parse_args()
     environment = args.env
     datalake_bucket = args.datalake_bucket
+    execution_date = args.execution_date
+    partition_cols = ["year", "month", "day"]
 
     logger.info(
         f"m=__main__, environment={environment}, datalake_bucket={datalake_bucket}, "
@@ -54,7 +58,7 @@ if __name__ == "__main__":
     database_location = db_info["db_raw_path"]
 
     for table in tables:
-        if table.table_name in ALLOW_LIST:
+        if table.table_name in ALLOW_LIST_FULL:
             df = postgres_consumer.get_data_from_table(table.table_name)
             # the table names in the datalake must be lowercase
             s3_loader.load_full_table(
@@ -71,3 +75,19 @@ if __name__ == "__main__":
                 format_options,
                 database_location,
             )
+        elif table.table_name in ALLOW_LIST_INCREMENTAL:
+            df = postgres_consumer.get_incremental_data_from_table(
+                table.table_name, "event_timestamp", execution_date
+            )
+            s3_loader.load_incremental_table(
+                df=df,
+                database_name=database_name,
+                table_name=table.table_name.lower(),
+                format_options=format_options,
+                database_location=database_location,
+                partition_cols=partition_cols,
+            )
+            metastore_service.create_new_partitions_from_df(
+                database_name, table.table_name.lower(), df, partition_cols
+            )
+            metastore_service.refresh_table(database_name, table.table_name.lower())

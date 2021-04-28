@@ -3,7 +3,7 @@ WITH lonely_events AS (
         COUNT(GET_JSON_OBJECT(metadata, '$.call_id')) AS count_call_id,
         GET_JSON_OBJECT(metadata, '$.call_id') AS call_id
     FROM
-        datalake_bigfone_events_clean.event
+        datalake_bigfone_clean.event
     WHERE
         provider = 'teravoz'
         AND (event = 'service.command' OR event = 'recording.available')
@@ -26,7 +26,7 @@ SELECT
     events.month AS month,
     events.day AS day
 FROM
-    datalake_bigfone_events_clean.event events
+    datalake_bigfone_clean.event events
 LEFT JOIN
     lonely_events lonely
         ON lonely.call_id = GET_JSON_OBJECT(events.metadata, '$.call_id')

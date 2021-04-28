@@ -13,6 +13,7 @@ from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
 from bietlejuice.jobs.composer.services import FileService
 
 SOURCE = "bigfone"
+INCREMENTAL_TABLES = ["event"]
 
 # airflow vars
 ENV = Variable.get("environment")
@@ -64,7 +65,34 @@ bigfone_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": RAW_SPARK_JOB_PATH,
-            "parameters": [ENV, DATALAKE_BUCKET],
+            "parameters": [ENV, DATALAKE_BUCKET, "{{ ds }}"],
+        }
+    },
+)
+
+sync_metastore_tables_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="sync-hive-metastore-raw-tables",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": BASE_SPARK_JOB_PATH + "sync_metastore_tables.py",
+            "parameters": [
+                DATALAKE_BUCKET,
+                LayerEnum.RAW.value,
+                SOURCE,
+                "--all-tables",
+            ],
+        }
+    },
+)
+
+validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
+    task_id="validate-sync-hive-metastore-table",
+    json={
+        "spark_python_task": {
+            "python_file": BASE_SPARK_JOB_PATH + "validate_sync_metastore_tables.py",
+            "parameters": [LayerEnum.RAW.value, SOURCE, "--all-tables"],
         }
     },
 )
@@ -85,8 +113,21 @@ file_list = FileService.list_sql_files_without_extension_from_layer(
     SOURCE, LayerEnum.CLEAN.value
 )
 
-clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(dag, file_list)
+for incremental_table in INCREMENTAL_TABLES:
+    file_list.remove(incremental_table)
+
+clean_sub_dags_full = clean_sub_dag.build_subdags_from_sql_files(dag, file_list)
+
+clean_sub_dags_incremental = clean_sub_dag.build_subdags_from_sql_files(
+    dag, INCREMENTAL_TABLES, is_incremental=True, partitions=["year", "month", "day"]
+)
 
 create_cluster_task >> bigfone_to_datalake_raw_task >> list(
-    clean_sub_dags.values()
+    clean_sub_dags_full.values()
 ) >> terminate_cluster_task
+
+bigfone_to_datalake_raw_task >> list(
+    clean_sub_dags_incremental.values()
+) >> terminate_cluster_task
+
+bigfone_to_datalake_raw_task >> sync_metastore_tables_task >> validate_sync_metastore_table_task >> terminate_cluster_task
