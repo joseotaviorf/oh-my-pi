@@ -8,6 +8,8 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
+from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
+
 
 SOURCE = "metabase"
 
@@ -22,6 +24,7 @@ DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 # spark and databricks vars
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
+BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{SOURCE}"
 CLUSTER_DESCRIPTION = Variable.get(
     "databricks_bietlejuice_metabase_cluster", deserialize_json=True
@@ -80,6 +83,35 @@ def create_tables_sub_dag(sub_dag_name, table_name, extraction_type):
         },
     )
 
+    sync_metastore_raw_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        task_id="sync-hive-metastore-raw-table",
+        dag=tables_sub_dag,
+        json={
+            "spark_python_task": {
+                "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables.py",
+                "parameters": [
+                    DATALAKE_BUCKET,
+                    LayerEnum.RAW.value,
+                    SOURCE,
+                    "--table-name",
+                    table_name,
+                ],
+            }
+        },
+    )
+
+    validate_sync_metastore_raw_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=tables_sub_dag,
+        task_id="validate-sync-hive-metastore-raw-table",
+        json={
+            "spark_python_task": {
+                "python_file": BASE_SPARK_JOBS_PATH
+                + "validate_sync_metastore_tables.py",
+                "parameters": [LayerEnum.RAW.value, SOURCE, "--table-name", table_name],
+            }
+        },
+    )
+
     load_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
         task_id=f"load-{slugged_table_name}-to-clean",
         dag=tables_sub_dag,
@@ -87,6 +119,40 @@ def create_tables_sub_dag(sub_dag_name, table_name, extraction_type):
             "spark_python_task": {
                 "python_file": f"{SPARK_JOBS_PATH}load_{extraction_type}_data_into_datalake_clean.py",
                 "parameters": [ENV, SOURCE, DATALAKE_BUCKET, "{{ ds }}", table_name],
+            }
+        },
+    )
+
+    sync_metastore_clean_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        task_id="sync-hive-metastore-clean-table",
+        dag=tables_sub_dag,
+        json={
+            "spark_python_task": {
+                "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables.py",
+                "parameters": [
+                    DATALAKE_BUCKET,
+                    LayerEnum.CLEAN.value,
+                    SOURCE,
+                    "--table-name",
+                    table_name,
+                ],
+            }
+        },
+    )
+
+    validate_sync_metastore_clean_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=tables_sub_dag,
+        task_id="validate-sync-hive-metastore-clean-table",
+        json={
+            "spark_python_task": {
+                "python_file": BASE_SPARK_JOBS_PATH
+                + "validate_sync_metastore_tables.py",
+                "parameters": [
+                    LayerEnum.CLEAN.value,
+                    SOURCE,
+                    "--table-name",
+                    table_name,
+                ],
             }
         },
     )
@@ -111,6 +177,9 @@ def create_tables_sub_dag(sub_dag_name, table_name, extraction_type):
     )
 
     load_to_raw_task >> load_to_clean_task >> create_clean_external_table_task
+    load_to_raw_task >> sync_metastore_raw_table_task >> validate_sync_metastore_raw_table_task
+    load_to_clean_task >> sync_metastore_clean_table_task >> validate_sync_metastore_clean_table_task
+
     return tables_sub_dag
 
 
