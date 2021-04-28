@@ -3,9 +3,6 @@
 #  (that uses DatalakeSubdag or DWSubdag) remove the DAG from the list bellow.
 
 - bietlejuice.braze_events
-- bietlejuice.dw_proposal
-- bietlejuice.dw_region
-- bietlejuice.dw_reservation
 - bietlejuice.dw_teravoz
 - bietlejuice.enrich_amplitude_visit
 - bietlejuice.enrich_bigfone_events
