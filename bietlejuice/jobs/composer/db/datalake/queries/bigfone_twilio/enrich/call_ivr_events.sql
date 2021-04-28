@@ -25,7 +25,10 @@ FROM
 	datalake_bigfone_events.events
 WHERE
 	provider = 'twilio'
-	AND GET_JSON_OBJECT(metadata,'$.event_data.WorkflowName') = 'IVR Events'
+	AND (
+		GET_JSON_OBJECT(metadata,'$.event_data.WorkflowName') = 'IVR Events'
+		OR CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.scheduled') AS BOOLEAN) = TRUE
+	)
 	AND year = {year}
 	AND month = {month}
 	AND day = {day}
