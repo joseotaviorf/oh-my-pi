@@ -1,6 +1,7 @@
 from datetime import datetime
 import json
 import pendulum
+import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from airflow.models import Variable
 from airflow.operators.quintoandar_databricks import (
@@ -85,6 +86,33 @@ linkedin_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
+sync_metastore_tables_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="sync-hive-metastore-raw-tables",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": SPARK_JOBS_PATH + "/sync_metastore_tables.py",
+            "parameters": [
+                DATALAKE_BUCKET,
+                LayerEnum.RAW.value,
+                SOURCE,
+                "--all-tables",
+            ],
+        }
+    },
+)
+
+validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
+    task_id="validate-sync-hive-metastore-table",
+    json={
+        "spark_python_task": {
+            "python_file": SPARK_JOBS_PATH + "/validate_sync_metastore_tables.py",
+            "parameters": [LayerEnum.RAW.value, SOURCE, "--all-tables"],
+        }
+    },
+)
+
 clean_sub_dag = DatalakeSubDAG(
     dag_id=DAG_ID,
     start_date=MAIN_START_DATE,
@@ -112,3 +140,10 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 create_cluster_task >> linkedin_to_datalake_raw_task >> list(
     clean_sub_dags.values()
 ) >> terminate_cluster_task
+
+airflow_helpers.chain(
+    linkedin_to_datalake_raw_task,
+    sync_metastore_tables_task,
+    validate_sync_metastore_table_task,
+    terminate_cluster_task,
+)
