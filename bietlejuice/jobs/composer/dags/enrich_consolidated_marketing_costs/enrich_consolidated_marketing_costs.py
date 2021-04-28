@@ -4,6 +4,7 @@ import pendulum
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
+    QuintoAndarDatabricksSubmitRunOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 
@@ -24,6 +25,7 @@ BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/enrich_{SOURCE}/"
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
+ARTIFACTS_S3_BUCKET = Variable.get("artifacts_default_bucket")
 
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
     Variable.get("databricks_s3_bucket"), DAG_ID
@@ -32,7 +34,9 @@ CLUSTER_DESCRIPTION = Variable.get(
     "databricks_bietlejuice_marketing_costs_cluster", deserialize_json=True
 )
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
-
+CUSTOM_LIBRARIES = [
+    {"jar": f"{ARTIFACTS_S3_BUCKET}/jars/RedshiftJDBC42-no-awssdk-1.2.12.1017.jar"}
+]
 local_tz = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz)
 MAIN_SCHEDULE_INTERVAL = None
@@ -54,7 +58,10 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=CLUSTER_DESCRIPTION,
+    libraries=CUSTOM_LIBRARIES,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -82,4 +89,18 @@ enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(
     dag, sql_file_list, is_incremental=True, partitions=["id_date"]
 )
 
-create_cluster_task >> list(enrich_sub_dags.values()) >> terminate_cluster_task
+consolidated_sharing_rules = QuintoAndarDatabricksSubmitRunOperator(
+    task_id=f"load-mkt-consolidated-sharing-rules-to-enrich",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": f"{SPARK_JOBS_PATH}load_sharing_rules_to_datalake.py",
+            "parameters": [ENV, DATALAKE_BUCKET],
+        }
+    },
+)
+
+base_enrich_tasks = list(enrich_sub_dags.values())
+base_enrich_tasks.append(consolidated_sharing_rules)
+
+create_cluster_task >> base_enrich_tasks >> terminate_cluster_task
