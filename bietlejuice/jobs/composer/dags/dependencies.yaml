@@ -407,9 +407,7 @@ bietlejuice.enrich_offer:
   - bietlejuice.ebdb:create-clean-offer-aud-in-data-lake
   - bietlejuice.enrich_booking:load-booking-to-enrich
   - bietlejuice.enrich_ebdb_user_revision_entity:load-user-revision-entity-to-enrich
-  - bietlejuice.enrich_firestore:load-sale-offer-to-enrich
-  - bietlejuice.enrich_firestore:load-monday-to-enrich
-  - bietlejuice.enrich_firestore:load-rent-offer-to-enrich
+  - bietlejuice.enrich_firestore
   - bietlejuice.godfather:load-business-offer
 
 bietlejuice.enrich_proposal:
