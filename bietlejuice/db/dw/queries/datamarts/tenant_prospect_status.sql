@@ -69,12 +69,16 @@ churn_dates AS (
     SELECT
         b.*,
         LAG(event_type) OVER(PARTITION BY sk_client, city_group ORDER BY ts_event) AS last_event,
+        LAG(ts_event) OVER(PARTITION BY sk_client, city_group ORDER BY ts_event) AS ts_last_event,
         LEAD(ts_event) OVER(PARTITION BY sk_client, city_group ORDER BY ts_event ASC, event_type DESC) AS ts_next_event,
         CASE
             WHEN event_type LIKE 'contract signed%'
                 THEN ts_event
             WHEN event_type = 'contract ended' AND last_event LIKE 'contract signed%'
                 THEN ts_event
+            WHEN event_type = 'contract ended' AND last_event = 'rent_flow'
+                    AND DATEDIFF(DAY, ts_last_event, COALESCE(ts_next_event, CURRENT_DATE)) > 35
+                THEN DATEADD(DAY, 35, ts_last_event)
             WHEN event_type NOT LIKE 'contract%'
                     AND DATEDIFF(DAY, ts_event, COALESCE(ts_next_event, CURRENT_DATE)) > 35
                 THEN DATEADD(DAY, 35, ts_event)
