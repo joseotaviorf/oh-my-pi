@@ -96,6 +96,11 @@ marketing_offline_manual_share_cost_center:
     sheet_name: offline_manual_share_cost_center
     clean_table_name: marketing_offline_manual_share_cost_center
 
+retencao_exclusividade_contato_ativo:
+    sheet_id: 1VT9AgLJYbGq5ftcBvSY2C-M99bVmpnmO7XFeueh_fmI
+    sheet_name: bases_cruzadas
+    clean_table_name: retention_exclusivity_active_contact
+
 taxonomy_affiliates:
     sheet_id: 1e3806Tog1avS6uVO6ACUqqcqRpwcJffDZhRvgE8A3V4
     sheet_name: taxonomy_affiliates
