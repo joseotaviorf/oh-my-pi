@@ -481,7 +481,7 @@ bietlejuice.regions_polygon:
   - bietlejuice.enrich_region:load-region-to-enrich
   - bietlejuice.ebdb:create-clean-polygon-region-in-data-lake
 
-bietlejuice.tenant_booking_review:
+bietlejuice.dw_tenant_booking_review:
   - bietlejuice.ebdb:create-clean-visit-in-data-lake
   - bietlejuice.ebdb:create-clean-booking-in-data-lake
   - bietlejuice.insider:load-review-feature-to-datalake-clean
