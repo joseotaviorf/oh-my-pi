@@ -11,7 +11,7 @@ WITH cte_tasks AS(
       >, 
       comentario STRING,
       origem STRING,
-      dataVisita STRING,
+      dataVisita DATE,
       descricao STRING,
       fase STRING,
       imovelId STRING,
@@ -77,13 +77,25 @@ SELECT
     json_metadata.assunto AS subject,
     tags,
     is_resolved,
-    ts_completed,
-    ts_silenced_until,
+    CAST(GET_JSON_OBJECT(REPLACE(completed_date_object, '$', ''), '$.date') AS TIMESTAMP) ts_completed,
+    CAST(GET_JSON_OBJECT(REPLACE(silenced_until_date_object, '$', ''), '$.date') AS TIMESTAMP) AS ts_silenced_until,
     CAST(GET_JSON_OBJECT(REPLACE(start_date_object, '$', ''), '$.date') AS TIMESTAMP) AS ts_start,
-    CAST(COALESCE(ts_visit, json_metadata.dataVisita) AS TIMESTAMP) AS ts_visit,
-    CAST(COALESCE(ts_created, json_metadata.dataCriacao) AS TIMESTAMP) AS ts_created,
+    COALESCE(dt_visit, json_metadata.dataVisita) AS dt_visit,
+    CAST(
+      COALESCE(
+        GET_JSON_OBJECT(REPLACE(created_date_object, '$', ''), '$.date'), 
+        json_metadata.dataCriacao
+      ) 
+      AS TIMESTAMP
+    ) AS ts_created,
     CAST(GET_JSON_OBJECT(REPLACE(origin_date_object, '$', ''), '$.date') AS TIMESTAMP) AS ts_origin,
-    CAST(COALESCE(ts_fup, json_metadata.dataFup) AS TIMESTAMP) AS ts_fup,
+    FROM_UNIXTIME(
+      COALESCE(
+        unix_fup/1000, 
+        CAST(json_metadata.dataFup AS DOUBLE)/1000
+      ), 
+      'yyyy-MM-dd HH:mm:ss'
+    ) AS ts_fup,
     year,
     month,
     day

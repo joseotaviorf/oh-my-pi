@@ -30,7 +30,7 @@ SELECT DISTINCT
   is_resolved,
   ts_start,
   ts_completed,
-  ts_visit,
+  dt_visit,
   ts_created,
   ts_silenced_until,
   ts_origin,
