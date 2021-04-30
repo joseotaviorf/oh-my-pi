@@ -2,6 +2,7 @@ from datetime import datetime
 
 import pendulum
 from airflow.models import DAG, Variable
+from airflow.utils import helpers as airflow_helpers
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -109,6 +110,48 @@ for app_group in APP_GROUPS:
         },
     )
 
-    create_cluster_task >> load_to_raw_task >> clean_sub_dags.pop(
-        f"events_{app_group}"
-    ) >> terminate_cluster_task
+    sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        task_id=f"sync-hive-metastore-events-{app_group}",
+        dag=dag,
+        json={
+            "spark_python_task": {
+                "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables.py",
+                "parameters": [
+                    DATALAKE_BUCKET,
+                    LayerEnum.RAW.value,
+                    SOURCE,
+                    "--table-name",
+                    f"events_{app_group}",
+                ],
+            }
+        },
+    )
+
+    validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=dag,
+        task_id=f"validate-sync-hive-metastore-events-{app_group}",
+        json={
+            "spark_python_task": {
+                "python_file": BASE_SPARK_JOBS_PATH
+                + "validate_sync_metastore_tables.py",
+                "parameters": [
+                    LayerEnum.RAW.value,
+                    SOURCE,
+                    "--table-name",
+                    f"events_{app_group}",
+                ],
+            }
+        },
+    )
+    airflow_helpers.chain(
+        load_to_raw_task,
+        sync_metastore_table_task,
+        validate_sync_metastore_table_task,
+        terminate_cluster_task,
+    )
+    airflow_helpers.chain(
+        create_cluster_task,
+        load_to_raw_task,
+        clean_sub_dags.pop(f"events_{app_group}"),
+        terminate_cluster_task,
+    )
