@@ -178,9 +178,21 @@ fact_rent AS (
 	FROM fact_house_listing_flows hlf
 	JOIN source_ops_rent AS sor
 	  ON sor.sk_house_listing_flow = hlf.sk_house_listing_flow
-)
+), union_all AS (
 SELECT *
 FROM fact_rent
 	UNION ALL
 	SELECT *
-	FROM fact_sale;
+	FROM fact_sale
+)
+SELECT
+        *,
+        row_number() OVER(PARTITION BY sk_house_listing_flow ORDER BY NULLIF(sk_prospect_date,-1)) AS aux_rn_prospect, -- column to help differentiate the prospect with equal dates
+        dense_rank() OVER(PARTITION BY sk_house_listing_flow ORDER BY NULLIF(sk_prospect_date,-1)) AS aux_order_prospect,
+        dense_rank() OVER(PARTITION BY sk_house_listing_flow ORDER BY NULLIF(sk_qualified_date,-1)) AS aux_order_qualified,
+        MIN(NULLIF(sk_prospect_date,-1)) OVER(PARTITION BY sk_house_listing_flow) AS first_prospect_date,
+        MAX(NULLIF(sk_prospect_date,-1)) OVER(PARTITION BY sk_house_listing_flow) AS last_prospect_date,
+        MIN(NULLIF(sk_qualified_date,-1)) OVER(PARTITION BY sk_house_listing_flow) AS first_qualified_date,
+        MAX(NULLIF(sk_qualified_date,-1)) OVER(PARTITION BY sk_house_listing_flow) AS last_qualified_date
+FROM
+    union_all
