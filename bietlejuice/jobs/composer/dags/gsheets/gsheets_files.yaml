@@ -76,6 +76,11 @@ marketing_costs_google_ad_type_flags:
     sheet_name: ad_type_flags
     clean_table_name: marketing_costs_google_ad_type_flags
 
+marketing_manual_campaign_cities:
+    sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
+    sheet_name: Campaign_City
+    clean_table_name: marketing_manual_campaign_cities
+
 marketing_manual_costs_google:
     sheet_id: 1e1FoBoCN0XYH3vo8u0aZ-GocU453gkfDIasX0ivDonc
     sheet_name: Google Costs

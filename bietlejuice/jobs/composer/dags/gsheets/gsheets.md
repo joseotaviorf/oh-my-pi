@@ -30,6 +30,7 @@ This pipeline produces the following output tables:
     - `marketing_costs_campaign_city`
     - `marketing_costs_full_taxonomy`
     - `marketing_costs_google_ad_type_flags`
+    - `marketing_manual_campaign_cities`
     - `marketing_costs_kenshoo_configuration`
     - `marketing_costs_manual_costs_google`
     - `marketing_costs_manual_shared_costs`
