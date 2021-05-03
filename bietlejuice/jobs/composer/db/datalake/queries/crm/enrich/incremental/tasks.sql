@@ -77,10 +77,10 @@ SELECT
     json_metadata.assunto AS subject,
     tags,
     is_resolved,
-    CAST(GET_JSON_OBJECT(REPLACE(completed_date_object, '$', ''), '$.date') AS TIMESTAMP) ts_completed,
+    CAST(GET_JSON_OBJECT(REPLACE(completed_date_object, '$', ''), '$.date') AS TIMESTAMP) AS ts_completed,
     CAST(GET_JSON_OBJECT(REPLACE(silenced_until_date_object, '$', ''), '$.date') AS TIMESTAMP) AS ts_silenced_until,
     CAST(GET_JSON_OBJECT(REPLACE(start_date_object, '$', ''), '$.date') AS TIMESTAMP) AS ts_start,
-    COALESCE(dt_visit, json_metadata.dataVisita) AS dt_visit,
+    DATE(COALESCE(dt_visit, json_metadata.dataVisita)) AS dt_visit,
     CAST(
       COALESCE(
         GET_JSON_OBJECT(REPLACE(created_date_object, '$', ''), '$.date'), 
