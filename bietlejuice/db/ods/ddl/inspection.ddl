@@ -23,6 +23,8 @@ create table if not exists inspection (
   os_owner_approval varchar(255),
   ts_updated timestamp,
   ts_expired timestamp,
+  ts_first_synced timestamp,
+  ts_last_synced timestamp,
   id_ref varchar(255),
   "type" varchar(255),
   "mode" varchar(255),

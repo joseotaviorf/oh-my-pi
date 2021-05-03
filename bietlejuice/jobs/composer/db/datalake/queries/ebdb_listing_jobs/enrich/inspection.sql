@@ -9,7 +9,19 @@ with
              datalake_ebdb_clean.inspection_item
         group by
             id_inspection
-    )
+    ),
+    inspection_aud_sync as(
+    SELECT DISTINCT
+        ia.id_inspection,
+        FIRST_VALUE(ia.ts_last_synced) OVER w as ts_first_synced,
+        LAST_VALUE(ia.ts_last_synced) OVER w as ts_last_synced
+    FROM
+        datalake_ebdb_clean.inspection_aud ia
+    WHERE
+        ia.status = 'Revisada'
+    WINDOW w AS (PARTITION BY ia.id_inspection, status ORDER BY IA.TS_LAST_SYNCED
+                 ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+)
 select
     v.id,
     v.id_house,
@@ -57,8 +69,12 @@ select
     v.ts_partial_owner_report_sent,
     v.ts_expired,
     v.ts_created,
-    v.ts_updated
+    v.ts_updated,
+    ias.ts_first_synced,
+    ias.ts_last_synced
 from
     datalake_ebdb_clean.inspection as v
     left join comments c
         on v.id = c.id_inspection
+    left join inspection_aud_sync ias
+        on v.id = ias.id_inspection

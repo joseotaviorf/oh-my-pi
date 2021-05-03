@@ -22,6 +22,8 @@ select
 	v.soAprovacaoProprietario as os_owner_approval,
 	v.atualizadoEm as ts_updated,
 	v.expiraEm as ts_expired,
+ 	vistoria_aud.ts_first_synced,
+  	vistoria_aud.ts_last_synced,
 	v.ref_id as id_ref,
 	v.tipo as "type",
 	v.mode,
@@ -47,5 +49,16 @@ select
   coalesce((select 1 from ItemVistoria ii_tenant where ii_tenant.vistoria_id = v.id and ii_tenant.comentarioInquilino is not null limit 1), 0) as has_tenant_comment,
   coalesce((select 1 from ItemVistoria ii_owner where ii_owner.vistoria_id = v.id and ii_owner.comentarioProprietario is not null limit 1), 0) as has_owner_comment
 from Vistoria v
+left join (    
+	select 
+        va.id,
+        min(va.lastSynced) as ts_first_synced,
+        max(va.lastSynced) as ts_last_synced
+    from 
+        Vistoria_AUD va
+    where 
+        va.status = 'Revisada' and lastSynced is not null 
+    group by 1
+) vistoria_aud on v.id = vistoria_aud.id
 where date(coalesce(v.criadoEm, '1900-01-01 00:00:00')) <= date('{}')
 ;

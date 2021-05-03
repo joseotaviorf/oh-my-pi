@@ -8,6 +8,8 @@ select
   status,
   ts_created,
   ts_expired,
+  ts_first_synced,
+  ts_last_synced,
   is_tenant_approved::boolean,
   is_owner_approved::boolean,
   coalesce(has_inspector_comment::boolean, false) as has_inspector_comment,

@@ -7,6 +7,8 @@ create table if not exists dim_inspection (
   status varchar,
   ts_created timestamp,
   ts_expired timestamp,
+  ts_first_synced timestamp,
+  ts_last_synced timestamp,
   is_tenant_approved boolean,
   is_owner_approved boolean,
   has_inspector_comment boolean,
