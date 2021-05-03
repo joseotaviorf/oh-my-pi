@@ -11,7 +11,8 @@ Daily after enrich layers. More information about run time [here]({chart_url}{da
 
 ### Outputs
 
-- `enrich_consolidated_marketing_costs.consolidated_google_costs`
+- `consolidated_google_costs`
+- `consolidated_media_costs`
 
 ### Responsible Data Team
 ​

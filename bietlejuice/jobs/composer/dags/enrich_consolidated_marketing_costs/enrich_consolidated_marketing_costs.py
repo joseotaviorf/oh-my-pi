@@ -89,6 +89,8 @@ enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(
     dag, sql_file_list, is_incremental=True, partitions=["id_date"]
 )
 
+consolidated_media_costs = enrich_sub_dags.pop("consolidated_media_costs")
+
 consolidated_sharing_rules = QuintoAndarDatabricksSubmitRunOperator(
     task_id=f"load-mkt-consolidated-sharing-rules-to-enrich",
     dag=dag,
@@ -103,4 +105,4 @@ consolidated_sharing_rules = QuintoAndarDatabricksSubmitRunOperator(
 base_enrich_tasks = list(enrich_sub_dags.values())
 base_enrich_tasks.append(consolidated_sharing_rules)
 
-create_cluster_task >> base_enrich_tasks >> terminate_cluster_task
+create_cluster_task >> base_enrich_tasks >> consolidated_media_costs >> terminate_cluster_task
