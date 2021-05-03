@@ -58,8 +58,10 @@ environment-python2:
 	@pyenv local bi-etl-ejuice-python2
 
 .PHONY: requirements-python2
+# install ordered requirements for python2, then test and lint requirements in any order
 requirements-python2:
-	@python -m pip install -r requirements.txt --extra-index-url https://quintoandar.github.io/python-package-server/
+	@python -m pip install --upgrade pip
+	@xargs -L 1 python -m pip install --extra-index-url https://quintoandar.github.io/python-package-server/ < requirements.txt
 	@make requirements-test-python2
 	@make requirements-lint-python2
 
