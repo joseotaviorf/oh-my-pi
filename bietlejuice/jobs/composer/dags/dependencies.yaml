@@ -405,12 +405,10 @@ bietlejuice.enrich_nps_answer_drivers:
 bietlejuice.enrich_offer:
   - bietlejuice.ebdb:create-clean-offer-in-data-lake
   - bietlejuice.ebdb:create-clean-offer-aud-in-data-lake
-  - bietlejuice.enrich_booking.load-booking-to-enrich:load-enrich-booking
-  - bietlejuice.enrich_ebdb_user_revision_entity.load-user-revision-entity-to-enrich:load-enrich-user-revision-entity
-  - bietlejuice.enrich_firestore.load-sale-offer-to-enrich:load-enrich-sale-offer
-  - bietlejuice.enrich_firestore.load-monday-to-enrich:load-enrich-monday
-  - bietlejuice.enrich_firestore.load-rent-offer-to-enrich:load-enrich-rent-offer
-  - bietlejuice.godfather.load-business-offer:create-clean-offer-in-data-lake
+  - bietlejuice.enrich_booking:load-booking-to-enrich
+  - bietlejuice.enrich_ebdb_user_revision_entity:load-user-revision-entity-to-enrich
+  - bietlejuice.enrich_firestore
+  - bietlejuice.godfather:load-business-offer
 
 bietlejuice.enrich_proposal:
   - bietlejuice.ebdb:create-clean-proposal-in-data-lake
