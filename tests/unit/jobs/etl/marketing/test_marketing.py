@@ -191,7 +191,7 @@ class TestMarketing(object):
                                                         mock__delete_old_entries,
                                                         marketing):
         # arrange
-        table_name = 'dim_google_ad'
+        table_name = 'dim_trovit_campaign'
 
         # act
         marketing._load_to_prod(table_name)
@@ -249,7 +249,7 @@ class TestMarketing(object):
     @mock.patch.object(BaseETL, 'execute_command')
     def test__delete_old_entries(self, mock_execute_command, marketing):
         # arrange
-        table_name = 'dim_google_keyword'
+        table_name = 'dim_trovit_campaign'
         delete_query = "select * from {table_name} where {sk_field}"
 
         # act

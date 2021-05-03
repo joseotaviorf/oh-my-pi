@@ -18,6 +18,7 @@ class TestLifullCampaigns(object):
                                                                    lifull_campaigns):
         # arrange
         mock_get_job_info_by_id.return_value = {'status': 'FAILED'}
+        mock_start_batch_job.return_value = {'jobName': 'test job'}
 
         # act & assert
         with pytest.raises(RuntimeError):
@@ -55,10 +56,10 @@ class TestLifullCampaigns(object):
             ('col2', str)
         ])
         schema = 'datalake_clean'
-        expect_key = 'clean/marketing/lifull_campaigns/table/acc=None/group_name=group_name/' \
+        expect_key = 'clean/marketing/lifull_campaigns/table/acc=account_id/group_name=group_name/' \
                      'dt_created=2018-01-01/2018-01-01.parquet'
         expect_query_path = '/marketing/lifull_campaigns/raw_to_clean/sql'
-        expect_partition = "dt_created='2018-01-01', acc='None', group_name='group_name'"
+        expect_partition = "dt_created='2018-01-01', acc='account_id', group_name='group_name'"
 
         # act
         lifull_campaigns._move_to_clean(table_name, sql_file_name, group_name, r_cols)
@@ -79,141 +80,21 @@ class TestLifullCampaigns(object):
         r_cols = OrderedDict([
             ('id', str),
             ('name', str),
+            ('account_name', str),
             ('clicks', str),
             ('desktop_cost', str),
             ('mobile_cost', str),
             ('total_cost', str),
             ('curr_date', str)
         ])
-        group_name = mock.ANY
 
         # act
-        lifull_campaigns.move_marketing_lifull_campaigns_to_clean(group_name=mock.ANY)
+        lifull_campaigns.move_marketing_lifull_campaigns_to_clean(group_name='group')
 
         # assert
         mock__move_to_clean.assert_called_once_with(table_name=expected_table_name,
                                                     sql_file_name=expected_sql_file_name,
-                                                    group_name=lifull_campaigns.group_names,
+                                                    group_name='group',
                                                     r_cols=r_cols,
                                                     c_cols=r_cols)
 
-    @mock.patch.object(LifullCampaigns, '_load_table')
-    @mock.patch.object(LifullCampaigns, '_load_to_staging')
-    def test_load_to_staging(self, mock__load_to_staging, mock__load_table,
-                             lifull_campaigns):
-        # arrange
-        dw_table_name = mock.ANY
-        query = '{date} {account}'
-        formatted_query = '2018-01-01 default'
-        mock__load_table.return_value = query
-
-        # act
-        lifull_campaigns.load_to_staging(dw_table_name)
-
-        # assert
-        mock__load_to_staging.assert_called_once_with(dw_table_name, formatted_query)
-
-    @mock.patch.object(LifullCampaigns, '_load_dim_to_staging')
-    def test__load_table_dim(self, mock__load_dim_to_staging, lifull_campaigns):
-        # arrange
-        table_name = 'dim_foo_bar'
-
-        # act
-        lifull_campaigns._load_table(table_name)
-
-        # assert
-        mock__load_dim_to_staging.assert_called_once_with(table_name)
-
-    @mock.patch.object(LifullCampaigns, '_load_fact_to_staging')
-    def test__load_table_fact(self, mock__load_fact_to_staging, lifull_campaigns):
-        # arrange
-        table_name = 'fact_foo_bar'
-
-        # act
-        lifull_campaigns._load_table(table_name)
-
-        # assert
-        mock__load_fact_to_staging.assert_called_once_with(table_name)
-
-    def test__load_table_not_fact_nor_dim(self, lifull_campaigns):
-        # arrange
-        table_name = mock.ANY
-
-        # act
-        with pytest.raises(AttributeError):
-            lifull_campaigns._load_table(table_name)
-
-    @mock.patch.object(BaseETL, 'get_query_from_file_name')
-    def test__load_dim_to_staging(self, mock_get_query_from_file_name, lifull_campaigns):
-        # arrange
-        table_name = mock.ANY
-        expected_full_load_query = 'marketing/lifull_campaigns/clean_to_staging/{}.sql'.format(table_name)
-
-        # act
-        lifull_campaigns._load_dim_to_staging(table_name)
-
-        # assert
-        mock_get_query_from_file_name.assert_called_once()
-        mock_get_query_from_file_name.assert_called_with('{}/{}'.format(DATALAKE_QUERIES_DIR, expected_full_load_query))
-
-    @mock.patch.object(BaseETL, 'get_query_from_file_name')
-    @mock.patch.object(LifullCampaigns, '_is_prod_table_empty')
-    def test__load_fact_to_staging_empty(self, mock__is_prod_table_empty, mock_get_query_from_file_name,
-                                         lifull_campaigns):
-        # arrange
-        table_name = mock.ANY
-        expected_full_load_query = 'marketing/lifull_campaigns/clean_to_staging/{}.sql'.format(table_name)
-        mock__is_prod_table_empty.return_value = True
-
-        # act
-        lifull_campaigns._load_fact_to_staging(table_name)
-
-        # assert
-        mock_get_query_from_file_name.assert_called_once()
-        mock_get_query_from_file_name.assert_called_with('{}/{}'.format(DATALAKE_QUERIES_DIR, expected_full_load_query))
-
-    @mock.patch.object(BaseETL, 'get_query_from_file_name')
-    @mock.patch.object(LifullCampaigns, '_is_prod_table_empty')
-    @mock.patch.object(BaseETL, 'execute_command')
-    def test__load_fact_to_staging_not_empty(self, mock_execute_command, mock__is_prod_table_empty,
-                                             mock_get_query_from_file_name, lifull_campaigns):
-        # arrange
-        table_name = mock.ANY
-        expected_full_load_query = 'marketing/lifull_campaigns/clean_to_staging/{}.sql'.format(table_name)
-        mock__is_prod_table_empty.return_value = False
-        int_date = int(lifull_campaigns.execution_date.strftime("%Y%m%d"))
-        expected_args = [({'command': 'DELETE FROM staging.<ANY> where sk_date = {0}'.format(int_date), 'commit': True,
-                           'db_enum': EnumDB.BI_DW, 'encoding': 'utf-8'},),
-                         ({'command': 'DELETE FROM marketing.<ANY> where sk_date = {0}'.format(int_date),
-                           'commit': True, 'db_enum': EnumDB.BI_DW, 'encoding': 'utf-8'},)]
-
-        # act
-        lifull_campaigns._load_fact_to_staging(table_name)
-
-        # assert
-        mock_get_query_from_file_name.assert_called_once()
-        mock_get_query_from_file_name.assert_called_with('{}/{}'.format(DATALAKE_QUERIES_DIR, expected_full_load_query))
-        assert mock_execute_command.call_count == 2
-        assert mock_execute_command.call_args_list == expected_args
-
-    @mock.patch.object(LifullCampaigns, '_load_to_prod')
-    def test_load_to_prod(self, mock__load_to_prod, lifull_campaigns):
-        # arrange
-        table_name = 'dim_table'
-
-        # act
-        lifull_campaigns.load_to_prod(table_name)
-
-        # assert
-        mock__load_to_prod.assert_called_once_with(table_name)
-
-    @mock.patch.object(LifullCampaigns, '_load_dim_to_staging')
-    def test_load_to_prod(self, mock__load_dim_to_staging, lifull_campaigns):
-        # arrange
-        table_name = 'dim_{}'.format(mock.ANY)
-
-        # act
-        lifull_campaigns._load_table(table_name)
-
-        # assert
-        mock__load_dim_to_staging.assert_called_once_with(table_name)
