@@ -57,3 +57,7 @@ d013d:
 p014p:
   query: marketing/costs/p014p.sql
   funnel_side: partners
+
+d015d:
+  query: marketing/costs/d015d.sql
+  funnel_side: demand
