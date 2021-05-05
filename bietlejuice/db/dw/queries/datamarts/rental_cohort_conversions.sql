@@ -301,8 +301,8 @@ SELECT
     dp.guarantee,
     CASE
         WHEN dhl.is_b2b = TRUE THEN 'B2B'
-        WHEN ciq.is_quintoandar_consultant = TRUE THEN 'CIQ'
-        WHEN dhl.is_b2b = FALSE OR ciq.is_quintoandar_consultant = FALSE THEN 'FALSE'
+        WHEN ciq.sk_house_listing IS NOT NULL THEN 'CIQ'
+        WHEN dhl.is_b2b = FALSE OR ciq.sk_house_listing IS NULL THEN 'FALSE'
     END AS is_b2b,
     dr.city_group,
     db.mkt_channel AS demand_mkt_channel_booking,
