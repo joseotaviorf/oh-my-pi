@@ -1,5 +1,0 @@
-# Config for listing_demand_penetration
----
-streams:
-  - direction: 'upstream'
-    task_ids: ['dw_rent_flow_interactions']

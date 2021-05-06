@@ -1,0 +1,5 @@
+# Config for rental_marketplace_flows
+---
+streams:
+  - direction: 'upstream'
+    task_ids: ['dw_rent_flow_interactions', 'dw_tenant_prospect_status']
