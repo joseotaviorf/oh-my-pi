@@ -1,7 +1,17 @@
 # Temporary file for controlling the turning on of the Hive Metastore sync task
 #   in the DAGs. For activating the task sync-hive-metastore-table for a DAG
-#  (that uses DatalakeSubdag or DWSubdag) remove the DAG from the list bellow.
+#   (that uses DatalakeSubdag, DWSubdag or IncrementalDWSubDAG) remove the DAG
+#   from the list bellow.
 
+- dw_braze_events_user_centric
+- dw_braze_events_user_dispatch
+- dw_marketing_costs
+- dw_marketing_costs_criteo_campaigns
+- dw_marketing_costs_facebook_insights
+- dw_marketing_costs_linkedin
+- dw_marketing_costs_mitula
+- dw_marketing_costs_rtb_campaigns
+- dw_marketing_costs_trovit
 - bietlejuice.dw_teravoz
 - bietlejuice.enrich_amplitude_visit
 - bietlejuice.enrich_bigfone_events
