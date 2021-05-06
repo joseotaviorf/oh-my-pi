@@ -14,8 +14,10 @@ SELECT
   GET_JSON_OBJECT(moa.updated_message, '$.pessoas.value') AS id_consultant,
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.text1.value') AS BIGINT) AS id_agent,
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.text5.value') AS BIGINT) AS id_fifty_agent,
+  CAST(REGEXP_EXTRACT(GET_JSON_OBJECT(moa.updated_message, '$.pessoas0.value'), '(\\w+)') AS BIGINT) AS id_legal_risk_analyst,
   CAST(REGEXP_EXTRACT(GET_JSON_OBJECT(moa.updated_message, '$.lista_suspensa.value'), '(\\w+)') AS BIGINT) AS real_estate_register_office_number,
-  CAST(REGEXP_EXTRACT(GET_JSON_OBJECT(moa.updated_message, '$.forma_de_pagamento4.value'), '(\\w+)') AS BIGINT) AS payment_method,  
+  CAST(REGEXP_EXTRACT(GET_JSON_OBJECT(moa.updated_message, '$.forma_de_pagamento4.value'), '(\\w+)') AS BIGINT) AS payment_method,
+  GET_JSON_OBJECT(moa.updated_message, '$.status06.value') AS credit_model,
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.numbers.value') AS FLOAT) AS offer_acceptance_probability,
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.valor_do_an_ncio.value') AS FLOAT) AS listing_sale_price,
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.valor_da_proposta.value') AS FLOAT) AS price_offered_by_buyer,
@@ -31,10 +33,11 @@ SELECT
   GET_JSON_OBJECT(moa.updated_message, '$.group.title') AS status,
   GET_JSON_OBJECT(moa.updated_message, '$.status_de_negocia__o.value') AS offer_status,
   GET_JSON_OBJECT(moa.updated_message, '$.status88.value') AS bank_analysis_status,
-  GET_JSON_OBJECT(moa.updated_message, '$.an_lise_de_cr_dito.value') AS credit_status, 
+  GET_JSON_OBJECT(moa.updated_message, '$.an_lise_de_cr_dito.value') AS credit_status,
   GET_JSON_OBJECT(moa.updated_message, '$.status9.value') AS notary_office_status,
   GET_JSON_OBJECT(moa.updated_message, '$.cart_rio_de_notas.value') AS real_estate_register_office_status,
   GET_JSON_OBJECT(moa.updated_message, '$.status4.value') AS house_dilligence_status,
+  GET_JSON_OBJECT(moa.updated_message, '$.status15.value') AS report_dilligence_status,
   GET_JSON_OBJECT(moa.updated_message, '$.status6.value') AS seller_dilligence_status,
   GET_JSON_OBJECT(moa.updated_message, '$.status.value') AS sale_agreement_status,
   GET_JSON_OBJECT(moa.updated_message, '$.ccv.value') AS payment_status,
@@ -81,7 +84,7 @@ SELECT
 FROM
   datalake_firestore_clean.monday AS moa
 INNER JOIN
-  last_update AS lup 
+  last_update AS lup
     ON moa.id = lup.id
     AND moa.ts_updated = lup.ts_last_updated
 )
@@ -93,8 +96,10 @@ SELECT
   moa.id_consultant,
   moa.id_agent,
   moa.id_fifty_agent,
+  moa.id_legal_risk_analyst,
   moa.real_estate_register_office_number,
   moa.payment_method,
+  moa.credit_model,
   moa.offer_acceptance_probability,
   moa.listing_sale_price,
   moa.price_offered_by_buyer,
@@ -114,6 +119,7 @@ SELECT
   moa.notary_office_status,
   moa.real_estate_register_office_status,
   moa.house_dilligence_status,
+  moa.report_dilligence_status,
   moa.seller_dilligence_status,
   moa.sale_agreement_status,
   moa.payment_status,
