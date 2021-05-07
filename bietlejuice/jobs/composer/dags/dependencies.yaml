@@ -20,39 +20,39 @@ bietlejuice.dw_booking:
   - bietlejuice.enrich_booking
   - bietlejuice.ebdb:create-clean-visit-in-data-lake
   - bietlejuice.enrich_amplitude_visit
-  - bietlejuice.gsheets.load-taxonomy-demand-to-clean:load-clean-taxonomy-demand
+  - bietlejuice.gsheets:load-taxonomy-demand-to-clean
 
 bietlejuice.dw_braze_events_user_centric:
-  - bietlejuice.enrich_braze_events_user_centric_periodicity.load-user-events-same-week-to-enrich:load-enrich-user-events-same-week
-  - bietlejuice.enrich_braze_events_user_centric_periodicity.load-user-events-1w-before-to-enrich:load-enrich-user-events-1w-before
-  - bietlejuice.enrich_braze_events_user_centric_periodicity.load-user-events-2w-before-to-enrich:load-enrich-user-events-2w-before
-  - bietlejuice.enrich_braze_events_user_centric_periodicity.load-user-events-3w-before-to-enrich:load-enrich-user-events-3w-before
-  - bietlejuice.enrich_braze_events_user_centric_periodicity.load-user-events-all-time-before-to-enrich:load-enrich-user-events-all-time-before
+  - bietlejuice.enrich_braze_events_user_centric_periodicity:load-user-events-same-week-to-enrich
+  - bietlejuice.enrich_braze_events_user_centric_periodicity:load-user-events-1w-before-to-enrich
+  - bietlejuice.enrich_braze_events_user_centric_periodicity:load-user-events-2w-before-to-enrich
+  - bietlejuice.enrich_braze_events_user_centric_periodicity:load-user-events-3w-before-to-enrich
+  - bietlejuice.enrich_braze_events_user_centric_periodicity:load-user-events-all-time-before-to-enrich
 
 bietlejuice.dw_braze_events_user_dispatch:
-  - bietlejuice.enrich_braze_events_dispatches_user.load-owners-events-to-enrich:load-enrich-owners-events
-  - bietlejuice.enrich_braze_events_dispatches_user.load-tenants-events-to-enrich:load-enrich-tenants-events
+  - bietlejuice.enrich_braze_events_dispatches_user:load-owners-events-to-enrich
+  - bietlejuice.enrich_braze_events_dispatches_user:load-tenants-events-to-enrich
 
 bietlejuice.dw_call:
-  - bietlejuice.enrich_bigfone_twilio.load-call-agents-to-enrich:load-enrich-call-agents
-  - bietlejuice.enrich_bigfone_twilio.load-call-flex-events-to-enrich:load-enrich-call-flex-events
-  - bietlejuice.enrich_bigfone_twilio.load-call-flex-reservations-to-enrich:load-enrich-call-flex-reservations
-  - bietlejuice.enrich_bigfone_twilio.load-call-ivr-events-to-enrich:load-enrich-call-ivr-events
-  - bietlejuice.enrich_bigfone_twilio.load-call-ivr-paths-to-enrich:load-enrich-call-ivr-paths
-  - bietlejuice.enrich_bigfone_twilio.load-inbound-call-locations-to-enrich:load-enrich-inbound-call-locations
+  - bietlejuice.enrich_bigfone_twilio:load-call-agents-to-enrich
+  - bietlejuice.enrich_bigfone_twilio:load-call-flex-events-to-enrich
+  - bietlejuice.enrich_bigfone_twilio:load-call-flex-reservations-to-enrich
+  - bietlejuice.enrich_bigfone_twilio:load-call-ivr-events-to-enrich
+  - bietlejuice.enrich_bigfone_twilio:load-call-ivr-paths-to-enrich
+  - bietlejuice.enrich_bigfone_twilio:load-inbound-call-locations-to-enrich
 
 bietlejuice.dw_chattermill:
-  - bietlejuice.enrich_chattermill.load-responses-to-enrich:load-enrich-responses
+  - bietlejuice.enrich_chattermill:load-responses-to-enrich
 
 bietlejuice.dw_dim_listing_owner:
   - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
   - bietlejuice.ebdb:create-clean-user-preferences-in-data-lake
-  - bietlejuice.enrich_ebdb_listing.load-listing-business-context-to-enrich:load-enrich-listing-business-context
-  - bietlejuice.enrich_ebdb_listing.load-house-to-enrich:load-enrich-house
-  - bietlejuice.enrich_ebdb_user.load-user-to-enrich:load-enrich-user
+  - bietlejuice.enrich_ebdb_listing:load-listing-business-context-to-enrich
+  - bietlejuice.enrich_ebdb_listing:load-house-to-enrich
+  - bietlejuice.enrich_ebdb_user:load-user-to-enrich
 
 bietlejuice.dw_house:
-  - bietlejuice.enrich_ebdb_listing.load-house-to-enrich:load-enrich-house
+  - bietlejuice.enrich_ebdb_listing:load-house-to-enrich
 
 bietlejuice.dw_invoice_entries:
   - bietlejuice.ebdb:create-clean-affiliate-data-in-data-lake
@@ -63,10 +63,10 @@ bietlejuice.dw_invoice_entries:
   - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
   - bietlejuice.ebdb:create-clean-rent-flow-in-data-lake
   - bietlejuice.ebdb:create-clean-user-in-data-lake
-  - bietlejuice.retsuko.load-account-to-clean:create-clean-account-in-data-lake
-  - bietlejuice.retsuko.load-contract-to-clean:create-clean-contract-in-data-lake
-  - bietlejuice.retsuko.load-entry-to-clean:create-clean-entry-in-data-lake
-  - bietlejuice.retsuko.load-invoice-to-clean:create-clean-invoice-in-data-lake
+  - bietlejuice.retsuko:load-account-to-clean
+  - bietlejuice.retsuko:load-contract-to-clean
+  - bietlejuice.retsuko:load-entry-to-clean
+  - bietlejuice.retsuko:load-invoice-to-clean
 
 bietlejuice.dw_marketing_costs:
   - bietlejuice.enrich_marketing_costs.load-google-keywords-performance-report-to-enrich:load-enrich-google-keywords-performance-report
@@ -90,10 +90,10 @@ bietlejuice.dw_marketing_costs_trovit:
   - bietlejuice.trovit
 
 bietlejuice.dw_proposal:
-  - bietlejuice.enrich_proposal.load-proposal-to-enrich:load-enrich-proposal
-  - bietlejuice.enrich_docx.load-credit-evaluation-to-enrich:load-enrich-credit-evaluation
-  - bietlejuice.sorting_hat.load-proposal-to-datalake-clean:create-clean-proposal-in-data-lake
-  - bietlejuice.sorting_hat.load-proposal-version-to-datalake-clean:create-clean-proposal-version-in-data-lake
+  - bietlejuice.enrich_proposal:load-proposal-to-enrich
+  - bietlejuice.enrich_docx:load-credit-evaluation-to-enrich
+  - bietlejuice.sorting_hat:load-proposal-to-datalake-clean
+  - bietlejuice.sorting_hat:load-proposal-version-to-datalake-clean
 
 bietlejuice.dw_quinto_messenger:
   - bietlejuice.enrich_ebdb_customer_contact_identification
@@ -102,50 +102,50 @@ bietlejuice.dw_quinto_messenger:
 bietlejuice.dw_region:
   - bietlejuice.enrich_region
   - bietlejuice.enrich_booking
-  - bietlejuice.enrich_ebdb_listing.load-house-to-enrich:load-enrich-house
+  - bietlejuice.enrich_ebdb_listing:load-house-to-enrich
 
 bietlejuice.dw_rent_fact_listing_owners:
-  - bietlejuice.enrich_listing_owners.load-rental-metrics-to-enrich:load-enrich-rental-metrics
+  - bietlejuice.enrich_listing_owners:load-rental-metrics-to-enrich
 
 bietlejuice.dw_reservation:
   - bietlejuice.enrich_kill_queue
 
 bietlejuice.dw_sale_flows:
   - bietlejuice.ebdb:create-clean-visit-in-data-lake
-  - bietlejuice.enrich_amplitude_visit.load-amplitude-visit-to-enrich:load-enrich-amplitude-visit
-  - bietlejuice.enrich_amplitude_offer.load-sale-offer-raw-events-to-enrich:load-enrich-sale-offer-raw-events
-  - bietlejuice.enrich_booking.load-booking-to-enrich:load-enrich-booking
-  - bietlejuice.enrich_ebdb_listing.load-listing-business-context-to-enrich:load-enrich-listing-business-context
-  - bietlejuice.enrich_sale_flows.load-sale-flow-to-enrich:load-enrich-sale-flow
-  - bietlejuice.gsheets.load-taxonomy-demand-to-clean:load-clean-taxonomy-demand
+  - bietlejuice.enrich_amplitude_visit:load-amplitude-visit-to-enrich
+  - bietlejuice.enrich_amplitude_offer:load-sale-offer-raw-events-to-enrich
+  - bietlejuice.enrich_booking:load-booking-to-enrich
+  - bietlejuice.enrich_ebdb_listing:load-listing-business-context-to-enrich
+  - bietlejuice.enrich_sale_flows:load-sale-flow-to-enrich
+  - bietlejuice.gsheets:load-taxonomy-demand-to-clean
 
 bietlejuice.dw_sale_listings:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-house-registration-status-in-data-lake
-  - bietlejuice.enrich_ebdb_listing.load-listing-business-context-to-enrich:load-enrich-listing-business-context
-  - bietlejuice.enrich_sale_listings.load-sale-listing-status-to-enrich:load-enrich-sale-listing-status
-  - bietlejuice.enrich_sale_listings.load-sale-listing-to-enrich:load-enrich-sale-listing
+  - bietlejuice.enrich_ebdb_listing:load-listing-business-context-to-enrich
+  - bietlejuice.enrich_sale_listings:load-sale-listing-status-to-enrich
+  - bietlejuice.enrich_sale_listings:load-sale-listing-to-enrich
 
 bietlejuice.dw_sale_offers:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
-  - bietlejuice.enrich_amplitude_offer.load-sale-offer-raw-events-to-enrich:load-enrich-sale-offer-raw-events
-  - bietlejuice.enrich_offer.load-sale-offer-to-enrich:load-enrich-sale-offer
-  - bietlejuice.gsheets.load-taxonomy-demand-to-clean:load-clean-taxonomy-demand
+  - bietlejuice.enrich_amplitude_offer:load-sale-offer-raw-events-to-enrich
+  - bietlejuice.enrich_offer:load-sale-offer-to-enrich
+  - bietlejuice.gsheets:load-taxonomy-demand-to-clean
 
 bietlejuice.dw_sale_visits:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-real-estate-agent-rating-in-data-lake
-  - bietlejuice.enrich_booking.load-booking-to-enrich:load-enrich-booking
-  - bietlejuice.enrich_offer.load-sale-offer-to-enrich:load-enrich-sale-offer
-  - bietlejuice.insider.load-review-to-datalake-clean:create-clean-review-in-data-lake
+  - bietlejuice.enrich_booking:load-booking-to-enrich
+  - bietlejuice.enrich_offer:load-sale-offer-to-enrich
+  - bietlejuice.insider:load-review-to-datalake-clean
 
 bietlejuice.dw_sauron:
   - bietlejuice.enrich_ebdb_customer_contact_identification
-  - bietlejuice.enrich_quinto_messenger.load-channel-to-enrich:load-enrich-channel
+  - bietlejuice.enrich_quinto_messenger:load-channel-to-enrich
   - bietlejuice.enrich_sauron
 
 bietlejuice.dw_smart_price:
-  - bietlejuice.enrich_ebdb_smart_price.load-smart-price-versioning-to-enrich:load-enrich-smart-price-versioning
+  - bietlejuice.enrich_ebdb_smart_price:load-smart-price-versioning-to-enrich
   - bietlejuice.ebdb:create-clean-dynamic-pricing-house-in-data-lake
   - bietlejuice.ebdb:create-clean-dynamic-pricing-parameters-in-data-lake
 
@@ -161,7 +161,7 @@ bietlejuice.dw_tracksale:
 bietlejuice.dw_user:
   - bietlejuice.ebdb:create-clean-partner-in-data-lake
   - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
-  - bietlejuice.enrich_ebdb_user.load-user-doorman-to-enrich:load-enrich-user-doorman
+  - bietlejuice.enrich_ebdb_user:load-user-doorman-to-enrich
   - bietlejuice.ebdb:create-clean-visit-in-data-lake
   - bietlejuice.ebdb:create-clean-rent-flow-in-data-lake
   - bietlejuice.ebdb:create-clean-pre-proposal-in-data-lake
@@ -171,21 +171,21 @@ bietlejuice.dw_user:
   - bietlejuice.ebdb:create-clean-bank-in-data-lake
   - bietlejuice.ebdb:create-clean-photographer-data-in-data-lake
   - bietlejuice.ebdb:create-clean-sales-rep-in-data-lake
-  - bietlejuice.enrich_booking.load-booking-to-enrich:load-enrich-booking
-  - bietlejuice.enrich_ebdb_user.load-user-to-enrich:load-enrich-user
-  - bietlejuice.enrich_ebdb_user.load-agent-data-to-enrich:load-enrich-agent-data
-  - bietlejuice.enrich_ebdb_user.load-affiliate-data-to-enrich:load-enrich-affiliate-data
+  - bietlejuice.enrich_booking:load-booking-to-enrich
+  - bietlejuice.enrich_ebdb_user:load-user-to-enrich
+  - bietlejuice.enrich_ebdb_user:load-agent-data-to-enrich
+  - bietlejuice.enrich_ebdb_user:load-affiliate-data-to-enrich
 
 bietlejuice.dw_user_affiliate:
-  - bietlejuice.enrich_amplitude_user.load-user-affiliate-origin-to-enrich:load-enrich-user-affiliate-origin
-  - bietlejuice.enrich_ebdb_user.load-affiliate-data-to-enrich:load-enrich-affiliate-data
-  - bietlejuice.enrich_ebdb_user.load-user-to-enrich:load-enrich-user
-  - bietlejuice.enrich_ebdb_user.load-agent-data-to-enrich:load-enrich-agent-data
-  - bietlejuice.enrich_region.load-region-to-enrich:load-enrich-region
-  - bietlejuice.gsheets.load-taxonomy-affiliates-to-clean:load-clean-taxonomy-affiliates
+  - bietlejuice.enrich_amplitude_user:load-user-affiliate-origin-to-enrich
+  - bietlejuice.enrich_ebdb_user:load-affiliate-data-to-enrich
+  - bietlejuice.enrich_ebdb_user:load-user-to-enrich
+  - bietlejuice.enrich_ebdb_user:load-agent-data-to-enrich
+  - bietlejuice.enrich_region:load-region-to-enrich
+  - bietlejuice.gsheets:load-taxonomy-affiliates-to-clean
 
 bietlejuice.dw_user_sales_rep:
-  - bietlejuice.enrich_ebdb_user.load-user-sales-rep-to-enrich:load-enrich-user-sales-rep
+  - bietlejuice.enrich_ebdb_user:load-user-sales-rep-to-enrich
 
 bietlejuice.dw_visit:
   - bietlejuice.ebdb:create-clean-visit-in-data-lake
@@ -206,14 +206,14 @@ bietlejuice.enrich_amplitude_visit:
   - bietlejuice.amplitude
 
 bietlejuice.enrich_bigfone_events:
-  - bietlejuice.bigfone.load-event-to-clean:load-clean-event
+  - bietlejuice.bigfone:load-event-to-clean
 
 bietlejuice.enrich_bigfone_twilio:
-  - bietlejuice.enrich_bigfone_events.load-events-to-enrich:load-enrich-events
+  - bietlejuice.enrich_bigfone_events:load-events-to-enrich
 
 bietlejuice.enrich_bob:
-  - bietlejuice.bob.load-house-draft-aud-to-clean:load-clean-house-draft-aud
-  - bietlejuice.bob.load-house-draft-to-clean:load-clean-house-draft
+  - bietlejuice.bob:load-house-draft-aud-to-clean
+  - bietlejuice.bob:load-house-draft-to-clean
 
 bietlejuice.enrich_booking:
   - bietlejuice.ebdb:create-clean-booking-in-data-lake
@@ -226,57 +226,57 @@ bietlejuice.enrich_booking:
   - bietlejuice.ebdb:create-clean-visit-in-data-lake
   - bietlejuice.ebdb:create-clean-visit-origin-in-data-lake
   - bietlejuice.ebdb:create-clean-visitor-in-data-lake
-  - bietlejuice.gsheets.load-from-to-cancellation-to-clean:load-clean-from-to-cancellation
+  - bietlejuice.gsheets:load-from-to-cancellation-to-clean
 
 bietlejuice.enrich_braze_events:
-  - bietlejuice.braze_events.load-events-tenants-to-clean:load-clean-events-tenants
-  - bietlejuice.braze_events.load-events-owners-to-clean:load-clean-events-owners
+  - bietlejuice.braze_events:load-events-tenants-to-clean
+  - bietlejuice.braze_events:load-events-owners-to-clean
 
 bietlejuice.enrich_braze_events_dispatches:
-  - bietlejuice.enrich_braze_events.load-events-tenants-to-enrich:load-enrich-events-tenants
-  - bietlejuice.enrich_braze_events.load-events-owners-to-enrich:load-enrich-events-owners
+  - bietlejuice.enrich_braze_events:load-events-tenants-to-enrich
+  - bietlejuice.enrich_braze_events:load-events-owners-to-enrich
 
 bietlejuice.enrich_braze_events_dispatches_user:
-  - bietlejuice.enrich_braze_events.load-events-tenants-to-enrich:load-enrich-events-tenants
-  - bietlejuice.enrich_braze_events.load-events-owners-to-enrich:load-enrich-events-owners
-  - bietlejuice.enrich_braze_events_dispatches.load-inapp-tenants-to-enrich:load-enrich-inapp-tenants
-  - bietlejuice.enrich_braze_events_dispatches.load-sms-tenants-to-enrich:load-enrich-sms-tenants
-  - bietlejuice.enrich_braze_events_dispatches.load-email-tenants-to-enrich:load-enrich-email-tenants
-  - bietlejuice.enrich_braze_events_dispatches.load-webhook-tenants-to-enrich:load-enrich-webhook-tenants
-  - bietlejuice.enrich_braze_events_dispatches.load-push-tenants-to-enrich:load-enrich-push-tenants
-  - bietlejuice.enrich_braze_events_dispatches.load-inapp-owners-to-enrich:load-enrich-inapp-owners
-  - bietlejuice.enrich_braze_events_dispatches.load-sms-owners-to-enrich:load-enrich-sms-owners
-  - bietlejuice.enrich_braze_events_dispatches.load-email-owners-to-enrich:load-enrich-email-owners
-  - bietlejuice.enrich_braze_events_dispatches.load-webhook-owners-to-enrich:load-enrich-webhook-owners
-  - bietlejuice.enrich_braze_events_dispatches.load-push-owners-to-enrich:load-enrich-push-owners
+  - bietlejuice.enrich_braze_events:load-events-tenants-to-enrich
+  - bietlejuice.enrich_braze_events:load-events-owners-to-enrich
+  - bietlejuice.enrich_braze_events_dispatches:load-inapp-tenants-to-enrich
+  - bietlejuice.enrich_braze_events_dispatches:load-sms-tenants-to-enrich
+  - bietlejuice.enrich_braze_events_dispatches:load-email-tenants-to-enrich
+  - bietlejuice.enrich_braze_events_dispatches:load-webhook-tenants-to-enrich
+  - bietlejuice.enrich_braze_events_dispatches:load-push-tenants-to-enrich
+  - bietlejuice.enrich_braze_events_dispatches:load-inapp-owners-to-enrich
+  - bietlejuice.enrich_braze_events_dispatches:load-sms-owners-to-enrich
+  - bietlejuice.enrich_braze_events_dispatches:load-email-owners-to-enrich
+  - bietlejuice.enrich_braze_events_dispatches:load-webhook-owners-to-enrich
+  - bietlejuice.enrich_braze_events_dispatches:load-push-owners-to-enrich
 
 bietlejuice.enrich_braze_events_user_centric:
-  - bietlejuice.enrich_braze_events.load-events-tenants-to-enrich:load-enrich-events-tenants
-  - bietlejuice.enrich_braze_events.load-events-owners-to-enrich:load-enrich-events-owners
+  - bietlejuice.enrich_braze_events:load-events-tenants-to-enrich
+  - bietlejuice.enrich_braze_events:load-events-owners-to-enrich
 
 bietlejuice.enrich_braze_events_user_centric_periodicity:
-  - bietlejuice.enrich_braze_events_user_centric.load-user-events-daily-to-enrich:load-enrich-user-events-daily
+  - bietlejuice.enrich_braze_events_user_centric:load-user-events-daily-to-enrich
 
 bietlejuice.enrich_chattermill:
-  - bietlejuice.chattermill.load-responses-to-clean:load-clean-responses
+  - bietlejuice.chattermill:load-responses-to-clean
 
 bietlejuice.enrich_consolidated_marketing_costs:
   - bietlejuice.enrich_marketing_costs
 
 bietlejuice.enrich_credit_evers:
-  - bietlejuice.enrich_invoice.load-credit-invoice-original-due-date-to-enrich:load-enrich-credit-invoice-original-due-date
-  - bietlejuice.enrich_invoice.load-credit-invoice-to-enrich:load-enrich-credit-invoice
+  - bietlejuice.enrich_invoice:load-credit-invoice-original-due-date-to-enrich
+  - bietlejuice.enrich_invoice:load-credit-invoice-to-enrich
 
 bietlejuice.enrich_crm:
   - bietlejuice.crm
 
 bietlejuice.enrich_crm_tasks_resolution:
-  - bietlejuice.enrich_crm.load-tasks-actions-to-enrich:load-enrich-tasks-actions
-  - bietlejuice.enrich_crm.load-tasks-to-enrich:load-enrich-tasks
-  - bietlejuice.enrich_crm.load-task-status-histories-to-enrich:load-enrich-task-status-histories
+  - bietlejuice.enrich_crm:load-tasks-actions-to-enrich
+  - bietlejuice.enrich_crm:load-tasks-to-enrich
+  - bietlejuice.enrich_crm:load-task-status-histories-to-enrich
 
 bietlejuice.enrich_docx:
-  - bietlejuice.docx.load-credit-evaluation-to-clean:load-clean-credit-evaluation
+  - bietlejuice.docx:load-credit-evaluation-to-clean
 
 bietlejuice.enrich_ebdb_contract:
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
@@ -285,8 +285,8 @@ bietlejuice.enrich_ebdb_contract:
   - bietlejuice.ebdb:create-clean-full-contract-in-data-lake
   - bietlejuice.ebdb:create-clean-rent-flow-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
-  - bietlejuice.enrich_ebdb_listing.load-house-to-enrich:load-enrich-house
-  - bietlejuice.enrich_ebdb_listing.load-house-listing-to-enrich:load-enrich-house-listing
+  - bietlejuice.enrich_ebdb_listing:load-house-to-enrich
+  - bietlejuice.enrich_ebdb_listing:load-house-listing-to-enrich
 
 bietlejuice.enrich_ebdb_customer_contact_identification:
   - bietlejuice.ebdb:create-clean-user-in-data-lake
@@ -357,36 +357,36 @@ bietlejuice.enrich_ebdb_user_revision_entity:
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
 
 bietlejuice.enrich_firestore:
-  - bietlejuice.firestore.load-monday-to-clean:load-clean-monday
-  - bietlejuice.firestore.load-rent-offer-to-clean:load-clean-rent-offer
-  - bietlejuice.firestore.load-sale-offer-to-clean:load-clean-sale-offer
+  - bietlejuice.firestore:load-monday-to-clean
+  - bietlejuice.firestore:load-rent-offer-to-clean
+  - bietlejuice.firestore:load-sale-offer-to-clean
 
 bietlejuice.enrich_invoice:
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
-  - bietlejuice.retsuko.load-account-to-clean:create-clean-account-in-data-lake
-  - bietlejuice.retsuko.load-contract-to-clean:create-clean-contract-in-data-lake
-  - bietlejuice.retsuko.load-entry-to-clean:create-clean-entry-in-data-lake
-  - bietlejuice.retsuko.load-invoice-to-clean:create-clean-invoice-in-data-lake
+  - bietlejuice.retsuko:load-account-to-clean
+  - bietlejuice.retsuko:load-contract-to-clean
+  - bietlejuice.retsuko:load-entry-to-clean
+  - bietlejuice.retsuko:load-invoice-to-clean
 
 bietlejuice.enrich_kill_queue:
-  - bietlejuice.kill_queue.load-house-to-datalake-clean:create-clean-house-in-data-lake
-  - bietlejuice.kill_queue.load-reservation-to-datalake-clean:create-clean-reservation-in-data-lake
+  - bietlejuice.kill_queue:load-house-to-datalake-clean
+  - bietlejuice.kill_queue:load-reservation-to-datalake-clean
 
 bietlejuice.enrich_listing_owners:
   - bietlejuice.ebdb:create-clean-proposal-in-data-lake
-  - bietlejuice.enrich_booking.load-booking-to-enrich:load-enrich-booking
-  - bietlejuice.enrich_ebdb_contract.load-contract-to-enrich:load-enrich-contract
-  - bietlejuice.enrich_ebdb_listing.load-listing-business-context-to-enrich:load-enrich-listing-business-context
-  - bietlejuice.enrich_ebdb_listing.load-house-listing-status-to-enrich:load-enrich-house-listing-status
-  - bietlejuice.enrich_ebdb_listing.load-house-to-enrich:load-enrich-house
-  - bietlejuice.enrich_kill_queue.load-reservation-to-enrich:load-enrich-reservation
-  - bietlejuice.enrich_offer.load-offer-to-enrich:load-enrich-offer
+  - bietlejuice.enrich_booking:load-booking-to-enrich
+  - bietlejuice.enrich_ebdb_contract:load-contract-to-enrich
+  - bietlejuice.enrich_ebdb_listing:load-listing-business-context-to-enrich
+  - bietlejuice.enrich_ebdb_listing:load-house-listing-status-to-enrich
+  - bietlejuice.enrich_ebdb_listing:load-house-to-enrich
+  - bietlejuice.enrich_kill_queue:load-reservation-to-enrich
+  - bietlejuice.enrich_offer:load-offer-to-enrich
 
 bietlejuice.enrich_marketing_costs:
   - bietlejuice.marketing_hub
 
 bietlejuice.enrich_marketing_costs_criteo_campaigns:
-  - bietlejuice.criteo_campaigns.load-criteo-campaigns-to-clean:load-clean-criteo-campaigns
+  - bietlejuice.criteo_campaigns:load-criteo-campaigns-to-clean
 
 bietlejuice.enrich_marketing_costs_facebook_insights:
   - bietlejuice.facebook_insights
@@ -395,53 +395,53 @@ bietlejuice.enrich_marketing_costs_offline:
   - bietlejuice.marketing_offline_costs
 
 bietlejuice.enrich_nps_answer_drivers:
-  - bietlejuice.enrich_tracksale.load-answer-to-enrich:load-enrich-answer
+  - bietlejuice.enrich_tracksale:load-answer-to-enrich
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-booking-in-data-lake
   - bietlejuice.ebdb:create-clean-offer-in-data-lake
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
-  - bietlejuice.enrich_ebdb_listing.load-house-listing-to-enrich:load-enrich-house-listing
+  - bietlejuice.enrich_ebdb_listing:load-house-listing-to-enrich
 
 bietlejuice.enrich_offer:
   - bietlejuice.ebdb:create-clean-offer-in-data-lake
   - bietlejuice.ebdb:create-clean-offer-aud-in-data-lake
-  - bietlejuice.enrich_booking.load-booking-to-enrich:load-enrich-booking
-  - bietlejuice.enrich_ebdb_user_revision_entity.load-user-revision-entity-to-enrich:load-enrich-user-revision-entity
+  - bietlejuice.enrich_booking:load-booking-to-enrich
+  - bietlejuice.enrich_ebdb_user_revision_entity:load-user-revision-entity-to-enrich
   - bietlejuice.enrich_firestore
-  - bietlejuice.godfather.load-business-offer:create-clean-offer-in-data-lake
+  - bietlejuice.godfather:load-business-offer
 
 bietlejuice.enrich_proposal:
   - bietlejuice.ebdb:create-clean-proposal-in-data-lake
   - bietlejuice.ebdb:create-clean-proposal-aud-in-data-lake
-  - bietlejuice.enrich_ebdb_user_revision_entity.load-user-revision-entity-to-enrich:load-enrich-user-revision-entity
-  - bietlejuice.sorting_hat.load-proposal-to-datalake-clean:create-clean-proposal-in-data-lake
-  - bietlejuice.sorting_hat.load-proposal-version-to-datalake-clean:create-clean-proposal-version-in-data-lake
+  - bietlejuice.enrich_ebdb_user_revision_entity:load-user-revision-entity-to-enrich
+  - bietlejuice.sorting_hat:load-proposal-to-datalake-clean
+  - bietlejuice.sorting_hat:load-proposal-version-to-datalake-clean
 
 bietlejuice.enrich_quinto_messenger:
-  - bietlejuice.quinto_messenger.load-channel-to-clean:load-clean-channel
-  - bietlejuice.quinto_messenger.load-channel-event-to-clean:load-clean-channel-event
-  - bietlejuice.quinto_messenger.load-task-to-clean:load-clean-task
-  - bietlejuice.quinto_messenger.load-task-event-to-clean:load-clean-task-event
+  - bietlejuice.quinto_messenger:load-channel-to-clean
+  - bietlejuice.quinto_messenger:load-channel-event-to-clean
+  - bietlejuice.quinto_messenger:load-task-to-clean
+  - bietlejuice.quinto_messenger:load-task-event-to-clean
 
 bietlejuice.enrich_region:
   - bietlejuice.ebdb:create-clean-region-in-data-lake
-  - bietlejuice.gsheets.load-auxiliary-region-to-clean:load-clean-auxiliary-region
+  - bietlejuice.gsheets:load-auxiliary-region-to-clean
 
 bietlejuice.enrich_retsuko:
-  - bietlejuice.retsuko.load-account-to-clean:create-clean-account-in-data-lake
-  - bietlejuice.retsuko.load-entry-to-clean:create-clean-entry-in-data-lake
-  - bietlejuice.retsuko.load-invoice-to-clean:create-clean-invoice-in-data-lake
+  - bietlejuice.retsuko:load-account-to-clean
+  - bietlejuice.retsuko:load-entry-to-clean
+  - bietlejuice.retsuko:load-invoice-to-clean
 
 bietlejuice.enrich_robin_hood:
-  - bietlejuice.robin_hood.load-accounting-entry-to-datalake-clean:create-clean-accounting-entry-in-data-lake
-  - bietlejuice.robin_hood.load-payee-to-datalake-clean:create-clean-payee-in-data-lake
-  - bietlejuice.robin_hood.load-tax-to-datalake-clean:create-clean-tax-in-data-lake
+  - bietlejuice.robin_hood:load-accounting-entry-to-datalake-clean
+  - bietlejuice.robin_hood:load-payee-to-datalake-clean
+  - bietlejuice.robin_hood:load-tax-to-datalake-clean
 
 bietlejuice.enrich_sale_flows:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
-  - bietlejuice.enrich_booking.load-booking-to-enrich:load-enrich-booking
-  - bietlejuice.enrich_ebdb_listing.load-listing-business-context-to-enrich:load-enrich-listing-business-context
-  - bietlejuice.enrich_offer.load-sale-offer-to-enrich:load-enrich-sale-offer
+  - bietlejuice.enrich_booking:load-booking-to-enrich
+  - bietlejuice.enrich_ebdb_listing:load-listing-business-context-to-enrich
+  - bietlejuice.enrich_offer:load-sale-offer-to-enrich
 
 bietlejuice.enrich_sale_listings:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
@@ -449,14 +449,14 @@ bietlejuice.enrich_sale_listings:
   - bietlejuice.ebdb:create-clean-listing-business-context-in-data-lake
   - bietlejuice.ebdb:create-clean-listing-business-context-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
-  - bietlejuice.enrich_ebdb_listing.load-listing-business-context-to-enrich:load-enrich-listing-business-context
-  - bietlejuice.enrich_ebdb_user_revision_entity.load-user-revision-entity-to-enrich:load-enrich-user-revision-entity
+  - bietlejuice.enrich_ebdb_listing:load-listing-business-context-to-enrich
+  - bietlejuice.enrich_ebdb_user_revision_entity:load-user-revision-entity-to-enrich
 
 bietlejuice.enrich_sauron:
-  - bietlejuice.sauron.load-session-to-clean:load-clean-session
+  - bietlejuice.sauron:load-session-to-clean
 
 bietlejuice.enrich_terminator:
-  - bietlejuice.terminator.load-termination-aud-to-clean:load-clean-termination-aud
+  - bietlejuice.terminator:load-termination-aud-to-clean
 
 bietlejuice.enrich_tracksale:
   - bietlejuice.tracksale:dispatch
@@ -466,21 +466,21 @@ bietlejuice.enrich_zendesk_custom_fields:
   - bietlejuice.zendesk_tickets
 
 bietlejuice.enrich_zendesk_ticket_funnels:
-  - bietlejuice.enrich_ebdb_contract.load-contract-house-to-enrich:load-enrich-contract-house
-  - bietlejuice.enrich_ebdb_customer_contact_identification.load-customer-contact-identification-to-enrich:load-enrich-customer-contact-identification
-  - bietlejuice.enrich_zendesk_custom_fields.load-custom-fields-to-enrich:load-enrich-custom-fields
-  - bietlejuice.enrich_zendesk_tickets.load-ticket-measurements-to-enrich:load-enrich-ticket-measurements
-  - bietlejuice.enrich_zendesk_tickets.load-zendesk-users-contact-to-enrich:load-enrich-zendesk-users-contact
+  - bietlejuice.enrich_ebdb_contract:load-contract-house-to-enrich
+  - bietlejuice.enrich_ebdb_customer_contact_identification:load-customer-contact-identification-to-enrich
+  - bietlejuice.enrich_zendesk_custom_fields:load-custom-fields-to-enrich
+  - bietlejuice.enrich_zendesk_tickets:load-ticket-measurements-to-enrich
+  - bietlejuice.enrich_zendesk_tickets:load-zendesk-users-contact-to-enrich
 
 bietlejuice.enrich_zendesk_tickets:
-  - bietlejuice.enrich_zendesk_custom_fields.load-custom-fields-to-enrich:load-enrich-custom-fields
+  - bietlejuice.enrich_zendesk_custom_fields:load-custom-fields-to-enrich
 
 bietlejuice.regions_polygon:
-  - bietlejuice.enrich_region.load-region-to-enrich:load-enrich-region
+  - bietlejuice.enrich_region:load-region-to-enrich
   - bietlejuice.ebdb:create-clean-polygon-region-in-data-lake
 
 bietlejuice.dw_tenant_booking_review:
   - bietlejuice.ebdb:create-clean-visit-in-data-lake
   - bietlejuice.ebdb:create-clean-booking-in-data-lake
-  - bietlejuice.insider.load-review-feature-to-datalake-clean:create-clean-review-feature-in-data-lake
-  - bietlejuice.insider.load-review-to-datalake-clean:create-clean-review-in-data-lake
+  - bietlejuice.insider:load-review-feature-to-datalake-clean
+  - bietlejuice.insider:load-review-to-datalake-clean
