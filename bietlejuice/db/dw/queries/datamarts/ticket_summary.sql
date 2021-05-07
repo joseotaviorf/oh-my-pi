@@ -127,7 +127,6 @@ WITH sla AS (
                         ON dt.sk_ticket = ft.sk_ticket
                 WHERE
                     dt.channel IN ('email', 'form_faq', 'web', 'other')
-                    -- and ft.ts_solved_local is not null
                     -- emails with the tags below are not new demands, therefore, they should not be considered
                     AND dt.tags NOT ILIKE '%resolve_ticket_acompanhamento%'
                     AND dt.tags NOT ILIKE '%fechado_automaticamente_noreply%'
@@ -335,6 +334,26 @@ automatically_closed_emails AS (
     WHERE
         dt.channel IN ('email', 'form_faq', 'web', 'other')
         AND tt.ticket_tag IN ('resolve_ticket_acompanhamento', 'fechado_automaticamente_noreply', 'redirecionado_atendimento_2', 'closed_by_merge', 'zapdesk', 'ticket_via_call', 'call_contato_receptivo', 'call_contato_ativo', 'resolve_ticket_acompanhamento', 'redirecionado_adm_v1', 'robotserviceaccount02') 
+),
+back_tickets AS (
+    SELECT 
+        sk_ticket AS sk_back_ticket
+    FROM
+        tickets.dim_ticket 
+    WHERE
+        tags ILIKE '%tarefa_atendimento_escalado%'
+),
+answered_calls AS ( 
+    SELECT
+	ft.sk_ticket
+    FROM
+        tickets.fact_tickets AS ft
+    JOIN
+        call.fact_calls fc
+            ON fc.sk_call = ft.sk_call
+    WHERE
+        has_ended_in_ura = FALSE
+        AND is_answered = TRUE 
 ),
 ticket_calls AS (
     SELECT
@@ -551,6 +570,147 @@ tax AS (
         AND customer_type_tag IS NOT NULL
         AND contact_motivation_tag IS NOT NULL
         AND dt.contact_theme_tag IS NOT NULL 
+),
+front_or_back_call_tasks AS (
+    SELECT
+        DISTINCT sk_ticket AS back_ticket,
+        REGEXP_SUBSTR(description, 'WT[a-z0-9]{20,40}') AS front_task,
+        description,
+        ts_created_local
+    FROM
+        tickets.dim_ticket
+    WHERE 
+        tags LIKE '%tarefa_atendimento_escalado%'
+        AND DATE(ts_created_local)>='2020-09-01' 
+        AND (tags NOT ILIKE '%bot_end_conversation%'
+        AND tags NOT ILIKE '%closed_by_merge%')
+        AND front_task!='' 
+),
+front_or_back_call_tickets AS (
+    SELECT
+        ct.back_ticket,
+        ct.ts_created_local, 
+        sk_ticket AS front_ticket
+    FROM
+        front_or_back_call_tasks ct 
+    INNER JOIN
+        datalake_bigfone_twilio_prod.call_flex_events cfe
+            ON cfe.id_task=ct.front_task
+    INNER JOIN
+        call.fact_call_tasks fct
+            ON fct.sk_call=cfe.id_call
+    INNER JOIN  
+        tickets.fact_tickets ft
+            ON fct.sk_call=ft.sk_call
+),
+front_or_back_email_tickets AS (
+    SELECT
+        sk_ticket AS back_ticket,
+        REGEXP_SUBSTR(SUBSTRING(SPLIT_PART(description, 'Ticket do contato', 2), 1, 18), '[0-9]{8}') AS front_ticket,
+        description,
+        ts_created_local
+    FROM
+        tickets.dim_ticket
+    WHERE 
+        tags LIKE '%tarefa_atendimento_escalado%'
+        AND DATE(ts_created_local)>='2020-09-01' 
+        AND (tags NOT ILIKE '%bot_end_conversation%'
+        AND tags NOT ILIKE '%closed_by_merge%')
+        AND front_ticket!=''
+),
+front_or_back_chat_tasks AS (
+    SELECT
+        sk_ticket AS back_ticket,
+        REGEXP_SUBSTR(description, 'WT[a-z0-9]{20,40}') AS front_ticket,
+        description,
+        ts_created_local
+    FROM
+        tickets.dim_ticket
+    WHERE 
+        tags LIKE '%tarefa_atendimento_escalado%'
+        AND DATE(ts_created_local)>='2020-09-01' 
+        AND (tags NOT ILIKE '%bot_end_conversation%'
+        AND tags NOT ILIKE '%closed_by_merge%')
+        AND front_ticket!='' 
+),
+front_or_back_chat_tickets AS (
+    SELECT
+        back_ticket,
+        sk_ticket AS front_ticket,
+        description,
+        ct.ts_created_local
+    FROM
+        front_or_back_chat_tasks ct 
+    JOIN
+        quinto_messenger.fact_tasks ft 
+            ON ct.front_ticket=ft.sk_task
+    JOIN
+        quinto_messenger.fact_chats fc 
+            ON ft.sk_chat=fc.sk_chat
+    JOIN
+        tickets.fact_tickets zft 
+            ON fc.sk_session=zft.sk_session
+),
+total_back_tickets AS (
+    SELECT
+        back_ticket,
+        front_ticket,
+        ts_created_local
+    FROM
+        front_or_back_call_tickets
+    UNION
+    SELECT
+        back_ticket,
+        sk_ticket AS front_ticket,
+        bet.ts_created_local
+    FROM
+        front_or_back_email_tickets bet 
+    INNER JOIN
+        tickets.dim_ticket dt 
+            ON bet.front_ticket=dt.sk_ticket
+    UNION
+    SELECT
+        back_ticket,
+        front_ticket,
+        ts_created_local
+    FROM
+        front_or_back_chat_tickets
+),
+chat_tasks_transfers AS (
+    SELECT
+        ft.sk_chat
+    FROM
+        quinto_messenger.dim_task dt 
+    INNER JOIN
+        quinto_messenger.fact_tasks ft 
+            ON ft.sk_task=dt.sk_task
+    WHERE
+        completion_reason='task transferred'
+),
+total_transfers AS (
+    --call transfers
+    SELECT
+        ft.sk_ticket
+    
+    FROM
+        zendesk.fact_tickets AS ft
+    INNER JOIN
+        call.fact_calls fc
+            ON fc.sk_call=ft.sk_call
+        AND fc.is_transfered=TRUE
+    UNION
+    --chat transfers
+    SELECT
+        ft.sk_ticket
+    FROM
+        zendesk.fact_tickets ft
+    INNER JOIN
+        quinto_messenger.fact_chats fc
+            ON fc.sk_session=ft.sk_session
+    INNER JOIN
+        --chat tasks transfers
+        chat_tasks_transfers tt 
+            ON fc.sk_chat=tt.sk_chat
 )
 SELECT
 	DISTINCT ft.sk_ticket,
@@ -660,16 +820,77 @@ SELECT
 	ft.minutes_first_resolution_time_business,
 	sla.sla_achieved,
 	sla.minutes_full_resolution_time_calendar,
+    CASE
+        WHEN ace.sk_ticket IS NULL THEN 0
+        ELSE 1
+    END AS is_automatic_email,
+    CASE
+        WHEN tk.tags ILIKE '%bot_end_conversation%' THEN 1
+        ELSE 0
+    END AS is_bot, 
+    CASE
+        WHEN tk.tags ILIKE '%closed_by_merge%' THEN 1
+        ELSE 0
+    END AS is_closed_by_merge, 
+    tbt.back_ticket, 
+    CASE
+        WHEN btk.status LIKE 'open' OR btk.status LIKE 'pending' OR btk.status LIKE 'new' OR btk.status LIKE 'hold'
+            THEN 1
+        WHEN btk.status LIKE 'closed' OR btk.status LIKE 'deleted' OR btk.status LIKE 'solved'
+            THEN 0
+        END AS is_open_back_ticket,
+    CASE
+        WHEN total_transfers.sk_ticket IS NULL THEN 0
+        ELSE 1
+        END AS has_transfers,
+    CASE
+        WHEN ac.sk_ticket IS NULL THEN 0
+        ELSE 1
+        END AS is_answered,
 	CASE
 		WHEN csat.is_solved >1 THEN 1
 		ELSE csat.is_solved
 	END AS is_solved,
-	csat.csat
+	csat.csat,
+    CASE
+        WHEN is_solved = 1
+            AND (back_ticket IS NULL OR is_open_back_ticket = 0)
+            AND is_automatic_email = 0 AND is_bot = 0 AND is_closed_by_merge = 0 --crr só é aplicável aos dados que passam por esse filtro
+            THEN 1
+        WHEN is_solved IS NOT NULL 
+            AND is_automatic_email = 0 AND is_bot = 0 AND is_closed_by_merge = 0 THEN 0
+        ELSE NULL
+        END AS is_crr,
+    CASE
+        WHEN is_solved = 1
+            AND back_ticket IS NULL
+            AND has_transfers = 0
+            AND is_automatic_email = 0 AND is_bot = 0 AND is_closed_by_merge = 0 --fcr só é aplicável aos dados que passam por esse filtro
+            THEN 1
+        WHEN is_solved IS NOT NULL
+            AND is_automatic_email = 0 AND is_bot = 0 AND is_closed_by_merge = 0 THEN 0
+        ELSE NULL
+        END AS is_fcr
 FROM
 	zendesk.fact_tickets ft
 JOIN 
     zendesk.dim_ticket tk 
         ON ft.sk_ticket = tk.sk_ticket
+LEFT JOIN 
+    automatically_closed_emails ace
+        ON ace.sk_ticket = ft.sk_ticket
+LEFT JOIN
+    back_tickets bt
+        ON bt.sk_back_ticket = ft.sk_ticket
+LEFT JOIN
+    total_back_tickets tbt
+        ON tbt.front_ticket = ft.sk_ticket
+LEFT JOIN 
+    zendesk.dim_ticket btk 
+        ON tbt.back_ticket = btk.sk_ticket
+LEFT JOIN
+    answered_calls ac
+        ON ac.sk_ticket = ft.sk_ticket
 LEFT JOIN 
     sla 
         ON ft.sk_ticket = sla.sk_ticket
@@ -682,4 +903,8 @@ LEFT JOIN
 LEFT JOIN 
     tickets_areas AS ta 
         ON ta.sk_ticket = ft.sk_ticket
-	-- where ft.sk_user<>-1
+LEFT JOIN
+    total_transfers
+        ON ft.sk_ticket = total_transfers.sk_ticket
+WHERE
+    bt.sk_back_ticket IS NULL
