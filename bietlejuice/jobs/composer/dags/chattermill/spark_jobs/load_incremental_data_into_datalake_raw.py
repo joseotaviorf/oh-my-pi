@@ -75,7 +75,9 @@ if __name__ == "__main__":
             if "user_attributes" in row:
                 row["user_attributes"] = json.dumps(row.get("user_attributes"))
             if "tags" in row:
-                row["tags"] = json.dumps(row.get("user_attributes"))
+                row["tags"] = json.dumps(row.get("tags"))
+            if "phrases" in row:
+                row["phrases"] = json.dumps(row.get("phrases"))
 
         if api_response:
             df = spark_client.create_dataframe(api_response)
