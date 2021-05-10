@@ -9,6 +9,8 @@ SELECT
     source,
     status,
     internal_status, 
+    cancellation_info,
+    rescheduling_history,
     date AS dt_termination,
     vacancy_date AS dt_vacancy,
     canceled_at AS ts_canceled,
