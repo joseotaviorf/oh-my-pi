@@ -47,7 +47,7 @@ shared_consolidated_costs AS (
 -- https://docs.google.com/presentation/d/1YnqR-ypPI58I_Q1Re3VljXQqlP6XlUzfcvInxFFlUZw/edit#slide=id.gcd7c7ea5b9_0_0
 
 city_group_mappings AS (
-    SELECT
+    SELECT DISTINCT
         mc.campaign_name,
         CASE 
             WHEN LOWER(mc.campaign_name) IN (
