@@ -18,7 +18,6 @@
 - bietlejuice.enrich_sauron
 - bietlejuice.enrich_zendesk_custom_fields
 - bietlejuice.enrich_zendesk_tickets
-- bietlejuice.gsheets
 - bietlejuice.owner_fees
 - bietlejuice.quinto_messenger
 - bietlejuice.ramo_sap
