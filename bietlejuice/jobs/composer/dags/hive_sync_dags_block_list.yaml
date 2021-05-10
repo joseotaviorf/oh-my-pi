@@ -3,7 +3,6 @@
 #   (that uses DatalakeSubdag, DWSubdag or IncrementalDWSubDAG) remove the DAG
 #   from the list bellow.
 
-- dw_marketing_costs
 - dw_marketing_costs_mitula
 - dw_marketing_costs_trovit
 - bietlejuice.dw_teravoz
