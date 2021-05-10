@@ -45,34 +45,35 @@ taxonomy_demand AS (
 ----------------------
 filtered_events AS (
     SELECT DISTINCT
-    COALESCE(business_context, 'rent') AS business_context,
-    COALESCE(CAST(ep_house_id AS STRING), top5_house_id[1]) AS id_house,
-    utm_source,
-    utm_medium,
-    utm_campaign,
-    utm_term,
-    utm_content,
-    CAST(up_platform AS STRING) AS app_type,
-    COALESCE(
-        CAST(id_user AS STRING),
-        CAST(id_device AS STRING)
-    ) AS id_tof_user,
-    CASE
-        WHEN UPPER(CAST(utm_campaign AS STRING)) LIKE '%BRANDED%'
-            OR UPPER(CAST(utm_campaign AS STRING)) LIKE '%INSTITUCIONAL%'
-        THEN 'Branded'
-        ELSE 'Outro'
-    END AS branded,
-    year,
-    month,
-    day,
-    CAST(ts_event AS DATE) AS dt_event
-FROM
-    datalake_amplitude_page_viewed_events.schedule_search_listing_events
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+        COALESCE(business_context, 'rent') AS business_context,
+        COALESCE(CAST(ep_house_id AS STRING), top5_house_id[1]) AS id_house,
+        utm_source,
+        utm_medium,
+        utm_campaign,
+        utm_term,
+        utm_content,
+        CAST(up_platform AS STRING) AS app_type,
+        COALESCE(
+            CAST(id_user AS STRING),
+            CAST(id_device AS STRING)
+        ) AS id_tof_user,
+        CASE
+            WHEN UPPER(CAST(utm_campaign AS STRING)) LIKE '%BRANDED%'
+                OR UPPER(CAST(utm_campaign AS STRING)) LIKE '%INSTITUCIONAL%'
+            THEN 'Branded'
+            ELSE 'Outro'
+        END AS branded,
+        year,
+        month,
+        day,
+        ts_event,
+        CAST(ts_event AS DATE) AS dt_event
+    FROM
+        datalake_amplitude_page_viewed_events.schedule_search_listing_events
+    WHERE
+        year = {year}
+        AND month = {month}
+        AND day = {day}
 ),
 -------------------
 -- HOUSE REGIONS --
@@ -84,6 +85,7 @@ dim_house AS (
     from datalake_ebdb_clean.house h
 )
 SELECT
+    BIGINT(year*10000 + month*100 + day || ROW_NUMBER() OVER (ORDER BY evt.dt_event)) AS id,
     evt.id_tof_user,
     COALESCE(evt.id_house, -1) AS id_house,
     COALESCE(dh.sk_region, -1) AS sk_region,
@@ -106,7 +108,8 @@ SELECT
     year,
     month,
     day,
-    evt.dt_event
+    evt.dt_event,
+    evt.ts_event
 FROM
     filtered_events AS evt
 LEFT JOIN dim_house AS dh

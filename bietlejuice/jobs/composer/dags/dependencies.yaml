@@ -458,6 +458,9 @@ bietlejuice.enrich_sauron:
 bietlejuice.enrich_terminator:
   - bietlejuice.terminator:load-termination-aud-to-clean
 
+bietlejuice.enrich_top_of_funnel_demand:
+  - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
+
 bietlejuice.enrich_tracksale:
   - bietlejuice.tracksale:dispatch
   - bietlejuice.tracksale:answer

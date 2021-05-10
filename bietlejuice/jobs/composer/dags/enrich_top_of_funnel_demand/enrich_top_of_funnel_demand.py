@@ -2,6 +2,7 @@ from datetime import datetime
 import pendulum
 
 from airflow.models import DAG, Variable
+import airflow.utils.helpers as airflow_helpers
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -15,7 +16,7 @@ from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 8, 11, 0, 0, 0, tzinfo=LOCAL_TZ)
 
-CONTEXT = "amplitude_page_viewed_events"
+CONTEXT = "top_of_funnel_demand"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = Variable.get("environment")
@@ -31,14 +32,8 @@ LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
     Variable.get("databricks_s3_bucket"), DAG_ID
 )
 
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_bietlejuice_amplitude_page_viewed_events", deserialize_json=True
-)
+CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
-
-LIBRARIES_DESCRIPTION = Variable.get(
-    "bietlejuice_default_libraries", deserialize_json=True
-)
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -55,10 +50,7 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag,
-    task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=LIBRARIES_DESCRIPTION,
+    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
 )
 
 enrich_sub_dag = DatalakeSubDAG(
@@ -73,14 +65,30 @@ enrich_sub_dag = DatalakeSubDAG(
     layer=LayerEnum.ENRICH,
 )
 
+PARTITION_COLS = ["year", "month", "day"]
+
 file_list = FileService.list_sql_files_without_extension_from_layer(
     CONTEXT, LayerEnum.ENRICH.value
 )
 
-enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(dag, file_list)
+enrich_sub_dags_incremental = enrich_sub_dag.build_subdags_from_sql_files(
+    dag, file_list, is_incremental=True, partitions=PARTITION_COLS
+)
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-create_cluster_task >> list(enrich_sub_dags.values()) >> terminate_cluster_task
+tables_ordered = [
+    "user_interactions",
+    "first_user_interaction_staging",
+    "first_user_interaction",
+]
+
+airflow_helpers.chain(
+    create_cluster_task,
+    enrich_sub_dags_incremental[tables_ordered[0]],
+    enrich_sub_dags_incremental[tables_ordered[1]],
+    enrich_sub_dags_incremental[tables_ordered[2]],
+    terminate_cluster_task,
+)
