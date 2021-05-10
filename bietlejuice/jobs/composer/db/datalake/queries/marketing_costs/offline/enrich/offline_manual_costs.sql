@@ -38,7 +38,10 @@ WITH offline_costs AS (
         city_group,
         id_rule_cost_center,
         cost_center,
-        cost
+        CASE 
+            WHEN entry_type = 'Estorno' AND cost > 0 THEN cost * (-1)
+            ELSE cost
+        END AS cost
     FROM
         datalake_marketing_offline_costs_clean.marketing_offline_manual_costs
 ),
