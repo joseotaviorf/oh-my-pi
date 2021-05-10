@@ -6,6 +6,7 @@ import pendulum
 from airflow.models import DAG
 from airflow.models import Variable
 
+import airflow.utils.helpers as airflow_helpers
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -23,6 +24,8 @@ ENV = Variable.get("environment")
 # DAG params setup
 SOURCE = "marketing_costs"
 MEDIA = "facebook_insights"
+INSIGHTS_TABLE_NAME = MEDIA
+SOCIAL_INSIGHTS_TABLE_NAME = "facebook_social_insights"
 DAG_ID = f"bietlejuice.{MEDIA}"
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
@@ -97,6 +100,39 @@ facebook_insights_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
+sync_metastore_facebook_insights_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="sync-hive-metastore-raw-facebook-insights",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": SPARK_JOBS_PATH + "/sync_metastore_tables.py",
+            "parameters": [
+                DATALAKE_BUCKET,
+                LayerEnum.RAW.value,
+                SOURCE,
+                "--table-name",
+                INSIGHTS_TABLE_NAME,
+            ],
+        }
+    },
+)
+
+validate_sync_metastore_facebook_insights_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
+    task_id="validate-sync-hive-metastore-raw-facebook-insights",
+    json={
+        "spark_python_task": {
+            "python_file": SPARK_JOBS_PATH + "/validate_sync_metastore_tables.py",
+            "parameters": [
+                LayerEnum.RAW.value,
+                SOURCE,
+                "--table-name",
+                INSIGHTS_TABLE_NAME,
+            ],
+        }
+    },
+)
+
 social_account_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id="facebook-insights-social-to-datalake-raw",
     dag=dag,
@@ -106,12 +142,45 @@ social_account_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
             "parameters": [
                 ENV,
                 SOURCE,
-                "facebook_social_insights",
+                SOCIAL_INSIGHTS_TABLE_NAME,
                 DATALAKE_BUCKET,
                 json.dumps(CONFIGS["accounts"]["social"]),
                 json.dumps(CONFIGS["fields"]["social"]),
                 json.dumps(CONFIGS["breakdowns"]["social"]),
                 "{{ ds }}",
+            ],
+        }
+    },
+)
+
+sync_metastore_facebook_social_insights_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="sync-hive-metastore-raw-facebook-social-insights",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": SPARK_JOBS_PATH + "/sync_metastore_tables.py",
+            "parameters": [
+                DATALAKE_BUCKET,
+                LayerEnum.RAW.value,
+                SOURCE,
+                "--table-name",
+                SOCIAL_INSIGHTS_TABLE_NAME,
+            ],
+        }
+    },
+)
+
+validate_sync_metastore_facebook_social_insights_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
+    task_id="validate-sync-hive-metastore-raw-facebook-social-insights",
+    json={
+        "spark_python_task": {
+            "python_file": SPARK_JOBS_PATH + "/validate_sync_metastore_tables.py",
+            "parameters": [
+                LayerEnum.RAW.value,
+                SOURCE,
+                "--table-name",
+                SOCIAL_INSIGHTS_TABLE_NAME,
             ],
         }
     },
@@ -142,11 +211,25 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 )
 
 create_cluster_task >> facebook_insights_to_datalake_raw_task >> clean_sub_dags[
-    "facebook_insights"
+    INSIGHTS_TABLE_NAME
 ]
 
 create_cluster_task >> social_account_to_datalake_raw_task >> clean_sub_dags[
-    "facebook_social_insights"
+    SOCIAL_INSIGHTS_TABLE_NAME
 ]
 
 list(clean_sub_dags.values()) >> terminate_cluster_task
+
+airflow_helpers.chain(
+    facebook_insights_to_datalake_raw_task,
+    sync_metastore_facebook_insights_task,
+    validate_sync_metastore_facebook_insights_task,
+    terminate_cluster_task,
+)
+
+airflow_helpers.chain(
+    social_account_to_datalake_raw_task,
+    sync_metastore_facebook_social_insights_task,
+    validate_sync_metastore_facebook_social_insights_task,
+    terminate_cluster_task,
+)
