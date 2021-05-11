@@ -4,7 +4,6 @@
 #   from the list bellow.
 
 - bietlejuice.dw_teravoz
-- bietlejuice.enrich_amplitude_visit
 - bietlejuice.enrich_bigfone_events
 - bietlejuice.enrich_bigfone_twilio
 - bietlejuice.enrich_proposal
