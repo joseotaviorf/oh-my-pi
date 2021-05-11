@@ -9,7 +9,6 @@
 - bietlejuice.enrich_retsuko
 - bietlejuice.enrich_sale_flows
 - bietlejuice.enrich_sauron
-- bietlejuice.enrich_zendesk_custom_fields
 - bietlejuice.enrich_zendesk_tickets
 - bietlejuice.owner_fees
 - bietlejuice.quinto_messenger
