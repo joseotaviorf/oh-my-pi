@@ -8,10 +8,11 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
 )
-
+from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 
 SOURCE = "heimdall"
+TABLE_NAME = "activity"
 DAG_ID = f"bietlejuice.{SOURCE}"
 ENV = Variable.get("environment")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
@@ -19,7 +20,7 @@ ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-
+BASE_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
 
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
@@ -87,6 +88,34 @@ create_raw_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
+sync_metastore_raw_table_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="sync-hive-metastore-raw-tables",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": BASE_SPARK_JOB_PATH + "sync_metastore_tables.py",
+            "parameters": [
+                DATALAKE_BUCKET,
+                LayerEnum.RAW.value,
+                SOURCE,
+                "--table-name",
+                TABLE_NAME,
+            ],
+        }
+    },
+)
+
+validate_sync_metastore_raw_table_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
+    task_id="validate-sync-hive-metastore-table",
+    json={
+        "spark_python_task": {
+            "python_file": BASE_SPARK_JOB_PATH + "validate_sync_metastore_tables.py",
+            "parameters": [LayerEnum.RAW.value, SOURCE, "--table-name", TABLE_NAME],
+        }
+    },
+)
+
 create_clean_table_in_datalake = QuintoAndarDatabricksSubmitRunOperator(
     task_id="create_clean_table_in_datalake",
     dag=dag,
@@ -109,6 +138,34 @@ create_clean_external_table_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
+sync_metastore_clean_table_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="sync-hive-metastore-clean-tables",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": BASE_SPARK_JOB_PATH + "sync_metastore_tables.py",
+            "parameters": [
+                DATALAKE_BUCKET,
+                LayerEnum.CLEAN.value,
+                SOURCE,
+                "--table-name",
+                TABLE_NAME,
+            ],
+        }
+    },
+)
+
+validate_sync_metastore_clean_table_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
+    task_id="validate-sync-hive-metastore-clean-table",
+    json={
+        "spark_python_task": {
+            "python_file": BASE_SPARK_JOB_PATH + "validate_sync_metastore_tables.py",
+            "parameters": [LayerEnum.CLEAN.value, SOURCE, "--table-name", TABLE_NAME],
+        }
+    },
+)
+
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
@@ -119,5 +176,19 @@ airflow_helpers.chain(
     create_raw_external_tables_task,
     create_clean_table_in_datalake,
     create_clean_external_table_task,
+    terminate_cluster_task,
+)
+
+airflow_helpers.chain(
+    heimdall_to_datalake_raw_task,
+    sync_metastore_raw_table_task,
+    validate_sync_metastore_raw_table_task,
+    terminate_cluster_task,
+)
+
+airflow_helpers.chain(
+    create_clean_table_in_datalake,
+    sync_metastore_clean_table_task,
+    validate_sync_metastore_clean_table_task,
     terminate_cluster_task,
 )
