@@ -8,7 +8,6 @@
 - bietlejuice.enrich_proposal
 - bietlejuice.enrich_retsuko
 - bietlejuice.enrich_sale_flows
-- bietlejuice.enrich_sale_listings
 - bietlejuice.enrich_sauron
 - bietlejuice.enrich_zendesk_custom_fields
 - bietlejuice.enrich_zendesk_tickets
