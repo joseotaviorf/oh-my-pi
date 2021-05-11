@@ -361,17 +361,53 @@ polygon_region_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
+sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
+    task_id=f"sync-hive-metastore-raw",
+    json={
+        "spark_python_task": {
+            "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables.py",
+            "parameters": [
+                DATALAKE_BUCKET,
+                LayerEnum.RAW.value,
+                SOURCE,
+                "--all-tables",
+            ],
+        }
+    },
+)
+
+validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
+    task_id=f"validate-sync-hive-metastore-raw",
+    json={
+        "spark_python_task": {
+            "python_file": f"{BASE_SPARK_JOBS_PATH}/validate_sync_metastore_tables.py",
+            "parameters": [LayerEnum.RAW.value, SOURCE, "--all-tables"],
+        }
+    },
+)
+
 raw_task_list = build_raw_task_list()
 clean_task_list = build_layer_task_list("clean")
 dw_sub_dags = build_layer_task_list("dw")
 
+# create-cluster >> downstream
 create_cluster_task >> [
     task_list_first_task(raw_task_list),
     polygon_region_to_datalake_raw_task,
 ]
 
-cross_downstream(
-    task_list_last_tasks(raw_task_list),
+# raw >> hive sync
+chain(
+    task_list_first_task(raw_task_list),
+    sync_metastore_table_task,
+    validate_sync_metastore_table_task,
+)
+
+# raw >> clean
+chain(
+    task_list_first_task(raw_task_list),
     [task_list_first_task(c) for c in clean_task_list.values()],
 )
 
@@ -379,6 +415,7 @@ polygon_region_to_datalake_raw_task >> task_list_first_task(
     clean_task_list["polygon_region"]
 )
 
+# clean >> dw
 cross_downstream(
     task_list_last_tasks(clean_task_list.pop("proponent_proposal")),
     [
@@ -425,6 +462,12 @@ cross_downstream(
         task_list_first_task(dw_sub_dags["dim_contract_person"]),
         task_list_first_task(dw_sub_dags["fact_contract_people"]),
     ],
+)
+
+# upstream >> terminate-cluster
+cross_downstream(
+    [validate_sync_metastore_table_task] + task_list_last_tasks(raw_task_list),
+    terminate_cluster_task,
 )
 
 for task_list in clean_task_list.values():
