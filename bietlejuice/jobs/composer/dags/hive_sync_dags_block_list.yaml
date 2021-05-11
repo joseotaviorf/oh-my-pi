@@ -7,7 +7,6 @@
 - bietlejuice.enrich_bigfone_events
 - bietlejuice.enrich_proposal
 - bietlejuice.enrich_retsuko
-- bietlejuice.enrich_robin_hood
 - bietlejuice.enrich_sale_flows
 - bietlejuice.enrich_sale_listings
 - bietlejuice.enrich_sauron
