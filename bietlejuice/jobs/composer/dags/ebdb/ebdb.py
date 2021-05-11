@@ -115,9 +115,43 @@ def dw_tasks(table_name):
         },
     )
 
+    sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=dag,
+        task_id=f"sync-hive-metastore-dw-{slugged_table_name}",
+        json={
+            "spark_python_task": {
+                "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables.py",
+                "parameters": [
+                    DW_BUCKET,
+                    LayerEnum.DW.value,
+                    DW_SCHEMA,
+                    "--table-name",
+                    table_name,
+                ],
+            }
+        },
+    )
+
+    validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=dag,
+        task_id=f"validate-sync-hive-metastore-dw-{slugged_table_name}",
+        json={
+            "spark_python_task": {
+                "python_file": f"{BASE_SPARK_JOBS_PATH}/validate_sync_metastore_tables.py",
+                "parameters": [
+                    LayerEnum.DW.value,
+                    DW_SCHEMA,
+                    "--table-name",
+                    table_name,
+                ],
+            }
+        },
+    )
+    chain(dim_table_task, sync_metastore_table_task, validate_sync_metastore_table_task)
+
     dim_table_task >> load_dim_table_task
 
-    return [dim_table_task, load_dim_table_task]
+    return [dim_table_task, [load_dim_table_task, validate_sync_metastore_table_task]]
 
 
 def clean_tasks(table_name):
