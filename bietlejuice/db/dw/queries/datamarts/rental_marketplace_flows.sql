@@ -124,7 +124,9 @@ weekly_listings_status AS (
                 THEN 'New Listing'
             WHEN  COALESCE(status_week_start, '') NOT IN ('publicado','alugado','') AND COALESCE(status_change_reason, '') IN ('suspended_in_negotiation', 'minuta', 'reservation')
                 THEN 'Advanced Negociation'
-            ELSE 'Other'
+            WHEN week_start < DATEADD('WEEK', -1, DATE_TRUNC('WEEK', CURRENT_DATE))
+                THEN 'Other'
+            ELSE NULL
         END AS status_short,
         CASE
             WHEN COALESCE(status_next_week, '') = 'publicado'
@@ -133,7 +135,9 @@ weekly_listings_status AS (
                 THEN 'Rented'
             WHEN COALESCE(status_next_week, '') NOT IN ('publicado', 'alugado') AND COALESCE(next_status_change_reason, '') IN ('suspended_in_negotiation', 'minuta', 'reservation')
                 THEN 'Advanced Negociation'
-            ELSE 'Other'
+            WHEN week_start < DATEADD('WEEK', -1, DATE_TRUNC('WEEK', CURRENT_DATE))
+                THEN 'Other'
+            ELSE NULL
         END AS status_next_week_short
     FROM
         al_week_status_region AS alm
