@@ -5,7 +5,6 @@
 
 - bietlejuice.dw_teravoz
 - bietlejuice.enrich_bigfone_events
-- bietlejuice.enrich_bigfone_twilio
 - bietlejuice.enrich_proposal
 - bietlejuice.enrich_region
 - bietlejuice.enrich_retsuko
