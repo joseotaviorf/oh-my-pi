@@ -7,9 +7,10 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from airflow.utils.helpers import cross_downstream
+from airflow.utils.helpers import cross_downstream, chain
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.services.file_service import FileService
 
 # DAG params
@@ -31,6 +32,7 @@ DATALAKE_BUCKET = Variable.get("datalake_bucket")
 
 # s3 path setup
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
+BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 EBDB_SPARK_JOBS_PATH = S3_PREFIX + "/spark_jobs/{}/".format(DAG_ID)
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
     Variable.get("databricks_s3_bucket"), DAG_ID
@@ -164,9 +166,48 @@ def clean_tasks(table_name):
         },
     )
 
+    sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=dag,
+        task_id=f"sync-hive-metastore-clean-{slugged_table_name}",
+        json={
+            "spark_python_task": {
+                "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables.py",
+                "parameters": [
+                    DATALAKE_BUCKET,
+                    LayerEnum.CLEAN.value,
+                    SOURCE,
+                    "--table-name",
+                    table_name,
+                ],
+            }
+        },
+    )
+
+    validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=dag,
+        task_id=f"validate-sync-hive-metastore-clean-{slugged_table_name}",
+        json={
+            "spark_python_task": {
+                "python_file": f"{BASE_SPARK_JOBS_PATH}/validate_sync_metastore_tables.py",
+                "parameters": [
+                    LayerEnum.CLEAN.value,
+                    SOURCE,
+                    "--table-name",
+                    table_name,
+                ],
+            }
+        },
+    )
+    chain(
+        clean_table_task, sync_metastore_table_task, validate_sync_metastore_table_task
+    )
+
     clean_table_task >> create_clean_external_tables_task
 
-    return [clean_table_task, create_clean_external_tables_task]
+    return [
+        clean_table_task,
+        [create_clean_external_tables_task, validate_sync_metastore_table_task],
+    ]
 
 
 def build_raw_task_list():
