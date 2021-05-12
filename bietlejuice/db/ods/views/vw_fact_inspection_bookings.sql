@@ -17,6 +17,7 @@ select
   coalesce(insp.id_user_inspector, -1) as sk_inspector,
   insp.id_contract as sk_contract,
   coalesce(to_char(b."data", 'YYYYMMDD')::integer, -1) as sk_booking_inspected_date,
+  coalesce(to_char(date(b.ts_first_canceled_unevaluated), 'YYYYMMDD')::integer, -1) as sk_booking_cancelled_date,
   coalesce(to_char(insp.dt_inspected, 'YYYYMMDD')::integer, -1) as sk_inspected_date,
   coalesce(to_char(insp.ts_expired, 'YYYYMMDD')::integer, -1) as sk_expired_date,
   coalesce(to_char(insp.ts_tenant_approved, 'YYYYMMDD')::integer, -1) as sk_tenant_approved_date,

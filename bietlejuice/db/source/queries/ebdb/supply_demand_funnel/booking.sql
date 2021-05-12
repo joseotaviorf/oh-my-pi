@@ -28,6 +28,7 @@ select
   	when cast(FROM_UNIXTIME(rcanc.`timestamp`/1000) as date) > a.data then null
   	else FROM_UNIXTIME(rcanc.`timestamp`/1000)
   end as cancel_timestamp,
+  FROM_UNIXTIME(rcanc.`timestamp`/1000) ts_first_canceled_unevaluated,
   vo_create.nome as first_update_source,
   vo_create.isApp as is_visit_created_from_app,
   fup.inquilinoCompareceu as visitor_arrived,

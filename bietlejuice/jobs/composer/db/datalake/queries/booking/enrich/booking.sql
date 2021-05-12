@@ -236,6 +236,7 @@ base_booking AS (
        cd.ts_first_canceled,
        NULL
     ) AS ts_first_canceled,
+    cd.ts_first_canceled AS ts_first_canceled_unevaluated,
     CAST(b.dt_booking AS TIMESTAMP)
       + ((b.slot_day * 15 / 60)+8) * INTERVAL 1 HOURS
       + abs(b.slot_day * 15 % 60) * INTERVAL 1 MINUTES

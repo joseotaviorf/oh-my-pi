@@ -26,6 +26,7 @@ create table if not exists booking (
   last_update_source varchar(255),
   is_visit_last_updated_from_app boolean,
   cancel_timestamp timestamp,
+  ts_first_canceled_unevaluated timestamp,
   first_update_source varchar(255),
   is_visit_created_from_app boolean,
   visitor_arrived varchar(255),

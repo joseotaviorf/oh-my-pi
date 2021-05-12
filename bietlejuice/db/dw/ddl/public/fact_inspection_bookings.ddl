@@ -6,6 +6,7 @@ create table if not exists fact_inspection_bookings (
   sk_inspector bigint,
   sk_contract bigint,
   sk_booking_inspected_date bigint,
+  sk_booking_cancelled_date bigint,
   sk_inspected_date bigint,
   sk_expired_date bigint,
   sk_tenant_approved_date bigint,
