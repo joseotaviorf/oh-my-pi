@@ -48,10 +48,34 @@ def create_table(dw_schema, file_path, database_connection):
         keepalives_idle=200,
     )
 
+    table_exists = database_client.get_records(
+        f"""
+            SELECT
+                1
+            FROM
+                information_schema.tables t
+            WHERE
+                t.table_schema = '{dw_schema}'
+                AND t.table_name = '{table_name}'
+        """
+    )
+
+    if table_exists:
+        alter_table_query = f"""
+            ALTER TABLE {dw_schema}.{table_name} RENAME TO {table_name}_old;
+            ALTER TABLE {dw_schema}.{table_name}_new RENAME TO {table_name};
+        """
+    else:
+        alter_table_query = (
+            f"ALTER TABLE {dw_schema}.{table_name}_new RENAME TO {table_name};"
+        )
+
     logger.info("m=create_table, msg=executing query {0}".format(query))
 
-    database_client.drop_table(dw_schema, table_name, if_exists=True)
-    database_client.create_table_from_select(dw_schema, table_name, query)
+    database_client.drop_table(dw_schema, f"{table_name}_new", if_exists=True)
+    database_client.create_table_from_select(dw_schema, f"{table_name}_new", query)
+    database_client.run(alter_table_query)
+    database_client.drop_table(dw_schema, f"{table_name}_old", if_exists=True)
 
 
 def start_spark_job(dw_schema, files_paths, database_connection):
