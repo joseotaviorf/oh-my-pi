@@ -55,6 +55,10 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
 )
 
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    dag=dag, task_id="terminate-cluster"
+)
+
 # [BEGIN] Raw layer tasks
 
 configs_file = FileService.get_dict_from_yaml_file(CONFIGS_FILE_PATH)
@@ -62,13 +66,15 @@ configs_file = FileService.get_dict_from_yaml_file(CONFIGS_FILE_PATH)
 raw_tasks = {}
 
 for table in configs_file:
-    slugged_table_name = table["table_name"].replace("_", "-")
+    table_name = table["table_name"]
+    slugged_table_name = table_name.replace("_", "-")
     extraction_type = table["extraction_type"]
 
-    parameters = [ENV, SOURCE, DATALAKE_BUCKET, table["table_name"]]
+    parameters = [ENV, SOURCE, DATALAKE_BUCKET, table_name]
     if extraction_type == "incremental":
         parameters.append(table["date_filter_column"])
         parameters.append("{{ ds }}")
+
     raw_task = QuintoAndarDatabricksSubmitRunOperator(
         task_id=f"load-{extraction_type}-{slugged_table_name}-to-raw",
         dag=dag,
@@ -79,8 +85,38 @@ for table in configs_file:
             }
         },
     )
-    create_cluster_task >> raw_task
-    raw_tasks[table["table_name"]] = raw_task
+
+    sync_metastore_raw_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        task_id=f"sync-{slugged_table_name}-hive-metastore-raw-table",
+        dag=dag,
+        json={
+            "spark_python_task": {
+                "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables.py",
+                "parameters": [
+                    DATALAKE_BUCKET,
+                    LayerEnum.RAW.value,
+                    SOURCE,
+                    "--table-name",
+                    table_name,
+                ],
+            }
+        },
+    )
+
+    validate_sync_metastore_raw_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=dag,
+        task_id=f"validate-{slugged_table_name}-sync-hive-metastore-raw-table",
+        json={
+            "spark_python_task": {
+                "python_file": BASE_SPARK_JOBS_PATH
+                + "validate_sync_metastore_tables.py",
+                "parameters": [LayerEnum.RAW.value, SOURCE, "--table-name", table_name],
+            }
+        },
+    )
+
+    create_cluster_task >> raw_task >> sync_metastore_raw_table_task >> validate_sync_metastore_raw_table_task >> terminate_cluster_task
+    raw_tasks[table_name] = raw_task
 
 # [END] Raw layer sub dags
 
@@ -122,12 +158,6 @@ clean_sub_dags_dict = {**incr_clean_sub_dags, **full_clean_sub_dags}
 
 # [END] Clean layer sub dags
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-    dag=dag, task_id="terminate-cluster"
-)
-
 for table_name, raw_task in raw_tasks.items():
     if clean_sub_dags_dict.get(table_name):
         raw_task >> clean_sub_dags_dict.get(table_name) >> terminate_cluster_task
-    else:
-        raw_task >> terminate_cluster_task

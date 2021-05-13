@@ -3,6 +3,5 @@
 #   (that uses DatalakeSubdag, DWSubdag or IncrementalDWSubDAG) remove the DAG
 #   from the list bellow.
 
-- bietlejuice.owner_fees
 - bietlejuice.quinto_messenger
 - bietlejuice.ramo_sap
