@@ -1,5 +1,6 @@
 from datetime import datetime
 import pendulum
+import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from airflow.models import Variable
 from airflow.operators.quintoandar_databricks import (
@@ -59,6 +60,9 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
 )
 
+table_name = "razao_sap"
+slugged_table_name = table_name.replace("_", "-")
+
 ramo_sap_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id="ramo-sap-to-datalake-raw",
     dag=dag,
@@ -70,9 +74,37 @@ ramo_sap_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
                 SOURCE,
                 DATALAKE_BUCKET,
                 SAP_DATA_PATH,
-                "razao_sap",
+                table_name,
                 "{{ ds }}",
             ],
+        }
+    },
+)
+
+sync_metastore_raw_table_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id=f"sync-{slugged_table_name}-hive-metastore-raw-table",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": SPARK_JOBS_PATH + "sync_metastore_tables.py",
+            "parameters": [
+                DATALAKE_BUCKET,
+                LayerEnum.RAW.value,
+                SOURCE,
+                "--table-name",
+                table_name,
+            ],
+        }
+    },
+)
+
+validate_sync_metastore_raw_table_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
+    task_id=f"validate-{slugged_table_name}-sync-hive-metastore-raw-table",
+    json={
+        "spark_python_task": {
+            "python_file": SPARK_JOBS_PATH + "validate_sync_metastore_tables.py",
+            "parameters": [LayerEnum.RAW.value, SOURCE, "--table-name", table_name],
         }
     },
 )
@@ -101,6 +133,11 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-create_cluster_task >> ramo_sap_datalake_raw_task >> list(
-    clean_sub_dags.values()
-) >> terminate_cluster_task
+airflow_helpers.chain(
+    create_cluster_task,
+    ramo_sap_datalake_raw_task,
+    sync_metastore_raw_table_task,
+    validate_sync_metastore_raw_table_task,
+    terminate_cluster_task,
+)
+ramo_sap_datalake_raw_task >> list(clean_sub_dags.values()) >> terminate_cluster_task

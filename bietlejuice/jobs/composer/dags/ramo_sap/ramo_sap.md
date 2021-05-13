@@ -14,7 +14,7 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output table: 
 
 1. In data lake raw: 
-- All tables available in source's database.
+- `razao_sap`
 
 2. In data lake clean:​
 - `razao_sap`
