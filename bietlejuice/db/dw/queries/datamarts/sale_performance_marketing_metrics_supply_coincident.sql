@@ -793,5 +793,4 @@ FROM costs_targets_results_combined
   JOIN dim_date AS dd
     USING(sk_date)
 WHERE business_context = 'Sale'
-AND city_group IN ('RMSP','Rio de Janeiro')
 GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
