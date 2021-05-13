@@ -7,6 +7,7 @@ WITH medias_consolidated AS (
         campaign_city,
         account_name,
         report_type,
+        ad_type,
         utm_term,
         utm_content,
         utm_campaign,
@@ -34,7 +35,8 @@ shared_consolidated_costs AS (
         mobile_cost * COALESCE(sr.share, 1) AS mobile_cost,
         other_cost * COALESCE(sr.share, 1) AS other_cost,
         total_cost * COALESCE(sr.share, 1) AS total_cost,
-        report_type
+        report_type,
+        ad_type
     FROM
         medias_consolidated mc
         LEFT JOIN datalake_consolidated_marketing_costs.sharing_rules_marketing_daily_costs sr
@@ -160,7 +162,8 @@ SELECT
     mobile_cost,
     other_cost,
     total_cost,
-    report_type
+    report_type,
+    ad_type
 FROM 
     shared_consolidated_costs scc
     LEFT JOIN city_group_mappings cgm

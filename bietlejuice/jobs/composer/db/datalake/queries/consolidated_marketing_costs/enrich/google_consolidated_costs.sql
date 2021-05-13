@@ -78,14 +78,18 @@ campaign_main_report_type AS (
         campaign_name,
         id_campaign,
         CASE
-            WHEN LOWER(campaign_name) LIKE '%discovery%' THEN 'ads_performance_report'
-            WHEN LOWER(campaign_name) LIKE '%smart%' THEN 'keywords_performance_report'
-            ELSE COALESCE(
+            WHEN (
+                LOWER(campaign_name) LIKE '%discovery%'
+                OR LOWER(campaign_name) LIKE '%smart%'
+            ) 
+                THEN 'ads_performance_report'
+            ELSE 
+                COALESCE(
                      has_keywords_performance_report,
                      has_videos_performance_report,
                      has_ads_performance_report,
                      has_campaigns_performance_report
-                 )
+                )
         END AS report_type
     FROM
         pivot_campaign_reports
@@ -98,14 +102,15 @@ keywords_costs AS (
         INT(REPLACE(gkpr.load_date, '-', '')) AS id_date,
         gkpr.campaign_name,
         LOWER(
-            CASE WHEN SPLIT(gkpr.campaign_name, '\\.')[2] RLIKE '[0-9]+$' THEN
-                SPLIT(gkpr.campaign_name, '\\.')[3]
-            ELSE
+            CASE WHEN SPLIT(gkpr.campaign_name, '\\.')[1] RLIKE '[0-9]+$' THEN
                 SPLIT(gkpr.campaign_name, '\\.')[2]
+            ELSE
+                SPLIT(gkpr.campaign_name, '\\.')[1]
             END
         ) AS campaign_city,
         gkpr.acc AS account_name,
         gkpr.report_type,
+        NULL AS ad_type,
         criteria || '_' || LOWER(LEFT(match_type, 1)) AS utm_term,
         NULL AS utm_content,
         gkpr.campaign_name AS utm_campaign,
@@ -126,7 +131,7 @@ keywords_costs AS (
     WHERE
         load_date = DATE('{year}-{month}-{day}')
     GROUP BY
-        1,2,3,4,5,6,7
+        1,2,3,4,5,6,7,8
 ),
 
 ads_costs AS (
@@ -134,14 +139,15 @@ ads_costs AS (
         INT(REPLACE(gapr.load_date, '-', '')) AS id_date,
         gapr.campaign_name,
         LOWER(
-            CASE WHEN SPLIT(gapr.campaign_name, '\\.')[2] RLIKE '[0-9]+$' THEN
-                SPLIT(gapr.campaign_name, '\\.')[3]
-            ELSE
+            CASE WHEN SPLIT(gapr.campaign_name, '\\.')[1] RLIKE '[0-9]+$' THEN
                 SPLIT(gapr.campaign_name, '\\.')[2]
+            ELSE
+                SPLIT(gapr.campaign_name, '\\.')[1]
             END
         ) AS campaign_city,
         gapr.acc AS account_name,
         gapr.report_type,
+        COALESCE(ad_types.flag, 'other') AS ad_type,
         STRING(ad_group_name) AS utm_term,
         STRING(id_ad) AS utm_content,
         gapr.campaign_name AS utm_campaign,
@@ -159,10 +165,12 @@ ads_costs AS (
         JOIN campaign_main_report_type cmrt 
             ON cmrt.id_campaign = gapr.id_campaign 
             AND cmrt.report_type = gapr.report_type
+        LEFT JOIN datalake_gsheets_clean.marketing_costs_google_ad_type_flags ad_types
+            ON ad_types.ad_type = gapr.ad_type
     WHERE
         load_date = DATE('{year}-{month}-{day}')
     GROUP BY
-        1,2,3,4,5,6,7
+        1,2,3,4,5,6,7,8
 ),
 
 campaigns_costs AS (
@@ -170,14 +178,15 @@ campaigns_costs AS (
         INT(REPLACE(gcpr.load_date, '-', '')) AS id_date,
         gcpr.campaign_name,
         LOWER(
-            CASE WHEN SPLIT(gcpr.campaign_name, '\\.')[2] RLIKE '[0-9]+$' THEN
-                SPLIT(gcpr.campaign_name, '\\.')[3]
-            ELSE
+            CASE WHEN SPLIT(gcpr.campaign_name, '\\.')[1] RLIKE '[0-9]+$' THEN
                 SPLIT(gcpr.campaign_name, '\\.')[2]
+            ELSE
+                SPLIT(gcpr.campaign_name, '\\.')[1]
             END
         ) AS campaign_city,
         gcpr.acc AS account_name,
         gcpr.report_type,
+        NULL AS ad_type,
         NULL AS utm_term,
         NULL AS utm_content,
         gcpr.campaign_name AS utm_campaign,
@@ -198,7 +207,7 @@ campaigns_costs AS (
     WHERE
         load_date = DATE('{year}-{month}-{day}')
     GROUP BY
-        1,2,3,4,5,6,7
+        1,2,3,4,5,6,7,8
 ),
 
 videos_costs AS (
@@ -206,14 +215,15 @@ videos_costs AS (
         INT(REPLACE(gvpr.load_date, '-', '')) AS id_date,
         gvpr.campaign_name,
         LOWER(
-            CASE WHEN SPLIT(gvpr.campaign_name, '\\.')[2] RLIKE '[0-9]+$' THEN
-                SPLIT(gvpr.campaign_name, '\\.')[3]
-            ELSE
+            CASE WHEN SPLIT(gvpr.campaign_name, '\\.')[1] RLIKE '[0-9]+$' THEN
                 SPLIT(gvpr.campaign_name, '\\.')[2]
+            ELSE
+                SPLIT(gvpr.campaign_name, '\\.')[1]
             END
         ) AS campaign_city,
         gvpr.acc AS account_name,
         gvpr.report_type,
+        NULL AS ad_type,
         NULL AS utm_term,
         NULL AS utm_content,
         gvpr.campaign_name AS utm_campaign,
@@ -234,7 +244,7 @@ videos_costs AS (
     WHERE
         load_date = DATE('{year}-{month}-{day}')
     GROUP BY
-        1,2,3,4,5,6,7
+        1,2,3,4,5,6,7,8
 )
 
 SELECT * FROM keywords_costs

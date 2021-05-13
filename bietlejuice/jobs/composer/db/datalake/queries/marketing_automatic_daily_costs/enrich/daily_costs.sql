@@ -1,21 +1,21 @@
 WITH platforms AS (
     SELECT
-        1 AS i,
+        0 AS i,
         'Desktop' AS mkt_platform
     UNION ALL
     SELECT
-        2,
+        1,
         'Mobile'
     UNION ALL
     SELECT
-        3,
+        2,
         'Other'
 ),
 
 taxonomy_by_platform AS (
     SELECT
         mcft.*,
-        FLOAT(COALESCE(NULLIF(TRIM(SPLIT(cost_factor, ';')[p.i-1]), ''), '1.0')) AS fator_custo,
+        FLOAT(COALESCE(NULLIF(TRIM(SPLIT(cost_factor, ';')[p.i]), ''), '1.0')) AS fator_custo,
         p.mkt_platform
     FROM
         datalake_gsheets_clean.marketing_costs_full_taxonomy mcft
@@ -59,23 +59,18 @@ media_costs_with_taxonomy AS (
         COALESCE(tp.mkt_platform, 'Not Mapped') AS mkt_platform,
         COALESCE(tp.side, 'Not Mapped') AS funnel_side,
         tp.fator_custo,
-        (CASE WHEN total_cost IS NULL THEN
-            (CASE 
-                WHEN tp.mkt_platform = 'Mobile' THEN mobile_cost
-                WHEN tp.mkt_platform = 'Desktop' THEN desktop_cost
-                WHEN tp.mkt_platform = 'Other' THEN other_cost
-                WHEN tp.mkt_platform IS NULL AND total_cost IS NULL THEN
-                    COALESCE(mobile_cost, 0) + COALESCE(desktop_cost, 0) + COALESCE(other_cost, 0)
-            END)
-            ELSE
-                total_cost
-        END) * FLOAT(COALESCE(tp.fator_custo, '1')) AS cost
+        CASE 
+            WHEN tp.mkt_platform = 'Mobile' THEN mobile_cost
+            WHEN tp.mkt_platform = 'Desktop' THEN desktop_cost
+            WHEN tp.mkt_platform = 'Other' THEN other_cost
+        END * tp.fator_custo AS cost
     FROM
         enriched_consolidated_media_costs ecmc
         LEFT JOIN
             taxonomy_by_platform AS tp 
                 ON COALESCE(ecmc.account_name, '') = COALESCE(tp.account_name, '')
                     AND COALESCE(ecmc.report_type, '') = COALESCE(tp.report_type, '')
+                    AND COALESCE(ecmc.ad_type, '') = COALESCE(tp.ad_type, '')
                     AND ecmc.origin = tp.origin
                     AND ecmc.campaign_origin_acquisition = tp.campaign_origin_acquisition
 )
@@ -86,3 +81,4 @@ FROM
     media_costs_with_taxonomy 
 WHERE
     cost > 0
+    AND LOWER(SPLIT(campaign_name, '\\.')[0]) <> 'zebra'
