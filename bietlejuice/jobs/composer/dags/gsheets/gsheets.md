@@ -42,6 +42,7 @@ This pipeline produces the following output tables:
     - `marketing_offline_manual_share_cost_center`
     - `taxonomy_affiliates`
     - `taxonomy_demand`
+    - `marketing_offline_budget`
 
 ### Responsible Data Engineering Team
 ​
