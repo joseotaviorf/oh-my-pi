@@ -37,7 +37,7 @@ LOAD_SAP_INTO_DATALAKE_RAW_FILE_PATH = (
 )
 DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
 LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{DAG_ID}"
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base"
+SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 
 # cluster setup
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
