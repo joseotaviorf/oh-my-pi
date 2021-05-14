@@ -89,7 +89,9 @@ file_list = FileService.list_sql_files_without_extension_from_layer(
     DAG_NAME, LayerEnum.CLEAN.value
 )
 
-clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(dag, file_list)
+clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(
+    dag, file_list, is_incremental=True, partitions=["year", "month", "day"]
+)
 
 # Creating sub dags
 for app_group in APP_GROUPS:
