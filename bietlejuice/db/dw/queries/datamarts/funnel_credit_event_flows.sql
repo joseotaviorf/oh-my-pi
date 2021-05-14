@@ -23,7 +23,7 @@ WITH rent_flows_base AS (
     INNER JOIN dim_date dd
         ON f.sk_offer_approved_date = dd.sk_date
     WHERE
-        dd.date >= '2019-01-01'
+        dd.date >= '2020-01-01'
     ),
 
 events_dates AS (

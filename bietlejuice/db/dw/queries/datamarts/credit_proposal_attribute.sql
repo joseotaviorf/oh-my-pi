@@ -1,6 +1,5 @@
 WITH rent_flows_base AS (
     SELECT
-        sk_rent_flow,
         sk_house_listing,
         LEFT(sk_house_listing,9) AS id_house,
         sk_region,
@@ -24,18 +23,19 @@ WITH rent_flows_base AS (
     INNER JOIN dim_date dd
         ON f.sk_offer_approved_date = dd.sk_date
     WHERE
-        dd.date >= '2019-01-01'
+        dd.date >= '2020-01-01'
     ),
 
 tenants AS (
     SELECT
         proposta_id,
-    	COUNT(*) AS tenants,
-    	SUM(CASE WHEN vaimorar is true THEN 1 ELSE 0 END) AS solidarity_tenant
+        COUNT(*) AS tenants,
+        SUM(CASE WHEN vaimorar is true THEN 1 ELSE 0 END) AS solidarity_tenant
     FROM
         datalake_ebdb_raw_prod.propostaproponente pp
     WHERE
         tipo = 'Inquilino'
+        AND criadoem >= '2020-01-01'
     GROUP BY 1
     ),
 
@@ -56,8 +56,8 @@ proponent AS (
 user_proposal_score AS (
     SELECT
         id_proposal,
-    	MAX(boavista_score) AS bv_score,
-    	MAX(serasa_score) AS serasa_score
+        MAX(boavista_score) AS bv_score,
+        MAX(serasa_score) AS serasa_score
     FROM 
         proponent
     WHERE
@@ -68,38 +68,40 @@ user_proposal_score AS (
 dti AS (
     SELECT
         p.id,
-    	MAX(p.status) AS status,
-    	MAX(p.ts_analyzed) AS created_at,
-        SUM(p2.monthly_income) AS renda,
-    	MAX(p.rent_value + p.condo_value + p.iptu_value + NULLIF(p.home_insurance_value,0)) AS package
+        MAX(p.status) AS status,
+        MAX(p.ts_created) AS created_at,
+        SUM(p2.monthly_income) AS income,
+        MAX(p.rent_value + p.condo_value + p.iptu_value + NULLIF(p.home_insurance_value,0)) AS package
     FROM 
-        datalake_sorting_hat_clean_prod.proposal AS p 
+        datalake_sorting_hat_clean_prod.proposal AS p
     LEFT JOIN 
         proponent AS p2
             ON p.id = p2.id_proposal 
+    WHERE
+        p.ts_created >= '2020-01-01'
     GROUP BY 1
     ),
     
 job_type AS (
-     with proposal_income_nature AS (
+    with proposal_income_nature AS (
         SELECT
             id_proposal,
-            SUM(CASE WHEN income_nature = 'CLT' THEN 1 ELSE 0 END) AS CLT,
-            SUM(CASE WHEN income_nature != 'CLT' THEN 1 ELSE 0 END) AS Outros,
+            SUM(CASE WHEN income_nature = 'CLT' THEN 1 ELSE 0 END) AS clt,
+            SUM(CASE WHEN income_nature != 'CLT' THEN 1 ELSE 0 END) AS outros,
             COUNT(DISTINCT id) AS total_iq
 	FROM 
 	    proponent
 	GROUP BY 1
-        )
+    )
     
     SELECT
         DISTINCT id_proposal,
-    	CASE
-    	    WHEN clt = total_iq THEN 'clt'
-    	    WHEN outros = total_iq THEN 'outros'
-    	    WHEN clt > 0 THEN 'clt'
-    	    WHEN outros > 0 THEN 'outros'
-    	    ELSE ''
+        CASE
+            WHEN clt = total_iq THEN 'clt'
+            WHEN outros = total_iq THEN 'outros'
+            WHEN clt > 0 THEN 'clt'
+            WHEN outros > 0 THEN 'outros'
+            ELSE ''
         END AS jobtype
     FROM 
         proposal_income_nature
@@ -111,6 +113,8 @@ credit_analysis AS (
     	    id_proposal,
     	    max(ts_updated) AS laststatus
         FROM datalake_sorting_hat_clean_prod.credit_analysis
+        WHERE
+            ts_created >= '2020-01-01'
         GROUP BY 1
 	) 
 	    
@@ -130,6 +134,8 @@ credit_analysis AS (
 	INNER JOIN 
 	    last_status AS ls
 	        ON ls.id_proposal = ca.id_proposal AND ls.laststatus = ca.ts_updated
+	WHERE
+        ca.ts_created >= '2020-01-01'
 	),
 	
 house_origin_type as (
@@ -145,9 +151,11 @@ house_origin_type as (
     LEFT JOIN
         datamarts.quintoandar_consultant_listings AS ciq
             ON dhl.id_house = ciq.id_house
+    WHERE
+        dhl.ts_house_first_publication >= '2020-01-01'
     )
     
-SELECT
+SELECT DISTINCT
     rfb.sk_proposal,
     dp.status AS status_proposal,
     dp.status_sortinghat AS status_sortinghat,
@@ -156,9 +164,9 @@ SELECT
     dp.guarantee AS proposal_guarantee,
     dc.cancellation_reason AS contract_cancellation_reason,
     jt.jobtype,
-    dti.renda AS income,
+    dti.income,
     dti.package,
-    (dti.package/dti.renda::float) AS dti,
+    (dti.package/nullif(dti.income::float,0)) AS dti,
     ca.type,
     ca.level,
     ca.result,
@@ -177,21 +185,18 @@ SELECT
     END AS classification,
     t.tenants,
     t.solidarity_tenant,
-    CASE
-        WHEN (dr.city_group = '' OR dr.city_group IS NULL) THEN 'Sem info'
-        ELSE dr.city_group
-    END AS city_group,
+    dr.city_group,
     dr.city_name,
     ups.bv_score,
     ups.serasa_score,    
     sr.risk_category,
     sr.score,
     CASE 
-    	WHEN sr.score between 0 AND 350 THEN 'E'
-    	WHEN sr.score between 351 AND 569 THEN 'D'
-    	WHEN sr.score between 570 AND 815 THEN 'C'
-    	WHEN sr.score between 816 AND 913 THEN 'B'
-    	WHEN sr.score between 914 AND 1000 THEN 'A'
+        WHEN sr.score between 0 AND 350 THEN 'E'
+        WHEN sr.score between 351 AND 569 THEN 'D'
+        WHEN sr.score between 570 AND 815 THEN 'C'
+        WHEN sr.score between 816 AND 913 THEN 'B'
+        WHEN sr.score between 914 AND 1000 THEN 'A'
     END AS fx_score_5a,
     dof.is_instant_offer,
     dof.type AS offer_type,
@@ -201,15 +206,12 @@ FROM
 INNER JOIN
     dim_proposal AS dp
         ON rfb.sk_proposal = dp.sk_proposal
-LEFT JOIN
+INNER JOIN
     house_origin_type AS ht
         ON rfb.id_house = ht.id_house
 LEFT JOIN
     dim_contract AS dc
         ON rfb.sk_contract = dc.sk_contract
-INNER JOIN 
-    datamarts.funnel_demand_flows AS fdf 
-        ON rfb.sk_rent_flow = fdf.sk_rent_flow
 INNER JOIN 
     dim_offer AS dof
         ON rfb.sk_offer = dof.sk_offer
