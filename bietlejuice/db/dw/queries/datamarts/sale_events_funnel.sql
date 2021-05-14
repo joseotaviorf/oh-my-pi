@@ -32,8 +32,8 @@ SELECT
         WHEN lf.mkt_channel = 'Paid' AND lf.mkt_origin = 'Owner PWA' THEN 'Paid'
 	END AS mkt_type,
 	CASE
-	    WHEN dr.city_group NOT IN ('RMSP', 'Rio de Janeiro','Belo Horizonte') THEN 'Out of coverage area'
-	    WHEN dr.city_group IN ('RMSP', 'Rio de Janeiro','Belo Horizonte') THEN dr.city_group
+	    WHEN dr.city_group NOT IN ('RMSP', 'Rio de Janeiro','Belo Horizonte','Porto Alegre') THEN 'Out of coverage area'
+	    WHEN dr.city_group IN ('RMSP', 'Rio de Janeiro','Belo Horizonte','Porto Alegre') THEN dr.city_group
 	END AS city_group
 FROM
     datamarts.lead_listing_flows lf
