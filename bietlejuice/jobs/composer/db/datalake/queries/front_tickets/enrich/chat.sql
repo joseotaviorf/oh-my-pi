@@ -111,19 +111,19 @@ back_tickets AS (
     zd.id_ticket AS back_ticket,
     zd.status AS back_ticket_status,
     zd2.id_ticket AS front_ticket,
-    REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{20,40})',1) AS front_task
+    REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})',1) AS front_task
   FROM
     zendesk_aditional_ticket_info zd
   JOIN
     quinto_messenger_tickets qmt
-      ON qmt.id_task = REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{20,40})',1)
+      ON qmt.id_task = REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})',1)
   JOIN
     zendesk_aditional_ticket_info zd2
       ON qmt.id_session = zd2.id_session
   WHERE
     zd.tags LIKE '%tarefa_atendimento_escalado%'
     AND (zd.tags NOT LIKE '%bot_end_conversation%' AND zd.tags NOT LIKE '%closed_by_merge%')
-    AND REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{20,40})',1) != '' 
+    AND REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})',1) != '' 
 ),
 task_completion_reason AS (
     SELECT

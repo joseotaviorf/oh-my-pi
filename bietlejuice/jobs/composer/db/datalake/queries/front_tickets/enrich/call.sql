@@ -162,7 +162,7 @@ zendesk AS (
   filtered_custom_fields AS (
     SELECT
       zcf.id_ticket,
-      explode(split(REPLACE(REPLACE(custom_fields, '{', ''), '}', ''), ',')) AS custom_field
+      EXPLODE(SPLIT(REPLACE(REPLACE(custom_fields, '{{', ''), '}}', ''), ',')) AS custom_field
     FROM 
       datalake_clean.zendesk_custom_fields zcf
   ),
@@ -247,7 +247,7 @@ zendesk AS (
 ),
 back_tickets AS (
   SELECT 
-    REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{20,40})',1) AS front_task,
+    REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})',1) AS front_task,
     zd.id_ticket AS back_ticket,
     zd.status,
     zd2.id_ticket AS front_ticket
@@ -255,14 +255,14 @@ back_tickets AS (
     zendesk zd
   JOIN
     call
-      ON call.id_task = REGEXP_EXTRACT(description, '(WT[a-z0-9]{20,40})',1)
+      ON call.id_task = REGEXP_EXTRACT(description, '(WT[a-z0-9]{{20,40}})',1)
   JOIN  
     zendesk zd2
       ON zd2.id_call = call.sk_call
   WHERE 
     zd.tags LIKE '%tarefa_atendimento_escalado%'
     AND (zd.tags NOT LIKE '%bot_end_conversation%' AND zd.tags NOT LIKE '%closed_by_merge%')
-    AND REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{20,40})',1) != '' 
+    AND REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})',1) != '' 
 )
 SELECT
   DISTINCT zd.id_ticket,
@@ -321,4 +321,4 @@ LEFT JOIN
   back_tickets bt
     ON bt.front_ticket = zd.id_ticket
 WHERE
-  t.tags NOT LIKE '%tarefa_atendimento_escalado%'
+  zd.tags NOT LIKE '%tarefa_atendimento_escalado%'

@@ -10,7 +10,7 @@ WITH zendesk_taxonomy AS (
   filtered_custom_fields AS (
     SELECT
       zcf.id_ticket,
-      EXPLODE(SPLIT(REPLACE(REPLACE(custom_fields, '{', ''), '}', ''), ',')) AS custom_field
+      EXPLODE(SPLIT(REPLACE(REPLACE(custom_fields, '{{', ''), '}}', ''), ',')) AS custom_field
     FROM 
       datalake_clean.zendesk_custom_fields zcf
     WHERE 

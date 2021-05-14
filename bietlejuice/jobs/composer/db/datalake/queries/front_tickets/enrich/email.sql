@@ -97,7 +97,7 @@ taxonomy AS (
   filtered_custom_fields AS (
     SELECT
       zcf.id_ticket,
-      EXPLODE(SPLIT(REPLACE(REPLACE(custom_fields, '{', ''), '}', ''), ',')) AS custom_field
+      EXPLODE(SPLIT(REPLACE(REPLACE(custom_fields, '{{', ''), '}}', ''), ',')) AS custom_field
     FROM 
       datalake_clean.zendesk_custom_fields zcf
     WHERE 
@@ -169,13 +169,13 @@ back_tickets AS (
   SELECT
     id_ticket AS back_ticket,
     status AS back_ticket_status,
-    REGEXP_EXTRACT(SUBSTRING(SPLIT(description, 'Ticket do contato')[1], 1, 18), '([0-9]{8})', 1) AS front_ticket
+    REGEXP_EXTRACT(SUBSTRING(SPLIT(description, 'Ticket do contato')[1], 1, 18), '([0-9]{{8}})', 1) AS front_ticket
   FROM
     zendesk_email
   WHERE 
     tags LIKE '%tarefa_atendimento_escalado%'
     AND (tags NOT LIKE '%bot_end_conversation%' AND tags NOT LIKE '%closed_by_merge%')
-    AND REGEXP_EXTRACT(SUBSTRING(SPLIT(description, 'Ticket do contato')[1], 1, 18), '([0-9]{8})', 1) != ''
+    AND REGEXP_EXTRACT(SUBSTRING(SPLIT(description, 'Ticket do contato')[1], 1, 18), '([0-9]{{8}})', 1) != ''
 )
 SELECT DISTINCT 
   ze.id_ticket,
