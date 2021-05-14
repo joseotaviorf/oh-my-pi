@@ -85,8 +85,8 @@ campaign_main_report_type AS (
                 THEN 'ads_performance_report'
             ELSE 
                 COALESCE(
-                     has_keywords_performance_report,
                      has_videos_performance_report,
+                     has_keywords_performance_report,
                      has_ads_performance_report,
                      has_campaigns_performance_report
                 )

@@ -70,7 +70,7 @@ media_costs_with_taxonomy AS (
             taxonomy_by_platform AS tp 
                 ON COALESCE(ecmc.account_name, '') = COALESCE(tp.account_name, '')
                     AND COALESCE(ecmc.report_type, '') = COALESCE(tp.report_type, '')
-                    AND COALESCE(ecmc.ad_type, '') = COALESCE(tp.ad_type, '')
+                    AND COALESCE(ecmc.ad_type, 'other') = COALESCE(tp.ad_type, 'other')
                     AND ecmc.origin = tp.origin
                     AND ecmc.campaign_origin_acquisition = tp.campaign_origin_acquisition
 )
