@@ -10,6 +10,8 @@ CREATE TABLE sale.dim_listing (
 	unpublished_reason VARCHAR,
 	short_url VARCHAR,
 	is_for_rent BOOLEAN,
+	has_active_rental_contract BOOLEAN,
+	has_house_been_rented BOOLEAN,
 	ts_created TIMESTAMP,
 	ts_first_publication TIMESTAMP,
 	ts_last_publication TIMESTAMP,
