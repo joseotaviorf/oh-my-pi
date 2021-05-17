@@ -5,6 +5,26 @@ WITH quinto_messenger_tickets AS (
         MAX(ts_updated) AS ts_last_updated 
       FROM datalake_quinto_messenger.task
       GROUP BY 1
+  ),
+  task_started AS (
+    SELECT
+        id_task,
+        ts_created_local AS ts_task_created
+    FROM
+        datalake_quinto_messenger.task_event
+    WHERE
+        type = 'reservation.accepted'
+    GROUP BY 1,2
+  ),
+  task_closed AS (
+    SELECT
+      id_task,
+      ts_created_local AS ts_task_closed
+    FROM
+      datalake_quinto_messenger.task_event
+    WHERE 
+      type IN ('reservation.completed', 'reservation.rejected', 'reservation.timeout')
+    GROUP BY 1,2
   )
   SELECT
       t.id_task,
@@ -12,8 +32,9 @@ WITH quinto_messenger_tickets AS (
       c.id_source AS id_session,
       id_agent,
       seconds_to_first_response AS seconds_first_reply,
-      FIRST_VALUE(task_queue_name) OVER (PARTITION BY te.id_task ORDER BY te.ts_created) AS first_departament,
-      LAST_VALUE(task_queue_name) OVER (PARTITION BY te.id_task ORDER BY te.ts_created) AS last_departament, 
+      task_queue_name AS departament,
+      FIRST_VALUE(task_queue_name) OVER (PARTITION BY c.id_conversation ORDER BY t.ts_created) AS first_departament,
+      LAST_VALUE(task_queue_name) OVER (PARTITION BY c.id_conversation ORDER BY t.ts_created) AS last_departament, 
       CASE
           WHEN seconds_to_first_response / 60 <= 15 THEN TRUE
           WHEN seconds_to_first_response / 60 > 15 THEN FALSE
@@ -23,6 +44,10 @@ WITH quinto_messenger_tickets AS (
       contact_motivation_tag AS motivation,
       contact_theme_tag AS theme,
       c.seconds_duration/60.0 AS minutes_full_resolution_time_calendar,
+      t.ts_created,
+      t.ts_updated,
+      tc.ts_task_closed,
+      ts.ts_task_created,
       ts_twilio_created_local,
       ts_twilio_updated_local  
     FROM
@@ -37,6 +62,12 @@ WITH quinto_messenger_tickets AS (
     JOIN
       datalake_quinto_messenger.task_event te
         ON t.id_task = te.id_task
+    LEFT JOIN
+      task_closed tc
+        ON tc.id_task = t.id_task
+    LEFT JOIN
+      task_started ts
+        ON ts.id_task = t.id_task
     WHERE
         c.ts_created > '2020-08-20'
         AND c.channel_status <> 'missed'

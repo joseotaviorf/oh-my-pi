@@ -16,6 +16,17 @@ WITH tasks AS (
         datalake_bigfone_twilio.call_flex_events
     WHERE
         event_type = 'reservation.accepted'
+    GROUP BY 1,2,3
+  ),
+  task_closed AS (
+    SELECT
+        GET_JSON_OBJECT(metadata,'$.event_data.ReservationSid') AS id_reservation,
+        FROM_UTC_TIMESTAMP(TO_TIMESTAMP(event_timestamp, 'yyyy-MM-dd HH:mm:ss'), 'Brazil/East') AS ts_closed
+    FROM
+        datalake_bigfone_clean.event
+    WHERE
+        event IN ('reservation.completed', 'reservation.timeout', 'reservation.canceled', 'reservation.rejected')
+    GROUP BY 1,2
   )
   SELECT
     r.id_reservation,
@@ -35,7 +46,8 @@ WITH tasks AS (
     ts_created,
     ts_ended,
     tt.ts_twilio_created_local,
-    tt.ts_twilio_created_utc
+    tt.ts_twilio_created_utc,
+    tc.ts_closed
   FROM
     datalake_bigfone_twilio.call_flex_reservations r
   INNER JOIN
@@ -45,6 +57,9 @@ WITH tasks AS (
   LEFT JOIN
     twilio_timestamp tt
         ON tt.id_reservation = r.id_reservation
+  LEFT JOIN
+    task_closed tc
+        ON tc.id_reservation = r.id_reservation
 ),
 call AS (
   WITH ivr_events AS (
@@ -280,6 +295,8 @@ SELECT
       WHEN seconds_total_wait_time > 60 AND t.is_answered THEN FALSE
       ELSE NULL
   END AS sla_achieved,
+  t.seconds_duration/60.0 AS task_minutes_duration,
+  t.seconds_wait_time/60.0 AS task_minutes_wait_time,
   c.seconds_duration/60.0 AS minutes_full_resolution_time_calendar,
   zd.minutes_first_resolution_time_calendar,
   zd.minutes_first_resolution_time_business,
@@ -307,7 +324,9 @@ SELECT
   c.is_csat_answered,
   c.is_solved,
   c.csat_rating,
-  c.ts_csat_answered
+  c.ts_csat_answered,
+  t.ts_twilio_created_local AS ts_task_created,
+  t.ts_closed AS ts_task_closed
 FROM 
   tasks t
 JOIN 
