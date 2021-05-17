@@ -179,7 +179,6 @@ back_tickets AS (
 )
 SELECT DISTINCT 
   ze.id_ticket,
-  ze.id_ticket,
   ze.id_requester,
   ze.id_agent,
   ze.tags,

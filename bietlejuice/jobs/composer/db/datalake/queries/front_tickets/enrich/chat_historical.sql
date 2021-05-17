@@ -166,7 +166,26 @@ chat_csat AS (
     AND DATE(c.ts_attended) >= DATE'2018-01-01'
 )
 SELECT DISTINCT
-  * 
+  ct.id_ticket,
+  ct.id_agent,
+  ct.seconds_first_reply_time,
+  ct.departament,
+  ct.first_departament,
+  ct.last_departament,
+  ct.sla_achieved,
+  ct.contact_type_tag,
+  ct.contact_motivation_tag,
+  ct.contact_theme_tag,
+  ct.minutes_full_resolution_time_calendar,
+  ct.minutes_first_resolution_time_calendar,
+  ct.minutes_first_resolution_time_business,
+  cc.csat_score,
+  cc.group_name,
+  cc.comment,
+  cc.is_solved,
+  cc.dt_survey,
+  ct.ts_created,
+  ct.ts_updated
 FROM 
   historical_chat_tickets ct
 LEFT JOIN
