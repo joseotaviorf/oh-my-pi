@@ -521,6 +521,8 @@ campaigns_full AS (
             campaign_name_l,
             CASE WHEN campaign_name_l LIKE '%calc%' THEN
                 'Calculator'
+            WHEN campaign_name_l LIKE '%newchannel%' THEN
+                'New Channels'
             ELSE
                 'Other'
             END AS campaign_origin_aquisition,
@@ -571,6 +573,9 @@ cost_taxonomy AS (
             CASE WHEN LOWER(NULLIF (campaign_name, ''))
             LIKE '%calc%' THEN
                 'Calculator'
+                WHEN LOWER(NULLIF (campaign_name, ''))
+            LIKE '%newchannel%' THEN
+                'New Channels'
             ELSE
                 'Other'
             END::varchar campaign_origin_aquisition,
@@ -632,9 +637,10 @@ cost_taxonomy AS (
                 NULLIF (r.city_group, '') AS cost_city_group,
                 NULL AS city_campaign_mapping_rule,
                 NULL AS campaign_city_matched,
-                CASE WHEN LOWER(NULLIF (campaign_name, ''))
-                LIKE '%calc%' THEN
+                CASE WHEN LOWER(NULLIF (campaign_name, '')) LIKE '%calc%' THEN
                     'Calculator'
+                WHEN LOWER(NULLIF (campaign_name, '')) LIKE '%newchannel%' THEN
+                    'New Channels'
                 ELSE
                     'Other'
                 END AS campaign_origin_aquisition,
