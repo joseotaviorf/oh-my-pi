@@ -4,6 +4,7 @@ SELECT
     COALESCE(b.id_house, -1) AS sk_house,
     COALESCE(h.id_region, -1) AS sk_region,
     COALESCE(b.id_agent, -1) AS sk_agent,
+    COALESCE(b.id_sale_fixed_agent, -1) AS sk_fixed_agent,
     COALESCE(b.id_visitor, -1) AS sk_buyer,
     COALESCE(h.id_user, -1) AS sk_seller,
     COALESCE(b.id_visit, -1) AS sk_visit,
@@ -17,6 +18,8 @@ SELECT
     COALESCE(BIGINT(DATE_FORMAT(b.ts_visit_fup, 'yyyyMMdd')), -1) AS sk_visit_follow_up_date,
     COALESCE(BIGINT(DATE_FORMAT(ar.ts_created, 'yyyyMMdd')), -1) AS sk_agent_review_rating_date,
     COALESCE(BIGINT(DATE_FORMAT(br.dt_creation, 'yyyyMMdd')), -1) AS sk_buyer_review_rating_date,
+    b.days_visit_cancelled_to_visit,
+    b.days_visit_booked_to_visit,
     b.days_visit_booked_to_visit_cancelled,
     b.days_visit_booked_to_visit_completed,
     NOW() AS ts_load

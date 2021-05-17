@@ -119,6 +119,52 @@ reschedules AS (
       id_rescheduled_booking IS NOT NULL
     GROUP BY 1 -- guaranteeing there are no future duplication on Product
 ),
+visitor_fixed_agent as (
+  WITH fixed_agent_disabled AS (
+  -- Gets the last date the fixed_agent was disabled
+    SELECT
+      pfa_aud.id,
+      MAX(CASE WHEN pfa_aud.is_enabled = false THEN from_unixtime(ure.ts_revision / 1000) END) AS ts_fixed_agent_disabled
+    FROM 
+      datalake_ebdb_clean.preferred_fixed_agent_aud pfa_aud
+    LEFT JOIN 
+      datalake_ebdb_clean.user_revision_entity ure
+        ON ure.id = pfa_aud.rev
+    WHERE 
+      pfa_aud.mod_is_enabled = true
+    GROUP BY 1
+  )
+  -- Looks the booking date and find which agent was linked to the buyer at the period
+  -- Buyers can have different fixed agents in each city, so it has to match the id_city of the house visited
+  SELECT
+    uvp.id_user,
+    pfa.id_agent_data AS id_fixed_agent,
+    b.id AS id_booking,
+    pfa.business_context
+  FROM
+    datalake_ebdb_clean.user_visit_preferences uvp
+  JOIN
+    datalake_ebdb_clean.preferred_fixed_agent pfa
+      ON pfa.id_user_visit_preferences = uvp.id
+  LEFT JOIN
+    fixed_agent_disabled fad
+      ON fad.id = pfa.id
+  JOIN
+    datalake_ebdb_clean.booking b
+      ON b.id_visitor = uvp.id_user
+      AND b.business_context = pfa.business_context
+  JOIN
+    datalake_ebdb_clean.house h
+      ON h.id = b.id_house
+  JOIN
+    datalake_region.region r
+      ON r.id = h.id_region
+  WHERE
+    -- If the fixed_agent is active it compares bookings from pfa creation until now
+    -- Otherwise it compares bookings from pfa creation until pfa disabled
+    b.ts_created BETWEEN pfa.ts_created AND IF(pfa.is_enabled = TRUE, NOW(), fad.ts_fixed_agent_disabled)
+    AND r.id_city = pfa.id_region -- id_region from pfa it's actually the id_city
+),
 base_booking AS (
   SELECT
     b.id,
@@ -129,11 +175,12 @@ base_booking AS (
     b.id_agent,
     b.id_attendant,
     b.id_rent_flow,
-    IF(b.business_context = 'SALE', 
-      CONCAT(b.id_visitor, '_', b.id_house), 
+    IF(b.business_context = 'SALE',
+      CONCAT(b.id_visitor, '_', b.id_house),
       NULL
     ) AS id_sale_flow,
     vo.id_real_estate_agent_rating,
+    IF(b.business_context = 'SALE', vfa.id_fixed_agent,NULL) AS id_sale_fixed_agent,
     b.dt_booking,
     b.status,
     b.business_context AS visit_intent,
@@ -292,6 +339,9 @@ base_booking AS (
   LEFT JOIN
     datalake_gsheets_clean.from_to_cancellation AS gsheets_cancel
       ON gsheets_cancel.reason = sc.reason
+  LEFT JOIN
+    visitor_fixed_agent vfa
+      ON vfa.id_booking = b.id
 )
 -- custom columns that need pre-calculated ones
 SELECT
@@ -313,6 +363,8 @@ SELECT
     ELSE bb.cancellation_reason_category
   END AS responsible,
   DATEDIFF(FROM_UTC_TIMESTAMP(bb.ts_first_canceled, 'Brazil/East'), bb.ts_created_local_tz) AS days_visit_booked_to_visit_cancelled,
+  DATEDIFF(bb.ts_booking_local_tz, FROM_UTC_TIMESTAMP(bb.ts_first_canceled, 'Brazil/East')) AS days_visit_cancelled_to_visit,
+  DATEDIFF(bb.ts_booking_local_tz, bb.ts_created_local_tz) AS days_visit_booked_to_visit,
   IF(is_visit_completed, DATEDIFF(bb.ts_booking_local_tz, bb.ts_created_local_tz), NULL)
    AS days_visit_booked_to_visit_completed 
 FROM

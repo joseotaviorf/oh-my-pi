@@ -5,6 +5,7 @@ CREATE TABLE sale.fact_visits (
 	sk_house BIGINT,
 	sk_region BIGINT,
 	sk_agent BIGINT,
+	sk_fixed_agent BIGINT,
 	sk_buyer BIGINT,
 	sk_seller BIGINT,
 	sk_visit BIGINT,
@@ -19,6 +20,8 @@ CREATE TABLE sale.fact_visits (
 	sk_agent_review_rating_date BIGINT,
 	sk_buyer_review_rating_date BIGINT,
 	days_visit_booked_to_visit_cancelled INTEGER,
+	days_visit_cancelled_to_visit INTEGER,
+	days_visit_booked_to_visit INTEGER,
 	days_visit_booked_to_visit_completed INTEGER,
 	ts_load TIMESTAMP
 );
