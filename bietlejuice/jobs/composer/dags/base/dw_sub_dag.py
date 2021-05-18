@@ -107,41 +107,40 @@ class DWSubDAG(BaseSubDAG):
             },
         )
 
+        sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+            dag=sub_dag,
+            task_id="sync-hive-metastore-table",
+            json={
+                "spark_python_task": {
+                    "python_file": f"{self.spark_job_path}/sync_metastore_tables.py",
+                    "parameters": [
+                        self.dw_bucket,
+                        self.layer.value,
+                        self.dw_schema,
+                        "--table-name",
+                        table_name,
+                    ],
+                }
+            },
+        )
+
+        validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+            dag=sub_dag,
+            task_id="validate-sync-hive-metastore-table",
+            json={
+                "spark_python_task": {
+                    "python_file": f"{self.spark_job_path}/validate_sync_metastore_tables.py",
+                    "parameters": [
+                        self.layer.value,
+                        self.dw_schema,
+                        "--table-name",
+                        table_name,
+                    ],
+                }
+            },
+        )
+
+        load_table_to_dw_final_schema >> sync_metastore_table_task >> validate_sync_metastore_table_task
         load_table_to_dw_final_schema >> load_table_to_redshift
-
-        if self.is_hive_sync_turned_on_for_dag(self.dag_id):
-            sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
-                dag=sub_dag,
-                task_id="sync-hive-metastore-table",
-                json={
-                    "spark_python_task": {
-                        "python_file": f"{self.spark_job_path}/sync_metastore_tables.py",
-                        "parameters": [
-                            self.dw_bucket,
-                            self.layer.value,
-                            self.dw_schema,
-                            "--table-name",
-                            table_name,
-                        ],
-                    }
-                },
-            )
-
-            validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
-                dag=sub_dag,
-                task_id="validate-sync-hive-metastore-table",
-                json={
-                    "spark_python_task": {
-                        "python_file": f"{self.spark_job_path}/validate_sync_metastore_tables.py",
-                        "parameters": [
-                            self.layer.value,
-                            self.dw_schema,
-                            "--table-name",
-                            table_name,
-                        ],
-                    }
-                },
-            )
-            load_table_to_dw_final_schema >> sync_metastore_table_task >> validate_sync_metastore_table_task
 
         return sub_dag

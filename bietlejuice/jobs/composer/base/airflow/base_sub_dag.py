@@ -6,8 +6,6 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
-from bietlejuice.jobs.composer.dags import COMPOSER_DAGS_PATH
-from bietlejuice.jobs.composer.services import FileService
 
 logger = QuintoAndarLogger("BaseDAG")
 
@@ -101,30 +99,3 @@ class BaseSubDAG(object):
         :return: the subdag created
         """
         raise NotImplementedError()
-
-    @staticmethod
-    def is_hive_sync_turned_on_for_dag(dag_id):
-        """
-        Checks whether the DAG is permitted to have the Hive metastore sync task.
-
-        This is a temporary method that will be removed at the end of Hive
-         implementation.
-
-        :param dag_id: the dag name
-        :rtype: bool
-        """
-        hive_sync_dags_block_list = (
-            COMPOSER_DAGS_PATH + "/hive_sync_dags_block_list.yaml"
-        )
-        hive_sync_dags_off = FileService.get_dict_from_yaml_file(
-            hive_sync_dags_block_list
-        )
-
-        sync_turned_off = dag_id in hive_sync_dags_off
-        if sync_turned_off:
-            logger.info(
-                f"m=is_dag_turned_on_for_hive_sync, dag={dag_id}, msg=The "
-                "Hive Metastore synchronization for this DAG is turned off."
-            )
-
-        return not sync_turned_off
