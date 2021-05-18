@@ -106,6 +106,16 @@ retencao_exclusividade_contato_ativo:
     sheet_name: bases_cruzadas
     clean_table_name: retention_exclusivity_active_contact
 
+targets_avg_ticket_adm_fee:
+    sheet_id: 1yhpIYXHsLWFbhjA_Ee9lJ_mKOh6_-7sY_oDgIYCfjNE
+    sheet_name: targets_avg_ticket_adm_fee
+    clean_table_name: targets_avg_ticket_adm_fee
+
+targets_nr_bf_er_or:
+    sheet_id: 1hJu-ASanek3BV0SPxRqnG0pU0x8wPp-osoWcT14FMCU
+    sheet_name: targets_nr_bf_er_or
+    clean_table_name: targets_nr_bf_er_or
+
 taxonomy_affiliates:
     sheet_id: 1e3806Tog1avS6uVO6ACUqqcqRpwcJffDZhRvgE8A3V4
     sheet_name: taxonomy_affiliates

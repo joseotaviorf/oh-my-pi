@@ -40,6 +40,8 @@ This pipeline produces the following output tables:
     - `marketing_offline_manual_costs`
     - `marketing_offline_manual_share_city_group`
     - `marketing_offline_manual_share_cost_center`
+    - `targets_avg_ticket_adm_fee`
+    - `targets_nr_bf_er_or`
     - `taxonomy_affiliates`
     - `taxonomy_demand`
     - `marketing_offline_budget`
