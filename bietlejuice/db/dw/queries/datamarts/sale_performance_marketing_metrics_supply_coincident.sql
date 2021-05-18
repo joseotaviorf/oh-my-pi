@@ -541,7 +541,7 @@ affiliates AS (
     JOIN dim_date dbt ON dbt.sk_date = co.sk_date
     WHERE co.funnel_side = 'supply'
       AND dbt.date BETWEEN '2020-01-01' AND (CURRENT_DATE - interval '1 day')
-      AND co.mkt_origin IN ('Owner PWA','Price Calculator')
+      AND co.mkt_origin IN ('Owner PWA','Price Calculator','New Channels')
       AND co.mkt_channel != 'Girafa'
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11
     ),
