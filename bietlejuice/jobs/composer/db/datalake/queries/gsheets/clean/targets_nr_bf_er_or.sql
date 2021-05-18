@@ -6,7 +6,7 @@ SELECT
 	CAST(REPLACE(new_rentals,',','') AS FLOAT) AS new_rentals,
 	CAST(REPLACE(ended_rentals,',','') AS FLOAT) AS ended_rentals,
 	CAST(REPLACE(ongoing_rentals,',','') AS FLOAT) AS ongoing_rentals,
-	CAST(REPLACE(date,'-','') AS date) AS dt_date,
-	CAST(REPLACE(week_start,'-','') AS date) AS dt_week_started
+	DATE(date) AS dt_date,
+	DATE(week_start) AS dt_week_started
 FROM
 	datalake_gsheets_raw.targets_nr_bf_er_or
