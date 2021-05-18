@@ -9,4 +9,4 @@ SELECT
 	CAST(REPLACE(date,'-','') AS date) AS dt_date,
 	CAST(REPLACE(week_start,'-','') AS date) AS dt_week_started
 FROM
-	datalake_gsheets_raw.targets_avg_ticket_adm_fee
+	datalake_gsheets_raw.targets_nr_bf_er_or
