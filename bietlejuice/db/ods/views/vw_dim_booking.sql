@@ -187,6 +187,7 @@ bookings as (
         s.successful_entrance,
         s.troublesome_entrance,
         s.checkin_status,
+        s.auto_booking_flag,
         case when (UPPER(sources.utm_campaign) like '%BRANDED%'
                     or UPPER(sources.utm_campaign) like '%INSTITUCIONAL%')
                     and lower(sources.utm_campaign) not like '%non-branded%' then 'Branded'
@@ -273,6 +274,7 @@ select
     TIMEZONE('UTC', b.cancel_timestamp) at time zone 'Brazil/East'  as ts_cancel_local,
     TIMEZONE('UTC', b.dt_created) at time zone 'Brazil/East' as ts_created_local,
     TIMEZONE('UTC', b.dt_visit_follow_up) at time zone 'Brazil/East' as ts_visit_follow_up_local,
+    b.auto_booking_flag as is_first_booking_auto,
     -- Columns used in demand taxonomy
     b.is_visit_created_from_app,
     b.is_visit_last_updated_from_app,

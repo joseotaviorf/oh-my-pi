@@ -53,6 +53,7 @@ create table if not exists dim_booking
  ts_cancel_local timestamp without time zone   encode az64,
  ts_created_local timestamp without time zone   encode az64,
  ts_visit_follow_up_local timestamp without time zone   encode az64,
+ is_first_booking_auto boolean,
  is_visit_created_from_app boolean,
  is_visit_last_updated_from_app boolean,
  flg_branded boolean,

@@ -40,7 +40,8 @@ select
   (case when e.successful=1 then 1 when e.successful=0 then 0 else null end) as successful_entrance,
   e.problem as troublesome_entrance,
   a.checkInStatus as checkin_status,
-  m.reasonEnum as reason_enum
+  m.reasonEnum as reason_enum,
+  CASE WHEN m_first.usuario_id = 194233 THEN 1 ELSE 0 END AS auto_booking_flag
 from
   Agendamento a
 -- MUDANCA STATUS
@@ -117,4 +118,17 @@ left join
 left join
 	ebdb.Entrance e
 	on fup.idEntrance = e.id
+-- AUTOMATIC OR MANUAL BOOKING
+left join 
+    (
+		select
+			m.agendamento_id,
+			min(id) as id
+		from
+			MudancaStatusAgendamento m
+		group by
+			m.agendamento_id
+	) m_min 
+	on m_min.agendamento_id = a.id 
+left join MudancaStatusAgendamento m_first on m_first.id = m_min.id
 where DATE(coalesce(a.criadoEm, '1900-01-01 00:00:00')) <= DATE('{}')

@@ -52,6 +52,7 @@ create external table if not exists datalake_clean.ods_dim_booking (
   ts_cancel_local string,
   ts_created_local string,
   ts_visit_follow_up_local string,
+  is_first_booking_auto string,
   is_visit_created_from_app string,
   is_visit_last_updated_from_app string,
   flg_branded string,

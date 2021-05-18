@@ -19,6 +19,7 @@ create table if not exists janus.dim_booking
   is_closed boolean,
   has_reschedule boolean,
   is_via_reschedule boolean,
+  is_first_booking_auto boolean,
   is_branded boolean,
   has_tenant_attended boolean,
   has_agent_attended boolean,

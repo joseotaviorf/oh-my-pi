@@ -38,5 +38,6 @@ create table if not exists booking (
   successful_entrance varchar(255),
   troublesome_entrance varchar(255),
   checkin_status varchar(255),
-  reason_enum varchar(255)
+  reason_enum varchar(255),
+  auto_booking_flag boolean
 );

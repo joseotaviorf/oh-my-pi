@@ -52,6 +52,7 @@ CREATE TABLE staging.dim_booking (
   ts_cancel_local TIMESTAMP WITHOUT TIME ZONE,
   ts_created_local TIMESTAMP WITHOUT TIME ZONE,
   ts_visit_follow_up_local TIMESTAMP WITHOUT TIME ZONE,
+  is_first_booking_auto boolean,
   is_visit_created_from_app boolean,
   is_visit_last_updated_from_app boolean,
   flg_branded boolean,

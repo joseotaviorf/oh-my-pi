@@ -54,6 +54,7 @@ SELECT
   b.is_closed,
   b.has_reschedule,
   b.is_via_reschedule,
+  b.is_first_booking_auto,
   COALESCE(src.is_branded, false) AS is_branded,
   b.has_tenant_attended,
   b.has_agent_attended,

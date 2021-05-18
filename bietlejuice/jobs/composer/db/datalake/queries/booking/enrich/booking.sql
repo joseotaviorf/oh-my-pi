@@ -119,6 +119,16 @@ reschedules AS (
       id_rescheduled_booking IS NOT NULL
     GROUP BY 1 -- guaranteeing there are no future duplication on Product
 ),
+first_booking_author AS (
+  SELECT DISTINCT
+    bsc.id_booking,
+    FIRST_VALUE(id_user) OVER (
+      PARTITION BY bsc.id_booking ORDER BY id 
+        ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+    ) first_author
+  FROM 
+    datalake_ebdb_clean.booking_status_change AS bsc
+),
 visitor_fixed_agent as (
   WITH fixed_agent_disabled AS (
   -- Gets the last date the fixed_agent was disabled
@@ -308,7 +318,11 @@ base_booking AS (
     va.has_tenant_attended,
     va.has_agent_attended,
     va.has_landlord_attended,
-    (e.problem <> 'LandlordNoShow') AS has_owner_arrived
+    (e.problem <> 'LandlordNoShow') AS has_owner_arrived,
+    CASE
+        WHEN fba.first_author = 194233 THEN True
+        ELSE False
+    END AS is_first_booking_auto
   FROM
     datalake_ebdb_clean.booking AS b
   LEFT JOIN
@@ -339,9 +353,13 @@ base_booking AS (
   LEFT JOIN
     datalake_gsheets_clean.from_to_cancellation AS gsheets_cancel
       ON gsheets_cancel.reason = sc.reason
+  LEFT JOIN 
+    first_booking_author AS fba
+      ON fba.id_booking = b.id
   LEFT JOIN
     visitor_fixed_agent vfa
       ON vfa.id_booking = b.id
+
 )
 -- custom columns that need pre-calculated ones
 SELECT
