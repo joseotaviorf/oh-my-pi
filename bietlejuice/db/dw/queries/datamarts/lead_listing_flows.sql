@@ -141,6 +141,7 @@ fact_sale AS (
 	    ssf.funnel_drop_reason,
 	    ssf.lead_context_origin,
 	    ssf.has_isales_intervention,
+	    ssf.sk_user_lead_affiliate,
 	    'Sale' AS origin_table
 	FROM sale.fact_listing_flows ssf
 	JOIN source_ops_sale AS sor
@@ -174,6 +175,7 @@ fact_rent AS (
 	    hlf.funnel_drop_reason,
 	    hlf.lead_context_origin,
 	    hlf.has_isales_intervention,
+	    hlf.sk_user_lead_affiliate,
 	    'Rent' AS origin_table
 	FROM fact_house_listing_flows hlf
 	JOIN source_ops_rent AS sor
