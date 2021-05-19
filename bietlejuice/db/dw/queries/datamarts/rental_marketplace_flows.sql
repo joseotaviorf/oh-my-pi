@@ -142,7 +142,7 @@ weekly_listings_status AS (
     FROM
         al_week_status_region AS alm
     WHERE
-        week_start < DATEADD('WEEK', -1, DATE_TRUNC('WEEK', CURRENT_DATE))
+        week_start < DATE_TRUNC('WEEK', CURRENT_DATE)
         AND NOT (status_short = 'Other' AND status_next_week_short = 'Other')
 ),
 ---------------------------------------------------------------------------------------------------
@@ -404,8 +404,10 @@ SELECT DISTINCT
         ORDER BY COALESCE(wls.week_start, atp.week_start, lwd.week_start) ASC, COALESCE(listing_cummulative_rent_flows, 0) DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
     ) AS listing_cummulative_rent_flows,
-    dhl.house_bedrooms,
-    dhl.house_type,
+    SUM(lwd.rent_flows) OVER(
+        PARTITION BY COALESCE(wls.week_start, atp.week_start, lwd.week_start),
+                     COALESCE(wls.sk_house_listing, atp.sk_house_listing, lwd.sk_house_listing)
+    ) AS listing_weekly_rent_flows,
     status_short,
     status_next_week_short,
     CASE
@@ -433,5 +435,3 @@ FROM
         ON COALESCE(wls.week_start, atp.week_start) = lwd.week_start
         AND COALESCE(wls.sk_house_listing, atp.sk_house_listing) = lwd.sk_house_listing
         AND atp.sk_client = lwd.sk_client
-    LEFT OUTER JOIN dim_house_listing AS dhl
-        ON COALESCE(wls.sk_house_listing, atp.sk_house_listing, lwd.sk_house_listing) = dhl.sk_house_listing
