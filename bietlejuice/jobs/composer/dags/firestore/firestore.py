@@ -125,7 +125,7 @@ for subscription in SUBSCRIPTIONS:
     )
 
     sync_metastore_tables_task = QuintoAndarDatabricksSubmitRunOperator(
-        task_id="sync-hive-metastore-raw-tables",
+        task_id=f"sync-hive-metastore-raw-{slugged_table_name}",
         dag=dag,
         json={
             "spark_python_task": {
@@ -143,7 +143,7 @@ for subscription in SUBSCRIPTIONS:
 
     validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
         dag=dag,
-        task_id="validate-sync-hive-metastore-table",
+        task_id=f"validate-sync-hive-metastore-{slugged_table_name}",
         json={
             "spark_python_task": {
                 "python_file": BASE_SPARK_JOB_PATH
