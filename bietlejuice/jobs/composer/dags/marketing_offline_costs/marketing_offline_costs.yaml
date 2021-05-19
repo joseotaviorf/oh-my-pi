@@ -13,3 +13,8 @@ marketing_offline_manual_share_cost_center:
     sheet_id: 1zUM7FIxpNXmnTsbWZoX1wV7S_C49XMO8Vo68ElSqipo
     sheet_name: offline_manual_share_cost_center
     clean_table_name: marketing_offline_manual_share_cost_center
+
+marketing_offline_budget:
+    sheet_id: 1Ap6n1wC_jsmX8gyjcVPYlq7ckC2UV77XNULdABHp2Bo
+    sheet_name: marketing_offline_budget
+    clean_table_name: marketing_offline_budget

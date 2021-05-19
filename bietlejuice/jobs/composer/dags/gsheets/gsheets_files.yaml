@@ -135,8 +135,3 @@ vistoria_bugs:
     sheet_id: 1-cuOGaxOf4hfqs1rhz6XUGv4y8r-0HbJv6YHGMRMkyc
     sheet_name: vistoria_bugs
     clean_table_name: inspection_bugs
-
-marketing_offline_budget:
-    sheet_id: 1Ap6n1wC_jsmX8gyjcVPYlq7ckC2UV77XNULdABHp2Bo
-    sheet_name: marketing_offline_budget
-    clean_table_name: marketing_offline_budget

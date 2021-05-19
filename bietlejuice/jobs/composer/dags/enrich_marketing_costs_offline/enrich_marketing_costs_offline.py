@@ -79,5 +79,8 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 )
 
 airflow_helpers.chain(
-    create_cluster_task, enrich_sub_dags.values(), terminate_cluster_task
+    create_cluster_task,
+    enrich_sub_dags.pop("offline_manual_costs"),
+    enrich_sub_dags.values(),
+    terminate_cluster_task,
 )
