@@ -25,6 +25,18 @@ WITH quinto_messenger_tickets AS (
     WHERE 
       type IN ('reservation.completed', 'reservation.rejected', 'reservation.timeout')
     GROUP BY 1,2
+  ),
+  chat_metrics AS (
+    SELECT 
+      id_conversation,
+      COUNT(DISTINCT t.id_task) AS number_of_tasks,
+      COUNT(DISTINCT task_queue_name) AS number_of_departaments
+    FROM 
+      datalake_quinto_messenger.task t
+    JOIN 
+      datalake_quinto_messenger.task_event te
+        ON t.id_task = te.id_task
+    GROUP BY 1
   )
   SELECT
       t.id_task,
@@ -32,7 +44,10 @@ WITH quinto_messenger_tickets AS (
       c.id_source AS id_session,
       id_agent,
       seconds_to_first_response AS seconds_first_reply,
+      seconds_to_first_response/60.0 AS task_minutes_wait_time,
       task_queue_name AS departament,
+      COALESCE(cm.number_of_departaments,0) AS number_of_departaments,
+      COALESCE(cm.number_of_tasks,0) AS number_of_tasks,
       FIRST_VALUE(task_queue_name) OVER (PARTITION BY c.id_conversation ORDER BY t.ts_created) AS first_departament,
       LAST_VALUE(task_queue_name) OVER (PARTITION BY c.id_conversation ORDER BY t.ts_created) AS last_departament, 
       CASE
@@ -40,9 +55,9 @@ WITH quinto_messenger_tickets AS (
           WHEN seconds_to_first_response / 60 > 15 THEN FALSE
           ELSE NULL
       END AS sla_achieved,
-      customer_type_tag AS client,
-      contact_motivation_tag AS motivation,
-      contact_theme_tag AS theme,
+      customer_type_tag,
+      contact_motivation_tag,
+      contact_theme_tag,
       c.seconds_duration/60.0 AS minutes_full_resolution_time_calendar,
       t.ts_created,
       t.ts_updated,
@@ -52,6 +67,9 @@ WITH quinto_messenger_tickets AS (
       ts_twilio_updated_local  
     FROM
       datalake_quinto_messenger.channel c
+    LEFT JOIN
+      chat_metrics cm
+        ON cm.id_conversation = c.id_conversation
     LEFT JOIN
       datalake_quinto_messenger.task t
         ON t.id_channel = c.id_channel
@@ -89,6 +107,33 @@ zendesk_aditional_ticket_info AS (
     FROM 
       datalake_zendesk_tickets_clean.tickets
     GROUP BY 1
+  ),
+  filtered_custom_fields AS (
+    SELECT
+      zcf.id_ticket,
+      EXPLODE(SPLIT(REPLACE(REPLACE(custom_fields, '{{', ''), '}}', ''), ',')) AS custom_field
+    FROM 
+      datalake_clean.zendesk_custom_fields zcf
+  ),
+  parsed_custom_fields AS (
+    SELECT DISTINCT
+      id_ticket,
+      REGEXP_EXTRACT(custom_field, '"(.*)":(.*)', 1) AS id_ticket_fields,
+      REPLACE(REGEXP_EXTRACT(custom_field, '"(.*)":(.*)', 2), '"', '') AS value,
+      tf.raw_title AS key
+    FROM 
+      filtered_custom_fields tcf
+    JOIN
+      datalake_zendesk_tickets_clean.ticket_fields tf
+        ON tf.id_ticket_fields = regexp_extract(custom_field, '"(.*)":(.*)', 1)
+  ),
+  zendesk_custom_fields AS (
+    SELECT
+      id_ticket,
+      TO_JSON(MAP_FROM_ARRAYS(COLLECT_LIST(key), COLLECT_LIST(value))) AS custom_fields
+    FROM
+      parsed_custom_fields
+    GROUP BY 1
   )
   SELECT 
     DISTINCT t.id_ticket,
@@ -97,7 +142,18 @@ zendesk_aditional_ticket_info AS (
     t.description,
     t.status,
     ftm.minutes_first_resolution_calendar AS minutes_first_resolution_time_calendar,
-    ftm.minutes_first_resolution_business AS minutes_first_resolution_time_business
+    ftm.minutes_first_resolution_business AS minutes_first_resolution_time_business,
+    REPLACE(REPLACE(GET_JSON_OBJECT(zcf.custom_fields, '$.Motivo de contato'), '[', ''), ']', '') AS contact_type_tag,
+    REPLACE(REPLACE(GET_JSON_OBJECT(zcf.custom_fields, '$.Cliente Tag'), '[', ''), ']', '') AS client_type,
+    REPLACE(REPLACE(GET_JSON_OBJECT(zcf.custom_fields, '$.Tipo de Solicitação'), '[', ''), ']', '') AS request_type,
+    COALESCE(
+      ctt.contact_motivation_tag,
+      REPLACE(REPLACE(get_json_object(zcf.custom_fields, '$.Motivo Tag'), '[', ''), ']', '')
+    ) AS contact_motivation_tag,
+    COALESCE(
+      ctt.contact_theme_tag,
+      REPLACE(REPLACE(get_json_object(zcf.custom_fields, '$.Assunto Tag'), '[', ''), ']', '')
+    ) AS contact_theme_tag
   FROM
     datalake_zendesk_tickets_clean.tickets t
   JOIN 
@@ -112,6 +168,13 @@ zendesk_aditional_ticket_info AS (
       ON ftm.id_ticket = lutm.id_ticket
       AND ftm.ts_updated = lutm.ts_updated
       AND DATE(CONCAT(ftm.year,'-',ftm.month,'-',ftm.day)) = lutm.ts_extracted
+  LEFT JOIN
+    zendesk_custom_fields zcf
+      ON zcf.id_ticket = t.id_ticket
+  LEFT JOIN
+    datalake_raw.gsheets_contact_types_tags ctt 
+      ON ctt.contact_type_tag = REPLACE(REPLACE(GET_JSON_OBJECT(zcf.custom_fields, '$.Motivo de contato'), '[', ''), ']', '')
+      AND ctt.is_correspondent_contact_type = 1
 ),
 chat_csat AS(
   SELECT
@@ -168,12 +231,41 @@ task_completion_reason AS (
     GROUP BY 1, 2, 3
 )
 SELECT DISTINCT 
-  ct.*,
+  ct.id_task,
   zd.id_ticket,
+  ct.id_conversation,
+  ct.id_session,
+  ct.id_agent,
+  cc.comment AS csat_comment,
+  ct.departament,
+  ct.first_departament,
+  ct.last_departament,
+  COALESCE(
+      ct.customer_type_tag,
+      zd.client_type
+  ) AS client_type,
+  COALESCE(
+      ct.contact_motivation_tag,
+      zd.contact_motivation_tag
+  ) AS contact_motivation_tag,
+  COALESCE(
+    ct.contact_theme_tag,
+    zd.contact_theme_tag
+  ) AS contact_theme_tag,
+  zd.contact_type_tag,
+  zd.request_type,
   zd.tags,
+  zd.status,
+  bt.back_ticket,
+  ct.seconds_first_reply,
+  ct.task_minutes_wait_time,
+  ct.number_of_departaments,
+  ct.number_of_tasks,
+  ct.sla_achieved,
+  ct.minutes_full_resolution_time_calendar,
   zd.minutes_first_resolution_time_calendar,
   zd.minutes_first_resolution_time_business,
-  tcr.id_task IS NOT NULL AS task_transfered,
+  tcr.id_task IS NOT NULL AS has_transfers,
   zd.tags LIKE '%bot_end_conversation%' AS is_bot,
   zd.tags LIKE '%closed_by_merge%' AS is_closed_by_merge, 
   bt.front_ticket IS NOT NULL AS has_back_ticket,
@@ -181,12 +273,17 @@ SELECT DISTINCT
     WHEN bt.back_ticket_status IN ('open','pending','new','hold') THEN TRUE
     WHEN bt.back_ticket_status IN ('closed','deleted','solved') THEN FALSE
   END AS is_open_back_ticket,
-  bt.back_ticket,
+  cc.id_ticket IS NOT NULL AS is_csat_answered,
+  cc.is_solved,
   cc.csat_score,
   cc.group_name,
-  cc.comment AS csat_comment,
-  cc.is_solved,
-  cc.dt_survey
+  cc.dt_survey,
+  ct.ts_created,
+  ct.ts_updated,
+  ct.ts_task_closed,
+  ct.ts_task_created,
+  ct.ts_twilio_created_local,
+  ct.ts_twilio_updated_local
 FROM
   quinto_messenger_tickets ct
 JOIN
