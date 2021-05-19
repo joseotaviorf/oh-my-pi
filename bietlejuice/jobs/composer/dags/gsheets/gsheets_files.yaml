@@ -16,6 +16,11 @@ aux_regiao:
     sheet_name: aux_regiao
     clean_table_name: auxiliary_region
 
+contact_type_tag:
+    sheet_id: 1HQaKDATgePg4oIoDBASzPm5QkEG61Dee8T-bYqdSHFM
+    sheet_name: contact_types_tree_taxonomy
+    clean_table_name: contact_type_taxonomy
+
 csat_vistoria_entrada:
     sheet_id: 1ZTI-1XhPJey4o0e0IVfOVEeTeoWr7Vd10u-1TEZfIcc
     sheet_name: entrada
