@@ -12,6 +12,7 @@ WITH fact_visits AS (
         vb.sk_booking_created_date,
         vb.sk_visit_completed_date,
         db.first_update_source,
+        ROW_NUMBER() OVER (PARTITION BY id_buyer ORDER BY dt_scheduling) AS buyer_rw,
 
         -- Visit Cancellation
         db.cancellation_reason_category,
@@ -220,8 +221,7 @@ WITH fact_visits AS (
         sk_booking,
         id_buyer,
         sk_agent,
-        ROW_NUMBER() OVER (PARTITION BY sk_agent, id_buyer ORDER BY dt_scheduling) AS vc_rw,
-        ROW_NUMBER() OVER (PARTITION BY id_buyer ORDER BY dt_scheduling) AS buyer_rw
+        ROW_NUMBER() OVER (PARTITION BY sk_agent, id_buyer ORDER BY dt_scheduling) AS vc_rw
     FROM fact_visits
     WHERE sk_visit_completed_date > 0
 )
@@ -370,20 +370,15 @@ WITH fact_visits AS (
         avg8w.sum_b_vb_8w AS buyers_with_bookings_8w,
         avg8w.sum_b_oa_8w AS buyers_with_offers_accepted_8w,
         avg8w.b_vb2oa_avg8w AS buyers_vb2oa_avg8w,
-        CASE
-            WHEN sum_b_vb_8w > 49 THEN ntile(4) OVER (PARTITION BY avg8w.week ORDER BY avg8w.b_vb2oa_avg8w, avg8w.sum_b_oa_8w , avg8w.sum_b_os_8w)
-            ELSE 0
-        END AS quinto_8W_moving_avg_quartil,
-        CASE
-            WHEN sum_b_vb_8w > 49 THEN ntile(4) OVER (PARTITION BY avg8w.week, arw.region_code ORDER BY avg8w.b_vb2oa_avg8w, avg8w.sum_b_oa_8w , avg8w.sum_b_os_8w)
-            ELSE 0
-        END AS region_8W_moving_avg_quartil
+        ntile(4) OVER (PARTITION BY avg8w.week ORDER BY avg8w.b_vb2oa_avg8w, avg8w.sum_b_oa_8w , avg8w.sum_b_os_8w) AS quinto_8W_moving_avg_quartil,
+        ntile(4) OVER (PARTITION BY avg8w.week, arw.region_code ORDER BY avg8w.b_vb2oa_avg8w, avg8w.sum_b_oa_8w , avg8w.sum_b_os_8w) AS region_8W_moving_avg_quartil
     FROM avg_8w_vb2oa AS avg8w
     LEFT JOIN
         agent_region_week AS arw
             ON arw.week = avg8w.week
             AND avg8w.sk_agent = arw.sk_agent
     WHERE avg8w.agent_week_order > 13
+    AND sum_b_vb_8w > 49
 )
 
 SELECT
@@ -425,8 +420,14 @@ SELECT
     avg8w.sum_b_vb_8w AS buyers_with_bookings_8w,
     avg8w.sum_b_oa_8w AS buyers_with_offers_accepted_8w,
     avg8w.b_vb2oa_avg8w AS buyers_vb2oa_avg8w,
-    agq.quinto_8W_moving_avg_quartil,
-    agq.region_8W_moving_avg_quartil,
+    CASE
+        WHEN avg8w.sum_b_vb_8w <= 49 AND avg8w.agent_week_order > 13 THEN 0
+        ELSE agq.quinto_8W_moving_avg_quartil
+    END AS quinto_8W_moving_avg_quartil,
+    CASE
+        WHEN avg8w.sum_b_vb_8w <= 49 AND avg8w.agent_week_order > 13 THEN 0
+        ELSE agq.region_8W_moving_avg_quartil
+    END AS region_8W_moving_avg_quartil,
 
     -- Regions with visits
     cpaw.count_region_code_booked,
