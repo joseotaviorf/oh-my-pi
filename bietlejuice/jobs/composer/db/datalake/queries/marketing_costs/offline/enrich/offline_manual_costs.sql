@@ -1,6 +1,6 @@
 WITH offline_costs AS (
     SELECT
-        COALESCE(ts_entry,'') ||'-'|| COALESCE(email,'') ||'-'|| COALESCE(invoice_number,'') AS aux_key,
+        COALESCE(ts_entry,'') ||'-'|| COALESCE(entry_type,'') ||'-'|| COALESCE(email,'') ||'-'|| COALESCE(invoice_number,'') AS aux_key,
         ts_entry,
         email,
         team,
