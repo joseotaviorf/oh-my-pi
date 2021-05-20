@@ -31,6 +31,11 @@ csat_vistoria_saida:
     sheet_name: saida
     clean_table_name: exit_inspection_csat
 
+department_control:
+    sheet_id: 1wIwrWi0xlY4TAZnE6JlGm6B0UyezOPxfF5s0_pn-i9E
+    sheet_name: Department/Channel
+    clean_table_name: department_control
+
 de_para_cancelamento:
     sheet_id: 1Om2IjwtSPHfg4GRq2IPKGshHLBdXnP0bCMBPbOrh5fc
     sheet_name: de_para_cancelamento
