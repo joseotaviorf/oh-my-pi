@@ -37,6 +37,9 @@ local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in loc
 MAIN_START_DATE = datetime(2021, 1, 14, 0, 0, 0, tzinfo=local_tz)
 MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
 
+# Task params
+TASK_POOL = "gsheets_pool"
+
 # s3 paths setup
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 ARTIFACTS_S3_BUCKET = Variable.get("artifacts_default_bucket")
@@ -123,6 +126,7 @@ for TABLE_NAME, SHEET_DETAILS in GOOGLE_FILES.items():
     gsheets_to_datalake_raw_tasks = QuintoAndarDatabricksSubmitRunOperator(
         task_id=f"gsheets-{slugged_table_name}-to-datalake-raw",
         dag=dag,
+        pool=TASK_POOL,
         json={
             "spark_python_task": {
                 "python_file": LOAD_GSHEETS_INTO_DATALAKE_RAW_FILE_PATH,
