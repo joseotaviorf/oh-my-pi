@@ -19,6 +19,7 @@ CREATE TABLE sale.fact_visits (
 	sk_visit_follow_up_date BIGINT,
 	sk_agent_review_rating_date BIGINT,
 	sk_buyer_review_rating_date BIGINT,
+	is_house_rented BOOLEAN,
 	days_visit_booked_to_visit_cancelled INTEGER,
 	days_visit_cancelled_to_visit INTEGER,
 	days_visit_booked_to_visit INTEGER,

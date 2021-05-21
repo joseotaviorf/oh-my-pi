@@ -175,6 +175,28 @@ visitor_fixed_agent as (
     b.ts_created BETWEEN pfa.ts_created AND IF(pfa.is_enabled = TRUE, NOW(), fad.ts_fixed_agent_disabled)
     AND r.id_city = pfa.id_region -- id_region from pfa it's actually the id_city
 ),
+booking_in_rented_house AS (
+-- Track if the sale visit was in a house with rental contract active
+  SELECT
+    b.id,
+    CASE
+         WHEN c.status = 'Ativo' AND c.dt_started <= b.dt_booking THEN TRUE
+         WHEN c.status = 'Finalizado' AND b.dt_booking BETWEEN c.dt_started AND c.dt_termination THEN TRUE
+         ELSE FALSE
+    END AS is_house_rented
+  FROM
+    datalake_ebdb_clean.booking AS b
+  JOIN
+    datalake_ebdb_contract.contract AS c
+      ON c.id_house = b.id_house
+  WHERE
+    c.status in ('Ativo','Finalizado')
+    AND b.dt_booking BETWEEN c.dt_started
+    AND CASE
+         WHEN c.status = 'Ativo' THEN NOW()
+         WHEN c.status = 'Finalizado' THEN c.dt_termination END
+    AND b.business_context = 'SALE'
+),
 base_booking AS (
   SELECT
     b.id,
@@ -322,7 +344,8 @@ base_booking AS (
     CASE
         WHEN fba.first_author = 194233 THEN True
         ELSE False
-    END AS is_first_booking_auto
+    END AS is_first_booking_auto,
+    brh.is_house_rented
   FROM
     datalake_ebdb_clean.booking AS b
   LEFT JOIN
@@ -353,13 +376,15 @@ base_booking AS (
   LEFT JOIN
     datalake_gsheets_clean.from_to_cancellation AS gsheets_cancel
       ON gsheets_cancel.reason = sc.reason
-  LEFT JOIN 
+  LEFT JOIN
     first_booking_author AS fba
       ON fba.id_booking = b.id
   LEFT JOIN
     visitor_fixed_agent vfa
       ON vfa.id_booking = b.id
-
+  LEFT JOIN
+    booking_in_rented_house brh
+      ON brh.id = b.id
 )
 -- custom columns that need pre-calculated ones
 SELECT
