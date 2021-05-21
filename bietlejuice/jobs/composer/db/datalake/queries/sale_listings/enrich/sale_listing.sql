@@ -109,7 +109,7 @@ SELECT
   sf.ts_first_booking,
   sf.dt_first_sale_agreement_signed,
   sf.dt_house_registry_ended,
-  COALESCE(DATEDIFF(NOW(), lc.ts_first_publication) - COALESCE(np.days_not_published,0), 0) AS days_as_published
+  IF(lc.ts_first_publication IS NULL, NULL, DATEDIFF(NOW(), lc.ts_first_publication) - COALESCE(np.days_not_published,0)) AS days_as_published
 FROM
   listing_columns AS lc
 JOIN
