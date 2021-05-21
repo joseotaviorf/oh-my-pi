@@ -6,6 +6,11 @@
 #     clean_table_name: <clean_table_name>
 #     cron: 1,9,17 (optional and limited to 1,9 and 17)
 
+agents_control:
+    sheet_id: 1wIwrWi0xlY4TAZnE6JlGm6B0UyezOPxfF5s0_pn-i9E
+    sheet_name: Agents Control
+    clean_table_name: agents_control
+
 aglomerados_subnormais_2010_limites:
     sheet_id: 1fANN7TIDQt7qxQMKV-MbCJEJjqaUHjoowKm2UgnNHH0
     sheet_name: AglomeradosSubnormais2010_Limites
