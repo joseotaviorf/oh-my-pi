@@ -11,7 +11,7 @@ filtered_custom_fields AS (
     SELECT
         tck.id_ticket,
         -- The double curly brackets (chave) had to be put to escape that character in the function .format in Python. If you test this in Databricks or somewhere else, remember to replace by a single curly bracket
-        EXPLODE(SPLIT(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(tck.custom_fields, '"id":', ''), ',"value"', ''), '[', ''), ']', ''), '{{', ''), '}}', ''), ',')) AS custom_field
+        EXPLODE(SPLIT(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REGEXP_REPLACE(tck.custom_fields, '"(?!")', ''), 'id:', ''), ',value', ''), '[', ''), ']', ''), '{{', ''), '}}', ''), ',')) AS custom_field
     FROM
         datalake_zendesk_tickets_clean.tickets tck
     JOIN
@@ -31,8 +31,7 @@ parsed_custom_fields AS (
         datalake_zendesk_tickets_clean.ticket_fields tf
             ON tf.id_ticket_fields = SPLIT(custom_field, ':')[0]
     WHERE
-        SPLIT(custom_field, ':')[1] IS NOT NULL
-        AND SPLIT(custom_field, ':')[1] != 'null'
+        NULLIF(REPLACE(SPLIT(custom_field, ':')[1], '"', NULL), 'null') IS NOT NULL
 )
 SELECT
     id_ticket,
