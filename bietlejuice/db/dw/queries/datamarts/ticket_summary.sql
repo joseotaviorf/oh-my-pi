@@ -515,7 +515,7 @@ tax AS (
             ON ft.sk_ticket = fct.sk_ticket
             AND is_contact_type_taxonomy = TRUE
     INNER JOIN 
-        datalake_raw.gsheets_contact_types_tags ctt 
+        datalake_gsheets_clean_prod.contact_type_taxonomy ctt 
             ON ctt.contact_type_tag = fct.contact_type_tag
             AND ctt.is_correspondent_contact_type = 1
     JOIN 

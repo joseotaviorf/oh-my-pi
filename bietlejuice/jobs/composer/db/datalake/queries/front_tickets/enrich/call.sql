@@ -117,7 +117,7 @@ call AS (
       SELECT
           id_task,
           id_call,
-          COUNT(DISTINCT queue_name) AS number_of_departaments,
+          COUNT(DISTINCT queue_name) AS number_of_departments,
           COUNT(DISTINCT id_reservation) AS number_of_tasks,
           COUNT(id_reservation) AS reservations,
           SUM(CAST(is_answered AS SMALLINT)) AS reservations_accepted,
@@ -140,7 +140,7 @@ call AS (
       fe.direction,
       fe.scheduling_source,
       COALESCE(cm.number_of_tasks,0) AS number_of_tasks,
-      COALESCE(cm.number_of_departaments,0) AS number_of_departaments,
+      COALESCE(cm.number_of_departments,0) AS number_of_departments,
       cm.reservations IS NULL AS has_ended_in_ura,
       cm.reservations_accepted > 0 AS is_answered,
       cm.reservations > 1 AS is_transfered,
@@ -228,6 +228,7 @@ zendesk AS (
     t.tags,
     t.description,
     t.status,
+    zcf.custom_fields,
     NULLIF(GET_JSON_OBJECT(REPLACE(REPLACE(zcf.custom_fields, ']',''), '[', ''), '$.CALL Call id'), '') AS id_call,
     tfm.minutes_first_resolution_calendar AS minutes_first_resolution_time_calendar,
     tfm.minutes_first_resolution_business AS minutes_first_resolution_time_business,
@@ -260,7 +261,7 @@ zendesk AS (
     zendesk_custom_fields zcf
       ON zcf.id_ticket = t.id_ticket
   LEFT JOIN
-    datalake_raw.gsheets_contact_types_tags ctt 
+    datalake_gsheets_clean.contact_type_taxonomy ctt 
       ON ctt.contact_type_tag = REPLACE(REPLACE(GET_JSON_OBJECT(zcf.custom_fields, '$.Motivo de contato'), '[', ''), ']', '')
       AND ctt.is_correspondent_contact_type = 1
 ),
@@ -291,9 +292,9 @@ SELECT
   c.id_conversation,
   t.id_agent,
   t.id_queue,
-  t.queue_name AS departament,
-  FIRST(t.queue_name) OVER (PARTITION BY c.id_task ORDER BY c.ts_created) AS first_departament,
-  LAST(t.queue_name) OVER (PARTITION BY c.id_task ORDER BY c.ts_created) AS last_departament,
+  t.queue_name AS department,
+  FIRST(t.queue_name) OVER (PARTITION BY c.id_task ORDER BY c.ts_created) AS first_department,
+  LAST(t.queue_name) OVER (PARTITION BY c.id_task ORDER BY c.ts_created) AS last_department,
   CASE
       WHEN seconds_total_wait_time <= 60 AND t.is_answered THEN TRUE
       WHEN seconds_total_wait_time > 60 AND t.is_answered THEN FALSE
@@ -302,7 +303,7 @@ SELECT
   t.seconds_duration/60.0 AS task_minutes_duration,
   t.seconds_wait_time/60.0 AS task_minutes_wait_time,
   c.seconds_duration/60.0 AS minutes_full_resolution_time_calendar,
-  c.number_of_departaments,
+  c.number_of_departments,
   c.number_of_tasks,
   zd.minutes_first_resolution_time_calendar,
   zd.minutes_first_resolution_time_business,
@@ -313,6 +314,7 @@ SELECT
   zd.contact_theme_tag,
   zd.tags,
   zd.status,
+  zd.custom_fields,
   zd.tags LIKE '%tarefa_atendimento_escalado%' AS has_back_tickets,
   zd.tags LIKE '%bot_end_conversation%' AS is_bot, 
   zd.tags LIKE '%closed_by_merge%' AS is_closed_by_merge,
@@ -332,7 +334,9 @@ SELECT
   c.csat_rating,
   c.ts_csat_answered,
   t.ts_twilio_created_local AS ts_task_created,
-  t.ts_closed AS ts_task_closed
+  t.ts_closed AS ts_task_closed,
+  c.ts_started AS ts_ticket_started,
+  c.ts_ended AS ts_ticket_ended
 FROM 
   tasks t
 JOIN 

@@ -79,7 +79,7 @@ WITH zendesk_taxonomy AS (
     zendesk_custom_fields zcf
       ON zcf.id_ticket = t.id_ticket
   LEFT JOIN
-    datalake_raw.gsheets_contact_types_tags ctt 
+    datalake_gsheets_clean.contact_type_taxonomy ctt 
       ON ctt.contact_type_tag = GET_JSON_OBJECT(zcf.custom_fields, '$.Motivo de contato')
       AND ctt.is_correspondent_contact_type = 1
 ),

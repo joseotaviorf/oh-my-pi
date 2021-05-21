@@ -23,14 +23,20 @@ WITH zendesk_email AS (
     t.tags,
     t.description,
     t.status,
-    g.name AS departament,
+    g.name AS department,
     CASE
       WHEN CAST(tfm.minutes_requester_wait_business AS INT) / (60.0 * COALESCE(CAST(tfm.replies AS INT),1)) < 6 THEN TRUE
       WHEN CAST(tfm.minutes_requester_wait_business AS INT) / (60.0 * COALESCE(CAST(tfm.replies AS INT),1)) >= 6 THEN FALSE
       ELSE NULL
     END AS is_sla,
+    tfm.minutes_requester_wait_business AS minutes_first_response,
     tfm.minutes_full_resolution_calendar AS minutes_full_resolution_time_calendar,
-    tfm.minutes_full_resolution_business AS minutes_full_resolution_time_business
+    tfm.minutes_full_resolution_business AS minutes_full_resolution_time_business,
+    tfm.ts_initially_assigned_local,
+    tfm.ts_last_assigned_local,
+    tfm.ts_created_local AS ts_ticket_started,
+    tfm.ts_solved_local AS ts_ticket_solved,
+    tfm.ts_closed_local AS ts_ticket_ended
   FROM
     datalake_zendesk_tickets_clean.tickets t
   JOIN
@@ -161,7 +167,7 @@ taxonomy AS (
     zendesk_custom_fields zcf
       ON zcf.id_ticket = t.id_ticket
   LEFT JOIN
-    datalake_raw.gsheets_contact_types_tags ctt 
+    datalake_gsheets_clean.contact_type_taxonomy ctt 
       ON ctt.contact_type_tag = REPLACE(REPLACE(GET_JSON_OBJECT(zcf.custom_fields, '$.Motivo de contato'), '[', ''), ']', '')
       AND ctt.is_correspondent_contact_type = 1
 ),
@@ -183,10 +189,11 @@ SELECT DISTINCT
   ze.id_agent,
   ze.tags,
   ze.status,
-  ze.departament,
+  ze.department,
   ze.is_sla,
   ze.minutes_full_resolution_time_calendar,
   ze.minutes_full_resolution_time_business,
+  ze.minutes_first_response,
   cs.csat_score,
   cs.is_answered,
   cs.is_solved,
@@ -208,7 +215,12 @@ SELECT DISTINCT
     WHEN bt.back_ticket_status IN ('open','pending','new','hold') THEN TRUE
     WHEN bt.back_ticket_status IN ('closed','deleted','solved') THEN FALSE
   END AS is_open_back_ticket,
-  bt.back_ticket
+  bt.back_ticket,
+  ze.ts_initially_assigned_local,
+  ze.ts_last_assigned_local,
+  ze.ts_ticket_started,
+  ze.ts_ticket_solved,
+  ze.ts_ticket_ended
 FROM 
   zendesk_email ze
 LEFT JOIN

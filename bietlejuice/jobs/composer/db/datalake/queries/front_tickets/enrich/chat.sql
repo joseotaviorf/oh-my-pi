@@ -30,7 +30,9 @@ WITH quinto_messenger_tickets AS (
     SELECT 
       id_conversation,
       COUNT(DISTINCT t.id_task) AS number_of_tasks,
-      COUNT(DISTINCT task_queue_name) AS number_of_departaments
+      COUNT(DISTINCT task_queue_name) AS number_of_departments,
+      MAX(te.ts_created_local) AS ts_last_event,
+      MIN(te.ts_created_local) AS ts_first_event
     FROM 
       datalake_quinto_messenger.task t
     JOIN 
@@ -45,11 +47,11 @@ WITH quinto_messenger_tickets AS (
       id_agent,
       seconds_to_first_response AS seconds_first_reply,
       seconds_to_first_response/60.0 AS task_minutes_wait_time,
-      task_queue_name AS departament,
-      COALESCE(cm.number_of_departaments,0) AS number_of_departaments,
+      task_queue_name AS department,
+      COALESCE(cm.number_of_departments,0) AS number_of_departments,
       COALESCE(cm.number_of_tasks,0) AS number_of_tasks,
-      FIRST_VALUE(task_queue_name) OVER (PARTITION BY c.id_conversation ORDER BY t.ts_created) AS first_departament,
-      LAST_VALUE(task_queue_name) OVER (PARTITION BY c.id_conversation ORDER BY t.ts_created) AS last_departament, 
+      FIRST_VALUE(task_queue_name) OVER (PARTITION BY c.id_conversation ORDER BY t.ts_created) AS first_department,
+      LAST_VALUE(task_queue_name) OVER (PARTITION BY c.id_conversation ORDER BY t.ts_created) AS last_department, 
       CASE
           WHEN seconds_to_first_response / 60 <= 15 THEN TRUE
           WHEN seconds_to_first_response / 60 > 15 THEN FALSE
@@ -64,12 +66,14 @@ WITH quinto_messenger_tickets AS (
       tc.ts_task_closed,
       ts.ts_task_created,
       ts_twilio_created_local,
-      ts_twilio_updated_local  
+      ts_twilio_updated_local,
+      cm.ts_first_event,
+      cm.ts_last_event
     FROM
       datalake_quinto_messenger.channel c
     LEFT JOIN
       chat_metrics cm
-        ON cm.id_conversation = c.id_conversation
+        ON cm.id_conversation = c.id_source
     LEFT JOIN
       datalake_quinto_messenger.task t
         ON t.id_channel = c.id_channel
@@ -141,6 +145,7 @@ zendesk_aditional_ticket_info AS (
     t.tags,
     t.description,
     t.status,
+    zcf.custom_fields,
     ftm.minutes_first_resolution_calendar AS minutes_first_resolution_time_calendar,
     ftm.minutes_first_resolution_business AS minutes_first_resolution_time_business,
     REPLACE(REPLACE(GET_JSON_OBJECT(zcf.custom_fields, '$.Motivo de contato'), '[', ''), ']', '') AS contact_type_tag,
@@ -172,7 +177,7 @@ zendesk_aditional_ticket_info AS (
     zendesk_custom_fields zcf
       ON zcf.id_ticket = t.id_ticket
   LEFT JOIN
-    datalake_raw.gsheets_contact_types_tags ctt 
+    datalake_gsheets_clean.contact_type_taxonomy ctt 
       ON ctt.contact_type_tag = REPLACE(REPLACE(GET_JSON_OBJECT(zcf.custom_fields, '$.Motivo de contato'), '[', ''), ']', '')
       AND ctt.is_correspondent_contact_type = 1
 ),
@@ -237,9 +242,9 @@ SELECT DISTINCT
   ct.id_session,
   ct.id_agent,
   cc.comment AS csat_comment,
-  ct.departament,
-  ct.first_departament,
-  ct.last_departament,
+  ct.department,
+  ct.first_department,
+  ct.last_department,
   COALESCE(
       ct.customer_type_tag,
       zd.client_type
@@ -256,10 +261,11 @@ SELECT DISTINCT
   zd.request_type,
   zd.tags,
   zd.status,
+  zd.custom_fields,
   bt.back_ticket,
   ct.seconds_first_reply,
   ct.task_minutes_wait_time,
-  ct.number_of_departaments,
+  ct.number_of_departments,
   ct.number_of_tasks,
   ct.sla_achieved,
   ct.minutes_full_resolution_time_calendar,
@@ -280,6 +286,8 @@ SELECT DISTINCT
   cc.dt_survey,
   ct.ts_created,
   ct.ts_updated,
+  ct.ts_first_event AS ts_ticket_started,
+  ct.ts_last_event AS ts_ticket_ended,
   ct.ts_task_closed,
   ct.ts_task_created,
   ct.ts_twilio_created_local,
