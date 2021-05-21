@@ -1,4 +1,4 @@
-# Config for resolution_metrics
+# Config for front_tickets_resolution
 ---
 streams:
   - direction: 'upstream'

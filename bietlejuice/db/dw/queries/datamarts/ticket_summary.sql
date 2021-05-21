@@ -1,8 +1,8 @@
 WITH sla AS (
     SELECT
         sk_ticket ,
-        sla_achieved ,
-        minutes_full_resolution_time_calendar
+        MIN(sla_achieved) AS sla_achieved,
+        MAX(minutes_full_resolution_time_calendar) AS minutes_full_resolution_time_calendar 
     FROM
         (
             -- call 01
@@ -144,7 +144,7 @@ WITH sla AS (
                 )temp
         GROUP BY 1,2,3 
     )
-    GROUP BY 1,2,3 
+    GROUP BY 1
 ),
 last_event_completed_call AS (
     SELECT
@@ -162,7 +162,7 @@ csat_ticket_calls AS (
         DISTINCT
         --       c.id_call, 
         ft.sk_ticket,
-        cc.is_solved,
+        cc.resolution_survey,
         cc.csat,
         cc.ts_first_call_event,
         --		c.agent_email, 
@@ -184,7 +184,7 @@ csat_ticket_calls AS (
         (
             SELECT
                 id_call,
-                csat_1 AS is_solved,
+                csat_1 AS resolution_survey,
                 CAST(csat_2 AS INTEGER) AS csat,
                 min(ts_created_local) AS ts_first_call_event
             FROM
@@ -202,7 +202,7 @@ csat_ticket_calls AS (
             WHEN fc.is_solved IS TRUE THEN 1
             WHEN fc.is_solved IS FALSE THEN 0
             ELSE NULL
-        END AS is_solved ,
+        END AS resolution_survey ,
         fc.csat_rating AS csat ,
         dc.ts_started AS ts_first_call_event ,
         fc.last_queue_name AS department_name ,
@@ -241,7 +241,7 @@ csat_email_base AS (
         CASE
             WHEN dt.score IN ('good') THEN 1
             WHEN dt.score IN ('bad') THEN 0
-        END AS is_solved,
+        END AS resolution_survey,
         CASE
             WHEN dt.score = 'good' THEN 5
             WHEN dt.score = 'bad' THEN 1
@@ -269,7 +269,7 @@ csat_chat_base AS (
             WHEN sa.is_solved = TRUE THEN 1
             WHEN sa.is_solved = FALSE THEN 0
             ELSE NULL
-        END AS is_solved,
+        END AS resolution_survey,
         sa.rating AS csat,
         c.group_name,
         c.id_ticket,
@@ -303,7 +303,7 @@ csat AS (
         DATE(tk.ts_created_local) AS ticket_date,
         tk.request_type,
         tk.group_name,
-        COALESCE(c.is_solved, cll.is_solved, e.is_solved) AS is_solved,
+        COALESCE(c.resolution_survey, cll.resolution_survey, e.resolution_survey) AS resolution_survey,
         COALESCE(c.csat, cll.csat, e.score_num) AS csat
     FROM
         zendesk.fact_tickets ft
@@ -335,13 +335,23 @@ automatically_closed_emails AS (
         dt.channel IN ('email', 'form_faq', 'web', 'other')
         AND tt.ticket_tag IN ('resolve_ticket_acompanhamento', 'fechado_automaticamente_noreply', 'redirecionado_atendimento_2', 'closed_by_merge', 'zapdesk', 'ticket_via_call', 'call_contato_receptivo', 'call_contato_ativo', 'resolve_ticket_acompanhamento', 'redirecionado_adm_v1', 'robotserviceaccount02') 
 ),
+department_control AS (
+    SELECT
+        department AS back_department
+    FROM 
+        datalake_gsheets_clean_prod.department_control
+    WHERE front_or_back LIKE 'Back'
+),
 back_tickets AS (
     SELECT 
         sk_ticket AS sk_back_ticket
     FROM
-        tickets.dim_ticket 
+        tickets.dim_ticket
+    LEFT JOIN
+        department_control
+        ON department_control.back_department = dim_ticket.group_name
     WHERE
-        tags ILIKE '%tarefa_atendimento_escalado%'
+        tags ILIKE '%tarefa_atendimento_escalado%' OR back_department IS NOT NULL
 ),
 answered_calls AS ( 
     SELECT
@@ -494,7 +504,7 @@ tickets_areas AS (
         area_aux <> '-'
     GROUP BY 1,2,3 
 ),
-tax AS (
+/*tax AS (
     SELECT
         DISTINCT dd.date AS "Data_Hora",
         ft.sk_ticket AS "Ticket_Id",
@@ -569,8 +579,8 @@ tax AS (
         )
         AND customer_type_tag IS NOT NULL
         AND contact_motivation_tag IS NOT NULL
-        AND dt.contact_theme_tag IS NOT NULL 
-),
+        AND dt.contact_theme_tag IS NOT NULL
+),*/
 front_or_back_call_tasks AS (
     SELECT
         DISTINCT sk_ticket AS back_ticket,
@@ -579,8 +589,11 @@ front_or_back_call_tasks AS (
         ts_created_local
     FROM
         tickets.dim_ticket
+    LEFT JOIN
+        department_control
+        ON department_control.back_department = dim_ticket.group_name
     WHERE 
-        tags LIKE '%tarefa_atendimento_escalado%'
+        (tags LIKE '%tarefa_atendimento_escalado%' OR back_department IS NOT NULL)
         AND DATE(ts_created_local)>='2020-09-01' 
         AND (tags NOT ILIKE '%bot_end_conversation%'
         AND tags NOT ILIKE '%closed_by_merge%')
@@ -611,8 +624,11 @@ front_or_back_email_tickets AS (
         ts_created_local
     FROM
         tickets.dim_ticket
+    LEFT JOIN
+        department_control
+        ON department_control.back_department = dim_ticket.group_name
     WHERE 
-        tags LIKE '%tarefa_atendimento_escalado%'
+        (tags LIKE '%tarefa_atendimento_escalado%' OR back_department IS NOT NULL)
         AND DATE(ts_created_local)>='2020-09-01' 
         AND (tags NOT ILIKE '%bot_end_conversation%'
         AND tags NOT ILIKE '%closed_by_merge%')
@@ -626,8 +642,11 @@ front_or_back_chat_tasks AS (
         ts_created_local
     FROM
         tickets.dim_ticket
+    LEFT JOIN
+        department_control
+        ON department_control.back_department = dim_ticket.group_name
     WHERE 
-        tags LIKE '%tarefa_atendimento_escalado%'
+        (tags LIKE '%tarefa_atendimento_escalado%' OR back_department IS NOT NULL)
         AND DATE(ts_created_local)>='2020-09-01' 
         AND (tags NOT ILIKE '%bot_end_conversation%'
         AND tags NOT ILIKE '%closed_by_merge%')
@@ -727,7 +746,7 @@ SELECT
 	tk.subject,
 	tk.group_name,
 	ta.ticket_area,
-	tax.theme,
+	/*tax.theme,
     tax.motivation,
     tax.client AS customer,
 	CASE
@@ -743,7 +762,11 @@ SELECT
 		OR tk.group_name LIKE '%Vistoria%' THEN 'inspection'
 		WHEN tax.theme IS NULL THEN 'null'
 		ELSE tax.theme
-	END AS theme_tag_agg,
+	END AS theme_tag_agg,*/
+    tk.customer_type_tag,
+    tk.contact_motivation_tag,
+    tk.contact_theme_tag,
+    tk.comment,
 	CASE
         WHEN 
             tk.group_name IN (
@@ -848,26 +871,26 @@ SELECT
         ELSE 1
         END AS is_answered,
 	CASE
-		WHEN csat.is_solved >1 THEN 1
-		ELSE csat.is_solved
-	END AS is_solved,
+		WHEN csat.resolution_survey >1 THEN 1
+		ELSE csat.resolution_survey
+	END AS resolution_survey,
 	csat.csat,
     CASE
-        WHEN is_solved = 1
+        WHEN resolution_survey = 1
             AND (back_ticket IS NULL OR is_open_back_ticket = 0)
             AND is_automatic_email = 0 AND is_bot = 0 AND is_closed_by_merge = 0 --crr só é aplicável aos dados que passam por esse filtro
             THEN 1
-        WHEN is_solved IS NOT NULL 
+        WHEN resolution_survey IS NOT NULL 
             AND is_automatic_email = 0 AND is_bot = 0 AND is_closed_by_merge = 0 THEN 0
         ELSE NULL
-        END AS is_crr,
+        END AS is_solved,
     CASE
-        WHEN is_solved = 1
+        WHEN resolution_survey = 1
             AND back_ticket IS NULL
             AND has_transfers = 0
             AND is_automatic_email = 0 AND is_bot = 0 AND is_closed_by_merge = 0 --fcr só é aplicável aos dados que passam por esse filtro
             THEN 1
-        WHEN is_solved IS NOT NULL
+        WHEN resolution_survey IS NOT NULL
             AND is_automatic_email = 0 AND is_bot = 0 AND is_closed_by_merge = 0 THEN 0
         ELSE NULL
         END AS is_fcr
@@ -894,9 +917,9 @@ LEFT JOIN
 LEFT JOIN 
     sla 
         ON ft.sk_ticket = sla.sk_ticket
-LEFT JOIN 
+/*LEFT JOIN 
     tax 
-        ON ft.sk_ticket = tax.Ticket_Id
+        ON ft.sk_ticket = tax.Ticket_Id*/
 LEFT JOIN 
     csat 
         ON ft.sk_ticket = csat.sk_ticket
