@@ -1,50 +1,42 @@
-WITH tickets_filter AS (
-    SELECT DISTINCT
-        *
+-- The double curly brackets (chave) had to be put to escape that character in the function .format in Python. If you test this in Databricks or somewhere else, remember to replace by a single curly bracket
+WITH last_ticket_update AS (
+    SELECT
+        t.id_ticket,
+        MAX(t.ts_updated) AS ts_last_update
     FROM
         datalake_zendesk_tickets_clean.tickets t
-    WHERE
-        (
-            t.ticket_via <> 'api'
-            OR (
-                t.ticket_via='api'
-                AND t.tags NOT LIKE '%hsm%'
-            )
-        )
-),
-last_updated_ticket AS (
-    SELECT
-        id_ticket,
-        MAX(ts_updated) AS ts_last_updated
-    FROM
-        tickets_filter
     GROUP BY 1
 ),
-distinct_tickets AS (
+filtered_custom_fields AS (
     SELECT
-        tf.id_ticket,
-        tf.custom_fields,
-        tf.ts_updated,
-        tf.dt_extracted
+        tck.id_ticket,
+        -- The double curly brackets (chave) had to be put to escape that character in the function .format in Python. If you test this in Databricks or somewhere else, remember to replace by a single curly bracket
+        EXPLODE(SPLIT(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(tck.custom_fields, '"id":', ''), ',"value"', ''), '[', ''), ']', ''), '{{', ''), '}}', ''), ',')) AS custom_field
     FROM
-        tickets_filter tf
-    INNER JOIN
-        last_updated_ticket lt
-            ON tf.id_ticket = lt.id_ticket
-            AND tf.ts_updated = lt.ts_last_updated
+        datalake_zendesk_tickets_clean.tickets tck
+    JOIN
+        last_ticket_update ltu
+            ON tck.id_ticket = ltu.id_ticket
+            AND tck.ts_updated = ltu.ts_last_update
+),
+parsed_custom_fields AS (
+    SELECT DISTINCT
+        id_ticket,
+        SPLIT(custom_field, ':')[0] AS id_custom_field,
+        SPLIT(custom_field, ':')[1] AS custom_field_value,
+        tf.raw_title AS custom_field_title
+    FROM
+        filtered_custom_fields tcf
+    JOIN
+        datalake_zendesk_tickets_clean.ticket_fields tf
+            ON tf.id_ticket_fields = SPLIT(custom_field, ':')[0]
+    WHERE
+        SPLIT(custom_field, ':')[1] IS NOT NULL
+        AND SPLIT(custom_field, ':')[1] != 'null'
 )
 SELECT
-    df.id_ticket,
-    cf.id AS id_field,
-    cf.value AS value_field,
-    df.custom_fields,
-    df.ts_updated,
-    YEAR(dt_extracted) AS year,
-    MONTH(dt_extracted) AS month,
-    DAY(dt_extracted) AS day
+    id_ticket,
+    MAP_FROM_ARRAYS(COLLECT_LIST(custom_field_title), COLLECT_LIST(custom_field_value)) AS custom_fields
 FROM
-    distinct_tickets df
-LATERAL VIEW
-    EXPLODE(FROM_JSON(df.custom_fields,'array<struct<id:string,value:string>>')) AS cf
-WHERE
-    cf.value IS NOT NULL
+    parsed_custom_fields
+GROUP BY 1
