@@ -31,7 +31,7 @@ parsed_custom_fields AS (
         datalake_zendesk_tickets_clean.ticket_fields tf
             ON tf.id_ticket_fields = SPLIT(custom_field, ':')[0]
     WHERE
-        NULLIF(REPLACE(SPLIT(custom_field, ':')[1], '"', NULL), 'null') IS NOT NULL
+        NULLIF(NULLIF(REPLACE(SPLIT(custom_field, ':')[1], '"', ''), ''), 'null') IS NOT NULL
 )
 SELECT
     id_ticket,
