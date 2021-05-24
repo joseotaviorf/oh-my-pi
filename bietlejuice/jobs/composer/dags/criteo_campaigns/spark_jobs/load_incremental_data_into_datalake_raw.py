@@ -27,13 +27,31 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
+def map_cols(df):
+    col_mapping = {
+        "SalesAllPc1d": "Sales All",
+        "Adset": "Campaign Name",
+        "Advertiser": "Advertiser Name",
+        "ECpc": "CPC",
+        "AdsetId": "Campaign Id",
+        "AdvertiserCost": "Cost",
+        "OverallCompetitionWin": "Comp. Win",
+        "RevenueGeneratedPc1d": "Revenue",
+        "Day": "Cost Attribution Date",
+        "Displays": "Impressions",
+    }
+
+    for key, value in col_mapping.items():
+        df = df.withColumnRenamed(key, value)
+    return df
+
+
 def get_api_response(credentials, execution_date):
-    raw_data = list()
     headers = {"Content-Type": "application/json", "Accept": "application/octet-stream"}
     body = {
         "startDate": f"{execution_date}T00:00:59.000Z",
         "endDate": f"{execution_date}T23:59:00.000Z",
-        "dimensions": ["AdsetId", "Day"],
+        "dimensions": ["AdsetId", "Day", "Advertiser"],
         "metrics": [
             "Clicks",
             "Displays",
@@ -53,10 +71,7 @@ def get_api_response(credentials, execution_date):
     client_secret = credentials["client_secret"]
     criteo_client = CriteoClient(client_id=client_id, client_secret=client_secret)
     api_response = criteo_client.get_data(body, headers)
-    if api_response:
-        for data in api_response:
-            raw_data.append(data)
-    return raw_data
+    return api_response
 
 
 if __name__ == "__main__":
@@ -96,7 +111,7 @@ if __name__ == "__main__":
 
     if api_response:
         df = spark_client.create_dataframe(api_response)
-        df = df.withColumnRenamed("Day", "Cost Attribution Date")
+        df = map_cols(df)
         dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
         df = df.coalesce(1)
         df = (
