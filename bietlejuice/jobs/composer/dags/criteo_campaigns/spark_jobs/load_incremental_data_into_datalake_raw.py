@@ -29,11 +29,11 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 def map_cols(df):
     col_mapping = {
-        "SalesAllPc1d": "Sales All",
+        "SalesAllPc1d": "All Sales",
         "Adset": "Campaign Name",
         "Advertiser": "Advertiser Name",
         "ECpc": "CPC",
-        "AdsetId": "Campaign Id",
+        "AdsetId": "Campaign ID",
         "AdvertiserCost": "Cost",
         "OverallCompetitionWin": "Comp. Win",
         "RevenueGeneratedPc1d": "Revenue",
