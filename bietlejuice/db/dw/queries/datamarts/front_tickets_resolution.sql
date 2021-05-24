@@ -15,7 +15,7 @@ SELECT
     tm.contact_motivation_tag,
     tm.contact_theme_tag,
     tm.comment,
-    tm.resolution_survey
+    tm.resolution_survey,
     tm.csat,
     tm.is_solved,
     tm.is_fcr,

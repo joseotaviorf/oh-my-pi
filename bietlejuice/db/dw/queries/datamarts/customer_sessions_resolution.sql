@@ -85,7 +85,6 @@ SELECT
     back_ticket,
     has_transfers,
     resolution_survey,
-    is_solved,
     tts.tickets AS ticket_count,
     CASE
         WHEN
