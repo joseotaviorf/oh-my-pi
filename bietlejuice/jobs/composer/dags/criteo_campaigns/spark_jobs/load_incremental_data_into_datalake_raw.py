@@ -27,41 +27,35 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def get_api_response(accounts, execution_date):
+def get_api_response(credentials, execution_date):
     raw_data = list()
-    for account in accounts:
-        headers = {
-            "Content-Type": "application/json",
-            "Accept": "application/octet-stream",
-        }
-        body = {
-            "reportType": "CampaignPerformance",
-            "startDate": f"{execution_date}T00:00:59.000Z",
-            "endDate": f"{execution_date}T23:59:00.000Z",
-            "dimensions": ["CampaignId", "Day"],
-            "metrics": [
-                "Clicks",
-                "Displays",
-                "Audience",
-                "AdvertiserCost",
-                "SalesAllPc",
-                "RevenueGeneratedPc",
-                "OverallCompetitionWin",
-                "ECpc",
-            ],
-            "format": "json",
-            "timezone": "BRT",
-            "currency": "BRL",
-        }
-        data = json.dumps(body)
+    headers = {"Content-Type": "application/json", "Accept": "application/octet-stream"}
+    body = {
+        "startDate": f"{execution_date}T00:00:59.000Z",
+        "endDate": f"{execution_date}T23:59:00.000Z",
+        "dimensions": ["AdsetId", "Day"],
+        "metrics": [
+            "Clicks",
+            "Displays",
+            "Audience",
+            "AdvertiserCost",
+            "SalesAllPc1d",
+            "RevenueGeneratedPc1d",
+            "OverallCompetitionWin",
+            "ECpc",
+        ],
+        "format": "json",
+        "timezone": "BRT",
+        "currency": "BRL",
+    }
 
-        client_id = account["client_id"]
-        client_secret = account["client_secret"]
-        criteo_client = CriteoClient(client_id=client_id, client_secret=client_secret)
-        api_response = criteo_client.get_data(data, headers)
-        if api_response:
-            for data in api_response:
-                raw_data.append(data)
+    client_id = credentials["client_id"]
+    client_secret = credentials["client_secret"]
+    criteo_client = CriteoClient(client_id=client_id, client_secret=client_secret)
+    api_response = criteo_client.get_data(body, headers)
+    if api_response:
+        for data in api_response:
+            raw_data.append(data)
     return raw_data
 
 
@@ -88,8 +82,8 @@ if __name__ == "__main__":
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
-    credentials = dbutils.secrets.get(scope="quintoandar", key=APIEnum.CRITEO)
-    accounts = json.loads(credentials)
+    credentials_str = dbutils.secrets.get(scope="quintoandar", key=APIEnum.CRITEO)
+    credentials = json.loads(credentials_str)
     environment = args.environment
     source = args.source
     media = args.media
@@ -98,7 +92,7 @@ if __name__ == "__main__":
     partition_cols = ["year", "month", "day"]
 
     spark_client = SparkClient()
-    api_response = get_api_response(accounts, execution_date)
+    api_response = get_api_response(credentials, execution_date)
 
     if api_response:
         df = spark_client.create_dataframe(api_response)
