@@ -1,6 +1,7 @@
 from datetime import datetime
 import pendulum
 
+from airflow.utils.helpers import chain
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -85,6 +86,7 @@ enrich_sub_dag = DatalakeSubDAG(
     start_date=MAIN_START_DATE,
     execution_timeout_hours=EXECUTION_TIMEOUT_HOURS,
 )
+
 enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(
     dag, sql_file_list, is_incremental=True, partitions=["id_date"]
 )
@@ -100,6 +102,49 @@ consolidated_sharing_rules = QuintoAndarDatabricksSubmitRunOperator(
             "parameters": [ENV, DATALAKE_BUCKET],
         }
     },
+)
+
+enrich_table_name = "sharing_rules_marketing_daily_costs"
+slugged_enrich_table_name = enrich_table_name.replace("_", "-")
+
+sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id=f"sync-hive-metastore-{slugged_enrich_table_name}",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": f"{BASE_SPARK_JOBS_PATH}sync_metastore_tables.py",
+            "parameters": [
+                DATALAKE_BUCKET,
+                LayerEnum.ENRICH.value,
+                SOURCE,
+                "--table-name",
+                enrich_table_name,
+            ],
+        }
+    },
+)
+
+validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
+    task_id=f"validate-sync-hive-metastore-{slugged_enrich_table_name}",
+    json={
+        "spark_python_task": {
+            "python_file": f"{BASE_SPARK_JOBS_PATH}validate_sync_metastore_tables.py",
+            "parameters": [
+                LayerEnum.ENRICH.value,
+                SOURCE,
+                "--table-name",
+                enrich_table_name,
+            ],
+        }
+    },
+)
+
+chain(
+    consolidated_sharing_rules,
+    sync_metastore_table_task,
+    validate_sync_metastore_table_task,
+    terminate_cluster_task,
 )
 
 base_enrich_tasks = list(enrich_sub_dags.values())
