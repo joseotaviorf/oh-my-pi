@@ -10,6 +10,7 @@ create table staging.dim_partner (
     cnpj varchar,
     creci varchar,
     type varchar,
+    city varchar,
     utm_campaign varchar,
     utm_medium varchar,
     utm_source varchar,

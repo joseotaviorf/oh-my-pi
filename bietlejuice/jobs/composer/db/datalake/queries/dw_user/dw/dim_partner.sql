@@ -9,6 +9,7 @@ SELECT DISTINCT
   p.cnpj,
   p.creci,
   p.type,
+  p.city,
   LAST_VALUE(apt.utm_campaign) OVER w AS utm_campaign,
   LAST_VALUE(apt.utm_medium) OVER w AS utm_medium,
   LAST_VALUE(apt.utm_source) OVER w AS utm_source,

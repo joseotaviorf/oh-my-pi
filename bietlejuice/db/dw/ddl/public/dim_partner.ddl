@@ -10,6 +10,7 @@ create table dim_partner (
     cnpj varchar(255)  DEFAULT NULL,
     creci varchar(255) DEFAULT NULL,
     type varchar(255) DEFAULT NULL,
+    city varchar(255) DEFAULT NULL
     utm_campaign varchar(255) DEFAULT NULL,
     utm_medium varchar(255) DEFAULT NULL,
     utm_source varchar(255) DEFAULT NULL,

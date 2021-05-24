@@ -10,6 +10,7 @@ create table janus.dim_partner (
     cnpj varchar(255),
     creci varchar(255),
     type varchar(255),
+    city varchar(255),
     utm_campaign varchar(255),
     utm_medium varchar(255),
     utm_source varchar(255),
