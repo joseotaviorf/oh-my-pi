@@ -27,14 +27,35 @@ WITH tasks AS (
     WHERE
         event IN ('reservation.completed', 'reservation.timeout', 'reservation.canceled', 'reservation.rejected')
     GROUP BY 1,2
+  ),
+  agent_info AS (
+    SELECT
+      id_task,
+      id_reservation,
+      cfe.agent_email,
+      GET_JSON_OBJECT(metadata, '$.event_data.WorkerAttributes.location') AS agent_company,
+      ac.agent_name,
+      ac.manager AS agent_manager,
+      GET_JSON_OBJECT(metadata, '$.event_data.WorkerAttributes.routing.skills') AS agent_skills
+    FROM
+      datalake_bigfone_twilio.call_flex_events cfe
+    JOIN
+      datalake_gsheets_clean.agents_control ac
+        ON cfe.agent_email = ac.email
+    GROUP BY 1,2,3,4,5,6,7
   )
   SELECT
     r.id_reservation,
-    COALESCE(id_call,id_task) AS sk_call,
+    COALESCE(id_call,r.id_task) AS sk_call,
     id_call,
-    id_task,
+    r.id_task,
     id_agent,
     id_queue,
+    agent_email,
+    agent_manager,
+    agent_company,
+    agent_name,
+    agent_skills,
     queue_name,
     seconds_duration,
     seconds_wait_time,
@@ -50,6 +71,10 @@ WITH tasks AS (
     tc.ts_closed
   FROM
     datalake_bigfone_twilio.call_flex_reservations r
+  JOIN
+    agent_info ae
+      ON ae.id_task = r.id_task
+      AND ae.id_reservation = r.id_reservation
   INNER JOIN
     last_updated_reservations lur
         ON lur.id_reservation = r.id_reservation
@@ -169,101 +194,29 @@ call AS (
       call_metrics cm
           ON cm.id_task = fe.id_task
 ),
-zendesk AS (
-  WITH last_update_ticket AS (
-    SELECT 
-      id_ticket, 
-      MAX(ts_updated) AS ts_last_updated 
-    FROM 
-      datalake_zendesk_tickets_clean.tickets
-    GROUP BY 1
-  ),
-  filtered_custom_fields AS (
-    SELECT
-      zcf.id_ticket,
-      EXPLODE(SPLIT(REPLACE(REPLACE(custom_fields, '{{', ''), '}}', ''), ',')) AS custom_field
-    FROM 
-      datalake_clean.zendesk_custom_fields zcf
-  ),
-  parsed_custom_fields AS (
-    SELECT DISTINCT
-      id_ticket,
-      REGEXP_EXTRACT(custom_field, '"(.*)":(.*)', 1) AS id_ticket_fields,
-      REPLACE(REGEXP_EXTRACT(custom_field, '"(.*)":(.*)', 2), '"', '') AS value,
-      tf.raw_title AS key
-    FROM 
-      filtered_custom_fields tcf
-    JOIN
-      datalake_zendesk_tickets_clean.ticket_fields tf
-        ON tf.id_ticket_fields = regexp_extract(custom_field, '"(.*)":(.*)', 1)
-  ),
-  zendesk_custom_fields AS (
-    SELECT
-      id_ticket,
-      TO_JSON(MAP_FROM_ARRAYS(COLLECT_LIST(key), COLLECT_LIST(value))) AS custom_fields
-    FROM
-      parsed_custom_fields
-    GROUP BY 1
-  ),
-  last_updated_ticket_metrics AS (
-    SELECT
-      t.id_ticket, 
-      MAX(DATE(CONCAT(year, '-', month, '-', day))) AS dt_last_updated,
-      MAX(ts_updated) AS ts_updated
-    FROM 
-      datalake_zendesk_ticket_funnels.tickets_funnel_metrics t
-    GROUP BY 1
-  )
-  SELECT
-    t.id_ticket,
-    CASE
-          WHEN 
-              t.ticket_via IN ('api', 'web') 
-              AND (tags LIKE '%call_contato_ativo%' OR tags LIKE '%call_contato_receptivo%') 
-          THEN 'call'
-          WHEN t.ticket_via = 'api' AND tags LIKE '%form%' THEN 'form_faq'
-          WHEN t.ticket_via IN ('web', 'email', 'chat') THEN t.ticket_via
-          ELSE 'other'
-    END AS channel,
-    t.tags,
-    t.description,
-    t.status,
-    zcf.custom_fields,
-    NULLIF(GET_JSON_OBJECT(REPLACE(REPLACE(zcf.custom_fields, ']',''), '[', ''), '$.CALL Call id'), '') AS id_call,
-    tfm.minutes_first_resolution_calendar AS minutes_first_resolution_time_calendar,
-    tfm.minutes_first_resolution_business AS minutes_first_resolution_time_business,
-    REPLACE(REPLACE(GET_JSON_OBJECT(zcf.custom_fields, '$.Motivo de contato'), '[', ''), ']', '') AS contact_type_tag,
-    REPLACE(REPLACE(GET_JSON_OBJECT(zcf.custom_fields, '$.Cliente Tag'), '[', ''), ']', '') AS client_type,
-    REPLACE(REPLACE(GET_JSON_OBJECT(zcf.custom_fields, '$.Tipo de Solicitação'), '[', ''), ']', '') AS request_type,
-    COALESCE(
-      ctt.contact_motivation_tag,
-      REPLACE(REPLACE(get_json_object(zcf.custom_fields, '$.Motivo Tag'), '[', ''), ']', '')
-    ) AS contact_motivation_tag,
-    COALESCE(
-      ctt.contact_theme_tag,
-      REPLACE(REPLACE(get_json_object(zcf.custom_fields, '$.Assunto Tag'), '[', ''), ']', '')
-    ) AS contact_theme_tag
+zendesk_aditional_ticket_info AS (
+  SELECT DISTINCT 
+    tf.id_ticket,
+    ftm.id_call,
+    tf.tags,
+    tf.description,
+    tf.status,
+    tf.custom_fields,
+    tf.group_name AS zendesk_ticket_department,
+    ftm.minutes_first_resolution_calendar AS minutes_first_resolution_time_calendar,
+    ftm.minutes_first_resolution_business AS minutes_first_resolution_time_business,
+    tf.request_type,
+    tf.client_type,
+    tf.customer_type_tag,
+    tf.contact_motivation_tag,
+    tf.contact_theme_tag
   FROM
-    datalake_zendesk_tickets_clean.tickets t
+    datalake_zendesk_ticket_funnels.ticket_funnel tf
   JOIN
-    last_update_ticket lut
-      ON t.id_ticket = lut.id_ticket
-      AND t.ts_updated = lut.ts_last_updated
-  JOIN
-    datalake_zendesk_ticket_funnels.tickets_funnel_metrics tfm
-      ON t.id_ticket = tfm.id_ticket
-  JOIN
-    last_updated_ticket_metrics lutm
-      ON lutm.id_ticket = tfm.id_ticket
-      AND lutm.dt_last_updated = DATE(CONCAT(tfm.year, '-', tfm.month, '-', tfm.day))
-      AND lutm.ts_updated = tfm.ts_updated
-  JOIN
-    zendesk_custom_fields zcf
-      ON zcf.id_ticket = t.id_ticket
-  LEFT JOIN
-    datalake_gsheets_clean.contact_type_taxonomy ctt 
-      ON ctt.contact_type_tag = REPLACE(REPLACE(GET_JSON_OBJECT(zcf.custom_fields, '$.Motivo de contato'), '[', ''), ']', '')
-      AND ctt.is_correspondent_contact_type = 1
+    datalake_zendesk_ticket_funnels.tickets_funnel_metrics ftm
+      ON tf.id_ticket = ftm.id_ticket
+  WHERE
+    ftm.id_call IS NOT NULL
 ),
 back_tickets AS (
   SELECT 
@@ -272,17 +225,36 @@ back_tickets AS (
     zd.status,
     zd2.id_ticket AS front_ticket
   FROM
-    zendesk zd
+    zendesk_aditional_ticket_info zd
   JOIN
     call
       ON call.id_task = REGEXP_EXTRACT(description, '(WT[a-z0-9]{{20,40}})',1)
+  LEFT JOIN
+    datalake_gsheets_clean.department_control dc
+      ON dc.department = zd.zendesk_ticket_department 
   JOIN  
-    zendesk zd2
+    zendesk_aditional_ticket_info zd2
       ON zd2.id_call = call.sk_call
   WHERE 
-    zd.tags LIKE '%tarefa_atendimento_escalado%'
+    (zd.tags LIKE '%tarefa_atendimento_escalado%' OR LOWER(dc.front_or_back) = 'back')
     AND (zd.tags NOT LIKE '%bot_end_conversation%' AND zd.tags NOT LIKE '%closed_by_merge%')
     AND REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})',1) != '' 
+  GROUP BY 1,2,3,4
+),
+first_and_last_task AS (
+  SELECT
+    id_ticket,
+    FIRST(t.id_reservation) OVER (PARTITION BY id_ticket ORDER BY t.ts_twilio_created_local ASC) AS first_task,
+    LAST(t.id_reservation) OVER (PARTITION BY id_ticket ORDER BY t.ts_twilio_created_local ASC) AS last_task
+  FROM 
+    tasks t
+  JOIN 
+    call c
+      ON t.sk_call = c.sk_call
+  JOIN 
+    zendesk_aditional_ticket_info zd 
+      ON zd.id_call IS NOT NULL
+      AND zd.id_call = c.id_call
 )
 SELECT
   DISTINCT zd.id_ticket,
@@ -292,6 +264,11 @@ SELECT
   c.id_conversation,
   t.id_agent,
   t.id_queue,
+  t.agent_email,
+  t.agent_manager,
+  t.agent_company,
+  t.agent_name,
+  t.agent_skills,
   t.queue_name AS department,
   FIRST(t.queue_name) OVER (PARTITION BY c.id_task ORDER BY c.ts_created) AS first_department,
   LAST(t.queue_name) OVER (PARTITION BY c.id_task ORDER BY c.ts_created) AS last_department,
@@ -305,17 +282,20 @@ SELECT
   c.seconds_duration/60.0 AS minutes_full_resolution_time_calendar,
   c.number_of_departments,
   c.number_of_tasks,
+  c.direction,
   zd.minutes_first_resolution_time_calendar,
   zd.minutes_first_resolution_time_business,
-  zd.contact_type_tag,
-  zd.client_type,
   zd.request_type,
+  zd.client_type,
+  zd.customer_type_tag,
   zd.contact_motivation_tag,
   zd.contact_theme_tag,
   zd.tags,
   zd.status,
   zd.custom_fields,
-  zd.tags LIKE '%tarefa_atendimento_escalado%' AS has_back_tickets,
+  last_task.id_ticket IS NOT NULL AS is_last_task,
+  first_task.id_ticket IS NOT NULL AS is_first_task,
+  bt.front_ticket IS NOT NULL AS has_back_tickets,
   zd.tags LIKE '%bot_end_conversation%' AS is_bot, 
   zd.tags LIKE '%closed_by_merge%' AS is_closed_by_merge,
   c.has_ended_in_ura = FALSE AND t.is_answered = TRUE AS is_answered,
@@ -343,9 +323,21 @@ JOIN
   call c
     ON t.sk_call = c.sk_call
 JOIN 
-  zendesk zd 
+  zendesk_aditional_ticket_info zd 
     ON zd.id_call IS NOT NULL
     AND zd.id_call = c.id_call
+LEFT JOIN
+  first_and_last_task last_task
+    ON last_task.id_ticket = zd.id_ticket
+    AND last_task.last_task = t.id_reservation
+LEFT JOIN
+  first_and_last_task first_task
+    ON first_task.id_ticket = zd.id_ticket
+    AND first_task.first_task = t.id_reservation
+JOIN
+  datalake_gsheets_clean.department_control dc
+    ON dc.department = t.queue_name 
+    AND LOWER(dc.front_or_back) <> 'back'
 LEFT JOIN
   back_tickets bt
     ON bt.front_ticket = zd.id_ticket

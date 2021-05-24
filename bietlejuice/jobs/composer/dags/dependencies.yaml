@@ -363,23 +363,21 @@ bietlejuice.enrich_firestore:
   - bietlejuice.firestore:load-sale-offer-to-clean
 
 bietlejuice.enrich_front_tickets:
-  - bietlejuice.enrich_zendesk_custom_fields:load-custom-fields-to-enrich
-  - bietlejuice.enrich_zendesk_ticket_funnels:load-tickets-funnel-metrics-to-enrich
-  - bietlejuice.enrich_zendesk_ticket_funnels:load-ticket-funnel-to-enrich
-  - bietlejuice.enrich_quinto_messenger:load-task-to-enrich
-  - bietlejuice.enrich_quinto_messenger:load-task-event-to-enrich
-  - bietlejuice.enrich_quinto_messenger:load-channel-event-to-enrich
-  - bietlejuice.enrich_quinto_messenger:load-channel-to-enrich
-  - bietlejuice.enrich_bigfone_twilio:load-call-ivr-paths-to-enrich
+  - bietlejuice.chat_fup:load-chats-chat-to-datalake-clean
+  - bietlejuice.chat_fup:load-surveys-answer-to-datalake-clean
+  - bietlejuice.chat_fup:load-surveys-survey-to-datalake-clean
   - bietlejuice.enrich_bigfone_twilio:load-call-flex-reservations-to-enrich
   - bietlejuice.enrich_bigfone_twilio:load-call-flex-events-to-enrich
   - bietlejuice.enrich_bigfone_twilio:load-call-ivr-events-to-enrich
-  - bietlejuice.zendesk_tickets:load-tickets-to-clean
-  - bietlejuice.zendesk_tickets:load-ticket-fields-to-clean
-  - bietlejuice.zendesk_tickets:load-groups-to-clean
-  - bietlejuice.chat_fup:load-chats-chat-to-datalake-clean
-  - bietlejuice.chat_fup:load-surveys-survey-to-datalake-clean
-  - bietlejuice.chat_fup:load-surveys-answer-to-datalake-clean
+  - bietlejuice.enrich_bigfone_twilio:load-call-ivr-paths-to-enrich
+  - bietlejuice.enrich_quinto_messenger:load-channel-event-to-enrich
+  - bietlejuice.enrich_quinto_messenger:load-channel-to-enrich
+  - bietlejuice.enrich_quinto_messenger:load-task-to-enrich
+  - bietlejuice.enrich_quinto_messenger:load-task-event-to-enrich
+  - bietlejuice.enrich_zendesk_ticket_funnels:load-tickets-funnel-metrics-to-enrich
+  - bietlejuice.enrich_zendesk_ticket_funnels:load-ticket-funnel-to-enrich
+  - bietlejuice.gsheets:load-agents-control-to-clean
+  - bietlejuice.gsheets:load-department-control-to-clean
 
 bietlejuice.enrich_invoice:
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
