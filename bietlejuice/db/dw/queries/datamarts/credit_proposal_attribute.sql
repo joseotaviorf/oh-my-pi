@@ -206,7 +206,7 @@ FROM
 INNER JOIN
     dim_proposal AS dp
         ON rfb.sk_proposal = dp.sk_proposal
-INNER JOIN
+LEFT JOIN
     house_origin_type AS ht
         ON rfb.id_house = ht.id_house
 LEFT JOIN
