@@ -1,0 +1,16 @@
+DROP TABLE IF EXISTS front_tickets.fact_task;
+CREATE TABLE IF NOT EXISTS front_tickets.fact_task (
+    sk_ticket BIGINT,
+    sk_task VARCHAR,
+    sk_agent VARCHAR,
+    sk_department VARCHAR(40),
+    sk_channel VARCHAR(40),
+    department VARCHAR(100),
+    channel VARCHAR(5),
+    is_sla BOOLEAN,
+    is_first_task BOOLEAN,
+    is_last_task BOOLEAN,
+    ts_started TIMESTAMP,
+    ts_closed TIMESTAMP
+);
+ALTER TABLE front_tickets.fact_task OWNER TO airflow;
