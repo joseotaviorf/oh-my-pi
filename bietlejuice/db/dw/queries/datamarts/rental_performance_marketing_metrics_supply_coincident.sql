@@ -563,7 +563,7 @@ affiliates AS (
     FROM marketing.fact_marketing_daily_costs co
     JOIN dim_date dbt ON dbt.sk_date = co.sk_date
     WHERE co.account_name IN ('quintoandar_supply_sale_display', 'quintoandar_supply_sale', 'supply_landlords_sale', 'supply_landlords')
-      AND co.mkt_origin LIKE 'Owner PWA - Sale'
+      AND co.mkt_origin IN ('Owner PWA - Sale', 'Price Calculator - Sale')
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11
     ),
     supply_ciq_cost AS (
@@ -740,6 +740,7 @@ SELECT
         WHEN mkt_origin = 'Doorman Sale' THEN 'Doorman'
         WHEN mkt_origin = 'Indica Aí - Agents Sale' THEN 'Indica Aí - Agents'
         WHEN mkt_origin = 'Indica Aí - General Sale' THEN 'Indica Aí - General'
+        WHEN mkt_origin = 'Price Calculator - Sale' THEN 'Price Calculator'
         WHEN mkt_origin IN ('CR', 'Autonomous Agent', 'Autonomuos Agent') THEN 'CIQ'
         ELSE mkt_origin
     END AS planning_mkt_channel,
