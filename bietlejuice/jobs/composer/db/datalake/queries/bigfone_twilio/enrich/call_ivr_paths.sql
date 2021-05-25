@@ -28,14 +28,14 @@ event_step_by_step AS (
 	FROM
 		event_steps
 )
-SELECT
+SELECT DISTINCT
 	es.id,
 	es.id_event,
 	es.id_call,
 	es.id_task,
 	REGEXP_EXTRACT(esbs.step,'([A-Za-z0-9_]+)',1) AS step_name,
 	REGEXP_EXTRACT(esbs.step,'("event":")(\\w+)',2) AS event_type,
-	CAST(REGEXP_EXTRACT(esbs.step,'("digits":")(\\d+)',2) AS INT) AS digits,
+	CAST(REGEXP_EXTRACT(esbs.step,'("digits":")(\\d+)',2) AS BIGINT) AS digits,
 	FROM_UNIXTIME(CAST(REGEXP_EXTRACT(esbs.step,'("timestamp":)(\\d+)',2) AS BIGINT)/1000) AS ts_created,
 	es.year,
 	es.month,

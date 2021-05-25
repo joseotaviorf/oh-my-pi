@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS call.fact_ivr_paths;
 CREATE TABLE IF NOT EXISTS call.fact_ivr_paths (
 	sk_call VARCHAR(50),
 	step VARCHAR(100),
-	answer INTEGER,
+	answer BIGINT,
 	is_timeout BOOLEAN,
 	seconds_elapsed BIGINT,
 	ts_answered TIMESTAMP,
