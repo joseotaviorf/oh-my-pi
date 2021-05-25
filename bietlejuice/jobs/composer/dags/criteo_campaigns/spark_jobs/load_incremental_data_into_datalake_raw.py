@@ -49,8 +49,8 @@ def map_cols(df):
 def get_api_response(credentials, execution_date):
     headers = {"Content-Type": "application/json", "Accept": "application/octet-stream"}
     body = {
-        "startDate": f"{execution_date}T00:00:59.000Z",
-        "endDate": f"{execution_date}T23:59:00.000Z",
+        "startDate": execution_date,
+        "endDate": execution_date,
         "dimensions": ["AdsetId", "Day", "Advertiser"],
         "metrics": [
             "Clicks",
@@ -63,7 +63,7 @@ def get_api_response(credentials, execution_date):
             "ECpc",
         ],
         "format": "json",
-        "timezone": "BRT",
+        "timezone": "GMT",
         "currency": "BRL",
     }
 
