@@ -71,16 +71,6 @@ marketing_costs_kenshoo_configuration:
     sheet_name: Kenshoo_Configuration
     clean_table_name: marketing_costs_kenshoo_configuration
 
-marketing_costs_manual_shared_costs:
-    sheet_id: 1YiFYgv-KTO8JydV5lO6HryZ8qnnN9wXSmPcGQ6KdmLI
-    sheet_name: rateio_manual
-    clean_table_name: marketing_costs_manual_shared_costs
-
-marketing_costs_name_convention_shared_costs:
-    sheet_id: 1YiFYgv-KTO8JydV5lO6HryZ8qnnN9wXSmPcGQ6KdmLI
-    sheet_name: rateio_name_convention
-    clean_table_name: marketing_costs_name_convention_shared_costs
-
 marketing_costs_national_affiliate_historical_costs:
     sheet_id: 1mcTp6mmjNBpsaEiwn1ZepnhkyGozDEC5HAmVWeeArGA
     sheet_name: historic_national_costs
@@ -95,11 +85,6 @@ marketing_manual_campaign_cities:
     sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
     sheet_name: Campaign_City
     clean_table_name: marketing_manual_campaign_cities
-
-marketing_manual_costs_google:
-    sheet_id: 1e1FoBoCN0XYH3vo8u0aZ-GocU453gkfDIasX0ivDonc
-    sheet_name: Google Costs
-    clean_table_name: marketing_manual_costs_google
 
 marketing_offline_manual_costs:
     sheet_id: 1gneeE6l30lv4om6FBEUe23YGfbMCCNe8IwpbCRL6vXQ
