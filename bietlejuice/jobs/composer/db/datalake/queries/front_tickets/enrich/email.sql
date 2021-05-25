@@ -146,7 +146,7 @@ SELECT DISTINCT
   ze.status,
   ze.department,
   ze.is_sla,
-  ze.minutes_full_resolution_time_calendar,
+  CAST(ze.minutes_full_resolution_time_calendar AS DOUBLE) AS minutes_full_resolution_time_calendar,
   ze.minutes_full_resolution_time_business,
   ze.minutes_first_response,
   cs.csat_score,

@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS front_tickets.fact_ticket (
     channel VARCHAR(5),
     csat_score INTEGER,
     status VARCHAR(20),
-    minutes_full_resolution_time_calendar INTEGER, 
+    minutes_full_resolution_time_calendar DOUBLE PRECISION, 
     first_department VARCHAR(100),
     last_department VARCHAR(100),
     number_of_departments INTEGER,
