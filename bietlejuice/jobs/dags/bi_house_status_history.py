@@ -115,6 +115,7 @@ def house_status_full_history_sub_dag(sub_dag_name, **kwargs):
         task_id='load_data_into_ods',
         python_callable=execute_class_method,
         dag=local_dag,
+        execution_timeout=timedelta(hours=4),
         op_kwargs={
             'class_': HouseStatusFullHistory,
             'method': 'load_data_into_ods'
