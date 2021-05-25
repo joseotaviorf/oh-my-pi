@@ -1,4 +1,5 @@
 import logging
+import json
 
 from argparse import ArgumentParser
 from datetime import datetime
@@ -54,12 +55,12 @@ if __name__ == "__main__":
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
-    auth = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key=APIEnum.LINKEDIN)
+    auth = json.loads(dbutils.secrets.get(scope=DATABRICKS_SCOPE, key=APIEnum.LINKEDIN))
 
-    spark_client = SparkClient()
     linkedin_consumer = LinkedInConsumer(datalake_bucket, execution_date, auth)
     data = linkedin_consumer.get_data()
     if data:
+        spark_client = SparkClient()
         for data_type in data:
             stats = data[data_type]
             if stats:
