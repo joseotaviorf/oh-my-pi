@@ -10,23 +10,15 @@ WITH tasks AS (
   twilio_timestamp AS (
     SELECT
         id_reservation,
-        ts_created_local AS ts_twilio_created_local,
-        ts_created_utc AS ts_twilio_created_utc
+        MIN(ts_created_local) AS ts_twilio_created_local,
+        MIN(ts_created_utc) AS ts_twilio_created_utc,
+        MAX(ts_created_local) AS ts_twilio_closed_local,
+        MAX(ts_created_utc) AS ts_twilio_closed_utc
     FROM
         datalake_bigfone_twilio.call_flex_events
     WHERE
-        event_type = 'reservation.accepted'
-    GROUP BY 1,2,3
-  ),
-  task_closed AS (
-    SELECT
-        GET_JSON_OBJECT(metadata,'$.event_data.ReservationSid') AS id_reservation,
-        FROM_UTC_TIMESTAMP(TO_TIMESTAMP(event_timestamp, 'yyyy-MM-dd HH:mm:ss'), 'Brazil/East') AS ts_closed
-    FROM
-        datalake_bigfone_clean.event
-    WHERE
-        event IN ('reservation.completed', 'reservation.timeout', 'reservation.canceled', 'reservation.rejected')
-    GROUP BY 1,2
+        event_type IN ('reservation.completed', 'reservation.timeout', 'reservation.canceled', 'reservation.rejected', 'reservation.accepted')
+    GROUP BY 1
   ),
   agent_info AS (
     SELECT
@@ -68,23 +60,21 @@ WITH tasks AS (
     ts_ended,
     tt.ts_twilio_created_local,
     tt.ts_twilio_created_utc,
-    tc.ts_closed
+    tt.ts_twilio_closed_local,
+    tt.ts_twilio_closed_utc
   FROM
     datalake_bigfone_twilio.call_flex_reservations r
+  JOIN
+    last_updated_reservations lur
+        ON lur.id_reservation = r.id_reservation
+        AND lur.dt_last_updated = DATE(CONCAT(r.year, '-', r.month, '-', r.day))
   JOIN
     agent_info ae
       ON ae.id_task = r.id_task
       AND ae.id_reservation = r.id_reservation
-  INNER JOIN
-    last_updated_reservations lur
-        ON lur.id_reservation = r.id_reservation
-        AND lur.dt_last_updated = DATE(CONCAT(r.year, '-', r.month, '-', r.day))
   LEFT JOIN
     twilio_timestamp tt
         ON tt.id_reservation = r.id_reservation
-  LEFT JOIN
-    task_closed tc
-        ON tc.id_reservation = r.id_reservation
 ),
 call AS (
   WITH ivr_events AS (
@@ -240,24 +230,9 @@ back_tickets AS (
     AND (zd.tags NOT LIKE '%bot_end_conversation%' AND zd.tags NOT LIKE '%closed_by_merge%')
     AND REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})',1) != '' 
   GROUP BY 1,2,3,4
-),
-first_and_last_task AS (
-  SELECT
-    id_ticket,
-    FIRST(t.id_reservation) OVER (PARTITION BY id_ticket ORDER BY t.ts_twilio_created_local ASC) AS first_task,
-    LAST(t.id_reservation) OVER (PARTITION BY id_ticket ORDER BY t.ts_twilio_created_local ASC) AS last_task
-  FROM 
-    tasks t
-  JOIN 
-    call c
-      ON t.sk_call = c.sk_call
-  JOIN 
-    zendesk_aditional_ticket_info zd 
-      ON zd.id_call IS NOT NULL
-      AND zd.id_call = c.id_call
 )
-SELECT
-  DISTINCT zd.id_ticket,
+SELECT DISTINCT 
+  zd.id_ticket,
   t.id_task,
   t.id_reservation,
   t.id_call,
@@ -293,8 +268,8 @@ SELECT
   zd.tags,
   zd.status,
   zd.custom_fields,
-  last_task.id_ticket IS NOT NULL AS is_last_task,
-  first_task.id_ticket IS NOT NULL AS is_first_task,
+  LAST(t.id_reservation) OVER (PARTITION BY zd.id_ticket ORDER BY t.ts_twilio_created_local ASC) = t.id_reservation AS is_last_task,
+  FIRST(t.id_reservation) OVER (PARTITION BY zd.id_ticket ORDER BY t.ts_twilio_created_local ASC) = t.id_reservation AS is_first_task,
   bt.front_ticket IS NOT NULL AS has_back_tickets,
   zd.tags LIKE '%bot_end_conversation%' AS is_bot, 
   zd.tags LIKE '%closed_by_merge%' AS is_closed_by_merge,
@@ -314,7 +289,7 @@ SELECT
   c.csat_rating,
   c.ts_csat_answered,
   t.ts_twilio_created_local AS ts_task_created,
-  t.ts_closed AS ts_task_closed,
+  t.ts_twilio_closed_local AS ts_task_closed,
   c.ts_started AS ts_ticket_started,
   c.ts_ended AS ts_ticket_ended
 FROM 
@@ -326,14 +301,6 @@ JOIN
   zendesk_aditional_ticket_info zd 
     ON zd.id_call IS NOT NULL
     AND zd.id_call = c.id_call
-LEFT JOIN
-  first_and_last_task last_task
-    ON last_task.id_ticket = zd.id_ticket
-    AND last_task.last_task = t.id_reservation
-LEFT JOIN
-  first_and_last_task first_task
-    ON first_task.id_ticket = zd.id_ticket
-    AND first_task.first_task = t.id_reservation
 JOIN
   datalake_gsheets_clean.department_control dc
     ON dc.department = t.queue_name 

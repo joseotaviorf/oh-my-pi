@@ -6,25 +6,16 @@ WITH quinto_messenger_tickets AS (
       FROM datalake_quinto_messenger.task
       GROUP BY 1
   ),
-  task_started AS (
-    SELECT
-        id_task,
-        ts_created_local AS ts_task_created
-    FROM
-        datalake_quinto_messenger.task_event
-    WHERE
-        type = 'reservation.accepted'
-    GROUP BY 1,2
-  ),
-  task_closed AS (
+  task_timestamps AS (
     SELECT
       id_task,
-      ts_created_local AS ts_task_closed
+      MAX(ts_created_local) AS ts_task_closed,
+      MIN(ts_created_local) AS ts_task_created
     FROM
       datalake_quinto_messenger.task_event
     WHERE 
-      type IN ('reservation.completed', 'reservation.rejected', 'reservation.timeout')
-    GROUP BY 1,2
+      type IN ('reservation.completed', 'reservation.rejected', 'reservation.timeout', 'reservation.accepted')
+    GROUP BY 1
   ),
   chat_metrics AS (
     SELECT 
@@ -67,8 +58,8 @@ WITH quinto_messenger_tickets AS (
       c.seconds_duration/60.0 AS minutes_full_resolution_time_calendar,
       t.ts_created,
       t.ts_updated,
-      tc.ts_task_closed,
-      ts.ts_task_created,
+      tt.ts_task_closed,
+      tt.ts_task_created,
       ts_twilio_created_local,
       ts_twilio_updated_local,
       cm.ts_first_event,
@@ -92,11 +83,8 @@ WITH quinto_messenger_tickets AS (
       datalake_quinto_messenger.task_event te
         ON t.id_task = te.id_task
     LEFT JOIN
-      task_closed tc
-        ON tc.id_task = t.id_task
-    LEFT JOIN
-      task_started ts
-        ON ts.id_task = t.id_task
+      task_timestamps tt
+        ON tt.id_task = t.id_task
     WHERE
         c.ts_created > '2020-08-20'
         AND c.channel_status <> 'missed'
@@ -182,17 +170,6 @@ task_completion_reason AS (
     WHERE 
       task_completion_reason = 'task transferred' 
     GROUP BY 1, 2, 3
-),
-first_and_last_task AS (
-  SELECT
-    id_ticket,
-    FIRST(id_task) OVER (PARTITION BY id_ticket ORDER BY ts_task_created ASC) AS first_task,
-    LAST(id_task) OVER (PARTITION BY id_ticket ORDER BY ts_task_created ASC) AS last_task
-  FROM
-    quinto_messenger_tickets ct
-  JOIN
-    zendesk_aditional_ticket_info zd
-      ON zd.id_session = ct.id_session
 )
 SELECT DISTINCT 
   ct.id_task,
@@ -225,8 +202,8 @@ SELECT DISTINCT
   ct.minutes_full_resolution_time_calendar,
   zd.minutes_first_resolution_time_calendar,
   zd.minutes_first_resolution_time_business,
-  last_task.id_ticket IS NOT NULL AS is_last_task,
-  first_task.id_ticket IS NOT NULL AS is_first_task,
+  LAST(ct.id_task) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created ASC) = ct.id_task AS is_last_task,
+  FIRST(ct.id_task) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created ASC) = ct.id_task AS is_first_task,
   tcr.id_task IS NOT NULL AS has_transfers,
   zd.tags LIKE '%bot_end_conversation%' AS is_bot,
   zd.tags LIKE '%closed_by_merge%' AS is_closed_by_merge, 
@@ -253,14 +230,6 @@ FROM
 JOIN
   zendesk_aditional_ticket_info zd
     ON zd.id_session = ct.id_session
-LEFT JOIN
-  first_and_last_task last_task
-    ON last_task.id_ticket = zd.id_ticket
-    AND last_task.last_task = ct.id_task
-LEFT JOIN
-  first_and_last_task first_task
-    ON first_task.id_ticket = zd.id_ticket
-    AND first_task.first_task = ct.id_task
 JOIN
   datalake_gsheets_clean.department_control dc
     ON dc.department = ct.department

@@ -28,7 +28,7 @@ BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 LOGS_OUTPUT_PATH = f"s3://{Variable.get('databricks_s3_bucket')}/logs/jobs/{DAG_ID}"
 
 CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_bietlejuice_zendesk_tickets", deserialize_json=True
+    "databricks_bietlejuice_front_tickets", deserialize_json=True
 )
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 
