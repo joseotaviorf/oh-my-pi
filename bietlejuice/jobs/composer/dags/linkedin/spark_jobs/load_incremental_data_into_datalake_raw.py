@@ -1,4 +1,3 @@
-import json
 import logging
 
 from argparse import ArgumentParser
@@ -6,11 +5,15 @@ from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 
-from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
+from bietlejuice.jobs.composer.base.api.api_enum import APIEnum
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
+from bietlejuice.jobs.composer.base.spark import (
+    SparkDataFrameService,
+    SparkTableStorageFormat,
+    BaseDBUtils,
+)
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 from quintoandar_linkedin_client.linkedin_consumer import LinkedInConsumer
 
@@ -30,7 +33,6 @@ if __name__ == "__main__":
     parser.add_argument("source", help="name of the source")
     parser.add_argument("media", help="name of the media")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
-    parser.add_argument("auth", help="id, secret  and refresh token for api call")
     parser.add_argument("execution_date", help="execution date in str format")
 
     args = parser.parse_args()
@@ -46,9 +48,13 @@ if __name__ == "__main__":
     source = args.source
     media = args.media
     datalake_bucket = args.datalake_bucket
-    auth = json.loads(args.auth)
     execution_date = args.execution_date
     partition_cols = ["acc", "year", "month", "day"]
+
+    base_dbutils = BaseDBUtils()
+    if base_dbutils.get_dbutils() is not None:
+        dbutils = base_dbutils.get_dbutils()
+    auth = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key=APIEnum.LINKEDIN)
 
     spark_client = SparkClient()
     linkedin_consumer = LinkedInConsumer(datalake_bucket, execution_date, auth)

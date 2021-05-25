@@ -1,6 +1,6 @@
 from datetime import datetime
-import json
 import pendulum
+import os
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
 from airflow.models import Variable
@@ -14,15 +14,9 @@ from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.services import FileService
 
-# ENV setup
-ENV = Variable.get("environment")
-API_KEY = Variable.get("linkedin_api_key")
-API_SECRET = Variable.get("linkedin_api_secret")
-REFRESH_TOKEN = Variable.get("linkedin_refresh_token")
+# airflow vars
+ENV = os.environ.get("ENVIRONMENT")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
-AUTH = json.dumps(
-    {"API_KEY": API_KEY, "API_SECRET": API_SECRET, "REFRESH_TOKEN": REFRESH_TOKEN}
-)
 
 # DAG params setup
 SOURCE = "marketing_costs"
@@ -81,7 +75,7 @@ linkedin_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": LOAD_LINKEDIN_INTO_DATALAKE_RAW_FILE_PATH,
-            "parameters": [ENV, SOURCE, MEDIA, DATALAKE_BUCKET, AUTH, "{{ ds }}"],
+            "parameters": [ENV, SOURCE, MEDIA, DATALAKE_BUCKET, "{{ ds }}"],
         }
     },
 )
