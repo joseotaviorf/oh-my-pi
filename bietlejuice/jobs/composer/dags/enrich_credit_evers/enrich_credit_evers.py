@@ -2,6 +2,7 @@ from datetime import datetime
 import pendulum
 
 from airflow.models import DAG, Variable
+import airflow.utils.helpers as airflow_helpers
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -67,16 +68,50 @@ enrich_sub_dag = DatalakeSubDAG(
     layer=LayerEnum.ENRICH,
 )
 
-file_list = FileService.list_sql_files_without_extension_from_layer(
-    CONTEXT, LayerEnum.ENRICH.value
+full_file_list = FileService.list_sql_files_without_extension_from_layer(
+    CONTEXT, LayerEnum.ENRICH.value, schema="full"
+)
+
+incremental_file_list = FileService.list_sql_files_without_extension_from_layer(
+    CONTEXT, LayerEnum.ENRICH.value, schema="incremental"
+)
+
+enrich_audit_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(
+    dag,
+    incremental_file_list,
+    is_incremental=True,
+    partitions=PARTITION_COLS,
+    schema="incremental",
 )
 
 enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(
-    dag, file_list, is_incremental=True, partitions=PARTITION_COLS
+    dag, full_file_list, schema="full"
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-create_cluster_task >> list(enrich_sub_dags.values()) >> terminate_cluster_task
+credit_evers_audit_sub_dag = [enrich_audit_sub_dags.pop("credit_evers_audit")]
+credit_evers_sub_dag = [enrich_sub_dags.pop("credit_evers")]
+
+credit_evers_original_due_date_audit_sub_dag = [
+    enrich_audit_sub_dags.pop("credit_evers_original_due_date_audit")
+]
+credit_evers_original_due_date_sub_dag = [
+    enrich_sub_dags.pop("credit_evers_original_due_date")
+]
+
+airflow_helpers.chain(
+    create_cluster_task,
+    credit_evers_audit_sub_dag,
+    credit_evers_sub_dag,
+    terminate_cluster_task,
+)
+
+airflow_helpers.chain(
+    create_cluster_task,
+    credit_evers_original_due_date_audit_sub_dag,
+    credit_evers_original_due_date_sub_dag,
+    terminate_cluster_task,
+)

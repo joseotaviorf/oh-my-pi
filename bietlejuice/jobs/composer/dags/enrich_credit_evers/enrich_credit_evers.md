@@ -14,7 +14,13 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-Produces the following output table in enrich layer through incremental load:
+Produces the following output table in enrich layer:
+
+Through incremental load:
+    - `credit_evers_audit`
+    - `credit_evers_original_due_date_audit`
+
+And through full load:
     - `credit_evers`
     - `credit_evers_original_due_date`
 
