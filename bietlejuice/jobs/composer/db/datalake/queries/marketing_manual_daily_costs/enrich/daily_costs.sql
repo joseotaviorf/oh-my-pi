@@ -78,7 +78,7 @@ enriched_manual_costs AS (
             WHEN LOWER(campaign_name) LIKE '%calc%' THEN 'Calculator'
             WHEN LOWER(campaign_name) LIKE '%newchannel%' THEN 'New Channels'
             ELSE 'Other'
-        END AS campaign_origin_aquisition,
+        END AS campaign_origin_acquisition,
         'Inbound' AS mkt_category,
         'Self-Service' AS mkt_flow,
         'Full Self-Service' AS mkt_completion,
@@ -133,7 +133,7 @@ SELECT
     utm_term,
     utm_content,
     city_group,
-    campaign_origin_aquisition,
+    campaign_origin_acquisition,
     mkt_category,
     mkt_flow,
     mkt_completion,
