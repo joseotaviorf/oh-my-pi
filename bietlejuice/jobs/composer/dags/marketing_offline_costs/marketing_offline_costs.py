@@ -25,7 +25,7 @@ SOURCE = "marketing_offline_costs"
 DAG_ID = f"bietlejuice.{SOURCE}"
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2021, 1, 14, 0, 0, 0, tzinfo=local_tz)
-MAIN_SCHEDULE_INTERVAL = "55 16 * * *"
+MAIN_SCHEDULE_INTERVAL = "55 6 * * *"
 
 # s3 paths setup
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
