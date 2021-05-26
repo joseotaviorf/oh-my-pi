@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 import pendulum
 
@@ -15,8 +16,7 @@ from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.services import FileService
 
 # ENV setup
-ENV = Variable.get("environment")
-ACCOUNT = Variable.get("rtb_login")
+ENV = os.environ.get("ENVIRONMENT")
 
 # DAG params setup
 SOURCE = "marketing_costs"
@@ -76,7 +76,7 @@ rtb_campaigns_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": LOAD_CRITEO_CAMPAIGNS_INTO_DATALAKE_RAW_FILE_PATH,
-            "parameters": [ENV, SOURCE, MEDIA, DATALAKE_BUCKET, ACCOUNT, "{{ ds }}"],
+            "parameters": [ENV, SOURCE, MEDIA, DATALAKE_BUCKET, "{{ ds }}"],
         }
     },
 )

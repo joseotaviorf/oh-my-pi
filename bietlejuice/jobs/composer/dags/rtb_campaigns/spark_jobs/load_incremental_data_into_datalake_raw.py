@@ -1,21 +1,19 @@
 import json
 import logging
-
 from argparse import ArgumentParser
 from datetime import datetime
 
+from pyspark.sql.types import StructType, StructField, StringType, DoubleType
 from quintoandar_logger import QuintoAndarLogger
 from quintoandar_rtb_api_client.clients import RTBClient
 
-from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat
-from bietlejuice.jobs.composer.clients.db_clients import SparkClient
-
-from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
+from bietlejuice.jobs.composer.base.api import APIEnum
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
-from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
-
+from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
+from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat, BaseDBUtils
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
-from pyspark.sql.types import StructType, StructField, StringType, DoubleType
+from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_incremental_data_into_datalake_raw"
@@ -45,12 +43,13 @@ schema = StructType(
 )
 
 
-def get_api_response(account, execution_date):
-    client_id = account["client_id"]
-    client_secret = account["client_secret"]
+def get_api_response(rtb_api_auth, execution_date):
     rtb_client = RTBClient(
-        client_id=client_id, client_secret=client_secret, execution_date=execution_date
+        client_id=rtb_api_auth["client_id"],
+        client_secret=rtb_api_auth["client_secret"],
+        execution_date=execution_date,
     )
+
     try:
         api_response = rtb_client.get_data()
         for data in api_response:
@@ -69,7 +68,6 @@ if __name__ == "__main__":
     parser.add_argument("source", help="name of the source")
     parser.add_argument("media", help="name of the media")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
-    parser.add_argument("account", help="account w/ id and secret for api call")
     parser.add_argument("execution_date", help="execution date in str format")
 
     args = parser.parse_args()
@@ -85,14 +83,18 @@ if __name__ == "__main__":
     source = args.source
     media = args.media
     datalake_bucket = args.datalake_bucket
-    account = json.loads(args.account)
     execution_date = args.execution_date
     partition_cols = ["year", "month", "day"]
 
-    spark_client = SparkClient()
-    api_response = get_api_response(account, execution_date)
+    base_dbutils = BaseDBUtils()
+    if base_dbutils.get_dbutils() is not None:
+        dbutils = base_dbutils.get_dbutils()
+    rtb_api_auth = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key=APIEnum.RTB)
+    rtb_api_auth = json.loads(rtb_api_auth)
+    api_response = get_api_response(rtb_api_auth, execution_date)
 
     if api_response:
+        spark_client = SparkClient()
         df = spark_client.create_dataframe(api_response)
         dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
         df = df.coalesce(1)
