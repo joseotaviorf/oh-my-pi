@@ -1,7 +1,7 @@
 ## Enrich Marketing Automatic Daily Costs
 ### Purpose
 
-This DAG generates the automatic costs (i.e. gathered from medias API/Crawlers) combined with the taxonomy tables and saves its part in the final Fact Marketing Daily Costs aside Enrich Marketing Manual Daily Costs.
+This DAG generates the manual costs (i.e. gathered from gsheets tables) and saves its part in the final Fact Marketing Daily Costs aside Enrich Marketing Automatic Daily Costs.
 
 More information about the Fact's architecture can be found at [this diagram] (https://app.diagrams.net/#G1aM-IGy6JcG1rxB0IyDxOJpyCU6GMoFzm) under the "New Arch" tab.
 
@@ -11,7 +11,7 @@ Daily after enrich layers. More information about run time [here]({chart_url}{da
 
 ### Outputs
 
-- `datalake_marketing_costs.daily_costs`
+- `datalake_marketing_costs.datalake_marketing_costs.daily_costs`
 
 ### Responsible Data Team
 ​

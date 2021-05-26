@@ -421,6 +421,10 @@ bietlejuice.enrich_marketing_costs_facebook_insights:
 bietlejuice.enrich_marketing_costs_offline:
   - bietlejuice.marketing_offline_costs
 
+bietlejuice.enrich_marketing_manual_daily_costs:
+  - bietlejuice.marketing_manual_daily_costs:load-marketing-costs-name-convention-shared-costs-to-clean
+  - bietlejuice.marketing_manual_daily_costs:load-marketing-costs-manual-shared-costs-to-clean
+
 bietlejuice.enrich_nps_answer_drivers:
   - bietlejuice.enrich_tracksale:load-answer-to-enrich
   - bietlejuice.ebdb:create-clean-house-in-data-lake
