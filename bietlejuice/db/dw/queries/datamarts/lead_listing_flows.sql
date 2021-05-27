@@ -191,6 +191,7 @@ SELECT
         *,
         row_number() OVER(PARTITION BY sk_house_listing_flow ORDER BY NULLIF(sk_prospect_date,-1)) AS aux_rn_prospect, -- column to help differentiate the prospect with equal dates
         dense_rank() OVER(PARTITION BY sk_house_listing_flow ORDER BY NULLIF(sk_prospect_date,-1)) AS aux_order_prospect,
+        row_number() OVER(PARTITION BY sk_house_listing_flow ORDER BY NULLIF(sk_qualified_date,-1)) AS aux_rn_qualified, -- column to help differentiate the qualified with equal dates
         dense_rank() OVER(PARTITION BY sk_house_listing_flow ORDER BY NULLIF(sk_qualified_date,-1)) AS aux_order_qualified,
         MIN(NULLIF(sk_prospect_date,-1)) OVER(PARTITION BY sk_house_listing_flow) AS first_prospect_date,
         MAX(NULLIF(sk_prospect_date,-1)) OVER(PARTITION BY sk_house_listing_flow) AS last_prospect_date,
