@@ -27,36 +27,7 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 MAX_RETRIES = 3
 CHUNK_SIZE = 500
-
-
-def get_messages_with_retries(pubsub_consumer, retry):
-    messages, ack_ids = pubsub_consumer.get_messages()
-
-    # Pubsub can return 0 messages even when there are messages in subscription.
-    if not messages and retry < MAX_RETRIES:
-        messages, ack_ids = get_messages_with_retries(pubsub_consumer, retry + 1)
-
-    return messages, ack_ids
-
-
-def get_messages_in_chunks(pubsub_consumer):
-    final_messages = []
-    final_ack_ids = []
-
-    while len(final_messages) <= CHUNK_SIZE:
-        messages, ack_ids = get_messages_with_retries(pubsub_consumer, 0)
-
-        if not messages:
-            logger.info(
-                f"m=get_messages_in_chunks, pubsub_consumer={pubsub_consumer}, msg=All messages have been consumed!"
-            )
-            break
-
-        final_messages.extend(messages)
-        final_ack_ids.extend(ack_ids)
-
-    return final_messages, final_ack_ids
-
+TASK_TIMEOUT = 6480
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
@@ -118,50 +89,46 @@ if __name__ == "__main__":
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
     subscription_is_empty = False
-    while not subscription_is_empty:
-        messages, ack_ids = get_messages_in_chunks(pubsub_consumer)
 
-        if not messages:
-            break
+    for messages, ack_ids in pubsub_consumer.get_messages_in_chunks(
+        chunk_size=CHUNK_SIZE, max_retries=MAX_RETRIES, pull_timeout=TASK_TIMEOUT
+    ):
+        if messages:
+            messages = JsonService.transform_json_list_terms(messages)
+            df = spark_client.create_dataframe(messages)
 
-        if len(messages) < CHUNK_SIZE:
-            subscription_is_empty = True
+            df = (
+                SparkDataFrameService()
+                .input(df)
+                .create_year_month_day_columns_from_dataframe_column("timestamp")
+                .optimize_partition(200000)
+                .output()
+            )
 
-        messages = JsonService.transform_json_list_terms(messages)
-        df = spark_client.create_dataframe(messages)
+            s3_loader.load_df(
+                df=df,
+                s3_path=database_location + table_name,
+                format_options=format_options,
+                partitions=partition_cols,
+                write_mode="append",
+            )
 
-        df = (
-            SparkDataFrameService()
-            .input(df)
-            .create_year_month_day_columns_from_dataframe_column("timestamp")
-            .optimize_partition(200000)
-            .output()
-        )
+            spark_metastore_loader.update_metastore(
+                df,
+                database_name,
+                table_name,
+                format_options,
+                database_location,
+                partition_cols,
+                force_recreate=False,
+            )
 
-        s3_loader.load_df(
-            df=df,
-            s3_path=database_location + table_name,
-            format_options=format_options,
-            partitions=partition_cols,
-            write_mode="append",
-        )
+            spark_metastore_service.create_new_partitions_from_df(
+                database_name=database_name,
+                table_name=table_name,
+                df=df,
+                partition_cols=partition_cols,
+            )
 
-        spark_metastore_loader.update_metastore(
-            df,
-            database_name,
-            table_name,
-            format_options,
-            database_location,
-            partition_cols,
-            force_recreate=False,
-        )
-
-        spark_metastore_service.create_new_partitions_from_df(
-            database_name=database_name,
-            table_name=table_name,
-            df=df,
-            partition_cols=partition_cols,
-        )
-
-        pubsub_client.acknowledge_messages(ack_ids)
-        spark_metastore_service.refresh_table(database_name, table_name)
+            pubsub_client.acknowledge_messages(ack_ids)
+            spark_metastore_service.refresh_table(database_name, table_name)
