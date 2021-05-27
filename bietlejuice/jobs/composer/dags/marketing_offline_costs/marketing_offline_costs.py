@@ -32,6 +32,7 @@ ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 ARTIFACTS_S3_BUCKET = Variable.get("artifacts_default_bucket")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
+BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/"
 LOAD_GSHEETS_INTO_DATALAKE_RAW_FILE_PATH = (
     S3_PREFIX + f"/spark_jobs/gsheets/load_full_data_into_datalake_raw.py"
@@ -100,7 +101,7 @@ for TABLE_NAME, SHEET_DETAILS in GOOGLE_FILES.items():
 
     slugged_table_name = TABLE_NAME.replace("_", "-")
 
-    gsheets_to_datalake_raw_tasks = QuintoAndarDatabricksSubmitRunOperator(
+    gsheets_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
         task_id=f"gsheets-{slugged_table_name}-to-datalake-raw",
         dag=dag,
         json={
@@ -117,9 +118,44 @@ for TABLE_NAME, SHEET_DETAILS in GOOGLE_FILES.items():
         },
     )
 
+    sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        task_id=f"sync-hive-metastore-{slugged_table_name}",
+        dag=dag,
+        json={
+            "spark_python_task": {
+                "python_file": f"{BASE_SPARK_JOBS_PATH}sync_metastore_tables.py",
+                "parameters": [
+                    DATALAKE_BUCKET,
+                    LayerEnum.RAW.value,
+                    SOURCE,
+                    "--table-name",
+                    TABLE_NAME,
+                ],
+            }
+        },
+    )
+
+    validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=dag,
+        task_id=f"validate-sync-hive-metastore-{slugged_table_name}",
+        json={
+            "spark_python_task": {
+                "python_file": f"{BASE_SPARK_JOBS_PATH}validate_sync_metastore_tables.py",
+                "parameters": [LayerEnum.RAW.value, SOURCE, "--table-name", TABLE_NAME],
+            }
+        },
+    )
+
     airflow_helpers.chain(
         create_cluster_task,
-        gsheets_to_datalake_raw_tasks,
+        gsheets_to_datalake_raw_task,
         clean_sub_dags.pop(SHEET_DETAILS["clean_table_name"]),
+        terminate_cluster_task,
+    )
+
+    airflow_helpers.chain(
+        gsheets_to_datalake_raw_task,
+        sync_metastore_table_task,
+        validate_sync_metastore_table_task,
         terminate_cluster_task,
     )
