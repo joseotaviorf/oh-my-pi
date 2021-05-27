@@ -1,5 +1,5 @@
 WITH call_tickets AS (
-  SELECT
+  SELECT DISTINCT
     CAST(id_ticket AS BIGINT) AS sk_ticket,
     MD5(
       CONCAT(
@@ -37,7 +37,7 @@ WITH call_tickets AS (
           AND is_closed_by_merge = FALSE
       THEN FALSE
       ELSE NULL
-    END AS is_crr,
+    END AS is_solved,
     CASE
       WHEN is_solved = TRUE
           AND back_ticket IS NULL
@@ -59,7 +59,7 @@ WITH call_tickets AS (
     datalake_front_tickets.call
 ),
 chat_tickets AS (
-  SELECT
+  SELECT DISTINCT
     CAST(id_ticket AS BIGINT) AS sk_ticket,
     MD5(
       CONCAT(
@@ -96,7 +96,7 @@ chat_tickets AS (
           AND is_closed_by_merge = FALSE
       THEN FALSE
       ELSE NULL
-    END AS is_crr,
+    END AS is_solved,
     CASE
       WHEN is_solved = TRUE
           AND back_ticket IS NULL
@@ -118,7 +118,7 @@ chat_tickets AS (
     datalake_front_tickets.chat
 ),
 email_tickets AS (
-  SELECT
+  SELECT DISTINCT
     CAST(id_ticket AS BIGINT) AS sk_ticket,
     MD5(
       CONCAT(
@@ -155,7 +155,7 @@ email_tickets AS (
           AND is_closed_by_merge = FALSE 
       THEN FALSE
       ELSE NULL
-    END AS is_crr,
+    END AS is_solved,
     CASE
       WHEN is_solved = TRUE
           AND back_ticket IS NULL

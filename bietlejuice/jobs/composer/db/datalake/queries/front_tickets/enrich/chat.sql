@@ -45,8 +45,7 @@ WITH quinto_messenger_tickets AS (
       task_queue_name AS department,
       CAST(COALESCE(cm.number_of_departments,0) AS INT) AS number_of_departments,
       CAST(COALESCE(cm.number_of_tasks,0) AS INT) AS number_of_tasks,
-      FIRST_VALUE(task_queue_name) OVER (PARTITION BY c.id_conversation ORDER BY t.ts_created) AS first_department,
-      LAST_VALUE(task_queue_name) OVER (PARTITION BY c.id_conversation ORDER BY t.ts_created) AS last_department, 
+      cm.number_of_tasks > 1 AS has_transfers,
       CASE
           WHEN seconds_to_first_response / 60 <= 15 THEN TRUE
           WHEN seconds_to_first_response / 60 > 15 THEN FALSE
@@ -159,17 +158,6 @@ back_tickets AS (
     AND (zd.tags NOT LIKE '%bot_end_conversation%' AND zd.tags NOT LIKE '%closed_by_merge%')
     AND REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})',1) != '' 
   GROUP BY 1,2,3,4
-),
-task_completion_reason AS (
-    SELECT
-        id_task,
-        task_queue_name,
-        task_completion_reason
-    FROM 
-      datalake_quinto_messenger.task_event
-    WHERE 
-      task_completion_reason = 'task transferred' 
-    GROUP BY 1, 2, 3
 )
 SELECT DISTINCT 
   ct.id_task,
@@ -183,8 +171,8 @@ SELECT DISTINCT
   ct.agent_company,
   cc.comment AS csat_comment,
   ct.department,
-  ct.first_department,
-  ct.last_department,
+  FIRST_VALUE(ct.department) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_first_event) AS first_department,
+  LAST_VALUE(ct.department) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_first_event) AS last_department,
   zd.request_type,
   zd.client_type,
   zd.customer_type_tag,
@@ -204,7 +192,7 @@ SELECT DISTINCT
   zd.minutes_first_resolution_time_business,
   LAST(ct.id_task) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created ASC) = ct.id_task AS is_last_task,
   FIRST(ct.id_task) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created ASC) = ct.id_task AS is_first_task,
-  tcr.id_task IS NOT NULL AS has_transfers,
+  ct.has_transfers,
   zd.tags LIKE '%bot_end_conversation%' AS is_bot,
   zd.tags LIKE '%closed_by_merge%' AS is_closed_by_merge, 
   bt.front_ticket IS NOT NULL AS has_back_ticket,
@@ -234,9 +222,6 @@ JOIN
   datalake_gsheets_clean.department_control dc
     ON dc.department = ct.department
     AND LOWER(dc.front_or_back) <> 'back'
-LEFT JOIN
-  task_completion_reason tcr
-    ON tcr.id_task = ct.id_task
 LEFT JOIN
   chat_csat cc
     ON cc.id_ticket = zd.id_ticket

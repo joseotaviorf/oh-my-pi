@@ -31,9 +31,11 @@ WITH tasks AS (
       GET_JSON_OBJECT(metadata, '$.event_data.WorkerAttributes.routing.skills') AS agent_skills
     FROM
       datalake_bigfone_twilio.call_flex_events cfe
-    JOIN
+    LEFT JOIN
       datalake_gsheets_clean.agents_control ac
         ON cfe.agent_email = ac.email
+    WHERE
+      id_reservation IS NOT NULL
     GROUP BY 1,2,3,4,5,6,7
   )
   SELECT
@@ -134,7 +136,6 @@ call AS (
           id_call,
           COUNT(DISTINCT queue_name) AS number_of_departments,
           COUNT(DISTINCT id_reservation) AS number_of_tasks,
-          COUNT(id_reservation) AS reservations,
           SUM(CAST(is_answered AS SMALLINT)) AS reservations_accepted,
           SUM(seconds_wait_time) AS wait_time_flex,
           SUM(seconds_talk_time) AS talk_time,
@@ -156,9 +157,9 @@ call AS (
       fe.scheduling_source,
       COALESCE(cm.number_of_tasks,0) AS number_of_tasks,
       COALESCE(cm.number_of_departments,0) AS number_of_departments,
-      cm.reservations IS NULL AS has_ended_in_ura,
+      cm.number_of_tasks IS NULL OR cm.number_of_tasks = 0 AS has_ended_in_ura,
       cm.reservations_accepted > 0 AS is_answered,
-      cm.reservations > 1 AS is_transfered,
+      cm.number_of_tasks > 1 AS is_transfered,
       cm.wait_time_flex AS seconds_total_wait_time,
       cm.talk_time AS seconds_total_talk_time,
       ce.csat_2 IS NOT NULL AS is_csat_answered,
@@ -236,6 +237,7 @@ SELECT DISTINCT
   t.id_task,
   t.id_reservation,
   t.id_call,
+  c.sk_call,
   c.id_conversation,
   t.id_agent,
   t.id_queue,
@@ -293,20 +295,19 @@ SELECT DISTINCT
   c.ts_started AS ts_ticket_started,
   c.ts_ended AS ts_ticket_ended
 FROM 
-  tasks t
-JOIN 
   call c
-    ON t.sk_call = c.sk_call
 JOIN 
   zendesk_aditional_ticket_info zd 
-    ON zd.id_call IS NOT NULL
-    AND zd.id_call = c.id_call
-JOIN
+    ON zd.id_call = c.sk_call
+LEFT JOIN 
+  tasks t
+    ON t.sk_call = c.sk_call
+LEFT JOIN
   datalake_gsheets_clean.department_control dc
     ON dc.department = t.queue_name 
-    AND LOWER(dc.front_or_back) <> 'back'
 LEFT JOIN
   back_tickets bt
     ON bt.front_ticket = zd.id_ticket
 WHERE
   zd.tags NOT LIKE '%tarefa_atendimento_escalado%'
+  AND (LOWER(dc.front_or_back) <> 'back' OR dc.front_or_back IS NULL)

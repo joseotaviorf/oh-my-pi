@@ -6,15 +6,6 @@ WITH zendesk_email AS (
     FROM 
       datalake_zendesk_tickets_clean.tickets
     GROUP BY 1
-  ),
-  last_updated_ticket_metrics AS (
-    SELECT
-      t.id_ticket, 
-      MAX(DATE(CONCAT(year, '-', month, '-', day))) AS dt_last_updated,
-      MAX(ts_updated) AS ts_updated
-    FROM 
-      datalake_zendesk_ticket_funnels.tickets_funnel_metrics t
-    GROUP BY 1
   )
   SELECT DISTINCT 
     t.id_ticket,
@@ -44,26 +35,18 @@ WITH zendesk_email AS (
   FROM
     datalake_zendesk_tickets_clean.tickets t
   JOIN
-    datalake_gsheets_clean.agents_control ac
-      ON t.id_assignee = ac.id_assignee
-  JOIN
     last_update_ticket lut
       ON t.id_ticket = lut.id_ticket
       AND t.ts_updated = lut.ts_last_updated
   JOIN
     datalake_zendesk_ticket_funnels.tickets_funnel_metrics tfm
       ON t.id_ticket = tfm.id_ticket
-      AND tfm.ts_updated = lut.ts_last_updated
-  JOIN
-    last_updated_ticket_metrics lutm
-      ON lutm.id_ticket = tfm.id_ticket
-      AND lutm.dt_last_updated = DATE(CONCAT(tfm.year, '-', tfm.month, '-', tfm.day))
-      AND lutm.ts_updated = tfm.ts_updated
+  LEFT JOIN
+    datalake_gsheets_clean.agents_control ac
+      ON t.id_assignee = ac.id_assignee
   LEFT JOIN
     datalake_zendesk_tickets_clean.groups g
       ON g.id_group = t.id_group
-  WHERE 
-    ticket_via = 'email'
 ),
 csat AS (
     WITH last_update_ticket AS (
@@ -95,8 +78,6 @@ csat AS (
       last_update_ticket lut
         ON t.id_ticket = lut.id_ticket
         AND t.ts_updated = lut.ts_last_updated
-    WHERE 
-      ticket_via = 'email'
 ),
 taxonomy AS (
   SELECT 
@@ -107,15 +88,7 @@ taxonomy AS (
     contact_motivation_tag,
     contact_theme_tag,
     custom_fields,
-    CASE
-      WHEN 
-          ticket_via IN ('api', 'web') 
-          AND (tags LIKE '%call_contato_ativo%' OR tags LIKE '%call_contato_receptivo%') 
-      THEN 'call'
-      WHEN ticket_via = 'api' AND tags LIKE '%form%' THEN 'form_faq'
-      WHEN ticket_via IN ('web', 'email', 'chat') THEN ticket_via
-      ELSE 'other'
-    END AS channel
+    channel
   FROM 
     datalake_zendesk_ticket_funnels.ticket_funnel 
 ),
@@ -179,6 +152,9 @@ SELECT DISTINCT
 FROM 
   zendesk_email ze
 JOIN
+  taxonomy t
+    ON t.id_ticket = ze.id_ticket
+JOIN
   datalake_gsheets_clean.department_control dc
     ON dc.department = ze.department
     AND LOWER(dc.front_or_back) <> 'back'
@@ -186,14 +162,11 @@ LEFT JOIN
   csat cs
     ON ze.id_ticket = cs.id_ticket
 LEFT JOIN
-  taxonomy t
-    ON t.id_ticket = ze.id_ticket
-    AND t.channel = 'email'
-LEFT JOIN
   back_tickets bt
     ON bt.front_ticket = ze.id_ticket
 WHERE 
   ze.tags NOT LIKE '%tarefa_atendimento_escalado%'
+  AND t.channel IN ('email', 'form_faq', 'web', 'other')
   -- emails with the tags below are not new demands or automatically closed, therefore, they should not be considered
   AND ze.tags NOT LIKE '%resolve_ticket_acompanhamento%'
   AND ze.tags NOT LIKE '%fechado_automaticamente_noreply%'

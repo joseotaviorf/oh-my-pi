@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS front_tickets.fact_ticket (
     has_anwsered_survey BOOLEAN,
     has_back_ticket BOOLEAN,
     is_open_back_ticket BOOLEAN,
-    is_crr BOOLEAN,
+    is_solved BOOLEAN,
     is_fcr BOOLEAN,
     has_transfers BOOLEAN,
     ts_started TIMESTAMP,

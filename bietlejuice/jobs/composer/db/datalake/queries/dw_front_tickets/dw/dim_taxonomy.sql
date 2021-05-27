@@ -9,7 +9,7 @@ WITH taxonomy AS (
         COALESCE(contact_theme_tag, '')
       )
     ) AS sk_taxonomy, 
-    client_type,
+    client_type AS customer_type,
     customer_type_tag,
     request_type,
     contact_motivation_tag AS motivation,
@@ -28,7 +28,7 @@ WITH taxonomy AS (
         COALESCE(contact_theme_tag, '')
       )
     ) AS sk_taxonomy, 
-    client_type,
+    client_type AS customer_type,
     customer_type_tag,
     request_type,
     contact_motivation_tag AS motivation,
@@ -47,7 +47,7 @@ WITH taxonomy AS (
         COALESCE(contact_theme_tag, '')
       )
     ) AS sk_taxonomy, 
-    client_type,
+    client_type AS customer_type,
     customer_type_tag,
     request_type,
     contact_motivation_tag AS motivation,
