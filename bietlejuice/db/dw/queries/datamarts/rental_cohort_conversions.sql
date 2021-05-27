@@ -301,7 +301,7 @@ SELECT
     dp.guarantee,
     CASE
         WHEN dhl.is_b2b = TRUE THEN 'B2B'
-        WHEN ciq.sk_house_listing IS NOT NULL THEN 'CIQ'
+        WHEN ciq.sk_house_listing IS NOT NULL THEN ciq.type_big_agent
         WHEN dhl.is_b2b = FALSE OR ciq.sk_house_listing IS NULL THEN 'FALSE'
     END AS is_b2b,
     dr.city_group,
@@ -1521,4 +1521,3 @@ SELECT
 FROM
     union_all
 GROUP BY "date", city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
-ORDER BY 1 DESC
