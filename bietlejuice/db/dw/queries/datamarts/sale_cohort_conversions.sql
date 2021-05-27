@@ -232,8 +232,8 @@ SELECT
 	sdc.id_buyer,
 	sdc.id_house,
 	CASE
-	    WHEN COALESCE(sdr.city_group,sdc.city_group) NOT IN ('RMSP', 'Rio de Janeiro') THEN 'Out of coverage area'
-	    WHEN COALESCE(sdr.city_group,sdc.city_group) IN ('RMSP', 'Rio de Janeiro') THEN COALESCE(sdr.city_group,sdc.city_group)
+	    WHEN COALESCE(sdr.city_group,sdc.city_group) NOT IN ('RMSP', 'Rio de Janeiro','Porto Alegre') THEN 'Out of coverage area'
+	    WHEN COALESCE(sdr.city_group,sdc.city_group) IN ('RMSP', 'Rio de Janeiro','Porto Alegre') THEN COALESCE(sdr.city_group,sdc.city_group)
 	END AS city_group,
 	sdc.form_of_payment,
 	sdc.dt_created,
