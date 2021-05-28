@@ -1,6 +1,6 @@
 SELECT
     CAST(tct.id_ticket AS BIGINT) AS sk_ticket,
-    COALESCE(CAST(DATE_FORMAT(tct.ts_updated, '%Y%m%d') AS INTEGER), -1) AS sk_updated,
+    COALESCE(CAST(DATE_FORMAT(tct.ts_updated, 'yMMdd') AS INTEGER), -1) AS sk_updated,
     tct.contact_type_tag,
     client_taxonomy,
     category_taxonomy,
