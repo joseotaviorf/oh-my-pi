@@ -1,4 +1,38 @@
 WITH
+fact_house_listing_flows_adjust AS (
+SELECT
+    hl.sk_house_listing_flow,
+    hl.sk_lead,
+    hl.sk_house_listing,
+    hl.sk_region,
+    hl.mkt_completion,
+    hl.has_isales_intervention,
+    hl.sk_lead_date,
+    hl.sk_prospect_date,
+    hl.sk_qualified_date,
+    hl.sk_opportunity_date,
+    hl.sk_first_listing_date,
+    hl.sk_first_contact_date,
+    hl.lead_origin,
+	hl.funnel_drop_reason,
+	hl.mkt_channel,
+	hl.mkt_source,
+	hl.mkt_medium,
+	hl.lead_context_origin,
+	hl.sk_user_lead_affiliate,
+	hl.sk_user_house_registrant,
+	hl.is_b2b,
+    CASE
+        WHEN hl.mkt_origin = 'CIQ' AND ciq.type_big_agent = 'CIQ_FULL'
+            THEN 'CIQ'
+        WHEN hl.mkt_origin = 'CIQ' AND ciq.type_big_agent = 'CIQ_MANAGER'
+            THEN 'Backend'
+        ELSE hl.mkt_origin
+    END AS mkt_origin
+FROM fact_house_listing_flows hl
+LEFT JOIN datamarts.quintoandar_consultant_listings ciq
+	        ON ciq.sk_house_listing = hl.sk_house_listing
+),
 source_ops_rent AS (
 	WITH
 	photo_job AS (
@@ -46,7 +80,7 @@ source_ops_rent AS (
 	        COALESCE(du.sales_company, dl.sales_company) AS sales_company,
 	        hlf.lead_origin,
 	        hlf.funnel_drop_reason
-	FROM fact_house_listing_flows hlf
+	FROM fact_house_listing_flows_adjust hlf
 	    JOIN dim_lead dl
 	        ON dl.sk_lead = hlf.sk_lead
 	    LEFT JOIN quintoandar.dim_user_sales_rep du
@@ -177,7 +211,7 @@ fact_rent AS (
 	    hlf.has_isales_intervention,
 	    hlf.sk_user_lead_affiliate,
 	    'Rent' AS origin_table
-	FROM fact_house_listing_flows hlf
+	FROM fact_house_listing_flows_adjust hlf
 	JOIN source_ops_rent AS sor
 	  ON sor.sk_house_listing_flow = hlf.sk_house_listing_flow
 ), union_all AS (
