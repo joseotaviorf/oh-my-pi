@@ -33,7 +33,7 @@ SHARING_RULES_TABLE = "sharing_rules_marketing_daily_costs"
 # DAG setup
 MAIN_DAG_NAME = 'bi-marketing-daily-costs'
 MAIN_START_DATE = datetime(2019, 1, 1)
-MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule("0 6,11 * * *")
+MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule("30 5,10 * * *")
 
 logger = QuintoAndarLogger(MAIN_DAG_NAME)
 
