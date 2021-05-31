@@ -149,7 +149,7 @@ call AS (
       COALESCE(ie.id_call, fe.id_call) AS id_call,
       COALESCE(ie.id_call, fe.id_call, fe.id_conversation, fe.id_task) AS sk_call,
       fe.id_conversation,
-      fe.id_task,
+      COALESCE(fe.id_task, ie.id_task) AS id_task,
       COALESCE(ie.from_number,fe.from_number) AS from_phone_number,
       COALESCE(ie.to_number,fe.to_number) AS to_phone_number,
       ie.initial_ivr_time AS seconds_ivr_time,
@@ -234,9 +234,9 @@ back_tickets AS (
 )
 SELECT DISTINCT 
   zd.id_ticket,
-  t.id_task,
+  c.id_task,
   t.id_reservation,
-  t.id_call,
+  c.id_call,
   c.sk_call,
   c.id_conversation,
   t.id_agent,
