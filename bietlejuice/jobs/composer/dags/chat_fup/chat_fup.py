@@ -1,5 +1,6 @@
 from datetime import datetime
 import pendulum
+import os
 
 from airflow.models import DAG, Variable
 import airflow.utils.helpers as airflow_helpers
@@ -15,7 +16,7 @@ from bietlejuice.jobs.composer.services import FileService
 
 DAG_NAME = "chat_fup"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-ENV = Variable.get("environment")
+ENV = os.environ.get("ENVIRONMENT")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")

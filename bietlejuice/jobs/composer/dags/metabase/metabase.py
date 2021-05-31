@@ -1,5 +1,6 @@
 from datetime import datetime
 import pendulum
+import os
 
 from airflow.models import DAG, Variable
 from airflow.utils import helpers as airflow_helpers
@@ -16,7 +17,7 @@ from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
 SOURCE = "metabase"
 
 # airflow vars
-ENV = Variable.get("environment")
+ENV = os.environ.get("ENVIRONMENT")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")

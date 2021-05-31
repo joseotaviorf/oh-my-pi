@@ -1,5 +1,6 @@
 from datetime import datetime
 import pendulum
+import os
 
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
@@ -18,7 +19,7 @@ MEDIA = "criteo_campaigns"
 TARGET = "marketing_costs"
 DAG_NAME = f"enrich_{TARGET}_{MEDIA}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-ENV = Variable.get("environment")
+ENV = os.environ.get("ENVIRONMENT")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 DATALAKE_BUCKET = Variable.get("datalake_bucket")

@@ -1,5 +1,6 @@
 from datetime import datetime
 import pendulum
+import os
 
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
@@ -24,7 +25,7 @@ MAIN_SCHEDULE_INTERVAL = "0 5 * * *"
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 DAG_ID = f"bietlejuice.{SOURCE}"
-ENV = Variable.get("environment")
+ENV = os.environ.get("ENVIRONMENT")
 SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
 DW_BUCKET = Variable.get("dw_bucket")
 

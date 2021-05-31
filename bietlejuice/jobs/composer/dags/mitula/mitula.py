@@ -1,5 +1,6 @@
 from datetime import datetime
 import pendulum
+import os
 
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
@@ -14,7 +15,7 @@ from bietlejuice.jobs.composer.services import FileService
 
 SOURCE = "mitula"
 DAG_ID = f"bietlejuice.{SOURCE}"
-ENV = Variable.get("environment")
+ENV = os.environ.get("ENVIRONMENT")
 
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")

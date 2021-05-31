@@ -28,7 +28,7 @@ def check_run_hour(cron, ts):
 
 
 # ENV setup
-ENV = Variable.get("environment")
+ENV = os.environ.get("ENVIRONMENT")
 
 # DAG params setup
 SOURCE = "gsheets"

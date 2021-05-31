@@ -1,5 +1,6 @@
 from datetime import datetime
 import pendulum
+import os
 
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
@@ -18,7 +19,7 @@ MAIN_START_DATE = datetime(2015, 10, 29, 0, 0, 0, tzinfo=LOCAL_TZ)
 CONTEXT = "crm_tasks_resolution"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-ENV = Variable.get("environment")
+ENV = os.environ.get("ENVIRONMENT")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")

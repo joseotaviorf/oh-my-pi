@@ -1,5 +1,6 @@
 from datetime import datetime
 import pendulum
+import os
 from airflow.models import DAG, Variable
 import airflow.utils.helpers as airflow_helpers
 from airflow.operators.quintoandar_databricks import (
@@ -13,7 +14,7 @@ from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.services import FileService
 
 # ENV setup
-ENV = Variable.get("environment")
+ENV = os.environ.get("ENVIRONMENT")
 
 # DAG params setup
 SOURCE = "marketing_costs"

@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import pendulum
+import os
 from airflow.utils import helpers as airflow_helpers
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
@@ -15,7 +16,7 @@ from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
 from bietlejuice.jobs.composer.services import FileService
 
 
-ENV = Variable.get("environment")
+ENV = os.environ.get("ENVIRONMENT")
 
 SOURCE = "braze"
 DAG_NAME = f"{SOURCE}_details"

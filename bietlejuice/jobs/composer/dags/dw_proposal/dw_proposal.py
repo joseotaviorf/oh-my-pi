@@ -1,5 +1,6 @@
 from datetime import datetime
 import pendulum
+import os
 
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
@@ -20,7 +21,7 @@ MAIN_START_DATE = datetime(2020, 2, 20, 0, 0, 0, tzinfo=LOCAL_TZ)
 DW_SCHEMA = "janus"
 DAG_NAME = f"dw_proposal"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-ENV = Variable.get("environment")
+ENV = os.environ.get("ENVIRONMENT")
 SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
 DW_BUCKET = Variable.get("dw_bucket")
 

@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import pendulum
+import os
 from airflow.models import DAG, Variable
 import airflow.utils.helpers as airflow_helpers
 from airflow.operators.quintoandar_databricks import (
@@ -17,7 +18,7 @@ from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 SOURCE = "classified_leads"
 
 # airflow vars
-ENV = Variable.get("environment")
+ENV = os.environ.get("ENVIRONMENT")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")

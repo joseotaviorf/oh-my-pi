@@ -16,7 +16,7 @@ from bietlejuice.jobs.composer.services import FileService
 # DAG params
 DAG_NAME = "datamarts"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-ENV = Variable.get("environment")
+ENV = os.environ.get("ENVIRONMENT")
 SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 

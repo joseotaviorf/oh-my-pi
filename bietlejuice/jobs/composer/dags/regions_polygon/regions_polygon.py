@@ -1,5 +1,6 @@
 from datetime import datetime
 import pendulum
+import os
 
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
@@ -15,7 +16,7 @@ MAIN_START_DATE = datetime(2020, 8, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
 
 DAG_NAME = "regions_polygon"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-ENV = Variable.get("environment")
+ENV = os.environ.get("ENVIRONMENT")
 
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")

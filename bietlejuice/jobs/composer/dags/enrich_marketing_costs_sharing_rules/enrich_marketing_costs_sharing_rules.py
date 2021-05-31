@@ -1,4 +1,5 @@
 import pendulum
+import os
 from datetime import datetime
 
 from airflow.models import DAG, Variable
@@ -15,7 +16,7 @@ from bietlejuice.jobs.composer.dags.enrich_marketing_costs_sharing_rules.enrich_
 SOURCE = "marketing_costs_sharing_rules"
 DAG_NAME = f"enrich_{SOURCE}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-ENV = Variable.get("environment")
+ENV = os.environ.get("ENVIRONMENT")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 DATALAKE_BUCKET = Variable.get("datalake_bucket")

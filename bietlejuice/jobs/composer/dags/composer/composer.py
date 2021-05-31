@@ -2,6 +2,7 @@ from datetime import datetime
 
 import airflow.utils.helpers as airflow_helpers
 import pendulum
+import os
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_athena import (
     QuintoAndarCreateAthenaExternalTableOperator,
@@ -22,7 +23,7 @@ LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in loc
 MAIN_START_DATE = datetime(2019, 8, 21, 0, 0, 0, tzinfo=LOCAL_TZ)
 SCHEDULE_INTERVAL = "0 8 * * *"
 
-ENV = Variable.get("environment")
+ENV = os.environ.get("ENVIRONMENT")
 S3_BUCKET = Variable.get("datalake_bucket")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 

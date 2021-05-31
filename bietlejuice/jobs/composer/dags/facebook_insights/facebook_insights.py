@@ -19,7 +19,7 @@ from bietlejuice.jobs.composer.services import FileService
 
 
 # ENV setup
-ENV = Variable.get("environment")
+ENV = os.environ.get("ENVIRONMENT")
 
 # DAG params setup
 SOURCE = "marketing_costs"

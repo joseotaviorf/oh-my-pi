@@ -1,5 +1,6 @@
 from datetime import datetime
 import pendulum
+import os
 
 from airflow.utils.helpers import chain
 from airflow.models import DAG, Variable
@@ -17,7 +18,7 @@ from bietlejuice.jobs.composer.services import FileService
 SOURCE = "consolidated_marketing_costs"
 DAG_NAME = f"enrich_{SOURCE}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-ENV = Variable.get("environment")
+ENV = os.environ.get("ENVIRONMENT")
 
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 S3_MARKETING_PATH = Variable.get("datalake_marketing_bucket")

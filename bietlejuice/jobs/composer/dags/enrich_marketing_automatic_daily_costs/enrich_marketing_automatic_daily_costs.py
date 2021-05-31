@@ -1,5 +1,6 @@
 from datetime import datetime
 import pendulum
+import os
 
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
@@ -15,7 +16,7 @@ from bietlejuice.jobs.composer.services import FileService
 SOURCE = "marketing_automatic_daily_costs"
 DAG_NAME = f"enrich_{SOURCE}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-ENV = Variable.get("environment")
+ENV = os.environ.get("ENVIRONMENT")
 TARGET = "marketing_costs"
 
 DATALAKE_BUCKET = Variable.get("datalake_bucket")

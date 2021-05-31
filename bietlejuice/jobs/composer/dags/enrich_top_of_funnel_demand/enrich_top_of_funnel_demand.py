@@ -1,5 +1,6 @@
 from datetime import datetime
 import pendulum
+import os
 
 from airflow.models import DAG, Variable
 import airflow.utils.helpers as airflow_helpers
@@ -19,7 +20,7 @@ MAIN_START_DATE = datetime(2020, 8, 11, 0, 0, 0, tzinfo=LOCAL_TZ)
 CONTEXT = "top_of_funnel_demand"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-ENV = Variable.get("environment")
+ENV = os.environ.get("ENVIRONMENT")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")

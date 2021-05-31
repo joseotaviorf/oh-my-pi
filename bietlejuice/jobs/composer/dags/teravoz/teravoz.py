@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 
 import airflow.utils.helpers as airflow_helpers
+import os
+
 from airflow.models import DAG
 from airflow.models import Variable
 from airflow.operators.quintoandar_databricks import (
@@ -16,7 +18,7 @@ DAG_ID = "bietlejuice.{}".format(SOURCE)
 MAIN_START_DATE = datetime(2019, 7, 12, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
 
-ENV = Variable.get("environment")
+ENV = os.environ.get("ENVIRONMENT")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")

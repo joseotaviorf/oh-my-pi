@@ -1,6 +1,8 @@
 from datetime import datetime
 import pendulum
 import airflow.utils.helpers as airflow_helpers
+import os
+
 from airflow.models import DAG
 from airflow.models import Variable
 from airflow.operators.quintoandar_databricks import (
@@ -15,7 +17,7 @@ from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 DAG_NAME = "amplitude"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 
-ENV = Variable.get("environment")
+ENV = os.environ.get("ENVIRONMENT")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 
 local_tz = pendulum.timezone("America/Sao_Paulo")

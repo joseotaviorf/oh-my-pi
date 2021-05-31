@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import pendulum
+import os
 
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG, Variable
@@ -17,7 +18,7 @@ from bietlejuice.jobs.composer.services import FileService
 # DAG params
 SOURCE = "wall_street"
 DAG_ID = f"bietlejuice.{SOURCE}"
-ENV = Variable.get("environment")
+ENV = os.environ.get("ENVIRONMENT")
 SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz)

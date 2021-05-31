@@ -23,7 +23,7 @@ TARGET = "marketing_costs"
 MEDIA = "facebook_insights"
 DAG_NAME = f"enrich_{TARGET}_{MEDIA}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-ENV = Variable.get("environment")
+ENV = os.environ.get("ENVIRONMENT")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 DATALAKE_BUCKET = Variable.get("datalake_bucket")

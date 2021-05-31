@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 import pendulum
+import os
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -16,7 +17,7 @@ from bietlejuice.jobs.composer.services.file_service import FileService
 # DAG params
 DAG_ID = "ebdb"
 FULL_DAG_ID = "bietlejuice.{}".format(DAG_ID)
-ENV = Variable.get("environment")
+ENV = os.environ.get("ENVIRONMENT")
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time

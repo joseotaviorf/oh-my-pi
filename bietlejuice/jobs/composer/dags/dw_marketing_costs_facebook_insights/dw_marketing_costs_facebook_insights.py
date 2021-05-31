@@ -1,5 +1,6 @@
 from datetime import datetime
 import pendulum
+import os
 
 from airflow.utils.helpers import cross_downstream
 from airflow.models import DAG, Variable
@@ -20,7 +21,7 @@ TARGET = "dw_marketing_costs"
 SOURCE = f"{TARGET}_{MEDIA}"
 DAG_ID = f"bietlejuice.{SOURCE}"
 
-ENV = Variable.get("environment")
+ENV = os.environ.get("ENVIRONMENT")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 DW_BUCKET = Variable.get("dw_bucket")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")

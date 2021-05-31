@@ -1,5 +1,6 @@
 from datetime import datetime
 import pendulum
+import os
 from airflow.models import DAG
 from airflow.models import Variable
 import airflow.utils.helpers as airflow_helpers
@@ -14,7 +15,7 @@ from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.services import FileService
 
 # ENV setup
-ENV = Variable.get("environment")
+ENV = os.environ.get("ENVIRONMENT")
 
 # DAG and Jobs params setup
 SOURCE = "chattermill"
