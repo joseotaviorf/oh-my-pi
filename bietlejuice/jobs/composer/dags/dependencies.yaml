@@ -470,7 +470,6 @@ bietlejuice.enrich_robin_hood:
 
 bietlejuice.enrich_sale_flows:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
-  - bietlejuice.enrich_booking:load-booking-to-enrich
   - bietlejuice.enrich_ebdb_listing:load-listing-business-context-to-enrich
   - bietlejuice.enrich_offer:load-sale-offer-to-enrich
 
