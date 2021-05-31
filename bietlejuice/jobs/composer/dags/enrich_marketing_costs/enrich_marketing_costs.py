@@ -1,6 +1,5 @@
 from datetime import datetime
 import pendulum
-import json
 
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
@@ -16,8 +15,6 @@ from bietlejuice.jobs.composer.services import FileService
 
 
 PARTITION_COLS = {"google": ["acc", "load_date"]}
-MARKETING_HUB_MEDIAS = ["google"]
-SOURCE = "marketing_hub"
 TARGET = "marketing_costs"
 DAG_NAME = f"enrich_{TARGET}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
@@ -45,8 +42,6 @@ LIBRARIES_DESCRIPTION = Variable.get(
 local_tz = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz)
 
-ACCOUNTS_NAME_MAPPING = json.loads(Variable.get("facebook_insights_account_names"))
-
 (
     database_name,
     database_location,
@@ -56,12 +51,6 @@ ACCOUNTS_NAME_MAPPING = json.loads(Variable.get("facebook_insights_account_names
 )
 
 EXECUTION_TIMEOUT_HOURS = 3
-
-
-def get_database_name(media_name):
-    if media_name in MARKETING_HUB_MEDIAS:
-        return SOURCE
-    return TARGET
 
 
 dag = DAG(
@@ -94,7 +83,6 @@ media_name = "google"
 layers = FileService.list_layer_sql_files(TARGET, media_name)
 
 if LayerEnum.ENRICH.value in layers:
-    database_base_name = get_database_name(media_name)
     enrich_layer = f"{media_name}/{LayerEnum.ENRICH.value}"
     sql_file_list = FileService.list_sql_files_without_extension_from_layer(
         TARGET, enrich_layer
@@ -104,7 +92,7 @@ if LayerEnum.ENRICH.value in layers:
         env=ENV,
         datalake_bucket=DATALAKE_BUCKET,
         layer=LayerEnum.ENRICH,
-        database_base_name=database_base_name,
+        database_base_name=TARGET,
         target_database_base_name=TARGET,
         relative_query_path=f"{TARGET}/{media_name}",
         spark_job_paths=BASE_SPARK_JOBS_PATH,
