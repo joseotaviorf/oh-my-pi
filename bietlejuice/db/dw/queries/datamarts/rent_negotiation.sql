@@ -179,11 +179,11 @@ WITH anniversary_contracts AS (
         nc.sk_contract,
         nc.is_b2b,
         nc.status AS contract_status,
-        to_char(trunc(nc.dt_entrance),'mm/dd/yyyy') AS dt_entrance,
+        nc.dt_entrance AS dt_entrance,
         date_part('month', nc.dt_entrance) AS month,
         date_part('year', nc.dt_entrance) AS year,
-        to_char(trunc(nc.anniversary_date),'mm/dd/yyyy') AS dt_anniversary,
-        to_char(trunc(nc.dt_annulment),'mm/dd/yyyy') AS dt_annulment,
+        nc.anniversary_date AS dt_anniversary,
+        nc.dt_annulment AS dt_annulment,
         CASE 
             WHEN pn.pwa_contract IS NOT NULL THEN TRUE 
             WHEN cn.crm_contract IS NOT NULL THEN TRUE
@@ -218,28 +218,28 @@ WITH anniversary_contracts AS (
 	datediff(day, cast(first_ts_negotiation AS date), cast(last_ts_negotiation AS date)) AS negotiation_lead_time,
 	CASE 
             WHEN last_ts_negotiation = pn.pwa_neg_created THEN 'pwa'
-            WHEN last_ts_negotiation = fa.form_request_created THEN 'form'
-            WHEN last_ts_negotiation = f2.ts_request_created THEN 'form'
+            WHEN last_ts_negotiation = fa.first_execution THEN 'form'
+            WHEN last_ts_negotiation = f2.ts_request_executed THEN 'form'
             WHEN last_ts_negotiation = cn.crm_date_start THEN 'crm'
-            WHEN last_ts_negotiation = tn.last_ticket_neg_created THEN 'ticket'
+            WHEN last_ts_negotiation = tn.last_ticket_neg_solved THEN 'ticket'
             ELSE NULL 
-        END last_origin_negotiation,
+        END last_negotiation_origin,
         CASE 
             WHEN last_ts_negotiation = pn.pwa_neg_created THEN pn.type
-            WHEN last_ts_negotiation = fa.form_request_created THEN NULL
-            WHEN last_ts_negotiation = f2.ts_request_created THEN f2.index
+            WHEN last_ts_negotiation = fa.first_execution THEN NULL
+            WHEN last_ts_negotiation = f2.ts_request_executed THEN f2.index
             WHEN last_ts_negotiation = cn.crm_date_start THEN NULL
-            WHEN last_ts_negotiation = tn.last_ticket_neg_created THEN NULL
+            WHEN last_ts_negotiation = tn.last_ticket_neg_solved THEN NULL
             ELSE NULL 
-        END last_type_negotiation,
+        END last_negotiation_type,
         CASE 
             WHEN last_ts_negotiation = pn.pwa_neg_created THEN pn.status
-            WHEN last_ts_negotiation = fa.form_request_created THEN fa.status
-            WHEN last_ts_negotiation = f2.ts_request_created THEN f2.status
+            WHEN last_ts_negotiation = fa.first_execution THEN fa.status
+            WHEN last_ts_negotiation = f2.ts_request_executed THEN f2.status
             WHEN last_ts_negotiation = cn.crm_date_start THEN cn.status
-            WHEN last_ts_negotiation = tn.last_ticket_neg_created THEN tn.last_ticket_status
+            WHEN last_ts_negotiation = tn.last_ticket_neg_solved THEN tn.last_ticket_status
             ELSE NULL 
-        END last_status_negotiation,
+        END last_negotiation_status,
         CASE 
             WHEN pn.pwa_contract IS NOT NULL THEN TRUE
             ELSE FALSE
@@ -256,7 +256,7 @@ WITH anniversary_contracts AS (
             WHEN fa.form_contract IS NOT NULL OR f2.form2_contract IS NOT NULL THEN TRUE
             ELSE FALSE
         END AS has_forms_contract,
-        to_char(date(pn.pwa_neg_created),'MM/DD/YYYY') AS pwa_negotiation_created,
+        date(pn.pwa_neg_created) AS pwa_negotiation_created,
         pn.status AS pwa_negotiation_status,
         pn.type AS pwa_negotiation_type,
         cn.sk_task AS crm_negotiation_task,
