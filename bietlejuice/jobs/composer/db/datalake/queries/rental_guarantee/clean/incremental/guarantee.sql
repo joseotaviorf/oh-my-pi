@@ -13,7 +13,6 @@ SELECT
     final_value,
     created_at AS ts_created,
     updated_at AS ts_updated,
-    base_value_updated_at AS ts_base_value_updated,
     cancellation_requested_at AS ts_cancellation_requested,
     expires_at AS ts_expired,
     paid_at AS ts_paid,
