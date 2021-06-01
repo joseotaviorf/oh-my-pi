@@ -64,24 +64,28 @@ SELECT
     id_contract_ebdb,
     id_contract_retsuko,
     id_proposal,
-    months_of_contract,
+    CAST(months_of_contract AS INTEGER) AS months_of_contract,
     ma.contract_mob_number,
     ea.contract_ever_number,
-    MAX(
-      CASE
-        WHEN invoice_over_number >= ea.contract_ever_number
-          AND (12*(DATE_FORMAT(DATE_ADD(ts_due, ea.contract_ever_number), "y") - DATE_FORMAT(ts_signature, "y")) + 
-                     (DATE_FORMAT(DATE_ADD(ts_due, ea.contract_ever_number), "M") - DATE_FORMAT(ts_signature, "M"))) <= ma.contract_mob_number THEN 1
-        ELSE 0
-      END
+    CAST(
+      MAX(
+        CASE
+          WHEN invoice_over_number >= ea.contract_ever_number
+            AND (12*(DATE_FORMAT(DATE_ADD(ts_due, ea.contract_ever_number), "y") - DATE_FORMAT(ts_signature, "y")) + 
+                      (DATE_FORMAT(DATE_ADD(ts_due, ea.contract_ever_number), "M") - DATE_FORMAT(ts_signature, "M"))) <= ma.contract_mob_number THEN 1
+          ELSE 0
+        END
+      ) AS BOOLEAN 
     ) AS is_ever,
-    SUM(
-      CASE
-        WHEN invoice_over_number >= ea.contract_ever_number
-          AND (12*(DATE_FORMAT(DATE_ADD(ts_due, ea.contract_ever_number), "y") - DATE_FORMAT(ts_signature, "y")) + 
-                     (DATE_FORMAT(DATE_ADD(ts_due, ea.contract_ever_number), "M") - DATE_FORMAT(ts_signature, "M"))) <= ma.contract_mob_number THEN 1
-        ELSE 0
-      END
+    CAST(
+      SUM(
+        CASE
+          WHEN invoice_over_number >= ea.contract_ever_number
+            AND (12*(DATE_FORMAT(DATE_ADD(ts_due, ea.contract_ever_number), "y") - DATE_FORMAT(ts_signature, "y")) + 
+                      (DATE_FORMAT(DATE_ADD(ts_due, ea.contract_ever_number), "M") - DATE_FORMAT(ts_signature, "M"))) <= ma.contract_mob_number THEN 1
+          ELSE 0
+        END
+      ) AS INTEGER
     ) AS num_overs_in_mob_window,
     SUM(
       CASE
@@ -91,12 +95,14 @@ SELECT
         ELSE 0
       END
     ) AS total_due_amount_in_mob_window,
-    SUM(
-      CASE
-        WHEN invoice_over_number >= ea.contract_ever_number
-          THEN 1
-        ELSE 0
-      END
+    CAST(
+      SUM(
+        CASE
+          WHEN invoice_over_number >= ea.contract_ever_number
+            THEN 1
+          ELSE 0
+        END
+      ) AS INTEGER
     ) AS num_total_overs,
     SUM(
       CASE
@@ -116,6 +122,7 @@ CROSS JOIN
 GROUP BY
     1,2,3,4,5,6,12,13
 HAVING 
-    (is_ever = 0 
+    (is_ever = FALSE 
         AND (months_of_contract > ma.contract_mob_number)
-            OR (is_ever = 1))
+            OR (is_ever = TRUE)
+            )
