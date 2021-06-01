@@ -373,7 +373,8 @@ campaigns_full AS (
         LEFT JOIN marketing_costs.dim_criteo_campaign dct ON fct.sk_criteo_campaign = dct.sk_criteo_campaign
     WHERE
         fct.sk_date >= 20180101
-        AND SUBSTRING(dct.campaign_name, 1, 5) <> 'ZEBRA'
+        AND (SUBSTRING(dct.campaign_name, 1, 5) <> 'ZEBRA' 
+            OR SUBSTRING(dct.campaign_name, 1, 5) IS NULL)
         -- RTB
     UNION
     SELECT
