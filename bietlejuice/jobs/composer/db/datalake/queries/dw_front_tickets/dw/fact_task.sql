@@ -11,7 +11,8 @@ WITH call_tasks AS (
         is_first_task,
         is_last_task,
         ts_task_created AS ts_started,
-        ts_task_closed AS ts_closed
+        ts_task_closed AS ts_closed,
+        NOW() AS ts_load
     FROM
         datalake_front_tickets.call c
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
@@ -29,7 +30,8 @@ chat_tasks AS (
         is_last_task,
         is_first_task,
         ts_task_created AS ts_started,
-        ts_task_closed AS ts_closed
+        ts_task_closed AS ts_closed,
+        NOW() AS ts_load
     FROM 
         datalake_front_tickets.chat c
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
@@ -47,7 +49,8 @@ email_tasks AS (
         TRUE AS is_first_task,
         TRUE AS is_last_task,
         ts_ticket_started AS ts_started,
-        ts_ticket_ended AS ts_closed
+        ts_ticket_ended AS ts_closed,
+        NOW() AS ts_load
     FROM 
         datalake_front_tickets.email
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12

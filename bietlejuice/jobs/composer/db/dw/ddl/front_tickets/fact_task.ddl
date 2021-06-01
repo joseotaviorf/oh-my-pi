@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS front_tickets.fact_task (
     is_first_task BOOLEAN,
     is_last_task BOOLEAN,
     ts_started TIMESTAMP,
-    ts_closed TIMESTAMP
+    ts_closed TIMESTAMP,
+    ts_load TIMESTAMP
 );
 ALTER TABLE front_tickets.fact_task OWNER TO airflow;
