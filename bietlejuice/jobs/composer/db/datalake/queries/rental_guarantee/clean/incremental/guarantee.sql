@@ -1,0 +1,29 @@
+SELECT 
+    id, 
+    contract_ebdb_id AS id_contract_ebdb,
+    documentation_ebdb_id AS id_documentation_ebdb,
+    house_ebdb_id AS id_house_ebdb, 
+    tenant_ebdb_id AS id_tenant_ebdb, 
+    accepted_terms_and_conditions,
+    cancellation_reason,
+    score,
+    "source" AS guarantee_source, 
+    "status" AS guarantee_status,
+    base_value,
+    final_value,
+    created_at AS ts_created,
+    updated_at AS ts_updated,
+    base_value_updated_at AS ts_base_value_updated,
+    cancellation_requested_at AS ts_cancellation_requested,
+    expires_at AS ts_expired,
+    paid_at AS ts_paid,
+    payment_expires_at AS ts_payment_expired,
+    year,
+    month, 
+    day
+FROM 
+    datalake_rental_guarantee_raw.guarantee
+WHERE 
+    year = {year}
+    AND month = {month} 
+    AND day = {day}
