@@ -61,3 +61,15 @@ p014p:
 d015d:
   query: marketing/costs/d015d.sql
   funnel_side: demand
+
+b016b:
+  query: marketing/costs/b016b.sql
+  funnel_side: branding
+
+b017b:
+  query: marketing/costs/b017b.sql
+  funnel_side: branding
+
+b018b:
+  query: marketing/costs/b018b.sql
+  funnel_side: branding
