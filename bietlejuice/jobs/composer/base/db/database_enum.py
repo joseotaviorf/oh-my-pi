@@ -3,6 +3,7 @@ class DatabaseEnum:
     #  Maybe SourceEnum would be more appropriate now.
     ASTERISK = "ENV_ASTERISK"
     AUTODIALER = "ENV_AUTODIALER"
+    BIG_AGENT = "BIG_AGENT_DB"
     BIGFONE = "BIGFONE_DB"
     BOB = "BOB_DB"
     CHAT_FUP = "CHAT_FUP_DB"
