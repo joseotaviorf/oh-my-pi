@@ -19,7 +19,8 @@ WITH front_tickets AS (
         ticket_summary.ts_solved_local,
         ticket_summary.ts_closed_local,
         MAX(ticket_summary.back_ticket) AS back_ticket,
-        ticket_summary.has_transfers,
+        ticket_summary.has_department_transfers,
+        ticket_summary.has_analyst_transfers,
         ticket_summary.resolution_survey
     FROM
         datamarts.ticket_summary
@@ -29,10 +30,11 @@ WITH front_tickets AS (
         AND is_automatic_email = 0
         AND is_bot = 0
         AND is_closed_by_merge = 0
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,17,18
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,17,18,19
 ),
 user_recontacts AS (
-    SELECT DISTINCT sk_ticket,
+    SELECT DISTINCT
+        sk_ticket,
         COALESCE(telefone_principal, cpf, sk_contract_ticket::TEXT, sk_user::TEXT) AS ticket_user,
         CASE
             WHEN DATEDIFF(hour, LAG(ts_created_local, 1) OVER(PARTITION BY ticket_user ORDER BY ts_created_local), ts_created_local) < 168 THEN 1
@@ -83,15 +85,23 @@ SELECT
     contact_motivation_tag,
     contact_theme_tag,
     back_ticket,
-    has_transfers,
+    has_department_transfers,
+    has_analyst_transfers,
     resolution_survey,
     tts.tickets AS ticket_count,
     CASE
-        WHEN
-            (tickets > 1) OR
-            back_ticket IS NOT NULL OR
-            has_transfers > 0 OR 
-            resolution_survey = 0
+        WHEN channel <> 'chat'
+            AND ((tickets > 1)
+            OR back_ticket IS NOT NULL
+            OR has_department_transfers > 0
+            OR has_analyst_transfers > 0
+            OR resolution_survey = 0)
+        THEN 0
+        WHEN channel = 'chat'
+            AND ((tickets > 1)
+            OR back_ticket IS NOT NULL
+            OR has_department_transfers > 0
+            OR resolution_survey = 0)
         THEN 0
         ELSE 1
     END AS is_fcr,

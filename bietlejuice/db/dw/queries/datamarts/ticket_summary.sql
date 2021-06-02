@@ -6,8 +6,8 @@ WITH sla AS (
     FROM
         (
             -- call 01
-            SELECT
-                DISTINCT fc.sk_ticket,
+            SELECT DISTINCT
+                fc.sk_ticket,
                 CASE
                     WHEN fcq.seconds_queue_waiting_duration <= 60
                     AND fcq.is_call_abandoned_in_queue = 'False' THEN 1
@@ -28,8 +28,8 @@ WITH sla AS (
                 AND fc.ts_started_local <= DATE'2020-08-20'
             UNION
             -- call 02
-            SELECT
-                DISTINCT zd.sk_ticket ,
+            SELECT DISTINCT
+                zd.sk_ticket,
                 CASE
                     WHEN fc.seconds_total_wait_time <= 60
                     AND fct.is_answered THEN 1
@@ -55,8 +55,8 @@ WITH sla AS (
                 AND dc.ts_started > DATE'2020-08-20'
             UNION
             -- chat 01
-            SELECT
-                DISTINCT fc.sk_ticket ,
+            SELECT DISTINCT
+                fc.sk_ticket ,
                 CASE
                     WHEN fc.seconds_first_reply_time / 60 <= 15 THEN 1
                     WHEN fc.seconds_first_reply_time / 60 > 15 THEN 0
@@ -158,14 +158,11 @@ last_event_completed_call AS (
     GROUP BY 1 
 ),
 csat_ticket_calls AS (
-    SELECT
-        DISTINCT
-        --       c.id_call, 
+    SELECT DISTINCT
         ft.sk_ticket,
         cc.resolution_survey,
         cc.csat,
         cc.ts_first_call_event,
-        --		c.agent_email, 
         c.department_name,
         dept.area_aux
     FROM
@@ -196,8 +193,8 @@ csat_ticket_calls AS (
         cc.ts_first_call_event > DATE'2018-01-01'
         AND cc.ts_first_call_event <= DATE'2020-08-20'
     UNION
-    SELECT
-        DISTINCT zd.sk_ticket ,
+    SELECT DISTINCT
+        zd.sk_ticket ,
         CASE
             WHEN fc.is_solved IS TRUE THEN 1
             WHEN fc.is_solved IS FALSE THEN 0
@@ -324,8 +321,8 @@ csat AS (
     GROUP BY 1,2,3,4,5,6,7,8,9 
 ) ,
 automatically_closed_emails AS (
-    SELECT
-        DISTINCT tt.sk_ticket
+    SELECT DISTINCT
+        tt.sk_ticket
     FROM
         zendesk.fact_ticket_tags tt
     JOIN 
@@ -582,8 +579,8 @@ tickets_areas AS (
         AND dt.contact_theme_tag IS NOT NULL
 ),*/
 front_or_back_call_tasks AS (
-    SELECT
-        DISTINCT sk_ticket AS back_ticket,
+    SELECT DISTINCT
+        sk_ticket AS back_ticket,
         REGEXP_SUBSTR(description, 'WT[a-z0-9]{20,40}') AS front_task,
         description,
         ts_created_local
@@ -695,28 +692,83 @@ total_back_tickets AS (
     FROM
         front_or_back_chat_tickets
 ),
-chat_tasks_transfers AS (
-    SELECT
-        ft.sk_chat
+call_next_dpts AS (
+    SELECT DISTINCT
+        cfr.id_call,
+        cfr.id_task,
+        cfr.id_reservation,
+        cfr.queue_name AS department,
+        cfr.ts_created,
+        LEAD(cfr.queue_name, 1) OVER(PARTITION BY cfr.id_task ORDER BY cfr.ts_created) AS next_department
     FROM
-        quinto_messenger.dim_task dt 
-    INNER JOIN
-        quinto_messenger.fact_tasks ft 
-            ON ft.sk_task=dt.sk_task
-    WHERE
-        completion_reason='task transferred'
+        datalake_bigfone_twilio_prod.call_flex_reservations AS cfr
 ),
-total_transfers AS (
+call_department_transfers AS (
+    SELECT DISTINCT
+        COALESCE(id_call, id_task) AS sk_call
+    FROM
+        call_next_dpts AS cft
+    WHERE
+        next_department IS NOT NULL --estou considerando apenas id_call/id_tasks que houveram transferencias
+        AND next_department <> department --transferencias para diferentes departamentos
+),
+call_analyst_transfers AS (
+    SELECT DISTINCT
+        COALESCE(id_call, id_task) AS sk_call
+    FROM
+        call_next_dpts AS cft
+    WHERE
+        next_department IS NOT NULL --estou considerando apenas id_call/id_tasks que houveram transferencias
+        AND next_department = department --transferencias para o mesmo departamento
+),
+chat_next_dpts AS (
+    SELECT
+        ft.sk_task,
+        ft.sk_chat,
+        dt.department,
+        dt.completion_reason,
+        --dt.ts_created,
+        CASE
+            WHEN completion_reason = 'task transferred' THEN LEAD(dt.department, 1) OVER(PARTITION BY ft.sk_chat ORDER BY dt.ts_created)
+            END AS next_department
+    FROM
+        quinto_messenger.fact_tasks AS ft
+    LEFT JOIN
+        quinto_messenger.dim_task AS dt
+            USING(sk_task)
+),
+chat_department_transfers AS (
+    SELECT DISTINCT
+        sk_chat
+    FROM
+        chat_next_dpts 
+    WHERE
+        completion_reason = 'task transferred'
+        AND next_department <> department
+),
+chat_analyst_transfers AS (
+    SELECT DISTINCT
+        sk_chat
+    FROM
+        chat_next_dpts 
+    WHERE
+        completion_reason = 'task transferred'
+        AND next_department = department
+),
+total_department_transfers AS (
     --call transfers
     SELECT
         ft.sk_ticket
-    
     FROM
         zendesk.fact_tickets AS ft
     INNER JOIN
         call.fact_calls fc
             ON fc.sk_call=ft.sk_call
         AND fc.is_transfered=TRUE
+    INNER JOIN
+        --call tasks transfers
+        call_department_transfers cdt 
+            ON fc.sk_call=cdt.sk_call
     UNION
     --chat transfers
     SELECT
@@ -728,11 +780,39 @@ total_transfers AS (
             ON fc.sk_session=ft.sk_session
     INNER JOIN
         --chat tasks transfers
-        chat_tasks_transfers tt 
+        chat_department_transfers tt 
+            ON fc.sk_chat=tt.sk_chat
+),
+total_analyst_transfers AS (
+    --call transfers
+    SELECT
+        ft.sk_ticket
+    FROM
+        zendesk.fact_tickets AS ft
+    INNER JOIN
+        call.fact_calls fc
+            ON fc.sk_call=ft.sk_call
+        AND fc.is_transfered=TRUE
+    INNER JOIN
+        --call tasks transfers
+        call_analyst_transfers cat 
+            ON fc.sk_call=cat.sk_call
+    UNION
+    --chat transfers
+    SELECT
+        ft.sk_ticket
+    FROM
+        zendesk.fact_tickets ft
+    INNER JOIN
+        quinto_messenger.fact_chats fc
+            ON fc.sk_session=ft.sk_session
+    INNER JOIN
+        --chat tasks transfers
+        chat_analyst_transfers tt 
             ON fc.sk_chat=tt.sk_chat
 )
-SELECT
-	DISTINCT ft.sk_ticket,
+SELECT DISTINCT
+    ft.sk_ticket,
 	ft.sk_contract AS sk_contract_ticket,
 	ft.sk_user,
 	CASE
@@ -863,9 +943,13 @@ SELECT
             THEN 0
         END AS is_open_back_ticket,
     CASE
-        WHEN total_transfers.sk_ticket IS NULL THEN 0
+        WHEN total_department_transfers.sk_ticket IS NULL THEN 0
         ELSE 1
-        END AS has_transfers,
+        END AS has_department_transfers,
+    CASE
+        WHEN total_analyst_transfers.sk_ticket IS NULL THEN 0
+        ELSE 1
+        END AS has_analyst_transfers,
     CASE
         WHEN ac.sk_ticket IS NULL THEN 0
         ELSE 1
@@ -885,9 +969,17 @@ SELECT
         ELSE NULL
         END AS is_solved,
     CASE
-        WHEN resolution_survey = 1
+        WHEN tk.channel <> 'chat'
+            AND resolution_survey = 1
             AND back_ticket IS NULL
-            AND has_transfers = 0
+            AND has_department_transfers = 0
+            AND has_analyst_transfers = 0
+            AND is_automatic_email = 0 AND is_bot = 0 AND is_closed_by_merge = 0 --fcr só é aplicável aos dados que passam por esse filtro
+            THEN 1
+        WHEN tk.channel = 'chat'
+            AND resolution_survey = 1
+            AND back_ticket IS NULL
+            AND has_department_transfers = 0
             AND is_automatic_email = 0 AND is_bot = 0 AND is_closed_by_merge = 0 --fcr só é aplicável aos dados que passam por esse filtro
             THEN 1
         WHEN resolution_survey IS NOT NULL
@@ -927,7 +1019,10 @@ LEFT JOIN
     tickets_areas AS ta 
         ON ta.sk_ticket = ft.sk_ticket
 LEFT JOIN
-    total_transfers
-        ON ft.sk_ticket = total_transfers.sk_ticket
+    total_department_transfers
+        ON ft.sk_ticket = total_department_transfers.sk_ticket
+LEFT JOIN
+    total_analyst_transfers
+        ON ft.sk_ticket = total_analyst_transfers.sk_ticket
 WHERE
     bt.sk_back_ticket IS NULL

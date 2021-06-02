@@ -1,5 +1,5 @@
-SELECT
-    DISTINCT(tm.sk_ticket),
+SELECT DISTINCT
+    tm.sk_ticket,
     tm.sk_user,    
     tm.sk_contract_ticket,
     tm.channel,
