@@ -5,7 +5,11 @@ WITH call_tasks AS (
         id_agent AS sk_agent,
         MD5(department) AS sk_department,
         MD5(concat('call', tags, direction)) AS sk_channel,
+        id_task AS sk_segment,
         department,
+        transferred_from_dept,
+        transferred_to_dept,
+        transference_type,
         'call' AS channel,
         sla_achieved AS is_sla,
         is_first_task,
@@ -15,7 +19,7 @@ WITH call_tasks AS (
         NOW() AS ts_load
     FROM
         datalake_front_tickets.call c
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
 ),
 chat_tasks AS (
     SELECT 
@@ -24,7 +28,11 @@ chat_tasks AS (
         id_agent AS sk_agent,
         MD5(department) AS sk_department,
         MD5(concat('chat', tags)) AS sk_channel,
+        id_task AS sk_segment,
         department,
+        transferred_from_dept,
+        transferred_to_dept,
+        transference_type,
         'chat' AS channel,
         sla_achieved AS is_sla,
         is_last_task,
@@ -34,7 +42,7 @@ chat_tasks AS (
         NOW() AS ts_load
     FROM 
         datalake_front_tickets.chat c
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
 ),
 email_tasks AS (
     SELECT 
@@ -43,7 +51,11 @@ email_tasks AS (
         id_agent AS sk_agent,
         MD5(department) AS sk_department,
         MD5(concat('email', tags)) AS sk_channel,
+        NULL AS sk_segment,
         department,
+        NULL AS transferred_from_dept,
+        NULL AS transferred_to_dept,
+        NULL AS transference_type,
         'email' AS channel,
         is_sla,
         TRUE AS is_first_task,
@@ -53,7 +65,7 @@ email_tasks AS (
         NOW() AS ts_load
     FROM 
         datalake_front_tickets.email
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
 )
 SELECT
     *

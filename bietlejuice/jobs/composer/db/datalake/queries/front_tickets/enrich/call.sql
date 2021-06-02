@@ -77,6 +77,8 @@ WITH tasks AS (
   LEFT JOIN
     twilio_timestamp tt
         ON tt.id_reservation = r.id_reservation
+  WHERE
+    is_answered = TRUE
 ),
 call AS (
   WITH ivr_events AS (
@@ -247,8 +249,14 @@ SELECT DISTINCT
   t.agent_name,
   t.agent_skills,
   t.queue_name AS department,
-  FIRST(t.queue_name) OVER (PARTITION BY c.id_task ORDER BY c.ts_created) AS first_department,
-  LAST(t.queue_name) OVER (PARTITION BY c.id_task ORDER BY c.ts_created) AS last_department,
+  FIRST(t.queue_name) OVER (PARTITION BY c.id_task ORDER BY c.ts_created ASC) AS first_department,
+  FIRST(t.queue_name) OVER (PARTITION BY c.id_task ORDER BY c.ts_created DESC) AS last_department,
+  LAG(t.queue_name,1) OVER (PARTITION BY zd.id_ticket ORDER BY t.ts_twilio_created_local) AS transferred_from_dept,
+  LEAD(t.queue_name,1) OVER (PARTITION BY zd.id_ticket ORDER BY t.ts_twilio_created_local) AS transferred_to_dept,
+  CASE
+      WHEN LEAD(t.queue_name,1) OVER (PARTITION BY zd.id_ticket ORDER BY t.ts_twilio_created_local) = t.queue_name THEN 'internal'
+      WHEN LEAD(t.queue_name,1) OVER (PARTITION BY zd.id_ticket ORDER BY t.ts_twilio_created_local) != t.queue_name THEN 'external'
+  END AS transference_type,
   CASE
       WHEN seconds_total_wait_time <= 60 AND t.is_answered THEN TRUE
       WHEN seconds_total_wait_time > 60 AND t.is_answered THEN FALSE
@@ -270,7 +278,7 @@ SELECT DISTINCT
   zd.tags,
   zd.status,
   zd.custom_fields,
-  LAST(t.id_reservation) OVER (PARTITION BY zd.id_ticket ORDER BY t.ts_twilio_created_local ASC) = t.id_reservation AS is_last_task,
+  FIRST(t.id_reservation) OVER (PARTITION BY zd.id_ticket ORDER BY t.ts_twilio_created_local DESC) = t.id_reservation AS is_last_task,
   FIRST(t.id_reservation) OVER (PARTITION BY zd.id_ticket ORDER BY t.ts_twilio_created_local ASC) = t.id_reservation AS is_first_task,
   bt.front_ticket IS NOT NULL AS has_back_tickets,
   zd.tags LIKE '%bot_end_conversation%' AS is_bot, 

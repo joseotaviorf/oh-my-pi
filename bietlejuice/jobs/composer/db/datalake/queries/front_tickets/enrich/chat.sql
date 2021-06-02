@@ -171,8 +171,14 @@ SELECT DISTINCT
   ct.agent_company,
   cc.comment AS csat_comment,
   ct.department,
-  FIRST_VALUE(ct.department) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_first_event) AS first_department,
-  LAST_VALUE(ct.department) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_first_event) AS last_department,
+  FIRST(ct.department) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_first_event ASC) AS first_department,
+  FIRST(ct.department) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_first_event DESC) AS last_department,
+  LAG(ct.department,1) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created) AS transferred_from_dept,
+  LEAD(ct.department,1) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created) AS transferred_to_dept,
+  CASE
+      WHEN LEAD(ct.department,1) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created) = ct.department THEN 'internal'
+      WHEN LEAD(ct.department,1) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created) != ct.department THEN 'external'
+  END AS transference_type,
   zd.request_type,
   zd.client_type,
   zd.customer_type_tag,
@@ -190,7 +196,7 @@ SELECT DISTINCT
   CAST(ct.minutes_full_resolution_time_calendar AS DOUBLE) AS minutes_full_resolution_time_calendar,
   zd.minutes_first_resolution_time_calendar,
   zd.minutes_first_resolution_time_business,
-  LAST(ct.id_task) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created ASC) = ct.id_task AS is_last_task,
+  FIRST(ct.id_task) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created DESC) = ct.id_task AS is_last_task,
   FIRST(ct.id_task) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created ASC) = ct.id_task AS is_first_task,
   ct.has_transfers,
   zd.tags LIKE '%bot_end_conversation%' AS is_bot,
