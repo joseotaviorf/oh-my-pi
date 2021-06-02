@@ -5,4 +5,4 @@ SELECT
     FLOAT(NULLIF(budget,'')) AS budget,
     DATE(NULLIF(date, '')) AS dt_budget
 FROM
-    datalake_gsheets_raw.marketing_offline_budget
+    datalake_marketing_offline_costs_raw.marketing_offline_budget
