@@ -21,9 +21,6 @@ DAG_ID = f"bietlejuice.{DAG_NAME}"
 DW_BUCKET = Variable.get("dw_bucket")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
-AWS_ACCESS_KEY_ID = Variable.get("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = Variable.get("AWS_SECRET_ACCESS_KEY")
-
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 METRICS_BUCKET = Variable.get("metrics_bucket")
 METRICS_S3_PATH = f"s3://{METRICS_BUCKET}/metrics"
@@ -53,7 +50,6 @@ dag = DAG(
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
 )
-
 
 ctas_task = QuintoAndarDatabricksSubmitRunOperator(
     dag=dag,
