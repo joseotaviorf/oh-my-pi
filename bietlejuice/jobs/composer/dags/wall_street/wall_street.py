@@ -119,26 +119,9 @@ def clean_tasks(sub_dag_name, table_name, slugged_table_name):
         },
     )
 
-    validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
-        dag=sub_dag,
-        task_id="validate-sync-hive-metastore-clean-table",
-        json={
-            "spark_python_task": {
-                "python_file": BASE_SPARK_JOB_PATH
-                + "validate_sync_metastore_tables.py",
-                "parameters": [
-                    LayerEnum.CLEAN.value,
-                    SOURCE,
-                    "--table-name",
-                    table_name,
-                ],
-            }
-        },
+    load_clean_table_task.set_downstream(
+        [create_external_table_task, sync_metastore_table_task]
     )
-
-    load_clean_table_task >> create_external_table_task
-
-    load_clean_table_task >> sync_metastore_table_task >> validate_sync_metastore_table_task
 
     return sub_dag
 
@@ -190,17 +173,6 @@ sync_metastore_tables_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
-    dag=dag,
-    task_id="validate-sync-hive-metastore-table",
-    json={
-        "spark_python_task": {
-            "python_file": BASE_SPARK_JOB_PATH + "validate_sync_metastore_tables.py",
-            "parameters": [LayerEnum.RAW.value, SOURCE, "--all-tables"],
-        }
-    },
-)
-
 # tasks definitions
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
@@ -218,7 +190,6 @@ airflow_helpers.chain(
     create_cluster_task,
     load_tables_into_datalake_raw_task,
     sync_metastore_tables_task,
-    validate_sync_metastore_table_task,
     terminate_cluster_task,
 )
 

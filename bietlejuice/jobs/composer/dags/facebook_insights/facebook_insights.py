@@ -117,22 +117,6 @@ sync_metastore_facebook_insights_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-validate_sync_metastore_facebook_insights_task = QuintoAndarDatabricksSubmitRunOperator(
-    dag=dag,
-    task_id="validate-sync-hive-metastore-raw-facebook-insights",
-    json={
-        "spark_python_task": {
-            "python_file": SPARK_JOBS_PATH + "/validate_sync_metastore_tables.py",
-            "parameters": [
-                LayerEnum.RAW.value,
-                SOURCE,
-                "--table-name",
-                INSIGHTS_TABLE_NAME,
-            ],
-        }
-    },
-)
-
 social_account_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id="facebook-insights-social-to-datalake-raw",
     dag=dag,
@@ -161,22 +145,6 @@ sync_metastore_facebook_social_insights_task = QuintoAndarDatabricksSubmitRunOpe
             "python_file": SPARK_JOBS_PATH + "/sync_metastore_tables.py",
             "parameters": [
                 DATALAKE_BUCKET,
-                LayerEnum.RAW.value,
-                SOURCE,
-                "--table-name",
-                SOCIAL_INSIGHTS_TABLE_NAME,
-            ],
-        }
-    },
-)
-
-validate_sync_metastore_facebook_social_insights_task = QuintoAndarDatabricksSubmitRunOperator(
-    dag=dag,
-    task_id="validate-sync-hive-metastore-raw-facebook-social-insights",
-    json={
-        "spark_python_task": {
-            "python_file": SPARK_JOBS_PATH + "/validate_sync_metastore_tables.py",
-            "parameters": [
                 LayerEnum.RAW.value,
                 SOURCE,
                 "--table-name",
@@ -223,13 +191,11 @@ list(clean_sub_dags.values()) >> terminate_cluster_task
 airflow_helpers.chain(
     facebook_insights_to_datalake_raw_task,
     sync_metastore_facebook_insights_task,
-    validate_sync_metastore_facebook_insights_task,
     terminate_cluster_task,
 )
 
 airflow_helpers.chain(
     social_account_to_datalake_raw_task,
     sync_metastore_facebook_social_insights_task,
-    validate_sync_metastore_facebook_social_insights_task,
     terminate_cluster_task,
 )

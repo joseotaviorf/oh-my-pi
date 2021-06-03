@@ -135,20 +135,9 @@ def build_entity_subdag(subdag_name, entity_name, entity_pipeline):
         },
     )
 
-    validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
-        dag=entity_subdag,
-        task_id=f"validate-sync-hive-metastore-{slugged_table_name}-table",
-        json={
-            "spark_python_task": {
-                "python_file": BASE_SPARK_JOBS_PATH
-                + "validate_sync_metastore_tables.py",
-                "parameters": [LayerEnum.DW.value, DW_SCHEMA, "--table-name", table],
-            }
-        },
+    create_table_in_datalake_task.set_downstream(
+        [sync_metastore_table_task, load_table_into_redshift_task]
     )
-
-    create_table_in_datalake_task >> sync_metastore_table_task >> validate_sync_metastore_table_task
-    create_table_in_datalake_task >> load_table_into_redshift_task
 
     return entity_subdag
 

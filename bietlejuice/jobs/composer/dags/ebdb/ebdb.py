@@ -133,26 +133,9 @@ def dw_tasks(table_name):
         },
     )
 
-    validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
-        dag=dag,
-        task_id=f"validate-sync-hive-metastore-dw-{slugged_table_name}",
-        json={
-            "spark_python_task": {
-                "python_file": f"{BASE_SPARK_JOBS_PATH}/validate_sync_metastore_tables.py",
-                "parameters": [
-                    LayerEnum.DW.value,
-                    DW_SCHEMA,
-                    "--table-name",
-                    table_name,
-                ],
-            }
-        },
-    )
-    chain(dim_table_task, sync_metastore_table_task, validate_sync_metastore_table_task)
+    chain(dim_table_task, [sync_metastore_table_task, load_dim_table_task])
 
-    dim_table_task >> load_dim_table_task
-
-    return [dim_table_task, [load_dim_table_task, validate_sync_metastore_table_task]]
+    return [dim_table_task, [load_dim_table_task, sync_metastore_table_task]]
 
 
 def clean_tasks(table_name):
@@ -218,30 +201,13 @@ def clean_tasks(table_name):
         },
     )
 
-    validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
-        dag=dag,
-        task_id=f"validate-sync-hive-metastore-clean-{slugged_table_name}",
-        json={
-            "spark_python_task": {
-                "python_file": f"{BASE_SPARK_JOBS_PATH}/validate_sync_metastore_tables.py",
-                "parameters": [
-                    LayerEnum.CLEAN.value,
-                    SOURCE,
-                    "--table-name",
-                    table_name,
-                ],
-            }
-        },
-    )
     chain(
-        clean_table_task, sync_metastore_table_task, validate_sync_metastore_table_task
+        clean_table_task, [sync_metastore_table_task, create_clean_external_tables_task]
     )
-
-    clean_table_task >> create_clean_external_tables_task
 
     return [
         clean_table_task,
-        [create_clean_external_tables_task, validate_sync_metastore_table_task],
+        [create_clean_external_tables_task, sync_metastore_table_task],
     ]
 
 
@@ -378,17 +344,6 @@ sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
-    dag=dag,
-    task_id=f"validate-sync-hive-metastore-raw",
-    json={
-        "spark_python_task": {
-            "python_file": f"{BASE_SPARK_JOBS_PATH}/validate_sync_metastore_tables.py",
-            "parameters": [LayerEnum.RAW.value, SOURCE, "--all-tables"],
-        }
-    },
-)
-
 raw_task_list = build_raw_task_list()
 clean_task_list = build_layer_task_list("clean")
 dw_sub_dags = build_layer_task_list("dw")
@@ -400,11 +355,7 @@ create_cluster_task >> [
 ]
 
 # raw >> hive sync
-chain(
-    task_list_first_task(raw_task_list),
-    sync_metastore_table_task,
-    validate_sync_metastore_table_task,
-)
+chain(task_list_first_task(raw_task_list), sync_metastore_table_task)
 
 # raw >> clean
 chain(
@@ -467,7 +418,7 @@ cross_downstream(
 
 # upstream >> terminate-cluster
 cross_downstream(
-    [validate_sync_metastore_table_task] + task_list_last_tasks(raw_task_list),
+    [sync_metastore_table_task] + task_list_last_tasks(raw_task_list),
     terminate_cluster_task,
 )
 

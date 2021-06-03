@@ -1,5 +1,7 @@
 import json
 
+from airflow.utils.helpers import chain
+
 from bietlejuice.jobs.composer.dags.base.dw_staging_sub_dag import DWStagingSubDAG
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
@@ -25,7 +27,6 @@ class IncrementalDWSubDAG(DWStagingSubDAG):
         extra_query_template_params=None,
         dw_query_filters=None,
     ):
-
         partitions = partitions or []
         extra_query_template_params = extra_query_template_params or {}
         dw_query_filters = dw_query_filters or {}
@@ -112,23 +113,10 @@ class IncrementalDWSubDAG(DWStagingSubDAG):
             },
         )
 
-        validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
-            dag=sub_dag,
-            task_id="validate-sync-hive-metastore-table",
-            json={
-                "spark_python_task": {
-                    "python_file": f"{self.spark_job_path}/validate_sync_metastore_tables.py",
-                    "parameters": [
-                        LayerEnum.DW.value,
-                        self.dw_schema,
-                        "--table-name",
-                        table_name,
-                    ],
-                }
-            },
+        chain(
+            load_table_to_dw_staging_schema,
+            load_table_to_dw_final_schema,
+            [load_table_to_redshift, sync_metastore_table_task],
         )
-
-        load_table_to_dw_final_schema >> sync_metastore_table_task >> validate_sync_metastore_table_task
-        load_table_to_dw_staging_schema >> load_table_to_dw_final_schema >> load_table_to_redshift
 
         return sub_dag

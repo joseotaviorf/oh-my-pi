@@ -95,17 +95,6 @@ sync_metastore_raw_tables_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-validate_sync_metastore_raw_table_task = QuintoAndarDatabricksSubmitRunOperator(
-    dag=dag,
-    task_id="validate-sync-hive-metastore-table",
-    json={
-        "spark_python_task": {
-            "python_file": BASE_SPARK_JOBS_PATH + "validate_sync_metastore_tables.py",
-            "parameters": [LayerEnum.RAW.value, SOURCE, "--all-tables"],
-        }
-    },
-)
-
 try:
     media_names = FileService.list_layer_sql_files(SOURCE, "")
 except RuntimeError:
@@ -145,6 +134,5 @@ airflow_helpers.chain(
     create_cluster_task,
     google_ads_load_to_raw_task,
     sync_metastore_raw_tables_task,
-    validate_sync_metastore_raw_table_task,
     terminate_cluster_task,
 )

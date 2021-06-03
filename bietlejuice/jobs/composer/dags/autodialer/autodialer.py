@@ -118,25 +118,9 @@ def build_table_sub_dag(
         },
     )
 
-    validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
-        dag=table_sub_dag,
-        task_id="validate-sync-hive-metastore-table",
-        json={
-            "spark_python_task": {
-                "python_file": BASE_SPARK_JOBS_PATH
-                + "validate_sync_metastore_tables.py",
-                "parameters": [
-                    LayerEnum.CLEAN.value,
-                    source,
-                    "--table-name",
-                    table_name,
-                ],
-            }
-        },
+    clean_table_task.set_downstream(
+        [sync_metastore_tables_task, create_clean_external_tables_task]
     )
-
-    clean_table_task >> sync_metastore_tables_task >> validate_sync_metastore_table_task
-    clean_table_task >> create_clean_external_tables_task
     return table_sub_dag
 
 
@@ -272,17 +256,6 @@ sync_hive_metastore_raw_tables_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-validate_sync_metastore_raw_tables_task = QuintoAndarDatabricksSubmitRunOperator(
-    dag=main_dag,
-    task_id="validate-sync-hive-metastore-raw-tables",
-    json={
-        "spark_python_task": {
-            "python_file": BASE_SPARK_JOBS_PATH + "validate_sync_metastore_tables.py",
-            "parameters": [LayerEnum.RAW.value, SOURCE, "--all-tables"],
-        }
-    },
-)
-
 file_list = FileService.list_layer_sql_files(SOURCE, "clean")
 for file_name in file_list:
     file_name = FileService.remove_file_extension(file_name)
@@ -308,7 +281,6 @@ chain(
     create_cluster_task,
     create_raw_sub_tasks,
     sync_hive_metastore_raw_tables_task,
-    validate_sync_metastore_raw_tables_task,
     terminate_cluster_task,
 )
 

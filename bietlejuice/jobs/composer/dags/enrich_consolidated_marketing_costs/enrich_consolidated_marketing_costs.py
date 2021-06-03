@@ -125,28 +125,7 @@ sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
-    dag=dag,
-    task_id=f"validate-sync-hive-metastore-{slugged_enrich_table_name}",
-    json={
-        "spark_python_task": {
-            "python_file": f"{BASE_SPARK_JOBS_PATH}validate_sync_metastore_tables.py",
-            "parameters": [
-                LayerEnum.ENRICH.value,
-                SOURCE,
-                "--table-name",
-                enrich_table_name,
-            ],
-        }
-    },
-)
-
-chain(
-    consolidated_sharing_rules,
-    sync_metastore_table_task,
-    validate_sync_metastore_table_task,
-    terminate_cluster_task,
-)
+chain(consolidated_sharing_rules, sync_metastore_table_task, terminate_cluster_task)
 
 base_enrich_tasks = list(enrich_sub_dags.values())
 base_enrich_tasks.append(consolidated_sharing_rules)

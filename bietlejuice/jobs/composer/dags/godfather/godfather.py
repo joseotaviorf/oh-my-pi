@@ -187,28 +187,9 @@ def build_table_sub_dag(
         },
     )
 
-    validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
-        dag=table_sub_dag,
-        task_id="validate-sync-hive-metastore-table",
-        json={
-            "spark_python_task": {
-                "python_file": BASE_SPARK_JOBS_PATH
-                + "validate_sync_metastore_tables.py",
-                "parameters": [
-                    LayerEnum.CLEAN.value,
-                    source,
-                    "--table-name",
-                    f"{schema}_{table_name}",
-                ],
-            }
-        },
+    clean_table_task.set_downstream(
+        [sync_metastore_table_task, create_clean_external_tables_task]
     )
-
-    clean_table_task >> sync_metastore_table_task >> validate_sync_metastore_table_task
-
-    clean_table_task >> create_clean_external_tables_task
-
-    # Todo: implement dim_task. Will be done on next PR
 
     return table_sub_dag
 
@@ -237,17 +218,6 @@ sync_metastore_tables_task = QuintoAndarDatabricksSubmitRunOperator(
                 SOURCE,
                 "--all-tables",
             ],
-        }
-    },
-)
-
-validate_sync_metastore_tables_task = QuintoAndarDatabricksSubmitRunOperator(
-    dag=DAG,
-    task_id="validate-sync-hive-metastore-tables",
-    json={
-        "spark_python_task": {
-            "python_file": BASE_SPARK_JOBS_PATH + "validate_sync_metastore_tables.py",
-            "parameters": [LayerEnum.RAW.value, SOURCE, "--all-tables"],
         }
     },
 )
@@ -290,6 +260,5 @@ for schema in SOURCE_SCHEMAS:
         create_cluster_task,
         load_raw_sub_dag,
         sync_metastore_tables_task,
-        validate_sync_metastore_tables_task,
         terminate_cluster_task,
     )

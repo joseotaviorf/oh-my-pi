@@ -135,17 +135,6 @@ for TABLE_NAME, SHEET_DETAILS in GOOGLE_FILES.items():
         },
     )
 
-    validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
-        dag=dag,
-        task_id=f"validate-sync-hive-metastore-{slugged_table_name}",
-        json={
-            "spark_python_task": {
-                "python_file": f"{BASE_SPARK_JOBS_PATH}validate_sync_metastore_tables.py",
-                "parameters": [LayerEnum.RAW.value, SOURCE, "--table-name", TABLE_NAME],
-            }
-        },
-    )
-
     airflow_helpers.chain(
         create_cluster_task,
         gsheets_to_datalake_raw_task,
@@ -154,8 +143,5 @@ for TABLE_NAME, SHEET_DETAILS in GOOGLE_FILES.items():
     )
 
     airflow_helpers.chain(
-        gsheets_to_datalake_raw_task,
-        sync_metastore_table_task,
-        validate_sync_metastore_table_task,
-        terminate_cluster_task,
+        gsheets_to_datalake_raw_task, sync_metastore_table_task, terminate_cluster_task
     )

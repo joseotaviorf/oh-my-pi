@@ -129,28 +129,8 @@ for app_group in APP_GROUPS:
             },
         )
 
-        validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
-            dag=dag,
-            task_id=f"validate-sync-hive-metastore-{identifier}-details-{app_group}",
-            json={
-                "spark_python_task": {
-                    "python_file": BASE_SPARK_JOBS_PATH
-                    + "validate_sync_metastore_tables.py",
-                    "parameters": [
-                        LayerEnum.RAW.value,
-                        SOURCE,
-                        "--table-name",
-                        f"{identifier}_details_{app_group}",
-                    ],
-                }
-            },
-        )
-
         airflow_helpers.chain(
-            load_to_raw_task,
-            sync_metastore_table_task,
-            validate_sync_metastore_table_task,
-            terminate_cluster_task,
+            load_to_raw_task, sync_metastore_table_task, terminate_cluster_task
         )
 
         airflow_helpers.chain(

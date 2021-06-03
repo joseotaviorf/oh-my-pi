@@ -94,17 +94,6 @@ sync_metastore_tables_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
-    dag=dag,
-    task_id="validate-sync-hive-metastore-table",
-    json={
-        "spark_python_task": {
-            "python_file": SPARK_JOBS_PATH + "/validate_sync_metastore_tables.py",
-            "parameters": [LayerEnum.RAW.value, SOURCE, "--all-tables"],
-        }
-    },
-)
-
 clean_sub_dag = DatalakeSubDAG(
     dag_id=DAG_ID,
     start_date=MAIN_START_DATE,
@@ -128,10 +117,10 @@ clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
+
 airflow_helpers.chain(
     criteo_campaigns_to_datalake_raw_task,
     sync_metastore_tables_task,
-    validate_sync_metastore_table_task,
     terminate_cluster_task,
 )
 

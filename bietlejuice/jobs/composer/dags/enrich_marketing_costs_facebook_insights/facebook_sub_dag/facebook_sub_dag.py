@@ -151,24 +151,7 @@ class FacebookSubDAG(BaseSubDAG):
             },
         )
 
-        validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
-            dag=sub_dag,
-            task_id="validate-sync-hive-metastore-table",
-            json={
-                "spark_python_task": {
-                    "python_file": BASE_SPARK_JOBS_PATH
-                    + "validate_sync_metastore_tables.py",
-                    "parameters": [
-                        self.layer.value,
-                        self.target_database_base_name,
-                        "--table-name",
-                        table_name,
-                    ],
-                }
-            },
-        )
-
         load_table >> create_external_table
-        load_table >> sync_metastore_table_task >> validate_sync_metastore_table_task
+        load_table >> sync_metastore_table_task
 
         return sub_dag

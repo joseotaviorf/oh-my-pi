@@ -142,20 +142,8 @@ for subscription in SUBSCRIPTIONS:
         },
     )
 
-    validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
-        dag=dag,
-        task_id=f"validate-sync-hive-metastore-{slugged_table_name}",
-        json={
-            "spark_python_task": {
-                "python_file": BASE_SPARK_JOB_PATH
-                + "validate_sync_metastore_tables.py",
-                "parameters": [LayerEnum.RAW.value, SOURCE, "--table-name", table_name],
-            }
-        },
-    )
-
     create_cluster_task >> load_to_raw_task >> clean_sub_dags.pop(
         table_name
     ) >> terminate_cluster_task
 
-    load_to_raw_task >> sync_metastore_tables_task >> validate_sync_metastore_table_task >> terminate_cluster_task
+    load_to_raw_task >> sync_metastore_tables_task >> terminate_cluster_task
