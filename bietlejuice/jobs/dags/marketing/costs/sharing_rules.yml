@@ -50,17 +50,17 @@ s012s:
   query: marketing/costs/s012s.sql
   funnel_side: social
 
-d013d:
-  query: marketing/costs/d013d.sql
-  funnel_side: demand
+#d013d: Killed. The query was too heavy causing the job take longer to run
+#  query: marketing/costs/d013d.sql
+#  funnel_side: demand
 
 p014p:
   query: marketing/costs/p014p.sql
   funnel_side: partners
 
-d015d:
-  query: marketing/costs/d015d.sql
-  funnel_side: demand
+#d015d: Killed. The query was too heavy causing the job take longer to run
+#  query: marketing/costs/d015d.sql
+#  funnel_side: demand
 
 b016b:
   query: marketing/costs/b016b.sql
