@@ -31,7 +31,7 @@ house_owner AS (
 SELECT DISTINCT
     t.id_ticket,
     own.id_house_listing,
-    t.id_contract,
+    ten.id_contract,
     zuc.id_user,
     zuc.id_personal_document,
     ten.id_client,
