@@ -38,7 +38,7 @@ CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 DAG_ID = f"bietlejuice.{SOURCE}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2020, 7, 27, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 5 * * *"
 
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 

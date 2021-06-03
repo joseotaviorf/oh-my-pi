@@ -42,7 +42,7 @@ LIBRARIES_DESCRIPTION = Variable.get(
 DAG_ID = f"bietlejuice.{SOURCE}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 1, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 dag = DAG(

@@ -40,7 +40,7 @@ CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 DAG_ID = f"bietlejuice.{SOURCE}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2021, 2, 18, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 2 * * *"
 
 dag = DAG(
     dag_id=DAG_ID,

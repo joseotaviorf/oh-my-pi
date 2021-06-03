@@ -18,7 +18,7 @@ SOURCE = "sales_flow"
 DAG_ID = f"bietlejuice.{SOURCE}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2021, 3, 2, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
 
 # airflow vars
 ENV = os.environ.get("ENVIRONMENT")

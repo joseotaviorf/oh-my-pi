@@ -25,7 +25,7 @@ DAG_ID = f"bietlejuice.{MEDIA}"
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2019, 6, 1, 0, 0, 0, tzinfo=local_tz)
-MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
 
 # s3 paths setup
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
