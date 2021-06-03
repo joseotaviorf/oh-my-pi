@@ -19,6 +19,14 @@ WITH zendesk_email AS (
     ac.agent_company,
     ac.manager AS agent_manager,
     ac.email AS agent_email,
+    tf.request_type,
+    tf.client_type,
+    tf.customer_type_tag,
+    tf.contact_motivation_tag,
+    tf.contact_theme_tag,
+    tf.custom_fields,
+    tf.channel,
+    tf.custom_fields,
     CASE
       WHEN CAST(tfm.minutes_requester_wait_business AS INT) / (60.0 * COALESCE(CAST(tfm.replies AS INT),1)) < 6 THEN TRUE
       WHEN CAST(tfm.minutes_requester_wait_business AS INT) / (60.0 * COALESCE(CAST(tfm.replies AS INT),1)) >= 6 THEN FALSE
@@ -41,6 +49,9 @@ WITH zendesk_email AS (
   JOIN
     datalake_zendesk_ticket_funnels.tickets_funnel_metrics tfm
       ON t.id_ticket = tfm.id_ticket
+  JOIN
+    datalake_zendesk_ticket_funnels.ticket_funnel tf
+      ON t.id_ticket = tf.id_ticket
   LEFT JOIN
     datalake_gsheets_clean.agents_control ac
       ON t.id_assignee = ac.id_assignee
@@ -79,24 +90,14 @@ csat AS (
         ON t.id_ticket = lut.id_ticket
         AND t.ts_updated = lut.ts_last_updated
 ),
-taxonomy AS (
-  SELECT 
-    id_ticket,
-    request_type,
-    client_type,
-    customer_type_tag,
-    contact_motivation_tag,
-    contact_theme_tag,
-    custom_fields,
-    channel
-  FROM 
-    datalake_zendesk_ticket_funnels.ticket_funnel 
-),
 back_tickets AS (
   SELECT
     id_ticket AS back_ticket,
     status AS back_ticket_status,
-    REGEXP_EXTRACT(SUBSTRING(SPLIT(description, 'Ticket do contato')[1], 1, 18), '([0-9]{{8}})', 1) AS front_ticket
+    COALESCE(
+      GET_JSON_OBJECT(custom_fields, '$.Ticket de contato'),
+      REGEXP_EXTRACT(SUBSTRING(SPLIT(description, 'Ticket do contato')[1], 1, 18), '([0-9]{{8}})', 1) 
+    ) AS front_ticket
   FROM
     zendesk_email
   LEFT JOIN
@@ -105,7 +106,7 @@ back_tickets AS (
   WHERE 
     (tags LIKE '%tarefa_atendimento_escalado%' OR LOWER(dc.front_or_back) = 'back')
     AND (tags NOT LIKE '%bot_end_conversation%' AND tags NOT LIKE '%closed_by_merge%')
-    AND REGEXP_EXTRACT(SUBSTRING(SPLIT(description, 'Ticket do contato')[1], 1, 18), '([0-9]{{8}})', 1) != ''
+    AND COALESCE(GET_JSON_OBJECT(custom_fields, '$.Ticket de contato'),REGEXP_EXTRACT(SUBSTRING(SPLIT(description, 'Ticket do contato')[1], 1, 18), '([0-9]{{8}})', 1)) != ''
 )
 SELECT DISTINCT 
   ze.id_ticket,
@@ -128,13 +129,13 @@ SELECT DISTINCT
   cs.score_reason,
   cs.csat_comment,
   cs.satisfaction_rating,
-  t.channel,
-  t.custom_fields,
-  t.request_type,
-  t.client_type,
-  t.customer_type_tag,
-  t.contact_motivation_tag,
-  t.contact_theme_tag,
+  ze.channel,
+  ze.custom_fields,
+  ze.request_type,
+  ze.client_type,
+  ze.customer_type_tag,
+  ze.contact_motivation_tag,
+  ze.contact_theme_tag,
   bt.front_ticket IS NOT NULL AS has_back_tickets,
   ze.tags LIKE '%bot_end_conversation%' AS is_bot, 
   ze.tags LIKE '%closed_by_merge%' AS is_closed_by_merge,
@@ -152,9 +153,6 @@ SELECT DISTINCT
 FROM 
   zendesk_email ze
 JOIN
-  taxonomy t
-    ON t.id_ticket = ze.id_ticket
-JOIN
   datalake_gsheets_clean.department_control dc
     ON dc.department = ze.department
     AND LOWER(dc.front_or_back) <> 'back'
@@ -166,7 +164,7 @@ LEFT JOIN
     ON bt.front_ticket = ze.id_ticket
 WHERE 
   ze.tags NOT LIKE '%tarefa_atendimento_escalado%'
-  AND t.channel IN ('email', 'form_faq', 'web', 'other')
+  AND ze.channel IN ('email', 'form_faq', 'web', 'other')
   -- emails with the tags below are not new demands or automatically closed, therefore, they should not be considered
   AND ze.tags NOT LIKE '%resolve_ticket_acompanhamento%'
   AND ze.tags NOT LIKE '%fechado_automaticamente_noreply%'

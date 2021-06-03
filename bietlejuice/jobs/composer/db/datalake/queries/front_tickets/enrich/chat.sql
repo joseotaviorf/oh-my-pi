@@ -9,12 +9,13 @@ WITH quinto_messenger_tickets AS (
   task_timestamps AS (
     SELECT
       id_task,
+      MAX(task_queue_name) AS department,
       MAX(ts_created_local) AS ts_task_closed,
       MIN(ts_created_local) AS ts_task_created
     FROM
       datalake_quinto_messenger.task_event
     WHERE 
-      type IN ('reservation.completed', 'reservation.rejected', 'reservation.timeout', 'reservation.accepted')
+      type LIKE 'reservation.%'
     GROUP BY 1
   ),
   chat_metrics AS (
@@ -30,37 +31,69 @@ WITH quinto_messenger_tickets AS (
       datalake_quinto_messenger.task_event te
         ON t.id_task = te.id_task
     GROUP BY 1
+  ),
+  task AS (
+    SELECT 
+      t.id_task,
+      t.id_channel,
+      t.id_agent,
+      t.agent_email,
+      department,
+      LAG(department,1) OVER (PARTITION BY id_channel ORDER BY tt.ts_task_created) AS transferred_from_dept,
+      LEAD(department,1) OVER (PARTITION BY id_channel ORDER BY tt.ts_task_created) AS transferred_to_dept,
+      CASE
+          WHEN LEAD(department,1) OVER (PARTITION BY id_channel ORDER BY tt.ts_task_created) = department THEN 'internal'
+          WHEN LEAD(department,1) OVER (PARTITION BY id_channel ORDER BY tt.ts_task_created) != department THEN 'external'
+      END AS transference_type,
+      t.customer_type_tag,
+      t.contact_motivation_tag,
+      t.contact_theme_tag,
+      t.seconds_to_first_response,
+      tt.ts_task_closed,
+      tt.ts_task_created,
+      t.ts_created,
+      t.ts_updated
+    FROM 
+      datalake_quinto_messenger.task t
+    JOIN
+      last_updated_task lup
+        ON t.id_task = lup.id_task
+        AND t.ts_updated = lup.ts_last_updated
+    JOIN
+      task_timestamps tt
+        ON tt.id_task = t.id_task
   )
   SELECT
       t.id_task,
       c.id_conversation,
       c.id_source AS id_session,
-      id_agent,
+      t.id_agent,
       t.agent_email,
       ac.manager AS agent_manager,
       ac.agent_name,
       ac.agent_company,
-      seconds_to_first_response AS seconds_first_reply,
-      seconds_to_first_response/60.0 AS task_minutes_wait_time,
-      task_queue_name AS department,
+      t.seconds_to_first_response AS seconds_first_reply,
+      t.seconds_to_first_response/60.0 AS task_minutes_wait_time,
+      t.department,
+      t.transferred_from_dept,
+      t.transferred_to_dept,
+      t.transference_type,
       CAST(COALESCE(cm.number_of_departments,0) AS INT) AS number_of_departments,
       CAST(COALESCE(cm.number_of_tasks,0) AS INT) AS number_of_tasks,
       cm.number_of_tasks > 1 AS has_transfers,
       CASE
-          WHEN seconds_to_first_response / 60 <= 15 THEN TRUE
-          WHEN seconds_to_first_response / 60 > 15 THEN FALSE
+          WHEN t.seconds_to_first_response / 60 <= 15 THEN TRUE
+          WHEN t.seconds_to_first_response / 60 > 15 THEN FALSE
           ELSE NULL
       END AS sla_achieved,
-      customer_type_tag,
-      contact_motivation_tag,
-      contact_theme_tag,
+      t.customer_type_tag,
+      t.contact_motivation_tag,
+      t.contact_theme_tag,
       c.seconds_duration/60.0 AS minutes_full_resolution_time_calendar,
       t.ts_created,
       t.ts_updated,
-      tt.ts_task_closed,
-      tt.ts_task_created,
-      ts_twilio_created_local,
-      ts_twilio_updated_local,
+      t.ts_task_closed,
+      t.ts_task_created,
       cm.ts_first_event,
       cm.ts_last_event
     FROM
@@ -69,21 +102,11 @@ WITH quinto_messenger_tickets AS (
       chat_metrics cm
         ON cm.id_conversation = c.id_source
     LEFT JOIN
-      datalake_quinto_messenger.task t
+      task t
         ON t.id_channel = c.id_channel
     LEFT JOIN
       datalake_gsheets_clean.agents_control ac
         ON t.agent_email = ac.email
-    JOIN
-      last_updated_task lup
-        ON t.id_task = lup.id_task
-        AND t.ts_updated = lup.ts_last_updated
-    JOIN
-      datalake_quinto_messenger.task_event te
-        ON t.id_task = te.id_task
-    LEFT JOIN
-      task_timestamps tt
-        ON tt.id_task = t.id_task
     WHERE
         c.ts_created > '2020-08-20'
         AND c.channel_status <> 'missed'
@@ -141,12 +164,15 @@ back_tickets AS (
     zd.id_ticket AS back_ticket,
     zd.status AS back_ticket_status,
     zd2.id_ticket AS front_ticket,
-    REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})',1) AS front_task
+    COALESCE(
+      GET_JSON_OBJECT(zd.custom_fields, '$.Ticket de contato'),
+      REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})',1) 
+    ) AS front_task
   FROM
     zendesk_aditional_ticket_info zd
   JOIN
     quinto_messenger_tickets qmt
-      ON qmt.id_task = REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})',1)
+      ON qmt.id_task = COALESCE(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket de contato'),REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})',1))
   LEFT JOIN
     datalake_gsheets_clean.department_control dc
       ON dc.department = zd.zendesk_ticket_department 
@@ -156,7 +182,7 @@ back_tickets AS (
   WHERE
     (zd.tags LIKE '%tarefa_atendimento_escalado%' OR LOWER(dc.front_or_back) = 'back')
     AND (zd.tags NOT LIKE '%bot_end_conversation%' AND zd.tags NOT LIKE '%closed_by_merge%')
-    AND REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})',1) != '' 
+    AND COALESCE(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket de contato'),REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})',1)) != '' 
   GROUP BY 1,2,3,4
 )
 SELECT DISTINCT 
@@ -173,12 +199,9 @@ SELECT DISTINCT
   ct.department,
   FIRST(ct.department) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_first_event ASC) AS first_department,
   FIRST(ct.department) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_first_event DESC) AS last_department,
-  LAG(ct.department,1) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created) AS transferred_from_dept,
-  LEAD(ct.department,1) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created) AS transferred_to_dept,
-  CASE
-      WHEN LEAD(ct.department,1) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created) = ct.department THEN 'internal'
-      WHEN LEAD(ct.department,1) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created) != ct.department THEN 'external'
-  END AS transference_type,
+  ct.transferred_from_dept,
+  ct.transferred_to_dept,
+  ct.transference_type,
   zd.request_type,
   zd.client_type,
   zd.customer_type_tag,
@@ -216,9 +239,7 @@ SELECT DISTINCT
   ct.ts_first_event AS ts_ticket_started,
   ct.ts_last_event AS ts_ticket_ended,
   ct.ts_task_closed,
-  ct.ts_task_created,
-  ct.ts_twilio_created_local,
-  ct.ts_twilio_updated_local
+  ct.ts_task_created
 FROM
   quinto_messenger_tickets ct
 JOIN

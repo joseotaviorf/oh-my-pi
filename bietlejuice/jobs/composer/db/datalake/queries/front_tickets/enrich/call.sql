@@ -17,7 +17,7 @@ WITH tasks AS (
     FROM
         datalake_bigfone_twilio.call_flex_events
     WHERE
-        event_type IN ('reservation.completed', 'reservation.timeout', 'reservation.canceled', 'reservation.rejected', 'reservation.accepted')
+        event_type LIKE 'reservation.%'
     GROUP BY 1
   ),
   agent_info AS (
@@ -51,6 +51,12 @@ WITH tasks AS (
     agent_name,
     agent_skills,
     queue_name,
+    LAG(queue_name,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) AS transferred_from_dept,
+    LEAD(queue_name,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) AS transferred_to_dept,
+    CASE
+        WHEN LEAD(queue_name,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) = queue_name THEN 'internal'
+        WHEN LEAD(queue_name,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) != queue_name THEN 'external'
+    END AS transference_type,
     seconds_duration,
     seconds_wait_time,
     seconds_talk_time,
@@ -213,7 +219,10 @@ zendesk_aditional_ticket_info AS (
 ),
 back_tickets AS (
   SELECT 
-    REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})',1) AS front_task,
+    COALESCE(
+      GET_JSON_OBJECT(zd.custom_fields, '$.Ticket de contato'),
+      REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})',1) 
+    ) AS front_task,
     zd.id_ticket AS back_ticket,
     zd.status,
     zd2.id_ticket AS front_ticket
@@ -221,7 +230,7 @@ back_tickets AS (
     zendesk_aditional_ticket_info zd
   JOIN
     call
-      ON call.id_task = REGEXP_EXTRACT(description, '(WT[a-z0-9]{{20,40}})',1)
+      ON call.id_task = COALESCE(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket de contato'),REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})',1))
   LEFT JOIN
     datalake_gsheets_clean.department_control dc
       ON dc.department = zd.zendesk_ticket_department 
@@ -231,7 +240,7 @@ back_tickets AS (
   WHERE 
     (zd.tags LIKE '%tarefa_atendimento_escalado%' OR LOWER(dc.front_or_back) = 'back')
     AND (zd.tags NOT LIKE '%bot_end_conversation%' AND zd.tags NOT LIKE '%closed_by_merge%')
-    AND REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})',1) != '' 
+    AND COALESCE(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket de contato'),REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})',1)) != '' 
   GROUP BY 1,2,3,4
 )
 SELECT DISTINCT 
@@ -249,14 +258,11 @@ SELECT DISTINCT
   t.agent_name,
   t.agent_skills,
   t.queue_name AS department,
-  FIRST(t.queue_name) OVER (PARTITION BY c.id_task ORDER BY c.ts_created ASC) AS first_department,
-  FIRST(t.queue_name) OVER (PARTITION BY c.id_task ORDER BY c.ts_created DESC) AS last_department,
-  LAG(t.queue_name,1) OVER (PARTITION BY zd.id_ticket ORDER BY t.ts_twilio_created_local) AS transferred_from_dept,
-  LEAD(t.queue_name,1) OVER (PARTITION BY zd.id_ticket ORDER BY t.ts_twilio_created_local) AS transferred_to_dept,
-  CASE
-      WHEN LEAD(t.queue_name,1) OVER (PARTITION BY zd.id_ticket ORDER BY t.ts_twilio_created_local) = t.queue_name THEN 'internal'
-      WHEN LEAD(t.queue_name,1) OVER (PARTITION BY zd.id_ticket ORDER BY t.ts_twilio_created_local) != t.queue_name THEN 'external'
-  END AS transference_type,
+  FIRST(t.queue_name) OVER (PARTITION BY zd.id_ticket ORDER BY c.ts_created ASC) AS first_department,
+  FIRST(t.queue_name) OVER (PARTITION BY zd.id_ticket ORDER BY c.ts_created DESC) AS last_department,
+  t.transferred_from_dept,
+  t.transferred_to_dept,
+  t.transference_type,
   CASE
       WHEN seconds_total_wait_time <= 60 AND t.is_answered THEN TRUE
       WHEN seconds_total_wait_time > 60 AND t.is_answered THEN FALSE
