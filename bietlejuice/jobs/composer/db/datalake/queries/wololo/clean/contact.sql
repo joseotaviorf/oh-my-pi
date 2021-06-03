@@ -3,6 +3,7 @@ SELECT
     prospectreferenceid AS id_prospect_reference,
     analystid AS id_analyst,
     externalcallid AS id_external_call,
+    analystemail as analyst_email,
     channel,
     salescompany AS sales_company,
     phoneoutput AS phone_output,

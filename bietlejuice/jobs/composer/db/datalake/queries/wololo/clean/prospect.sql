@@ -2,6 +2,9 @@ SELECT
     id,
     referenceid AS id_reference,
     dimensionentity_id AS id_dimension_entity,
+    affiliateid AS id_affiliate,
+    taskid AS id_task,
+    externalid AS id_external,
     status,
     address,
     number,
@@ -13,13 +16,22 @@ SELECT
     rentprice AS rent_price,
     condominium,
     name,
+    email,
     phone,
     phonesecondary AS phone_secondary,
     phonetertiary AS phone_tertiary,
+    origin,
+    originphone AS origin_phone,
+    leadtype AS lead_type,
+    affiliatetype AS affiliate_type,
+    affiliatename AS affiliate_name,
+    mktorigin AS mkt_origin,
     longtail AS is_long_tail,
     whatsappoptedin AS is_whatsapp_opted_in,
     forsale AS is_for_sale,
     forrent AS is_for_rent,
-    exclusivityintent AS is_exclusivity_intent
+    exclusivityintent AS is_exclusivity_intent,
+    created_at AS ts_created,
+    updated_at AS ts_updated
 FROM
     datalake_wololo_raw.prospect
