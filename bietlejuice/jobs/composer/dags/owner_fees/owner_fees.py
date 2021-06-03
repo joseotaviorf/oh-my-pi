@@ -8,6 +8,8 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
+from airflow.utils.helpers import chain
+
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
@@ -103,19 +105,12 @@ for table in configs_file:
         },
     )
 
-    validate_sync_metastore_raw_table_task = QuintoAndarDatabricksSubmitRunOperator(
-        dag=dag,
-        task_id=f"validate-{slugged_table_name}-sync-hive-metastore-raw-table",
-        json={
-            "spark_python_task": {
-                "python_file": BASE_SPARK_JOBS_PATH
-                + "validate_sync_metastore_tables.py",
-                "parameters": [LayerEnum.RAW.value, SOURCE, "--table-name", table_name],
-            }
-        },
+    chain(
+        create_cluster_task,
+        raw_task,
+        sync_metastore_raw_table_task,
+        terminate_cluster_task,
     )
-
-    create_cluster_task >> raw_task >> sync_metastore_raw_table_task >> validate_sync_metastore_raw_table_task >> terminate_cluster_task
     raw_tasks[table_name] = raw_task
 
 # [END] Raw layer sub dags

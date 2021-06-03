@@ -108,22 +108,8 @@ sync_metastore_raw_tables_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-validate_sync_metastore_raw_tables_task = QuintoAndarDatabricksSubmitRunOperator(
-    dag=dag,
-    task_id=f"validate-{slugged_table_name}-sync-hive-metastore-raw-table",
-    json={
-        "spark_python_task": {
-            "python_file": SPARK_JOBS_PATH + "validate_sync_metastore_tables.py",
-            "parameters": [LayerEnum.RAW.value, DAG_NAME, "--all-tables"],
-        }
-    },
-)
-
 airflow_helpers.chain(
-    list(raw_tasks.values()),
-    sync_metastore_raw_tables_task,
-    validate_sync_metastore_raw_tables_task,
-    terminate_cluster_task,
+    list(raw_tasks.values()), sync_metastore_raw_tables_task, terminate_cluster_task
 )
 
 # [END] Raw layer sub dags
