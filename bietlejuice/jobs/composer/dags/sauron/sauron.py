@@ -11,7 +11,7 @@ from airflow.operators.quintoandar_databricks import (
 )
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
-from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
+from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.jobs.composer.services import FileService
 
 SOURCE = "sauron"
@@ -96,29 +96,34 @@ sync_metastore_tables_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-clean_sub_dag = DatalakeSubDAG(
-    dag_id=DAG_ID,
-    start_date=MAIN_START_DATE,
+task_group = DatalakeTaskGroup(
+    dag=dag,
     env=ENV,
     datalake_bucket=DATALAKE_BUCKET,
-    layer=LayerEnum.CLEAN,
-    database_base_name=SOURCE,
     relative_query_path=SOURCE,
-    spark_job_paths=BASE_SPARK_JOB_PATH,
+    spark_jobs_path=BASE_SPARK_JOB_PATH,
     athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
 )
 
-file_list = FileService.list_sql_files_without_extension_from_layer(
+table_names = FileService.list_sql_files_without_extension_from_layer(
     SOURCE, LayerEnum.CLEAN.value
 )
 
-clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(
-    dag, file_list, is_incremental=True, partitions=["year", "month", "day"]
+clean_task_groups = task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.CLEAN,
+    source_database_base_name=SOURCE,
+    target_database_base_name=SOURCE,
+    table_names=table_names,
+    is_incremental=True,
+    partitions=["year", "month", "day"],
 )
 
-create_cluster_task >> sauron_to_datalake_raw_task >> list(
-    clean_sub_dags.values()
-) >> terminate_cluster_task
+airflow_helpers.chain(
+    create_cluster_task,
+    sauron_to_datalake_raw_task,
+    DatalakeTaskGroup.all_first_tasks(clean_task_groups),
+)
+terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
 
 airflow_helpers.chain(
     sauron_to_datalake_raw_task, sync_metastore_tables_task, terminate_cluster_task
