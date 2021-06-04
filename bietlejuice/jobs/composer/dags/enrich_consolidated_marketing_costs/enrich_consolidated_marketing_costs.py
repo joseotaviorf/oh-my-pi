@@ -2,11 +2,9 @@ from datetime import datetime
 import pendulum
 import os
 
-from airflow.utils.helpers import chain
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
-    QuintoAndarDatabricksSubmitRunOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 
@@ -36,9 +34,6 @@ CLUSTER_DESCRIPTION = Variable.get(
     "databricks_bietlejuice_marketing_costs_cluster", deserialize_json=True
 )
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
-CUSTOM_LIBRARIES = [
-    {"jar": f"{ARTIFACTS_S3_BUCKET}/jars/RedshiftJDBC42-no-awssdk-1.2.12.1017.jar"}
-]
 local_tz = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz)
 MAIN_SCHEDULE_INTERVAL = None
@@ -60,10 +55,7 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag,
-    task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=CUSTOM_LIBRARIES,
+    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -93,41 +85,6 @@ enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(
 )
 
 consolidated_media_costs = enrich_sub_dags.pop("consolidated_media_costs")
-
-consolidated_sharing_rules = QuintoAndarDatabricksSubmitRunOperator(
-    task_id=f"load-mkt-consolidated-sharing-rules-to-enrich",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": f"{SPARK_JOBS_PATH}load_sharing_rules_to_datalake.py",
-            "parameters": [ENV, DATALAKE_BUCKET],
-        }
-    },
-)
-
-enrich_table_name = "sharing_rules_marketing_daily_costs"
-slugged_enrich_table_name = enrich_table_name.replace("_", "-")
-
-sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id=f"sync-hive-metastore-{slugged_enrich_table_name}",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": f"{BASE_SPARK_JOBS_PATH}sync_metastore_tables.py",
-            "parameters": [
-                DATALAKE_BUCKET,
-                LayerEnum.ENRICH.value,
-                SOURCE,
-                "--table-name",
-                enrich_table_name,
-            ],
-        }
-    },
-)
-
-chain(consolidated_sharing_rules, sync_metastore_table_task, terminate_cluster_task)
-
 base_enrich_tasks = list(enrich_sub_dags.values())
-base_enrich_tasks.append(consolidated_sharing_rules)
 
 create_cluster_task >> base_enrich_tasks >> consolidated_media_costs >> terminate_cluster_task

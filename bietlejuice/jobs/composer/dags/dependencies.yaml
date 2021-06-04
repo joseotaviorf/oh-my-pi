@@ -269,6 +269,7 @@ bietlejuice.enrich_chattermill:
 
 bietlejuice.enrich_consolidated_marketing_costs:
   - bietlejuice.enrich_marketing_costs
+  - bietlejuice.enrich_maketing_costs_sharing_rules:load-online-sharing-rules-to-datalake
 
 bietlejuice.enrich_credit_evers:
   - bietlejuice.enrich_invoice:load-credit-invoice-original-due-date-to-enrich

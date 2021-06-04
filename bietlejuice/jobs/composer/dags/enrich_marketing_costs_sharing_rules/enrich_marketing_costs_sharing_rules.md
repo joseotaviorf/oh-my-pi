@@ -24,6 +24,7 @@ Currently, there are the following output tables in our enrich layer:
 
 - `online`
 - `offline`
+- `old_sharing_rules`
 
 ### Responsible Data Team
 
