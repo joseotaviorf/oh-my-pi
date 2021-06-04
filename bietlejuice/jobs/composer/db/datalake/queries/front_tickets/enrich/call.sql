@@ -27,8 +27,7 @@ WITH tasks AS (
       cfe.agent_email,
       GET_JSON_OBJECT(metadata, '$.event_data.WorkerAttributes.location') AS agent_company,
       ac.agent_name,
-      ac.manager AS agent_manager,
-      GET_JSON_OBJECT(metadata, '$.event_data.WorkerAttributes.routing.skills') AS agent_skills
+      ac.manager AS agent_manager
     FROM
       datalake_bigfone_twilio.call_flex_events cfe
     LEFT JOIN
@@ -36,7 +35,7 @@ WITH tasks AS (
         ON cfe.agent_email = ac.email
     WHERE
       id_reservation IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7
+    GROUP BY 1,2,3,4,5,6
   )
   SELECT
     r.id_reservation,
@@ -49,7 +48,6 @@ WITH tasks AS (
     agent_manager,
     agent_company,
     agent_name,
-    agent_skills,
     queue_name,
     LAG(queue_name,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) AS transferred_from_dept,
     LEAD(queue_name,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) AS transferred_to_dept,
@@ -256,7 +254,6 @@ SELECT DISTINCT
   t.agent_manager,
   t.agent_company,
   t.agent_name,
-  t.agent_skills,
   t.queue_name AS department,
   FIRST(t.queue_name) OVER (PARTITION BY zd.id_ticket ORDER BY c.ts_created ASC) AS first_department,
   FIRST(t.queue_name) OVER (PARTITION BY zd.id_ticket ORDER BY c.ts_created DESC) AS last_department,
