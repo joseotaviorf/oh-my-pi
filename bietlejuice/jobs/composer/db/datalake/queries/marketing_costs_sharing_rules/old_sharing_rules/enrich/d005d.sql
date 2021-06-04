@@ -4,7 +4,8 @@ SELECT DISTINCT
     (DENSE_RANK() OVER(PARTITION BY dd.sk_date, dr.city_group ORDER BY fhs.sk_house_listing) +
      DENSE_RANK() OVER(PARTITION BY dd.sk_date, dr.city_group ORDER BY fhs.sk_house_listing DESC) - 1) /
          (DENSE_RANK() OVER(PARTITION BY dd.sk_date ORDER BY fhs.sk_house_listing) +
-         DENSE_RANK() OVER(PARTITION BY dd.sk_date ORDER BY fhs.sk_house_listing DESC) - 1)::FLOAT AS share
+         DENSE_RANK() OVER(PARTITION BY dd.sk_date ORDER BY fhs.sk_house_listing DESC) - 1)::FLOAT AS share,
+    'demand' AS funnel_side
 FROM
     dim_date AS dd
     JOIN fact_house_listing_status AS fhs

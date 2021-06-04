@@ -59,7 +59,8 @@ share AS (--pegando o share da ultima semana
 SELECT
 	d.sk_date AS id_date,
 	d.city_group,
-	COALESCE(s.share, 0) AS share
+	COALESCE(s.share, 0) AS share,
+	'partners' AS funnel_side
 FROM
 	dim_distinct d
 JOIN share s

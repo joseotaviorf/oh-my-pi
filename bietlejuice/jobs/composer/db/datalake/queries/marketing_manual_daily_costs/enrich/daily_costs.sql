@@ -58,8 +58,8 @@ city_group_share_rules AS (
         datalake_marketing_manual_daily_costs_clean.marketing_costs_name_convention_shared_costs s
     JOIN
         datalake_marketing_costs_sharing_rules.old_sharing_rules AS r 
-            ON INT(REPLACE(dt_cost, '-', '')) = r.sk_date
-            AND s.id_rule = r.rule_id
+            ON INT(REPLACE(dt_cost, '-', '')) = r.id_date
+            AND s.id_rule = r.id_rule
             AND s.side = r.funnel_side
     WHERE
         DATE(dt_cost) = DATE('{year}-{month}-{day}')

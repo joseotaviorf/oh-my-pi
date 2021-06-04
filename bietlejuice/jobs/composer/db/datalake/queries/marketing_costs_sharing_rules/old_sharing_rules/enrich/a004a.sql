@@ -67,7 +67,8 @@ share AS (
 SELECT
 	d.sk_date AS id_date,
 	d.city_group,
-	coalesce(s.share,0) AS share
+	coalesce(s.share,0) AS share,
+	'affiliates' AS funnel_side
 FROM
 	dim_distinct d
 	JOIN share s

@@ -7,7 +7,8 @@ SELECT
 		WHEN dr.city_group='Rio de Janeiro' THEN 0.3129
         	WHEN dr.city_group='Porto Alegre' THEN 0.0716
 		ELSE 0
-	END AS share
+	END AS share,
+	'branding' AS funnel_side
 FROM
 	dim_date dd
 	JOIN dim_region dr

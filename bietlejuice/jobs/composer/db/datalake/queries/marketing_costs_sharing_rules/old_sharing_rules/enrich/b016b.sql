@@ -7,7 +7,8 @@ SELECT
 		WHEN dr.city_group='Florianópolis' THEN 0.116
         	WHEN dr.city_group='Belo Horizonte' THEN 0.5977
 		ELSE 0
-	END AS share
+	END AS share,
+	'branding' AS funnel_side
 FROM
 	dim_date dd
 	JOIN dim_region dr

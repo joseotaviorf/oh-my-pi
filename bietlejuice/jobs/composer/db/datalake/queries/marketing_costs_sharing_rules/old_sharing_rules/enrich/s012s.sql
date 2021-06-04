@@ -6,7 +6,8 @@ SELECT
 		WHEN dr.city_group='RMSP' THEN 0.6
 		WHEN dr.city_group='Rio de Janeiro' THEN 0.4
 		ELSE 0
-	END AS share
+	END AS share,
+	'social' AS funnel_side
 FROM
 	dim_date dd
 	JOIN dim_region dr
