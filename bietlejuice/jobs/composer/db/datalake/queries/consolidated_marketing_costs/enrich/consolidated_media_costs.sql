@@ -23,7 +23,7 @@ WITH medias_consolidated AS (
 
 shared_consolidated_costs AS (
     SELECT
-        id_date,
+        mc.id_date,
         origin,
         campaign_name,
         campaign_city,
