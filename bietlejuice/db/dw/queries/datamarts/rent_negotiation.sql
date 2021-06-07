@@ -3,7 +3,7 @@ WITH anniversary_contracts AS (
     	dc.sk_contract,
     	dc.dt_entrance,
     	dd.date AS anniversary_date,
-    	t.dt_termination AS dt_annulment,
+    	COALESCE(t.dt_termination, dc.dt_annulment) AS dt_annulment,
     	dc.is_b2b,
     	dc.status,
     	fhl.sk_house_listing
@@ -16,7 +16,7 @@ WITH anniversary_contracts AS (
 	ON fhl.sk_contract = dc.sk_contract
     WHERE dc.status IN ('Ativo', 'Finalizado')
         AND dd.date >= date '2020-10-01'
-        AND COALESCE(date_trunc('month', t.dt_termination), current_date + interval '3' month) >= date_trunc('month', dd.date)
+        AND COALESCE(DATE_TRUNC('month', COALESCE(t.dt_termination, dc.dt_annulment)), DATEADD(month, 3, GETDATE())) >= DATE_TRUNC('month', dd.date)
 ), pwa_negotiation AS (
     SELECT 
 	id_contract AS pwa_contract, 
