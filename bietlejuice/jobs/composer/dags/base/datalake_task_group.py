@@ -30,7 +30,6 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type env: str
         :param datalake_bucket: datalake bucket in S3
         :type datalake_bucket: str
-
         :param relative_query_path: relative query path from default queries
             path containing sql file for the table to be created
         :type relative_query_path: str
