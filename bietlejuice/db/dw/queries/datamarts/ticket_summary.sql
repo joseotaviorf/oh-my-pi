@@ -581,7 +581,10 @@ tickets_areas AS (
 front_or_back_call_tasks AS (
     SELECT DISTINCT
         sk_ticket AS back_ticket,
-        REGEXP_SUBSTR(description, 'WT[a-z0-9]{20,40}') AS front_task,
+        COALESCE(
+            JSON_EXTRACT_PATH_TEXT(custom_fields, 'Ticket do contato'),
+            REGEXP_SUBSTR(description, 'WT[a-z0-9]{20,40}') 
+        ) AS front_task,
         description,
         ts_created_local
     FROM
@@ -616,7 +619,10 @@ front_or_back_call_tickets AS (
 front_or_back_email_tickets AS (
     SELECT
         sk_ticket AS back_ticket,
-        REGEXP_SUBSTR(SUBSTRING(SPLIT_PART(description, 'Ticket do contato', 2), 1, 18), '[0-9]{8}') AS front_ticket,
+        COALESCE(
+            JSON_EXTRACT_PATH_TEXT(custom_fields, 'Ticket do contato'),
+            REGEXP_SUBSTR(SUBSTRING(SPLIT_PART(description, 'Ticket do contato', 2), 1, 18), '[0-9]{8}') 
+        ) AS front_ticket,
         description,
         ts_created_local
     FROM
@@ -634,7 +640,10 @@ front_or_back_email_tickets AS (
 front_or_back_chat_tasks AS (
     SELECT
         sk_ticket AS back_ticket,
-        REGEXP_SUBSTR(description, 'WT[a-z0-9]{20,40}') AS front_ticket,
+        COALESCE(
+            JSON_EXTRACT_PATH_TEXT(custom_fields, 'Ticket do contato'),
+            REGEXP_SUBSTR(description, 'WT[a-z0-9]{20,40}') 
+        ) AS front_ticket,
         description,
         ts_created_local
     FROM
