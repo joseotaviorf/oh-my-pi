@@ -168,7 +168,7 @@ chat_csat AS(
             WHEN sa.is_solved = FALSE THEN FALSE
             ELSE NULL
         END AS is_solved,
-        DATE(c.ts_attended) AS dt_survey
+        CAST(c.ts_attended AS TIMESTAMP) AS ts_survey
   FROM
       datalake_chat_fup_clean.chats_chat c
   JOIN 
@@ -255,7 +255,7 @@ SELECT DISTINCT
   cc.is_solved,
   cc.csat_score,
   cc.group_name,
-  cc.dt_survey,
+  cc.ts_survey,
   ct.ts_created,
   ct.ts_updated,
   ct.ts_first_event AS ts_ticket_started,
