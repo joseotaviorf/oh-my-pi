@@ -12,6 +12,46 @@ WITH custom_field_ids AS (
         base.custom_fields['[CALL] Call id'] AS id_call --'
     FROM
         datalake_zendesk_custom_fields.custom_fields base
+),
+most_recent_ticket_metric AS (
+    WITH last_extracted AS (
+      SELECT
+          id_ticket,
+          MAX(dt_extracted) AS dt_last_extracted
+      FROM
+          datalake_zendesk_tickets_clean.ticket_metrics
+      GROUP BY 1
+    )
+    SELECT
+        tm.id_ticket,
+        tm.group_stations,
+        tm.assignee_stations,
+        tm.minutes_reply_calendar,
+        tm.minutes_reply_business,
+        tm.minutes_first_resolution_business,
+        tm.minutes_first_resolution_calendar,
+        tm.minutes_requester_wait_business,
+        tm.minutes_requester_wait_calendar,
+        tm.minutes_agent_wait_business,
+        tm.minutes_agent_wait_calendar,
+        tm.minutes_on_hold_business,
+        tm.minutes_on_hold_calendar,
+        tm.minutes_full_resolution_business,
+        tm.minutes_full_resolution_calendar,
+        tm.reopens,
+        tm.replies,
+        tm.ts_initially_assigned,
+        tm.ts_initially_assigned,
+        tm.ts_assigned,
+        tm.ts_assigned,
+        tm.ts_solved,
+        tm.ts_solved
+    FROM
+      datalake_zendesk_tickets_clean.ticket_metrics tm
+    JOIN
+      last_extracted le
+          ON le.id_ticket = tm.id_ticket
+          AND le.dt_last_extracted = tm.dt_extracted
 )
 SELECT DISTINCT
     t.id_ticket,
@@ -65,7 +105,7 @@ SELECT DISTINCT
 FROM
     datalake_zendesk_tickets_clean.tickets t
 LEFT JOIN
-    datalake_zendesk_tickets_clean.ticket_metrics tm
+    most_recent_ticket_metric tm
         ON t.id_ticket=tm.id_ticket
 LEFT JOIN
     custom_field_ids cfi
