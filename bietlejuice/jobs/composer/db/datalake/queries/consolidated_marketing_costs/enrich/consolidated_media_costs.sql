@@ -34,13 +34,36 @@ WITH medias_consolidated AS (
         NULL AS ad_type,
         NULL AS utm_term,
         NULL AS utm_content,
-        NULL AS utm_campaign,
+        utm_campaign,
         0.0 AS desktop_cost,
         0.0 AS mobile_cost,
         other_cost,
         total_cost
     FROM
         datalake_consolidated_marketing_costs.criteo_consolidated_costs
+    WHERE
+        id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
+    
+    -- RTB
+    UNION ALL
+
+    SELECT
+        id_date,
+        'rtb' AS origin,
+        campaign_name,
+        NULL AS campaign_city,
+        account_name,
+        NULL AS report_type,
+        NULL AS ad_type,
+        NULL AS utm_term,
+        NULL AS utm_content,
+        utm_campaign,
+        0.0 AS desktop_cost,
+        0.0 AS mobile_cost,
+        other_cost,
+        total_cost
+    FROM
+        datalake_consolidated_marketing_costs.rtb_consolidated_costs
     WHERE
         id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
 ),
