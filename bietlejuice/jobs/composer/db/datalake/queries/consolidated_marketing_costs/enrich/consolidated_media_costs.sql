@@ -89,6 +89,29 @@ WITH medias_consolidated AS (
         datalake_consolidated_marketing_costs.mitula_consolidated_costs
     WHERE
         id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
+
+    -- TROVIT
+    UNION ALL
+
+    SELECT
+        id_date,
+        'trovit' AS origin,
+        campaign_name,
+        NULL AS campaign_city,
+        account_name,
+        NULL AS report_type,
+        NULL AS ad_type,
+        NULL AS utm_term,
+        NULL AS utm_content,
+        utm_campaign,
+        desktop_cost,
+        mobile_cost,
+        0.0 AS other_cost,
+        total_cost
+    FROM
+        datalake_consolidated_marketing_costs.mitula_consolidated_costs
+    WHERE
+        id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
 ),
 
 shared_consolidated_costs AS (
