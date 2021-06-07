@@ -18,7 +18,7 @@ from bietlejuice.jobs.composer.services import FileService
 ENV = os.environ.get("ENVIRONMENT")
 
 # DAG params setup
-SOURCE = "ramo_sap"
+SOURCE = "ramo"
 DAG_ID = f"bietlejuice.{SOURCE}"
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2020, 11, 24, 0, 0, 0, tzinfo=local_tz)
@@ -64,8 +64,8 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
 table_name = "razao_sap"
 slugged_table_name = table_name.replace("_", "-")
 
-ramo_sap_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="ramo-sap-to-datalake-raw",
+ramo_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="ramo-to-datalake-raw",
     dag=dag,
     json={
         "spark_python_task": {
@@ -125,8 +125,8 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 
 airflow_helpers.chain(
     create_cluster_task,
-    ramo_sap_datalake_raw_task,
+    ramo_datalake_raw_task,
     sync_metastore_raw_table_task,
     terminate_cluster_task,
 )
-ramo_sap_datalake_raw_task >> list(clean_sub_dags.values()) >> terminate_cluster_task
+ramo_datalake_raw_task >> list(clean_sub_dags.values()) >> terminate_cluster_task

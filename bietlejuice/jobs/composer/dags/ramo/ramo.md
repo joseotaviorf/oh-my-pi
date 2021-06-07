@@ -1,8 +1,8 @@
-## Ramo SAP
+## Ramo
 ​
 ### Purpose
 ​
-This DAG creates the incremental tables for Ramo SAP, a Controllership confident about financial result. 
+This DAG creates the incremental tables for Ramo, a Controllership confident about financial result. 
 
 ### Execution​ Interval
 This DAG is triggered daily. 

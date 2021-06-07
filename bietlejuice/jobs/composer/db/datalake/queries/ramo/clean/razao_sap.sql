@@ -18,7 +18,7 @@ SELECT
     month,
     day
 FROM
-     datalake_ramo_sap_raw.razao_sap
+     datalake_ramo_raw.razao_sap
 WHERE
     year = {year}
     AND month = {month}
