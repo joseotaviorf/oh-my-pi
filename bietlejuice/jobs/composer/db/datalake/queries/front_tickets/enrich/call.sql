@@ -24,10 +24,10 @@ WITH tasks AS (
     SELECT
       id_task,
       id_reservation,
-      cfe.agent_email,
-      GET_JSON_OBJECT(metadata, '$.event_data.WorkerAttributes.location') AS agent_company,
-      ac.agent_name,
-      ac.manager AS agent_manager
+      MAX(cfe.agent_email) AS agent_email,
+      MAX(GET_JSON_OBJECT(metadata, '$.event_data.WorkerAttributes.location')) AS agent_company,
+      MAX(ac.agent_name) AS agent_name,
+      MAX(ac.manager) AS agent_manager
     FROM
       datalake_bigfone_twilio.call_flex_events cfe
     LEFT JOIN
@@ -35,7 +35,7 @@ WITH tasks AS (
         ON cfe.agent_email = ac.email
     WHERE
       id_reservation IS NOT NULL
-    GROUP BY 1,2,3,4,5,6
+    GROUP BY 1,2
   )
   SELECT
     r.id_reservation,
@@ -52,7 +52,14 @@ WITH tasks AS (
     LAG(queue_name,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) AS transferred_from_dept,
     LEAD(queue_name,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) AS transferred_to_dept,
     CASE
-        WHEN LEAD(queue_name,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) = queue_name THEN 'internal'
+        WHEN 
+          LEAD(queue_name,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) = queue_name 
+          AND LEAD(id_queue,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) = id_queue 
+          THEN 'internal-same-agent'
+        WHEN 
+          LEAD(queue_name,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) = queue_name 
+          AND LEAD(id_queue,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) != id_queue 
+          THEN 'internal-other-agent'
         WHEN LEAD(queue_name,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) != queue_name THEN 'external'
     END AS transference_type,
     seconds_duration,
@@ -149,6 +156,8 @@ call AS (
           MAX(ts_created) AS ts_last_reservation
       FROM
           datalake_bigfone_twilio.call_flex_reservations
+      WHERE
+          is_answered = TRUE
       GROUP BY 1,2
   )
   SELECT

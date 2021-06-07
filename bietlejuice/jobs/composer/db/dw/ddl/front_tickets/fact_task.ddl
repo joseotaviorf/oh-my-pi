@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS front_tickets.fact_task (
     department VARCHAR(100),
     transferred_from_dept VARCHAR(100),
     transferred_to_dept VARCHAR(100),
-    transference_type VARCHAR(10),
+    transference_type VARCHAR(25),
     channel VARCHAR(5),
     is_sla BOOLEAN,
     is_first_task BOOLEAN,

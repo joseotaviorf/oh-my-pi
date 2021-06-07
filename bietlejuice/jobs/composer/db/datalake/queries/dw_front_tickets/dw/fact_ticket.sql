@@ -19,13 +19,13 @@ WITH call_tickets AS (
     minutes_full_resolution_time_calendar,
     first_department,
     last_department,
-    number_of_departments,
-    number_of_tasks,
+    number_of_departments AS total_departments,
+    number_of_tasks AS total_tasks,
     CAST(back_ticket AS BIGINT) AS back_ticket,
-    is_solved AS is_resolution_survey,
+    is_solved AS resolution_survey,
     is_csat_answered AS has_anwsered_survey,
     has_back_ticket,
-    is_open_back_ticket,
+    is_open_back_ticket AS is_back_ticket_open,
     CASE
       WHEN is_solved = TRUE
           AND (back_ticket IS NULL OR is_open_back_ticket = FALSE)
@@ -78,13 +78,13 @@ chat_tickets AS (
     minutes_full_resolution_time_calendar,
     first_department,
     last_department,
-    number_of_departments,
-    number_of_tasks,
+    number_of_departments AS total_departments,
+    number_of_tasks AS total_tasks,
     CAST(back_ticket AS BIGINT) AS back_ticket,
-    is_solved AS is_resolution_survey,
+    is_solved AS resolution_survey,
     is_csat_answered AS has_anwsered_survey,
     has_back_ticket,
-    is_open_back_ticket,
+    is_open_back_ticket AS is_back_ticket_open,
     CASE
       WHEN is_solved = TRUE
           AND (back_ticket IS NULL OR is_open_back_ticket = FALSE)
@@ -137,13 +137,13 @@ email_tickets AS (
     minutes_full_resolution_time_calendar,
     department AS first_department,
     department AS last_department,
-    1 AS number_of_departments,
-    1 AS number_of_tasks,
+    1 AS total_departments,
+    1 AS total_tasks,
     CAST(back_ticket AS BIGINT) AS back_ticket,
-    is_solved AS is_resolution_survey,
+    is_solved AS resolution_survey,
     is_answered AS has_anwsered_survey,
     has_back_ticket,
-    is_open_back_ticket,
+    is_open_back_ticket AS is_back_ticket_open,
     CASE
       WHEN is_solved = TRUE
           AND (back_ticket IS NULL OR is_open_back_ticket = FALSE)

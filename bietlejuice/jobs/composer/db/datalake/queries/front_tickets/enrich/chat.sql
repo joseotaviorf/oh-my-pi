@@ -42,7 +42,14 @@ WITH quinto_messenger_tickets AS (
       LAG(department,1) OVER (PARTITION BY id_channel ORDER BY tt.ts_task_created) AS transferred_from_dept,
       LEAD(department,1) OVER (PARTITION BY id_channel ORDER BY tt.ts_task_created) AS transferred_to_dept,
       CASE
-          WHEN LEAD(department,1) OVER (PARTITION BY id_channel ORDER BY tt.ts_task_created) = department THEN 'internal'
+          WHEN 
+            LEAD(department,1) OVER (PARTITION BY id_channel ORDER BY tt.ts_task_created) = department 
+            AND LEAD(t.id_agent,1) OVER (PARTITION BY id_channel ORDER BY tt.ts_task_created) = t.id_agent
+            THEN 'internal-same-agent'
+          WHEN 
+            LEAD(department,1) OVER (PARTITION BY id_channel ORDER BY tt.ts_task_created) = department 
+            AND LEAD(t.id_agent,1) OVER (PARTITION BY id_channel ORDER BY tt.ts_task_created) != t.id_agent
+            THEN 'internal-other-agent'
           WHEN LEAD(department,1) OVER (PARTITION BY id_channel ORDER BY tt.ts_task_created) != department THEN 'external'
       END AS transference_type,
       t.customer_type_tag,
@@ -111,6 +118,18 @@ WITH quinto_messenger_tickets AS (
         c.ts_created > '2020-08-20'
         AND c.channel_status <> 'missed'
 ),
+zendesk_tickets_unique AS (
+  --this CTE fix the error of multiple tickets openned for a single session
+  SELECT
+    tfm.id_session,
+    MAX(tfm.id_ticket) AS id_ticket
+  FROM
+    datalake_zendesk_ticket_funnels.tickets_funnel_metrics tfm
+  JOIN
+    datalake_quinto_messenger.channel c
+      ON c.id_source = tfm.id_session
+  GROUP BY 1
+),
 zendesk_aditional_ticket_info AS (
   SELECT DISTINCT 
     tf.id_ticket,
@@ -132,6 +151,9 @@ zendesk_aditional_ticket_info AS (
   JOIN
     datalake_zendesk_ticket_funnels.tickets_funnel_metrics ftm
       ON tf.id_ticket = ftm.id_ticket
+  JOIN
+    zendesk_tickets_unique ztu
+      ON ztu.id_ticket = ftm.id_ticket
   WHERE
     ftm.id_session IS NOT NULL
 ),
