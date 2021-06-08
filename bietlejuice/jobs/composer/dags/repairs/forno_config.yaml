@@ -1,0 +1,37 @@
+---
+dag_name: repairs
+
+tables:
+  - table_name: instant_approval_preference_aud
+    extraction_type: full
+  - table_name: instant_approval_preference
+    extraction_type: incremental
+    date_filter_column: updated_at
+  - table_name: repair_evidence_aud
+    extraction_type: full
+  - table_name: repair_evidence
+    extraction_type: incremental
+    date_filter_column: updated_at
+  - table_name: repair_expense_aud
+    extraction_type: full
+  - table_name: repair_expense
+    extraction_type: full
+  - table_name: repair_expense_group_aud
+    extraction_type: full
+  - table_name: repair_expense_group
+    extraction_type: full
+  - table_name: repair_request_aud
+    extraction_type: full
+  - table_name: repair_request
+    extraction_type: incremental
+    date_filter_column: updated_at
+  - table_name: repair_request_item_aud
+    extraction_type: full
+  - table_name: repair_request_item
+    extraction_type: incremental
+    date_filter_column: updated_at
+  - table_name: revinfo
+    clean_table_name: rev_info
+    extraction_type: incremental
+    date_filter_column: revtstmp
+    unixtime_measure: miliseconds
