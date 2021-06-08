@@ -1,6 +1,9 @@
 class DatabaseEnum:
-    # TODO REVIEW this Enum name. There are API and Database secrets here.
-    #  Maybe SourceEnum would be more appropriate now.
+    """
+    Mapping of secret keys for the database connections parameters stored in
+    the Databricks secrets.
+    """
+
     ASTERISK = "ENV_ASTERISK"
     AUTODIALER = "ENV_AUTODIALER"
     BIG_AGENT = "BIG_AGENT_DB"
@@ -46,7 +49,12 @@ class DatabaseEnum:
     WOLOLO = "WOLOLO"
 
 
+# TODO: This DatabaseType enum should be placed into a separate file
 class DatabaseTypeEnum:
+    """
+    Mapping of existent database types extracted by our extraction jobs.
+    """
+
     FIRESTORE = "firestore"
     MONGO = "mongo"
     MYSQL = "mysql"

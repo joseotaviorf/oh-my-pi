@@ -1,4 +1,9 @@
 class APIEnum:
+    """
+    Mapping of secret keys for the API connections parameters stored in
+    the Databricks secrets.
+    """
+
     BRAZE_OWNERS = "BRAZE_OWNERS_API"
     BRAZE_TENANTS = "BRAZE_TENANTS_API"
     CHATTERMILL = "CHATTERMILL_API"
