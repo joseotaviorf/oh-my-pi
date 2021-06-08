@@ -11,6 +11,7 @@ SELECT
     withoutIptu AS has_no_iptu,
     currentOffer_id AS id_current_offer,
     currentContrato_id AS id_current_contract,
-    currentProposta_id AS id_current_proposal
+    currentProposta_id AS id_current_proposal,
+    originalRentFlowId AS id_original_rent_flow
 FROM
     datalake_ebdb_raw.fluxolocacao

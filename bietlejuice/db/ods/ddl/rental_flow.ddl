@@ -12,5 +12,6 @@ create table if not exists rental_flow (
   withoutIptu bit(1),
   currentOffer_id bigint,
   currentContrato_id bigint,
-  currentProposta_id bigint
+  currentProposta_id bigint,
+  originalRentFlowId bigint
 );
