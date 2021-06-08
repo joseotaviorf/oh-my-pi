@@ -15,7 +15,7 @@ WITH platforms AS (
 taxonomy_by_platform AS (
     SELECT
         mcft.*,
-        FLOAT(COALESCE(NULLIF(TRIM(SPLIT(cost_factor, ';')[p.i]), ''), '1.0')) AS cost_factor_enriched,
+        FLOAT(NULLIF(TRIM(SPLIT(cost_factor, ';')[p.i]), '')) AS cost_factor_enriched,
         p.mkt_platform
     FROM
         datalake_gsheets_clean.marketing_costs_full_taxonomy mcft
@@ -59,10 +59,17 @@ media_costs_with_taxonomy AS (
         COALESCE(tp.mkt_platform, 'Not Mapped') AS mkt_platform,
         COALESCE(tp.side, 'Not Mapped') AS funnel_side,
         CASE 
-            WHEN tp.mkt_platform = 'Mobile' THEN mobile_cost
-            WHEN tp.mkt_platform = 'Desktop' THEN desktop_cost
-            WHEN tp.mkt_platform = 'Other' THEN other_cost
-        END * tp.cost_factor_enriched AS cost
+            WHEN tp.cost_factor_enriched IS NULL THEN
+                -- Cost/Platform defined in API/Source
+                CASE 
+                    WHEN tp.mkt_platform = 'Mobile' THEN mobile_cost
+                    WHEN tp.mkt_platform = 'Desktop' THEN desktop_cost
+                    WHEN tp.mkt_platform = 'Other' THEN other_cost
+                END
+            ELSE 
+                -- Cost/Platform defined in taxonomy
+                total_cost * tp.cost_factor_enriched
+        END AS cost
     FROM
         enriched_consolidated_media_costs ecmc
         LEFT JOIN
