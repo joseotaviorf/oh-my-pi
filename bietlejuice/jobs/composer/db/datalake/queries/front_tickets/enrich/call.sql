@@ -200,10 +200,23 @@ call AS (
       call_metrics cm
           ON cm.id_task = fe.id_task
 ),
+zendesk_tickets_unique AS (
+  --this CTE fix the error of multiple tickets openned for a single call
+  SELECT
+    tfm.id_call,
+    MAX(tfm.id_ticket) AS id_ticket
+  FROM
+    datalake_zendesk_ticket_funnels.tickets_funnel_metrics tfm
+  WHERE
+    id_call IS NOT NULL
+  GROUP BY 1
+),
 zendesk_aditional_ticket_info AS (
   SELECT DISTINCT 
     tf.id_ticket,
     ftm.id_call,
+    ftm.id_user,
+    ftm.id_contract,
     tf.tags,
     tf.description,
     tf.status,
@@ -221,6 +234,9 @@ zendesk_aditional_ticket_info AS (
   JOIN
     datalake_zendesk_ticket_funnels.tickets_funnel_metrics ftm
       ON tf.id_ticket = ftm.id_ticket
+  JOIN
+    zendesk_tickets_unique ztu
+      ON ztu.id_ticket = ftm.id_ticket
   WHERE
     ftm.id_call IS NOT NULL
 ),
@@ -259,6 +275,8 @@ SELECT DISTINCT
   c.id_conversation,
   t.id_agent,
   t.id_queue,
+  zd.id_user,
+  zd.id_contract,
   t.agent_email,
   t.agent_manager,
   t.agent_company,
@@ -322,6 +340,7 @@ JOIN
 LEFT JOIN 
   tasks t
     ON t.sk_call = c.sk_call
+    AND t.id_task = c.id_task
 LEFT JOIN
   datalake_gsheets_clean.department_control dc
     ON dc.department = t.queue_name 

@@ -134,6 +134,8 @@ zendesk_aditional_ticket_info AS (
   SELECT DISTINCT 
     tf.id_ticket,
     ftm.id_session,
+    ftm.id_user,
+    ftm.id_contract,
     tf.tags,
     tf.description,
     tf.status,
@@ -213,6 +215,8 @@ SELECT DISTINCT
   ct.id_conversation,
   ct.id_session,
   ct.id_agent,
+  zd.id_user,
+  zd.id_contract,
   ct.agent_email,
   ct.agent_manager,
   ct.agent_name,

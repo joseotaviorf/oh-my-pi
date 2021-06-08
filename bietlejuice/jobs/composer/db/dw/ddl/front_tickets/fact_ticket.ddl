@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS front_tickets.fact_ticket (
     sk_channel VARCHAR(40),
     sk_first_department VARCHAR(40),
     sk_last_department VARCHAR(40),
+    sk_user BIGINT,
+    sk_contract BIGINT,
     channel VARCHAR(5),
     csat_score INTEGER,
     status VARCHAR(20),

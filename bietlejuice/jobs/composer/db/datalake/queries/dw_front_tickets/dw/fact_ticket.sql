@@ -13,6 +13,8 @@ WITH call_tickets AS (
     MD5(concat('call', tags, direction)) AS sk_channel,
     MD5(first_department) AS sk_first_department,
     MD5(last_department) AS sk_last_department, 
+    id_user AS sk_user,
+    id_contract AS sk_contract,
     'call' AS channel,
     csat_rating AS csat_score,
     status,
@@ -71,7 +73,9 @@ chat_tickets AS (
     ) AS sk_taxonomy,
     MD5(concat('chat', tags)) AS sk_channel,
     MD5(first_department) AS sk_first_department,
-    MD5(last_department) AS sk_last_department, 
+    MD5(last_department) AS sk_last_department,
+    id_user AS sk_user,
+    id_contract AS sk_contract, 
     'chat' AS channel,
     csat_score,
     status,
@@ -100,12 +104,13 @@ chat_tickets AS (
     CASE
       WHEN is_solved = TRUE
           AND back_ticket IS NULL
-          AND has_transfers = FALSE
+          AND number_of_departments <= 1
           AND is_bot = FALSE
           AND is_closed_by_merge = FALSE
       THEN TRUE
       WHEN is_solved IS NOT NULL
           AND is_bot = FALSE
+          AND number_of_departments > 1
           AND is_closed_by_merge = FALSE
       THEN FALSE
       ELSE NULL
@@ -131,6 +136,8 @@ email_tickets AS (
     MD5(concat('email', tags)) AS sk_channel,
     MD5(department) AS sk_first_department,
     MD5(department) AS sk_last_department, 
+    id_user AS sk_user,
+    id_contract AS sk_contract,
     'email' AS channel,
     csat_score,
     status,
