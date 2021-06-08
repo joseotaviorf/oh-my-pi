@@ -11,7 +11,11 @@ Daily after enrich layers. More information about run time [here]({chart_url}{da
 
 ### Outputs
 
-- `consolidated_google_costs`
+- `google_consolidated_costs`
+- `criteo_consolidated_costs`
+- `rtb_consolidated_costs`
+- `mitula_consolidated_costs`
+- `trovit_consolidated_costs`
 - `consolidated_media_costs`
 
 ### Responsible Data Team

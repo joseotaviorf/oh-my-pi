@@ -109,7 +109,7 @@ WITH medias_consolidated AS (
         0.0 AS other_cost,
         total_cost
     FROM
-        datalake_consolidated_marketing_costs.mitula_consolidated_costs
+        datalake_consolidated_marketing_costs.trovit_consolidated_costs
     WHERE
         id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
 ),
