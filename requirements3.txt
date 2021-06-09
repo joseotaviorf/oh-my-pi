@@ -1,4 +1,4 @@
-# Notice: Requirements for Spark jobs in Databricks.
+# Notice: The requirements are for Spark jobs in Databricks.
 # These requirements are not used for Composer. Composer requirements are set
 #  through Pypi Packages tab in GCP panel interface.
 # Please, keep the dependencies sorted alphabetically.
@@ -22,16 +22,6 @@ dependency-injector==4.8.2
 deprecated==1.2.10
 docutils==0.14
 firebase_admin==3.0.0
-Flask==1.0.3
-Flask-Admin==1.5.3
-Flask-AppBuilder==1.12.3
-Flask-Babel==0.12.2
-Flask-Caching==1.3.3
-Flask-Login==0.4.1
-Flask-OpenID==1.2.5
-Flask-SQLAlchemy==2.4.0
-flask-swagger==0.2.13
-Flask-WTF==0.14.2
 funcsigs==1.0.0
 future==0.16.0
 gitdb2==2.0.5
