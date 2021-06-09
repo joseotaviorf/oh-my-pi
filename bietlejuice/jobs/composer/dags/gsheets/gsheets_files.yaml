@@ -26,12 +26,27 @@ contact_type_tag:
     sheet_name: contact_types_tree_taxonomy
     clean_table_name: contact_type_taxonomy
 
-csat_vistoria_entrada:
+csat_vistoria_entrada:  # to be excluded @Set,01
     sheet_id: 1ZTI-1XhPJey4o0e0IVfOVEeTeoWr7Vd10u-1TEZfIcc
     sheet_name: entrada
     clean_table_name: entrance_inspection_csat
 
-csat_vistoria_saida:
+csat_vistoria_iq_entrada:
+    sheet_id: 1AqKMDXh_xgv3LY5fzmiHSRWSXROxfUXNDAIrsW3ScFs
+    sheet_name: entrada_iq
+    clean_table_name: tenant_entrance_inspection_csat
+
+csat_vistoria_pp_entrada:
+    sheet_id: 1AqKMDXh_xgv3LY5fzmiHSRWSXROxfUXNDAIrsW3ScFs
+    sheet_name: entrada_pp
+    clean_table_name: owner_entrance_inspection_csat
+
+csat_vistoria_pp_saida:
+    sheet_id: 1AqKMDXh_xgv3LY5fzmiHSRWSXROxfUXNDAIrsW3ScFs
+    sheet_name: saida_pp
+    clean_table_name: owner_exit_inspection_csat
+
+csat_vistoria_saida:  # to be excluded @Set,01
     sheet_id: 1ZTI-1XhPJey4o0e0IVfOVEeTeoWr7Vd10u-1TEZfIcc
     sheet_name: saida
     clean_table_name: exit_inspection_csat
