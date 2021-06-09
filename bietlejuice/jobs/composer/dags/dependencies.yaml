@@ -404,7 +404,7 @@ bietlejuice.enrich_kill_queue:
 bietlejuice.enrich_listing_owners:
   - bietlejuice.ebdb:create-clean-proposal-in-data-lake
   - bietlejuice.enrich_booking:load-booking-to-enrich
-  - bietlejuice.enrich_ebdb_contract:load-contract-to-enrich
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_listing:load-listing-business-context-to-enrich
   - bietlejuice.enrich_ebdb_listing:load-house-listing-status-to-enrich
   - bietlejuice.enrich_ebdb_listing:load-house-to-enrich
