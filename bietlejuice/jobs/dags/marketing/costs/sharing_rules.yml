@@ -73,3 +73,7 @@ b017b:
 b018b:
   query: marketing/costs/b018b.sql
   funnel_side: branding
+
+s019s:
+  query: marketing/costs/s019s.sql
+  funnel_side: social
