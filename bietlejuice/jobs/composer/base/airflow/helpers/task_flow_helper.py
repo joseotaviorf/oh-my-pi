@@ -29,7 +29,7 @@ class TaskFlowHelper:
                     "msg=Table does not exist in the destination task_groups."
                 )
 
-            airflow_helpers.chain(
+            airflow_helpers.cross_downstream(
                 BaseTaskGroup.last_tasks(from_task_groups[table_name]),
                 BaseTaskGroup.first_tasks(to_task_groups[table_name]),
             )
