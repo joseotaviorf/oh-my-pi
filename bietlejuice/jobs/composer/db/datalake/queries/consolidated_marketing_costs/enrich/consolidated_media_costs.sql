@@ -152,7 +152,7 @@ city_group_mappings AS (
                     'santos', 'recife', 'salvador', 
                     'são josé dos campos', 'mogi das cruzes', 'vitória', 
                     'itapecerica da serra', 'cotia', 'sorocaba', 
-                    'ribeirão preto'
+                    'ribeirão preto', 'uberlândia', 'são josé do rio preto'
                 ) THEN LOWER(mc.campaign_name)
             WHEN LOWER(mc.campaign_name) LIKE '%campinas%' THEN 'Campinas'
             WHEN LOWER(mc.campaign_name) LIKE '%s_o_paulo%'OR LOWER(mc.campaign_name) LIKE '%sp detailed%' THEN'RMSP'
@@ -192,6 +192,8 @@ city_group_mappings AS (
             WHEN LOWER(mc.campaign_name) LIKE '%itapecerica%' THEN 'Itapecerica da Serra'
             WHEN LOWER(mc.campaign_name) LIKE '%sorocaba%' THEN 'Sorocaba'
             WHEN LOWER(mc.campaign_name) LIKE '%ribeir_o%preto%' THEN 'Ribeirão Preto'
+            WHEN LOWER(mc.campaign_name) LIKE '%sjrp%' OR LOWER(mc.campaign_name) LIKE '%s_o%jos_%do%rio%preto%' THEN 'São José do Rio Preto'
+            WHEN LOWER(mc.campaign_name) LIKE '%uberl_andia%' THEN 'Uberlândia'
         END AS city_group_by_campaign_name,
         CASE 
             WHEN campaign_city IN (
@@ -201,7 +203,7 @@ city_group_mappings AS (
                     'Santos', 'Recife', 'Salvador', 
                     'São José dos Campos', 'Mogi das Cruzes', 'Vitória', 
                     'Itapecerica da Serra', 'Cotia', 'Sorocaba', 
-                    'Ribeirão Preto'
+                    'Ribeirão Preto', 'São José do Rio Preto', 'Uberlândia'
                 ) THEN campaign_city
             WHEN campaign_city = 'campinas' THEN 'Campinas'
             WHEN campaign_city IN (
@@ -229,6 +231,8 @@ city_group_mappings AS (
             WHEN campaign_city = 'cotia'THEN 'Cotia'
             WHEN campaign_city = 'sorocaba'THEN 'Sorocaba'
             WHEN campaign_city IN ('ribeirao_preto', 'ribeiraopreto') THEN 'Ribeirão Preto'
+            WHEN campaign_city IN ('sjrp', 'sao_jose_do_rio_preto') THEN 'São José do Rio Preto'
+            WHEN campaign_city = 'uberlandia' THEN 'Uberlândia'
         END AS city_group_by_campaign_convention,
         manual_cities.city_group AS city_group_by_manual_convention
     FROM
