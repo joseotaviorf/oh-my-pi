@@ -67,17 +67,23 @@ date_series as (
   date(date) >= date('2020-06-01') and date(week_start) <= current_date - interval '1' day
     and date != ''
 ),
-regions as (
-  select
-    CAST(dr.id AS BIGINT) as region_id,
+regions AS (
+  SELECT DISTINCT
+    CAST(dr.id AS BIGINT) AS region_id,
     dr.region_code,
     dr.city_group,
     dr.city_name
-  from
-    datalake_clean.ods_dim_region dr
-  where
+  FROM
+    datalake_booking_prod.booking AS b
+  JOIN
+    datalake_ebdb_clean_prod.house AS h
+        ON h.id = b.id_house
+  JOIN
+    (SELECT id, region_code, city_group, city_name FROM datalake_clean.ods_dim_region WHERE id != '') AS dr
+        ON CAST(dr.id AS BIGINT) = h.id_region
+  WHERE
     dr.region_code != '-1'
-    and dr.city_name IN ('São Paulo', 'Rio de Janeiro', 'Guarulhos', 'São Caetano do Sul', 'Jundiaí', 'Osasco', 'Santo André', 'Niterói', 'São Bernardo do Campo', 'Barueri', 'Diadema')
+    AND visit_intent = 'SALE'
 ),
 slot_series as (
   select slot from unnest(sequence(0,100)) seq (slot)

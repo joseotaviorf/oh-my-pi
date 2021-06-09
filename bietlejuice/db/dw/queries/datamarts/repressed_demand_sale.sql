@@ -65,16 +65,19 @@ with house_available_hours as (
 	where date >= '2020-01-13' and week_start <= current_date - interval '1' day
 		and date IS NOT NULL
 )
-, regions as (
-	select
-		dr.id as region_id,
+, regions AS (
+	SELECT DISTINCT
+		fv.sk_region AS region_id,
 		dr.region_code,
 		dr.city_group,
 		dr.city_name
-	from dim_region dr
-	where 
+	FROM
+	    sale.fact_visits AS fv
+	LEFT JOIN
+	    dim_region AS dr
+	        ON dr.id = fv.sk_region
+	WHERE
 		dr.region_code != -1
-		and dr.city_name IN ('São Paulo', 'Rio de Janeiro', 'Guarulhos', 'São Caetano do Sul', 'Jundiaí', 'Osasco', 'Santo André', 'Niterói', 'São Bernardo do Campo', 'Barueri', 'Diadema')
 )
 , slot_series as (
     with slot_0_9 as (
