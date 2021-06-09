@@ -2,7 +2,7 @@ SELECT
     house_id AS id_house,
     rev,
     revend AS rev_end, 
-    revtype AS rev_type, 
+    CAST(revtype AS INTEGER) AS rev_type, 
     covered_amount,
     covered_amount_mod AS mod_covered_amount
 FROM 

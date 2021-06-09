@@ -4,7 +4,7 @@ SELECT
     repair_request_id AS id_repair_request, 
     rev, 
     revend AS rev_end, 
-    revtype AS rev_type, 
+    CAST(revtype AS INTEGER) AS rev_type, 
     description AS repair_item_description,
     is_urgent, 
     expense_id_mod AS mod_id_expense, 

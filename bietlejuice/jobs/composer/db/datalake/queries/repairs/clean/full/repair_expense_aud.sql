@@ -3,7 +3,7 @@ SELECT
     expense_group_id AS id_expense_group,
     rev, 
     revend AS rev_end, 
-    revtype AS rev_type, 
+    CAST(revtype AS INTEGER) AS rev_type, 
     name AS repair_name, 
     description AS repair_description,
     instant_approval,

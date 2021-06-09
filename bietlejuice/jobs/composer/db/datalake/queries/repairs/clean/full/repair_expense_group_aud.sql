@@ -3,7 +3,7 @@ SELECT
     parent_id AS id_parent,
     rev,
     revend AS rev_end, 
-    revtype AS rev_type,
+    CAST(revtype AS INTEGER) AS rev_type,
     name AS repair_group_name, 
     description AS repair_group_description,
     parent_id_mod AS mod_id_parent, 

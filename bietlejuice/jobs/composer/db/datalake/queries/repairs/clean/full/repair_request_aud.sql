@@ -6,7 +6,7 @@ SELECT
     third_party_crm_ticket_external_id AS id_third_party_crm_ticket_external,
     rev, 
     revend AS rev_end, 
-    revtype AS rev_type, 
+    CAST(revtype AS INTEGER) AS rev_type, 
     allow_personal_info_sharing,
     third_party_crm,
     contract_id_mod AS mod_id_contract, 
