@@ -7,6 +7,8 @@ SELECT
     operation_id AS id_operation,
     rev,
     revtype AS rev_type,
+    investment_source,
+    investment_source_mod AS mod_investment_source,
     status,
     status_mod AS mod_status,
     months_anticipated_number AS months_anticipated,
