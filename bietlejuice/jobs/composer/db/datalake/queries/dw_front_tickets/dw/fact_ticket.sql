@@ -110,7 +110,6 @@ chat_tickets AS (
       THEN TRUE
       WHEN is_solved IS NOT NULL
           AND is_bot = FALSE
-          AND number_of_departments > 1
           AND is_closed_by_merge = FALSE
       THEN FALSE
       ELSE NULL
