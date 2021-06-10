@@ -11,7 +11,6 @@ from airflow.operators.quintoandar_databricks import (
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
-from bietlejuice.jobs.composer.services import FileService
 
 SOURCE = "greenseer"
 
@@ -93,15 +92,10 @@ task_group = DatalakeTaskGroup(
     athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
 )
 
-table_names = FileService.list_sql_files_without_extension_from_layer(
-    SOURCE, LayerEnum.CLEAN.value
-)
-
 clean_task_groups = task_group.build_task_group_from_sql_files(
     layer=LayerEnum.CLEAN,
     source_database_base_name=SOURCE,
     target_database_base_name=SOURCE,
-    table_names=table_names,
     is_incremental=False,
 )
 
