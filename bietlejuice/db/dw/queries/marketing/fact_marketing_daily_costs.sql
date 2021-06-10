@@ -900,7 +900,8 @@ cost_taxonomy AS (
             END * CAST(COALESCE(tp.fator_custo, '1') AS numeric(3, 2)) AS
             COST,
             -- Funnel side is extracted FROM taxonomy
-            COALESCE(tp.side, 'Not Mapped') AS side
+            COALESCE(tp.side, 'Not Mapped') AS side,
+            dr.city_group AS city_group_by_sk_region
         FROM
             campaigns_full cf
         LEFT JOIN datalake_raw.gsheets_marketing_cost_campaign_city AS mccc ON LOWER(mccc.campaign_name) = cf.campaign_name_l
@@ -910,10 +911,13 @@ cost_taxonomy AS (
             AND cf.fact_cost = tp.fact_cost
             AND cf.origin = tp.origin
             AND cf.campaign_origin_aquisition = tp.campaign_origin_aquisition
+        LEFT JOIN dim_region dr
+            ON (SPLIT_PART(cf.campaign_name, '.', 1)) = dr.sk_region::VARCHAR
             -- Append manual costs
         UNION
         SELECT
-            *
+            *,
+            NULL AS city_group_by_sk_region
         FROM
             manual_shared_costs
     WHERE
@@ -921,7 +925,8 @@ cost_taxonomy AS (
     UNION
     -- Append Name Convetion costs
     SELECT
-        *
+        *,
+        NULL AS city_group_by_sk_region
     FROM
         name_convention_shared_costs
     WHERE
@@ -1013,6 +1018,7 @@ final_costs AS (
         cost_city_group,
         city_campaign_mapping_rule,
         campaign_city_matched,
+        city_group_by_sk_region,
         mkt_category,
         mkt_flow,
         mkt_completion,
@@ -1037,6 +1043,7 @@ final_costs AS (
         cost_city_group,
         city_campaign_mapping_rule,
         campaign_city_matched,
+        NULL AS city_group_by_sk_region,
         mkt_category,
         mkt_flow,
         mkt_completion,
@@ -1059,7 +1066,13 @@ SELECT
     account_name,
     campaign_name,
     -- consolidating final city_group
-    COALESCE(cost_city_group, city_campaign_mapping_rule, campaign_city_matched, 'Not Mapped') AS city_group_final,
+    COALESCE(
+        cost_city_group, 
+        city_campaign_mapping_rule, 
+        campaign_city_matched, 
+        city_group_by_sk_region,
+        'Not Mapped'
+    ) AS city_group_final,
     mkt_category,
     mkt_flow,
     mkt_completion,

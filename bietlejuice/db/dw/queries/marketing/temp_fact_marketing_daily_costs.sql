@@ -37,8 +37,9 @@ WITH google_consolidated_cost AS (
         AND dgc.is_test_campaign IS NOT TRUE
         AND (gtatf.flag <> 'other'
             OR gtatf.flag IS NULL)
-        AND coalesce(dgk.campaign_name, '') NOT LIKE '%DISCOVERY%'
-        AND coalesce(dga.campaign_name, '') NOT LIKE '%SMART%'),
+        AND COALESCE(dgk.campaign_name, '') NOT LIKE '%DISCOVERY%'
+        AND COALESCE(dgk.campaign_name, '') NOT LIKE '%SMART%'
+        AND SUBSTRING(COALESCE(dgk.campaign_name, dga.campaign_name, dgc.campaign_name, dgv.campaign_name), 1, 5) <> 'ZEBRA'),
     manual_google_costs AS (
         WITH t_prep AS (
             SELECT
@@ -372,6 +373,8 @@ campaigns_full AS (
         LEFT JOIN marketing_costs.dim_criteo_campaign dct ON fct.sk_criteo_campaign = dct.sk_criteo_campaign
     WHERE
         fct.sk_date >= 20180101
+        AND (SUBSTRING(dct.campaign_name, 1, 5) <> 'ZEBRA' 
+            OR SUBSTRING(dct.campaign_name, 1, 5) IS NULL)
         -- RTB
     UNION
     SELECT
@@ -520,6 +523,8 @@ campaigns_full AS (
             campaign_name_l,
             CASE WHEN campaign_name_l LIKE '%calc%' THEN
                 'Calculator'
+            WHEN campaign_name_l LIKE '%newchannel%' THEN
+                'New Channels'
             ELSE
                 'Other'
             END AS campaign_origin_aquisition,
@@ -570,6 +575,9 @@ cost_taxonomy AS (
             CASE WHEN LOWER(NULLIF (campaign_name, ''))
             LIKE '%calc%' THEN
                 'Calculator'
+                WHEN LOWER(NULLIF (campaign_name, ''))
+            LIKE '%newchannel%' THEN
+                'New Channels'
             ELSE
                 'Other'
             END::varchar campaign_origin_aquisition,
@@ -631,9 +639,10 @@ cost_taxonomy AS (
                 NULLIF (r.city_group, '') AS cost_city_group,
                 NULL AS city_campaign_mapping_rule,
                 NULL AS campaign_city_matched,
-                CASE WHEN LOWER(NULLIF (campaign_name, ''))
-                LIKE '%calc%' THEN
+                CASE WHEN LOWER(NULLIF (campaign_name, '')) LIKE '%calc%' THEN
                     'Calculator'
+                WHEN LOWER(NULLIF (campaign_name, '')) LIKE '%newchannel%' THEN
+                    'New Channels'
                 ELSE
                     'Other'
                 END AS campaign_origin_aquisition,
@@ -725,7 +734,7 @@ cost_taxonomy AS (
             -- city via manual mapping
             mccc.city_group AS cost_city_group,
             -- city via campaign_name full name written
-            CASE WHEN campaign_name_l IN ('florianópolis', 'curitiba', 'goiânia', 'rio de janeiro', 'rmsp', 'belo horizonte', 'brasília', 'campinas', 'porto alegre', 'santos', 'recife', 'salvador', 'são josé dos campos', 'mogi das cruzes', 'vitória', 'itapecerica da serra', 'cotia') THEN
+            CASE WHEN campaign_name_l IN ('florianópolis', 'curitiba', 'goiânia', 'rio de janeiro', 'rmsp', 'belo horizonte', 'brasília', 'campinas', 'porto alegre', 'santos', 'recife', 'salvador', 'são josé dos campos', 'mogi das cruzes', 'vitória', 'itapecerica da serra', 'cotia', 'sorocaba', 'ribeirão preto') THEN
                 campaign_name_l
             WHEN cf.campaign_name_l LIKE '%campinas%' THEN
                 'Campinas'
@@ -806,9 +815,13 @@ cost_taxonomy AS (
                 'Vitória'
             WHEN cf.campaign_name_l LIKE '%itapecerica%' THEN
                 'Itapecerica da Serra'
+            WHEN cf.campaign_name_l LIKE '%sorocaba%' THEN
+                'Sorocaba'
+            WHEN cf.campaign_name_l LIKE '%ribeir_o%preto%' THEN
+                'Ribeirão Preto'
             END AS city_campaign_mapping_rule,
             -- city via campaign_name name convention
-            CASE WHEN campaign_city IN ('Florianópolis', 'Curitiba', 'Goiânia', 'Rio de Janeiro', 'RMSP', 'Belo Horizonte', 'Brasília', 'Campinas', 'Porto Alegre', 'Santos', 'Recife', 'Salvador', 'São José dos Campos', 'Mogi das Cruzes', 'Vitória', 'Itapecerica da Serra', 'Cotia') THEN
+            CASE WHEN campaign_city IN ('Florianópolis', 'Curitiba', 'Goiânia', 'Rio de Janeiro', 'RMSP', 'Belo Horizonte', 'Brasília', 'Campinas', 'Porto Alegre', 'Santos', 'Recife', 'Salvador', 'São José dos Campos', 'Mogi das Cruzes', 'Vitória', 'Itapecerica da Serra', 'Cotia', 'Sorocaba', 'Ribeirão Preto') THEN
                 campaign_city
             WHEN campaign_city = 'campinas' THEN
                 'Campinas'
@@ -844,6 +857,10 @@ cost_taxonomy AS (
                 'Itapecerica da Serra'
             WHEN campaign_city = 'cotia'THEN
                 'Cotia'
+            WHEN campaign_city = 'sorocaba'THEN
+                'Sorocaba'
+            WHEN campaign_city IN ('ribeirao_preto', 'ribeiraopreto') THEN
+                'Ribeirão Preto'
             END AS campaign_city_matched,
             COALESCE(tp.campaign_origin_aquisition, 'Not Mapped') AS campaign_origin_aquisition,
             COALESCE(tp.mkt_category, 'Not Mapped') AS mkt_category,
