@@ -7,6 +7,11 @@ with
     select
         f.sk_house_listing,
         f.status_history,
+        CASE
+            WHEN dhl.is_b2b = TRUE THEN 'B2B'
+            WHEN ciq.sk_house_listing IS NOT NULL THEN 'CIQ'
+            WHEN dhl.is_b2b = FALSE OR ciq.sk_house_listing IS NULL THEN 'Core'
+        END AS is_b2b,
         d.date,
         d.week_start,
         d.weekday_name,
@@ -16,6 +21,10 @@ with
     from fact_house_listing_status f
     join dim_date d
       on d.sk_date between nullif(f.sk_status_start_date,-1) and coalesce(to_char(to_date(nullif(sk_status_end_date,-1),'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, to_char(current_date -1, 'YYYYMMDD')::bigint)
+    left join dim_house_listing dhl
+      on dhl.sk_house_listing = f.sk_house_listing
+    left join datamarts.quintoandar_consultant_listings ciq
+        on f.sk_house_listing = ciq.sk_house_listing
     where f.status_history = 'publicado'
       and d.week_start >= '2018-12-31'
     ),
@@ -29,6 +38,7 @@ with
         fhs.month_end,
         fhs.order_status,
         fhs.status_history,
+        fhs.is_b2b,
         dr.city_name,
         dr.city_group,
         dr.regional
@@ -46,6 +56,7 @@ with
         city_name as city_name_ol,
         regional as regional_ol,
         status_history as status_history_ol,
+        is_b2b as is_b2b_ol,
         sk_house_listing as sk_house_listing_ol
     from fact_adjusted
     where order_status = 1
@@ -81,6 +92,11 @@ with
         d.weekday_name,
         d.month_start,
         d.month_end,
+        CASE
+            WHEN dhl.is_b2b = TRUE THEN 'B2B'
+            WHEN ciq.sk_house_listing IS NOT NULL THEN 'CIQ'
+            WHEN dhl.is_b2b = FALSE OR ciq.sk_house_listing IS NULL THEN 'Core'
+        END AS is_b2b,
         f.status_history,
         case
             when status_history != 'suspenso' then status_history
@@ -92,6 +108,10 @@ with
     from fact_house_listing_status f
     join dim_date d
       on d.sk_date between nullif(f.sk_status_start_date,-1) and coalesce(to_char(to_date(nullif(sk_status_end_date,-1),'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, to_char(current_date -1, 'YYYYMMDD')::bigint)
+    left join dim_house_listing dhl
+      on dhl.sk_house_listing = f.sk_house_listing
+    left join datamarts.quintoandar_consultant_listings ciq
+        on f.sk_house_listing = ciq.sk_house_listing
     where d.week_start >= '2018-12-31'
     ),
     fact_adjusted_AL as (
@@ -103,6 +123,7 @@ with
         fhsal.month_start,
         fhsal.month_end,
         fhsal.order_status,
+        fhsal.is_b2b,
         fhsal.status_history,
         fhsal.status_history_v2,
         dr.city_name,
@@ -121,6 +142,7 @@ with
         faal.city_name as city_name_al,
         faal.regional as regional_al,
         faal.sk_house_listing as sk_house_listing_al,
+        faal.is_b2b as is_b2b_al,
         faal.status_history as status_history_al,
         faal.status_history_v2 as status_history_v2_al,
         dhl.listing_category_start as listing_category_start_al,
@@ -157,6 +179,8 @@ select
     city_name_al,
     regional_ol,
     regional_al,
+    is_b2b_ol,
+    is_b2b_al,
     status_history_ol,
     status_history_al,
     status_history_v2_al,
@@ -176,6 +200,8 @@ group by
   city_name_al,
   regional_ol,
   regional_al,
+  is_b2b_ol,
+  is_b2b_al,
   status_history_ol,
   status_history_al,
   status_history_v2_al,
@@ -193,6 +219,7 @@ select
 	coalesce(city_name_ol,city_name_al) as city_name,
 	coalesce(city_group_ol,city_group_al) as city_group,
 	coalesce(regional_ol,regional_al) as regional,
+	coalesce(is_b2b_ol,is_b2b_al) as is_b2b,
 	sum(listings_ol) as ol_week,
 	sum(case when status_history_ol = 'publicado' and (status_history_al not in ('publicado','suspenso', 'alugado') or status_history_al is null)
 		then listings_ol end) as ol_unpublished,
@@ -243,6 +270,7 @@ group by
   coalesce(city_name_ol, city_name_al),
   coalesce(city_group_ol, city_group_al),
   coalesce(regional_ol, regional_al),
+  coalesce(is_b2b_ol,is_b2b_al),
   date(least(week_start_ol,(week_start_al - interval '1 week')) + interval '1 week')
 order by
   date(least(week_start_ol,(week_start_al - interval '1 week'))) desc,
@@ -254,6 +282,7 @@ select
 	wf.city_group,
 	wf.city_name,
 	wf.regional,
+	wf.is_b2b,
 	sum(coalesce(wf.ol_week,0)) as ol_week,
 	sum(coalesce(wf.ol_unpublished,0)) as ol_unpublished,
 	sum(coalesce(wf.ol_suspended,0)) as ol_suspended,
@@ -275,6 +304,7 @@ group by
   wf.city_group,
   wf.city_name,
   wf.regional,
+  wf.is_b2b,
   wf.next_week_start
 order by
   wf.week_start desc
