@@ -13,7 +13,7 @@ class TaskGroupMethodFactory(object):
             method build_task_group_from_sql_files
 
         :param layer_enum: layer Enum
-        :type layer_enum: bietlejuice.jobs.composer.base.pipeline.LayerEnum
+        :type layer_enum: bietlejuice.jobs.composer.base.pipeline.LayerEnum member
         :return: respective method for the supplied layer
         :rtype: method
         """
@@ -38,7 +38,7 @@ class TaskGroupMethodFactory(object):
         Maps methods according to layer
 
         :param layer_enum: layer Enum
-        :type layer_enum: bietlejuice.jobs.composer.base.pipeline.LayerEnum
+        :type layer_enum: bietlejuice.jobs.composer.base.pipeline.LayerEnum member
         :return: respective method for the supplied layer
         :rtype: method
         """

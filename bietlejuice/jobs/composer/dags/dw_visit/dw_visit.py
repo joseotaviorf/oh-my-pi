@@ -13,7 +13,6 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.jobs.composer.dags.base.dw_task_group import DWTaskGroup
-from bietlejuice.jobs.composer.services import FileService
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 2, 20, 0, 0, 0, tzinfo=LOCAL_TZ)
@@ -77,16 +76,12 @@ dw_task_group = DWTaskGroup(
     spark_jobs_path=SPARK_JOBS_PATH,
 )
 
-table_names = FileService.list_sql_files_without_extension_from_layer(
-    DAG_NAME, LayerEnum.DW.value
-)
-
 dw_staging_task_group = dw_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.DW_STAGING, table_names=table_names, has_ods_migration_test=True
+    layer=LayerEnum.DW_STAGING, has_ods_migration_test=True
 )
 
 dw_task_group = dw_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.DW, table_names=table_names, spectrum_iam_role=SPECTRUM_IAM_ROLE
+    layer=LayerEnum.DW, spectrum_iam_role=SPECTRUM_IAM_ROLE
 )
 
 

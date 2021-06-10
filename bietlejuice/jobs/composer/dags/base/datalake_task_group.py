@@ -40,13 +40,11 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :param execution_timeout_hours: timeout in hours to be set to the tasks
         :type execution_timeout_hours: int
         """
-        self.dag = dag
-        self.env = env
+        super().__init__(
+            dag, env, relative_query_path, spark_jobs_path, execution_timeout_hours
+        )
         self.datalake_bucket = datalake_bucket
-        self.relative_query_path = relative_query_path
-        self.spark_jobs_path = spark_jobs_path
         self.athena_query_result_location = athena_query_result_location
-        self.execution_timeout_hours = execution_timeout_hours
 
     def build_clean_task_group(
         self,
@@ -164,7 +162,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         3. sync table from spark metastore to hive metastore
 
         :param layer: layer Enum
-        :type layer: bietlejuice.jobs.composer.base.pipeline.LayerEnum
+        :type layer: bietlejuice.jobs.composer.base.pipeline.LayerEnum member
         :param source_database_base_name: database base name for the source
             table database
         :type source_database_base_name: str

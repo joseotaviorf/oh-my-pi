@@ -42,13 +42,11 @@ class DWTaskGroup(BaseTaskGroup):
         :param execution_timeout_hours: timeout in hours to be set to the tasks
         :type execution_timeout_hours: int
         """
-        self.dag = dag
-        self.env = env
+        super().__init__(
+            dag, env, relative_query_path, spark_jobs_path, execution_timeout_hours
+        )
         self.dw_bucket = dw_bucket
         self.dw_schema = dw_schema
-        self.relative_query_path = relative_query_path
-        self.spark_jobs_path = spark_jobs_path
-        self.execution_timeout_hours = execution_timeout_hours
 
     def build_dw_task_group(self, table_name, spectrum_iam_role):
         """

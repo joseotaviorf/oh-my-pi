@@ -1,5 +1,7 @@
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.jobs.composer.base.airflow import TaskGroupMethodFactory
+from bietlejuice.jobs.composer.services import FileService
+from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 
 logger = QuintoAndarLogger("BaseTaskGroup")
 
@@ -13,17 +15,44 @@ class BaseTaskGroup(object):
     TASK_GROUP_INITIAL_TASKS_DICT_KEY = "initial_tasks"
     TASK_GROUP_FINAL_TASKS_DICT_KEY = "final_tasks"
 
-    def build_task_group_from_sql_files(self, layer, table_names, **kwargs):
+    def __init__(
+        self,
+        dag,
+        env,
+        relative_query_path,
+        spark_jobs_path,
+        execution_timeout_hours=DEFAULT_EXECUTION_TIMEOUT_HOURS,
+    ):
+        """
+        :param dag: main dag instance
+        :type dag: airflow.models.DAG
+        :param env: forno or prod environments
+        :type env: str
+        :param relative_query_path: relative query path from default queries
+            path containing sql file for the table to be created
+        :type relative_query_path: str
+        :param spark_jobs_path: base path for spark jobs
+        :type spark_jobs_path: str
+        :param execution_timeout_hours: timeout in hours to be set to the tasks
+        :type execution_timeout_hours: int
+        """
+        self.dag = dag
+        self.env = env
+        self.relative_query_path = relative_query_path
+        self.spark_jobs_path = spark_jobs_path
+        self.execution_timeout_hours = execution_timeout_hours
+
+    def build_task_group_from_sql_files(self, layer, **kwargs):
         """
         Create a task-group for each table, based on each table's respective sql file
 
         :param layer: layer Enum
-        :type layer: bietlejuice.jobs.composer.base.pipeline.LayerEnum
-        :param table_names: name of tables containing sql queries for each one
-        :type table_names: list[str]
+        :type layer: bietlejuice.jobs.composer.base.pipeline.LayerEnum member
         :return: a dict of task groups created
         :rtype: dict
         """
+        table_names = self._get_table_names_from_sql_files(layer=layer)
+
         method = TaskGroupMethodFactory.get_method_for_build_task_group_from_sql_files(
             layer_enum=layer
         )
@@ -33,6 +62,22 @@ class BaseTaskGroup(object):
             task_groups[table_name] = method(self, **params)
 
         return task_groups
+
+    def _get_table_names_from_sql_files(self, layer):
+        """
+        Auxiliary method to adjust the layer and fetch table names from queries
+         within the DAG's queries folder via FileService
+
+        :param layer: bietlejuice.jobs.composer.base.pipeline.LayerEnum member
+        :return: table_names of each query-file
+        :rtype: list[str]
+        """
+        if layer == LayerEnum.DW_STAGING:
+            layer = LayerEnum.DW
+
+        return FileService.list_sql_files_without_extension_from_layer(
+            self.relative_query_path, layer.value
+        )
 
     @staticmethod
     def format_tasks_boundaries(initial_tasks, final_tasks):

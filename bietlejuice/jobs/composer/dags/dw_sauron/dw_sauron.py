@@ -12,7 +12,6 @@ from airflow.operators.quintoandar_databricks import (
 from bietlejuice.jobs.composer.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.dags.base.dw_task_group import DWTaskGroup
-from bietlejuice.jobs.composer.services import FileService
 from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 
 
@@ -65,16 +64,12 @@ dw_task_group = DWTaskGroup(
     spark_jobs_path=SPARK_JOBS_PATH,
 )
 
-table_names = FileService.list_sql_files_without_extension_from_layer(
-    DAG_NAME, LayerEnum.DW.value
-)
-
 dw_staging_task_group = dw_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.DW_STAGING, table_names=table_names
+    layer=LayerEnum.DW_STAGING
 )
 
 dw_task_group = dw_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.DW, table_names=table_names, spectrum_iam_role=SPECTRUM_IAM_ROLE
+    layer=LayerEnum.DW, spectrum_iam_role=SPECTRUM_IAM_ROLE
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
