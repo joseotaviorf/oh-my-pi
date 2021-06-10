@@ -3,7 +3,6 @@ SELECT
     pipeline_id AS id_pipeline,
     language_code,
     memory,
-    metadata,
     current_state,
     beginning_timestamp AS ts_started,
     end_timestamp AS ts_ended
