@@ -101,7 +101,7 @@ days_diff_and_cohorts_maturation AS (
         DATEDIFF('day',last_evaluation_started_date,contract_signed_date) AS days_evaluation_started_to_contract_signed,
         DATEDIFF('day',evaluation_approved_date,document_first_sent_date) AS days_evaluation_approved_to_document_first_sent,
         DATEDIFF('day',document_first_sent_date,credit_analysis_approved_date) AS days_document_first_sent_to_document_approved,
-        DATEDIFF('day',credit_analysis_approved_date,contract_signed_date) AS days_document_approved_to_contract_signed_date
+        DATEDIFF('day',credit_analysis_approved_date,contract_signed_date) AS days_document_approved_to_contract_signed
     FROM 
         events_dates
     ),
@@ -142,6 +142,7 @@ pair_user_unique_proposal AS (
                 date_trunc('week',ed.offer_approved_date)
     		ORDER BY 
     			rfb.sk_contract_signed_date DESC,
+    			rfb.sk_contract_created_date DESC,
     			rfb.sk_credit_analysis_approved_date DESC,
     			rfb.sk_tenant_first_doc_sent_date DESC,
     			rfb.sk_last_credit_evaluation_positive DESC,
@@ -194,7 +195,7 @@ SELECT
     days_evaluation_started_to_evaluation_approved,
     days_evaluation_started_to_contract_signed,
     days_document_first_sent_to_document_approved,
-    days_document_approved_to_contract_signed_date,
+    days_document_approved_to_contract_signed,
     funnel_step,
     offers_in_window
 FROM 
