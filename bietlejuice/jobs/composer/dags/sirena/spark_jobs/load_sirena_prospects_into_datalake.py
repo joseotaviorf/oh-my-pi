@@ -32,6 +32,7 @@ SCHEMA = """
     initialGroup STRING,
     initialGroupId STRING,
     firstName STRING,
+    label STRING,
     lastName STRING,
     category STRING COMMENT 'The unique name identifier of the prospect category',
     status STRING NOT NULL COMMENT 'Enum: "unclaimed" "new" "followUp" "processing" "archived"',
