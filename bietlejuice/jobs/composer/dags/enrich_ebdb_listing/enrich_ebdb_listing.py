@@ -1,17 +1,17 @@
-from datetime import datetime
-import pendulum
 import os
+from datetime import datetime
 
+import pendulum
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
+from airflow.utils.helpers import cross_downstream, chain
 
-from bietlejuice.jobs.composer.base.airflow import BaseDAG
-from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
-from bietlejuice.jobs.composer.services import FileService
+from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseTaskGroup
 from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 7, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
@@ -62,34 +62,43 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     libraries=LIBRARIES_DESCRIPTION,
 )
 
-enrich_sub_dag = DatalakeSubDAG(
-    dag_id=DAG_ID,
-    start_date=MAIN_START_DATE,
-    env=ENV,
-    datalake_bucket=DATALAKE_BUCKET,
-    database_base_name=CONTEXT,
-    relative_query_path=CONTEXT,
-    spark_job_paths=SPARK_JOBS_PATH,
-    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
-    layer=LayerEnum.ENRICH,
-)
-
-file_list = FileService.list_sql_files_without_extension_from_layer(
-    CONTEXT, LayerEnum.ENRICH.value
-)
-
-enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(dag, file_list)
-
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-dependency_sub_dags = [enrich_sub_dags.pop("house_status_version_order")]
-dependent_sub_dags = [
-    enrich_sub_dags.pop("house_listing"),
-    enrich_sub_dags.pop("house_listing_status"),
-]
-BaseDAG.cross_downstream(dependency_sub_dags, dependent_sub_dags)
-create_cluster_task >> dependency_sub_dags
-dependent_sub_dags >> terminate_cluster_task
-create_cluster_task >> list(enrich_sub_dags.values()) >> terminate_cluster_task
+datalake_task_group = DatalakeTaskGroup(
+    dag=dag,
+    env=ENV,
+    datalake_bucket=DATALAKE_BUCKET,
+    relative_query_path=CONTEXT,
+    spark_jobs_path=SPARK_JOBS_PATH,
+    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
+)
+
+enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.ENRICH,
+    source_database_base_name=CONTEXT,
+    target_database_base_name=CONTEXT,
+)
+
+house_listing_tasks = enrich_task_groups.pop("house_listing")
+house_listing_status_tasks = enrich_task_groups.pop("house_listing_status")
+
+dependent_first_tasks = list()
+dependent_first_tasks.extend(BaseTaskGroup.first_tasks(house_listing_tasks))
+dependent_first_tasks.extend(BaseTaskGroup.first_tasks(house_listing_status_tasks))
+
+dependent_last_tasks = list()
+dependent_last_tasks.extend(BaseTaskGroup.last_tasks(house_listing_tasks))
+dependent_last_tasks.extend(BaseTaskGroup.last_tasks(house_listing_status_tasks))
+
+house_status_version_order_tasks = enrich_task_groups.pop("house_status_version_order")
+dependency_first_tasks = BaseTaskGroup.first_tasks(house_status_version_order_tasks)
+dependency_last_tasks = BaseTaskGroup.last_tasks(house_status_version_order_tasks)
+
+chain(create_cluster_task, dependency_first_tasks)
+cross_downstream(dependency_last_tasks, dependent_first_tasks)
+chain(dependent_last_tasks, terminate_cluster_task)
+
+chain(create_cluster_task, BaseTaskGroup.all_first_tasks(enrich_task_groups))
+chain(BaseTaskGroup.all_last_tasks(enrich_task_groups), terminate_cluster_task)

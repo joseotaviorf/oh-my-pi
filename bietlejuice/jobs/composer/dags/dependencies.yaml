@@ -47,8 +47,8 @@ bietlejuice.dw_chattermill:
 bietlejuice.dw_dim_listing_owner:
   - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
   - bietlejuice.ebdb:create-clean-user-preferences-in-data-lake
-  - bietlejuice.enrich_ebdb_listing:load-listing-business-context-to-enrich
-  - bietlejuice.enrich_ebdb_listing:load-house-to-enrich
+  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_user:load-user-to-enrich
 
 bietlejuice.dw_front_tickets:
@@ -58,7 +58,7 @@ bietlejuice.dw_front_tickets:
   - bietlejuice.gsheets:load-department-control-to-clean
 
 bietlejuice.dw_house:
-  - bietlejuice.enrich_ebdb_listing:load-house-to-enrich
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
 
 bietlejuice.dw_invoice_entries:
   - bietlejuice.ebdb:create-clean-affiliate-data-in-data-lake
@@ -108,7 +108,7 @@ bietlejuice.dw_quinto_messenger:
 bietlejuice.dw_region:
   - bietlejuice.enrich_region
   - bietlejuice.enrich_booking
-  - bietlejuice.enrich_ebdb_listing:load-house-to-enrich
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
 
 bietlejuice.dw_rent_fact_listing_owners:
   - bietlejuice.enrich_listing_owners:load-rental-metrics-to-enrich
@@ -121,14 +121,14 @@ bietlejuice.dw_sale_flows:
   - bietlejuice.enrich_amplitude_visit:load-amplitude-visit-to-enrich
   - bietlejuice.enrich_amplitude_offer:load-sale-offer-raw-events-to-enrich
   - bietlejuice.enrich_booking:load-booking-to-enrich
-  - bietlejuice.enrich_ebdb_listing:load-listing-business-context-to-enrich
+  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_sale_flows:load-sale-flow-to-enrich
   - bietlejuice.gsheets:load-taxonomy-demand-to-clean
 
 bietlejuice.dw_sale_listings:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-house-registration-status-in-data-lake
-  - bietlejuice.enrich_ebdb_listing:load-listing-business-context-to-enrich
+  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_sale_listings:load-sale-listing-status-to-enrich
   - bietlejuice.enrich_sale_listings:load-sale-listing-to-enrich
 
@@ -297,8 +297,8 @@ bietlejuice.enrich_ebdb_contract:
   - bietlejuice.ebdb:create-clean-full-contract-in-data-lake
   - bietlejuice.ebdb:create-clean-rent-flow-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
-  - bietlejuice.enrich_ebdb_listing:load-house-to-enrich
-  - bietlejuice.enrich_ebdb_listing:load-house-listing-to-enrich
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
 
 bietlejuice.enrich_ebdb_customer_contact_identification:
   - bietlejuice.ebdb:create-clean-user-in-data-lake
@@ -405,9 +405,9 @@ bietlejuice.enrich_listing_owners:
   - bietlejuice.ebdb:create-clean-proposal-in-data-lake
   - bietlejuice.enrich_booking:load-booking-to-enrich
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
-  - bietlejuice.enrich_ebdb_listing:load-listing-business-context-to-enrich
-  - bietlejuice.enrich_ebdb_listing:load-house-listing-status-to-enrich
-  - bietlejuice.enrich_ebdb_listing:load-house-to-enrich
+  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_kill_queue:load-reservation-to-enrich
   - bietlejuice.enrich_offer:load-offer-to-enrich
 
@@ -436,7 +436,7 @@ bietlejuice.enrich_nps_answer_drivers:
   - bietlejuice.ebdb:create-clean-booking-in-data-lake
   - bietlejuice.ebdb:create-clean-offer-in-data-lake
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
-  - bietlejuice.enrich_ebdb_listing:load-house-listing-to-enrich
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
 
 bietlejuice.enrich_offer:
   - bietlejuice.ebdb:create-clean-offer-in-data-lake
@@ -478,7 +478,7 @@ bietlejuice.enrich_robin_hood:
 
 bietlejuice.enrich_sale_flows:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
-  - bietlejuice.enrich_ebdb_listing:load-listing-business-context-to-enrich
+  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_offer:load-sale-offer-to-enrich
 
 bietlejuice.enrich_sale_listings:
@@ -487,7 +487,7 @@ bietlejuice.enrich_sale_listings:
   - bietlejuice.ebdb:create-clean-listing-business-context-in-data-lake
   - bietlejuice.ebdb:create-clean-listing-business-context-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
-  - bietlejuice.enrich_ebdb_listing:load-listing-business-context-to-enrich
+  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_user_revision_entity:load-user-revision-entity-to-enrich
 
 bietlejuice.enrich_sauron:
