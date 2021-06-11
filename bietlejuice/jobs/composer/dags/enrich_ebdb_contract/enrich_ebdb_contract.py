@@ -18,8 +18,8 @@ MAIN_START_DATE = datetime(2020, 7, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
 CONTEXT = "ebdb_contract"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
+
 ENV = os.environ.get("ENVIRONMENT")
-SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
