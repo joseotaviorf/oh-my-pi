@@ -61,6 +61,11 @@ de_para_cancelamento:
     sheet_name: de_para_cancelamento
     clean_table_name: from_to_cancellation
 
+deduplicate_batch_listings_forsale:
+    sheet_id: 18zKmMCSdcZSttLhj0Kb8qqU4-_yCt2njKurjxhZrSc4
+    sheet_name: deduplicate_batch_listings_forsale
+    clean_table_name: deduplicate_batch_listings_forsale
+
 hotjar_demanda_reprimida_fotos:
     sheet_id: 1aP3ir1aAPLpzGwbRiS16UH1iTtTQPJbaKz0CcLIbTdc
     sheet_name: demanda_reprimida_fotos

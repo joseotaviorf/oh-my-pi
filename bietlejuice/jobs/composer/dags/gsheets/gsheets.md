@@ -22,6 +22,7 @@ This pipeline produces the following output tables:
 2. Data lake clean:
     - `auxiliary_region`
     - `census_subnormal_crowding_areas`
+    - `deduplicate_batch_listings_forsale`
     - `entrance_inspection_csat`
     - `exit_inspection_csat`
     - `from_to_cancellation`
