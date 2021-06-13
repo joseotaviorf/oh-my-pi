@@ -6,7 +6,7 @@ SELECT DISTINCT
     month,
     day
 FROM
-    datalake_braze_raw.events_owners
+    datalake_braze_events_raw.events_owners
 WHERE
     year = {year}
     AND month = {month}

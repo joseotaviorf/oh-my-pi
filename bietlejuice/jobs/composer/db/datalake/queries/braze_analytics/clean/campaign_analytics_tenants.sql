@@ -16,7 +16,7 @@ SELECT
     month,
     day
 FROM
-    datalake_braze_raw.campaign_analytics_tenants
+    datalake_braze_analytics_raw.campaign_analytics_tenants
 WHERE
     year = {year}
     AND month = {month}

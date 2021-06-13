@@ -6,7 +6,7 @@ SELECT
     month,
     day
 FROM
-    datalake_braze_raw.canvas_analytics_owners
+    datalake_braze_analytics_raw.canvas_analytics_owners
 WHERE
     year = {year}
     AND month = {month}

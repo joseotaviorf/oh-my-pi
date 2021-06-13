@@ -18,9 +18,8 @@ from bietlejuice.jobs.composer.services import FileService
 
 ENV = os.environ.get("ENVIRONMENT")
 
-SOURCE = "braze"
-DAG_NAME = f"{SOURCE}_analytics"
-DAG_ID = f"bietlejuice.{DAG_NAME}"
+SOURCE = "braze_analytics"
+DAG_ID = f"bietlejuice.{SOURCE}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 11, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "30 0 * * *"
@@ -32,9 +31,9 @@ DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
-LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{DAG_NAME}"
+LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{SOURCE}"
 BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{DAG_NAME}"
+SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}"
 
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
@@ -57,9 +56,7 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
-        chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
-    ),
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
@@ -80,14 +77,14 @@ clean_sub_dag = DatalakeSubDAG(
     datalake_bucket=DATALAKE_BUCKET,
     layer=LayerEnum.CLEAN,
     database_base_name=SOURCE,
-    relative_query_path=DAG_NAME,
+    relative_query_path=SOURCE,
     spark_job_paths=BASE_SPARK_JOBS_PATH,
     athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
     execution_timeout_hours=0.5,
 )
 
 file_list = FileService.list_sql_files_without_extension_from_layer(
-    DAG_NAME, LayerEnum.CLEAN.value
+    SOURCE, LayerEnum.CLEAN.value
 )
 
 clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(

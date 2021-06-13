@@ -29,7 +29,7 @@ SELECT
     month,
     day
 FROM
-    datalake_braze_clean.events_owners
+    datalake_braze_events_clean.events_owners
 WHERE
     event_type NOT IN(
         'users.behaviors.subscriptiongroup.StateChange',

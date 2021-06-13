@@ -14,4 +14,4 @@ SELECT
     TO_TIMESTAMP(created_at) AS ts_created,
     TO_TIMESTAMP(updated_at) AS ts_updated
 FROM
-    datalake_braze_raw.canvas_details_owners
+    datalake_braze_details_raw.canvas_details_owners
