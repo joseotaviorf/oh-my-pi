@@ -1,6 +1,6 @@
 --Social cost share
 SELECT
-  dd.sk_date,
+  dd.sk_date AS id_date,
   dr.city_group,
   CASE
     WHEN dr.city_group='RMSP' THEN 0.55009
