@@ -20,10 +20,8 @@ WITH medias_consolidated AS (
         datalake_consolidated_marketing_costs.google_consolidated_costs
     WHERE
         id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
-    
     -- CRITEO
     UNION ALL
-
     SELECT
         id_date,
         'criteo' AS origin,
@@ -43,10 +41,8 @@ WITH medias_consolidated AS (
         datalake_consolidated_marketing_costs.criteo_consolidated_costs
     WHERE
         id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
-
     -- RTB
     UNION ALL
-
     SELECT
         id_date,
         'rtb' AS origin,
@@ -66,10 +62,8 @@ WITH medias_consolidated AS (
         datalake_consolidated_marketing_costs.rtb_consolidated_costs
     WHERE
         id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
-
     -- MITULA
     UNION ALL
-
     SELECT
         id_date,
         'mitula' AS origin,
@@ -89,10 +83,8 @@ WITH medias_consolidated AS (
         datalake_consolidated_marketing_costs.mitula_consolidated_costs
     WHERE
         id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
-
     -- TROVIT
     UNION ALL
-
     SELECT
         id_date,
         'trovit' AS origin,
@@ -110,6 +102,27 @@ WITH medias_consolidated AS (
         total_cost
     FROM
         datalake_consolidated_marketing_costs.trovit_consolidated_costs
+    WHERE
+        id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
+    -- FACEBOOK
+    UNION ALL
+    SELECT
+        id_date,
+        'facebook' AS origin,
+        campaign_name,
+        campaign_city,
+        account_name,
+        NULL AS report_type,
+        NULL AS ad_type,
+        utm_term,
+        utm_content,
+        utm_campaign,
+        desktop_cost,
+        mobile_cost,
+        other_cost,
+        total_cost
+    FROM
+        datalake_consolidated_marketing_costs.facebook_consolidated_costs
     WHERE
         id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
 ),
