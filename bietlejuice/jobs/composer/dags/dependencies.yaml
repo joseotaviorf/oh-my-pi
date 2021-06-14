@@ -493,6 +493,9 @@ bietlejuice.enrich_sale_listings:
 bietlejuice.enrich_sauron:
   - bietlejuice.sauron:load-clean-session
 
+bietlejuice.enrich_survicate:
+  - bietlejuice.survicate:load-surveys-to-clean
+
 bietlejuice.enrich_terminator:
   - bietlejuice.terminator:load-termination-aud-to-clean
 
