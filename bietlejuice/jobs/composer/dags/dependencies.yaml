@@ -497,7 +497,7 @@ bietlejuice.enrich_survicate:
   - bietlejuice.survicate:load-surveys-to-clean
 
 bietlejuice.enrich_terminator:
-  - bietlejuice.terminator:load-termination-aud-to-clean
+  - bietlejuice.terminator:load-clean-termination-aud
 
 bietlejuice.enrich_top_of_funnel_demand:
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
