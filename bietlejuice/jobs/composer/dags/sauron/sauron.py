@@ -7,7 +7,6 @@ from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
-    QuintoAndarDatabricksSubmitRunOperator,
 )
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
@@ -68,33 +67,6 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-sauron_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="sauron-to-datalake-raw",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": RAW_SPARK_JOB_PATH,
-            "parameters": [ENV, DATALAKE_BUCKET, "{{ ds }}"],
-        }
-    },
-)
-
-sync_metastore_tables_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="sync-hive-metastore-raw-tables",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": BASE_SPARK_JOB_PATH + "sync_metastore_tables.py",
-            "parameters": [
-                DATALAKE_BUCKET,
-                LayerEnum.RAW.value,
-                SOURCE,
-                "--all-tables",
-            ],
-        }
-    },
-)
-
 task_group = DatalakeTaskGroup(
     dag=dag,
     env=ENV,
@@ -102,6 +74,13 @@ task_group = DatalakeTaskGroup(
     relative_query_path=SOURCE,
     spark_jobs_path=BASE_SPARK_JOB_PATH,
     athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
+)
+
+raw_task_group = task_group.build_raw_task_group_for_all_tables(
+    source=SOURCE,
+    target_database_base_name=SOURCE,
+    extraction_spark_job_file=RAW_SPARK_JOB_PATH,
+    raw_spark_job_extra_args=["{{ ds }}"],
 )
 
 clean_task_groups = task_group.build_task_group_from_sql_files(
@@ -113,12 +92,12 @@ clean_task_groups = task_group.build_task_group_from_sql_files(
 )
 
 airflow_helpers.chain(
-    create_cluster_task,
-    sauron_to_datalake_raw_task,
+    create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group)
+)
+
+airflow_helpers.cross_downstream(
+    DatalakeTaskGroup.last_tasks(raw_task_group),
     DatalakeTaskGroup.all_first_tasks(clean_task_groups),
 )
-terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
 
-airflow_helpers.chain(
-    sauron_to_datalake_raw_task, sync_metastore_tables_task, terminate_cluster_task
-)
+terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
