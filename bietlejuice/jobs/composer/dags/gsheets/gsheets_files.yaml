@@ -78,7 +78,7 @@ marketing_costs_manual_costs_google:
 
 marketing_costs_full_taxonomy:
     sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
-    sheet_name: Full_Taxonomy_New_Test
+    sheet_name: Oficial Taxonomy Composer
     clean_table_name: marketing_costs_full_taxonomy
 
 marketing_costs_campaign_city:
