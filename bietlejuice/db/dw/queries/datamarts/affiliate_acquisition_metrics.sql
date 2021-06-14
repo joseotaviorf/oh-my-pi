@@ -4,16 +4,16 @@ affiliates_acquisition_funnel as (
 -- Affiliates Acquisition Funnel --
 -----------------------------------
     SELECT
-		NULLIF(dua.ts_joined_program,NULL)::DATE AS date,
-		COALESCE(dua.marketing_city_group, 'Not Mapped') AS city_group,
-		COALESCE(dua.mkt_origin, '') AS mkt_origin,
-		COALESCE(dua.mkt_channel, '') AS mkt_channel,
-		COALESCE(dua.mkt_medium, '') AS mkt_medium,
-		COALESCE(dua.mkt_source, '') AS mkt_source,
-		COALESCE(dua.tracking_campaign, '') AS utm_campaign,
-		COALESCE(dua.tracking_content, '') AS utm_content,
-		COALESCE(dua.tracking_term, '') AS utm_term,
-		COUNT(DISTINCT dua.sk_user) AS affiliates,
+        NULLIF(dua.ts_joined_program,NULL)::DATE AS date,
+        COALESCE(dua.marketing_city_group, 'Not Mapped') AS city_group,
+        COALESCE(dua.mkt_origin, '') AS mkt_origin,
+        COALESCE(dua.mkt_channel, '') AS mkt_channel,
+        COALESCE(dua.mkt_medium, '') AS mkt_medium,
+        COALESCE(dua.mkt_source, '') AS mkt_source,
+        COALESCE(dua.tracking_campaign, '') AS utm_campaign,
+        COALESCE(dua.tracking_content, '') AS utm_content,
+        COALESCE(dua.tracking_term, '') AS utm_term,
+        COUNT(DISTINCT dua.sk_user) AS affiliates,
         COUNT(DISTINCT CASE WHEN dt_lead.date <= DATE(dua.ts_joined_program) + 1 THEN dua.sk_user END) AS active_affiliate_lead_d1,
         COUNT(DISTINCT CASE WHEN dt_prospect.date <= DATE(dua.ts_joined_program) + 1 THEN dua.sk_user END) AS active_affiliate_prospect_d1,
         COUNT(DISTINCT CASE WHEN dt_qualified.date <= DATE(dua.ts_joined_program) + 1 THEN dua.sk_user END) AS active_affiliate_qualified_d1,
@@ -71,7 +71,7 @@ UNION ALL
         ON dd.sk_date =  mkt.sk_date
     WHERE mkt.funnel_side IN ('supply','affiliates')
         AND mkt.mkt_origin = 'Indica Aí - General'
-        AND mkt.mkt_channel = 'Paid'
+        AND mkt.mkt_channel IN ('Paid', 'Organic')
     GROUP BY 1,2,3,4,5,6,7,8,9
 
 UNION ALL
