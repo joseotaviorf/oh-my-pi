@@ -193,7 +193,7 @@ city_group_mappings AS (
             WHEN LOWER(mc.campaign_name) LIKE '%sorocaba%' THEN 'Sorocaba'
             WHEN LOWER(mc.campaign_name) LIKE '%ribeir_o%preto%' THEN 'Ribeirão Preto'
             WHEN LOWER(mc.campaign_name) LIKE '%sjrp%' OR LOWER(mc.campaign_name) LIKE '%s_o%jos_%do%rio%preto%' THEN 'São José do Rio Preto'
-            WHEN LOWER(mc.campaign_name) LIKE '%uberl_andia%' THEN 'Uberlândia'
+            WHEN LOWER(mc.campaign_name) LIKE '%uberl_ndia%' THEN 'Uberlândia'
         END AS city_group_by_campaign_name,
         CASE 
             WHEN campaign_city IN (

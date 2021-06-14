@@ -822,7 +822,7 @@ cost_taxonomy AS (
             WHEN cf.campaign_name_l LIKE '%sjrp%'
                 OR cf.campaign_name_l LIKE '%s_o%jos_%do%rio%preto%' THEN
                 'São José do Rio Preto'
-            WHEN cf.campaign_name_l LIKE '%uberl_andia%' THEN
+            WHEN cf.campaign_name_l LIKE '%uberl_ndia%' THEN
                 'Uberlândia'
             END AS city_campaign_mapping_rule,
             -- city via campaign_name name convention
