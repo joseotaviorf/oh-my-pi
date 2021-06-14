@@ -14,7 +14,7 @@ WITH anniversary_contracts AS (
         ON extract(day FROM dt_entrance) = dd.day AND extract(month FROM dt_entrance) = dd.month AND extract(year FROM dt_entrance) < dd.year AND dd.year <= COALESCE(extract(year FROM dt_termination) , extract(year FROM date '2021-01-01') + 1 )
     LEFT JOIN fact_house_listings fhl
 	ON fhl.sk_contract = dc.sk_contract
-    WHERE dc.status IN ('Ativo', 'Finalizado')
+    WHERE ((dc.status = 'Ativo') OR (dc.status = 'Finalizado' AND COALESCE(t.dt_termination, dc.dt_annulment) > dd.date))
         AND dd.date >= date '2020-10-01'
         AND COALESCE(DATE_TRUNC('month', COALESCE(t.dt_termination, dc.dt_annulment)), DATEADD(month, 3, GETDATE())) >= DATE_TRUNC('month', dd.date)
 ), pwa_negotiation AS (
@@ -215,7 +215,6 @@ WITH anniversary_contracts AS (
         END AS negotiation_origin, 
         least(pn.pwa_neg_created, fa.form_request_created, cn.crm_date_start, tn.first_ticket_neg_created, f2.ts_request_created) AS first_ts_negotiation,
 	greatest(pwa_neg_created,fa.first_execution,crm_date_start,last_ticket_neg_solved,f2.ts_request_executed) AS last_ts_negotiation,
-	datediff(day, cast(first_ts_negotiation AS date), cast(last_ts_negotiation AS date)) AS negotiation_lead_time,
 	CASE 
             WHEN last_ts_negotiation = pn.pwa_neg_created THEN 'pwa'
             WHEN last_ts_negotiation = fa.first_execution THEN 'form'
