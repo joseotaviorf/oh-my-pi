@@ -443,7 +443,7 @@ bietlejuice.enrich_offer:
   - bietlejuice.ebdb:create-clean-offer-in-data-lake
   - bietlejuice.ebdb:create-clean-offer-aud-in-data-lake
   - bietlejuice.enrich_booking:load-booking-to-enrich
-  - bietlejuice.enrich_ebdb_user_revision_entity:load-user-revision-entity-to-enrich
+  - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
   - bietlejuice.enrich_firestore
   - bietlejuice.godfather:load-business-offer
 
@@ -453,7 +453,7 @@ bietlejuice.enrich_owner_fees:
 bietlejuice.enrich_proposal:
   - bietlejuice.ebdb:create-clean-proposal-in-data-lake
   - bietlejuice.ebdb:create-clean-proposal-aud-in-data-lake
-  - bietlejuice.enrich_ebdb_user_revision_entity:load-user-revision-entity-to-enrich
+  - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
   - bietlejuice.sorting_hat:load-proposal-to-datalake-clean
   - bietlejuice.sorting_hat:load-proposal-version-to-datalake-clean
 
@@ -489,7 +489,7 @@ bietlejuice.enrich_sale_listings:
   - bietlejuice.ebdb:create-clean-listing-business-context-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
-  - bietlejuice.enrich_ebdb_user_revision_entity:load-user-revision-entity-to-enrich
+  - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
 
 bietlejuice.enrich_sauron:
   - bietlejuice.sauron:load-clean-session
