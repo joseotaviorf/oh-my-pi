@@ -343,7 +343,7 @@ LEFT JOIN
     AND t.id_task = c.id_task
 LEFT JOIN
   datalake_gsheets_clean.department_control dc
-    ON dc.department = t.queue_name 
+    ON dc.department = zd.zendesk_ticket_department  
 LEFT JOIN
   back_tickets bt
     ON bt.front_ticket = zd.id_ticket
