@@ -41,9 +41,7 @@ WITH
   (
     SELECT
       id,
-      id_contract,
-      keys_location,
-      keys_location_comment
+      id_contract
     FROM datalake_terminator_clean_prod.inspection i
   ),
   last_inspection
@@ -59,14 +57,11 @@ WITH
   AS
   (
     SELECT
-      i.id_contract,
-      i.id,
-      keys_location,
-      keys_location_comment
-    FROM inspections i
-      INNER JOIN last_inspection ii
-      ON ii.id = i.id
-        AND ii.id_contract = i.id_contract
+      id_contract,
+      id,
+      tenant_keys_location,
+      owner_keys_location
+    FROM datalake_terminator_clean_prod.termination
   ),
   inspection_tasks
   AS
@@ -108,8 +103,9 @@ SELECT
     WHEN t.source = 'CRM' then 'Manual'
     ELSE 'Automatic'
     END AS type,
-  k.keys_location AS key_location,
-  k.keys_location_comment AS key_location_detail,
+  JSON_EXTRACT_PATH_TEXT(k.tenant_keys_location, 'location') AS tenant_key_location,
+  k.tenant_keys_location AS tenant_key_detail,
+  k.owner_keys_location AS owner_key_detail,
   n.has_landlord_comment AS has_repairs,
   n.needs_repair_by_tenant AS is_repair_tenant_duty,
   n.repair_resolution,
