@@ -536,7 +536,7 @@ SELECT
    NULL::BIGINT AS fc2q,
    NULL::BIGINT AS p2q,
    NULL::BIGINT AS q2o,
-   COUNT(slf.sk_opportunity_date) AS o2fl,
+   COUNT(DISTINCT slf.sk_house_listing) AS o2fl,
    NULL::BIGINT AS vb2vc,
    NULL::BIGINT AS vb2os,
    NULL::BIGINT AS vb2oa,

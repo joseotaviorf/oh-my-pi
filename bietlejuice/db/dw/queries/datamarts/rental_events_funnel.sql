@@ -232,7 +232,7 @@ SELECT
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
-	COUNT(fhlf.sk_first_listing_date) AS first_listings,
+	COUNT(DISTINCT fhlf.sk_house_listing) AS first_listings,
 	NULL::BIGINT AS messages_sent_tta,
 	NULL::BIGINT AS registered_agent_supports,
 	NULL::BIGINT AS visits_booked,

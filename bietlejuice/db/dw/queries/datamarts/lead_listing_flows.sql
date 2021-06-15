@@ -79,7 +79,8 @@ source_ops_rent AS (
 	            ELSE NULL END AS first_listing_context,
 	        COALESCE(du.sales_company, dl.sales_company) AS sales_company,
 	        hlf.lead_origin,
-	        hlf.funnel_drop_reason
+	        hlf.funnel_drop_reason,
+	        sk_first_photo_job_date
 	FROM fact_house_listing_flows_adjust hlf
 	    JOIN dim_lead dl
 	        ON dl.sk_lead = hlf.sk_lead
@@ -136,7 +137,8 @@ source_ops_sale AS (
 	            ELSE NULL END AS first_listing_context,
 	        COALESCE(du.sales_company, dl.sales_company) AS sales_company,
 	        ssf.lead_origin,
-	        ssf.funnel_drop_reason
+	        ssf.funnel_drop_reason,
+	        sk_first_photo_job_date
 	FROM sale.fact_listing_flows ssf
 	    JOIN dim_lead dl
 	        ON dl.sk_lead = ssf.sk_lead
@@ -164,6 +166,7 @@ fact_sale AS (
 	    sor.qualified_context AS context_qualified,
 	    sor.opportunity_context AS context_opportunity,
 	    sor.first_listing_context AS context_first_listing,
+	    sor.sk_first_photo_job_date AS sk_first_photojob_date_fact_photo_job,
 	    ssf.mkt_origin,
 	    ssf.mkt_completion,
 	    ssf.mkt_channel,
@@ -198,6 +201,7 @@ fact_rent AS (
 	    sor.qualified_context AS context_qualified,
 	    sor.opportunity_context AS context_opportunity,
 	    sor.first_listing_context AS context_first_listing,
+	    sor.sk_first_photo_job_date AS sk_first_photojob_date_fact_photo_job,
 	    hlf.mkt_origin,
 	    hlf.mkt_completion,
 	    hlf.mkt_channel,
