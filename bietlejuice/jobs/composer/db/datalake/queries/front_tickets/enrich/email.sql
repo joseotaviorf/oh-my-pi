@@ -72,6 +72,9 @@ csat AS (
     )
     SELECT
       t.id_ticket,
+      GET_JSON_OBJECT(satisfaction_rating,'$.comment') AS csat_comment,
+      GET_JSON_OBJECT(satisfaction_rating,'$.reason') AS score_reason,
+      satisfaction_rating,
       CASE
         WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') = 'bad' THEN  1
         WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') = 'good' THEN  5
@@ -82,15 +85,29 @@ csat AS (
           WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') IN ('good') THEN TRUE
           WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') IN ('bad') THEN FALSE
       END AS is_solved,
-      GET_JSON_OBJECT(satisfaction_rating,'$.reason') AS score_reason,
-      GET_JSON_OBJECT(satisfaction_rating,'$.comment') AS csat_comment,
-      satisfaction_rating
+      NULL AS ts_first_seen,
+      NULL AS ts_first_response
     FROM
       datalake_zendesk_tickets_clean.tickets t
     JOIN
       last_update_ticket lut
         ON t.id_ticket = lut.id_ticket
         AND t.ts_updated = lut.ts_last_updated
+    UNION ALL
+    SELECT
+      id_ticket,
+      user_comment AS csat_comment,
+      NULL AS score_reason,
+      NULL AS satisfaction_rating,
+      csat_score,
+      COALESCE(CAST(user_comment AS STRING),CAST(csat_score AS STRING),CAST(is_solved AS STRING)) IS NOT NULL AS is_answered,
+      is_solved,
+      ts_first_seen,
+      ts_first_response
+    FROM
+      datalake_survicate.surveys
+    WHERE
+      id_ticket IS NOT NULL
 ),
 back_tickets AS (
   SELECT
@@ -149,6 +166,8 @@ SELECT DISTINCT
     WHEN bt.back_ticket_status IN ('closed','deleted','solved') THEN FALSE
   END AS is_open_back_ticket,
   bt.back_ticket,
+  cs.ts_first_seen AS ts_csat_first_seen,
+  cs.ts_first_response AS ts_csat_first_response,
   ze.ts_initially_assigned_local,
   ze.ts_last_assigned_local,
   ze.ts_ticket_started,
