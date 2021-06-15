@@ -23,7 +23,10 @@ WITH reservations_events AS (
         datalake_bigfone_events.events
     WHERE
         provider = 'twilio'
-        AND GET_JSON_OBJECT(metadata,'$.event_data.WorkflowName') = 'Assign to Anyone'
+        AND (
+            GET_JSON_OBJECT(metadata,'$.event_data.WorkflowName') = 'Assign to Anyone'
+            OR GET_JSON_OBJECT(metadata,'$.event_data.WorkflowName') = 'Assign to Flex'
+        )
         AND event LIKE 'reservation.%'
         AND GET_JSON_OBJECT(metadata,'$.event_data.ReservationSid') IS NOT NULL
         AND year = {year}
@@ -49,7 +52,10 @@ tasks_events AS (
       datalake_bigfone_events.events
   WHERE
       provider = 'twilio'
-      AND GET_JSON_OBJECT(metadata,'$.event_data.WorkflowName') = 'Assign to Anyone'
+      AND (
+            GET_JSON_OBJECT(metadata,'$.event_data.WorkflowName') = 'Assign to Anyone'
+            OR GET_JSON_OBJECT(metadata,'$.event_data.WorkflowName') = 'Assign to Flex'
+      )
       AND (event = 'task.created' OR event='task.wrapup')
       AND year = {year}
       AND month = {month}

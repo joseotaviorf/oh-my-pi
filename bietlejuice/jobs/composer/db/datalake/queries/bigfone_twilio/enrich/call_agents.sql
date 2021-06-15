@@ -14,7 +14,10 @@ WITH last_agent_events AS (
 		datalake_bigfone_events.events
 	WHERE
 		provider = 'twilio'
-		AND GET_JSON_OBJECT(metadata,'$.event_data.WorkflowName') = 'Assign to Anyone'
+		AND (
+			GET_JSON_OBJECT(metadata,'$.event_data.WorkflowName') = 'Assign to Anyone'
+			OR GET_JSON_OBJECT(metadata,'$.event_data.WorkflowName') = 'Assign to Flex'
+		)
 		AND GET_JSON_OBJECT(metadata,'$.event_data.WorkerAttributes') IS NOT NULL
 		AND year = {year}
 		AND month = {month}
@@ -38,7 +41,10 @@ INNER JOIN last_agent_events lae
 	ON GET_JSON_OBJECT(cfe.metadata,'$.event_data.Sid') = lae.id_last_event
 WHERE
 	cfe.provider = 'twilio'
-	AND GET_JSON_OBJECT(cfe.metadata,'$.event_data.WorkflowName') = 'Assign to Anyone'
+	AND (
+		GET_JSON_OBJECT(metadata,'$.event_data.WorkflowName') = 'Assign to Anyone'
+		OR GET_JSON_OBJECT(metadata,'$.event_data.WorkflowName') = 'Assign to Flex'
+	)
 	AND cfe.year = {year}
 	AND cfe.month = {month}
 	AND cfe.day = {day}

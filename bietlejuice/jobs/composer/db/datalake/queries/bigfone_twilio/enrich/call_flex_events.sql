@@ -51,7 +51,10 @@ FROM
 	datalake_bigfone_events.events
 WHERE
 	provider = 'twilio'
-	AND GET_JSON_OBJECT(metadata,'$.event_data.WorkflowName') = 'Assign to Anyone'
+	AND (
+		GET_JSON_OBJECT(metadata,'$.event_data.WorkflowName') = 'Assign to Anyone'
+		OR GET_JSON_OBJECT(metadata,'$.event_data.WorkflowName') = 'Assign to Flex'
+	)
 	AND year = {year}
 	AND month = {month}
 	AND day = {day}
