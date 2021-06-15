@@ -7,350 +7,382 @@ WITH consultant_prep AS (
             WHEN id_consultant NOT LIKE '%,%'
             THEN REPLACE(REPLACE(id_consultant, ']', ''), '[', '')
             ELSE SPLIT_PART(REPLACE(id_consultant, ']', ''),',', 2)
-        END AS id_consultant
-    FROM datalake_firestore_prod.monday dfm
+        END AS id_consultant,
+        id_closing_specialist
+    FROM
+        datalake_firestore_prod.monday AS dfm
+),
+consultant_prep_rules AS (
+    SELECT
+        cp.id_offer,
+        CASE
+            WHEN id_consultant = '11422665' THEN '12614540'
+            ELSE id_consultant
+        END AS id_consultant_adjusted,
+        ms.id_monday AS id_closing_specialist,
+        CASE
+            WHEN id_consultant IS NULL THEN 'não atribuido'
+            ELSE mu.name
+        END AS name_consultant,
+        ms.email AS closing_specialist_email
+    FROM
+        consultant_prep cp
+    LEFT JOIN
+        datalake_raw.gsheets_monday_users AS mu
+        ON mu.id_monday = cp.id_consultant
+    LEFT JOIN
+        datalake_raw.gsheets_monday_users AS ms
+        ON ms.id_monday = cp.id_closing_specialist
+),
+offer_rules AS (
+    SELECT
+        so.id AS id_offer,
+        dfm.sale_agreement_status,
+        CASE
+            WHEN dfm.status = 'Propostas em validação' THEN 'Ongoing'
+            WHEN dfm.status = 'Propostas Ongoing' THEN 'Ongoing'
+            WHEN dfm.status = 'Propostas Aceitas' THEN 'Accepted Ongoing'
+            WHEN dfm.status = 'Pós CCV' THEN 'CCV Assinado'
+            WHEN dfm.status = 'Compra e Venda Concluídas' THEN 'CCV Assinado'
+            WHEN dfm.status = 'CCV - Cancelado' THEN 'CCV Assinado'
+            WHEN dfm.status = 'Canceladas pós Aceite' THEN 'Descarte'
+            WHEN dfm.status = 'Canceladas em negociação' THEN 'Descarte'
+            WHEN dfm.status = 'Canceladas em validação' THEN 'Descarte'
+            ELSE 'ERRO'
+        END AS status_type,
+        CASE
+            WHEN dt_offer_dismissed IS NOT NULL OR dfm.drop_reason IS NOT NULL THEN TRUE ELSE FALSE
+        END AS is_offer_dismissed,
+        CASE
+            WHEN dfm.drop_reason IS NULL AND dfm.dt_offer_dismissed is NULL THEN ''
+            WHEN len(dfm.drop_reason) > 4 THEN dfm.drop_reason
+            WHEN dfm.drop_reason = 120 THEN 'BY - Vai procurar outro imóvel dentro do 5A'
+            WHEN dfm.drop_reason = 121 THEN 'BY - Vai procurar outro imóvel fora do 5A'
+            WHEN dfm.drop_reason = 122 THEN 'BY - Pagamento parcelado'
+            WHEN dfm.drop_reason = 123 THEN 'BY - Pagamento permuta'
+            WHEN dfm.drop_reason = 124 THEN 'BY - Pagamento aluguel investido'
+            WHEN dfm.drop_reason = 125 THEN 'BY - Sem contato/retorno'
+            WHEN dfm.drop_reason = 126 THEN 'BY - Não possui valor de entrada/sinal (qualquer imóvel)'
+            WHEN dfm.drop_reason = 127 THEN 'BY - Não possui valor de entrada/sinal (deste imóvel)'
+            WHEN dfm.drop_reason = 128 THEN 'BY - Não aceitou a contra SL'
+            WHEN dfm.drop_reason = 129 THEN 'BY - Não aceita modelo 5A'
+            WHEN dfm.drop_reason = 130 THEN 'BY - Alugou ou comprou fora do 5A'
+            WHEN dfm.drop_reason = 131 THEN 'BY - Financiamento do BY não cobre o do SL'
+            WHEN dfm.drop_reason = 132 THEN 'BY - Desistiu de comprar qualquer imóvel'
+            WHEN dfm.drop_reason = 133 THEN 'BY - Comprou outro imóvel pelo 5A'
+            WHEN dfm.drop_reason = 134 THEN 'BY - Não tem o valor para as custas de cartório'
+            WHEN dfm.drop_reason = 135 THEN 'BY - Falta de flexibilização em cláusulas contratuais'
+            WHEN dfm.drop_reason = 136 THEN 'SL - Vendeu por fora do 5A'
+            WHEN dfm.drop_reason = 137 THEN 'SL - Vendeu pelo 5A para outro buyer'
+            WHEN dfm.drop_reason = 138 THEN 'SL - IQ dificultou processo de venda'
+            WHEN dfm.drop_reason = 139 THEN 'SL- Problemas de documentação do imóvel'
+            WHEN dfm.drop_reason = 140 THEN 'SL - Problemas de documentação do vendedor'
+            WHEN dfm.drop_reason = 141 THEN 'SL - Sem contato/retorno'
+            WHEN dfm.drop_reason = 142 THEN 'SL - Desistiu de vender o imóvel'
+            WHEN dfm.drop_reason = 143 THEN 'SL - Só aceita valor do anuncio'
+            WHEN dfm.drop_reason = 144 THEN 'SL - Não aceitou contraproposta do BY'
+            WHEN dfm.drop_reason = 145 THEN 'SL - Só aceita pagamento à vista'
+            WHEN dfm.drop_reason = 146 THEN 'SL - Anúncio com valor incorreto'
+            WHEN dfm.drop_reason = 147 THEN 'SL - Alugou ou vai alugar o imóvel'
+            WHEN dfm.drop_reason = 148 THEN 'SL - Possível Bypass'
+            WHEN dfm.drop_reason = 149 THEN 'SL - Não aceita modelo 5A'
+            WHEN dfm.drop_reason = 150 THEN 'SL - Não concorda com taxa de corretagem'
+            WHEN dfm.drop_reason = 151 THEN 'SL - Falta de flexibilização em cláusulas contratuais'
+            WHEN dfm.drop_reason = 1 THEN 'Buyer - pagamento envolve permuta'
+            WHEN dfm.drop_reason = 2 THEN 'Buyer - pagamento envolve aluguel investido'
+            WHEN dfm.drop_reason = 3 THEN 'Buyer - pagamento parcelado'
+            WHEN dfm.drop_reason = 4 THEN 'Buyer - não tem dinheiro para a entrada de qualquer imóvel'
+            WHEN dfm.drop_reason = 5 THEN 'Buyer - não aceita modelo 5A'
+            WHEN dfm.drop_reason = 7 THEN 'Buyer - não aceitou a contraproposta do Seller'
+            WHEN dfm.drop_reason = 8 THEN 'Buyer - vai procurar outro imóvel'
+            WHEN dfm.drop_reason = 9 THEN 'Buyer - pediu para desconsiderar a proposta'
+            WHEN dfm.drop_reason = 10 THEN 'Buyer - nunca atende'
+            WHEN dfm.drop_reason = 11 THEN 'Buyer - demora para retornar'
+            WHEN dfm.drop_reason = 12 THEN 'Seller - não aceitou proposta do buyer (sem contraproposta)'
+            WHEN dfm.drop_reason = 13 THEN 'Buyer - desistiu de comprar qualquer imóvel'
+            WHEN dfm.drop_reason = 14 THEN 'Seller - não aceitou contraproposta do buyer'
+            WHEN dfm.drop_reason = 15 THEN 'Buyer - já alugou ou comprou com outra imobiliária'
+            WHEN dfm.drop_reason = 16 THEN 'Seller - problemas de documentação do Imóvel'
+            WHEN dfm.drop_reason = 17 THEN 'Seller - condições legais (que não a documentação do Imóvel)'
+            WHEN dfm.drop_reason = 18 THEN 'Seller - vendeu por outra imobiliária'
+            WHEN dfm.drop_reason = 19 THEN 'Seller - alugou ou vai alugar o imóvel'
+            WHEN dfm.drop_reason = 20 THEN 'Seller - não vai mais vender o imóvel'
+            WHEN dfm.drop_reason = 102 THEN 'Seller - nunca atende'
+            WHEN dfm.drop_reason = 103 THEN 'Seller - demora para retornar'
+            WHEN dfm.drop_reason = 104 THEN 'Seller - não aceita modelo 5A'
+            WHEN dfm.drop_reason = 105 THEN 'Seller - problemas para visitar o imóvel'
+            WHEN dfm.drop_reason = 106 THEN 'Seller - IQ dificultou processo de venda'
+            WHEN dfm.drop_reason = 107 THEN 'Buyer - não tem dinheiro para a entrada (deste imóvel)'
+            WHEN dfm.drop_reason = 108 THEN 'Seller - anúncio com valor incorreto'
+            WHEN dfm.drop_reason = 109 THEN 'Seller - seller é PJ'
+            WHEN dfm.drop_reason = 110 THEN 'Buyer - comprou outro imóvel pelo 5A'
+            WHEN dfm.drop_reason = 111 THEN 'Seller - vendeu pelo 5A para outro buyer'
+            WHEN dfm.drop_reason = 112 THEN 'Buyer - problemas de documentação'
+            WHEN dfm.drop_reason = 113 THEN 'Buyer - financiamento do Buyer não cobre o do Seller'
+            WHEN dfm.drop_reason = 114 THEN 'Seller - não aceita pagamento financiado'
+            WHEN dfm.drop_reason = 115 THEN 'Buyer - desconto maior do que 30%'
+            WHEN dfm.drop_reason = 116 THEN 'Buyer - pediu para desconsiderar a proposta'
+            WHEN dfm.drop_reason = 117 THEN 'Buyer - Proposta aceita invalidada'
+            WHEN dfm.drop_reason = 118 THEN 'Seller - Proposta aceita invalidada'
+            WHEN dfm.drop_reason = 119 THEN 'Possível Bypass'
+            ELSE 'ERRO'
+        END AS drop_reason_name,
+        CASE
+            WHEN dfm.drop_reason IS NULL AND dfm.dt_offer_dismissed IS NULL THEN ''
+            WHEN dfm.drop_reason = 120 THEN 'Quali'
+            WHEN dfm.drop_reason = 121 THEN 'Quali'
+            WHEN dfm.drop_reason = 122 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 123 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 124 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 125 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 126 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 127 THEN 'Quali'
+            WHEN dfm.drop_reason = 128 THEN 'Quali'
+            WHEN dfm.drop_reason = 129 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 130 THEN 'Quali'
+            WHEN dfm.drop_reason = 131 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 132 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 133 THEN 'Quali'
+            WHEN dfm.drop_reason = 134 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 135 THEN 'Quali'
+            WHEN dfm.drop_reason = 136 THEN 'Quali'
+            WHEN dfm.drop_reason = 137 THEN 'Quali'
+            WHEN dfm.drop_reason = 138 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 139 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 140 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 141 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 142 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 143 THEN 'Quali'
+            WHEN dfm.drop_reason = 144 THEN 'Quali'
+            WHEN dfm.drop_reason = 145 THEN 'Quali'
+            WHEN dfm.drop_reason = 146 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 147 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 148 THEN 'Quali'
+            WHEN dfm.drop_reason = 149 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 150 THEN 'Quali'
+            WHEN dfm.drop_reason = 151 THEN 'Quali'
+            WHEN dfm.drop_reason = 1 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 2 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 3 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 4 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 5 THEN 'Quali'
+            WHEN dfm.drop_reason = 7 THEN 'Quali'
+            WHEN dfm.drop_reason = 8 THEN 'Quali'
+            WHEN dfm.drop_reason = 9 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 10 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 11 THEN 'Quali'
+            WHEN dfm.drop_reason = 12 THEN 'Quali'
+            WHEN dfm.drop_reason = 13 THEN 'Quali'
+            WHEN dfm.drop_reason = 14 THEN 'Quali'
+            WHEN dfm.drop_reason = 15 THEN 'Quali'
+            WHEN dfm.drop_reason = 16 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 17 THEN 'Quali'
+            WHEN dfm.drop_reason = 18 THEN 'Quali'
+            WHEN dfm.drop_reason = 19 THEN 'Quali'
+            WHEN dfm.drop_reason = 20 THEN 'Quali'
+            WHEN dfm.drop_reason = 102 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 103 THEN 'Quali'
+            WHEN dfm.drop_reason = 104 THEN 'Quali'
+            WHEN dfm.drop_reason = 105 THEN 'Quali'
+            WHEN dfm.drop_reason = 106 THEN 'Quali'
+            WHEN dfm.drop_reason = 107 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 108 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 109 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 110 THEN 'Quali'
+            WHEN dfm.drop_reason = 111 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 112 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 113 THEN 'Quali'
+            WHEN dfm.drop_reason = 114 THEN 'Quali'
+            WHEN dfm.drop_reason = 115 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 116 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 117 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 118 THEN 'Não Quali'
+            WHEN dfm.drop_reason = 119 THEN 'Quali'
+            ELSE 'ERRO'
+        END AS drop_category,
+        CASE
+            WHEN dfm.drop_reason IS NULL AND dfm.dt_offer_dismissed IS NULL THEN ''
+            WHEN dfm.drop_reason = 120 THEN 'Cliente 5A'
+            WHEN dfm.drop_reason = 121 THEN 'Concorrência'
+            WHEN dfm.drop_reason = 122 THEN 'Modelo 5A'
+            WHEN dfm.drop_reason = 123 THEN 'Modelo 5A'
+            WHEN dfm.drop_reason = 124 THEN 'Modelo 5A'
+            WHEN dfm.drop_reason = 125 THEN 'Desistência'
+            WHEN dfm.drop_reason = 126 THEN 'Modelo 5A'
+            WHEN dfm.drop_reason = 127 THEN 'Problema Jurídico/Financeiro'
+            WHEN dfm.drop_reason = 128 THEN 'Negociação'
+            WHEN dfm.drop_reason = 129 THEN 'Modelo 5A'
+            WHEN dfm.drop_reason = 130 THEN 'Concorrência'
+            WHEN dfm.drop_reason = 131 THEN 'Problema Jurídico/Financeiro'
+            WHEN dfm.drop_reason = 132 THEN 'Desistência'
+            WHEN dfm.drop_reason = 133 THEN 'Cliente 5A'
+            WHEN dfm.drop_reason = 134 THEN 'Problema Jurídico/Financeiro'
+            WHEN dfm.drop_reason = 135 THEN 'Modelo 5A'
+            WHEN dfm.drop_reason = 136 THEN 'Concorrência'
+            WHEN dfm.drop_reason = 137 THEN 'Cliente 5A'
+            WHEN dfm.drop_reason = 138 THEN 'Problema Jurídico/Financeiro'
+            WHEN dfm.drop_reason = 139 THEN 'Problema Jurídico/Financeiro'
+            WHEN dfm.drop_reason = 140 THEN 'Problema Jurídico/Financeiro'
+            WHEN dfm.drop_reason = 141 THEN 'Desistência'
+            WHEN dfm.drop_reason = 142 THEN 'Desistência'
+            WHEN dfm.drop_reason = 143 THEN 'Negociação'
+            WHEN dfm.drop_reason = 144 THEN 'Negociação'
+            WHEN dfm.drop_reason = 145 THEN 'Negociação'
+            WHEN dfm.drop_reason = 146 THEN 'Erro 5A/SL'
+            WHEN dfm.drop_reason = 147 THEN 'Desistência'
+            WHEN dfm.drop_reason = 148 THEN 'Concorrência'
+            WHEN dfm.drop_reason = 149 THEN 'Modelo 5A'
+            WHEN dfm.drop_reason = 150 THEN 'Modelo 5A'
+            WHEN dfm.drop_reason = 151 THEN 'Modelo 5A'
+            WHEN dfm.drop_reason = 1 THEN 'Fora do Modelo'
+            WHEN dfm.drop_reason = 2 THEN 'Fora do Modelo'
+            WHEN dfm.drop_reason = 3 THEN 'Fora do Modelo'
+            WHEN dfm.drop_reason = 4 THEN 'Falta de Recursos'
+            WHEN dfm.drop_reason = 5 THEN 'Fora do Modelo'
+            WHEN dfm.drop_reason = 7 THEN 'Negociação'
+            WHEN dfm.drop_reason = 8 THEN 'SLA'
+            WHEN dfm.drop_reason = 9 THEN 'Baixo intent'
+            WHEN dfm.drop_reason = 10 THEN 'Baixo intent'
+            WHEN dfm.drop_reason = 11 THEN 'SLA'
+            WHEN dfm.drop_reason = 12 THEN 'Negociação'
+            WHEN dfm.drop_reason = 13 THEN 'SLA'
+            WHEN dfm.drop_reason = 14 THEN 'Negociação'
+            WHEN dfm.drop_reason = 15 THEN 'Concorrência'
+            WHEN dfm.drop_reason = 16 THEN 'Documentação'
+            WHEN dfm.drop_reason = 17 THEN 'Documentação'
+            WHEN dfm.drop_reason = 18 THEN 'Concorrência'
+            WHEN dfm.drop_reason = 19 THEN 'SLA'
+            WHEN dfm.drop_reason = 20 THEN 'SLA'
+            WHEN dfm.drop_reason = 102 THEN 'Baixo intent'
+            WHEN dfm.drop_reason = 103 THEN 'SLA'
+            WHEN dfm.drop_reason = 104 THEN 'Fora do Modelo'
+            WHEN dfm.drop_reason = 105 THEN 'Baixo intent'
+            WHEN dfm.drop_reason = 106 THEN 'Baixo intent'
+            WHEN dfm.drop_reason = 107 THEN 'Falta de Recursos'
+            WHEN dfm.drop_reason = 108 THEN 'Erro de Cadastro'
+            WHEN dfm.drop_reason = 109 THEN 'Erro de Cadastro'
+            WHEN dfm.drop_reason = 110 THEN 'Liquidez'
+            WHEN dfm.drop_reason = 111 THEN 'Liquidez'
+            WHEN dfm.drop_reason = 112 THEN 'Documentação'
+            WHEN dfm.drop_reason = 113 THEN 'Falta de Recursos'
+            WHEN dfm.drop_reason = 114 THEN 'Negociação'
+            WHEN dfm.drop_reason = 115 THEN 'Falta de Recursos'
+            WHEN dfm.drop_reason = 116 THEN 'Baixo intent'
+            WHEN dfm.drop_reason = 117 THEN 'Outros'
+            WHEN dfm.drop_reason = 118 THEN 'Outros'
+            WHEN dfm.drop_reason = 119 THEN 'Outros'
+            ELSE 'ERRO'
+        END AS drop_subcategory,
+        CASE
+            WHEN dfm.drop_reason IS NULL AND dfm.dt_offer_dismissed IS NULL THEN ''
+            WHEN dfm.drop_reason = 120 THEN 'Buyer'
+            WHEN dfm.drop_reason = 121 THEN 'Buyer'
+            WHEN dfm.drop_reason = 122 THEN 'Buyer'
+            WHEN dfm.drop_reason = 123 THEN 'Buyer'
+            WHEN dfm.drop_reason = 124 THEN 'Buyer'
+            WHEN dfm.drop_reason = 125 THEN 'Buyer'
+            WHEN dfm.drop_reason = 126 THEN 'Buyer'
+            WHEN dfm.drop_reason = 127 THEN 'Buyer'
+            WHEN dfm.drop_reason = 128 THEN 'Buyer'
+            WHEN dfm.drop_reason = 129 THEN 'Buyer'
+            WHEN dfm.drop_reason = 130 THEN 'Buyer'
+            WHEN dfm.drop_reason = 131 THEN 'Buyer'
+            WHEN dfm.drop_reason = 132 THEN 'Buyer'
+            WHEN dfm.drop_reason = 133 THEN 'Buyer'
+            WHEN dfm.drop_reason = 134 THEN 'Buyer'
+            WHEN dfm.drop_reason = 135 THEN 'Buyer'
+            WHEN dfm.drop_reason = 136 THEN 'Seller'
+            WHEN dfm.drop_reason = 137 THEN 'Seller'
+            WHEN dfm.drop_reason = 138 THEN 'Seller'
+            WHEN dfm.drop_reason = 139 THEN 'Seller'
+            WHEN dfm.drop_reason = 140 THEN 'Seller'
+            WHEN dfm.drop_reason = 141 THEN 'Seller'
+            WHEN dfm.drop_reason = 142 THEN 'Seller'
+            WHEN dfm.drop_reason = 143 THEN 'Seller'
+            WHEN dfm.drop_reason = 144 THEN 'Seller'
+            WHEN dfm.drop_reason = 145 THEN 'Seller'
+            WHEN dfm.drop_reason = 146 THEN 'Seller'
+            WHEN dfm.drop_reason = 147 THEN 'Seller'
+            WHEN dfm.drop_reason = 148 THEN 'Seller'
+            WHEN dfm.drop_reason = 149 THEN 'Seller'
+            WHEN dfm.drop_reason = 150 THEN 'Seller'
+            WHEN dfm.drop_reason = 151 THEN 'Seller'
+            WHEN dfm.drop_reason = 1 THEN 'Buyer'
+            WHEN dfm.drop_reason = 2 THEN 'Buyer'
+            WHEN dfm.drop_reason = 3 THEN 'Buyer'
+            WHEN dfm.drop_reason = 4 THEN 'Buyer'
+            WHEN dfm.drop_reason = 5 THEN 'Buyer'
+            WHEN dfm.drop_reason = 7 THEN 'Buyer'
+            WHEN dfm.drop_reason = 8 THEN 'Buyer'
+            WHEN dfm.drop_reason = 9 THEN 'Buyer'
+            WHEN dfm.drop_reason = 10 THEN 'Buyer'
+            WHEN dfm.drop_reason = 11 THEN 'Buyer'
+            WHEN dfm.drop_reason = 12 THEN 'Seller'
+            WHEN dfm.drop_reason = 13 THEN 'Buyer'
+            WHEN dfm.drop_reason = 14 THEN 'Seller'
+            WHEN dfm.drop_reason = 15 THEN 'Buyer'
+            WHEN dfm.drop_reason = 16 THEN 'Seller'
+            WHEN dfm.drop_reason = 17 THEN 'Seller'
+            WHEN dfm.drop_reason = 18 THEN 'Seller'
+            WHEN dfm.drop_reason = 19 THEN 'Seller'
+            WHEN dfm.drop_reason = 20 THEN 'Seller'
+            WHEN dfm.drop_reason = 102 THEN 'Seller'
+            WHEN dfm.drop_reason = 103 THEN 'Seller'
+            WHEN dfm.drop_reason = 104 THEN 'Seller'
+            WHEN dfm.drop_reason = 105 THEN 'Seller'
+            WHEN dfm.drop_reason = 106 THEN 'Seller'
+            WHEN dfm.drop_reason = 107 THEN 'Buyer'
+            WHEN dfm.drop_reason = 108 THEN 'Seller'
+            WHEN dfm.drop_reason = 109 THEN 'Seller'
+            WHEN dfm.drop_reason = 110 THEN 'Buyer'
+            WHEN dfm.drop_reason = 111 THEN 'Seller'
+            WHEN dfm.drop_reason = 112 THEN 'Buyer'
+            WHEN dfm.drop_reason = 113 THEN 'Buyer'
+            WHEN dfm.drop_reason = 114 THEN 'Seller'
+            WHEN dfm.drop_reason = 115 THEN 'Buyer'
+            WHEN dfm.drop_reason = 116 THEN 'Buyer'
+            WHEN dfm.drop_reason = 117 THEN 'Buyer'
+            WHEN dfm.drop_reason = 118 THEN 'Seller'
+            WHEN dfm.drop_reason = 119 THEN 'Definir'
+            ELSE 'ERRO'
+        END AS deal_breaker,
+        CASE
+            WHEN drop_category = 'Quali' THEN dfm.dt_offer_dismissed
+            ELSE NULL
+        END AS dt_offer_dismissed_qualified,
+        CASE
+            WHEN drop_category = 'Não Quali' THEN dfm.dt_offer_dismissed
+            ELSE NULL
+        END AS dt_offer_dismissed_unqualified,
+        CASE
+            WHEN dt_offer_dismissed IS NOT NULL AND dt_accepted IS NULL THEN 'Pré_OA'
+            WHEN dt_offer_dismissed < dt_accepted AND dt_accepted IS NOT NULL AND dt_offer_dismissed IS NOT NULL THEN 'Pré_OA'
+            WHEN dt_offer_dismissed >= dt_accepted AND dt_accepted IS NOT NULL AND dt_offer_dismissed IS NOT NULL THEN 'Pós_OA'
+        END AS step_discard
+    FROM
+        datalake_firestore_prod.sale_offer AS so
+    LEFT JOIN
+        datalake_firestore_prod.monday AS dfm
+        ON so.id = dfm.id_offer
 )
-
-SELECT DISTINCT
-    so.id AS id_offer,
-    --dfm.id_auto_generated, --AGUARDANDO COLUNA
-    so.id_house,
-    so.id_buyer,
-    CONCAT(CONCAT(so.id_buyer,'_'),so.id_house) AS "sk_sale_flow",
-    --dfm.id_consultant, -- ID DO PRIMEIRO ANALISTA A TRATAR A OFERTA, CORRETO É O ÚLTIMO
-    CASE -- id_consultant_adjusted
-        WHEN cp.id_consultant IS NULL THEN ''
-        WHEN cp.id_consultant = '12614540' THEN '12614540'
-        WHEN cp.id_consultant = '12041621' THEN '12041621'
-        WHEN cp.id_consultant = '11422663' THEN '11422663'
-        WHEN cp.id_consultant = '11422665' THEN '12614540'
-        WHEN COALESCE(cp.id_consultant, '') IS NULL THEN 'ERRO'
-        ELSE cp.id_consultant
-    END AS "id_consultant_adjusted",
-    CASE -- name_consultant
-        WHEN id_consultant_adjusted IS NULL THEN NULL
-        WHEN id_consultant_adjusted = '15520028' THEN 'Dayse Susan'
-        WHEN id_consultant_adjusted = '11422665' THEN 'Antonio Sader'
-        WHEN id_consultant_adjusted = '12114276' THEN 'Ana Cléo Moraes'
-        WHEN id_consultant_adjusted = '15265928' THEN 'Gabriel Zucchini'
-        WHEN id_consultant_adjusted = '15265915' THEN 'Pedro Guilherme Faria'
-        WHEN id_consultant_adjusted = '16209415' THEN 'Monique Gadelha'
-        WHEN id_consultant_adjusted = '14832753' THEN 'Renan Rocha de Paiva'
-        WHEN id_consultant_adjusted = '16243829' THEN 'Anna Caroline Maia de Almeida'
-        WHEN id_consultant_adjusted = '14610991' THEN 'Thomas Viana da Silva'
-        WHEN id_consultant_adjusted = '15557400' THEN 'Tuani Damaceno'
-        WHEN id_consultant_adjusted = '15265919' THEN 'Jéssica Thayse'
-        WHEN id_consultant_adjusted = '15429031' THEN 'Thiago Araújo'
-        WHEN id_consultant_adjusted = '15265925' THEN 'Nataly Maciel'
-        WHEN id_consultant_adjusted = '14832767' THEN 'Pedro Santos'
-        WHEN id_consultant_adjusted = '12614540' THEN 'Mariana Boer'
-        WHEN id_consultant_adjusted = '12041621' THEN 'Bruna Araujo'
-        WHEN id_consultant_adjusted = '11422663' THEN 'Felipe Calegari da Cunha'
-        WHEN id_consultant_adjusted = '14832760' THEN 'Mariana Montanha Alves'
-        WHEN id_consultant_adjusted = '15284501' THEN 'Emerson de Souza Meneguel'
-        WHEN id_consultant_adjusted = '17469676' THEN 'Kaue Cavignato Lima'
-        WHEN id_consultant_adjusted = '17329099' THEN 'Luiz Fernando Secco Bocayuva Cunha'
-        WHEN id_consultant_adjusted = '17437477' THEN 'Mariana Passos'
-        WHEN id_consultant_adjusted = '17328901' THEN 'Monique Freire Lourenço'
-        WHEN id_consultant_adjusted = '17914796' THEN 'Elizangela Fernandes'
-        WHEN id_consultant_adjusted = '18242764' THEN 'Augusto Vinicius de Barros'
-        WHEN id_consultant_adjusted = '17940448' THEN 'Rafael Burckauser Ceschi'
-        WHEN id_consultant_adjusted = '17940769' THEN 'Paulo Sérgio Pitondo'
-        WHEN id_consultant_adjusted = '17940876' THEN 'Rafael Gonçalves de Freitas Lima'
-        WHEN id_consultant_adjusted = '18257464' THEN 'Brenda Fernandes'
-        WHEN id_consultant_adjusted = '14783782' THEN 'Jaquelinne de Jorge Bassi'
-        WHEN id_consultant_adjusted = '17940623' THEN 'Beatriz Fonseca'
-        WHEN id_consultant_adjusted = '18341985' THEN 'Nicolás Santana da Silva'
-        WHEN id_consultant_adjusted = '19694893' THEN 'Karoline Barboza Costa'
-        WHEN id_consultant_adjusted = '18341988' THEN 'Stella Batista Leal'
-        WHEN id_consultant_adjusted = '20446112' THEN 'Gustavo Issa Ribeiro'
-        ELSE 'ERRO'
-    END AS "name_consultant",
-    dfm.id_closing_specialist,
-    CASE
-        WHEN dfm.id_closing_specialist = 20920407 THEN 'alexandra.sales@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 16077805 THEN 'alexandre.brianezi@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 21317381 THEN 'ana.albiero@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 21345778 THEN 'ana.carolina@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 20919656 THEN 'andressa.marins@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 20998862 THEN 'andressa.martins@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 16077813 THEN 'barbara.lunetta@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 17893559 THEN 'barbara.moreira@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 21345779 THEN 'barbara.romani@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 20919664 THEN 'bianca.brasileiro@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 20919652 THEN 'bruno.waaro@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 15821726 THEN 'bruno.naves@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 17686691 THEN 'camila.souza@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 15821729 THEN 'carla.bezerra@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 15126363 THEN 'carolina.henriques@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 20165693 THEN 'clara.castro@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 19004850 THEN 'claudia.ferraz@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 21345772 THEN 'danilo.jesus@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 15821720 THEN 'denise.sa@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 20919647 THEN 'dislaine.brito@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 20920139 THEN 'edmar.luz@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 20919645 THEN 'emerson.souza@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 20919668 THEN 'fabio.pinheiro@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 18056905 THEN 'felipe.furlanetti@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 17205052 THEN 'gabriel.oliveira@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 20165706 THEN 'gabriela.freitas@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 20149733 THEN 'gabriela.lisboa@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 17653074 THEN 'henrique.oliveira@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 20165661 THEN 'ingrid.ferreira@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 20919659 THEN 'jackson.santos@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 20919634 THEN 'jadi.braga@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 20919726 THEN 'jairo.lacerda@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 20371607 THEN 'james.squetini@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 21345780 THEN 'joao.oliveira@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 21345775 THEN 'jonas.olegario@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 20919633 THEN 'jose.canada@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 13790653 THEN 'julia.rocha@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 15840305 THEN 'kayline.sena@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 16077803 THEN 'leonardo.mondin@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 21055601 THEN 'lorraine.freire@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 17568619 THEN 'luana.francisca@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 20919638 THEN 'luana.alves@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 17653073 THEN 'lucas.favero@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 21345774 THEN 'lucas.nunes@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 12924820 THEN 'luis.lima@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 16077814 THEN 'luiz.ribeiro@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 17893560 THEN 'marcel.nascimento@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 18056903 THEN 'marcela.domingues@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 15821730 THEN 'mariana.costa@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 19950480 THEN 'monica.martinez@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 15821724 THEN 'monique.borguezan@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 20919644 THEN 'natalia.porto@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 20919635 THEN 'nathan.silva@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 15821728 THEN 'pamela.mariano@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 20919628 THEN 'pamella.soares@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 19950485 THEN 'pedro.perrella@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 15821721 THEN 'rafael.vieira@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 21345777 THEN 'rafael.mesquita@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 20919642 THEN 'renan.almeida@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 14999241 THEN 'ricardo.marchioni@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 16927297 THEN 'rodrigo.souza@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 20919650 THEN 'rosilene.silva@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 16077812 THEN 'rosinei.costa@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 20919648 THEN 'sergio.junior@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 21345782 THEN 'silvia.oliveira@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 16077807 THEN 'suamy.varcese@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 14999242 THEN 'susanne.acauan@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 16927296 THEN 'tatiane.chaves@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 20371606 THEN 'tayna.andrade@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 21345781 THEN 'thais.oliveira@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 20371605 THEN 'thatiane.colombo@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 16077804 THEN 'thauane.cerqueira@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 17653076 THEN 'thays.barreto@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 19950478 THEN 'thiago.sansivieri@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 16077810 THEN 'ursulla.nogueira@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 15821731 THEN 'vanessa.lima@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 19950483 THEN 'victor.bonifacio@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 18056906 THEN 'victoria.navarro@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 20919637 THEN 'vinicius.bertini@quintoandar.com.br'
-        WHEN dfm.id_closing_specialist = 16077806 THEN 'vinicius.franca@quintoandar.com.br'
-        ELSE NULL
-    END AS closing_specialist_email,
-    dhl.house_city,
-    dfm.status,
-    so.status AS status_offer_firestore,
-    CASE -- status_type
-        WHEN dfm.status = 'Propostas em validação' THEN 'Ongoing'
-        WHEN dfm.status = 'Propostas Ongoing' THEN 'Ongoing'
-        WHEN dfm.status = 'Propostas Aceitas' THEN 'Accepted Ongoing'
-        WHEN dfm.status = 'Pós CCV' THEN 'CCV Assinado'
-        WHEN dfm.status = 'Compra e Venda Concluídas' THEN 'CCV Assinado'
-        WHEN dfm.status = 'CCV - Cancelado' THEN 'CCV Assinado'
-        WHEN dfm.status = 'Canceladas pós Aceite' THEN 'Descarte'
-        WHEN dfm.status = 'Canceladas em negociação' THEN 'Descarte'
-        WHEN dfm.status = 'Canceladas em validação' THEN 'Descarte'
-        ELSE 'ERRO'
-    END AS "status_type",
-    dfm.sale_agreement_status,
-    dfm.dt_offer_dismissed,
-    CASE WHEN dt_offer_dismissed IS NOT NULL OR dfm.drop_reason IS NOT NULL THEN 1 ELSE 0 END AS "is_offer_dismissed",
-    CASE -- drop_reason_adjusted
-        WHEN dfm.drop_reason is NULL and dt_offer_dismissed is NULL THEN ''
-        WHEN len(dfm.drop_reason) > 4 THEN dfm.drop_reason
-        WHEN dfm.drop_reason = 1 THEN 'Buyer - pagamento envolve permuta'
-        WHEN dfm.drop_reason = 2 THEN 'Buyer - pagamento envolve aluguel investido'
-        WHEN dfm.drop_reason = 3 THEN 'Buyer - pagamento parcelado'
-        WHEN dfm.drop_reason = 4 THEN 'Buyer - não tem dinheiro para a entrada de qualquer imóvel'
-        WHEN dfm.drop_reason = 5 THEN 'Buyer - não aceita modelo 5A'
-        WHEN dfm.drop_reason = 7 THEN 'Buyer - não aceitou a contraproposta do Seller'
-        WHEN dfm.drop_reason = 8 THEN 'Buyer - vai procurar outro imóvel'
-        WHEN dfm.drop_reason = 9 THEN 'Buyer - pediu para desconsiderar a proposta'
-        WHEN dfm.drop_reason = 10 THEN 'Buyer - nunca atende'
-        WHEN dfm.drop_reason = 11 THEN 'Seller - demora para retornar'
-        WHEN dfm.drop_reason = 11 THEN 'Buyer - demora para retornar'
-        WHEN dfm.drop_reason = 12 THEN 'Seller - não aceitou proposta do buyer (sem contraproposta)'
-        WHEN dfm.drop_reason = 13 THEN 'Buyer - desistiu de comprar qualquer imóvel'
-        WHEN dfm.drop_reason = 14 THEN 'Seller - não aceitou contraproposta do buyer'
-        WHEN dfm.drop_reason = 15 THEN 'Buyer - já alugou ou comprou com outra imobiliária'
-        WHEN dfm.drop_reason = 16 THEN 'Seller - problemas de documentação do Imóvel'
-        WHEN dfm.drop_reason = 17 THEN 'Seller - condições legais (que não a documentação do Imóvel)'
-        WHEN dfm.drop_reason = 18 THEN 'Seller - vendeu por outra imobiliária'
-        WHEN dfm.drop_reason = 19 THEN 'Seller - alugou ou vai alugar o imóvel'
-        WHEN dfm.drop_reason = 20 THEN 'Seller - não vai mais vender o imóvel'
-        WHEN dfm.drop_reason = 102 THEN 'Seller - nunca atende'
-        WHEN dfm.drop_reason = 103 THEN 'Seller - demora para retornar'
-        WHEN dfm.drop_reason = 104 THEN 'Seller - não aceita modelo 5A'
-        WHEN dfm.drop_reason = 105 THEN 'Seller - problemas para visitar o imóvel'
-        WHEN dfm.drop_reason = 106 THEN 'Seller - IQ dificultou processo de venda'
-        WHEN dfm.drop_reason = 107 THEN 'Buyer - não tem dinheiro para a entrada (deste imóvel)'
-        WHEN dfm.drop_reason = 108 THEN 'Seller - anúncio com valor incorreto'
-        WHEN dfm.drop_reason = 109 THEN 'Seller - seller é PJ'
-        WHEN dfm.drop_reason = 110 THEN 'Buyer - comprou outro imóvel pelo 5A'
-        WHEN dfm.drop_reason = 111 THEN 'Seller - vendeu pelo 5A para outro buyer'
-        WHEN dfm.drop_reason = 112 THEN 'Buyer - problemas de documentação'
-        WHEN dfm.drop_reason = 113 THEN 'Buyer - financiamento do Buyer não cobre o do Seller'
-        WHEN dfm.drop_reason = 114 THEN 'Seller - não aceita pagamento financiado'
-        WHEN dfm.drop_reason = 115 THEN 'Buyer - desconto maior do que 30%'
-        WHEN dfm.drop_reason = 116 THEN 'Buyer - pediu para desconsiderar a proposta'
-        WHEN dfm.drop_reason = 117 THEN 'Buyer - Proposta aceita invalidada'
-        WHEN dfm.drop_reason = 118 THEN 'Seller - Proposta aceita invalidada'
-        ELSE 'ERRO'
-    END AS "drop_reason_name",
-    CASE -- drop_category
-        WHEN dfm.drop_reason is NULL and dt_offer_dismissed is NULL THEN ''
-        WHEN drop_reason_name = 'Buyer - pediu para desconsiderar a proposta' THEN 'Não Quali'
-        WHEN drop_reason_name = 'Buyer - nunca atende' THEN 'Não Quali'
-        WHEN drop_reason_name = 'Seller - nunca atende' THEN 'Não Quali'
-        WHEN drop_reason_name = 'Buyer - Proposta inválida' THEN 'Não Quali'
-        WHEN drop_reason_name = 'Buyer - Proposta sem visita' THEN 'Não Quali'
-        WHEN drop_reason_name = 'Buyer Não Qualificado' THEN 'Não Quali'
-        WHEN drop_reason_name = 'Imóvel - IQ Morando' THEN 'Não Quali'
-        WHEN drop_reason_name = 'Buyer - problemas de documentação' THEN 'Não Quali'
-        WHEN drop_reason_name = 'Seller - problemas de documentação do Imóvel' THEN 'Não Quali'
-        WHEN drop_reason_name = 'Imóvel - Diligência' THEN 'Não Quali'
-        WHEN drop_reason_name = 'Seller - anúncio com valor incorreto' THEN 'Não Quali'
-        WHEN drop_reason_name = 'Seller - seller é PJ' THEN 'Não Quali'
-        WHEN drop_reason_name = 'Buyer - desconto maior do que 30%' THEN 'Não Quali'
-        WHEN drop_reason_name = 'Buyer - não tem dinheiro para a entrada (deste imóvel)' THEN 'Não Quali'
-        WHEN drop_reason_name = 'Buyer - não tem dinheiro para a entrada de qualquer imóvel' THEN 'Não Quali'
-        WHEN drop_reason_name = 'Buyer - pagamento envolve aluguel investido' THEN 'Não Quali'
-        WHEN drop_reason_name = 'Buyer - pagamento envolve permuta' THEN 'Não Quali'
-        WHEN drop_reason_name = 'Buyer - pagamento parcelado' THEN 'Não Quali'
-        WHEN drop_reason_name = 'Buyer - Condição de Pagamento' THEN 'Não Quali'
-        WHEN drop_reason_name = 'Seller - vendeu pelo 5A para outro buyer' THEN 'Não Quali'
-        WHEN drop_reason_name = 'Seller - IQ dificultou processo de venda' THEN 'Quali'
-        WHEN drop_reason_name = 'Seller - problemas para visitar o imóvel' THEN 'Quali'
-        WHEN drop_reason_name = 'Buyer - já alugou ou comprou com outra imobiliária' THEN 'Quali'
-        WHEN drop_reason_name = 'Seller - vendeu por outra imobiliária' THEN 'Quali'
-        WHEN drop_reason_name = 'Seller - condições legais (que não a documentação do Imóvel)' THEN 'Quali'
-        WHEN drop_reason_name = 'Buyer - financiamento do Buyer não cobre o do Seller' THEN 'Quali'
-        WHEN drop_reason_name = 'Buyer - não aceita modelo 5A' THEN 'Quali'
-        WHEN drop_reason_name = 'Seller - não aceita modelo 5A' THEN 'Quali'
-        WHEN drop_reason_name = 'Buyer - comprou outro imóvel pelo 5A' THEN 'Quali'
-        WHEN drop_reason_name = 'Buyer - não aceitou a contraproposta do Seller' THEN 'Quali'
-        WHEN drop_reason_name = 'Seller - não aceita pagamento financiado' THEN 'Quali'
-        WHEN drop_reason_name = 'Seller - não aceitou contraproposta do buyer' THEN 'Quali'
-        WHEN drop_reason_name = 'Seller - não aceitou proposta do buyer (sem contraproposta)' THEN 'Quali'
-        WHEN drop_reason_name = 'Valor de desconto - Com Contra' THEN 'Quali'
-        WHEN drop_reason_name = 'Valor de desconto - Sem Contra' THEN 'Quali'
-        WHEN drop_reason_name = 'COVID19' THEN 'Quali'
-        WHEN drop_reason_name = 'Buyer - demora para retornar' THEN 'Quali'
-        WHEN drop_reason_name = 'Buyer - desistiu de comprar qualquer imóvel' THEN 'Quali'
-        WHEN drop_reason_name = 'Buyer - vai procurar outro imóvel' THEN 'Quali'
-        WHEN drop_reason_name = 'Seller - alugou ou vai alugar o imóvel' THEN 'Quali'
-        WHEN drop_reason_name = 'Seller - demora para retornar' THEN 'Quali'
-        WHEN drop_reason_name = 'Seller - não vai mais vender o imóvel' THEN 'Quali'
-        WHEN drop_reason_name = 'Buyer desistiu de comprar (esse imóvel)' THEN 'Quali'
-        WHEN drop_reason_name = 'Buyer Expirado - Ainda Procurando' THEN 'Quali'
-        WHEN drop_reason_name = 'Buyer - Proposta aceita invalidada' THEN 'Não Quali'
-        WHEN drop_reason_name = 'Seller - Proposta aceita invalidada' THEN 'Não Quali'
-        ELSE 'ERRO'
-    END AS "drop_category",
-    CASE -- drop_subcategory
-        WHEN dfm.drop_reason is NULL and dt_offer_dismissed is NULL THEN ''
-        WHEN drop_reason_name = 'Buyer - pediu para desconsiderar a proposta' THEN 'Baixo intent'
-        WHEN drop_reason_name = 'Buyer - nunca atende' THEN 'Baixo intent'
-        WHEN drop_reason_name = 'Seller - nunca atende' THEN 'Baixo intent'
-        WHEN drop_reason_name = 'Buyer - Proposta inválida' THEN 'Baixo intent'
-        WHEN drop_reason_name = 'Buyer - Proposta sem visita' THEN 'Baixo intent'
-        WHEN drop_reason_name = 'Buyer Não Qualificado' THEN 'Baixo intent'
-        WHEN drop_reason_name = 'Imóvel - IQ Morando' THEN 'Baixo intent'
-        WHEN drop_reason_name = 'Buyer - problemas de documentação' THEN 'Documentação'
-        WHEN drop_reason_name = 'Seller - problemas de documentação do Imóvel' THEN 'Documentação'
-        WHEN drop_reason_name = 'Imóvel - Diligência' THEN 'Documentação'
-        WHEN drop_reason_name = 'Seller - anúncio com valor incorreto' THEN 'Erro de Cadastro'
-        WHEN drop_reason_name = 'Seller - seller é PJ' THEN 'Erro de Cadastro'
-        WHEN drop_reason_name = 'Buyer - desconto maior do que 30%' THEN 'Falta de Recursos'
-        WHEN drop_reason_name = 'Buyer - não tem dinheiro para a entrada (deste imóvel)' THEN 'Falta de Recursos'
-        WHEN drop_reason_name = 'Buyer - não tem dinheiro para a entrada de qualquer imóvel' THEN 'Falta de Recursos'
-        WHEN drop_reason_name = 'Buyer - pagamento envolve aluguel investido' THEN 'Fora do Modelo'
-        WHEN drop_reason_name = 'Buyer - pagamento envolve permuta' THEN 'Fora do Modelo'
-        WHEN drop_reason_name = 'Buyer - pagamento parcelado' THEN 'Fora do Modelo'
-        WHEN drop_reason_name = 'Buyer - Condição de Pagamento' THEN 'Fora do Modelo'
-        WHEN drop_reason_name = 'Seller - vendeu pelo 5A para outro buyer' THEN 'Liquidez'
-        WHEN drop_reason_name = 'Seller - IQ dificultou processo de venda' THEN 'Baixo intent'
-        WHEN drop_reason_name = 'Seller - problemas para visitar o imóvel' THEN 'Baixo intent'
-        WHEN drop_reason_name = 'Buyer - já alugou ou comprou com outra imobiliária' THEN 'Concorrência'
-        WHEN drop_reason_name = 'Seller - vendeu por outra imobiliária' THEN 'Concorrência'
-        WHEN drop_reason_name = 'Seller - condições legais (que não a documentação do Imóvel)' THEN 'Documentação'
-        WHEN drop_reason_name = 'Buyer - financiamento do Buyer não cobre o do Seller' THEN 'Falta de Recursos'
-        WHEN drop_reason_name = 'Buyer - não aceita modelo 5A' THEN 'Fora do Modelo'
-        WHEN drop_reason_name = 'Seller - não aceita modelo 5A' THEN 'Fora do Modelo'
-        WHEN drop_reason_name = 'Buyer - comprou outro imóvel pelo 5A' THEN 'Liquidez'
-        WHEN drop_reason_name = 'Buyer - não aceitou a contraproposta do Seller' THEN 'Negociação'
-        WHEN drop_reason_name = 'Seller - não aceita pagamento financiado' THEN 'Negociação'
-        WHEN drop_reason_name = 'Seller - não aceitou contraproposta do buyer' THEN 'Negociação'
-        WHEN drop_reason_name = 'Seller - não aceitou proposta do buyer (sem contraproposta)' THEN 'Negociação'
-        WHEN drop_reason_name = 'Valor de desconto - Com Contra' THEN 'Negociação'
-        WHEN drop_reason_name = 'Valor de desconto - Sem Contra' THEN 'Negociação'
-        WHEN drop_reason_name = 'COVID19' THEN 'Outros'
-        WHEN drop_reason_name = 'Buyer - demora para retornar' THEN 'SLA'
-        WHEN drop_reason_name = 'Buyer - desistiu de comprar qualquer imóvel' THEN 'SLA'
-        WHEN drop_reason_name = 'Buyer - vai procurar outro imóvel' THEN 'SLA'
-        WHEN drop_reason_name = 'Seller - alugou ou vai alugar o imóvel' THEN 'SLA'
-        WHEN drop_reason_name = 'Seller - demora para retornar' THEN 'SLA'
-        WHEN drop_reason_name = 'Seller - não vai mais vender o imóvel' THEN 'SLA'
-        WHEN drop_reason_name = 'Buyer desistiu de comprar (esse imóvel)' THEN 'SLA'
-        WHEN drop_reason_name = 'Buyer Expirado - Ainda Procurando' THEN 'SLA'
-        WHEN drop_reason_name = 'Buyer - Proposta aceita invalidada' THEN 'Baixo intent'
-        WHEN drop_reason_name = 'Seller - Proposta aceita invalidada' THEN 'Baixo intent'
-        ELSE 'ERRO'
-    END AS "drop_subcategory",
-    CASE -- deal_breaker
-        WHEN drop_reason is NULL and dt_offer_dismissed is NULL THEN ''
-        WHEN drop_reason_name = 'ERRO' THEN 'ERRO'
-        WHEN drop_reason_name = 'Valor de desconto - Sem Contra' THEN 'Seller'
-        WHEN drop_reason_name = 'Imóvel - Diligência' THEN 'Seller'
-        WHEN drop_reason_name = 'Imóvel - IQ Morando' THEN 'Seller'
-        WHEN drop_reason_name = 'Valor de desconto - Com Contra' THEN 'Buyer'
-        WHEN drop_reason_name = 'Buyer desistiu de comprar (esse imóvel)' THEN 'Buyer'
-        WHEN drop_reason_name = 'Buyer Expirado - Ainda Procurando' THEN 'Buyer'
-        WHEN drop_reason_name = 'Buyer Não Qualificado' THEN 'Buyer'
-        WHEN drop_reason_name = 'COVID19' THEN 'Outros'
-        WHEN drop_reason_name != '' THEN LEFT(drop_reason_name, CHARINDEX(' - ', drop_reason_name))
-        ELSE 'ERRO'
-    END AS "deal_breaker",
-    CASE WHEN drop_category = 'Quali' THEN dfm.dt_offer_dismissed ELSE NULL END AS "dt_offer_dismissed_quali",
-    CASE WHEN drop_category = 'Não Quali' THEN dfm.dt_offer_dismissed ELSE NULL END AS "dt_offer_dismissed_naoquali",
-    COALESCE(so.ts_created, dfm.dt_submitted) AS "dt_offer_submitted",
-    least(dfm.dt_deal_qualified,dt_offer_dismissed_quali,dfm.dt_accepted) AS "dt_deal_qualified_adjusted",
-    dfm.dt_accepted AS "dt_offer_accepted",
-    dfm.dt_sale_agreement_created,
-    --'' as "dt_sale_agreement_submitted", -- AGUARDANDO COLUNA
-    dfm.dt_sale_agreement_signed,
-    CASE
-        WHEN dt_offer_dismissed_naoquali is NULL THEN 0
-        WHEN dt_offer_dismissed_naoquali > dt_deal_qualified_adjusted THEN 1
-        ELSE 0
-    END AS "erro_deal_quali",
-    CASE
-        WHEN is_offer_dismissed = 0 THEN NULL
-        WHEN dfm.dt_offer_dismissed >= dfm.dt_sale_agreement_signed THEN 'pós_assinatura_ccv'
-        --WHEN dfm.dt_offer_dismissed >= dfm.dt_sale_agreement_submitted THEN 'pós_envio_ccv' -- AGUARDANDO COLUNA
-        WHEN dfm.dt_offer_dismissed >= dfm.dt_sale_agreement_created THEN 'pós_pedido_confec'
-        WHEN dfm.dt_offer_dismissed >= dt_offer_accepted THEN 'pós_aceite_proposta'
-        WHEN dfm.dt_offer_dismissed >= dt_deal_qualified_adjusted THEN 'pós_deal_quali'
-        WHEN dfm.dt_offer_dismissed >= dt_offer_submitted THEN 'pós_proposta_enviada'
-        ELSE 'ERRO'
-    END AS "descarte_etapa"
-FROM datalake_firestore_prod.sale_offer so
-LEFT JOIN datalake_firestore_prod.monday dfm
-    ON so.id = dfm.id_offer
-LEFT JOIN consultant_prep cp
-    ON dfm.id_offer = cp.id_offer
-LEFT JOIN dim_house_listing dhl
-    ON dfm.id_house = dhl.id_house
+SELECT
+   ofu.id_offer,
+   id_consultant_adjusted,
+   id_closing_specialist,
+   name_consultant,
+   closing_specialist_email,
+   status_type,
+   sale_agreement_status,
+   drop_reason_name,
+   drop_category,
+   drop_subcategory,
+   deal_breaker,
+   step_discard,
+   dt_offer_dismissed_qualified,
+   dt_offer_dismissed_unqualified,
+   is_offer_dismissed
+FROM
+    offer_rules AS ofu
+LEFT JOIN
+    consultant_prep_rules AS pr
+    ON pr.id_offer = ofu.id_offer
