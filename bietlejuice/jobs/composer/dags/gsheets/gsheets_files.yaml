@@ -121,6 +121,11 @@ marketing_offline_manual_share_cost_center:
     sheet_name: offline_manual_share_cost_center
     clean_table_name: marketing_offline_manual_share_cost_center
 
+recuperacao_fachada_e_area_comum:
+    sheet_id: 1DB63rTGhu5b_x6fUzgUEzIAKdQ-O52hly2D7hIa10CI
+    sheet_name: recovery_common_area_facade
+    clean_table_name: photos_recovery_common_area_facade
+
 retencao_exclusividade_contato_ativo:
     sheet_id: 1VT9AgLJYbGq5ftcBvSY2C-M99bVmpnmO7XFeueh_fmI
     sheet_name: bases_cruzadas

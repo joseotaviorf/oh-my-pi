@@ -43,6 +43,7 @@ This pipeline produces the following output tables:
     - `marketing_offline_manual_share_cost_center`
     - `owner_entrance_inspection_csat`
     - `owner_exit_inspection_csat`
+    - `photos_recovery_common_area_facade`
     - `targets_avg_ticket_adm_fee`
     - `targets_nr_bf_er_or`
     - `taxonomy_affiliates`
