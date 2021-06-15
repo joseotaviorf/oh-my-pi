@@ -96,7 +96,7 @@ bietlejuice.dw_marketing_costs_trovit:
   - bietlejuice.trovit
 
 bietlejuice.dw_proposal:
-  - bietlejuice.enrich_proposal:load-proposal-to-enrich
+  - bietlejuice.enrich_proposal:load-enrich-proposal
   - bietlejuice.enrich_docx:load-credit-evaluation-to-enrich
   - bietlejuice.sorting_hat:load-proposal-to-datalake-clean
   - bietlejuice.sorting_hat:load-proposal-version-to-datalake-clean
