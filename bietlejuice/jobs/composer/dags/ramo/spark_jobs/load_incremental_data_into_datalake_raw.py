@@ -27,8 +27,8 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("environment", help="forno/prod values")
-    parser.add_argument("source", help="name of the source")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
+    parser.add_argument("context", help="context of the DAG")
     parser.add_argument("sap_data_path", help="bucket value in forno/prod")
     parser.add_argument("table_name", help="table name for data catalog")
     parser.add_argument("execution_date", help="execution date in str format")
@@ -37,13 +37,13 @@ if __name__ == "__main__":
 
     logger.info(
         f"""
-            m={JOB_NAME}, environment={args.environment}, source={args.source}
+            m={JOB_NAME}, environment={args.environment}, context={args.context}
             execution_date={args.execution_date}, datalake_bucket={args.datalake_bucket}, msg=print spark jobs args"
         """
     )
 
     environment = args.environment
-    source = args.source
+    context = args.context
     datalake_bucket = args.datalake_bucket
     sap_data_path = args.sap_data_path
     execution_date = args.execution_date
@@ -65,7 +65,9 @@ if __name__ == "__main__":
         .output()
     )
 
-    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
+    db_info = DatalakeMetastoreService.get_db_info(
+        environment, context, datalake_bucket
+    )
     spark_metastore_service = SparkMetastoreService(spark_client)
 
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
