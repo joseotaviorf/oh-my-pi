@@ -135,14 +135,14 @@ bietlejuice.dw_sale_listings:
 bietlejuice.dw_sale_offers:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.enrich_amplitude_offer:load-sale-offer-raw-events-to-enrich
-  - bietlejuice.enrich_offer:load-sale-offer-to-enrich
+  - bietlejuice.enrich_offer:load-enrich-sale-offer
   - bietlejuice.gsheets:load-taxonomy-demand-to-clean
 
 bietlejuice.dw_sale_visits:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-real-estate-agent-rating-in-data-lake
   - bietlejuice.enrich_booking:load-booking-to-enrich
-  - bietlejuice.enrich_offer:load-sale-offer-to-enrich
+  - bietlejuice.enrich_offer:load-enrich-sale-offer
   - bietlejuice.insider:load-review-to-datalake-clean
 
 bietlejuice.dw_sauron:
@@ -410,7 +410,7 @@ bietlejuice.enrich_listing_owners:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_kill_queue:load-reservation-to-enrich
-  - bietlejuice.enrich_offer:load-offer-to-enrich
+  - bietlejuice.enrich_offer:load-enrich-offer
 
 bietlejuice.enrich_marketing_automatic_daily_costs:
   - bietlejuice.enrich_consolidated_marketing_costs:load-consolidated-media-costs-to-enrich
@@ -480,7 +480,7 @@ bietlejuice.enrich_robin_hood:
 bietlejuice.enrich_sale_flows:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
-  - bietlejuice.enrich_offer:load-sale-offer-to-enrich
+  - bietlejuice.enrich_offer:load-enrich-sale-offer
 
 bietlejuice.enrich_sale_listings:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
