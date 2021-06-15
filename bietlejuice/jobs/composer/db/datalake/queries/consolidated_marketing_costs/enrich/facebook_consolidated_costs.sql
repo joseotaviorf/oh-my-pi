@@ -1,7 +1,7 @@
 SELECT    
     INT(year*10000 + month*100 + day) AS id_date,
     campaign_name,
-    account_name,
+    acc AS account_name,
     campaign_name AS utm_campaign,
     LOWER(SPLIT(campaign_name, '\\.')[3]) AS campaign_city,
     adset_name AS utm_term,

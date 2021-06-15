@@ -11,10 +11,10 @@ SELECT
     NULLIF(mkt_channel, '') AS mkt_channel,
     NULLIF(mkt_medium, '') AS mkt_medium,
     NULLIF(mkt_source, '') AS mkt_source,
-    CAST(NULLIF(cost, '') AS FLOAT) AS cost,
-    CAST(NULLIF(cost_share_mobile, '') AS FLOAT) AS cost_share_mobile,
-    CAST(NULLIF(cost_share_desktop, '') AS FLOAT) AS cost_share_desktop,
-    CAST(NULLIF(cost_share_other, '') AS FLOAT) AS cost_share_other,
+    CAST(REPLACE(NULLIF(cost, ''), ',', '') AS FLOAT) AS cost,
+    CAST(REPLACE(NULLIF(cost_share_mobile, ''), ',', '') AS FLOAT) AS cost_share_mobile,
+    CAST(REPLACE(NULLIF(cost_share_desktop, ''), ',', '') AS FLOAT) AS cost_share_desktop,
+    CAST(REPLACE(NULLIF(cost_share_other, ''), ',', '') AS FLOAT) AS cost_share_other,
     CAST(NULLIF(dt, '') AS DATE) AS dt_cost
 FROM
     datalake_marketing_manual_daily_costs_raw.marketing_costs_name_convention_shared_costs

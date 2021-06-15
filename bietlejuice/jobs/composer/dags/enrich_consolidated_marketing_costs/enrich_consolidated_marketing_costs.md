@@ -16,6 +16,7 @@ Daily after enrich layers. More information about run time [here]({chart_url}{da
 - `rtb_consolidated_costs`
 - `mitula_consolidated_costs`
 - `trovit_consolidated_costs`
+- `facebook_consolidated_costs`
 - `consolidated_media_costs`
 
 ### Responsible Data Team

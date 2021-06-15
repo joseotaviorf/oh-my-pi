@@ -65,6 +65,7 @@ media_costs_with_taxonomy AS (
                     WHEN tp.mkt_platform = 'Mobile' THEN mobile_cost
                     WHEN tp.mkt_platform = 'Desktop' THEN desktop_cost
                     WHEN tp.mkt_platform = 'Other' THEN other_cost
+                    ELSE total_cost
                 END
             ELSE 
                 -- Cost/Platform defined in taxonomy
