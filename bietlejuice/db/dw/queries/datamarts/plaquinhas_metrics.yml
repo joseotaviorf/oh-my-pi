@@ -1,0 +1,5 @@
+# Config for plaquinhas_metrics
+---
+streams:
+  - direction: 'upstream'
+    task_ids: ['dw_performance_marketing_metrics_demand']
