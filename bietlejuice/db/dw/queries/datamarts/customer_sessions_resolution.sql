@@ -21,7 +21,8 @@ WITH front_tickets AS (
         MAX(ticket_summary.back_ticket) AS back_ticket,
         ticket_summary.has_department_transfers,
         ticket_summary.has_analyst_transfers,
-        ticket_summary.resolution_survey
+        ticket_summary.resolution_survey,
+        ticket_summary.call_direction
     FROM
         datamarts.ticket_summary
     WHERE
@@ -30,7 +31,7 @@ WITH front_tickets AS (
         AND is_automatic_email = 0
         AND is_bot = 0
         AND is_closed_by_merge = 0
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,17,18,19
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,17,18,19,20
 ),
 user_recontacts AS (
     SELECT DISTINCT
@@ -72,10 +73,10 @@ tickets_by_ticket_session AS (
 )
 SELECT
     tts.ticket_session AS sk_ticket_session,
-    sk_user,
+    ft.sk_user,
     sk_contract_ticket,
     tts.ticket_user AS session_user,
-    channel,
+    ft.channel,
     group_name,
     ticket_area,
     rental_process_step,
@@ -84,24 +85,24 @@ SELECT
     customer_type_tag,
     contact_motivation_tag,
     contact_theme_tag,
-    back_ticket,
+    ft.back_ticket,
     has_department_transfers,
     has_analyst_transfers,
-    resolution_survey,
+    ft.resolution_survey,
     tts.tickets AS ticket_count,
     CASE
-        WHEN channel <> 'chat'
+        WHEN ft.channel <> 'chat'
             AND ((tickets > 1)
-            OR back_ticket IS NOT NULL
+            OR ft.back_ticket IS NOT NULL
             OR has_department_transfers > 0
             OR has_analyst_transfers > 0
-            OR resolution_survey = 0)
+            OR ft.resolution_survey = 0)
         THEN 0
-        WHEN channel = 'chat'
+        WHEN ft.channel = 'chat'
             AND ((tickets > 1)
-            OR back_ticket IS NOT NULL
+            OR ft.back_ticket IS NOT NULL
             OR has_department_transfers > 0
-            OR resolution_survey = 0)
+            OR ft.resolution_survey = 0)
         THEN 0
         ELSE 1
     END AS is_fcr,
@@ -111,5 +112,7 @@ SELECT
 FROM
     tickets_by_ticket_session AS tts
 LEFT JOIN
-    front_tickets
-        ON front_tickets.sk_ticket = tts.ticket_session
+    front_tickets AS ft
+        ON ft.sk_ticket = tts.ticket_session
+WHERE
+    (call_direction = 'inbound' OR call_direction is null)

@@ -48,7 +48,7 @@ WITH sla AS (
                 call.dim_call_task dct 
                     ON dct.sk_task = fct.sk_task
             INNER JOIN 
-                zendesk.fact_tickets zd 
+                tickets.fact_tickets zd 
                     ON zd.sk_call = dc.sk_call
             WHERE
                 dc.direction = 'inbound'
@@ -94,7 +94,7 @@ WITH sla AS (
                 quinto_messenger.dim_task dts
                     ON fts.sk_task = dts.sk_task
             INNER JOIN 
-                zendesk.fact_tickets zd
+                tickets.fact_tickets zd
                     ON zd.sk_session = fc.sk_session
             WHERE
                 dc.ts_created > DATE'2020-08-20'
@@ -121,9 +121,9 @@ WITH sla AS (
                     minutes_full_resolution_time_calendar::DECIMAL,
                     minutes_full_resolution_time_business::DECIMAL
                 FROM
-                    zendesk.fact_tickets AS ft
+                    tickets.fact_tickets AS ft
                 JOIN 
-                    zendesk.dim_ticket AS dt 
+                    tickets.dim_ticket AS dt 
                         ON dt.sk_ticket = ft.sk_ticket
                 WHERE
                     dt.channel IN ('email', 'form_faq', 'web', 'other')
@@ -175,7 +175,7 @@ csat_ticket_calls AS (
         datalake_raw.gsheets_department_channel dept 
             ON dept.aux_canal = c.department_name
     INNER JOIN 
-        zendesk.fact_tickets ft
+        tickets.fact_tickets ft
             ON ft.sk_call = c.id_call
     INNER JOIN 
         (
@@ -216,7 +216,7 @@ csat_ticket_calls AS (
         call.dim_call_task dct 
             ON dct.sk_task = fct.sk_task
     JOIN 
-        zendesk.fact_tickets zd 
+        tickets.fact_tickets zd 
             ON zd.sk_call = dc.sk_call
     LEFT JOIN 
         datalake_raw.gsheets_department_channel dept 
@@ -247,9 +247,9 @@ csat_email_base AS (
         dt.reason,
         dt.comment
     FROM
-        zendesk.fact_tickets ft
+        tickets.fact_tickets ft
     JOIN 
-        zendesk.dim_ticket dt 
+        tickets.dim_ticket dt 
             ON ft.sk_ticket = dt.sk_ticket
     WHERE
         channel IN ('web', 'email', 'form_faq', 'other')
@@ -303,9 +303,9 @@ csat AS (
         COALESCE(c.resolution_survey, cll.resolution_survey, e.resolution_survey) AS resolution_survey,
         COALESCE(c.csat, cll.csat, e.score_num) AS csat
     FROM
-        zendesk.fact_tickets ft
+        tickets.fact_tickets ft
     INNER JOIN 
-        zendesk.dim_ticket tk 
+        tickets.dim_ticket tk 
             ON ft.sk_ticket = tk.sk_ticket
     LEFT JOIN 
         csat_email_base e 
@@ -324,9 +324,9 @@ automatically_closed_emails AS (
     SELECT DISTINCT
         tt.sk_ticket
     FROM
-        zendesk.fact_ticket_tags tt
+        tickets.fact_ticket_tags tt
     JOIN 
-        zendesk.dim_ticket dt 
+        tickets.dim_ticket dt 
             ON dt.sk_ticket = tt.sk_ticket
     WHERE
         dt.channel IN ('email', 'form_faq', 'web', 'other')
@@ -361,6 +361,16 @@ answered_calls AS (
     WHERE
         has_ended_in_ura = FALSE
         AND is_answered = TRUE 
+),
+call_direction AS ( 
+    SELECT
+        ft.sk_ticket,
+        direction
+    FROM
+        tickets.fact_tickets AS ft
+    JOIN
+        call.dim_call dc
+            ON dc.sk_call = ft.sk_call
 ),
 ticket_calls AS (
     SELECT
@@ -404,7 +414,7 @@ calls_tickets AS (
         call.fact_calls fc 
             ON fc.sk_call = dc.sk_call
     INNER JOIN 
-        zendesk.fact_tickets ft 
+        tickets.fact_tickets ft 
             ON ft.sk_call = dc.sk_call 
 ),
 last_task AS (
@@ -450,11 +460,11 @@ chat_tickets AS (
         ) te 
             ON te.id_task = t.id_task
     INNER JOIN 
-        zendesk.fact_tickets ft
+        tickets.fact_tickets ft
             ON ft.sk_session = t.id_conversation
             AND ft.sk_session > 0
     INNER JOIN 
-        zendesk.dim_ticket dt
+        tickets.dim_ticket dt
             ON dt.sk_ticket = ft.sk_ticket
     WHERE
         dt.channel IN ('chat')
@@ -466,7 +476,7 @@ email_tickets AS (
         dt.sk_ticket,
         dt.group_name AS dept
     FROM
-        zendesk.dim_ticket dt
+        tickets.dim_ticket dt
     WHERE
         channel NOT IN ('call', 'chat')
     GROUP BY 1,2 
@@ -769,7 +779,7 @@ total_department_transfers AS (
     SELECT
         ft.sk_ticket
     FROM
-        zendesk.fact_tickets AS ft
+        tickets.fact_tickets AS ft
     INNER JOIN
         call.fact_calls fc
             ON fc.sk_call=ft.sk_call
@@ -783,7 +793,7 @@ total_department_transfers AS (
     SELECT
         ft.sk_ticket
     FROM
-        zendesk.fact_tickets ft
+        tickets.fact_tickets ft
     INNER JOIN
         quinto_messenger.fact_chats fc
             ON fc.sk_session=ft.sk_session
@@ -797,7 +807,7 @@ total_analyst_transfers AS (
     SELECT
         ft.sk_ticket
     FROM
-        zendesk.fact_tickets AS ft
+        tickets.fact_tickets AS ft
     INNER JOIN
         call.fact_calls fc
             ON fc.sk_call=ft.sk_call
@@ -811,7 +821,7 @@ total_analyst_transfers AS (
     SELECT
         ft.sk_ticket
     FROM
-        zendesk.fact_tickets ft
+        tickets.fact_tickets ft
     INNER JOIN
         quinto_messenger.fact_chats fc
             ON fc.sk_session=ft.sk_session
@@ -963,6 +973,7 @@ SELECT DISTINCT
         WHEN ac.sk_ticket IS NULL THEN 0
         ELSE 1
         END AS is_answered,
+    cd.direction AS call_direction,
 	CASE
 		WHEN csat.resolution_survey >1 THEN 1
 		ELSE csat.resolution_survey
@@ -996,9 +1007,9 @@ SELECT DISTINCT
         ELSE NULL
         END AS is_fcr
 FROM
-	zendesk.fact_tickets ft
+	tickets.fact_tickets ft
 JOIN 
-    zendesk.dim_ticket tk 
+    tickets.dim_ticket tk 
         ON ft.sk_ticket = tk.sk_ticket
 LEFT JOIN 
     automatically_closed_emails ace
@@ -1010,11 +1021,14 @@ LEFT JOIN
     total_back_tickets tbt
         ON tbt.front_ticket = ft.sk_ticket
 LEFT JOIN 
-    zendesk.dim_ticket btk 
+    tickets.dim_ticket btk 
         ON tbt.back_ticket = btk.sk_ticket
 LEFT JOIN
     answered_calls ac
         ON ac.sk_ticket = ft.sk_ticket
+LEFT JOIN
+    call_direction cd
+        ON cd.sk_ticket = ft.sk_ticket
 LEFT JOIN 
     sla 
         ON ft.sk_ticket = sla.sk_ticket
