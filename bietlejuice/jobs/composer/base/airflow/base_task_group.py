@@ -51,7 +51,9 @@ class BaseTaskGroup(object):
         :return: a dict of task groups created
         :rtype: dict
         """
-        table_names = self._get_table_names_from_sql_files(layer=layer)
+        table_names = self._get_table_names_from_sql_files(
+            layer=layer, schema=kwargs.get("schema")
+        )
 
         method = TaskGroupMethodFactory.get_method_for_build_task_group_from_sql_files(
             layer_enum=layer
@@ -63,12 +65,15 @@ class BaseTaskGroup(object):
 
         return task_groups
 
-    def _get_table_names_from_sql_files(self, layer):
+    def _get_table_names_from_sql_files(self, layer, schema=None):
         """
         Auxiliary method to adjust the layer and fetch table names from queries
          within the DAG's queries folder via FileService
 
-        :param layer: bietlejuice.jobs.composer.base.pipeline.LayerEnum member
+        :param layer: the layer to get queries from its respective folder
+        :type layer: bietlejuice.jobs.composer.base.pipeline.LayerEnum member
+        :param schema: schema name of the folder which the queries are inside
+        :type schema: str
         :return: table_names of each query-file
         :rtype: list[str]
         """
@@ -76,7 +81,7 @@ class BaseTaskGroup(object):
             layer = LayerEnum.DW
 
         return FileService.list_sql_files_without_extension_from_layer(
-            self.relative_query_path, layer.value
+            self.relative_query_path, layer.value, schema
         )
 
     @staticmethod
