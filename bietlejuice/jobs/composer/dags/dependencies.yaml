@@ -448,7 +448,7 @@ bietlejuice.enrich_offer:
   - bietlejuice.godfather:load-business-offer
 
 bietlejuice.enrich_owner_fees:
-  - bietlejuice.owner_fees:load-contract-to-clean
+  - bietlejuice.owner_fees:load-clean-contract
 
 bietlejuice.enrich_proposal:
   - bietlejuice.ebdb:create-clean-proposal-in-data-lake

@@ -22,8 +22,8 @@ if __name__ == "__main__":
 
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("environment", help="forno/prod values")
-    parser.add_argument("source", help="name of the source")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
+    parser.add_argument("source", help="name of the source")
     parser.add_argument("table_name", help="table name")
     parser.add_argument("date_filter_column", help="Date column to be filtered")
     parser.add_argument(
