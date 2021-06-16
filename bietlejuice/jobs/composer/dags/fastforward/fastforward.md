@@ -1,10 +1,14 @@
 ## FastForward
+
 ### Purpose
 
 Retrieves data from the FastForward database (postgresql). [FastForward](https://github.com/quintoandar/fast-forward) 
 is the service responsible for handling rent anticipation from its offer creation 
 and acceptance so our operations team can make the payment and SeuBarriga to 
 notify that the rent has already been transferred. 
+
+<details>
+  <summary><strong> > DAG details (click to expand)</strong></summary>
 
 ### Execution Interval
 
@@ -25,3 +29,5 @@ We load the following tables into the datalake:
 ### Responsible Data Team
 
 For any questions or concerns about this DAG, please contact the Data Engineering or Data Analytics team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
+
+</details>

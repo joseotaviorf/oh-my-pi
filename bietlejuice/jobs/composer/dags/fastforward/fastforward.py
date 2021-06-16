@@ -1,21 +1,20 @@
-from datetime import datetime
-import pendulum
 import os
+from datetime import datetime
 
-import airflow.utils.helpers as airflow_helpers
+import pendulum
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
-    QuintoAndarDatabricksSubmitRunOperator,
 )
+from airflow.utils.helpers import chain, cross_downstream
+
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
-from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
-from bietlejuice.jobs.composer.services import FileService
-
+from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 
 SOURCE = "fastforward"
+CONTEXT = SOURCE
 
 # airflow vars
 ENV = os.environ.get("ENVIRONMENT")
@@ -24,15 +23,15 @@ ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
 DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-LOAD_FASTFORWARD_INTO_DATALAKE_RAW_FILE_PATH = (
-    S3_PREFIX + f"/spark_jobs/{SOURCE}/load_fastforward_into_datalake.py"
+RAW_SPARK_JOB_PATH = (
+    f"{S3_PREFIX}/spark_jobs/{CONTEXT}/load_fastforward_into_datalake.py"
 )
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 # spark and databricks vars
 BASE_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/"
-LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{SOURCE}"
+LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{CONTEXT}"
 CLUSTER_DESCRIPTION = Variable.get(
     "databricks_bietlejuice_fastforward", deserialize_json=True
 )
@@ -46,12 +45,10 @@ CUSTOM_LIBRARIES = [
 LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
 
 # dag vars
-DAG_ID = f"bietlejuice.{SOURCE}"
-LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
+DAG_ID = f"bietlejuice.{CONTEXT}"
+LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 7, 27, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
-
-local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -62,9 +59,10 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(SOURCE).format(chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID),
+    doc_md=BaseDAG.get_dag_doc(CONTEXT).format(
+        chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
+    ),
 )
-
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
@@ -73,57 +71,36 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     libraries=LIBRARIES_DESCRIPTION,
 )
 
-fastforward_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="fastforward-to-datalake-raw",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": LOAD_FASTFORWARD_INTO_DATALAKE_RAW_FILE_PATH,
-            "parameters": [ENV, DATALAKE_BUCKET],
-        }
-    },
-)
-
-sync_metastore_tables_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="sync-hive-metastore-raw-tables",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": BASE_SPARK_JOB_PATH + "sync_metastore_tables.py",
-            "parameters": [
-                DATALAKE_BUCKET,
-                LayerEnum.RAW.value,
-                SOURCE,
-                "--all-tables",
-            ],
-        }
-    },
-)
-
-clean_sub_dag = DatalakeSubDAG(
-    dag_id=DAG_ID,
-    start_date=MAIN_START_DATE,
-    env=ENV,
-    datalake_bucket=DATALAKE_BUCKET,
-    layer=LayerEnum.CLEAN,
-    database_base_name=SOURCE,
-    relative_query_path=SOURCE,
-    spark_job_paths=f"{SPARK_JOB_PATH}/base",
-    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
-)
-file_list = FileService.list_sql_files_without_extension_from_layer(
-    SOURCE, LayerEnum.CLEAN.value
-)
-clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(dag, file_list)
-
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-create_cluster_task >> fastforward_to_datalake_raw_task >> list(
-    clean_sub_dags.values()
-) >> terminate_cluster_task
-
-airflow_helpers.chain(
-    fastforward_to_datalake_raw_task, sync_metastore_tables_task, terminate_cluster_task
+task_group = DatalakeTaskGroup(
+    dag=dag,
+    env=ENV,
+    datalake_bucket=DATALAKE_BUCKET,
+    relative_query_path=CONTEXT,
+    spark_jobs_path=BASE_SPARK_JOB_PATH,
+    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
 )
+
+raw_task_group = task_group.build_raw_task_group_for_all_tables(
+    source=SOURCE,
+    target_database_base_name=CONTEXT,
+    extraction_spark_job_file=RAW_SPARK_JOB_PATH,
+)
+
+clean_task_groups = task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.CLEAN,
+    source_database_base_name=CONTEXT,
+    target_database_base_name=CONTEXT,
+)
+
+chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
+
+cross_downstream(
+    DatalakeTaskGroup.last_tasks(raw_task_group),
+    DatalakeTaskGroup.all_first_tasks(clean_task_groups),
+)
+
+terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
