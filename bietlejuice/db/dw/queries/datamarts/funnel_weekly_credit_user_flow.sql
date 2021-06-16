@@ -134,7 +134,7 @@ pair_user_unique_proposal AS (
         ddcm.days_evaluation_started_to_evaluation_approved,
         ddcm.days_evaluation_started_to_contract_signed,
         ddcm.days_document_first_sent_to_document_approved,
-        ddcm.days_document_approved_to_contract_signed_date,
+        ddcm.days_document_approved_to_contract_signed,
         rfb.funnel_step,
         ROW_NUMBER() OVER(
             PARTITION BY 
