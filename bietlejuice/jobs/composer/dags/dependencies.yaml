@@ -369,9 +369,9 @@ bietlejuice.enrich_ebdb_user_revision_entity:
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
 
 bietlejuice.enrich_firestore:
-  - bietlejuice.firestore:load-monday-to-clean
-  - bietlejuice.firestore:load-rent-offer-to-clean
-  - bietlejuice.firestore:load-sale-offer-to-clean
+  - bietlejuice.firestore:load-clean-monday
+  - bietlejuice.firestore:load-clean-rent-offer
+  - bietlejuice.firestore:load-clean-sale-offer
 
 bietlejuice.enrich_front_tickets:
   - bietlejuice.chat_fup:load-chats-chat-to-datalake-clean

@@ -33,8 +33,8 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("env")
-    parser.add_argument("source")
     parser.add_argument("datalake_bucket")
+    parser.add_argument("source")
     parser.add_argument("project_id", help="project id from GCP")
     parser.add_argument("pubsub_credentials_path")
     parser.add_argument("subscription_id")
@@ -42,8 +42,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     environment = args.env
-    source = args.source
     datalake_bucket = args.datalake_bucket
+    source = args.source
     project_id = args.project_id
     pubsub_credentials_path = args.pubsub_credentials_path
     subscription_id = args.subscription_id
