@@ -1,12 +1,13 @@
 from datetime import timedelta
 
+import airflow.utils.helpers as airflow_helpers
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
 
 from bietlejuice.jobs.composer.base.airflow import BaseTaskGroup
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
-import airflow.utils.helpers as airflow_helpers
+from bietlejuice.jobs.composer.formatters import StringFormatter
 
 AIRFLOW_DEFAULT_POOL = "default_pool"  # TODO: Add to parameter service to be created
 
@@ -15,6 +16,9 @@ class DatalakeTaskGroup(BaseTaskGroup):
     """
     Responsible for creating task groups related to datalake operations
     """
+
+    ALL_TABLES = "--all-tables"
+    SINGLE_TABLE = "--table-name"
 
     def __init__(
         self,
@@ -49,98 +53,157 @@ class DatalakeTaskGroup(BaseTaskGroup):
         self.datalake_bucket = datalake_bucket
         self.athena_query_result_location = athena_query_result_location
 
-    def build_clean_task_group(
+    def _build_raw_task_group(
         self,
-        source_database_base_name,
+        source,
         target_database_base_name,
-        table_name,
-        partitions=None,
-        is_incremental=False,
-        spark_params={},
-        extra_query_template_params=None,
-        schema="",
+        extraction_spark_job_file,
+        table_name=None,
+        raw_spark_job_extra_args=None,
+        pool=AIRFLOW_DEFAULT_POOL,
     ):
         """
-        Build a task group for clean layer
+        Create a task group containing 2 tasks:
+        1. load to raw from source
+        2. sync metadata from spark metastore to hive metastore
 
-        :param source_database_base_name: database base name for the source
-            table database
-        :type source_database_base_name: str
-        :param target_database_base_name database base name for the target
+        :param source: source name
+        :type source: str
+        :param target_database_base_name: database base name for the target
             table database
         :type target_database_base_name: str
-        :param table_name: table name to be created
+        :param extraction_spark_job_file: full filepath for the extraction spark job
+        :type extraction_spark_job_file: str
+        :param table_name: the table name when loading a single table
         :type table_name: str
-        :param partitions: list of columns to partition table
-        :type partitions: list[str]
-        :param is_incremental: if this table uses incremental load type
-        :type is_incremental: bool
-        :param spark_params: general parameters to be passed to the spark job
-        :type spark_params: dict
-        :param extra_query_template_params: filter parameters applied to
-            the query besides year, month and day
-        :type extra_query_template_params: dict
-        :param schema: db schema where the table is at. Used in the query path
-        :type schema: str
-        :rtype: list[BaseOperator]
+        :param raw_spark_job_extra_args: extra arguments to be passed to the spark job,
+            default spark job parameters are [env, bucket]
+        :type raw_spark_job_extra_args: list[str]
+        :param pool: airflow's pool name
+        :type pool: str
+        :return: initial and final tasks of the created task group
+        :rtype: dict
         """
-        return self._build_task_group(
-            LayerEnum.CLEAN,
-            source_database_base_name,
-            target_database_base_name,
-            table_name,
-            partitions,
-            is_incremental,
-            spark_params,
-            extra_query_template_params,
-            schema,
+
+        table_name_arg = []
+        tasks_name_suffix = ""
+        sync_mode = self.ALL_TABLES
+        layer = LayerEnum.RAW.value
+
+        if table_name:
+            sync_mode = self.SINGLE_TABLE
+            table_name_arg = [table_name]
+            tasks_name_suffix = StringFormatter.slugify(f"-{table_name}")
+
+        if raw_spark_job_extra_args is None:
+            raw_spark_job_extra_args = []
+
+        load_table_task = QuintoAndarDatabricksSubmitRunOperator(
+            task_id=f"load-{layer}-{source}{tasks_name_suffix}",
+            pool=pool,
+            dag=self.dag,
+            json={
+                "spark_python_task": {
+                    "python_file": extraction_spark_job_file,
+                    "parameters": [self.env, self.datalake_bucket]
+                    + raw_spark_job_extra_args,
+                }
+            },
         )
 
-    def build_enrich_task_group(
+        sync_metastore_tables_task = QuintoAndarDatabricksSubmitRunOperator(
+            task_id=f"sync-hive-metastore-{layer}{tasks_name_suffix}",
+            dag=self.dag,
+            json={
+                "spark_python_task": {
+                    "python_file": self.spark_jobs_path + "sync_metastore_tables.py",
+                    "parameters": [
+                        self.datalake_bucket,
+                        layer,
+                        target_database_base_name,
+                        sync_mode,
+                    ]
+                    + table_name_arg,
+                }
+            },
+        )
+
+        airflow_helpers.chain(load_table_task, sync_metastore_tables_task)
+
+        return DatalakeTaskGroup.format_tasks_boundaries(
+            initial_tasks=[load_table_task], final_tasks=[sync_metastore_tables_task]
+        )
+
+    def build_raw_task_group_for_all_tables(
         self,
-        source_database_base_name,
+        source,
         target_database_base_name,
-        table_name,
-        partitions=None,
-        is_incremental=False,
-        spark_params={},
-        extra_query_template_params=None,
-        schema="",
+        extraction_spark_job_file,
+        raw_spark_job_extra_args=None,
+        pool=AIRFLOW_DEFAULT_POOL,
     ):
         """
-        Build a task group for enrich layer
+        Build a task group for raw layer to extract all tables from source
 
-        :param source_database_base_name: database base name for the source
-            table database
-        :type source_database_base_name: str
-        :param target_database_base_name database base name for the target
+        :param source: source name
+        :type source: str
+        :param target_database_base_name: database base name for the target
             table database
         :type target_database_base_name: str
-        :param table_name: table name to be created
-        :type table_name: str
-        :param partitions: list of columns to partition table
-        :type partitions: list[str]
-        :param is_incremental: if this table uses incremental load type
-        :type is_incremental: bool
-        :param spark_params: general parameters to be passed to the spark job
-        :type spark_params: dict
-        :param extra_query_template_params: filter parameters applied to
-            the query besides year, month and day
-        :type extra_query_template_params: dict
-        :param schema: db schema where the table is at. Used in the query path
-        :type schema: str
-        :rtype: list[BaseOperator]
+        :param extraction_spark_job_file: full filepath for the extraction spark job
+        :type extraction_spark_job_file: str
+        :param raw_spark_job_extra_args: extra arguments to be passed to the spark job,
+            default spark job parameters are [env, bucket]
+        :type raw_spark_job_extra_args: list[str]
+        :param pool: airflow's pool name
+        :type pool: str
+        :return: initial and final tasks of the created task group
+        :rtype: dict
         """
-        return self._build_task_group(
-            LayerEnum.ENRICH,
-            source_database_base_name,
-            target_database_base_name,
-            table_name,
-            partitions,
-            is_incremental,
-            spark_params,
-            extra_query_template_params,
-            schema,
+        return self._build_raw_task_group(
+            source=source,
+            target_database_base_name=target_database_base_name,
+            extraction_spark_job_file=extraction_spark_job_file,
+            raw_spark_job_extra_args=raw_spark_job_extra_args,
+            pool=pool,
+        )
+
+    def build_raw_task_group_for_single_table(
+        self,
+        source,
+        target_database_base_name,
+        table_name,
+        extraction_spark_job_file,
+        raw_spark_job_extra_args=None,
+        pool=AIRFLOW_DEFAULT_POOL,
+    ):
+        """
+        Build a task group for raw layer to extract a specific table from source
+
+        :param source: source name
+        :type source: str
+        :param target_database_base_name: database base name for the target
+            table database
+        :type target_database_base_name: str
+        :param table_name: table name to be extracted and synced
+        :type table_name: str
+        :param extraction_spark_job_file: full filepath for the extraction spark job
+        :type extraction_spark_job_file: str
+        :param raw_spark_job_extra_args: extra arguments to be passed to the spark job,
+            default spark job parameters are [env, bucket]
+        :type raw_spark_job_extra_args: list[str]
+        :param pool: airflow's pool name
+        :type pool: str
+        :return: initial and final tasks of the created task group
+        :rtype: dict
+        """
+        return self._build_raw_task_group(
+            source=source,
+            target_database_base_name=target_database_base_name,
+            extraction_spark_job_file=extraction_spark_job_file,
+            table_name=table_name,
+            raw_spark_job_extra_args=raw_spark_job_extra_args,
+            pool=pool,
         )
 
     def _build_task_group(
@@ -266,150 +329,96 @@ class DatalakeTaskGroup(BaseTaskGroup):
             final_tasks=[create_external_table_task, sync_metastore_table_task],
         )
 
-    def build_raw_task_group_for_all_tables(
+    def build_clean_task_group(
         self,
-        source,
-        target_database_base_name,
-        extraction_spark_job_file,
-        raw_spark_job_extra_args=None,
-        pool=AIRFLOW_DEFAULT_POOL,
-    ):
-        """
-        Build a task group for raw layer to extract all tables from source
-
-        :param source: source name
-        :type source: str
-        :param target_database_base_name: database base name for the target
-            table database
-        :type target_database_base_name: str
-        :param extraction_spark_job_file: full filepath for the extraction spark job
-        :type extraction_spark_job_file: str
-        :param raw_spark_job_extra_args: extra arguments to be passed to the spark job,
-            default spark job parameters are [env, bucket]
-        :type raw_spark_job_extra_args: list[str]
-        :param pool: airflow's pool name
-        :type pool: str
-        :return: initial and final tasks of the created task group
-        :rtype: dict
-        """
-        return self._build_raw_task_group(
-            source=source,
-            target_database_base_name=target_database_base_name,
-            extraction_spark_job_file=extraction_spark_job_file,
-            hive_sync_table_param="--all-tables",
-            raw_spark_job_extra_args=raw_spark_job_extra_args,
-            pool=pool,
-        )
-
-    def build_raw_task_group_for_single_table(
-        self,
-        source,
+        source_database_base_name,
         target_database_base_name,
         table_name,
-        extraction_spark_job_file,
-        raw_spark_job_extra_args=None,
-        pool=AIRFLOW_DEFAULT_POOL,
+        partitions=None,
+        is_incremental=False,
+        spark_params={},
+        extra_query_template_params=None,
+        schema="",
     ):
         """
-        Build a task group for raw layer to extract a specific table from source
+        Build a task group for clean layer
 
-        :param source: source name
-        :type source: str
-        :param target_database_base_name: database base name for the target
+        :param source_database_base_name: database base name for the source
+            table database
+        :type source_database_base_name: str
+        :param target_database_base_name database base name for the target
             table database
         :type target_database_base_name: str
-        :param table_name: table name to be extracted and synced
+        :param table_name: table name to be created
         :type table_name: str
-        :param extraction_spark_job_file: full filepath for the extraction spark job
-        :type extraction_spark_job_file: str
-        :param raw_spark_job_extra_args: extra arguments to be passed to the spark job,
-            default spark job parameters are [env, bucket]
-        :type raw_spark_job_extra_args: list[str]
-        :param pool: airflow's pool name
-        :type pool: str
-        :return: initial and final tasks of the created task group
-        :rtype: dict
+        :param partitions: list of columns to partition table
+        :type partitions: list[str]
+        :param is_incremental: if this table uses incremental load type
+        :type is_incremental: bool
+        :param spark_params: general parameters to be passed to the spark job
+        :type spark_params: dict
+        :param extra_query_template_params: filter parameters applied to
+            the query besides year, month and day
+        :type extra_query_template_params: dict
+        :param schema: db schema where the table is at. Used in the query path
+        :type schema: str
+        :rtype: list[BaseOperator]
         """
-        return self._build_raw_task_group(
-            source=source,
-            target_database_base_name=target_database_base_name,
-            extraction_spark_job_file=extraction_spark_job_file,
-            tasks_name_suffix=f"-{table_name.replace('_', '-')}",
-            hive_sync_table_param=f"--table-name {table_name}",
-            raw_spark_job_extra_args=raw_spark_job_extra_args,
-            pool=pool,
+        return self._build_task_group(
+            LayerEnum.CLEAN,
+            source_database_base_name,
+            target_database_base_name,
+            table_name,
+            partitions,
+            is_incremental,
+            spark_params,
+            extra_query_template_params,
+            schema,
         )
 
-    def _build_raw_task_group(
+    def build_enrich_task_group(
         self,
-        source,
+        source_database_base_name,
         target_database_base_name,
-        extraction_spark_job_file,
-        hive_sync_table_param,
-        tasks_name_suffix="",
-        raw_spark_job_extra_args=None,
-        pool=AIRFLOW_DEFAULT_POOL,
+        table_name,
+        partitions=None,
+        is_incremental=False,
+        spark_params={},
+        extra_query_template_params=None,
+        schema="",
     ):
         """
-        Create a task group containing 2 tasks:
-        1. load to raw from source
-        2. sync metadata from spark metastore to hive metastore
+        Build a task group for enrich layer
 
-        :param source: source name
-        :type source: str
-        :param target_database_base_name: database base name for the target
+        :param source_database_base_name: database base name for the source
+            table database
+        :type source_database_base_name: str
+        :param target_database_base_name database base name for the target
             table database
         :type target_database_base_name: str
-        :param extraction_spark_job_file: full filepath for the extraction spark job
-        :type extraction_spark_job_file: str
-        :param hive_sync_table_param: sync_metastore_tables spark job parameter
-            for syncing a specific table or all tables from specified database
-        :type hive_sync_table_param: str
-        :param tasks_name_suffix: suffix for appending to default task names
-        :type tasks_name_suffix: str
-        :param raw_spark_job_extra_args: extra arguments to be passed to the spark job,
-            default spark job parameters are [env, bucket]
-        :type raw_spark_job_extra_args: list[str]
-        :param pool: airflow's pool name
-        :type pool: str
-        :return: initial and final tasks of the created task group
-        :rtype: dict
+        :param table_name: table name to be created
+        :type table_name: str
+        :param partitions: list of columns to partition table
+        :type partitions: list[str]
+        :param is_incremental: if this table uses incremental load type
+        :type is_incremental: bool
+        :param spark_params: general parameters to be passed to the spark job
+        :type spark_params: dict
+        :param extra_query_template_params: filter parameters applied to
+            the query besides year, month and day
+        :type extra_query_template_params: dict
+        :param schema: db schema where the table is at. Used in the query path
+        :type schema: str
+        :rtype: list[BaseOperator]
         """
-        layer = LayerEnum.RAW.value
-        if raw_spark_job_extra_args is None:
-            raw_spark_job_extra_args = []
-
-        load_table_task = QuintoAndarDatabricksSubmitRunOperator(
-            task_id=f"load-{layer}-{source}{tasks_name_suffix}",
-            pool=pool,
-            dag=self.dag,
-            json={
-                "spark_python_task": {
-                    "python_file": extraction_spark_job_file,
-                    "parameters": [self.env, self.datalake_bucket]
-                    + raw_spark_job_extra_args,
-                }
-            },
-        )
-
-        sync_metastore_tables_task = QuintoAndarDatabricksSubmitRunOperator(
-            task_id=f"sync-hive-metastore-{layer}{tasks_name_suffix}",
-            dag=self.dag,
-            json={
-                "spark_python_task": {
-                    "python_file": self.spark_jobs_path + "sync_metastore_tables.py",
-                    "parameters": [
-                        self.datalake_bucket,
-                        layer,
-                        target_database_base_name,
-                        hive_sync_table_param,
-                    ],
-                }
-            },
-        )
-
-        airflow_helpers.chain(load_table_task, sync_metastore_tables_task)
-
-        return DatalakeTaskGroup.format_tasks_boundaries(
-            initial_tasks=[load_table_task], final_tasks=[sync_metastore_tables_task]
+        return self._build_task_group(
+            LayerEnum.ENRICH,
+            source_database_base_name,
+            target_database_base_name,
+            table_name,
+            partitions,
+            is_incremental,
+            spark_params,
+            extra_query_template_params,
+            schema,
         )
