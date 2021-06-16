@@ -6,6 +6,9 @@ _<This is the DAGs' documentation template to be followed when creating a new DA
 
 E.g. extraction of Bla tables into data lake.
 
+<details>
+  <summary><strong> > DAG details (click to expand)</strong></summary>
+
 ### Execution Interval
 
 Daily. More information about run time [here]({chart_url}{dag_id}).
@@ -27,3 +30,4 @@ the Data Analytics Team responsible listed in the
 
 _<If there is any external link or documentation that helps to understand this DAG, you can add it here. Else, 
 you must remove this section.>_
+</details>
