@@ -26,6 +26,8 @@ services:
       dockerfile: docker/airflow-py3.Dockerfile
       args:
          GITHUB_TOKEN: ${GITHUB_TOKEN}
+    environment:
+      - ENVIRONMENT=forno
     ports:
       - "8080:8080"
     volumes:
@@ -41,6 +43,7 @@ services:
     restart: always
     environment:
       - C_FORCE_ROOT=true
+      - ENVIRONMENT=forno
     depends_on:
       - airflow_python3
     volumes:
@@ -59,6 +62,7 @@ services:
     restart: always
     environment:
       - C_FORCE_ROOT=true
+      - ENVIRONMENT=forno
     depends_on:
       - airflow_python3
     volumes:
