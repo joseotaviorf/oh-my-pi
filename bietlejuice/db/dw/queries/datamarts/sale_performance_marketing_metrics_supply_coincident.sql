@@ -750,6 +750,7 @@ SELECT
     city_group,
     CASE
         WHEN mkt_origin = 'PWA - Paid' THEN 'Owner PWA'
+        WHEN mkt_origin LIKE '% - Sale' THEN replace(mkt_origin,' - Sale','')
         ELSE mkt_origin
     END AS mkt_origin,
     mkt_channel,
