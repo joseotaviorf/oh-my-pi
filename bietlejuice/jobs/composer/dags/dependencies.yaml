@@ -240,12 +240,12 @@ bietlejuice.enrich_braze_events:
   - bietlejuice.braze_events:load-events-owners-to-clean
 
 bietlejuice.enrich_braze_events_dispatches:
-  - bietlejuice.enrich_braze_events:load-events-tenants-to-enrich
-  - bietlejuice.enrich_braze_events:load-events-owners-to-enrich
+  - bietlejuice.enrich_braze_events:load-enrich-events-tenants
+  - bietlejuice.enrich_braze_events:load-enrich-events-owners
 
 bietlejuice.enrich_braze_events_dispatches_user:
-  - bietlejuice.enrich_braze_events:load-events-tenants-to-enrich
-  - bietlejuice.enrich_braze_events:load-events-owners-to-enrich
+  - bietlejuice.enrich_braze_events:load-enrich-events-tenants
+  - bietlejuice.enrich_braze_events:load-enrich-events-owners
   - bietlejuice.enrich_braze_events_dispatches:load-inapp-tenants-to-enrich
   - bietlejuice.enrich_braze_events_dispatches:load-sms-tenants-to-enrich
   - bietlejuice.enrich_braze_events_dispatches:load-email-tenants-to-enrich
@@ -258,8 +258,8 @@ bietlejuice.enrich_braze_events_dispatches_user:
   - bietlejuice.enrich_braze_events_dispatches:load-push-owners-to-enrich
 
 bietlejuice.enrich_braze_events_user_centric:
-  - bietlejuice.enrich_braze_events:load-events-tenants-to-enrich
-  - bietlejuice.enrich_braze_events:load-events-owners-to-enrich
+  - bietlejuice.enrich_braze_events:load-enrich-events-tenants
+  - bietlejuice.enrich_braze_events:load-enrich-events-owners
 
 bietlejuice.enrich_braze_events_user_centric_periodicity:
   - bietlejuice.enrich_braze_events_user_centric:load-user-events-daily-to-enrich

@@ -4,6 +4,9 @@
 ​
 This DAG creates the enriched tables of the first layer of enrichment from Braze Events DAG, by cleaning data and applying an event type filter.
 ​
+<details>
+  <summary><strong> > DAG details (click to expand)</strong></summary>
+
 ### Execution​ Interval
 This DAG is triggered daily, via Mediator.
 
@@ -28,3 +31,4 @@ If you need additional information about the Braze data, please contact Growth D
 ### Major Changes (JIRA Tasks)
 ​
 None.
+</details>
