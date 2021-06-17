@@ -3,23 +3,24 @@ import pendulum
 import os
 
 from airflow.models import DAG, Variable
+from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
-from bietlejuice.jobs.composer.dags.base.dw_staging_sub_dag import DWStagingSubDAG
-from bietlejuice.jobs.composer.dags.base.dw_sub_dag import DWSubDAG
-from bietlejuice.jobs.composer.services import FileService
 from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.jobs.composer.base.airflow.helpers import TaskFlowHelper
+from bietlejuice.jobs.composer.dags.base.dw_task_group import DWTaskGroup
 
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 2, 20, 0, 0, 0, tzinfo=LOCAL_TZ)
 
 DW_SCHEMA = "janus"
-DAG_NAME = f"dw_proposal"
+CONTEXT = "proposal"
+DAG_NAME = f"dw_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = os.environ.get("ENVIRONMENT")
 SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
@@ -38,10 +39,6 @@ CLUSTER_DESCRIPTION = Variable.get(
 )
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 
-LIBRARIES_DESCRIPTION = Variable.get(
-    "bietlejuice_default_libraries", deserialize_json=True
-)
-
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
@@ -57,49 +54,30 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag,
-    task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=LIBRARIES_DESCRIPTION,
+    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
 )
-
-dw_staging_sub_dag = DWStagingSubDAG(
-    dag_id=DAG_ID,
-    start_date=MAIN_START_DATE,
-    env=ENV,
-    dw_bucket=DW_BUCKET,
-    dw_schema=DW_SCHEMA,
-    relative_query_path=DAG_NAME,
-    spark_job_path=SPARK_JOBS_PATH,
-)
-
-dw_sub_dag = DWSubDAG(
-    dag_id=DAG_ID,
-    start_date=MAIN_START_DATE,
-    env=ENV,
-    dw_bucket=DW_BUCKET,
-    dw_schema=DW_SCHEMA,
-    relative_query_path=DAG_NAME,
-    spark_job_path=SPARK_JOBS_PATH,
-    spectrum_iam_role=SPECTRUM_IAM_ROLE,
-)
-
-file_list = FileService.list_sql_files_without_extension_from_layer(
-    DAG_NAME, LayerEnum.DW.value
-)
-
-dw_staging_sub_dags = dw_staging_sub_dag.build_subdags_from_sql_files(
-    dag, file_list, test_ods_migration=True
-)
-
-dw_sub_dags = dw_sub_dag.build_subdags_from_sql_files(dag, file_list)
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-BaseDAG.set_dependencies_in_sequence(file_list, dw_staging_sub_dags, dw_sub_dags)
+dw_task_group = DWTaskGroup(
+    dag=dag,
+    env=ENV,
+    dw_bucket=DW_BUCKET,
+    dw_schema=DW_SCHEMA,
+    relative_query_path=DAG_NAME,
+    spark_jobs_path=SPARK_JOBS_PATH,
+)
 
-create_cluster_task >> list(dw_staging_sub_dags.values())
+dw_staging_task_group = dw_task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.DW_STAGING, has_ods_migration_test=True
+)
 
-list(dw_sub_dags.values()) >> terminate_cluster_task
+dw_task_group = dw_task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.DW, spectrum_iam_role=SPECTRUM_IAM_ROLE
+)
+
+chain(create_cluster_task, DWTaskGroup.all_first_tasks(dw_staging_task_group))
+TaskFlowHelper.chain_task_groups_via_common_table(dw_staging_task_group, dw_task_group)
+chain(DWTaskGroup.all_last_tasks(dw_task_group), terminate_cluster_task)
