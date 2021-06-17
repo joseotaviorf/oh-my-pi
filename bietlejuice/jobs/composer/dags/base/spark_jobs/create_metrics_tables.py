@@ -73,6 +73,7 @@ def create_table(dw_schema, file_path, database_connection):
     logger.info("m=create_table, msg=executing query {0}".format(query))
 
     database_client.drop_table(dw_schema, f"{table_name}_new", if_exists=True)
+    database_client.drop_table(dw_schema, f"{table_name}_old", if_exists=True)
     database_client.create_table_from_select(dw_schema, f"{table_name}_new", query)
     database_client.run(alter_table_query)
     database_client.drop_table(dw_schema, f"{table_name}_old", if_exists=True)
