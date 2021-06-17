@@ -4,6 +4,9 @@
 
 This DAG creates the dim and fact that the Marketing Analysts will use to analyze the commission costs that occur in our Indica AI Program.  
 
+<details>
+  <summary><strong> > DAG details (click to expand)</strong></summary>
+
 ### Dag Dependencies
 `enrich_robin_hood` (all tasks)
 
@@ -26,3 +29,4 @@ This pipeline produces the following output tables:
 
 For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the 
 [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
+</details>
