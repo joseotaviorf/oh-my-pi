@@ -118,7 +118,7 @@ bietlejuice.dw_reservation:
 
 bietlejuice.dw_sale_flows:
   - bietlejuice.ebdb:create-clean-visit-in-data-lake
-  - bietlejuice.enrich_amplitude_visit:load-amplitude-visit-to-enrich
+  - bietlejuice.enrich_amplitude_visit:load-enrich-amplitude-visit
   - bietlejuice.enrich_amplitude_offer:load-sale-offer-raw-events-to-enrich
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
