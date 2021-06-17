@@ -30,7 +30,11 @@ if __name__ == "__main__":
     parser.add_argument("partitions")
     parser.add_argument("execution_date")
     parser.add_argument("additional_query_template_params")
-    parser.add_argument("spark_params", type=str, help="parameters to pass to spark")
+    parser.add_argument(
+        "cluster_config_params",
+        type=str,
+        help="custom config parameters to be set in spark cluster",
+    )
 
     args = parser.parse_args()
 
@@ -42,7 +46,7 @@ if __name__ == "__main__":
     partitions = json.loads(args.partitions.replace("'", '"'))
     execution_date = args.execution_date
     query_template_params = json.loads(args.additional_query_template_params)
-    spark_params = json.loads(args.spark_params)
+    cluster_config_params = json.loads(args.cluster_config_params)
 
     logger.info(
         f"m={JOB_NAME}, env={env}, dw_bucket={dw_bucket},  dw_schema={dw_schema}, "
@@ -71,7 +75,7 @@ if __name__ == "__main__":
         database_location=schema_database_location,
         layer=LayerEnum.DW_STAGING.value,
         query=query,
-        spark_params=spark_params,
+        cluster_config_params=cluster_config_params,
         partitions=partitions,
         query_template_params=query_template_params,
     )

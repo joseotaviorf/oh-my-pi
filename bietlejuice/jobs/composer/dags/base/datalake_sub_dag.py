@@ -28,7 +28,7 @@ class DatalakeSubDAG(BaseSubDAG):
         athena_query_result_location,
         schedule_interval=None,
         target_database_base_name=None,
-        spark_params={},
+        cluster_config_params={},
         execution_timeout_hours=DEFAULT_EXECUTION_TIMEOUT_HOURS,
     ):
         """
@@ -43,7 +43,8 @@ class DatalakeSubDAG(BaseSubDAG):
         :param spark_job_paths: paths for spark jobs used in subdag tasks
         :param athena_query_result_location: athena query results location
         :param schedule_interval: schedule interval
-        :param target_database_base_name database base name for the target table database
+        :param target_database_base_name: database base name for the target table database
+        :param cluster_config_params: custom config parameters to be set in spark cluster
         """
         self.dag_id = dag_id
         self.start_date = start_date
@@ -59,7 +60,7 @@ class DatalakeSubDAG(BaseSubDAG):
             if target_database_base_name
             else database_base_name
         )
-        self.spark_params = spark_params
+        self.cluster_config_params = cluster_config_params
         self.execution_timeout_hours = execution_timeout_hours
 
         if layer not in [LayerEnum.CLEAN, LayerEnum.ENRICH]:
@@ -122,7 +123,7 @@ class DatalakeSubDAG(BaseSubDAG):
                         table_name,
                         str(partitions),
                         "{{ ds }}",
-                        str(self.spark_params),
+                        str(self.cluster_config_params),
                         str(extra_query_template_params),
                         schema,
                     ],

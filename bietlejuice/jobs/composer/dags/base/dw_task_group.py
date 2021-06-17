@@ -131,7 +131,7 @@ class DWTaskGroup(BaseTaskGroup):
         )
 
     def build_dw_staging_task_group(
-        self, table_name, has_ods_migration_test=False, spark_params={}
+        self, table_name, has_ods_migration_test=False, cluster_config_params={}
     ):
         """
         Creates a task group containing the tasks:
@@ -147,8 +147,8 @@ class DWTaskGroup(BaseTaskGroup):
         :param has_ods_migration_test: whether to create tasks to validate migrated
             data x ods
         :type has_ods_migration_test: bool
-        :param spark_params: general parameters to be passed to the spark job
-        :type spark_params: dict
+        :param cluster_config_params: custom config parameters to be set in spark cluster
+        :type cluster_config_params: dict
         :return: dict with initial and final tasks of the created task group
         :rtype: dict
         """
@@ -167,7 +167,7 @@ class DWTaskGroup(BaseTaskGroup):
                         self.dw_schema,
                         self.relative_query_path,
                         table_name,
-                        str(spark_params),
+                        str(cluster_config_params),
                     ],
                 }
             },

@@ -26,7 +26,11 @@ if __name__ == "__main__":
         help="relative query path for sql file to create table",
     )
     parser.add_argument("table_name", type=str, help="table name that will be created")
-    parser.add_argument("spark_params", type=str, help="parameters to pass to spark")
+    parser.add_argument(
+        "cluster_config_params",
+        type=str,
+        help="custom config parameters to be set in spark cluster",
+    )
 
     args = parser.parse_args()
 
@@ -35,7 +39,7 @@ if __name__ == "__main__":
     dw_schema = args.dw_schema
     relative_query_path = args.relative_query_path
     table_name = args.table_name
-    spark_params = json.loads(args.spark_params)
+    cluster_config_params = json.loads(args.cluster_config_params)
 
     logger.info(
         f"m={JOB_NAME}, env={env}, dw_bucket={dw_bucket},  dw_schema={dw_schema}, "
@@ -56,6 +60,6 @@ if __name__ == "__main__":
         database_location=schema_database_location,
         layer=LayerEnum.DW_STAGING.value,
         query=query,
-        spark_params=spark_params,
+        cluster_config_params=cluster_config_params,
     )
     table_loader_pipeline.run()

@@ -25,7 +25,7 @@ class TableLoaderPipeline(AbstractPipeline):
         query_template_params=None,
         target_database_name=None,
         target_database_location=None,
-        spark_params=None,
+        cluster_config_params=None,
     ):
         """
         :param database_name: database name to create the enriched table
@@ -35,7 +35,9 @@ class TableLoaderPipeline(AbstractPipeline):
         :param query: query for specified table
         :param partitions: list of columns to partition table
         :param query_template_params: dict of parameters to apply to query template, example: {'year':2020, 'month':1, 'day':1}
-        :param is_incremental: if this table uses incremental load type
+        :param target_database_name: target database name
+        :param target_database_location: target database location in S3
+        :param cluster_config_params: custom config parameters to be set in spark cluster
         """
         self.database_name = database_name
         self.table_name = table_name
@@ -46,7 +48,7 @@ class TableLoaderPipeline(AbstractPipeline):
         self.target_database_name = target_database_name or database_name
         self.target_database_location = target_database_location or database_location
         self.partitions = partitions or []
-        self.spark_params = spark_params
+        self.cluster_config_params = cluster_config_params
 
     def run(self):
         """
@@ -60,9 +62,9 @@ class TableLoaderPipeline(AbstractPipeline):
         for database in databases_to_be_created:
             spark_metastore_service.create_database(database)
 
-        if self.spark_params:
+        if self.cluster_config_params:
             spark_configurator_service = SparkConfiguratorService(
-                spark_client, self.spark_params
+                spark_client, self.cluster_config_params
             )
             spark_configurator_service.configure_spark_session()
 

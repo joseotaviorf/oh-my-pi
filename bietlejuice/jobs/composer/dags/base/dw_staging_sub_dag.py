@@ -22,7 +22,7 @@ class DWStagingSubDAG(BaseSubDAG):
         relative_query_path,
         spark_job_path,
         schedule_interval=None,
-        spark_params={},
+        cluster_config_params={},
     ):
         """
         :param dag_id: main dag id to attach subdag to
@@ -34,6 +34,7 @@ class DWStagingSubDAG(BaseSubDAG):
         to be created
         :param spark_job_path: paths for spark jobs used in subdag tasks
         :param schedule_interval: schedule interval
+        :param cluster_config_params: custom config parameters to be set in spark cluster
         """
         self.dag_id = dag_id
         self.start_date = start_date
@@ -44,7 +45,7 @@ class DWStagingSubDAG(BaseSubDAG):
         self.spark_job_path = spark_job_path
         self.schedule_interval = schedule_interval
         self.layer = LayerEnum.DW_STAGING
-        self.spark_params = spark_params
+        self.cluster_config_params = cluster_config_params
 
     def build_subdag(
         self, sub_dag_name, table_name, slugged_table_name, test_ods_migration
@@ -69,7 +70,7 @@ class DWStagingSubDAG(BaseSubDAG):
                         self.dw_schema,
                         self.relative_query_path,
                         table_name,
-                        str(self.spark_params),
+                        str(self.cluster_config_params),
                     ],
                 }
             },

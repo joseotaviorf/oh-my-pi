@@ -54,7 +54,7 @@ class IncrementalDWSubDAG(DWStagingSubDAG):
                         str(partitions),
                         "{{ ds }}",
                         json.dumps(extra_query_template_params),
-                        str(self.spark_params),
+                        str(self.cluster_config_params),
                     ],
                 }
             },

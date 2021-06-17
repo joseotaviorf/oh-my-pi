@@ -214,7 +214,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         table_name,
         partitions=None,
         is_incremental=False,
-        spark_params={},
+        cluster_config_params={},
         extra_query_template_params=None,
         schema="",  # TODO: Remove schema param after dags are all in pattern
         # 'schema' parameter could be replaced by source or target database_base_name.
@@ -241,8 +241,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type partitions: list[str]
         :param is_incremental: if this table uses incremental load type
         :type is_incremental: bool
-        :param spark_params: general parameters to be passed to the spark job
-        :type spark_params: dict
+        :param cluster_config_params: custom config parameters to be set in spark cluster
+        :type cluster_config_params: dict
         :param extra_query_template_params: filter parameters applied to
             the query besides year, month and day
         :type extra_query_template_params: dict
@@ -273,7 +273,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                         table_name,
                         str(partitions),
                         "{{ ds }}",
-                        str(spark_params),
+                        str(cluster_config_params),
                         str(extra_query_template_params),
                         schema,
                     ],
@@ -336,7 +336,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         table_name,
         partitions=None,
         is_incremental=False,
-        spark_params={},
+        cluster_config_params={},
         extra_query_template_params=None,
         schema="",
     ):
@@ -355,8 +355,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type partitions: list[str]
         :param is_incremental: if this table uses incremental load type
         :type is_incremental: bool
-        :param spark_params: general parameters to be passed to the spark job
-        :type spark_params: dict
+        :param cluster_config_params: custom config parameters to be set in spark cluster
+        :type cluster_config_params: dict
         :param extra_query_template_params: filter parameters applied to
             the query besides year, month and day
         :type extra_query_template_params: dict
@@ -371,7 +371,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             table_name,
             partitions,
             is_incremental,
-            spark_params,
+            cluster_config_params,
             extra_query_template_params,
             schema,
         )
@@ -383,7 +383,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         table_name,
         partitions=None,
         is_incremental=False,
-        spark_params={},
+        cluster_config_params={},
         extra_query_template_params=None,
         schema="",
     ):
@@ -402,8 +402,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type partitions: list[str]
         :param is_incremental: if this table uses incremental load type
         :type is_incremental: bool
-        :param spark_params: general parameters to be passed to the spark job
-        :type spark_params: dict
+        :param cluster_config_params: custom config parameters to be set in spark cluster
+        :type cluster_config_params: dict
         :param extra_query_template_params: filter parameters applied to
             the query besides year, month and day
         :type extra_query_template_params: dict
@@ -418,7 +418,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             table_name,
             partitions,
             is_incremental,
-            spark_params,
+            cluster_config_params,
             extra_query_template_params,
             schema,
         )
