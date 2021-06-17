@@ -33,13 +33,9 @@ LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
 )
 
 CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_bietlejuice_amplitude_offer_cluster", deserialize_json=True
+    "databricks_bietlejuice_enrich_amplitude", deserialize_json=True
 )
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
-
-LIBRARIES_DESCRIPTION = Variable.get(
-    "bietlejuice_default_libraries", deserialize_json=True
-)
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -56,10 +52,7 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag,
-    task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=LIBRARIES_DESCRIPTION,
+    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
 )
 
 enrich_sub_dag = DatalakeSubDAG(
