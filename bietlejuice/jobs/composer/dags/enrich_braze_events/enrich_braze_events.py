@@ -71,6 +71,8 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     layer=LayerEnum.ENRICH,
     source_database_base_name=CONTEXT,
     target_database_base_name=CONTEXT,
+    is_incremental=True,
+    partitions=PARTITION_COLS,
 )
 
 chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(enrich_task_groups))
