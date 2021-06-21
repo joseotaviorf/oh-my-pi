@@ -23,11 +23,11 @@ bietlejuice.dw_booking:
   - bietlejuice.gsheets:load-taxonomy-demand-to-clean
 
 bietlejuice.dw_braze_events_user_centric:
-  - bietlejuice.enrich_braze_events_user_centric_periodicity:load-user-events-same-week-to-enrich
-  - bietlejuice.enrich_braze_events_user_centric_periodicity:load-user-events-1w-before-to-enrich
-  - bietlejuice.enrich_braze_events_user_centric_periodicity:load-user-events-2w-before-to-enrich
-  - bietlejuice.enrich_braze_events_user_centric_periodicity:load-user-events-3w-before-to-enrich
-  - bietlejuice.enrich_braze_events_user_centric_periodicity:load-user-events-all-time-before-to-enrich
+  - bietlejuice.enrich_braze_events_user_centric_periodicity:load-enrich-user-events-same-week
+  - bietlejuice.enrich_braze_events_user_centric_periodicity:load-enrich-user-events-1w-before
+  - bietlejuice.enrich_braze_events_user_centric_periodicity:load-enrich-user-events-2w-before
+  - bietlejuice.enrich_braze_events_user_centric_periodicity:load-enrich-user-events-3w-before
+  - bietlejuice.enrich_braze_events_user_centric_periodicity:load-enrich-user-events-all-time-before
 
 bietlejuice.dw_braze_events_user_dispatch:
   - bietlejuice.enrich_braze_events_dispatches_user:load-enrich-owners-events
