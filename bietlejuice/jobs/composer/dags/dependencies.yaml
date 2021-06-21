@@ -30,8 +30,8 @@ bietlejuice.dw_braze_events_user_centric:
   - bietlejuice.enrich_braze_events_user_centric_periodicity:load-user-events-all-time-before-to-enrich
 
 bietlejuice.dw_braze_events_user_dispatch:
-  - bietlejuice.enrich_braze_events_dispatches_user:load-owners-events-to-enrich
-  - bietlejuice.enrich_braze_events_dispatches_user:load-tenants-events-to-enrich
+  - bietlejuice.enrich_braze_events_dispatches_user:load-enrich-owners-events
+  - bietlejuice.enrich_braze_events_dispatches_user:load-enrich-tenants-events
 
 bietlejuice.dw_call:
   - bietlejuice.enrich_bigfone_twilio:load-call-agents-to-enrich
