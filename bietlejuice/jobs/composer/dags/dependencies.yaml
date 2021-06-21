@@ -246,16 +246,16 @@ bietlejuice.enrich_braze_events_dispatches:
 bietlejuice.enrich_braze_events_dispatches_user:
   - bietlejuice.enrich_braze_events:load-enrich-events-tenants
   - bietlejuice.enrich_braze_events:load-enrich-events-owners
-  - bietlejuice.enrich_braze_events_dispatches:load-inapp-tenants-to-enrich
-  - bietlejuice.enrich_braze_events_dispatches:load-sms-tenants-to-enrich
-  - bietlejuice.enrich_braze_events_dispatches:load-email-tenants-to-enrich
-  - bietlejuice.enrich_braze_events_dispatches:load-webhook-tenants-to-enrich
-  - bietlejuice.enrich_braze_events_dispatches:load-push-tenants-to-enrich
-  - bietlejuice.enrich_braze_events_dispatches:load-inapp-owners-to-enrich
-  - bietlejuice.enrich_braze_events_dispatches:load-sms-owners-to-enrich
-  - bietlejuice.enrich_braze_events_dispatches:load-email-owners-to-enrich
-  - bietlejuice.enrich_braze_events_dispatches:load-webhook-owners-to-enrich
-  - bietlejuice.enrich_braze_events_dispatches:load-push-owners-to-enrich
+  - bietlejuice.enrich_braze_events_dispatches:load-enrich-inapp-tenants
+  - bietlejuice.enrich_braze_events_dispatches:load-enrich-sms-tenants
+  - bietlejuice.enrich_braze_events_dispatches:load-enrich-email-tenants
+  - bietlejuice.enrich_braze_events_dispatches:load-enrich-webhook-tenants
+  - bietlejuice.enrich_braze_events_dispatches:load-enrich-push-tenants
+  - bietlejuice.enrich_braze_events_dispatches:load-enrich-inapp-owners
+  - bietlejuice.enrich_braze_events_dispatches:load-enrich-sms-owners
+  - bietlejuice.enrich_braze_events_dispatches:load-enrich-email-owners
+  - bietlejuice.enrich_braze_events_dispatches:load-enrich-webhook-owners
+  - bietlejuice.enrich_braze_events_dispatches:load-enrich-push-owners
 
 bietlejuice.enrich_braze_events_user_centric:
   - bietlejuice.enrich_braze_events:load-enrich-events-tenants
