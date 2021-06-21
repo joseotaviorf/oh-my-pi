@@ -116,6 +116,9 @@ bietlejuice.dw_rent_fact_listing_owners:
 bietlejuice.dw_reservation:
   - bietlejuice.enrich_kill_queue
 
+bietlejuice.dw_sale_closing_flows:
+  - bietlejuice.enrich_sale_closing_flows:load-enrich-closing-flow
+
 bietlejuice.dw_sale_flows:
   - bietlejuice.ebdb:create-clean-visit-in-data-lake
   - bietlejuice.enrich_amplitude_offer:load-enrich-sale-offer-raw-events
