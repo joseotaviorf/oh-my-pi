@@ -164,7 +164,7 @@ bietlejuice.dw_tickets:
 
 bietlejuice.dw_tracksale:
   - bietlejuice.enrich_tracksale
-  - bietlejuice.enrich_nps_answer_drivers
+  - bietlejuice.enrich_nps_answer_drivers:load-enrich-answers-drivers
   - bietlejuice.enrich_ebdb_customer_contact_identification
 
 bietlejuice.dw_user:
