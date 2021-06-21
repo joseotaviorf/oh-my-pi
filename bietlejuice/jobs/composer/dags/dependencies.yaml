@@ -477,6 +477,10 @@ bietlejuice.enrich_robin_hood:
   - bietlejuice.robin_hood:load-payee-to-datalake-clean
   - bietlejuice.robin_hood:load-tax-to-datalake-clean
 
+bietlejuice.enrich_sale_closing_flows:
+  - bietlejuice.enrich_firestore:load-monday-to-enrich
+  - bietlejuice.enrich_firestore:load-sale-offer-to-enrich
+
 bietlejuice.enrich_sale_flows:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
