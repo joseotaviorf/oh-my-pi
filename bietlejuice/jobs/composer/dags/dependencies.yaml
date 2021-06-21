@@ -412,7 +412,7 @@ bietlejuice.enrich_listing_owners:
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
-  - bietlejuice.enrich_kill_queue:load-reservation-to-enrich
+  - bietlejuice.enrich_kill_queue:load-enrich-reservation
   - bietlejuice.enrich_offer:load-enrich-offer
 
 bietlejuice.enrich_marketing_automatic_daily_costs:
