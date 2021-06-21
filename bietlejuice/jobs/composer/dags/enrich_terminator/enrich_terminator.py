@@ -1,4 +1,5 @@
 from datetime import datetime
+from airflow.utils.helpers import chain
 
 import pendulum
 import os
@@ -10,11 +11,10 @@ from airflow.operators.quintoandar_databricks import (
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
-from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
-from bietlejuice.jobs.composer.services import FileService
+from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 
 
-SOURCE = "terminator"
+CONTEXT = "terminator"
 
 # airflow vars
 ENV = os.environ.get("ENVIRONMENT")
@@ -25,8 +25,8 @@ S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 # spark and databricks vars
-SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/"
-LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{SOURCE}"
+SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base"
+LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{CONTEXT}"
 CLUSTER_DESCRIPTION = Variable.get(
     "databricks_bietlejuice_terminator", deserialize_json=True
 )
@@ -36,7 +36,7 @@ LIBRARIES_DESCRIPTION = Variable.get(
 )
 
 # DAG vars
-DAG_NAME = f"enrich_{SOURCE}"
+DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 12, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
@@ -62,24 +62,24 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     libraries=LIBRARIES_DESCRIPTION,
 )
 
-enrich_sub_dag = DatalakeSubDAG(
-    dag_id=DAG_ID,
-    start_date=MAIN_START_DATE,
-    env=ENV,
-    datalake_bucket=DATALAKE_BUCKET,
-    layer=LayerEnum.ENRICH,
-    database_base_name=SOURCE,
-    relative_query_path=SOURCE,
-    spark_job_paths=f"{SPARK_JOB_PATH}/base",
-    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
-)
-file_list = FileService.list_sql_files_without_extension_from_layer(
-    SOURCE, LayerEnum.ENRICH.value
-)
-enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(dag, file_list)
-
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-create_cluster_task >> list(enrich_sub_dags.values()) >> terminate_cluster_task
+datalake_task_group = DatalakeTaskGroup(
+    dag=dag,
+    env=ENV,
+    datalake_bucket=DATALAKE_BUCKET,
+    relative_query_path=CONTEXT,
+    spark_jobs_path=SPARK_JOBS_PATH,
+    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
+)
+
+enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.ENRICH,
+    source_database_base_name=CONTEXT,
+    target_database_base_name=CONTEXT,
+)
+
+chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(enrich_task_groups))
+chain(DatalakeTaskGroup.all_last_tasks(enrich_task_groups), terminate_cluster_task)
