@@ -3,7 +3,6 @@ import logging
 from argparse import ArgumentParser
 from datetime import datetime
 
-from pyspark.sql.types import StructType, StructField, StringType, DoubleType
 from quintoandar_logger import QuintoAndarLogger
 from quintoandar_rtb_api_client.clients import RTBClient
 
@@ -22,25 +21,23 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-schema = StructType(
-    [
-        StructField("subcampaign", StringType(), True),
-        StructField("impsCount", DoubleType(), True),
-        StructField("clicksCount", DoubleType(), True),
-        StructField("campaignCost", DoubleType(), True),
-        StructField("conversionsCount", DoubleType(), True),
-        StructField("conversionsValue", DoubleType(), True),
-        StructField("cr", DoubleType(), True),
-        StructField("ctr", DoubleType(), True),
-        StructField("roas", DoubleType(), True),
-        StructField("subcampaignHash", StringType(), True),
-        StructField("account_hash", StringType(), True),
-        StructField("account_name", StringType(), True),
-        StructField("account_currency", StringType(), True),
-        StructField("account_status", StringType(), True),
-        StructField("cost_attribution_date", StringType(), True),
-    ]
-)
+schema = """
+    account_currency STRING,
+    account_hash STRING,
+    account_name STRING,
+    account_status STRING,
+    campaignCost DOUBLE,
+    clicksCount DOUBLE,
+    conversionsCount DOUBLE,
+    conversionsValue DOUBLE,
+    cost_attribution_date STRING,
+    cr DOUBLE,
+    ctr DOUBLE,
+    impsCount DOUBLE,
+    roas DOUBLE,
+    subcampaign STRING,
+    subcampaignHash STRING
+"""
 
 
 def get_api_response(rtb_api_auth, execution_date):
@@ -95,7 +92,7 @@ if __name__ == "__main__":
 
     if api_response:
         spark_client = SparkClient()
-        df = spark_client.create_dataframe(api_response)
+        df = spark_client.create_dataframe(api_response, schema=schema)
         dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
         df = df.coalesce(1)
         df = (
