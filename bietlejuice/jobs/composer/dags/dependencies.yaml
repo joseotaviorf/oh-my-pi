@@ -154,7 +154,7 @@ bietlejuice.dw_sauron:
   - bietlejuice.enrich_sauron:load-enrich-session
 
 bietlejuice.dw_smart_price:
-  - bietlejuice.enrich_ebdb_smart_price:load-smart-price-versioning-to-enrich
+  - bietlejuice.enrich_ebdb_smart_price:load-enrich-smart-price-versioning
   - bietlejuice.ebdb:create-clean-dynamic-pricing-house-in-data-lake
   - bietlejuice.ebdb:create-clean-dynamic-pricing-parameters-in-data-lake
 
