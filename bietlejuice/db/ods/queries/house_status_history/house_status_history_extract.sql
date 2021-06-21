@@ -11,7 +11,7 @@ select
 	i.complemento,
 	i.condominio,
 	i.dataConstrucao,
-	i.dataParaMudar,
+	nullif(i.dataParaMudar, '0000-00-00 00:00:00') as dataParaMudar, -- due to a bug in Product, 0 timestamps are being created
 	i.descricaoImovel,
 	i.detalhesMobilia,
 	i.elevador,
