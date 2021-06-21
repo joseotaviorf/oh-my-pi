@@ -283,9 +283,9 @@ bietlejuice.enrich_crm:
   - bietlejuice.crm
 
 bietlejuice.enrich_crm_tasks_resolution:
-  - bietlejuice.enrich_crm:load-tasks-actions-to-enrich
-  - bietlejuice.enrich_crm:load-tasks-to-enrich
-  - bietlejuice.enrich_crm:load-task-status-histories-to-enrich
+  - bietlejuice.enrich_crm:load-enrich-tasks-actions
+  - bietlejuice.enrich_crm:load-enrich-tasks
+  - bietlejuice.enrich_crm:load-enrich-task-status-histories
 
 bietlejuice.enrich_docx:
   - bietlejuice.docx:load-credit-evaluation-to-clean
