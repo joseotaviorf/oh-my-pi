@@ -279,8 +279,8 @@ bietlejuice.enrich_consolidated_marketing_costs:
   - bietlejuice.trovit:load-trovit-report-to-clean
 
 bietlejuice.enrich_credit_evers:
-  - bietlejuice.enrich_invoice:load-credit-invoice-original-due-date-to-enrich
-  - bietlejuice.enrich_invoice:load-credit-invoice-to-enrich
+  - bietlejuice.enrich_invoice:load-enrich-credit-invoice-original-due-date
+  - bietlejuice.enrich_invoice:load-enrich-credit-invoice
 
 bietlejuice.enrich_crm:
   - bietlejuice.crm
