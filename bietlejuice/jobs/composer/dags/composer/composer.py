@@ -19,9 +19,9 @@ from bietlejuice.jobs.composer.services import FileService
 DAG_NAME = "composer"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 
-LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
+LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2019, 8, 21, 0, 0, 0, tzinfo=LOCAL_TZ)
-SCHEDULE_INTERVAL = "0 8 * * *"
+SCHEDULE_INTERVAL = "*/15 6-18 * * *"
 
 ENV = os.environ.get("ENVIRONMENT")
 S3_BUCKET = Variable.get("datalake_bucket")
