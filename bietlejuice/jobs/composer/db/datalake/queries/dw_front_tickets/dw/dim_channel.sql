@@ -1,5 +1,5 @@
 SELECT
-  MD5(CONCAT('call', tags, direction)) AS sk_channel,
+  MD5(CONCAT('call', COALESCE(tags, ''), COALESCE(direction, ''))) AS sk_channel,
   'call' AS channel,
   direction,
   tags,
@@ -9,7 +9,7 @@ FROM
 GROUP BY 1,2,3,4,5
 UNION ALL
 SELECT
-  MD5(CONCAT('chat', tags)) AS sk_channel,
+  MD5(CONCAT('chat', COALESCE(tags, ''))) AS sk_channel,
   'chat' AS channel,
   'inbound' AS direction,
   tags,
@@ -19,7 +19,7 @@ FROM
 GROUP BY 1,2,3,4,5
 UNION ALL
 SELECT
-  MD5(CONCAT('email', tags)) AS sk_channel,
+  MD5(CONCAT('email', COALESCE(tags, ''))) AS sk_channel,
   'email' AS channel,
   'inbound' AS direction,
   tags,

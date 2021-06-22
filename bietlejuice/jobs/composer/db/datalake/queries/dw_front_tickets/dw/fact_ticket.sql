@@ -10,9 +10,10 @@ WITH call_tickets AS (
         COALESCE(contact_theme_tag, '')
       )
     ) AS sk_taxonomy,
-    MD5(concat('call', tags, direction)) AS sk_channel,
+    MD5(CONCAT('call', COALESCE(tags, ''), COALESCE(direction, ''))) AS sk_channel,
     MD5(first_department) AS sk_first_department,
     MD5(last_department) AS sk_last_department, 
+    MD5(zendesk_department) AS sk_zendesk_department,
     id_user AS sk_user,
     id_contract AS sk_contract,
     'call' AS channel,
@@ -21,11 +22,12 @@ WITH call_tickets AS (
     minutes_full_resolution_time_calendar,
     first_department,
     last_department,
+    zendesk_department,
     number_of_departments AS total_departments,
     number_of_tasks AS total_tasks,
     CAST(back_ticket AS BIGINT) AS back_ticket,
     is_solved AS resolution_survey,
-    is_csat_answered AS has_anwsered_survey,
+    is_csat_answered AS has_answered_csat,
     has_back_ticket,
     is_open_back_ticket AS is_back_ticket_open,
     CASE
@@ -71,9 +73,10 @@ chat_tickets AS (
         COALESCE(contact_theme_tag, '')
       )
     ) AS sk_taxonomy,
-    MD5(concat('chat', tags)) AS sk_channel,
+    MD5(CONCAT('chat', COALESCE(tags, ''))) AS sk_channel,
     MD5(first_department) AS sk_first_department,
     MD5(last_department) AS sk_last_department,
+    MD5(zendesk_department) AS sk_zendesk_department,
     id_user AS sk_user,
     id_contract AS sk_contract, 
     'chat' AS channel,
@@ -82,11 +85,12 @@ chat_tickets AS (
     minutes_full_resolution_time_calendar,
     first_department,
     last_department,
+    zendesk_department,
     number_of_departments AS total_departments,
     number_of_tasks AS total_tasks,
     CAST(back_ticket AS BIGINT) AS back_ticket,
     is_solved AS resolution_survey,
-    is_csat_answered AS has_anwsered_survey,
+    is_csat_answered AS has_answered_csat,
     has_back_ticket,
     is_open_back_ticket AS is_back_ticket_open,
     CASE
@@ -132,9 +136,10 @@ email_tickets AS (
         COALESCE(contact_theme_tag, '')
       )
     ) AS sk_taxonomy,
-    MD5(concat('email', tags)) AS sk_channel,
+    MD5(CONCAT('email', COALESCE(tags, ''))) AS sk_channel,
     MD5(department) AS sk_first_department,
     MD5(department) AS sk_last_department, 
+    MD5(department) AS sk_zendesk_department,
     id_user AS sk_user,
     id_contract AS sk_contract,
     'email' AS channel,
@@ -143,11 +148,12 @@ email_tickets AS (
     minutes_full_resolution_time_calendar,
     department AS first_department,
     department AS last_department,
+    department AS zendesk_department,
     1 AS total_departments,
     1 AS total_tasks,
     CAST(back_ticket AS BIGINT) AS back_ticket,
     is_solved AS resolution_survey,
-    is_answered AS has_anwsered_survey,
+    is_answered AS has_answered_csat,
     has_back_ticket,
     is_open_back_ticket AS is_back_ticket_open,
     CASE

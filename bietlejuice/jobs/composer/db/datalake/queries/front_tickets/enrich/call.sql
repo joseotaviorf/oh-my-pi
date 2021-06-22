@@ -128,6 +128,13 @@ call AS (
           datalake_bigfone_twilio.call_flex_events
       WHERE
           event_type != 'task.updated'
+          AND (
+            GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.scheduled') <> 'true'
+            OR (
+                  GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.scheduled') = 'true' 
+                  AND GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.conversations.conversation_attribute_1') = 2
+            )
+          )
       GROUP BY 1,2,3,4,5,6,7,8,9
   ),
   csat_events AS (
@@ -234,17 +241,12 @@ zendesk_aditional_ticket_info AS (
   JOIN
     datalake_zendesk_ticket_funnels.tickets_funnel_metrics ftm
       ON tf.id_ticket = ftm.id_ticket
-  JOIN
-    zendesk_tickets_unique ztu
-      ON ztu.id_ticket = ftm.id_ticket
-  WHERE
-    ftm.id_call IS NOT NULL
 ),
 back_tickets AS (
   SELECT 
     COALESCE(
-      GET_JSON_OBJECT(zd.custom_fields, '$.Ticket de contato'),
-      REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})',1) 
+      NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),
+      REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})', 1)
     ) AS front_task,
     zd.id_ticket AS back_ticket,
     zd.status,
@@ -253,7 +255,7 @@ back_tickets AS (
     zendesk_aditional_ticket_info zd
   JOIN
     call
-      ON call.id_task = COALESCE(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket de contato'),REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})',1))
+      ON call.id_task = COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})', 1))
   LEFT JOIN
     datalake_gsheets_clean.department_control dc
       ON dc.department = zd.zendesk_ticket_department 
@@ -263,7 +265,7 @@ back_tickets AS (
   WHERE 
     (zd.tags LIKE '%tarefa_atendimento_escalado%' OR LOWER(dc.front_or_back) = 'back')
     AND (zd.tags NOT LIKE '%bot_end_conversation%' AND zd.tags NOT LIKE '%closed_by_merge%')
-    AND COALESCE(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket de contato'),REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})',1)) != '' 
+    AND COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})', 1)) != '' 
   GROUP BY 1,2,3,4
 )
 SELECT DISTINCT 
@@ -282,6 +284,7 @@ SELECT DISTINCT
   t.agent_company,
   t.agent_name,
   t.queue_name AS department,
+  zd.zendesk_ticket_department AS zendesk_department,
   FIRST(t.queue_name) OVER (PARTITION BY zd.id_ticket ORDER BY c.ts_created ASC) AS first_department,
   FIRST(t.queue_name) OVER (PARTITION BY zd.id_ticket ORDER BY c.ts_created DESC) AS last_department,
   t.transferred_from_dept,
@@ -337,6 +340,9 @@ FROM
 JOIN 
   zendesk_aditional_ticket_info zd 
     ON zd.id_call = c.sk_call
+JOIN
+  zendesk_tickets_unique ztu
+    ON zd.id_ticket = ztu.id_ticket
 LEFT JOIN 
   tasks t
     ON t.sk_call = c.sk_call

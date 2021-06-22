@@ -153,11 +153,6 @@ zendesk_aditional_ticket_info AS (
   JOIN
     datalake_zendesk_ticket_funnels.tickets_funnel_metrics ftm
       ON tf.id_ticket = ftm.id_ticket
-  JOIN
-    zendesk_tickets_unique ztu
-      ON ztu.id_ticket = ftm.id_ticket
-  WHERE
-    ftm.id_session IS NOT NULL
 ),
 chat_csat AS(
   SELECT
@@ -189,14 +184,14 @@ back_tickets AS (
     zd.status AS back_ticket_status,
     zd2.id_ticket AS front_ticket,
     COALESCE(
-      GET_JSON_OBJECT(zd.custom_fields, '$.Ticket de contato'),
-      REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})',1) 
+      NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),
+      REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})', 1)
     ) AS front_task
   FROM
     zendesk_aditional_ticket_info zd
   JOIN
     quinto_messenger_tickets qmt
-      ON qmt.id_task = COALESCE(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket de contato'),REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})',1))
+      ON qmt.id_task = COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})', 1))
   LEFT JOIN
     datalake_gsheets_clean.department_control dc
       ON dc.department = zd.zendesk_ticket_department 
@@ -206,7 +201,7 @@ back_tickets AS (
   WHERE
     (zd.tags LIKE '%tarefa_atendimento_escalado%' OR LOWER(dc.front_or_back) = 'back')
     AND (zd.tags NOT LIKE '%bot_end_conversation%' AND zd.tags NOT LIKE '%closed_by_merge%')
-    AND COALESCE(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket de contato'),REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})',1)) != '' 
+    AND COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})', 1)) != '' 
   GROUP BY 1,2,3,4
 )
 SELECT DISTINCT 
@@ -223,6 +218,7 @@ SELECT DISTINCT
   ct.agent_company,
   cc.comment AS csat_comment,
   ct.department,
+  zd.zendesk_ticket_department AS zendesk_department,
   FIRST(ct.department) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_first_event ASC) AS first_department,
   FIRST(ct.department) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_first_event DESC) AS last_department,
   ct.transferred_from_dept,
@@ -271,6 +267,9 @@ FROM
 JOIN
   zendesk_aditional_ticket_info zd
     ON zd.id_session = ct.id_session
+JOIN
+  zendesk_tickets_unique ztu
+    ON ztu.id_ticket = zd.id_ticket
 JOIN
   datalake_gsheets_clean.department_control dc
     ON dc.department = ct.department

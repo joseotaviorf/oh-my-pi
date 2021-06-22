@@ -114,8 +114,8 @@ back_tickets AS (
     id_ticket AS back_ticket,
     status AS back_ticket_status,
     COALESCE(
-      GET_JSON_OBJECT(custom_fields, '$.Ticket de contato'),
-      REGEXP_EXTRACT(SUBSTRING(SPLIT(description, 'Ticket do contato')[1], 1, 18), '([0-9]{{8}})', 1) 
+      NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(custom_fields, '$.Ticket do contato'), '([0-9]{{8}})', 1), ''),
+      REGEXP_EXTRACT(SUBSTRING(SPLIT(description, 'Ticket do contato')[1], 1, 18), '([0-9]{{8}})', 1)
     ) AS front_ticket
   FROM
     zendesk_email
@@ -125,7 +125,7 @@ back_tickets AS (
   WHERE 
     (tags LIKE '%tarefa_atendimento_escalado%' OR LOWER(dc.front_or_back) = 'back')
     AND (tags NOT LIKE '%bot_end_conversation%' AND tags NOT LIKE '%closed_by_merge%')
-    AND COALESCE(GET_JSON_OBJECT(custom_fields, '$.Ticket de contato'),REGEXP_EXTRACT(SUBSTRING(SPLIT(description, 'Ticket do contato')[1], 1, 18), '([0-9]{{8}})', 1)) != ''
+    AND COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(custom_fields, '$.Ticket do contato'), '([0-9]{{8}})', 1), ''),REGEXP_EXTRACT(SUBSTRING(SPLIT(description, 'Ticket do contato')[1], 1, 18), '([0-9]{{8}})', 1)) != ''
 )
 SELECT DISTINCT 
   ze.id_ticket,
