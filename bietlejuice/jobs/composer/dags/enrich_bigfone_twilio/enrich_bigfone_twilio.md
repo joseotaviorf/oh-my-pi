@@ -3,6 +3,9 @@
 
 This is the second layer of the enrichment phase of the [Bigfone](github.com/quintoandar/big-fone) data preparation. [Bigfone](https://github.com/quintoandar/big-fone) is a system responsible for interacting with Twilio (an external service) to manage calls, peers and store data used to generate some reports. Also, it acts as a central place to identify a person, adding info from Skynet, Akinator, Timeline (from Stalker) and Akinator.
 
+<details>
+  <summary><strong> > DAG details (click to expand)</strong></summary>
+
 ### Execution Interval
 
 This DAG is triggered once per day via Mediator, after `enrich_bigfone_events` DAG, usually around 6:00 A.M. UTC.
@@ -27,3 +30,5 @@ The logic of call_flex_reservations is highly dependent of the order of the even
 ### Responsible Data Team
 ​
 For any questions or concerns about this DAG, please contact the Data Engineering or Data Analytics team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
+
+</details>

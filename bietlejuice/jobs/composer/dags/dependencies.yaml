@@ -34,12 +34,12 @@ bietlejuice.dw_braze_events_user_dispatch:
   - bietlejuice.enrich_braze_events_dispatches_user:load-enrich-tenants-events
 
 bietlejuice.dw_call:
-  - bietlejuice.enrich_bigfone_twilio:load-call-agents-to-enrich
-  - bietlejuice.enrich_bigfone_twilio:load-call-flex-events-to-enrich
-  - bietlejuice.enrich_bigfone_twilio:load-call-flex-reservations-to-enrich
-  - bietlejuice.enrich_bigfone_twilio:load-call-ivr-events-to-enrich
-  - bietlejuice.enrich_bigfone_twilio:load-call-ivr-paths-to-enrich
-  - bietlejuice.enrich_bigfone_twilio:load-inbound-call-locations-to-enrich
+  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-agents
+  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-events
+  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-reservations
+  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-events
+  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-paths
+  - bietlejuice.enrich_bigfone_twilio:load-enrich-inbound-call-locations
 
 bietlejuice.dw_chattermill:
   - bietlejuice.enrich_chattermill:load-responses-to-enrich
@@ -380,10 +380,10 @@ bietlejuice.enrich_front_tickets:
   - bietlejuice.chat_fup:load-chats-chat-to-datalake-clean
   - bietlejuice.chat_fup:load-surveys-answer-to-datalake-clean
   - bietlejuice.chat_fup:load-surveys-survey-to-datalake-clean
-  - bietlejuice.enrich_bigfone_twilio:load-call-flex-reservations-to-enrich
-  - bietlejuice.enrich_bigfone_twilio:load-call-flex-events-to-enrich
-  - bietlejuice.enrich_bigfone_twilio:load-call-ivr-events-to-enrich
-  - bietlejuice.enrich_bigfone_twilio:load-call-ivr-paths-to-enrich
+  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-reservations
+  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-events
+  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-events
+  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-paths
   - bietlejuice.enrich_quinto_messenger:load-channel-event-to-enrich
   - bietlejuice.enrich_quinto_messenger:load-channel-to-enrich
   - bietlejuice.enrich_quinto_messenger:load-task-to-enrich
