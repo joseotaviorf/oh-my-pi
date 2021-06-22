@@ -52,9 +52,9 @@ bietlejuice.dw_dim_listing_owner:
   - bietlejuice.enrich_ebdb_user:load-user-to-enrich
 
 bietlejuice.dw_front_tickets:
-  - bietlejuice.enrich_front_tickets:load-call-to-enrich
-  - bietlejuice.enrich_front_tickets:load-chat-to-enrich
-  - bietlejuice.enrich_front_tickets:load-email-to-enrich
+  - bietlejuice.enrich_front_tickets:load-enrich-call
+  - bietlejuice.enrich_front_tickets:load-enrich-chat
+  - bietlejuice.enrich_front_tickets:load-enrich-email
   - bietlejuice.gsheets:load-department-control-to-clean
 
 bietlejuice.dw_house:
