@@ -129,7 +129,8 @@ call AS (
       WHERE
           event_type != 'task.updated'
           AND (
-            GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.scheduled') <> 'true'
+            GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.scheduled') IS NULL
+            OR GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.scheduled') <> 'true'
             OR (
                   GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.scheduled') = 'true' 
                   AND GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.conversations.conversation_attribute_1') = 2
