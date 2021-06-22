@@ -219,7 +219,7 @@ bietlejuice.enrich_bigfone_events:
   - bietlejuice.bigfone:load-event-to-clean
 
 bietlejuice.enrich_bigfone_twilio:
-  - bietlejuice.enrich_bigfone_events:load-events-to-enrich
+  - bietlejuice.enrich_bigfone_events:load-enrich-events
 
 bietlejuice.enrich_bob:
   - bietlejuice.bob:load-house-draft-aud-to-clean
