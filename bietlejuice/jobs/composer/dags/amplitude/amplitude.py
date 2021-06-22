@@ -25,9 +25,7 @@ MAIN_START_DATE = datetime(2019, 1, 1, 0, 0, 0, tzinfo=local_tz)
 MAIN_SCHEDULE_INTERVAL = "30 23 * * *"
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
-AMPLITUDE_ACCOUNTS_BLOCK_LIST = Variable.get("amplitude_accounts_block_list")
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
-EVENT_TYPES = Variable.get("amplitude_event_types", deserialize_json=True)
 DEFAULT_PARTITION_BY = ["year", "month", "day"]
 
 # s3 paths setup
@@ -62,14 +60,9 @@ LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
 
 # cluster configuration
 CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_bietlejuice_amplitude", deserialize_json=True
+    "databricks_memory_optimized_cluster", deserialize_json=True
 )
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
-
-# libraries dependencies
-LIBRARIES_DESCRIPTION = Variable.get(
-    "bietlejuice_default_libraries", deserialize_json=True
-)
 
 # Dag definition
 dag = DAG(
@@ -87,10 +80,7 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag,
-    task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=LIBRARIES_DESCRIPTION,
+    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -103,12 +93,7 @@ events_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": LOAD_EVENTS_INTO_DATALAKE_RAW_FILE_PATH,
-            "parameters": [
-                "{{ ds }}",
-                ENV,
-                DATALAKE_BUCKET,
-                AMPLITUDE_ACCOUNTS_BLOCK_LIST,
-            ],
+            "parameters": ["{{ ds }}", ENV, DATALAKE_BUCKET],
         }
     },
 )

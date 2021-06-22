@@ -31,14 +31,12 @@ parser = ArgumentParser(description="load_events_into_datalake_raw")
 parser.add_argument("execution_date")
 parser.add_argument("env")
 parser.add_argument("datalake_bucket")
-parser.add_argument("block_list")
 
 if __name__ == "__main__":
     args = parser.parse_args()
     execution_date = args.execution_date
     env = args.env
     datalake_bucket = args.datalake_bucket
-    block_list = args.block_list
 
     start_date = datetime.strptime(execution_date, "%Y-%m-%d")
     end_date = start_date + timedelta(hours=23)
@@ -66,39 +64,36 @@ if __name__ == "__main__":
     )
     for key in keys:
         app_key = key["app_key"]
-        if app_key not in block_list:
-            logger.info(
-                "m=load_events_into_datalake_raw, App id: {}, App name: {}".format(
-                    key["app_id"], key["app_name"]
-                )
+        logger.info(
+            "m=load_events_into_datalake_raw, App id: {}, App name: {}".format(
+                key["app_id"], key["app_name"]
             )
-            amplitude_export_api = AmplitudeClient(key["app_key"], key["secret_key"])
-            logger.info("m=load_events_into_datalake_raw, get_files_from_extract_api")
-            file_from_api = amplitude_export_api.get_event_data_files(start, end)
-            if file_from_api:
-                df = amplitude_events.create_raw_events_df(
-                    file_from_api, dataframe_service
-                )
-                format_options = SparkTableStorageFormat.DEFAULT_RAW
-                database_location = db_info["db_raw_path"]
-                s3_loader.load_incremental_table(
-                    df=df,
-                    database_name=database_name,
-                    table_name=table_name,
-                    format_options=format_options,
-                    database_location=database_location,
-                    partition_cols=partition_cols,
-                )
+        )
+        amplitude_export_api = AmplitudeClient(key["app_key"], key["secret_key"])
+        logger.info("m=load_events_into_datalake_raw, get_files_from_extract_api")
+        file_from_api = amplitude_export_api.get_event_data_files(start, end)
+        if file_from_api:
+            df = amplitude_events.create_raw_events_df(file_from_api, dataframe_service)
+            format_options = SparkTableStorageFormat.DEFAULT_RAW
+            database_location = db_info["db_raw_path"]
+            s3_loader.load_incremental_table(
+                df=df,
+                database_name=database_name,
+                table_name=table_name,
+                format_options=format_options,
+                database_location=database_location,
+                partition_cols=partition_cols,
+            )
 
-                spark_metastore_loader.update_metastore(
-                    df,
-                    database_name,
-                    table_name,
-                    format_options,
-                    database_location,
-                    partition_cols,
-                    force_recreate=False,
-                )
-                metastore_service.create_new_partitions_from_df(
-                    database_name, table_name, df, partition_cols, parallelism=8
-                )
+            spark_metastore_loader.update_metastore(
+                df,
+                database_name,
+                table_name,
+                format_options,
+                database_location,
+                partition_cols,
+                force_recreate=False,
+            )
+            metastore_service.create_new_partitions_from_df(
+                database_name, table_name, df, partition_cols, parallelism=8
+            )
