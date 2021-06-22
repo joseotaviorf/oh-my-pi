@@ -3,6 +3,8 @@ from bietlejuice.jobs.composer.base.airflow import TaskGroupMethodFactory
 from bietlejuice.jobs.composer.services import FileService
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 
+from copy import copy
+
 logger = QuintoAndarLogger("BaseTaskGroup")
 
 
@@ -161,3 +163,89 @@ class BaseTaskGroup(object):
             tasks_list.extend(BaseTaskGroup.last_tasks(task_group))
 
         return tasks_list
+
+    def set_inner_dag_dependencies(
+        self,
+        task_flow_helper,
+        task_groups_boundaries: dict,
+        dag_inner_dependencies: dict,
+    ) -> list:
+        """
+        Set internal dag dependencies of task groups by
+         building the DAG task-flow of one task group to another.
+
+        :param task_flow_helper: Task Flow Helper class instance
+        :type task_flow_helper: bietlejuice.jobs.composer.base.airflow.helpers.TaskFlowHelper
+        :param task_groups_boundaries: dict of task groups containing tasks boundaries
+        :type task_groups_boundaries: dict[str:dict[str:list[airflow.models.BaseOperator]]]
+        :param dag_inner_dependencies: task name of dependant (key) and respective
+            dependency (value)
+        :type dag_inner_dependencies: dict[str:list[str]]
+        :return: the task_group_boundaries without the inner dag dependencies task,
+            and all initial and final boundaries from all the inner dag dependencies TaskGroups
+        :rtype: list[
+            dict[str:dict[str:list[airflow.models.BaseOperator]]],
+            dict[str:list[airflow.models.BaseOperator]]
+            ]
+        """
+        task_groups_boundaries_without_inner_dependencies = copy(task_groups_boundaries)
+        all_inner_dependencies_first_tasks = []
+        all_inner_dependencies_last_tasks = []
+
+        for dependent, dependencies in dag_inner_dependencies.items():
+            dependent_task_group_boundaries = task_groups_boundaries.get(dependent)
+            for dependency in dependencies:
+                dependency_task_group_boundaries = task_groups_boundaries.get(
+                    dependency
+                )
+
+                task_flow_helper.cross_downstream_task_groups(
+                    dependency_task_group_boundaries, dependent_task_group_boundaries
+                )
+
+                inner_dependencies_task_group_boundaries = self.format_tasks_boundaries(
+                    initial_tasks=self.first_tasks(dependency_task_group_boundaries),
+                    final_tasks=self.last_tasks(dependent_task_group_boundaries),
+                )
+
+                all_inner_dependencies_first_tasks.extend(
+                    self.first_tasks(inner_dependencies_task_group_boundaries)
+                )
+                all_inner_dependencies_last_tasks.extend(
+                    self.last_tasks(inner_dependencies_task_group_boundaries)
+                )
+
+                task_groups_boundaries_without_inner_dependencies = self._remove_task_group_from_task_groups(
+                    task_group_name=dependency,
+                    task_groups_boundaries=task_groups_boundaries_without_inner_dependencies,
+                )
+
+            task_groups_boundaries_without_inner_dependencies = self._remove_task_group_from_task_groups(
+                task_group_name=dependent,
+                task_groups_boundaries=task_groups_boundaries_without_inner_dependencies,
+            )
+
+        return [
+            task_groups_boundaries_without_inner_dependencies,
+            self.format_tasks_boundaries(
+                initial_tasks=all_inner_dependencies_first_tasks,
+                final_tasks=all_inner_dependencies_last_tasks,
+            ),
+        ]
+
+    def _remove_task_group_from_task_groups(
+        self, task_group_name: str, task_groups_boundaries: dict
+    ) -> dict:
+        """
+        Make a copy of the task_groups_boundaries to not change the original var,
+            and removes the specified task_group_name
+
+        :param task_group_name: name of task_group to be removed
+        :param task_groups_boundaries: dict of task groups containing tasks boundaries
+        :type task_groups_boundaries: dict[str:dict[str:list[airflow.models.BaseOperator]]]
+        :return: new dict with the specified key removed
+        :rtype: dict[str:dict[str:list[airflow.models.BaseOperator]]]
+        """
+        task_groups_copy = copy(task_groups_boundaries)
+        task_groups_copy.pop(task_group_name, None)
+        return task_groups_copy
