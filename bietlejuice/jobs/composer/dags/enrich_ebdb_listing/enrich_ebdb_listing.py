@@ -7,11 +7,15 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from airflow.utils.helpers import cross_downstream, chain
+
+from airflow.utils.helpers import chain
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseTaskGroup
 from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.jobs.composer.base.airflow.helpers.task_flow_helper import (
+    TaskFlowHelper,
+)
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 7, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
@@ -41,6 +45,11 @@ LIBRARIES_DESCRIPTION = Variable.get(
     "bietlejuice_default_libraries", deserialize_json=True
 )
 
+INNER_DEPENDENCIES = {
+    "house_listing": ["house_status_version_order"],
+    "house_listing_status": ["house_status_version_order"],
+}
+
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
@@ -62,6 +71,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     libraries=LIBRARIES_DESCRIPTION,
 )
 
+
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
@@ -81,24 +91,23 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     target_database_base_name=CONTEXT,
 )
 
-house_listing_tasks = enrich_task_groups.pop("house_listing")
-house_listing_status_tasks = enrich_task_groups.pop("house_listing_status")
+(
+    task_groups_boundaries_without_inner_dependencies,
+    inner_dependencies_task_groups_boundaries,
+) = datalake_task_group.set_inner_dag_dependencies(
+    task_flow_helper=TaskFlowHelper(),
+    task_groups_boundaries=enrich_task_groups,
+    dag_inner_dependencies=INNER_DEPENDENCIES,
+)
 
-dependent_first_tasks = list()
-dependent_first_tasks.extend(BaseTaskGroup.first_tasks(house_listing_tasks))
-dependent_first_tasks.extend(BaseTaskGroup.first_tasks(house_listing_status_tasks))
+chain(
+    create_cluster_task,
+    BaseTaskGroup.all_first_tasks(task_groups_boundaries_without_inner_dependencies)
+    + BaseTaskGroup.first_tasks(inner_dependencies_task_groups_boundaries),
+)
 
-dependent_last_tasks = list()
-dependent_last_tasks.extend(BaseTaskGroup.last_tasks(house_listing_tasks))
-dependent_last_tasks.extend(BaseTaskGroup.last_tasks(house_listing_status_tasks))
-
-house_status_version_order_tasks = enrich_task_groups.pop("house_status_version_order")
-dependency_first_tasks = BaseTaskGroup.first_tasks(house_status_version_order_tasks)
-dependency_last_tasks = BaseTaskGroup.last_tasks(house_status_version_order_tasks)
-
-chain(create_cluster_task, dependency_first_tasks)
-cross_downstream(dependency_last_tasks, dependent_first_tasks)
-chain(dependent_last_tasks, terminate_cluster_task)
-
-chain(create_cluster_task, BaseTaskGroup.all_first_tasks(enrich_task_groups))
-chain(BaseTaskGroup.all_last_tasks(enrich_task_groups), terminate_cluster_task)
+chain(
+    BaseTaskGroup.all_last_tasks(task_groups_boundaries_without_inner_dependencies)
+    + BaseTaskGroup.last_tasks(inner_dependencies_task_groups_boundaries),
+    terminate_cluster_task,
+)
