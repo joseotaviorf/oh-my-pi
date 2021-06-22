@@ -534,27 +534,27 @@ marketing_campaigns_costs_and_volumes AS (
     UNION ALL
 
     SELECT
-        TO_CHAR(DATE(dsf.ts_first_event), 'YYYYMMDD')::INT AS sk_date,
+        sk_first_event_date AS sk_date,
         'New Buyer Prospect' AS event_type,
         dr.city_group,
-        dsf.mkt_category,
-        dsf.mkt_flow,
-        dsf.mkt_completion,
-        dsf.mkt_origin,
-        dsf.mkt_channel,
-        dsf.mkt_medium,
-        dsf.mkt_source,
-        dsf.utm_campaign,
+        fsf.mkt_category,
+        fsf.mkt_flow,
+        fsf.mkt_completion,
+        fsf.mkt_origin,
+        fsf.mkt_channel,
+        fsf.mkt_medium,
+        fsf.mkt_source,
+        fsf.utm_campaign,
         NULL::TEXT AS cost_funnel_side,
         COUNT(NULL) AS events_quantity_fr,
-        COUNT(DISTINCT CASE WHEN dsf.is_buyer_first_sale_flow = 'True' THEN id_buyer ELSE NULL END) AS events_quantity_fs,
+        COUNT(DISTINCT CASE WHEN fsf.is_buyer_first_sale_flow = 'True' THEN fsf.sk_buyer ELSE NULL END) AS events_quantity_fs,
         SUM(0::FLOAT) AS cost_fr,
         SUM(0::FLOAT) AS cost_fs
-    FROM datamarts.demand_sale_flows AS dsf
+    FROM sale.fact_sale_flows AS fsf
         JOIN dim_region AS dr
-            ON dsf.sk_region = dr.sk_region
+            ON fsf.sk_region = dr.sk_region
     WHERE
-        dsf.ts_first_event >= DATE('2019-01-01')
+        fsf.sk_first_event_date >= 20190101
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
 
     UNION ALL
