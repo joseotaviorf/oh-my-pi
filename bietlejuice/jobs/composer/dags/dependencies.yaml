@@ -42,7 +42,7 @@ bietlejuice.dw_call:
   - bietlejuice.enrich_bigfone_twilio:load-enrich-inbound-call-locations
 
 bietlejuice.dw_chattermill:
-  - bietlejuice.enrich_chattermill:load-responses-to-enrich
+  - bietlejuice.enrich_chattermill:load-enrich-responses
 
 bietlejuice.dw_dim_listing_owner:
   - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
