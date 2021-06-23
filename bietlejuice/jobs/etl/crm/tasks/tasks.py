@@ -404,6 +404,7 @@ class CRMTasks(object):
         self.athena_client.create_parquet_from_query(
             key=key,
             query=query.replace(CRMTasks.TABLE_PARTITION_PARAM, self.partition_date),
+            row_group_offsets=250000,
             raw_columns=r_cols,
             clean_columns=c_cols,
         )
