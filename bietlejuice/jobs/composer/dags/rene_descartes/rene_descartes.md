@@ -3,7 +3,8 @@
 ### Purpose
 
 This DAG handles the ingestion of our raw and clean data for our Rene Descartes Microservice, which is a Microservice for Owner Lead discard rules. For more information about the Database please refer to [the repository](https://github.com/quintoandar/rene-descartes).
-
+<details>
+  <summary><strong> > DAG details (click to expand)</strong></summary>
 
 ### Execution Interval
 
@@ -31,7 +32,9 @@ More information about run time [here]({chart_url}{dag_id}).
     - `rejection_history_collector`
     - `rejection_history_event_aud`
     - `rejection_history_event`
-### Responsible Data Engineering Team
 
-For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the
+### Responsible Data Teams
+For any questions or concerns about this DAG, please contact the Data Engineering Team or 
+the Data Analytics Team responsible listed in the 
 [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
+</details>
