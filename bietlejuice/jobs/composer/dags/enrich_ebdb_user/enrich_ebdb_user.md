@@ -6,6 +6,9 @@ Creates enriched tables for the context `User` from ebdb.
 
 It will track detailed information about the QuintoAndar users, such as the affiliate, agents, end-user, doorman, and sales rep.
 
+<details>
+  <summary><strong> > DAG details (click to expand)</strong></summary>
+
 ### Execution Interval
 
 Daily. More information about run time [here]({chart_url}{dag_id}).
@@ -25,3 +28,5 @@ Produces the following output tables:
 
 For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the 
 [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
+
+</details>

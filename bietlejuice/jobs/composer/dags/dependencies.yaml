@@ -49,7 +49,7 @@ bietlejuice.dw_dim_listing_owner:
   - bietlejuice.ebdb:create-clean-user-preferences-in-data-lake
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
-  - bietlejuice.enrich_ebdb_user:load-user-to-enrich
+  - bietlejuice.enrich_ebdb_user:load-enrich-user
 
 bietlejuice.dw_front_tickets:
   - bietlejuice.enrich_front_tickets:load-enrich-call
@@ -170,7 +170,7 @@ bietlejuice.dw_tracksale:
 bietlejuice.dw_user:
   - bietlejuice.ebdb:create-clean-partner-in-data-lake
   - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
-  - bietlejuice.enrich_ebdb_user:load-user-doorman-to-enrich
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-doorman
   - bietlejuice.ebdb:create-clean-visit-in-data-lake
   - bietlejuice.ebdb:create-clean-rent-flow-in-data-lake
   - bietlejuice.ebdb:create-clean-pre-proposal-in-data-lake
@@ -181,21 +181,21 @@ bietlejuice.dw_user:
   - bietlejuice.ebdb:create-clean-photographer-data-in-data-lake
   - bietlejuice.ebdb:create-clean-sales-rep-in-data-lake
   - bietlejuice.enrich_booking:load-enrich-booking
-  - bietlejuice.enrich_ebdb_user:load-user-to-enrich
-  - bietlejuice.enrich_ebdb_user:load-agent-data-to-enrich
-  - bietlejuice.enrich_ebdb_user:load-affiliate-data-to-enrich
+  - bietlejuice.enrich_ebdb_user:load-enrich-user
+  - bietlejuice.enrich_ebdb_user:load-enrich-agent-data
+  - bietlejuice.enrich_ebdb_user:load-enrich-affiliate-data
   - bietlejuice.enrich_amplitude_partner_taxonomy:load-amplitude-partner-taxonomy-to-enrich
 
 bietlejuice.dw_user_affiliate:
   - bietlejuice.enrich_amplitude_user:load-user-affiliate-origin-to-enrich
-  - bietlejuice.enrich_ebdb_user:load-affiliate-data-to-enrich
-  - bietlejuice.enrich_ebdb_user:load-user-to-enrich
-  - bietlejuice.enrich_ebdb_user:load-agent-data-to-enrich
+  - bietlejuice.enrich_ebdb_user:load-enrich-affiliate-data
+  - bietlejuice.enrich_ebdb_user:load-enrich-user
+  - bietlejuice.enrich_ebdb_user:load-enrich-agent-data
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.gsheets:load-taxonomy-affiliates-to-clean
 
 bietlejuice.dw_user_sales_rep:
-  - bietlejuice.enrich_ebdb_user:load-user-sales-rep-to-enrich
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-sales-rep
 
 bietlejuice.dw_visit:
   - bietlejuice.ebdb:create-clean-visit-in-data-lake
