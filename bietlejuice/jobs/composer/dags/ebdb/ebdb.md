@@ -4,6 +4,9 @@
 
 Extraction of EBDB tables into data lake. EBDB is the main database for QuintoAndar.
 
+<details>
+  <summary><strong> > DAG details (click to expand)</strong></summary>
+
 ### Execution Interval
 
 Daily. More information about run time [here]({chart_url}{dag_id}).
@@ -29,3 +32,5 @@ Produces the following output tables:
 
 For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the 
 [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
+
+</details>
