@@ -27,7 +27,7 @@ if __name__ == "__main__":
     context = args.context
 
     logger.info(
-        f"m=__main__, environment={environment}, datalake_bucket={datalake_bucket}, "
+        f"m=__main__, environment={environment}, datalake_bucket={datalake_bucket}, context={context},"
         "msg=Starting spark job..."
     )
 
