@@ -1,5 +1,6 @@
 import json
 import os
+from math import ceil
 from abc import abstractmethod
 from collections import OrderedDict
 from gzip import GzipFile
@@ -387,9 +388,7 @@ class CRMTasks(object):
             c_cols,
             queries_folder_suffix=None,
     ):
-        key = "clean/{}/dt={}/{}.parq".format(
-            bucket_folder_suffix, self.partition_date, CRMTasks.S3_FILE_NAME
-        )
+        key = "clean/{}/dt={}/{}{}.parq"
 
         query = BaseETL.get_query_from_file_name(
             "{}/{}/{}".format(
@@ -401,13 +400,33 @@ class CRMTasks(object):
             )
         )
 
-        self.athena_client.create_parquet_from_query(
-            key=key,
-            query=query.replace(CRMTasks.TABLE_PARTITION_PARAM, self.partition_date),
-            row_group_offsets=250000,
-            raw_columns=r_cols,
-            clean_columns=c_cols,
+        df = self.athena_client.execute_query_and_return_dataframe(
+            query.replace(CRMTasks.TABLE_PARTITION_PARAM, self.partition_date)
         )
+        total_row_count = df.shape[0]
+        expected_rows_per_file = 100000
+        number_of_files = int(ceil(total_row_count / float(expected_rows_per_file)))
+
+        for i in range(number_of_files):
+            logger.info(
+                "m=_move_to_clean, key={}, msg=Saving file to s3".format(
+                    key.format(
+                        bucket_folder_suffix, 
+                        self.partition_date, 
+                        CRMTasks.S3_FILE_NAME, 
+                        i+1
+                    )
+                )
+            )
+            self.athena_client.create_parquet_from_df(
+                key.format(bucket_folder_suffix, self.partition_date, CRMTasks.S3_FILE_NAME, i+1),
+                df.iloc[
+                    expected_rows_per_file * i:expected_rows_per_file * (i + 1), :
+                ],
+                row_group_offsets=1000,
+                raw_columns=r_cols,
+                clean_columns=c_cols
+            )
 
     @logger
     def _move_to_staging(
