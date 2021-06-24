@@ -2,17 +2,16 @@ from datetime import datetime
 import pendulum
 import os
 
+from airflow.utils.helpers import chain
 from airflow.models import DAG, Variable
-import airflow.utils.helpers as airflow_helpers
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
-from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
-from bietlejuice.jobs.composer.services import FileService
+from bietlejuice.jobs.composer.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2021, 4, 22, 0, 0, 0, tzinfo=LOCAL_TZ)
@@ -20,8 +19,6 @@ MAIN_START_DATE = datetime(2021, 4, 22, 0, 0, 0, tzinfo=LOCAL_TZ)
 CONTEXT = "credit_evers"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-
-PARTITION_COLS = ["dt_contract_updated"]
 
 ENV = os.environ.get("ENVIRONMENT")
 SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
@@ -38,6 +35,12 @@ LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
 
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+
+PARTITION_COLS = ["dt_contract_updated"]
+INNER_DEPENDENCIES = {
+    "credit_evers": ["credit_evers_audit"],
+    "credit_evers_original_due_date": ["credit_evers_original_due_date_audit"],
+}
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -57,62 +60,58 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
 )
 
-enrich_sub_dag = DatalakeSubDAG(
-    dag_id=DAG_ID,
-    start_date=MAIN_START_DATE,
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    dag=dag, task_id="terminate-cluster"
+)
+
+datalake_task_group = DatalakeTaskGroup(
+    dag=dag,
     env=ENV,
     datalake_bucket=DATALAKE_BUCKET,
-    database_base_name=CONTEXT,
     relative_query_path=CONTEXT,
-    spark_job_paths=SPARK_JOBS_PATH,
+    spark_jobs_path=SPARK_JOBS_PATH,
     athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
+)
+
+incremental_task_groups = datalake_task_group.build_task_group_from_sql_files(
     layer=LayerEnum.ENRICH,
-)
-
-full_file_list = FileService.list_sql_files_without_extension_from_layer(
-    CONTEXT, LayerEnum.ENRICH.value, schema="full"
-)
-
-incremental_file_list = FileService.list_sql_files_without_extension_from_layer(
-    CONTEXT, LayerEnum.ENRICH.value, schema="incremental"
-)
-
-enrich_audit_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(
-    dag,
-    incremental_file_list,
+    source_database_base_name=CONTEXT,
+    target_database_base_name=CONTEXT,
     is_incremental=True,
     partitions=PARTITION_COLS,
     schema="incremental",
 )
 
-enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(
-    dag, full_file_list, schema="full"
+full_task_groups = datalake_task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.ENRICH,
+    source_database_base_name=CONTEXT,
+    target_database_base_name=CONTEXT,
+    schema="full",  # TODO: we are misusing the schema here: full mode is not a schema
 )
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-    dag=dag, task_id="terminate-cluster"
+all_task_groups = {**incremental_task_groups, **full_task_groups}
+
+(
+    task_groups_boundaries_without_inner_dependencies,
+    inner_dependencies_task_groups_boundaries,
+) = datalake_task_group.set_inner_dag_dependencies(
+    task_flow_helper=TaskFlowHelper(),
+    task_groups_boundaries=all_task_groups,
+    dag_inner_dependencies=INNER_DEPENDENCIES,
 )
 
-credit_evers_audit_sub_dag = [enrich_audit_sub_dags.pop("credit_evers_audit")]
-credit_evers_sub_dag = [enrich_sub_dags.pop("credit_evers")]
-
-credit_evers_original_due_date_audit_sub_dag = [
-    enrich_audit_sub_dags.pop("credit_evers_original_due_date_audit")
-]
-credit_evers_original_due_date_sub_dag = [
-    enrich_sub_dags.pop("credit_evers_original_due_date")
-]
-
-airflow_helpers.chain(
+chain(
     create_cluster_task,
-    credit_evers_audit_sub_dag,
-    credit_evers_sub_dag,
-    terminate_cluster_task,
+    datalake_task_group.all_first_tasks(
+        task_groups_boundaries_without_inner_dependencies
+    )
+    + datalake_task_group.first_tasks(inner_dependencies_task_groups_boundaries),
 )
 
-airflow_helpers.chain(
-    create_cluster_task,
-    credit_evers_original_due_date_audit_sub_dag,
-    credit_evers_original_due_date_sub_dag,
+chain(
+    datalake_task_group.all_last_tasks(
+        task_groups_boundaries_without_inner_dependencies
+    )
+    + datalake_task_group.last_tasks(inner_dependencies_task_groups_boundaries),
     terminate_cluster_task,
 )
