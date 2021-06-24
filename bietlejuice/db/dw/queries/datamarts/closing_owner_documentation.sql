@@ -1,39 +1,49 @@
 WITH documents AS (
-SELECT
-	fr.target_folder_id AS house_folder_id, 
-	tf.external_id AS house_id, 
-	sf.id AS part_folder_id, 
-	sf.external_id AS user_id,
-	sft.name AS type_name, 
-	fr.id AS folder_reference_id, 
-	frt.name AS ref_name, 
-	d.id AS document_id, 
-	dt.name AS document_name, 
-	d.ATTRIBUTES,
-	CASE WHEN sft.name = 'COMPANY' 
-		AND dt.name = 'REPRESENTED_DATA'  THEN JSON_EXTRACT_PATH_TEXT(d.attributes,'cnpj')
-	WHEN sft.name IN ('PERSON','USER') 
-		AND dt.name = 'PERSONAL_DATA' THEN JSON_EXTRACT_PATH_TEXT(d.attributes,'cpf') 
-	ELSE '-1'
-	END AS person_id,
-	tf.created_at::timestamp AS ts_target_folder_created,
-	sf.created_at::timestamp AS ts_source_folder_created,
-	d.created_at::timestamp AS ts_document_created
-FROM datalake_docx_raw_prod.document d
-INNER JOIN datalake_docx_raw_prod.document_type dt 
-	ON dt.id = d.document_type_id
-INNER JOIN datalake_docx_raw_prod.folder_reference fr 
-	ON fr.source_folder_id = d.folder_id
-INNER JOIN datalake_docx_raw_prod.folder_reference_type frt 
-	ON frt.id = fr.folder_reference_type_id
-INNER JOIN datalake_docx_raw_prod.folder sf 
-	ON fr.source_folder_id = sf.id
-INNER JOIN datalake_docx_raw_prod.folder_type sft 
-	ON sf.folder_type_id = sft.id
-INNER JOIN datalake_docx_raw_prod.folder tf 
-	ON fr.target_folder_id = tf.id
-WHERE frt.name NOT IN ('PROPONENT_TENANT','RESIDENT')
-), docs AS (
+	SELECT
+		fr.id_target_folder AS house_folder_id, 
+		tf.id_external AS house_id, 
+		sf.id AS part_folder_id, 
+		sf.id_external AS user_id,
+		fr.id AS folder_reference_id,
+		d.id AS document_id,
+		CASE
+			WHEN sft.name = 'COMPANY' 
+				AND dt.name = 'REPRESENTED_DATA' THEN JSON_EXTRACT_PATH_TEXT(d.attributes,'cnpj')
+			WHEN sft.name IN ('PERSON','USER') 
+				AND dt.name = 'PERSONAL_DATA' THEN JSON_EXTRACT_PATH_TEXT(d.attributes,'cpf') 
+			ELSE '-1'
+		END AS person_id,
+		sft.name AS type_name, 
+		frt.name AS ref_name, 
+		dt.name AS document_name, 
+		d.attributes,
+		tf.ts_created AS ts_target_folder_created,
+		sf.ts_created AS ts_source_folder_created,
+		d.ts_created AS ts_document_created
+	FROM
+		datalake_docx_clean_prod.document AS d
+	INNER JOIN
+		datalake_docx_clean_prod.document_type AS dt 
+			ON dt.id = d.id_document_type
+	INNER JOIN
+		datalake_docx_clean_prod.folder_reference AS fr 
+			ON fr.id_source_folder = d.id_folder
+	INNER JOIN
+		datalake_docx_clean_prod.folder_reference_type AS frt 
+			ON frt.id = fr.id_folder_reference_type
+	INNER JOIN
+		datalake_docx_clean_prod.folder AS sf 
+			ON fr.id_source_folder = sf.id
+	INNER JOIN
+		datalake_docx_clean_prod.folder_type AS sft 
+			ON sf.id_folder_type = sft.id
+	INNER JOIN
+		datalake_docx_clean_prod.folder AS tf 
+			ON fr.id_target_folder = tf.id
+	WHERE
+		frt.name NOT IN ('PROPONENT_TENANT','RESIDENT')
+),
+docs AS (
 SELECT
 	house_folder_id, 
 	house_id,
