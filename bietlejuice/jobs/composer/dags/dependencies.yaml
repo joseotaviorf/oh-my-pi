@@ -511,8 +511,8 @@ bietlejuice.enrich_top_of_funnel_demand:
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
 
 bietlejuice.enrich_tracksale:
-  - bietlejuice.tracksale:load-dispatch-to-clean
-  - bietlejuice.tracksale:load-answer-to-clean
+  - bietlejuice.tracksale:load-clean-dispatch
+  - bietlejuice.tracksale:load-clean-answer
 
 bietlejuice.enrich_zendesk_custom_fields:
   - bietlejuice.zendesk_tickets
