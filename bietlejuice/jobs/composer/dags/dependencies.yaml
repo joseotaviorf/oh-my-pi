@@ -239,8 +239,8 @@ bietlejuice.enrich_booking:
   - bietlejuice.gsheets:load-from-to-cancellation-to-clean
 
 bietlejuice.enrich_braze_events:
-  - bietlejuice.braze_events:load-events-tenants-to-clean
-  - bietlejuice.braze_events:load-events-owners-to-clean
+  - bietlejuice.braze_events:load-clean-events-tenants
+  - bietlejuice.braze_events:load-clean-events-owners
 
 bietlejuice.enrich_braze_events_dispatches:
   - bietlejuice.enrich_braze_events:load-enrich-events-tenants

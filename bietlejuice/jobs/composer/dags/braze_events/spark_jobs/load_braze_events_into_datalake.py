@@ -56,8 +56,8 @@ def get_event_data(app_group_path, event, execution_date):
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("environment")
-    parser.add_argument("source")
     parser.add_argument("datalake_bucket")
+    parser.add_argument("source")
     parser.add_argument("braze_bucket")
     parser.add_argument("app_group")
     parser.add_argument("execution_date")

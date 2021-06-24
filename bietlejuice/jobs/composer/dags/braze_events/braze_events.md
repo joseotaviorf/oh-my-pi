@@ -1,8 +1,12 @@
 ## Braze Events
+
 ### Purpose
 
 Retrieves data from events streamed by [Braze's Currents tool](https://www.braze.com/docs/user_guide/data_and_analytics/braze_currents/).
 Braze is a multichannel communication platform, and its tool Currents is responsible for streaming event data into our infrastructure.
+
+
+<details>
 
 ### Execution Interval
 
@@ -19,5 +23,6 @@ Currently, the output tables are the following:
 - `events_tenants`
 
 ### Responsible Data Team
-
 For any questions or concerns about this DAG, please contact the Data Engineering or Data Analytics team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
+
+</details>
