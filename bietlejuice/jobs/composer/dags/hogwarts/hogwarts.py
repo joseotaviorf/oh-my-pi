@@ -25,7 +25,7 @@ S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 # spark and databricks vars
-BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base"
+BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 RAW_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/load_hogwarts_into_datalake.py"
 LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{SOURCE}"
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
