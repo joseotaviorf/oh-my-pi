@@ -1,19 +1,19 @@
 from datetime import datetime
 import pendulum
 import os
-import airflow.utils.helpers as airflow_helpers
+
+from airflow.utils.helpers import chain, cross_downstream
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
-    QuintoAndarDatabricksSubmitRunOperator,
 )
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
-from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
-from bietlejuice.jobs.composer.services import FileService
+from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 
 SOURCE = "hogwarts"
+CONTEXT = SOURCE
 
 # airflow vars
 ENV = os.environ.get("ENVIRONMENT")
@@ -25,7 +25,7 @@ S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 # spark and databricks vars
-BASE_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/base/"
+BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base"
 RAW_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/load_hogwarts_into_datalake.py"
 LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{SOURCE}"
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
@@ -57,55 +57,33 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-hogwarts_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="hogwarts-to-datalake-raw",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": RAW_SPARK_JOB_PATH,
-            "parameters": [ENV, DATALAKE_BUCKET],
-        }
-    },
-)
 
-sync_metastore_tables_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="sync-hive-metastore-raw-tables",
+task_group = DatalakeTaskGroup(
     dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": BASE_SPARK_JOB_PATH + "sync_metastore_tables.py",
-            "parameters": [
-                DATALAKE_BUCKET,
-                LayerEnum.RAW.value,
-                SOURCE,
-                "--all-tables",
-            ],
-        }
-    },
-)
-
-clean_sub_dag = DatalakeSubDAG(
-    dag_id=DAG_ID,
-    start_date=MAIN_START_DATE,
     env=ENV,
     datalake_bucket=DATALAKE_BUCKET,
-    layer=LayerEnum.CLEAN,
-    database_base_name=SOURCE,
-    relative_query_path=SOURCE,
-    spark_job_paths=BASE_SPARK_JOB_PATH,
+    relative_query_path=CONTEXT,
+    spark_jobs_path=BASE_SPARK_JOBS_PATH,
     athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
 )
 
-file_list = FileService.list_sql_files_without_extension_from_layer(
-    SOURCE, LayerEnum.CLEAN.value
+raw_task_groups = task_group.build_raw_task_group_for_all_tables(
+    source=SOURCE,
+    target_database_base_name=SOURCE,
+    extraction_spark_job_file=RAW_SPARK_JOB_PATH,
 )
 
-clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(dag, file_list)
-
-create_cluster_task >> hogwarts_to_datalake_raw_task >> list(
-    clean_sub_dags.values()
-) >> terminate_cluster_task
-
-airflow_helpers.chain(
-    hogwarts_to_datalake_raw_task, sync_metastore_tables_task, terminate_cluster_task
+clean_task_groups = task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.CLEAN,
+    source_database_base_name=SOURCE,
+    target_database_base_name=SOURCE,
 )
+
+chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_groups))
+
+cross_downstream(
+    DatalakeTaskGroup.last_tasks(raw_task_groups),
+    DatalakeTaskGroup.all_first_tasks(clean_task_groups),
+)
+
+terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
