@@ -21,6 +21,16 @@ aux_regiao:
     sheet_name: aux_regiao
     clean_table_name: auxiliary_region
 
+ciq_costs:
+    sheet_id: 1ZkPABh53UrzKn4aQudZzr5QpJsBXhCZDnJkDZob2Rqc
+    sheet_name: ciq_costs
+    clean_table_name: ciq_costs
+
+city_share:
+    sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
+    sheet_name: city_share
+    clean_table_name: city_share
+
 contact_type_tag:
     sheet_id: 1HQaKDATgePg4oIoDBASzPm5QkEG61Dee8T-bYqdSHFM
     sheet_name: contact_types_tree_taxonomy
@@ -51,6 +61,26 @@ csat_vistoria_saida:  # to be excluded @Set,01
     sheet_name: saida
     clean_table_name: exit_inspection_csat
 
+demand_channel_share:
+    sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
+    sheet_name: demand_channel_share
+    clean_table_name: demand_channel_share
+
+demand_targets_2019:
+    sheet_id: 1PQfAlpy2YhUKg_qn786_4xQ5E1cW2-YSpz1NJ1lVruA
+    sheet_name: demand_targets_2019
+    clean_table_name: demand_targets_2019
+
+demand_targets_2020:
+    sheet_id: 1rIFNs-Wy6glWjeclgUTUukjS2hJUu5BCSZh6N7Vy5dk
+    sheet_name: demand_targets_2020
+    clean_table_name: demand_targets_2020
+
+demand_targets_2021:
+    sheet_id: 1l-KtlqNoMh_OgGc72Q5NyQz-IcBVLDo1kjJa5FzijqI
+    sheet_name: demand_targets_2021
+    clean_table_name: demand_targets_2021
+
 department_control:
     sheet_id: 1wIwrWi0xlY4TAZnE6JlGm6B0UyezOPxfF5s0_pn-i9E
     sheet_name: Department/Channel
@@ -66,10 +96,20 @@ deduplicate_batch_listings_forsale:
     sheet_name: deduplicate_batch_listings_forsale
     clean_table_name: deduplicate_batch_listings_forsale
 
+espelhamento_dl:
+    sheet_id: 14sgdtouI0lnxTDHsYH0ySt_R1nvMu4W0Qa8QJmg9mVI
+    sheet_name: Espelhamento_DL
+    clean_table_name: projreparos_espelhamento_dl
+
 hotjar_demanda_reprimida_fotos:
     sheet_id: 1aP3ir1aAPLpzGwbRiS16UH1iTtTQPJbaKz0CcLIbTdc
     sheet_name: demanda_reprimida_fotos
     clean_table_name: hotjar_photos_repressed_demand
+
+local_holidays:
+    sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
+    sheet_name: local_holidays
+    clean_table_name: local_holidays
 
 marketing_costs_manual_costs_google:
     sheet_id: 1e1FoBoCN0XYH3vo8u0aZ-GocU453gkfDIasX0ivDonc
@@ -125,6 +165,51 @@ recuperacao_fachada_e_area_comum:
     sheet_id: 1DB63rTGhu5b_x6fUzgUEzIAKdQ-O52hly2D7hIa10CI
     sheet_name: recovery_common_area_facade
     clean_table_name: photos_recovery_common_area_facade
+
+mkt_cost_per_source:
+    sheet_id: 1kHFTMdaRTYyLa6e6FY6G2i1UpCkivcpmxZvYqVrqe5o
+    sheet_name: mkt_cost_per_source
+    clean_table_name: mkt_cost_per_source
+
+rental_cohort_demand:
+    sheet_id: 1rTjKP11jXCV8Jfchynmi3UHx5wwoWDVPojxAWABj-rw
+    sheet_name: rental_cohort_demand
+    clean_table_name: rental_cohort_demand
+
+rental_cohort_supply:
+    sheet_id: 1qz4QZD4OYSfXV_mMiAUH9okYT5hodlwfP3edmeyldO4
+    sheet_name: rental_cohort_supply
+    clean_table_name: rental_cohort_supply
+
+rental_flows_targets:
+    sheet_id: 1_-_V3Js51s88opC8aZVc7SAzXT-OC7huQ1I-rsqpdlU
+    sheet_name: rental_flows_targets
+    clean_table_name: rental_flows_targets
+
+rental_ntp_source_targets:
+    sheet_id: 1gKybsAl4m69AjJOpBgTk9VDQfqR9ViKv7ei6SXZ3DEE
+    sheet_name: rental_ntp_source_targets
+    clean_table_name: rental_ntp_source_targets
+
+rental_rtp_targets:
+    sheet_id: 1VZW41499YJO3Im--velqKWEblCLjxOqZIqNaaizMB_U
+    sheet_name: rental_rtp_targets
+    clean_table_name: rental_rtp_targets
+
+rental_tof_daily_targets:
+    sheet_id: 1rUa1jyrjcbkZP_33O-7vZH376O16zkGI7FcFVAZkDSo
+    sheet_name: rental_tof_daily_targets
+    clean_table_name: rental_tof_daily_targets
+
+rental_tof_monthly_targets:
+    sheet_id: 1fMYV90b5hkmkRFspX6JRT9_yc4OjLB9AdPPGDvmu-Iw
+    sheet_name: rental_tof_monthly_targets
+    clean_table_name: rental_tof_monthly_targets
+
+rental_tof_weekly_targets:
+    sheet_id: 1M3yd-RpHMDwnEdWs18sf0oCEHDhmz_Y_9O4zSEcD1nU
+    sheet_name: rental_tof_weekly_targets
+    clean_table_name: rental_tof_weekly_targets
 
 retencao_exclusividade_contato_ativo:
     sheet_id: 1VT9AgLJYbGq5ftcBvSY2C-M99bVmpnmO7XFeueh_fmI

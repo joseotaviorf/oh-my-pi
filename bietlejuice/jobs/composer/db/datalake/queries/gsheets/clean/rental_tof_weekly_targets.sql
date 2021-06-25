@@ -1,0 +1,9 @@
+SELECT
+    city_group,
+    mkt_channel,
+    mkt_medium,
+    mkt_source,
+    tof_users_target,
+    week_start
+FROM
+    datalake_gsheets_raw.rental_tof_weekly_targets

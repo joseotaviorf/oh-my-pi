@@ -1,0 +1,15 @@
+SELECT
+    city,
+    daily_churn,
+    daily_recovered,
+    daily_retained,
+    daily_inactive_by_renting,
+    activetp_eom,
+    activetp_som,
+    week_start,
+    weekly_recurrent,
+    month,
+    monthly_recurrent,
+    date
+FROM
+    datalake_gsheets_raw.rental_rtp_targets

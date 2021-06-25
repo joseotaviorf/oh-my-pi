@@ -1,0 +1,26 @@
+SELECT
+    city_group,
+    demand_channel,
+    demand_channel_type,
+    funnel_origin,
+    tier,
+    halfyear,
+    evaluation_positive,
+    evaluation_started,
+    new_tenant_prospects,
+    contracts_signed,
+    credit_approved,
+    doc_completed,
+    doc_sent,
+    guarantee,
+    offer_accepted,
+    offer_sent,
+    visits_booked,
+    visits_completed,
+    quarter,
+    week_start,
+    month,
+    year,
+    date
+FROM
+    datalake_gsheets_raw.demand_targets_2021

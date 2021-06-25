@@ -1,0 +1,12 @@
+SELECT
+    business,
+    city,
+    daily_value,
+    mkt_medium,
+    mkt_source,
+    week_start,
+    month,
+    year,
+    date
+FROM
+    datalake_gsheets_raw.mkt_cost_per_source

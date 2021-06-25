@@ -1,0 +1,12 @@
+SELECT
+    daily_tof_target,
+    city_group,
+    mkt_channel,
+    mkt_medium,
+    mkt_source,
+    dia,
+    week_start,
+    month,
+    date
+FROM
+    datalake_gsheets_raw.rental_tof_daily_targets

@@ -1,0 +1,18 @@
+SELECT
+    city_group,
+    funnel_flow,
+    guarantee,
+    target_ca,
+    target_cep,
+    target_cs,
+    target_ds,
+    target_es,
+    target_oa,
+    target_os,
+    target_vb,
+    target_vc,
+    visao,
+    week,
+    week_origin
+FROM
+    datalake_gsheets_raw.rental_cohort_demand

@@ -1,0 +1,14 @@
+SELECT
+    city_group,
+    first_listing,
+    mkt_channel,
+    mkt_origin,
+    operacao,
+    opportunities,
+    prospect,
+    qualified,
+    week,
+    week_origin,
+    year
+FROM
+    datalake_gsheets_raw.rental_cohort_supply

@@ -1,0 +1,15 @@
+SELECT
+    city,
+    comission_cs_ciq_full,
+    comission_cs_ciq_manager,
+    comission_listing,
+    data,
+    impostos,
+    month,
+    other,
+    revshare_cs_ciq_full,
+    revshare_cs_ciq_manager,
+    week_start,
+    year
+FROM
+    datalake_gsheets_raw.ciq_costs

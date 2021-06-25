@@ -1,0 +1,13 @@
+SELECT
+    ntp_target,
+    tier,
+    city_group,
+    mkt_channel,
+    mkt_medium,
+    mkt_source,
+    week_start,
+    month,
+    year,
+    date
+FROM
+    datalake_gsheets_raw.rental_ntp_source_targets
