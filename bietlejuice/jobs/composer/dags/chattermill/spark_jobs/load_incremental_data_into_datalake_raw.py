@@ -29,9 +29,9 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("environment", help="forno/prod values")
+    parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
     parser.add_argument("source", help="name of the source")
     parser.add_argument("endpoints", help="name of the endpoints")
-    parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
     parser.add_argument("execution_date", help="execution date in str format")
 
     args = parser.parse_args()
@@ -44,10 +44,10 @@ if __name__ == "__main__":
     )
 
     environment = args.environment
+    datalake_bucket = args.datalake_bucket
     source = args.source
     endpoints = args.endpoints
     endpoints = endpoints.split(",")
-    datalake_bucket = args.datalake_bucket
     execution_date = args.execution_date
     execution_date = execution_date.replace("-", "")
     partition_cols = ["year", "month", "day"]

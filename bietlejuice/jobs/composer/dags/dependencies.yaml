@@ -268,7 +268,7 @@ bietlejuice.enrich_braze_events_user_centric_periodicity:
   - bietlejuice.enrich_braze_events_user_centric:load-enrich-user-events-daily
 
 bietlejuice.enrich_chattermill:
-  - bietlejuice.chattermill:load-responses-to-clean
+  - bietlejuice.chattermill:load-clean-responses
 
 bietlejuice.enrich_consolidated_marketing_costs:
   - bietlejuice.enrich_marketing_costs
