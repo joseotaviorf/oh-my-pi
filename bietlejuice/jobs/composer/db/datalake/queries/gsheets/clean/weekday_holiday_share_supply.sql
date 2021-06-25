@@ -1,0 +1,17 @@
+SELECT
+    contract_signed,
+    credit_approved,
+    document_sent,
+    first_listings,
+    mkt_channel,
+    offer_accepted,
+    offer_submitted,
+    opportunity,
+    prospect,
+    qualified,
+    vb2vc,
+    visit_booked,
+    visit_completed,
+    weekday_name
+FROM
+    datalake_gsheets_raw.weekday_holiday_share_supply

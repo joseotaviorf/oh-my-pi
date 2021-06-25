@@ -1,0 +1,25 @@
+SELECT
+    city_group,
+    forma_pagamento,
+    payment_concluded,
+    credito_fim,
+    credito_inicio,
+    cri_fim,
+    cri_inicio,
+    crn_fim,
+    crn_inicio,
+    dd_fim_legal,
+    dd_fim_legaut,
+    dd_inicio_legal,
+    diligencia_fim,
+    diligencia_inicio,
+    financiamento_fim,
+    financiamento_inicio,
+    halfyear,
+    quarter,
+    week,
+    month,
+    year,
+    date
+FROM
+    datalake_gsheets_raw.sale_payment_concluded_targets

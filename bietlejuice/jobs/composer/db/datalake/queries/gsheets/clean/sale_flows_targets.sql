@@ -1,0 +1,10 @@
+SELECT
+    city_group,
+    sf_target,
+    sf_type,
+    week_start,
+    month,
+    year,
+    date
+FROM
+    datalake_gsheets_raw.sale_flows_targets

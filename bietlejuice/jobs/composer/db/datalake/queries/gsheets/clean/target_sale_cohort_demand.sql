@@ -1,0 +1,13 @@
+SELECT
+    ccv,
+    cidade,
+    deal_quali,
+    offer_accepted,
+    offer_sent,
+    origem,
+    visit_booked,
+    visit_completed,
+    week,
+    week_origin
+FROM
+    datalake_gsheets_raw.target_sale_cohort_demand

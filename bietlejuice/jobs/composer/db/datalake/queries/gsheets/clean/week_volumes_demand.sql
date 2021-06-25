@@ -1,0 +1,18 @@
+SELECT
+    city_group,
+    contract_signed,
+    credit_approved,
+    credit_evaluation_init,
+    credit_evaluation_positive,
+    demand_channel_type,
+    document_sent,
+    funnel_first_touchpoint,
+    guarantee,
+    new_tenant_prospect,
+    offer_accepted,
+    offer_submitted,
+    visit_booked,
+    visit_completed,
+    week_start
+FROM
+    datalake_gsheets_raw.week_volumes_demand

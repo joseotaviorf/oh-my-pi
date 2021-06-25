@@ -1,0 +1,12 @@
+SELECT
+    city,
+    context,
+    mkt_channel,
+    mkt_medium,
+    mkt_source,
+    tof_users_target,
+    week_start,
+    month,
+    year
+FROM
+    datalake_gsheets_raw.sale_tof_weekly_targets

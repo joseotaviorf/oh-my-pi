@@ -1,0 +1,18 @@
+SELECT
+    city_group,
+    first_listings,
+    lead_context,
+    opportunities,
+    prospects,
+    qualifieds,
+    supply_channel,
+    supply_origin,
+    tier,
+    halfyear,
+    quarter,
+    week_start,
+    month,
+    year,
+    date
+FROM
+    datalake_gsheets_raw.supply_targets_2020

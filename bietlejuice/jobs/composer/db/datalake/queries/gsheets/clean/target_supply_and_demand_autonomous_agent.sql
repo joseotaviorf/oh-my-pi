@@ -1,0 +1,21 @@
+SELECT
+    ca,
+    cs,
+    city,
+    ds,
+    drafts,
+    first_listings,
+    is_account__management,
+    oa,
+    ol,
+    os,
+    opportunities,
+    qualified,
+    vb,
+    vc,
+    quarter,
+    week_start,
+    month,
+    data
+FROM
+    datalake_gsheets_raw.target_supply_and_demand_autonomous_agent

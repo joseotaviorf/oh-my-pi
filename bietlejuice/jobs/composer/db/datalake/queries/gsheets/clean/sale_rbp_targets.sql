@@ -1,0 +1,11 @@
+SELECT
+    city,
+    daily_rbp,
+    monthly_rbp,
+    week_start,
+    weekly_rbp,
+    month,
+    year,
+    date
+FROM
+    datalake_gsheets_raw.sale_rbp_targets

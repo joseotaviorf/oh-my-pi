@@ -1,0 +1,10 @@
+SELECT
+    channel,
+    city,
+    cumulative_cr_daily,
+    new_cr_daily,
+    week,
+    day,
+    month
+FROM
+    datalake_gsheets_raw.targets_acquisition_cumulative_autonomous_agent

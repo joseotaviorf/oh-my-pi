@@ -1,0 +1,14 @@
+SELECT
+    first_rentals,
+    contract_start_month,
+    months_after,
+    months_after_first_contract,
+    total_re_rentals,
+    total_rentals,
+    ended_first_rentals,
+    ended_re_rentals,
+    ended_rentals,
+    year,
+    dt_last_updated
+FROM
+    datalake_gsheets_raw.survival_estimation_new_version

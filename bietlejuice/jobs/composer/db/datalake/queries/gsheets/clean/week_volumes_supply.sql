@@ -1,0 +1,12 @@
+SELECT
+    city_group,
+    first_listing,
+    lead_context,
+    mkt_channel,
+    mkt_origin,
+    opportunity,
+    prospect,
+    qualified,
+    week_start
+FROM
+    datalake_gsheets_raw.week_volumes_supply

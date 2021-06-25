@@ -1,0 +1,18 @@
+SELECT
+    ccv,
+    cidade,
+    deal_quali,
+    new_buyer_prospect,
+    origin,
+    offer_accepted,
+    offer_sent,
+    visit_booked,
+    visit_completed,
+    halfyear,
+    quarter,
+    week,
+    month,
+    year,
+    date
+FROM
+    datalake_gsheets_raw.sale_demand_targets

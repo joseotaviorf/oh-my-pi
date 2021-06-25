@@ -1,0 +1,11 @@
+SELECT
+    city_group,
+    first_listing,
+    lead_context,
+    mkt_channel,
+    opportunity,
+    prospect,
+    qualified,
+    weekday
+FROM
+    datalake_gsheets_raw.weekday_supply_channel_share

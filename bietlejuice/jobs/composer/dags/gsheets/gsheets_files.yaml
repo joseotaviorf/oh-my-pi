@@ -216,6 +216,106 @@ retencao_exclusividade_contato_ativo:
     sheet_name: bases_cruzadas
     clean_table_name: retention_exclusivity_active_contact
 
+sale_demand_targets:
+    sheet_id: 1NlB0E3Gd7HFmgzvB8GIQte_i18SxV5Uw1A5lNihXd08
+    sheet_name: sale_demand_targets
+    clean_table_name: sale_demand_targets
+
+sale_flows_targets:
+    sheet_id: 1V316dJUIlf4xv3tOBVRIGdSn38NqKRPcS1emTCQlBYE
+    sheet_name: sale_flows_targets
+    clean_table_name: sale_flows_targets
+
+sale_nbp_source_targets:
+    sheet_id: 1PDY6WpRj2DmkxfjT81cd1jdA8HWSGu3U0hYGnoHPVtM
+    sheet_name: sale_nbp_source_targets
+    clean_table_name: sale_nbp_source_targets
+
+sale_ongoing_listings_targets:
+    sheet_id: 1w6mujHGpk5nvL_N6AWVwO6z8xRISLSq1Vu4p3U3SM9Y
+    sheet_name: sale_ongoing_listings_targets
+    clean_table_name: sale_ongoing_listings_targets
+
+sale_payment_concluded_targets:
+    sheet_id: 1nwIPhFWSYwHoN5dWsl9hjOLoxQZRufRmKXVz6mB3nBI
+    sheet_name: sale_payment_concluded_targets
+    clean_table_name: sale_payment_concluded_targets
+
+sale_rbp_targets:
+    sheet_id: 1dbPJT39JNkgakOE95INVipThMe-vLDDXHZ4aOp3q4pg
+    sheet_name: sale_rbp_targets
+    clean_table_name: sale_rbp_targets
+
+sale_supply_targets:
+    sheet_id: 1D0ocZdAiabVBMg9lp3KTuACv5mgG7ninW3zdgXLuFiU
+    sheet_name: sale_supply_targets
+    clean_table_name: sale_supply_targets
+
+sale_tof_daily_targets:
+    sheet_id: 1u6wcCnO1HPl30mq34iR9VoWcD2z6XWYW8erXpLnXXKo
+    sheet_name: sale_tof_daily_targets
+    clean_table_name: sale_tof_daily_targets
+
+sale_tof_monthly_targets:
+    sheet_id: 1wIlVgN-OFXxZS8T54-ga4dvHnZxJqBBGPSl-wpu-Pug
+    sheet_name: sale_tof_monthly_targets
+    clean_table_name: sale_tof_monthly_targets
+
+sale_tof_weekly_targets:
+    sheet_id: 1a2UYkFZS6LsBZuduYtKpQPuKr1rUM5aQBnN3aBdEIAU
+    sheet_name: sale_tof_weekly_targets
+    clean_table_name: sale_tof_weekly_targets
+
+supply_targets_2019:
+    sheet_id: 1Nxh1_mAsyr3tkChizMyYc4QIg3jTR1YNGAenjy9NWKQ
+    sheet_name: supply_targets_2019
+    clean_table_name: supply_targets_2019
+
+supply_targets_2020:
+    sheet_id: 1jPCEFt6ECCt1KSuiitqGh7fgPSh7TV0DIZsTLdE-U0k
+    sheet_name: supply_targets_2020
+    clean_table_name: supply_targets_2020
+
+supply_targets_2021:
+    sheet_id: 1LwTojiD_NXervUoR_RW1pNWGjWcvB_Nx0prnpZYwP4g
+    sheet_name: supply_targets_2021
+    clean_table_name: supply_targets_2021
+
+survival_estimation:
+    sheet_id: 1hBZp2g6smNXBRFnITrihnwzztkFRr7q_IF5sSBgSQKo
+    sheet_name: survival_estimation
+    clean_table_name: survival_estimation
+
+survival_estimation_new_version:
+    sheet_id: 1hBZp2g6smNXBRFnITrihnwzztkFRr7q_IF5sSBgSQKo
+    sheet_name: survival_estimation_new_version
+    clean_table_name: survival_estimation_new_version
+
+target_sale_cohort_demand:
+    sheet_id: 1IzXMT2uzLovZ6sI30a_dfFsBuWaffBAoid6rFdIszC0
+    sheet_name: target_sale_cohort_demand
+    clean_table_name: target_sale_cohort_demand
+
+target_sale_cohort_supply:
+    sheet_id: 1rd3uFtw61jj3rLmxCs1XmDo1ZFd_HNrGv9eDVI25v5w
+    sheet_name: target_sale_cohort_supply
+    clean_table_name: target_sale_cohort_supply
+
+target_supply_and_demand_autonomous_agent:
+    sheet_id: 1i2cHxc4h9c8FKEORH4K_0n_ho-3haXH04fWhdDHE2nU
+    sheet_name: target_supply_and_demand_autonomous_agent
+    clean_table_name: target_supply_and_demand_autonomous_agent
+
+targets_acquisition_cumulative_autonomous_agent:
+    sheet_id: 1eDioFikgifTfeFIH7nXqbCuoJ1lohXmjLiFrfrojoW8
+    sheet_name: targets_acquisition_cumulative_autonomous_agent
+    clean_table_name: targets_acquisition_cumulative_autonomous_agent
+
+targets_agents_engagement:
+    sheet_id: 1Nf3OlUhvk8TiIN0T6uvQ_ES99yyB9D3K6anj5Hdr-ys
+    sheet_name: targets_agents_engagement
+    clean_table_name: targets_agents_engagement
+
 targets_avg_ticket_adm_fee:
     sheet_id: 1yhpIYXHsLWFbhjA_Ee9lJ_mKOh6_-7sY_oDgIYCfjNE
     sheet_name: targets_avg_ticket_adm_fee
@@ -240,3 +340,33 @@ vistoria_bugs:
     sheet_id: 1-cuOGaxOf4hfqs1rhz6XUGv4y8r-0HbJv6YHGMRMkyc
     sheet_name: vistoria_bugs
     clean_table_name: inspection_bugs
+
+week_volumes_demand:
+    sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
+    sheet_name: week_volumes_demand
+    clean_table_name: week_volumes_demand
+
+week_volumes_supply:
+    sheet_id: 1Kq-1flAT8YljbtZOD4s1GV5AQg-kkbBrDNdeUtAKwGA
+    sheet_name: week_volumes_supply
+    clean_table_name: week_volumes_supply
+
+weekday_demand_share:
+    sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
+    sheet_name: weekday_demand_share
+    clean_table_name: weekday_demand_share
+
+weekday_holiday_share:
+    sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
+    sheet_name: weekday_holiday_share
+    clean_table_name: weekday_holiday_share
+
+weekday_holiday_share_supply:
+    sheet_id: 1Kq-1flAT8YljbtZOD4s1GV5AQg-kkbBrDNdeUtAKwGA
+    sheet_name: weekday_holiday_share_supply
+    clean_table_name: weekday_holiday_share_supply
+
+weekday_supply_channel_share:
+    sheet_id: 1Kq-1flAT8YljbtZOD4s1GV5AQg-kkbBrDNdeUtAKwGA
+    sheet_name: weekday_supply_channel_share
+    clean_table_name: weekday_supply_channel_share

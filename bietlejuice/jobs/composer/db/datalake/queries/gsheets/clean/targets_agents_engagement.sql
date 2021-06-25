@@ -1,0 +1,11 @@
+SELECT
+    active_cr_daily,
+    channel,
+    city,
+    cluster,
+    share_cluster,
+    week,
+    day,
+    month
+FROM
+    datalake_gsheets_raw.targets_agents_engagement

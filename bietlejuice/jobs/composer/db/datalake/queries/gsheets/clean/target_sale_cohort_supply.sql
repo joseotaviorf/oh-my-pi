@@ -1,0 +1,12 @@
+SELECT
+    op,
+    cidade,
+    first_listing,
+    mkt_origin,
+    operacao,
+    opportunity,
+    qualified,
+    week,
+    week_origin
+FROM
+    datalake_gsheets_raw.target_sale_cohort_supply
