@@ -461,10 +461,10 @@ bietlejuice.enrich_proposal:
   - bietlejuice.sorting_hat:load-proposal-version-to-datalake-clean
 
 bietlejuice.enrich_quinto_messenger:
-  - bietlejuice.quinto_messenger:load-channel-to-clean
-  - bietlejuice.quinto_messenger:load-channel-event-to-clean
-  - bietlejuice.quinto_messenger:load-task-to-clean
-  - bietlejuice.quinto_messenger:load-task-event-to-clean
+  - bietlejuice.quinto_messenger:load-clean-channel
+  - bietlejuice.quinto_messenger:load-clean-channel-event
+  - bietlejuice.quinto_messenger:load-clean-task
+  - bietlejuice.quinto_messenger:load-clean-task-event
 
 bietlejuice.enrich_region:
   - bietlejuice.ebdb:create-clean-region-in-data-lake
