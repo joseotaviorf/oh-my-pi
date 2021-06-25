@@ -161,6 +161,11 @@ marketing_offline_manual_share_cost_center:
     sheet_name: offline_manual_share_cost_center
     clean_table_name: marketing_offline_manual_share_cost_center
 
+offers_hub_central:
+    sheet_id: 1uZpIFY-bhuxzS4LKl2jwFdBGdReQI7ifiYsewBIpKUE
+    sheet_name: offers_hub_central
+    clean_table_name: offers_hub_central
+
 recuperacao_fachada_e_area_comum:
     sheet_id: 1DB63rTGhu5b_x6fUzgUEzIAKdQ-O52hly2D7hIa10CI
     sheet_name: recovery_common_area_facade

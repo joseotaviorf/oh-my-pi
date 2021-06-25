@@ -52,6 +52,7 @@ This pipeline produces the following output tables:
     - `marketing_offline_manual_share_city_group`
     - `marketing_offline_manual_share_cost_center`
     - `mkt_cost_per_source`
+    - `offers_hub_central`
     - `owner_entrance_inspection_csat`
     - `owner_exit_inspection_csat`
     - `photos_recovery_common_area_facade`
