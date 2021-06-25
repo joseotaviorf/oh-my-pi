@@ -246,6 +246,11 @@ SELECT DISTINCT
   ct.has_transfers,
   zd.tags LIKE '%bot_end_conversation%' AS is_bot,
   zd.tags LIKE '%closed_by_merge%' AS is_closed_by_merge, 
+  CASE 
+    WHEN dc.front_or_back = 'Back' OR zd.tags LIKE '%tarefa_atendimento_escalado%' THEN 'back'
+    WHEN dc.front_or_back = 'Front' OR dc.front_or_back IS NULL THEN 'front'
+    ELSE dc.front_or_back
+  END AS front_or_back,
   bt.front_ticket IS NOT NULL AS has_back_ticket,
   CASE
     WHEN bt.back_ticket_status IN ('open','pending','new','hold') THEN TRUE
@@ -270,15 +275,12 @@ JOIN
 JOIN
   zendesk_tickets_unique ztu
     ON ztu.id_ticket = zd.id_ticket
-JOIN
+LEFT JOIN
   datalake_gsheets_clean.department_control dc
     ON dc.department = ct.department
-    AND LOWER(dc.front_or_back) <> 'back'
 LEFT JOIN
   chat_csat cc
     ON cc.id_ticket = zd.id_ticket
 LEFT JOIN
   back_tickets bt
     ON bt.front_ticket = zd.id_ticket
-WHERE 
-  zd.tags NOT LIKE '%tarefa_atendimento_escalado%'

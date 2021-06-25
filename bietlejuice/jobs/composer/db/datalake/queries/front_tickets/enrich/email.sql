@@ -160,6 +160,11 @@ SELECT DISTINCT
   bt.front_ticket IS NOT NULL AS has_back_tickets,
   ze.tags LIKE '%bot_end_conversation%' AS is_bot, 
   ze.tags LIKE '%closed_by_merge%' AS is_closed_by_merge,
+  CASE 
+    WHEN dc.front_or_back = 'Back' OR ze.tags LIKE '%tarefa_atendimento_escalado%' THEN 'back'
+    WHEN dc.front_or_back = 'Front' OR dc.front_or_back IS NULL THEN 'front'
+    ELSE dc.front_or_back
+  END AS front_or_back,
   bt.back_ticket IS NOT NULL has_back_ticket,
   CASE
     WHEN bt.back_ticket_status IN ('open','pending','new','hold') THEN TRUE
@@ -175,10 +180,9 @@ SELECT DISTINCT
   ze.ts_ticket_ended
 FROM 
   zendesk_email ze
-JOIN
+LEFT JOIN
   datalake_gsheets_clean.department_control dc
     ON dc.department = ze.department
-    AND LOWER(dc.front_or_back) <> 'back'
 LEFT JOIN
   csat cs
     ON ze.id_ticket = cs.id_ticket
@@ -186,8 +190,7 @@ LEFT JOIN
   back_tickets bt
     ON bt.front_ticket = ze.id_ticket
 WHERE 
-  ze.tags NOT LIKE '%tarefa_atendimento_escalado%'
-  AND ze.channel IN ('email', 'form_faq', 'web', 'other')
+  ze.channel IN ('email', 'form_faq', 'web', 'other')
   -- emails with the tags below are not new demands or automatically closed, therefore, they should not be considered
   AND ze.tags NOT LIKE '%resolve_ticket_acompanhamento%'
   AND ze.tags NOT LIKE '%fechado_automaticamente_noreply%'

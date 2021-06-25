@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS front_tickets.fact_ticket (
     zendesk_department VARCHAR(100),
     total_departments INTEGER,
     total_tasks INTEGER,
+    front_or_back VARCHAR(10)
     back_ticket BIGINT,
     resolution_survey BOOLEAN,
     has_answered_csat BOOLEAN,
