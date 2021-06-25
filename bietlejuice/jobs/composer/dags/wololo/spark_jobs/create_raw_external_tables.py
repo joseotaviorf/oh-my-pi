@@ -12,6 +12,7 @@ from bietlejuice.jobs.composer.services.metastore_services import (
 )
 
 JOB_NAME = "create_raw_external_tables"
+BLOCK_LIST = ["change_owner_control", "flyway_schema_history", "inboundeventhistory"]
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -40,18 +41,20 @@ if __name__ == "__main__":
     athena_metastore_service = AthenaMetastoreService(
         AthenaClient(athena_query_result_location)
     )
+
     for table_name in tables:
-        table_schema = spark_metastore_service.get_table_schema(
-            database_name=db_info["db_raw_databricks"], table_name=table_name
-        )
-        athena_metastore_service.drop_table(athena_db, table_name)
-        athena_metastore_service.create_external_table(
-            database_name=athena_db,
-            table_name=table_name,
-            table_location=db_info["db_raw_path"] + table_name,
-            table_schema=table_schema,
-            partition_cols=[],
-            format_options=TableStorageFormat.DEFAULT_RAW,
-        )
+        if table_name not in BLOCK_LIST:
+            table_schema = spark_metastore_service.get_table_schema(
+                database_name=db_info["db_raw_databricks"], table_name=table_name
+            )
+            athena_metastore_service.drop_table(athena_db, table_name)
+            athena_metastore_service.create_external_table(
+                database_name=athena_db,
+                table_name=table_name,
+                table_location=db_info["db_raw_path"] + table_name,
+                table_schema=table_schema,
+                partition_cols=[],
+                format_options=TableStorageFormat.DEFAULT_RAW,
+            )
 
     logger.info("m=__main__, msg=All raw external tables were created successfully.")

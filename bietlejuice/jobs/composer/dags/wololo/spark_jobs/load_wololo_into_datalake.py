@@ -12,6 +12,7 @@ from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_wololo_into_datalake"
+BLOCK_LIST = ["change_owner_control", "flyway_schema_history", "inboundeventhistory"]
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -39,26 +40,28 @@ if __name__ == "__main__":
     metastore_service = SparkMetastoreService(spark_client)
     s3_loader = S3Loader()
     spark_metastore_loader = SparkMetastoreLoader(metastore_service)
+
     for table in tables:
-        concurrent_tasks = spark_client._session.sparkContext.defaultParallelism * 2
-        df = postgres_consumer.get_data_from_table_in_parallel(
-            table.table_name, concurrent_tasks
-        )
-        database_name = db_info["db_raw_databricks"]
-        format_options = SparkTableStorageFormat.DEFAULT_RAW
-        database_location = db_info["db_raw_path"]
-        # the table names in the datalake must be lowercase
-        s3_loader.load_full_table(
-            df=df,
-            database_name=database_name,
-            table_name=table.table_name.lower(),
-            format_options=format_options,
-            database_location=database_location,
-        )
-        spark_metastore_loader.update_metastore(
-            df,
-            database_name,
-            table.table_name.lower(),
-            format_options,
-            database_location,
-        )
+        if table.table_name not in BLOCK_LIST:
+            concurrent_tasks = spark_client._session.sparkContext.defaultParallelism * 2
+            df = postgres_consumer.get_data_from_table_in_parallel(
+                table.table_name, concurrent_tasks
+            )
+            database_name = db_info["db_raw_databricks"]
+            format_options = SparkTableStorageFormat.DEFAULT_RAW
+            database_location = db_info["db_raw_path"]
+            # the table names in the datalake must be lowercase
+            s3_loader.load_full_table(
+                df=df,
+                database_name=database_name,
+                table_name=table.table_name.lower(),
+                format_options=format_options,
+                database_location=database_location,
+            )
+            spark_metastore_loader.update_metastore(
+                df,
+                database_name,
+                table.table_name.lower(),
+                format_options,
+                database_location,
+            )
