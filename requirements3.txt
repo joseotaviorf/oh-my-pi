@@ -45,6 +45,7 @@ mccabe==0.6.1
 numpy==1.16.4
 ordereddict==1.1
 pandas==0.24.2
+pconf==1.6.0
 pendulum==1.4.4
 pip==18.1
 poyo==0.5.0
