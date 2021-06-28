@@ -166,11 +166,6 @@ offers_hub_central:
     sheet_name: offers_hub_central
     clean_table_name: offers_hub_central
 
-recuperacao_fachada_e_area_comum:
-    sheet_id: 1DB63rTGhu5b_x6fUzgUEzIAKdQ-O52hly2D7hIa10CI
-    sheet_name: recovery_common_area_facade
-    clean_table_name: photos_recovery_common_area_facade
-
 mkt_cost_per_source:
     sheet_id: 1kHFTMdaRTYyLa6e6FY6G2i1UpCkivcpmxZvYqVrqe5o
     sheet_name: mkt_cost_per_source
