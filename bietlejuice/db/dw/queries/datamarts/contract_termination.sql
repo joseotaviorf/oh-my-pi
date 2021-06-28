@@ -89,7 +89,7 @@ WITH
 SELECT
   t.id AS sk_termination,
   t.id_contract AS sk_contract,
-  COALESCE(i.id,-1) AS sk_last_inspection,
+  t.id_exit_inspection AS sk_exit_inspection,
   JSON_EXTRACT_PATH_TEXT(t.feedback, 'reason') AS reason,
   t.feedback,
   t.requested_by,
@@ -103,6 +103,7 @@ SELECT
     WHEN t.source = 'CRM' then 'Manual'
     ELSE 'Automatic'
     END AS type,
+  tw.current_step AS workflow_current_step,
   JSON_EXTRACT_PATH_TEXT(k.tenant_keys_location, 'location') AS tenant_key_location,
   k.tenant_keys_location AS tenant_key_detail,
   k.owner_keys_location AS owner_key_detail,
@@ -110,15 +111,18 @@ SELECT
   n.needs_repair_by_tenant AS is_repair_tenant_duty,
   n.repair_resolution,
   n.repair_cost,
+  t.utility_bill_info,
+  t.has_exit_inspection,
   (m.id IS NOT NULL) AS has_been_rescheduled,
   (t.ts_canceled IS NOT NULL) AS is_termination_canceled,
+  (tw.id IS NOT NULL) AS is_workflow,
+  (occ.sk_contract IS NOT NULL OR (tw.id IS NOT NULL AND tw.ts_created > '2021-05-19 18:00:00')) AS is_carteirizado,
+  t.is_relisting,
   t.dt_termination,
   m.dt_last_updated AS dt_last_rescheduled,
-  n.ts_updated::date as dt_negotiation_updated,
+  n.ts_updated::date AS dt_negotiation_updated,
   t.ts_created,
   t.ts_canceled,
-  tc.ts_task_created AS ts_inspection_task_created,
-  tc.ts_task_completed AS ts_inspection_task_completed,
   CASE WHEN d.ts_termination_finished <= '2020-07-07' THEN n.ts_updated
     WHEN d.ts_termination_finished > '2020-07-07' THEN d.ts_termination_finished
     END AS ts_termination_finished,
@@ -133,10 +137,16 @@ FROM datalake_terminator_clean_prod.termination t
   LEFT JOIN last_inspection i
   ON i.id_contract = t.id_contract
   LEFT JOIN keys k
-  ON k.id_contract = t.id_contract
+  ON k.id = t.id
   LEFT JOIN terminations_modified m
   ON m.id = t.id
   LEFT JOIN dim_contract dc
   ON dc.sk_contract = t.id_contract
   LEFT JOIN inspection_task tc
   ON tc.sk_contract = t.id_contract 
+  LEFT JOIN datalake_terminator_clean_prod.termination_workflow tw
+  ON t.id = tw.id_termination
+  LEFT JOIN (SELECT distinct cast(nullif(ongoing_contracts,'') AS BIGINT) AS sk_contract FROM datalake_raw.gsheets_offboarding_carteirizacao_contratos
+            UNION all
+            SELECT distinct cast(nullif(finished_contracts,'') AS BIGINT) AS sk_contract FROM datalake_raw.gsheets_offboarding_carteirizacao_contratos) occ 
+  ON t.id_contract = occ.sk_contract 
