@@ -3,18 +3,27 @@ WITH customer_conversions AS (
 		cc.id_customer,
 		cc.id_dispatch,
 		cc.id_answer,
+		c.customer_type,
 		d.status,
 		a.score_category,
 		a.nps_answer,
 		a.nps_comment,
+		a.ts_answer_sent_utc,
 		ROUND(a.seconds_spent_answering/60.0,2) AS minutes_spent_answering,
 		d.ts_created
-	FROM datalake_tracksale.customer_conversions cc
-	INNER JOIN datalake_tracksale.dispatch d
-		ON cc.id_dispatch_lot = d.id
-	LEFT JOIN datalake_tracksale.answer a
-		ON cc.id_answer = a.id
-	WHERE cc.id_customer != '-1' -- filter out dispatches FROM unidentified customers
+	FROM
+	    datalake_tracksale.customer_conversions cc
+	INNER JOIN
+	    datalake_tracksale.dispatch d
+		    ON cc.id_dispatch_lot = d.id
+	LEFT JOIN
+	    datalake_tracksale.answer a
+		    ON cc.id_answer = a.id
+	LEFT JOIN
+	    datalake_tracksale.campaign AS c
+		    ON c.id = d.id_campaign
+	WHERE
+	    cc.id_customer != '-1' -- filter out dispatches FROM unidentified customers
 ),
 customer_metrics AS (
 	SELECT
@@ -22,16 +31,62 @@ customer_metrics AS (
 		MAX(id_answer) AS id_last_answer,
 		COUNT(id_dispatch) AS total_dispatches,
 		COUNT(id_answer) AS total_answers,
-		COUNT(CASE WHEN score_category = 'promoter' THEN id_answer end) AS promoters,
-		COUNT(CASE WHEN score_category = 'passive' THEN id_answer end) AS passives,
-		COUNT(CASE WHEN score_category = 'detractor' THEN id_answer end) AS detractors,
-		COUNT(CASE WHEN nps_comment IS NOT NULL THEN id_answer end) AS total_comments,
+		COUNT(CASE
+			WHEN customer_type IN ('seller','buyer') THEN id_answer
+		      END
+		) AS total_answers_forsale,
+		COUNT(CASE
+		        WHEN customer_type IN ('IQ','PP') THEN id_answer
+		      END
+		) AS total_answers_forrent,
+		COUNT(CASE
+		        WHEN score_category = 'promoter' THEN id_answer
+		      END
+		) AS promoters,
+		COUNT(CASE
+		        WHEN score_category = 'passive' THEN id_answer
+		      END
+		) AS passives,
+		COUNT(CASE
+		        WHEN score_category = 'detractor' THEN id_answer
+		      END) AS detractors,
+		COUNT(CASE
+		        WHEN score_category = 'promoter' AND customer_type IN ('seller','buyer') THEN id_answer
+		      END
+		) AS promoters_forsale,
+		COUNT(CASE
+		        WHEN score_category = 'detractor' AND customer_type IN ('seller','buyer') THEN id_answer
+		      END
+		) AS detractors_forsale,
+		COUNT(CASE
+		        WHEN score_category = 'promoter' AND customer_type IN ('IQ','PP') THEN id_answer
+		      END
+		) AS promoters_forrent,
+		COUNT(CASE
+		        WHEN score_category = 'detractor' AND customer_type IN ('IQ','PP') THEN id_answer
+		      END
+		) AS detractors_forrent,
+		COUNT(CASE
+		        WHEN nps_comment IS NOT NULL THEN id_answer
+		      END
+		) AS total_comments,
 		AVG(minutes_spent_answering) AS avg_minutes_response_time,
 		AVG(nps_answer) AS avg_score,
+		AVG(CASE
+		        WHEN customer_type IN ('seller','buyer') THEN nps_answer
+		    END
+		) AS avg_score_forsale,
+		AVG(CASE
+		        WHEN customer_type IN ('IQ','PP') THEN nps_answer
+		    END
+		) AS avg_score_forrent,
 		COUNT(CASE WHEN status != 'Finalizado' THEN id_dispatch END) > 0 AS has_pending_survey,
 		CAST(MAX(ts_created) AS date) AS dt_last_dispatched,
-		MIN(ts_created) AS ts_first_dispatched
-	FROM customer_conversions
+		MIN(ts_created) AS ts_first_dispatched,
+		CAST(MAX(ts_answer_sent_utc) AS DATE) AS dt_last_answer,
+		CAST(MIN(ts_answer_sent_utc) AS DATE) AS dt_first_answer
+	FROM
+	    customer_conversions
 	GROUP BY 1
 ),
 conversion_metrics AS (
@@ -40,83 +95,121 @@ conversion_metrics AS (
 		id_last_answer,
 		total_dispatches,
 		total_answers,
+		total_answers_forsale,
+		total_answers_forrent,
+		promoters AS answers_as_promoter,
+		detractors AS answers_as_detractor,
 		avg_minutes_response_time,
 		avg_score,
-		CASE WHEN total_answers > 0 THEN ROUND(100.0*(promoters - detractors)/total_answers,0)
-			END AS overall_nps,
-		CASE WHEN total_dispatches > 0 THEN ROUND(1.0*total_answers/total_dispatches,3)
-			END AS answer_rate,
-		CASE WHEN total_answers > 0 THEN ROUND(1.0*total_comments/total_answers,3)
-			END AS comment_rate,
+		avg_score_forsale,
+		avg_score_forrent,
+		CASE
+		    WHEN total_answers > 0 THEN ROUND(100.0*(promoters - detractors)/total_answers,0)
+		END AS overall_nps,
+		CASE
+		    WHEN total_answers_forsale > 0 THEN ROUND(100.0*(promoters_forsale - detractors_forsale)/total_answers_forsale,0)
+		END AS overall_nps_forsale,
+		CASE
+		    WHEN total_answers_forrent > 0 THEN ROUND(100.0*(promoters_forrent - detractors_forrent)/total_answers_forrent,0)
+		END AS overall_nps_forrent,
+		CASE
+		    WHEN total_dispatches > 0 THEN ROUND(1.0*total_answers/total_dispatches,3)
+		END AS answer_rate,
+		CASE
+		    WHEN total_answers > 0 THEN ROUND(1.0*total_comments/total_answers,3)
+		END AS comment_rate,
 		has_pending_survey,
 		dt_last_dispatched,
-		ts_first_dispatched
-	FROM customer_metrics
+		ts_first_dispatched,
+		dt_last_answer,
+		dt_first_answer
+	FROM
+	    customer_metrics
 ),
 last_category AS (
 	SELECT
 		cc.id_customer,
 		cc.nps_answer AS last_score,
 		cc.score_category AS last_category
-	FROM customer_conversions cc
-	INNER JOIN customer_metrics cm
+	FROM 
+	    customer_conversions cc
+	INNER JOIN
+	    customer_metrics cm
 		ON cm.id_last_answer = cc.id_answer
 ),
 second_last_answer AS (
 	SELECT
 		cc.id_customer,
 		max(cc.id_answer) AS id_second_last_answer
-	FROM customer_conversions cc
-	LEFT JOIN customer_metrics cm
-		ON cm.id_customer = cc.id_customer
-	WHERE cc.id_answer < cm.id_last_answer
+	FROM
+	    customer_conversions cc
+	LEFT JOIN
+	    customer_metrics cm
+		    ON cm.id_customer = cc.id_customer
+	WHERE
+	    cc.id_answer < cm.id_last_answer
 	GROUP BY 1
 ),
 second_last_category AS (
 	SELECT
 		cc.id_customer,
 		cc.score_category AS second_last_category
-	FROM customer_conversions cc
-	INNER JOIN second_last_answer sla
-		ON sla.id_second_last_answer = cc.id_answer
+	FROM
+	    customer_conversions cc
+	INNER JOIN
+	    second_last_answer sla
+		    ON sla.id_second_last_answer = cc.id_answer
 ),
 last_shift AS (
 	SELECT
 		lc.id_customer,
 		lc.last_score,
 		CONCAT(slc.second_last_category,CONCAT(':',lc.last_category)) AS last_shift_type
-	FROM last_category lc
-	INNER JOIN second_last_category slc
-		ON slc.id_customer = lc.id_customer
-	WHERE lc.last_category != slc.second_last_category
+	FROM
+	    last_category lc
+	INNER JOIN
+	    second_last_category slc
+		    ON slc.id_customer = lc.id_customer
+	WHERE
+	    lc.last_category != slc.second_last_category
 ),
 answer_keys AS (
 	SELECT
 		id_answer,
-		MAX(CASE WHEN tag_name = 'User Id' THEN CAST(tag_value AS BIGINT)
-				END) AS id_user,
-		MAX(CASE WHEN tag_name = 'CPF' THEN tag_value
-				END) AS cpf
-	FROM datalake_tracksale.answer_tags
-	WHERE tag_name IN ('User Id','CPF')
+		MAX(CASE
+		        WHEN tag_name = 'User Id' THEN CAST(tag_value AS BIGINT)
+		    END
+		) AS id_user,
+		MAX(CASE
+		        WHEN tag_name = 'CPF' THEN tag_value
+			END
+	    ) AS cpf
+	FROM
+	    datalake_tracksale.answer_tags
+	WHERE
+	    tag_name IN ('User Id','CPF')
 	GROUP BY 1
 ),
 ebdb_user AS (
 	SELECT
 		ak.id_answer,
 		ak.id_user
-	FROM answer_keys ak
-	INNER JOIN datalake_ebdb_clean.user u
-		ON ak.id_user = u.id
+	FROM
+	    answer_keys ak
+	INNER JOIN
+	    datalake_ebdb_clean.user u
+		    ON ak.id_user = u.id
 	GROUP BY 1,2
 ),
 ebdb_cpf AS (
 	SELECT
 		ak.id_answer,
 		ak.cpf
-	FROM answer_keys ak
-	INNER JOIN datalake_ebdb_customer_contact_identification.customer_contact_identification cci
-		ON ak.cpf = cci.cpf
+	FROM
+	    answer_keys ak
+	INNER JOIN
+	    datalake_ebdb_customer_contact_identification.customer_contact_identification cci
+		    ON ak.cpf = cci.cpf
 	GROUP BY 1,2
 ),
 customer_keys AS (
@@ -124,17 +217,22 @@ customer_keys AS (
 		cc.id_customer,
 		MAX(COALESCE(eu.id_user,cci_e.id_user, cci_p.id_user)) AS id_user,
 		MAX(COALESCE(ec.cpf,cci_e.cpf,cci_p.cpf)) AS cpf
-	FROM datalake_tracksale.customer_conversions cc
-	LEFT JOIN ebdb_user eu
-		ON eu.id_answer = cc.id_answer
-	LEFT JOIN ebdb_cpf ec
-		ON ec.id_answer = cc.id_answer
-	LEFT JOIN datalake_ebdb_customer_contact_identification.customer_contact_identification cci_p
-		ON cci_p.customer_contact = cc.customer_phone
-		AND cci_p.channel = 'phone'
-	LEFT JOIN datalake_ebdb_customer_contact_identification.customer_contact_identification cci_e
-		ON cci_e.customer_contact = cc.customer_email
-		AND cci_e.channel = 'email'
+	FROM
+	    datalake_tracksale.customer_conversions cc
+	LEFT JOIN
+	    ebdb_user eu
+		    ON eu.id_answer = cc.id_answer
+	LEFT JOIN
+	    ebdb_cpf ec
+		    ON ec.id_answer = cc.id_answer
+	LEFT JOIN
+	    datalake_ebdb_customer_contact_identification.customer_contact_identification cci_p
+		    ON cci_p.customer_contact = cc.customer_phone
+		    AND cci_p.channel = 'phone'
+	LEFT JOIN
+	    datalake_ebdb_customer_contact_identification.customer_contact_identification cci_e
+		    ON cci_e.customer_contact = cc.customer_email
+		    AND cci_e.channel = 'email'
 	GROUP BY 1
 )
 SELECT
@@ -144,17 +242,30 @@ SELECT
 	ls.last_shift_type,
 	cm.total_dispatches,
 	cm.total_answers,
+	cm.total_answers_forsale,
+	cm.total_answers_forrent,
+	cm.answers_as_promoter,
+	cm.answers_as_detractor,
 	cm.answer_rate,
 	cm.comment_rate,
 	cm.avg_score,
+	cm.avg_score_forsale,
+	cm.avg_score_forrent,
 	ls.last_score,
 	cm.overall_nps,
+	cm.overall_nps_forsale,
+	cm.overall_nps_forrent,
 	cm.avg_minutes_response_time,
 	cm.has_pending_survey,
 	cm.dt_last_dispatched,
+	cm.dt_last_answer,
+	cm.dt_first_answer,
 	current_timestamp AS ts_load
-FROM conversion_metrics cm
-LEFT JOIN customer_keys ck
-	ON ck.id_customer = cm.id_customer
-LEFT JOIN last_shift ls
-	ON ls.id_customer = cm.id_customer
+FROM
+    conversion_metrics cm
+LEFT JOIN
+    customer_keys ck
+	    ON ck.id_customer = cm.id_customer
+LEFT JOIN
+    last_shift ls
+	    ON ls.id_customer = cm.id_customer
