@@ -222,8 +222,8 @@ bietlejuice.enrich_bigfone_twilio:
   - bietlejuice.enrich_bigfone_events:load-enrich-events
 
 bietlejuice.enrich_bob:
-  - bietlejuice.bob:load-house-draft-aud-to-clean
-  - bietlejuice.bob:load-house-draft-to-clean
+  - bietlejuice.bob:load-clean-house-draft-aud
+  - bietlejuice.bob:load-clean-house-draft
 
 bietlejuice.enrich_booking:
   - bietlejuice.ebdb:create-clean-booking-in-data-lake

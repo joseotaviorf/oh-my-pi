@@ -10,7 +10,6 @@ from bietlejuice.jobs.composer.consumers.db_consumers import PostgresConsumer
 from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
-SOURCE = "bob"
 JOB_NAME = "load_bob_into_datalake"
 BLOCK_LIST = ["change_owner_control", "flyway_schema_history", "pg_stat_statements"]
 
@@ -21,9 +20,13 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
+    parser.add_argument("source")
+
     args = parser.parse_args()
+
     environment = args.env
     datalake_bucket = args.datalake_bucket
+    source = args.source
 
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
@@ -35,7 +38,7 @@ if __name__ == "__main__":
     postgres_consumer = PostgresConsumer(conn_config, spark_client)
 
     tables = postgres_consumer.get_table_names_and_sizes().collect()
-    db_info = DatalakeMetastoreService.get_db_info(environment, SOURCE, datalake_bucket)
+    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     metastore_service = SparkMetastoreService(spark_client)
     s3_loader = S3Loader()
     spark_metastore_loader = SparkMetastoreLoader(metastore_service)
