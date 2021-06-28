@@ -18,7 +18,7 @@ WITH call_tasks AS (
         ts_task_closed AS ts_closed,
         NOW() AS ts_load
     FROM
-        datalake_front_tickets.call c
+        datalake_customer_support.call c
     WHERE
         id_reservation IS NOT NULL
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
@@ -43,7 +43,7 @@ chat_tasks AS (
         ts_task_closed AS ts_closed,
         NOW() AS ts_load
     FROM 
-        datalake_front_tickets.chat c
+        datalake_customer_support.chat c
     WHERE
         id_task IS NOT NULL
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
@@ -68,7 +68,7 @@ email_tasks AS (
         ts_ticket_ended AS ts_closed,
         NOW() AS ts_load
     FROM 
-        datalake_front_tickets.email
+        datalake_customer_support.email
     WHERE
         id_ticket IS NOT NULL
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16

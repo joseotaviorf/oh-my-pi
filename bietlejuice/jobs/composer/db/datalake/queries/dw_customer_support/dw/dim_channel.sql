@@ -5,7 +5,7 @@ SELECT
   tags,
   NOW() AS ts_load
 FROM
-  datalake_front_tickets.call
+  datalake_customer_support.call
 GROUP BY 1,2,3,4,5
 UNION ALL
 SELECT
@@ -15,7 +15,7 @@ SELECT
   tags,
   NOW() AS ts_load
 FROM
-  datalake_front_tickets.chat
+  datalake_customer_support.chat
 GROUP BY 1,2,3,4,5
 UNION ALL
 SELECT
@@ -25,5 +25,5 @@ SELECT
   tags,
   NOW() AS ts_load
 FROM
-  datalake_front_tickets.email
+  datalake_customer_support.email
 GROUP BY 1,2,3,4,5

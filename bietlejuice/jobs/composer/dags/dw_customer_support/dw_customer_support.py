@@ -11,26 +11,29 @@ from airflow.operators.quintoandar_databricks import (
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
-from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.jobs.composer.base.airflow.helpers import TaskFlowHelper
+from bietlejuice.jobs.composer.dags.base.dw_task_group import DWTaskGroup
+
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
-MAIN_START_DATE = datetime(2021, 5, 12, 0, 0, 0, tzinfo=LOCAL_TZ)
+MAIN_START_DATE = datetime(2021, 2, 7, 0, 0, 0, tzinfo=LOCAL_TZ)
 
-CONTEXT = "front_tickets"
-DAG_NAME = f"enrich_{CONTEXT}"
+DW_SCHEMA = "customer_support"
+CONTEXT = "customer_support"
+DAG_NAME = f"dw_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = os.environ.get("ENVIRONMENT")
-DATALAKE_BUCKET = Variable.get("datalake_bucket")
-ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
-DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
+SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
+DW_BUCKET = Variable.get("dw_bucket")
 
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base"
-LOGS_OUTPUT_PATH = f"s3://{Variable.get('databricks_s3_bucket')}/logs/jobs/{DAG_ID}"
-
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_bietlejuice_front_tickets", deserialize_json=True
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
+LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
+    Variable.get("databricks_s3_bucket"), DAG_ID
 )
+
+CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 
 dag = DAG(
@@ -55,20 +58,23 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-datalake_task_group = DatalakeTaskGroup(
+dw_task_group = DWTaskGroup(
     dag=dag,
     env=ENV,
-    datalake_bucket=DATALAKE_BUCKET,
-    relative_query_path=CONTEXT,
+    dw_bucket=DW_BUCKET,
+    dw_schema=DW_SCHEMA,
+    relative_query_path=DAG_NAME,
     spark_jobs_path=SPARK_JOBS_PATH,
-    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
 )
 
-enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.ENRICH,
-    source_database_base_name=CONTEXT,
-    target_database_base_name=CONTEXT,
+dw_staging_task_group = dw_task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.DW_STAGING
 )
 
-chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(enrich_task_groups))
-chain(DatalakeTaskGroup.all_last_tasks(enrich_task_groups), terminate_cluster_task)
+dw_task_group = dw_task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.DW, spectrum_iam_role=SPECTRUM_IAM_ROLE
+)
+
+chain(create_cluster_task, DWTaskGroup.all_first_tasks(dw_staging_task_group))
+TaskFlowHelper.chain_task_groups_via_common_table(dw_staging_task_group, dw_task_group)
+chain(DWTaskGroup.all_last_tasks(dw_task_group), terminate_cluster_task)

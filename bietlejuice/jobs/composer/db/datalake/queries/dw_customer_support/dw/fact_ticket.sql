@@ -61,7 +61,7 @@ WITH call_tickets AS (
     ts_ticket_ended AS ts_closed,
     NOW() AS ts_load
   FROM
-    datalake_front_tickets.call
+    datalake_customer_support.call
 ),
 chat_tickets AS (
   SELECT DISTINCT
@@ -125,7 +125,7 @@ chat_tickets AS (
     ts_ticket_ended AS ts_closed,
     NOW() AS ts_load
   FROM
-    datalake_front_tickets.chat
+    datalake_customer_support.chat
 ),
 email_tickets AS (
   SELECT DISTINCT
@@ -188,7 +188,7 @@ email_tickets AS (
     ts_ticket_ended AS ts_closed,
     NOW() AS ts_load
   FROM 
-    datalake_front_tickets.email
+    datalake_customer_support.email
 )
 SELECT 
   *

@@ -16,7 +16,7 @@ WITH taxonomy AS (
     contact_theme_tag AS theme,
     NOW() AS ts_load
   FROM 
-    datalake_front_tickets.chat
+    datalake_customer_support.chat
   UNION ALL
   SELECT 
     MD5(
@@ -35,7 +35,7 @@ WITH taxonomy AS (
     contact_theme_tag AS theme,
     NOW() AS ts_load
   FROM 
-    datalake_front_tickets.call
+    datalake_customer_support.call
   UNION ALL
   SELECT 
     MD5(
@@ -54,7 +54,7 @@ WITH taxonomy AS (
     contact_theme_tag AS theme,
     NOW() AS ts_load
   FROM 
-    datalake_front_tickets.email
+    datalake_customer_support.email
 )
 SELECT DISTINCT
   *

@@ -1,19 +1,19 @@
-## DW Front Tickets
+## DW Customer Support
 ### Purpose
 ​
-This DAG load the DW tables for Front Tickets.
+This DAG load the DW tables for Customer Support.
 
 ​<details>
   <summary><strong> > DAG details (click to expand)</strong></summary>​
 
 ### Execution​ Interval
-This DAG is triggered once per day via Mediator, after enrich_front_tickets DAG
+This DAG is triggered once per day via Mediator, after enrich_customer_support DAG
 
 More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 ​
-This pipeline produces the following output tables in `front_tickets` schema:
+This pipeline produces the following output tables in `customer_support` schema:
 ​
 - `fact_ticket`
 - `fact_task`

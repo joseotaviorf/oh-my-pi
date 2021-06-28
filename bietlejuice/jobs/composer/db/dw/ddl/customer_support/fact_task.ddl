@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS front_tickets.fact_task;
-CREATE TABLE IF NOT EXISTS front_tickets.fact_task (
+DROP TABLE IF EXISTS customer_support.fact_task;
+CREATE TABLE IF NOT EXISTS customer_support.fact_task (
     sk_ticket BIGINT,
     sk_task VARCHAR,
     sk_agent VARCHAR,
@@ -18,4 +18,4 @@ CREATE TABLE IF NOT EXISTS front_tickets.fact_task (
     ts_closed TIMESTAMP,
     ts_load TIMESTAMP
 );
-ALTER TABLE front_tickets.fact_task OWNER TO airflow;
+ALTER TABLE customer_support.fact_task OWNER TO airflow;

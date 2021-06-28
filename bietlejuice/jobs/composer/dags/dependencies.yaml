@@ -51,10 +51,10 @@ bietlejuice.dw_dim_listing_owner:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_user:load-enrich-user
 
-bietlejuice.dw_front_tickets:
-  - bietlejuice.enrich_front_tickets:load-enrich-call
-  - bietlejuice.enrich_front_tickets:load-enrich-chat
-  - bietlejuice.enrich_front_tickets:load-enrich-email
+bietlejuice.dw_customer_support:
+  - bietlejuice.enrich_customer_support:load-enrich-call
+  - bietlejuice.enrich_customer_support:load-enrich-chat
+  - bietlejuice.enrich_customer_support:load-enrich-email
   - bietlejuice.gsheets:load-department-control-to-clean
 
 bietlejuice.dw_house:
@@ -376,7 +376,7 @@ bietlejuice.enrich_firestore:
   - bietlejuice.firestore:load-clean-rent-offer
   - bietlejuice.firestore:load-clean-sale-offer
 
-bietlejuice.enrich_front_tickets:
+bietlejuice.enrich_customer_support:
   - bietlejuice.chat_fup:load-chats-chat-to-datalake-clean
   - bietlejuice.chat_fup:load-surveys-answer-to-datalake-clean
   - bietlejuice.chat_fup:load-surveys-survey-to-datalake-clean

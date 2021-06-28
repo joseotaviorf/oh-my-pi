@@ -6,7 +6,7 @@ WITH agents AS (
     agent_name AS full_name,
     LOWER(agent_company) AS agent_company
   FROM
-    datalake_front_tickets.call
+    datalake_customer_support.call
   UNION ALL
   SELECT
     id_agent AS sk_agent,
@@ -15,7 +15,7 @@ WITH agents AS (
     agent_name AS full_name,
     LOWER(agent_company) AS agent_company
   FROM
-    datalake_front_tickets.chat
+    datalake_customer_support.chat
   UNION ALL
   SELECT
     id_agent AS sk_agent,
@@ -24,7 +24,7 @@ WITH agents AS (
     agent_name AS full_name,
     LOWER(agent_company) AS agent_company
   FROM
-    datalake_front_tickets.email
+    datalake_customer_support.email
 )
 SELECT
   sk_agent,
