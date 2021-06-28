@@ -216,7 +216,7 @@ bietlejuice.enrich_amplitude_visit:
   - bietlejuice.amplitude
 
 bietlejuice.enrich_bigfone_events:
-  - bietlejuice.bigfone:load-event-to-clean
+  - bietlejuice.bigfone:load-clean-event
 
 bietlejuice.enrich_bigfone_twilio:
   - bietlejuice.enrich_bigfone_events:load-enrich-events
