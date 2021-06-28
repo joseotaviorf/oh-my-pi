@@ -249,3 +249,9 @@ class BaseTaskGroup(object):
         task_groups_copy = copy(task_groups_boundaries)
         task_groups_copy.pop(task_group_name, None)
         return task_groups_copy
+
+    def _get_load_mode(self, is_incremental: bool) -> str:
+        """
+        Identify the loading mode according to is_incremental flag
+        """
+        return "incremental" if is_incremental else "full"

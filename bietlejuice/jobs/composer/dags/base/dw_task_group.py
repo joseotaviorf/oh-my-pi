@@ -2,9 +2,10 @@ from datetime import timedelta
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
-
+import json
 from bietlejuice.jobs.composer.base.airflow import BaseTaskGroup
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
+from bietlejuice.jobs.composer.formatters import StringFormatter
 
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import Variable
@@ -131,11 +132,86 @@ class DWTaskGroup(BaseTaskGroup):
         )
 
     def build_dw_staging_task_group(
-        self, table_name, has_ods_migration_test=False, cluster_config_params={}
-    ):
+        self,
+        table_name: str,
+        is_incremental: bool = False,
+        partitions: list = None,
+        has_ods_migration_test: bool = False,
+        extra_query_template_params: dict = None,
+        cluster_config_params: dict = None,
+    ) -> dict:
         """
-        Creates a task group containing the tasks:
+        Creates a task group containing the default loading task:
         . load_table_to_dw_staging_schema_task: load table to dw staging layer
+        For full load pipelines, it builds additional task groups
+
+        :param table_name: table name to be created
+        :param is_incremental: if this table uses incremental load type
+        :param partitions: list of columns to partition table
+        :type partitions: list[str]
+        :param has_ods_migration_test: whether to create tasks to validate migrated
+            data x ods
+        :param extra_query_template_params: additional parameters to be supplied to query template
+        :param cluster_config_params: custom config parameters to be set in spark cluster
+        :return: dict with initial and final tasks of the created task group
+        :rtype: dict[str:list[airflow.models.BaseOperator]]
+        """
+        layer = LayerEnum.DW_STAGING.value
+        partitions = partitions or []
+        extra_query_template_params = extra_query_template_params or {}
+        cluster_config_params = cluster_config_params or {}
+
+        slugged_table_name = StringFormatter.slugify(table_name)
+        table_load_mode = self._get_load_mode(is_incremental)
+
+        load_table_to_dw_staging_params = [
+            self.env,
+            self.dw_bucket,
+            self.dw_schema,
+            self.relative_query_path,
+            table_name,
+        ]
+
+        if is_incremental:
+            load_table_to_dw_staging_params += [
+                str(partitions),
+                "{{ ds }}",
+                json.dumps(extra_query_template_params),
+            ]
+
+        load_table_to_dw_staging_schema_task = QuintoAndarDatabricksSubmitRunOperator(
+            dag=self.dag,
+            task_id=f"load-{layer}-{self.dw_schema}-{slugged_table_name}",
+            json={
+                "spark_python_task": {
+                    "python_file": f"{self.spark_jobs_path}/load_{table_load_mode}_table_to_dw_staging_schema.py",
+                    "parameters": load_table_to_dw_staging_params
+                    + [str(cluster_config_params)],
+                }
+            },
+            execution_timeout=timedelta(hours=self.execution_timeout_hours),
+        )
+
+        if is_incremental:
+            return DWTaskGroup.format_tasks_boundaries(
+                initial_tasks=[load_table_to_dw_staging_schema_task],
+                final_tasks=[load_table_to_dw_staging_schema_task],
+            )
+        else:
+            return self._build_dw_staging_full_load_extra_tasks(
+                load_table_to_dw_staging_schema_task=load_table_to_dw_staging_schema_task,
+                table_name=table_name,
+                has_ods_migration_test=has_ods_migration_test,
+            )
+
+    def _build_dw_staging_full_load_extra_tasks(
+        self,
+        load_table_to_dw_staging_schema_task,
+        table_name: str,
+        has_ods_migration_test: bool = False,
+    ) -> dict:
+        """
+        For full load pipelines, it builds the additional tasks:
         . emptiness_test_task: validate if table in staging is not empty
         . test_entity_ods_migration_task: (optional) test if migrated data from ods
          matches transformations mapped
@@ -143,36 +219,13 @@ class DWTaskGroup(BaseTaskGroup):
          default row with -1 in primary key column
 
         :param table_name: table name to be created
-        :type table_name: str
         :param has_ods_migration_test: whether to create tasks to validate migrated
-            data x ods
-        :type has_ods_migration_test: bool
-        :param cluster_config_params: custom config parameters to be set in spark cluster
-        :type cluster_config_params: dict
+            data versus ods
         :return: dict with initial and final tasks of the created task group
-        :rtype: dict
+        :rtype: dict[str:list[airflow.models.BaseOperator]]
         """
         layer = LayerEnum.DW_STAGING.value
-        slugged_table_name = table_name.replace("_", "-")
-
-        load_table_to_dw_staging_schema_task = QuintoAndarDatabricksSubmitRunOperator(
-            dag=self.dag,
-            task_id=f"load-{layer}-{self.dw_schema}-{slugged_table_name}",
-            json={
-                "spark_python_task": {
-                    "python_file": f"{self.spark_jobs_path}/load_full_table_to_dw_staging_schema.py",
-                    "parameters": [
-                        self.env,
-                        self.dw_bucket,
-                        self.dw_schema,
-                        self.relative_query_path,
-                        table_name,
-                        str(cluster_config_params),
-                    ],
-                }
-            },
-            execution_timeout=timedelta(hours=self.execution_timeout_hours),
-        )
+        slugged_table_name = StringFormatter.slugify(table_name)
 
         emptiness_test_task = QuintoAndarDatabricksSubmitRunOperator(
             dag=self.dag,
@@ -237,12 +290,10 @@ class DWTaskGroup(BaseTaskGroup):
         )
 
     @staticmethod
-    def is_dim(table_name):
+    def is_dim(table_name: str) -> bool:
         """
         Validates whether table is a dim according to name prefix
 
         :param table_name: table name
-        :type table_name: str
-        :rtype: bool
         """
         return table_name.startswith("dim_")
