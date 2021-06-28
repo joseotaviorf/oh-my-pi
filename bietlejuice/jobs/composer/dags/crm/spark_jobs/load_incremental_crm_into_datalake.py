@@ -19,17 +19,14 @@ JOB_NAME = "load_incremental_crm_into_datalake_raw"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-INCREMENTAL_COLUMNS_MAPPING = {
-    "workflows": "updated",
-    "tasks": "actions.date",
-    "taskstatushistories": "history.date",
-}
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env", type=str, help="forno/prod environment")
-    parser.add_argument("source")
     parser.add_argument("datalake_bucket")
+    parser.add_argument("source")
+    parser.add_argument("table_name", help="table name")
+    parser.add_argument("date_filter_column", help="Date filter column")
     parser.add_argument("execution_date", type=str, help="DAG execution date")
 
     args = parser.parse_args()
@@ -37,6 +34,8 @@ if __name__ == "__main__":
     source = args.source
     data_lake_bucket = args.datalake_bucket
     execution_date = args.execution_date
+    table_name = args.table_name
+    date_filter_column = args.date_filter_column
 
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
@@ -65,40 +64,39 @@ if __name__ == "__main__":
     partition_cols = ["year", "month", "day"]
     s3_loader = S3Loader()
 
-    for table_name, mapped_column in INCREMENTAL_COLUMNS_MAPPING.items():
-        df = mongo_consumer.get_incremental_data_from_table(
-            table_name, mapped_column, execution_date
+    df = mongo_consumer.get_incremental_data_from_table(
+        table_name, date_filter_column, execution_date
+    )
+
+    if df is not None:
+        df = (
+            SparkDataFrameService()
+            .input(df)
+            .optimize_partition(10000)
+            .create_year_month_day_columns_from_date(dt_execution)
+            .output()
+        )
+        s3_loader.load_incremental_table(
+            df=df,
+            database_name=database_name,
+            table_name=table_name,
+            format_options=format_options,
+            database_location=database_location,
+            partition_cols=partition_cols,
+        )
+        spark_metastore_loader.update_metastore(
+            df,
+            database_name,
+            table_name,
+            format_options,
+            database_location,
+            partition_cols,
+            force_recreate=False,
         )
 
-        if df is not None:
-            df = (
-                SparkDataFrameService()
-                .input(df)
-                .optimize_partition(10000)
-                .create_year_month_day_columns_from_date(dt_execution)
-                .output()
-            )
-            s3_loader.load_incremental_table(
-                df=df,
-                database_name=database_name,
-                table_name=table_name,
-                format_options=format_options,
-                database_location=database_location,
-                partition_cols=partition_cols,
-            )
-            spark_metastore_loader.update_metastore(
-                df,
-                database_name,
-                table_name,
-                format_options,
-                database_location,
-                partition_cols,
-                force_recreate=False,
-            )
-
-            spark_metastore_service.create_new_partitions_from_df(
-                database_name=database_name,
-                table_name=table_name,
-                df=df,
-                partition_cols=partition_cols,
-            )
+        spark_metastore_service.create_new_partitions_from_df(
+            database_name=database_name,
+            table_name=table_name,
+            df=df,
+            partition_cols=partition_cols,
+        )

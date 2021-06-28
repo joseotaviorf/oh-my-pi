@@ -2,19 +2,20 @@ from datetime import datetime
 import pendulum
 import os
 
-import airflow.utils.helpers as airflow_helpers
+from airflow.utils.helpers import chain
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
-    QuintoAndarDatabricksSubmitRunOperator,
 )
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
-from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
+from bietlejuice.jobs.composer.base.airflow.helpers import TaskFlowHelper
+from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.jobs.composer.services import FileService
 
 SOURCE = "crm"
+CONTEXT = SOURCE
 
 # airflow vars
 ENV = os.environ.get("ENVIRONMENT")
@@ -27,11 +28,6 @@ DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 # spark and databricks vars
 BASE_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/base/"
-RAW_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}"
-RAW_INCREMENTAL_LOAD_SPARK_JOB_PATH = (
-    f"{RAW_SPARK_JOB_PATH}/load_incremental_crm_into_datalake.py"
-)
-RAW_FULL_LOAD_SPARK_JOB_PATH = f"{RAW_SPARK_JOB_PATH}/load_full_crm_into_datalake.py"
 LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{SOURCE}"
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
@@ -41,6 +37,7 @@ DAG_ID = f"bietlejuice.{SOURCE}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2021, 2, 18, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 2 * * *"
+CONFIGS_FILE_PATH = f"{os.path.dirname(os.path.realpath(__file__))}/crm.config"
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -62,88 +59,57 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-full_load_crm_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="full-load-crm-to-datalake-raw",
+task_group = DatalakeTaskGroup(
     dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": RAW_FULL_LOAD_SPARK_JOB_PATH,
-            "parameters": [ENV, SOURCE, DATALAKE_BUCKET],
-        }
-    },
-)
-
-incremental_load_crm_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="incremental-load-crm-to-datalake-raw",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": RAW_INCREMENTAL_LOAD_SPARK_JOB_PATH,
-            "parameters": [ENV, SOURCE, DATALAKE_BUCKET, "{{ds}}"],
-        }
-    },
-)
-
-sync_metastore_tables_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="sync-hive-metastore-raw-tables",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": BASE_SPARK_JOB_PATH + "sync_metastore_tables.py",
-            "parameters": [
-                DATALAKE_BUCKET,
-                LayerEnum.RAW.value,
-                SOURCE,
-                "--all-tables",
-            ],
-        }
-    },
-)
-
-clean_sub_dag = DatalakeSubDAG(
-    dag_id=DAG_ID,
-    start_date=MAIN_START_DATE,
     env=ENV,
     datalake_bucket=DATALAKE_BUCKET,
-    layer=LayerEnum.CLEAN,
-    database_base_name=SOURCE,
-    relative_query_path=SOURCE,
-    spark_job_paths=BASE_SPARK_JOB_PATH,
+    relative_query_path=CONTEXT,
+    spark_jobs_path=BASE_SPARK_JOB_PATH,
     athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
 )
 
-incremental_load_file_list = FileService.list_sql_files_without_extension_from_layer(
-    SOURCE, LayerEnum.CLEAN.value, schema="incremental"
-)
-incremental_load_clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(
-    dag,
-    incremental_load_file_list,
+raw_task_groups = {}
+configs_file = FileService.get_dict_from_yaml_file(CONFIGS_FILE_PATH)
+for table in configs_file:
+    table_name = table["table_name"]
+    clean_table_name = table["clean_table_name"]
+    extraction_type = table["extraction_type"]
+    parameters = [SOURCE, table_name]
+
+    if extraction_type == "incremental":
+        parameters.extend([table["date_filter_column"], "{{ ds }}"])
+
+    raw_spark_job_path = (
+        f"{S3_PREFIX}/spark_jobs/{CONTEXT}/load_{extraction_type}_crm_into_datalake.py"
+    )
+    raw_task_group = task_group.build_raw_task_group_for_single_table(
+        source=SOURCE,
+        table_name=table_name,
+        target_database_base_name=CONTEXT,
+        extraction_spark_job_file=raw_spark_job_path,
+        raw_spark_job_extra_args=parameters,
+    )
+    raw_task_groups[clean_table_name] = raw_task_group
+
+incremental_clean_task_groups = task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.CLEAN,
+    source_database_base_name=SOURCE,
+    target_database_base_name=SOURCE,
     is_incremental=True,
     partitions=["year", "month", "day"],
-    schema="incremental",
+    schema="incremental",  # TODO: we are misusing the schema here: incremental mode is not a schema
 )
 
-full_load_file_list = FileService.list_sql_files_without_extension_from_layer(
-    SOURCE, LayerEnum.CLEAN.value, schema="full"
-)
-full_load_clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(
-    dag, full_load_file_list, schema="full"
-)
-
-create_cluster_task >> list(
-    (full_load_crm_to_datalake_raw_task, incremental_load_crm_to_datalake_raw_task)
+full_clean_task_groups = task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.CLEAN,
+    source_database_base_name=SOURCE,
+    target_database_base_name=SOURCE,
+    schema="full",  # TODO: we are misusing the schema here: full mode is not a schema
 )
 
-incremental_load_crm_to_datalake_raw_task >> list(
-    incremental_load_clean_sub_dags.values()
-) >> terminate_cluster_task
+clean_task_groups = {**incremental_clean_task_groups, **full_clean_task_groups}
 
-full_load_crm_to_datalake_raw_task >> list(
-    full_load_clean_sub_dags.values()
-) >> terminate_cluster_task
+chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(raw_task_groups))
+TaskFlowHelper.chain_task_groups_via_common_table(raw_task_groups, clean_task_groups)
 
-airflow_helpers.cross_downstream(
-    [incremental_load_crm_to_datalake_raw_task, full_load_crm_to_datalake_raw_task],
-    [sync_metastore_tables_task],
-)
-airflow_helpers.chain(sync_metastore_tables_task, terminate_cluster_task)
+terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))

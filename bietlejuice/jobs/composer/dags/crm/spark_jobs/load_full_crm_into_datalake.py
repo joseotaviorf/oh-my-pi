@@ -17,18 +17,18 @@ JOB_NAME = "load_full_crm_into_datalake_raw"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-TABLES = ["tasktitles", "workgroups"]
-
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env", type=str, help="forno/prod environment")
-    parser.add_argument("source")
     parser.add_argument("datalake_bucket")
+    parser.add_argument("source")
+    parser.add_argument("table_name", help="table name")
 
     args = parser.parse_args()
     environment = args.env
     source = args.source
     data_lake_bucket = args.datalake_bucket
+    table_name = args.table_name
 
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
@@ -55,22 +55,21 @@ if __name__ == "__main__":
 
     s3_loader = S3Loader()
 
-    for table_name in TABLES:
-        df = mongo_consumer.get_data_from_table(table_name)
+    df = mongo_consumer.get_data_from_table(table_name)
 
-        if not df.rdd.isEmpty():
-            s3_loader.load_full_table(
-                df=df,
-                database_name=database_name,
-                table_name=table_name,
-                format_options=format_options,
-                database_location=database_location,
-            )
-            spark_metastore_loader.update_metastore(
-                df,
-                database_name,
-                table_name,
-                format_options,
-                database_location,
-                force_recreate=False,
-            )
+    if not df.rdd.isEmpty():
+        s3_loader.load_full_table(
+            df=df,
+            database_name=database_name,
+            table_name=table_name,
+            format_options=format_options,
+            database_location=database_location,
+        )
+        spark_metastore_loader.update_metastore(
+            df,
+            database_name,
+            table_name,
+            format_options,
+            database_location,
+            force_recreate=False,
+        )
