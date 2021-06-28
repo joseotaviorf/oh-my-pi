@@ -267,6 +267,16 @@ bietlejuice.enrich_braze_events_user_centric:
 bietlejuice.enrich_braze_events_user_centric_periodicity:
   - bietlejuice.enrich_braze_events_user_centric:load-enrich-user-events-daily
 
+bietlejuice.enrich_buyer_prospect:
+  - bietlejuice.ebdb:create-clean-contract-person-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.enrich_booking:load-enrich-booking
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
+  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
+  - bietlejuice.enrich_offer:load-enrich-offer
+  - bietlejuice.enrich_offer:load-enrich-sale-offer
+  - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
+
 bietlejuice.enrich_chattermill:
   - bietlejuice.chattermill:load-clean-responses
 
