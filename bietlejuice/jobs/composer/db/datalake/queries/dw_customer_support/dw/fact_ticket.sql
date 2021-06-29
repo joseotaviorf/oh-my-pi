@@ -36,10 +36,12 @@ WITH call_tickets AS (
           AND (back_ticket IS NULL OR is_open_back_ticket = FALSE)
           AND is_bot = FALSE
           AND is_closed_by_merge = FALSE
+          AND (front_or_back = 'front' OR front_or_back IS NULL)
       THEN TRUE
       WHEN is_solved IS NOT NULL 
           AND is_bot = FALSE
           AND is_closed_by_merge = FALSE
+          AND (front_or_back = 'front' OR front_or_back IS NULL)
       THEN FALSE
       ELSE NULL
     END AS is_solved,
@@ -49,10 +51,12 @@ WITH call_tickets AS (
           AND has_transfers = FALSE
           AND is_bot = FALSE
           AND is_closed_by_merge = FALSE
+          AND (front_or_back = 'front' OR front_or_back IS NULL)
       THEN TRUE
       WHEN is_solved IS NOT NULL
           AND is_bot = FALSE
           AND is_closed_by_merge = FALSE 
+          AND (front_or_back = 'front' OR front_or_back IS NULL)
       THEN FALSE
       ELSE NULL
     END AS is_fcr,
@@ -100,10 +104,12 @@ chat_tickets AS (
           AND (back_ticket IS NULL OR is_open_back_ticket = FALSE)
           AND is_bot = FALSE
           AND is_closed_by_merge = FALSE
+          AND (front_or_back = 'front' OR front_or_back IS NULL)
       THEN TRUE
       WHEN is_solved IS NOT NULL 
           AND is_bot = FALSE 
           AND is_closed_by_merge = FALSE
+          AND (front_or_back = 'front' OR front_or_back IS NULL)
       THEN FALSE
       ELSE NULL
     END AS is_solved,
@@ -113,10 +119,12 @@ chat_tickets AS (
           AND number_of_departments <= 1
           AND is_bot = FALSE
           AND is_closed_by_merge = FALSE
+          AND (front_or_back = 'front' OR front_or_back IS NULL)
       THEN TRUE
       WHEN is_solved IS NOT NULL
           AND is_bot = FALSE
           AND is_closed_by_merge = FALSE
+          AND (front_or_back = 'front' OR front_or_back IS NULL)
       THEN FALSE
       ELSE NULL
     END AS is_fcr,
@@ -164,10 +172,12 @@ email_tickets AS (
           AND (back_ticket IS NULL OR is_open_back_ticket = FALSE)
           AND is_bot = FALSE 
           AND is_closed_by_merge = FALSE
+          AND (front_or_back = 'front' OR front_or_back IS NULL)
       THEN TRUE
       WHEN is_solved IS NOT NULL 
           AND is_bot = FALSE
-          AND is_closed_by_merge = FALSE 
+          AND is_closed_by_merge = FALSE
+          AND (front_or_back = 'front' OR front_or_back IS NULL)
       THEN FALSE
       ELSE NULL
     END AS is_solved,
@@ -176,10 +186,12 @@ email_tickets AS (
           AND back_ticket IS NULL
           AND is_bot = FALSE 
           AND is_closed_by_merge = FALSE
+          AND (front_or_back = 'front' OR front_or_back IS NULL)
       THEN TRUE
       WHEN is_solved IS NOT NULL
           AND is_bot = FALSE 
           AND is_closed_by_merge = FALSE
+          AND (front_or_back = 'front' OR front_or_back IS NULL)
       THEN FALSE
       ELSE NULL
     END AS is_fcr,

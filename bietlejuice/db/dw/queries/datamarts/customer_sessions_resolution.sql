@@ -13,12 +13,13 @@ WITH front_tickets AS (
         ts_started,
         ts_closed
     FROM
-        front_tickets.fact_ticket as ft
+        customer_support.fact_ticket as ft
     LEFT JOIN
-        front_tickets.dim_channel
+        customer_support.dim_channel
             using(sk_channel)
     WHERE
         sk_user > -1
+        AND (front_or_back = 'front' OR front_or_back IS NULL)
     GROUP BY 1,2,4,6,7,8,9,10,11,12
 ),
 user_recontacts AS (
