@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 import os
 import pendulum
 
@@ -6,16 +7,60 @@ from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
+    QuintoAndarDatabricksSubmitRunOperator,
 )
+import airflow.utils.helpers as airflow_helpers
 
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.services import FileService
 
-from bietlejuice.jobs.composer.dags.enrich_marketing_costs_facebook_insights.facebook_sub_dag import (
-    FacebookSubDAG,
-)
+
+def sync_metastore(table_name, table_task):
+
+    slugged_table_name = table_name.replace("_", "-")
+
+    sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        task_id=f"sync-{slugged_table_name}-hive-metastore",
+        dag=dag,
+        json={
+            "spark_python_task": {
+                "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables.py",
+                "parameters": [
+                    DATALAKE_BUCKET,
+                    LayerEnum.ENRICH.value,
+                    TARGET,
+                    "--table-name",
+                    table_name,
+                ],
+            }
+        },
+    )
+
+    validate_sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=dag,
+        task_id=f"validate-sync-{slugged_table_name}-hive-metastore",
+        json={
+            "spark_python_task": {
+                "python_file": BASE_SPARK_JOBS_PATH
+                + "validate_sync_metastore_tables.py",
+                "parameters": [
+                    LayerEnum.ENRICH.value,
+                    TARGET,
+                    "--table-name",
+                    table_name,
+                ],
+            }
+        },
+    )
+
+    airflow_helpers.chain(
+        table_task,
+        sync_metastore_table_task,
+        validate_sync_metastore_table_task,
+        terminate_cluster_task,
+    )
 
 
 PARTITION_COLS = ["year", "month", "day"]
@@ -36,13 +81,8 @@ ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
     Variable.get("databricks_s3_bucket"), DAG_ID
 )
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_bietlejuice_marketing_costs_cluster", deserialize_json=True
-)
+CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
-LIBRARIES_DESCRIPTION = Variable.get(
-    "bietlejuice_default_libraries", deserialize_json=True
-)
 
 local_tz = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz)
@@ -55,6 +95,12 @@ CONFIGS_YAML_PATH = os.path.join(
 CONFIGS = FileService.get_dict_from_yaml_file(CONFIGS_YAML_PATH)
 
 ACCOUNTS_NAME_MAPPING = CONFIGS["account_names"]
+BREAKDOWNS_SOCIAL = CONFIGS["breakdowns"]["social"]
+BREAKDOWNS_GENERAL = CONFIGS["breakdowns"]["general"]
+str_partitions = json.dumps(PARTITION_COLS)
+str_breakdowns_social = json.dumps(BREAKDOWNS_SOCIAL)
+str_breakdowns_general = json.dumps(BREAKDOWNS_GENERAL)
+str_accounts_name_mapping = json.dumps(ACCOUNTS_NAME_MAPPING)
 
 (
     database_name,
@@ -82,50 +128,60 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag,
-    task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=LIBRARIES_DESCRIPTION,
+    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-facebook_sub_dag_class = FacebookSubDAG(
-    dag_id=DAG_ID,
-    env=ENV,
-    datalake_bucket=DATALAKE_BUCKET,
-    database_base_name=TARGET,
-    target_database_base_name=TARGET,
-    spark_job_paths=SPARK_JOBS_PATH,
-    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
-    start_date=MAIN_START_DATE,
+load_facebook_social_table = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="load-facebook-social-insights-to-enrich",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": f"{SPARK_JOBS_PATH}load_facebook_insights.py",
+            "parameters": [
+                ENV,
+                DATALAKE_BUCKET,
+                TARGET,
+                TARGET,
+                "facebook_social_insights",
+                str_breakdowns_social,
+                str_partitions,
+                str_accounts_name_mapping,
+                "{{ ds }}",
+            ],
+        }
+    },
 )
 
-facebook_sub_dag = facebook_sub_dag_class.get_sub_dag_operator(
+sync_metastore("facebook_social_insights", load_facebook_social_table)
+
+load_facebook_table = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="load-facebook-insights-to-enrich",
     dag=dag,
-    sub_dag_name="load-facebook-insights-to-enrich",
-    sub_dag_func=facebook_sub_dag_class.build_subdag,
-    table_name="facebook_insights",
-    slugged_table_name="facebook-insights",
-    accounts_name_mapping=ACCOUNTS_NAME_MAPPING,
-    partitions=PARTITION_COLS,
-    breakdowns=CONFIGS["breakdowns"]["general"],
+    json={
+        "spark_python_task": {
+            "python_file": f"{SPARK_JOBS_PATH}load_facebook_insights.py",
+            "parameters": [
+                ENV,
+                DATALAKE_BUCKET,
+                TARGET,
+                TARGET,
+                "facebook_insights",
+                str_breakdowns_general,
+                str_partitions,
+                str_accounts_name_mapping,
+                "{{ ds }}",
+            ],
+        }
+    },
 )
 
-facebook_social_sub_dag = facebook_sub_dag_class.get_sub_dag_operator(
-    dag=dag,
-    sub_dag_name="load-facebook-social-insights-to-enrich",
-    sub_dag_func=facebook_sub_dag_class.build_subdag,
-    table_name="facebook_social_insights",
-    slugged_table_name="facebook-social-insights",
-    accounts_name_mapping=ACCOUNTS_NAME_MAPPING,
-    partitions=PARTITION_COLS,
-    breakdowns=CONFIGS["breakdowns"]["social"],
-)
+sync_metastore("facebook_insights", load_facebook_table)
 
 create_cluster_task >> [
-    facebook_sub_dag,
-    facebook_social_sub_dag,
+    load_facebook_social_table,
+    load_facebook_table,
 ] >> terminate_cluster_task
