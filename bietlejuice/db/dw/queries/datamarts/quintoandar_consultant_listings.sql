@@ -1,92 +1,120 @@
-WITH
-imovel_quintoandar_consultant AS (
-SELECT
-	ia.id,
-	ia.usuarioquecadastrou_id,
-	max(ia.rev) as max_rev_uid
-FROM
-    datalake_ebdb_raw_prod.Imovel_AUD ia
-JOIN
-    datalake_ebdb_raw_prod.Imovel i
-      ON i.id = ia.id
-      AND i.id NOT IN (893189969,893189245,893188683,893183943)
-WHERE i.datacriacao >= '2020-10-24'
-  AND ia.usuarioquecadastrou_mod = True
-GROUP BY 1, 2
+WITH check_ciq_full AS (
+    SELECT
+        JSON_EXTRACT_PATH_TEXT(House.details, 'houseExternalId') AS id_house_external
+    FROM
+        datalake_big_agent_clean_prod.House
+    INNER JOIN
+        datalake_big_agent_clean_prod.Agency
+            ON Agency.id_house = house.id
+    GROUP BY
+        JSON_EXTRACT_PATH_TEXT(House.details, 'houseExternalId')
+    HAVING
+        COUNT(JSON_EXTRACT_PATH_TEXT( House.details, 'houseExternalId'))  > 1
 ),
-base AS (
-SELECT
-    dhl.sk_house_listing,
-    dhl.id_house,
-    lf.mkt_origin = 'CIQ' AS is_mkt_origin_ciq,
-    dhl.is_autonomous_agent as is_autonomous_agent_ciq_origin,
-    aa.vinculado as gsheets_accmgmt_vinculado,
-    (i_quintoandar_consultant.id is not null AND dpa.id_user is not null) as usuarioquecadastrou_mod_and_partner_agent,
-    dpa.id_user,
-    i_quintoandar_consultant.max_rev_uid,
-    coalesce(nullif(dhl.sk_autonomous_agent,-1),i_quintoandar_consultant.usuarioquecadastrou_id) as sk_quintoandar_consultant
-FROM dim_house_listing dhl
-LEFT JOIN fact_house_listing_flows lf
-    ON dhl.id_house = lf.sk_house_listing/1000
-LEFT JOIN
-    imovel_quintoandar_consultant i_quintoandar_consultant
-      ON dhl.id_house = i_quintoandar_consultant.id
-LEFT JOIN
-    dim_partner_agent dpa
-      ON dpa.id_user = i_quintoandar_consultant.usuarioquecadastrou_id
-LEFT JOIN
-    datalake_raw.gsheets_house_autonomous_agent aa
-      ON dhl.id_house = aa.id_house
+last_enrollment AS (
+    SELECT
+        id_house,
+        MAX(id_enrollment) AS id_enrollment
+    FROM
+        datalake_big_agent_clean_prod.Agency
+    GROUP BY 1
 ),
-base2 as (
-SELECT
-    sk_house_listing,
-    id_house,
-    sk_quintoandar_consultant,
-    is_mkt_origin_ciq AS is_ciq_origin,
-    CASE WHEN gsheets_accmgmt_vinculado = 'Sim' OR usuarioquecadastrou_mod_and_partner_agent THEN TRUE ELSE FALSE END AS is_account_manager,
-    max(max_rev_uid) as max_rev_uid
-FROM
-   base
-GROUP BY 1, 2, 3, 4, 5
+house_change AS
+(
+    SELECT
+        id
+    FROM
+        datalake_ebdb_raw_prod.imovel_aud
+    WHERE
+        usuarioquecadastrou_mod IS TRUE
+        OR forsale_mod IS TRUE
 ),
-final_flags AS (
-SELECT
-    sk_house_listing,
-    id_house,
-    sk_quintoandar_consultant,
-    is_ciq_origin as mkt_origin_ciq,
-    is_ciq_origin AND is_account_manager = FALSE as is_ciq_origin,
-    (is_ciq_origin AND is_account_manager = TRUE) OR (is_ciq_origin = FALSE AND is_account_manager = TRUE) as is_account_management,
-    max_rev_uid
-FROM
-    base2
-WHERE mkt_origin_ciq OR is_account_manager
-),
-final_flags2 as (
-SELECT
-    sk_house_listing,
-    id_house,
-    max_rev_uid,
-    DENSE_RANK() over(partition by id_house order by max_rev_uid desc) as max_rev_uid_order,
-    sk_quintoandar_consultant,
-    mkt_origin_ciq,
-    is_ciq_origin,
-    CASE WHEN mkt_origin_ciq THEN TRUE ELSE is_account_management END as is_account_manager,
-    CASE
-        WHEN is_ciq_origin THEN 'CIQ_FULL'
-        WHEN is_account_management THEN 'CIQ_MANAGER' END AS type_big_agent
-FROM
-    final_flags
-)
-SELECT
-    sk_house_listing,
-    id_house,
-    sk_quintoandar_consultant,
-    mkt_origin_ciq,
-    is_ciq_origin,
-    is_account_manager,
-    type_big_agent
-FROM
-    final_flags2
-WHERE (max_rev_uid_order = 1 OR max_rev_uid_order IS NULL)
+quintoandar_consultant_listings as
+((
+    SELECT
+        dhl.sk_house_listing,
+        CAST(JSON_EXTRACT_PATH_TEXT(House.details, 'houseExternalId') AS BIGINT) AS id_house,
+        CAST(JSON_EXTRACT_PATH_TEXT(Agent.details, 'userExternalId') AS BIGINT) AS sk_quintoandar_consultant,
+        lf.mkt_origin = 'CIQ' AS mkt_origin_ciq,
+        lf.mkt_origin = 'CIQ' AND  program.name='CIQ_FULL' AS is_ciq_origin,
+        CASE
+            WHEN lf.mkt_origin = 'CIQ'  THEN TRUE
+            ELSE program.name='CIQ_MANAGER'
+        END AS is_account_manager,
+        CASE
+            WHEN ccf.id_house_external IS NOT NULL THEN 'CIQ_FULL'
+            ELSE program.name
+        END AS type_big_agent,
+        'RENT' AS businesscontext
+    FROM
+        datalake_big_agent_clean_prod.House
+    LEFT JOIN
+        last_enrollment le
+            ON le.id_house =House.id
+    LEFT JOIN
+        datalake_big_agent_clean_prod.enrollment
+            ON enrollment.id=le.id_enrollment
+    LEFT JOIN
+        datalake_big_agent_clean_prod.Agent
+            ON agent.id=enrollment.id_agent
+    LEFT JOIN
+        datalake_big_agent_clean_prod.program
+            ON program.id=enrollment.id_program
+    LEFT JOIN
+        dim_house_listing dhl
+            ON dhl.id_house=JSON_EXTRACT_PATH_TEXT(House.details, 'houseExternalId')
+    LEFT JOIN
+        fact_house_listing_flows lf
+            ON dhl.id_house = lf.sk_house_listing/1000
+    LEFT JOIN
+        check_ciq_full ccf
+            ON ccf.id_house_external=JSON_EXTRACT_PATH_TEXT(House.details, 'houseExternalId')
+    )
+    UNION
+    (
+    SELECT DISTINCT
+        dl.sk_sale_listing,
+        i.id AS id_house,
+        pa.id_user AS sk_quintoandar_consultant,
+        lf.mkt_origin = 'CIQ' AS mkt_origin_ciq,
+        lf.mkt_origin = 'CIQ' AS is_ciq_origin,
+        CASE
+            WHEN lf.mkt_origin = 'CIQ'  THEN TRUE
+            ELSE FALSE
+        END AS is_account_manager,
+        'CIQ_FULL' AS type_big_agent,
+        'SALE' AS businesscontext
+    FROM
+        datalake_ebdb_raw_prod.imovel i
+    LEFT JOIN
+        datalake_ebdb_raw_prod.listingbusinesscontext lbc
+            ON i.id=lbc.imovelid
+    INNER JOIN
+        dim_partner_agent pa
+            ON pa.id_user=i.usuarioquecadastrou_id
+    LEFT JOIN
+        dim_partner dp
+            ON dp.id_partner=pa.id_partner
+    LEFT JOIN
+        house_change hc
+            ON hc.id=i.id
+    LEFT JOIN
+        sale.dim_listing dl
+            ON dl.sk_house=i.id
+    LEFT JOIN
+        sale.fact_listing_flows lf
+            ON LEFT(lf.sk_house_listing,9) = i.id
+    WHERE
+        businesscontext = 'SALE'
+        AND dp.type = 'AUTONOMOUS_AGENT'
+        AND i.externalid IS NOT NULL
+        AND hc.id IS NULL
+    ORDER BY 2
+))
+
+SELECT 
+    * 
+FROM 
+    quintoandar_consultant_listings
+ORDER BY
+    sk_house_listing
