@@ -1,0 +1,18 @@
+---
+dag_name: casa_mineira_crm
+
+source_root_path: "s3://casamineira.s3.forno.data.quintoandar.com.br/casamineira/"
+
+source_path_template: "s3://casamineira.s3.forno.data.quintoandar.com.br/casamineira/{table_name}/*.csv"
+
+job_extra_args:
+  consumer:
+    format: csv
+    options:
+      header: "true"
+  custom_records_per_file:
+    registro_exibicao: 2500000
+    registro_acesso: 1250000
+    imagem: 1000000
+    revisions: 1000000
+    imovel_atributo: 1000000
