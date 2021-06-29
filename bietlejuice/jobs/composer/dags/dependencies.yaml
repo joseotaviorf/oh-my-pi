@@ -387,9 +387,9 @@ bietlejuice.enrich_firestore:
   - bietlejuice.firestore:load-clean-sale-offer
 
 bietlejuice.enrich_customer_support:
-  - bietlejuice.chat_fup:load-chats-chat-to-datalake-clean
-  - bietlejuice.chat_fup:load-surveys-answer-to-datalake-clean
-  - bietlejuice.chat_fup:load-surveys-survey-to-datalake-clean
+  - bietlejuice.chat_fup:load-clean-chats-chat
+  - bietlejuice.chat_fup:load-clean-surveys-answer
+  - bietlejuice.chat_fup:load-clean-surveys-survey
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-reservations
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-events
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-events
