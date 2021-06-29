@@ -16,6 +16,9 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.services import FileService
+from bietlejuice.jobs.composer.services.configuration_service import (
+    ConfigurationService,
+)
 
 
 # ENV setup
@@ -54,11 +57,7 @@ CUSTOM_LIBRARIES = [
     }
 ]
 
-CONFIGS_YAML_PATH = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), "facebook_insights_config.yaml"
-)
-
-CONFIGS = FileService.get_dict_from_yaml_file(CONFIGS_YAML_PATH)
+config_service = ConfigurationService(MEDIA)
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -91,9 +90,9 @@ facebook_insights_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
                 SOURCE,
                 MEDIA,
                 DATALAKE_BUCKET,
-                json.dumps(CONFIGS["accounts"]["general"]),
-                json.dumps(CONFIGS["fields"]["general"]),
-                json.dumps(CONFIGS["breakdowns"]["general"]),
+                json.dumps(config_service.get_config("accounts_general")),
+                json.dumps(config_service.get_config("fields_general")),
+                json.dumps(config_service.get_config("breakdowns_general")),
                 "{{ ds }}",
             ],
         }
@@ -128,9 +127,9 @@ social_account_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
                 SOURCE,
                 SOCIAL_INSIGHTS_TABLE_NAME,
                 DATALAKE_BUCKET,
-                json.dumps(CONFIGS["accounts"]["social"]),
-                json.dumps(CONFIGS["fields"]["social"]),
-                json.dumps(CONFIGS["breakdowns"]["social"]),
+                json.dumps(config_service.get_config("accounts_social")),
+                json.dumps(config_service.get_config("fields_social")),
+                json.dumps(config_service.get_config("breakdowns_social")),
                 "{{ ds }}",
             ],
         }
