@@ -7,13 +7,12 @@ from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
-    QuintoAndarDatabricksSubmitRunOperator,
 )
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
-from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
-from bietlejuice.jobs.composer.services import FileService
+from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 
 
 ENV = os.environ.get("ENVIRONMENT")
@@ -33,7 +32,9 @@ DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{SOURCE}"
 BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}"
+RAW_SPARK_JOB_PATH = (
+    f"{S3_PREFIX}/spark_jobs/{SOURCE}/load_braze_analytics_into_datalake.py"
+)
 
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
@@ -46,6 +47,7 @@ CUSTOM_LIBRARIES = [
 
 APP_GROUPS = ["owners", "tenants"]
 IDENTIFIERS = ["campaign", "canvas"]
+PARTITION_COLS = ["year", "month", "day"]
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -70,72 +72,41 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-clean_sub_dag = DatalakeSubDAG(
-    dag_id=DAG_ID,
-    start_date=MAIN_START_DATE,
+task_group = DatalakeTaskGroup(
+    dag=dag,
     env=ENV,
     datalake_bucket=DATALAKE_BUCKET,
-    layer=LayerEnum.CLEAN,
-    database_base_name=SOURCE,
     relative_query_path=SOURCE,
-    spark_job_paths=BASE_SPARK_JOBS_PATH,
+    spark_jobs_path=BASE_SPARK_JOBS_PATH,
     athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
-    execution_timeout_hours=0.5,
 )
 
-file_list = FileService.list_sql_files_without_extension_from_layer(
-    SOURCE, LayerEnum.CLEAN.value
-)
-
-clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(
-    dag, file_list, is_incremental=True, partitions=["year", "month", "day"]
-)
-
-# Creating sub dags
+raw_task_groups = {}
 for app_group in APP_GROUPS:
     for identifier in IDENTIFIERS:
-        load_to_raw_task = QuintoAndarDatabricksSubmitRunOperator(
-            task_id=f"load-{identifier}-analytics-{app_group}-to-raw",
-            dag=dag,
-            json={
-                "spark_python_task": {
-                    "python_file": f"{SPARK_JOBS_PATH}/load_braze_analytics_into_datalake.py",
-                    "parameters": [
-                        ENV,
-                        SOURCE,
-                        DATALAKE_BUCKET,
-                        app_group,
-                        identifier,
-                        "{{ds}}",
-                    ],
-                }
-            },
+        parameters = [SOURCE, app_group, identifier, "{{ds}}"]
+        table_name = table_name = f"{identifier}_analytics_{app_group}"
+        raw_task_group = task_group.build_raw_task_group_for_single_table(
+            source=SOURCE,
+            table_name=table_name,
+            target_database_base_name=SOURCE,
+            extraction_spark_job_file=RAW_SPARK_JOB_PATH,
+            raw_spark_job_extra_args=parameters,
         )
+        raw_task_groups[table_name] = raw_task_group
 
-        sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
-            task_id=f"sync-hive-metastore-{identifier}-analytics-{app_group}",
-            dag=dag,
-            json={
-                "spark_python_task": {
-                    "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables.py",
-                    "parameters": [
-                        DATALAKE_BUCKET,
-                        LayerEnum.RAW.value,
-                        SOURCE,
-                        "--table-name",
-                        f"{identifier}_analytics_{app_group}",
-                    ],
-                }
-            },
-        )
+clean_task_groups = task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.CLEAN,
+    source_database_base_name=SOURCE,
+    target_database_base_name=SOURCE,
+    is_incremental=True,
+    partitions=PARTITION_COLS,
+)
 
-        airflow_helpers.chain(
-            load_to_raw_task, sync_metastore_table_task, terminate_cluster_task
-        )
+airflow_helpers.chain(
+    create_cluster_task, DatalakeTaskGroup.all_first_tasks(raw_task_groups)
+)
 
-        airflow_helpers.chain(
-            create_cluster_task,
-            load_to_raw_task,
-            clean_sub_dags.pop(f"{identifier}_analytics_{app_group}"),
-            terminate_cluster_task,
-        )
+TaskFlowHelper.chain_task_groups_via_common_table(raw_task_groups, clean_task_groups)
+
+terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
