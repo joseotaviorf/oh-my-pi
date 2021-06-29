@@ -445,7 +445,7 @@ bietlejuice.enrich_marketing_manual_daily_costs:
   - bietlejuice.marketing_manual_daily_costs:load-marketing-costs-manual-shared-costs-to-clean
 
 bietlejuice.enrich_nps_answer_drivers:
-  - bietlejuice.enrich_tracksale:load-answer-to-enrich
+  - bietlejuice.enrich_tracksale:load-enrich-answer
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-booking-in-data-lake
   - bietlejuice.ebdb:create-clean-offer-in-data-lake
