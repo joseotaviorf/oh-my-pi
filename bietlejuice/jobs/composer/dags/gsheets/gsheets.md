@@ -96,6 +96,8 @@ This pipeline produces the following output tables:
     - `weekday_holiday_share`
     - `weekday_holiday_share_supply`
     - `weekday_supply_channel_share`
+    - `sale_criteo_eng_ab_test`
+    - `rent_criteo_eng_ab_test`
 
 ### Responsible Data Engineering Team
 ​

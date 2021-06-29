@@ -370,3 +370,13 @@ weekday_supply_channel_share:
     sheet_id: 1Kq-1flAT8YljbtZOD4s1GV5AQg-kkbBrDNdeUtAKwGA
     sheet_name: weekday_supply_channel_share
     clean_table_name: weekday_supply_channel_share
+
+sale_criteo_eng_ab_test:
+    sheet_id: 1_Lbgnyz8-1BMs3eq6KteLCND1uvLbidzE1hXLAiVFmI
+    sheet_name: sale_criteo_eng_ab_test
+    clean_table_name: sale_criteo_eng_ab_test
+
+rent_criteo_eng_ab_test:
+    sheet_id: 17PonK69vjOYru-xD0acbVqD0bkl_LPuGodhR2AHmn5I
+    sheet_name: rent_criteo_eng_ab_test
+    clean_table_name: rent_criteo_eng_ab_test
