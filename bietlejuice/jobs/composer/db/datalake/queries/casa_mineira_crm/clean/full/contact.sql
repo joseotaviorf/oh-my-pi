@@ -1,0 +1,19 @@
+SELECT
+    id, 
+    cliente_id AS id_customer,
+    imovel_id AS id_house,
+    midia_id AS id_media, 
+    origem_id AS id_origin, 
+    usuario_atendimento_id AS id_user_attendance, 
+    usuario_encaminhamento_id AS id_user_forwarding,
+    usuario_rejeicao_id AS id_user_rejection,
+    criado_por AS created_by,
+    email,
+    telefone AS phone_number, 
+    token,
+    CAST(automatizado AS BOOLEAN) AS is_automated,
+    CAST(atendimento_em AS TIMESTAMP) AS ts_attended,
+    CAST(rejeitado_em AS TIMESTAMP) AS ts_rejected
+FROM 
+    datalake_casa_mineira_crm_raw.contato
+
