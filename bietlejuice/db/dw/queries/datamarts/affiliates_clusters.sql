@@ -12,7 +12,7 @@ WITH date_month_range as (
 metrics AS(
     SELECT
         dt.month_start,
-        DATE(dua.ts_created) AS created_date,
+        DATE(dua.ts_joined_program) AS joined_program_date,
         dua.sk_user,
         dua.type,
         COUNT(CASE WHEN llf.sk_lead_date > 0 AND dtl.date BETWEEN dt.month_start AND dt.month_end AND llf.context_lead = 'Rent' THEN 1 ELSE NULL END) AS rent_lead,
@@ -26,7 +26,7 @@ metrics AS(
     FROM
         dim_user_affiliate dua
     LEFT JOIN date_month_range dt
-        ON dt.month_start BETWEEN DATE_TRUNC('month', dua.ts_created) AND current_date
+        ON dt.month_start BETWEEN DATE_TRUNC('month', dua.ts_joined_program) AND current_date
     LEFT JOIN datamarts.lead_listing_flows llf
         ON dua.sk_user = llf.sk_user_lead_affiliate
     LEFT JOIN dim_date dtl
@@ -52,8 +52,14 @@ SELECT
     TO_CHAR(DATE(month_start), 'YYYY/MM') AS year_month,
     sk_user,
     type,
-    created_date,
+    joined_program_date,
+    rent_lead,
+    sale_lead,
+    hybrid_lead,
     total_lead,
+    rent_prospect,
+    sale_prospect,
+    hybrid_prospect,
     total_prospect,
     lead_prev_month,
     prospect_prev_month,
@@ -61,11 +67,11 @@ SELECT
     acum_prospect,
     CASE
         WHEN sk_user IN (360754,912255,1711931,2257503) THEN 'Spinver'
-        WHEN DATE_TRUNC('month', created_date) = DATE_TRUNC('month', month_start) THEN 'Novo usuário'
-        WHEN DATE_TRUNC('month', created_date) < DATE_TRUNC('month', month_start) AND acum_lead = total_lead AND acum_prospect = total_prospect AND prospect_prev_month = 0 THEN 'Nunca Ativo em Lead'
-        WHEN DATE_TRUNC('month', created_date) < DATE_TRUNC('month', month_start) AND acum_lead > total_lead AND acum_prospect = total_prospect AND prospect_prev_month = 0 THEN 'Nunca Ativo em Prospect'
-        WHEN DATE_TRUNC('month', created_date) < DATE_TRUNC('month', month_start) AND acum_lead > total_lead AND acum_lead > 0 AND acum_prospect > 0 AND prospect_prev_month = 0 THEN 'Inativo'
-        WHEN DATE_TRUNC('month', created_date) < DATE_TRUNC('month', month_start) AND prospect_prev_month > 0 THEN 'Ativo no periodo anterior'
+        WHEN DATE_TRUNC('month', joined_program_date) = DATE_TRUNC('month', month_start) THEN 'Novo usuário'
+        WHEN DATE_TRUNC('month', joined_program_date) < DATE_TRUNC('month', month_start) AND acum_lead = total_lead AND acum_prospect = total_prospect AND prospect_prev_month = 0 THEN 'Nunca Ativo em Lead'
+        WHEN DATE_TRUNC('month', joined_program_date) < DATE_TRUNC('month', month_start) AND acum_lead > total_lead AND acum_prospect = total_prospect AND prospect_prev_month = 0 THEN 'Nunca Ativo em Prospect'
+        WHEN DATE_TRUNC('month', joined_program_date) < DATE_TRUNC('month', month_start) AND acum_lead > total_lead AND acum_lead > 0 AND acum_prospect > 0 AND prospect_prev_month = 0 THEN 'Inativo'
+        WHEN DATE_TRUNC('month', joined_program_date) < DATE_TRUNC('month', month_start) AND prospect_prev_month > 0 THEN 'Ativo no periodo anterior'
         ELSE NULL
     END AS cluster
 FROM calculated_metrics
