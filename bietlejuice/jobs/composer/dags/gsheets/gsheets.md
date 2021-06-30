@@ -23,14 +23,28 @@ This pipeline produces the following output tables:
     - All gsheets defined in `gsheets_files.yaml`
 
 2. Data lake clean:
+    - `affiliates_monthly_expected_results`
+    - `agents_control`
     - `auxiliary_region`
+    - `branding_where_is_plaquinha`
     - `census_subnormal_crowding_areas`
     - `ciq_costs`
+    - `city_share`
+    - `contact_type_taxonomy`
+    - `contract_attribution_models`
+    - `costs_allocation_relative_indexes`
+    - `criteo_abtest_rj`
+    - `crm_iptu_wave4`
+    - `daily_target_supply_rental`
+    - `daily_target_supply_sale`
     - `deduplicate_batch_listings_forsale`
     - `demand_channel_share`
     - `demand_targets_2019`
     - `demand_targets_2020`
     - `demand_targets_2021`
+    - `demand_targets_replanning`
+    - `department_control`
+    - `department_schedule`
     - `entrance_inspection_csat`
     - `exit_inspection_csat`
     - `from_to_cancellation`
@@ -40,23 +54,25 @@ This pipeline produces the following output tables:
     - `marketing_costs_campaign_city`
     - `marketing_costs_full_taxonomy`
     - `marketing_costs_google_ad_type_flags`
-    - `marketing_manual_campaign_cities`
     - `marketing_costs_kenshoo_configuration`
     - `marketing_costs_manual_costs_google`
-    - `marketing_costs_manual_shared_costs`
-    - `marketing_costs_name_convention_shared_costs`
     - `marketing_costs_national_affiliate_historical_costs`
+    - `marketing_kenshoo_configuration`
+    - `marketing_manual_campaign_cities`
     - `marketing_manual_costs_google`
-    - `marketing_offline_budget`
-    - `marketing_offline_manual_costs`
-    - `marketing_offline_manual_share_city_group`
-    - `marketing_offline_manual_share_cost_center`
     - `mkt_cost_per_source`
+    - `mta_budget_october_2020`
     - `offers_hub_central`
+    - `offline_and_branding_marketing_costs`
+    - `offline_manual_costs`
+    - `offline_manual_share_city_group`
+    - `offline_manual_share_cost_center`
     - `owner_entrance_inspection_csat`
     - `owner_exit_inspection_csat`
-    - `photos_recovery_common_area_facade`
     - `projreparos_espelhamento_dl`
+    - `promotional_bonus_segmentation_targets`
+    - `promotional_bonus_user_targets`
+    - `rent_criteo_eng_ab_test`
     - `rental_cohort_demand`
     - `rental_cohort_supply`
     - `rental_flows_targets`
@@ -65,6 +81,8 @@ This pipeline produces the following output tables:
     - `rental_tof_daily_targets`
     - `rental_tof_monthly_targets`
     - `rental_tof_weekly_targets`
+    - `retention_exclusivity_active_contact`
+    - `sale_criteo_eng_ab_test`
     - `sale_demand_targets`
     - `sale_flows_targets`
     - `sale_nbp_source_targets`
@@ -78,27 +96,28 @@ This pipeline produces the following output tables:
     - `supply_targets_2019`
     - `supply_targets_2020`
     - `supply_targets_2021`
-    - `survival_estimation`
     - `survival_estimation_new_version`
-    - `target_sale_cohort_demand`
-    - `target_sale_cohort_supply`
-    - `target_supply_and_demand_autonomous_agent`
+    - `survival_estimation`
     - `targets_acquisition_cumulative_autonomous_agent`
     - `targets_agents_engagement`
+    - `target_sale_cohort_demand`
+    - `target_sale_cohort_supply`
     - `targets_avg_ticket_adm_fee`
     - `targets_nr_bf_er_or`
+    - `target_supply_and_demand_autonomous_agent`
     - `taxonomy_affiliates`
     - `taxonomy_demand`
+    - `taxonomy_mkt_cost_new_test`
+    - `taxonomy_mkt_cost`
     - `tenant_entrance_inspection_csat`
-    - `week_volumes_demand`
-    - `week_volumes_supply`
+    - `users_cx_plaquinhas`
     - `weekday_demand_share`
     - `weekday_holiday_share`
     - `weekday_holiday_share_supply`
     - `weekday_supply_channel_share`
-    - `sale_criteo_eng_ab_test`
-    - `rent_criteo_eng_ab_test`
-
+    - `week_volumes_demand`
+    - `week_volumes_supply`
+                           
 ### Responsible Data Engineering Team
 ​
 For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the 

@@ -1,0 +1,13 @@
+SELECT
+    sk_date,
+    sk_user_lead_affiliate,
+    ltv,
+    avg_daily_prospects_last_6_months,
+    avg_p2fl_last_6_months,
+    avg_p2q_last_6_months,
+    avg_rent_value_last_6_months,
+    cluster,
+    expected_indications,
+    survival_prob
+FROM
+    datalake_gsheets_raw.ltvoutput

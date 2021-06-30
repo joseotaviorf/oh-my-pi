@@ -1,0 +1,21 @@
+SELECT
+    budget,
+    city_group,
+    contracts_signed_target,
+    credit_approved_target,
+    doc_completed_target,
+    doc_sent_target,
+    first_offer_sent_target,
+    mkt_channel,
+    mkt_medium,
+    mkt_source,
+    new_rent_flows_target,
+    new_tenant_prospects_target,
+    offer_accepted_target,
+    offer_sent_target,
+    visits_booked_target,
+    visits_completed_target,
+    week_start,
+    date
+FROM
+    datalake_gsheets_raw.demand_targets_replanning

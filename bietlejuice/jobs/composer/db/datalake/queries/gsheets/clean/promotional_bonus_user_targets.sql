@@ -1,0 +1,9 @@
+SELECT
+    sk_user,
+    bonus_base,
+    bonus_boost,
+    target_base,
+    target_boost,
+    year_month
+FROM
+    datalake_gsheets_raw.promotional_bonus_user_targets

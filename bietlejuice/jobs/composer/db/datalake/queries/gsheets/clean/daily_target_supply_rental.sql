@@ -1,0 +1,21 @@
+SELECT
+    concat_cost,
+    concat_prospects,
+    concat_qualifieds,
+    concat_date,
+    cost_per_source,
+    prospects,
+    qualifieds,
+    city_group,
+    supply_channel,
+    supply_medium,
+    supply_origin,
+    supply_source,
+    tier,
+    week_start,
+    quarter,
+    halfyear,
+    month,
+    date
+FROM
+    datalake_gsheets_raw.base_supply_souce_for_rent

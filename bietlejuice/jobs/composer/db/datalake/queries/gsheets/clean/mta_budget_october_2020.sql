@@ -1,0 +1,10 @@
+SELECT
+    budget,
+    city_group,
+    mkt_medium,
+    mkt_source,
+    is_blocked_budget,
+    week_start,
+    month
+FROM
+    datalake_gsheets_raw.mta_budget

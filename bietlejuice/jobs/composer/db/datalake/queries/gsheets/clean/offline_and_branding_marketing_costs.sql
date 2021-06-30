@@ -1,0 +1,16 @@
+SELECT
+    sk_date,
+    business_context,
+    city_group,
+    cost,
+    funnel_side,
+    mkt_category,
+    mkt_channel,
+    mkt_completion,
+    mkt_flow,
+    mkt_medium,
+    mkt_origin,
+    mkt_source,
+    utm_campaign
+FROM
+    datalake_gsheets_raw.offline_and_branding_marketing_costs

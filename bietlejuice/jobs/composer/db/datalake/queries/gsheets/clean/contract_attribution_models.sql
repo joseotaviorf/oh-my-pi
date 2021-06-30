@@ -1,0 +1,12 @@
+SELECT
+    channel,
+    city,
+    first_interaction,
+    last_interaction,
+    last_non_direct,
+    linear,
+    markov,
+    u_shape,
+    month
+FROM
+    datalake_gsheets_raw.contract_attribution_models

@@ -9,5 +9,5 @@ SELECT
     cpf,
     situacao AS agent_status,
     DATE(data_inicio) AS dt_start
-FROM    
+FROM
     datalake_gsheets_raw.agents_control

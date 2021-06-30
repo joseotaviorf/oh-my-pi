@@ -1,0 +1,10 @@
+SELECT
+    affiliate_type,
+    bonus_base,
+    bonus_boost,
+    segmentation,
+    target_base,
+    target_boost,
+    year_month
+FROM
+    datalake_gsheets_raw.promotional_bonus_segmentation_targets

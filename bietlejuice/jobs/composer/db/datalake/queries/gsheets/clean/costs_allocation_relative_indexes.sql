@@ -1,0 +1,10 @@
+SELECT
+    cost_definition,
+    cost_funnel,
+    cost_type,
+    mkt_origin,
+    relative_value_fr_fs,
+    month_start,
+    month_end
+FROM
+    datalake_gsheets_raw.costs_allocation_relative_indexes

@@ -1,0 +1,11 @@
+SELECT
+    id_braze,
+    cpf,
+    email,
+    type,
+    variant_entered,
+    wave,
+    is_gmail_hotmail,
+    date_import
+FROM
+    datalake_gsheets_raw.crm_iptu_wave4
