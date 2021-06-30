@@ -11,5 +11,3 @@ SELECT
   NOW() AS ts_load
 FROM 
   datalake_gsheets_clean.department_control
-WHERE
-  LOWER(front_or_back) <> 'back'
