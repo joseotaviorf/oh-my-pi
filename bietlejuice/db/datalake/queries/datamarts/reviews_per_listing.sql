@@ -1,6 +1,6 @@
 with
 reviews as (
-    select reviewed_id as visit_code,
+    select id_reviewed as visit_code,
         cast(max(case when feature.name='painting' then rating_selected[1] else null end) as bigint) as painting,
         cast(max(case when feature.name='costbenefit' then rating_selected[1] else null end) as bigint) as costbenefit,
         cast(max(case when feature.name='listingfidelity' then rating_selected[1] else null end) as bigint) as listingfidelity,
@@ -10,11 +10,11 @@ reviews as (
         cast(max(case when feature.name='naturallight' then rating_selected[1] else null end) as bigint) as naturallight,
         cast(max(case when feature.name='indoorsilence' then rating_selected[1] else null end) as bigint) as indoorsilence
         
-    from datalake_insider_raw_prod.review as review
-    inner join datalake_insider_raw_prod.review_feature as feature_rev on review.id = feature_rev.review_id
-    inner join datalake_insider_raw_prod.feature as feature on feature_rev.feature_id = feature.id
+    from datalake_insider_clean_prod.review as review
+    inner join datalake_insider_clean_prod.review_feature as feature_rev on review.id = feature_rev.id_review
+    inner join datalake_insider_clean_prod.feature as feature on feature_rev.id_feature = feature.id
     where review.status = 'DONE' AND review.type = 'tenant_visit'
-    group by reviewed_id
+    group by id_reviewed
 ),
 reviews_by_house as (
   select
