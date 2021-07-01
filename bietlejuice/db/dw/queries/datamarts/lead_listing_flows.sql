@@ -23,10 +23,12 @@ SELECT
 	hl.sk_user_house_registrant,
 	hl.is_b2b,
     CASE
-        WHEN hl.mkt_origin = 'CIQ' AND ciq.type_big_agent = 'CIQ_FULL'
+        WHEN ciq.businesscontext= 'RENT' AND ciq.type_big_agent = 'CIQ_FULL'
             THEN 'CIQ'
-        WHEN hl.mkt_origin = 'CIQ' AND ciq.type_big_agent = 'CIQ_MANAGER'
+        WHEN hl.mkt_origin = 'CIQ' AND ciq.businesscontext= 'RENT' AND ciq.type_big_agent = 'CIQ_MANAGER'
             THEN 'Backend'
+        WHEN hl.mkt_origin = 'CIQ' AND ciq.type_big_agent IS NULL
+            THEN 'Other'
         ELSE hl.mkt_origin
     END AS mkt_origin
 FROM fact_house_listing_flows hl
@@ -91,6 +93,38 @@ source_ops_rent AS (
 	    LEFT JOIN  sale.fact_listing_flows ssf
 	        ON hlf.sk_house_listing_flow = ssf.sk_house_listing_flow
 ),
+sale_fact_listing_flows_adjust AS (
+SELECT
+    hl.sk_house_listing_flow,
+    hl.sk_lead,
+    hl.sk_house_listing,
+    hl.sk_region,
+    hl.mkt_completion,
+    hl.has_isales_intervention,
+    hl.sk_lead_date,
+    hl.sk_prospect_date,
+    hl.sk_qualified_date,
+    hl.sk_opportunity_date,
+    hl.sk_first_listing_date,
+    hl.sk_first_contact_date,
+    hl.lead_origin,
+	hl.funnel_drop_reason,
+	hl.mkt_channel,
+	hl.mkt_source,
+	hl.mkt_medium,
+	hl.lead_context_origin,
+	hl.sk_user_lead_affiliate,
+	hl.sk_user_house_registrant,
+	hl.is_b2b,
+    CASE
+        WHEN  ciq.type_big_agent = 'CIQ_FULL'
+            THEN 'CIQ'
+        ELSE hl.mkt_origin
+    END AS mkt_origin
+FROM sale.fact_listing_flows hl
+LEFT JOIN datamarts.quintoandar_consultant_listings ciq
+	        ON ciq.sk_house_listing = hl.sk_house_listing AND ciq.businesscontext='SALE'
+),
 source_ops_sale AS (
 	with
 	photo_job AS (
@@ -139,7 +173,7 @@ source_ops_sale AS (
 	        ssf.lead_origin,
 	        ssf.funnel_drop_reason,
 	        sk_first_photo_job_date
-	FROM sale.fact_listing_flows ssf
+	FROM sale_fact_listing_flows_adjust ssf
 	    JOIN dim_lead dl
 	        ON dl.sk_lead = ssf.sk_lead
 	    LEFT JOIN quintoandar.dim_user_sales_rep du
@@ -180,7 +214,7 @@ fact_sale AS (
 	    ssf.has_isales_intervention,
 	    ssf.sk_user_lead_affiliate,
 	    'Sale' AS origin_table
-	FROM sale.fact_listing_flows ssf
+	FROM sale_fact_listing_flows_adjust ssf
 	JOIN source_ops_sale AS sor
 	  ON sor.sk_house_listing_flow = ssf.sk_house_listing_flow
 ),

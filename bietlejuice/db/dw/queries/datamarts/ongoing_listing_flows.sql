@@ -9,7 +9,7 @@ with
         f.status_history,
         CASE
             WHEN dhl.is_b2b = TRUE THEN 'B2B'
-            WHEN ciq.sk_house_listing IS NOT NULL THEN 'CIQ'
+            WHEN ciq.type_big_agent IS NOT NULL AND ciq.businesscontext='RENT' THEN 'CIQ'
             WHEN dhl.is_b2b = FALSE OR ciq.sk_house_listing IS NULL THEN 'Core'
         END AS is_b2b,
         d.date,
@@ -94,7 +94,7 @@ with
         d.month_end,
         CASE
             WHEN dhl.is_b2b = TRUE THEN 'B2B'
-            WHEN ciq.sk_house_listing IS NOT NULL THEN 'CIQ'
+            WHEN ciq.type_big_agent IS NOT NULL AND ciq.businesscontext='RENT' THEN 'CIQ'
             WHEN dhl.is_b2b = FALSE OR ciq.sk_house_listing IS NULL THEN 'Core'
         END AS is_b2b,
         f.status_history,
