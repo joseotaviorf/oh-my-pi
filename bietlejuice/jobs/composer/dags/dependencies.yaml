@@ -69,10 +69,11 @@ bietlejuice.dw_invoice_entries:
   - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
   - bietlejuice.ebdb:create-clean-rent-flow-in-data-lake
   - bietlejuice.ebdb:create-clean-user-in-data-lake
-  - bietlejuice.retsuko:load-account-to-clean
-  - bietlejuice.retsuko:load-contract-to-clean
-  - bietlejuice.retsuko:load-entry-to-clean
-  - bietlejuice.retsuko:load-invoice-to-clean
+  - bietlejuice.retsuko:load-clean-account
+  - bietlejuice.retsuko:load-clean-contract
+  - bietlejuice.retsuko:load-clean-entry
+  - bietlejuice.retsuko:load-clean-invoice
+  - bietlejuice.enrich_retsuko:load-enrich-invoice
 
 bietlejuice.dw_marketing_costs:
   - bietlejuice.enrich_marketing_costs.load-google-keywords-performance-report-to-enrich:load-enrich-google-keywords-performance-report
@@ -406,10 +407,10 @@ bietlejuice.enrich_customer_support:
 
 bietlejuice.enrich_invoice:
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
-  - bietlejuice.retsuko:load-account-to-clean
-  - bietlejuice.retsuko:load-contract-to-clean
-  - bietlejuice.retsuko:load-entry-to-clean
-  - bietlejuice.retsuko:load-invoice-to-clean
+  - bietlejuice.retsuko:load-clean-account
+  - bietlejuice.retsuko:load-clean-contract
+  - bietlejuice.retsuko:load-clean-entry
+  - bietlejuice.retsuko:load-clean-invoice
 
 bietlejuice.enrich_kill_queue:
   - bietlejuice.kill_queue:load-house-to-datalake-clean
@@ -481,9 +482,9 @@ bietlejuice.enrich_region:
   - bietlejuice.gsheets:load-auxiliary-region-to-clean
 
 bietlejuice.enrich_retsuko:
-  - bietlejuice.retsuko:load-account-to-clean
-  - bietlejuice.retsuko:load-entry-to-clean
-  - bietlejuice.retsuko:load-invoice-to-clean
+  - bietlejuice.retsuko:load-clean-account
+  - bietlejuice.retsuko:load-clean-entry
+  - bietlejuice.retsuko:load-clean-invoice
 
 bietlejuice.enrich_robin_hood:
   - bietlejuice.robin_hood:load-accounting-entry-to-datalake-clean

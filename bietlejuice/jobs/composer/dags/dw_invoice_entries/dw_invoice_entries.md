@@ -17,6 +17,8 @@ More information about run time [here]({chart_url}{dag_id}).
 ​
 This pipeline produces the following output model, in DW schema `payment`, via full load:​​
 
+- `dim_invoice`
+- `dim_invoice_entry`
 - `fact_invoice_entries`
 ​
 ### Responsible Data Teams
