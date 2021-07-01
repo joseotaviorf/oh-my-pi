@@ -22,6 +22,7 @@ SELECT
     paganteIptu AS paying_iptu,
     valorCondominio AS condo_price,
     valorIptu AS value_iptu, -- force to memory: column name repeated
+    priceindextype AS price_index_type,
     enviadoAvisoDeIGPMEm AS ts_igpm_notice_sent,
     autoIgpm AS is_auto_igpm,
     admFeeChargeType AS adm_fee_charge_type,
