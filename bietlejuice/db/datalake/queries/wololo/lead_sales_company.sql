@@ -1,17 +1,17 @@
 with
 lead_revision as (
     select
-      referenceid as id_lead,
-      dimensionentity_id,
-      salescompany as sales_company,
-      from_unixtime(info.revtstmp/1000) as rev_datetime,
+      id_reference as id_lead,
+      id_dimension_entity,
+      sales_company,
+      ts_rev as rev_datetime,
       info.rev,
-      min(from_unixtime(info.revtstmp/1000)) over (partition by referenceid) as insert_time,
-      case when lag (salescompany) over (partition by referenceid order by from_unixtime(info.revtstmp/1000) asc) <> salescompany then true else false end as flag_change_sales_company
-    from datalake_wololo_raw_prod.prospect_aud p
-      join datalake_wololo_raw_prod.prospectdimension_aud pd_aud
+      min(ts_rev) over (partition by id_reference) as insert_time,
+      case when lag (sales_company) over (partition by id_reference order by ts_rev asc) <> sales_company then true else false end as flag_change_sales_company
+    from datalake_wololo_clean_prod.prospect_aud p
+      join datalake_wololo_clean_prod.prospect_dimension_aud pd_aud
           on p.dimensionentity_id =  pd_aud.id
-      join datalake_wololo_raw_prod.revinfo info
+      join datalake_wololo_clean_prod.rev_info info
          on pd_aud.rev = info.rev
 ),
 last_change_company as (
