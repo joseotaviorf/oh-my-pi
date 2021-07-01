@@ -85,7 +85,7 @@ with
     delete_documents_repeated as (
         select
             max(cons.id) as max_id,
-            nullif(regexp_extract(cons.company_use, '(\\d+\\D\\d{4})\d*', 1), '') as id_company_use,
+            nullif(regexp_extract(cons.company_use, '(\\d+\\D\\d{{4}})\d*', 1), '') as id_company_use,
             company_use,
             cons.ts_created,
             cons.ts_issued,
@@ -150,7 +150,7 @@ with
             case when related_document_type = 'payment-request' then coalesce(cast(id_related_document as bigint), -1)
                 else -1
             end as sk_payment_request,
-            coalesce(cast(nullif(regexp_extract(company_use_code, '(\\d+)\\D\\d{4}\\d*'),'') as bigint), -1) as sk_contract,
+            coalesce(cast(nullif(regexp_extract(company_use_code, '(\\d+)\\D\\d{{4}}\\d*'),'') as bigint), -1) as sk_contract,
             coalesce(company_use_code, -1) as sk_company_use,
             coalesce(occurrence_code, -1) as sk_occurrence_code,
             coalesce(payer_document, -1) as sk_charge_payer_user,

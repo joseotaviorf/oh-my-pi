@@ -103,7 +103,7 @@ with
     delete_documents_repeated as (
         select
             max(cons.id) as max_id,
-            nullif(regexp_extract(cons.company_use, '(\\d+\\D\\d{4})\d*', 1), '') as id_company_use,
+            nullif(regexp_extract(cons.company_use, '(\\d+\\D\\d{{4}})\d*', 1), '') as id_company_use,
             company_use,
             cons.ts_created,
             cons.ts_issued,
@@ -148,7 +148,7 @@ with
                     nullif(regexp_extract(company_use, '^\\d+(\\D+)', 1), '') 
                 else null
             end as rental_user,
-            nullif(regexp_extract(id_company_use, '\\d+\\D(\\d{4})', 1), '') as accrual_year_month
+            nullif(regexp_extract(id_company_use, '\\d+\\D(\\d{{4}})', 1), '') as accrual_year_month
         from vans_payments
     ),
     map_column_values as (
@@ -189,8 +189,8 @@ with
                 id_company_use,
                 type as tp,
                 accrual_year_month,
-                cast(regexp_extract(accrual_year_month, '(\\d{2})(\\d{2})', 1) as int) as year,
-                cast(regexp_extract(accrual_year_month, '(\\d{2})(\\d{2})', 2) as int) as month
+                cast(regexp_extract(accrual_year_month, '(\\d{{2}})(\\d{{2}})', 1) as int) as year,
+                cast(regexp_extract(accrual_year_month, '(\\d{{2}})(\\d{{2}})', 2) as int) as month
             from enriched_vans_payments
         )
         where accrual_year_month is not null

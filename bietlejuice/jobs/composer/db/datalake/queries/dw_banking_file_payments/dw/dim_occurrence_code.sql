@@ -258,8 +258,8 @@ with
     )
     select
         *,
-        regexp_extract(name,'(\\w{2})?(\\w{2})?(\\w{2})', 3) as last_code,
-        regexp_extract(name,'(\\w{2})?(\\w{2})(\\w{2})', 2) as second_last_code,
-        regexp_extract(name,'(\\w{2})(\\w{2})(\\w{2})', 1) as third_last_code,
+        regexp_extract(name,'(\\w{{2}})?(\\w{{2}})?(\\w{{2}})', 3) as last_code,
+        regexp_extract(name,'(\\w{{2}})?(\\w{{2}})(\\w{{2}})', 2) as second_last_code,
+        regexp_extract(name,'(\\w{{2}})(\\w{{2}})(\\w{{2}})', 1) as third_last_code,
         now() as ts_load
     from codes

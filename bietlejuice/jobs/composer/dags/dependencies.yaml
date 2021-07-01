@@ -16,6 +16,14 @@ bietlejuice.dw_banking:
   - bietlejuice.ebdb:create-clean-account-transaction-in-data-lake
   - bietlejuice.ebdb:create-clean-user-in-data-lake
 
+bietlejuice.dw_banking_file_payments:
+  - bietlejuice.vans:load-clean-boleto
+  - bietlejuice.vans:load-clean-payment
+  - bietlejuice.vans:load-clean-payment-boleto
+  - bietlejuice.vans:load-clean-bank-boleto
+  - bietlejuice.vans:load-clean-bank
+  - bietlejuice.vans:load-clean-bank-payment
+
 bietlejuice.dw_booking:
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.ebdb:create-clean-visit-in-data-lake
