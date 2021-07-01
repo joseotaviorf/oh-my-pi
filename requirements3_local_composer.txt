@@ -114,6 +114,7 @@ opt-einsum==3.2.1
 pandas==0.25.3
 pandas-gbq==0.13.1
 pbr==5.4.3
+pconf==1.6.0
 pendulum==1.4.4
 pipdeptree==1.0.0
 prison==0.1.3
