@@ -35,6 +35,7 @@ Produces the following output tables, through full load:
     - `folder_type`
     - `rev_info`
     - `simulation`
+    - `simulation_user`
     - `user_tenant_flow`
 
 ### Responsible Data Teams
