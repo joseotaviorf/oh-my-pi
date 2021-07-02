@@ -10,7 +10,7 @@ lead_revision as (
       case when lag (sales_company) over (partition by id_reference order by ts_rev asc) <> sales_company then true else false end as flag_change_sales_company
     from datalake_wololo_clean_prod.prospect_aud p
       join datalake_wololo_clean_prod.prospect_dimension_aud pd_aud
-          on p.dimensionentity_id =  pd_aud.id
+          on p.id_dimension_entity =  pd_aud.id
       join datalake_wololo_clean_prod.rev_info info
          on pd_aud.rev = info.rev
 ),
