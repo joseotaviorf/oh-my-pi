@@ -23,6 +23,7 @@ This pipeline produces the following output tables:
     - All gsheets defined in `gsheets_files.yaml`
 
 2. Data lake clean:
+    - `affiliate_type_targets`
     - `affiliates_monthly_expected_results`
     - `agents_control`
     - `auxiliary_region`
@@ -50,6 +51,7 @@ This pipeline produces the following output tables:
     - `from_to_cancellation`
     - `hotjar_photos_repressed_demand`
     - `inspection_bugs`
+    - `inspectors_control`
     - `local_holidays`
     - `marketing_costs_campaign_city`
     - `marketing_costs_full_taxonomy`
@@ -117,7 +119,7 @@ This pipeline produces the following output tables:
     - `weekday_supply_channel_share`
     - `week_volumes_demand`
     - `week_volumes_supply`
-                           
+
 ### Responsible Data Engineering Team
 ​
 For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the 

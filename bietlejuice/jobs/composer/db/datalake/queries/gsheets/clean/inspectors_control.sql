@@ -1,0 +1,27 @@
+SELECT
+    sk_inspector,
+    agenda_type,
+    beneficiary_document,
+    beneficiary_name,
+    company,
+    employee_contract_type,
+    inspector_address,
+    inspector_cnpj,
+    inspector_corporate_name,
+    inspector_cpf,
+    inspector_name,
+    inspector_phone,
+    inspector_rg,
+    inspector_secondary_phone,
+    insperctor_email,
+    main_operating_region,
+    operating_city,
+    operating_regions,
+    registry_type,
+    salary,
+    status,
+    transportation_type,
+    dt_start,
+    dt_end
+FROM
+    datalake_gsheets_raw.inspectors_control

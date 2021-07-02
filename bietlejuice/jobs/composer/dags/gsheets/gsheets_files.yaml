@@ -6,6 +6,11 @@
 #     clean_table_name: <clean_table_name>
 #     cron: 1,9,17 (optional and limited to 1,9 and 17)
 
+affiliate_type_targets:
+    sheet_id: 1dK5zcAgTcFg8KaNU3FEiZbHJOBw1DuTwdFhiqGZBETE
+    sheet_name: affiliate_type_targets
+    clean_table_name: affiliate_type_targets
+
 agents_control:
     sheet_id: 1wIwrWi0xlY4TAZnE6JlGm6B0UyezOPxfF5s0_pn-i9E
     sheet_name: Agents Control
@@ -160,6 +165,11 @@ hotjar_demanda_reprimida_fotos:
     sheet_id: 1aP3ir1aAPLpzGwbRiS16UH1iTtTQPJbaKz0CcLIbTdc
     sheet_name: demanda_reprimida_fotos
     clean_table_name: hotjar_photos_repressed_demand
+
+inspectors_control:
+    sheet_id: 1cFwadBcEkIoC9zpGQNV7iA1Ii0fZmln5mRbB0LaW4zw
+    sheet_name: inspectors_control
+    clean_table_name: inspectors_control
 
 kenshoo_configuration:
     sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
