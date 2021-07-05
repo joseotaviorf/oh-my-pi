@@ -17,15 +17,17 @@ JOB_NAME = "load_oscar_into_datalake"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-BLOCK_LIST = ["pg_stat_statements", "flyway_schema_history"]
-
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
+    parser.add_argument("tables_block_list")
     args = parser.parse_args()
     environment = args.env
     datalake_bucket = args.datalake_bucket
+    tables_block_list = args.tables_block_list
+
+    tables_block_list = json.loads(tables_block_list)
 
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
@@ -52,7 +54,7 @@ if __name__ == "__main__":
     for table in tables:
         df = postgres_consumer.get_data_from_table(table.table_name)
 
-        if table.table_name not in BLOCK_LIST:
+        if table.table_name not in tables_block_list:
             df = postgres_consumer.get_data_from_table(table.table_name)
             # the table names in the datalake must be lowercase
             s3_loader.load_full_table(
