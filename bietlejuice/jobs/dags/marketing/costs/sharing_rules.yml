@@ -81,3 +81,7 @@ s019s:
 d020d:
   query: marketing/costs/d020d.sql
   funnel_side: demand
+
+d021d:
+  query: marketing/costs/d021d.sql
+  funnel_side: demand
