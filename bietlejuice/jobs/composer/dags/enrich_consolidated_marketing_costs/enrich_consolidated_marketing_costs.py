@@ -3,42 +3,40 @@ import pendulum
 import os
 
 from airflow.models import DAG, Variable
+from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
-from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
+from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
-from bietlejuice.jobs.composer.services import FileService
+from bietlejuice.jobs.composer.base.airflow.helpers import TaskFlowHelper
 
-SOURCE = "consolidated_marketing_costs"
-DAG_NAME = f"enrich_{SOURCE}"
-DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = os.environ.get("ENVIRONMENT")
 
+CONTEXT = "consolidated_marketing_costs"
+DAG_NAME = f"enrich_{CONTEXT}"
+DAG_ID = f"bietlejuice.{DAG_NAME}"
+
+PARTITION_COLS = ["id_date"]
+
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
-S3_MARKETING_PATH = Variable.get("datalake_marketing_bucket")
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/enrich_{SOURCE}/"
+SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
-ARTIFACTS_S3_BUCKET = Variable.get("artifacts_default_bucket")
 
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
     Variable.get("databricks_s3_bucket"), DAG_ID
 )
 CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_bietlejuice_marketing_costs_cluster", deserialize_json=True
+    "databricks_compute_optimized_cluster", deserialize_json=True
 )
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
-local_tz = pendulum.timezone("America/Sao_Paulo")
-MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz)
+MAIN_START_DATE = datetime(2019, 5, 31, tzinfo=pendulum.timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = None
-
-EXECUTION_TIMEOUT_HOURS = 3
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -62,29 +60,50 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-sql_file_list = FileService.list_sql_files_without_extension_from_layer(
-    SOURCE, LayerEnum.ENRICH.value
-)
-
-enrich_sub_dag = DatalakeSubDAG(
-    dag_id=DAG_ID,
+datalake_task_group = DatalakeTaskGroup(
+    dag=dag,
     env=ENV,
     datalake_bucket=DATALAKE_BUCKET,
-    layer=LayerEnum.ENRICH,
-    database_base_name=SOURCE,
-    target_database_base_name=SOURCE,
-    relative_query_path=SOURCE,
-    spark_job_paths=BASE_SPARK_JOBS_PATH,
+    relative_query_path=CONTEXT,
+    spark_jobs_path=SPARK_JOBS_PATH,
     athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
-    start_date=MAIN_START_DATE,
-    execution_timeout_hours=EXECUTION_TIMEOUT_HOURS,
 )
 
-enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(
-    dag, sql_file_list, is_incremental=True, partitions=["id_date"]
+enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.ENRICH,
+    source_database_base_name=CONTEXT,
+    target_database_base_name=CONTEXT,
+    is_incremental=True,
+    partitions=PARTITION_COLS,
 )
 
-consolidated_media_costs = enrich_sub_dags.pop("consolidated_media_costs")
-base_enrich_tasks = list(enrich_sub_dags.values())
+INNER_DEPENDENCIES = {
+    "consolidated_media_costs": list(
+        set(enrich_task_groups.keys()).difference(set(["consolidated_media_costs"]))
+    )
+}
 
-create_cluster_task >> base_enrich_tasks >> consolidated_media_costs >> terminate_cluster_task
+(
+    task_groups_boundaries_without_inner_dependencies,
+    inner_dependencies_task_groups_boundaries,
+) = datalake_task_group.set_inner_dag_dependencies(
+    task_flow_helper=TaskFlowHelper(),
+    task_groups_boundaries=enrich_task_groups,
+    dag_inner_dependencies=INNER_DEPENDENCIES,
+)
+
+chain(
+    create_cluster_task,
+    datalake_task_group.all_first_tasks(
+        task_groups_boundaries_without_inner_dependencies
+    )
+    + datalake_task_group.first_tasks(inner_dependencies_task_groups_boundaries),
+)
+
+chain(
+    datalake_task_group.all_last_tasks(
+        task_groups_boundaries_without_inner_dependencies
+    )
+    + datalake_task_group.last_tasks(inner_dependencies_task_groups_boundaries),
+    terminate_cluster_task,
+)

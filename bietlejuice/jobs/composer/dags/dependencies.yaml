@@ -435,7 +435,7 @@ bietlejuice.enrich_listing_owners:
   - bietlejuice.enrich_offer:load-enrich-offer
 
 bietlejuice.enrich_marketing_automatic_daily_costs:
-  - bietlejuice.enrich_consolidated_marketing_costs:load-consolidated-media-costs-to-enrich
+  - bietlejuice.enrich_consolidated_marketing_costs:load-enrich-consolidated-media-costs
 
 bietlejuice.enrich_marketing_costs:
   - bietlejuice.marketing_hub
