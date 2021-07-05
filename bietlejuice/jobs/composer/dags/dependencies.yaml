@@ -104,8 +104,8 @@ bietlejuice.dw_marketing_costs_trovit:
 bietlejuice.dw_proposal:
   - bietlejuice.enrich_proposal:load-enrich-proposal
   - bietlejuice.enrich_docx:load-enrich-credit-evaluation
-  - bietlejuice.sorting_hat:load-proposal-to-datalake-clean
-  - bietlejuice.sorting_hat:load-proposal-version-to-datalake-clean
+  - bietlejuice.sorting_hat:load-clean-proposal
+  - bietlejuice.sorting_hat:load-clean-proposal-version
 
 bietlejuice.dw_quinto_messenger:
   - bietlejuice.enrich_ebdb_customer_contact_identification
@@ -470,8 +470,8 @@ bietlejuice.enrich_proposal:
   - bietlejuice.ebdb:create-clean-proposal-in-data-lake
   - bietlejuice.ebdb:create-clean-proposal-aud-in-data-lake
   - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
-  - bietlejuice.sorting_hat:load-proposal-to-datalake-clean
-  - bietlejuice.sorting_hat:load-proposal-version-to-datalake-clean
+  - bietlejuice.sorting_hat:load-clean-proposal
+  - bietlejuice.sorting_hat:load-clean-proposal-version
 
 bietlejuice.enrich_quinto_messenger:
   - bietlejuice.quinto_messenger:load-clean-channel
