@@ -33,7 +33,7 @@ SELECT
     END AS mkt_origin
 FROM fact_house_listing_flows hl
 LEFT JOIN datamarts.quintoandar_consultant_listings ciq
-	        ON ciq.sk_house_listing = hl.sk_house_listing
+	        ON ciq.sk_house_listing = hl.sk_house_listing AND ciq.businesscontext= 'RENT'
 ),
 source_ops_rent AS (
 	WITH

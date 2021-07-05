@@ -415,7 +415,7 @@ LEFT JOIN dim_offer dof
 LEFT JOIN datamarts.funnel_demand_flows fdf
   ON rf.sk_rent_flow = fdf.sk_rent_flow
 LEFT JOIN datamarts.quintoandar_consultant_listings ciq
-  ON rf.sk_house_listing = ciq.sk_house_listing
+  ON rf.sk_house_listing = ciq.sk_house_listing AND ciq.businesscontext= 'RENT'
 ),
 visits_booked AS (
 SELECT

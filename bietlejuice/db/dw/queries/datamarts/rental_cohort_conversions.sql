@@ -331,7 +331,7 @@ LEFT JOIN
         ON rf.sk_rent_flow = fdf.sk_rent_flow
 LEFT JOIN
     datamarts.quintoandar_consultant_listings ciq
-        ON rf.sk_house_listing = ciq.sk_house_listing
+        ON rf.sk_house_listing = ciq.sk_house_listing AND ciq.businesscontext= 'RENT'
 ),
 vb2vc AS (
 SELECT
