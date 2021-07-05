@@ -1,4 +1,1 @@
-from bietlejuice.jobs.composer.base.db import QUERIES_DATALAKE_PATH
 
-SOURCE = "insider"
-QUERIES_INSIDER_DATALAKE_PATH = QUERIES_DATALAKE_PATH + SOURCE
