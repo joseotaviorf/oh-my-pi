@@ -9,7 +9,6 @@ from bietlejuice.jobs.composer.base.db import DatabaseEnum, DatalakeMetastoreSer
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient, MongoClient
 from bietlejuice.jobs.composer.consumers.db_consumers import MongoConsumer
 from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
-from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 
@@ -54,15 +53,17 @@ if __name__ == "__main__":
 
     for table in tables:
         df = mongo_consumer.get_data_from_table(table.table_name)
-        df = SparkDataFrameService().input(df).optimize_partition(250000).output()
 
-        s3_loader.load_full_table(
+        s3_loader.load_df(
             df=df,
-            database_name=database_name,
-            table_name=table.table_name.lower(),
+            s3_path=f"{database_location}{table.table_name.lower()}",
             format_options=format_options,
-            database_location=database_location,
         )
-    spark_metastore_loader.update_metastore(
-        df, database_name, table.table_name.lower(), format_options, database_location
-    )
+
+        spark_metastore_loader.update_metastore(
+            df,
+            database_name,
+            table.table_name.lower(),
+            format_options,
+            database_location,
+        )
