@@ -29,14 +29,14 @@ if __name__ == "__main__":
 
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env", type=str, help="forno/prod environment")
-    parser.add_argument("source")
     parser.add_argument("datalake_bucket")
+    parser.add_argument("source")
     parser.add_argument("execution_date", type=str, help="DAG execution date")
 
     args = parser.parse_args()
     environment = args.env
-    source = args.source
     data_lake_bucket = args.datalake_bucket
+    source = args.source
     execution_date = args.execution_date
 
     base_dbutils = BaseDBUtils()

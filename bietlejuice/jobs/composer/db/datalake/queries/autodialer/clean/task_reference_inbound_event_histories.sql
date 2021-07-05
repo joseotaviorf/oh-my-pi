@@ -1,28 +1,31 @@
-with exploded_events as (
-  select
-    regexp_extract(_id, '\\"(\\w+)\\"', 1) as id,
-    regexp_extract(taskid, '\\"(\\w+)\\"', 1) as id_task,
-    explode_outer(from_json(inboundevents, 'array<string>')) as events_json,
-    cast(regexp_extract(createdat, '(\\d{{4}}-\\d{{2}}-\\d{{2}}\\w{{1}}\\d{{2}}:\\d{{2}}:\\d{{2}})', 1) as timestamp) as ts_created,
-    cast(regexp_extract(updatedat, '(\\d{{4}}-\\d{{2}}-\\d{{2}}\\w{{1}}\\d{{2}}:\\d{{2}}:\\d{{2}})', 1) as timestamp) as ts_updated,
+with exploded_events AS (
+  SELECT
+    GET_JSON_OBJECT(REPLACE(_id, '$', ''), '$.oid') AS id,
+    GET_JSON_OBJECT(REPLACE(taskid, '$', ''), '$.oid') AS id_task,
+    EXPLODE_OUTER(FROM_JSON(inboundevents, 'array<string>')) AS events_json,
+    CAST(GET_JSON_OBJECT(REPLACE(createdat, '$',  ''), '$.date') AS TIMESTAMP) AS ts_created,
+    CAST(GET_JSON_OBJECT(REPLACE(updatedat, '$',  ''), '$.date') AS TIMESTAMP) AS ts_updated,
     year,
     month,
     day
-  from datalake_autodialer_raw.taskreferenceinboundeventhistories
+  FROM
+    datalake_autodialer_raw.taskreferenceinboundeventhistories
 )
-select
+SELECT
   id,
   id_task,
-  get_json_object(events_json, '$.taskReferenceEventOrigin') as task_reference_event_origin,
-  get_json_object(events_json, '$.dialStatus') as dial_status,
-  cast(date_format(regexp_extract(get_json_object(events_json, '$.eventDate'), '(\\d{{4}}-\\d{{2}}-\\d{{2}}\\w{{1}}\\d{{2}}:\\d{{2}}:\\d{{2}})', 1), 'yyyy-MM-dd HH:mm:ss') as timestamp) as event_date,
-  cast(date_format(regexp_extract(get_json_object(events_json, '$.snoozed'), '(\\d{{4}}-\\d{{2}}-\\d{{2}}\\w{{1}}\\d{{2}}:\\d{{2}}:\\d{{2}})', 1), 'yyyy-MM-dd HH:mm:ss') as timestamp) as snoozed,
+  GET_JSON_OBJECT(events_json, '$.taskReferenceEventOrigin') AS task_reference_event_origin,
+  GET_JSON_OBJECT(events_json, '$.dialStatus') AS dial_status,
+  CAST(DATE_FORMAT(GET_JSON_OBJECT(REPLACE(events_json, '$', ''), '$.eventDate.date'), 'yyyy-MM-dd HH:mm:ss') AS TIMESTAMP) AS event_date,
+  CAST(DATE_FORMAT(GET_JSON_OBJECT(REPLACE(events_json, '$', ''), '$.snoozed.date'), 'yyyy-MM-dd HH:mm:ss') AS TIMESTAMP) AS snoozed,
   ts_created,
   ts_updated,
   year,
   month,
   day
-from
+FROM
   exploded_events
-where
-    year={year} and month={month} and day={day}
+WHERE
+    year={year} 
+    AND month={month} 
+    AND day={day}
