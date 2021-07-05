@@ -489,9 +489,9 @@ bietlejuice.enrich_retsuko:
   - bietlejuice.retsuko:load-clean-invoice
 
 bietlejuice.enrich_robin_hood:
-  - bietlejuice.robin_hood:load-accounting-entry-to-datalake-clean
-  - bietlejuice.robin_hood:load-payee-to-datalake-clean
-  - bietlejuice.robin_hood:load-tax-to-datalake-clean
+  - bietlejuice.robin_hood:load-clean-accounting-entry
+  - bietlejuice.robin_hood:load-clean-payee
+  - bietlejuice.robin_hood:load-clean-tax
 
 bietlejuice.enrich_sale_closing_flows:
   - bietlejuice.enrich_firestore:load-enrich-monday
