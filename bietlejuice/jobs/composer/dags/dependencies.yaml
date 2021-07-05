@@ -310,7 +310,7 @@ bietlejuice.enrich_crm_tasks_resolution:
   - bietlejuice.enrich_crm:load-enrich-task-status-histories
 
 bietlejuice.enrich_docx:
-  - bietlejuice.docx:load-credit-evaluation-to-clean
+  - bietlejuice.docx:load-clean-credit-evaluation
 
 bietlejuice.enrich_ebdb_contract:
   - bietlejuice.ebdb:create-clean-contract-in-data-lake

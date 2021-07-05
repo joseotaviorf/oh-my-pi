@@ -21,10 +21,13 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
+    parser.add_argument("source")
+
     args = parser.parse_args()
+
     environment = args.env
     datalake_bucket = args.datalake_bucket
-    source = "docx"
+    source = args.source
 
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
@@ -51,7 +54,7 @@ if __name__ == "__main__":
     for table in tables:
         if table.table_name not in BLOCK_LIST:
             df = consumer.get_data_from_table(table.table_name)
-            # the table names in the datalake must be lowercase
+
             s3_loader.load_full_table(
                 df=df,
                 database_name=database_name,
