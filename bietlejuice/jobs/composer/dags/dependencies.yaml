@@ -92,9 +92,6 @@ bietlejuice.dw_marketing_costs_criteo_campaigns:
 bietlejuice.dw_marketing_costs_facebook_insights:
   - bietlejuice.enrich_marketing_costs_facebook_insights
 
-bietlejuice.dw_marketing_costs_linkedin:
-  - bietlejuice.linkedin
-
 bietlejuice.dw_marketing_costs_mitula:
   - bietlejuice.mitula
 
