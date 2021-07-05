@@ -2,20 +2,19 @@ from datetime import datetime
 import pendulum
 import os
 
+from airflow.utils.helpers import chain, cross_downstream
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
-    QuintoAndarDatabricksSubmitRunOperator,
 )
-from airflow.utils.helpers import chain
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
-from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
-from bietlejuice.jobs.composer.services import FileService
+from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 
 SOURCE = "wololo"
+CONTEXT = SOURCE
 
 # airflow vars
 ENV = os.environ.get("ENVIRONMENT")
@@ -61,72 +60,36 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
 )
 
-wololo_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="wololo-to-datalake-raw",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": LOAD_WOLOLO_INTO_DATALAKE_RAW_FILE_PATH,
-            "parameters": [ENV, DATALAKE_BUCKET],
-        }
-    },
-)
-
-create_raw_external_tables_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="create-raw-external-tables",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": CREATE_RAW_EXTERNAL_TABLES_FILE_PATH,
-            "parameters": [ENV, DATALAKE_BUCKET, ATHENA_QUERY_RESULT_LOCATION],
-        }
-    },
-)
-
-sync_metastore_tables_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="sync-hive-metastore-raw-tables",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables.py",
-            "parameters": [
-                DATALAKE_BUCKET,
-                LayerEnum.RAW.value,
-                SOURCE,
-                "--all-tables",
-            ],
-        }
-    },
-)
-
-clean_sub_dag = DatalakeSubDAG(
-    dag_id=DAG_ID,
-    start_date=MAIN_START_DATE,
-    env=ENV,
-    datalake_bucket=DATALAKE_BUCKET,
-    layer=LayerEnum.CLEAN,
-    database_base_name=SOURCE,
-    relative_query_path=SOURCE,
-    spark_job_paths=BASE_SPARK_JOBS_PATH,
-    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
-)
-
-file_list = FileService.list_sql_files_without_extension_from_layer(
-    SOURCE, LayerEnum.CLEAN.value
-)
-
-clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(dag, file_list)
-
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-chain(
-    create_cluster_task,
-    wololo_to_datalake_raw_task,
-    [sync_metastore_tables_task, create_raw_external_tables_task],
-    terminate_cluster_task,
+task_group = DatalakeTaskGroup(
+    dag=dag,
+    env=ENV,
+    datalake_bucket=DATALAKE_BUCKET,
+    relative_query_path=CONTEXT,
+    spark_jobs_path=BASE_SPARK_JOBS_PATH,
+    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
 )
 
-wololo_to_datalake_raw_task >> list(clean_sub_dags.values())
-terminate_cluster_task.set_upstream(list(clean_sub_dags.values()))
+raw_task_groups = task_group.build_raw_task_group_for_all_tables(
+    source=SOURCE,
+    target_database_base_name=SOURCE,
+    extraction_spark_job_file=LOAD_WOLOLO_INTO_DATALAKE_RAW_FILE_PATH,
+)
+
+clean_task_groups = task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.CLEAN,
+    source_database_base_name=SOURCE,
+    target_database_base_name=SOURCE,
+)
+
+chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_groups))
+
+cross_downstream(
+    DatalakeTaskGroup.last_tasks(raw_task_groups),
+    DatalakeTaskGroup.all_first_tasks(clean_task_groups),
+)
+
+terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))

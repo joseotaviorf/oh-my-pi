@@ -3,6 +3,9 @@
 ### Purpose
 This DAG imports the tables from [Wololo](https://github.com/quintoandar/wololo), our service for interacting with Prospects.
 
+​<details>
+  <summary><strong> > DAG details (click to expand)</strong></summary>
+
 ### Execution Interval
 This DAG is triggered daily. 
 
@@ -18,8 +21,14 @@ This pipeline produces, via full load:
     - `contract` 
     - `context_discard`
     - `conversion` 
+    - `prospect_aud`
+    - `prospect_dimension_aud`
+    - `prospect_dimension`
     - `prospect`
+    - `rev_info`
 
 ### Responsible Data Engineering Team
 For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the 
 [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
+
+</details>
