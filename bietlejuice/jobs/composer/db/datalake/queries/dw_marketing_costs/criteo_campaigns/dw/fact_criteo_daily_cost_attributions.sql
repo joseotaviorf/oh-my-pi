@@ -1,12 +1,6 @@
 SELECT
-    id AS sk_criteo_campaign,
-    CAST(
-      CONCAT(
-        string(year),
-        lpad(string(month), 2, '0'),
-        lpad(string(day), 2, '0')
-      )
-    AS integer) AS sk_date,
+    CONCAT(id_campaign, '-', campaign_name) AS sk_criteo_campaign,
+    CAST(CONCAT(STRING(year), LPAD(STRING(month),2,'0'), LPAD(STRING(day),2,'0')) AS INTEGER) AS sk_date,
     clicks,
     impressions,
     audience,
@@ -18,6 +12,10 @@ SELECT
     year,
     month,
     day,
-    current_timestamp  AS ts_load
-FROM datalake_marketing_costs.criteo_campaigns
-WHERE year = '{year}' AND month = '{month}' AND day = '{day}'
+    CURRENT_TIMESTAMP AS ts_load
+FROM
+    datalake_marketing_costs_clean.criteo_campaigns
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}

@@ -87,7 +87,7 @@ bietlejuice.dw_marketing_costs:
   - bietlejuice.enrich_marketing_costs.load-google-keywords-performance-report-to-enrich:load-enrich-google-keywords-performance-report
 
 bietlejuice.dw_marketing_costs_criteo_campaigns:
-  - bietlejuice.enrich_marketing_costs_criteo_campaigns
+  - bietlejuice.criteo_campaigns:load-criteo-campaigns-to-clean
 
 bietlejuice.dw_marketing_costs_facebook_insights:
   - bietlejuice.enrich_marketing_costs_facebook_insights
@@ -291,7 +291,7 @@ bietlejuice.enrich_chattermill:
 
 bietlejuice.enrich_consolidated_marketing_costs:
   - bietlejuice.enrich_marketing_costs
-  - bietlejuice.enrich_marketing_costs_criteo_campaigns:load-criteo-campaigns-to-enrich
+  - bietlejuice.criteo_campaigns:load-criteo-campaigns-to-clean
   - bietlejuice.enrich_marketing_costs_sharing_rules:load-old-sharing-rules-from-redshift-to-datalake
   - bietlejuice.mitula:load-mitula-report-to-clean
   - bietlejuice.rtb_campaigns:load-clean-rtb-campaigns
@@ -439,9 +439,6 @@ bietlejuice.enrich_marketing_automatic_daily_costs:
 
 bietlejuice.enrich_marketing_costs:
   - bietlejuice.marketing_hub
-
-bietlejuice.enrich_marketing_costs_criteo_campaigns:
-  - bietlejuice.criteo_campaigns:load-criteo-campaigns-to-clean
 
 bietlejuice.enrich_marketing_costs_facebook_insights:
   - bietlejuice.facebook_insights
