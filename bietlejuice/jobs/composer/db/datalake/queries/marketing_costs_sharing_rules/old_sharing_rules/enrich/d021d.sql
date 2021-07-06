@@ -1,5 +1,5 @@
 SELECT DISTINCT
-    dd.sk_date::INTEGER AS  sk_date,
+    dd.sk_date::INTEGER AS  id_date,
     dr.city_group::VARCHAR AS city_group,
     (DENSE_RANK() OVER(PARTITION BY dd.sk_date, dr.city_group ORDER BY fhs.sk_sale_listing) +
      DENSE_RANK() OVER(PARTITION BY dd.sk_date, dr.city_group ORDER BY fhs.sk_sale_listing DESC) - 1) /
