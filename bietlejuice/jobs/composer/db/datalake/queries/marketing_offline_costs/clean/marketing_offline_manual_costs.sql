@@ -4,7 +4,7 @@ SELECT
     NULLIF(email, '') AS email,
     NULLIF(team, '') AS team,
     NULLIF(entry_type, '') AS entry_type,
-    BIGINT(NULLIF(invoice_number, '')) AS invoice_number,
+    STRING(NULLIF(invoice_number, '')) AS invoice_number,
     NULLIF(cnpj, '') AS cnpj,
     NULLIF(vendor_name, '') AS vendor_name,
     NULLIF(description, '') AS description,
