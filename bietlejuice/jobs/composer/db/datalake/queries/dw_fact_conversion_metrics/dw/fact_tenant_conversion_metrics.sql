@@ -102,7 +102,7 @@ with
             eo.id as id_offer,
             max(coalesce(eo.id_godfather, go_firestore.id)) over (partition by eo.id_firestore) as id_godfather
         from datalake_ebdb_clean.offer eo
-            left join datalake_godfather_clean.business_offer go_firestore
+            left join datalake_godfather_clean.offer go_firestore
             on eo.id_firestore = go_firestore.id_firestore
                 and eo.id_godfather is null
     ),
@@ -118,7 +118,7 @@ with
             go_firestore.type as distinct_type
         from offer_firestore
      of
-	join datalake_godfather_clean.business_offer go_firestore
+	join datalake_godfather_clean.offer go_firestore
     	on go_firestore.id = of.id_godfather
 	group by 1,2,3,4,5,6
 ),
@@ -135,7 +135,7 @@ new_offer as
     coalesce(go_godfather.ts_last_sent, go_firestore.ts_last_sent) as offer_submitted,
     o.rejection_reason
 from datalake_ebdb_clean.offer o
-    left join datalake_godfather_clean.business_offer go_godfather
+    left join datalake_godfather_clean.offer go_godfather
     on o.id_godfather = go_godfather.id
         and o.id_godfather is not null
     left join firestore_offers go_firestore

@@ -1,0 +1,21 @@
+SELECT
+  id,
+  main_id as id_main,
+  rent_flow_id as id_rent_flow,
+  version,
+  `status`,
+  owner_accepted_default_contract as has_owner_accepted_default_contract,
+  owner_sent_documentation as has_owner_sent_documentation,
+  tenant_status,
+  owner_status,
+  tenant_accepted_default_contract as has_tenant_accepted_default_contract,
+  tenant_sent_documentation as has_tenant_sent_documentation,
+  main_created_at as ts_main_created,
+  main_updated_at as ts_main_updated,
+  tenant_sent_documentation_at as ts_tenant_sent_documentation,
+  tenant_visualized_documentation_at as ts_tenant_visualized_documentation,
+  owner_sent_documentation_at as ts_owner_sent_documentation,
+  owner_visualized_documentation_at as ts_owner_visualized_documentation,
+  created_at as ts_created,
+  updated_at as ts_updated
+FROM datalake_godfather_raw.documentation

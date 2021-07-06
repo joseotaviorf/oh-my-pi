@@ -69,7 +69,7 @@ firestore_offers as (
         max(coalesce(offer.id_godfather, g_offer.id))
             over (partition by offer.id_firestore) as id_offer_godfather
     from datalake_ebdb_clean.offer
-    left join datalake_godfather_clean.business_offer g_offer
+    left join datalake_godfather_clean.offer g_offer
         on offer.id_firestore = g_offer.id_firestore
         and offer.id_godfather is null
   ),
@@ -89,7 +89,7 @@ firestore_offers as (
     bo_godfather.type,
     io_firestore.is_instant_offer
   from offer_firestore o_firestore
-  join datalake_godfather_clean.business_offer bo_godfather
+  join datalake_godfather_clean.offer bo_godfather
     on bo_godfather.id = o_firestore.id_offer_godfather
   left join instant_offer_firestore io_firestore
     on bo_godfather.id_firestore = io_firestore.id_firestore
@@ -127,7 +127,7 @@ select distinct
 from datalake_ebdb_clean.offer offer
 left join analyzed_offers analyzed
   on analyzed.id_offer = offer.id
-left join datalake_godfather_clean.business_offer bus_offer
+left join datalake_godfather_clean.offer bus_offer
   on offer.id_godfather = bus_offer.id
   and offer.id_godfather is not null
 left join firestore_offers firestore
