@@ -461,7 +461,7 @@ bietlejuice.enrich_offer:
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
   - bietlejuice.enrich_firestore
-  - bietlejuice.godfather:load-clean-offer
+  - bietlejuice.godfather:load-business-offer
 
 bietlejuice.enrich_owner_fees:
   - bietlejuice.owner_fees:load-clean-contract

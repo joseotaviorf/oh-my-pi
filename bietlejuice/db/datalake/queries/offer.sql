@@ -40,7 +40,7 @@ firestore_offers as (
       eo.id as id_offer,
       max(coalesce(eo.godfatherid, try_cast(go_firestore.id as bigint))) over (partition by eo.firestoreid) as godfatherid
     from datalake_ebdb_raw_prod.offer eo
-    left join datalake_godfather_clean_prod.offer go_firestore
+    left join datalake_godfather_clean_prod.business_offer go_firestore
       on eo.firestoreid = go_firestore.id_firestore
         and eo.godfatherid is null
   ),
@@ -60,7 +60,7 @@ firestore_offers as (
     go_firestore.type as distinct_type,
     fo.is_instant_offer
   from offer_firestore
-  join datalake_godfather_clean_prod.offer go_firestore
+  join datalake_godfather_clean_prod.business_offer go_firestore
     on go_firestore.id = godfatherid
   left join instantoffer_firestore fo
     on go_firestore.id_firestore = fo.id_firestore
@@ -96,7 +96,7 @@ select distinct
   rvo.last_rent_offered_by_owner,
   coalesce(go_firestore.is_instant_offer, false) as is_instant_offer
 from datalake_ebdb_raw_prod.offer eo
-left join datalake_godfather_clean_prod.offer go_godfather
+left join datalake_godfather_clean_prod.business_offer go_godfather
   on eo.godfatherid = try_cast(go_godfather.id as bigint)
     and eo.godfatherid is not null
 left join firestore_offers go_firestore
