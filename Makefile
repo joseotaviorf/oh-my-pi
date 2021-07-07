@@ -93,6 +93,10 @@ unit-tests-python2:
 
 .PHONY: environment-python3
 environment-python3:
+	@echo ""
+	@echo "Creating environment for python 3 project"
+	@echo "=========="
+	@echo ""
 	@pyenv install -s 3.7.3
 	@pyenv virtualenv 3.7.3 bi-etl-ejuice-python3
 	@pyenv local bi-etl-ejuice-python3
@@ -108,27 +112,43 @@ test-environment-python3:
 
 .PHONY: requirements-python3
 requirements-python3:
+	@echo ""
+	@echo "Installing python 3 packages"
+	@echo "=========="
+	@echo ""
 	@python -m pip install -U -r requirements3.txt --extra-index-url https://quintoandar.github.io/python-package-server/
 	@make requirements-lint-python3
 
 .PHONY: requirements-test-python3
 requirements-test-python3:
+	@echo ""
+	@echo "Installing Python 3 tests packages"
+	@echo "=========="
+	@echo ""
 	@python -m pip install -r requirements3_test.txt  --extra-index-url https://quintoandar.github.io/python-package-server/
 
 .PHONY: requirements-lint-python3
 requirements-lint-python3:
+	@echo ""
+	@echo "Installing lint packages"
+	@echo "=========="
+	@echo ""
 	@python -m pip install -r requirements3_lint.txt
 
 .PHONY: lint-python3
 ## run black to fix code style
 lint-python3:
+	@echo ""
+	@echo "Running lint in all files from <bietlejuice/jobs/composer/> and <tests3/unit/composer/>"
+	@echo "=========="
+	@echo ""
 	@python -m black bietlejuice/jobs/composer/ tests3/unit/composer/
 
 .PHONY: check-style-python3
 ## check style with flake8 and black
 check-style-python3:
 	@echo ""
-	@echo "Check Style"
+	@echo "Running Check Style"
 	@echo "=========="
 	@echo ""
 	@python -m black --check bietlejuice/jobs/composer/ tests3/unit/composer/
@@ -136,6 +156,10 @@ check-style-python3:
 
 .PHONY: package-python3
 package-python3:
+	@echo ""
+	@echo "Creating wheel for bi-etl-ejuice"
+	@echo "=========="
+	@echo ""
 	@PYTHONPATH=. python -m setup3 sdist bdist_wheel
 
 .PHONY: unit-tests-python3

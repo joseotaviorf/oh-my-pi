@@ -10,4 +10,5 @@ else
   echo "Changes in Composer files detected! Executing step..."
   $1 # command 1
   $2 # command 2
+  $3 # command 3
 fi
