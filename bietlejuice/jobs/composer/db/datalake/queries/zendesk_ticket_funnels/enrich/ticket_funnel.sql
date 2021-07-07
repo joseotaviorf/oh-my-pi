@@ -67,10 +67,23 @@ SELECT DISTINCT
     CAST(GET_JSON_OBJECT(t.satisfaction_rating,'$.comment') AS STRING) AS comment,
     TO_JSON(cf.custom_fields) AS custom_fields,
     cf.custom_fields['Tipo de Solicitação'] AS request_type,
-    cf.custom_fields['Tipo de Cliente'] AS client_type,
+    COALESCE(
+        cf.custom_fields['Tipo de Cliente'], 
+        REPLACE(REPLACE(REPLACE(cf.custom_fields['[CC] - Tipo de Cliente'], 'cc_',''), 'er_', 'er'), 'serviços', 'serviço')
+    ) AS client_type,
     cf.custom_fields['Cliente Tag'] AS customer_type_tag,
-    cf.custom_fields['Motivo Tag'] AS contact_motivation_tag,
-    cf.custom_fields['Assunto Tag'] AS contact_theme_tag,
+    COALESCE(
+        cf.custom_fields['Motivo Tag'], 
+        cf.custom_fields['[CC] - Motivo do contato']
+    ) AS contact_motivation_tag,
+    COALESCE(
+        cf.custom_fields['Assunto Tag'], 
+        cf.custom_fields['Tipo de Solicitação'], 
+        cf.custom_fields['[CC] - Assunto do Contato'], 
+        cf.custom_fields['[NG] Tipo de solicitação (IGPM/IPCA)'], 
+        cf.custom_fields['[PAY] Tipo de Solicitação'], 
+        cf.custom_fields['Tema do DM']
+    ) AS contact_theme_tag,
     t.ts_created,
     t.ts_created_local,
     t.ts_updated,

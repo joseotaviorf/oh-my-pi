@@ -248,8 +248,7 @@ SELECT DISTINCT
   zd.tags LIKE '%closed_by_merge%' AS is_closed_by_merge, 
   CASE 
     WHEN dc.front_or_back = 'Back' OR zd.tags LIKE '%tarefa_atendimento_escalado%' THEN 'back'
-    WHEN dc.front_or_back = 'Front' OR dc.front_or_back IS NULL THEN 'front'
-    ELSE dc.front_or_back
+    WHEN dc.front_or_back = 'Front' OR NULLIF(dc.front_or_back, '-') IS NULL THEN 'front'
   END AS front_or_back,
   bt.front_ticket IS NOT NULL AS has_back_ticket,
   CASE
