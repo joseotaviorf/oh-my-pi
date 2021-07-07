@@ -3,6 +3,9 @@
 
 Retrieves surveys from [Survicate](https://developers.survicate.com/data-export/#get-the-list-of-surveys). Today we are using this tool to create surveys to collect user CSAT for email tickets
 
+<details>
+  <summary><strong> > DAG details (click to expand)</strong></summary>
+
 ### Execution Interval
 
 Daily. More information about run time [here]({chart_url}{dag_id}).
@@ -17,3 +20,5 @@ This pipeline produces, via incremental load (layers raw and clean):
 ### Responsible Data Team
 
 For any questions or concerns about this DAG, please contact the Data Engineering or Data Analytics team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
+
+</details>

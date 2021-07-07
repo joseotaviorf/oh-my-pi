@@ -51,14 +51,14 @@ SCHEMA = """
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("environment")
-    parser.add_argument("source")
     parser.add_argument("datalake_bucket")
+    parser.add_argument("source")
     parser.add_argument("execution_date")
     args = parser.parse_args()
 
     environment = args.environment
-    source = args.source
     datalake_bucket = args.datalake_bucket
+    source = args.source
     execution_date = args.execution_date
     dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
     partition_cols = ["year", "month", "day"]

@@ -515,7 +515,7 @@ bietlejuice.enrich_sauron:
   - bietlejuice.sauron:load-clean-session
 
 bietlejuice.enrich_survicate:
-  - bietlejuice.survicate:load-surveys-to-clean
+  - bietlejuice.survicate:load-clean-surveys
 
 bietlejuice.enrich_terminator:
   - bietlejuice.terminator:load-clean-termination-aud
