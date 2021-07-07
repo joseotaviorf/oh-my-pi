@@ -72,7 +72,9 @@ This pipeline produces the following output tables:
     - `owner_entrance_inspection_csat`
     - `owner_exit_inspection_csat`
     - `projreparos_espelhamento_dl`
+    - `promotional_bonus_cluster_targets`
     - `promotional_bonus_segmentation_targets`
+    - `promotional_bonus_user_cluster_targets`
     - `promotional_bonus_user_targets`
     - `rent_criteo_eng_ab_test`
     - `rental_cohort_demand`

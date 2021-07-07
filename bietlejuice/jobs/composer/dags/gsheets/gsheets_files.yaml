@@ -241,10 +241,20 @@ offline_and_branding_marketing_costs:
     sheet_name: offline_and_branding_marketing_costs
     clean_table_name: offline_and_branding_marketing_costs
 
+promotional_bonus_cluster_targets:
+    sheet_id: 1nSCX7SDFFg87Ow3yHGv8j6k_CRv9OYYBeKwhkpilWog
+    sheet_name: promotional_bonus_cluster_targets
+    clean_table_name: promotional_bonus_cluster_targets
+
 promotional_bonus_segmentation_targets:
     sheet_id: 15SKrchR92WDs0I4Ia5_qmfkYl8jS6sutsAiX2HB445E
     sheet_name: promotional_bonus_segmentation_targets
     clean_table_name: promotional_bonus_segmentation_targets
+
+promotional_bonus_user_cluster_targets:
+    sheet_id: 1nSCX7SDFFg87Ow3yHGv8j6k_CRv9OYYBeKwhkpilWog
+    sheet_name: promotional_bonus_user_cluster_targets
+    clean_table_name: promotional_bonus_user_cluster_targets
 
 promotional_bonus_user_targets:
     sheet_id: 15SKrchR92WDs0I4Ia5_qmfkYl8jS6sutsAiX2HB445E
