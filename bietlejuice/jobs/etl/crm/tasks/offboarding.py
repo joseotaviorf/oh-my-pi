@@ -7,10 +7,15 @@ logger = QuintoAndarLogger('CRMTasksOffboarding')
 
 class CRMTasksOffboarding(CRMTasks):
     QUEUES = [
+        'DataDeRescisaoAlterada',
         'EncerrarContrato',
         'OrientarInquilinoRescisao',
         'OrientarProprietarioRescisao',
-        'OrientarInquilinoDesocupacao'
+        'OrientarInquilinoDesocupacao',
+        'RescisaoCancelada',
+        'RevisarCancelamentoDeRescisao',
+        'RevisarPagamentosRescisao',
+        'VerificarDesocupacaoImovel'
     ]
 
     MANUAL_TASK_WORKGROUP_IDS = [
