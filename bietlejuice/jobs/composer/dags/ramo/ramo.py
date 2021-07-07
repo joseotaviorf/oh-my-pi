@@ -26,7 +26,7 @@ TABLE = "razao_sap"
 DAG_ID = f"bietlejuice.{CONTEXT}"
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2020, 11, 24, 0, 0, 0, tzinfo=local_tz)
-MAIN_SCHEDULE_INTERVAL = "0 5 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 7 * * *"
 
 # s3 paths setup
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
