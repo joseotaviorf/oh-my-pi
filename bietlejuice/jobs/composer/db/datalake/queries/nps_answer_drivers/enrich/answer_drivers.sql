@@ -59,7 +59,7 @@ ebdb_house_listing AS (
 	INNER JOIN datalake_ebdb_listing.house_listing hl
 		ON hl.id_house = eh.id_house
 	WHERE eh.ts_answer_sent_local >= hl.ts_listing_version_start
-		AND eh.ts_answer_sent_local <= hl.ts_listing_version_end
+		AND eh.ts_answer_sent_local <= COALESCE(hl.ts_listing_version_end, NOW())
 	GROUP BY 1,2
 ),
 listing_drivers AS (

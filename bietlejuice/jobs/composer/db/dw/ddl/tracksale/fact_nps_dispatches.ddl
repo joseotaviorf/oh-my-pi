@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS tracksale.fact_nps_dispatches (
     score SMALLINT,
     minutes_response_time DECIMAL(27,2),
     dispatch_status VARCHAR(255),
+    city VARCHAR(255),
     is_survey_opened BOOLEAN,
     is_pending_survey BOOLEAN,
     is_answered BOOLEAN,
