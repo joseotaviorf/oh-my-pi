@@ -3,18 +3,22 @@ import pendulum
 import os
 
 from airflow.models import DAG, Variable
-from airflow.utils import helpers as airflow_helpers
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
-    QuintoAndarDatabricksSubmitRunOperator,
 )
-from bietlejuice.jobs.composer.services import FileService
+from airflow.utils.helpers import chain
+
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
-from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
+from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.jobs.composer.services.configuration_service import (
+    ConfigurationService,
+)
 
 SOURCE = "metabase"
+CONTEXT = SOURCE
 
 # airflow vars
 ENV = os.environ.get("ENVIRONMENT")
@@ -26,7 +30,6 @@ S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 # spark and databricks vars
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
 BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{SOURCE}"
 CLUSTER_DESCRIPTION = Variable.get(
@@ -39,28 +42,11 @@ DAG_ID = f"bietlejuice.{SOURCE}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2020, 7, 27, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 5 * * *"
+PARTITION_COLS = ["year", "month", "day"]
 
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 
-# every table to be loaded must be here, with its SQL file name and extraction type
-JOBS_EXTRACTION_TYPE = [
-    {"table_name": "core_user", "extraction_type": "incremental"},
-    {"table_name": "metabase_database", "extraction_type": "incremental"},
-    {"table_name": "metabase_field", "extraction_type": "incremental"},
-    {"table_name": "metabase_table", "extraction_type": "incremental"},
-    {"table_name": "pulse", "extraction_type": "incremental"},
-    {"table_name": "pulse_channel", "extraction_type": "incremental"},
-    {"table_name": "report_card", "extraction_type": "incremental"},
-    {"table_name": "report_dashboard", "extraction_type": "incremental"},
-    {"table_name": "report_dashboard_card", "extraction_type": "incremental"},
-    {"table_name": "collection", "extraction_type": "full"},
-    {"table_name": "pulse_card", "extraction_type": "full"},
-    {"table_name": "pulse_channel_recipient", "extraction_type": "full"},
-    {"table_name": "query", "extraction_type": "full"},
-    {"table_name": "query_execution", "extraction_type": "full"},
-    {"table_name": "revision", "extraction_type": "full"},
-    {"table_name": "view_log", "extraction_type": "full"},
-]
+config_service = ConfigurationService(SOURCE)
 
 # dag definition
 dag = DAG(
@@ -83,80 +69,58 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-clean_sub_dag = DatalakeSubDAG(
-    dag_id=DAG_ID,
-    start_date=MAIN_START_DATE,
+task_group = DatalakeTaskGroup(
+    dag=dag,
     env=ENV,
     datalake_bucket=DATALAKE_BUCKET,
-    layer=LayerEnum.CLEAN,
-    database_base_name=SOURCE,
-    relative_query_path=SOURCE,
-    spark_job_paths=BASE_SPARK_JOBS_PATH,
+    relative_query_path=CONTEXT,
+    spark_jobs_path=BASE_SPARK_JOBS_PATH,
     athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
 )
 
-incremental_load_file_list = FileService.list_sql_files_without_extension_from_layer(
-    SOURCE, LayerEnum.CLEAN.value, schema="incremental"
-)
-incremental_load_clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(
-    dag,
-    incremental_load_file_list,
+raw_task_groups = {}
+tables = config_service.get_config("tables")
+for table in tables:
+    table_name = table["table_name"]
+    clean_table_name = table.get("clean_table_name", table_name)
+    extraction_type = table["extraction_type"]
+    parameters = [CONTEXT, table_name]
+
+    if extraction_type == "incremental":
+        parameters.extend([table["date_filter_column"], "{{ ds }}"])
+
+    raw_spark_job_path = "{s3_prefix}/spark_jobs/{context}/load_{extraction_type}_data_into_datalake_raw.py".format(
+        s3_prefix=S3_PREFIX, context=CONTEXT, extraction_type=extraction_type
+    )
+    raw_task_group = task_group.build_raw_task_group_for_single_table(
+        source=SOURCE,
+        table_name=table_name,
+        target_database_base_name=CONTEXT,
+        extraction_spark_job_file=raw_spark_job_path,
+        raw_spark_job_extra_args=parameters,
+    )
+    raw_task_groups[clean_table_name] = raw_task_group
+
+incremental_clean_task_groups = task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.CLEAN,
+    source_database_base_name=CONTEXT,
+    target_database_base_name=CONTEXT,
+    schema="incremental",  # TODO: we are misusing the schema here: incremental mode is not a schema
     is_incremental=True,
-    partitions=["year", "month", "day"],
-    schema="incremental",
+    partitions=PARTITION_COLS,
 )
 
-full_load_file_list = FileService.list_sql_files_without_extension_from_layer(
-    SOURCE, LayerEnum.CLEAN.value, schema="full"
+full_clean_task_groups = task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.CLEAN,
+    source_database_base_name=CONTEXT,
+    target_database_base_name=CONTEXT,
+    schema="full",  # TODO: we are misusing the schema here: full mode is not a schema
 )
-full_load_clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(
-    dag, full_load_file_list, schema="full"
-)
 
-all_clean_subdags = {**incremental_load_clean_sub_dags, **full_load_clean_sub_dags}
+clean_task_groups = {**incremental_clean_task_groups, **full_clean_task_groups}
 
-# creating sub dags
-for job_extraction_type in JOBS_EXTRACTION_TYPE:
-    table_name = job_extraction_type["table_name"]
-    extraction_type = job_extraction_type["extraction_type"]
+chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(raw_task_groups))
 
-    slugged_table_name = table_name.replace("_", "-")
+TaskFlowHelper.chain_task_groups_via_common_table(raw_task_groups, clean_task_groups)
 
-    load_to_raw_task = QuintoAndarDatabricksSubmitRunOperator(
-        task_id=f"load-{slugged_table_name}-to-raw",
-        dag=dag,
-        json={
-            "spark_python_task": {
-                "python_file": f"{SPARK_JOBS_PATH}load_{extraction_type}_data_into_datalake_raw.py",
-                "parameters": [ENV, SOURCE, DATALAKE_BUCKET, "{{ ds }}", table_name],
-            }
-        },
-    )
-
-    sync_metastore_raw_table_task = QuintoAndarDatabricksSubmitRunOperator(
-        task_id=f"sync-hive-metastore-{slugged_table_name}-raw-table",
-        dag=dag,
-        json={
-            "spark_python_task": {
-                "python_file": f"{BASE_SPARK_JOBS_PATH}sync_metastore_tables.py",
-                "parameters": [
-                    DATALAKE_BUCKET,
-                    LayerEnum.RAW.value,
-                    SOURCE,
-                    "--table-name",
-                    table_name,
-                ],
-            }
-        },
-    )
-
-    airflow_helpers.chain(
-        create_cluster_task,
-        load_to_raw_task,
-        sync_metastore_raw_table_task,
-        terminate_cluster_task,
-    )
-
-    airflow_helpers.chain(
-        load_to_raw_task, all_clean_subdags.pop(table_name), terminate_cluster_task
-    )
+terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))

@@ -15,7 +15,6 @@ from bietlejuice.jobs.composer.consumers.db_consumers import PostgresConsumer
 from bietlejuice.jobs.composer.base.db.database_enum import DatabaseEnum
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
-from bietlejuice.jobs.composer.services import FileService
 
 from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 
@@ -33,10 +32,11 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("environment", help="forno/prod values")
-    parser.add_argument("source", help="name of the source")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
-    parser.add_argument("execution_date", help="execution date in str format")
+    parser.add_argument("source", help="name of the source")
     parser.add_argument("table_name", help="table name")
+    parser.add_argument("date_filter_column", help="Date column to be filtered")
+    parser.add_argument("execution_date", help="execution date in str format")
 
     args = parser.parse_args()
 
@@ -44,6 +44,7 @@ if __name__ == "__main__":
     source = args.source
     datalake_bucket = args.datalake_bucket
     execution_date = args.execution_date
+    date_filter_column = args.date_filter_column
     table_name = args.table_name.lower()
 
     logger.info(
@@ -66,18 +67,17 @@ if __name__ == "__main__":
 
     partition_cols = list(partitions.keys())
 
-    # incremental load of a Postgres db type to our data lake with Spark
-    raw_query = FileService().get_query_from_file_name(
-        QUERIES_METABASE_DATALAKE_PATH + "/raw/" + table_name + ".sql"
-    )
-
     conn_config = dbutils.secrets.get(scope="quintoandar", key=DatabaseEnum.METABASE)
     conn_config_json = json.loads(conn_config)
     spark_client = SparkClient()
 
     consumer = PostgresConsumer(conn_config_json, spark_client)
 
-    df = consumer.get_data_from_query(raw_query.format(**partitions))
+    df = consumer.get_incremental_data_from_table(
+        table_name=table_name,
+        date_filter_column=date_filter_column,
+        date_filter_value=execution_date,
+    )
 
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     spark_metastore_service = SparkMetastoreService(spark_client)
@@ -92,13 +92,11 @@ if __name__ == "__main__":
     format_options = SparkTableStorageFormat.DEFAULT_RAW
     database_location = db_info["db_raw_path"]
 
-    s3_loader.load_incremental_table(
+    s3_loader.load_df(
         df=df,
-        database_name=database_name,
-        table_name=table_name,
+        s3_path=f"{database_location}{table_name}",
         format_options=format_options,
-        database_location=database_location,
-        partition_cols=partition_cols,
+        partitions=partition_cols,
     )
 
     spark_metastore_loader.update_metastore(

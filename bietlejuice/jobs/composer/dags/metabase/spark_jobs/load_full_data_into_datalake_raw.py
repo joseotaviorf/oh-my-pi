@@ -11,11 +11,7 @@ from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
-from bietlejuice.jobs.composer.base.spark import (
-    BaseDBUtils,
-    SparkTableStorageFormat,
-    SparkDataFrameService,
-)
+from bietlejuice.jobs.composer.base.spark import BaseDBUtils, SparkTableStorageFormat
 
 JOB_NAME = "load_full_data_into_datalake_raw"
 
@@ -28,9 +24,8 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("environment", help="forno/prod values")
-    parser.add_argument("source", help="name of the source")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
-    parser.add_argument("execution_date", help="execution date in str format")
+    parser.add_argument("source", help="name of the source")
     parser.add_argument("table_name", help="table name")
 
     args = parser.parse_args()
@@ -64,15 +59,10 @@ if __name__ == "__main__":
     metastore_service.create_database(database_name)
 
     df = postgres_consumer.get_data_from_table(table_name)
-    df = SparkDataFrameService().input(df).optimize_partition(200000).output()
 
     s3_loader = S3Loader()
-    s3_loader.load_full_table(
-        df=df,
-        database_name=database_name,
-        table_name=table_name,
-        format_options=format_options,
-        database_location=database_location,
+    s3_loader.load_df(
+        df=df, s3_path=f"{database_location}{table_name}", format_options=format_options
     )
 
     spark_metastore_loader = SparkMetastoreLoader(metastore_service)

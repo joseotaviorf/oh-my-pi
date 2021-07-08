@@ -1,0 +1,78 @@
+---
+tables: [
+   {
+      "table_name": "core_user",
+      "extraction_type": "incremental",
+      "date_filter_column": "updated_at"
+
+   },
+   {
+      "table_name": "metabase_database",
+      "extraction_type": "incremental",
+      "date_filter_column": "updated_at"
+   },
+   {
+      "table_name": "metabase_field",
+      "extraction_type": "incremental",
+      "date_filter_column": "updated_at"
+   },
+   {
+      "table_name": "metabase_table",
+      "extraction_type": "incremental",
+      "date_filter_column": "updated_at"
+   },
+   {
+      "table_name": "pulse",
+      "extraction_type": "incremental",
+      "date_filter_column": "updated_at"
+   },
+   {
+      "table_name": "pulse_channel",
+      "extraction_type": "incremental",
+      "date_filter_column": "updated_at"
+   },
+   {
+      "table_name": "report_card",
+      "extraction_type": "incremental",
+      "date_filter_column": "updated_at"
+   },
+   {
+      "table_name": "report_dashboard",
+      "extraction_type": "incremental",
+      "date_filter_column": "updated_at"
+   },
+   {
+      "table_name": "report_dashboardcard",
+      "clean_table_name": "report_dashboard_card",
+      "extraction_type": "incremental",
+      "date_filter_column": "updated_at"
+   },
+   {
+      "table_name": "collection",
+      "extraction_type": "full"
+   },
+   {
+      "table_name": "pulse_card",
+      "extraction_type": "full"
+   },
+   {
+      "table_name": "pulse_channel_recipient",
+      "extraction_type": "full"
+   },
+   {
+      "table_name": "query",
+      "extraction_type": "full"
+   },
+   {
+      "table_name": "query_execution",
+      "extraction_type": "full"
+   },
+   {
+      "table_name": "revision",
+      "extraction_type": "full"
+   },
+   {
+      "table_name": "view_log",
+      "extraction_type": "full"
+   }
+]
