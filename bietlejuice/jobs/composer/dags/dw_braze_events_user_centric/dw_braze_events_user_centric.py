@@ -3,16 +3,16 @@ import pendulum
 import os
 
 from airflow.models import DAG, Variable
+from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
+
+from bietlejuice.jobs.composer.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
-from bietlejuice.jobs.composer.dags.base.incremental_dw_sub_dag import (
-    IncrementalDWSubDAG,
-)
+from bietlejuice.jobs.composer.dags.base.dw_task_group import DWTaskGroup
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
-from bietlejuice.jobs.composer.services import FileService
 
 DW_SCHEMA = "braze"
 CONTEXT = "braze_events_user_centric"
@@ -39,7 +39,7 @@ CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 8, 29, 0, 0, 0, tzinfo=LOCAL_TZ)
 
-DAG_PARAMETERS = {
+INCREMENTAL_LOAD_PARAMETERS = {
     "partitions": ["year", "month", "day"],
     "dw_query_filters": {"year": "{year}", "month": "{month}", "day": "{day}"},
 }
@@ -66,28 +66,32 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-file_list = FileService.list_sql_files_without_extension_from_layer(
-    DAG_NAME, LayerEnum.DW.value
-)
-
-dw_sub_dag = IncrementalDWSubDAG(
-    dag_id=DAG_ID,
-    start_date=MAIN_START_DATE,
+task_group = DWTaskGroup(
+    dag=dag,
     env=ENV,
     dw_bucket=DW_BUCKET,
     dw_schema=DW_SCHEMA,
     relative_query_path=DAG_NAME,
-    spark_job_path=BASE_SPARK_JOBS_PATH,
+    spark_jobs_path=BASE_SPARK_JOBS_PATH,
 )
 
-dw_sub_dags = dw_sub_dag.build_subdags_from_sql_files(
-    dag,
-    file_list,
-    test_ods_migration=False,
-    partitions=DAG_PARAMETERS["partitions"],
-    dw_query_filters=DAG_PARAMETERS["dw_query_filters"],
+dw_staging_task_group = task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.DW_STAGING,
+    is_incremental=True,
+    partitions=INCREMENTAL_LOAD_PARAMETERS["partitions"],
+    extra_query_template_params=INCREMENTAL_LOAD_PARAMETERS["dw_query_filters"],
+)
+
+dw_task_group = task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.DW,
     spectrum_iam_role=SPECTRUM_IAM_ROLE,
+    is_incremental=True,
+    partitions=INCREMENTAL_LOAD_PARAMETERS["partitions"],
+    extra_query_template_params=INCREMENTAL_LOAD_PARAMETERS["dw_query_filters"],
 )
 
-create_cluster_task >> list(dw_sub_dags.values())
-list(dw_sub_dags.values()) >> terminate_cluster_task
+chain(create_cluster_task, DWTaskGroup.all_first_tasks(dw_staging_task_group))
+
+TaskFlowHelper.chain_task_groups_via_common_table(dw_staging_task_group, dw_task_group)
+
+chain(DWTaskGroup.all_last_tasks(dw_task_group), terminate_cluster_task)
