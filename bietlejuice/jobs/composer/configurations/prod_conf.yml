@@ -1,4 +1,4 @@
-datalake_bucket: 5a-datalake-prod
+athena_query_results_bucket: s3://5a-datalake/query_results/
 dags_out_of_pattern: [
     "amplitude",
     "ebdb",
@@ -19,3 +19,8 @@ dags_out_of_pattern: [
     "regions_polygon",
     "rtb_campaigns",
 ]
+databricks_bietlejuice_repo_path: s3://5a-databricks/github-repos/bi-etl-ejuice
+datalake_bucket: 5a-datalake-prod
+doc_md_chart_url: https://k6ead11b55326f9c9-tp.appspot.com/admin/airflow/chart?chart_id=11&iteration_no=22&dag_id=
+dw_bucket: 5a-dw-prod
+spark_jobs_logs_path: s3://5a-databricks/logs/jobs/
