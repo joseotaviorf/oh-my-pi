@@ -1,1 +1,22 @@
 datalake_bucket: datalake.s3.forno.data.quintoandar.com.br
+dags_out_of_pattern: [
+    "amplitude",
+    "ebdb",
+    "criteo_campaigns",
+    "dw_marketing_costs",
+    "enrich_marketing_costs_sharing_rules",
+    "enrich_amplitude_partner_taxonomy",
+    "enrich_amplitude_user",
+    "enrich_marketing_costs",
+    "enrich_marketing_costs.load-google-keywords-performance-report-to-enrich", # old subdag pattern
+    "gsheets",
+    "godfather",
+    "kill_queue",
+    "marketing_manual_daily_costs",
+    "marketing_hub",
+    "marketing_costs",
+    "mitula",
+    "regions_polygon",
+    "rtb_campaigns",
+    "teravoz",
+]

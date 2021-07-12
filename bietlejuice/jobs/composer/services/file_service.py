@@ -1,3 +1,4 @@
+import glob
 from os import listdir
 from os.path import isdir, isfile
 
@@ -24,7 +25,6 @@ class FileService:
             )
 
     @staticmethod
-    @logger
     def get_dict_from_yaml_file(file_path):
         """
         Given a file path, opens the file and returns the dictionary contained
@@ -82,6 +82,22 @@ class FileService:
             raw_to_clean_path = f"{raw_to_clean_path}/{schema}"
 
         return FileService.list_files(raw_to_clean_path)
+
+    @staticmethod
+    def list_all_files_recursively(root_directory, extension="*"):
+        """
+        Recursively lists all the files inside the path and its subdirectories.
+        If specified an extension, only files from this extension will be listed.
+
+        :param root_directory: The root path to be searched (without trailing slash)
+        :type root_directory: str
+        :param extension: Files extension filter
+        :type extension: str
+        :return: list of files found
+        :rtype: generator object
+        """
+        files = glob.iglob(f"{root_directory}/**/*.{extension}", recursive=True)
+        return files
 
     @staticmethod
     def list_sql_files_without_extension_from_layer(source, layer, schema=None):

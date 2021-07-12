@@ -94,7 +94,7 @@ class TestHiveMetastoreService:
         )
         mocked_serde_info_builder.assert_called_once_with(
             serialization_lib=format_info.serde_lib,
-            parameters={"timestamp.formats": "yyyy-MM-dd'T'HH:mm:ss.SSSS'Z'"}
+            parameters={"timestamp.formats": "yyyy-MM-dd'T'HH:mm:ss.SSSS'Z'"},
         )
         mocked_storage_desc_builder.assert_called_once_with(
             columns=mocked_cols_or_part_keys,

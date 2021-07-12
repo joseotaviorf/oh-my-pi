@@ -178,6 +178,14 @@ files-validation-python3:
 	@echo ""
 	@python -m pytest tests3/files_validation/
 
+.PHONY: validate-dags-dependencies
+validate-dags-dependencies:
+	@echo ""
+	@echo "Validating DAGs dependencies"
+	@echo "=========="
+	@echo ""
+	@python scripts/validate_dags_dependencies.py
+
 ############# common commands #######################
 
 .PHONY: cov-badge
