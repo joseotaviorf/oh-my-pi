@@ -1,3 +1,7 @@
+/*
+In order to run these queries directly from databricks notebook you must replace double 
+brackets (`{{` `}}`) for single ones.
+*/
 WITH zendesk_email AS (
   WITH last_update_ticket AS (
     SELECT 
@@ -74,7 +78,6 @@ csat AS (
       t.id_ticket,
       GET_JSON_OBJECT(satisfaction_rating,'$.comment') AS csat_comment,
       GET_JSON_OBJECT(satisfaction_rating,'$.reason') AS score_reason,
-      satisfaction_rating,
       CASE
         WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') = 'bad' THEN  1
         WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') = 'good' THEN  5
@@ -93,12 +96,13 @@ csat AS (
       last_update_ticket lut
         ON t.id_ticket = lut.id_ticket
         AND t.ts_updated = lut.ts_last_updated
+    WHERE
+      GET_JSON_OBJECT(satisfaction_rating, '$.score') IN ('good', 'bad')
     UNION ALL
     SELECT
       id_ticket,
       user_comment AS csat_comment,
       NULL AS score_reason,
-      NULL AS satisfaction_rating,
       csat_score,
       COALESCE(CAST(user_comment AS STRING),CAST(csat_score AS STRING),CAST(is_solved AS STRING)) IS NOT NULL AS is_answered,
       is_solved,
@@ -108,6 +112,22 @@ csat AS (
       datalake_survicate.surveys
     WHERE
       id_ticket IS NOT NULL
+      AND COALESCE(CAST(user_comment AS STRING),CAST(csat_score AS STRING),CAST(is_solved AS STRING)) IS NOT NULL
+),
+last_csat_answer AS (
+  SELECT
+    id_ticket,
+    LAST(csat_comment, true) AS csat_comment,
+    LAST(score_reason) AS score_reason,
+    LAST(csat_score, true) AS csat_score,
+    LAST(is_answered, true) AS is_answered,
+    LAST(is_solved, true) AS is_solved,
+    LAST(ts_first_seen, true) AS ts_first_seen,
+    LAST(ts_first_response, true) AS ts_first_response
+  FROM
+    csat
+  GROUP BY 1
+  ORDER BY ts_first_response
 ),
 back_tickets AS (
   SELECT
@@ -149,7 +169,6 @@ SELECT DISTINCT
   cs.is_solved,
   cs.score_reason,
   cs.csat_comment,
-  cs.satisfaction_rating,
   ze.channel,
   ze.custom_fields,
   ze.request_type,
@@ -183,7 +202,7 @@ LEFT JOIN
   datalake_gsheets_clean.department_control dc
     ON dc.department = ze.department
 LEFT JOIN
-  csat cs
+  last_csat_answer cs
     ON ze.id_ticket = cs.id_ticket
 LEFT JOIN
   back_tickets bt

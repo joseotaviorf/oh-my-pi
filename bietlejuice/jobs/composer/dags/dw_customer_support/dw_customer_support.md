@@ -13,10 +13,10 @@ More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 ​
-This pipeline produces the following output tables in `customer_support` schema:
-​
+This pipeline produces the following output tables in `customer_support` schema
+
 - `fact_ticket`
-- `fact_task`
+- `fact_segment`
 - `dim_agent`
 - `dim_department`
 - `dim_taxonomy`

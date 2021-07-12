@@ -10,7 +10,7 @@ WITH call_tickets AS (
         COALESCE(contact_theme_tag, '')
       )
     ) AS sk_taxonomy,
-    MD5(CONCAT('call', COALESCE(tags, ''), COALESCE(direction, ''))) AS sk_channel,
+    MD5(CONCAT('call', COALESCE(direction, ''))) AS sk_channel,
     MD5(first_department) AS sk_first_department,
     MD5(last_department) AS sk_last_department, 
     MD5(zendesk_department) AS sk_zendesk_department,
@@ -24,7 +24,7 @@ WITH call_tickets AS (
     last_department,
     zendesk_department,
     number_of_departments AS total_departments,
-    number_of_tasks AS total_tasks,
+    number_of_segments AS total_segments,
     front_or_back,
     CAST(back_ticket AS BIGINT) AS back_ticket,
     is_solved AS resolution_survey,
@@ -78,7 +78,7 @@ chat_tickets AS (
         COALESCE(contact_theme_tag, '')
       )
     ) AS sk_taxonomy,
-    MD5(CONCAT('chat', COALESCE(tags, ''))) AS sk_channel,
+    MD5('chat') AS sk_channel,
     MD5(first_department) AS sk_first_department,
     MD5(last_department) AS sk_last_department,
     MD5(zendesk_department) AS sk_zendesk_department,
@@ -92,7 +92,7 @@ chat_tickets AS (
     last_department,
     zendesk_department,
     number_of_departments AS total_departments,
-    number_of_tasks AS total_tasks,
+    number_of_segments AS total_segments,
     front_or_back,
     CAST(back_ticket AS BIGINT) AS back_ticket,
     is_solved AS resolution_survey,
@@ -146,7 +146,7 @@ email_tickets AS (
         COALESCE(contact_theme_tag, '')
       )
     ) AS sk_taxonomy,
-    MD5(CONCAT('email', COALESCE(tags, ''))) AS sk_channel,
+    MD5('email') AS sk_channel,
     MD5(department) AS sk_first_department,
     MD5(department) AS sk_last_department, 
     MD5(department) AS sk_zendesk_department,
@@ -160,7 +160,7 @@ email_tickets AS (
     department AS last_department,
     department AS zendesk_department,
     1 AS total_departments,
-    1 AS total_tasks,
+    1 AS total_segments,
     front_or_back,
     CAST(back_ticket AS BIGINT) AS back_ticket,
     is_solved AS resolution_survey,

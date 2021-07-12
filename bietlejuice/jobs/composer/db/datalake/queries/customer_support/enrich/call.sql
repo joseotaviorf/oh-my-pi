@@ -1,4 +1,8 @@
-WITH tasks AS (
+/*
+In order to run these queries directly from databricks notebook you must replace double 
+brackets (`{{` `}}`) for single ones.
+*/
+WITH segment AS (
   WITH last_updated_reservations AS (
     SELECT
         id_reservation,
@@ -91,7 +95,7 @@ WITH tasks AS (
   WHERE
     is_answered = TRUE
 ),
-call AS (
+conversation AS (
   WITH ivr_events AS (
       SELECT
           id_call,
@@ -255,14 +259,14 @@ back_tickets AS (
   FROM
     zendesk_aditional_ticket_info zd
   JOIN
-    call
-      ON call.id_task = COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})', 1))
+    conversation c
+      ON c.id_task = COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})', 1))
   LEFT JOIN
     datalake_gsheets_clean.department_control dc
       ON dc.department = zd.zendesk_ticket_department 
   JOIN  
     zendesk_aditional_ticket_info zd2
-      ON zd2.id_call = call.sk_call
+      ON zd2.id_call = c.sk_call
   WHERE 
     (zd.tags LIKE '%tarefa_atendimento_escalado%' OR LOWER(dc.front_or_back) = 'back')
     AND (zd.tags NOT LIKE '%bot_end_conversation%' AND zd.tags NOT LIKE '%closed_by_merge%')
@@ -271,11 +275,10 @@ back_tickets AS (
 )
 SELECT DISTINCT 
   zd.id_ticket,
-  c.id_task,
-  t.id_reservation,
+  c.id_task AS id_external_service,
+  t.id_reservation AS id_segment,
   c.id_call,
   c.sk_call,
-  c.id_conversation,
   t.id_agent,
   t.id_queue,
   zd.id_user,
@@ -296,11 +299,11 @@ SELECT DISTINCT
       WHEN seconds_total_wait_time > 60 AND t.is_answered THEN FALSE
       ELSE NULL
   END AS sla_achieved,
-  t.seconds_duration/60.0 AS task_minutes_duration,
-  t.seconds_wait_time/60.0 AS task_minutes_wait_time,
+  t.seconds_duration/60.0 AS segment_minutes_duration,
+  t.seconds_wait_time/60.0 AS segment_minutes_wait_time,
   CAST(c.seconds_duration/60.0 AS DOUBLE) AS minutes_full_resolution_time_calendar,
   CAST(c.number_of_departments AS INT) AS number_of_departments,
-  CAST(c.number_of_tasks AS INT) AS number_of_tasks,
+  CAST(c.number_of_tasks AS INT) AS number_of_segments,
   c.direction,
   zd.minutes_first_resolution_time_calendar,
   zd.minutes_first_resolution_time_business,
@@ -312,8 +315,8 @@ SELECT DISTINCT
   zd.tags,
   zd.status,
   zd.custom_fields,
-  FIRST(t.id_reservation) OVER (PARTITION BY zd.id_ticket ORDER BY t.ts_twilio_created_local DESC) = t.id_reservation AS is_last_task,
-  FIRST(t.id_reservation) OVER (PARTITION BY zd.id_ticket ORDER BY t.ts_twilio_created_local ASC) = t.id_reservation AS is_first_task,
+  FIRST(t.id_reservation) OVER (PARTITION BY zd.id_ticket ORDER BY t.ts_twilio_created_local DESC) = t.id_reservation AS is_last_segment,
+  FIRST(t.id_reservation) OVER (PARTITION BY zd.id_ticket ORDER BY t.ts_twilio_created_local ASC) = t.id_reservation AS is_first_segment,
   bt.front_ticket IS NOT NULL AS has_back_tickets,
   zd.tags LIKE '%bot_end_conversation%' AS is_bot, 
   zd.tags LIKE '%closed_by_merge%' AS is_closed_by_merge,
@@ -336,12 +339,12 @@ SELECT DISTINCT
   c.is_solved,
   c.csat_rating,
   c.ts_csat_answered,
-  t.ts_twilio_created_local AS ts_task_created,
-  t.ts_twilio_closed_local AS ts_task_closed,
+  t.ts_twilio_created_local AS ts_segment_created,
+  t.ts_twilio_closed_local AS ts_segment_closed,
   c.ts_started AS ts_ticket_started,
   c.ts_ended AS ts_ticket_ended
 FROM 
-  call c
+  conversation c
 JOIN 
   zendesk_aditional_ticket_info zd 
     ON zd.id_call = c.sk_call
@@ -349,7 +352,7 @@ JOIN
   zendesk_tickets_unique ztu
     ON zd.id_ticket = ztu.id_ticket
 LEFT JOIN 
-  tasks t
+  segment t
     ON t.sk_call = c.sk_call
     AND t.id_task = c.id_task
 LEFT JOIN

@@ -17,10 +17,12 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output table on Enrich layer:
 
 - `chat`
-- `chat_historical`
 - `call`
 - `email`
 
+### Disclaimer
+
+In order to run these queries directly from databricks notebook you must replace double brackets for single ones. This occurs because when running on our data pipeline we read and execute these queries using pyspark and to avoid python syntax errors we must escape the brackets characters.
 ### Responsible Data Team
 ​
 For any questions or concerns about this DAG, please contact the Data Engineering or Data Analytics team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).

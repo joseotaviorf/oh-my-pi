@@ -1,69 +1,69 @@
-WITH call_tasks AS (
+WITH call_segments AS (
     SELECT
         CAST(c.id_ticket AS BIGINT) AS sk_ticket,
-        id_reservation AS sk_task,
+        id_segment AS sk_segment,
         id_agent AS sk_agent,
         MD5(department) AS sk_department,
-        MD5(CONCAT('call', COALESCE(tags, ''), COALESCE(direction, ''))) AS sk_channel,
-        id_task AS sk_segment,
+        MD5(CONCAT('call', COALESCE(direction, ''))) AS sk_channel,
+        id_external_service AS sk_external_service,
         department,
         transferred_from_dept,
         transferred_to_dept,
         transference_type,
         'call' AS channel,
         sla_achieved AS is_sla,
-        is_first_task,
-        is_last_task,
-        ts_task_created AS ts_started,
-        ts_task_closed AS ts_closed,
+        is_first_segment,
+        is_last_segment,
+        ts_segment_created AS ts_started,
+        ts_segment_closed AS ts_closed,
         NOW() AS ts_load
     FROM
         datalake_customer_support.call c
     WHERE
-        id_reservation IS NOT NULL
+        id_segment IS NOT NULL
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
 ),
-chat_tasks AS (
+chat_segments AS (
     SELECT 
         CAST(c.id_ticket AS BIGINT) AS sk_ticket,
-        id_task AS sk_task,
+        id_segment AS sk_segment,
         id_agent AS sk_agent,
         MD5(department) AS sk_department,
-        MD5(CONCAT('chat', COALESCE(tags, ''))) AS sk_channel,
-        id_task AS sk_segment,
+        MD5('chat') AS sk_channel,
+        id_segment AS sk_external_service,
         department,
         transferred_from_dept,
         transferred_to_dept,
         transference_type,
         'chat' AS channel,
         sla_achieved AS is_sla,
-        is_last_task,
-        is_first_task,
-        ts_task_created AS ts_started,
-        ts_task_closed AS ts_closed,
+        is_first_segment,
+        is_last_segment,
+        ts_segment_created AS ts_started,
+        ts_segment_closed AS ts_closed,
         NOW() AS ts_load
     FROM 
         datalake_customer_support.chat c
     WHERE
-        id_task IS NOT NULL
+        id_segment IS NOT NULL
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
 ),
-email_tasks AS (
+email_segments AS (
     SELECT 
         CAST(id_ticket AS BIGINT) AS sk_ticket,
-        id_ticket AS sk_task,
+        id_ticket AS sk_segment,
         id_agent AS sk_agent,
         MD5(department) AS sk_department,
-        MD5(CONCAT('email', COALESCE(tags, ''))) AS sk_channel,
-        NULL AS sk_segment,
+        MD5('email') AS sk_channel,
+        NULL AS sk_external_service,
         department,
         NULL AS transferred_from_dept,
         NULL AS transferred_to_dept,
         NULL AS transference_type,
         'email' AS channel,
         is_sla,
-        TRUE AS is_first_task,
-        TRUE AS is_last_task,
+        TRUE AS is_first_segment,
+        TRUE AS is_last_segment,
         ts_ticket_started AS ts_started,
         ts_ticket_ended AS ts_closed,
         NOW() AS ts_load
@@ -76,14 +76,14 @@ email_tasks AS (
 SELECT
     *
 FROM
-    call_tasks
+    call_segments
 UNION ALL
 SELECT
     *
 FROM
-    chat_tasks
+    chat_segments
 UNION ALL
 SELECT
     *
 FROM
-    email_tasks
+    email_segments

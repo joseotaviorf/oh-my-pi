@@ -1,3 +1,7 @@
+/*
+In order to run these queries directly from databricks notebook you must replace double 
+brackets (`{{` `}}`) for single ones.
+*/
 WITH quinto_messenger_tickets AS (
   WITH last_updated_task AS (
       SELECT
@@ -205,7 +209,7 @@ back_tickets AS (
   GROUP BY 1,2,3,4
 )
 SELECT DISTINCT 
-  ct.id_task,
+  ct.id_task AS id_segment,
   zd.id_ticket,
   ct.id_conversation,
   ct.id_session,
@@ -234,15 +238,15 @@ SELECT DISTINCT
   zd.custom_fields,
   bt.back_ticket,
   ct.seconds_first_reply,
-  ct.task_minutes_wait_time,
+  ct.task_minutes_wait_time AS segment_minutes_wait_time,
   ct.number_of_departments,
-  ct.number_of_tasks,
+  ct.number_of_tasks AS number_of_segments,
   ct.sla_achieved,
   CAST(ct.minutes_full_resolution_time_calendar AS DOUBLE) AS minutes_full_resolution_time_calendar,
   zd.minutes_first_resolution_time_calendar,
   zd.minutes_first_resolution_time_business,
-  FIRST(ct.id_task) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created DESC) = ct.id_task AS is_last_task,
-  FIRST(ct.id_task) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created ASC) = ct.id_task AS is_first_task,
+  FIRST(ct.id_task) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created DESC) = ct.id_task AS is_last_segment,
+  FIRST(ct.id_task) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created ASC) = ct.id_task AS is_first_segment,
   ct.has_transfers,
   zd.tags LIKE '%bot_end_conversation%' AS is_bot,
   zd.tags LIKE '%closed_by_merge%' AS is_closed_by_merge, 
@@ -264,8 +268,8 @@ SELECT DISTINCT
   ct.ts_updated,
   ct.ts_first_event AS ts_ticket_started,
   ct.ts_last_event AS ts_ticket_ended,
-  ct.ts_task_closed,
-  ct.ts_task_created
+  ct.ts_task_closed AS ts_segment_closed,
+  ct.ts_task_created AS ts_segment_created
 FROM
   quinto_messenger_tickets ct
 JOIN
@@ -276,7 +280,7 @@ JOIN
     ON ztu.id_ticket = zd.id_ticket
 LEFT JOIN
   datalake_gsheets_clean.department_control dc
-    ON dc.department = ct.department
+    ON dc.department = zd.zendesk_ticket_department
 LEFT JOIN
   chat_csat cc
     ON cc.id_ticket = zd.id_ticket

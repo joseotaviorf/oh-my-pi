@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS customer_support.fact_ticket (
     last_department VARCHAR(100),
     zendesk_department VARCHAR(100),
     total_departments INTEGER,
-    total_tasks INTEGER,
+    total_segments INTEGER,
     front_or_back VARCHAR(10),
     back_ticket BIGINT,
     resolution_survey BOOLEAN,

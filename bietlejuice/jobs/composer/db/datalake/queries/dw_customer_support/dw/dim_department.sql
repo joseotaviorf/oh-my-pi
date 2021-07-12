@@ -5,6 +5,7 @@ SELECT
   NULLIF(team,'-') AS team,
   NULLIF(journey_step,'-') AS journey_step,
   channel,
+  LOWER(front_or_back) AS front_or_back,
   concentrix_area_name,
   concentrix_area = 'Sim' AS is_concentrix,
   active_department = 'Sim' AS is_active,
