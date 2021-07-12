@@ -1,4 +1,0 @@
-from bietlejuice.jobs.composer.base.db import QUERIES_DATALAKE_PATH
-
-SOURCE = "teravoz"
-QUERIES_TERAVOZ_DATALAKE_PATH = QUERIES_DATALAKE_PATH + SOURCE

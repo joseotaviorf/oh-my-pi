@@ -18,5 +18,4 @@ dags_out_of_pattern: [
     "mitula",
     "regions_polygon",
     "rtb_campaigns",
-    "teravoz",
 ]
