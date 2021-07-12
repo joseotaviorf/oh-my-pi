@@ -68,7 +68,7 @@ SELECT
   --
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.data_assinatura_ccv4.value') AS DATE) AS dt_sale_agreement_created,
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.data27.value') AS DATE) AS dt_sale_agreement_signed,
-  CAST(GET_JSON_OBJECT(moa.updated_message, '$.data4.value') AS DATE) AS dt_onboarding_ended,
+  CAST(GET_JSON_OBJECT(moa.updated_message, '$.date4.value') AS DATE) AS dt_onboarding_ended,
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.data0.value') AS DATE) AS dt_bank_legal_analysis_started,
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.data15.value') AS DATE) AS dt_financing_started,
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.data10.value') AS DATE) AS dt_financing_ended,
