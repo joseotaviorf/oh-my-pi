@@ -28,6 +28,7 @@ costs_targets_results_combined AS (
 		COALESCE(dl.utm_campaign,'') AS utm_campaign,
 		COALESCE(dl.utm_content,'') AS utm_content,
 		COALESCE(dl.utm_term,'') AS utm_term,
+		COALESCE(p.origin_phone,'') AS origin_phone,
     CASE
         WHEN LOWER(dl.utm_campaign) ~ '(sale|girafa|vender)' OR f.sk_user_lead_affiliate IN (912255, 360754, 1711931, 2257503)
             THEN 'Sale'
@@ -56,9 +57,11 @@ costs_targets_results_combined AS (
             ON dl.sk_lead = f.sk_lead
         JOIN dim_region AS dr
             ON f.sk_region = dr.sk_region
+        LEFT JOIN datalake_wololo_clean_prod.prospect p
+            ON p.id_reference = f.sk_lead
     WHERE
         f.sk_lead_date > 0
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
 
 UNION ALL
 
@@ -75,6 +78,7 @@ UNION ALL
 		COALESCE(dl.utm_campaign,'') AS utm_campaign,
 		COALESCE(dl.utm_content,'') AS utm_content,
 		COALESCE(dl.utm_term,'') AS utm_term,
+		COALESCE(p.origin_phone,'') AS origin_phone,
         CASE
             WHEN LOWER(dl.utm_campaign) ~ '(sale|girafa|vender)' OR f.sk_user_lead_affiliate IN (912255, 360754, 1711931, 2257503)
                 THEN 'Sale'
@@ -103,9 +107,11 @@ UNION ALL
             ON dl.sk_lead = f.sk_lead
         JOIN dim_region AS dr
             ON f.sk_region = dr.sk_region
+        LEFT JOIN datalake_wololo_clean_prod.prospect p
+            ON p.id_reference = f.sk_lead
     WHERE
         f.sk_prospect_date > 0
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
 
 UNION ALL
 
@@ -122,6 +128,7 @@ UNION ALL
 		COALESCE(dl.utm_campaign,'') AS utm_campaign,
 		COALESCE(dl.utm_content,'') AS utm_content,
 		COALESCE(dl.utm_term,'') AS utm_term,
+		COALESCE(p.origin_phone,'') AS origin_phone,
         CASE
             WHEN LOWER(dl.utm_campaign) ~ '(sale|girafa|vender)' OR f.sk_user_lead_affiliate IN (912255, 360754, 1711931, 2257503)
                 THEN 'Sale'
@@ -150,9 +157,11 @@ UNION ALL
             ON dl.sk_lead = f.sk_lead
         JOIN dim_region AS dr
             ON f.sk_region = dr.sk_region
+        LEFT JOIN datalake_wololo_clean_prod.prospect p
+            ON p.id_reference = f.sk_lead
     WHERE
         f.sk_qualified_date > 0
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
 
 UNION ALL
 
@@ -169,6 +178,7 @@ UNION ALL
 		COALESCE(dl.utm_campaign,'') AS utm_campaign,
 		COALESCE(dl.utm_content,'') AS utm_content,
 		COALESCE(dl.utm_term,'') AS utm_term,
+		COALESCE(p.origin_phone,'') AS origin_phone,
         CASE
             WHEN LOWER(dl.utm_campaign) ~ '(sale|girafa|vender)' OR f.sk_user_lead_affiliate IN (912255, 360754, 1711931, 2257503)
                 THEN 'Sale'
@@ -197,9 +207,11 @@ UNION ALL
             ON dl.sk_lead = f.sk_lead
         JOIN dim_region AS dr
             ON f.sk_region = dr.sk_region
+        LEFT JOIN datalake_wololo_clean_prod.prospect p
+            ON p.id_reference = f.sk_lead
     WHERE
         f.sk_opportunity_date > 0
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
 
 UNION ALL
 
@@ -216,6 +228,7 @@ UNION ALL
         COALESCE(dl.utm_campaign,'') AS utm_campaign,
         COALESCE(dl.utm_content,'') AS utm_content,
         COALESCE(dl.utm_term,'') AS utm_term,
+		COALESCE(p.origin_phone,'') AS origin_phone,
         CASE
             WHEN LOWER(dl.utm_campaign) ~ '(sale|girafa|vender)' OR f.sk_user_lead_affiliate IN (912255, 360754, 1711931, 2257503)
                 THEN 'Sale'
@@ -244,6 +257,8 @@ UNION ALL
             ON dl.sk_lead = f.sk_lead
         JOIN dim_region AS dr
             ON f.sk_region = dr.sk_region
+        LEFT JOIN datalake_wololo_clean_prod.prospect p
+            ON p.id_reference = f.sk_lead
         JOIN dim_date AS dd
             ON f.sk_first_listing_date = dd.sk_date
         LEFT JOIN listings_rental AS lr
@@ -251,7 +266,7 @@ UNION ALL
             AND dd.month_start = lr.month_start
     WHERE
         f.sk_first_listing_date > 0
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
 
 UNION ALL
 
@@ -465,6 +480,7 @@ affiliates AS (
         utm_campaign,
         utm_content,
         utm_term,
+        NULL::TEXT AS origin_phone,
         NULL::TEXT AS campaign_context,
         'Sale' as business,
         COUNT(NULL) AS leads,
@@ -481,7 +497,7 @@ affiliates AS (
         SUM(0::FLOAT) AS budget
     FROM affiliates
     WHERE business_context = 'Sale' OR (business_context IS NULL AND mkt_origin IN ('Doorman Sale','Indica Aí - Agents Sale','Indica Aí - General Sale'))
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
     ),
     supply_affiliates_cost AS (
     SELECT
@@ -494,6 +510,7 @@ affiliates AS (
         utm_campaign,
         utm_content,
         utm_term,
+        NULL::TEXT AS origin_phone,
         NULL::TEXT AS campaign_context,
         'Rental' as business,
         COUNT(NULL) AS leads,
@@ -510,7 +527,7 @@ affiliates AS (
         SUM(0::FLOAT) AS budget
     FROM affiliates
     WHERE business_context = 'Rent' OR (business_context is NULL AND mkt_origin IN ('Doorman','Indica Aí - Agents','Indica Aí - General'))
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
     ),
     supply_landlords_cost AS (
     SELECT
@@ -523,6 +540,7 @@ affiliates AS (
         co.utm_campaign AS utm_campaign,
         co.utm_content AS utm_content,
         co.utm_term AS utm_term,
+        NULL::TEXT AS origin_phone,
         NULL::TEXT AS campaign_context,
         'Rental' AS business,
         COUNT(NULL) AS leads,
@@ -543,7 +561,7 @@ affiliates AS (
       AND dbt.date BETWEEN '2020-01-01' AND (CURRENT_DATE - interval '1 day')
       AND co.mkt_origin IN ('Owner PWA','Price Calculator','New Channels')
       AND co.mkt_channel != 'Girafa'
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
     ),
     supply_sale_cost AS (
     SELECT
@@ -556,6 +574,7 @@ affiliates AS (
         co.utm_campaign AS utm_campaign,
         co.utm_content AS utm_content,
         co.utm_term AS utm_term,
+        NULL::TEXT AS origin_phone,
         NULL::TEXT AS campaign_context,
         'Sale' AS business,
         COUNT(NULL) AS leads,
@@ -574,7 +593,7 @@ affiliates AS (
     JOIN dim_date dbt ON dbt.sk_date = co.sk_date
     WHERE co.account_name IN ('quintoandar_supply_sale_display', 'quintoandar_supply_sale', 'supply_landlords_sale', 'supply_landlords')
       AND co.mkt_origin IN ('Owner PWA - Sale', 'Price Calculator - Sale')
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
     ),
     supply_ciq_cost AS (
     SELECT
@@ -587,6 +606,7 @@ affiliates AS (
         co.utm_campaign AS utm_campaign,
         co.utm_content AS utm_content,
         co.utm_term AS utm_term,
+        NULL::TEXT AS origin_phone,
         NULL::TEXT AS campaign_context,
         'Rental' AS business,
         COUNT(NULL) AS leads,
@@ -604,7 +624,7 @@ affiliates AS (
     FROM marketing.fact_marketing_daily_costs co
     JOIN dim_date dbt ON dbt.sk_date = co.sk_date
     WHERE co.mkt_origin = 'CIQ'
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
     ),
     cost_union AS (
         SELECT * FROM supply_affiliates_cost
@@ -639,6 +659,7 @@ UNION ALL
         NULL::TEXT AS utm_campaign,
         NULL::TEXT AS utm_content,
         NULL::TEXT AS utm_term,
+        NULL::TEXT AS origin_phone,
         'Sale' campaign_context,
         'Sale' AS business_context,
         COUNT(NULL) AS leads,
@@ -656,7 +677,7 @@ UNION ALL
     FROM
         datalake_raw.gsheets_daily_target_supply_sale str
     WHERE str.date >= '2021-04-01'
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
 
 UNION ALL
 
@@ -677,6 +698,7 @@ UNION ALL
         NULL::TEXT AS utm_campaign,
         NULL::TEXT AS utm_content,
         NULL::TEXT AS utm_term,
+        NULL::TEXT AS origin_phone,
         CASE
             WHEN mkt_campaign_context IN ('Organic','Branded') THEN 'Organic'
             WHEN mkt_campaign_context IN ('Only Rent','Rent') THEN 'Rental'
@@ -700,7 +722,7 @@ UNION ALL
     FROM
         datalake_raw.gsheets_sale_mkt_perf_supply_targets str
     WHERE str.date < '2021-04-01'
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
 
 UNION ALL
 
@@ -725,6 +747,7 @@ UNION ALL
         NULL::TEXT AS utm_campaign,
         NULL::TEXT AS utm_content,
         NULL::TEXT AS utm_term,
+        NULL::TEXT AS origin_phone,
         campaign AS campaign_context,
         business AS business_context,
         COUNT(NULL) AS leads,
@@ -743,7 +766,7 @@ UNION ALL
         datalake_raw.gsheets_costs_targets sct
     WHERE planning_mkt_level1 = 'Supply'
         AND sct.date < '2021-04-01'
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
 )
 SELECT
     date,
@@ -771,6 +794,7 @@ SELECT
     utm_campaign,
     utm_content,
     utm_term,
+    NULLIF(origin_phone,'') AS origin_phone,
     CASE
         WHEN campaign_context = 'Rent' THEN 'Rental'
         ELSE campaign_context
@@ -795,4 +819,4 @@ FROM costs_targets_results_combined
   JOIN dim_date AS dd
     USING(sk_date)
 WHERE business_context = 'Sale'
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13
