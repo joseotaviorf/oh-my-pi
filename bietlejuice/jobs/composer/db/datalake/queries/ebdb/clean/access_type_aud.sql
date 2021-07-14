@@ -1,0 +1,26 @@
+SELECT
+   id,
+   imovel_id AS id_house,
+   type_id AS id_type,
+   restriction_id AS id_restriction,
+   occupant_id AS id_occupant,
+   authorization_id AS id_authorization,
+   additionalinfo AS additional_info,
+   description,
+   lockeraddress AS locker_address,
+   password,
+   rev AS rev,
+   revtype AS rev_type,
+   imovel_mod AS mod_id_house,
+   additionalinfo_mod AS mod_additional_info,
+   authorization_mod AS mod_authorization,
+   description_mod AS mod_description,
+   lockeraddress_mod AS mod_locker_address,
+   password_mod AS mod_password,
+   occupant_mod AS mod_occupant,
+   restriction_mod AS mod_restriction,
+   type_mod AS mod_type,
+   vacanton_mod AS mod_dt_vacated_on,
+   vacanton AS dt_vacated_on
+FROM
+   datalake_ebdb_raw.accesstype_aud
