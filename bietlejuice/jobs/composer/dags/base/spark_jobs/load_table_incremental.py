@@ -106,6 +106,7 @@ if __name__ == "__main__":
     )
 
     query_path = (
+        # TODO: maybe we can remove the line below since we do not have schemas on the queries folder anymore
         f"{QUERIES_DATALAKE_PATH}{relative_query_path}/{layer}/{schema}/{table_name}.sql"
         if schema
         else f"{QUERIES_DATALAKE_PATH}{relative_query_path}/{layer}/{table_name}.sql"
