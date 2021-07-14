@@ -49,6 +49,7 @@ This pipeline produces the following output tables:
     - `entrance_inspection_csat`
     - `exit_inspection_csat`
     - `from_to_cancellation`
+    - `google_searches_share_of_interest`    
     - `hotjar_photos_repressed_demand`
     - `inspection_bugs`
     - `inspectors_control`

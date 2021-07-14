@@ -161,6 +161,11 @@ google_costs:
     sheet_name: Google Costs
     clean_table_name: marketing_manual_costs_google
 
+google_searches_share_of_interest:
+    sheet_id: 1eDqOTxQqgQOJVA6CnPa8ZuuriCaYe5MrUpFYni2BpeM
+    sheet_name: google_searches_share_of_interest
+    clean_table_name: google_searches_share_of_interest
+
 hotjar_demanda_reprimida_fotos:
     sheet_id: 1aP3ir1aAPLpzGwbRiS16UH1iTtTQPJbaKz0CcLIbTdc
     sheet_name: demanda_reprimida_fotos
@@ -261,6 +266,11 @@ promotional_bonus_user_targets:
     sheet_name: promotional_bonus_user_targets
     clean_table_name: promotional_bonus_user_targets
 
+rent_criteo_eng_ab_test:
+    sheet_id: 17PonK69vjOYru-xD0acbVqD0bkl_LPuGodhR2AHmn5I
+    sheet_name: rent_criteo_eng_ab_test
+    clean_table_name: rent_criteo_eng_ab_test
+
 rental_cohort_demand:
     sheet_id: 1rTjKP11jXCV8Jfchynmi3UHx5wwoWDVPojxAWABj-rw
     sheet_name: rental_cohort_demand
@@ -305,6 +315,11 @@ retencao_exclusividade_contato_ativo:
     sheet_id: 1VT9AgLJYbGq5ftcBvSY2C-M99bVmpnmO7XFeueh_fmI
     sheet_name: bases_cruzadas
     clean_table_name: retention_exclusivity_active_contact
+
+sale_criteo_eng_ab_test:
+    sheet_id: 1_Lbgnyz8-1BMs3eq6KteLCND1uvLbidzE1hXLAiVFmI
+    sheet_name: sale_criteo_eng_ab_test
+    clean_table_name: sale_criteo_eng_ab_test
 
 sale_demand_targets:
     sheet_id: 1NlB0E3Gd7HFmgzvB8GIQte_i18SxV5Uw1A5lNihXd08
@@ -470,13 +485,3 @@ weekday_supply_channel_share:
     sheet_id: 1Kq-1flAT8YljbtZOD4s1GV5AQg-kkbBrDNdeUtAKwGA
     sheet_name: weekday_supply_channel_share
     clean_table_name: weekday_supply_channel_share
-
-sale_criteo_eng_ab_test:
-    sheet_id: 1_Lbgnyz8-1BMs3eq6KteLCND1uvLbidzE1hXLAiVFmI
-    sheet_name: sale_criteo_eng_ab_test
-    clean_table_name: sale_criteo_eng_ab_test
-
-rent_criteo_eng_ab_test:
-    sheet_id: 17PonK69vjOYru-xD0acbVqD0bkl_LPuGodhR2AHmn5I
-    sheet_name: rent_criteo_eng_ab_test
-    clean_table_name: rent_criteo_eng_ab_test
