@@ -76,6 +76,7 @@ class DWTaskGroup(BaseTaskGroup):
         :rtype: dict[str:list[airflow.models.BaseOperator]]
         """
         layer = LayerEnum.DW.value
+        slugged_dw_schema = StringFormatter.slugify(self.dw_schema)
         slugged_table_name = StringFormatter.slugify(table_name)
         extra_query_template_params = extra_query_template_params or {}
 
@@ -96,7 +97,7 @@ class DWTaskGroup(BaseTaskGroup):
 
         load_table_to_dw_final_schema_task = QuintoAndarDatabricksSubmitRunOperator(
             dag=self.dag,
-            task_id=f"load-{layer}-{self.dw_schema}-{slugged_table_name}",
+            task_id=f"load-{layer}-{slugged_dw_schema}-{slugged_table_name}",
             json={
                 "spark_python_task": {
                     "python_file": f"{self.spark_jobs_path}/load_{table_load_mode}_table_to_dw_final_schema.py",
@@ -108,7 +109,7 @@ class DWTaskGroup(BaseTaskGroup):
 
         load_table_to_redshift_task = QuintoAndarDatabricksSubmitRunOperator(
             dag=self.dag,
-            task_id=f"load-{self.dw_schema}-{slugged_table_name}-into-redshift",
+            task_id=f"load-{slugged_dw_schema}-{slugged_table_name}-into-redshift",
             json={
                 "spark_python_task": {
                     "python_file": f"{self.spark_jobs_path}/load_table_to_redshift.py",
@@ -181,6 +182,8 @@ class DWTaskGroup(BaseTaskGroup):
         extra_query_template_params = extra_query_template_params or {}
         cluster_config_params = cluster_config_params or {}
 
+        slugged_layer = StringFormatter.slugify(layer)
+        slugged_dw_schema = StringFormatter.slugify(self.dw_schema)
         slugged_table_name = StringFormatter.slugify(table_name)
         table_load_mode = self._get_load_mode(is_incremental)
 
@@ -201,7 +204,7 @@ class DWTaskGroup(BaseTaskGroup):
 
         load_table_to_dw_staging_schema_task = QuintoAndarDatabricksSubmitRunOperator(
             dag=self.dag,
-            task_id=f"load-{layer}-{self.dw_schema}-{slugged_table_name}",
+            task_id=f"load-{slugged_layer}-{slugged_dw_schema}-{slugged_table_name}",
             json={
                 "spark_python_task": {
                     "python_file": f"{self.spark_jobs_path}/load_{table_load_mode}_table_to_dw_staging_schema.py",
@@ -245,11 +248,13 @@ class DWTaskGroup(BaseTaskGroup):
         :rtype: dict[str:list[airflow.models.BaseOperator]]
         """
         layer = LayerEnum.DW_STAGING.value
+        slugged_layer = StringFormatter.slugify(layer)
+        slugged_dw_schema = StringFormatter.slugify(self.dw_schema)
         slugged_table_name = StringFormatter.slugify(table_name)
 
         emptiness_test_task = QuintoAndarDatabricksSubmitRunOperator(
             dag=self.dag,
-            task_id=f"test-{layer}-{self.dw_schema}-{slugged_table_name}-emptiness",
+            task_id=f"test-{slugged_layer}-{slugged_dw_schema}-{slugged_table_name}-emptiness",
             json={
                 "spark_python_task": {
                     "python_file": f"{self.spark_jobs_path}/emptiness_test.py",
@@ -263,7 +268,7 @@ class DWTaskGroup(BaseTaskGroup):
         if has_ods_migration_test:
             test_entity_ods_migration_task = QuintoAndarDatabricksSubmitRunOperator(
                 dag=self.dag,
-                task_id=f"test-{layer}-{self.dw_schema}-{slugged_table_name}-ods-migration",
+                task_id=f"test-{slugged_layer}-{slugged_dw_schema}-{slugged_table_name}-ods-migration",
                 json={
                     "spark_python_task": {
                         "python_file": f"{self.spark_jobs_path}/test_ods_migration.py",
@@ -282,7 +287,7 @@ class DWTaskGroup(BaseTaskGroup):
         if self.is_dim(table_name):
             add_default_row_to_dim_task = QuintoAndarDatabricksSubmitRunOperator(
                 dag=self.dag,
-                task_id=f"add-default-row-to-{layer}-{self.dw_schema}-{slugged_table_name}",
+                task_id=f"add-default-row-to-{slugged_layer}-{slugged_dw_schema}-{slugged_table_name}",
                 json={
                     "spark_python_task": {
                         "python_file": f"{self.spark_jobs_path}/add_default_row_to_dim.py",

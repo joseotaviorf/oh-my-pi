@@ -251,7 +251,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :return: dict with initial and final tasks of the created task group
         :rtype: dict
         """
-        slugged_table_name = table_name.replace("_", "-")
+        slugged_table_name = StringFormatter.slugify(table_name)
         partitions = partitions or []
         extra_query_template_params = extra_query_template_params or {}
 
