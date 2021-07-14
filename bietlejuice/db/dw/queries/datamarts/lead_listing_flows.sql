@@ -123,7 +123,7 @@ SELECT
     END AS mkt_origin
 FROM sale.fact_listing_flows hl
 LEFT JOIN datamarts.quintoandar_consultant_listings ciq
-	        ON ciq.sk_house_listing = hl.sk_house_listing AND ciq.businesscontext='SALE'
+	        ON LEFT(ciq.sk_house_listing,9) = LEFT(hl.sk_house_listing,9) AND ciq.businesscontext='SALE'
 ),
 source_ops_sale AS (
 	with
