@@ -27,7 +27,7 @@ CONTEXT = SOURCE
 DAG_ID = f"bietlejuice.{SOURCE}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 11, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "30 0 * * *"
+MAIN_SCHEDULE_INTERVAL = "30 6 * * *"
 
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
