@@ -7,7 +7,7 @@ WITH dispatch_explode AS (
   FROM
       datalake_tracksale_clean.dispatch
 )
-SELECT
+SELECT DISTINCT
   id,
   GET_JSON_OBJECT(d.customers_explode,'$.name') as name,
   GET_JSON_OBJECT(d.customers_explode,'$.identification') as identification,

@@ -15,7 +15,7 @@ last_updated_dispatches AS (
 	FROM dispatches
 	GROUP BY 1
 )
-SELECT
+SELECT DISTINCT
 	d.id,
 	CAST(d.c1 AS INTEGER) AS id_campaign,
 	d.c0 AS campaign_name,
