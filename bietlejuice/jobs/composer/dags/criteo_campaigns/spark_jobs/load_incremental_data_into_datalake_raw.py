@@ -79,16 +79,16 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("environment", help="forno/prod values")
-    parser.add_argument("source", help="name of the source")
-    parser.add_argument("media", help="name of the media")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
+    parser.add_argument("context", help="name of the context")
+    parser.add_argument("media", help="name of the media")
     parser.add_argument("execution_date", help="execution date in str format")
 
     args = parser.parse_args()
 
     logger.info(
         f"""
-            m={JOB_NAME}, environment={args.environment}, source={args.source}, media={args.media},
+            m={JOB_NAME}, environment={args.environment}, context={args.context}, media={args.media},
             execution_date={args.execution_date}, datalake_bucket={args.datalake_bucket}, msg=print spark jobs args"
         """
     )
@@ -100,9 +100,9 @@ if __name__ == "__main__":
     credentials_str = dbutils.secrets.get(scope="quintoandar", key=APIEnum.CRITEO)
     credentials = json.loads(credentials_str)
     environment = args.environment
-    source = args.source
-    media = args.media
     datalake_bucket = args.datalake_bucket
+    context = args.context
+    media = args.media
     execution_date = args.execution_date
     partition_cols = ["year", "month", "day"]
 
@@ -122,7 +122,7 @@ if __name__ == "__main__":
         )
 
         datalake_info = DatalakeMetastoreService.get_db_info(
-            environment, source, datalake_bucket
+            environment, context, datalake_bucket
         )
         spark_metastore_service = SparkMetastoreService(spark_client)
         database_name = datalake_info["db_raw_databricks"]
