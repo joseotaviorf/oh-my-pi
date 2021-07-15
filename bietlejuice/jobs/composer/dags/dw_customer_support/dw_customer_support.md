@@ -17,6 +17,7 @@ This pipeline produces the following output tables in `customer_support` schema
 
 - `fact_ticket`
 - `fact_segment`
+- `fact_csat`
 - `dim_agent`
 - `dim_department`
 - `dim_taxonomy`
