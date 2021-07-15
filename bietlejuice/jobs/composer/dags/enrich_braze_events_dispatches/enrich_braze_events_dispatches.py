@@ -17,8 +17,8 @@ LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 11, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
 
 PARTITION_COLS = ["event_channel", "year", "month", "day"]
-SOURCE = "braze"
-CONTEXT = f"{SOURCE}_events_dispatches"
+
+CONTEXT = "braze_events_dispatches"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 
@@ -62,15 +62,15 @@ datalake_task_group = DatalakeTaskGroup(
     dag=dag,
     env=ENV,
     datalake_bucket=DATALAKE_BUCKET,
-    relative_query_path=CONTEXT,
+    relative_query_path=DAG_NAME,
     spark_jobs_path=SPARK_JOBS_PATH,
     athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
 )
 
 enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     layer=LayerEnum.ENRICH,
-    source_database_base_name=f"{SOURCE}_dispatches",
-    target_database_base_name=f"{SOURCE}_dispatches",
+    source_database_base_name="braze_dispatches",  # TODO this should be the context
+    target_database_base_name="braze_dispatches",  # TODO this should be the context
     is_incremental=True,
     partitions=PARTITION_COLS,
 )
