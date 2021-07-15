@@ -11,9 +11,11 @@ logger = QuintoAndarLogger("ConfigurationService")
 
 class ConfigurationService:
     """
-    Service for getting configuration variables from repository, can interact
-    with global variables set in the default config location or another yaml
-    file.
+    Service to retrieve configuration variables from YAML files and enable their access
+    according to priority rules based on the scope on which each variable was set, with
+    `general` scope as the lowest priority rule and `DAG` or `Spark Job` scopes as the
+    highest ones. The environment affects the selection of each variable as well, requiring
+    all variables to be replicated in each environment in order to be retrieved and used.
     """
 
     VALID_ENVIRONMENTS = ["forno", "prod"]
@@ -33,11 +35,18 @@ class ConfigurationService:
           always the last to be read.
           The first to be read has the priority when getting a config by key.
         """
-        self._ENV = self._get_environment()
-        self._CONFIG_FILE_NAME = f"{self._ENV}_conf.yml"
-        self._GENERAL_CONFIGURATION_FILE = f"{os.path.dirname(os.path.realpath(__file__))}/../configurations/{self._CONFIG_FILE_NAME}"
+        self._dag_name = dag_name
+        self._env = self._get_environment()
+        self._config_file_name = f"{self._env}_conf.yml"
+
+        self._general_configuration_file = f"{os.path.dirname(os.path.realpath(__file__))}/../configurations/{self._config_file_name}"
+        self._dag_configuration_file = (
+            f"{COMPOSER_DAGS_PATH}/{dag_name}/{dag_name}_{self._config_file_name}"
+        )
+        self._spark_job_configuration_file = f"{COMPOSER_DAGS_PATH}/{dag_name}/spark_jobs/{dag_name}_{self._config_file_name}"
+
         self._configuration_files = self._get_configuration_files(
-            dag_name, inverse_file_config_order
+            inverse_file_config_order
         )
         self._configs = self._load_configurations_from_files()
 
@@ -66,9 +75,7 @@ class ConfigurationService:
                 "msg=The environment variable was not set or is invalid."
             )
 
-    def _get_configuration_files(
-        self, dag_name: str, inverse_file_config_order: bool
-    ) -> list:
+    def _get_configuration_files(self, inverse_file_config_order: bool) -> list:
         """
         Identifies the configuration file and add to a list,
 
@@ -76,7 +83,6 @@ class ConfigurationService:
          configuration files.
         The general configuration file is always appended.
 
-        :param dag_name: the DAG name if the Service is called within a DAG or Spark job
         :param inverse_file_config_order: whether it should switch which file
          to load first. If true general configuration files are read first. If
          False the DAGs followed by Spark job files are loaded first.
@@ -84,57 +90,35 @@ class ConfigurationService:
         :return: the files ordered by priority
         """
         configuration_files = []
-        dag_config_file = self.get_dag_config_file(dag_name)
-        if dag_config_file:
-            configuration_files.append(dag_config_file)
 
-        spark_config_file = self.get_spark_job_config_file(dag_name)
-        if spark_config_file:
-            configuration_files.append(spark_config_file)
+        if self._dag_name:
+            if self._config_file_exists(self._dag_configuration_file):
+                configuration_files.append(self._dag_configuration_file)
 
-        if inverse_file_config_order:
-            configuration_files = configuration_files[::-1]
+            if self._config_file_exists(self._spark_job_configuration_file):
+                configuration_files.append(self._spark_job_configuration_file)
 
-        configuration_files.append(self._GENERAL_CONFIGURATION_FILE)
+            if inverse_file_config_order:
+                configuration_files = configuration_files[::-1]
+
+        configuration_files.append(self._general_configuration_file)
         return configuration_files
 
-    @staticmethod
-    def get_dag_config_file(dag_name: str) -> Union[str, bool]:
+    def _config_file_exists(self, config_file_path: str) -> bool:
         """
-        Gets configuration file path for a specific DAG when existent.
+        Checks if the configuration file path exists.
 
-        :param dag_name: Name of the DAG
+        :param config_file_path: DAG's or Spark Job's configuration file path
         """
-        if dag_name is None:
-            return False
-
-        dag_config_file_path = f"{COMPOSER_DAGS_PATH}/{dag_name}/{dag_name}_conf.yml"
-        if not os.path.isfile(dag_config_file_path):
+        if not os.path.isfile(config_file_path):
             logger.warning(
-                f"dag_name={dag_name}, expected_file={dag_config_file_path}, msg=The DAG configuration file does not exist."
+                f"dag_name={self._dag_name}, "
+                f"ENV={self._env}, "
+                f"expected_file={config_file_path}, "
+                f"msg=This configuration file was not found in the given path."
             )
-            dag_config_file_path = False
-
-        return dag_config_file_path
-
-    @staticmethod
-    def get_spark_job_config_file(dag_name: str) -> Union[str, bool]:
-        """
-        Gets configuration file under spark_jobs path for a specific DAG when
-         existent.
-
-        :param dag_name: Name of the DAG
-        """
-        if dag_name is None:
             return False
-
-        spark_job_config_file_path = (
-            f"{COMPOSER_DAGS_PATH}/{dag_name}/spark_jobs/{dag_name}_conf.yml"
-        )
-        if not os.path.isfile(spark_job_config_file_path):
-            spark_job_config_file_path = False
-
-        return spark_job_config_file_path
+        return True
 
     def _load_configurations_from_files(self) -> dict:
         """
@@ -170,7 +154,7 @@ class ConfigurationService:
         """
         if not self._configuration_key_exists(key):
             raise IndexError(
-                f"configuration_key={key}, env_configuration_file={self._CONFIG_FILE_NAME}, "
+                f"configuration_key={key}, env_configuration_file={self._config_file_name}, "
                 f"msg=Configuration not registered in configuration file."
             )
 

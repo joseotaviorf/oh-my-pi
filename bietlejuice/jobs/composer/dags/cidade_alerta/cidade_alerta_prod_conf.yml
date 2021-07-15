@@ -1,0 +1,21 @@
+---
+tables: [
+  {
+    "table_name": "alert",
+    "extraction_type": "incremental",
+    "date_filter_column": "created_at"
+  },
+  {
+    "table_name": "audit",
+    "extraction_type": "incremental",
+    "date_filter_column": "revision_date"
+  },
+  {
+    "table_name": "highlights",
+    "extraction_type": "full"
+  },
+  {
+    "table_name": "profile",
+    "extraction_type": "full"
+  }
+]

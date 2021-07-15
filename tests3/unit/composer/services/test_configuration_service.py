@@ -37,14 +37,12 @@ class TestConfigurationService:
         )
 
         # assert
-        assert configuration_service._ENV == mocked_env
-        assert configuration_service._CONFIG_FILE_NAME == "my_mocked_env_conf.yml"
+        assert configuration_service._env == mocked_env
+        assert configuration_service._config_file_name == "my_mocked_env_conf.yml"
         assert configuration_service._configuration_files == mocked_config_files
         assert configuration_service._configs == mocked_configs
         mock__get_environment.assert_called_once_with()
-        mock__get_configuration_files.assert_called_once_with(
-            dag_name, inverse_file_config_order
-        )
+        mock__get_configuration_files.assert_called_once_with(inverse_file_config_order)
         mock__load_configurations_from_files.assert_called_once_with()
 
     @mock.patch.object(ConfigurationService, "_validate_environment")
@@ -69,58 +67,99 @@ class TestConfigurationService:
         with pytest.raises(ValueError):
             configuration_service._validate_environment(invalid_env)
 
-    @mock.patch.object(ConfigurationService, "get_spark_job_config_file")
-    @mock.patch.object(ConfigurationService, "get_dag_config_file")
-    def test__get_configuration_files_with_dag_conf_file(
-        self,
-        mocked_get_dag_config_file,
-        mocked_get_spark_job_config_file,
-        configuration_service,
-    ):
+    def test__get_configuration_files_without_dag_name(self, configuration_service):
         # arrange
-        dag_name = "cool_dag"
         inverse_file_config_order = False
-
-        mocked_dag_conf_file_path = "mocked_general_conf_file_path"
-        mocked_get_dag_config_file.return_value = mocked_dag_conf_file_path
+        configuration_service._dag_name = None
 
         mocked_general_conf_file_path = "mocked_general_conf_file_path"
-        configuration_service._GENERAL_CONFIGURATION_FILE = (
+        configuration_service._general_configuration_file = (
             mocked_general_conf_file_path
         )
 
-        mocked_get_spark_job_config_file.return_value = False
-        expected_files = [mocked_dag_conf_file_path, mocked_general_conf_file_path]
+        expected_files = [mocked_general_conf_file_path]
 
         # act
         returned_files = configuration_service._get_configuration_files(
-            dag_name, inverse_file_config_order
+            inverse_file_config_order
         )
 
         # assert
         assert returned_files == expected_files
 
-    @mock.patch.object(ConfigurationService, "get_spark_job_config_file")
-    @mock.patch.object(ConfigurationService, "get_dag_config_file")
-    def test__get_configuration_files_with_spark_job_conf_file(
-        self,
-        mocked_get_dag_config_file,
-        mocked_get_spark_job_config_file,
-        configuration_service,
+    @mock.patch.object(ConfigurationService, "_config_file_exists")
+    def test__get_configuration_files_without_specific_conf_file(
+        self, mocked__config_file_exists, configuration_service
     ):
         # arrange
-        dag_name = "cool_dag"
-        inverse_file_config_order = False
+        mocked__config_file_exists.side_effect = [False, False]
 
-        mocked_get_dag_config_file.return_value = False
+        inverse_file_config_order = False
+        configuration_service._dag_name = "dag"
 
         mocked_general_conf_file_path = "mocked_general_conf_file_path"
-        configuration_service._GENERAL_CONFIGURATION_FILE = (
+        configuration_service._general_configuration_file = (
             mocked_general_conf_file_path
         )
 
+        expected_files = [mocked_general_conf_file_path]
+
+        # act
+        returned_files = configuration_service._get_configuration_files(
+            inverse_file_config_order
+        )
+
+        # assert
+        assert returned_files == expected_files
+
+    @mock.patch.object(ConfigurationService, "_config_file_exists")
+    def test__get_configuration_files_with_dag_conf_file(
+        self, mocked__config_file_exists, configuration_service
+    ):
+        # arrange
+        mocked__config_file_exists.side_effect = [True, False]
+
+        inverse_file_config_order = False
+        configuration_service._dag_name = "dag"
+
+        mocked_dag_conf_file_path = "mocked_dag_conf_file_path"
+        configuration_service._dag_configuration_file = mocked_dag_conf_file_path
+
+        mocked_general_conf_file_path = "mocked_general_conf_file_path"
+        configuration_service._general_configuration_file = (
+            mocked_general_conf_file_path
+        )
+
+        expected_files = [mocked_dag_conf_file_path, mocked_general_conf_file_path]
+
+        # act
+        returned_files = configuration_service._get_configuration_files(
+            inverse_file_config_order
+        )
+
+        # assert
+        assert returned_files == expected_files
+
+    @mock.patch.object(ConfigurationService, "_config_file_exists")
+    def test__get_configuration_files_with_spark_job_conf_file(
+        self, mocked__config_file_exists, configuration_service
+    ):
+        # arrange
+        mocked__config_file_exists.side_effect = [False, True]
+
+        inverse_file_config_order = False
+        configuration_service._dag_name = "dag"
+
         mocked_spark_job_conf_file_path = "mocked_spark_job_conf_file_path"
-        mocked_get_spark_job_config_file.return_value = mocked_spark_job_conf_file_path
+        configuration_service._spark_job_configuration_file = (
+            mocked_spark_job_conf_file_path
+        )
+
+        mocked_general_conf_file_path = "mocked_general_conf_file_path"
+        configuration_service._general_configuration_file = (
+            mocked_general_conf_file_path
+        )
+
         expected_files = [
             mocked_spark_job_conf_file_path,
             mocked_general_conf_file_path,
@@ -128,34 +167,35 @@ class TestConfigurationService:
 
         # act
         returned_files = configuration_service._get_configuration_files(
-            dag_name, inverse_file_config_order
+            inverse_file_config_order
         )
 
         # assert
         assert returned_files == expected_files
 
-    @mock.patch.object(ConfigurationService, "get_spark_job_config_file")
-    @mock.patch.object(ConfigurationService, "get_dag_config_file")
+    @mock.patch.object(ConfigurationService, "_config_file_exists")
     def test__get_configuration_files_in_inverse_order(
-        self,
-        mocked_get_dag_config_file,
-        mocked_get_spark_job_config_file,
-        configuration_service,
+        self, mocked__config_file_exists, configuration_service
     ):
         # arrange
-        dag_name = "cool_dag"
+        mocked__config_file_exists.side_effect = [True, True]
+
         inverse_file_config_order = True
+        configuration_service._dag_name = "dag"
 
         mocked_dag_conf_file_path = "mocked_dag_conf_file_path"
-        mocked_get_dag_config_file.return_value = mocked_dag_conf_file_path
+        configuration_service._dag_configuration_file = mocked_dag_conf_file_path
+
+        mocked_spark_job_conf_file_path = "mocked_spark_job_conf_file_path"
+        configuration_service._spark_job_configuration_file = (
+            mocked_spark_job_conf_file_path
+        )
 
         mocked_general_conf_file_path = "mocked_general_conf_file_path"
-        configuration_service._GENERAL_CONFIGURATION_FILE = (
+        configuration_service._general_configuration_file = (
             mocked_general_conf_file_path
         )
 
-        mocked_spark_job_conf_file_path = "mocked_spark_job_conf_file_path"
-        mocked_get_spark_job_config_file.return_value = mocked_spark_job_conf_file_path
         expected_files = [
             mocked_spark_job_conf_file_path,
             mocked_dag_conf_file_path,
@@ -164,89 +204,59 @@ class TestConfigurationService:
 
         # act
         returned_files = configuration_service._get_configuration_files(
-            dag_name, inverse_file_config_order
+            inverse_file_config_order
         )
 
         # assert
         assert returned_files == expected_files
 
-    def test_get_dag_config_file_with_no_dag_specified(self, configuration_service):
-        # Act
-        returned_value = configuration_service.get_dag_config_file(dag_name=None)
-
-        # Assert
-        assert not returned_value
-
-    @mock.patch("bietlejuice.jobs.composer.services.configuration_service.os")
-    def test_get_dag_config_file_with_non_existent_config_file_for_dag(
-        self, mocked_os, configuration_service
+    @mock.patch(
+        "bietlejuice.jobs.composer.services.configuration_service.logger.warning"
+    )
+    @mock.patch(
+        "bietlejuice.jobs.composer.services.configuration_service.os.path.isfile"
+    )
+    def test_config_file_exists_false(
+        self, mocked_isfile, mocked_logger, configuration_service
     ):
-        # Arrange
-        dag_name = "<some_awesome_dag>"
-        mocked_os.path.isfile.return_value = False
-        expected_return = False
+        # arrange
+        config_file_path = "path"
 
-        # Act
-        config_path = configuration_service.get_dag_config_file(dag_name)
+        dag_name = "dag"
+        configuration_service._dag_name = dag_name
 
-        # Assert
-        assert config_path == expected_return
+        env = "env"
+        configuration_service._env = env
 
-    @mock.patch("bietlejuice.jobs.composer.services.configuration_service.os")
-    def test_get_dag_config_file_with_existent_config_file_for_dag(
-        self, mocked_os, configuration_service
-    ):
-        # Arrange
-        dag_name = "<some_awesome_dag>"
-        mocked_os.path.isfile.return_value = True
-        expected_return = f"{COMPOSER_DAGS_PATH}/{dag_name}/{dag_name}_conf.yml"
+        mocked_isfile.return_value = False
 
-        # Act
-        config_path = configuration_service.get_dag_config_file(dag_name)
+        # act
+        returned_value = configuration_service._config_file_exists(config_file_path)
 
-        # Assert
-        assert config_path == expected_return
-
-    def test_get_spark_job_config_file_with_no_dag_specified(
-        self, configuration_service
-    ):
-        # Act
-        returned_value = configuration_service.get_spark_job_config_file(dag_name=None)
-
-        # Assert
-        assert not returned_value
-
-    @mock.patch("bietlejuice.jobs.composer.services.configuration_service.os")
-    def test_get_spark_job_config_file_with_non_existent_config_file_for_dag(
-        self, mocked_os, configuration_service
-    ):
-        # Arrange
-        dag_name = "<some_awesome_dag>"
-        mocked_os.path.isfile.return_value = False
-        expected_return = False
-
-        # Act
-        config_path = configuration_service.get_spark_job_config_file(dag_name)
-
-        # Assert
-        assert config_path == expected_return
-
-    @mock.patch("bietlejuice.jobs.composer.services.configuration_service.os")
-    def test_get_spark_job_config_file_with_existent_config_file_for_dag(
-        self, mocked_os, configuration_service
-    ):
-        # Arrange
-        dag_name = "<some_awesome_dag>"
-        mocked_os.path.isfile.return_value = True
-        expected_return = (
-            f"{COMPOSER_DAGS_PATH}/{dag_name}/spark_jobs/{dag_name}_conf.yml"
+        # assert
+        assert returned_value is False
+        mocked_isfile.assert_called_once_with(config_file_path)
+        mocked_logger.assert_called_once_with(
+            f"dag_name={dag_name}, "
+            f"ENV={env}, "
+            f"expected_file={config_file_path}, "
+            f"msg=This configuration file was not found in the given path."
         )
 
-        # Act
-        config_path = configuration_service.get_spark_job_config_file(dag_name)
+    @mock.patch(
+        "bietlejuice.jobs.composer.services.configuration_service.os.path.isfile"
+    )
+    def test_config_file_exists_true(self, mocked_isfile, configuration_service):
+        # arrange
+        config_file_path = "path"
+        mocked_isfile.return_value = True
 
-        # Assert
-        assert config_path == expected_return
+        # act
+        returned_value = configuration_service._config_file_exists(config_file_path)
+
+        # assert
+        assert returned_value is True
+        mocked_isfile.assert_called_once_with(config_file_path)
 
     @mock.patch("bietlejuice.jobs.composer.services.configuration_service.pconf")
     def test__load_configurations_from_files(self, mocked_pconf, configuration_service):
