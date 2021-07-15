@@ -51,6 +51,10 @@ Repository with implementation of Airflow DAGs.
     - [Export AWS credentials](#5-export-aws-credentials)
     - [Set up Airflow](#6-set-up-airflow)
     - [Set up Git hooks](#7-set-necessary-environment-variables)
+  - [Local setup python 3 - pyenv](#local-setup-python-3---pyenv)
+    - [Clone the project](#1-clone-the-project-3)
+    - [Setup python environment](#2-setup-python-environment)
+    - [Install dependencies](#3-install-dependencies)
 - [Useful commands](#useful-commands)
 - [Improving local Airflow Performance](#improving-local-airflow-performance)
 - [Architecture](#architecture)
@@ -79,8 +83,8 @@ The Airflow - python3 will run in your machine and at Databricks, thereby we can
 
 **Requirements**
     
-    docker-ce (https://docs.docker.com/install/linux/docker-ce/ubuntu/)
-    docker-compose (https://docs.docker.com/compose/install/)
+    docker (https://docs.docker.com/get-docker/)
+    docker-compose (https://docs.docker.com/compose/install/) 
 
 #### 1. Clone the project
 
@@ -114,7 +118,18 @@ Run the following command in the project root folder replacing the placeholders
 
 After install docker and docker-compose, we need to set the local environment
 
-##### 3.1 Create docker local environemnt
+#### 3.1 For macOS users
+
+Docker for Mac requires shared paths to be set explicitly. See [this page](https://docs.docker.com/docker-for-mac) for more info.
+
+You can configure shared paths from Docker -> Preferences -> Resources -> File Sharing. There, add two new paths:
+
+```
+/home/PostgreSQL/airflow_py3
+/home/your-username/.aws
+```
+
+##### 3.2 Create docker local environemnt
 ```
 $ make create-docker-environment-python3
 ``` 
@@ -341,6 +356,68 @@ Create a new connection like example below:
 ```
     $ pip install -I flake8==3.5.0 && flake8 --install-hook git && git config --bool flake8.strict true
 ```
+
+### Local setup python 3 - pyenv
+
+This setup is only used to run unit-tests, linting and style check. To run Airflow, use the docker environment 
+
+**Requirements**
+
+    [pyenv](https://github.com/pyenv/pyenv)
+    [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv)
+    # you can install both using pyenv-installer
+    [pyenv-installer](https://github.com/pyenv/pyenv-installer)
+
+
+#### 1. Clone the project
+
+    $ git clone git@github.com:quintoandar/bi-etl-ejuice.git
+    $ cd bi-etl-ejuice
+
+Obs.: From now on the current repo (`bi-etl-ejuice`) will be referred to as $BIETLEJUICE_HOME
+
+
+#### 2. Setup python environment
+
+```
+  make environment-python3
+```
+
+#### 2.1 For macOS users
+
+Pyenv might fail to install Python versions in Mac. As a workaround, you can [download and install versions manually](https://www.python.org/downloads/) or follow
+the steps provided in [this Github issue](https://github.com/pyenv/pyenv/issues/1740#issuecomment-738749988).
+
+Your shell should have automatically activated the virtualenv
+
+#### 3. Install dependencies
+
+```
+  make requirements-python3
+  make requirements-test-python3
+```
+
+#### 3.1 For macOS users
+
+Some dependencies might fail to install on Mac:
+
+* Pandas: Try installing cython and numpy manually: `pip install cython numpy`
+  
+* Psycopg2: You can install postgresql via homewbrew and then install psycopg2:
+  ```
+  brew install postgresql
+  pip install psycopg2 
+  ```
+  
+* Other dependencies (grpcio, criptography, etc): Make sure you're using a updated version of pip before installing dependencies
+  ```
+  pip install --upgrade pip
+  ```
+
+**Note**: QuintoAndar internal libs might fail to install due to dependency errors. You can avoid installing them by commenting their lines in `requirements3.txt`
+
+Now you should be able to run the commands described in the Useful commands section
+
 
 ### Useful commands
 
