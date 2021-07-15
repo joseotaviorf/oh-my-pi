@@ -8,7 +8,7 @@ This DAG enriches amplitude events that come from user login, user created, and 
 Thus, we can track the user's initial journey in the app.
 
 ​<details>
-  <summary><strong> > DAG details (click to expand)</strong></summary
+  <summary><strong> > DAG details (click to expand)</strong></summary>
 
 ### Execution Interval
 
