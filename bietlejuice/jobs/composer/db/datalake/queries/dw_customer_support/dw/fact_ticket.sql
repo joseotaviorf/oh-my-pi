@@ -11,8 +11,10 @@ WITH call_tickets AS (
       )
     ) AS sk_taxonomy,
     MD5(CONCAT('call', COALESCE(direction, ''))) AS sk_channel,
+    id_first_agent AS sk_first_agent,
+    id_last_agent AS sk_last_agent,
     MD5(first_department) AS sk_first_department,
-    MD5(last_department) AS sk_last_department, 
+    MD5(last_department) AS sk_last_department,
     MD5(zendesk_department) AS sk_zendesk_department,
     id_user AS sk_user,
     id_contract AS sk_contract,
@@ -79,6 +81,8 @@ chat_tickets AS (
       )
     ) AS sk_taxonomy,
     MD5('chat') AS sk_channel,
+    id_first_agent AS sk_first_agent,
+    id_last_agent AS sk_last_agent,
     MD5(first_department) AS sk_first_department,
     MD5(last_department) AS sk_last_department,
     MD5(zendesk_department) AS sk_zendesk_department,
@@ -147,6 +151,8 @@ email_tickets AS (
       )
     ) AS sk_taxonomy,
     MD5('email') AS sk_channel,
+    id_agent AS sk_first_agent,
+    id_agent AS sk_last_agent,
     MD5(department) AS sk_first_department,
     MD5(department) AS sk_last_department, 
     MD5(department) AS sk_zendesk_department,
