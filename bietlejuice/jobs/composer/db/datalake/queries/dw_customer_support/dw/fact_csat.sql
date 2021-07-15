@@ -1,5 +1,5 @@
 SELECT
-  id_ticket AS sk_ticket,
+  CAST(id_ticket AS BIGINT) AS sk_ticket,
   channel,
   csat_comment,
   is_solved,
