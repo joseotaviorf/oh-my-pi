@@ -23,6 +23,7 @@ This pipeline produces the following output tables:
     - All gsheets defined in `gsheets_files.yaml`
 
 2. Data lake clean:
+    - `acquisition_target_per_source`
     - `affiliate_type_targets`
     - `affiliates_monthly_expected_results`
     - `agents_control`
@@ -125,7 +126,7 @@ This pipeline produces the following output tables:
 
 ### Responsible Data Engineering Team
 ​
-For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the 
+For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the
 [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
 
 </details>
