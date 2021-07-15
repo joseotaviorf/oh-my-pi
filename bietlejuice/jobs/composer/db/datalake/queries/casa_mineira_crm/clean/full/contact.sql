@@ -1,6 +1,6 @@
 SELECT
     id, 
-    cliente_id AS id_customer,
+    cliente_id AS id_client,
     imovel_id AS id_house,
     midia_id AS id_media, 
     origem_id AS id_origin, 
