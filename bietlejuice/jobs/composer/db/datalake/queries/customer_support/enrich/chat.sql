@@ -10,6 +10,21 @@ WITH quinto_messenger_tickets AS (
       FROM datalake_quinto_messenger.task
       GROUP BY 1
   ),
+  task_transfer_reason AS (
+    SELECT DISTINCT
+      id_reviewed AS id_task,
+      rating_selected[0] AS transference_reason
+    FROM 
+      datalake_insider_clean.review r
+    JOIN
+      datalake_insider_clean.review_feature rf
+        ON r.id = rf.id
+    JOIN
+      datalake_insider_clean.feature f
+        ON rf.id_feature = f.id
+    WHERE
+      f.name = 'ticket_transfer_reason'
+  ),
   task_timestamps AS (
     SELECT
       id_task,
@@ -89,6 +104,7 @@ WITH quinto_messenger_tickets AS (
       t.transferred_from_dept,
       t.transferred_to_dept,
       t.transference_type,
+      task_transfer_reason.transference_reason,
       CAST(COALESCE(cm.number_of_departments,0) AS INT) AS number_of_departments,
       CAST(COALESCE(cm.number_of_tasks,0) AS INT) AS number_of_tasks,
       cm.number_of_tasks > 1 AS has_transfers,
@@ -115,6 +131,9 @@ WITH quinto_messenger_tickets AS (
     LEFT JOIN
       task t
         ON t.id_channel = c.id_channel
+    LEFT JOIN
+      task_transfer_reason
+        ON task_transfer_reason.id_task = t.id_task
     LEFT JOIN
       datalake_gsheets_clean.agents_control ac
         ON t.agent_email = ac.email
@@ -247,6 +266,7 @@ SELECT DISTINCT
   zd.minutes_first_resolution_time_business,
   FIRST(ct.id_task) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created DESC) = ct.id_task AS is_last_segment,
   FIRST(ct.id_task) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created ASC) = ct.id_task AS is_first_segment,
+  ct.transference_reason,
   ct.has_transfers,
   zd.tags LIKE '%bot_end_conversation%' AS is_bot,
   zd.tags LIKE '%closed_by_merge%' AS is_closed_by_merge, 

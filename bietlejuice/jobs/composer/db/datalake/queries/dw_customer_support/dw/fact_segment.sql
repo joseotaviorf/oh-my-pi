@@ -10,6 +10,7 @@ WITH call_segments AS (
         transferred_from_dept,
         transferred_to_dept,
         transference_type,
+        NULL AS transference_reason,
         'call' AS channel,
         sla_achieved AS is_sla,
         is_first_segment,
@@ -21,7 +22,7 @@ WITH call_segments AS (
         datalake_customer_support.call c
     WHERE
         id_segment IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
 ),
 chat_segments AS (
     SELECT 
@@ -35,6 +36,7 @@ chat_segments AS (
         transferred_from_dept,
         transferred_to_dept,
         transference_type,
+        transference_reason,
         'chat' AS channel,
         sla_achieved AS is_sla,
         is_first_segment,
@@ -46,7 +48,7 @@ chat_segments AS (
         datalake_customer_support.chat c
     WHERE
         id_segment IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
 ),
 email_segments AS (
     SELECT 
@@ -60,6 +62,7 @@ email_segments AS (
         NULL AS transferred_from_dept,
         NULL AS transferred_to_dept,
         NULL AS transference_type,
+        NULL AS transference_reason,
         'email' AS channel,
         is_sla,
         TRUE AS is_first_segment,
@@ -71,7 +74,7 @@ email_segments AS (
         datalake_customer_support.email
     WHERE
         id_ticket IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
 )
 SELECT
     *

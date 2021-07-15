@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS customer_support.fact_segment (
     transferred_from_dept VARCHAR(100),
     transferred_to_dept VARCHAR(100),
     transference_type VARCHAR(25),
+    transference_reason VARCHAR,
     channel VARCHAR(5),
     is_sla BOOLEAN,
     is_first_segment BOOLEAN,

@@ -409,6 +409,9 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-ticket-funnel
   - bietlejuice.gsheets:load-agents-control-to-clean
   - bietlejuice.gsheets:load-department-control-to-clean
+  - bietlejuice.insider:load-clean-feature
+  - bietlejuice.insider:load-clean-review
+  - bietlejuice.insider:load-clean-review-feature
 
 bietlejuice.enrich_invoice:
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
