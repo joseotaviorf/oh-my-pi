@@ -38,6 +38,7 @@ canceled_date AS (
   )
   SELECT
     mcd.id_booking,
+    ure.id_user AS id_user_cancelation,
     -- TODO [ODS] check if milliseconds is really needed for this column
     CAST(FROM_UNIXTIME(ure.ts_revision/1000) AS TIMESTAMP)
       + (ure.ts_revision % 1000) * INTERVAL 1 MILLISECONDS
@@ -62,7 +63,7 @@ visit_origin AS (
   LEFT JOIN
     datalake_ebdb_clean.visit_origin AS vo_create
       ON vo_create.id = v.id_creation_origin
-  LEFT JOIN 
+  LEFT JOIN
     datalake_ebdb_clean.visit_origin AS vo_update
       ON vo_update.id = v.id_last_update_origin
 ),
@@ -123,10 +124,10 @@ first_booking_author AS (
   SELECT DISTINCT
     bsc.id_booking,
     FIRST_VALUE(id_user) OVER (
-      PARTITION BY bsc.id_booking ORDER BY id 
+      PARTITION BY bsc.id_booking ORDER BY id
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-    ) first_author
-  FROM 
+    ) AS id_user_creation
+  FROM
     datalake_ebdb_clean.booking_status_change AS bsc
 ),
 visitor_fixed_agent as (
@@ -135,12 +136,12 @@ visitor_fixed_agent as (
     SELECT
       pfa_aud.id,
       MAX(CASE WHEN pfa_aud.is_enabled = false THEN from_unixtime(ure.ts_revision / 1000) END) AS ts_fixed_agent_disabled
-    FROM 
+    FROM
       datalake_ebdb_clean.preferred_fixed_agent_aud pfa_aud
-    LEFT JOIN 
+    LEFT JOIN
       datalake_ebdb_clean.user_revision_entity ure
         ON ure.id = pfa_aud.rev
-    WHERE 
+    WHERE
       pfa_aud.mod_is_enabled = true
     GROUP BY 1
   )
@@ -203,6 +204,8 @@ base_booking AS (
     b.id_rescheduled_booking,
     b.id_visitor,
     b.id_visit,
+    fba.id_user_creation,
+    cd.id_user_cancelation,
     b.id_house,
     b.id_agent,
     b.id_attendant,
@@ -325,6 +328,7 @@ base_booking AS (
     b.is_confirmed,
     b.is_closed,
     b.is_agent_fixed,
+    IF(fud.visit_type = 'VIDEO', TRUE, FALSE) AS is_virtual_visit,
     e.is_successful AS is_entrance_successful,
     (b.status = 'Cancelado') AS is_canceled,
     (b.business_context = 'SALE') AS is_sale_visit,
@@ -342,7 +346,7 @@ base_booking AS (
     va.has_landlord_attended,
     (e.problem <> 'LandlordNoShow') AS has_owner_arrived,
     CASE
-        WHEN fba.first_author = 194233 THEN True
+        WHEN fba.id_user_creation = 194233 THEN True
         ELSE False
     END AS is_first_booking_auto,
     brh.is_house_rented
