@@ -13,8 +13,12 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 
-
+# DAG vars
 CONTEXT = "terminator"
+DAG_NAME = f"enrich_{CONTEXT}"
+DAG_ID = f"bietlejuice.{DAG_NAME}"
+LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
+MAIN_START_DATE = datetime(2020, 12, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
 
 # airflow vars
 ENV = os.environ.get("ENVIRONMENT")
@@ -34,12 +38,6 @@ CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 LIBRARIES_DESCRIPTION = Variable.get(
     "bietlejuice_default_libraries", deserialize_json=True
 )
-
-# DAG vars
-DAG_NAME = f"enrich_{CONTEXT}"
-DAG_ID = f"bietlejuice.{DAG_NAME}"
-LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
-MAIN_START_DATE = datetime(2020, 12, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -70,7 +68,7 @@ datalake_task_group = DatalakeTaskGroup(
     dag=dag,
     env=ENV,
     datalake_bucket=DATALAKE_BUCKET,
-    relative_query_path=CONTEXT,
+    relative_query_path=DAG_NAME,
     spark_jobs_path=SPARK_JOBS_PATH,
     athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
 )

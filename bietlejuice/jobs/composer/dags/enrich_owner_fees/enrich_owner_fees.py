@@ -61,7 +61,7 @@ enrich_sub_dag = DatalakeSubDAG(
     env=ENV,
     datalake_bucket=DATALAKE_BUCKET,
     database_base_name=CONTEXT,
-    relative_query_path=CONTEXT,
+    relative_query_path=DAG_NAME,
     spark_job_paths=SPARK_JOBS_PATH,
     athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
     layer=LayerEnum.ENRICH,
@@ -69,7 +69,7 @@ enrich_sub_dag = DatalakeSubDAG(
 
 
 full_file_list = FileService.list_sql_files_without_extension_from_layer(
-    CONTEXT, LayerEnum.ENRICH.value, schema="full"
+    DAG_NAME, LayerEnum.ENRICH.value, schema="full"
 )
 
 enrich_sub_dags = enrich_sub_dag.build_subdags_from_sql_files(
