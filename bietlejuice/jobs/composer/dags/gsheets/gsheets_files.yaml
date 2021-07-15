@@ -176,6 +176,11 @@ hotjar_demanda_reprimida_fotos:
     sheet_name: demanda_reprimida_fotos
     clean_table_name: hotjar_photos_repressed_demand
 
+hub_agents_hierarchy:
+    sheet_id: 1LCtC41-pZRUM34Y6jyfSSys5zCXcueZ5uDmXVoQ5zVk
+    sheet_name: Output
+    clean_table_name: hub_agents_hierarchy
+
 inspectors_control:
     sheet_id: 1cFwadBcEkIoC9zpGQNV7iA1Ii0fZmln5mRbB0LaW4zw
     sheet_name: inspectors_control
