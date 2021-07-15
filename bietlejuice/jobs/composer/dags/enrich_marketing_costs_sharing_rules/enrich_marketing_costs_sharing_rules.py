@@ -61,8 +61,12 @@ def sync_metastore(table_name, table_task):
     )
 
 
-SOURCE = "marketing_costs_sharing_rules"
-DAG_NAME = f"enrich_{SOURCE}"
+# TODO: rename the folder /queries/marketing_costs_sharing_rules to /queries/enrich_marketing_costs_sharing_rules
+SOURCE = (
+    "marketing_costs_sharing_rules"
+)  # TODO: we do not have 'sources' in enrichment DAG, only context
+CONTEXT = SOURCE
+DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = os.environ.get("ENVIRONMENT")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")

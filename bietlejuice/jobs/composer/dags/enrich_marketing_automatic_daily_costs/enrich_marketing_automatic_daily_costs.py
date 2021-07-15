@@ -13,13 +13,16 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 
-SOURCE = "marketing_automatic_daily_costs"
-CONTEXT = "marketing_costs"
-ENV = os.environ.get("ENVIRONMENT")
 
-DAG_NAME = f"enrich_{SOURCE}"
+# TODO: This context is misapplied here.
+#  The DAG is loading data outside its real context (marketing_automatic_daily_costs)
+CONTEXT = "marketing_costs"
+
+# TODO [name against our patterns]: The DAG name shall always be enrich_<context>
+DAG_NAME = f"enrich_marketing_automatic_daily_costs"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 
+ENV = os.environ.get("ENVIRONMENT")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
@@ -64,7 +67,7 @@ datalake_task_group = DatalakeTaskGroup(
     dag=dag,
     env=ENV,
     datalake_bucket=DATALAKE_BUCKET,
-    relative_query_path=SOURCE,
+    relative_query_path=DAG_NAME,
     spark_jobs_path=SPARK_JOBS_PATH,
     athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
 )

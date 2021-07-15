@@ -19,7 +19,9 @@ ENV = os.environ.get("ENVIRONMENT")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 # DAG params setup
-SOURCE = "marketing_costs"
+SOURCE = (
+    "marketing_costs"
+)  # TODO: source misapplied here. The source should be 1:1 to each DAG.
 MEDIA = "linkedin"
 DAG_ID = f"bietlejuice.{MEDIA}"
 
@@ -103,7 +105,7 @@ clean_sub_dag = DatalakeSubDAG(
     datalake_bucket=DATALAKE_BUCKET,
     layer=LayerEnum.CLEAN,
     database_base_name=SOURCE,
-    relative_query_path=f"{SOURCE}/{MEDIA}",
+    relative_query_path=f"{SOURCE}/{MEDIA}",  # TODO: Each DAG shall have its own query folder
     spark_job_paths=SPARK_JOBS_PATH,
     athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
 )

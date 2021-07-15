@@ -14,14 +14,13 @@ from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTask
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.base.airflow.helpers import TaskFlowHelper
 
-ENV = os.environ.get("ENVIRONMENT")
-
 CONTEXT = "consolidated_marketing_costs"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 
 PARTITION_COLS = ["id_date"]
 
+ENV = os.environ.get("ENVIRONMENT")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
@@ -64,7 +63,7 @@ datalake_task_group = DatalakeTaskGroup(
     dag=dag,
     env=ENV,
     datalake_bucket=DATALAKE_BUCKET,
-    relative_query_path=CONTEXT,
+    relative_query_path=DAG_NAME,
     spark_jobs_path=SPARK_JOBS_PATH,
     athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
 )

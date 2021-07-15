@@ -22,7 +22,9 @@ ENV = os.environ["ENVIRONMENT"]
 
 # DAG params setup
 SOURCE = "marketing_manual_daily_costs"
-DAG_ID = f"bietlejuice.{SOURCE}"
+DAG_ID = (
+    f"bietlejuice.{SOURCE}"
+)  # TODO: this DAG must be split into 2 DAGs: clean and enrichment
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2021, 1, 14, 0, 0, 0, tzinfo=local_tz)
 MAIN_SCHEDULE_INTERVAL = "0 11 * * *"

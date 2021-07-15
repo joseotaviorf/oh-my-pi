@@ -18,7 +18,9 @@ from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTask
 ENV = os.environ.get("ENVIRONMENT")
 
 # DAG params setup
-CONTEXT = "marketing_costs"
+CONTEXT = (
+    "marketing_costs"
+)  # TODO: context misapplied here. The context should be 1:1 to each DAG.
 MEDIA = "rtb_campaigns"
 DAG_ID = f"bietlejuice.{MEDIA}"
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
@@ -77,7 +79,7 @@ task_group = DatalakeTaskGroup(
     dag=dag,
     env=ENV,
     datalake_bucket=DATALAKE_BUCKET,
-    relative_query_path=f"{CONTEXT}/{MEDIA}",
+    relative_query_path=f"{CONTEXT}/{MEDIA}",  # TODO: Each DAG shall have its own query folder
     spark_jobs_path=BASE_SPARK_JOB_PATH,
     athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
 )
