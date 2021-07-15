@@ -65,7 +65,7 @@ datalake_task_group = DatalakeTaskGroup(
     dag=dag,
     env=ENV,
     datalake_bucket=datalake_bucket,
-    relative_query_path=CONTEXT,
+    relative_query_path=DAG_NAME,
     spark_jobs_path=BASE_SPARK_JOBS_PATH,
     athena_query_result_location=athena_query_results_bucket,
 )
