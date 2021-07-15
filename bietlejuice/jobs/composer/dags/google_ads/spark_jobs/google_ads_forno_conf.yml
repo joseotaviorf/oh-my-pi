@@ -1,0 +1,89 @@
+---
+raw_partition_cols: [acc, dt]
+ads_performance_bucket: ads-performance.s3.forno.quintoandar.com.br
+# This filter uses RegExp to remove all accounts from Casa Mineira
+account_filter: '(?i)^(?:(?!mineira).)*$'
+report_folder_mapping:
+  ads_performance_report: AD_PERFORMANCE_REPORT
+  campaigns_performance_report: CAMPAIGN_PERFORMANCE_REPORT
+  keywords_performance_report: KEYWORDS_PERFORMANCE_REPORT
+  videos_performance_report: VIDEO_PERFORMANCE_REPORT
+report_schemas:
+  ads_performance_report: [
+    ExternalCustomerId,
+    AdGroupId,
+    AdGroupName,
+    AdType,
+    CampaignId,
+    CampaignName,
+    Clicks,
+    Cost,
+    Date,
+    Description,
+    Description1,
+    Description2,
+    Device,
+    DisplayUrl,
+    Id,
+    Impressions,
+    ImageCreativeName,
+    AccountDescriptiveName,
+    acc,
+    dt,
+    ReportType,
+  ]
+  campaigns_performance_report: [
+    ExternalCustomerId,
+    CampaignId,
+    CampaignName,
+    Clicks,
+    Cost,
+    Date,
+    Device,
+    Impressions,
+    AccountDescriptiveName,
+    Month,
+    Labels,
+    Week,
+    Year,
+    acc,
+    dt,
+    ReportType,
+  ]
+  keywords_performance_report: [
+    ExternalCustomerId,
+    AdGroupId,
+    AdGroupName,
+    CampaignId,
+    CampaignName,
+    Clicks,
+    Cost,
+    Date,
+    Device,
+    Id,
+    Impressions,
+    KeywordMatchType,
+    Labels,
+    Criteria,
+    AccountDescriptiveName,
+    acc,
+    dt,
+    ReportType,
+  ]
+  videos_performance_report: [
+    ExternalCustomerId,
+    AdGroupID,
+    AdGroup,
+    CampaignID,
+    Campaign,
+    Clicks,
+    Cost,
+    Day,
+    Device,
+    Impressions,
+    Account,
+    VideoID,
+    acc,
+    dt,
+    ReportType,
+  ]
