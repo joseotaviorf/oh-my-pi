@@ -1,5 +1,0 @@
-# Config for front_tickets_resolution
----
-streams:
-  - direction: 'upstream'
-    task_ids: ['dw_ticket_summary']
