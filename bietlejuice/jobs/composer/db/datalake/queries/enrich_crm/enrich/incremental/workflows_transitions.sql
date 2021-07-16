@@ -28,7 +28,7 @@ SELECT
     transition._id.oid AS id_transition,
     GET_JSON_OBJECT(REPLACE(id,'$',''),'$.oid') AS id_workflow,
     transition.from.taskId.oid AS id_task_from,
-    transition.from.taskId.oid AS id_task_to,
+    transition.to.taskId.oid AS id_task_to,
     transition.assignmentMethod AS assignment_method,
     transition.from.taskDefinition AS definition_task_from,
     transition.to.taskDefinition AS definition_task_to,
