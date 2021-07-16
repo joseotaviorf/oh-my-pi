@@ -6,4 +6,4 @@ SELECT
     ordem AS house_type_order,
     CAST(criado_em AS TIMESTAMP) AS ts_created
 FROM 
-    datalake_casa_mineira_crm_raw.type
+    datalake_casa_mineira_crm_raw.tipo
