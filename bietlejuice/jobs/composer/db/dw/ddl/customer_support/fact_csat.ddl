@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS customer_support.fact_csat;
 CREATE TABLE IF NOT EXISTS customer_support.fact_csat (
     sk_ticket BIGINT,
     channel VARCHAR(10),
-    csat_comment VARCHAR(1000),
+    csat_comment VARCHAR(2000),
     is_solved BOOLEAN,
     csat_score INTEGER,
     ts_survey TIMESTAMP,
