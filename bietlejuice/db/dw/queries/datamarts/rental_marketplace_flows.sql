@@ -3,7 +3,7 @@ WITH
 -- All Listing Flows base query --
 ----------------------------------
 all_listings AS (
-    SELECT 
+    SELECT
         f.sk_house_listing,
         f.status_history,
         CASE
@@ -16,11 +16,11 @@ all_listings AS (
                 THEN 'ended_rental'
             WHEN status_history = 'despublicado' AND (LOWER(status_change_reason) LIKE '%contato%' OR LOWER(status_change_reason) LIKE '%não atende%')
                 THEN 'no_contact'
-            WHEN status_history = 'despublicado' AND LOWER(status_change_reason) LIKE '%vend%' 
+            WHEN status_history = 'despublicado' AND LOWER(status_change_reason) LIKE '%vend%'
                 THEN 'sale'
             WHEN status_history = 'despublicado' AND (LOWER(status_change_reason) LIKE '%modelo de negócio%' OR LOWER(status_change_reason) LIKE       '%administração%')
                 THEN 'business_model'
-            WHEN status_history = 'despublicado' AND LOWER(status_change_reason) LIKE '%gestão%' 
+            WHEN status_history = 'despublicado' AND LOWER(status_change_reason) LIKE '%gestão%'
                 THEN 'consequence_mngmt'
             WHEN status_history = 'despublicado' AND (LOWER(status_change_reason) LIKE '%locou%' OR LOWER(status_change_reason) LIKE '%alugou%')
                 THEN 'rented_elsewhere'
@@ -39,7 +39,7 @@ all_listings AS (
         DATE(f.ts_status_start) AS dt_status_start,
         DATE(COALESCE(f.ts_status_end, CURRENT_DATE)) AS dt_status_end,
         f.ts_status_start
-    FROM 
+    FROM
         fact_house_listing_status AS f
         INNER JOIN dim_house_listing AS dhl
             ON dhl.sk_house_listing = f.sk_house_listing
@@ -71,36 +71,36 @@ al_week AS (
         aldr.status_history_v2 AS status_history,
         aldr.status_change_reason,
         aldr.week_start,
-        DATE(DATEADD(WEEK, 1, aldr.week_start)) AS next_week_start
+        DATE(DATEADD(WEEK, -1, aldr.week_start)) AS last_week_start
     FROM
         all_listings_date AS aldr
     WHERE
         last_status_start = ts_status_start
-), 
+),
 al_week_status AS (
     SELECT
-        COALESCE(alm_ms.sk_house_listing, alm_nms.sk_house_listing) AS sk_house_listing,
-        alm_ms.status_history AS status_week_start,
-        alm_nms.status_history AS status_next_week,
-        alm_ms.status_change_reason,
-        alm_nms.status_change_reason AS next_status_change_reason,
-        COALESCE(alm_ms.week_start, (DATEADD(WEEK, -1, COALESCE(alm_ms.next_week_start, alm_nms.week_start))))::DATE AS week_start,
-        COALESCE(alm_ms.next_week_start, alm_nms.week_start) AS next_week_start
-    FROM al_week AS alm_ms
-        FULL OUTER JOIN al_week AS alm_nms
-            ON alm_ms.sk_house_listing = alm_nms.sk_house_listing
-            AND alm_ms.next_week_start = alm_nms.week_start
+        COALESCE(alm.sk_house_listing, alm_lw.sk_house_listing) AS sk_house_listing,
+        alm.status_history AS status_week_end,
+        alm_lw.status_history AS status_last_week,
+        alm.status_change_reason,
+        alm_lw.status_change_reason AS last_status_change_reason,
+        COALESCE(alm.week_start, DATEADD(WEEK, 1, alm_lw.week_start))::DATE AS week_start,
+        COALESCE(alm.last_week_start, alm_lw.week_start) AS last_week_start
+    FROM al_week AS alm
+        FULL OUTER JOIN al_week AS alm_lw
+            ON alm.sk_house_listing = alm_lw.sk_house_listing
+            AND alm.last_week_start = alm_lw.week_start
 ),
 al_week_status_region AS (
     SELECT
         alm.sk_house_listing,
         fhl.sk_region,
-        alm.status_week_start,
-        alm.status_next_week,
+        alm.status_week_end,
+        alm.status_last_week,
         alm.status_change_reason,
-        alm.next_status_change_reason,
+        alm.last_status_change_reason,
         alm.week_start,
-        alm.next_week_start
+        alm.last_week_start
     FROM al_week_status AS alm
         LEFT JOIN fact_house_listings AS fhl
             ON alm.sk_house_listing = fhl.sk_house_listing
@@ -118,32 +118,32 @@ weekly_listings_status AS (
         sk_house_listing,
         sk_region,
         CASE
-            WHEN  COALESCE(status_week_start, '') = 'publicado'
+            WHEN  COALESCE(status_last_week, '') = 'publicado'
                 THEN 'Ongoing Listing'
-            WHEN COALESCE(status_week_start, '') = ''
+            WHEN COALESCE(status_last_week, '') = ''
                 THEN 'New Listing'
-            WHEN  COALESCE(status_week_start, '') NOT IN ('publicado','alugado','') AND COALESCE(status_change_reason, '') IN ('suspended_in_negotiation', 'minuta', 'reservation')
+            WHEN  COALESCE(status_last_week, '') NOT IN ('publicado','alugado','') AND COALESCE(last_status_change_reason, '') IN ('suspended_in_negotiation', 'minuta', 'reservation')
                 THEN 'Advanced Negociation'
-            WHEN week_start < DATEADD('WEEK', -1, DATE_TRUNC('WEEK', CURRENT_DATE))
+            WHEN last_week_start < DATE_TRUNC('WEEK', CURRENT_DATE)
                 THEN 'Other'
             ELSE NULL
-        END AS status_short,
+        END AS status_last_week_short,
         CASE
-            WHEN COALESCE(status_next_week, '') = 'publicado'
+            WHEN COALESCE(status_week_end, '') = 'publicado'
                 THEN 'Ongoing Listing'
-            WHEN COALESCE(status_next_week, '') = 'alugado'
+            WHEN COALESCE(status_week_end, '') = 'alugado'
                 THEN 'Rented'
-            WHEN COALESCE(status_next_week, '') NOT IN ('publicado', 'alugado') AND COALESCE(next_status_change_reason, '') IN ('suspended_in_negotiation', 'minuta', 'reservation')
+            WHEN COALESCE(status_week_end, '') NOT IN ('publicado', 'alugado') AND COALESCE(status_change_reason, '') IN ('suspended_in_negotiation', 'minuta', 'reservation')
                 THEN 'Advanced Negociation'
-            WHEN week_start < DATEADD('WEEK', -1, DATE_TRUNC('WEEK', CURRENT_DATE))
+            WHEN week_start < DATE_TRUNC('WEEK', CURRENT_DATE)
                 THEN 'Other'
             ELSE NULL
-        END AS status_next_week_short
+        END AS status_short
     FROM
         al_week_status_region AS alm
     WHERE
         week_start < DATE_TRUNC('WEEK', CURRENT_DATE)
-        AND NOT (status_short = 'Other' AND status_next_week_short = 'Other')
+        AND NOT (status_last_week_short = 'Other' AND status_short = 'Other')
 ),
 ---------------------------------------------------------------------------------------------------
 -- Query Bottom Demand Funnel in listing and client grain and Cummulative Rent Flows per Listing --
@@ -355,7 +355,6 @@ tenant_prospect_interactions AS (
     SELECT DISTINCT
         dt_event,
         sk_region,
-        city_group,
         sk_house_listing,
         sk_client
     FROM
@@ -365,7 +364,6 @@ activation_periods AS (
     SELECT
         status,
         sk_client,
-        city_group,
         ts_start,
         dd.date,
         dd.week_start
@@ -388,7 +386,6 @@ active_tp_interactions AS (
         activation_periods AS ap
         LEFT JOIN tenant_prospect_interactions AS tpi
             ON ap.sk_client = tpi.sk_client
-            AND ap.city_group = tpi.city_group
             AND DATEDIFF('DAY', tpi.dt_event, ap.date) BETWEEN 0 AND 35 --Tenant Prospects are considered "active" if their last rent flow occurred within 35 days
 )
 ----------------------------------------------------
@@ -408,8 +405,8 @@ SELECT DISTINCT
         PARTITION BY COALESCE(wls.week_start, atp.week_start, lwd.week_start),
                      COALESCE(wls.sk_house_listing, atp.sk_house_listing, lwd.sk_house_listing)
     ) AS listing_weekly_rent_flows,
+    status_last_week_short,
     status_short,
-    status_next_week_short,
     CASE
         WHEN atp.sk_client > 0
             THEN TRUE
