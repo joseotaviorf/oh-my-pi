@@ -204,29 +204,31 @@ pipeline:
     when:
       event: push
 
-#  validate-dags-dependencies-forno:
-#    group: tests
-#    image: python:3.7.3
-#    environment:
-#      ENVIRONMENT: forno
-#    commands:
-#      - make requirements-python3
-#      - make validate-dags-dependencies
-#    when:
-#      event: push
-#      branch: forno
-#
-#  validate-dags-dependencies-prod:
-#    group: tests
-#    image: python:3.7.3
-#    environment:
-#      ENVIRONMENT: prod
-#    commands:
-#      - make requirements-python3
-#      - make validate-dags-dependencies
-#    when:
-#      event: push
-#      branch: master
+  validate-dags-dependencies-forno:
+    group: tests
+    image: python:3.7.3
+    environment:
+      ENVIRONMENT: forno
+    commands:
+      - make requirements-python3
+      - make validate-dags-dependencies
+    when:
+      event: push
+      branch:
+        exclude:
+          - master
+
+  validate-dags-dependencies-prod:
+    group: tests
+    image: python:3.7.3
+    environment:
+      ENVIRONMENT: prod
+    commands:
+      - make requirements-python3
+      - make validate-dags-dependencies
+    when:
+      event: push
+      branch: master
 
   make-package-python3:
     group: package

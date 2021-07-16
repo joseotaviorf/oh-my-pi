@@ -2,15 +2,15 @@ athena_query_results_bucket: s3://5a-datalake/query_results/
 dags_out_of_pattern: [
     "amplitude",
     "ebdb",
+    "criteo_campaigns",
     "dw_marketing_costs",
     "enrich_marketing_costs_sharing_rules",
     "enrich_amplitude_partner_taxonomy",
-    "enrich_amplitude_user",
     "enrich_marketing_costs",
     "enrich_marketing_costs.load-google-keywords-performance-report-to-enrich", # old subdag pattern
     "gsheets",
-    "godfather",
     "kill_queue",
+    "marketing_costs_sharing_rules",
     "marketing_manual_daily_costs",
     "marketing_hub",
     "marketing_costs",

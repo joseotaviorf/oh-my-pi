@@ -77,11 +77,7 @@ class CrossDAGDependenciesValidator:
                 return dag_name, None
 
             layer = match_layer.group(1)
-            table_name = f"{layer}_{match.group(3)}"
-
-        # the dag name in the enrichment queries are without prefix. Manually fixing it here (temp)
-        if "/enrich/" in file_path:
-            dag_name = "enrich_" + dag_name
+            table_name = f"{layer}:{match.group(3)}"
 
         return dag_name, table_name
 
@@ -157,12 +153,7 @@ class CrossDAGDependenciesValidator:
 
         layer = match_layer.group(1)
         table_name = match.group(3).replace("-", "_")
-        table_name = f"{layer}_{table_name}"
-
-        # TODO remove
-        # the dag name in the enrichment queries are without prefix. Manually fixing it here (temp)
-        # if "enrich" == layer:
-        #     dag_name = "enrich_" + dag_name
+        table_name = f"{layer}:{table_name}"
 
         return dag_name, table_name
 
