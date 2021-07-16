@@ -7,6 +7,5 @@ SELECT
     removido_por AS removed_by, 
     CAST(criado_em AS TIMESTAMP) AS ts_created, 
     CAST(deletado_em AS TIMESTAMP) AS ts_deleted
-
 FROM 
     datalake_casa_mineira_crm_raw.imovel_captacao_participante

@@ -17,4 +17,3 @@ SELECT
     CAST(rejeitado_em AS TIMESTAMP) AS ts_rejected
 FROM 
     datalake_casa_mineira_crm_raw.contato
-

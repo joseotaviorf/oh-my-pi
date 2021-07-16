@@ -7,4 +7,4 @@ SELECT
     CAST(criado_em AS TIMESTAMP) AS ts_created, 
     CAST(revogado_em AS TIMESTAMP) AS ts_revoked 
 FROM 
-    datalake_casa_mineira_crm_raw.cliente_permissao 
+    datalake_casa_mineira_crm_raw.cliente_permissao
