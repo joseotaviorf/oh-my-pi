@@ -461,10 +461,15 @@ users_cx_plaquinhas:
     sheet_name: users_cx_plaquinhas
     clean_table_name: users_cx_plaquinhas
 
-vistoria_bugs:
+vistoria_bugs:  # to be excluded @Set,01
     sheet_id: 1-cuOGaxOf4hfqs1rhz6XUGv4y8r-0HbJv6YHGMRMkyc
     sheet_name: vistoria_bugs
     clean_table_name: inspection_bugs
+
+vistoria_bugs_v2:
+    sheet_id: 1-cuOGaxOf4hfqs1rhz6XUGv4y8r-0HbJv6YHGMRMkyc
+    sheet_name: vistoria_bugs_v2
+    clean_table_name: inspection_bugs_v2
 
 week_volumes_demand:
     sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c

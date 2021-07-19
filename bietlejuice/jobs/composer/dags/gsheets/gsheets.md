@@ -54,6 +54,7 @@ This pipeline produces the following output tables:
     - `hotjar_photos_repressed_demand`
     - `hub_agents_hierarchy`      
     - `inspection_bugs`
+    - `inspection_bugs_v2`
     - `inspectors_control`
     - `local_holidays`
     - `marketing_costs_campaign_city`
