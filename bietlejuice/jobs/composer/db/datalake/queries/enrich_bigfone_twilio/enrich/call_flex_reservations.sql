@@ -7,12 +7,8 @@ WITH reservations_events AS (
             GET_JSON_OBJECT(metadata,'$.event_data.WorkerSid'),
             GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.worker_sid')
         ) AS id_agent,
-        CASE
-            WHEN event = 'reservation.created' THEN GET_JSON_OBJECT(metadata,'$.event_data.TaskQueueSid')
-        END AS id_queue,
-        CASE
-            WHEN event = 'reservation.created' THEN GET_JSON_OBJECT(metadata,'$.event_data.TaskQueueName')
-        END AS queue_name,
+        GET_JSON_OBJECT(metadata,'$.event_data.TaskQueueSid') AS id_queue,
+        GET_JSON_OBJECT(metadata,'$.event_data.TaskQueueName') AS queue_name,
         event,
         GET_JSON_OBJECT(metadata,'$.created_at') as ts_event,
         GET_JSON_OBJECT(metadata, '$.event_data.Timestamp') AS ts_event_unix,
