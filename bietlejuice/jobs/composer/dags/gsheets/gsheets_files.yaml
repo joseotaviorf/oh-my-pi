@@ -121,6 +121,11 @@ demand_channel_share:
     sheet_name: demand_channel_share
     clean_table_name: demand_channel_share
 
+demand_retention_ab_tests:
+    sheet_id: 1l80txsBUzAAuCMalf6mfECgoULxbLHpw7J3z841aITw
+    sheet_name: demand_retention_ab_tests
+    clean_table_name: demand_retention_ab_tests
+
 demand_targets_2019:
     sheet_id: 1PQfAlpy2YhUKg_qn786_4xQ5E1cW2-YSpz1NJ1lVruA
     sheet_name: demand_targets_2019
