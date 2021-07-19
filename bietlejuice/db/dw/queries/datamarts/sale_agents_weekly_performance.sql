@@ -3,14 +3,19 @@ WITH fact_visits AS (
         -- IDs
         db.id_visitor AS id_buyer,
         vb.sk_booking,
+        vb.sk_house,
         vb.sk_agent,
         fo.sk_offer,
+        vb.sk_user_agent,
+        vb.sk_user_cancelation,
 
         -- Visit
         db.dt_scheduling,
         dd.week_start AS week,
         vb.sk_booking_created_date,
         vb.sk_visit_completed_date,
+        vb.is_virtual_visit,
+        db.status,
         db.first_update_source,
         ROW_NUMBER() OVER (PARTITION BY id_buyer ORDER BY dt_scheduling) AS buyer_rw,
 
@@ -229,6 +234,7 @@ WITH fact_visits AS (
 , daily_agent_hours AS (
     SELECT
         fa.sk_agent,
+        dslot.date,
         dslot.week_start AS week,
         CASE
             WHEN dslot.date <= '2021-03-07'::date THEN
@@ -254,14 +260,24 @@ WITH fact_visits AS (
                 END
             ELSE fa.area
         END AS region_code,
-        fa.allocated_slots_0/4 AS horas_disponibilizadas,
-        fa.max_slots_allocation_available/4 AS total_horas
-    FROM agent.fact_agent_daily_allocations AS fa
+        fa.id_work_contract,
+        CASE
+            WHEN dslot.weekday_name = 'Monday' THEN 'Seg'
+            WHEN dslot.weekday_name = 'Tuesday' THEN 'Ter'
+            WHEN dslot.weekday_name = 'Wednesday' THEN 'Qua'
+            WHEN dslot.weekday_name = 'Thursday' THEN 'Qui'
+            WHEN dslot.weekday_name = 'Friday' THEN 'Sex'
+            WHEN dslot.weekday_name = 'Saturday' THEN 'Sab'
+            WHEN dslot.weekday_name = 'Sunday' THEN 'Dom'
+        END AS weekdays,
+        fa.allocated_slots_0/4 AS hours_available,
+        fa.max_slots_allocation_available/4 AS total_hours
+    FROM
+        agent.fact_agent_daily_allocations AS fa
     LEFT JOIN
         dim_date AS dslot
             ON fa.sk_slot_date = dslot.sk_date
     WHERE region_code > -1 AND dslot.year > 2019
-    ORDER BY 1, 2
 )
 
 , weekly_region_agent_hours AS (
@@ -269,8 +285,8 @@ WITH fact_visits AS (
         week,
         sk_agent,
         region_code,
-        SUM(horas_disponibilizadas) weekly_available_hours,
-        SUM(total_horas) weekly_total_hours,
+        SUM(hours_available) weekly_available_hours,
+        SUM(total_hours) weekly_total_hours,
         ROW_NUMBER() OVER (PARTITION BY week, sk_agent ORDER BY weekly_available_hours DESC) AS rw
     FROM daily_agent_hours
     GROUP BY 1, 2, 3
@@ -286,13 +302,35 @@ WITH fact_visits AS (
 )
 
 , weekly_agent_hours AS (
+    WITH weekdays_with_hours_available as (
+        SELECT
+            week,
+            sk_agent,
+            LISTAGG(weekdays, '-') WITHIN GROUP (ORDER BY date) AS weekdays_w_hours_available
+        FROM daily_agent_hours
+        WHERE hours_available > 0
+        GROUP BY 1, 2
+    )
     SELECT
-        week,
-        sk_agent,
-        SUM(horas_disponibilizadas) weekly_available_hours,
-        SUM(total_horas) weekly_total_hours
-    FROM daily_agent_hours
-    GROUP BY 1, 2
+        dah.week,
+        dah.sk_agent,
+        CASE
+            WHEN wha.weekdays_w_hours_available = 'Seg-Ter-Qua-Qui-Sex-Sab-Dom' THEN 'Seg-à-Dom'
+            WHEN wha.weekdays_w_hours_available = 'Seg-Ter-Qua-Qui-Sex-Sab' THEN 'Seg-à-Sab'
+            WHEN wha.weekdays_w_hours_available = 'Seg-Ter-Qua-Qui-Sex' THEN 'Seg-à-Sex'
+            ELSE wha.weekdays_w_hours_available
+        END AS weekdays_w_hours_available,
+        MAX(CASE WHEN dah.date <= dah.week THEN dah.id_work_contract END) AS id_work_contract,
+        COUNT(DISTINCT CASE WHEN dah.hours_available > 0 THEN date END) AS days_w_hours_available,
+        SUM(dah.hours_available) weekly_available_hours,
+        SUM(dah.total_hours) weekly_total_hours
+    FROM
+        daily_agent_hours dah
+    LEFT JOIN
+        weekdays_with_hours_available wha
+            ON dah.week = wha.week
+            AND dah.sk_agent = wha.sk_agent
+    GROUP BY 1, 2, 3
 )
 
 , count_per_agent_week AS (
@@ -306,8 +344,11 @@ WITH fact_visits AS (
         -- Visits
         COUNT(DISTINCT CASE WHEN sf.sk_booking > 0 THEN sf.sk_booking END) AS bookings,
         COUNT(DISTINCT CASE WHEN sf.sk_booking > 0 AND sf.sk_booking_created_date AND sf.first_update_source = 'Corretores' THEN sf.sk_booking END) AS bookings_by_agent,
-        COUNT(DISTINCT CASE WHEN sf.sk_visit_completed_date = -1 AND sf.cancellation_reason_category = 'Agent' THEN sf.sk_booking END) AS visits_cancelled_by_agent,
+        COUNT(DISTINCT CASE WHEN sf.sk_visit_completed_date = -1 AND sf.sk_user_agent = sk_user_cancelation THEN sf.sk_booking END) AS visits_cancelled_by_agent,
+        COUNT(DISTINCT CASE WHEN sf.sk_visit_completed_date = -1 AND sf.cancellation_reason_category = 'Agent' THEN sf.sk_booking END) AS visits_cancelled_agent_reason,
         COUNT(DISTINCT CASE WHEN sf.sk_visit_completed_date = -1 AND sf.cancellation_reason_category IS NULL AND sf.troublesome_entrance IS NULL AND sf.agent_arrived = 0 THEN sf.sk_booking END) AS no_show_by_agent,
+        COUNT(DISTINCT CASE WHEN sf.status = 'Realizado' THEN sf.sk_booking END) AS visits_ended,
+        COUNT(DISTINCT CASE WHEN sf.is_virtual_visit THEN sf.sk_booking END) AS virtual_visits,
         COUNT(DISTINCT CASE WHEN sf.sk_visit_completed_date > 0 THEN sf.sk_booking END) AS visits_completed,
         -- Offers
         COUNT(DISTINCT sf.sk_offer) AS offers_submitted,
@@ -317,7 +358,9 @@ WITH fact_visits AS (
         COUNT(DISTINCT CASE WHEN sf.sk_sale_agreement_signed_date > 0 THEN sf.sk_offer END) AS sales_agreements,
         -- House Registry
         COUNT(DISTINCT CASE WHEN sf.ts_house_registry_ended > 0 THEN sf.sk_offer END) AS house_registred,
-
+        -- House Metrics
+        COUNT(DISTINCT CASE WHEN sf.sk_booking_created_date > 0 THEN sf.sk_house END) AS houses_booked,
+        COUNT(DISTINCT CASE WHEN sf.sk_visit_completed_date > 0 THEN sf.sk_house END) AS houses_visited,
         -- Buyer Metrics
         COUNT(DISTINCT CASE WHEN sf.sk_booking_created_date > 0 THEN sf.id_buyer END) AS b_vb,
         COUNT(DISTINCT CASE WHEN sf.sk_visit_completed_date > 0 THEN sf.id_buyer END) AS b_vc,
@@ -380,18 +423,22 @@ WITH fact_visits AS (
     WHERE avg8w.agent_week_order > 13
     AND sum_b_vb_8w > 49
 )
-
 SELECT
     -- ID
     cpaw.sk_agent,
     cpaw.week,
     cpaw.agent_week_order,
     arw.region_code AS region_code,
+    wc.contract_name AS work_contract,
+    CASE WHEN wc.contract_name LIKE '%HUB%' THEN TRUE ELSE FALSE END AS is_hub_agent,
 
     -- Event Metrics
     cpaw.bookings,
     cpaw.bookings_by_agent,
+    cpaw.visits_ended,
+    cpaw.virtual_visits,
     cpaw.visits_completed,
+    cpaw.visits_cancelled_agent_reason,
     cpaw.visits_cancelled_by_agent,
     cpaw.no_show_by_agent,
     cpaw.visits_completed*1.00 / NULLIF(cpaw.b_vc,0) AS visits_per_buyer,
@@ -400,6 +447,8 @@ SELECT
     cpaw.offers_accepted,
     cpaw.sales_agreements,
     cpaw.house_registred,
+    cpaw.houses_booked,
+    cpaw.houses_visited,
 
     -- Buyer Metrics
     cpaw.b_vb AS buyers_with_bookings,
@@ -436,6 +485,8 @@ SELECT
     -- Weekly Hours
     wh.weekly_available_hours,
     wh.weekly_total_hours,
+    wh.days_w_hours_available,
+    wh.weekdays_w_hours_available,
 
     -- NPS Metrics
     nps.b_nps_answers AS buyers_nps_answers,
@@ -450,7 +501,8 @@ SELECT
     ((cpaw.promoters_reviews*1.00 - cpaw.detractors_reviews*1.00) / NULLIF(cpaw.visits_reviews*1.00,0))*100 AS nps_visit_review,
     cpaw.does_not_want_same_agent
 
-FROM count_per_agent_week AS cpaw
+FROM
+    count_per_agent_week AS cpaw
 LEFT JOIN
     buyer_nps AS nps
         ON cpaw.sk_agent = nps.sk_agent
@@ -468,5 +520,9 @@ LEFT JOIN
     agent_quartil AS agq
         ON agq.sk_agent = cpaw.sk_agent
         AND agq.week = cpaw.week
-WHERE cpaw.week IS NOT NULL
+LEFT JOIN
+    datalake_ebdb_clean_prod.work_contract wc
+        ON wc.id = wh.id_work_contract
+WHERE
+    cpaw.week IS NOT NULL
 ORDER BY 1, 2
