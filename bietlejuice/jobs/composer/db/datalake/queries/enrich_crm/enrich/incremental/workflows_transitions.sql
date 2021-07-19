@@ -38,6 +38,13 @@ SELECT
     transition.from.taskDefinition AS definition_task_from,
     transition.to.taskDefinition AS definition_task_to,
     transition.context AS context,
+    GET_JSON_OBJECT(transition.context,'$.Liberar para Minuta') AS release_minuta,
+    GET_JSON_OBJECT(transition.context,'$.Resolver pendências com Proprietário') AS owner_pendency,
+    GET_JSON_OBJECT(transition.context,'$.Resolver pendências com Inquilino') AS tenant_pendency,
+    GET_JSON_OBJECT(transition.context,'$.Rejeitar Proposta') AS reject_proposal,
+    GET_JSON_OBJECT(transition.context,'$.AlinhamentoComPP-contactType') AS owner_contact_channel,
+    GET_JSON_OBJECT(transition.context,'$.FrontEnd-contactType') AS frontend_contact_channel,
+    GET_JSON_OBJECT(transition.context,'$.VerificacaoComIQ-contactType') AS tenant_contact_channel,
     COALESCE(CAST(transition.to.endWorkflow AS BOOLEAN), false) AS is_end_of_workflow,
     CAST(GET_JSON_OBJECT(REPLACE(start_date_object,'$',''),'$.date') AS TIMESTAMP) AS ts_workflow_started,
     CAST(GET_JSON_OBJECT(REPLACE(updated_date_object,'$',''),'$.date') AS TIMESTAMP) AS ts_workflow_updated,
@@ -50,3 +57,4 @@ FROM
     exploded_transitions
 WHERE
     DATE(transition.date.date) = DATE('{year}-{month}-{day}')
+
