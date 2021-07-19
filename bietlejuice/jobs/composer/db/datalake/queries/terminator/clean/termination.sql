@@ -12,6 +12,7 @@ SELECT
     cancellation_info,
     rescheduling_history,
     utility_bill_info,
+    last_condominium_responsible,
     exit_inspection_required AS has_exit_inspection,
     relisting_enabled AS is_relisting,
     date AS dt_termination,
