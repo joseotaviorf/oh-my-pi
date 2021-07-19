@@ -16,6 +16,7 @@ class CRMTasksOnboardingTenant(CRMTasks):
         'ConfirmarDados',
         'ConfirmarLocalChaves',
         'ContatarInquilinoInfoEntregaChaves',
+        'DevolverChavesParaProprietarios',
         'EntregaChavesParaInquilino',
         'InquilinoNaoRecebeuTodasChaves',
         'PagarContasConsumo',
@@ -28,7 +29,10 @@ class CRMTasksOnboardingTenant(CRMTasks):
         'VerificarContrato'
     ]
 
-    MANUAL_TASK_WORKGROUP_IDS = ['DEP_ONBOARDING_INQUILINO']
+    MANUAL_TASK_WORKGROUP_IDS = [
+        'DEP_ONBOARDING_INQUILINO',
+        'DEP_KEY_TRAVEL_AFTER_EXIT'
+    ]
 
     TABLE_NAMES = {
         'fact': 'fact_onboarding_tenant_tasks',

@@ -9,9 +9,11 @@ class CRMTasksOffboarding(CRMTasks):
     QUEUES = [
         'DataDeRescisaoAlterada',
         'EncerrarContrato',
+        'FollowUpReparosRescisao',
         'OrientarInquilinoRescisao',
         'OrientarProprietarioRescisao',
         'OrientarInquilinoDesocupacao',
+        'ProtecaoReparosRescisao',
         'RescisaoCancelada',
         'RevisarCancelamentoDeRescisao',
         'RevisarPagamentosRescisao',
