@@ -5,24 +5,25 @@ from datetime import datetime
 
 from airflow.models import DAG
 from airflow.models import Variable
+from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
-    QuintoAndarDatabricksSubmitRunOperator,
 )
-import airflow.utils.helpers as airflow_helpers
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
-from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
+from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.jobs.composer.services import FileService
+from bietlejuice.jobs.composer.base.airflow.helpers import TaskFlowHelper
 
 # ENV setup
 ENV = os.environ.get("ENVIRONMENT")
 
 # DAG params setup
 SOURCE = "marketing_offline_costs"
-DAG_ID = f"bietlejuice.{SOURCE}"
+CONTEXT = SOURCE
+DAG_ID = f"bietlejuice.{CONTEXT}"
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2021, 1, 14, 0, 0, 0, tzinfo=local_tz)
 MAIN_SCHEDULE_INTERVAL = "55 6 * * *"
@@ -31,15 +32,15 @@ MAIN_SCHEDULE_INTERVAL = "55 6 * * *"
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 ARTIFACTS_S3_BUCKET = Variable.get("artifacts_default_bucket")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/"
 LOAD_GSHEETS_INTO_DATALAKE_RAW_FILE_PATH = (
-    S3_PREFIX + f"/spark_jobs/gsheets/load_full_data_into_datalake_raw.py"
+    f"{BASE_SPARK_JOBS_PATH}load_gsheets_into_datalake_raw.py"
 )
 DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
 LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{DAG_ID}"
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base"
 
 # cluster setup
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
@@ -67,24 +68,10 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(SOURCE),
+    doc_md=BaseDAG.get_dag_doc(CONTEXT).format(
+        chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
+    ),
 )
-
-clean_sub_dag = DatalakeSubDAG(
-    dag_id=DAG_ID,
-    start_date=MAIN_START_DATE,
-    env=ENV,
-    datalake_bucket=DATALAKE_BUCKET,
-    layer=LayerEnum.CLEAN,
-    database_base_name=SOURCE,
-    relative_query_path=SOURCE,
-    spark_job_paths=f"{SPARK_JOB_PATH}/base",
-    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
-)
-file_list = FileService.list_sql_files_without_extension_from_layer(
-    SOURCE, LayerEnum.CLEAN.value
-)
-clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(dag, file_list)
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
@@ -97,51 +84,36 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
+task_group = DatalakeTaskGroup(
+    dag=dag,
+    env=ENV,
+    datalake_bucket=DATALAKE_BUCKET,
+    relative_query_path=CONTEXT,
+    spark_jobs_path=BASE_SPARK_JOBS_PATH,
+    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
+)
+
+raw_task_groups = {}
 for TABLE_NAME, SHEET_DETAILS in GOOGLE_FILES.items():
 
-    slugged_table_name = TABLE_NAME.replace("_", "-")
-
-    gsheets_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
-        task_id=f"gsheets-{slugged_table_name}-to-datalake-raw",
-        dag=dag,
-        json={
-            "spark_python_task": {
-                "python_file": LOAD_GSHEETS_INTO_DATALAKE_RAW_FILE_PATH,
-                "parameters": [
-                    ENV,
-                    SOURCE,
-                    DATALAKE_BUCKET,
-                    TABLE_NAME,
-                    json.dumps(SHEET_DETAILS),
-                ],
-            }
-        },
+    raw_task_group = task_group.build_raw_task_group_for_single_table(
+        source=SOURCE,
+        target_database_base_name=SOURCE,
+        table_name=TABLE_NAME,
+        extraction_spark_job_file=LOAD_GSHEETS_INTO_DATALAKE_RAW_FILE_PATH,
+        raw_spark_job_extra_args=[SOURCE, TABLE_NAME, json.dumps(SHEET_DETAILS)],
     )
+    raw_task_groups[TABLE_NAME] = raw_task_group
 
-    sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
-        task_id=f"sync-hive-metastore-{slugged_table_name}",
-        dag=dag,
-        json={
-            "spark_python_task": {
-                "python_file": f"{BASE_SPARK_JOBS_PATH}sync_metastore_tables.py",
-                "parameters": [
-                    DATALAKE_BUCKET,
-                    LayerEnum.RAW.value,
-                    SOURCE,
-                    "--table-name",
-                    TABLE_NAME,
-                ],
-            }
-        },
-    )
 
-    airflow_helpers.chain(
-        create_cluster_task,
-        gsheets_to_datalake_raw_task,
-        clean_sub_dags.pop(SHEET_DETAILS["clean_table_name"]),
-        terminate_cluster_task,
-    )
+clean_task_groups = task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.CLEAN,
+    source_database_base_name=SOURCE,
+    target_database_base_name=SOURCE,
+)
 
-    airflow_helpers.chain(
-        gsheets_to_datalake_raw_task, sync_metastore_table_task, terminate_cluster_task
-    )
+chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(raw_task_groups))
+
+TaskFlowHelper.chain_task_groups_via_common_table(raw_task_groups, clean_task_groups)
+
+terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))

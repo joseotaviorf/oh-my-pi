@@ -448,7 +448,10 @@ bietlejuice.enrich_marketing_costs_facebook_insights:
   - bietlejuice.facebook_insights
 
 bietlejuice.enrich_marketing_costs_offline:
-  - bietlejuice.marketing_offline_costs
+  - bietlejuice.marketing_offline_costs:load-clean-marketing-offline-budget
+  - bietlejuice.marketing_offline_costs:load-clean-marketing-offline-manual-costs
+  - bietlejuice.marketing_offline_costs:load-clean-marketing-offline-manual-share-city-group
+  - bietlejuice.marketing_offline_costs:load-clean-marketing-offline-manual-share-cost-center
 
 bietlejuice.enrich_marketing_manual_daily_costs:
   - bietlejuice.marketing_manual_daily_costs:load-marketing-costs-name-convention-shared-costs-to-clean
