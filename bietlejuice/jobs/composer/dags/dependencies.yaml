@@ -99,7 +99,7 @@ bietlejuice.dw_marketing_costs_facebook_insights:
 bietlejuice.dw_marketing_costs_mitula:
   - bietlejuice.mitula
 
-bietlejuice.dw_marketing_costs_rtb_campaigns:
+bietlejuice.dw_rtb_campaigns:
   - bietlejuice.rtb_campaigns
 
 bietlejuice.dw_marketing_costs_trovit:

@@ -1,4 +1,4 @@
-## DW Marketing Costs RTB Campaigns
+## DW RTB Campaigns
 ### Purpose
 
 RTB is a retargeting platform (serves ads based on people that have already visited our site.) We use them to send campaigns to our clients. This DAG creates the fact and dim based off of the data that they provide to us via API (Accessible via our [RTB Repository](https://github.com/quintoandar/rtb-api-client-python)).
