@@ -194,7 +194,7 @@ bietlejuice.dw_user:
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_ebdb_user:load-enrich-agent-data
   - bietlejuice.enrich_ebdb_user:load-enrich-affiliate-data
-  - bietlejuice.enrich_amplitude_partner_taxonomy:load-amplitude-partner-taxonomy-to-enrich
+  - bietlejuice.enrich_amplitude_partner_taxonomy:load-enrich-amplitude-partner-taxonomy
 
 bietlejuice.dw_user_affiliate:
   - bietlejuice.enrich_amplitude_user:load-enrich-user-affiliate-origin
