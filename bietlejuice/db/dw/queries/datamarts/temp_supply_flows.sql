@@ -1,75 +1,98 @@
 WITH
+context_rene AS (
+SELECT
+    id_house_lead,
+    CASE
+        WHEN business_context = 'SALE' THEN reason
+        ELSE NULL
+    END AS is_sale,
+    CASE
+        WHEN business_context = 'RENT' THEN reason
+        ELSE NULL
+    END AS is_rent
+FROM
+    datalake_rene_descartes_clean_prod.lead_rejection
+),
 discard_rene AS (
-    WITH context AS (
-    SELECT
-        id_house_lead,
-        CASE
-            WHEN business_context = 'SALE' THEN reason
-            ELSE NULL
-        END AS is_sale,
-        CASE
-            WHEN business_context = 'RENT' THEN reason
-            ELSE NULL
-        END AS is_rent
-    FROM
-        datalake_rene_descartes_clean_prod.lead_rejection
-    )
-    SELECT
-        id_house_lead,
-        MAX(is_sale) AS discard_sale,
-        MAX(is_rent) AS discard_rent
-    FROM
-        context
-    GROUP BY 1
+SELECT
+    id_house_lead,
+    MAX(is_sale) AS discard_sale,
+    MAX(is_rent) AS discard_rent
+FROM
+    context_rene
+GROUP BY 1
+),
+unique_wololo AS (
+SELECT distinct
+    id_prospect,
+    business_context,
+    MAX(id) AS id
+FROM
+    datalake_wololo_clean_prod.context_discard
+GROUP BY 1, 2
+),
+context_wololo AS (
+SELECT
+    u.id_prospect,
+    CASE
+        WHEN u.business_context = 'SALE' THEN cd.reason
+        ELSE NULL
+    END AS is_sale,
+    CASE
+        WHEN u.business_context = 'RENT' THEN cd.reason
+        ELSE NULL
+    END AS is_rent
+FROM
+    datalake_wololo_clean_prod.context_discard cd
+INNER JOIN
+    unique_wololo u
+    ON u.id = cd.id
+    AND u.business_context = cd.business_context
+    AND u.id_prospect = cd.id_prospect
 ),
 wololo_discard AS (
-    WITH unique_wololo AS (
-    SELECT distinct
-        id_prospect,
-        business_context,
-        MAX(id) AS id
-    FROM
-        datalake_wololo_clean_prod.context_discard
-    GROUP BY 1, 2
+SELECT
+    id_prospect,
+    MAX(is_sale) discard_sale,
+    MAX(is_rent) discard_rent
+FROM
+    context_wololo
+GROUP BY 1
 ),
-context AS (
-    SELECT
-        u.id_prospect,
-        CASE
-            WHEN u.business_context = 'SALE' THEN cd.reason
-            ELSE NULL
-        END AS is_sale,
-        CASE
-            WHEN u.business_context = 'RENT' THEN cd.reason
-            ELSE NULL
-        END AS is_rent
-    FROM
-        datalake_wololo_clean_prod.context_discard cd
-    INNER JOIN
-        unique_wololo u
-        ON u.id = cd.id
-        AND u.business_context = cd.business_context
-        AND u.id_prospect = cd.id_prospect
-)
-    SELECT
-        id_prospect,
-        MAX(is_sale) discard_sale,
-        MAX(is_rent) discard_rent
-    FROM
-        context
-    GROUP BY 1
+conversions AS (
+SELECT distinct
+    id_prospect,
+    CASE
+        WHEN business_context = 'SALE' THEN 'true'
+        ELSE NULL
+    END AS is_sale,
+    CASE
+        WHEN business_context = 'RENT' THEN 'true'
+        ELSE NULL
+    END AS is_rent
+FROM datalake_wololo_clean_prod.conversion
+),
+conversions_prospect as (
+SELECT
+    id_prospect,
+    MAX(is_sale) AS conversion_sale,
+    MAX(is_rent) AS conversion_rent
+FROM
+    conversions
+GROUP by 1
 ),
 discard_by_context AS (
 SELECT
     dl.sk_lead,
-    dl.reason,
-    dl.reason_detail,
     dl.is_for_rent,
     dl.is_for_sale,
     r.discard_rent AS lead_discard_rent,
     r.discard_sale AS lead_discard_sale,
-    w.discard_rent AS prospect_discard_rent,
-    w.discard_sale AS prospect_discard_sale
+    p.status AS prospect_status,
+    COALESCE(w.discard_rent,dl.reason_detail) AS prospect_discard_rent,
+    w.discard_sale AS prospect_discard_sale,
+    cp.conversion_rent,
+    cp.conversion_sale
 FROM
     dim_lead dl
 LEFT JOIN
@@ -78,6 +101,9 @@ LEFT JOIN
 LEFT JOIN
     wololo_discard w
     ON w.id_prospect = p.id
+LEFT JOIN
+    conversions_prospect cp
+    ON cp.id_prospect = p.id
 LEFT JOIN
     discard_rene r
     ON r.id_house_lead = dl.external_id
@@ -137,6 +163,14 @@ SELECT
         ELSE NULL
     END AS lead_origin_sale,
     CASE
+        WHEN origin_table = 'Rent' THEN funnel_drop_reason
+        ELSE NULL
+    END AS funnel_drop_reason_rent,
+    CASE
+        WHEN origin_table = 'Sale' THEN funnel_drop_reason
+        ELSE NULL
+    END AS funnel_drop_reason_sale,
+    CASE
         WHEN origin_table = 'Rent' THEN sk_lead_date
         ELSE '-1'
     END AS sk_lead_date_rent,
@@ -177,6 +211,30 @@ SELECT
         ELSE '-1'
     END AS sk_first_listing_date_sale,
     CASE
+        WHEN origin_table = 'Rent' THEN sk_discard_date
+        ELSE '-1'
+    END AS sk_discard_date_rent,
+    CASE
+        WHEN origin_table = 'Sale' THEN sk_discard_date
+        ELSE '-1'
+    END AS sk_discard_date_sale,
+    CASE
+        WHEN origin_table = 'Rent' THEN sk_conversion_date
+        ELSE '-1'
+    END AS sk_conversion_date_rent,
+    CASE
+        WHEN origin_table = 'Sale' THEN sk_conversion_date
+        ELSE '-1'
+    END AS sk_conversion_date_sale,
+    CASE
+        WHEN origin_table = 'Rent' THEN context_opportunity
+        ELSE NULL
+    END AS context_opportunity_rent,
+    CASE
+        WHEN origin_table = 'Sale' THEN context_opportunity
+        ELSE NULL
+    END AS context_opportunity_sale,
+    CASE
         WHEN origin_table = 'Rent' THEN context_first_listing
         ELSE NULL
     END AS context_first_listing_rent,
@@ -205,6 +263,8 @@ SELECT
     MAX(sourcing_ops_sale) AS sourcing_ops_sale,
     MAX(lead_origin_rent) AS lead_origin_rent,
     MAX(lead_origin_sale) AS lead_origin_sale,
+    MAX(funnel_drop_reason_rent) AS funnel_drop_reason_rent,
+    MAX(funnel_drop_reason_sale) AS funnel_drop_reason_sale,
     MAX(sk_lead_date_rent) AS sk_lead_date_rent,
     MAX(sk_lead_date_sale) AS sk_lead_date_sale,
     MAX(sk_prospect_date_rent) AS sk_prospect_date_rent,
@@ -215,6 +275,12 @@ SELECT
     MAX(sk_opportunity_date_sale) AS sk_opportunity_date_sale,
     MAX(sk_first_listing_date_rent) AS sk_first_listing_date_rent,
     MAX(sk_first_listing_date_sale) AS sk_first_listing_date_sale,
+    MAX(sk_discard_date_rent) AS sk_discard_date_rent,
+    MAX(sk_discard_date_sale) AS sk_discard_date_sale,
+    MAX(sk_conversion_date_rent) AS sk_conversion_date_rent,
+    MAX(sk_conversion_date_sale) AS sk_conversion_date_sale,
+    MAX(context_opportunity_rent) AS context_opportunity_rent,
+    MAX(context_opportunity_sale) AS context_opportunity_sale,
     MAX(context_first_listing_rent) AS context_first_listing_rent,
     MAX(context_first_listing_sale) AS context_first_listing_sale
 FROM
@@ -282,6 +348,15 @@ SELECT
         ELSE lead_origin_rent
     END AS lead_origin_rent,
     CASE
+		WHEN lead_origin_rent = 'PriceSuggestion' AND mkt_origin_rent= 'Price Calculator' AND funnel_drop_reason_sale IS NULL  THEN funnel_drop_reason_rent
+		WHEN mkt_origin_rent IN ('Indica Aí - General', 'Indica Aí - Agents') AND funnel_drop_reason_sale IS NULL THEN funnel_drop_reason_rent
+		ELSE funnel_drop_reason_sale
+	END AS funnel_drop_reason_sale,
+	CASE
+		WHEN mkt_origin_sale IN ('Indica Aí - General', 'Indica Aí - Agents') AND funnel_drop_reason_rent IS NULL  THEN funnel_drop_reason_sale
+		ELSE funnel_drop_reason_rent
+	END AS funnel_drop_reason_rent,
+    CASE
 		WHEN lead_origin_rent = 'PriceSuggestion' AND mkt_origin_rent= 'Price Calculator' AND sk_lead_date_sale<0  THEN sk_lead_date_rent
 		WHEN mkt_origin_rent IN ('Indica Aí - General', 'Indica Aí - Agents') AND sk_lead_date_sale<0 THEN sk_lead_date_rent
 		ELSE sk_lead_date_sale
@@ -312,10 +387,73 @@ SELECT
 	sk_opportunity_date_rent,
 	sk_first_listing_date_sale,
 	sk_first_listing_date_rent,
+	sk_discard_date_sale,
+	sk_discard_date_rent,
+	sk_conversion_date_sale,
+	sk_conversion_date_rent,
+	context_opportunity_sale,
+	context_opportunity_rent,
 	context_first_listing_sale,
 	context_first_listing_rent
 FROM
     max_dates
+),
+qualified_date AS (
+SELECT
+    llf.sk_house_listing_flow,
+    llf.sk_house_listing,
+    llf.sk_lead,
+    llf.sk_region,
+    llf.mkt_origin_rent,
+    llf.mkt_origin_sale,
+    llf.mkt_completion_rent,
+    llf.mkt_completion_sale,
+    llf.mkt_channel_rent,
+    llf.mkt_channel_sale,
+    llf.sales_company_rent,
+    llf.sales_company_sale,
+    llf.sourcing_ops_rent,
+    llf.sourcing_ops_sale,
+    llf.lead_origin_rent,
+    llf.lead_origin_sale,
+    llf.funnel_drop_reason_rent,
+    llf.funnel_drop_reason_sale,
+    llf.sk_lead_date_rent,
+    llf.sk_lead_date_sale,
+    llf.sk_prospect_date_rent,
+    llf.sk_prospect_date_sale,
+    CASE
+        WHEN llf.sk_prospect_date_rent>0 AND llf.sk_qualified_date_rent<0 AND prospect_status IN ('CONVERTED','DISCARDED') AND prospect_discard_rent IN ('HOUSE_ALREADY_RENTED_AVAILABLE_IN_MORE_THAN_6_MONTHS',
+        'HOUSE_UNDER_MAJOR_RENOVATION','HOUSE_ALREADY_RENTED_AVAILABLE_IN_1_MONTH','HOUSE_ALREADY_RENTED_AVAILABLE_IN_6_MONTHS','SEASONAL_RENT','HOUSE_ALREADY_RENTED_AVAILABLE_IN_3_MONTHS',
+        'ISSUES_WITH_HOUSE_ENTRANCE_CONDITIONS','OWNER_GAVE_UP_RENTING','HOUSE_ONLY_FOR_SELLING')
+        THEN COALESCE(NULLIF(llf.sk_conversion_date_rent,-1),NULLIF(llf.sk_discard_date_rent,-1),NULLIF(llf.sk_prospect_date_rent,-1))
+        ELSE llf.sk_qualified_date_rent
+    END AS sk_qualified_date_rent,
+    CASE
+        WHEN llf.sk_prospect_date_sale>0 AND llf.sk_qualified_date_sale<0 AND prospect_status IN ('CONVERTED','DISCARDED') AND prospect_discard_sale IN ('HOUSE_ALREADY_RENTED_AVAILABLE_IN_MORE_THAN_6_MONTHS',
+        'HOUSE_UNDER_MAJOR_RENOVATION','HOUSE_ALREADY_RENTED_AVAILABLE_IN_1_MONTH','HOUSE_ALREADY_RENTED_AVAILABLE_IN_6_MONTHS','SEASONAL_RENT','HOUSE_ALREADY_RENTED_AVAILABLE_IN_3_MONTHS',
+        'ISSUES_WITH_HOUSE_ENTRANCE_CONDITIONS','OWNER_GAVE_UP_RENTING','HOUSE_ONLY_FOR_SELLING')
+        THEN COALESCE(NULLIF(llf.sk_conversion_date_sale,-1),NULLIF(llf.sk_discard_date_sale,-1),NULLIF(llf.sk_prospect_date_sale,-1))
+        ELSE llf.sk_qualified_date_sale
+    END AS sk_qualified_date_sale,
+    llf.sk_opportunity_date_rent,
+	llf.sk_opportunity_date_sale,
+	llf.sk_first_listing_date_sale,
+	llf.sk_first_listing_date_rent,
+	llf.context_opportunity_sale,
+	llf.context_opportunity_rent,
+	llf.context_first_listing_sale,
+	llf.context_first_listing_rent,
+	dc.lead_discard_sale,
+	dc.lead_discard_rent,
+	dc.prospect_discard_sale,
+	dc.prospect_discard_rent,
+	dc.prospect_status
+FROM
+    hybrid_dates llf
+LEFT JOIN
+    discard_by_context dc
+    ON llf.sk_lead = dc.sk_lead
 ),
 dates_filters AS (
 SELECT
@@ -335,50 +473,39 @@ SELECT
     llf.sourcing_ops_sale,
     llf.lead_origin_rent,
     llf.lead_origin_sale,
+    llf.funnel_drop_reason_rent,
+    llf.funnel_drop_reason_sale,
     llf.sk_lead_date_rent,
     llf.sk_lead_date_sale,
-    CASE -- filtering prospect rent
-		WHEN lead_discard_rent IN ('HOUSE_WAS_OUT_OF_HOUSE_RENTING_REGIONS', 'ForaArea','DUPLICATED_LEAD','CONTACT_ON_BLOCK_LIST') THEN '-1'
-		ELSE sk_prospect_date_rent
-	END sk_prospect_date_rent,
-	CASE -- filtering prospect sale
-		WHEN lead_discard_sale IN ('HOUSE_WAS_OUT_OF_HOUSE_SALES_REGIONS', 'ForaArea','DUPLICATED_LEAD','CONTACT_ON_BLOCK_LIST') THEN '-1'
-		ELSE sk_prospect_date_sale
-	END sk_prospect_date_sale,
+    llf.sk_prospect_date_rent,
+	llf.sk_prospect_date_sale,
 	CASE -- filtering qualified rent
 	    WHEN prospect_discard_rent IN ('CONTACT_DIDNT_EXIST','HOUSE_ALREADY_PUBLISHED','CONTACT_KNOW_OWNER','CONTACT_WASNT_THE_HOUSE_OWNER','HOUSE_ALREADY_SOLD',
 	    'HOUSE_WAS_A_BUSINESS_REAL_ESTATE','HOUSE_WITH_BAD_CONDITIONS','OWNER_DIDNT_ANSWER_PHONE','OWNER_DIDNT_LISTEN_TO_PITCH','OWNER_DIDNT_WANT_RECEIVE_CALL',
-	    'PROPERTY_IN_OFFPLANT','HOUSE_PRICE_WAS_OUT_OF_BOUNDS','ONLY_PART_OF_THE_HOUSE_WAS_AVAILABLE_FOR_RENTING','HOUSE_WAS_OUT_OF_HOUSE_RENTING_REGIONS') THEN '-1'
+	    'PROPERTY_IN_OFFPLANT','HOUSE_PRICE_WAS_OUT_OF_BOUNDS','ONLY_PART_OF_THE_HOUSE_WAS_AVAILABLE_FOR_RENTING','HOUSE_WAS_OUT_OF_HOUSE_RENTING_REGIONS') AND sk_opportunity_date_rent<0 THEN '-1'
 	    ELSE sk_qualified_date_rent
 	END sk_qualified_date_rent,
 	CASE -- filtering qualified sale
 	    WHEN prospect_discard_sale IN ('CONTACT_DIDNT_EXIST','HOUSE_ALREADY_PUBLISHED','CONTACT_KNOW_OWNER','CONTACT_WASNT_THE_HOUSE_OWNER','HOUSE_ALREADY_SOLD',
 	    'HOUSE_WAS_A_BUSINESS_REAL_ESTATE','HOUSE_WITH_BAD_CONDITIONS','OWNER_DIDNT_ANSWER_PHONE','OWNER_DIDNT_LISTEN_TO_PITCH','OWNER_DIDNT_WANT_RECEIVE_CALL',
-	    'PROPERTY_IN_OFFPLANT','HOUSE_PRICE_WAS_OUT_OF_BOUNDS','HOUSE_WAS_OUT_OF_HOUSE_SALES_REGIONS') THEN '-1'
+	    'PROPERTY_IN_OFFPLANT','HOUSE_PRICE_WAS_OUT_OF_BOUNDS','HOUSE_WAS_OUT_OF_HOUSE_SALES_REGIONS') AND sk_opportunity_date_sale<0 THEN '-1'
 	    ELSE sk_qualified_date_sale
 	END sk_qualified_date_sale,
-	CASE -- filtering opportunity rent
-	    WHEN prospect_discard_rent IN ('HOUSE_ALREADY_RENTED_AVAILABLE_IN_1_MONTH','HOUSE_ALREADY_RENTED_AVAILABLE_IN_3_MONTHS','HOUSE_UNDER_EXCLUSIVITY_CONTRACT','OWNER_WITH_PRIME_PROFILE',
-	    'OWNER_DISAGREE_CHARGES_PAYMENTS','OWNER_CONSIDERED_ADMINISTRATION_FEE_TOO_HIGH','OWNER_CONSIDERED_BROKERAGE_FEE_TOO_HIGH','OWNER_DIDNT_WANT_ADMINISTRATION','ISSUES_WITH_HOUSE_ENTRANCE_CONDITIONS') THEN '-1'
-	    ELSE sk_opportunity_date_rent
-	END sk_opportunity_date_rent,
-	CASE -- filtering opportunity sale
-	    WHEN prospect_discard_sale IN ('HOUSE_UNDER_EXCLUSIVITY_CONTRACT','OWNER_WITH_PRIME_PROFILE','OWNER_DISAGREE_CHARGES_PAYMENTS','OWNER_DISAGREE_PAYMENT_TIMING','ISSUES_WITH_HOUSE_ENTRANCE_CONDITIONS') THEN '-1'
-	    ELSE sk_opportunity_date_sale
-	END sk_opportunity_date_sale,
+    llf.sk_opportunity_date_rent,
+	llf.sk_opportunity_date_sale,
 	llf.sk_first_listing_date_sale,
 	llf.sk_first_listing_date_rent,
+	llf.context_opportunity_sale,
+	llf.context_opportunity_rent,
 	llf.context_first_listing_sale,
 	llf.context_first_listing_rent,
-	dc.lead_discard_sale,
-	dc.lead_discard_rent,
-	dc.prospect_discard_sale,
-	dc.prospect_discard_rent
+	llf.lead_discard_sale,
+	llf.lead_discard_rent,
+	llf.prospect_discard_sale,
+	llf.prospect_discard_rent,
+	llf.prospect_status
 FROM
-    hybrid_dates llf
-LEFT JOIN
-    discard_by_context dc
-    ON llf.sk_lead = dc.sk_lead
+    qualified_date llf
 ),
 available_qualified AS (
 SELECT
@@ -398,30 +525,42 @@ SELECT
     llf.sourcing_ops_sale,
     llf.lead_origin_rent,
     llf.lead_origin_sale,
+    llf.funnel_drop_reason_rent,
+    llf.funnel_drop_reason_sale,
     llf.sk_lead_date_rent,
     llf.sk_lead_date_sale,
-    llf.sk_prospect_date_rent,
-	llf.sk_prospect_date_sale,
+	CASE -- filtering prospect rent
+		WHEN lead_discard_rent IN ('HOUSE_WAS_OUT_OF_HOUSE_RENTING_REGIONS', 'ForaArea','DUPLICATED_LEAD','CONTACT_ON_BLOCK_LIST') AND sk_qualified_date_rent<0 THEN '-1'
+		ELSE sk_prospect_date_rent
+	END sk_prospect_date_rent,
+	CASE -- filtering prospect sale
+		WHEN lead_discard_sale IN ('HOUSE_WAS_OUT_OF_HOUSE_SALES_REGIONS', 'ForaArea','DUPLICATED_LEAD','CONTACT_ON_BLOCK_LIST') AND sk_qualified_date_sale<0 THEN '-1'
+		ELSE sk_prospect_date_sale
+	END sk_prospect_date_sale,
 	llf.sk_qualified_date_rent,
 	llf.sk_qualified_date_sale,
 	CASE -- filtering available qualified rent
-	    WHEN prospect_discard_rent IN ('HOUSE_ALREADY_RENTED_AVAILABLE_IN_6_MONTHS','HOUSE_ALREADY_RENTED_AVAILABLE_IN_MORE_THAN_6_MONTHS','HOUSE_ALREADY_RENTED','OWNER_GAVE_UP_RENTING','SEASONAL_RENT','HOUSE_UNDER_MAJOR_RENOVATION') THEN '-1'
+	    WHEN prospect_discard_rent IN ('HOUSE_ALREADY_RENTED_AVAILABLE_IN_6_MONTHS','HOUSE_ALREADY_RENTED_AVAILABLE_IN_MORE_THAN_6_MONTHS','HOUSE_ALREADY_RENTED','OWNER_GAVE_UP_RENTING',
+	    'SEASONAL_RENT','HOUSE_UNDER_MAJOR_RENOVATION') AND sk_opportunity_date_rent<0 THEN '-1'
 	    ELSE sk_qualified_date_rent
 	END AS sk_available_qualified_date_rent,
 	CASE -- filtering available qualified sale
-	    WHEN prospect_discard_sale IN ('OWNER_GAVE_UP_SELLING','ISSUES_WITH_HOUSE_DOCUMENTATION','PROPERTY_IN_JUDICIAL_INVENTORY') THEN '-1'
+	    WHEN prospect_discard_sale IN ('OWNER_GAVE_UP_SELLING','ISSUES_WITH_HOUSE_DOCUMENTATION','PROPERTY_IN_JUDICIAL_INVENTORY') AND sk_opportunity_date_sale<0 THEN '-1'
 	    ELSE sk_qualified_date_sale
 	END AS sk_available_qualified_date_sale,
 	llf.sk_opportunity_date_rent,
 	llf.sk_opportunity_date_sale,
 	llf.sk_first_listing_date_sale,
 	llf.sk_first_listing_date_rent,
+	llf.context_opportunity_sale,
+	llf.context_opportunity_rent,
 	llf.context_first_listing_sale,
 	llf.context_first_listing_rent,
 	llf.lead_discard_sale,
 	llf.lead_discard_rent,
 	llf.prospect_discard_sale,
-	llf.prospect_discard_rent
+	llf.prospect_discard_rent,
+	prospect_status
 FROM dates_filters llf
 )
 SELECT
@@ -441,6 +580,8 @@ SELECT
     llf.sourcing_ops_sale,
     llf.lead_origin_rent,
     llf.lead_origin_sale,
+    llf.funnel_drop_reason_rent,
+    llf.funnel_drop_reason_sale,
     llf.sk_lead_date_rent,
     llf.sk_lead_date_sale,
     llf.sk_prospect_date_rent,
@@ -485,19 +626,14 @@ SELECT
         WHEN sk_available_qualified_date_rent = sk_available_qualified_date_sale AND sk_available_qualified_date_sale>0 AND sk_available_qualified_date_rent>0 THEN 'Hybrid'
         WHEN sk_available_qualified_date_rent >0 AND sk_available_qualified_date_rent != sk_available_qualified_date_sale THEN 'Rent'
     END AS context_available_qualified_rent,
-    CASE
-        WHEN sk_opportunity_date_rent = sk_opportunity_date_sale AND sk_opportunity_date_sale>0 AND sk_opportunity_date_rent>0 THEN 'Hybrid'
-        WHEN sk_opportunity_date_sale >0 AND sk_lead_date_rent != sk_opportunity_date_sale THEN 'Sale'
-    END AS context_opportunity_sale,
-    CASE
-        WHEN sk_opportunity_date_rent = sk_opportunity_date_sale AND sk_opportunity_date_sale>0 AND sk_opportunity_date_rent>0 THEN 'Hybrid'
-        WHEN sk_opportunity_date_rent >0 AND sk_opportunity_date_rent != sk_opportunity_date_sale THEN 'Rent'
-    END AS context_opportunity_rent,
+    llf.context_opportunity_sale,
+	llf.context_opportunity_rent,
 	llf.context_first_listing_sale,
 	llf.context_first_listing_rent,
 	llf.lead_discard_sale,
 	llf.lead_discard_rent,
 	llf.prospect_discard_sale,
-	llf.prospect_discard_rent
+	llf.prospect_discard_rent,
+	llf.prospect_status
 FROM
     available_qualified llf
