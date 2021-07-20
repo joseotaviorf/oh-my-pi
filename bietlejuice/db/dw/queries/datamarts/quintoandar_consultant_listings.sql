@@ -163,7 +163,7 @@ INNER JOIN
 quintoandar_consultant_listings AS (
 (
 SELECT
-   dl.sk_sale_listing,
+   dl.sk_sale_listing  AS sk_house_listing,
     qcls.id_house,
     qcls.sk_quintoandar_consultant,
     lf.mkt_origin = 'CIQ' AS mkt_origin_ciq,
