@@ -341,8 +341,8 @@ campaigns_full AS (
         NULL AS report_type,
         NULL AS ad_type
     FROM
-        marketing_costs.fact_mitula_daily_cost_attributions fm
-        JOIN marketing_costs.dim_mitula_campaign dm ON fm.sk_mitula_campaign = dm.sk_mitula_campaign
+        mitula.fact_mitula_daily_cost_attributions fm
+        JOIN mitula.dim_mitula_campaign dm ON fm.sk_mitula_campaign = dm.sk_mitula_campaign
     WHERE
         fm.sk_date >= 20180101
         -- CRITEO
@@ -395,8 +395,8 @@ campaigns_full AS (
         sum(cost) AS total_cost,
         NULL AS report_type,
         NULL AS ad_type
-    FROM marketing_costs.fact_rtb_daily_cost_attributions frt
-        LEFT JOIN marketing_costs.dim_rtb_campaign drt
+    FROM rtb_campaigns.fact_rtb_daily_cost_attributions frt
+        LEFT JOIN rtb_campaigns.dim_rtb_campaign drt
         ON frt.sk_sub_campaign = drt.sk_sub_campaign
         AND frt.sk_date = drt.sk_date
     WHERE frt.sk_date >= 20180101
