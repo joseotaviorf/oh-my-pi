@@ -2,40 +2,42 @@ from datetime import datetime
 import os
 import pendulum
 
-import airflow.utils.helpers as airflow_helpers
+from airflow.utils.helpers import chain
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
-    QuintoAndarDatabricksSubmitRunOperator,
 )
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
-from bietlejuice.jobs.composer.base.pipeline import LayerEnum
-from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
-from bietlejuice.jobs.composer.services import FileService
+from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.jobs.composer.services.configuration_service import (
+    ConfigurationService,
+)
 
 # airflow vars
 ENV = os.environ.get("ENVIRONMENT")
-DAG_NAME = "rental_guarantee"
-DATALAKE_BUCKET = Variable.get("datalake_bucket")
-ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
-ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
-DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
-S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
+SOURCE = "rental_guarantee"
+CONTEXT = SOURCE
+DAG_ID = f"bietlejuice.{SOURCE}"
 
-# spark and databricks vars
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
-LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{DAG_NAME}"
+config_service = ConfigurationService(SOURCE)
+athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
+datalake_bucket = config_service.get_config("datalake_bucket")
+databricks_bietlejuice_repo_path = config_service.get_config(
+    "databricks_bietlejuice_repo_path"
+)
+spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
+doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+
+RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{CONTEXT}/"
+BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
+
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = spark_jobs_logs_path
 
-# dag vars
-DAG_ID = f"bietlejuice.{DAG_NAME}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2020, 7, 27, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 6 * * *"
-CONFIGS_FILE_PATH = f"{os.path.dirname(os.path.realpath(__file__))}/{DAG_NAME}.config"
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -46,11 +48,10 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
-        chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
+        chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
 )
-
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
@@ -60,99 +61,53 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-configs_file = FileService.get_dict_from_yaml_file(CONFIGS_FILE_PATH)
+task_group = DatalakeTaskGroup(
+    dag=dag,
+    env=ENV,
+    datalake_bucket=datalake_bucket,
+    relative_query_path=CONTEXT,
+    spark_jobs_path=BASE_SPARK_JOBS_PATH,
+    athena_query_result_location=athena_query_results_bucket,
+)
 
-raw_tasks = {}
-raw_to_clean = {}
-
-for table in configs_file:
+tables = config_service.get_config("tables")
+clean_partition_columns = config_service.get_config("clean_partition_columns")
+for table in tables:
     table_name = table["table_name"]
-    slugged_table_name = table_name.replace("_", "-")
     extraction_type = table["extraction_type"]
-    raw_to_clean[table_name] = table.get("clean_table_name", table_name)
+    clean_table_name = table.get("clean_table_name", table_name)
 
-    parameters = [ENV, DATALAKE_BUCKET, DAG_NAME, table_name]
+    parameters = [SOURCE, table_name]
     if extraction_type == "incremental":
         parameters.append(table["date_filter_column"])
         parameters.append(table.get("unixtime_measure", "date"))
         parameters.append("{{ ds }}")
 
-    raw_task = QuintoAndarDatabricksSubmitRunOperator(
-        task_id=f"load-{extraction_type}-{slugged_table_name}-to-raw",
-        dag=dag,
-        json={
-            "spark_python_task": {
-                "python_file": S3_PREFIX
-                + f"/spark_jobs/{DAG_NAME}/load_{extraction_type}_tables_into_datalake_raw.py",
-                "parameters": parameters,
-            }
-        },
+    raw_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{CONTEXT}//load_{extraction_type}_{CONTEXT}_into_datalake.py"
+
+    raw_task_group = task_group.build_raw_task_group_for_single_table(
+        source=SOURCE,
+        table_name=table_name,
+        target_database_base_name=CONTEXT,
+        extraction_spark_job_file=raw_spark_job_path,
+        raw_spark_job_extra_args=parameters,
     )
 
-    airflow_helpers.chain(create_cluster_task, raw_task)
-    raw_tasks[table_name] = raw_task
+    is_incremental = table.get("extraction_type") == "incremental"
+    partitions = clean_partition_columns if is_incremental else None
+    clean_task_group = task_group.build_clean_task_group(
+        source_database_base_name=CONTEXT,
+        target_database_base_name=CONTEXT,
+        table_name=clean_table_name,
+        is_incremental=is_incremental,
+        partitions=partitions,
+    )
 
-sync_metastore_raw_tables_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id=f"sync-{slugged_table_name}-hive-metastore-raw-table",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": SPARK_JOBS_PATH + "sync_metastore_tables.py",
-            "parameters": [
-                DATALAKE_BUCKET,
-                LayerEnum.RAW.value,
-                DAG_NAME,
-                "--all-tables",
-            ],
-        }
-    },
-)
+    chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
 
-airflow_helpers.chain(
-    list(raw_tasks.values()), sync_metastore_raw_tables_task, terminate_cluster_task
-)
+    chain(
+        DatalakeTaskGroup.last_tasks(raw_task_group),
+        DatalakeTaskGroup.first_tasks(clean_task_group),
+    )
 
-# [END] Raw layer sub dags
-
-clean_sub_dag = DatalakeSubDAG(
-    dag_id=DAG_ID,
-    start_date=MAIN_START_DATE,
-    env=ENV,
-    datalake_bucket=DATALAKE_BUCKET,
-    layer=LayerEnum.CLEAN,
-    database_base_name=DAG_NAME,
-    relative_query_path=DAG_NAME,
-    spark_job_paths=SPARK_JOBS_PATH,
-    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
-)
-
-file_list_full = FileService.list_sql_files_without_extension_from_layer(
-    DAG_NAME, LayerEnum.CLEAN.value, schema="full"
-)
-
-file_list_incremental = FileService.list_sql_files_without_extension_from_layer(
-    DAG_NAME, LayerEnum.CLEAN.value, schema="incremental"
-)
-
-clean_sub_dags_full = clean_sub_dag.build_subdags_from_sql_files(
-    dag, file_list_full, schema="full"
-)
-clean_sub_dags_incremental = clean_sub_dag.build_subdags_from_sql_files(
-    dag,
-    file_list_incremental,
-    is_incremental=True,
-    partitions=["year", "month", "day"],
-    schema="incremental",
-)
-
-clean_sub_dags_dict = {**clean_sub_dags_full, **clean_sub_dags_incremental}
-
-
-# DAG FLOW:
-
-for table_name, raw_task in raw_tasks.items():
-    clean_table_name = raw_to_clean.get(table_name)
-    if clean_sub_dags_dict.get(clean_table_name):
-        airflow_helpers.chain(
-            raw_task, clean_sub_dags_dict.get(clean_table_name), terminate_cluster_task
-        )
+    terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_group))
