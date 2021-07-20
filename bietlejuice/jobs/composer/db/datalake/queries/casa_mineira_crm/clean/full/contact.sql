@@ -11,6 +11,7 @@ SELECT
     email,
     telefone AS phone_number, 
     token,
+    tipo AS contact_type,
     CAST(automatizado AS BOOLEAN) AS is_automated,
     CAST(criado_em AS TIMESTAMP) AS ts_created,
     CAST(atendimento_em AS TIMESTAMP) AS ts_attended,
