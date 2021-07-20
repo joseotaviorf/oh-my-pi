@@ -15,6 +15,6 @@ SELECT
     DATE(Day) AS dt_loaded,
     TO_DATE(dt, 'dd-MM-yyyy') AS dt_created
 FROM
-    datalake_google_ads_cm_raw.videos_performance_report
+    datalake_casa_mineira_google_ads_raw.videos_performance_report
 WHERE 
     TO_DATE(dt, 'dd-MM-yyyy') = DATE('{year}-{month}-{day}') 
