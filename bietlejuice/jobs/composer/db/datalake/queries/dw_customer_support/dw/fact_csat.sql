@@ -2,7 +2,8 @@ SELECT
   CAST(id_ticket AS BIGINT) AS sk_ticket,
   channel,
   csat_comment,
-  is_solved,
+  source,
+  resolution_survey,
   csat_score,
   ts_survey,
   ts_response

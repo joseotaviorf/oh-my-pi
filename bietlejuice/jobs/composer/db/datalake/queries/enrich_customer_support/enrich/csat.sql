@@ -3,7 +3,8 @@ WITH chat_total AS (
     cc.id_ticket,
     'chat' AS channel,
     SUBSTR(sa.comment,1,1000) AS csat_comment,
-    sa.is_solved,
+    'chat_fup' AS source,
+    sa.is_solved AS resolution_survey,
     sa.rating AS csat_score,
     ss.ts_created AS ts_survey,
     sa.ts_created AS ts_response
@@ -19,7 +20,7 @@ WITH chat_total AS (
     datalake_chat_fup_clean.surveys_answer AS sa
       ON ss.id = sa.id_survey
   WHERE
-    sa.is_solved IS NOT NULL
+    COALESCE(CAST(sa.is_solved AS string), CAST(sa.rating AS string)) IS NOT NULL
 ),
 email_total AS (
   WITH last_update_ticket AS (
@@ -34,6 +35,7 @@ email_total AS (
     SELECT
       t.id_ticket AS id_ticket,
       GET_JSON_OBJECT(satisfaction_rating, '$.comment') AS csat_comment,
+      'zendesk' AS source,
       GET_JSON_OBJECT(satisfaction_rating, '$.reason') AS score_reason,
       satisfaction_rating,
       CASE
@@ -47,7 +49,7 @@ email_total AS (
         WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') IN ('bad') THEN FALSE
       END AS is_solved,
       NULL AS ts_first_seen,
-      NULL AS ts_first_response
+      NULL AS ts_first_response -- here we'll put th updated_at field when importing the Zendesk Satisfaction Ratings data.
     FROM
       datalake_zendesk_tickets_clean.tickets t
       JOIN
@@ -58,6 +60,7 @@ email_total AS (
     SELECT
       id_ticket,
       user_comment AS csat_comment,
+      'survicate' AS source,
       NULL AS score_reason,
       NULL AS satisfaction_rating,
       csat_score,
@@ -73,13 +76,14 @@ email_total AS (
       datalake_survicate.surveys
     WHERE
       id_ticket IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9    
+    GROUP BY 1,2,3,4,5,6,7,8,9,10    
   )
   SELECT
     csat.id_ticket,
     'email' AS channel,
     SUBSTR(csat.csat_comment,1,1000) AS csat_comment,
-    csat.is_solved,
+    source,
+    csat.is_solved AS resolution_survey,
     csat.csat_score,
     NULL AS ts_survey,
     csat.ts_first_response AS ts_response
@@ -93,7 +97,7 @@ email_total AS (
         ON tf.id_ticket = t.id_ticket
   WHERE
     tf.channel IN ('email', 'form_faq', 'web', 'other')
-    AND is_solved IS NOT NULL
+    AND COALESCE(CAST(is_solved AS string), CAST(csat_score AS string)) IS NOT NULL
     -- emails with the tags below are not new demands or automatically closed, therefore, they should not be considered
     AND tf.tags NOT LIKE '%resolve_ticket_acompanhamento%'
     AND tf.tags NOT LIKE '%fechado_automaticamente_noreply%'
@@ -104,7 +108,7 @@ email_total AS (
     AND tf.tags NOT LIKE '%call_contato_receptivo%'
     AND tf.tags NOT LIKE '%call_contato_ativo%'
     AND tf.tags NOT LIKE '%redirecionado_adm_v1%'
-  GROUP BY 1,2,3,4,5,6,7
+  GROUP BY 1,2,3,4,5,6,7,8
 ),
 call_total AS (
   WITH ivr_events AS (
@@ -172,10 +176,11 @@ call_total AS (
     ztu.id_ticket,
     'call' AS channel,
     NULL AS csat_comment,
+    'bigfone' AS source,
     CASE
       WHEN csat_1 = 1 THEN TRUE
       WHEN csat_1 = 2 THEN FALSE
-    END AS is_solved,
+    END AS resolution_survey,
     csat_2 AS csat_score,
     ts_survey,
     ts_response
