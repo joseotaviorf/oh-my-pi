@@ -50,8 +50,9 @@ SELECT
     month,
     day
 FROM
-    datalake_casa_mineira_amplitude_portal_raw.events
-WHERE 
-    year = {year}
+    datalake_casa_mineira_amplitude_raw.events
+WHERE
+    app = 329001
+    AND year = {year}
     AND month = {month}
     AND day = {day}

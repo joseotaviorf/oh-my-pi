@@ -1,0 +1,4 @@
+---
+custom_records_per_file: 2500000
+partition_cols: [app, year, month, day]
+table_name: events

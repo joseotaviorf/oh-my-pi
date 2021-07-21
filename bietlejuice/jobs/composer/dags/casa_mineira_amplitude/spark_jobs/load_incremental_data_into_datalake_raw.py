@@ -14,9 +14,11 @@ from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
+from bietlejuice.jobs.composer.services.configuration_service import (
+    ConfigurationService,
+)
 
 JOB_NAME = "load_incremental_data_into_datalake_raw"
-TABLE_NAME = "events"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -40,8 +42,6 @@ if __name__ == "__main__":
     start = start_date.strftime(AmplitudeEvents.AMPLITUDE_API_DATE_FORMAT)
     end = end_date.strftime(AmplitudeEvents.AMPLITUDE_API_DATE_FORMAT)
 
-    partition_cols = ["year", "month", "day", "app"]
-
     logger.info(
         f"""
         msg=load_incremental_data_into_datalake_raw, environment={environment}, datalake_bucket={datalake_bucket},
@@ -54,6 +54,11 @@ if __name__ == "__main__":
         dbutils = base_dbutils.get_dbutils()
 
     keys = json.loads(dbutils.secrets.get("quintoandar", "ENV_CM_AMPLITUDE"))
+
+    config_service = ConfigurationService(source, inverse_file_config_order=True)
+    custom_records_per_file = config_service.get_config("custom_records_per_file")
+    partition_cols = config_service.get_config("partition_cols")
+    table_name = config_service.get_config("table_name")
 
     spark_client = SparkClient()
 
@@ -88,20 +93,21 @@ if __name__ == "__main__":
 
             s3_loader.load_df(
                 df=df,
-                s3_path=f"{database_location}{TABLE_NAME}",
+                s3_path=f"{database_location}{table_name}",
                 format_options=format_options,
                 partitions=partition_cols,
+                max_records_per_file=custom_records_per_file,
             )
 
             spark_metastore_loader.update_metastore(
                 df,
                 database_name,
-                TABLE_NAME,
+                table_name,
                 format_options,
                 database_location,
                 partition_cols,
                 force_recreate=False,
             )
             spark_metastore_service.create_new_partitions_from_df(
-                database_name, TABLE_NAME, df, partition_cols, parallelism=8
+                database_name, table_name, df, partition_cols, parallelism=8
             )

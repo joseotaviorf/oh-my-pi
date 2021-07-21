@@ -1,8 +1,8 @@
-## Casa Mineira Amplitude Portal
+## Casa Mineira Amplitude
 
 ### Purpose
 
-This DAG imports the Portal events data of user interaction from Casa Mineira, through Amplitude API.
+This DAG imports the events data of user interaction from Casa Mineira, through Amplitude API.
 
 <details>
   <summary><strong> > DAG details (click to expand)</strong></summary>
@@ -15,8 +15,11 @@ More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-This pipeline produces, in **datalake raw and clean**, via incremental load:
+This pipeline produces, in **datalake raw**, via incremental load:
     - `events`
+
+And in **datalake clean**, via incremental load:
+    - `329001_portal`
 
 ### Responsible Data Teams
 
@@ -25,5 +28,5 @@ Data Analytics Team responsible listed in the [DAG owners](https://www.notion.so
 
 ### Additional Information
 
-If it is necessary to add a new `app_id` to this DAG, when updating the Secret, you must add it as a JSON array.
+If it is necessary to add a new `app_id` to this DAG, when updating the Secret, you must add it as a JSON array. Also, we tested to use the Amplitude setup to automatically import data to a S3 bucket but the partitions offered by Amplitude were not suitable and could not be customized.
 </details>
