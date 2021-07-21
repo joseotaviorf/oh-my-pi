@@ -1,6 +1,7 @@
 import os
 import pendulum
 import json
+import pytz
 from datetime import datetime, timedelta
 
 from airflow.models import DAG
@@ -8,23 +9,24 @@ from airflow.models import Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
-    QuintoAndarDatabricksSubmitRunOperator,
 )
 from airflow.operators.python_operator import ShortCircuitOperator
-import airflow.utils.helpers as airflow_helpers
 
+from bietlejuice.jobs.composer.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
-from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
+from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.services import FileService
+from bietlejuice.jobs.composer.services.configuration_service import (
+    ConfigurationService,
+)
 
-
-def check_run_hour(cron, ts):
-    ts_no_tz = ts[:-6]
-    current_time_utc = datetime.strptime(ts_no_tz, "%Y-%m-%dT%H:%M:%S")
-    current_time_brt = current_time_utc - timedelta(hours=3)
+def check_run_hour(schedule_hours, dag_execution_date):
+    brt_tz = pytz.timezone("America/Sao_Paulo")
+    current_time_utc = datetime.strptime(dag_execution_date[:19], "%Y-%m-%dT%H:%M:%S")
+    current_time_brt = current_time_utc.replace(tzinfo=pytz.utc).astimezone(brt_tz)
     current_hour = current_time_brt.hour
-    return str(current_hour) in cron.split(",")
+    return str(current_hour) in schedule_hours.split(",")
 
 
 # ENV setup
@@ -40,23 +42,26 @@ MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
 # Task params
 TASK_POOL = "gsheets_pool"
 
-# s3 paths setup
-ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
+config_service = ConfigurationService(SOURCE)
+athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 ARTIFACTS_S3_BUCKET = Variable.get("artifacts_default_bucket")
-DATALAKE_BUCKET = Variable.get("datalake_bucket")
-S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/"
-BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
-LOAD_GSHEETS_INTO_DATALAKE_RAW_FILE_PATH = (
-    S3_PREFIX + f"/spark_jobs/{SOURCE}/load_full_data_into_datalake_raw.py"
+datalake_bucket = config_service.get_config("datalake_bucket")
+spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
+doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+databricks_bietlejuice_repo_path = config_service.get_config(
+    "databricks_bietlejuice_repo_path"
 )
-DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
-LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{DAG_ID}"
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base"
+BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
+LOAD_GSHEETS_INTO_DATALAKE_RAW_FILE_PATH = (
+    f"{BASE_SPARK_JOBS_PATH}load_gsheets_into_datalake_raw.py"
+)
 
 # cluster setup
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
+CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
+    "destination"
+] = f"{spark_jobs_logs_path}{DAG_ID}"
 
 CUSTOM_LIBRARIES = [
     {
@@ -80,24 +85,10 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(SOURCE),
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
+        chart_url=doc_md_chart_url, dag_id=DAG_ID
+    ),
 )
-
-clean_sub_dag = DatalakeSubDAG(
-    dag_id=DAG_ID,
-    start_date=MAIN_START_DATE,
-    env=ENV,
-    datalake_bucket=DATALAKE_BUCKET,
-    layer=LayerEnum.CLEAN,
-    database_base_name=SOURCE,
-    relative_query_path=SOURCE,
-    spark_job_paths=f"{SPARK_JOB_PATH}/base",
-    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
-)
-file_list = FileService.list_sql_files_without_extension_from_layer(
-    SOURCE, LayerEnum.CLEAN.value
-)
-clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(dag, file_list)
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
@@ -110,9 +101,18 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-for TABLE_NAME, SHEET_DETAILS in GOOGLE_FILES.items():
+task_group = DatalakeTaskGroup(
+    dag=dag,
+    env=ENV,
+    datalake_bucket=datalake_bucket,
+    relative_query_path=SOURCE,
+    spark_jobs_path=BASE_SPARK_JOBS_PATH,
+    athena_query_result_location=athena_query_results_bucket,
+)
 
-    slugged_table_name = TABLE_NAME.replace("_", "-")
+raw_task_groups = {}
+skip_run_tasks = {}
+for TABLE_NAME, SHEET_DETAILS in GOOGLE_FILES.items():
 
     if "cron" not in SHEET_DETAILS:
         SHEET_DETAILS["cron"] = "1,9,17"
@@ -120,54 +120,33 @@ for TABLE_NAME, SHEET_DETAILS in GOOGLE_FILES.items():
     skip_run_task = ShortCircuitOperator(
         task_id=f"check-hour-to-skip-{TABLE_NAME}",
         python_callable=check_run_hour,
-        op_kwargs={"cron": SHEET_DETAILS["cron"], "ts": "{{ts}}"},
+        op_kwargs={
+            "schedule_hours": SHEET_DETAILS["cron"],
+            "dag_execution_date": "{{ts}}",
+        },
     )
+    skip_run_tasks[TABLE_NAME] = skip_run_task
 
-    gsheets_to_datalake_raw_tasks = QuintoAndarDatabricksSubmitRunOperator(
-        task_id=f"gsheets-{slugged_table_name}-to-datalake-raw",
-        dag=dag,
+    raw_task_group = task_group.build_raw_task_group_for_single_table(
+        source=SOURCE,
+        target_database_base_name=SOURCE,
+        table_name=TABLE_NAME,
+        extraction_spark_job_file=LOAD_GSHEETS_INTO_DATALAKE_RAW_FILE_PATH,
+        raw_spark_job_extra_args=[SOURCE, TABLE_NAME, json.dumps(SHEET_DETAILS)],
         pool=TASK_POOL,
-        json={
-            "spark_python_task": {
-                "python_file": LOAD_GSHEETS_INTO_DATALAKE_RAW_FILE_PATH,
-                "parameters": [
-                    ENV,
-                    SOURCE,
-                    DATALAKE_BUCKET,
-                    TABLE_NAME,
-                    json.dumps(SHEET_DETAILS),
-                ],
-            }
-        },
+    )
+    raw_task_groups[SHEET_DETAILS["clean_table_name"]] = raw_task_group
+
+    create_cluster_task >> skip_run_task >> DatalakeTaskGroup.first_tasks(
+        raw_task_group
     )
 
-    sync_metastore_raw_table_task = QuintoAndarDatabricksSubmitRunOperator(
-        task_id=f"sync-hive-metastore-raw-{slugged_table_name}",
-        dag=dag,
-        json={
-            "spark_python_task": {
-                "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables.py",
-                "parameters": [
-                    DATALAKE_BUCKET,
-                    LayerEnum.RAW.value,
-                    SOURCE,
-                    "--table-name",
-                    TABLE_NAME,
-                ],
-            }
-        },
-    )
+clean_task_groups = task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.CLEAN,
+    source_database_base_name=SOURCE,
+    target_database_base_name=SOURCE,
+)
 
-    airflow_helpers.chain(
-        create_cluster_task,
-        skip_run_task,
-        gsheets_to_datalake_raw_tasks,
-        clean_sub_dags.pop(SHEET_DETAILS["clean_table_name"]),
-        terminate_cluster_task,
-    )
+TaskFlowHelper.chain_task_groups_via_common_table(raw_task_groups, clean_task_groups)
 
-    airflow_helpers.chain(
-        gsheets_to_datalake_raw_tasks,
-        sync_metastore_raw_table_task,
-        terminate_cluster_task,
-    )
+terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
