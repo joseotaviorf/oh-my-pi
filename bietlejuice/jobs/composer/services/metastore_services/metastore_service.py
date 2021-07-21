@@ -31,7 +31,7 @@ class MetastoreService(ABC):
         :param database_name: database name
         :type database_name: str
         """
-        command = f"CREATE DATABASE IF NOT EXISTS {database_name}"
+        command = f"CREATE DATABASE IF NOT EXISTS `{database_name}`"
         self.client.run(command)
         logger.info(
             f"m=create_database, database_name={database_name}, msg=the "
@@ -48,7 +48,7 @@ class MetastoreService(ABC):
         :param table_name: table name
         :type table_name: str
         """
-        command = f"MSCK REPAIR TABLE {database_name}.{table_name}"
+        command = f"MSCK REPAIR TABLE `{database_name}`.`{table_name}`"
         self.client.run(command)
 
     @logger
@@ -75,7 +75,7 @@ class MetastoreService(ABC):
         between characters, can be used.
         :type regex: str
         """
-        query = f"SHOW TABLES IN {database_name} '{regex}'"
+        query = f"SHOW TABLES IN `{database_name}` '{regex}'"
         res = self.client.get_records(query)
 
         return res
@@ -96,8 +96,8 @@ class MetastoreService(ABC):
         :return:
         """
         query = (
-            "DESCRIBE " + ("FORMATTED " if formatted else "") + f"{database_name}."
-            f"{table_name}"
+            "DESCRIBE " + ("FORMATTED " if formatted else "") + f"`{database_name}`."
+            f"`{table_name}`"
         )
         res = self.client.get_records(query)
 
