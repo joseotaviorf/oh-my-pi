@@ -64,7 +64,7 @@ date_series as (
   from
     datalake_clean.ods_dim_date dd
   where
-  date(date) >= date('2020-06-01') and date(week_start) <= current_date - interval '1' day
+    date(date) >= current_date - interval '45' day and date(week_start) <= current_date - interval '1' day
     and date != ''
 ),
 regions AS (
@@ -124,18 +124,18 @@ dimensions as (
   cross join date_series ds
   cross join slot_series ss
   where
-    date >= current_date - interval '6' month
+    date >= current_date - interval '45' day
 ),
 encaixe_to_booking as (
-  select
-    distinct id_visitor as user_id,
-    id_property as house_id
+  select distinct
+    CAST(id_visitor AS BIGINT) AS user_id,
+    CAST(id_property AS BIGINT) AS house_id
   from
     datalake_clean.ods_dim_booking
   where
     type = 'Visita'
-  and visit_intent = 'SALE'
-  and date(date_parse(dt_scheduling, '%Y-%m-%d %H:%i:%s')) >= date('2020-06-01')
+    and visit_intent = 'SALE'
+    and date(date_parse(dt_scheduling, '%Y-%m-%d %H:%i:%s')) >= current_date - interval '55' day
 ),
 booking_for_rent as (
   select distinct
@@ -150,35 +150,53 @@ booking_for_rent as (
   where type = 'Visita'
     and visit_intent = 'RENT' 
     and id_visitor != ''
-    and date(date_parse(dt_scheduling, '%Y-%m-%d %H:%i:%s')) >= date('2020-06-01')
+    and date(date_parse(dt_scheduling, '%Y-%m-%d %H:%i:%s')) >= current_date - interval '55' day
     and (status = 'Realizado' OR status = 'Marcado' OR            
         (status = 'Cancelado' and date(date_parse(dt_scheduling, '%Y-%m-%d %H:%i:%s')) = try_cast(try_cast(substring(dt_cancel,1,19) as timestamp) as date)))
 ),
+visit_hoursalert_confirmed AS (
+    SELECT
+        trim(event_type) AS event,
+        ts_event as event_date,
+        CAST(id_user AS BIGINT) AS user_id,
+        CAST(json_extract_scalar(event_properties, '$.house_id') AS BIGINT) AS house_id,
+        CAST(DATE_PARSE(COALESCE(json_extract_scalar(event_properties, '$.alert_target_date'), ''), '%a, %d %b %Y %T GMT') AS DATE) AS target_date,
+        CAST(COALESCE(json_extract_scalar(event_properties, '$.alert_slot_from'), '') AS BIGINT) AS alert_slot_from,
+        CAST(COALESCE(json_extract_scalar(event_properties, '$.alert_slot_to'), '') AS BIGINT) AS alert_slot_to
+    FROM
+        datalake_amplitude_clean_prod.events
+    WHERE
+        trim(event_type) = 'visit_hoursalert_confirmed'
+        AND json_extract_scalar(event_properties, '$.business_context') = 'sale'
+        AND json_extract_scalar(event_properties, '$.house_id') <> ''
+        AND id_user <> ''
+        AND ts_event >= current_date - interval '45' day
+),
 encaixes_raw as (
   select
-    evt.ts_event as event_date,
-    CAST(trim(evt.id_user) AS BIGINT) as user_id,
-    CAST(trim(evt.ep_house_id) AS BIGINT) as house_id,
-    cast(date_parse(evt.ep_alert_target_date, '%a, %d %b %Y %T GMT') as date) as target_date,
-    cast(trim(evt.ep_alert_slot_from) as double) alert_slot_from,
-    cast(trim(evt.ep_alert_slot_to) as double) alert_slot_to,
-    case when etb.user_id is not null then 1 else 0 end as encaixe_realizado,
-    rank() over (partition by trim(evt.id_user), trim(coalesce(evt.ep_house_id, '')) order by evt.ts_event desc) as rank_enc
-  from datalake_amplitude_clean_prod."170698_visit_hoursalert_confirmed_events" evt
-     left join encaixe_to_booking etb on etb.user_id = trim(evt.id_user) and etb.house_id = trim(coalesce(evt.ep_house_id, ''))
-  where concat(cast(year as varchar), '-', cast(month as varchar)) >= '2020-06'
-    and cast(json_extract(event_properties, '$.business_context') as varchar) = 'sale'
+        evt.event_date,
+        evt.user_id,
+        evt.house_id,
+        evt.target_date,
+        evt.alert_slot_from,
+        evt.alert_slot_to,
+        case when etb.user_id is not null then 1 else 0 end as encaixe_realizado,
+        rank() over (partition by evt.user_id, evt.house_id order by evt.event_date desc) as rank_enc
+    from visit_hoursalert_confirmed evt
+    left join encaixe_to_booking etb
+        on etb.user_id = evt.user_id
+        and etb.house_id = evt.house_id
 ),
 encaixes_temp as (
   select distinct
-    CAST(user_id AS BIGINT) AS user_id,
-    CAST(house_id AS BIGINT) AS house_id,
+    user_id,
+    house_id,
     r.*,
     event_date,
     target_date,
     slot,
     encaixe_realizado,
-    1 / cast(count(slot) over (partition by enc.user_id,enc.house_id, enc.target_date) as double) as slot_share_encaixe
+    1.0 / cast(count(slot) over (partition by enc.user_id,enc.house_id, enc.target_date) as double) as slot_share_encaixe
   from
     encaixes_raw enc
   join slot_series ss on
@@ -232,71 +250,93 @@ suspended_houses as (
     )
   WHERE status = 'SUSPENDED'
 ),
+ -- !! NEW canceled bookings that are considered repressed demand
+cant_find_another_agent as (
+	select distinct
+    	id_visitor as user_id,
+    	id_house as house_id,
+    	cast(slot_day as bigint) as slot_dia,
+    	dt_booking as dt_scheduling,
+    	date(dt_booking) as visit_date,
+    	status
+    from datalake_booking_prod.booking
+    	where type = 'Visita'
+    	    and visit_intent = 'SALE'
+        	and status = 'Cancelado'
+        	and cancellation_reason = 'CANCELED_CANT_FIND_ANOTHER_AGENT'
+        	and date(dt_booking) >= current_date - interval '45' day
+),
 encaixes_clean as (
 select
-  region_id,
-  max(t.house_id) house_id,
-  t.user_id,
-  event_date,
-  target_date,
-  slot,
-  slot_share_encaixe,
-  case when encaixe_realizado = 0 and (t.event_date between bh.init and bh."end") and bh.status = 'BLOCKED' then slot_share_encaixe end as slot_share_nao_realizados_por_bloqueio,
-  case when encaixe_realizado = 0 and (t.event_date between sh.init and sh."end") and sh.status = 'SUSPENDED' then slot_share_encaixe end as slot_share_nao_realizados_por_suspensao,
-  case when encaixe_realizado = 0 and (((t.event_date between sh.init and sh."end") and sh.status = 'SUSPENDED') or ((t.event_date between bh.init and bh."end")and bh.status = 'BLOCKED')) then slot_share_encaixe
-  end as slot_share_nao_realizados_por_bloqueio_suspensao,
-  case when encaixe_realizado = 1 then slot_share_encaixe end as slot_share_encaixe_realizado,
-  case when encaixe_realizado = 0 then slot_share_encaixe end as slot_share_encaixe_nao_realizado,
-          case when encaixe_realizado = 0
-                and ((slot between  0 and  3 and hs.hours_available_08to09 = false)
-                  or (slot between  4 and  7 and hs.hours_available_09to10 = false)
-                    or (slot between  8 and 11 and hs.hours_available_10to11 = false)
-                    or (slot between 12 and 15 and hs.hours_available_11to12 = false)
-                    or (slot between 16 and 19 and hs.hours_available_12to13 = false)
-                    or (slot between 20 and 23 and hs.hours_available_13to14 = false)
-                    or (slot between 24 and 27 and hs.hours_available_14to15 = false)
-                    or (slot between 28 and 31 and hs.hours_available_15to16 = false)
-                    or (slot between 32 and 35 and hs.hours_available_16to17 = false)
-                  or (slot between 36 and 39 and hs.hours_available_17to18 = false)
-                  or (slot between 40 and 43 and hs.hours_available_18to19 = false))
-        then slot_share_encaixe
-        end as slot_share_nao_realizados_por_agenda,
-        case when encaixe_realizado = 0 and (((t.event_date between sh.init and sh."end") and sh.status = 'SUSPENDED') or ((t.event_date between bh.init and bh."end") and bh.status = 'BLOCKED')
-          or ((slot between  0 and  3 and hs.hours_available_08to09 = false)
-                    or (slot between  4 and  7 and hs.hours_available_08to09 = false)
-                    or (slot between  8 and 11 and hs.hours_available_10to11 = false)
-                    or (slot between 12 and 15 and hs.hours_available_11to12 = false)
-                    or (slot between 16 and 19 and hs.hours_available_12to13 = false)
-                    or (slot between 20 and 23 and hs.hours_available_13to14 = false)
-                    or (slot between 24 and 27 and hs.hours_available_14to15 = false)
-                    or (slot between 28 and 31 and hs.hours_available_15to16 = false)
-                    or (slot between 32 and 35 and hs.hours_available_16to17 = false)
-          or (slot between 36 and 39 and hs.hours_available_17to18 = false)
-          or (slot between 40 and 43 and hs.hours_available_18to19 = false)))
+    region_id,
+    max(t.house_id) house_id,
+    t.user_id,
+    event_date,
+    target_date,
+    slot,
+    slot_share_encaixe,
+    case when encaixe_realizado = 0 and (t.event_date between bh.init and bh."end") and bh.status = 'BLOCKED' then slot_share_encaixe end as slot_share_nao_realizados_por_bloqueio,
+    case when encaixe_realizado = 0 and (t.event_date between sh.init and sh."end") and sh.status = 'SUSPENDED' then slot_share_encaixe end as slot_share_nao_realizados_por_suspensao,
+    case when encaixe_realizado = 0 and (((t.event_date between sh.init and sh."end") and sh.status = 'SUSPENDED') or ((t.event_date between bh.init and bh."end")and bh.status = 'BLOCKED')) then slot_share_encaixe
+    end as slot_share_nao_realizados_por_bloqueio_suspensao,
+    case when encaixe_realizado = 1 then slot_share_encaixe end as slot_share_encaixe_realizado,
+    case when encaixe_realizado = 0 then slot_share_encaixe end as slot_share_encaixe_nao_realizado,
+    case when encaixe_realizado = 0
+        and ((slot between  0 and  3 and hs.hours_available_08to09 = false)
+        or (slot between  4 and  7 and hs.hours_available_09to10 = false)
+        or (slot between  8 and 11 and hs.hours_available_10to11 = false)
+        or (slot between 12 and 15 and hs.hours_available_11to12 = false)
+        or (slot between 16 and 19 and hs.hours_available_12to13 = false)
+        or (slot between 20 and 23 and hs.hours_available_13to14 = false)
+        or (slot between 24 and 27 and hs.hours_available_14to15 = false)
+        or (slot between 28 and 31 and hs.hours_available_15to16 = false)
+        or (slot between 32 and 35 and hs.hours_available_16to17 = false)
+        or (slot between 36 and 39 and hs.hours_available_17to18 = false)
+        or (slot between 40 and 43 and hs.hours_available_18to19 = false))
+    then slot_share_encaixe end as slot_share_nao_realizados_por_agenda,
+    case when encaixe_realizado = 0
+        and (((t.event_date between sh.init and sh."end") and sh.status = 'SUSPENDED') or ((t.event_date between bh.init and bh."end") and bh.status = 'BLOCKED')
+        or ((slot between  0 and  3 and hs.hours_available_08to09 = false)
+        or (slot between  4 and  7 and hs.hours_available_08to09 = false)
+        or (slot between  8 and 11 and hs.hours_available_10to11 = false)
+        or (slot between 12 and 15 and hs.hours_available_11to12 = false)
+        or (slot between 16 and 19 and hs.hours_available_12to13 = false)
+        or (slot between 20 and 23 and hs.hours_available_13to14 = false)
+        or (slot between 24 and 27 and hs.hours_available_14to15 = false)
+        or (slot between 28 and 31 and hs.hours_available_15to16 = false)
+        or (slot between 32 and 35 and hs.hours_available_16to17 = false)
+        or (slot between 36 and 39 and hs.hours_available_17to18 = false)
+        or (slot between 40 and 43 and hs.hours_available_18to19 = false)))
     then slot_share_encaixe end as slot_share_nao_realizados_por_bloqueio_suspensao_agenda,
-        cast(hs.hours_available_08to09 as bigint) + cast(hs.hours_available_09to10 as bigint) + cast(hs.hours_available_10to11 as bigint) +
+    --NOVIDADE!! NOVIDADE!! NOVIDADE!! NOVIDADE!! NOVIDADE!!
+    case when encaixe_realizado = 1 and cfaa.status = 'Cancelado' then slot_share_encaixe end as slot_share_encaixe_nao_realizado_cant_find_another_agent,
+    cast(hs.hours_available_08to09 as bigint) + cast(hs.hours_available_09to10 as bigint) + cast(hs.hours_available_10to11 as bigint) +
         cast(hs.hours_available_11to12 as bigint) + cast(hs.hours_available_12to13 as bigint) + cast(hs.hours_available_13to14 as bigint) +
         cast(hs.hours_available_14to15 as bigint) + cast(hs.hours_available_15to16 as bigint) + cast(hs.hours_available_16to17 as bigint) +
-    cast(hs.hours_available_17to18 as bigint) + cast(hs.hours_available_18to19 as bigint) as slots_disponiveis_target_date,
+        cast(hs.hours_available_17to18 as bigint) + cast(hs.hours_available_18to19 as bigint) as slots_disponiveis_target_date,
     case when encaixe_realizado = 0 and visit_intent = 'RENT' then slot_share_encaixe else null end as slot_share_ocupado_por_visita_rent
 from
   encaixes_temp t
-left join house_available_hours hs 
-  on t.house_id = hs.id_house
-      and hs.day_of_week = dow(t.target_date)
-        and event_date between hs.available_started_date and coalesce(hs.available_ended_date, (date_add('day',2,current_date)))
+left join house_available_hours hs
+    on t.house_id = hs.id_house
+    and hs.day_of_week = dow(t.target_date)
+    and event_date between hs.available_started_date and coalesce(hs.available_ended_date, (date_add('day',2,current_date)))
 left join blocked_houses bh
-  on t.house_id = bh.house_id
+    on t.house_id = bh.house_id
     and t.event_date between bh.init and bh."end"
 left join suspended_houses sh
-  on t.house_id = sh.house_id
+    on t.house_id = sh.house_id
     and t.event_date between sh.init and sh."end"
 left join booking_for_rent bfr
-  on t.house_id = bfr.house_id
-  and t.user_id = bfr.user_id
-  and t.target_date = bfr.visit_date
-  and t.slot = bfr.slot_dia
-group by 1,3,4,5,6,7,8,9,10,11,12,13,14,15,16
+    on t.house_id = bfr.house_id
+    and t.user_id = bfr.user_id
+    and t.target_date = bfr.visit_date
+    and t.slot = bfr.slot_dia
+left join cant_find_another_agent cfaa
+	on cast(t.house_id as bigint) = cast(cfaa.house_id as bigint)
+	and t.target_date = cfaa.visit_date
+	and t.slot = cfaa.slot_dia
+group by 1,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 17
 ),
 encaixes_agg as (
   select
@@ -307,8 +347,9 @@ encaixes_agg as (
     user_id,
     house_id,
     sum(slot_share_encaixe) as share_encaixes_total,
-    sum(slot_share_encaixe_realizado) as share_encaixes_realizados,
-    sum(slot_share_encaixe_nao_realizado) as share_encaixes_nao_realizados,
+    sum(coalesce(slot_share_encaixe_realizado,0) - coalesce(slot_share_encaixe_nao_realizado_cant_find_another_agent,0)) as share_encaixes_realizados,
+    sum(coalesce(slot_share_encaixe_nao_realizado,0) + coalesce(slot_share_encaixe_nao_realizado_cant_find_another_agent,0)) as share_encaixes_nao_realizados,
+    sum(slot_share_encaixe_nao_realizado_cant_find_another_agent) as share_encaixes_nao_realizados_cant_find_another_agent,
     sum(slot_share_nao_realizados_por_agenda) as share_encaixes_nao_realizados_por_agenda,
     sum(slot_share_nao_realizados_por_bloqueio) as share_encaixes_nao_realizados_por_bloqueio,
     sum(slot_share_nao_realizados_por_suspensao) as share_encaixes_nao_realizados_por_suspensao,
@@ -316,7 +357,7 @@ encaixes_agg as (
     sum(slot_share_nao_realizados_por_bloqueio_suspensao_agenda) as share_encaixes_nao_realizados_por_bloqueio_suspensao_agenda,
     sum(case when slots_disponiveis_target_date = 0 then slot_share_encaixe end) as encaixes_em_imovel_sem_slot_disponivel_target_date,
     sum(slot_share_ocupado_por_visita_rent) as share_encaixes_nao_realizados_por_visita_rent,
-    sum(coalesce(slot_share_encaixe_nao_realizado,0) - (coalesce(slot_share_nao_realizados_por_bloqueio_suspensao_agenda,0) + coalesce(slot_share_ocupado_por_visita_rent,0))) as share_encaixes_nao_realizados_por_agent
+    sum(coalesce(slot_share_encaixe_nao_realizado,0) + coalesce(slot_share_encaixe_nao_realizado_cant_find_another_agent,0) - (coalesce(slot_share_nao_realizados_por_bloqueio_suspensao_agenda,0) + coalesce(slot_share_ocupado_por_visita_rent,0))) as share_encaixes_nao_realizados_por_agent
 from
     encaixes_clean
 group by 1,2,3,4,5,6
@@ -337,6 +378,7 @@ select
     enc.share_encaixes_total as sum_encaixes_total,
     enc.share_encaixes_realizados as sum_share_encaixes_realizados,
     enc.share_encaixes_nao_realizados as sum_encaixes_nao_realizados,
+    enc.share_encaixes_nao_realizados_cant_find_another_agent as sum_encaixes_nao_realizados_cant_find_another_agent,
     enc.share_encaixes_nao_realizados_por_agenda as sum_encaixes_nao_realizados_por_agenda,
     enc.share_encaixes_nao_realizados_por_bloqueio as sum_encaixes_nao_realizados_por_bloqueio,
     enc.share_encaixes_nao_realizados_por_suspensao as sum_encaixes_nao_realizados_por_suspensao,

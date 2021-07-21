@@ -190,7 +190,7 @@ with house_available_hours as (
         visit_hoursalert_confirmed as evt
     left join 
         encaixe_to_booking etb 
-            on etb.user_id = evt.user_id 
+            on etb.user_id = evt.user_id
             and etb.house_id = evt.house_id
 )
 , encaixes_temp as (
@@ -246,6 +246,22 @@ with house_available_hours as (
       	)
   where status = 'SUSPENDED'
 )
+-- !! NEW canceled bookings that are considered repressed demand
+, cant_find_another_agent as (
+	select distinct
+		id_visitor as user_id,
+		id_property as house_id,
+		cast(slot_dia as bigint) as slot_dia,
+		dt_scheduling,
+		date(dt_scheduling) as visit_date,
+		status
+	from dim_booking
+		where type = 'Visita'
+			and visit_intent = 'SALE'
+			and status = 'Cancelado'
+			and cancellation_reason = 'CANCELED_CANT_FIND_ANOTHER_AGENT'
+            and dt_scheduling >= current_date - interval '45 days'
+)
 , encaixes_clean as (
 	select
     	region_id,
@@ -284,6 +300,7 @@ with house_available_hours as (
 					or (slot between 36 and 39 and hs.hours_available_17to18 = false)
 					or (slot between 40 and 43 and hs.hours_available_18to19 = false)))
 		then slot_share_encaixe end as slot_share_nao_realizados_por_bloqueio_suspensao_agenda,
+        case when encaixe_realizado = 1 and cfaa.status = 'Cancelado' then slot_share_encaixe end as slot_share_nao_realizado_cant_find_another_agent,--NOVIDADE!! NOVIDADE!! NOVIDADE!! NOVIDADE!! NOVIDADE!!
         cast(hs.hours_available_08to09 as bigint) + cast(hs.hours_available_09to10 as bigint) + cast(hs.hours_available_10to11 as bigint) +
         cast(hs.hours_available_11to12 as bigint) + cast(hs.hours_available_12to13 as bigint) + cast(hs.hours_available_13to14 as bigint) +
         cast(hs.hours_available_14to15 as bigint) + cast(hs.hours_available_15to16 as bigint) + cast(hs.hours_available_16to17 as bigint) +
@@ -304,6 +321,10 @@ with house_available_hours as (
 		on t.house_id = bfr.house_id
 		and t.target_date = bfr.visit_date
 		and t.slot = bfr.slot_dia
+	left join cant_find_another_agent cfaa
+		on cast(t.house_id as bigint) = cast(cfaa.house_id as bigint)
+		and t.target_date = cfaa.visit_date
+		and t.slot = cfaa.slot_dia
     WHERE
         target_date >= '2020-01-13'
 )
@@ -313,8 +334,8 @@ with house_available_hours as (
         ec.target_date,
         ec.slot,
         sum(ec.slot_share_encaixe) as share_encaixes_total,
-        sum(ec.slot_share_encaixe_realizado) as share_encaixes_realizados,
-        sum(ec.slot_share_encaixe_nao_realizado) as share_encaixes_nao_realizados,
+        sum(coalesce(slot_share_encaixe_realizado,0) - coalesce(slot_share_nao_realizado_cant_find_another_agent,0)) as share_encaixes_realizados, -- removing referring slots from bookings cancelled with CANT FIND ANOTHER AGENT reason
+        sum(coalesce(slot_share_encaixe_nao_realizado,0) + coalesce(slot_share_nao_realizado_cant_find_another_agent,0)) as share_encaixes_nao_realizados,
         sum(ec.slot_share_nao_realizados_por_agenda) as share_encaixes_nao_realizados_por_agenda,
         sum(ec.slot_share_nao_realizados_por_bloqueio) as share_encaixes_nao_realizados_por_bloqueio,
         sum(ec.slot_share_nao_realizados_por_suspensao) as share_encaixes_nao_realizados_por_suspensao,
@@ -322,7 +343,8 @@ with house_available_hours as (
         sum(ec.slot_share_nao_realizados_por_bloqueio_suspensao_agenda) as share_encaixes_nao_realizados_por_bloqueio_suspensao_agenda,
         sum(case when ec.slots_disponiveis_target_date = 0 then ec.slot_share_encaixe end) as encaixes_em_imovel_sem_slot_disponivel_target_date,
         sum(ec.slot_share_ocupado_por_visita_rent) as share_encaixes_nao_realizados_por_visita_rent,
-        sum(coalesce(ec.slot_share_encaixe_nao_realizado,0) - (coalesce(ec.slot_share_nao_realizados_por_bloqueio_suspensao_agenda,0) + coalesce(ec.slot_share_ocupado_por_visita_rent,0))) as share_encaixes_nao_realizados_por_agent
+        sum(slot_share_nao_realizado_cant_find_another_agent) as share_nao_realizado_cant_find_another_agent,
+        sum(coalesce(slot_share_encaixe_nao_realizado,0) + coalesce(slot_share_nao_realizado_cant_find_another_agent,0) - (coalesce(ec.slot_share_nao_realizados_por_bloqueio_suspensao_agenda,0) + coalesce(ec.slot_share_ocupado_por_visita_rent,0))) as share_encaixes_nao_realizados_por_agent
 	from encaixes_clean ec
     group by 1, 2, 3
 )
@@ -338,6 +360,7 @@ with house_available_hours as (
   	join datalake_ebdb_clean_prod.house h on h.id = bk.id_property
   	where bk.type = 'Visita'
 		and bk.visit_intent = 'SALE'
+		and (cancellation_reason is null or cancellation_reason != 'CANCELED_CANT_FIND_ANOTHER_AGENT') -- removing all bookings that were cancelled with this reason, so we can count them as still repressed demand
 		and dt_scheduling >= '2020-01-13'
 )
 , bookings_clean as (
@@ -365,6 +388,7 @@ select
     sum(enc.share_encaixes_total) as sum_encaixes,
     sum(enc.share_encaixes_realizados) as sum_encaixes_realized,
     sum(enc.share_encaixes_nao_realizados) as sum_encaixes_not_realized,
+    sum(enc.share_nao_realizado_cant_find_another_agent) as sum_encaixes_nao_realizado_cant_find_another_agent,
     sum(enc.share_encaixes_nao_realizados_por_agenda) as sum_encaixes_nao_realizados_por_agenda,
     sum(enc.share_encaixes_nao_realizados_por_bloqueio) as sum_encaixes_nao_realizados_por_bloqueio,
     sum(enc.share_encaixes_nao_realizados_por_suspensao) as sum_encaixes_nao_realizados_por_suspensao,
