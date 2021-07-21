@@ -122,8 +122,8 @@ fb_hist_list_affiliates AS (
         df.campaign_name,
         hist.campaign
     FROM
-        marketing_costs.fact_facebook_daily_cost_attributions ff
-        JOIN marketing_costs.dim_facebook_ad df ON ff.sk_ad = df.sk_ad
+        facebook_insights.fact_facebook_daily_cost_attributions ff
+        JOIN facebook_insights.dim_facebook_ad df ON ff.sk_ad = df.sk_ad
             AND df.is_test_campaign IS NOT TRUE
         JOIN formatted_historic_affiliates_national_campaigns_cost hist ON LOWER(df.campaign_name) = LOWER(hist.campaign)
             AND TO_CHAR(ff.dt_start::date, 'yyyyMMdd')::integer = hist.sk_cost_date
@@ -136,7 +136,7 @@ facebook_info AS (
         campaign_name,
         account_name
     FROM
-        marketing_costs.dim_facebook_ad
+        facebook_insights.dim_facebook_ad
 ),
 gg_hist_list_affiliates AS (
     SELECT DISTINCT
@@ -239,8 +239,8 @@ campaigns_full AS (
                 NULL AS report_type,
                 NULL AS ad_type
             FROM
-                marketing_costs.fact_facebook_daily_cost_attributions ff
-                JOIN marketing_costs.dim_facebook_ad df ON ff.sk_ad = df.sk_ad
+                facebook_insights.fact_facebook_daily_cost_attributions ff
+                JOIN facebook_insights.dim_facebook_ad df ON ff.sk_ad = df.sk_ad
                     AND df.is_test_campaign IS NOT TRUE
             LEFT JOIN fb_hist_list_affiliates hl ON hl.sk_date = TO_CHAR(ff.dt_start::date, 'yyyyMMdd')::integer
                 AND df.campaign_name = hl.campaign_name

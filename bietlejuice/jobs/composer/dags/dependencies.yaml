@@ -93,7 +93,7 @@ bietlejuice.dw_marketing_costs:
 bietlejuice.dw_marketing_costs_criteo_campaigns:
   - bietlejuice.criteo_campaigns:load-clean-criteo-campaigns
 
-bietlejuice.dw_marketing_costs_facebook_insights:
+bietlejuice.dw_facebook_insights:
   - bietlejuice.enrich_marketing_costs_facebook_insights
 
 bietlejuice.dw_mitula:
