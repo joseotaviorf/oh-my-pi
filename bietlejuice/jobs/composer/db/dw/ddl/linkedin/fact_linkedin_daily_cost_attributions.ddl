@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS marketing_costs.fact_linkedin_daily_cost_attributions;
-CREATE TABLE IF NOT EXISTS marketing_costs.fact_linkedin_daily_cost_attributions(
+DROP TABLE IF EXISTS linkedin.fact_linkedin_daily_cost_attributions;
+CREATE TABLE IF NOT EXISTS linkedin.fact_linkedin_daily_cost_attributions(
   sk_creative                                   VARCHAR(100),
   sk_campaign                                   VARCHAR(100),
   sk_campaign_group                             VARCHAR(100),
@@ -20,3 +20,8 @@ CREATE TABLE IF NOT EXISTS marketing_costs.fact_linkedin_daily_cost_attributions
   text_url_clicks                               INTEGER,
   ts_load                                       TIMESTAMP
 );
+ALTER TABLE linkedin.fact_linkedin_daily_cost_attributions OWNER TO databricks;
+
+CALL grant_all_permissions_on_schema('linkedin');
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA linkedin TO GROUP etl;
+GRANT ALL ON SCHEMA linkedin TO GROUP ETL;

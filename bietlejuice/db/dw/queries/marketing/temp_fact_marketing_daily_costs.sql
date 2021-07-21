@@ -464,9 +464,9 @@ campaigns_full AS (
         NULL AS report_type,
         NULL AS ad_type
     FROM
-        marketing_costs.fact_linkedin_daily_cost_attributions fli
-        JOIN marketing_costs.dim_linkedin_campaign dlc ON dlc.sk_campaign = fli.sk_campaign
-        JOIN marketing_costs.dim_linkedin_campaign_group dlcc ON dlcc.sk_campaign_group = fli.sk_campaign_group
+        linkedin.fact_linkedin_daily_cost_attributions fli
+        JOIN linkedin.dim_linkedin_campaign dlc ON dlc.sk_campaign = fli.sk_campaign
+        JOIN linkedin.dim_linkedin_campaign_group dlcc ON dlcc.sk_campaign_group = fli.sk_campaign_group
     GROUP BY
         1,
         2,
