@@ -11,7 +11,7 @@ SELECT DISTINCT
   id,
   GET_JSON_OBJECT(d.customers_explode,'$.name') as name,
   GET_JSON_OBJECT(d.customers_explode,'$.identification') as identification,
-  GET_JSON_OBJECT(d.customers_explode,'$.email') as email,
+  LOWER(GET_JSON_OBJECT(d.customers_explode,'$.email')) as email,
   GET_JSON_OBJECT(d.customers_explode,'$.phone') as phone,
   GET_JSON_OBJECT(d.customers_explode,'$.status') as status,
   GET_JSON_OBJECT(d.customers_explode,'$.has_answered') as has_answered,
@@ -21,4 +21,3 @@ SELECT DISTINCT
   dt_updated
 FROM
   dispatch_explode d
-

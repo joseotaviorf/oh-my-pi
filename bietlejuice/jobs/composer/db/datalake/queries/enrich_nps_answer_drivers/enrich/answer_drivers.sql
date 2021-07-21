@@ -13,9 +13,10 @@ driver_tags AS (
 		at1.id_answer,
 		at1.ts_answer_sent_local,
 		CAST((CASE WHEN at1.tag_value = 'house_listing' THEN at2.tag_value END) AS BIGINT) AS id_house_listing,
+		CAST((CASE WHEN at1.tag_value = 'listing' THEN at2.tag_value END) AS BIGINT) AS id_listing,
 		CAST((CASE WHEN at1.tag_value = 'booking' THEN at2.tag_value END) AS BIGINT) AS id_booking,
 		CASE WHEN at1.tag_value = 'talk to agent' THEN at2.tag_value END AS id_tta,
-		CAST((CASE WHEN at1.tag_value = 'offer' THEN at2.tag_value END) AS BIGINT) AS id_offer_context, -- this comes in Tracksale as sk_offer rather than id_offer from EBDB
+		CASE WHEN at1.tag_value = 'offer' THEN at2.tag_value END AS id_offer_context, -- this comes in Tracksale as sk_offer rather than id_offer from EBDB
 		CAST((CASE WHEN at1.tag_value IN ('contract', 'sk_contract', 'id_contract') THEN at2.tag_value END) AS BIGINT) AS id_contract
 	FROM datalake_tracksale.answer_tags at1
 	INNER JOIN datalake_tracksale.answer_tags at2
@@ -28,6 +29,7 @@ combined_drivers AS (
 		COALESCE(dt.id_answer,hct.id_answer) AS id_answer,
 		hct.id_house,
 		dt.id_house_listing,
+		dt.id_listing,
 		dt.id_booking,
 		dt.id_tta,
 		dt.id_offer_context,
@@ -58,7 +60,7 @@ ebdb_house_listing AS (
 	FROM ebdb_house eh
 	INNER JOIN datalake_ebdb_listing.house_listing hl
 		ON hl.id_house = eh.id_house
-	WHERE eh.ts_answer_sent_local >= hl.ts_listing_version_start
+	WHERE eh.ts_answer_sent_local >= COALESCE(hl.ts_listing_version_start, eh.ts_answer_sent_local)
 		AND eh.ts_answer_sent_local <= COALESCE(hl.ts_listing_version_end, NOW())
 	GROUP BY 1,2
 ),
@@ -78,6 +80,14 @@ ebdb_listing AS (
 	INNER JOIN datalake_ebdb_listing.house_listing hl
 		ON hl.id_house_listing = ld.id_house_listing
 ),
+listing AS (
+	SELECT
+		cd.id_answer,
+		lh.id AS id_listing
+	FROM combined_drivers cd
+	INNER JOIN datalake_ebdb_clean.house lh
+		ON cd.id_listing = lh.id
+),
 ebdb_booking AS (
 	SELECT
 		cd.id_answer,
@@ -85,6 +95,14 @@ ebdb_booking AS (
 	FROM combined_drivers cd
 	INNER JOIN datalake_ebdb_clean.booking b
 		ON b.id = cd.id_booking
+),
+sales_offer AS (
+	SELECT
+		dt.id_answer,
+		dt.id_offer_context
+	FROM driver_tags dt
+	INNER JOIN datalake_firestore.sale_offer so
+		ON so.id = dt.id_offer_context
 ),
 unmounted_offers AS (
 	SELECT
@@ -113,19 +131,24 @@ ebdb_contract AS (
 SELECT 
 	a.id AS id_answer,
 	el.id_house_listing,
+	l.id_listing,
 	eb.id_booking,
 	cd.id_tta,
-	eo.id_offer_context,
+	COALESCE(eo.id_offer_context, so.id_offer_context) AS  id_offer_context,
 	ec.id_contract
 FROM datalake_tracksale.answer a
 LEFT JOIN combined_drivers cd 
 	ON cd.id_answer = a.id
 LEFT JOIN ebdb_listing el 
 	ON el.id_answer = cd.id_answer
+LEFT JOIN listing l
+	ON l.id_answer = cd.id_answer
 LEFT JOIN ebdb_booking eb 
 	ON eb.id_answer = cd.id_answer
 LEFT JOIN ebdb_offer eo 
 	ON eo.id_answer = cd.id_answer
+LEFT JOIN sales_offer so
+	ON so.id_answer = cd.id_answer
 LEFT JOIN ebdb_contract ec 
 	ON ec.id_answer = cd.id_answer
-WHERE COALESCE(el.id_house_listing, eb.id_booking, cd.id_tta, eo.id_offer_context, ec.id_contract) IS NOT NULL
+WHERE COALESCE(el.id_house_listing, l.id_listing, eb.id_booking, cd.id_tta, eo.id_offer_context, so.id_offer_context, ec.id_contract) IS NOT NULL

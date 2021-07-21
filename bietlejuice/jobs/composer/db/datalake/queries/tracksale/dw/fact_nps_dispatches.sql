@@ -80,12 +80,14 @@ answer_cities AS (
           ON eb.id = ad.id_booking
      LEFT JOIN datalake_ebdb_clean.offer eo
           ON eo.id = (ad.id_offer_context - 2)/100.0
+     LEFT JOIN datalake_firestore.sale_offer so
+          ON so.id = ad.id_offer_context
      LEFT JOIN datalake_ebdb_clean.contract ec
           ON ec.id = ad.id_contract
      LEFT JOIN datalake_ebdb_listing.house_listing ehl
           ON ehl.id_house_listing = ad.id_house_listing
      LEFT JOIN datalake_ebdb_clean.house eh
-          ON COALESCE(ehl.id_house, ec.id_house, eo.id_house, eb.id_house) = eh.id
+          ON COALESCE(ehl.id_house, ec.id_house, eo.id_house, so.id_house, eb.id_house, ad.id_listing) = eh.id
      WHERE
           COALESCE(eh.city, (CASE WHEN atg.tag_name = 'Cidade' THEN atg.tag_value END)) IS NOT NULL
      GROUP BY 1,2
@@ -123,7 +125,6 @@ LEFT JOIN datalake_nps_answer_drivers.answer_drivers ad
      ON cc.id_answer = ad.id_answer
 LEFT JOIN datalake_tracksale.dispatch_attributes da
      ON cc.id_dispatch_lot = da.id
-     AND (cc.customer_email = da.email
-     OR cc.customer_phone = da.phone)
+     AND (COALESCE(cc.customer_email, cc.customer_phone) = COALESCE(da.email, da.phone))
 LEFT JOIN answer_cities ac
      ON ac.id_answer = cc.id_answer
