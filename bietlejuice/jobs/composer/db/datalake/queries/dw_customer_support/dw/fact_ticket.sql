@@ -74,6 +74,7 @@ chat_tickets AS (
     CAST(id_ticket AS BIGINT) AS sk_ticket,
     MD5(
       CONCAT(
+        COALESCE(customer_type_tag, ''),
         COALESCE(client_type, ''),
         COALESCE(request_type, ''),
         COALESCE(contact_motivation_tag, ''),
@@ -144,6 +145,7 @@ email_tickets AS (
     CAST(id_ticket AS BIGINT) AS sk_ticket,
     MD5(
       CONCAT(
+        COALESCE(customer_type_tag, ''),
         COALESCE(client_type, ''),
         COALESCE(request_type, ''),
         COALESCE(contact_motivation_tag, ''),
