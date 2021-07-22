@@ -102,7 +102,7 @@ bietlejuice.dw_mitula:
 bietlejuice.dw_rtb_campaigns:
   - bietlejuice.rtb_campaigns
 
-bietlejuice.dw_marketing_costs_trovit:
+bietlejuice.dw_trovit:
   - bietlejuice.trovit
 
 bietlejuice.dw_proposal:
