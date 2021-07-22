@@ -1,4 +1,4 @@
-SELECT DISTINCT
+SELECT DISTINCT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
   p.id as sk_partner,
   p.id as id_partner,
   p.id_amplitude_device,
@@ -13,7 +13,7 @@ SELECT DISTINCT
   LAST_VALUE(apt.utm_campaign) OVER w AS utm_campaign,
   LAST_VALUE(apt.utm_medium) OVER w AS utm_medium,
   LAST_VALUE(apt.utm_source) OVER w AS utm_source,
-  p.ts_partnership_started,
+  p.ts_partnership_started AS ts_joined_partnership,
   p.ts_created,
   p.ts_updated,
   now() as ts_load

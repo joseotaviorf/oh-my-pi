@@ -14,7 +14,7 @@ create table janus.dim_partner (
     utm_campaign varchar(255),
     utm_medium varchar(255),
     utm_source varchar(255),
-    ts_partnership_started timestamp,
+    ts_joined_partnership timestamp,
     ts_created timestamp,
     ts_updated timestamp,
     ts_load timestamp
