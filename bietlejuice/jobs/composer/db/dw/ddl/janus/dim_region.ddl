@@ -1,12 +1,12 @@
 drop table if exists janus.dim_region;
 create table if not exists janus.dim_region (
-  sk_region bigint primary key,
-  id_region bigint,
-  id_macro_region bigint,
-  id_city bigint,
+  sk_region integer primary key,
+  id integer,
+  macro_id integer,
+  city_id integer,
   level varchar,
   name varchar,
-  macro_region_name varchar,
+  macro_name varchar,
   city_name varchar,
   city_group varchar,
   city_ddd varchar(2),
@@ -19,9 +19,9 @@ create table if not exists janus.dim_region (
   regional_deprecated varchar,
   regional_inspection varchar,
   tier integer,
-  dt_first_booking date,
-  ts_first_house_created timestamp,
-  ts_created timestamp without time zone,
-  ts_updated timestamp without time zone,
-  ts_load timestamp without time zone
+  dt_first_booking timestamp,
+  dt_first_property_created timestamp,
+  dt_created timestamp without time zone,
+  dt_updated timestamp without time zone,
+  dt_timestamp timestamp without time zone
 );
