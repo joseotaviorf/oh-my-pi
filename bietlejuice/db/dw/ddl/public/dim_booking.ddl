@@ -2,7 +2,7 @@ drop table if exists dim_booking;
 create table if not exists dim_booking
 (
  sk_booking integer not null  encode az64,
- id_booking integer   encode az64,
+ id_booking integer encode az64,
  is_rescheduled boolean,
  dt_scheduling timestamp without time zone   encode az64,
  visit_intent varchar(100)   encode lzo,
