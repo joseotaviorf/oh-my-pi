@@ -118,6 +118,7 @@ This pipeline produces the following output tables:
     - `taxonomy_demand`
     - `taxonomy_mkt_cost_new_test`
     - `taxonomy_mkt_cost`
+    - `taxonomy_portal_casa_mineira`
     - `tenant_entrance_inspection_csat`
     - `users_cx_plaquinhas`
     - `weekday_demand_share`

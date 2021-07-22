@@ -461,6 +461,11 @@ taxonomy_demand:
     sheet_name: taxonomy_demand
     clean_table_name: taxonomy_demand
 
+taxonomy_portal_casa_mineira:
+    sheet_id: 12_zyljMVOTLUvBSCen6QXSx23bXSd6krs8_fpxueqNU
+    sheet_name: taxonomy_portal_casa_mineira
+    clean_table_name: taxonomy_portal_casa_mineira
+
 users_cx_plaquinhas:
     sheet_id: 1oiUlhua9uFXbwkaSeF_EYRvaB652JIhOoWDy1bYolK0
     sheet_name: users_cx_plaquinhas
