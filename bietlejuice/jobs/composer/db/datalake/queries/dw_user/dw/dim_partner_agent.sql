@@ -1,11 +1,11 @@
-select
-    id as sk_partner_agent,
-    id as id_partner_agent,
+SELECT  -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
+    id AS sk_partner_agent,
+    id AS id_partner_agent,
     id_user,
     id_partner,
-    status,
+    status AS status_partner_agent,
     type,
     ts_created,
     ts_updated,
-    now() as ts_load
-from datalake_ebdb_clean.partner_agent
+    NOW() AS ts_load
+FROM datalake_ebdb_clean.partner_agent
