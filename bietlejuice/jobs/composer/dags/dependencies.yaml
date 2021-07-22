@@ -28,7 +28,7 @@ bietlejuice.dw_booking:
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.ebdb:create-clean-visit-in-data-lake
   - bietlejuice.enrich_amplitude_visit
-  - bietlejuice.gsheets:load-taxonomy-demand-to-clean
+  - bietlejuice.gsheets:load-clean-taxonomy-demand
 
 bietlejuice.dw_braze_events_user_centric:
   - bietlejuice.enrich_braze_events_user_centric_periodicity:load-enrich-user-events-same-week
@@ -67,7 +67,7 @@ bietlejuice.dw_customer_support:
   - bietlejuice.enrich_customer_support:load-enrich-csat
   - bietlejuice.enrich_customer_support:load-enrich-chat
   - bietlejuice.enrich_customer_support:load-enrich-email
-  - bietlejuice.gsheets:load-department-control-to-clean
+  - bietlejuice.gsheets:load-clean-department-control
 
 bietlejuice.dw_house:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
@@ -136,7 +136,7 @@ bietlejuice.dw_sale_flows:
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
-  - bietlejuice.gsheets:load-taxonomy-demand-to-clean
+  - bietlejuice.gsheets:load-clean-taxonomy-demand
 
 bietlejuice.dw_sale_listings:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
@@ -149,7 +149,7 @@ bietlejuice.dw_sale_offers:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.enrich_amplitude_offer:load-enrich-sale-offer-raw-events
   - bietlejuice.enrich_offer:load-enrich-sale-offer
-  - bietlejuice.gsheets:load-taxonomy-demand-to-clean
+  - bietlejuice.gsheets:load-clean-taxonomy-demand
 
 bietlejuice.dw_sale_visits:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
@@ -202,7 +202,7 @@ bietlejuice.dw_user_affiliate:
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_ebdb_user:load-enrich-agent-data
   - bietlejuice.enrich_region:load-enrich-region
-  - bietlejuice.gsheets:load-taxonomy-affiliates-to-clean
+  - bietlejuice.gsheets:load-clean-taxonomy-affiliates
 
 bietlejuice.dw_user_sales_rep:
   - bietlejuice.enrich_ebdb_user:load-enrich-user-sales-rep
@@ -246,7 +246,7 @@ bietlejuice.enrich_booking:
   - bietlejuice.ebdb:create-clean-visit-in-data-lake
   - bietlejuice.ebdb:create-clean-visit-origin-in-data-lake
   - bietlejuice.ebdb:create-clean-visitor-in-data-lake
-  - bietlejuice.gsheets:load-from-to-cancellation-to-clean
+  - bietlejuice.gsheets:load-clean-from-to-cancellation
 
 bietlejuice.enrich_braze_events:
   - bietlejuice.braze_events:load-clean-events-tenants
@@ -411,8 +411,8 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.enrich_survicate:load-enrich-surveys
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-ticket-funnel
-  - bietlejuice.gsheets:load-agents-control-to-clean
-  - bietlejuice.gsheets:load-department-control-to-clean
+  - bietlejuice.gsheets:load-clean-agents-control
+  - bietlejuice.gsheets:load-clean-department-control
   - bietlejuice.insider:load-clean-feature
   - bietlejuice.insider:load-clean-review
   - bietlejuice.insider:load-clean-review-feature
@@ -491,7 +491,7 @@ bietlejuice.enrich_quinto_messenger:
 
 bietlejuice.enrich_region:
   - bietlejuice.ebdb:create-clean-region-in-data-lake
-  - bietlejuice.gsheets:load-auxiliary-region-to-clean
+  - bietlejuice.gsheets:load-clean-auxiliary-region
 
 bietlejuice.enrich_retsuko:
   - bietlejuice.retsuko:load-clean-account
