@@ -60,7 +60,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   CAST(b.has_agent_attended AS VARCHAR(255)) AS agent_arrived,
   -- TODO [ODS] review this rule
   CAST(COALESCE(b.has_owner_arrived, true) AS VARCHAR(255)) AS owner_arrived,
-  CAST(b.is_entrance_successful AS VARCHAR(255) AS successful_entrance,
+  CAST(b.is_entrance_successful AS VARCHAR(255)) AS successful_entrance,
   b.is_visit_created_from_app,
   b.is_visit_last_updated_from_app,
   b.visit_fup AS visit_follow_up,
