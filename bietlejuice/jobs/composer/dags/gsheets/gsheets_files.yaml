@@ -261,6 +261,11 @@ offline_and_branding_marketing_costs:
     sheet_name: offline_and_branding_marketing_costs
     clean_table_name: offline_and_branding_marketing_costs
 
+payments_deals_and_discounts:
+    sheet_id: 1j0zGI74gyA6e4PWjk7yegpz5no6A102qHaIIvC1viCk
+    sheet_name: form_requests
+    clean_table_name: payments_deals_and_discounts
+
 promotional_bonus_cluster_targets:
     sheet_id: 1nSCX7SDFFg87Ow3yHGv8j6k_CRv9OYYBeKwhkpilWog
     sheet_name: promotional_bonus_cluster_targets
