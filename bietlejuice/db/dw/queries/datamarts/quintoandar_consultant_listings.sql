@@ -158,8 +158,27 @@ INNER JOIN
     first_rev fr
         ON fr.id_house=ia.id_house
         AND ia.rev=fr.first_rev
-)
-,
+),
+
+last_change_user AS (
+SELECT
+    ia.id_house,
+    MIN(rev) as rev_user
+FROM
+    datalake_ebdb_clean_prod.house_aud ia
+WHERE mod_user_registrant=TRUE
+GROUP BY  1
+),
+
+last_change_sale AS (
+SELECT
+    ia.id_house,
+    MAX(rev) as rev_sale
+FROM
+    datalake_ebdb_clean_prod.house_aud ia
+WHERE mod_is_for_sale=TRUE
+GROUP BY  1
+),
 quintoandar_consultant_listings AS (
 (
 SELECT
@@ -173,7 +192,7 @@ SELECT
     'SALE' AS businesscontext,
     CASE
         WHEN dc.is_for_rent IS TRUE AND dc.is_for_sale IS TRUE THEN 'cadastrado como rent e sale'
-        WHEN dc.is_for_rent IS TRUE THEN 'cadastrado como rent e virou sale'
+        WHEN dc.is_for_rent IS TRUE AND (lcs.rev_sale>=lcu.rev_user or lcu.rev_user IS NULL OR qclr.type_big_agent='CIQ_FULL') THEN 'cadastrado como rent e virou sale'
         WHEN dc.is_for_sale IS TRUE AND bf.id_house IS NOT NULL AND qcls.id_house<>bf.id_house AND dc.is_for_rent IS FALSE  THEN 'Cadastro de novo Id imovel para ForSale de imovel que já existe em ForRent'
         WHEN dc.is_for_rent IS FALSE AND dc.is_for_sale IS TRUE THEN 'cadastrado somente como sale'
         ELSE 'check'
@@ -200,7 +219,20 @@ LEFT JOIN sale.dim_listing dl
 LEFT JOIN
     sale.fact_listing_flows lf
         ON LEFT(lf.sk_house_listing,9)=qcls.id_house
-ORDER BY qcls.id_house
+LEFT JOIN
+    last_change_user lcu
+        ON lcu.id_house=qcls.id_house
+LEFT JOIN
+    last_change_sale lcs
+        ON lcs.id_house=qcls.id_house
+LEFT JOIN
+    quintoandar_consultant_listings_rent qclr
+        ON qclr.id_house=qcls.id_house
+WHERE
+   lcs.rev_sale>=lcu.rev_user
+   OR dc.is_for_sale IS TRUE
+   OR lcu.rev_user IS NULL
+   OR qclr.type_big_agent='CIQ_FULL'
 )
 UNION
 
