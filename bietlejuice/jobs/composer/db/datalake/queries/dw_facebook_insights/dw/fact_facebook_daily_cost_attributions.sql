@@ -17,7 +17,7 @@ WITH fb_grouped_records AS (
     FROM
         datalake_marketing_costs.facebook_insights AS fi
     JOIN
-        dw_marketing_costs_staging.dim_facebook_ad AS stg_dim
+        dw_facebook_insights_staging.dim_facebook_ad AS stg_dim
             ON fi.sk_ad = stg_dim.sk_ad
     WHERE
         fi.year = {year}
