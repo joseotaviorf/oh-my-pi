@@ -68,7 +68,9 @@ if __name__ == "__main__":
             f"s3://{ads_performance_bucket}/google-reports/report={report_folder}/*/dt={execution_date}"
         )
         .filter(col("Account").rlike(report_account_regex_filter))
-        .withColumn("acc", udf(StringFormatter.slugify)(col("Account")))
+        .withColumn(
+            "acc", udf(StringFormatter.set_alphanumeric_snake_case)(col("Account"))
+        )
         .withColumn("raw_report_type", lit(report_folder))
         .toDF(*report_schemas[report_type])
     )
