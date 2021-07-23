@@ -11,7 +11,7 @@ SELECT
   hub_region,
   manager,
   CAST(has_email_quintoandar AS BOOLEAN) AS has_email_quintoandar,
-  CAST(dt_entrance AS DATE) AS dt_entrance,
-  CAST(dt_ended AS DATE) AS dt_ended
+  TO_DATE(dt_entrance, 'dd/mm/yyyy') AS dt_entrance,
+  TO_DATE(dt_ended, 'dd/mm/yyyy') AS dt_ended
 FROM
   datalake_gsheets_raw.hub_agents_hierarchy
