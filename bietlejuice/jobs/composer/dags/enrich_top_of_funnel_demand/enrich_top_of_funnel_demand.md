@@ -2,7 +2,10 @@
 
 ### Purpose
 
-As a derivation of amplitude enrich layer, this DAG generates tables to track demand user behaviors in the top of the funnel.
+As a derivation of Amplitude enrich layer, this DAG generates tables to track demand user behaviors in the top of the funnel.
+
+​<details>
+  <summary><strong> > DAG details (click to expand)</strong></summary>
 
 ### Execution Interval
 
@@ -19,3 +22,4 @@ Currently, there are the following output tables in our enrich layer:
 ### Responsible Data Team
 
 For any questions or concerns about this DAG, please contact the Data Engineering or Data Analytics team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
+</details>

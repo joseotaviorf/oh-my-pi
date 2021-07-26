@@ -1,0 +1,8 @@
+---
+partition_cols:
+  - year
+  - month
+  - day
+inner_dependencies:
+  first_user_interaction_staging: [user_interactions]
+  first_user_interaction: [first_user_interaction_staging]
