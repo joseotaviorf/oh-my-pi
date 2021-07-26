@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.db import DatabaseTypeEnum
@@ -288,6 +289,49 @@ class MySqlConsumer(DBConsumer):
         )
 
     @logger
-    def get_incremental_data_from_table(self, table_name, column_name, execution_date):
-        # todo: implement me!
-        raise NotImplementedError()
+    def get_incremental_data_from_table(
+        self, table_name, date_filter_column, date_filter_value, unixtime_measure=None
+    ):
+        """
+        Gets incremental data from table in a MySQL database.
+        The method expects a table and a date/timestamp or unix timestamp
+        column to make the filter.
+        :param table_name: Name of the table
+        :param date_filter_column: Name of the column to make the filter
+        :param date_filter_value: Value of the column
+        :param unixtime_measure: Unix time measure to be set as milliseconds or seconds
+        :return: A Spark DataFrame with the table data
+        """
+
+        dt_filter_value = datetime.strptime(date_filter_value, "%Y-%m-%d")
+        dt_filter_value_day_after = dt_filter_value + timedelta(days=1)
+
+        if unixtime_measure == "milliseconds":
+            filter_value = 1000 * int(dt_filter_value.timestamp())
+            filter_value_day_after = 1000 * int(dt_filter_value_day_after.timestamp())
+
+        elif unixtime_measure == "seconds":
+            filter_value = int(dt_filter_value.timestamp())
+            filter_value_day_after = int(dt_filter_value_day_after.timestamp())
+
+        else:
+            filter_value = f"'{dt_filter_value}'"
+            filter_value_day_after = f"'{dt_filter_value_day_after}'"
+
+        filter_condition = f"""{date_filter_column} >= {filter_value}
+                                AND {date_filter_column} < {filter_value_day_after}
+                                """
+
+        query = f"""
+                SELECT
+                    *,
+                    CAST({dt_filter_value.year} AS UNSIGNED) AS year,
+                    CAST({dt_filter_value.month} AS UNSIGNED) AS month,
+                    CAST({dt_filter_value.day} AS UNSIGNED) AS day
+                FROM
+                    {table_name}
+                WHERE
+                    {filter_condition}
+                    """
+
+        return self.get_data_from_query(query)
