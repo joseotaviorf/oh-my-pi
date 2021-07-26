@@ -163,15 +163,15 @@ class OdsMigrationValidation:
         df_janus = self._remove_janus_df_new_columns(df_janus)
         df_janus = self._convert_all_df_columns_to_string(df_janus)
 
+        # remove now() columns since it will always differ
+        dynamic_timestamp_columns = ["ts_load", "dt_timestamp", "load_timestamp"]
+        for column in dynamic_timestamp_columns:
+            if column in df_janus.columns:
+                df_janus = df_janus.drop(column)
+                df_dw = df_dw.drop(column)
+
         df_all = df_janus.unionByName(df_dw)
-
-        # remove ts_load since it will always differ
-        if "ts_load" in df_janus.columns:
-            df_janus = df_janus.drop("ts_load")
-
-        new_columns = df_janus.columns
-
-        window = Window.partitionBy(new_columns).rowsBetween(-sys.maxsize, sys.maxsize)
+        window = Window.partitionBy(df_janus.columns).rowsBetween(-sys.maxsize, sys.maxsize)
         df_all = df_all.withColumn(
             "test_control",
             when((count("*").over(window) > 1), "VALID").otherwise(lit("ERROR")),
