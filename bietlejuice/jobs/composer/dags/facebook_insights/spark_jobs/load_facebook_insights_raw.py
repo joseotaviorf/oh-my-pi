@@ -13,6 +13,9 @@ from bietlejuice.jobs.composer.base.api import APIEnum
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
+from bietlejuice.jobs.composer.services.configuration_service import (
+    ConfigurationService,
+)
 
 from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 
@@ -22,72 +25,54 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def build_facebook_client(auth):
-    fb_client = FacebookClient(auth["access_token"])
-    return fb_client
-
-
-def get_data(configs, auth):
-    fb_client = build_facebook_client(auth)
-    client_response = fb_client.get_data(**configs)
-    return client_response
-
-
-def get_configs(dbutils):
-    configs = json.loads(dbutils.secrets.get(scope="quintoandar", key=APIEnum.FACEBOOK))
-    return configs
-
-
 if __name__ == "__main__":
 
     parser = ArgumentParser(description=JOB_NAME)
-
-    parser.add_argument("environment", help="forno/prod values")
-    parser.add_argument("target", help="name of the target")
-    parser.add_argument("context", help="name of the context")
+    parser.add_argument("env", help="forno/prod values")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
-    parser.add_argument("accounts", help="accounts to fetch")
-    parser.add_argument("fields", help="fields to fetch")
-    parser.add_argument("breakdowns", help="granularity columns")
+    parser.add_argument("source", help="name of the source")
+    parser.add_argument("context", help="name of the context")
     parser.add_argument("execution_date", help="execution date in str format")
+    parser.add_argument("table_name", help="granularity columns")
 
     args = parser.parse_args()
-
-    logger.info(
-        f"""
-            m={JOB_NAME}, environment={args.environment}, source={args.target}, context={args.context},
-            execution_date={args.execution_date}, datalake_bucket={args.datalake_bucket}, msg=print spark jobs args"
-        """
-    )
-
-    environment = args.environment
-    target = args.target
+    env = args.env
+    source = args.source
     context = args.context
     datalake_bucket = args.datalake_bucket
-    accounts = json.loads(args.accounts)
     execution_date = args.execution_date
-    fields = json.loads(args.fields)
-    breakdowns = json.loads(args.breakdowns)
-    partition_cols = ["year", "month", "day"]
+    table_name = args.table_name
 
-    spark_client = SparkClient()
+    config_service = ConfigurationService(context)
+    accounts = config_service.get_config("accounts")[table_name]
+    fields = config_service.get_config("fields")[table_name]
+    breakdowns = config_service.get_config("breakdowns")[table_name]
+    raw_partition_cols = config_service.get_config("raw_partition_cols")
+
+    logger.info(
+        f"""m=__main__, env={env}, source={source}, context={context},
+        datalake_bucket={datalake_bucket}, execution_date={execution_date},
+        table_name={table_name}, msg=Starting spark job..."""
+    )
 
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
-    configs = get_configs(dbutils)
+    configs = json.loads(dbutils.secrets.get(scope="quintoandar", key=APIEnum.FACEBOOK))
     auth = configs.pop("auth")
 
     configs["date"] = execution_date
     configs["accounts"] = accounts
-    configs["fields"] = fields or []
-    configs["breakdowns"] = breakdowns or []
+    configs["fields"] = fields
+    configs["breakdowns"] = breakdowns
 
-    client_response = get_data(configs, auth)
+    fb_client = FacebookClient(auth["access_token"])
+    client_response = fb_client.get_data(**configs)
 
     if len(client_response):
 
+        spark_client = SparkClient()
         df = spark_client.create_dataframe(client_response)
 
         dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
@@ -99,7 +84,7 @@ if __name__ == "__main__":
         )
 
         datalake_info = DatalakeMetastoreService.get_db_info(
-            environment, target, datalake_bucket
+            env, source, datalake_bucket
         )
         spark_metastore_service = SparkMetastoreService(spark_client)
         database_name = datalake_info["db_raw_databricks"]
@@ -107,7 +92,6 @@ if __name__ == "__main__":
 
         database_location = datalake_info["db_raw_path"]
         format_options = SparkTableStorageFormat.DEFAULT_RAW
-        table_name = context
 
         # loaders
         s3_loader = S3Loader()
@@ -116,7 +100,7 @@ if __name__ == "__main__":
             df=df,
             s3_path=f"{database_location}{table_name}",
             format_options=format_options,
-            partitions=partition_cols,
+            partitions=raw_partition_cols,
         )
         spark_metastore_loader.update_metastore(
             df,
@@ -124,18 +108,19 @@ if __name__ == "__main__":
             table_name,
             format_options,
             database_location,
-            partition_cols,
+            raw_partition_cols,
             force_recreate=False,
         )
         spark_metastore_service.create_new_partitions_from_df(
             database_name=database_name,
             table_name=table_name,
             df=df,
-            partition_cols=partition_cols,
+            partition_cols=raw_partition_cols,
         )
         spark_metastore_service.refresh_table(database_name, table_name)
 
     else:
-        logger.info(
-            f"m={JOB_NAME}, environment={environment}, accounts: {accounts}, msg=no data"
+        logger.warning(
+            f"""m=__main__, execution_date={execution_date}, table_name={table_name},
+            accounts: {accounts}, msg=No data returned from API."""
         )
