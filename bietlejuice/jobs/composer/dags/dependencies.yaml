@@ -96,6 +96,24 @@ bietlejuice.dw_marketing_costs_criteo_campaigns:
 bietlejuice.dw_facebook_insights:
   - bietlejuice.enrich_marketing_costs_facebook_insights
 
+bietlejuice.dw_fact_conversion_metrics:
+  - bietlejuice.ebdb:create-clean-booking-in-data-lake
+  - bietlejuice.ebdb:create-clean-contract-in-data-lake
+  - bietlejuice.ebdb:create-clean-conversion-lead-in-data-lake
+  - bietlejuice.ebdb:create-clean-device-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-lead-in-data-lake
+  - bietlejuice.ebdb:create-clean-offer-in-data-lake
+  - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
+  - bietlejuice.ebdb:create-clean-pre-proposal-in-data-lake
+  - bietlejuice.ebdb:create-clean-proposal-in-data-lake
+  - bietlejuice.ebdb:create-clean-rent-flow-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
+  - bietlejuice.ebdb:create-clean-visit-in-data-lake
+  - bietlejuice.godfather:load-clean-offer
+
 bietlejuice.dw_mitula:
   - bietlejuice.mitula:load-clean-mitula-report
 
