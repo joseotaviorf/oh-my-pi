@@ -13,7 +13,6 @@ dags_out_of_pattern: [
     "marketing_manual_daily_costs",
     "marketing_hub",
     "marketing_costs",
-    "mitula",
     "regions_polygon",
     "rtb_campaigns",
 ]

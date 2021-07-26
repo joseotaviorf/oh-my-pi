@@ -7,27 +7,36 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
+from airflow.utils.helpers import chain
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
-from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
+from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.services import FileService
+from bietlejuice.jobs.composer.services.configuration_service import (
+    ConfigurationService,
+)
 
 SOURCE = "mitula"
 DAG_ID = f"bietlejuice.{SOURCE}"
 ENV = os.environ.get("ENVIRONMENT")
 
-DATALAKE_BUCKET = Variable.get("datalake_bucket")
-S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
-BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
-ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
+config_service = ConfigurationService(SOURCE)
 
-LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
-    Variable.get("databricks_s3_bucket"), DAG_ID
+ATHENA_QUERY_RESULT_BUCKET = config_service.get_config("athena_query_results_bucket")
+DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
+DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config(
+    "databricks_bietlejuice_repo_path"
 )
+SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
+DOC_MD_CHART_URL = config_service.get_config("doc_md_chart_url")
+BASE_SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
+
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
+CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
+    "destination"
+] = f"{SPARK_JOBS_LOGS_PATH}{DAG_ID}"
 
 
 local_tz = pendulum.timezone("America/Sao_Paulo")
@@ -42,9 +51,12 @@ dag = DAG(
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(SOURCE),
+    schedule_interval=None,
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
+        chart_url=DOC_MD_CHART_URL, dag_id=DAG_ID
+    ),
 )
+
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
@@ -55,24 +67,22 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 )
 
 
-sql_file_list = FileService.list_sql_files_without_extension_from_layer(
-    SOURCE, LayerEnum.CLEAN.value
-)
-
-clean_sub_dag = DatalakeSubDAG(
-    dag_id=DAG_ID,
+task_group = DatalakeTaskGroup(
+    dag=dag,
     env=ENV,
     datalake_bucket=DATALAKE_BUCKET,
+    relative_query_path=SOURCE,
+    spark_jobs_path=BASE_SPARK_JOBS_PATH,
+    athena_query_result_location=ATHENA_QUERY_RESULT_BUCKET,
+)
+
+clean_task_groups = task_group.build_task_group_from_sql_files(
     layer=LayerEnum.CLEAN,
-    database_base_name=SOURCE,
-    relative_query_path=f"{SOURCE}",
-    spark_job_paths=BASE_SPARK_JOBS_PATH,
-    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
-    start_date=MAIN_START_DATE,
+    source_database_base_name=SOURCE,
+    target_database_base_name=SOURCE,
+    is_incremental=True,
+    partitions=["dt"],
 )
 
-clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(
-    dag, sql_file_list, is_incremental=True, partitions=["dt"]
-)
-
-create_cluster_task >> list(clean_sub_dags.values()) >> terminate_cluster_task
+chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(clean_task_groups))
+chain(DatalakeTaskGroup.all_last_tasks(clean_task_groups), terminate_cluster_task)
