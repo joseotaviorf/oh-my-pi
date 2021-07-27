@@ -1,5 +1,5 @@
 WITH call_tickets AS (
-  SELECT DISTINCT
+  SELECT
     CAST(id_ticket AS BIGINT) AS sk_ticket,
     MD5(
       CONCAT(
@@ -16,7 +16,7 @@ WITH call_tickets AS (
     MD5(first_department) AS sk_first_department,
     MD5(last_department) AS sk_last_department,
     MD5(zendesk_department) AS sk_zendesk_department,
-    id_user AS sk_user,
+    MAX(id_user) AS sk_user,
     id_contract AS sk_contract,
     'call' AS channel,
     csat_rating AS csat_score,
@@ -27,15 +27,17 @@ WITH call_tickets AS (
     zendesk_department,
     number_of_departments AS total_departments,
     number_of_segments AS total_segments,
+    frt AS full_resolution_time,
     front_or_back,
-    CAST(back_ticket AS BIGINT) AS back_ticket,
+    CAST(last_back_ticket AS BIGINT) AS last_back_ticket,
+    back_ticket_list AS back_tickets,
     is_solved AS resolution_survey,
     is_csat_answered AS has_answered_csat,
     has_back_ticket,
     is_open_back_ticket AS is_back_ticket_open,
     CASE
       WHEN is_solved = TRUE
-          AND (back_ticket IS NULL OR is_open_back_ticket = FALSE)
+          AND (back_ticket_list IS NULL OR is_open_back_ticket = FALSE)
           AND is_bot = FALSE
           AND is_closed_by_merge = FALSE
           AND (front_or_back = 'front' OR front_or_back IS NULL)
@@ -49,7 +51,7 @@ WITH call_tickets AS (
     END AS is_solved,
     CASE
       WHEN is_solved = TRUE
-          AND back_ticket IS NULL
+          AND back_ticket_list IS NULL
           AND has_transfers = FALSE
           AND is_bot = FALSE
           AND is_closed_by_merge = FALSE
@@ -68,9 +70,10 @@ WITH call_tickets AS (
     NOW() AS ts_load
   FROM
     datalake_customer_support.call
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32
 ),
 chat_tickets AS (
-  SELECT DISTINCT
+  SELECT
     CAST(id_ticket AS BIGINT) AS sk_ticket,
     MD5(
       CONCAT(
@@ -87,7 +90,7 @@ chat_tickets AS (
     MD5(first_department) AS sk_first_department,
     MD5(last_department) AS sk_last_department,
     MD5(zendesk_department) AS sk_zendesk_department,
-    id_user AS sk_user,
+    MAX(id_user) AS sk_user,
     id_contract AS sk_contract, 
     'chat' AS channel,
     csat_score,
@@ -98,15 +101,17 @@ chat_tickets AS (
     zendesk_department,
     number_of_departments AS total_departments,
     number_of_segments AS total_segments,
+    frt AS full_resolution_time,
     front_or_back,
-    CAST(back_ticket AS BIGINT) AS back_ticket,
+    CAST(last_back_ticket AS BIGINT) AS last_back_ticket,
+    back_ticket_list AS back_tickets,
     is_solved AS resolution_survey,
     is_csat_answered AS has_answered_csat,
     has_back_ticket,
     is_open_back_ticket AS is_back_ticket_open,
     CASE
       WHEN is_solved = TRUE
-          AND (back_ticket IS NULL OR is_open_back_ticket = FALSE)
+          AND (back_ticket_list IS NULL OR is_open_back_ticket = FALSE)
           AND is_bot = FALSE
           AND is_closed_by_merge = FALSE
           AND (front_or_back = 'front' OR front_or_back IS NULL)
@@ -120,7 +125,7 @@ chat_tickets AS (
     END AS is_solved,
     CASE
       WHEN is_solved = TRUE
-          AND back_ticket IS NULL
+          AND back_ticket_list IS NULL
           AND number_of_departments <= 1
           AND is_bot = FALSE
           AND is_closed_by_merge = FALSE
@@ -139,9 +144,10 @@ chat_tickets AS (
     NOW() AS ts_load
   FROM
     datalake_customer_support.chat
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32
 ),
 email_tickets AS (
-  SELECT DISTINCT
+  SELECT
     CAST(id_ticket AS BIGINT) AS sk_ticket,
     MD5(
       CONCAT(
@@ -158,7 +164,7 @@ email_tickets AS (
     MD5(department) AS sk_first_department,
     MD5(department) AS sk_last_department, 
     MD5(department) AS sk_zendesk_department,
-    id_user AS sk_user,
+    MAX(id_user) AS sk_user,
     id_contract AS sk_contract,
     'email' AS channel,
     csat_score,
@@ -169,15 +175,17 @@ email_tickets AS (
     department AS zendesk_department,
     1 AS total_departments,
     1 AS total_segments,
+    frt AS full_resolution_time,
     front_or_back,
-    CAST(back_ticket AS BIGINT) AS back_ticket,
+    CAST(last_back_ticket AS BIGINT) AS last_back_ticket,
+    back_ticket_list AS back_tickets,
     is_solved AS resolution_survey,
     is_answered AS has_answered_csat,
     has_back_ticket,
     is_open_back_ticket AS is_back_ticket_open,
     CASE
       WHEN is_solved = TRUE
-          AND (back_ticket IS NULL OR is_open_back_ticket = FALSE)
+          AND (back_ticket_list IS NULL OR is_open_back_ticket = FALSE)
           AND is_bot = FALSE 
           AND is_closed_by_merge = FALSE
           AND (front_or_back = 'front' OR front_or_back IS NULL)
@@ -191,7 +199,7 @@ email_tickets AS (
     END AS is_solved,
     CASE
       WHEN is_solved = TRUE
-          AND back_ticket IS NULL
+          AND back_ticket_list IS NULL
           AND is_bot = FALSE 
           AND is_closed_by_merge = FALSE
           AND (front_or_back = 'front' OR front_or_back IS NULL)
@@ -209,6 +217,7 @@ email_tickets AS (
     NOW() AS ts_load
   FROM 
     datalake_customer_support.email
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32
 )
 SELECT 
   *

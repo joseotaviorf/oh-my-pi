@@ -170,7 +170,8 @@ zendesk_aditional_ticket_info AS (
     tf.client_type,
     tf.customer_type_tag,
     tf.contact_motivation_tag,
-    tf.contact_theme_tag
+    tf.contact_theme_tag,
+    ftm.ts_solved_local AS ts_solved
   FROM
     datalake_zendesk_ticket_funnels.ticket_funnel tf
   JOIN
@@ -209,7 +210,8 @@ back_tickets AS (
     COALESCE(
       NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),
       REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})', 1)
-    ) AS front_task
+    ) AS front_task,
+    zd.ts_solved
   FROM
     zendesk_aditional_ticket_info zd
   JOIN
@@ -225,7 +227,29 @@ back_tickets AS (
     (zd.tags LIKE '%tarefa_atendimento_escalado%' OR LOWER(dc.front_or_back) = 'back')
     AND (zd.tags NOT LIKE '%bot_end_conversation%' AND zd.tags NOT LIKE '%closed_by_merge%')
     AND COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})', 1)) != '' 
-  GROUP BY 1,2,3,4
+  GROUP BY 1,2,3,4,5
+),
+last_back_ticket_timestamp AS (
+  SELECT
+    front_ticket,
+    CONCAT_WS(',' , COLLECT_SET(back_ticket)) AS back_ticket_list,
+    SUM(CAST(back_ticket_status IN ('closed','deleted','solved') AS SMALLINT))/CAST(COUNT(DISTINCT back_ticket) AS FLOAT) != 1 AS is_open_back_ticket,
+    MAX(ts_solved) AS ts_last_solved
+  FROM
+    back_tickets
+  GROUP BY 1
+),
+last_back_ticket AS (
+  SELECT
+    bt.*,
+    lt.is_open_back_ticket,
+    lt.back_ticket_list
+  FROM
+    back_tickets bt
+  JOIN
+    last_back_ticket_timestamp lt
+      ON lt.front_ticket = bt.front_ticket
+      AND lt.ts_last_solved = bt.ts_solved
 )
 SELECT DISTINCT 
   ct.id_task AS id_segment,
@@ -257,7 +281,9 @@ SELECT DISTINCT
   zd.tags,
   zd.status,
   zd.custom_fields,
-  bt.back_ticket,
+  CAST((TO_UNIX_TIMESTAMP(COALESCE(bt.ts_solved, ct.ts_last_event)) - TO_UNIX_TIMESTAMP(ct.ts_first_event))/60.0 AS DOUBLE) AS frt,
+  bt.back_ticket AS last_back_ticket,
+  bt.back_ticket_list,
   ct.seconds_first_reply,
   ct.task_minutes_wait_time AS segment_minutes_wait_time,
   ct.number_of_departments,
@@ -277,10 +303,7 @@ SELECT DISTINCT
     WHEN dc.front_or_back = 'Front' OR NULLIF(dc.front_or_back, '-') IS NULL THEN 'front'
   END AS front_or_back,
   bt.front_ticket IS NOT NULL AS has_back_ticket,
-  CASE
-    WHEN bt.back_ticket_status IN ('open','pending','new','hold') THEN TRUE
-    WHEN bt.back_ticket_status IN ('closed','deleted','solved') THEN FALSE
-  END AS is_open_back_ticket,
+  bt.is_open_back_ticket,
   cc.id_ticket IS NOT NULL AS is_csat_answered,
   cc.is_solved,
   cc.csat_score,
@@ -307,5 +330,5 @@ LEFT JOIN
   chat_csat cc
     ON cc.id_ticket = zd.id_ticket
 LEFT JOIN
-  back_tickets bt
+  last_back_ticket bt
     ON bt.front_ticket = zd.id_ticket

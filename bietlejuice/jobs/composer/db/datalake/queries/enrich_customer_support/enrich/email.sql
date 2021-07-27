@@ -136,7 +136,8 @@ back_tickets AS (
     COALESCE(
       NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(custom_fields, '$.Ticket do contato'), '([0-9]{{8}})', 1), ''),
       REGEXP_EXTRACT(SUBSTRING(SPLIT(description, 'Ticket do contato')[1], 1, 18), '([0-9]{{8}})', 1)
-    ) AS front_ticket
+    ) AS front_ticket,
+    ts_ticket_solved
   FROM
     zendesk_email
   LEFT JOIN
@@ -146,6 +147,28 @@ back_tickets AS (
     (tags LIKE '%tarefa_atendimento_escalado%' OR LOWER(dc.front_or_back) = 'back')
     AND (tags NOT LIKE '%bot_end_conversation%' AND tags NOT LIKE '%closed_by_merge%')
     AND COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(custom_fields, '$.Ticket do contato'), '([0-9]{{8}})', 1), ''),REGEXP_EXTRACT(SUBSTRING(SPLIT(description, 'Ticket do contato')[1], 1, 18), '([0-9]{{8}})', 1)) != ''
+),
+last_back_ticket_timestamp AS (
+  SELECT
+    front_ticket,
+    CONCAT_WS(',' , COLLECT_SET(back_ticket)) AS back_ticket_list,
+    SUM(CAST(back_ticket_status IN ('closed','deleted','solved') AS SMALLINT))/CAST(COUNT(DISTINCT back_ticket) AS FLOAT) != 1 AS is_open_back_ticket,
+    MAX(ts_ticket_solved) AS ts_last_solved
+  FROM
+    back_tickets
+  GROUP BY 1
+),
+last_back_ticket AS (
+  SELECT
+    bt.*,
+    lt.is_open_back_ticket,
+    lt.back_ticket_list
+  FROM
+    back_tickets bt
+  JOIN
+    last_back_ticket_timestamp lt
+      ON lt.front_ticket = bt.front_ticket
+      AND lt.ts_last_solved = bt.ts_ticket_solved
 )
 SELECT DISTINCT 
   ze.id_ticket,
@@ -184,11 +207,10 @@ SELECT DISTINCT
     WHEN dc.front_or_back = 'Front' OR NULLIF(dc.front_or_back, '-') IS NULL THEN 'front'
   END AS front_or_back,
   bt.back_ticket IS NOT NULL has_back_ticket,
-  CASE
-    WHEN bt.back_ticket_status IN ('open','pending','new','hold') THEN TRUE
-    WHEN bt.back_ticket_status IN ('closed','deleted','solved') THEN FALSE
-  END AS is_open_back_ticket,
-  bt.back_ticket,
+  CAST((TO_UNIX_TIMESTAMP(COALESCE(bt.ts_ticket_solved, ze.ts_ticket_solved)) - TO_UNIX_TIMESTAMP(ze.ts_ticket_started))/60.0 AS DOUBLE) AS frt,
+  bt.is_open_back_ticket,
+  bt.back_ticket_list,
+  bt.back_ticket AS last_back_ticket,
   cs.ts_first_seen AS ts_csat_first_seen,
   cs.ts_first_response AS ts_csat_first_response,
   ze.ts_initially_assigned_local,
@@ -205,7 +227,7 @@ LEFT JOIN
   last_csat_answer cs
     ON ze.id_ticket = cs.id_ticket
 LEFT JOIN
-  back_tickets bt
+  last_back_ticket bt
     ON bt.front_ticket = ze.id_ticket
 WHERE 
   ze.channel IN ('email', 'form_faq', 'web', 'other')
