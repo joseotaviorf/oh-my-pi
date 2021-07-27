@@ -189,7 +189,7 @@ conversation AS (
       cm.number_of_tasks > 1 AS is_transfered,
       cm.wait_time_flex AS seconds_total_wait_time,
       cm.talk_time AS seconds_total_talk_time,
-      ce.csat_2 IS NOT NULL AS is_csat_answered,
+      COALESCE(CAST(ce.csat_2 AS string), CAST(ce.csat_1 AS string)) IS NOT NULL AS is_csat_answered,
       ce.csat_1 = 1 AS is_solved,
       ce.csat_2 AS csat_rating,
       GREATEST(ie.ts_last_event_local_unix,fe.ts_last_event_local_unix) - COALESCE(ie.ts_first_event_local_unix,fe.ts_first_event_local_unix) AS seconds_duration,
