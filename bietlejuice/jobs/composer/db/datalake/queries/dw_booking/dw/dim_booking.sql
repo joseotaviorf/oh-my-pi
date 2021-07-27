@@ -38,7 +38,7 @@ WITH taxonomy_demand AS (
 SELECT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
   CAST(b.id AS INT) AS sk_booking,
   COALESCE(td.id, -1) AS sk_rent_flow_taxonomy,
-  b.id AS id_booking,
+  CAST(b.id AS INT) AS id_booking,
   b.id_visitor,
   b.id_visit,
   b.id_house AS id_property,
