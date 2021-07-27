@@ -10,22 +10,30 @@ from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import MySqlConsumer
 from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
-from bietlejuice.jobs.composer.dags.kill_queue import SOURCE
 
 JOB_NAME = "load_kill_queue_into_datalake"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-BLOCK_LIST = ["flyway_schema_history"]
-
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
+    parser.add_argument("source")
+    parser.add_argument("table_name")
     args = parser.parse_args()
     environment = args.env
     datalake_bucket = args.datalake_bucket
+    source = args.source
+    table_name = args.table_name
+
+    logger.info(
+        f"""
+                m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
+                table_name={table_name}, msg=Starting Spark job...
+        """
+    )
 
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
@@ -38,8 +46,7 @@ if __name__ == "__main__":
     spark_client = SparkClient()
     mysql_consumer = MySqlConsumer(conn_config, spark_client)
 
-    tables = mysql_consumer.get_table_names_and_sizes().collect()
-    db_info = DatalakeMetastoreService.get_db_info(environment, SOURCE, datalake_bucket)
+    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     metastore_service = SparkMetastoreService(spark_client)
 
     # create database if it doesn't exists
@@ -51,21 +58,14 @@ if __name__ == "__main__":
     s3_loader = S3Loader()
     spark_metastore_loader = SparkMetastoreLoader(metastore_service)
 
-    for table in tables:
-        if table.table_name not in BLOCK_LIST:
-            df = mysql_consumer.get_data_from_table(table.table_name)
-            # the table names in the datalake must be lowercase
-            s3_loader.load_full_table(
-                df=df,
-                database_name=database_name,
-                table_name=table.table_name.lower(),
-                format_options=format_options,
-                database_location=database_location,
-            )
-            spark_metastore_loader.update_metastore(
-                df,
-                database_name,
-                table.table_name.lower(),
-                format_options,
-                database_location,
-            )
+    df = mysql_consumer.get_data_from_table(table_name)
+    # the table names in the datalake must be lowercase
+    s3_loader.load_df(
+        df=df,
+        s3_path=f"{database_location}{table_name.lower()}",
+        format_options=format_options,
+        database_location=database_location,
+    )
+    spark_metastore_loader.update_metastore(
+        df, database_name, table_name.lower(), format_options, database_location
+    )

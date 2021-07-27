@@ -1,8 +1,15 @@
 SELECT
     id,
+    reservation_id AS id_reservation,
+    version, 
     created_at AS ts_created,
     updated_at AS ts_updated,
-    version,
-    reservation_id as id_reservation
+    year, 
+    month, 
+    day
 FROM
     datalake_kill_queue_raw.charge
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}

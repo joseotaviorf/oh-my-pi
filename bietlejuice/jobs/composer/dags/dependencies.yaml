@@ -443,8 +443,8 @@ bietlejuice.enrich_invoice:
   - bietlejuice.retsuko:load-clean-invoice
 
 bietlejuice.enrich_kill_queue:
-  - bietlejuice.kill_queue:load-house-to-datalake-clean
-  - bietlejuice.kill_queue:load-reservation-to-datalake-clean
+  - bietlejuice.kill_queue:load-clean-house
+  - bietlejuice.kill_queue:load-clean-reservation
 
 bietlejuice.enrich_listing_owners:
   - bietlejuice.ebdb:create-clean-proposal-in-data-lake

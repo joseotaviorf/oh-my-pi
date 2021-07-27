@@ -1,19 +1,26 @@
 SELECT
     id,
-    timestamp(created_at) as ts_created,
-    timestamp(updated_at) as ts_updated,
-    version,
-    main_id as id_main,
-    street_address,
-    house_number,
-    complement,
+    main_id AS id_main,
+    owner_id AS id_owner, 
+    region_id AS id_region,
     city,
+    complement,
+    house_number,
+    street_address,
     state,
-    reservation_allowed as is_reservation_allowed,
-    rent_price,
+    version, 
     floor,
+    rent_price,
     reservation_fee,
-    region_id as id_region,
-    owner_id as id_owner
+    CAST(reservation_allowed AS BOOLEAN) AS is_reservation_allowed,
+    TIMESTAMP(created_at) AS ts_created,
+    TIMESTAMP(updated_at) AS ts_updated,
+    year,
+    month,
+    day
 FROM
     datalake_kill_queue_raw.house
+WHERE 
+    year = {year}
+    AND month = {month}
+    AND day = {day}

@@ -1,20 +1,20 @@
 SELECT
     id,
+    house_id AS id_house,
+    rent_flow_id AS id_rent_flow,
+    tenant_id AS id_tenant,
     rev,
     revtype as rev_type,
     revend as rev_end,
     attempt,
-    attempt_mod as is_attempt_mod,
-    mundipagg_token,
-    mundipagg_token_mod as is_mundipagg_token_mod,
-    rent_flow_id as id_rent_flow,
-    status,
-    status_mod as is_status_mod,
-    tenant_id as id_tenant,
-    value,
-    value_mod as is_value_mod,
-    house_id as id_house,
     cancellation_reason,
-    cancellation_reason_mod as is_cancellation_reason_mod
+    mundipagg_token,
+    status,
+    value,
+    CAST(attempt_mod AS BOOLEAN) AS mod_has_attempt,
+    CAST(cancellation_reason_mod AS BOOLEAN) AS mod_has_cancellation_reason,
+    CAST(mundipagg_token_mod AS BOOLEAN) AS mod_has_mundipagg_token,
+    CAST(status_mod AS BOOLEAN) AS mod_has_status,
+    CAST(value_mod AS BOOLEAN) AS mod_has_value
 FROM
     datalake_kill_queue_raw.reservation_aud

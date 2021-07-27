@@ -1,8 +1,8 @@
 SELECT
     id,
+    reservation_id AS id_reservation,
     rev,
-    revtype as rev_type,
-    revend as rev_end,
-    reservation_id as id_reservation
+    revtype AS rev_type,
+    revend AS rev_end
 FROM
     datalake_kill_queue_raw.charge_aud

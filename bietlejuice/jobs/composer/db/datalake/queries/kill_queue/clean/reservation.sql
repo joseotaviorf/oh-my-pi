@@ -1,19 +1,26 @@
 SELECT
     id,
-    timestamp(created_at) as ts_created,
-    timestamp(updated_at) as ts_updated,
+    house_id AS id_house,
+    rent_flow_id AS id_rent_flow,
+    tenant_id AS id_tenant,
+    cancellation_reason,
+    last_charge_status,
+    mundipagg_token,
+    status,
     version,
     attempt,
-    rent_flow_id as id_rent_flow,
-    status,
-    tenant_id as id_tenant,
+    CAST(installments AS INTEGER) AS installments,
+    tenant_refund_percentage,
     value,
-    house_id as id_house,
-    mundipagg_token,
-    is_ongoing,
-    cancellation_reason,
-    cast(installments as integer) as installments,
-    last_charge_status,
-    tenant_refund_percentage
+    CAST(is_ongoing AS BOOLEAN) is_ongoing,
+    TIMESTAMP(created_at) AS ts_created,
+    TIMESTAMP(updated_at) AS ts_updated,
+    year, 
+    month, 
+    day
 FROM
     datalake_kill_queue_raw.reservation
+WHERE 
+    year = {year}
+    AND month = {month}
+    AND day = {day}

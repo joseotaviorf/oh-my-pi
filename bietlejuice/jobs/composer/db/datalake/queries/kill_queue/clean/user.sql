@@ -1,12 +1,19 @@
 SELECT
     id,
-    timestamp(created_at) as ts_created,
-    timestamp(updated_at) as ts_updated,
-    version,
-    cellphone as cell_phone,
-    cpf,
+    main_id AS id_main, 
+    cellphone AS cell_phone,
+    cpf, 
     email,
-    main_id as id_main,
-    name
+    name, 
+    version, 
+    TIMESTAMP(created_at) AS ts_created,
+    TIMESTAMP(updated_at) AS ts_updated,
+    year, 
+    month,
+    day
 FROM
     datalake_kill_queue_raw.user
+WHERE 
+    year = {year}
+    AND month = {month}
+    AND day = {day}

@@ -1,22 +1,22 @@
 SELECT
     id,
+    main_id AS id_main,
+    owner_id AS id_owner,
+    region_id AS id_region,
     rev,
-    revtype as rev_type,
-    revend as rev_end,
+    revtype AS rev_type,
+    revend AS rev_end,
     city,
     complement,
     floor,
     house_number,
     state,
     street_address,
-    main_id as id_main,
     rent_price,
-    rent_price_mod as is_rent_price_mod,
-    reservation_allowed as is_reservation_allowed,
-    reservation_allowed_mod as is_reservation_allowed_mod,
     reservation_fee,
-    reservation_fee_mod as is_reservation_fee_mod,
-    region_id as id_region,
-    owner_id as id_owner
+    CAST(reservation_allowed AS BOOLEAN) AS is_reservation_allowed,
+    CAST(rent_price_mod AS BOOLEAN) AS mod_has_rent_price,
+    CAST(reservation_fee_mod AS BOOLEAN) AS mod_has_reservation_fee,
+    CAST(reservation_allowed_mod AS BOOLEAN) AS mod_is_reservation_allowed
 FROM
     datalake_kill_queue_raw.house_aud
