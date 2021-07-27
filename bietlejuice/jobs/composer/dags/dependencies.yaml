@@ -90,7 +90,7 @@ bietlejuice.dw_invoice_entries:
 bietlejuice.dw_marketing_costs:
   - bietlejuice.enrich_marketing_costs.load-google-keywords-performance-report-to-enrich:load-enrich-google-keywords-performance-report
 
-bietlejuice.dw_marketing_costs_criteo_campaigns:
+bietlejuice.dw_criteo_campaigns:
   - bietlejuice.criteo_campaigns:load-clean-criteo-campaigns
 
 bietlejuice.dw_facebook_insights:

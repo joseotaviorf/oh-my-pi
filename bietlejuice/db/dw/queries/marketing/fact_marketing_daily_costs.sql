@@ -369,8 +369,8 @@ campaigns_full AS (
         NULL AS report_type,
         NULL AS ad_type
     FROM
-        marketing_costs.fact_criteo_daily_cost_attributions fct
-        LEFT JOIN marketing_costs.dim_criteo_campaign dct ON fct.sk_criteo_campaign = dct.sk_criteo_campaign
+        criteo_campaigns.fact_criteo_daily_cost_attributions fct
+        LEFT JOIN criteo_campaigns.dim_criteo_campaign dct ON fct.sk_criteo_campaign = dct.sk_criteo_campaign
     WHERE
         fct.sk_date >= 20180101
         AND (SUBSTRING(dct.campaign_name, 1, 5) <> 'ZEBRA' 

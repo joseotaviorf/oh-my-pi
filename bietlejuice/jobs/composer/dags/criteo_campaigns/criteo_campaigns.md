@@ -1,7 +1,7 @@
 ## Criteo Campaigns
 ### Purpose
 
-Criteo is a retargeting platform (serves ads based on people that have already visited our site.) We use them to send campaigns to our clients. This DAG ingests the data that they provide to us via API (Accessible via our [Criteo Repository](https://github.com/quintoandar/criteo-api-client-python)).
+Creates incremental RAW and CLEAN tables with data retrieved from Criteo's API, using our own client integration available in [this API Client Criteo repository](https://github.com/quintoandar/criteo-api-client-python)). Criteo is a retargeting platform - serves ads based on people that have already visited our site - used to show ads to our clients.
 
 ### Execution Interval
 
