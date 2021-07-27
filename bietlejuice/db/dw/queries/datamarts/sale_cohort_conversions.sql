@@ -83,6 +83,20 @@ SELECT
 FROM
     datalake_firestore_prod.monday mo
 ),
+
+region_flow_type as (
+	select
+		id,
+	    coalesce(nullif(json_extract_path_text(soa.updated_message, 'flowType'),''),
+	    		 nullif(json_extract_path_text(soa.updated_message, 'house','regionFlowType'),'')) AS rf_type
+	from
+		datalake_firestore_clean_prod.sale_offer soa
+	where
+		rf_type is not null
+	and
+		event_type = 'create'
+),
+
 sale_bookings AS (
 SELECT
 	fv.sk_house AS id_property,
@@ -188,9 +202,13 @@ SELECT
 	offers.dt_finan_ended,
 	sc.os_date,
 	sc.oa_date,
-	sc.ccv_date
+	sc.ccv_date,
+	rft.rf_type
 FROM
     monday_adjusted offers
+LEFT join
+	region_flow_type rft
+		ON offers.id_offer = rft.id
 FULL OUTER JOIN
     sale_closing sc
         ON offers.id_offer = sc.sk_offer
@@ -224,7 +242,8 @@ SELECT
 	db.sk_booking,
 	db.dt_created,
 	db.dt_completed,
-	db.city_group
+	db.city_group,
+	sde.rf_type
 FROM
     sale_demand_events sde
 FULL OUTER JOIN
@@ -266,7 +285,8 @@ SELECT
 	sdc.dt_finan_ended,
 	fsf.first_event AS first_touchpoint,
 	fsf.higher_intent_before_offer,
-	fsf.higher_intent_after_offer
+	fsf.higher_intent_after_offer,
+	sdc.rf_type
 FROM
     sale_demand_events_complete sdc
 LEFT JOIN
@@ -300,6 +320,7 @@ SELECT
          WHEN datediff('week',DATE_TRUNC('week',DATE(slf.sk_prospect_date)),DATE_TRUNC('week',DATE(NULLIF(slf.sk_first_contact_date,-1)))) >= 20
             THEN 'W20+'
     END AS weeks_conversion,
+    NULL AS region_flow_type,
     COUNT(slf.sk_prospect_date) AS p2fc,
     NULL::BIGINT AS fc2q,
     NULL::BIGINT AS p2q,
@@ -335,7 +356,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_prospect_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 fc2q AS (
 SELECT
@@ -358,6 +379,7 @@ SELECT
 	    WHEN datediff('week',DATE_TRUNC('week',DATE(slf.sk_first_contact_date)),DATE_TRUNC('week',DATE(NULLIF(slf.sk_qualified_date,-1)))) >= 20
 	        THEN 'W20+'
     END AS weeks_conversion,
+    NULL AS region_flow_type,
     NULL::BIGINT AS p2fc,
     COUNT(slf.sk_first_contact_date) AS fc2q,
     NULL::BIGINT AS p2q,
@@ -393,7 +415,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_first_contact_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 p2q AS (
 SELECT
@@ -416,6 +438,7 @@ SELECT
        WHEN datediff('week',DATE_TRUNC('week',DATE(slf.sk_prospect_date)),DATE_TRUNC('week',DATE(NULLIF(slf.sk_qualified_date,-1)))) >= 20
 	        THEN 'W20+'
    END AS weeks_conversion,
+   NULL AS region_flow_type,
    NULL::BIGINT AS p2fc,
    NULL::BIGINT AS fc2q,
    COUNT(slf.sk_prospect_date) AS p2q,
@@ -451,7 +474,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_prospect_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 q2o AS (
 SELECT
@@ -474,6 +497,7 @@ SELECT
        WHEN datediff('week',DATE_TRUNC('week',DATE(slf.sk_qualified_date)),DATE_TRUNC('week',DATE(NULLIF(slf.sk_opportunity_date,-1)))) >= 20
 	        THEN 'W20+'
    END AS weeks_conversion,
+   NULL AS region_flow_type,
    NULL::BIGINT AS p2fc,
    NULL::BIGINT AS fc2q,
    NULL::BIGINT AS p2q,
@@ -509,7 +533,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_qualified_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 o2fl AS (
 SELECT
@@ -532,6 +556,7 @@ SELECT
        WHEN datediff('week',DATE_TRUNC('week',DATE(slf.sk_opportunity_date)),DATE_TRUNC('week',DATE(NULLIF(slf.sk_first_listing_date,-1)))) >= 20
 	        THEN 'W20+'
    END AS weeks_conversion,
+   NULL AS region_flow_type,
    NULL::BIGINT AS p2fc,
    NULL::BIGINT AS fc2q,
    NULL::BIGINT AS p2q,
@@ -567,7 +592,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_opportunity_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 vb2vc AS (
 SELECT
@@ -590,6 +615,7 @@ SELECT
        WHEN datediff('week',DATE_TRUNC('week',DATE(dt_created)),DATE_TRUNC('week',DATE(dt_completed))) >= 20
 	        THEN 'W20+'
    END AS weeks_conversion,
+   rf_type AS region_flow_type,
    NULL::BIGINT AS p2fc,
    NULL::BIGINT AS fc2q,
    NULL::BIGINT AS p2q,
@@ -625,7 +651,7 @@ FROM
     sale_demand_classification
 WHERE
     date(dt_created) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 vb2os AS (
 SELECT
@@ -648,6 +674,7 @@ SELECT
 	WHEN datediff('week',DATE_TRUNC('week',DATE(dt_created)),DATE_TRUNC('week',DATE(dt_offer_sent))) >= 20
 	         THEN 'W20+'
     END AS weeks_conversion,
+    rf_type AS region_flow_type,
     NULL::BIGINT AS p2fc,
     NULL::BIGINT AS fc2q,
     NULL::BIGINT AS p2q,
@@ -683,7 +710,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_created) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 vb2oa AS (
 SELECT
@@ -706,6 +733,7 @@ SELECT
 	WHEN datediff('week',DATE_TRUNC('week',DATE(dt_created)),DATE_TRUNC('week',DATE(dt_offer_accepted))) >= 20
 	         THEN 'W20+'
     END AS weeks_conversion,
+    rf_type AS region_flow_type,
     NULL::BIGINT AS p2fc,
     NULL::BIGINT AS fc2q,
     NULL::BIGINT AS p2q,
@@ -741,7 +769,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_created) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 vb2ccv AS (
 SELECT
@@ -764,6 +792,7 @@ SELECT
 	WHEN datediff('week',DATE_TRUNC('week',DATE(dt_created)),DATE_TRUNC('week',DATE(dt_ccv_signed))) >= 20
 	         THEN 'W20+'
     END AS weeks_conversion,
+    rf_type AS region_flow_type,
     NULL::BIGINT AS p2fc,
     NULL::BIGINT AS fc2q,
     NULL::BIGINT AS p2q,
@@ -799,7 +828,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_created) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 vc2ccv AS (
 SELECT
@@ -822,6 +851,7 @@ SELECT
 	WHEN datediff('week',DATE_TRUNC('week',DATE(dt_completed)),DATE_TRUNC('week',DATE(dt_ccv_signed))) >= 20
 	         THEN 'W20+'
     END AS weeks_conversion,
+    rf_type AS region_flow_type,
     NULL::BIGINT AS p2fc,
     NULL::BIGINT AS fc2q,
     NULL::BIGINT AS p2q,
@@ -857,7 +887,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_completed) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 vc2os AS (
 SELECT
@@ -880,6 +910,7 @@ SELECT
        WHEN datediff('week',DATE_TRUNC('week',DATE(dt_completed)),DATE_TRUNC('week',DATE(dt_offer_sent))) >= 20
 	        THEN 'W20+'
    END AS weeks_conversion,
+   rf_type AS region_flow_type,
    NULL::BIGINT AS p2fc,
    NULL::BIGINT AS fc2q,
    NULL::BIGINT AS p2q,
@@ -915,7 +946,7 @@ FROM
     sale_demand_classification
 WHERE
     date(dt_completed) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 vc2oa AS (
 SELECT
@@ -938,6 +969,7 @@ SELECT
        WHEN datediff('week',DATE_TRUNC('week',DATE(dt_completed)),DATE_TRUNC('week',DATE(dt_offer_accepted))) >= 20
 	        THEN 'W20+'
    END AS weeks_conversion,
+   rf_type AS region_flow_type,
    NULL::BIGINT AS p2fc,
    NULL::BIGINT AS fc2q,
    NULL::BIGINT AS p2q,
@@ -973,7 +1005,7 @@ FROM
     sale_demand_classification
 WHERE
     date(dt_completed) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 os2oa AS (
 SELECT
@@ -996,6 +1028,7 @@ SELECT
 	    WHEN datediff('week',DATE_TRUNC('week',DATE(dt_offer_sent)),DATE_TRUNC('week',DATE(dt_offer_accepted))) >= 20
 	         THEN 'W20+'
     END AS weeks_conversion,
+    rf_type AS region_flow_type,
     NULL::BIGINT AS p2fc,
     NULL::BIGINT AS fc2q,
     NULL::BIGINT AS p2q,
@@ -1031,7 +1064,7 @@ FROM
     sale_demand_classification
 WHERE
     date(dt_offer_sent) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 os2dq AS (
 SELECT
@@ -1054,6 +1087,7 @@ SELECT
 	WHEN datediff('week',DATE_TRUNC('week',DATE(dt_offer_sent)),DATE_TRUNC('week',DATE(dt_deal_qualified))) >= 20
 	     THEN 'W20+'
     END AS weeks_conversion,
+    rf_type AS region_flow_type,
     NULL::BIGINT AS p2fc,
     NULL::BIGINT AS fc2q,
     NULL::BIGINT AS p2q,
@@ -1089,7 +1123,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_offer_sent) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 dq2oa AS (
 SELECT
@@ -1112,6 +1146,7 @@ SELECT
 	WHEN datediff('week',DATE_TRUNC('week',DATE(dt_deal_qualified)),DATE_TRUNC('week',DATE(dt_offer_accepted))) >= 20
 	     THEN 'W20+'
     END AS weeks_conversion,
+    rf_type AS region_flow_type,
     NULL::BIGINT AS p2fc,
     NULL::BIGINT AS fc2q,
     NULL::BIGINT AS p2q,
@@ -1147,7 +1182,7 @@ FROM
     sale_demand_classification
 WHERE
     date(dt_deal_qualified) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 oa2ccv AS (
 SELECT
@@ -1170,6 +1205,7 @@ SELECT
         WHEN datediff('week',DATE_TRUNC('week',DATE(dt_offer_accepted)),DATE_TRUNC('week',DATE(dt_ccv_signed))) >= 20
              THEN 'W20+'
     END AS weeks_conversion,
+    rf_type AS region_flow_type,
     NULL::BIGINT AS p2fc,
     NULL::BIGINT AS fc2q,
     NULL::BIGINT AS p2q,
@@ -1205,7 +1241,7 @@ FROM
     sale_demand_classification
 WHERE
     date(dt_offer_accepted) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 ccv2lts AS (
 SELECT
@@ -1228,6 +1264,7 @@ SELECT
 	WHEN datediff('week',DATE_TRUNC('week',DATE(dt_ccv_signed)),DATE_TRUNC('week',DATE(dt_diligence_started_legaut))) >= 20
 	     THEN 'W20+'
     END AS weeks_conversion,
+    rf_type AS region_flow_type,
     NULL::BIGINT AS p2fc,
     NULL::BIGINT AS fc2q,
     NULL::BIGINT AS p2q,
@@ -1263,7 +1300,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_ccv_signed) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 lts2lte AS (
 SELECT
@@ -1286,6 +1323,7 @@ SELECT
         WHEN datediff('week',DATE_TRUNC('week',DATE(dt_diligence_started_legaut)),DATE_TRUNC('week',DATE(dt_diligence_ended_legaut))) >= 20
 	     THEN 'W20+'
     END AS weeks_conversion,
+    rf_type AS region_flow_type,
     NULL::BIGINT AS p2fc,
     NULL::BIGINT AS fc2q,
     NULL::BIGINT AS p2q,
@@ -1321,7 +1359,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_diligence_started_legaut) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 lte2lrs AS (
 SELECT
@@ -1344,6 +1382,7 @@ SELECT
 	 WHEN datediff('week',DATE_TRUNC('week',DATE(dt_diligence_ended_legaut)),DATE_TRUNC('week',DATE(dt_diligence_started_legal))) >= 20
 	     THEN 'W20+'
     END AS weeks_conversion,
+    rf_type AS region_flow_type,
     NULL::BIGINT AS p2fc,
     NULL::BIGINT AS fc2q,
     NULL::BIGINT AS p2q,
@@ -1379,7 +1418,7 @@ FROM
     sale_demand_classification
 WHERE
     date(dt_diligence_ended_legaut) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 lrs2lre AS (
 SELECT
@@ -1402,6 +1441,7 @@ SELECT
 	 WHEN datediff('week',DATE_TRUNC('week',DATE(dt_diligence_started_legal)),DATE_TRUNC('week',DATE(dt_diligence_ended_legal))) >= 20
 	      THEN 'W20+'
     END AS weeks_conversion,
+    rf_type AS region_flow_type,
     NULL::BIGINT AS p2fc,
     NULL::BIGINT AS fc2q,
     NULL::BIGINT AS p2q,
@@ -1437,7 +1477,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_diligence_started_legal) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 lre2de AS (
 SELECT
@@ -1460,6 +1500,7 @@ SELECT
 	    WHEN datediff('week',DATE_TRUNC('week',DATE(dt_diligence_ended_legal)),DATE_TRUNC('week',DATE(dt_diligence_ended))) >= 20
 	    	  THEN 'W20+'
     END AS weeks_conversion,
+    rf_type AS region_flow_type,
     NULL::BIGINT AS p2fc,
     NULL::BIGINT AS fc2q,
     NULL::BIGINT AS p2q,
@@ -1495,7 +1536,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_diligence_ended_legal) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 ccv2credstart AS (
 SELECT
@@ -1518,9 +1559,10 @@ SELECT
 	    WHEN datediff('week',DATE_TRUNC('week',DATE(dt_ccv_signed)),DATE_TRUNC('week',DATE(dt_credit_started))) >= 20
 	     	 THEN 'W20+'
 	END AS weeks_conversion,
+	rf_type AS region_flow_type,
 	NULL::BIGINT AS p2fc,
-        NULL::BIGINT AS fc2q,
-        NULL::BIGINT AS p2q,
+    NULL::BIGINT AS fc2q,
+    NULL::BIGINT AS p2q,
 	NULL::BIGINT AS q2o,
 	NULL::BIGINT AS o2fl,
 	NULL::BIGINT AS vb2vc,
@@ -1553,7 +1595,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_ccv_signed) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 credstart2credsent AS (
 SELECT
@@ -1576,6 +1618,7 @@ SELECT
 	    WHEN datediff('week',DATE_TRUNC('week',DATE(dt_credit_started)),DATE_TRUNC('week',DATE(dt_credit_approved))) >= 20
 	        THEN 'W20+'
     END AS weeks_conversion,
+    rf_type AS region_flow_type,
     NULL::BIGINT AS p2fc,
     NULL::BIGINT AS fc2q,
     NULL::BIGINT AS p2q,
@@ -1611,7 +1654,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_credit_started) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 ccv2crnended AS (
 SELECT
@@ -1634,6 +1677,7 @@ SELECT
 	    WHEN datediff('week',DATE_TRUNC('week',DATE(dt_ccv_signed)),DATE_TRUNC('week',DATE(dt_notes_registry_ended))) >= 20
 	        THEN 'W20+'
     END AS weeks_conversion,
+    rf_type AS region_flow_type,
     NULL::BIGINT AS p2fc,
     NULL::BIGINT AS fc2q,
     NULL::BIGINT AS p2q,
@@ -1669,7 +1713,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_ccv_signed) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 credsent2finstart AS (
 SELECT
@@ -1692,6 +1736,7 @@ SELECT
 	    WHEN datediff('week',DATE_TRUNC('week',DATE(dt_credit_approved)),DATE_TRUNC('week',DATE(dt_finan_started))) >= 20
 	        THEN 'W20+'
     END AS weeks_conversion,
+    rf_type AS region_flow_type,
     NULL::BIGINT AS p2fc,
     NULL::BIGINT AS fc2q,
     NULL::BIGINT AS p2q,
@@ -1727,7 +1772,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_credit_approved) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 ccv2finstart AS (
 SELECT
@@ -1750,6 +1795,7 @@ SELECT
 	    WHEN datediff('week',DATE_TRUNC('week',DATE(dt_ccv_signed)),DATE_TRUNC('week',DATE(dt_finan_started))) >= 20
 	        THEN 'W20+'
     END AS weeks_conversion,
+    rf_type AS region_flow_type,
     NULL::BIGINT AS p2fc,
     NULL::BIGINT AS fc2q,
     NULL::BIGINT AS p2q,
@@ -1785,7 +1831,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_ccv_signed) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 finstart2finended AS (
 SELECT
@@ -1808,6 +1854,7 @@ SELECT
 	WHEN datediff('week',DATE_TRUNC('week',DATE(dt_finan_started)),DATE_TRUNC('week',DATE(dt_finan_ended))) >= 20
 	    THEN 'W20+'
     END AS weeks_conversion,
+    rf_type AS region_flow_type,
     NULL::BIGINT AS p2fc,
     NULL::BIGINT AS fc2q,
     NULL::BIGINT AS p2q,
@@ -1843,7 +1890,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_finan_started) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 ccv2mi AS (
 SELECT
@@ -1866,6 +1913,7 @@ SELECT
 	    WHEN datediff('week',DATE_TRUNC('week',DATE(dt_ccv_signed)),DATE_TRUNC('week',DATE(dt_matricula_inicio))) >= 20
 	        THEN 'W20+'
     END AS weeks_conversion,
+    rf_type AS region_flow_type,
     NULL::BIGINT AS p2fc,
     NULL::BIGINT AS fc2q,
     NULL::BIGINT AS p2q,
@@ -1901,7 +1949,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_ccv_signed) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 mi2ma AS (
 SELECT
@@ -1924,6 +1972,7 @@ SELECT
 	    WHEN datediff('week',DATE_TRUNC('week',DATE(dt_matricula_inicio)),DATE_TRUNC('week',DATE(dt_matricula_atualizada))) >= 20
 	        THEN 'W20+'
     END AS weeks_conversion,
+    rf_type AS region_flow_type,
     NULL::BIGINT AS p2fc,
     NULL::BIGINT AS fc2q,
     NULL::BIGINT AS p2q,
@@ -1959,7 +2008,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_matricula_inicio) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 ccv2ma AS (
 SELECT
@@ -1982,6 +2031,7 @@ SELECT
 	    WHEN datediff('week',DATE_TRUNC('week',DATE(dt_ccv_signed)),DATE_TRUNC('week',DATE(dt_matricula_atualizada))) >= 20
 	        THEN 'W20+'
     END AS weeks_conversion,
+    rf_type AS region_flow_type,
     NULL::BIGINT AS p2fc,
     NULL::BIGINT AS fc2q,
     NULL::BIGINT AS p2q,
@@ -2017,7 +2067,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_ccv_signed) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 ccv2pc AS (
 SELECT
@@ -2039,6 +2089,7 @@ SELECT
 	 WHEN datediff('week',DATE_TRUNC('week',DATE(dt_ccv_signed)),DATE_TRUNC('week',DATE(dt_payment_concluded))) >= 20
 	      THEN 'W20+'
     END AS weeks_conversion,
+    rf_type AS region_flow_type,
     NULL::BIGINT AS p2fc,
     NULL::BIGINT AS fc2q,
     NULL::BIGINT AS p2q,
@@ -2074,7 +2125,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_ccv_signed) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 union_all AS (
 SELECT * FROM p2fc
@@ -2158,6 +2209,7 @@ SELECT
 	ua.origin_after_offer,
 	ua.form_of_payment,
 	ua.weeks_conversion,
+	ua.region_flow_type,
 	ua.p2fc,
 	ua.fc2q,
 	ua.p2q,
@@ -2216,6 +2268,7 @@ SELECT
 	origin_after_offer,
 	form_of_payment,
 	weeks_conversion,
+	region_flow_type,
 	SUM(p2fc) AS p2fc,
 	SUM(fc2q) AS fc2q,
 	SUM(p2q) AS p2q,
@@ -2266,5 +2319,6 @@ GROUP BY week_start,
 	 origin_before_offer,
 	 origin_after_offer,
 	 form_of_payment,
-	 weeks_conversion
+	 weeks_conversion,
+	 region_flow_type
 ORDER BY 2 DESC
