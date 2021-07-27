@@ -133,7 +133,7 @@ if __name__ == "__main__":
 
     groups_list = consumer_groups.sync(flattened_key="id")
     agents_list = consumer_agents.sync(
-        groups=groups_list, flattened_key="id", executor_type="thread"
+        groups=groups_list, flattened_key="id", executor_type="thread", unique=True
     )
     results = consumer_prospects.sync(
         agents=agents_list,
