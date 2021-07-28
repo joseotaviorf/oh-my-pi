@@ -1,8 +1,5 @@
 import json
 import logging
-import re
-
-from unidecode import unidecode
 
 from argparse import ArgumentParser
 
@@ -27,8 +24,11 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 def __columns_to_alphanumeric_snake_case(df):
     old_columns = df.columns
-    new_columns = [StringFormatter.set_alphanumeric_snake_case(column) for column in old_columns]
+    new_columns = [
+        StringFormatter.set_alphanumeric_snake_case(column) for column in old_columns
+    ]
     return df.toDF(*new_columns)
+
 
 def __generate_schema(data):
 

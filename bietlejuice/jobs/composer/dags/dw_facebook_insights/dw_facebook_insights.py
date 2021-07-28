@@ -52,13 +52,13 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=None,
-    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(chart_url=doc_md_chart_url, dag_id=DAG_ID),
+    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
+        chart_url=doc_md_chart_url, dag_id=DAG_ID
+    ),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag,
-    task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
+    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -91,8 +91,8 @@ dw_task_group = task_group.build_task_group_from_sql_files(
 
 TaskFlowHelper.chain_task_groups_via_common_table(dw_staging_task_group, dw_task_group)
 chain(
-    dw_staging_task_group['dim_facebook_ad']['final_tasks'],
-    dw_staging_task_group.pop('fact_facebook_daily_cost_attributions')['initial_tasks']
+    dw_staging_task_group["dim_facebook_ad"]["final_tasks"],
+    dw_staging_task_group.pop("fact_facebook_daily_cost_attributions")["initial_tasks"],
 )
-chain(create_cluster_task, DWTaskGroup.all_first_tasks(dw_staging_task_group))    
+chain(create_cluster_task, DWTaskGroup.all_first_tasks(dw_staging_task_group))
 chain(DWTaskGroup.all_last_tasks(dw_task_group), terminate_cluster_task)

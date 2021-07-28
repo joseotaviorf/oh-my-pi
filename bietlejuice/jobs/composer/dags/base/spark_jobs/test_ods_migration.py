@@ -171,7 +171,9 @@ class OdsMigrationValidation:
                 df_dw = df_dw.drop(column)
 
         df_all = df_janus.unionByName(df_dw)
-        window = Window.partitionBy(df_janus.columns).rowsBetween(-sys.maxsize, sys.maxsize)
+        window = Window.partitionBy(df_janus.columns).rowsBetween(
+            -sys.maxsize, sys.maxsize
+        )
         df_all = df_all.withColumn(
             "test_control",
             when((count("*").over(window) > 1), "VALID").otherwise(lit("ERROR")),

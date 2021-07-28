@@ -1,5 +1,3 @@
-import re
-from unidecode import unidecode
 from argparse import ArgumentParser
 from pyspark.sql.functions import col, lit, udf
 
@@ -45,7 +43,7 @@ if __name__ == "__main__":
     report_folder = config_service.get_config("report_folder_mapping")[report_type]
 
     logger.info(
-        f"""m=__main__, environment={env}, source={source}, datalake_bucket={datalake_bucket}, 
+        f"""m=__main__, environment={env}, source={source}, datalake_bucket={datalake_bucket},
         report_type={report_type}, execution_date={execution_date}, msg=Starting spark job..."""
     )
 

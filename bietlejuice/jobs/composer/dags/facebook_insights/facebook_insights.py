@@ -36,9 +36,7 @@ TABLES_LIST = config_service.get_config("tables_list")
 
 MAIN_START_DATE = datetime(2019, 6, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
-RAW_SPARK_JOB_FILE = (
-    f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/{CONTEXT}/load_facebook_insights_raw.py"
-)
+RAW_SPARK_JOB_FILE = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/{CONTEXT}/load_facebook_insights_raw.py"
 BASE_SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
 
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
@@ -62,7 +60,9 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(DAG_ID).format(chart_url=DOC_MD_CHART_URL, dag_id=DAG_ID),
+    doc_md=BaseDAG.get_dag_doc(DAG_ID).format(
+        chart_url=DOC_MD_CHART_URL, dag_id=DAG_ID
+    ),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
@@ -91,12 +91,7 @@ for table_name in TABLES_LIST:
         target_database_base_name=SOURCE,
         table_name=table_name,
         extraction_spark_job_file=RAW_SPARK_JOB_FILE,
-        raw_spark_job_extra_args=[
-            SOURCE,
-            CONTEXT,
-            "{{ ds }}",
-            table_name
-        ],
+        raw_spark_job_extra_args=[SOURCE, CONTEXT, "{{ ds }}", table_name],
     )
 
     clean_task_group = task_group.build_clean_task_group(

@@ -89,7 +89,7 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
 
 chain(
     create_cluster_task,
-    datalake_task_group.first_tasks(enrich_task_groups["user_interactions"])
+    datalake_task_group.first_tasks(enrich_task_groups["user_interactions"]),
 )
 
 chain(

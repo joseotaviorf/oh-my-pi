@@ -2,7 +2,7 @@ import os
 import pendulum
 import json
 import pytz
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from airflow.models import DAG
 from airflow.models import Variable
@@ -20,6 +20,7 @@ from bietlejuice.jobs.composer.services import FileService
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
+
 
 def check_run_hour(schedule_hours, dag_execution_date):
     brt_tz = pytz.timezone("America/Sao_Paulo")

@@ -2,9 +2,8 @@ import os
 
 import mock
 import pytest
-from mock import patch, call
+from mock import call
 
-from bietlejuice.jobs.composer.dags import COMPOSER_DAGS_PATH
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
