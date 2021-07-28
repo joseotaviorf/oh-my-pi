@@ -5,22 +5,15 @@ SELECT
     region_id AS id_region,
     city,
     complement,
-    house_number,
+    CAST(house_number AS INT) AS house_number,
     street_address,
     state,
-    version, 
-    floor,
-    rent_price,
-    reservation_fee,
+    CAST(version AS SMALLINT) AS version, 
+    CAST(floor AS SMALLINT) AS floor,
+    CAST(rent_price AS FLOAT) AS rent_price,
+    CAST(reservation_fee AS FLOAT) AS reservation_fee,
     CAST(reservation_allowed AS BOOLEAN) AS is_reservation_allowed,
     TIMESTAMP(created_at) AS ts_created,
-    TIMESTAMP(updated_at) AS ts_updated,
-    year,
-    month,
-    day
+    TIMESTAMP(updated_at) AS ts_updated
 FROM
     datalake_kill_queue_raw.house
-WHERE 
-    year = {year}
-    AND month = {month}
-    AND day = {day}

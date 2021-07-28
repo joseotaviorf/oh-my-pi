@@ -1,17 +1,13 @@
 ---
 tables:
   - table_name: charge
-    extraction_type: incremental
-    date_filter_column: updated_at
+    extraction_type: full
   - table_name: documentation
-    extraction_type: incremental
-    date_filter_column: updated_at
+    extraction_type: full
   - table_name: house
-    extraction_type: incremental
-    date_filter_column: updated_at
+    extraction_type: full
   - table_name: reservation
-    extraction_type: incremental
-    date_filter_column: updated_at
+    extraction_type: full
   - table_name: revinfo
     clean_table_name: rev_info
     extraction_type: incremental

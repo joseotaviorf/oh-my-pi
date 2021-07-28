@@ -7,13 +7,6 @@ SELECT
     CAST(expires_at AS TIMESTAMP) AS ts_expired,
     CAST(event_date AS TIMESTAMP) AS ts_event,
     CAST(created_at AS TIMESTAMP) AS ts_created,
-    CAST(updated_at AS TIMESTAMP) AS ts_updated,
-    year,
-    month,
-    day
+    CAST(updated_at AS TIMESTAMP) AS ts_updated
 FROM
     datalake_kill_queue_raw.documentation
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
