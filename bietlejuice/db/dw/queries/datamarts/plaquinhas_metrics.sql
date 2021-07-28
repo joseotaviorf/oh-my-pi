@@ -4,7 +4,7 @@ WITH phone_users_number AS (
     FROM
         call.dim_call dc
     WHERE
-        dc.to_phone_number in ('+5511933058701', '+5531933007908')
+        dc.to_phone_number in ('+5511933058701', '+5531933007908', '+5540202507')
     GROUP BY 1 
 ), 
 chat_users_number AS (
