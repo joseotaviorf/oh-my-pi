@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS facebook_insights.dim_facebook_social_costs (
     platform_position VARCHAR,
     publisher_platform VARCHAR,
     ts_load TIMESTAMP
-)
+);
 ALTER TABLE facebook_insights.dim_facebook_social_costs OWNER TO databricks;
 
 CALL grant_all_permissions_on_schema('facebook_insights');

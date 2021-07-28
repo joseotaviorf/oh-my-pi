@@ -1,3 +1,5 @@
+CREATE SCHEMA IF NOT EXISTS linkedin;
+
 DROP TABLE IF EXISTS linkedin.fact_linkedin_daily_cost_attributions;
 CREATE TABLE IF NOT EXISTS linkedin.fact_linkedin_daily_cost_attributions(
   sk_creative                                   VARCHAR(100),
