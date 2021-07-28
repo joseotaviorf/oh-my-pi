@@ -19,7 +19,7 @@ LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 8, 29, 0, 0, 0, tzinfo=LOCAL_TZ)
 
 DW_SCHEMA = "quintoandar"
-CONTEXT = "dim_listing_owner"
+CONTEXT = "listing_owners"
 DAG_NAME = f"dw_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 

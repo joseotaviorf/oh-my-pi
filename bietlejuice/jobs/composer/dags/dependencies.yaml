@@ -55,7 +55,7 @@ bietlejuice.dw_call:
 bietlejuice.dw_chattermill:
   - bietlejuice.enrich_chattermill:load-enrich-responses
 
-bietlejuice.dw_dim_listing_owner:
+bietlejuice.dw_listing_owners:
   - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
   - bietlejuice.ebdb:create-clean-user-preferences-in-data-lake
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context

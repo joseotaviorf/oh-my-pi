@@ -1,4 +1,4 @@
-## DW Dim Listing Owner
+## DW Listing Owners
 
 ### Purpose
 
@@ -12,9 +12,9 @@ This DAG is triggered daily, via Mediator. More information about run time [here
 
 ### Outputs
 
-This pipeline produces the following output table in DW, schema `quintoandar`, via full load: 
+This pipeline produces the following output table in DW, via full load: 
 
-- `dim_listing_owner` – Contains information about users with login that are responsible (manager) for a listing at QuintoAndar. Note that they do not have to be the property owners (but could also be). These could be individuals, property managers, employees of real estate companies (B2B). Each line is a user.
+- `quintoandar.dim_listing_owner` – Contains information about users with login that are responsible (manager) for a listing at QuintoAndar. Note that they do not have to be the property owners (but could also be). These could be individuals, property managers, employees of real estate companies (B2B). Each line is a user.
 
 ### Responsible Data Teams
 
