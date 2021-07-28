@@ -1,19 +1,19 @@
 WITH clean_table_common AS (
     SELECT DISTINCT
-        id AS sk_video,
+	    SHA2(CONCAT(id_external_customer, id_video, campaign_name, ad_group_name, device), 256) AS sk_video,
         id_video,
         ad_group_name,
         campaign_name,
-        is_test_campaign,
         device,
-        acc AS account_name,
+        account_snake_case AS account_name,
         account_descriptive_name,
         report_type,
-        load_date
+        (campaign_name LIKE 'ZEBRA%') AS is_test_campaign,
+        dt_loaded
     FROM 
-        datalake_marketing_costs.google_videos_performance_report
+        datalake_google_ads_clean.videos_performance_report
     WHERE
-        load_date = DATE('{year}-{month}-{day}')
+        dt_loaded = DATE('{year}-{month}-{day}')
 )
 SELECT 
     clean_table_common.*,

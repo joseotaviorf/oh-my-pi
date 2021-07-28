@@ -5,9 +5,9 @@ WITH campaing_reports AS (
         id_campaign,
         'ads_performance_report' AS report_type
     FROM 
-        datalake_marketing_costs.google_ads_performance_report
+        datalake_google_ads_clean.ads_performance_report
     WHERE
-        load_date = DATE('{year}-{month}-{day}')
+        dt_loaded = DATE('{year}-{month}-{day}')
 
     UNION ALL
 
@@ -16,9 +16,9 @@ WITH campaing_reports AS (
         id_campaign, 
         'keywords_performance_report' AS report_type 
     FROM 
-        datalake_marketing_costs.google_keywords_performance_report
+        datalake_google_ads_clean.keywords_performance_report
     WHERE
-        load_date = DATE('{year}-{month}-{day}')
+        dt_loaded = DATE('{year}-{month}-{day}')
 
     UNION ALL
 
@@ -27,9 +27,9 @@ WITH campaing_reports AS (
         id_campaign, 
         'campaigns_performance_report' AS report_type 
     FROM 
-        datalake_marketing_costs.google_campaigns_performance_report
+        datalake_google_ads_clean.campaigns_performance_report
     WHERE
-        load_date = DATE('{year}-{month}-{day}')
+        dt_loaded = DATE('{year}-{month}-{day}')
 
     UNION ALL
 
@@ -38,9 +38,9 @@ WITH campaing_reports AS (
         id_campaign, 
         'videos_performance_report' AS report_type 
     FROM 
-        datalake_marketing_costs.google_videos_performance_report
+        datalake_google_ads_clean.videos_performance_report
     WHERE
-        load_date = DATE('{year}-{month}-{day}')
+        dt_loaded = DATE('{year}-{month}-{day}')
 ),
 
 pivot_campaign_reports AS (
@@ -99,7 +99,7 @@ campaign_main_report_type AS (
 
 keywords_costs AS (
     SELECT
-        INT(REPLACE(gkpr.load_date, '-', '')) AS id_date,
+        INT(REPLACE(gkpr.dt_loaded, '-', '')) AS id_date,
         gkpr.campaign_name,
         LOWER(
             CASE WHEN SPLIT(gkpr.campaign_name, '\\.')[1] RLIKE '[0-9]+$' THEN
@@ -124,19 +124,19 @@ keywords_costs AS (
         END) AS mobile_cost,
         SUM(cost/1000000) AS total_cost
     FROM
-        datalake_marketing_costs.google_keywords_performance_report gkpr
+        datalake_google_ads_clean.keywords_performance_report gkpr
         JOIN campaign_main_report_type cmrt 
             ON cmrt.id_campaign = gkpr.id_campaign 
             AND cmrt.report_type = 'keywords_performance_report'
     WHERE
-        load_date = DATE('{year}-{month}-{day}')
+        dt_loaded = DATE('{year}-{month}-{day}')
     GROUP BY
         1,2,3,4,5,6,7,8
 ),
 
 ads_costs AS (
     SELECT
-        INT(REPLACE(gapr.load_date, '-', '')) AS id_date,
+        INT(REPLACE(gapr.dt_loaded, '-', '')) AS id_date,
         gapr.campaign_name,
         LOWER(
             CASE WHEN SPLIT(gapr.campaign_name, '\\.')[1] RLIKE '[0-9]+$' THEN
@@ -161,21 +161,21 @@ ads_costs AS (
         END) AS mobile_cost,
         SUM(cost/1000000) AS total_cost
     FROM
-        datalake_marketing_costs.google_ads_performance_report gapr
+        datalake_google_ads_clean.ads_performance_report gapr
         JOIN campaign_main_report_type cmrt 
             ON cmrt.id_campaign = gapr.id_campaign 
             AND cmrt.report_type = gapr.report_type
         LEFT JOIN datalake_gsheets_clean.marketing_costs_google_ad_type_flags ad_types
             ON ad_types.ad_type = gapr.ad_type
     WHERE
-        load_date = DATE('{year}-{month}-{day}')
+        dt_loaded = DATE('{year}-{month}-{day}')
     GROUP BY
         1,2,3,4,5,6,7,8
 ),
 
 campaigns_costs AS (
     SELECT
-        INT(REPLACE(gcpr.load_date, '-', '')) AS id_date,
+        INT(REPLACE(gcpr.dt_loaded, '-', '')) AS id_date,
         gcpr.campaign_name,
         LOWER(
             CASE WHEN SPLIT(gcpr.campaign_name, '\\.')[1] RLIKE '[0-9]+$' THEN
@@ -200,19 +200,19 @@ campaigns_costs AS (
         END) AS mobile_cost,
         SUM(cost/1000000) AS total_cost
     FROM
-        datalake_marketing_costs.google_campaigns_performance_report gcpr
+        datalake_google_ads_clean.campaigns_performance_report gcpr
         JOIN campaign_main_report_type cmrt 
             ON cmrt.id_campaign = gcpr.id_campaign 
             AND cmrt.report_type = gcpr.report_type
     WHERE
-        load_date = DATE('{year}-{month}-{day}')
+        dt_loaded = DATE('{year}-{month}-{day}')
     GROUP BY
         1,2,3,4,5,6,7,8
 ),
 
 videos_costs AS (
     SELECT
-        INT(REPLACE(gvpr.load_date, '-', '')) AS id_date,
+        INT(REPLACE(gvpr.dt_loaded, '-', '')) AS id_date,
         gvpr.campaign_name,
         LOWER(
             CASE WHEN SPLIT(gvpr.campaign_name, '\\.')[1] RLIKE '[0-9]+$' THEN
@@ -237,12 +237,12 @@ videos_costs AS (
         END) AS mobile_cost,
         SUM(cost/1000000) AS total_cost
     FROM
-        datalake_marketing_costs.google_videos_performance_report gvpr
+        datalake_google_ads_clean.videos_performance_report gvpr
         JOIN campaign_main_report_type cmrt 
             ON cmrt.id_campaign = gvpr.id_campaign 
             AND cmrt.report_type = gvpr.report_type
     WHERE
-        load_date = DATE('{year}-{month}-{day}')
+        dt_loaded = DATE('{year}-{month}-{day}')
     GROUP BY
         1,2,3,4,5,6,7,8
 )

@@ -1,19 +1,19 @@
 WITH clean_table_common AS (
     SELECT DISTINCT
-        id AS sk_ad,
+        SHA2(CONCAT(id_external_customer, id_ad, campaign_name, ad_group_name, device), 256) AS sk_ad,
         id_ad,
-        acc AS account_name,
         campaign_name,
         ad_group_name,
-        account_descriptive_name,
         ad_type,
-        is_test_campaign,
+        account_snake_case AS account_name,
+        account_descriptive_name,
         report_type,
-        load_date
+        (campaign_name LIKE 'ZEBRA%') AS is_test_campaign,
+        dt_loaded
     FROM 
-        datalake_marketing_costs.google_ads_performance_report
+        datalake_google_ads_clean.ads_performance_report
     WHERE
-        load_date = DATE('{year}-{month}-{day}')
+        dt_loaded = DATE('{year}-{month}-{day}')
 )
 SELECT 
     clean_table_common.*,

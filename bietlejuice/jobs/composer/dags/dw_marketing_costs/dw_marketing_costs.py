@@ -57,8 +57,8 @@ MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz)
 
 MEDIA_DAG_PARAMETERS = {
     "google": {
-        "partitions": ["load_date"],
-        "dw_query_filters": {"load_date": "date('{year}-{month}-{day}')"},
+        "partitions": ["dt_loaded"],
+        "dw_query_filters": {"dt_loaded": "date('{year}-{month}-{day}')"},
     },
     "facebook_insights": {
         "partitions": ["year", "month", "day"],

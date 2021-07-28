@@ -2,7 +2,7 @@
 
 WITH computer_devices_ads AS (
     SELECT 
-        id,
+        SHA2(CONCAT(id_external_customer, id_ad, campaign_name, ad_group_name, device), 256) AS id,
         id_ad,
         id_campaign,
         id_external_customer,
@@ -12,19 +12,18 @@ WITH computer_devices_ads AS (
         SUM(coalesce(cast(clicks AS INTEGER), 0)) AS total_clicks,
         SUM(coalesce(cast(cost AS FLOAT), 0)) / 1000000 AS total_cost,
         SUM(coalesce(cast(impressions AS INTEGER), 0)) AS impressions,
-        dt_load,
-        load_date
+        dt_loaded
     FROM 
-        datalake_marketing_costs.google_ads_performance_report
+        datalake_google_ads_clean.ads_performance_report
     WHERE 
         device = 'Computers'
-        AND load_date = DATE('{year}-{month}-{day}')
+        AND dt_loaded = DATE('{year}-{month}-{day}')
     GROUP BY 
         1,2,3,4,5,6,7,11,12
 ),
 mobile_devices_ads AS (
     SELECT 
-        id,
+        SHA2(CONCAT(id_external_customer, id_ad, campaign_name, ad_group_name, device), 256) AS id,
         id_ad,
         id_campaign,
         id_external_customer,
@@ -34,19 +33,18 @@ mobile_devices_ads AS (
         SUM(coalesce(cast(clicks AS INTEGER), 0)) AS total_clicks,
         SUM(coalesce(cast(cost AS FLOAT), 0)) / 1000000 AS total_cost,
         SUM(coalesce(cast(impressions AS INTEGER), 0)) AS impressions,
-        dt_load,
-        load_date
+        dt_loaded
     FROM 
-        datalake_marketing_costs.google_ads_performance_report
+        datalake_google_ads_clean.ads_performance_report
     WHERE 
         device = 'Mobile devices with full browsers'
-        AND load_date = DATE('{year}-{month}-{day}')
+        AND dt_loaded = DATE('{year}-{month}-{day}')
     GROUP BY 
         1,2,3,4,5,6,7,11,12
 ),
 tablet_devices_ads AS (
     SELECT
-        id,
+        SHA2(CONCAT(id_external_customer, id_ad, campaign_name, ad_group_name, device), 256) AS id,
         id_ad,
         id_campaign,
         id_external_customer,
@@ -56,28 +54,28 @@ tablet_devices_ads AS (
         SUM(coalesce(cast(clicks AS INTEGER), 0)) AS total_clicks,
         SUM(coalesce(cast(cost AS FLOAT), 0)) / 1000000 AS total_cost,
         SUM(coalesce(cast(impressions AS INTEGER), 0)) AS impressions,
-        dt_load,
-        load_date
+        dt_loaded
     FROM 
-        datalake_marketing_costs.google_ads_performance_report
+        datalake_google_ads_clean.ads_performance_report
     WHERE 
         device = 'Tablets with full browsers'
-        AND load_date = DATE('{year}-{month}-{day}')
+        AND dt_loaded = DATE('{year}-{month}-{day}')
     GROUP BY 
         1,2,3,4,5,6,7,11,12
 ),
 cte_ads AS (
     SELECT 
-        google_table.id,
-        CAST(REPLACE(google_table.dt_load, '-', '') AS INTEGER) AS sk_date,
-        BIGINT(google_table.id_ad),
-        google_table.id_external_customer,
-        google_table.id_campaign,
-        google_table.id_ad_group,
-        google_table.account_name,
-        google_table.campaign_name,
-        google_table.ad_group_name,
-        google_table.ad_type,
+        SHA2(CONCAT(gads.id_external_customer, gads.id_ad, gads.campaign_name, gads.ad_group_name, gads.device), 256) AS id,
+        CAST(REPLACE(gads.dt_loaded, '-', '') AS INTEGER) AS sk_date,
+        BIGINT(gads.id_ad),
+        gads.id_external_customer,
+        gads.id_campaign,
+        gads.id_ad_group,
+        gads.account_descriptive_name,
+        gads.account_snake_case,
+        gads.campaign_name,
+        gads.ad_group_name,
+        gads.ad_type,
         COALESCE(mobile_devices_ads.total_clicks, 0) AS mobile_clicks,
         COALESCE(tablet_devices_ads.total_clicks, 0) AS tablet_clicks,
         COALESCE(computer_devices_ads.total_clicks, 0) AS computer_clicks,
@@ -89,21 +87,20 @@ cte_ads AS (
         COALESCE(tablet_devices_ads.impressions, 0) AS tablet_impressions,
         COALESCE(computer_devices_ads.impressions, 0) AS desktop_impressions,
         (COALESCE(mobile_devices_ads.impressions, 0) + COALESCE(tablet_devices_ads.impressions, 0) + COALESCE(computer_devices_ads.impressions, 0)) AS impressions,
-        google_table.acc,
-        google_table.load_date
+        gads.dt_loaded
     FROM 
-        datalake_marketing_costs.google_ads_performance_report google_table
+        datalake_google_ads_clean.ads_performance_report gads
         LEFT JOIN computer_devices_ads
-            ON computer_devices_ads.id = google_table.id
-            AND computer_devices_ads.dt_load = google_table.dt_load
+            ON computer_devices_ads.id = gads.id
+            AND computer_devices_ads.dt_loaded = gads.dt_loaded
         LEFT JOIN mobile_devices_ads
-            ON mobile_devices_ads.id = google_table.id
-            AND mobile_devices_ads.dt_load = google_table.dt_load
+            ON mobile_devices_ads.id = gads.id
+            AND mobile_devices_ads.dt_loaded = gads.dt_loaded
         LEFT JOIN tablet_devices_ads
-            ON tablet_devices_ads.id = google_table.id
-            AND tablet_devices_ads.dt_load = google_table.dt_load
+            ON tablet_devices_ads.id = gads.id
+            AND tablet_devices_ads.dt_loaded = gads.dt_loaded
         WHERE
-            google_table.load_date = DATE('{year}-{month}-{day}')
+            gads.dt_loaded = DATE('{year}-{month}-{day}')
 ), 
 final_cte_ads AS (
     SELECT
@@ -129,7 +126,7 @@ final_cte_ads AS (
         SUM(cte_ads.desktop_impressions) AS desktop_impressions,
         SUM(cte_ads.impressions) AS impressions,
         NOW() AS ts_load,
-        cte_ads.load_date
+        cte_ads.dt_loaded
     FROM 
         cte_ads
         LEFT JOIN dw_marketing_costs_staging.dim_google_ad dim
@@ -143,7 +140,7 @@ final_cte_ads AS (
 
 computer_devices_keywords AS (
     SELECT 
-        id,
+        SHA2(CONCAT(id_external_customer, id_keyword, campaign_name, ad_group_name, device), 256) AS id,
         id_keyword,
         id_campaign,
         id_external_customer,
@@ -153,19 +150,18 @@ computer_devices_keywords AS (
         SUM(COALESCE(CAST(clicks AS INTEGER), 0)) AS total_clicks,
         SUM(COALESCE(CAST(cost AS FLOAT), 0)) / 1000000 AS total_cost,
         MAX(COALESCE(CAST(impressions AS INTEGER), 0)) AS impressions,
-        dt_load,
-        load_date
+        dt_loaded
     FROM 
-        datalake_marketing_costs.google_keywords_performance_report
+        datalake_google_ads_clean.keywords_performance_report
     WHERE 
         device = 'Computers'
-        AND load_date = DATE('{year}-{month}-{day}')
+        AND dt_loaded = DATE('{year}-{month}-{day}')
     GROUP BY 
         1,2,3,4,5,6,7,11,12
 ),
 mobile_devices_keywords AS (
     SELECT 
-        id,
+        SHA2(CONCAT(id_external_customer, id_keyword, campaign_name, ad_group_name, device), 256) AS id,
         id_keyword,
         id_campaign,
         id_external_customer,
@@ -175,19 +171,18 @@ mobile_devices_keywords AS (
         SUM(COALESCE(CAST(clicks AS INTEGER), 0)) AS total_clicks,
         SUM(COALESCE(CAST(cost AS FLOAT), 0)) / 1000000 AS total_cost,
         MAX(COALESCE(CAST(impressions AS INTEGER), 0)) AS impressions,
-        dt_load,
-        load_date
+        dt_loaded
     FROM 
-        datalake_marketing_costs.google_keywords_performance_report
+        datalake_google_ads_clean.keywords_performance_report
     WHERE 
         device = 'Mobile devices with full browsers'
-        AND load_date = DATE('{year}-{month}-{day}')
+        AND dt_loaded = DATE('{year}-{month}-{day}')
     GROUP BY 
         1,2,3,4,5,6,7,11,12
 ),
 tablet_devices_keywords AS (
     SELECT 
-        id,
+        SHA2(CONCAT(id_external_customer, id_keyword, campaign_name, ad_group_name, device), 256) AS id,
         id_keyword,
         id_campaign,
         id_external_customer,
@@ -197,28 +192,28 @@ tablet_devices_keywords AS (
         SUM(COALESCE(CAST(clicks AS INTEGER), 0)) AS total_clicks,
         SUM(COALESCE(CAST(cost AS FLOAT), 0)) / 1000000 AS total_cost,
         MAX(COALESCE(CAST(impressions AS INTEGER), 0)) AS impressions,
-        dt_load,
-        load_date
+        dt_loaded
     FROM 
-        datalake_marketing_costs.google_keywords_performance_report
+        datalake_google_ads_clean.keywords_performance_report
     WHERE 
         device = 'Tablets with full browsers'
-        AND load_date = DATE('{year}-{month}-{day}')
+        AND dt_loaded = DATE('{year}-{month}-{day}')
     GROUP BY 
         1,2,3,4,5,6,7,11,12
 ),
 cte_keywords AS (
     SELECT 
-        google_table.id,
-        CAST(replace(google_table.dt_load, '-', '') AS INTEGER) AS sk_date,
-        google_table.id_keyword,
-        google_table.id_external_customer,
-        google_table.id_campaign,
-        google_table.id_ad_group,
-        google_table.account_descriptive_name,
-        google_table.campaign_name,
-        google_table.ad_group_name,
-        google_table.match_type,
+        SHA2(CONCAT(gads.d_external_customer, gads.id_keyword, gads.campaign_name, gads.ad_group_name, gads.device), 256) AS id,
+        CAST(replace(gads.dt_loaded, '-', '') AS INTEGER) AS sk_date,
+        gads.id_keyword,
+        gads.id_external_customer,
+        gads.id_campaign,
+        gads.id_ad_group,
+        gads.account_descriptive_name,
+        gads.account_snake_case,
+        gads.campaign_name,
+        gads.ad_group_name,
+        gads.match_type,
         COALESCE(mobile_devices_keywords.total_clicks, 0) AS mobile_clicks,
         COALESCE(tablet_devices_keywords.total_clicks, 0) AS tablet_clicks,
         COALESCE(computer_devices_keywords.total_clicks, 0) AS computer_clicks,
@@ -230,21 +225,20 @@ cte_keywords AS (
         COALESCE(tablet_devices_keywords.impressions, 0)  AS tablet_impressions,
         COALESCE(computer_devices_keywords.impressions, 0)  AS desktop_impressions,
         (COALESCE(mobile_devices_keywords.impressions, 0) + COALESCE(tablet_devices_keywords.impressions, 0) + COALESCE(computer_devices_keywords.impressions, 0)) AS impressions,
-        google_table.acc,
-        google_table.load_date
+        gads.dt_loaded
 FROM 
-    datalake_marketing_costs.google_keywords_performance_report google_table
+    datalake_google_ads_clean.keywords_performance_report gads
     LEFT JOIN computer_devices_keywords
-        ON computer_devices_keywords.id = google_table.id
-        AND computer_devices_keywords.dt_load = google_table.dt_load
+        ON computer_devices_keywords.id = gads.id
+        AND computer_devices_keywords.dt_loaded = gads.dt_loaded
     LEFT JOIN mobile_devices_keywords
-        ON mobile_devices_keywords.id = google_table.id
-        AND mobile_devices_keywords.dt_load = google_table.dt_load
+        ON mobile_devices_keywords.id = gads.id
+        AND mobile_devices_keywords.dt_loaded = gads.dt_loaded
     LEFT JOIN tablet_devices_keywords
-        ON tablet_devices_keywords.id = google_table.id
-        AND tablet_devices_keywords.dt_load = google_table.dt_load
+        ON tablet_devices_keywords.id = gads.id
+        AND tablet_devices_keywords.dt_loaded = gads.dt_loaded
 WHERE 
-    google_table.load_date = DATE('{year}-{month}-{day}')
+    gads.dt_loaded = DATE('{year}-{month}-{day}')
 ), 
 final_cte_keywords AS (
     SELECT
@@ -270,7 +264,7 @@ final_cte_keywords AS (
         SUM(cte_keywords.desktop_impressions) AS desktop_impressions,
         SUM(cte_keywords.impressions) AS impressions,
         NOW() AS ts_load,
-        cte_keywords.load_date
+        cte_keywords.dt_loaded
     FROM 
         cte_keywords
         LEFT JOIN dw_marketing_costs_staging.dim_google_keyword dim
@@ -284,7 +278,7 @@ final_cte_keywords AS (
 
 computer_devices_campaigns AS (
     SELECT 
-        id,
+        SHA2(CONCAT(id_external_customer, id_campaign, campaign_name, device), 256) AS id,
         id_campaign,
         id_external_customer,
         campaign_name,
@@ -292,19 +286,18 @@ computer_devices_campaigns AS (
         SUM(COALESCE(CAST(clicks AS integer), 0)) AS total_clicks,
         SUM(COALESCE(CAST(cost AS float), 0)) / 1000000 AS total_cost,
         MAX(COALESCE(CAST(impressions AS integer), 0)) AS impressions,
-        dt_load,
-        load_date
+        dt_loaded
     FROM 
-        datalake_marketing_costs.google_campaigns_performance_report
+        datalake_google_ads_clean.campaigns_performance_report
     WHERE 
         device = 'Computers'
-        AND load_date = date('{year}-{month}-{day}')
+        AND dt_loaded = DATE('{year}-{month}-{day}')
     GROUP BY 
         1,2,3,4,5,9,10
 ),
 mobile_devices_campaigns AS (
     SELECT 
-        id,
+        SHA2(CONCAT(id_external_customer, id_campaign, campaign_name, device), 256) AS id,
         id_campaign,
         id_external_customer,
         campaign_name,
@@ -312,19 +305,18 @@ mobile_devices_campaigns AS (
         SUM(COALESCE(CAST(clicks AS integer), 0)) AS total_clicks,
         SUM(COALESCE(CAST(cost AS float), 0)) / 1000000 AS total_cost,
         MAX(COALESCE(CAST(impressions AS integer), 0)) AS impressions,
-        dt_load,
-        load_date
+        dt_loaded
     FROM 
-        datalake_marketing_costs.google_campaigns_performance_report
+        datalake_google_ads_clean.campaigns_performance_report
     WHERE 
         device = 'Mobile devices with full browsers'
-        AND load_date = date('{year}-{month}-{day}')
+        AND dt_loaded = date('{year}-{month}-{day}')
     GROUP BY 
         1,2,3,4,5,9,10
 ),
 tablet_devices_campaigns AS (
     SELECT
-        id,
+        SHA2(CONCAT(id_external_customer, id_campaign, campaign_name, device), 256) AS id,
         id_campaign,
         id_external_customer,
         campaign_name,
@@ -332,24 +324,24 @@ tablet_devices_campaigns AS (
         SUM(COALESCE(CAST(clicks AS integer), 0)) AS total_clicks,
         SUM(COALESCE(CAST(cost AS float), 0)) / 1000000 AS total_cost,
         MAX(COALESCE(CAST(impressions AS integer), 0)) AS impressions,
-        dt_load,
-        load_date
+        dt_loaded
     FROM 
-        datalake_marketing_costs.google_campaigns_performance_report
+        datalake_google_ads_clean.campaigns_performance_report
     WHERE 
         device = 'Tablets with full browsers'
-        AND load_date = date('{year}-{month}-{day}')
+        AND dt_loaded = date('{year}-{month}-{day}')
     GROUP BY 
         1,2,3,4,5,9,10
 ),
 cte_campaigns AS (
     SELECT 
-        google_table.id AS id,
-        CAST(REPLACE(google_table.dt_load, '-', '') AS integer) AS sk_date,
-        google_table.id_external_customer,
-        google_table.id_campaign,
-        google_table.account_descriptive_name,
-        google_table.campaign_name,
+        SHA2(CONCAT(gads.id_external_customer, gads.id_campaign, gads.campaign_name, gads.device), 256) AS id,
+        CAST(REPLACE(gads.dt_loaded, '-', '') AS integer) AS sk_date,
+        gads.id_external_customer,
+        gads.id_campaign,
+        gads.account_descriptive_name,
+        gads.account_snake_case,
+        gads.campaign_name,
         COALESCE(mobile_devices_campaigns.total_clicks, 0) AS mobile_clicks,
         COALESCE(tablet_devices_campaigns.total_clicks, 0) AS tablet_clicks,
         COALESCE(computer_devices_campaigns.total_clicks, 0) AS computer_clicks,
@@ -361,21 +353,20 @@ cte_campaigns AS (
         COALESCE(tablet_devices_campaigns.impressions, 0) AS tablet_impressions,
         COALESCE(computer_devices_campaigns.impressions, 0) AS desktop_impressions,
         (COALESCE(mobile_devices_campaigns.impressions, 0) + COALESCE(tablet_devices_campaigns.impressions, 0) + COALESCE(computer_devices_campaigns.impressions, 0)) AS impressions,
-        google_table.acc,
-        google_table.load_date
+        gads.dt_loaded
 FROM 
-    datalake_marketing_costs.google_campaigns_performance_report google_table
+    datalake_google_ads_clean.campaigns_performance_report gads
     LEFT JOIN computer_devices_campaigns
-        ON computer_devices_campaigns.id = google_table.id
-        AND computer_devices_campaigns.dt_load = google_table.dt_load
+        ON computer_devices_campaigns.id = gads.id
+        AND computer_devices_campaigns.dt_loaded = gads.dt_loaded
     LEFT JOIN mobile_devices_campaigns
-        ON mobile_devices_campaigns.id = google_table.id
-        AND mobile_devices_campaigns.dt_load = google_table.dt_load
+        ON mobile_devices_campaigns.id = gads.id
+        AND mobile_devices_campaigns.dt_loaded = gads.dt_loaded
     LEFT JOIN tablet_devices_campaigns
-        ON tablet_devices_campaigns.id = google_table.id
-        AND tablet_devices_campaigns.dt_load = google_table.dt_load
+        ON tablet_devices_campaigns.id = gads.id
+        AND tablet_devices_campaigns.dt_loaded = gads.dt_loaded
 WHERE
-    google_table.load_date = date('{year}-{month}-{day}')
+    gads.dt_loaded = date('{year}-{month}-{day}')
 ),
 final_cte_campaigns as (
     SELECT
@@ -401,7 +392,7 @@ final_cte_campaigns as (
         SUM(cte_campaigns.desktop_impressions) AS desktop_impressions,
         SUM(cte_campaigns.impressions) AS impressions,
         now() AS ts_load,
-        cte_campaigns.load_date
+        cte_campaigns.dt_loaded
     FROM 
         cte_campaigns
         LEFT JOIN dw_marketing_costs_staging.dim_google_campaign dim
@@ -415,7 +406,7 @@ final_cte_campaigns as (
 
 computer_devices_videos AS (
     SELECT 
-        id,
+	    SHA2(CONCAT(id_external_customer, id_video, campaign_name, ad_group_name, device), 256) AS id,
         id_video,
         id_campaign,
         id_external_customer,
@@ -425,19 +416,18 @@ computer_devices_videos AS (
         SUM(COALESCE(CAST(clicks AS INTEGER), 0)) AS total_clicks,
         SUM(COALESCE(CAST(cost AS FLOAT), 0)) / 1000000 AS total_cost,
         SUM(COALESCE(CAST(impressions AS INTEGER), 0)) AS impressions,
-        dt_load,
-        load_date
+        dt_loaded
     FROM 
-        datalake_marketing_costs.google_videos_performance_report
+        datalake_google_ads_clean.videos_performance_report
     WHERE 
         device = 'Computers'
-        AND load_date = DATE('{year}-{month}-{day}')
+        AND dt_loaded = DATE('{year}-{month}-{day}')
     GROUP BY 
         1,2,3,4,5,6,7,11,12
 ),
 mobile_devices_videos AS (
     SELECT 
-        id,
+	    SHA2(CONCAT(id_external_customer, id_video, campaign_name, ad_group_name, device), 256) AS id,
         id_video,
         id_campaign,
         id_external_customer,
@@ -447,19 +437,18 @@ mobile_devices_videos AS (
         SUM(COALESCE(CAST(clicks AS INTEGER), 0)) AS total_clicks,
         SUM(COALESCE(CAST(cost AS FLOAT), 0)) / 1000000 AS total_cost,
         SUM(COALESCE(CAST(impressions AS INTEGER), 0)) AS impressions,
-        dt_load,
-        load_date
+        dt_loaded
     FROM 
-        datalake_marketing_costs.google_videos_performance_report
+        datalake_google_ads_clean.videos_performance_report
     WHERE 
         device = 'Mobile devices with full browsers'
-        AND load_date = DATE('{year}-{month}-{day}')
+        AND dt_loaded = DATE('{year}-{month}-{day}')
     GROUP BY 
         1,2,3,4,5,6,7,11,12
 ),
 tablet_devices_videos AS (
     SELECT 
-        id,
+	    SHA2(CONCAT(id_external_customer, id_video, campaign_name, ad_group_name, device), 256) AS id,
         id_video,
         id_campaign,
         id_external_customer,
@@ -469,27 +458,27 @@ tablet_devices_videos AS (
         SUM(COALESCE(CAST(clicks AS INTEGER), 0)) AS total_clicks,
         SUM(COALESCE(CAST(cost AS FLOAT), 0)) / 1000000 AS total_cost,
         SUM(COALESCE(CAST(impressions AS INTEGER), 0)) AS impressions,
-        dt_load,
-        load_date
+        dt_loaded
     FROM 
-        datalake_marketing_costs.google_videos_performance_report
+        datalake_google_ads_clean.videos_performance_report
     WHERE 
         device = 'Tablets with full browsers'
-        AND load_date = DATE('{year}-{month}-{day}')
+        AND dt_loaded = DATE('{year}-{month}-{day}')
     GROUP BY 
         1,2,3,4,5,6,7,11,12
 ),
 cte_videos AS (
     SELECT 
-        google_table.id,
-        CAST(REPLACE(google_table.dt_load, '-', '') AS INTEGER) AS sk_date,
-        google_table.id_video,
-        google_table.id_external_customer,
-        google_table.id_campaign,
-        google_table.id_ad_group,
-        google_table.acc,
-        google_table.campaign_name,
-        google_table.ad_group_name,
+	    SHA2(CONCAT(gads.id_external_customer, gads.id_video, gads.campaign_name, gads.ad_group_name, gads.device), 256) AS id,
+        CAST(REPLACE(gads.dt_loaded, '-', '') AS INTEGER) AS sk_date,
+        gads.id_video,
+        gads.id_external_customer,
+        gads.id_campaign,
+        gads.id_ad_group,
+        gads.account_descriptive_name,
+        gads.account_snake_case,
+        gads.campaign_name,
+        gads.ad_group_name,
         COALESCE(mobile_devices_videos.total_clicks, 0) AS mobile_clicks,
         COALESCE(tablet_devices_videos.total_clicks, 0) AS tablet_clicks,
         COALESCE(computer_devices_videos.total_clicks, 0) AS computer_clicks,
@@ -501,20 +490,19 @@ cte_videos AS (
         COALESCE(tablet_devices_videos.impressions, 0) AS tablet_impressions,
         COALESCE(computer_devices_videos.impressions, 0) AS desktop_impressions,
         (COALESCE(mobile_devices_videos.impressions, 0) + COALESCE(tablet_devices_videos.impressions, 0) + COALESCE(computer_devices_videos.impressions, 0)) AS impressions,
-        google_table.acc,
-        google_table.load_date
-FROM datalake_marketing_costs.google_videos_performance_report google_table
+        gads.dt_loaded
+FROM datalake_google_ads_clean.videos_performance_report gads
     LEFT JOIN computer_devices_videos
-        ON computer_devices_videos.id = google_table.id
-        AND computer_devices_videos.dt_load = google_table.dt_load
+        ON computer_devices_videos.id = gads.id
+        AND computer_devices_videos.dt_loaded = gads.dt_loaded
     LEFT JOIN mobile_devices_videos
-        ON mobile_devices_videos.id = google_table.id
-        AND mobile_devices_videos.dt_load = google_table.dt_load
+        ON mobile_devices_videos.id = gads.id
+        AND mobile_devices_videos.dt_loaded = gads.dt_loaded
     LEFT JOIN tablet_devices_videos
-        ON tablet_devices_videos.id = google_table.id
-        AND tablet_devices_videos.dt_load = google_table.dt_load
+        ON tablet_devices_videos.id = gads.id
+        AND tablet_devices_videos.dt_loaded = gads.dt_loaded
 WHERE
-    google_table.load_date = DATE('{year}-{month}-{day}')
+    gads.dt_loaded = DATE('{year}-{month}-{day}')
 ),
 final_cte_videos AS (
     SELECT 
@@ -540,7 +528,7 @@ final_cte_videos AS (
         SUM(cte_videos.desktop_impressions) AS desktop_impressions,
         SUM(cte_videos.impressions) AS impressions,
         NOW() AS ts_load,
-        cte_videos.load_date
+        cte_videos.dt_loaded
     FROM 
         cte_videos
         LEFT JOIN dw_marketing_costs_staging.dim_google_video dim
