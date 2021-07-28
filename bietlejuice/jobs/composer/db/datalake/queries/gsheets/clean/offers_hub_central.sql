@@ -8,9 +8,12 @@ SELECT
   status,
   agent,
   executive,
+  executive_lead,
   CAST(sale_price_agreed AS FLOAT) AS sale_price_agreed,
   CAST(dt_offer_submitted AS DATE) AS dt_offer_submitted,
-  CAST(dt_offer_accepted_dismissed AS DATE) AS dt_offer_accepted_dismissed,
+  CAST(dt_offer_ended AS DATE) AS dt_offer_ended,
+  CAST(dt_offer_accepted AS DATE) AS dt_offer_accepted,
+  CAST(dt_offer_dismissed AS DATE) AS dt_offer_dismissed,
   CAST(dt_sale_agreement_signed AS DATE) AS dt_sale_agreement_signed
 FROM 
   datalake_gsheets_raw.offers_hub_central
