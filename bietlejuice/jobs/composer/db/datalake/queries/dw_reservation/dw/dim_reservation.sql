@@ -1,4 +1,4 @@
-SELECT
+SELECT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
   id_reservation as sk_reservation,
   id_reservation,
   version,
@@ -7,8 +7,7 @@ SELECT
   cancellation_reason,
   value,
   installments,
-  is_ongoing,
+  cast(is_ongoing as integer) as is_ongoing,
   ts_created,
-  ts_updated,
-  now() as ts_load
+  ts_updated
 FROM datalake_kill_queue.reservation

@@ -1,14 +1,3 @@
 # Migration file for dim_reservation
 dw_schema: public
-columns_mapping:
- - ods_column: version
-   new_column_type: integer
- - ods_column: attempt
-   new_column_type: integer
- - ods_column: installments
-   new_column_type: integer
- - ods_column: is_ongoing
-   new_column_type: boolean
- - new_column: ts_load
-   new_column_type: timestamp
 base_date_column: ts_updated
