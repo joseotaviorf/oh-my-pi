@@ -23,17 +23,17 @@ class KillQueueReservationAud(KillQueue):
             ('rev_type', str),
             ('rev_end', str),
             ('attempt', str),
-            ('is_attempt_mod', str),
+            ('mod_has_attempt', str),
             ('mundipagg_token', str),
-            ('is_mundipagg_token_mod', str),
+            ('mod_has_mundipagg_token', str),
             ('status', str),
-            ('is_status_mod', str),
+            ('mod_has_status', str),
             ('id_tenant', str),
             ('value', str),
-            ('is_value_mod', str),
+            ('mod_has_value', str),
             ('id_house', str),
             ('cancellation_reason', str),
-            ('is_cancellation_reason_mod', str),
+            ('mod_has_cancellation_reason', str),
         ])
         c_cols = deepcopy(r_cols)
 
