@@ -1,0 +1,2 @@
+---
+metrics_path: s3://datalake.s3.forno.data.quintoandar.com.br/raw/metrics
