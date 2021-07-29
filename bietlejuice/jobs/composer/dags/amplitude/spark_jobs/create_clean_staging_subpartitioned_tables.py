@@ -78,7 +78,7 @@ def create_subpartitioned_table_in_athena(subpartitioned_table_name):
     )
 
     athena_metastore_service.repair_table_partitions(
-        db_info["db_clean_staging_athena"], "`{}`".format(subpartitioned_table_name)
+        db_info["db_clean_staging_athena"], subpartitioned_table_name
     )
 
     logger.info(
