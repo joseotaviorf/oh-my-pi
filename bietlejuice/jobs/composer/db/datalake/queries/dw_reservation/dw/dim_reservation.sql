@@ -5,7 +5,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   attempt,
   status,
   cancellation_reason,
-  value,
+  CAST(value AS DECIMAL(19,2)) AS value,
   installments,
   cast(is_ongoing as integer) as is_ongoing,
   ts_created,
