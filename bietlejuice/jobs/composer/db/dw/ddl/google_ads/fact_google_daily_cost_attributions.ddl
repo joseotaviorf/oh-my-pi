@@ -1,3 +1,5 @@
+CREATE SCHEMA IF NOT EXISTS marketing_costs;
+
 DROP TABLE IF EXISTS marketing_costs.fact_google_daily_cost_attributions;
 CREATE TABLE IF NOT EXISTS marketing_costs.fact_google_daily_cost_attributions (
 	sk_date BIGINT,
@@ -23,3 +25,9 @@ CREATE TABLE IF NOT EXISTS marketing_costs.fact_google_daily_cost_attributions (
 	impressions BIGINT,
 	ts_load TIMESTAMP
 );
+
+ALTER TABLE marketing_costs.fact_google_daily_cost_attributions OWNER TO databricks;
+
+CALL grant_all_permissions_on_schema('marketing_costs');
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA marketing_costs TO GROUP etl;
+GRANT ALL ON SCHEMA marketing_costs TO GROUP ETL;

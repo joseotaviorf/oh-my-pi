@@ -1,7 +1,7 @@
 WITH clean_table_common AS (
     SELECT DISTINCT
-        SHA2(CONCAT(id_external_customer, id_keyword, campaign_name, ad_group_name, device), 256) AS sk_keyword,
-        id_keyword AS id_keyword,
+        SHA2(CONCAT(id_external_customer, id_keyword, id_campaign, id_ad_group, device), 256) AS sk_keyword,
+        id_keyword,
         criteria AS keyword_name,
         campaign_name,
         ad_group_name,
