@@ -1,11 +1,11 @@
-select
+select -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
    bt.id as sk_bank_transaction,
-   bt.id_account as sk_bank_account,
+   cast(bt.id_account as integer) as sk_bank_account,
    coalesce(u.id, -1) as sk_user_recipient,
-   coalesce(b.id, -1) as sk_bank,
-   cast(date_format(bt.ts_transaction, "yyyyMMdd") as bigint) as sk_transaction_date,
+   cast(coalesce(b.id, -1) as integer) as sk_bank,
+   cast(date_format(bt.ts_transaction, "yyyyMMdd") as bigint) as sk_transaction,
    bt.id_house,
-   bt.value,
+   cast(bt.value as decimal(22,2)) as value,
    bt.type,
    bt.ts_transaction as ts_transaction,
    bt.ts_updated,
