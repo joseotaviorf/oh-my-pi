@@ -125,33 +125,25 @@ def compare_ddls():
     :return: None
     """
     for file_name in os.listdir("{}/../{}".format(ABS_PATH, BASE_JANUS_DDLS)):
-        print("Opening janus file...")
+        print("\nValidating DDL {}".format(file_name))
+
         table_name = file_name.split(".")[-2]
         janus_file_path = "{}/../{}{}".format(ABS_PATH, BASE_JANUS_DDLS, file_name)
-
-        print("Processing janus ddl file...")
         janus_dict = extract_formatted_dict_from_file(janus_file_path)
-
-        print("Opening migration definition file...")
         yaml_as_dict = read_yaml_file(
             "{}/../{}{}.yaml".format(ABS_PATH, BASE_YAML_FILES, table_name)
         )
 
-        print("Opening origin ddl file...")
         # utilize yaml info to get file
         table_schema = yaml_as_dict.get("dw_schema", "public")
         dw_file_path = "{}/../{}{}/{}".format(
             ABS_PATH, BASE_DW_DDLS, table_schema, file_name
         )
 
-        print("Processing dw ddl file...")
         dw_dict = extract_formatted_dict_from_file(dw_file_path)
-
-        print("Processing keys of dw ddl file...")
         dw_dict_changed = apply_migration_changes(yaml_as_dict, dw_dict)
 
         # validates match between dicts
-        print("Comparing ddl files...")
         error = False
         for col in dw_dict_changed.keys():
             if dw_dict_changed[col] != janus_dict[col]:
@@ -176,10 +168,9 @@ def compare_ddls():
                     table_schema, table_name
                 )
             )
-        print(
-            "table={}, msg=Validation success! DDLs matching according to migration "
-            "file!".format(table_name)
-        )
+    print(
+        "msg=Validation success! DDLs matching according to migration files!"
+    )
 
 
 if __name__ == "__main__":

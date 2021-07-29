@@ -1,131 +1,132 @@
-with user_dates (
-    select
+WITH user_dates (
+    SELECT
         u.id,
-        min(b.ts_created) as ts_first_booking,
+        MIN(b.ts_created) AS ts_first_booking,
         -- TODO [ODS] the value for status should be Cancelado instead of Canceled
-        min(if(b.status != 'Canceled', b.ts_created, null)) as ts_first_booking_confirmed,
-        min(v.dt_visit) as dt_first_visit,
+        MIN(if(b.status != 'Canceled', b.ts_created, NULL)) AS ts_first_booking_confirmed,
+        MIN(v.dt_visit) AS dt_first_visit,
         -- TODO [ODS] the value for status should be Cancelado instead of Canceled
-        min(if(b.status != 'Canceled', v.dt_visit, null)) as dt_first_visit_confirmed,
-        min(pp.ts_created) as ts_first_pre_proposal,
-        min(p.ts_created) as ts_first_proposal_accepted,
-        min(c.ts_created) as ts_first_contract,
-        min(c.ts_signed) as ts_first_signed_contract
-    from datalake_ebdb_user.user u
-    left join datalake_booking.booking b
+        MIN(if(b.status != 'Canceled', v.dt_visit, NULL)) AS dt_first_visit_confirmed,
+        MIN(pp.ts_created) AS ts_first_pre_proposal,
+        MIN(p.ts_created) AS ts_first_proposal_accepted,
+        MIN(c.ts_created) AS ts_first_contract,
+        MIN(c.ts_signed) AS ts_first_signed_contract
+    FROM datalake_ebdb_user.user u
+    LEFT JOIN datalake_booking.booking b
         on b.id_visitor = u.id
-    left join datalake_ebdb_clean.visit v
+    LEFT JOIN datalake_ebdb_clean.visit v
         on v.id = b.id_visit
-    left join datalake_ebdb_clean.rent_flow rf
+    LEFT JOIN datalake_ebdb_clean.rent_flow rf
         on rf.id = b.id_rent_flow
-    left join datalake_ebdb_clean.pre_proposal pp
+    LEFT JOIN datalake_ebdb_clean.pre_proposal pp
         on rf.id_client = pp.id_user
-    left join datalake_ebdb_clean.proposal p
+    LEFT JOIN datalake_ebdb_clean.proposal p
         on p.id_pre_proposal = pp.id
-    left join datalake_ebdb_clean.contract c
+    LEFT JOIN datalake_ebdb_clean.contract c
         on c.id_proposal = p.id
-    group by u.id
+    GROUP BY u.id
 ),
-booking_counts as (
-    select
+booking_counts AS (
+    SELECT
         id_visitor,
-        cast(count(1) as integer) as visits_booked,
-        cast(sum(if(is_visit_completed, 1, 0)) as integer) as visits_realized,
-        cast(sum(if(visit_fup is not null, 1, 0)) as integer) as visits_expected_to_happen
-    from datalake_booking.booking
-    group by id_visitor
+        CAST(COUNT(1) AS INTEGER) AS visits_booked,
+        CAST(SUM(if(is_visit_completed, 1, 0)) AS INTEGER) AS visits_realized,
+        CAST(SUM(if(visit_fup IS NOT NULL, 1, 0)) AS INTEGER) AS visits_expected_to_happen
+    FROM datalake_booking.booking
+    GROUP BY id_visitor
  )
-select
-    u.id as sk_user,
-    coalesce(cast(date_format(ad.ts_doorman_joined, 'yyyyMMdd') as bigint), -1) as sk_doorman_joined_date,
-    u.id as id_user,
-    u.id_agent,
-    u.id_photographer_data,
-    u.id_sales_rep,
-    u.id_affiliates as id_affiliate,
-    u.id_facebook,
-    u.id_linkedin,
-    u.id_google,
-    u.is_active,
-    u.is_blocked,
-    ad.is_active as is_affiliate_active,
-    ag.is_active as is_agent_active,
-    p.is_active as is_photographer_active,
-    coalesce(ad.is_doorman_affiliate, false) as is_doorman_affiliate,
-    u.is_tenant,
+SELECT -- [ODS] This table was migrated FROM ODS flow and needs a future refactoring to remove castings and renamings
+    u.id AS sk_user,
+    COALESCE(CAST(date_format(ad.ts_doorman_joined, 'yyyyMMdd') AS bigint), -1) AS sk_doorman_joined_date,
+    u.id,
+    CAST(u.id_agent AS INTEGER) AS dados_agente_id,
+    CAST(u.id_photographer_data AS INTEGER) AS dados_fotografo_id,
+    CAST(u.id_sales_rep AS INTEGER) AS dados_vendedor_id,
+    CAST(u.id_affiliates AS INTEGER) AS dados_afiliado_id,
+    u.id_facebook AS facebook_id,
+    u.id_linkedin AS linkedin_id,
+    u.id_google AS google_id,
+    CAST(u.is_active AS INTEGER) AS active,
+    CAST(u.is_blocked AS INTEGER) AS bloqueado,
+    CAST(ad.is_active AS INTEGER) AS dadosafiliado_ativo,
+    CAST(ag.is_active AS INTEGER) AS dadosagente_ativo,
+    CAST(p.is_active AS INTEGER) AS dadosfotografo_ativo,
+    CAST(COALESCE(ad.is_doorman_affiliate, false) AS INTEGER) AS flg_doorman_affiliate,
+    CAST(u.is_tenant AS INTEGER) AS inquilino,
     ag.is_sale_agent,
     ag.is_rent_agent,
-    u.bank_another_holder as is_bank_another_holder,
-    u.has_house,
-    u.has_tenant_app,
-    u.has_active_contract,
-    u.has_accepted_sms,
-    left(u.name, 200) as name,
+    CAST(u.bank_another_holder AS INTEGER) AS dadosbancarios_outro_titular,
+    CAST(u.has_house AS INTEGER) AS tem_imovel,
+    CAST(u.has_tenant_app AS INTEGER) AS tem_app_inquilino,
+    CAST(u.has_active_contract AS INTEGER) AS tem_contrato_ativo,
+    CAST(u.has_accepted_sms AS INTEGER) AS aceita_sms,
+    LEFT(u.name, 200) AS nome,
     u.cpf,
     u.rg,
-    u.gender,
+    u.gender AS sexo,
     u.email,
-    u.alternative_email,
-    u.main_phone,
-    u.address,
-    u.number,
-    u.complement,
-    u.neighborhood,
-    u.zip_code,
-    u.city,
-    s.name as state_name,
-    s.abbreviation as state_abbreviation,
-    u.admin_type,
-    b.code as bank_code,
-    b.name as bank_name,
-    u.bank_agency,
-    u.bank_account,
-    u.bank_cpf_cnpj,
-    u.bank_name as bank_person_name,
-    u.bank_account_type,
-    ag.profile as agent_profile,
-    ag.creci_number as agent_creci_number,
-    p.contract_type as photographer_contract_type,
-    ad.work_city as affiliate_work_city,
-    ad.payment_preference as affiliate_payment_preference,
-    ad.creci_number as affiliate_creci_number,
-    ad.last_week_balance_communication as affiliate_last_week_balance_communication,
+    u.alternative_email AS email_alternativo,
+    u.main_phone AS telefone_principal,
+    u.address AS endereco,
+    u.number AS numero,
+    u.complement AS complemento,
+    u.neighborhood AS bairro,
+    u.zip_code AS cep,
+    u.city AS cidade,
+    s.name AS estado_nome,
+    s.abbreviation AS estado_abreviacao,
+    u.admin_type AS tipo_admin,
+    b.code AS dadosbancarios_banco_codigo,
+    b.name AS dadosbancarios_banco,
+    u.bank_agency AS dadosbancarios_agencia,
+    u.bank_account AS dadosbancarios_conta_corrente,
+    u.bank_cpf_cnpj AS dadosbancarios_cpf_cnpj,
+    u.bank_name AS dadosbancarios_nome,
+    u.bank_account_type AS dadosbancarios_tipo_conta,
+    ag.profile AS dadosagente_perfil,
+    ag.creci_number AS dadosagente_numero_creci,
+    p.contract_type AS dadosfotografo_tipo_contrato,
+    ad.work_city AS dadosafiliado_cidade_atuacao,
+    ad.payment_preference AS dadosafiliado_preferencia_pagamento,
+    ad.creci_number AS dadosafiliado_numero_creci,
+    ad.last_week_balance_communication AS dadosafiliado_semana_ultima_comunicacao_balanco,
     b_counts.visits_booked,
     b_counts.visits_realized,
     b_counts.visits_expected_to_happen,
-    u.dt_birth,
-    user_dates.dt_first_visit,
-    user_dates.dt_first_visit_confirmed,
-    u.ts_click_anuncie,
-    p.ts_contract_started as ts_photographer_contract_started,
-    sr.ts_contract_started as ts_sales_rep_contract_started,
-    ad.ts_first_operation_start as ts_affiliate_first_operation_started,
-    user_dates.ts_first_booking,
-    user_dates.ts_first_booking_confirmed,
-    user_dates.ts_first_pre_proposal,
-    user_dates.ts_first_proposal_accepted,
-    user_dates.ts_first_contract,
-    user_dates.ts_first_signed_contract,
-    u.ts_first_document_sent,
-    u.ts_last_document_sent,
-    u.ts_first_sent_to_insurance,
-    u.ts_created,
-    u.ts_updated,
-    now() as ts_load
-from datalake_ebdb_user.user u
-inner join user_dates user_dates
+    u.dt_birth AS data_nascimento,
+    CAST(user_dates.dt_first_visit AS TIMESTAMP) AS first_visit_date,
+    CAST(user_dates.dt_first_visit_confirmed AS TIMESTAMP) AS first_visit_confirmed_date,
+    u.ts_click_anuncie AS data_clickanuncie,
+    p.ts_contract_started AS dadosfotografo_inicio_contrato,
+    sr.ts_contract_started AS dadosvendedor_inicio_contrato,
+    ad.ts_first_operation_start AS dadosafiliado_inicio_atuacao,
+    user_dates.ts_first_booking AS first_booking_date,
+    user_dates.ts_first_booking_confirmed AS first_booking_confirmed_date,
+    user_dates.ts_first_pre_proposal AS first_pre_proposal_date,
+    user_dates.ts_first_proposal_accepted AS first_proposal_accepted_date,
+    user_dates.ts_first_contract AS first_contract_date,
+    user_dates.ts_first_signed_contract AS first_signed_contract,
+    u.ts_first_document_sent AS first_dt_document_sent,
+    u.ts_last_document_sent AS last_dt_document_sent,
+    u.ts_first_sent_to_insurance AS first_dt_sent_to_insurance,
+    u.ts_created AS criado_em,
+    u.ts_updated AS atualizado_em,
+    CAST(NULL AS VARCHAR(255)) AS network, -- [ODS] just to match ODS original table / Remove after ODS migration
+    NOW() AS load_timestamp
+FROM datalake_ebdb_user.user u
+INNER JOIN user_dates user_dates
     on user_dates.id = u.id
-left join booking_counts b_counts
+LEFT JOIN booking_counts b_counts
     on b_counts.id_visitor = u.id
-left join datalake_ebdb_clean.state s
+LEFT JOIN datalake_ebdb_clean.state s
     on s.id = u.id_state
-left join datalake_ebdb_user.agent_data ag
+LEFT JOIN datalake_ebdb_user.agent_data ag
     on ag.id = u.id_agent
-left join datalake_ebdb_clean.bank b
+LEFT JOIN datalake_ebdb_clean.bank b
     on b.id = u.id_bank
-left join datalake_ebdb_clean.photographer_data p
+LEFT JOIN datalake_ebdb_clean.photographer_data p
     on p.id = u.id_photographer_data
-left join datalake_ebdb_clean.sales_rep sr
+LEFT JOIN datalake_ebdb_clean.sales_rep sr
     on sr.id = u.id_sales_rep
-left join datalake_ebdb_user.affiliate_data ad
+LEFT JOIN datalake_ebdb_user.affiliate_data ad
     on ad.id = u.id_affiliates
