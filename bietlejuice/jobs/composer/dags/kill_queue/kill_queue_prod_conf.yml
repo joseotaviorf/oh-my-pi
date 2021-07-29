@@ -3,16 +3,22 @@ tables:
   - table_name: charge
     extraction_type: full
   - table_name: documentation
-    extraction_type: full
+    extraction_type: incremental
+    date_filter_column: updated_at
   - table_name: house
-    extraction_type: full
+    extraction_type: incremental
+    date_filter_column: updated_at
   - table_name: reservation
-    extraction_type: full
+    extraction_type: incremental
+    date_filter_column: updated_at
   - table_name: revinfo
     clean_table_name: rev_info
-    extraction_type: full
+    extraction_type: incremental
+    date_filter_column: revtstmp
+    unixtime_measure: milliseconds
   - table_name: user
-    extraction_type: full
+    extraction_type: incremental
+    date_filter_column: updated_at
   - table_name: charge_aud
     extraction_type: full
   - table_name: documentation_aud
