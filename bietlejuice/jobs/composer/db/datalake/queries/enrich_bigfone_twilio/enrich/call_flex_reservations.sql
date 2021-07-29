@@ -95,7 +95,10 @@ call_flex_reservations AS (
             END
         ) > 0 AS is_rejected,
         MIN(re1.ts_event_unix) AS ts_created_unix,
-        MAX(re1.ts_event_unix) AS ts_ended_unix
+        MAX(re1.ts_event_unix) AS ts_ended_unix,
+        MAX(year) AS year,
+        MAX(month) AS month,
+        MAX(day) AS day
     FROM
         reservations_events AS re1
     GROUP BY 1,2,3
@@ -156,15 +159,11 @@ SELECT
     CAST(FROM_UNIXTIME(ts_ended_unix, 'yyyy-MM-dd HH:mm:ss') AS TIMESTAMP) AS ts_ended,
     FROM_UTC_TIMESTAMP(CAST(FROM_UNIXTIME(ts_ended_unix, 'yyyy-MM-dd HH:mm:ss') AS TIMESTAMP), 'Brazil/East') AS ts_ended_local,
     ts_created_unix,
-    fe.year,
-    fe.month,
-    fe.day
+    cr.year,
+    cr.month,
+    cr.day
 FROM
-    full_events fe
-JOIN
     call_flex_reservations AS cr
-        ON fe.id_task = cr.id_task
-        AND fe.id_reservation = cr.id_reservation
 LEFT JOIN
     answered_time_calculations AS atc
         ON cr.id_task = atc.id_task
