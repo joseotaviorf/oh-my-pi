@@ -108,7 +108,7 @@ keywords_costs AS (
                 SPLIT(gkpr.campaign_name, '\\.')[1]
             END
         ) AS campaign_city,
-        gkpr.acc AS account_name,
+        gkpr.account_descriptive_name AS account_name,
         gkpr.report_type,
         NULL AS ad_type,
         criteria || '_' || LOWER(LEFT(match_type, 1)) AS utm_term,
@@ -145,7 +145,7 @@ ads_costs AS (
                 SPLIT(gapr.campaign_name, '\\.')[1]
             END
         ) AS campaign_city,
-        gapr.acc AS account_name,
+        gapr.account_descriptive_name AS account_name,
         gapr.report_type,
         COALESCE(ad_types.flag, 'other') AS ad_type,
         STRING(ad_group_name) AS utm_term,
@@ -184,7 +184,7 @@ campaigns_costs AS (
                 SPLIT(gcpr.campaign_name, '\\.')[1]
             END
         ) AS campaign_city,
-        gcpr.acc AS account_name,
+        gcpr.account_descriptive_name AS account_name,
         gcpr.report_type,
         NULL AS ad_type,
         NULL AS utm_term,
@@ -221,7 +221,7 @@ videos_costs AS (
                 SPLIT(gvpr.campaign_name, '\\.')[1]
             END
         ) AS campaign_city,
-        gvpr.acc AS account_name,
+        gvpr.account_descriptive_name AS account_name,
         gvpr.report_type,
         NULL AS ad_type,
         NULL AS utm_term,
