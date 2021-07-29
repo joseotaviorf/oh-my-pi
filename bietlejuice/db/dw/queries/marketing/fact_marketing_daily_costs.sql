@@ -12,7 +12,12 @@ WITH google_consolidated_cost AS (
             fg.sk_date,
             COALESCE(dgk.campaign_name, dga.campaign_name, dgc.campaign_name, dgv.campaign_name) AS campaign_name,
             COALESCE(dgk.account_name, dga.account_name, dgc.account_name, dgv.account_name) AS account_name,
-            COALESCE(dgk.report_type, dga.report_type, dgc.report_type, dgv.report_type) AS report_type,
+            CASE COALESCE(dgk.report_type, dga.report_type, dgc.report_type, dgv.report_type)
+            WHEN 'KEYWORDS_PERFORMANCE_REPORT' THEN 'keywords_performance_report'
+            WHEN 'AD_PERFORMANCE_REPORT' THEN 'ads_performance_report'
+            WHEN 'CAMPAIGN_PERFORMANCE_REPORT' THEN 'campaigns_performance_report'
+            WHEN 'VIDEO_PERFORMANCE_REPORT' THEN 'videos_performance_report'
+            END AS report_type,
             COALESCE(gtatf.flag, 'other') AS ad_type,
             CASE WHEN fg.sk_keyword <> - 1 THEN
                 dgk.keyword_name || '_' || LOWER(
