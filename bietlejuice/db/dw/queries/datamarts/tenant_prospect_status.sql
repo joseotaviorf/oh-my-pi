@@ -148,6 +148,7 @@ churned_periods AS (
             WHEN cd.event_type = 'rent_flow'
                 THEN 'Inactivity'
         END AS status_detail,
+        NULL::TIMESTAMP AS ts_ntp,
         NULL::INT AS activation_order
     FROM
         aux_churn_dates AS cd
@@ -162,6 +163,7 @@ active_periods AS (
         cd.ts_next_churn AS ts_end,
         'ACTIVE' AS status,
         NULL::TEXT AS status_detail,
+        MIN(ts_start) OVER(PARTITION BY cd.sk_client) AS ts_ntp, -- Get first activetion by client,
         ROW_NUMBER() OVER(PARTITION BY cd.sk_client, cd.city_group ORDER BY ts_start) AS activation_order -- Get first activetion by client and city group
     FROM
         aux_churn_dates AS cd
@@ -190,14 +192,17 @@ SELECT
     TO_CHAR(ts_end, 'YYYYMMDD') AS sk_end_date,
     status,
     CASE
+        WHEN activation_order = 1 AND ts_start = ts_ntp
+            THEN 'New TP'
         WHEN activation_order = 1
-            THEN 'First activation'
+            THEN 'First activation in city_group'
         WHEN LAG(status) OVER(PARTITION BY sk_client, city_group ORDER BY ts_start) = 'CHURNED'
             THEN COALESCE(status_detail, 'Recovered after churn')
         WHEN LAG(status) OVER(PARTITION BY sk_client, city_group ORDER BY ts_start) = 'RENTED'
             THEN COALESCE(status_detail, 'Recovered after renting')
         ELSE status_detail
     END AS status_detail,
-	COALESCE(LEAD(status) OVER(PARTITION BY sk_client, city_group ORDER BY ts_start), 'STILL ACTIVE') AS next_status
+    MIN(ts_ntp) OVER(PARTITION BY sk_client) AS ts_first_activation,
+    FIRST_VALUE(CASE WHEN ts_start = ts_ntp THEN city_group END) OVER(PARTITION BY sk_client ORDER BY ts_start ROWS UNBOUNDED PRECEDING) AS city_group_first_activation
 FROM
     base
