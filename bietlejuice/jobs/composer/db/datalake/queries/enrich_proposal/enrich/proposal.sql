@@ -167,6 +167,7 @@ select
         else aud_analysis.ts_credit_analysis_last_init
     end as ts_credit_analysis_last_init,
     aud_analysis.ts_credit_analysis_first_end,
+    aud_analysis.ts_credit_analysis_last_end as dt_credit_analysis_last_end,
     case when cast(p.ts_created as date) < date('2020-01-02')
         then coalesce(shp.ts_processed, aud_analysis.ts_credit_analysis_last_end, shp.ts_analyzed)
         else aud_analysis.ts_credit_analysis_last_end
