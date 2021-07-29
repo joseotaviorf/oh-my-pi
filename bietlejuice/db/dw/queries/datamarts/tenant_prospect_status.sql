@@ -203,6 +203,6 @@ SELECT
         ELSE status_detail
     END AS status_detail,
     MIN(ts_ntp) OVER(PARTITION BY sk_client) AS ts_first_activation,
-    FIRST_VALUE(CASE WHEN ts_start = ts_ntp THEN city_group END) OVER(PARTITION BY sk_client ORDER BY ts_start ROWS UNBOUNDED PRECEDING) AS city_group_first_activation
+    FIRST_VALUE(CASE WHEN ts_start = ts_ntp THEN city_group END IGNORE NULLS) OVER(PARTITION BY sk_client ORDER BY ts_start ROWS UNBOUNDED PRECEDING) AS city_group_first_activation
 FROM
     base
