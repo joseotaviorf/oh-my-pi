@@ -19,6 +19,10 @@ from bietlejuice.jobs.composer.base.spark import (
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_incremental_data_into_datalake_raw"
+BLOCK_LIST_CAMPAIGN = [
+    "[PA] ClimaeEngajamento - Gestor",
+    "[PA] ClimaeEngajamento - Colaborador",
+]
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -78,6 +82,14 @@ if __name__ == "__main__":
                 row["tags"] = json.dumps(row.get("tags"))
             if "phrases" in row:
                 row["phrases"] = json.dumps(row.get("phrases"))
+
+        api_response = list(
+            filter(
+                lambda item: json.loads(item["user_attributes"])["campaign"]["value"]
+                not in BLOCK_LIST_CAMPAIGN,
+                api_response,
+            )
+        )
 
         if api_response:
             df = spark_client.create_dataframe(api_response)
