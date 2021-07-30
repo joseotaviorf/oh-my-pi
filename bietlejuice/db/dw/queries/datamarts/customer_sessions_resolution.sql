@@ -4,7 +4,7 @@ WITH front_tickets AS (
         ft.sk_contract,
         MIN(ft.sk_user) AS sk_user,
         ft.channel,
-        MAX(ft.back_ticket) AS back_ticket,
+        last_back_ticket AS back_ticket,
         direction,
         status,        
         ft.has_transfers,
@@ -20,7 +20,7 @@ WITH front_tickets AS (
     WHERE
         sk_user > -1
         AND (front_or_back = 'front' OR front_or_back IS NULL)
-    GROUP BY 1,2,4,6,7,8,9,10,11,12
+    GROUP BY 1,2,4,5,6,7,8,9,10,11,12
 ),
 user_recontacts AS (
     SELECT DISTINCT
