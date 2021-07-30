@@ -59,7 +59,7 @@ CAMPAIGN_COLUMN = {
 }
 
 # If more than one Campaing ID need to be blocked, separate them by comma
-CAMPAIGNS_TO_BLOCK = "248,326"
+CAMPAIGNS_TO_BLOCK = "248,326,327"
 
 
 # Dag definition
