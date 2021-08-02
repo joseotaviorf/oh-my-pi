@@ -67,6 +67,7 @@ This pipeline produces the following output tables:
     - `marketing_kenshoo_configuration`
     - `marketing_manual_campaign_cities`
     - `marketing_manual_costs_google`
+    - `media_plan_current_quarter`
     - `mkt_cost_per_source`
     - `mta_budget_october_2020`
     - `offers_hub_central`

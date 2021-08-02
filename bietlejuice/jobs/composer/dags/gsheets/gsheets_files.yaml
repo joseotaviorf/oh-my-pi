@@ -241,6 +241,11 @@ marketing_manual_campaign_cities:
     sheet_name: Campaign_City
     clean_table_name: marketing_manual_campaign_cities
 
+media_plan:
+    sheet_id: 1aief4f2Iu0vEZ68ZOxq7cRjkzdz1ePOhZf2lN6rcITQ
+    sheet_name: media_plan
+    clean_table_name: media_plan_current_quarter
+
 mta_budget:
     sheet_id: 16HF0DnPTkCIG8oexncHizjhmoGyAJapvGVeA46mUCa4
     sheet_name: mta_budget
