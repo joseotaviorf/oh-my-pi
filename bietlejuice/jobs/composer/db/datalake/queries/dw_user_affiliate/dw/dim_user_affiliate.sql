@@ -132,13 +132,13 @@ applied_taxonomy AS (
       AND COALESCE(tax.tracking_source, '') = COALESCE(acg.tracking_source, '')
       AND COALESCE(tax.tracking_campaign, '') = COALESCE(acg.tracking_campaign, '')
   )
-SELECT
+SELECT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
   atax.sk_user_affiliate,
   atax.id_user AS sk_user,
   atax.id_user_affiliate,
   atax.sk_user_indicated_by,
   atax.origin,
-  atax.affiliate_type,
+  atax.affiliate_type AS type,
   atax.marketing_city_group,
   atax.regional,
   atax.tracking_source,
@@ -158,7 +158,7 @@ SELECT
   atax.is_realstate_agent,
   atax.is_photographer,
   atax.is_active,
-  atax.ts_operation_start,
+  atax.ts_operation_start AS ts_joined_program,
   atax.ts_created,
   atax.ts_updated,
   NOW() AS ts_load

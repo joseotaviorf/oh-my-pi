@@ -1,9 +1,4 @@
 # Migration file for dim_proposal
 dw_schema: public
-columns_mapping:
-  - ods_column: ts_joined_program
-    new_column: ts_operation_start
-  - ods_column: type
-    new_column: affiliate_type
 base_date_column: ts_created
 sample_size_months: 3
