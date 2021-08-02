@@ -37,7 +37,9 @@ INNER_DEPENDENCIES = config_service.get_config("inner_dependencies")
 
 BASE_SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = SPARK_JOBS_LOGS_PATH
+CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
+    "destination"
+] = f"{SPARK_JOBS_LOGS_PATH}{DAG_ID}"
 
 dag = DAG(
     dag_id=DAG_ID,

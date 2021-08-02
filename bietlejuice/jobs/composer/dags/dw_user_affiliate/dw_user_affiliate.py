@@ -41,7 +41,9 @@ BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base"
 CLUSTER_DESCRIPTION = Variable.get(
     "databricks_minimum_resources_cluster", deserialize_json=True
 )
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = spark_jobs_logs_path
+CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
+    "destination"
+] = f"{spark_jobs_logs_path}{DAG_ID}"
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -52,13 +54,13 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=None,
-    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(chart_url=doc_md_chart_url, dag_id=DAG_ID),
+    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
+        chart_url=doc_md_chart_url, dag_id=DAG_ID
+    ),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag,
-    task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
+    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -75,13 +77,11 @@ dw_task_group = DWTaskGroup(
 )
 
 dw_staging_task_group = dw_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.DW_STAGING,
-    has_ods_migration_test=True
+    layer=LayerEnum.DW_STAGING, has_ods_migration_test=True
 )
 
 dw_task_group = dw_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.DW, 
-    spectrum_iam_role=spectrum_iam_role
+    layer=LayerEnum.DW, spectrum_iam_role=spectrum_iam_role
 )
 
 chain(create_cluster_task, DWTaskGroup.all_first_tasks(dw_staging_task_group))
