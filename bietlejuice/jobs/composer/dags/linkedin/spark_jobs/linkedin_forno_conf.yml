@@ -1,0 +1,2 @@
+---
+raw_partition_cols: ["acc", "year", "month", "day"]

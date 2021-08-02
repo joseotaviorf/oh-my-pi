@@ -15,6 +15,9 @@ from bietlejuice.jobs.composer.base.spark import (
     SparkTableStorageFormat,
     BaseDBUtils,
 )
+from bietlejuice.jobs.composer.services.configuration_service import (
+    ConfigurationService,
+)
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 from quintoandar_linkedin_client.linkedin_consumer import LinkedInConsumer
 
@@ -31,9 +34,9 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("environment", help="forno/prod values")
+    parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
     parser.add_argument("source", help="name of the source")
     parser.add_argument("media", help="name of the media")
-    parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
     parser.add_argument("execution_date", help="execution date in str format")
 
     args = parser.parse_args()
@@ -46,11 +49,13 @@ if __name__ == "__main__":
     )
 
     environment = args.environment
+    datalake_bucket = args.datalake_bucket
     source = args.source
     media = args.media
-    datalake_bucket = args.datalake_bucket
     execution_date = args.execution_date
-    partition_cols = ["acc", "year", "month", "day"]
+
+    config_service = ConfigurationService(source)
+    raw_partition_cols = config_service.get_config("raw_partition_cols")
 
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
@@ -96,7 +101,7 @@ if __name__ == "__main__":
                         df=df,
                         s3_path=f"{database_location}{table_name}",
                         format_options=format_options,
-                        partitions=partition_cols,
+                        partitions=raw_partition_cols,
                     )
                     spark_metastore_loader.update_metastore(
                         df,
@@ -104,14 +109,14 @@ if __name__ == "__main__":
                         table_name,
                         format_options,
                         database_location,
-                        partition_cols,
+                        raw_partition_cols,
                         force_recreate=False,
                     )
                     spark_metastore_service.create_new_partitions_from_df(
                         database_name=database_name,
                         table_name=table_name,
                         df=df,
-                        partition_cols=partition_cols,
+                        partition_cols=raw_partition_cols,
                     )
                     spark_metastore_service.refresh_table(database_name, table_name)
                 except Exception as e:
