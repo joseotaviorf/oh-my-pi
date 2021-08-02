@@ -71,7 +71,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   p.ts_guarantee_paid AS dt_guarantee_paid,
   ce.ts_proposal_first_credit_evaluation_positive AS dt_first_credit_evaluation_positive,
   ce.ts_proposal_last_credit_evaluation_positive AS dt_last_credit_evaluation_positive,
-  p.ts_credit_analysis_first_end AS dt_credit_analysis_last_init,
+  p.dt_credit_analysis_last_init,
   p.dt_credit_analysis_last_end,
   p.ts_tenant_last_doc_complete AS dt_tenant_doc_complete,
   now() AS dt_timestamp,

@@ -162,6 +162,7 @@ select
     aud_analysis.ts_tenant_last_doc_complete,
     -- Dates related to credit analysis (these dates had their business rules changed on jan/2020 and are deprecated after 08/06/2020).
     aud_analysis.ts_credit_analysis_first_init,
+    aud_analysis.ts_credit_analysis_last_init as dt_credit_analysis_last_init,  -- Column to match ODS rules
     case when cast(p.ts_created as date) < date('2020-01-02')
         then coalesce(shp.ts_first_analyzed, aud_analysis.ts_credit_analysis_last_init)
         else aud_analysis.ts_credit_analysis_last_init
