@@ -371,6 +371,26 @@ pipeline:
       event: push
       branch: master
 
+  load-atlas-metadata-files-to-s3-forno:
+    group: update_jobs
+    image: python:3.7.3
+    commands:
+      - pip install boto3==1.9.159 PyYAML==5.1
+      - python scripts/upload_atlas_metadata_files_to_s3.py data-documentation.s3.forno.data.quintoandar.com.br
+    when:
+      event: push
+      branch: forno
+
+  load-atlas-metadata-files-to-s3-prod:
+    group: update_jobs
+    image: python:3.7.3
+    commands:
+      - pip install boto3==1.9.159 PyYAML==5.1
+      - python scripts/upload_atlas_metadata_files_to_s3.py data-documentation.s3.data.quintoandar.com.br
+    when:
+      event: push
+      branch: master
+
 #  =======================================================================
 # =============================== Common ===============================
 #  =======================================================================
