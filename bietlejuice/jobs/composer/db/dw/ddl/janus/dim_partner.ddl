@@ -19,3 +19,5 @@ create table janus.dim_partner (
     ts_updated timestamp,
     ts_load timestamp
 );
+
+ALTER TABLE janus.dim_partner OWNER TO airflow;

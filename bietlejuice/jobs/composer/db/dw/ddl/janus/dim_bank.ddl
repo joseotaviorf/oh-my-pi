@@ -10,3 +10,5 @@ create table janus.dim_bank (
   ts_updated timestamp,
   ts_load timestamp
 );
+
+ALTER TABLE janus.dim_bank OWNER TO airflow;

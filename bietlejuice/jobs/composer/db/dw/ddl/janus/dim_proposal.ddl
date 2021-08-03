@@ -51,3 +51,5 @@ create table janus.dim_proposal (
   dt_timestamp timestamp,
   ts_load timestamp
 );
+
+ALTER TABLE janus.dim_proposal OWNER TO airflow;

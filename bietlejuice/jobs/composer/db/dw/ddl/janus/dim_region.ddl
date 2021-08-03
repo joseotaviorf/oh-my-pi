@@ -25,3 +25,5 @@ create table if not exists janus.dim_region (
   dt_updated timestamp without time zone,
   dt_timestamp timestamp without time zone
 );
+
+ALTER TABLE janus.dim_region OWNER TO airflow;

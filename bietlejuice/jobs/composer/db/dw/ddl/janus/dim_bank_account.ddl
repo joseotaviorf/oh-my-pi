@@ -9,3 +9,5 @@ create table if not exists janus.dim_bank_account (
   ts_created timestamp,
   ts_load timestamp
 );
+
+ALTER TABLE janus.dim_bank_account OWNER TO airflow;

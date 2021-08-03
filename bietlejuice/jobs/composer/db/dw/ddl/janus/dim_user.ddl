@@ -78,3 +78,5 @@ create table janus.dim_user (
   network varchar(255),
   load_timestamp timestamp
 );
+
+ALTER TABLE janus.dim_user OWNER TO airflow;
