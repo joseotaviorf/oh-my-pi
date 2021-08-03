@@ -186,6 +186,15 @@ validate-dags-dependencies:
 	@echo ""
 	@python scripts/validate_dags_dependencies.py
 
+.PHONY: validate-atlas-metadata-files
+validate-atlas-metadata-files:
+	@echo ""
+	@echo "Validating Atlas metadata files"
+	@echo "=========="
+	@echo ""
+	@git fetch --no-tags origin +refs/heads/master
+	@python scripts/atlas_metadata_validation/validate_atlas_metadata.py  "$(DRONE_BRANCH)"
+
 ############# common commands #######################
 
 .PHONY: cov-badge

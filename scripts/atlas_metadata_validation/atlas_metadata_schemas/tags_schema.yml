@@ -1,0 +1,7 @@
+---
+database_name: str(max=100)
+table_name: str(max=100)
+columns: map(include("column"), key=str())
+---
+column:
+  tags: list()

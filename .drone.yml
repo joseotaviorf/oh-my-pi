@@ -230,6 +230,15 @@ pipeline:
       event: push
       branch: master
 
+  validate-atlas-metadata-files:
+    group: tests
+    image: python:3.7.3
+    commands:
+      - pip install yamale==3.0.7
+      - make validate-atlas-metadata-files
+    when:
+      event: push
+
   make-package-python3:
     group: package
     image: python:3.7.3
