@@ -198,6 +198,49 @@ booking_in_rented_house AS (
          WHEN c.status = 'Finalizado' THEN c.dt_termination END
     AND b.business_context = 'SALE'
 ),
+-- Rule to identify bookings from agents that works in HUB flow
+booking_hub_agent AS (
+  WITH agent_contract_aud AS (
+    SELECT
+      adaud.id AS id_agent,
+      adaud.rev,
+      adaud.id_work_contract,
+      CAST(FROM_UNIXTIME(ure.ts_revision/1000) AS TIMESTAMP) + (ure.ts_revision % 1000) * INTERVAL 1 MILLISECONDS AS ts_revision,
+      LEAD(adaud.id_work_contract) OVER (PARTITION BY adaud.id ORDER BY adaud.rev) AS next_id_work_contract
+    FROM
+      datalake_ebdb_clean.agent_data_aud adaud
+    LEFT JOIN
+      datalake_ebdb_clean.user_revision_entity ure
+        ON ure.id = adaud.rev
+    WHERE
+      adaud.id_work_contract is not null
+  )
+  , agent_contract AS (
+    SELECT
+      id_agent,
+      id_work_contract,
+      ts_revision AS ts_work_contract_start,
+      LEAD(ts_revision) OVER (PARTITION BY id_agent ORDER BY rev) AS ts_work_contract_end
+    FROM
+      agent_contract_aud
+    WHERE
+      id_work_contract != next_id_work_contract
+      OR next_id_work_contract IS NULL
+  )
+SELECT
+  b.id
+FROM
+  agent_contract ac
+JOIN
+  datalake_ebdb_clean.booking b
+    ON b.ts_created BETWEEN ac.ts_work_contract_start AND COALESCE(ac.ts_work_contract_end, CURRENT_DATE)
+    AND ac.id_agent = b.id_agent
+WHERE
+  -- Work contract that indicates agents working in HUB flow
+  ac.id_work_contract = 33
+  -- Date that the visits in HUB flow started
+  AND CAST(b.ts_created AS DATE) >= '2021-07-19'
+),
 base_booking AS (
   SELECT
     b.id,
@@ -328,6 +371,7 @@ base_booking AS (
     b.is_confirmed,
     b.is_closed,
     b.is_agent_fixed,
+    IF(bha.id IS NOT NULL, TRUE, FALSE) AS is_hub_flow,
     IF(fud.visit_type = 'VIDEO', TRUE, FALSE) AS is_virtual_visit,
     e.is_successful AS is_entrance_successful,
     (b.status = 'Cancelado') AS is_canceled,
@@ -389,6 +433,9 @@ base_booking AS (
   LEFT JOIN
     booking_in_rented_house brh
       ON brh.id = b.id
+  LEFT JOIN
+    booking_hub_agent bha
+      ON bha.id = b.id
 )
 -- custom columns that need pre-calculated ones
 SELECT
