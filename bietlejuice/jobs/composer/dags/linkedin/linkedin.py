@@ -31,7 +31,7 @@ local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in loc
 MAIN_START_DATE = datetime(2019, 6, 1, 0, 0, 0, tzinfo=local_tz)
 MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
 
-config_service = ConfigurationService(SOURCE)
+config_service = ConfigurationService(MEDIA)
 ATHENA_QUERY_RESULT_BUCKET = config_service.get_config("athena_query_results_bucket")
 ARTIFACTS_S3_BUCKET = config_service.get_config("artifacts_bucket")
 DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
