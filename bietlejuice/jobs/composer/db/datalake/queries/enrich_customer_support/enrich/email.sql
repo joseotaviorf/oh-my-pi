@@ -135,7 +135,7 @@ back_tickets AS (
     status AS back_ticket_status,
     COALESCE(
       NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(custom_fields, '$.Ticket do contato'), '([0-9]{{8}})', 1), ''),
-      REGEXP_EXTRACT(SUBSTRING(SPLIT(description, 'Ticket do contato')[1], 1, 18), '([0-9]{{8}})', 1)
+      REGEXP_EXTRACT(SUBSTRING(SPLIT(REGEXP_REPLACE(description, 'WT[a-z0-9]{{20,40}}',''), 'Ticket do contato')[1], 1, 18), '([0-9]{{8}})', 1)
     ) AS front_ticket,
     ts_ticket_solved
   FROM
@@ -146,7 +146,7 @@ back_tickets AS (
   WHERE 
     (tags LIKE '%tarefa_atendimento_escalado%' OR LOWER(dc.front_or_back) = 'back')
     AND (tags NOT LIKE '%bot_end_conversation%' AND tags NOT LIKE '%closed_by_merge%')
-    AND COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(custom_fields, '$.Ticket do contato'), '([0-9]{{8}})', 1), ''),REGEXP_EXTRACT(SUBSTRING(SPLIT(description, 'Ticket do contato')[1], 1, 18), '([0-9]{{8}})', 1)) != ''
+    AND COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(custom_fields, '$.Ticket do contato'), '([0-9]{{8}})', 1), ''),REGEXP_EXTRACT(SUBSTRING(SPLIT(REGEXP_REPLACE(description, 'WT[a-z0-9]{{20,40}}',''), 'Ticket do contato')[1], 1, 18), '([0-9]{{8}})', 1)) != ''
 ),
 last_back_ticket_timestamp AS (
   SELECT
