@@ -64,7 +64,7 @@ date_series as (
   from
     datalake_clean.ods_dim_date dd
   where
-    date(date) >= current_date - interval '45' day and date(week_start) <= current_date - interval '1' day
+    date(date) >= current_date - interval '45' day and date(week_start) <= current_date + interval '7' day
     and date != ''
 ),
 regions AS (
@@ -336,7 +336,7 @@ left join cant_find_another_agent cfaa
 	on cast(t.house_id as bigint) = cast(cfaa.house_id as bigint)
 	and t.target_date = cfaa.visit_date
 	and t.slot = cfaa.slot_dia
-group by 1,3,4,5,6,7,8,9,10,11,12,13,14,15,16, 17
+group by 1,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
 ),
 encaixes_agg as (
   select
@@ -366,27 +366,27 @@ select
     d.region_code,
     d.city_name,
     d.city_group,
-    event_date,
-    target_date as visit_date,
-    d.week_start,
-    cast(d.date as timestamp) + interval '8' hour + (interval '15' minute)* d.slot as visit_hour,
-    d.hour,
+    CAST(event_date AS TIMESTAMP) AS event_date,
+    CAST(target_date AS DATE) AS visit_date,
+    CAST(d.week_start AS DATE) AS week_start,
+    CAST(CAST(d.date AS TIMESTAMP) + interval '8' hour + (interval '15' minute)* d.slot AS TIMESTAMP) AS visit_hour,
+    CAST(d.hour AS BIGINT) AS hour,
     d.faixa,
-    enc.user_id,
-    enc.house_id,
-    enc.slot,
-    enc.share_encaixes_total as sum_encaixes_total,
-    enc.share_encaixes_realizados as sum_share_encaixes_realizados,
-    enc.share_encaixes_nao_realizados as sum_encaixes_nao_realizados,
-    enc.share_encaixes_nao_realizados_cant_find_another_agent as sum_encaixes_nao_realizados_cant_find_another_agent,
-    enc.share_encaixes_nao_realizados_por_agenda as sum_encaixes_nao_realizados_por_agenda,
-    enc.share_encaixes_nao_realizados_por_bloqueio as sum_encaixes_nao_realizados_por_bloqueio,
-    enc.share_encaixes_nao_realizados_por_suspensao as sum_encaixes_nao_realizados_por_suspensao,
-    enc.share_encaixes_nao_realizados_por_bloqueio_suspensao as sum_encaixes_nao_realizados_por_bloqueio_suspensao,
-    enc.share_encaixes_nao_realizados_por_bloqueio_suspensao_agenda as sum_encaixes_nao_realizados_por_bloqueio_suspensao_agenda,
-    enc.encaixes_em_imovel_sem_slot_disponivel_target_date as sum_encaixes_em_imovel_sem_slot_disponivel_target_date,
-    enc.share_encaixes_nao_realizados_por_visita_rent as sum_encaixes_nao_realizados_por_visita_rent,
-    enc.share_encaixes_nao_realizados_por_agent as sum_encaixes_nao_realizados_por_agent
+    CAST(enc.user_id AS BIGINT) AS user_id,
+    CAST(enc.house_id AS BIGINT) AS house_id,
+    CAST(enc.slot AS BIGINT) AS slot,
+    CAST(enc.share_encaixes_total AS DOUBLE) as sum_encaixes_total,
+    CAST(enc.share_encaixes_realizados AS DOUBLE) as sum_share_encaixes_realizados,
+    CAST(enc.share_encaixes_nao_realizados AS DOUBLE) as sum_encaixes_nao_realizados,
+    CAST(enc.share_encaixes_nao_realizados_cant_find_another_agent AS DOUBLE) as sum_encaixes_nao_realizados_cant_find_another_agent,
+    CAST(enc.share_encaixes_nao_realizados_por_agenda AS DOUBLE) as sum_encaixes_nao_realizados_por_agenda,
+    CAST(enc.share_encaixes_nao_realizados_por_bloqueio AS DOUBLE) as sum_encaixes_nao_realizados_por_bloqueio,
+    CAST(enc.share_encaixes_nao_realizados_por_suspensao AS DOUBLE) as sum_encaixes_nao_realizados_por_suspensao,
+    CAST(enc.share_encaixes_nao_realizados_por_bloqueio_suspensao AS DOUBLE) as sum_encaixes_nao_realizados_por_bloqueio_suspensao,
+    CAST(enc.share_encaixes_nao_realizados_por_bloqueio_suspensao_agenda AS DOUBLE) as sum_encaixes_nao_realizados_por_bloqueio_suspensao_agenda,
+    CAST(enc.encaixes_em_imovel_sem_slot_disponivel_target_date AS DOUBLE) as sum_encaixes_em_imovel_sem_slot_disponivel_target_date,
+    CAST(enc.share_encaixes_nao_realizados_por_visita_rent AS DOUBLE) as sum_encaixes_nao_realizados_por_visita_rent,
+    CAST(enc.share_encaixes_nao_realizados_por_agent AS DOUBLE) as sum_encaixes_nao_realizados_por_agent
 from
     encaixes_agg enc
 left join dimensions d on
