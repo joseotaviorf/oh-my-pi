@@ -267,6 +267,7 @@ bietlejuice.enrich_bob:
   - bietlejuice.bob:load-clean-house-draft
 
 bietlejuice.enrich_booking:
+  - bietlejuice.ebdb:create-clean-agent-data-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-booking-in-data-lake
   - bietlejuice.ebdb:create-clean-booking-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-follow-up-details-in-data-lake
