@@ -12,7 +12,6 @@ from airflow.operators.quintoandar_databricks import (
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
-from bietlejuice.jobs.composer.services import FileService
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
@@ -41,9 +40,7 @@ DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config(
 SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
 BASE_SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
 
-LOAD_LINKEDIN_INTO_DATALAKE_RAW_FILE_PATH = (
-    f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/{MEDIA}/load_incremental_data_into_datalake_raw.py"
-)
+LOAD_LINKEDIN_INTO_DATALAKE_RAW_FILE_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/{MEDIA}/load_incremental_data_into_datalake_raw.py"
 DOC_MD_CHART_URL = config_service.get_config("doc_md_chart_url")
 
 PARTITION_COLS = config_service.get_config("partition_cols")
@@ -71,9 +68,7 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(MEDIA).format(
-        chart_url=DOC_MD_CHART_URL, dag_id=DAG_ID
-    ),
+    doc_md=BaseDAG.get_dag_doc(MEDIA).format(chart_url=DOC_MD_CHART_URL, dag_id=DAG_ID),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
