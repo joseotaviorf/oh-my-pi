@@ -108,6 +108,9 @@ bietlejuice.dw_fact_conversion_metrics:
 bietlejuice.dw_listing:
   - bietlejuice.ebdb:create-clean-condo-in-data-lake
 
+bietlejuice.dw_listing_jobs:
+  - bietlejuice.enrich_ebdb_listing_jobs:load-enrich-inspection
+
 bietlejuice.dw_listing_owners:
   - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
   - bietlejuice.ebdb:create-clean-user-preferences-in-data-lake
