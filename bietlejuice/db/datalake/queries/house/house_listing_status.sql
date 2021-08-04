@@ -5,15 +5,20 @@ imovel_aud as (
 -- Also creates previous_status column so we can identify status changes		    				  --
 -- (status_MOD = 1 may not work sometimes)  	        				            				  --
 -------------------------------------------------------------------------------------------------------- 
-    select 
-	  from_unixtime(cast(rev.timestamp as bigint)/1000) as status_time, -- datetime status started
-	  cast(from_unixtime(cast(rev.timestamp as bigint)/1000) as date) as status_date, -- date status started
-	  rev.usuario_id, -- user responsible to change status
-	  rev.motivo, -- reason status changed
-	  lag(i.status) over(partition by i.id order by i.rev) as previous_status, -- previous status ordered by the datetime that happened
--- since there's manual updates in the Imovel table that mismatches the last value of Imovel_AUD, we need to consider the current region value.
-	  im.regiao_id as id_region,
-	  i.* -- all information from Imovel table
+	select 
+		from_unixtime(cast(rev.timestamp as bigint)/1000) as status_time, -- datetime status started
+		cast(from_unixtime(cast(rev.timestamp as bigint)/1000) as date) as status_date, -- date status started
+		rev.usuario_id, -- user responsible to change status
+		rev.motivo, -- reason status changed
+		lag(i.status) over(partition by i.id order by i.rev) as previous_status, -- previous status ordered by the datetime that happened
+		-- since there's manual updates in the Imovel table that mismatches the last value of Imovel_AUD, we need to consider the current region value.
+		im.regiao_id as id_region,
+		-- all information from Imovel table
+		i.id,
+		i.rev,
+		i.status,
+		i.status_mod,
+		i.firstPublication
     from datalake_ebdb_raw_prod.imovel_aud i
     join datalake_ebdb_raw_prod.imovel im
       on i.id = im.id

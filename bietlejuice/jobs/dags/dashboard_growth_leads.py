@@ -66,8 +66,8 @@ def __get_leads():
                 select
                     case
                         when coalesce(i.cidade, l.cidade) in ('Belo Horizonte', 'Nova Lima') then 'bh'
-                        when coalesce(i.cidade, l.cidade) in ('BrasÌlia') then 'bsb'
-                        when coalesce(i.cidade, l.cidade) in ('Goi‚nia') then 'go'
+                        when coalesce(i.cidade, l.cidade) in ('Bras√≠lia') then 'bsb'
+                        when coalesce(i.cidade, l.cidade) in ('Goi√¢nia') then 'go'
                         when coalesce(i.cidade, l.cidade) in ('Rio de Janeiro') then 'rj'
                         else 'sp'
                     end as city,
@@ -100,9 +100,9 @@ def __get_leads():
                         null as lead_status,
                         null as conversao_id,
                         case
-                            when (i.usuarioQueCadastrou_id=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
+                            when (coalesce(i.originalUsuarioQueCadastrou_id, i.usuarioQueCadastrou_id)=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
                             then NULL
-                            else i.usuarioQueCadastrou_id
+                            else coalesce(i.originalUsuarioQueCadastrou_id, i.usuarioQueCadastrou_id)
                         end as rep_id,
                         null as affiliate_id,
                         i.usuario_id as owner_id,
@@ -111,17 +111,17 @@ def __get_leads():
                         i.dataCriacao as dt_prospect,
                         from_unixtime(ure.timestamp/1000) as dt_qualified,
                         case
-                            when (i.usuarioQueCadastrou_id=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
+                            when (coalesce(i.originalUsuarioQueCadastrou_id, i.usuarioQueCadastrou_id)=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
                             then 'Self Service Flow'
                             else 'Organic Flow'
                         end as flow,
                         case
-                            when (i.usuarioQueCadastrou_id=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
+                            when (coalesce(i.originalUsuarioQueCadastrou_id, i.usuarioQueCadastrou_id)=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
                             then 'Self-Service'
                             else 'Non-Self Service'
                         end as acquisition_method,
                         case
-                            when (i.usuarioQueCadastrou_id=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
+                            when (coalesce(i.originalUsuarioQueCadastrou_id, i.usuarioQueCadastrou_id)=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
                             then 'Owner App'
                             else 'Admin'
                         end as acquisition_channel
@@ -132,7 +132,7 @@ def __get_leads():
                         on cl.imovel_id = i.id
                     left join
                         Usuario u
-                        on u.id = i.usuarioQueCadastrou_id
+                        on u.id = coalesce(i.originalUsuarioQueCadastrou_id, i.usuarioQueCadastrou_id)
                     left join
                         (
                             select
@@ -156,7 +156,7 @@ def __get_leads():
                         l.id as lead_id,
                         l.status as lead_status,
                         cl.id as conversao_id,
-                        i.usuarioQueCadastrou_id as rep_id,
+                        coalesce(i.originalUsuarioQueCadastrou_id, i.usuarioQueCadastrou_id) as rep_id,
                         uda.id as affiliate_id,
                         i.usuario_id as owner_id,
                         i.regiao_id as region_id,
@@ -248,7 +248,7 @@ def __get_leads():
                         null as lead_id,
                         null as lead_status,
                         cl.id as conversao_id,
-                        i.usuarioQueCadastrou_id as rep_id,
+                        coalesce(i.originalUsuarioQueCadastrou_id, i.usuarioQueCadastrou_id) as rep_id,
                         null as affiliate_id,
                         i.usuario_id as owner_id,
                         i.regiao_id as region_id,
@@ -265,7 +265,7 @@ def __get_leads():
                         on i.id = cl.imovel_id
                     left join
                         Usuario u
-                        on u.id = i.usuarioQueCadastrou_id
+                        on u.id = coalesce(i.originalUsuarioQueCadastrou_id, i.usuarioQueCadastrou_id)
                     left join
                         (
                             select

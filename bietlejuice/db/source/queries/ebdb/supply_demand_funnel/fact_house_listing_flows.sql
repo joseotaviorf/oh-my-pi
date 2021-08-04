@@ -118,9 +118,9 @@ from
 			null as reason,
 			null as conversao_id,
 			case
-				when (i.usuarioQueCadastrou_id=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
+				when (coalesce(i.originalUsuarioQueCadastrou_id, i.usuarioQueCadastrou_id)=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
 				then NULL
-				else i.usuarioQueCadastrou_id
+				else coalesce(i.originalUsuarioQueCadastrou_id, i.usuarioQueCadastrou_id)
 			end as rep_id,
 			null as affiliate_id,
 			i.usuario_id as owner_id,
@@ -131,7 +131,7 @@ from
 			null as dt_first_contact,
 			null as dt_conversion,
 			case
-				when (i.usuarioQueCadastrou_id=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
+				when (coalesce(i.originalUsuarioQueCadastrou_id, i.usuarioQueCadastrou_id)=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
 				then from_unixtime(ure.timestamp/1000)
 				else i.dataCriacao
 			end as dt_qualified,
@@ -139,22 +139,22 @@ from
 			null as user_id_lead_first_discarder,
 			null as user_id_lead_last_discarder,
 			case
-				when (i.usuarioQueCadastrou_id=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
+				when (coalesce(i.originalUsuarioQueCadastrou_id, i.usuarioQueCadastrou_id)=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
 				then 'Self-Service Flow'
 				else 'Organic Flow'
 			end as flow,
 			case
-				when (i.usuarioQueCadastrou_id=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
+				when (coalesce(i.originalUsuarioQueCadastrou_id, i.usuarioQueCadastrou_id)=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
 				then 'Self-Service'
 				else 'Non-Self Service'
 			end as acquisition_method,
 			case
-				when (i.usuarioQueCadastrou_id=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
+				when (coalesce(i.originalUsuarioQueCadastrou_id, i.usuarioQueCadastrou_id)=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
 				then 'Organic Owner App'
 				else 'Admin'
 			end as acquisition_channel,
 			case
-				when (i.usuarioQueCadastrou_id=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
+				when (coalesce(i.originalUsuarioQueCadastrou_id, i.usuarioQueCadastrou_id)=i.usuario_id and u.tipoAdmin = 'Normal' and u.email not like '%quintoandar%')
 				then 'Owner App'
 				else 'Admin'
 			end as acquisition_source
@@ -165,7 +165,7 @@ from
 			on cl.imovel_id = i.id
 		left join
 			Usuario u
-			on u.id = i.usuarioQueCadastrou_id
+			on u.id = coalesce(i.originalUsuarioQueCadastrou_id, i.usuarioQueCadastrou_id)
 		left join
 		 	(
 		 		select
@@ -339,7 +339,7 @@ from
       on rep.dadosVendedor_id = cl.vendedor_id
     left join
       Usuario reg
-      on reg.id = i.usuarioQueCadastrou_id
+      on reg.id = coalesce(i.originalUsuarioQueCadastrou_id, i.usuarioQueCadastrou_id)
     left join
     (	SELECT
 	    	laud.id,
@@ -392,7 +392,7 @@ from
 			null as lead_reason,
 			null as reason,
 			cl.id as conversao_id,
-			i.usuarioQueCadastrou_id as rep_id,
+			coalesce(i.originalUsuarioQueCadastrou_id, i.usuarioQueCadastrou_id) as rep_id,
 			null as affiliate_id,
 			i.usuario_id as owner_id,
 			i.regiao_id as region_id,
@@ -417,7 +417,7 @@ from
 			AND DATE(coalesce(i.dataCriacao, '1900-01-01 00:00:00')) <= DATE('{0}')
 		left join
 			Usuario u
-			on u.id = i.usuarioQueCadastrou_id
+			on u.id = coalesce(i.originalUsuarioQueCadastrou_id, i.usuarioQueCadastrou_id)
 		where leadConvertido_id is null
 	) base
 	left join

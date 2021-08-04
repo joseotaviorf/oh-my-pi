@@ -71,7 +71,7 @@ SELECT
     dataPrimeiroVerificado AS ts_first_verified,
     tipoColisaoLead AS lead_collision_type,
     calculoPagamentoLeadCorretor AS ts_agent_lead_payment_calculated,
-    usuarioQueCadastrou_id AS id_user_registrant,
+    coalesce(originalUsuarioQueCadastrou_id, usuarioQueCadastrou_id) AS id_user_registrant,
     nomeImagemCapa AS cover_image_name,
     geoHash AS geo_hash,
     tipoAnuncio AS listing_type,

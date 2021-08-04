@@ -114,7 +114,7 @@ select
   coalesce(iv.chave_box_quintoandar,0) as info_visita_chave_box_quintoandar,
   nullif(i.dataCriacao, '0000-00-00 00:00:00') as data_criacao, -- due to a bug in Product, 0 timestamps are being created
   nullif(i.atualizadoEm, '0000-00-00 00:00:00') as atualizado_em, -- due to a bug in Product, 0 timestamps are being created
-  i.usuarioQueCadastrou_id as usuario_que_cadastrou_id,
+  coalesce(i.originalUsuarioQueCadastrou_id, i.usuarioQueCadastrou_id) as usuario_que_cadastrou_id,
   i.announcedBy is not null or i.announcedBy_id is not null as imovel_v3,
   i.areaTotal as area_total,
   i.areaTerreno as area_terreno,

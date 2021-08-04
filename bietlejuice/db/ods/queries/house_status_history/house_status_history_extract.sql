@@ -70,7 +70,7 @@ select
 	nullif(i.dataPrimeiroVerificado, '0000-00-00 00:00:00') as dataPrimeiroVerificado, -- due to a bug in Product, 0 timestamps are being created
 	i.tipoColisaoLead,
 	nullif(i.calculoPagamentoLeadCorretor, '0000-00-00 00:00:00') as calculoPagamentoLeadCorretor, -- due to a bug in Product, 0 timestamps are being created
-	i.usuarioQueCadastrou_id,
+	coalesce(i.originalUsuarioQueCadastrou_id, i.usuarioQueCadastrou_id) as usuarioQueCadastrou_id,
 	i.nomeImagemCapa,
 	i.geoHash,
 	i.tipoAnuncio,

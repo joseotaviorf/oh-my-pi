@@ -52,7 +52,7 @@ FROM
     
     f.dadosFotografo_id,
     coalesce(i.usuario_id, l.proprietarioLead_id) AS owner_id,
-    i.usuarioQueCadastrou_id AS rep_id,
+    coalesce(i.originalUsuarioQueCadastrou_id, i.usuarioQueCadastrou_id) AS rep_id,
     g.id as manager_id,
     u.tipoAdmin AS tipoAdmin ,
 
