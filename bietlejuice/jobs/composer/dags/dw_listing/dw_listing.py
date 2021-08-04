@@ -71,7 +71,7 @@ dw_task_group = DWTaskGroup(
 )
 
 dw_staging_task_group = dw_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.DW_STAGING
+    layer=LayerEnum.DW_STAGING, has_ods_migration_test=True
 )
 
 dw_task_group = dw_task_group.build_task_group_from_sql_files(
