@@ -14,7 +14,7 @@ WITH reservation AS (
     cast(r.is_ongoing as integer) as is_ongoing,
     r.cancellation_reason,
     r.installments,
-    ROW_NUMBER() OVER(PARTITION BY r.id ORDER BY h.ts_updated DESC) AS row_n
+    ROW_NUMBER() OVER(PARTITION BY r.id ORDER BY r.ts_updated DESC) AS row_n
   FROM datalake_kill_queue_clean_prod.reservation r
   left join datalake_kill_queue_clean_prod.house h on r.id_house = h.id
 )
