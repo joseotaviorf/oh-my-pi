@@ -351,9 +351,12 @@ bietlejuice.enrich_docx:
 bietlejuice.enrich_ebdb_contract:
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
   - bietlejuice.ebdb:create-clean-contract-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-contract-person-in-data-lake
   - bietlejuice.ebdb:create-clean-contract-version-in-data-lake
   - bietlejuice.ebdb:create-clean-full-contract-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-rent-flow-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
