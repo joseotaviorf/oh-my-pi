@@ -271,6 +271,11 @@ payments_deals_and_discounts:
     sheet_name: form_requests
     clean_table_name: payments_deals_and_discounts
 
+poa_partners:
+    sheet_id: 1Tq4Aq6TWz2csI-MTCyy49I63I1amEzn3cmTTyaZDKlU
+    sheet_name: poa_partners
+    clean_table_name: poa_partners
+
 promotional_bonus_cluster_targets:
     sheet_id: 1nSCX7SDFFg87Ow3yHGv8j6k_CRv9OYYBeKwhkpilWog
     sheet_name: promotional_bonus_cluster_targets
