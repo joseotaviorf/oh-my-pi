@@ -22,6 +22,7 @@ SELECT
     phonetertiary AS phone_tertiary,
     origin,
     originphone AS origin_phone,
+    sales_company,
     leadtype AS lead_type,
     affiliatetype AS affiliate_type,
     affiliatename AS affiliate_name,
