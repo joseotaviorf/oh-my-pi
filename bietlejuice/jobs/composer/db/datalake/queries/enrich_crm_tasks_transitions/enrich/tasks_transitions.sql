@@ -24,7 +24,10 @@ SELECT DISTINCT
         WHEN frontend_contact_channel IS NOT NULL THEN frontend_contact_channel
         WHEN tenant_contact_channel IS NOT NULL THEN tenant_contact_channel
     END AS contact_channel,
-    ts_transitioned
+    ts_transitioned,
+    wt.year,
+    wt.month,
+    wt.day
 FROM 
     datalake_crm.workflows_transitions AS wt
 INNER JOIN
@@ -33,3 +36,7 @@ INNER JOIN
 INNER JOIN
     datalake_crm.tasks AS task_to
         ON wt.id_task_to = task_to.id
+WHERE
+    wt.year = {year}
+    AND wt.month = {month}
+    AND wt.day = {day}
