@@ -78,6 +78,6 @@ SELECT
 FROM
     datalake_ebdb_clean.inspection AS i
     LEFT JOIN comments c
-        ON v.id = c.id_inspection
+        ON i.id = c.id_inspection
     LEFT JOIN inspection_aud_sync ias
-        ON v.id = ias.id_inspection
+        ON i.id = ias.id_inspection
