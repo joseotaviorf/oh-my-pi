@@ -348,6 +348,10 @@ bietlejuice.enrich_crm_tasks_resolution:
   - bietlejuice.enrich_crm:load-enrich-tasks
   - bietlejuice.enrich_crm:load-enrich-task-status-histories
 
+bietlejuice.enrich_crm_tasks_transitions:
+  - bietlejuice.enrich_crm:load-enrich-tasks
+  - bietlejuice.enrich_crm:load-enrich-workflows-transitions
+
 bietlejuice.enrich_docx:
   - bietlejuice.docx:load-clean-credit-evaluation
 
