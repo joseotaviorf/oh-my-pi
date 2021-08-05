@@ -1,0 +1,18 @@
+---
+tables:
+  - table_name: emails
+    extraction_type: incremental
+    date_filter_column: updated
+  - table_name: emailevents
+    clean_table_name: email_events
+    extraction_type: incremental
+    date_filter_column: created
+  - table_name: messages
+    extraction_type: incremental
+    date_filter_column: created
+  - table_name: unsubscriptions
+    extraction_type: incremental
+    date_filter_column: updated
+  - table_name: reasons
+    extraction_type: full
+partition_cols: ["year", "month", "day"]
