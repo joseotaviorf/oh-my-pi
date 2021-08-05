@@ -46,6 +46,6 @@ INNER JOIN
     last_extracted_events lev
       	ON lev.id_event = te.id_event
       	AND lev.dt_last_extracted = DATE(CONCAT(CAST(te.year AS VARCHAR(4)), '-', CAST(te.month AS VARCHAR(2)), '-', CAST(te.day AS VARCHAR(2))))
-INNER JOIN 
+LEFT JOIN 
     twilio_date ted
     	ON te.id_task_external = ted.id_task_external
