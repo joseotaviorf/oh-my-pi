@@ -10,9 +10,12 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-Produces the following output tables:
+Produces the following output tables, via full load:
 
 - `contract`
+- `contract_house`
+- `contract_person`
+- `ongoing_contracts`
 
 ### Responsible Data Engineering Team
 
