@@ -153,7 +153,7 @@ select
                         else  cast(cast(f.ts_scheduled as date) as timestamp) + interval '12' hour
                     end
                 ) - unix_timestamp(f.ts_created)
-            )/60000
+            )/60
         ) as creation_to_scheduling_diff_minutes,
         photographer_data.dt_photographer_started,
         f.ts_photographer_accepted,
