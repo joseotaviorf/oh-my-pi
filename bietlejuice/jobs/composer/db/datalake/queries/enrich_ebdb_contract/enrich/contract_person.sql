@@ -200,7 +200,7 @@ SELECT
     cp.name AS full_name,
     cp.phone_number,
     cp.email,
-    cv.doc_type AS personal_document_type,
+    UPPER(cv.doc_type) AS personal_document_type,
     cp.cpf AS personal_document,
     REPLACE(LOWER(cp.gender), 'o', 'e') AS gender,
     CASE
