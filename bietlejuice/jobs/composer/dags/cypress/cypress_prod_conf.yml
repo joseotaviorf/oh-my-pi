@@ -1,0 +1,3 @@
+---
+partition_cols: ["pwa", "dt"]
+tables_list: ["suites", "tests"]

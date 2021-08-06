@@ -1,47 +1,49 @@
 from datetime import datetime
-import pendulum
+from pendulum import timezone
 import os
 
+from airflow.utils.helpers import chain, cross_downstream
 from airflow.models import DAG, Variable
-import airflow.utils.helpers as airflow_helpers
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
-    QuintoAndarDatabricksSubmitRunOperator,
+)
+from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.jobs.composer.base.pipeline import LayerEnum
+from bietlejuice.jobs.composer.services.configuration_service import (
+    ConfigurationService,
 )
 
-from bietlejuice.jobs.composer.base.airflow import BaseDAG
-from bietlejuice.jobs.composer.base.pipeline import LayerEnum
-from bietlejuice.jobs.composer.dags.base.datalake_sub_dag import DatalakeSubDAG
-from bietlejuice.jobs.composer.services import FileService
 
 SOURCE = "cypress"
 DAG_ID = f"bietlejuice.{SOURCE}"
 ENV = os.environ.get("ENVIRONMENT")
-DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
-DATALAKE_BUCKET = Variable.get("datalake_bucket")
-CYPRESS_SOURCE_PATH = Variable.get("cypress_bucket")
-S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{SOURCE}/"
-BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
-ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
-
-LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
-    Variable.get("databricks_s3_bucket"), DAG_ID
+config_service = ConfigurationService(SOURCE)
+ATHENA_QUERY_RESULTS_BUCKET = config_service.get_config("athena_query_results_bucket")
+DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
+DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config(
+    "databricks_bietlejuice_repo_path"
 )
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
-LIBRARIES_DESCRIPTION = Variable.get(
-    "bietlejuice_default_libraries", deserialize_json=True
-)
+SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
+DOC_MD_CHART_URL = config_service.get_config("doc_md_chart_url")
 
+PARTITION_COLS = config_service.get_config("partition_cols")
+TABLES_LIST = config_service.get_config("tables_list")
 
-local_tz = pendulum.timezone("America/Sao_Paulo")
-MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz)
+MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "15 7 * * *"
+RAW_SPARK_JOB_FILE = (
+    f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/{SOURCE}/load_cypress_raw.py"
+)
+BASE_SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
 
-CYPRESS_TARGET_PATH = f"s3://{DATALAKE_BUCKET}/raw/cypress"
+CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
+CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
+CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
+    "destination"
+] = f"{SPARK_JOBS_LOGS_PATH}{DAG_ID}"
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -52,77 +54,51 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(SOURCE).format(chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID),
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
+        chart_url=DOC_MD_CHART_URL, dag_id=DAG_ID
+    ),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag,
-    task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=LIBRARIES_DESCRIPTION,
+    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-cypress_load_to_raw_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="cypress-load-to-raw",
+task_group = DatalakeTaskGroup(
     dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": SPARK_JOBS_PATH + "cypress_load_to_raw.py",
-            "parameters": [
-                CYPRESS_SOURCE_PATH,
-                CYPRESS_TARGET_PATH,
-                DATALAKE_BUCKET,
-                ENV,
-                "{{ ds }}",
-            ],
-        }
-    },
-)
-
-sync_metastore_tables_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="sync-hive-metastore-raw-tables",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables.py",
-            "parameters": [
-                DATALAKE_BUCKET,
-                LayerEnum.RAW.value,
-                SOURCE,
-                "--all-tables",
-            ],
-        }
-    },
-)
-
-clean_sub_dag = DatalakeSubDAG(
-    dag_id=DAG_ID,
-    start_date=MAIN_START_DATE,
     env=ENV,
     datalake_bucket=DATALAKE_BUCKET,
-    layer=LayerEnum.CLEAN,
-    database_base_name=SOURCE,
     relative_query_path=SOURCE,
-    spark_job_paths=BASE_SPARK_JOBS_PATH,
-    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
+    spark_jobs_path=BASE_SPARK_JOBS_PATH,
+    athena_query_result_location=ATHENA_QUERY_RESULTS_BUCKET,
 )
 
-file_list = FileService.list_sql_files_without_extension_from_layer(
-    SOURCE, LayerEnum.CLEAN.value
-)
+for table_name in TABLES_LIST:
 
-clean_sub_dags = clean_sub_dag.build_subdags_from_sql_files(
-    dag, file_list, is_incremental=True, partitions=["pwa", "dt"]
-)
+    raw_task_group = task_group.build_raw_task_group_for_single_table(
+        source=SOURCE,
+        target_database_base_name=SOURCE,
+        table_name=table_name,
+        extraction_spark_job_file=RAW_SPARK_JOB_FILE,
+        raw_spark_job_extra_args=[SOURCE, table_name, "{{ ds }}"],
+    )
 
-create_cluster_task >> cypress_load_to_raw_task >> list(
-    clean_sub_dags.values()
-) >> terminate_cluster_task
+    clean_task_group = task_group.build_clean_task_group(
+        source_database_base_name=SOURCE,
+        target_database_base_name=SOURCE,
+        table_name=table_name,
+        is_incremental=True,
+        partitions=PARTITION_COLS,
+    )
 
-airflow_helpers.chain(
-    cypress_load_to_raw_task, sync_metastore_tables_task, terminate_cluster_task
-)
+    chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
+
+    cross_downstream(
+        DatalakeTaskGroup.last_tasks(raw_task_group),
+        DatalakeTaskGroup.first_tasks(clean_task_group),
+    )
+
+    terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_group))

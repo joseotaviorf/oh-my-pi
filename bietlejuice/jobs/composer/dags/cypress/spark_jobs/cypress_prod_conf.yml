@@ -1,0 +1,84 @@
+---
+raw_partition_cols: ["pwa", "dt"]
+cypress_source_bucket: 5a-cypress
+cypress_enrich_query:
+  suites: |
+    WITH results_set AS (
+        SELECT
+            EXPLODE(results) AS results,
+            SPLIT(INPUT_FILE_NAME(), '/') AS split_path
+        FROM
+            temp_view_{source}_{table_name}
+    ),
+    suites_set AS (
+        SELECT
+            EXPLODE(results.suites) AS suites,
+            split_path[5] AS test_execution_id,
+            split_path[3] AS pwa,
+            split_path[4] AS dt
+        FROM results_set
+    )
+    SELECT
+        suites._timeout,
+        suites.afterHooks,
+        suites.beforeHooks,
+        suites.duration,
+        suites.failures,
+        suites.file,
+        suites.fullFile,
+        suites.passes,
+        suites.pending,
+        suites.root,
+        suites.rootEmpty,
+        suites.skipped,
+        suites.suites,
+        suites.title,
+        suites.uuid,
+        test_execution_id,
+        pwa,
+        dt
+    FROM suites_set
+  tests: |
+    WITH results_set AS (
+        SELECT
+            EXPLODE(results) AS results,
+            SPLIT(INPUT_FILE_NAME(), '/') AS split_path
+        FROM
+            temp_view_{source}_{table_name}
+    ),
+    suites_set AS (
+        SELECT
+            EXPLODE(results.suites) AS suites,
+            split_path[3] AS pwa,
+            split_path[4] AS dt
+        FROM
+            results_set
+    ),
+    tests_set AS (
+        SELECT
+            EXPLODE(suites.tests) AS tests,
+            pwa,
+            dt
+        FROM
+            suites_set
+    )
+    SELECT
+        tests.code,
+        tests.context,
+        tests.duration,
+        tests.err,
+        tests.fail,
+        tests.fullTitle,
+        tests.isHook,
+        tests.parentUUID,
+        tests.pass,
+        tests.pending,
+        tests.skipped,
+        tests.speed,
+        tests.state,
+        tests.timedOut,
+        tests.title,
+        tests.uuid,
+        pwa,
+        dt
+    FROM tests_set
