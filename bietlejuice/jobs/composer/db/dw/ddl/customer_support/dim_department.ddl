@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS customer_support.dim_department (
     journey_step VARCHAR,
     channel VARCHAR,
     front_or_back VARCHAR(10),
+    area VARCHAR,
     concentrix_area_name VARCHAR,
     is_concentrix BOOLEAN,
     is_active BOOLEAN,

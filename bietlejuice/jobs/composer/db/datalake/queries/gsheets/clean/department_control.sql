@@ -7,6 +7,7 @@ SELECT
     area_cc AS concentrix_area_name,
     caixa_ativa_atualmente AS active_department,
     etapa_da_jornada AS journey_step,
-    front_back AS front_or_back
+    front_back AS front_or_back,
+    area
 FROM
     datalake_gsheets_raw.department_control
