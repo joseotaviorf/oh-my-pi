@@ -13,7 +13,6 @@ elasticsearch==5.4.0
 enum==0.4.6
 enum34==1.1.6
 et-xmlfile==1.0.1
-facebookads==2.11.1
 numpy==1.13.0
 fastparquet==0.2.1
 futures==3.0.5
@@ -42,7 +41,6 @@ pyarrow==0.4.0
 pyasn1==0.1.9
 pyasn1-modules==0.0.8
 pycparser==2.17
-pycriteo==0.0.2
 PyDrive
 pymongo==3.5.1
 pymysql==0.8.0
@@ -54,7 +52,6 @@ python-dateutil==2.7.3
 python-slugify==1.1.4
 pytz==2019.3
 pyyaml==4.2b1
-quintoandar-linkedin-client==0.2.0
 raven==6.3.0
 requests>=2.20.0
 rsa==3.4.2
@@ -79,7 +76,6 @@ xlrd
 xmltodict==0.10.2
 snakebite==2.11.0
 sshtunnel==0.1.4
-twitter-ads==7.0.1
 configparser==3.5.0b2
 apache-airflow==1.10.2
 git+git://github.com/quintoandar/python-utils.git@v0.4.2
