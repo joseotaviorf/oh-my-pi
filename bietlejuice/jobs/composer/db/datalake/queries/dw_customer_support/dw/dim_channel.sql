@@ -17,9 +17,9 @@ FROM
 GROUP BY 1,2,3,4
 UNION ALL
 SELECT
-  MD5('email') AS sk_channel,
+  MD5(CONCAT('email', COALESCE(direction, ''))) AS sk_channel,
   'email' AS channel,
-  'inbound' AS direction,
+  direction,
   NOW() AS ts_load
 FROM
   datalake_customer_support.email

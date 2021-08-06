@@ -180,6 +180,10 @@ SELECT DISTINCT
   ze.agent_company,
   ze.agent_manager,
   ze.agent_email,
+  CASE 
+    WHEN ze.tags LIKE '%"ticket_ativo"%' THEN 'outbound'
+    ELSE 'inbound'
+  END AS direction,
   ze.tags,
   ze.status,
   ze.department,

@@ -158,7 +158,7 @@ email_tickets AS (
         COALESCE(contact_theme_tag, '')
       )
     ) AS sk_taxonomy,
-    MD5('email') AS sk_channel,
+    MD5(CONCAT('email', COALESCE(direction, ''))) AS sk_channel,
     id_agent AS sk_first_agent,
     id_agent AS sk_last_agent,
     MD5(department) AS sk_first_department,
