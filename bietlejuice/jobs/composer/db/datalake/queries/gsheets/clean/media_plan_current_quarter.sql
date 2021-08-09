@@ -14,6 +14,7 @@ SELECT
     NULLIF(creative, '') AS creative_name,
     NULLIF(ad_description, '') AS ad_description,
     NULLIF(ad_type, '') AS ad_type,
+    NULLIF(id_rule_city_group, '') AS id_rule_city_group,
     FLOAT(NULLIF(cost, '')) AS cost,
     FLOAT(NULLIF(grp, '')) AS grp,
     FLOAT(NULLIF(trp, '')) AS trp,
