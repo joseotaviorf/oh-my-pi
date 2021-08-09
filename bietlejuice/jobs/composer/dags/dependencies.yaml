@@ -259,6 +259,13 @@ bietlejuice.enrich_amplitude_user:
 bietlejuice.enrich_amplitude_visit:
   - bietlejuice.amplitude
 
+bietlejuice.enrich_big_agent:
+  - bietlejuice.big_agent:load-clean-agency
+  - bietlejuice.big_agent:load-clean-agent
+  - bietlejuice.big_agent:load-clean-enrollment
+  - bietlejuice.big_agent:load-clean-house
+  - bietlejuice.big_agent:load-clean-program
+
 bietlejuice.enrich_bigfone_events:
   - bietlejuice.bigfone:load-clean-event
 
