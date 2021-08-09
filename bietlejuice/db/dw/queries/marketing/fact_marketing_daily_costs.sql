@@ -788,7 +788,7 @@ cost_taxonomy AS (
             WHEN cf.campaign_name_l LIKE '%porto%alegre%' THEN
                 'Porto Alegre'
             WHEN cf.campaign_name_l LIKE '%curitiba%'
-                OR cf.campaign_name_l LIKE '%paran_%' THEN
+                OR cf.campaign_name_l LIKE '%parana%' THEN
                 'Curitiba'
             WHEN cf.campaign_name_l LIKE '%florian_polis%'
                 OR cf.campaign_name_l LIKE '%santa_catarina%' THEN
