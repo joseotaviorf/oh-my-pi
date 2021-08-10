@@ -52,6 +52,7 @@ select
 		when e.bill_item = 'entry.bill-item/reservation' then 'reservation'
 		else et.entry_type
     end as accounting_account,
+    e.producer,
     e.description,
     e.accrual_year_month,
     now() as ts_load
