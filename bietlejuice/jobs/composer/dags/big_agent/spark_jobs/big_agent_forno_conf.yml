@@ -1,0 +1,10 @@
+---
+raw_partition_cols: [year, month, day]
+block_list: [change_owner_control, flyway_schema_history]
+customized_tables:
+  revinfo:
+    date_filter_column: revtstmp
+    unixtime_measure: miliseconds
+  user_revision_entity:
+    date_filter_column: timestamp
+    unixtime_measure: miliseconds

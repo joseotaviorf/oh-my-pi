@@ -11,14 +11,11 @@ from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import PostgresConsumer
 from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
+from bietlejuice.jobs.composer.services.configuration_service import (
+    ConfigurationService,
+)
 
 JOB_NAME = "load_incremental_big_agent_into_datalake_raw"
-BLOCK_LIST = ["change_owner_control", "flyway_schema_history"]
-
-# if the table doesn't have an "updated_at" column to load it incrementally, then it is necessary to map it.
-COLUMN_MAPPING = {"revinfo": "revtstmp", "user_revision_entity": "timestamp"}
-
-UNIX_FORMAT_TABLES = ["revinfo", "user_revision_entity"]
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -26,8 +23,8 @@ logger = QuintoAndarLogger(JOB_NAME)
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env", type=str, help="forno/prod environment")
-    parser.add_argument("source")
     parser.add_argument("datalake_bucket")
+    parser.add_argument("source")
     parser.add_argument("execution_date")
 
     args = parser.parse_args()
@@ -36,7 +33,11 @@ if __name__ == "__main__":
     datalake_bucket = args.datalake_bucket
     execution_date = args.execution_date
 
-    partition_cols = ["year", "month", "day"]
+    config_service = ConfigurationService(source)
+
+    block_list = config_service.get_config("block_list")
+    raw_partition_cols = config_service.get_config("raw_partition_cols")
+    customized_tables = config_service.get_config("customized_tables")
 
     logger.info(
         f"""
@@ -75,38 +76,37 @@ if __name__ == "__main__":
 
     for table in tables:
         table_name = table.table_name
-        if table_name not in BLOCK_LIST:
-            unixtime_measure = (
-                "miliseconds" if table_name in UNIX_FORMAT_TABLES else None
+        if table_name not in block_list:
+            unixtime_measure = customized_tables.get(table_name, {}).get(
+                "unixtime_measure"
+            )
+            date_filter_column = customized_tables.get(table_name, {}).get(
+                "date_filter_column", "updated_at"
             )
             df = postgres_consumer.get_incremental_data_by_granularity_from_table(
                 table_name,
-                COLUMN_MAPPING.get(table_name, "updated_at"),
+                date_filter_column,
                 execution_date,
                 unixtime_measure=unixtime_measure,
             )
 
-            s3_loader.load_incremental_table(
+            s3_loader.load_df(
+                df=df,
+                s3_path=f"{database_location}{table_name}",
+                format_options=format_options,
+                partitions=raw_partition_cols,
+            )
+            spark_metastore_loader.update_metastore(
                 df=df,
                 database_name=database_name,
                 table_name=table_name,
                 format_options=format_options,
                 database_location=database_location,
-                partition_cols=partition_cols,
-            )
-            spark_metastore_loader.update_metastore(
-                df,
-                database_name,
-                table_name,
-                format_options,
-                database_location,
-                partition_cols,
-                force_recreate=False,
+                partitions=raw_partition_cols,
             )
             spark_metastore_service.create_new_partitions_from_df(
+                df=df,
                 database_name=database_name,
                 table_name=table_name,
-                df=df,
-                partition_cols=partition_cols,
+                partition_cols=raw_partition_cols,
             )
-            spark_metastore_service.refresh_table(database_name, table_name)
