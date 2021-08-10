@@ -8,3 +8,4 @@ class ServiceEnum(Enum):
     """
 
     PUBSUB = "PUBSUB_SERVICE"
+    METADATA_PROPAGATOR = "METADATA_PROPAGATOR_SERVICE"
