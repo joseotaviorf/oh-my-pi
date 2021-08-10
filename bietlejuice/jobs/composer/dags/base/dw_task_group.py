@@ -5,10 +5,16 @@ from airflow.operators.quintoandar_databricks import (
 import json
 from bietlejuice.jobs.composer.base.airflow import BaseTaskGroup
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
+from bietlejuice.jobs.composer.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.jobs.composer.formatters import StringFormatter
 
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import Variable
+
+from bietlejuice.jobs.composer.services import FileService
+from bietlejuice.jobs.composer.services.atlas_services.metadata_files_service import (
+    MetadataFilesService,
+)
 
 
 class DWTaskGroup(BaseTaskGroup):
@@ -65,6 +71,8 @@ class DWTaskGroup(BaseTaskGroup):
            final schema database in S3
         . sync_metastore_table_task: sync the table from spark metastore
            to hive metastore
+        . propagate_table_metadata_task: propagates to metadata-propagator service
+           the metadata of the table
 
         :param table_name: table name to be created
         :param spectrum_iam_role: aws redshift spectrum IAM role
@@ -143,13 +151,36 @@ class DWTaskGroup(BaseTaskGroup):
             execution_timeout=timedelta(hours=self.execution_timeout_hours),
         )
 
+        final_tasks = [load_table_to_redshift_task, sync_metastore_table_task]
+
+        if FileService.metadata_file_exists(
+            self.relative_query_path, layer, table_name
+        ):
+            propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
+                dag=self.dag,
+                task_id=f"propagate-table-metadata-{layer}-{slugged_table_name}",
+                json={
+                    "spark_python_task": {
+                        "python_file": f"{self.spark_jobs_path}/propagate_table_metadata.py",
+                        "parameters": [
+                            layer,
+                            MetadataTypeEnum.LINEAGE.value,
+                            self.dw_schema,
+                            table_name,
+                        ],
+                    }
+                },
+                execution_timeout=timedelta(hours=self.execution_timeout_hours),
+            )
+            sync_metastore_table_task.set_downstream([propagate_table_metadata_task])
+            final_tasks = [load_table_to_redshift_task, propagate_table_metadata_task]
+
         load_table_to_dw_final_schema_task.set_downstream(
             [sync_metastore_table_task, load_table_to_redshift_task]
         )
 
         return DWTaskGroup.format_tasks_boundaries(
-            initial_tasks=[load_table_to_dw_final_schema_task],
-            final_tasks=[load_table_to_redshift_task, sync_metastore_table_task],
+            initial_tasks=[load_table_to_dw_final_schema_task], final_tasks=final_tasks
         )
 
     def build_dw_staging_task_group(
