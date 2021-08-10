@@ -49,13 +49,16 @@ email_total AS (
         WHEN GET_JSON_OBJECT(satisfaction_rating, '$.score') IN ('bad') THEN FALSE
       END AS is_solved,
       NULL AS ts_first_seen,
-      NULL AS ts_first_response -- here we'll put th updated_at field when importing the Zendesk Satisfaction Ratings data.
+      MIN(sr.ts_updated) OVER(PARTITION BY t.id_ticket) AS ts_first_response
     FROM
       datalake_zendesk_tickets_clean.tickets t
-      JOIN
-        last_update_ticket lut
-          ON t.id_ticket = lut.id_ticket
-          AND t.ts_updated = lut.ts_last_updated
+    JOIN
+      last_update_ticket lut
+        ON t.id_ticket = lut.id_ticket
+        AND t.ts_updated = lut.ts_last_updated
+    LEFT JOIN
+      datalake_zendesk_tickets_clean.satisfaction_ratings AS sr
+        ON sr.id_ticket = lut.id_ticket
     UNION ALL
     SELECT
       id_ticket,

@@ -62,6 +62,7 @@ bietlejuice.dw_customer_support:
   - bietlejuice.enrich_customer_support:load-enrich-chat
   - bietlejuice.enrich_customer_support:load-enrich-email
   - bietlejuice.gsheets:load-clean-department-control
+  - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
 
 bietlejuice.dw_house:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
