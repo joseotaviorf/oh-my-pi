@@ -7,12 +7,7 @@ from airflow.operators.quintoandar_databricks import (
 
 from bietlejuice.jobs.composer.base.airflow import BaseTaskGroup
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
-from bietlejuice.jobs.composer.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.jobs.composer.formatters import StringFormatter
-from bietlejuice.jobs.composer.services import FileService
-from bietlejuice.jobs.composer.services.atlas_services.metadata_files_service import (
-    MetadataFilesService,
-)
 
 AIRFLOW_DEFAULT_POOL = "default_pool"  # TODO: Add to parameter service to be created
 
@@ -227,11 +222,10 @@ class DatalakeTaskGroup(BaseTaskGroup):
         # cannot chose only one now, we would need a refactoring first.
     ):
         """
-        Create a task group containing 4 tasks:
+        Create a task group containing 3 tasks:
         1. load table to metastore database using a sql query
         2. create a external table in Athena using metastore created before
         3. sync table from spark metastore to hive metastore
-        4. propagate the table metadata to metadata-propagator service
 
         :param layer: layer Enum
         :type layer: bietlejuice.jobs.composer.base.pipeline.LayerEnum member
@@ -330,33 +324,9 @@ class DatalakeTaskGroup(BaseTaskGroup):
         load_table_task.set_downstream(
             [create_external_table_task, sync_metastore_table_task]
         )
-
-        final_tasks = [create_external_table_task, sync_metastore_table_task]
-
-        if FileService.metadata_file_exists(
-            self.relative_query_path, layer.value, table_name
-        ):
-            propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
-                dag=self.dag,
-                task_id=f"propagate-table-metadata-{layer.value}-{slugged_table_name}",
-                json={
-                    "spark_python_task": {
-                        "python_file": f"{self.spark_jobs_path}/propagate_table_metadata.py",
-                        "parameters": [
-                            layer.value,
-                            MetadataTypeEnum.LINEAGE.value,
-                            target_database_base_name,
-                            table_name,
-                        ],
-                    }
-                },
-                execution_timeout=timedelta(hours=self.execution_timeout_hours),
-            )
-            sync_metastore_table_task.set_downstream([propagate_table_metadata_task])
-            final_tasks = [create_external_table_task, propagate_table_metadata_task]
-
         return DatalakeTaskGroup.format_tasks_boundaries(
-            initial_tasks=[load_table_task], final_tasks=final_tasks
+            initial_tasks=[load_table_task],
+            final_tasks=[create_external_table_task, sync_metastore_table_task],
         )
 
     def build_clean_task_group(

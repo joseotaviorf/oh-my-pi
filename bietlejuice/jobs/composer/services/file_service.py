@@ -5,10 +5,7 @@ from os.path import isdir, isfile
 import yaml
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.db import (
-    QUERIES_DATALAKE_PATH,
-    DATALAKE_METADATA_PATH,
-)
+from bietlejuice.jobs.composer.base.db import QUERIES_DATALAKE_PATH
 
 logger = QuintoAndarLogger("FileService")
 
@@ -149,27 +146,3 @@ class FileService:
     def remove_file_extension(file_name):
         ext_pos = file_name.rfind(".")
         return file_name[:ext_pos]
-
-    @staticmethod
-    @logger
-    def metadata_file_exists(
-        relative_file_path: str, layer: str, table_name: str
-    ) -> bool:
-        """
-        Checks if a metadata file for a given table exists
-        :param relative_file_path: The relative path to the file.
-            This should be the same as the relative_query_path used in other tasks
-            e.g:
-            `dw_smart_price`, `dw_marketing_costs/google`, etc
-        :param layer: The layer that the file is related to.
-        :param table_name: The name of the table that the file is related to
-        :return: True if the file exists, False if no file is found
-        """
-        for extension in ("yml", "yaml"):
-            files = glob.glob(
-                f"{DATALAKE_METADATA_PATH}/{relative_file_path}/{layer}/**/{table_name}.{extension}",
-                recursive=True,
-            )
-            if files and files[0]:
-                return True
-        return False
