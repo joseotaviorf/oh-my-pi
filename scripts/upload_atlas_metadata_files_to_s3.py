@@ -1,8 +1,11 @@
 import argparse
 import glob
+import os
 
 from yaml import safe_load
 import boto3
+
+ABS_PATH = os.path.dirname(os.path.realpath(__file__))
 
 
 def get_first_key(input_dict: dict) -> str:
@@ -59,19 +62,25 @@ def main():
     s3 = boto3.client("s3")
 
     for extension in ("*.yml", "*.yaml"):
-        for file_path in glob.iglob(
-            f"../bietlejuice/jobs/composer/db/datalake/metadata/**/{extension}",
+        files = glob.glob(
+            f"{ABS_PATH}/../bietlejuice/jobs/composer/db/datalake/metadata/**/{extension}",
             recursive=True,
-        ):
-            remote_path = get_remote_path_from_yml_file(file_path)
-            s3.upload_file(
-                file_path,
-                metadata_s3_bucket,
-                remote_path,
-                ExtraArgs={"ACL": "bucket-owner-full-control"},
-            )
+        )
+        if files:
+            for file_path in files:
+                remote_path = get_remote_path_from_yml_file(file_path)
+                s3.upload_file(
+                    file_path,
+                    metadata_s3_bucket,
+                    remote_path,
+                    ExtraArgs={"ACL": "bucket-owner-full-control"},
+                )
+                print(
+                    f"local_path={file_path}, remote_path={remote_path}, msg=Metadata file saved to S3"
+                )
+        else:
             print(
-                f"local_path={file_path}, remote_path={remote_path}, msg=Metadata file saved to S3"
+                f"msg=No files found!"
             )
 
 
