@@ -192,6 +192,7 @@ validate-atlas-metadata-files:
 	@echo "Validating Atlas metadata files"
 	@echo "=========="
 	@echo ""
+	@pip install yamale==3.0.8
 	@git fetch --no-tags origin +refs/heads/master
 	@python scripts/atlas_metadata_validation/validate_atlas_metadata.py  "$(DRONE_BRANCH)"
 
