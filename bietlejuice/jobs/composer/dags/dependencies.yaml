@@ -246,19 +246,19 @@ bietlejuice.dw_visit:
   - bietlejuice.ebdb:create-clean-visit-in-data-lake
 
 bietlejuice.enrich_amplitude_offer:
-  - bietlejuice.amplitude
+  - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
 
 bietlejuice.enrich_amplitude_page_viewed_events:
-  - bietlejuice.amplitude
+  - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
 
 bietlejuice.enrich_amplitude_partner_taxonomy:
-  - bietlejuice.amplitude:events-raw-to-clean
+  - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
 
 bietlejuice.enrich_amplitude_user:
   - bietlejuice.amplitude:update-clean-events-daily-partition-athena
 
 bietlejuice.enrich_amplitude_visit:
-  - bietlejuice.amplitude
+  - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
 
 bietlejuice.enrich_big_agent:
   - bietlejuice.big_agent:load-clean-agency
