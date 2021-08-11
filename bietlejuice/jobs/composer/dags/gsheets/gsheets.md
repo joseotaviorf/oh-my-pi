@@ -112,6 +112,7 @@ This pipeline produces the following output tables:
     - `survival_estimation`
     - `targets_acquisition_cumulative_autonomous_agent`
     - `targets_agents_engagement`
+    - `target_nps_weekly`
     - `target_sale_cohort_demand`
     - `target_sale_cohort_supply`
     - `targets_avg_ticket_adm_fee`

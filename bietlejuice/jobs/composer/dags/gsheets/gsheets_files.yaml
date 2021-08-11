@@ -431,6 +431,11 @@ survival_estimation_new_version:
     sheet_name: survival_estimation_new_version
     clean_table_name: survival_estimation_new_version
 
+target_nps_weekly:
+    sheet_id: 17hx0dsLK4CJ-sivMf7w1L54LMpZgkHboKpuI0S1Di3o
+    sheet_name: target_nps_weekly
+    clean_table_name: target_nps_weekly
+
 target_sale_cohort_demand:
     sheet_id: 1IzXMT2uzLovZ6sI30a_dfFsBuWaffBAoid6rFdIszC0
     sheet_name: target_sale_cohort_demand
