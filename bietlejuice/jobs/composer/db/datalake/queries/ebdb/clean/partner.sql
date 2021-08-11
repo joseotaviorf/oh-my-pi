@@ -1,23 +1,23 @@
 SELECT
     id,
     amplitudedeviceid as id_amplitude_device,
-    atualizadoEm AS ts_updated,
-    criadoEm AS ts_created,
+    state_id AS id_state,
     name,
     phone,
-    partnershipStartsAt AS ts_partnership_started,
     cnpj,
     creci,
     email,
-    landingUrl AS landing_url,
-    zipCode AS zip_code,
     address,
-    complement,
     number,
-    neighborhood,
+    complement,
     city,
-    state_id AS id_state,
+    neighborhood,
+    zipCode AS zip_code,
+    type,
+    landingUrl AS landing_url,
     tradeName AS trade_name,
-    type
+    partnershipStartsAt AS ts_partnership_started,
+    criadoEm AS ts_created,
+    atualizadoEm AS ts_updated
 FROM
     datalake_ebdb_raw.`Partner`
