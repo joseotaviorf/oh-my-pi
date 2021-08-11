@@ -25,7 +25,7 @@ WITH reservations_events AS (
     GROUP BY 1,2,3,4,5,6,7,8,9
 ),
 reservations_attributes AS (
-    SELECT 
+    SELECT DISTINCT
         GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.call_sid') AS id_call,
         GET_JSON_OBJECT(metadata,'$.event_data.TaskSid') AS id_task,
         GET_JSON_OBJECT(metadata,'$.event_data.ReservationSid') AS id_reservation,
@@ -43,7 +43,7 @@ reservations_attributes AS (
             GET_JSON_OBJECT(metadata,'$.event_data.WorkflowName') = 'Assign to Anyone'
             OR GET_JSON_OBJECT(metadata,'$.event_data.WorkflowName') = 'Assign to Flex'
         )
-        AND event = 'reservation.accepted'
+        AND event IN ('reservation.accepted', 'reservation.rejected', 'reservation.timeout')
         AND GET_JSON_OBJECT(metadata,'$.event_data.ReservationSid') IS NOT NULL
         AND year = {year}
         AND month = {month}
