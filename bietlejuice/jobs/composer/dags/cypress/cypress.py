@@ -4,6 +4,7 @@ import os
 
 from airflow.utils.helpers import chain, cross_downstream
 from airflow.models import DAG, Variable
+from airflow.operators.sensors import S3KeySensor
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -31,6 +32,7 @@ DOC_MD_CHART_URL = config_service.get_config("doc_md_chart_url")
 
 PARTITION_COLS = config_service.get_config("partition_cols")
 TABLES_LIST = config_service.get_config("tables_list")
+CYPRESS_SOURCE_BUCKET = config_service.get_config("cypress_source_bucket")
 
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "15 7 * * *"
@@ -57,6 +59,18 @@ dag = DAG(
     doc_md=BaseDAG.get_dag_doc(SOURCE).format(
         chart_url=DOC_MD_CHART_URL, dag_id=DAG_ID
     ),
+)
+
+check_s3_objects_task = S3KeySensor(
+    task_id="check-s3-objects",
+    poke_interval=0,
+    timeout=10,
+    soft_fail=True,
+    aws_conn_id="aws_default",
+    wildcard_match=True,
+    bucket_name=CYPRESS_SOURCE_BUCKET,
+    bucket_key="*/{{ ds }}/*/*.json",
+    dag=dag,
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
@@ -94,7 +108,11 @@ for table_name in TABLES_LIST:
         partitions=PARTITION_COLS,
     )
 
-    chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
+    chain(
+        check_s3_objects_task,
+        create_cluster_task,
+        DatalakeTaskGroup.first_tasks(raw_task_group),
+    )
 
     cross_downstream(
         DatalakeTaskGroup.last_tasks(raw_task_group),
