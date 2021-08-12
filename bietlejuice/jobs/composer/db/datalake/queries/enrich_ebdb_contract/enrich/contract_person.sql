@@ -2,8 +2,8 @@ WITH person_cpf AS (
     SELECT
         id,
         cpf,
-        cpf RLIKE '^([0-9]{{3}})?(\.)([0-9]{{3}})?(\.)([0-9]{{3}})?(.)([0-9]{{2}})$' AS is_cpf_format,
-        cpf RLIKE '^([0-9]{{2}})?(\.)([0-9]{{3}})?(\.)([0-9]{{3}})(\/)([0-9]{{4}})?(.)([0-9]{{2}})$' AS is_cnpj_format
+        cpf RLIKE '^([0-9]{{3}})(\.)?([0-9]{{3}})(\.)?([0-9]{{3}})(\.)?([0-9]{{2}})$' AS is_cpf_format,
+        cpf RLIKE '^([0-9]{{2}})(\.)?([0-9]{{3}})(\.)?([0-9]{{3}})(\/)?([0-9]{{4}})(\.)?([0-9]{{2}})$' AS is_cnpj_format
     FROM
         datalake_ebdb_clean.contract_person
     WHERE
