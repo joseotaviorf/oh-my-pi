@@ -5,10 +5,10 @@ from io import BytesIO
 import petl
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
 from bietlejuice.jobs.base.data_frame_service import DataFrameJsonService
-from bietlejuice.jobs.composer.formatters.string_formatter import StringFormatter
 from bietlejuice.jobs.etl import DATALAKE_QUERIES_DIR
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.google.google_sheets import GoogleSheetsClient
+from unidecode import unidecode
 
 logger = QuintoAndarLogger("GoogleSheets")
 
@@ -46,9 +46,7 @@ class GoogleSheets(object):
                 )
             )
 
-        snake_case_columns = StringFormatter.set_alphanumeric_snake_case(
-            df_gsheets_raw.columns
-        )
+        snake_case_columns = self._to_snake_case_columns(df_gsheets_raw.columns)
         df_gsheets_raw.rename(columns=snake_case_columns, inplace=True)
 
         df_gsheets = self._exclude_empty_column_labels(df_gsheets_raw)
@@ -96,6 +94,7 @@ class GoogleSheets(object):
             subbed = _underscorer1.sub(r"\1_\2", old_column)
             new_column = _underscorer2.sub(r"\1_\2", subbed).lower()
             new_column = new_column.replace(" ", "_")
+            new_column = unidecode(new_column.decode("utf-8"))
             new_columns.update({old_column: new_column})
 
         return new_columns
