@@ -149,7 +149,7 @@ select
   c.rental_guarantee_value,
   c.home_insurance_installment,
   c.home_insurance_value,
-  c.fist_rent_comission_fee,
+  c.fist_rent_comission_fee, -- TODO this column name is wrong and must be updated to first_rent_comission_fee
   c.condo_price,
   c.iptu,
   c.tenant_service_fee,
