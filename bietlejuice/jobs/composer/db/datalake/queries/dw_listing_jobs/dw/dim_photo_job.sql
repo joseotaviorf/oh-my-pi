@@ -21,7 +21,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
 	j.photo_session_phone AS photo_shoot_phone,
 	NULLIF(j.photo_session_secondary_phone, '') AS photo_shoot_second_phone,
 	j.key_pick_up AS key_withdraw,
-	LEFT(NULLIF(j.key_others, ''), 255) as key_comments,
+	LEFT(NULLIF(j.key_others, ''), 100) as key_comments,
 	j.photographer_name AS photographer_name,
 	j.photographer_email AS photographer_email,
 	j.contract_type AS photographer_contract_type,
