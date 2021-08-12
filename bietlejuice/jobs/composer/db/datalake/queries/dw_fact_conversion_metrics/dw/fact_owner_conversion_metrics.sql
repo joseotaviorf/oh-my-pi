@@ -168,7 +168,7 @@ contract_owner as (
 		on lc.id_house = h.id
 	left join datalake_ebdb_clean.lead l
 		on l.id = lc.id_converted_lead
-	    and l.affiliate_type = 'B2BPartner'
+	    and l.affiliate_type = 'B2BPartner'  -- TODO [ODS] SHOULD BE ON AN ENRICH
 	left join datalake_ebdb_clean.partner_agent pa_b2b_online
 	  on pa_b2b_online.id_user = l.id_agent_has_indicated
 ),

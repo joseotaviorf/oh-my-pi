@@ -82,6 +82,13 @@ bietlejuice.dw_invoice_entries:
   - bietlejuice.retsuko:load-clean-invoice
   - bietlejuice.enrich_retsuko:load-enrich-invoice
 
+bietlejuice.dw_contract:
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract-b2b
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
+  - bietlejuice.enrich_ebdb_listing:load-enrich-portability
+
 bietlejuice.dw_criteo_campaigns:
   - bietlejuice.criteo_campaigns:load-clean-criteo-campaigns
 
@@ -370,10 +377,16 @@ bietlejuice.enrich_ebdb_contract:
   - bietlejuice.ebdb:create-clean-contract-person-in-data-lake
   - bietlejuice.ebdb:create-clean-contract-version-in-data-lake
   - bietlejuice.ebdb:create-clean-full-contract-in-data-lake
+  - bietlejuice.ebdb:create-clean-conversion-lead-in-data-lake
   - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.ebdb:create-clean-lead-in-data-lake
+  - bietlejuice.ebdb:create-clean-partner-in-data-lake
+  - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
+  - bietlejuice.ebdb:create-clean-photographer-job-in-data-lake
   - bietlejuice.ebdb:create-clean-rent-flow-in-data-lake
   - bietlejuice.ebdb:create-clean-user-in-data-lake
   - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
+  - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
 

@@ -22,7 +22,7 @@ WITH contract_user AS (
 	LEFT JOIN
         datalake_ebdb_clean.lead AS l
             ON l.id = lc.id_converted_lead
-            AND l.affiliate_type = 'B2BPartner'
+            AND l.affiliate_type = 'B2BPartner' -- TODO [ODS] SHOULD BE ON AN ENRICH
 	LEFT JOIN
         datalake_ebdb_clean.affiliate_data AS ad
             ON ad.id = l.id_affiliate_has_indicated
