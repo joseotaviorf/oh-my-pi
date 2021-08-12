@@ -83,72 +83,121 @@ SELECT
 FROM
 	datalake_firestore_prod.monday AS mo
 ),
-
-region_flow_type as (
-	select
-		id,
-	    coalesce(nullif(json_extract_path_text(soa.updated_message, 'flowType'),''),
-	    		 nullif(json_extract_path_text(soa.updated_message, 'house','regionFlowType'),'')) AS rf_type
-	from
-		datalake_firestore_clean_prod.sale_offer soa
-	where
-		rf_type is not null
-	and
-		event_type = 'create'
+hub_agents_hierarchy AS (
+SELECT
+    du.dados_agente_id as sk_agent,
+    ah.hub_region
+FROM
+    datalake_gsheets_clean_prod.hub_agents_hierarchy ah
+LEFT JOIN
+    dim_user du
+    ON REPLACE(REPLACE(CAST(du.cpf as varchar),'.',''),'-','') =  REPLACE(REPLACE(CAST(ah.cpf as varchar),'.',''),'-','')
 ),
-
 sale_bookings AS (
 SELECT
 	fv.sk_house AS id_property,
 	fv.sk_buyer AS id_visitor,
+	fv.sk_offer,
 	fv.sk_booking,
+	fv.is_hub_flow,
+	CASE
+        WHEN ah.hub_region = 'BELA VISTA' AND is_hub_flow = true THEN 'HUB Bela Vista'
+        WHEN ah.hub_region = 'VILA MARIANA' AND is_hub_flow = true THEN 'HUB Vila Mariana'
+    END AS hub_visit,
 	dr.city_group,
 	DATE(NULLIF(fv.sk_booking_created_date,-1)) AS dt_created,
 	DATE(NULLIF(fv.sk_visit_completed_date,-1)) AS dt_completed
 FROM
     sale.fact_visits fv
+LEFT JOIN hub_agents_hierarchy ah
+    ON ah.sk_agent = fv.sk_agent and fv.sk_agent>0
 JOIN dim_region dr
     ON fv.sk_region = dr.sk_region
 ),
 sale_closing AS (
     WITH fact_os AS (
     SELECT
-        DATE_TRUNC('week', DATE(sk_offer_submitted_date)) AS week_start,
-        DATE(sk_offer_submitted_date) AS date,
+        COALESCE(DATE(NULLIF(sk_offer_submitted_date,-1)),dt_offer_submitted) AS date,
         sk_house,
-        sk_offer,
-        sk_buyer
+        sk_booking,
+        fo.sk_offer AS sk_offer,
+        COALESCE(fo.sk_buyer,hub.id_client_cm, hub.id_user_5a) AS sk_buyer,
+        CASE
+            WHEN executive_lead = 'Leonardo Monteiro' OR hub.offer_flow = 'HUB_BV_V0' THEN 'HUB Bela Vista'
+            WHEN executive_lead = 'Rodrigo Pereira' OR hub.offer_flow = 'HUB_VM_V0' THEN 'HUB Vila Mariana'
+            WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'Porto Alegre' THEN 'CENTRAL POA'
+            WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'RMSP' THEN 'CENTRAL SP'
+            WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'Rio de Janeiro' THEN 'CENTRAL RJ'
+            ELSE 'foraHUB'
+        END AS hub
     FROM
-    	sale.fact_offers
+    	sale.fact_offers fo
+    LEFT JOIN
+        dim_region dr
+        ON dr.sk_region = fo.sk_region
+    LEFT JOIN
+        datalake_gsheets_clean_prod.offers_hub_central hub
+            ON fo.sk_offer = hub.id_offer
     WHERE
-    	sk_offer_submitted_date > 0
+    	date > 0
     ),
     fact_oa AS (
     SELECT
-        DATE_TRUNC('week', DATE(sk_offer_accepted_date)) AS week_start,
-        DATE(sk_offer_accepted_date) AS date,
+        COALESCE(DATE(NULLIF(sk_offer_accepted_date,-1)),dt_offer_accepted) AS date,
         sk_house,
-        sk_offer,
-        sk_buyer
+        sk_booking,
+        fo.sk_offer AS sk_offer,
+        COALESCE(fo.sk_buyer,hub.id_client_cm, hub.id_user_5a) AS sk_buyer,
+        CASE
+            WHEN executive_lead = 'Leonardo Monteiro' OR hub.offer_flow = 'HUB_BV_V0' THEN 'HUB Bela Vista'
+            WHEN executive_lead = 'Rodrigo Pereira' OR hub.offer_flow = 'HUB_VM_V0' THEN 'HUB Vila Mariana'
+            WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'Porto Alegre' THEN 'CENTRAL POA'
+            WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'RMSP' THEN 'CENTRAL SP'
+            WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'Rio de Janeiro' THEN 'CENTRAL RJ'
+            ELSE 'foraHUB'
+        END AS hub
     FROM
-        sale.fact_offers
+        sale.fact_offers fo
+    LEFT JOIN
+        dim_region dr
+        ON dr.sk_region = fo.sk_region
+    LEFT JOIN
+        datalake_gsheets_clean_prod.offers_hub_central hub
+            ON fo.sk_offer = hub.id_offer
     WHERE
-        sk_offer_accepted_date > 0
+        date > 0
     ),
     fact_ccv AS (
     SELECT
-        DATE_TRUNC('week', DATE(ts_sale_agreement_signed)) AS week_start,
-        DATE(ts_sale_agreement_signed) AS date,
-        sk_offer
+        COALESCE(DATE(NULLIF(sa.ts_sale_agreement_signed,-1)),hub.dt_sale_agreement_signed) AS date,
+        fo.sk_offer AS sk_offer,
+        CASE
+            WHEN executive_lead = 'Leonardo Monteiro' OR hub.offer_flow = 'HUB_BV_V0' THEN 'HUB Bela Vista'
+            WHEN executive_lead = 'Rodrigo Pereira' OR hub.offer_flow = 'HUB_VM_V0' THEN 'HUB Vila Mariana'
+            WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'Porto Alegre' THEN 'CENTRAL POA'
+            WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'RMSP' THEN 'CENTRAL SP'
+            WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'Rio de Janeiro' THEN 'CENTRAL RJ'
+            ELSE 'foraHUB'
+        END AS hub
     FROM
-        sale.dim_sale_agreement
-    WHERE
-        ts_sale_agreement_signed IS NOT NULL
+        sale.fact_offers fo
+    LEFT JOIN
+        sale.dim_sale_agreement sa
+        ON fo.sk_offer = sa.sk_offer
+    LEFT JOIN
+        dim_region dr
+        ON dr.sk_region = fo.sk_region
+    LEFT JOIN
+        datalake_gsheets_clean_prod.offers_hub_central hub
+            ON fo.sk_offer = hub.id_offer
+    WHERE date>0
     )
 SELECT
     COALESCE(COALESCE(fact_os.sk_offer, fact_oa.sk_offer), fact_ccv.sk_offer) AS sk_offer,
     COALESCE(fact_os.sk_house,fact_oa.sk_house) AS sk_house,
     COALESCE(fact_os.sk_buyer,fact_oa.sk_buyer) AS sk_buyer,
+    COALESCE(fact_os.sk_booking,fact_oa.sk_booking) AS sk_booking,
+    COALESCE(COALESCE(fact_os.hub, fact_oa.hub), fact_ccv.hub) AS hub_offer,
     MAX(fact_os.date) AS os_date,
     MAX(fact_oa.date) AS oa_date,
     MAX(fact_ccv.date) AS ccv_date
@@ -162,7 +211,8 @@ FULL OUTER JOIN
     fact_ccv
         ON fact_os.sk_offer = fact_ccv.sk_offer
         -- AND fact_os.date = fact_ccv.date
-GROUP BY 1, 2, 3
+GROUP BY 1, 2, 3, 4, 5
+
 ),
 sale_tta AS (
 SELECT
@@ -193,6 +243,7 @@ SELECT
 	offers.form_of_payment,
 	offers.dt_deal_qualified,
 	COALESCE(offers.id_offer,sc.sk_offer) AS id_offer,
+	sc.sk_booking,
 	offers.dt_diligence_started_legaut,
 	offers.dt_diligence_ended_legaut,
 	offers.dt_diligence_ended,
@@ -214,12 +265,9 @@ SELECT
 	sc.os_date,
 	sc.oa_date,
 	sc.ccv_date,
-	rft.rf_type
+	sc.hub_offer
 FROM
     monday_adjusted offers
-LEFT join
-	region_flow_type rft
-		ON offers.id_offer = rft.id
 FULL OUTER JOIN
     sale_tta tta
         ON (offers.id_house = tta.house_id AND offers.id_user = tta.tenant_id)
@@ -260,12 +308,13 @@ SELECT
 	db.dt_created,
 	db.dt_completed,
 	db.city_group,
-	sde.rf_type
+	db.hub_visit,
+	sde.hub_offer
 FROM
     sale_demand_events sde
 FULL OUTER JOIN
     sale_bookings db
-        ON (sde.id_house = db.id_property AND sde.id_buyer = db.id_visitor)
+        ON (sde.id_house = db.id_property AND sde.id_buyer = db.id_visitor AND sde.id_offer = db.sk_offer )
 ),
 sale_demand_classification AS (
 SELECT
@@ -305,7 +354,8 @@ SELECT
 	fsf.first_event AS first_touchpoint,
 	fsf.higher_intent_before_offer,
 	fsf.higher_intent_after_offer,
-	sdc.rf_type
+	sdc.hub_offer,
+	sdc.hub_visit
 FROM
     sale_demand_events_complete sdc
 LEFT JOIN
@@ -331,7 +381,8 @@ SELECT
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
 	NULL AS form_of_payment,
-	NULL AS region_flow_type,
+	NULL AS hub_visit,
+	NULL AS hub_offer,
     COUNT(slf.sk_lead_date) AS leads,
     NULL::BIGINT AS prospects,
     NULL::BIGINT AS first_contacts,
@@ -365,7 +416,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_lead_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 prospect AS (
 SELECT
@@ -382,7 +433,8 @@ SELECT
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
 	NULL AS form_of_payment,
-	NULL AS region_flow_type,
+	NULL AS hub_visit,
+	NULL AS hub_offer,
     NULL::BIGINT AS leads,
     COUNT(slf.sk_prospect_date) AS prospects,
     NULL::BIGINT AS first_contacts,
@@ -416,7 +468,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_prospect_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 first_contacts AS (
 SELECT
@@ -433,7 +485,8 @@ SELECT
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
 	NULL AS form_of_payment,
-	NULL AS region_flow_type,
+	NULL AS hub_visit,
+	NULL AS hub_offer,
     NULL::BIGINT AS leads,
     NULL::BIGINT AS prospects,
     COUNT(slf.sk_first_contact_date) AS first_contacts,
@@ -467,7 +520,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_first_contact_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 qualified AS (
 SELECT
@@ -484,7 +537,8 @@ SELECT
     NULL AS origin_before_offer,
     NULL AS origin_after_offer,
     NULL AS form_of_payment,
-    NULL AS region_flow_type,
+    NULL AS hub_visit,
+	NULL AS hub_offer,
     NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -518,7 +572,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_qualified_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 opportunity AS (
 SELECT
@@ -535,7 +589,8 @@ SELECT
     NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
 	NULL AS form_of_payment,
-	NULL AS region_flow_type,
+	NULL AS hub_visit,
+	NULL AS hub_offer,
     NULL::BIGINT AS leads,
     NULL::BIGINT AS prospects,
     NULL::BIGINT AS first_contacts,
@@ -569,7 +624,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_opportunity_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 first_listing AS (
 SELECT
@@ -586,7 +641,8 @@ SELECT
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
 	NULL AS form_of_payment,
-	NULL AS region_flow_type,
+	NULL AS hub_visit,
+	NULL AS hub_offer,
     NULL::BIGINT AS leads,
     NULL::BIGINT AS prospects,
     NULL::BIGINT AS first_contacts,
@@ -620,7 +676,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_first_listing_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 tta_sent AS (
 SELECT
@@ -637,7 +693,8 @@ SELECT
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	NULL AS form_of_payment,
-	rf_type AS region_flow_type,
+	hub_visit AS hub_visit,
+	hub_offer AS hub_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -671,7 +728,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(tta_started) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 tta_completed AS (
 SELECT
@@ -688,7 +745,8 @@ SELECT
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	NULL AS form_of_payment,
-	rf_type AS region_flow_type,
+	hub_visit AS hub_visit,
+	hub_offer AS hub_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -722,7 +780,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(tta_started) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 visits_booked AS (
 SELECT
@@ -739,7 +797,8 @@ SELECT
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	NULL AS form_of_payment,
-	rf_type AS region_flow_type,
+	hub_visit AS hub_visit,
+	hub_offer AS hub_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -773,7 +832,8 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_created) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+order by 1 desc
 ),
 visits_completed AS (
 SELECT
@@ -790,7 +850,8 @@ SELECT
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	NULL AS form_of_payment,
-	rf_type AS region_flow_type,
+	hub_visit AS hub_visit,
+	hub_offer AS hub_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -824,7 +885,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_completed) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 offers_sent AS (
 SELECT
@@ -841,7 +902,8 @@ SELECT
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	form_of_payment,
-	rf_type AS region_flow_type,
+	hub_visit AS hub_visit,
+	hub_offer AS hub_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -875,7 +937,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_offer_sent) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 offers_deal_qualified AS (
 SELECT
@@ -892,7 +954,8 @@ SELECT
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	form_of_payment,
-	rf_type AS region_flow_type,
+	hub_visit AS hub_visit,
+	hub_offer AS hub_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -926,7 +989,7 @@ FROM
 	sale_demand_classification
 WHERE
 	DATE(dt_deal_qualified) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 offers_accepted AS (
 SELECT
@@ -943,7 +1006,8 @@ SELECT
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	form_of_payment,
-	rf_type AS region_flow_type,
+	hub_visit AS hub_visit,
+	hub_offer AS hub_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -977,7 +1041,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_offer_accepted) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 ccv_signed AS (
 SELECT
@@ -994,7 +1058,8 @@ SELECT
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	form_of_payment,
-	rf_type AS region_flow_type,
+	hub_visit AS hub_visit,
+	hub_offer AS hub_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -1028,7 +1093,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_ccv_signed) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 diligence_started_legaut AS (
 SELECT
@@ -1045,7 +1110,8 @@ SELECT
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	form_of_payment,
-	rf_type AS region_flow_type,
+	hub_visit AS hub_visit,
+	hub_offer AS hub_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -1079,7 +1145,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_diligence_started_legaut) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 diligence_ended_legaut AS (
 SELECT
@@ -1096,7 +1162,8 @@ SELECT
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	form_of_payment,
-	rf_type AS region_flow_type,
+	hub_visit AS hub_visit,
+	hub_offer AS hub_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -1130,7 +1197,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_diligence_ended_legaut) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 diligence_ended AS (
 SELECT
@@ -1147,7 +1214,8 @@ SELECT
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	form_of_payment,
-	rf_type AS region_flow_type,
+	hub_visit AS hub_visit,
+	hub_offer AS hub_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -1181,7 +1249,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_diligence_ended) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 diligence_started_legal AS (
 SELECT
@@ -1198,7 +1266,8 @@ SELECT
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	form_of_payment,
-	rf_type AS region_flow_type,
+	hub_visit AS hub_visit,
+	hub_offer AS hub_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -1232,7 +1301,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_diligence_started_legal) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 diligence_ended_legal AS (
 SELECT
@@ -1249,7 +1318,8 @@ SELECT
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	form_of_payment,
-	rf_type AS region_flow_type,
+	hub_visit AS hub_visit,
+	hub_offer AS hub_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -1283,7 +1353,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_diligence_ended_legal) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 credit_sent AS (
 SELECT
@@ -1300,7 +1370,8 @@ SELECT
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	form_of_payment,
-	rf_type AS region_flow_type,
+	hub_visit AS hub_visit,
+	hub_offer AS hub_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -1334,7 +1405,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_credit_started) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 credit_approved AS (
 SELECT
@@ -1351,7 +1422,8 @@ SELECT
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	form_of_payment,
-	rf_type AS region_flow_type,
+	hub_visit AS hub_visit,
+	hub_offer AS hub_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -1385,7 +1457,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_credit_approved) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 finan_started AS (
 SELECT
@@ -1402,7 +1474,8 @@ SELECT
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	form_of_payment,
-	rf_type AS region_flow_type,
+	hub_visit AS hub_visit,
+	hub_offer AS hub_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -1436,7 +1509,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_finan_started) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 finan_ended AS (
 SELECT
@@ -1453,7 +1526,8 @@ SELECT
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	form_of_payment,
-	rf_type AS region_flow_type,
+	hub_visit AS hub_visit,
+	hub_offer AS hub_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -1487,7 +1561,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_finan_ended) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 payment_concluded AS (
 SELECT
@@ -1504,7 +1578,8 @@ SELECT
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	form_of_payment,
-	rf_type AS region_flow_type,
+	hub_visit AS hub_visit,
+	hub_offer AS hub_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -1538,7 +1613,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_payment_concluded) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 notes_registry_started AS (
 SELECT
@@ -1555,7 +1630,8 @@ SELECT
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	form_of_payment,
-	rf_type AS region_flow_type,
+	hub_visit AS hub_visit,
+	hub_offer AS hub_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -1589,7 +1665,7 @@ FROM
 	sale_demand_classification
 WHERE
 	DATE(dt_notes_registry_started) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 notes_registry_ended AS (
 SELECT
@@ -1606,7 +1682,8 @@ SELECT
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	form_of_payment,
-	rf_type AS region_flow_type,
+	hub_visit AS hub_visit,
+	hub_offer AS hub_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -1640,7 +1717,7 @@ FROM
 	sale_demand_classification
 WHERE
 	DATE(dt_notes_registry_ended) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 matricula_inicio AS (
 SELECT
@@ -1657,7 +1734,8 @@ SELECT
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	form_of_payment,
-	rf_type AS region_flow_type,
+	hub_visit AS hub_visit,
+	hub_offer AS hub_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -1691,7 +1769,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_matricula_inicio) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 matricula_atualizada AS (
 SELECT
@@ -1708,7 +1786,8 @@ SELECT
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	form_of_payment,
-	rf_type AS region_flow_type,
+	hub_visit AS hub_visit,
+	hub_offer AS hub_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -1742,7 +1821,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_matricula_atualizada) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 entrega_chave AS (
 SELECT
@@ -1759,7 +1838,8 @@ SELECT
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
 	form_of_payment,
-	rf_type AS region_flow_type,
+	hub_visit AS hub_visit,
+	hub_offer AS hub_offer,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS first_contacts,
@@ -1793,7 +1873,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_entrega_chaves) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 ),
 union_all AS (
 SELECT * FROM lead_
@@ -1872,7 +1952,8 @@ SELECT
 	ua.origin_before_offer,
 	ua.origin_after_offer,
 	ua.form_of_payment,
-	ua.region_flow_type,
+	ua.hub_visit,
+	ua.hub_offer,
 	ua.leads,
 	ua.prospects,
 	ua.first_contacts,
@@ -1928,7 +2009,8 @@ SELECT
 	origin_before_offer,
 	origin_after_offer,
 	form_of_payment,
-	region_flow_type,
+	hub_visit,
+	hub_offer,
 	SUM(leads) AS leads,
     SUM(prospects) AS prospects,
     SUM(first_contacts) AS first_contacts,
@@ -1961,7 +2043,8 @@ SELECT
 	current_timestamp AS ts_load
 FROM
     union_all_date
-GROUP BY week_start,
+GROUP BY
+    week_start,
 	 date,
 	 month,
 	 quarter,
@@ -1977,5 +2060,6 @@ GROUP BY week_start,
 	 origin_before_offer,
 	 origin_after_offer,
 	 form_of_payment,
-	 region_flow_type
-ORDER BY 2 desc
+	 hub_visit,
+	 hub_offer
+ORDER BY 1 desc
