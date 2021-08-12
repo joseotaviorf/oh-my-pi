@@ -40,7 +40,7 @@ b2b_info AS (
                 CASE
                     WHEN pj.id IS NULL AND h.dt_first_publication IS NOT NULL
                       THEN 'advanced_negotiation'
-                    WHEN h.id_external IS NULL OR h.id_external RLIKE '^([a-zA-Z0-9]+-){4}[a-zA-Z0-9]+$'
+                    WHEN h.id_external IS NULL OR h.id_external RLIKE '^([a-zA-Z0-9]+-){{4}}[a-zA-Z0-9]+$'
                       THEN 'standard'
                     WHEN h.id_external IS NOT NULL
                         THEN 'batch'
