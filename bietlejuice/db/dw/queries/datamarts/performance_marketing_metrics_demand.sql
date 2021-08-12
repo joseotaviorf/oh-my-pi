@@ -129,18 +129,84 @@ demand_daily_spent AS (
         AND co.mkt_medium != 'Branding'
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,30,31,32
 ),
+taxonomy AS (
+    SELECT DISTINCT
+        td.Origin as mkt_origin,
+        td.Channel as mkt_channel,
+        td.Medium as mkt_medium
+    FROM
+        datalake_raw.gsheets_taxonomy_demand AS td
+    WHERE
+        td.Channel NOT IN  ('Paid Retention', 'Paid Traffic')
+),
+target_sheets AS (
+    SELECT
+        NULLIF(str.date, '')::date AS dt_event,
+        NULLIF(str.city_group, '') AS city_group,
+        'Tenants PWA' AS mkt_origin,
+        NULLIF(str.mkt_channel, '') AS mkt_channel,
+        NULLIF(str.mkt_medium, '') AS mkt_medium,
+        NULLIF(str.mkt_source, '') AS mkt_source,
+        NULLIF(str.new_rent_flows_target, '')::FLOAT AS new_rent_flows_target,
+        NULLIF(str.new_tenant_prospects_target, '')::FLOAT AS new_tenant_prospects_target,
+        NULLIF(str.budget, '')::FLOAT AS budget
+    FROM
+        datalake_gsheets_clean_prod.demand_targets_replanning AS str
+    WHERE
+        NULLIF(str.date, '')::date < DATE('2021-08-01')
+    
+    UNION ALL
+    
+    SELECT
+        NULLIF(cps.date, '')::date AS dt_event,
+        NULLIF(cps.city, '') AS city_group,
+        'Tenants PWA' AS mkt_origin,
+        NULLIF(t.mkt_channel, '') AS mkt_channel,
+        NULLIF(cps.mkt_medium, '') AS mkt_medium,
+        NULLIF(cps.mkt_source, '') AS mkt_source,
+        NULL::FLOAT AS new_rent_flows_target,
+        NULL::FLOAT AS new_tenant_prospects_target,
+        NULLIF(cps.daily_value, '')::FLOAT AS budget
+    FROM datalake_gsheets_clean_prod.mkt_cost_per_source AS cps
+        LEFT JOIN taxonomy AS t
+            ON cps.mkt_medium = t.mkt_medium
+    WHERE
+        business = 'Rent'
+        AND NULLIF(cps.date, '')::date >= DATE('2021-08-01')
+    
+    UNION ALL
+    
+    SELECT
+        NULLIF(date, '')::date AS dt_event,
+        city_group,
+        'Tenants PWA' AS mkt_origin,
+        CASE 
+            WHEN mkt_channel IN ('Lost Tracking', 'Not Mapped', 'Agents') THEN 'Other'
+            ELSE mkt_channel
+        END AS mkt_channel,
+        mkt_medium,
+        mkt_source,
+        NULL::FLOAT AS new_rent_flows_target,
+        NULLIF(ntp_target, '')::FLOAT AS new_tenant_prospects_target,
+        NULL::FLOAT AS budget
+        
+    FROM 
+        datalake_gsheets_clean_prod.rental_ntp_source_targets
+    WHERE
+        NULLIF(date, '')::date >= DATE('2021-08-01')
+),
 -------------------------------------------------------------------------------------
 -- Query Performance Marketing Rental Demand targets and introduce NULLs for UNION --
 -------------------------------------------------------------------------------------
 demand_daily_targets AS (
     SELECT
-        NULLIF(str.date, '')::date AS dt_event,
-        NULLIF(str.city_group, '') AS city_group,
+        dt_event,
+        city_group,
         NULL::TEXT AS flow_event,
-        'Tenants PWA' AS mkt_origin,
-        NULLIF(str.mkt_channel, '') AS mkt_channel,
-        NULLIF(str.mkt_medium, '') AS mkt_medium,
-        NULLIF(str.mkt_source, '') AS mkt_source,
+        mkt_origin,
+        mkt_channel,
+        mkt_medium,
+        mkt_source,
         NULL::TEXT AS utm_campaign,
         NULL::TEXT AS utm_term,
         NULL::TEXT AS utm_content,
@@ -163,13 +229,11 @@ demand_daily_targets AS (
         NULL::DATE AS dt_credit_analysis_approved,
         NULL::DATE AS dt_contract_signed,
         0.0 AS marketing_cost,
-        NULLIF(str.new_rent_flows_target, '')::FLOAT AS new_rent_flows_target,
-        NULLIF(str.new_tenant_prospects_target, '')::FLOAT AS new_tenant_prospects_target,
-        NULLIF(str.budget, '')::FLOAT AS budget
+        new_rent_flows_target,
+        new_tenant_prospects_target,
+        budget
     FROM
-        datalake_raw.gsheets_demand_targets_replanning AS str
-    WHERE
-        NULLIF(str.date, '')::date >= DATE('2018-01-01')
+        target_sheets
 )
 SELECT
     rf.*

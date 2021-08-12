@@ -14,6 +14,8 @@ taxonomy AS (
         td.Medium as mkt_medium
     FROM
         datalake_raw.gsheets_taxonomy_demand AS td
+    WHERE
+        td.Channel NOT IN  ('Paid Retention', 'Paid Traffic')
 ),
 -----------------------------------------------------------
 -- Query bookings, offers and talk to agent full history --
