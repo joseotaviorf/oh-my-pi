@@ -6,21 +6,6 @@ with cancellation_info as (
         from datalake_ebdb_clean.photographer_job_aud
         where status = 'Cancelado' and mod_status
         group by 1
-    ),
-    cancellation_reason as (
-        with house_reg_status_max_rev as (
-            select
-                id_photo_shoot,
-                max(rev) as rev
-            from datalake_ebdb_clean.house_registration_status_aud
-            group by 1
-        )
-        select
-            hrsmr.id_photo_shoot,
-            hrs.photo_shoot_schedule_reason
-        from house_reg_status_max_rev hrsmr
-        join datalake_ebdb_clean.house_registration_status_aud hrs
-            on hrsmr.rev = hrs.rev
     )
     select
         pj.id as id_photographer_job,
@@ -30,17 +15,29 @@ with cancellation_info as (
         user.id as id_user_who_canceled,
         user.name as user_who_canceled_name,
         user.email as user_who_canceled_email,
-        coalesce(pj.reason_of_change, cr.photo_shoot_schedule_reason) as cancellation_reason,
         ure.ts_revision
     from datalake_ebdb_clean.photographer_job pj
-    left join cancelled_jobs_max_rev cjmr
+    join cancelled_jobs_max_rev cjmr
         on cjmr.id_photographer_job = pj.id
     join datalake_ebdb_user_revision_entity.user_revision_entity ure
         on ure.id = cjmr.rev
     join datalake_ebdb_clean.user
         on user.id = ure.id_user
-    left join cancellation_reason cr
-        on cr.id_photo_shoot = pj.id
+),
+cancellation_reason as (
+    with house_reg_status_max_rev as (
+        select
+            id_photo_shoot,
+            max(rev) as rev
+        from datalake_ebdb_clean.house_registration_status_aud
+        group by 1
+    )
+    select
+        hrsmr.id_photo_shoot,
+        hrs.photo_shoot_schedule_reason
+    from house_reg_status_max_rev hrsmr
+    join datalake_ebdb_clean.house_registration_status_aud hrs
+        on hrsmr.rev = hrs.rev
 ),
 problems_info as (
     with jobs_with_problem_max_rev as (
@@ -111,7 +108,7 @@ select
         f.contract_type,
         f.problem,
         f.photo_sender_user_type,
-        cancellation_info.cancellation_reason,
+        coalesce(f.reason_of_change, cancellation_reason.photo_shoot_schedule_reason) as cancellation_reason,
         f.cancellation_reason_text,
         cancellation_info.user_who_canceled_name,
         cancellation_info.user_who_canceled_email,
@@ -175,3 +172,5 @@ select
         on photographer_data.id_photographer_data = f.id_photographer_data
     left join job_creator_info
         on job_creator_info.id_photographer_job = f.id
+    left join cancellation_reason
+        on cancellation_reason.id_photo_shoot = f.id
