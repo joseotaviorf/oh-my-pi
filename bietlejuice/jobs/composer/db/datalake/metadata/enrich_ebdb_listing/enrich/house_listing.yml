@@ -1,0 +1,86 @@
+database_name: datalake_ebdb_listing
+table_name: house_listing
+columns:
+  id_house_listing:
+    lineage:
+      - datalake_ebdb_listing.house_status_version_order.id_house
+      - datalake_ebdb_listing.house_status_version_order.order_version
+  id_house:
+    lineage:
+      - datalake_ebdb_listing.house_status_version_order.id_house
+  version:
+    lineage:
+      - datalake_ebdb_listing.house_status_version_order.order_version
+  status:
+    lineage:
+      - datalake_ebdb_listing.house_status_version_order.status_history_new
+  rent:
+    lineage:
+      - datalake_ebdb_clean.house_aud.rent
+  listing_category:
+    lineage:
+      - datalake_ebdb_listing.house_status_version_order.events_change_status
+      - datalake_ebdb_listing.house_status_version_order.order_version
+  last_originals_type:
+    lineage:
+      - datalake_ebdb_clean.special_condition.special_condition_type
+  last_iorent_type:
+    lineage:
+      - datalake_ebdb_clean.special_condition.special_condition_type
+  is_last_version:
+    lineage:
+      - datalake_ebdb_listing.house_status_version_order.order_version
+  is_exclusive:
+    lineage:
+      - datalake_ebdb_clean.special_condition_aud.ts_opted_in
+  is_originals_active:
+    lineage:
+      - datalake_ebdb_clean.special_condition_aud.ts_opted_in
+      - datalake_ebdb_clean.special_condition_aud.ts_opted_out
+  is_iorent_active:
+    lineage:
+      - datalake_ebdb_clean.special_condition_aud.ts_opted_in
+      - datalake_ebdb_clean.special_condition_aud.ts_opted_out
+  ts_listing_version_start:
+    lineage:
+      - datalake_ebdb_listing.house_status_version_order.publication_version_date
+  ts_listing_version_end:
+    lineage:
+      - datalake_ebdb_listing.house_status_version_order.ts_status_changed_next
+  ts_last_unpublished:
+    lineage:
+      - datalake_ebdb_listing.house_status_version_order.status_history_new
+      - datalake_ebdb_listing.house_status_version_order.ts_status_changed_new
+  dt_last_exclusive_opted_in:
+    lineage:
+      - datalake_ebdb_clean.special_condition_aud.ts_opted_in
+  dt_last_exclusive_opted_out:
+    lineage:
+      - datalake_ebdb_clean.special_condition_aud.ts_opted_out
+  dt_last_originals_opted_in:
+    lineage:
+      - datalake_ebdb_clean.special_condition_aud.ts_opted_in
+  dt_last_originals_opted_out:
+    lineage:
+      - datalake_ebdb_clean.special_condition_aud.ts_opted_out
+  dt_last_iorent_opted_in:
+    lineage:
+      - datalake_ebdb_clean.special_condition_aud.ts_opted_in
+  dt_last_iorent_opted_out:
+    lineage:
+      - datalake_ebdb_clean.special_condition_aud.ts_opted_out
+  id_contract:
+    lineage:
+      - datalake_ebdb_contract.contract.id
+  ts_contract_signed:
+    lineage:
+      - datalake_ebdb_contract.contract.ts_signed
+  dt_contract_annulment:
+    lineage:
+      - datalake_ebdb_contract.contract.dt_termination
+  ts_next_contract_signed:
+    lineage:
+      - datalake_ebdb_contract.contract.ts_signed
+  nr_renting:
+    lineage:
+      - datalake_ebdb_contract.contract.id
