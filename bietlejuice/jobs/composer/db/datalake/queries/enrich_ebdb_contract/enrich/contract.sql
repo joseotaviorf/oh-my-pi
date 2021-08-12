@@ -113,7 +113,7 @@ tenant_service_fee_opt_out_info as (
       c_aud.tenant_service_fee as tenant_service_fee,
       c_aud.rev
     from datalake_ebdb_clean.contract_aud c_aud
-    join datalake_ebdb_clean.user_revision_entity ure
+    join datalake_ebdb_user_revision_entity.user_revision_entity ure
       on c_aud.rev = ure.id
     where c_aud.mod_tenant_service_fee = true
 )
