@@ -46,34 +46,68 @@ calculated_metrics AS (
     FROM
         metrics
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
+),
+clusters AS(
+    SELECT
+        month_start,
+        TO_CHAR(DATE(month_start), 'YYYY/MM') AS year_month,
+        sk_user,
+        type,
+        joined_program_date,
+        rent_lead,
+        sale_lead,
+        hybrid_lead,
+        total_lead,
+        rent_prospect,
+        sale_prospect,
+        hybrid_prospect,
+        total_prospect,
+        lead_prev_month,
+        prospect_prev_month,
+        acum_lead,
+        acum_prospect,
+        CASE
+            WHEN sk_user IN (360754,912255,1711931,2257503) THEN 'Spinver'
+            WHEN DATE_TRUNC('month', joined_program_date) = month_start THEN 'Novo usuário'
+            WHEN DATE_TRUNC('month', joined_program_date) < month_start AND acum_lead = total_lead AND acum_prospect = total_prospect AND prospect_prev_month = 0 THEN 'Nunca Ativo em Lead'
+            WHEN DATE_TRUNC('month', joined_program_date) < month_start AND acum_lead > total_lead AND acum_prospect = total_prospect AND prospect_prev_month = 0 THEN 'Nunca Ativo em Prospect'
+            WHEN DATE_TRUNC('month', joined_program_date) < month_start AND acum_lead > total_lead AND acum_lead > 0 AND acum_prospect > 0 AND prospect_prev_month = 0 THEN 'Inativo'
+            WHEN DATE_TRUNC('month', joined_program_date) < month_start AND prospect_prev_month > 0 THEN 'Ativo no periodo anterior'
+            ELSE NULL
+        END AS cluster
+    FROM calculated_metrics
+    ORDER BY 1 DESC
+),
+first_inactivation AS(
+    SELECT
+        sk_user,
+        MIN(month_start) AS first_inactivation
+    FROM clusters
+    WHERE cluster = 'Inativo'
+    GROUP BY 1
 )
 SELECT
-    month_start,
-    TO_CHAR(DATE(month_start), 'YYYY/MM') AS year_month,
-    sk_user,
-    type,
-    joined_program_date,
-    rent_lead,
-    sale_lead,
-    hybrid_lead,
-    total_lead,
-    rent_prospect,
-    sale_prospect,
-    hybrid_prospect,
-    total_prospect,
-    lead_prev_month,
-    prospect_prev_month,
-    acum_lead,
-    acum_prospect,
-    CASE
-        WHEN sk_user IN (360754,912255,1711931,2257503) THEN 'Spinver'
-        WHEN DATE_TRUNC('month', joined_program_date) = DATE_TRUNC('month', month_start) THEN 'Novo usuário'
-        WHEN DATE_TRUNC('month', joined_program_date) < DATE_TRUNC('month', month_start) AND acum_lead = total_lead AND acum_prospect = total_prospect AND prospect_prev_month = 0 THEN 'Nunca Ativo em Lead'
-        WHEN DATE_TRUNC('month', joined_program_date) < DATE_TRUNC('month', month_start) AND acum_lead > total_lead AND acum_prospect = total_prospect AND prospect_prev_month = 0 THEN 'Nunca Ativo em Prospect'
-        WHEN DATE_TRUNC('month', joined_program_date) < DATE_TRUNC('month', month_start) AND acum_lead > total_lead AND acum_lead > 0 AND acum_prospect > 0 AND prospect_prev_month = 0 THEN 'Inativo'
-        WHEN DATE_TRUNC('month', joined_program_date) < DATE_TRUNC('month', month_start) AND prospect_prev_month > 0 THEN 'Ativo no periodo anterior'
-        ELSE NULL
-    END AS cluster
-FROM calculated_metrics
-WHERE month_start >= '2019/01/01'
+    c.month_start,
+    c.year_month,
+    c.sk_user,
+    c.type,
+    c.joined_program_date,
+    c.rent_lead,
+    c.sale_lead,
+    c.hybrid_lead,
+    c.total_lead,
+    c.rent_prospect,
+    c.sale_prospect,
+    c.hybrid_prospect,
+    c.total_prospect,
+    c.lead_prev_month,
+    c.prospect_prev_month,
+    c.acum_lead,
+    c.acum_prospect,
+    c.cluster,
+    f.first_inactivation
+FROM clusters c
+LEFT JOIN first_inactivation f
+    ON f.sk_user = c.sk_user
+WHERE c.month_start >= '2019-01-01'
 ORDER BY 1 DESC
