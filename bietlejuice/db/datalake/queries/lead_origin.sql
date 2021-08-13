@@ -109,7 +109,7 @@ with t_all as (
                 where 	event_type in ('Affiliate-Lead_referred', 'Refer-Lead_referred' )
                     and regexp_like(cast(json_extract(event_properties, '$.Lead_id') as varchar), '(^\d+)')
 			    )
-    ,prep_firestore as (
+    ,prep_firestore_tmp as (
                 select
                         null as id_lead,
                         coalesce(cast(json_extract(user_properties, '$.lead_firestore_id') as varchar), '') as firestore_id,
@@ -131,6 +131,28 @@ with t_all as (
                     where id_app = 183047
                         and json_extract(user_properties, '$.lead_firestore_id') is not null
 				)
+	, prep_firestore as (
+        select
+            id_lead,
+            coalesce(rene.id, prep_firestore_tmp.firestore_id) as firestore_id,
+            e_formfield_lead_uuid,
+            rule_num,
+            rule,
+            ts_event,
+            up_utm_campaign,
+            up_utm_medium,
+            up_utm_source,
+            up_utm_content,
+            up_utm_term,
+            up_platform,
+            up_referring_domain,
+            region,
+            city,
+            uuid
+        from prep_firestore_tmp 
+        left join datalake_rene_descartes_clean_prod.house_lead rene
+        on rene.id_external_reference = prep_firestore_tmp.firestore_id and date(ts_event) >= date('2021-07-15')
+    )
     , prep_form as (
                 select
                         null as id_lead,
