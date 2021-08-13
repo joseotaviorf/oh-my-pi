@@ -2,9 +2,9 @@ WITH check_ciq_full AS (
     SELECT
         JSON_EXTRACT_PATH_TEXT(House.details, 'houseExternalId') AS id_house_external
     FROM
-        datalake_big_agent_clean_prod.House
+        datalake_big_agent_prod.House
     INNER JOIN
-        datalake_big_agent_clean_prod.Agency
+        datalake_big_agent_prod.Agency
             ON Agency.id_house = house.id
     GROUP BY
         JSON_EXTRACT_PATH_TEXT(House.details, 'houseExternalId')
@@ -16,7 +16,7 @@ last_enrollment AS (
         id_house,
         MAX(id_enrollment) AS id_enrollment
     FROM
-        datalake_big_agent_clean_prod.Agency
+        datalake_big_agent_prod.Agency
     GROUP BY 1
 ),
 
@@ -39,18 +39,18 @@ quintoandar_consultant_listings_rent as
         'RENT' AS businesscontext,
         NULL as businesscontext_detail
     FROM
-        datalake_big_agent_clean_prod.House
+        datalake_big_agent_prod.House
     LEFT JOIN
         last_enrollment le
             ON le.id_house =House.id
     LEFT JOIN
-        datalake_big_agent_clean_prod.enrollment
+        datalake_big_agent_prod.enrollment
             ON enrollment.id=le.id_enrollment
     LEFT JOIN
-        datalake_big_agent_clean_prod.Agent
+        datalake_big_agent_prod.Agent
             ON agent.id=enrollment.id_agent
     LEFT JOIN
-        datalake_big_agent_clean_prod.program
+        datalake_big_agent_prod.program
             ON program.id=enrollment.id_program
     LEFT JOIN
         dim_house_listing dhl
@@ -251,3 +251,4 @@ FROM
     quintoandar_consultant_listings
 ORDER BY
     id_house
+
