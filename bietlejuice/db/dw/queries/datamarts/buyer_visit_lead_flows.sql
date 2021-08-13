@@ -132,6 +132,8 @@ UNION ALL
         JOIN datalake_classified_leads_clean_prod.lead_contact c
             ON c.id = lrw.id_lead
         WHERE c.business_context = 'SALE'
+            -- spam registries that must be dropped
+            AND c.ts_received::date||c.id_property != '2021-07-30893359741'
     )
     , first_contact_by_phone AS (
         SELECT
@@ -166,6 +168,8 @@ UNION ALL
         JOIN  datalake_classified_leads_clean_prod.lead_reply_email lre
             ON c.id = lre.id_lead
         WHERE c.business_context = 'SALE'
+            -- spam registries that must be dropped
+            AND c.ts_received::date||c.id_property != '2021-07-30893359741'
     )
     SELECT
         *
