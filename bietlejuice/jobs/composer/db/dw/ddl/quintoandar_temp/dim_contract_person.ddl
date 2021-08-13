@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS quintoandar.dim_contract_person;
-CREATE TABLE quintoandar.dim_contract_person (
+DROP TABLE IF EXISTS quintoandar_temp.dim_contract_person;
+CREATE TABLE quintoandar_temp.dim_contract_person (
   sk_contract_person BIGINT PRIMARY KEY,
   full_name VARCHAR,
   phone_number VARCHAR,
@@ -15,4 +15,4 @@ CREATE TABLE quintoandar.dim_contract_person (
   ts_updated TIMESTAMP,
   ts_load TIMESTAMP
 );
-ALTER TABLE quintoandar.dim_contract_person OWNER TO airflow;
+ALTER TABLE quintoandar_temp.dim_contract_person OWNER TO airflow;

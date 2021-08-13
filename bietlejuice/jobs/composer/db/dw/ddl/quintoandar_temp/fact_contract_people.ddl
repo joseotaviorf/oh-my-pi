@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS quintoandar.fact_contract_people;
-CREATE TABLE quintoandar.fact_contract_people (
+DROP TABLE IF EXISTS quintoandar_temp.fact_contract_people;
+CREATE TABLE quintoandar_temp.fact_contract_people (
   sk_contract_person BIGINT PRIMARY KEY,
   sk_personal_document VARCHAR,
   sk_user BIGINT,
@@ -17,4 +17,4 @@ CREATE TABLE quintoandar.fact_contract_people (
   is_last_contract BOOLEAN,
   ts_load TIMESTAMP
 );
-ALTER TABLE quintoandar.fact_contract_people OWNER TO airflow;
+ALTER TABLE quintoandar_temp.fact_contract_people OWNER TO airflow;
