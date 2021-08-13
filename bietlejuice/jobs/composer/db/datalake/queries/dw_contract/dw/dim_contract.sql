@@ -46,9 +46,9 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   c.ts_updated,
   c.ts_signed AS ts_signature,
   c.ts_minuta_approved AS ts_draft_approved,
-  c.ts_canceled,
+  CAST(c.ts_canceled AS TIMESTAMP) as ts_canceled,
   c.ts_tenant_service_fee_opt_out,
-  c.ts_analyst_annulment_input,
+  CAST(c.ts_analyst_annulment_input AS TIMESTAMP) as ts_analyst_annulment_input,
   NOW() AS ts_load
 FROM datalake_ebdb_contract.contract c
 LEFT JOIN datalake_ebdb_contract.contract_b2b contract_b2b
