@@ -230,7 +230,7 @@ class SparkDataFrameService:
         :return: SparkDataFrameService object with the result df
         """
         len_data = self.df.count()
-        partitions = max(len_data // records_by_partition, 1)
+        partitions = max(-(-len_data // records_by_partition), 1)
         if partitions > self.df.rdd.getNumPartitions():
             return SparkDataFrameService(self.df.repartition(partitions))
         return SparkDataFrameService(self.df.coalesce(partitions))

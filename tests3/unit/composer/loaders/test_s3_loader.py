@@ -132,8 +132,8 @@ class TestS3Loader:
 
     @mock.patch.object(S3Loader, "_optimize_dataframe_partitions")
     @pytest.mark.parametrize(
-        "s3_path, format_options, partitions, write_mode, max_records_per_file, options",
-        [("path/to/file", "csv", [], "overwrite", 10, {"delimiter": ";"})],
+        "s3_path, format_options, partitions, write_mode, max_records_per_file, options, optimize_dataframe",
+        [("path/to/file", "csv", [], "overwrite", 10, {"delimiter": ";"}, False)],
     )
     def test_load_df_full_with_success(
         self,
@@ -144,6 +144,7 @@ class TestS3Loader:
         write_mode,
         max_records_per_file,
         options,
+        optimize_dataframe,
         mocked_write_df,
         s3_loader,
     ):
@@ -165,6 +166,7 @@ class TestS3Loader:
             partitions,
             write_mode,
             max_records_per_file,
+            optimize_dataframe,
             **options,
         )
 
@@ -173,7 +175,7 @@ class TestS3Loader:
 
     @mock.patch.object(S3Loader, "_optimize_dataframe_partitions")
     @pytest.mark.parametrize(
-        "s3_path, format_options, partitions, write_mode, max_records_per_file, options",
+        "s3_path, format_options, partitions, write_mode, max_records_per_file, options, optimize_dataframe",
         [
             (
                 "path/to/file",
@@ -182,6 +184,7 @@ class TestS3Loader:
                 "overwrite",
                 10,
                 {"delimiter": ";"},
+                False,
             )
         ],
     )
@@ -194,6 +197,7 @@ class TestS3Loader:
         write_mode,
         max_records_per_file,
         options,
+        optimize_dataframe,
         mocked_write_df,
         s3_loader,
     ):
@@ -218,6 +222,7 @@ class TestS3Loader:
             partitions,
             write_mode,
             max_records_per_file,
+            optimize_dataframe,
             **options,
         )
 

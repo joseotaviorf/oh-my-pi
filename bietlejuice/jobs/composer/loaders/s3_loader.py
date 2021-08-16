@@ -200,16 +200,16 @@ class S3Loader:
                     partition_overwrite_mode
                 )
             )
+
+        df_writer = df.write.mode(write_mode).format(format_options)
+
         if optimize_dataframe:
             df = self._optimize_dataframe_partitions(
                 df, partitions, max_records_per_file
             )
+        else:
+            df_writer = df_writer.option("maxRecordsPerFile", max_records_per_file)
 
-        df_writer = (
-            df.write.mode(write_mode)
-            .format(format_options)
-            .option("maxRecordsPerFile", max_records_per_file)
-        )
         if partitions:
             df_writer = df_writer.partitionBy(*partitions)
 
