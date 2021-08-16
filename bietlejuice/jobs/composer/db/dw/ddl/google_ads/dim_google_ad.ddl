@@ -1,7 +1,7 @@
-CREATE SCHEMA IF NOT EXISTS marketing_costs;
+CREATE SCHEMA IF NOT EXISTS google_ads;
 
-DROP TABLE IF EXISTS marketing_costs.dim_google_ad;
-CREATE TABLE IF NOT EXISTS marketing_costs.dim_google_ad (
+DROP TABLE IF EXISTS google_ads.dim_google_ad;
+CREATE TABLE IF NOT EXISTS google_ads.dim_google_ad (
     sk_ad VARCHAR PRIMARY KEY,
     id_ad BIGINT,
     campaign_name VARCHAR,
@@ -14,8 +14,8 @@ CREATE TABLE IF NOT EXISTS marketing_costs.dim_google_ad (
     ts_load TIMESTAMP
 );
 
-ALTER TABLE marketing_costs.dim_google_ad OWNER TO databricks;
+ALTER TABLE google_ads.dim_google_ad OWNER TO databricks;
 
-CALL grant_all_permissions_on_schema('marketing_costs');
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA marketing_costs TO GROUP etl;
-GRANT ALL ON SCHEMA marketing_costs TO GROUP ETL;
+CALL grant_all_permissions_on_schema('google_ads');
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA google_ads TO GROUP etl;
+GRANT ALL ON SCHEMA google_ads TO GROUP ETL;

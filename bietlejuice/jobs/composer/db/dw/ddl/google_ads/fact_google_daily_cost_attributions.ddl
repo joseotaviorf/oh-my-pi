@@ -1,7 +1,7 @@
-CREATE SCHEMA IF NOT EXISTS marketing_costs;
+CREATE SCHEMA IF NOT EXISTS google_ads;
 
-DROP TABLE IF EXISTS marketing_costs.fact_google_daily_cost_attributions;
-CREATE TABLE IF NOT EXISTS marketing_costs.fact_google_daily_cost_attributions (
+DROP TABLE IF EXISTS google_ads.fact_google_daily_cost_attributions;
+CREATE TABLE IF NOT EXISTS google_ads.fact_google_daily_cost_attributions (
 	sk_date BIGINT,
 	sk_keyword VARCHAR,
 	sk_ad VARCHAR,
@@ -26,8 +26,8 @@ CREATE TABLE IF NOT EXISTS marketing_costs.fact_google_daily_cost_attributions (
 	ts_load TIMESTAMP
 );
 
-ALTER TABLE marketing_costs.fact_google_daily_cost_attributions OWNER TO databricks;
+ALTER TABLE google_ads.fact_google_daily_cost_attributions OWNER TO databricks;
 
-CALL grant_all_permissions_on_schema('marketing_costs');
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA marketing_costs TO GROUP etl;
-GRANT ALL ON SCHEMA marketing_costs TO GROUP ETL;
+CALL grant_all_permissions_on_schema('google_ads');
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA google_ads TO GROUP etl;
+GRANT ALL ON SCHEMA google_ads TO GROUP ETL;
