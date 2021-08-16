@@ -1,3 +1,2 @@
 # Migration file for dim_user
 dw_schema: public
-base_date_column: criado_em

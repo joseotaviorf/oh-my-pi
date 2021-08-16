@@ -1,3 +1,2 @@
 # Migration file for dim_visit
 dw_schema: public
-base_date_column: dt_created
