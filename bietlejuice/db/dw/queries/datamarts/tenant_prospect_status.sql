@@ -6,7 +6,7 @@ tps_contracts AS (
         dc.ts_signature,
         dc.sk_contract,
         'tenant prospect' AS contract_role,
-        CAST(dt_annulment AS TIMESTAMP) AS ts_annulment,
+        DATEADD('SEC', 86399, CAST(dt_annulment AS TIMESTAMP))  AS ts_annulment, --bring time to 23:59
         NULL::INT AS cs_order
     FROM
         dim_contract AS dc
@@ -14,6 +14,8 @@ tps_contracts AS (
             ON dc.sk_contract = flrf.sk_contract
         JOIN dim_region AS dr
             ON flrf.sk_region = dr.sk_region
+    WHERE
+        dc.ts_signature < COALESCE(ts_annulment, CURRENT_DATE)
 ),
 contract_person AS (
     SELECT DISTINCT
@@ -22,7 +24,7 @@ contract_person AS (
         dc.ts_signature,
         dc.sk_contract,
         fcp.contract_role,
-        CAST(dt_annulment AS TIMESTAMP) AS ts_annulment,
+        DATEADD('SEC', 86399, CAST(dt_annulment AS TIMESTAMP)) AS ts_annulment, --bring time to 23:59
         ROW_NUMBER() OVER(PARTITION BY COALESCE(NULLIF(fcp.sk_user, -1), flrf.sk_client),
                                        dc.sk_contract,
                                        dr.city_group,
@@ -44,6 +46,7 @@ contract_person AS (
         AND dc.ts_signature IS NOT NULL
         AND fcp.sk_user != -1
         AND fcp.contract_role IN ('tenant', 'dweller')
+        AND dc.ts_signature < COALESCE(DATEADD('SEC', 86399, CAST(dt_annulment AS TIMESTAMP)), CURRENT_DATE)
 ),
 contract_flows AS (
     SELECT
@@ -58,8 +61,7 @@ contract_flows AS (
     WHERE
         cs_order = 1
 ),
-events_base AS (
-    -- Rent Flows
+rent_flows AS (
     SELECT DISTINCT
         rfi.sk_client,
         dr.city_group,
@@ -71,7 +73,15 @@ events_base AS (
             USING(sk_region)
     WHERE
         rfi.rent_flow_order = 1
+        AND ts_event IS NOT NULL
     GROUP BY 1,2,3,4
+),
+events_base AS (
+    -- Rent Flows
+    SELECT
+        *
+    FROM
+        rent_flows
 
     UNION ALL
 
@@ -83,19 +93,35 @@ events_base AS (
         'contract signed as ' ||  contract_role AS event_type
     FROM
         contract_flows
+    WHERE
+        ts_signature IS NOT NULL
 
     UNION ALL
 
     -- Contracts ended
     SELECT DISTINCT
-        sk_client,
-        city_group,
-        ts_annulment AS ts_event,
+        cf1.sk_client,
+        cf1.city_group,
+        cf1.ts_annulment AS ts_event,
         'contract ended' AS event_type
     FROM
-        contract_flows
+        contract_flows AS cf1
+        LEFT JOIN contract_flows AS cf2 -- Filter all endings that occured when a new contract was active
+            ON cf1.sk_client = cf2.sk_client
+            AND cf1.city_group = cf2.city_group
+            AND cf1.ts_signature < cf2.ts_signature
+            AND cf1.ts_annulment > cf2.ts_signature
+        LEFT JOIN rent_flows AS rf -- Filter all endings that occured after a new activation
+            ON cf1.sk_client = rf.sk_client
+            AND cf1.city_group = rf.city_group
+            AND cf1.ts_signature < rf.ts_event
+            AND cf1.ts_annulment > rf.ts_event
     WHERE
-        ts_annulment IS NOT NULL
+        cf1.ts_annulment IS NOT NULL
+        AND (cf2.ts_signature NOT BETWEEN cf1.ts_signature AND cf1.ts_annulment
+             OR cf2.sk_client IS NULL)
+        AND (rf.ts_event NOT BETWEEN cf1.ts_signature AND cf1.ts_annulment
+             OR rf.sk_client IS NULL)
 ),
 churn_dates AS (
     SELECT
@@ -108,11 +134,7 @@ churn_dates AS (
                 THEN ts_event
             WHEN event_type = 'contract ended' AND last_event LIKE 'contract signed%'
                 THEN ts_event
-            WHEN event_type = 'contract ended' AND last_event = 'rent_flow'
-                    AND DATEDIFF(DAY, ts_last_event, COALESCE(ts_next_event, CURRENT_DATE)) > 35
-                THEN DATEADD(DAY, 35, ts_last_event)
-            WHEN event_type NOT LIKE 'contract%'
-                    AND DATEDIFF(DAY, ts_event, COALESCE(ts_next_event, CURRENT_DATE)) > 35
+            WHEN event_type = 'rent_flow' AND DATEDIFF(DAY, ts_event, COALESCE(ts_next_event, CURRENT_DATE)) > 35
                 THEN DATEADD(DAY, 35, ts_event)
         END AS ts_churn
     FROM
