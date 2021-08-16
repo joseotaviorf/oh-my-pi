@@ -142,6 +142,13 @@ bietlejuice.dw_google_ads:
 bietlejuice.dw_mitula:
   - bietlejuice.mitula:load-clean-mitula-report
 
+bietlejuice.dw_offer:
+  - bietlejuice.enrich_ebdb_proposal:load-enrich-pre-proposal
+  - bietlejuice.enrich_ebdb_proposal:load-enrich-pre-proposal-aud
+  - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
+  - bietlejuice.enrich_offer:load-enrich-offer
+  - bietlejuice.gsheets:load-clean-taxonomy-demand
+
 bietlejuice.dw_proposal:
   - bietlejuice.enrich_proposal:load-enrich-proposal
   - bietlejuice.enrich_docx:load-enrich-credit-evaluation
@@ -437,9 +444,9 @@ bietlejuice.enrich_ebdb_listing_jobs:
 bietlejuice.enrich_ebdb_proposal:
   - bietlejuice.ebdb:create-clean-pre-proposal-in-data-lake
   - bietlejuice.ebdb:create-clean-pre-proposal-aud-in-data-lake
-  - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
   - bietlejuice.ebdb:create-clean-pre-proposal-condition-in-data-lake
   - bietlejuice.ebdb:create-clean-proposal-condition-in-data-lake
+  - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
 
 bietlejuice.enrich_ebdb_smart_price:
   - bietlejuice.ebdb:create-clean-house-aud-in-data-lake

@@ -10,20 +10,20 @@ with first_sent as (
   )
   select
     pp.id as id_pre_proposal,
-    min(FROM_UNIXTIME(ure.ts_revision/1000)) as ts_first_sent
+    min(ure.ts_revision) as ts_first_sent
   from datalake_ebdb_clean.pre_proposal pp
   join first_change fc
     on fc.id_pre_proposal = pp.id
-  join datalake_ebdb_clean.user_revision_entity ure
+  join datalake_ebdb_user_revision_entity.user_revision_entity ure
     on ure.id = fc.min_rev
   group by 1
 ),
 last_analysis as (
   select
     ppa.id_pre_proposal,
-    max(FROM_UNIXTIME(ure.ts_revision/1000)) as ts_last_analysis
+    max(ure.ts_revision) as ts_last_analysis
   from datalake_ebdb_clean.pre_proposal_aud ppa
-  join datalake_ebdb_clean.user_revision_entity ure
+  join datalake_ebdb_user_revision_entity.user_revision_entity ure
     on ure.id = ppa.rev
   	and ppa.status in ('Aprovada', 'Rejeitada')
   group by 1

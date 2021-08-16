@@ -96,6 +96,7 @@ firestore_offers as (
 )
 select distinct
   offer.id,
+  (offer.id * 100) + 2 as id_offer_context,
   offer.id_firestore,
   -- TODO [ODS] bug in Product attaching the same firestore id to different godfather entries
   max(coalesce(offer.id_godfather, firestore.id)) over (partition by offer.id_firestore) as id_godfather,
@@ -116,7 +117,7 @@ select distinct
   negotiation.first_rent_offered_by_owner,
   negotiation.last_rent_offered_by_tenant,
   negotiation.last_rent_offered_by_owner,
-  firestore.is_instant_offer,
+  coalesce(firestore.is_instant_offer, false) as is_instant_offer,
   coalesce(bus_offer.ts_last_sent, firestore.ts_last_sent) is not null as is_offer_submitted,
   offer.ts_expired,
   analyzed.first_ts_revision as ts_analyzed,
