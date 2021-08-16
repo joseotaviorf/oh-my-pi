@@ -35,7 +35,7 @@ TABLES_LIST = config_service.get_config("tables_list")
 CYPRESS_SOURCE_BUCKET = config_service.get_config("cypress_source_bucket")
 
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "15 7 * * *"
+MAIN_SCHEDULE_INTERVAL = "15 7 * * 1-5"
 RAW_SPARK_JOB_FILE = (
     f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/{SOURCE}/load_cypress_raw.py"
 )
