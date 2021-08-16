@@ -241,6 +241,11 @@ marketing_manual_campaign_cities:
     sheet_name: Campaign_City
     clean_table_name: marketing_manual_campaign_cities
 
+marketing_social_media_costs:
+    sheet_id: 1yleDGeVtbzrT5rM0zo9AomOZKIGTOiYm-FK0_GNnGNs
+    sheet_name: social_media_costs
+    clean_table_name: marketing_social_media_costs
+
 media_plan:
     sheet_id: 1aief4f2Iu0vEZ68ZOxq7cRjkzdz1ePOhZf2lN6rcITQ
     sheet_name: media_plan
