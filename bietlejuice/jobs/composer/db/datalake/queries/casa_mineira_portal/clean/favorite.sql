@@ -1,7 +1,7 @@
 SELECT
     id,
     imovel_id AS id_house,
-    uid,
+    dispositivo_uuid AS device_uuid,
     ip,
     CAST(criado_em AS TIMESTAMP) AS ts_created,
     CAST(deletado_em AS TIMESTAMP) AS ts_deleted

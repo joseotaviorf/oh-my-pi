@@ -2,7 +2,7 @@ SELECT
     id,
     imovel_id AS id_house,
     uuid,
-    uid,
+    dispositivo_uuid AS device_uuid,
     ip,
     email,
     dispositivo AS device,

@@ -3,7 +3,7 @@ SELECT
     bairro_id AS id_neighborhood,
     imobiliaria_id AS id_real_estate_agency,
     tipo_id AS id_type,
-    uid,
+    dispositivo_uuid AS device_uuid,
     ip,
     logradouro AS address,
     email,
