@@ -10,7 +10,7 @@ WITH call_segments AS (
         transferred_from_dept,
         transferred_to_dept,
         transference_type,
-        NULL AS transference_reason,
+        transference_reason,
         'call' AS channel,
         sla_achieved AS is_sla,
         is_first_segment,

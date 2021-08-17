@@ -40,6 +40,23 @@ WITH segment AS (
     WHERE
       id_reservation IS NOT NULL
     GROUP BY 1,2
+  ),
+  transfer_reason AS (
+    SELECT DISTINCT
+      id_reviewed AS id_reservation,
+      rating_selected[0] AS transference_reason
+    FROM 
+      datalake_insider_clean.review r
+    JOIN
+      datalake_insider_clean.review_feature rf
+        ON r.id = rf.id
+    JOIN
+      datalake_insider_clean.feature f
+        ON rf.id_feature = f.id
+    WHERE
+      f.name = 'ticket_transfer_reason'
+      AND r.type = 'ticket_transfer'
+      AND id_reviewed like 'WR%'
   )
   SELECT
     r.id_reservation,
@@ -66,6 +83,7 @@ WITH segment AS (
           THEN 'internal-other-agent'
         WHEN LEAD(queue_name,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) != queue_name THEN 'external'
     END AS transference_type,
+    tr.transference_reason,
     seconds_duration,
     seconds_wait_time,
     seconds_talk_time,
@@ -91,7 +109,10 @@ WITH segment AS (
       AND ae.id_reservation = r.id_reservation
   LEFT JOIN
     twilio_timestamp tt
-        ON tt.id_reservation = r.id_reservation
+      ON tt.id_reservation = r.id_reservation
+  LEFT JOIN
+    transfer_reason tr
+      ON tr.id_reservation = r.id_reservation
   WHERE
     is_answered = TRUE
 ),
@@ -320,6 +341,7 @@ SELECT DISTINCT
   t.transferred_from_dept,
   t.transferred_to_dept,
   t.transference_type,
+  t.transference_reason,
   CASE
       WHEN seconds_total_wait_time <= 60 AND t.is_answered THEN TRUE
       WHEN seconds_total_wait_time > 60 AND t.is_answered THEN FALSE
