@@ -1,10 +1,11 @@
 SELECT
     id,
-    locale,
-    cost_center_code,
+    account_id AS id_account,
+    sale_transaction_id AS id_sale_transaction,
+    person_type,
+    type AS entry_type,
     credit,
     debit,
-    accrual_year_month,
     created_at AS ts_created
 FROM
     datalake_monopoly_raw.accounting_entry
