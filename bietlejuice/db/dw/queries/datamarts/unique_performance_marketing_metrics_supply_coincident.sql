@@ -3,7 +3,7 @@ costs_targets_results_combined AS (
     ---------------------------------
         -- Supply Leads Volume --
     ---------------------------------
-	SELECT
+    SELECT
 		f.sk_lead_date AS sk_date,
 		COALESCE(dr.city_group, 'Not Mapped') AS city_group,
 		COALESCE(f.mkt_origin,'') AS mkt_origin,
@@ -13,6 +13,7 @@ costs_targets_results_combined AS (
 		COALESCE(dl.utm_campaign,'') AS utm_campaign,
 		COALESCE(dl.utm_content,'') AS utm_content,
 		COALESCE(dl.utm_term,'') AS utm_term,
+		COALESCE(p.origin_phone,'') AS origin_phone,
 		COUNT(DISTINCT CASE WHEN sk_lead_date > 0 AND f.context_lead = 'Rent' THEN f.sk_house_listing_flow ELSE NULL END) AS leads_rent,
 		COUNT(DISTINCT CASE WHEN sk_lead_date > 0 AND f.context_lead = 'Sale' THEN f.sk_house_listing_flow ELSE NULL END) AS leads_sale,
 		COUNT(DISTINCT CASE WHEN sk_lead_date > 0 AND (f.context_lead = 'Hybrid' OR f.context_lead = NULL) THEN f.sk_house_listing_flow ELSE NULL END) AS leads_hybrid,
@@ -46,17 +47,19 @@ costs_targets_results_combined AS (
         ON dl.sk_lead = f.sk_lead
     JOIN dim_region AS dr
         ON f.sk_region = dr.sk_region
+    LEFT JOIN datalake_wololo_clean_prod.prospect p
+        ON p.id_reference = f.sk_lead
     WHERE
         f.sk_lead_date > 0
     GROUP BY 
-        1,2,3,4,5,6,7,8,9
+        1,2,3,4,5,6,7,8,9,10
     
     UNION ALL
 
   -------------------------------------
   -- Supply Prospects Volume --
   -------------------------------------
-	SELECT
+    SELECT
 		f.sk_prospect_date AS sk_date,
 		COALESCE(dr.city_group, 'Not Mapped') AS city_group,
 		COALESCE(f.mkt_origin,'') AS mkt_origin,
@@ -66,6 +69,7 @@ costs_targets_results_combined AS (
 		COALESCE(dl.utm_campaign,'') AS utm_campaign,
 		COALESCE(dl.utm_content,'') AS utm_content,
 		COALESCE(dl.utm_term,'') AS utm_term,
+		COALESCE(p.origin_phone,'') AS origin_phone,
 		COUNT(NULL) AS leads_rent,
 		COUNT(NULL) AS leads_sale,
 		COUNT(NULL) AS leads_hybrid,
@@ -99,10 +103,12 @@ costs_targets_results_combined AS (
         ON dl.sk_lead = f.sk_lead
     JOIN dim_region AS dr
         ON f.sk_region = dr.sk_region
+    LEFT JOIN datalake_wololo_clean_prod.prospect p
+        ON p.id_reference = f.sk_lead
     WHERE
         f.sk_prospect_date > 0
     GROUP BY 
-        1,2,3,4,5,6,7,8,9
+        1,2,3,4,5,6,7,8,9,10
     
     UNION ALL
     --------------------------------------
@@ -118,6 +124,7 @@ costs_targets_results_combined AS (
 		COALESCE(dl.utm_campaign,'') AS utm_campaign,
 		COALESCE(dl.utm_content,'') AS utm_content,
 		COALESCE(dl.utm_term,'') AS utm_term,
+		COALESCE(p.origin_phone,'') AS origin_phone,
 		COUNT(NULL) AS leads_rent,
 		COUNT(NULL) AS leads_sale,
 		COUNT(NULL) AS leads_hybrid,
@@ -151,10 +158,12 @@ costs_targets_results_combined AS (
         ON dl.sk_lead = f.sk_lead
     JOIN dim_region AS dr
         ON f.sk_region = dr.sk_region
+    LEFT JOIN datalake_wololo_clean_prod.prospect p
+        ON p.id_reference = f.sk_lead
     WHERE
         f.sk_qualified_date > 0
     GROUP BY 
-        1,2,3,4,5,6,7,8,9
+        1,2,3,4,5,6,7,8,9,10
  
     UNION ALL
 
@@ -171,6 +180,7 @@ costs_targets_results_combined AS (
 		COALESCE(dl.utm_campaign,'') AS utm_campaign,
 		COALESCE(dl.utm_content,'') AS utm_content,
 		COALESCE(dl.utm_term,'') AS utm_term,
+		COALESCE(p.origin_phone,'') AS origin_phone,
 		COUNT(NULL) AS leads_rent,
 		COUNT(NULL) AS leads_sale,
 		COUNT(NULL) AS leads_hybrid,
@@ -204,10 +214,12 @@ costs_targets_results_combined AS (
         ON dl.sk_lead = f.sk_lead
     JOIN dim_region AS dr
         ON f.sk_region = dr.sk_region
+    LEFT JOIN datalake_wololo_clean_prod.prospect p
+        ON p.id_reference = f.sk_lead
     WHERE
         f.sk_opportunity_date > 0
     GROUP BY 
-        1,2,3,4,5,6,7,8,9
+        1,2,3,4,5,6,7,8,9,10
     
     UNION ALL
 
@@ -224,6 +236,7 @@ costs_targets_results_combined AS (
 		COALESCE(dl.utm_campaign,'') AS utm_campaign,
 		COALESCE(dl.utm_content,'') AS utm_content,
 		COALESCE(dl.utm_term,'') AS utm_term,
+		COALESCE(p.origin_phone,'') AS origin_phone,
 		COUNT(NULL) AS leads_rent,
 		COUNT(NULL) AS leads_sale,
 		COUNT(NULL) AS leads_hybrid,
@@ -259,10 +272,12 @@ costs_targets_results_combined AS (
         ON f.sk_region = dr.sk_region
     JOIN dim_date AS dd
         ON f.sk_first_listing_date = dd.sk_date
+    LEFT JOIN datalake_wololo_clean_prod.prospect p
+        ON p.id_reference = f.sk_lead
     WHERE
         f.sk_first_listing_date > 0
     GROUP BY 
-        1,2,3,4,5,6,7,8,9
+        1,2,3,4,5,6,7,8,9,10
     
     UNION ALL
 
@@ -602,6 +617,7 @@ costs_targets_results_combined AS (
                 utm_campaign,
                 utm_content,
                 utm_term,
+                NULL::TEXT AS origin_phone,
                 COUNT(NULL) AS leads_rent,
                 COUNT(NULL) AS leads_sale,
                 COUNT(NULL) AS leads_hybrid,
@@ -635,7 +651,7 @@ costs_targets_results_combined AS (
                 business_context = 'Sale' 
                 OR (business_context is NULL AND mkt_origin IN ('Doorman Sale','Indica Aí - Agents Sale','Indica Aí - General Sale'))
             GROUP BY 
-                1,2,3,4,5,6,7,8,9
+                1,2,3,4,5,6,7,8,9,10
         ),
         supply_affiliates_cost AS (
             SELECT
@@ -648,6 +664,7 @@ costs_targets_results_combined AS (
                 utm_campaign,
                 utm_content,
                 utm_term,
+                NULL::TEXT AS origin_phone,
                 COUNT(NULL) AS leads_rent,
                 COUNT(NULL) AS leads_sale,
                 COUNT(NULL) AS leads_hybrid,
@@ -681,7 +698,7 @@ costs_targets_results_combined AS (
                 business_context = 'Rent' 
                 OR (business_context is NULL AND mkt_origin IN ('Doorman','Indica Aí - Agents','Indica Aí - General'))
             GROUP BY 
-                1,2,3,4,5,6,7,8,9
+                1,2,3,4,5,6,7,8,9,10
         ),
         supply_landlords_cost AS (
             SELECT
@@ -694,6 +711,7 @@ costs_targets_results_combined AS (
                 co.utm_campaign AS utm_campaign,
                 co.utm_content AS utm_content,
                 co.utm_term AS utm_term,
+                NULL::TEXT AS origin_phone,
                 COUNT(NULL) AS leads_rent,
                 COUNT(NULL) AS leads_sale,
                 COUNT(NULL) AS leads_hybrid,
@@ -732,7 +750,7 @@ costs_targets_results_combined AS (
                 AND co.mkt_origin IN ('Owner PWA','Price Calculator','New Channels')
                 AND co.mkt_channel != 'Girafa'
             GROUP BY 
-                1,2,3,4,5,6,7,8,9
+                1,2,3,4,5,6,7,8,9,10
         ),
         supply_sale_cost AS (
             SELECT
@@ -745,6 +763,7 @@ costs_targets_results_combined AS (
                 co.utm_campaign AS utm_campaign,
                 co.utm_content AS utm_content,
                 co.utm_term AS utm_term,
+                NULL::TEXT AS origin_phone,
                 COUNT(NULL) AS leads_rent,
                 COUNT(NULL) AS leads_sale,
                 COUNT(NULL) AS leads_hybrid,
@@ -781,7 +800,7 @@ costs_targets_results_combined AS (
                 co.account_name IN ('quintoandar_supply_sale_display', 'quintoandar_supply_sale', 'supply_landlords_sale', 'supply_landlords')
                 AND co.mkt_origin IN ('Owner PWA - Sale', 'Price Calculator - Sale')
             GROUP BY 
-                1,2,3,4,5,6,7,8,9
+                1,2,3,4,5,6,7,8,9,10
         ),
         supply_ciq_cost AS (
             SELECT
@@ -794,6 +813,7 @@ costs_targets_results_combined AS (
                 co.utm_campaign AS utm_campaign,
                 co.utm_content AS utm_content,
                 co.utm_term AS utm_term,
+                NULL::TEXT AS origin_phone,
                 COUNT(NULL) AS leads_rent,
                 COUNT(NULL) AS leads_sale,
                 COUNT(NULL) AS leads_hybrid,
@@ -829,7 +849,7 @@ costs_targets_results_combined AS (
             WHERE 
                 co.mkt_origin = 'CIQ'
             GROUP BY 
-                1,2,3,4,5,6,7,8,9
+                1,2,3,4,5,6,7,8,9,10
         ),
         cost_union AS (
             SELECT * FROM supply_affiliates_cost
@@ -868,6 +888,7 @@ costs_targets_results_combined AS (
         NULL::TEXT AS utm_campaign,
         NULL::TEXT AS utm_content,
         NULL::TEXT AS utm_term,
+        NULL::TEXT AS origin_phone,
         COUNT(NULL) AS leads_rent,
         COUNT(NULL) AS leads_sale,
         COUNT(NULL) AS leads_hybrid,
@@ -900,7 +921,7 @@ costs_targets_results_combined AS (
     WHERE 
         str.date >= '2021-04-01'
     GROUP BY 
-        1,2,3,4,5,6,7,8,9
+        1,2,3,4,5,6,7,8,9,10
     
     UNION ALL
     
@@ -917,6 +938,7 @@ costs_targets_results_combined AS (
         NULL::TEXT AS utm_campaign,
         NULL::TEXT AS utm_content,
         NULL::TEXT AS utm_term,
+        NULL::TEXT AS origin_phone,
         COUNT(NULL) AS leads_rent,
         COUNT(NULL) AS leads_sale,
         COUNT(NULL) AS leads_hybrid,
@@ -949,7 +971,7 @@ costs_targets_results_combined AS (
     WHERE 
         str.date >= '2021-04-01'
     GROUP BY 
-        1,2,3,4,5,6,7,8,9
+        1,2,3,4,5,6,7,8,9,10
     
     UNION ALL
     
@@ -970,6 +992,7 @@ costs_targets_results_combined AS (
         NULL::TEXT AS utm_campaign,
         NULL::TEXT AS utm_content,
         NULL::TEXT AS utm_term,
+        NULL::TEXT AS origin_phone,
         COUNT(NULL) AS leads_rent,
         COUNT(NULL) AS leads_sale,
         COUNT(NULL) AS leads_hybrid,
@@ -1002,7 +1025,7 @@ costs_targets_results_combined AS (
     WHERE 
         str.date < '2021-04-01'
     GROUP BY 
-        1,2,3,4,5,6,7,8,9
+        1,2,3,4,5,6,7,8,9,10
     
     UNION ALL
 
@@ -1019,6 +1042,7 @@ costs_targets_results_combined AS (
         NULL::TEXT AS utm_campaign,
         NULL::TEXT AS utm_content,
         NULL::TEXT AS utm_term,
+        NULL::TEXT AS origin_phone,
         COUNT(NULL) AS leads_rent,
         COUNT(NULL) AS leads_sale,
         COUNT(NULL) AS leads_hybrid,
@@ -1051,7 +1075,7 @@ costs_targets_results_combined AS (
     WHERE 
         str.date < '2021-04-01'
     GROUP BY 
-        1,2,3,4,5,6,7,8,9
+        1,2,3,4,5,6,7,8,9,10
     
     UNION ALL
 
@@ -1076,6 +1100,7 @@ costs_targets_results_combined AS (
         NULL::TEXT AS utm_campaign,
         NULL::TEXT AS utm_content,
         NULL::TEXT AS utm_term,
+        NULL::TEXT AS origin_phone,
         COUNT(NULL) AS leads_rent,
         COUNT(NULL) AS leads_sale,
         COUNT(NULL) AS leads_hybrid,
@@ -1109,7 +1134,7 @@ costs_targets_results_combined AS (
         planning_mkt_level1 = 'Supply'
         AND sct.date < '2021-04-01'
     GROUP BY 
-        1,2,3,4,5,6,7,8,9
+        1,2,3,4,5,6,7,8,9,10
     
     UNION ALL
 
@@ -1134,6 +1159,7 @@ costs_targets_results_combined AS (
         NULL::TEXT AS utm_campaign,
         NULL::TEXT AS utm_content,
         NULL::TEXT AS utm_term,
+        NULL::TEXT AS origin_phone,
         COUNT(NULL) AS leads_rent,
         COUNT(NULL) AS leads_sale,
         COUNT(NULL) AS leads_hybrid,
@@ -1167,7 +1193,7 @@ costs_targets_results_combined AS (
         planning_mkt_level1 = 'Supply'
         AND sct.date < '2021-04-01'
     GROUP BY 
-        1,2,3,4,5,6,7,8,9
+        1,2,3,4,5,6,7,8,9,10
 
 )
 
@@ -1197,6 +1223,7 @@ SELECT
     utm_campaign,
     utm_content,
     utm_term,
+    NULLIF(origin_phone,'') AS origin_phone,
     SUM(leads_rent) AS leads_rent,
     SUM(leads_sale) AS leads_sale,
     SUM(leads_hybrid) AS leads_hybrid,
@@ -1228,6 +1255,6 @@ FROM
     costs_targets_results_combined
 JOIN 
     dim_date AS dd
-    USING(sk_date)
+    USING(sk_date) 
 GROUP BY 
-    1,2,3,4,5,6,7,8,9,10
+    1,2,3,4,5,6,7,8,9,10,11
