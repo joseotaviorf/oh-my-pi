@@ -135,6 +135,14 @@ requirements-lint-python3:
 	@echo ""
 	@python -m pip install -r requirements3_lint.txt
 
+.PHONY: requirements-scripts-python3
+requirements-scripts-python3:
+	@echo ""
+	@echo "Installing scripts packages"
+	@echo "=========="
+	@echo ""
+	@python -m pip install -r requirements3_scripts.txt
+
 .PHONY: lint-python3
 ## run black to fix code style
 lint-python3:
@@ -192,7 +200,6 @@ validate-atlas-metadata-files:
 	@echo "Validating Atlas metadata files"
 	@echo "=========="
 	@echo ""
-	@pip install yamale==3.0.8
 	@git fetch --no-tags origin +refs/heads/master
 	@python scripts/atlas_metadata_validation/validate_atlas_metadata.py  "$(DRONE_BRANCH)"
 

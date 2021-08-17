@@ -234,6 +234,7 @@ pipeline:
     group: tests
     image: python:3.7.3
     commands:
+      - make requirements-scripts-python3
       - make validate-atlas-metadata-files
     when:
       event: push

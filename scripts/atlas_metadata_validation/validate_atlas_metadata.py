@@ -93,7 +93,7 @@ def validate_yaml_schema(yaml_data: dict):
         file_path = yaml_data[0][1]
         raise ValueError(
             f"file_path={file_path} yaml_type={yaml_type} "
-            f"msg=Expected file_type to be tags or lineage"
+            f"msg=Columns defined in the file should only have 'lineage' or 'tags', found '{yaml_type}'"
         )
 
     yamale.validate(YAML_SCHEMAS[yaml_type], yaml_data)
@@ -113,7 +113,8 @@ def validate_file_name_matches_table_name(file_path: str, yaml_content: dict):
     if file_name != table_name:
         raise ValueError(
             f"file_name={file_name} table_name={table_name} file_path={file_path} "
-            f"msg=File name does not match table name"
+            f"msg=The name defined under 'table_name' in metadata file is not the same as the file name. "
+            f"Make sure the file name is the same as the table_name key "
         )
 
 
@@ -145,8 +146,9 @@ def main():
 
             validate_yaml_schema(yaml_data)
             validate_file_name_matches_table_name(file_path, yaml_content)
+        print("msg=Successfully validated all files!")
     else:
-        print("msg=No changes on Atlas metadata files")
+        print("msg=No changes found on Atlas metadata files")
 
 
 if __name__ == "__main__":
