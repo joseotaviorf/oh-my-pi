@@ -58,8 +58,9 @@ filtered_events AS (
             CAST(id_device AS STRING)
         ) AS id_tof_user,
         CASE
-            WHEN UPPER(CAST(utm_campaign AS STRING)) LIKE '%BRANDED%'
-                OR UPPER(CAST(utm_campaign AS STRING)) LIKE '%INSTITUCIONAL%'
+            WHEN (UPPER(CAST(utm_campaign AS STRING)) LIKE '%BRANDED%'
+                  OR UPPER(CAST(utm_campaign AS STRING)) LIKE '%INSTITUCIONAL%')
+                 AND UPPER(CAST(utm_campaign AS STRING)) NOT LIKE '%NON-BRANDED%'
             THEN 'Branded'
             ELSE 'Outro'
         END AS branded,
