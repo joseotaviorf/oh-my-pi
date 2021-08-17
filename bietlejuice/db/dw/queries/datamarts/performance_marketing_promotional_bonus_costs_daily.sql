@@ -223,6 +223,8 @@ WITH
         (final_bonus_sale - previous_bonus_sale) AS final_bonus_sale
     FROM
         final_bonus
+    WHERE
+        sk_user NOT IN (360754,912255,1711931,2257503)
 
 
 

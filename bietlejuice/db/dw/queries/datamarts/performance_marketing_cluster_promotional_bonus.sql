@@ -149,3 +149,5 @@ SELECT
     lwb.total_listings*100 AS commission_listing
 FROM
 	listings_with_bonus lwb
+WHERE
+    lwb.sk_user NOT IN (360754,912255,1711931,2257503)

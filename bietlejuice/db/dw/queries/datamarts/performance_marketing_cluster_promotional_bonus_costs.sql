@@ -222,3 +222,5 @@ FROM
     final_bonus
 WHERE
     sk_date >= 20190101
+AND
+    sk_user NOT IN (360754,912255,1711931,2257503)
