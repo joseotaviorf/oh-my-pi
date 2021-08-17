@@ -1,0 +1,31 @@
+database_name: datalake_amplitude_page_viewed_events
+table_name: listing_page_viewed
+columns:
+  id_amplitude:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_listing_page_viewed_events.id_amplitude
+      - datalake_amplitude_raw.170698_user_merge.merged_amplitude_id
+  id_session:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_listing_page_viewed_events.id_session
+  id_house:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_listing_page_viewed_events.event_properties
+  utm_source:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_listing_page_viewed_events.user_properties
+  utm_medium:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_listing_page_viewed_events.user_properties
+  utm_campaign:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_listing_page_viewed_events.user_properties
+  utm_content:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_listing_page_viewed_events.user_properties
+  utm_term:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_listing_page_viewed_events.user_properties
+  ts_event:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_listing_page_viewed_events.ts_event
