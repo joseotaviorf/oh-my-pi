@@ -29,8 +29,18 @@ SELECT DISTINCT
     tsk.phase,
     tsk.subject,
     tsk.visit_fup,
+    IF(
+        tsh.action_user_name IS NULL,
+        NULL,
+        ROUND(
+            (TO_UNIX_TIMESTAMP(LEAD(tsh.ts_action) OVER (PARTITION BY tsk.id ORDER BY tsh.ts_action),  'yyyy-MM-dd HH:mm:ss') - TO_UNIX_TIMESTAMP(tsh.ts_action, 'yyyy-MM-dd HH:mm:ss'))/3600.0,
+            1
+        )
+    ) AS task_user_resolve_hours,
     tsk.is_resolved,
     tsh.ts_action,
+    LAG(tsh.ts_action) OVER (PARTITION BY tsk.id ORDER BY tsh.ts_action) AS ts_previous_action,
+    LEAD(tsh.ts_action) OVER (PARTITION BY tsk.id ORDER BY tsh.ts_action) AS ts_next_action,
     tsk.ts_created,
     tsk.ts_start,
     tsk.ts_completed,
@@ -78,8 +88,18 @@ SELECT DISTINCT
     tsk.phase,
     tsk.subject,
     tsk.visit_fup,
+    IF(
+        tac.action_user_name IS NULL,
+        NULL,
+        ROUND(
+            (TO_UNIX_TIMESTAMP(LEAD(tac.ts_action) OVER (PARTITION BY tsk.id ORDER BY tac.ts_action),  'yyyy-MM-dd HH:mm:ss') - TO_UNIX_TIMESTAMP(tac.ts_action, 'yyyy-MM-dd HH:mm:ss'))/3600.0,
+            1
+        )
+    ) AS task_user_resolve_hours,
     tsk.is_resolved,
     tac.ts_action,
+    LAG(tac.ts_action) OVER (PARTITION BY tsk.id ORDER BY tac.ts_action) AS ts_previous_action,
+    LEAD(tac.ts_action) OVER (PARTITION BY tsk.id ORDER BY tac.ts_action) AS ts_next_action,
     tsk.ts_created,
     tsk.ts_start,
     tsk.ts_completed,
