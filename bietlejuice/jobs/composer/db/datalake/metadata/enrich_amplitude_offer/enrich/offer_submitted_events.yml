@@ -1,0 +1,63 @@
+database_name: datalake_amplitude_offer
+table_name: offer_submitted_events
+columns:
+  id_user:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_offer_submitted_events.id_user
+      - datalake_amplitude_clean_staging.170135_offer_submitted_events.id_user
+      - datalake_amplitude_clean_staging.183049_offer_submitted_events.id_user
+  id_house:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_offer_submitted_events.event_properties
+      - datalake_amplitude_clean_staging.170135_offer_submitted_events.event_properties
+      - datalake_amplitude_clean_staging.183049_offer_submitted_events.event_properties
+  id_firestore:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_offer_submitted_events.event_properties
+      - datalake_amplitude_clean_staging.170135_offer_submitted_events.event_properties
+      - datalake_amplitude_clean_staging.183049_offer_submitted_events.event_properties
+  app_type:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_offer_submitted_events.user_properties
+      - datalake_amplitude_clean_staging.170135_offer_submitted_events.user_properties
+      - datalake_amplitude_clean_staging.183049_offer_submitted_events.user_properties
+  utm_source:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_offer_submitted_events.user_properties
+      - datalake_amplitude_clean_staging.170135_offer_submitted_events.user_properties
+      - datalake_amplitude_clean_staging.183049_offer_submitted_events.user_properties
+  utm_medium:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_offer_submitted_events.user_properties
+      - datalake_amplitude_clean_staging.170135_offer_submitted_events.user_properties
+      - datalake_amplitude_clean_staging.183049_offer_submitted_events.user_properties
+  utm_campaign:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_offer_submitted_events.user_properties
+      - datalake_amplitude_clean_staging.170135_offer_submitted_events.user_properties
+      - datalake_amplitude_clean_staging.183049_offer_submitted_events.user_properties
+  utm_content:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_offer_submitted_events.user_properties
+      - datalake_amplitude_clean_staging.170135_offer_submitted_events.user_properties
+      - datalake_amplitude_clean_staging.183049_offer_submitted_events.user_properties
+  utm_term:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_offer_submitted_events.user_properties
+      - datalake_amplitude_clean_staging.170135_offer_submitted_events.user_properties
+      - datalake_amplitude_clean_staging.183049_offer_submitted_events.user_properties
+  branded:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_offer_submitted_events.user_properties
+      - datalake_amplitude_clean_staging.170135_offer_submitted_events.user_properties
+      - datalake_amplitude_clean_staging.183049_offer_submitted_events.user_properties
+  is_branded:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_offer_submitted_events.user_properties
+      - datalake_amplitude_clean_staging.170135_offer_submitted_events.user_properties
+      - datalake_amplitude_clean_staging.183049_offer_submitted_events.user_properties
+  dt_event:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_offer_submitted_events.ts_event
+      - datalake_amplitude_clean_staging.170135_offer_submitted_events.ts_event
+      - datalake_amplitude_clean_staging.183049_offer_submitted_events.ts_event
