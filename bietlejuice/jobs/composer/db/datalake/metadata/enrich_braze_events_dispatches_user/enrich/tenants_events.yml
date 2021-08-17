@@ -1,0 +1,87 @@
+database_name: datalake_braze_dispatches_user
+table_name: tenants_events
+columns:
+  id_user_dispatch:
+    lineage:
+      - datalake_braze.events_tenants.id_user_dispatch
+  id_user_braze:
+    lineage:
+      - datalake_braze.events_tenants.id_user_braze
+  id_campaign:
+    lineage:
+      - datalake_braze.events_tenants.id_campaign
+  id_variant_campaign:
+    lineage:
+      - datalake_braze.events_tenants.id_variant_campaign
+  id_canvas:
+    lineage:
+      - datalake_braze.events_tenants.id_canvas
+  id_variant_canvas:
+    lineage:
+      - datalake_braze.events_tenants.id_variant_canvas
+  id_step_canvas:
+    lineage:
+      - datalake_braze.events_tenants.id_step_canvas
+  event_channel:
+    lineage:
+      - datalake_braze.events_tenants.event_channel
+  ts_email_sent:
+    lineage:
+      - datalake_braze_dispatches.email_tenants.ts_email_sent
+  ts_email_delivered:
+    lineage:
+      - datalake_braze_dispatches.email_tenants.ts_email_delivered
+  ts_email_opened:
+    lineage:
+      - datalake_braze_dispatches.email_tenants.ts_email_opened
+  ts_email_clicked:
+    lineage:
+      - datalake_braze_dispatches.email_tenants.ts_email_clicked
+  ts_email_bounced:
+    lineage:
+      - datalake_braze_dispatches.email_tenants.ts_email_bounced
+  ts_email_spammed:
+    lineage:
+      - datalake_braze_dispatches.email_tenants.ts_email_spammed
+  ts_email_unsubscribed:
+    lineage:
+      - datalake_braze_dispatches.email_tenants.ts_email_unsubscribed
+  ts_push_sent:
+    lineage:
+      - datalake_braze_dispatches.push_tenants.ts_push_sent
+  ts_push_opened:
+    lineage:
+      - datalake_braze_dispatches.push_tenants.ts_push_opened
+  ts_push_bounced:
+    lineage:
+      - datalake_braze_dispatches.push_tenants.ts_push_bounced
+  ts_webhook_sent:
+    lineage:
+      - datalake_braze_dispatches.webhook_tenants.ts_webhook_sent
+  ts_inapp_impressioned:
+    lineage:
+      - datalake_braze_dispatches.inapp_tenants.ts_inapp_impressioned
+  ts_sms_sent:
+    lineage:
+      - datalake_braze_dispatches.sms_tenants.ts_sms_sent
+  ts_sms_send_to_carried:
+    lineage:
+      - datalake_braze_dispatches.sms_tenants.ts_sms_send_to_carried
+  ts_sms_delivered:
+    lineage:
+      - datalake_braze_dispatches.sms_tenants.ts_sms_delivered
+  ts_sms_rejected:
+    lineage:
+      - datalake_braze_dispatches.sms_tenants.ts_sms_rejected
+  ts_sms_delivery_failed:
+    lineage:
+      - datalake_braze_dispatches.sms_tenants.ts_sms_delivery_failed
+  year:
+    lineage:
+      - datalake_braze.events_tenants.year
+  month:
+    lineage:
+      - datalake_braze.events_tenants.month
+  day:
+    lineage:
+      - datalake_braze.events_tenants.day
