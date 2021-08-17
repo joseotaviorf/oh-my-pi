@@ -8,8 +8,8 @@ with
         f.sk_house_listing,
         f.status_history,
         CASE
-            WHEN dhl.is_b2b = TRUE THEN 'B2B'
-            WHEN ciq.type_big_agent IS NOT NULL AND ciq.businesscontext='RENT' THEN 'CIQ'
+            WHEN ciq.type_big_agent IS NOT NULL THEN ciq.type_big_agent
+            WHEN  dhl.is_b2b = TRUE THEN 'B2B'
             WHEN dhl.is_b2b = FALSE OR ciq.sk_house_listing IS NULL THEN 'Core'
         END AS is_b2b,
         d.date,
@@ -24,7 +24,7 @@ with
     left join dim_house_listing dhl
       on dhl.sk_house_listing = f.sk_house_listing
     left join datamarts.quintoandar_consultant_listings ciq
-        on f.sk_house_listing = ciq.sk_house_listing
+        on f.sk_house_listing = ciq.sk_house_listing AND ciq.businesscontext='RENT'
     where f.status_history = 'publicado'
       and d.week_start >= '2018-12-31'
     ),
@@ -93,8 +93,8 @@ with
         d.month_start,
         d.month_end,
         CASE
-            WHEN dhl.is_b2b = TRUE THEN 'B2B'
-            WHEN ciq.type_big_agent IS NOT NULL AND ciq.businesscontext='RENT' THEN 'CIQ'
+            WHEN ciq.type_big_agent IS NOT NULL THEN ciq.type_big_agent
+            WHEN  dhl.is_b2b = TRUE THEN 'B2B'
             WHEN dhl.is_b2b = FALSE OR ciq.sk_house_listing IS NULL THEN 'Core'
         END AS is_b2b,
         f.status_history,
@@ -111,7 +111,7 @@ with
     left join dim_house_listing dhl
       on dhl.sk_house_listing = f.sk_house_listing
     left join datamarts.quintoandar_consultant_listings ciq
-        on f.sk_house_listing = ciq.sk_house_listing
+        on f.sk_house_listing = ciq.sk_house_listing AND ciq.businesscontext='RENT'
     where d.week_start >= '2018-12-31'
     ),
     fact_adjusted_AL as (
