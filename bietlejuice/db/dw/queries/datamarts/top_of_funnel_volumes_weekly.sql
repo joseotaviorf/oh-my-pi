@@ -5,13 +5,15 @@
             city_group,
             LOWER(ui.business_context) AS business_context,
             CASE
-                WHEN LOWER(utm_campaign) LIKE '%sale%'
+                WHEN LOWER(ui.business_context) = 'sale'
+                    AND (LOWER(utm_campaign) LIKE '%sale%'
                         OR LOWER(utm_campaign) LIKE '%girafa%'
                         OR LOWER(utm_campaign) LIKE '%vender%'
-                        OR LOWER(utm_campaign) = 'whatsapp_s'
+                        OR LOWER(utm_campaign) = 'whatsapp_s')
                     THEN 'Sale'
-                WHEN NULLIF(utm_campaign, '') IS NULL
-                        OR LOWER(utm_campaign) LIKE '%branded%'
+                WHEN LOWER(ui.business_context) = 'sale'
+                    AND (NULLIF(utm_campaign, '') IS NULL
+                        OR LOWER(utm_campaign) LIKE '%branded%')
                     THEN 'Organic'
                 ELSE 'Rental'
             END AS campaign_context,
@@ -36,7 +38,7 @@
             LEFT JOIN dim_region AS dr
                 ON ui.sk_region::INT = dr.sk_region
         WHERE
-            ui.dt_event >= DATE_TRUNC('WEEK', CURRENT_DATE - INTERVAL '24 WEEK')
+            ui.dt_event >= DATE_TRUNC('WEEK', CURRENT_DATE - INTERVAL '104 WEEK')
         GROUP BY 1,2,3,4,5,6,7,8
 
         UNION ALL
@@ -74,17 +76,7 @@
             DATE(DATE_TRUNC('WEEK', dt_event)) AS week_start,
             city_group,
             'rent' AS business_context,
-            CASE
-                WHEN LOWER(utm_campaign) LIKE '%sale%'
-                        OR LOWER(utm_campaign) LIKE '%girafa%'
-                        OR LOWER(utm_campaign) LIKE '%vender%'
-                        OR LOWER(utm_campaign) = 'whatsapp_s'
-                    THEN 'Sale'
-                WHEN NULLIF(utm_campaign, '') IS NULL
-                        OR LOWER(utm_campaign) LIKE '%branded%'
-                    THEN 'Organic'
-                ELSE 'Rental'
-            END AS campaign_context,
+            'Rental' AS campaign_context,
             pmmd.mkt_origin,
             pmmd.mkt_channel,
             pmmd.mkt_medium,

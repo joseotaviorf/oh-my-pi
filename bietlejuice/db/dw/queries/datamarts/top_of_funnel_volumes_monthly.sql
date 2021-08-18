@@ -5,13 +5,15 @@
             city_group,
             LOWER(ui.business_context) AS business_context,
             CASE
-                WHEN LOWER(utm_campaign) LIKE '%sale%'
+                WHEN LOWER(ui.business_context) = 'sale'
+                    AND (LOWER(utm_campaign) LIKE '%sale%'
                         OR LOWER(utm_campaign) LIKE '%girafa%'
                         OR LOWER(utm_campaign) LIKE '%vender%'
-                        OR LOWER(utm_campaign) = 'whatsapp_s'
+                        OR LOWER(utm_campaign) = 'whatsapp_s')
                     THEN 'Sale'
-                WHEN NULLIF(utm_campaign, '') IS NULL
-                        OR LOWER(utm_campaign) LIKE '%branded%'
+                WHEN LOWER(ui.business_context) = 'sale'
+                    AND (NULLIF(utm_campaign, '') IS NULL
+                        OR LOWER(utm_campaign) LIKE '%branded%')
                     THEN 'Organic'
                 ELSE 'Rental'
             END AS campaign_context,
@@ -74,17 +76,7 @@
             DATE(DATE_TRUNC('MONTH', dt_event)) AS month_start,
             city_group,
             'rent' AS business_context,
-            CASE
-                WHEN LOWER(utm_campaign) LIKE '%sale%'
-                        OR LOWER(utm_campaign) LIKE '%girafa%'
-                        OR LOWER(utm_campaign) LIKE '%vender%'
-                        OR LOWER(utm_campaign) = 'whatsapp_s'
-                    THEN 'Sale'
-                WHEN NULLIF(utm_campaign, '') IS NULL
-                        OR LOWER(utm_campaign) LIKE '%branded%'
-                    THEN 'Organic'
-                ELSE 'Rental'
-            END AS campaign_context,
+            'Rental' AS campaign_context,
             pmmd.mkt_origin,
             pmmd.mkt_channel,
             pmmd.mkt_medium,
