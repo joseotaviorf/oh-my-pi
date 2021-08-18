@@ -3,32 +3,36 @@ import pendulum
 from datetime import datetime
 
 from airflow.models import DAG, Variable
-from airflow.utils.helpers import chain
+from airflow.utils.helpers import chain, cross_downstream
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
-from bietlejuice.jobs.composer.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.jobs.composer.dags.base.dw_task_group import DWTaskGroup
-from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
-from bietlejuice.jobs.composer.services import ConfigurationService
+from bietlejuice.jobs.composer.services.configuration_service import (
+    ConfigurationService,
+)
 
-DW_SCHEMA = "janus"
+# This DAG is part of ODS migration but also loads models that are already created on Composer.
+# Schemas can be found on Config files, since we use `janus` and `quintoandar_temp`, in order to
+# create a single TaskGroup.
+
 CONTEXT = "contract"
 DAG_NAME = f"dw_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 
 
-configs_service = ConfigurationService(DAG_NAME)
-spectrum_iam_role = configs_service.get_config("spectrum_iam_role")
-dw_bucket = configs_service.get_config("dw_bucket")
-doc_md_chart_url = configs_service.get_config("doc_md_chart_url")
-databricks_bietlejuice_repo_path = configs_service.get_config(
+config_service = ConfigurationService(DAG_NAME)
+
+spectrum_iam_role = config_service.get_config("spectrum_iam_role")
+dw_bucket = config_service.get_config("dw_bucket")
+doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
-spark_jobs_logs_path = configs_service.get_config("spark_jobs_logs_path")
+spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 
 ENV = os.environ.get("ENVIRONMENT")
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
@@ -61,23 +65,33 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-dw_task_group = DWTaskGroup(
-    dag=dag,
-    env=ENV,
-    dw_bucket=dw_bucket,
-    dw_schema=DW_SCHEMA,
-    relative_query_path=DAG_NAME,
-    spark_jobs_path=SPARK_JOBS_PATH,
-)
+tables = config_service.get_config("tables")
 
-dw_staging_task_group = dw_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.DW_STAGING, has_ods_migration_test=True
-)
+for table in tables:
+    table_name = table["table_name"]
+    has_ods_migration_test = table.get("has_ods_migration_test", False)
+    dw_schema = table.get("schema")
 
-dw_task_group = dw_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.DW, spectrum_iam_role=spectrum_iam_role
-)
+    task_group = DWTaskGroup(
+        dag=dag,
+        env=ENV,
+        dw_bucket=dw_bucket,
+        dw_schema=dw_schema,
+        relative_query_path=DAG_NAME,
+        spark_jobs_path=SPARK_JOBS_PATH,
+    )
 
-chain(create_cluster_task, DWTaskGroup.all_first_tasks(dw_staging_task_group))
-TaskFlowHelper.chain_task_groups_via_common_table(dw_staging_task_group, dw_task_group)
-chain(DWTaskGroup.all_last_tasks(dw_task_group), terminate_cluster_task)
+    dw_staging_task_group = task_group.build_dw_staging_task_group(
+        table_name=table_name, has_ods_migration_test=has_ods_migration_test
+    )
+
+    dw_task_group = task_group.build_dw_task_group(
+        table_name=table_name, spectrum_iam_role=spectrum_iam_role
+    )
+
+    chain(create_cluster_task, DWTaskGroup.first_tasks(dw_staging_task_group))
+    cross_downstream(
+        DWTaskGroup.last_tasks(dw_staging_task_group),
+        DWTaskGroup.first_tasks(dw_task_group),
+    )
+    chain(DWTaskGroup.last_tasks(dw_task_group), terminate_cluster_task)

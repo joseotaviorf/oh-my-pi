@@ -1,0 +1,9 @@
+---
+tables:
+  - table_name: dim_contract
+    has_ods_migration_test: true
+    schema: janus
+  - table_name: dim_contract_person
+    schema: quintoandar_temp
+  - table_name: fact_contract_people
+    schema: quintoandar_temp
