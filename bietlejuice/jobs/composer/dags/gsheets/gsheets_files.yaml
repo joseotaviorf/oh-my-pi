@@ -286,6 +286,11 @@ poa_partners:
     sheet_name: poa_partners
     clean_table_name: poa_partners
 
+process_eviction:
+    sheet_id: 13D27A-NeWnDC2-army_6c-mc-ORy5KEzrnVZfJv9aDM
+    sheet_name: datamart_send
+    clean_table_name: process_eviction
+
 promotional_bonus_cluster_targets:
     sheet_id: 1nSCX7SDFFg87Ow3yHGv8j6k_CRv9OYYBeKwhkpilWog
     sheet_name: promotional_bonus_cluster_targets

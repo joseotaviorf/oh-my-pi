@@ -81,6 +81,7 @@ This pipeline produces the following output tables:
     - `owner_exit_inspection_csat`
     - `payments_deals_and_discounts`
     - `poa_partners`
+    - `process_eviction`
     - `projreparos_espelhamento_dl`
     - `promotional_bonus_cluster_targets`
     - `promotional_bonus_segmentation_targets`
