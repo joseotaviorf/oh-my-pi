@@ -1,0 +1,48 @@
+database_name: datalake_risk_and_mortgage_clean
+table_name: credit_application_aud
+columns:
+  id:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_application_aud.id
+  id_user:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_application_aud.user_id
+  id_offer:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_application_aud.offer_id
+  id_financing_options:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_application_aud.financing_options_id
+  rev:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_application_aud.rev
+  rev_type:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_application_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_application_aud.revend
+  status:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_application_aud.status
+  mod_id_financing_options:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_application_aud.financing_options_id_mod
+  mod_id_offer:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_application_aud.offer_id_mod
+  mod_status:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_application_aud.status_mod
+  ts_created:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_application_aud.created_at
+  year:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_application_aud.year
+  month:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_application_aud.month
+  day:
+    lineage:
+      - datalake_risk_and_mortgage_raw.credit_application_aud.day

@@ -1,0 +1,63 @@
+database_name: datalake_risk_and_mortgage_clean
+table_name: bank_application
+columns:
+  id:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application.id
+  id_external:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application.external_id
+  id_credit_application:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application.credit_application_id
+  bank_name:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application.bank
+  status:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application.status
+  annual_fee:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application.annual_fee
+  requested_amount:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application.requested_amount
+  approved_amount:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application.approved_amount
+  requested_installments:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application.requested_installments
+  approved_installments:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application.approved_installments
+  first_installment_amount:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application.first_installment_amount
+  last_installment_amount:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application.last_installment_amount
+  response_from_bank:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application.response_from_bank
+  dates:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application.dates
+  values:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application.values
+  ts_created:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application.created_at
+  ts_updated:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application.updated_at
+  year:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application.year
+  month:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application.month
+  day:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application.day

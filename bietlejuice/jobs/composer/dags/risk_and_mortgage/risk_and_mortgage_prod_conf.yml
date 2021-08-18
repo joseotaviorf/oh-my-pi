@@ -1,0 +1,15 @@
+---
+tables:
+  - table_name: bank_application
+    date_filter_column: updated_at
+  - table_name: bank_application_aud
+    date_filter_column: created_at
+  - table_name: credit_application
+    date_filter_column: updated_at
+  - table_name: credit_application_aud
+    date_filter_column: created_at
+  - table_name: financing_options
+    date_filter_column: updated_at
+  - table_name: financing_options_aud
+    date_filter_column: created_at
+partition_cols: ["year", "month", "day"]

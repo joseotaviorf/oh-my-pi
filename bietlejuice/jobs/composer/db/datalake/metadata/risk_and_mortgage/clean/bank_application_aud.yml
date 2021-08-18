@@ -1,0 +1,78 @@
+database_name: datalake_risk_and_mortgage_clean
+table_name: bank_application_aud
+columns:
+  id:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application_aud.id
+  id_external:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application_aud.external_id
+  id_credit_application:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application_aud.credit_application_id
+  rev:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application_aud.rev
+  rev_type:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application_aud.revend
+  bank_name:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application_aud.bank
+  status:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application_aud.status
+  annual_fee:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application_aud.annual_fee
+  requested_amount:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application_aud.requested_amount
+  approved_amount:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application_aud.approved_amount
+  requested_installments:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application_aud.requested_installments
+  approved_installments:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application_aud.approved_installments
+  first_installment_amount:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application_aud.first_installment_amount
+  last_installment_amount:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application_aud.last_installmente_amount
+  response_from_bank:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application_aud.response_from_bank
+  dates:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application_aud.dates
+  values:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application_aud.values
+  mod_status:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application_aud.status_mod
+  mod_dates:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application_aud.dates_mod
+  mod_values:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application_aud.values_mod
+  ts_created:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application_aud.created_at
+  year:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application_aud.year
+  month:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application_aud.month
+  day:
+    lineage:
+      - datalake_risk_and_mortgage_raw.bank_application_aud.day

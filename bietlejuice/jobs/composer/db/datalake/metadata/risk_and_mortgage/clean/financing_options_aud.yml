@@ -1,0 +1,69 @@
+database_name: datalake_risk_and_mortgage_clean
+table_name: financing_options_aud
+columns:
+  id:
+    lineage:
+      - datalake_risk_and_mortgage_raw.financing_options_aud.id
+  id_house_external:
+    lineage:
+      - datalake_risk_and_mortgage_raw.financing_options_aud.house_external_id
+  rev:
+    lineage:
+      - datalake_risk_and_mortgage_raw.financing_options_aud.rev
+  rev_type:
+    lineage:
+      - datalake_risk_and_mortgage_raw.financing_options_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_risk_and_mortgage_raw.financing_options_aud.revend
+  installments_quantity:
+    lineage:
+      - datalake_risk_and_mortgage_raw.financing_options_aud.installments_quantity
+  sale_price_amount:
+    lineage:
+      - datalake_risk_and_mortgage_raw.financing_options_aud.sale_price_amount
+  financing_amount:
+    lineage:
+      - datalake_risk_and_mortgage_raw.financing_options_aud.financing_amount
+  entry_amount:
+    lineage:
+      - datalake_risk_and_mortgage_raw.financing_options_aud.entry_amount
+  amortization_type:
+    lineage:
+      - datalake_risk_and_mortgage_raw.financing_options_aud.amortization_type
+  house_uf:
+    lineage:
+      - datalake_risk_and_mortgage_raw.financing_options_aud.house_uf
+  house_condition:
+    lineage:
+      - datalake_risk_and_mortgage_raw.financing_options_aud.house_condition
+  house_type:
+    lineage:
+      - datalake_risk_and_mortgage_raw.financing_options_aud.house_type
+  fgts_amount:
+    lineage:
+      - datalake_risk_and_mortgage_raw.financing_options_aud.fgts_amount
+  itbi_amount:
+    lineage:
+      - datalake_risk_and_mortgage_raw.financing_options_aud.itbi_amount
+  valuation_amount:
+    lineage:
+      - datalake_risk_and_mortgage_raw.financing_options_aud.valuation_amount
+  has_included_fees:
+    lineage:
+      - datalake_risk_and_mortgage_raw.financing_options_aud.include_fees
+  has_included_valuation_fee:
+    lineage:
+      - datalake_risk_and_mortgage_raw.financing_options_aud.include_valuation_fee
+  ts_created:
+    lineage:
+      - datalake_risk_and_mortgage_raw.financing_options_aud.created_at
+  year:
+    lineage:
+      - datalake_risk_and_mortgage_raw.financing_options_aud.year
+  month:
+    lineage:
+      - datalake_risk_and_mortgage_raw.financing_options_aud.month
+  day:
+    lineage:
+      - datalake_risk_and_mortgage_raw.financing_options_aud.day
