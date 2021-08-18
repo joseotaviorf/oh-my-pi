@@ -27,6 +27,7 @@ This pipeline produces the following output tables:
     - `affiliate_type_targets`
     - `affiliates_monthly_expected_results`
     - `agents_control`
+    - `aux_agents_sale_hub`
     - `auxiliary_region`
     - `branding_where_is_plaquinha`
     - `census_subnormal_crowding_areas`

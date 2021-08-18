@@ -26,6 +26,11 @@ aglomerados_subnormais_2010_limites:
     sheet_name: AglomeradosSubnormais2010_Limites
     clean_table_name: census_subnormal_crowding_areas
 
+aux_agents_sale_hub:
+    sheet_id: 1mom8xcJ4XCpr02S38DgW_cmEDcdzsOiMkW2vSbg0Ra0
+    sheet_name: aux_agents_HUB
+    clean_table_name: aux_agents_sale_hub
+
 aux_regiao:
     sheet_id: 1gh8S0xVQ9HsTs6EkvE0BcXvh5_cfaG3aUpIgrluqqlM
     sheet_name: aux_regiao
