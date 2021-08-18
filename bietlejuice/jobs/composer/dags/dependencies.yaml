@@ -94,6 +94,10 @@ bietlejuice.dw_contract:
 bietlejuice.dw_criteo_campaigns:
   - bietlejuice.criteo_campaigns:load-clean-criteo-campaigns
 
+bietlejuice.dw_crm:
+  - bietlejuice.enrich_crm:load-enrich-workflows-transitions
+  - bietlejuice.enrich_crm_tasks_transitions:load-enrich-tasks-transitions
+
 bietlejuice.dw_facebook_insights:
   - bietlejuice.enrich_marketing_costs_facebook_insights
 
