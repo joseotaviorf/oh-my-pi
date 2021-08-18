@@ -54,7 +54,9 @@ if __name__ == "__main__":
     s3_consumer = S3Consumer(spark_client)
     s3_data_path = f"{sap_data_path}/{execution_date.replace('-', '')}/"
     df = s3_consumer.get_data_from_file(
-        path=s3_data_path, format="json", options={"multiline": True}
+        path=s3_data_path,
+        format="json",
+        options={"multiline": True, "allowUnquotedControlChars": True},
     )
 
     dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
