@@ -1,0 +1,43 @@
+database_name: datalake_braze_dispatches
+table_name: email_owners
+columns:
+  id_user_dispatch:
+    lineage:
+      - datalake_braze.events_owners.id_user_dispatch
+  id_user_braze:
+    lineage:
+      - datalake_braze.events_owners.id_user_braze
+  event_channel:
+    lineage:
+      - datalake_braze.events_owners.event_channel
+  ts_email_sent:
+    lineage:
+      - datalake_braze.events_owners.ts_event
+  ts_email_delivered:
+    lineage:
+      - datalake_braze.events_owners.ts_event
+  ts_email_opened:
+    lineage:
+      - datalake_braze.events_owners.ts_event
+  ts_email_clicked:
+    lineage:
+      - datalake_braze.events_owners.ts_event
+  ts_email_bounced:
+    lineage:
+      - datalake_braze.events_owners.ts_event
+  ts_email_spammed:
+    lineage:
+      - datalake_braze.events_owners.ts_event
+  ts_email_unsubscribed:
+    lineage:
+      - datalake_braze.events_owners.ts_event
+  year:
+    lineage:
+      - datalake_braze.events_owners.year
+  month:
+    lineage:
+      - datalake_braze.events_owners.month
+  day:
+    lineage:
+      - datalake_braze.events_owners.day
+  
