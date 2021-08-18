@@ -299,8 +299,8 @@ SELECT DISTINCT
   zd.tags LIKE '%bot_end_conversation%' AS is_bot,
   zd.tags LIKE '%closed_by_merge%' AS is_closed_by_merge, 
   CASE 
-    WHEN dc.front_or_back = 'Back' OR zd.tags LIKE '%tarefa_atendimento_escalado%' THEN 'back'
     WHEN dc.front_or_back = 'Front' OR NULLIF(dc.front_or_back, '-') IS NULL THEN 'front'
+    WHEN dc.front_or_back = 'Back' OR zd.tags LIKE '%tarefa_atendimento_escalado%' THEN 'back'
   END AS front_or_back,
   bt.front_ticket IS NOT NULL AS has_back_ticket,
   bt.is_open_back_ticket,

@@ -71,18 +71,11 @@ SELECT
     ft.is_solved,
     tts.tickets AS ticket_count,
     CASE
-        WHEN ft.channel <> 'chat'
-            AND ((tickets > 1)
+        WHEN tickets > 1
             OR ft.back_ticket IS NOT NULL
-            OR has_transfers = True
-            OR is_solved = False)
-        THEN 0
-        WHEN ft.channel = 'chat'
-            AND ((tickets > 1)
-            OR ft.back_ticket IS NOT NULL
-            OR total_departments > 1)
-        THEN 0
-        ELSE 1
+            OR is_solved = False
+        THEN FALSE
+        ELSE TRUE
     END AS is_fcr,
     ft.ts_started,
     ft.ts_closed
