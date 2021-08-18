@@ -5,6 +5,9 @@ CREATE TABLE crm_migration.dim_closing_task_workflow (
 	ts_started TIMESTAMP,
 	ts_updated TIMESTAMP,
 	ts_ended TIMESTAMP,
-	ts_load TIMESTAMP
+	ts_load TIMESTAMP,
+	year INT,
+	month INT,
+	day INT
 );
 ALTER TABLE crm_migration.dim_closing_task_workflow OWNER TO airflow;
