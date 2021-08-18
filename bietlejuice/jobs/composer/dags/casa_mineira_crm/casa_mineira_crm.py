@@ -97,7 +97,6 @@ clean_task_groups = task_group.build_task_group_from_sql_files(
     layer=LayerEnum.CLEAN,
     source_database_base_name=CONTEXT,
     target_database_base_name=CONTEXT,
-    schema="full",  # TODO: we are misusing the schema here: full mode is not a schema
 )
 
 

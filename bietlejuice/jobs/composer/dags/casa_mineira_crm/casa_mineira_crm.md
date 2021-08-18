@@ -61,13 +61,46 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 2. In datalake clean
     
+  * archived_client
+  * attribute_type
+  * attribute
+  * builder
+  * change_request
+  * change_request_type
   * city
   * client
+  * client_attendance
+  * client_history
+  * client_observation
+  * client_pemission
+  * client_reminder
+  * condo
   * contact
+  * document
+  * document_type
+  * form
+  * house
+  * house_attribute
+  * house_exclusivity
+  * house_status
+  * house_type
+  * keys
   * media_contact
+  * neighborhood
   * origin_contact
-  * property
+  * owner
+  * register_access
+  * register_exhibition
+  * revision
+  * sale
+  * sale_brokerage
+  * sign
+  * uf
   * unity
+  * user_group
+  * user_house_brokerage
+  * user_house_evaluation
+  * user_login
   * user
   * visit
   * visit_request

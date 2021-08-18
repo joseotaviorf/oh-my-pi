@@ -5,6 +5,6 @@ SELECT
     `key` AS revision_key,
     revisionable_type,
     CAST(created_at AS TIMESTAMP) AS ts_created,
-    CAST(updated_At AS TIMESTAMP) AS ts_updated 
+    CAST(updated_at AS TIMESTAMP) AS ts_updated 
 FROM 
     datalake_casa_mineira_crm_raw.revisions

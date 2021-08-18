@@ -60,7 +60,7 @@ SELECT
     CAST(cobertura_area_terraco AS FLOAT) AS roof_terrace_area, 
     CAST(semissuites AS SMALLINT) AS semi_suites, 
     CAST(loja_pe_direito AS FLOAT) AS store_ceiling_height,
-    CAST(loja_sobreloja AS SMALLINT) AS store_mezzanines,
+    CAST(loja_sobreloja AS SMALLINT) AS store_mezzanine,
     CAST(suites AS SMALLINT) AS suites,  
     CAST(lavabos AS SMALLINT) AS toilets, 
     CAST(area AS FLOAT) AS total_area,
