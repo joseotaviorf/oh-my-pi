@@ -18,7 +18,9 @@ SELECT
             'valorFixoPorLocacaoDeImovel') THEN 'Commission Rent'
         WHEN ae.source_bill_item IN
             ('valorFixoPorVendaDeImovelManual',
-            'valorFixoPorVendaDeImovel') THEN 'Commission Sale'
+            'valorFixoPorVendaDeImovel',
+            'comissaoSobreImovelVendido',
+            'valorFixoPorVendaDeImovelForSale') THEN 'Commission Sale'
         WHEN ae.source_bill_item in
             ('comissaoUnicaSobreAfiliadoIndicado',
             'comissaoSobreAfiliadoIndicado') THEN 'Commission MGM'
@@ -53,6 +55,8 @@ WHERE
         'valorFixoPorLocacaoDeImovelManual',
         'valorFixoPorLocacaoDeImovel',
         'valorFixoPorVendaDeImovelManual',
-        'valorFixoPorVendaDeImovel')
+        'valorFixoPorVendaDeImovel',
+        'comissaoSobreImovelVendido',
+        'valorFixoPorVendaDeImovelForSale')
     AND ae.dt_occurrence >= DATE('2020-01-01')
 ORDER BY dt_transaction ASC
