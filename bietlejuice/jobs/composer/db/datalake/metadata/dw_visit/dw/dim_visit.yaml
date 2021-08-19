@@ -1,0 +1,36 @@
+database_name: dw_janus
+table_name: dim_visit
+columns:
+  sk_visit:
+    lineage:
+      - datalake_ebdb_clean.visit.id
+  id_visit:
+    lineage:
+      - datalake_ebdb_clean.visit.id
+  cd_visit:
+    lineage:
+      - datalake_ebdb_clean.visit.code
+  day_visit:
+    lineage:
+      - datalake_ebdb_clean.visit.dt_visit
+  slot:
+    lineage:
+      - datalake_ebdb_clean.visit.slot
+  slot_count:
+    lineage:
+      - datalake_ebdb_clean.visit.slot_count
+  type:
+    lineage:
+      - datalake_ebdb_clean.visit.type
+  status:
+    lineage:
+      - datalake_ebdb_clean.visit.status
+  booking_type:
+    lineage:
+      - datalake_ebdb_clean.visit.booking_type
+  dt_created:
+    lineage:
+      - datalake_ebdb_clean.visit.ts_created
+  dt_updated:
+    lineage:
+      - datalake_ebdb_clean.visit.ts_updated
