@@ -1,0 +1,209 @@
+database_name: dw_janus
+table_name: dim_booking
+columns:
+  sk_booking:
+    lineage:
+      - datalake_booking.booking.id
+  sk_rent_flow_taxonomy:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.id
+  id_booking:
+    lineage:
+      - datalake_booking.booking.id
+  id_visitor:
+    lineage:
+      - datalake_booking.booking.id_visitor
+  id_visit:
+    lineage:
+      - datalake_booking.booking.id_visit
+  id_property:
+    lineage:
+      - datalake_booking.booking.id_house
+  id_agent:
+    lineage:
+      - datalake_booking.booking.id_agent
+  id_attendant:
+    lineage:
+      - datalake_booking.booking.id_attendant
+  id_rental_flow:
+    lineage:
+      - datalake_booking.booking.id_rent_flow
+  rescheduled_from_id:
+    lineage:
+      - datalake_booking.booking.id_rescheduled_booking
+  visit_intent:
+    lineage:
+      - datalake_booking.booking.visit_intent
+  buyer_intention:
+    lineage:
+      - datalake_booking.booking.buyer_intention
+  type:
+    lineage:
+      - datalake_booking.booking.type
+  confirmed:
+    lineage:
+      - datalake_booking.booking.is_visit_completed
+  performed:
+    lineage:
+      - datalake_booking.booking.is_visit_performed
+  closed:
+    lineage:
+      - datalake_booking.booking.is_closed
+  is_rescheduled:
+    lineage:
+      - datalake_booking.booking.has_reschedule
+  flg_via_reschedule:
+    lineage:
+      - datalake_booking.booking.is_via_reschedule
+  is_first_booking_auto:
+    lineage:
+      - datalake_booking.booking.is_first_booking_auto
+  flg_branded:
+    lineage:
+      - datalake_amplitude_visit.amplitude_visit.is_branded
+  visitor_arrived:
+    lineage:
+      - datalake_booking.booking.has_tenant_attended
+  agent_arrived:
+    lineage:
+      - datalake_booking.booking.has_agent_attended
+  owner_arrived:
+    lineage:
+      - datalake_booking.booking.has_owner_arrived
+  successful_entrance:
+    lineage:
+      - datalake_booking.booking.is_entrance_successful
+  is_visit_created_from_app:
+    lineage:
+      - datalake_booking.booking.is_visit_created_from_app
+  is_visit_last_updated_from_app:
+    lineage:
+      - datalake_booking.booking.is_visit_last_updated_from_app
+  visit_follow_up:
+    lineage:
+      - datalake_booking.booking.visit_fup
+  status:
+    lineage:
+      - datalake_booking.booking.status
+  slot_dia:
+    lineage:
+      - datalake_booking.booking.slot_day
+  reason:
+    lineage:
+      - datalake_booking.booking.last_status_change_reason
+  cancellation_reason:
+    lineage:
+      - datalake_booking.booking.cancellation_reason
+  cancellation_reason_category:
+    lineage:
+      - datalake_booking.booking.cancellation_reason_category
+  reason_category:
+    lineage:
+      - datalake_booking.booking.reason_category
+  responsible:
+    lineage:
+      - datalake_booking.booking.responsible
+  last_update_source:
+    lineage:
+      - datalake_booking.booking.last_update_source
+  first_update_source:
+    lineage:
+      - datalake_booking.booking.first_update_source
+  visitor_missing_reason:
+    lineage:
+      - datalake_booking.booking.tenant_absence_reason
+  agent_missing_reason:
+    lineage:
+      - datalake_booking.booking.agent_absence_reason
+  owner_missing_reason:
+    lineage:
+      - datalake_booking.booking.owner_missing_reason
+  troublesome_entrance:
+    lineage:
+      - datalake_booking.booking.troublesome_entrance_problem
+  checkin_status:
+    lineage:
+      - datalake_booking.booking.checkin_status
+  app_type:
+    lineage:
+      - datalake_amplitude_visit.amplitude_visit.app_type
+  media_source:
+    lineage:
+      - datalake_amplitude_visit.amplitude_visit.media_source
+  adjust_network:
+    lineage:
+      - datalake_amplitude_visit.amplitude_visit.adjust_network
+  utm_source:
+    lineage:
+      - datalake_amplitude_visit.amplitude_visit.utm_source
+  utm_medium:
+    lineage:
+      - datalake_amplitude_visit.amplitude_visit.utm_medium
+  utm_campaign:
+    lineage:
+      - datalake_amplitude_visit.amplitude_visit.utm_campaign
+  utm_content:
+    lineage:
+      - datalake_amplitude_visit.amplitude_visit.utm_content
+  utm_term:
+    lineage:
+      - datalake_amplitude_visit.amplitude_visit.utm_term
+  mkt_category:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.id
+      - datalake_gsheets_clean.taxonomy_demand.category
+  mkt_flow:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.id
+      - datalake_gsheets_clean.taxonomy_demand.flow
+  mkt_completion:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.id
+      - datalake_gsheets_clean.taxonomy_demand.completion
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.id
+      - datalake_gsheets_clean.taxonomy_demand.origin
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.id
+      - datalake_gsheets_clean.taxonomy_demand.channel
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.id
+      - datalake_gsheets_clean.taxonomy_demand.medium
+  mkt_source:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.id
+      - datalake_gsheets_clean.taxonomy_demand.source
+  mkt_platform:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.id
+      - datalake_gsheets_clean.taxonomy_demand.platform
+  dt_visit_follow_up:
+    lineage:
+      - datalake_booking.booking.ts_visit_fup
+  ts_visit_follow_up_local:
+    lineage:
+      - datalake_booking.booking.ts_visit_follow_up_local_tz
+  dt_scheduling:
+    lineage:
+      - datalake_booking.booking.ts_booking_utc
+  ts_scheduling_local:
+    lineage:
+      - datalake_booking.booking.ts_booking_local_tz
+  dt_cancel:
+    lineage:
+      - datalake_booking.booking.ts_first_canceled
+  ts_cancel_local:
+    lineage:
+      - datalake_booking.booking.ts_first_canceled_local_tz
+  dt_created:
+    lineage:
+      - datalake_booking.booking.ts_created
+  ts_created_local:
+    lineage:
+      - datalake_booking.booking.ts_created_local_tz
+  dt_updated:
+    lineage:
+      - datalake_booking.booking.ts_updated
