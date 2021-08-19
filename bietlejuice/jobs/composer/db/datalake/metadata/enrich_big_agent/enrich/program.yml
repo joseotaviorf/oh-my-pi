@@ -1,0 +1,30 @@
+database_name: datalake_big_agent
+table_name: program
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_clean.program.id
+  name:
+    lineage:
+      - datalake_big_agent_clean.program.name
+  code:
+    lineage:
+      - datalake_big_agent_clean.program.code
+  details:
+    lineage:
+      - datalake_big_agent_clean.program.details
+  ts_created:
+    lineage:
+      - datalake_big_agent_clean.program.ts_created
+  ts_updated:
+    lineage:
+      - datalake_big_agent_clean.program.ts_updated
+  year:
+    lineage:
+      - datalake_big_agent_clean.program.year
+  month:
+    lineage:
+      - datalake_big_agent_clean.program.month
+  day:
+    lineage:
+      - datalake_big_agent_clean.program.day
