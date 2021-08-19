@@ -45,7 +45,7 @@ columns:
       - datalake_risk_and_mortgage_raw.bank_application_aud.first_installment_amount
   last_installment_amount:
     lineage:
-      - datalake_risk_and_mortgage_raw.bank_application_aud.last_installmente_amount
+      - datalake_risk_and_mortgage_raw.bank_application_aud.last_installment_amount
   response_from_bank:
     lineage:
       - datalake_risk_and_mortgage_raw.bank_application_aud.response_from_bank
