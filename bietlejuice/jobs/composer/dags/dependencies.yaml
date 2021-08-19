@@ -125,6 +125,8 @@ bietlejuice.dw_listing:
 bietlejuice.dw_listing_jobs:
   - bietlejuice.enrich_ebdb_listing_jobs:load-enrich-inspection
   - bietlejuice.enrich_ebdb_listing_jobs:load-enrich-photo-job
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
 
 bietlejuice.dw_listing_owners:
   - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake

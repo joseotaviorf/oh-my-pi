@@ -14,8 +14,9 @@ This DAG is triggered daily, via Mediator. More information about run time [here
 
 This pipeline produces the following output table in DW, via full load: 
 
-- `dim_inspection` – Contains information about the properties inspections 
-extracted from EBDB `Vistoria` table and enriched in `datalake_ebdb_listing_jobs.inspection`.
+- `dim_inspection`
+- `dim_photo_job`
+- `fact_photo_job`
 
 ### Responsible Data Teams
 
