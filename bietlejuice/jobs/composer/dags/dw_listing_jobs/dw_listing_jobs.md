@@ -17,6 +17,7 @@ This pipeline produces the following output table in DW, via full load:
 - `dim_inspection`
 - `dim_photo_job`
 - `fact_photo_job`
+- `fact_inspection_bookings`
 
 ### Responsible Data Teams
 

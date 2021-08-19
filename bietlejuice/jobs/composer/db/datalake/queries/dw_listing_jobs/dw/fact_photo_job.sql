@@ -8,7 +8,7 @@ WITH base_jobs AS (
 )
 SELECT
     j.id AS id_photo_job,
-    -- There is already the 'hl.id_house_listing' that has a similar rule to the above,
+    -- There is already the 'hl.id_house_listing' that has a similar rule to the below,
     --  however it does not cover NULL cases, so we replicated the ODS concatenation here
     -- to be one hundred percent compliant to the original rule
     CAST(

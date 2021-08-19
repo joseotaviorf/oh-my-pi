@@ -123,6 +123,11 @@ bietlejuice.dw_listing:
   - bietlejuice.ebdb:create-clean-condo-in-data-lake
 
 bietlejuice.dw_listing_jobs:
+  - bietlejuice.ebdb:create-clean-contract-in-data-lake
+  - bietlejuice.ebdb:create-clean-inspection-in-data-lake
+  - bietlejuice.ebdb:create-clean-booking-in-data-lake
+  - bietlejuice.enrich_booking:load-enrich-booking
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_listing_jobs:load-enrich-inspection
   - bietlejuice.enrich_ebdb_listing_jobs:load-enrich-photo-job
   - bietlejuice.ebdb:create-clean-house-in-data-lake
