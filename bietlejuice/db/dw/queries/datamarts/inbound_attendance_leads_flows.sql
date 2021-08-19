@@ -333,8 +333,15 @@ SELECT DISTINCT
   at.sk_lead,
   lt.sk_lead_rent_date,
   lt.sk_lead_sale_date,
-  lt.sk_prospect_rent_date,
-  lt.sk_prospect_sale_date,
+  -- filling qualified leads without prospect date
+  CASE
+    WHEN lt.sk_prospect_rent_date < 0 AND lt.sk_qualified_rent_date > 0 THEN lt.sk_qualified_rent_date
+    ELSE lt.sk_prospect_rent_date
+  END AS sk_prospect_rent_date,
+  CASE
+    WHEN lt.sk_prospect_sale_date < 0 AND lt.sk_qualified_sale_date > 0 THEN lt.sk_qualified_sale_date
+    ELSE lt.sk_prospect_sale_date
+  END AS sk_prospect_sale_date,
   lt.sk_qualified_rent_date,
   lt.sk_qualified_sale_date,
   lt.sk_opportunity_rent_date,
