@@ -160,6 +160,11 @@ espelhamento_dl:
     sheet_name: Espelhamento_DL
     clean_table_name: projreparos_espelhamento_dl
 
+forms_analise_vistoria:
+     sheet_id: 1htuLjT4tBXbVl3TLP375CWKZDV7jIDtFFjpZNl7xH6w
+     sheet_name: inspection_analysis_forms
+     clean_table_name: inspection_analysis_forms
+
 full_taxonomy_new_test:
     sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
     sheet_name: Full_Taxonomy_New_Test

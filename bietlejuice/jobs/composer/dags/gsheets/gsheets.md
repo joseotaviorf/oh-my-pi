@@ -54,7 +54,8 @@ This pipeline produces the following output tables:
     - `from_to_cancellation`
     - `google_searches_share_of_interest`    
     - `hotjar_photos_repressed_demand`
-    - `hub_agents_hierarchy`      
+    - `hub_agents_hierarchy` 
+    - `inspection_analysis_forms`
     - `inspection_bugs`
     - `inspection_bugs_v2`
     - `inspectors_control`
