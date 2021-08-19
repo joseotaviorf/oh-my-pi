@@ -4,7 +4,6 @@
 #     sheet_id: <sheet_id>
 #     sheet_name: <sheet_name>
 #     clean_table_name: <clean_table_name>
-#     cron: 1,9,17 (optional and limited to 1,9 and 17)
 
 acquisition_target_per_source:
     sheet_id: 16Lu61Hz7f6dSTuCRjFmYQTINfz5qp5Fs_LHWPVu9s18

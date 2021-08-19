@@ -1,7 +1,6 @@
 import os
 import pendulum
 import json
-import pytz
 from datetime import datetime
 
 from airflow.models import DAG
@@ -10,7 +9,6 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from airflow.operators.python_operator import ShortCircuitOperator
 
 from bietlejuice.jobs.composer.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
@@ -22,23 +20,13 @@ from bietlejuice.jobs.composer.services.configuration_service import (
 )
 
 
-def check_run_hour(schedule_hours, dag_execution_date):
-    brt_tz = pytz.timezone("America/Sao_Paulo")
-    current_time_utc = datetime.strptime(dag_execution_date[:19], "%Y-%m-%dT%H:%M:%S")
-    current_time_brt = current_time_utc.replace(tzinfo=pytz.utc).astimezone(brt_tz)
-    current_hour = current_time_brt.hour
-    return str(current_hour) in schedule_hours.split(",")
-
-
-# ENV setup
-ENV = os.environ.get("ENVIRONMENT")
-
-# DAG params setup
 SOURCE = "gsheets"
 DAG_ID = f"bietlejuice.{SOURCE}"
-local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
+local_tz = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2021, 1, 14, 0, 0, 0, tzinfo=local_tz)
 MAIN_SCHEDULE_INTERVAL = "0 1 * * *"
+
+ENV = os.environ.get("ENVIRONMENT")
 
 # Task params
 TASK_POOL = "gsheets_pool"
@@ -57,7 +45,6 @@ LOAD_GSHEETS_INTO_DATALAKE_RAW_FILE_PATH = (
     f"{BASE_SPARK_JOBS_PATH}load_gsheets_into_datalake_raw.py"
 )
 
-# cluster setup
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
 CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
@@ -112,21 +99,7 @@ task_group = DatalakeTaskGroup(
 )
 
 raw_task_groups = {}
-skip_run_tasks = {}
 for TABLE_NAME, SHEET_DETAILS in GOOGLE_FILES.items():
-
-    if "cron" not in SHEET_DETAILS:
-        SHEET_DETAILS["cron"] = "1,9,17"
-
-    skip_run_task = ShortCircuitOperator(
-        task_id=f"check-hour-to-skip-{TABLE_NAME}",
-        python_callable=check_run_hour,
-        op_kwargs={
-            "schedule_hours": SHEET_DETAILS["cron"],
-            "dag_execution_date": "{{ts}}",
-        },
-    )
-    skip_run_tasks[TABLE_NAME] = skip_run_task
 
     raw_task_group = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,
@@ -138,9 +111,7 @@ for TABLE_NAME, SHEET_DETAILS in GOOGLE_FILES.items():
     )
     raw_task_groups[SHEET_DETAILS["clean_table_name"]] = raw_task_group
 
-    create_cluster_task >> skip_run_task >> DatalakeTaskGroup.first_tasks(
-        raw_task_group
-    )
+    create_cluster_task >> DatalakeTaskGroup.first_tasks(raw_task_group)
 
 clean_task_groups = task_group.build_task_group_from_sql_files(
     layer=LayerEnum.CLEAN,
