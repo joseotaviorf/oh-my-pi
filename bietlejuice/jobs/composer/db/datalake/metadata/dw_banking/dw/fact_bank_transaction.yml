@@ -1,0 +1,36 @@
+database_name: dw_janus
+table_name: fact_bank_transaction
+columns:
+  sk_bank_transaction:
+    lineage:
+      - datalake_ebdb_clean.account_transaction.id
+  sk_bank_account:
+    lineage:
+      - datalake_ebdb_clean.account_transaction.id_account
+  sk_user_recipient:
+    lineage:
+      - datalake_ebdb_clean.user.id
+  sk_bank:
+    lineage:
+      - datalake_ebdb_clean.bank.id
+  sk_transaction:
+    lineage:
+      - datalake_ebdb_clean.account_transaction.ts_transaction
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.account_transaction.id_house
+  value:
+    lineage:
+      - datalake_ebdb_clean.account_transaction.value
+  type:
+    lineage:
+      - datalake_ebdb_clean.account_transaction.type
+  ts_transaction:
+    lineage:
+      - datalake_ebdb_clean.account_transaction.ts_transaction
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.account_transaction.ts_updated
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.account_transaction.ts_created
