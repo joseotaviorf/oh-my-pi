@@ -1,0 +1,24 @@
+database_name: dw_janus
+table_name: dim_bank_account
+columns:
+  sk_bank_account:
+    lineage:
+      - datalake_ebdb_clean.user.id_account
+  id_bank_account:
+    lineage:
+      - datalake_ebdb_clean.user.id_account
+  account_number:
+    lineage:
+      - datalake_ebdb_clean.user.bank_account
+  account_type:
+    lineage:
+      - datalake_ebdb_clean.user.bank_account_type
+  agency_number:
+    lineage:
+      - datalake_ebdb_clean.user.bank_agency
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.account.ts_updated
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.account.ts_created
