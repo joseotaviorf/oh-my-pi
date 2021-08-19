@@ -1,0 +1,27 @@
+database_name: dw_janus
+table_name: dim_partner_agent
+columns:
+  sk_partner_agent:
+    lineage:
+      - datalake_ebdb_clean.partner_agent.id
+  id_partner_agent:
+    lineage:
+      - datalake_ebdb_clean.partner_agent.id
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.partner_agent.id_user
+  id_partner:
+    lineage:
+      - datalake_ebdb_clean.partner_agent.id_partner
+  status_partner_agent:
+    lineage:
+      - datalake_ebdb_clean.partner_agent.status
+  type:
+    lineage:
+      - datalake_ebdb_clean.partner_agent.type
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.partner_agent.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.partner_agent.ts_updated
