@@ -25,16 +25,16 @@ columns:
       - datalake_booking.booking.ts_first_canceled_unevaluated
   sk_inspected_date:
     lineage:
-      - datalake_booking.booking.dt_inspected
+      - datalake_ebdb_clean.inspection.dt_inspected
   sk_expired_date:
     lineage:
-      - datalake_booking.booking.ts_expired
+      - datalake_ebdb_clean.inspection.ts_expired
   sk_tenant_approved_date:
     lineage:
-      - datalake_booking.booking.ts_tenant_approved
+      - datalake_ebdb_clean.inspection.ts_tenant_approved
   sk_owner_approved_date:
     lineage:
-      - datalake_booking.booking.ts_owner_approved
+      - datalake_ebdb_clean.inspection.ts_owner_approved
   booking_retry_rank_by_inspection_type:
     lineage:
       - datalake_ebdb_clean.contract.id
