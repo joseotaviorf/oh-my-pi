@@ -35,9 +35,7 @@ DOC_MD_CHART_URL = config_service.get_config("doc_md_chart_url")
 ATHENA_QUERY_RESULT_LOCATION = config_service.get_config("athena_query_results_bucket")
 SPECTRUM_IAM_ROLE = config_service.get_config("spectrum_iam_role")
 
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_default_cluster", deserialize_json=True
-)
+CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
 CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
     "destination"
@@ -64,9 +62,7 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag,
-    task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

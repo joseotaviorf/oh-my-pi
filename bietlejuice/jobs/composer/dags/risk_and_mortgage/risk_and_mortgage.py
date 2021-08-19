@@ -1,6 +1,5 @@
 import os
 import pendulum
-import json
 from datetime import datetime
 
 from airflow.utils.helpers import chain, cross_downstream

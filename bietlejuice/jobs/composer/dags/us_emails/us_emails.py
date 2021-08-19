@@ -1,6 +1,5 @@
 import os
 import pendulum
-import json
 from datetime import datetime
 
 from airflow.utils.helpers import chain, cross_downstream
@@ -88,10 +87,7 @@ for table in tables:
     parameters = [SOURCE, table_name]
 
     if extraction_type == "incremental":
-        extended_parameters = [
-            table["date_filter_column"],
-            "{{ ds }}",
-        ]
+        extended_parameters = [table["date_filter_column"], "{{ ds }}"]
         extended_parameters = list(filter(None, extended_parameters))
         parameters.extend(extended_parameters)
 
