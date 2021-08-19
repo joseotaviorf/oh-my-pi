@@ -1,0 +1,27 @@
+database_name: dw_janus
+table_name: dim_bank
+columns:
+  sk_bank:
+    lineage:
+      - datalake_ebdb_clean.bank.id
+  id_bank:
+    lineage:
+      - datalake_ebdb_clean.bank.id
+  code:
+    lineage:
+      - datalake_ebdb_clean.bank.code
+  name:
+    lineage:
+      - datalake_ebdb_clean.bank.name
+  febraban_name:
+      lineage:
+        - datalake_ebdb_clean.bank.febraban_name
+  featured_rank:
+    lineage:
+      - datalake_ebdb_clean.bank.featured_rank
+  ts_created:
+      lineage:
+        - datalake_ebdb_clean.bank.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.bank.ts_updated
