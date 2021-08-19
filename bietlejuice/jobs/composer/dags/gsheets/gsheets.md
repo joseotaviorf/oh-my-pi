@@ -31,6 +31,7 @@ This pipeline produces the following output tables:
     - `auxiliary_region`
     - `branding_where_is_plaquinha`
     - `census_subnormal_crowding_areas`
+    - `casa_mineira_marketing_manual_shared_costs`
     - `ciq_costs`
     - `city_share`
     - `contact_type_taxonomy`

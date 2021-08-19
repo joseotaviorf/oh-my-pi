@@ -50,6 +50,11 @@ branding_where_is_plaquinha:
     sheet_name: branding_where_is_plaquinha
     clean_table_name: branding_where_is_plaquinha
 
+casa_mineira_marketing_manual_shared_costs:
+    sheet_id: 1IRBcIhdi7V0gXtvoImz7-sA5P38FALN_CgXcpAORzYY
+    sheet_name: rateio_manual
+    clean_table_name: casa_mineira_marketing_manual_shared_costs
+
 ciq_costs:
     sheet_id: 1ZkPABh53UrzKn4aQudZzr5QpJsBXhCZDnJkDZob2Rqc
     sheet_name: ciq_costs
