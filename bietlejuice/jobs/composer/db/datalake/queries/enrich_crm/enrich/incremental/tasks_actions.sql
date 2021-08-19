@@ -9,7 +9,7 @@ WITH exploded_actions AS (
                     userName: STRING,
                     userId: INTEGER,
                     notificationSource: STRING,
-                    metadata: STRUCT<key: STRING, oldValue: STRING>,
+                    metadata: STRING,
                     date: STRUCT<date: TIMESTAMP>
                 >
             >'
@@ -32,8 +32,8 @@ SELECT
     action.userId AS id_user_action,
     REPLACE(action.userName,'"') AS action_user_name,
     REPLACE(action.type,'"') AS action_type,
-    action.metadata.key AS metadata_key,
-    action.metadata.oldValue AS metadata_old_value,
+    GET_JSON_OBJECT(action.metadata, '$.key') AS metadata_key,
+    GET_JSON_OBJECT(action.metadata, '$.oldValue') AS metadata_old_value,
     action.notificationSource AS notification_source,
     action.date.date AS ts_action,
     year,
