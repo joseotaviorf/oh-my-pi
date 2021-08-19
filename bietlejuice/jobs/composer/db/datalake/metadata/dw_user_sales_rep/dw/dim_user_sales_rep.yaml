@@ -1,0 +1,27 @@
+database_name: dw_quintoandar
+table_name: dim_user_sales_rep
+columns:
+  sk_user_sales_rep:
+    lineage:
+      - datalake_ebdb_user.user_sales_rep.id_user_sales_rep
+  name:
+    lineage:
+      - datalake_ebdb_user.user_sales_rep.name
+  email:
+    lineage:
+      - datalake_ebdb_user.user_sales_rep.email
+  phone_number:
+    lineage:
+      - datalake_ebdb_user.user_sales_rep.phone_number
+  admin_type:
+    lineage:
+      - datalake_ebdb_user.user_sales_rep.admin_type
+  sales_company:
+    lineage:
+      - datalake_ebdb_user.user_sales_rep.sales_company
+  is_sales_rep_active:
+    lineage:
+      - datalake_ebdb_user.user_sales_rep.is_sales_rep_active
+  dt_sales_rep_started:
+    lineage:
+      - datalake_ebdb_user.user_sales_rep.dt_sales_rep_started
