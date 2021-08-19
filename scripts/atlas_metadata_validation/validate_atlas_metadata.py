@@ -73,6 +73,10 @@ def get_yaml_type(yaml_data: dict) -> str:
         a string with either "tags" or "lineage"
     """
     yaml_content = yaml_data[0][0]
+
+    if not yaml_content.get("columns"):
+        return "tags"
+
     first_column_name = get_first_key(yaml_content["columns"])
     return get_first_key(yaml_content["columns"][first_column_name])
 
