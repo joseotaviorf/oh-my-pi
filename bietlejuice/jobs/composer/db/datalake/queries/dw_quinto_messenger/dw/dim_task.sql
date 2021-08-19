@@ -1,11 +1,20 @@
 WITH completion_reason AS (
     SELECT
         id_task,
-        task_queue_name,
         task_completion_reason
-    FROM datalake_quinto_messenger.task_event
-    WHERE task_completion_reason IS NOT NULL
-    GROUP BY 1, 2, 3
+    FROM 
+        datalake_quinto_messenger.task_event
+    WHERE 
+        task_completion_reason IS NOT NULL
+    GROUP BY 1, 2
+),
+task_department AS (
+    SELECT
+        id_task,
+        task_queue_name
+    FROM 
+        datalake_quinto_messenger.task_event
+    GROUP BY 1, 2
 ),
 twilio_date AS (
     SELECT 
@@ -22,7 +31,7 @@ twilio_date AS (
 SELECT
     t.id_task AS sk_task,
     t.channel_type_internal AS channel,
-    cr.task_queue_name AS department,
+    task_department.task_queue_name AS department,
     t.task_status AS status,
     cr.task_completion_reason AS completion_reason,
     t.customer_type_tag AS customer_type,
@@ -39,6 +48,9 @@ SELECT
     NOW() AS ts_load
 FROM 
     datalake_quinto_messenger.task t
+LEFT JOIN
+    task_department
+        ON task_department.id_task = t.id_task
 LEFT JOIN
     twilio_date td
         ON t.id_task = td.id_task
