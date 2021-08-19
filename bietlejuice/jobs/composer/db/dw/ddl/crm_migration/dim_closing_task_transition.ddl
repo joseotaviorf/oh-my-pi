@@ -8,9 +8,6 @@ CREATE TABLE crm_migration.dim_closing_task_transition (
 	contact_channel VARCHAR,
 	status VARCHAR,
 	ts_transitioned TIMESTAMP,
-	ts_load TIMESTAMP,
-	year INT,
-	month INT,
-	day INT
+	ts_load TIMESTAMP
 );
 ALTER TABLE crm_migration.dim_closing_task_transition OWNER TO airflow;
