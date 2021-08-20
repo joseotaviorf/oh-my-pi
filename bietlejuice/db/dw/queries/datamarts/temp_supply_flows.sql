@@ -287,100 +287,90 @@ FROM
     dates_by_context
 GROUP BY 1,2,3,4
 ),
-hybrid_dates AS ( -- duplicating dates when Calculadora de Aluguel and IndicaAi
+hybrid_dates AS ( -- creating hybrid scenery when Calculadora de Aluguel, IndicaAi, Doorman, Other
 SELECT
     sk_house_listing_flow,
     sk_house_listing,
     sk_lead,
     sk_region,
     CASE
-        WHEN mkt_origin_rent IN ('Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND mkt_origin_sale IS NULL THEN mkt_origin_rent
-        WHEN lead_origin_rent = 'PriceSuggestion' AND mkt_origin_rent= 'Price Calculator' AND mkt_origin_sale IS NULL THEN mkt_origin_rent
+        WHEN mkt_origin_rent IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND mkt_origin_sale IS NULL THEN mkt_origin_rent
         ELSE mkt_origin_sale
     END AS mkt_origin_sale,
     CASE
-        WHEN mkt_origin_sale IN ('Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND mkt_origin_rent IS NULL THEN mkt_origin_sale
+        WHEN mkt_origin_sale IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND mkt_origin_rent IS NULL THEN mkt_origin_sale
         ELSE mkt_origin_rent
     END AS mkt_origin_rent,
     CASE
-        WHEN mkt_origin_rent IN ('Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND mkt_completion_sale IS NULL THEN mkt_completion_rent
-        WHEN lead_origin_rent = 'PriceSuggestion' AND mkt_origin_rent= 'Price Calculator' AND mkt_completion_sale IS NULL THEN mkt_completion_rent
+        WHEN mkt_origin_rent IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND mkt_completion_sale IS NULL THEN mkt_completion_rent
         ELSE mkt_completion_sale
     END AS mkt_completion_sale,
     CASE
-        WHEN mkt_origin_sale IN ('Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND mkt_completion_rent IS NULL THEN mkt_completion_sale
+        WHEN mkt_origin_sale IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND mkt_completion_rent IS NULL THEN mkt_completion_sale
         ELSE mkt_completion_rent
     END AS mkt_completion_rent,
     CASE
-        WHEN mkt_origin_rent IN ('Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND mkt_channel_sale IS NULL THEN mkt_channel_rent
-        WHEN lead_origin_rent = 'PriceSuggestion' AND mkt_origin_rent= 'Price Calculator' AND mkt_channel_sale IS NULL THEN mkt_channel_rent
+        WHEN mkt_origin_rent IN ('Price Calculator','Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND mkt_channel_sale IS NULL THEN mkt_channel_rent
         ELSE mkt_channel_sale
     END AS mkt_channel_sale,
     CASE
-        WHEN mkt_origin_sale IN ('Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND mkt_channel_rent IS NULL THEN mkt_channel_sale
+        WHEN mkt_origin_sale IN ('Price Calculator','Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND mkt_channel_rent IS NULL THEN mkt_channel_sale
         ELSE mkt_channel_rent
     END AS mkt_channel_rent,
     CASE
-        WHEN mkt_origin_rent IN ('Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND sales_company_sale IS NULL THEN sales_company_rent
-        WHEN lead_origin_rent = 'PriceSuggestion' AND mkt_origin_rent= 'Price Calculator' AND sales_company_sale IS NULL THEN sales_company_rent
+        WHEN mkt_origin_rent IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND sales_company_sale IS NULL THEN sales_company_rent
         ELSE sales_company_sale
     END AS sales_company_sale,
     CASE
-        WHEN mkt_origin_sale IN ('Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND sales_company_rent IS NULL THEN sales_company_sale
+        WHEN mkt_origin_sale IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND sales_company_rent IS NULL THEN sales_company_sale
         ELSE sales_company_rent
     END AS sales_company_rent,
     CASE
-        WHEN mkt_origin_rent IN ('Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND sourcing_ops_sale IS NULL THEN sourcing_ops_rent
-        WHEN lead_origin_rent = 'PriceSuggestion' AND mkt_origin_rent= 'Price Calculator' AND sourcing_ops_sale IS NULL THEN sourcing_ops_rent
+        WHEN mkt_origin_rent IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND sourcing_ops_sale IS NULL THEN sourcing_ops_rent
         ELSE sourcing_ops_sale
     END AS sourcing_ops_sale,
     CASE
-        WHEN mkt_origin_sale IN ('Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND sourcing_ops_rent IS NULL THEN sourcing_ops_sale
+        WHEN mkt_origin_sale IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND sourcing_ops_rent IS NULL THEN sourcing_ops_sale
         ELSE sourcing_ops_rent
     END AS sourcing_ops_rent,
     CASE
-        WHEN mkt_origin_rent IN ('Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND lead_origin_sale IS NULL THEN lead_origin_rent
-        WHEN lead_origin_rent = 'PriceSuggestion' AND mkt_origin_rent= 'Price Calculator' AND lead_origin_sale IS NULL THEN lead_origin_rent
+        WHEN mkt_origin_rent IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND lead_origin_sale IS NULL THEN lead_origin_rent
         ELSE lead_origin_sale
     END AS lead_origin_sale,
     CASE
-        WHEN mkt_origin_sale IN ('Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND lead_origin_rent IS NULL THEN lead_origin_sale
+        WHEN mkt_origin_sale IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND lead_origin_rent IS NULL THEN lead_origin_sale
         ELSE lead_origin_rent
     END AS lead_origin_rent,
     CASE
-        WHEN mkt_origin_rent IN ('Indica Aí - General', 'Indica Aí - Agents','Doorman', 'Other') AND funnel_drop_reason_sale IS NULL THEN funnel_drop_reason_rent
-		WHEN lead_origin_rent = 'PriceSuggestion' AND mkt_origin_rent= 'Price Calculator' AND funnel_drop_reason_sale IS NULL  THEN funnel_drop_reason_rent
+        WHEN mkt_origin_rent IN ('Price Calculator', 'Indica Aí - General', 'Indica Aí - Agents','Doorman', 'Other') AND funnel_drop_reason_sale IS NULL THEN funnel_drop_reason_rent
 		ELSE funnel_drop_reason_sale
 	END AS funnel_drop_reason_sale,
 	CASE
-		WHEN mkt_origin_sale IN ('Indica Aí - General', 'Indica Aí - Agents','Doorman', 'Other') AND funnel_drop_reason_rent IS NULL  THEN funnel_drop_reason_sale
+		WHEN mkt_origin_sale IN ('Price Calculator','Indica Aí - General', 'Indica Aí - Agents','Doorman', 'Other') AND funnel_drop_reason_rent IS NULL  THEN funnel_drop_reason_sale
 		ELSE funnel_drop_reason_rent
 	END AS funnel_drop_reason_rent,
     CASE
-		WHEN lead_origin_rent = 'PriceSuggestion' AND mkt_origin_rent= 'Price Calculator' AND sk_lead_date_sale<0  THEN sk_lead_date_rent
-		WHEN mkt_origin_rent IN ('Indica Aí - General', 'Indica Aí - Agents','Doorman', 'Other') AND sk_lead_date_sale<0 THEN sk_lead_date_rent
+		WHEN mkt_origin_rent IN ('Price Calculator', 'Indica Aí - General', 'Indica Aí - Agents','Doorman', 'Other') AND sk_lead_date_sale<0 THEN sk_lead_date_rent
 		ELSE sk_lead_date_sale
 	END AS sk_lead_date_sale,
 	CASE
-		WHEN mkt_origin_sale IN ('Indica Aí - General', 'Indica Aí - Agents','Doorman', 'Other') AND sk_lead_date_rent<0 THEN sk_lead_date_sale
+		WHEN mkt_origin_sale IN ('Price Calculator','Indica Aí - General', 'Indica Aí - Agents','Doorman', 'Other') AND sk_lead_date_rent<0 THEN sk_lead_date_sale
 		ELSE sk_lead_date_rent
 	END AS sk_lead_date_rent,
     CASE
-		WHEN lead_origin_rent = 'PriceSuggestion' AND mkt_origin_rent = 'Price Calculator' AND sk_prospect_date_sale<0  THEN sk_prospect_date_rent
-		WHEN mkt_origin_rent IN ('Indica Aí - General', 'Indica Aí - Agents','Doorman', 'Other') AND sk_prospect_date_sale<0 THEN sk_prospect_date_rent
+		WHEN mkt_origin_rent IN ('Price Calculator', 'Indica Aí - General', 'Indica Aí - Agents','Doorman', 'Other') AND sk_prospect_date_sale<0 THEN sk_prospect_date_rent
 		ELSE sk_prospect_date_sale
 	END AS sk_prospect_date_sale,
 	CASE
-		WHEN mkt_origin_sale IN ('Indica Aí - General', 'Indica Aí - Agents','Doorman', 'Other') AND sk_prospect_date_rent<0 THEN sk_prospect_date_sale
+		WHEN mkt_origin_sale IN ('Price Calculator', 'Indica Aí - General', 'Indica Aí - Agents','Doorman', 'Other') AND sk_prospect_date_rent<0 THEN sk_prospect_date_sale
 		ELSE sk_prospect_date_rent
 	END AS sk_prospect_date_rent,
 	CASE
-		WHEN lead_origin_rent = 'PriceSuggestion' AND mkt_origin_rent = 'Price Calculator' AND sk_qualified_date_sale<0  THEN sk_qualified_date_rent
-		WHEN mkt_origin_rent IN ('Indica Aí - General', 'Indica Aí - Agents','Doorman', 'Other') AND sk_qualified_date_sale<0 THEN sk_qualified_date_rent
+		WHEN mkt_origin_rent IN ('Price Calculator','Indica Aí - General', 'Indica Aí - Agents','Doorman', 'Other') AND sk_qualified_date_sale<0 THEN sk_qualified_date_rent
 		ELSE sk_qualified_date_sale
 	END AS sk_qualified_date_sale,
 	CASE
-		WHEN mkt_origin_sale IN ('Indica Aí - General', 'Indica Aí - Agents','Doorman', 'Other') AND sk_qualified_date_rent<0 THEN sk_qualified_date_sale
+		WHEN mkt_origin_sale IN ('Price Calculator','Indica Aí - General', 'Indica Aí - Agents','Doorman', 'Other') AND sk_qualified_date_rent<0 THEN sk_qualified_date_sale
 		ELSE sk_qualified_date_rent
 	END AS sk_qualified_date_rent,
 	sk_opportunity_date_sale,
@@ -397,6 +387,120 @@ SELECT
 	context_first_listing_rent
 FROM
     max_dates
+),
+filtering_prospect AS ( --filtering prospect dates
+SELECT
+    llf.sk_house_listing_flow,
+    llf.sk_house_listing,
+    llf.sk_lead,
+    llf.sk_region,
+    llf.mkt_origin_rent,
+    llf.mkt_origin_sale,
+    llf.mkt_completion_rent,
+    llf.mkt_completion_sale,
+    llf.mkt_channel_rent,
+    llf.mkt_channel_sale,
+    llf.sales_company_rent,
+    llf.sales_company_sale,
+    llf.sourcing_ops_rent,
+    llf.sourcing_ops_sale,
+    llf.lead_origin_rent,
+    llf.lead_origin_sale,
+    llf.funnel_drop_reason_rent,
+    llf.funnel_drop_reason_sale,
+    llf.sk_lead_date_rent,
+    llf.sk_lead_date_sale,
+    CASE -- filtering prospect rent
+		WHEN lead_discard_rent IN ('HOUSE_WAS_OUT_OF_HOUSE_RENTING_REGIONS', 'ForaArea','DUPLICATED_LEAD','CONTACT_ON_BLOCK_LIST') THEN '-1'
+		ELSE sk_prospect_date_rent
+	END sk_prospect_date_rent,
+	CASE -- filtering prospect sale
+		WHEN lead_discard_sale IN ('HOUSE_WAS_OUT_OF_HOUSE_SALES_REGIONS', 'ForaArea','DUPLICATED_LEAD','CONTACT_ON_BLOCK_LIST') THEN '-1'
+		WHEN city_group NOT IN ('RMSP', 'Rio de Janeiro', 'Belo Horizonte', 'Porto Alegre') THEN '-1'
+		ELSE sk_prospect_date_sale
+	END sk_prospect_date_sale,
+	dr.city_group,
+    llf.sk_qualified_date_rent,
+    llf.sk_qualified_date_sale,
+    llf.sk_opportunity_date_rent,
+	llf.sk_opportunity_date_sale,
+	llf.sk_first_listing_date_sale,
+	llf.sk_first_listing_date_rent,
+	llf.context_opportunity_sale,
+	llf.context_opportunity_rent,
+	llf.context_first_listing_sale,
+	llf.context_first_listing_rent,
+	llf.sk_discard_date_sale,
+	llf.sk_discard_date_rent,
+	llf.sk_conversion_date_sale,
+	llf.sk_conversion_date_rent,
+	dc.lead_discard_sale,
+	dc.lead_discard_rent,
+	dc.prospect_discard_sale,
+	dc.prospect_discard_rent,
+	dc.prospect_status
+FROM
+    hybrid_dates llf
+LEFT JOIN
+    discard_by_context dc
+    ON llf.sk_lead = dc.sk_lead
+LEFT JOIN
+    dim_region dr
+    ON llf.sk_region = dr.sk_region
+),
+adjusting_prospect AS ( --creating prospect date when Indica Ai
+SELECT
+    llf.sk_house_listing_flow,
+    llf.sk_house_listing,
+    llf.sk_lead,
+    llf.sk_region,
+    llf.mkt_origin_rent,
+    llf.mkt_origin_sale,
+    llf.mkt_completion_rent,
+    llf.mkt_completion_sale,
+    llf.mkt_channel_rent,
+    llf.mkt_channel_sale,
+    llf.sales_company_rent,
+    llf.sales_company_sale,
+    llf.sourcing_ops_rent,
+    llf.sourcing_ops_sale,
+    llf.lead_origin_rent,
+    llf.lead_origin_sale,
+    llf.funnel_drop_reason_rent,
+    llf.funnel_drop_reason_sale,
+    llf.sk_lead_date_rent,
+    llf.sk_lead_date_sale,
+    CASE
+        WHEN (sk_prospect_date_rent<0 AND sk_prospect_date_sale>0 AND mkt_origin_rent IN ('Indica Aí - Agents', 'Indica Aí - General')) THEN sk_prospect_date_sale
+        ELSE sk_prospect_date_rent
+    END AS sk_prospect_date_rent,
+    CASE
+        WHEN (sk_prospect_date_sale<0 AND sk_prospect_date_rent>0 AND mkt_origin_sale IN ('Indica Aí - Agents', 'Indica Aí - General')
+            AND city_group IN ('RMSP', 'Rio de Janeiro', 'Belo Horizonte', 'Porto Alegre')) THEN sk_prospect_date_rent
+        ELSE sk_prospect_date_sale
+    END AS sk_prospect_date_sale,
+    city_group,
+    llf.sk_qualified_date_rent,
+    llf.sk_qualified_date_sale,
+    llf.sk_opportunity_date_rent,
+	llf.sk_opportunity_date_sale,
+	llf.sk_first_listing_date_sale,
+	llf.sk_first_listing_date_rent,
+	llf.sk_discard_date_sale,
+	llf.sk_discard_date_rent,
+	llf.sk_conversion_date_sale,
+	llf.sk_conversion_date_rent,
+	llf.context_opportunity_sale,
+	llf.context_opportunity_rent,
+	llf.context_first_listing_sale,
+	llf.context_first_listing_rent,
+	llf.lead_discard_sale,
+	llf.lead_discard_rent,
+	llf.prospect_discard_sale,
+	llf.prospect_discard_rent,
+	llf.prospect_status
+FROM
+    filtering_prospect llf
 ),
 qualified_date AS ( --creating artificial qualified date to adjust cases of drops in prospect
 SELECT
@@ -425,14 +529,14 @@ SELECT
     CASE
         WHEN llf.sk_prospect_date_rent>0 AND llf.sk_qualified_date_rent<0 AND prospect_status IN ('CONVERTED','DISCARDED') AND prospect_discard_rent IN ('HOUSE_ALREADY_RENTED_AVAILABLE_IN_MORE_THAN_6_MONTHS',
         'HOUSE_UNDER_MAJOR_RENOVATION','HOUSE_ALREADY_RENTED_AVAILABLE_IN_1_MONTH','HOUSE_ALREADY_RENTED_AVAILABLE_IN_6_MONTHS','SEASONAL_RENT','HOUSE_ALREADY_RENTED_AVAILABLE_IN_3_MONTHS',
-        'ISSUES_WITH_HOUSE_ENTRANCE_CONDITIONS','OWNER_GAVE_UP_RENTING','HOUSE_ONLY_FOR_SELLING')
+        'ISSUES_WITH_HOUSE_ENTRANCE_CONDITIONS','OWNER_GAVE_UP_RENTING','OWNER_GAVE_UP_SELLING','HOUSE_ONLY_FOR_SELLING')
         THEN COALESCE(NULLIF(llf.sk_conversion_date_rent,-1),NULLIF(llf.sk_discard_date_rent,-1),NULLIF(llf.sk_prospect_date_rent,-1))
         ELSE llf.sk_qualified_date_rent
     END AS sk_qualified_date_rent,
     CASE
         WHEN llf.sk_prospect_date_sale>0 AND llf.sk_qualified_date_sale<0 AND prospect_status IN ('CONVERTED','DISCARDED') AND prospect_discard_sale IN ('HOUSE_ALREADY_RENTED_AVAILABLE_IN_MORE_THAN_6_MONTHS',
         'HOUSE_UNDER_MAJOR_RENOVATION','HOUSE_ALREADY_RENTED_AVAILABLE_IN_1_MONTH','HOUSE_ALREADY_RENTED_AVAILABLE_IN_6_MONTHS','SEASONAL_RENT','HOUSE_ALREADY_RENTED_AVAILABLE_IN_3_MONTHS',
-        'ISSUES_WITH_HOUSE_ENTRANCE_CONDITIONS','OWNER_GAVE_UP_RENTING','HOUSE_ONLY_FOR_SELLING')
+        'ISSUES_WITH_HOUSE_ENTRANCE_CONDITIONS','OWNER_GAVE_UP_RENTING','OWNER_GAVE_UP_SELLING','HOUSE_ONLY_FOR_SELLING')
         THEN COALESCE(NULLIF(llf.sk_conversion_date_sale,-1),NULLIF(llf.sk_discard_date_sale,-1),NULLIF(llf.sk_prospect_date_sale,-1))
         ELSE llf.sk_qualified_date_sale
     END AS sk_qualified_date_sale,
@@ -444,16 +548,14 @@ SELECT
 	llf.context_opportunity_rent,
 	llf.context_first_listing_sale,
 	llf.context_first_listing_rent,
-	dc.lead_discard_sale,
-	dc.lead_discard_rent,
-	dc.prospect_discard_sale,
-	dc.prospect_discard_rent,
-	dc.prospect_status
+	llf.lead_discard_sale,
+	llf.lead_discard_rent,
+	llf.prospect_discard_sale,
+	llf.prospect_discard_rent,
+	city_group,
+	llf.prospect_status
 FROM
-    hybrid_dates llf
-LEFT JOIN
-    discard_by_context dc
-    ON llf.sk_lead = dc.sk_lead
+    adjusting_prospect llf
 ),
 dates_filters AS (
 SELECT
@@ -489,6 +591,7 @@ SELECT
 	    WHEN prospect_discard_sale IN ('CONTACT_DIDNT_EXIST','HOUSE_ALREADY_PUBLISHED','CONTACT_KNOW_OWNER','CONTACT_WASNT_THE_HOUSE_OWNER','HOUSE_ALREADY_SOLD',
 	    'HOUSE_WAS_A_BUSINESS_REAL_ESTATE','HOUSE_WITH_BAD_CONDITIONS','OWNER_DIDNT_ANSWER_PHONE','OWNER_DIDNT_LISTEN_TO_PITCH','OWNER_DIDNT_WANT_RECEIVE_CALL',
 	    'PROPERTY_IN_OFFPLANT','HOUSE_PRICE_WAS_OUT_OF_BOUNDS','HOUSE_WAS_OUT_OF_HOUSE_SALES_REGIONS') AND sk_opportunity_date_sale<0 THEN '-1'
+	    WHEN city_group NOT IN ('RMSP', 'Rio de Janeiro', 'Belo Horizonte', 'Porto Alegre') THEN '-1'
 	    ELSE sk_qualified_date_sale
 	END sk_qualified_date_sale,
     llf.sk_opportunity_date_rent,
@@ -503,7 +606,8 @@ SELECT
 	llf.lead_discard_rent,
 	llf.prospect_discard_sale,
 	llf.prospect_discard_rent,
-	llf.prospect_status
+	llf.prospect_status,
+	city_group
 FROM
     qualified_date llf
 ),
@@ -529,14 +633,8 @@ SELECT
     llf.funnel_drop_reason_sale,
     llf.sk_lead_date_rent,
     llf.sk_lead_date_sale,
-	CASE -- filtering prospect rent
-		WHEN lead_discard_rent IN ('HOUSE_WAS_OUT_OF_HOUSE_RENTING_REGIONS', 'ForaArea','DUPLICATED_LEAD','CONTACT_ON_BLOCK_LIST') AND sk_qualified_date_rent<0 THEN '-1'
-		ELSE sk_prospect_date_rent
-	END sk_prospect_date_rent,
-	CASE -- filtering prospect sale
-		WHEN lead_discard_sale IN ('HOUSE_WAS_OUT_OF_HOUSE_SALES_REGIONS', 'ForaArea','DUPLICATED_LEAD','CONTACT_ON_BLOCK_LIST') AND sk_qualified_date_sale<0 THEN '-1'
-		ELSE sk_prospect_date_sale
-	END sk_prospect_date_sale,
+	llf.sk_prospect_date_rent,
+	llf.sk_prospect_date_sale,
 	llf.sk_qualified_date_rent,
 	llf.sk_qualified_date_sale,
 	CASE -- filtering available qualified rent
@@ -560,7 +658,8 @@ SELECT
 	llf.lead_discard_rent,
 	llf.prospect_discard_sale,
 	llf.prospect_discard_rent,
-	prospect_status
+	prospect_status,
+	city_group
 FROM
     dates_filters llf
 ),
@@ -616,7 +715,8 @@ SELECT
 	llf.lead_discard_rent,
 	llf.prospect_discard_sale,
 	llf.prospect_discard_rent,
-	prospect_status
+	prospect_status,
+	city_group
 FROM
 	available_qualified llf
 )
@@ -691,6 +791,7 @@ SELECT
 	llf.lead_discard_rent,
 	llf.prospect_discard_sale,
 	llf.prospect_discard_rent,
-	llf.prospect_status
+	llf.prospect_status,
+	city_group
 FROM
     hybrid_qualified llf
