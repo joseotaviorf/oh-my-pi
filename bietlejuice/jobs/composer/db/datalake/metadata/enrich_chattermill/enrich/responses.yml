@@ -1,0 +1,68 @@
+database_name: datalake_chattermill
+table_name: responses
+columns:
+  id_response_tag:
+    lineage:
+      - datalake_chattermill_clean.responses.user_attributes
+      - datalake_chattermill_clean.responses.themes
+  id:
+    lineage:
+      - datalake_chattermill_clean.responses.id
+  id_response:
+    lineage:
+      - datalake_chattermill_clean.responses.user_attributes
+  id_tag_theme:
+    lineage:
+      - datalake_chattermill_clean.responses.themes
+  id_tag_parent:
+    lineage:
+      - datalake_chattermill_clean.responses.themes
+  name:
+    lineage:
+      - datalake_chattermill_clean.responses.user_attributes
+  email:
+    lineage:
+      - datalake_chattermill_clean.responses.user_attributes
+  telephone:
+    lineage:
+      - datalake_chattermill_clean.responses.user_attributes
+  collected_by:
+    lineage:
+      - datalake_chattermill_clean.responses.user_attributes
+  previous_score:
+    lineage:
+      - datalake_chattermill_clean.responses.user_attributes
+  score:
+    lineage:
+      - datalake_chattermill_clean.responses.score
+  comment:
+    lineage:
+      - datalake_chattermill_clean.responses.comment
+  original_comment:
+    lineage:
+      - datalake_chattermill_clean.responses.original_comment
+  data_type:
+    lineage:
+      - datalake_chattermill_clean.responses.data_type
+  data_source:
+    lineage:
+      - datalake_chattermill_clean.responses.data_source
+  dataset:
+    lineage:
+      - datalake_chattermill_clean.responses.dataset
+  tag_parent:
+    lineage:
+      - datalake_chattermill_clean.responses.themes
+  tag_name:
+    lineage:
+      - datalake_chattermill_clean.responses.themes
+  tag_sentiment:
+    lineage:
+      - datalake_chattermill_clean.responses.themes
+  ts_created:
+    lineage:
+      - datalake_chattermill_clean.responses.created_at
+  ts_updated:
+    lineage:
+      - datalake_chattermill_clean.responses.updated_at
+    
