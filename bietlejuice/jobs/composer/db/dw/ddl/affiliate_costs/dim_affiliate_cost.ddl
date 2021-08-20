@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS quintoandar.dim_affiliate_cost (
     city_group VARCHAR(255),
     description VARCHAR(255),
     source_bill_item VARCHAR(255),
-    comission_type VARCHAR(255),
+    commission_type VARCHAR(255),
     cost_center_code VARCHAR(255),
     mkt_origin VARCHAR(255),
     ts_load TIMESTAMP

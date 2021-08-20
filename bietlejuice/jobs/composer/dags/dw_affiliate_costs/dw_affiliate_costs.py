@@ -10,7 +10,6 @@ from airflow.operators.quintoandar_databricks import (
 )
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
-from bietlejuice.jobs.composer.dags.base.dw_staging_sub_dag import DWStagingSubDAG
 from bietlejuice.jobs.composer.dags.base.dw_task_group import DWTaskGroup
 from bietlejuice.jobs.composer.base.airflow.helpers.task_flow_helper import (
     TaskFlowHelper,
@@ -56,16 +55,6 @@ dag = DAG(
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
-)
-
-dw_staging_sub_dag = DWStagingSubDAG(
-    dag_id=DAG_ID,
-    start_date=MAIN_START_DATE,
-    env=ENV,
-    dw_bucket=DW_BUCKET,
-    dw_schema=DW_SCHEMA,
-    relative_query_path=DAG_NAME,
-    spark_job_path=SPARK_JOBS_PATH,
 )
 
 dw_task_group = DWTaskGroup(
