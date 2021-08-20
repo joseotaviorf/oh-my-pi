@@ -38,6 +38,7 @@ This pipeline produces the following output tables:
     - `contract_attribution_models`
     - `costs_allocation_relative_indexes`
     - `criteo_abtest_rj`
+    - `credit_analysis_fraudsters`
     - `crm_iptu_wave4`
     - `daily_target_supply_rental`
     - `daily_target_supply_sale`

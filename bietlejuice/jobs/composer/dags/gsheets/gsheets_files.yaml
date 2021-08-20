@@ -85,6 +85,11 @@ criteo_abtest_rj:
     sheet_name: criteo_abtest_rj
     clean_table_name: criteo_abtest_rj
 
+credit_analysis_fraudsters:
+    sheet_id: 11rRz5SwpqCq2pCqyOOydOIKGMzc9NPPufnaAWX5Lmho
+    sheet_name: gsheet_fraud
+    clean_table_name: credit_analysis_fraudsters
+
 crm_iptu_wave4:
     sheet_id: 1jz2kwgaE4qCi9aL1UaK2osdVv30ryWQI_sJ9qZARIqM
     sheet_name: crm_iptu_wave4
