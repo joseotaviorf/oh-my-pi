@@ -1,0 +1,22 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: user_house_evaluation
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario_avaliacao_imovel.id
+  id_house:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario_avaliacao_imovel.imovel_id
+  evaluated_by:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario_avaliacao_imovel.avaliado_por
+  created_by:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario_avaliacao_imovel.criado_por
+  evaluation_sale_price:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario_avaliacao_imovel.preco_avaliacao
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario_avaliacao_imovel.criado_em

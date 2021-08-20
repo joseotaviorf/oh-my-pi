@@ -1,0 +1,19 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: city
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cidade.id
+  id_uf:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cidade.uf_id
+  city_name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cidade.nome
+  city_slug_name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cidade.slug
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cidade.criado_em

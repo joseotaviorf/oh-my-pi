@@ -1,0 +1,16 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: client_observation
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_observacao.id
+  id_client:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_observacao.cliente_id
+  created_by:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_observacao.criado_por
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_observacao.criado_em

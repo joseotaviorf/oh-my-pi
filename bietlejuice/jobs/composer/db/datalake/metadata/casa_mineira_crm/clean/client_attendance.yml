@@ -1,0 +1,22 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: client_attendance
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_atendimento.id
+  id_client:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_atendimento.cliente_id
+  created_by:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_atendimento.criado_por
+  attendance_type:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_atendimento.tipo
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_atendimento.criado_em
+  ts_attended:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_atendimento.atendimento_em

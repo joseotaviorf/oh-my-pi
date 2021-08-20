@@ -1,0 +1,55 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: contact
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato.id
+  id_client:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato.cliente_id
+  id_house:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato.imovel_id
+  id_media:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato.midia_id
+  id_origin:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato.origem_id
+  id_user_attendance:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato.usuario_atendimento_id
+  id_user_forwarding:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato.usuario_encaminhamento_id
+  id_user_rejection:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato.usuario_rejeicao_id
+  created_by:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato.criado_por
+  email:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato.email
+  phone_number:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato.telefone
+  token:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato.token
+  contact_type:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato.tipo
+  is_automated:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato.automatizado
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato.criado_em
+  ts_attended:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato.atendimento_em
+  ts_rejected:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato.rejeitado_em

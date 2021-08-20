@@ -1,0 +1,22 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: client
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente.id
+  created_by:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente.criado_por
+  email:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente.email
+  phone_number:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente.telefone
+  second_phone_number:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente.telefone_secundario
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente.criado_em

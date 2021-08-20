@@ -1,0 +1,28 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: neighborhood
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.bairro.id
+  id_city:
+    lineage:
+      - datalake_casa_mineira_crm_raw.bairro.cidade_id
+  neighborhood_name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.bairro.nome
+  neighborhood_slug_name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.bairro.slug
+  neighborhood_full_slug_name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.bairro.slug_completo
+  is_priority:
+    lineage:
+      - datalake_casa_mineira_crm_raw.bairro.prioridade
+  is_visible:
+    lineage:
+      - datalake_casa_mineira_crm_raw.bairro.visibilidade
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.bairro.criado_em

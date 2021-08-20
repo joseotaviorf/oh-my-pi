@@ -1,0 +1,28 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: client_reminder
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_lembrete.id
+  id_client:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_lembrete.cliente_id
+  created_by:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_lembrete.criado_por
+  is_priority:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_lembrete.prioridade
+  ts_reminded:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_lembrete.lembrete_em
+  ts_notified:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_lembrete.notificado_em
+  ts_completed:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_lembrete.concluido_em
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_lembrete.criado_em

@@ -1,0 +1,256 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: house
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.id
+  id_real_estate_agency:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.imobiliaria_id
+  id_condo:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.condominio_id
+  id_house_quintoandar:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.codigo_quintoandar
+  id_key:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.chave_id
+  id_neighborhood:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.bairro_id
+  id_status:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.status_id
+  id_type:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.tipo_id
+  address:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.logradouro
+  bank:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.banco
+  coverage_type:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.cobertura_tipo
+  hangar_roof:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.galpao_telhado
+  hangar_structure:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.galpao_estrutura
+  lot_geometry:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.lote_geometria
+  lot_inclination:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.lote_inclinacao
+  lot_zoning:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.lote_zoneamento
+  partner_indication:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.imobiliaria_indicacao
+  store_position:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.loja_posicao
+  sun_position:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.posicao
+  video_url:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.video_url
+  visit_type:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.visita_forma
+  zip_code:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.cep
+  bathrooms:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.banheiros
+  bedrooms:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.quartos
+  brokerage:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.comissao
+  brokerage_bonus:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.comissao_bonus
+  building_floors:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.numero_andares
+  condo_price:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.valor_condominio
+  evaluation_price:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.preco_avaliacao
+  iptu_price:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.valor_iptu
+  predicted_price:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.preco_modelo
+  price:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.preco
+  debit_balance_value:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.valor_saldo_devedor
+  construction_year:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.ano_construcao
+  covered_parking_slots:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.vagas_cobertas
+  elevators:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.elevadores
+  floor:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.andar
+  floor_unities:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.unidade_andar
+  hangar_ceiling_height:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.galpao_pe_direito
+  hangar_front:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.galpao_frente
+  hangar_lateral:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.galpao_lateral
+  house_floors:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.casa_andares
+  images_quality:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.qualidade_imagens
+  lat:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.latitude
+  lng:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.longitude
+  line_parking_slots:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.vagas_linha
+  liquidity:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.liquidez
+  inferior_liquidity:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.liquidez_inferior
+  superior_liquidity:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.liquidez_superior
+  living_rooms:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.salas
+  lot_area:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.lote_area
+  lot_front:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.lote_frente
+  lot_lateral:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.lote_lateral
+  mezzanine_store_area:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.loja_sobreloja_area
+  open_parking_slots:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.vagas_livres
+  parking_slots:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.vagas
+  private_area:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.quantidade_area_privativa
+  roof_building_area:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.cobertura_area_construida
+  roof_terrace_area:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.cobertura_area_terraco
+  semi_suites:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.semissuites
+  store_ceiling_height:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.loja_pe_direito
+  store_mezzanine:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.loja_sobreloja
+  suites:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.suites
+  toilets:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.lavabos
+  total_area:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.area
+  has_roof_pool:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.cobertura_piscina
+  has_roof_sauna:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.cobertura_sauna
+  has_roof_grill:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.cobertura_churrasqueira
+  has_roof_douche:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.cobertura_ducha
+  has_roof_ofuro:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.cobertura_ofuro
+  has_roof_gourmet_area:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.cobertura_espaco_gourmet
+  is_house_entrance_semi_detached:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.casa_geminada_entrada
+  is_permute_accepted:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.aceita_permuta
+  is_portal_published:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.publicar_portais
+  is_profissional_photos:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.fotos_profissionais
+  is_walled_lot:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.lote_murado
+  ts_construction_ended:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.obra_entregue_em
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.criado_em
+  ts_deleted:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.deletado_em
+  ts_disabled:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.desativado_em
+  ts_publication_requested:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.publicacao_solicitada_em
+  ts_published:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.publicado_em
+  ts_republished:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.republicado_em
+  ts_updated:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel.atualizado_em

@@ -1,0 +1,40 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: unit
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.unidade.id
+  id_neighborhood:
+    lineage:
+      - datalake_casa_mineira_crm_raw.unidade.bairro_id
+  unit_name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.unidade.nome
+  unit_slug_name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.unidade.slug
+  address:
+    lineage:
+      - datalake_casa_mineira_crm_raw.unidade.logradouro
+  unit_number:
+    lineage:
+      - datalake_casa_mineira_crm_raw.unidade.numero
+  address_complement:
+    lineage:
+      - datalake_casa_mineira_crm_raw.unidade.complemento
+  phone_for_sale:
+    lineage:
+      - datalake_casa_mineira_crm_raw.unidade.telefone_venda
+  phone_for_rent:
+    lineage:
+      - datalake_casa_mineira_crm_raw.unidade.telefone_aluguel
+  is_visible:
+    lineage:
+      - datalake_casa_mineira_crm_raw.unidade.visivel
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.unidade.criado_em
+  ts_disabled:
+    lineage:
+      - datalake_casa_mineira_crm_raw.unidade.desativado_em

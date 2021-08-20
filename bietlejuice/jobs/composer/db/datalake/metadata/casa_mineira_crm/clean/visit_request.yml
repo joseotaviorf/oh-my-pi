@@ -1,0 +1,25 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: visit_request
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.visita_solicitacao.id
+  id_contact:
+    lineage:
+      - datalake_casa_mineira_crm_raw.visita_solicitacao.contato_id
+  id_user_validation:
+    lineage:
+      - datalake_casa_mineira_crm_raw.visita_solicitacao.usuario_validacao_id
+  validation_type:
+    lineage:
+      - datalake_casa_mineira_crm_raw.visita_solicitacao.validacao
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.visita_solicitacao.criado_em
+  ts_visited:
+    lineage:
+      - datalake_casa_mineira_crm_raw.visita_solicitacao.visita_em
+  ts_validated:
+    lineage:
+      - datalake_casa_mineira_crm_raw.visita_solicitacao.validado_em

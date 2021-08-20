@@ -1,0 +1,28 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: owner
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario.id
+  id_house:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario.imovel_id
+  owner_type:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario.tipo
+  owner_neighborhood:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario.bairro
+  owner_city:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario.cidade
+  owner_uf:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario.uf
+  owner_zip_code:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario.cep
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.proprietario.criado_em

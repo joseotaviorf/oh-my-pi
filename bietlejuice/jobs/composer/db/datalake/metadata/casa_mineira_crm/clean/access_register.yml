@@ -1,0 +1,19 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: access_register
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.registro_acesso.id
+  id_house:
+    lineage:
+      - datalake_casa_mineira_crm_raw.registro_acesso.imovel_id
+  id_user:
+    lineage:
+      - datalake_casa_mineira_crm_raw.registro_acesso.usuario_id
+  action:
+    lineage:
+      - datalake_casa_mineira_crm_raw.registro_acesso.acao
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.registro_acesso.criado_em

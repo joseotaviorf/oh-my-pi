@@ -1,0 +1,46 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: sale
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.venda.id
+  id_user:
+    lineage:
+      - datalake_casa_mineira_crm_raw.venda.usuario_id
+  id_house:
+    lineage:
+      - datalake_casa_mineira_crm_raw.venda.imovel_id
+  id_client:
+    lineage:
+      - datalake_casa_mineira_crm_raw.venda.cliente_id
+  buyer_email:
+    lineage:
+      - datalake_casa_mineira_crm_raw.venda.comprador_email
+  buyer_phone_number:
+    lineage:
+      - datalake_casa_mineira_crm_raw.venda.comprador_telefone
+  acquisition_brokerage_fee:
+    lineage:
+      - datalake_casa_mineira_crm_raw.venda.porcentagem_comissao_captacao
+  listing_sale_price:
+    lineage:
+      - datalake_casa_mineira_crm_raw.venda.preco_anunciado
+  sale_price_agreed:
+    lineage:
+      - datalake_casa_mineira_crm_raw.venda.preco_negociado
+  brokarage_fee_agreed:
+    lineage:
+      - datalake_casa_mineira_crm_raw.venda.comissao_negociada
+  bonus:
+    lineage:
+      - datalake_casa_mineira_crm_raw.venda.bonus
+  ts_sold:
+    lineage:
+      - datalake_casa_mineira_crm_raw.venda.vendido_em
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.venda.criado_em
+  ts_updated:
+    lineage:
+      - datalake_casa_mineira_crm_raw.venda.atualizado_em

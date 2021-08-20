@@ -1,0 +1,16 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: user_group
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario_grupo.id
+  group_name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario_grupo.nome
+  slug_group_name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario_grupo.slug
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario_grupo.criado_em

@@ -1,0 +1,31 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: change_request
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.solicitacao_alteracao.id
+  id_house:
+    lineage:
+      - datalake_casa_mineira_crm_raw.solicitacao_alteracao.imovel_id
+  id_user_attendance:
+    lineage:
+      - datalake_casa_mineira_crm_raw.solicitacao_alteracao.usuario_atendimento_id
+  id_user_confirmation:
+    lineage:
+      - datalake_casa_mineira_crm_raw.solicitacao_alteracao.usuario_confirmacao_id
+  id_type:
+    lineage:
+      - datalake_casa_mineira_crm_raw.solicitacao_alteracao.tipo_id
+  change_request_status:
+    lineage:
+      - datalake_casa_mineira_crm_raw.solicitacao_alteracao.status
+  ts_accepted:
+    lineage:
+      - datalake_casa_mineira_crm_raw.solicitacao_alteracao.aceito_em
+  ts_rejected:
+    lineage:
+      - datalake_casa_mineira_crm_raw.solicitacao_alteracao.recusado_em
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.solicitacao_alteracao.criado_em

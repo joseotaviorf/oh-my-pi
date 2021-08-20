@@ -1,0 +1,43 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: visit
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.visita.id
+  id_client:
+    lineage:
+      - datalake_casa_mineira_crm_raw.visita.cliente_id
+  id_form:
+    lineage:
+      - datalake_casa_mineira_crm_raw.visita.ficha_id
+  id_house:
+    lineage:
+      - datalake_casa_mineira_crm_raw.visita.imovel_id
+  id_request:
+    lineage:
+      - datalake_casa_mineira_crm_raw.visita.solicitacao_id
+  id_user:
+    lineage:
+      - datalake_casa_mineira_crm_raw.visita.usuario_id
+  id_user_validation:
+    lineage:
+      - datalake_casa_mineira_crm_raw.visita.usuario_validacao_id
+  created_by:
+    lineage:
+      - datalake_casa_mineira_crm_raw.visita.criado_por
+  validation_type:
+    lineage:
+      - datalake_casa_mineira_crm_raw.visita.validacao
+  is_virtual:
+    lineage:
+      - datalake_casa_mineira_crm_raw.visita.virtual
+  ts_visited:
+    lineage:
+      - datalake_casa_mineira_crm_raw.visita.visita_em
+  ts_validated:
+    lineage:
+      - datalake_casa_mineira_crm_raw.visita.validado_em
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.visita.criado_em

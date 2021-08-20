@@ -1,0 +1,16 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: attribute_type
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.atributo_tipo.id
+  attribute_type_name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.atributo_tipo.nome
+  attribute_type_slug_name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.atributo_tipo.slug
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.atributo_tipo.criado_em

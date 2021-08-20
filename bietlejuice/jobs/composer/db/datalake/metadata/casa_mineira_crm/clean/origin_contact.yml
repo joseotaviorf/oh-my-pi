@@ -1,0 +1,19 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: origin_contact
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato_origem.id
+  origin_contact_name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato_origem.nome
+  origin_contact_slug_name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato_origem.slug
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato_origem.criado_em
+  ts_disabled:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato_origem.desativado_em

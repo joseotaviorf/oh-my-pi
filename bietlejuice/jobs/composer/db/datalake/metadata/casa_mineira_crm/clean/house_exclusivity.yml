@@ -1,0 +1,31 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: house_exclusivity
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel_exclusividade.id
+  id_house:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel_exclusividade.imovel_id
+  id_user_cancellation:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel_exclusividade.usuario_cancelamento_id
+  id_user_exclusion:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel_exclusividade.usuario_exclusao_id
+  created_by:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel_exclusividade.criado_por
+  dt_begun:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel_exclusividade.inicio_em
+  dt_cancelled:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel_exclusividade.cancelado_em
+  dt_deleted:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel_exclusividade.deletado_em
+  dt_finished:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel_exclusividade.termino_em

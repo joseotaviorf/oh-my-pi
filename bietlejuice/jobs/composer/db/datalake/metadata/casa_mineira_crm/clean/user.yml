@@ -1,0 +1,43 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: user
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario.id
+  id_group:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario.grupo_id
+  id_manager:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario.gerente_id
+  id_unit:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario.unidade_id
+  created_by:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario.criado_por
+  level:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario.nivel
+  is_intern:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario.interno
+  is_suspended:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario.suspenso
+  dt_agent_contract:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario.contrato_corretor_data
+  ts_started:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario.entrou_em
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario.criado_em
+  ts_updated:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario.atualizado_em
+  ts_deleted:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario.deletado_em

@@ -1,0 +1,43 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: condo
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.condominio.id
+  id_builder:
+    lineage:
+      - datalake_casa_mineira_crm_raw.condominio.construtora_id
+  id_neighborhood:
+    lineage:
+      - datalake_casa_mineira_crm_raw.condominio.bairro_id
+  condo_name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.condominio.nome
+  condo_full_name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.condominio.nome_completo
+  condo_slug_name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.condominio.slug
+  condo_slug_full_name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.condominio.slug_completo
+  address:
+    lineage:
+      - datalake_casa_mineira_crm_raw.condominio.logradouro
+  address_number:
+    lineage:
+      - datalake_casa_mineira_crm_raw.condominio.numero
+  zip_code:
+    lineage:
+      - datalake_casa_mineira_crm_raw.condominio.cep
+  lat:
+    lineage:
+      - datalake_casa_mineira_crm_raw.condominio.latitude
+  lng:
+    lineage:
+      - datalake_casa_mineira_crm_raw.condominio.longitude
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.condominio.criado_em

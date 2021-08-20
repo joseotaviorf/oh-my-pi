@@ -1,0 +1,16 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: exhibition_register
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.registro_exibicao.id
+  id_house:
+    lineage:
+      - datalake_casa_mineira_crm_raw.registro_exibicao.imovel_id
+  id_user:
+    lineage:
+      - datalake_casa_mineira_crm_raw.registro_exibicao.usuario_id
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.registro_exibicao.criado_em

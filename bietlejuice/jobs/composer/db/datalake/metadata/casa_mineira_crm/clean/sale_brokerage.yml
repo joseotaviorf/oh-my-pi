@@ -1,0 +1,40 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: sale_brokerage
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.venda_comissao.id
+  id_sale:
+    lineage:
+      - datalake_casa_mineira_crm_raw.venda_comissao.venda_id
+  id_user:
+    lineage:
+      - datalake_casa_mineira_crm_raw.venda_comissao.usuario_id
+  sale_type:
+    lineage:
+      - datalake_casa_mineira_crm_raw.venda_comissao.tipo
+  sale_subtype:
+    lineage:
+      - datalake_casa_mineira_crm_raw.venda_comissao.subtipo
+  sale_status:
+    lineage:
+      - datalake_casa_mineira_crm_raw.venda_comissao.status
+  office:
+    lineage:
+      - datalake_casa_mineira_crm_raw.venda_comissao.escritorio
+  percentage_brokerage_type:
+    lineage:
+      - datalake_casa_mineira_crm_raw.venda_comissao.porcentagem_comissao_tipo
+  percentage_total_brokerage:
+    lineage:
+      - datalake_casa_mineira_crm_raw.venda_comissao.porcentagem_comissao_total
+  gross_brokerage_value:
+    lineage:
+      - datalake_casa_mineira_crm_raw.venda_comissao.comissao_bruta
+  taxes_brokerage_value:
+    lineage:
+      - datalake_casa_mineira_crm_raw.venda_comissao.comissao_impostos
+  net_brokerage_value:
+    lineage:
+      - datalake_casa_mineira_crm_raw.venda_comissao.comissao_liquida

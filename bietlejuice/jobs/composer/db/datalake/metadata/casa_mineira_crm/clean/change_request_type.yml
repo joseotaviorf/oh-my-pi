@@ -1,0 +1,16 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: change_request_type
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.solicitacao_alteracao_tipo.id
+  change_request_type_name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.solicitacao_alteracao_tipo.nome
+  priority:
+    lineage:
+      - datalake_casa_mineira_crm_raw.solicitacao_alteracao_tipo.prioridade
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.solicitacao_alteracao_tipo.criado_em

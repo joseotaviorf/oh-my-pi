@@ -1,0 +1,16 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: archived_client
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_arquivado.id
+  id_client:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_arquivado.cliente_id
+  id_user:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_arquivado.usuario_id
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_arquivado.criado_em

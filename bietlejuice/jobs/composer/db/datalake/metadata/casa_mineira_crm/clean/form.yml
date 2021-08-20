@@ -1,0 +1,19 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: form
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.ficha.id
+  ip:
+    lineage:
+      - datalake_casa_mineira_crm_raw.ficha.ip
+  confirmation:
+    lineage:
+      - datalake_casa_mineira_crm_raw.ficha.confirmacao
+  file:
+    lineage:
+      - datalake_casa_mineira_crm_raw.ficha.arquivo
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.ficha.criado_em

@@ -1,0 +1,25 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: client_permission
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_permissao.id
+  id_client:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_permissao.cliente_id
+  id_user_revogation:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_permissao.usuario_revogacao_id
+  id_user:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_permissao.usuario_id
+  created_by:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_permissao.criado_por
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_permissao.criado_em
+  ts_revoked:
+    lineage:
+      - datalake_casa_mineira_crm_raw.cliente_permissao.revogado_em

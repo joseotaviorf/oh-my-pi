@@ -1,0 +1,13 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: house_status
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.status.id
+  house_status_name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.status.nome
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.status.criado_em

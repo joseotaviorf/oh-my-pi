@@ -1,0 +1,25 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: revisions
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.revisions.id
+  id_revisionable:
+    lineage:
+      - datalake_casa_mineira_crm_raw.revisions.revisionable_id
+  id_user:
+    lineage:
+      - datalake_casa_mineira_crm_raw.revisions.user_id
+  revision_key:
+    lineage:
+      - datalake_casa_mineira_crm_raw.revisions.key
+  revisionable_type:
+    lineage:
+      - datalake_casa_mineira_crm_raw.revisions.revisionable_type
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.revisions.created_at
+  ts_updated:
+    lineage:
+      - datalake_casa_mineira_crm_raw.revisions.updated_at

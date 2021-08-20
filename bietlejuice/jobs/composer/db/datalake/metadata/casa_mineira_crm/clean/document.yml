@@ -1,0 +1,28 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: document
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.documento.id
+  id_house:
+    lineage:
+      - datalake_casa_mineira_crm_raw.documento.imovel_id
+  id_type:
+    lineage:
+      - datalake_casa_mineira_crm_raw.documento.tipo_id
+  file:
+    lineage:
+      - datalake_casa_mineira_crm_raw.documento.arquivo
+  created_by:
+    lineage:
+      - datalake_casa_mineira_crm_raw.documento.criado_por
+  removed_by:
+    lineage:
+      - datalake_casa_mineira_crm_raw.documento.removido_por
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.documento.criado_em
+  ts_deleted:
+    lineage:
+      - datalake_casa_mineira_crm_raw.documento.deletado_em

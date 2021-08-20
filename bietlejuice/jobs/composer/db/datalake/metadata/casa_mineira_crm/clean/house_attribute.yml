@@ -1,0 +1,13 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: house_attribute
+columns:
+  id_attribute:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel_atributo.atributo_id
+  id_house:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel_atributo.imovel_id
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel_atributo.criado_em

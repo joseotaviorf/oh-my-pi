@@ -1,0 +1,31 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: user_house_brokerage
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario_comissao_imovel.id
+  id_house:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario_comissao_imovel.imovel_id
+  id_user:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario_comissao_imovel.usuario_id
+  created_by:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario_comissao_imovel.criado_por
+  removed_by:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario_comissao_imovel.removido_por
+  brokerage_fee:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario_comissao_imovel.comissao
+  is_principal:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario_comissao_imovel.principal
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario_comissao_imovel.criado_em
+  ts_deleted:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario_comissao_imovel.deletado_em

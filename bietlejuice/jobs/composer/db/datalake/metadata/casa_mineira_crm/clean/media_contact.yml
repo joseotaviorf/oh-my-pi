@@ -1,0 +1,19 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: media_contact
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato_midia.id
+  media_contact_name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato_midia.nome
+  media_contact_slug_name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato_midia.slug
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato_midia.criado_em
+  ts_disabled:
+    lineage:
+      - datalake_casa_mineira_crm_raw.contato_midia.desativado_em

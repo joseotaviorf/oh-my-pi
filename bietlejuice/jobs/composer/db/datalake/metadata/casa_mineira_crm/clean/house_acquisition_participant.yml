@@ -1,0 +1,28 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: house_acquisition_participant
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel_captacao_participante.id
+  id_house:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel_captacao_participante.imovel_id
+  id_user:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel_captacao_participante.usuario_id
+  id_user_group:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel_captacao_participante.usuario_grupo_id
+  created_by:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel_captacao_participante.criado_por
+  removed_by:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel_captacao_participante.removido_por
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel_captacao_participante.criado_em
+  ts_deleted:
+    lineage:
+      - datalake_casa_mineira_crm_raw.imovel_captacao_participante.deletado_em

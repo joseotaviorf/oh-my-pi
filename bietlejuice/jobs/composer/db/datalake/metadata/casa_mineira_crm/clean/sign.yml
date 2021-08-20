@@ -1,0 +1,37 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: sign
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.placa.id
+  id_house:
+    lineage:
+      - datalake_casa_mineira_crm_raw.placa.imovel_id
+  id_user:
+    lineage:
+      - datalake_casa_mineira_crm_raw.placa.usuario_id
+  id_user_scheduling:
+    lineage:
+      - datalake_casa_mineira_crm_raw.placa.usuario_agendamento_id
+  entry_form:
+    lineage:
+      - datalake_casa_mineira_crm_raw.placa.forma_entrada
+  installation_place:
+    lineage:
+      - datalake_casa_mineira_crm_raw.placa.local_instalacao
+  sign_type:
+    lineage:
+      - datalake_casa_mineira_crm_raw.placa.tipo
+  has_maintenance:
+    lineage:
+      - datalake_casa_mineira_crm_raw.placa.manutencao
+  is_exclusive_sign:
+    lineage:
+      - datalake_casa_mineira_crm_raw.placa.placa_exclusiva
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.placa.criado_em
+  ts_updated:
+    lineage:
+      - datalake_casa_mineira_crm_raw.placa.atualizado_em

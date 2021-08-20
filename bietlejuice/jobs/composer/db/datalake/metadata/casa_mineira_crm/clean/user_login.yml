@@ -1,0 +1,19 @@
+---
+database_name: datalake_casa_mineira_crm_clean
+table_name: user_login
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario_login.id
+  id_user:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario_login.usuario_id
+  ip:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario_login.ip
+  device:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario_login.dispositivo
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario_login.criado_em
