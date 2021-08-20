@@ -139,6 +139,22 @@ SELECT
         ELSE NULL
     END AS mkt_channel_sale,
     CASE
+        WHEN origin_table = 'Rent' THEN mkt_source
+        ELSE NULL
+    END AS mkt_source_rent,
+    CASE
+        WHEN origin_table = 'Sale' THEN mkt_source
+        ELSE NULL
+    END AS mkt_source_sale,
+    CASE
+        WHEN origin_table = 'Rent' THEN mkt_medium
+        ELSE NULL
+    END AS mkt_medium_rent,
+    CASE
+        WHEN origin_table = 'Sale' THEN mkt_medium
+        ELSE NULL
+    END AS mkt_medium_sale,
+    CASE
         WHEN origin_table = 'Rent' THEN sales_company
         ELSE NULL
     END AS sales_company_rent,
@@ -257,6 +273,10 @@ SELECT
     MAX(mkt_completion_sale) AS mkt_completion_sale,
     MAX(mkt_channel_rent) AS mkt_channel_rent,
     MAX(mkt_channel_sale) AS mkt_channel_sale,
+    MAX(mkt_source_rent) AS mkt_source_rent,
+    MAX(mkt_source_sale) AS mkt_source_sale,
+    MAX(mkt_medium_rent) AS mkt_medium_rent,
+    MAX(mkt_medium_sale) AS mkt_medium_sale,
     MAX(sales_company_rent) AS sales_company_rent,
     MAX(sales_company_sale) AS sales_company_sale,
     MAX(sourcing_ops_rent) AS sourcing_ops_rent,
@@ -317,6 +337,22 @@ SELECT
         WHEN mkt_origin_sale IN ('Price Calculator','Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND mkt_channel_rent IS NULL THEN mkt_channel_sale
         ELSE mkt_channel_rent
     END AS mkt_channel_rent,
+    CASE
+        WHEN mkt_origin_rent IN ('Price Calculator','Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND mkt_source_sale IS NULL THEN mkt_source_rent
+        ELSE mkt_source_sale
+    END AS mkt_source_sale,
+    CASE
+        WHEN mkt_origin_sale IN ('Price Calculator','Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND mkt_source_rent IS NULL THEN mkt_source_sale
+        ELSE mkt_source_rent
+    END AS mkt_source_rent,
+    CASE
+        WHEN mkt_origin_rent IN ('Price Calculator','Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND mkt_medium_sale IS NULL THEN mkt_medium_rent
+        ELSE mkt_medium_sale
+    END AS mkt_medium_sale,
+    CASE
+        WHEN mkt_origin_sale IN ('Price Calculator','Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND mkt_medium_rent IS NULL THEN mkt_medium_sale
+        ELSE mkt_medium_rent
+    END AS mkt_medium_rent,
     CASE
         WHEN mkt_origin_rent IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND sales_company_sale IS NULL THEN sales_company_rent
         ELSE sales_company_sale
@@ -400,6 +436,10 @@ SELECT
     llf.mkt_completion_sale,
     llf.mkt_channel_rent,
     llf.mkt_channel_sale,
+    llf.mkt_source_rent,
+    llf.mkt_source_sale,
+    llf.mkt_medium_rent,
+    llf.mkt_medium_sale,
     llf.sales_company_rent,
     llf.sales_company_sale,
     llf.sourcing_ops_rent,
@@ -460,6 +500,10 @@ SELECT
     llf.mkt_completion_sale,
     llf.mkt_channel_rent,
     llf.mkt_channel_sale,
+    llf.mkt_source_rent,
+    llf.mkt_source_sale,
+    llf.mkt_medium_rent,
+    llf.mkt_medium_sale,
     llf.sales_company_rent,
     llf.sales_company_sale,
     llf.sourcing_ops_rent,
@@ -514,6 +558,10 @@ SELECT
     llf.mkt_completion_sale,
     llf.mkt_channel_rent,
     llf.mkt_channel_sale,
+    llf.mkt_source_rent,
+    llf.mkt_source_sale,
+    llf.mkt_medium_rent,
+    llf.mkt_medium_sale,
     llf.sales_company_rent,
     llf.sales_company_sale,
     llf.sourcing_ops_rent,
@@ -569,6 +617,10 @@ SELECT
     llf.mkt_completion_sale,
     llf.mkt_channel_rent,
     llf.mkt_channel_sale,
+    llf.mkt_source_rent,
+    llf.mkt_source_sale,
+    llf.mkt_medium_rent,
+    llf.mkt_medium_sale,
     llf.sales_company_rent,
     llf.sales_company_sale,
     llf.sourcing_ops_rent,
@@ -623,6 +675,10 @@ SELECT
     llf.mkt_completion_sale,
     llf.mkt_channel_rent,
     llf.mkt_channel_sale,
+    llf.mkt_source_rent,
+    llf.mkt_source_sale,
+    llf.mkt_medium_rent,
+    llf.mkt_medium_sale,
     llf.sales_company_rent,
     llf.sales_company_sale,
     llf.sourcing_ops_rent,
@@ -675,6 +731,10 @@ SELECT
     llf.mkt_completion_sale,
     llf.mkt_channel_rent,
     llf.mkt_channel_sale,
+    llf.mkt_source_rent,
+    llf.mkt_source_sale,
+    llf.mkt_medium_rent,
+    llf.mkt_medium_sale,
     llf.sales_company_rent,
     llf.sales_company_sale,
     llf.sourcing_ops_rent,
@@ -731,6 +791,10 @@ SELECT
     llf.mkt_completion_sale,
     llf.mkt_channel_rent,
     llf.mkt_channel_sale,
+    llf.mkt_source_rent,
+    llf.mkt_source_sale,
+    llf.mkt_medium_rent,
+    llf.mkt_medium_sale,
     llf.sales_company_rent,
     llf.sales_company_sale,
     llf.sourcing_ops_rent,
