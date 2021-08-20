@@ -1,0 +1,21 @@
+database_name: datalake_consolidated_marketing_costs
+table_name: mitula_consolidated_costs
+columns:
+  campaign_name:
+    lineage:
+      - datalake_mitula_clean.mitula_report.campaign_name
+  account_name:
+    lineage:
+      - datalake_mitula_clean.mitula_report.account_name
+  utm_campaign:
+    lineage:
+      - datalake_mitula_clean.mitula_report.campaign_name
+  desktop_cost:
+    lineage:
+      - datalake_mitula_clean.mitula_report.desktop_cost
+  mobile_cost:
+    lineage:
+      - datalake_mitula_clean.mitula_report.mobile_cost
+  total_cost:
+    lineage:
+      - datalake_mitula_clean.mitula_report.total_cost

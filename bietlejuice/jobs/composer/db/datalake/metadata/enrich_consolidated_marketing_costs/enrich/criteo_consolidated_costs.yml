@@ -1,0 +1,23 @@
+database_name: datalake_consolidated_marketing_costs
+table_name: criteo_consolidated_costs
+columns:
+  id_date:
+    lineage:
+      - datalake_marketing_costs_clean.criteo_campaigns.year
+      - datalake_marketing_costs_clean.criteo_campaigns.month
+      - datalake_marketing_costs_clean.criteo_campaigns.day
+  campaign_name:
+    lineage:
+      - datalake_marketing_costs_clean.criteo_campaigns.campaign_name
+  account_name:
+    lineage:
+      - datalake_marketing_costs_clean.criteo_campaigns.advertiser_name
+  utm_campaign:
+    lineage:
+      - datalake_marketing_costs_clean.criteo_campaigns.campaign_name
+  other_cost:
+    lineage:
+      - datalake_marketing_costs_clean.criteo_campaigns.cost
+  total_cost:
+    lineage:
+      - datalake_marketing_costs_clean.criteo_campaigns.cost
