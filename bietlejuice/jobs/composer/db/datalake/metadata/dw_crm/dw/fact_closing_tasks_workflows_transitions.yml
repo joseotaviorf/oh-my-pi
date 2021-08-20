@@ -1,0 +1,31 @@
+database_name: dw_crm_migration
+table_name: fact_closing_tasks_workflows_transitions
+columns:
+  sk_transition:
+    lineage:
+      - datalake_crm.workflows_transitions.id_transition
+  sk_workflow:
+    lineage:
+      - datalake_crm.workflows_transitions.id_workflow
+  sk_origin_task:
+    lineage:
+      - datalake_crm.workflows_transitions.id_task_from
+  sk_destination_task:
+    lineage:
+      - datalake_crm.workflows_transitions.id_task_to
+  sk_transitioned_date:
+    lineage:
+      - datalake_crm.workflows_transitions.ts_transitioned
+  is_end_of_workflow:
+    lineage:
+      - datalake_crm.workflows_transitions.is_end_of_workflow
+  year:
+    lineage:
+      - datalake_crm.workflows_transitions.year
+  month:
+    lineage:
+      - datalake_crm.workflows_transitions.month
+  day:
+    lineage:
+      - datalake_crm.workflows_transitions.day
+  
