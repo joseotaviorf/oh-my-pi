@@ -1,0 +1,264 @@
+database_name: datalake_firestore
+table_name: monday
+columns:
+  id_offer:
+    lineage:
+      - datalake_firestore_clean.monday.id
+  id_buyer:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  id_house:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  id_closing_specialist:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  id_consultant:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  id_agent:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  id_fifty_agent:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  id_pre_specialist:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  id_post_specialist:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  id_credit_specialist:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  id_start_financing_specialist:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  id_follow_up_financing_specialist:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  id_end_financing_specialist:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  id_notes_registry_specialist:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  id_real_estate_register_specialist:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  id_legal_risk_analyst:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  real_estate_register_office_number:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  payment_method:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  credit_model:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  offer_acceptance_probability:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  listing_sale_price:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  price_offered_by_buyer:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  price_offered_by_seller:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  sale_price_agreed:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  brokerage_fee:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  deed_value:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  fgts_value:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  financing_value:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  payment_entry_amount:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  value_in_cash:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  financing_bank:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  status:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  offer_status:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  bank_analysis_status:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  credit_status:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  notary_office_status:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  real_estate_register_office_status:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  house_dilligence_status:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  report_dilligence_status:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  seller_dilligence_status:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  sale_agreement_status:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  payment_status:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  seller_payment_status:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  closing_status:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  sale_agreement_cancellation_reason:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  drop_reason_before_acceptance:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  drop_reason_after_acceptance:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  current_drop_reason:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  drop_reason:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  drop_reason_responsible:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  house_occupant:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  land_tenure:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  has_seller_debt_payments:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  days_offer_accepted_to_offer_dismissed:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  days_offer_accepted_to_sale_agreement_created:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  days_offer_accepted_to_sale_agreement_signed:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  days_sale_agreement_created_to_sale_agreement_signed:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_submitted:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_deal_qualified:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_accepted:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_offer_dismissed:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_last_follow_up:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_last_buyer_follow_up:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_last_seller_follow_up:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_sale_agreement_created:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_sale_agreement_signed:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_sale_agreement_cancelled:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_onboarding_ended:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_bank_legal_analysis_started:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_financing_started:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_financing_ended:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_legaut_analysis_started:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_legaut_analysis_ended:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_legal_risk_started:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_legal_risk_ended:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_legal_analysis_ended:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_credit_analysis_started:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_credit_analysis_ended:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_credit_analysis_result_answered:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_notes_registry_started:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_notes_registry_ended:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_house_registry_started:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_house_registry_ended:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_sale_transacton_paid:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_sale_key_delivered:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  dt_kit_delivered:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  ts_updated:
+    lineage:
+      - datalake_firestore_clean.monday.ts_updated
