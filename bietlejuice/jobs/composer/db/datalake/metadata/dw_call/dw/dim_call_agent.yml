@@ -1,0 +1,24 @@
+database_name: dw_call
+table_name: dim_call_agent
+columns:
+  sk_call_agent:
+    lineage:
+      - datalake_bigfone_twilio.call_agents.id_agent
+  full_name:
+    lineage:
+      - datalake_bigfone_twilio.call_agents.full_name
+  email:
+    lineage:
+      - datalake_bigfone_twilio.call_agents.email
+  location:
+    lineage:
+      - datalake_bigfone_twilio.call_agents.location
+  skills:
+    lineage:
+      - datalake_bigfone_twilio.call_agents.skills
+  ts_created:
+    lineage:
+      - datalake_bigfone_twilio.call_agents.ts_first_event
+  ts_updated:
+    lineage:
+      - datalake_bigfone_twilio.call_agents.ts_last_event
