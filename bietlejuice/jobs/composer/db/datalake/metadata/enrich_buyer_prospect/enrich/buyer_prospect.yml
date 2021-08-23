@@ -1,0 +1,330 @@
+database_name: datalake_buyer_prospect
+table_name: buyer_prospect
+columns:
+  id_buyer:
+    lineage:
+      - datalake_sale_flows.sale_flow.id_buyer
+  id_first_region:
+    lineage:
+      - datalake_sale_flows.sale_flow.id_region
+  id_last_region:
+    lineage:
+      - datalake_sale_flows.sale_flow.id_region
+  first_event:
+    lineage:
+      - datalake_sale_flows.sale_flow.first_event
+  last_event:
+    lineage:
+      - datalake_booking.booking.id
+      - datalake_booking.booking.is_visit_completed
+      - datalake_booking.booking.ts_booking_utc
+      - datalake_offer.sale_offer.dt_offer_accepted
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_offer.sale_offer.ts_offer_submitted
+      - datalake_sale_flows.sale_flow.first_event
+      - datalake_sale_flows.sale_flow.ts_first_event
+  further_funnel_step:
+    lineage:
+      - datalake_booking.booking.id
+      - datalake_booking.booking.is_visit_completed
+      - datalake_booking.booking.ts_booking_utc
+      - datalake_offer.sale_offer.dt_offer_accepted
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_offer.sale_offer.ts_offer_submitted
+  first_buyer_intention:
+    lineage:
+      - datalake_booking.booking.buyer_intention
+  is_tenant:
+    lineage:
+      - datalake_ebdb_clean.contract_person.type
+  is_current_tenant:
+    lineage:
+      - datalake_ebdb_clean.contract.status
+      - datalake_ebdb_clean.contract_person.type
+  is_contract_owner:
+    lineage:
+      - datalake_ebdb_clean.contract_person.type
+  is_tenant_prospect:
+    lineage:
+      - datalake_booking.booking.visit_intent
+      - datalake_offer.offer.id_client
+  sale_flows:
+    lineage:
+      - datalake_sale_flows.sale_flow.id_sale_flow
+  regions_with_sale_flows:
+    lineage:
+      - datalake_sale_flows.sale_flow.id_region
+  weeks_with_sale_flows:
+    lineage:
+      - datalake_sale_flows.sale_flow.ts_first_event
+  bookings_created:
+    lineage:
+      - datalake_booking.booking.id
+  bookings_created_by_agent:
+    lineage:
+      - datalake_booking.booking.id
+      - datalake_booking.booking.first_update_source
+  bookings_canceled:
+    lineage:
+      - datalake_booking.booking.id
+      - datalake_booking.booking.is_canceled
+  visits_completed:
+    lineage:
+      - datalake_booking.booking.id
+      - datalake_booking.booking.is_visit_completed
+  offers_submitted:
+    lineage:
+      - datalake_offer.sale_offer.id_offer
+  offers_accepted:
+    lineage:
+      - datalake_offer.sale_offer.dt_offer_accepted
+      - datalake_offer.sale_offer.id_offer
+  offers_dismissed:
+    lineage:
+      - datalake_offer.sale_offer.dt_offer_dismissed
+      - datalake_offer.sale_offer.id_offer
+  sale_agreements_signed:
+    lineage:
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_offer.sale_offer.id_offer
+  avg_sale_price:
+    lineage:
+      - datalake_ebdb_clean.house.sale_price
+  avg_offer_price:
+    lineage:
+      - datalake_offer.sale_offer.first_price_offered_by_buyer
+  avg_offer_discount:
+    lineage:
+      - datalake_offer.sale_offer.first_price_offered_by_buyer
+      - datalake_offer.sale_offer.sale_price
+  houses_owned:
+    lineage:
+      - datalake_ebdb_clean.house.id
+  listings_for_sale:
+    lineage:
+      - datalake_ebdb_clean.house.id
+      - datalake_ebdb_listing.listing_business_context.business_context
+  listings_for_rent:
+    lineage:      
+      - datalake_ebdb_clean.house.id
+      - datalake_ebdb_listing.listing_business_context.business_context
+  days_first_sale_flow_to_first_booking_created:
+    lineage:
+      - datalake_booking.booking.id
+      - datalake_booking.booking.is_visit_completed
+      - datalake_sale_flows.sale_flow.ts_first_event
+  days_first_sale_flow_to_first_visit_completed:
+    lineage:
+      - datalake_booking.booking.is_visit_completed
+      - datalake_booking.booking.ts_booking_utc
+      - datalake_sale_flows.sale_flow.ts_first_event
+  days_first_sale_flow_to_first_offer_submitted:
+    lineage:
+      - datalake_offer.sale_offer.ts_offer_submitted
+      - datalake_sale_flows.sale_flow.ts_first_event
+  days_first_sale_flow_to_first_offer_accepted:
+    lineage:
+      - datalake_offer.sale_offer.dt_offer_accepted
+      - datalake_sale_flows.sale_flow.ts_first_event
+  days_first_sale_flow_to_first_sale_agreement_signed:
+    lineage:
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_sale_flows.sale_flow.ts_first_event
+  days_first_booking_created_to_first_visit_completed:
+    lineage:
+      - datalake_booking.booking.id
+      - datalake_booking.booking.is_visit_completed
+      - datalake_booking.booking.ts_booking_utc
+  days_first_booking_created_to_first_offer_submitted:
+    lineage:
+      - datalake_booking.booking.id
+      - datalake_booking.booking.is_visit_completed
+      - datalake_offer.sale_offer.ts_offer_submitted
+  days_first_booking_created_to_first_offer_accepted:
+    lineage:
+      - datalake_booking.booking.id
+      - datalake_booking.booking.is_visit_completed
+      - datalake_offer.sale_offer.dt_offer_accepted
+  days_first_booking_created_to_first_sale_agreement_signed:
+    lineage:
+      - datalake_booking.booking.id
+      - datalake_booking.booking.is_visit_completed
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+  days_first_visit_completed_to_first_offer_submitted:
+    lineage:
+      - datalake_booking.booking.is_visit_completed
+      - datalake_booking.booking.ts_booking_utc
+      - datalake_offer.sale_offer.ts_offer_submitted
+  days_first_visit_completed_to_first_offer_accepted:
+    lineage:
+      - datalake_booking.booking.is_visit_completed
+      - datalake_booking.booking.ts_booking_utc
+      - datalake_offer.sale_offer.dt_offer_accepted
+  days_first_visit_completed_to_first_sale_agreement_signed:
+    lineage:
+      - datalake_booking.booking.is_visit_completed
+      - datalake_booking.booking.ts_booking_utc
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+  days_first_offer_submitted_to_first_offer_accepted:
+    lineage:
+      - datalake_offer.sale_offer.dt_offer_accepted
+      - datalake_offer.sale_offer.ts_offer_submitted
+  days_first_offer_submitted_to_first_sale_agreement_signed:
+    lineage:
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_offer.sale_offer.ts_offer_submitted
+  days_first_offer_accepted_to_first_sale_agreement_signed:
+    lineage:
+      - datalake_offer.sale_offer.dt_offer_accepted
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+  days_first_sale_flow_to_last_sale_flow:
+    lineage:
+      - datalake_sale_flows.sale_flow.id_sale_flow
+      - datalake_sale_flows.sale_flow.ts_first_event
+  days_first_sale_flow_to_last_booking_created:
+    lineage:
+      - datalake_booking.booking.ts_created
+      - datalake_sale_flows.sale_flow.ts_first_event
+  days_first_sale_flow_to_last_visit_completed:
+    lineage:
+      - datalake_booking.booking.is_visit_completed
+      - datalake_booking.booking.ts_booking_utc
+      - datalake_sale_flows.sale_flow.ts_first_event
+  days_first_sale_flow_to_last_offer_submitted:
+    lineage:
+      - datalake_offer.sale_offer.ts_offer_submitted
+      - datalake_sale_flows.sale_flow.ts_first_event
+  days_first_sale_flow_to_last_offer_accepted:
+    lineage:
+      - datalake_offer.sale_offer.dt_offer_accepted
+      - datalake_sale_flows.sale_flow.ts_first_event
+  days_first_sale_flow_to_last_sale_agreement_signed:
+    lineage:
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_sale_flows.sale_flow.ts_first_event
+  days_first_sale_flow_to_last_event:
+    lineage:
+      - datalake_booking.booking.is_visit_completed
+      - datalake_booking.booking.ts_booking_utc
+      - datalake_booking.booking.ts_created
+      - datalake_offer.sale_offer.dt_offer_accepted
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_offer.sale_offer.ts_offer_submitted
+      - datalake_sale_flows.sale_flow.ts_first_event
+  days_first_booking_created_to_last_booking_created:
+    lineage:
+      - datalake_booking.booking.id
+      - datalake_booking.booking.is_visit_completed
+      - datalake_booking.booking.ts_created
+  days_first_booking_created_to_last_visit_completed:
+    lineage:
+      - datalake_booking.booking.id
+      - datalake_booking.booking.is_visit_completed
+      - datalake_booking.booking.ts_booking_utc
+  days_first_booking_created_to_last_offer_submitted:
+    lineage:
+      - datalake_booking.booking.id
+      - datalake_booking.booking.is_visit_completed
+      - datalake_offer.sale_offer.ts_offer_submitted
+  days_first_booking_created_to_last_offer_accepted:
+    lineage:
+      - datalake_booking.booking.id
+      - datalake_booking.booking.is_visit_completed
+      - datalake_offer.sale_offer.dt_offer_accepted
+  days_first_booking_created_to_last_sale_agreement_signed:
+    lineage:
+      - datalake_booking.booking.id
+      - datalake_booking.booking.is_visit_completed
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+  days_first_visit_completed_to_last_visit_completed:
+    lineage:
+      - datalake_booking.booking.id
+      - datalake_booking.booking.is_visit_completed
+      - datalake_booking.booking.ts_booking_utc
+  days_first_visit_completed_to_last_offer_submitted:
+    lineage:
+      - datalake_booking.booking.is_visit_completed
+      - datalake_booking.booking.ts_booking_utc
+      - datalake_offer.sale_offer.dt_offer_accepted
+  days_first_visit_completed_to_last_offer_accepted:
+    lineage:
+      - datalake_booking.booking.is_visit_completed
+      - datalake_booking.booking.ts_booking_utc
+      - datalake_offer.sale_offer.dt_offer_accepted
+  days_first_visit_completed_to_last_sale_agreement_signed:
+    lineage:
+      - datalake_booking.booking.is_visit_completed
+      - datalake_booking.booking.ts_booking_utc
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+  days_first_offer_submitted_to_last_offer_submitted:
+    lineage:
+      - datalake_offer.sale_offer.id_offer
+      - datalake_offer.sale_offer.ts_offer_submitted
+  days_first_offer_submitted_to_last_offer_accepted:
+    lineage:
+      - datalake_offer.sale_offer.dt_offer_accepted
+      - datalake_offer.sale_offer.ts_offer_submitted
+  days_first_offer_submitted_to_last_sale_agreement_signed:
+    lineage:
+      - datalake_offer.sale_offer.id_offer
+      - datalake_offer.sale_offer.ts_offer_submitted
+  days_first_offer_accepted_to_last_offer_accepted:
+    lineage:
+      - datalake_offer.sale_offer.id_offer
+      - datalake_offer.sale_offer.dt_offer_accepted
+  days_first_offer_accepted_to_last_sale_agreement_signed:
+    lineage:
+      - datalake_offer.sale_offer.dt_offer_accepted
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+  days_first_sale_agreement_signed_to_last_sale_agreement_signed:
+    lineage:
+      - datalake_offer.sale_offer.id_offer
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+  ts_first_sale_flow:
+    lineage:
+      - datalake_sale_flows.sale_flow.ts_first_event
+  ts_first_booking_created:
+    lineage:
+      - datalake_booking.booking.id
+      - datalake_booking.booking.is_visit_completed
+  ts_first_visit_completed:
+    lineage:
+      - datalake_booking.booking.is_visit_completed
+      - datalake_booking.booking.ts_booking_utc
+  ts_first_offer_submitted:
+    lineage:
+      - datalake_offer.sale_offer.ts_offer_submitted
+  dt_first_offer_accepted:
+    lineage:
+      - datalake_offer.sale_offer.dt_offer_accepted
+  dt_first_sale_agreement_signed:
+    lineage:
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+  ts_last_sale_flow:
+    lineage:
+      - datalake_sale_flows.sale_flow.ts_first_event
+  ts_last_booking_created:
+    lineage:
+      - datalake_booking.booking.ts_created
+  ts_last_visit_completed:
+    lineage:
+      - datalake_booking.booking.is_visit_completed
+      - datalake_booking.booking.ts_booking_utc
+  ts_last_offer_submitted:
+    lineage:
+      - datalake_offer.sale_offer.ts_offer_submitted
+  dt_last_offer_accepted:
+    lineage:
+      - datalake_offer.sale_offer.dt_offer_accepted
+  dt_last_sale_agreement_signed:
+    lineage:
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+  ts_last_event:
+    lineage:
+      - datalake_booking.booking.is_visit_completed
+      - datalake_booking.booking.ts_booking_utc
+      - datalake_booking.booking.ts_created
+      - datalake_offer.sale_offer.dt_offer_accepted
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_offer.sale_offer.ts_offer_submitted
+      - datalake_sale_flows.sale_flow.ts_first_event
