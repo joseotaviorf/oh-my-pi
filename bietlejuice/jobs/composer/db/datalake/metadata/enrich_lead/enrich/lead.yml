@@ -100,7 +100,7 @@ columns:
       - datalake_ebdb_clean.lead_reason.reason
   reason_detail:
     lineage:
-      - datalake_ebdb_clean.lead.reason_detail
+      - datalake_ebdb_clean.lead_reason.reason_detail
   lead_owner_name:
     lineage:
       - datalake_ebdb_clean.ownerlead.name
