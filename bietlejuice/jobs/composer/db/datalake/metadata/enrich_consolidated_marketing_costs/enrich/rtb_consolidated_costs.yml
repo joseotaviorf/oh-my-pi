@@ -1,0 +1,23 @@
+database_name: datalake_consolidated_marketing_costs
+table_name: rtb_consolidated_costs
+columns:
+  id_date:
+    lineage:
+      - datalake_marketing_costs_clean.rtb_campaigns.year
+      - datalake_marketing_costs_clean.rtb_campaigns.month
+      - datalake_marketing_costs_clean.rtb_campaigns.day
+  campaign_name:
+    lineage:
+      - datalake_marketing_costs_clean.rtb_campaigns.sub_campaign
+  account_name:
+    lineage:
+      - datalake_marketing_costs_clean.rtb_campaigns.account_name
+  utm_campaign:
+    lineage:
+      - datalake_marketing_costs_clean.rtb_campaigns.sub_campaign
+  other_cost:
+    lineage:
+      - datalake_marketing_costs_clean.rtb_campaigns.cost
+  total_cost:
+    lineage:
+      - datalake_marketing_costs_clean.rtb_campaigns.cost

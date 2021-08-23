@@ -1,0 +1,21 @@
+database_name: datalake_consolidated_marketing_costs
+table_name: trovit_consolidated_costs
+columns:
+  campaign_name:
+    lineage:
+      - datalake_trovit_clean.trovit_report.campaign_name
+  account_name:
+    lineage:
+      - datalake_trovit_clean.trovit_report.account_name
+  utm_campaign:
+    lineage:
+      - datalake_trovit_clean.trovit_report.campaign_name
+  desktop_cost:
+    lineage:
+      - datalake_trovit_clean.trovit_report.desktop_cost
+  mobile_cost:
+    lineage:
+      - datalake_trovit_clean.trovit_report.mobile_cost
+  total_cost:
+    lineage:
+      - datalake_trovit_clean.trovit_report.total_cost

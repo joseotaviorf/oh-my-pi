@@ -1,0 +1,38 @@
+database_name: datalake_consolidated_marketing_costs
+table_name: facebook_consolidated_costs
+columns:
+  id_date:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.year
+      - datalake_marketing_costs.facebook_insights.month
+      - datalake_marketing_costs.facebook_insights.day
+  campaign_name:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.campaign_name
+  account_name:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.acc
+  utm_campaign:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.campaign_name
+  campaign_city:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.campaign_name
+  utm_term:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.adset_name
+  utm_content:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.ad_name
+  mobile_cost:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.spend
+  desktop_cost:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.spend
+  other_cost:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.spend
+  total_cost:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.spend
