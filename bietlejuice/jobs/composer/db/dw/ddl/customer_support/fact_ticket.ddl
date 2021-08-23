@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS customer_support.fact_ticket (
     full_resolution_time DOUBLE PRECISION,
     front_or_back VARCHAR(10),
     last_back_ticket BIGINT,
-    back_tickets VARCHAR,
+    back_tickets VARCHAR(1500),
     resolution_survey BOOLEAN,
     has_answered_csat BOOLEAN,
     has_back_ticket BOOLEAN,
