@@ -16,20 +16,14 @@ WITH task_status_histories AS (
                         actionUserName: STRING,
                         assigneeId: INTEGER
                 >>'
-        )) AS history,
-        year,
-        month,
-        day
+        )) AS history
     FROM
         datalake_crm_clean.task_status_histories
     WHERE
         -- Filtering out bugged tasks with more than 500 actions
         SIZE(FROM_JSON(history,'ARRAY<STRUCT<>>')) <= 500
-        AND year = '{year}'
-        AND month = '{month}'
-        AND day = '{day}'
 )
-SELECT
+SELECT DISTINCT
     history._id.oid AS id,
     id AS id_task,
     history.actionUserId AS id_user_action,
@@ -40,10 +34,8 @@ SELECT
     history.status AS task_status,
     version,
     history.date.date AS ts_action,
-    year,
-    month,
-    day   
+    EXTRACT(YEAR FROM history.date.date) AS year,
+    EXTRACT(MONTH FROM history.date.date) AS month,
+    EXTRACT(DAY FROM history.date.date) AS day
 FROM
     task_status_histories
-WHERE 
-    DATE(history.date.date) = DATE('{year}-{month}-{day}')
