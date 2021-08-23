@@ -1,0 +1,45 @@
+database_name: datalake_kill_queue
+table_name: reservation
+columns:
+  id_reservation:
+    lineage:
+      - datalake_kill_queue_clean.reservation.id
+  id_rent_flow:
+    lineage:
+      - datalake_kill_queue_clean.reservation.id_rent_flow
+  id_tenant:
+    lineage:
+      - datalake_kill_queue_clean.reservation.id_tenant
+  id_house:
+    lineage:
+      - datalake_kill_queue_clean.house.id_main
+  version:
+    lineage:
+      - datalake_kill_queue_clean.reservation.version
+  attempt:
+    lineage:
+      - datalake_kill_queue_clean.reservation.attempt
+  status:
+    lineage:
+      - datalake_kill_queue_clean.reservation.status
+  value:
+    lineage:
+      - datalake_kill_queue_clean.reservation.value
+  mundipagg_token:
+    lineage:
+      - datalake_kill_queue_clean.reservation.mundipagg_token
+  cancellation_reason:
+    lineage:
+      - datalake_kill_queue_clean.reservation.cancellation_reason
+  installments:
+    lineage:
+      - datalake_kill_queue_clean.reservation.installments
+  is_ongoing:
+    lineage:
+      - datalake_kill_queue_clean.reservation.is_ongoing
+  ts_created:
+    lineage:
+      - datalake_kill_queue_clean.reservation.ts_created
+  ts_updated:
+    lineage:
+      - datalake_kill_queue_clean.reservation.ts_updated

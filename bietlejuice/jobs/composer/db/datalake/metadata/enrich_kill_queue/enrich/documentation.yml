@@ -1,0 +1,39 @@
+database_name: datalake_kill_queue
+table_name: documentation
+columns:
+  id:
+    lineage:
+      - datalake_kill_queue_clean.documentation.id
+  id_house:
+    lineage:
+      - datalake_kill_queue_clean.documentation.id_house
+  id_tenant:
+    lineage:
+      - datalake_kill_queue_clean.documentation.id_tenant
+  version:
+    lineage:
+      - datalake_kill_queue_clean.documentation.version
+  is_active:
+    lineage:
+      - datalake_kill_queue_clean.documentation.is_active
+  ts_expired:
+    lineage:
+      - datalake_kill_queue_clean.documentation.ts_expired
+  ts_event:
+    lineage:
+      - datalake_kill_queue_clean.documentation.ts_event
+  ts_created:
+    lineage:
+      - datalake_kill_queue_clean.documentation.ts_created
+  ts_updated:
+    lineage:
+      - datalake_kill_queue_clean.documentation.ts_updated
+  year:
+    lineage:
+      - datalake_kill_queue_clean.documentation.year
+  month:
+    lineage:
+      - datalake_kill_queue_clean.documentation.month
+  day:
+    lineage:
+      - datalake_kill_queue_clean.documentation.day

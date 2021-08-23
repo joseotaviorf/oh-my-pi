@@ -1,0 +1,60 @@
+database_name: datalake_kill_queue
+table_name: house
+columns:
+  id:
+    lineage:
+      - datalake_kill_queue_clean.house.id
+  id_main:
+    lineage:
+      - datalake_kill_queue_clean.house.id_main
+  id_owner:
+    lineage:
+      - datalake_kill_queue_clean.house.id_owner
+  id_region:
+    lineage:
+      - datalake_kill_queue_clean.house.id_region
+  city:
+    lineage:
+      - datalake_kill_queue_clean.house.city
+  complement:
+    lineage:
+      - datalake_kill_queue_clean.house.complement
+  house_number:
+    lineage:
+      - datalake_kill_queue_clean.house.house_number
+  street_address:
+    lineage:
+      - datalake_kill_queue_clean.house.street_address
+  state:
+    lineage:
+      - datalake_kill_queue_clean.house.state
+  version:
+    lineage:
+      - datalake_kill_queue_clean.house.version
+  floor:
+    lineage:
+      - datalake_kill_queue_clean.house.floor
+  rent_price:
+    lineage:
+      - datalake_kill_queue_clean.house.rent_price
+  reservation_fee:
+    lineage:
+      - datalake_kill_queue_clean.house.reservation_fee
+  is_reservation_allowed:
+    lineage:
+      - datalake_kill_queue_clean.house.is_reservation_allowed
+  ts_created:
+    lineage:
+      - datalake_kill_queue_clean.house.ts_created
+  ts_updated:
+    lineage:
+      - datalake_kill_queue_clean.house.ts_updated
+  year:
+    lineage:
+      - datalake_kill_queue_clean.house.year
+  month:
+    lineage:
+      - datalake_kill_queue_clean.house.month
+  day:
+    lineage:
+      - datalake_kill_queue_clean.house.day
