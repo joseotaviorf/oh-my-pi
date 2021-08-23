@@ -1,0 +1,43 @@
+database_name: dw_call
+table_name: dim_call
+columns:
+  sk_call:
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_events.id_call
+      - datalake_bigfone_twilio.call_flex_events.id_call
+      - datalake_bigfone_twilio.call_flex_events.id_conversation
+      - datalake_bigfone_twilio.call_flex_events.id_task
+  from_phone_number:
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_events.from_number
+      - datalake_bigfone_twilio.call_flex_events.from_number
+  to_phone_number:
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_events.to_number
+      - datalake_bigfone_twilio.call_flex_events.to_number
+  direction:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.direction
+  from_city:
+    lineage:
+      - datalake_bigfone_twilio.inbound_call_locations.from_city
+  from_state:
+    lineage:
+      - datalake_bigfone_twilio.inbound_call_locations.from_state
+  from_country:
+    lineage:
+      - datalake_bigfone_twilio.inbound_call_locations.from_country
+  scheduling_source:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.scheduling_source
+  ts_started:
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
+      - datalake_bigfone_twilio.call_flex_events.ts_created_local
+  ts_csat_answered:
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
+  ts_ended:
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
+      - datalake_bigfone_twilio.call_flex_events.ts_created_local
