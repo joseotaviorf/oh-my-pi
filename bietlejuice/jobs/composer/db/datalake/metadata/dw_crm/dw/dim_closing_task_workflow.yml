@@ -1,0 +1,27 @@
+database_name: dw_crm_migration
+table_name: dim_closing_task_workflow
+columns:
+  sk_workflow:
+    lineage:
+      - datalake_crm.workflows_transitions.id_workflow
+  status:
+    lineage:
+      - datalake_crm.workflows_transitions.status
+  ts_started:
+    lineage:
+      - datalake_crm.workflows_transitions.ts_workflow_started
+  ts_updated:
+    lineage:
+      - datalake_crm.workflows_transitions.ts_workflow_updated
+  ts_ended:
+    lineage:
+      - datalake_crm.workflows_transitions.ts_workflow_ended
+  year:
+    lineage:
+      - datalake_crm.workflows_transitions.year
+  month:
+    lineage:
+      - datalake_crm.workflows_transitions.month
+  day:
+    lineage:
+      - datalake_crm.workflows_transitions.day
