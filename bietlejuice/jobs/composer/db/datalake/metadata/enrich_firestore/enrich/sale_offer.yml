@@ -1,0 +1,99 @@
+database_name: datalake_firestore
+table_name: sale_offer
+columns:
+  id:
+    lineage:
+      - datalake_firestore_clean.sale_offer.id
+  id_sale_flow:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  id_buyer:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  id_house:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  id_owner:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  id_monday_user_last_revision:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  brokerage_fee:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  deed_price:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  earnest_value:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  fgts_value:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  financing_value:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  itbi_price:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  first_price_offered_by_buyer:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  sale_price:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  registry_price:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  planned_payment_method:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  last_price_offered_by_buyer:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  current_payment_method:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  credit_status:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  payment_entry_amount:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  payment_type:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  status:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  status_closing:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  status_reason:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  turn:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  first_discount_proposed:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  last_discount_proposed:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  has_used_negotiation_chat:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  has_used_fgts_in_payment:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  dt_tenant_left:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  ts_created:
+    lineage:
+      - datalake_firestore_clean.sale_offer.updated_message
+  ts_updated:
+    lineage:
+      - datalake_firestore_clean.sale_offer.ts_updated
