@@ -153,23 +153,31 @@ class FileService:
     @staticmethod
     @logger
     def metadata_file_exists(
-        relative_file_path: str, layer: str, table_name: str
+        relative_file_path: str, layer: str, table_name, check_all_tables=False
     ) -> bool:
         """
-        Checks if a metadata file for a given table exists
+        Checks if a metadata file for a given table exists. If check_all_tables is True,
+        checks if at least the folder for the relative_file_path and layer exists.
         :param relative_file_path: The relative path to the file.
             This should be the same as the relative_query_path used in other tasks
             e.g:
             `dw_smart_price`, `dw_marketing_costs/google`, etc
         :param layer: The layer that the file is related to.
         :param table_name: The name of the table that the file is related to
+        :param check_all_tables: if all tables are being checked or not
         :return: True if the file exists, False if no file is found
         """
-        for extension in ("yml", "yaml"):
-            files = glob.glob(
-                f"{DATALAKE_METADATA_PATH}/{relative_file_path}/{layer}/**/{table_name}.{extension}",
-                recursive=True,
-            )
-            if files and files[0]:
+        if check_all_tables:
+            folder = glob.glob(f"{DATALAKE_METADATA_PATH}/{relative_file_path}/{layer}")
+            if folder:
                 return True
-        return False
+            return False
+        else:
+            for extension in ("yml", "yaml"):
+                files = glob.glob(
+                    f"{DATALAKE_METADATA_PATH}/{relative_file_path}/{layer}/**/{table_name}.{extension}",
+                    recursive=True,
+                )
+                if files and files[0]:
+                    return True
+            return False

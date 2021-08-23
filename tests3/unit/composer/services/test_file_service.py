@@ -44,3 +44,39 @@ class TestFileService:
 
         # assert
         assert not exists
+
+    @mock.patch(
+        "bietlejuice.jobs.composer.services.file_service.DATALAKE_METADATA_PATH",
+        MOCK_DATALAKE_METADATA_PATH,
+    )
+    @mock.patch("bietlejuice.jobs.composer.services.file_service.glob")
+    def test_metadata_folder_exists(self, mocked_glob):
+        # arrange
+        mocked_glob.glob.return_value = [
+            f"{MOCK_DATALAKE_METADATA_PATH}/example/clean/"
+        ]
+
+        # act
+        exists = FileService.metadata_file_exists(
+            "example", LayerEnum.CLEAN.value, None, True
+        )
+
+        # assert
+        assert exists
+
+    @mock.patch(
+        "bietlejuice.jobs.composer.services.file_service.DATALAKE_METADATA_PATH",
+        MOCK_DATALAKE_METADATA_PATH,
+    )
+    @mock.patch("bietlejuice.jobs.composer.services.file_service.glob")
+    def test_metadata_folder_does_not_exists(self, mocked_glob):
+        # arrange
+        mocked_glob.glob.return_value = []
+
+        # act
+        exists = FileService.metadata_file_exists(
+            "example", LayerEnum.CLEAN.value, None, True
+        )
+
+        # assert
+        assert not exists

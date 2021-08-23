@@ -12,6 +12,7 @@ class MetadataPropagatorPipeline(AbstractPipeline):
 
     ENDPOINT_MAP = {
         MetadataTypeEnum.LINEAGE.value: "/lineage",
+        MetadataTypeEnum.LINEAGE_FROM_PRODUCT.value: "/lineageFromProduct",
         MetadataTypeEnum.TAGS.value: "/tags",
     }
 
@@ -28,13 +29,7 @@ class MetadataPropagatorPipeline(AbstractPipeline):
         self.endpoint = self.ENDPOINT_MAP[metadata_type.value]
 
     def build_metadata_propagator_payload(self):
-        return [
-            {
-                "vendor": ["atlas"],
-                "database_name": self.database_name,
-                "table_name": self.table_name,
-            }
-        ]
+        raise NotImplementedError()
 
     def run(self):
         payload = self.build_metadata_propagator_payload()

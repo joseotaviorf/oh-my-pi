@@ -10,9 +10,7 @@ from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.jobs.composer.base.service import ServiceEnum
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils
-from bietlejuice.jobs.composer.pipeline.metadata_propagator_pipeline import (
-    MetadataPropagatorPipeline,
-)
+from bietlejuice.jobs.composer.pipeline.lineage_tags_pipeline import LineageTagsPipeline
 
 JOB_NAME = "propagate_table_metadata"
 
@@ -28,7 +26,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "db_name_part",
         type=str,
-        help="The `source` name for raw and clean layers."
+        help="The `source` name for clean layer."
         " The `source` and/or `context` name for enrich layer. The `schema` for DW layer.",
     )
     parser.add_argument("table_name", type=str, help="table name")
@@ -63,7 +61,7 @@ if __name__ == "__main__":
         dl_ms_mapping = DatalakeMetastoreMapping(source=db_name_part, bucket="")
         database_name, _ = dl_ms_mapping.get_datalake_info_from_layer(layer)
 
-    MetadataPropagatorPipeline(
+    LineageTagsPipeline(
         metadata_propagator_host=metadata_propagator_confs_json["host"],
         database_name=database_name,
         table_name=table_name,

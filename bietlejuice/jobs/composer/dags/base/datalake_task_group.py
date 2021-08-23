@@ -62,6 +62,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         extraction_spark_job_file,
         table_name=None,
         raw_spark_job_extra_args=None,
+        create_lineage=False,
         pool=AIRFLOW_DEFAULT_POOL,
     ):
         """
@@ -81,6 +82,9 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :param raw_spark_job_extra_args: extra arguments to be passed to the spark job,
             default spark job parameters are [env, bucket]
         :type raw_spark_job_extra_args: list[str]
+        :param create_lineage: if task group should have a
+            task to automatically generate the table/tables lineage.
+        :type create_lineage: bool
         :param pool: airflow's pool name
         :type pool: str
         :return: initial and final tasks of the created task group
@@ -132,8 +136,40 @@ class DatalakeTaskGroup(BaseTaskGroup):
 
         airflow_helpers.chain(load_table_task, sync_metastore_tables_task)
 
+        metadata_type = None
+        if FileService.metadata_file_exists(
+            self.relative_query_path, layer, table_name, sync_mode == self.ALL_TABLES
+        ):
+            metadata_type = MetadataTypeEnum.TAGS.value
+        elif create_lineage:
+            metadata_type = MetadataTypeEnum.LINEAGE_FROM_PRODUCT.value
+
+        if metadata_type:
+            propagate_table_lineage_task = QuintoAndarDatabricksSubmitRunOperator(
+                dag=self.dag,
+                task_id=f"propagate-table-metadata-{layer}-{source}{tasks_name_suffix}",
+                json={
+                    "spark_python_task": {
+                        "python_file": f"{self.spark_jobs_path}/propagate_raw_tables_metadata.py",
+                        "parameters": [
+                            layer,
+                            metadata_type,
+                            target_database_base_name,
+                            self.relative_query_path,
+                            sync_mode,
+                        ]
+                        + table_name_arg,
+                    }
+                },
+                execution_timeout=timedelta(hours=self.execution_timeout_hours),
+            )
+            sync_metastore_tables_task.set_downstream([propagate_table_lineage_task])
+            final_tasks = [propagate_table_lineage_task]
+        else:
+            final_tasks = [sync_metastore_tables_task]
+
         return DatalakeTaskGroup.format_tasks_boundaries(
-            initial_tasks=[load_table_task], final_tasks=[sync_metastore_tables_task]
+            initial_tasks=[load_table_task], final_tasks=final_tasks
         )
 
     def build_raw_task_group_for_all_tables(
@@ -142,6 +178,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         target_database_base_name,
         extraction_spark_job_file,
         raw_spark_job_extra_args=None,
+        create_lineage=False,
         pool=AIRFLOW_DEFAULT_POOL,
     ):
         """
@@ -157,6 +194,9 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :param raw_spark_job_extra_args: extra arguments to be passed to the spark job,
             default spark job parameters are [env, bucket]
         :type raw_spark_job_extra_args: list[str]
+        :param create_lineage: if task group should have a
+            task to automatically generate the table lineage
+        :type create_lineage: bool
         :param pool: airflow's pool name
         :type pool: str
         :return: initial and final tasks of the created task group
@@ -167,6 +207,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             target_database_base_name=target_database_base_name,
             extraction_spark_job_file=extraction_spark_job_file,
             raw_spark_job_extra_args=raw_spark_job_extra_args,
+            create_lineage=create_lineage,
             pool=pool,
         )
 
@@ -177,6 +218,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         table_name,
         extraction_spark_job_file,
         raw_spark_job_extra_args=None,
+        create_lineage=False,
         pool=AIRFLOW_DEFAULT_POOL,
     ):
         """
@@ -194,6 +236,9 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :param raw_spark_job_extra_args: extra arguments to be passed to the spark job,
             default spark job parameters are [env, bucket]
         :type raw_spark_job_extra_args: list[str]
+        :param create_lineage: if task group should have a
+            task to automatically generate the table lineage
+        :type create_lineage: bool
         :param pool: airflow's pool name
         :type pool: str
         :return: initial and final tasks of the created task group
@@ -205,6 +250,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             extraction_spark_job_file=extraction_spark_job_file,
             table_name=table_name,
             raw_spark_job_extra_args=raw_spark_job_extra_args,
+            create_lineage=create_lineage,
             pool=pool,
         )
 
