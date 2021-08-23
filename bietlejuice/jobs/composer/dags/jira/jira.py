@@ -46,7 +46,7 @@ DEFAULT_LIBRARIES = Variable.get("bietlejuice_default_libraries", deserialize_js
 CUSTOM_LIBRARIES = [
     {
         "whl": f"{ARTIFACTS_S3_BUCKET}/jira-api-client-python/"
-        f"quintoandar_jira_api_client-0.1.0-py2.py3-none-any.whl"
+        f"quintoandar_jira_api_client-0.2.1-py2.py3-none-any.whl"
     }
 ]
 LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
