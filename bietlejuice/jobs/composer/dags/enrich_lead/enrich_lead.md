@@ -17,6 +17,7 @@ Produces the following output tables:
 
 1. In data lake enrich:
     - `reprocessed_lead`
+    - `lead`
 
 ### Responsible Data Engineering Team
 

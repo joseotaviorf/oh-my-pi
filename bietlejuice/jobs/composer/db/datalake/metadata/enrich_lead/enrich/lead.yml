@@ -1,0 +1,166 @@
+database_name: datalake_lead
+table_name: lead
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_clean.lead.id
+  id_agent:
+    lineage:
+      - datalake_ebdb_clean.lead.id_agent
+  id_region:
+    lineage:
+      - datalake_ebdb_clean.lead.id_region
+  id_external:
+    lineage:
+      - datalake_ebdb_clean.lead.id_external
+  id_lead_owner:
+    lineage:
+      - datalake_ebdb_clean.lead.id_lead_owner
+  id_user_has_indicated:
+    lineage:
+      - datalake_ebdb_clean.user.id
+  address:
+    lineage:
+      - datalake_ebdb_clean.lead.address
+  house_number:
+    lineage:
+      - datalake_ebdb_clean.lead.house_number
+  complement:
+    lineage:
+      - datalake_ebdb_clean.lead.complement
+  neighborhood:
+    lineage:
+      - datalake_ebdb_clean.lead.neighborhood
+  zip_code:
+    lineage:
+      - datalake_ebdb_clean.lead.zip_code
+  city:
+    lineage:
+      - datalake_ebdb_clean.lead.city
+  total_area:
+    lineage:
+      - datalake_ebdb_clean.lead.total_area
+  advertiser_name:
+    lineage:
+      - datalake_ebdb_clean.lead.advertiser_name
+  bathrooms:
+    lineage:
+      - datalake_ebdb_clean.lead.bathrooms
+  bedrooms:
+    lineage:
+      - datalake_ebdb_clean.lead.bedrooms
+  suites:
+    lineage:
+      - datalake_ebdb_clean.lead.suites
+  ad_url:
+    lineage:
+      - datalake_ebdb_clean.lead.ad_url
+  advertiser_phone:
+    lineage:
+      - datalake_ebdb_clean.lead.advertiser_phone
+  type:
+    lineage:
+      - datalake_ebdb_clean.lead.type
+  email:
+    lineage:
+      - datalake_ebdb_clean.lead.email
+  pick_up_email:
+    lineage:
+      - datalake_ebdb_clean.lead.pick_up_email
+  pick_up_phone:
+    lineage:
+      - datalake_ebdb_clean.lead.pick_up_phone
+  lat:
+    lineage:
+      - datalake_ebdb_clean.lead.lat
+  lng:
+    lineage:
+      - datalake_ebdb_clean.lead.lng
+  condo_price:
+    lineage:
+      - datalake_ebdb_clean.lead.condo_price
+  iptu:
+    lineage:
+      - datalake_ebdb_clean.lead.iptu
+  status:
+    lineage:
+      - datalake_ebdb_clean.lead.status
+  source:
+    lineage:
+      - datalake_ebdb_clean.lead.source
+  unbounce_page_variant:
+    lineage:
+      - datalake_ebdb_clean.lead.unbounce_page_variant
+  unbounce_page_name:
+    lineage:
+      - datalake_ebdb_clean.lead.unbounce_page_name
+  reason:
+    lineage:
+      - datalake_ebdb_clean.lead.reason
+      - datalake_ebdb_clean.lead_reason.reason
+  reason_detail:
+    lineage:
+      - datalake_ebdb_clean.lead.reason_detail
+  lead_owner_name:
+    lineage:
+      - datalake_ebdb_clean.ownerlead.name
+  lead_owner_email:
+    lineage:
+      - datalake_ebdb_clean.ownerlead.email
+  affiliate_type:
+    lineage:
+      - datalake_ebdb_clean.lead.affiliate_type
+  affiliate_operation_city:
+    lineage:
+      - datalake_ebdb_clean.affiliate_data.operation_city
+  utm_medium:
+    lineage:
+      - datalake_ebdb_clean.lead.utm_medium
+  utm_campaign:
+    lineage:
+      - datalake_ebdb_clean.lead.utm_campaign
+  utm_source:
+    lineage:
+      - datalake_ebdb_clean.lead.utm_source
+  real_estate_agency_code:
+    lineage:
+      - datalake_ebdb_clean.lead.real_estate_agency_code
+  sale_price:
+    lineage:
+      - datalake_ebdb_clean.lead.sale_price
+  is_b2b:
+    lineage:
+      - datalake_ebdb_clean.lead.extra_infos
+  is_inside_operation_area:
+    lineage:
+      - datalake_ebdb_clean.lead.is_inside_operation_area
+  is_enriched_data:
+    lineage:
+      - datalake_ebdb_clean.lead.is_enriched_data
+  is_to_be_mentioned:
+    lineage:
+      - datalake_ebdb_clean.lead.is_to_be_mentioned
+  is_for_rent:
+    lineage:
+      - datalake_ebdb_clean.lead.is_for_rent
+  is_for_sale:
+    lineage:
+      - datalake_ebdb_clean.lead.is_for_sale
+  has_processed:
+    lineage:
+      - datalake_ebdb_clean.lead.has_processed
+  has_automatically_discarded:
+    lineage:
+      - datalake_ebdb_clean.lead.has_automatically_discarded
+  dt_picked_up:
+    lineage:
+      - datalake_ebdb_clean.lead.dt_picked_up
+  ts_affiliate_operation_start:
+    lineage:
+      - datalake_ebdb_clean.affiliate_data.ts_operation_start
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.lead.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.lead.ts_updated

@@ -522,7 +522,10 @@ bietlejuice.enrich_kill_queue:
   - bietlejuice.kill_queue:load-clean-reservation
 
 bietlejuice.enrich_lead:
+  - bietlejuice.ebdb:create-clean-affiliate-data-in-data-lake
   - bietlejuice.ebdb:create-clean-lead-in-data-lake
+  - bietlejuice.ebdb:create-clean-lead-reason-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-in-data-lake
 
 bietlejuice.enrich_listing_owners:
   - bietlejuice.ebdb:create-clean-proposal-in-data-lake

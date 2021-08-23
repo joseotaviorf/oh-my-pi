@@ -1,0 +1,65 @@
+SELECT DISTINCT
+  l.id,
+  l.id_agent,
+  l.id_region,
+  l.id_external,
+  l.id_lead_owner,
+  user_affiliate.id AS id_user_has_indicated,
+  l.address,
+  l.house_number,
+  l.complement,
+  l.neighborhood,
+  l.zip_code,
+  l.city,
+  l.total_area,
+  l.advertiser_name,
+  l.bathrooms,
+  l.bedrooms,
+  l.suites,
+  l.ad_url,
+  l.advertiser_phone,
+  l.type,
+  l.email,
+  l.pick_up_email,
+  l.pick_up_phone,
+  l.lat,
+  l.lng,
+  l.condo_price,
+  l.iptu,
+  l.status,
+  l.source,
+  l.unbounce_page_variant,
+  l.unbounce_page_name,
+  COALESCE(lead_reason.reason, l.reason) AS reason,
+  -- Consider Old and New reasons
+  lead_reason.reason_detail,
+  ol.name AS lead_owner_name,
+  ol.email AS lead_owner_email,
+  l.affiliate_type,
+  ad.operation_city AS affiliate_operation_city,
+  l.utm_medium,
+  l.utm_campaign,
+  l.utm_source,
+  l.real_estate_agency_code,
+  l.sale_price,
+  COALESCE(l.extra_infos LIKE '%source=b2b_%', FALSE) AS is_b2b,
+  l.is_inside_operation_area,
+  l.is_enriched_data,
+  l.is_to_be_mentioned,
+  COALESCE(l.is_for_rent, TRUE) AS is_for_rent,
+  l.is_for_sale,
+  l.has_processed,
+  l.has_automatically_discarded,
+  l.dt_picked_up,
+  ad.ts_operation_start AS ts_affiliate_operation_start,
+  l.ts_created,
+  l.ts_updated
+FROM datalake_ebdb_clean.lead l
+LEFT JOIN datalake_ebdb_clean.ownerlead ol
+    ON ol.id = l.id_lead_owner
+LEFT JOIN datalake_ebdb_clean.affiliate_data ad
+    ON ad.id = l.id_affiliate_has_indicated
+LEFT JOIN datalake_ebdb_clean.user user_affiliate
+    ON ad.id = user_affiliate.id_affiliates
+LEFT JOIN datalake_ebdb_clean.lead_reason lead_reason
+ 	ON l.reason = lead_reason.reason_detail
