@@ -1,0 +1,26 @@
+database_name: dw_call
+table_name: dim_call_task
+columns:
+  sk_task:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_reservations.id_reservation
+  queue_name:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_reservations.queue_name
+  dt_updated:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_reservations.year
+      - datalake_bigfone_twilio.call_flex_reservations.month
+      - datalake_bigfone_twilio.call_flex_reservations.day
+  ts_created:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_reservations.ts_created
+  ts_ended:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_reservations.ts_ended
+  ts_twilio_created_local:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.ts_created_local
+  ts_twilio_created_utc:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.ts_created_utc
