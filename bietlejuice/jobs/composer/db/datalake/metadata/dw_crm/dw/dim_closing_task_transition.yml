@@ -1,0 +1,36 @@
+database_name: dw_crm_migration
+table_name: dim_closing_task_transition
+columns:
+  sk_transition:
+    lineage:
+      - datalake_crm_tasks_transitions.tasks_transitions.id_transition
+  origin_type:
+    lineage:
+      - datalake_crm_tasks_transitions.tasks_transitions.origin_type
+  destination_type:
+    lineage:
+      - datalake_crm_tasks_transitions.tasks_transitions.destination_type
+  conclusion_option:
+    lineage:
+      - datalake_crm_tasks_transitions.tasks_transitions.conclusion_option
+  conclusion_context:
+    lineage:
+      - datalake_crm_tasks_transitions.tasks_transitions.conclusion_context
+  contact_channel:
+    lineage:
+      - datalake_crm_tasks_transitions.tasks_transitions.contact_channel
+  status:
+    lineage:
+      - datalake_crm_tasks_transitions.tasks_transitions.status
+  ts_transitioned:
+    lineage:
+      - datalake_crm_tasks_transitions.tasks_transitions.ts_transitioned
+  year:
+    lineage:
+      - datalake_crm_tasks_transitions.tasks_transitions.year
+  month:
+    lineage:
+      - datalake_crm_tasks_transitions.tasks_transitions.month
+  day:
+    lineage:
+      - datalake_crm_tasks_transitions.tasks_transitions.day
