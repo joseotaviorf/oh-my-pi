@@ -13,6 +13,7 @@ class S3Loader:
 
     # todo:  check this value and argue the choice
     MAX_RECORDS_PER_FILE = 250000
+    RECORDS_COLS_PER_FILE_RELATION = 43.48 * (10 ** 6)  # For a 128 MB file
 
     @logger(exclude="df")
     def load_full_table(
@@ -152,7 +153,7 @@ class S3Loader:
         format_options,
         partitions=None,
         write_mode="overwrite",
-        max_records_per_file=MAX_RECORDS_PER_FILE,
+        max_records_per_file=None,
         optimize_dataframe=True,
         **options,
     ):
@@ -201,14 +202,21 @@ class S3Loader:
                 )
             )
 
-        df_writer = df.write.mode(write_mode).format(format_options)
+        max_records_per_file = (
+            max_records_per_file or self._calculate_dynamic_max_records(df)
+        )
 
         if optimize_dataframe:
             df = self._optimize_dataframe_partitions(
                 df, partitions, max_records_per_file
             )
+            df_writer = df.write.mode(write_mode).format(format_options)
         else:
-            df_writer = df_writer.option("maxRecordsPerFile", max_records_per_file)
+            df_writer = (
+                df.write.mode(write_mode)
+                .format(format_options)
+                .option("maxRecordsPerFile", max_records_per_file)
+            )
 
         if partitions:
             df_writer = df_writer.partitionBy(*partitions)
@@ -233,3 +241,10 @@ class S3Loader:
             ).output()
 
         return df_service.optimize_partition(max_records_per_file).output()
+
+    @logger(exclude="df")
+    def _calculate_dynamic_max_records(self, df):
+        num_cols = len(df.columns)
+        max_records_per_file = int(self.RECORDS_COLS_PER_FILE_RELATION / num_cols)
+
+        return max_records_per_file
