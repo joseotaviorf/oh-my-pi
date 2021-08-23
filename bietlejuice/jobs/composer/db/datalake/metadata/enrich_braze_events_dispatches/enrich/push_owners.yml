@@ -1,0 +1,30 @@
+database_name: datalake_braze_dispatches
+table_name: push_owners
+columns:
+  id_user_dispatch:
+    lineage:
+      - datalake_braze.events_owners.id_user_dispatch
+  id_user_braze:
+    lineage:
+      - datalake_braze.events_owners.id_user_braze
+  event_channel:
+    lineage:
+      - datalake_braze.events_owners.event_channel
+  ts_push_sent:
+    lineage:
+      - datalake_braze.events_owners.ts_event
+  ts_push_opened:
+    lineage:
+      - datalake_braze.events_owners.ts_event
+  ts_push_bounced:
+    lineage:
+      - datalake_braze.events_owners.ts_event
+  year:
+    lineage:
+      - datalake_braze.events_owners.year
+  month:
+    lineage:
+      - datalake_braze.events_owners.month
+  day:
+    lineage:
+      - datalake_braze.events_owners.day
