@@ -1,0 +1,21 @@
+database_name: datalake_bigfone_clean
+table_name: queued
+columns:
+  id:
+    lineage:
+      - datalake_bigfone_raw.queued.id
+  id_call:
+    lineage:
+      - datalake_bigfone_raw.queued.call_id
+  queue:
+    lineage:
+      - datalake_bigfone_raw.queued.queue
+  abandoned:
+    lineage:
+      - datalake_bigfone_raw.queued.abandoned
+  ts_joined_queue:
+    lineage:
+      - datalake_bigfone_raw.queued.joined_queue_time
+  ts_left_queue:
+    lineage:
+      - datalake_bigfone_raw.queued.left_queue_time

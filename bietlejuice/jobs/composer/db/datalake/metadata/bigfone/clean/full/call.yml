@@ -1,0 +1,30 @@
+database_name: datalake_bigfone_clean
+table_name: call
+columns:
+  id_source_unique:
+    lineage:
+      - datalake_bigfone_raw.call.uuid
+  caller_phone_number:
+    lineage:
+      - datalake_bigfone_raw.call.caller_phone_number
+  destination_phone_number:
+    lineage:
+      - datalake_bigfone_raw.call.destination_phone_number
+  direction:
+    lineage:
+      - datalake_bigfone_raw.call.direction
+  provider:
+    lineage:
+      - datalake_bigfone_raw.call.provider
+  metadata:
+    lineage:
+      - datalake_bigfone_raw.call.metadata
+  recording_url:
+    lineage:
+      - datalake_bigfone_raw.call.recording_url
+  ts_started:
+    lineage:
+      - datalake_bigfone_raw.call.start_time
+  ts_ended:
+    lineage:
+      - datalake_bigfone_raw.call.end_time
