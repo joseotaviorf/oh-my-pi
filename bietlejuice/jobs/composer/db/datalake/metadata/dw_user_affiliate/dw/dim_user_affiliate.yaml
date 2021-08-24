@@ -1,0 +1,88 @@
+database_name: dw_janus
+table_name: dim_user_affiliate
+columns:
+  sk_user_affiliate:
+    lineage:
+      - datalake_ebdb_user.affiliate_data.id
+  sk_user:
+    lineage:
+      - datalake_ebdb_user.user.id
+  id_user_affiliate:
+    lineage:
+      - datalake_ebdb_user.affiliate_data.id
+  sk_user_indicated_by:
+    lineage:
+      - datalake_ebdb_user.affiliate_data.id_indicated_by
+  origin:
+    lineage:
+      - datalake_ebdb_user.affiliate_data.origin
+  type:
+    lineage:
+      - datalake_ebdb_user.affiliate_data.affiliate_type
+  marketing_city_group:
+    lineage:
+      - datalake_amplitude_user.user_affiliate_origin.city_campaign
+      - datalake_region.region.city_group
+  regional:
+    lineage:
+      - datalake_region.region.regional
+  tracking_source:
+    lineage:
+      - datalake_amplitude_user.user_affiliate_origin.utm_source
+  tracking_medium:
+    lineage:
+      - datalake_amplitude_user.user_affiliate_origin.utm_medium
+  tracking_campaign:
+    lineage:
+      - datalake_amplitude_user.user_affiliate_origin.utm_campaign
+  tracking_content:
+    lineage:
+      - datalake_amplitude_user.user_affiliate_origin.utm_content
+  tracking_term:
+    lineage:
+      - datalake_amplitude_user.user_affiliate_origin.utm_term
+  tracking_platform:
+    lineage:
+      - datalake_amplitude_user.user_affiliate_origin.platform
+  tracking_device_type:
+    lineage:
+      - datalake_amplitude_user.user_affiliate_origin.device_type
+  tracking_country:
+    lineage:
+      - datalake_amplitude_user.user_affiliate_origin.country
+  tracking_state:
+    lineage:
+      - datalake_amplitude_user.user_affiliate_origin.region
+  tracking_city:
+    lineage:
+      - datalake_amplitude_user.user_affiliate_origin.city
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_affiliates.mkt_origin
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_affiliates.mkt_channel
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_affiliates.mkt_medium
+  mkt_source:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_affiliates.mkt_source
+  is_realstate_agent:
+    lineage:
+      - datalake_ebdb_user.agent_data.is_realstate_agent
+  is_photographer:
+    lineage:
+      - datalake_ebdb_user.agent_data.is_photographer
+  is_active:
+    lineage:
+      - datalake_ebdb_user.affiliate_data.is_active
+  ts_joined_program:
+    lineage:
+      - datalake_ebdb_user.affiliate_data.ts_operation_start
+  ts_created:
+    lineage:
+      - datalake_ebdb_user.affiliate_data.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_user.affiliate_data.ts_updated
