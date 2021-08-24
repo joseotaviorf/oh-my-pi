@@ -1,0 +1,10 @@
+database_name: datalake_lead
+table_name: reprocessed_lead
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_clean.lead.id
+  id_origin_lead:
+    lineage:
+      - datalake_ebdb_clean.lead.extra_infos
+      - datalake_ebdb_clean.lead.id
