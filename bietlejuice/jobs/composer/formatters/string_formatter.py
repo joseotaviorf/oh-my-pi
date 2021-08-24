@@ -38,6 +38,6 @@ class StringFormatter:
     @staticmethod
     def replace_accents(str_value: str) -> str:
         """
-        Replaces an accented charater by its respective non-accented character.
+        Replaces an accented character by its respective non-accented character.
         """
         return unidecode(str_value)

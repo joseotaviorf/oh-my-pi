@@ -75,6 +75,7 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     layer=LayerEnum.ENRICH,
     source_database_base_name=CONTEXT,
     target_database_base_name=CONTEXT,
+    cluster_config_params={"udfs": ["SF_REMOVE_ACCENTUATION"]},
 )
 
 create_cluster_task.set_downstream(

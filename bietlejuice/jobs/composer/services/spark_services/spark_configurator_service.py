@@ -1,4 +1,6 @@
-from bietlejuice.jobs.composer.services.spark_services.udfs import UDFS
+from bietlejuice.jobs.composer.services.spark_services.udfs import (
+    USER_DEFINED_FUNCTIONS,
+)
 
 
 class SparkConfiguratorService:
@@ -16,7 +18,7 @@ class SparkConfiguratorService:
 
     def configure_spark_session(self):
         """
-        Configure spark session using parameters provide. For now it registers UDFs.
+        Configure spark session using parameters provide. For now it only registers UDFs.
         """
         if self.cluster_config_params["udfs"]:
             for udf in self.cluster_config_params["udfs"]:
@@ -25,10 +27,11 @@ class SparkConfiguratorService:
     def register_udf(self, udf_identifier):
         """
         Register UDF into spark session
-        :param self:
-        :param udf_identifier:
-        :return:
+
+        :param udf_identifier: the name of UDF
+            (that was previously defined in /spark_services/udfs/__init__.py)
+        :type udf_identifier: str
         """
-        udf = UDFS[udf_identifier]
+        udf = USER_DEFINED_FUNCTIONS[udf_identifier]
         if udf:
             self.spark_client.conn.udf.register(udf_identifier, udf)

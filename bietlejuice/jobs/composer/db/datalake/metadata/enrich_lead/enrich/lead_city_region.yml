@@ -1,0 +1,9 @@
+database_name: datalake_lead
+table_name: lead_city_region
+columns:
+  id_lead:
+    lineage:
+      - datalake_ebdb_clean.lead.id
+  id_region:
+    lineage:
+      - datalake_region.region.id
