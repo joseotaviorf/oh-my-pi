@@ -1,0 +1,21 @@
+database_name: datalake_braze_events_clean
+table_name: events_tenants
+columns:
+  id:
+    lineage:
+      - datalake_braze_events_raw.events_tenants.id
+  event_info:
+    lineage:
+      - datalake_braze_events_raw.events_tenants.event_info
+  event_type:
+    lineage:
+      - datalake_braze_events_raw.events_tenants.event_type
+  year:
+    lineage:
+      - datalake_braze_events_raw.events_tenants.year
+  month:
+    lineage:
+      - datalake_braze_events_raw.events_tenants.month
+  day:
+    lineage:
+      - datalake_braze_events_raw.events_tenants.day
