@@ -1,0 +1,30 @@
+database_name: datalake_big_agent_clean
+table_name: enrollment
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.enrollment.id
+  id_agent:
+    lineage:
+      - datalake_big_agent_raw.enrollment.agent_id
+  id_program:
+    lineage:
+      - datalake_big_agent_raw.enrollment.program_id
+  details:
+    lineage:
+      - datalake_big_agent_raw.enrollment.details
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.enrollment.created_at
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.enrollment.updated_at
+  year:
+    lineage:
+      - datalake_big_agent_raw.enrollment.year
+  month:
+    lineage:
+      - datalake_big_agent_raw.enrollment.month
+  day:
+    lineage:
+      - datalake_big_agent_raw.enrollment.day

@@ -1,0 +1,24 @@
+database_name: datalake_big_agent_clean
+table_name: house
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.house.id
+  details:
+    lineage:
+      - datalake_big_agent_raw.house.metadata
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.house.created_at
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.house.updated_at
+  year:
+    lineage:
+      - datalake_big_agent_raw.house.year
+  month:
+    lineage:
+      - datalake_big_agent_raw.house.month
+  day:
+    lineage:
+      - datalake_big_agent_raw.house.day

@@ -1,0 +1,33 @@
+database_name: datalake_big_agent_clean
+table_name: agency
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.agency.id
+  id_house:
+    lineage:
+      - datalake_big_agent_raw.agency.house_id
+  id_enrollment:
+    lineage:
+      - datalake_big_agent_raw.agency.enrollment_id
+  details:
+    lineage:
+      - datalake_big_agent_raw.agency.details
+  dt_since:
+    lineage:
+      - datalake_big_agent_raw.agency.since
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.agency.created_at
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.agency.updated_at
+  year:
+    lineage:
+      - datalake_big_agent_raw.agency.year
+  month:
+    lineage:
+      - datalake_big_agent_raw.agency.month
+  day:
+    lineage:
+      - datalake_big_agent_raw.agency.day
