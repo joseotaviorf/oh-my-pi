@@ -1,0 +1,9 @@
+database_name: datalake_bob_clean
+table_name: registrar
+columns:
+  id:
+    lineage:
+      - datalake_bob_raw.registrar.id
+  id_main:
+    lineage:
+      - datalake_bob_raw.registrar.main_id

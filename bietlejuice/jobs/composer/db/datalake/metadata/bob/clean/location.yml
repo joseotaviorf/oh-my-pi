@@ -1,0 +1,45 @@
+database_name: datalake_bob_clean
+table_name: location
+columns:
+  id_house_draft:
+    lineage:
+      - datalake_bob_raw.location.house_draft_id
+  id_region:
+    lineage:
+      - datalake_bob_raw.location.region_id
+  address:
+    lineage:
+      - datalake_bob_raw.location.address
+  number:
+    lineage:
+      - datalake_bob_raw.location.number
+  floor:
+    lineage:
+      - datalake_bob_raw.location.floor
+  complement:
+    lineage:
+      - datalake_bob_raw.location.complement
+  reference_point:
+    lineage:
+      - datalake_bob_raw.location.reference_point
+  neighborhood:
+    lineage:
+      - datalake_bob_raw.location.neighborhood
+  city:
+    lineage:
+      - datalake_bob_raw.location.city
+  state:
+    lineage:
+      - datalake_bob_raw.location.state
+  zip_code:
+    lineage:
+      - datalake_bob_raw.location.zip_code
+  lat:
+    lineage:
+      - datalake_bob_raw.location.lat
+  lng:
+    lineage:
+      - datalake_bob_raw.location.lng
+  is_out_of_area:
+    lineage:
+      - datalake_bob_raw.location.out_of_area

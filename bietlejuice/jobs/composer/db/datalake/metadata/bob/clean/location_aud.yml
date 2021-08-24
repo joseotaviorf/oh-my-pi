@@ -1,0 +1,93 @@
+database_name: datalake_bob_clean
+table_name: location_aud
+columns:
+  id_house_draft:
+    lineage:
+      - datalake_bob_raw.location_aud.house_draft_id
+  id_region:
+    lineage:
+      - datalake_bob_raw.location_aud.region_id
+  rev:
+    lineage:
+      - datalake_bob_raw.location_aud.rev
+  rev_type:
+    lineage:
+      - datalake_bob_raw.location_aud.revtype
+  address:
+    lineage:
+      - datalake_bob_raw.location_aud.address
+  number:
+    lineage:
+      - datalake_bob_raw.location_aud.number
+  floor:
+    lineage:
+      - datalake_bob_raw.location_aud.floor
+  complement:
+    lineage:
+      - datalake_bob_raw.location_aud.complement
+  reference_point:
+    lineage:
+      - datalake_bob_raw.location_aud.reference_point
+  neighborhood:
+    lineage:
+      - datalake_bob_raw.location_aud.neighborhood
+  city:
+    lineage:
+      - datalake_bob_raw.location_aud.city
+  state:
+    lineage:
+      - datalake_bob_raw.location_aud.state
+  zip_code:
+    lineage:
+      - datalake_bob_raw.location_aud.zip_code
+  lat:
+    lineage:
+      - datalake_bob_raw.location_aud.lat
+  lng:
+    lineage:
+      - datalake_bob_raw.location_aud.lng
+  is_out_of_area:
+    lineage:
+      - datalake_bob_raw.location_aud.out_of_area
+  mod_id_house_draft:
+    lineage:
+      - datalake_bob_raw.location_aud.house_draft_mod
+  mod_id_region:
+    lineage:
+      - datalake_bob_raw.location_aud.region_id_mod
+  mod_address:
+    lineage:
+      - datalake_bob_raw.location_aud.address_mod
+  mod_number:
+    lineage:
+      - datalake_bob_raw.location_aud.number_mod
+  mod_floor:
+    lineage:
+      - datalake_bob_raw.location_aud.floor_mod
+  mod_complement:
+    lineage:
+      - datalake_bob_raw.location_aud.complement_mod
+  mod_reference_point:
+    lineage:
+      - datalake_bob_raw.location_aud.reference_point_mod
+  mod_neighborhood:
+    lineage:
+      - datalake_bob_raw.location_aud.neighborhood_mod
+  mod_city:
+    lineage:
+      - datalake_bob_raw.location_aud.city_mod
+  mod_state:
+    lineage:
+      - datalake_bob_raw.location_aud.state_mod
+  mod_zip_code:
+    lineage:
+      - datalake_bob_raw.location_aud.zip_code_mod
+  mod_lat:
+    lineage:
+      - datalake_bob_raw.location_aud.lat_mod
+  mod_lng:
+    lineage:
+      - datalake_bob_raw.location_aud.lng_mod
+  mod_is_out_of_area:
+    lineage:
+      - datalake_bob_raw.location_aud.out_of_area_mod

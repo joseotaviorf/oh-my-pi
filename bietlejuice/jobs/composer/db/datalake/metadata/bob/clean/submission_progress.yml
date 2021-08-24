@@ -1,0 +1,18 @@
+database_name: datalake_bob_clean
+table_name: submission_progress
+columns:
+  id_house_draft:
+    lineage:
+      - datalake_bob_raw.submission_progress.house_draft_id
+  id_external:
+    lineage:
+      - datalake_bob_raw.submission_progress.external_id
+  attempts:
+    lineage:
+      - datalake_bob_raw.submission_progress.attempts
+  status:
+    lineage:
+      - datalake_bob_raw.submission_progress.status
+  error_description:
+    lineage:
+      - datalake_bob_raw.submission_progress.error_description

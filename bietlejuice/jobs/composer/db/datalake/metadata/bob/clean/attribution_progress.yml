@@ -1,0 +1,12 @@
+database_name: datalake_bob_clean
+table_name: attribution_progress
+columns:
+  id_house_draft:
+    lineage:
+      - datalake_bob_raw.attribution_progress.house_draft_id
+  confirmation_attempts:
+    lineage:
+      - datalake_bob_raw.attribution_progress.confirmation_attempts
+  status:
+    lineage:
+      - datalake_bob_raw.attribution_progress.status

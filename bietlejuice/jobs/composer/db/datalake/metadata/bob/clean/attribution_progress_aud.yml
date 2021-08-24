@@ -1,0 +1,27 @@
+database_name: datalake_bob_clean
+table_name: attribution_progress_aud
+columns:
+  id_house_draft:
+    lineage:
+      - datalake_bob_raw.attribution_progress_aud.house_draft_id
+  rev:
+    lineage:
+      - datalake_bob_raw.attribution_progress_aud.rev
+  rev_type:
+    lineage:
+      - datalake_bob_raw.attribution_progress_aud.revtype
+  confirmation_attempts:
+    lineage:
+      - datalake_bob_raw.attribution_progress_aud.confirmation_attempts
+  status:
+    lineage:
+      - datalake_bob_raw.attribution_progress_aud.status
+  mod_id_house_draft:
+    lineage:
+      - datalake_bob_raw.attribution_progress_aud.house_draft_mod
+  mod_confirmation_attempts:
+    lineage:
+      - datalake_bob_raw.attribution_progress_aud.confirmation_attempts_mod
+  mod_status:
+    lineage:
+      - datalake_bob_raw.attribution_progress_aud.status_mod

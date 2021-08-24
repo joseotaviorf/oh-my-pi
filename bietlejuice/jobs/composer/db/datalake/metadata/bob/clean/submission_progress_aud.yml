@@ -1,0 +1,39 @@
+database_name: datalake_bob_clean
+table_name: submission_progress_aud
+columns:
+  id_house_draft:
+    lineage:
+      - datalake_bob_raw.submission_progress_aud.house_draft_id
+  id_external:
+    lineage:
+      - datalake_bob_raw.submission_progress_aud.external_id
+  rev:
+    lineage:
+      - datalake_bob_raw.submission_progress_aud.rev
+  rev_type:
+    lineage:
+      - datalake_bob_raw.submission_progress_aud.revtype
+  attempts:
+    lineage:
+      - datalake_bob_raw.submission_progress_aud.attempts
+  status:
+    lineage:
+      - datalake_bob_raw.submission_progress_aud.status
+  error_description:
+    lineage:
+      - datalake_bob_raw.submission_progress_aud.error_description
+  mod_id_house_draft:
+    lineage:
+      - datalake_bob_raw.submission_progress_aud.house_draft_mod
+  mod_id_external:
+    lineage:
+      - datalake_bob_raw.submission_progress_aud.external_id_mod
+  mod_attempts:
+    lineage:
+      - datalake_bob_raw.submission_progress_aud.attempts_mod
+  mod_status:
+    lineage:
+      - datalake_bob_raw.submission_progress_aud.status_mod
+  mod_error_description:
+    lineage:
+      - datalake_bob_raw.submission_progress_aud.error_description_mod

@@ -1,0 +1,96 @@
+database_name: datalake_bob_clean
+table_name: house_draft_aud
+columns:
+  id_house_draft:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.id
+  id_client_side:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.client_side_id
+  id_original_lead:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.original_lead_id
+  rev:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.rev
+  rev_type:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.revtype
+  registrar:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.registrar
+  owners:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.owners
+  details:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.details
+  access:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.access
+  pricing:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.pricing
+  blueprint:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.blueprint
+  status:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.status
+  business_context:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.business_context
+  type:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.type
+  administrators:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.administrators
+  mod_id_client_side:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.client_side_id_mod
+  mod_id_original_lead:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.original_lead_id_mod
+  mod_registrar:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.registrar_mod
+  mod_owners:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.owners_mod
+  mod_details:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.details_mod
+  mod_access:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.access_mod
+  mod_pricing:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.pricing_mod
+  mod_blueprint:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.blueprint_mod
+  mod_status:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.status_mod
+  mod_business_context:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.business_context_mod
+  mod_type:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.type_mod
+  mod_administrators:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.administrators_mod
+  mod_ts_created:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.created_at_mod
+  mod_ts_updated:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.updated_at_mod
+  ts_created:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.updated_at

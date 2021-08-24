@@ -1,0 +1,48 @@
+database_name: datalake_bob_clean
+table_name: house_draft
+columns:
+  id:
+    lineage:
+      - datalake_bob_raw.house_draft.id
+  id_client_side:
+    lineage:
+      - datalake_bob_raw.house_draft.client_side_id
+  id_original_lead:
+    lineage:
+      - datalake_bob_raw.house_draft.original_lead_id
+  registrar:
+    lineage:
+      - datalake_bob_raw.house_draft.registrar
+  owners:
+    lineage:
+      - datalake_bob_raw.house_draft.owners
+  details:
+    lineage:
+      - datalake_bob_raw.house_draft.details
+  access:
+    lineage:
+      - datalake_bob_raw.house_draft.access
+  pricing:
+    lineage:
+      - datalake_bob_raw.house_draft.pricing
+  blueprint:
+    lineage:
+      - datalake_bob_raw.house_draft.blueprint
+  status:
+    lineage:
+      - datalake_bob_raw.house_draft.status
+  business_context:
+    lineage:
+      - datalake_bob_raw.house_draft.business_context
+  type:
+    lineage:
+      - datalake_bob_raw.house_draft.type
+  administrators:
+    lineage:
+      - datalake_bob_raw.house_draft.administrators
+  ts_created:
+    lineage:
+      - datalake_bob_raw.house_draft.created_at
+  ts_updated:
+    lineage:
+      - datalake_bob_raw.house_draft.updated_at

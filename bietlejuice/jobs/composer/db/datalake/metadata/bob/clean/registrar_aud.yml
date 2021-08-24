@@ -1,0 +1,21 @@
+database_name: datalake_bob_clean
+table_name: registrar_aud
+columns:
+  id_registrar:
+    lineage:
+      - datalake_bob_raw.registrar_aud.id
+  id_main:
+    lineage:
+      - datalake_bob_raw.registrar_aud.main_id
+  rev:
+    lineage:
+      - datalake_bob_raw.registrar_aud.rev
+  rev_type:
+    lineage:
+      - datalake_bob_raw.registrar_aud.revtype
+  mod_id_main:
+    lineage:
+      - datalake_bob_raw.registrar_aud.main_id_mod
+  mod_house_drafts:
+    lineage:
+      - datalake_bob_raw.registrar_aud.house_drafts_mod
