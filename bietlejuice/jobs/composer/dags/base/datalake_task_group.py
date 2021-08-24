@@ -1,3 +1,4 @@
+import json
 from datetime import timedelta
 
 import airflow.utils.helpers as airflow_helpers
@@ -322,7 +323,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                         table_name,
                         str(partitions),
                         "{{ ds }}",
-                        str(cluster_config_params),
+                        json.dumps(cluster_config_params),
                         str(extra_query_template_params),
                         schema,
                     ],
