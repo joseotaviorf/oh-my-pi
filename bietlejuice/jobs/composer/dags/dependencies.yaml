@@ -633,6 +633,11 @@ bietlejuice.enrich_tracksale:
   - bietlejuice.tracksale:load-clean-dispatch
   - bietlejuice.tracksale:load-clean-answer
 
+bietlejuice.enrich_wololo_lead:
+  - bietlejuice.wololo:load-clean-prospect-aud
+  - bietlejuice.wololo:load-clean-prospect-dimension-aud
+  - bietlejuice.wololo:load-clean-rev-info
+
 bietlejuice.enrich_zendesk_custom_fields:
   - bietlejuice.zendesk_tickets
 
