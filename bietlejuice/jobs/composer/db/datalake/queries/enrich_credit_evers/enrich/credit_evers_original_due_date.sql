@@ -38,8 +38,7 @@ WITH debtors_all_time AS (
   FROM
     datalake_invoice.credit_invoice_original_due_date
   WHERE
-    dt_contract_updated = DATE('{year}-{month}-{day}')
-    AND purpose IN ('monthly', 'onboarding')
+    purpose IN ('monthly', 'onboarding')
     AND (paid_amount IS NULL
       OR status <> 'divergent-payment'
         OR (status LIKE 'divergent-payment'
