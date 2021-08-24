@@ -1,0 +1,102 @@
+database_name: datalake_firestore
+table_name: rent_offer
+columns:
+  id_firestore:
+    lineage:
+      - datalake_firestore_clean.rent_offer.id
+  id_house:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  id_owner:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  id_partner:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  id_tenant:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  id_owner_string:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  id_tenant_string:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  code:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  comment:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  house:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  iteration:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  last_proposed_rent:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  last_proposed_rent_draft:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  origin_offer:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  original_rent:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  original_total:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  rejection_reason:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  rejection_reason_description:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  resident:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  status:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  turn:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  type:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  tenant_service_fee:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  has_draft_topics:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  is_instant_offer:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  is_visualized:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  ts_first_sent:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  ts_last_sent:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  ts_deadline:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  ts_visualized:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  ts_created:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  ts_updated:
+    lineage:
+      - datalake_firestore_clean.rent_offer.updated_message
+  ts_updated_message:
+    lineage:
+      - datalake_firestore_clean.rent_offer.ts_updated
