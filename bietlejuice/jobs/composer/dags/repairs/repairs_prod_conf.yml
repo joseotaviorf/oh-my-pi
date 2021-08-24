@@ -1,6 +1,4 @@
 ---
-dag_name: repairs
-
 tables:
   - table_name: instant_approval_preference_aud
     extraction_type: full
@@ -35,3 +33,5 @@ tables:
     extraction_type: incremental
     date_filter_column: revtstmp
     unixtime_measure: miliseconds
+
+clean_partition_columns: [year, month, day]
