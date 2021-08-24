@@ -1,0 +1,66 @@
+database_name: datalake_casa_mineira_google_ads_clean
+table_name: ads_performance_report
+columns:
+  id_ad:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.ads_performance_report.id
+  id_external_customer:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.ads_performance_report.externalcustomerid
+  id_ad_group:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.ads_performance_report.adgroupid
+  id_campaign:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.ads_performance_report.campaignid
+  ad_group_name:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.ads_performance_report.adgroupname
+  ad_type:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.ads_performance_report.adtype
+  campaign_name:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.ads_performance_report.campaignname
+  clicks:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.ads_performance_report.clicks
+  cost:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.ads_performance_report.cost
+  description:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.ads_performance_report.description
+  description_one:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.ads_performance_report.description1
+  description_two:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.ads_performance_report.description2
+  device:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.ads_performance_report.device
+  display_url:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.ads_performance_report.displayurl
+  impressions:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.ads_performance_report.impressions
+  image_creative_name:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.ads_performance_report.imagecreativename
+  account_descriptive_name:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.ads_performance_report.accountdescriptivename
+  report_type:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.ads_performance_report.reporttype
+  account_snake_case:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.ads_performance_report.acc
+  dt_loaded:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.ads_performance_report.date
+  dt_created:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.ads_performance_report.dt

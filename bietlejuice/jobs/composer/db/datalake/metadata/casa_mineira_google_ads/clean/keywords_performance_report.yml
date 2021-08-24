@@ -1,0 +1,57 @@
+database_name: datalake_casa_mineira_google_ads_clean
+table_name: keywords_performance_report
+columns:
+  id_keyword:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.keywords_performance_report.id
+  id_external_customer:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.keywords_performance_report.externalcustomerid
+  id_ad_group:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.keywords_performance_report.adgroupid
+  id_campaign:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.keywords_performance_report.campaignid
+  campaign_name:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.keywords_performance_report.campaignname
+  ad_group_name:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.keywords_performance_report.adgroupname
+  clicks:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.keywords_performance_report.clicks
+  cost:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.keywords_performance_report.cost
+  device:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.keywords_performance_report.device
+  impressions:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.keywords_performance_report.impressions
+  match_type:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.keywords_performance_report.keywordmatchtype
+  labels:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.keywords_performance_report.labels
+  criteria:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.keywords_performance_report.criteria
+  account_descriptive_name:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.keywords_performance_report.accountdescriptivename
+  report_type:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.keywords_performance_report.reporttype
+  account_snake_case:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.keywords_performance_report.acc
+  dt_loaded:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.keywords_performance_report.date
+  dt_created:
+    lineage:
+      - datalake_casa_mineira_google_ads_raw.keywords_performance_report.dt
