@@ -1,0 +1,33 @@
+database_name: datalake_quinto_messenger
+table_name: channel_event
+columns:
+  id_channel_event:
+    lineage:
+      - datalake_quinto_messenger_clean.channel_event.id
+  id_message:
+    lineage:
+      - datalake_quinto_messenger_clean.channel_event.event_payload
+  id_channel:
+    lineage:
+      - datalake_quinto_messenger_clean.channel_event.id_channel_external
+  event_type:
+    lineage:
+      - datalake_quinto_messenger_clean.channel_event.event_type
+  source:
+    lineage:
+      - datalake_quinto_messenger_clean.channel_event.event_payload
+  from_phone_number:
+    lineage:
+      - datalake_quinto_messenger_clean.channel_event.event_payload
+  from_email:
+    lineage:
+      - datalake_quinto_messenger_clean.channel_event.event_payload
+  message_index:
+    lineage:
+      - datalake_quinto_messenger_clean.channel_event.event_payload
+  ts_created:
+    lineage:
+      - datalake_quinto_messenger_clean.channel_event.ts_created
+  ts_updated:
+    lineage:
+      - datalake_quinto_messenger_clean.channel_event.ts_updated
