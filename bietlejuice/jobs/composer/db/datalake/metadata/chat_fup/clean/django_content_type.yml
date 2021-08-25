@@ -1,0 +1,12 @@
+database_name: datalake_chat_fup_clean
+table_name: django_content_type
+columns:
+  id:
+    lineage:
+      - datalake_chat_fup_raw.django_content_type.id
+  app_label:
+    lineage:
+      - datalake_chat_fup_raw.django_content_type.app_label
+  model:
+    lineage:
+      - datalake_chat_fup_raw.django_content_type.model
