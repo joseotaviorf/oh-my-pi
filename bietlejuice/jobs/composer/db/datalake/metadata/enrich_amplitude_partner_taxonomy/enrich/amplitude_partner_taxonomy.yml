@@ -1,0 +1,24 @@
+database_name: datalake_amplitude_partner_taxonomy
+table_name: amplitude_partner_taxonomy
+columns:
+  id_device:
+    lineage:
+      - datalake_amplitude_clean.events.id_device
+  utm_campaign:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  utm_medium:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  utm_source:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  year:
+    lineage:
+      - datalake_amplitude_clean.events.year
+  month:
+    lineage:
+      - datalake_amplitude_clean.events.month
+  day:
+    lineage:
+      - datalake_amplitude_clean.events.day
