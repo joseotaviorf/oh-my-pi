@@ -1,0 +1,75 @@
+database_name: datalake_quinto_messenger
+table_name: task
+columns:
+  id_task:
+    lineage:
+      - datalake_quinto_messenger_clean.task.id_external
+  id_channel:
+    lineage:
+      - datalake_quinto_messenger_clean.task.id_channel_external
+  id_conversation:
+    lineage:
+      - datalake_quinto_messenger_clean.task.task_attributes
+  id_agent:
+    lineage:
+      - datalake_quinto_messenger_clean.task.assigned_to
+  agent_email:
+    lineage:
+      - datalake_quinto_messenger_clean.task.assigned_to
+  channel_type_twilio:
+    lineage:
+      - datalake_quinto_messenger_clean.task.task_attributes
+  channel_type_internal:
+    lineage:
+      - datalake_quinto_messenger_clean.task.task_attributes
+  task_status:
+    lineage:
+      - datalake_quinto_messenger_clean.task.task_status
+  channel_status:
+    lineage:
+      - datalake_quinto_messenger_clean.task.task_attributes
+  ticket_group_name:
+    lineage:
+      - datalake_quinto_messenger_clean.task.task_attributes
+  from_phone_number:
+    lineage:
+      - datalake_quinto_messenger_clean.task.task_attributes
+  twilio_phone_number:
+    lineage:
+      - datalake_quinto_messenger_clean.task.task_attributes
+  service_phone_number:
+    lineage:
+      - datalake_quinto_messenger_clean.task.task_attributes
+  routing_tags:
+    lineage:
+      - datalake_quinto_messenger_clean.task.task_attributes
+  contact_theme_tag:
+    lineage:
+      - datalake_quinto_messenger_clean.task.task_attributes
+  customer_type_tag:
+    lineage:
+      - datalake_quinto_messenger_clean.task.task_attributes
+  contact_motivation_tag:
+    lineage:
+      - datalake_quinto_messenger_clean.task.task_attributes
+  is_forwarded:
+    lineage:
+      - datalake_quinto_messenger_clean.task.task_attributes
+  task_number:
+    lineage:
+      - datalake_quinto_messenger_clean.task.task_attributes
+  seconds_to_first_response:
+    lineage:
+      - datalake_quinto_messenger_clean.task.seconds_to_first_response
+  ts_created:
+    lineage:
+      - datalake_quinto_messenger_clean.task.ts_created
+  ts_updated:
+    lineage:
+      - datalake_quinto_messenger_clean.task.ts_updated
+  ts_created_local:
+    lineage:
+      - datalake_quinto_messenger_clean.task.ts_created
+  ts_updated_local:
+    lineage:
+      - datalake_quinto_messenger_clean.task.ts_updated

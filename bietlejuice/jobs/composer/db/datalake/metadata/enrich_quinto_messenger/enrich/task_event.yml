@@ -1,0 +1,69 @@
+database_name: datalake_quinto_messenger
+table_name: task_event
+columns:
+  id_task_event:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.id_event
+  id_task:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.id_task_external
+  id_channel:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.event_payload
+  id_task_queue:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.event_payload
+  type:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.event_type
+  task_queue_name:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.event_payload
+  channel_name:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.event_payload
+  agent_full_name:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.event_payload
+  agent_email:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.event_payload
+  agent_skills:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.event_payload
+  agent_location:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.event_payload
+  task_assignment_status:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.event_payload
+  task_completion_reason:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.event_payload
+  task_priority:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.event_payload
+  ts_created:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.ts_created
+  ts_updated:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.ts_updated
+  ts_twilio_created:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.ts_created
+  ts_twilio_updated:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.ts_updated
+  ts_created_local:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.ts_created
+  ts_updated_local:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.ts_updated
+  ts_twilio_created_local:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.ts_created
+  ts_twilio_updated_local:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.ts_updated

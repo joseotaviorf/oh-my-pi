@@ -1,0 +1,56 @@
+database_name: datalake_quinto_messenger
+table_name: chat_aht
+columns:
+  dt_task_created_local:
+    lineage:
+      - datalake_quinto_messenger_clean.task.ts_created
+  agent_email:
+    lineage:
+      - datalake_quinto_messenger_clean.task.assigned_to
+  department_name:
+    lineage:
+      - datalake_quinto_messenger_clean.task.task_resource
+  ts_start_first_task:
+    lineage:
+      - datalake_quinto_messenger_clean.task.ts_created
+      - datalake_quinto_messenger_clean.task_event.event_type
+      - datalake_quinto_messenger_clean.task_event.ts_created
+  ts_end_last_task:
+    lineage:
+      - datalake_quinto_messenger_clean.task.ts_created
+      - datalake_quinto_messenger_clean.task_event.event_type
+      - datalake_quinto_messenger_clean.task_event.ts_created
+  seconds_idle_time:
+    lineage:
+      - datalake_quinto_messenger_clean.task.ts_created
+      - datalake_quinto_messenger_clean.task_event.event_type
+      - datalake_quinto_messenger_clean.task_event.ts_created
+  tasks:
+    lineage:
+      - datalake_quinto_messenger_clean.task.id_external
+  average_seconds_task_duration:
+    lineage:
+      - datalake_quinto_messenger_clean.task.ts_created
+      - datalake_quinto_messenger_clean.task_event.event_type
+      - datalake_quinto_messenger_clean.task_event.ts_created
+  cumulative_seconds_chatting_duration:
+    lineage:
+      - datalake_quinto_messenger_clean.task.ts_created
+      - datalake_quinto_messenger_clean.task_event.event_type
+      - datalake_quinto_messenger_clean.task_event.ts_created
+  seconds_chatting_duration:
+    lineage:
+      - datalake_quinto_messenger_clean.task.ts_created
+      - datalake_quinto_messenger_clean.task_event.event_type
+      - datalake_quinto_messenger_clean.task_event.ts_created
+  average_concurrency:
+    lineage:
+      - datalake_quinto_messenger_clean.task.ts_created
+      - datalake_quinto_messenger_clean.task_event.event_type
+      - datalake_quinto_messenger_clean.task_event.ts_created
+  average_handling_time_seconds:
+    lineage:
+      - datalake_quinto_messenger_clean.task.ts_created
+      - datalake_quinto_messenger_clean.task_event.event_type
+      - datalake_quinto_messenger_clean.task_event.ts_created
+
