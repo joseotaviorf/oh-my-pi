@@ -16,6 +16,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 Produces the following output tables:
 
 1. In data lake enrich:
+    - `conversion_lead`
     - `lead`
     - `lead_city_region`
     - `reprocessed_lead`
