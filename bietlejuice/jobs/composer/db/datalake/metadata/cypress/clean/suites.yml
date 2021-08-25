@@ -1,0 +1,54 @@
+database_name: datalake_cypress_clean
+table_name: suites
+columns:
+  id:
+    lineage:
+      - datalake_cypress_raw.suites.uuid
+  id_test_execution:
+    lineage:
+      - datalake_cypress_raw.suites.test_execution_id
+  timeout:
+    lineage:
+      - datalake_cypress_raw.suites._timeout
+  after_hooks:
+    lineage:
+      - datalake_cypress_raw.suites.afterhooks
+  before_hooks:
+    lineage:
+      - datalake_cypress_raw.suites.beforehooks
+  duration:
+    lineage:
+      - datalake_cypress_raw.suites.duration
+  failures:
+    lineage:
+      - datalake_cypress_raw.suites.failures
+  file:
+    lineage:
+      - datalake_cypress_raw.suites.file
+  full_file:
+    lineage:
+      - datalake_cypress_raw.suites.fullfile
+  passes:
+    lineage:
+      - datalake_cypress_raw.suites.passes
+  pending:
+    lineage:
+      - datalake_cypress_raw.suites.pending
+  is_root:
+    lineage:
+      - datalake_cypress_raw.suites.root
+  is_root_empty:
+    lineage:
+      - datalake_cypress_raw.suites.rootempty
+  skipped:
+    lineage:
+      - datalake_cypress_raw.suites.skipped
+  title:
+    lineage:
+      - datalake_cypress_raw.suites.title
+  pwa:
+    lineage:
+      - datalake_cypress_raw.suites.pwa
+  dt:
+    lineage:
+      - datalake_cypress_raw.suites.dt

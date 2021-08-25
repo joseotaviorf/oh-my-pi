@@ -1,0 +1,60 @@
+database_name: datalake_cypress_clean
+table_name: tests
+columns:
+  id:
+    lineage:
+      - datalake_cypress_raw.tests.uuid
+  id_parent:
+    lineage:
+      - datalake_cypress_raw.tests.parentuuid
+  code:
+    lineage:
+      - datalake_cypress_raw.tests.code
+  context:
+    lineage:
+      - datalake_cypress_raw.tests.context
+  duration:
+    lineage:
+      - datalake_cypress_raw.tests.duration
+  error_message:
+    lineage:
+      - datalake_cypress_raw.tests.err
+  has_failed:
+    lineage:
+      - datalake_cypress_raw.tests.fail
+  full_title:
+    lineage:
+      - datalake_cypress_raw.tests.fulltitle
+  is_hook:
+    lineage:
+      - datalake_cypress_raw.tests.ishook
+  has_passed:
+    lineage:
+      - datalake_cypress_raw.tests.pass
+  is_pending:
+    lineage:
+      - datalake_cypress_raw.tests.pending
+  has_been_skipped:
+    lineage:
+      - datalake_cypress_raw.tests.skipped
+  speed:
+    lineage:
+      - datalake_cypress_raw.tests.speed
+  state:
+    lineage:
+      - datalake_cypress_raw.tests.state
+  has_timed_out:
+    lineage:
+      - datalake_cypress_raw.tests.timedout
+  title:
+    lineage:
+      - datalake_cypress_raw.tests.title
+  retry_count:
+    lineage:
+      - datalake_cypress_raw.tests.context
+  pwa:
+    lineage:
+      - datalake_cypress_raw.tests.pwa
+  dt:
+    lineage:
+      - datalake_cypress_raw.tests.dt
