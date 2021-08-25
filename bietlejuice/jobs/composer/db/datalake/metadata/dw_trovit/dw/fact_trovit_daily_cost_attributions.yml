@@ -1,0 +1,23 @@
+---
+database_name: dw_trovit
+table_name: fact_trovit_daily_cost_attributions
+columns:
+  sk_trovit_campaign:
+    lineage:
+      - datalake_trovit_clean.trovit_report.id
+      - datalake_trovit_clean.trovit_report.curr_dt
+  sk_date:
+    lineage:
+      - datalake_trovit_clean.trovit_report.curr_dt
+  clicks:
+    lineage:
+      - datalake_trovit_clean.trovit_report.clicks
+  desktop_cost:
+    lineage:
+      - datalake_trovit_clean.trovit_report.desktop_cost
+  mobile_cost:
+    lineage:
+      - datalake_trovit_clean.trovit_report.mobile_cost
+  total_cost:
+    lineage:
+      - datalake_trovit_clean.trovit_report.total_cost
