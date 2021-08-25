@@ -1,15 +1,17 @@
-select
-  a.id,
-  a.imovel_id as id_house,
-  a.authorization_id as id_authorization,
-  a.restriction_id as id_restriction,
-  a.type_id as id_type,
-  a.occupant_id as id_occupant,
-  a.password,
-  a.description,
-  a.lockeraddress as locker_address,
-  a.additionalinfo as additional_info,
-  a.criadoem as ts_created,
-  a.atualizadoem as ts_updated,
-  a.vacanton as ts_vacant_on
-from datalake_ebdb_raw.AccessType a
+SELECT
+    id,
+    authorization_id AS id_authorization,
+    imovel_id AS id_house,
+    occupant_id AS id_occupant,
+    restriction_id AS id_restriction,
+    type_id AS id_type,
+    additionalinfo AS additional_info,
+    description,
+    lockeraddress AS locker_address,
+    password,    
+    CAST(optedkeyswithagent AS BOOLEAN) AS has_opted_keys_with_agent,
+    CAST(vacanton AS DATE) AS dt_vacated,
+    CAST(criadoem AS TIMESTAMP) AS ts_created,
+    CAST(atualizadoem AS TIMESTAMP) AS ts_updated
+FROM 
+    datalake_ebdb_raw.AccessType
