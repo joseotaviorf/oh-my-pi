@@ -1,0 +1,15 @@
+database_name: datalake_docx_clean
+table_name: document_context
+columns:
+  id:
+    lineage:
+      - datalake_docx_raw.document_context.id
+  name:
+    lineage:
+      - datalake_docx_raw.document_context.name
+  ts_created:
+    lineage:
+      - datalake_docx_raw.document_context.created_at
+  ts_updated:
+    lineage:
+      - datalake_docx_raw.document_context.updated_at

@@ -1,0 +1,33 @@
+database_name: datalake_docx_clean
+table_name: document_aud
+columns:
+  id:
+    lineage:
+      - datalake_docx_raw.document_aud.id
+  id_folder:
+    lineage:
+      - datalake_docx_raw.document_aud.folder_id
+  id_document_context:
+    lineage:
+      - datalake_docx_raw.document_aud.document_context_id
+  id_context_external:
+    lineage:
+      - datalake_docx_raw.document_aud.context_external_id
+  id_document_type:
+    lineage:
+      - datalake_docx_raw.document_aud.document_type_id
+  rev:
+    lineage:
+      - datalake_docx_raw.document_aud.rev
+  rev_type:
+    lineage:
+      - datalake_docx_raw.document_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_docx_raw.document_aud.revend
+  attributes:
+    lineage:
+      - datalake_docx_raw.document_aud.attributes
+  attachments:
+    lineage:
+      - datalake_docx_raw.document_aud.attachments

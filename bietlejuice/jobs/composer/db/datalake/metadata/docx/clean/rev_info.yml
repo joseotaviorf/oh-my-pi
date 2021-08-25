@@ -1,0 +1,9 @@
+database_name: datalake_docx_clean
+table_name: rev_info
+columns:
+  rev:
+    lineage:
+      - datalake_docx_raw.revinfo.rev
+  ts_rev:
+    lineage:
+      - datalake_docx_raw.revinfo.revtstmp

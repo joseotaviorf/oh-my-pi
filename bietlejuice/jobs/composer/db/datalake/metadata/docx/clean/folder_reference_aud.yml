@@ -1,0 +1,30 @@
+database_name: datalake_docx_clean
+table_name: folder_reference_aud
+columns:
+  id:
+    lineage:
+      - datalake_docx_raw.folder_reference_aud.id
+  rev:
+    lineage:
+      - datalake_docx_raw.folder_reference_aud.rev
+  id_folder_reference_type:
+    lineage:
+      - datalake_docx_raw.folder_reference_aud.folder_reference_type_id
+  id_source_folder:
+    lineage:
+      - datalake_docx_raw.folder_reference_aud.source_folder_id
+  id_target_folder:
+    lineage:
+      - datalake_docx_raw.folder_reference_aud.target_folder_id
+  rev_type:
+    lineage:
+      - datalake_docx_raw.folder_reference_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_docx_raw.folder_reference_aud.revend
+  mod_ts_documentation_sent:
+    lineage:
+      - datalake_docx_raw.folder_reference_aud.documentation_send_date_mod
+  ts_documentation_sent:
+    lineage:
+      - datalake_docx_raw.folder_reference_aud.documentation_send_date

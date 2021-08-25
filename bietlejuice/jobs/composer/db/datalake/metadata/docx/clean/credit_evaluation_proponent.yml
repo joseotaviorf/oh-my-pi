@@ -1,0 +1,39 @@
+database_name: datalake_docx_clean
+table_name: credit_evaluation_proponent
+columns:
+  id:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_proponent.id
+  id_credit_evaluation:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_proponent.credit_evaluation_id
+  name:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_proponent.name
+  cpf:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_proponent.cpf
+  occupation_area:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_proponent.occupation_area
+  status:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_proponent.status
+  resident:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_proponent.resident
+  proponent_type:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_proponent.proponent_type
+  income_nature:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_proponent.income_nature
+  monthly_income:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_proponent.monthly_income
+  ts_created:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_proponent.created_at
+  ts_updated:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_proponent.updated_at

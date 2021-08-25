@@ -1,0 +1,27 @@
+database_name: datalake_docx_clean
+table_name: simulation_user
+columns:
+  id:
+    lineage:
+      - datalake_docx_raw.simulation_user.id
+  id_main:
+    lineage:
+      - datalake_docx_raw.simulation_user.main_id
+  name:
+    lineage:
+      - datalake_docx_raw.simulation_user.name
+  email:
+    lineage:
+      - datalake_docx_raw.simulation_user.email
+  telephone:
+    lineage:
+      - datalake_docx_raw.simulation_user.telephone
+  version:
+    lineage:
+      - datalake_docx_raw.simulation_user.version
+  ts_created:
+    lineage:
+      - datalake_docx_raw.simulation_user.created_at
+  ts_updated:
+    lineage:
+      - datalake_docx_raw.simulation_user.updated_at

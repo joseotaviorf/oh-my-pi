@@ -1,0 +1,18 @@
+database_name: datalake_docx_clean
+table_name: user_tenant_flow
+columns:
+  id:
+    lineage:
+      - datalake_docx_raw.user_tenant_flow.id
+  id_user:
+    lineage:
+      - datalake_docx_raw.user_tenant_flow.user_id
+  tenant_flow:
+    lineage:
+      - datalake_docx_raw.user_tenant_flow.tenant_flow
+  ts_created:
+    lineage:
+      - datalake_docx_raw.user_tenant_flow.created_at
+  ts_updated:
+    lineage:
+      - datalake_docx_raw.user_tenant_flow.updated_at

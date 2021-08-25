@@ -1,0 +1,36 @@
+database_name: datalake_docx_clean
+table_name: simulation
+columns:
+  id:
+    lineage:
+      - datalake_docx_raw.simulation.id
+  id_simulation_user:
+    lineage:
+      - datalake_docx_raw.simulation.simulation_user_id
+  version:
+    lineage:
+      - datalake_docx_raw.simulation.version
+  simulation_version:
+    lineage:
+      - datalake_docx_raw.simulation.simulation_version
+  sharing_option:
+    lineage:
+      - datalake_docx_raw.simulation.sharing_option
+  result:
+    lineage:
+      - datalake_docx_raw.simulation.result
+  max_package:
+    lineage:
+      - datalake_docx_raw.simulation.max_package
+  ts_calculated:
+    lineage:
+      - datalake_docx_raw.simulation.calculated_at
+  ts_queried:
+    lineage:
+      - datalake_docx_raw.simulation.queried_at
+  ts_created:
+    lineage:
+      - datalake_docx_raw.simulation.created_at
+  ts_updated:
+    lineage:
+      - datalake_docx_raw.simulation.updated_at

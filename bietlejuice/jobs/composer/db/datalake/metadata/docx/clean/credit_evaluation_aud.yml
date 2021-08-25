@@ -1,0 +1,45 @@
+database_name: datalake_docx_clean
+table_name: credit_evaluation_aud
+columns:
+  id_credit_evaluation:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_aud.id
+  id_proposal:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_aud.proposal_id
+  id_house:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_aud.house_id
+  id_user:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_aud.user_id
+  rev:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_aud.rev
+  rev_type:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_aud.revtype
+  status:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_aud.status
+  result:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_aud.result
+  reason:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_aud.reason
+  rev_end:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_aud.revend
+  mod_id_user:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_aud.user_id_mod
+  mod_status:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_aud.status_mod
+  mod_result:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_aud.result_mod
+  mod_reason:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_aud.reason_mod

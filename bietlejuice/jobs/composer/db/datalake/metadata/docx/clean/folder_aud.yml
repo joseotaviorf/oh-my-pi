@@ -1,0 +1,21 @@
+database_name: datalake_docx_clean
+table_name: folder_aud
+columns:
+  id:
+    lineage:
+      - datalake_docx_raw.folder_aud.id
+  id_external:
+    lineage:
+      - datalake_docx_raw.folder_aud.external_id
+  id_folder_type:
+    lineage:
+      - datalake_docx_raw.folder_aud.folder_type_id
+  rev:
+    lineage:
+      - datalake_docx_raw.folder_aud.rev
+  rev_type:
+    lineage:
+      - datalake_docx_raw.folder_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_docx_raw.folder_aud.revend

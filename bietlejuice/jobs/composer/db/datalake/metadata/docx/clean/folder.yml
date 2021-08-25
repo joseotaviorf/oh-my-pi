@@ -1,0 +1,18 @@
+database_name: datalake_docx_clean
+table_name: folder
+columns:
+  id:
+    lineage:
+      - datalake_docx_raw.folder.id
+  id_external:
+    lineage:
+      - datalake_docx_raw.folder.external_id
+  id_folder_type:
+    lineage:
+      - datalake_docx_raw.folder.folder_type_id
+  ts_created:
+    lineage:
+      - datalake_docx_raw.folder.created_at
+  ts_updated:
+    lineage:
+      - datalake_docx_raw.folder.updated_at

@@ -1,0 +1,30 @@
+database_name: datalake_docx_clean
+table_name: document
+columns:
+  id:
+    lineage:
+      - datalake_docx_raw.document.id
+  id_folder:
+    lineage:
+      - datalake_docx_raw.document.folder_id
+  id_document_context:
+    lineage:
+      - datalake_docx_raw.document.document_context_id
+  id_context_external:
+    lineage:
+      - datalake_docx_raw.document.context_external_id
+  id_document_type:
+    lineage:
+      - datalake_docx_raw.document.document_type_id
+  attributes:
+    lineage:
+      - datalake_docx_raw.document.attributes
+  attachments:
+    lineage:
+      - datalake_docx_raw.document.attachments
+  ts_created:
+    lineage:
+      - datalake_docx_raw.document.created_at
+  ts_updated:
+    lineage:
+      - datalake_docx_raw.document.updated_at

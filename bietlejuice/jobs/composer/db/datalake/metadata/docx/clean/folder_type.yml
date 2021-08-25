@@ -1,0 +1,15 @@
+database_name: datalake_docx_clean
+table_name: folder_type
+columns:
+  id:
+    lineage:
+      - datalake_docx_raw.folder_type.id
+  name:
+    lineage:
+      - datalake_docx_raw.folder_type.name
+  ts_created:
+    lineage:
+      - datalake_docx_raw.folder_type.created_at
+  ts_updated:
+    lineage:
+      - datalake_docx_raw.folder_type.updated_at
