@@ -1,0 +1,12 @@
+database_name: datalake_cidade_alerta_clean
+table_name: highlights
+columns:
+  id:
+    lineage:
+      - datalake_cidade_alerta_raw.highlights._id
+  field:
+    lineage:
+      - datalake_cidade_alerta_raw.highlights.field
+  rank:
+    lineage:
+      - datalake_cidade_alerta_raw.highlights.rank

@@ -1,0 +1,96 @@
+database_name: datalake_cidade_alerta_clean
+table_name: profile
+columns:
+  id:
+    lineage:
+      - datalake_cidade_alerta_raw.profile._id
+  id_agent:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.agentid
+  id_hash:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.hashid
+  id_push_user:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.push_user_id
+  id_quintoandar:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.quintoandar_id
+  business_context:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.businesscontext
+  name:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.name
+  first_name:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.firstname
+  birth_date:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.birthdate
+  cpf:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.cpf
+  email:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.email
+  alternative_email:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.alternativeemail
+  phone:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.phone
+  phone_number:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.phonenumber
+  phone_number_secondary:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.phonenumbersecondary
+  phone_number_secondary_view:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.phonenumbersecondaryview
+  phone_number_view:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.phonenumberview
+  house_alerts:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.house_alerts
+  houses_sent:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.houses_sent
+  similar_houses_blocklist:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.similar_houses_blacklist
+  unsubscribed_notifications:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.unsubscribed_notifications
+  visit_time_alert:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.visit_time_alert
+  has_document:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.hasdocument
+  has_accept_sms:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.acceptsms
+  has_accept_whatsapp:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.acceptwhatsapp
+  has_visit_time_alert_subscription:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.visit_time_alert_subscription
+  has_new_houses_alert_subscription:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.new_houses_alert_subscription
+  is_partner:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.ispartner
+  is_pwa:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.is_pwa
+  is_instant_login:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.isinstantlogin
+  ts_last_email_run:
+    lineage:
+      - datalake_cidade_alerta_raw.profile.last_email_run

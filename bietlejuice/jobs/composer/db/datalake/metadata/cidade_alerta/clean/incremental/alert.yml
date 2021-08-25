@@ -1,0 +1,105 @@
+database_name: datalake_cidade_alerta_clean
+table_name: alert
+columns:
+  id:
+    lineage:
+      - datalake_cidade_alerta_raw.alert._id
+  id_user:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.user_id
+  id_profile:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.profile_id
+  id_house:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.house_id
+  ids_house:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.house_ids
+  ids_houses:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.houses_ids
+  id_lead:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.lead_id
+  id_push_user:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.push_user_id
+  id_quintoandar:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.quintoandar_id
+  id_grandpa_user:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.grandpa_user_id
+  id_device:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.device_id
+  name:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.name
+  type:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.type
+  days:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.days
+  visit_code:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.visit_code
+  business_context:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.business_context
+  cloudsearch_criteria:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.cloudsearch_criteria
+  filters:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.filters
+  houses_sent:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.houses_sent
+  notifications_sent_agent:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.notifications_sent_agent
+  results:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.results
+  source:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.source
+  is_active:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.active
+  is_auto_scheduling_possible:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.is_auto_scheduling_possible
+  dt_alert_triggered:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.date
+  ts_created:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.created_at
+  ts_updated:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.updated_at
+  ts_visited:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.visit_day_time
+  ts_last_email_run:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.last_email_run
+  ts_last_activation:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.lastactivation
+  ts_last_day_sent:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.last_day_sent
+  year:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.year
+  month:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.month
+  day:
+    lineage:
+      - datalake_cidade_alerta_raw.alert.day

@@ -1,0 +1,36 @@
+database_name: datalake_cidade_alerta_clean
+table_name: audit
+columns:
+  id:
+    lineage:
+      - datalake_cidade_alerta_raw.audit._id
+  id_entity:
+    lineage:
+      - datalake_cidade_alerta_raw.audit.entity_id
+  collection_name:
+    lineage:
+      - datalake_cidade_alerta_raw.audit.collection
+  entity_data:
+    lineage:
+      - datalake_cidade_alerta_raw.audit.entity_data
+  query:
+    lineage:
+      - datalake_cidade_alerta_raw.audit.query
+  operation_type:
+    lineage:
+      - datalake_cidade_alerta_raw.audit.operation
+  is_status:
+    lineage:
+      - datalake_cidade_alerta_raw.audit.status
+  ts_revised:
+    lineage:
+      - datalake_cidade_alerta_raw.audit.revision_date
+  year:
+    lineage:
+      - datalake_cidade_alerta_raw.audit.year
+  month:
+    lineage:
+      - datalake_cidade_alerta_raw.audit.month
+  day:
+    lineage:
+      - datalake_cidade_alerta_raw.audit.day
