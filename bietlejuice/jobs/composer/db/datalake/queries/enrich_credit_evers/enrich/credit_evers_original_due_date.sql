@@ -14,22 +14,12 @@ WITH debtors_all_time AS (
       )
     ) AS months_of_contract,
     CASE
-      WHEN is_over_180 THEN 180
-      WHEN is_over_160 THEN 160
-      WHEN is_over_140 THEN 140
       WHEN is_over_120 THEN 120
-      WHEN is_over_110 THEN 110
-      WHEN is_over_100 THEN 100
       WHEN is_over_90 THEN 90
-      WHEN is_over_80 THEN 80
-      WHEN is_over_70 THEN 70
       WHEN is_over_60 THEN 60
-      WHEN is_over_50 THEN 50
       WHEN is_over_40 THEN 40
       WHEN is_over_30 THEN 30
-      WHEN is_over_20 THEN 20
       WHEN is_over_15 THEN 15
-      WHEN is_over_10 THEN 10
     END AS invoice_over_number,
     due_amount,
     ts_signature,
@@ -38,7 +28,8 @@ WITH debtors_all_time AS (
   FROM
     datalake_invoice.credit_invoice_original_due_date
   WHERE
-    purpose IN ('monthly', 'onboarding')
+    ts_signature >= DATE('2018-01-01')
+    AND purpose IN ('monthly', 'onboarding')
     AND (paid_amount IS NULL
       OR status <> 'divergent-payment'
         OR (status LIKE 'divergent-payment'
@@ -48,15 +39,13 @@ WITH debtors_all_time AS (
 mob_array AS (
   SELECT
     EXPLODE(
-      ARRAY(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-            20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37,
-            38, 39, 40)
+      ARRAY(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 40)
     ) AS contract_mob_number
 ),
 ever_array AS (
   SELECT
     EXPLODE(
-      ARRAY(10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 140, 160, 180)
+      ARRAY(15, 30, 40, 60, 90, 120)
     ) AS contract_ever_number
 )
 SELECT
