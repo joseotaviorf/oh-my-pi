@@ -1,0 +1,54 @@
+database_name: dw_janus
+table_name: dim_partner
+columns:
+  sk_partner:
+    lineage:
+      - datalake_ebdb_clean.partner.id
+  id_partner:
+    lineage:
+      - datalake_ebdb_clean.partner.id
+  id_amplitude_device:
+    lineage:
+      - datalake_ebdb_clean.partner.id_amplitude_device
+  name:
+    lineage:
+      - datalake_ebdb_clean.partner.name
+  trade_name:
+    lineage:
+      - datalake_ebdb_clean.partner.trade_name
+  phone:
+    lineage:
+      - datalake_ebdb_clean.partner.phone
+  email:
+    lineage:
+      - datalake_ebdb_clean.partner.email
+  cnpj:
+    lineage:
+      - datalake_ebdb_clean.partner.cnpj
+  creci:
+    lineage:
+      - datalake_ebdb_clean.partner.creci
+  type:
+    lineage:
+      - datalake_ebdb_clean.partner.type
+  city:
+    lineage:
+      - datalake_ebdb_clean.partner.city
+  utm_campaign:
+    lineage:
+      - datalake_amplitude_partner_taxonomy.amplitude_partner_taxonomy.utm_campaign
+  utm_medium:
+    lineage:
+      - datalake_amplitude_partner_taxonomy.amplitude_partner_taxonomy.utm_medium
+  utm_source:
+    lineage:
+      - datalake_amplitude_partner_taxonomy.amplitude_partner_taxonomy.utm_source
+  ts_joined_partnership:
+    lineage:
+      - datalake_ebdb_clean.partner.ts_partnership_started
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.partner.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.partner.ts_updated
