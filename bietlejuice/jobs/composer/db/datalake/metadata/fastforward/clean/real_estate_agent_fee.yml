@@ -1,0 +1,27 @@
+database_name: datalake_fastforward_clean
+table_name: real_estate_agent_fee
+columns:
+  id:
+    lineage:
+      - datalake_fastforward_raw.real_estate_agent_fee.id
+  id_agent:
+    lineage:
+      - datalake_fastforward_raw.real_estate_agent_fee.agent_id
+  id_contract:
+    lineage:
+      - datalake_fastforward_raw.real_estate_agent_fee.contract_id
+  fee:
+    lineage:
+      - datalake_fastforward_raw.real_estate_agent_fee.fee
+  month:
+    lineage:
+      - datalake_fastforward_raw.real_estate_agent_fee.month
+  year:
+    lineage:
+      - datalake_fastforward_raw.real_estate_agent_fee.year
+  ts_created:
+    lineage:
+      - datalake_fastforward_raw.real_estate_agent_fee.created_at
+  ts_updated:
+    lineage:
+      - datalake_fastforward_raw.real_estate_agent_fee.updated_at

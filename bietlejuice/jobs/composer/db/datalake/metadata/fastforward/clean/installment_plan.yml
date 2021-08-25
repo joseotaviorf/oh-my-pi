@@ -1,0 +1,21 @@
+database_name: datalake_fastforward_clean
+table_name: installment_plan
+columns:
+  id:
+    lineage:
+      - datalake_fastforward_raw.installment_plan.id
+  installments:
+    lineage:
+      - datalake_fastforward_raw.installment_plan.number_of_installments
+  interest_rate:
+    lineage:
+      - datalake_fastforward_raw.installment_plan.interest_rate
+  min_installment_value:
+    lineage:
+      - datalake_fastforward_raw.installment_plan.min_installment_value
+  ts_created:
+    lineage:
+      - datalake_fastforward_raw.installment_plan.created_at
+  ts_updated:
+    lineage:
+      - datalake_fastforward_raw.installment_plan.updated_at

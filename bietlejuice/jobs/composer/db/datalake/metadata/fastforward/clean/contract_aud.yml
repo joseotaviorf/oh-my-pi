@@ -1,0 +1,42 @@
+database_name: datalake_fastforward_clean
+table_name: contract_aud
+columns:
+  id_contract:
+    lineage:
+      - datalake_fastforward_raw.contract_aud.id
+  id_external:
+    lineage:
+      - datalake_fastforward_raw.contract_aud.external_id
+  id_landlord:
+    lineage:
+      - datalake_fastforward_raw.contract_aud.landlord_id
+  id_house:
+    lineage:
+      - datalake_fastforward_raw.contract_aud.house_id
+  id_owner:
+    lineage:
+      - datalake_fastforward_raw.contract_aud.owner_id
+  id_brokerage_fee:
+    lineage:
+      - datalake_fastforward_raw.contract_aud.brokerage_fee_id
+  id_installment_plan:
+    lineage:
+      - datalake_fastforward_raw.contract_aud.installment_plan_id
+  rev:
+    lineage:
+      - datalake_fastforward_raw.contract_aud.rev
+  rev_type:
+    lineage:
+      - datalake_fastforward_raw.contract_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_fastforward_raw.contract_aud.revend
+  is_off_limits:
+    lineage:
+      - datalake_fastforward_raw.contract_aud.off_limits
+  ts_started:
+    lineage:
+      - datalake_fastforward_raw.contract_aud.start_date
+  ts_ended:
+    lineage:
+      - datalake_fastforward_raw.contract_aud.end_date
