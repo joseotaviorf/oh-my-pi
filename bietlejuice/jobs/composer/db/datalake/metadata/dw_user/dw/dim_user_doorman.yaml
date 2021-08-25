@@ -1,0 +1,63 @@
+database_name: dw_janus
+table_name: dim_user_doorman
+columns:
+  sk_user_doorman:
+    lineage:
+      - datalake_ebdb_user.user_doorman.id
+  sk_user_affiliate:
+    lineage:
+      - datalake_ebdb_user.user_doorman.id_affiliate_data
+  id_user_doorman:
+    lineage:
+      - datalake_ebdb_user.user_doorman.id
+  occupation_id:
+    lineage:
+      - datalake_ebdb_user.user_doorman.id_doorman_occupation
+  work_place_id:
+    lineage:
+      - datalake_ebdb_user.user_doorman.id_place
+  work_address:
+    lineage:
+      - datalake_ebdb_user.user_doorman.work_address
+  work_street:
+    lineage:
+      - datalake_ebdb_user.user_doorman.work_street
+  work_house_number:
+    lineage:
+      - datalake_ebdb_user.user_doorman.work_house_number
+  work_neighbourhood:
+    lineage:
+      - datalake_ebdb_user.user_doorman.work_neighborhood
+  work_city:
+    lineage:
+      - datalake_ebdb_user.user_doorman.work_city
+  work_state:
+    lineage:
+      - datalake_ebdb_user.user_doorman.work_state
+  work_lat:
+    lineage:
+      - datalake_ebdb_user.user_doorman.lat
+  work_lng:
+    lineage:
+      - datalake_ebdb_user.user_doorman.lng
+  recruiter:
+    lineage:
+      - datalake_ebdb_user.user_doorman.recruiter
+  subscription_source:
+    lineage:
+      - datalake_ebdb_user.user_doorman.subscription_source
+  occupation_name:
+    lineage:
+      - datalake_ebdb_user.user_doorman.occupation_name
+  is_active:
+    lineage:
+      - datalake_ebdb_user.user_doorman.is_active
+  ts_created:
+    lineage:
+      - datalake_ebdb_user.user_doorman.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_user.user_doorman.ts_updated
+  ts_joined_program:
+    lineage:
+      - datalake_ebdb_user.user_doorman.ts_joined
