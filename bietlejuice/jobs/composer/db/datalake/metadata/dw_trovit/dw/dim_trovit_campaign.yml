@@ -1,0 +1,14 @@
+---
+database_name: dw_trovit
+table_name: dim_trovit_campaign
+columns:
+  sk_trovit_campaign:
+    lineage:
+      - datalake_trovit_clean.trovit_report.id
+      - datalake_trovit_clean.trovit_report.curr_dt
+  campaign_name:
+    lineage:
+      - datalake_trovit_clean.trovit_report.campaign_name
+  account_name:
+    lineage:
+      - datalake_trovit_clean.trovit_report.account_name
