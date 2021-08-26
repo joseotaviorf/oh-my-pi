@@ -1,0 +1,25 @@
+database_name: datalake_nps_answer_drivers
+table_name: answer_drivers
+columns:
+  id_answer:
+    lineage:
+      - datalake_tracksale.answer.id
+  id_house_listing:
+    lineage:
+      - datalake_tracksale.answer_tags.tag_value
+      - datalake_ebdb_listing.house_listing.id_house_listing
+  id_listing:
+    lineage:
+      - datalake_ebdb_clean.house.id
+  id_booking:
+    lineage:
+      - datalake_tracksale.answer_tags.tag_value
+  id_tta:
+    lineage:
+      - datalake_tracksale.answer_tags.tag_value
+  id_offer_context:
+    lineage:
+      - datalake_tracksale.answer_tags.tag_value
+  id_contract:
+    lineage:
+      - datalake_tracksale.answer_tags.tag_value
