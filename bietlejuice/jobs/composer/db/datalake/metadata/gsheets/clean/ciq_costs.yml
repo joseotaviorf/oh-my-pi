@@ -1,0 +1,39 @@
+database_name: datalake_gsheets_clean
+table_name: ciq_costs
+columns:
+  city:
+    lineage:
+      - datalake_gsheets_raw.ciq_costs.city
+  comission_cs_ciq_full:
+    lineage:
+      - datalake_gsheets_raw.ciq_costs.comission_cs_ciq_full
+  comission_cs_ciq_manager:
+    lineage:
+      - datalake_gsheets_raw.ciq_costs.comission_cs_ciq_manager
+  comission_listing:
+    lineage:
+      - datalake_gsheets_raw.ciq_costs.comission_listing
+  data:
+    lineage:
+      - datalake_gsheets_raw.ciq_costs.data
+  impostos:
+    lineage:
+      - datalake_gsheets_raw.ciq_costs.impostos
+  month:
+    lineage:
+      - datalake_gsheets_raw.ciq_costs.month
+  other:
+    lineage:
+      - datalake_gsheets_raw.ciq_costs.other
+  revshare_cs_ciq_full:
+    lineage:
+      - datalake_gsheets_raw.ciq_costs.revshare_cs_ciq_full
+  revshare_cs_ciq_manager:
+    lineage:
+      - datalake_gsheets_raw.ciq_costs.revshare_cs_ciq_manager
+  week_start:
+    lineage:
+      - datalake_gsheets_raw.ciq_costs.week_start
+  year:
+    lineage:
+      - datalake_gsheets_raw.ciq_costs.year

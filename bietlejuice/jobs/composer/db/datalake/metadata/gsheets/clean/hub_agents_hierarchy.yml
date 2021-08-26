@@ -1,0 +1,45 @@
+database_name: datalake_gsheets_clean
+table_name: hub_agents_hierarchy
+columns:
+  cpf:
+    lineage:
+      - datalake_gsheets_raw.hub_agents_hierarchy.cpf
+  cnpj:
+    lineage:
+      - datalake_gsheets_raw.hub_agents_hierarchy.cnpj
+  creci:
+    lineage:
+      - datalake_gsheets_raw.hub_agents_hierarchy.creci
+  full_name:
+    lineage:
+      - datalake_gsheets_raw.hub_agents_hierarchy.full_name
+  quintoandar_email:
+    lineage:
+      - datalake_gsheets_raw.hub_agents_hierarchy.quintoandar_email
+  personal_number:
+    lineage:
+      - datalake_gsheets_raw.hub_agents_hierarchy.personal_number
+  status:
+    lineage:
+      - datalake_gsheets_raw.hub_agents_hierarchy.status
+  register_status:
+    lineage:
+      - datalake_gsheets_raw.hub_agents_hierarchy.register_status
+  function_type:
+    lineage:
+      - datalake_gsheets_raw.hub_agents_hierarchy.function_type
+  hub_region:
+    lineage:
+      - datalake_gsheets_raw.hub_agents_hierarchy.hub_region
+  manager:
+    lineage:
+      - datalake_gsheets_raw.hub_agents_hierarchy.manager
+  has_email_quintoandar:
+    lineage:
+      - datalake_gsheets_raw.hub_agents_hierarchy.has_email_quintoandar
+  dt_entrance:
+    lineage:
+      - datalake_gsheets_raw.hub_agents_hierarchy.dt_entrance
+  dt_ended:
+    lineage:
+      - datalake_gsheets_raw.hub_agents_hierarchy.dt_ended

@@ -1,0 +1,51 @@
+database_name: datalake_gsheets_clean
+table_name: affiliate_type_targets
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.affiliate_type_targets.city_group
+  tier:
+    lineage:
+      - datalake_gsheets_raw.affiliate_type_targets.tier
+  business:
+    lineage:
+      - datalake_gsheets_raw.affiliate_type_targets.business
+  supply_origin:
+    lineage:
+      - datalake_gsheets_raw.affiliate_type_targets.supply_origin
+  supply_type_of_user:
+    lineage:
+      - datalake_gsheets_raw.affiliate_type_targets.supply_type_of_user
+  new_users:
+    lineage:
+      - datalake_gsheets_raw.affiliate_type_targets.new_users
+  active_users:
+    lineage:
+      - datalake_gsheets_raw.affiliate_type_targets.active_users
+  total_users:
+    lineage:
+      - datalake_gsheets_raw.affiliate_type_targets.total_users
+  prospects:
+    lineage:
+      - datalake_gsheets_raw.affiliate_type_targets.prospects
+  qualifieds:
+    lineage:
+      - datalake_gsheets_raw.affiliate_type_targets.qualifieds
+  cost:
+    lineage:
+      - datalake_gsheets_raw.affiliate_type_targets.cost
+  target_month:
+    lineage:
+      - datalake_gsheets_raw.affiliate_type_targets.target_month
+  quarter:
+    lineage:
+      - datalake_gsheets_raw.affiliate_type_targets.quarter
+  half_year:
+    lineage:
+      - datalake_gsheets_raw.affiliate_type_targets.half_year
+  dt_target:
+    lineage:
+      - datalake_gsheets_raw.affiliate_type_targets.target_date
+  dt_week_started:
+    lineage:
+      - datalake_gsheets_raw.affiliate_type_targets.week_start

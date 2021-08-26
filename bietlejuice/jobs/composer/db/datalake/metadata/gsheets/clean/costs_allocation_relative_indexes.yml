@@ -1,0 +1,24 @@
+database_name: datalake_gsheets_clean
+table_name: costs_allocation_relative_indexes
+columns:
+  cost_definition:
+    lineage:
+      - datalake_gsheets_raw.costs_allocation_relative_indexes.cost_definition
+  cost_funnel:
+    lineage:
+      - datalake_gsheets_raw.costs_allocation_relative_indexes.cost_funnel
+  cost_type:
+    lineage:
+      - datalake_gsheets_raw.costs_allocation_relative_indexes.cost_type
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_raw.costs_allocation_relative_indexes.mkt_origin
+  relative_value_fr_fs:
+    lineage:
+      - datalake_gsheets_raw.costs_allocation_relative_indexes.relative_value_fr_fs
+  month_start:
+    lineage:
+      - datalake_gsheets_raw.costs_allocation_relative_indexes.month_start
+  month_end:
+    lineage:
+      - datalake_gsheets_raw.costs_allocation_relative_indexes.month_end

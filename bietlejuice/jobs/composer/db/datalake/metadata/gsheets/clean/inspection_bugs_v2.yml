@@ -1,0 +1,21 @@
+database_name: datalake_gsheets_clean
+table_name: inspection_bugs_v2
+columns:
+  id_inspection:
+    lineage:
+      - datalake_gsheets_raw.vistoria_bugs_v2.id_inspection
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.vistoria_bugs_v2.id_house
+  id_inspector:
+    lineage:
+      - datalake_gsheets_raw.vistoria_bugs_v2.id_inspector
+  type:
+    lineage:
+      - datalake_gsheets_raw.vistoria_bugs_v2.type
+  description:
+    lineage:
+      - datalake_gsheets_raw.vistoria_bugs_v2.description
+  inspector_name:
+    lineage:
+      - datalake_gsheets_raw.vistoria_bugs_v2.inspector_name

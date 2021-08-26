@@ -1,0 +1,33 @@
+database_name: datalake_gsheets_clean
+table_name: affiliates_monthly_expected_results
+columns:
+  sk_date:
+    lineage:
+      - datalake_gsheets_raw.ltvoutput.sk_date
+  sk_user_lead_affiliate:
+    lineage:
+      - datalake_gsheets_raw.ltvoutput.sk_user_lead_affiliate
+  ltv:
+    lineage:
+      - datalake_gsheets_raw.ltvoutput.ltv
+  avg_daily_prospects_last_6_months:
+    lineage:
+      - datalake_gsheets_raw.ltvoutput.avg_daily_prospects_last_6_months
+  avg_p2fl_last_6_months:
+    lineage:
+      - datalake_gsheets_raw.ltvoutput.avg_p2fl_last_6_months
+  avg_p2q_last_6_months:
+    lineage:
+      - datalake_gsheets_raw.ltvoutput.avg_p2q_last_6_months
+  avg_rent_value_last_6_months:
+    lineage:
+      - datalake_gsheets_raw.ltvoutput.avg_rent_value_last_6_months
+  cluster:
+    lineage:
+      - datalake_gsheets_raw.ltvoutput.cluster
+  expected_indications:
+    lineage:
+      - datalake_gsheets_raw.ltvoutput.expected_indications
+  survival_prob:
+    lineage:
+      - datalake_gsheets_raw.ltvoutput.survival_prob

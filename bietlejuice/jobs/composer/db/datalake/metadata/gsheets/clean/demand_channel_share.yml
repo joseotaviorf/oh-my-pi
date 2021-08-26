@@ -1,0 +1,42 @@
+database_name: datalake_gsheets_clean
+table_name: demand_channel_share
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.demand_channel_share.city_group
+  contract_signed:
+    lineage:
+      - datalake_gsheets_raw.demand_channel_share.contract_signed
+  credit_approved:
+    lineage:
+      - datalake_gsheets_raw.demand_channel_share.credit_approved
+  credit_evaluation_init:
+    lineage:
+      - datalake_gsheets_raw.demand_channel_share.credit_evaluation_init
+  credit_evaluation_positive:
+    lineage:
+      - datalake_gsheets_raw.demand_channel_share.credit_evaluation_positive
+  demand_channel:
+    lineage:
+      - datalake_gsheets_raw.demand_channel_share.demand_channel
+  document_sent:
+    lineage:
+      - datalake_gsheets_raw.demand_channel_share.document_sent
+  new_tenant_prospect:
+    lineage:
+      - datalake_gsheets_raw.demand_channel_share.new_tenant_prospect
+  offer_accepted:
+    lineage:
+      - datalake_gsheets_raw.demand_channel_share.offer_accepted
+  offer_submitted:
+    lineage:
+      - datalake_gsheets_raw.demand_channel_share.offer_submitted
+  visit_booked:
+    lineage:
+      - datalake_gsheets_raw.demand_channel_share.visit_booked
+  visit_completed:
+    lineage:
+      - datalake_gsheets_raw.demand_channel_share.visit_completed
+  week_start:
+    lineage:
+      - datalake_gsheets_raw.demand_channel_share.week_start

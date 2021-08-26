@@ -1,0 +1,21 @@
+database_name: datalake_gsheets_clean
+table_name: hotjar_photos_repressed_demand
+columns:
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.hotjar_demanda_reprimida_fotos.id_house
+  id_user_hotjar:
+    lineage:
+      - datalake_gsheets_raw.hotjar_demanda_reprimida_fotos.id_user_hotjar
+  find_the_time:
+    lineage:
+      - datalake_gsheets_raw.hotjar_demanda_reprimida_fotos.find_the_time
+  reason:
+    lineage:
+      - datalake_gsheets_raw.hotjar_demanda_reprimida_fotos.reason
+  comment:
+    lineage:
+      - datalake_gsheets_raw.hotjar_demanda_reprimida_fotos.comment
+  ts_answer_submitted:
+    lineage:
+      - datalake_gsheets_raw.hotjar_demanda_reprimida_fotos.ts_answer_submitted

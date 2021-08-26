@@ -1,0 +1,30 @@
+database_name: datalake_gsheets_clean
+table_name: contract_attribution_models
+columns:
+  channel:
+    lineage:
+      - datalake_gsheets_raw.contract_attribution_models.channel
+  city:
+    lineage:
+      - datalake_gsheets_raw.contract_attribution_models.city
+  first_interaction:
+    lineage:
+      - datalake_gsheets_raw.contract_attribution_models.first_interaction
+  last_interaction:
+    lineage:
+      - datalake_gsheets_raw.contract_attribution_models.last_interaction
+  last_non_direct:
+    lineage:
+      - datalake_gsheets_raw.contract_attribution_models.last_non_direct
+  linear:
+    lineage:
+      - datalake_gsheets_raw.contract_attribution_models.linear
+  markov:
+    lineage:
+      - datalake_gsheets_raw.contract_attribution_models.markov
+  u_shape:
+    lineage:
+      - datalake_gsheets_raw.contract_attribution_models.u_shape
+  month:
+    lineage:
+      - datalake_gsheets_raw.contract_attribution_models.month

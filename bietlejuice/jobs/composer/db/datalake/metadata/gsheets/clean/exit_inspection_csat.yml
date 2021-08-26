@@ -1,0 +1,81 @@
+database_name: datalake_gsheets_clean
+table_name: exit_inspection_csat
+columns:
+  id_csat:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_saida.id_csat
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_saida.contractid
+  id_inspector:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_saida.id_vistoriador
+  email:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_saida.email
+  microtag_1:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_saida.microtag_1
+  macrotag_1:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_saida.macrotag_1
+  microtag_2:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_saida.microtag_2
+  macrotag_2:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_saida.macrotag_2
+  microtag_3:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_saida.microtag_3
+  macrotag_3:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_saida.macrotag_3
+  description:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_saida.description
+  company:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_saida.company
+  internal_observation:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_saida.internal_observation
+  app_evaluation:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_saida.app_evaluation
+  general_satisfaction_evaluation:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_saida.general_satisfaction_evaluation
+  report_pictures_evaluation:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_saida.report_pictures_evaluation
+  inspection_deadline_evaluation:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_saida.inspection_deadline_evaluation
+  report_deadline_evaluation:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_saida.report_deadline_evaluation
+  inspectors_comments_evaluation:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_saida.inspectors_comments_evaluation
+  is_tag_1_positive:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_saida.is_1_positive
+  is_tag_2_positive:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_saida.is_2_positive
+  is_tag_3_positive:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_saida.is_3_positive
+  is_tag_ok:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_saida.is_tag_ok
+  is_repair_needed:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_saida.is_repair_needed
+  ts_utc_started:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_saida.ts_utc_start_date
+  ts_utc_submitted:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_saida.ts_utc_submit_date

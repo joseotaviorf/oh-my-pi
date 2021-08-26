@@ -1,0 +1,15 @@
+database_name: datalake_gsheets_clean
+table_name: marketing_manual_campaign_cities
+columns:
+  campaign_name:
+    lineage:
+      - datalake_gsheets_raw.marketing_manual_campaign_cities.campaign_name
+  account_name:
+    lineage:
+      - datalake_gsheets_raw.marketing_manual_campaign_cities.account_name
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.marketing_manual_campaign_cities.city_group
+  side:
+    lineage:
+      - datalake_gsheets_raw.marketing_manual_campaign_cities.side

@@ -1,0 +1,33 @@
+database_name: datalake_gsheets_clean
+table_name: agents_control
+columns:
+  id_assignee:
+    lineage:
+      - datalake_gsheets_raw.agents_control.assignee_id
+  id_registration:
+    lineage:
+      - datalake_gsheets_raw.agents_control.matricula
+  agent_name:
+    lineage:
+      - datalake_gsheets_raw.agents_control.nome
+  agent_company:
+    lineage:
+      - datalake_gsheets_raw.agents_control.centro_de_custo
+  department:
+    lineage:
+      - datalake_gsheets_raw.agents_control.departamento
+  manager:
+    lineage:
+      - datalake_gsheets_raw.agents_control.gestores
+  email:
+    lineage:
+      - datalake_gsheets_raw.agents_control.email
+  cpf:
+    lineage:
+      - datalake_gsheets_raw.agents_control.cpf
+  agent_status:
+    lineage:
+      - datalake_gsheets_raw.agents_control.situacao
+  dt_start:
+    lineage:
+      - datalake_gsheets_raw.agents_control.data_inicio

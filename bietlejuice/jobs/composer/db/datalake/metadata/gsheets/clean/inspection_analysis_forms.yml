@@ -1,0 +1,30 @@
+database_name: datalake_gsheets_clean
+table_name: inspection_analysis_forms
+columns:
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.forms_analise_vistoria.sk_contract
+  id_ticket:
+    lineage:
+      - datalake_gsheets_raw.forms_analise_vistoria.sk_ticket
+  email:
+    lineage:
+      - datalake_gsheets_raw.forms_analise_vistoria.email
+  status:
+    lineage:
+      - datalake_gsheets_raw.forms_analise_vistoria.status
+  inspector_comments_due:
+    lineage:
+      - datalake_gsheets_raw.forms_analise_vistoria.comentarios_vistoriador_devidos
+  total_inspector_comments:
+    lineage:
+      - datalake_gsheets_raw.forms_analise_vistoria.comentarios_vistoriador_total
+  inspector_commented:
+    lineage:
+      - datalake_gsheets_raw.forms_analise_vistoria.vistoriador_comentou
+  adjustments_tenant_duty:
+    lineage:
+      - datalake_gsheets_raw.forms_analise_vistoria.analise_ajustes_devidos_iq
+  ts_input:
+    lineage:
+      - datalake_gsheets_raw.forms_analise_vistoria.ts_input

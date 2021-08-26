@@ -1,0 +1,42 @@
+database_name: datalake_gsheets_clean
+table_name: auxiliary_region
+columns:
+  id:
+    lineage:
+      - datalake_gsheets_raw.aux_regiao.id
+  neighbourhood:
+    lineage:
+      - datalake_gsheets_raw.aux_regiao.neighbourhood
+  city:
+    lineage:
+      - datalake_gsheets_raw.aux_regiao.city
+  region_code:
+    lineage:
+      - datalake_gsheets_raw.aux_regiao.region_code
+  region_code_deprecated:
+    lineage:
+      - datalake_gsheets_raw.aux_regiao.region_code_deprecated
+  region_code_inspector:
+    lineage:
+      - datalake_gsheets_raw.aux_regiao.region_code_inspector
+  state:
+    lineage:
+      - datalake_gsheets_raw.aux_regiao.state
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.aux_regiao.city_group
+  ddd:
+    lineage:
+      - datalake_gsheets_raw.aux_regiao.ddd
+  regional:
+    lineage:
+      - datalake_gsheets_raw.aux_regiao.regional
+  regional_deprecated:
+    lineage:
+      - datalake_gsheets_raw.aux_regiao.regional_deprecated
+  regional_inspection:
+    lineage:
+      - datalake_gsheets_raw.aux_regiao.regional_inspection
+  tier:
+    lineage:
+      - datalake_gsheets_raw.aux_regiao.tier

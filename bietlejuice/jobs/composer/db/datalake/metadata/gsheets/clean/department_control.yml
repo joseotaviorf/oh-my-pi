@@ -1,0 +1,33 @@
+database_name: datalake_gsheets_clean
+table_name: department_control
+columns:
+  department:
+    lineage:
+      - datalake_gsheets_raw.department_control.aux_canal
+  board:
+    lineage:
+      - datalake_gsheets_raw.department_control.diretoria
+  team:
+    lineage:
+      - datalake_gsheets_raw.department_control.area_aux
+  channel:
+    lineage:
+      - datalake_gsheets_raw.department_control.canal
+  concentrix_area:
+    lineage:
+      - datalake_gsheets_raw.department_control.area_concentrix
+  concentrix_area_name:
+    lineage:
+      - datalake_gsheets_raw.department_control.area_cc
+  active_department:
+    lineage:
+      - datalake_gsheets_raw.department_control.caixa_ativa_atualmente
+  journey_step:
+    lineage:
+      - datalake_gsheets_raw.department_control.etapa_da_jornada
+  front_or_back:
+    lineage:
+      - datalake_gsheets_raw.department_control.front_back
+  area:
+    lineage:
+      - datalake_gsheets_raw.department_control.area

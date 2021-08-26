@@ -1,0 +1,21 @@
+database_name: datalake_gsheets_clean
+table_name: census_subnormal_crowding_areas
+columns:
+  id_city_census:
+    lineage:
+      - datalake_gsheets_raw.aglomerados_subnormais_2010_limites.city_census_id
+  id_crowding_area:
+    lineage:
+      - datalake_gsheets_raw.aglomerados_subnormais_2010_limites.crowding_area_id
+  polygon:
+    lineage:
+      - datalake_gsheets_raw.aglomerados_subnormais_2010_limites.polygon
+  crowding_area_name:
+    lineage:
+      - datalake_gsheets_raw.aglomerados_subnormais_2010_limites.crowding_area_name
+  city_name:
+    lineage:
+      - datalake_gsheets_raw.aglomerados_subnormais_2010_limites.city_name
+  uf:
+    lineage:
+      - datalake_gsheets_raw.aglomerados_subnormais_2010_limites.uf

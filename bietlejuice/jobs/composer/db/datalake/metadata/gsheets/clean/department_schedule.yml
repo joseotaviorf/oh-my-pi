@@ -1,0 +1,21 @@
+database_name: datalake_gsheets_clean
+table_name: department_schedule
+columns:
+  area:
+    lineage:
+      - datalake_gsheets_raw.schedule.area
+  final_hour:
+    lineage:
+      - datalake_gsheets_raw.schedule.final_hour
+  start_hour:
+    lineage:
+      - datalake_gsheets_raw.schedule.start_hour
+  week_day:
+    lineage:
+      - datalake_gsheets_raw.schedule.week_day
+  start_date:
+    lineage:
+      - datalake_gsheets_raw.schedule.start_date
+  end_date:
+    lineage:
+      - datalake_gsheets_raw.schedule.end_date

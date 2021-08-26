@@ -1,0 +1,27 @@
+database_name: datalake_gsheets_clean
+table_name: inspection_bugs
+columns:
+  id_inspection:
+    lineage:
+      - datalake_gsheets_raw.vistoria_bugs.id_vistoria
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.vistoria_bugs.id_imovel
+  id_inspector:
+    lineage:
+      - datalake_gsheets_raw.vistoria_bugs.id_vistoriador
+  type:
+    lineage:
+      - datalake_gsheets_raw.vistoria_bugs.tipo
+  description:
+    lineage:
+      - datalake_gsheets_raw.vistoria_bugs.descricao
+  inspector_name:
+    lineage:
+      - datalake_gsheets_raw.vistoria_bugs.vistoriador
+  is_solved:
+    lineage:
+      - datalake_gsheets_raw.vistoria_bugs.solved
+  dt_entrace:
+    lineage:
+      - datalake_gsheets_raw.vistoria_bugs.vigencia

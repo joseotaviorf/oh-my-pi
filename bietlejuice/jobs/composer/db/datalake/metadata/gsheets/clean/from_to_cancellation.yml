@@ -1,0 +1,18 @@
+database_name: datalake_gsheets_clean
+table_name: from_to_cancellation
+columns:
+  reason:
+    lineage:
+      - datalake_gsheets_raw.de_para_cancelamento.reason
+  reason_category:
+    lineage:
+      - datalake_gsheets_raw.de_para_cancelamento.reason_category
+  new_reason:
+    lineage:
+      - datalake_gsheets_raw.de_para_cancelamento.new_reason
+  responsible:
+    lineage:
+      - datalake_gsheets_raw.de_para_cancelamento.responsible
+  count:
+    lineage:
+      - datalake_gsheets_raw.de_para_cancelamento.count

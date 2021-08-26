@@ -1,0 +1,42 @@
+database_name: datalake_gsheets_clean
+table_name: aux_agents_sale_hub
+columns:
+  id_user_agent:
+    lineage:
+      - datalake_gsheets_raw.aux_agents_sale_hub.id
+  status:
+    lineage:
+      - datalake_gsheets_raw.aux_agents_sale_hub.status
+  agent_type:
+    lineage:
+      - datalake_gsheets_raw.aux_agents_sale_hub.tipo_agent
+  days_since_activation:
+    lineage:
+      - datalake_gsheets_raw.aux_agents_sale_hub.dias_desde_ativacao
+  permanently_deactivated:
+    lineage:
+      - datalake_gsheets_raw.aux_agents_sale_hub.descred_permanente
+  suspension_reason:
+    lineage:
+      - datalake_gsheets_raw.aux_agents_sale_hub.motivo_suspensao
+  deactivation_reason:
+    lineage:
+      - datalake_gsheets_raw.aux_agents_sale_hub.motivo_descredenciamento
+  dt_registration:
+    lineage:
+      - datalake_gsheets_raw.aux_agents_sale_hub.semana_credenciamento
+  dt_activation:
+    lineage:
+      - datalake_gsheets_raw.aux_agents_sale_hub.data_ativacao
+  dt_last_suspension:
+    lineage:
+      - datalake_gsheets_raw.aux_agents_sale_hub.data_last_suspensao
+  dt_last_suspension_return:
+    lineage:
+      - datalake_gsheets_raw.aux_agents_sale_hub.data_last_retorno_suspensao
+  dt_last_deactivation:
+    lineage:
+      - datalake_gsheets_raw.aux_agents_sale_hub.data_last_descredenciamento
+  dt_last_deactivation_return:
+    lineage:
+      - datalake_gsheets_raw.aux_agents_sale_hub.data_last_retorno_descredenciamento

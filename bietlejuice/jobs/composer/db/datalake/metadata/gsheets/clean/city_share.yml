@@ -1,0 +1,12 @@
+database_name: datalake_gsheets_clean
+table_name: city_share
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.city_share.city_group
+  city_name:
+    lineage:
+      - datalake_gsheets_raw.city_share.city_name
+  share:
+    lineage:
+      - datalake_gsheets_raw.city_share.share

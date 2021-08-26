@@ -1,0 +1,75 @@
+database_name: datalake_gsheets_clean
+table_name: inspectors_control
+columns:
+  sk_inspector:
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.sk_inspector
+  agenda_type:
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.agenda_type
+  beneficiary_document:
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.beneficiary_document
+  beneficiary_name:
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.beneficiary_name
+  company:
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.company
+  employee_contract_type:
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.employee_contract_type
+  inspector_address:
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.inspector_address
+  inspector_cnpj:
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.inspector_cnpj
+  inspector_corporate_name:
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.inspector_corporate_name
+  inspector_cpf:
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.inspector_cpf
+  inspector_name:
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.inspector_name
+  inspector_phone:
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.inspector_phone
+  inspector_rg:
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.inspector_rg
+  inspector_secondary_phone:
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.inspector_secondary_phone
+  insperctor_email:
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.insperctor_email
+  main_operating_region:
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.main_operating_region
+  operating_city:
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.operating_city
+  operating_regions:
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.operating_regions
+  registry_type:
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.registry_type
+  salary:
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.salary
+  status:
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.status
+  transportation_type:
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.transportation_type
+  dt_start:
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.dt_start
+  dt_end:
+    lineage:
+      - datalake_gsheets_raw.inspectors_control.dt_end

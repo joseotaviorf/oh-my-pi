@@ -1,0 +1,72 @@
+database_name: datalake_gsheets_clean
+table_name: demand_targets_2020
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2020.city_group
+  demand_channel:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2020.demand_channel
+  demand_channel_type:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2020.demand_channel_type
+  funnel_origin:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2020.funnel_origin
+  tier:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2020.tier
+  halfyear:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2020.halfyear
+  evaluation_positive:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2020.evaluation_positive
+  evaluation_started:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2020.evaluation_started
+  new_tenant_prospects:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2020.new_tenant_prospects
+  contracts_signed:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2020.contracts_signed
+  credit_approved:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2020.credit_approved
+  doc_completed:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2020.doc_completed
+  doc_sent:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2020.doc_sent
+  guarantee:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2020.guarantee
+  offer_accepted:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2020.offer_accepted
+  offer_sent:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2020.offer_sent
+  visits_booked:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2020.visits_booked
+  visits_completed:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2020.visits_completed
+  quarter:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2020.quarter
+  week_start:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2020.week_start
+  month:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2020.month
+  year:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2020.year
+  date:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2020.date

@@ -1,0 +1,84 @@
+database_name: datalake_gsheets_clean
+table_name: entrance_inspection_csat
+columns:
+  id_csat:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_entrada.id_csat
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_entrada.contractid
+  id_inspector:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_entrada.id_vistoriador
+  email:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_entrada.email
+  microtag_1:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_entrada.microtag_1
+  macrotag_1:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_entrada.macrotag_1
+  microtag_2:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_entrada.microtag_2
+  macrotag_2:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_entrada.macrotag_2
+  microtag_3:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_entrada.microtag_3
+  macrotag_3:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_entrada.macrotag_3
+  description:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_entrada.description
+  client_type:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_entrada.client_type
+  company:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_entrada.company
+  internal_observation:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_entrada.internal_observation
+  app_evaluation:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_entrada.app_evaluation
+  general_satisfaction_evaluation:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_entrada.general_satisfaction_evaluation
+  report_pictures_evaluation:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_entrada.report_pictures_evaluation
+  inspection_deadline_evaluation:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_entrada.inspection_deadline_evaluation
+  report_deadline_evaluation:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_entrada.report_deadline_evaluation
+  inspectors_comments_evaluation:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_entrada.inspectors_comments_evaluation
+  is_tag_1_positive:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_entrada.is_1_positive
+  is_tag_2_positive:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_entrada.is_2_positive
+  is_tag_3_positive:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_entrada.is_3_positive
+  is_tag_ok:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_entrada.is_tag_ok
+  is_repair_needed:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_entrada.is_repair_needed
+  ts_utc_started:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_entrada.ts_utc_start_date
+  ts_utc_submitted:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_entrada.ts_utc_submit_date

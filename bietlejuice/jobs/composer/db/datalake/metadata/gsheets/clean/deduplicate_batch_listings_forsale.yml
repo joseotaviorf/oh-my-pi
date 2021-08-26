@@ -1,0 +1,34 @@
+database_name: datalake_gsheets_clean
+table_name: deduplicate_batch_listings_forsale
+columns:
+  id_house_partner:
+    lineage:
+      - datalake_gsheets_raw.deduplicate_batch_listings_forsale.id_house_partner
+  partner:
+    lineage:
+      - datalake_gsheets_raw.deduplicate_batch_listings_forsale.partner
+  address:
+    lineage:
+      - datalake_gsheets_raw.deduplicate_batch_listings_forsale.address
+  number:
+    lineage:
+      - datalake_gsheets_raw.deduplicate_batch_listings_forsale.number
+  complement:
+    lineage:
+      - datalake_gsheets_raw.deduplicate_batch_listings_forsale.complement
+  complement_number:
+    lineage:
+      - datalake_gsheets_raw.deduplicate_batch_listings_forsale.complement
+  lat:
+    lineage:
+      - datalake_gsheets_raw.deduplicate_batch_listings_forsale.lat
+  lng:
+    lineage:
+      - datalake_gsheets_raw.deduplicate_batch_listings_forsale.lng
+  lat_lng:
+    lineage:
+      - datalake_gsheets_raw.deduplicate_batch_listings_forsale.lat
+      - datalake_gsheets_raw.deduplicate_batch_listings_forsale.lng
+  zip_code:
+    lineage:
+      - datalake_gsheets_raw.deduplicate_batch_listings_forsale.cep

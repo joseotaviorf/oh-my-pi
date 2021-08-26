@@ -1,0 +1,12 @@
+database_name: datalake_gsheets_clean
+table_name: marketing_costs_google_ad_type_flags
+columns:
+  ad_type:
+    lineage:
+      - datalake_gsheets_raw.marketing_costs_google_ad_type_flags.ad_type
+  flag:
+    lineage:
+      - datalake_gsheets_raw.marketing_costs_google_ad_type_flags.flag
+  report_type:
+    lineage:
+      - datalake_gsheets_raw.marketing_costs_google_ad_type_flags.report_type

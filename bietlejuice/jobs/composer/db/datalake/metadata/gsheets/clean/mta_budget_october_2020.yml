@@ -1,0 +1,24 @@
+database_name: datalake_gsheets_clean
+table_name: mta_budget_october_2020
+columns:
+  budget:
+    lineage:
+      - datalake_gsheets_raw.mta_budget.budget
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.mta_budget.city_group
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_raw.mta_budget.mkt_medium
+  mkt_source:
+    lineage:
+      - datalake_gsheets_raw.mta_budget.mkt_source
+  is_blocked_budget:
+    lineage:
+      - datalake_gsheets_raw.mta_budget.is_blocked_budget
+  week_start:
+    lineage:
+      - datalake_gsheets_raw.mta_budget.week_start
+  month:
+    lineage:
+      - datalake_gsheets_raw.mta_budget.month

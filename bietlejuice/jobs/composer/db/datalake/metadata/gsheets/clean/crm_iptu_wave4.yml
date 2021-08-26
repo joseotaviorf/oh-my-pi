@@ -1,0 +1,27 @@
+database_name: datalake_gsheets_clean
+table_name: crm_iptu_wave4
+columns:
+  id_braze:
+    lineage:
+      - datalake_gsheets_raw.crm_iptu_wave4.id_braze
+  cpf:
+    lineage:
+      - datalake_gsheets_raw.crm_iptu_wave4.cpf
+  email:
+    lineage:
+      - datalake_gsheets_raw.crm_iptu_wave4.email
+  type:
+    lineage:
+      - datalake_gsheets_raw.crm_iptu_wave4.type
+  variant_entered:
+    lineage:
+      - datalake_gsheets_raw.crm_iptu_wave4.variant_entered
+  wave:
+    lineage:
+      - datalake_gsheets_raw.crm_iptu_wave4.wave
+  is_gmail_hotmail:
+    lineage:
+      - datalake_gsheets_raw.crm_iptu_wave4.is_gmail_hotmail
+  date_import:
+    lineage:
+      - datalake_gsheets_raw.crm_iptu_wave4.date_import

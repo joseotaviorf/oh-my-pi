@@ -1,0 +1,45 @@
+database_name: datalake_gsheets_clean
+table_name: acquisition_target_per_source
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.acquisition_target_per_source.city_group
+  tier:
+    lineage:
+      - datalake_gsheets_raw.acquisition_target_per_source.tier
+  supply_origin:
+    lineage:
+      - datalake_gsheets_raw.acquisition_target_per_source.supply_origin
+  type_of_user:
+    lineage:
+      - datalake_gsheets_raw.acquisition_target_per_source.type_of_user
+  supply_channel:
+    lineage:
+      - datalake_gsheets_raw.acquisition_target_per_source.supply_channel
+  supply_medium:
+    lineage:
+      - datalake_gsheets_raw.acquisition_target_per_source.supply_medium
+  supply_source:
+    lineage:
+      - datalake_gsheets_raw.acquisition_target_per_source.supply_source
+  new_active_users:
+    lineage:
+      - datalake_gsheets_raw.acquisition_target_per_source.new_active_users
+  cost_per_source:
+    lineage:
+      - datalake_gsheets_raw.acquisition_target_per_source.cost_per_source
+  target_month:
+    lineage:
+      - datalake_gsheets_raw.acquisition_target_per_source.target_month
+  quarter:
+    lineage:
+      - datalake_gsheets_raw.acquisition_target_per_source.quarter
+  half_year:
+    lineage:
+      - datalake_gsheets_raw.acquisition_target_per_source.half_year
+  dt_target:
+    lineage:
+      - datalake_gsheets_raw.acquisition_target_per_source.target_date
+  dt_week_started:
+    lineage:
+      - datalake_gsheets_raw.acquisition_target_per_source.week_start

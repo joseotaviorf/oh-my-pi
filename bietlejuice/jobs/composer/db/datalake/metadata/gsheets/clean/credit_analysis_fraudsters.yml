@@ -1,0 +1,27 @@
+database_name: datalake_gsheets_clean
+table_name: credit_analysis_fraudsters
+columns:
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.credit_analysis_fraudsters.id_house
+  cpf:
+    lineage:
+      - datalake_gsheets_raw.credit_analysis_fraudsters.cpf
+  email:
+    lineage:
+      - datalake_gsheets_raw.credit_analysis_fraudsters.email
+  login:
+    lineage:
+      - datalake_gsheets_raw.credit_analysis_fraudsters.login
+  name:
+    lineage:
+      - datalake_gsheets_raw.credit_analysis_fraudsters.name
+  phone:
+    lineage:
+      - datalake_gsheets_raw.credit_analysis_fraudsters.phone
+  rejection_reason:
+    lineage:
+      - datalake_gsheets_raw.credit_analysis_fraudsters.rejection_reason
+  dt_occurence:
+    lineage:
+      - datalake_gsheets_raw.credit_analysis_fraudsters.date_occurence

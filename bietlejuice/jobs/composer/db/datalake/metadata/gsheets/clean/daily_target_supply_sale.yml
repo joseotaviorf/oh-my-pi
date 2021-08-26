@@ -1,0 +1,57 @@
+database_name: datalake_gsheets_clean
+table_name: daily_target_supply_sale
+columns:
+  concat_cost:
+    lineage:
+      - datalake_gsheets_raw.base_supply_souce_for_sale.concat_cost
+  concat_prospects:
+    lineage:
+      - datalake_gsheets_raw.base_supply_souce_for_sale.concat_prospects
+  concat_qualifieds:
+    lineage:
+      - datalake_gsheets_raw.base_supply_souce_for_sale.concat_qualifieds
+  concat_date:
+    lineage:
+      - datalake_gsheets_raw.base_supply_souce_for_sale.concat_date
+  cost_per_source:
+    lineage:
+      - datalake_gsheets_raw.base_supply_souce_for_sale.cost_per_source
+  prospects:
+    lineage:
+      - datalake_gsheets_raw.base_supply_souce_for_sale.prospects
+  qualifieds:
+    lineage:
+      - datalake_gsheets_raw.base_supply_souce_for_sale.qualifieds
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.base_supply_souce_for_sale.city_group
+  supply_channel:
+    lineage:
+      - datalake_gsheets_raw.base_supply_souce_for_sale.supply_channel
+  supply_medium:
+    lineage:
+      - datalake_gsheets_raw.base_supply_souce_for_sale.supply_medium
+  supply_origin:
+    lineage:
+      - datalake_gsheets_raw.base_supply_souce_for_sale.supply_origin
+  supply_source:
+    lineage:
+      - datalake_gsheets_raw.base_supply_souce_for_sale.supply_source
+  tier:
+    lineage:
+      - datalake_gsheets_raw.base_supply_souce_for_sale.tier
+  week_start:
+    lineage:
+      - datalake_gsheets_raw.base_supply_souce_for_sale.week_start
+  quarter:
+    lineage:
+      - datalake_gsheets_raw.base_supply_souce_for_sale.quarter
+  halfyear:
+    lineage:
+      - datalake_gsheets_raw.base_supply_souce_for_sale.halfyear
+  month:
+    lineage:
+      - datalake_gsheets_raw.base_supply_souce_for_sale.month
+  date:
+    lineage:
+      - datalake_gsheets_raw.base_supply_souce_for_sale.date

@@ -1,0 +1,57 @@
+database_name: datalake_gsheets_clean
+table_name: demand_targets_replanning
+columns:
+  budget:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_replanning.budget
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_replanning.city_group
+  contracts_signed_target:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_replanning.contracts_signed_target
+  credit_approved_target:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_replanning.credit_approved_target
+  doc_completed_target:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_replanning.doc_completed_target
+  doc_sent_target:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_replanning.doc_sent_target
+  first_offer_sent_target:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_replanning.first_offer_sent_target
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_replanning.mkt_channel
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_replanning.mkt_medium
+  mkt_source:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_replanning.mkt_source
+  new_rent_flows_target:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_replanning.new_rent_flows_target
+  new_tenant_prospects_target:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_replanning.new_tenant_prospects_target
+  offer_accepted_target:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_replanning.offer_accepted_target
+  offer_sent_target:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_replanning.offer_sent_target
+  visits_booked_target:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_replanning.visits_booked_target
+  visits_completed_target:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_replanning.visits_completed_target
+  week_start:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_replanning.week_start
+  date:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_replanning.date
