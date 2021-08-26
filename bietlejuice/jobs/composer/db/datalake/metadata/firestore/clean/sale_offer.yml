@@ -1,0 +1,27 @@
+database_name: datalake_firestore_clean
+table_name: sale_offer
+columns:
+  id:
+    lineage:
+      - datalake_firestore_raw.sale_offer.documentid
+  original_message:
+    lineage:
+      - datalake_firestore_raw.sale_offer.before
+  updated_message:
+    lineage:
+      - datalake_firestore_raw.sale_offer.after
+  event_type:
+    lineage:
+      - datalake_firestore_raw.sale_offer.eventtype
+  ts_updated:
+    lineage:
+      - datalake_firestore_raw.sale_offer.timestamp
+  year:
+    lineage:
+      - datalake_firestore_raw.sale_offer.year
+  month:
+    lineage:
+      - datalake_firestore_raw.sale_offer.month
+  day:
+    lineage:
+      - datalake_firestore_raw.sale_offer.day

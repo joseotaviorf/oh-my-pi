@@ -1,0 +1,27 @@
+database_name: datalake_firestore_clean
+table_name: monday
+columns:
+  id:
+    lineage:
+      - datalake_firestore_raw.monday.documentid
+  original_message:
+    lineage:
+      - datalake_firestore_raw.monday.before
+  updated_message:
+    lineage:
+      - datalake_firestore_raw.monday.after
+  event_type:
+    lineage:
+      - datalake_firestore_raw.monday.eventtype
+  ts_updated:
+    lineage:
+      - datalake_firestore_raw.monday.timestamp
+  year:
+    lineage:
+      - datalake_firestore_raw.monday.year
+  month:
+    lineage:
+      - datalake_firestore_raw.monday.month
+  day:
+    lineage:
+      - datalake_firestore_raw.monday.day
