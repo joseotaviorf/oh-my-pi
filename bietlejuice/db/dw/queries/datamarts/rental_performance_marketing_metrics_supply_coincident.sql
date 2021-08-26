@@ -21,10 +21,16 @@ costs_targets_results_combined AS (
 		SELECT
 		f.sk_lead_date AS sk_date,
 		COALESCE(dr.city_group, 'Not Mapped') AS city_group,
-		COALESCE(f.mkt_origin,'') AS mkt_origin,
+		CASE
+		    WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Partners'
+		    ELSE COALESCE(f.mkt_origin,'')
+        END AS mkt_origin,
 		COALESCE(f.mkt_channel,'') AS mkt_channel,
 		COALESCE(f.mkt_medium,'') AS mkt_medium,
-		COALESCE(f.mkt_source,'') AS mkt_source,
+		CASE
+		    WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Spinver'
+		    ELSE COALESCE(f.mkt_source,'')
+	    END AS mkt_source,
 		COALESCE(dl.utm_campaign,'') AS utm_campaign,
 		COALESCE(dl.utm_content,'') AS utm_content,
 		COALESCE(dl.utm_term,'') AS utm_term,
@@ -69,10 +75,16 @@ costs_targets_results_combined AS (
 	SELECT
 		f.sk_prospect_date AS sk_date,
 		COALESCE(dr.city_group, 'Not Mapped') AS city_group,
-		COALESCE(f.mkt_origin,'') AS mkt_origin,
+		CASE
+		    WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Partners'
+		    ELSE COALESCE(f.mkt_origin,'')
+        END AS mkt_origin,
 		COALESCE(f.mkt_channel,'') AS mkt_channel,
 		COALESCE(f.mkt_medium,'') AS mkt_medium,
-		COALESCE(f.mkt_source,'') AS mkt_source,
+		CASE
+		    WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Spinver'
+		    ELSE COALESCE(f.mkt_source,'')
+	    END AS mkt_source,
 		COALESCE(dl.utm_campaign,'') AS utm_campaign,
 		COALESCE(dl.utm_content,'') AS utm_content,
 		COALESCE(dl.utm_term,'') AS utm_term,
@@ -117,10 +129,16 @@ costs_targets_results_combined AS (
 	SELECT
 		f.sk_qualified_date AS sk_date,
 		COALESCE(dr.city_group, 'Not Mapped') AS city_group,
-		COALESCE(f.mkt_origin,'') AS mkt_origin,
+		CASE
+		    WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Partners'
+		    ELSE COALESCE(f.mkt_origin,'')
+        END AS mkt_origin,
 		COALESCE(f.mkt_channel,'') AS mkt_channel,
 		COALESCE(f.mkt_medium,'') AS mkt_medium,
-		COALESCE(f.mkt_source,'') AS mkt_source,
+		CASE
+		    WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Spinver'
+		    ELSE COALESCE(f.mkt_source,'')
+	    END AS mkt_source,
 		COALESCE(dl.utm_campaign,'') AS utm_campaign,
 		COALESCE(dl.utm_content,'') AS utm_content,
 		COALESCE(dl.utm_term,'') AS utm_term,
@@ -165,10 +183,16 @@ costs_targets_results_combined AS (
 	SELECT
 		f.sk_opportunity_date AS sk_date,
 		COALESCE(dr.city_group, 'Not Mapped') AS city_group,
-		COALESCE(f.mkt_origin,'') AS mkt_origin,
+		CASE
+		    WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Partners'
+		    ELSE COALESCE(f.mkt_origin,'')
+        END AS mkt_origin,
 		COALESCE(f.mkt_channel,'') AS mkt_channel,
 		COALESCE(f.mkt_medium,'') AS mkt_medium,
-		COALESCE(f.mkt_source,'') AS mkt_source,
+		CASE
+		    WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Spinver'
+		    ELSE COALESCE(f.mkt_source,'')
+	    END AS mkt_source,
 		COALESCE(dl.utm_campaign,'') AS utm_campaign,
 		COALESCE(dl.utm_content,'') AS utm_content,
 		COALESCE(dl.utm_term,'') AS utm_term,
@@ -213,10 +237,16 @@ costs_targets_results_combined AS (
     SELECT
         f.sk_first_listing_date AS sk_date,
         COALESCE(dr.city_group, 'Not Mapped') AS city_group,
-        COALESCE(f.mkt_origin,'') AS mkt_origin,
-        COALESCE(f.mkt_channel,'') AS mkt_channel,
-        COALESCE(f.mkt_medium,'') AS mkt_medium,
-        COALESCE(f.mkt_source,'') AS mkt_source,
+        CASE
+		    WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Partners'
+		    ELSE COALESCE(f.mkt_origin,'')
+        END AS mkt_origin,
+		COALESCE(f.mkt_channel,'') AS mkt_channel,
+		COALESCE(f.mkt_medium,'') AS mkt_medium,
+		CASE
+		    WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Spinver'
+		    ELSE COALESCE(f.mkt_source,'')
+	    END AS mkt_source,
         COALESCE(dl.utm_campaign,'') AS utm_campaign,
         COALESCE(dl.utm_content,'') AS utm_content,
         COALESCE(dl.utm_term,'') AS utm_term,
@@ -286,8 +316,8 @@ affiliates AS (
             fc.cost
         FROM
             marketing.fact_marketing_daily_costs fc
-        WHERE
-            fc.mkt_origin = 'Indica Aí - General'
+        WHERE fc.mkt_origin = 'Indica Aí - General'
+        AND fc.mkt_source <> 'Spinver'
     ),
     ia_affiliate_commission_costs AS (
         WITH commission_costs AS (
@@ -304,13 +334,14 @@ affiliates AS (
             LEFT JOIN
                 quintoandar.dim_affiliate_cost d
                 ON f.sk_rh_accounting_entry = d.sk_rh_accounting_entry
+            WHERE sk_user NOT IN (360754,912255,1711931,2257503)
             )
             SELECT
                 cc.sk_date,
                 cc.mkt_origin,
                 NULL::TEXT AS mkt_channel,
                 NULL::TEXT AS mkt_medium,
-                NULL::TEXT AS mkt_source,
+                cc.mkt_source,
                 NULL::TEXT AS utm_campaign,
                 NULL::TEXT AS utm_content,
                 NULL::TEXT AS utm_term,
@@ -327,55 +358,113 @@ affiliates AS (
             GROUP BY 1,2,3,4,5,6,7,8,9,10,11
     ),
     promo_bonus AS (
-        SELECT
-            sk_date,
-            CASE
-                WHEN affiliate_type = 'Standard' THEN 'Indica Aí - General'
-                WHEN affiliate_type = 'Agent' THEN 'Indica Aí - Agents'
-                WHEN affiliate_type = 'Doorman' THEN 'Doorman'
-                ELSE affiliate_type
-            END AS mkt_origin,
-            NULL::TEXT AS mkt_channel,
-            NULL::TEXT AS mkt_medium,
-            NULL::TEXT AS mkt_source,
-            NULL::TEXT AS utm_campaign,
-            NULL::TEXT AS utm_content,
-            NULL::TEXT AS utm_term,
-            city_group,
-            'Promo Bonus' AS source,
-            'Rent' AS business_context,
-            SUM(final_bonus_rent) AS cost
-        FROM
-            datamarts.performance_marketing_promotional_bonus_costs_daily
-        WHERE final_bonus_rent > 0
-        AND sk_date >= 20210208
-        GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+        WITH segmentation_promo_bonus AS(
+            SELECT
+                sk_date,
+                CASE
+                    WHEN affiliate_type = 'Standard' THEN 'Indica Aí - General'
+                    WHEN affiliate_type = 'Agent' THEN 'Indica Aí - Agents'
+                    WHEN affiliate_type = 'Doorman' THEN 'Doorman'
+                    ELSE affiliate_type
+                END AS mkt_origin,
+                NULL::TEXT AS mkt_channel,
+                NULL::TEXT AS mkt_medium,
+                NULL::TEXT AS mkt_source,
+                NULL::TEXT AS utm_campaign,
+                NULL::TEXT AS utm_content,
+                NULL::TEXT AS utm_term,
+                city_group,
+                'Promo Bonus' AS source,
+                'Rent' AS business_context,
+                SUM(final_bonus_rent) AS cost
+            FROM
+                datamarts.performance_marketing_promotional_bonus_costs_daily
+            WHERE final_bonus_rent > 0
+            AND sk_date >= 20210208
+            AND sk_date < 20210701
+            GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 
-        UNION ALL
+            UNION ALL
 
-        SELECT
-            sk_date,
-            CASE
-                WHEN affiliate_type = 'Standard' THEN 'Indica Aí - General'
-                WHEN affiliate_type = 'Agent' THEN 'Indica Aí - Agents'
-                WHEN affiliate_type = 'Doorman' THEN 'Doorman'
-                ELSE affiliate_type
-            END AS mkt_origin,
-            NULL::TEXT AS mkt_channel,
-            NULL::TEXT AS mkt_medium,
-            NULL::TEXT AS mkt_source,
-            NULL::TEXT AS utm_campaign,
-            NULL::TEXT AS utm_content,
-            NULL::TEXT AS utm_term,
-            city_group,
-            'Promo Bonus' AS source,
-            'Sale' AS business_context,
-            SUM(final_bonus_sale) AS cost
-        FROM
-            datamarts.performance_marketing_promotional_bonus_costs_daily
-        WHERE final_bonus_sale > 0
-        AND sk_date >= 20210208
-        GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+            SELECT
+                sk_date,
+                CASE
+                    WHEN affiliate_type = 'Standard' THEN 'Indica Aí - General'
+                    WHEN affiliate_type = 'Agent' THEN 'Indica Aí - Agents'
+                    WHEN affiliate_type = 'Doorman' THEN 'Doorman'
+                    ELSE affiliate_type
+                END AS mkt_origin,
+                NULL::TEXT AS mkt_channel,
+                NULL::TEXT AS mkt_medium,
+                NULL::TEXT AS mkt_source,
+                NULL::TEXT AS utm_campaign,
+                NULL::TEXT AS utm_content,
+                NULL::TEXT AS utm_term,
+                city_group,
+                'Promo Bonus' AS source,
+                'Sale' AS business_context,
+                SUM(final_bonus_sale) AS cost
+            FROM
+                datamarts.performance_marketing_promotional_bonus_costs_daily
+            WHERE final_bonus_sale > 0
+            AND sk_date >= 20210208
+            AND sk_date < 20210701
+            GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+        ),
+        cluster_promo_bonus AS(
+            SELECT
+                sk_date,
+                CASE
+                    WHEN affiliate_type = 'Standard' THEN 'Indica Aí - General'
+                    WHEN affiliate_type = 'Agent' THEN 'Indica Aí - Agents'
+                    WHEN affiliate_type = 'Doorman' THEN 'Doorman'
+                    ELSE affiliate_type
+                END AS mkt_origin,
+                NULL::TEXT AS mkt_channel,
+                NULL::TEXT AS mkt_medium,
+                NULL::TEXT AS mkt_source,
+                NULL::TEXT AS utm_campaign,
+                NULL::TEXT AS utm_content,
+                NULL::TEXT AS utm_term,
+                city_group,
+                'Promo Bonus' AS source,
+                'Rent' AS business_context,
+                SUM(final_bonus_rent) AS cost
+            FROM
+                datamarts.performance_marketing_cluster_promotional_bonus_costs
+            WHERE final_bonus_rent > 0
+            AND sk_date >= 20210701
+            GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+
+            UNION ALL
+
+            SELECT
+                sk_date,
+                CASE
+                    WHEN affiliate_type = 'Standard' THEN 'Indica Aí - General'
+                    WHEN affiliate_type = 'Agent' THEN 'Indica Aí - Agents'
+                    WHEN affiliate_type = 'Doorman' THEN 'Doorman'
+                    ELSE affiliate_type
+                END AS mkt_origin,
+                NULL::TEXT AS mkt_channel,
+                NULL::TEXT AS mkt_medium,
+                NULL::TEXT AS mkt_source,
+                NULL::TEXT AS utm_campaign,
+                NULL::TEXT AS utm_content,
+                NULL::TEXT AS utm_term,
+                city_group,
+                'Promo Bonus' AS source,
+                'Sale' AS business_context,
+                SUM(final_bonus_sale) AS cost
+            FROM
+                datamarts.performance_marketing_cluster_promotional_bonus_costs
+            WHERE final_bonus_sale > 0
+            AND sk_date >= 20210701
+            GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+        )
+    SELECT * FROM segmentation_promo_bonus
+    UNION ALL
+    SELECT * FROM cluster_promo_bonus
     ),
     ia_fact_affiliate_transposed AS (
         SELECT sk_date, mkt_origin, NULL::TEXT AS mkt_channel, NULL::TEXT AS mkt_medium, NULL::TEXT AS mkt_source, NULL::TEXT AS utm_campaign, NULL::TEXT AS utm_content, NULL::TEXT AS utm_term, city_group, 'Commission Listing' AS source, NULL AS business_context, commission_listing AS cost FROM marketing.fact_affiliate_daily_cost_attributions WHERE sk_date < 20210125
