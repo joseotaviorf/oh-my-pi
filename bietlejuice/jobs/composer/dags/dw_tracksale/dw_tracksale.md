@@ -1,4 +1,4 @@
-## DW Chattermill
+## DW Tracksale
 ### Purpose
 ​
 This DAG loads the DW tables with [Tracksale](https://www.tracksale.co/) data. This data is related to NPS.
