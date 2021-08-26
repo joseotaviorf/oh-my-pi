@@ -1,0 +1,21 @@
+database_name: datalake_braze_analytics_clean
+table_name: canvas_analytics_tenants
+columns:
+  id_canvas:
+    lineage:
+      - datalake_braze_analytics_raw.canvas_analytics_tenants.canvas_id
+  canvas_name:
+    lineage:
+      - datalake_braze_analytics_raw.canvas_analytics_tenants.name
+  stats:
+    lineage:
+      - datalake_braze_analytics_raw.canvas_analytics_tenants.stats
+  year:
+    lineage:
+      - datalake_braze_analytics_raw.canvas_analytics_tenants.year
+  month:
+    lineage:
+      - datalake_braze_analytics_raw.canvas_analytics_tenants.month
+  day:
+    lineage:
+      - datalake_braze_analytics_raw.canvas_analytics_tenants.day

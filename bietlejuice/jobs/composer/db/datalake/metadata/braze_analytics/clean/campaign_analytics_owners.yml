@@ -1,0 +1,51 @@
+database_name: datalake_braze_analytics_clean
+table_name: campaign_analytics_owners
+columns:
+  id_campaign:
+    lineage:
+      - datalake_braze_analytics_raw.campaign_analytics_owners.campaign_id
+  messages:
+    lineage:
+      - datalake_braze_analytics_raw.campaign_analytics_owners.messages
+  conversions_by_send_time:
+    lineage:
+      - datalake_braze_analytics_raw.campaign_analytics_owners.conversions_by_send_time
+  conversions1_by_send_time:
+    lineage:
+      - datalake_braze_analytics_raw.campaign_analytics_owners.conversions1_by_send_time
+  conversions2_by_send_time:
+    lineage:
+      - datalake_braze_analytics_raw.campaign_analytics_owners.conversions2_by_send_time
+  conversions3_by_send_time:
+    lineage:
+      - datalake_braze_analytics_raw.campaign_analytics_owners.conversions3_by_send_time
+  conversions:
+    lineage:
+      - datalake_braze_analytics_raw.campaign_analytics_owners.conversions
+  conversions1:
+    lineage:
+      - datalake_braze_analytics_raw.campaign_analytics_owners.conversions1
+  conversions2:
+    lineage:
+      - datalake_braze_analytics_raw.campaign_analytics_owners.conversions2
+  conversions3:
+    lineage:
+      - datalake_braze_analytics_raw.campaign_analytics_owners.conversions3
+  unique_recipients:
+    lineage:
+      - datalake_braze_analytics_raw.campaign_analytics_owners.unique_recipients
+  revenue:
+    lineage:
+      - datalake_braze_analytics_raw.campaign_analytics_owners.revenue
+  ts_campaign_analytics_time:
+    lineage:
+      - datalake_braze_analytics_raw.campaign_analytics_owners.time
+  year:
+    lineage:
+      - datalake_braze_analytics_raw.campaign_analytics_owners.year
+  month:
+    lineage:
+      - datalake_braze_analytics_raw.campaign_analytics_owners.month
+  day:
+    lineage:
+      - datalake_braze_analytics_raw.campaign_analytics_owners.day
