@@ -1,0 +1,24 @@
+database_name: datalake_greenseer_clean
+table_name: session
+columns:
+  id_session:
+    lineage:
+      - datalake_greenseer_raw.session.session_id
+  id_pipeline:
+    lineage:
+      - datalake_greenseer_raw.session.pipeline_id
+  language_code:
+    lineage:
+      - datalake_greenseer_raw.session.language_code
+  memory:
+    lineage:
+      - datalake_greenseer_raw.session.memory
+  current_state:
+    lineage:
+      - datalake_greenseer_raw.session.current_state
+  ts_started:
+    lineage:
+      - datalake_greenseer_raw.session.beginning_timestamp
+  ts_ended:
+    lineage:
+      - datalake_greenseer_raw.session.end_timestamp
