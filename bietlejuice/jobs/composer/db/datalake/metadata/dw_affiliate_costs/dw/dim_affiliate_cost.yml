@@ -1,0 +1,28 @@
+---
+database_name: dw_quintoandar
+table_name: dim_affiliate_cost
+columns:
+  sk_rh_accounting_entry:
+    lineage:
+      - datalake_robin_hood.affiliate_costs.id_rh_accounting_entry
+  sk_payee:
+    lineage:
+      - datalake_robin_hood.affiliate_costs.id_payee
+  city_group:
+    lineage:
+      - datalake_robin_hood.affiliate_costs.city_group
+  description:
+    lineage:
+      - datalake_robin_hood.affiliate_costs.description
+  source_bill_item:
+    lineage:
+      - datalake_robin_hood.affiliate_costs.source_bill_item
+  commission_type:
+    lineage:
+      - datalake_robin_hood.affiliate_costs.commission_type
+  cost_center_code:
+    lineage:
+      - datalake_robin_hood.affiliate_costs.cost_center_code
+  mkt_origin:
+    lineage:
+      - datalake_robin_hood.affiliate_costs.mkt_origin
