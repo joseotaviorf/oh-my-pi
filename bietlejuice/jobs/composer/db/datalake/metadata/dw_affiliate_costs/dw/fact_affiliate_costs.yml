@@ -1,0 +1,19 @@
+---
+database_name: dw_quintoandar
+table_name: fact_affiliate_costs
+columns:
+  sk_rh_accounting_entry:
+    lineage:
+      - datalake_robin_hood.affiliate_costs.id_rh_accounting_entry
+  sk_payee:
+    lineage:
+      - datalake_robin_hood.affiliate_costs.id_payee
+  sk_date:
+    lineage:
+      - datalake_robin_hood.affiliate_costs.dt_transaction
+  sk_user:
+    lineage:
+      - datalake_robin_hood.affiliate_costs.id_external
+  cost:
+    lineage:
+      - datalake_robin_hood.affiliate_costs.cost
