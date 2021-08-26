@@ -1,0 +1,24 @@
+database_name: datalake_godfather_clean
+table_name: revived_offer
+columns:
+  id:
+    lineage:
+      - datalake_godfather_raw.revived_offer.id
+  id_source_offer:
+    lineage:
+      - datalake_godfather_raw.revived_offer.source_offer_id
+  id_target_offer:
+    lineage:
+      - datalake_godfather_raw.revived_offer.target_offer_id
+  version:
+    lineage:
+      - datalake_godfather_raw.revived_offer.version
+  status:
+    lineage:
+      - datalake_godfather_raw.revived_offer.status
+  ts_created:
+    lineage:
+      - datalake_godfather_raw.revived_offer.created_at
+  ts_updated:
+    lineage:
+      - datalake_godfather_raw.revived_offer.updated_at

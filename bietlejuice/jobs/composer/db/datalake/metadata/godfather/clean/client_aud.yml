@@ -1,0 +1,30 @@
+database_name: datalake_godfather_clean
+table_name: client_aud
+columns:
+  id:
+    lineage:
+      - datalake_godfather_raw.client_aud.id
+  rev:
+    lineage:
+      - datalake_godfather_raw.client_aud.rev
+  rev_type:
+    lineage:
+      - datalake_godfather_raw.client_aud.revtype
+  name:
+    lineage:
+      - datalake_godfather_raw.client_aud.name
+  email:
+    lineage:
+      - datalake_godfather_raw.client_aud.email
+  cellphone:
+    lineage:
+      - datalake_godfather_raw.client_aud.cellphone
+  tenant_ongoing_offer:
+    lineage:
+      - datalake_godfather_raw.client_aud.tenant_ongoing_offer
+  mod_tenant_ongoing_offer:
+    lineage:
+      - datalake_godfather_raw.client_aud.tenant_ongoing_offer_mod
+  login_hash:
+    lineage:
+      - datalake_godfather_raw.client_aud.login_hash

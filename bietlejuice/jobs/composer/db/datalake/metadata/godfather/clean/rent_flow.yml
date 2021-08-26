@@ -1,0 +1,21 @@
+database_name: datalake_godfather_clean
+table_name: rent_flow
+columns:
+  id:
+    lineage:
+      - datalake_godfather_raw.rent_flow.id
+  id_rent:
+    lineage:
+      - datalake_godfather_raw.rent_flow.rent_id
+  version:
+    lineage:
+      - datalake_godfather_raw.rent_flow.version
+  status:
+    lineage:
+      - datalake_godfather_raw.rent_flow.status
+  ts_created:
+    lineage:
+      - datalake_godfather_raw.rent_flow.created_at
+  ts_updated:
+    lineage:
+      - datalake_godfather_raw.rent_flow.updated_at

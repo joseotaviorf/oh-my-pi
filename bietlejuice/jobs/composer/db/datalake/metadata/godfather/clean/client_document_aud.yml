@@ -1,0 +1,36 @@
+database_name: datalake_godfather_clean
+table_name: client_document_aud
+columns:
+  id:
+    lineage:
+      - datalake_godfather_raw.client_document_aud.id
+  id_client_selfie_document:
+    lineage:
+      - datalake_godfather_raw.client_document_aud.client_selfie_document_id
+  rev:
+    lineage:
+      - datalake_godfather_raw.client_document_aud.rev
+  rev_type:
+    lineage:
+      - datalake_godfather_raw.client_document_aud.revtype
+  type:
+    lineage:
+      - datalake_godfather_raw.client_document_aud.type
+  mod_type:
+    lineage:
+      - datalake_godfather_raw.client_document_aud.type_mod
+  mod_client_selfie_document:
+    lineage:
+      - datalake_godfather_raw.client_document_aud.client_selfie_document_mod
+  mod_path_front:
+    lineage:
+      - datalake_godfather_raw.client_document_aud.path_front_mod
+  path_back:
+    lineage:
+      - datalake_godfather_raw.client_document_aud.path_back
+  mod_path_back:
+    lineage:
+      - datalake_godfather_raw.client_document_aud.path_back_mod
+  path_front:
+    lineage:
+      - datalake_godfather_raw.client_document_aud.path_front

@@ -1,0 +1,36 @@
+database_name: datalake_godfather_clean
+table_name: message_aud
+columns:
+  id:
+    lineage:
+      - datalake_godfather_raw.message_aud.id
+  id_firestore:
+    lineage:
+      - datalake_godfather_raw.message_aud.firestore_id
+  id_topic:
+    lineage:
+      - datalake_godfather_raw.message_aud.topic_id
+  id_author:
+    lineage:
+      - datalake_godfather_raw.message_aud.author_id
+  type:
+    lineage:
+      - datalake_godfather_raw.message_aud.type
+  rev:
+    lineage:
+      - datalake_godfather_raw.message_aud.rev
+  rev_type:
+    lineage:
+      - datalake_godfather_raw.message_aud.revtype
+  iteration:
+    lineage:
+      - datalake_godfather_raw.message_aud.iteration
+  text:
+    lineage:
+      - datalake_godfather_raw.message_aud.text
+  turn:
+    lineage:
+      - datalake_godfather_raw.message_aud.turn
+  mod_id_firestore:
+    lineage:
+      - datalake_godfather_raw.message_aud.firestore_id_mod

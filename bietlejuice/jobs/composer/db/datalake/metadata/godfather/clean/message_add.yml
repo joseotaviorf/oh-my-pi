@@ -1,0 +1,6 @@
+database_name: datalake_godfather_clean
+table_name: message_add
+columns:
+  id:
+    lineage:
+      - datalake_godfather_raw.message_add.id

@@ -1,0 +1,81 @@
+database_name: datalake_godfather_clean
+table_name: house
+columns:
+  id:
+    lineage:
+      - datalake_godfather_raw.house.id
+  id_owner:
+    lineage:
+      - datalake_godfather_raw.house.owner_id
+  id_main:
+    lineage:
+      - datalake_godfather_raw.house.main_id
+  version:
+    lineage:
+      - datalake_godfather_raw.house.version
+  status:
+    lineage:
+      - datalake_godfather_raw.house.status
+  type:
+    lineage:
+      - datalake_godfather_raw.house.type
+  suspension_reason:
+    lineage:
+      - datalake_godfather_raw.house.suspension_reason
+  neighbourhood:
+    lineage:
+      - datalake_godfather_raw.house.neighbourhood
+  home_insurance:
+    lineage:
+      - datalake_godfather_raw.house.home_insurance
+  city:
+    lineage:
+      - datalake_godfather_raw.house.city
+  url_main_image:
+    lineage:
+      - datalake_godfather_raw.house.url_main_image
+  rent:
+    lineage:
+      - datalake_godfather_raw.house.rent
+  is_iptu_included:
+    lineage:
+      - datalake_godfather_raw.house.iptu_included
+  total_cost:
+    lineage:
+      - datalake_godfather_raw.house.total_cost
+  number:
+    lineage:
+      - datalake_godfather_raw.house.number
+  condo:
+    lineage:
+      - datalake_godfather_raw.house.condo
+  iptu_type:
+    lineage:
+      - datalake_godfather_raw.house.iptu_type
+  condo_type:
+    lineage:
+      - datalake_godfather_raw.house.condo_type
+  iptu:
+    lineage:
+      - datalake_godfather_raw.house.iptu
+  complement:
+    lineage:
+      - datalake_godfather_raw.house.complement
+  state:
+    lineage:
+      - datalake_godfather_raw.house.state
+  address:
+    lineage:
+      - datalake_godfather_raw.house.address
+  ts_main_created:
+    lineage:
+      - datalake_godfather_raw.house.main_created_at
+  ts_main_updated:
+    lineage:
+      - datalake_godfather_raw.house.main_updated_at
+  ts_created:
+    lineage:
+      - datalake_godfather_raw.house.created_at
+  ts_updated:
+    lineage:
+      - datalake_godfather_raw.house.updated_at

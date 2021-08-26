@@ -1,0 +1,84 @@
+database_name: datalake_godfather_clean
+table_name: offer
+columns:
+  id:
+    lineage:
+      - datalake_godfather_raw.offer.id
+  id_resident_info:
+    lineage:
+      - datalake_godfather_raw.offer.resident_info_id
+  id_firestore:
+    lineage:
+      - datalake_godfather_raw.offer.firestore_id
+  id_rent_flow:
+    lineage:
+      - datalake_godfather_raw.offer.rent_flow_id
+  version:
+    lineage:
+      - datalake_godfather_raw.offer.version
+  status:
+    lineage:
+      - datalake_godfather_raw.offer.status
+  rejection_reason_description:
+    lineage:
+      - datalake_godfather_raw.offer.rejection_reason_description
+  type:
+    lineage:
+      - datalake_godfather_raw.offer.type
+  rejection_reason:
+    lineage:
+      - datalake_godfather_raw.offer.rejection_reason
+  original_rent:
+    lineage:
+      - datalake_godfather_raw.offer.original_rent
+  iteration:
+    lineage:
+      - datalake_godfather_raw.offer.iteration
+  is_visualized:
+    lineage:
+      - datalake_godfather_raw.offer.visualized
+  rent:
+    lineage:
+      - datalake_godfather_raw.offer.rent
+  original_home_insurance:
+    lineage:
+      - datalake_godfather_raw.offer.original_home_insurance
+  original_iptu:
+    lineage:
+      - datalake_godfather_raw.offer.original_iptu
+  turn:
+    lineage:
+      - datalake_godfather_raw.offer.turn
+  original_condo:
+    lineage:
+      - datalake_godfather_raw.offer.original_condo
+  code:
+    lineage:
+      - datalake_godfather_raw.offer.code
+  offer_status:
+    lineage:
+      - datalake_godfather_raw.offer.offer_status
+  raw_document:
+    lineage:
+      - datalake_godfather_raw.offer.raw_document
+  ts_expiration:
+    lineage:
+      - datalake_godfather_raw.offer.expiration_date
+  ts_created_firestore:
+    lineage:
+      - datalake_godfather_raw.offer.created_firestore_at
+  ts_visualized:
+    lineage:
+      - datalake_godfather_raw.offer.visualized_at
+  ts_first_sent:
+    lineage:
+      - datalake_godfather_raw.offer.first_sent_at
+  ts_last_sent:
+    lineage:
+      - datalake_godfather_raw.offer.last_sent_at
+  ts_created:
+    lineage:
+      - datalake_godfather_raw.offer.created_at
+  ts_updated:
+    lineage:
+      - datalake_godfather_raw.offer.updated_at

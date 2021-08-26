@@ -1,0 +1,27 @@
+database_name: datalake_godfather_clean
+table_name: cloned_firestore_entity
+columns:
+  id:
+    lineage:
+      - datalake_godfather_raw.cloned_firestore_entity.id
+  id_revived_offer:
+    lineage:
+      - datalake_godfather_raw.cloned_firestore_entity.revived_offer_id
+  version:
+    lineage:
+      - datalake_godfather_raw.cloned_firestore_entity.version
+  type:
+    lineage:
+      - datalake_godfather_raw.cloned_firestore_entity.type
+  firestore_source:
+    lineage:
+      - datalake_godfather_raw.cloned_firestore_entity.firestore_source
+  firestore_target:
+    lineage:
+      - datalake_godfather_raw.cloned_firestore_entity.firestore_target
+  ts_created:
+    lineage:
+      - datalake_godfather_raw.cloned_firestore_entity.created_at
+  ts_updated:
+    lineage:
+      - datalake_godfather_raw.cloned_firestore_entity.updated_at

@@ -1,0 +1,30 @@
+database_name: datalake_godfather_clean
+table_name: rent
+columns:
+  id:
+    lineage:
+      - datalake_godfather_raw.rent.id
+  id_main:
+    lineage:
+      - datalake_godfather_raw.rent.main_id
+  id_house:
+    lineage:
+      - datalake_godfather_raw.rent.house_id
+  id_tenant:
+    lineage:
+      - datalake_godfather_raw.rent.tenant_id
+  version:
+    lineage:
+      - datalake_godfather_raw.rent.version
+  ts_main_created:
+    lineage:
+      - datalake_godfather_raw.rent.main_created_at
+  ts_main_updated:
+    lineage:
+      - datalake_godfather_raw.rent.main_updated_at
+  ts_created:
+    lineage:
+      - datalake_godfather_raw.rent.created_at
+  ts_updated:
+    lineage:
+      - datalake_godfather_raw.rent.updated_at

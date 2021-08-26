@@ -1,0 +1,12 @@
+database_name: datalake_godfather_clean
+table_name: message_price
+columns:
+  id:
+    lineage:
+      - datalake_godfather_raw.message_price.id
+  value:
+    lineage:
+      - datalake_godfather_raw.message_price.value
+  comment:
+    lineage:
+      - datalake_godfather_raw.message_price.comment

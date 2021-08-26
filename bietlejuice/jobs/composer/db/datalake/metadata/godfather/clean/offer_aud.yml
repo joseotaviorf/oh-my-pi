@@ -1,0 +1,108 @@
+database_name: datalake_godfather_clean
+table_name: offer_aud
+columns:
+  id:
+    lineage:
+      - datalake_godfather_raw.offer_aud.id
+  id_rent_flow:
+    lineage:
+      - datalake_godfather_raw.offer_aud.rent_flow_id
+  id_resident_info:
+    lineage:
+      - datalake_godfather_raw.offer_aud.resident_info_id
+  id_firestore:
+    lineage:
+      - datalake_godfather_raw.offer_aud.firestore_id
+  mod_id_firestore:
+    lineage:
+      - datalake_godfather_raw.offer_aud.firestore_id_mod
+  rev:
+    lineage:
+      - datalake_godfather_raw.offer_aud.rev
+  rev_type:
+    lineage:
+      - datalake_godfather_raw.offer_aud.revtype
+  code:
+    lineage:
+      - datalake_godfather_raw.offer_aud.code
+  is_visualized:
+    lineage:
+      - datalake_godfather_raw.offer_aud.visualized
+  original_rent:
+    lineage:
+      - datalake_godfather_raw.offer_aud.original_rent
+  original_condo:
+    lineage:
+      - datalake_godfather_raw.offer_aud.original_condo
+  original_home_insurance:
+    lineage:
+      - datalake_godfather_raw.offer_aud.original_home_insurance
+  original_iptu:
+    lineage:
+      - datalake_godfather_raw.offer_aud.original_iptu
+  type:
+    lineage:
+      - datalake_godfather_raw.offer_aud.type
+  status:
+    lineage:
+      - datalake_godfather_raw.offer_aud.status
+  mod_status:
+    lineage:
+      - datalake_godfather_raw.offer_aud.status_mod
+  rejection_reason:
+    lineage:
+      - datalake_godfather_raw.offer_aud.rejection_reason
+  mod_rejection_reason:
+    lineage:
+      - datalake_godfather_raw.offer_aud.rejection_reason_mod
+  rejection_reason_description:
+    lineage:
+      - datalake_godfather_raw.offer_aud.rejection_reason_description
+  mod_rejection_reason_description:
+    lineage:
+      - datalake_godfather_raw.offer_aud.rejection_reason_description_mod
+  rent:
+    lineage:
+      - datalake_godfather_raw.offer_aud.rent
+  mod_rent:
+    lineage:
+      - datalake_godfather_raw.offer_aud.rent_mod
+  turn:
+    lineage:
+      - datalake_godfather_raw.offer_aud.turn
+  mod_turn:
+    lineage:
+      - datalake_godfather_raw.offer_aud.turn_mod
+  iteration:
+    lineage:
+      - datalake_godfather_raw.offer_aud.iteration
+  mod_iteration:
+    lineage:
+      - datalake_godfather_raw.offer_aud.iteration_mod
+  ts_visualized:
+    lineage:
+      - datalake_godfather_raw.offer_aud.visualized_at
+  mod_ts_visualized_mod:
+    lineage:
+      - datalake_godfather_raw.offer_aud.visualized_at_mod
+  ts_first_sent:
+    lineage:
+      - datalake_godfather_raw.offer_aud.first_sent_at
+  ts_last_sent:
+    lineage:
+      - datalake_godfather_raw.offer_aud.last_sent_at
+  mod_ts_last_sent:
+    lineage:
+      - datalake_godfather_raw.offer_aud.last_sent_at_mod
+  ts_created_firestore:
+    lineage:
+      - datalake_godfather_raw.offer_aud.created_firestore_at
+  mod_ts_created_firestore:
+    lineage:
+      - datalake_godfather_raw.offer_aud.created_firestore_at_mod
+  ts_expiration:
+    lineage:
+      - datalake_godfather_raw.offer_aud.expiration_date
+  mod_ts_expiration:
+    lineage:
+      - datalake_godfather_raw.offer_aud.expiration_date_mod

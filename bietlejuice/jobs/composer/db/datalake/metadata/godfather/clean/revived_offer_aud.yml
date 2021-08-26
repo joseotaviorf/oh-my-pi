@@ -1,0 +1,27 @@
+database_name: datalake_godfather_clean
+table_name: revived_offer_aud
+columns:
+  id:
+    lineage:
+      - datalake_godfather_raw.revived_offer_aud.id
+  id_source_offer:
+    lineage:
+      - datalake_godfather_raw.revived_offer_aud.source_offer_id
+  id_target_offer:
+    lineage:
+      - datalake_godfather_raw.revived_offer_aud.target_offer_id
+  rev:
+    lineage:
+      - datalake_godfather_raw.revived_offer_aud.rev
+  rev_type:
+    lineage:
+      - datalake_godfather_raw.revived_offer_aud.revtype
+  status:
+    lineage:
+      - datalake_godfather_raw.revived_offer_aud.status
+  mod_status:
+    lineage:
+      - datalake_godfather_raw.revived_offer_aud.status_mod
+  mod_target_offer:
+    lineage:
+      - datalake_godfather_raw.revived_offer_aud.target_offer_mod

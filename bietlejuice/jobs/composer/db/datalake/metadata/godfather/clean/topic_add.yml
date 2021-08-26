@@ -1,0 +1,6 @@
+database_name: datalake_godfather_clean
+table_name: topic_add
+columns:
+  id:
+    lineage:
+      - datalake_godfather_raw.topic_add.id

@@ -1,0 +1,21 @@
+database_name: datalake_godfather_clean
+table_name: client_selfie_document_analysis
+columns:
+  id:
+    lineage:
+      - datalake_godfather_raw.client_selfie_document_analysis.id
+  id_client_selfie_document:
+    lineage:
+      - datalake_godfather_raw.client_selfie_document_analysis.client_selfie_document_id
+  version:
+    lineage:
+      - datalake_godfather_raw.client_selfie_document_analysis.version
+  selfie_labels:
+    lineage:
+      - datalake_godfather_raw.client_selfie_document_analysis.selfie_labels
+  ts_created:
+    lineage:
+      - datalake_godfather_raw.client_selfie_document_analysis.created_at
+  ts_updated:
+    lineage:
+      - datalake_godfather_raw.client_selfie_document_analysis.updated_at

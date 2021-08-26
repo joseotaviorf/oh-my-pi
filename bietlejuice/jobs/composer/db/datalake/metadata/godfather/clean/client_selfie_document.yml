@@ -1,0 +1,24 @@
+database_name: datalake_godfather_clean
+table_name: client_selfie_document
+columns:
+  id:
+    lineage:
+      - datalake_godfather_raw.client_selfie_document.id
+  id_client:
+    lineage:
+      - datalake_godfather_raw.client_selfie_document.client_id
+  version:
+    lineage:
+      - datalake_godfather_raw.client_selfie_document.version
+  type_selected:
+    lineage:
+      - datalake_godfather_raw.client_selfie_document.type_selected
+  path_selfie:
+    lineage:
+      - datalake_godfather_raw.client_selfie_document.path_selfie
+  ts_created:
+    lineage:
+      - datalake_godfather_raw.client_selfie_document.created_at
+  ts_updated:
+    lineage:
+      - datalake_godfather_raw.client_selfie_document.updated_at

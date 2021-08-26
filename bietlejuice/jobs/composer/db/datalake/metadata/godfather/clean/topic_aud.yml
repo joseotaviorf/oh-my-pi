@@ -1,0 +1,33 @@
+database_name: datalake_godfather_clean
+table_name: topic_aud
+columns:
+  id:
+    lineage:
+      - datalake_godfather_raw.topic_aud.id
+  id_offer:
+    lineage:
+      - datalake_godfather_raw.topic_aud.offer_id
+  id_offer_firestore:
+    lineage:
+      - datalake_godfather_raw.topic_aud.offer_firestore_id
+  id_firestore:
+    lineage:
+      - datalake_godfather_raw.topic_aud.firestore_id
+  mod_id_firestore:
+    lineage:
+      - datalake_godfather_raw.topic_aud.firestore_id_mod
+  rev:
+    lineage:
+      - datalake_godfather_raw.topic_aud.rev
+  rev_type:
+    lineage:
+      - datalake_godfather_raw.topic_aud.revtype
+  status:
+    lineage:
+      - datalake_godfather_raw.topic_aud.status
+  mod_status:
+    lineage:
+      - datalake_godfather_raw.topic_aud.status_mod
+  type:
+    lineage:
+      - datalake_godfather_raw.topic_aud.type

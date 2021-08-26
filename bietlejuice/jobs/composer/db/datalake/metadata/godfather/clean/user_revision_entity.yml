@@ -1,0 +1,12 @@
+database_name: datalake_godfather_clean
+table_name: user_revision_entity
+columns:
+  id:
+    lineage:
+      - datalake_godfather_raw.user_revision_entity.id
+  id_author:
+    lineage:
+      - datalake_godfather_raw.user_revision_entity.author_id
+  ts_revision:
+    lineage:
+      - datalake_godfather_raw.user_revision_entity.timestamp

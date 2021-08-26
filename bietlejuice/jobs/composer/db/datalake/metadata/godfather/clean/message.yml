@@ -1,0 +1,39 @@
+database_name: datalake_godfather_clean
+table_name: message
+columns:
+  id:
+    lineage:
+      - datalake_godfather_raw.message.id
+  id_firestore:
+    lineage:
+      - datalake_godfather_raw.message.firestore_id
+  id_topic:
+    lineage:
+      - datalake_godfather_raw.message.topic_id
+  id_author:
+    lineage:
+      - datalake_godfather_raw.message.author_id
+  version:
+    lineage:
+      - datalake_godfather_raw.message.version
+  type:
+    lineage:
+      - datalake_godfather_raw.message.type
+  iteration:
+    lineage:
+      - datalake_godfather_raw.message.iteration
+  text:
+    lineage:
+      - datalake_godfather_raw.message.text
+  turn:
+    lineage:
+      - datalake_godfather_raw.message.turn
+  raw_document:
+    lineage:
+      - datalake_godfather_raw.message.raw_document
+  ts_created:
+    lineage:
+      - datalake_godfather_raw.message.created_at
+  ts_updated:
+    lineage:
+      - datalake_godfather_raw.message.updated_at

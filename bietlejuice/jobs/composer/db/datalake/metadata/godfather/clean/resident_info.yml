@@ -1,0 +1,36 @@
+database_name: datalake_godfather_clean
+table_name: resident_info
+columns:
+  id:
+    lineage:
+      - datalake_godfather_raw.resident_info.id
+  name:
+    lineage:
+      - datalake_godfather_raw.resident_info.name
+  version:
+    lineage:
+      - datalake_godfather_raw.resident_info.version
+  lives_with:
+    lineage:
+      - datalake_godfather_raw.resident_info.lives_with
+  pets_description:
+    lineage:
+      - datalake_godfather_raw.resident_info.pets_description
+  number_of_kids:
+    lineage:
+      - datalake_godfather_raw.resident_info.number_of_kids
+  user_introduction:
+    lineage:
+      - datalake_godfather_raw.resident_info.user_introduction
+  has_pets:
+    lineage:
+      - datalake_godfather_raw.resident_info.have_pets
+  number_of_cohabitants:
+    lineage:
+      - datalake_godfather_raw.resident_info.number_of_cohabitants
+  ts_created:
+    lineage:
+      - datalake_godfather_raw.resident_info.created_at
+  ts_updated:
+    lineage:
+      - datalake_godfather_raw.resident_info.updated_at

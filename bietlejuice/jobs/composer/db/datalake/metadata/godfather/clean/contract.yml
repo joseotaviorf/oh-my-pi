@@ -1,0 +1,51 @@
+database_name: datalake_godfather_clean
+table_name: contract
+columns:
+  id:
+    lineage:
+      - datalake_godfather_raw.contract.id
+  id_main:
+    lineage:
+      - datalake_godfather_raw.contract.main_id
+  id_rent_flow:
+    lineage:
+      - datalake_godfather_raw.contract.rent_flow_id
+  version:
+    lineage:
+      - datalake_godfather_raw.contract.version
+  status:
+    lineage:
+      - datalake_godfather_raw.contract.status
+  contract_type:
+    lineage:
+      - datalake_godfather_raw.contract.contract_type
+  has_tenant_signed:
+    lineage:
+      - datalake_godfather_raw.contract.tenant_signed
+  has_owner_signed:
+    lineage:
+      - datalake_godfather_raw.contract.owner_signed
+  has_partner_signed:
+    lineage:
+      - datalake_godfather_raw.contract.partner_signed
+  ts_main_created:
+    lineage:
+      - datalake_godfather_raw.contract.main_created_at
+  ts_main_updated:
+    lineage:
+      - datalake_godfather_raw.contract.main_updated_at
+  ts_tenant_signed:
+    lineage:
+      - datalake_godfather_raw.contract.tenant_signed_at
+  ts_partner_signed:
+    lineage:
+      - datalake_godfather_raw.contract.partner_signed_at
+  ts_owner_signed:
+    lineage:
+      - datalake_godfather_raw.contract.owner_signed_at
+  ts_created:
+    lineage:
+      - datalake_godfather_raw.contract.created_at
+  ts_updated:
+    lineage:
+      - datalake_godfather_raw.contract.updated_at

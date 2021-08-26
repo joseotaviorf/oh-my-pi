@@ -1,0 +1,9 @@
+database_name: datalake_godfather_clean
+table_name: message_add_aud
+columns:
+  id:
+    lineage:
+      - datalake_godfather_raw.message_add_aud.id
+  rev:
+    lineage:
+      - datalake_godfather_raw.message_add_aud.rev

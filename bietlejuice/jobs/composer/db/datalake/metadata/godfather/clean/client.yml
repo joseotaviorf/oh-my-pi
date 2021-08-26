@@ -1,0 +1,39 @@
+database_name: datalake_godfather_clean
+table_name: client
+columns:
+  id:
+    lineage:
+      - datalake_godfather_raw.client.id
+  id_main:
+    lineage:
+      - datalake_godfather_raw.client.main_id
+  name:
+    lineage:
+      - datalake_godfather_raw.client.name
+  email:
+    lineage:
+      - datalake_godfather_raw.client.email
+  version:
+    lineage:
+      - datalake_godfather_raw.client.version
+  cellphone:
+    lineage:
+      - datalake_godfather_raw.client.cellphone
+  login_hash:
+    lineage:
+      - datalake_godfather_raw.client.login_hash
+  tenant_ongoing_offer:
+    lineage:
+      - datalake_godfather_raw.client.tenant_ongoing_offer
+  ts_main_created:
+    lineage:
+      - datalake_godfather_raw.client.main_created_at
+  ts_main_updated:
+    lineage:
+      - datalake_godfather_raw.client.main_updated_at
+  ts_created:
+    lineage:
+      - datalake_godfather_raw.client.created_at
+  ts_updated:
+    lineage:
+      - datalake_godfather_raw.client.updated_at
