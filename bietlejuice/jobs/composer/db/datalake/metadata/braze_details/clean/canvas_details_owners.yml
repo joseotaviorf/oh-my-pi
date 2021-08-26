@@ -1,0 +1,45 @@
+database_name: datalake_braze_details_clean
+table_name: canvas_details_owners
+columns:
+  id_canvas:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_owners.canvas_id
+  canvas_name:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_owners.name
+  canvas_description:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_owners.description
+  variants:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_owners.variants
+  schedule_type:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_owners.schedule_type
+  steps:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_owners.steps
+  channels:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_owners.channels
+  tags:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_owners.tags
+  archived:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_owners.archived
+  draft:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_owners.draft
+  ts_first_entry:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_owners.first_entry
+  ts_last_entry:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_owners.last_entry
+  ts_created:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_owners.created_at
+  ts_updated:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_owners.updated_at
