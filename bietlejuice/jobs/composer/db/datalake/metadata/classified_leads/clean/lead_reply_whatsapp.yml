@@ -1,0 +1,12 @@
+database_name: datalake_classified_leads_clean
+table_name: lead_reply_whatsapp
+columns:
+  id:
+    lineage:
+      - datalake_classified_leads_raw.lead_reply_whatsapp.id
+  id_lead:
+    lineage:
+      - datalake_classified_leads_raw.lead_reply_whatsapp.lead_id
+  user_phone_number:
+    lineage:
+      - datalake_classified_leads_raw.lead_reply_whatsapp.user_phone_number

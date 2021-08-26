@@ -1,0 +1,12 @@
+database_name: datalake_classified_leads_clean
+table_name: lead_reply_email
+columns:
+  id:
+    lineage:
+      - datalake_classified_leads_raw.lead_reply_email.id
+  id_lead:
+    lineage:
+      - datalake_classified_leads_raw.lead_reply_email.lead_id
+  user_email:
+    lineage:
+      - datalake_classified_leads_raw.lead_reply_email.user_email

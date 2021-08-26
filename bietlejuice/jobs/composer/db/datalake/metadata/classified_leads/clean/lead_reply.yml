@@ -1,0 +1,9 @@
+database_name: datalake_classified_leads_clean
+table_name: lead_reply
+columns:
+  id:
+    lineage:
+      - datalake_classified_leads_raw.lead_reply.id
+  ts_sent_at:
+    lineage:
+      - datalake_classified_leads_raw.lead_reply.sent_at

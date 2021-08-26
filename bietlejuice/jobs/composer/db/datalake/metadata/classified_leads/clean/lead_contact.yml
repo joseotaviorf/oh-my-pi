@@ -1,0 +1,45 @@
+database_name: datalake_classified_leads_clean
+table_name: lead_contact
+columns:
+  id:
+    lineage:
+      - datalake_classified_leads_raw.lead_contact.id
+  id_property:
+    lineage:
+      - datalake_classified_leads_raw.lead_contact.property_id
+  id_lead_reply_email:
+    lineage:
+      - datalake_classified_leads_raw.lead_contact.lead_reply_email_id
+  id_lead_reply_whatsapp:
+    lineage:
+      - datalake_classified_leads_raw.lead_contact.lead_reply_whatsapp_id
+  id_external_lead:
+    lineage:
+      - datalake_classified_leads_raw.lead_contact.external_lead_id
+  origin_partner:
+    lineage:
+      - datalake_classified_leads_raw.lead_contact.origin_partner
+  user_ddd:
+    lineage:
+      - datalake_classified_leads_raw.lead_contact.userddd
+  user_email:
+    lineage:
+      - datalake_classified_leads_raw.lead_contact.user_email
+  user_message:
+    lineage:
+      - datalake_classified_leads_raw.lead_contact.user_message
+  user_name:
+    lineage:
+      - datalake_classified_leads_raw.lead_contact.user_name
+  user_phone_number:
+    lineage:
+      - datalake_classified_leads_raw.lead_contact.user_phone_number
+  business_context:
+    lineage:
+      - datalake_classified_leads_raw.lead_contact.business_context
+  publication_type:
+    lineage:
+      - datalake_classified_leads_raw.lead_contact.publication_type
+  ts_received:
+    lineage:
+      - datalake_classified_leads_raw.lead_contact.received_at
