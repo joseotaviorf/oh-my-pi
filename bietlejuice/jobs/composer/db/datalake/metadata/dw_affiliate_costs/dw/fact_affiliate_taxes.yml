@@ -1,0 +1,16 @@
+---
+database_name: dw_quintoandar
+table_name: fact_affiliate_taxes
+columns:
+  sk_tax:
+    lineage:
+      - datalake_robin_hood_clean.tax.id
+  sk_payee:
+    lineage:
+      - datalake_robin_hood_clean.tax.id_payee
+  due_amount:
+    lineage:
+      - datalake_robin_hood_clean.tax.due_amount
+  dt_accounting_year_month:
+    lineage:
+      - datalake_robin_hood_clean.tax.accounting_year_month
