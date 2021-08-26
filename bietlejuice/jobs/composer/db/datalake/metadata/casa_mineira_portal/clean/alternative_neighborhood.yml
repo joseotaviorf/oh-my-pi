@@ -1,0 +1,18 @@
+database_name: datalake_casa_mineira_portal_clean
+table_name: alternative_neighborhood
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_portal_raw.bairro_alternativo.id
+  id_neighborhood:
+    lineage:
+      - datalake_casa_mineira_portal_raw.bairro_alternativo.bairro_id
+  neighborhood:
+    lineage:
+      - datalake_casa_mineira_portal_raw.bairro_alternativo.nome
+  mail:
+    lineage:
+      - datalake_casa_mineira_portal_raw.bairro_alternativo.correios
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_portal_raw.bairro_alternativo.criado_em

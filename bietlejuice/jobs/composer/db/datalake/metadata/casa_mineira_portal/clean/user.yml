@@ -1,0 +1,18 @@
+database_name: datalake_casa_mineira_portal_clean
+table_name: user
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_portal_raw.usuario.id
+  id_real_estate_agency:
+    lineage:
+      - datalake_casa_mineira_portal_raw.usuario.imobiliaria_id
+  id_group:
+    lineage:
+      - datalake_casa_mineira_portal_raw.usuario.grupo_id
+  is_suspended:
+    lineage:
+      - datalake_casa_mineira_portal_raw.usuario.suspenso
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_portal_raw.usuario.criado_em

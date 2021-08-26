@@ -1,0 +1,36 @@
+database_name: datalake_casa_mineira_portal_clean
+table_name: acquisition
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_portal_raw.captacao.id
+  id_neighborhood:
+    lineage:
+      - datalake_casa_mineira_portal_raw.captacao.bairro_id
+  id_real_estate_agency:
+    lineage:
+      - datalake_casa_mineira_portal_raw.captacao.imobiliaria_id
+  id_type:
+    lineage:
+      - datalake_casa_mineira_portal_raw.captacao.tipo_id
+  device_uuid:
+    lineage:
+      - datalake_casa_mineira_portal_raw.captacao.dispositivo_uuid
+  ip:
+    lineage:
+      - datalake_casa_mineira_portal_raw.captacao.ip
+  address:
+    lineage:
+      - datalake_casa_mineira_portal_raw.captacao.logradouro
+  email:
+    lineage:
+      - datalake_casa_mineira_portal_raw.captacao.email
+  goal:
+    lineage:
+      - datalake_casa_mineira_portal_raw.captacao.finalidade
+  ts_sent:
+    lineage:
+      - datalake_casa_mineira_portal_raw.captacao.enviado_em
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_portal_raw.captacao.criado_em

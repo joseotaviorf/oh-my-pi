@@ -1,0 +1,42 @@
+database_name: datalake_casa_mineira_portal_clean
+table_name: city
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_portal_raw.cidade.id
+  id_uf:
+    lineage:
+      - datalake_casa_mineira_portal_raw.cidade.uf_id
+  city_name:
+    lineage:
+      - datalake_casa_mineira_portal_raw.cidade.nome
+  city_full_name:
+    lineage:
+      - datalake_casa_mineira_portal_raw.cidade.nome_completo
+  city_full_slug_name:
+    lineage:
+      - datalake_casa_mineira_portal_raw.cidade.slug_completo
+  total_houses:
+    lineage:
+      - datalake_casa_mineira_portal_raw.cidade.total_imoveis
+  total_active_houses:
+    lineage:
+      - datalake_casa_mineira_portal_raw.cidade.total_imoveis_ativos
+  total_neighborhoods:
+    lineage:
+      - datalake_casa_mineira_portal_raw.cidade.total_bairros
+  total_addresses:
+    lineage:
+      - datalake_casa_mineira_portal_raw.cidade.total_logradouros
+  total_condo:
+    lineage:
+      - datalake_casa_mineira_portal_raw.cidade.total_condominios
+  total_builders:
+    lineage:
+      - datalake_casa_mineira_portal_raw.cidade.total_construtoras
+  total_interest_points:
+    lineage:
+      - datalake_casa_mineira_portal_raw.cidade.total_pontos_interesse
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_portal_raw.cidade.criado_em
