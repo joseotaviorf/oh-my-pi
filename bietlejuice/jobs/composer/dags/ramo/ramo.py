@@ -15,6 +15,8 @@ from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 
 # ENV setup
+from bietlejuice.jobs.composer.services import ConfigurationService
+
 ENV = os.environ.get("ENVIRONMENT")
 
 # DAG params setup
@@ -29,13 +31,14 @@ MAIN_START_DATE = datetime(2020, 11, 24, 0, 0, 0, tzinfo=local_tz)
 MAIN_SCHEDULE_INTERVAL = "0 7 * * *"
 
 # s3 paths setup
+config_service = ConfigurationService(SOURCE)
 ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 DATALAKE_BUCKET = Variable.get("datalake_bucket")
-S3_RAMO_BUCKET = Variable.get("ramo_sap_bucket")
+ramo_sap_bucket = config_service.get_config("ramo_sap_bucket")
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
-SAP_DATA_PATH = f"s3://{S3_RAMO_BUCKET}/razao"
+SAP_DATA_PATH = f"s3://{ramo_sap_bucket}/razao"
 RAW_SPARK_JOB_PATH = (
     S3_PREFIX + f"/spark_jobs/{CONTEXT}/load_incremental_data_into_datalake_raw.py"
 )
