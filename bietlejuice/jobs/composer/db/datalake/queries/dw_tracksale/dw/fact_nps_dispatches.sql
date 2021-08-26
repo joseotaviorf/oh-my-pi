@@ -67,30 +67,6 @@ customer_keys AS (
         AND cci_e.channel = 'email'
      WHERE cc.id_customer IS NOT NULL
      GROUP BY 1
-),
-answer_cities AS (
-     SELECT
-          atg.id_answer,
-          COALESCE(eh.city, (CASE WHEN atg.tag_name = 'Cidade' THEN atg.tag_value END)) AS city
-     FROM
-          datalake_tracksale.answer_tags atg
-     LEFT JOIN datalake_nps_answer_drivers.answer_drivers ad
-          ON atg.id_answer = ad.id_answer
-     LEFT JOIN datalake_ebdb_clean.booking eb 
-          ON eb.id = ad.id_booking
-     LEFT JOIN datalake_ebdb_clean.offer eo
-          ON eo.id = (ad.id_offer_context - 2)/100.0
-     LEFT JOIN datalake_firestore.sale_offer so
-          ON so.id = ad.id_offer_context
-     LEFT JOIN datalake_ebdb_clean.contract ec
-          ON ec.id = ad.id_contract
-     LEFT JOIN datalake_ebdb_listing.house_listing ehl
-          ON ehl.id_house_listing = ad.id_house_listing
-     LEFT JOIN datalake_ebdb_clean.house eh
-          ON COALESCE(ehl.id_house, ec.id_house, eo.id_house, so.id_house, eb.id_house, ad.id_listing) = eh.id
-     WHERE
-          COALESCE(eh.city, (CASE WHEN atg.tag_name = 'Cidade' THEN atg.tag_value END)) IS NOT NULL
-     GROUP BY 1,2
 )
 SELECT
      COALESCE(cc.id_dispatch,-1) AS sk_nps_dispatch,
@@ -111,7 +87,7 @@ SELECT
      cc.nps_answer AS score,
      minutes_spent_answering AS minutes_response_time,
      da.status AS dispatch_status,
-     COALESCE(ac.city, 'Não Informado') AS city,
+     COALESCE(ac.city, 'NÃO INFORMADO') AS city,
      CAST(COALESCE(da.survey_opened, 'false') AS BOOLEAN) as is_survey_opened,
      cc.status <> 'Finalizado' AS is_pending_survey,
      cc.id_answer IS NOT NULL AS is_answered,
@@ -126,5 +102,5 @@ LEFT JOIN datalake_nps_answer_drivers.answer_drivers ad
 LEFT JOIN datalake_tracksale.dispatch_attributes da
      ON cc.id_dispatch_lot = da.id
      AND (COALESCE(cc.customer_email, cc.customer_phone) = COALESCE(da.email, da.phone))
-LEFT JOIN answer_cities ac
+LEFT JOIN datalake_tracksale.answer_cities ac
      ON ac.id_answer = cc.id_answer

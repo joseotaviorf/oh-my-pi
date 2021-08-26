@@ -38,6 +38,7 @@ CLUSTER_DESCRIPTION = Variable.get(
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 
 INNER_DEPENDENCIES = {
+    "answer_cities": ["answer_tags"],
     "answer_tags": ["answer"],
     "customer_conversions": ["answer", "dispatch"],
     "answer_justifications": ["answer"],
