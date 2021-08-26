@@ -11,7 +11,7 @@ from bietlejuice.jobs.composer.formatters import StringFormatter
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import Variable
 
-from bietlejuice.jobs.composer.services import FileService
+from bietlejuice.jobs.composer.services import FileService, ConfigurationService
 
 
 class DWTaskGroup(BaseTaskGroup):
@@ -294,6 +294,8 @@ class DWTaskGroup(BaseTaskGroup):
 
         test_tasks = [emptiness_test_task]
         if has_ods_migration_test:
+            config_service = ConfigurationService()
+            ods_migration_tests_threshold = config_service.get_config("ods_migration_tests_threshold")
             test_entity_ods_migration_task = QuintoAndarDatabricksSubmitRunOperator(
                 dag=self.dag,
                 task_id=f"test-{slugged_layer}-{slugged_dw_schema}-{slugged_table_name}-ods-migration",
@@ -303,7 +305,7 @@ class DWTaskGroup(BaseTaskGroup):
                         "parameters": [
                             self.env,
                             table_name,
-                            Variable.get("ODS_MIGRATION_TESTS_THRESHOLD"),
+                            ods_migration_tests_threshold,
                             "{{ ds }}",
                         ],
                     }

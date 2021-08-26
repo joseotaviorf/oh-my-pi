@@ -5,6 +5,7 @@ from airflow.operators.quintoandar_databricks import (
 
 from bietlejuice.jobs.composer.base.airflow import BaseSubDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
+from bietlejuice.jobs.composer.services import ConfigurationService
 
 
 class DWStagingSubDAG(BaseSubDAG):
@@ -89,6 +90,8 @@ class DWStagingSubDAG(BaseSubDAG):
 
         test_tasks = [emptiness_test]
         if test_ods_migration:
+            config_service = ConfigurationService()
+            ods_migration_tests_threshold = config_service.get_config("ods_migration_tests_threshold")
             test_entity_ods_migration = QuintoAndarDatabricksSubmitRunOperator(
                 dag=sub_dag,
                 task_id=f"test-{self.dw_schema}-{slugged_table_name}-ods-migration",
@@ -98,7 +101,7 @@ class DWStagingSubDAG(BaseSubDAG):
                         "parameters": [
                             self.env,
                             table_name,
-                            Variable.get("ODS_MIGRATION_TESTS_THRESHOLD"),
+                            ods_migration_tests_threshold,
                             "{{ ds }}",
                         ],
                     }
