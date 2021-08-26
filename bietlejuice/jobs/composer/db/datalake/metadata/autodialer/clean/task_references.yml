@@ -1,0 +1,48 @@
+database_name: datalake_autodialer_clean
+table_name: task_references
+columns:
+  id:
+    lineage:
+      - datalake_autodialer_raw.taskreferences._id
+  id_task:
+    lineage:
+      - datalake_autodialer_raw.taskreferences.taskid
+  id_agent:
+    lineage:
+      - datalake_autodialer_raw.taskreferences.agentid
+  is_active:
+    lineage:
+      - datalake_autodialer_raw.taskreferences.active
+  assignee:
+    lineage:
+      - datalake_autodialer_raw.taskreferences.assignee
+  auto_dialer_response:
+    lineage:
+      - datalake_autodialer_raw.taskreferences.autodialerresponse
+  score:
+    lineage:
+      - datalake_autodialer_raw.taskreferences.score
+  snoozed_until:
+    lineage:
+      - datalake_autodialer_raw.taskreferences.snoozeduntil
+  task_link:
+    lineage:
+      - datalake_autodialer_raw.taskreferences.tasklink
+  task_type:
+    lineage:
+      - datalake_autodialer_raw.taskreferences.tasktype
+  ts_created:
+    lineage:
+      - datalake_autodialer_raw.taskreferences.createddate
+  ts_updated:
+    lineage:
+      - datalake_autodialer_raw.taskreferences.updateddate
+  year:
+    lineage:
+      - datalake_autodialer_raw.taskreferences.year
+  month:
+    lineage:
+      - datalake_autodialer_raw.taskreferences.month
+  day:
+    lineage:
+      - datalake_autodialer_raw.taskreferences.day

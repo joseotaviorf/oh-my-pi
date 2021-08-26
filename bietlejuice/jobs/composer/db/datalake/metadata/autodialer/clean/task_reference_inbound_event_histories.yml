@@ -1,0 +1,36 @@
+database_name: datalake_autodialer_clean
+table_name: task_reference_inbound_event_histories
+columns:
+  id:
+    lineage:
+      - datalake_autodialer_raw.taskreferenceinboundeventhistories._id
+  id_task:
+    lineage:
+      - datalake_autodialer_raw.taskreferenceinboundeventhistories.taskid
+  task_reference_event_origin:
+    lineage:
+      - datalake_autodialer_raw.taskreferenceinboundeventhistories.inboundevents
+  dial_status:
+    lineage:
+      - datalake_autodialer_raw.taskreferenceinboundeventhistories.inboundevents
+  event_date:
+    lineage:
+      - datalake_autodialer_raw.taskreferenceinboundeventhistories.inboundevents
+  snoozed:
+    lineage:
+      - datalake_autodialer_raw.taskreferenceinboundeventhistories.inboundevents
+  ts_created:
+    lineage:
+      - datalake_autodialer_raw.taskreferenceinboundeventhistories.createdat
+  ts_updated:
+    lineage:
+      - datalake_autodialer_raw.taskreferenceinboundeventhistories.updatedat
+  year:
+    lineage:
+      - datalake_autodialer_raw.taskreferenceinboundeventhistories.year
+  month:
+    lineage:
+      - datalake_autodialer_raw.taskreferenceinboundeventhistories.month
+  day:
+    lineage:
+      - datalake_autodialer_raw.taskreferenceinboundeventhistories.day
