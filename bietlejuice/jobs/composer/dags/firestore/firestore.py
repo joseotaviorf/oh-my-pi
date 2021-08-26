@@ -13,11 +13,13 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.jobs.composer.services import ConfigurationService
 
 SOURCE = "firestore"
 CONTEXT = SOURCE
 
 # DAG params setup
+config_service = ConfigurationService(SOURCE)
 ENV = os.environ.get("ENVIRONMENT")
 DAG_ID = f"bietlejuice.{CONTEXT}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
@@ -44,7 +46,7 @@ CLUSTER_DESCRIPTION["spark_env_vars"][
 ] = PUBSUB_CREDENTIALS_PATH
 
 # job params
-PROJECT_ID = Variable.get("pwa_google_project_id")
+pwa_google_project_id = config_service.get_config("pwa_google_project_id")
 SUBSCRIPTIONS = [
     {
         "subscription_id": "domainSaleOffer-audit-data-engineering-subscription",
@@ -102,7 +104,7 @@ for subscription in SUBSCRIPTIONS:
         extraction_spark_job_file=RAW_SPARK_JOB_PATH,
         raw_spark_job_extra_args=[
             CONTEXT,
-            PROJECT_ID,
+            pwa_google_project_id,
             PUBSUB_CREDENTIALS_PATH,
             subscription["subscription_id"],
             subscription["table_name"],
