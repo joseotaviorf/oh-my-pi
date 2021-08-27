@@ -114,6 +114,7 @@ SELECT
     sk_house_listing,
     sk_lead,
     sk_region,
+    sk_user_lead_affiliate,
     CASE
         WHEN origin_table = 'Rent' THEN mkt_origin
         ELSE NULL
@@ -267,6 +268,7 @@ SELECT
     sk_house_listing,
     sk_lead,
     sk_region,
+    sk_user_lead_affiliate,
     MAX(mkt_origin_rent) AS mkt_origin_rent,
     MAX(mkt_origin_sale) AS mkt_origin_sale,
     MAX(mkt_completion_rent) AS mkt_completion_rent,
@@ -305,7 +307,7 @@ SELECT
     MAX(context_first_listing_sale) AS context_first_listing_sale
 FROM
     dates_by_context
-GROUP BY 1,2,3,4
+GROUP BY 1,2,3,4,5
 ),
 hybrid_dates AS ( -- creating hybrid scenery when Calculadora de Aluguel, IndicaAi, Doorman, Other
 SELECT
@@ -313,6 +315,7 @@ SELECT
     sk_house_listing,
     sk_lead,
     sk_region,
+    sk_user_lead_affiliate,
     CASE
         WHEN mkt_origin_rent IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents','Doorman', 'Other') AND mkt_origin_sale IS NULL THEN mkt_origin_rent
         ELSE mkt_origin_sale
@@ -430,6 +433,7 @@ SELECT
     llf.sk_house_listing,
     llf.sk_lead,
     llf.sk_region,
+    llf.sk_user_lead_affiliate,
     llf.mkt_origin_rent,
     llf.mkt_origin_sale,
     llf.mkt_completion_rent,
@@ -494,6 +498,7 @@ SELECT
     llf.sk_house_listing,
     llf.sk_lead,
     llf.sk_region,
+    llf.sk_user_lead_affiliate,
     llf.mkt_origin_rent,
     llf.mkt_origin_sale,
     llf.mkt_completion_rent,
@@ -552,6 +557,7 @@ SELECT
     llf.sk_house_listing,
     llf.sk_lead,
     llf.sk_region,
+    llf.sk_user_lead_affiliate,
     llf.mkt_origin_rent,
     llf.mkt_origin_sale,
     llf.mkt_completion_rent,
@@ -611,6 +617,7 @@ SELECT
     llf.sk_house_listing,
     llf.sk_lead,
     llf.sk_region,
+    llf.sk_user_lead_affiliate,
     llf.mkt_origin_rent,
     llf.mkt_origin_sale,
     llf.mkt_completion_rent,
@@ -669,6 +676,7 @@ SELECT
     llf.sk_house_listing,
     llf.sk_lead,
     llf.sk_region,
+    llf.sk_user_lead_affiliate,
     llf.mkt_origin_rent,
     llf.mkt_origin_sale,
     llf.mkt_completion_rent,
@@ -725,6 +733,7 @@ SELECT
     llf.sk_house_listing,
     llf.sk_lead,
     llf.sk_region,
+    llf.sk_user_lead_affiliate,
     llf.mkt_origin_rent,
     llf.mkt_origin_sale,
     llf.mkt_completion_rent,
@@ -785,6 +794,7 @@ SELECT
     llf.sk_lead,
 	llf.sk_house_listing,
 	llf.sk_region,
+	llf.sk_user_lead_affiliate,
     llf.mkt_origin_rent,
     llf.mkt_origin_sale,
     llf.mkt_completion_rent,
