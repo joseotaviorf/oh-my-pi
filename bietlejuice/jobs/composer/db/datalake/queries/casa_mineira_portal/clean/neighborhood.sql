@@ -3,7 +3,7 @@ SELECT
     cidade_id AS id_city,
     nome AS neighborhood,
     nome_completo AS full_neighborhood,
-    slug_completo AS full_slug_neighborhood,
+    slug AS slug_neighborhood,
     nome_correios AS mail_name,
     genero AS gender,
     CAST(total_imoveis AS INT) AS total_house,

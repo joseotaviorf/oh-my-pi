@@ -5,7 +5,7 @@ SELECT
     bairro_id AS id_neighborhood,
     nome AS condo_name,
     nome_completo AS condo_full_name,
-    slug_completo AS condo_slug_full_name,
+    slug AS condo_slug_name,
     logradouro AS address,
     numero AS address_number,
     cep AS zip_code,

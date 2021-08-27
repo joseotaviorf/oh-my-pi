@@ -3,7 +3,7 @@ SELECT
     cidade_id AS id_city,
     nome AS real_estate_agency_name,
     nome_completo AS real_estate_agency_full_name,
-    slug_completo AS real_estate_agency_full_slug_name,
+    slug AS real_estate_agency_slug_name,
     uf,
     cidade AS city,
     bairro AS neighborhood,

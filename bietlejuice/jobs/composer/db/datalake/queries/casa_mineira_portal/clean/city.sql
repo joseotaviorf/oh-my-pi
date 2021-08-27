@@ -3,7 +3,7 @@ SELECT
     uf_id AS id_uf,
     nome AS city_name,
     nome_completo AS city_full_name,
-    slug_completo AS city_full_slug_name,
+    slug AS city_slug_name,
     CAST(total_imoveis AS INT) AS total_houses,
     CAST(total_imoveis_ativos AS INT) AS total_active_houses,
     CAST(total_bairros AS INT) AS total_neighborhoods,
