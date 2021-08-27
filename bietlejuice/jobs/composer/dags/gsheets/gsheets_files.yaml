@@ -210,6 +210,11 @@ inspectors_control:
     sheet_name: inspectors_control
     clean_table_name: inspectors_control
 
+ipsos_brandtracking_questions:
+    sheet_id: 19RfjayG4z4qKpS6HMUTyYJbaM3LYmJB-rRl2dyTTSqw
+    sheet_name: ipsos_brandtracking_questions
+    clean_table_name: ipsos_brandtracking_questions
+
 kenshoo_configuration:
     sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
     sheet_name: Kenshoo_Configuration

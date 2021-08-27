@@ -61,6 +61,7 @@ This pipeline produces the following output tables:
     - `inspection_bugs`
     - `inspection_bugs_v2`
     - `inspectors_control`
+    - `ipsos_brandtracking_questions`
     - `local_holidays`
     - `marketing_costs_campaign_city`
     - `marketing_costs_full_taxonomy`
