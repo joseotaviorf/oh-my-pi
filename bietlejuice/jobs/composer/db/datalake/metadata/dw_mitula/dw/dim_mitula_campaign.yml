@@ -1,0 +1,14 @@
+---
+database_name: dw_mitula
+table_name: dim_mitula_campaign
+columns:
+  sk_mitula_campaign:
+    lineage:
+      - datalake_mitula_clean.mitula_report.id
+      - datalake_mitula_clean.mitula_report.curr_dt
+  campaign_name:
+    lineage:
+      - datalake_mitula_clean.mitula_report.campaign_name
+  account_name:
+    lineage:
+      - datalake_mitula_clean.mitula_report.account_name
