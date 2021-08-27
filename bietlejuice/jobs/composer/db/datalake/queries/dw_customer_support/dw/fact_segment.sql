@@ -56,7 +56,7 @@ email_segments AS (
         id_ticket AS sk_segment,
         id_agent AS sk_agent,
         MD5(department) AS sk_department,
-        MD5('email') AS sk_channel,
+        MD5(CONCAT('email', COALESCE(direction, ''))) AS sk_channel,
         NULL AS sk_external_service,
         department,
         NULL AS transferred_from_dept,
