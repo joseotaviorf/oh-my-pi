@@ -30,6 +30,8 @@ bookings AS (
         db.mkt_channel,
         db.mkt_medium,
         db.mkt_source,
+        db.utm_medium,
+        db.utm_source,
         db.utm_campaign,
         db.utm_term,
         db.utm_content,
@@ -59,6 +61,8 @@ offers AS (
         o.mkt_channel,
         o.mkt_medium,
         o.mkt_source,
+        o.utm_medium,
+        o.utm_source,
         o.utm_campaign,
         NULL::TEXT AS utm_term,
         NULL::TEXT AS utm_content,
@@ -83,6 +87,8 @@ tta AS (
         a.mkt_channel,
         a.mkt_medium,
         a.mkt_source,
+        a.utm_medium,
+        a.utm_source,
         a.utm_campaign,
         a.utm_term,
         a.utm_content,
@@ -128,6 +134,8 @@ sale_flows AS (
         evt.mkt_channel,
         evt.mkt_medium,
         evt.mkt_source,
+        evt.utm_medium,
+        evt.utm_source,
         evt.utm_campaign AS campaign_name,
         evt.utm_campaign,
         evt.utm_term,
@@ -153,6 +161,8 @@ sale_flows_funnel_events AS (
         sf.mkt_channel,
         sf.mkt_medium,
         sf.mkt_source,
+        sf.utm_medium,
+        sf.utm_source,
         sf.utm_campaign AS campaign_name,
         sf.utm_campaign,
         CASE
@@ -207,6 +217,8 @@ targets AS (
         END AS mkt_channel,
         bd.mkt_medium,
         bd.mkt_source,
+        NULL::TEXT AS utm_medium,
+        NULL::TEXT AS utm_source,
         NULL::TEXT AS campaign_name,
         NULL::TEXT AS utm_campaign,
         'Sale' AS campaign_context,
@@ -240,6 +252,8 @@ targets AS (
         bp.mkt_channel,
         bp.mkt_medium,
         bp.mkt_source,
+        NULL::TEXT AS utm_medium,
+        NULL::TEXT AS utm_source,
         NULL::TEXT AS campaign_name,
         NULL::TEXT AS utm_campaign,
         bp.context AS campaign_context,
@@ -269,6 +283,8 @@ targets AS (
         NULL::TEXT AS mkt_channel,
         NULL::TEXT AS mkt_medium,
         NULL::TEXT AS mkt_source,
+        NULL::TEXT AS utm_medium,
+        NULL::TEXT AS utm_source,
         NULL::TEXT AS campaign_name,
         NULL::TEXT AS utm_campaign,
         'Sale' AS campaign_context,
@@ -302,6 +318,8 @@ investment AS (
         mkt_channel,
         mkt_medium,
         mkt_source,
+        NULL::TEXT AS utm_medium,
+        NULL::TEXT AS utm_source,
         campaign_name,
         utm_campaign,
         'Sale' AS campaign_context,
@@ -328,7 +346,7 @@ investment AS (
         co.mkt_origin = 'Tenants PWA - Sale'
         AND dd.date >= DATE('2020-01-01')
         AND co.mkt_medium != 'Branding'
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26
 )
 SELECT
     *

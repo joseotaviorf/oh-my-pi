@@ -47,6 +47,8 @@ fact_rent_flows AS (
         rf.mkt_channel,
         rf.mkt_medium,
         rf.mkt_source,
+        rf.utm_medium,
+        rf.utm_source,
         rf.utm_campaign,
         rf.utm_term,
         rf.utm_content,
@@ -94,6 +96,8 @@ demand_daily_spent AS (
         co.mkt_channel,
         co.mkt_medium,
         co.mkt_source,
+        NULL::TEXT AS utm_medium,
+        NULL::TEXT AS utm_source,
         co.utm_campaign,
         co.utm_term,
         co.utm_content,
@@ -127,7 +131,7 @@ demand_daily_spent AS (
         co.mkt_origin = 'Tenants PWA'
         AND dd.date >= DATE('2018-01-01')
         AND co.mkt_medium != 'Branding'
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,30,31,32
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,32,33,34
 ),
 taxonomy AS (
     SELECT DISTINCT
@@ -207,6 +211,8 @@ demand_daily_targets AS (
         mkt_channel,
         mkt_medium,
         mkt_source,
+        NULL::TEXT AS utm_medium,
+        NULL::TEXT AS utm_source,
         NULL::TEXT AS utm_campaign,
         NULL::TEXT AS utm_term,
         NULL::TEXT AS utm_content,
