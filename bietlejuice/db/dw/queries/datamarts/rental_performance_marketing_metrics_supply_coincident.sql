@@ -18,34 +18,34 @@ costs_targets_results_combined AS (
   ---------------------------------
   -- Supply ForRental Leads Volume --
   ---------------------------------
-		SELECT
-		f.sk_lead_date AS sk_date,
-		COALESCE(dr.city_group, 'Not Mapped') AS city_group,
-		CASE
-		    WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Partners'
-		    ELSE COALESCE(f.mkt_origin,'')
+        SELECT
+        f.sk_lead_date AS sk_date,
+        COALESCE(dr.city_group, 'Not Mapped') AS city_group,
+        CASE
+            WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Partners'
+            ELSE COALESCE(f.mkt_origin,'')
         END AS mkt_origin,
-		COALESCE(f.mkt_channel,'') AS mkt_channel,
-		COALESCE(f.mkt_medium,'') AS mkt_medium,
-		CASE
-		    WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Spinver'
-		    ELSE COALESCE(f.mkt_source,'')
-	    END AS mkt_source,
-		COALESCE(dl.utm_campaign,'') AS utm_campaign,
-		COALESCE(dl.utm_content,'') AS utm_content,
-		COALESCE(dl.utm_term,'') AS utm_term,
-		COALESCE(p.origin_phone,'') AS origin_phone,
-		CASE
-	        WHEN LOWER(dl.utm_campaign) ~ '(sale|girafa|vender)' OR f.sk_user_lead_affiliate in (912255, 360754, 1711931, 2257503)
-	            THEN 'Sale'
-	        WHEN f.mkt_origin IN ('Indica Aí - Agents', 'Doorman', 'Indica Aí - General') OR LOWER(dl.utm_campaign) LIKE '%hybrid%'
-	            THEN 'Hybrid'
+        COALESCE(f.mkt_channel,'') AS mkt_channel,
+        COALESCE(f.mkt_medium,'') AS mkt_medium,
+        CASE
+            WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Spinver'
+            ELSE COALESCE(f.mkt_source,'')
+        END AS mkt_source,
+        COALESCE(dl.utm_campaign,'') AS utm_campaign,
+        COALESCE(dl.utm_content,'') AS utm_content,
+        COALESCE(dl.utm_term,'') AS utm_term,
+        COALESCE(p.origin_phone,'') AS origin_phone,
+        CASE
+            WHEN LOWER(dl.utm_campaign) ~ '(sale|girafa|vender)' OR f.sk_user_lead_affiliate in (912255, 360754, 1711931, 2257503)
+                THEN 'Sale'
+            WHEN f.mkt_origin IN ('Indica Aí - Agents', 'Doorman', 'Indica Aí - General') OR LOWER(dl.utm_campaign) LIKE '%hybrid%'
+                THEN 'Hybrid'
             WHEN ((dl.utm_campaign IS NULL OR dl.utm_campaign = '') AND LOWER(f.mkt_channel) NOT LIKE '%paid%') OR (LOWER(dl.utm_campaign) LIKE '%branded%' AND LOWER(dl.utm_campaign) NOT LIKE '%non-branded%')
-	            THEN 'Organic'
-	        ELSE 'Rental'
-	    END AS campaign_context,
-	    'Rental' AS business_context,
-		COUNT(DISTINCT CASE WHEN f.sk_lead_date > 0 THEN f.sk_house_listing_flow ELSE NULL END) AS leads,
+                THEN 'Organic'
+            ELSE 'Rental'
+        END AS campaign_context,
+        'Rental' AS business_context,
+        COUNT(DISTINCT CASE WHEN f.sk_lead_date > 0 THEN f.sk_house_listing_flow ELSE NULL END) AS leads,
         COUNT(NULL) AS prospects,
         COUNT(NULL) AS qualifieds,
         COUNT(NULL) AS opportunities,
@@ -57,7 +57,7 @@ costs_targets_results_combined AS (
         SUM(0::FLOAT) AS opportunities_target,
         SUM(0::FLOAT) AS first_listings_target,
         SUM(0::FLOAT) AS budget
-	FROM
+    FROM
 		fact_house_listing_flows f
 		JOIN dim_lead dl
 			ON dl.sk_lead = f.sk_lead
@@ -75,16 +75,16 @@ costs_targets_results_combined AS (
 	SELECT
 		f.sk_prospect_date AS sk_date,
 		COALESCE(dr.city_group, 'Not Mapped') AS city_group,
-		CASE
-		    WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Partners'
-		    ELSE COALESCE(f.mkt_origin,'')
+        CASE
+            WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Partners'
+            ELSE COALESCE(f.mkt_origin,'')
         END AS mkt_origin,
-		COALESCE(f.mkt_channel,'') AS mkt_channel,
-		COALESCE(f.mkt_medium,'') AS mkt_medium,
-		CASE
-		    WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Spinver'
-		    ELSE COALESCE(f.mkt_source,'')
-	    END AS mkt_source,
+        COALESCE(f.mkt_channel,'') AS mkt_channel,
+        COALESCE(f.mkt_medium,'') AS mkt_medium,
+        CASE
+            WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Spinver'
+            ELSE COALESCE(f.mkt_source,'')
+        END AS mkt_source,
 		COALESCE(dl.utm_campaign,'') AS utm_campaign,
 		COALESCE(dl.utm_content,'') AS utm_content,
 		COALESCE(dl.utm_term,'') AS utm_term,
@@ -129,16 +129,16 @@ costs_targets_results_combined AS (
 	SELECT
 		f.sk_qualified_date AS sk_date,
 		COALESCE(dr.city_group, 'Not Mapped') AS city_group,
-		CASE
-		    WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Partners'
-		    ELSE COALESCE(f.mkt_origin,'')
+        CASE
+            WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Partners'
+            ELSE COALESCE(f.mkt_origin,'')
         END AS mkt_origin,
-		COALESCE(f.mkt_channel,'') AS mkt_channel,
-		COALESCE(f.mkt_medium,'') AS mkt_medium,
-		CASE
-		    WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Spinver'
-		    ELSE COALESCE(f.mkt_source,'')
-	    END AS mkt_source,
+        COALESCE(f.mkt_channel,'') AS mkt_channel,
+        COALESCE(f.mkt_medium,'') AS mkt_medium,
+        CASE
+            WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Spinver'
+            ELSE COALESCE(f.mkt_source,'')
+        END AS mkt_source,
 		COALESCE(dl.utm_campaign,'') AS utm_campaign,
 		COALESCE(dl.utm_content,'') AS utm_content,
 		COALESCE(dl.utm_term,'') AS utm_term,
@@ -183,16 +183,16 @@ costs_targets_results_combined AS (
 	SELECT
 		f.sk_opportunity_date AS sk_date,
 		COALESCE(dr.city_group, 'Not Mapped') AS city_group,
-		CASE
-		    WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Partners'
-		    ELSE COALESCE(f.mkt_origin,'')
+        CASE
+            WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Partners'
+            ELSE COALESCE(f.mkt_origin,'')
         END AS mkt_origin,
-		COALESCE(f.mkt_channel,'') AS mkt_channel,
-		COALESCE(f.mkt_medium,'') AS mkt_medium,
-		CASE
-		    WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Spinver'
-		    ELSE COALESCE(f.mkt_source,'')
-	    END AS mkt_source,
+        COALESCE(f.mkt_channel,'') AS mkt_channel,
+        COALESCE(f.mkt_medium,'') AS mkt_medium,
+        CASE
+            WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Spinver'
+            ELSE COALESCE(f.mkt_source,'')
+        END AS mkt_source,
 		COALESCE(dl.utm_campaign,'') AS utm_campaign,
 		COALESCE(dl.utm_content,'') AS utm_content,
 		COALESCE(dl.utm_term,'') AS utm_term,
@@ -238,15 +238,15 @@ costs_targets_results_combined AS (
         f.sk_first_listing_date AS sk_date,
         COALESCE(dr.city_group, 'Not Mapped') AS city_group,
         CASE
-		    WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Partners'
-		    ELSE COALESCE(f.mkt_origin,'')
+            WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Partners'
+            ELSE COALESCE(f.mkt_origin,'')
         END AS mkt_origin,
-		COALESCE(f.mkt_channel,'') AS mkt_channel,
-		COALESCE(f.mkt_medium,'') AS mkt_medium,
-		CASE
-		    WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Spinver'
-		    ELSE COALESCE(f.mkt_source,'')
-	    END AS mkt_source,
+        COALESCE(f.mkt_channel,'') AS mkt_channel,
+        COALESCE(f.mkt_medium,'') AS mkt_medium,
+        CASE
+            WHEN f.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Spinver'
+            ELSE COALESCE(f.mkt_source,'')
+        END AS mkt_source,
         COALESCE(dl.utm_campaign,'') AS utm_campaign,
         COALESCE(dl.utm_content,'') AS utm_content,
         COALESCE(dl.utm_term,'') AS utm_term,
@@ -341,7 +341,7 @@ affiliates AS (
                 cc.mkt_origin,
                 NULL::TEXT AS mkt_channel,
                 NULL::TEXT AS mkt_medium,
-                cc.mkt_source,
+                NULL::TEXT AS mkt_source,
                 NULL::TEXT AS utm_campaign,
                 NULL::TEXT AS utm_content,
                 NULL::TEXT AS utm_term,
