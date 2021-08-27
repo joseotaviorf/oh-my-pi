@@ -13,9 +13,9 @@ columns:
   builder_full_name:
     lineage:
       - datalake_casa_mineira_portal_raw.construtora.nome_completo
-  builder_full_slug_name:
+  builder_slug_name:
     lineage:
-      - datalake_casa_mineira_portal_raw.construtora.slug_completo
+      - datalake_casa_mineira_portal_raw.construtora.slug
   total_houses:
     lineage:
       - datalake_casa_mineira_portal_raw.construtora.total_imoveis
