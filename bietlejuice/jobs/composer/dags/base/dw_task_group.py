@@ -305,7 +305,7 @@ class DWTaskGroup(BaseTaskGroup):
                         "parameters": [
                             self.env,
                             table_name,
-                            ods_migration_tests_threshold,
+                            json.dumps(ods_migration_tests_threshold),
                             "{{ ds }}",
                         ],
                     }
