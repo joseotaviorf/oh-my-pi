@@ -103,6 +103,8 @@ SELECT
 	CASE
         WHEN ah.hub_region = 'BELA VISTA' AND is_hub_flow = true THEN 'HUB Bela Vista'
         WHEN ah.hub_region = 'VILA MARIANA' AND is_hub_flow = true THEN 'HUB Vila Mariana'
+        WHEN ah.hub_region like '%PERDIZES%' AND is_hub_flow = true then 'HUB Perdizes'
+        WHEN ah.hub_region like '%MADALENA%' AND is_hub_flow = true then 'HUB Vila Madalena'
     END AS hub_visit,
 	dr.city_group,
 	DATE(NULLIF(fv.sk_booking_created_date,-1)) AS dt_created,
@@ -119,25 +121,27 @@ sale_closing AS (
     SELECT
         COALESCE(DATE(NULLIF(sk_offer_submitted_date,-1)),dt_offer_submitted) AS date,
         sk_house,
-        fo.sk_offer AS sk_offer,
+        sk_booking,
+        COALESCE(fo.sk_offer, hub.id_offer) AS sk_offer,
         COALESCE(fo.sk_buyer,hub.id_client_cm, hub.id_user_5a) AS sk_buyer,
-        -- fo.sk_buyer AS sk_buyer,
         CASE
             WHEN executive_lead = 'Leonardo Monteiro' OR hub.offer_flow = 'HUB_BV_V0' THEN 'HUB Bela Vista'
             WHEN executive_lead = 'Rodrigo Pereira' OR hub.offer_flow = 'HUB_VM_V0' THEN 'HUB Vila Mariana'
             WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'Porto Alegre' THEN 'CENTRAL POA'
             WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'RMSP' THEN 'CENTRAL SP'
             WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'Rio de Janeiro' THEN 'CENTRAL RJ'
+            WHEN executive_lead = 'Antonio Muller' THEN 'HUB Vila Madalena'
+            WHEN executive_lead = 'Karina do Nascimento' THEN 'HUB Perdizes'
             ELSE 'foraHUB'
         END AS hub
     FROM
     	sale.fact_offers fo
+    FULL OUTER JOIN
+        datalake_gsheets_clean_prod.offers_hub_central hub
+            ON fo.sk_offer = hub.id_offer
     LEFT JOIN
         dim_region dr
         ON dr.sk_region = fo.sk_region
-    LEFT JOIN
-        datalake_gsheets_clean_prod.offers_hub_central hub
-            ON fo.sk_offer = hub.id_offer
     WHERE
     	date > 0
     ),
@@ -145,57 +149,62 @@ sale_closing AS (
     SELECT
         COALESCE(DATE(NULLIF(sk_offer_accepted_date,-1)),dt_offer_accepted) AS date,
         sk_house,
-        fo.sk_offer AS sk_offer,
+        sk_booking,
+        COALESCE(fo.sk_offer, hub.id_offer) AS sk_offer,
         COALESCE(fo.sk_buyer,hub.id_client_cm, hub.id_user_5a) AS sk_buyer,
-        -- fo.sk_buyer AS sk_buyer,
         CASE
             WHEN executive_lead = 'Leonardo Monteiro' OR hub.offer_flow = 'HUB_BV_V0' THEN 'HUB Bela Vista'
             WHEN executive_lead = 'Rodrigo Pereira' OR hub.offer_flow = 'HUB_VM_V0' THEN 'HUB Vila Mariana'
             WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'Porto Alegre' THEN 'CENTRAL POA'
             WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'RMSP' THEN 'CENTRAL SP'
             WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'Rio de Janeiro' THEN 'CENTRAL RJ'
+            WHEN executive_lead = 'Antonio Muller' THEN 'HUB Vila Madalena'
+            WHEN executive_lead = 'Karina do Nascimento' THEN 'HUB Perdizes'
             ELSE 'foraHUB'
         END AS hub
     FROM
         sale.fact_offers fo
+    FULL OUTER JOIN
+        datalake_gsheets_clean_prod.offers_hub_central hub
+            ON fo.sk_offer = hub.id_offer
     LEFT JOIN
         dim_region dr
         ON dr.sk_region = fo.sk_region
-    LEFT JOIN
-        datalake_gsheets_clean_prod.offers_hub_central hub
-            ON fo.sk_offer = hub.id_offer
     WHERE
         date > 0
     ),
     fact_ccv AS (
     SELECT
         COALESCE(DATE(NULLIF(sa.ts_sale_agreement_signed,-1)),hub.dt_sale_agreement_signed) AS date,
-        fo.sk_offer AS sk_offer,
+        COALESCE(fo.sk_offer, hub.id_offer) AS sk_offer,
         CASE
             WHEN executive_lead = 'Leonardo Monteiro' OR hub.offer_flow = 'HUB_BV_V0' THEN 'HUB Bela Vista'
             WHEN executive_lead = 'Rodrigo Pereira' OR hub.offer_flow = 'HUB_VM_V0' THEN 'HUB Vila Mariana'
             WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'Porto Alegre' THEN 'CENTRAL POA'
             WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'RMSP' THEN 'CENTRAL SP'
             WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'Rio de Janeiro' THEN 'CENTRAL RJ'
+            WHEN executive_lead = 'Antonio Muller' THEN 'HUB Vila Madalena'
+            WHEN executive_lead = 'Karina do Nascimento' THEN 'HUB Perdizes'
             ELSE 'foraHUB'
         END AS hub
     FROM
         sale.fact_offers fo
+    FULL OUTER JOIN
+        datalake_gsheets_clean_prod.offers_hub_central hub
+            ON fo.sk_offer = hub.id_offer
     LEFT JOIN
         sale.dim_sale_agreement sa
         ON fo.sk_offer = sa.sk_offer
     LEFT JOIN
         dim_region dr
         ON dr.sk_region = fo.sk_region
-    LEFT JOIN
-        datalake_gsheets_clean_prod.offers_hub_central hub
-            ON fo.sk_offer = hub.id_offer
     WHERE date>0
     )
 SELECT
     COALESCE(COALESCE(fact_os.sk_offer, fact_oa.sk_offer), fact_ccv.sk_offer) AS sk_offer,
     COALESCE(fact_os.sk_house,fact_oa.sk_house) AS sk_house,
     COALESCE(fact_os.sk_buyer,fact_oa.sk_buyer) AS sk_buyer,
+    COALESCE(fact_os.sk_booking,fact_oa.sk_booking) AS sk_booking,
     COALESCE(COALESCE(fact_os.hub, fact_oa.hub), fact_ccv.hub) AS hub_offer,
     MAX(fact_os.date) AS os_date,
     MAX(fact_oa.date) AS oa_date,
@@ -210,7 +219,7 @@ FULL OUTER JOIN
     fact_ccv
         ON fact_os.sk_offer = fact_ccv.sk_offer
         -- AND fact_os.date = fact_ccv.date
-GROUP BY 1, 2, 3, 4
+GROUP BY 1, 2, 3, 4, 5
 ),
 sale_demand_region AS (
 SELECT
