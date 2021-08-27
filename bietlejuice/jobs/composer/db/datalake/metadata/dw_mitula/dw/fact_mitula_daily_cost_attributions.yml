@@ -1,0 +1,23 @@
+---
+database_name: dw_mitula
+table_name: fact_mitula_daily_cost_attributions
+columns:
+  sk_mitula_campaign:
+    lineage:
+      - datalake_mitula_clean.mitula_report.id
+      - datalake_mitula_clean.mitula_report.curr_dt
+  sk_date:
+    lineage:
+      - datalake_mitula_clean.mitula_report.curr_dt
+  clicks:
+    lineage:
+      - datalake_mitula_clean.mitula_report.clicks
+  desktop_cost:
+    lineage:
+      - datalake_mitula_clean.mitula_report.desktop_cost
+  mobile_cost:
+    lineage:
+      - datalake_mitula_clean.mitula_report.mobile_cost
+  total_cost:
+    lineage:
+      - datalake_mitula_clean.mitula_report.total_cost
