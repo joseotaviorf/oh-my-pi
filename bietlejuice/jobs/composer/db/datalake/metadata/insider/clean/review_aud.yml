@@ -1,0 +1,39 @@
+database_name: datalake_insider_clean
+table_name: review_aud
+columns:
+  id_review:
+    lineage:
+      - datalake_insider_raw.review_aud.id
+  id_reviewed:
+    lineage:
+      - datalake_insider_raw.review_aud.reviewed_id
+  id_reviewer:
+    lineage:
+      - datalake_insider_raw.review_aud.reviewer_id
+  rev:
+    lineage:
+      - datalake_insider_raw.review_aud.rev
+  labels:
+    lineage:
+      - datalake_insider_raw.review_aud.labels
+  status:
+    lineage:
+      - datalake_insider_raw.review_aud.status
+  mod_is_status:
+    lineage:
+      - datalake_insider_raw.review_aud.status_mod
+  type:
+    lineage:
+      - datalake_insider_raw.review_aud.type
+  rev_type:
+    lineage:
+      - datalake_insider_raw.review_aud.revtype
+  comment:
+    lineage:
+      - datalake_insider_raw.review_aud.comment
+  revend:
+    lineage:
+      - datalake_insider_raw.review_aud.revend
+  dt_creation:
+    lineage:
+      - datalake_insider_raw.review_aud.creation_date

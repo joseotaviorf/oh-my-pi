@@ -1,0 +1,42 @@
+database_name: datalake_jira_clean
+table_name: projects
+columns:
+  avatar_urls:
+    lineage:
+      - datalake_jira_raw.projects.avatarurls
+  id_entity:
+    lineage:
+      - datalake_jira_raw.projects.entityid
+  expand:
+    lineage:
+      - datalake_jira_raw.projects.expand
+  id:
+    lineage:
+      - datalake_jira_raw.projects.id
+  is_private:
+    lineage:
+      - datalake_jira_raw.projects.isprivate
+  key:
+    lineage:
+      - datalake_jira_raw.projects.key
+  name:
+    lineage:
+      - datalake_jira_raw.projects.name
+  project_type_key:
+    lineage:
+      - datalake_jira_raw.projects.projecttypekey
+  properties:
+    lineage:
+      - datalake_jira_raw.projects.properties
+  self:
+    lineage:
+      - datalake_jira_raw.projects.self
+  is_simplified:
+    lineage:
+      - datalake_jira_raw.projects.simplified
+  style:
+    lineage:
+      - datalake_jira_raw.projects.style
+  uuid:
+    lineage:
+      - datalake_jira_raw.projects.uuid

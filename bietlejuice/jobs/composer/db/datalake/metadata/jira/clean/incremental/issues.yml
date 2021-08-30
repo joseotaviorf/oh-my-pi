@@ -1,0 +1,30 @@
+database_name: datalake_jira_clean
+table_name: issues
+columns:
+  change_log:
+    lineage:
+      - datalake_jira_raw.issues.changelog
+  expand:
+    lineage:
+      - datalake_jira_raw.issues.expand
+  fields:
+    lineage:
+      - datalake_jira_raw.issues.fields
+  id:
+    lineage:
+      - datalake_jira_raw.issues.id
+  key:
+    lineage:
+      - datalake_jira_raw.issues.key
+  self:
+    lineage:
+      - datalake_jira_raw.issues.self
+  year:
+    lineage:
+      - datalake_jira_raw.issues.year
+  month:
+    lineage:
+      - datalake_jira_raw.issues.month
+  day:
+    lineage:
+      - datalake_jira_raw.issues.day

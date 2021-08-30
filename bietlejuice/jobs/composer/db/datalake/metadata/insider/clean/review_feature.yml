@@ -1,0 +1,21 @@
+database_name: datalake_insider_clean
+table_name: review_feature
+columns:
+  id:
+    lineage:
+      - datalake_insider_raw.review_feature.id
+  id_review:
+    lineage:
+      - datalake_insider_raw.review_feature.review_id
+  id_feature:
+    lineage:
+      - datalake_insider_raw.review_feature.feature_id
+  id_resource:
+    lineage:
+      - datalake_insider_raw.review_feature.resource_id
+  rating_selected:
+    lineage:
+      - datalake_insider_raw.review_feature.rating_selected
+  comment:
+    lineage:
+      - datalake_insider_raw.review_feature.comment

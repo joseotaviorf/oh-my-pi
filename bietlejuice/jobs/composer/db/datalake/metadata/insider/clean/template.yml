@@ -1,0 +1,12 @@
+database_name: datalake_insider_clean
+table_name: template
+columns:
+  id:
+    lineage:
+      - datalake_insider_raw.template.id
+  is_active:
+    lineage:
+      - datalake_insider_raw.template.active
+  type:
+    lineage:
+      - datalake_insider_raw.template.type
