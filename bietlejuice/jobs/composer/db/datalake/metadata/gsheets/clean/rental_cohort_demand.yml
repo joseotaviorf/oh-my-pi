@@ -1,0 +1,48 @@
+database_name: datalake_gsheets_clean
+table_name: rental_cohort_demand
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.rental_cohort_demand.city_group
+  funnel_flow:
+    lineage:
+      - datalake_gsheets_raw.rental_cohort_demand.funnel_flow
+  guarantee:
+    lineage:
+      - datalake_gsheets_raw.rental_cohort_demand.guarantee
+  target_ca:
+    lineage:
+      - datalake_gsheets_raw.rental_cohort_demand.target_ca
+  target_cep:
+    lineage:
+      - datalake_gsheets_raw.rental_cohort_demand.target_cep
+  target_cs:
+    lineage:
+      - datalake_gsheets_raw.rental_cohort_demand.target_cs
+  target_ds:
+    lineage:
+      - datalake_gsheets_raw.rental_cohort_demand.target_ds
+  target_es:
+    lineage:
+      - datalake_gsheets_raw.rental_cohort_demand.target_es
+  target_oa:
+    lineage:
+      - datalake_gsheets_raw.rental_cohort_demand.target_oa
+  target_os:
+    lineage:
+      - datalake_gsheets_raw.rental_cohort_demand.target_os
+  target_vb:
+    lineage:
+      - datalake_gsheets_raw.rental_cohort_demand.target_vb
+  target_vc:
+    lineage:
+      - datalake_gsheets_raw.rental_cohort_demand.target_vc
+  visao:
+    lineage:
+      - datalake_gsheets_raw.rental_cohort_demand.visao
+  week:
+    lineage:
+      - datalake_gsheets_raw.rental_cohort_demand.week
+  week_origin:
+    lineage:
+      - datalake_gsheets_raw.rental_cohort_demand.week_origin

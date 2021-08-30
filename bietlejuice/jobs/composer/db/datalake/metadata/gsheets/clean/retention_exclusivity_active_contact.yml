@@ -1,0 +1,114 @@
+database_name: datalake_gsheets_clean
+table_name: retention_exclusivity_active_contact
+columns:
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.id_contract
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.id_house
+  contract_version:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.version
+  status:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.status
+  status_blank:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.status_blank
+  house_city:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.house_city
+  house_unpublished_reason:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.house_unpublished_reason
+  owner_name:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.nome
+  owner_email:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.email
+  owner_phone_number:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.telefone_principal
+  owner_segment:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.segment
+  call_status:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.call
+  call_status_w_blank:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.call_blank
+  offer_exclusive:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.offer_exclusive
+  discount_type:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.discount_type
+  comment:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.comment
+  comment_tag:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.comment_tag
+  adm_fee:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.adm_fee
+  group_adm_fee:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.group_adm_fee
+  group_adm_fee_new:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.group_adm_fee_new
+  analyst_name:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.owner
+  lost_contacts:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.lost_contacts
+  priority:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.priority
+  group_score:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.group_score
+  days_listing_to_contract_signed:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.days_listing_to_contract_signed
+  week_listing_to_contract_signed:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.week_listing_to_contract_signed
+  last_nps_offboarding:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.nps
+  is_house_unpublished:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.house_unpublished
+  is_exclusive:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.is_exclusive
+  is_b2b:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.is_b2b
+  dt_termination:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.dt_termination
+  dt_termination_month:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.dt_termination_month
+  dt_termination_15d:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.dt_termination_15d
+  dt_call:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.dt_call
+  dt_call_format:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.dt_call_format
+  dt_call_weekday:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.dt_call_weekday
+  dt_call_weeknum:
+    lineage:
+      - datalake_gsheets_raw.retencao_exclusividade_contato_ativo.dt_call_weeknum

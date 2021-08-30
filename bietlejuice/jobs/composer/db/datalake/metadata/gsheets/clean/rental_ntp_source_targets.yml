@@ -1,0 +1,33 @@
+database_name: datalake_gsheets_clean
+table_name: rental_ntp_source_targets
+columns:
+  ntp_target:
+    lineage:
+      - datalake_gsheets_raw.rental_ntp_source_targets.ntp_target
+  tier:
+    lineage:
+      - datalake_gsheets_raw.rental_ntp_source_targets.tier
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.rental_ntp_source_targets.city_group
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_raw.rental_ntp_source_targets.mkt_channel
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_raw.rental_ntp_source_targets.mkt_medium
+  mkt_source:
+    lineage:
+      - datalake_gsheets_raw.rental_ntp_source_targets.mkt_source
+  week_start:
+    lineage:
+      - datalake_gsheets_raw.rental_ntp_source_targets.week_start
+  month:
+    lineage:
+      - datalake_gsheets_raw.rental_ntp_source_targets.month
+  year:
+    lineage:
+      - datalake_gsheets_raw.rental_ntp_source_targets.year
+  date:
+    lineage:
+      - datalake_gsheets_raw.rental_ntp_source_targets.date

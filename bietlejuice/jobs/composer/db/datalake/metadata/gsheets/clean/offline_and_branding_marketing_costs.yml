@@ -1,0 +1,42 @@
+database_name: datalake_gsheets_clean
+table_name: offline_and_branding_marketing_costs
+columns:
+  sk_date:
+    lineage:
+      - datalake_gsheets_raw.offline_and_branding_marketing_costs.sk_date
+  business_context:
+    lineage:
+      - datalake_gsheets_raw.offline_and_branding_marketing_costs.business_context
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.offline_and_branding_marketing_costs.city_group
+  cost:
+    lineage:
+      - datalake_gsheets_raw.offline_and_branding_marketing_costs.cost
+  funnel_side:
+    lineage:
+      - datalake_gsheets_raw.offline_and_branding_marketing_costs.funnel_side
+  mkt_category:
+    lineage:
+      - datalake_gsheets_raw.offline_and_branding_marketing_costs.mkt_category
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_raw.offline_and_branding_marketing_costs.mkt_channel
+  mkt_completion:
+    lineage:
+      - datalake_gsheets_raw.offline_and_branding_marketing_costs.mkt_completion
+  mkt_flow:
+    lineage:
+      - datalake_gsheets_raw.offline_and_branding_marketing_costs.mkt_flow
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_raw.offline_and_branding_marketing_costs.mkt_medium
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_raw.offline_and_branding_marketing_costs.mkt_origin
+  mkt_source:
+    lineage:
+      - datalake_gsheets_raw.offline_and_branding_marketing_costs.mkt_source
+  utm_campaign:
+    lineage:
+      - datalake_gsheets_raw.offline_and_branding_marketing_costs.utm_campaign

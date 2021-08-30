@@ -1,0 +1,30 @@
+database_name: datalake_gsheets_clean
+table_name: rental_tof_daily_targets
+columns:
+  daily_tof_target:
+    lineage:
+      - datalake_gsheets_raw.rental_tof_daily_targets.daily_tof_target
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.rental_tof_daily_targets.city_group
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_raw.rental_tof_daily_targets.mkt_channel
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_raw.rental_tof_daily_targets.mkt_medium
+  mkt_source:
+    lineage:
+      - datalake_gsheets_raw.rental_tof_daily_targets.mkt_source
+  dia:
+    lineage:
+      - datalake_gsheets_raw.rental_tof_daily_targets.dia
+  week_start:
+    lineage:
+      - datalake_gsheets_raw.rental_tof_daily_targets.week_start
+  month:
+    lineage:
+      - datalake_gsheets_raw.rental_tof_daily_targets.month
+  date:
+    lineage:
+      - datalake_gsheets_raw.rental_tof_daily_targets.date

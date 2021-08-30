@@ -1,0 +1,27 @@
+database_name: datalake_gsheets_clean
+table_name: sale_rbp_targets
+columns:
+  city:
+    lineage:
+      - datalake_gsheets_raw.sale_rbp_targets.city
+  daily_rbp:
+    lineage:
+      - datalake_gsheets_raw.sale_rbp_targets.daily_rbp
+  monthly_rbp:
+    lineage:
+      - datalake_gsheets_raw.sale_rbp_targets.monthly_rbp
+  week_start:
+    lineage:
+      - datalake_gsheets_raw.sale_rbp_targets.week_start
+  weekly_rbp:
+    lineage:
+      - datalake_gsheets_raw.sale_rbp_targets.weekly_rbp
+  month:
+    lineage:
+      - datalake_gsheets_raw.sale_rbp_targets.month
+  year:
+    lineage:
+      - datalake_gsheets_raw.sale_rbp_targets.year
+  date:
+    lineage:
+      - datalake_gsheets_raw.sale_rbp_targets.date

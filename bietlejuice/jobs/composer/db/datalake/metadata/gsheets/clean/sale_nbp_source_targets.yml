@@ -1,0 +1,33 @@
+database_name: datalake_gsheets_clean
+table_name: sale_nbp_source_targets
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.sale_nbp_source_targets.city_group
+  context:
+    lineage:
+      - datalake_gsheets_raw.sale_nbp_source_targets.context
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_raw.sale_nbp_source_targets.mkt_channel
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_raw.sale_nbp_source_targets.mkt_medium
+  mkt_source:
+    lineage:
+      - datalake_gsheets_raw.sale_nbp_source_targets.mkt_source
+  nbp_target:
+    lineage:
+      - datalake_gsheets_raw.sale_nbp_source_targets.nbp_target
+  week_start:
+    lineage:
+      - datalake_gsheets_raw.sale_nbp_source_targets.week_start
+  month:
+    lineage:
+      - datalake_gsheets_raw.sale_nbp_source_targets.month
+  year:
+    lineage:
+      - datalake_gsheets_raw.sale_nbp_source_targets.year
+  date:
+    lineage:
+      - datalake_gsheets_raw.sale_nbp_source_targets.date

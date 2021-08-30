@@ -1,0 +1,27 @@
+database_name: datalake_gsheets_clean
+table_name: sale_ongoing_listings_targets
+columns:
+  cidade:
+    lineage:
+      - datalake_gsheets_raw.sale_ongoing_listings_targets.cidade
+  ongoing_listing:
+    lineage:
+      - datalake_gsheets_raw.sale_ongoing_listings_targets.ongoing_listing
+  halfyear:
+    lineage:
+      - datalake_gsheets_raw.sale_ongoing_listings_targets.halfyear
+  quarter:
+    lineage:
+      - datalake_gsheets_raw.sale_ongoing_listings_targets.quarter
+  week:
+    lineage:
+      - datalake_gsheets_raw.sale_ongoing_listings_targets.week
+  month:
+    lineage:
+      - datalake_gsheets_raw.sale_ongoing_listings_targets.month
+  year:
+    lineage:
+      - datalake_gsheets_raw.sale_ongoing_listings_targets.year
+  date:
+    lineage:
+      - datalake_gsheets_raw.sale_ongoing_listings_targets.date

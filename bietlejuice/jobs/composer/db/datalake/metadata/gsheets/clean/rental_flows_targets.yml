@@ -1,0 +1,18 @@
+database_name: datalake_gsheets_clean
+table_name: rental_flows_targets
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.rental_flows_targets.city_group
+  rf_target:
+    lineage:
+      - datalake_gsheets_raw.rental_flows_targets.rf_target
+  rf_type:
+    lineage:
+      - datalake_gsheets_raw.rental_flows_targets.rf_type
+  week_start:
+    lineage:
+      - datalake_gsheets_raw.rental_flows_targets.week_start
+  date:
+    lineage:
+      - datalake_gsheets_raw.rental_flows_targets.date

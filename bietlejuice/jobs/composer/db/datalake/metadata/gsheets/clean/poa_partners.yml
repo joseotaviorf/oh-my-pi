@@ -1,0 +1,9 @@
+database_name: datalake_gsheets_clean
+table_name: poa_partners
+columns:
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.poa_partners.id_house
+  partner:
+    lineage:
+      - datalake_gsheets_raw.poa_partners.partner

@@ -1,0 +1,51 @@
+database_name: datalake_gsheets_clean
+table_name: offers_hub_central
+columns:
+  id_offer:
+    lineage:
+      - datalake_gsheets_raw.offers_hub_central.id_offer
+  id_client_cm:
+    lineage:
+      - datalake_gsheets_raw.offers_hub_central.id_client_cm
+  id_user_5a:
+    lineage:
+      - datalake_gsheets_raw.offers_hub_central.id_user_5a
+  id_house_cm:
+    lineage:
+      - datalake_gsheets_raw.offers_hub_central.id_house_cm
+  id_house_5a:
+    lineage:
+      - datalake_gsheets_raw.offers_hub_central.id_house_5a
+  offer_flow:
+    lineage:
+      - datalake_gsheets_raw.offers_hub_central.offer_flow
+  status:
+    lineage:
+      - datalake_gsheets_raw.offers_hub_central.status
+  agent:
+    lineage:
+      - datalake_gsheets_raw.offers_hub_central.agent
+  executive:
+    lineage:
+      - datalake_gsheets_raw.offers_hub_central.executive
+  executive_lead:
+    lineage:
+      - datalake_gsheets_raw.offers_hub_central.executive_lead
+  sale_price_agreed:
+    lineage:
+      - datalake_gsheets_raw.offers_hub_central.sale_price_agreed
+  dt_offer_submitted:
+    lineage:
+      - datalake_gsheets_raw.offers_hub_central.dt_offer_submitted
+  dt_offer_ended:
+    lineage:
+      - datalake_gsheets_raw.offers_hub_central.dt_offer_ended
+  dt_offer_accepted:
+    lineage:
+      - datalake_gsheets_raw.offers_hub_central.dt_offer_accepted
+  dt_offer_dismissed:
+    lineage:
+      - datalake_gsheets_raw.offers_hub_central.dt_offer_dismissed
+  dt_sale_agreement_signed:
+    lineage:
+      - datalake_gsheets_raw.offers_hub_central.dt_sale_agreement_signed

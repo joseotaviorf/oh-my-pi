@@ -1,0 +1,24 @@
+database_name: datalake_gsheets_clean
+table_name: promotional_bonus_segmentation_targets
+columns:
+  affiliate_type:
+    lineage:
+      - datalake_gsheets_raw.promotional_bonus_segmentation_targets.affiliate_type
+  bonus_base:
+    lineage:
+      - datalake_gsheets_raw.promotional_bonus_segmentation_targets.bonus_base
+  bonus_boost:
+    lineage:
+      - datalake_gsheets_raw.promotional_bonus_segmentation_targets.bonus_boost
+  segmentation:
+    lineage:
+      - datalake_gsheets_raw.promotional_bonus_segmentation_targets.segmentation
+  target_base:
+    lineage:
+      - datalake_gsheets_raw.promotional_bonus_segmentation_targets.target_base
+  target_boost:
+    lineage:
+      - datalake_gsheets_raw.promotional_bonus_segmentation_targets.target_boost
+  year_month:
+    lineage:
+      - datalake_gsheets_raw.promotional_bonus_segmentation_targets.year_month

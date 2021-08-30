@@ -1,0 +1,144 @@
+database_name: datalake_gsheets_clean
+table_name: process_eviction
+columns:
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.contract_id
+  id_house_listing:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.house_listing
+  agreement_status:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.agreement_status
+  check_abandonment:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.check_abandonment
+  city:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.city
+  condo_internalization_status:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.condo_internalization_status
+  contract_ended_reason:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.contract_ended_reason
+  contract_status:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.contract_status
+  cs_eviction_code:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.cs_eviction_code
+  cs_status:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.cs_status
+  eviction_code:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.eviction_code
+  eviction_status:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.eviction_status
+  general_comments:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.general_comments
+  guarantee:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.guarantee
+  landlord_emails:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.landlord_emails
+  landlord_names:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.landlord_names
+  landlord_ticket_number:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.landlord_ticket_number
+  last_communication_subject:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.last_communication_subject
+  last_settlement_communication_subject:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.last_settlement_communication_subject
+  offboarding_status:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.offboarding_status
+  office_judge:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.office_judge
+  order_type:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.order_type
+  procedure:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.procedure
+  resident_emails:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.resident_emails
+  responsible_office:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.responsible_office
+  settlement_ticket_number:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.settlement_ticket_number
+  tenant_emails:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.tenant_emails
+  tenant_names:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.tenant_names
+  tenant_ticket_number:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.tenant_ticket_number
+  is_fraud:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.is_fraud
+  is_repeat_offender:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.is_repeat_offender
+  dt_agreement_settlement:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.agreement_settlement_date
+  dt_agreement_start:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.agreement_start_date
+  dt_broken_agreement:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.broken_agreement_date
+  dt_competency_month:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.competency_month
+  dt_contract_ended:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.contract_ended_date
+  dt_contract_ended_status_change:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.contract_ended_status_change_date
+  dt_contract_ending:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.contract_ending_date
+  dt_contract_ending_status_change:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.contract_ending_status_change_date
+  dt_contract_start:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.contract_start_date
+  dt_cs_distribution:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.cs_distribution_date
+  dt_cs_verdict:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.cs_verdict_date
+  dt_distribution:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.distribution_date
+  dt_final_verdict:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.final_verdict_date
+  dt_settlement_without_agreement:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.settlement_without_agreement_date
+  dt_sheet_insertion:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.sheet_insertion_date
+  dt_verdict:
+    lineage:
+      - datalake_gsheets_raw.process_eviction.verdict_date

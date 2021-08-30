@@ -1,0 +1,60 @@
+database_name: datalake_gsheets_clean
+table_name: payments_deals_and_discounts
+columns:
+  sk_request:
+    lineage:
+      - datalake_gsheets_raw.payments_deals_and_discounts.sk_request
+  sk_contract:
+    lineage:
+      - datalake_gsheets_raw.payments_deals_and_discounts.sk_contract
+  sk_house:
+    lineage:
+      - datalake_gsheets_raw.payments_deals_and_discounts.sk_house
+  agent_email:
+    lineage:
+      - datalake_gsheets_raw.payments_deals_and_discounts.agent_email
+  origin_form:
+    lineage:
+      - datalake_gsheets_raw.payments_deals_and_discounts.origin_form
+  charge:
+    lineage:
+      - datalake_gsheets_raw.payments_deals_and_discounts.charge
+  requester:
+    lineage:
+      - datalake_gsheets_raw.payments_deals_and_discounts.requester
+  recipient:
+    lineage:
+      - datalake_gsheets_raw.payments_deals_and_discounts.recipient
+  installment_type:
+    lineage:
+      - datalake_gsheets_raw.payments_deals_and_discounts.installment_type
+  installments:
+    lineage:
+      - datalake_gsheets_raw.payments_deals_and_discounts.installments
+  origin_request:
+    lineage:
+      - datalake_gsheets_raw.payments_deals_and_discounts.origin_request
+  comment:
+    lineage:
+      - datalake_gsheets_raw.payments_deals_and_discounts.comment
+  is_canceled:
+    lineage:
+      - datalake_gsheets_raw.payments_deals_and_discounts.is_canceled
+  sla:
+    lineage:
+      - datalake_gsheets_raw.payments_deals_and_discounts.sla
+  value:
+    lineage:
+      - datalake_gsheets_raw.payments_deals_and_discounts.value
+  reference_month:
+    lineage:
+      - datalake_gsheets_raw.payments_deals_and_discounts.reference_month
+  due_date:
+    lineage:
+      - datalake_gsheets_raw.payments_deals_and_discounts.due_date
+  ts_request:
+    lineage:
+      - datalake_gsheets_raw.payments_deals_and_discounts.ts_request
+  ts_request_execution:
+    lineage:
+      - datalake_gsheets_raw.payments_deals_and_discounts.ts_request_execution

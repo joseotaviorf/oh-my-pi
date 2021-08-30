@@ -1,0 +1,51 @@
+database_name: datalake_gsheets_clean
+table_name: sale_supply_targets
+columns:
+  campaign:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets.campaign
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets.city_group
+  first_listings:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets.first_listings
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets.mkt_channel
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets.mkt_origin
+  mkt_type:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets.mkt_type
+  operacao:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets.operacao
+  opportunities:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets.opportunities
+  prospects:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets.prospects
+  qualifieds:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets.qualifieds
+  halfyear:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets.halfyear
+  quarter:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets.quarter
+  week:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets.week
+  year:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets.year
+  month:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets.month
+  date:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets.date

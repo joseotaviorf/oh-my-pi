@@ -1,0 +1,24 @@
+database_name: datalake_gsheets_clean
+table_name: sale_flows_targets
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.sale_flows_targets.city_group
+  sf_target:
+    lineage:
+      - datalake_gsheets_raw.sale_flows_targets.sf_target
+  sf_type:
+    lineage:
+      - datalake_gsheets_raw.sale_flows_targets.sf_type
+  week_start:
+    lineage:
+      - datalake_gsheets_raw.sale_flows_targets.week_start
+  month:
+    lineage:
+      - datalake_gsheets_raw.sale_flows_targets.month
+  year:
+    lineage:
+      - datalake_gsheets_raw.sale_flows_targets.year
+  date:
+    lineage:
+      - datalake_gsheets_raw.sale_flows_targets.date

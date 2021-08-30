@@ -1,0 +1,39 @@
+database_name: datalake_gsheets_clean
+table_name: rental_rtp_targets
+columns:
+  city:
+    lineage:
+      - datalake_gsheets_raw.rental_rtp_targets.city
+  daily_churn:
+    lineage:
+      - datalake_gsheets_raw.rental_rtp_targets.daily_churn
+  daily_recovered:
+    lineage:
+      - datalake_gsheets_raw.rental_rtp_targets.daily_recovered
+  daily_retained:
+    lineage:
+      - datalake_gsheets_raw.rental_rtp_targets.daily_retained
+  daily_inactive_by_renting:
+    lineage:
+      - datalake_gsheets_raw.rental_rtp_targets.daily_inactive_by_renting
+  activetp_eom:
+    lineage:
+      - datalake_gsheets_raw.rental_rtp_targets.activetp_eom
+  activetp_som:
+    lineage:
+      - datalake_gsheets_raw.rental_rtp_targets.activetp_som
+  week_start:
+    lineage:
+      - datalake_gsheets_raw.rental_rtp_targets.week_start
+  weekly_recurrent:
+    lineage:
+      - datalake_gsheets_raw.rental_rtp_targets.weekly_recurrent
+  month:
+    lineage:
+      - datalake_gsheets_raw.rental_rtp_targets.month
+  monthly_recurrent:
+    lineage:
+      - datalake_gsheets_raw.rental_rtp_targets.monthly_recurrent
+  date:
+    lineage:
+      - datalake_gsheets_raw.rental_rtp_targets.date

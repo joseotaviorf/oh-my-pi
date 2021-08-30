@@ -1,0 +1,48 @@
+database_name: datalake_gsheets_clean
+table_name: sale_demand_targets
+columns:
+  ccv:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets.ccv
+  cidade:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets.cidade
+  deal_quali:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets.deal_quali
+  new_buyer_prospect:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets.new_buyer_prospect
+  origin:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets.origin
+  offer_accepted:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets.offer_accepted
+  offer_sent:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets.offer_sent
+  visit_booked:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets.visit_booked
+  visit_completed:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets.visit_completed
+  halfyear:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets.halfyear
+  quarter:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets.quarter
+  week:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets.week
+  month:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets.month
+  year:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets.year
+  date:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets.date

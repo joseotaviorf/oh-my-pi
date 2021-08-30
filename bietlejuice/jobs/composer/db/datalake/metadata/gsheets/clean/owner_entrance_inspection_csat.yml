@@ -1,0 +1,21 @@
+database_name: datalake_gsheets_clean
+table_name: owner_entrance_inspection_csat
+columns:
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_pp_entrada.id_do_contrato
+  email:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_pp_entrada.email
+  improvement_tags:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_pp_entrada.pontos_de_melhoria
+  comments:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_pp_entrada.campo_aberto
+  general_satisfaction_evaluation:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_pp_entrada.avaliacao_csat
+  ts_submitted:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_pp_entrada.submitted_at

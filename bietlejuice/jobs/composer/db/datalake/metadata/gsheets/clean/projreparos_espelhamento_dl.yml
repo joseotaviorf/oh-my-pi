@@ -1,0 +1,153 @@
+database_name: datalake_gsheets_clean
+table_name: projreparos_espelhamento_dl
+columns:
+  analista_responsavel:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.analista_responsavel
+  cidade:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.cidade
+  cliente_contestou_qualidade_servico:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.cliente_contestou_qualidade_servico
+  complexidade_reparos:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.complexidade_reparos
+  conseguimos_confirmar_com_pp_forma_de_resolucao:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.conseguimos_confirmar_com_pp_forma_de_resolucao
+  conseguimos_orcar_reembolso:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.conseguimos_orcar_reembolso
+  contrato:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.contrato
+  fim_do_servico:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.fim_do_servico
+  forma_de_resolucao:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.forma_de_resolucao
+  ha_reparos_negados_por_qualidade:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.ha_reparos_negados_por_qualidade
+  impacto_cliente:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.impacto_cliente
+  incluimos_outros_reparos_apos_negociacao:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.incluimos_outros_reparos_apos_negociacao
+  leadtime_execucao_parceiros:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.leadtime_execucao_parceiros
+  leadtime_final:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.leadtime_final
+  leadtime_iniciado_preferencia:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.leadtime_iniciado_preferencia
+  leadtime_orcamento_parceiros:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.leadtime_orcamento_parceiros
+  leadtime_preferencia_concluido:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.leadtime_preferencia_concluido
+  leadtime_tarefa_iniciado:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.leadtime_tarefa_iniciado
+  leadtime_total:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.leadtime_total
+  observacao_parceiro:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.observacao_parceiro
+  observacao_valor_reparo:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.observacao_valor_reparo
+  pp_contestou_reparos_negados:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.pp_contestou_reparos_negados
+  parceiro:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.parceiro
+  perc_valor_recuperado:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.perc_valor_recuperado
+  resultado:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.resultado
+  retorno_de_garantia:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.retorno_de_garantia
+  ticket_pp:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.ticket_pp
+  ticket_paceiro:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.ticket_paceiro
+  valor_final_reembolsado:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.valor_final_reembolsado
+  valor_final_servico:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.valor_final_servico
+  valor_orcado_para_reembolso:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.valor_orcado_para_reembolso
+  valor_recuperado:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.valor_recuperado
+  aux_month:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.aux_month
+  nome_da_semana:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.nome_da_semana
+  semana:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.semana
+  semana_projeto:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.semana_projeto
+  is_b2b:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.is_b2b
+  is_tratativa_chaves_itens_acesso:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.is_tratativa_chaves_itens_acesso
+  is_tratativa_contas_consumo:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.is_tratativa_contas_consumo
+  data_1_contato_pp:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.data_1_contato_pp
+  data_abertura_tarefa:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.data_abertura_tarefa
+  data_acionamento_parceiro:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.data_acionamento_parceiro
+  data_aprovacao_servico:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.data_aprovacao_servico
+  data_cobranca_inicial:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.data_cobranca_inicial
+  data_definicao_forma_de_resolucao:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.data_definicao_forma_de_resolucao
+  data_final_resolucao:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.data_final_resolucao
+  data_finalizacao_reparo:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.data_finalizacao_reparo
+  data_finalizacao_servico:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.data_finalizacao_servico
+  data_finalizacao_ticket:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.data_finalizacao_ticket
+  data_recebimento_orcamento:
+    lineage:
+      - datalake_gsheets_raw.espelhamento_dl.data_recebimento_orcamento
