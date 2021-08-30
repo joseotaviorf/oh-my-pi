@@ -1,0 +1,52 @@
+---
+database_name: datalake_terminator
+table_name: termination_aud
+columns:
+  id:
+    lineage:
+      - datalake_terminator_clean.termination_aud.id
+  id_contract:
+    lineage:
+      - datalake_terminator_clean.termination_aud.id_contract
+  id_exit_inspection:
+    lineage:
+      - datalake_terminator_clean.termination_aud.id_exit_inspection
+  rev:
+    lineage:
+      - datalake_terminator_clean.termination_aud.rev
+  rev_type:
+    lineage:
+      - datalake_terminator_clean.termination_aud.rev_type
+  rev_end:
+    lineage:
+      - datalake_terminator_clean.termination_aud.rev_end
+  feedback:
+    lineage:
+      - datalake_terminator_clean.termination_aud.feedback
+  status:
+    lineage:
+      - datalake_terminator_clean.termination_aud.status
+  source:
+    lineage:
+      - datalake_terminator_clean.termination_aud.source
+  requested_by:
+    lineage:
+      - datalake_terminator_clean.termination_aud.requested_by
+  reason:
+    lineage:
+      - datalake_terminator_clean.termination_aud.feedback
+  dt_termination:
+    lineage:
+      - datalake_terminator_clean.termination_aud.dt_termination
+  dt_vacancy:
+    lineage:
+      - datalake_terminator_clean.termination_aud.dt_vacancy
+  ts_canceled:
+    lineage:
+      - datalake_terminator_clean.termination_aud.ts_canceled
+  ts_created:
+    lineage:
+      - datalake_terminator_clean.termination_aud.ts_created
+  ts_updated:
+    lineage:
+      - datalake_terminator_clean.termination_aud.ts_updated
