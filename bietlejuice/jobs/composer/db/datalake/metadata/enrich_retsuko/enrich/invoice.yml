@@ -1,0 +1,24 @@
+database_name: datalake_retsuko
+table_name: invoice
+columns:
+  id_invoice:
+    lineage:
+      - datalake_retsuko_clean.invoice.id_external
+  invoice_frequency:
+    lineage:
+      - datalake_retsuko_clean.invoice.purpose
+  payment_status:
+    lineage:
+      - datalake_retsuko_clean.invoice.status
+  invoice_user:
+    lineage:
+      - datalake_retsuko_clean.account.type
+  ts_sent:
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_sent
+  ts_due:
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_due
+  ts_paid:
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_paid
