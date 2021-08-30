@@ -1,0 +1,42 @@
+database_name: datalake_amplitude_user
+table_name: user_affiliate_origin
+columns:
+  id_user:
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+  utm_source:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  utm_medium:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  utm_campaign:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  city_campaign:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  utm_content:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  utm_term:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  platform:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  device_type:
+    lineage:
+      - datalake_amplitude_clean.events.device_type
+  country:
+    lineage:
+      - datalake_amplitude_clean.events.country
+  region:
+    lineage:
+      - datalake_amplitude_clean.events.region
+  city:
+    lineage:
+      - datalake_amplitude_clean.events.city
+  ts_client_event:
+    lineage:
+      - datalake_amplitude_clean.events.ts_client_event
