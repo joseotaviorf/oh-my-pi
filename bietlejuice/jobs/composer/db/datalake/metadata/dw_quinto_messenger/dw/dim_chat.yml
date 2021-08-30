@@ -1,0 +1,27 @@
+database_name: dw_quinto_messenger
+table_name: dim_chat
+columns:
+  sk_chat:
+    lineage:
+      - datalake_quinto_messenger.channel.id_conversation
+  channel:
+    lineage:
+      - datalake_quinto_messenger.channel.channel_type
+  customer_phone:
+    lineage:
+      - datalake_quinto_messenger.channel.from_phone_number
+  twilio_phone:
+    lineage:
+      - datalake_quinto_messenger.channel.twilio_phone_number
+  status:
+    lineage:
+      - datalake_quinto_messenger.channel.channel_status
+  is_forwarded:
+    lineage:
+      - datalake_quinto_messenger.channel.is_forwarded
+  ts_created:
+    lineage:
+      - datalake_quinto_messenger.channel.ts_created
+  ts_updated:
+    lineage:
+      - datalake_quinto_messenger.channel.ts_updated

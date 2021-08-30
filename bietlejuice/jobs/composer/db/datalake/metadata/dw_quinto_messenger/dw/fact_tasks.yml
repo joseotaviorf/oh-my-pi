@@ -1,0 +1,25 @@
+database_name: dw_quinto_messenger
+table_name: fact_tasks
+columns:
+  sk_task:
+    lineage:
+      - datalake_quinto_messenger.task.id_task
+  sk_chat:
+    lineage:
+      - datalake_quinto_messenger.channel.id_conversation
+  sk_quinto_messenger_agent:
+    lineage:
+      - datalake_quinto_messenger.task.id_agent
+  sk_created_date:
+    lineage:
+      - datalake_quinto_messenger.task.ts_created
+  is_forwarded:
+    lineage:
+      - datalake_quinto_messenger.task.is_forwarded
+  seconds_first_reply:
+    lineage:
+      - datalake_quinto_messenger.task.seconds_first_reply
+  task_number:
+    lineage:
+      - datalake_quinto_messenger.task.task_number
+  

@@ -1,0 +1,51 @@
+database_name: dw_quinto_messenger
+table_name: dim_task
+columns:
+  sk_task:
+    lineage:
+      - datalake_quinto_messenger.task.id_task
+  channel:
+    lineage:
+      - datalake_quinto_messenger.task.channel_type_internal
+  department:
+    lineage:
+      - datalake_quinto_messenger.task_event.task_queue_name
+  status:
+    lineage:
+      - datalake_quinto_messenger.task.task_status
+  completion_reason:
+    lineage:
+      - datalake_quinto_messenger.task_event.task_completion_reason
+  customer_type:
+    lineage:
+      - datalake_quinto_messenger.task.customer_type_tag
+  contact_motivation:
+    lineage:
+      - datalake_quinto_messenger.task.contact_motivation_tag
+  contact_theme:
+    lineage:
+      - datalake_quinto_messenger.task.contact_theme_tag
+  ts_created:
+    lineage:
+      - datalake_quinto_messenger.task.ts_created
+  ts_updated:
+    lineage:
+      - datalake_quinto_messenger.task.ts_updated
+  ts_created_local:
+    lineage:
+      - datalake_quinto_messenger.task.ts_created_local
+  ts_updated_local:
+    lineage:
+      - datalake_quinto_messenger.task.ts_updated_local
+  ts_twilio_created:
+    lineage:
+      - datalake_quinto_messenger.task_event.ts_twilio_created
+  ts_twilio_updated:
+    lineage:
+      - datalake_quinto_messenger.task_event.ts_twilio_updated
+  ts_twilio_created_local:
+    lineage:
+      - datalake_quinto_messenger.task_event.ts_twilio_created_local
+  ts_twilio_updated_local:
+    lineage:
+      - datalake_quinto_messenger.task_event.ts_twilio_updated_local

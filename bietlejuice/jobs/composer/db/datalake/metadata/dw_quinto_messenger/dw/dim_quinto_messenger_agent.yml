@@ -1,0 +1,21 @@
+database_name: dw_quinto_messenger
+table_name: dim_quinto_messenger_agent
+columns:
+  sk_quinto_messenger_agent:
+    lineage:
+      - datalake_quinto_messenger.task.id_agent
+  name:
+    lineage:
+      - datalake_quinto_messenger.task_event.agent_full_name
+  email:
+    lineage:
+      - datalake_quinto_messenger.task_event.agent_email
+  location:
+    lineage:
+      - datalake_quinto_messenger.task_event.agent_location
+  skills:
+    lineage:
+      - datalake_quinto_messenger.task_event.agent_skills
+  ts_updated:
+    lineage:
+      - datalake_quinto_messenger.task_event.ts_updated

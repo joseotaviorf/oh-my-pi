@@ -1,0 +1,25 @@
+database_name: dw_quinto_messenger
+table_name: fact_chats
+columns:
+  sk_chat:
+    lineage:
+      - datalake_quinto_messenger.channel.id_conversation
+  sk_session:
+    lineage:
+      - datalake_quinto_messenger.channel.id_source
+  sk_user:
+    lineage:
+      - datalake_ebdb_customer_contact_identification.customer_contact_identification.id_user
+  sk_personal_document:
+    lineage:
+      - datalake_ebdb_customer_contact_identification.customer_contact_identification.cpf
+  sk_created_date:
+    lineage:
+      - datalake_quinto_messenger.channel.ts_created
+  minutes_duration:
+    lineage:
+      - datalake_quinto_messenger.channel.seconds_duration
+  tasks:
+    lineage:
+      - datalake_quinto_messenger.task.id_task
+  
