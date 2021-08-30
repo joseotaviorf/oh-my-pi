@@ -16,7 +16,6 @@ CREATE TABLE sale.dim_sale_agreement (
     seller_dilligence_status VARCHAR,
     report_dilligence_status VARCHAR,
     bank_analysis_status VARCHAR,
-    financing_bank VARCHAR,
     payment_status VARCHAR,
     credit_status VARCHAR,
     notary_office_status VARCHAR,

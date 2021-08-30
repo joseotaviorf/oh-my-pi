@@ -15,7 +15,6 @@ SELECT
   eso.seller_dilligence_status,
   eso.report_dilligence_status,
   eso.bank_analysis_status,
-  eso.financing_bank,
   eso.payment_status,
   eso.credit_status,
   eso.notary_office_status,
