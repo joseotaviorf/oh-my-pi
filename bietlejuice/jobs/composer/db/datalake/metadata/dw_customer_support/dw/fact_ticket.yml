@@ -105,7 +105,7 @@ columns:
       - datalake_customer_support.call.frt
       - datalake_customer_support.chat.frt
       - datalake_customer_support.email.frt
-  front_of_back:
+  front_or_back:
     lineage:
       - datalake_customer_support.call.front_or_back
       - datalake_customer_support.chat.front_or_back

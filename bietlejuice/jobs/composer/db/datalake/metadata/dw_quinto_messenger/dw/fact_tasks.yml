@@ -18,7 +18,7 @@ columns:
       - datalake_quinto_messenger.task.is_forwarded
   seconds_first_reply:
     lineage:
-      - datalake_quinto_messenger.task.seconds_first_reply
+      - datalake_quinto_messenger.task.seconds_to_first_response
   task_number:
     lineage:
       - datalake_quinto_messenger.task.task_number
