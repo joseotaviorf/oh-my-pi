@@ -1,0 +1,24 @@
+database_name: datalake_monopoly_clean
+table_name: income
+columns:
+  id:
+    lineage:
+      - datalake_monopoly_raw.income.id
+  id_person_sale:
+    lineage:
+      - datalake_monopoly_raw.income.person_sale_id
+  id_invoice:
+    lineage:
+      - datalake_monopoly_raw.income.invoice_id
+  event:
+    lineage:
+      - datalake_monopoly_raw.income.event
+  status:
+    lineage:
+      - datalake_monopoly_raw.income.status
+  amount:
+    lineage:
+      - datalake_monopoly_raw.income.amount
+  ts_created:
+    lineage:
+      - datalake_monopoly_raw.income.created_at

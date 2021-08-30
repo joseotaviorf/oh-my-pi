@@ -1,0 +1,15 @@
+database_name: datalake_monopoly_clean
+table_name: person_sale
+columns:
+  id:
+    lineage:
+      - datalake_monopoly_raw.person_sale.id
+  id_person:
+    lineage:
+      - datalake_monopoly_raw.person_sale.person_id
+  id_sale:
+    lineage:
+      - datalake_monopoly_raw.person_sale.sale_id
+  person_type:
+    lineage:
+      - datalake_monopoly_raw.person_sale.type

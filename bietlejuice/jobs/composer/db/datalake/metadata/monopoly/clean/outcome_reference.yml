@@ -1,0 +1,24 @@
+database_name: datalake_monopoly_clean
+table_name: outcome_reference
+columns:
+  id:
+    lineage:
+      - datalake_monopoly_raw.outcome_reference.id
+  id_outcome:
+    lineage:
+      - datalake_monopoly_raw.outcome_reference.outcome_id
+  outcome_to:
+    lineage:
+      - datalake_monopoly_raw.outcome_reference.to
+  amount:
+    lineage:
+      - datalake_monopoly_raw.outcome_reference.amount
+  dt_outcome:
+    lineage:
+      - datalake_monopoly_raw.outcome_reference.outcome_date
+  ts_created:
+    lineage:
+      - datalake_monopoly_raw.outcome_reference.created_at
+  ts_updated:
+    lineage:
+      - datalake_monopoly_raw.outcome_reference.updated_at

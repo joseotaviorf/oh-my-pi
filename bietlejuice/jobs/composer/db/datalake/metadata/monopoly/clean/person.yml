@@ -1,0 +1,24 @@
+database_name: datalake_monopoly_clean
+table_name: person
+columns:
+  id:
+    lineage:
+      - datalake_monopoly_raw.person.id
+  id_external:
+    lineage:
+      - datalake_monopoly_raw.person.external_id
+  person_name:
+    lineage:
+      - datalake_monopoly_raw.person.name
+  document_number:
+    lineage:
+      - datalake_monopoly_raw.person.document_number
+  email:
+    lineage:
+      - datalake_monopoly_raw.person.email
+  ts_created:
+    lineage:
+      - datalake_monopoly_raw.person.created_at
+  ts_updated:
+    lineage:
+      - datalake_monopoly_raw.person.updated_at

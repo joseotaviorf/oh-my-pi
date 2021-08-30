@@ -1,0 +1,21 @@
+database_name: datalake_monopoly_clean
+table_name: outcome_status_log
+columns:
+  id:
+    lineage:
+      - datalake_monopoly_raw.outcome_status_log.id
+  id_outcome:
+    lineage:
+      - datalake_monopoly_raw.outcome_status_log.outcome_id
+  status:
+    lineage:
+      - datalake_monopoly_raw.outcome_status_log.status
+  updated_by:
+    lineage:
+      - datalake_monopoly_raw.outcome_status_log.updated_by
+  dt_occurence:
+    lineage:
+      - datalake_monopoly_raw.outcome_status_log.occurrence_date
+  ts_created:
+    lineage:
+      - datalake_monopoly_raw.outcome_status_log.created_at

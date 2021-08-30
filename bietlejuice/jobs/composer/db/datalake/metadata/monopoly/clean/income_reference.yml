@@ -1,0 +1,24 @@
+database_name: datalake_monopoly_clean
+table_name: income_reference
+columns:
+  id:
+    lineage:
+      - datalake_monopoly_raw.income_reference.id
+  id_income:
+    lineage:
+      - datalake_monopoly_raw.income_reference.income_id
+  income_from:
+    lineage:
+      - datalake_monopoly_raw.income_reference.from
+  amount:
+    lineage:
+      - datalake_monopoly_raw.income_reference.amount
+  dt_income:
+    lineage:
+      - datalake_monopoly_raw.income_reference.income_date
+  ts_created:
+    lineage:
+      - datalake_monopoly_raw.income_reference.created_at
+  ts_updated:
+    lineage:
+      - datalake_monopoly_raw.income_reference.updated_at

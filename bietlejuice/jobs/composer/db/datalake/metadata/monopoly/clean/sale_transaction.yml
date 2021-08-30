@@ -1,0 +1,39 @@
+database_name: datalake_monopoly_clean
+table_name: sale_transaction
+columns:
+  id:
+    lineage:
+      - datalake_monopoly_raw.sale_transaction.id
+  id_sale:
+    lineage:
+      - datalake_monopoly_raw.sale_transaction.sale_id
+  id_income_reference:
+    lineage:
+      - datalake_monopoly_raw.sale_transaction.income_reference_id
+  id_outcome_reference:
+    lineage:
+      - datalake_monopoly_raw.sale_transaction.outcome_reference_id
+  event:
+    lineage:
+      - datalake_monopoly_raw.sale_transaction.event
+  description:
+    lineage:
+      - datalake_monopoly_raw.sale_transaction.description
+  status:
+    lineage:
+      - datalake_monopoly_raw.sale_transaction.status
+  reversed_by:
+    lineage:
+      - datalake_monopoly_raw.sale_transaction.reversed_by
+  dt_accounting:
+    lineage:
+      - datalake_monopoly_raw.sale_transaction.accounting_date
+  ts_reversed:
+    lineage:
+      - datalake_monopoly_raw.sale_transaction.reversed_at
+  ts_created:
+    lineage:
+      - datalake_monopoly_raw.sale_transaction.created_at
+  ts_updated:
+    lineage:
+      - datalake_monopoly_raw.sale_transaction.updated_at

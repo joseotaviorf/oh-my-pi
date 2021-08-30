@@ -1,0 +1,27 @@
+database_name: datalake_monopoly_clean
+table_name: accounting_entry
+columns:
+  id:
+    lineage:
+      - datalake_monopoly_raw.accounting_entry.id
+  id_account:
+    lineage:
+      - datalake_monopoly_raw.accounting_entry.account_id
+  id_sale_transaction:
+    lineage:
+      - datalake_monopoly_raw.accounting_entry.sale_transaction_id
+  person_type:
+    lineage:
+      - datalake_monopoly_raw.accounting_entry.person_type
+  entry_type:
+    lineage:
+      - datalake_monopoly_raw.accounting_entry.type
+  credit:
+    lineage:
+      - datalake_monopoly_raw.accounting_entry.credit
+  debit:
+    lineage:
+      - datalake_monopoly_raw.accounting_entry.debit
+  ts_created:
+    lineage:
+      - datalake_monopoly_raw.accounting_entry.created_at

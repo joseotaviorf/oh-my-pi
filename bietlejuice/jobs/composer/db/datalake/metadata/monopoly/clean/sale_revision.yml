@@ -1,0 +1,24 @@
+database_name: datalake_monopoly_clean
+table_name: sale_revision
+columns:
+  id:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.id
+  id_external_offer:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.external_offer_id
+  revision:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.revision
+  ledger_rule:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.ledger_rule
+  down_payment_amount:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.down_payment_amount
+  entry_payment_amount:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.entry_payment_amount
+  fgts_amount_preview:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.fgts_amount_preview

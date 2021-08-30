@@ -1,0 +1,15 @@
+database_name: datalake_monopoly_clean
+table_name: account
+columns:
+  id:
+    lineage:
+      - datalake_monopoly_raw.account.id
+  code:
+    lineage:
+      - datalake_monopoly_raw.account.code
+  account_name:
+    lineage:
+      - datalake_monopoly_raw.account.name
+  ts_created:
+    lineage:
+      - datalake_monopoly_raw.account.created_at

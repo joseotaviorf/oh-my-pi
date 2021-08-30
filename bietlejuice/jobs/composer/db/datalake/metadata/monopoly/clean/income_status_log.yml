@@ -1,0 +1,24 @@
+database_name: datalake_monopoly_clean
+table_name: income_status_log
+columns:
+  id:
+    lineage:
+      - datalake_monopoly_raw.income_status_log.id
+  id_income:
+    lineage:
+      - datalake_monopoly_raw.income_status_log.income_id
+  status:
+    lineage:
+      - datalake_monopoly_raw.income_status_log.status
+  gateway_response:
+    lineage:
+      - datalake_monopoly_raw.income_status_log.gateway_response
+  amount:
+    lineage:
+      - datalake_monopoly_raw.income_status_log.amount
+  dt_due:
+    lineage:
+      - datalake_monopoly_raw.income_status_log.due_date
+  ts_created:
+    lineage:
+      - datalake_monopoly_raw.income_status_log.created_at
