@@ -1,0 +1,39 @@
+database_name: datalake_amplitude_visit
+table_name: amplitude_visit
+columns:
+  id_visit:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.event_properties
+  app_type:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.user_properties
+  media_source:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.user_properties
+  adjust_network:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.user_properties
+  utm_source:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.user_properties
+  utm_campaign:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.user_properties
+  utm_medium:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.user_properties
+  utm_content:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.user_properties
+  utm_term:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.user_properties
+  is_branded:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.user_properties
+  branded:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.user_properties
+  ts_event:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.ts_event
