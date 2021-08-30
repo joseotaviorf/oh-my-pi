@@ -17,6 +17,7 @@ Produces the following output tables:
 - `house_listing_status`
 - `house_status_version_order`
 - `listing_business_context`
+- `non_doorman_listing`
 - `portability`
 
 ### Responsible Data Engineering Team

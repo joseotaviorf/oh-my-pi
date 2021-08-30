@@ -48,6 +48,7 @@ LIBRARIES_DESCRIPTION = Variable.get(
 INNER_DEPENDENCIES = {
     "house_listing": ["house_status_version_order"],
     "house_listing_status": ["house_status_version_order"],
+    "non_doorman_listing": ["house_listing"],
 }
 
 dag = DAG(
