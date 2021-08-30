@@ -279,6 +279,10 @@ bietlejuice.dw_user_sales_rep:
 bietlejuice.dw_visit:
   - bietlejuice.ebdb:create-clean-visit-in-data-lake
 
+bietlejuice.enrich_amplitude_lead:
+  - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
+  - bietlejuice.rene_descartes:load-clean-house-lead
+
 bietlejuice.enrich_amplitude_offer:
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
 
