@@ -1,0 +1,9 @@
+database_name: datalake_crm_lead
+table_name: lead_score_factor
+columns:
+  id_lead:
+    lineage:
+      - datalake_crm.tasks.id_origin
+  score_factor:
+    lineage:
+      - datalake_crm.tasks.score_factor

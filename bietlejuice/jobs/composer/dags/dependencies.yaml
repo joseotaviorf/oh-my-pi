@@ -385,6 +385,9 @@ bietlejuice.enrich_credit_evers:
 bietlejuice.enrich_crm:
   - bietlejuice.crm
 
+bietlejuice.enrich_crm_lead:
+  - bietlejuice.enrich_crm:load-enrich-tasks
+
 bietlejuice.enrich_crm_tasks_resolution:
   - bietlejuice.enrich_crm:load-enrich-tasks-actions
   - bietlejuice.enrich_crm:load-enrich-tasks
