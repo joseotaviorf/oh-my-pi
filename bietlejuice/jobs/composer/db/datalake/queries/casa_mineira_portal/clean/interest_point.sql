@@ -5,7 +5,6 @@ SELECT
     nome AS interest_point_name,
     nome_completo AS interest_point_full_name,
     slug AS interest_point_slug_name,
-    genero AS gender,
     logradouro AS address,
     numero AS address_number,
     complemento AS complement,

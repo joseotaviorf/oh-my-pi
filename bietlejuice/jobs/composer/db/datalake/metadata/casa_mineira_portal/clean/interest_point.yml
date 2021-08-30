@@ -19,9 +19,6 @@ columns:
   interest_point_slug_name:
     lineage:
       - datalake_casa_mineira_portal_raw.ponto_interesse.slug
-  gender:
-    lineage:
-      - datalake_casa_mineira_portal_raw.ponto_interesse.genero
   address:
     lineage:
       - datalake_casa_mineira_portal_raw.ponto_interesse.logradouro

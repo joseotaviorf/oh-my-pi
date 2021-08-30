@@ -5,7 +5,6 @@ SELECT
     nome_completo AS full_neighborhood,
     slug AS slug_neighborhood,
     nome_correios AS mail_name,
-    genero AS gender,
     CAST(total_imoveis AS INT) AS total_house,
     CAST(total_imoveis_ativos AS INT) AS total_active_house,
     CAST(total_condominios AS SMALLINT) AS total_condo,

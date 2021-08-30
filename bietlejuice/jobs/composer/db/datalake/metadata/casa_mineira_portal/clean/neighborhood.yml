@@ -19,9 +19,6 @@ columns:
   mail_name:
     lineage:
       - datalake_casa_mineira_portal_raw.bairro.nome_correios
-  gender:
-    lineage:
-      - datalake_casa_mineira_portal_raw.bairro.genero
   total_house:
     lineage:
       - datalake_casa_mineira_portal_raw.bairro.total_imoveis
