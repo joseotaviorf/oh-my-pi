@@ -1,8 +1,0 @@
-{
-    "$lookup": {
-        "from": "employees",
-        "localField": "assigneeId",
-        "foreignField": "_id",
-        "as": "assignee"
-    }
-}
