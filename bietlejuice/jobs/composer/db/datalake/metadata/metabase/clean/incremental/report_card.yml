@@ -1,0 +1,60 @@
+database_name: datalake_metabase_clean
+table_name: report_card
+columns:
+  id:
+    lineage:
+      - datalake_metabase_raw.report_card.id
+  id_user_creator:
+    lineage:
+      - datalake_metabase_raw.report_card.creator_id
+  id_database:
+    lineage:
+      - datalake_metabase_raw.report_card.database_id
+  id_table:
+    lineage:
+      - datalake_metabase_raw.report_card.table_id
+  id_collection:
+    lineage:
+      - datalake_metabase_raw.report_card.collection_id
+  name:
+    lineage:
+      - datalake_metabase_raw.report_card.name
+  description:
+    lineage:
+      - datalake_metabase_raw.report_card.description
+  display:
+    lineage:
+      - datalake_metabase_raw.report_card.display
+  query_type:
+    lineage:
+      - datalake_metabase_raw.report_card.query_type
+  dataset_query:
+    lineage:
+      - datalake_metabase_raw.report_card.dataset_query
+  visualization_settings:
+    lineage:
+      - datalake_metabase_raw.report_card.visualization_settings
+  embedding_params:
+    lineage:
+      - datalake_metabase_raw.report_card.embedding_params
+  is_enabled_for_embedding:
+    lineage:
+      - datalake_metabase_raw.report_card.enable_embedding
+  is_archived:
+    lineage:
+      - datalake_metabase_raw.report_card.archived
+  ts_created:
+    lineage:
+      - datalake_metabase_raw.report_card.created_at
+  ts_updated:
+    lineage:
+      - datalake_metabase_raw.report_card.updated_at
+  year:
+    lineage:
+      - datalake_metabase_raw.report_card.year
+  month:
+    lineage:
+      - datalake_metabase_raw.report_card.month
+  day:
+    lineage:
+      - datalake_metabase_raw.report_card.day

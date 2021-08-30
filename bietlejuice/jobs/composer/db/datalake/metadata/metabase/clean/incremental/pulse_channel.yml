@@ -1,0 +1,45 @@
+database_name: datalake_metabase_clean
+table_name: pulse_channel
+columns:
+  id:
+    lineage:
+      - datalake_metabase_raw.pulse_channel.id
+  id_pulse:
+    lineage:
+      - datalake_metabase_raw.pulse_channel.pulse_id
+  channel_type:
+    lineage:
+      - datalake_metabase_raw.pulse_channel.channel_type
+  details:
+    lineage:
+      - datalake_metabase_raw.pulse_channel.details
+  schedule_type:
+    lineage:
+      - datalake_metabase_raw.pulse_channel.schedule_type
+  schedule_frame:
+    lineage:
+      - datalake_metabase_raw.pulse_channel.schedule_frame
+  schedule_hour:
+    lineage:
+      - datalake_metabase_raw.pulse_channel.schedule_hour
+  schedule_day:
+    lineage:
+      - datalake_metabase_raw.pulse_channel.schedule_day
+  is_enabled:
+    lineage:
+      - datalake_metabase_raw.pulse_channel.enabled
+  ts_created:
+    lineage:
+      - datalake_metabase_raw.pulse_channel.created_at
+  ts_updated:
+    lineage:
+      - datalake_metabase_raw.pulse_channel.updated_at
+  year:
+    lineage:
+      - datalake_metabase_raw.pulse_channel.year
+  month:
+    lineage:
+      - datalake_metabase_raw.pulse_channel.month
+  day:
+    lineage:
+      - datalake_metabase_raw.pulse_channel.day

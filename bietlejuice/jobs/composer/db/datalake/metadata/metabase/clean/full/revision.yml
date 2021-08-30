@@ -1,0 +1,30 @@
+database_name: datalake_metabase_clean
+table_name: revision
+columns:
+  id:
+    lineage:
+      - datalake_metabase_raw.revision.id
+  id_user_revisor:
+    lineage:
+      - datalake_metabase_raw.revision.user_id
+  id_model:
+    lineage:
+      - datalake_metabase_raw.revision.model_id
+  model:
+    lineage:
+      - datalake_metabase_raw.revision.model
+  object:
+    lineage:
+      - datalake_metabase_raw.revision.object
+  message:
+    lineage:
+      - datalake_metabase_raw.revision.message
+  is_reversion:
+    lineage:
+      - datalake_metabase_raw.revision.is_reversion
+  is_creation:
+    lineage:
+      - datalake_metabase_raw.revision.is_creation
+  ts_revision:
+    lineage:
+      - datalake_metabase_raw.revision.timestamp

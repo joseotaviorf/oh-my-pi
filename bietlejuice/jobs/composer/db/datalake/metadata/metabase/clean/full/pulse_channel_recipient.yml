@@ -1,0 +1,12 @@
+database_name: datalake_metabase_clean
+table_name: pulse_channel_recipient
+columns:
+  id:
+    lineage:
+      - datalake_metabase_raw.pulse_channel_recipient.id
+  id_pulse_channel:
+    lineage:
+      - datalake_metabase_raw.pulse_channel_recipient.pulse_channel_id
+  id_user:
+    lineage:
+      - datalake_metabase_raw.pulse_channel_recipient.user_id

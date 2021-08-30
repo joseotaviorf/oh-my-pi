@@ -1,0 +1,48 @@
+database_name: datalake_metabase_clean
+table_name: core_user
+columns:
+  id:
+    lineage:
+      - datalake_metabase_raw.core_user.id
+  email:
+    lineage:
+      - datalake_metabase_raw.core_user.email
+  first_name:
+    lineage:
+      - datalake_metabase_raw.core_user.first_name
+  last_name:
+    lineage:
+      - datalake_metabase_raw.core_user.last_name
+  is_active:
+    lineage:
+      - datalake_metabase_raw.core_user.is_active
+  is_superuser:
+    lineage:
+      - datalake_metabase_raw.core_user.is_superuser
+  is_qbnewb:
+    lineage:
+      - datalake_metabase_raw.core_user.is_qbnewb
+  has_google_auth:
+    lineage:
+      - datalake_metabase_raw.core_user.google_auth
+  has_ldap_auth:
+    lineage:
+      - datalake_metabase_raw.core_user.ldap_auth
+  ts_joined:
+    lineage:
+      - datalake_metabase_raw.core_user.date_joined
+  ts_last_login:
+    lineage:
+      - datalake_metabase_raw.core_user.last_login
+  ts_updated:
+    lineage:
+      - datalake_metabase_raw.core_user.updated_at
+  year:
+    lineage:
+      - datalake_metabase_raw.core_user.year
+  month:
+    lineage:
+      - datalake_metabase_raw.core_user.month
+  day:
+    lineage:
+      - datalake_metabase_raw.core_user.day

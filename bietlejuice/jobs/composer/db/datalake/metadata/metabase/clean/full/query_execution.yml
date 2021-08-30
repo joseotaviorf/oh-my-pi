@@ -1,0 +1,42 @@
+database_name: datalake_metabase_clean
+table_name: query_execution
+columns:
+  id:
+    lineage:
+      - datalake_metabase_raw.query_execution.id
+  id_user_executor:
+    lineage:
+      - datalake_metabase_raw.query_execution.executor_id
+  id_card:
+    lineage:
+      - datalake_metabase_raw.query_execution.card_id
+  id_dashboard:
+    lineage:
+      - datalake_metabase_raw.query_execution.dashboard_id
+  id_pulse:
+    lineage:
+      - datalake_metabase_raw.query_execution.pulse_id
+  id_database:
+    lineage:
+      - datalake_metabase_raw.query_execution.database_id
+  hash:
+    lineage:
+      - datalake_metabase_raw.query_execution.hash
+  context:
+    lineage:
+      - datalake_metabase_raw.query_execution.context
+  result_rows:
+    lineage:
+      - datalake_metabase_raw.query_execution.result_rows
+  error_message:
+    lineage:
+      - datalake_metabase_raw.query_execution.error
+  running_time_in_milliseconds:
+    lineage:
+      - datalake_metabase_raw.query_execution.running_time
+  is_native:
+    lineage:
+      - datalake_metabase_raw.query_execution.native
+  ts_started:
+    lineage:
+      - datalake_metabase_raw.query_execution.started_at

@@ -1,0 +1,12 @@
+database_name: datalake_metabase_clean
+table_name: query
+columns:
+  query:
+    lineage:
+      - datalake_metabase_raw.query.query
+  query_hash:
+    lineage:
+      - datalake_metabase_raw.query.query_hash
+  average_execution_time_in_milliseconds:
+    lineage:
+      - datalake_metabase_raw.query.average_execution_time

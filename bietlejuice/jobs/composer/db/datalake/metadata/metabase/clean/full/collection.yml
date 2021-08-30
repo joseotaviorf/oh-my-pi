@@ -1,0 +1,24 @@
+database_name: datalake_metabase_clean
+table_name: collection
+columns:
+  id:
+    lineage:
+      - datalake_metabase_raw.collection.id
+  id_user_personal_owner:
+    lineage:
+      - datalake_metabase_raw.collection.personal_owner_id
+  name:
+    lineage:
+      - datalake_metabase_raw.collection.name
+  description:
+    lineage:
+      - datalake_metabase_raw.collection.description
+  location:
+    lineage:
+      - datalake_metabase_raw.collection.location
+  slug:
+    lineage:
+      - datalake_metabase_raw.collection.slug
+  is_archived:
+    lineage:
+      - datalake_metabase_raw.collection.archived

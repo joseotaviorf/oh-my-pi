@@ -1,0 +1,54 @@
+database_name: datalake_metabase_clean
+table_name: report_dashboard
+columns:
+  id:
+    lineage:
+      - datalake_metabase_raw.report_dashboard.id
+  id_user_creator:
+    lineage:
+      - datalake_metabase_raw.report_dashboard.creator_id
+  id_collection:
+    lineage:
+      - datalake_metabase_raw.report_dashboard.collection_id
+  name:
+    lineage:
+      - datalake_metabase_raw.report_dashboard.name
+  description:
+    lineage:
+      - datalake_metabase_raw.report_dashboard.description
+  position:
+    lineage:
+      - datalake_metabase_raw.report_dashboard.position
+  collection_position:
+    lineage:
+      - datalake_metabase_raw.report_dashboard.collection_position
+  parameters:
+    lineage:
+      - datalake_metabase_raw.report_dashboard.parameters
+  embedding_params:
+    lineage:
+      - datalake_metabase_raw.report_dashboard.embedding_params
+  is_archived:
+    lineage:
+      - datalake_metabase_raw.report_dashboard.archived
+  has_show_in_getting_started:
+    lineage:
+      - datalake_metabase_raw.report_dashboard.show_in_getting_started
+  is_enabled_for_embedding:
+    lineage:
+      - datalake_metabase_raw.report_dashboard.enable_embedding
+  ts_created:
+    lineage:
+      - datalake_metabase_raw.report_dashboard.created_at
+  ts_updated:
+    lineage:
+      - datalake_metabase_raw.report_dashboard.updated_at
+  year:
+    lineage:
+      - datalake_metabase_raw.report_dashboard.year
+  month:
+    lineage:
+      - datalake_metabase_raw.report_dashboard.month
+  day:
+    lineage:
+      - datalake_metabase_raw.report_dashboard.day

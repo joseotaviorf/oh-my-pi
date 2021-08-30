@@ -1,0 +1,75 @@
+database_name: datalake_metabase_clean
+table_name: metabase_field
+columns:
+  id:
+    lineage:
+      - datalake_metabase_raw.metabase_field.id
+  id_table:
+    lineage:
+      - datalake_metabase_raw.metabase_field.table_id
+  id_parent:
+    lineage:
+      - datalake_metabase_raw.metabase_field.parent_id
+  id_fk_target_field:
+    lineage:
+      - datalake_metabase_raw.metabase_field.fk_target_field_id
+  name:
+    lineage:
+      - datalake_metabase_raw.metabase_field.name
+  display_name:
+    lineage:
+      - datalake_metabase_raw.metabase_field.display_name
+  description:
+    lineage:
+      - datalake_metabase_raw.metabase_field.description
+  base_type:
+    lineage:
+      - datalake_metabase_raw.metabase_field.base_type
+  special_type:
+    lineage:
+      - datalake_metabase_raw.metabase_field.special_type
+  position:
+    lineage:
+      - datalake_metabase_raw.metabase_field.position
+  field_values:
+    lineage:
+      - datalake_metabase_raw.metabase_field.has_field_values
+  visibility_type:
+    lineage:
+      - datalake_metabase_raw.metabase_field.visibility_type
+  fingerprint:
+    lineage:
+      - datalake_metabase_raw.metabase_field.fingerprint
+  fingerprint_version:
+    lineage:
+      - datalake_metabase_raw.metabase_field.fingerprint_version
+  database_field_type:
+    lineage:
+      - datalake_metabase_raw.metabase_field.database_type
+  settings:
+    lineage:
+      - datalake_metabase_raw.metabase_field.settings
+  is_active:
+    lineage:
+      - datalake_metabase_raw.metabase_field.active
+  has_preview_display:
+    lineage:
+      - datalake_metabase_raw.metabase_field.preview_display
+  ts_last_analyzed:
+    lineage:
+      - datalake_metabase_raw.metabase_field.last_analyzed
+  ts_created:
+    lineage:
+      - datalake_metabase_raw.metabase_field.created_at
+  ts_updated:
+    lineage:
+      - datalake_metabase_raw.metabase_field.updated_at
+  year:
+    lineage:
+      - datalake_metabase_raw.metabase_field.year
+  month:
+    lineage:
+      - datalake_metabase_raw.metabase_field.month
+  day:
+    lineage:
+      - datalake_metabase_raw.metabase_field.day

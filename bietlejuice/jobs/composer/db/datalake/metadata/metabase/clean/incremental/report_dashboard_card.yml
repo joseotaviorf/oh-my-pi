@@ -1,0 +1,45 @@
+database_name: datalake_metabase_clean
+table_name: report_dashboard_card
+columns:
+  id:
+    lineage:
+      - datalake_metabase_raw.report_dashboardcard.id
+  id_card:
+    lineage:
+      - datalake_metabase_raw.report_dashboardcard.card_id
+  id_dashboard:
+    lineage:
+      - datalake_metabase_raw.report_dashboardcard.dashboard_id
+  size_x:
+    lineage:
+      - datalake_metabase_raw.report_dashboardcard.sizex
+  size_y:
+    lineage:
+      - datalake_metabase_raw.report_dashboardcard.sizey
+  row:
+    lineage:
+      - datalake_metabase_raw.report_dashboardcard.row
+  column:
+    lineage:
+      - datalake_metabase_raw.report_dashboardcard.col
+  parameter_mappings:
+    lineage:
+      - datalake_metabase_raw.report_dashboardcard.parameter_mappings
+  visualization_settings:
+    lineage:
+      - datalake_metabase_raw.report_dashboardcard.visualization_settings
+  ts_created:
+    lineage:
+      - datalake_metabase_raw.report_dashboardcard.created_at
+  ts_updated:
+    lineage:
+      - datalake_metabase_raw.report_dashboardcard.updated_at
+  year:
+    lineage:
+      - datalake_metabase_raw.report_dashboardcard.year
+  month:
+    lineage:
+      - datalake_metabase_raw.report_dashboardcard.month
+  day:
+    lineage:
+      - datalake_metabase_raw.report_dashboardcard.day

@@ -1,0 +1,51 @@
+database_name: datalake_metabase_clean
+table_name: metabase_table
+columns:
+  id:
+    lineage:
+      - datalake_metabase_raw.metabase_table.id
+  id_database:
+    lineage:
+      - datalake_metabase_raw.metabase_table.db_id
+  name:
+    lineage:
+      - datalake_metabase_raw.metabase_table.name
+  display_name:
+    lineage:
+      - datalake_metabase_raw.metabase_table.display_name
+  description:
+    lineage:
+      - datalake_metabase_raw.metabase_table.description
+  entity_name:
+    lineage:
+      - datalake_metabase_raw.metabase_table.entity_name
+  entity_type:
+    lineage:
+      - datalake_metabase_raw.metabase_table.entity_type
+  schema:
+    lineage:
+      - datalake_metabase_raw.metabase_table.schema
+  visibility_type:
+    lineage:
+      - datalake_metabase_raw.metabase_table.visibility_type
+  is_active:
+    lineage:
+      - datalake_metabase_raw.metabase_table.active
+  has_table_showing_in_getting_started:
+    lineage:
+      - datalake_metabase_raw.metabase_table.show_in_getting_started
+  ts_created:
+    lineage:
+      - datalake_metabase_raw.metabase_table.created_at
+  ts_updated:
+    lineage:
+      - datalake_metabase_raw.metabase_table.updated_at
+  year:
+    lineage:
+      - datalake_metabase_raw.metabase_table.year
+  month:
+    lineage:
+      - datalake_metabase_raw.metabase_table.month
+  day:
+    lineage:
+      - datalake_metabase_raw.metabase_table.day

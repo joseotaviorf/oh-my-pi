@@ -1,0 +1,21 @@
+database_name: datalake_metabase_clean
+table_name: pulse_card
+columns:
+  id:
+    lineage:
+      - datalake_metabase_raw.pulse_card.id
+  id_pulse:
+    lineage:
+      - datalake_metabase_raw.pulse_card.pulse_id
+  id_card:
+    lineage:
+      - datalake_metabase_raw.pulse_card.card_id
+  position:
+    lineage:
+      - datalake_metabase_raw.pulse_card.position
+  has_csv_included:
+    lineage:
+      - datalake_metabase_raw.pulse_card.include_csv
+  has_xls_included:
+    lineage:
+      - datalake_metabase_raw.pulse_card.include_xls
