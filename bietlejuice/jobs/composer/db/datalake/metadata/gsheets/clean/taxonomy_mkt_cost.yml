@@ -1,0 +1,51 @@
+database_name: datalake_gsheets_clean
+table_name: taxonomy_mkt_cost
+columns:
+  account_name:
+    lineage:
+      - datalake_gsheets_raw.full_taxonomy.account_name
+  campaign_origin_aquisition:
+    lineage:
+      - datalake_gsheets_raw.full_taxonomy.campaign_origin_aquisition
+  cost_factor:
+    lineage:
+      - datalake_gsheets_raw.full_taxonomy.cost_factor
+  fact_cost:
+    lineage:
+      - datalake_gsheets_raw.full_taxonomy.fact_cost
+  mkt_category:
+    lineage:
+      - datalake_gsheets_raw.full_taxonomy.mkt_category
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_raw.full_taxonomy.mkt_channel
+  mkt_completion:
+    lineage:
+      - datalake_gsheets_raw.full_taxonomy.mkt_completion
+  mkt_flow:
+    lineage:
+      - datalake_gsheets_raw.full_taxonomy.mkt_flow
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_raw.full_taxonomy.mkt_medium
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_raw.full_taxonomy.mkt_origin
+  mkt_source:
+    lineage:
+      - datalake_gsheets_raw.full_taxonomy.mkt_source
+  origin:
+    lineage:
+      - datalake_gsheets_raw.full_taxonomy.origin
+  schema:
+    lineage:
+      - datalake_gsheets_raw.full_taxonomy.schema
+  side:
+    lineage:
+      - datalake_gsheets_raw.full_taxonomy.side
+  split_into_cities:
+    lineage:
+      - datalake_gsheets_raw.full_taxonomy.split_into_cities
+  table_dim:
+    lineage:
+      - datalake_gsheets_raw.full_taxonomy.table_dim

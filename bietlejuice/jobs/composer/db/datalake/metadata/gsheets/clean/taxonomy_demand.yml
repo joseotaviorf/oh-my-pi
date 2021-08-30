@@ -1,0 +1,48 @@
+database_name: datalake_gsheets_clean
+table_name: taxonomy_demand
+columns:
+  id:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_demand.id
+  app_type:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_demand.app_type
+  utm_source:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_demand.utm_source
+  utm_medium:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_demand.utm_medium
+  branded:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_demand.branded
+  category:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_demand.category
+  flow:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_demand.flow
+  completion:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_demand.completion
+  origin:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_demand.origin
+  channel:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_demand.channel
+  medium:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_demand.medium
+  source:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_demand.source
+  platform:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_demand.platform
+  flg_via_reschedule:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_demand.flg_via_reschedule
+  first_update_source:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_demand.first_update_source

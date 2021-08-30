@@ -1,0 +1,48 @@
+database_name: datalake_gsheets_clean
+table_name: week_volumes_demand
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.week_volumes_demand.city_group
+  contract_signed:
+    lineage:
+      - datalake_gsheets_raw.week_volumes_demand.contract_signed
+  credit_approved:
+    lineage:
+      - datalake_gsheets_raw.week_volumes_demand.credit_approved
+  credit_evaluation_init:
+    lineage:
+      - datalake_gsheets_raw.week_volumes_demand.credit_evaluation_init
+  credit_evaluation_positive:
+    lineage:
+      - datalake_gsheets_raw.week_volumes_demand.credit_evaluation_positive
+  demand_channel_type:
+    lineage:
+      - datalake_gsheets_raw.week_volumes_demand.demand_channel_type
+  document_sent:
+    lineage:
+      - datalake_gsheets_raw.week_volumes_demand.document_sent
+  funnel_first_touchpoint:
+    lineage:
+      - datalake_gsheets_raw.week_volumes_demand.funnel_first_touchpoint
+  guarantee:
+    lineage:
+      - datalake_gsheets_raw.week_volumes_demand.guarantee
+  new_tenant_prospect:
+    lineage:
+      - datalake_gsheets_raw.week_volumes_demand.new_tenant_prospect
+  offer_accepted:
+    lineage:
+      - datalake_gsheets_raw.week_volumes_demand.offer_accepted
+  offer_submitted:
+    lineage:
+      - datalake_gsheets_raw.week_volumes_demand.offer_submitted
+  visit_booked:
+    lineage:
+      - datalake_gsheets_raw.week_volumes_demand.visit_booked
+  visit_completed:
+    lineage:
+      - datalake_gsheets_raw.week_volumes_demand.visit_completed
+  week_start:
+    lineage:
+      - datalake_gsheets_raw.week_volumes_demand.week_start

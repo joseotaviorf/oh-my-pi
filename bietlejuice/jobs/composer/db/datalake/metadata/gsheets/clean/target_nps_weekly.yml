@@ -1,0 +1,66 @@
+database_name: datalake_gsheets_clean
+table_name: target_nps_weekly
+columns:
+  nps_global:
+    lineage:
+      - datalake_gsheets_raw.target_nps_weekly.nps_global
+  nps_global_4060_l4w:
+    lineage:
+      - datalake_gsheets_raw.target_nps_weekly.nps_global_4060_l4w
+  fr_lost:
+    lineage:
+      - datalake_gsheets_raw.target_nps_weekly.fr_lost
+  lost_visits_fr:
+    lineage:
+      - datalake_gsheets_raw.target_nps_weekly.lost_visits_fr
+  lost_proposals_fr:
+    lineage:
+      - datalake_gsheets_raw.target_nps_weekly.lost_proposals_fr
+  unpublished_fr:
+    lineage:
+      - datalake_gsheets_raw.target_nps_weekly.unpublished_fr
+  fr_true:
+    lineage:
+      - datalake_gsheets_raw.target_nps_weekly.fr_true
+  fr_onboarding:
+    lineage:
+      - datalake_gsheets_raw.target_nps_weekly.fr_onboarding
+  fr_ongoing:
+    lineage:
+      - datalake_gsheets_raw.target_nps_weekly.fr_ongoing
+  fr_offboarding:
+    lineage:
+      - datalake_gsheets_raw.target_nps_weekly.fr_offboarding
+  fr_lost_iq_rejected:
+    lineage:
+      - datalake_gsheets_raw.target_nps_weekly.fr_lost_iq_rejected
+  fs_true:
+    lineage:
+      - datalake_gsheets_raw.target_nps_weekly.fs_true
+  fs_lost:
+    lineage:
+      - datalake_gsheets_raw.target_nps_weekly.fs_lost
+  fs_ccv:
+    lineage:
+      - datalake_gsheets_raw.target_nps_weekly.fs_ccv
+  fs_registry:
+    lineage:
+      - datalake_gsheets_raw.target_nps_weekly.fs_registry
+  unpublished_fs:
+    lineage:
+      - datalake_gsheets_raw.target_nps_weekly.unpublished_fs
+  lost_visits_fs:
+    lineage:
+      - datalake_gsheets_raw.target_nps_weekly.lost_visits_fs
+  lost_proposals_fs:
+    lineage:
+      - datalake_gsheets_raw.target_nps_weekly.lost_proposals_fs
+  dt_week_start:
+    lineage:
+      - datalake_gsheets_raw.target_nps_weekly.week_start
+  month:
+    lineage:
+      - datalake_gsheets_raw.target_nps_weekly.month
+  year:
+    lineage:
+      - datalake_gsheets_raw.target_nps_weekly.year

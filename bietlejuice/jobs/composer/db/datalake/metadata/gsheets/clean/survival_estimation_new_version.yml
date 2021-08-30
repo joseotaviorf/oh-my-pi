@@ -1,0 +1,36 @@
+database_name: datalake_gsheets_clean
+table_name: survival_estimation_new_version
+columns:
+  first_rentals:
+    lineage:
+      - datalake_gsheets_raw.survival_estimation_new_version.first_rentals
+  contract_start_month:
+    lineage:
+      - datalake_gsheets_raw.survival_estimation_new_version.contract_start_month
+  months_after:
+    lineage:
+      - datalake_gsheets_raw.survival_estimation_new_version.months_after
+  months_after_first_contract:
+    lineage:
+      - datalake_gsheets_raw.survival_estimation_new_version.months_after_first_contract
+  total_re_rentals:
+    lineage:
+      - datalake_gsheets_raw.survival_estimation_new_version.total_re_rentals
+  total_rentals:
+    lineage:
+      - datalake_gsheets_raw.survival_estimation_new_version.total_rentals
+  ended_first_rentals:
+    lineage:
+      - datalake_gsheets_raw.survival_estimation_new_version.ended_first_rentals
+  ended_re_rentals:
+    lineage:
+      - datalake_gsheets_raw.survival_estimation_new_version.ended_re_rentals
+  ended_rentals:
+    lineage:
+      - datalake_gsheets_raw.survival_estimation_new_version.ended_rentals
+  year:
+    lineage:
+      - datalake_gsheets_raw.survival_estimation_new_version.year
+  dt_last_updated:
+    lineage:
+      - datalake_gsheets_raw.survival_estimation_new_version.dt_last_updated

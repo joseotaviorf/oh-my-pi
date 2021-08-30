@@ -1,0 +1,30 @@
+database_name: datalake_gsheets_clean
+table_name: targets_nr_bf_er_or
+columns:
+  month:
+    lineage:
+      - datalake_gsheets_raw.targets_nr_bf_er_or.month
+  year:
+    lineage:
+      - datalake_gsheets_raw.targets_nr_bf_er_or.year
+  quarter:
+    lineage:
+      - datalake_gsheets_raw.targets_nr_bf_er_or.quarter
+  weekday:
+    lineage:
+      - datalake_gsheets_raw.targets_nr_bf_er_or.weekday
+  new_rentals:
+    lineage:
+      - datalake_gsheets_raw.targets_nr_bf_er_or.new_rentals
+  ended_rentals:
+    lineage:
+      - datalake_gsheets_raw.targets_nr_bf_er_or.ended_rentals
+  ongoing_rentals:
+    lineage:
+      - datalake_gsheets_raw.targets_nr_bf_er_or.ongoing_rentals
+  dt_date:
+    lineage:
+      - datalake_gsheets_raw.targets_nr_bf_er_or.date
+  dt_week_started:
+    lineage:
+      - datalake_gsheets_raw.targets_nr_bf_er_or.week_start

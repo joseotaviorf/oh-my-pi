@@ -1,0 +1,36 @@
+database_name: datalake_gsheets_clean
+table_name: targets_avg_ticket_adm_fee
+columns:
+  year:
+    lineage:
+      - datalake_gsheets_raw.targets_avg_ticket_adm_fee.year
+  month:
+    lineage:
+      - datalake_gsheets_raw.targets_avg_ticket_adm_fee.month
+  quarter:
+    lineage:
+      - datalake_gsheets_raw.targets_avg_ticket_adm_fee.quarter
+  ticket_medio:
+    lineage:
+      - datalake_gsheets_raw.targets_avg_ticket_adm_fee.ticket_medio
+  adm_fee:
+    lineage:
+      - datalake_gsheets_raw.targets_avg_ticket_adm_fee.adm_fee
+  brokerage_fee:
+    lineage:
+      - datalake_gsheets_raw.targets_avg_ticket_adm_fee.brokerage_fee
+  new_rentals:
+    lineage:
+      - datalake_gsheets_raw.targets_avg_ticket_adm_fee.new_rentals
+  ongoing_rentals:
+    lineage:
+      - datalake_gsheets_raw.targets_avg_ticket_adm_fee.ongoing_rentals
+  ended_rentals:
+    lineage:
+      - datalake_gsheets_raw.targets_avg_ticket_adm_fee.ended_rentals
+  ticket_medio_ongoing_rentals:
+    lineage:
+      - datalake_gsheets_raw.targets_avg_ticket_adm_fee.ticket_medio_ongoing_rentals
+  adm_fee_ongoing_rentals:
+    lineage:
+      - datalake_gsheets_raw.targets_avg_ticket_adm_fee.adm_fee_ongoing_rentals

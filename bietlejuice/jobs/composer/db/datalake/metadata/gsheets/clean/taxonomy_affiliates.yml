@@ -1,0 +1,27 @@
+database_name: datalake_gsheets_clean
+table_name: taxonomy_affiliates
+columns:
+  affiliate_type:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_affiliates.affiliate_type
+  tracking_source:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_affiliates.tracking_source
+  tracking_medium:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_affiliates.tracking_medium
+  tracking_campaign:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_affiliates.tracking_campaign
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_affiliates.mkt_origin
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_affiliates.mkt_channel
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_affiliates.mkt_medium
+  mkt_source:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_affiliates.mkt_source

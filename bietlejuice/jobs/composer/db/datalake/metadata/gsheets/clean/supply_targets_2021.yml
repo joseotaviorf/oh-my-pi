@@ -1,0 +1,48 @@
+database_name: datalake_gsheets_clean
+table_name: supply_targets_2021
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.supply_targets_2021.city_group
+  first_listings:
+    lineage:
+      - datalake_gsheets_raw.supply_targets_2021.first_listings
+  lead_context:
+    lineage:
+      - datalake_gsheets_raw.supply_targets_2021.lead_context
+  opportunities:
+    lineage:
+      - datalake_gsheets_raw.supply_targets_2021.opportunities
+  prospects:
+    lineage:
+      - datalake_gsheets_raw.supply_targets_2021.prospects
+  qualifieds:
+    lineage:
+      - datalake_gsheets_raw.supply_targets_2021.qualifieds
+  supply_channel:
+    lineage:
+      - datalake_gsheets_raw.supply_targets_2021.supply_channel
+  supply_origin:
+    lineage:
+      - datalake_gsheets_raw.supply_targets_2021.supply_origin
+  tier:
+    lineage:
+      - datalake_gsheets_raw.supply_targets_2021.tier
+  halfyear:
+    lineage:
+      - datalake_gsheets_raw.supply_targets_2021.halfyear
+  quarter:
+    lineage:
+      - datalake_gsheets_raw.supply_targets_2021.quarter
+  week_start:
+    lineage:
+      - datalake_gsheets_raw.supply_targets_2021.week_start
+  month:
+    lineage:
+      - datalake_gsheets_raw.supply_targets_2021.month
+  year:
+    lineage:
+      - datalake_gsheets_raw.supply_targets_2021.year
+  date:
+    lineage:
+      - datalake_gsheets_raw.supply_targets_2021.date

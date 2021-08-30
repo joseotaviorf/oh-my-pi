@@ -1,0 +1,36 @@
+database_name: datalake_gsheets_clean
+table_name: users_cx_plaquinhas
+columns:
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.users_cx_plaquinhas.id_house
+  id_user:
+    lineage:
+      - datalake_gsheets_raw.users_cx_plaquinhas.id_user
+  atendimento_plaquinha:
+    lineage:
+      - datalake_gsheets_raw.users_cx_plaquinhas.atendimento_plaquinha
+  bairro:
+    lineage:
+      - datalake_gsheets_raw.users_cx_plaquinhas.bairro
+  canal:
+    lineage:
+      - datalake_gsheets_raw.users_cx_plaquinhas.canal
+  conhecia_5a:
+    lineage:
+      - datalake_gsheets_raw.users_cx_plaquinhas.conhecia_5a
+  conhecia_5a_2:
+    lineage:
+      - datalake_gsheets_raw.users_cx_plaquinhas.conhecia_5a_2
+  email:
+    lineage:
+      - datalake_gsheets_raw.users_cx_plaquinhas.email
+  motivo:
+    lineage:
+      - datalake_gsheets_raw.users_cx_plaquinhas.motivo
+  has_visit_booked:
+    lineage:
+      - datalake_gsheets_raw.users_cx_plaquinhas.has_visit_booked
+  data_hora:
+    lineage:
+      - datalake_gsheets_raw.users_cx_plaquinhas.data_hora

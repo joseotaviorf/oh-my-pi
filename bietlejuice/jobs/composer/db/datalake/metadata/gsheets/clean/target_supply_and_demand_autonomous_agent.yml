@@ -1,0 +1,57 @@
+database_name: datalake_gsheets_clean
+table_name: target_supply_and_demand_autonomous_agent
+columns:
+  ca:
+    lineage:
+      - datalake_gsheets_raw.target_supply_and_demand_autonomous_agent.ca
+  cs:
+    lineage:
+      - datalake_gsheets_raw.target_supply_and_demand_autonomous_agent.cs
+  city:
+    lineage:
+      - datalake_gsheets_raw.target_supply_and_demand_autonomous_agent.city
+  ds:
+    lineage:
+      - datalake_gsheets_raw.target_supply_and_demand_autonomous_agent.ds
+  drafts:
+    lineage:
+      - datalake_gsheets_raw.target_supply_and_demand_autonomous_agent.drafts
+  first_listings:
+    lineage:
+      - datalake_gsheets_raw.target_supply_and_demand_autonomous_agent.first_listings
+  is_account__management:
+    lineage:
+      - datalake_gsheets_raw.target_supply_and_demand_autonomous_agent.is_account__management
+  oa:
+    lineage:
+      - datalake_gsheets_raw.target_supply_and_demand_autonomous_agent.oa
+  ol:
+    lineage:
+      - datalake_gsheets_raw.target_supply_and_demand_autonomous_agent.ol
+  os:
+    lineage:
+      - datalake_gsheets_raw.target_supply_and_demand_autonomous_agent.os
+  opportunities:
+    lineage:
+      - datalake_gsheets_raw.target_supply_and_demand_autonomous_agent.opportunities
+  qualified:
+    lineage:
+      - datalake_gsheets_raw.target_supply_and_demand_autonomous_agent.qualified
+  vb:
+    lineage:
+      - datalake_gsheets_raw.target_supply_and_demand_autonomous_agent.vb
+  vc:
+    lineage:
+      - datalake_gsheets_raw.target_supply_and_demand_autonomous_agent.vc
+  quarter:
+    lineage:
+      - datalake_gsheets_raw.target_supply_and_demand_autonomous_agent.quarter
+  week_start:
+    lineage:
+      - datalake_gsheets_raw.target_supply_and_demand_autonomous_agent.week_start
+  month:
+    lineage:
+      - datalake_gsheets_raw.target_supply_and_demand_autonomous_agent.month
+  data:
+    lineage:
+      - datalake_gsheets_raw.target_supply_and_demand_autonomous_agent.data

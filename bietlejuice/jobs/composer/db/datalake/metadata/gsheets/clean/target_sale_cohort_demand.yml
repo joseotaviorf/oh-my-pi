@@ -1,0 +1,33 @@
+database_name: datalake_gsheets_clean
+table_name: target_sale_cohort_demand
+columns:
+  ccv:
+    lineage:
+      - datalake_gsheets_raw.target_sale_cohort_demand.ccv
+  cidade:
+    lineage:
+      - datalake_gsheets_raw.target_sale_cohort_demand.cidade
+  deal_quali:
+    lineage:
+      - datalake_gsheets_raw.target_sale_cohort_demand.deal_quali
+  offer_accepted:
+    lineage:
+      - datalake_gsheets_raw.target_sale_cohort_demand.offer_accepted
+  offer_sent:
+    lineage:
+      - datalake_gsheets_raw.target_sale_cohort_demand.offer_sent
+  origem:
+    lineage:
+      - datalake_gsheets_raw.target_sale_cohort_demand.origem
+  visit_booked:
+    lineage:
+      - datalake_gsheets_raw.target_sale_cohort_demand.visit_booked
+  visit_completed:
+    lineage:
+      - datalake_gsheets_raw.target_sale_cohort_demand.visit_completed
+  week:
+    lineage:
+      - datalake_gsheets_raw.target_sale_cohort_demand.week
+  week_origin:
+    lineage:
+      - datalake_gsheets_raw.target_sale_cohort_demand.week_origin

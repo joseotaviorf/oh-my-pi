@@ -1,0 +1,30 @@
+database_name: datalake_gsheets_clean
+table_name: target_sale_cohort_supply
+columns:
+  op:
+    lineage:
+      - datalake_gsheets_raw.target_sale_cohort_supply.op
+  cidade:
+    lineage:
+      - datalake_gsheets_raw.target_sale_cohort_supply.cidade
+  first_listing:
+    lineage:
+      - datalake_gsheets_raw.target_sale_cohort_supply.first_listing
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_raw.target_sale_cohort_supply.mkt_origin
+  operacao:
+    lineage:
+      - datalake_gsheets_raw.target_sale_cohort_supply.operacao
+  opportunity:
+    lineage:
+      - datalake_gsheets_raw.target_sale_cohort_supply.opportunity
+  qualified:
+    lineage:
+      - datalake_gsheets_raw.target_sale_cohort_supply.qualified
+  week:
+    lineage:
+      - datalake_gsheets_raw.target_sale_cohort_supply.week
+  week_origin:
+    lineage:
+      - datalake_gsheets_raw.target_sale_cohort_supply.week_origin

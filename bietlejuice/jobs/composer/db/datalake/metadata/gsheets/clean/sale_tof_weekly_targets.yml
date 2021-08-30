@@ -1,0 +1,30 @@
+database_name: datalake_gsheets_clean
+table_name: sale_tof_weekly_targets
+columns:
+  city:
+    lineage:
+      - datalake_gsheets_raw.sale_tof_weekly_targets.city
+  context:
+    lineage:
+      - datalake_gsheets_raw.sale_tof_weekly_targets.context
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_raw.sale_tof_weekly_targets.mkt_channel
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_raw.sale_tof_weekly_targets.mkt_medium
+  mkt_source:
+    lineage:
+      - datalake_gsheets_raw.sale_tof_weekly_targets.mkt_source
+  tof_users_target:
+    lineage:
+      - datalake_gsheets_raw.sale_tof_weekly_targets.tof_users_target
+  week_start:
+    lineage:
+      - datalake_gsheets_raw.sale_tof_weekly_targets.week_start
+  month:
+    lineage:
+      - datalake_gsheets_raw.sale_tof_weekly_targets.month
+  year:
+    lineage:
+      - datalake_gsheets_raw.sale_tof_weekly_targets.year

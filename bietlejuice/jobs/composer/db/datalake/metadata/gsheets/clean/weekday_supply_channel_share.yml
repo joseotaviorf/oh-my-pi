@@ -1,0 +1,27 @@
+database_name: datalake_gsheets_clean
+table_name: weekday_supply_channel_share
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.weekday_supply_channel_share.city_group
+  first_listing:
+    lineage:
+      - datalake_gsheets_raw.weekday_supply_channel_share.first_listing
+  lead_context:
+    lineage:
+      - datalake_gsheets_raw.weekday_supply_channel_share.lead_context
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_raw.weekday_supply_channel_share.mkt_channel
+  opportunity:
+    lineage:
+      - datalake_gsheets_raw.weekday_supply_channel_share.opportunity
+  prospect:
+    lineage:
+      - datalake_gsheets_raw.weekday_supply_channel_share.prospect
+  qualified:
+    lineage:
+      - datalake_gsheets_raw.weekday_supply_channel_share.qualified
+  weekday:
+    lineage:
+      - datalake_gsheets_raw.weekday_supply_channel_share.weekday

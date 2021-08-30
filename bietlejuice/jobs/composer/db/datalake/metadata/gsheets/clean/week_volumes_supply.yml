@@ -1,0 +1,30 @@
+database_name: datalake_gsheets_clean
+table_name: week_volumes_supply
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.week_volumes_supply.city_group
+  first_listing:
+    lineage:
+      - datalake_gsheets_raw.week_volumes_supply.first_listing
+  lead_context:
+    lineage:
+      - datalake_gsheets_raw.week_volumes_supply.lead_context
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_raw.week_volumes_supply.mkt_channel
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_raw.week_volumes_supply.mkt_origin
+  opportunity:
+    lineage:
+      - datalake_gsheets_raw.week_volumes_supply.opportunity
+  prospect:
+    lineage:
+      - datalake_gsheets_raw.week_volumes_supply.prospect
+  qualified:
+    lineage:
+      - datalake_gsheets_raw.week_volumes_supply.qualified
+  week_start:
+    lineage:
+      - datalake_gsheets_raw.week_volumes_supply.week_start
