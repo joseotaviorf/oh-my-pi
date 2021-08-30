@@ -1,0 +1,9 @@
+database_name: datalake_oscar_clean
+table_name: referral_status
+columns:
+  name:
+    lineage:
+      - datalake_oscar_raw.referral_status.name
+  rank:
+    lineage:
+      - datalake_oscar_raw.referral_status.rank

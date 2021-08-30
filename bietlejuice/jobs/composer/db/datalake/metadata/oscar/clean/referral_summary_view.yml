@@ -1,0 +1,27 @@
+database_name: datalake_oscar_clean
+table_name: referral_summary_view
+columns:
+  id_referred:
+    lineage:
+      - datalake_oscar_raw.referral_summary_view.referred_id
+  user_name:
+    lineage:
+      - datalake_oscar_raw.referral_summary_view.name
+  user_email:
+    lineage:
+      - datalake_oscar_raw.referral_summary_view.email
+  user_phone:
+    lineage:
+      - datalake_oscar_raw.referral_summary_view.phone
+  ts_created:
+    lineage:
+      - datalake_oscar_raw.referral_summary_view.created_at
+  count_recommended_house:
+    lineage:
+      - datalake_oscar_raw.referral_summary_view.recommended_house_count
+  status:
+    lineage:
+      - datalake_oscar_raw.referral_summary_view.status
+  id_referrer:
+    lineage:
+      - datalake_oscar_raw.referral_summary_view.referrer_id

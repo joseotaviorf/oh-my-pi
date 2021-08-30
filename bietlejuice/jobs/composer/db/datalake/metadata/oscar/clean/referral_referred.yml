@@ -1,0 +1,18 @@
+database_name: datalake_oscar_clean
+table_name: referral_referred
+columns:
+  id_referral:
+    lineage:
+      - datalake_oscar_raw.referral_referred.referral_id
+  id_referred:
+    lineage:
+      - datalake_oscar_raw.referral_referred.referred_id
+  ts_contract_signed:
+    lineage:
+      - datalake_oscar_raw.referral_referred.contract_signed_at
+  rent:
+    lineage:
+      - datalake_oscar_raw.referral_referred.rent_value
+  status:
+    lineage:
+      - datalake_oscar_raw.referral_referred.status

@@ -1,0 +1,27 @@
+database_name: datalake_oscar_clean
+table_name: referred_aud
+columns:
+  id:
+    lineage:
+      - datalake_oscar_raw.referred_aud.id
+  rev:
+    lineage:
+      - datalake_oscar_raw.referred_aud.rev
+  rev_type:
+    lineage:
+      - datalake_oscar_raw.referred_aud.revtype
+  name:
+    lineage:
+      - datalake_oscar_raw.referred_aud.name
+  email:
+    lineage:
+      - datalake_oscar_raw.referred_aud.email
+  phone:
+    lineage:
+      - datalake_oscar_raw.referred_aud.phone
+  id_user:
+    lineage:
+      - datalake_oscar_raw.referred_aud.user_id
+  mod_id_user:
+    lineage:
+      - datalake_oscar_raw.referred_aud.user_id_mod

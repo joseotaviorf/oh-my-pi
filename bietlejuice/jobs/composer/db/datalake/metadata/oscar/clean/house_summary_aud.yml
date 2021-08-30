@@ -1,0 +1,30 @@
+database_name: datalake_oscar_clean
+table_name: house_summary_aud
+columns:
+  id_house:
+    lineage:
+      - datalake_oscar_raw.house_summary_aud.id
+  rev:
+    lineage:
+      - datalake_oscar_raw.house_summary_aud.rev
+  rev_type:
+    lineage:
+      - datalake_oscar_raw.house_summary_aud.revtype
+  rent:
+    lineage:
+      - datalake_oscar_raw.house_summary_aud.rent_value
+  type:
+    lineage:
+      - datalake_oscar_raw.house_summary_aud.type
+  neighborhood:
+    lineage:
+      - datalake_oscar_raw.house_summary_aud.neighborhood
+  address:
+    lineage:
+      - datalake_oscar_raw.house_summary_aud.address
+  number:
+    lineage:
+      - datalake_oscar_raw.house_summary_aud.number
+  complement:
+    lineage:
+      - datalake_oscar_raw.house_summary_aud.complement

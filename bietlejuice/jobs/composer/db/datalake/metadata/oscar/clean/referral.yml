@@ -1,0 +1,18 @@
+database_name: datalake_oscar_clean
+table_name: referral
+columns:
+  id:
+    lineage:
+      - datalake_oscar_raw.referral.id
+  ts_created:
+    lineage:
+      - datalake_oscar_raw.referral.created_at
+  ts_updated:
+    lineage:
+      - datalake_oscar_raw.referral.updated_at
+  id_house_summary:
+    lineage:
+      - datalake_oscar_raw.referral.house_summary_id
+  id_referrer:
+    lineage:
+      - datalake_oscar_raw.referral.referrer_id

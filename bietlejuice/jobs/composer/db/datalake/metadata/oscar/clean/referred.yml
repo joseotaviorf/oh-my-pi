@@ -1,0 +1,24 @@
+database_name: datalake_oscar_clean
+table_name: referred
+columns:
+  id:
+    lineage:
+      - datalake_oscar_raw.referred.id
+  ts_created:
+    lineage:
+      - datalake_oscar_raw.referred.created_at
+  ts_updated:
+    lineage:
+      - datalake_oscar_raw.referred.updated_at
+  name:
+    lineage:
+      - datalake_oscar_raw.referred.name
+  email:
+    lineage:
+      - datalake_oscar_raw.referred.email
+  phone:
+    lineage:
+      - datalake_oscar_raw.referred.phone
+  id_user:
+    lineage:
+      - datalake_oscar_raw.referred.user_id

@@ -1,0 +1,27 @@
+database_name: datalake_oscar_clean
+table_name: referral_referred_aud
+columns:
+  id_referral:
+    lineage:
+      - datalake_oscar_raw.referral_referred_aud.referral_id
+  id_referred:
+    lineage:
+      - datalake_oscar_raw.referral_referred_aud.referred_id
+  rev:
+    lineage:
+      - datalake_oscar_raw.referral_referred_aud.rev
+  rev_type:
+    lineage:
+      - datalake_oscar_raw.referral_referred_aud.revtype
+  ts_contract_signed:
+    lineage:
+      - datalake_oscar_raw.referral_referred_aud.contract_signed_at
+  mod_ts_contract_signed:
+    lineage:
+      - datalake_oscar_raw.referral_referred_aud.contract_signed_at_mod
+  rent:
+    lineage:
+      - datalake_oscar_raw.referral_referred_aud.rent_value
+  mod_rent:
+    lineage:
+      - datalake_oscar_raw.referral_referred_aud.rent_value_mod

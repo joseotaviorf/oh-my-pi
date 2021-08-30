@@ -1,0 +1,21 @@
+database_name: datalake_oscar_clean
+table_name: referral_aud
+columns:
+  id:
+    lineage:
+      - datalake_oscar_raw.referral_aud.id
+  rev:
+    lineage:
+      - datalake_oscar_raw.referral_aud.rev
+  rev_type:
+    lineage:
+      - datalake_oscar_raw.referral_aud.revtype
+  id_house_summary:
+    lineage:
+      - datalake_oscar_raw.referral_aud.house_summary_id
+  id_referred:
+    lineage:
+      - datalake_oscar_raw.referral_aud.referred_id
+  id_referrer:
+    lineage:
+      - datalake_oscar_raw.referral_aud.referrer_id
