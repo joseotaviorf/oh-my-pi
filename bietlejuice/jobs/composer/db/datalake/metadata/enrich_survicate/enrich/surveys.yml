@@ -1,0 +1,43 @@
+---
+database_name: datalake_survicate
+table_name: surveys
+columns:
+  id_survey:
+    lineage:
+      - datalake_survicate_clean.surveys.id
+  id_ticket:
+    lineage:
+      - datalake_survicate_clean.surveys.custom_attributes
+  id_visitor:
+    lineage:
+      - datalake_survicate_clean.surveys.id_visitor
+  response_uuid:
+    lineage:
+      - datalake_survicate_clean.surveys.response_uuid
+  visitor_uuid:
+    lineage:
+      - datalake_survicate_clean.surveys.visitor_uuid
+  user_comment:
+    lineage:
+      - datalake_survicate_clean.surveys.answers
+  csat_score:
+    lineage:
+      - datalake_survicate_clean.surveys.answers
+  is_solved:
+    lineage:
+      - datalake_survicate_clean.surveys.answers
+  ts_first_seen:
+    lineage:
+      - datalake_survicate_clean.surveys.ts_first_seen
+  ts_first_response:
+    lineage:
+      - datalake_survicate_clean.surveys.ts_first_response
+  year:
+    lineage:
+      - datalake_survicate_clean.surveys.year
+  month:
+    lineage:
+      - datalake_survicate_clean.surveys.month
+  day:
+    lineage:
+      - datalake_survicate_clean.surveys.day
