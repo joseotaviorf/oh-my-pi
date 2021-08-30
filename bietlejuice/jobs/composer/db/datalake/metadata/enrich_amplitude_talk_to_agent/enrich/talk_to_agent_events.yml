@@ -1,0 +1,45 @@
+database_name: datalake_amplitude_talk_to_agent
+table_name: talk_to_agent_events
+columns:
+  id_user:
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+  id_app:
+    lineage:
+      - datalake_amplitude_clean.events.id_app
+  id_house:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  id_agent:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  business_context:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  app_type:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  utm_source:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  utm_medium:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  utm_campaign:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  utm_content:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  utm_term:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  branded:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  is_branded:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  ts_event:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
