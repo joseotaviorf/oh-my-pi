@@ -1,0 +1,39 @@
+database_name: datalake_owner_fees_clean
+table_name: contract_brokerage_fee
+columns:
+  id:
+    lineage:
+      - datalake_owner_fees_raw.contract_brokerage_fee.id
+  id_contract:
+    lineage:
+      - datalake_owner_fees_raw.contract_brokerage_fee.contract_id
+  charge_delay_in_days:
+    lineage:
+      - datalake_owner_fees_raw.contract_brokerage_fee.charge_delay_in_days
+  installment_number:
+    lineage:
+      - datalake_owner_fees_raw.contract_brokerage_fee.installment_number
+  brokerage_fee:
+    lineage:
+      - datalake_owner_fees_raw.contract_brokerage_fee.fee
+  premium_fee:
+    lineage:
+      - datalake_owner_fees_raw.contract_brokerage_fee.premium_fee
+  down_payment:
+    lineage:
+      - datalake_owner_fees_raw.contract_brokerage_fee.down_payment
+  ts_created:
+    lineage:
+      - datalake_owner_fees_raw.contract_brokerage_fee.created_at
+  ts_updated:
+    lineage:
+      - datalake_owner_fees_raw.contract_brokerage_fee.updated_at
+  year:
+    lineage:
+      - datalake_owner_fees_raw.contract_brokerage_fee.year
+  month:
+    lineage:
+      - datalake_owner_fees_raw.contract_brokerage_fee.month
+  day:
+    lineage:
+      - datalake_owner_fees_raw.contract_brokerage_fee.day

@@ -1,0 +1,48 @@
+database_name: datalake_owner_fees_clean
+table_name: installment_option_aud
+columns:
+  id_installment_option:
+    lineage:
+      - datalake_owner_fees_raw.installment_option_aud.id
+  id_charge_delay:
+    lineage:
+      - datalake_owner_fees_raw.installment_option_aud.charge_delay_id
+  installment_number:
+    lineage:
+      - datalake_owner_fees_raw.installment_option_aud.installment_number
+  rev:
+    lineage:
+      - datalake_owner_fees_raw.installment_option_aud.rev
+  rev_type:
+    lineage:
+      - datalake_owner_fees_raw.installment_option_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_owner_fees_raw.installment_option_aud.revend
+  percentage_of_entry:
+    lineage:
+      - datalake_owner_fees_raw.installment_option_aud.percentage_of_entry
+  premium_fee:
+    lineage:
+      - datalake_owner_fees_raw.installment_option_aud.premium_fee
+  dt_valid_from:
+    lineage:
+      - datalake_owner_fees_raw.installment_option_aud.valid_from
+  dt_valid_until:
+    lineage:
+      - datalake_owner_fees_raw.installment_option_aud.valid_until
+  ts_created:
+    lineage:
+      - datalake_owner_fees_raw.installment_option_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_owner_fees_raw.installment_option_aud.updated_at
+  year:
+    lineage:
+      - datalake_owner_fees_raw.installment_option_aud.year
+  month:
+    lineage:
+      - datalake_owner_fees_raw.installment_option_aud.month
+  day:
+    lineage:
+      - datalake_owner_fees_raw.installment_option_aud.day

@@ -1,0 +1,33 @@
+database_name: datalake_owner_fees_clean
+table_name: house_aud
+columns:
+  id_house:
+    lineage:
+      - datalake_owner_fees_raw.house_aud.id
+  id_user:
+    lineage:
+      - datalake_owner_fees_raw.house_aud.user_id
+  id_external:
+    lineage:
+      - datalake_owner_fees_raw.house_aud.external_id
+  status:
+    lineage:
+      - datalake_owner_fees_raw.house_aud.status
+  rev:
+    lineage:
+      - datalake_owner_fees_raw.house_aud.rev
+  rev_type:
+    lineage:
+      - datalake_owner_fees_raw.house_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_owner_fees_raw.house_aud.revend
+  rent:
+    lineage:
+      - datalake_owner_fees_raw.house_aud.rent
+  ts_created:
+    lineage:
+      - datalake_owner_fees_raw.house_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_owner_fees_raw.house_aud.updated_at

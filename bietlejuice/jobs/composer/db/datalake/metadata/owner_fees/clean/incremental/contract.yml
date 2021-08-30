@@ -1,0 +1,39 @@
+database_name: datalake_owner_fees_clean
+table_name: contract
+columns:
+  id:
+    lineage:
+      - datalake_owner_fees_raw.contract.id
+  id_house:
+    lineage:
+      - datalake_owner_fees_raw.contract.house_id
+  id_external:
+    lineage:
+      - datalake_owner_fees_raw.contract.external_id
+  id_admin_fee_option:
+    lineage:
+      - datalake_owner_fees_raw.contract.admin_fee_option_id
+  real_state_agent_share:
+    lineage:
+      - datalake_owner_fees_raw.contract.real_state_agent_share
+  rent:
+    lineage:
+      - datalake_owner_fees_raw.contract.rent
+  dt_validity:
+    lineage:
+      - datalake_owner_fees_raw.contract.validity_date
+  ts_created:
+    lineage:
+      - datalake_owner_fees_raw.contract.created_at
+  ts_updated:
+    lineage:
+      - datalake_owner_fees_raw.contract.updated_at
+  year:
+    lineage:
+      - datalake_owner_fees_raw.contract.year
+  month:
+    lineage:
+      - datalake_owner_fees_raw.contract.month
+  day:
+    lineage:
+      - datalake_owner_fees_raw.contract.day

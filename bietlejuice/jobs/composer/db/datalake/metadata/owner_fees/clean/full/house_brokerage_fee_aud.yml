@@ -1,0 +1,48 @@
+database_name: datalake_owner_fees_clean
+table_name: house_brokerage_fee_aud
+columns:
+  id_house_brokerage_fee:
+    lineage:
+      - datalake_owner_fees_raw.house_brokerage_fee_aud.id
+  id_house:
+    lineage:
+      - datalake_owner_fees_raw.house_brokerage_fee_aud.house_id
+  id_contract:
+    lineage:
+      - datalake_owner_fees_raw.house_brokerage_fee_aud.contract_id
+  charge_delay_in_days:
+    lineage:
+      - datalake_owner_fees_raw.house_brokerage_fee_aud.charge_delay_in_days
+  installment_number:
+    lineage:
+      - datalake_owner_fees_raw.house_brokerage_fee_aud.installment_number
+  rev:
+    lineage:
+      - datalake_owner_fees_raw.house_brokerage_fee_aud.rev
+  rev_type:
+    lineage:
+      - datalake_owner_fees_raw.house_brokerage_fee_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_owner_fees_raw.house_brokerage_fee_aud.revend
+  brokerage_fee:
+    lineage:
+      - datalake_owner_fees_raw.house_brokerage_fee_aud.brokerage_fee
+  premium_fee:
+    lineage:
+      - datalake_owner_fees_raw.house_brokerage_fee_aud.premium_fee
+  down_payment:
+    lineage:
+      - datalake_owner_fees_raw.house_brokerage_fee_aud.down_payment
+  mod_installment_number:
+    lineage:
+      - datalake_owner_fees_raw.house_brokerage_fee_aud.installment_number_mod
+  mod_premium_fee:
+    lineage:
+      - datalake_owner_fees_raw.house_brokerage_fee_aud.premium_fee_mod
+  ts_created:
+    lineage:
+      - datalake_owner_fees_raw.house_brokerage_fee_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_owner_fees_raw.house_brokerage_fee_aud.updated_at
