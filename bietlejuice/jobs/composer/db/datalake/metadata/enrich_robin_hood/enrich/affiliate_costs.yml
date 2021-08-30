@@ -1,0 +1,37 @@
+---
+database_name: datalake_robin_hood
+table_name: affiliate_costs
+columns:
+  id_rh_accounting_entry:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.id
+  id_external:
+    lineage:
+      - datalake_robin_hood_clean.payee.id_external
+  id_payee:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.id_payee
+  city_group:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.locale
+  description:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.description
+  source_bill_item:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.source_bill_item
+  commission_type:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.source_bill_item
+  cost_center_code:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.cost_center_code
+  mkt_origin:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.id_source
+  cost:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.due_amount
+  dt_transaction:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.dt_occurrence
