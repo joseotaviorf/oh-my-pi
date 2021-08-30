@@ -1,0 +1,39 @@
+database_name: datalake_bigfone_events
+table_name: events
+columns:
+  id:
+    lineage:
+      - datalake_bigfone_clean.event.id
+  event:
+    lineage:
+      - datalake_bigfone_clean.event.event
+  id_call:
+    lineage:
+      - datalake_bigfone_clean.event.metadata
+  metadata:
+    lineage:
+      - datalake_bigfone_clean.event.metadata
+  provider:
+    lineage:
+      - datalake_bigfone_clean.event.provider
+  ts_created:
+    lineage:
+      - datalake_bigfone_clean.event.event_timestamp
+  ts_created_local:
+    lineage:
+      - datalake_bigfone_clean.event.event_timestamp
+  ts_received:
+    lineage:
+      - datalake_bigfone_clean.event.received_timestamp
+  ts_received_local:
+    lineage:
+      - datalake_bigfone_clean.event.received_timestamp
+  year:
+    lineage:
+      - datalake_bigfone_clean.event.year
+  month:
+    lineage:
+      - datalake_bigfone_clean.event.month
+  day:
+    lineage:
+      - datalake_bigfone_clean.event.day
