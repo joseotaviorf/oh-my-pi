@@ -8,6 +8,7 @@ create table if not exists partner (
     cnpj varchar,
     creci varchar,
     type varchar,
+    city varchar,
     ts_joined_partnership timestamp,
     ts_updated timestamp,
     ts_created timestamp,
