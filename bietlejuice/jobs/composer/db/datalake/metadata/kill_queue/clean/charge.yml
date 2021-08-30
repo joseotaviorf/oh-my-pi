@@ -1,0 +1,18 @@
+database_name: datalake_kill_queue_clean
+table_name: charge
+columns:
+  id:
+    lineage:
+      - datalake_kill_queue_raw.charge.id
+  id_reservation:
+    lineage:
+      - datalake_kill_queue_raw.charge.reservation_id
+  version:
+    lineage:
+      - datalake_kill_queue_raw.charge.version
+  ts_created:
+    lineage:
+      - datalake_kill_queue_raw.charge.created_at
+  ts_updated:
+    lineage:
+      - datalake_kill_queue_raw.charge.updated_at

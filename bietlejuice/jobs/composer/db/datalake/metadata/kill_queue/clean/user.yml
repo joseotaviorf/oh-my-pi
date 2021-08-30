@@ -1,0 +1,39 @@
+database_name: datalake_kill_queue_clean
+table_name: user
+columns:
+  id:
+    lineage:
+      - datalake_kill_queue_raw.user.id
+  id_main:
+    lineage:
+      - datalake_kill_queue_raw.user.main_id
+  cell_phone:
+    lineage:
+      - datalake_kill_queue_raw.user.cellphone
+  cpf:
+    lineage:
+      - datalake_kill_queue_raw.user.cpf
+  email:
+    lineage:
+      - datalake_kill_queue_raw.user.email
+  name:
+    lineage:
+      - datalake_kill_queue_raw.user.name
+  version:
+    lineage:
+      - datalake_kill_queue_raw.user.version
+  ts_created:
+    lineage:
+      - datalake_kill_queue_raw.user.created_at
+  ts_updated:
+    lineage:
+      - datalake_kill_queue_raw.user.updated_at
+  year:
+    lineage:
+      - datalake_kill_queue_raw.user.year
+  month:
+    lineage:
+      - datalake_kill_queue_raw.user.month
+  day:
+    lineage:
+      - datalake_kill_queue_raw.user.day

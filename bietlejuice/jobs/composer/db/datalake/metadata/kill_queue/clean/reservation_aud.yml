@@ -1,0 +1,54 @@
+database_name: datalake_kill_queue_clean
+table_name: reservation_aud
+columns:
+  id:
+    lineage:
+      - datalake_kill_queue_raw.reservation_aud.id
+  id_house:
+    lineage:
+      - datalake_kill_queue_raw.reservation_aud.house_id
+  id_rent_flow:
+    lineage:
+      - datalake_kill_queue_raw.reservation_aud.rent_flow_id
+  id_tenant:
+    lineage:
+      - datalake_kill_queue_raw.reservation_aud.tenant_id
+  rev:
+    lineage:
+      - datalake_kill_queue_raw.reservation_aud.rev
+  rev_type:
+    lineage:
+      - datalake_kill_queue_raw.reservation_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_kill_queue_raw.reservation_aud.revend
+  attempt:
+    lineage:
+      - datalake_kill_queue_raw.reservation_aud.attempt
+  cancellation_reason:
+    lineage:
+      - datalake_kill_queue_raw.reservation_aud.cancellation_reason
+  mundipagg_token:
+    lineage:
+      - datalake_kill_queue_raw.reservation_aud.mundipagg_token
+  status:
+    lineage:
+      - datalake_kill_queue_raw.reservation_aud.status
+  value:
+    lineage:
+      - datalake_kill_queue_raw.reservation_aud.value
+  mod_has_attempt:
+    lineage:
+      - datalake_kill_queue_raw.reservation_aud.attempt_mod
+  mod_has_cancellation_reason:
+    lineage:
+      - datalake_kill_queue_raw.reservation_aud.cancellation_reason_mod
+  mod_has_mundipagg_token:
+    lineage:
+      - datalake_kill_queue_raw.reservation_aud.mundipagg_token_mod
+  mod_has_status:
+    lineage:
+      - datalake_kill_queue_raw.reservation_aud.status_mod
+  mod_has_value:
+    lineage:
+      - datalake_kill_queue_raw.reservation_aud.value_mod
