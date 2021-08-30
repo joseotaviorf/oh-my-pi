@@ -216,7 +216,7 @@ UNION ALL
         SELECT
             uu.user_key,
             uu.id_classified_lead,
-            c.id_property AS id_house_first_classified_intent,
+            c.id_property::BIGINT AS sk_house,
             fl.sk_region AS sk_region_classified,
             c.origin_partner AS classified_partner,
             c.ts_received AS ts_classified_first_intent,
@@ -237,7 +237,7 @@ UNION ALL
         SELECT
             uu.user_key,
             uu.id_secretariat_client,
-            h.id_house_quintoandar,
+            h.id_house_quintoandar::BIGINT as sk_house,
             c.id_house AS id_house_cm,
             cth.city_name AS city_secretariat_contact,
             oc.origin_contact_name AS secretariat_contact_origin,
@@ -272,7 +272,7 @@ UNION ALL
             uu.user_key,
             uu.id_secretariat_client,
             v.id_house AS id_house_cm,
-            h.id_house_quintoandar,
+            h.id_house_quintoandar::BIGINT as sk_house,
             cth.city_name AS city_first_booking_cm,
             fl.sk_region AS sk_region_first_booking_cm,
             CONVERT_TIMEZONE('BRT', 'UTC', v.ts_created) AS ts_booking_created_cm,
@@ -321,6 +321,7 @@ UNION ALL
             CAST(e.id_user AS BIGINT) AS id_user,
             CAST(e.ts_event AS TIMESTAMP) AS ts_visit_intent,
             dr.sk_region,
+            CAST(NULLIF(TRIM(JSON_EXTRACT_PATH_TEXT(e.event_properties, 'house_id')),'') AS BIGINT) AS sk_house,
             ROW_NUMBER() OVER (PARTITION BY e.id_user ORDER BY e.ts_event) AS rw -- get first row for each user
         FROM datalake_amplitude_clean_prod.events e
         LEFT JOIN sale.fact_listings fl
@@ -336,6 +337,7 @@ UNION ALL
     )
     SELECT
         id_user,
+        sk_house,
         sk_region AS sk_region_visit_intent,
         ts_visit_intent AS ts_first_visit_scheduling_event
     FROM first_vic
@@ -345,7 +347,7 @@ UNION ALL
     WITH first_booking AS (
         SELECT
             fv.sk_buyer AS id_user,
-            fv.sk_house AS id_house,
+            fv.sk_house,
             fv.sk_region AS sk_region_first_booking_5a,
             db.dt_created AS ts_booking_created_5a,
             ROW_NUMBER() OVER (PARTITION BY fv.sk_buyer ORDER BY db.dt_created) AS rw
@@ -378,6 +380,7 @@ UNION ALL
     WITH all_offers AS (
         SELECT
             uu.user_key,
+            fo.sk_house,
             fo.sk_offer,
             CASE
                 WHEN oh.offer_flow LIKE '%HUB%' THEN 'HUB'
@@ -396,6 +399,7 @@ UNION ALL
         -- HUB v0 offer flow
         SELECT
             uu.user_key,
+            fl.sk_house,
             oh.id_offer AS sk_offer,
             oh.offer_flow,
             fl.sk_region AS sk_region_first_offer,
@@ -468,6 +472,14 @@ UNION ALL
             WHEN first_touch = 'Booking' THEN fbq.sk_region_first_booking_5a
             WHEN first_touch = 'Offer_submitted' THEN fo.sk_region_first_offer
         END,-1) AS sk_first_region,
+        COALESCE(CASE
+            WHEN first_touch = 'Classified' THEN lci.sk_house
+            WHEN first_touch = 'Secretariat' THEN COALESCE(csi.sk_house,fbcm.sk_house,vie.sk_house,fbq.sk_house,lci.sk_house)
+            WHEN first_touch = 'Visit_scheduling_event' THEN vie.sk_house
+            WHEN first_touch = 'Booking' THEN fbq.sk_house
+            WHEN first_touch = 'Offer_submitted' THEN fo.sk_house
+        END,-1) AS sk_first_house,
+        COALESCE(CASE WHEN fc.dt_sale_agreement_signed IS NOT NULL THEN fc.sk_house END,-1) AS sk_house_sale_agreement,
         lci.classified_partner,
         CASE
             WHEN csi.ts_first_secretariat_contact IS NOT NULL AND DATE_DIFF('min', fbq.ts_booking_created_5a, csi.ts_first_secretariat_contact) > - 4
