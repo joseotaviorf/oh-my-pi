@@ -1,0 +1,18 @@
+database_name: datalake_hogwarts_clean
+table_name: locale
+columns:
+  id:
+    lineage:
+      - datalake_hogwarts_raw.locale.code
+  locale_name:
+    lineage:
+      - datalake_hogwarts_raw.locale.name
+  is_active:
+    lineage:
+      - datalake_hogwarts_raw.locale.active
+  ts_created:
+    lineage:
+      - datalake_hogwarts_raw.locale.created_on
+  ts_updated:
+    lineage:
+      - datalake_hogwarts_raw.locale.updated_on

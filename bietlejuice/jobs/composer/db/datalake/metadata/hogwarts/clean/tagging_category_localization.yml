@@ -1,0 +1,21 @@
+database_name: datalake_hogwarts_clean
+table_name: tagging_category_localization
+columns:
+  id_tagging_category:
+    lineage:
+      - datalake_hogwarts_raw.tagging_category_localization.tagging_category_code
+  id_locale:
+    lineage:
+      - datalake_hogwarts_raw.tagging_category_localization.locale_code
+  tagging_category_name:
+    lineage:
+      - datalake_hogwarts_raw.tagging_category_localization.name
+  tagging_category_description:
+    lineage:
+      - datalake_hogwarts_raw.tagging_category_localization.description
+  ts_created:
+    lineage:
+      - datalake_hogwarts_raw.tagging_category_localization.created_on
+  ts_updated:
+    lineage:
+      - datalake_hogwarts_raw.tagging_category_localization.updated_on

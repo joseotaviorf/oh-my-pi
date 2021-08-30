@@ -1,0 +1,21 @@
+database_name: datalake_hogwarts_clean
+table_name: tag
+columns:
+  id:
+    lineage:
+      - datalake_hogwarts_raw.tag.code
+  id_tagging_category:
+    lineage:
+      - datalake_hogwarts_raw.tag.tagging_category_code
+  tagging_class:
+    lineage:
+      - datalake_hogwarts_raw.tag.tagging_class
+  is_active:
+    lineage:
+      - datalake_hogwarts_raw.tag.active
+  ts_created:
+    lineage:
+      - datalake_hogwarts_raw.tag.created_on
+  ts_updated:
+    lineage:
+      - datalake_hogwarts_raw.tag.updated_on

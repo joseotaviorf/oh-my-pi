@@ -1,0 +1,33 @@
+database_name: datalake_heimdall_clean
+table_name: activity
+columns:
+  id:
+    lineage:
+      - datalake_heimdall_raw.activity._id
+  id_external_contract:
+    lineage:
+      - datalake_heimdall_raw.activity.externalcontractid
+  id_house:
+    lineage:
+      - datalake_heimdall_raw.activity.houseid
+  class:
+    lineage:
+      - datalake_heimdall_raw.activity._class
+  status:
+    lineage:
+      - datalake_heimdall_raw.activity.status
+  type:
+    lineage:
+      - datalake_heimdall_raw.activity.type
+  transition_list:
+    lineage:
+      - datalake_heimdall_raw.activity.transitionlist
+  metadata:
+    lineage:
+      - datalake_heimdall_raw.activity.metadata
+  ts_created:
+    lineage:
+      - datalake_heimdall_raw.activity.createdat
+  ts_updated:
+    lineage:
+      - datalake_heimdall_raw.activity.updatedat

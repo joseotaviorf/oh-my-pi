@@ -1,0 +1,21 @@
+database_name: datalake_hogwarts_clean
+table_name: tag_localization
+columns:
+  id_tag:
+    lineage:
+      - datalake_hogwarts_raw.tag_localization.tag_code
+  id_locale:
+    lineage:
+      - datalake_hogwarts_raw.tag_localization.locale_code
+  tag_name:
+    lineage:
+      - datalake_hogwarts_raw.tag_localization.name
+  tag_description:
+    lineage:
+      - datalake_hogwarts_raw.tag_localization.description
+  ts_created:
+    lineage:
+      - datalake_hogwarts_raw.tag_localization.created_on
+  ts_updated:
+    lineage:
+      - datalake_hogwarts_raw.tag_localization.updated_on

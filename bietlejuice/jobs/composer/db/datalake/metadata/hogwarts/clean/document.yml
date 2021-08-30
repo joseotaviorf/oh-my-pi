@@ -1,0 +1,18 @@
+database_name: datalake_hogwarts_clean
+table_name: document
+columns:
+  id:
+    lineage:
+      - datalake_hogwarts_raw.document.code
+  scope:
+    lineage:
+      - datalake_hogwarts_raw.document.scope
+  is_active:
+    lineage:
+      - datalake_hogwarts_raw.document.active
+  ts_created:
+    lineage:
+      - datalake_hogwarts_raw.document.created_on
+  ts_updated:
+    lineage:
+      - datalake_hogwarts_raw.document.updated_on

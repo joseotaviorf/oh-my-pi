@@ -1,0 +1,15 @@
+database_name: datalake_hogwarts_clean
+table_name: document_x_tag_join
+columns:
+  id_document:
+    lineage:
+      - datalake_hogwarts_raw.document_x_tag_join.document_code
+  id_tag:
+    lineage:
+      - datalake_hogwarts_raw.document_x_tag_join.tag_code
+  ts_created:
+    lineage:
+      - datalake_hogwarts_raw.document_x_tag_join.created_on
+  ts_updated:
+    lineage:
+      - datalake_hogwarts_raw.document_x_tag_join.updated_on

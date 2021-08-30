@@ -1,0 +1,24 @@
+database_name: datalake_hogwarts_clean
+table_name: document_location
+columns:
+  id_document:
+    lineage:
+      - datalake_hogwarts_raw.document_localization.document_code
+  id_locale:
+    lineage:
+      - datalake_hogwarts_raw.document_localization.locale_code
+  title:
+    lineage:
+      - datalake_hogwarts_raw.document_localization.title
+  document_content:
+    lineage:
+      - datalake_hogwarts_raw.document_localization.text
+  link:
+    lineage:
+      - datalake_hogwarts_raw.document_localization.link
+  ts_created:
+    lineage:
+      - datalake_hogwarts_raw.document_localization.created_on
+  ts_updated:
+    lineage:
+      - datalake_hogwarts_raw.document_localization.updated_on
