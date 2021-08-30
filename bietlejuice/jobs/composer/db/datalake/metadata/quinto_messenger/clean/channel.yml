@@ -1,0 +1,48 @@
+database_name: datalake_quinto_messenger_clean
+table_name: channel
+columns:
+  id:
+    lineage:
+      - datalake_quinto_messenger_raw.channel.id
+  id_external:
+    lineage:
+      - datalake_quinto_messenger_raw.channel.channel_id
+  id_source:
+    lineage:
+      - datalake_quinto_messenger_raw.channel.source_id
+  id_source_unique:
+    lineage:
+      - datalake_quinto_messenger_raw.channel.source_uuid
+  channel_status:
+    lineage:
+      - datalake_quinto_messenger_raw.channel.channel_status
+  channel_attributes:
+    lineage:
+      - datalake_quinto_messenger_raw.channel.channel_attributes
+  channel_resource:
+    lineage:
+      - datalake_quinto_messenger_raw.channel.channel_resource
+  channel_proxy:
+    lineage:
+      - datalake_quinto_messenger_raw.channel.channel_proxy
+  source:
+    lineage:
+      - datalake_quinto_messenger_raw.channel.source
+  user_phone:
+    lineage:
+      - datalake_quinto_messenger_raw.channel.user_phone
+  ts_created:
+    lineage:
+      - datalake_quinto_messenger_raw.channel.created_at
+  ts_updated:
+    lineage:
+      - datalake_quinto_messenger_raw.channel.updated_at
+  year:
+    lineage:
+      - datalake_quinto_messenger_raw.channel.year
+  month:
+    lineage:
+      - datalake_quinto_messenger_raw.channel.month
+  day:
+    lineage:
+      - datalake_quinto_messenger_raw.channel.day

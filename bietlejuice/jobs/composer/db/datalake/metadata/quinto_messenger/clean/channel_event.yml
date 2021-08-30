@@ -1,0 +1,30 @@
+database_name: datalake_quinto_messenger_clean
+table_name: channel_event
+columns:
+  id:
+    lineage:
+      - datalake_quinto_messenger_raw.channelevent.id
+  id_channel_external:
+    lineage:
+      - datalake_quinto_messenger_raw.channelevent.channel_id
+  event_type:
+    lineage:
+      - datalake_quinto_messenger_raw.channelevent.event_type
+  event_payload:
+    lineage:
+      - datalake_quinto_messenger_raw.channelevent.event_payload
+  ts_created:
+    lineage:
+      - datalake_quinto_messenger_raw.channelevent.created_at
+  ts_updated:
+    lineage:
+      - datalake_quinto_messenger_raw.channelevent.updated_at
+  year:
+    lineage:
+      - datalake_quinto_messenger_raw.channelevent.year
+  month:
+    lineage:
+      - datalake_quinto_messenger_raw.channelevent.month
+  day:
+    lineage:
+      - datalake_quinto_messenger_raw.channelevent.day

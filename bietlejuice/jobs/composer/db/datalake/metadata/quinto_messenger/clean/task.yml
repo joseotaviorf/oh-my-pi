@@ -1,0 +1,42 @@
+database_name: datalake_quinto_messenger_clean
+table_name: task
+columns:
+  id:
+    lineage:
+      - datalake_quinto_messenger_raw.task.id
+  id_external:
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_id
+  id_channel_external:
+    lineage:
+      - datalake_quinto_messenger_raw.task.channel_id
+  task_status:
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_status
+  task_attributes:
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_attributes
+  task_resource:
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_resource
+  assigned_to:
+    lineage:
+      - datalake_quinto_messenger_raw.task.assigned_to
+  seconds_to_first_response:
+    lineage:
+      - datalake_quinto_messenger_raw.task.seconds_to_first_response
+  ts_created:
+    lineage:
+      - datalake_quinto_messenger_raw.task.created_at
+  ts_updated:
+    lineage:
+      - datalake_quinto_messenger_raw.task.updated_at
+  year:
+    lineage:
+      - datalake_quinto_messenger_raw.task.year
+  month:
+    lineage:
+      - datalake_quinto_messenger_raw.task.month
+  day:
+    lineage:
+      - datalake_quinto_messenger_raw.task.day

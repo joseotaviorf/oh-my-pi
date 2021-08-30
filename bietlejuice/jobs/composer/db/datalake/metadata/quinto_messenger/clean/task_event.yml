@@ -1,0 +1,33 @@
+database_name: datalake_quinto_messenger_clean
+table_name: task_event
+columns:
+  id:
+    lineage:
+      - datalake_quinto_messenger_raw.taskevent.id
+  id_task_external:
+    lineage:
+      - datalake_quinto_messenger_raw.taskevent.task_id
+  id_event:
+    lineage:
+      - datalake_quinto_messenger_raw.taskevent.event_id
+  event_type:
+    lineage:
+      - datalake_quinto_messenger_raw.taskevent.event_type
+  event_payload:
+    lineage:
+      - datalake_quinto_messenger_raw.taskevent.event_payload
+  ts_created:
+    lineage:
+      - datalake_quinto_messenger_raw.taskevent.created_at
+  ts_updated:
+    lineage:
+      - datalake_quinto_messenger_raw.taskevent.updated_at
+  year:
+    lineage:
+      - datalake_quinto_messenger_raw.taskevent.year
+  month:
+    lineage:
+      - datalake_quinto_messenger_raw.taskevent.month
+  day:
+    lineage:
+      - datalake_quinto_messenger_raw.taskevent.day

@@ -1,0 +1,66 @@
+database_name: datalake_ramo_clean
+table_name: razao_sap
+columns:
+  id_trans:
+    lineage:
+      - datalake_ramo_raw.razao_sap.transid
+  acct_code:
+    lineage:
+      - datalake_ramo_raw.razao_sap.acctcode
+  account:
+    lineage:
+      - datalake_ramo_raw.razao_sap.account
+  account_name:
+    lineage:
+      - datalake_ramo_raw.razao_sap.acctname
+  contract_act:
+    lineage:
+      - datalake_ramo_raw.razao_sap.contraact
+  ctr_act_name:
+    lineage:
+      - datalake_ramo_raw.razao_sap.ctractname
+  ocr_code_2:
+    lineage:
+      - datalake_ramo_raw.razao_sap.ocrcode2
+  profit_code:
+    lineage:
+      - datalake_ramo_raw.razao_sap.profitcode
+  ref_1:
+    lineage:
+      - datalake_ramo_raw.razao_sap.ref1
+  ref_2:
+    lineage:
+      - datalake_ramo_raw.razao_sap.ref2
+  ref_3:
+    lineage:
+      - datalake_ramo_raw.razao_sap.ref3
+  short_name:
+    lineage:
+      - datalake_ramo_raw.razao_sap.shortname
+  line_memo:
+    lineage:
+      - datalake_ramo_raw.razao_sap.linememo
+  line_total:
+    lineage:
+      - datalake_ramo_raw.razao_sap.linetotal
+  dt_created:
+    lineage:
+      - datalake_ramo_raw.razao_sap.createdate
+  dt_due:
+    lineage:
+      - datalake_ramo_raw.razao_sap.duedate
+  dt_ref:
+    lineage:
+      - datalake_ramo_raw.razao_sap.refdate
+  dt_tax:
+    lineage:
+      - datalake_ramo_raw.razao_sap.taxdate
+  year:
+    lineage:
+      - datalake_ramo_raw.razao_sap.year
+  month:
+    lineage:
+      - datalake_ramo_raw.razao_sap.month
+  day:
+    lineage:
+      - datalake_ramo_raw.razao_sap.day
