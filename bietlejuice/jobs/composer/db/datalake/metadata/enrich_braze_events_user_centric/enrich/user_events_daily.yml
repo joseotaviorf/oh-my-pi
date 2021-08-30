@@ -1,0 +1,48 @@
+---
+database_name: datalake_braze_user_centric
+table_name: user_events_daily
+columns:
+  id_user_braze:
+    lineage:
+      - datalake_braze.events_owners.id_user_braze
+      - datalake_braze.events_tenants.id_user_braze
+  id_canvas:
+    lineage:
+      - datalake_braze.events_owners.id_canvas
+      - datalake_braze.events_tenants.id_canvas
+  id_campaign:
+    lineage:
+      - datalake_braze.events_owners.id_campaign
+      - datalake_braze.events_tenants.id_campaign
+  event_type:
+    lineage:
+      - datalake_braze.events_owners.event_type
+      - datalake_braze.events_tenants.event_type
+  event_channel:
+    lineage:
+      - datalake_braze.events_owners.event_channel
+      - datalake_braze.events_tenants.event_channel
+  event_action:
+    lineage:
+      - datalake_braze.events_owners.event_action
+      - datalake_braze.events_tenants.event_action
+  event_count:
+    lineage:
+      - datalake_braze.events_owners.id_event
+      - datalake_braze.events_tenants.id_event
+  dt_event:
+    lineage:
+      - datalake_braze.events_owners.ts_event
+      - datalake_braze.events_tenants.ts_event
+  year:
+    lineage:
+      - datalake_braze.events_owners.year
+      - datalake_braze.events_tenants.year
+  month:
+    lineage:
+      - datalake_braze.events_owners.month
+      - datalake_braze.events_tenants.month
+  day:
+    lineage:
+      - datalake_braze.events_owners.day
+      - datalake_braze.events_tenants.day
