@@ -1,0 +1,25 @@
+---
+database_name: datalake_braze_dispatches
+table_name: webhook_tenants
+columns:
+  id_user_dispatch:
+    lineage:
+      - datalake_braze.events_tenants.id_user_dispatch
+  id_user_braze:
+    lineage:
+      - datalake_braze.events_tenants.id_user_braze
+  event_channel:
+    lineage:
+      - datalake_braze.events_tenants.event_channel
+  ts_webhook_sent:
+    lineage:
+      - datalake_braze.events_tenants.ts_event
+  year:
+    lineage:
+      - datalake_braze.events_tenants.year
+  month:
+    lineage:
+      - datalake_braze.events_tenants.month
+  day:
+    lineage:
+      - datalake_braze.events_tenants.day
