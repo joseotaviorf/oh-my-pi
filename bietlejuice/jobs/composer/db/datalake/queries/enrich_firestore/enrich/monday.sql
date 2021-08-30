@@ -68,7 +68,7 @@ SELECT
   --
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.data_assinatura_ccv4.value') AS DATE) AS dt_sale_agreement_created,
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.data27.value') AS DATE) AS dt_sale_agreement_signed,
-  CAST(GET_JSON_OBJECT(moa.updated_message, '$.date4.value') AS DATE) AS dt_onboarding_ended,
+  CAST(GET_JSON_OBJECT(moa.updated_message, '$.data4.value') AS DATE) AS dt_onboarding_ended,
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.data0.value') AS DATE) AS dt_bank_legal_analysis_started,
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.data15.value') AS DATE) AS dt_financing_started,
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.data10.value') AS DATE) AS dt_financing_ended,
@@ -136,8 +136,8 @@ SELECT
   moa.notary_office_status,
   moa.real_estate_register_office_status,
   moa.house_dilligence_status,
-  moa.report_dilligence_status,
   moa.seller_dilligence_status,
+  moa.report_dilligence_status,
   moa.sale_agreement_status,
   moa.payment_status,
   moa.seller_payment_status,
@@ -155,7 +155,22 @@ SELECT
   END AS drop_reason_responsible,
   moa.house_occupant,
   moa.land_tenure,
+  CASE
+    WHEN moa.payment_method = 2 THEN 'Á vista'
+    WHEN moa.payment_method = 3 THEN 'Á vista + FGTS'
+    WHEN moa.payment_method = 1 THEN 'Financiado'
+    WHEN moa.payment_method = 4 THEN 'Financiado + FGTS'
+    WHEN (moa.payment_method = 6) OR
+      (moa.payment_method IS NULL) THEN 'Não definida'
+    WHEN moa.payment_method = 7 THEN 'Financiado por fora'
+  END AS form_of_payment,
   moa.has_seller_debt_payments,
+  CASE
+    WHEN moa.dt_sale_agreement_signed IS NOT NULL THEN
+        CASE WHEN moa.status = 'CCV - Cancelado' THEN TRUE
+        ELSE FALSE
+    ELSE NULL
+  END AS is_ccv_canceled,
   CASE WHEN moa.dt_accepted <= moa.dt_offer_dismissed THEN DATEDIFF(moa.dt_offer_dismissed, moa.dt_accepted) END AS days_offer_accepted_to_offer_dismissed,
   DATEDIFF(moa.dt_sale_agreement_created, moa.dt_accepted) AS days_offer_accepted_to_sale_agreement_created,
   DATEDIFF(moa.dt_sale_agreement_signed, moa.dt_accepted) AS days_offer_accepted_to_sale_agreement_signed,
