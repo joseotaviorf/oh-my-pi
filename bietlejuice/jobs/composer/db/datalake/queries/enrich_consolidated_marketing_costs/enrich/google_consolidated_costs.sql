@@ -109,7 +109,7 @@ keywords_costs AS (
             END
         ) AS campaign_city,
         gkpr.account_descriptive_name AS account_name,
-        gkpr.report_type,
+        cmrt.report_type,
         NULL AS ad_type,
         criteria || '_' || LOWER(LEFT(match_type, 1)) AS utm_term,
         NULL AS utm_content,
@@ -146,7 +146,7 @@ ads_costs AS (
             END
         ) AS campaign_city,
         gapr.account_descriptive_name AS account_name,
-        gapr.report_type,
+        cmrt.report_type,
         COALESCE(ad_types.flag, 'other') AS ad_type,
         STRING(ad_group_name) AS utm_term,
         STRING(id_ad) AS utm_content,
@@ -164,7 +164,7 @@ ads_costs AS (
         datalake_google_ads_clean.ads_performance_report gapr
         JOIN campaign_main_report_type cmrt 
             ON cmrt.id_campaign = gapr.id_campaign 
-            AND cmrt.report_type = gapr.report_type
+            AND cmrt.report_type = 'ads_performance_report'
         LEFT JOIN datalake_gsheets_clean.marketing_costs_google_ad_type_flags ad_types
             ON ad_types.ad_type = gapr.ad_type
     WHERE
@@ -185,7 +185,7 @@ campaigns_costs AS (
             END
         ) AS campaign_city,
         gcpr.account_descriptive_name AS account_name,
-        gcpr.report_type,
+        cmrt.report_type,
         NULL AS ad_type,
         NULL AS utm_term,
         NULL AS utm_content,
@@ -203,7 +203,7 @@ campaigns_costs AS (
         datalake_google_ads_clean.campaigns_performance_report gcpr
         JOIN campaign_main_report_type cmrt 
             ON cmrt.id_campaign = gcpr.id_campaign 
-            AND cmrt.report_type = gcpr.report_type
+            AND cmrt.report_type = 'campaigns_performance_report'
     WHERE
         dt_loaded = DATE('{year}-{month}-{day}')
     GROUP BY
@@ -222,7 +222,7 @@ videos_costs AS (
             END
         ) AS campaign_city,
         gvpr.account_descriptive_name AS account_name,
-        gvpr.report_type,
+        cmrt.report_type,
         NULL AS ad_type,
         NULL AS utm_term,
         NULL AS utm_content,
@@ -240,7 +240,7 @@ videos_costs AS (
         datalake_google_ads_clean.videos_performance_report gvpr
         JOIN campaign_main_report_type cmrt 
             ON cmrt.id_campaign = gvpr.id_campaign 
-            AND cmrt.report_type = gvpr.report_type
+            AND cmrt.report_type = 'videos_performance_report'
     WHERE
         dt_loaded = DATE('{year}-{month}-{day}')
     GROUP BY
