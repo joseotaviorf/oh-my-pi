@@ -1,0 +1,18 @@
+database_name: datalake_rene_descartes_clean
+table_name: phone
+columns:
+  id:
+    lineage:
+      - datalake_rene_descartes_raw.phone.id
+  id_owner:
+    lineage:
+      - datalake_rene_descartes_raw.phone.owner_id
+  phone_number:
+    lineage:
+      - datalake_rene_descartes_raw.phone.phone_nr
+  ts_created:
+    lineage:
+      - datalake_rene_descartes_raw.phone.created_at
+  ts_updated:
+    lineage:
+      - datalake_rene_descartes_raw.phone.updated_at

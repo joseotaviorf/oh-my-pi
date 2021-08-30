@@ -1,0 +1,39 @@
+database_name: datalake_rene_descartes_clean
+table_name: rejection_history_event_aud
+columns:
+  id:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_event_aud.id
+  id_external_reference:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_event_aud.external_reference_id
+  id_rejection_history_collector:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_event_aud.rejection_history_collector_id
+  external_reference_name:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_event_aud.external_reference_name
+  reason:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_event_aud.reason
+  business_context:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_event_aud.business_context
+  rev:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_event_aud.rev
+  rev_type:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_event_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_event_aud.revend
+  ts_created:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_event_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_event_aud.updated_at
+  ts_rejected:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_event_aud.rejected_at

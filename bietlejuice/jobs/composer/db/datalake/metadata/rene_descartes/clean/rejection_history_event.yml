@@ -1,0 +1,30 @@
+database_name: datalake_rene_descartes_clean
+table_name: rejection_history_event
+columns:
+  id:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_event.id
+  id_external_reference:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_event.external_reference_id
+  id_rejection_history_collector:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_event.rejection_history_collector_id
+  external_reference_name:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_event.external_reference_name
+  reason:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_event.reason
+  business_context:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_event.business_context
+  ts_created:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_event.created_at
+  ts_updated:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_event.updated_at
+  ts_rejected:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_event.rejected_at

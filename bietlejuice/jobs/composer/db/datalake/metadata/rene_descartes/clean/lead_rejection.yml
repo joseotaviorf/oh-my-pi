@@ -1,0 +1,21 @@
+database_name: datalake_rene_descartes_clean
+table_name: lead_rejection
+columns:
+  id:
+    lineage:
+      - datalake_rene_descartes_raw.lead_rejection.id
+  id_house_lead:
+    lineage:
+      - datalake_rene_descartes_raw.lead_rejection.house_lead_id
+  business_context:
+    lineage:
+      - datalake_rene_descartes_raw.lead_rejection.business_context
+  reason:
+    lineage:
+      - datalake_rene_descartes_raw.lead_rejection.reason
+  ts_created:
+    lineage:
+      - datalake_rene_descartes_raw.lead_rejection.created_at
+  ts_updated:
+    lineage:
+      - datalake_rene_descartes_raw.lead_rejection.updated_at

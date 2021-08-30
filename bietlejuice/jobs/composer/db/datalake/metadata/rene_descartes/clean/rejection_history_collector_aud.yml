@@ -1,0 +1,24 @@
+database_name: datalake_rene_descartes_clean
+table_name: rejection_history_collector_aud
+columns:
+  id:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_collector_aud.id
+  phone_number:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_collector_aud.phone
+  rev:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_collector_aud.rev
+  rev_type:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_collector_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_collector_aud.revend
+  ts_created:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_collector_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_rene_descartes_raw.rejection_history_collector_aud.updated_at
