@@ -1,6 +1,6 @@
 WITH clean_table_common AS (
     SELECT DISTINCT
-	SHA2(CONCAT(id_external_customer, id_video, id_campaign, id_ad_group, device), 256) AS sk_video,
+	    SHA2(CONCAT(id_external_customer, id_video, id_campaign, id_ad_group, device), 256) AS sk_video,
         id_video,
         ad_group_name,
         campaign_name,

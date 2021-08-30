@@ -1,0 +1,37 @@
+database_name: dw_google_ads
+table_name: dim_google_ad
+columns:
+  sk_ad:
+    lineage:
+      - datalake_google_ads_clean.ads_performance_report.id_external_customer
+      - datalake_google_ads_clean.ads_performance_report.id_ad
+      - datalake_google_ads_clean.ads_performance_report.id_campaign
+      - datalake_google_ads_clean.ads_performance_report.id_ad_group
+      - datalake_google_ads_clean.ads_performance_report.device
+  id_ad:
+    lineage:
+      - datalake_google_ads_clean.ads_performance_report.id_ad
+  campaign_name:
+    lineage:
+      - datalake_google_ads_clean.ads_performance_report.campaign_name
+  ad_group_name:
+    lineage:
+      - datalake_google_ads_clean.ads_performance_report.ad_group_name
+  ad_type:
+    lineage:
+      - datalake_google_ads_clean.ads_performance_report.ad_type
+  account_name:
+    lineage:
+      - datalake_google_ads_clean.ads_performance_report.account_snake_case
+  account_descriptive_name:
+    lineage:
+      - datalake_google_ads_clean.ads_performance_report.account_descriptive_name
+  report_type:
+    lineage:
+      - datalake_google_ads_clean.ads_performance_report.report_type
+  is_test_campaign:
+    lineage:
+      - datalake_google_ads_clean.ads_performance_report.campaign_name
+  dt_loaded:
+    lineage:
+      - datalake_google_ads_clean.ads_performance_report.dt_loaded
