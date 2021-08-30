@@ -1,0 +1,12 @@
+database_name: datalake_kodak_clean
+table_name: user_revision_entity
+columns:
+  id:
+    lineage:
+      - datalake_kodak_raw.userrevisionentity.id
+  id_user:
+    lineage:
+      - datalake_kodak_raw.userrevisionentity.userid
+  ts_revised:
+    lineage:
+      - datalake_kodak_raw.userrevisionentity.timestamp

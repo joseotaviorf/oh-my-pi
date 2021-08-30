@@ -1,0 +1,12 @@
+database_name: datalake_linhadireta_clean
+table_name: chat_users
+columns:
+  id:
+    lineage:
+      - datalake_linhadireta_raw.chat_users.id
+  id_chat:
+    lineage:
+      - datalake_linhadireta_raw.chat_users.chat_id
+  id_user:
+    lineage:
+      - datalake_linhadireta_raw.chat_users.user_id

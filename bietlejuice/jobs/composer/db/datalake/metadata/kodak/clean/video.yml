@@ -1,0 +1,21 @@
+database_name: datalake_kodak_clean
+table_name: video
+columns:
+  id:
+    lineage:
+      - datalake_kodak_raw.video.id
+  external_domain:
+    lineage:
+      - datalake_kodak_raw.video.externaldomain
+  id_external_domain:
+    lineage:
+      - datalake_kodak_raw.video.externaldomainid
+  metadata:
+    lineage:
+      - datalake_kodak_raw.video.metadata
+  id_source:
+    lineage:
+      - datalake_kodak_raw.video.sourceid
+  video_source:
+    lineage:
+      - datalake_kodak_raw.video.videosource

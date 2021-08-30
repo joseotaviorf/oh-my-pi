@@ -1,0 +1,45 @@
+database_name: datalake_kodak_clean
+table_name: photo_sphere_aud
+columns:
+  id:
+    lineage:
+      - datalake_kodak_raw.photosphere_aud.id
+  rev:
+    lineage:
+      - datalake_kodak_raw.photosphere_aud.rev
+  rev_type:
+    lineage:
+      - datalake_kodak_raw.photosphere_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_kodak_raw.photosphere_aud.revend
+  external_domain:
+    lineage:
+      - datalake_kodak_raw.photosphere_aud.externaldomain
+  id_external_domain:
+    lineage:
+      - datalake_kodak_raw.photosphere_aud.externaldomainid
+  metadata:
+    lineage:
+      - datalake_kodak_raw.photosphere_aud.metadata
+  mod_metadata:
+    lineage:
+      - datalake_kodak_raw.photosphere_aud.metadata_mod
+  path:
+    lineage:
+      - datalake_kodak_raw.photosphere_aud.path
+  mod_path:
+    lineage:
+      - datalake_kodak_raw.photosphere_aud.path_mod
+  path_preview:
+    lineage:
+      - datalake_kodak_raw.photosphere_aud.pathpreview
+  mod_path_preview:
+    lineage:
+      - datalake_kodak_raw.photosphere_aud.pathpreview_mod
+  position:
+    lineage:
+      - datalake_kodak_raw.photosphere_aud.position
+  mod_position:
+    lineage:
+      - datalake_kodak_raw.photosphere_aud.position_mod

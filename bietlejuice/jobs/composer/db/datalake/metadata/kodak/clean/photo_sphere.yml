@@ -1,0 +1,24 @@
+database_name: datalake_kodak_clean
+table_name: photo_sphere
+columns:
+  id:
+    lineage:
+      - datalake_kodak_raw.photosphere.id
+  external_domain:
+    lineage:
+      - datalake_kodak_raw.photosphere.externaldomain
+  id_external_domain:
+    lineage:
+      - datalake_kodak_raw.photosphere.externaldomainid
+  metadata:
+    lineage:
+      - datalake_kodak_raw.photosphere.metadata
+  path:
+    lineage:
+      - datalake_kodak_raw.photosphere.path
+  path_preview:
+    lineage:
+      - datalake_kodak_raw.photosphere.pathpreview
+  position:
+    lineage:
+      - datalake_kodak_raw.photosphere.position
