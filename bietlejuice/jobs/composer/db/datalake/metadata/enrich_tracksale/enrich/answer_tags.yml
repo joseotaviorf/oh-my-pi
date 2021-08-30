@@ -1,0 +1,16 @@
+---
+database_name: datalake_tracksale
+table_name: answer_tags
+columns:
+  id_answer:
+    lineage:
+      - datalake_tracksale.answer.id
+  ts_answer_sent_local:
+    lineage:
+      - datalake_tracksale.answer.ts_answer_sent_local
+  tag_name:
+    lineage:
+      - datalake_tracksale.answer.tags
+  tag_value:
+    lineage:
+      - datalake_tracksale.answer.tags

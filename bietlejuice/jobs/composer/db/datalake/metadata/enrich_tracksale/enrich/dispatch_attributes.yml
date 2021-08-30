@@ -1,0 +1,34 @@
+---
+database_name: datalake_tracksale
+table_name: dispatch_attributes
+columns:
+  id:
+    lineage:
+      - datalake_tracksale_clean.dispatch.id
+  name:
+    lineage:
+      - datalake_tracksale_clean.dispatch.customers
+  identification:
+    lineage:
+      - datalake_tracksale_clean.dispatch.customers
+  email:
+    lineage:
+      - datalake_tracksale_clean.dispatch.customers
+  phone:
+    lineage:
+      - datalake_tracksale_clean.dispatch.customers
+  status:
+    lineage:
+      - datalake_tracksale_clean.dispatch.customers
+  has_answered:
+    lineage:
+      - datalake_tracksale_clean.dispatch.customers
+  survey_opened:
+    lineage:
+      - datalake_tracksale_clean.dispatch.customers
+  dispatch_time:
+    lineage:
+      - datalake_tracksale_clean.dispatch.customers
+  ts_created:
+    lineage:
+      - datalake_tracksale_clean.dispatch.ts_created

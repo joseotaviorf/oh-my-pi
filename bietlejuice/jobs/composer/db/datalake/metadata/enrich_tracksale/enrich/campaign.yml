@@ -1,0 +1,34 @@
+---
+database_name: datalake_tracksale
+table_name: campaign
+columns:
+  id:
+    lineage:
+      - datalake_tracksale_clean.campaign.id
+  campaign_name:
+    lineage:
+      - datalake_tracksale_clean.campaign.campaign_name
+  business_context:
+    lineage:
+      - datalake_tracksale_clean.campaign.description
+  customer_journey:
+    lineage:
+      - datalake_tracksale_clean.campaign.description
+  purpose:
+    lineage:
+      - datalake_tracksale_clean.campaign.description
+  customer_type:
+    lineage:
+      - datalake_tracksale_clean.campaign.description
+  partner_name:
+    lineage:
+      - datalake_tracksale_clean.campaign.campaign_name
+  metric_group:
+    lineage:
+      - datalake_tracksale_clean.campaign.description
+  main_channel:
+    lineage:
+      - datalake_tracksale_clean.campaign.main_channel
+  ts_created:
+    lineage:
+      - datalake_tracksale_clean.campaign.ts_created

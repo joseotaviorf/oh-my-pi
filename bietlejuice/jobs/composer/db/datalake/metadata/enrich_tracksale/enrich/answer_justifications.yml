@@ -1,0 +1,10 @@
+---
+database_name: datalake_tracksale
+table_name: answer_justifications
+columns:
+  id_answer:
+    lineage:
+      - datalake_tracksale.answer.id
+  justification:
+    lineage:
+      - datalake_tracksale.answer.justifications
