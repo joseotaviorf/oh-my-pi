@@ -1,0 +1,205 @@
+database_name: datalake_customer_support
+table_name: chat
+columns:
+  id_segment:
+    lineage:
+      - datalake_quinto_messenger.task.id_task
+  id_ticket:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+  id_conversation:
+    lineage:
+      - datalake_quinto_messenger.channel.id_conversation
+  id_session:
+    lineage:
+      - datalake_quinto_messenger.channel.id_source
+  id_agent:
+    lineage:
+      - datalake_quinto_messenger.task.id_agent
+  id_first_agent:
+    lineage:
+      - datalake_quinto_messenger.task.id_agent
+      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+      - datalake_quinto_messenger.task_event.ts_created_local
+  id_last_agent:
+    lineage:
+      - datalake_quinto_messenger.task.id_agent
+      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+      - datalake_quinto_messenger.task_event.ts_created_local
+  id_user:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_user
+  id_contract:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_contract
+  agent_email:
+    lineage:
+      - datalake_quinto_messenger.task.agent_email
+  agent_manager:
+    lineage:
+      - datalake_gsheets_clean.agents_control.manager
+  agent_name:
+    lineage:
+      - datalake_gsheets_clean.agents_control.agent_name
+  agent_company:
+    lineage:
+      - datalake_gsheets_clean.agents_control.agent_company
+  csat_comment:
+    lineage:
+      - datalake_chat_fup_clean.surveys_answer.comment
+  department:
+    lineage:
+      - datalake_quinto_messenger.task_event.task_queue_name
+  zendesk_department:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.group_name
+  first_department:
+    lineage:
+      - datalake_quinto_messenger.task_event.task_queue_name
+      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+      - datalake_quinto_messenger.task_event.ts_created_local
+  last_department:
+    lineage:
+      - datalake_quinto_messenger.task_event.task_queue_name
+      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+      - datalake_quinto_messenger.task_event.ts_created_local
+  transferred_from_dept:
+    lineage:
+      - datalake_quinto_messenger.task_event.task_queue_name
+      - datalake_quinto_messenger.task.id_channel
+      - datalake_quinto_messenger.task_event.ts_created_local
+  transferred_to_dept:
+    lineage:
+      - datalake_quinto_messenger.task_event.task_queue_name
+      - datalake_quinto_messenger.task.id_channel
+      - datalake_quinto_messenger.task_event.ts_created_local
+  transference_type:
+    lineage:
+      - datalake_quinto_messenger.task_event.task_queue_name
+      - datalake_quinto_messenger.task.id_channel
+      - datalake_quinto_messenger.task_event.ts_created_local
+      - datalake_quinto_messenger.task.id_agent
+  request_type:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.request_type
+  client_type:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.client_type
+  customer_type_tag:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.customer_type_tag
+  contact_motivation_tag:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.contact_motivation_tag
+  contact_theme_tag:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.contact_theme_tag
+  tags:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+  status:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.status
+  custom_fields:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+  frt:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_solved_local
+      - datalake_quinto_messenger.task.ts_created_local
+  last_back_ticket:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+  back_ticket_list:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+  seconds_first_reply:
+    lineage:
+      - datalake_quinto_messenger.task.seconds_to_first_response
+  segment_minutes_wait_time:
+    lineage:
+      - datalake_quinto_messenger.task.seconds_to_first_response
+  number_of_departments:
+    lineage:
+      - datalake_quinto_messenger.task_event.task_queue_name
+  number_of_segments:
+    lineage:
+      - datalake_quinto_messenger.task.id_task
+  sla_achieved:
+    lineage:
+      - datalake_quinto_messenger.task.seconds_to_first_response
+  minutes_full_resolution_time_calendar:
+    lineage:
+      - datalake_quinto_messenger.channel.seconds_duration
+  minutes_first_resolution_time_calendar:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_first_resolution_calendar
+  minutes_first_resolution_time_business:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_first_resolution_business
+  is_last_segment:
+    lineage:
+      - datalake_quinto_messenger.task.id_task
+      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+      - datalake_quinto_messenger.task_event.ts_created_local
+  is_first_segment:
+    lineage:
+      - datalake_quinto_messenger.task.id_task
+      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+      - datalake_quinto_messenger.task_event.ts_created_local
+  transference_reason:
+    lineage:
+      - datalake_insider_clean.review_feature.rating_selected
+  has_transfers:
+    lineage:
+      - datalake_quinto_messenger.task.id_task
+  is_bot:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+  is_closed_by_merge:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+  front_or_back:
+    lineage:
+      - datalake_gsheets_clean.department_control.front_or_back
+      - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+  has_back_ticket:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+  is_open_back_ticket:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.status
+      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+  is_csat_answered:
+    lineage:
+      - datalake_chat_fup_clean.chats_chat.id_ticket
+  is_solved:
+    lineage:
+      - datalake_chat_fup_clean.surveys_answer.is_solved
+  csat_score:
+    lineage:
+      - datalake_chat_fup_clean.surveys_answer.rating
+  group_name:
+    lineage:
+      - datalake_chat_fup_clean.chats_chat.group_name
+  ts_survey:
+    lineage:
+      - datalake_chat_fup_clean.chats_chat.ts_attended
+  ts_created:
+    lineage:
+      - datalake_quinto_messenger.task.ts_created
+  ts_updated:
+    lineage:
+      - datalake_quinto_messenger.task.ts_updated
+  ts_ticket_started:
+    lineage:
+      - datalake_quinto_messenger.task_event.ts_created_local
+  ts_ticket_ended:
+    lineage:
+      - datalake_quinto_messenger.task_event.ts_created_local
+  ts_segment_closed:
+    lineage:
+      - datalake_quinto_messenger.task_event.ts_created_local
+  ts_segment_created:
+    lineage:
+      - datalake_quinto_messenger.task_event.ts_created_local

@@ -1,0 +1,39 @@
+database_name: datalake_customer_support
+table_name: csat
+columns:
+  id_ticket:
+    lineage:
+      - datalake_chat_fup_clean.chats_chat.id_ticket
+      - datalake_zendesk_tickets_clean.tickets.id_ticket
+      - datalake_survicate.surveys.id_ticket
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_ticket
+  csat_comment:
+    lineage:
+      - datalake_chat_fup_clean.surveys_answer.comment
+      - datalake_zendesk_tickets_clean.tickets.satisfaction_rating
+      - datalake_survicate.surveys.user_comment
+  resolution_survey:
+    lineage:
+      - datalake_chat_fup_clean.surveys_answer.is_solved
+      - datalake_zendesk_tickets_clean.tickets.satisfaction_rating
+      - datalake_survicate.surveys.is_solved
+      - datalake_bigfone_twilio.call_ivr_events.csat_1
+  csat_score:
+    lineage:
+      - datalake_chat_fup_clean.surveys_answer.rating
+      - datalake_zendesk_tickets_clean.tickets.satisfaction_rating
+      - datalake_survicate.surveys.csat_score
+      - datalake_bigfone_twilio.call_ivr_events.csat_2
+  ts_survey:
+    lineage:
+      - datalake_chat_fup_clean.surveys_survey.ts_created
+      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
+  ts_response:
+    lineage:
+      - datalake_chat_fup_clean.surveys_answer.ts_created
+      - datalake_zendesk_tickets_clean.satisfaction_ratings.ts_updated
+      - datalake_zendesk_tickets_clean.tickets.id_ticket
+      - datalake_survicate.surveys.ts_first_response
+      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
+      
+    

@@ -1,0 +1,149 @@
+database_name: datalake_customer_support
+table_name: email
+columns:
+  id_ticket: 
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.id_ticket
+  id_requester:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.id_requester
+  id_agent:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.id_assignee
+  id_user:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_user
+  id_contract:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_contract
+  agent_name:
+    lineage:
+      - datalake_gsheets_clean.agents_control.agent_name
+  agent_company:
+    lineage:
+      - datalake_gsheets_clean.agents_control.agent_company
+  agent_manager:
+    lineage:
+      - datalake_gsheets_clean.agents_control.manager
+  agent_email:
+    lineage:
+      - datalake_gsheets_clean.agents_control.email
+  direction:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.tags
+  tags:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.tags
+  status:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.status
+  department:
+    lineage:
+      - datalake_zendesk_tickets_clean.groups.name
+  is_sla:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_requester_wait_business
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.replies
+  minutes_full_resolution_time_calendar:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_full_resolution_calendar
+  minutes_full_resolution_time_business:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_full_resolution_business
+  minutes_first_response:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_requester_wait_business
+  csat_score:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.satisfaction_rating
+      - datalake_survicate.surveys.csat_score
+  is_answered:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.satisfaction_rating
+      - datalake_survicate.surveys.user_comment
+      - datalake_survicate.surveys.csat_score
+      - datalake_survicate.surveys.is_solved
+  is_solved:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.satisfaction_rating
+      - datalake_survicate.surveys.is_solved
+  score_reason:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.satisfaction_rating
+  csat_comment:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.satisfaction_rating
+      - datalake_survicate.surveys.user_comment
+  channel:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.channel
+  custom_fields:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+  request_type:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.request_type
+  client_type:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.client_type
+  customer_type_tag:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.customer_type_tag
+  contact_motivation_tag:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.contact_motivation_tag
+  contact_theme_tag:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.contact_theme_tag
+  has_back_tickets:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+      - datalake_zendesk_tickets_clean.tickets.description
+  is_bot:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.tags
+  is_closed_by_merge:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.tags
+  front_or_back:
+    lineage:
+      - datalake_gsheets_clean.department_control.front_or_back
+      - datalake_zendesk_tickets_clean.tickets.tags
+  has_back_ticket:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.id_ticket
+  frt:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_solved_local
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_created_local
+  is_open_back_ticket:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.status
+      - datalake_zendesk_tickets_clean.tickets.id_ticket
+  back_ticket_list:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.id_ticket
+  last_back_ticket:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.id_ticket
+  ts_csat_first_seen:
+    lineage:
+      - datalake_survicate.surveys.ts_first_seen
+  ts_csat_first_response:
+    lineage:
+      - datalake_survicate.surveys.ts_first_response
+  ts_initially_assigned_local:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_initially_assigned_local
+  ts_last_assigned_local:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_last_assigned_local
+  ts_ticket_started:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_created_local
+  ts_ticket_solved:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_solved_local
+  ts_ticket_ended:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_closed_local
