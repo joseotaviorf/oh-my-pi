@@ -1,0 +1,11 @@
+database_name: dw_customer_support
+table_name: dim_channel
+columns:
+  sk_channel:
+    lineage:
+      - datalake_customer_support.call.direction
+      - datalake_customer_support.email.direction
+  direction:
+    lineage:
+      - datalake_customer_support.call.direction
+      - datalake_customer_support.email.direction

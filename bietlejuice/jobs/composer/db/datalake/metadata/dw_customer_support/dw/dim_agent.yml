@@ -1,0 +1,28 @@
+database_name: dw_customer_support
+table_name: dim_agent
+columns:
+  sk_agent:
+    lineage:
+      - datalake_customer_support.call.id_agent
+      - datalake_customer_support.chat.id_agent
+      - datalake_customer_support.email.id_agent
+  email:
+    lineage:
+      - datalake_customer_support.call.agent_email
+      - datalake_customer_support.chat.agent_email
+      - datalake_customer_support.email.agent_email
+  agent_manager:
+    lineage:
+      - datalake_customer_support.call.agent_manager
+      - datalake_customer_support.chat.agent_manager
+      - datalake_customer_support.email.agent_manager
+  full_name:
+    lineage:
+      - datalake_customer_support.call.agent_name
+      - datalake_customer_support.chat.agent_name
+      - datalake_customer_support.email.agent_name
+  agent_company:
+    lineage:
+      - datalake_customer_support.call.agent_company
+      - datalake_customer_support.chat.agent_company
+      - datalake_customer_support.email.agent_company

@@ -1,0 +1,36 @@
+database_name: dw_customer_support
+table_name: dim_department
+columns:
+  sk_department:
+    lineage:
+      - datalake_gsheets_clean.department_control.department
+  department:
+    lineage:
+      - datalake_gsheets_clean.department_control.department
+  board:
+    lineage:
+      - datalake_gsheets_clean.department_control.board
+  team:
+    lineage:
+      - datalake_gsheets_clean.department_control.team
+  journey_step:
+    lineage:
+      - datalake_gsheets_clean.department_control.journey_step
+  channel:
+    lineage:
+      - datalake_gsheets_clean.department_control.channel
+  front_or_back:
+    lineage:
+      - datalake_gsheets_clean.department_control.front_or_back
+  area:
+    lineage:
+      - datalake_gsheets_clean.department_control.area
+  concentrix_area_name:
+    lineage:
+      - datalake_gsheets_clean.department_control.concentrix_area_name
+  is_concentrix:
+    lineage:
+      - datalake_gsheets_clean.department_control.concentrix_area
+  is_active:
+    lineage:
+      - datalake_gsheets_clean.department_control.active_department

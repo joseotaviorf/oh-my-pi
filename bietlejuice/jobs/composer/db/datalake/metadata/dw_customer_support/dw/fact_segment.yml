@@ -1,0 +1,75 @@
+database_name: dw_customer_support
+table_name: fact_segment
+columns:
+  sk_ticket:
+    lineage:
+      - datalake_customer_support.call.id_ticket
+      - datalake_customer_support.chat.id_ticket
+      - datalake_customer_support.email.id_ticket
+  sk_segment:
+    lineage:
+      - datalake_customer_support.call.id_segment
+      - datalake_customer_support.chat.id_segment
+      - datalake_customer_support.email.id_ticket
+  sk_agent:
+    lineage:
+      - datalake_customer_support.call.id_agent
+      - datalake_customer_support.chat.id_agent
+      - datalake_customer_support.email.id_agent
+  sk_department:
+    lineage:
+      - datalake_customer_support.call.department
+      - datalake_customer_support.chat.department
+      - datalake_customer_support.email.department
+  sk_channel:
+    lineage:
+      - datalake_customer_support.call.direction
+      - datalake_customer_support.email.direction
+  sk_external_service:
+    lineage:
+      - datalake_customer_support.call.id_external_service
+      - datalake_customer_support.chat.id_segment
+  department:
+    lineage:
+      - datalake_customer_support.call.department
+      - datalake_customer_support.chat.department
+      - datalake_customer_support.email.department
+  transferred_from_dept:
+    lineage:
+      - datalake_customer_support.call.transferred_from_dept
+      - datalake_customer_support.chat.transferred_from_dept
+  transferred_to_dept:
+    lineage:
+      - datalake_customer_support.call.transferred_to_dept
+      - datalake_customer_support.chat.transferred_to_dept
+  transference_type:
+    lineage:
+      - datalake_customer_support.call.transference_type
+      - datalake_customer_support.chat.transference_type
+  transference_reason:
+    lineage:
+      - datalake_customer_support.call.transference_reason
+      - datalake_customer_support.chat.transference_reason
+  is_sla:
+    lineage:
+      - datalake_customer_support.call.sla_achieved
+      - datalake_customer_support.chat.sla_achieved
+      - datalake_customer_support.email.is_sla
+  is_first_segment:
+    lineage:
+      - datalake_customer_support.call.is_first_segment
+      - datalake_customer_support.chat.is_first_segment
+  is_last_segment:
+    lineage:
+      - datalake_customer_support.call.is_last_segment
+      - datalake_customer_support.chat.is_last_segment
+  ts_started:
+    lineage:
+      - datalake_customer_support.call.ts_segment_created
+      - datalake_customer_support.chat.ts_segment_created
+      - datalake_customer_support.email.ts_ticket_started
+  ts_closed:
+    lineage:
+      - datalake_customer_support.call.ts_segment_closed
+      - datalake_customer_support.chat.ts_segment_closed
+      - datalake_customer_support.email.ts_ticket_ended

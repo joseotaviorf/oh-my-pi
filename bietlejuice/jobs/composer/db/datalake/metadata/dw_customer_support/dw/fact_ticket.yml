@@ -1,0 +1,195 @@
+database_name: dw_customer_support
+table_name: fact_ticket
+columns:
+  sk_ticket:
+    lineage:
+      - datalake_customer_support.call.id_ticket
+      - datalake_customer_support.chat.id_ticket
+      - datalake_customer_support.email.id_ticket
+  sk_taxonomy:
+    lineage:
+      - datalake_customer_support.call.customer_type_tag
+      - datalake_customer_support.call.client_type
+      - datalake_customer_support.call.request_type
+      - datalake_customer_support.call.contact_motivation_tag
+      - datalake_customer_support.call.contact_theme_tag
+      - datalake_customer_support.chat.customer_type_tag
+      - datalake_customer_support.chat.client_type
+      - datalake_customer_support.chat.request_type
+      - datalake_customer_support.chat.contact_motivation_tag
+      - datalake_customer_support.chat.contact_theme_tag
+      - datalake_customer_support.email.customer_type_tag
+      - datalake_customer_support.email.client_type
+      - datalake_customer_support.email.request_type
+      - datalake_customer_support.email.contact_motivation_tag
+      - datalake_customer_support.email.contact_theme_tag
+  sk_channel:
+    lineage:
+      - datalake_customer_support.call.direction
+      - datalake_customer_support.email.direction
+  sk_first_agent:
+    lineage:
+      - datalake_customer_support.call.id_first_agent
+      - datalake_customer_support.chat.id_first_agent
+      - datalake_customer_support.email.id_agent
+  sk_last_agent:
+    lineage:
+      - datalake_customer_support.call.id_last_agent
+      - datalake_customer_support.chat.id_last_agent
+      - datalake_customer_support.email.id_agent
+  sk_first_department:
+    lineage:
+      - datalake_customer_support.call.first_department
+      - datalake_customer_support.chat.first_department
+      - datalake_customer_support.email.department
+  sk_last_department:
+    lineage:
+      - datalake_customer_support.call.last_department
+      - datalake_customer_support.chat.last_department
+      - datalake_customer_support.email.department
+  sk_zendesk_department:
+    lineage:
+      - datalake_customer_support.call.zendesk_department
+      - datalake_customer_support.chat.zendesk_department
+      - datalake_customer_support.email.department
+  sk_user:
+    lineage:
+      - datalake_customer_support.call.id_user
+      - datalake_customer_support.chat.id_user
+      - datalake_customer_support.email.id_user
+  sk_contract:
+    lineage:
+      - datalake_customer_support.call.id_contract
+      - datalake_customer_support.chat.id_contract
+      - datalake_customer_support.email.id_contract
+  csat_score:
+    lineage:
+      - datalake_customer_support.call.csat_rating
+      - datalake_customer_support.chat.csat_score
+      - datalake_customer_support.email.csat_score
+  status:
+    lineage:
+      - datalake_customer_support.call.status
+      - datalake_customer_support.chat.status
+      - datalake_customer_support.email.status
+  minutes_full_resolution_time_calendar:
+    lineage:
+      - datalake_customer_support.call.minutes_full_resolution_time_calendar
+      - datalake_customer_support.chat.minutes_full_resolution_time_calendar
+      - datalake_customer_support.email.minutes_full_resolution_time_calendar
+  first_department:
+    lineage:
+      - datalake_customer_support.call.first_department
+      - datalake_customer_support.chat.first_department
+      - datalake_customer_support.email.department
+  last_department:
+    lineage:
+      - datalake_customer_support.call.last_department
+      - datalake_customer_support.chat.last_department
+      - datalake_customer_support.email.department
+  zendesk_department:
+    lineage:
+      - datalake_customer_support.call.zendesk_department
+      - datalake_customer_support.chat.zendesk_department
+      - datalake_customer_support.email.department
+  total_departments:
+    lineage:
+      - datalake_customer_support.call.number_of_departments
+      - datalake_customer_support.chat.number_of_departments
+  total_segments:
+    lineage:
+      - datalake_customer_support.call.number_of_segments
+      - datalake_customer_support.chat.number_of_segments
+  full_resolution_time:
+    lineage:
+      - datalake_customer_support.call.frt
+      - datalake_customer_support.chat.frt
+      - datalake_customer_support.email.frt
+  front_of_back:
+    lineage:
+      - datalake_customer_support.call.front_or_back
+      - datalake_customer_support.chat.front_or_back
+      - datalake_customer_support.email.front_or_back
+  last_back_ticket:
+    lineage:
+      - datalake_customer_support.call.last_back_ticket
+      - datalake_customer_support.chat.last_back_ticket
+      - datalake_customer_support.email.last_back_ticket
+  back_tickets:
+    lineage:
+      - datalake_customer_support.call.back_ticket_list
+      - datalake_customer_support.chat.back_ticket_list
+      - datalake_customer_support.email.back_ticket_list
+  resolution_survey:
+    lineage:
+      - datalake_customer_support.call.is_solved
+      - datalake_customer_support.chat.is_solved
+      - datalake_customer_support.email.is_solved
+  has_answered_csat:
+    lineage:
+      - datalake_customer_support.call.is_csat_answered
+      - datalake_customer_support.chat.is_csat_answered
+      - datalake_customer_support.email.is_answered
+  has_back_ticket:
+    lineage:
+      - datalake_customer_support.call.has_back_ticket
+      - datalake_customer_support.chat.has_back_ticket
+      - datalake_customer_support.email.has_back_ticket
+  is_back_ticket_open:
+    lineage:
+      - datalake_customer_support.call.is_open_back_ticket
+      - datalake_customer_support.chat.is_open_back_ticket
+      - datalake_customer_support.email.is_open_back_ticket
+  is_solved:
+    lineage:
+      - datalake_customer_support.call.is_solved
+      - datalake_customer_support.call.back_ticket_list
+      - datalake_customer_support.call.is_open_back_ticket
+      - datalake_customer_support.call.is_bot
+      - datalake_customer_support.call.is_closed_by_merge
+      - datalake_customer_support.call.front_or_back
+      - datalake_customer_support.chat.is_solved
+      - datalake_customer_support.chat.back_ticket_list
+      - datalake_customer_support.chat.is_open_back_ticket
+      - datalake_customer_support.chat.is_bot
+      - datalake_customer_support.chat.is_closed_by_merge
+      - datalake_customer_support.chat.front_or_back
+      - datalake_customer_support.email.is_solved
+      - datalake_customer_support.email.back_ticket_list
+      - datalake_customer_support.email.is_open_back_ticket
+      - datalake_customer_support.email.is_bot
+      - datalake_customer_support.email.is_closed_by_merge
+      - datalake_customer_support.email.front_or_back
+  is_fcr:
+    lineage:
+      - datalake_customer_support.call.is_solved
+      - datalake_customer_support.call.back_ticket_list
+      - datalake_customer_support.call.has_transfers
+      - datalake_customer_support.call.is_bot
+      - datalake_customer_support.call.is_closed_by_merge
+      - datalake_customer_support.call.front_or_back
+      - datalake_customer_support.chat.is_solved
+      - datalake_customer_support.chat.back_ticket_list
+      - datalake_customer_support.chat.number_of_departments
+      - datalake_customer_support.chat.is_bot
+      - datalake_customer_support.chat.is_closed_by_merge
+      - datalake_customer_support.chat.front_or_back
+      - datalake_customer_support.email.is_solved
+      - datalake_customer_support.email.back_ticket_list
+      - datalake_customer_support.email.is_bot
+      - datalake_customer_support.email.is_closed_by_merge
+      - datalake_customer_support.email.front_or_back
+  has_transfers:
+    lineage:
+      - datalake_customer_support.call.has_transfers
+      - datalake_customer_support.chat.has_transfers
+  ts_started:
+    lineage:
+      - datalake_customer_support.call.ts_ticket_started
+      - datalake_customer_support.chat.ts_ticket_started
+      - datalake_customer_support.email.ts_ticket_started
+  ts_closed:
+    lineage:
+      - datalake_customer_support.call.ts_ticket_ended
+      - datalake_customer_support.chat.ts_ticket_ended
+      - datalake_customer_support.email.ts_ticket_ended
