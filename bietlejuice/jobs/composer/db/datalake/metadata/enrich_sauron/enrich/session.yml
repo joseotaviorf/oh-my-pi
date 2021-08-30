@@ -1,0 +1,53 @@
+---
+database_name: datalake_sauron
+table_name: session
+columns:
+  id_session:
+    lineage:
+      - datalake_sauron_clean.session.id
+  id_user:
+    lineage:
+      - datalake_sauron_clean.session.user_data
+  customer_phone:
+    lineage:
+      - datalake_sauron_clean.session.user_phone
+  customer_phone_formatted:
+    lineage:
+      - datalake_sauron_clean.session.user_phone
+  agent:
+    lineage:
+      - datalake_sauron_clean.session.agent
+  source_environment:
+    lineage:
+      - datalake_sauron_clean.session.source_environment
+  department:
+    lineage:
+      - datalake_sauron_clean.session.department
+  status:
+    lineage:
+      - datalake_sauron_clean.session.status
+  customer_type:
+    lineage:
+      - datalake_sauron_clean.session.user_data
+  customer_flow_step:
+    lineage:
+      - datalake_sauron_clean.session.user_data
+  customer_tags:
+    lineage:
+      - datalake_sauron_clean.session.context
+  seconds_duration:
+    lineage:
+      - datalake_sauron_clean.session.ts_last_message
+      - datalake_sauron_clean.session.ts_first_message
+  ts_created:
+    lineage:
+      - datalake_sauron_clean.session.ts_created
+  ts_first_message:
+    lineage:
+      - datalake_sauron_clean.session.ts_first_message
+  ts_last_message:
+    lineage:
+      - datalake_sauron_clean.session.ts_last_message
+  ts_updated:
+    lineage:
+      - datalake_sauron_clean.session.ts_updated
