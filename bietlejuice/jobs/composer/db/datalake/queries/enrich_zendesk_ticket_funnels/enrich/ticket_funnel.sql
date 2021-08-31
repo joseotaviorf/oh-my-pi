@@ -71,12 +71,19 @@ SELECT DISTINCT
         cf.custom_fields['Tipo de Cliente'], 
         REPLACE(REPLACE(REPLACE(cf.custom_fields['[CC] - Tipo de Cliente'], 'cc_',''), 'er_', 'er'), 'serviços', 'serviço')
     ) AS client_type,
-    cf.custom_fields['Cliente Tag'] AS customer_type_tag,
+    SPLIT(cf.custom_fields['Classificação do atendimento (Tags)'], '__')[0] AS step_tag,
     COALESCE(
+        SPLIT(cf.custom_fields['Classificação do atendimento (Tags)'], '__')[1],
+        cf.custom_fields['Cliente Tag']
+    ) AS customer_type_tag,
+    COALESCE(
+        SPLIT(cf.custom_fields['Classificação do atendimento (Tags)'], '__')[3],
         cf.custom_fields['Motivo Tag'], 
         cf.custom_fields['[CC] - Motivo do contato']
     ) AS contact_motivation_tag,
+    SPLIT(cf.custom_fields['Classificação do atendimento (Tags)'], '__')[4] AS contact_theme_detail_tag,
     COALESCE(
+        SPLIT(cf.custom_fields['Classificação do atendimento (Tags)'], '__')[2],
         cf.custom_fields['Assunto Tag'], 
         cf.custom_fields['Tipo de Solicitação'], 
         cf.custom_fields['[CC] - Assunto do Contato'], 
