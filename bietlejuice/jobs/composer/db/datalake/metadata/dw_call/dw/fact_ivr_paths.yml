@@ -1,0 +1,22 @@
+database_name: dw_call
+table_name: fact_ivr_paths
+columns:
+  sk_call:
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_paths.id_call
+  step:
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_paths.step_name
+  answer:
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_paths.digits
+  is_timeout:
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_paths.event_type
+  seconds_elapsed:
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_paths.id_call
+      - datalake_bigfone_twilio.call_ivr_paths.ts_created
+  ts_answered:
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_paths.ts_created
