@@ -1,0 +1,57 @@
+database_name: datalake_ebdb_listing
+table_name: listing_business_context
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.id
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.id_house
+  business_context:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.business_context
+  calculator_price:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.calculator_price
+  status:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.status
+  status_reason:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.status_reason
+  status_closing:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.status_closing
+  short_url:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.short_url
+  is_rent_context:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.business_context
+  is_sale_context:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.business_context
+  user_listing_registrant_rent:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.id_user
+  user_listing_registrant_sale:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.id_user
+  ts_first_listing:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_first_publication
+  ts_last_listing:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_last_publication
+  ts_opt_out_rent:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  ts_opt_out_sale:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_updated
