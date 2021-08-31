@@ -1,0 +1,75 @@
+database_name: dw_call
+table_name: fact_calls
+columns:
+  sk_call:
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_events.id_call
+      - datalake_bigfone_twilio.call_flex_events.id_call
+      - datalake_bigfone_twilio.call_flex_events.id_conversation
+      - datalake_bigfone_twilio.call_flex_events.id_task
+  sk_user:
+    lineage:
+      - datalake_ebdb_customer_contact_identification.customer_contact_identification.id_user
+  sk_personal_document:
+    lineage:
+      - datalake_ebdb_customer_contact_identification.customer_contact_identification.cpf
+  sk_call_date:
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_events.ts_created_local_unix
+      - datalake_bigfone_twilio.call_flex_events.ts_created_local_unix
+  last_queue_name:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_reservations.queue_name
+  has_ended_in_ura:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_reservations.id_reservation
+  is_answered:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_reservations.is_answered
+      - datalake_bigfone_twilio.call_flex_reservations.id_reservation
+  is_transfered:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_reservations.id_reservation
+  is_csat_answered:
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_events.csat_2
+  is_solved:
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_events.csat_1
+  tasks:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_reservations.id_reservation
+  answered_tasks:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_reservations.is_answered
+      - datalake_bigfone_twilio.call_flex_reservations.id_reservation
+  seconds_first_answer:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_reservations.seconds_wait_time
+  seconds_ivr_time:
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_paths.ts_created
+  seconds_total_wait_time:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_reservations.seconds_wait_time
+  seconds_total_talk_time:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_reservations.seconds_talk_time
+  seconds_wrapup_time:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.ts_created_local_unix
+      - datalake_bigfone_twilio.call_flex_events.ts_wrapup_event_local_unix
+  seconds_aht:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.ts_created_local_unix
+      - datalake_bigfone_twilio.call_flex_reservations.ts_created_local
+  seconds_duration:
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_events.ts_created_local_unix
+      - datalake_bigfone_twilio.call_flex_events.ts_created_local_unix
+  csat_rating:
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_events.csat_2
+  is_scheduled:
+    lineage:
+      - datalake_bigfone_twilio.call_flex_events.is_scheduled
