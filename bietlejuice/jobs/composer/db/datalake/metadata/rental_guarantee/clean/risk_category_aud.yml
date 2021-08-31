@@ -1,0 +1,45 @@
+database_name: datalake_rental_guarantee_clean
+table_name: risk_category_aud
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_raw.risk_category_aud.id
+  category_level:
+    lineage:
+      - datalake_rental_guarantee_raw.risk_category_aud.category_level
+  factor:
+    lineage:
+      - datalake_rental_guarantee_raw.risk_category_aud.factor
+  rev:
+    lineage:
+      - datalake_rental_guarantee_raw.risk_category_aud.rev
+  rev_end:
+    lineage:
+      - datalake_rental_guarantee_raw.risk_category_aud.revend
+  rev_type:
+    lineage:
+      - datalake_rental_guarantee_raw.risk_category_aud.revtype
+  is_guarantee_allowed:
+    lineage:
+      - datalake_rental_guarantee_raw.risk_category_aud.allow_guarantee
+  mod_category_level:
+    lineage:
+      - datalake_rental_guarantee_raw.risk_category_aud.category_level_mod
+  mod_factor:
+    lineage:
+      - datalake_rental_guarantee_raw.risk_category_aud.factor_mod
+  mod_is_guarantee_allowed:
+    lineage:
+      - datalake_rental_guarantee_raw.risk_category_aud.allow_guarantee_mod
+  mod_ts_created:
+    lineage:
+      - datalake_rental_guarantee_raw.risk_category_aud.created_at_mod
+  mod_ts_updated:
+    lineage:
+      - datalake_rental_guarantee_raw.risk_category_aud.updated_at_mod
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_raw.risk_category_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_raw.risk_category_aud.updated_at

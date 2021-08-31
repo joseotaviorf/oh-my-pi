@@ -1,0 +1,117 @@
+database_name: datalake_rental_guarantee_clean
+table_name: guarantee_aud
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.id
+  id_contract_ebdb:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.contract_ebdb_id
+  id_documentation_ebdb:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.documentation_ebdb_id
+  id_house_ebdb:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.house_ebdb_id
+  id_tenant_ebdb:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.tenant_ebdb_id
+  rev:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.rev
+  rev_end:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.revend
+  rev_type:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.revtype
+  accepted_terms_and_conditions:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.accepted_terms_and_conditions
+  cancellation_reason:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.cancellation_reason
+  score:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.score
+  guarantee_source:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.source
+  guarantee_status:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.status
+  base_value:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.base_value
+  final_value:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.final_value
+  mod_id_contract_ebdb:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.contract_ebdb_id_mod
+  mod_id_documentation_ebdb:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.documentation_ebdb_id_mod
+  mod_id_house_ebdb:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.house_ebdb_id_mod
+  mod_id_tenant_ebdb:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.tenant_ebdb_id_mod
+  mod_accepted_terms_and_conditions:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.accepted_terms_and_conditions_mod
+  mod_cancellation_reason:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.cancellation_reason_mod
+  mod_score:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.score_mod
+  mod_guarantee_source:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.source_mod
+  mod_guarantee_status:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.status_mod
+  mod_base_value:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.base_value_mod
+  mod_final_value:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.final_value_mod
+  mod_ts_created:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.created_at_mod
+  mod_ts_updated:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.updated_at_mod
+  mod_ts_cancellation_requested:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.cancellation_requested_at_mod
+  mod_ts_expired:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.expires_at_mod
+  mod_ts_paid:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.paid_at_mod
+  mod_ts_payment_expired:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.payment_expires_at_mod
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.updated_at
+  ts_cancellation_requested:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.cancellation_requested_at
+  ts_expired:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.expires_at
+  ts_paid:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.paid_at
+  ts_payment_expired:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.payment_expires_at

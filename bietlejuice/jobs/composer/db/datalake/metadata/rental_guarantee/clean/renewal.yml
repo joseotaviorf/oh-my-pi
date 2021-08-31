@@ -1,0 +1,18 @@
+database_name: datalake_rental_guarantee_clean
+table_name: renewal
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_raw.renewal.id
+  id_guarantee:
+    lineage:
+      - datalake_rental_guarantee_raw.renewal.guarantee_id
+  id_charge:
+    lineage:
+      - datalake_rental_guarantee_raw.renewal.charge_id
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_raw.renewal.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_raw.renewal.updated_at

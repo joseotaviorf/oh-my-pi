@@ -1,0 +1,66 @@
+database_name: datalake_rental_guarantee_clean
+table_name: guarantee
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee.id
+  id_contract_ebdb:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee.contract_ebdb_id
+  id_documentation_ebdb:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee.documentation_ebdb_id
+  id_house_ebdb:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee.house_ebdb_id
+  id_tenant_ebdb:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee.tenant_ebdb_id
+  accepted_terms_and_conditions:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee.accepted_terms_and_conditions
+  cancellation_reason:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee.cancellation_reason
+  score:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee.score
+  guarantee_source:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee.source
+  guarantee_status:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee.status
+  base_value:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee.base_value
+  final_value:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee.final_value
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee.updated_at
+  ts_cancellation_requested:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee.cancellation_requested_at
+  ts_expired:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee.expires_at
+  ts_paid:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee.paid_at
+  ts_payment_expired:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee.payment_expires_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee.day

@@ -1,0 +1,87 @@
+database_name: datalake_rental_guarantee_clean
+table_name: charge_aud
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.id
+  id_guarantee:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.guarantee_id
+  rev:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.rev
+  rev_end:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.revend
+  rev_type:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.revtype
+  cancellation_reason:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.cancellation_reason
+  card_token:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.card_token
+  emv:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.emv
+  installments:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.installments
+  pix_link:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.pix_link
+  qr_code:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.qr_code
+  charge_status:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.status
+  charge_type:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.type
+  refund_amount:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.refund_amount
+  mod_id_guarantee:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.guarantee_id_mod
+  mod_cancellation_reason:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.cancellation_reason_mod
+  mod_card_token:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.card_token_mod
+  mod_emv:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.emv_mod
+  mod_installments:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.installments_mod
+  mod_pix_link:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.pix_link_mod
+  mod_qr_code:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.qr_code_mod
+  mod_charge_status:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.status_mod
+  mod_charge_type:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.type_mod
+  mod_refund_amount:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.refund_amount_mod
+  mod_ts_created:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.created_at_mod
+  mod_ts_updated:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.updated_at_mod
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_raw.charge_aud.updated_at
