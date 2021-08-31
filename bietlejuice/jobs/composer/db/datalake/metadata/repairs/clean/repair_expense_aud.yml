@@ -1,0 +1,51 @@
+database_name: datalake_repairs_clean
+table_name: repair_expense_aud
+columns:
+  id:
+    lineage:
+      - datalake_repairs_raw.repair_expense_aud.id
+  id_expense_group:
+    lineage:
+      - datalake_repairs_raw.repair_expense_aud.expense_group_id
+  rev:
+    lineage:
+      - datalake_repairs_raw.repair_expense_aud.rev
+  rev_end:
+    lineage:
+      - datalake_repairs_raw.repair_expense_aud.revend
+  rev_type:
+    lineage:
+      - datalake_repairs_raw.repair_expense_aud.revtype
+  repair_name:
+    lineage:
+      - datalake_repairs_raw.repair_expense_aud.name
+  repair_description:
+    lineage:
+      - datalake_repairs_raw.repair_expense_aud.description
+  instant_approval:
+    lineage:
+      - datalake_repairs_raw.repair_expense_aud.instant_approval
+  responsible_after_grace:
+    lineage:
+      - datalake_repairs_raw.repair_expense_aud.responsible_after_grace
+  responsible_before_grace:
+    lineage:
+      - datalake_repairs_raw.repair_expense_aud.responsible_before_grace
+  mod_id_expense_group:
+    lineage:
+      - datalake_repairs_raw.repair_expense_aud.expense_group_id_mod
+  mod_repair_name:
+    lineage:
+      - datalake_repairs_raw.repair_expense_aud.name_mod
+  mod_repair_description:
+    lineage:
+      - datalake_repairs_raw.repair_expense_aud.description_mod
+  mod_instant_approval:
+    lineage:
+      - datalake_repairs_raw.repair_expense_aud.instant_approval_mod
+  mod_responsible_after_grace:
+    lineage:
+      - datalake_repairs_raw.repair_expense_aud.responsible_after_grace_mod
+  mod_responsible_before_grace:
+    lineage:
+      - datalake_repairs_raw.repair_expense_aud.responsible_before_grace_mod

@@ -1,0 +1,27 @@
+database_name: datalake_repairs_clean
+table_name: repair_evidence_aud
+columns:
+  id:
+    lineage:
+      - datalake_repairs_raw.repair_evidence_aud.id
+  id_repair_request_item:
+    lineage:
+      - datalake_repairs_raw.repair_evidence_aud.repair_request_item_id
+  rev:
+    lineage:
+      - datalake_repairs_raw.repair_evidence_aud.rev
+  rev_end:
+    lineage:
+      - datalake_repairs_raw.repair_evidence_aud.revend
+  rev_type:
+    lineage:
+      - datalake_repairs_raw.repair_evidence_aud.revtype
+  asset_url:
+    lineage:
+      - datalake_repairs_raw.repair_evidence_aud.asset_url
+  mod_asset_url:
+    lineage:
+      - datalake_repairs_raw.repair_evidence_aud.asset_url_mod
+  mod_id_repair_request_item:
+    lineage:
+      - datalake_repairs_raw.repair_evidence_aud.repair_request_item_id_mod

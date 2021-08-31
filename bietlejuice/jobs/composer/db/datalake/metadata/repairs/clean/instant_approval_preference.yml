@@ -1,0 +1,24 @@
+database_name: datalake_repairs_clean
+table_name: instant_approval_preference
+columns:
+  id_house:
+    lineage:
+      - datalake_repairs_raw.instant_approval_preference.house_id
+  covered_amount:
+    lineage:
+      - datalake_repairs_raw.instant_approval_preference.covered_amount
+  ts_created:
+    lineage:
+      - datalake_repairs_raw.instant_approval_preference.created_at
+  ts_updated:
+    lineage:
+      - datalake_repairs_raw.instant_approval_preference.updated_at
+  year:
+    lineage:
+      - datalake_repairs_raw.instant_approval_preference.year
+  month:
+    lineage:
+      - datalake_repairs_raw.instant_approval_preference.month
+  day:
+    lineage:
+      - datalake_repairs_raw.instant_approval_preference.day

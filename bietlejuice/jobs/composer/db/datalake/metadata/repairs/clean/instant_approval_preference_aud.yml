@@ -1,0 +1,21 @@
+database_name: datalake_repairs_clean
+table_name: instant_approval_preference_aud
+columns:
+  id_house:
+    lineage:
+      - datalake_repairs_raw.instant_approval_preference_aud.house_id
+  rev:
+    lineage:
+      - datalake_repairs_raw.instant_approval_preference_aud.rev
+  rev_end:
+    lineage:
+      - datalake_repairs_raw.instant_approval_preference_aud.revend
+  rev_type:
+    lineage:
+      - datalake_repairs_raw.instant_approval_preference_aud.revtype
+  covered_amount:
+    lineage:
+      - datalake_repairs_raw.instant_approval_preference_aud.covered_amount
+  mod_covered_amount:
+    lineage:
+      - datalake_repairs_raw.instant_approval_preference_aud.covered_amount_mod

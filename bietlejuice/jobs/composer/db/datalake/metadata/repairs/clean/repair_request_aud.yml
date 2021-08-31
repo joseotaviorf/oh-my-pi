@@ -1,0 +1,48 @@
+database_name: datalake_repairs_clean
+table_name: repair_request_aud
+columns:
+  id:
+    lineage:
+      - datalake_repairs_raw.repair_request_aud.id
+  id_contract:
+    lineage:
+      - datalake_repairs_raw.repair_request_aud.contract_id
+  id_house:
+    lineage:
+      - datalake_repairs_raw.repair_request_aud.house_id
+  id_requester_user:
+    lineage:
+      - datalake_repairs_raw.repair_request_aud.requester_user_id
+  id_third_party_crm_ticket_external:
+    lineage:
+      - datalake_repairs_raw.repair_request_aud.third_party_crm_ticket_external_id
+  rev:
+    lineage:
+      - datalake_repairs_raw.repair_request_aud.rev
+  rev_end:
+    lineage:
+      - datalake_repairs_raw.repair_request_aud.revend
+  rev_type:
+    lineage:
+      - datalake_repairs_raw.repair_request_aud.revtype
+  allow_personal_info_sharing:
+    lineage:
+      - datalake_repairs_raw.repair_request_aud.allow_personal_info_sharing
+  third_party_crm:
+    lineage:
+      - datalake_repairs_raw.repair_request_aud.third_party_crm
+  mod_id_contract:
+    lineage:
+      - datalake_repairs_raw.repair_request_aud.contract_id_mod
+  mod_id_house:
+    lineage:
+      - datalake_repairs_raw.repair_request_aud.house_id_mod
+  mod_id_requester_user:
+    lineage:
+      - datalake_repairs_raw.repair_request_aud.requester_user_id_mod
+  mod_id_third_party_crm_ticket_external:
+    lineage:
+      - datalake_repairs_raw.repair_request_aud.third_party_crm_ticket_external_id_mod
+  mod_third_party_crm:
+    lineage:
+      - datalake_repairs_raw.repair_request_aud.third_party_crm_mod

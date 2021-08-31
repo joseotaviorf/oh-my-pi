@@ -1,0 +1,33 @@
+database_name: datalake_repairs_clean
+table_name: repair_expense_group_aud
+columns:
+  id:
+    lineage:
+      - datalake_repairs_raw.repair_expense_group_aud.id
+  id_parent:
+    lineage:
+      - datalake_repairs_raw.repair_expense_group_aud.parent_id
+  rev:
+    lineage:
+      - datalake_repairs_raw.repair_expense_group_aud.rev
+  rev_end:
+    lineage:
+      - datalake_repairs_raw.repair_expense_group_aud.revend
+  rev_type:
+    lineage:
+      - datalake_repairs_raw.repair_expense_group_aud.revtype
+  repair_group_name:
+    lineage:
+      - datalake_repairs_raw.repair_expense_group_aud.name
+  repair_group_description:
+    lineage:
+      - datalake_repairs_raw.repair_expense_group_aud.description
+  mod_id_parent:
+    lineage:
+      - datalake_repairs_raw.repair_expense_group_aud.parent_id_mod
+  mod_repair_group_name:
+    lineage:
+      - datalake_repairs_raw.repair_expense_group_aud.name_mod
+  mod_repair_group_description:
+    lineage:
+      - datalake_repairs_raw.repair_expense_group_aud.description_mod

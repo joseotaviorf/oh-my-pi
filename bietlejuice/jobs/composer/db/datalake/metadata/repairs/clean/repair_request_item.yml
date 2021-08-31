@@ -1,0 +1,33 @@
+database_name: datalake_repairs_clean
+table_name: repair_request_item
+columns:
+  id:
+    lineage:
+      - datalake_repairs_raw.repair_request_item.id
+  id_expense:
+    lineage:
+      - datalake_repairs_raw.repair_request_item.expense_id
+  id_repair_request:
+    lineage:
+      - datalake_repairs_raw.repair_request_item.repair_request_id
+  repair_item_description:
+    lineage:
+      - datalake_repairs_raw.repair_request_item.description
+  is_urgent:
+    lineage:
+      - datalake_repairs_raw.repair_request_item.is_urgent
+  ts_created:
+    lineage:
+      - datalake_repairs_raw.repair_request_item.created_at
+  ts_updated:
+    lineage:
+      - datalake_repairs_raw.repair_request_item.updated_at
+  year:
+    lineage:
+      - datalake_repairs_raw.repair_request_item.year
+  month:
+    lineage:
+      - datalake_repairs_raw.repair_request_item.month
+  day:
+    lineage:
+      - datalake_repairs_raw.repair_request_item.day

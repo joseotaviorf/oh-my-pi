@@ -1,0 +1,39 @@
+database_name: datalake_repairs_clean
+table_name: repair_request_item_aud
+columns:
+  id:
+    lineage:
+      - datalake_repairs_raw.repair_request_item_aud.id
+  id_expense:
+    lineage:
+      - datalake_repairs_raw.repair_request_item_aud.expense_id
+  id_repair_request:
+    lineage:
+      - datalake_repairs_raw.repair_request_item_aud.repair_request_id
+  rev:
+    lineage:
+      - datalake_repairs_raw.repair_request_item_aud.rev
+  rev_end:
+    lineage:
+      - datalake_repairs_raw.repair_request_item_aud.revend
+  rev_type:
+    lineage:
+      - datalake_repairs_raw.repair_request_item_aud.revtype
+  repair_item_description:
+    lineage:
+      - datalake_repairs_raw.repair_request_item_aud.description
+  is_urgent:
+    lineage:
+      - datalake_repairs_raw.repair_request_item_aud.is_urgent
+  mod_id_expense:
+    lineage:
+      - datalake_repairs_raw.repair_request_item_aud.expense_id_mod
+  mod_id_repair_request:
+    lineage:
+      - datalake_repairs_raw.repair_request_item_aud.repair_request_id_mod
+  mod_repair_item_description:
+    lineage:
+      - datalake_repairs_raw.repair_request_item_aud.description_mod
+  mod_is_urgent:
+    lineage:
+      - datalake_repairs_raw.repair_request_item_aud.is_urgent_mod
