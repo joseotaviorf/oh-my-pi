@@ -543,6 +543,10 @@ bietlejuice.enrich_lead:
   - bietlejuice.ebdb:create-clean-user-in-data-lake
   - bietlejuice.enrich_region:load-enrich-region
 
+bietlejuice.enrich_lead_tracking:
+  - bietlejuice.ebdb:create-clean-lead-in-data-lake
+  - bietlejuice.enrich_amplitude_lead:load-enrich-lead-origin
+
 bietlejuice.enrich_listing_owners:
   - bietlejuice.ebdb:create-clean-proposal-in-data-lake
   - bietlejuice.enrich_booking:load-enrich-booking

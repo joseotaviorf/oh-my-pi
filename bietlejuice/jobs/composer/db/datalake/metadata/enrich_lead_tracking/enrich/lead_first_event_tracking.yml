@@ -1,0 +1,33 @@
+database_name: datalake_lead_tracking
+table_name: lead_first_event_tracking
+columns:
+  id_lead:
+    lineage:
+      - datalake_ebdb_clean.lead.id
+  tracking_campaign:
+    lineage:
+      - datalake_amplitude_lead.lead_origin.utm_campaign
+  tracking_medium:
+    lineage:
+      - datalake_amplitude_lead.lead_origin.utm_medium
+  tracking_source:
+    lineage:
+      - datalake_amplitude_lead.lead_origin.utm_source
+  tracking_content:
+    lineage:
+      - datalake_amplitude_lead.lead_origin.utm_content
+  tracking_term:
+    lineage:
+      - datalake_amplitude_lead.lead_origin.utm_term
+  tracking_platform:
+    lineage:
+      - datalake_amplitude_lead.lead_origin.platform
+  tracking_referring_domain:
+    lineage:
+      - datalake_amplitude_lead.lead_origin.referring_domain
+  tracking_region:
+    lineage:
+      - datalake_amplitude_lead.lead_origin.region
+  tracking_city:
+    lineage:
+      - datalake_amplitude_lead.lead_origin.city
