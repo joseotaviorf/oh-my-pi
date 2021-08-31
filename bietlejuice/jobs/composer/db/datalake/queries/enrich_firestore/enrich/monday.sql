@@ -167,8 +167,10 @@ SELECT
   moa.has_seller_debt_payments,
   CASE
     WHEN moa.dt_sale_agreement_signed IS NOT NULL THEN
-        CASE WHEN moa.status = 'CCV - Cancelado' THEN TRUE
-        ELSE FALSE
+        CASE
+          WHEN moa.status = 'CCV - Cancelado' THEN TRUE
+          ELSE FALSE
+        END
     ELSE NULL
   END AS is_ccv_canceled,
   CASE WHEN moa.dt_accepted <= moa.dt_offer_dismissed THEN DATEDIFF(moa.dt_offer_dismissed, moa.dt_accepted) END AS days_offer_accepted_to_offer_dismissed,
