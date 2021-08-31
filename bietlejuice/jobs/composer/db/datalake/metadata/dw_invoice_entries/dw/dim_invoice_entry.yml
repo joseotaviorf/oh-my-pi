@@ -1,0 +1,28 @@
+---
+database_name: dw_payment
+table_name: dim_invoice_entry
+columns:
+  sk_invoice_entry:
+    lineage:
+      - datalake_retsuko_clean.entry.id_external
+  entry_type:
+    lineage:
+      - datalake_retsuko_clean.entry.bill_item
+  from_account_type:
+    lineage:
+      - datalake_retsuko_clean.account.type
+  to_account_type:
+    lineage:
+      - datalake_retsuko_clean.account.type
+  accounting_account:
+    lineage:
+      - datalake_retsuko_clean.entry.bill_item
+  producer:
+    lineage:
+      - datalake_retsuko_clean.entry.producer
+  description:
+    lineage:
+      - datalake_retsuko_clean.entry.description
+  accrual_year_month:
+    lineage:
+      - datalake_retsuko_clean.entry.accrual_year_month

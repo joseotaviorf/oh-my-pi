@@ -1,0 +1,41 @@
+---
+database_name: dw_payment
+table_name: fact_invoice_entries
+columns:
+  sk_invoice_entry:
+    lineage:
+      - datalake_retsuko_clean.entry.id_external
+  sk_invoice:
+    lineage:
+      - datalake_retsuko_clean.invoice.id_external
+  sk_contract:
+    lineage:
+      - datalake_retsuko_clean.contract.id_external
+  sk_contract_user:
+    lineage:
+      - datalake_ebdb_clean.rent_flow.id_client
+      - datalake_ebdb_clean.house.id_user
+      - datalake_ebdb_clean.partner_agent.id_user
+  sk_region:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+  sk_created_date:
+    lineage:
+      - datalake_retsuko_clean.entry.ts_created
+  sk_due_date:
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_due
+  sk_paid_date:
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_paid
+  brl_entry_due_amount:
+    lineage:
+      - datalake_retsuko_clean.entry.amount
+  brl_entry_paid_amount:
+    lineage:
+      - datalake_retsuko_clean.entry.amount
+      - datalake_retsuko_clean.invoice.due_amount
+      - datalake_retsuko_clean.invoice.paid_amount
+  ts_created:
+    lineage:
+      - datalake_retsuko_clean.entry.ts_created

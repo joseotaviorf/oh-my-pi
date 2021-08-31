@@ -1,0 +1,37 @@
+---
+database_name: dw_payment
+table_name: dim_invoice
+columns:
+  sk_invoice:
+    lineage:
+      - datalake_retsuko.invoice.id_invoice
+  frequency:
+    lineage:
+      - datalake_retsuko.invoice.invoice_frequency
+  payment_status:
+    lineage:
+      - datalake_retsuko.invoice.payment_status
+  user:
+    lineage:
+      - datalake_retsuko.invoice.invoice_user
+  due_amount:
+    lineage:
+      - datalake_retsuko_clean.invoice.due_amount
+  paid_amount:
+    lineage:
+      - datalake_retsuko_clean.invoice.paid_amount
+  accrual_year_month:
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+  ts_created:
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_created
+  dt_sent:
+    lineage:
+      - datalake_retsuko.invoice.ts_sent
+  dt_due:
+    lineage:
+      - datalake_retsuko.invoice.ts_due
+  dt_paid:
+    lineage:
+      - datalake_retsuko.invoice.ts_paid
