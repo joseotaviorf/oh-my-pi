@@ -1,0 +1,105 @@
+database_name: datalake_ebdb_listing
+table_name: portability
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_clean.portability.id
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.portability.id_house
+  id_flow:
+    lineage:
+      - datalake_ebdb_clean.portability.id_flow
+  id_tenant:
+    lineage:
+      - datalake_ebdb_clean.portability.id_tenant
+  id_house_state:
+    lineage:
+      - datalake_ebdb_clean.portability.id_state
+  id_house_region:
+    lineage:
+      - datalake_ebdb_clean.portability.id_region
+  owner_type:
+    lineage:
+      - datalake_ebdb_clean.portability.owner_type
+  dt_contract_started:
+    lineage:
+      - datalake_ebdb_clean.portability.dt_contract_started
+  dt_contract_ended:
+    lineage:
+      - datalake_ebdb_clean.portability.dt_contract_ended
+  current_condo_fee:
+    lineage:
+      - datalake_ebdb_clean.portability.current_condo_fee
+  current_iptu_twelth:
+    lineage:
+      - datalake_ebdb_clean.portability.current_iptu_twelth
+  current_rent:
+    lineage:
+      - datalake_ebdb_clean.portability.current_rent
+  house_address_neighborhood:
+    lineage:
+      - datalake_ebdb_clean.portability.house_address_neighborhood
+  house_address_zipcode:
+    lineage:
+      - datalake_ebdb_clean.portability.house_address_zipcode
+  house_address_city:
+    lineage:
+      - datalake_ebdb_clean.portability.house_address_city
+  house_address_complement:
+    lineage:
+      - datalake_ebdb_clean.portability.house_address_complement
+  house_address_street:
+    lineage:
+      - datalake_ebdb_clean.portability.house_address_street
+  house_address_number:
+    lineage:
+      - datalake_ebdb_clean.portability.house_address_number
+  house_type:
+    lineage:
+      - datalake_ebdb_clean.portability.house_type
+  lat:
+    lineage:
+      - datalake_ebdb_clean.portability.lat
+  lng:
+    lineage:
+      - datalake_ebdb_clean.portability.lng
+  owner_data_email:
+    lineage:
+      - datalake_ebdb_clean.portability.owner_data_email
+  owner_data_gender:
+    lineage:
+      - datalake_ebdb_clean.portability.owner_data_gender
+  owner_data_name:
+    lineage:
+      - datalake_ebdb_clean.portability.owner_data_name
+  owner_data_phone_number:
+    lineage:
+      - datalake_ebdb_clean.portability.owner_data_phone_number
+  status:
+    lineage:
+      - datalake_ebdb_clean.portability.status
+  tenant_data_email:
+    lineage:
+      - datalake_ebdb_clean.portability.tenant_data_email
+  tenant_data_gender:
+    lineage:
+      - datalake_ebdb_clean.portability.tenant_data_gender
+  tenant_data_name:
+    lineage:
+      - datalake_ebdb_clean.portability.tenant_data_name
+  tenant_data_phone_number:
+    lineage:
+      - datalake_ebdb_clean.portability.tenant_data_phone_number
+  contract_observations:
+    lineage:
+      - datalake_ebdb_clean.portability.contract_observations
+  is_owner_b2b:
+    lineage:
+      - datalake_ebdb_clean.portability.owner_type
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.portability.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.portability.ts_updated
