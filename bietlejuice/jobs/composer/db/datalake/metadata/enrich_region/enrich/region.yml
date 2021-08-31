@@ -1,0 +1,70 @@
+database_name: datalake_region
+table_name: region
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_clean.region.id
+      - datalake_gsheets_clean.auxiliary_region.id
+  level:
+    lineage:
+      - datalake_ebdb_clean.region.level
+  name:
+    lineage:
+      - datalake_ebdb_clean.region.name
+      - datalake_gsheets_clean.auxiliary_region.neighbourhood
+  id_macro_region:
+    lineage:
+      - datalake_ebdb_clean.region.id
+  macro_region_name:
+    lineage:
+      - datalake_ebdb_clean.region.name
+  is_city:
+    lineage:
+      - datalake_ebdb_clean.region.level
+  id_city:
+    lineage:
+      - datalake_ebdb_clean.region.id
+  city_name:
+    lineage:
+      - datalake_ebdb_clean.region.name
+      - datalake_gsheets_clean.auxiliary_region.city
+  city_group:
+    lineage:
+      - datalake_gsheets_clean.auxiliary_region.city_group
+  city_ddd:
+    lineage:
+      - datalake_gsheets_clean.auxiliary_region.ddd
+  region_code:
+    lineage:
+      - datalake_gsheets_clean.auxiliary_region.region_code
+  region_code_deprecated:
+    lineage:
+      - datalake_gsheets_clean.auxiliary_region.region_code_deprecated
+  region_code_inspector:
+    lineage:
+      - datalake_gsheets_clean.auxiliary_region.region_code_inspector
+  short_region_name:
+    lineage:
+      - datalake_gsheets_clean.auxiliary_region.state
+  greater_region:
+    lineage:
+      - datalake_gsheets_clean.auxiliary_region.city
+      - datalake_ebdb_clean.region.name
+  regional:
+    lineage:
+      - datalake_gsheets_clean.auxiliary_region.regional
+  regional_deprecated:
+    lineage:
+      - datalake_gsheets_clean.auxiliary_region.regional_deprecated
+  regional_inspection:
+    lineage:
+      - datalake_gsheets_clean.auxiliary_region.regional_inspection
+  tier:
+    lineage:
+      - datalake_gsheets_clean.auxiliary_region.tier
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.region.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.region.ts_updated
