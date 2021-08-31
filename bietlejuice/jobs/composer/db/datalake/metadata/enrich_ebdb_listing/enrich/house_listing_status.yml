@@ -1,0 +1,36 @@
+database_name: datalake_ebdb_listing
+table_name: house_listing_status
+columns:
+  id_house_listing:
+    lineage:
+      - datalake_ebdb_listing.house_status_version_order.id_house
+      - datalake_ebdb_listing.house_status_version_order.order_version
+  id_house:
+    lineage:
+      - datalake_ebdb_listing.house_status_version_order.id_house
+  id_region:
+    lineage:
+      - datalake_ebdb_listing.house_status_version_order.id_region
+  version:
+    lineage:
+      - datalake_ebdb_listing.house_status_version_order.order_version
+  status_history:
+    lineage:
+      - datalake_ebdb_listing.house_status_version_order.status_history_new
+  status_change_reason:
+    lineage:
+      - datalake_ebdb_listing.house_status_version_order.reason
+  is_last_status_of_day:
+    lineage:
+      - datalake_ebdb_listing.house_status_version_order.ts_status_changed_new
+      - datalake_ebdb_listing.house_status_version_order.id_house
+      - datalake_ebdb_listing.house_status_version_order.order_version
+  ts_first_publication:
+    lineage:
+      - datalake_ebdb_listing.house_status_version_order.ts_first_publication
+  ts_status_started:
+    lineage:
+      - datalake_ebdb_listing.house_status_version_order.ts_status_changed_new
+  ts_status_ended:
+    lineage:
+      - datalake_ebdb_listing.house_status_version_order.ts_status_changed_next
