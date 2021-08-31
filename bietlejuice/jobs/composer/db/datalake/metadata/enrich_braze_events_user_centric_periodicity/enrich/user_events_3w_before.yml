@@ -1,0 +1,82 @@
+---
+database_name: datalake_braze_user_centric_periodicity
+table_name: user_events_3w_before
+columns:
+  id_user_braze:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.id_user_braze
+  total_campaigns_sent_to:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.id_campaign
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_canvases_sent_to:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.id_canvas
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_tenant_communications_sent_to:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.user_type
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_owner_communications_sent_to:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.user_type
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_emails_sent_to:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_emails_delivered_to:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_email_opens:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_email_clicks:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_push_notifications_sent_to:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_push_notification_opens:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_inapp_message_views:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_inapp_message_clicks:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_webhooks_sent_to:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_sms_sent_to:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_sms_delivered_to:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
