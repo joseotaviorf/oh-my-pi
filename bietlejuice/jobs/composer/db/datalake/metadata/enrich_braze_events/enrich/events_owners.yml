@@ -1,0 +1,56 @@
+---
+database_name: datalake_braze
+table_name: events_owners
+columns:
+  id_event:
+    lineage:
+      - datalake_braze_events_clean.events_owners.event_info
+  id_dispatch:
+    lineage:
+      - datalake_braze_events_clean.events_owners.event_info
+  id_user_dispatch:
+    lineage:
+      - datalake_braze_events_clean.events_owners.event_info
+      - datalake_braze_events_clean.events_owners.event_type
+  id_user_braze:
+    lineage:
+      - datalake_braze_events_clean.events_owners.event_info
+  id_user:
+    lineage:
+      - datalake_braze_events_clean.events_owners.event_info
+  id_campaign:
+    lineage:
+      - datalake_braze_events_clean.events_owners.event_info
+  id_variant_campaign:
+    lineage:
+      - datalake_braze_events_clean.events_owners.event_info
+  id_canvas:
+    lineage:
+      - datalake_braze_events_clean.events_owners.event_info
+  id_variant_canvas:
+    lineage:
+      - datalake_braze_events_clean.events_owners.event_info
+  id_step_canvas:
+    lineage:
+      - datalake_braze_events_clean.events_owners.event_info
+  event_channel:
+    lineage:
+      - datalake_braze_events_clean.events_owners.event_type
+  event_action:
+    lineage:
+      - datalake_braze_events_clean.events_owners.event_type
+  event_type:
+    lineage:
+      - datalake_braze_events_clean.events_owners.event_type
+  ts_event:
+    lineage:
+      - datalake_braze_events_clean.events_owners.event_info
+  year:
+    lineage:
+      - datalake_braze_events_clean.events_owners.year
+  month:
+    lineage:
+      - datalake_braze_events_clean.events_owners.month
+  day:
+    lineage:
+      - datalake_braze_events_clean.events_owners.day
