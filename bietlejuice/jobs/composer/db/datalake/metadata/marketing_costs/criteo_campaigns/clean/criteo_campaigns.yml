@@ -1,0 +1,51 @@
+database_name: datalake_marketing_costs_clean
+table_name: criteo_campaigns
+columns:
+  id_campaign:
+    lineage:
+      - 'datalake_marketing_costs_raw.criteo_campaigns.campaign id'
+  advertiser_name:
+    lineage:
+      - 'datalake_marketing_costs_raw.criteo_campaigns.advertiser name'
+  all_sales:
+    lineage:
+      - 'datalake_marketing_costs_raw.criteo_campaigns.all sales'
+  audience:
+    lineage:
+      - datalake_marketing_costs_raw.criteo_campaigns.audience
+  cost_per_click:
+    lineage:
+      - datalake_marketing_costs_raw.criteo_campaigns.cpc
+  campaign_name:
+    lineage:
+      - 'datalake_marketing_costs_raw.criteo_campaigns.campaign name'
+  clicks:
+    lineage:
+      - datalake_marketing_costs_raw.criteo_campaigns.clicks
+  composition_win:
+    lineage:
+      - 'datalake_marketing_costs_raw.criteo_campaigns.comp. win'
+  cost:
+    lineage:
+      - datalake_marketing_costs_raw.criteo_campaigns.cost
+  currency:
+    lineage:
+      - datalake_marketing_costs_raw.criteo_campaigns.currency
+  impressions:
+    lineage:
+      - datalake_marketing_costs_raw.criteo_campaigns.impressions
+  revenue:
+    lineage:
+      - datalake_marketing_costs_raw.criteo_campaigns.revenue
+  dt_cost_attribution:
+    lineage:
+      - 'datalake_marketing_costs_raw.criteo_campaigns.cost attribution date'
+  year:
+    lineage:
+      - datalake_marketing_costs_raw.criteo_campaigns.year
+  month:
+    lineage:
+      - datalake_marketing_costs_raw.criteo_campaigns.month
+  day:
+    lineage:
+      - datalake_marketing_costs_raw.criteo_campaigns.day

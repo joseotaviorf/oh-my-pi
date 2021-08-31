@@ -1,0 +1,69 @@
+database_name: datalake_marketing_costs_clean
+table_name: linkedin_campaigns
+columns:
+  id:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaigns.id
+  id_campaign_group:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaigns.campaign_group_id
+  id_account:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaigns.account_id
+  name:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaigns.name
+  cost_type:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaigns.cost_type
+  daily_cost:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaigns.daily_budget_amount
+  daily_currency_code:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaigns.daily_budget_currencycode
+  total_cost:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaigns.total_budget_amount
+  total_cost_currency_code:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaigns.total_budget_currencycode
+  unit_cost:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaigns.unit_cost_amount
+  unit_cost_currency_code:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaigns.unit_cost_currency_code
+  objective_type:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaigns.objective_type
+  run_schedule_start:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaigns.run_schedule_start
+  run_schedule_end:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaigns.run_schedule_end
+  type:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaigns.type
+  status:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaigns.status
+  locale_country:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaigns.locale_country
+  locale_language:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaigns.locale_language
+  acc:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaigns.acc
+  year:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaigns.year
+  month:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaigns.month
+  day:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaigns.day

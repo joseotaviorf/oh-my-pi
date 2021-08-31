@@ -1,0 +1,45 @@
+database_name: datalake_marketing_costs_clean
+table_name: linkedin_campaign_groups
+columns:
+  id:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaign_groups.id
+  id_account:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaign_groups.account_id
+  name:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaign_groups.name
+  status:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaign_groups.status
+  total_cost:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaign_groups.total_budget_amount
+  total_cost_currency_code:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaign_groups.total_budget_currency_code
+  run_schedule_start:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaign_groups.run_schedule_start
+  run_schedule_end:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaign_groups.run_schedule_end
+  backfilled:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaign_groups.backfilled
+  account_name:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaign_groups.account_name
+  acc:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaign_groups.acc
+  year:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaign_groups.year
+  month:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaign_groups.month
+  day:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_campaign_groups.day

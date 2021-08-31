@@ -1,0 +1,27 @@
+database_name: datalake_marketing_costs_clean
+table_name: linkedin_creatives
+columns:
+  id:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_creatives.id
+  id_campaign:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_creatives.campaign
+  status:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_creatives.status
+  type:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_creatives.type
+  acc:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_creatives.acc
+  year:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_creatives.year
+  month:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_creatives.month
+  day:
+    lineage:
+      - datalake_marketing_costs_raw.linkedin_creatives.day
