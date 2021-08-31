@@ -4,6 +4,9 @@ SELECT
 	dd."date",
 	dd.sk_date,
 	dr.city_group,
+	CASE
+        WHEN sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN TRUE ELSE FALSE
+    END AS is_spinver,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
 	lf.mkt_completion AS supply_mkt_completion,
@@ -37,13 +40,16 @@ LEFT JOIN
         ON dr.sk_region = lf.sk_region
 WHERE
     dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 p2q AS (
 SELECT
 	dd."date",
 	dd.sk_date,
 	dr.city_group,
+	CASE
+        WHEN sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN TRUE ELSE FALSE
+    END AS is_spinver,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
 	lf.mkt_completion AS supply_mkt_completion,
@@ -77,13 +83,16 @@ LEFT JOIN
         ON dr.sk_region = lf.sk_region
 WHERE
     dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 q2opp AS (
 SELECT
 	dd."date",
 	dd.sk_date,
 	dr.city_group,
+	CASE
+        WHEN sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN TRUE ELSE FALSE
+    END AS is_spinver,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
 	lf.mkt_completion AS supply_mkt_completion,
@@ -117,13 +126,16 @@ LEFT JOIN
         ON dr.sk_region = lf.sk_region
 WHERE
     dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 opp2fl AS (
 SELECT
 	dd."date",
 	dd.sk_date,
 	dr.city_group,
+	CASE
+        WHEN sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN TRUE ELSE FALSE
+    END AS is_spinver,
 	lf.mkt_origin AS supply_mkt_origin,
 	lf.mkt_channel AS supply_mkt_channel,
 	lf.mkt_completion AS supply_mkt_completion,
@@ -157,7 +169,7 @@ LEFT JOIN
         ON dr.sk_region = lf.sk_region
 WHERE
     dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 ),
 union_all AS (
     SELECT * FROM l2p
@@ -172,6 +184,7 @@ union_all_date AS (
 SELECT
   dd."date",
   ua.city_group,
+  ua.is_spinver,
   ua.supply_mkt_origin,
   ua.supply_mkt_channel,
   ua.supply_mkt_completion,
@@ -198,6 +211,7 @@ WHERE
 SELECT
    "date",
     city_group,
+    is_spinver,
     supply_mkt_origin,
     CASE
         WHEN supply_mkt_origin = 'Owner PWA'
@@ -231,4 +245,4 @@ SELECT
     current_timestamp AS ts_load
 FROM
     union_all_date
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14;
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
