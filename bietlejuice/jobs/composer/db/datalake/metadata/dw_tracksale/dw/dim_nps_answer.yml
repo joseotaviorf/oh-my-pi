@@ -1,0 +1,22 @@
+---
+database_name: dw_tracksale
+table_name: dim_nps_answer
+columns:
+  sk_nps_answer:
+    lineage:
+      - datalake_tracksale.answer.id
+  campaign_step:
+    lineage:
+      - datalake_tracksale.answer_tags.tag_value
+  score_category:
+    lineage:
+      - datalake_tracksale.answer.score_category
+  comment:
+    lineage:
+      - datalake_tracksale.answer.nps_comment
+  ts_answered:
+    lineage:
+      - datalake_tracksale.answer.ts_answer_sent_local
+  is_customer_identified:
+    lineage:
+      - datalake_tracksale.customer_conversions.is_customer_identified

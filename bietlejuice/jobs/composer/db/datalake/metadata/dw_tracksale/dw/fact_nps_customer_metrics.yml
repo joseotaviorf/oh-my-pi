@@ -1,0 +1,79 @@
+---
+database_name: dw_tracksale
+table_name: fact_nps_customer_metrics
+columns:
+  sk_nps_customer:
+    lineage:
+      - datalake_tracksale.customer_conversions.id_customer
+  sk_user:
+    lineage:
+      - datalake_tracksale.answer_tags.tag_value
+      - datalake_ebdb_customer_contact_identification.customer_contact_identification.id_user
+  sk_personal_document:
+    lineage:
+      - datalake_tracksale.answer_tags.tag_value
+      - datalake_ebdb_customer_contact_identification.customer_contact_identification.id_user      
+  last_shift_type:
+    lineage:
+      - datalake_tracksale.answer.score_category
+  total_dispatches:
+    lineage:
+      - datalake_tracksale.customer_conversions.id_dispatch
+  total_answers:
+    lineage:
+      - datalake_tracksale.customer_conversions.id_answer
+  total_answers_forsale:
+    lineage:
+      - datalake_tracksale.customer_conversions.id_answer
+  total_answers_forrent:
+    lineage:
+      - datalake_tracksale.customer_conversions.id_answer
+  answers_as_promoter:
+    lineage:
+      - datalake_tracksale.customer_conversions.id_answer
+  answers_as_detractor:
+    lineage:
+      - datalake_tracksale.customer_conversions.id_answer
+  answer_rate:
+    lineage:
+      - datalake_tracksale.customer_conversions.id_answer
+      - datalake_tracksale.customer_conversions.id_dispatch
+  comment_rate:
+    lineage:
+      - datalake_tracksale.customer_conversions.id_answer
+  avg_score:
+    lineage:
+      - datalake_tracksale.answer.nps_answer
+  avg_score_forsale:
+    lineage:
+      - datalake_tracksale.answer.nps_answer
+  avg_score_forrent:
+    lineage:
+      - datalake_tracksale.answer.nps_answer
+  last_score:
+    lineage:
+      - datalake_tracksale.answer.nps_answer
+  overall_nps:
+    lineage:
+      - datalake_tracksale.customer_conversions.id_answer
+  overall_nps_forsale:
+    lineage:
+      - datalake_tracksale.customer_conversions.id_answer
+  overall_nps_forrent:
+    lineage:
+      - datalake_tracksale.customer_conversions.id_answer
+  avg_minutes_response_time:
+    lineage:
+      - datalake_tracksale.answer.seconds_spent_answering
+  has_pending_survey:
+    lineage:
+      - datalake_tracksale.customer_conversions.id_dispatch
+  dt_last_dispatched:
+    lineage:
+      - datalake_tracksale.dispatch.ts_created
+  dt_last_answer:
+    lineage:
+      - datalake_tracksale.answer.ts_answer_sent_utc
+  dt_first_answer:
+    lineage:
+      - datalake_tracksale.answer.ts_answer_sent_utc

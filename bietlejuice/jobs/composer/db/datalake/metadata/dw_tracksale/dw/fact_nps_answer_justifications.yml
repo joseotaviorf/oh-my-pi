@@ -1,0 +1,13 @@
+---
+database_name: dw_tracksale
+table_name: fact_nps_answer_justifications
+columns:
+  sk_nps_answer:
+    lineage:
+      - datalake_tracksale.answer_justifications.id_answer
+  level:
+    lineage:
+      - datalake_tracksale.answer_justifications.level
+  justification:
+    lineage:
+      - datalake_tracksale.answer_justifications.justification
