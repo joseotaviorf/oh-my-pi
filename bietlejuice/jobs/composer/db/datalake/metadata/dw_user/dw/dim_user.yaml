@@ -1,0 +1,230 @@
+database_name: dw_janus
+table_name: dim_user
+columns:
+  sk_user:
+    lineage:
+      - datalake_ebdb_user.user.id
+  sk_doorman_joined_date:
+    lineage:
+      - datalake_ebdb_user.affiliate_data.ts_doorman_joined
+  id:
+    lineage:
+      - datalake_ebdb_user.user.id
+  dados_agente_id:
+    lineage:
+      - datalake_ebdb_user.user.id_agent
+  dados_fotografo_id:
+    lineage:
+      - datalake_ebdb_user.user.id_photographer_data
+  dados_vendedor_id:
+    lineage:
+      - datalake_ebdb_user.user.id_sales_rep
+  dados_afiliado_id:
+    lineage:
+      - datalake_ebdb_user.user.id_affiliates
+  facebook_id:
+    lineage:
+      - datalake_ebdb_user.user.id_facebook
+  linkedin_id:
+    lineage:
+      - datalake_ebdb_user.user.id_linkedin
+  google_id:
+    lineage:
+      - datalake_ebdb_user.user.id_google
+  active:
+    lineage:
+      - datalake_ebdb_user.user.is_active
+  bloqueado:
+    lineage:
+      - datalake_ebdb_user.user.is_blocked
+  dadosafiliado_ativo:
+    lineage:
+      - datalake_ebdb_user.affiliate_data.is_active
+  dadosagente_ativo:
+    lineage:
+      - datalake_ebdb_user.agent_data.is_active
+  dadosfotografo_ativo:
+    lineage:
+      - datalake_ebdb_clean.photographer_data.is_active
+  flg_doorman_affiliate:
+    lineage:
+      - datalake_ebdb_user.affiliate_data.is_doorman_affiliate
+  inquilino:
+    lineage:
+      - datalake_ebdb_user.user.is_tenant
+  is_sale_agent:
+    lineage:
+      - datalake_ebdb_user.agent_data.is_sale_agent
+  is_rent_agent:
+    lineage:
+      - datalake_ebdb_user.agent_data.is_rent_agent
+  dadosbancarios_outro_titular:
+    lineage:
+      - datalake_ebdb_user.user.bank_another_holder
+  tem_imovel:
+    lineage:
+      - datalake_ebdb_user.user.has_house
+  tem_app_inquilino:
+    lineage:
+      - datalake_ebdb_user.user.has_tenant_app
+  tem_contrato_ativo:
+    lineage:
+      - datalake_ebdb_user.user.has_active_contract
+  aceita_sms:
+    lineage:
+      - datalake_ebdb_user.user.has_accepted_sms
+  nome:
+    lineage:
+      - datalake_ebdb_user.user.name
+  cpf:
+    lineage:
+      - datalake_ebdb_user.user.cpf
+  rg:
+    lineage:
+      - datalake_ebdb_user.user.rg
+  sexo:
+    lineage:
+      - datalake_ebdb_user.user.gender
+  email:
+    lineage:
+      - datalake_ebdb_user.user.email
+  email_alternativo:
+    lineage:
+      - datalake_ebdb_user.user.alternative_email
+  telefone_principal:
+    lineage:
+      - datalake_ebdb_user.user.main_phone
+  endereco:
+    lineage:
+      - datalake_ebdb_user.user.address
+  numero:
+    lineage:
+      - datalake_ebdb_user.user.number
+  complemento:
+    lineage:
+      - datalake_ebdb_user.user.complement
+  bairro:
+    lineage:
+      - datalake_ebdb_user.user.neighborhood
+  cep:
+    lineage:
+      - datalake_ebdb_user.user.zip_code
+  cidade:
+    lineage:
+      - datalake_ebdb_user.user.city
+  estado_nome:
+    lineage:
+      - datalake_ebdb_clean.state.name
+  estado_abreviacao:
+    lineage:
+      - datalake_ebdb_clean.state.abbreviation
+  tipo_admin:
+    lineage:
+      - datalake_ebdb_user.user.admin_type
+  dadosbancarios_banco_codigo:
+    lineage:
+      - datalake_ebdb_clean.bank.code
+  dadosbancarios_banco:
+    lineage:
+      - datalake_ebdb_clean.bank.name
+  dadosbancarios_agencia:
+    lineage:
+      - datalake_ebdb_user.user.bank_agency
+  dadosbancarios_conta_corrente:
+    lineage:
+      - datalake_ebdb_user.user.bank_account
+  dadosbancarios_cpf_cnpj:
+    lineage:
+      - datalake_ebdb_user.user.bank_cpf_cnpj
+  dadosbancarios_nome:
+    lineage:
+      - datalake_ebdb_user.user.bank_name
+  dadosbancarios_tipo_conta:
+    lineage:
+      - datalake_ebdb_user.user.bank_account_type
+  dadosagente_perfil:
+    lineage:
+      - datalake_ebdb_user.agent_data.profile
+  dadosagente_numero_creci:
+    lineage:
+      - datalake_ebdb_user.agent_data.creci_number
+  dadosfotografo_tipo_contrato:
+    lineage:
+      - datalake_ebdb_clean.photographer_data.contract_type
+  dadosafiliado_cidade_atuacao:
+    lineage:
+      - datalake_ebdb_user.affiliate_data.work_city
+  dadosafiliado_preferencia_pagamento:
+    lineage:
+      - datalake_ebdb_user.affiliate_data.payment_preference
+  dadosafiliado_numero_creci:
+    lineage:
+      - datalake_ebdb_user.affiliate_data.creci_number
+  dadosafiliado_semana_ultima_comunicacao_balanco:
+    lineage:
+      - datalake_ebdb_user.affiliate_data.last_week_balance_communication
+  visits_booked:
+    lineage:
+      - datalake_booking.booking.id_visitor
+  visits_realized:
+    lineage:
+      - datalake_booking.booking.is_visit_completed
+  visits_expected_to_happen:
+    lineage:
+      - datalake_booking.booking.visit_fup
+  data_nascimento:
+    lineage:
+      - datalake_ebdb_user.user.dt_birth
+  first_visit_date:
+    lineage:
+      - datalake_ebdb_clean.visit.dt_visit
+  first_visit_confirmed_date:
+    lineage:
+      - datalake_booking.booking.status
+      - datalake_ebdb_clean.visit.dt_visit
+  data_clickanuncie:
+    lineage:
+      - datalake_ebdb_user.user.ts_click_anuncie
+  dadosfotografo_inicio_contrato:
+    lineage:
+      - datalake_ebdb_clean.photographer_data.ts_contract_started
+  dadosvendedor_inicio_contrato:
+    lineage:
+      - datalake_ebdb_clean.sales_rep.ts_contract_started
+  dadosafiliado_inicio_atuacao:
+    lineage:
+      - datalake_ebdb_user.affiliate_data.ts_first_operation_start
+  first_booking_date:
+    lineage:
+      - datalake_booking.booking.ts_created
+  first_booking_confirmed_date:
+    lineage:
+      - datalake_booking.booking.status
+      - datalake_booking.booking.ts_created
+  first_pre_proposal_date:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal.ts_created
+  first_proposal_accepted_date:
+    lineage:
+      - datalake_ebdb_clean.proposal.ts_created
+  first_contract_date:
+    lineage:
+      - datalake_ebdb_clean.contract.ts_created
+  first_signed_contract:
+    lineage:
+      - datalake_ebdb_clean.contract.ts_signed
+  first_dt_document_sent:
+    lineage:
+      - datalake_ebdb_user.user.ts_first_document_sent
+  last_dt_document_sent:
+    lineage:
+      - datalake_ebdb_user.user.ts_last_document_sent
+  first_dt_sent_to_insurance:
+    lineage:
+      - datalake_ebdb_user.user.ts_first_sent_to_insurance
+  criado_em:
+    lineage:
+      - datalake_ebdb_user.user.ts_created
+  atualizado_em:
+    lineage:
+      - datalake_ebdb_user.user.ts_updated
