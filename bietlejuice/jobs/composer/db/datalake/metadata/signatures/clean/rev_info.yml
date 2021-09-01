@@ -1,0 +1,18 @@
+database_name: datalake_signatures_clean
+table_name: rev_info
+columns:
+  rev:
+    lineage:
+      - datalake_signatures_raw.revinfo.rev
+  ts_created:
+    lineage:
+      - datalake_signatures_raw.revinfo.revtstmp
+  year:
+    lineage:
+      - datalake_signatures_raw.revinfo.revtstmp
+  month:
+    lineage:
+      - datalake_signatures_raw.revinfo.revtstmp
+  day:
+    lineage:
+      - datalake_signatures_raw.revinfo.revtstmp

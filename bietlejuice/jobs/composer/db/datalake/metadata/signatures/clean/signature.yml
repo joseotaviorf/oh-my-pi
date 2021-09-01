@@ -1,0 +1,42 @@
+database_name: datalake_signatures_clean
+table_name: signature
+columns:
+  id:
+    lineage:
+      - datalake_signatures_raw.signature.id
+  id_recipient:
+    lineage:
+      - datalake_signatures_raw.signature.recipient_id
+  id_agreement_document:
+    lineage:
+      - datalake_signatures_raw.signature.agreement_document_id
+  id_signature_collector:
+    lineage:
+      - datalake_signatures_raw.signature.signature_collector_id
+  version:
+    lineage:
+      - datalake_signatures_raw.signature.version
+  status:
+    lineage:
+      - datalake_signatures_raw.signature.status
+  ts_sent:
+    lineage:
+      - datalake_signatures_raw.signature.sent_at
+  ts_signed:
+    lineage:
+      - datalake_signatures_raw.signature.signed_at
+  ts_created:
+    lineage:
+      - datalake_signatures_raw.signature.created_at
+  ts_updated:
+    lineage:
+      - datalake_signatures_raw.signature.updated_at
+  year:
+    lineage:
+      - datalake_signatures_raw.signature.updated_at
+  month:
+    lineage:
+      - datalake_signatures_raw.signature.updated_at
+  day:
+    lineage:
+      - datalake_signatures_raw.signature.updated_at

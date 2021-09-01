@@ -1,0 +1,87 @@
+database_name: datalake_signatures_clean
+table_name: agreement_document_aud
+columns:
+  id_agreement_document:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.id
+  id_internal_reference:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.internal_reference_id
+  id_external_reference:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.external_reference_id
+  rev:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.rev
+  rev_end:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.revend
+  rev_type:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.revtype
+  internal_reference_name:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.internal_reference_name
+  external_reference_name:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.external_reference_name
+  version:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.version
+  type:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.type
+  document_s3_uid:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.document_s3_uid
+  name:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.name
+  email_subject:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.email_subject
+  email_body:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.email_body
+  signed_document_s3_uid:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.signed_document_s3_uid
+  mod_id_internal_reference:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.internal_reference_mod
+  mod_id_external_reference:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.external_reference_mod
+  mod_type:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.type_mod
+  mod_document_s3_uid:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.document_s3_uid_mod
+  mod_name:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.name_mod
+  mod_email_subject:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.email_subject_mod
+  mod_email_body:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.email_body_mod
+  mod_signed_document_s3_uid:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.signed_document_s3_uid_mod
+  ts_created:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.updated_at
+  year:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.updated_at
+  month:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.updated_at
+  day:
+    lineage:
+      - datalake_signatures_raw.agreement_document_aud.updated_at

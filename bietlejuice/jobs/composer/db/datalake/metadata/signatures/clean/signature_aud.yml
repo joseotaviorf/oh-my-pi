@@ -1,0 +1,69 @@
+database_name: datalake_signatures_clean
+table_name: signature_aud
+columns:
+  id_signature:
+    lineage:
+      - datalake_signatures_raw.signature_aud.id
+  id_recipient:
+    lineage:
+      - datalake_signatures_raw.signature_aud.recipient_id
+  id_agreement_document:
+    lineage:
+      - datalake_signatures_raw.signature_aud.agreement_document_id
+  id_signature_collector:
+    lineage:
+      - datalake_signatures_raw.signature_aud.signature_collector_id
+  rev:
+    lineage:
+      - datalake_signatures_raw.signature_aud.rev
+  rev_end:
+    lineage:
+      - datalake_signatures_raw.signature_aud.revend
+  rev_type:
+    lineage:
+      - datalake_signatures_raw.signature_aud.revtype
+  version:
+    lineage:
+      - datalake_signatures_raw.signature_aud.version
+  status:
+    lineage:
+      - datalake_signatures_raw.signature_aud.status
+  mod_id_recipient:
+    lineage:
+      - datalake_signatures_raw.signature_aud.recipient_id_mod
+  mod_id_agreement_document:
+    lineage:
+      - datalake_signatures_raw.signature_aud.agreement_document_id_mod
+  mod_id_signature_collector:
+    lineage:
+      - datalake_signatures_raw.signature_aud.signature_collector_id_mod
+  mod_status:
+    lineage:
+      - datalake_signatures_raw.signature_aud.status_mod
+  mod_ts_sent:
+    lineage:
+      - datalake_signatures_raw.signature_aud.sent_at_mod
+  mod_ts_signed:
+    lineage:
+      - datalake_signatures_raw.signature_aud.signed_at_mod
+  ts_sent:
+    lineage:
+      - datalake_signatures_raw.signature_aud.sent_at
+  ts_signed:
+    lineage:
+      - datalake_signatures_raw.signature_aud.signed_at
+  ts_created:
+    lineage:
+      - datalake_signatures_raw.signature_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_signatures_raw.signature_aud.updated_at
+  year:
+    lineage:
+      - datalake_signatures_raw.signature_aud.updated_at
+  month:
+    lineage:
+      - datalake_signatures_raw.signature_aud.updated_at
+  day:
+    lineage:
+      - datalake_signatures_raw.signature_aud.updated_at
