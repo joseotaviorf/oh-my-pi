@@ -1,0 +1,33 @@
+database_name: datalake_retsuko_clean
+table_name: contract
+columns:
+  id:
+    lineage:
+      - datalake_retsuko_raw.contract.id
+  id_external:
+    lineage:
+      - datalake_retsuko_raw.contract.external_id
+  version:
+    lineage:
+      - datalake_retsuko_raw.contract.version
+  city:
+    lineage:
+      - datalake_retsuko_raw.contract.locale
+  guarantee:
+    lineage:
+      - datalake_retsuko_raw.contract.guarantee
+  is_b2b:
+    lineage:
+      - datalake_retsuko_raw.contract.is_b2b
+  ts_signature:
+    lineage:
+      - datalake_retsuko_raw.contract.signature_date
+  ts_guaranteed_start:
+    lineage:
+      - datalake_retsuko_raw.contract.guarantee_start_date
+  ts_period_started:
+    lineage:
+      - datalake_retsuko_raw.contract.start_period
+  ts_charge_started:
+    lineage:
+      - datalake_retsuko_raw.contract.start_charge

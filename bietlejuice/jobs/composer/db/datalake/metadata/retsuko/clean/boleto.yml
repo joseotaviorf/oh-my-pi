@@ -1,0 +1,42 @@
+database_name: datalake_retsuko_clean
+table_name: boleto
+columns:
+  id:
+    lineage:
+      - datalake_retsuko_raw.boleto.id
+  id_external:
+    lineage:
+      - datalake_retsuko_raw.boleto.external_id
+  id_invoice:
+    lineage:
+      - datalake_retsuko_raw.boleto.invoice_id
+  identifier:
+    lineage:
+      - datalake_retsuko_raw.boleto.identifier
+  due_amount:
+    lineage:
+      - datalake_retsuko_raw.boleto.due_amount
+  our_number:
+    lineage:
+      - datalake_retsuko_raw.boleto.our_number
+  our_number_digit:
+    lineage:
+      - datalake_retsuko_raw.boleto.our_number_digit
+  wallet_number:
+    lineage:
+      - datalake_retsuko_raw.boleto.wallet_number
+  barcode:
+    lineage:
+      - datalake_retsuko_raw.boleto.barcode
+  inputtable_line:
+    lineage:
+      - datalake_retsuko_raw.boleto.inputtable_line
+  ts_due:
+    lineage:
+      - datalake_retsuko_raw.boleto.due_date
+  ts_issued:
+    lineage:
+      - datalake_retsuko_raw.boleto.issue_date
+  ts_created:
+    lineage:
+      - datalake_retsuko_raw.boleto.created_at

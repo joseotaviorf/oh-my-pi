@@ -1,0 +1,51 @@
+database_name: datalake_retsuko_clean
+table_name: invoice
+columns:
+  id:
+    lineage:
+      - datalake_retsuko_raw.invoice.id
+  id_external:
+    lineage:
+      - datalake_retsuko_raw.invoice.external_id
+  id_account:
+    lineage:
+      - datalake_retsuko_raw.invoice.account_id
+  accrual_year_month:
+    lineage:
+      - datalake_retsuko_raw.invoice.accrual_year_month
+  closing_mode:
+    lineage:
+      - datalake_retsuko_raw.invoice.closing_mode
+  due_amount:
+    lineage:
+      - datalake_retsuko_raw.invoice.due_amount
+  ts_due:
+    lineage:
+      - datalake_retsuko_raw.invoice.due_date
+  purpose:
+    lineage:
+      - datalake_retsuko_raw.invoice.purpose
+  status:
+    lineage:
+      - datalake_retsuko_raw.invoice.status
+  paid_via:
+    lineage:
+      - datalake_retsuko_raw.invoice.paid_via
+  paid_amount:
+    lineage:
+      - datalake_retsuko_raw.invoice.paid_amount
+  ts_paid:
+    lineage:
+      - datalake_retsuko_raw.invoice.paid_date
+  ts_canceled:
+    lineage:
+      - datalake_retsuko_raw.invoice.canceled_at
+  ts_sent:
+    lineage:
+      - datalake_retsuko_raw.invoice.sent_at
+  ts_created:
+    lineage:
+      - datalake_retsuko_raw.invoice.created_at
+  id_contract:
+    lineage:
+      - datalake_retsuko_raw.invoice.contract_id

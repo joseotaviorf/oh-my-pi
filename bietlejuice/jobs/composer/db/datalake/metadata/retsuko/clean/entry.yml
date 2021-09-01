@@ -1,0 +1,42 @@
+database_name: datalake_retsuko_clean
+table_name: entry
+columns:
+  id:
+    lineage:
+      - datalake_retsuko_raw.entry.id
+  id_external:
+    lineage:
+      - datalake_retsuko_raw.entry.external_id
+  accrual_year_month:
+    lineage:
+      - datalake_retsuko_raw.entry.accrual_year_month
+  due_year_month:
+    lineage:
+      - datalake_retsuko_raw.entry.due_year_month
+  id_from_account:
+    lineage:
+      - datalake_retsuko_raw.entry.from_account_id
+  id_to_account:
+    lineage:
+      - datalake_retsuko_raw.entry.to_account_id
+  id_invoice:
+    lineage:
+      - datalake_retsuko_raw.entry.invoice_id
+  amount:
+    lineage:
+      - datalake_retsuko_raw.entry.amount
+  bill_item:
+    lineage:
+      - datalake_retsuko_raw.entry.bill_item
+  description:
+    lineage:
+      - datalake_retsuko_raw.entry.description
+  producer:
+    lineage:
+      - datalake_retsuko_raw.entry.producer
+  ts_created:
+    lineage:
+      - datalake_retsuko_raw.entry.created_at
+  id_contract:
+    lineage:
+      - datalake_retsuko_raw.entry.contract_id
