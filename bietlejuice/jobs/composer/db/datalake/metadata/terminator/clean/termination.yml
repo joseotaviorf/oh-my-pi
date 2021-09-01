@@ -1,0 +1,66 @@
+database_name: datalake_terminator_clean
+table_name: termination
+columns:
+  id:
+    lineage:
+      - datalake_terminator_raw.termination.id
+  id_contract:
+    lineage:
+      - datalake_terminator_raw.termination.contract_id
+  id_exit_inspection:
+    lineage:
+      - datalake_terminator_raw.termination.exit_inspection_id
+  feedback:
+    lineage:
+      - datalake_terminator_raw.termination.feedback
+  tenant_keys_location:
+    lineage:
+      - datalake_terminator_raw.termination.tenant_keys_location
+  owner_keys_location:
+    lineage:
+      - datalake_terminator_raw.termination.owner_keys_location
+  requested_by:
+    lineage:
+      - datalake_terminator_raw.termination.requested_by
+  source:
+    lineage:
+      - datalake_terminator_raw.termination.source
+  status:
+    lineage:
+      - datalake_terminator_raw.termination.status
+  internal_status:
+    lineage:
+      - datalake_terminator_raw.termination.internal_status
+  cancellation_info:
+    lineage:
+      - datalake_terminator_raw.termination.cancellation_info
+  rescheduling_history:
+    lineage:
+      - datalake_terminator_raw.termination.rescheduling_history
+  utility_bill_info:
+    lineage:
+      - datalake_terminator_raw.termination.utility_bill_info
+  last_condominium_responsible:
+    lineage:
+      - datalake_terminator_raw.termination.last_condominium_responsible
+  has_exit_inspection:
+    lineage:
+      - datalake_terminator_raw.termination.exit_inspection_required
+  is_relisting:
+    lineage:
+      - datalake_terminator_raw.termination.relisting_enabled
+  dt_termination:
+    lineage:
+      - datalake_terminator_raw.termination.date
+  dt_vacancy:
+    lineage:
+      - datalake_terminator_raw.termination.vacancy_date
+  ts_canceled:
+    lineage:
+      - datalake_terminator_raw.termination.canceled_at
+  ts_created:
+    lineage:
+      - datalake_terminator_raw.termination.created_at
+  ts_updated:
+    lineage:
+      - datalake_terminator_raw.termination.updated_at

@@ -1,0 +1,36 @@
+database_name: datalake_terminator_clean
+table_name: inspection
+columns:
+  id:
+    lineage:
+      - datalake_terminator_raw.inspection.id
+  id_contract:
+    lineage:
+      - datalake_terminator_raw.inspection.contract_id
+  id_schedule:
+    lineage:
+      - datalake_terminator_raw.inspection.schedule_id
+  type:
+    lineage:
+      - datalake_terminator_raw.inspection.type
+  status:
+    lineage:
+      - datalake_terminator_raw.inspection.status
+  ts_expiration:
+    lineage:
+      - datalake_terminator_raw.inspection.expiration_date
+  ts_inspected:
+    lineage:
+      - datalake_terminator_raw.inspection.date
+  ts_created:
+    lineage:
+      - datalake_terminator_raw.inspection.created_at
+  ts_updated:
+    lineage:
+      - datalake_terminator_raw.inspection.updated_at
+  keys_location:
+    lineage:
+      - datalake_terminator_raw.inspection.keys_location
+  keys_location_comment:
+    lineage:
+      - datalake_terminator_raw.inspection.keys_location_comment

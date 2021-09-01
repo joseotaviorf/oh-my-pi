@@ -1,0 +1,24 @@
+database_name: datalake_terminator_clean
+table_name: attachment
+columns:
+  id:
+    lineage:
+      - datalake_terminator_raw.attachment.id
+  id_termination:
+    lineage:
+      - datalake_terminator_raw.attachment.termination_id
+  filename:
+    lineage:
+      - datalake_terminator_raw.attachment.filename
+  path:
+    lineage:
+      - datalake_terminator_raw.attachment.path
+  type:
+    lineage:
+      - datalake_terminator_raw.attachment.type
+  ts_created:
+    lineage:
+      - datalake_terminator_raw.attachment.created_at
+  ts_updated:
+    lineage:
+      - datalake_terminator_raw.attachment.updated_at

@@ -1,0 +1,18 @@
+database_name: datalake_terminator_clean
+table_name: contract
+columns:
+  id:
+    lineage:
+      - datalake_terminator_raw.contract.id
+  condominium_payer:
+    lineage:
+      - datalake_terminator_raw.contract.condominium_payer
+  dt_start:
+    lineage:
+      - datalake_terminator_raw.contract.start_date
+  ts_created:
+    lineage:
+      - datalake_terminator_raw.contract.created_at
+  ts_updated:
+    lineage:
+      - datalake_terminator_raw.contract.updated_at

@@ -1,0 +1,9 @@
+database_name: datalake_terminator_clean
+table_name: rev_info
+columns:
+  rev:
+    lineage:
+      - datalake_terminator_raw.revinfo.rev
+  ts_rev:
+    lineage:
+      - datalake_terminator_raw.revinfo.revtstmp
