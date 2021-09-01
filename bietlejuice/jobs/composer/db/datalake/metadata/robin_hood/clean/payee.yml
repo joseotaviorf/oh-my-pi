@@ -1,0 +1,36 @@
+database_name: datalake_robin_hood_clean
+table_name: payee
+columns:
+  id:
+    lineage:
+      - datalake_robin_hood_raw.payee.id
+  id_external:
+    lineage:
+      - datalake_robin_hood_raw.payee.external_id
+  id_external_agent:
+    lineage:
+      - datalake_robin_hood_raw.payee.external_agent_id
+  id_external_affiliate:
+    lineage:
+      - datalake_robin_hood_raw.payee.external_affiliate_id
+  id_external_photographer:
+    lineage:
+      - datalake_robin_hood_raw.payee.external_photographer_id
+  id_external_salesman:
+    lineage:
+      - datalake_robin_hood_raw.payee.external_salesman_id
+  name:
+    lineage:
+      - datalake_robin_hood_raw.payee.name
+  email:
+    lineage:
+      - datalake_robin_hood_raw.payee.email
+  document_number:
+    lineage:
+      - datalake_robin_hood_raw.payee.document_number
+  ts_created:
+    lineage:
+      - datalake_robin_hood_raw.payee.created_at
+  ts_updated:
+    lineage:
+      - datalake_robin_hood_raw.payee.updated_at

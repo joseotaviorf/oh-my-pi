@@ -1,0 +1,24 @@
+database_name: datalake_robin_hood_clean
+table_name: tax
+columns:
+  id:
+    lineage:
+      - datalake_robin_hood_raw.tax.id
+  id_payee:
+    lineage:
+      - datalake_robin_hood_raw.tax.payee_id
+  due_amount:
+    lineage:
+      - datalake_robin_hood_raw.tax.due_amount
+  accounting_year_month:
+    lineage:
+      - datalake_robin_hood_raw.tax.accounting_year_month
+  ts_created:
+    lineage:
+      - datalake_robin_hood_raw.tax.created_at
+  ts_disabled:
+    lineage:
+      - datalake_robin_hood_raw.tax.disabled_at
+  ts_blocked:
+    lineage:
+      - datalake_robin_hood_raw.tax.blocked_at

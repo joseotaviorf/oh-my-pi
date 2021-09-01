@@ -1,0 +1,39 @@
+database_name: datalake_robin_hood_clean
+table_name: accounting_entry
+columns:
+  id:
+    lineage:
+      - datalake_robin_hood_raw.accounting_entry.id
+  id_external:
+    lineage:
+      - datalake_robin_hood_raw.accounting_entry.external_id
+  id_source:
+    lineage:
+      - datalake_robin_hood_raw.accounting_entry.source_id
+  description:
+    lineage:
+      - datalake_robin_hood_raw.accounting_entry.description
+  accrual_year_month:
+    lineage:
+      - datalake_robin_hood_raw.accounting_entry.accrual_year_month
+  source_bill_item:
+    lineage:
+      - datalake_robin_hood_raw.accounting_entry.source_bill_item
+  id_payee:
+    lineage:
+      - datalake_robin_hood_raw.accounting_entry.payee_id
+  due_amount:
+    lineage:
+      - datalake_robin_hood_raw.accounting_entry.due_amount
+  ts_created:
+    lineage:
+      - datalake_robin_hood_raw.accounting_entry.created_at
+  locale:
+    lineage:
+      - datalake_robin_hood_raw.accounting_entry.locale
+  cost_center_code:
+    lineage:
+      - datalake_robin_hood_raw.accounting_entry.cost_center_code
+  dt_occurrence:
+    lineage:
+      - datalake_robin_hood_raw.accounting_entry.occurrence_date

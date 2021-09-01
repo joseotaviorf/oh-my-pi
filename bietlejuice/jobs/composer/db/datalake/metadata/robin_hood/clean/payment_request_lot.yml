@@ -1,0 +1,30 @@
+database_name: datalake_robin_hood_clean
+table_name: payment_request_lot
+columns:
+  id:
+    lineage:
+      - datalake_robin_hood_raw.payment_request_lot.id
+  id_source:
+    lineage:
+      - datalake_robin_hood_raw.payment_request_lot.source_id
+  id_external_request:
+    lineage:
+      - datalake_robin_hood_raw.payment_request_lot.external_request_id
+  name:
+    lineage:
+      - datalake_robin_hood_raw.payment_request_lot.name
+  payment_method:
+    lineage:
+      - datalake_robin_hood_raw.payment_request_lot.payment_method
+  dt_sent:
+    lineage:
+      - datalake_robin_hood_raw.payment_request_lot.send_date
+  ts_sent:
+    lineage:
+      - datalake_robin_hood_raw.payment_request_lot.sent_at
+  ts_created:
+    lineage:
+      - datalake_robin_hood_raw.payment_request_lot.created_at
+  ts_canceled:
+    lineage:
+      - datalake_robin_hood_raw.payment_request_lot.canceled_at

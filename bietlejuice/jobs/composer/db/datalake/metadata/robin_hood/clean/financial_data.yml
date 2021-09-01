@@ -1,0 +1,33 @@
+database_name: datalake_robin_hood_clean
+table_name: financial_data
+columns:
+  id:
+    lineage:
+      - datalake_robin_hood_raw.financial_data.id
+  id_payee:
+    lineage:
+      - datalake_robin_hood_raw.financial_data.payee_id
+  name:
+    lineage:
+      - datalake_robin_hood_raw.financial_data.name
+  document_number:
+    lineage:
+      - datalake_robin_hood_raw.financial_data.document_number
+  bank_code:
+    lineage:
+      - datalake_robin_hood_raw.financial_data.bank_code
+  account_type:
+    lineage:
+      - datalake_robin_hood_raw.financial_data.account_type
+  agency_number:
+    lineage:
+      - datalake_robin_hood_raw.financial_data.agency_number
+  account_number:
+    lineage:
+      - datalake_robin_hood_raw.financial_data.account_number
+  ts_created:
+    lineage:
+      - datalake_robin_hood_raw.financial_data.created_at
+  ts_disabled:
+    lineage:
+      - datalake_robin_hood_raw.financial_data.disabled_at

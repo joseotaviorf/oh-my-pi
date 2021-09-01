@@ -1,0 +1,24 @@
+database_name: datalake_robin_hood_clean
+table_name: payee_account
+columns:
+  id:
+    lineage:
+      - datalake_robin_hood_raw.payee_account.id
+  id_payee:
+    lineage:
+      - datalake_robin_hood_raw.payee_account.payee_id
+  id_related_account:
+    lineage:
+      - datalake_robin_hood_raw.payee_account.related_account_id
+  related_account_type:
+    lineage:
+      - datalake_robin_hood_raw.payee_account.related_account_type
+  id_source:
+    lineage:
+      - datalake_robin_hood_raw.payee_account.source_id
+  ts_created:
+    lineage:
+      - datalake_robin_hood_raw.payee_account.created_at
+  ts_disabled:
+    lineage:
+      - datalake_robin_hood_raw.payee_account.disabled_at
