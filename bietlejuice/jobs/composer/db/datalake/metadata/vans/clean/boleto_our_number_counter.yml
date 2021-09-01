@@ -1,0 +1,6 @@
+database_name: datalake_vans_clean
+table_name: boleto_our_number_counter
+columns:
+  our_number:
+    lineage:
+      - datalake_vans_raw.boletoournumbercounter.our_number

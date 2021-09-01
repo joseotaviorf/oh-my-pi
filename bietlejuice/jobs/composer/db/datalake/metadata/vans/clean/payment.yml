@@ -1,0 +1,84 @@
+database_name: datalake_vans_clean
+table_name: payment
+columns:
+  id:
+    lineage:
+      - datalake_vans_raw.payment.id
+  id_related_document:
+    lineage:
+      - datalake_vans_raw.payment.related_document_id
+  due_amount:
+    lineage:
+      - datalake_vans_raw.payment.due_amount
+  dt_dued:
+    lineage:
+      - datalake_vans_raw.payment.due_date
+  ts_issued:
+    lineage:
+      - datalake_vans_raw.payment.issue_date_time
+  company_use:
+    lineage:
+      - datalake_vans_raw.payment.company_use
+  our_number:
+    lineage:
+      - datalake_vans_raw.payment.our_number
+  occurrence_code:
+    lineage:
+      - datalake_vans_raw.payment.occurrence_code
+  payee_name:
+    lineage:
+      - datalake_vans_raw.payment.payee_name
+  payee_document:
+    lineage:
+      - datalake_vans_raw.payment.payee_document
+  payee_agency:
+    lineage:
+      - datalake_vans_raw.payment.payee_agency
+  payee_account:
+    lineage:
+      - datalake_vans_raw.payment.payee_account
+  has_payee_savings_acc:
+    lineage:
+      - datalake_vans_raw.payment.payee_savings_acc
+  payee_bank_code:
+    lineage:
+      - datalake_vans_raw.payment.payee_bank_code
+  ts_created:
+    lineage:
+      - datalake_vans_raw.payment.created_at
+  ts_updated:
+    lineage:
+      - datalake_vans_raw.payment.updated_at
+  status:
+    lineage:
+      - datalake_vans_raw.payment.status
+  dt_paid:
+    lineage:
+      - datalake_vans_raw.payment.paid_at
+  requested_by:
+    lineage:
+      - datalake_vans_raw.payment.requested_by
+  related_document_type:
+    lineage:
+      - datalake_vans_raw.payment.related_document_type
+  original_response:
+    lineage:
+      - datalake_vans_raw.payment.original_response
+  related_document_status:
+    lineage:
+      - datalake_vans_raw.payment.related_document_status
+  paid_amount:
+    lineage:
+      - datalake_vans_raw.payment.paid_amount
+  bank_payment_code:
+    lineage:
+      - datalake_vans_raw.payment.bank_payment_code
+  type:
+    lineage:
+      - datalake_vans_raw.payment.type
+  style:
+    lineage:
+      - datalake_vans_raw.payment.style
+  id_bank_payment:
+    lineage:
+      - datalake_vans_raw.payment.bank_payment_id

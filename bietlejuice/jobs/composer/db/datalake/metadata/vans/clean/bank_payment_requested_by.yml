@@ -1,0 +1,15 @@
+database_name: datalake_vans_clean
+table_name: bank_payment_requested_by
+columns:
+  requested_by:
+    lineage:
+      - datalake_vans_raw.bankpaymentrequestedby.requested_by
+  id_bank_payment:
+    lineage:
+      - datalake_vans_raw.bankpaymentrequestedby.bank_payment_id
+  is_active:
+    lineage:
+      - datalake_vans_raw.bankpaymentrequestedby.active
+  is_fallback:
+    lineage:
+      - datalake_vans_raw.bankpaymentrequestedby.fallback

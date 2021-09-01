@@ -1,0 +1,15 @@
+database_name: datalake_vans_clean
+table_name: bank_boleto_requested_by
+columns:
+  requested_by:
+    lineage:
+      - datalake_vans_raw.bankboletorequestedby.requested_by
+  id_bank_boleto:
+    lineage:
+      - datalake_vans_raw.bankboletorequestedby.bank_boleto_id
+  is_active:
+    lineage:
+      - datalake_vans_raw.bankboletorequestedby.active
+  is_fallback:
+    lineage:
+      - datalake_vans_raw.bankboletorequestedby.fallback

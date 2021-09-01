@@ -1,0 +1,9 @@
+database_name: datalake_vans_clean
+table_name: file_payment
+columns:
+  id_file:
+    lineage:
+      - datalake_vans_raw.file_payment.file_id
+  id_payment:
+    lineage:
+      - datalake_vans_raw.file_payment.payment_id

@@ -1,0 +1,9 @@
+database_name: datalake_vans_clean
+table_name: file_payment_boleto
+columns:
+  id_file:
+    lineage:
+      - datalake_vans_raw.file_paymentboleto.file_id
+  id_payment_boleto:
+    lineage:
+      - datalake_vans_raw.file_paymentboleto.payment_boleto_id
