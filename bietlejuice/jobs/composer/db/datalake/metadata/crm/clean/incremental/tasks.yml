@@ -1,0 +1,111 @@
+database_name: datalake_crm_clean
+table_name: tasks
+columns:
+  id:
+    lineage:
+      - datalake_crm_raw.tasks._id
+  id_origin:
+    lineage:
+      - datalake_crm_raw.tasks.origemid
+  id_assignee:
+    lineage:
+      - datalake_crm_raw.tasks.assigneeid
+  id_house:
+    lineage:
+      - datalake_crm_raw.tasks.imovelid
+  id_opened_by:
+    lineage:
+      - datalake_crm_raw.tasks.openedbyid
+  id_tenant:
+    lineage:
+      - datalake_crm_raw.tasks.inquilinoid
+  id_negotiation:
+    lineage:
+      - datalake_crm_raw.tasks.negociacaoid
+  id_manager:
+    lineage:
+      - datalake_crm_raw.tasks.gerenteid
+  id_owner:
+    lineage:
+      - datalake_crm_raw.tasks.proprietarioid
+  id_receiver:
+    lineage:
+      - datalake_crm_raw.tasks.destinatarioid
+  version:
+    lineage:
+      - datalake_crm_raw.tasks.__v
+  actions:
+    lineage:
+      - datalake_crm_raw.tasks.actions
+  score:
+    lineage:
+      - datalake_crm_raw.tasks.score
+  score_factor:
+    lineage:
+      - datalake_crm_raw.tasks.scorefactor
+  receiver_name:
+    lineage:
+      - datalake_crm_raw.tasks.nomedestinatario
+  task_comment:
+    lineage:
+      - datalake_crm_raw.tasks.comentario
+  origin:
+    lineage:
+      - datalake_crm_raw.tasks.origem
+  type:
+    lineage:
+      - datalake_crm_raw.tasks.type
+  receiver_type:
+    lineage:
+      - datalake_crm_raw.tasks.tipodestinatario
+  description:
+    lineage:
+      - datalake_crm_raw.tasks.descricao
+  phase:
+    lineage:
+      - datalake_crm_raw.tasks.fase
+  start_date_object:
+    lineage:
+      - datalake_crm_raw.tasks.datainicio
+  origin_date_object:
+    lineage:
+      - datalake_crm_raw.tasks.origemdata
+  completed_date_object:
+    lineage:
+      - datalake_crm_raw.tasks.realizadaem
+  silenced_until_date_object:
+    lineage:
+      - datalake_crm_raw.tasks.silenciadaate
+  created_date_object:
+    lineage:
+      - datalake_crm_raw.tasks.datacriacao
+  visit_fup:
+    lineage:
+      - datalake_crm_raw.tasks.followupvisita
+  unix_fup:
+    lineage:
+      - datalake_crm_raw.tasks.datafup
+  analyst_started:
+    lineage:
+      - datalake_crm_raw.tasks.startedat
+  tags:
+    lineage:
+      - datalake_crm_raw.tasks.tags
+  metadata:
+    lineage:
+      - datalake_crm_raw.tasks.metadata
+  is_resolved:
+    lineage:
+      - datalake_crm_raw.tasks.resolvida
+  dt_visit:
+    lineage:
+      - datalake_crm_raw.tasks.datavisita
+  year:
+    lineage:
+      - datalake_crm_raw.tasks.year
+  month:
+    lineage:
+      - datalake_crm_raw.tasks.month
+  day:
+    lineage:
+      - datalake_crm_raw.tasks.day

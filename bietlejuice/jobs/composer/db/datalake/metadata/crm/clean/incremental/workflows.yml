@@ -1,0 +1,48 @@
+database_name: datalake_crm_clean
+table_name: workflows
+columns:
+  id:
+    lineage:
+      - datalake_crm_raw.workflows._id
+  id_workflow_definition:
+    lineage:
+      - datalake_crm_raw.workflows.workflowdefinitionid
+  id_flow:
+    lineage:
+      - datalake_crm_raw.workflows.flowid
+  workflow_definition_version:
+    lineage:
+      - datalake_crm_raw.workflows.workflowdefinitionversion
+  version:
+    lineage:
+      - datalake_crm_raw.workflows.__v
+  states:
+    lineage:
+      - datalake_crm_raw.workflows.states
+  status:
+    lineage:
+      - datalake_crm_raw.workflows.status
+  transitions:
+    lineage:
+      - datalake_crm_raw.workflows.transitions
+  context:
+    lineage:
+      - datalake_crm_raw.workflows.context
+  start_date_object:
+    lineage:
+      - datalake_crm_raw.workflows.starttime
+  updated_date_object:
+    lineage:
+      - datalake_crm_raw.workflows.updated
+  end_date_object:
+    lineage:
+      - datalake_crm_raw.workflows.endtime
+  year:
+    lineage:
+      - datalake_crm_raw.workflows.year
+  month:
+    lineage:
+      - datalake_crm_raw.workflows.month
+  day:
+    lineage:
+      - datalake_crm_raw.workflows.day

@@ -1,0 +1,21 @@
+database_name: datalake_crm_clean
+table_name: task_status_histories
+columns:
+  id:
+    lineage:
+      - datalake_crm_raw.taskstatushistories._id
+  history:
+    lineage:
+      - datalake_crm_raw.taskstatushistories.history
+  version:
+    lineage:
+      - datalake_crm_raw.taskstatushistories.__v
+  year:
+    lineage:
+      - datalake_crm_raw.taskstatushistories.year
+  month:
+    lineage:
+      - datalake_crm_raw.taskstatushistories.month
+  day:
+    lineage:
+      - datalake_crm_raw.taskstatushistories.day
