@@ -1,0 +1,114 @@
+---
+database_name: datalake_invoice
+table_name: credit_invoice_original_due_date
+columns:
+  id:
+    lineage:
+      - datalake_retsuko_clean.invoice.id
+  id_contract_retsuko:
+    lineage:
+      - datalake_retsuko_clean.invoice.id_contract
+  id_contract_ebdb:
+    lineage:
+      - datalake_ebdb_clean.contract.id
+  id_proposal:
+    lineage:
+      - datalake_ebdb_clean.contract.id_proposal
+  purpose:
+    lineage:
+      - datalake_retsuko_clean.invoice.purpose
+  account_type:
+    lineage:
+      - datalake_retsuko_clean.account.type
+  status:
+    lineage:
+      - datalake_retsuko_clean.invoice.status
+  due_amount:
+    lineage:
+      - datalake_retsuko_clean.invoice.due_amount
+  paid_amount:
+    lineage:
+      - datalake_retsuko_clean.invoice.paid_amount
+  late_days:
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+      - datalake_retsuko_clean.invoice.ts_paid
+  is_over_10:
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+      - datalake_retsuko_clean.invoice.ts_paid
+  is_over_15:
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+      - datalake_retsuko_clean.invoice.ts_paid
+  is_over_20:
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+      - datalake_retsuko_clean.invoice.ts_paid
+  is_over_30:
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+      - datalake_retsuko_clean.invoice.ts_paid
+  is_over_40:
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+      - datalake_retsuko_clean.invoice.ts_paid
+  is_over_50:
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+      - datalake_retsuko_clean.invoice.ts_paid
+  is_over_60:
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+      - datalake_retsuko_clean.invoice.ts_paid
+  is_over_70:
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+      - datalake_retsuko_clean.invoice.ts_paid
+  is_over_80:
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+      - datalake_retsuko_clean.invoice.ts_paid
+  is_over_90:
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+      - datalake_retsuko_clean.invoice.ts_paid
+  is_over_100:
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+      - datalake_retsuko_clean.invoice.ts_paid
+  is_over_110:
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+      - datalake_retsuko_clean.invoice.ts_paid
+  is_over_120:
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+      - datalake_retsuko_clean.invoice.ts_paid
+  is_over_140:
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+      - datalake_retsuko_clean.invoice.ts_paid
+  is_over_160:
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+      - datalake_retsuko_clean.invoice.ts_paid
+  is_over_180:
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+      - datalake_retsuko_clean.invoice.ts_paid
+  accrual_year_month:
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+  original_due_date:
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+  ts_paid:
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_paid
+  ts_signature:
+    lineage:
+      - datalake_retsuko_clean.contract.ts_signature
+  dt_contract_updated:
+    lineage:
+      - datalake_ebdb_clean.contract.ts_updated
