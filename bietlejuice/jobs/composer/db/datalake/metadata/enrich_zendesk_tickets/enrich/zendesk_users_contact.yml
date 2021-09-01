@@ -1,0 +1,102 @@
+database_name: datalake_zendesk_tickets
+table_name: zendesk_users_contact
+columns:
+  id_user:
+    lineage:
+      - datalake_ebdb_customer_contact_identification.customer_contact_identification.id_user
+  id_personal_document:
+    lineage:
+      - datalake_ebdb_customer_contact_identification.customer_contact_identification.cpf
+  id_zendesk_user:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.id_user
+  phone:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.phone
+  email:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.email
+  is_active:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.is_active
+  name:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.name
+  url_user:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.url_user
+  locale:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.locale
+  id_locale:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.id_locale
+  is_moderator:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.is_moderator
+  is_only_private_comments:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.is_only_private_comments
+  id_organization:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.id_organization
+  is_permanently_deleted:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.is_permanently_deleted
+  is_report_csv:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.is_report_csv
+  is_restricted_agent:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.is_restricted_agent
+  role:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.role
+  role_type:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.role_type
+  is_shared:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.is_shared
+  is_shared_agent:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.is_shared_agent
+  is_shared_phone_number:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.is_shared_phone_number
+  signature:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.signature
+  is_suspended:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.is_suspended
+  tags:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.tags
+  ticket_restriction:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.ticket_restriction
+  time_zone:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.time_zone
+  user_fields:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.user_fields
+  is_verified:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.is_verified
+  dt_extracted:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.dt_extracted
+  ts_last_login:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.ts_last_login
+  ts_created:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.ts_created
+  ts_created_local:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.ts_created_local
+  ts_updated:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.ts_updated

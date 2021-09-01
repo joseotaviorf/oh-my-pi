@@ -1,0 +1,10 @@
+database_name: datalake_zendesk_custom_fields
+table_name: custom_fields
+columns:
+  id_ticket:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.id_ticket
+  custom_fields:
+    lineage:
+      - datalake_zendesk_tickets_clean.ticket_fields.raw_title
+      - datalake_zendesk_tickets_clean.tickets.custom_fields

@@ -1,0 +1,91 @@
+database_name: datalake_zendesk_ticket_funnels
+table_name: ticket_funnel
+columns:
+  id_ticket:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.id_ticket
+  subject:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.subject
+  description:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.description
+  ticket_via:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.ticket_via
+  channel:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.ticket_via
+      - datalake_zendesk_tickets_clean.tickets.tags
+  group_name:
+    lineage:
+      - datalake_zendesk_tickets_clean.groups.name
+  priority:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.priority
+  recipient:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.recipient
+  tags:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.tags
+  status:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.status
+  has_public_comments:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.is_public
+  score:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.satisfaction_rating
+  reason:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.satisfaction_rating
+  comment:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.satisfaction_rating
+  custom_fields:
+    lineage:
+      - datalake_zendesk_custom_fields.custom_fields.custom_fields
+  request_type:
+    lineage:
+      - datalake_zendesk_custom_fields.custom_fields.custom_fields
+  client_type:
+    lineage:
+      - datalake_zendesk_custom_fields.custom_fields.custom_fields
+  step_tag:
+    lineage:
+      - datalake_zendesk_custom_fields.custom_fields.custom_fields
+  customer_type_tag:
+    lineage:
+      - datalake_zendesk_custom_fields.custom_fields.custom_fields
+  contact_motivation_tag:
+    lineage:
+      - datalake_zendesk_custom_fields.custom_fields.custom_fields
+  contact_theme_detail_tag:
+    lineage:
+      - datalake_zendesk_custom_fields.custom_fields.custom_fields
+  contact_theme_tag:
+    lineage:
+      - datalake_zendesk_custom_fields.custom_fields.custom_fields
+  ts_created:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.ts_created
+  ts_created_local:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.ts_created_local
+  ts_updated:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.ts_updated
+  ts_updated_local:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.ts_updated
+  year:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.ts_updated
+  month:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.ts_updated
+  day:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.ts_updated

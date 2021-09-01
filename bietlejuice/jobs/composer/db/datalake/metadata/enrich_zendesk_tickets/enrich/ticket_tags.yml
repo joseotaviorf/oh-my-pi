@@ -1,0 +1,24 @@
+database_name: datalake_zendesk_tickets
+table_name: ticket_tags
+columns:
+  id_ticket:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.id_ticket
+  ticket_tag:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.tags
+  ts_updated:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.ts_updated
+  tags:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.tags
+  year:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.ts_updated
+  month:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.ts_updated
+  day:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.ts_updated

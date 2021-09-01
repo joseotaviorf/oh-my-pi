@@ -1,0 +1,134 @@
+database_name: datalake_zendesk_ticket_funnels
+table_name: tickets_funnel_metrics
+columns:
+  id_ticket:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.id_ticket
+  id_house_listing:
+    lineage:
+      - datalake_ebdb_contract.contract_house.id_house_listing
+  id_contract:
+    lineage:
+      - datalake_ebdb_contract.contract_house.id_contract
+  id_user:
+    lineage:
+      - datalake_zendesk_tickets.zendesk_users_contact.id_user
+  id_personal_document:
+    lineage:
+      - datalake_zendesk_tickets.zendesk_users_contact.id_personal_document
+  id_client:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.client_type
+      - datalake_ebdb_contract.contract_house.id_client
+  id_owner:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.client_type
+      - datalake_ebdb_contract.contract_house.id_owner
+  id_zendesk_requester_user:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.id_zendesk_requester_user
+  id_zendesk_submitter_user:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.id_zendesk_submitter_user
+  id_zendesk_assignee_user:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.id_zendesk_assignee_user
+  id_session:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.id_session
+  id_call:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.id_call
+  total_group_stations:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.total_group_stations
+  total_assignee_stations:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.total_assignee_stations
+  minutes_reply_calendar:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.minutes_reply_calendar
+  minutes_reply_business:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.minutes_reply_business
+  minutes_first_resolution_calendar:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.minutes_first_resolution_calendar
+  minutes_first_resolution_business:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.minutes_first_resolution_business
+  minutes_requester_wait_calendar:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.minutes_requester_wait_calendar
+  minutes_requester_wait_business:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.minutes_requester_wait_business
+  minutes_agent_wait_calendar:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.minutes_agent_wait_calendar
+  minutes_agent_wait_business:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.minutes_agent_wait_business
+  minutes_on_hold_calendar:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.minutes_on_hold_calendar
+  minutes_on_hold_business:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.minutes_on_hold_business
+  minutes_full_resolution_calendar:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.minutes_full_resolution_calendar
+  minutes_full_resolution_business:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.minutes_full_resolution_business
+  reopens:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.reopens
+  replies:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.replies
+  ts_created:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.ts_created
+  ts_created_local:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.ts_created_local
+  ts_solved:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.ts_solved
+  ts_solved_local:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.ts_solved_local
+  ts_closed:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.ts_closed
+  ts_closed_local:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.ts_closed_local
+  ts_initially_assigned:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.ts_initially_assigned
+  ts_initially_assigned_local:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.ts_initially_assigned_local
+  ts_last_assigned:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.ts_last_assigned
+  ts_last_assigned_local:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.ts_last_assigned_local
+  ts_updated:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.ts_updated
+  ts_updated_local:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.ts_updated_local
+  year:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.ts_updated
+  month:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.ts_updated
+  day:
+    lineage:
+      - datalake_zendesk_tickets.ticket_measurements.ts_updated

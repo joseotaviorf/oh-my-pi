@@ -1,0 +1,30 @@
+database_name: datalake_zendesk_tickets
+table_name: ticket_contact_types
+columns:
+  id_ticket:
+    lineage:
+      - datalake_zendesk_custom_fields.custom_fields.id_ticket
+  contact_type_tag:
+    lineage:
+      - datalake_zendesk_custom_fields.custom_fields.custom_fields
+  client_taxonomy:
+    lineage:
+      - datalake_zendesk_custom_fields.custom_fields.custom_fields
+  category_taxonomy:
+    lineage:
+      - datalake_zendesk_custom_fields.custom_fields.custom_fields
+  has_valid_prefix:
+    lineage:
+      - datalake_zendesk_custom_fields.custom_fields.custom_fields
+  ts_updated:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.ts_updated
+  year:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.ts_updated
+  month:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.ts_updated
+  day:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.ts_updated

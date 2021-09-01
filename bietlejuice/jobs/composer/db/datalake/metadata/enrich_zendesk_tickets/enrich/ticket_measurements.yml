@@ -1,0 +1,125 @@
+database_name: datalake_zendesk_tickets
+table_name: ticket_measurements
+columns:
+  id_ticket:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.id_ticket
+  id_house:
+    lineage:
+      - datalake_zendesk_custom_fields.custom_fields.custom_fields
+  id_contract:
+    lineage:
+      - datalake_zendesk_custom_fields.custom_fields.custom_fields
+  id_session:
+    lineage:
+      - datalake_zendesk_custom_fields.custom_fields.custom_fields
+  id_call:
+    lineage:
+      - datalake_zendesk_custom_fields.custom_fields.custom_fields
+  client_type:
+    lineage:
+      - datalake_zendesk_custom_fields.custom_fields.custom_fields
+  total_group_stations:
+    lineage:
+      - datalake_zendesk_tickets_clean.ticket_metrics.group_stations
+  total_assignee_stations:
+    lineage:
+      - datalake_zendesk_tickets_clean.ticket_metrics.assignee_stations
+  minutes_reply_calendar:
+    lineage:
+      - datalake_zendesk_tickets_clean.ticket_metrics.minutes_reply_calendar
+  minutes_reply_business:
+    lineage:
+      - datalake_zendesk_tickets_clean.ticket_metrics.minutes_reply_business
+  minutes_first_resolution_business:
+    lineage:
+      - datalake_zendesk_tickets_clean.ticket_metrics.minutes_first_resolution_business
+  minutes_first_resolution_calendar:
+    lineage:
+      - datalake_zendesk_tickets_clean.ticket_metrics.minutes_first_resolution_calendar
+  minutes_requester_wait_business:
+    lineage:
+      - datalake_zendesk_tickets_clean.ticket_metrics.minutes_requester_wait_business
+  minutes_requester_wait_calendar:
+    lineage:
+      - datalake_zendesk_tickets_clean.ticket_metrics.minutes_requester_wait_calendar
+  minutes_agent_wait_business:
+    lineage:
+      - datalake_zendesk_tickets_clean.ticket_metrics.minutes_agent_wait_business
+  minutes_agent_wait_calendar:
+    lineage:
+      - datalake_zendesk_tickets_clean.ticket_metrics.minutes_agent_wait_calendar
+  minutes_on_hold_business:
+    lineage:
+      - datalake_zendesk_tickets_clean.ticket_metrics.minutes_on_hold_business
+  minutes_on_hold_calendar:
+    lineage:
+      - datalake_zendesk_tickets_clean.ticket_metrics.minutes_on_hold_calendar
+  minutes_full_resolution_business:
+    lineage:
+      - datalake_zendesk_tickets_clean.ticket_metrics.minutes_full_resolution_business
+  minutes_full_resolution_calendar:
+    lineage:
+      - datalake_zendesk_tickets_clean.ticket_metrics.minutes_full_resolution_calendar
+  reopens:
+    lineage:
+      - datalake_zendesk_tickets_clean.ticket_metrics.reopens
+  replies:
+    lineage:
+      - datalake_zendesk_tickets_clean.ticket_metrics.replies
+  ts_initially_assigned:
+    lineage:
+      - datalake_zendesk_tickets_clean.ticket_metrics.ts_initially_assigned
+  ts_initially_assigned_local:
+    lineage:
+      - datalake_zendesk_tickets_clean.ticket_metrics.ts_initially_assigned
+  ts_last_assigned:
+    lineage:
+      - datalake_zendesk_tickets_clean.ticket_metrics.ts_assigned
+  ts_last_assigned_local:
+    lineage:
+      - datalake_zendesk_tickets_clean.ticket_metrics.ts_assigned
+  ts_solved:
+    lineage:
+      - datalake_zendesk_tickets_clean.ticket_metrics.ts_solved
+  ts_solved_local:
+    lineage:
+      - datalake_zendesk_tickets_clean.ticket_metrics.ts_solved
+  tags:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.tags
+  id_zendesk_requester_user:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.id_requester
+  id_zendesk_submitter_user:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.id_submitter
+  id_zendesk_assignee_user:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.id_assignee
+  ts_created:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.ts_created
+  str_created_date:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.ts_created
+  ts_created_local:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.ts_created_local
+  ts_updated:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.ts_updated
+  ts_updated_local:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.ts_updated
+  ts_closed:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.status
+      - datalake_zendesk_tickets_clean.tickets.ts_updated
+  ts_closed_local:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.status
+      - datalake_zendesk_tickets_clean.tickets.ts_updated
+  ts_load:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.ts_load
