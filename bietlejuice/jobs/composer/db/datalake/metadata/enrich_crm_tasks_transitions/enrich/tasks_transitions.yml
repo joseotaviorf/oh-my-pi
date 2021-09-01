@@ -1,0 +1,56 @@
+database_name: datalake_crm_tasks_transitions
+table_name: tasks_transitions
+columns:
+  id_transition:
+    lineage:
+      - datalake_crm.workflows_transitions.id_transition
+  id_workflow:
+    lineage:
+      - datalake_crm.workflows_transitions.id_workflow
+  id_task_from:
+    lineage:
+      - datalake_crm.workflows_transitions.id_task_from
+  origin_type:
+    lineage:
+      - datalake_crm.tasks.type
+  id_task_to:
+    lineage:
+      - datalake_crm.workflows_transitions.id_task_to
+  destination_type:
+    lineage:
+      - datalake_crm.tasks.type
+  status:
+    lineage:
+      - datalake_crm.workflows_transitions.status
+  conclusion_option:
+    lineage:
+      - datalake_crm.workflows_transitions.release_minuta
+      - datalake_crm.workflows_transitions.owner_pendency
+      - datalake_crm.workflows_transitions.tenant_pendency
+      - datalake_crm.workflows_transitions.reject_proposal
+  conclusion_context:
+    lineage:
+      - datalake_crm.workflows_transitions.release_minuta
+      - datalake_crm.workflows_transitions.owner_pendency
+      - datalake_crm.workflows_transitions.tenant_pendency
+      - datalake_crm.workflows_transitions.reject_proposal
+  context:
+    lineage:
+      - datalake_crm.workflows_transitions.context
+  contact_channel:
+    lineage:
+      - datalake_crm.workflows_transitions.owner_contact_channel
+      - datalake_crm.workflows_transitions.frontend_contact_channel
+      - datalake_crm.workflows_transitions.tenant_contact_channel
+  ts_transitioned:
+    lineage:
+      - datalake_crm.workflows_transitions.ts_transitioned
+  year:
+    lineage:
+      - datalake_crm.workflows_transitions.year
+  month:
+    lineage:
+      - datalake_crm.workflows_transitions.month
+  day:
+    lineage:
+      - datalake_crm.workflows_transitions.day

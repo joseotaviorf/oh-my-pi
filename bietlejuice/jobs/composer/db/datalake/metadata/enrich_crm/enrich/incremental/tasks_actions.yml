@@ -1,0 +1,39 @@
+database_name: datalake_crm
+table_name: tasks_actions
+columns:
+  id:
+    lineage:
+      - datalake_crm_clean.tasks.actions
+  id_task:
+    lineage:
+      - datalake_crm_clean.tasks.id
+  id_user_action:
+    lineage:
+      - datalake_crm_clean.tasks.actions
+  action_user_name:
+    lineage:
+      - datalake_crm_clean.tasks.actions
+  action_type:
+    lineage:
+      - datalake_crm_clean.tasks.actions
+  metadata_key:
+    lineage:
+      - datalake_crm_clean.tasks.actions
+  metadata_old_value:
+    lineage:
+      - datalake_crm_clean.tasks.actions
+  notification_source:
+    lineage:
+      - datalake_crm_clean.tasks.actions
+  ts_action:
+    lineage:
+      - datalake_crm_clean.tasks.actions
+  year:
+    lineage:
+      - datalake_crm_clean.tasks.year
+  month:
+    lineage:
+      - datalake_crm_clean.tasks.month
+  day:
+    lineage:
+      - datalake_crm_clean.tasks.day

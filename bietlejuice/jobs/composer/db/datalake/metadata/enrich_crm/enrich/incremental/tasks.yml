@@ -1,0 +1,134 @@
+database_name: datalake_crm
+table_name: tasks
+columns:
+  id:
+    lineage:
+      - datalake_crm_clean.tasks.id
+  id_rent_flow:
+    lineage:
+      - datalake_crm_clean.tasks.metadata
+  id_origin:
+    lineage:
+      - datalake_crm_clean.tasks.id_origin
+  id_assignee:
+    lineage:
+      - datalake_crm_clean.tasks.id_assignee
+  id_house:
+    lineage:
+      - datalake_crm_clean.tasks.metadata
+      - datalake_crm_clean.tasks.id_house
+  id_owner:
+    lineage:
+      - datalake_crm_clean.tasks.id_owner
+      - datalake_crm_clean.tasks.metadata
+  id_opened_by:
+    lineage:
+      - datalake_crm_clean.tasks.id_opened_by
+  id_receiver:
+    lineage:
+      - datalake_crm_clean.tasks.id_receiver
+      - datalake_crm_clean.tasks.metadata
+  id_negotiation:
+    lineage:
+      - datalake_crm_clean.tasks.id_negotiation
+      - datalake_crm_clean.tasks.metadata
+  id_tenant:
+    lineage:
+      - datalake_crm_clean.tasks.id_tenant
+      - datalake_crm_clean.tasks.metadata
+  id_manager:
+    lineage:
+      - datalake_crm_clean.tasks.id_manager
+      - datalake_crm_clean.tasks.metadata
+  id_workgroup:
+    lineage:
+      - datalake_crm_clean.tasks.metadata
+  id_contract:
+    lineage:
+      - datalake_crm_clean.tasks.metadata
+  id_state:
+    lineage:
+      - datalake_crm_clean.tasks.metadata
+  version:
+    lineage:
+      - datalake_crm_clean.tasks.version
+  score_factor:
+    lineage:
+      - datalake_crm_clean.tasks.score_factor
+  receiver_name:
+    lineage:
+      - datalake_crm_clean.tasks.receiver_name
+      - datalake_crm_clean.tasks.metadata
+  receiver_label:
+    lineage:
+      - datalake_crm_clean.tasks.metadata
+  task_comment:
+    lineage:
+      - datalake_crm_clean.tasks.task_comment
+      - datalake_crm_clean.tasks.metadata
+  score:
+    lineage:
+      - datalake_crm_clean.tasks.score
+  origin:
+    lineage:
+      - datalake_crm_clean.tasks.origin
+      - datalake_crm_clean.tasks.metadata
+  type:
+    lineage:
+      - datalake_crm_clean.tasks.type
+  receiver_type:
+    lineage:
+      - datalake_crm_clean.tasks.receiver_type
+  description:
+    lineage:
+      - datalake_crm_clean.tasks.description
+      - datalake_crm_clean.tasks.metadata
+  phase:
+    lineage:
+      - datalake_crm_clean.tasks.phase
+      - datalake_crm_clean.tasks.metadata
+  visit_fup:
+    lineage:
+      - datalake_crm_clean.tasks.visit_fup
+  subject:
+    lineage:
+      - datalake_crm_clean.tasks.metadata
+  tags:
+    lineage:
+      - datalake_crm_clean.tasks.tags
+  is_resolved:
+    lineage:
+      - datalake_crm_clean.tasks.is_resolved
+  ts_completed:
+    lineage:
+      - datalake_crm_clean.tasks.completed_date_object
+  ts_silenced_until:
+    lineage:
+      - datalake_crm_clean.tasks.silenced_until_date_object
+  ts_start:
+    lineage:
+      - datalake_crm_clean.tasks.start_date_object
+  dt_visit:
+    lineage:
+      - datalake_crm_clean.tasks.dt_visit
+      - datalake_crm_clean.tasks.metadata
+  ts_created:
+    lineage:
+      - datalake_crm_clean.tasks.created_date_object
+      - datalake_crm_clean.tasks.metadata
+  ts_origin:
+    lineage:
+      - datalake_crm_clean.tasks.origin_date_object
+  ts_fup:
+    lineage:
+      - datalake_crm_clean.tasks.unix_fup
+      - datalake_crm_clean.tasks.metadata
+  year:
+    lineage:
+      - datalake_crm_clean.tasks.year
+  month:
+    lineage:
+      - datalake_crm_clean.tasks.month
+  day:
+    lineage:
+      - datalake_crm_clean.tasks.day

@@ -1,0 +1,75 @@
+database_name: datalake_crm
+table_name: workflows_transitions
+columns:
+  id_transition:
+    lineage:
+      - datalake_crm_clean.workflows.transitions
+  id_workflow:
+    lineage:
+      - datalake_crm_clean.workflows.id
+  id_task_from:
+    lineage:
+      - datalake_crm_clean.workflows.transitions
+  id_task_to:
+    lineage:
+      - datalake_crm_clean.workflows.transitions
+  status:
+    lineage:
+      - datalake_crm_clean.workflows.status
+  assignment_method:
+    lineage:
+      - datalake_crm_clean.workflows.transitions
+  definition_task_from:
+    lineage:
+      - datalake_crm_clean.workflows.transitions
+  definition_task_to:
+    lineage:
+      - datalake_crm_clean.workflows.transitions
+  context:
+    lineage:
+      - datalake_crm_clean.workflows.transitions
+  release_minuta:
+    lineage:
+      - datalake_crm_clean.workflows.transitions
+  owner_pendency:
+    lineage:
+      - datalake_crm_clean.workflows.transitions
+  tenant_pendency:
+    lineage:
+      - datalake_crm_clean.workflows.transitions
+  reject_proposal:
+    lineage:
+      - datalake_crm_clean.workflows.transitions
+  owner_contact_channel:
+    lineage:
+      - datalake_crm_clean.workflows.transitions
+  frontend_contact_channel:
+    lineage:
+      - datalake_crm_clean.workflows.transitions
+  tenant_contact_channel:
+    lineage:
+      - datalake_crm_clean.workflows.transitions
+  is_end_of_workflow:
+    lineage:
+      - datalake_crm_clean.workflows.transitions
+  ts_workflow_started:
+    lineage:
+      - datalake_crm_clean.workflows.start_date_object
+  ts_workflow_updated:
+    lineage:
+      - datalake_crm_clean.workflows.updated_date_object
+  ts_workflow_ended:
+    lineage:
+      - datalake_crm_clean.workflows.end_date_object
+  ts_transitioned:
+    lineage:
+      - datalake_crm_clean.workflows.transitions
+  year:
+    lineage:
+      - datalake_crm_clean.workflows.year
+  month:
+    lineage:
+      - datalake_crm_clean.workflows.month
+  day:
+    lineage:
+      - datalake_crm_clean.workflows.day

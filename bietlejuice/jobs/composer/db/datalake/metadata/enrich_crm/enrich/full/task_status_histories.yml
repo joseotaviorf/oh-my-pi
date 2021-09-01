@@ -1,0 +1,42 @@
+database_name: datalake_crm
+table_name: task_status_histories
+columns:
+  id:
+    lineage:
+      - datalake_crm_clean.task_status_histories.history
+  id_task:
+    lineage:
+      - datalake_crm_clean.task_status_histories.id
+  id_user_action:
+    lineage:
+      - datalake_crm_clean.task_status_histories.history
+  id_assignee:
+    lineage:
+      - datalake_crm_clean.task_status_histories.history
+  action_user_name:
+    lineage:
+      - datalake_crm_clean.task_status_histories.history
+  action_type:
+    lineage:
+      - datalake_crm_clean.task_status_histories.history
+  action_reason:
+    lineage:
+      - datalake_crm_clean.task_status_histories.history
+  task_status:
+    lineage:
+      - datalake_crm_clean.task_status_histories.history
+  version:
+    lineage:
+      - datalake_crm_clean.task_status_histories.version
+  ts_action:
+    lineage:
+      - datalake_crm_clean.task_status_histories.history
+  year:
+    lineage:
+      - datalake_crm_clean.task_status_histories.history
+  month:
+    lineage:
+      - datalake_crm_clean.task_status_histories.history
+  day:
+    lineage:
+      - datalake_crm_clean.task_status_histories.history

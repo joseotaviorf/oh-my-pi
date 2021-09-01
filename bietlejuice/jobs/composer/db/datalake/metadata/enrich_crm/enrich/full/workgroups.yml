@@ -1,0 +1,12 @@
+database_name: datalake_crm
+table_name: workgroups
+columns:
+  id:
+    lineage:
+      - datalake_crm_clean.workgroups.id
+  task_type:
+    lineage:
+      - datalake_crm_clean.workgroups.task_types
+  title:
+    lineage:
+      - datalake_crm_clean.workgroups.title

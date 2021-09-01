@@ -1,0 +1,156 @@
+database_name: datalake_crm_tasks_resolution
+table_name: tasks_resolution_history
+columns:
+  id_task:
+    lineage:
+      - datalake_crm.tasks.id
+  id_action:
+    lineage:
+      - datalake_crm.task_status_histories.id
+      - datalake_crm.tasks_actions.id
+  id_user_action:
+    lineage:
+      - datalake_crm.task_status_histories.id_user_action
+      - datalake_crm.tasks_actions.id_user_action
+  id_assignee:
+    lineage:
+      - datalake_crm.tasks.id_assignee
+  id_house:
+    lineage:
+      - datalake_crm.tasks.id_house
+  id_rent_flow:
+    lineage:
+      - datalake_crm.tasks.id_rent_flow
+  id_origin:
+    lineage:
+      - datalake_crm.tasks.id_origin
+  id_opened_by:
+    lineage:
+      - datalake_crm.tasks.id_opened_by
+  id_tenant:
+    lineage:
+      - datalake_crm.tasks.id_tenant
+  id_negotiation:
+    lineage:
+      - datalake_crm.tasks.id_negotiation
+  id_manager:
+    lineage:
+      - datalake_crm.tasks.id_manager
+  id_owner:
+    lineage:
+      - datalake_crm.tasks.id_owner
+  id_receiver:
+    lineage:
+      - datalake_crm.tasks.id_receiver
+  id_workgroup:
+    lineage:
+      - datalake_crm.tasks.id_workgroup
+  task_status:
+    lineage:
+      - datalake_crm.task_status_histories.task_status
+  action_reason:
+    lineage:
+      - datalake_crm.task_status_histories.action_reason
+  action_user_name:
+    lineage:
+      - datalake_crm.task_status_histories.action_user_name
+      - datalake_crm.tasks_actions.action_user_name
+  action_type:
+    lineage:
+      - datalake_crm.task_status_histories.action_type
+      - datalake_crm.tasks_actions.action_type
+  type:
+    lineage:
+      - datalake_crm.tasks.type
+  version:
+    lineage:
+      - datalake_crm.tasks.version
+  tags:
+    lineage:
+      - datalake_crm.tasks.tags
+  score:
+    lineage:
+      - datalake_crm.tasks.score
+  score_factor:
+    lineage:
+      - datalake_crm.tasks.score_factor
+  receiver_name:
+    lineage:
+      - datalake_crm.tasks.receiver_name
+  receiver_type:
+    lineage:
+      - datalake_crm.tasks.receiver_type
+  task_comment:
+    lineage:
+      - datalake_crm.tasks.task_comment
+  origin:
+    lineage:
+      - datalake_crm.tasks.origin
+  description:
+    lineage:
+      - datalake_crm.tasks.description
+  phase:
+    lineage:
+      - datalake_crm.tasks.phase
+  subject:
+    lineage:
+      - datalake_crm.tasks.subject
+  visit_fup:
+    lineage:
+      - datalake_crm.tasks.visit_fup
+  task_user_resolve_hours:
+    lineage:
+      - datalake_crm.task_status_histories.action_user_name
+      - datalake_crm.task_status_histories.ts_action
+      - datalake_crm.tasks_actions.ts_action
+      - datalake_crm.tasks.id
+  is_resolved:
+    lineage:
+      - datalake_crm.tasks.is_resolved
+  ts_action:
+    lineage:
+      - datalake_crm.task_status_histories.ts_action
+      - datalake_crm.tasks_actions.ts_action
+  ts_previous_action:
+    lineage:
+      - datalake_crm.task_status_histories.ts_action
+      - datalake_crm.tasks_actions.ts_action
+      - datalake_crm.tasks.id
+  ts_next_action:
+    lineage:
+      - datalake_crm.task_status_histories.ts_action
+      - datalake_crm.tasks_actions.ts_action
+      - datalake_crm.tasks.id
+  ts_created:
+    lineage:
+      - datalake_crm.tasks.ts_created
+  ts_start:
+    lineage:
+      - datalake_crm.tasks.ts_start
+  ts_completed:
+    lineage:
+      - datalake_crm.tasks.ts_completed
+  dt_visit:
+    lineage:
+      - datalake_crm.tasks.dt_visit
+  ts_silenced_until:
+    lineage:
+      - datalake_crm.tasks.ts_silenced_until
+  ts_origin:
+    lineage:
+      - datalake_crm.tasks.ts_origin
+  ts_fup:
+    lineage:
+      - datalake_crm.tasks.ts_fup
+  year:
+    lineage:
+      - datalake_crm.task_status_histories.year
+      - datalake_crm.tasks_actions.year
+  month:
+    lineage:
+      - datalake_crm.task_status_histories.month
+      - datalake_crm.tasks_actions.month
+  day:
+    lineage:
+      - datalake_crm.task_status_histories.day
+      - datalake_crm.tasks_actions.day
