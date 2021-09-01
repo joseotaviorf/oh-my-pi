@@ -1,0 +1,57 @@
+database_name: datalake_sauron_clean
+table_name: session
+columns:
+  id:
+    lineage:
+      - datalake_sauron_raw.session.id
+  agent:
+    lineage:
+      - datalake_sauron_raw.session.agent
+  status:
+    lineage:
+      - datalake_sauron_raw.session.status
+  user_data:
+    lineage:
+      - datalake_sauron_raw.session.user_data
+  user_phone:
+    lineage:
+      - datalake_sauron_raw.session.user_phone
+  source:
+    lineage:
+      - datalake_sauron_raw.session.source
+  source_environment:
+    lineage:
+      - datalake_sauron_raw.session.source_env
+  department:
+    lineage:
+      - datalake_sauron_raw.session.department
+  tags:
+    lineage:
+      - datalake_sauron_raw.session.tags
+  context:
+    lineage:
+      - datalake_sauron_raw.session.context
+  created_by:
+    lineage:
+      - datalake_sauron_raw.session.created_by
+  ts_last_message:
+    lineage:
+      - datalake_sauron_raw.session.last_message_at
+  ts_first_message:
+    lineage:
+      - datalake_sauron_raw.session.first_message_at
+  ts_created:
+    lineage:
+      - datalake_sauron_raw.session.created_at
+  ts_updated:
+    lineage:
+      - datalake_sauron_raw.session.updated_at
+  year:
+    lineage:
+      - datalake_sauron_raw.session.year
+  month:
+    lineage:
+      - datalake_sauron_raw.session.month
+  day:
+    lineage:
+      - datalake_sauron_raw.session.day

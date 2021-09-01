@@ -1,0 +1,39 @@
+database_name: datalake_sauron_clean
+table_name: bot_outgoing_messages
+columns:
+  id:
+    lineage:
+      - datalake_sauron_raw.botoutgoingmessages.id
+  id_session:
+    lineage:
+      - datalake_sauron_raw.botoutgoingmessages.session_id
+  id_message:
+    lineage:
+      - datalake_sauron_raw.botoutgoingmessages.message_id
+  message_payload:
+    lineage:
+      - datalake_sauron_raw.botoutgoingmessages.message_payload
+  bot_response:
+    lineage:
+      - datalake_sauron_raw.botoutgoingmessages.bot_response
+  user_phone:
+    lineage:
+      - datalake_sauron_raw.botoutgoingmessages.user_phone
+  year_month:
+    lineage:
+      - datalake_sauron_raw.botoutgoingmessages.year_month
+  ts_created:
+    lineage:
+      - datalake_sauron_raw.botoutgoingmessages.created_at
+  ts_updated:
+    lineage:
+      - datalake_sauron_raw.botoutgoingmessages.updated_at
+  year:
+    lineage:
+      - datalake_sauron_raw.botoutgoingmessages.year
+  month:
+    lineage:
+      - datalake_sauron_raw.botoutgoingmessages.month
+  day:
+    lineage:
+      - datalake_sauron_raw.botoutgoingmessages.day
