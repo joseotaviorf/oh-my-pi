@@ -1,0 +1,22 @@
+---
+database_name: datalake_braze_events_clean
+table_name: events_indica_ai
+columns:
+  id:
+    lineage:
+      - datalake_braze_events_raw.events_indica_ai.id
+  event_info:
+    lineage:
+      - datalake_braze_events_raw.events_indica_ai.event_info
+  event_type:
+    lineage:
+      - datalake_braze_events_raw.events_indica_ai.event_type
+  year:
+    lineage:
+      - datalake_braze_events_raw.events_indica_ai.year
+  month:
+    lineage:
+      - datalake_braze_events_raw.events_indica_ai.month
+  day:
+    lineage:
+      - datalake_braze_events_raw.events_indica_ai.day

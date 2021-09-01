@@ -19,6 +19,7 @@ For more information about how to setup these integrations, please refer to [thi
 
 Currently, the output tables are the following:
 
+- `events_indica_ai`
 - `events_owners`
 - `events_tenants`
 

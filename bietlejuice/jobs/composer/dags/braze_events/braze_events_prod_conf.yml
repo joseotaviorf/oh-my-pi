@@ -3,6 +3,7 @@
 app_groups_list:
   - tenants
   - owners
+  - indica_ai
 clean_partition_cols:
   - event_type
   - year
