@@ -1,0 +1,42 @@
+database_name: datalake_sales_flow_clean
+table_name: address_data
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_raw.address_data.id
+  street:
+    lineage:
+      - datalake_sales_flow_raw.address_data.street
+  number:
+    lineage:
+      - datalake_sales_flow_raw.address_data.number
+  complement:
+    lineage:
+      - datalake_sales_flow_raw.address_data.complement
+  neighborhood:
+    lineage:
+      - datalake_sales_flow_raw.address_data.neighborhood
+  city:
+    lineage:
+      - datalake_sales_flow_raw.address_data.city
+  state:
+    lineage:
+      - datalake_sales_flow_raw.address_data.state
+  zip_code:
+    lineage:
+      - datalake_sales_flow_raw.address_data.zip_code
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.address_data.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.address_data.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.address_data.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.address_data.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.address_data.day

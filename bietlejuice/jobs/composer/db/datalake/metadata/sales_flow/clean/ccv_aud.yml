@@ -1,0 +1,72 @@
+database_name: datalake_sales_flow_clean
+table_name: ccv_aud
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_raw.ccv_aud.id
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_raw.ccv_aud.sales_flow_id
+  id_house:
+    lineage:
+      - datalake_sales_flow_raw.ccv_aud.house_id
+  signed_document_token:
+    lineage:
+      - datalake_sales_flow_raw.ccv_aud.signed_document_token
+  unsigned_document_token:
+    lineage:
+      - datalake_sales_flow_raw.ccv_aud.unsigned_document_token
+  sale_price:
+    lineage:
+      - datalake_sales_flow_raw.ccv_aud.sale_value
+  status:
+    lineage:
+      - datalake_sales_flow_raw.ccv_aud.status
+  rev:
+    lineage:
+      - datalake_sales_flow_raw.ccv_aud.rev
+  rev_type:
+    lineage:
+      - datalake_sales_flow_raw.ccv_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_sales_flow_raw.ccv_aud.revend
+  mod_id_sales_flow:
+    lineage:
+      - datalake_sales_flow_raw.ccv_aud.sales_flow_id_mod
+  mod_id_house:
+    lineage:
+      - datalake_sales_flow_raw.ccv_aud.house_id_mod
+  mod_signed_document_token:
+    lineage:
+      - datalake_sales_flow_raw.ccv_aud.signed_document_token_mod
+  mod_unsigned_document_token:
+    lineage:
+      - datalake_sales_flow_raw.ccv_aud.unsigned_document_token_mod
+  mod_sale_price:
+    lineage:
+      - datalake_sales_flow_raw.ccv_aud.sale_value_mod
+  mod_status:
+    lineage:
+      - datalake_sales_flow_raw.ccv_aud.status_mod
+  mod_ts_signed:
+    lineage:
+      - datalake_sales_flow_raw.ccv_aud.signed_at_mod
+  ts_signed:
+    lineage:
+      - datalake_sales_flow_raw.ccv_aud.signed_at
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.ccv_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.ccv_aud.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.ccv_aud.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.ccv_aud.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.ccv_aud.day

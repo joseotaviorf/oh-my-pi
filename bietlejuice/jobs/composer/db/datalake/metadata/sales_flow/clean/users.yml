@@ -1,0 +1,30 @@
+database_name: datalake_sales_flow_clean
+table_name: users
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_raw.users.id
+  id_external:
+    lineage:
+      - datalake_sales_flow_raw.users.external_id
+  name:
+    lineage:
+      - datalake_sales_flow_raw.users.name
+  email:
+    lineage:
+      - datalake_sales_flow_raw.users.email
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.users.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.users.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.users.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.users.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.users.day

@@ -1,0 +1,36 @@
+database_name: datalake_sales_flow_clean
+table_name: visit_lead_aud
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_raw.visit_lead_aud.id
+  rev:
+    lineage:
+      - datalake_sales_flow_raw.visit_lead_aud.rev
+  rev_type:
+    lineage:
+      - datalake_sales_flow_raw.visit_lead_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_sales_flow_raw.visit_lead_aud.revend
+  data:
+    lineage:
+      - datalake_sales_flow_raw.visit_lead_aud.data
+  mod_data:
+    lineage:
+      - datalake_sales_flow_raw.visit_lead_aud.data_mod
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.visit_lead_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.visit_lead_aud.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.visit_lead_aud.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.visit_lead_aud.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.visit_lead_aud.day

@@ -1,0 +1,36 @@
+database_name: datalake_sales_flow_clean
+table_name: sales_flow
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow.id
+  id_buyer:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow.buyer_id
+  id_seller:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow.seller_id
+  id_house:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow.house_id
+  id_monday:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow.monday_id
+  status:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow.status
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow.day

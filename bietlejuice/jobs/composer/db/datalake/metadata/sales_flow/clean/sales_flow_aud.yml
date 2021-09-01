@@ -1,0 +1,60 @@
+database_name: datalake_sales_flow_clean
+table_name: sales_flow_aud
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.id
+  id_buyer:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.buyer_id
+  id_seller:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.seller_id
+  id_house:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.house_id
+  id_monday:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.monday_id
+  status:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.status
+  rev:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.rev
+  rev_type:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.revend
+  mod_id_buyer:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.buyer_id_mod
+  mod_id_seller:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.seller_id_mod
+  mod_id_house:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.house_id_mod
+  mod_id_monday:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.monday_id_mod
+  mod_status:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.status_mod
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.day

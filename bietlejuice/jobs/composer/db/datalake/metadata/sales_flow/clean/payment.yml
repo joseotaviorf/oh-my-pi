@@ -1,0 +1,30 @@
+database_name: datalake_sales_flow_clean
+table_name: payment
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_raw.payment.id
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_raw.payment.sales_flow_id
+  payment_method:
+    lineage:
+      - datalake_sales_flow_raw.payment.payment_method
+  payment_model:
+    lineage:
+      - datalake_sales_flow_raw.payment.payment_model
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.payment.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.payment.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.payment.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.payment.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.payment.day

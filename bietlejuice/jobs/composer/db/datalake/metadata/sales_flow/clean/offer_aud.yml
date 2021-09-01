@@ -1,0 +1,48 @@
+database_name: datalake_sales_flow_clean
+table_name: offer_aud
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_raw.offer_aud.id
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_raw.offer_aud.sales_flow_id
+  rev:
+    lineage:
+      - datalake_sales_flow_raw.offer_aud.rev
+  rev_type:
+    lineage:
+      - datalake_sales_flow_raw.offer_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_sales_flow_raw.offer_aud.revend
+  id_firestore:
+    lineage:
+      - datalake_sales_flow_raw.offer_aud.firestore_id
+  status:
+    lineage:
+      - datalake_sales_flow_raw.offer_aud.status
+  mod_id_sales_flow:
+    lineage:
+      - datalake_sales_flow_raw.offer_aud.sales_flow_id_mod
+  mod_id_firestore:
+    lineage:
+      - datalake_sales_flow_raw.offer_aud.firestore_id_mod
+  mod_status:
+    lineage:
+      - datalake_sales_flow_raw.offer_aud.status_mod
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.offer_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.offer_aud.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.offer_aud.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.offer_aud.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.offer_aud.day

@@ -1,0 +1,30 @@
+database_name: datalake_sales_flow_clean
+table_name: offer
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_raw.offer.id
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_raw.offer.sales_flow_id
+  id_firestore:
+    lineage:
+      - datalake_sales_flow_raw.offer.firestore_id
+  status:
+    lineage:
+      - datalake_sales_flow_raw.offer.status
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.offer.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.offer.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.offer.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.offer.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.offer.day

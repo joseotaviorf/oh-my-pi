@@ -1,0 +1,48 @@
+database_name: datalake_sales_flow_clean
+table_name: payment_aud
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.id
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.sales_flow_id
+  rev:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.rev
+  rev_type:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.revend
+  payment_method:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.payment_method
+  payment_model:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.payment_model
+  mod_id_sales_flow:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.sales_flow_id_mod
+  mod_payment_method:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.payment_method_mod
+  mod_payment_model:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.payment_model_mod
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.day

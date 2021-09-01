@@ -1,0 +1,30 @@
+database_name: datalake_sales_flow_clean
+table_name: user_sample
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_raw.user_sample.id
+  name:
+    lineage:
+      - datalake_sales_flow_raw.user_sample.name
+  email:
+    lineage:
+      - datalake_sales_flow_raw.user_sample.email
+  main_phone:
+    lineage:
+      - datalake_sales_flow_raw.user_sample.main_phone
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.user_sample.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.user_sample.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.user_sample.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.user_sample.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.user_sample.day

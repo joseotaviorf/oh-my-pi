@@ -1,0 +1,27 @@
+database_name: datalake_sales_flow_clean
+table_name: house
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_raw.house.id
+  id_external:
+    lineage:
+      - datalake_sales_flow_raw.house.external_id
+  id_address_data:
+    lineage:
+      - datalake_sales_flow_raw.house.address_data_id
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.house.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.house.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.house.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.house.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.house.day

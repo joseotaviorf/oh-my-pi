@@ -1,0 +1,42 @@
+database_name: datalake_sales_flow_clean
+table_name: house_aud
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_raw.house_aud.id
+  id_external:
+    lineage:
+      - datalake_sales_flow_raw.house_aud.external_id
+  id_address_data:
+    lineage:
+      - datalake_sales_flow_raw.house_aud.address_data_id
+  rev:
+    lineage:
+      - datalake_sales_flow_raw.house_aud.rev
+  rev_type:
+    lineage:
+      - datalake_sales_flow_raw.house_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_sales_flow_raw.house_aud.revend
+  mod_id_external:
+    lineage:
+      - datalake_sales_flow_raw.house_aud.external_id_mod
+  mod_id_address_data:
+    lineage:
+      - datalake_sales_flow_raw.house_aud.address_data_id_mod
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.house_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.house_aud.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.house_aud.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.house_aud.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.house_aud.day
