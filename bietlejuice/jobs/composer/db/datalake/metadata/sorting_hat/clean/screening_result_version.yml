@@ -1,0 +1,24 @@
+database_name: datalake_sorting_hat_clean
+table_name: screening_result_version
+columns:
+  id:
+    lineage:
+      - datalake_sorting_hat_raw.screeningresultversion.id
+  id_screening_result:
+    lineage:
+      - datalake_sorting_hat_raw.screeningresultversion.screening_result_id
+  score:
+    lineage:
+      - datalake_sorting_hat_raw.screeningresultversion.score
+  risk_category:
+    lineage:
+      - datalake_sorting_hat_raw.screeningresultversion.risk_category
+  liquidity:
+    lineage:
+      - datalake_sorting_hat_raw.screeningresultversion.liquidity
+  id_proposal:
+    lineage:
+      - datalake_sorting_hat_raw.screeningresultversion.proposal_id
+  ts_versioned:
+    lineage:
+      - datalake_sorting_hat_raw.screeningresultversion.versioned_at

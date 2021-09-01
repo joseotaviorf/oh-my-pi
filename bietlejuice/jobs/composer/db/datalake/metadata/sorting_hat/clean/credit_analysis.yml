@@ -1,0 +1,51 @@
+database_name: datalake_sorting_hat_clean
+table_name: credit_analysis
+columns:
+  id_credit_analysis:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis.id
+  id_analyst:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis.analyst_main_id
+  id_proposal:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis.proposal_id
+  id_variant:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis.variant_id
+  level:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis.level
+  type:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis.type
+  result:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis.result
+  reason:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis.reason
+  comment:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis.comment
+  analyst_name:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis.analyst_name
+  category:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis.category
+  automatic_decision_reason:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis.automatic_decision_reason
+  bypass:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis.bypass
+  is_a_potential_interview:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis.should_interview
+  ts_created:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis.created_at
+  ts_updated:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis.updated_at

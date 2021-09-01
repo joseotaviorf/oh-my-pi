@@ -1,0 +1,12 @@
+database_name: datalake_sorting_hat_clean
+table_name: user
+columns:
+  id:
+    lineage:
+      - datalake_sorting_hat_raw.user.id
+  name:
+    lineage:
+      - datalake_sorting_hat_raw.user.name
+  email:
+    lineage:
+      - datalake_sorting_hat_raw.user.email

@@ -1,0 +1,18 @@
+database_name: datalake_sorting_hat_clean
+table_name: variant
+columns:
+  id:
+    lineage:
+      - datalake_sorting_hat_raw.variant.id
+  id_experiment:
+    lineage:
+      - datalake_sorting_hat_raw.variant.experiment_id
+  name:
+    lineage:
+      - datalake_sorting_hat_raw.variant.name
+  description:
+    lineage:
+      - datalake_sorting_hat_raw.variant.description
+  percentage:
+    lineage:
+      - datalake_sorting_hat_raw.variant.percentage

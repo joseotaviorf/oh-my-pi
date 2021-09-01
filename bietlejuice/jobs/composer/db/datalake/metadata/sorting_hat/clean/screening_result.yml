@@ -1,0 +1,18 @@
+database_name: datalake_sorting_hat_clean
+table_name: screening_result
+columns:
+  id:
+    lineage:
+      - datalake_sorting_hat_raw.screeningresult.id
+  score:
+    lineage:
+      - datalake_sorting_hat_raw.screeningresult.score
+  risk_category:
+    lineage:
+      - datalake_sorting_hat_raw.screeningresult.risk_category
+  liquidity:
+    lineage:
+      - datalake_sorting_hat_raw.screeningresult.liquidity
+  id_proposal:
+    lineage:
+      - datalake_sorting_hat_raw.screeningresult.proposal_id

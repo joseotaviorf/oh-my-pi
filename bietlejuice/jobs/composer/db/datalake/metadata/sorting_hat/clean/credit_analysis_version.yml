@@ -1,0 +1,99 @@
+database_name: datalake_sorting_hat_clean
+table_name: credit_analysis_version
+columns:
+  id_credit_analysis_version:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.id
+  ts_created:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.created_at
+  ts_updated:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.updated_at
+  level:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.level
+  type:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.type
+  is_a_potential_interview:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.should_interview
+  result:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.result
+  reason:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.reason
+  comment:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.comment
+  analyst_name:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.analyst_name
+  id_analyst:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.analyst_main_id
+  id_proposal:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.proposal_id
+  id_transaction:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.transaction_id
+  id_end_transaction:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.end_transaction_id
+  operation_type:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.operation_type
+  category:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.category
+  mod_ts_created:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.created_at_mod
+  mod_ts_updated:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.updated_at_mod
+  mod_level:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.level_mod
+  mod_type:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.type_mod
+  mod_is_a_potential_interview:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.should_interview_mod
+  mod_result:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.result_mod
+  mod_reason:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.reason_mod
+  mod_comment:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.comment_mod
+  mod_analyst_name:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.analyst_name_mod
+  mod_id_analyst:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.analyst_main_id_mod
+  mod_id_proposal:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.proposal_id_mod
+  mod_category:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.category_mod
+  automatic_decision_reason:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.automatic_decision_reason
+  mod_automatic_decision_reason:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.automatic_decision_reason_mod
+  bypass:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.bypass
+  mod_bypass:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.bypass_mod

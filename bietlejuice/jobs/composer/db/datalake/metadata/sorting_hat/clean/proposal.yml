@@ -1,0 +1,108 @@
+database_name: datalake_sorting_hat_clean
+table_name: proposal
+columns:
+  id:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.id
+  id_house:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.imovel_id
+  ts_analyzed:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.analysis_date
+  score_5a:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.score_5a
+  score_5a_best_subset:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.score_5a_best_subset
+  score_cardif:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.score_cardif
+  score_cardif_best_subset:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.score_cardif_best_subset
+  status:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.status
+  comment:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.comment
+  analyst_name:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.analyst_name
+  supervisor_name:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.supervisor_name
+  rent_value:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.rent_value
+  condo_value:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.condo_value
+  iptu_value:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.iptu_value
+  ts_created:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.created_at
+  ts_updated:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.updated_at
+  home_area:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.home_area
+  home_bathrooms:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.home_bathrooms
+  home_city:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.home_city
+  home_garages:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.home_garages
+  home_region:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.home_region
+  home_suites:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.home_suites
+  home_type:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.home_type
+  home_zipcode:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.home_zipcode
+  id_drive:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.drive_id
+  reason:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.reason
+  home_insurance_value:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.home_insurance_value
+  risk_level:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.risk_level
+  risk_level_best_subset:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.risk_level_best_subset
+  ts_processed:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.process_date
+  is_home_exclusive_5a:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.home_exclusive_5a
+  ts_home_last_published:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.home_last_published_at
+  has_bypassed_pre_analysis:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.bypass_pre_analysis
+  pre_analysis_result:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.pre_analysis_result
+  pre_analysis_reason:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.pre_analysis_reason

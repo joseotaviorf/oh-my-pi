@@ -1,0 +1,18 @@
+database_name: datalake_sorting_hat_clean
+table_name: experiment
+columns:
+  id:
+    lineage:
+      - datalake_sorting_hat_raw.experiment.id
+  name:
+    lineage:
+      - datalake_sorting_hat_raw.experiment.name
+  description:
+    lineage:
+      - datalake_sorting_hat_raw.experiment.description
+  ts_started:
+    lineage:
+      - datalake_sorting_hat_raw.experiment.start_date
+  ts_ended:
+    lineage:
+      - datalake_sorting_hat_raw.experiment.end_date

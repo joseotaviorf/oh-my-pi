@@ -1,0 +1,18 @@
+database_name: datalake_sorting_hat_clean
+table_name: offer
+columns:
+  id:
+    lineage:
+      - datalake_sorting_hat_raw.offer.id
+  type:
+    lineage:
+      - datalake_sorting_hat_raw.offer.type
+  ts_approved:
+    lineage:
+      - datalake_sorting_hat_raw.offer.approved_at
+  id_firestore:
+    lineage:
+      - datalake_sorting_hat_raw.offer.firestore_id
+  id_proposal:
+    lineage:
+      - datalake_sorting_hat_raw.offer.proposal_id

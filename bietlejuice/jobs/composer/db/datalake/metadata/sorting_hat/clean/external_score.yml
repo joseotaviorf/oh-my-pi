@@ -1,0 +1,18 @@
+database_name: datalake_sorting_hat_clean
+table_name: external_score
+columns:
+  id:
+    lineage:
+      - datalake_sorting_hat_raw.externalscore.id
+  cpf:
+    lineage:
+      - datalake_sorting_hat_raw.externalscore.cpf
+  source:
+    lineage:
+      - datalake_sorting_hat_raw.externalscore.source
+  value:
+    lineage:
+      - datalake_sorting_hat_raw.externalscore.value
+  ts_created:
+    lineage:
+      - datalake_sorting_hat_raw.externalscore.created_at

@@ -1,0 +1,12 @@
+database_name: datalake_sorting_hat_clean
+table_name: proposal_error
+columns:
+  id:
+    lineage:
+      - datalake_sorting_hat_raw.proposalerror.id
+  error:
+    lineage:
+      - datalake_sorting_hat_raw.proposalerror.error
+  id_proposal:
+    lineage:
+      - datalake_sorting_hat_raw.proposalerror.proposal_id
