@@ -1,0 +1,48 @@
+database_name: datalake_wololo_clean
+table_name: prospect_aud
+columns:
+  id:
+    lineage:
+      - datalake_wololo_raw.prospect_aud.id
+  id_reference:
+    lineage:
+      - datalake_wololo_raw.prospect_aud.referenceid
+  id_dimension_entity:
+    lineage:
+      - datalake_wololo_raw.prospect_aud.dimensionentity_id
+  address:
+    lineage:
+      - datalake_wololo_raw.prospect_aud.address
+  rev:
+    lineage:
+      - datalake_wololo_raw.prospect_aud.rev
+  revtype:
+    lineage:
+      - datalake_wololo_raw.prospect_aud.revtype
+  revend:
+    lineage:
+      - datalake_wololo_raw.prospect_aud.revend
+  status:
+    lineage:
+      - datalake_wololo_raw.prospect_aud.status
+  whatsappoptedin:
+    lineage:
+      - datalake_wololo_raw.prospect_aud.whatsappoptedin
+  longtail:
+    lineage:
+      - datalake_wololo_raw.prospect_aud.longtail
+  mod_id_reference:
+    lineage:
+      - datalake_wololo_raw.prospect_aud.referenceid_mod
+  mod_longtail:
+    lineage:
+      - datalake_wololo_raw.prospect_aud.longtail_mod
+  mod_whatsappoptedin:
+    lineage:
+      - datalake_wololo_raw.prospect_aud.whatsappoptedin_mod
+  mod_dimension_entity:
+    lineage:
+      - datalake_wololo_raw.prospect_aud.dimensionentity_mod
+  mod_status:
+    lineage:
+      - datalake_wololo_raw.prospect_aud.status_mod

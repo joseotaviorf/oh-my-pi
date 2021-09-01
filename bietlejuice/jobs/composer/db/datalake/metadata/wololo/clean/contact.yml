@@ -1,0 +1,36 @@
+database_name: datalake_wololo_clean
+table_name: contact
+columns:
+  id:
+    lineage:
+      - datalake_wololo_raw.contact.id
+  id_prospect_reference:
+    lineage:
+      - datalake_wololo_raw.contact.prospectreferenceid
+  id_analyst:
+    lineage:
+      - datalake_wololo_raw.contact.analystid
+  id_external_call:
+    lineage:
+      - datalake_wololo_raw.contact.externalcallid
+  analyst_email:
+    lineage:
+      - datalake_wololo_raw.contact.analystemail
+  channel:
+    lineage:
+      - datalake_wololo_raw.contact.channel
+  sales_company:
+    lineage:
+      - datalake_wololo_raw.contact.salescompany
+  phone_output:
+    lineage:
+      - datalake_wololo_raw.contact.phoneoutput
+  phone_number:
+    lineage:
+      - datalake_wololo_raw.contact.phonenumber
+  duration_in_seconds:
+    lineage:
+      - datalake_wololo_raw.contact.durationinseconds
+  ts_contacted:
+    lineage:
+      - datalake_wololo_raw.contact.contactedat

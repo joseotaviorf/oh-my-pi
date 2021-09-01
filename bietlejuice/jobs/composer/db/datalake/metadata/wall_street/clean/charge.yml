@@ -1,0 +1,48 @@
+database_name: datalake_wall_street_clean
+table_name: charge
+columns:
+  id:
+    lineage:
+      - datalake_wall_street_raw.charge.id
+  acquire:
+    lineage:
+      - datalake_wall_street_raw.charge.acquire
+  id_acquire:
+    lineage:
+      - datalake_wall_street_raw.charge.acquireid
+  amount:
+    lineage:
+      - datalake_wall_street_raw.charge.amount
+  charge_status:
+    lineage:
+      - datalake_wall_street_raw.charge.chargestatus
+  code:
+    lineage:
+      - datalake_wall_street_raw.charge.code
+  id_customer:
+    lineage:
+      - datalake_wall_street_raw.charge.customerid
+  id_external:
+    lineage:
+      - datalake_wall_street_raw.charge.externalid
+  ts_updated:
+    lineage:
+      - datalake_wall_street_raw.charge.lastupdate
+  id_store:
+    lineage:
+      - datalake_wall_street_raw.charge.store_id
+  acquire_charge_status:
+    lineage:
+      - datalake_wall_street_raw.charge.acquirechargestatus
+  installments:
+    lineage:
+      - datalake_wall_street_raw.charge.installments
+  acquire_auth_code:
+    lineage:
+      - datalake_wall_street_raw.charge.acquireauthcode
+  acquire_nsu:
+    lineage:
+      - datalake_wall_street_raw.charge.acquirensu
+  id_acquire_transaction:
+    lineage:
+      - datalake_wall_street_raw.charge.acquiretid

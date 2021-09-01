@@ -1,0 +1,42 @@
+database_name: datalake_wall_street_clean
+table_name: charge_aud
+columns:
+  id:
+    lineage:
+      - datalake_wall_street_raw.charge_aud.id
+  rev:
+    lineage:
+      - datalake_wall_street_raw.charge_aud.rev
+  rev_type:
+    lineage:
+      - datalake_wall_street_raw.charge_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_wall_street_raw.charge_aud.revend
+  acquire:
+    lineage:
+      - datalake_wall_street_raw.charge_aud.acquire
+  id_acquire:
+    lineage:
+      - datalake_wall_street_raw.charge_aud.acquireid
+  charge_status:
+    lineage:
+      - datalake_wall_street_raw.charge_aud.chargestatus
+  id_external:
+    lineage:
+      - datalake_wall_street_raw.charge_aud.externalid
+  ts_updated:
+    lineage:
+      - datalake_wall_street_raw.charge_aud.lastupdate
+  acquire_charge_status:
+    lineage:
+      - datalake_wall_street_raw.charge_aud.acquirechargestatus
+  acquire_auth_code:
+    lineage:
+      - datalake_wall_street_raw.charge_aud.acquireauthcode
+  acquire_nsu:
+    lineage:
+      - datalake_wall_street_raw.charge_aud.acquirensu
+  id_acquire_transaction:
+    lineage:
+      - datalake_wall_street_raw.charge_aud.acquiretid

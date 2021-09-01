@@ -1,0 +1,108 @@
+database_name: datalake_wololo_clean
+table_name: prospect
+columns:
+  id:
+    lineage:
+      - datalake_wololo_raw.prospect.id
+  id_reference:
+    lineage:
+      - datalake_wololo_raw.prospect.referenceid
+  id_dimension_entity:
+    lineage:
+      - datalake_wololo_raw.prospect.dimensionentity_id
+  id_affiliate:
+    lineage:
+      - datalake_wololo_raw.prospect.affiliateid
+  id_task:
+    lineage:
+      - datalake_wololo_raw.prospect.taskid
+  id_external:
+    lineage:
+      - datalake_wololo_raw.prospect.externalid
+  status:
+    lineage:
+      - datalake_wololo_raw.prospect.status
+  address:
+    lineage:
+      - datalake_wololo_raw.prospect.address
+  number:
+    lineage:
+      - datalake_wololo_raw.prospect.number
+  additional_address:
+    lineage:
+      - datalake_wololo_raw.prospect.additionaladdress
+  neighborhood:
+    lineage:
+      - datalake_wololo_raw.prospect.neighborhood
+  city:
+    lineage:
+      - datalake_wololo_raw.prospect.city
+  zip_code:
+    lineage:
+      - datalake_wololo_raw.prospect.zipcode
+  sale_price:
+    lineage:
+      - datalake_wololo_raw.prospect.saleprice
+  rent_price:
+    lineage:
+      - datalake_wololo_raw.prospect.rentprice
+  condominium:
+    lineage:
+      - datalake_wololo_raw.prospect.condominium
+  name:
+    lineage:
+      - datalake_wololo_raw.prospect.name
+  email:
+    lineage:
+      - datalake_wololo_raw.prospect.email
+  phone:
+    lineage:
+      - datalake_wololo_raw.prospect.phone
+  phone_secondary:
+    lineage:
+      - datalake_wololo_raw.prospect.phonesecondary
+  phone_tertiary:
+    lineage:
+      - datalake_wololo_raw.prospect.phonetertiary
+  origin:
+    lineage:
+      - datalake_wololo_raw.prospect.origin
+  origin_phone:
+    lineage:
+      - datalake_wololo_raw.prospect.originphone
+  sales_company:
+    lineage:
+      - datalake_wololo_raw.prospect.sales_company
+  lead_type:
+    lineage:
+      - datalake_wololo_raw.prospect.leadtype
+  affiliate_type:
+    lineage:
+      - datalake_wololo_raw.prospect.affiliatetype
+  affiliate_name:
+    lineage:
+      - datalake_wololo_raw.prospect.affiliatename
+  mkt_origin:
+    lineage:
+      - datalake_wololo_raw.prospect.mktorigin
+  is_long_tail:
+    lineage:
+      - datalake_wololo_raw.prospect.longtail
+  is_whatsapp_opted_in:
+    lineage:
+      - datalake_wololo_raw.prospect.whatsappoptedin
+  is_for_sale:
+    lineage:
+      - datalake_wololo_raw.prospect.forsale
+  is_for_rent:
+    lineage:
+      - datalake_wololo_raw.prospect.forrent
+  is_exclusivity_intent:
+    lineage:
+      - datalake_wololo_raw.prospect.exclusivityintent
+  ts_created:
+    lineage:
+      - datalake_wololo_raw.prospect.created_at
+  ts_updated:
+    lineage:
+      - datalake_wololo_raw.prospect.updated_at

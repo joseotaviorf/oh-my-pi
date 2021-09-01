@@ -1,0 +1,51 @@
+database_name: datalake_wall_street_clean
+table_name: charge_mundipagg
+columns:
+  id:
+    lineage:
+      - datalake_wall_street_raw.chargemundipagg.id
+  acquire_message:
+    lineage:
+      - datalake_wall_street_raw.chargemundipagg.acquiremessage
+  amount:
+    lineage:
+      - datalake_wall_street_raw.chargemundipagg.amount
+  id_card:
+    lineage:
+      - datalake_wall_street_raw.chargemundipagg.cardid
+  ts_created:
+    lineage:
+      - datalake_wall_street_raw.chargemundipagg.createdat
+  currency:
+    lineage:
+      - datalake_wall_street_raw.chargemundipagg.currency
+  id_customer:
+    lineage:
+      - datalake_wall_street_raw.chargemundipagg.customerid
+  id_gateway:
+    lineage:
+      - datalake_wall_street_raw.chargemundipagg.gatewayid
+  ts_paid:
+    lineage:
+      - datalake_wall_street_raw.chargemundipagg.paidat
+  payment_method:
+    lineage:
+      - datalake_wall_street_raw.chargemundipagg.paymentmethod
+  status:
+    lineage:
+      - datalake_wall_street_raw.chargemundipagg.status
+  ts_updated:
+    lineage:
+      - datalake_wall_street_raw.chargemundipagg.updatedat
+  acquire_return_code:
+    lineage:
+      - datalake_wall_street_raw.chargemundipagg.acquirereturncode
+  acquire_auth_code:
+    lineage:
+      - datalake_wall_street_raw.chargemundipagg.acquireauthcode
+  acquire_nsu:
+    lineage:
+      - datalake_wall_street_raw.chargemundipagg.acquirensu
+  id_acquire_transaction:
+    lineage:
+      - datalake_wall_street_raw.chargemundipagg.acquiretid

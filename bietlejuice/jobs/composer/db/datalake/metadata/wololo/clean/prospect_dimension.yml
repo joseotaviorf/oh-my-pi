@@ -1,0 +1,9 @@
+database_name: datalake_wololo_clean
+table_name: prospect_dimension
+columns:
+  id:
+    lineage:
+      - datalake_wololo_raw.prospectdimension.id
+  sales_company:
+    lineage:
+      - datalake_wololo_raw.prospectdimension.salescompany

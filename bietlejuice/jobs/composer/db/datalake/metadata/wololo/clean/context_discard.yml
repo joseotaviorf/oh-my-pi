@@ -1,0 +1,30 @@
+database_name: datalake_wololo_clean
+table_name: context_discard
+columns:
+  id:
+    lineage:
+      - datalake_wololo_raw.context_discard.id
+  id_prospect:
+    lineage:
+      - datalake_wololo_raw.context_discard.prospectid
+  id_user:
+    lineage:
+      - datalake_wololo_raw.context_discard.userid
+  business_context:
+    lineage:
+      - datalake_wololo_raw.context_discard.businesscontext
+  reason:
+    lineage:
+      - datalake_wololo_raw.context_discard.reason
+  sales_company:
+    lineage:
+      - datalake_wololo_raw.context_discard.salescompany
+  is_automatically_discarded:
+    lineage:
+      - datalake_wololo_raw.context_discard.automaticallydiscarded
+  ts_created:
+    lineage:
+      - datalake_wololo_raw.context_discard.created_at
+  ts_updated:
+    lineage:
+      - datalake_wololo_raw.context_discard.updated_at

@@ -1,0 +1,21 @@
+database_name: datalake_wololo_clean
+table_name: prospect_dimension_aud
+columns:
+  id:
+    lineage:
+      - datalake_wololo_raw.prospectdimension_aud.id
+  rev:
+    lineage:
+      - datalake_wololo_raw.prospectdimension_aud.rev
+  revtype:
+    lineage:
+      - datalake_wololo_raw.prospectdimension_aud.revtype
+  revend:
+    lineage:
+      - datalake_wololo_raw.prospectdimension_aud.revend
+  sales_company:
+    lineage:
+      - datalake_wololo_raw.prospectdimension_aud.salescompany
+  mod_sales_company:
+    lineage:
+      - datalake_wololo_raw.prospectdimension_aud.salescompany_mod

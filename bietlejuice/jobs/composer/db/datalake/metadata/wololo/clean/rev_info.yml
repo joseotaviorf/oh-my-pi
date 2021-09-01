@@ -1,0 +1,9 @@
+database_name: datalake_wololo_clean
+table_name: rev_info
+columns:
+  rev:
+    lineage:
+      - datalake_wololo_raw.revinfo.rev
+  ts_rev:
+    lineage:
+      - datalake_wololo_raw.revinfo.revtstmp

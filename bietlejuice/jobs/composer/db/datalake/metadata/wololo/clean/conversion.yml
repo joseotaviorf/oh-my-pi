@@ -1,0 +1,24 @@
+database_name: datalake_wololo_clean
+table_name: conversion
+columns:
+  id:
+    lineage:
+      - datalake_wololo_raw.conversion.id
+  id_prospect:
+    lineage:
+      - datalake_wololo_raw.conversion.prospectid
+  id_user:
+    lineage:
+      - datalake_wololo_raw.conversion.userid
+  business_context:
+    lineage:
+      - datalake_wololo_raw.conversion.businesscontext
+  sales_company:
+    lineage:
+      - datalake_wololo_raw.conversion.salescompany
+  ts_created:
+    lineage:
+      - datalake_wololo_raw.conversion.created_at
+  ts_updated:
+    lineage:
+      - datalake_wololo_raw.conversion.updated_at
