@@ -1,4 +1,18 @@
 WITH
+buyer_prospect_status as (
+    SELECT
+        sk_buyer,
+        city_group,
+        ts_start,
+        ts_end,
+        status,
+        status_detail,
+        LAG(status) OVER(PARTITION BY sk_buyer, city_group order by ts_start) as last_status
+    FROM
+        datamarts.buyer_prospect_status
+    WHERE
+        ts_start >= ts_first_activation
+),
 dim_house AS (
     SELECT
         id AS sk_house,
@@ -128,6 +142,7 @@ events AS (
 sale_flows AS (
     SELECT
         DATE(evt.ts_event) AS dt_event,
+        evt.ts_event,
         dr.city_group,
         evt.flow_event,
         evt.mkt_origin,
@@ -155,6 +170,11 @@ sale_flows AS (
 sale_flows_funnel_events AS (
     SELECT
         sf.dt_event,
+        sf.ts_event,
+        bps.status,
+        bps.status_detail,
+        bps.ts_start AS ts_status_start,
+        bps.ts_end AS ts_status_end,
         sf.city_group,
         sf.flow_event,
         sf.mkt_origin,
@@ -198,6 +218,12 @@ sale_flows_funnel_events AS (
             ON sf.sk_sale_flow = b.sk_sale_flow
         LEFT JOIN offers AS o
             ON sf.sk_sale_flow = o.sk_sale_flow
+        LEFT JOIN buyer_prospect_status AS bps
+            ON sf.ts_event >= bps.ts_start
+            AND sf.ts_event <= COALESCE(bps.ts_end, CURRENT_DATE)
+            AND sf.sk_buyer = bps.sk_buyer
+            AND sf.city_group = bps.city_group
+            AND bps.status = 'ACTIVE'
     WHERE
         sale_flow_order = 1
 ),
@@ -207,6 +233,11 @@ sale_flows_funnel_events AS (
 targets AS (
     SELECT
         bd.date::DATE,
+        bd.date::TIMESTAMP AS ts_event,
+        NULL::TEXT AS status,
+        NULL:: TEXT AS status_detail,
+        NULL::TIMESTAMP AS ts_status_start,
+        NULL::TIMESTAMP AS ts_status_end,
         bd.city AS city_group,
         NULL::TEXT AS flow_event,
         'Tenants PWA' AS mkt_origin,
@@ -246,6 +277,11 @@ targets AS (
     UNION ALL
     SELECT
         bp.date::DATE,
+        bp.date::TIMESTAMP AS ts_event,
+        NULL::TEXT AS status,
+        NULL:: TEXT AS status_detail,
+        NULL::TIMESTAMP AS ts_status_start,
+        NULL::TIMESTAMP AS ts_status_end,
         bp.city_group,
         NULL::TEXT AS flow_event,
         'Tenants PWA' AS mkt_origin,
@@ -277,6 +313,11 @@ targets AS (
     UNION ALL
     SELECT
         date::DATE,
+        date::TIMESTAMP AS ts_event,
+        NULL::TEXT AS status,
+        NULL:: TEXT AS status_detail,
+        NULL::TIMESTAMP AS ts_status_start,
+        NULL::TIMESTAMP AS ts_status_end,
         city_group,
         NULL::TEXT AS flow_event,
         'Tenants PWA' AS mkt_origin,
@@ -312,6 +353,11 @@ targets AS (
 investment AS (
     SELECT
         dd.date,
+        dd.date::TIMESTAMP AS ts_event,
+        NULL::TEXT AS status,
+        NULL:: TEXT AS status_detail,
+        NULL::TIMESTAMP AS ts_status_start,
+        NULL::TIMESTAMP AS ts_status_end,
         city_group,
         NULL::TEXT AS flow_event,
         'Tenants PWA' AS mkt_origin,
@@ -346,7 +392,50 @@ investment AS (
         co.mkt_origin = 'Tenants PWA - Sale'
         AND dd.date >= DATE('2020-01-01')
         AND co.mkt_medium != 'Branding'
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31
+),
+-------------------------------------------------------------------------------------
+-- Query Performance Marketing Rental Demand targets and introduce NULLs for UNION --
+-------------------------------------------------------------------------------------
+deactivations AS (
+    SELECT
+        DATE(ts_start) AS dt_event,
+        ts_start AS ts_event,
+        status,
+        status_detail,
+        ts_start AS ts_status_start,
+        ts_end AS ts_status_end,
+        city_group,
+        NULL::TEXT AS flow_event,
+        NULL::TEXT AS mkt_origin,
+        NULL::TEXT AS mkt_channel,
+        NULL::TEXT AS mkt_medium,
+        NULL::TEXT AS mkt_source,
+        NULL::TEXT AS utm_medium,
+        NULL::TEXT AS utm_source,
+        NULL::TEXT AS campaign_name,
+        NULL::TEXT AS utm_campaign,
+        NULL::TEXT AS campaign_context,
+        NULL::TEXT AS utm_term,
+        NULL::TEXT AS utm_content,
+        NULL::TEXT AS sk_sale_flow,
+        sk_buyer,
+        NULL::INT AS sk_house,
+        NULL::DATE AS dt_booking_created,
+        NULL::INT AS sk_booking,
+        NULL::DATE AS dt_offer_submitted,
+        NULL::TEXT AS sk_offer,
+        NULL::INT AS sale_flow_order,
+        NULL::INT AS buyer_prospect_order,
+        NULL::FLOAT AS budget,
+        NULL::FLOAT AS new_buyer_prospects_target,
+        NULL::FLOAT AS sale_flows_target,
+        0.0 AS marketing_cost
+    FROM
+        buyer_prospect_status
+    WHERE
+        status IN ('CHURNED', 'SIGNED CCV')
+        AND last_status = 'ACTIVE'
 )
 SELECT
     *
@@ -362,3 +451,8 @@ SELECT
     *
 FROM
     investment
+UNION ALL
+SELECT
+    *
+FROM
+    deactivations;

@@ -2,4 +2,4 @@
 ---
 streams:
   - direction: 'upstream'
-    task_ids: ['athena_talk_to_agent']
+    task_ids: ['athena_talk_to_agent', 'dw_buyer_prospect_status']
