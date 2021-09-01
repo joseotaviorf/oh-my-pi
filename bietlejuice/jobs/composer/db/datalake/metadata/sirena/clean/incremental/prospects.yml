@@ -1,0 +1,96 @@
+database_name: datalake_sirena_clean
+table_name: prospects
+columns:
+  id:
+    lineage:
+      - datalake_sirena_raw.prospects.id
+  id_group:
+    lineage:
+      - datalake_sirena_raw.prospects.groupid
+  id_account:
+    lineage:
+      - datalake_sirena_raw.prospects.accountid
+  id_initial_group:
+    lineage:
+      - datalake_sirena_raw.prospects.initialgroupid
+  label:
+    lineage:
+      - datalake_sirena_raw.prospects.label
+  group:
+    lineage:
+      - datalake_sirena_raw.prospects.group
+  account:
+    lineage:
+      - datalake_sirena_raw.prospects.account
+  initial_group:
+    lineage:
+      - datalake_sirena_raw.prospects.initialgroup
+  first_name:
+    lineage:
+      - datalake_sirena_raw.prospects.firstname
+  last_name:
+    lineage:
+      - datalake_sirena_raw.prospects.lastname
+  category:
+    lineage:
+      - datalake_sirena_raw.prospects.category
+  status:
+    lineage:
+      - datalake_sirena_raw.prospects.status
+  national_identification_number:
+    lineage:
+      - datalake_sirena_raw.prospects.nin
+  additional_data:
+    lineage:
+      - datalake_sirena_raw.prospects.additionaldata
+  phones:
+    lineage:
+      - datalake_sirena_raw.prospects.phones
+  emails:
+    lineage:
+      - datalake_sirena_raw.prospects.emails
+  contact_mediums:
+    lineage:
+      - datalake_sirena_raw.prospects.contactmediums
+  leads:
+    lineage:
+      - datalake_sirena_raw.prospects.leads
+  agent:
+    lineage:
+      - datalake_sirena_raw.prospects.agent
+  archiving_reason:
+    lineage:
+      - datalake_sirena_raw.prospects.archivingreason
+  absence_message:
+    lineage:
+      - datalake_sirena_raw.prospects.absencemessage
+  is_user_made:
+    lineage:
+      - datalake_sirena_raw.prospects.usermade
+  is_merged:
+    lineage:
+      - datalake_sirena_raw.prospects.merged
+  ts_created:
+    lineage:
+      - datalake_sirena_raw.prospects.created
+  ts_assigned:
+    lineage:
+      - datalake_sirena_raw.prospects.assigned
+  ts_next_reminder:
+    lineage:
+      - datalake_sirena_raw.prospects.nextreminder
+  ts_first_contact:
+    lineage:
+      - datalake_sirena_raw.prospects.firstcontactedat
+  ts_sent_working_hour_message:
+    lineage:
+      - datalake_sirena_raw.prospects.sentworkinghourmessage
+  year:
+    lineage:
+      - datalake_sirena_raw.prospects.year
+  month:
+    lineage:
+      - datalake_sirena_raw.prospects.month
+  day:
+    lineage:
+      - datalake_sirena_raw.prospects.day

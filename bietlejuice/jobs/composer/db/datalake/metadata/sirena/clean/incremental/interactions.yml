@@ -1,0 +1,48 @@
+database_name: datalake_sirena_clean
+table_name: interactions
+columns:
+  id:
+    lineage:
+      - datalake_sirena_raw.interactions.id
+  id_prospect:
+    lineage:
+      - datalake_sirena_raw.interactions.prospectid
+  id_agent:
+    lineage:
+      - datalake_sirena_raw.interactions.agentid
+  agent:
+    lineage:
+      - datalake_sirena_raw.interactions.agent
+  status:
+    lineage:
+      - datalake_sirena_raw.interactions.status
+  via:
+    lineage:
+      - datalake_sirena_raw.interactions.via
+  output:
+    lineage:
+      - datalake_sirena_raw.interactions.output
+  is_proactive:
+    lineage:
+      - datalake_sirena_raw.interactions.proactive
+  ts_created:
+    lineage:
+      - datalake_sirena_raw.interactions.createdat
+  ts_due:
+    lineage:
+      - datalake_sirena_raw.interactions.dueat
+  ts_started:
+    lineage:
+      - datalake_sirena_raw.interactions.startedat
+  ts_finished:
+    lineage:
+      - datalake_sirena_raw.interactions.finishedat
+  year:
+    lineage:
+      - datalake_sirena_raw.interactions.year
+  month:
+    lineage:
+      - datalake_sirena_raw.interactions.month
+  day:
+    lineage:
+      - datalake_sirena_raw.interactions.day

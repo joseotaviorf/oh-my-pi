@@ -1,0 +1,12 @@
+database_name: datalake_sirena_clean
+table_name: channels
+columns:
+  id_channel:
+    lineage:
+      - datalake_sirena_raw.channels.channelid
+  channel:
+    lineage:
+      - datalake_sirena_raw.channels.channel
+  templates:
+    lineage:
+      - datalake_sirena_raw.channels.templates
