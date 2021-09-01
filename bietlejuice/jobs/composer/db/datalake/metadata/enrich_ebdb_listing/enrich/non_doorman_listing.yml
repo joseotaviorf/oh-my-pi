@@ -1,0 +1,47 @@
+---
+database_name: datalake_ebdb_listing
+table_name: non_doorman_listing
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_house
+  id_house_listing:
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_house_listing
+  first_key_location:
+    lineage:
+      - datalake_ebdb_clean.access_authorization_type.name
+  house_key_location:
+    lineage:
+      - datalake_ebdb_listing.house.key_location
+  last_key_location:
+    lineage:
+      - datalake_ebdb_clean.access_authorization_type.name
+  who_is_living:
+    lineage:
+      - datalake_ebdb_listing.house.occupant_type
+  has_keys_with_agent_attributed:
+    lineage:
+      - datalake_ebdb_clean.house_agent_key_tracking.status
+  has_keys_with_agent_delivered:
+    lineage:
+      - datalake_ebdb_clean.house_agent_key_tracking.status
+  has_keys_with_agent_returned:
+    lineage:
+      - datalake_ebdb_clean.house_agent_key_tracking.status
+  is_keys_with_agent_opt_in:
+    lineage:
+      - datalake_ebdb_clean.access_type_aud.has_opted_keys_with_agent
+  is_keys_with_agent_eligible:
+    lineage:
+      - datalake_ebdb_clean.house_agent_aud.relation_type
+      - datalake_ebdb_listing.house.doorman_type
+      - datalake_ebdb_listing.house.key_location
+      - datalake_ebdb_listing.house.occupant_type
+      - datalake_ebdb_listing.house.is_for_sale
+  ts_listing_version_start:
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_listing_version_start
+  ts_listing_version_end:
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_listing_version_end
