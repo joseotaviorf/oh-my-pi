@@ -1,0 +1,54 @@
+database_name: datalake_us_emails_clean
+table_name: emails
+columns:
+  id:
+    lineage:
+      - datalake_us_emails_raw.emails._id
+  id_template:
+    lineage:
+      - datalake_us_emails_raw.emails.templateid
+  id_request:
+    lineage:
+      - datalake_us_emails_raw.emails.requestid
+  to:
+    lineage:
+      - datalake_us_emails_raw.emails.to
+  cc:
+    lineage:
+      - datalake_us_emails_raw.emails.cc
+  bcc:
+    lineage:
+      - datalake_us_emails_raw.emails.bcc
+  attachments:
+    lineage:
+      - datalake_us_emails_raw.emails.attachments
+  body_parameters:
+    lineage:
+      - datalake_us_emails_raw.emails.bodyparameters
+  reason:
+    lineage:
+      - datalake_us_emails_raw.emails.reason
+  status:
+    lineage:
+      - datalake_us_emails_raw.emails.status
+  raw_data:
+    lineage:
+      - datalake_us_emails_raw.emails.rawdata
+  version:
+    lineage:
+      - datalake_us_emails_raw.emails.__v
+  created_date_object:
+    lineage:
+      - datalake_us_emails_raw.emails.created
+  updated_date_object:
+    lineage:
+      - datalake_us_emails_raw.emails.updated
+  year:
+    lineage:
+      - datalake_us_emails_raw.emails.year
+  month:
+    lineage:
+      - datalake_us_emails_raw.emails.month
+  day:
+    lineage:
+      - datalake_us_emails_raw.emails.day

@@ -1,0 +1,36 @@
+database_name: datalake_us_emails_clean
+table_name: email_events
+columns:
+  id:
+    lineage:
+      - datalake_us_emails_raw.emailevents._id
+  id_email:
+    lineage:
+      - datalake_us_emails_raw.emailevents.emailid
+  email_reason:
+    lineage:
+      - datalake_us_emails_raw.emailevents.emailreason
+  description:
+    lineage:
+      - datalake_us_emails_raw.emailevents.description
+  status:
+    lineage:
+      - datalake_us_emails_raw.emailevents.status
+  type:
+    lineage:
+      - datalake_us_emails_raw.emailevents.type
+  version:
+    lineage:
+      - datalake_us_emails_raw.emailevents.__v
+  created_date_object:
+    lineage:
+      - datalake_us_emails_raw.emailevents.created
+  year:
+    lineage:
+      - datalake_us_emails_raw.emailevents.year
+  month:
+    lineage:
+      - datalake_us_emails_raw.emailevents.month
+  day:
+    lineage:
+      - datalake_us_emails_raw.emailevents.day

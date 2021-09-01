@@ -1,0 +1,33 @@
+database_name: datalake_us_emails_clean
+table_name: unsubscriptions
+columns:
+  id:
+    lineage:
+      - datalake_us_emails_raw.unsubscriptions._id
+  email:
+    lineage:
+      - datalake_us_emails_raw.unsubscriptions.emailaddress
+  reason:
+    lineage:
+      - datalake_us_emails_raw.unsubscriptions.reason
+  version:
+    lineage:
+      - datalake_us_emails_raw.unsubscriptions.__v
+  is_active:
+    lineage:
+      - datalake_us_emails_raw.unsubscriptions.isactive
+  created_date_object:
+    lineage:
+      - datalake_us_emails_raw.unsubscriptions.created
+  updated_date_object:
+    lineage:
+      - datalake_us_emails_raw.unsubscriptions.updated
+  year:
+    lineage:
+      - datalake_us_emails_raw.unsubscriptions.year
+  month:
+    lineage:
+      - datalake_us_emails_raw.unsubscriptions.month
+  day:
+    lineage:
+      - datalake_us_emails_raw.unsubscriptions.day

@@ -1,0 +1,18 @@
+database_name: datalake_us_emails_clean
+table_name: reasons
+columns:
+  id:
+    lineage:
+      - datalake_us_emails_raw.reasons._id
+  id_smart_email:
+    lineage:
+      - datalake_us_emails_raw.reasons.smartemailid
+  reason:
+    lineage:
+      - datalake_us_emails_raw.reasons.reason
+  disabled:
+    lineage:
+      - datalake_us_emails_raw.reasons.disabled
+  data_required:
+    lineage:
+      - datalake_us_emails_raw.reasons.data_required
