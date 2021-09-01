@@ -1,0 +1,59 @@
+---
+database_name: datalake_ebdb_agents
+table_name: agents_specific_weekly_schedule
+columns:
+  id_agent:
+    lineage:
+      - datalake_ebdb_clean.agent_specific_hour.id_agent
+  slot_number:
+    lineage:
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_08_and_09
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_09_and_10
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_10_and_11
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_11_and_12
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_12_and_13
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_13_and_14
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_14_and_15
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_15_and_16
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_16_and_17
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_17_and_18
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_18_and_19
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_19_and_20
+  is_available_slot:
+    lineage:
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_08_and_09
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_09_and_10
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_10_and_11
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_11_and_12
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_12_and_13
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_13_and_14
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_14_and_15
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_15_and_16
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_16_and_17
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_17_and_18
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_18_and_19
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_19_and_20
+  is_off_work:
+    lineage:
+      - datalake_ebdb_clean.agent_specific_hour.is_off_work
+  ts_slot:
+    lineage:
+      - datalake_ebdb_clean.agent_specific_hour.dt_agent_specific_hour
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_08_and_09
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_09_and_10
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_10_and_11
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_11_and_12
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_12_and_13
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_13_and_14
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_14_and_15
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_15_and_16
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_16_and_17
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_17_and_18
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_18_and_19
+      - datalake_ebdb_clean.agent_specific_hour.is_available_between_19_and_20
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.agent_specific_hour.dt_agent_specific_hour
+      - datalake_ebdb_clean.agent_specific_hour.id_agent
+      - datalake_ebdb_clean.agent_specific_hour.ts_updated
+      

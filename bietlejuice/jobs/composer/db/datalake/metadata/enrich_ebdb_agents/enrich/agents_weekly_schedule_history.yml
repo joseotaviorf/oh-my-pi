@@ -1,0 +1,48 @@
+---
+database_name: datalake_ebdb_agents
+table_name: agents_weekly_schedule_history
+columns:
+  id_agent:
+    lineage:
+      - datalake_ebdb_clean.agent_weekly_hours_aud.id_agent
+  agent_type:
+    lineage:
+      - datalake_ebdb_clean.agent_data_types.types
+  day_of_week:
+    lineage:
+      - datalake_ebdb_clean.agent_weekly_hours_aud.day_of_week
+  slot_number:
+    lineage:
+      - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_08_and_09_available
+      - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_09_and_10_available
+      - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_10_and_11_available
+      - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_11_and_12_available
+      - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_12_and_13_available
+      - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_13_and_14_available
+      - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_14_and_15_available
+      - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_15_and_16_available
+      - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_16_and_17_available
+      - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_17_and_18_available
+      - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_18_and_19_available
+      - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_19_and_20_available
+  is_available_slot:
+    lineage:
+      - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_08_and_09_available
+      - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_09_and_10_available
+      - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_10_and_11_available
+      - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_11_and_12_available
+      - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_12_and_13_available
+      - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_13_and_14_available
+      - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_14_and_15_available
+      - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_15_and_16_available
+      - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_16_and_17_available
+      - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_17_and_18_available
+      - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_18_and_19_available
+      - datalake_ebdb_clean.agent_weekly_hours_aud.has_hours_between_19_and_20_available
+  ts_slot:
+    lineage:
+      - datalake_ebdb_agents.slots_base_time.ts_slot
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.agent_weekly_hours_aud.ts_updated
+      

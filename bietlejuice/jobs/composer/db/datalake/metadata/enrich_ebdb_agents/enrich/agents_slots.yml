@@ -1,0 +1,81 @@
+---
+database_name: datalake_ebdb_agents
+table_name: agents_slots
+columns:
+  id_agent:
+    lineage:
+      - datalake_ebdb_agents.agents_weekly_schedule_history.id_agent
+  agent_type:
+    lineage:
+      - datalake_ebdb_agents.agents_weekly_schedule_history.agent_type
+  day_of_week:
+    lineage:
+      - datalake_ebdb_agents.agents_weekly_schedule_history.day_of_week
+  last_change_reason:
+    lineage:
+      - datalake_ebdb_agents.agents_specific_weekly_schedule.is_available_slot
+      - datalake_ebdb_agents.agents_specific_weekly_schedule.is_off_work
+      - datalake_ebdb_agents.agents_specific_weekly_schedule.ts_updated
+      - datalake_ebdb_agents.agents_weekly_schedule_history.is_available_slot
+      - datalake_ebdb_agents.agents_weekly_schedule_history.ts_slot
+      - datalake_ebdb_agents.agents_weekly_schedule_history.ts_updated
+  slot_number:
+    lineage:
+      - datalake_ebdb_agents.agents_weekly_schedule_history.slot_number
+  is_active:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.is_active
+  is_available_specific_slot:
+    lineage:
+      - datalake_ebdb_agents.agents_specific_weekly_schedule.is_available_slot
+      - datalake_ebdb_agents.agents_specific_weekly_schedule.is_off_work
+      - datalake_ebdb_agents.agents_weekly_schedule_history.is_available_slot
+  is_available_slot:
+    lineage:
+      - datalake_ebdb_agents.agents_specific_weekly_schedule.is_available_slot
+      - datalake_ebdb_agents.agents_specific_weekly_schedule.is_off_work
+      - datalake_ebdb_agents.agents_specific_weekly_schedule.ts_updated
+      - datalake_ebdb_agents.agents_weekly_schedule_history.is_available_slot
+      - datalake_ebdb_agents.agents_weekly_schedule_history.ts_slot
+      - datalake_ebdb_agents.agents_weekly_schedule_history.ts_updated
+  is_available_slot_24h:
+    lineage:
+      - datalake_ebdb_agents.agents_specific_weekly_schedule.is_available_slot
+      - datalake_ebdb_agents.agents_specific_weekly_schedule.is_off_work
+      - datalake_ebdb_agents.agents_specific_weekly_schedule.ts_updated
+      - datalake_ebdb_agents.agents_weekly_schedule_history.is_available_slot
+      - datalake_ebdb_agents.agents_weekly_schedule_history.ts_slot
+      - datalake_ebdb_agents.agents_weekly_schedule_history.ts_updated
+  is_specif_update:
+    lineage:
+      - datalake_ebdb_agents.agents_specific_weekly_schedule.is_available_slot
+      - datalake_ebdb_agents.agents_specific_weekly_schedule.is_off_work
+      - datalake_ebdb_agents.agents_weekly_schedule_history.is_available_slot
+  is_time_window_update:
+    lineage:
+      - datalake_ebdb_agents.agents_specific_weekly_schedule.is_available_slot
+      - datalake_ebdb_agents.agents_specific_weekly_schedule.is_off_work
+      - datalake_ebdb_agents.agents_specific_weekly_schedule.ts_updated
+      - datalake_ebdb_agents.agents_weekly_schedule_history.is_available_slot
+      - datalake_ebdb_agents.agents_weekly_schedule_history.ts_slot
+      - datalake_ebdb_agents.agents_weekly_schedule_history.ts_updated
+  ts_last_specific_updated:
+    lineage:
+      - datalake_ebdb_agents.agents_specific_weekly_schedule.is_available_slot
+      - datalake_ebdb_agents.agents_specific_weekly_schedule.ts_updated
+      - datalake_ebdb_agents.agents_weekly_schedule_history.is_available_slot
+  ts_last_weekly_updated:
+    lineage:
+      - datalake_ebdb_agents.agents_weekly_schedule_history.ts_updated
+  ts_slot:
+    lineage:
+      - datalake_ebdb_agents.agents_weekly_schedule_history.ts_slot
+  year:
+    lineage:
+      - datalake_ebdb_agents.agents_weekly_schedule_history.ts_slot
+  month:
+    lineage:
+      - datalake_ebdb_agents.agents_weekly_schedule_history.ts_slot
+  day:
+    lineage:
+      - datalake_ebdb_agents.agents_weekly_schedule_history.ts_slot
