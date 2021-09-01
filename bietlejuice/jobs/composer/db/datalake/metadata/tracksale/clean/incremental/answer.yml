@@ -1,0 +1,87 @@
+database_name: datalake_tracksale_clean
+table_name: answer
+columns:
+  id:
+    lineage:
+      - datalake_tracksale_raw.answer.id
+  id_campaign:
+    lineage:
+      - datalake_tracksale_raw.answer.campaign_code
+  campaign_name:
+    lineage:
+      - datalake_tracksale_raw.answer.campaign_name
+  name:
+    lineage:
+      - datalake_tracksale_raw.answer.name
+  identification:
+    lineage:
+      - datalake_tracksale_raw.answer.identification
+  email:
+    lineage:
+      - datalake_tracksale_raw.answer.email
+  alternative_email:
+    lineage:
+      - datalake_tracksale_raw.answer.alternative_email
+  phone:
+    lineage:
+      - datalake_tracksale_raw.answer.phone
+  alternative_phone:
+    lineage:
+      - datalake_tracksale_raw.answer.alternative_phone
+  priority:
+    lineage:
+      - datalake_tracksale_raw.answer.priority
+  type:
+    lineage:
+      - datalake_tracksale_raw.answer.type
+  status:
+    lineage:
+      - datalake_tracksale_raw.answer.status
+  smallint:
+    lineage:
+      - datalake_tracksale_raw.answer.nps_answer
+  last_nps_answer:
+    lineage:
+      - datalake_tracksale_raw.answer.last_nps_answer
+  nps_comment:
+    lineage:
+      - datalake_tracksale_raw.answer.nps_comment
+  justifications:
+    lineage:
+      - datalake_tracksale_raw.answer.justifications
+  lot_code:
+    lineage:
+      - datalake_tracksale_raw.answer.lot_code
+  assignee:
+    lineage:
+      - datalake_tracksale_raw.answer.assignee
+  tags:
+    lineage:
+      - datalake_tracksale_raw.answer.tags
+  categories:
+    lineage:
+      - datalake_tracksale_raw.answer.categories
+  seconds_spent_answering:
+    lineage:
+      - datalake_tracksale_raw.answer.elapsed_time
+  ts_deadline:
+    lineage:
+      - datalake_tracksale_raw.answer.deadline
+  ts_reminder:
+    lineage:
+      - datalake_tracksale_raw.answer.reminder_time
+  ts_dispatch:
+    lineage:
+      - datalake_tracksale_raw.answer.dispatch_time
+  ts_answer_sent:
+    lineage:
+      - datalake_tracksale_raw.answer.time
+  year:
+    lineage:
+      - datalake_tracksale_raw.answer.year
+  month:
+    lineage:
+      - datalake_tracksale_raw.answer.month
+  day:
+    lineage:
+      - datalake_tracksale_raw.answer.day
