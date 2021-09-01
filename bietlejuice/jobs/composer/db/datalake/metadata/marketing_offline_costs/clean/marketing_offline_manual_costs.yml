@@ -1,0 +1,78 @@
+database_name: datalake_marketing_offline_costs_clean
+table_name: marketing_offline_manual_costs
+columns:
+  id_rule_city_group_rent:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_costs.id_rule_city_group_rent
+  id_rule_city_group_sale:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_costs.id_rule_city_group_sale
+  email:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_costs.email
+  team:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_costs.team
+  entry_type:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_costs.entry_type
+  invoice_number:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_costs.invoice_number
+  cnpj:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_costs.cnpj
+  vendor_name:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_costs.vendor_name
+  description:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_costs.description
+  campaign_name:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_costs.campaign_name
+  cost_category:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_costs.cost_category
+  cost_subcategory:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_costs.cost_subcategory
+  action:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_costs.action
+  business_context:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_costs.business_context
+  cost:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_costs.cost
+  has_cost_center_share:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_costs.has_cost_center_share
+  id_rule_cost_center:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_costs.id_rule_cost_center
+  has_city_group_share_1:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_costs.has_city_group_share_1
+  cost_center:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_costs.cost_center
+  has_city_group_share_2:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_costs.has_city_group_share_2
+  city_group:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_costs.city_group
+  ts_entry:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_costs.ts_entry
+  dt_invoice:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_costs.dt_invoice
+  dt_service_started:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_costs.dt_service_started
+  dt_service_ended:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_costs.dt_service_ended

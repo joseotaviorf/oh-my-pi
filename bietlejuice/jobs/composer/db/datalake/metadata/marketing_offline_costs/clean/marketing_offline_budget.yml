@@ -1,0 +1,18 @@
+database_name: datalake_marketing_offline_costs_clean
+table_name: marketing_offline_budget
+columns:
+  city_group:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_budget.city_group
+  cost_category:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_budget.cost_category
+  business_context:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_budget.business_context
+  budget:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_budget.budget
+  dt_budget:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_budget.date

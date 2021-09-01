@@ -1,0 +1,12 @@
+database_name: datalake_marketing_offline_costs_clean
+table_name: marketing_offline_manual_share_cost_center
+columns:
+  id_rule_cost_center:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_share_cost_center.id_rule_cost_center
+  cost_center:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_share_cost_center.cost_center
+  share:
+    lineage:
+      - datalake_marketing_offline_costs_raw.marketing_offline_manual_share_cost_center.share
