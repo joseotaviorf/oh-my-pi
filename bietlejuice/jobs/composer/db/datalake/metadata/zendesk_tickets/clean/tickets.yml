@@ -1,0 +1,97 @@
+database_name: datalake_zendesk_tickets_clean
+table_name: tickets
+columns:
+  id_ticket:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.id
+  satisfaction_rating:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.satisfaction_rating
+  url_ticket:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.url
+  priority:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.priority
+  raw_subject:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.raw_subject
+  subject:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.subject
+  ticket_via:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.via
+  via:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.via
+  tags:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.tags
+  id_group:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.group_id
+  id_ticket_form:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.ticket_form_id
+  id_requester:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.requester_id
+  id_assignee:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.assignee_id
+  ids_collaborator:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.collaborator_ids
+  id_brand:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.brand_id
+  id_submitter:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.submitter_id
+  status:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.status
+  custom_fields:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.custom_fields
+  has_incidents:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.has_incidents
+  type:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.type
+  allow_channelback:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.allow_channelback
+  description:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.description
+  recipient:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.recipient
+  is_public:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.is_public
+  dt_extracted:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.dt
+  ts_created:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.created_at
+  ts_created_local:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.created_at
+  ts_updated:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.created_at
+      - datalake_zendesk_tickets_raw.tickets.updated_at
+  year:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.updated_at
+  month:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.updated_at
+  day:
+    lineage:
+      - datalake_zendesk_tickets_raw.tickets.updated_at
