@@ -1,0 +1,36 @@
+database_name: datalake_ebdb_clean
+table_name: info_amenities
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.amenidadesinfo.id
+  is_first_field:
+    lineage:
+      - datalake_ebdb_raw.amenidadesinfo.campo1
+  is_second_field:
+    lineage:
+      - datalake_ebdb_raw.amenidadesinfo.campo2
+  is_third_field:
+    lineage:
+      - datalake_ebdb_raw.amenidadesinfo.campo3
+  is_fourth_field:
+    lineage:
+      - datalake_ebdb_raw.amenidadesinfo.campo4
+  is_fifth_field:
+    lineage:
+      - datalake_ebdb_raw.amenidadesinfo.campo5
+  has_characteristic:
+    lineage:
+      - datalake_ebdb_raw.amenidadesinfo.temcaracteristica
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.amenidadesinfo.imovel_id
+  id_amenities:
+    lineage:
+      - datalake_ebdb_raw.amenidadesinfo.amenidades_id
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.amenidadesinfo.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.amenidadesinfo.criadoem

@@ -1,0 +1,9 @@
+database_name: datalake_ebdb_clean
+table_name: lead_reason
+columns:
+  reason:
+    lineage:
+      - datalake_ebdb_raw.vw_lead_reason.reason
+  reason_detail:
+    lineage:
+      - datalake_ebdb_raw.vw_lead_reason.reason_detail

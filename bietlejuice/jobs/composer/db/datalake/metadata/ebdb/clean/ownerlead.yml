@@ -1,0 +1,39 @@
+database_name: datalake_ebdb_clean
+table_name: ownerlead
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.proprietariolead.id
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.proprietariolead.datacriacao
+  id_user:
+    lineage:
+      - datalake_ebdb_raw.proprietariolead.usuario_id
+  id_sales_responsible:
+    lineage:
+      - datalake_ebdb_raw.proprietariolead.vendedorresponsavel_id
+  id_agent_referrer:
+    lineage:
+      - datalake_ebdb_raw.proprietariolead.corretorqueindicou_id
+  id_affiliate_referrer:
+    lineage:
+      - datalake_ebdb_raw.proprietariolead.afiliadoqueindicou_id
+  id_contract_salesforce:
+    lineage:
+      - datalake_ebdb_raw.proprietariolead.salesforcecontatoid
+  owner_type:
+    lineage:
+      - datalake_ebdb_raw.proprietariolead.tipoproprietario
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.proprietariolead.atualizadoem
+  email:
+    lineage:
+      - datalake_ebdb_raw.proprietariolead.email
+  name:
+    lineage:
+      - datalake_ebdb_raw.proprietariolead.nome
+  has_accepted_whatsapp:
+    lineage:
+      - datalake_ebdb_raw.proprietariolead.acceptwhatsapp

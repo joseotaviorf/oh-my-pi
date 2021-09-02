@@ -1,0 +1,15 @@
+database_name: datalake_ebdb_clean
+table_name: occupant_type
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.occupanttype.id
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.occupanttype.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.occupanttype.criadoem
+  name:
+    lineage:
+      - datalake_ebdb_raw.occupanttype.name

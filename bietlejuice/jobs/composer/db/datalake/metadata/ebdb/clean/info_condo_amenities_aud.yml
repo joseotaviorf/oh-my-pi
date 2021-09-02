@@ -1,0 +1,24 @@
+database_name: datalake_ebdb_clean
+table_name: info_condo_amenities_aud
+columns:
+  id_info_condo_amenity:
+    lineage:
+      - datalake_ebdb_raw.instalacaoinfo_aud.id
+  rev:
+    lineage:
+      - datalake_ebdb_raw.instalacaoinfo_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.instalacaoinfo_aud.revtype
+  has_feature:
+    lineage:
+      - datalake_ebdb_raw.instalacaoinfo_aud.temcaracteristica
+  mod_has_feature:
+    lineage:
+      - datalake_ebdb_raw.instalacaoinfo_aud.temcaracteristica_mod
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.instalacaoinfo_aud.imovel_id
+  id_amenity:
+    lineage:
+      - datalake_ebdb_raw.instalacaoinfo_aud.instalacao_id

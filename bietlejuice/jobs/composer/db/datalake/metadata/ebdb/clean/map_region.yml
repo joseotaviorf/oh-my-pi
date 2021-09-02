@@ -1,0 +1,30 @@
+database_name: datalake_ebdb_clean
+table_name: map_region
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.mapregiao.id
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.mapregiao.criadaem
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.mapregiao.atualizadoem
+  level:
+    lineage:
+      - datalake_ebdb_raw.mapregiao.nivel
+  name:
+    lineage:
+      - datalake_ebdb_raw.mapregiao.nome
+  id_macro:
+    lineage:
+      - datalake_ebdb_raw.mapregiao.macroid
+  macro_name:
+    lineage:
+      - datalake_ebdb_raw.mapregiao.macronome
+  id_city:
+    lineage:
+      - datalake_ebdb_raw.mapregiao.cidadeid
+  city_name:
+    lineage:
+      - datalake_ebdb_raw.mapregiao.cidadenome

@@ -1,0 +1,75 @@
+database_name: datalake_ebdb_clean
+table_name: listing_business_context_aud
+columns:
+  id_listing_business_context:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.id
+  rev:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.revtype
+  ts_last_publication:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.lastpublicationdate
+  mod_ts_last_publication:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.lastpublicationdate_mod
+  business_context:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.businesscontext
+  mod_business_context:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.businesscontext_mod
+  short_url:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.shorturl
+  mod_short_url:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.shorturl_mod
+  status:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.status
+  mod_status:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.status_mod
+  status_closing:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.closingstatus
+  mod_status_closing:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.closingstatus_mod
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.imovelid
+  selected_action:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.selectedaction
+  mod_selected_action:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.selectedaction_mod
+  status_reason:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.statusreason
+  mod_status_reason:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.statusreason_mod
+  calculator_price:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.calculatorprice
+  mod_calculator_price:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.calculatorprice_mod
+  ts_first_publication:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.firstpublicationdate
+  mod_ts_first_publication:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.firstpublicationdate_mod
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.criadoem

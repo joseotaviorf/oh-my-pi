@@ -1,0 +1,72 @@
+database_name: datalake_ebdb_clean
+table_name: offer_aud
+columns:
+  id_offer:
+    lineage:
+      - datalake_ebdb_raw.offer_aud.id
+  rev:
+    lineage:
+      - datalake_ebdb_raw.offer_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.offer_aud.revtype
+  id_client:
+    lineage:
+      - datalake_ebdb_raw.offer_aud.client_id
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.offer_aud.house_id
+  id_rent_flow:
+    lineage:
+      - datalake_ebdb_raw.offer_aud.rentflow_id
+  id_firestore:
+    lineage:
+      - datalake_ebdb_raw.offer_aud.firestoreid
+  id_godfather:
+    lineage:
+      - datalake_ebdb_raw.offer_aud.godfatherid
+  original_condo:
+    lineage:
+      - datalake_ebdb_raw.offer_aud.originalcondo
+  original_home_insurance:
+    lineage:
+      - datalake_ebdb_raw.offer_aud.originalhomeinsurance
+  original_iptu:
+    lineage:
+      - datalake_ebdb_raw.offer_aud.originaliptu
+  original_rent:
+    lineage:
+      - datalake_ebdb_raw.offer_aud.originalrent
+  rent:
+    lineage:
+      - datalake_ebdb_raw.offer_aud.rent
+  status:
+    lineage:
+      - datalake_ebdb_raw.offer_aud.status
+  turn:
+    lineage:
+      - datalake_ebdb_raw.offer_aud.turn
+  ts_expiration:
+    lineage:
+      - datalake_ebdb_raw.offer_aud.expirationdate
+  iteration:
+    lineage:
+      - datalake_ebdb_raw.offer_aud.iteration
+  rejection_reason:
+    lineage:
+      - datalake_ebdb_raw.offer_aud.rejectionreason
+  mod_status:
+    lineage:
+      - datalake_ebdb_raw.offer_aud.status_mod
+  mod_turn:
+    lineage:
+      - datalake_ebdb_raw.offer_aud.turn_mod
+  type:
+    lineage:
+      - datalake_ebdb_raw.offer_aud.type
+  ts_godfather_updated:
+    lineage:
+      - datalake_ebdb_raw.offer_aud.godfatherupdatedat
+  resident_name:
+    lineage:
+      - datalake_ebdb_raw.offer_aud.residentname

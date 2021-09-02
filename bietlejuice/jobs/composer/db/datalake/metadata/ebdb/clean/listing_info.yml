@@ -1,0 +1,39 @@
+database_name: datalake_ebdb_clean
+table_name: listing_info
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.listinginfo.id
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.listinginfo.house_id
+  moving_date:
+    lineage:
+      - datalake_ebdb_raw.listinginfo.movingdate
+  days_to_vacate:
+    lineage:
+      - datalake_ebdb_raw.listinginfo.daystovacate
+  display_custom_offer_preference:
+    lineage:
+      - datalake_ebdb_raw.listinginfo.displaycustomofferpreference
+  awaiting_availability_reason:
+    lineage:
+      - datalake_ebdb_raw.listinginfo.awaitingavailabilityreason
+  allows_custom_offer:
+    lineage:
+      - datalake_ebdb_raw.listinginfo.allowscustomoffer
+  availability_type:
+    lineage:
+      - datalake_ebdb_raw.listinginfo.availabilitytype
+  furniture:
+    lineage:
+      - datalake_ebdb_raw.listinginfo.furniture
+  dt_moving_defined:
+    lineage:
+      - datalake_ebdb_raw.listinginfo.movingdatedefined
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.listinginfo.updated_on
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.listinginfo.created_on

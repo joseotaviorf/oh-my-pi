@@ -1,0 +1,15 @@
+database_name: datalake_ebdb_clean
+table_name: key_type
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.keytype.id
+  name:
+    lineage:
+      - datalake_ebdb_raw.keytype.name
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.keytype.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.keytype.criadoem

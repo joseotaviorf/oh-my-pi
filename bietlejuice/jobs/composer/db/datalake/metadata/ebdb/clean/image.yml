@@ -1,0 +1,27 @@
+database_name: datalake_ebdb_clean
+table_name: image
+columns:
+  id_contract:
+    lineage:
+      - datalake_ebdb_raw.imagem.id
+  name:
+    lineage:
+      - datalake_ebdb_raw.imagem.nome
+  is_principal:
+    lineage:
+      - datalake_ebdb_raw.imagem.principal
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.imagem.imovel_id
+  subtitle:
+    lineage:
+      - datalake_ebdb_raw.imagem.legenda
+  sequence:
+    lineage:
+      - datalake_ebdb_raw.imagem.ordem
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.imagem.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.imagem.criadoem

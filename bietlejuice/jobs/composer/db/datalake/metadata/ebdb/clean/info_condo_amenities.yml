@@ -1,0 +1,36 @@
+database_name: datalake_ebdb_clean
+table_name: info_condo_amenities
+columns:
+  id_info_condo_amenity:
+    lineage:
+      - datalake_ebdb_raw.instalacaoinfo.id
+  is_first_field:
+    lineage:
+      - datalake_ebdb_raw.instalacaoinfo.campo1
+  is_second_field:
+    lineage:
+      - datalake_ebdb_raw.instalacaoinfo.campo2
+  is_third_field:
+    lineage:
+      - datalake_ebdb_raw.instalacaoinfo.campo3
+  is_fourth_field:
+    lineage:
+      - datalake_ebdb_raw.instalacaoinfo.campo4
+  is_fifth_field:
+    lineage:
+      - datalake_ebdb_raw.instalacaoinfo.campo5
+  has_characteristic:
+    lineage:
+      - datalake_ebdb_raw.instalacaoinfo.temcaracteristica
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.instalacaoinfo.imovel_id
+  id_condo_amenities:
+    lineage:
+      - datalake_ebdb_raw.instalacaoinfo.instalacao_id
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.instalacaoinfo.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.instalacaoinfo.criadoem

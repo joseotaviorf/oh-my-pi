@@ -1,0 +1,42 @@
+database_name: datalake_ebdb_clean
+table_name: local
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.local.id
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.local.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.local.criadoem
+  lat:
+    lineage:
+      - datalake_ebdb_raw.local.lat
+  lat_lng:
+    lineage:
+      - datalake_ebdb_raw.local.latlng
+  lng:
+    lineage:
+      - datalake_ebdb_raw.local.lng
+  name:
+    lineage:
+      - datalake_ebdb_raw.local.nome
+  external_reference:
+    lineage:
+      - datalake_ebdb_raw.local.referenciaexterna
+  type:
+    lineage:
+      - datalake_ebdb_raw.local.tipo
+  is_active:
+    lineage:
+      - datalake_ebdb_raw.local.active
+  comment:
+    lineage:
+      - datalake_ebdb_raw.local.comment
+  slug:
+    lineage:
+      - datalake_ebdb_raw.local.slug
+  id_region:
+    lineage:
+      - datalake_ebdb_raw.local.region_id

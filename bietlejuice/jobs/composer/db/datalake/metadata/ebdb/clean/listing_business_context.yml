@@ -1,0 +1,42 @@
+database_name: datalake_ebdb_clean
+table_name: listing_business_context
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext.id
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext.imovelid
+  business_context:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext.businesscontext
+  status:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext.status
+  status_reason:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext.statusreason
+  status_closing:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext.closingstatus
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext.criadoem
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext.atualizadoem
+  ts_first_publication:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext.firstpublicationdate
+  ts_last_publication:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext.lastpublicationdate
+  short_url:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext.shorturl
+  calculator_price:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext.calculatorprice
+  selected_action:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext.selectedaction
