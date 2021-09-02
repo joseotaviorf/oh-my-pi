@@ -75,6 +75,7 @@ task_group = DatalakeTaskGroup(
     relative_query_path=SOURCE,
     spark_jobs_path=BASE_SPARK_JOBS_PATH,
     athena_query_result_location=athena_query_results_bucket,
+    execution_timeout_hours=4,
 )
 
 for report_type in reports_list:
