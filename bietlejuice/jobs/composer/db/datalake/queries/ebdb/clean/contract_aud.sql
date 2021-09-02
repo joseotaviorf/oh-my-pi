@@ -53,7 +53,7 @@ SELECT
     tipoAssinatura AS signature_type,
     tipoAssinatura_MOD AS mod_signature_type,
     dataContratoEletronicoEnviado AS ts_electronic_contract_sent,
-    dataContratoEletronicoEnviado AS mod_ts_electronic_contract_sent,
+    dataContratoEletronicoEnviado_MOD AS mod_ts_electronic_contract_sent,
     statusClosing AS status_closing,
     statusClosing_MOD AS mod_status_closing,
     contratoAssinado AS contract_signed,

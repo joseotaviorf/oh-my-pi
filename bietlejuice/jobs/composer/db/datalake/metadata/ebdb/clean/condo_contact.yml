@@ -1,0 +1,24 @@
+database_name: datalake_ebdb_clean
+table_name: condo_contact
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.contatocondominio.id
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.contatocondominio.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.contatocondominio.criadoem
+  name:
+    lineage:
+      - datalake_ebdb_raw.contatocondominio.nome
+  phone_number:
+    lineage:
+      - datalake_ebdb_raw.contatocondominio.telefone
+  type:
+    lineage:
+      - datalake_ebdb_raw.contatocondominio.tipo
+  id_condo:
+    lineage:
+      - datalake_ebdb_raw.contatocondominio.condominio_id

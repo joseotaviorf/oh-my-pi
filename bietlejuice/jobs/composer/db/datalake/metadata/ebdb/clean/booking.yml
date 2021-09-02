@@ -1,0 +1,114 @@
+database_name: datalake_ebdb_clean
+table_name: booking
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.agendamento.id
+  id_visitor:
+    lineage:
+      - datalake_ebdb_raw.agendamento.visitante_id
+  id_agent:
+    lineage:
+      - datalake_ebdb_raw.agendamento.agente_id
+  id_coordinate:
+    lineage:
+      - datalake_ebdb_raw.agendamento.coordinateid
+  is_closed:
+    lineage:
+      - datalake_ebdb_raw.agendamento.encerrado
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.agendamento.imovel_id
+  is_first_time:
+    lineage:
+      - datalake_ebdb_raw.agendamento.primeiravez
+  id_visit:
+    lineage:
+      - datalake_ebdb_raw.agendamento.visita_id
+  id_rent_flow:
+    lineage:
+      - datalake_ebdb_raw.agendamento.fluxolocacao_id
+  id_rescheduled_booking:
+    lineage:
+      - datalake_ebdb_raw.agendamento.reagendadode_id
+  id_fup_details:
+    lineage:
+      - datalake_ebdb_raw.agendamento.followupdetails_id
+  id_photo_job:
+    lineage:
+      - datalake_ebdb_raw.agendamento.jobfotografo_id
+  id_attendant:
+    lineage:
+      - datalake_ebdb_raw.agendamento.atendente_id
+  id_last_update_origin:
+    lineage:
+      - datalake_ebdb_raw.agendamento.origemultimaatualizacao_id
+  code:
+    lineage:
+      - datalake_ebdb_raw.agendamento.codigo
+  slots_duration:
+    lineage:
+      - datalake_ebdb_raw.agendamento.durationinslots
+  business_context:
+    lineage:
+      - datalake_ebdb_raw.agendamento.businesscontext
+  buyer_intention:
+    lineage:
+      - datalake_ebdb_raw.agendamento.intention
+  checkin_status:
+    lineage:
+      - datalake_ebdb_raw.agendamento.checkinstatus
+  visitor_id_date_slot:
+    lineage:
+      - datalake_ebdb_raw.agendamento.visitordatetime
+  status:
+    lineage:
+      - datalake_ebdb_raw.agendamento.status
+  contact_preference:
+    lineage:
+      - datalake_ebdb_raw.agendamento.preferecontato
+  hash:
+    lineage:
+      - datalake_ebdb_raw.agendamento.hash
+  slot_day:
+    lineage:
+      - datalake_ebdb_raw.agendamento.slotdia
+  visit_fup:
+    lineage:
+      - datalake_ebdb_raw.agendamento.fupvisita
+  type:
+    lineage:
+      - datalake_ebdb_raw.agendamento.tipo
+  is_agent_fixed:
+    lineage:
+      - datalake_ebdb_raw.agendamento.agentefixo
+  visit_fup_comment:
+    lineage:
+      - datalake_ebdb_raw.agendamento.comentariofupvisita
+  is_tenant_notification_pending:
+    lineage:
+      - datalake_ebdb_raw.agendamento.informeinquilinopendente
+  is_confirmed:
+    lineage:
+      - datalake_ebdb_raw.agendamento.confirmado
+  is_conflict_allowed:
+    lineage:
+      - datalake_ebdb_raw.agendamento.permitirconflito
+  dt_booking:
+    lineage:
+      - datalake_ebdb_raw.agendamento.data
+  ts_next_not_fup:
+    lineage:
+      - datalake_ebdb_raw.agendamento.proxnotfup
+  ts_visit_fup:
+    lineage:
+      - datalake_ebdb_raw.agendamento.datafupvisita
+  ts_negotiation_start_notified:
+    lineage:
+      - datalake_ebdb_raw.agendamento.avisadoentrouemnegociacao
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.agendamento.criadoem
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.agendamento.atualizadoem

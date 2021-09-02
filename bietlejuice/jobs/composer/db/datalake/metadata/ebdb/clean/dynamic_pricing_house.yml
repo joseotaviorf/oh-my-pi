@@ -1,0 +1,45 @@
+database_name: datalake_ebdb_clean
+table_name: dynamic_pricing_house
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse.id
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse.houseid
+  min_rent:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse.minrent
+  initial_rent:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse.initialrent
+  dt_last_price_updated:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse.lastpriceupdate
+  id_dynamic_pricing_parameter:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse.dynamicpricingparameterid
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse.criadoem
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse.atualizadoem
+  status:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse.status
+  occurred_price_changes:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse.pricechangesoccurred
+  is_enabled:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse.enabled
+  operation_mode:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse.operationmode
+  origin:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse.origin
+  pre_publication_rent_probability:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse.prepublicationrentprobability

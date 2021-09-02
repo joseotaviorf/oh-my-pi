@@ -1,0 +1,54 @@
+database_name: datalake_ebdb_clean
+table_name: doorman_affiliate_data
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.doormanaffiliatedata.id
+  work_address:
+    lineage:
+      - datalake_ebdb_raw.doormanaffiliatedata.workaddress
+  work_house_number:
+    lineage:
+      - datalake_ebdb_raw.doormanaffiliatedata.workhousenumber
+  code:
+    lineage:
+      - datalake_ebdb_raw.doormanaffiliatedata.code
+  work_neighborhood:
+    lineage:
+      - datalake_ebdb_raw.doormanaffiliatedata.workneighbourhood
+  work_city:
+    lineage:
+      - datalake_ebdb_raw.doormanaffiliatedata.workcity
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.doormanaffiliatedata.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.doormanaffiliatedata.criadoem
+  ts_joined:
+    lineage:
+      - datalake_ebdb_raw.doormanaffiliatedata.joinedprogramat
+  lat:
+    lineage:
+      - datalake_ebdb_raw.doormanaffiliatedata.lat
+  lng:
+    lineage:
+      - datalake_ebdb_raw.doormanaffiliatedata.lng
+  id_place:
+    lineage:
+      - datalake_ebdb_raw.doormanaffiliatedata.placeid
+  subscription_source:
+    lineage:
+      - datalake_ebdb_raw.doormanaffiliatedata.subscriptionsource
+  work_state:
+    lineage:
+      - datalake_ebdb_raw.doormanaffiliatedata.workstate
+  work_street:
+    lineage:
+      - datalake_ebdb_raw.doormanaffiliatedata.workstreet
+  recrutier:
+    lineage:
+      - datalake_ebdb_raw.doormanaffiliatedata.recruiter
+  id_doorman_occupation:
+    lineage:
+      - datalake_ebdb_raw.doormanaffiliatedata.doorman_occupation_id

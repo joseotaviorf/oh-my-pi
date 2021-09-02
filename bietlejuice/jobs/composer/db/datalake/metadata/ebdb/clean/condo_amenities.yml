@@ -1,0 +1,45 @@
+database_name: datalake_ebdb_clean
+table_name: condo_amenities
+columns:
+  id_condo_amenity:
+    lineage:
+      - datalake_ebdb_raw.instalacao.id
+  name:
+    lineage:
+      - datalake_ebdb_raw.instalacao.nome
+  is_active:
+    lineage:
+      - datalake_ebdb_raw.instalacao.ativo
+  first_description_field:
+    lineage:
+      - datalake_ebdb_raw.instalacao.descricaocampo1
+  second_description_field:
+    lineage:
+      - datalake_ebdb_raw.instalacao.descricaocampo2
+  third_description_field:
+    lineage:
+      - datalake_ebdb_raw.instalacao.descricaocampo3
+  fourth_description_field:
+    lineage:
+      - datalake_ebdb_raw.instalacao.descricaocampo4
+  fifth_description_field:
+    lineage:
+      - datalake_ebdb_raw.instalacao.descricaocampo5
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.instalacao.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.instalacao.criadoem
+  is_editable:
+    lineage:
+      - datalake_ebdb_raw.instalacao.editavel
+  code:
+    lineage:
+      - datalake_ebdb_raw.instalacao.codigo
+  slug:
+    lineage:
+      - datalake_ebdb_raw.instalacao.slug
+  salesforce_code:
+    lineage:
+      - datalake_ebdb_raw.instalacao.salesforcecode

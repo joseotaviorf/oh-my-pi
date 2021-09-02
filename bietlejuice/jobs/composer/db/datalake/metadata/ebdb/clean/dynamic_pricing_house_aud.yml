@@ -1,0 +1,66 @@
+database_name: datalake_ebdb_clean
+table_name: dynamic_pricing_house_aud
+columns:
+  rev:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.revtype
+  id:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.id
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.houseid
+  min_rent:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.minrent
+  initial_rent:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.initialrent
+  last_price_updated:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.lastpriceupdate
+  id_dynamic_pricing_parameter:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.dynamicpricingparameterid
+  status:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.status
+  mod_status:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.status_mod
+  mod_id_dynamic_pricing_parameter:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.dynamicpricingparameterid_mod
+  price_changes_occurred:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.pricechangesoccurred
+  mod_price_changes_occurred:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.pricechangesoccurred_mod
+  is_enabled:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.enabled
+  mod_is_enabled:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.enabled_mod
+  operation_mode:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.operationmode
+  mod_operation_mode:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.operationmode_mod
+  origin:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.origin
+  mod_origin:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.origin_mod
+  pre_publication_rent_probability:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.prepublicationrentprobability
+  mod_pre_publication_rent_probability:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.prepublicationrentprobability_mod

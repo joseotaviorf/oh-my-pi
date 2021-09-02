@@ -1,0 +1,21 @@
+database_name: datalake_ebdb_clean
+table_name: city
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.municipio.id
+  siafi_code:
+    lineage:
+      - datalake_ebdb_raw.municipio.codigosiafi
+  name:
+    lineage:
+      - datalake_ebdb_raw.municipio.nomemunicipio
+  uf:
+    lineage:
+      - datalake_ebdb_raw.municipio.uf
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.municipio.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.municipio.criadoem

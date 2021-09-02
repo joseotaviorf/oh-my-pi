@@ -1,0 +1,99 @@
+database_name: datalake_ebdb_clean
+table_name: booking_aud
+columns:
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.revtype
+  business_context:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.businesscontext
+  checkin_status:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.checkinstatus
+  status:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.status
+  mod_id_agent:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.agente_mod
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.imovel_id
+  mod_id_house:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.imovel_mod
+  mod_dt_booking:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.data_mod
+  ts_visit_fup:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.datafupvisita
+  id_rent_flow:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.fluxolocacao_id
+  dt_booking:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.data
+  slot_day:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.slotdia
+  is_agent_fixed:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.agentefixo
+  id:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.id
+  id_visitor:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.visitante_id
+  mod_id_visitor:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.visitante_mod
+  id_agent:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.agente_id
+  visit_fup:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.fupvisita
+  id_rescheduled_booking:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.reagendadode_id
+  mod_is_tenant_notification_pending:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.informeinquilinopendente_mod
+  mod_slot_day:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.slotdia_mod
+  rev:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.rev
+  mod_is_fixed_agent:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.agentefixo_mod
+  is_tenant_notification_pending:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.informeinquilinopendente
+  mod_status:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.status_mod
+  visit_fup_comment:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.comentariofupvisita
+  mod_id_attendant:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.atendente_mod
+  mod_id_rescheduled_booking:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.reagendadode_mod
+  mod_checkin_status:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.checkinstatus_mod
+  id_attendant:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.atendente_id
+  id_last_update_origin:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.origemultimaatualizacao_id
+  type:
+    lineage:
+      - datalake_ebdb_raw.agendamento_aud.tipo

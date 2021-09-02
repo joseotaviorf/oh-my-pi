@@ -1,0 +1,30 @@
+database_name: datalake_ebdb_clean
+table_name: cep
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.cep.id
+  state:
+    lineage:
+      - datalake_ebdb_raw.cep.estado
+  city:
+    lineage:
+      - datalake_ebdb_raw.cep.cidade
+  house_address_street:
+    lineage:
+      - datalake_ebdb_raw.cep.logradouro
+  neighborhood:
+    lineage:
+      - datalake_ebdb_raw.cep.bairro
+  zip_code:
+    lineage:
+      - datalake_ebdb_raw.cep.cep
+  house_address_street_type:
+    lineage:
+      - datalake_ebdb_raw.cep.tplogradouro
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.cep.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.cep.criadoem

@@ -1,0 +1,231 @@
+database_name: datalake_ebdb_clean
+table_name: contract_aud
+columns:
+  id_contract:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.id
+  rev:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.revtype
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.imovel_id
+  observation:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.observacao
+  rent:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.valoraluguel
+  mod_rent:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.valoraluguel_mod
+  status:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.status
+  mod_status:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.status_mod
+  billing_day_of_month:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.diamescobranca
+  guarantee_type:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.garantia
+  mod_guarantee_type:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.garantia_mod
+  type:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.tipo
+  id_user:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.usuario_id
+  owners_comment:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.comentarioproprietario
+  dt_entered:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.dataentrada
+  mod_dt_entered:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.dataentrada_mod
+  dt_started:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.datainicio
+  mod_dt_started:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.datainicio_mod
+  iptu_installment:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.iptu_parcelas
+  iptu:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.iptu_valor
+  mod_iptu:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.iptu_mod
+  paying_condo:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.pagantecondominio
+  paying_iptu:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.paganteiptu
+  responsible_for_condo:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.responsavelcondominio
+  responsible_for_iptu:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.responsaveliptu
+  home_insurance_installment:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.seguroresidencial_parcelas
+  home_insurance_value:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.seguroresidencial_valor
+  fist_rent_comission_fee:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.taxacomissaoprimeiroaluguel
+  mod_fist_rent_comission_fee:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.taxacomissaoprimeiroaluguel_mod
+  condo_price:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.valorcondominio
+  value_iptu:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.valoriptu
+  mod_value_iptu:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.valoriptu_mod
+  has_home_insurance:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.comseguroresidencial
+  ts_contract_expected_end:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.datafimcontratoprevisto
+  mod_ts_contract_expected_end:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.datafimcontratoprevisto_mod
+  dt_termination:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.datarescisao
+  mod_dt_termination:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.datarescisao_mod
+  bank_data_agency:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.dadosbanco_agencia
+  bank_data_account:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.dadosbanco_contacorrente
+  bank_data_cpf_cnpj:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.dadosbanco_cpfoucnpj
+  bank_data_name:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.dadosbanco_nome
+  bank_data_other_holder:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.dadosbanco_outrotitular
+  bank_data_account_type:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.dadosbanco_tipoconta
+  mod_bank_data:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.dadosbanco_mod
+  ts_signed:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.dataassinado
+  mod_ts_signed:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.dataassinado_mod
+  ts_minuta_approved:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.dataminutaaprovada
+  has_contract_amendment:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.termoaditivoadicionado
+  mod_has_contract_amendment:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.termoaditivoadicionado_mod
+  signature_type:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.tipoassinatura
+  mod_signature_type:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.tipoassinatura_mod
+  ts_electronic_contract_sent:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.datacontratoeletronicoenviado
+  mod_ts_electronic_contract_sent:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.datacontratoeletronicoenviado_mod
+  status_closing:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.statusclosing
+  mod_status_closing:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.statusclosing_mod
+  contract_signed:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.contratoassinado
+  id_google_drive:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.googledriveid
+  token_esignature_rent:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.tokenesignaturelocacao
+  token_esignature_adm:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.tokenesignatureadm
+  mod_token_esignature_adm:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.tokenesignatureadm_mod
+  management_contract_signed:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.contratoadministracaoassinado
+  authorization_contract_entry_signed:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.contratoautorizacaoentradaassinado
+  rent_contract_signed:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.contratolocacaoassinado
+  ts_ownership_swapped:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.datatrocatitularidade
+  policy:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.policy
+  id_administration_fee_type:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.administrationfeetype_id
+  id_contract_version:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.contractversion_id
+  mod_contract_version:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.contractversion_mod
+  ts_expected_termination:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.datarescisaoprevista
+  mod_ts_expected_termination:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.datarescisaoprevista_mod
+  ts_fair_fax_start:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.fairfaxstartdate
+  agent_brokerage_share:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.estateagentbrokerageshare
+  mod_agent_brokerage_share:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.estateagentbrokerageshare_mod
+  tenant_service_fee:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.tenantservicefee
+  mod_tenant_service_fee:
+    lineage:
+      - datalake_ebdb_raw.contrato_aud.tenantservicefee_mod

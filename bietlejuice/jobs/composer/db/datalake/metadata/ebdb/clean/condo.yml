@@ -1,0 +1,72 @@
+database_name: datalake_ebdb_clean
+table_name: condo
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.condominio.id
+  id_condo_manager:
+    lineage:
+      - datalake_ebdb_raw.condominio.condomanager_id
+  name:
+    lineage:
+      - datalake_ebdb_raw.condominio.nome
+  address:
+    lineage:
+      - datalake_ebdb_raw.condominio.endereco
+  number:
+    lineage:
+      - datalake_ebdb_raw.condominio.numero
+  neighborhood:
+    lineage:
+      - datalake_ebdb_raw.condominio.bairro
+  city:
+    lineage:
+      - datalake_ebdb_raw.condominio.cidade
+  zipcode:
+    lineage:
+      - datalake_ebdb_raw.condominio.cep
+  lat:
+    lineage:
+      - datalake_ebdb_raw.condominio.lat
+  lng:
+    lineage:
+      - datalake_ebdb_raw.condominio.lng
+  latlng:
+    lineage:
+      - datalake_ebdb_raw.condominio.latlng
+  rules:
+    lineage:
+      - datalake_ebdb_raw.condominio.rules
+  external_reference:
+    lineage:
+      - datalake_ebdb_raw.condominio.referenciaexterna
+  entry_authorization:
+    lineage:
+      - datalake_ebdb_raw.condominio.entryauthorization
+  entry_authorization_info:
+    lineage:
+      - datalake_ebdb_raw.condominio.entryauthorizationinfo
+  has_condo_page:
+    lineage:
+      - datalake_ebdb_raw.condominio.hascondominiumpage
+  dt_expiration:
+    lineage:
+      - datalake_ebdb_raw.condominio.expirationday
+  ts_weekend_moving_schedule_ended:
+    lineage:
+      - datalake_ebdb_raw.condominio.weekendendmovingschedule
+  ts_weekend_moving_schedule_started:
+    lineage:
+      - datalake_ebdb_raw.condominio.weekendstartmovingschedule
+  ts_workdays_moving_schedule_ended:
+    lineage:
+      - datalake_ebdb_raw.condominio.workdaysendmovingschedule
+  ts_workdays_moving_schedule_started:
+    lineage:
+      - datalake_ebdb_raw.condominio.workdaysstartmovingschedule
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.condominio.criadoem
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.condominio.atualizadoem

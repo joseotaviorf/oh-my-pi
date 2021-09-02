@@ -1,0 +1,21 @@
+database_name: datalake_ebdb_clean
+table_name: doorman_affiliate_occupation
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.doormanaffiliateoccupation.id
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.doormanaffiliateoccupation.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.doormanaffiliateoccupation.criadoem
+  name:
+    lineage:
+      - datalake_ebdb_raw.doormanaffiliateoccupation.name
+  rank:
+    lineage:
+      - datalake_ebdb_raw.doormanaffiliateoccupation.rank
+  is_active:
+    lineage:
+      - datalake_ebdb_raw.doormanaffiliateoccupation.active

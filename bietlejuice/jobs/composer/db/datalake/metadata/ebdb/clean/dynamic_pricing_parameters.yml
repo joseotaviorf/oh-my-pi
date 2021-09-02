@@ -1,0 +1,51 @@
+database_name: datalake_ebdb_clean
+table_name: dynamic_pricing_parameters
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.id
+  parameters_name:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.name
+  parameters_description:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.description
+  days_threshold:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.daysthreshold
+  offers_threshold:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.offersthreshold
+  visits_days_threshold:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.visitsdaysthreshold
+  visits_threshold:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.visitsthreshold
+  drops:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.dropscount
+  ts_started:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.begindate
+  ts_ended:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.enddate
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.criadoem
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.atualizadoem
+  initial_rent_percentile:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.initialrentpercentile
+  min_rent_percentile:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.minrentpercentile
+  initial_rent_ratio:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.initialrentratio
+  min_rent_ratio:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.minrentratio

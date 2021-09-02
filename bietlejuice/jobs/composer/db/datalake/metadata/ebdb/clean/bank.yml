@@ -1,0 +1,24 @@
+database_name: datalake_ebdb_clean
+table_name: bank
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.banco.id
+  name:
+    lineage:
+      - datalake_ebdb_raw.banco.nome
+  code:
+    lineage:
+      - datalake_ebdb_raw.banco.codigo
+  febraban_name:
+    lineage:
+      - datalake_ebdb_raw.banco.nomefebraban
+  featured_rank:
+    lineage:
+      - datalake_ebdb_raw.banco.featuredrank
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.banco.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.banco.criadoem

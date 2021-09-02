@@ -1,0 +1,42 @@
+database_name: datalake_ebdb_clean
+table_name: device
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.device.id
+  arn:
+    lineage:
+      - datalake_ebdb_raw.device.arn
+  mobile_app:
+    lineage:
+      - datalake_ebdb_raw.device.mobileapp
+  id_user:
+    lineage:
+      - datalake_ebdb_raw.device.usuario_id
+  token:
+    lineage:
+      - datalake_ebdb_raw.device.token
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.device.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.device.criadoem
+  arn_endpoint:
+    lineage:
+      - datalake_ebdb_raw.device.endpointarn
+  mobile_platform:
+    lineage:
+      - datalake_ebdb_raw.device.mobileplatform
+  app_version:
+    lineage:
+      - datalake_ebdb_raw.device.appversion
+  environment:
+    lineage:
+      - datalake_ebdb_raw.device.environment
+  pwa_public_key:
+    lineage:
+      - datalake_ebdb_raw.device.pwapublickey
+  pwa_auth:
+    lineage:
+      - datalake_ebdb_raw.device.pwaauth
