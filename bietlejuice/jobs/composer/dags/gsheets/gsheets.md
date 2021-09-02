@@ -62,6 +62,10 @@ This pipeline produces the following output tables:
     - `inspection_bugs_v2`
     - `inspectors_control`
     - `ipsos_brandtracking_questions`
+    - `keys_logistic_offboarding`
+    - `keys_logistic_onboarding_tenant_b2b`
+    - `keys_logistic_onboarding_tenant`
+    - `keys_logistic_pre_contract`   
     - `local_holidays`
     - `marketing_costs_campaign_city`
     - `marketing_costs_full_taxonomy`

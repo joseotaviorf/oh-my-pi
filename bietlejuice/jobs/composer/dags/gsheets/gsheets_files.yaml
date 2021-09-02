@@ -230,6 +230,26 @@ ltvoutput:
     sheet_name: LTVOutput
     clean_table_name: affiliates_monthly_expected_results
 
+keys_logistic_offboarding:
+    sheet_id: 1Ck3g42BHvOXp32KQT7fgOSNw7CytPno7DHdoybYSVS0
+    sheet_name: keys_logistic_offboarding
+    clean_table_name: keys_logistic_offboarding
+
+keys_logistic_onboarding_tenant_b2b:
+    sheet_id: 1fwrpBAr2g4mhd76xdKKgifpLz0AHoo75vqHn5GEIuyE
+    sheet_name: keys_logistic_onboarding_tenant_b2b
+    clean_table_name: keys_logistic_onboarding_tenant_b2b
+
+keys_logistic_onboarding_tenant:
+    sheet_id: 1fwrpBAr2g4mhd76xdKKgifpLz0AHoo75vqHn5GEIuyE
+    sheet_name: keys_logistic_onboarding_tenant
+    clean_table_name: keys_logistic_onboarding_tenant
+
+keys_logistic_pre_contract:
+    sheet_id: 1ge87PnLZDt16PME8mytPOHDs1uBbBrYxuGncrpuiwrg
+    sheet_name: keys_logistic_pre_contract
+    clean_table_name: keys_logistic_pre_contract
+
 marketing_costs_manual_costs_google:
     sheet_id: 1e1FoBoCN0XYH3vo8u0aZ-GocU453gkfDIasX0ivDonc
     sheet_name: Google Costs
