@@ -1,0 +1,21 @@
+database_name: datalake_ebdb_clean
+table_name: proposal_condition
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.condicaoproposta.id
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.condicaoproposta.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.condicaoproposta.criadoem
+  has_agreed:
+    lineage:
+      - datalake_ebdb_raw.condicaoproposta.concordado
+  description:
+    lineage:
+      - datalake_ebdb_raw.condicaoproposta.descricao
+  title:
+    lineage:
+      - datalake_ebdb_raw.condicaoproposta.titulo

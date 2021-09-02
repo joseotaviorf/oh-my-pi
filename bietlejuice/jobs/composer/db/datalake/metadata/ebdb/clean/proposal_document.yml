@@ -1,0 +1,30 @@
+database_name: datalake_ebdb_clean
+table_name: proposal_document
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.documentoproposta.id
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.documentoproposta.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.documentoproposta.criadoem
+  file_name:
+    lineage:
+      - datalake_ebdb_raw.documentoproposta.nomearquivo
+  sequence:
+    lineage:
+      - datalake_ebdb_raw.documentoproposta.sequencia
+  type:
+    lineage:
+      - datalake_ebdb_raw.documentoproposta.tipo
+  url:
+    lineage:
+      - datalake_ebdb_raw.documentoproposta.url
+  id_proponent:
+    lineage:
+      - datalake_ebdb_raw.documentoproposta.proponente_id
+  content_type:
+    lineage:
+      - datalake_ebdb_raw.documentoproposta.contenttype

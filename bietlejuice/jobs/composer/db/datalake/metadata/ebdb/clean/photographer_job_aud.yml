@@ -1,0 +1,165 @@
+database_name: datalake_ebdb_clean
+table_name: photographer_job_aud
+columns:
+  id_photographer_job:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.id
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.imovel_id
+  id_origin_creation:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.origincreation_id
+  mod_origin_creation:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.origincreation_mod
+  id_reserved_for:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.reservadopara_id
+  mod_reserved_for:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.reservadopara_mod
+  id_photographer_data:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.dadosfotografo_id
+  mod_id_photographer_data:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.dadosfotografo_mod
+  id_last_update_origin:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.originlastupdate_id
+  mod_id_last_update_origin:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.originlastupdate_mod
+  rev:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.rev
+  correctness_score:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.scorecorretude
+  photo_session_email:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.emailsessaofotos
+  mod_photo_session_email:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.emailsessaofotos_mod
+  photo_session_phone:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.telefonesessaofotos
+  mod_photo_session_phone:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.telefonesessaofotos_mod
+  photo_session_secondary_phone:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.telefonesessaofotossecundario
+  mod_photo_session_secondary_phone:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.telefonesessaofotossecundario_mod
+  photo_session_contact_name:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.nomecontatosessaofotos
+  mod_photo_session_contact_name:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.nomecontatosessaofotos_mod
+  photo_sender_user_type:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.photosender
+  status:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.status
+  mod_status:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.status_mod
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.revtype
+  key_pick_up:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.retirarchave
+  mod_key_pick_up:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.retirarchave_mod
+  problem:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.problema
+  mod_problem:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.problema_mod
+  cancellation_reason_text:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.textomotivocancelamento
+  mod_cancellation_reason_text:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.textomotivocancelamento_mod
+  key_others:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.outroschave
+  mod_key_others:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.outroschave_mod
+  has_written_authorization:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.autorizacaoporescrito
+  booking_instructions:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.instrucoesagendamento
+  mod_booking_instructions:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.instrucoesagendamento_mod
+  house_revision:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.revisionimovel
+  contract_type:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.tipocontrato
+  mod_contract_type:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.tipocontrato_mod
+  completeness_score:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.scorecompletude
+  has_lockbox:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.lockbox
+  mod_has_lockbox:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.lockbox_mod
+  mod_has_written_authorization:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.autorizacaoporescrito_mod
+  is_fixed:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.fixed
+  is_confirmed:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.confirmado
+  mod_is_confirmed:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.confirmado_mod
+  is_approved:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.aprovado
+  mod_is_approved:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.aprovado_mod
+  ts_payment:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.datapagamento
+  ts_session_started:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.datainiciosessao
+  ts_photos_uploaded:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.datauploadfotos
+  ts_photo_job_requested:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.datajobpedido
+  ts_scheduled:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.dataagendamento
+  mod_ts_scheduled:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.dataagendamento_mod
+  ts_photographer_accepted:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo_aud.dataaceitofotografo

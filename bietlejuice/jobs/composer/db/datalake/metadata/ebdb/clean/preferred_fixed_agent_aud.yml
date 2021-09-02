@@ -1,0 +1,30 @@
+database_name: datalake_ebdb_clean
+table_name: preferred_fixed_agent_aud
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.preferredfixedagent_aud.id
+  business_context:
+    lineage:
+      - datalake_ebdb_raw.preferredfixedagent_aud.businesscontext
+  mod_business_context:
+    lineage:
+      - datalake_ebdb_raw.preferredfixedagent_aud.businesscontext_mod
+  is_enabled:
+    lineage:
+      - datalake_ebdb_raw.preferredfixedagent_aud.isenabled
+  mod_is_enabled:
+    lineage:
+      - datalake_ebdb_raw.preferredfixedagent_aud.isenabled_mod
+  rev:
+    lineage:
+      - datalake_ebdb_raw.preferredfixedagent_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.preferredfixedagent_aud.revtype
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.preferredfixedagent_aud.criadoem
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.preferredfixedagent_aud.atualizadoem

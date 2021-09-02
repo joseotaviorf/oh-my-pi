@@ -1,0 +1,147 @@
+database_name: datalake_ebdb_clean
+table_name: proposal_aud
+columns:
+  id_proposal:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.id
+  rev:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.revtype
+  ts_approved:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.dataaprovacao
+  ts_documentation_sent:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.datadocumentosenviados
+  ts_owner_documentation_sent:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.datadocumentosproprietarioenviados
+  guarantee_description:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.descricaogarantia
+  has_tenant_accepted_contract:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.inquilinoaceitoucontrato
+  mod_has_tenant_accepted_contract:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.inquilinoaceitoucontrato_mod
+  has_tenant_sent_documentation:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.inquilinoenvioudocumentos
+  mod_has_tenant_sent_documentation:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.inquilinoenvioudocumentos_mod
+  tenant_gdrive_folder:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.inquilinopastagdrive
+  has_owner_accepted_contract:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.proprietarioaceitoucontrato
+  mod_has_owner_accepted_contract:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.proprietarioaceitoucontrato_mod
+  has_owner_sent_documentation:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.proprietarioenvioudocumentos
+  mod_has_owner_sent_documentation:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.proprietarioenvioudocumentos_mod
+  owner_gdrive_folder:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.proprietariopastagdrive
+  status:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.status
+  mod_status:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.status_mod
+  tenant_documentation_status:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.statusdocumentacaoinq
+  mod_tenant_documentation_status:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.statusdocumentacaoinq_mod
+  owner_documentation_status:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.statusdocumentacaoprop
+  mod_owner_documentation_status:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.statusdocumentacaoprop_mod
+  id_ticket:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.ticketid
+  id_proponent:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.proponente_id
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.imovel_id
+  id_negotiation:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.negociacao_id
+  id_pre_proposal:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.preproposta_id
+  has_additive_term:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.fazertermoaditivo
+  mod_has_additive_term:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.fazertermoaditivo_mod
+  ts_owner_visualized:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.visualizeddateowner
+  mod_ts_owner_visualized:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.visualizeddateowner_mod
+  ts_tenant_visualized:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.visualizeddatetenant
+  mod_ts_tenant_visualized:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.visualizeddatetenant_mod
+  id_offer:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.offer_id
+  mod_resident:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.moradores_mod
+  ts_expired:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.expiresat
+  mod_ts_expired:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.expiresat_mod
+  id_portability:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.portability_id
+  mod_portability:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.portability_mod
+  rejection_reason:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.rejectionreason
+  mod_rejection_reason:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.rejectionreason_mod
+  is_tenant_auto_submission:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.istenantautomaticsubmission
+  mod_is_tenant_auto_submission:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.istenantautomaticsubmission_mod
+  is_pre_analyze:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.bypasspreanalysis
+  mod_is_pre_analyze:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.bypasspreanalysis_mod
+  guarantee:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.garantia
+  mod_guarantee:
+    lineage:
+      - datalake_ebdb_raw.proposta_aud.garantia_mod

@@ -1,0 +1,114 @@
+database_name: datalake_ebdb_clean
+table_name: pre_proposal_aud
+columns:
+  id_pre_proposal:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.id
+  rev:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.revtype
+  has_rental_accepted:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.aceitoaluguel
+  mod_has_rental_accepted:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.aceitoaluguel_mod
+  has_income_proof_accepted:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.aceitocomprovarrenda
+  mod_has_income_proof_accepted:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.aceitocomprovarrenda_mod
+  has_charge_accepted:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.aceitoencargos
+  mod_has_charge_accepted:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.aceitoencargos_mod
+  rent:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.aluguel
+  mod_rent:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.aluguel_mod
+  ts_approved:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.dataaprovacao
+  edition:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.edicao
+  mod_edition:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.edicao_mod
+  is_owner_accept_condition:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.proprietarioaceitoucondicoes5a
+  status:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.status
+  mod_status:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.status_mod
+  id_animals:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.animais_id
+  mod_animals:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.animais_mod
+  mod_conditions:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.condicoes_mod
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.imovel_id
+  mod_house:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.imovel_mod
+  id_when_will_schedule:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.quandovaimudar_id
+  mod_when_will_schedule:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.quandovaimudar_mod
+  id_who_will_live:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.quemvaimorar_id
+  mod_who_will_live:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.quemvaimorar_mod
+  id_user:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.usuario_id
+  mod_user:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.usuario_mod
+  original_rent:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.alugueloriginal
+  original_condo:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.condominiooriginal
+  original_iptu:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.iptuoriginal
+  original_home_insurance:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.homeownerinsuranceoriginalvalue
+  ts_expired:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.expirationdate
+  rejection_reason:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.rejectionreason
+  code:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.code
+  ts_visualized:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.visualizeddate
+  mod_ts_visualized:
+    lineage:
+      - datalake_ebdb_raw.preproposta_aud.visualizeddate_mod

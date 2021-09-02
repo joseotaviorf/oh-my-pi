@@ -1,0 +1,18 @@
+database_name: datalake_ebdb_clean
+table_name: polygon_region
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.poligonoregiao.id
+  polygon:
+    lineage:
+      - datalake_ebdb_raw.poligonoregiao.poligono
+  id_region:
+    lineage:
+      - datalake_ebdb_raw.poligonoregiao.regiao_id
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.poligonoregiao.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.poligonoregiao.criadoem

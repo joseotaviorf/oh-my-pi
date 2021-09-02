@@ -1,0 +1,33 @@
+database_name: datalake_ebdb_clean
+table_name: proposal_resident
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.propostamorador.id
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.propostamorador.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.propostamorador.criadoem
+  cpf:
+    lineage:
+      - datalake_ebdb_raw.propostamorador.cpf
+  dt_birth:
+    lineage:
+      - datalake_ebdb_raw.propostamorador.datanascimento
+  email:
+    lineage:
+      - datalake_ebdb_raw.propostamorador.email
+  name:
+    lineage:
+      - datalake_ebdb_raw.propostamorador.nome
+  rg:
+    lineage:
+      - datalake_ebdb_raw.propostamorador.rg
+  phone_number:
+    lineage:
+      - datalake_ebdb_raw.propostamorador.telefone
+  id_proposal:
+    lineage:
+      - datalake_ebdb_raw.propostamorador.proposta_id

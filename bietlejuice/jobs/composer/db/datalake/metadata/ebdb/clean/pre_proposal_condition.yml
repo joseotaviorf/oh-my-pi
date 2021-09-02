@@ -1,0 +1,9 @@
+database_name: datalake_ebdb_clean
+table_name: pre_proposal_condition
+columns:
+  id_pre_proposal:
+    lineage:
+      - datalake_ebdb_raw.preproposta_condicaoproposta.preproposta_id
+  id_conditions:
+    lineage:
+      - datalake_ebdb_raw.preproposta_condicaoproposta.condicoes_id

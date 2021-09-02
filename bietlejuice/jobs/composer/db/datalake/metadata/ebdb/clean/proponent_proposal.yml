@@ -1,0 +1,189 @@
+database_name: datalake_ebdb_clean
+table_name: proponent_proposal
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.id
+  has_contributed_to_current_house:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.contribuinoimovelatual
+  cpf:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.cpf
+  dt_admission_date:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.dataadmissao
+  current_owner:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.donodoatual
+  email:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.email
+  emp_link:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.empvinculo
+  company:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.empresa
+  marital_status:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.estadocivil
+  name:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.nome
+  profession:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.profissao
+  name_reference:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.refnome
+  phone_number_reference:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.reftelefone
+  link_referencce:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.refvinculo
+  monthly_salary:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.rendamensal
+  rg:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.rg
+  gender:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.sexo
+  current_situation:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.situacaoatual
+  phone_number:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.telefone
+  time_lived_in_residence:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.tempoderesidenciaanos
+  id_proposal:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.proposta_id
+  number_of_dependents:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.numerodependentes
+  neighborhood:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.bairro
+  cep:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.cep
+  city:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.cidade
+  complement:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.complemento
+  address:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.endereco
+  number:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.numero
+  id_estado:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.estado_id
+  dt_rg_created:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.dataexpedicaorg
+  dt_birth:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.datanascimento
+  has_guarantor:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.fiador
+  issuing_body:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.orgaoexpedidor
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.criadoem
+  type:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.tipo
+  rental_motive:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.motivolocacao
+  will_live:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.vaimorar
+  nationality:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.nacionalidade
+  name_of_real_estate_company_or_landlord:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.nomeimobiliariaouproprietario
+  mothers_name:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.nomemae
+  country_of_origin:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.paisorigem
+  id_drive_folder:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.pastadriveid
+  branch:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.ramal
+  company_phone_number:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.telefoneempresa
+  phone_number_of_real_estate_company_or_landlord:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.telefoneimobiliariaouproprietario
+  agency_number:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.dadosbancarios_agencia
+  account_number:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.dadosbancarios_contacorrente
+  account_cpf_or_cnpj:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.dadosbancarios_cpfoucnpj
+  account_name:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.dadosbancarios_nome
+  has_secondary_account_holder:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.dadosbancarios_outrotitular
+  account_type:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.dadosbancarios_tipoconta
+  person_type:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.tipopessoa
+  id_bank_account:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.dadosbancarios_banco_id
+  ts_document_validity:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.datavalidadedocumento
+  residential_phone_number:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.telefoneresidencial
+  source_of_income:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.origemrenda
+  additional_income:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.rendimentoadicional
+  documentation_extra_comment:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.documentationextracomment
+  has_cpf_on_rg:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.rghascpf
+  has_cpf_on_rne:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.rnehascpf
+  chosen_documentation_flow:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.chosendocumentationflow

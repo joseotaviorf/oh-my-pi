@@ -1,0 +1,30 @@
+database_name: datalake_ebdb_clean
+table_name: proposal_condition_aud
+columns:
+  id_proposal_condition:
+    lineage:
+      - datalake_ebdb_raw.condicaoproposta_aud.id
+  rev:
+    lineage:
+      - datalake_ebdb_raw.condicaoproposta_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.condicaoproposta_aud.revtype
+  has_agreed:
+    lineage:
+      - datalake_ebdb_raw.condicaoproposta_aud.concordado
+  mod_has_agreed:
+    lineage:
+      - datalake_ebdb_raw.condicaoproposta_aud.concordado_mod
+  description:
+    lineage:
+      - datalake_ebdb_raw.condicaoproposta_aud.descricao
+  mod_description:
+    lineage:
+      - datalake_ebdb_raw.condicaoproposta_aud.descricao_mod
+  title:
+    lineage:
+      - datalake_ebdb_raw.condicaoproposta_aud.titulo
+  mod_title:
+    lineage:
+      - datalake_ebdb_raw.condicaoproposta_aud.titulo_mod

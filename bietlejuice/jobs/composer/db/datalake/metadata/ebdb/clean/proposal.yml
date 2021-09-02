@@ -1,0 +1,114 @@
+database_name: datalake_ebdb_clean
+table_name: proposal
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.proposta.id
+  ts_to_scheduling:
+    lineage:
+      - datalake_ebdb_raw.proposta.dataparamudanca
+  ts_proposal:
+    lineage:
+      - datalake_ebdb_raw.proposta.dataproposta
+  guarantee:
+    lineage:
+      - datalake_ebdb_raw.proposta.garantia
+  ts_guarantee_paid:
+    lineage:
+      - datalake_ebdb_raw.proposta.garantiapagaem
+  motivation:
+    lineage:
+      - datalake_ebdb_raw.proposta.motivacao
+  rent_proposal:
+    lineage:
+      - datalake_ebdb_raw.proposta.propostaaluguel
+  status:
+    lineage:
+      - datalake_ebdb_raw.proposta.status
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.proposta.imovel_id
+  id_proponent:
+    lineage:
+      - datalake_ebdb_raw.proposta.proponente_id
+  explanation:
+    lineage:
+      - datalake_ebdb_raw.proposta.explicacao
+  id_ticket:
+    lineage:
+      - datalake_ebdb_raw.proposta.ticketid
+  guarantee_description:
+    lineage:
+      - datalake_ebdb_raw.proposta.descricaogarantia
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.proposta.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.proposta.criadoem
+  ts_approved:
+    lineage:
+      - datalake_ebdb_raw.proposta.dataaprovacao
+  ts_documentation_sent:
+    lineage:
+      - datalake_ebdb_raw.proposta.datadocumentosenviados
+  id_negotiation:
+    lineage:
+      - datalake_ebdb_raw.proposta.negociacao_id
+  ts_owner_documentation_sent:
+    lineage:
+      - datalake_ebdb_raw.proposta.datadocumentosproprietarioenviados
+  has_owner_sent_documentation:
+    lineage:
+      - datalake_ebdb_raw.proposta.proprietarioenvioudocumentos
+  has_tenant_sent_documentation:
+    lineage:
+      - datalake_ebdb_raw.proposta.inquilinoenvioudocumentos
+  has_owner_accepted_contract:
+    lineage:
+      - datalake_ebdb_raw.proposta.proprietarioaceitoucontrato
+  has_tenant_accepted_contract:
+    lineage:
+      - datalake_ebdb_raw.proposta.inquilinoaceitoucontrato
+  tenant_gdrive_folder:
+    lineage:
+      - datalake_ebdb_raw.proposta.inquilinopastagdrive
+  owner_gdrive_folder:
+    lineage:
+      - datalake_ebdb_raw.proposta.proprietariopastagdrive
+  tenant_documentation_status:
+    lineage:
+      - datalake_ebdb_raw.proposta.statusdocumentacaoinq
+  owner_documentation_status:
+    lineage:
+      - datalake_ebdb_raw.proposta.statusdocumentacaoprop
+  id_pre_proposal:
+    lineage:
+      - datalake_ebdb_raw.proposta.preproposta_id
+  has_additive_term:
+    lineage:
+      - datalake_ebdb_raw.proposta.fazertermoaditivo
+  ts_owner_visualized:
+    lineage:
+      - datalake_ebdb_raw.proposta.visualizeddateowner
+  ts_tenant_visualized:
+    lineage:
+      - datalake_ebdb_raw.proposta.visualizeddatetenant
+  id_offer:
+    lineage:
+      - datalake_ebdb_raw.proposta.offer_id
+  ts_expired:
+    lineage:
+      - datalake_ebdb_raw.proposta.expiresat
+  id_portability:
+    lineage:
+      - datalake_ebdb_raw.proposta.portability_id
+  rejection_reason:
+    lineage:
+      - datalake_ebdb_raw.proposta.rejectionreason
+  is_tenant_auto_submission:
+    lineage:
+      - datalake_ebdb_raw.proposta.istenantautomaticsubmission
+  is_pre_analyze:
+    lineage:
+      - datalake_ebdb_raw.proposta.bypasspreanalysis

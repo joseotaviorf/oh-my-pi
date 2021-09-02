@@ -1,0 +1,81 @@
+database_name: datalake_ebdb_clean
+table_name: pre_proposal
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.preproposta.id
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.preproposta.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.preproposta.criadoem
+  has_rental_accepted:
+    lineage:
+      - datalake_ebdb_raw.preproposta.aceitoaluguel
+  has_income_proof_accepted:
+    lineage:
+      - datalake_ebdb_raw.preproposta.aceitocomprovarrenda
+  has_charge_accepted:
+    lineage:
+      - datalake_ebdb_raw.preproposta.aceitoencargos
+  rent:
+    lineage:
+      - datalake_ebdb_raw.preproposta.aluguel
+  ts_approved:
+    lineage:
+      - datalake_ebdb_raw.preproposta.dataaprovacao
+  edition:
+    lineage:
+      - datalake_ebdb_raw.preproposta.edicao
+  is_owner_accept_condition:
+    lineage:
+      - datalake_ebdb_raw.preproposta.proprietarioaceitoucondicoes5a
+  status:
+    lineage:
+      - datalake_ebdb_raw.preproposta.status
+  last_edition_updated:
+    lineage:
+      - datalake_ebdb_raw.preproposta.ultimoupdateedicao
+  id_animals:
+    lineage:
+      - datalake_ebdb_raw.preproposta.animais_id
+  id_user:
+    lineage:
+      - datalake_ebdb_raw.preproposta.usuario_id
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.preproposta.imovel_id
+  id_when_will_live:
+    lineage:
+      - datalake_ebdb_raw.preproposta.quandovaimudar_id
+  id_who_will_live:
+    lineage:
+      - datalake_ebdb_raw.preproposta.quemvaimorar_id
+  original_rent:
+    lineage:
+      - datalake_ebdb_raw.preproposta.alugueloriginal
+  original_condo:
+    lineage:
+      - datalake_ebdb_raw.preproposta.condominiooriginal
+  original_iptu:
+    lineage:
+      - datalake_ebdb_raw.preproposta.iptuoriginal
+  original_home_insurance:
+    lineage:
+      - datalake_ebdb_raw.preproposta.homeownerinsuranceoriginalvalue
+  ts_expired:
+    lineage:
+      - datalake_ebdb_raw.preproposta.expirationdate
+  ts_last_edition_updated:
+    lineage:
+      - datalake_ebdb_raw.preproposta.lastedicaoupdatedate
+  rejection_reason:
+    lineage:
+      - datalake_ebdb_raw.preproposta.rejectionreason
+  code:
+    lineage:
+      - datalake_ebdb_raw.preproposta.code
+  ts_visualized:
+    lineage:
+      - datalake_ebdb_raw.preproposta.visualizeddate

@@ -1,0 +1,120 @@
+database_name: datalake_ebdb_clean
+table_name: photographer_job
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.id
+  id_photographer_data:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.dadosfotografo_id
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.imovel_id
+  id_origin_creation:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.origincreation_id
+  id_reserved_for:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.reservadopara_id
+  id_last_update_origin:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.originlastupdate_id
+  photo_session_phone:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.telefonesessaofotos
+  photo_session_email:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.emailsessaofotos
+  photo_session_secondary_phone:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.telefonesessaofotossecundario
+  photo_session_contact_name:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.nomecontatosessaofotos
+  photo_sender_user_type:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.photosender
+  status:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.status
+  reason_of_change:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.motivoalteracao
+  cancellation_reason:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.motivocancelamentojob
+  cancellation_reason_text:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.textomotivocancelamento
+  correctness_score:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.scorecorretude
+  key_pick_up:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.retirarchave
+  key_others:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.outroschave
+  problem:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.problema
+  booking_instructions:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.instrucoesagendamento
+  house_revision:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.revisionimovel
+  contract_type:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.tipocontrato
+  completeness_score:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.scorecompletude
+  has_tried_contact:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.naotentoucontato
+  has_lockbox:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.lockbox
+  has_written_authorization:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.autorizacaoporescrito
+  has_no_landlord_contact:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.semcontatoproprietario
+  is_fixed:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.fixed
+  is_photo_session_email_preferred:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.prefereemailsessaofotos
+  is_approved:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.aprovado
+  is_confirmed:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.confirmado
+  ts_photographer_accepted:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.dataaceitofotografo
+  ts_payment:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.datapagamento
+  ts_session_started:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.datainiciosessao
+  ts_photos_uploaded:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.datauploadfotos
+  ts_photo_job_requested:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.datajobpedido
+  ts_scheduled:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.dataagendamento
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.datacriacao
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.jobfotografo.atualizadoem

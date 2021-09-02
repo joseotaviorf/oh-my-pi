@@ -1,0 +1,27 @@
+database_name: datalake_ebdb_clean
+table_name: preferred_fixed_agent
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.preferredfixedagent.id
+  id_agent_data:
+    lineage:
+      - datalake_ebdb_raw.preferredfixedagent.agentdata_id
+  id_region:
+    lineage:
+      - datalake_ebdb_raw.preferredfixedagent.region_id
+  id_user_visit_preferences:
+    lineage:
+      - datalake_ebdb_raw.preferredfixedagent.uservisitpreferences_id
+  business_context:
+    lineage:
+      - datalake_ebdb_raw.preferredfixedagent.businesscontext
+  is_enabled:
+    lineage:
+      - datalake_ebdb_raw.preferredfixedagent.isenabled
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.preferredfixedagent.criadoem
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.preferredfixedagent.atualizadoem
