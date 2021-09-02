@@ -119,6 +119,12 @@ bietlejuice.dw_facebook_insights:
 #   - bietlejuice.ebdb:create-clean-visit-in-data-lake
 #   - bietlejuice.godfather:load-clean-offer
 
+bietlejuice.dw_lead_tracking:
+  - bietlejuice.autodialer:load-clean-task-references
+  - bietlejuice.autodialer:load-clean-task-reference-inbound-event-histories
+  - bietlejuice.ebdb:create-clean-lead-in-data-lake
+  - bietlejuice.enrich_crm:load-enrich-tasks
+
 bietlejuice.dw_listing:
   - bietlejuice.ebdb:create-clean-condo-in-data-lake
 
