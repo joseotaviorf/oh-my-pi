@@ -37,7 +37,7 @@ columns:
   status:
     lineage:
       - datalake_tracksale_raw.answer.status
-  smallint:
+  nps_answer:
     lineage:
       - datalake_tracksale_raw.answer.nps_answer
   last_nps_answer:
