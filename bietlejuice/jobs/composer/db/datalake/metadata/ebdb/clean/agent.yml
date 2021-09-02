@@ -1,0 +1,57 @@
+database_name: datalake_ebdb_clean
+table_name: agent
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.dadoscorretor.id
+  closed_contracts:
+    lineage:
+      - datalake_ebdb_raw.dadoscorretor.contratosfechados
+  creci:
+    lineage:
+      - datalake_ebdb_raw.dadoscorretor.creci
+  ts_started:
+    lineage:
+      - datalake_ebdb_raw.dadoscorretor.inicioatuacao
+  grade_average:
+    lineage:
+      - datalake_ebdb_raw.dadoscorretor.medianota
+  id_creci_state:
+    lineage:
+      - datalake_ebdb_raw.dadoscorretor.estadocreci_id
+  id_user:
+    lineage:
+      - datalake_ebdb_raw.dadoscorretor.usuario_id
+  description:
+    lineage:
+      - datalake_ebdb_raw.dadoscorretor.descricao
+  creci_supervisor:
+    lineage:
+      - datalake_ebdb_raw.dadoscorretor.crecisupervisor
+  short_url:
+    lineage:
+      - datalake_ebdb_raw.dadoscorretor.shorturl
+  creci_type:
+    lineage:
+      - datalake_ebdb_raw.dadoscorretor.tipocreci
+  is_verified:
+    lineage:
+      - datalake_ebdb_raw.dadoscorretor.verificado
+  indication_short_url:
+    lineage:
+      - datalake_ebdb_raw.dadoscorretor.indicacaoshorturl
+  id_indicated_by:
+    lineage:
+      - datalake_ebdb_raw.dadoscorretor.indicadopor_id
+  lead_sheet_counter:
+    lineage:
+      - datalake_ebdb_raw.dadoscorretor.contadorplanilhadeleads
+  id_account_manager:
+    lineage:
+      - datalake_ebdb_raw.dadoscorretor.gerentecontas_id
+  ts_latest_referred_commission_calculation:
+    lineage:
+      - datalake_ebdb_raw.dadoscorretor.ultimocalculocomissaoindicado
+  affiliated_type:
+    lineage:
+      - datalake_ebdb_raw.dadoscorretor.tipoafiliado

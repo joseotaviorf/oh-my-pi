@@ -1,0 +1,42 @@
+database_name: datalake_ebdb_clean
+table_name: agent_support_aud
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.agentsupport_aud.id
+  rev:
+    lineage:
+      - datalake_ebdb_raw.agentsupport_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.agentsupport_aud.revtype
+  id_user:
+    lineage:
+      - datalake_ebdb_raw.agentsupport_aud.user_id
+  mod_id_user:
+    lineage:
+      - datalake_ebdb_raw.agentsupport_aud.user_id_mod
+  id_agent:
+    lineage:
+      - datalake_ebdb_raw.agentsupport_aud.agent_id
+  mod_id_agent:
+    lineage:
+      - datalake_ebdb_raw.agentsupport_aud.agent_id_mod
+  id_listing:
+    lineage:
+      - datalake_ebdb_raw.agentsupport_aud.listing_id
+  mod_id_listing:
+    lineage:
+      - datalake_ebdb_raw.agentsupport_aud.listing_id_mod
+  status:
+    lineage:
+      - datalake_ebdb_raw.agentsupport_aud.status
+  mod_status:
+    lineage:
+      - datalake_ebdb_raw.agentsupport_aud.status_mod
+  agent_comment:
+    lineage:
+      - datalake_ebdb_raw.agentsupport_aud.agent_comment
+  mod_agent_comment:
+    lineage:
+      - datalake_ebdb_raw.agentsupport_aud.agent_comment_mod

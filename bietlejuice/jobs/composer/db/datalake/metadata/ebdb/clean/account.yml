@@ -1,0 +1,15 @@
+database_name: datalake_ebdb_clean
+table_name: account
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.contacorrente.id
+  id_user:
+    lineage:
+      - datalake_ebdb_raw.contacorrente.usuario_id
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.contacorrente.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.contacorrente.criadoem

@@ -1,0 +1,78 @@
+database_name: datalake_ebdb_clean
+table_name: access_type_aud
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.accesstype_aud.id
+  id_authorization:
+    lineage:
+      - datalake_ebdb_raw.accesstype_aud.authorization_id
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.accesstype_aud.imovel_id
+  id_occupant:
+    lineage:
+      - datalake_ebdb_raw.accesstype_aud.occupant_id
+  id_restriction:
+    lineage:
+      - datalake_ebdb_raw.accesstype_aud.restriction_id
+  id_type:
+    lineage:
+      - datalake_ebdb_raw.accesstype_aud.type_id
+  rev:
+    lineage:
+      - datalake_ebdb_raw.accesstype_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.accesstype_aud.revtype
+  additional_info:
+    lineage:
+      - datalake_ebdb_raw.accesstype_aud.additionalinfo
+  description:
+    lineage:
+      - datalake_ebdb_raw.accesstype_aud.description
+  locker_address:
+    lineage:
+      - datalake_ebdb_raw.accesstype_aud.lockeraddress
+  password:
+    lineage:
+      - datalake_ebdb_raw.accesstype_aud.password
+  has_opted_keys_with_agent:
+    lineage:
+      - datalake_ebdb_raw.accesstype_aud.optedkeyswithagent
+  mod_id_house:
+    lineage:
+      - datalake_ebdb_raw.accesstype_aud.imovel_mod
+  mod_additional_info:
+    lineage:
+      - datalake_ebdb_raw.accesstype_aud.additionalinfo_mod
+  mod_authorization:
+    lineage:
+      - datalake_ebdb_raw.accesstype_aud.authorization_mod
+  mod_description:
+    lineage:
+      - datalake_ebdb_raw.accesstype_aud.description_mod
+  mod_locker_address:
+    lineage:
+      - datalake_ebdb_raw.accesstype_aud.lockeraddress_mod
+  mod_occupant:
+    lineage:
+      - datalake_ebdb_raw.accesstype_aud.occupant_mod
+  mod_password:
+    lineage:
+      - datalake_ebdb_raw.accesstype_aud.password_mod
+  mod_restriction:
+    lineage:
+      - datalake_ebdb_raw.accesstype_aud.restriction_mod
+  mod_type:
+    lineage:
+      - datalake_ebdb_raw.accesstype_aud.type_mod
+  mod_has_opted_keys_with_agent:
+    lineage:
+      - datalake_ebdb_raw.accesstype_aud.optedkeyswithagent_mod
+  mod_dt_vacated:
+    lineage:
+      - datalake_ebdb_raw.accesstype_aud.vacanton_mod
+  dt_vacated:
+    lineage:
+      - datalake_ebdb_raw.accesstype_aud.vacanton

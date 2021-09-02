@@ -1,0 +1,33 @@
+database_name: datalake_ebdb_clean
+table_name: agent_data_aud
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.dadosagente_aud.id
+  rev:
+    lineage:
+      - datalake_ebdb_raw.dadosagente_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.dadosagente_aud.revtype
+  is_active:
+    lineage:
+      - datalake_ebdb_raw.dadosagente_aud.ativo
+  is_schedule_blocked:
+    lineage:
+      - datalake_ebdb_raw.dadosagente_aud.edicaoagendabloqueada
+  profile:
+    lineage:
+      - datalake_ebdb_raw.dadosagente_aud.perfil
+  id_work_contract:
+    lineage:
+      - datalake_ebdb_raw.dadosagente_aud.workcontract_id
+  id_preferred_region:
+    lineage:
+      - datalake_ebdb_raw.dadosagente_aud.preferredregion_id
+  creci_number:
+    lineage:
+      - datalake_ebdb_raw.dadosagente_aud.numerocreci
+  mod_creci_number:
+    lineage:
+      - datalake_ebdb_raw.dadosagente_aud.numerocreci_mod

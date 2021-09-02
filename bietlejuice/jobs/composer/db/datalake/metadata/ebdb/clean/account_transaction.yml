@@ -1,0 +1,39 @@
+database_name: datalake_ebdb_clean
+table_name: account_transaction
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.operacaocontacorrente.id
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.operacaocontacorrente.datacriacao
+  description:
+    lineage:
+      - datalake_ebdb_raw.operacaocontacorrente.descricao
+  type:
+    lineage:
+      - datalake_ebdb_raw.operacaocontacorrente.tipo
+  value:
+    lineage:
+      - datalake_ebdb_raw.operacaocontacorrente.valor
+  id_account:
+    lineage:
+      - datalake_ebdb_raw.operacaocontacorrente.contacorrente_id
+  ts_transaction:
+    lineage:
+      - datalake_ebdb_raw.operacaocontacorrente.dataoperacao
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.operacaocontacorrente.imovel_id
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.operacaocontacorrente.atualizadoem
+  id_expense:
+    lineage:
+      - datalake_ebdb_raw.operacaocontacorrente.despesa_id
+  ts_payment:
+    lineage:
+      - datalake_ebdb_raw.operacaocontacorrente.paymentdate
+  id_lead_campaign:
+    lineage:
+      - datalake_ebdb_raw.operacaocontacorrente.leadcampaign_id

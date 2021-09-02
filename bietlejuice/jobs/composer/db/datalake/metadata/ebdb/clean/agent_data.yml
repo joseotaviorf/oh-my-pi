@@ -1,0 +1,39 @@
+database_name: datalake_ebdb_clean
+table_name: agent_data
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.dadosagente.id
+  is_active:
+    lineage:
+      - datalake_ebdb_raw.dadosagente.ativo
+  id_coordinate:
+    lineage:
+      - datalake_ebdb_raw.dadosagente.coordinateid
+  id_salesforce:
+    lineage:
+      - datalake_ebdb_raw.dadosagente.salesforceid
+  profile:
+    lineage:
+      - datalake_ebdb_raw.dadosagente.perfil
+  id_city:
+    lineage:
+      - datalake_ebdb_raw.dadosagente.cidade_id
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.dadosagente.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.dadosagente.criadoem
+  creci_number:
+    lineage:
+      - datalake_ebdb_raw.dadosagente.numerocreci
+  blocked_schedule_edition:
+    lineage:
+      - datalake_ebdb_raw.dadosagente.edicaoagendabloqueada
+  id_work_contract:
+    lineage:
+      - datalake_ebdb_raw.dadosagente.workcontract_id
+  id_preferred_region:
+    lineage:
+      - datalake_ebdb_raw.dadosagente.preferredregion_id

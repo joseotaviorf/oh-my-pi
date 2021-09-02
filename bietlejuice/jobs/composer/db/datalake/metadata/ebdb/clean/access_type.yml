@@ -1,0 +1,45 @@
+database_name: datalake_ebdb_clean
+table_name: access_type
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.accesstype.id
+  id_authorization:
+    lineage:
+      - datalake_ebdb_raw.accesstype.authorization_id
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.accesstype.imovel_id
+  id_occupant:
+    lineage:
+      - datalake_ebdb_raw.accesstype.occupant_id
+  id_restriction:
+    lineage:
+      - datalake_ebdb_raw.accesstype.restriction_id
+  id_type:
+    lineage:
+      - datalake_ebdb_raw.accesstype.type_id
+  additional_info:
+    lineage:
+      - datalake_ebdb_raw.accesstype.additionalinfo
+  description:
+    lineage:
+      - datalake_ebdb_raw.accesstype.description
+  locker_address:
+    lineage:
+      - datalake_ebdb_raw.accesstype.lockeraddress
+  password:
+    lineage:
+      - datalake_ebdb_raw.accesstype.password
+  has_opted_keys_with_agent:
+    lineage:
+      - datalake_ebdb_raw.accesstype.optedkeyswithagent
+  dt_vacated:
+    lineage:
+      - datalake_ebdb_raw.accesstype.vacanton
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.accesstype.criadoem
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.accesstype.atualizadoem

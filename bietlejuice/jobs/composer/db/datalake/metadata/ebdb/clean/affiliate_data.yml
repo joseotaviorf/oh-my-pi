@@ -1,0 +1,72 @@
+database_name: datalake_ebdb_clean
+table_name: affiliate_data
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.dadosafiliado.id
+  id_user:
+    lineage:
+      - datalake_ebdb_raw.dadosafiliado.usuario_id
+  id_account_manager:
+    lineage:
+      - datalake_ebdb_raw.dadosafiliado.gerentecontas_id
+  id_indicated_by:
+    lineage:
+      - datalake_ebdb_raw.dadosafiliado.indicadopor_id
+  id_gdocs_sheet:
+    lineage:
+      - datalake_ebdb_raw.dadosafiliado.idplanilhagdocs
+  id_doorman_affiliate_data:
+    lineage:
+      - datalake_ebdb_raw.dadosafiliado.doormanaffiliatedata_id
+  is_active:
+    lineage:
+      - datalake_ebdb_raw.dadosafiliado.ativo
+  is_verified:
+    lineage:
+      - datalake_ebdb_raw.dadosafiliado.verificado
+  is_roof_topper:
+    lineage:
+      - datalake_ebdb_raw.dadosafiliado.rooftopper
+  affiliate_type:
+    lineage:
+      - datalake_ebdb_raw.dadosafiliado.affiliatetype
+  affiliate_type_old:
+    lineage:
+      - datalake_ebdb_raw.dadosafiliado.tipoafiliado
+  indication_short_url:
+    lineage:
+      - datalake_ebdb_raw.dadosafiliado.indicacaoshorturl
+  operation_city:
+    lineage:
+      - datalake_ebdb_raw.dadosafiliado.cidadeatuacao
+  main_operation_neighborhoods:
+    lineage:
+      - datalake_ebdb_raw.dadosafiliado.principaisbairrosatuacao
+  payment_preference:
+    lineage:
+      - datalake_ebdb_raw.dadosafiliado.preferenciapagamento
+  creci_number:
+    lineage:
+      - datalake_ebdb_raw.dadosafiliado.numerocreci
+  origin:
+    lineage:
+      - datalake_ebdb_raw.dadosafiliado.origin
+  last_week_balance_communication:
+    lineage:
+      - datalake_ebdb_raw.dadosafiliado.semanaultimacomunicacaobalanco
+  ts_last_commission_calculation_indicated:
+    lineage:
+      - datalake_ebdb_raw.dadosafiliado.ultimocalculocomissaoindicado
+  ts_card_sent_communication:
+    lineage:
+      - datalake_ebdb_raw.dadosafiliado.datacomunicacaoenviocartao
+  ts_operation_start:
+    lineage:
+      - datalake_ebdb_raw.dadosafiliado.inicioatuacao
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.dadosafiliado.criadoem
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.dadosafiliado.atualizadoem
