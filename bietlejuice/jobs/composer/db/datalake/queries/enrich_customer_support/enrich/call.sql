@@ -259,9 +259,11 @@ zendesk_aditional_ticket_info AS (
     ftm.minutes_first_resolution_business AS minutes_first_resolution_time_business,
     tf.request_type,
     tf.client_type,
+    tf.step_tag,
     tf.customer_type_tag,
     tf.contact_motivation_tag,
     tf.contact_theme_tag,
+    tf.contact_theme_detail_tag,
     ftm.ts_solved_local AS ts_solved
   FROM
     datalake_zendesk_ticket_funnels.ticket_funnel tf
@@ -357,9 +359,11 @@ SELECT DISTINCT
   zd.minutes_first_resolution_time_business,
   zd.request_type,
   zd.client_type,
+  zd.step_tag,
   zd.customer_type_tag,
   zd.contact_motivation_tag,
   zd.contact_theme_tag,
+  zd.contact_theme_detail_tag,
   zd.tags,
   zd.status,
   zd.custom_fields,

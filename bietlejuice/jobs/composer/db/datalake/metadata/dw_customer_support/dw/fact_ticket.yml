@@ -8,21 +8,27 @@ columns:
       - datalake_customer_support.email.id_ticket
   sk_taxonomy:
     lineage:
+      - datalake_customer_support.call.step_tag
       - datalake_customer_support.call.customer_type_tag
       - datalake_customer_support.call.client_type
       - datalake_customer_support.call.request_type
       - datalake_customer_support.call.contact_motivation_tag
       - datalake_customer_support.call.contact_theme_tag
+      - datalake_customer_support.call.contact_theme_detail_tag
+      - datalake_customer_support.chat.step_tag
       - datalake_customer_support.chat.customer_type_tag
       - datalake_customer_support.chat.client_type
       - datalake_customer_support.chat.request_type
       - datalake_customer_support.chat.contact_motivation_tag
       - datalake_customer_support.chat.contact_theme_tag
+      - datalake_customer_support.chat.contact_theme_detail_tag
+      - datalake_customer_support.email.step_tag
       - datalake_customer_support.email.customer_type_tag
       - datalake_customer_support.email.client_type
       - datalake_customer_support.email.request_type
       - datalake_customer_support.email.contact_motivation_tag
       - datalake_customer_support.email.contact_theme_tag
+      - datalake_customer_support.email.contact_theme_detail_tag
   sk_channel:
     lineage:
       - datalake_customer_support.call.direction

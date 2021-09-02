@@ -128,6 +128,9 @@ columns:
   client_type:
     lineage:
       - datalake_zendesk_ticket_funnels.ticket_funnel.client_type
+  step_tag:
+    lineage:
+      - datalake_zendesk_ticket_funnels.step_tag
   customer_type_tag:
     lineage:
       - datalake_zendesk_ticket_funnels.ticket_funnel.customer_type_tag
@@ -137,6 +140,9 @@ columns:
   contact_theme_tag:
     lineage:
       - datalake_zendesk_ticket_funnels.ticket_funnel.contact_theme_tag
+  contact_theme_detail_tag:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.contact_theme_detail_tag
   tags:
     lineage:
       - datalake_zendesk_ticket_funnels.ticket_funnel.tags

@@ -3,11 +3,13 @@ WITH call_tickets AS (
     CAST(id_ticket AS BIGINT) AS sk_ticket,
     MD5(
       CONCAT(
+        COALESCE(step_tag, ''),
         COALESCE(customer_type_tag, ''),
         COALESCE(client_type, ''),
         COALESCE(request_type, ''),
         COALESCE(contact_motivation_tag, ''),
-        COALESCE(contact_theme_tag, '')
+        COALESCE(contact_theme_tag, ''),
+        COALESCE(contact_theme_detail_tag, '')
       )
     ) AS sk_taxonomy,
     MD5(CONCAT('call', COALESCE(direction, ''))) AS sk_channel,
@@ -77,11 +79,13 @@ chat_tickets AS (
     CAST(id_ticket AS BIGINT) AS sk_ticket,
     MD5(
       CONCAT(
+        COALESCE(step_tag, ''),
         COALESCE(customer_type_tag, ''),
         COALESCE(client_type, ''),
         COALESCE(request_type, ''),
         COALESCE(contact_motivation_tag, ''),
-        COALESCE(contact_theme_tag, '')
+        COALESCE(contact_theme_tag, ''),
+        COALESCE(contact_theme_detail_tag, '')
       )
     ) AS sk_taxonomy,
     MD5('chat') AS sk_channel,
@@ -151,11 +155,13 @@ email_tickets AS (
     CAST(id_ticket AS BIGINT) AS sk_ticket,
     MD5(
       CONCAT(
+        COALESCE(step_tag, ''),
         COALESCE(customer_type_tag, ''),
         COALESCE(client_type, ''),
         COALESCE(request_type, ''),
         COALESCE(contact_motivation_tag, ''),
-        COALESCE(contact_theme_tag, '')
+        COALESCE(contact_theme_tag, ''),
+        COALESCE(contact_theme_detail_tag, '')
       )
     ) AS sk_taxonomy,
     MD5(CONCAT('email', COALESCE(direction, ''))) AS sk_channel,
