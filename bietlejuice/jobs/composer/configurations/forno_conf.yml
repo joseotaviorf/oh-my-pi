@@ -7,10 +7,7 @@ dags_out_of_pattern: [
     "dw_marketing_costs",
     "enrich_marketing_costs_sharing_rules",
     "enrich_amplitude_partner_taxonomy",
-    "enrich_marketing_costs",
-    "enrich_marketing_costs.load-google-keywords-performance-report-to-enrich", # old subdag pattern
     "marketing_costs_sharing_rules",
-    "marketing_hub",
     "marketing_costs",
     "regions_polygon",
     "rtb_campaigns",

@@ -30,11 +30,11 @@ WITH google_consolidated_cost AS (
             fg.mobile_cost,
             fg.total_cost
         FROM
-            marketing_costs.fact_google_daily_cost_attributions fg
-        LEFT JOIN marketing_costs.dim_google_keyword dgk ON dgk.sk_keyword = fg.sk_keyword
-        LEFT JOIN marketing_costs.dim_google_ad dga ON dga.sk_ad = fg.sk_ad
-        LEFT JOIN marketing_costs.dim_google_campaign dgc ON dgc.sk_campaign = fg.sk_campaign
-        LEFT JOIN marketing_costs.dim_google_video dgv ON dgv.sk_video = fg.sk_video
+            google_ads.fact_google_daily_cost_attributions fg
+        LEFT JOIN google_ads.dim_google_keyword dgk ON dgk.sk_keyword = fg.sk_keyword
+        LEFT JOIN google_ads.dim_google_ad dga ON dga.sk_ad = fg.sk_ad
+        LEFT JOIN google_ads.dim_google_campaign dgc ON dgc.sk_campaign = fg.sk_campaign
+        LEFT JOIN google_ads.dim_google_video dgv ON dgv.sk_video = fg.sk_video
         LEFT JOIN datalake_raw.gsheets_taxonomy_ad_type_flags gtatf ON dga.ad_type = gtatf.ad_type
     WHERE
         dgk.is_test_campaign IS NOT TRUE
