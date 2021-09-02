@@ -1,0 +1,51 @@
+database_name: dw_tickets
+table_name: dim_zendesk_user
+columns:
+  sk_zendesk_user:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.id_user
+  url_user:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.url_user
+  name:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.name
+  alias:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.alias
+  email:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.email
+  phone:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.phone
+  time_zone:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.time_zone
+  locale:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.locale
+  tags:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.tags
+  role:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.role
+  is_active:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.is_active
+  is_shared_phone_number:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.is_shared_phone_number
+  ts_last_login:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.ts_last_login
+  ts_created:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.ts_created
+  ts_created_local:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.ts_created_local
+  ts_updated:
+    lineage:
+      - datalake_zendesk_tickets_clean.users.ts_updated

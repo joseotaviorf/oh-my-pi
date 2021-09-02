@@ -1,0 +1,81 @@
+database_name: dw_tickets
+table_name: dim_ticket
+columns:
+  sk_ticket:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+  subject:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.subject
+  description:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.description
+  ticket_via:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.ticket_via
+  channel:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.channel
+  group_name:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.group_name
+  priority:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.priority
+  recipient:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.recipient
+  tags:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+  status:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.status
+  custom_fields:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+  score:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.score
+  reason:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.reason
+  comment:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.comment
+  request_type:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.request_type
+  client_type:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.client_type
+  customer_type_tag:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.customer_type_tag
+  contact_motivation_tag:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.contact_motivation_tag
+  contact_theme_tag:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.contact_theme_tag
+  has_public_comments:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.has_public_comments
+  ts_created:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.ts_created
+  ts_created_local:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.ts_created_local
+  ts_updated:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.ts_updated
+  ts_updated_local:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.ts_updated_local
+  contact_theme_detail_tag:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.contact_theme_detail_tag
+  step_tag:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.step_tag

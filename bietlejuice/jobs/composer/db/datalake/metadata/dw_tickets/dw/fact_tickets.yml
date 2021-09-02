@@ -1,0 +1,147 @@
+database_name: dw_tickets
+table_name: fact_tickets
+columns:
+  sk_ticket:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_ticket
+  sk_house_listing:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_house_listing
+  sk_contract:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_contract
+  sk_user:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_user
+  sk_personal_document:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_personal_document
+  sk_client:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_client
+  sk_owner:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_owner
+  sk_zendesk_requester_user:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_zendesk_requester_user
+  sk_zendesk_submitter_user:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_zendesk_submitter_user
+  sk_zendesk_assignee_user:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_zendesk_assignee_user
+  sk_session:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_session
+  sk_call:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_call
+  sk_created_date:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_created
+  sk_created_date_local:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_created_local
+  sk_solved_date:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_solved
+  sk_solved_date_local:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_solved_local
+  sk_closed_date:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_closed
+  sk_closed_date_local:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_closed_local
+  sk_initially_assigned:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_initially_assigned
+  sk_initially_assigned_local:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_initially_assigned_local
+  sk_last_assigned:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_last_assigned
+  sk_last_assigned_local:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_last_assigned_local
+  total_group_stations:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.total_group_stations
+  total_assignee_stations:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.total_assignee_stations
+  minutes_first_reply_time_calendar:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_reply_calendar
+  minutes_first_reply_time_business:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_reply_business
+  minutes_first_resolution_time_calendar:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_first_resolution_calendar
+  minutes_first_resolution_time_business:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_first_resolution_business
+  minutes_requester_wait_time_calendar:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_requester_wait_calendar
+  minutes_requester_wait_time_business:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_requester_wait_business
+  minutes_agent_wait_time_calendar:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_agent_wait_calendar
+  minutes_agent_wait_time_business:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_agent_wait_business
+  minutes_on_hold_time_calendar:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_on_hold_calendar
+  minutes_on_hold_time_business:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_on_hold_business
+  minutes_full_resolution_time_calendar:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_full_resolution_calendar
+  minutes_full_resolution_time_business:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_full_resolution_business
+  reopens:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.reopens
+  replies:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.replies
+  ts_initially_assigned:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_initially_assigned
+  ts_initially_assigned_local:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_initially_assigned_local
+  ts_last_assigned:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_last_assigned
+  ts_last_assigned_local:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_last_assigned_local
+  ts_solved:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_solved
+  ts_solved_local:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_solved_local
+  ts_updated:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_updated
+  ts_updated_local:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_updated_local
+  ts_closed:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_closed
+  ts_closed_local:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_closed_local

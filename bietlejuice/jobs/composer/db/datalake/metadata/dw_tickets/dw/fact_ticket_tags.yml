@@ -1,0 +1,12 @@
+database_name: dw_tickets
+table_name: fact_ticket_tags
+columns:
+  sk_ticket:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.id_ticket
+  ticket_tag:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.tags
+  ts_updated:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.ts_updated

@@ -1,0 +1,25 @@
+database_name: dw_tickets
+table_name: fact_ticket_contact_types
+columns:
+  sk_ticket:
+    lineage:
+      - datalake_zendesk_tickets.ticket_contact_types.id_ticket
+  sk_updated:
+    lineage:
+      - datalake_zendesk_tickets.ticket_contact_types.ts_updated
+  contact_type_tag:
+    lineage:
+      - datalake_zendesk_tickets.ticket_contact_types.contact_type_tag
+  client_taxonomy:
+    lineage:
+      - datalake_zendesk_tickets.ticket_contact_types.client_taxonomy
+  category_taxonomy:
+    lineage:
+      - datalake_zendesk_tickets.ticket_contact_types.category_taxonomy
+  is_contact_type_taxonomy:
+    lineage:
+      - datalake_zendesk_tickets.ticket_contact_types.has_valid_prefix
+  ts_updated:
+    lineage:
+      - datalake_zendesk_tickets.ticket_contact_types.ts_updated
+  
