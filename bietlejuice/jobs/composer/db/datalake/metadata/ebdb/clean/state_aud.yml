@@ -1,0 +1,18 @@
+database_name: datalake_ebdb_clean
+table_name: state_aud
+columns:
+  id_state:
+    lineage:
+      - datalake_ebdb_raw.estado_aud.id
+  rev:
+    lineage:
+      - datalake_ebdb_raw.estado_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.estado_aud.revtype
+  abbrevation:
+    lineage:
+      - datalake_ebdb_raw.estado_aud.abreviacao
+  name:
+    lineage:
+      - datalake_ebdb_raw.estado_aud.nome

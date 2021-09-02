@@ -1,0 +1,21 @@
+database_name: datalake_ebdb_clean
+table_name: region
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.regiao.id
+  name:
+    lineage:
+      - datalake_ebdb_raw.regiao.nome
+  level:
+    lineage:
+      - datalake_ebdb_raw.regiao.nivel
+  id_parent_region:
+    lineage:
+      - datalake_ebdb_raw.regiao.regiaopai_id
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.regiao.criadaem
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.regiao.atualizadoem

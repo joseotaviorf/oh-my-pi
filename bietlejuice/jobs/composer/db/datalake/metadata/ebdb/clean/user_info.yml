@@ -1,0 +1,60 @@
+database_name: datalake_ebdb_clean
+table_name: user_info
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.userinfo.id
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.userinfo.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.userinfo.criadoem
+  id_user:
+    lineage:
+      - datalake_ebdb_raw.userinfo.user_id
+  name:
+    lineage:
+      - datalake_ebdb_raw.userinfo.name
+  email:
+    lineage:
+      - datalake_ebdb_raw.userinfo.email
+  phone_number:
+    lineage:
+      - datalake_ebdb_raw.userinfo.phone
+  cpf:
+    lineage:
+      - datalake_ebdb_raw.userinfo.cpf
+  rg:
+    lineage:
+      - datalake_ebdb_raw.userinfo.rg
+  cnpj:
+    lineage:
+      - datalake_ebdb_raw.userinfo.cnpj
+  person_type:
+    lineage:
+      - datalake_ebdb_raw.userinfo.persontype
+  address:
+    lineage:
+      - datalake_ebdb_raw.userinfo.address
+  number:
+    lineage:
+      - datalake_ebdb_raw.userinfo.number
+  complement:
+    lineage:
+      - datalake_ebdb_raw.userinfo.complement
+  zip_code:
+    lineage:
+      - datalake_ebdb_raw.userinfo.zipcode
+  neighborhood:
+    lineage:
+      - datalake_ebdb_raw.userinfo.neighborhood
+  city:
+    lineage:
+      - datalake_ebdb_raw.userinfo.city
+  id_state:
+    lineage:
+      - datalake_ebdb_raw.userinfo.state_id
+  letter_of_attorney_file_name:
+    lineage:
+      - datalake_ebdb_raw.userinfo.letterofattorneyfilename

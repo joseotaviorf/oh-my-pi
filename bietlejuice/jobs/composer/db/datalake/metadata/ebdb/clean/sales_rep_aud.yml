@@ -1,0 +1,21 @@
+database_name: datalake_ebdb_clean
+table_name: sales_rep_aud
+columns:
+  id_sales_rep:
+    lineage:
+      - datalake_ebdb_raw.dadosvendedor_aud.id
+  id_user:
+    lineage:
+      - datalake_ebdb_raw.dadosvendedor_aud.usuario_id
+  rev:
+    lineage:
+      - datalake_ebdb_raw.dadosvendedor_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.dadosvendedor_aud.revtype
+  is_active:
+    lineage:
+      - datalake_ebdb_raw.dadosvendedor_aud.ativo
+  ts_contract_started:
+    lineage:
+      - datalake_ebdb_raw.dadosvendedor_aud.iniciocontrato

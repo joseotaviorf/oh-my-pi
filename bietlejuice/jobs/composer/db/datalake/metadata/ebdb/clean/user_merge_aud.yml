@@ -1,0 +1,30 @@
+database_name: datalake_ebdb_clean
+table_name: user_merge_aud
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.usermerge_aud.id
+  id_loser_account:
+    lineage:
+      - datalake_ebdb_raw.usermerge_aud.loseraccountid
+  id_winner_account:
+    lineage:
+      - datalake_ebdb_raw.usermerge_aud.winneraccountid
+  rev:
+    lineage:
+      - datalake_ebdb_raw.usermerge_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.usermerge_aud.revtype
+  failure_count:
+    lineage:
+      - datalake_ebdb_raw.usermerge_aud.failurecount
+  mod_failure_count:
+    lineage:
+      - datalake_ebdb_raw.usermerge_aud.failurecount_mod
+  status:
+    lineage:
+      - datalake_ebdb_raw.usermerge_aud.status
+  mod_status:
+    lineage:
+      - datalake_ebdb_raw.usermerge_aud.status_mod

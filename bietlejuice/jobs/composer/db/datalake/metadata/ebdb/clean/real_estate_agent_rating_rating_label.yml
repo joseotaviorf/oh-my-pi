@@ -1,0 +1,9 @@
+database_name: datalake_ebdb_clean
+table_name: real_estate_agent_rating_rating_label
+columns:
+  id_real_estate_agent_rating:
+    lineage:
+      - datalake_ebdb_raw.realestateagentrating_ratinglabel.realestateagentrating_id
+  id_rating_label:
+    lineage:
+      - datalake_ebdb_raw.realestateagentrating_ratinglabel.ratinglabels_id

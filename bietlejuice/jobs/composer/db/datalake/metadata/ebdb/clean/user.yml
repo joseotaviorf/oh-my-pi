@@ -1,0 +1,195 @@
+database_name: datalake_ebdb_clean
+table_name: user
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.usuario.id
+  is_active:
+    lineage:
+      - datalake_ebdb_raw.usuario.active
+  neighborhood:
+    lineage:
+      - datalake_ebdb_raw.usuario.bairro
+  zip_code:
+    lineage:
+      - datalake_ebdb_raw.usuario.cep
+  city:
+    lineage:
+      - datalake_ebdb_raw.usuario.cidade
+  complement:
+    lineage:
+      - datalake_ebdb_raw.usuario.complemento
+  cpf:
+    lineage:
+      - datalake_ebdb_raw.usuario.cpf
+  dt_birth:
+    lineage:
+      - datalake_ebdb_raw.usuario.datanascimento
+  email:
+    lineage:
+      - datalake_ebdb_raw.usuario.email
+  alternative_email:
+    lineage:
+      - datalake_ebdb_raw.usuario.emailalternativo
+  address:
+    lineage:
+      - datalake_ebdb_raw.usuario.endereco
+  id_facebook:
+    lineage:
+      - datalake_ebdb_raw.usuario.facebookid
+  photo:
+    lineage:
+      - datalake_ebdb_raw.usuario.foto
+  id_linkedin:
+    lineage:
+      - datalake_ebdb_raw.usuario.linkedinid
+  name:
+    lineage:
+      - datalake_ebdb_raw.usuario.nome
+  number:
+    lineage:
+      - datalake_ebdb_raw.usuario.numero
+  password:
+    lineage:
+      - datalake_ebdb_raw.usuario.password
+  gender:
+    lineage:
+      - datalake_ebdb_raw.usuario.sexo
+  business_phone:
+    lineage:
+      - datalake_ebdb_raw.usuario.telefonecomercial
+  main_phone:
+    lineage:
+      - datalake_ebdb_raw.usuario.telefoneprincipal
+  secondary_phone:
+    lineage:
+      - datalake_ebdb_raw.usuario.telefonesecundario
+  id_state:
+    lineage:
+      - datalake_ebdb_raw.usuario.estado_id
+  login_count:
+    lineage:
+      - datalake_ebdb_raw.usuario.contadorlogin
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.usuario.criadoem
+  do_not_ask_phone:
+    lineage:
+      - datalake_ebdb_raw.usuario.naomeperguntetelefone
+  is_blocked:
+    lineage:
+      - datalake_ebdb_raw.usuario.bloqueado
+  rg:
+    lineage:
+      - datalake_ebdb_raw.usuario.rg
+  ts_rg_created:
+    lineage:
+      - datalake_ebdb_raw.usuario.dataexpedicaorg
+  detail_lead_guided_search:
+    lineage:
+      - datalake_ebdb_raw.usuario.detalhesleadbuscaguiada
+  has_received_guided_search:
+    lineage:
+      - datalake_ebdb_raw.usuario.recebeubuscaguiada
+  id_agent_rep:
+    lineage:
+      - datalake_ebdb_raw.usuario.dadosagente_id
+  has_accepted_sms:
+    lineage:
+      - datalake_ebdb_raw.usuario.aceitasms
+  hash_login_bypass:
+    lineage:
+      - datalake_ebdb_raw.usuario.hashloginbypass
+  contact_preference:
+    lineage:
+      - datalake_ebdb_raw.usuario.preferenciacontato
+  desire_contact:
+    lineage:
+      - datalake_ebdb_raw.usuario.preferecontato
+  ts_click_anuncie:
+    lineage:
+      - datalake_ebdb_raw.usuario.dataclickanuncie
+  bank_agency:
+    lineage:
+      - datalake_ebdb_raw.usuario.dadosbancarios_agencia
+  bank_account:
+    lineage:
+      - datalake_ebdb_raw.usuario.dadosbancarios_contacorrente
+  bank_cpf_cnpj:
+    lineage:
+      - datalake_ebdb_raw.usuario.dadosbancarios_cpfoucnpj
+  bank_name:
+    lineage:
+      - datalake_ebdb_raw.usuario.dadosbancarios_nome
+  bank_another_holder:
+    lineage:
+      - datalake_ebdb_raw.usuario.dadosbancarios_outrotitular
+  bank_account_type:
+    lineage:
+      - datalake_ebdb_raw.usuario.dadosbancarios_tipoconta
+  do_not_send_search_monthly_notice:
+    lineage:
+      - datalake_ebdb_raw.usuario.naoenviaravisomensalprocura
+  sms_activation_code:
+    lineage:
+      - datalake_ebdb_raw.usuario.codativacaosms
+  ts_sms_code_created:
+    lineage:
+      - datalake_ebdb_raw.usuario.datageracaocodsms
+  admin_type:
+    lineage:
+      - datalake_ebdb_raw.usuario.tipoadmin
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.usuario.atualizadoem
+  ts_last_update_opportunity:
+    lineage:
+      - datalake_ebdb_raw.usuario.lastupdateoportunidade
+  id_bank:
+    lineage:
+      - datalake_ebdb_raw.usuario.dadosbancarios_banco_id
+  ts_noticed_cardiff_conditions:
+    lineage:
+      - datalake_ebdb_raw.usuario.avisadocondicoescardiffem
+  ts_collector_email_sent:
+    lineage:
+      - datalake_ebdb_raw.usuario.captadoraenviouemailem
+  ts_app_ecardiff_sent:
+    lineage:
+      - datalake_ebdb_raw.usuario.enviadoappecardiffem
+  id_google:
+    lineage:
+      - datalake_ebdb_raw.usuario.googleid
+  id_account_kit:
+    lineage:
+      - datalake_ebdb_raw.usuario.accountkitid
+  id_photographer_data:
+    lineage:
+      - datalake_ebdb_raw.usuario.dadosfotografo_id
+  id_sales_rep:
+    lineage:
+      - datalake_ebdb_raw.usuario.dadosvendedor_id
+  id_affiliates:
+    lineage:
+      - datalake_ebdb_raw.usuario.dadosafiliado_id
+  id_account:
+    lineage:
+      - datalake_ebdb_raw.usuario.contacorrente_id
+  old_phone:
+    lineage:
+      - datalake_ebdb_raw.usuario.oldphone
+  id_user_crm_data:
+    lineage:
+      - datalake_ebdb_raw.usuario.usercrmdata_id
+  ts_login_renewal:
+    lineage:
+      - datalake_ebdb_raw.usuario.loginrenewal
+  id_keycloak_user:
+    lineage:
+      - datalake_ebdb_raw.usuario.keycloakuserid
+  ts_last_logged:
+    lineage:
+      - datalake_ebdb_raw.usuario.lastloggedat
+  is_instant_login:
+    lineage:
+      - datalake_ebdb_raw.usuario.instantlogin

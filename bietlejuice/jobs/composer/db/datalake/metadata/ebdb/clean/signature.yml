@@ -1,0 +1,21 @@
+database_name: datalake_ebdb_clean
+table_name: signature
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.assinatura.id
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.assinatura.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.assinatura.criadoem
+  ts_signature:
+    lineage:
+      - datalake_ebdb_raw.assinatura.dataassinatura
+  id_contract:
+    lineage:
+      - datalake_ebdb_raw.assinatura.contrato_id
+  id_contract_person:
+    lineage:
+      - datalake_ebdb_raw.assinatura.contratopessoa_id

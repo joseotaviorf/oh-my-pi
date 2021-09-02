@@ -1,0 +1,54 @@
+database_name: datalake_ebdb_clean
+table_name: visit
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.visita.id
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.visita.criadoem
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.visita.atualizadoem
+  code:
+    lineage:
+      - datalake_ebdb_raw.visita.codigo
+  dt_visit:
+    lineage:
+      - datalake_ebdb_raw.visita.dia
+  slot:
+    lineage:
+      - datalake_ebdb_raw.visita.slot
+  slot_count:
+    lineage:
+      - datalake_ebdb_raw.visita.numeroslots
+  type:
+    lineage:
+      - datalake_ebdb_raw.visita.tipo
+  is_fixed_agent:
+    lineage:
+      - datalake_ebdb_raw.visita.agentefixo
+  id_real_estate_agent_rating:
+    lineage:
+      - datalake_ebdb_raw.visita.realestateagentrating_id
+  status:
+    lineage:
+      - datalake_ebdb_raw.visita.status
+  booking_type:
+    lineage:
+      - datalake_ebdb_raw.visita.bookingtype
+  id_visitor:
+    lineage:
+      - datalake_ebdb_raw.visita.visitante_id
+  id_agent:
+    lineage:
+      - datalake_ebdb_raw.visita.agente_id
+  id_creation_origin:
+    lineage:
+      - datalake_ebdb_raw.visita.origemcriacao_id
+  id_last_update_origin:
+    lineage:
+      - datalake_ebdb_raw.visita.origemultimaatualizacao_id
+  id_house_rating:
+    lineage:
+      - datalake_ebdb_raw.visita.houserating_id

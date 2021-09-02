@@ -1,0 +1,18 @@
+database_name: datalake_ebdb_clean
+table_name: restriction_type_aud
+columns:
+  id_restriction_type:
+    lineage:
+      - datalake_ebdb_raw.restrictiontype_aud.id
+  rev:
+    lineage:
+      - datalake_ebdb_raw.restrictiontype_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.restrictiontype_aud.revtype
+  name:
+    lineage:
+      - datalake_ebdb_raw.restrictiontype_aud.name
+  mod_name:
+    lineage:
+      - datalake_ebdb_raw.restrictiontype_aud.name_mod

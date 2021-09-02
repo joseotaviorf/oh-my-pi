@@ -1,0 +1,234 @@
+database_name: datalake_ebdb_clean
+table_name: user_aud
+columns:
+  id_user:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.id
+  rev:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.revtype
+  neighborhood:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.bairro
+  mod_neighborhood:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.bairro_mod
+  zip_code:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.cep
+  mod_zip_code:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.cep_mod
+  city:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.cidade
+  mod_city:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.cidade_mod
+  complement:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.complemento
+  mod_complement:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.complemento_mod
+  cpf:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.cpf
+  mod_cpf:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.cpf_mod
+  dt_birth:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.datanascimento
+  mod_dt_birth:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.datanascimento_mod
+  email:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.email
+  mod_email:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.email_mod
+  alternative_email:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.emailalternativo
+  mod_alternative_email:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.emailalternativo_mod
+  address:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.endereco
+  mod_address:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.endereco_mod
+  id_facebook:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.facebookid
+  mod_id_facebook:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.facebookid_mod
+  photo:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.foto
+  mod_photo:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.foto_mod
+  name:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.nome
+  mod_name:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.nome_mod
+  number:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.numero
+  mod_number:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.numero_mod
+  password:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.password
+  mod_password:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.password_mod
+  gender:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.sexo
+  mod_gender:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.sexo_mod
+  business_phone:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.telefonecomercial
+  mod_business_phone:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.telefonecomercial_mod
+  main_phone:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.telefoneprincipal
+  mod_main_phone:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.telefoneprincipal_mod
+  secondary_phone:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.telefonesecundario
+  mod_secondary_phone:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.telefonesecundario_mod
+  id_state:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.estado_id
+  mod_state:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.estado_mod
+  is_blocked:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.bloqueado
+  mod_is_blocked:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.bloqueado_mod
+  id_agent_rep:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.dadosagente_id
+  mod_agent_rep:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.dadosagente_mod
+  has_accepted_sms:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.aceitasms
+  mod_has_accepted_sms:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.aceitasms_mod
+  desire_contact:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.preferecontato
+  mod_desire_contact:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.preferecontato_mod
+  bank_agency:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.dadosbancarios_agencia
+  bank_account:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.dadosbancarios_contacorrente
+  bank_cpf_cnpj:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.dadosbancarios_cpfoucnpj
+  bank_name:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.dadosbancarios_nome
+  bank_another_holder:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.dadosbancarios_outrotitular
+  bank_account_type:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.dadosbancarios_tipoconta
+  admin_type:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.tipoadmin
+  mod_admin_type:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.tipoadmin_mod
+  id_bank:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.dadosbancarios_banco_id
+  ts_noticed_cardiff_conditions:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.avisadocondicoescardiffem
+  mod_ts_noticed_cardiff_conditions:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.avisadocondicoescardiffem_mod
+  ts_collector_email_sent:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.captadoraenviouemailem
+  mod_ts_collector_email_sent:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.captadoraenviouemailem_mod
+  mod_ts_app_ecardiff_sent:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.enviadoappecardiffem_mod
+  id_google:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.googleid
+  mod_id_google:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.googleid_mod
+  id_account_kit:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.accountkitid
+  mod_id_account_kit:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.accountkitid_mod
+  id_sales_rep:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.dadosvendedor_id
+  mod_sales_rep:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.dadosvendedor_mod
+  id_affiliates:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.dadosafiliado_id
+  mod_affiliates:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.dadosafiliado_mod
+  id_account:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.contacorrente_id
+  mod_account:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.contacorrente_mod
+  ts_login_renewal:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.loginrenewal
+  mod_ts_login_renewal:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.loginrenewal_mod
+  is_instant_login:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.instantlogin
+  mod_is_instant_login:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.instantlogin_mod

@@ -1,0 +1,21 @@
+database_name: datalake_ebdb_clean
+table_name: user_document
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.userdocument.id
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.userdocument.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.userdocument.criadoem
+  id_user:
+    lineage:
+      - datalake_ebdb_raw.userdocument.usuario_id
+  document_type:
+    lineage:
+      - datalake_ebdb_raw.userdocument.documenttype
+  document_value:
+    lineage:
+      - datalake_ebdb_raw.userdocument.documentvalue

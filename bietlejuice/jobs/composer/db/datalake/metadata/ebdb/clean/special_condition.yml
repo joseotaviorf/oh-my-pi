@@ -1,0 +1,33 @@
+database_name: datalake_ebdb_clean
+table_name: special_condition
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.specialcondition.id
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.specialcondition.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.specialcondition.criadoem
+  ts_opted_in:
+    lineage:
+      - datalake_ebdb_raw.specialcondition.optedinat
+  ts_opted_out:
+    lineage:
+      - datalake_ebdb_raw.specialcondition.optedoutat
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.specialcondition.imovel_id
+  special_condition_type:
+    lineage:
+      - datalake_ebdb_raw.specialcondition.specialconditiontype
+  ts_expired:
+    lineage:
+      - datalake_ebdb_raw.specialcondition.expirationdate
+  special_condition_status:
+    lineage:
+      - datalake_ebdb_raw.specialcondition.specialconditionstatus
+  id_partner:
+    lineage:
+      - datalake_ebdb_raw.specialcondition.partner_id

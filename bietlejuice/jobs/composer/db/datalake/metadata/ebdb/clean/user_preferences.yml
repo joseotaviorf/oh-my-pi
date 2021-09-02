@@ -1,0 +1,21 @@
+database_name: datalake_ebdb_clean
+table_name: user_preferences
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.userpreferences.id
+  id_user:
+    lineage:
+      - datalake_ebdb_raw.userpreferences.usuario_id
+  is_receiving_sms:
+    lineage:
+      - datalake_ebdb_raw.userpreferences.receivessms
+  is_receiving_whatsapp:
+    lineage:
+      - datalake_ebdb_raw.userpreferences.receiveswhatsapp
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.userpreferences.criadoem
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.userpreferences.atualizadoem

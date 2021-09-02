@@ -1,0 +1,15 @@
+database_name: datalake_ebdb_clean
+table_name: restriction_type
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.restrictiontype.id
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.restrictiontype.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.restrictiontype.criadoem
+  name:
+    lineage:
+      - datalake_ebdb_raw.restrictiontype.name
