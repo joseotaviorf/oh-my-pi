@@ -1,0 +1,21 @@
+database_name: datalake_top_of_funnel_demand
+table_name: first_user_interaction
+columns:
+  id:
+    lineage:
+      - datalake_top_of_funnel_demand.first_user_interaction_staging.id
+  id_tof_user:
+    lineage:
+      - datalake_top_of_funnel_demand.first_user_interaction_staging.id_tof_user
+  business_context:
+    lineage:
+      - datalake_top_of_funnel_demand.first_user_interaction_staging.business_context
+  year:
+    lineage:
+      - datalake_top_of_funnel_demand.first_user_interaction_staging.year
+  month:
+    lineage:
+      - datalake_top_of_funnel_demand.first_user_interaction_staging.month
+  day:
+    lineage:
+      - datalake_top_of_funnel_demand.first_user_interaction_staging.day

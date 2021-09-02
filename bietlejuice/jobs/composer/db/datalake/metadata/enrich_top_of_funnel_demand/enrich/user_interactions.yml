@@ -1,0 +1,83 @@
+database_name: datalake_top_of_funnel_demand
+table_name: user_interactions
+columns:
+  id:
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.ts_event
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.year
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.month
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.day
+  id_tof_user:
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.id_user
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.id_device
+  id_house:
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.ep_house_id
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.top5_house_id
+  sk_region:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+  mkt_category:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.category
+  mkt_flow:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.flow
+  mkt_completion:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.completion
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.origin
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.channel
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.medium
+  mkt_source:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.source
+  mkt_platform:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.platform
+  business_context:
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.business_context
+  app_type:
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.up_platform
+  utm_source:
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.utm_source
+  utm_medium:
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.utm_medium
+  branded:
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.utm_campaign
+  utm_campaign:
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.utm_campaign
+  utm_term:
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.utm_term
+  utm_content:
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.utm_content
+  year:
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.year
+  month:
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.month
+  day:
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.day
+  dt_event:
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.ts_event
+  ts_event:
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.ts_event
