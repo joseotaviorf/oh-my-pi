@@ -1,0 +1,138 @@
+database_name: dw_janus
+table_name: dim_photo_job
+columns:
+  sk_photo_job:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.id
+  id:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.id
+  imovel_id:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.id_house
+  rep_id:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.id_rep
+  photographer_id:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.id_photographer
+  user_cancel_id:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.id_user_who_canceled
+  job_status:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.job_status
+  creation_origin:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.creation_origin
+  scheduling_instructions:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.booking_instructions
+  photo_shoot_contact_name:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.photo_session_contact_name
+  photo_shoot_email:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.photo_session_email
+  photo_shoot_phone:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.photo_session_phone
+  photo_shoot_second_phone:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.photo_session_secondary_phone
+  key_withdraw:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.key_pick_up
+  key_comments:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.key_others
+  photographer_name:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.photographer_name
+  photographer_email:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.photographer_email
+  photographer_contract_type:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.contract_type
+  photographer_problem_reason:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.problem
+  user_sender_type:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.photo_sender_user_type
+  cancel_reason:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.cancellation_reason
+  cancel_reason_detailed:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.cancellation_reason_text
+  user_cancel_name:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.user_who_canceled_name
+  user_cancel_email:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.user_who_canceled_email
+  user_cancel_type:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.user_cancellation_type
+  flexible_schedule:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.is_flexible_schedule
+  approved:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.is_approved
+  confirmed:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.is_confirmed
+  lockbox:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.has_lockbox
+  rescheduled:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.id
+  is_same_day_upload:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.is_same_day_upload
+  is_anticipated:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.is_job_anticipated
+  dt_photographer_accepted:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.ts_photographer_accepted
+  dt_job_created:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.ts_created
+  dt_job_issued:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.ts_photo_job_requested
+  dt_shoot_started:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.ts_session_started
+  dt_job_scheduled:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.ts_scheduled
+  dt_photos_uploaded:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.ts_photos_uploaded
+  dt_updated:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.ts_updated
+  dt_problem_reported:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.ts_canceled
+  dt_photographer_start:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.dt_photographer_started
+  user_cancel_dt:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.ts_problem_reported
+  creation_to_scheduling_diff_minutes:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.creation_to_scheduling_diff_minutes
+  creation_to_scheduling_diff_hours:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.creation_to_scheduling_diff_minutes
+  creation_to_scheduling_diff_days:
+    lineage:
+      - datalake_ebdb_listing_jobs.photo_job.creation_to_scheduling_diff_minutes

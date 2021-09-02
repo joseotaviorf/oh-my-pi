@@ -1,0 +1,45 @@
+database_name: dw_janus
+table_name: dim_inspection
+columns:
+  sk_inspection:
+    lineage:
+      - datalake_ebdb_listing_jobs.inspection.id
+  id_inspection:
+    lineage:
+      - datalake_ebdb_listing_jobs.inspection.id
+  mode:
+    lineage:
+      - datalake_ebdb_listing_jobs.inspection.mode
+  status:
+    lineage:
+      - datalake_ebdb_listing_jobs.inspection.status
+  type:
+    lineage:
+      - datalake_ebdb_listing_jobs.inspection.type
+  is_tenant_approved:
+    lineage:
+      - datalake_ebdb_listing_jobs.inspection.is_tenant_approved
+  is_owner_approved:
+    lineage:
+      - datalake_ebdb_listing_jobs.inspection.is_owner_approved
+  has_inspector_comment:
+    lineage:
+      - datalake_ebdb_listing_jobs.inspection.has_inspector_comment
+  has_tenant_comment:
+    lineage:
+      - datalake_ebdb_listing_jobs.inspection.has_tenant_comment
+  has_owner_comment:
+    lineage:
+      - datalake_ebdb_listing_jobs.inspection.has_owner_comment
+  ts_created:
+    lineage:
+      - datalake_ebdb_listing_jobs.inspection.ts_created
+  ts_expired:
+    lineage:
+      - datalake_ebdb_listing_jobs.inspection.ts_expired
+  ts_first_synced:
+    lineage:
+      - datalake_ebdb_listing_jobs.inspection.ts_first_synced
+  ts_last_synced:
+    lineage:
+      - datalake_ebdb_listing_jobs.inspection.ts_last_synced

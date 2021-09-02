@@ -1,0 +1,39 @@
+database_name: dw_janus
+table_name: dim_condo
+columns:
+  sk_condo:
+    lineage:
+      - datalake_ebdb_clean.condo.id
+  id_condo:
+    lineage:
+      - datalake_ebdb_clean.condo.id
+  neighborhood:
+    lineage:
+      - datalake_ebdb_clean.condo.neighborhood
+  zipcode:
+    lineage:
+      - datalake_ebdb_clean.condo.zipcode
+  city:
+    lineage:
+      - datalake_ebdb_clean.condo.city
+  address:
+    lineage:
+      - datalake_ebdb_clean.condo.address
+  lat:
+    lineage:
+      - datalake_ebdb_clean.condo.lat
+  lng:
+    lineage:
+      - datalake_ebdb_clean.condo.lng
+  name:
+    lineage:
+      - datalake_ebdb_clean.condo.name
+  number:
+    lineage:
+      - datalake_ebdb_clean.condo.number
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.condo.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.condo.ts_updated
