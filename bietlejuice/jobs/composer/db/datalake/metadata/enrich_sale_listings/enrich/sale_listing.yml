@@ -1,0 +1,80 @@
+database_name: datalake_sale_listings
+table_name: sale_listing
+columns:
+  id_sale_listing:
+    lineage:
+      - datalake_sale_listings.sale_status_version_order.id_house
+      - datalake_sale_listings.sale_status_version_order.order_version
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.id_house
+  is_for_rent:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.id_house
+  has_active_rental_contract:
+    lineage:
+      - datalake_ebdb_contract.contract.status
+  has_house_been_rented:
+    lineage:
+      - datalake_ebdb_contract.contract.id_house
+  days_last_publication_to_depublication:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_last_publication
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  days_first_publication_to_first_depublication:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_first_publication
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  days_first_publication_to_last_depublication:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_first_publication
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  days_first_publication_to_first_sale_flow:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_first_publication
+      - datalake_sale_flows.sale_flow.ts_first_event
+  days_first_publication_to_first_booking:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_first_publication
+      - datalake_sale_flows.sale_flow.ts_first_booking_created
+  days_first_publication_to_first_sale_agreement_signed:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_first_publication
+      - datalake_sale_flows.sale_flow.dt_sale_agreement_signed
+  days_first_publication_to_house_registry_ended:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_first_publication
+      - datalake_sale_flows.sale_flow.dt_house_registry_ended
+  unpublications:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.id
+  ts_first_publication:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_first_publication
+  ts_last_publication:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_last_publication
+  ts_first_depublication:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  ts_last_depublication:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  ts_first_sale_flow:
+    lineage:
+      - datalake_sale_flows.sale_flow.ts_first_event
+  ts_first_booking:
+    lineage:
+      - datalake_sale_flows.sale_flow.ts_first_booking_created
+  dt_first_sale_agreement_signed:
+    lineage:
+      - datalake_sale_flows.sale_flow.dt_sale_agreement_signed
+  dt_house_registry_ended:
+    lineage:
+      - datalake_sale_flows.sale_flow.dt_house_registry_ended
+  days_as_published:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_first_publication
+      - datalake_sale_listings.sale_status_version_order.ts_status_changed_new
+      - datalake_sale_listings.sale_status_version_order.ts_status_changed_next
+

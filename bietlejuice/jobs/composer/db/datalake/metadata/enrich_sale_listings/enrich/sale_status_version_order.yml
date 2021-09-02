@@ -1,0 +1,73 @@
+---
+database_name: datalake_sale_listings
+table_name: sale_status_version_order
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.house_aud.id_house
+  id_region:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+  rev:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.rev
+  ts_first_publication:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.ts_first_publication
+  ts_status_changed:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  status_history:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.mod_status_closing
+      - datalake_ebdb_clean.listing_business_context_aud.status
+      - datalake_ebdb_clean.listing_business_context_aud.status_closing
+  reason:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.reason
+  ts_status_changed_next:
+    lineage:
+      - datalake_ebdb_clean.house_aud.id_house
+      - datalake_ebdb_clean.listing_business_context_aud.rev
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  order_status:
+    lineage:
+      - datalake_ebdb_clean.house_aud.id_house
+      - datalake_ebdb_clean.listing_business_context_aud.rev
+  days_unpublished:
+    lineage:
+      - datalake_ebdb_clean.house_aud.id_house
+      - datalake_ebdb_clean.listing_business_context_aud.rev
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  status_history_new:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.mod_status_closing
+      - datalake_ebdb_clean.listing_business_context_aud.status
+      - datalake_ebdb_clean.listing_business_context_aud.status_closing
+  ts_status_changed_new:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.mod_status_closing
+      - datalake_ebdb_clean.listing_business_context_aud.status
+      - datalake_ebdb_clean.listing_business_context_aud.status_closing
+      - datalake_ebdb_clean.listing_business_context_aud.ts_first_publication
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  max_order_status:
+    lineage:
+      - datalake_ebdb_clean.house_aud.id_house
+      - datalake_ebdb_clean.listing_business_context_aud.rev
+  first_publication_change_version:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.mod_status_closing
+      - datalake_ebdb_clean.listing_business_context_aud.status
+      - datalake_ebdb_clean.listing_business_context_aud.status_closing
+      - datalake_ebdb_clean.listing_business_context_aud.ts_first_publication
+      - datalake_ebdb_clean.house_aud.id_house
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  order_version:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.mod_status_closing
+      - datalake_ebdb_clean.listing_business_context_aud.status
+      - datalake_ebdb_clean.listing_business_context_aud.status_closing
+      - datalake_ebdb_clean.listing_business_context_aud.ts_first_publication
+      - datalake_ebdb_clean.house_aud.id_house
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
