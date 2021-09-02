@@ -1,0 +1,21 @@
+database_name: datalake_ebdb_clean
+table_name: house_media
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.housemedia.id
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.housemedia.house_id
+  type:
+    lineage:
+      - datalake_ebdb_raw.housemedia.type
+  url:
+    lineage:
+      - datalake_ebdb_raw.housemedia.url
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.housemedia.created_on
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.housemedia.updated_on

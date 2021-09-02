@@ -1,0 +1,30 @@
+database_name: datalake_ebdb_clean
+table_name: house_registration_status
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.houseregistrationstatus.id
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.houseregistrationstatus.house_id
+  photo_shoot_schedule_reason:
+    lineage:
+      - datalake_ebdb_raw.houseregistrationstatus.photoshootschedulingreason
+  registration_abandoned_reason:
+    lineage:
+      - datalake_ebdb_raw.houseregistrationstatus.registrationabandonedreason
+  status:
+    lineage:
+      - datalake_ebdb_raw.houseregistrationstatus.status
+  id_photo_shoot:
+    lineage:
+      - datalake_ebdb_raw.houseregistrationstatus.photoshoot_id
+  id_assignee:
+    lineage:
+      - datalake_ebdb_raw.houseregistrationstatus.assignee_id
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.houseregistrationstatus.criadoem
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.houseregistrationstatus.atualizadoem

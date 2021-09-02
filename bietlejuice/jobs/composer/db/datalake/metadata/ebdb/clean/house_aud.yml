@@ -1,0 +1,433 @@
+database_name: datalake_ebdb_clean
+table_name: house_aud
+columns:
+  rev:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.revtype
+  mod_rent:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.aluguel_mod
+  mod_condo:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.condominio_mod
+  mod_iptu:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.iptu_mod
+  mod_guarantees:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.garantias_mod
+  mod_floor:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.andar_mod
+  mod_total_area:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.areatotal_mod
+  mod_neighborhood:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.bairro_mod
+  mod_zipcode:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.cep_mod
+  mod_city:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.cidade_mod
+  mod_complement:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.complemento_mod
+  mod_house_description:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.descricaoimovel_mod
+  mod_has_elevator:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.elevador_mod
+  mod_address:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.endereco_mod
+  mod_is_furnished:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.mobiliado_mod
+  mod_number:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.numero_mod
+  mod_bathrooms:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.numerobanheiros_mod
+  mod_bedrooms:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.numeroquartos_mod
+  mod_suites:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.numerosuites_mod
+  mod_parking_slots:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.numerovagas_mod
+  mod_type:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.tipo_mod
+  mod_doorman_type:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.tipoporteiro_mod
+  mod_parking_slot_type:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.tipovagas_mod
+  mod_amenities_info:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.amenidadesinfos_mod
+  mod_state:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.estado_mod
+  mod_features_info:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.instalacoesinfos_mod
+  mod_status:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.status_mod
+  mod_ts_recapture:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.recaptadoem_mod
+  mod_is_visit_information_confirmed:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.confirmadoinformacoesvisita_mod
+  mod_dt_first_publication:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.firstpublication_mod
+  mod_accounts:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.contas_mod
+  mod_home_owners_insurance_value:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.homeownersinsurancevalue_mod
+  mod_admin_info:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.infosadmin_mod
+  mod_internal_admin_info:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.infosadmininterna_mod
+  mod_suspension_reason:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.suspensionreason_mod
+  mod_land_area:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.areaterreno_mod
+  mod_dt_vacant_on:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.vacanton_mod
+  mod_parking_slots_description:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.parkingslots_mod
+  mod_access_type:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.accesstype_mod
+  mod_unpublished_reason:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.unpublishedreason_mod
+  mod_iptu_details:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.iptudetails_mod
+  mod_user:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.usuario_mod
+  mod_penalization_score:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.penalizationscore_mod
+  mod_ts_last_publication:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.ultimapublicacao_mod
+  mod_is_verified:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.verificado_mod
+  mod_predicted_price:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.predictedprice_mod
+  mod_sale_price:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.saleprice_mod
+  mod_is_for_rent:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.forrent_mod
+  mod_is_for_sale:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.forsale_mod
+  mod_listing_highlight_priority:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.prioridadedestaqueclassificado_mod
+  mod_announced_by:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.announcedby_mod
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.id
+  rent:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.aluguel
+  floor:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.andar
+  building_floors:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.andarespredio
+  houses_per_floor:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.aptosporandar
+  total_area:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.areatotal
+  neighborhood:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.bairro
+  zipcode:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.cep
+  city:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.cidade
+  complement:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.complemento
+  condo:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.condominio
+  dt_built:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.dataconstrucao
+  dt_moving_in:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.dataparamudar
+  house_description:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.descricaoimovel
+  has_elevator:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.elevador
+  address:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.endereco
+  iptu:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.iptu
+  lat:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.lat
+  lng:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.lng
+  is_furnished:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.mobiliado
+  number:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.numero
+  bathrooms:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.numerobanheiros
+  bedrooms:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.numeroquartos
+  suites:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.numerosuites
+  parking_slots:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.numerovagas
+  status:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.status
+  type:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.tipo
+  doorman_type:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.tipoporteiro
+  parking_slot_type:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.tipovagas
+  is_verified:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.verificado
+  id_state:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.estado_id
+  id_user:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.usuario_id
+  promotion_code:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.codigopromocao
+  is_quote_insurance_needed:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.cotarseguro
+  total_value:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.valortotal
+  dt_first_publication:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.firstpublication
+  insurance_value:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.valorseguro
+  lead_description:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.descricaolead
+  listing_highlight_priority:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.prioridadedestaqueclassificado
+  condo_management_information:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.dadosadministradoracondominio
+  references:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.referencias
+  has_manual_coordinates:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.coordenadasmanuais
+  is_follow_up_owner_upload_photos:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.followupproprietariosubirfotos
+  lead_collision_type:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.tipocolisaolead
+  ts_agent_lead_payment_calculated:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.calculopagamentoleadcorretor
+  admin_info:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.infosadmin
+  internal_admin_info:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.infosadmininterna
+  has_service_bathroom:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.possuibanheiroservico
+  has_service_bedroom:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.possuiquartoservico
+  default_neighborhood:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.bairropadrao
+  id_sales_force:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.salesforceid
+  condo_type:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.tipocondominio
+  iptu_type:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.tipoiptu
+  dt_availability_end:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.disponivelate
+  code_cartographic:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.codcartografico
+  code_water_consumer:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.codconsumidoragua
+  code_power_consumer:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.codconsumidorenergia
+  code_taxpayer:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.codcontribuinte
+  registration:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.matricula
+  id_region:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.regiao_id
+  title:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.titulo
+  ts_suspension_end:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.suspensoate
+  id_external:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.externalid
+  is_in_negotiation:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.emnegociacao
+  is_in_external_negotiation:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.emnegociacaoexterna
+  ts_external_negotiation_start:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.entrouemnegociacaoexterna
+  cardiff_rejection_reason:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.motivorecusacardiff
+  ts_recapture:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.recaptadoem
+  is_photographer_job_pending:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.jobfotografopendente
+  has_requested_professional_photos:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.requisitoufotosprofissionais
+  lat_bkp:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.latbkp
+  lng_bkp:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.lngbkp
+  ts_last_confirmation_availability:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.lastconfirmationavailability
+  registry:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.cartorio
+  penalization_score:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.penalizationscore
+  is_receive_default_contract_copy_needed:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.recebercopiacontratopadrao
+  rank_score:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.rankscore
+  ts_last_publication:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.ultimapublicacao
+  is_visit_information_confirmed:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.confirmadoinformacoesvisita
+  home_owners_insurance_value:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.homeownersinsurancevalue
+  suspension_reason:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.suspensionreason
+  land_area:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.areaterreno
+  dt_vacant_on:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.vacanton
+  id_announced_by:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.announcedby_id
+  unpublished_reason:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.unpublishedreason
+  predicted_price:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.predictedprice
+  sale_price:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.saleprice
+  is_for_rent:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.forrent
+  is_for_sale:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.forsale
+  id_user_registrant:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.originalusuarioquecadastrou_id
+      - datalake_ebdb_raw.imovel_aud.usuarioquecadastrou_id
+  mod_user_registrant:
+    lineage:
+      - datalake_ebdb_raw.imovel_aud.usuarioquecadastrou_mod

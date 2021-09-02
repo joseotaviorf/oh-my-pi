@@ -1,0 +1,45 @@
+database_name: datalake_ebdb_clean
+table_name: house_registration_status_aud
+columns:
+  id_house_registration_status:
+    lineage:
+      - datalake_ebdb_raw.houseregistrationstatus_aud.id
+  rev:
+    lineage:
+      - datalake_ebdb_raw.houseregistrationstatus_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.houseregistrationstatus_aud.revtype
+  photo_shoot_schedule_reason:
+    lineage:
+      - datalake_ebdb_raw.houseregistrationstatus_aud.photoshootschedulingreason
+  mod_photo_shoot_schedule_reason:
+    lineage:
+      - datalake_ebdb_raw.houseregistrationstatus_aud.photoshootschedulingreason_mod
+  registration_abandoned_reason:
+    lineage:
+      - datalake_ebdb_raw.houseregistrationstatus_aud.registrationabandonedreason
+  mod_registration_abandoned_reason:
+    lineage:
+      - datalake_ebdb_raw.houseregistrationstatus_aud.registrationabandonedreason_mod
+  status:
+    lineage:
+      - datalake_ebdb_raw.houseregistrationstatus_aud.status
+  mod_status:
+    lineage:
+      - datalake_ebdb_raw.houseregistrationstatus_aud.status_mod
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.houseregistrationstatus_aud.house_id
+  id_photo_shoot:
+    lineage:
+      - datalake_ebdb_raw.houseregistrationstatus_aud.photoshoot_id
+  mod_photo_shoot:
+    lineage:
+      - datalake_ebdb_raw.houseregistrationstatus_aud.photoshoot_mod
+  id_assignee:
+    lineage:
+      - datalake_ebdb_raw.houseregistrationstatus_aud.assignee_id
+  mod_assignee:
+    lineage:
+      - datalake_ebdb_raw.houseregistrationstatus_aud.assignee_mod

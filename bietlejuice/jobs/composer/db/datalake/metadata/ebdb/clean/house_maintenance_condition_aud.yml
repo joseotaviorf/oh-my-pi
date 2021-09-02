@@ -1,0 +1,18 @@
+database_name: datalake_ebdb_clean
+table_name: house_maintenance_condition_aud
+columns:
+  id_house_maintenance_condition:
+    lineage:
+      - datalake_ebdb_raw.housemaintenancecondition_aud.id
+  rev:
+    lineage:
+      - datalake_ebdb_raw.housemaintenancecondition_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.housemaintenancecondition_aud.revtype
+  maintenance_condition:
+    lineage:
+      - datalake_ebdb_raw.housemaintenancecondition_aud.maintenancecondition
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.housemaintenancecondition_aud.houseid

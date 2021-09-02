@@ -1,0 +1,15 @@
+database_name: datalake_ebdb_clean
+table_name: house_guarantees_aud
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.imovel_garantias_aud.imovel_id
+  guarantee_type:
+    lineage:
+      - datalake_ebdb_raw.imovel_garantias_aud.garantias
+  rev:
+    lineage:
+      - datalake_ebdb_raw.imovel_garantias_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.imovel_garantias_aud.revtype

@@ -1,0 +1,54 @@
+database_name: datalake_ebdb_clean
+table_name: house_weekly_schedule
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.horariosemanalimovel.id
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.horariosemanalimovel.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.horariosemanalimovel.criadoem
+  weekday:
+    lineage:
+      - datalake_ebdb_raw.horariosemanalimovel.diadasemana
+  is_available_between_08_and_09:
+    lineage:
+      - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel08as09
+  is_available_between_09_and_10:
+    lineage:
+      - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel09as10
+  is_available_between_10_and_11:
+    lineage:
+      - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel10as11
+  is_available_between_11_and_12:
+    lineage:
+      - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel11as12
+  is_available_between_12_and_13:
+    lineage:
+      - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel12as13
+  is_available_between_13_and_14:
+    lineage:
+      - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel13as14
+  is_available_between_14_and_15:
+    lineage:
+      - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel14as15
+  is_available_between_15_and_16:
+    lineage:
+      - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel15as16
+  is_available_between_16_and_17:
+    lineage:
+      - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel16as17
+  is_available_between_17_and_18:
+    lineage:
+      - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel17as18
+  is_available_between_18_and_19:
+    lineage:
+      - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel18as19
+  is_available_between_19_and_20:
+    lineage:
+      - datalake_ebdb_raw.horariosemanalimovel.horarios_disponivel19as20
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.horariosemanalimovel.imovel_id

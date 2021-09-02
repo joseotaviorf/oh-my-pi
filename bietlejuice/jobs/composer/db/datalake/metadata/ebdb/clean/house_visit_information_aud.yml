@@ -1,0 +1,15 @@
+database_name: datalake_ebdb_clean
+table_name: house_visit_information_aud
+columns:
+  rev:
+    lineage:
+      - datalake_ebdb_raw.imovel_informacoesvisita_aud.rev
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.imovel_informacoesvisita_aud.imovel_id
+  visit_information:
+    lineage:
+      - datalake_ebdb_raw.imovel_informacoesvisita_aud.informacoesvisita
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.imovel_informacoesvisita_aud.revtype

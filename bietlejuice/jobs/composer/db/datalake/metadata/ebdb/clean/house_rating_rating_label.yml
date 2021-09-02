@@ -1,0 +1,9 @@
+database_name: datalake_ebdb_clean
+table_name: house_rating_rating_label
+columns:
+  id_house_rating:
+    lineage:
+      - datalake_ebdb_raw.houserating_ratinglabel.houserating_id
+  id_rating_labels:
+    lineage:
+      - datalake_ebdb_raw.houserating_ratinglabel.ratinglabels_id

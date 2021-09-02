@@ -1,0 +1,36 @@
+database_name: datalake_ebdb_clean
+table_name: financial_data
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.financialdata.id
+  partner_id:
+    lineage:
+      - datalake_ebdb_raw.financialdata.partner_id
+  id_bank:
+    lineage:
+      - datalake_ebdb_raw.financialdata.bankdata_banco_id
+  bank_agency:
+    lineage:
+      - datalake_ebdb_raw.financialdata.bankdata_agencia
+  bank_account:
+    lineage:
+      - datalake_ebdb_raw.financialdata.bankdata_contacorrente
+  bank_account_type:
+    lineage:
+      - datalake_ebdb_raw.financialdata.bankdata_tipoconta
+  bank_cpf_cnpj:
+    lineage:
+      - datalake_ebdb_raw.financialdata.bankdata_cpfoucnpj
+  bank_account_holder_name:
+    lineage:
+      - datalake_ebdb_raw.financialdata.bankdata_nome
+  bank_account_secondary_holder:
+    lineage:
+      - datalake_ebdb_raw.financialdata.bankdata_outrotitular
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.financialdata.criadoem
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.financialdata.atualizadoem

@@ -1,0 +1,9 @@
+database_name: datalake_ebdb_clean
+table_name: house_special_condition
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.housespecialcondition.house_id
+  id_special_condition:
+    lineage:
+      - datalake_ebdb_raw.housespecialcondition.specialcondition_id

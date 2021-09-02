@@ -1,0 +1,24 @@
+database_name: datalake_ebdb_clean
+table_name: feedback_tag
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.feedbacktag.id
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.feedbacktag.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.feedbacktag.criadoem
+  category:
+    lineage:
+      - datalake_ebdb_raw.feedbacktag.category
+  description:
+    lineage:
+      - datalake_ebdb_raw.feedbacktag.description
+  is_positive:
+    lineage:
+      - datalake_ebdb_raw.feedbacktag.positivo
+  is_active:
+    lineage:
+      - datalake_ebdb_raw.feedbacktag.active
