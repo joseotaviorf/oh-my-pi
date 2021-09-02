@@ -90,6 +90,9 @@ SELECT
   t.id AS sk_termination,
   t.id_contract AS sk_contract,
   t.id_exit_inspection AS sk_exit_inspection,
+  fhl.sk_house_listing,
+  fhl.sk_region,
+  tw.id_current_assignee AS sk_workflow_assignee,
   JSON_EXTRACT_PATH_TEXT(t.feedback, 'reason') AS reason,
   t.feedback,
   t.requested_by,
@@ -103,16 +106,31 @@ SELECT
     WHEN t.source = 'CRM' then 'Manual'
     ELSE 'Automatic'
     END AS type,
+  t.cancellation_info,
+  t.rescheduling_history,
+  JSON_EXTRACT_PATH_TEXT(JSON_EXTRACT_PATH_TEXT(feedback, 'churnInfo'), 'reason') AS churn_reason,
+  JSON_EXTRACT_PATH_TEXT(feedback, 'nextProperty') AS next_property,
+  JSON_EXTRACT_PATH_TEXT(feedback, 'propertyIssue') AS property_issue,
+  dc.b2b_type,
+  dc.b2b_prime_type,
   tw.current_step AS workflow_current_step,
   JSON_EXTRACT_PATH_TEXT(k.tenant_keys_location, 'location') AS tenant_key_location,
   k.tenant_keys_location AS tenant_key_detail,
   k.owner_keys_location AS owner_key_detail,
-  n.has_landlord_comment AS has_repairs,
-  n.needs_repair_by_tenant AS is_repair_tenant_duty,
   n.repair_resolution,
   n.repair_cost,
   t.utility_bill_info,
+  DATEDIFF('day', t.ts_created, t.dt_termination) AS leadtime_request_to_vacancy,
+  CASE WHEN d.ts_termination_finished <= '2020-07-07' THEN DATEDIFF('day', t.dt_termination, n.ts_updated)
+    WHEN d.ts_termination_finished > '2020-07-07' THEN DATEDIFF('day', t.dt_termination, d.ts_termination_finished)
+    END AS leadtime_vacancy_to_finish,
+  dc.is_b2b,
+  (t.ts_created < dc.dt_start) AS is_before_contract_start, 
   t.has_exit_inspection,
+  n.has_landlord_comment AS has_repairs,
+  n.needs_repair_by_tenant AS is_repair_tenant_duty,
+  (trunc(t.dt_termination) < dateadd('month', 1, trunc(t.ts_created))) AS has_prior_notice_fine,
+  (trunc(t.dt_termination) < dateadd('month', 12, trunc(dc.dt_start))) AS has_one_year_fine,
   (m.id IS NOT NULL) AS has_been_rescheduled,
   (t.ts_canceled IS NOT NULL) AS is_termination_canceled,
   (tw.id IS NOT NULL) AS is_workflow,
@@ -150,3 +168,5 @@ FROM datalake_terminator_clean_prod.termination t
             UNION all
             SELECT distinct cast(nullif(finished_contracts,'') AS BIGINT) AS sk_contract FROM datalake_raw.gsheets_offboarding_carteirizacao_contratos) occ 
   ON t.id_contract = occ.sk_contract 
+    LEFT JOIN fact_house_listings fhl
+  ON t.id_contract = fhl.sk_contract
