@@ -7,7 +7,8 @@ tenant_prospect_status as (
         ts_end,
         status,
         status_detail,
-        LAG(status) OVER(PARTITION BY sk_client, city_group order by ts_start) as last_status
+        LAG(status) OVER(PARTITION BY sk_client, city_group order by ts_start) as last_status,
+        LEAD(status) OVER(PARTITION BY sk_client, city_group order by ts_start) as next_status
     FROM
         datamarts.tenant_prospect_status
     WHERE
@@ -58,6 +59,7 @@ fact_rent_flows AS (
         rf.ts_event,
         tps.status,
         tps.status_detail,
+        tps.next_status,
         tps.ts_start AS ts_status_start,
         tps.ts_end AS ts_status_end,
         dr.city_group,
@@ -118,6 +120,7 @@ demand_daily_spent AS (
         dd.date::TIMESTAMP AS ts_event,
         NULL::TEXT AS status,
         NULL::TEXT AS status_detail,
+        NULL::TEXT AS next_status,
         NULL::TIMESTAMP AS ts_status_start,
         NULL::TIMESTAMP AS ts_status_end,
         co.city_group,
@@ -161,7 +164,7 @@ demand_daily_spent AS (
         co.mkt_origin = 'Tenants PWA'
         AND dd.date >= DATE('2018-01-01')
         AND co.mkt_medium != 'Branding'
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36
 ),
 taxonomy AS (
     SELECT DISTINCT
@@ -237,6 +240,7 @@ demand_daily_targets AS (
         dt_event::TIMESTAMP AS ts_event,
         NULL::TEXT AS status,
         NULL::TEXT AS status_detail,
+        NULL::TEXT AS next_status,
         NULL::TIMESTAMP AS ts_status_start,
         NULL::TIMESTAMP AS ts_status_end,
         city_group,
@@ -284,6 +288,7 @@ deactivations AS (
         ts_start AS ts_event,
         status,
         status_detail,
+        NULL::TEXT AS next_status,
         ts_start AS ts_status_start,
         ts_end AS ts_status_end,
         city_group,

@@ -7,7 +7,8 @@ buyer_prospect_status as (
         ts_end,
         status,
         status_detail,
-        LAG(status) OVER(PARTITION BY sk_buyer, city_group order by ts_start) as last_status
+        LAG(status) OVER(PARTITION BY sk_buyer, city_group order by ts_start) as last_status,
+        LEAD(status) OVER(PARTITION BY sk_buyer, city_group order by ts_start) as next_status
     FROM
         datamarts.buyer_prospect_status
     WHERE
@@ -34,7 +35,7 @@ taxonomy AS (
 -----------------------------------------------------------
 -- Query bookings, offers and talk to agent full history --
 -----------------------------------------------------------
-bookings AS (
+events AS (
     SELECT
         fsf.sk_sale_flow,
         fsf.sk_buyer,
@@ -50,8 +51,6 @@ bookings AS (
         db.utm_term,
         db.utm_content,
         db.dt_created AS ts_event,
-        sk_booking,
-        NULL::TEXT AS sk_offer,
         'Booking' AS flow_event
     FROM
         dim_booking AS db
@@ -64,8 +63,9 @@ bookings AS (
         AND db.visit_intent = 'SALE'
         AND db.type = 'Visita'
         AND db.dt_created IS NOT NULL
-),
-offers AS (
+
+    UNION ALL
+
     SELECT
         fsf.sk_sale_flow,
         fsf.sk_buyer,
@@ -81,8 +81,6 @@ offers AS (
         NULL::TEXT AS utm_term,
         NULL::TEXT AS utm_content,
         o.ts_offer_submitted AS ts_event,
-        NULL::INT AS sk_booking,
-        sk_offer,
         'Offer' AS flow_event
     FROM
         sale.dim_offer AS o
@@ -90,8 +88,9 @@ offers AS (
             USING(sk_offer)
         JOIN sale.fact_sale_flows AS fsf
             ON fsf.sk_sale_flow = fo.sk_sale_flow
-),
-tta AS (
+    --
+    UNION ALL
+    --
     SELECT
         tenant_id || '_' || house_id AS sk_sale_flow,
         tenant_id::INT AS sk_buyer,
@@ -107,8 +106,6 @@ tta AS (
         a.utm_term,
         a.utm_content,
         a.first_message_ts::timestamp AS ts_event,
-        NULL::INT AS sk_booking,
-        NULL::TEXT AS sk_offer,
         'Talk to Agent' AS flow_event
     FROM
         datamarts.talk_to_agent AS a
@@ -119,22 +116,6 @@ tta AS (
     WHERE
         a.business_context = 'SALE'
         AND a.first_message_ts IS NOT NULL
-),
-events AS (
-    SELECT
-        *
-    FROM
-        bookings
-    UNION ALL
-    SELECT
-        *
-    FROM
-        offers
-    UNION ALL
-    SELECT
-        *
-    FROM
-        tta
 ),
 ---------------------------------------------------------
 -- Order events by user and sale_flows (user || house) --
@@ -166,6 +147,35 @@ sale_flows AS (
         events AS evt
         JOIN dim_region AS dr
             USING(sk_region)
+        LEFT JOIN sale.fact_offers AS fo
+            ON evt.sk_sale_flow = fo.sk_sale_flow
+),
+sale_funnel AS (
+    SELECT
+        fsf.sk_sale_flow,
+        fo.sk_offer,
+        fv.sk_booking,
+        dd_os.date AS dt_offer_submitted,
+        dd_oa.date AS dt_offer_accepted,
+        dd_ccv.date AS dt_sale_agreement_signed,
+        dd_vb.date AS dt_booking_created,
+        dd_vc.date AS dt_visit_completed
+    FROM
+        sale.fact_sale_flows AS fsf
+        LEFT JOIN sale.fact_offers AS fo
+            ON fsf.sk_sale_flow = fo.sk_sale_flow
+        LEFT JOIN sale.fact_visits AS fv
+            ON fsf.sk_sale_flow = fv.sk_sale_flow
+        LEFT JOIN dim_date AS dd_os
+            ON fo.sk_offer_submitted_date = dd_os.sk_date
+        LEFT JOIN dim_date AS dd_oa
+            ON fo.sk_offer_accepted_date = dd_oa.sk_date
+        LEFT JOIN dim_date AS dd_ccv
+            ON fo.sk_sale_agreement_signed_date = dd_ccv.sk_date
+        LEFT JOIN dim_date AS dd_vb
+            ON fv.sk_booking_created_date = dd_vb.sk_date
+        LEFT JOIN dim_date AS dd_vc
+            ON fv.sk_visit_completed_date = dd_vc.sk_date
 ),
 sale_flows_funnel_events AS (
     SELECT
@@ -173,6 +183,7 @@ sale_flows_funnel_events AS (
         sf.ts_event,
         bps.status,
         bps.status_detail,
+        bps.next_status,
         bps.ts_start AS ts_status_start,
         bps.ts_end AS ts_status_end,
         sf.city_group,
@@ -202,10 +213,13 @@ sale_flows_funnel_events AS (
         sf.sk_sale_flow,
         sf.sk_buyer,
         sf.sk_house,
-        b.ts_event::DATE AS dt_booking_created,
-        b.sk_booking,
-        o.ts_event::DATE AS dt_offer_submitted,
-        o.sk_offer,
+        funnel.sk_offer,
+        funnel.sk_booking,
+        funnel.dt_offer_submitted,
+        funnel.dt_offer_accepted,
+        funnel.dt_sale_agreement_signed,
+        funnel.dt_booking_created,
+        funnel.dt_visit_completed,
         sf.sale_flow_order,
         sf.buyer_prospect_order,
         NULL::FLOAT AS budget,
@@ -214,10 +228,8 @@ sale_flows_funnel_events AS (
         NULL::FLOAT AS marketing_cost
     FROM
         sale_flows AS sf
-        LEFT JOIN bookings AS b
-            ON sf.sk_sale_flow = b.sk_sale_flow
-        LEFT JOIN offers AS o
-            ON sf.sk_sale_flow = o.sk_sale_flow
+        LEFT JOIN sale_funnel AS funnel
+            ON sf.sk_sale_flow = funnel.sk_sale_flow
         LEFT JOIN buyer_prospect_status AS bps
             ON sf.ts_event >= bps.ts_start
             AND sf.ts_event <= COALESCE(bps.ts_end, CURRENT_DATE)
@@ -236,6 +248,7 @@ targets AS (
         bd.date::TIMESTAMP AS ts_event,
         NULL::TEXT AS status,
         NULL:: TEXT AS status_detail,
+        NULL:: TEXT AS next_status,
         NULL::TIMESTAMP AS ts_status_start,
         NULL::TIMESTAMP AS ts_status_end,
         bd.city AS city_group,
@@ -258,10 +271,13 @@ targets AS (
         NULL::TEXT AS sk_sale_flow,
         NULL::INT AS sk_buyer,
         NULL::INT AS sk_house,
-        NULL::DATE AS dt_booking_created,
+        NULL::TEXT AS sk_offer,
         NULL::INT AS sk_booking,
         NULL::DATE AS dt_offer_submitted,
-        NULL::TEXT AS sk_offer,
+        NULL::DATE AS dt_offer_accepted,
+        NULL::DATE AS dt_sale_agreement_signed,
+        NULL::DATE AS dt_booking_created,
+        NULL::DATE AS dt_visit_completed,
         NULL::INT AS sale_flow_order,
         NULL::INT AS buyer_prospect_order,
         bd.daily__value::FLOAT AS budget,
@@ -280,6 +296,7 @@ targets AS (
         bp.date::TIMESTAMP AS ts_event,
         NULL::TEXT AS status,
         NULL:: TEXT AS status_detail,
+        NULL:: TEXT AS next_status,
         NULL::TIMESTAMP AS ts_status_start,
         NULL::TIMESTAMP AS ts_status_end,
         bp.city_group,
@@ -298,10 +315,13 @@ targets AS (
         NULL::TEXT AS sk_sale_flow,
         NULL::INT AS sk_buyer,
         NULL::INT AS sk_house,
-        NULL::DATE AS dt_booking_created,
+        NULL::TEXT AS sk_offer,
         NULL::INT AS sk_booking,
         NULL::DATE AS dt_offer_submitted,
-        NULL::TEXT AS sk_offer,
+        NULL::DATE AS dt_offer_accepted,
+        NULL::DATE AS dt_sale_agreement_signed,
+        NULL::DATE AS dt_booking_created,
+        NULL::DATE AS dt_visit_completed,
         NULL::INT AS sale_flow_order,
         NULL::INT AS buyer_prospect_order,
         NULL::FLOAT AS budget,
@@ -316,6 +336,7 @@ targets AS (
         date::TIMESTAMP AS ts_event,
         NULL::TEXT AS status,
         NULL:: TEXT AS status_detail,
+        NULL:: TEXT AS next_status,
         NULL::TIMESTAMP AS ts_status_start,
         NULL::TIMESTAMP AS ts_status_end,
         city_group,
@@ -334,10 +355,13 @@ targets AS (
         NULL::TEXT AS sk_sale_flow,
         NULL::INT AS sk_buyer,
         NULL::INT AS sk_house,
-        NULL::DATE AS dt_booking_created,
+        NULL::TEXT AS sk_offer,
         NULL::INT AS sk_booking,
         NULL::DATE AS dt_offer_submitted,
-        NULL::TEXT AS sk_offer,
+        NULL::DATE AS dt_offer_accepted,
+        NULL::DATE AS dt_sale_agreement_signed,
+        NULL::DATE AS dt_booking_created,
+        NULL::DATE AS dt_visit_completed,
         NULL::INT AS sale_flow_order,
         NULL::INT AS buyer_prospect_order,
         NULL::FLOAT AS budget,
@@ -356,6 +380,7 @@ investment AS (
         dd.date::TIMESTAMP AS ts_event,
         NULL::TEXT AS status,
         NULL:: TEXT AS status_detail,
+        NULL:: TEXT AS next_status,
         NULL::TIMESTAMP AS ts_status_start,
         NULL::TIMESTAMP AS ts_status_end,
         city_group,
@@ -374,10 +399,13 @@ investment AS (
         NULL::TEXT AS sk_sale_flow,
         NULL::INT AS sk_buyer,
         NULL::INT AS sk_house,
-        NULL::DATE AS dt_booking_created,
+        NULL::TEXT AS sk_offer,
         NULL::INT AS sk_booking,
         NULL::DATE AS dt_offer_submitted,
-        NULL::TEXT AS sk_offer,
+        NULL::DATE AS dt_offer_accepted,
+        NULL::DATE AS dt_sale_agreement_signed,
+        NULL::DATE AS dt_booking_created,
+        NULL::DATE AS dt_visit_completed,
         NULL::INT AS sale_flow_order,
         NULL::INT AS buyer_prospect_order,
         NULL::FLOAT AS budget,
@@ -392,7 +420,7 @@ investment AS (
         co.mkt_origin = 'Tenants PWA - Sale'
         AND dd.date >= DATE('2020-01-01')
         AND co.mkt_medium != 'Branding'
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35
 ),
 -------------------------------------------------------------------------------------
 -- Query Performance Marketing Rental Demand targets and introduce NULLs for UNION --
@@ -403,6 +431,7 @@ deactivations AS (
         ts_start AS ts_event,
         status,
         status_detail,
+        NULL:: TEXT AS next_status,
         ts_start AS ts_status_start,
         ts_end AS ts_status_end,
         city_group,
@@ -421,10 +450,13 @@ deactivations AS (
         NULL::TEXT AS sk_sale_flow,
         sk_buyer,
         NULL::INT AS sk_house,
-        NULL::DATE AS dt_booking_created,
+        NULL::TEXT AS sk_offer,
         NULL::INT AS sk_booking,
         NULL::DATE AS dt_offer_submitted,
-        NULL::TEXT AS sk_offer,
+        NULL::DATE AS dt_offer_accepted,
+        NULL::DATE AS dt_sale_agreement_signed,
+        NULL::DATE AS dt_booking_created,
+        NULL::DATE AS dt_visit_completed,
         NULL::INT AS sale_flow_order,
         NULL::INT AS buyer_prospect_order,
         NULL::FLOAT AS budget,
