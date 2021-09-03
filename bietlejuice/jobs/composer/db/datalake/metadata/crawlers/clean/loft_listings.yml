@@ -1,0 +1,61 @@
+---
+database_name: datalake_crawlers_clean
+table_name: loft_listings
+columns:
+  id:
+    lineage:
+      - datalake_crawlers_raw.loft_listings.id
+  address:
+    lineage:
+      - datalake_crawlers_raw.loft_listings.address
+  contact_information:
+    lineage:
+      - datalake_crawlers_raw.loft_listings.contact_information
+  crawl_metadata:
+    lineage:
+      - datalake_crawlers_raw.loft_listings.crawl_metadata
+  date_info:
+    lineage:
+      - datalake_crawlers_raw.loft_listings.date_info
+  geolocation:
+    lineage:
+      - datalake_crawlers_raw.loft_listings.geolocation
+  house_info:
+    lineage:
+      - datalake_crawlers_raw.loft_listings.house_info
+  image_urls:
+    lineage:
+      - datalake_crawlers_raw.loft_listings.image_urls
+  metadata:
+    lineage:
+      - datalake_crawlers_raw.loft_listings.metadata
+  listing_name:
+    lineage:
+      - datalake_crawlers_raw.loft_listings.name
+  origin:
+    lineage:
+      - datalake_crawlers_raw.loft_listings.origin
+  price:
+    lineage:
+      - datalake_crawlers_raw.loft_listings.price
+  region:
+    lineage:
+      - datalake_crawlers_raw.loft_listings.region
+  type:
+    lineage:
+      - datalake_crawlers_raw.loft_listings.type
+  validation:
+    lineage:
+      - datalake_crawlers_raw.loft_listings._validation
+  city:
+    lineage:
+      - datalake_crawlers_raw.loft_listings.city
+  year:
+    lineage:
+      - datalake_crawlers_raw.loft_listings.year
+  month:
+    lineage:
+      - datalake_crawlers_raw.loft_listings.month
+  day:
+    lineage:
+      - datalake_crawlers_raw.loft_listings.day

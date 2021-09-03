@@ -1,0 +1,26 @@
+SELECT 
+    id,
+    address,
+    contact_information,
+    crawl_metadata,
+    date_info,
+    geolocation,
+    house_info,
+    image_urls,
+    metadata,
+    name AS listing_name,
+    origin,
+    price,
+    region,
+    type,
+    _validation AS validation,
+    city,
+    year,
+    month,
+    day
+FROM
+    datalake_crawlers_raw.loft_listings
+WHERE
+    year={year}
+    AND month={month}
+    AND day={day}

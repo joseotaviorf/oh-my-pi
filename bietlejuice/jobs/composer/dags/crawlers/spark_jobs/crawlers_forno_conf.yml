@@ -1,0 +1,9 @@
+---
+root_path: "s3://datalake.s3.forno.data.quintoandar.com.br/validacao-crawlers/full/"
+job_extra_args:
+  consumer:
+    format: json
+  custom_records_per_file:
+    loft: 300000
+partition_cols: ["city", "year", "month", "day"]
+
