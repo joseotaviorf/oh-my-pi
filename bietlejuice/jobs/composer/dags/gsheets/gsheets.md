@@ -25,6 +25,7 @@ This pipeline produces the following output tables:
 2. Data lake clean:
     - `acquisition_target_per_source`
     - `affiliate_type_targets`
+    - `affiliates_extra_user_bonus`
     - `affiliates_monthly_expected_results`
     - `agents_control`
     - `aux_agents_sale_hub`
