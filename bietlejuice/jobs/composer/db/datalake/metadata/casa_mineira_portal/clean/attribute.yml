@@ -6,7 +6,7 @@ columns:
       - datalake_casa_mineira_portal_raw.atributo.id
   id_attribute_type:
     lineage:
-      - datalake_casa_mineira_portal_raw.atributo.atributo_tipo_id
+      - datalake_casa_mineira_portal_raw.atributo.tipo_id
   attribute_name:
     lineage:
       - datalake_casa_mineira_portal_raw.atributo.nome

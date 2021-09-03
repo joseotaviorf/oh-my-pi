@@ -1,6 +1,6 @@
 SELECT
     id,
-    atributo_tipo_id AS id_attribute_type,
+    tipo_id AS id_attribute_type,
     nome AS attribute_name,
     nome_completo AS attribute_full_name,
     nome_completo_preposto AS attribute_full_name_prepositional,
