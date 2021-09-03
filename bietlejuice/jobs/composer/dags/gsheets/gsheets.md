@@ -88,6 +88,7 @@ This pipeline produces the following output tables:
     - `owner_entrance_inspection_csat`
     - `owner_exit_inspection_csat`
     - `payments_deals_and_discounts`
+    - `photographer_account`
     - `poa_partners`
     - `process_eviction`
     - `projreparos_espelhamento_dl`

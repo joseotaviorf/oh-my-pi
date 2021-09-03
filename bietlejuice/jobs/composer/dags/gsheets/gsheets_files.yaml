@@ -320,6 +320,11 @@ payments_deals_and_discounts:
     sheet_name: form_requests
     clean_table_name: payments_deals_and_discounts
 
+photographer_account:
+    sheet_id: 1eXKN9IQVCljTrZPQ8HEac6KwYcatr5XdQr_IiD-7RJ8
+    sheet_name: photographer_account
+    clean_table_name: photographer_account
+
 poa_partners:
     sheet_id: 1Tq4Aq6TWz2csI-MTCyy49I63I1amEzn3cmTTyaZDKlU
     sheet_name: poa_partners
