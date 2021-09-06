@@ -20,7 +20,8 @@ SELECT
   COALESCE(CAST(REPLACE(SUBSTRING(dt_house_registry_started,1, 10),'-','') AS BIGINT), -1) AS sk_house_registry_started_date,
   COALESCE(CAST(REPLACE(SUBSTRING(dt_house_registry_ended,1, 10),'-','') AS BIGINT), -1) AS sk_house_registry_ended_date,
   COALESCE(CAST(REPLACE(SUBSTRING(dt_sale_key_delivered,1, 10),'-','') AS BIGINT), -1) AS sk_sale_key_delivered_date,
-  COALESCE(CAST(REPLACE(SUBSTRING(dt_sale_transacton_paid,1, 10),'-','') AS BIGINT), -1) AS sk_sale_transacton_paid_date,
+  COALESCE(CAST(REPLACE(SUBSTRING(dt_sale_transacton_paid,1, 10),'-','') AS BIGINT), -1) AS sk_sale_transaction_paid_date,
+  --
   id_closing_specialist,
   id_pre_specialist,
   id_post_specialist,
@@ -30,10 +31,14 @@ SELECT
   id_credit_specialist,
   id_notes_registry_specialist,
   id_real_estate_register_specialist,
+  --
   days_sale_agreement_signed_to_house_registry_ended,
   days_sale_agreement_signed_to_house_registry_started,
   days_sale_agreement_signed_to_sale_agreement_cancelled,
   days_sale_agreement_signed_to_credit_analysis_ended,
+  days_sale_agreement_signed_to_legaut_analysis_started,
+  days_sale_agreement_signed_to_legal_risk_ended,
+  days_sale_agreement_signed_to_legal_analysis_ended,
   days_sale_agreement_signed_to_financing_started,
   days_sale_agreement_signed_to_notes_registry_started,
   days_legaut_analysis_started_to_legaut_analysis_ended,
@@ -46,6 +51,9 @@ SELECT
   days_notes_registry_ended_to_house_registry_started,
   days_notes_registry_ended_to_house_registry_ended,
   days_financing_ended_to_house_registry_ended,
+  days_house_registry_ended_to_sale_key_delivered,
+  days_house_registry_ended_to_sale_transaction_paid,
+  --
   ts_updated,
   ts_load AS ts_monday_load,
   NOW() AS ts_load

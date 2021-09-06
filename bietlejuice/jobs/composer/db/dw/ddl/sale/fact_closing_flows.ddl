@@ -21,7 +21,7 @@ CREATE TABLE sale.fact_closing_flows (
   sk_house_registry_started_date BIGINT,
   sk_house_registry_ended_date BIGINT,
   sk_sale_key_delivered_date BIGINT,
-  sk_sale_transacton_paid_date BIGINT,
+  sk_sale_transaction_paid_date BIGINT,
   --
   id_closing_specialist BIGINT,
   id_pre_specialist BIGINT,
@@ -37,6 +37,9 @@ CREATE TABLE sale.fact_closing_flows (
   days_sale_agreement_signed_to_house_registry_started INTEGER,
   days_sale_agreement_signed_to_sale_agreement_cancelled INTEGER,
   days_sale_agreement_signed_to_credit_analysis_ended INTEGER,
+  days_sale_agreement_signed_to_legaut_analysis_started INTEGER,
+  days_sale_agreement_signed_to_legal_risk_ended INTEGER,
+  days_sale_agreement_signed_to_legal_analysis_ended INTEGER,
   days_sale_agreement_signed_to_financing_started INTEGER,
   days_sale_agreement_signed_to_notes_registry_started INTEGER,
   days_legaut_analysis_started_to_legaut_analysis_ended INTEGER,
@@ -49,6 +52,8 @@ CREATE TABLE sale.fact_closing_flows (
   days_notes_registry_ended_to_house_registry_started INTEGER,
   days_notes_registry_ended_to_house_registry_ended INTEGER,
   days_financing_ended_to_house_registry_ended INTEGER,
+  days_house_registry_ended_to_sale_key_delivered INTEGER,
+  days_house_registry_ended_to_sale_transaction_paid INTEGER,
   --
   ts_updated TIMESTAMP,
   ts_monday_load TIMESTAMP,
