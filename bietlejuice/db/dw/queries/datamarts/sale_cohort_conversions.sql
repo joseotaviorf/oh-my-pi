@@ -235,7 +235,7 @@ sale_demand_events AS (
 SELECT
 	COALESCE(offers.id_user, sc.sk_buyer) AS id_buyer,
 	COALESCE(offers.id_house, sc.sk_house) AS id_house,
-	COALESCE(offers.id_offer,sc.sk_offer) AS id_offer,
+	sc.sk_offer AS id_offer,
 	offers.form_of_payment,
 	offers.dt_offer_sent,
 	offers.dt_deal_qualified,

@@ -250,7 +250,7 @@ SELECT
 	COALESCE(offers.id_house, sc.sk_house, tta.house_id::BIGINT, sc.sk_house) AS id_house,
 	offers.form_of_payment,
 	offers.dt_deal_qualified,
-	COALESCE(offers.id_offer,sc.sk_offer) AS id_offer,
+	sc.sk_offer AS id_offer,
 	sc.sk_booking,
 	offers.dt_diligence_started_legaut,
 	offers.dt_diligence_ended_legaut,
