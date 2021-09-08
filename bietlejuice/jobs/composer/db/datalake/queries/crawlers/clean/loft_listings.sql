@@ -13,7 +13,6 @@ SELECT
     price,
     region,
     type,
-    _validation AS validation,
     city,
     year,
     month,

@@ -44,9 +44,6 @@ columns:
   type:
     lineage:
       - datalake_crawlers_raw.loft_listings.type
-  validation:
-    lineage:
-      - datalake_crawlers_raw.loft_listings._validation
   city:
     lineage:
       - datalake_crawlers_raw.loft_listings.city
