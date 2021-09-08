@@ -1,0 +1,2 @@
+database_name: datalake_tracksale_raw
+table_name: campaign

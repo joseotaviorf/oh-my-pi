@@ -1,0 +1,31 @@
+database_name: datalake_tracksale_raw
+table_name: answer
+columns:
+  alternative_email:
+    tags:
+    - Confidential
+  alternative_phone:
+    tags:
+    - Confidential
+  assignee:
+    tags:
+    - PII
+    - Confidential
+  email:
+    tags:
+    - Confidential
+  identification:
+    tags:
+    - PII
+    - Confidential
+  name:
+    tags:
+    - PII
+    - Confidential
+  phone:
+    tags:
+    - Confidential
+  tags:
+    tags:
+    - PII
+    - Confidential
