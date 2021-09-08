@@ -37,8 +37,12 @@ def get_remote_path_from_yml_file(yml_path: str) -> str:
         data = safe_load(fp)
         db_name = data["database_name"]
         table_name = data["table_name"]
-        first_column_key = get_first_key(data["columns"])
-        file_type = get_first_key(data["columns"][first_column_key])
+        columns = data.get("columns")
+        if not columns:
+            file_type = "tags"
+        else:
+            first_column_key = get_first_key(data.get("columns"))
+            file_type = get_first_key(data["columns"][first_column_key])
         if file_type not in ["lineage", "tags"]:
             raise ValueError(f"File {yml_path} has invalid type: {file_type}")
 
@@ -79,9 +83,7 @@ def main():
                     f"local_path={file_path}, remote_path={remote_path}, msg=Metadata file saved to S3"
                 )
         else:
-            print(
-                f"msg=No files found!"
-            )
+            print(f"msg=No files found!")
 
 
 if __name__ == "__main__":
