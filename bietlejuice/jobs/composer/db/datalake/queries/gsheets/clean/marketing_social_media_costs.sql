@@ -1,5 +1,6 @@
 SELECT
     NULLIF(city_name, '') AS city_name,
+    NULLIF(media, '') AS media,    
     NULLIF(network, '') AS network,
     NULLIF(campaign_name, '') AS campaign_name,
     FLOAT(NULLIF(cost, '')) AS cost,
