@@ -148,10 +148,33 @@ cluster_promo_bonus AS(
     WHERE final_bonus_sale > 0
     AND sk_date >= 20210701
     GROUP BY 1,2,3,4,5,6,7
+),
+extra_promotional_bonus AS(
+    SELECT
+        TO_CHAR(NULLIF(eb.date,'')::DATE,'yyyymmdd')::BIGINT AS sk_date,
+        'extra_bonus' AS table,
+        CASE
+            WHEN dua.type = 'Standard' THEN 'Indica Aí - General'
+            WHEN dua.type = 'Agent' THEN 'Indica Aí - Agents'
+            WHEN dua.type = 'Doorman' THEN 'Doorman'
+            ELSE dua.type
+        END AS mkt_origin,
+        eb.city_group,
+        'engagement' AS vertical,
+        'Promotional Bonus' AS source,
+        eb.business_context,
+        SUM(bonus) AS cost
+    FROM
+        datalake_gsheets_clean_prod.affiliates_extra_user_bonus eb
+    LEFT JOIN dim_user_affiliate dua
+        ON dua.sk_user = eb.sk_user
+    GROUP BY 1,2,3,4,5,6,7
 )
 SELECT * FROM segmentation_promo_bonus
 UNION ALL
 SELECT * FROM cluster_promo_bonus
+UNION ALL
+SELECT * FROM extra_promotional_bonus
 ),
 ia_fact_affiliate_transposed AS (
     SELECT
