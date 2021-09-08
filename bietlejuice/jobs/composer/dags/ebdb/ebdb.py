@@ -12,6 +12,7 @@ from airflow.utils.helpers import cross_downstream, chain
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
+from bietlejuice.jobs.composer.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.jobs.composer.services.file_service import FileService
 
 # DAG params
@@ -200,6 +201,28 @@ def clean_tasks(table_name):
             }
         },
     )
+    final_task = sync_metastore_table_task
+    if FileService.metadata_file_exists(
+            SOURCE, LayerEnum.CLEAN.value, table_name
+    ):
+        propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
+            dag=dag,
+            task_id=f"propagate-table-metadata-clean-{slugged_table_name}",
+            json={
+                "spark_python_task": {
+                    "python_file": f"{BASE_SPARK_JOBS_PATH}/propagate_table_metadata.py",
+                    "parameters": [
+                        LayerEnum.CLEAN.value,
+                        MetadataTypeEnum.LINEAGE.value,
+                        SOURCE,
+                        table_name,
+                    ]
+                }
+            }
+        )
+
+        sync_metastore_table_task >> propagate_table_metadata_task
+        final_task = propagate_table_metadata_task
 
     chain(
         clean_table_task, [sync_metastore_table_task, create_clean_external_tables_task]
@@ -207,7 +230,7 @@ def clean_tasks(table_name):
 
     return [
         clean_table_task,
-        [create_clean_external_tables_task, sync_metastore_table_task],
+        [create_clean_external_tables_task, final_task],
     ]
 
 
