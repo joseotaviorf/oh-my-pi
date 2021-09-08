@@ -1,0 +1,45 @@
+database_name: datalake_gsheets_clean
+table_name: keys_logistic_onboarding_tenant
+columns:
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_onboarding_tenant.codigo_contrato
+  tenant_name:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_onboarding_tenant.nome_iq
+  tenant_phone:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_onboarding_tenant.telefone_iq
+  house_address:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_onboarding_tenant.endereco
+  house_number:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_onboarding_tenant.numero
+  house_zipcode:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_onboarding_tenant.cep
+  house_neighborhood:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_onboarding_tenant.bairro
+  house_city:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_onboarding_tenant.cidade_de_entrega
+  house_complement:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_onboarding_tenant.complemento
+  comments:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_onboarding_tenant.observacao
+  best_hour:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_onboarding_tenant.melhor_horario
+  tenant_aware_of_entrance_only_in_entrance_date:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_onboarding_tenant.iq_ciente_da_chaves_somente_na_vigencia
+  tenant_with_key:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_onboarding_tenant.iq_com_chave
+  ts_answer_form:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_onboarding_tenant.ts_resposta_forms

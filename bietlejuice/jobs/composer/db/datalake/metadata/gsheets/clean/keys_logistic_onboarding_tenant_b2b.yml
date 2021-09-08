@@ -1,0 +1,36 @@
+database_name: datalake_gsheets_clean
+table_name: keys_logistic_onboarding_tenant_b2b
+columns:
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_onboarding_tenant_b2b.codigo_contrato
+  tenant_name:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_onboarding_tenant_b2b.nome_iq
+  tenant_phone:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_onboarding_tenant_b2b.telefone_iq
+  house_address:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_onboarding_tenant_b2b.endereco
+  house_number:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_onboarding_tenant_b2b.numero
+  house_complement:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_onboarding_tenant_b2b.complemento
+  house_zipcode:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_onboarding_tenant_b2b.cep
+  house_neighborhood:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_onboarding_tenant_b2b.bairro
+  house_city:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_onboarding_tenant_b2b.cidade
+  tenant_aware_of_entrance_only_in_entrance_date:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_onboarding_tenant_b2b.iq_ciente_entrada_imovel_somente_na_vigencia
+  ts_answer_form:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_onboarding_tenant_b2b.ts_resposta_forms

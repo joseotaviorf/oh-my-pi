@@ -1,0 +1,63 @@
+database_name: datalake_gsheets_clean
+table_name: keys_logistic_pre_contract
+columns:
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_pre_contract.codigo_imovel
+  id_ticket:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_pre_contract.ticket_id
+  agent_type:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_pre_contract.type
+  user_name:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_pre_contract.name
+  personal_document:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_pre_contract.cpf
+  user_email:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_pre_contract.email
+  user_telephone:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_pre_contract.telephone
+  first_request:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_pre_contract.pedido
+  second_request:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_pre_contract.pedido2
+  number_of_keys:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_pre_contract.quantidade_de_chaves
+  number_of_kits:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_pre_contract.quantidade_de_kits
+  house_address:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_pre_contract.endereco
+  house_number:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_pre_contract.numero
+  house_complement:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_pre_contract.complemento
+  house_neighborhood:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_pre_contract.bairro
+  house_zipcode:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_pre_contract.cep
+  house_city:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_pre_contract.cidade
+  house_state:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_pre_contract.estado
+  house_status:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_pre_contract.situacao_do_imovel
+  ts_answer_form:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_pre_contract.ts_criacao

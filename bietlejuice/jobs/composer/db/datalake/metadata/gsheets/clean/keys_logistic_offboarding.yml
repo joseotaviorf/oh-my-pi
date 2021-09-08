@@ -1,0 +1,39 @@
+database_name: datalake_gsheets_clean
+table_name: keys_logistic_offboarding
+columns:
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_offboarding.codigo_contrato
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_offboarding.cod_imovel
+  owner_name:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_offboarding.nome_pp
+  owner_phone:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_offboarding.telefone_cadastro_pp
+  best_hour:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_offboarding.melhor_horario
+  house_address:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_offboarding.endereco
+  house_number:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_offboarding.numero
+  house_complement:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_offboarding.complemento
+  house_zipcode:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_offboarding.cep
+  house_neighborhood:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_offboarding.bairro
+  house_city:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_offboarding.cidade
+  ts_answer_form:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_offboarding.ts_resposta_forms
