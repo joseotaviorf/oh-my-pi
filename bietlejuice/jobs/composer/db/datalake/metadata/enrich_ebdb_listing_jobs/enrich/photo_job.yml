@@ -1,0 +1,145 @@
+database_name: datalake_ebdb_listing_jobs
+table_name: photo_job
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.id
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.id_house
+  id_photographer:
+    lineage:
+      - datalake_ebdb_clean.photographer_data.id
+  id_user_who_canceled:
+    lineage:
+      - datalake_ebdb_clean.user.id
+  id_rep:
+    lineage:
+      - datalake_ebdb_clean.user.id_sales_rep
+      - datalake_ebdb_clean.user.id
+  job_status:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.status
+  booking_instructions:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.booking_instructions
+  photographer_name:
+    lineage:
+      - datalake_ebdb_clean.user.name
+  photographer_email:
+    lineage:
+      - datalake_ebdb_clean.user.email
+  photo_session_contact_name:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.photo_session_contact_name
+  photo_session_email:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.photo_session_email
+  photo_session_phone:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.photo_session_phone
+  photo_session_secondary_phone:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.photo_session_secondary_phone
+  key_pick_up:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.key_pick_up
+  key_others:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.key_others
+  contract_type:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.contract_type
+  problem:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.problem
+  photo_sender_user_type:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.photo_sender_user_type
+  cancellation_reason:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.reason_of_change
+      - datalake_ebdb_clean.house_registration_status_aud.photo_shoot_schedule_reason
+  cancellation_reason_text:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.cancellation_reason_text
+  user_who_canceled_name:
+    lineage:
+      - datalake_ebdb_clean.user.name
+  user_who_canceled_email:
+    lineage:
+      - datalake_ebdb_clean.user.email
+  creation_origin:
+    lineage:
+      - datalake_ebdb_clean.user.id_photographer_data
+      - datalake_ebdb_clean.user.id_sales_rep
+      - datalake_ebdb_clean.user.email
+  user_cancellation_type:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.status
+      - datalake_ebdb_clean.user.id
+      - datalake_ebdb_clean.user.id_photographer_data
+      - datalake_ebdb_clean.user.id_sales_rep
+      - datalake_ebdb_clean.user.email
+  has_lockbox:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.has_lockbox
+  is_canceled:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.status
+  is_approved:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.is_approved
+  is_confirmed:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.is_confirmed
+  is_flexible_schedule:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_scheduled
+  is_same_day_upload:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_photos_uploaded
+      - datalake_ebdb_clean.photographer_job.ts_session_started
+      - datalake_ebdb_clean.photographer_job.ts_scheduled
+  is_job_on_time:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_photos_uploaded
+      - datalake_ebdb_clean.photographer_job.ts_scheduled
+  is_job_anticipated:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_photos_uploaded
+      - datalake_ebdb_clean.photographer_job.ts_scheduled
+  creation_to_scheduling_diff_minutes:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_scheduled
+      - datalake_ebdb_clean.photographer_job.ts_created
+  dt_photographer_started:
+    lineage:
+      - datalake_ebdb_clean.photographer_data.ts_created
+  ts_photographer_accepted:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_photographer_accepted
+  ts_photo_job_requested:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_photo_job_requested
+  ts_session_started:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_session_started
+  ts_scheduled:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_scheduled
+  ts_photos_uploaded:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_photos_uploaded
+  ts_problem_reported:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  ts_canceled:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_updated
