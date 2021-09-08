@@ -1,0 +1,2 @@
+database_name: datalake_cypress_raw
+table_name: tests
