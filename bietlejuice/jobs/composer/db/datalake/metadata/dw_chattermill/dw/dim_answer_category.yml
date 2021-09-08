@@ -1,0 +1,12 @@
+database_name: dw_chattermill
+table_name: dim_answer_category
+columns:
+  sk_category:
+    lineage:
+      - datalake_chattermill.responses.id_tag_theme
+  category:
+    lineage:
+      - datalake_chattermill.responses.tag_parent
+  theme:
+    lineage:
+      - datalake_chattermill.responses.tag_name
