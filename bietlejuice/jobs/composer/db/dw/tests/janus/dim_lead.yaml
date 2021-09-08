@@ -1,2 +1,3 @@
 # Migration file for dim_lead
 dw_schema: public
+sample_size_months: 6
