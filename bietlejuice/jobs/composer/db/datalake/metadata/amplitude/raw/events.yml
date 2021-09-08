@@ -1,0 +1,50 @@
+database_name: datalake_amplitude_raw
+table_name: events
+columns:
+  adid:
+    tags:
+    - PII
+    - Confidential
+  amplitude_id:
+    tags:
+    - PII
+    - Confidential
+  city:
+    tags:
+    - Confidential
+  country:
+    tags:
+    - Confidential
+  device_id:
+    tags:
+    - Confidential
+  dma:
+    tags:
+    - Confidential
+  idfa:
+    tags:
+    - PII
+    - Confidential
+  ip_address:
+    tags:
+    - Confidential
+  location_lat:
+    tags:
+    - Confidential
+  location_lng:
+    tags:
+    - Confidential
+  region:
+    tags:
+    - Confidential
+  user_id:
+    tags:
+    - PII
+    - Confidential
+  user_properties:
+    tags:
+    - Confidential
+  uuid:
+    tags:
+    - PII
+    - Confidential
