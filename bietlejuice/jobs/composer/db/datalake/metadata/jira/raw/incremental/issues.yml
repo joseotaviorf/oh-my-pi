@@ -1,0 +1,9 @@
+database_name: datalake_jira_raw
+table_name: issues
+columns:
+  changelog:
+    tags:
+    - Confidential
+  fields:
+    tags:
+    - Confidential

@@ -1,0 +1,2 @@
+database_name: datalake_jira_raw
+table_name: projects
