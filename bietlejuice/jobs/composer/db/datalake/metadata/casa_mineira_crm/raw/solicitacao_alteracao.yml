@@ -1,0 +1,11 @@
+database_name: datalake_casa_mineira_crm_raw
+table_name: solicitacao_alteracao
+columns:
+  usuario_atendimento_id:
+    tags:
+    - PII
+    - Confidential
+  usuario_confirmacao_id:
+    tags:
+    - PII
+    - Confidential

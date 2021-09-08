@@ -1,0 +1,9 @@
+database_name: datalake_casa_mineira_crm_raw
+table_name: unidade
+columns:
+  telefone_venda:
+    tags:
+    - Confidential
+  telefone_aluguel:
+    tags:
+    - Confidential

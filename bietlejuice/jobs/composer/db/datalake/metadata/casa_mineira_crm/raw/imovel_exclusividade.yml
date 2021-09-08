@@ -1,0 +1,11 @@
+database_name: datalake_casa_mineira_crm_raw
+table_name: imovel_exclusividade
+columns:
+  usuario_cancelamento_id:
+    tags:
+    - PII
+    - Confidential
+  usuario_exclusao_id:
+    tags:
+    - PII
+    - Confidential

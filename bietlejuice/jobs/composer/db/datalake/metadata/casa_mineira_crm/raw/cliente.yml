@@ -1,0 +1,19 @@
+database_name: datalake_casa_mineira_crm_raw
+table_name: cliente
+columns:
+  id:
+    tags:
+    - PII
+    - Confidential
+  email:
+    tags:
+    - PII
+    - Confidential
+  telefone:
+    tags:
+    - PII
+    - Confidential
+  telefone_secundario:
+    tags:
+    - PII
+    - Confidential

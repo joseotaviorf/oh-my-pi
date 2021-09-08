@@ -1,0 +1,27 @@
+database_name: datalake_casa_mineira_crm_raw
+table_name: contato
+columns:
+  cliente_id:
+    tags:
+    - PII
+    - Confidential
+  usuario_encaminhamento_id:
+    tags:
+    - PII
+    - Confidential
+  usuario_atendimento_id:
+    tags:
+    - PII
+    - Confidential
+  usuario_rejeicao_id:
+    tags:
+    - PII
+    - Confidential
+  email:
+    tags:
+    - PII
+    - Confidential
+  telefone:
+    tags:
+    - PII
+    - Confidential

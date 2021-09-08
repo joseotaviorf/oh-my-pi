@@ -1,0 +1,11 @@
+database_name: datalake_casa_mineira_crm_raw
+table_name: cliente_arquivado
+columns:
+  usuario_id:
+    tags:
+    - PII
+    - Confidential
+  cliente_id:
+    tags:
+    - PII
+    - Confidential

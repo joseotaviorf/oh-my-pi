@@ -1,0 +1,14 @@
+database_name: datalake_casa_mineira_crm_raw
+table_name: cliente_permissao
+columns:
+  cliente_id:
+    tags:
+    - PII
+    - Confidential
+  usuario_id:
+    tags:
+    - Confidential
+  usuario_revogacao_id:
+    tags:
+    - PII
+    - Confidential

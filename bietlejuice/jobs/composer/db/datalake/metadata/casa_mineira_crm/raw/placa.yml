@@ -1,0 +1,11 @@
+database_name: datalake_casa_mineira_crm_raw
+table_name: placa
+columns:
+  usuario_id:
+    tags:
+    - PII
+    - Confidential
+  usuario_agendamento_id:
+    tags:
+    - PII
+    - Confidential

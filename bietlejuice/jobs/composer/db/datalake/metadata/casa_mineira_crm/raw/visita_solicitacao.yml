@@ -1,0 +1,11 @@
+database_name: datalake_casa_mineira_crm_raw
+table_name: visita_solicitacao
+columns:
+  contato_id:
+    tags:
+    - PII
+    - Confidential
+  usuario_validacao_id:
+    tags:
+    - PII
+    - Confidential
