@@ -1,0 +1,150 @@
+database_name: datalake_ebdb_listing_jobs
+table_name: inspection
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_clean.inspection.id
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.inspection.id_house
+  id_user_inspector:
+    lineage:
+      - datalake_ebdb_clean.inspection.id_user_inspector
+  id_contract:
+    lineage:
+      - datalake_ebdb_clean.inspection.id_contract
+  id_booking:
+    lineage:
+      - datalake_ebdb_clean.inspection.id_booking
+  id_ref:
+    lineage:
+      - datalake_ebdb_clean.inspection.id_ref
+  id_final_report_pdf:
+    lineage:
+      - datalake_ebdb_clean.inspection.id_final_report_pdf
+  status:
+    lineage:
+      - datalake_ebdb_clean.inspection.status
+  mode:
+    lineage:
+      - datalake_ebdb_clean.inspection.mode
+  comment:
+    lineage:
+      - datalake_ebdb_clean.inspection.comment
+  hash:
+    lineage:
+      - datalake_ebdb_clean.inspection.hash
+  browser_tenant_approval:
+    lineage:
+      - datalake_ebdb_clean.inspection.browser_tenant_approval
+  browser_owner_approval:
+    lineage:
+      - datalake_ebdb_clean.inspection.browser_owner_approval
+  tenant_comment:
+    lineage:
+      - datalake_ebdb_clean.inspection.tenant_comment
+  owner_comment:
+    lineage:
+      - datalake_ebdb_clean.inspection.owner_comment
+  ip_tenant_approval:
+    lineage:
+      - datalake_ebdb_clean.inspection.ip_tenant_approval
+  ip_owner_approval:
+    lineage:
+      - datalake_ebdb_clean.inspection.ip_owner_approval
+  os_tenant_approval:
+    lineage:
+      - datalake_ebdb_clean.inspection.os_tenant_approval
+  os_owner_approval:
+    lineage:
+      - datalake_ebdb_clean.inspection.os_owner_approval
+  type:
+    lineage:
+      - datalake_ebdb_clean.inspection.type
+  short_review_tenant:
+    lineage:
+      - datalake_ebdb_clean.inspection.short_review_tenant
+  short_review_owner:
+    lineage:
+      - datalake_ebdb_clean.inspection.short_review_owner
+  last_report_sent:
+    lineage:
+      - datalake_ebdb_clean.inspection.last_report_sent
+  key_location:
+    lineage:
+      - datalake_ebdb_clean.inspection.key_location
+  key_location_details:
+    lineage:
+      - datalake_ebdb_clean.inspection.key_location_details
+  version:
+    lineage:
+      - datalake_ebdb_clean.inspection.version
+  schedule_observations:
+    lineage:
+      - datalake_ebdb_clean.inspection.schedule_observations
+  report_revised:
+    lineage:
+      - datalake_ebdb_clean.inspection.report_revised
+  is_tenant_approved:
+    lineage:
+      - datalake_ebdb_clean.inspection.is_tenant_approved
+  is_owner_approved:
+    lineage:
+      - datalake_ebdb_clean.inspection.is_owner_approved
+  is_schedule_double_checked:
+    lineage:
+      - datalake_ebdb_clean.inspection.is_schedule_double_checked
+  is_report_finished:
+    lineage:
+      - datalake_ebdb_clean.inspection.is_report_finished
+  is_item_commented:
+    lineage:
+      - datalake_ebdb_clean.inspection.is_item_commented
+  is_final_report_created:
+    lineage:
+      - datalake_ebdb_clean.inspection.is_final_report_created
+  has_inspector_comment:
+    lineage:
+      - datalake_ebdb_clean.inspection_item.comment
+  has_tenant_comment:
+    lineage:
+      - datalake_ebdb_clean.inspection_item.tenant_comment
+  has_owner_comment:
+    lineage:
+      - datalake_ebdb_clean.inspection_item.owner_comment
+  has_inspector_got_all_info:
+    lineage:
+      - datalake_ebdb_clean.inspection.has_inspector_got_all_info
+  dt_final_report_sent:
+    lineage:
+      - datalake_ebdb_clean.inspection.dt_final_report_sent
+  dt_inspected:
+    lineage:
+      - datalake_ebdb_clean.inspection.dt_inspected
+  ts_tenant_approved:
+    lineage:
+      - datalake_ebdb_clean.inspection.ts_tenant_approved
+  ts_owner_approved:
+    lineage:
+      - datalake_ebdb_clean.inspection.ts_owner_approved
+  ts_partial_tenant_report_sent:
+    lineage:
+      - datalake_ebdb_clean.inspection.ts_partial_tenant_report_sent
+  ts_partial_owner_report_sent:
+    lineage:
+      - datalake_ebdb_clean.inspection.ts_partial_owner_report_sent
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.inspection.ts_created
+  ts_expired:
+    lineage:
+      - datalake_ebdb_clean.inspection.ts_expired
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.inspection.ts_updated
+  ts_first_synced:
+    lineage:
+      - datalake_ebdb_clean.inspection_aud.ts_last_synced
+  ts_last_synced:
+    lineage:
+      - datalake_ebdb_clean.inspection_aud.ts_last_synced
