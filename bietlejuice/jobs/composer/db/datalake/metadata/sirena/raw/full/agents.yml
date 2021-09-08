@@ -1,0 +1,21 @@
+database_name: datalake_sirena_raw
+table_name: agents
+columns:
+  email:
+    tags:
+    - Confidential
+  firstname:
+    tags:
+    - PII
+    - Confidential
+  id:
+    tags:
+    - PII
+    - Confidential
+  lastname:
+    tags:
+    - PII
+    - Confidential
+  phone:
+    tags:
+    - Confidential

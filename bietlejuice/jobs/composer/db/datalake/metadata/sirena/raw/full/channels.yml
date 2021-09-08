@@ -1,0 +1,2 @@
+database_name: datalake_sirena_raw
+table_name: channels
