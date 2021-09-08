@@ -1,0 +1,11 @@
+database_name: datalake_chattermill_raw
+table_name: responses
+columns:
+  tags:
+    tags:
+    - PII
+    - Confidential
+  user_attributes:
+    tags:
+    - PII
+    - Confidential
