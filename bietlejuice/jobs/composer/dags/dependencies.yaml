@@ -125,6 +125,19 @@ bietlejuice.dw_lead_tracking:
   - bietlejuice.ebdb:create-clean-lead-in-data-lake
   - bietlejuice.enrich_crm:load-enrich-tasks
 
+bietlejuice.dw_lead:
+  - bietlejuice.enrich_lead:load-enrich-lead
+  - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
+  - bietlejuice.enrich_lead:load-enrich-conversion-lead
+  - bietlejuice.enrich_lead_tracking:load-enrich-lead-first-event-tracking
+  - bietlejuice.enrich_crm_lead:load-enrich-lead-score-factor
+  - bietlejuice.enrich_wololo_lead:load-enrich-lead-sales-company
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
+  - bietlejuice.ebdb:create-clean-partner-in-data-lake
+  - bietlejuice.ebdb:create-clean-lead-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-in-data-lake
+
 bietlejuice.dw_listing:
   - bietlejuice.ebdb:create-clean-condo-in-data-lake
 

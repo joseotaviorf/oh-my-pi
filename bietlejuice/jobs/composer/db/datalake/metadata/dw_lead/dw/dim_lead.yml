@@ -1,0 +1,191 @@
+---
+database_name: dw_janus
+table_name: dim_lead
+columns:
+  sk_lead:
+    lineage:
+      - datalake_lead.lead.id
+  id:
+    lineage:
+      - datalake_lead.lead.id
+  external_id:
+    lineage:
+      - datalake_lead.lead.id_external
+  region_id:
+    lineage:
+      - datalake_lead.lead.id_region
+  area_total:
+    lineage:
+      - datalake_lead.lead.total_area
+  bairro:
+    lineage:
+      - datalake_lead.lead.neighborhood
+  cep:
+    lineage:
+      - datalake_lead.lead.zip_code
+  cidade:
+    lineage:
+      - datalake_lead.lead.city
+  complemento:
+    lineage:
+      - datalake_lead.lead.complement
+  endereco:
+    lineage:
+      - datalake_lead.lead.address
+  numero:
+    lineage:
+      - datalake_lead.lead.house_number
+  nome_anunciante:
+    lineage:
+      - datalake_lead.lead.advertiser_name
+  numero_banheiros:
+    lineage:
+      - datalake_lead.lead.bathrooms
+  numero_quartos:
+    lineage:
+      - datalake_lead.lead.bedrooms
+  numero_suites:
+    lineage:
+      - datalake_lead.lead.suites
+  url_anuncio:
+    lineage:
+      - datalake_lead.lead.ad_url
+  telefone_anunciante:
+    lineage:
+      - datalake_lead.lead.advertiser_phone
+  tipo:
+    lineage:
+      - datalake_lead.lead.type
+  email:
+    lineage:
+      - datalake_lead.lead.email
+  email_captador:
+    lineage:
+      - datalake_lead.lead.pick_up_email
+  telefone_captador:
+    lineage:
+      - datalake_lead.lead.pick_up_phone
+  lat:
+    lineage:
+      - datalake_lead.lead.lat
+  lng:
+    lineage:
+      - datalake_lead.lead.lng
+  condominio:
+    lineage:
+      - datalake_lead.lead.condo_price
+  iptu:
+    lineage:
+      - datalake_lead.lead.iptu
+  ub_page_variant:
+    lineage:
+      - datalake_lead.lead.unbounce_page_variant
+  ub_page_name:
+    lineage:
+      - datalake_lead.lead.unbounce_page_name
+  reason:
+    lineage:
+      - datalake_lead.lead.reason
+  reason_detail:
+    lineage:
+      - datalake_lead.lead.reason_detail
+  deadline_of_new_contact:
+    lineage:
+      - datalake_lead.lead.deadline_of_new_contact
+  status:
+    lineage:
+      - datalake_lead.lead.status
+  origem:
+    lineage:
+      - datalake_lead.lead.source
+  proprietario_nome:
+    lineage:
+      - datalake_lead.lead.lead_owner_name
+  proprietario_email:
+    lineage:
+      - datalake_lead.lead.lead_owner_email
+  affiliate_type:
+    lineage:
+      - datalake_lead.lead.affiliate_type
+  dados_afiliado_cidade_atuacao:
+    lineage:
+      - datalake_lead.lead.affiliate_operation_city
+  utm_source:
+    lineage:
+      - datalake_lead.lead.utm_source
+      - datalake_lead_tracking.lead_first_event_tracking.tracking_source
+  utm_medium:
+    lineage:
+      - datalake_lead.lead.utm_medium
+      - datalake_lead_tracking.lead_first_event_tracking.tracking_medium
+  utm_campaign:
+    lineage:
+      - datalake_lead.lead.utm_campaign
+      - datalake_lead_tracking.lead_first_event_tracking.tracking_campaign
+  utm_content:
+    lineage:
+      - datalake_lead_tracking.lead_first_event_tracking.tracking_content
+  utm_term:
+    lineage:
+      - datalake_lead_tracking.lead_first_event_tracking.tracking_term
+  tracking_platform:
+    lineage:
+      - datalake_lead_tracking.lead_first_event_tracking.tracking_platform
+  tracking_region:
+    lineage:
+      - datalake_lead_tracking.lead_first_event_tracking.tracking_region
+  tracking_city:
+    lineage:
+      - datalake_lead_tracking.lead_first_event_tracking.tracking_city
+  network:
+    lineage:
+      - datalake_lead.lead.utm_source
+      - datalake_static_files_raw.historical_lead_app_network.network
+  usuario_que_indicou_id:
+    lineage:
+      - datalake_lead.lead.id_user_has_indicated
+  score_factor:
+    lineage:
+      - datalake_crm_lead.lead_score_factor.score_factor
+  sales_company:
+    lineage:
+      - datalake_wololo_lead.lead_sales_company.sales_company
+  sale_price:
+    lineage:
+      - datalake_lead.lead.sale_price
+  automatically_discarded:
+    lineage:
+      - datalake_lead.lead.has_automatically_discarded
+  processado:
+    lineage:
+      - datalake_lead.lead.has_processed
+  is_for_rent:
+    lineage:
+      - datalake_lead.lead.is_for_rent
+  is_for_sale:
+    lineage:
+      - datalake_lead.lead.is_for_sale
+  dentro_area_atuacao:
+    lineage:
+      - datalake_lead.lead.is_inside_operation_area
+  is_enriched_data:
+    lineage:
+      - datalake_lead.lead.is_enriched_data
+  mencionar:
+    lineage:
+      - datalake_lead.lead.is_to_be_mentioned
+  captado_em:
+    lineage:
+      - datalake_lead.lead.dt_picked_up
+  dados_afiliado_inicio_atuacao:
+    lineage:
+      - datalake_lead.lead.ts_affiliate_operation_start
+  ts_sales_company_sent:
+    lineage:
+      - datalake_wololo_lead.lead_sales_company.ts_sales_company_sent
+  criado_em:
+    lineage:
+      - datalake_lead.lead.ts_created
+  atualizado_em:
+    lineage:
+      - datalake_lead.lead.ts_updated
