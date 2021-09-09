@@ -1,0 +1,89 @@
+database_name: datalake_consolidated_marketing_costs
+table_name: consolidated_media_costs
+columns:
+  id_date:
+    lineage:
+      - datalake_consolidated_marketing_costs.google_consolidated_costs.id_date
+      - datalake_consolidated_marketing_costs.criteo_consolidated_costs.id_date
+      - datalake_consolidated_marketing_costs.rtb_consolidated_costs.id_date
+      - datalake_consolidated_marketing_costs.mitula_consolidated_costs.id_date
+      - datalake_consolidated_marketing_costs.trovit_consolidated_costs.id_date
+      - datalake_consolidated_marketing_costs.facebook_consolidated_costs.id_date
+  campaign_name:
+    lineage:
+      - datalake_consolidated_marketing_costs.google_consolidated_costs.campaign_name
+      - datalake_consolidated_marketing_costs.criteo_consolidated_costs.campaign_name
+      - datalake_consolidated_marketing_costs.rtb_consolidated_costs.campaign_name
+      - datalake_consolidated_marketing_costs.mitula_consolidated_costs.campaign_name
+      - datalake_consolidated_marketing_costs.trovit_consolidated_costs.campaign_name
+      - datalake_consolidated_marketing_costs.facebook_consolidated_costs.campaign_name
+  city_group:
+    lineage:
+      - datalake_consolidated_marketing_costs.google_consolidated_costs.campaign_name
+      - datalake_consolidated_marketing_costs.criteo_consolidated_costs.campaign_name
+      - datalake_consolidated_marketing_costs.rtb_consolidated_costs.campaign_name
+      - datalake_consolidated_marketing_costs.mitula_consolidated_costs.campaign_name
+      - datalake_consolidated_marketing_costs.trovit_consolidated_costs.campaign_name
+      - datalake_consolidated_marketing_costs.facebook_consolidated_costs.campaign_name
+      - datalake_consolidated_marketing_costs.google_consolidated_costs.campaign_city
+      - datalake_consolidated_marketing_costs.facebook_consolidated_costs.campaign_city
+      - datalake_gsheets_clean.marketing_manual_campaign_cities.city_group
+  account_name:
+    lineage:
+      - datalake_consolidated_marketing_costs.google_consolidated_costs.account_name
+      - datalake_consolidated_marketing_costs.criteo_consolidated_costs.account_name
+      - datalake_consolidated_marketing_costs.rtb_consolidated_costs.account_name
+      - datalake_consolidated_marketing_costs.mitula_consolidated_costs.account_name
+      - datalake_consolidated_marketing_costs.trovit_consolidated_costs.account_name
+      - datalake_consolidated_marketing_costs.facebook_consolidated_costs.account_name
+  utm_campaign:
+    lineage:
+      - datalake_consolidated_marketing_costs.google_consolidated_costs.utm_campaign
+      - datalake_consolidated_marketing_costs.criteo_consolidated_costs.utm_campaign
+      - datalake_consolidated_marketing_costs.rtb_consolidated_costs.utm_campaign
+      - datalake_consolidated_marketing_costs.mitula_consolidated_costs.utm_campaign
+      - datalake_consolidated_marketing_costs.trovit_consolidated_costs.utm_campaign
+      - datalake_consolidated_marketing_costs.facebook_consolidated_costs.utm_campaign
+  utm_term:
+    lineage:
+      - datalake_consolidated_marketing_costs.google_consolidated_costs.utm_term
+      - datalake_consolidated_marketing_costs.facebook_consolidated_costs.utm_term
+  utm_content:
+    lineage:
+      - datalake_consolidated_marketing_costs.google_consolidated_costs.utm_content
+      - datalake_consolidated_marketing_costs.facebook_consolidated_costs.utm_content
+  desktop_cost:
+    lineage:
+      - datalake_consolidated_marketing_costs.google_consolidated_costs.desktop_cost
+      - datalake_consolidated_marketing_costs.mitula_consolidated_costs.desktop_cost
+      - datalake_consolidated_marketing_costs.trovit_consolidated_costs.desktop_cost
+      - datalake_consolidated_marketing_costs.facebook_consolidated_costs.desktop_cost
+      - datalake_marketing_costs_sharing_rules.old_sharing_rules.share
+  mobile_cost:
+    lineage:
+      - datalake_consolidated_marketing_costs.google_consolidated_costs.mobile_cost
+      - datalake_consolidated_marketing_costs.mitula_consolidated_costs.mobile_cost
+      - datalake_consolidated_marketing_costs.trovit_consolidated_costs.mobile_cost
+      - datalake_consolidated_marketing_costs.facebook_consolidated_costs.mobile_cost
+      - datalake_marketing_costs_sharing_rules.old_sharing_rules.share
+  other_cost:
+    lineage:
+      - datalake_consolidated_marketing_costs.criteo_consolidated_costs.other_cost
+      - datalake_consolidated_marketing_costs.rtb_consolidated_costs.other_cost
+      - datalake_consolidated_marketing_costs.facebook_consolidated_costs.other_cost
+      - datalake_marketing_costs_sharing_rules.old_sharing_rules.share
+  total_cost:
+    lineage:
+      - datalake_consolidated_marketing_costs.google_consolidated_costs.total_cost
+      - datalake_consolidated_marketing_costs.criteo_consolidated_costs.total_cost
+      - datalake_consolidated_marketing_costs.rtb_consolidated_costs.total_cost
+      - datalake_consolidated_marketing_costs.mitula_consolidated_costs.total_cost
+      - datalake_consolidated_marketing_costs.trovit_consolidated_costs.total_cost
+      - datalake_consolidated_marketing_costs.facebook_consolidated_costs.total_cost
+      - datalake_marketing_costs_sharing_rules.old_sharing_rules.share
+  report_type:
+    lineage:
+      - datalake_consolidated_marketing_costs.google_consolidated_costs.report_type
+  ad_type:
+    lineage:
+      - datalake_consolidated_marketing_costs.google_consolidated_costs.ad_type
