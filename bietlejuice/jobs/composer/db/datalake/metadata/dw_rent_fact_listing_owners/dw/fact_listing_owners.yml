@@ -1,0 +1,99 @@
+database_name: dw_quintoandar
+table_name: fact_listing_owners
+columns:
+  sk_listing_owner:
+    lineage:
+      - datalake_listing_owners.rental_metrics.id_listing_owner
+  sk_first_listing_registered_date:
+    lineage:
+      - datalake_listing_owners.rental_metrics.ts_first_listing_registered
+  sk_first_booking_date:
+    lineage:
+      - datalake_listing_owners.rental_metrics.ts_first_booking
+  sk_first_visit_date:
+    lineage:
+      - datalake_listing_owners.rental_metrics.dt_first_visited
+  sk_first_offer_received_date:
+    lineage:
+      - datalake_listing_owners.rental_metrics.ts_first_offer_received
+  sk_first_offer_accepted_date:
+    lineage:
+      - datalake_listing_owners.rental_metrics.ts_first_offer_accepted
+  sk_first_contract_signed_date:
+    lineage:
+      - datalake_listing_owners.rental_metrics.ts_first_contract_signed
+  sk_last_listing_registered_date:
+    lineage:
+      - datalake_listing_owners.rental_metrics.ts_last_listing_registered
+  sk_last_booking_date:
+    lineage:
+      - datalake_listing_owners.rental_metrics.ts_last_booking
+  sk_last_visit_date:
+    lineage:
+      - datalake_listing_owners.rental_metrics.dt_last_visited
+  sk_last_offer_received_date:
+    lineage:
+      - datalake_listing_owners.rental_metrics.ts_last_offer_received
+  sk_last_offer_accepted_date:
+    lineage:
+      - datalake_listing_owners.rental_metrics.ts_last_offer_accepted
+  sk_last_contract_signed_date:
+    lineage:
+      - datalake_listing_owners.rental_metrics.ts_last_contract_signed
+  properties_registered:
+    lineage:
+      - datalake_listing_owners.rental_metrics.properties_registered
+  listings_published:
+    lineage:
+      - datalake_listing_owners.rental_metrics.listings_published
+  visits_booked:
+    lineage:
+      - datalake_listing_owners.rental_metrics.visits_booked
+  visits_received:
+    lineage:
+      - datalake_listing_owners.rental_metrics.visits_received
+  visits_expected_to_happen:
+    lineage:
+      - datalake_listing_owners.rental_metrics.visits_expected_to_happen
+  visits_cancelled:
+    lineage:
+      - datalake_listing_owners.rental_metrics.visits_cancelled
+  offers_received:
+    lineage:
+      - datalake_listing_owners.rental_metrics.offers_received
+  offers_rejected:
+    lineage:
+      - datalake_listing_owners.rental_metrics.offers_rejected
+  offers_negotiating:
+    lineage:
+      - datalake_listing_owners.rental_metrics.offers_negotiating
+  offers_accepted:
+    lineage:
+      - datalake_listing_owners.rental_metrics.offers_accepted
+  proposals_rejected:
+    lineage:
+      - datalake_listing_owners.rental_metrics.proposals_rejected
+  proposals_approved:
+    lineage:
+      - datalake_listing_owners.rental_metrics.proposals_approved
+  reservations_received:
+    lineage:
+      - datalake_listing_owners.rental_metrics.reservations_received
+  contracts_cancelled:
+    lineage:
+      - datalake_listing_owners.rental_metrics.contracts_cancelled
+  contracts_to_be_signed:
+    lineage:
+      - datalake_listing_owners.rental_metrics.contracts_to_be_signed
+  contracts_signed:
+    lineage:
+      - datalake_listing_owners.rental_metrics.contracts_signed
+  contracts_annuled:
+    lineage:
+      - datalake_listing_owners.rental_metrics.contracts_annuled
+  ongoing_listings:
+    lineage:
+      - datalake_listing_owners.rental_metrics.ongoing_listings
+  ongoing_contracts:
+    lineage:
+      - datalake_listing_owners.rental_metrics.ongoing_contracts
