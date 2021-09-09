@@ -70,12 +70,14 @@ select
   end as mkt_branded,
   case
     when pl.is_b2b then 'B2B'
+    WHEN pl.is_autonomous_agent AND t.mkt_origin = 'Backend' THEN 'CIQ'
     when pl.affiliate_type = 'Doorman' then 'Doorman'
     when t.mkt_origin is null then 'Other'
     else t.mkt_origin
   end as mkt_origin,
   case
     when pl.is_b2b then null
+    WHEN pl.is_autonomous_agent AND t.mkt_origin = 'Backend' THEN NULL
     when pl.affiliate_type = 'Doorman' then 'Envio'
     when t.mkt_origin is null then 'Not Mapped'
     else t.mkt_channel
@@ -88,12 +90,14 @@ select
   end as mkt_platform,
   case
     when pl.is_b2b then null
+    WHEN pl.is_autonomous_agent AND t.mkt_origin = 'Backend' THEN NULL
     when pl.affiliate_type = 'Doorman' then 'Doorman User'
     when t.mkt_origin is null then 'Not Mapped'
     else t.mkt_medium
   end as mkt_medium,
   case
     when pl.is_b2b then null
+    WHEN pl.is_autonomous_agent AND t.mkt_origin = 'Backend' THEN NULL
     when pl.affiliate_type = 'Doorman' then (
         case
             when COALESCE(pl.subscription_source, '') in ('', 'Desconhecida')   then 'Cadastro Orgânico'

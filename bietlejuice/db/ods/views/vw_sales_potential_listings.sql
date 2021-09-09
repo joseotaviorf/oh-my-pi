@@ -24,6 +24,16 @@ base_lead_tasks_last as (
         sales_rn_lead rn_lead
     where
         rn_last = 1
+),
+autonomous_agent_info AS (
+    SELECT
+    	pa.user_id AS sk_autonomous_agent,
+    	pa.ts_created
+    FROM partner_agent AS pa
+    JOIN partner AS dp
+	    ON pa.partner_id = dp.id
+	    AND dp.type = 'AUTONOMOUS_AGENT'
+	    AND dp.id <> '257' -- Test User
 )
 select
     f.id as sk_house_listing_flow,
@@ -55,6 +65,7 @@ select
     coalesce(to_char(f.ts_sales_company_sent, 'YYYYMMDD')::integer, '-1'::integer) as sk_sales_company_lead_sent_date,
     coalesce(f.user_id_lead_first_discarder, '-1'::integer) as sk_user_lead_first_discarder,
     coalesce(f.user_id_lead_last_discarder, '-1'::integer) as sk_user_lead_last_discarder,
+    coalesce(aa_info.sk_autonomous_agent, -1) as sk_autonomous_agent,
     a.flow,
     a.acquisition_method,
     a.acquisition_channel,
@@ -113,6 +124,7 @@ select
         or (bpt.has_job_photo = true and not f.is_self_service_photo_job_scheduled)
     as has_isales_intervention,
     bpt.has_fup_photo as has_fup_photo_task,
+    coalesce(aa_info.sk_autonomous_agent IS NOT NULL, FALSE) AS is_autonomous_agent,
     lfet.tracking_referring_domain as lead_referring_domain,
     case
         when lower(lfet.tracking_referring_domain) LIKE '%corretor%' THEN 'Agents'
@@ -165,3 +177,7 @@ left join
     public.house_listing hl_version_zero
         on hl_version_zero.id_house = f.imovel_id
         and hl_version_zero.version = 0
+LEFT JOIN autonomous_agent_info AS aa_info
+    ON aa_info.sk_autonomous_agent = h.usuario_que_cadastrou_id
+    AND h.data_criacao >= aa_info.ts_created 
+    AND h.external_id IS NOT NULL 
