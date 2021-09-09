@@ -1,0 +1,63 @@
+database_name: datalake_gsheets_clean
+table_name: keys_logistic_funnel
+columns:
+  id_jitex:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_funil.codigo_jitex
+  email_or_ticket:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_funil.email_ticket
+  requesting_channel:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_funil.canal_solicitante
+  requested_quantity:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_funil.quantidade_solicitada
+  type_of_contact:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_funil.tipo_de_contato
+  name:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_funil.nome
+  phone:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_funil.telefone
+  house_address:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_funil.endereco
+  house_neighborhood:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_funil.bairro
+  house_zipcode:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_funil.cep
+  house_state:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_funil.uf
+  house_city:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_funil.cidade
+  house_complement:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_funil.complemento
+  status_deal:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_funil.status_tratativa
+  status_reason:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_funil.motivo_status
+  keys_logistic_comments:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_funil.obs_movimentacao_chaves
+  channel:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_funil.canal
+  ts_request:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_funil.data_solicitacao
+  dt_last_deal:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_funil.data_ultima_tratativa
+  dt_transport:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_funil.data_transporte

@@ -1,0 +1,48 @@
+database_name: datalake_gsheets_clean
+table_name: keys_logistic_control
+columns:
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_control.contrato
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_control.id_imovel
+  id_run:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_control.codigo_corrida
+  email:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_control.email
+  advanced_keys:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_control.chaves_antecipadas
+  service_provider:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_control.prestador_servico
+  type_of_keys:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_control.tipo_chaves
+  contract_phase:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_control.fase_contrato
+  running_cost:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_control.custo_corrida
+  status:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_control.status
+  final_running_cost:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_control.cutsto_corrida_final
+  dt_started_task:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_control.dt_abertura_tarefa
+  dt_max_to_send_keys:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_control.dt_vigencia_saida
+  dt_keys_travel:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_control.dt_viagem
+  dt_ended_key_logistics:
+    lineage:
+      - datalake_gsheets_raw.keys_logistic_control.data
