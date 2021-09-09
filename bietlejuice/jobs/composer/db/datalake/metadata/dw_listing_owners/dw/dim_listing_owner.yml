@@ -1,0 +1,67 @@
+database_name: dw_quintoandar
+table_name: dim_listing_owner
+columns:
+  sk_listing_owner:
+    lineage:
+      - datalake_ebdb_listing.house.id_user
+  name:
+    lineage:
+      - datalake_ebdb_user.user.name
+  personal_document:
+    lineage:
+      - datalake_ebdb_user.user.cpf
+  email:
+    lineage:
+      - datalake_ebdb_user.user.email
+  phone:
+    lineage:
+      - datalake_ebdb_user.user.main_phone
+  address_street:
+    lineage:
+      - datalake_ebdb_user.user.address
+  address_number:
+    lineage:
+      - datalake_ebdb_user.user.number
+  address_complement:
+    lineage:
+      - datalake_ebdb_user.user.complement
+  address_neighborhood:
+    lineage:
+      - datalake_ebdb_user.user.neighborhood
+  city:
+    lineage:
+      - datalake_ebdb_user.user.city
+  uf:
+    lineage:
+      - datalake_ebdb_user.user.uf
+  address_postal_code:
+    lineage:
+      - datalake_ebdb_user.user.zip_code
+  is_b2b:
+    lineage:
+      - datalake_ebdb_clean.partner_agent.id_user
+  has_rent_listings:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context.is_rent_context
+  has_sale_listings:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context.is_sale_context
+  has_sms_notifications_enabled:
+    lineage:
+      - datalake_ebdb_clean.user_preferences.id_user
+      - datalake_ebdb_clean.user_preferences.is_receiving_sms
+      - datalake_ebdb_clean.user_preferences.ts_created
+  has_whatsapp_notifications_enabled:
+    lineage:
+      - datalake_ebdb_clean.user_preferences.id_user
+      - datalake_ebdb_clean.user_preferences.is_receiving_whatsapp
+      - datalake_ebdb_clean.user_preferences.ts_created
+  dt_birth:
+    lineage:
+      - datalake_ebdb_user.user.dt_birth
+  ts_user_signed_up:
+    lineage:
+      - datalake_ebdb_user.user.ts_created
+  ts_first_house_created:
+    lineage:
+      - datalake_ebdb_listing.house.dt_creation
