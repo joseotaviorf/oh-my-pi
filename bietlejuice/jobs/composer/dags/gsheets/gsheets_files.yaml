@@ -235,6 +235,16 @@ ltvoutput:
     sheet_name: LTVOutput
     clean_table_name: affiliates_monthly_expected_results
 
+keys_logistic_control:
+    sheet_id: 1NsXQlPYoZ0RshYOU1N5TNMghZfOSozopzosfwy6Tv0A
+    sheet_name: keys_logistic_control
+    clean_table_name: keys_logistic_control
+
+keys_logistic_funil:
+    sheet_id: 12yXccvLCYfl01OtFRFwg736_pDzz843nDhKVjf3IDZ0
+    sheet_name: keys_logistic_funil
+    clean_table_name: keys_logistic_funnel
+
 keys_logistic_offboarding:
     sheet_id: 1Ck3g42BHvOXp32KQT7fgOSNw7CytPno7DHdoybYSVS0
     sheet_name: keys_logistic_offboarding
