@@ -15,24 +15,27 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 Currently, there is the following output table for both our raw and clean layers:
 
+- `best_subset`
 - `best_subset_5a`
 - `best_subset_5aversion`
-- `best_subset_cardif_version`
 - `best_subset_cardif`
+- `best_subset_cardif_version`
 - `best_subset_version`
 - `credit_analysis`
-- `external_score`
-- `best_subset`
 - `credit_analysis_version`
+- `early_credit_analysis`
+- `experiment`
+- `external_score`
 - `offer`
-- `proponent_version`
 - `proponent`
+- `proponent_version`
+- `proposal`
 - `proposal_error`
 - `proposal_version`
-- `proposal`
-- `screening_result_version`
 - `screening_result`
+- `screening_result_version`
 - `user`
+- `variant`
 
 ### Responsible Data Team
 

@@ -1,0 +1,24 @@
+database_name: datalake_sorting_hat_clean
+table_name: early_credit_analysis
+columns:
+  id:
+    lineage:
+      - datalake_sorting_hat_raw.earlycreditanalysis.id
+  id_credit_evaluation:
+    lineage:
+      - datalake_sorting_hat_raw.earlycreditanalysis.credit_evaluation_id
+  id_user:
+    lineage:
+      - datalake_sorting_hat_raw.earlycreditanalysis.user_id
+  id_house:
+    lineage:
+      - datalake_sorting_hat_raw.earlycreditanalysis.house_id
+  result:
+    lineage:
+      - datalake_sorting_hat_raw.earlycreditanalysis.result
+  ts_created:
+    lineage:
+      - datalake_sorting_hat_raw.earlycreditanalysis.created_at
+  ts_expired:
+    lineage:
+      - datalake_sorting_hat_raw.earlycreditanalysis.expiration_date
