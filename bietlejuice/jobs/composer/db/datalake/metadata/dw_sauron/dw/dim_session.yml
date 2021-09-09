@@ -1,0 +1,37 @@
+database_name: dw_sauron
+table_name: dim_session
+columns:
+  sk_session:
+    lineage:
+      - datalake_sauron.session.id_session
+  source:
+    lineage:
+      - datalake_sauron.session.source_environment
+  attendance:
+    lineage:
+      - datalake_sauron.session.agent
+  department_name:
+    lineage:
+      - datalake_sauron.session.department
+  customer_phone:
+    lineage:
+      - datalake_sauron.session.customer_phone_formatted
+  user_type:
+    lineage:
+      - datalake_sauron.session.customer_type
+  flow_step:
+    lineage:
+      - datalake_sauron.session.customer_flow_step
+  status:
+    lineage:
+      - datalake_sauron.session.status
+  ts_created:
+    lineage:
+      - datalake_sauron.session.ts_created
+  ts_first_message:
+    lineage:
+      - datalake_sauron.session.ts_first_message
+  ts_updated:
+    lineage:
+      - datalake_sauron.session.ts_updated
+  
