@@ -1,5 +1,7 @@
 ---
 tables:
+  - table_name: agents_region
+    is_incremental: false
   - table_name: agents_specific_weekly_schedule
     is_incremental: false
   - table_name: agents_weekly_schedule_history
@@ -7,5 +9,8 @@ tables:
   - table_name: slots_base_time
     is_incremental: false
   - table_name: agents_slots
+    is_incremental: true
+    partitions: [year, month, day]
+  - table_name: agents_slots_hourly
     is_incremental: true
     partitions: [year, month, day]

@@ -1,0 +1,33 @@
+---
+database_name: datalake_ebdb_agents
+table_name: agents_slots_hourly
+columns:
+  id_agent:
+    lineage:
+      - datalake_ebdb_agents.agents_slots.id_agent
+  agent_type:
+    lineage:
+      - datalake_ebdb_agents.agents_slots.agent_type
+  day_of_week:
+    lineage:
+      - datalake_ebdb_agents.agents_slots.day_of_week
+  allocated_slots:
+    lineage:
+      - datalake_ebdb_agents.agents_slots.is_available_slot_24h
+      - datalake_ebdb_agents.agents_slots.last_change_reason
+  specific_allocated_slots:
+    lineage:
+      - datalake_ebdb_agents.agents_slots.is_available_specific_slot
+      - datalake_ebdb_agents.agents_slots.last_change_reason
+  ts_slot_hour:
+    lineage:
+      - datalake_ebdb_agents.agents_slots.ts_slot
+  year:
+    lineage:
+      - datalake_ebdb_agents.agents_slots.ts_slot
+  month:
+    lineage:
+      - datalake_ebdb_agents.agents_slots.ts_slot
+  day:
+    lineage:
+      - datalake_ebdb_agents.agents_slots.ts_slot

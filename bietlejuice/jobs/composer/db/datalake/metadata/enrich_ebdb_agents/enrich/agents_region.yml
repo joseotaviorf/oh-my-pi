@@ -1,0 +1,24 @@
+---
+database_name: datalake_ebdb_agents
+table_name: agents_region
+columns:
+  id_agent:
+    lineage:
+      - datalake_ebdb_clean.agent_region_data_aud.id_agent_data
+  id_region:
+    lineage:
+      - datalake_ebdb_clean.agent_region_data_aud.id_region
+  rev_type:
+    lineage:
+      - datalake_ebdb_clean.agent_region_data_aud.rev_type
+  ts_ended:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.rev_type
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  ts_revision:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  ts_started:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.rev_type
+      - datalake_ebdb_clean.user_revision_entity.ts_revision

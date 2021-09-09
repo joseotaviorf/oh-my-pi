@@ -52,6 +52,7 @@ INNER_DEPENDENCIES = {
         "agents_specific_weekly_schedule",
         "agents_weekly_schedule_history",
     ],
+    "agents_slots_hourly": ["agents_slots"],
     "agents_weekly_schedule_history": ["slots_base_time"],
 }
 

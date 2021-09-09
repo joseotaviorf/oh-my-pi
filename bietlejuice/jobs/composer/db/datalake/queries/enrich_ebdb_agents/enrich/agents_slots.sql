@@ -122,5 +122,5 @@ LEFT JOIN
         AND tw.ts_slot BETWEEN ah.ts_revision
         AND ah.ts_last_version
 WHERE
-    DATE(tw.ts_slot) BETWEEN DATE('{year}-{month}-{day}') AND DATE('{year}-{month}-{day}') + INTERVAL 21 HOUR
+    DATE(tw.ts_slot) BETWEEN DATE('{year}-{month}-{day}') AND DATE('{year}-{month}-{day}') + INTERVAL 21 DAYS
     AND ah.is_active = true

@@ -12,12 +12,14 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 Produces the following output tables, via full load:
 
+- `agents_region`
 - `agents_specific_weekly_schedule`
 - `agents_weekly_schedule_history`
 - `slots_base_time`
 
 And via incremental load:
 - `agents_slots`
+- `agents_slots_hourly`
 
 ### Responsible Data Engineering Team
 
