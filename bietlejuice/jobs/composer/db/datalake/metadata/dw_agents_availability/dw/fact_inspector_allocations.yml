@@ -1,0 +1,66 @@
+---
+database_name: dw_agents_availability
+table_name: fact_inspector_allocations
+columns:
+  sk_agent:
+    lineage:
+      - datalake_ebdb_agents.agents_slots_hourly.id_agent
+  sk_agent_region:
+    lineage:
+      - datalake_ebdb_agents.agents_region.id_region
+      - datalake_ebdb_agents.agents_slots_hourly.id_agent
+  sk_agent_slot_date:
+    lineage:
+       - datalake_ebdb_agents.agents_slots_hourly.id_agent
+       - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+  sk_region_code_inspector:
+    lineage:
+      - datalake_ebdb_agents.agents_region.id_region
+  sk_slot_date:
+    lineage:
+      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+  sk_slot_date_hour:
+    lineage:
+      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+  sk_work_contract:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.id_work_contract
+  agent_type:
+    lineage:
+      - datalake_ebdb_agents.agents_slots_hourly.agent_type
+  allocated_slots:
+    lineage:
+      - datalake_ebdb_agents.agents_slots_hourly.allocated_slots
+  specific_allocated_slots:
+    lineage:
+      - datalake_ebdb_agents.agents_slots_hourly.specific_allocated_slots
+  is_allocation_available:
+    lineage:
+      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_08_and_09_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_09_and_10_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_10_and_11_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_11_and_12_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_12_and_13_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_13_and_14_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_14_and_15_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_15_and_16_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_16_and_17_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_17_and_18_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_18_and_19_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_19_and_20_available
+  ts_first_inspection:
+    lineage:
+      - datalake_ebdb_clean.booking.dt_booking
+  ts_slot_hour:
+    lineage:
+      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+  year:
+    lineage:
+      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+  month:
+    lineage:
+      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+  day:
+    lineage:
+      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
