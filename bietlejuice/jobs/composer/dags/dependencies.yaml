@@ -11,6 +11,14 @@
 bietlejuice.dw_affiliate_costs:
   - bietlejuice.enrich_robin_hood
 
+bietlejuice.dw_agents_availability:
+  - bietlejuice.ebdb:create-clean-agent-data-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-booking-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
+  - bietlejuice.ebdb:create-clean-mask-weekly-hour-in-data-lake
+  - bietlejuice.enrich_ebdb_agents:load-enrich-agents-region
+  - bietlejuice.enrich_ebdb_agents:load-enrich-agents-slots-hourly
+
 bietlejuice.dw_banking:
   - bietlejuice.ebdb:create-clean-bank-in-data-lake
   - bietlejuice.ebdb:create-clean-account-in-data-lake
