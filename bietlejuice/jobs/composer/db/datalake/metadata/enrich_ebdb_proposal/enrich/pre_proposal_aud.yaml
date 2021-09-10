@@ -1,0 +1,120 @@
+database_name: datalake_ebdb_proposal
+table_name: pre_proposal_aud
+columns:
+  id_pre_proposal:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.id_pre_proposal
+  rev:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.rev_type
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.id_house
+  mod_house:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.mod_house
+  id_when_will_schedule:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.id_when_will_schedule
+  mod_when_will_schedule:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.mod_when_will_schedule
+  id_who_will_live:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.id_who_will_live
+  mod_who_will_live:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.mod_who_will_live
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.id_user
+  mod_user:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.mod_user
+  id_animals:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.id_animals
+  mod_animals:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.mod_animals
+  rent:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.rent
+  mod_rent:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.mod_rent
+  edition:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.edition
+  mod_edition:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.mod_edition
+  status:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.status
+  mod_status:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.mod_status
+  original_rent:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.original_rent
+  original_condo:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.original_condo
+  original_iptu:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.original_iptu
+  original_home_insurance:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.original_home_insurance
+  rejection_reason:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.rejection_reason
+  code:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.code
+  ts_approved:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.ts_approved
+  ts_expired:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.ts_expired
+  ts_visualized:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.ts_visualized
+  mod_ts_visualized:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.mod_ts_visualized
+  has_rental_accepted:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.has_rental_accepted
+  mod_has_rental_accepted:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.mod_has_rental_accepted
+  has_income_proof_accepted:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.has_income_proof_accepted
+  mod_has_income_proof_accepted:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.mod_has_income_proof_accepted
+  has_charge_accepted:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.has_charge_accepted
+  mod_has_charge_accepted:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.mod_has_charge_accepted
+  is_owner_accept_condition:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.is_owner_accept_condition
+  mod_conditions:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.mod_conditions
+  is_tenant_edition:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.edition
+  is_landlord_edition:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal_aud.edition
