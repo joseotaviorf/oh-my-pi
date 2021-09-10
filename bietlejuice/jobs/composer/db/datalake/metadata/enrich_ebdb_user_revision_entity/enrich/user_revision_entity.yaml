@@ -1,0 +1,15 @@
+database_name: datalake_ebdb_user_revision_entity
+table_name: user_revision_entity
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.id
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.id_user
+  reason:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.reason
+  ts_revision:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
