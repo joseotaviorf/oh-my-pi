@@ -1,0 +1,96 @@
+database_name: datalake_offer
+table_name: offer
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_clean.offer.id
+  id_offer_context:
+    lineage:
+      - datalake_ebdb_clean.offer.id
+  id_firestore:
+    lineage:
+      - datalake_ebdb_clean.offer.id_firestore
+  id_godfather:
+    lineage:
+      - datalake_ebdb_clean.offer.id_godfather
+      - datalake_ebdb_clean.offer.id
+  id_client:
+    lineage:
+      - datalake_ebdb_clean.offer.id_client
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.offer.id_house
+  id_rent_flow:
+    lineage:
+      - datalake_ebdb_clean.offer.id_rent_flow
+  original_condo:
+    lineage:
+      - datalake_ebdb_clean.offer.original_condo
+  original_home_insurance:
+    lineage:
+      - datalake_ebdb_clean.offer.original_home_insurance
+  original_iptu:
+    lineage:
+      - datalake_ebdb_clean.offer.original_iptu
+  original_rent:
+    lineage:
+      - datalake_ebdb_clean.offer.original_rent
+  status:
+    lineage:
+      - datalake_ebdb_clean.offer.status
+  turn:
+    lineage:
+      - datalake_ebdb_clean.offer.turn
+  rejection_reason:
+    lineage:
+      - datalake_ebdb_clean.offer.rejection_reason
+  iteration:
+    lineage:
+      - datalake_ebdb_clean.offer.iteration
+  type:
+    lineage:
+      - datalake_godfather_clean.offer.type
+  last_offered_rent:
+    lineage:
+      - datalake_ebdb_clean.offer.rent
+  first_rent_offered_by_tenant:
+    lineage:
+      - datalake_ebdb_clean.offer_aud.rev
+      - datalake_ebdb_clean.offer_aud.rent
+  first_rent_offered_by_owner:
+    lineage:
+      - datalake_ebdb_clean.offer_aud.rev
+      - datalake_ebdb_clean.offer_aud.rent
+  last_rent_offered_by_tenant:
+    lineage:
+      - datalake_ebdb_clean.offer_aud.rev
+      - datalake_ebdb_clean.offer_aud.rent
+  last_rent_offered_by_owner:
+    lineage:
+      - datalake_ebdb_clean.offer_aud.rev
+      - datalake_ebdb_clean.offer_aud.rent
+  is_instant_offer:
+    lineage:
+      - datalake_firestore.rent_offer.is_instant_offer
+  is_offer_submitted:
+    lineage:
+      - datalake_godfather_clean.offer.ts_last_sent
+      - datalake_godfather_clean.offer.ts_last_sent
+  ts_expired:
+    lineage:
+      - datalake_ebdb_clean.offer.ts_expired
+  ts_analyzed:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  ts_first_sent:
+    lineage:
+      - datalake_godfather_clean.offer.ts_first_sent
+  ts_last_sent:
+    lineage:
+      - datalake_godfather_clean.offer.ts_last_sent
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.offer.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.offer.ts_updated
