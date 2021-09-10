@@ -1,0 +1,54 @@
+database_name: datalake_ebdb_user
+table_name: affiliate_data
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_clean.affiliate_data.id
+  id_indicated_by:
+    lineage:
+      - datalake_ebdb_clean.affiliate_data.id_indicated_by
+  id_doorman_affiliate_data:
+    lineage:
+      - datalake_ebdb_clean.affiliate_data.id_doorman_affiliate_data
+  is_active:
+    lineage:
+      - datalake_ebdb_clean.affiliate_data.is_active
+  is_doorman_affiliate:
+    lineage:
+      - datalake_ebdb_clean.affiliate_data.id_doorman_affiliate_data
+  origin:
+    lineage:
+      - datalake_ebdb_clean.affiliate_data.origin
+  affiliate_type:
+    lineage:
+      - datalake_ebdb_clean.affiliate_data.affiliate_type
+      - datalake_ebdb_clean.user.id_agent
+  payment_preference:
+    lineage:
+      - datalake_ebdb_clean.affiliate_data.payment_preference
+  creci_number:
+    lineage:
+      - datalake_ebdb_clean.affiliate_data.creci_number
+  work_city:
+    lineage:
+      - datalake_ebdb_clean.affiliate_data.operation_city
+      - datalake_ebdb_clean.doorman_affiliate_data.work_city
+  last_week_balance_communication:
+    lineage:
+      - datalake_ebdb_clean.affiliate_data.last_week_balance_communication
+  ts_doorman_joined:
+    lineage:
+      - datalake_ebdb_clean.doorman_affiliate_data.ts_joined
+  ts_first_operation_start:
+    lineage:
+      - datalake_ebdb_clean.affiliate_data_aud.ts_operation_start
+      - datalake_ebdb_clean.affiliate_data.ts_operation_start
+  ts_operation_start:
+    lineage:
+      - datalake_ebdb_clean.affiliate_data.ts_operation_start
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.affiliate_data.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.affiliate_data.ts_updated
