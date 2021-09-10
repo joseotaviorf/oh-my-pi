@@ -1,6 +1,6 @@
 WITH base_time AS (
     SELECT 
-        WEEKDAY(CAST(date_column AS TIMESTAMP)) AS day_of_week,
+        WEEKDAY(CAST(date_column AS TIMESTAMP)) + 1 AS day_of_week,
         (UNIX_TIMESTAMP(date_column) - UNIX_TIMESTAMP(DATE_TRUNC('day', CAST(date_column AS TIMESTAMP)) + INTERVAL 8 HOUR))/900 AS slot_number,
         CAST(date_column AS TIMESTAMP) AS ts_slot
     FROM

@@ -11,8 +11,12 @@ CREATE TABLE agents_availability.fact_inspector_allocations (
   allocated_slots SMALLINT,
   specific_allocated_slots SMALLINT,
   is_allocation_available BOOLEAN,
-  ts_first_inspection TIMESTAMP,
+  dt_first_inspection DATE,
   ts_slot_hour TIMESTAMP,
   ts_load TIMESTAMP
 );
 ALTER TABLE agents_availability.fact_inspector_allocations OWNER TO airflow;
+
+CALL grant_all_permissions_on_schema('agents_availability');
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA agents_availability TO GROUP etl;
+GRANT ALL ON SCHEMA agents_availability TO GROUP ETL;

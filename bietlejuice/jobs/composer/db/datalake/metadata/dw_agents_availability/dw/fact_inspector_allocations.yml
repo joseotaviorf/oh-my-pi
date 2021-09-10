@@ -49,7 +49,7 @@ columns:
       - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_17_and_18_available
       - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_18_and_19_available
       - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_19_and_20_available
-  ts_first_inspection:
+  dt_first_inspection:
     lineage:
       - datalake_ebdb_clean.booking.dt_booking
   ts_slot_hour:

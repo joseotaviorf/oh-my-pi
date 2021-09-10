@@ -30,7 +30,7 @@ agents_region AS (
 first_inspection AS (
     SELECT
         id_agent,
-        MIN(dt_booking) AS ts_first_inspection
+        MIN(dt_booking) AS dt_first_inspection
     FROM 
         datalake_ebdb_clean.booking
     WHERE 
@@ -58,8 +58,8 @@ SELECT DISTINCT
     CAST(DATE_FORMAT(ash.ts_slot_hour,'YMMddHH') AS BIGINT) AS sk_slot_date_hour, 
     CAST(COALESCE(acr.id_work_contract, -1) AS BIGINT) AS sk_work_contract,
     ash.agent_type,
-    ash.allocated_slots,
-    ash.specific_allocated_slots,
+    CAST(ash.allocated_slots AS SMALLINT) AS allocated_slots,
+    CAST(ash.specific_allocated_slots AS SMALLINT) AS specific_allocated_slots,
     CASE EXTRACT(HOUR FROM ash.ts_slot_hour)
         WHEN  8 THEN COALESCE(mwh.has_hours_between_08_and_09_available,FALSE)
         WHEN  9 THEN COALESCE(mwh.has_hours_between_09_and_10_available,FALSE)
@@ -75,7 +75,7 @@ SELECT DISTINCT
         WHEN 19 THEN COALESCE(mwh.has_hours_between_19_and_20_available,FALSE)
         ELSE FALSE
     END AS is_allocation_available,
-    ts_first_inspection,
+    dt_first_inspection,
     ash.ts_slot_hour,
     EXTRACT(year FROM ts_slot_hour) AS year,
     EXTRACT(month FROM ts_slot_hour) AS month,
