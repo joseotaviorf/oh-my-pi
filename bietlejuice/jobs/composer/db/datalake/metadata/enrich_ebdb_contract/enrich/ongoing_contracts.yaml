@@ -1,0 +1,46 @@
+database_name: datalake_ebdb_contract
+table_name: ongoing_contracts
+columns:
+  id_contract_person:
+    lineage:
+      - datalake_ebdb_clean.contract_person.id
+  id_user_contract_person:
+    lineage:
+      - datalake_ebdb_clean.contract_person.id_user
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.contract.id_user
+      - datalake_ebdb_clean.house.id_user
+  id_max_ongoing_contract_user:
+    lineage:
+      - datalake_ebdb_clean.contract.id
+  id_max_ongoig_contract_cpf:
+    lineage:
+      - datalake_ebdb_clean.contract.id
+  full_name:
+    lineage:
+      - datalake_ebdb_clean.contract_person.name
+  personal_document:
+    lineage:
+      - datalake_ebdb_clean.contract_person.cpf
+  phone_number:
+    lineage:
+      - datalake_ebdb_clean.contract_person.phone_number
+  email:
+    lineage:
+      - datalake_ebdb_clean.contract_person.email
+  state_code:
+    lineage:
+      - datalake_ebdb_clean.contract_person.state_id
+  has_ongoing_contract:
+    lineage:
+      - datalake_ebdb_clean.contract.id
+  dt_birth:
+    lineage:
+      - datalake_ebdb_clean.contract_person.dt_birth
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.contract_person.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.contract_person.ts_updated
