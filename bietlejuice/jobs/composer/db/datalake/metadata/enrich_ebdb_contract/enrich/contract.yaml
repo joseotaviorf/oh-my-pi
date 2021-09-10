@@ -1,0 +1,143 @@
+database_name: datalake_ebdb_contract
+table_name: contract
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_clean.contract.id
+  id_proposal:
+    lineage:
+      - datalake_ebdb_clean.contract.id_proposal
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.contract.id_house
+  rent:
+    lineage:
+      - datalake_ebdb_clean.contract.rent
+  billing_day_of_month:
+    lineage:
+      - datalake_ebdb_clean.contract.billing_day_of_month
+  guarantee_type:
+    lineage:
+      - datalake_ebdb_clean.contract.guarantee_type
+  type:
+    lineage:
+      - datalake_ebdb_clean.contract.type
+  status:
+    lineage:
+      - datalake_ebdb_clean.contract.status
+  paying_condo:
+    lineage:
+      - datalake_ebdb_clean.contract.paying_condo
+  responsible_for_condo:
+    lineage:
+      - datalake_ebdb_clean.contract.responsible_for_condo
+  paying_iptu:
+    lineage:
+      - datalake_ebdb_clean.contract.paying_iptu
+  responsible_for_iptu:
+    lineage:
+      - datalake_ebdb_clean.contract.responsible_for_iptu
+  rental_guarantee_installment:
+    lineage:
+      - datalake_ebdb_clean.contract.rental_guarantee_installment
+  rental_guarantee_value:
+    lineage:
+      - datalake_ebdb_clean.contract.rental_guarantee_value
+  home_insurance_installment:
+    lineage:
+      - datalake_ebdb_clean.contract.home_insurance_installment
+  home_insurance_value:
+    lineage:
+      - datalake_ebdb_clean.contract.home_insurance_value
+  fist_rent_comission_fee:
+    lineage:
+      - datalake_ebdb_clean.contract.fist_rent_comission_fee
+  condo_price:
+    lineage:
+      - datalake_ebdb_clean.contract.condo_price
+  iptu:
+    lineage:
+      - datalake_ebdb_clean.contract.iptu
+  tenant_service_fee:
+    lineage:
+      - datalake_ebdb_clean.contract.tenant_service_fee
+  is_tenant_service_fee_opt_out:
+    lineage:
+      - datalake_ebdb_clean.contract_aud.id_contract
+  ts_tenant_service_fee_opt_out:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.contract_aud.id_contract
+      - datalake_ebdb_clean.contract_aud.rev
+  signature_type:
+    lineage:
+      - datalake_ebdb_clean.contract.signature_type
+  status_closing:
+    lineage:
+      - datalake_ebdb_clean.contract.status_closing
+  contract_version:
+    lineage:
+      - datalake_ebdb_clean.contract_version.version_display_contract
+  is_ongoing_contract:
+    lineage:
+      - datalake_ebdb_clean.contract.ts_signed
+      - datalake_ebdb_clean.contract.dt_started
+      - datalake_ebdb_clean.contract.dt_entered
+      - datalake_ebdb_clean.contract.dt_termination
+      - datalake_ebdb_clean.contract.status
+      - datalake_ebdb_clean.contract.type
+  is_waiting_to_be_signed:
+    lineage:
+      - datalake_ebdb_clean.contract.status
+  is_active_or_ended:
+    lineage:
+      - datalake_ebdb_clean.contract.status
+  is_canceled:
+    lineage:
+      - datalake_ebdb_clean.contract.status
+  is_ended:
+    lineage:
+      - datalake_ebdb_clean.contract.status
+  is_full_service:
+    lineage:
+      - datalake_ebdb_clean.contract.type
+  is_deal_only:
+    lineage:
+      - datalake_ebdb_clean.contract.type
+  monthly_administration_fee:
+    lineage:
+      - datalake_ebdb_clean.full_contract.monthly_administration_fee
+  cancellation_reason:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.reason
+  ts_canceled:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  ts_analyst_annulment_input:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.contract_aud.dt_termination
+  dt_started:
+    lineage:
+      - datalake_ebdb_clean.contract.dt_started
+  dt_entered:
+    lineage:
+      - datalake_ebdb_clean.contract.dt_entered
+  dt_termination:
+    lineage:
+      - datalake_ebdb_clean.contract.dt_termination
+  ts_signed:
+    lineage:
+      - datalake_ebdb_clean.contract.ts_signed
+  dt_contract_expected_end:
+    lineage:
+      - datalake_ebdb_clean.contract.ts_contract_expected_end
+  ts_minuta_approved:
+    lineage:
+      - datalake_ebdb_clean.contract.ts_minuta_approved
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.contract.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.contract.ts_updated
