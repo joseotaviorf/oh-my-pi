@@ -1,0 +1,27 @@
+database_name: datalake_ebdb_contract
+table_name: contract_house
+columns:
+  id_client:
+    lineage:
+      - datalake_ebdb_clean.contract.id_user
+  id_contract:
+    lineage:
+      - datalake_ebdb_clean.contract.id
+  id_owner:
+    lineage:
+      - datalake_ebdb_listing.house.id_user
+  id_house_listing:
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_house_listing
+  id_house:
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_house
+  version:
+    lineage:
+      - datalake_ebdb_listing.house_listing.version
+  dt_listing_version_start:
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_listing_version_start
+  dt_listing_version_end:
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_listing_version_end
