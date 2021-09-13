@@ -1,0 +1,36 @@
+database_name: datalake_twilio_flex_insights_clean
+table_name: conversation_time_metrics
+columns:
+  id_conversation:
+    lineage:
+      - datalake_twilio_flex_insights_raw.conversation
+  id_reservation:
+    lineage:
+      - datalake_twilio_flex_insights_raw.conversation_attribute_4
+  id_segment:
+    lineage:
+      - datalake_twilio_flex_insights_raw.segment
+  queue_time:
+    lineage:
+      - datalake_twilio_flex_insights_raw.queue_time
+  talk_time:
+    lineage:
+      - datalake_twilio_flex_insights_raw.talk_time
+  wrap_up_time:
+    lineage:
+      - datalake_twilio_flex_insights_raw.wrap_up_time
+  handling_time:
+    lineage:
+      - datalake_twilio_flex_insights_raw.handling_time
+  dt_created:
+    lineage:
+      - datalake_twilio_flex_insights_raw.date
+  year:
+    lineage:
+      - datalake_twilio_flex_insights_raw.year
+  month:
+    lineage:
+      - datalake_twilio_flex_insights_raw.month
+  day:
+    lineage:
+      - datalake_twilio_flex_insights_raw.day

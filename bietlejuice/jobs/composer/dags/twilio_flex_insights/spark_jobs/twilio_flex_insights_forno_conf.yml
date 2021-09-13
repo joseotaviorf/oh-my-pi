@@ -1,0 +1,7 @@
+---
+partition_cols: [year, month, day]
+tables_configurations:
+  conversation_time_metrics:
+    workspace_id: "vz8klwkjsszukriuuqllc3dz4d8sl6yx"
+    object_id: "801119"
+    column_create_date: "date"
