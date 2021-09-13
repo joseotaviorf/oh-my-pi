@@ -1,0 +1,85 @@
+---
+database_name: dw_sale
+table_name: dim_offer
+columns:
+  sk_offer:
+    lineage:
+      - datalake_offer.sale_offer.id_offer
+  monday_status:
+    lineage:
+      - datalake_offer.sale_offer.monday_status
+  offer_status:
+    lineage:
+      - datalake_offer.sale_offer.offer_status
+  drop_reason:
+    lineage:
+      - datalake_offer.sale_offer.drop_reason
+  drop_reason_responsible:
+    lineage:
+      - datalake_offer.sale_offer.drop_reason_responsible
+  payment_method:
+    lineage:
+      - datalake_offer.sale_offer.current_payment_method
+  sale_price:
+    lineage:
+      - datalake_offer.sale_offer.sale_price
+  registry_price:
+    lineage:
+      - datalake_offer.sale_offer.registry_price
+  itbi_price:
+    lineage:
+      - datalake_offer.sale_offer.itbi_price
+  payment_entry_amount:
+    lineage:
+      - datalake_offer.sale_offer.payment_entry_amount
+  app_type:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.app_type
+  utm_source:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.utm_source
+  utm_medium:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.utm_medium
+  utm_campaign:
+    lineage:
+      - datalake_amplitude_offer.sale_offer_raw_events.utm_campaign
+  mkt_category:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.category
+  mkt_flow:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.flow
+  mkt_completion:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.completion
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.origin
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.channel
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.medium
+  mkt_source:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.source
+  mkt_platform:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.platform
+  is_branded:
+    lineage:
+      - datalake_amplitude_offer.sale_offer_raw_events.branded
+  has_used_fgts_in_payment:
+    lineage:
+      - datalake_offer.sale_offer.has_used_fgts_in_payment
+  has_used_negotiation_chat:
+    lineage:
+      - datalake_offer.sale_offer.has_used_negotiation_chat
+  ts_offer_submitted:
+    lineage:
+      - datalake_offer.sale_offer.ts_offer_submitted
+  ts_updated:
+    lineage:
+      - datalake_offer.sale_offer.ts_updated

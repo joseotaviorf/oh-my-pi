@@ -1,0 +1,34 @@
+---
+database_name: dw_sale
+table_name: fact_listing_status
+columns:
+  sk_sale_listing:
+    lineage:
+      - datalake_sale_listings.sale_listing_status.id_sale_listing
+  sk_region:
+    lineage:
+      - datalake_sale_listings.sale_listing_status.id_region
+  sk_first_publication_date:
+    lineage:
+      - datalake_sale_listings.sale_listing_status.ts_first_publication
+  sk_status_start_date:
+    lineage:
+      - datalake_sale_listings.sale_listing_status.ts_status_started
+  sk_status_end_date:
+    lineage:
+      - datalake_sale_listings.sale_listing_status.ts_status_ended
+  ts_status_started:
+    lineage:
+      - datalake_sale_listings.sale_listing_status.ts_status_started
+  ts_status_ended:
+    lineage:
+      - datalake_sale_listings.sale_listing_status.ts_status_ended
+  status_history:
+    lineage:
+      - datalake_sale_listings.sale_listing_status.status_history
+  status_change_reason:
+    lineage:
+      - datalake_sale_listings.sale_listing_status.status_change_reason
+  is_last_status:
+    lineage:
+      - datalake_sale_listings.sale_listing_status.is_last_status

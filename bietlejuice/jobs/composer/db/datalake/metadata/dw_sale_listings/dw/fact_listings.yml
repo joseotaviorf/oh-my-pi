@@ -1,0 +1,55 @@
+---
+database_name: dw_sale
+table_name: fact_listings
+columns:
+  sk_sale_listing:
+    lineage:
+      - datalake_sale_listings.sale_listing.id_sale_listing
+  sk_house:
+    lineage:
+      - datalake_sale_listings.sale_listing.id_house
+  sk_owner:
+    lineage:
+      - datalake_ebdb_clean.house.id_user
+  sk_region:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+  sk_first_publication_date:
+    lineage:
+      - datalake_sale_listings.sale_listing.ts_first_publication
+  sk_last_publication_date:
+    lineage:
+      - datalake_sale_listings.sale_listing.ts_last_publication
+  sk_first_depublication_date:
+    lineage:
+      - datalake_sale_listings.sale_listing.ts_first_depublication
+  sk_last_depublication_date:
+    lineage:
+      - datalake_sale_listings.sale_listing.ts_last_depublication
+  days_last_publication_to_depublication:
+    lineage:
+      - datalake_sale_listings.sale_listing.days_last_publication_to_depublication
+  days_first_publication_to_first_depublication:
+    lineage:
+      - datalake_sale_listings.sale_listing.days_first_publication_to_first_depublication
+  days_first_publication_to_last_depublication:
+    lineage:
+      - datalake_sale_listings.sale_listing.days_first_publication_to_last_depublication
+  days_first_publication_to_first_sale_flow:
+    lineage:
+      - datalake_sale_listings.sale_listing.days_first_publication_to_first_sale_flow
+  days_first_publication_to_first_booking:
+    lineage:
+      - datalake_sale_listings.sale_listing.days_first_publication_to_first_booking
+  days_first_publication_to_first_sale_agreement_signed:
+    lineage:
+      - datalake_sale_listings.sale_listing.days_first_publication_to_first_sale_agreement_signed
+  days_first_publication_to_house_registry_ended:
+    lineage:
+      - datalake_sale_listings.sale_listing.days_first_publication_to_house_registry_ended
+  total_depublications:
+    lineage:
+      - datalake_sale_listings.sale_listing.unpublications
+  days_as_published:
+    lineage:
+      - datalake_sale_listings.sale_listing.days_as_published

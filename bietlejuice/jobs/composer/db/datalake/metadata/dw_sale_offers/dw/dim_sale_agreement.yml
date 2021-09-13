@@ -1,0 +1,88 @@
+---
+database_name: dw_sale
+table_name: dim_sale_agreement
+columns:
+  sk_offer:
+    lineage:
+      - datalake_offer.sale_offer.id_offer
+  sale_agreement_status:
+    lineage:
+      - datalake_offer.sale_offer.sale_agreement_status
+  sale_agreement_cancellation_reason:
+    lineage:
+      - datalake_offer.sale_offer.sale_agreement_cancellation_reason
+  sale_price_agreed:
+    lineage:
+      - datalake_offer.sale_offer.sale_price_agreed
+  brokerage_fee:
+    lineage:
+      - datalake_offer.sale_offer.brokerage_fee
+  fgts_value:
+    lineage:
+      - datalake_offer.sale_offer.fgts_value
+  financing_bank:
+    lineage:
+      - datalake_offer.sale_offer.financing_bank
+  financing_value:
+    lineage:
+      - datalake_offer.sale_offer.financing_value
+  earnest_value:
+    lineage:
+      - datalake_offer.sale_offer.earnest_value
+  payment_method:
+    lineage:
+      - datalake_offer.sale_offer.current_payment_method
+  credit_model:
+    lineage:
+      - datalake_offer.sale_offer.credit_model
+  closing_status:
+    lineage:
+      - datalake_offer.sale_offer.closing_status
+  house_dilligence_status:
+    lineage:
+      - datalake_offer.sale_offer.house_dilligence_status
+  seller_dilligence_status:
+    lineage:
+      - datalake_offer.sale_offer.seller_dilligence_status
+  report_dilligence_status:
+    lineage:
+      - datalake_offer.sale_offer.report_dilligence_status
+  bank_analysis_status:
+    lineage:
+      - datalake_offer.sale_offer.bank_analysis_status
+  payment_status:
+    lineage:
+      - datalake_offer.sale_offer.payment_status
+  credit_status:
+    lineage:
+      - datalake_offer.sale_offer.credit_status
+  notary_office_status:
+    lineage:
+      - datalake_offer.sale_offer.notary_office_status
+  real_estate_register_office_status:
+    lineage:
+      - datalake_offer.sale_offer.real_estate_register_office_status
+  has_used_fgts_in_payment:
+    lineage:
+      - datalake_offer.sale_offer.has_used_fgts_in_payment
+  has_seller_debt_payments:
+    lineage:
+      - datalake_offer.sale_offer.has_seller_debt_payments
+  is_ccv_canceled:
+    lineage:
+      - datalake_offer.sale_offer.is_ccv_canceled
+  ts_sale_agreement_signed:
+    lineage:
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+  ts_sale_agreement_cancelled:
+    lineage:
+      - datalake_offer.sale_offer.dt_sale_agreement_cancelled
+  ts_house_registry_started:
+    lineage:
+      - datalake_offer.sale_offer.dt_house_registry_started
+  ts_house_registry_ended:
+    lineage:
+      - datalake_offer.sale_offer.dt_house_registry_ended
+  ts_sale_transaction_paid:
+    lineage:
+      - datalake_offer.sale_offer.dt_sale_transacton_paid

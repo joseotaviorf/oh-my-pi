@@ -1,0 +1,103 @@
+---
+database_name: dw_sale
+table_name: fact_offers
+columns:
+  sk_offer:
+    lineage:
+      - datalake_offer.sale_offer.id_offer
+  sk_sale_flow:
+    lineage:
+      - datalake_offer.sale_offer.id_sale_flow
+  sk_house:
+    lineage:
+      - datalake_offer.sale_offer.id_house
+  sk_buyer:
+    lineage:
+      - datalake_offer.sale_offer.id_buyer
+  sk_owner:
+    lineage:
+      - datalake_offer.sale_offer.id_owner
+  sk_region:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+  sk_booking:
+    lineage:
+      - datalake_offer.sale_offer.id_booking
+  sk_agent:
+    lineage:
+      - datalake_offer.sale_offer.id_agent
+  sk_consultant:
+    lineage:
+      - datalake_offer.sale_offer.id_consultant
+  sk_closing_specialist:
+    lineage:
+      - datalake_offer.sale_offer.id_closing_specialist
+  sk_offer_submitted_date:
+    lineage:
+      - datalake_offer.sale_offer.ts_offer_submitted
+  sk_offer_accepted_date:
+    lineage:
+      - datalake_offer.sale_offer.dt_offer_accepted
+  sk_offer_dismissed_date:
+    lineage:
+      - datalake_offer.sale_offer.dt_offer_dismissed
+  sk_sale_agreement_created_date:
+    lineage:
+      - datalake_offer.sale_offer.dt_sale_agreement_created
+  sk_sale_agreement_signed_date:
+    lineage:
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+  is_buyer_first_offer:
+    lineage:
+      - datalake_offer.sale_offer.is_buyer_first_offer
+  is_house_first_offer:
+    lineage:
+      - datalake_offer.sale_offer.is_house_first_offer
+  has_completed_visit_before_offer:
+    lineage:
+      - datalake_offer.sale_offer.flg_visit_completed_before_offer
+  has_booking_before_offer:
+    lineage:
+      - datalake_offer.sale_offer.flg_booking_before_offer
+  first_price_offered_by_buyer:
+    lineage:
+      - datalake_offer.sale_offer.first_price_offered_by_buyer
+  last_price_offered_by_buyer:
+    lineage:
+      - datalake_offer.sale_offer.last_price_offered_by_buyer
+  first_discount_proposed:
+    lineage:
+      - datalake_offer.sale_offer.first_discount_proposed
+  last_discount_proposed:
+    lineage:
+      - datalake_offer.sale_offer.last_discount_proposed
+  days_offer_submitted_to_offer_accepted:
+    lineage:
+      - datalake_offer.sale_offer.days_offer_submitted_to_offer_accepted
+  days_offer_submitted_to_offer_dismissed:
+    lineage:
+      - datalake_offer.sale_offer.days_offer_submitted_to_offer_dismissed
+  days_offer_submitted_to_sale_agreement_created:
+    lineage:
+      - datalake_offer.sale_offer.days_offer_submitted_to_sale_agreement_created
+  days_offer_submitted_to_sale_agreement_signed:
+    lineage:
+      - datalake_offer.sale_offer.days_offer_submitted_to_sale_agreement_signed
+  days_offer_accepted_to_offer_dismissed:
+    lineage:
+      - datalake_offer.sale_offer.days_offer_accepted_to_offer_dismissed
+  days_offer_accepted_to_sale_agreement_created:
+    lineage:
+      - datalake_offer.sale_offer.days_offer_accepted_to_sale_agreement_created
+  days_offer_accepted_to_sale_agreement_signed:
+    lineage:
+      - datalake_offer.sale_offer.days_offer_accepted_to_sale_agreement_signed
+  days_sale_agreement_created_to_sale_agreement_signed:
+    lineage:
+      - datalake_offer.sale_offer.days_sale_agreement_created_to_sale_agreement_signed
+  hours_booking_to_offer:
+    lineage:
+      - datalake_offer.sale_offer.hours_booking_to_offer
+  hours_visit_completed_to_offer:
+    lineage:
+      - datalake_offer.sale_offer.hours_visit_to_offer

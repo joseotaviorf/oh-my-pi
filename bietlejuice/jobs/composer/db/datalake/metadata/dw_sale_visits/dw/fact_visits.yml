@@ -1,0 +1,101 @@
+---
+database_name: dw_sale
+table_name: fact_visits
+columns:
+  sk_booking:
+    lineage:
+      - datalake_booking.booking.id
+  sk_sale_flow:
+    lineage:
+      - datalake_booking.booking.id_sale_flow
+  sk_house:
+    lineage:
+      - datalake_booking.booking.id_house
+  sk_region:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+  sk_agent:
+    lineage:
+      - datalake_booking.booking.id_agent
+  sk_user_agent:
+    lineage:
+      - datalake_ebdb_clean.user.id
+  sk_fixed_agent:
+    lineage:
+      - datalake_booking.booking.id_sale_fixed_agend
+  sk_buyer:
+    lineage:
+      - datalake_booking.booking.id_visitor
+  sk_seller:
+    lineage:
+      - datalake_ebdb_clean.house.id_user
+  sk_user_creation:
+    lineage:
+      - datalake_booking.booking.id_user_creation
+  sk_user_cancelation:
+    lineage:
+      - datalake_booking.booking.id_user_cancelation
+  sk_visit:
+    lineage:
+      - datalake_booking.booking.id_visit
+  sk_visit_code:
+    lineage:
+      - datalake_booking.booking.code
+  sk_offer:
+    lineage:
+      - datalake_offer.sale_offer.id_offer
+  sk_agent_booking_review:
+    lineage:
+      - datalake_ebdb_clean.real_estate_agent_rating.id
+  sk_buyer_booking_review:
+    lineage:
+      - datalake_booking.booking.id
+  sk_booking_created_date:
+    lineage:
+      - datalake_booking.booking.ts_created
+  sk_visit_date:
+    lineage:
+      - datalake_booking.booking.ts_booking_utc
+  sk_visit_canceled_date:
+    lineage:
+      - datalake_booking.booking.ts_first_canceled
+  sk_visit_completed_date:
+    lineage:
+      - datalake_booking.booking.is_visit_completed
+      - datalake_booking.booking.ts_booking_utc
+  sk_visit_follow_up_date:
+    lineage:
+      - datalake_booking.booking.ts_visit_fup
+  sk_agent_review_rating_date:
+    lineage:
+      - datalake_ebdb_clean.real_estate_agent_rating.ts_created
+  sk_buyer_review_rating_date:
+    lineage:
+      - datalake_insider_clean.review.dt_creation
+  is_hub_flow:
+    lineage:
+      - datalake_booking.booking.is_hub_flow
+  is_house_rented:
+    lineage:
+      - datalake_booking.booking.is_house_rented
+  is_virtual_visit:
+    lineage:
+      - datalake_booking.booking.is_virtual_visit
+  days_visit_cancelled_to_visit:
+    lineage:
+      - datalake_booking.booking.days_visit_cancelled_to_visit
+  days_visit_booked_to_visit:
+    lineage:
+      - datalake_booking.booking.days_visit_booked_to_visit
+  days_visit_booked_to_visit_cancelled:
+    lineage:
+      - datalake_booking.booking.days_visit_booked_to_visit_cancelled
+  days_visit_booked_to_visit_completed:
+    lineage:
+      - datalake_booking.booking.days_visit_booked_to_visit_completed
+  hours_booking_to_offer:
+    lineage:
+      - datalake_offer.sale_offer.hours_booking_to_offer
+  hours_visit_to_offer:
+    lineage:
+      - datalake_offer.sale_offer.hours_visit_to_offer

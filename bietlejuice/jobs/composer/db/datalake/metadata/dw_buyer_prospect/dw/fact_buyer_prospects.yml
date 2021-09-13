@@ -1,0 +1,238 @@
+---
+database_name: dw_sale
+table_name: fact_buyer_prospects
+columns:
+  sk_buyer:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.id_buyer
+  sk_first_region:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.id_first_region
+  sk_last_region:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.id_last_region
+  sk_first_sale_flow_date:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.ts_first_sale_flow
+  sk_first_booking_created_date:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.ts_first_booking_created
+  sk_first_visit_completed_date:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.ts_first_visit_completed
+  sk_first_offer_submitted_date:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.ts_first_offer_submitted
+  sk_first_offer_accepted_date:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.dt_first_offer_accepted
+  sk_first_sale_agreement_signed_date:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.dt_first_sale_agreement_signed
+  sk_last_sale_flow_date:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.ts_last_sale_flow
+  sk_last_booking_created_date:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.ts_last_booking_created
+  sk_last_visit_completed_date:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.ts_last_visit_completed
+  sk_last_offer_submitted_date:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.ts_last_offer_submitted
+  sk_last_offer_accepted_date:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.dt_last_offer_accepted
+  sk_last_sale_agreement_signed_date:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.dt_last_sale_agreement_signed
+  sk_last_event_date:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.ts_last_event
+  first_event:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.first_event
+  last_event:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.last_event
+  further_funnel_step:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.further_funnel_step
+  first_buyer_intention:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.first_buyer_intention
+  is_tenant:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.is_tenant
+  is_current_tenant:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.is_current_tenant
+  is_contract_owner:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.is_contract_owner
+  is_tenant_prospect:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.is_tenant_prospect
+  sale_flows:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.sale_flows
+  regions_with_sale_flows:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.regions_with_sale_flows
+  weeks_with_sale_flows:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.weeks_with_sale_flows
+  bookings_created:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.bookings_created
+  bookings_created_by_agent:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.bookings_created_by_agent
+  bookings_canceled:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.bookings_canceled
+  visits_completed:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.visits_completed
+  offers_submitted:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.offers_submitted
+  offers_accepted:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.offers_accepted
+  offers_dismissed:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.offers_dismissed
+  sale_agreements_signed:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.sale_agreements_signed
+  avg_sale_price:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.avg_sale_price
+  avg_offer_price:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.avg_offer_price
+  avg_offer_discount:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.avg_offer_discount
+  houses_owned:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.houses_owned
+  listings_for_sale:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.listings_for_sale
+  listings_for_rent:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.listings_for_rent
+  days_first_sale_flow_to_first_booking_created:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_sale_flow_to_first_booking_created
+  days_first_sale_flow_to_first_visit_completed:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_sale_flow_to_first_visit_completed
+  days_first_sale_flow_to_first_offer_submitted:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_sale_flow_to_first_offer_submitted
+  days_first_sale_flow_to_first_offer_accepted:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_sale_flow_to_first_offer_accepted
+  days_first_sale_flow_to_first_sale_agreement_signed:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_sale_flow_to_first_sale_agreement_signed
+  days_first_booking_created_to_first_visit_completed:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_booking_created_to_first_visit_completed
+  days_first_booking_created_to_first_offer_submitted:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_booking_created_to_first_offer_submitted
+  days_first_booking_created_to_first_offer_accepted:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_booking_created_to_first_offer_accepted
+  days_first_booking_created_to_first_sale_agreement_signed:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_booking_created_to_first_sale_agreement_signed
+  days_first_visit_completed_to_first_offer_submitted:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_visit_completed_to_first_offer_submitted
+  days_first_visit_completed_to_first_offer_accepted:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_visit_completed_to_first_offer_accepted
+  days_first_visit_completed_to_first_sale_agreement_signed:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_visit_completed_to_first_sale_agreement_signed
+  days_first_offer_submitted_to_first_offer_accepted:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_offer_submitted_to_first_offer_accepted
+  days_first_offer_submitted_to_first_sale_agreement_signed:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_offer_submitted_to_first_sale_agreement_signed
+  days_first_offer_accepted_to_first_sale_agreement_signed:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_offer_accepted_to_first_sale_agreement_signed
+  days_first_sale_flow_to_last_sale_flow:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_sale_flow_to_last_sale_flow
+  days_first_sale_flow_to_last_booking_created:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_sale_flow_to_last_booking_created
+  days_first_sale_flow_to_last_visit_completed:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_sale_flow_to_last_visit_completed
+  days_first_sale_flow_to_last_offer_submitted:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_sale_flow_to_last_offer_submitted
+  days_first_sale_flow_to_last_offer_accepted:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_sale_flow_to_last_offer_accepted
+  days_first_sale_flow_to_last_sale_agreement_signed:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_sale_flow_to_last_sale_agreement_signed
+  days_first_sale_flow_to_last_event:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_sale_flow_to_last_event
+  days_first_booking_created_to_last_booking_created:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_booking_created_to_last_booking_created
+  days_first_booking_created_to_last_visit_completed:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_booking_created_to_last_visit_completed
+  days_first_booking_created_to_last_offer_submitted:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_booking_created_to_last_offer_submitted
+  days_first_booking_created_to_last_offer_accepted:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_booking_created_to_last_offer_accepted
+  days_first_booking_created_to_last_sale_agreement_signed:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_booking_created_to_last_sale_agreement_signed
+  days_first_visit_completed_to_last_visit_completed:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_visit_completed_to_last_visit_completed
+  days_first_visit_completed_to_last_offer_submitted:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_visit_completed_to_last_offer_submitted
+  days_first_visit_completed_to_last_offer_accepted:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_visit_completed_to_last_offer_accepted
+  days_first_visit_completed_to_last_sale_agreement_signed:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_visit_completed_to_last_sale_agreement_signed
+  days_first_offer_submitted_to_last_offer_submitted:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_offer_submitted_to_last_offer_submitted
+  days_first_offer_submitted_to_last_offer_accepted:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_offer_submitted_to_last_offer_accepted
+  days_first_offer_submitted_to_last_sale_agreement_signed:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_offer_submitted_to_last_sale_agreement_signed
+  days_first_offer_accepted_to_last_offer_accepted:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_offer_accepted_to_last_offer_accepted
+  days_first_offer_accepted_to_last_sale_agreement_signed:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_offer_accepted_to_last_sale_agreement_signed
+  days_first_sale_agreement_signed_to_last_sale_agreement_signed:
+    lineage:
+      - datalake_buyer_prospect.buyer_prospect.days_first_sale_agreement_signed_to_last_sale_agreement_signed
