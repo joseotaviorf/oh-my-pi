@@ -1,0 +1,25 @@
+---
+database_name: dw_sauron
+table_name: fact_sessions
+columns:
+  sk_session:
+    lineage:
+      - datalake_sauron.session.id_session
+  sk_conversation:
+    lineage:
+      - datalake_quinto_messenger.channel.id_conversation
+  sk_user:
+    lineage:
+      - datalake_sauron.session.id_user
+  sk_personal_document:
+    lineage:
+      - datalake_ebdb_customer_contact_identification.customer_contact_identification.cpf
+  sk_created_date:
+    lineage:
+      - datalake_sauron.session.ts_created
+  is_retained_by_bot:
+    lineage:
+      - datalake_quinto_messenger.channel.id_source
+  minutes_duration:
+    lineage:
+      - datalake_sauron.session.seconds_duration

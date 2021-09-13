@@ -1,0 +1,10 @@
+---
+database_name: dw_sauron
+table_name: fact_session_tags
+columns:
+  sk_session:
+    lineage:
+      - datalake_sauron.session.id_session
+  tags:
+    lineage:
+      - datalake_sauron.session.customer_tags
