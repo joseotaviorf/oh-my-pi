@@ -140,11 +140,11 @@ person_contacts AS (
 	GROUP BY 1,2,3
 )
 SELECT
-	COALESCE(ufc.customer_contact,pc.customer_contact) AS customer_contact,
-	COALESCE(ufc.channel, pc.channel) AS channel,
 	MAX(ufc.id_user) AS id_user,
-	MAX(COALESCE(ufc.cpf, pc.cpf)) AS cpf
+	MAX(COALESCE(ufc.cpf, pc.cpf)) AS cpf,
+	COALESCE(ufc.customer_contact,pc.customer_contact) AS customer_contact,
+	COALESCE(ufc.channel, pc.channel) AS channel
 FROM user_full_contacts ufc
 FULL JOIN person_contacts pc
 	ON ufc.customer_contact = pc.customer_contact
-GROUP BY 1,2
+GROUP BY 3, 4

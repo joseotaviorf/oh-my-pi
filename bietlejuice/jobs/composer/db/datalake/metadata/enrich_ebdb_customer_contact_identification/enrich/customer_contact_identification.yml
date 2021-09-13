@@ -1,0 +1,16 @@
+database_name: datalake_ebdb_customer_contact_identification
+table_name: customer_contact_identification
+columns:
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.user_aud.id_user
+  cpf:
+    lineage:
+      - datalake_ebdb_clean.user.cpf
+      - datalake_ebdb_clean.user_aud.cpf
+  customer_contact:
+    lineage:
+      - datalake_ebdb_clean.user_aud.alternative_email
+      - datalake_ebdb_clean.user_aud.email
+      - datalake_ebdb_clean.user_aud.main_phone
+      - datalake_ebdb_clean.user_aud.secondary_phone
