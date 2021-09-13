@@ -1,0 +1,72 @@
+database_name: datalake_crm_tasks_flows
+table_name: tasks_actions_resolutions_flow
+columns:
+  id_task:
+    lineage:
+      - datalake_crm.tasks.id
+  id_workgroup:
+    lineage:
+      - datalake_crm.tasks.id_workgroup
+  score_factor:
+    lineage:
+      - datalake_crm.tasks.score_factor
+  version:
+    lineage:
+      - datalake_crm.tasks.version
+  origin: 
+    lineage:
+      - datalake_crm.tasks.origin
+  type:
+    lineage:
+      - datalake_crm.tasks.type
+  description:
+    lineage:
+      - datalake_crm.tasks.description
+  subject:
+    lineage:
+      - datalake_crm.tasks.subject
+  titles:
+    lineage:
+      - datalake_crm.tasks.subject
+      - datalake_crm.workgroups.title
+  workgroups:
+    lineage:
+      - datalake_crm.tasks.id_workgroup
+      - datalake_crm.workgroups.id
+  hours_task_started_to_completed:
+    lineage:
+      - datalake_crm.tasks.ts_start
+      - datalake_crm.tasks_actions.id_task
+      - datalake_crm.tasks_actions.ts_action
+  is_resolved:
+    lineage:
+      - datalake_crm.tasks.is_resolved
+  is_task_auto_completed:
+    lineage:
+      - datalake_crm.tasks_actions.id_user_action
+  ts_started:
+    lineage:
+      - datalake_crm.tasks.ts_start
+  ts_completed:
+    lineage:
+      - datalake_crm.tasks.ts_completed
+      - datalake_crm.tasks_actions.id_task
+      - datalake_crm.tasks_actions.ts_action
+  ts_silenced_until:
+    lineage:
+      - datalake_crm.tasks.ts_silenced_until
+  ts_analyst_started:
+    lineage:
+      - datalake_crm.tasks_actions.ts_analyst_started
+  ts_partition:
+    lineage:
+      - datalake_crm.tasks.ts_completed
+  year:
+    lineage:
+      - datalake_crm.tasks.year
+  month:
+    lineage:
+      - datalake_crm.tasks.month
+  day:
+    lineage:
+      - datalake_crm.tasks.day
