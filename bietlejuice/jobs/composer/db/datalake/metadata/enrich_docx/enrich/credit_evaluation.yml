@@ -1,0 +1,45 @@
+database_name: datalake_docx
+table_name: credit_evaluation
+columns:
+  id:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.id
+  id_proposal:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.id_proposal
+  id_house:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.id_house
+  id_user:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.id_user
+  reason:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.reason
+  result:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.result
+  status:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.status
+  proposal_last_result:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.result
+  proposal_number_evaluations:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.id
+  ts_created:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.ts_created
+  ts_updated:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.ts_updated
+  ts_proposal_first_credit_evaluation_positive:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.result
+      - datalake_docx_clean.credit_evaluation.ts_updated
+  ts_proposal_last_credit_evaluation_positive:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.result
+      - datalake_docx_clean.credit_evaluation.ts_updated
+ 

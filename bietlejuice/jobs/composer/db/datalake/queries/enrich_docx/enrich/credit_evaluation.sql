@@ -28,10 +28,10 @@ select
     ce.reason,
     ce.result,
     ce.status,
-    ce.ts_created,
-    ce.ts_updated,
     pr.result as proposal_last_result,
     pm.number_evaluations as proposal_number_evaluations,
+    ce.ts_created,
+    ce.ts_updated,
     pm.ts_first_credit_evaluation_positive as ts_proposal_first_credit_evaluation_positive,
     pm.ts_last_credit_evaluation_positive as ts_proposal_last_credit_evaluation_positive
 from datalake_docx_clean.credit_evaluation ce
