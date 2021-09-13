@@ -1,0 +1,54 @@
+database_name: datalake_ebdb_contract
+table_name: contract_person
+columns:
+  id_contract_person:
+    lineage:
+      - datalake_ebdb_clean.contract_person.id
+  id_user_contract_person:
+    lineage:
+      - datalake_ebdb_clean.contract_person.id_user
+  id_contract:
+    lineage:
+      - datalake_ebdb_clean.contract_person.id_contract
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.user.id
+  full_name:
+    lineage:
+      - datalake_ebdb_clean.contract_person.name
+  phone_number:
+    lineage:
+      - datalake_ebdb_clean.contract_person.phone_number
+  email:
+    lineage:
+      - datalake_ebdb_clean.contract_person.email
+  personal_document_type:
+    lineage:
+      - datalake_ebdb_clean.contract_person.cpf
+  personal_document:
+    lineage:
+      - datalake_ebdb_clean.contract_person.cpf
+  gender:
+    lineage:
+      - datalake_ebdb_clean.contract_person.gender
+  marital_status:
+    lineage:
+      - datalake_ebdb_clean.contract_person.marital_status
+  state_code:
+    lineage:
+      - datalake_ebdb_clean.contract_person.state_id
+  contract_role:
+    lineage:
+      - datalake_ebdb_clean.contract_person.type
+  is_living:
+    lineage:
+      - datalake_ebdb_clean.contract_person.will_live
+  dt_birth:
+    lineage:
+      - datalake_ebdb_clean.contract_person.dt_birth
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.contract_person.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.contract_person.ts_updated
