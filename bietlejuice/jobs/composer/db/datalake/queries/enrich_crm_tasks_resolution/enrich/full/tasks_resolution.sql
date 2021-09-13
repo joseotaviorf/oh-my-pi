@@ -1,5 +1,12 @@
+WITH last_updated_task AS (
+  SELECT
+    *,
+    MAX(DATE(CONCAT( year,'-', month,'-', day))) OVER (PARTITION BY id) AS dt_last_updated
+  FROM
+    datalake_crm.tasks
+)
 SELECT DISTINCT
-  tsk.id AS id_task,
+  lut.id AS id_task,
   tac.id AS id_action,
   id_rent_flow,
   id_origin,
@@ -41,7 +48,9 @@ SELECT DISTINCT
   tac.month,
   tac.day
 FROM
-  datalake_crm.tasks tsk
+  last_updated_task lut
 INNER JOIN
   datalake_crm.tasks_actions tac
-    ON tsk.id = tac.id_task
+    ON lut.id = tac.id_task
+WHERE
+  DATE(CONCAT(lut.year,'-',lut.month,'-',lut.day)) = lut.dt_last_updated
