@@ -1,0 +1,284 @@
+database_name: dw_braze
+table_name: fact_user_centric
+columns:
+  sk_braze_user:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.id_user_braze
+  total_campaigns_sent_to_same_week:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_same_week.total_campaigns_sent_to
+  total_campaigns_sent_to_1w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_1w_before.total_campaigns_sent_to
+  total_campaigns_sent_to_2w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_2w_before.total_campaigns_sent_to
+  total_campaigns_sent_to_3w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_3w_before.total_campaigns_sent_to
+  total_campaigns_sent_to_all_time_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.total_campaigns_sent_to
+  total_canvases_sent_to_same_week:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_same_week.total_canvases_sent_to
+  total_canvases_sent_to_1w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_1w_before.total_canvases_sent_to
+  total_canvases_sent_to_2w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_2w_before.total_canvases_sent_to
+  total_canvases_sent_to_3w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_3w_before.total_canvases_sent_to
+  total_canvases_sent_to_all_time_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.total_canvases_sent_to
+  total_tenant_communications_sent_to_same_week:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_same_week.total_tenant_communications_sent_to
+  total_tenant_communications_sent_to_1w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_1w_before.total_tenant_communications_sent_to
+  total_tenant_communications_sent_to_2w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_2w_before.total_tenant_communications_sent_to
+  total_tenant_communications_sent_to_3w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_3w_before.total_tenant_communications_sent_to
+  total_tenant_communications_sent_to_all_time_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.total_tenant_communications_sent_to
+  total_owner_communications_sent_to_same_week:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_same_week.total_owner_communications_sent_to
+  total_owner_communications_sent_to_1w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_1w_before.total_owner_communications_sent_to
+  total_owner_communications_sent_to_2w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_2w_before.total_owner_communications_sent_to
+  total_owner_communications_sent_to_3w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_3w_before.total_owner_communications_sent_to
+  total_owner_communications_sent_to_all_time_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.total_owner_communications_sent_to
+  total_emails_sent_to_same_week:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_same_week.total_emails_sent_to
+  total_emails_sent_to_1w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_1w_before.total_emails_sent_to
+  total_emails_sent_to_2w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_2w_before.total_emails_sent_to
+  total_emails_sent_to_3w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_3w_before.total_emails_sent_to
+  total_emails_sent_to_all_time_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.total_emails_sent_to
+  total_emails_delivered_to_same_week:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_same_week.total_emails_delivered_to
+  total_emails_delivered_to_1w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_1w_before.total_emails_delivered_to
+  total_emails_delivered_to_2w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_2w_before.total_emails_delivered_to
+  total_emails_delivered_to_3w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_3w_before.total_emails_delivered_to
+  total_emails_delivered_to_all_time_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.total_emails_delivered_to
+  total_email_opens_same_week:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_same_week.total_email_opens
+  total_email_opens_1w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_1w_before.total_email_opens
+  total_email_opens_2w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_2w_before.total_email_opens
+  total_email_opens_3w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_3w_before.total_email_opens
+  total_email_opens_all_time_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.total_email_opens
+  total_email_clicks_same_week:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_same_week.total_email_clicks
+  total_email_clicks_1w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_1w_before.total_email_clicks
+  total_email_clicks_2w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_2w_before.total_email_clicks
+  total_email_clicks_3w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_3w_before.total_email_clicks
+  total_email_clicks_all_time_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.total_email_clicks
+  total_push_notifications_sent_to_same_week:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_same_week.total_push_notifications_sent_to
+  total_push_notifications_sent_to_1w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_1w_before.total_push_notifications_sent_to
+  total_push_notifications_sent_to_2w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_2w_before.total_push_notifications_sent_to
+  total_push_notifications_sent_to_3w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_3w_before.total_push_notifications_sent_to
+  total_push_notifications_sent_to_all_time_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.total_push_notifications_sent_to
+  total_push_notification_opens_same_week:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_same_week.total_push_notification_opens
+  total_push_notification_opens_1w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_1w_before.total_push_notification_opens
+  total_push_notification_opens_2w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_2w_before.total_push_notification_opens
+  total_push_notification_opens_3w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_3w_before.total_push_notification_opens
+  total_push_notification_opens_all_time_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.total_push_notification_opens
+  total_inapp_message_views_same_week:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_same_week.total_inapp_message_views
+  total_inapp_message_views_1w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_1w_before.total_inapp_message_views
+  total_inapp_message_views_2w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_2w_before.total_inapp_message_views
+  total_inapp_message_views_3w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_3w_before.total_inapp_message_views
+  total_inapp_message_views_all_time_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.total_inapp_message_views
+  total_inapp_message_clicks_same_week:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_same_week.total_inapp_message_clicks
+  total_inapp_message_clicks_1w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_1w_before.total_inapp_message_clicks
+  total_inapp_message_clicks_2w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_2w_before.total_inapp_message_clicks
+  total_inapp_message_clicks_3w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_3w_before.total_inapp_message_clicks
+  total_inapp_message_clicks_all_time_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.total_inapp_message_clicks
+  total_webhooks_sent_to_same_week:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_same_week.total_webhooks_sent_to
+  total_webhooks_sent_to_1w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_1w_before.total_webhooks_sent_to
+  total_webhooks_sent_to_2w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_2w_before.total_webhooks_sent_to
+  total_webhooks_sent_to_3w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_3w_before.total_webhooks_sent_to
+  total_webhooks_sent_to_all_time_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.total_webhooks_sent_to
+  total_sms_sent_to_same_week:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_same_week.total_sms_sent_to
+  total_sms_sent_to_1w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_1w_before.total_sms_sent_to
+  total_sms_sent_to_2w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_2w_before.total_sms_sent_to
+  total_sms_sent_to_3w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_3w_before.total_sms_sent_to
+  total_sms_sent_to_all_time_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.total_sms_sent_to
+  total_sms_delivered_to_same_week:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_same_week.total_sms_delivered_to
+  total_sms_delivered_to_1w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_1w_before.total_sms_delivered_to
+  total_sms_delivered_to_2w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_2w_before.total_sms_delivered_to
+  total_sms_delivered_to_3w_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_3w_before.total_sms_delivered_to
+  total_sms_delivered_to_all_time_before:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.total_sms_delivered_to
+  dt_last_campaign_sent_to:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.dt_last_campaign_sent_to
+  dt_last_canvas_sent_to:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.dt_last_canvas_sent_to
+  dt_last_email_sent_to:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.dt_last_email_sent_to
+  dt_last_email_delivered_to:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.dt_last_email_delivered_to
+  dt_last_email_opened:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.dt_last_email_opened
+  dt_last_email_clicked:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.dt_last_email_clicked
+  dt_last_push_notification_sent_to:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.dt_last_push_notification_sent_to
+  dt_last_push_notification_opened:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.dt_last_push_notification_opened
+  dt_last_inapp_message_sent_to:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.dt_last_inapp_message_sent_to
+  dt_last_inapp_message_clicked:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.dt_last_inapp_message_clicked
+  dt_last_webhook_sent_to:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.dt_last_webhook_sent_to
+  dt_last_sms_sent_to:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.dt_last_sms_sent_to
+  dt_last_sms_delivered_to:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.dt_last_sms_delivered_to
+  dt_snapshot:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.year
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.month
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.day
+  year:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.year
+  month:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.month
+  day:
+    lineage:
+      - datalake_braze_user_centric_periodicity.user_events_all_time_before.day
