@@ -29,7 +29,7 @@ class LifullCampaigns(Marketing):
         r = batch_client.start_batch_job(
             job_name=job_name,
             job_queue=job_queue,
-            job_definition='scrap-marketing-data:1',
+            job_definition='scrap-marketing-data:3',
             command=['scrapy', 'crawl', 'trovit',
                      '-a', 'start_date={}'.format(start_date),
                      '-a', 'end_date={}'.format(start_date),
