@@ -22,7 +22,7 @@ columns:
       - datalake_ebdb_clean.user.id
   sk_fixed_agent:
     lineage:
-      - datalake_booking.booking.id_sale_fixed_agend
+      - datalake_booking.booking.id_sale_fixed_agent
   sk_buyer:
     lineage:
       - datalake_booking.booking.id_visitor
