@@ -103,7 +103,7 @@ if __name__ == "__main__":
         if api_response: 
 
             df = spark_client.create_dataframe(data=api_response, schema=schema)
-            df = df.withColumn(column_create_date, to_date(to_timestamp(unix_timestamp(column_create_date, "dd/MM/yyyy"))))
+            df = df.withColumn(column_create_date, to_date(to_timestamp(unix_timestamp(column_create_date, "MM/dd/yyyy"))))
             df = (
                 SparkDataFrameService()
                 .input(df)
