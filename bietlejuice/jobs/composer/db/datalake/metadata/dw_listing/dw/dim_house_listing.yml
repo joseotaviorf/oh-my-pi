@@ -1,0 +1,201 @@
+database_name: dw_janus
+table_name: dim_house_listing
+columns:
+  sk_house_listing:
+    lineage:
+      - datalake_ebdb_listing.house_listing.sk_house_listing
+  id_house:
+    lineage:
+      - datalake_ebdb_listing.house.id_house
+  short_id_house:
+    lineage:
+      - datalake_ebdb_listing.house.short_id_house
+  version:
+    lineage:
+      - datalake_ebdb_listing.house_listing.version
+  status:
+    lineage:
+      - datalake_ebdb_listing.house_listing.status
+  ts_listing_version_start:
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_listing_version_start
+  ts_listing_version_end:
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_listing_version_end
+  ts_house_first_publication:
+    lineage:
+      - datalake_ebdb_listing.house.ts_house_first_publication
+  ts_house_last_publication:
+    lineage:
+      - datalake_ebdb_listing.house.ts_house_last_publication
+  ts_publication:
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_publication
+  ts_last_unpublished:
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_last_unpublished
+  rent:
+    lineage:
+      - datalake_ebdb_listing.house_listing.rent
+  house_rent:
+    lineage:
+      - datalake_ebdb_listing.house.rent
+  house_neighborhood:
+    lineage:
+      - datalake_ebdb_listing.house.neighborhood
+  house_zipcode:
+    lineage:
+      - datalake_ebdb_listing.house.zipcode
+  house_city:
+    lineage:
+      - datalake_ebdb_listing.house.city
+  house_complement:
+    lineage:
+      - datalake_ebdb_listing.house.complement
+  house_condo:
+    lineage:
+      - datalake_ebdb_listing.house.condo
+  house_elevator:
+    lineage:
+      - datalake_ebdb_listing.house.has_elevator
+  house_address:
+    lineage:
+      - datalake_ebdb_listing.house.address
+  house_iptu:
+    lineage:
+      - datalake_ebdb_listing.house.iptu
+  house_lat:
+    lineage:
+      - datalake_ebdb_listing.house.lat
+  house_lng:
+    lineage:
+      - datalake_ebdb_listing.house.lng
+  is_house_furnished:
+    lineage:
+      - datalake_ebdb_listing.house.is_furnished
+  house_number:
+    lineage:
+      - datalake_ebdb_listing.house.number
+  house_bathrooms:
+    lineage:
+      - datalake_ebdb_listing.house.bathrooms
+  house_bedrooms:
+    lineage:
+      - datalake_ebdb_listing.house.bedrooms
+  house_suites:
+    lineage:
+      - datalake_ebdb_listing.house.suites
+  house_garages:
+    lineage:
+      - datalake_ebdb_listing.house.parking_slots
+  house_status:
+    lineage:
+      - datalake_ebdb_listing.house.status
+  house_type:
+    lineage:
+      - datalake_ebdb_listing.house.type
+  house_entrance:
+    lineage:
+      - datalake_ebdb_listing.house.doorman_type
+  house_garage_type:
+    lineage:
+      - datalake_ebdb_listing.house.parking_slot_type
+  is_house_registration_verified:
+    lineage:
+      - datalake_ebdb_listing.house.is_verified
+  house_total_value:
+    lineage:
+      - datalake_ebdb_listing.house.total_value
+  house_total_area:
+    lineage:
+      - datalake_ebdb_listing.house.total_area
+  house_construction_area:
+    lineage:
+      - datalake_ebdb_listing.house.land_area
+  house_condo_type:
+    lineage:
+      - datalake_ebdb_listing.house.condo_type
+  house_iptu_type:
+    lineage:
+      - datalake_ebdb_listing.house.iptu_type
+  ts_house_create:
+    lineage:
+      - datalake_ebdb_listing.house.dt_creation
+  ts_house_update:
+    lineage:
+      - datalake_ebdb_listing.house.ts_updated
+  registration_abandoned_reason:
+    lineage:
+      - datalake_ebdb_listing.house.registration_abandoned_reason
+  house_unpublished_reason:
+    lineage:
+      - datalake_ebdb_listing.house.unpublished_reason
+  listing_category:
+    lineage:
+      - datalake_ebdb_listing.house_listing.listing_category
+  is_last_version:
+    lineage:
+      - datalake_ebdb_listing.house_listing.is_last_version
+  is_exclusive:
+    lineage:
+      - datalake_ebdb_listing.house_listing.is_exclusive
+  who_is_living:
+    lineage:
+      - datalake_ebdb_listing.house.occupant_type
+  key_type:
+    lineage:
+      - datalake_ebdb_listing.house.key_type
+  key_location:
+    lineage:
+      - datalake_ebdb_listing.house.key_location
+  house_predicted_price:
+    lineage:
+      - datalake_ebdb_listing.house.predicted_price
+  dt_last_exclusive_opted_in:
+    lineage:
+      - datalake_ebdb_listing.house_listing.dt_last_exclusive_opted_in
+  dt_last_exclusive_opted_out:
+    lineage:
+      - datalake_ebdb_listing.house_listing.dt_last_exclusive_opted_out
+  is_autonomous_agent:
+    lineage:
+      - datalake_ebdb_clean.partner_agent.id_user
+  sk_autonomous_agent:
+    lineage:
+      - datalake_ebdb_clean.partner_agent.id_user
+  is_originals_active:
+    lineage:
+      - datalake_ebdb_listing.house_listing.is_originals_active
+  last_originals_type:
+    lineage:
+      - datalake_ebdb_listing.house_listing.last_originals_type
+  dt_last_originals_opted_in:
+    lineage:
+      - datalake_ebdb_listing.house_listing.dt_last_originals_opted_in
+  dt_last_originals_opted_out:
+    lineage:
+      - datalake_ebdb_listing.house_listing.dt_last_originals_opted_out
+  is_iorent_active:
+    lineage:
+      - datalake_ebdb_listing.house_listing.is_iorent_active
+  last_iorent_type:
+    lineage:
+      - datalake_ebdb_listing.house_listing.last_iorent_type
+  dt_last_iorent_opted_in:
+    lineage:
+      - datalake_ebdb_listing.house_listing.dt_last_iorent_opted_in
+  dt_last_iorent_opted_out:
+    lineage:
+      - datalake_ebdb_listing.house_listing.dt_last_iorent_opted_out
+  sale_price:
+    lineage:
+      - datalake_ebdb_listing.house_listing.sale_price
+  is_for_rent:
+    lineage:
+      - datalake_ebdb_listing.house_listing.is_for_rent
+  is_for_sale:
+    lineage:
+      - datalake_ebdb_listing.house_listing.is_for_sale
+  has_instant_offer_enabled:
+    lineage:
+      - datalake_ebdb_listing.house_listing.has_instant_offer_enabled
