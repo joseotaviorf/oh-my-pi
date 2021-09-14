@@ -1,0 +1,186 @@
+database_name: datalake_bob
+table_name: house_draft_aud
+columns:
+  id_house_draft:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.id_house_draft
+  id_client_side:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.id_client_side
+  id_original_lead:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.id_original_lead
+  id_main_administrator:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.administrators
+  rev:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.rev
+  rev_type:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.rev_type
+  registrar:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.registrar
+  owners_informations:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.owners
+  house_access_informations:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.access
+  administrators_informations:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.administrators
+  main_administrator_name:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.administrators
+  main_administrator_email:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.administrators
+  main_administrator_phone_number:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.administrators
+  house_appliances:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.details
+  house_description:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.details
+  front_door_type:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.details
+  installations:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.details
+  acessibility_items:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.details
+  days_to_vacate:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.details
+  availability_type:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.details
+  awaiting_availability_reason:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.details
+  awaiting_availability_custom_reason:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.details
+  rent_price:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.pricing
+  sale_price:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.pricing
+  condo_price:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.pricing
+  iptu_installment_informations:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.pricing
+  custom_administration_fee:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.pricing
+  special_conditions:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.pricing
+  suites:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.blueprint
+  garages:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.blueprint
+  garages_description:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.blueprint
+  bedrooms:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.blueprint
+  bathrooms:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.blueprint
+  house_type:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.blueprint
+  total_area:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.blueprint
+  business_context_type:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.business_context
+  status:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.status
+  type:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.type
+  is_furnished:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.details
+  is_penthouse:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.details
+  is_pet_friendly:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.details
+  has_condo:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.pricing
+  has_iptu_not_paid:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.pricing
+  is_accepting_instant_offer:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.pricing
+  mod_id_client_side:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.mod_id_client_side
+  mod_id_original_lead:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.mod_id_original_lead
+  mod_registrar:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.mod_registrar
+  mod_owners:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.mod_owners
+  mod_access:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.mod_access
+  mod_administrators:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.mod_administrators
+  mod_details:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.mod_details
+  mod_pricing:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.mod_pricing
+  mod_blueprint:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.mod_blueprint
+  mod_business_context:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.mod_business_context
+  mod_status:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.mod_status
+  mod_type:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.mod_type
+  mod_ts_created:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.mod_ts_created
+  mod_ts_updated:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.mod_ts_updated
+  ts_moved_out:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.details
+  ts_created:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.ts_created
+  ts_updated:
+    lineage:
+      - datalake_bob_clean.house_draft_aud.ts_updated
