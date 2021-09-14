@@ -104,6 +104,7 @@ bietlejuice.dw_criteo_campaigns:
 
 bietlejuice.dw_crm:
   - bietlejuice.enrich_crm:load-enrich-workflows-transitions
+  - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-actions-resolutions-flow
   - bietlejuice.enrich_crm_tasks_transitions:load-enrich-tasks-transitions
 
 bietlejuice.dw_facebook_insights:
