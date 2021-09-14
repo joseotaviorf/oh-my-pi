@@ -1,0 +1,227 @@
+database_name: datalake_booking
+table_name: booking
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_clean.booking.id
+  id_rescheduled_booking:
+    lineage:
+      - datalake_ebdb_clean.booking.id_rescheduled_booking
+  id_visitor:
+    lineage:
+      - datalake_ebdb_clean.booking.id_visitor
+  id_visit:
+    lineage:
+      - datalake_ebdb_clean.booking.id_visit
+  id_user_creation:
+    lineage:
+      - datalake_ebdb_clean.booking_status_change.id_user
+  id_user_cancelation:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.id_user
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.booking.id_house
+  id_agent:
+    lineage:
+      - datalake_ebdb_clean.booking.id_agent
+  id_attendant:
+    lineage:
+      - datalake_ebdb_clean.booking.id_attendant
+  id_rent_flow:
+    lineage:
+      - datalake_ebdb_clean.booking.id_rent_flow
+  id_sale_flow:
+    lineage:
+      - datalake_ebdb_clean.booking.id_visitor
+      - datalake_ebdb_clean.booking.id_house
+  id_real_estate_agent_rating:
+    lineage:
+      - datalake_ebdb_clean.visit.id_real_estate_agent_rating
+  id_sale_fixed_agent:
+    lineage:
+      - datalake_ebdb_clean.preferred_fixed_agent.id_agent_data
+  dt_booking:
+    lineage:
+      - datalake_ebdb_clean.booking.dt_booking
+  status:
+    lineage:
+      - datalake_ebdb_clean.booking.status
+  visit_intent:
+    lineage:
+      - datalake_ebdb_clean.booking.business_context
+  buyer_intention:
+    lineage:
+      - datalake_ebdb_clean.booking.buyer_intention
+  type:
+    lineage:
+      - datalake_ebdb_clean.booking.type
+  visit_fup:
+    lineage:
+      - datalake_ebdb_clean.booking.visit_fup
+  slot_day:
+    lineage:
+      - datalake_ebdb_clean.booking.slot_day
+  checkin_status:
+    lineage:
+      - datalake_ebdb_clean.booking.checkin_status
+  last_update_source:
+    lineage:
+      - datalake_ebdb_clean.visit_origin.name
+  first_update_source:
+    lineage:
+      - datalake_ebdb_clean.visit_origin.name
+  is_visit_created_from_app:
+    lineage:
+      - datalake_ebdb_clean.visit_origin.is_app
+  is_visit_last_updated_from_app:
+    lineage:
+      - datalake_ebdb_clean.visit_origin.is_app
+  code:
+    lineage:
+      - datalake_ebdb_clean.visit.code
+  last_status_change_reason:
+    lineage:
+      - datalake_ebdb_clean.booking_status_change.reason
+  last_status_change_reason_enum:
+    lineage:
+      - datalake_ebdb_clean.booking_status_change.reason_enum
+  last_status_change_reason_category:
+    lineage:
+      - datalake_ebdb_clean.appointment_change_reason_category.name
+  tenant_absence_reason:
+    lineage:
+      - datalake_ebdb_clean.visitor.absence_reason
+  agent_absence_reason:
+    lineage:
+      - datalake_ebdb_clean.visitor.absence_reason
+  landlord_absence_reason:
+    lineage:
+      - datalake_ebdb_clean.visitor.absence_reason
+  troublesome_entrance_problem:
+    lineage:
+      - datalake_ebdb_clean.entrance.problem
+  cancellation_reason:
+    lineage:
+      - datalake_ebdb_clean.booking_status_change.reason_enum
+  cancellation_reason_category:
+    lineage:
+      - datalake_ebdb_clean.booking_status_change.reason_enum
+  owner_missing_reason:
+    lineage:
+      - datalake_ebdb_clean.entrance.problem
+  reason_category:
+    lineage:
+      - datalake_gsheets_clean.from_to_cancellation.new_reason
+      - datalake_ebdb_clean.visit_origin.name
+      - datalake_ebdb_clean.booking_status_change.reason_enum
+      - datalake_ebdb_clean.appointment_change_reason_category.name
+  ts_visit_fup:
+    lineage:
+      - datalake_ebdb_clean.booking.ts_visit_fup
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.booking.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.booking.ts_updated
+  ts_first_canceled:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  ts_first_canceled_unevaluated:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  ts_booking_local_tz:
+    lineage:
+      - datalake_ebdb_clean.booking.dt_booking
+      - datalake_ebdb_clean.booking.slot_day
+  ts_created_local_tz:
+    lineage:
+      - datalake_ebdb_clean.booking.ts_created
+  ts_visit_follow_up_local_tz:
+    lineage:
+      - datalake_ebdb_clean.booking.ts_visit_fup
+  is_confirmed:
+    lineage:
+      - datalake_ebdb_clean.booking.is_confirmed
+  is_closed:
+    lineage:
+      - datalake_ebdb_clean.booking.is_closed
+  is_agent_fixed:
+    lineage:
+      - datalake_ebdb_clean.booking.is_agent_fixed
+  is_virtual_visit:
+    lineage:
+      - datalake_ebdb_clean.follow_up_details.visit_type
+  is_entrance_successful:
+    lineage:
+      - datalake_ebdb_clean.entrance.is_successful
+  is_canceled:
+    lineage:
+      - datalake_ebdb_clean.booking.status
+  is_sale_visit:
+    lineage:
+      - datalake_ebdb_clean.booking.business_context
+  is_inspection:
+    lineage:
+      - datalake_ebdb_clean.booking.type
+  is_visit:
+    lineage:
+      - datalake_ebdb_clean.booking.type
+  is_photo_session:
+    lineage:
+      - datalake_ebdb_clean.booking.type
+  is_visit_performed:
+    lineage:
+      - datalake_ebdb_clean.booking.visit_fup
+      - datalake_ebdb_clean.visitor.absence_reason
+  is_via_reschedule:
+    lineage:
+      - datalake_ebdb_clean.booking.id_rescheduled_booking
+  has_reschedule:
+    lineage:
+      - datalake_ebdb_clean.booking.id_rescheduled_booking
+  has_tenant_attended:
+    lineage:
+      - datalake_ebdb_clean.visitor.has_attended
+  has_agent_attended:
+    lineage:
+      - datalake_ebdb_clean.visitor.has_attended
+  has_landlord_attended:
+    lineage:
+      - datalake_ebdb_clean.visitor.has_attended
+  has_owner_arrived:
+    lineage:
+      - datalake_ebdb_clean.entrance.problem
+  is_first_booking_auto:
+    lineage:
+      - datalake_ebdb_clean.booking_status_change.id_user
+  ts_booking_utc:
+    lineage:
+      - datalake_ebdb_clean.booking.dt_booking
+      - datalake_ebdb_clean.booking.slot_day
+  ts_first_canceled_local_tz:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  responsible:
+    lineage:
+      - datalake_ebdb_clean.booking_status_change.reason_enum
+  days_visit_booked_to_visit_cancelled:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.booking.ts_created
+  days_visit_cancelled_to_visit:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.booking.dt_booking
+      - datalake_ebdb_clean.booking.slot_day
+  days_visit_booked_to_visit:
+    lineage:
+      - datalake_ebdb_clean.booking.dt_booking
+      - datalake_ebdb_clean.booking.slot_day
+      - datalake_ebdb_clean.booking.ts_created
+  days_visit_booked_to_visit_completed:
+    lineage:
+      - datalake_ebdb_clean.booking.dt_booking
+      - datalake_ebdb_clean.booking.slot_day
+      - datalake_ebdb_clean.booking.ts_created
