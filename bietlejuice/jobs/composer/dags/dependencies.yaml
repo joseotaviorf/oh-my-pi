@@ -167,12 +167,6 @@ bietlejuice.dw_listing_owners:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_user:load-enrich-user
 
-bietlejuice.dw_marketing_costs:
-  - bietlejuice.google_ads:load-clean-ads-performance-report
-  - bietlejuice.google_ads:load-clean-campaigns-performance-report
-  - bietlejuice.google_ads:load-clean-keywords-performance-report
-  - bietlejuice.google_ads:load-clean-videos-performance-report
-
 bietlejuice.dw_google_ads:
   - bietlejuice.google_ads:load-clean-ads-performance-report
   - bietlejuice.google_ads:load-clean-campaigns-performance-report
