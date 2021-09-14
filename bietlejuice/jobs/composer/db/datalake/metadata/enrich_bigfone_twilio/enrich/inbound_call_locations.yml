@@ -1,0 +1,24 @@
+database_name: datalake_bigfone_twilio
+table_name: inbound_call_locations
+columns:
+  id_call:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  from_city:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  from_state:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  from_country:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  year:
+    lineage:
+      - datalake_bigfone_events.events.year
+  month:
+    lineage:
+      - datalake_bigfone_events.events.month
+  day:
+    lineage:
+      - datalake_bigfone_events.events.day
