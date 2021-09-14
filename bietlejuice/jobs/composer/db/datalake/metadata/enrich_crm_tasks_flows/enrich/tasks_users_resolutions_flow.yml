@@ -1,0 +1,59 @@
+---
+database_name: datalake_crm_tasks_flows
+table_name: tasks_users_resolutions_flow
+columns:
+  id_action_date:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution.ts_action
+  id_assignee:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution.id_assignee
+  id_completed_date:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution.ts_completed
+  id_origin:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution.id_origin
+  id_receiver:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution.id_receiver
+  id_start_date:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution.ts_start
+  id_task:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution.id_task
+  id_task_user_end_date:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution.ts_action
+  id_task_user_start_date:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution.ts_action
+  id_user_action:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution.id_user_action
+  action_type:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution.action_type
+  action_user_name:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution.action_user_name
+  task_user_resolve_hours:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution.ts_action
+  task_user_type:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution.action_type
+  dt_partition:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution.ts_action
+  ts_action:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution.ts_action
+  ts_task_user_start:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution.ts_action
+  ts_task_user_end:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution.ts_action
+  
