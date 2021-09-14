@@ -17,7 +17,7 @@ SELECT DISTINCT
   id_tenant,
   id_negotiation,
   id_manager,
-  tsk.id_workgroup,
+  id_workgroup,
   id_user_action,
   id_receiver,
   score_factor,
