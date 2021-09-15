@@ -75,6 +75,10 @@ WITH quinto_messenger_tickets AS (
       t.contact_motivation_tag,
       t.contact_theme_tag,
       t.seconds_to_first_response,
+      ctm.talk_time AS seconds_talk_time,
+      ctm.queue_time AS seconds_queue_time,
+      ctm.wrap_up_time AS seconds_wrap_up_time,
+      ctm.handling_time AS seconds_handling_time,
       tt.ts_task_closed,
       tt.ts_task_created,
       t.ts_created,
@@ -88,6 +92,9 @@ WITH quinto_messenger_tickets AS (
     JOIN
       task_timestamps tt
         ON tt.id_task = t.id_task
+    LEFT JOIN
+      datalake_twilio_flex_insights_clean.conversation_time_metrics ctm
+          ON ctm.id_segment = t.id_task
   )
   SELECT
       t.id_task,
@@ -117,6 +124,10 @@ WITH quinto_messenger_tickets AS (
       t.contact_motivation_tag,
       t.contact_theme_tag,
       c.seconds_duration/60.0 AS minutes_full_resolution_time_calendar,
+      t.seconds_talk_time/60.0 AS minutes_talk_time,
+      t.seconds_queue_time/60.0 AS minutes_queue_time,
+      t.seconds_wrap_up_time/60.0 AS minutes_wrap_up_time,
+      t.seconds_handling_time/60.0 AS minutes_handling_time,
       t.ts_created,
       t.ts_updated,
       t.ts_task_closed,
@@ -290,6 +301,10 @@ SELECT DISTINCT
   bt.back_ticket_list,
   ct.seconds_first_reply,
   ct.task_minutes_wait_time AS segment_minutes_wait_time,
+  ct.minutes_talk_time AS segment_minutes_talk_time,
+  ct.minutes_queue_time AS segment_minutes_queue_time,
+  ct.minutes_wrap_up_time AS segment_minutes_wrap_up_time,
+  ct.minutes_handling_time AS segment_minutes_handling_time,
   ct.number_of_departments,
   ct.number_of_tasks AS number_of_segments,
   ct.sla_achieved,
