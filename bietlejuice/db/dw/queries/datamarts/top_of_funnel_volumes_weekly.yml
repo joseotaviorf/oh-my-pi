@@ -3,4 +3,6 @@
 streams:
   - direction: 'upstream'
     task_ids: ['dw_performance_marketing_metrics_demand',
-               'dw_sale_performance_marketing_metrics_demand']
+               'dw_sale_performance_marketing_metrics_demand',
+               'dw_tenant_prospect_status',
+               'dw_buyer_prospect_status']
