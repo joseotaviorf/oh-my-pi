@@ -84,9 +84,12 @@ WITH segment AS (
         WHEN LEAD(queue_name,1) OVER (PARTITION BY COALESCE(id_call,r.id_task) ORDER BY ts_twilio_created_local) != queue_name THEN 'external'
     END AS transference_type,
     tr.transference_reason,
-    seconds_duration,
     seconds_wait_time,
-    seconds_talk_time,
+    seconds_duration,
+    COALESCE(ctm.talk_time, r.seconds_talk_time) AS seconds_talk_time,
+    ctm.queue_time AS seconds_queue_time,
+    ctm.wrap_up_time AS seconds_wrap_up_time,
+    ctm.handling_time AS seconds_handling_time,
     is_answered,
     is_timeout,
     is_rejected,
@@ -113,6 +116,9 @@ WITH segment AS (
   LEFT JOIN
     transfer_reason tr
       ON tr.id_reservation = r.id_reservation
+  LEFT JOIN 
+    datalake_twilio_flex_insights_clean.conversation_time_metrics ctm
+      ON ctm.id_reservation = r.id_reservation
   WHERE
     is_answered = TRUE
 ),
@@ -351,6 +357,10 @@ SELECT DISTINCT
   END AS sla_achieved,
   t.seconds_duration/60.0 AS segment_minutes_duration,
   t.seconds_wait_time/60.0 AS segment_minutes_wait_time,
+  t.seconds_talk_time/60.0 AS segment_minutes_talk_time,
+  t.seconds_queue_time/60.0 AS segment_minutes_queue_time,
+  t.seconds_wrap_up_time/60.0 AS segment_minutes_wrap_up_time,
+  t.seconds_handling_time/60.0 AS segment_minutes_handling_time,
   CAST(c.seconds_duration/60.0 AS DOUBLE) AS minutes_full_resolution_time_calendar,
   CAST(c.number_of_departments AS INT) AS number_of_departments,
   CAST(c.number_of_tasks AS INT) AS number_of_segments,
