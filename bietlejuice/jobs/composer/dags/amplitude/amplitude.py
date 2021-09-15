@@ -13,6 +13,7 @@ from airflow.operators.quintoandar_databricks import (
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
+from bietlejuice.jobs.composer.base.pipeline.metadata_type_enum import MetadataTypeEnum
 
 DAG_NAME = "amplitude"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
@@ -98,8 +99,8 @@ events_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-sync_metastore_raw_tables_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="sync-hive-metastore-raw-tables",
+sync_metastore_raw_events_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="sync-hive-metastore-raw-events",
     dag=dag,
     json={
         "spark_python_task": {
@@ -108,7 +109,26 @@ sync_metastore_raw_tables_task = QuintoAndarDatabricksSubmitRunOperator(
                 DATALAKE_BUCKET,
                 LayerEnum.RAW.value,
                 DAG_NAME,
-                "--all-tables",
+                "--table-name",
+                "events",
+            ],
+        }
+    },
+)
+
+propagate_table_metadata_raw_events_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
+    task_id=f"propagate-table-metadata-raw-events",
+    json={
+        "spark_python_task": {
+            "python_file": BASE_SPARK_JOBS_PATH + "propagate_raw_tables_metadata.py",
+            "parameters": [
+                LayerEnum.RAW.value,
+                MetadataTypeEnum.TAGS.value,
+                DAG_NAME,
+                DAG_NAME,
+                "--table-name",
+                "events",
             ],
         }
     },
@@ -133,8 +153,8 @@ events_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-sync_metastore_clean_tables_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="sync-hive-metastore-clean-tables",
+sync_metastore_clean_events_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="sync-hive-metastore-clean-events",
     dag=dag,
     json={
         "spark_python_task": {
@@ -143,7 +163,24 @@ sync_metastore_clean_tables_task = QuintoAndarDatabricksSubmitRunOperator(
                 DATALAKE_BUCKET,
                 LayerEnum.CLEAN.value,
                 DAG_NAME,
-                "--all-tables",
+                "--table-name",
+                "events",
+            ],
+        }
+    },
+)
+
+propagate_table_metadata_clean_events_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
+    task_id=f"propagate-table-metadata-clean-events",
+    json={
+        "spark_python_task": {
+            "python_file": BASE_SPARK_JOBS_PATH + "propagate_table_metadata.py",
+            "parameters": [
+                LayerEnum.CLEAN.value,
+                MetadataTypeEnum.LINEAGE.value,
+                DAG_NAME,
+                "events",
             ],
         }
     },
@@ -300,14 +337,16 @@ update_clean_staging_subpartitioned_tables_athena_task = QuintoAndarDatabricksSu
 airflow_helpers.chain(
     create_cluster_task,
     events_to_datalake_raw_task,
-    sync_metastore_raw_tables_task,
+    sync_metastore_raw_events_task,
+    propagate_table_metadata_raw_events_task,
     terminate_cluster_task,
 )
 
 airflow_helpers.chain(
     events_to_datalake_raw_task,
     events_raw_to_clean_task,
-    sync_metastore_clean_tables_task,
+    sync_metastore_clean_events_task,
+    propagate_table_metadata_clean_events_task,
     terminate_cluster_task,
 )
 
