@@ -1,0 +1,54 @@
+database_name: datalake_big_agent_clean
+table_name: enrollment_aud
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.enrollment_aud.id
+  id_agent:
+    lineage:
+      - datalake_big_agent_raw.enrollment_aud.agent_id
+  id_program:
+    lineage:
+      - datalake_big_agent_raw.enrollment_aud.program_id
+  rev:
+    lineage:
+      - datalake_big_agent_raw.enrollment_aud.rev
+  rev_end:
+    lineage:
+      - datalake_big_agent_raw.enrollment_aud.revend
+  rev_type:
+    lineage:
+      - datalake_big_agent_raw.enrollment_aud.revtype
+  details:
+    lineage:
+      - datalake_big_agent_raw.enrollment_aud.details
+  mod_id_agent:
+    lineage:
+      - datalake_big_agent_raw.enrollment_aud.agent_mod
+  mod_agencies:
+    lineage:
+      - datalake_big_agent_raw.enrollment_aud.agencies_mod
+  mod_details:
+    lineage:
+      - datalake_big_agent_raw.enrollment_aud.details_mod
+  mod_ts_created:
+    lineage:
+      - datalake_big_agent_raw.enrollment_aud.created_at_mod
+  mod_ts_updated:
+    lineage:
+      - datalake_big_agent_raw.enrollment_aud.updated_at_mod
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.enrollment_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.enrollment_aud.updated_at
+  year:
+    lineage:
+      - datalake_big_agent_raw.enrollment_aud.year
+  month:
+    lineage:
+      - datalake_big_agent_raw.enrollment_aud.month
+  day:
+    lineage:
+      - datalake_big_agent_raw.enrollment_aud.day

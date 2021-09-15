@@ -1,0 +1,60 @@
+database_name: datalake_big_agent_clean
+table_name: agency_aud
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.agency_aud.id
+  id_enrollment:
+    lineage:
+      - datalake_big_agent_raw.agency_aud.enrollment_id
+  id_house:
+    lineage:
+      - datalake_big_agent_raw.agency_aud.house_id
+  rev:
+    lineage:
+      - datalake_big_agent_raw.agency_aud.rev
+  rev_end:
+    lineage:
+      - datalake_big_agent_raw.agency_aud.revend
+  rev_type:
+    lineage:
+      - datalake_big_agent_raw.agency_aud.revtype
+  details:
+    lineage:
+      - datalake_big_agent_raw.agency_aud.details
+  since:
+    lineage:
+      - datalake_big_agent_raw.agency_aud.since
+  mod_enrollment:
+    lineage:
+      - datalake_big_agent_raw.agency_aud.enrollment_mod
+  mod_house:
+    lineage:
+      - datalake_big_agent_raw.agency_aud.house_mod
+  mod_details:
+    lineage:
+      - datalake_big_agent_raw.agency_aud.details_mod
+  mod_since:
+    lineage:
+      - datalake_big_agent_raw.agency_aud.since_mod
+  mod_ts_created:
+    lineage:
+      - datalake_big_agent_raw.agency_aud.created_at_mod
+  mod_ts_updated:
+    lineage:
+      - datalake_big_agent_raw.agency_aud.updated_at_mod
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.agency_aud.created_at
+  ts_updated:
+    lineage:
+        - datalake_big_agent_raw.agency_aud.updated_at
+  year:
+    lineage:
+      - datalake_big_agent_raw.agency_aud.year
+  month:
+    lineage:
+      - datalake_big_agent_raw.agency_aud.month
+  day:
+    lineage:
+      - datalake_big_agent_raw.agency_aud.day

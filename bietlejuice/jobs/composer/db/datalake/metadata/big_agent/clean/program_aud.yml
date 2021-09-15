@@ -1,0 +1,57 @@
+database_name: datalake_big_agent_clean
+table_name: program_aud
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.program_aud.id
+  rev:
+    lineage:
+      - datalake_big_agent_raw.program_aud.rev
+  rev_end:
+    lineage:
+      - datalake_big_agent_raw.program_aud.revend
+  rev_type:
+    lineage:
+      - datalake_big_agent_raw.program_aud.revtype
+  code:
+    lineage:
+      - datalake_big_agent_raw.program_aud.code
+  details:
+    lineage:
+      - datalake_big_agent_raw.program_aud.details
+  name:
+    lineage:
+      - datalake_big_agent_raw.program_aud.name
+  mod_enrollments:
+    lineage:
+      - datalake_big_agent_raw.program_aud.enrollments_mod
+  mod_code:
+    lineage:
+      - datalake_big_agent_raw.program_aud.code_mod
+  mod_details:
+    lineage:
+      - datalake_big_agent_raw.program_aud.details_mod
+  mod_name:
+    lineage:
+      - datalake_big_agent_raw.program_aud.name_mod
+  mod_ts_created:
+    lineage:
+      - datalake_big_agent_raw.program_aud.created_at_mod
+  mod_ts_updated:
+    lineage:
+      - datalake_big_agent_raw.program_aud.updated_at_mod
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.program_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.program_aud.updated_at
+  year:
+    lineage:
+      - datalake_big_agent_raw.program_aud.year
+  month:
+    lineage:
+      - datalake_big_agent_raw.program_aud.month
+  day:
+    lineage:
+      - datalake_big_agent_raw.program_aud.day

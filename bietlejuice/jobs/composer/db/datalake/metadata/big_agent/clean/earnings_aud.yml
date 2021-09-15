@@ -1,0 +1,84 @@
+database_name: datalake_big_agent_clean
+table_name: earnings_aud
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.earnings_aud.id
+  id_agency:
+    lineage:
+      - datalake_big_agent_raw.earnings_aud.agency_id
+  id_agent:
+    lineage:
+      - datalake_big_agent_raw.earnings_aud.agent_id
+  id_program:
+    lineage:
+      - datalake_big_agent_raw.earnings_aud.program_id
+  id_house_external:
+    lineage:
+      - datalake_big_agent_raw.earnings_aud.house_external_id
+  rev:
+    lineage:
+      - datalake_big_agent_raw.earnings_aud.rev
+  rev_end:
+    lineage:
+      - datalake_big_agent_raw.earnings_aud.revend
+  rev_type:
+    lineage:
+      - datalake_big_agent_raw.earnings_aud.revtype
+  details:
+    lineage:
+      - datalake_big_agent_raw.earnings_aud.details
+  status:
+    lineage:
+      - datalake_big_agent_raw.earnings_aud.status
+  type:
+    lineage:
+      - datalake_big_agent_raw.earnings_aud.type
+  failure_count:
+    lineage:
+      - datalake_big_agent_raw.earnings_aud.failure_count
+  mod_id_agency:
+    lineage:
+      - datalake_big_agent_raw.earnings_aud.agency_id_mod
+  mod_id_agent:
+    lineage:
+      - datalake_big_agent_raw.earnings_aud.agent_id_mod
+  mod_id_program:
+    lineage:
+      - datalake_big_agent_raw.earnings_aud.program_id_mod
+  mod_id_house_external:
+    lineage:
+      - datalake_big_agent_raw.earnings_aud.house_external_id_mod
+  mod_details:
+    lineage:
+      - datalake_big_agent_raw.earnings_aud.details_mod
+  mod_status:
+    lineage:
+      - datalake_big_agent_raw.earnings_aud.status_mod
+  mod_type:
+    lineage:
+      - datalake_big_agent_raw.earnings_aud.type_mod
+  mod_failure_count:
+    lineage:
+      - datalake_big_agent_raw.earnings_aud.failure_count_mod
+  mod_ts_created:
+    lineage:
+      - datalake_big_agent_raw.earnings_aud.created_at_mod
+  mod_ts_updated:
+    lineage:
+      - datalake_big_agent_raw.earnings_aud.updated_at_mod
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.earnings_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.earnings_aud.updated_at
+  year:
+    lineage:
+      - datalake_big_agent_raw.earnings_aud.year
+  month:
+    lineage:
+      - datalake_big_agent_raw.earnings_aud.month
+  day:
+    lineage:
+      - datalake_big_agent_raw.earnings_aud.day

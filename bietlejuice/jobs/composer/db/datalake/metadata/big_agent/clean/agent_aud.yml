@@ -1,0 +1,45 @@
+database_name: datalake_big_agent_clean
+table_name: agent_aud
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.agent_aud.ir
+  rev:
+    lineage:
+      - datalake_big_agent_raw.agent_aud.rev
+  rev_end:
+    lineage:
+      - datalake_big_agent_raw.agent_aud.revend
+  rev_type:
+    lineage:
+      - datalake_big_agent_raw.agent_aud.revtype
+  details:
+    lineage:
+      - datalake_big_agent_raw.agent_aud.metadata
+  mod_details:
+    lineage:
+      - datalake_big_agent_raw.agent_aud.metadata_mod
+  mod_enrollments:
+    lineage:
+      - datalake_big_agent_raw.agent_aud.enrollments_mod
+  mod_ts_created:
+    lineage:
+      - datalake_big_agent_raw.agent_aud.created_at_mod
+  mod_ts_updated:
+    lineage:
+      - datalake_big_agent_raw.agent_aud.updated_at_mod
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.agent_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.agent_aud.updated_at
+  year:
+    lineage:
+      - datalake_big_agent_raw.agent_aud.year
+  month:
+    lineage:
+      - datalake_big_agent_raw.agent_aud.month
+  day:
+    lineage:
+      - datalake_big_agent_raw.agent_aud.day

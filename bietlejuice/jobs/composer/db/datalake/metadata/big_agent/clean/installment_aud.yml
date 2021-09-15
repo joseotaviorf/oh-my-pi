@@ -1,0 +1,72 @@
+database_name: datalake_big_agent_clean
+table_name: installment_aud
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.installment_aud.id
+  id_external_invoice:
+    lineage:
+      - datalake_big_agent_raw.installment_aud.external_invoice_id
+  uuid_installment:
+    lineage:
+      - datalake_big_agent_raw.installment_aud.installment_uuid
+  rev:
+    lineage:
+      - datalake_big_agent_raw.installment_aud.rev
+  rev_end:
+    lineage:
+      - datalake_big_agent_raw.installment_aud.revend
+  rev_type:
+    lineage:
+      - datalake_big_agent_raw.installment_aud.revtype
+  accrual_year_month:
+    lineage:
+      - datalake_big_agent_raw.installment_aud.accrual_year_month
+  status:
+    lineage:
+      - datalake_big_agent_raw.installment_aud.status
+  type:
+    lineage:
+      - datalake_big_agent_raw.installment_aud.type
+  amount:
+    lineage:
+      - datalake_big_agent_raw.installment_aud.amount
+  mod_uuid_installment:
+    lineage:
+      - datalake_big_agent_raw.installment_aud.installment_uuid_mod
+  mod_id_external_invoice:
+    lineage:
+      - datalake_big_agent_raw.installment_aud.external_invoice_id_mod
+  mod_accrual_year_month:
+    lineage:
+      - datalake_big_agent_raw.installment_aud.accrual_year_month_mod
+  mod_status:
+    lineage:
+      - datalake_big_agent_raw.installment_aud.status_mod
+  mod_type:
+    lineage:
+      - datalake_big_agent_raw.installment_aud.type_mod
+  mod_amount:
+    lineage:
+      - datalake_big_agent_raw.installment_aud.amount_mod
+  mod_ts_created:
+    lineage:
+      - datalake_big_agent_raw.installment_aud.created_at_mod
+  mod_ts_updated:
+    lineage:
+      - datalake_big_agent_raw.installment_aud.updated_at_mod
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.installment_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.installment_aud.updated_at
+  year:
+    lineage:
+      - datalake_big_agent_raw.installment_aud.year
+  month:
+    lineage:
+      - datalake_big_agent_raw.installment_aud.month
+  day:
+    lineage:
+      - datalake_big_agent_raw.installment_aud.day

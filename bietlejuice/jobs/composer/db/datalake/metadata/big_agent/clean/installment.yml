@@ -1,0 +1,39 @@
+database_name: datalake_big_agent_clean
+table_name: installment
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.installment.id
+  id_external_invoice:
+    lineage:
+      - datalake_big_agent_raw.installment.external_invoice_id
+  uuid_installment:
+    lineage:
+      - datalake_big_agent_raw.installment.installment_uuid
+  accrual_year_month:
+    lineage:
+      - datalake_big_agent_raw.installment.accrual_year_month
+  status:
+    lineage:
+      - datalake_big_agent_raw.installment.status
+  type:
+    lineage:
+      - datalake_big_agent_raw.installment.type
+  amount:
+    lineage:
+      - datalake_big_agent_raw.installment.amount
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.installment.created_at
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.installment.updated_at
+  year:
+    lineage:
+      - datalake_big_agent_raw.installment.year
+  month:
+    lineage:
+      - datalake_big_agent_raw.installment.month
+  day:
+    lineage:
+      - datalake_big_agent_raw.installment.day

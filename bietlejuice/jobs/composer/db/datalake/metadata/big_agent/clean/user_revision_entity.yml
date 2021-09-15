@@ -1,0 +1,21 @@
+database_name: datalake_big_agent_clean
+table_name: user_revision_entity
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.user_revision_entity.id
+  id_user:
+    lineage:
+      - datalake_big_agent_raw.user_revision_entity.user_id
+  ts_revision:
+    lineage:
+      - datalake_big_agent_raw.user_revision_entity.timestamp
+  year:
+    lineage:
+      - datalake_big_agent_raw.user_revision_entity.year
+  month:
+    lineage:
+      - datalake_big_agent_raw.user_revision_entity.month
+  day:
+    lineage:
+      - datalake_big_agent_raw.user_revision_entity.day
