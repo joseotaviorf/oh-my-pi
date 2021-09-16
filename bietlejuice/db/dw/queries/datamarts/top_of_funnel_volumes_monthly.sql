@@ -105,7 +105,7 @@ bps_monthly AS (
                 THEN 'Active'
             WHEN (status_month_start IS NULL AND city_group_first_activation = city_group)
                 OR (status_month_end = 'ACTIVE' AND status_detail_month_end = 'New BP')
-                THEN 'New TP'
+                THEN 'New BP'
             WHEN status_month_start IS NULL
                 OR (status_month_end = 'ACTIVE' AND status_detail_month_end = 'First activation in city_group')
                 THEN 'First activation in city_group'
@@ -172,7 +172,7 @@ events AS (
         COUNT(NULL) AS tenant_prospects,
         COUNT(NULL) AS recovered_tenant_prospects,
         COUNT(NULL) AS tenant_prospect_churns,
-        COUNT(NULL) AS tenant_prospects_deactivations_by_renting,
+        COUNT(NULL) AS tenant_prospect_deactivations_by_renting,
         COUNT(NULL) AS rent_flows,
         COUNT(NULL) AS new_tenant_prospects_target,
         COUNT(NULL) AS tof_users_target
@@ -218,7 +218,7 @@ events AS (
         COUNT(NULL) AS tenant_prospects,
         COUNT(NULL) AS recovered_tenant_prospects,
         COUNT(NULL) AS tenant_prospect_churns,
-        COUNT(NULL) AS tenant_prospects_deactivations_by_renting,
+        COUNT(NULL) AS tenant_prospect_deactivations_by_renting,
         COUNT(NULL) AS rent_flows,
         COUNT(NULL) AS new_tenant_prospects_target,
         COUNT(NULL) AS tof_users_target
@@ -271,7 +271,7 @@ events AS (
         COUNT(NULL) AS tenant_prospects,
         COUNT(NULL) AS recovered_tenant_prospects,
         COUNT(NULL) AS tenant_prospect_churns,
-        COUNT(NULL) AS tenant_prospects_deactivations_by_renting,
+        COUNT(NULL) AS tenant_prospect_deactivations_by_renting,
         COUNT(NULL) AS rent_flows,
         COUNT(NULL) AS new_tenant_prospects_target,
         COUNT(NULL) AS tof_users_target
@@ -319,7 +319,7 @@ events AS (
         COUNT(NULL) AS tenant_prospects,
         COUNT(NULL) AS recovered_tenant_prospects,
         COUNT(NULL) AS tenant_prospect_churns,
-        COUNT(NULL) AS tenant_prospects_deactivations_by_renting,
+        COUNT(NULL) AS tenant_prospect_deactivations_by_renting,
         COUNT(NULL) AS rent_flows,
         COUNT(NULL) AS new_tenant_prospects_target,
         COUNT(NULL) AS tof_users_target
@@ -365,14 +365,14 @@ events AS (
         COUNT(NULL) AS buyer_prospect_deactivations_by_ccv,
         COUNT(NULL) AS sale_flows,
         COUNT(NULL) AS new_buyer_prospects_target,
-        COUNT(NULL) AS recovered_tenant_prospects,
-        COUNT(NULL) AS tenant_prospect_churns,
-        COUNT(NULL) AS tenant_prospects_deactivations_by_renting,
+        COUNT(NULL) AS active_tenant_prospects,
+        COUNT(NULL) AS ongoing_churned_tenant_prospects,
+        COUNT(NULL) AS retained_tenant_prospects,
         COUNT(DISTINCT CASE WHEN pmmd.tenant_prospect_order = 1 THEN pmmd.sk_client ELSE NULL END) AS new_tenant_prospects,
         COUNT(DISTINCT CASE WHEN pmmd.status = 'ACTIVE' THEN pmmd.sk_client ELSE NULL END) AS tenant_prospects,
         COUNT(DISTINCT CASE WHEN pmmd.status_detail ilike 'Recover%' AND pmmd.ts_event = pmmd.ts_status_start THEN pmmd.sk_client ELSE NULL END) AS recovered_tenant_prospects,
         COUNT(DISTINCT CASE WHEN pmmd.status = 'CHURNED' THEN pmmd.sk_client ELSE NULL END) AS tenant_prospect_churns,
-        COUNT(DISTINCT CASE WHEN pmmd.status = 'RENTED' THEN pmmd.sk_client ELSE NULL END) AS tenant_prospects_deactivations_by_renting,
+        COUNT(DISTINCT CASE WHEN pmmd.status = 'RENTED' THEN pmmd.sk_client ELSE NULL END) AS tenant_prospect_deactivations_by_renting,
         COUNT(DISTINCT pmmd.sk_rf) AS rent_flows,
         SUM(pmmd.new_tenant_prospects_target) AS new_tenant_prospects_target,
         COUNT(NULL) AS tof_users_target
@@ -423,7 +423,7 @@ events AS (
         COUNT(NULL) AS tenant_prospects,
         COUNT(NULL) AS recovered_tenant_prospects,
         COUNT(NULL) AS tenant_prospect_churns,
-        COUNT(NULL) AS tenant_prospects_deactivations_by_renting,
+        COUNT(NULL) AS tenant_prospect_deactivations_by_renting,
         COUNT(NULL) AS rent_flows,
         COUNT(NULL) AS new_tenant_prospects_target,
         SUM(tof_users_target::FLOAT) AS tof_users_target
@@ -476,7 +476,7 @@ events AS (
         COUNT(NULL) AS tenant_prospects,
         COUNT(NULL) AS recovered_tenant_prospects,
         COUNT(NULL) AS tenant_prospect_churns,
-        COUNT(NULL) AS tenant_prospects_deactivations_by_renting,
+        COUNT(NULL) AS tenant_prospect_deactivations_by_renting,
         COUNT(NULL) AS rent_flows,
         COUNT(NULL) AS new_tenant_prospects_target,
         SUM(tof_users_target::FLOAT) AS tof_users_target
@@ -519,7 +519,7 @@ SELECT
     SUM(tenant_prospects) AS tenant_prospects,
     SUM(recovered_tenant_prospects) AS recovered_tenant_prospects,
     SUM(tenant_prospect_churns) AS tenant_prospect_churns,
-    SUM(tenant_prospects_deactivations_by_renting) AS tenant_prospects_deactivations_by_renting,
+    SUM(tenant_prospect_deactivations_by_renting) AS tenant_prospect_deactivations_by_renting,
     SUM(rent_flows) AS rent_flows,
     SUM(new_tenant_prospects_target) AS new_tenant_prospects_target,
     SUM(tof_users_target) AS tof_users_target
