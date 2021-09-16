@@ -3,7 +3,7 @@ table_name: agent_aud
 columns:
   id:
     lineage:
-      - datalake_big_agent_raw.agent_aud.ir
+      - datalake_big_agent_raw.agent_aud.id
   rev:
     lineage:
       - datalake_big_agent_raw.agent_aud.rev
