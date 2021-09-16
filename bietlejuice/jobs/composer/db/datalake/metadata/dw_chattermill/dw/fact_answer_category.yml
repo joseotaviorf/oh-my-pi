@@ -1,0 +1,33 @@
+database_name: dw_chattermill
+table_name: fact_answer_category
+columns:
+  sk_answer_category:
+    lineage:
+      - datalake_chattermill.responses.id_response_tag
+  sk_answer_classification:
+    lineage:
+      - datalake_chattermill.responses.id
+  sk_answer:
+    lineage:
+      - datalake_chattermill.responses.id_response
+  sk_category:
+    lineage:
+      - datalake_chattermill.responses.id_tag_theme
+  sk_answer_classification_created_date:
+    lineage:
+      - datalake_chattermill.responses.ts_created
+  sk_answer_classification_updated_date:
+    lineage:
+      - datalake_chattermill.responses.ts_updated
+  sentiment:
+    lineage:
+      - datalake_chattermill.responses.tag_sentiment
+  score:
+    lineage:
+      - datalake_chattermill.responses.score
+  original_comment:
+    lineage:
+      - datalake_chattermill.responses.original_comment
+  comment:
+    lineage:
+      - datalake_chattermill.responses.comment
