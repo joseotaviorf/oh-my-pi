@@ -3,13 +3,13 @@ table_name: dim_house_listing
 columns:
   sk_house_listing:
     lineage:
-      - datalake_ebdb_listing.house_listing.sk_house_listing
+      - datalake_ebdb_listing.house_listing.id_house_listing
   id_house:
     lineage:
-      - datalake_ebdb_listing.house.id_house
+      - datalake_ebdb_listing.house.id
   short_id_house:
     lineage:
-      - datalake_ebdb_listing.house.short_id_house
+      - datalake_ebdb_listing.house.id
   version:
     lineage:
       - datalake_ebdb_listing.house_listing.version
@@ -24,14 +24,14 @@ columns:
       - datalake_ebdb_listing.house_listing.ts_listing_version_end
   ts_house_first_publication:
     lineage:
-      - datalake_ebdb_listing.house.ts_house_first_publication
+      - datalake_ebdb_listing.house.dt_first_publication
   ts_house_last_publication:
     lineage:
-      - datalake_ebdb_listing.house.ts_house_last_publication
+      - datalake_ebdb_listing.house.ts_last_publication
   ts_publication:
     lineage:
-      - datalake_ebdb_listing.house_listing.ts_publication
-  ts_last_unpublished:
+      - datalake_ebdb_listing.house_listing.ts_listing_version_start
+  ts_last_de_publication:
     lineage:
       - datalake_ebdb_listing.house_listing.ts_last_unpublished
   rent:
@@ -130,7 +130,7 @@ columns:
   house_unpublished_reason:
     lineage:
       - datalake_ebdb_listing.house.unpublished_reason
-  listing_category:
+  listing_category_start:
     lineage:
       - datalake_ebdb_listing.house_listing.listing_category
   is_last_version:
@@ -189,13 +189,7 @@ columns:
       - datalake_ebdb_listing.house_listing.dt_last_iorent_opted_out
   sale_price:
     lineage:
-      - datalake_ebdb_listing.house_listing.sale_price
-  is_for_rent:
-    lineage:
-      - datalake_ebdb_listing.house_listing.is_for_rent
-  is_for_sale:
-    lineage:
-      - datalake_ebdb_listing.house_listing.is_for_sale
+      - datalake_ebdb_listing.house.sale_price
   has_instant_offer_enabled:
     lineage:
-      - datalake_ebdb_listing.house_listing.has_instant_offer_enabled
+      - datalake_ebdb_listing.house.has_instant_offer_enabled

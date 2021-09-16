@@ -103,7 +103,7 @@ house_listings AS (
         h.dt_first_publication AS ts_house_first_publication,
         h.ts_last_publication AS ts_house_last_publication,
         CAST(hl.ts_listing_version_start AS DATE) AS ts_publication,
-        hl.ts_last_unpublished, -- TODO ts_last_unpublished CHECK WITH ts_last_de_publication
+        hl.ts_last_unpublished,
         hl.rent,
         h.rent AS house_rent,
         h.neighborhood AS house_neighborhood,
