@@ -1,0 +1,18 @@
+database_name: datalake_credit_evers
+table_name: credit_evers_original_due_date
+columns:
+  id_contract_ebdb:
+    lineage:
+      - datalake_invoice.credit_invoice_original_due_date.id_contract_ebdb
+  id_contract_retsuko:
+    lineage:
+      - datalake_invoice.credit_invoice_original_due_date.id_contract_retsuko
+  id_proposal:
+    lineage:
+      - datalake_invoice.credit_invoice_original_due_date.id_proposal
+  ts_signature:
+    lineage:
+      - datalake_invoice.credit_invoice_original_due_date.ts_signature
+  dt_contract_updated:
+    lineage:
+      - datalake_invoice.credit_invoice_original_due_date.dt_contract_updated
