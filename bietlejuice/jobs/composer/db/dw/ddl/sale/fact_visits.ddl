@@ -23,6 +23,7 @@ CREATE TABLE sale.fact_visits (
     sk_visit_follow_up_date BIGINT,
     sk_agent_review_rating_date BIGINT,
     sk_buyer_review_rating_date BIGINT,
+    hub_agent_region VARCHAR,
     is_hub_flow BOOLEAN,
     is_house_rented BOOLEAN,
     is_virtual_visit BOOLEAN,

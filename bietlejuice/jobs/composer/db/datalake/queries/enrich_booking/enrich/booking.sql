@@ -228,7 +228,8 @@ booking_hub_agent AS (
           OR previous_id_work_contract IS NULL
       )
   SELECT
-    b.id
+    b.id,
+    wc.contract_name
   FROM
     agent_contract ac
   JOIN
@@ -356,6 +357,7 @@ base_booking AS (
       ),
       'Unknown')
     AS reason_category,
+    bha.contract_name AS hub_agent_region,
     b.ts_visit_fup,
     b.ts_created,
     b.ts_updated,

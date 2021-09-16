@@ -29,6 +29,7 @@ SELECT
     COALESCE(BIGINT(DATE_FORMAT(b.ts_visit_fup, 'yyyyMMdd')), -1) AS sk_visit_follow_up_date,
     COALESCE(BIGINT(DATE_FORMAT(ar.ts_created, 'yyyyMMdd')), -1) AS sk_agent_review_rating_date,
     COALESCE(BIGINT(DATE_FORMAT(br.dt_creation, 'yyyyMMdd')), -1) AS sk_buyer_review_rating_date,
+    b.hub_agent_region AS hub_agent_region,
     COALESCE(b.is_hub_flow,FALSE) AS is_hub_flow,
     COALESCE(b.is_house_rented,FALSE) AS is_house_rented,
     COALESCE(b.is_virtual_visit,FALSE) AS is_virtual_visit,
