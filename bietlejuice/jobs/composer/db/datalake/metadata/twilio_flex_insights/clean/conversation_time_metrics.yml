@@ -3,34 +3,34 @@ table_name: conversation_time_metrics
 columns:
   id_conversation:
     lineage:
-      - datalake_twilio_flex_insights_raw.conversation
+      - datalake_twilio_flex_insights_raw.conversation_time_metrics.conversation
   id_reservation:
     lineage:
-      - datalake_twilio_flex_insights_raw.conversation_attribute_4
+      - datalake_twilio_flex_insights_raw.conversation_time_metrics.conversation_attribute_4
   id_segment:
     lineage:
-      - datalake_twilio_flex_insights_raw.segment
+      - datalake_twilio_flex_insights_raw.conversation_time_metrics.segment
   queue_time:
     lineage:
-      - datalake_twilio_flex_insights_raw.queue_time
+      - datalake_twilio_flex_insights_raw.conversation_time_metrics.queue_time
   talk_time:
     lineage:
-      - datalake_twilio_flex_insights_raw.talk_time
+      - datalake_twilio_flex_insights_raw.conversation_time_metrics.talk_time
   wrap_up_time:
     lineage:
-      - datalake_twilio_flex_insights_raw.wrap_up_time
+      - datalake_twilio_flex_insights_raw.conversation_time_metrics.wrap_up_time
   handling_time:
     lineage:
-      - datalake_twilio_flex_insights_raw.handling_time
+      - datalake_twilio_flex_insights_raw.conversation_time_metrics.handling_time
   dt_created:
     lineage:
-      - datalake_twilio_flex_insights_raw.date
+      - datalake_twilio_flex_insights_raw.conversation_time_metrics.date
   year:
     lineage:
-      - datalake_twilio_flex_insights_raw.year
+      - datalake_twilio_flex_insights_raw.conversation_time_metrics.year
   month:
     lineage:
-      - datalake_twilio_flex_insights_raw.month
+      - datalake_twilio_flex_insights_raw.conversation_time_metrics.month
   day:
     lineage:
-      - datalake_twilio_flex_insights_raw.day
+      - datalake_twilio_flex_insights_raw.conversation_time_metrics.day
