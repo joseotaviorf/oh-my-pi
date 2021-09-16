@@ -1,4 +1,4 @@
-database_name: dw_criteo_campaign
+database_name: dw_criteo_campaigns
 table_name: dim_criteo_campaign
 columns:
   sk_criteo_campaign:
