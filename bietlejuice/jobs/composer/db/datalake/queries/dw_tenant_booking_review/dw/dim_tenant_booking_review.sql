@@ -1,26 +1,134 @@
-select
-    b.id as sk_tenant_booking_review,
-    b.id as id_tenant_booking_review,
-    min(review.status) as review_status,
-    max(case when array_contains(review.labels, '') then null else review.labels[1] end) as visit_not_happened_reason,
-    cast(max(case when ftr.name='listingfidelity_v2' then array_join(rf.rating_selected, ',') else null end) as boolean) as is_listing_accurate,
-    max(case when ftr.name='wronglistinginfo' then array_join(rf.rating_selected, ',') else null end) as wrong_listing_info,
-    cast(max(case when ftr.name='offerintent' then array_join(rf.rating_selected, ',') else null end) as boolean) as is_offer_intent,
-    max(case when ftr.name='noofferintentreason' then array_join(rf.rating_selected, ',') else null end) as no_offer_intent_reason,
-    cast(max(case when ftr.name='painting' then array_join(rf.rating_selected, ',') else null end) as smallint) as painting,
-    cast(max(case when ftr.name='costbenefit' then array_join(rf.rating_selected, ',') else null end) as smallint) as cost_benefit,
-    cast(max(case when ftr.name='conservation' then array_join(rf.rating_selected, ',') else null end) as smallint) as conservation,
-    cast(max(case when ftr.name='cleaning' then array_join(rf.rating_selected, ',') else null end) as smallint) as cleaning,
-    cast(max(case when ftr.name='furniture' then array_join(rf.rating_selected, ',') else null end) as smallint) as furniture,
-    cast(max(case when ftr.name='naturallight' then array_join(rf.rating_selected, ',') else null end) as smallint) as natural_light,
-    cast(max(case when ftr.name='indoorsilence' then array_join(rf.rating_selected, ',') else null end) as smallint) as indoor_silence,
-    cast(max(case when ftr.name='agentperformance' then array_join(rf.rating_selected, ',') else null end) as smallint) as agent_performance,
-    cast(max(case when ftr.name='wantsameagent' then array_join(rf.rating_selected, ',') else null end) as boolean) as does_want_same_agent,
-    max(case when ftr.name='visittype' then array_join(rf.rating_selected, ',') else null end) as visit_type,
-    max(review.comment) as comment from datalake_insider_clean.review review
-    join datalake_ebdb_clean.visit v on review.id_reviewed = v.code
-    join datalake_ebdb_clean.booking b on b.id_visit = v.id
-    left join datalake_insider_clean.review_feature rf on review.id = rf.id_review
-    left join datalake_insider_clean.feature ftr on rf.id_feature = ftr.id
-    where review.type='tenant_visit' 
-    group by 1
+SELECT
+  b.id AS sk_tenant_booking_review,
+  b.id AS id_tenant_booking_review,
+  MIN(review.status) AS review_status,
+  MAX(
+    CASE
+      WHEN array_contains(review.labels, '') THEN NULL
+      ELSE review.labels[1]
+    END
+  ) AS visit_not_happened_reason,
+  CAST(
+    MAX(
+      CASE
+        WHEN ftr.name = 'listingfidelity_v2' THEN array_join(rf.rating_selected, ',')
+        ELSE NULL
+      END
+    ) AS BOOLEAN
+  ) AS is_listing_accurate,
+  MAX(
+    CASE
+      WHEN ftr.name = 'wronglistinginfo' THEN array_join(rf.rating_selected, ',')
+      ELSE NULL
+    END
+  ) AS wrong_listing_info,
+  CAST(
+    MAX(
+      CASE
+        WHEN ftr.name = 'offerintent' THEN array_join(rf.rating_selected, ',')
+        ELSE NULL
+      END
+    ) AS BOOLEAN
+  ) AS is_offer_intent,
+  MAX(
+    CASE
+      WHEN ftr.name = 'noofferintentreason' THEN array_join(rf.rating_selected, ',')
+      ELSE NULL
+    END
+  ) AS no_offer_intent_reason,
+  CAST(
+    MAX(
+      CASE
+        WHEN ftr.name = 'painting' THEN array_join(rf.rating_selected, ',')
+        ELSE NULL
+      END
+    ) AS SMALLINT
+  ) AS painting,
+  CAST(
+    MAX(
+      CASE
+        WHEN ftr.name = 'costbenefit' THEN array_join(rf.rating_selected, ',')
+        ELSE NULL
+      END
+    ) AS SMALLINT
+  ) AS cost_benefit,
+  CAST(
+    MAX(
+      CASE
+        WHEN ftr.name = 'conservation' THEN array_join(rf.rating_selected, ',')
+        ELSE NULL
+      END
+    ) AS SMALLINT
+  ) AS conservation,
+  CAST(
+    MAX(
+      CASE
+        WHEN ftr.name = 'cleaning' THEN array_join(rf.rating_selected, ',')
+        ELSE NULL
+      END
+    ) AS SMALLINT
+  ) AS cleaning,
+  CAST(
+    MAX(
+      CASE
+        WHEN ftr.name = 'furniture' THEN array_join(rf.rating_selected, ',')
+        ELSE NULL
+      END
+    ) AS SMALLINT
+  ) AS furniture,
+  CAST(
+    MAX(
+      CASE
+        WHEN ftr.name = 'naturallight' THEN array_join(rf.rating_selected, ',')
+        ELSE NULL
+      END
+    ) AS SMALLINT
+  ) AS natural_light,
+  CAST(
+    MAX(
+      CASE
+        WHEN ftr.name = 'indoorsilence' THEN array_join(rf.rating_selected, ',')
+        ELSE NULL
+      END
+    ) AS SMALLINT
+  ) AS indoor_silence,
+  CAST(
+    MAX(
+      CASE
+        WHEN ftr.name = 'agentperformance' THEN array_join(rf.rating_selected, ',')
+        ELSE NULL
+      END
+    ) AS SMALLINT
+  ) AS agent_performance,
+  CAST(
+    MAX(
+      CASE
+        WHEN ftr.name = 'wantsameagent' THEN array_join(rf.rating_selected, ',')
+        ELSE NULL
+      END
+    ) AS BOOLEAN
+  ) AS does_want_same_agent,
+  MAX(
+    CASE
+      WHEN ftr.name = 'visittype' THEN array_join(rf.rating_selected, ',')
+      ELSE NULL
+    END
+  ) AS visit_type,
+  MAX(review.comment) AS comment
+FROM
+  datalake_insider_clean.review AS review
+  JOIN
+    datalake_ebdb_clean.visit AS v
+      ON review.id_reviewed = v.code
+  JOIN
+    datalake_ebdb_clean.booking AS b
+      ON b.id_visit = v.id
+  LEFT JOIN
+    datalake_insider_clean.review_feature AS rf
+      ON review.id = rf.id_review
+  LEFT JOIN
+    datalake_insider_clean.feature AS ftr
+      ON rf.id_feature = ftr.id
+WHERE
+  review.type = 'tenant_visit'
+GROUP BY 1

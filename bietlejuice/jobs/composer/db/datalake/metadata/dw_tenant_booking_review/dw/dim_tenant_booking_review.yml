@@ -1,0 +1,16 @@
+database_name: dw_public
+table_name: dim_tenant_booking_review
+columns:
+  sk_tenant_booking_review:
+    lineage:
+      - datalake_ebdb_clean.booking.id
+  id_tenant_booking_review:
+    lineage:
+      - datalake_ebdb_clean.booking.id
+  review_status:
+    lineage:
+      - datalake_insider_clean.review.status
+  comment:
+    lineage:
+      - datalake_insider_clean.review.comment
+  
