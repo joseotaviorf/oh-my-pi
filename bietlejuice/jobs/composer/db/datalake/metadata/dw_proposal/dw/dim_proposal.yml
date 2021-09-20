@@ -1,0 +1,147 @@
+database_name: dw_janus
+table_name: dim_proposal
+columns:
+  sk_proposal:
+    lineage:
+      - datalake_proposal.proposal.id
+  id_proposal:
+    lineage:
+      - datalake_proposal.proposal.id
+  guarantee:
+    lineage:
+      - datalake_proposal.proposal.guarantee
+  status:
+    lineage:
+      - datalake_proposal.proposal.status
+  status_doc_tenant:
+    lineage:
+      - datalake_proposal.proposal.tenant_documentation_status
+  status_doc_owner:
+    lineage:
+      - datalake_proposal.proposal.owner_documentation_status
+  rejection_reason:
+    lineage:
+      - datalake_proposal.proposal.rejection_reason
+  result_credit_evaluation:
+    lineage:
+      - datalake_docx.credit_evaluation.proposal_last_result
+  status_sortinghat:
+    lineage:
+      - datalake_sorting_hat_clean.proposal.status
+  renting_proposal_value:
+    lineage:
+      - datalake_proposal.proposal.rent_proposal
+  tenant_document_sent_count:
+    lineage:
+      - datalake_proposal.proposal.tenant_doc_sent_count
+  credit_evaluation_count:
+    lineage:
+      - datalake_docx.credit_evaluation.proposal_number_evaluations
+  tenant_document_sent:
+    lineage:
+      - datalake_proposal.proposal.has_tenant_sent_documentation
+  tenant_contract_accepted:
+    lineage:
+      - datalake_proposal.proposal.has_tenant_accepted_contract
+  owner_contract_accepted:
+    lineage:
+      - datalake_proposal.proposal.has_owner_accepted_contract
+  owner_document_sent:
+    lineage:
+      - datalake_proposal.proposal.has_owner_sent_documentation
+  flg_doc_reused:
+    lineage:
+      - datalake_proposal.proposal.is_doc_reused
+  dt_proposal:
+    lineage:
+      - datalake_proposal.proposal.ts_proposal
+  dt_proposal_approved:
+    lineage:
+      - datalake_proposal.proposal.ts_approved
+  ts_processed:
+    lineage:
+      - datalake_proposal.proposal.ts_processed
+  dt_created:
+    lineage:
+      - datalake_proposal.proposal.ts_created
+  dt_updated:
+    lineage:
+      - datalake_proposal.proposal.ts_updated
+  dt_tenant_document_sent:
+    lineage:
+      - datalake_proposal.proposal.ts_documentation_sent
+  dt_owner_document_sent:
+    lineage:
+      - datalake_proposal.proposal.ts_owner_documentation_sent
+  dt_tenant_first_document_sent:
+    lineage:
+      - datalake_proposal.proposal.ts_tenant_first_doc_sent
+  dt_tenant_auto_first_doc_sent:
+    lineage:
+      - datalake_proposal.proposal.ts_tenant_auto_first_doc_sent
+  dt_credit_analysis_first_init:
+    lineage:
+      - datalake_proposal.proposal.ts_credit_analysis_first_init
+  dt_credit_analysis_init:
+    lineage:
+      - datalake_proposal.proposal.ts_credit_analysis_last_init
+  dt_credit_analysis_first_end:
+    lineage:
+      - datalake_proposal.proposal.ts_credit_analysis_first_end
+  dt_credit_analysis_end:
+    lineage:
+      - datalake_proposal.proposal.ts_credit_analysis_last_end
+  dt_credit_last_approved:
+    lineage:
+      - datalake_proposal.proposal.ts_credit_approved_last
+  dt_tenant_first_doc_complete:
+    lineage:
+      - datalake_proposal.proposal.ts_tenant_first_doc_complete
+  dt_tenant_last_doc_complete:
+    lineage:
+      - datalake_proposal.proposal.ts_tenant_last_doc_complete
+  dt_first_credit_evaluation_init:
+    lineage:
+      - datalake_proposal.proposal.ts_credit_evaluation_first_init
+  dt_last_credit_evaluation_init:
+    lineage:
+      - datalake_proposal.proposal.ts_credit_evaluation_last_init
+  dt_first_credit_evaluation_negative:
+    lineage:
+      - datalake_proposal.proposal.ts_credit_evaluation_first_negative
+  dt_last_credit_evaluation_negative:
+    lineage:
+      - datalake_proposal.proposal.ts_credit_evaluation_last_negative
+  dt_guarantee:
+    lineage:
+      - datalake_proposal.proposal.ts_guarantee
+  dt_first_doc_analysis_approved:
+    lineage:
+      - datalake_proposal.proposal.ts_doc_analysis_first_approved
+  dt_last_doc_analysis_approved:
+    lineage:
+      - datalake_proposal.proposal.ts_doc_analysis_last_approved
+  dt_first_doc_analysis_rejected:
+    lineage:
+      - datalake_proposal.proposal.ts_doc_analysis_first_rejected
+  dt_last_doc_analysis_rejected:
+    lineage:
+      - datalake_proposal.proposal.ts_doc_analysis_last_rejected
+  dt_guarantee_paid:
+    lineage:
+      - datalake_proposal.proposal.ts_guarantee_paid
+  dt_first_credit_evaluation_positive:
+    lineage:
+      - datalake_docx.credit_evaluation.ts_proposal_first_credit_evaluation_positive
+  dt_last_credit_evaluation_positive:
+    lineage:
+      - datalake_docx.credit_evaluation.ts_proposal_last_credit_evaluation_positive
+  dt_credit_analysis_last_init:
+    lineage:
+      - datalake_proposal.proposal.dt_credit_analysis_last_init
+  dt_credit_analysis_last_end:
+    lineage:
+      - datalake_proposal.proposal.dt_credit_analysis_last_end
+  dt_tenant_doc_complete:
+    lineage:
+      - datalake_proposal.proposal.ts_tenant_last_doc_complete
