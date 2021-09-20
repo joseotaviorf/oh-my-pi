@@ -1,0 +1,72 @@
+database_name: dw_janus
+table_name: dim_region
+columns:
+  sk_region:
+    lineage:
+      - datalake_region.region.id
+  id:
+    lineage:
+      - datalake_region.region.id
+  macro_id:
+    lineage:
+      - datalake_region.region.id_macro_region
+  city_id:
+    lineage:
+      - datalake_region.region.id_city
+  level:
+    lineage:
+      - datalake_region.region.level
+  name:
+    lineage:
+      - datalake_region.region.name
+  macro_name:
+    lineage:
+      - datalake_region.region.macro_region_name
+  city_name:
+    lineage:
+      - datalake_region.region.city_name
+  city_group:
+    lineage:
+      - datalake_region.region.city_group
+  city_ddd:
+    lineage:
+      - datalake_region.region.city_ddd
+  region_code:
+    lineage:
+      - datalake_region.region.region_code
+  region_code_deprecated:
+    lineage:
+      - datalake_region.region.region_code_deprecated
+  region_code_inspector:
+    lineage:
+      - datalake_region.region.region_code_inspector
+  short_region_name:
+    lineage:
+      - datalake_region.region.short_region_name
+  greater_region:
+    lineage:
+      - datalake_region.region.greater_region
+  regional:
+    lineage:
+      - datalake_region.region.regional
+  regional_deprecated:
+    lineage:
+      - datalake_region.region.regional_deprecated
+  regional_inspection:
+    lineage:
+      - datalake_region.region.regional_inspection
+  tier:
+    lineage:
+      - datalake_region.region.tier
+  dt_first_booking:
+    lineage:
+      - datalake_booking.booking.dt_booking
+  dt_first_property_created:
+    lineage:
+      - datalake_ebdb_listing.house.dt_creation
+  dt_created:
+    lineage:
+      - datalake_region.region.ts_created
+  dt_updated:
+    lineage:
+      - datalake_region.region.ts_updated
