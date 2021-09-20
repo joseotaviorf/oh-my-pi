@@ -12,7 +12,7 @@ class MetadataPropagatorPipeline(AbstractPipeline):
 
     ENDPOINT_MAP = {
         MetadataTypeEnum.LINEAGE.value: "/lineage",
-        MetadataTypeEnum.LINEAGE_FROM_PRODUCT.value: "/lineageFromProduct",
+        MetadataTypeEnum.FULL_CONTENT_LINEAGE.value: "/fullContentLineage",
         MetadataTypeEnum.TAGS.value: "/tags",
     }
 

@@ -143,7 +143,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         ):
             metadata_type = MetadataTypeEnum.TAGS.value
         elif create_lineage:
-            metadata_type = MetadataTypeEnum.LINEAGE_FROM_PRODUCT.value
+            metadata_type = MetadataTypeEnum.FULL_CONTENT_LINEAGE.value
 
         if metadata_type:
             propagate_table_lineage_task = QuintoAndarDatabricksSubmitRunOperator(

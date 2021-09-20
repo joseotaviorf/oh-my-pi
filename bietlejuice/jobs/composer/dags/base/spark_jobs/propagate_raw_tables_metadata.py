@@ -29,7 +29,7 @@ def get_all_tables_metadata(spark_metastore_helper, metadata_type, relative_file
     tables_spark_metadata = dict()
     for table_name in spark_metastore_helper.get_table_names():
 
-        if metadata_type == MetadataTypeEnum.LINEAGE_FROM_PRODUCT:
+        if metadata_type == MetadataTypeEnum.FULL_CONTENT_LINEAGE:
             spark_ms_table_columns = spark_metastore_helper.get_spark_metastore_table_columns(
                 table_name
             )
@@ -78,7 +78,7 @@ class MetadataPropagator:
                 metadata_type=self.metadata_type,
             ).run()
 
-        if self.metadata_type == MetadataTypeEnum.LINEAGE_FROM_PRODUCT:
+        if self.metadata_type == MetadataTypeEnum.FULL_CONTENT_LINEAGE:
             RawLineagePipeline(
                 metadata_propagator_host=self.metadata_propagator_host,
                 database_name=self.database_name,

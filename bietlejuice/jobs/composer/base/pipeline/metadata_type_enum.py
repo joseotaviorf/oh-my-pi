@@ -3,5 +3,5 @@ from enum import Enum
 
 class MetadataTypeEnum(Enum):
     LINEAGE = "lineage"
-    LINEAGE_FROM_PRODUCT = "lineage_from_product"
+    FULL_CONTENT_LINEAGE = "full_content_lineage"
     TAGS = "tags"

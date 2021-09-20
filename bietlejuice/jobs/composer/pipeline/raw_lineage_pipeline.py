@@ -17,7 +17,7 @@ class RawLineagePipeline(MetadataPropagatorPipeline):
             metadata_propagator_host,
             database_name,
             table_name,
-            MetadataTypeEnum.LINEAGE_FROM_PRODUCT,
+            MetadataTypeEnum.FULL_CONTENT_LINEAGE,
         )
         self.table_schema = table_schema
         self.source_name = source_name
@@ -27,6 +27,7 @@ class RawLineagePipeline(MetadataPropagatorPipeline):
             "vendor": ["atlas"],
             "database_name": self.database_name,
             "table_name": self.table_name,
+            "is_input_from_product": True,
         }
         columns = {}
         for col_name, col_type in self.table_schema.items():
