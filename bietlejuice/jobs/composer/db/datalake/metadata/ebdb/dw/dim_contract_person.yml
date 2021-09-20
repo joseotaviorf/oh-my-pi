@@ -1,0 +1,33 @@
+database_name: dw_quintoandar
+table_name: dim_contract_person
+columns:
+  sk_contract_person:
+    lineage:
+      - datalake_ebdb_clean.contract_person.id
+  full_name:
+    lineage:
+      - datalake_ebdb_clean.contract_person.name
+  phone_number:
+    lineage:
+      - datalake_ebdb_clean.contract_person.phone_number
+  email:
+    lineage:
+      - datalake_ebdb_clean.contract_person.email
+  personal_document:
+    lineage:
+      - datalake_ebdb_clean.contract_person.cpf
+  gender:
+    lineage:
+      - datalake_ebdb_clean.contract_person.gender
+  state_code:
+    lineage:
+      - datalake_ebdb_clean.contract_person.state_id
+  dt_birth:
+    lineage:
+      - datalake_ebdb_clean.contract_person.dt_birth
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.contract_person.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.contract_person.ts_updated

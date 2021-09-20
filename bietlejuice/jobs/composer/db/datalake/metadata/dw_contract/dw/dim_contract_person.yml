@@ -1,0 +1,42 @@
+database_name: dw_quintoandar_temp
+table_name: dim_contract_person
+columns:
+  sk_contract_person:
+    lineage:
+      - datalake_ebdb_contract.ongoing_contracts.id_contract_person
+  full_name:
+    lineage:
+      - datalake_ebdb_contract.ongoing_contracts.full_name
+  phone_number:
+    lineage:
+      - datalake_ebdb_contract.ongoing_contracts.phone_number
+  email:
+    lineage:
+      - datalake_ebdb_contract.ongoing_contracts.email
+  personal_document:
+    lineage:
+      - datalake_ebdb_contract.contract_person.personal_document
+  personal_document_type:
+    lineage:
+      - datalake_ebdb_contract.contract_person.personal_document_type
+  has_ongoing_contract:
+    lineage:
+      - datalake_ebdb_contract.ongoing_contracts.has_ongoing_contract
+  gender:
+    lineage:
+      - datalake_ebdb_contract.contract_person.gender
+  marital_status:
+    lineage:
+      - datalake_ebdb_contract.contract_person.marital_status
+  state_code:
+    lineage:
+      - datalake_ebdb_contract.contract_person.state_code
+  dt_birth:
+    lineage:
+      - datalake_ebdb_contract.contract_person.dt_birth
+  ts_created:
+    lineage:
+      - datalake_ebdb_contract.contract_person.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_contract.contract_person.ts_updated
