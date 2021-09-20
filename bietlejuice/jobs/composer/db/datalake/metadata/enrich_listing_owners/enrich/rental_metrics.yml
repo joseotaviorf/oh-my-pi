@@ -1,0 +1,36 @@
+database_name: datalake_listing_owners
+table_name: rental_metrics
+columns:
+  id_listing_owner:
+    lineage:
+      - datalake_ebdb_listing.house.id_user 
+  ts_first_booking:
+    lineage:
+      - datalake_booking.booking.ts_created
+  ts_first_offer_received:
+    lineage:
+      - datalake_offer.offer.ts_created
+  ts_first_offer_accepted:
+    lineage:
+      - datalake_ebdb_clean.proposal.ts_created
+  ts_first_contract_signed:
+    lineage:
+      - datalake_ebdb_contract.contract.ts_signed
+  ts_first_listing_registered:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context.ts_created
+  ts_last_booking:
+    lineage:
+      - datalake_booking.booking.ts_created
+  ts_last_offer_received:
+    lineage:
+      - datalake_offer.offer.ts_created
+  ts_last_offer_accepted:
+    lineage:
+      - datalake_ebdb_clean.proposal.ts_created
+  ts_last_contract_signed:
+    lineage:
+      - datalake_ebdb_contract.contract.ts_signed
+  ts_last_listing_registered:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context.ts_created
