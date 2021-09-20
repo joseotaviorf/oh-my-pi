@@ -16,6 +16,7 @@ This pipeline produces the following output table in DW, via full load:
 
 - `dim_condo`
 - `dim_house_listing`
+- `fact_house_listing_status`
 
 ### Responsible Data Teams
 
