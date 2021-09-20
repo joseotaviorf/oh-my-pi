@@ -72,6 +72,9 @@ columns:
   sk_buyer_review_rating_date:
     lineage:
       - datalake_insider_clean.review.dt_creation
+  hub_agent_region:
+    lineage:
+      - datalake_booking.booking.hub_agent_region
   is_hub_flow:
     lineage:
       - datalake_booking.booking.is_hub_flow
