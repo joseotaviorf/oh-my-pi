@@ -1,0 +1,28 @@
+database_name: dw_quintoandar
+table_name: fact_proposal_people
+columns:
+  sk_proposal_person:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.id
+  sk_personal_document:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.cpf
+  sk_proponent:
+    lineage:
+      - datalake_ebdb_clean.user.id
+  sk_proposal:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.id_proposal
+  sk_birth_date:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.dt_birth
+  sk_created_date:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.ts_created
+  is_going_to_live:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.will_live
+  brl_total_income:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.additional_income
+      - datalake_ebdb_clean.proponent_proposal.monthly_salary

@@ -1,0 +1,43 @@
+database_name: dw_quintoandar
+table_name: dim_proposal_person
+columns:
+  sk_proposal_person:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.id
+  full_name:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.name
+  phone_number:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.phone_number
+  email:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.email
+  personal_document:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.cpf
+  number_of_dependents:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.number_of_dependents
+  has_contributed_to_current_house:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.has_contributed_to_current_house
+  gender:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.gender
+  marital_status:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.marital_status
+  state_code:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.id_estado
+  dt_birth:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.dt_birth
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.ts_updated
+  
