@@ -84,3 +84,7 @@ columns:
   nr_renting:
     lineage:
       - datalake_ebdb_contract.contract.id
+  dt_stranded:
+    lineage:
+      - datalake_ebdb_listing.house_listing_status.ts_status_started
+      - datalake_ebdb_listing.house_listing.ts_listing_version_start

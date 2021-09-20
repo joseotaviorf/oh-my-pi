@@ -1,4 +1,4 @@
-with house_aud as (
+WITH house_aud as (
 --------------------------------------------------------------------------------------------------------
 -- Bring to IMOVEL_AUD datetime for each revision made                                                --
 -- Also creates previous_status column so we can identify status changes                              --
@@ -309,27 +309,126 @@ house_listing_latest_contracts AS (
 ----------------------------------------------------------------------------------------------------------
 -- Include information related to contracts (including only active or ended contracts) for each listing --
 ----------------------------------------------------------------------------------------------------------
-    select 
+    select
       hl.id_house_listing,
       max(c.id) as id_contract,
       dense_rank() over (partition by hl.id_house order by hl.id_house_listing) as order_renting
-    from house_listing hl 
+    from house_listing hl
     join datalake_ebdb_contract.contract c
       on hl.id_house = c.id_house
       and c.ts_signed between coalesce(hl.ts_listing_version_start, '2000-01-01 00:00:00') and coalesce(hl.ts_listing_version_end, current_date)
       and c.status in ('Ativo', 'Finalizado')
     group by 1, hl.id_house
+),
+house_listing_stranded_status_all AS (
+    --select all status FROM each listing, calculate date_to_be_stranded using publication_date AND find IN which status was the stranded date
+    SELECT
+        hls.id_house_listing,
+        hls.status_history,
+        hls.ts_status_started,
+        COALESCE(hls.ts_status_ended, (CURRENT_TIMESTAMP - INTERVAL 1 day)) AS ts_status_ended,
+        hl.ts_listing_version_start,
+        (hl.ts_listing_version_start + INTERVAL 8 week) AS ts_to_be_stranded,
+        CASE
+            WHEN (hl.ts_listing_version_start + INTERVAL 8 week) <= hls.ts_status_started
+              OR (hl.ts_listing_version_start + INTERVAL 8 week) <= COALESCE(hls.ts_status_ended, (CURRENT_TIMESTAMP - INTERVAL 1 day))
+            THEN 'stranded'
+        END AS type_stranded,
+        LAG(hls.status_history) OVER(PARTITION BY hls.id_house_listing ORDER BY hls.ts_status_started, COALESCE(hls.ts_status_ended, (CURRENT_TIMESTAMP - INTERVAL 1 DAY))) AS previous_status_history
+    FROM datalake_ebdb_listing.house_listing_status hls
+    LEFT JOIN house_listing hl
+      ON hls.id_house_listing = hl.id_house_listing
+      ORDER BY hls.id_house_listing DESC, hls.ts_status_started
+),
+house_listing_stranded_rank_stranded AS (
+    --select only status WHERE stranded date already happened
+    SELECT
+        id_house_listing,
+        status_history,
+            previous_status_history,
+        ts_status_started,
+        ts_status_ended,
+        ts_listing_version_start,
+        ts_to_be_stranded,
+        type_stranded,
+        ROW_NUMBER() OVER (PARTITION BY id_house_listing, type_stranded ORDER BY ts_status_started) AS rn,
+        --calculate min date of all status, because if it is a valid status that is the date that will be used
+        MIN(CASE WHEN type_stranded = 'stranded' THEN ts_status_started END) OVER (PARTITION BY id_house_listing) AS min_ts_all_status,
+        --calculate min date of valid status to define stranded
+        MIN(CASE WHEN type_stranded = 'stranded'
+                      AND status_history IN ('publicado','suspenso','edicao','aguardando_publicacao')
+                                  AND (previous_status_history <> 'alugado' OR previous_status_history is null)
+                 THEN ts_status_started END) over (PARTITION BY id_house_listing) AS min_ts_valid_status,
+        MIN(CASE WHEN type_stranded = 'stranded' THEN ts_to_be_stranded END) over (PARTITION BY id_house_listing) AS min_ts_to_be_stranded
+    FROM house_listing_stranded_status_all
+    WHERE type_stranded IS NOT NULL
+    ORDER BY id_house_listing desc, ts_status_started
+),
+house_listing_stranded_status AS (
+    select
+        *,
+        case WHEN rn = 1 AND status_history = 'alugado' THEN NULL
+             WHEN rn = 1 AND status_history IN ('despublicado','excluido')
+               THEN MIN(min_ts_valid_status) over (PARTITION BY id_house_listing)
+             WHEN rn = 1 AND status_history IN ('publicado','suspenso','edicao','aguardando_publicacao')
+               THEN MIN(min_ts_valid_status) over (PARTITION BY id_house_listing)
+             END AS min_ts_stranded
+            /*
+             * case statement needed IN order to ignore cases where stranded date happened on not valid status
+             * (such AS 'alugado', 'despublicado', 'excluido'), but if it was 'despublicado' consider next valid status
+             * example 0:
+             *  -----------------------------------------------------------------------------------------------------------------
+             *  |listing | min_status_date | max_status_date | status    | ts_publication | date_to_be_stranded | stranded_date |
+             *  | 001    |   2018-12-06    |  2018-12-13     | publicado |  2018-12-06    |  2019-01-31         | NULL          |
+             *  | 001    |   2018-12-13    |  2018-12-14     | suspenso  |  2018-12-06    |  2019-01-31         | NULL          |
+             *  | 001    |   2018-12-14    |  2019-03-19     | alugado   |  2018-12-06    |  2019-01-31         | NULL          |
+             *  -----------------------------------------------------------------------------------------------------------------
+             *
+             * 	example 1:
+             *  --------------------------------------------------------------------------------------------------------------------
+             *  |listing | min_status_date | max_status_date | status       | ts_publication | date_to_be_stranded | stranded_date |
+             *  | 002    |   2018-12-05    |  2019-02-12     | publicado    |  2018-12-05    |  2019-01-30         | 2019-01-31    |
+             *  | 002    |   2019-02-12    |  2019-02-19     | suspenso     |  2018-12-05    |  2019-01-30         | 2019-01-31    |
+             *  | 002    |   2019-02-19    |  2019-03-14     | publicado    |  2018-12-05    |  2019-01-30         | 2019-01-31    |
+             *  | 002    |   2019-03-14    |  2019-03-19     | despublicado |  2018-12-05    |  2019-01-30         | 2019-01-31    |
+             *  --------------------------------------------------------------------------------------------------------------------
+             *
+             * 	example 2:
+             *  --------------------------------------------------------------------------------------------------------------------
+             *  |listing | min_status_date | max_status_date | status       | ts_publication | date_to_be_stranded | stranded_date |
+             *  | 003    |   2018-12-06    |  2018-12-07     | publicado    |  2018-12-06    |  2019-01-31         | 2019-02-11    |
+             *  | 003    |   2018-12-07    |  2019-02-11     | despublicado |  2018-12-06    |  2019-01-31         | 2019-02-11    |
+             *  | 003    |   2019-02-11    |  2019-03-07     | publicado    |  2018-12-06    |  2019-01-31         | 2019-02-11    |
+             *  | 003    |   2019-03-07    |  2019-03-19     | despublicado |  2018-12-06    |  2019-01-31         | 2019-02-11    |
+             *  --------------------------------------------------------------------------------------------------------------------
+             */
+    FROM house_listing_stranded_rank_stranded
+    ORDER BY id_house_listing DESC
+),
+house_listing_stranded_date AS (
+    SELECT
+        DISTINCT id_house_listing,
+        CASE
+            WHEN GREATEST(CAST(COALESCE(min_ts_stranded,'3000-01-01') as TIMESTAMP), min_ts_to_be_stranded) = '3000-01-01'
+            THEN NULL
+            ELSE GREATEST(CAST(COALESCE(min_ts_stranded,'3000-01-01')  as TIMESTAMP), min_ts_to_be_stranded)
+        END AS dt_stranded
+    FROM house_listing_stranded_status
+    WHERE rn = 1
 )
 select
   hl.*,
   hl_c.id_contract,
-  c.ts_signed as ts_contract_signed,
-  c.dt_termination as dt_contract_annulment,
-  lead(c.ts_signed,1) over (partition by hl.id_house order by hl.version) as ts_next_contract_signed,
   count(c.id) over (partition by c.id_house) as nr_renting,
-  hl_c.order_renting
+  hl_c.order_renting,
+  hlsd.dt_stranded,
+  c.dt_termination as dt_contract_annulment,
+  c.ts_signed as ts_contract_signed,
+  lead(c.ts_signed, 1) over (partition by hl.id_house order by hl.version) as ts_next_contract_signed
 from house_listing hl
 left join house_listing_latest_contracts hl_c
   on hl.id_house_listing = hl_c.id_house_listing
 left join datalake_ebdb_contract.contract c
   on hl_c.id_contract = c.id
+left join house_listing_stranded_date hlsd
+    ON hlsd.id_house_listing = hl.id_house_listing
