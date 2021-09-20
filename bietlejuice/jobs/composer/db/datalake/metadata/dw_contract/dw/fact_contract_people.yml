@@ -1,0 +1,48 @@
+database_name: dw_quintoandar_temp
+table_name: fact_contract_people
+columns:
+  sk_contract_person:
+    lineage:
+      - datalake_ebdb_contract.contract_person.id_contract_person
+  sk_personal_document:
+    lineage:
+      - datalake_ebdb_contract.contract_person.personal_document
+  sk_user:
+    lineage:
+      - datalake_ebdb_contract.contract_person.id_user_contract_person
+  sk_contract:
+    lineage:
+      - datalake_ebdb_contract.contract_person.id_contract
+  sk_birth_date:
+    lineage:
+      - datalake_ebdb_contract.contract_person.dt_birth
+  sk_created_date:
+    lineage:
+      - datalake_ebdb_contract.contract_person.ts_created
+  sk_updated_date:
+    lineage:
+      - datalake_ebdb_contract.contract_person.ts_updated
+  contract_role:
+    lineage:
+      - datalake_ebdb_contract.contract_person.contract_role
+  is_user:
+    lineage:
+      - datalake_ebdb_contract.contract_person.is_user
+  is_valid_cpf:
+    lineage:
+      - datalake_ebdb_contract.contract_person.is_valid_cpf
+  is_valid_cnpj:
+    lineage:
+      - datalake_ebdb_contract.contract_person.is_valid_cnpj
+  is_contract_user:
+    lineage:
+      - datalake_ebdb_contract.contract_person.is_contract_user
+  is_living:
+    lineage:
+      - datalake_ebdb_contract.contract_person.is_living
+  is_first_contract:
+    lineage:
+      - datalake_ebdb_contract.contract_person.is_first_contract
+  is_last_contract:
+    lineage:
+      - datalake_ebdb_contract.contract_person.is_last_contract

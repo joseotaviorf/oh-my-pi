@@ -1,0 +1,28 @@
+database_name: dw_quintoandar
+table_name: fact_contract_people
+columns:
+  sk_contract_person:
+    lineage:
+      - datalake_ebdb_clean.contract_person.id
+  sk_personal_document:
+    lineage:
+      - datalake_ebdb_clean.contract_person.cpf
+  sk_user:
+    lineage:
+      - datalake_ebdb_clean.contract_person.id_user
+  sk_contract:
+    lineage:
+      - datalake_ebdb_clean.contract_person.id_contract
+  sk_birth_date:
+    lineage:
+      - datalake_ebdb_clean.contract_person.dt_birth
+  sk_created_date:
+    lineage:
+      - datalake_ebdb_clean.contract_person.ts_created
+  sk_updated_date:
+    lineage:
+      - datalake_ebdb_clean.contract_person.ts_updated
+  is_living:
+    lineage:
+      - datalake_ebdb_clean.contract_person.will_live
+  
