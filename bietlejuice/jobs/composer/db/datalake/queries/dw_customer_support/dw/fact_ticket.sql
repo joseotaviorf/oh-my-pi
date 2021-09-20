@@ -67,12 +67,16 @@ WITH call_tickets AS (
       ELSE NULL
     END AS is_fcr,
     has_transfers,
+    SUM(CAST(segment_minutes_talk_time AS FLOAT)) AS total_minutes_talk_time,
+    SUM(CAST(segment_minutes_queue_time AS FLOAT)) AS total_minutes_queue_time,
+    SUM(CAST(segment_minutes_wrap_up_time AS FLOAT)) AS total_minutes_wrap_up_time,
+    SUM(CAST(segment_minutes_handling_time AS FLOAT)) AS total_minutes_handling_time,
     ts_ticket_started AS ts_started,
     ts_ticket_ended AS ts_closed,
     NOW() AS ts_load
   FROM
     datalake_customer_support.call
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,35,36
 ),
 chat_tickets AS (
   SELECT
@@ -143,12 +147,16 @@ chat_tickets AS (
       ELSE NULL
     END AS is_fcr,
     has_transfers,
+    SUM(CAST(segment_minutes_talk_time AS FLOAT)) AS total_minutes_talk_time,
+    SUM(CAST(segment_minutes_queue_time AS FLOAT)) AS total_minutes_queue_time,
+    SUM(CAST(segment_minutes_wrap_up_time AS FLOAT)) AS total_minutes_wrap_up_time,
+    SUM(CAST(segment_minutes_handling_time AS FLOAT)) AS total_minutes_handling_time,
     ts_ticket_started AS ts_started,
     ts_ticket_ended AS ts_closed,
     NOW() AS ts_load
   FROM
     datalake_customer_support.chat
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,35,36
 ),
 email_tickets AS (
   SELECT
@@ -218,12 +226,16 @@ email_tickets AS (
       ELSE NULL
     END AS is_fcr,
     NULL AS has_transfers,
+    NULL AS total_minutes_talk_time,
+    NULL AS total_minutes_queue_time,
+    NULL AS total_minutes_wrap_up_time,
+    NULL AS total_minutes_handling_time,
     ts_ticket_started AS ts_started,
     ts_ticket_ended AS ts_closed,
     NOW() AS ts_load
   FROM 
     datalake_customer_support.email
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36
 )
 SELECT 
   *

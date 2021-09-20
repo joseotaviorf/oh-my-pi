@@ -30,6 +30,10 @@ CREATE TABLE IF NOT EXISTS customer_support.fact_ticket (
     is_solved BOOLEAN,
     is_fcr BOOLEAN,
     has_transfers BOOLEAN,
+    total_minutes_talk_time FLOAT, 
+    total_minutes_queue_time FLOAT,
+    total_minutes_wrap_up_time FLOAT,
+    total_minutes_handling_time FLOAT,
     ts_started TIMESTAMP,
     ts_closed TIMESTAMP,
     ts_load TIMESTAMP
