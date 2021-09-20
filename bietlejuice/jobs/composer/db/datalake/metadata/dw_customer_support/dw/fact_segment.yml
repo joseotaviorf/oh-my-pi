@@ -63,6 +63,22 @@ columns:
     lineage:
       - datalake_customer_support.call.is_last_segment
       - datalake_customer_support.chat.is_last_segment
+  minutes_talk_time:
+    lineage:
+      - datalake_customer_support.call.segment_minutes_talk_time
+      - datalake_customer_support.chat.segment_minutes_talk_time
+  minutes_queue_time:
+    lineage:
+      - datalake_customer_support.call.segment_minutes_queue_time
+      - datalake_customer_support.chat.segment_minutes_queue_time
+  minutes_wrap_up_time:
+    lineage:
+      - datalake_customer_support.call.segment_minutes_wrap_up_time
+      - datalake_customer_support.chat.segment_minutes_wrap_up_time
+  minutes_handling_time:
+    lineage:
+      - datalake_customer_support.call.segment_minutes_handling_time
+      - datalake_customer_support.chat.segment_minutes_handling_time
   ts_started:
     lineage:
       - datalake_customer_support.call.ts_segment_created

@@ -15,6 +15,10 @@ CREATE TABLE IF NOT EXISTS customer_support.fact_segment (
     is_sla BOOLEAN,
     is_first_segment BOOLEAN,
     is_last_segment BOOLEAN,
+    minutes_talk_time FLOAT,
+    minutes_queue_time FLOAT,
+    minutes_wrap_up_time FLOAT,
+    minutes_handling_time FLOAT,
     ts_started TIMESTAMP,
     ts_closed TIMESTAMP,
     ts_load TIMESTAMP
