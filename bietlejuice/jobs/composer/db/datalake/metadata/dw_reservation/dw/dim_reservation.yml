@@ -1,0 +1,36 @@
+database_name: dw_janus
+table_name: dim_reservation
+columns:
+  sk_reservation:
+    lineage:
+      - datalake_kill_queue.reservation.id_reservation
+  id_reservation:
+    lineage:
+      - datalake_kill_queue.reservation.id_reservation
+  version:
+    lineage:
+      - datalake_kill_queue.reservation.version
+  attempt:
+    lineage:
+      - datalake_kill_queue.reservation.attempt
+  status:
+    lineage:
+      - datalake_kill_queue.reservation.status
+  cancellation_reason:
+    lineage:
+      - datalake_kill_queue.reservation.cancellation_reason
+  value:
+    lineage:
+      - datalake_kill_queue.reservation.value
+  installments:
+    lineage:
+      - datalake_kill_queue.reservation.installments
+  is_ongoing:
+    lineage:
+      - datalake_kill_queue.reservation.is_ongoing
+  ts_created:
+    lineage:
+      - datalake_kill_queue.reservation.ts_created
+  ts_updated:
+    lineage:
+      - datalake_kill_queue.reservation.ts_updated
