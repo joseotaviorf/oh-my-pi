@@ -1,0 +1,35 @@
+---
+database_name: dw_quintoandar
+table_name: fact_smart_price_status_changes
+columns:
+  sk_smart_price:
+    lineage:
+      - datalake_ebdb_smart_price.smart_price_versioning.id_smart_price
+  sk_house_listing:
+    lineage:
+      - datalake_ebdb_smart_price.smart_price_versioning.id_house_listing
+  sk_status_started_date:
+    lineage:
+      - datalake_ebdb_smart_price.smart_price_versioning.ts_start_status
+  sk_status_ended_date:
+    lineage:
+      - datalake_ebdb_smart_price.smart_price_versioning.ts_end_status
+  status:
+    lineage:
+      - datalake_ebdb_smart_price.smart_price_versioning.status
+  operation_mode:
+    lineage:
+      - datalake_ebdb_clean.dynamic_pricing_house_aud.operation_mode
+  is_enabled:
+    lineage:
+      - datalake_ebdb_clean.dynamic_pricing_house_aud.is_enabled
+  days_in_status:
+    lineage:
+      - datalake_ebdb_smart_price.smart_price_versioning.ts_end_status
+      - datalake_ebdb_smart_price.smart_price_versioning.ts_start_status
+  ts_status_started:
+    lineage:
+      - datalake_ebdb_smart_price.smart_price_versioning.ts_start_status
+  ts_status_ended:
+    lineage:
+      - datalake_ebdb_smart_price.smart_price_versioning.ts_end_status

@@ -1,0 +1,31 @@
+---
+database_name: dw_quintoandar
+table_name: fact_listing_price_changes
+columns:
+  sk_smart_price:
+    lineage:
+      - datalake_ebdb_smart_price.smart_price_versioning.id_smart_price
+  sk_house_listing:
+    lineage:
+      - datalake_ebdb_clean.house_aud.id_house
+  sk_price_started_date:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  sk_price_ended_date:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  is_smart_pricing_enabled:
+    lineage:
+      - datalake_ebdb_clean.dynamic_pricing_house_aud.is_enabled
+  rent:
+    lineage:
+      - datalake_ebdb_clean.house_aud.rent
+  days_with_same_rent:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  ts_price_started:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  ts_price_ended:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
