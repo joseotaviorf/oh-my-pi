@@ -1,0 +1,27 @@
+database_name: datalake_ebdb_smart_price
+table_name: smart_price_versioning
+columns:
+  id_smart_price:
+    lineage:
+      - datalake_ebdb_clean.house_aud.id_house
+  id_house_listing:
+    lineage:
+      - datalake_ebdb_clean.house_aud.id_house
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.dynamic_pricing_house_aud.id_house
+  id_dynamic_pricing:
+    lineage:
+      - datalake_ebdb_clean.dynamic_pricing_house_aud.id
+  rev_dynamic_pricing_house_aud:
+    lineage:
+      - datalake_ebdb_clean.dynamic_pricing_house_aud.rev
+  id_dynamic_pricing_parameter:
+    lineage:
+      - datalake_ebdb_clean.dynamic_pricing_house_aud.id_dynamic_pricing_parameter
+  status:
+    lineage:
+      - datalake_ebdb_clean.dynamic_pricing_house_aud.status
+  ts_start_status:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
