@@ -1,0 +1,54 @@
+database_name: datalake_bigfone_twilio
+table_name: call_flex_reservations
+columns:
+  id_call:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  id_task:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  id_reservation:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  id_agent:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  id_queue:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  queue_name:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  seconds_duration:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  seconds_wait_time:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  seconds_talk_time:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  ts_created:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  ts_created_local:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  ts_ended:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  ts_ended_local:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  ts_created_unix:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  year:
+    lineage:
+      - datalake_bigfone_events.events.year
+  month:
+    lineage:
+      - datalake_bigfone_events.events.month
+  day:
+    lineage:
+      - datalake_bigfone_events.events.day
