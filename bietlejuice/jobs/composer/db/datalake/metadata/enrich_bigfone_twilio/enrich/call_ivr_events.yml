@@ -1,0 +1,69 @@
+database_name: datalake_bigfone_twilio
+table_name: call_ivr_events
+columns:
+  id:
+    lineage:
+      - datalake_bigfone_events.events.id
+  id_event:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  id_call:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  id_call_teravoz:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  id_task:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  id_channel:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  from_number:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  to_number:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  customer_phone:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  event_type:
+    lineage:
+      - datalake_bigfone_events.events.event
+  task_cancelation_reason:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  steps:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  metadata:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  task_priority:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  csat_1:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  csat_2:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  ts_created_local:
+    lineage:
+      - datalake_bigfone_events.events.ts_created_local
+  ts_received_local:
+    lineage:
+      - datalake_bigfone_events.events.ts_received_local
+  ts_created_local_unix:
+    lineage:
+      - datalake_bigfone_events.events.ts_created_local
+  year:
+    lineage:
+      - datalake_bigfone_events.events.year
+  month:
+    lineage:
+      - datalake_bigfone_events.events.month
+  day:
+    lineage:
+      - datalake_bigfone_events.events.day
