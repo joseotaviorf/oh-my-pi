@@ -145,7 +145,7 @@ SELECT
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS qualifieds,
 	NULL::BIGINT AS opportunities,
-	COUNT(lf.sk_first_listing_date) AS first_listings
+	COUNT(DISTINCT lf.sk_house_listing) AS first_listings
 FROM dim_date dd
 JOIN datamarts.lead_listing_flows lf
   ON dd.sk_date = lf.sk_first_listing_date
