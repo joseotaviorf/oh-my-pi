@@ -1,0 +1,33 @@
+database_name: datalake_bigfone_twilio
+table_name: call_agents
+columns:
+  id_agent:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  email:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  full_name:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  location:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  skills:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  ts_first_event:
+    lineage:
+      - datalake_bigfone_events.events.ts_created_local
+  ts_last_event:
+    lineage:
+      - datalake_bigfone_events.events.ts_created_local
+  year:
+    lineage:
+      - datalake_bigfone_events.events.year
+  month:
+    lineage:
+      - datalake_bigfone_events.events.month
+  day:
+    lineage:
+      - datalake_bigfone_events.events.day
