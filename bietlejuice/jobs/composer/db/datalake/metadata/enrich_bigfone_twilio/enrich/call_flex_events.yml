@@ -1,0 +1,117 @@
+database_name: datalake_bigfone_twilio
+table_name: call_flex_events
+columns:
+  id:
+    lineage:
+      - datalake_bigfone_events.events.id
+  id_event:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  id_task:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  id_reservation:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  id_task_queue:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  id_task_queue_transferred:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  id_call:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  id_conversation:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  id_agent:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  id_agent_transferred:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  from_number:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  to_number:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  customer_phone:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  agent_email:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  department_name:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  task_queue_name:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  event_type:
+    lineage:
+      - datalake_bigfone_events.events.event
+  direction:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  location:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  reason:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  comment:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  metadata:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  task_priority:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  scheduling_source:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  seconds_waiting_time:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  is_scheduled:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  has_wrapup:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  has_csat:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  ts_created_utc:
+    lineage:
+      - datalake_bigfone_events.events.ts_created_local
+  ts_created_local:
+    lineage:
+      - datalake_bigfone_events.events.ts_created_local
+  ts_received_local:
+    lineage:
+      - datalake_bigfone_events.events.ts_received_local
+  ts_transfer_started:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  ts_wrapup_event_local:
+    lineage:
+      - datalake_bigfone_events.events.ts_created_local
+  ts_wrapup_event_local_unix:
+    lineage:
+      - datalake_bigfone_events.events.ts_created_local
+  ts_created_local_unix:
+    lineage:
+      - datalake_bigfone_events.events.ts_created_local
+  year:
+    lineage:
+      - datalake_bigfone_events.events.year
+  month:
+    lineage:
+      - datalake_bigfone_events.events.month
+  day:
+    lineage:
+      - datalake_bigfone_events.events.day
