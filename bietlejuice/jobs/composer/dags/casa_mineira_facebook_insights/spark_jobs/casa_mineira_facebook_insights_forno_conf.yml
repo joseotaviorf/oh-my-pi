@@ -1,0 +1,48 @@
+---
+raw_partition_cols: [year, month, day]
+fields:
+  facebook_insights:
+    - account_id
+    - account_name
+    - ad_id
+    - ad_name
+    - adset_id
+    - adset_name
+    - campaign_id
+    - campaign_name
+    - reach
+    - impressions
+    - clicks
+    - date_start
+    - date_stop
+    - inline_link_clicks
+    - spend
+  facebook_social_insights:
+    - account_id
+    - adset_id
+    - ad_id
+    - campaign_id
+    - impressions
+    - reach
+    - cpm
+    - cpc
+    - clicks
+    - campaign_name
+    - adset_name
+    - ad_name
+
+breakdowns:
+  facebook_insights:
+    - impression_device
+  facebook_social_insights:
+    - publisher_platform
+    - platform_position
+
+accounts:
+  facebook_insights:
+    - "324475549140409"
+    - "200918547394044"
+    - "827510637355828"
+    - "117781505233633"
+  facebook_social_insights:
+    - "351587129983600"

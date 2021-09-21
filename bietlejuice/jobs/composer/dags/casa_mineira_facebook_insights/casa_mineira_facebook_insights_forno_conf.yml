@@ -1,0 +1,8 @@
+---
+tables_list:
+  - facebook_insights
+  # - facebook_social_insights
+partition_cols:
+  - year
+  - month
+  - day

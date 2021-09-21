@@ -1,0 +1,3 @@
+---
+database_name: datalake_casa_mineira_facebook_insights_raw
+table_name: facebook_insights

@@ -1,0 +1,61 @@
+---
+database_name: datalake_casa_mineira_facebook_insights_clean
+table_name: facebook_social_insights
+columns:
+  id_ad:
+    lineage:
+      - datalake_casa_mineira_facebook_insights_raw.facebook_social_insights.ad_id
+  id_account:
+    lineage:
+      - datalake_casa_mineira_facebook_insights_raw.facebook_social_insights.account_id
+  id_adset:
+    lineage:
+      - datalake_casa_mineira_facebook_insights_raw.facebook_social_insights.adset_id
+  id_campaign:
+    lineage:
+      - datalake_casa_mineira_facebook_insights_raw.facebook_social_insights.campaign_id
+  ad_name:
+    lineage:
+      - datalake_casa_mineira_facebook_insights_raw.facebook_social_insights.ad_name
+  adset_name:
+    lineage:
+      - datalake_casa_mineira_facebook_insights_raw.facebook_social_insights.adset_name
+  campaign_name:
+    lineage:
+      - datalake_casa_mineira_facebook_insights_raw.facebook_social_insights.campaign_name
+  clicks:
+    lineage:
+      - datalake_casa_mineira_facebook_insights_raw.facebook_social_insights.clicks
+  cpc:
+    lineage:
+      - datalake_casa_mineira_facebook_insights_raw.facebook_social_insights.cpc
+  cpm:
+    lineage:
+      - datalake_casa_mineira_facebook_insights_raw.facebook_social_insights.cpm
+  impressions:
+    lineage:
+      - datalake_casa_mineira_facebook_insights_raw.facebook_social_insights.impressions
+  platform_position:
+    lineage:
+      - datalake_casa_mineira_facebook_insights_raw.facebook_social_insights.platform_position
+  publisher_platform:
+    lineage:
+      - datalake_casa_mineira_facebook_insights_raw.facebook_social_insights.publisher_platform
+  reach:
+    lineage:
+      - datalake_casa_mineira_facebook_insights_raw.facebook_social_insights.reach
+  dt_insights_range_started:
+    lineage:
+      - datalake_casa_mineira_facebook_insights_raw.facebook_social_insights.date_start
+  dt_insights_range_ended:
+    lineage:
+      - datalake_casa_mineira_facebook_insights_raw.facebook_social_insights.date_stop
+  year:
+    lineage:
+      - datalake_casa_mineira_facebook_insights_raw.facebook_social_insights.year
+  month:
+    lineage:
+      - datalake_casa_mineira_facebook_insights_raw.facebook_social_insights.month
+  day:
+    lineage:
+      - datalake_casa_mineira_facebook_insights_raw.facebook_social_insights.day
