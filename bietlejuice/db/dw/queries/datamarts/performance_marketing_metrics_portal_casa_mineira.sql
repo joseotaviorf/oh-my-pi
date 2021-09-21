@@ -54,7 +54,7 @@ costs AS (
     FROM info_costs ict
         LEFT JOIN dim_region dr
             ON ict.city_group_from_campaign=dr.sk_region
-    WHERE dt BETWEEN '2021-06-01' AND DATE_ADD('DAY', -1, CURRENT_DATE)
+    WHERE dt BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND DATE_ADD('DAY', -1, CURRENT_DATE)
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 ),
 ----------------------------------------------------
@@ -101,7 +101,7 @@ info_events AS (
         datalake_casa_mineira_amplitude_clean_prod."329001_portal"
     WHERE
         event_type = 'receive_information_clicked'
-        AND DATE(ts_event) BETWEEN '2021-06-01' AND CURRENT_DATE
+        AND DATE(ts_event) BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND CURRENT_DATE
 ),
 ------------------------------------------------------
 -- Filter the first contact flow cohort from events --
@@ -162,7 +162,6 @@ contacts as (
             ON n.id_city = ct.id
         LEFT JOIN datalake_casa_mineira_portal_clean_prod.uf AS uf
             ON ct.id_uf = uf.id
-    WHERE DATE(date_add('hour', 3, c.ts_created)) BETWEEN '2021-06-01' AND DATE_ADD('DAY', -1, CURRENT_DATE)
 ),
 -----------------------------------------------------------------------------------------------------------
 -- Join Contacts from Prod, Events From Amplitude and Taxonomy from Sheets and introduce NULLs for UNION --
@@ -202,6 +201,7 @@ FROM
       and LOWER(COALESCE(t.utm_source, '')) = LOWER(COALESCE(evt.utm_source, ''))
       and LOWER(COALESCE(t.utm_medium, '')) = LOWER(COALESCE(evt.utm_medium, ''))
       and LOWER(COALESCE(t.branded, '')) = LOWER(COALESCE(evt.branded, ''))
+WHERE DATE(c.ts_contact) BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND DATE_ADD('DAY', -1, CURRENT_DATE)
 GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
 )
 -----------------------------
