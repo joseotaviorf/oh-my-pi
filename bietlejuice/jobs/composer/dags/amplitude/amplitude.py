@@ -55,6 +55,9 @@ UPDATE_CLEAN_STAGING_SUBPARTITIONS_VALUES_FILE_PATH = (
 UPDATE_CLEAN_STAGING_SUBPARTITIONED_TABLES_FILE_PATH = (
     AMPLITUDE_SPARK_JOBS_PATH + "update_clean_staging_subpartitioned_tables.py"
 )
+PROPAGATE_TABLES_METADATA_CLEAN_STAGING_FILE_PATH = (
+    AMPLITUDE_SPARK_JOBS_PATH + "propagate_tables_metadata_clean_staging.py"
+)
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
     Variable.get("databricks_s3_bucket"), DAG_ID
 )
@@ -316,6 +319,16 @@ sync_metastore_clean_staging_tables_task = QuintoAndarDatabricksSubmitRunOperato
     },
 )
 
+propagate_tables_metadata_clean_staging_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="propagate-tables-metadata-clean-staging",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": PROPAGATE_TABLES_METADATA_CLEAN_STAGING_FILE_PATH
+        }
+    },
+)
+
 update_clean_staging_subpartitioned_tables_athena_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id="update-clean-staging-subpartitioned-tables-athena",
     dag=dag,
@@ -370,12 +383,7 @@ airflow_helpers.chain(
 airflow_helpers.chain(
     update_clean_staging_subpartitioned_tables_spark_task,
     sync_metastore_clean_staging_tables_task,
-    terminate_cluster_task,
-)
-
-airflow_helpers.chain(
-    update_clean_staging_subpartitioned_tables_spark_task,
-    sync_metastore_clean_staging_tables_task,
+    propagate_tables_metadata_clean_staging_task,
     terminate_cluster_task,
 )
 
