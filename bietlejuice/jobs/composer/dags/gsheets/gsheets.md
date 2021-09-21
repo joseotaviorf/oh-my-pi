@@ -35,6 +35,7 @@ This pipeline produces the following output tables:
     - `casa_mineira_marketing_manual_shared_costs`
     - `ciq_costs`
     - `city_share`
+    - `closing_analysts_hierarchy`
     - `contact_type_taxonomy`
     - `contract_attribution_models`
     - `costs_allocation_relative_indexes`

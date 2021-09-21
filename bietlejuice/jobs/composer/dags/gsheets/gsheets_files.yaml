@@ -70,6 +70,11 @@ city_share:
     sheet_name: city_share
     clean_table_name: city_share
 
+closing_analysts_hierarchy:
+    sheet_id: 1iG68JgfjlWezT1d5rMiCIQIoN3fgskXLpqnKs9OltyA
+    sheet_name: clean
+    clean_table_name: closing_analysts_hierarchy
+
 contact_type_tag:
     sheet_id: 1HQaKDATgePg4oIoDBASzPm5QkEG61Dee8T-bYqdSHFM
     sheet_name: contact_types_tree_taxonomy
