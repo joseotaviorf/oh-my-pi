@@ -149,13 +149,15 @@ bietlejuice.dw_lead:
 
 bietlejuice.dw_listing:
   - bietlejuice.ebdb:create-clean-condo-in-data-lake
+  - bietlejuice.ebdb:create-clean-contract-in-data-lake
+  - bietlejuice.ebdb:create-clean-conversion-lead-in-data-lake
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-lead-in-data-lake
-  - bietlejuice.ebdb:create-clean-conversion-lead-in-data-lake
   - bietlejuice.ebdb:create-clean-partner-in-data-lake
   - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
   - bietlejuice.ebdb:create-clean-photographer-job-in-data-lake
   - bietlejuice.ebdb:create-clean-portability-in-data-lake
+  - bietlejuice.enrich_lead:load-enrich-conversion-lead
   - bietlejuice.enrich_lead:load-enrich-lead
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
   - bietlejuice.enrich_ebdb_listing:load-enrich-house

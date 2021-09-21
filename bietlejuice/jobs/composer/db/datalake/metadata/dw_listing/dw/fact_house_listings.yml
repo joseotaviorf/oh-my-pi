@@ -1,0 +1,57 @@
+database_name: dw_janus
+table_name: fact_house_listings
+columns:
+  sk_house_listing:
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_house_listing
+  sk_owner:
+    lineage:
+      - datalake_ebdb_listing.house.id_user
+      - datalake_ebdb_clean.partner_agent.id_user
+  sk_region:
+    lineage:
+      - datalake_ebdb_listing.house.id_region
+  sk_user_registration:
+    lineage:
+      - datalake_ebdb_listing.house.id_user_registrant
+  sk_contract:
+    lineage:
+      - datalake_ebdb_clean.contract.id
+  sk_condo:
+    lineage:
+      - datalake_ebdb_clean.condo.id
+  sk_user_partner_agent:
+    lineage:
+      - datalake_ebdb_clean.partner_agent.id_user
+  sk_partner:
+    lineage:
+      - datalake_ebdb_clean.partner_agent.id_partner
+  sk_autonomous_agent:
+    lineage:
+      - datalake_ebdb_clean.partner_agent.id_user
+  sk_stranded_date:
+    lineage:
+      - datalake_ebdb_listing.house_listing.dt_stranded
+  days_listing_to_contract_signed:
+    lineage:
+      - datalake_ebdb_clean.contract.ts_signed
+      - datalake_ebdb_listing.house_listing.ts_listing_version_start
+  days_listing_to_depublication:
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_last_unpublished
+      - datalake_ebdb_listing.house_listing.ts_listing_version_start
+  days_ended_rental_to_relisting:
+    lineage:
+      - datalake_ebdb_clean.contract.dt_termination
+      - datalake_ebdb_listing.house_listing.ts_listing_version_start
+  days_relisting_to_re_rental:
+    lineage:
+      - datalake_ebdb_clean.contract.ts_signed
+      - datalake_ebdb_listing.house_listing.ts_listing_version_end
+  days_ended_rental_to_re_rented:
+    lineage:
+      - datalake_ebdb_clean.contract.ts_signed
+      - datalake_ebdb_clean.contract.dt_termination
+  nr_renting:
+    lineage:
+      - datalake_ebdb_clean.contract.id
