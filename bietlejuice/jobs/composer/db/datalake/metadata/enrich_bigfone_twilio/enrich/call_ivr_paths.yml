@@ -1,0 +1,36 @@
+database_name: datalake_bigfone_twilio
+table_name: call_ivr_paths
+columns:
+  id:
+    lineage:
+      - datalake_bigfone_events.events.id
+  id_event:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  id_call:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  id_task:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  step_name:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  event_type:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  digits:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  ts_created:
+    lineage:
+      - datalake_bigfone_events.events.metadata
+  year:
+    lineage:
+      - datalake_bigfone_events.events.year
+  month:
+    lineage:
+      - datalake_bigfone_events.events.month
+  day:
+    lineage:
+      - datalake_bigfone_events.events.day
