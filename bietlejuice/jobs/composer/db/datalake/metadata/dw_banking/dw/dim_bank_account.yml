@@ -1,4 +1,4 @@
-database_name: dw_janus
+database_name: dw_bank # legacy schema
 table_name: dim_bank_account
 columns:
   sk_bank_account:

@@ -25,13 +25,12 @@ class BankSubDag(DimSubDag):
     def build_bank_with_tests(self):
         bank_dag = self._build_local_dag()
 
-        ods_bank_task, dim_bank_staging_task, dim_bank_dw_task = self.__build_data_tasks(bank_dag)
+        ods_bank_task, dim_bank_staging_task = self.__build_data_tasks(bank_dag)
 
         tests_tasks = self.build_tests_tasks(bank_dag)
 
         ods_bank_task >> dim_bank_staging_task
         dim_bank_staging_task.set_downstream(tests_tasks)
-        dim_bank_dw_task.set_upstream(tests_tasks)
 
         return bank_dag
 
@@ -60,15 +59,4 @@ class BankSubDag(DimSubDag):
             }
         )
 
-        dim_bank_dw_task = BaseDAG.build_python_operator(
-            dag=dag,
-            task_id='DW_dim_bank',
-            python_callable=utils.load_dim_from_staging_to_dw,
-            op_kwargs={
-                'dim_name': self.ods_stg_table_name,
-                'bucket': self.bucket,
-                'schema_dest': 'bank'
-            }
-        )
-
-        return ods_bank_task, dim_bank_staging_task, dim_bank_dw_task
+        return ods_bank_task, dim_bank_staging_task

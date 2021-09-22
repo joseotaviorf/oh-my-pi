@@ -17,7 +17,7 @@ from bietlejuice.jobs.composer.dags.base.dw_task_group import DWTaskGroup
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 2, 20, 0, 0, 0, tzinfo=LOCAL_TZ)
 
-DW_SCHEMA = "janus"
+DW_SCHEMA = "bank"
 CONTEXT = "banking"
 DAG_NAME = f"dw_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
@@ -77,7 +77,7 @@ dw_task_group = DWTaskGroup(
 )
 
 dw_staging_task_group = dw_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.DW_STAGING, has_ods_migration_test=True
+    layer=LayerEnum.DW_STAGING
 )
 
 dw_task_group = dw_task_group.build_task_group_from_sql_files(

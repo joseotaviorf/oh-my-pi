@@ -1,5 +1,6 @@
-drop table if exists janus.fact_bank_transaction;
-create table if not exists janus.fact_bank_transaction (
+drop table if exists bank.fact_bank_transaction;
+
+create table if not exists bank.fact_bank_transaction (
   sk_bank_transaction bigint,
   sk_bank_account integer,
   sk_user_recipient bigint,
@@ -15,4 +16,4 @@ create table if not exists janus.fact_bank_transaction (
   ts_load timestamp
 );
 
-ALTER TABLE janus.fact_bank_transaction OWNER TO airflow;
+ALTER TABLE bank.fact_bank_transaction OWNER TO airflow;

@@ -1,5 +1,6 @@
-drop table if exists janus.dim_bank;
-create table janus.dim_bank (
+drop table if exists bank.dim_bank;
+
+create table bank.dim_bank (
   sk_bank bigint primary key,
   id_bank bigint,
   code varchar,
@@ -11,4 +12,4 @@ create table janus.dim_bank (
   ts_load timestamp
 );
 
-ALTER TABLE janus.dim_bank OWNER TO airflow;
+ALTER TABLE bank.dim_bank OWNER TO airflow;

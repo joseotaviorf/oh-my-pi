@@ -1,5 +1,6 @@
-drop table if exists janus.dim_bank_account;
-create table if not exists janus.dim_bank_account (
+drop table if exists bank.dim_bank_account;
+
+create table if not exists bank.dim_bank_account (
   sk_bank_account bigint primary key,
   id_bank_account bigint,
   account_number varchar,
@@ -10,4 +11,4 @@ create table if not exists janus.dim_bank_account (
   ts_load timestamp
 );
 
-ALTER TABLE janus.dim_bank_account OWNER TO airflow;
+ALTER TABLE bank.dim_bank_account OWNER TO airflow;

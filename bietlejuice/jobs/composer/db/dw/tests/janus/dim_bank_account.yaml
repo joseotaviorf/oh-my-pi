@@ -1,3 +1,0 @@
-# Migration file for dim_bank_account
-dw_schema: bank
-base_date_column: ts_updated

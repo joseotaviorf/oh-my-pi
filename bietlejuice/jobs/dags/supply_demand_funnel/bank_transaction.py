@@ -48,16 +48,13 @@ class BankTransactionSubDag(DimSubDag):
             task_id='DW_fact_bank_transaction',
             python_callable=self.__build_fact_bank_transaction,
             op_kwargs={
-                'fact_name': 'bank_transaction',
-                'schema_dest': 'bank'
+                'fact_name': 'bank_transaction'
             }
         )
 
         return ods_bank_transaction_task, fact_bank_transaction_task
 
     @logger
-    def __build_fact_bank_transaction(self, fact_name, schema_dest):
+    def __build_fact_bank_transaction(self, fact_name):
         # process to staging
         utils.load_dim_from_ods_to_staging(dim_name=fact_name, is_fact=True)
-        # staging to DW
-        utils.load_dim_from_staging_to_dw(dim_name=fact_name, bucket=self.bucket, is_fact=True, schema_dest=schema_dest)

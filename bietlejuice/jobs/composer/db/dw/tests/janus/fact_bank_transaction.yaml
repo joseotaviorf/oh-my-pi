@@ -1,3 +1,0 @@
-# Migration file for fact_bank_transaction
-dw_schema: bank
-base_date_column: ts_updated
