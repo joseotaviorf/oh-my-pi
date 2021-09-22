@@ -13,9 +13,18 @@ columns:
   id_house:
     lineage:
       - datalake_sorting_hat_raw.earlycreditanalysis.house_id
+  id_variant:
+    lineage:
+      - datalake_sorting_hat_raw.earlycreditanalysis.variant_id
   result:
     lineage:
       - datalake_sorting_hat_raw.earlycreditanalysis.result
+  city:
+    lineage:
+      - datalake_sorting_hat_raw.earlycreditanalysis.city
+  version:
+    lineage:
+      - datalake_sorting_hat_raw.earlycreditanalysis.version
   ts_created:
     lineage:
       - datalake_sorting_hat_raw.earlycreditanalysis.created_at
