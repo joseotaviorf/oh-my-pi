@@ -7,21 +7,12 @@ columns:
   id_task:
     lineage:
       - datalake_crm_clean.tasks.id
-  id_analyst_started:
-    lineage:
-      - datalake_crm_clean.tasks.analyst_started
   id_user_action:
     lineage:
       - datalake_crm_clean.tasks.actions
-  id_user_analyst_started:
-    lineage:
-      - datalake_crm_clean.tasks.analyst_started
   action_user_name:
     lineage:
       - datalake_crm_clean.tasks.actions
-  analyst_started_user_name:
-    lineage:
-      - datalake_crm_clean.tasks.analyst_started
   action_type:
     lineage:
       - datalake_crm_clean.tasks.actions
@@ -37,9 +28,6 @@ columns:
   ts_action:
     lineage:
       - datalake_crm_clean.tasks.actions
-  ts_analyst_started:
-    lineage:
-      - datalake_crm_clean.tasks.analyst_started
   year:
     lineage:
       - datalake_crm_clean.tasks.year
