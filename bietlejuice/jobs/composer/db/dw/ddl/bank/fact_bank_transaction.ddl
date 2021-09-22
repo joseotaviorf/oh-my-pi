@@ -16,4 +16,4 @@ create table if not exists bank.fact_bank_transaction (
   ts_load timestamp
 );
 
-ALTER TABLE bank.fact_bank_transaction OWNER TO airflow;
+ALTER TABLE bank.fact_bank_transaction OWNER TO databricks;

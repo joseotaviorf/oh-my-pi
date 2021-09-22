@@ -12,4 +12,4 @@ create table bank.dim_bank (
   ts_load timestamp
 );
 
-ALTER TABLE bank.dim_bank OWNER TO airflow;
+ALTER TABLE bank.dim_bank OWNER TO databricks;

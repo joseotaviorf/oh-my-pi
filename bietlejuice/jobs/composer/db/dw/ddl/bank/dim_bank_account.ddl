@@ -11,4 +11,4 @@ create table if not exists bank.dim_bank_account (
   ts_load timestamp
 );
 
-ALTER TABLE bank.dim_bank_account OWNER TO airflow;
+ALTER TABLE bank.dim_bank_account OWNER TO databricks;
