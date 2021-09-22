@@ -135,6 +135,7 @@ This pipeline produces the following output tables:
     - `targets_nr_bf_er_or`
     - `target_supply_and_demand_autonomous_agent`
     - `taxonomy_affiliates`
+    - `taxonomy_crm_casa_mineira`
     - `taxonomy_demand`
     - `taxonomy_mkt_cost_new_test`
     - `taxonomy_mkt_cost`

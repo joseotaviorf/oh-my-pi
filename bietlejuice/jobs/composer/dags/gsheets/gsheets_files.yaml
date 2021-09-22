@@ -555,6 +555,11 @@ taxonomy_affiliates:
     sheet_name: taxonomy_affiliates
     clean_table_name: taxonomy_affiliates
 
+taxonomy_crm_casa_mineira:
+    sheet_id: 12_zyljMVOTLUvBSCen6QXSx23bXSd6krs8_fpxueqNU
+    sheet_name: taxonomy_crm_casa_mineira
+    clean_table_name: taxonomy_crm_casa_mineira
+
 taxonomy_demand:
     sheet_id: 11Cck3VVSt9TVt75ChvpU-mVwwfF7TNvUIXocG9vaHtw
     sheet_name: taxonomy_demand
