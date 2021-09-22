@@ -1,5 +1,6 @@
 SELECT
   id_user_braze,
+  id_user,
   SUM(
     CASE
       WHEN id_campaign IS NOT NULL
@@ -28,6 +29,13 @@ SELECT
       ELSE 0
     END
   ) AS total_owner_communications_sent_to,
+  SUM(
+    CASE
+      WHEN user_type = 'affiliate'
+        AND event_action IN ('send','impression') THEN event_count
+      ELSE 0
+    END
+  ) AS total_affiliate_communications_sent_to,
   SUM(
     CASE
       WHEN event_channel = 'email'
@@ -203,4 +211,4 @@ FROM
     datalake_braze_user_centric.user_events_daily
 WHERE
     DATE(CONCAT(CAST(year AS VARCHAR(4)),'-',CAST(month AS VARCHAR(2)),'-',CAST(day AS VARCHAR(2)))) <= DATE('{year}-{month}-{day}')
-GROUP BY 1, 30, 31, 32
+GROUP BY 1, 2, 32, 33, 34

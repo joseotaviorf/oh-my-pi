@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS braze.fact_user_centric;
 CREATE TABLE braze.fact_user_centric (
     sk_braze_user VARCHAR,
+    sk_user VARCHAR,
     total_campaigns_sent_to_same_week BIGINT,
     total_campaigns_sent_to_1w_before BIGINT,
     total_campaigns_sent_to_2w_before BIGINT,
@@ -21,6 +22,11 @@ CREATE TABLE braze.fact_user_centric (
     total_owner_communications_sent_to_2w_before BIGINT,
     total_owner_communications_sent_to_3w_before BIGINT,
     total_owner_communications_sent_to_all_time_before BIGINT,
+    total_affiliate_communications_sent_to_same_week BIGINT,
+    total_affiliate_communications_sent_to_1w_before BIGINT,
+    total_affiliate_communications_sent_to_2w_before BIGINT,
+    total_affiliate_communications_sent_to_3w_before BIGINT,
+    total_affiliate_communications_sent_to_all_time_before BIGINT,
     total_emails_sent_to_same_week BIGINT,
     total_emails_sent_to_1w_before BIGINT,
     total_emails_sent_to_2w_before BIGINT,

@@ -1,6 +1,7 @@
 SELECT
 	eo.id_user_dispatch,
 	eo.id_user_braze,
+	eo.id_user,
 	eo.event_channel,
 	send_owners.ts_event AS ts_sms_sent,
 	sendtocarrier_owners.ts_event AS ts_sms_send_to_carried,
@@ -38,4 +39,4 @@ WHERE
 	AND eo.month = {month}
 	AND eo.day = {day}
 GROUP BY
-	1,2,3,4,5,6,7,8,9,10,11
+	1,2,3,4,5,6,7,8,9,10,11,12

@@ -1,6 +1,7 @@
 SELECT
     ea.id_user_dispatch,
     ea.id_user_braze,
+    ea.id_user,
     ea.event_channel,
     impression_affiliates.ts_event AS ts_inapp_impressioned,
 --  click_affiliates.ts_event AS ts_inapp_clicked,
@@ -23,4 +24,4 @@ WHERE
     AND ea.month = {month}
     AND ea.day = {day}
 GROUP BY
-    1,2,3,4,5,6,7
+    1,2,3,4,5,6,7,8

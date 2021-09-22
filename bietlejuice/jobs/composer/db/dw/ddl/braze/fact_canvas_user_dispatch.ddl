@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS braze.fact_canvas_user_dispatch;
 CREATE TABLE braze.fact_canvas_user_dispatch (
 	sk_braze_user VARCHAR,
 	sk_user_dispatch VARCHAR,
+	sk_user VARCHAR,
 	sk_canvas VARCHAR,
 	sk_variant_canvas VARCHAR,
 	sk_step_canvas VARCHAR,

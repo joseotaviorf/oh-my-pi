@@ -1,6 +1,7 @@
 SELECT DISTINCT
     et.id_user_dispatch,
     et.id_user_braze,
+    et.id_user,
     et.id_campaign,
     et.id_variant_campaign,
     et.id_canvas,

@@ -1,5 +1,6 @@
 SELECT
   ueat.id_user_braze AS sk_braze_user,
+  ueat.id_user AS sk_user,
   COALESCE(SUM(uetw.total_campaigns_sent_to),0) AS total_campaigns_sent_to_same_week,
   COALESCE(SUM(uelw.total_campaigns_sent_to),0) AS total_campaigns_sent_to_1w_before,
   COALESCE(SUM(ue2w.total_campaigns_sent_to),0) AS total_campaigns_sent_to_2w_before,
@@ -20,6 +21,11 @@ SELECT
   COALESCE(SUM(ue2w.total_owner_communications_sent_to),0) AS total_owner_communications_sent_to_2w_before,
   COALESCE(SUM(ue3w.total_owner_communications_sent_to),0) AS total_owner_communications_sent_to_3w_before,
   COALESCE(SUM(ueat.total_owner_communications_sent_to),0) AS total_owner_communications_sent_to_all_time_before,
+  COALESCE(SUM(uetw.total_affiliate_communications_sent_to),0) AS total_affiliate_communications_sent_to_same_week,
+  COALESCE(SUM(uelw.total_affiliate_communications_sent_to),0) AS total_affiliate_communications_sent_to_1w_before,
+  COALESCE(SUM(ue2w.total_affiliate_communications_sent_to),0) AS total_affiliate_communications_sent_to_2w_before,
+  COALESCE(SUM(ue3w.total_affiliate_communications_sent_to),0) AS total_affiliate_communications_sent_to_3w_before,
+  COALESCE(SUM(ueat.total_affiliate_communications_sent_to),0) AS total_affiliate_communications_sent_to_all_time_before,
   COALESCE(SUM(uetw.total_emails_sent_to),0) AS total_emails_sent_to_same_week,
   COALESCE(SUM(uelw.total_emails_sent_to),0) AS total_emails_sent_to_1w_before,
   COALESCE(SUM(ue2w.total_emails_sent_to),0) AS total_emails_sent_to_2w_before,
@@ -123,4 +129,4 @@ WHERE
     ueat.year = {year}
     AND ueat.month = {month}
     AND ueat.day = {day}
-GROUP BY 1,92,93,94
+GROUP BY 1,2,98,99,100

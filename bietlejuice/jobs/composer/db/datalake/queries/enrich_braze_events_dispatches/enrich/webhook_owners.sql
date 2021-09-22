@@ -1,6 +1,7 @@
 SELECT
 	eo.id_user_dispatch,
 	eo.id_user_braze,
+	eo.id_user,
 	eo.event_channel,
 	send_owners.ts_event AS ts_webhook_sent,
 	eo.year,
@@ -18,5 +19,5 @@ WHERE
 	AND eo.month = {month}
 	AND eo.day = {day}
 GROUP BY
-	1,2,3,4,5,6,7
+	1,2,3,4,5,6,7,8
     

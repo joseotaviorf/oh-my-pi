@@ -1,6 +1,7 @@
 SELECT
 	et.id_user_dispatch,
 	et.id_user_braze,
+	et.id_user,
 	et.event_channel,
 	send_tenants.ts_event AS ts_email_sent,
 	delivery_tenants.ts_event AS ts_email_delivered,
@@ -48,4 +49,4 @@ WHERE
 	AND et.month = {month}
 	AND et.day = {day}
 GROUP BY
-	1,2,3,4,5,6,7,8,9,10,11,12,13
+	1,2,3,4,5,6,7,8,9,10,11,12,13,14

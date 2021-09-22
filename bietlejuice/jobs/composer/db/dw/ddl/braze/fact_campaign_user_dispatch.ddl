@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS braze.fact_campaign_user_dispatch;
 CREATE TABLE braze.fact_campaign_user_dispatch (
  	sk_braze_user VARCHAR,
  	sk_user_dispatch VARCHAR,
+	sk_user VARCHAR,
  	sk_campaign VARCHAR,
  	sk_variant_campaign VARCHAR,
  	user_type VARCHAR,
