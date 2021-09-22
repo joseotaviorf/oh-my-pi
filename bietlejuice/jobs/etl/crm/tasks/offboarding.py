@@ -17,7 +17,8 @@ class CRMTasksOffboarding(CRMTasks):
         'RescisaoCancelada',
         'RevisarCancelamentoDeRescisao',
         'RevisarPagamentosRescisao',
-        'VerificarDesocupacaoImovel'
+        'VerificarDesocupacaoImovel',
+        'RescisaoPreVigencia'
     ]
 
     MANUAL_TASK_WORKGROUP_IDS = [
