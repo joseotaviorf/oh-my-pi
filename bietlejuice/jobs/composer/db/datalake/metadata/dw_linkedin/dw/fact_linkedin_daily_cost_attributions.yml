@@ -1,0 +1,69 @@
+---
+database_name: dw_linkedin
+table_name: fact_linkedin_daily_cost_attributions
+columns:
+  sk_creative:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_creatives_stats.id_creative
+  sk_campaign:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_campaigns.id
+  sk_campaign_group:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_campaign_groups.id
+  sk_date:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_creatives_stats.year
+      - datalake_marketing_costs_clean.linkedin_creatives_stats.month
+      - datalake_marketing_costs_clean.linkedin_creatives_stats.day
+  total_cost:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_creatives_stats.cost_in_local_currency
+  card_clicks:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_creatives_stats.card_clicks
+  card_impressions:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_creatives_stats.card_impressions
+  clicks:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_creatives_stats.clicks
+  comments:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_creatives_stats.comments
+  company_page_clicks:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_creatives_stats.company_page_clicks
+  follows:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_creatives_stats.follows
+  impressions:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_creatives_stats.impressions
+  likes:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_creatives_stats.likes
+  opens:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_creatives_stats.opens
+  reactions:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_creatives_stats.reactions
+  shares:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_creatives_stats.shares
+  sends:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_creatives_stats.sends
+  text_url_clicks:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_creatives_stats.text_url_clicks
+  year:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_creatives_stats.year
+  month:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_creatives_stats.month
+  day:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_creatives_stats.day

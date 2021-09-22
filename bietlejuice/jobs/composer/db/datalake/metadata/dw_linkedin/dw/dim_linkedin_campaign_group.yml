@@ -1,0 +1,28 @@
+---
+database_name: dw_linkedin
+table_name: dim_linkedin_campaign_group
+columns:
+  sk_campaign_group:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_campaign_groups.id
+  id_campaign_group:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_campaign_groups.id
+  id_account:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_campaign_groups.id_account
+  campaign_group_name:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_campaign_groups.name
+  account_name:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_campaign_groups.account_name
+  year:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_campaign_groups.year
+  month:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_campaign_groups.month
+  day:
+    lineage:
+      - datalake_marketing_costs_clean.linkedin_campaign_groups.day
