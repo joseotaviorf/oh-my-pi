@@ -32,15 +32,24 @@ columns:
   id_user_action:
     lineage:
       - datalake_crm_tasks_resolution.tasks_resolution.id_user_action
+  id_workgroup:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution.id_workgroup
   action_type:
     lineage:
       - datalake_crm_tasks_resolution.tasks_resolution.action_type
   action_user_name:
     lineage:
       - datalake_crm_tasks_resolution.tasks_resolution.action_user_name
+  origin:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution.origin
   task_user_resolve_hours:
     lineage:
       - datalake_crm_tasks_resolution.tasks_resolution.ts_action
+  type:
+    lineage:
+      - datalake_crm_tasks_resolution.tasks_resolution.type
   task_user_type:
     lineage:
       - datalake_crm_tasks_resolution.tasks_resolution.action_type
