@@ -429,6 +429,16 @@ bietlejuice.enrich_crm:
 bietlejuice.enrich_crm_lead:
   - bietlejuice.enrich_crm:load-enrich-tasks
 
+bietlejuice.enrich_crm_tasks_history_flows:
+  - bietlejuice.dw_offer:load-dw-janus-dim-offer
+  - bietlejuice.ebdb:create-clean-contract-in-data-lake
+  - bietlejuice.ebdb:create-clean-proposal-document-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.enrich_crm:load-enrich-tasks
+  - bietlejuice.enrich_crm:load-enrich-tasks-actions
+  - bietlejuice.enrich_crm:load-enrich-workgroups
+  - bietlejuice.enrich_crm_tasks_resolution:load-enrich-tasks-resolution-history
+
 bietlejuice.enrich_crm_tasks_flows:
   - bietlejuice.enrich_crm:load-enrich-tasks
   - bietlejuice.enrich_crm:load-enrich-tasks-actions

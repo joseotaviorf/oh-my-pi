@@ -4,6 +4,7 @@ dags_out_of_pattern: [
     "amplitude",
     "ebdb",
     "criteo_campaigns",
+    "dw_offer",
     "dw_marketing_costs",
     "enrich_marketing_costs_sharing_rules",
     "enrich_amplitude_partner_taxonomy",
