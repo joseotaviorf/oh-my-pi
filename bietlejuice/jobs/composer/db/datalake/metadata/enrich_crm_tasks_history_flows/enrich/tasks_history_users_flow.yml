@@ -1,0 +1,112 @@
+database_name: datalake_crm_tasks_history_flows
+table_name: tasks_history_users_flow
+columns:
+    id_task:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.id_task
+    id_receiver:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.id_receiver
+    id_start_date:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.ts_start
+    id_completed_date:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.ts_completed
+    id_origin:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.id_origin
+    id_assignee:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.id_assignee
+    id_user_action:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.id_user_action
+    id_action_date:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.ts_action
+    id_task_user_start_date:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.ts_action
+    id_task_user_end_date:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.ts_next_action
+    id_workgroup:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.id_workgroup
+    id_offer:
+      lineage:
+        - dw_janus.dim_offer.sk_offer
+        # - dw_janus.fact_listing_rent_flows.sk_offer
+    id_proposal:
+      lineage:
+        - datalake_ebdb_clean.proposal.id
+        - datalake_ebdb_clean.contract.id_proposal
+        # - dw_janus.fact_listing_rent_flows.sk_proposal
+    id_contract:
+      lineage:
+        - datalake_ebdb_clean.contract.id
+        # - dw_janus.fact_listing_rent_flows.sk_contract
+    # id_house_listing:
+    #   lineage:
+    #     - dw_janus.fact_listing_rent_flows.sk_house_listing
+    id_house_owner:
+      lineage:
+        - datalake_ebdb_clean.house.id_user
+        # - dw_janus.fact_listing_rent_flows.sk_owner
+    id_tenant:
+      lineage:
+        - datalake_ebdb_clean.proposal.id_proponent
+        - datalake_ebdb_clean.contract.id_user
+        # - dw_janus.fact_listing_rent_flows.sk_client
+    # id_proponent:
+    #   lineage:
+    #     - dw_janus.fact_listing_rent_flows.sk_client
+    type:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.type
+    action_user_name:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.action_user_name
+    action_type:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.action_type
+    action_reason:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.action_reason
+    task_status:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.task_status
+    task_user_type:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.action_type
+    minutes_task_created_to_started:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.ts_action
+    task_user_resolve_hours:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.task_user_resolve_hours
+        - datalake_crm_tasks_resolution.tasks_resolution_history.ts_action
+    ts_task_user_start:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.ts_action
+    ts_task_user_end:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.ts_next_action
+    ts_action:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.ts_action
+    dt_partition:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.year
+        - datalake_crm_tasks_resolution.tasks_resolution_history.month
+        - datalake_crm_tasks_resolution.tasks_resolution_history.day
+    year:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.year
+    month:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.month
+    day:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.day
