@@ -1,0 +1,93 @@
+---
+database_name: dw_payment
+table_name: fact_banking_file_payments
+columns:
+  sk_banking_file_payment:
+    lineage:
+      - datalake_vans_clean.boleto.id
+      - datalake_vans_clean.payment.id
+      - datalake_vans_clean.payment_boleto.id
+      - datalake_vans_clean.boleto.company_use
+      - datalake_vans_clean.payment.company_use
+      - datalake_vans_clean.payment_boleto.company_use
+  sk_invoice:
+    lineage:
+      - datalake_vans_clean.boleto.id_related_document
+      - datalake_vans_clean.payment.id_related_document
+      - datalake_vans_clean.payment_boleto.id_related_document
+  sk_payment_request:
+    lineage:
+      - datalake_vans_clean.boleto.id_related_document
+      - datalake_vans_clean.payment.id_related_document
+      - datalake_vans_clean.payment_boleto.id_related_document
+  sk_contract:
+    lineage:
+      - datalake_vans_clean.boleto.company_use
+      - datalake_vans_clean.payment.company_use
+      - datalake_vans_clean.payment_boleto.company_use
+  sk_company_use:
+    lineage:
+      - datalake_vans_clean.boleto.company_use
+      - datalake_vans_clean.payment.company_use
+      - datalake_vans_clean.payment_boleto.company_use
+  sk_occurrence_code:
+    lineage:
+      - datalake_vans_clean.boleto.occurrence_code
+      - datalake_vans_clean.payment.occurrence_code
+      - datalake_vans_clean.payment_boleto.occurrence_code
+  sk_charge_payer_user:
+    lineage:
+      - datalake_vans_clean.boleto.payer_document
+  sk_transfer_payee_user:
+    lineage:
+      - datalake_vans_clean.payment.payee_document
+  sk_account_payable_corporate_user:
+    lineage:
+      - datalake_vans_clean.payment_boleto.payee_name
+  is_payee_savings_acc:
+    lineage:
+      - datalake_vans_clean.payment.has_payee_savings_acc
+  sk_created_date:
+    lineage:
+      - datalake_vans_clean.boleto.ts_created
+      - datalake_vans_clean.payment.ts_created
+      - datalake_vans_clean.payment_boleto.ts_created
+  sk_issued_date:
+    lineage:
+      - datalake_vans_clean.boleto.ts_issued
+      - datalake_vans_clean.payment.ts_issued
+  sk_updated_date:
+    lineage:
+      - datalake_vans_clean.boleto.ts_updated
+      - datalake_vans_clean.payment.ts_updated
+      - datalake_vans_clean.payment_boleto.ts_updated
+  sk_due_date:
+    lineage:
+      - datalake_vans_clean.boleto.dt_due
+      - datalake_vans_clean.payment.dt_dued
+  sk_fine_due_date:
+    lineage:
+      - datalake_vans_clean.boleto.dt_fine_due
+  sk_paid_date:
+    lineage:
+      - datalake_vans_clean.boleto.dt_paid
+      - datalake_vans_clean.payment.dt_paid
+      - datalake_vans_clean.payment_boleto.dt_paid
+  brl_due_amount:
+    lineage:
+      - datalake_vans_clean.boleto.due_amount
+      - datalake_vans_clean.payment.due_amount
+  brl_paid_amount:
+    lineage:
+      - datalake_vans_clean.boleto.paid_amount
+      - datalake_vans_clean.payment.paid_amount
+      - datalake_vans_clean.payment_boleto.paid_amount
+  brl_fine_amount:
+    lineage:
+      - datalake_vans_clean.boleto.fine_amount
+  brl_one_day_interest:
+    lineage:
+      - datalake_vans_clean.boleto.one_day_interest
+  brl_charged_interest:
+    lineage:
+      - datalake_vans_clean.boleto.interest

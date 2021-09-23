@@ -1,0 +1,66 @@
+---
+database_name: dw_payment
+table_name: dim_banking_file_payment
+columns:
+  sk_banking_file_payment:
+    lineage:
+      - datalake_vans_clean.boleto.id
+      - datalake_vans_clean.payment.id
+      - datalake_vans_clean.payment_boleto.id
+      - datalake_vans_clean.boleto.company_use
+      - datalake_vans_clean.payment.company_use
+      - datalake_vans_clean.payment_boleto.company_use
+  bank_name:
+    lineage:
+      - datalake_vans_clean.bank.name
+  related_document_type:
+    lineage:
+      - datalake_vans_clean.boleto.related_document_type
+      - datalake_vans_clean.payment.related_document_type
+      - datalake_vans_clean.payment_boleto.related_document_type
+  invoice_status:
+    lineage:
+      - datalake_vans_clean.boleto.related_document_type
+      - datalake_vans_clean.payment.related_document_type
+      - datalake_vans_clean.payment_boleto.related_document_type
+  payment_request_status:
+    lineage:
+      - datalake_vans_clean.boleto.related_document_type
+      - datalake_vans_clean.payment.related_document_type
+      - datalake_vans_clean.payment_boleto.related_document_type
+  status:
+    lineage:
+      - datalake_vans_clean.boleto.status
+      - datalake_vans_clean.payment.status
+      - datalake_vans_clean.payment_boleto.status
+  accrual_year_month:
+    lineage:
+      - datalake_vans_clean.boleto.company_use
+      - datalake_vans_clean.payment.company_use
+      - datalake_vans_clean.payment_boleto.company_use
+  ts_created:
+    lineage:
+      - datalake_vans_clean.boleto.ts_created
+      - datalake_vans_clean.payment.ts_created
+      - datalake_vans_clean.payment_boleto.ts_created
+  ts_issued:
+    lineage:
+      - datalake_vans_clean.boleto.ts_issued
+      - datalake_vans_clean.payment.ts_issued
+  ts_updated:
+    lineage:
+      - datalake_vans_clean.boleto.ts_updated
+      - datalake_vans_clean.payment.ts_updated
+      - datalake_vans_clean.payment_boleto.ts_updated
+  dt_due:
+    lineage:
+      - datalake_vans_clean.boleto.dt_due
+      - datalake_vans_clean.payment.dt_dued
+  dt_fine_due:
+    lineage:
+      - datalake_vans_clean.boleto.dt_fine_due
+  dt_paid:
+    lineage:
+      - datalake_vans_clean.boleto.dt_paid
+      - datalake_vans_clean.payment.dt_paid
+      - datalake_vans_clean.payment_boleto.dt_paid

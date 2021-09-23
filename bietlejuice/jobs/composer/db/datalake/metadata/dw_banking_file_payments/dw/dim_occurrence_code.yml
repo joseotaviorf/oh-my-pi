@@ -1,0 +1,29 @@
+---
+database_name: dw_payment
+table_name: dim_occurrence_code
+columns:
+  sk_occurrence_code:
+    lineage:
+      - datalake_vans_clean.boleto.occurrence_code
+      - datalake_vans_clean.payment.occurrence_code
+      - datalake_vans_clean.payment_boleto.occurrence_code
+  name:
+    lineage:
+      - datalake_vans_clean.boleto.occurrence_code
+      - datalake_vans_clean.payment.occurrence_code
+      - datalake_vans_clean.payment_boleto.occurrence_code
+  last_code:
+    lineage:
+      - datalake_vans_clean.boleto.occurrence_code
+      - datalake_vans_clean.payment.occurrence_code
+      - datalake_vans_clean.payment_boleto.occurrence_code
+  second_last_code:
+    lineage:
+      - datalake_vans_clean.boleto.occurrence_code
+      - datalake_vans_clean.payment.occurrence_code
+      - datalake_vans_clean.payment_boleto.occurrence_code
+  third_last_code:
+    lineage:
+      - datalake_vans_clean.boleto.occurrence_code
+      - datalake_vans_clean.payment.occurrence_code
+      - datalake_vans_clean.payment_boleto.occurrence_code
