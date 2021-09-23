@@ -104,12 +104,18 @@ columns:
   days_sale_agreement_signed_to_sale_agreement_cancelled:
     lineage:
       - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_sale_agreement_cancelled
+  days_sale_agreement_signed_to_credit_analysis_started:
+    lineage:
+      - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_credit_analysis_started
   days_sale_agreement_signed_to_credit_analysis_ended:
     lineage:
       - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_credit_analysis_ended
   days_sale_agreement_signed_to_legaut_analysis_started:
     lineage:
       - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_legaut_analysis_started
+  days_sale_agreement_signed_to_legaut_analysis_ended:
+    lineage:
+      - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_legaut_analysis_ended
   days_sale_agreement_signed_to_legal_risk_ended:
     lineage:
       - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_legal_risk_ended
@@ -122,6 +128,9 @@ columns:
   days_sale_agreement_signed_to_notes_registry_started:
     lineage:
       - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_notes_registry_started
+  days_sale_agreement_signed_to_notes_registry_ended:
+    lineage:
+      - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_notes_registry_ended
   days_legaut_analysis_started_to_legaut_analysis_ended:
     lineage:
       - datalake_sale_closing_flows.closing_flow.days_legaut_analysis_started_to_legaut_analysis_ended
