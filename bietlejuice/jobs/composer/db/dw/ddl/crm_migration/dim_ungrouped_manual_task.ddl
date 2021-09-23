@@ -9,13 +9,12 @@ CREATE TABLE crm_migration.dim_ungrouped_manual_task (
 	subject VARCHAR,
 	titles VARCHAR(4000),
 	workgroups VARCHAR(4000),
-	hours_task_started_to_completed FLOAT,
-	is_resolved BOOLEAN,
+	hours_task_start_to_completed FLOAT,
+	flg_solved BOOLEAN,
 	is_task_auto_completed BOOLEAN,
-	ts_started TIMESTAMP,
+	ts_start TIMESTAMP,
 	ts_completed TIMESTAMP,
 	ts_silenced_until TIMESTAMP,
-	ts_partition TIMESTAMP,
 	ts_load TIMESTAMP
 );
 

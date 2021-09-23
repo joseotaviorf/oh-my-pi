@@ -28,16 +28,16 @@ columns:
   workgroups:
     lineage:
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.workgroups
-  hours_task_started_to_completed:
+  hours_task_start_to_completed:
     lineage:
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.hours_task_started_to_completed
-  is_resolved:
+  flg_solved:
     lineage:
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.is_resolved
   is_task_auto_completed:
     lineage:
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.is_task_auto_completed
-  ts_started:
+  ts_start:
     lineage:
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_started
   ts_completed:
@@ -46,9 +46,6 @@ columns:
   ts_silenced_until:
     lineage:
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_silenced_until
-  ts_partition:
-    lineage:
-      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_partition
   year:
     lineage:
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.year

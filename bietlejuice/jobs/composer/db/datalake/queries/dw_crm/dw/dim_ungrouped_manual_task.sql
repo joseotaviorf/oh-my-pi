@@ -8,13 +8,12 @@ SELECT
   subject,
   CAST(titles AS STRING) AS titles,
   CAST(workgroups AS STRING) AS workgroups,
-  hours_task_started_to_completed,
-  is_resolved,
+  hours_task_started_to_completed AS hours_task_start_to_completed,
+  is_resolved AS flg_solved,
   is_task_auto_completed,
-  ts_started,
+  ts_started AS ts_start,
   ts_completed,
   ts_silenced_until,
-  ts_partition,
   NOW() AS ts_load,
   year,
   month,
@@ -23,7 +22,7 @@ FROM
   datalake_crm_tasks_flows.tasks_actions_resolutions_flow
 WHERE
   type = 'Manual'
-  AND id_workgroup IS NULL
+  AND id_workgroup = -1
   AND year = {year}
   AND month = {month}
   AND day = {month}
