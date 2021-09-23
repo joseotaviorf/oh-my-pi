@@ -1,0 +1,18 @@
+database_name: datalake_gsheets_clean
+table_name: owner_offboarding_repair_csat
+columns:
+  email:
+    lineage:
+      - datalake_gsheets_raw.csat_reparos_off_pp.email
+  improvement_tags:
+    lineage:
+      - datalake_gsheets_raw.csat_reparos_off_pp.tags
+  comments:
+    lineage:
+      - datalake_gsheets_raw.csat_reparos_off_pp.comments
+  score:
+    lineage:
+      - datalake_gsheets_raw.csat_reparos_off_pp.score
+  ts_input:
+    lineage:
+      - datalake_gsheets_raw.csat_reparos_off_pp.ts_input
