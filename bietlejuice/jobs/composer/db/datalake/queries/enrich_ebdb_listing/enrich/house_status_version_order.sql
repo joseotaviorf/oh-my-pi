@@ -52,7 +52,12 @@ house_new_status_new_date as (
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     select
         *,
-        case when status_history = 'despublicado' then datediff(cast(coalesce(ts_status_changed_next, now()) as date), cast(ts_status_changed as date)) end as days_unpublished,
+        case
+            when status_history = 'despublicado'
+            -- SparkSQL's datediff ignores the time part, so we get the seconds diff and convert it to integer days.
+            -- 60s*60m*24h = 86400s
+            then CAST((CAST(CAST(coalesce(ts_status_changed_next, now()) AS TIMESTAMP) AS LONG) - CAST(CAST(ts_status_changed AS TIMESTAMP) AS LONG))/(86400) AS INTEGER)
+        end as days_unpublished,
         case when status_history is null then 'publicado' else status_history end as status_history_new,
         case when status_history is null then ts_first_publication else ts_status_changed end as ts_status_changed_new,
         max(order_status) over(partition by id_house) as max_order_status
