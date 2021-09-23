@@ -1,0 +1,33 @@
+database_name: datalake_terminator_clean
+table_name: utility_bill
+columns:
+  id:
+    lineage:
+      - datalake_terminator_raw.utility_bill.id
+  id_termination:
+    lineage:
+      - datalake_terminator_raw.utility_bill.termination_id
+  id_external:
+    lineage:
+      - datalake_terminator_raw.utility_bill.external_id
+  type:
+    lineage:
+      - datalake_terminator_raw.utility_bill.type
+  status:
+    lineage:
+      - datalake_terminator_raw.utility_bill.status
+  attachments_last_invoice:
+    lineage:
+      - datalake_terminator_raw.utility_bill.attachments_last_invoice
+  attachments_payment_voucher:
+    lineage:
+      - datalake_terminator_raw.utility_bill.attachments_payment_voucher
+  is_included_condominium:
+    lineage:
+      - datalake_terminator_raw.utility_bill.is_included_condominium
+  ts_created:
+    lineage:
+      - datalake_terminator_raw.utility_bill.created_at
+  ts_updated:
+    lineage:
+      - datalake_terminator_raw.utility_bill.updated_at

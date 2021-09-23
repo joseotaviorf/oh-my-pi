@@ -29,6 +29,8 @@ This pipeline produces, via full load:
     - `termination_aud`
     - `termination_fee`
     - `termination_fee_aud`
+    - `utility_bill`
+    - `utility_bill_aud`
 
 ### Responsible Data Engineering Team
 For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the 
