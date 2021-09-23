@@ -5,7 +5,7 @@ SELECT
     nome AS interest_point_name,
     nome_completo AS interest_point_full_name,
     slug AS interest_point_slug_name,
-    logradouro AS address,
+    logradouro_original AS address,
     numero AS address_number,
     complemento AS complement,
     cep AS zip_code,

@@ -6,7 +6,7 @@ SELECT
     nome AS condo_name,
     nome_completo AS condo_full_name,
     slug AS condo_slug_name,
-    logradouro AS address,
+    logradouro_original AS address,
     numero AS address_number,
     cep AS zip_code,
     CAST(latitude AS FLOAT) AS lat,

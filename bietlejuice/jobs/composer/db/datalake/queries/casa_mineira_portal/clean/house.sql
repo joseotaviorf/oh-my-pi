@@ -6,7 +6,7 @@ SELECT
     bairro_id AS id_neighborhood,
     tipo_id AS id_type, 
     finalidade AS goal,
-    logradouro AS address, 
+    logradouro_original AS address, 
     cep AS zip_code,
     CAST(latitude AS FLOAT) AS lat, 
     CAST(longitude AS FLOAT) as lng, 
