@@ -105,6 +105,16 @@ crm_iptu_wave4:
     sheet_name: crm_iptu_wave4
     clean_table_name: crm_iptu_wave4
 
+csat_chaves_off_pp:
+    sheet_id: 1mezgNmlXsMgMxPYmDib-av_T3rtKCGbqvyaZlh2z84M
+    sheet_name: respostas_csat
+    clean_table_name: owner_offboarding_keys_csat
+
+csat_reparos_off_pp:
+    sheet_id: 1iZ4l6NVakfkSXUebhivPvGeUjmDo2X01gnDUOGnozcE
+    sheet_name: respostas_csat
+    clean_table_name: owner_offboarding_repair_csat
+
 csat_vistoria_entrada:  # to be excluded @Set,01
     sheet_id: 1ZTI-1XhPJey4o0e0IVfOVEeTeoWr7Vd10u-1TEZfIcc
     sheet_name: entrada

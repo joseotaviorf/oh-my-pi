@@ -91,6 +91,8 @@ This pipeline produces the following output tables:
     - `offline_manual_share_cost_center`
     - `owner_entrance_inspection_csat`
     - `owner_exit_inspection_csat`
+    - `owner_offboarding_keys_csat`
+    - `owner_offboarding_repair_csat`
     - `payments_deals_and_discounts`
     - `photographer_account`
     - `poa_partners`
