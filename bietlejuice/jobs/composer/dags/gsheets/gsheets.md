@@ -24,6 +24,7 @@ This pipeline produces the following output tables:
 
 2. Data lake clean:
     - `acquisition_target_per_source`
+    - `actionline_negotiations`
     - `affiliate_type_targets`
     - `affiliates_extra_user_bonus`
     - `affiliates_monthly_expected_results`
@@ -142,7 +143,7 @@ This pipeline produces the following output tables:
     - `taxonomy_mkt_cost_new_test`
     - `taxonomy_mkt_cost`
     - `taxonomy_portal_casa_mineira`
-    - `tenant_entrance_inspection_csat`
+    - `tenant_entrance_inspection_csat` 
     - `users_cx_plaquinhas`
     - `weekday_demand_share`
     - `weekday_holiday_share`

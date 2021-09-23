@@ -580,6 +580,11 @@ taxonomy_portal_casa_mineira:
     sheet_name: taxonomy_portal_casa_mineira
     clean_table_name: taxonomy_portal_casa_mineira
 
+tratativas_actionline:
+    sheet_id: 1ElKBNwteL7B_RQYk62-53qiIbhicjmOiV6VyoaRuOG4
+    sheet_name: forms_actionline
+    clean_table_name: actionline_negotiations
+
 users_cx_plaquinhas:
     sheet_id: 1oiUlhua9uFXbwkaSeF_EYRvaB652JIhOoWDy1bYolK0
     sheet_name: users_cx_plaquinhas
