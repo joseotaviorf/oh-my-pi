@@ -3,19 +3,14 @@ WITH cte_tasks AS(
     *,
     FROM_JSON(metadata,
      'fluxoLocacaoId STRING,
-      destinatario STRUCT<
-        id: BIGINT,
-        label: STRING,
-        nome: STRING,
-        email: STRING
-      >, 
+      destinatario STRING, 
       comentario STRING,
       origem STRING,
       dataVisita DATE,
       descricao STRING,
       fase STRING,
       imovelId STRING,
-      imovel STRUCT<id: STRING, proprietarioId: STRING>,
+      imovel STRING,
       assunto STRING,
       inquilinoId STRING,
       dataCriacao STRING,
@@ -26,8 +21,8 @@ WITH cte_tasks AS(
       dataFup STRING,
       estadoId STRING,
       proprietarioId STRING,
-      house STRUCT<proprietarioId: STRING>,
-      contrato STRUCT<imovel: STRUCT<proprietarioId: STRING>>,
+      house STRING,
+      contrato STRING,
       destinatarioId STRING'
     ) AS json_metadata
   FROM
@@ -42,19 +37,19 @@ SELECT
     json_metadata.fluxoLocacaoId AS id_rent_flow,
     id_origin,
     id_assignee,
-    COALESCE(json_metadata.imovelId, id_house, json_metadata.imovel.id) AS id_house,
+    COALESCE(json_metadata.imovelId, id_house, GET_JSON_OBJECT(json_metadata.imovel, "$.id")) AS id_house,
     COALESCE(
       id_owner, 
-      json_metadata.proprietarioId, 
-      json_metadata.house.proprietarioId, 
-      json_metadata.imovel.proprietarioId, 
-      json_metadata.contrato.imovel.proprietarioId
+      json_metadata.proprietarioId,
+      GET_JSON_OBJECT(json_metadata.house, "$.proprietarioId"),
+      GET_JSON_OBJECT(json_metadata.imovel, "$.proprietarioId"),
+      GET_JSON_OBJECT(GET_JSON_OBJECT(json_metadata.contrato, "$.imovel"), "$.proprietarioId")
     ) AS id_owner,
     id_opened_by,
     COALESCE(
       json_metadata.destinatarioId,
       id_receiver,
-      json_metadata.destinatario.id
+      GET_JSON_OBJECT(json_metadata.destinatario, "$.id")
     ) AS id_receiver,
     COALESCE(id_negotiation, json_metadata.negociacaoId) AS id_negotiation,
     COALESCE(id_tenant, json_metadata.inquilinoId) AS id_tenant,
@@ -64,8 +59,8 @@ SELECT
     json_metadata.estadoId AS id_state,
     CAST(version AS INTEGER) AS version,
     CAST(score_factor AS INTEGER) AS score_factor,
-    REPLACE(COALESCE(receiver_name,json_metadata.destinatario.nome), ',', '') AS receiver_name,
-    json_metadata.destinatario.label AS receiver_label,
+    REPLACE(COALESCE(receiver_name,GET_JSON_OBJECT(json_metadata.destinatario, "$.nome")), ',', '') AS receiver_name,
+    GET_JSON_OBJECT(json_metadata.destinatario, "$.label") AS receiver_label,
     COALESCE(task_comment,json_metadata.comentario) AS task_comment,
     score,
     COALESCE(origin, json_metadata.origem) AS origin,
