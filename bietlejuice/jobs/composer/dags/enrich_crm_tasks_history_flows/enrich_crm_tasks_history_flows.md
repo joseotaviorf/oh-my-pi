@@ -11,7 +11,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-- In datalake `enrich` layer (full load):
+- In datalake `enrich` layer (incremental load):
     * `tasks_history_resolutions_flow`
     * `tasks_history_users_flow`
     

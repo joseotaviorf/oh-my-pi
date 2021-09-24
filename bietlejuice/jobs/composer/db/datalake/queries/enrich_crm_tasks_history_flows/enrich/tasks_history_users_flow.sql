@@ -212,7 +212,7 @@ SELECT DISTINCT
   pc.task_status,
   pc.action_type AS task_user_type,
   pc.minutes_task_created_to_started,
-  pc.task_user_resolve_hours,
+  CAST(pc.task_user_resolve_hours AS FLOAT),
   pc.ts_action AS ts_task_user_start,
   pc.ts_next_action AS ts_task_user_end,
   pc.ts_action,

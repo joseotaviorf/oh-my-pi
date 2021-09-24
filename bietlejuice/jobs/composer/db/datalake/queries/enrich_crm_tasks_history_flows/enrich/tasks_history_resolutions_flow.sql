@@ -31,19 +31,21 @@ SELECT DISTINCT
   CAST(t.version AS INTEGER) AS version,
   t.origin AS origin,
   t.type AS type,
-  t.description,
+  SUBSTR(t.description, 1, 4000) AS description,
   t.subject AS subject,
-  ROUND(
+  CAST(
+    ROUND(
       (TO_UNIX_TIMESTAMP(COALESCE(tr.ts_action, t.ts_completed), 'yyyy-MM-dd HH:mm:ss') - TO_UNIX_TIMESTAMP(t.ts_start,'yyyy-MM-dd HH:mm:ss')) / 60.0,
       2
+    ) AS FLOAT
   ) AS hours_task_start_to_completed,
   t.is_resolved,
   COALESCE(tr.is_task_auto_completed, false) AS is_task_auto_completed,  
   t.ts_start,
   t.ts_completed,
   t.ts_silenced_until,
-  CAST(COLLECT_SET(COALESCE(t.subject, cw.title)) OVER (PARTITION BY t.id) AS STRING) AS titles,
-  CAST(COLLECT_SET(COALESCE(t.id_workgroup, cw.id)) OVER (PARTITION BY t.id) AS STRING) AS workgroups,
+  COLLECT_SET(COALESCE(t.subject, cw.title)) OVER (PARTITION BY t.id) AS titles,
+  COLLECT_SET(COALESCE(t.id_workgroup, cw.id)) OVER (PARTITION BY t.id) AS workgroups,
   t.year,
   t.month,
   t.day
