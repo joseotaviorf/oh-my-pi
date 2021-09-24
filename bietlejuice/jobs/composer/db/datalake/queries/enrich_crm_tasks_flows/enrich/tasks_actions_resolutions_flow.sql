@@ -1,7 +1,7 @@
 WITH tasks_resolution_max_date AS (
   SELECT
     id_task,
-    id_workgroup,
+    COALESCE(id_workgroup, -1) AS id_workgroup,
     type,
     ROW_NUMBER() OVER (PARTITION BY id_task, id_workgroup, type ORDER BY ts_action DESC) AS ranking,
     NULLIF(id_user_action, '') IS NULL AS is_task_auto_completed,
@@ -17,7 +17,7 @@ WITH tasks_resolution_max_date AS (
 tasks_max_date AS (
   SELECT
     id,
-    id_workgroup,
+    COALESCE(id_workgroup, -1) AS id_workgroup,
     type,
     MAX(DATE(CONCAT(year,'-', month,'-', day))) AS dt_last_updated
   FROM
@@ -33,11 +33,14 @@ SELECT DISTINCT
   ct.type,
   SUBSTR(description, 1, 4000) AS description,
   ct.subject,
-  CAST(COLLECT_SET(COALESCE(ct.subject, cw.title)) OVER (PARTITION BY ct.id) AS STRING) AS titles,
-  CAST(COLLECT_SET(COALESCE(ct.id_workgroup, cw.id)) OVER (PARTITION BY ct.id) AS STRING) AS workgroups,
-  ROUND((
-    UNIX_TIMESTAMP(trm.ts_action) - UNIX_TIMESTAMP(ct.ts_start)
-  ) / 3600, 2) AS hours_task_started_to_completed,
+  COLLECT_SET(COALESCE(ct.subject, cw.title)) OVER (PARTITION BY ct.id) AS titles,
+  COLLECT_SET(COALESCE(ct.id_workgroup, cw.id)) OVER (PARTITION BY ct.id) AS workgroups,
+  CAST(
+    ROUND((
+      UNIX_TIMESTAMP(trm.ts_action) - UNIX_TIMESTAMP(ct.ts_start)
+    ) / 3600, 2) 
+    AS FLOAT
+  ) AS hours_task_started_to_completed,
   ct.is_resolved,
   COALESCE(trm.is_task_auto_completed, FALSE) AS is_task_auto_completed,
   ct.ts_start AS ts_started,
@@ -52,7 +55,7 @@ FROM
   JOIN
     tasks_max_date AS tmd
       ON ct.id = tmd.id
-        AND ct.id_workgroup = tmd.id_workgroup
+        AND COALESCE(ct.id_workgroup, -1) = tmd.id_workgroup
         AND ct.type = tmd.type
         AND DATE(CONCAT(ct.year,'-', ct.month,'-', ct.day)) = tmd.dt_last_updated
   LEFT JOIN
@@ -61,7 +64,7 @@ FROM
   LEFT JOIN
     tasks_resolution_max_date AS trm
       ON ct.id = trm.id_task
-        AND trm.id_workgroup = ct.id_workgroup
+        AND trm.id_workgroup = COALESCE(ct.id_workgroup, -1)
         AND trm.type = ct.type
         AND trm.ranking = 1
 WHERE
