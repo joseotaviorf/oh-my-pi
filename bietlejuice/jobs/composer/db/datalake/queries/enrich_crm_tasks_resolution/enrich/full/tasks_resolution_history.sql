@@ -73,12 +73,14 @@ WITH tasks_resolution_history AS (
     last_updated_task lut
         ON tsk.id = lut.id
         AND DATE(CONCAT(tsk.year,'-',tsk.month,'-',tsk.day)) = lut.dt_last_updated
-  INNER JOIN
+  LEFT JOIN
     datalake_crm.tasks_actions tac
         ON tsk.id=tac.id_task
   LEFT JOIN
     datalake_crm.task_status_histories tsh
         ON tsk.id = tsh.id_task  
+  WHERE
+    COALESCE(tac.id, tsh.id) IS NOT NULL
 )
 SELECT
   id_task,
