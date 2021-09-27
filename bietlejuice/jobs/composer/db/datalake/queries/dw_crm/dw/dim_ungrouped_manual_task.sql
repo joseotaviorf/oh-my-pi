@@ -22,7 +22,7 @@ FROM
   datalake_crm_tasks_flows.tasks_actions_resolutions_flow
 WHERE
   type = 'Manual'
-  AND id_workgroup = -1
+  AND id_workgroup IS NULL
   AND year = {year}
   AND month = {month}
   AND day = {month}
