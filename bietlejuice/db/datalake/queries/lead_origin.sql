@@ -47,7 +47,7 @@ with t_all as (
                 from    datalake_amplitude_clean_prod."183047_lead_form_submitted_events"
                 where   ep_formfield_lead_uuid is not null
                 union
-                 select ep_formfield_lead_uuid,
+                select ep_formfield_lead_uuid,
                         event_properties,
                         ts_event,
                         up_utm_campaign,
@@ -61,6 +61,22 @@ with t_all as (
                         city,
                         uuid
                 from    datalake_amplitude_clean_prod."183047_price_suggestion_form_submitted_events"
+                where   ep_formfield_lead_uuid is not null
+                union
+                select ep_formfield_lead_uuid,
+                        event_properties,
+                        ts_event,
+                        up_utm_campaign,
+                        up_utm_medium,
+                        up_utm_source,
+                        up_utm_content,
+                        up_utm_term,
+                        up_platform,
+                        up_referring_domain,
+                        region,
+                        city,
+                        uuid
+                from    datalake_amplitude_clean_prod."183047_price_suggestion_sale_form_submitted_events"
                 where   ep_formfield_lead_uuid is not null
 	            )
     ,prep_ref as (
@@ -151,13 +167,13 @@ with t_all as (
             uuid
         from prep_firestore_tmp 
         left join datalake_rene_descartes_clean_prod.house_lead rene
-        on rene.id_external_reference = prep_firestore_tmp.firestore_id and date(ts_event) >= date('2021-07-15')
+        on rene.id_external_reference = prep_firestore_tmp.firestore_id and date(ts_event) >= date('2021-07-15') -- On 2021-07-15 a change was made by the Product Team, the firestore_id is no longer being inserted on datalake_amplitude_clean_prod.events, but in datalake_rene_descartes_clean_prod.house_lead
     )
     , prep_form as (
                 select
                         null as id_lead,
                         null as firestore_id,
-                        coalesce(cast(ep_formfield_lead_uuid as varchar), '') as e_formfield_lead_uuid,
+                        coalesce(rene.id, cast(ep_formfield_lead_uuid as varchar), '') as e_formfield_lead_uuid,
                         4 as rule_num,
                         'formfield' as rule,
                         ts_event,
@@ -172,6 +188,8 @@ with t_all as (
                         coalesce(city, '') as city,
                         coalesce(uuid, '') as uuid
                 from    app_183047
+                left join datalake_rene_descartes_clean_prod.house_lead rene
+                on rene.id_external_reference = app_183047.ep_formfield_lead_uuid and date(app_183047.ts_event) >= date('2021-07-15') -- On 2021-07-15 a change was made by the Product Team, the ep_formfield_lead_uuid is no longer being inserted on datalake_amplitude_clean_prod.events, but in datalake_rene_descartes_clean_prod.house_lead
                 )
     select
         *,

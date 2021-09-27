@@ -77,6 +77,25 @@ app_183047 AS (
         datalake_amplitude_clean.183047_price_suggestion_form_submitted_events
     WHERE
         formfield_lead_uuid IS NOT NULL
+    UNION
+    SELECT
+        formfield_lead_uuid,
+        event_properties,
+        ts_event,
+        utm_campaign,
+        utm_medium,
+        utm_source,
+        utm_content,
+        utm_term,
+        app_type,
+        referring_domain,
+        region,
+        city,
+        uuid
+    FROM
+        datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events
+    WHERE
+        formfield_lead_uuid IS NOT NULL
 ),
 prep_ref AS (
     select
@@ -180,13 +199,13 @@ prep_firestore AS (
         prep_firestore_tmp
     LEFT JOIN datalake_rene_descartes_clean.house_lead rene
         ON rene.id_external_reference = prep_firestore_tmp.id_firestore
-            AND DATE(ts_event) >= DATE('2021-07-15')
+            AND DATE(ts_event) >= DATE('2021-07-15') -- On 2021-07-15 a change was made by the Product Team, the firestore_id is no longer being inserted on datalake_amplitude_clean_prod.events, but in datalake_rene_descartes_clean_prod.house_lead
 ),
 prep_form AS (
     SELECT
         NULL AS id_lead,
         NULL AS id_firestore,
-        COALESCE(CAST(formfield_lead_uuid AS VARCHAR(255)), '') AS formfield_lead_uuid,
+        COALESCE(rene.id, CAST(formfield_lead_uuid AS VARCHAR(255)), '') AS formfield_lead_uuid,
         4 AS rule_num,
         'formfield' AS RULE,
         ts_event,
@@ -202,6 +221,9 @@ prep_form AS (
         COALESCE(uuid, '') AS uuid
     FROM
         app_183047
+    LEFT JOIN datalake_rene_descartes_clean.house_lead rene
+        ON rene.id_external_reference = app_183047.formfield_lead_uuid
+            AND DATE(app_183047.ts_event) >= DATE('2021-07-15') -- On 2021-07-15 a change was made by the Product Team, the ep_formfield_lead_uuid is no longer being inserted on datalake_amplitude_clean_prod.events, but in datalake_rene_descartes_clean_prod.house_lead
 ),
 t_all AS (
     SELECT
