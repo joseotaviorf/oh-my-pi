@@ -89,6 +89,19 @@ WITH quinto_messenger_tickets AS (
       task_timestamps tt
         ON tt.id_task = t.id_task
   ),
+  chatbot_time_metrics AS (
+    SELECT
+      s.id AS id_session,
+      (UNIX_TIMESTAMP(MIN(bot.ts_created)) - UNIX_TIMESTAMP(MIN(s.ts_created)))/60 AS total_minutes_reception_time
+    FROM
+      datalake_sauron_clean.bot_outgoing_messages AS bot
+    JOIN
+      datalake_sauron_clean.session s
+        ON s.id = bot.id_session
+    WHERE
+      GET_JSON_OBJECT(bot.bot_response, '$.action') = 'TRANSFER_CONVERSATION_TO_HUMAN'
+    GROUP BY 1
+  ),
   twilio_time_metrics AS (
     SELECT
         ctm.id_conversation,
@@ -139,6 +152,7 @@ WITH quinto_messenger_tickets AS (
       t.customer_type_tag,
       t.contact_motivation_tag,
       t.contact_theme_tag,
+      bot.total_minutes_reception_time,
       c.seconds_duration/60.0 AS minutes_full_resolution_time_calendar,
       ctm.total_talk_time AS seconds_total_talk_time,
       ctm.total_queue_time AS seconds_total_queue_time,
@@ -152,6 +166,9 @@ WITH quinto_messenger_tickets AS (
       cm.ts_last_event
     FROM
       datalake_quinto_messenger.channel c
+    LEFT JOIN 
+      chatbot_time_metrics bot
+        ON c.id_source = bot.id_session
     LEFT JOIN
       chat_metrics cm
         ON cm.id_conversation = c.id_source
@@ -326,6 +343,7 @@ SELECT DISTINCT
   CAST(ct.minutes_full_resolution_time_calendar AS DOUBLE) AS minutes_full_resolution_time_calendar,
   zd.minutes_first_resolution_time_calendar,
   zd.minutes_first_resolution_time_business,
+  ct.total_minutes_reception_time,
   ct.seconds_total_talk_time/60.0 AS total_minutes_talk_time,
   ct.seconds_total_queue_time/60.0 AS total_minutes_queue_time,
   ct.seconds_total_wrap_up_time/60.0 AS total_minutes_wrap_up_time,

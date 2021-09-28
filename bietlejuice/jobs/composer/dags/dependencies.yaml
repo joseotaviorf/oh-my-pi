@@ -578,6 +578,7 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.insider:load-clean-feature
   - bietlejuice.insider:load-clean-review
   - bietlejuice.insider:load-clean-review-feature
+  - bietlejuice.sauron:load-clean-session
   - bietlejuice.twilio_flex_insights:load-clean-conversation-time-metrics
 
 bietlejuice.enrich_invoice:

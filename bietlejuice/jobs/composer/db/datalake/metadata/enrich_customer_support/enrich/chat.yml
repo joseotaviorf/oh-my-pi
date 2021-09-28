@@ -122,6 +122,9 @@ columns:
   seconds_first_reply:
     lineage:
       - datalake_quinto_messenger.task.seconds_to_first_response
+  total_minutes_reception_time:
+    lineage:
+      - datalake_sauron_clean.bot_outgoing_messages.ts_created
   segment_minutes_wait_time:
     lineage:
       - datalake_quinto_messenger.task.seconds_to_first_response

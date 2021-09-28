@@ -123,7 +123,7 @@ conversation AS (
           from_number,
           to_number,
           customer_phone,
-          UNIX_TIMESTAMP(MAX(ts_created_local)) - UNIX_TIMESTAMP(MIN(ts_created_local)) AS initial_ivr_time,
+          (UNIX_TIMESTAMP(MAX(ts_created_local)) - UNIX_TIMESTAMP(MIN(ts_created_local)))/60 AS total_minutes_reception_time,
           MIN(id_task) AS id_task, -- workaround to filter 1 instance with duplicity
           MIN(ts_created_local) AS ts_first_event,
           MAX(ts_created_local) AS ts_last_event,
@@ -223,7 +223,6 @@ conversation AS (
       COALESCE(fe.id_task, ie.id_task) AS id_task,
       COALESCE(ie.from_number,fe.from_number) AS from_phone_number,
       COALESCE(ie.to_number,fe.to_number) AS to_phone_number,
-      ie.initial_ivr_time AS seconds_ivr_time,
       fe.direction,
       fe.scheduling_source,
       COALESCE(cm.number_of_tasks,0) AS number_of_tasks,
@@ -239,6 +238,7 @@ conversation AS (
       COALESCE(CAST(ce.csat_2 AS string), CAST(ce.csat_1 AS string)) IS NOT NULL AS is_csat_answered,
       ce.csat_1 = 1 AS is_solved,
       ce.csat_2 AS csat_rating,
+      ie.total_minutes_reception_time,
       GREATEST(ie.ts_last_event_local_unix,fe.ts_last_event_local_unix) - COALESCE(ie.ts_first_event_local_unix,fe.ts_first_event_local_unix) AS seconds_duration,
       COALESCE(ie.ts_first_event,fe.ts_first_event) AS ts_started,
       ce.ts_csat AS ts_csat_answered,
@@ -378,6 +378,7 @@ SELECT DISTINCT
       WHEN seconds_total_wait_time > 60 AND t.is_answered THEN FALSE
       ELSE NULL
   END AS sla_achieved,
+  c.total_minutes_reception_time,
   t.seconds_duration/60.0 AS segment_minutes_duration,
   t.seconds_wait_time/60.0 AS segment_minutes_wait_time,
   t.seconds_talk_time/60.0 AS segment_minutes_talk_time,

@@ -97,6 +97,9 @@ columns:
     lineage:
       - datalake_bigfone_twilio.call_flex_reservations.seconds_wait_time
       - datalake_bigfone_twilio.call_flex_reservations.is_answered
+  total_minutes_reception_time:
+    lineage:
+      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
   segment_minutes_duration:
     lineage:
       - datalake_bigfone_twilio.call_flex_reservations.seconds_duration
