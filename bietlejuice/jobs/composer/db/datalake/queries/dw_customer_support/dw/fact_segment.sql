@@ -15,10 +15,6 @@ WITH call_segments AS (
         sla_achieved AS is_sla,
         is_first_segment,
         is_last_segment,
-        CAST(segment_minutes_talk_time AS FLOAT) AS minutes_talk_time,
-        CAST(segment_minutes_queue_time AS FLOAT) AS minutes_queue_time,
-        CAST(segment_minutes_wrap_up_time AS FLOAT) AS minutes_wrap_up_time,
-        CAST(segment_minutes_handling_time AS FLOAT) AS minutes_handling_time,
         ts_segment_created AS ts_started,
         ts_segment_closed AS ts_closed,
         NOW() AS ts_load
@@ -26,7 +22,7 @@ WITH call_segments AS (
         datalake_customer_support.call c
     WHERE
         id_segment IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
 ),
 chat_segments AS (
     SELECT 
@@ -45,10 +41,6 @@ chat_segments AS (
         sla_achieved AS is_sla,
         is_first_segment,
         is_last_segment,
-        CAST(segment_minutes_talk_time AS FLOAT) AS minutes_talk_time,
-        CAST(segment_minutes_queue_time AS FLOAT) AS minutes_queue_time,
-        CAST(segment_minutes_wrap_up_time AS FLOAT) AS minutes_wrap_up_time,
-        CAST(segment_minutes_handling_time AS FLOAT) AS minutes_handling_time,
         ts_segment_created AS ts_started,
         ts_segment_closed AS ts_closed,
         NOW() AS ts_load
@@ -56,7 +48,7 @@ chat_segments AS (
         datalake_customer_support.chat c
     WHERE
         id_segment IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
 ),
 email_segments AS (
     SELECT 
@@ -75,10 +67,6 @@ email_segments AS (
         is_sla,
         TRUE AS is_first_segment,
         TRUE AS is_last_segment,
-        NULL AS minutes_talk_time,
-        NULL AS minutes_queue_time,
-        NULL AS minutes_wrap_up_time,
-        NULL AS minutes_handling_time,
         ts_ticket_started AS ts_started,
         ts_ticket_ended AS ts_closed,
         NOW() AS ts_load
@@ -86,7 +74,7 @@ email_segments AS (
         datalake_customer_support.email
     WHERE
         id_ticket IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
 )
 SELECT
     *
