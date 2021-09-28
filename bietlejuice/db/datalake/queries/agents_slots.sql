@@ -147,12 +147,12 @@ with
             date_diff('minute', date_trunc('day', cast(date_column AS timestamp)) + interval '8' hour, cast(date_column AS timestamp))/15 as slot_number
         from
             (
-            values(sequence(from_iso8601_date('2019-01-01'),current_date + interval '2' month, interval '15' minute))
+            values(sequence(from_iso8601_date('2021-01-01'),current_date + interval '2' month, interval '15' minute))
             ) AS t1(date_array)
             cross join unnest(date_array) as t2(date_column)
         where
             hour(cast(date_column AS timestamp)) between 7 and 21
-            and cast(date_column AS timestamp) >= cast('2019-01-01' AS timestamp)
+            and cast(date_column AS timestamp) >= cast('2021-01-01' AS timestamp)
     ),
     base_schedule as (
         select
