@@ -1,0 +1,30 @@
+SELECT
+    id_insertion_order,
+    id_rule_city_group,
+    media,
+    network,
+    short_region_name,
+    city_name,
+    channel,
+    program,
+    frequency,
+    genre,
+    daypart,
+    creative,
+    ad_description,
+    ad_type,
+    cost,
+    grp,
+    trp,
+    dt_insertion_order,
+    dt_started,
+    hour_started,
+    dt_ended,
+    hour_ended,
+    year,
+    quarter
+FROM
+    datalake_media_plan_raw.media_plan
+WHERE
+    year = {year_previous_quarter}
+    AND quarter = {previous_quarter}
