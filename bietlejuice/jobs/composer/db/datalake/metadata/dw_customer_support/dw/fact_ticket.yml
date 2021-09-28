@@ -189,6 +189,10 @@ columns:
     lineage:
       - datalake_customer_support.call.has_transfers
       - datalake_customer_support.chat.has_transfers
+  total_minutes_reception_time:
+    lineage:
+      - datalake_customer_support.call.total_minutes_reception_time
+      - datalake_customer_support.chat.total_minutes_reception_time
   total_minutes_talk_time:
     lineage:
       - datalake_customer_support.call.total_minutes_talk_time

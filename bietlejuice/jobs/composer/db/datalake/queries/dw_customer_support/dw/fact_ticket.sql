@@ -67,6 +67,7 @@ WITH call_tickets AS (
       ELSE NULL
     END AS is_fcr,
     has_transfers,
+    total_minutes_reception_time,
     total_minutes_talk_time,
     total_minutes_queue_time,
     total_minutes_wrap_up_time,
@@ -76,7 +77,7 @@ WITH call_tickets AS (
     NOW() AS ts_load
   FROM
     datalake_customer_support.call
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,35,36
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37
 ),
 chat_tickets AS (
   SELECT
@@ -147,6 +148,7 @@ chat_tickets AS (
       ELSE NULL
     END AS is_fcr,
     has_transfers,
+    total_minutes_reception_time,
     total_minutes_talk_time,
     total_minutes_queue_time,
     total_minutes_wrap_up_time,
@@ -156,7 +158,7 @@ chat_tickets AS (
     NOW() AS ts_load
   FROM
     datalake_customer_support.chat
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,35,36
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37
 ),
 email_tickets AS (
   SELECT
@@ -226,6 +228,7 @@ email_tickets AS (
       ELSE NULL
     END AS is_fcr,
     NULL AS has_transfers,
+    NULL AS total_minutes_reception_time,
     NULL AS total_minutes_talk_time,
     NULL AS total_minutes_queue_time,
     NULL AS total_minutes_wrap_up_time,
@@ -235,7 +238,7 @@ email_tickets AS (
     NOW() AS ts_load
   FROM 
     datalake_customer_support.email
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37
 )
 SELECT 
   *
