@@ -125,18 +125,6 @@ columns:
   segment_minutes_wait_time:
     lineage:
       - datalake_quinto_messenger.task.seconds_to_first_response
-  segment_minutes_talk_time:
-    lineage:
-      - datalake_twilio_flex_insights_clean.conversation_time_metrics.talk_time
-  segment_minutes_queue_time:
-    lineage:
-      - datalake_twilio_flex_insights_clean.conversation_time_metrics.queue_time
-  segment_minutes_wrap_up_time:
-    lineage:
-      - datalake_twilio_flex_insights_clean.conversation_time_metrics.wrap_up_time
-  segment_minutes_handling_time:
-    lineage:
-      - datalake_twilio_flex_insights_clean.conversation_time_metrics.handling_time
   number_of_departments:
     lineage:
       - datalake_quinto_messenger.task_event.task_queue_name
@@ -155,6 +143,18 @@ columns:
   minutes_first_resolution_time_business:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_first_resolution_business
+  total_minutes_talk_time:
+    lineage:
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_talk_time
+  total_minutes_queue_time:
+    lineage:
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_queue_time
+  total_minutes_wrap_up_time:
+    lineage:
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_wrap_up_time
+  total_minutes_handling_time:
+    lineage:
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_handling_time
   is_last_segment:
     lineage:
       - datalake_quinto_messenger.task.id_task

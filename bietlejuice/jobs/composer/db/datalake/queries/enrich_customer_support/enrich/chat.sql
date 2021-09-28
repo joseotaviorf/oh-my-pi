@@ -75,10 +75,6 @@ WITH quinto_messenger_tickets AS (
       t.contact_motivation_tag,
       t.contact_theme_tag,
       t.seconds_to_first_response,
-      ctm.talk_time AS seconds_talk_time,
-      ctm.queue_time AS seconds_queue_time,
-      ctm.wrap_up_time AS seconds_wrap_up_time,
-      ctm.handling_time AS seconds_handling_time,
       tt.ts_task_closed,
       tt.ts_task_created,
       t.ts_created,
@@ -92,9 +88,29 @@ WITH quinto_messenger_tickets AS (
     JOIN
       task_timestamps tt
         ON tt.id_task = t.id_task
-    LEFT JOIN
-      datalake_twilio_flex_insights_clean.conversation_time_metrics ctm
-          ON ctm.id_segment = t.id_task
+  ),
+  twilio_time_metrics AS (
+    SELECT
+        ctm.id_conversation,
+        CASE   
+            WHEN SUM(ctm.total_talk_time) IS NULL THEN 0   
+            ELSE CAST(SUM(ctm.total_talk_time) AS FLOAT)  
+        END AS total_talk_time,
+        CASE   
+            WHEN SUM(ctm.total_queue_time) IS NULL THEN 0   
+            ELSE CAST(SUM(ctm.total_queue_time) AS FLOAT)  
+        END AS total_queue_time,
+        CASE   
+            WHEN SUM(ctm.total_wrap_up_time) IS NULL THEN 0   
+            ELSE CAST(SUM(ctm.total_wrap_up_time) AS FLOAT)  
+        END AS total_wrap_up_time,
+        CASE   
+            WHEN SUM(ctm.total_handling_time) IS NULL THEN 0   
+            ELSE CAST(SUM(ctm.total_handling_time) AS FLOAT)  
+        END AS total_handling_time
+    FROM 
+        datalake_twilio_flex_insights_clean.conversation_time_metrics ctm
+    GROUP BY 1
   )
   SELECT
       t.id_task,
@@ -124,10 +140,10 @@ WITH quinto_messenger_tickets AS (
       t.contact_motivation_tag,
       t.contact_theme_tag,
       c.seconds_duration/60.0 AS minutes_full_resolution_time_calendar,
-      t.seconds_talk_time/60.0 AS minutes_talk_time,
-      t.seconds_queue_time/60.0 AS minutes_queue_time,
-      t.seconds_wrap_up_time/60.0 AS minutes_wrap_up_time,
-      t.seconds_handling_time/60.0 AS minutes_handling_time,
+      ctm.total_talk_time AS seconds_total_talk_time,
+      ctm.total_queue_time AS seconds_total_queue_time,
+      ctm.total_wrap_up_time AS seconds_total_wrap_up_time,
+      ctm.total_handling_time AS seconds_total_handling_time,
       t.ts_created,
       t.ts_updated,
       t.ts_task_closed,
@@ -148,6 +164,9 @@ WITH quinto_messenger_tickets AS (
     LEFT JOIN
       datalake_gsheets_clean.agents_control ac
         ON t.agent_email = ac.email
+    LEFT JOIN
+      twilio_time_metrics ctm
+        ON c.id_conversation = ctm.id_conversation
     WHERE
         c.ts_created > '2020-08-20'
         AND c.channel_status <> 'missed'
@@ -301,16 +320,16 @@ SELECT DISTINCT
   bt.back_ticket_list,
   ct.seconds_first_reply,
   ct.task_minutes_wait_time AS segment_minutes_wait_time,
-  ct.minutes_talk_time AS segment_minutes_talk_time,
-  ct.minutes_queue_time AS segment_minutes_queue_time,
-  ct.minutes_wrap_up_time AS segment_minutes_wrap_up_time,
-  ct.minutes_handling_time AS segment_minutes_handling_time,
   ct.number_of_departments,
   ct.number_of_tasks AS number_of_segments,
   ct.sla_achieved,
   CAST(ct.minutes_full_resolution_time_calendar AS DOUBLE) AS minutes_full_resolution_time_calendar,
   zd.minutes_first_resolution_time_calendar,
   zd.minutes_first_resolution_time_business,
+  ct.seconds_total_talk_time/60.0 AS total_minutes_talk_time,
+  ct.seconds_total_queue_time/60.0 AS total_minutes_queue_time,
+  ct.seconds_total_wrap_up_time/60.0 AS total_minutes_wrap_up_time,
+  ct.seconds_total_handling_time/60.0 AS total_minutes_handling_time,
   FIRST(ct.id_task) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created DESC) = ct.id_task AS is_last_segment,
   FIRST(ct.id_task) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created ASC) = ct.id_task AS is_first_segment,
   ct.transference_reason,
