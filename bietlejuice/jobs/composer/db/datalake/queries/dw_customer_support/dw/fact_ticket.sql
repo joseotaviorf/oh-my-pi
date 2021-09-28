@@ -67,10 +67,10 @@ WITH call_tickets AS (
       ELSE NULL
     END AS is_fcr,
     has_transfers,
-    SUM(CAST(segment_minutes_talk_time AS FLOAT)) AS total_minutes_talk_time,
-    SUM(CAST(segment_minutes_queue_time AS FLOAT)) AS total_minutes_queue_time,
-    SUM(CAST(segment_minutes_wrap_up_time AS FLOAT)) AS total_minutes_wrap_up_time,
-    SUM(CAST(segment_minutes_handling_time AS FLOAT)) AS total_minutes_handling_time,
+    total_minutes_talk_time,
+    total_minutes_queue_time,
+    total_minutes_wrap_up_time,
+    total_minutes_handling_time,
     ts_ticket_started AS ts_started,
     ts_ticket_ended AS ts_closed,
     NOW() AS ts_load
@@ -147,10 +147,10 @@ chat_tickets AS (
       ELSE NULL
     END AS is_fcr,
     has_transfers,
-    SUM(CAST(segment_minutes_talk_time AS FLOAT)) AS total_minutes_talk_time,
-    SUM(CAST(segment_minutes_queue_time AS FLOAT)) AS total_minutes_queue_time,
-    SUM(CAST(segment_minutes_wrap_up_time AS FLOAT)) AS total_minutes_wrap_up_time,
-    SUM(CAST(segment_minutes_handling_time AS FLOAT)) AS total_minutes_handling_time,
+    total_minutes_talk_time,
+    total_minutes_queue_time,
+    total_minutes_wrap_up_time,
+    total_minutes_handling_time,
     ts_ticket_started AS ts_started,
     ts_ticket_ended AS ts_closed,
     NOW() AS ts_load
