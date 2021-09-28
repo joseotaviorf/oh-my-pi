@@ -16,6 +16,7 @@ This pipeline produces the following output tables in DW layer, via incremental 
 
 - `crm_migration.dim_closing_task_transition`
 - `crm_migration.dim_closing_task_workflow`
+- `crm_migration.dim_offboarding_task`
 - `crm_migration.dim_ungrouped_manual_task`
 - `crm_migration.fact_closing_tasks_workflows_transitions`
 
