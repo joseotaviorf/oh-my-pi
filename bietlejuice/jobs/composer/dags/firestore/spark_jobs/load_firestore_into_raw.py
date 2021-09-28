@@ -67,6 +67,8 @@ if __name__ == "__main__":
         scope=DATABRICKS_SCOPE, key=ServiceEnum.PUBSUB.value
     )
     # PubSub Client expects a json file path containing the credentials
+    if pubsub_credentials_path.startswith("/dbfs"):
+        pubsub_credentials_path = pubsub_credentials_path.replace("/dbfs", "")
     dbutils.fs.put(
         file=pubsub_credentials_path, contents=json_credentials, overwrite=True
     )
