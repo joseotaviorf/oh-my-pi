@@ -4,24 +4,21 @@ columns:
   id_conversation:
     lineage:
       - datalake_twilio_flex_insights_raw.conversation_time_metrics.conversation
-  id_reservation:
-    lineage:
-      - datalake_twilio_flex_insights_raw.conversation_time_metrics.conversation_attribute_4
   id_segment:
     lineage:
       - datalake_twilio_flex_insights_raw.conversation_time_metrics.segment
-  queue_time:
+  total_queue_time:
     lineage:
-      - datalake_twilio_flex_insights_raw.conversation_time_metrics.queue_time
-  talk_time:
+      - datalake_twilio_flex_insights_raw.conversation_time_metrics.total_queue_time
+  total_talk_time:
     lineage:
-      - datalake_twilio_flex_insights_raw.conversation_time_metrics.talk_time
-  wrap_up_time:
+      - datalake_twilio_flex_insights_raw.conversation_time_metrics.total_talk_time
+  total_wrap_up_time:
     lineage:
-      - datalake_twilio_flex_insights_raw.conversation_time_metrics.wrap_up_time
-  handling_time:
+      - datalake_twilio_flex_insights_raw.conversation_time_metrics.total_wrap_up_time
+  total_handling_time:
     lineage:
-      - datalake_twilio_flex_insights_raw.conversation_time_metrics.handling_time
+      - datalake_twilio_flex_insights_raw.conversation_time_metrics.total_handling_time
   dt_created:
     lineage:
       - datalake_twilio_flex_insights_raw.conversation_time_metrics.date
