@@ -103,8 +103,12 @@ bietlejuice.dw_criteo_campaigns:
   - bietlejuice.criteo_campaigns:load-clean-criteo-campaigns
 
 bietlejuice.dw_crm:
+  - bietlejuice.ebdb:create-clean-contract-in-data-lake
+  - bietlejuice.ebdb:create-clean-inspection-in-data-lake
+  - bietlejuice.ebdb:create-clean-rent-flow-in-data-lake
   - bietlejuice.enrich_crm:load-enrich-workflows-transitions
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-actions-resolutions-flow
+  - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-users-resolutions-flow
   - bietlejuice.enrich_crm_tasks_transitions:load-enrich-tasks-transitions
 
 bietlejuice.dw_facebook_insights:
