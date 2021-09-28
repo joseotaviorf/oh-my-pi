@@ -37,7 +37,7 @@ SELECT DISTINCT
   COLLECT_SET(COALESCE(ct.id_workgroup, cw.id)) OVER (PARTITION BY ct.id) AS workgroups,
   CAST(
     ROUND((
-      UNIX_TIMESTAMP(trm.ts_action) - UNIX_TIMESTAMP(ct.ts_start)
+      UNIX_TIMESTAMP(COALESCE(trm.ts_action, ct.ts_completed)) - UNIX_TIMESTAMP(ct.ts_start)
     ) / 3600, 2) 
     AS FLOAT
   ) AS hours_task_started_to_completed,
