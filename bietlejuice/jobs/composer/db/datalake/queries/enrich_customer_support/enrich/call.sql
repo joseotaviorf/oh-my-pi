@@ -86,10 +86,7 @@ WITH segment AS (
     tr.transference_reason,
     seconds_wait_time,
     seconds_duration,
-    COALESCE(ctm.talk_time, r.seconds_talk_time) AS seconds_talk_time,
-    ctm.queue_time AS seconds_queue_time,
-    ctm.wrap_up_time AS seconds_wrap_up_time,
-    ctm.handling_time AS seconds_handling_time,
+    seconds_talk_time,
     is_answered,
     is_timeout,
     is_rejected,
@@ -116,9 +113,6 @@ WITH segment AS (
   LEFT JOIN
     transfer_reason tr
       ON tr.id_reservation = r.id_reservation
-  LEFT JOIN 
-    datalake_twilio_flex_insights_clean.conversation_time_metrics ctm
-      ON ctm.id_reservation = r.id_reservation
   WHERE
     is_answered = TRUE
 ),
@@ -198,6 +192,29 @@ conversation AS (
       WHERE
           is_answered = TRUE
       GROUP BY 1,2
+  ),
+  twilio_time_metrics AS (
+      SELECT
+          ctm.id_segment,
+          CASE   
+              WHEN SUM(ctm.total_talk_time) IS NULL THEN 0   
+              ELSE CAST(SUM(ctm.total_talk_time) AS FLOAT)  
+          END AS total_talk_time,
+          CASE   
+              WHEN SUM(ctm.total_queue_time) IS NULL THEN 0   
+              ELSE CAST(SUM(ctm.total_queue_time) AS FLOAT)  
+          END AS total_queue_time,
+          CASE   
+              WHEN SUM(ctm.total_wrap_up_time) IS NULL THEN 0   
+              ELSE CAST(SUM(ctm.total_wrap_up_time) AS FLOAT)  
+          END AS total_wrap_up_time,
+          CASE   
+              WHEN SUM(ctm.total_handling_time) IS NULL THEN 0   
+              ELSE CAST(SUM(ctm.total_handling_time) AS FLOAT)  
+          END AS total_handling_time
+      FROM 
+          datalake_twilio_flex_insights_clean.conversation_time_metrics ctm
+      GROUP BY 1
   )
   SELECT
       COALESCE(ie.id_call, fe.id_call) AS id_call,
@@ -215,7 +232,10 @@ conversation AS (
       cm.reservations_accepted > 0 AS is_answered,
       cm.number_of_tasks > 1 AS is_transfered,
       cm.wait_time_flex AS seconds_total_wait_time,
-      cm.talk_time AS seconds_total_talk_time,
+      COALESCE(ctm.total_talk_time, cm.talk_time) AS seconds_total_talk_time,
+      ctm.total_queue_time AS seconds_total_queue_time,
+      ctm.total_wrap_up_time AS seconds_total_wrap_up_time,
+      ctm.total_handling_time AS seconds_total_handling_time,
       COALESCE(CAST(ce.csat_2 AS string), CAST(ce.csat_1 AS string)) IS NOT NULL AS is_csat_answered,
       ce.csat_1 = 1 AS is_solved,
       ce.csat_2 AS csat_rating,
@@ -238,6 +258,9 @@ conversation AS (
   LEFT JOIN
       call_metrics cm
           ON cm.id_task = fe.id_task
+  LEFT JOIN
+      twilio_time_metrics ctm
+          ON cfe.id_task = ctm.id_segment
 ),
 zendesk_tickets_unique AS (
   --this CTE fix the error of multiple tickets openned for a single call
@@ -358,9 +381,10 @@ SELECT DISTINCT
   t.seconds_duration/60.0 AS segment_minutes_duration,
   t.seconds_wait_time/60.0 AS segment_minutes_wait_time,
   t.seconds_talk_time/60.0 AS segment_minutes_talk_time,
-  t.seconds_queue_time/60.0 AS segment_minutes_queue_time,
-  t.seconds_wrap_up_time/60.0 AS segment_minutes_wrap_up_time,
-  t.seconds_handling_time/60.0 AS segment_minutes_handling_time,
+  c.seconds_total_talk_time/60.0 AS total_minutes_talk_time,
+  c.seconds_total_queue_time/60.0 AS total_minutes_queue_time,
+  c.seconds_total_wrap_up_time/60.0 AS total_minutes_wrap_up_time,
+  c.seconds_total_handling_time/60.0 AS total_minutes_handling_time,
   CAST(c.seconds_duration/60.0 AS DOUBLE) AS minutes_full_resolution_time_calendar,
   CAST(c.number_of_departments AS INT) AS number_of_departments,
   CAST(c.number_of_tasks AS INT) AS number_of_segments,

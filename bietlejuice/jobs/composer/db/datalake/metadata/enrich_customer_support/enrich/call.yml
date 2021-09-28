@@ -106,16 +106,19 @@ columns:
   segment_minutes_talk_time:
     lineage:
       - datalake_bigfone_twilio.call_flex_reservations.seconds_talk_time
-      - datalake_twilio_flex_insights_clean.conversation_time_metrics.talk_time
-  segment_minutes_queue_time:
+  total_minutes_talk_time:
     lineage:
-      - datalake_twilio_flex_insights_clean.conversation_time_metrics.queue_time
-  segment_minutes_wrap_up_time:
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_talk_time
+      - datalake_bigfone_twilio.call_flex_reservations.seconds_talk_time
+  total_minutes_queue_time:
     lineage:
-      - datalake_twilio_flex_insights_clean.conversation_time_metrics.wrap_up_time
-  segment_minutes_handling_time:
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_queue_time
+  total_minutes_wrap_up_time:
     lineage:
-      - datalake_twilio_flex_insights_clean.conversation_time_metrics.handling_time
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_wrap_up_time
+  total_minutes_handling_time:
+    lineage:
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_handling_time
   minutes_full_resolution_time_calendar:
     lineage:
       - datalake_bigfone_twilio.call_ivr_events.ts_created_local_unix
