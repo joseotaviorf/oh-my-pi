@@ -32,8 +32,8 @@ SCHEMA = """
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("environment")
-    parser.add_argument("source")
     parser.add_argument("datalake_bucket")
+    parser.add_argument("source")
     parser.add_argument("table_name")
     args = parser.parse_args()
 

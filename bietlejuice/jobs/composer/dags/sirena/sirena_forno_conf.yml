@@ -10,3 +10,4 @@ endpoints:
     extraction_type: incremental
   - endpoint: prospects
     extraction_type: incremental
+partition_cols: ["year", "month", "day"]
