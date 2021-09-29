@@ -26,7 +26,7 @@ prev_tasks_full AS (
         tr.action_type AS task_user_type,
         tr.origin,
         ROUND((TO_UNIX_TIMESTAMP(tr.ts_action, 'yyyy-MM-dd hh:mm:ss')
-               - TO_UNIX_TIMESTAMP(LAG(tr.ts_action) OVER (PARTITION BY tr.id_task ORDER BY tr.ts_action), 'yyyy-MM-dd hh:mm:ss')) / 3600.0 , 1) AS task_user_resolve_hours,
+               - TO_UNIX_TIMESTAMP(LAG(tr.ts_action) OVER (PARTITION BY tr.id_task ORDER BY tr.ts_action), 'yyyy-MM-dd hh:mm:ss')) / 3600.0 , 2) AS task_user_resolve_hours,
         tr.type,
         DATE(tr.ts_action) AS dt_partition,
         tr.ts_action,
