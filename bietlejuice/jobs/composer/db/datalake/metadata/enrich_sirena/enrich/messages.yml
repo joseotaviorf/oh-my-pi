@@ -1,0 +1,40 @@
+---
+database_name: datalake_sirena
+table_name: messages
+columns:
+  id:
+    lineage:
+      - datalake_sirena_clean.interactions.id
+  id_prospect:
+    lineage:
+      - datalake_sirena_clean.interactions.id_prospect
+  id_house:
+    lineage:
+      - datalake_sirena_clean.prospects.last_name
+  id_agent:
+    lineage:
+      - datalake_sirena_clean.interactions.id_agent
+  agent_first_name:
+    lineage:
+      - datalake_sirena_clean.agents.first_name
+  agent_last_name:
+    lineage:
+      - datalake_sirena_clean.agents.last_name
+  agent_phone:
+    lineage:
+      - datalake_sirena_clean.agents.phone
+  agent_email:
+    lineage:
+      - datalake_sirena_clean.agents.email
+  via:
+    lineage:
+      - datalake_sirena_clean.interactions.via
+  template:
+    lineage:
+      - datalake_sirena_clean.interactions.output
+  is_proactive:
+    lineage:
+      - datalake_sirena_clean.interactions.is_proactive
+  ts_created:
+    lineage:
+      - datalake_sirena_clean.interactions.ts_created

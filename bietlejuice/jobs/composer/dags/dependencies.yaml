@@ -701,6 +701,12 @@ bietlejuice.enrich_sale_listings:
 bietlejuice.enrich_sauron:
   - bietlejuice.sauron:load-clean-session
 
+bietlejuice.enrich_sirena:
+  - bietlejuice.sirena:load-clean-agents
+  - bietlejuice.sirena:load-clean-groups
+  - bietlejuice.sirena:load-clean-interactions
+  - bietlejuice.sirena:load-clean-prospects
+  
 bietlejuice.enrich_survicate:
   - bietlejuice.survicate:load-clean-surveys
 
