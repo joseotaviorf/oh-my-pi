@@ -1,0 +1,129 @@
+database_name: datalake_ebdb_user
+table_name: user
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_clean.user.id
+  id_facebook:
+    lineage:
+      - datalake_ebdb_clean.user.id_facebook
+  id_linkedin:
+    lineage:
+      - datalake_ebdb_clean.user.id_linkedin
+  id_google:
+    lineage:
+      - datalake_ebdb_clean.user.id_google
+  id_agent:
+    lineage:
+      - datalake_ebdb_clean.user.id_agent
+  id_photographer_data:
+    lineage:
+      - datalake_ebdb_clean.user.id_photographer_data
+  id_sales_rep:
+    lineage:
+      - datalake_ebdb_clean.user.id_sales_rep
+  id_affiliates:
+    lineage:
+      - datalake_ebdb_clean.user.id_affiliates
+  id_bank:
+    lineage:
+      - datalake_ebdb_clean.user.id_bank
+  id_state:
+    lineage:
+      - datalake_ebdb_clean.user.id_state
+  cpf:
+    lineage:
+      - datalake_ebdb_clean.user.cpf
+  rg:
+    lineage:
+      - datalake_ebdb_clean.user.rg
+  gender:
+    lineage:
+      - datalake_ebdb_clean.user.gender
+  email:
+    lineage:
+      - datalake_ebdb_clean.user.email
+  alternative_email:
+    lineage:
+      - datalake_ebdb_clean.user.alternative_email
+  name:
+    lineage:
+      - datalake_ebdb_clean.user.name
+  admin_type:
+    lineage:
+      - datalake_ebdb_clean.user.admin_type
+  address:
+    lineage:
+      - datalake_ebdb_clean.user.address
+  number:
+    lineage:
+      - datalake_ebdb_clean.user.number
+  complement:
+    lineage:
+      - datalake_ebdb_clean.user.complement
+  neighborhood:
+    lineage:
+      - datalake_ebdb_clean.user.neighborhood
+  city:
+    lineage:
+      - datalake_ebdb_clean.user.city
+  zip_code:
+    lineage:
+      - datalake_ebdb_clean.user.zip_code
+  uf:
+    lineage:
+      - datalake_ebdb_clean.user.id_state
+  main_phone:
+    lineage:
+      - datalake_ebdb_clean.user.main_phone
+  main_phone_ddd:
+    lineage:
+      - datalake_ebdb_clean.user.main_phone
+  bank_agency:
+    lineage:
+      - datalake_ebdb_clean.user.bank_agency
+  bank_account:
+    lineage:
+      - datalake_ebdb_clean.user.bank_account
+  bank_cpf_cnpj:
+    lineage:
+      - datalake_ebdb_clean.user.bank_cpf_cnpj
+  bank_name:
+    lineage:
+      - datalake_ebdb_clean.user.bank_name
+  bank_another_holder:
+    lineage:
+      - datalake_ebdb_clean.user.bank_another_holder
+  bank_account_type:
+    lineage:
+      - datalake_ebdb_clean.user.bank_account_type
+  has_accepted_sms:
+    lineage:
+      - datalake_ebdb_clean.user.has_accepted_sms
+  is_active:
+    lineage:
+      - datalake_ebdb_clean.user.is_active
+  is_blocked:
+    lineage:
+      - datalake_ebdb_clean.user.is_blocked
+  dt_birth:
+    lineage:
+      - datalake_ebdb_clean.user.dt_birth
+  ts_click_anuncie:
+    lineage:
+      - datalake_ebdb_clean.user.ts_click_anuncie
+  ts_first_document_sent:
+    lineage:
+      - datalake_ebdb_clean.proposal.ts_documentation_sent
+  ts_last_document_sent:
+    lineage:
+      - datalake_ebdb_clean.proposal.ts_documentation_sent
+  ts_first_sent_to_insurance:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.user.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.user.ts_updated
