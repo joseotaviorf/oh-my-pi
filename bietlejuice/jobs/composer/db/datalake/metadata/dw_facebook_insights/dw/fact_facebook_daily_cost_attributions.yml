@@ -1,0 +1,62 @@
+---
+database_name: dw_facebook_insights
+table_name: fact_facebook_daily_cost_attributions
+columns:
+  sk_date:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.dt_start
+  sk_ad:
+    lineage:
+      - dw_facebook_insights.dim_facebook_ad.sk_ad
+  id_ad:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.id_ad
+  id_account:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.id_account
+  id_campaign:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.id_campaign
+  id_adset:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.id_adset
+  impressions:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.impressions
+      - datalake_marketing_costs.facebook_insights.impression_device
+  reach:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.reach
+      - datalake_marketing_costs.facebook_insights.impression_device
+  inline_link_clicks:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.inline_link_clicks
+      - datalake_marketing_costs.facebook_insights.impression_device
+  spend:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.spend
+      - datalake_marketing_costs.facebook_insights.impression_device
+  spend_mobile:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.spend
+  spend_desktop:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.spend
+  spend_other:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.spend
+  year:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.year
+  month:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.month
+  day:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.day
+  dt_start:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.dt_start
+  dt_stop:
+    lineage:
+      - datalake_marketing_costs.facebook_insights.dt_stop
