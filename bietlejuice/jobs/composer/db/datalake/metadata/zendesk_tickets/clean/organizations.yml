@@ -1,0 +1,57 @@
+database_name: datalake_zendesk_tickets_clean
+table_name: organizations
+columns:
+  id:
+    lineage:
+      - datalake_zendesk_tickets_raw.organizations.id
+  id_group:
+    lineage:
+      - datalake_zendesk_tickets_raw.organizations.group_id
+  id_external:
+    lineage:
+      - datalake_zendesk_tickets_raw.organizations.external_id
+  name:
+    lineage:
+      - datalake_zendesk_tickets_raw.organizations.name
+  domain_names:
+    lineage:
+      - datalake_zendesk_tickets_raw.organizations.domain_names
+  url:
+    lineage:
+      - datalake_zendesk_tickets_raw.organizations.url
+  organization_fields:
+    lineage:
+      - datalake_zendesk_tickets_raw.organizations.organization_fields
+  has_shared_tickets:
+    lineage:
+      - datalake_zendesk_tickets_raw.organizations.shared_tickets
+  has_shared_comments:
+    lineage:
+      - datalake_zendesk_tickets_raw.organizations.shared_comments
+  tags:
+    lineage:
+      - datalake_zendesk_tickets_raw.organizations.tags
+  details:
+    lineage:
+      - datalake_zendesk_tickets_raw.organizations.details
+  notes:
+    lineage:
+      - datalake_zendesk_tickets_raw.organizations.notes
+  ts_updated:
+    lineage:
+      - datalake_zendesk_tickets_raw.organizations.updated_at
+  ts_created:
+    lineage:
+      - datalake_zendesk_tickets_raw.organizations.created_at
+  ts_deleted:
+    lineage:
+      - datalake_zendesk_tickets_raw.organizations.deleted_at
+  year:
+    lineage:
+      - datalake_zendesk_tickets_raw.organizations.updated_at
+  month:
+    lineage:
+      - datalake_zendesk_tickets_raw.organizations.updated_at
+  day:
+    lineage:
+      - datalake_zendesk_tickets_raw.organizations.updated_at

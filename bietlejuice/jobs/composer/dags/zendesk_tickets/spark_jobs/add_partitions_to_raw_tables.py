@@ -28,7 +28,8 @@ if __name__ == "__main__":
     TABLE_DB_MAPPING = {
         "group_memberships": "zendesk_tickets",
         "groups": "zendesk_groups",
-        "satisfaction_ratings": "zendesk_tickets",
+        "organizations": "zendesk_groups",
+        "satisfaction_ratings": "zendesk_satisfaction",
         "ticket_fields": "zendesk_ticket_fields",
         "ticket_metrics": "zendesk_tickets",
         "tickets": "zendesk_tickets",
