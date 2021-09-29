@@ -1,0 +1,75 @@
+database_name: datalake_ebdb_proposal
+table_name: pre_proposal
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal.id
+  id_offer_context:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal.id
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal.id_user
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal.id_house
+  code:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal.code
+  rejection_reason:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal.rejection_reason
+  rent:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal.rent
+  original_rent:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal.original_rent
+  original_condo:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal.original_condo
+  edition:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal.edition
+  status:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal.status
+  last_edition_updated:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal.last_edition_updated
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal.ts_updated
+  ts_first_sent:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  ts_last_analysis:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  has_rental_accepted:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal.has_rental_accepted
+  has_income_proof_accepted:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal.has_income_proof_accepted
+  has_charge_accepted:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal.has_charge_accepted
+  is_owner_accept_condition:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal.is_owner_accept_condition
+  has_animals_condition:
+    lineage:
+      - datalake_ebdb_clean.proposal_condition.description
+  has_when_will_live_condition:
+    lineage:
+      - datalake_ebdb_clean.proposal_condition.description
+  has_who_will_live_condition:
+    lineage:
+      - datalake_ebdb_clean.proposal_condition.description
+  has_edition_update:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal.last_edition_updated
