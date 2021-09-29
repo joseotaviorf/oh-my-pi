@@ -1,0 +1,26 @@
+database_name: datalake_ebdb_user
+table_name: user_sales_rep
+columns:
+  id_user_sales_rep:
+    lineage:
+      - datalake_ebdb_clean.user.id
+  name:
+    lineage:
+      - datalake_ebdb_clean.user.name
+  email:
+    lineage:
+      - datalake_ebdb_clean.user.email
+  phone_number:
+    lineage:
+      - datalake_ebdb_clean.user.main_phone
+  admin_type:
+    lineage:
+      - datalake_ebdb_clean.user.admin_type
+  is_sales_rep_active:
+    lineage:
+      - datalake_ebdb_clean.user.is_active
+      - datalake_ebdb_clean.sales_rep.is_active
+  dt_sales_rep_started:
+    lineage:
+      - datalake_ebdb_clean.user.ts_created
+      - datalake_ebdb_clean.sales_rep.ts_contract_started
