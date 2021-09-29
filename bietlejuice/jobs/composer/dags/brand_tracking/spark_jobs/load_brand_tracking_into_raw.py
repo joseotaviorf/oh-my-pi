@@ -59,11 +59,10 @@ if __name__ == "__main__":
     ignore_cols_list = config_service.get_config("ignore_cols_list")
     file_to_ingest_base_path = config_service.get_config("file_to_ingest_base_path")
     file_to_ingest_prefix = config_service.get_config("file_to_ingest_prefix")
-    table_name = config_service.get_config("table_name")
 
     logger.info(
         f"""m=__main__, environment={env}, source={source}, datalake_bucket={datalake_bucket},
-        msg=Starting spark job..."""
+        table_name={table_name}, msg=Starting spark job..."""
     )
 
     spark_client = SparkClient()
