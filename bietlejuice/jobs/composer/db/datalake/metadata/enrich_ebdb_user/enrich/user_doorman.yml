@@ -1,0 +1,57 @@
+database_name: datalake_ebdb_user
+table_name: user_doorman
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_clean.doorman_affiliate_data.id
+  id_affiliate_data:
+    lineage:
+      - datalake_ebdb_clean.affiliate_data.id
+  id_doorman_occupation:
+    lineage:
+      - datalake_ebdb_clean.doorman_affiliate_data.id_doorman_occupation
+  id_place:
+    lineage:
+      - datalake_ebdb_clean.doorman_affiliate_data.id_place
+  work_address:
+    lineage:
+      - datalake_ebdb_clean.doorman_affiliate_data.work_address
+  work_street:
+    lineage:
+      - datalake_ebdb_clean.doorman_affiliate_data.work_street
+  work_house_number:
+    lineage:
+      - datalake_ebdb_clean.doorman_affiliate_data.work_house_number
+  work_neighborhood:
+    lineage:
+      - datalake_ebdb_clean.doorman_affiliate_data.work_neighborhood
+  work_city:
+    lineage:
+      - datalake_ebdb_clean.doorman_affiliate_data.work_city
+  work_state:
+    lineage:
+      - datalake_ebdb_clean.doorman_affiliate_data.work_state
+  lat:
+    lineage:
+      - datalake_ebdb_clean.doorman_affiliate_data.lat
+  lng:
+    lineage:
+      - datalake_ebdb_clean.doorman_affiliate_data.lng
+  recruiter:
+    lineage:
+      - datalake_ebdb_clean.doorman_affiliate_data.recrutier
+  subscription_source:
+    lineage:
+      - datalake_ebdb_clean.doorman_affiliate_data.subscription_source
+  occupation_name:
+    lineage:
+      - datalake_ebdb_clean.doorman_affiliate_occupation.name
+  ts_joined:
+    lineage:
+      - datalake_ebdb_clean.doorman_affiliate_data.ts_joined
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.doorman_affiliate_data.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.doorman_affiliate_data.ts_updated
