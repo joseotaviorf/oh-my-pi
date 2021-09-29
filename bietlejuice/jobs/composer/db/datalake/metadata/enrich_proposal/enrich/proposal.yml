@@ -1,0 +1,144 @@
+database_name: datalake_proposal
+table_name: proposal
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_clean.proposal.id
+  id_pre_proposal:
+    lineage:
+      - datalake_ebdb_clean.proposal.id_pre_proposal
+  id_offer:
+    lineage:
+      - datalake_ebdb_clean.proposal.id_offer
+  guarantee:
+    lineage:
+      - datalake_ebdb_clean.proposal.guarantee
+  motivation:
+    lineage:
+      - datalake_ebdb_clean.proposal.motivation
+  rent_proposal:
+    lineage:
+      - datalake_ebdb_clean.proposal.rent_proposal
+  status:
+    lineage:
+      - datalake_ebdb_clean.proposal.status
+  status_sorting_hat:
+    lineage:
+      - datalake_sorting_hat_clean.proposal.status
+  tenant_documentation_status:
+    lineage:
+      - datalake_ebdb_clean.proposal.tenant_documentation_status
+  owner_documentation_status:
+    lineage:
+      - datalake_ebdb_clean.proposal.owner_documentation_status
+  rejection_reason:
+    lineage:
+      - datalake_ebdb_clean.proposal.rejection_reason
+  has_tenant_sent_documentation:
+    lineage:
+      - datalake_ebdb_clean.proposal.has_tenant_sent_documentation
+  has_owner_sent_documentation:
+    lineage:
+      - datalake_ebdb_clean.proposal.has_owner_sent_documentation
+  has_tenant_accepted_contract:
+    lineage:
+      - datalake_ebdb_clean.proposal.has_tenant_accepted_contract
+  has_owner_accepted_contract:
+    lineage:
+      - datalake_ebdb_clean.proposal.has_owner_accepted_contract
+  has_additive_term:
+    lineage:
+      - datalake_ebdb_clean.proposal.has_additive_term
+  is_doc_reused:
+    lineage:
+      - datalake_ebdb_clean.proposal_aud.is_tenant_auto_submission
+  ts_to_scheduling:
+    lineage:
+      - datalake_ebdb_clean.proposal.ts_to_scheduling
+  ts_proposal:
+    lineage:
+      - datalake_ebdb_clean.proposal.ts_proposal
+  ts_approved:
+    lineage:
+      - datalake_ebdb_clean.proposal.ts_approved
+  ts_documentation_sent:
+    lineage:
+      - datalake_ebdb_clean.proposal.ts_documentation_sent
+  ts_owner_documentation_sent:
+    lineage:
+      - datalake_ebdb_clean.proposal.ts_owner_documentation_sent
+  ts_processed:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.proposal.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.proposal.ts_updated
+  ts_tenant_first_doc_sent:
+    lineage:
+      - datalake_ebdb_clean.proposal_aud.ts_documentation_sent
+  ts_tenant_auto_first_doc_sent:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  ts_tenant_first_doc_complete:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  ts_tenant_last_doc_complete:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  ts_credit_analysis_first_init:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  dt_credit_analysis_last_init:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  ts_credit_analysis_last_init:
+    lineage:
+      - datalake_sorting_hat_clean.proposal_version.ts_analyzed
+      - datalake_sorting_hat_clean.proposal.ts_analyzed
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  ts_credit_analysis_first_end:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  dt_credit_analysis_last_end:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  ts_credit_analysis_last_end:
+    lineage:
+      - datalake_sorting_hat_clean.proposal.ts_processed
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  ts_credit_approved_last:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  ts_credit_evaluation_first_init:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  ts_credit_evaluation_last_init:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  ts_credit_evaluation_first_negative:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  ts_credit_evaluation_last_negative:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  ts_guarantee:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  ts_doc_analysis_first_approved:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  ts_doc_analysis_last_approved:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  ts_doc_analysis_first_rejected:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  ts_doc_analysis_last_rejected:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  ts_guarantee_paid:
+    lineage:
+      - datalake_ebdb_clean.proposal.ts_guarantee_paid
