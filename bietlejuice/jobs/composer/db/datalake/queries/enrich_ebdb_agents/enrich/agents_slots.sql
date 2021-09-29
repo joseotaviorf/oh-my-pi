@@ -69,25 +69,25 @@ time_window_updates AS (
         sc.day_of_week,
         CASE
             WHEN is_available_slot = true
-                AND (UNIX_TIMESTAMP(ts_slot) - UNIX_TIMESTAMP(COALESCE(ts_last_specific_updated, ts_last_weekly_updated)))/216000 < 96 THEN '96 hours'
+                AND (UNIX_TIMESTAMP(ts_slot) - UNIX_TIMESTAMP(COALESCE(ts_last_specific_updated, ts_last_weekly_updated)))/3600 < 96 THEN '96 hours'
             ELSE sc.last_change_reason
         END AS last_change_reason,
         sc.slot_number,
         CASE
             WHEN is_available_slot = true
-                AND (UNIX_TIMESTAMP(ts_slot) - UNIX_TIMESTAMP(COALESCE(ts_last_specific_updated, ts_last_weekly_updated)))/216000 < 96 THEN false
+                AND (UNIX_TIMESTAMP(ts_slot) - UNIX_TIMESTAMP(COALESCE(ts_last_specific_updated, ts_last_weekly_updated)))/3600 < 96 THEN false
             ELSE is_available_slot
         END AS is_available_slot,
         CASE
             WHEN is_available_slot = true
-                AND (UNIX_TIMESTAMP(ts_slot) - UNIX_TIMESTAMP(COALESCE(ts_last_specific_updated, ts_last_weekly_updated)))/216000 < 24 THEN false
+                AND (UNIX_TIMESTAMP(ts_slot) - UNIX_TIMESTAMP(COALESCE(ts_last_specific_updated, ts_last_weekly_updated)))/3600 < 24 THEN false
             ELSE is_available_slot
         END AS is_available_slot_24h,
         sc.is_available_slot AS is_available_specific_slot,
         is_specific_update,
         CASE
             WHEN is_available_slot = true
-                AND (UNIX_TIMESTAMP(ts_slot) - UNIX_TIMESTAMP(COALESCE(ts_last_specific_updated, ts_last_weekly_updated)))/216000 < 96 THEN true
+                AND (UNIX_TIMESTAMP(ts_slot) - UNIX_TIMESTAMP(COALESCE(ts_last_specific_updated, ts_last_weekly_updated)))/3600 < 96 THEN true
             ELSE false
         END AS is_time_window_update,
         sc.ts_last_weekly_updated,
