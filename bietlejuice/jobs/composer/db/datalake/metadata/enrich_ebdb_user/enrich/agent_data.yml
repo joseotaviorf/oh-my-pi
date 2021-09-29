@@ -1,0 +1,21 @@
+database_name: datalake_ebdb_user
+table_name: agent_data
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_clean.agent_data.id
+  id_city:
+    lineage:
+      - datalake_ebdb_clean.agent_data.id_city
+  creci_number:
+    lineage:
+      - datalake_ebdb_clean.agent_data.creci_number
+  profile:
+    lineage:
+      - datalake_ebdb_clean.agent_data.profile
+  is_active:
+    lineage:
+      - datalake_ebdb_clean.agent_data.is_active
+  is_photographer:
+    lineage:
+      - datalake_ebdb_user.user.is_photographer
