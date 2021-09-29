@@ -1,0 +1,62 @@
+database_name: datalake_marketing_costs
+table_name: daily_costs
+columns:
+  id_date:
+    lineage:
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_name_convention_shared_costs.dt_cost
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_manual_shared_costs.dt_cost
+  account_name:
+    lineage:
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_name_convention_shared_costs.account_name
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_manual_shared_costs.account_name
+  campaign_name:
+    lineage:
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_name_convention_shared_costs.campaign_name
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_manual_shared_costs.campaign_name
+  utm_campaign:
+    lineage:
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_name_convention_shared_costs.campaign_name
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_manual_shared_costs.campaign_name
+  utm_term:
+    lineage:
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_name_convention_shared_costs.utm_term
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_manual_shared_costs.utm_term
+  utm_content:
+    lineage:
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_name_convention_shared_costs.utm_content
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_manual_shared_costs.utm_content
+  city_group:
+    lineage:
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_manual_shared_costs.city_group
+      - datalake_marketing_costs_sharing_rules.old_sharing_rules.city_group
+  mkt_origin:
+    lineage:
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_name_convention_shared_costs.mkt_origin
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_manual_shared_costs.mkt_origin
+  mkt_channel:
+    lineage:
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_name_convention_shared_costs.mkt_channel
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_manual_shared_costs.mkt_channel
+  mkt_medium:
+    lineage:
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_name_convention_shared_costs.mkt_medium
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_manual_shared_costs.mkt_medium
+  mkt_source:
+    lineage:
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_name_convention_shared_costs.mkt_source
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_manual_shared_costs.mkt_source
+  cost:
+    lineage:
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_name_convention_shared_costs.cost
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_manual_shared_costs.cost
+      - datalake_marketing_costs_sharing_rules.old_sharing_rules.share
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_manual_shared_costs.cost_share_desktop
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_manual_shared_costs.cost_share_mobile
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_manual_shared_costs.cost_share_other
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_name_convention_shared_costs.cost_share_desktop
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_name_convention_shared_costs.cost_share_mobile
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_name_convention_shared_costs.cost_share_other
+  funnel_side:
+    lineage:
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_name_convention_shared_costs.side
+      - datalake_marketing_manual_daily_costs_clean.marketing_costs_manual_shared_costs.side
