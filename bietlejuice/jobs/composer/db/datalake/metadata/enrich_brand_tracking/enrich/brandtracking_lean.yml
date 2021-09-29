@@ -1,0 +1,42 @@
+database_name: datalake_brand_tracking
+table_name: brandtracking_lean
+columns:
+  id_respondent:
+    lineage:
+      - datalake_brand_tracking_clean.brandtracking.respondent_serial
+  market:
+    lineage:
+      - datalake_brand_tracking_clean.brandtracking.market
+  region:
+    lineage:
+      - datalake_brand_tracking_clean.brandtracking.region
+  wave:
+    lineage:
+      - datalake_brand_tracking_clean.brandtracking.wave
+  city:
+    lineage:
+      - datalake_brand_tracking_clean.brandtracking.city
+  state:
+    lineage:
+      - datalake_brand_tracking_clean.brandtracking.state
+  gender:
+    lineage:
+      - datalake_brand_tracking_clean.brandtracking.gender
+  age:
+    lineage:
+      - datalake_brand_tracking_clean.brandtracking.age
+  income:
+    lineage:
+      - datalake_brand_tracking_clean.brandtracking.income
+  civil_status:
+    lineage:
+      - datalake_brand_tracking_clean.brandtracking.civil_status
+  target:
+    lineage:
+      - datalake_brand_tracking_clean.brandtracking.target
+  year:
+    lineage:
+      - datalake_brand_tracking_clean.brandtracking.year
+  quarter:
+    lineage:
+      - datalake_brand_tracking_clean.brandtracking.quarter

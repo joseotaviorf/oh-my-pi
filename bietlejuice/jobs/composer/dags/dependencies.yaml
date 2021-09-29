@@ -370,6 +370,10 @@ bietlejuice.enrich_booking:
   - bietlejuice.ebdb:create-clean-visitor-in-data-lake
   - bietlejuice.gsheets:load-clean-from-to-cancellation
 
+bietlejuice.enrich_brand_tracking:
+  - bietlejuice.brand_tracking:load-clean-brandtracking
+  - bietlejuice.brand_tracking:load-clean-brandtracking-unpivoted
+
 bietlejuice.enrich_braze_events:
   - bietlejuice.braze_events:load-clean-events-tenants
   - bietlejuice.braze_events:load-clean-events-owners

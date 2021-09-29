@@ -1,0 +1,24 @@
+database_name: datalake_brand_tracking_clean
+table_name: brandtracking_unpivoted
+columns:
+  id_respondent:
+    lineage:
+      - datalake_brand_tracking_raw.brandtracking_unpivoted.respondent_serial
+  wave:
+    lineage:
+      - datalake_brand_tracking_raw.brandtracking_unpivoted.wave
+  dt_load:
+    lineage:
+      - datalake_brand_tracking_raw.brandtracking_unpivoted.dt_load
+  id_question:
+    lineage:
+      - datalake_brand_tracking_raw.brandtracking_unpivoted.id_question
+  answer:
+    lineage:
+      - datalake_brand_tracking_raw.brandtracking_unpivoted.answer
+  year:
+    lineage:
+      - datalake_brand_tracking_raw.brandtracking_unpivoted.year
+  quarter:
+    lineage:
+      - datalake_brand_tracking_raw.brandtracking_unpivoted.quarter
