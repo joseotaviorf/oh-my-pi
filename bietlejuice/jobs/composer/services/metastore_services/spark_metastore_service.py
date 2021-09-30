@@ -169,6 +169,26 @@ class SparkMetastoreService(MetastoreService):
         return res
 
     @logger
+    def get_table_created_time(self, database_name, table_name):
+        """
+        Gets the created time of a table.
+        :param database_name: database name
+        :type database_name: str
+        :param table_name: table name
+        :type table_name: str
+        :return: the created time of table as a str
+        """
+        df = super().get_table_description(database_name, table_name, True)
+        res = (
+            df.where("col_name = 'Created Time'")
+            .select("data_type")
+            .collect()[0][0]
+            .lower()
+        )
+
+        return res
+
+    @logger
     def get_file_paths_and_sizes_from_table(self, database_name, table_name, s3_client):
         """
         Gets the path and size of each data file of a table.
