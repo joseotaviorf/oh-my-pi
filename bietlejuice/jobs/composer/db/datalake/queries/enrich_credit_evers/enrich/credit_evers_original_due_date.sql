@@ -39,7 +39,7 @@ WITH debtors_all_time AS (
 mob_array AS (
   SELECT
     EXPLODE(
-      ARRAY(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 40)
+      ARRAY(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 30, 40)
     ) AS contract_mob_number
 ),
 ever_array AS (
