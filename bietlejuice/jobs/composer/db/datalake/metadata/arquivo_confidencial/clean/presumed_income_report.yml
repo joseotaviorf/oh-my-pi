@@ -1,0 +1,27 @@
+database_name: datalake_arquivo_confidencial_clean
+table_name: presumed_income_report
+columns:
+  id:
+    lineage:
+      - datalake_arquivo_confidencial_raw.presumed_income_report.id
+  cpf:
+    lineage:
+      - datalake_arquivo_confidencial_raw.presumed_income_report.cpf
+  presumed_income:
+    lineage:
+      - datalake_arquivo_confidencial_raw.presumed_income_report.presumed_income
+  source:
+    lineage:
+      - datalake_arquivo_confidencial_raw.presumed_income_report.source
+  attributes:
+    lineage:
+      - datalake_arquivo_confidencial_raw.presumed_income_report.attributes
+  version:
+    lineage:
+      - datalake_arquivo_confidencial_raw.presumed_income_report.version
+  ts_created:
+    lineage:
+      - datalake_arquivo_confidencial_raw.presumed_income_report.created_at
+  ts_updated:
+    lineage:
+      - datalake_arquivo_confidencial_raw.presumed_income_report.updated_at
