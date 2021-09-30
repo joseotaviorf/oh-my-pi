@@ -13,6 +13,7 @@ from bietlejuice.jobs.composer.services.metastore_services import SparkMetastore
 
 
 JOB_NAME = "load_heimdall_into_datalake"
+TABLE_ALLOW_LIST = ["activity"]
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -52,6 +53,8 @@ if __name__ == "__main__":
     spark_metastore_service.create_database(database_name)
 
     for table in tables:
+        if table.table_name not in TABLE_ALLOW_LIST:
+            continue
         df = mongo_consumer.get_data_from_table(table.table_name)
 
         s3_loader.load_df(
