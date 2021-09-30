@@ -80,23 +80,28 @@ class BaseSubDag(object):
         return entity_dag
 
     @logger
-    def _build_with_tests(self, entity, source_command, tests, table_name=None):
+    def _build_with_tests(self, entity, source_command, tests, table_name=None, remove_redshift_load=False):
         """
         Method for calling the entity subdag with its etl and tests tasks and building the entire flow
         :param entity: name of the entity that composes the subdag
         :param source_command: command string for calling source data retrieval method
         :param tests: list of test tuples to be built (ex: ('test_task_id_suffix', test_method))
+        :param remove_redshift_load: defines whether the subdag should be created without the last task,
+            the one that loads data to Redshift
         :return: the entity dag
         """
         entity_dag = self._build_local_dag()
-        entity, staging_dim_entity, load_entity = self._build_data_tasks(entity_dag, entity, source_command, table_name)
-
         tests_tasks = self._build_tests_tasks(entity_dag, tests)
+
+        entity, staging_dim_entity, load_entity = self._build_data_tasks(entity_dag, entity, source_command, table_name,
+                                                                         remove_redshift_load)
 
         # flow
         entity >> staging_dim_entity
         staging_dim_entity.set_downstream(tests_tasks)
-        load_entity.set_upstream(tests_tasks)
+
+        if load_entity:
+            load_entity.set_upstream(tests_tasks)
 
         return entity_dag
 
@@ -104,12 +109,14 @@ class BaseSubDag(object):
         utils.extract_query_dim_from_ebdb_to_ods(dim_name, bucket, command, table_name, kwargs['execution_date'])
 
     @logger
-    def _build_data_tasks(self, dag, entity, source_command, table_name=None):
+    def _build_data_tasks(self, dag, entity, source_command, table_name=None, remove_redshift_load=False):
         """
         Method for building all the main tasks for the etl step
         :param dag: the dag which the tasks will be in
         :param entity: name of the entity that composes the subdag
         :param source_command: command string for calling source data retrieval method
+        :param remove_redshift_load: defines whether the subdag should be created without the last task,
+            the one that loads data to Redshift
         :return: the main tasks related to the etl step
         """
         entity_task = BaseDAG.build_python_operator(
@@ -134,15 +141,18 @@ class BaseSubDag(object):
             }
         )
 
-        load_entity_task = BaseDAG.build_python_operator(
-            dag=dag,
-            task_id='DW_dim_{}'.format(entity),
-            python_callable=utils.load_dim_from_staging_to_dw,
-            op_kwargs={
-                'dim_name': entity,
-                'bucket': self.bucket
-            }
-        )
+        if remove_redshift_load:
+            load_entity_task = None
+        else:
+            load_entity_task = BaseDAG.build_python_operator(
+                dag=dag,
+                task_id='DW_dim_{}'.format(entity),
+                python_callable=utils.load_dim_from_staging_to_dw,
+                op_kwargs={
+                    'dim_name': entity,
+                    'bucket': self.bucket
+                }
+            )
 
         return entity_task, staging_dim_entity_task, load_entity_task
 

@@ -15,7 +15,7 @@ class DimSubDag(BaseSubDag):
         self.ods_stg_table_name = ods_stg_table_name
 
     @logger
-    def build_with_tests(self, source_command, from_file_query=False, table_name=None):
+    def build_with_tests(self, source_command, from_file_query=False, table_name=None, remove_redshift_load=False):
         return self._build_with_tests(
             entity=self.ods_stg_table_name,
             source_command=source_command,
@@ -25,7 +25,8 @@ class DimSubDag(BaseSubDag):
                 ('counts_dim_{}'.format(self.ods_stg_table_name),
                  self.__test_counts_from_raw_query if from_file_query is False else self.__test_counts_from_file_query)
             ],
-            table_name=table_name
+            table_name=table_name,
+            remove_redshift_load=remove_redshift_load
         )
 
     @logger
