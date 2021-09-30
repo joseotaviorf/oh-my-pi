@@ -1,0 +1,27 @@
+---
+database_name: dw_quintoandar
+table_name: fact_owner_conversion_metrics
+columns:
+  sk_user:
+    lineage:
+      - datalake_ebdb_clean.user.id
+  sk_first_listing_date:
+    lineage:
+      - datalake_ebdb_clean.house_aud.dt_first_publication
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  sk_first_booking_date:
+    lineage:
+      - datalake_ebdb_clean.booking.ts_created
+  sk_first_visit_date:
+    lineage:
+      - datalake_ebdb_clean.visit.dt_visit
+  sk_first_offer_received_date:
+    lineage:
+      - datalake_ebdb_clean.pre_proposal.ts_last_edition_updated
+      - datalake_godfather_clean.offer.ts_last_sent
+  sk_first_proposal_accepted_date:
+    lineage:
+      - datalake_ebdb_clean.proposal.ts_created
+  sk_first_contract_signed_date:
+    lineage:
+      - datalake_ebdb_clean.contract.ts_signed
