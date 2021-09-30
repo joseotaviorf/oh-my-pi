@@ -7,12 +7,6 @@ columns:
     id_receiver:
       lineage:
         - datalake_crm_tasks_resolution.tasks_resolution_history.id_receiver
-    id_start_date:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.ts_start
-    id_completed_date:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.ts_completed
     id_origin:
       lineage:
         - datalake_crm_tasks_resolution.tasks_resolution_history.id_origin
@@ -22,15 +16,18 @@ columns:
     id_user_action:
       lineage:
         - datalake_crm_tasks_resolution.tasks_resolution_history.id_user_action
+    id_start_date:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.ts_start
+    id_completed_date:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.ts_completed
+    id_next_action_date:
+      lineage:
+        - datalake_crm_tasks_resolution.tasks_resolution_history.ts_next_action
     id_action_date:
       lineage:
         - datalake_crm_tasks_resolution.tasks_resolution_history.ts_action
-    id_task_user_start_date:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.ts_action
-    id_task_user_end_date:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.ts_next_action
     id_workgroup:
       lineage:
         - datalake_crm_tasks_resolution.tasks_resolution_history.id_workgroup
@@ -49,9 +46,6 @@ columns:
     task_status:
       lineage:
         - datalake_crm_tasks_resolution.tasks_resolution_history.task_status
-    task_user_type:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.action_type
     minutes_task_created_to_started:
       lineage:
         - datalake_crm_tasks_resolution.tasks_resolution_history.ts_action
@@ -59,10 +53,7 @@ columns:
       lineage:
         - datalake_crm_tasks_resolution.tasks_resolution_history.task_user_resolve_hours
         - datalake_crm_tasks_resolution.tasks_resolution_history.ts_action
-    ts_task_user_start:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.ts_action
-    ts_task_user_end:
+    ts_next_action:
       lineage:
         - datalake_crm_tasks_resolution.tasks_resolution_history.ts_next_action
     ts_action:
