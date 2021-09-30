@@ -78,11 +78,6 @@ columns:
       - datalake_customer_support.call.status
       - datalake_customer_support.chat.status
       - datalake_customer_support.email.status
-  minutes_full_resolution_time_calendar:
-    lineage:
-      - datalake_customer_support.call.minutes_full_resolution_time_calendar
-      - datalake_customer_support.chat.minutes_full_resolution_time_calendar
-      - datalake_customer_support.email.minutes_full_resolution_time_calendar
   first_department:
     lineage:
       - datalake_customer_support.call.first_department
@@ -126,6 +121,11 @@ columns:
       - datalake_customer_support.call.back_ticket_list
       - datalake_customer_support.chat.back_ticket_list
       - datalake_customer_support.email.back_ticket_list
+  total_backoffice_minutes_time:
+    lineage:
+      - datalake_customer_support.call.total_backoffice_minutes_time
+      - datalake_customer_support.chat.total_backoffice_minutes_time
+      - datalake_customer_support.email.total_backoffice_minutes_time
   resolution_survey:
     lineage:
       - datalake_customer_support.call.is_solved

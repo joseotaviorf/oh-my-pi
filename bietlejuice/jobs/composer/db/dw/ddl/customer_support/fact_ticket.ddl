@@ -13,7 +13,6 @@ CREATE TABLE IF NOT EXISTS customer_support.fact_ticket (
     channel VARCHAR(5),
     csat_score INTEGER,
     status VARCHAR(20),
-    minutes_full_resolution_time_calendar DOUBLE PRECISION, 
     first_department VARCHAR(100),
     last_department VARCHAR(100),
     zendesk_department VARCHAR(100),
@@ -35,6 +34,7 @@ CREATE TABLE IF NOT EXISTS customer_support.fact_ticket (
     total_minutes_queue_time FLOAT,
     total_minutes_wrap_up_time FLOAT,
     total_minutes_handling_time FLOAT,
+    total_backoffice_minutes_time FLOAT,
     ts_started TIMESTAMP,
     ts_closed TIMESTAMP,
     ts_load TIMESTAMP

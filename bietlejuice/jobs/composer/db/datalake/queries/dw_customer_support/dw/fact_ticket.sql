@@ -23,7 +23,6 @@ WITH call_tickets AS (
     'call' AS channel,
     csat_rating AS csat_score,
     status,
-    minutes_full_resolution_time_calendar,
     first_department,
     last_department,
     zendesk_department,
@@ -72,6 +71,7 @@ WITH call_tickets AS (
     total_minutes_queue_time,
     total_minutes_wrap_up_time,
     total_minutes_handling_time,
+    total_backoffice_minutes_time,
     ts_ticket_started AS ts_started,
     ts_ticket_ended AS ts_closed,
     NOW() AS ts_load
@@ -104,7 +104,6 @@ chat_tickets AS (
     'chat' AS channel,
     csat_score,
     status,
-    minutes_full_resolution_time_calendar,
     first_department,
     last_department,
     zendesk_department,
@@ -153,6 +152,7 @@ chat_tickets AS (
     total_minutes_queue_time,
     total_minutes_wrap_up_time,
     total_minutes_handling_time,
+    total_backoffice_minutes_time,
     ts_ticket_started AS ts_started,
     ts_ticket_ended AS ts_closed,
     NOW() AS ts_load
@@ -185,7 +185,6 @@ email_tickets AS (
     'email' AS channel,
     csat_score,
     status,
-    minutes_full_resolution_time_calendar,
     department AS first_department,
     department AS last_department,
     department AS zendesk_department,
@@ -233,6 +232,7 @@ email_tickets AS (
     NULL AS total_minutes_queue_time,
     NULL AS total_minutes_wrap_up_time,
     NULL AS total_minutes_handling_time,
+    total_backoffice_minutes_time,
     ts_ticket_started AS ts_started,
     ts_ticket_ended AS ts_closed,
     NOW() AS ts_load
