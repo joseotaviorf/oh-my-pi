@@ -119,14 +119,12 @@ SELECT
     dpla.weekday_name,
     CASE
         WHEN dpla.id_plaquinha IS NOT NULL 
-            AND dpla.dt_plaquinha <= dpla.date 
-            AND DATEDIFF(day, dpla.dt_plaquinha, dpla.date) <= 60 THEN TRUE
+            AND dpla.dt_plaquinha <= dpla.date THEN TRUE
         ELSE FALSE
     END AS has_plaquinha, -- flag to identify if the house or the house condo has plaquinha
     CASE
         WHEN dpla.id_plaquinha_house IS NOT NULL 
-            AND dpla.dt_plaquinha_house <= dpla.date 
-            AND DATEDIFF(day, dpla.dt_plaquinha_house, dpla.date) <= 60 THEN TRUE
+            AND dpla.dt_plaquinha_house <= dpla.date THEN TRUE
         ELSE FALSE
     END AS has_plaquinha_house, -- flag to identify if the house has plaquinha
     dpla.month_end AS dt_month_end,
