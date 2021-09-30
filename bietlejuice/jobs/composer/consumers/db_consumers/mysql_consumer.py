@@ -45,6 +45,7 @@ class MySqlConsumer(DBConsumer):
             ),
             "user": self.conn_config["user"],
             "password": self.conn_config["pwd"],
+            "zeroDateTimeBehavior": "convertToNull",
         }
 
         if "params" in conn_config:
