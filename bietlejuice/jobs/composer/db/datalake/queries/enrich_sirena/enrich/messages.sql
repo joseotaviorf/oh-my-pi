@@ -1,28 +1,25 @@
 with agents_class AS (
     SELECT
-        ag.id,
         gr.group_name,
+        ag.id,
         ag.first_name,
         ag.last_name,
         ag.phone,
         ag.email
     FROM
         datalake_sirena_clean.agents as ag
-    LEFT JOIN
+    INNER JOIN
         datalake_sirena_clean.groups AS gr
             ON ag.id_group = gr.id
     WHERE
         gr.group_name IN ('Closing', 'Deal Making')
-    ORDER BY
-        ag.id
 ),
 client_info AS (
     SELECT
         id,
         CASE
-            WHEN pr.last_name REGEXP '[0-9]{{9}}'
-                THEN regexp_extract(pr.last_name, '[0-9]{{9}}', 0)
-            ELSE NULL
+            WHEN pr.last_name REGEXP '[0-9]{9}'
+                THEN regexp_extract(pr.last_name, '[0-9]{9}', 0)
         END AS id_house,
         CASE label
             WHEN 'warm' THEN 'Seller'
@@ -53,12 +50,12 @@ SELECT
     intrc.id_prospect,
     ci.id_house,
     intrc.id_agent,
+    ci.prospect_type,
     CASE
         WHEN intrc.is_proactive = false
             THEN intrc.output.message.sender
         ELSE intrc.output.message.recipient
     END AS prospect_phone,
-    ci.prospect_type,
     CASE
         WHEN ac.group_name IS NULL
             THEN 'QuintoAndar Admin'
@@ -119,5 +116,3 @@ WHERE
     intrc.via = 'whatsApp'
     AND intrc.output.message.content NOT LIKE '%Mensagem automática do QuintoAndar%'
     AND ts_created LIKE '2021%'
-ORDER BY
-    intrc.id
