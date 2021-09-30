@@ -4,6 +4,7 @@ class DatabaseEnum:
     the Databricks secrets.
     """
 
+    ARQUIVO_CONFIDENCIAL = "ARQUIVO_CONFIDENCIAL_DB"
     ASTERISK = "ENV_ASTERISK"
     AUTODIALER = "ENV_AUTODIALER"
     BIG_AGENT = "BIG_AGENT_DB"

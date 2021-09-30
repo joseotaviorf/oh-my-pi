@@ -1,0 +1,13 @@
+---
+tables:
+  - table_name: presumed_income_report
+    extraction_type: full
+  - table_name: presumed_income_report_aud
+    extraction_type: full
+  - table_name: revinfo
+    extraction_type: incremental
+    date_filter_column: revtstmp
+    unixtime_measure: miliseconds
+    clean_table_name: rev_info
+  
+partition_columns: [year, month, day]
