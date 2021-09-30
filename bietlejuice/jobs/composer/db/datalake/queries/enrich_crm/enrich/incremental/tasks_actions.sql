@@ -17,13 +17,13 @@ WITH exploded_actions AS (
 SELECT
     GET_JSON_OBJECT(action, '$._id.oid') AS id,
     id AS id_task,
-    GET_JSON_OBJECT(action, '$.userId') AS id_user_action,
+    CAST(GET_JSON_OBJECT(action, '$.userId') AS INT) AS id_user_action,
     REPLACE(GET_JSON_OBJECT(action, '$.userName'),'"') AS action_user_name,
     REPLACE(GET_JSON_OBJECT(action, '$.type'),'"') AS action_type,
     GET_JSON_OBJECT(action, '$.metadata.key') AS metadata_key,
     GET_JSON_OBJECT(action, '$.metadata.oldValue') AS metadata_old_value,
     GET_JSON_OBJECT(action, '$.notificationSource') AS notification_source,
-    GET_JSON_OBJECT(action, '$.date.date') AS ts_action,
+    CAST(GET_JSON_OBJECT(action, '$.date.date') AS TIMESTAMP) AS ts_action,
     year,
     month,
     day

@@ -16,16 +16,16 @@ WITH task_status_histories AS (
 SELECT DISTINCT
     GET_JSON_OBJECT(history, '$._id.oid') AS id,
     id AS id_task,
-    GET_JSON_OBJECT(history, '$.actionUserId') AS id_user_action,
-    GET_JSON_OBJECT(history, '$.assigneeId') AS id_assignee,
+    CAST(GET_JSON_OBJECT(history, '$.actionUserId') AS INT) AS id_user_action,
+    CAST(GET_JSON_OBJECT(history, '$.assigneeId') AS INT) AS id_assignee,
     GET_JSON_OBJECT(history, '$.actionUserName') AS action_user_name,
     GET_JSON_OBJECT(history, '$.action') AS action_type,
     GET_JSON_OBJECT(history, '$.reason') AS action_reason,
     GET_JSON_OBJECT(history, '$.status') AS task_status,
     version,
-    GET_JSON_OBJECT(history, '$.date.date') AS ts_action,
-    EXTRACT(YEAR FROM GET_JSON_OBJECT(history, '$.date.date')) AS year,
-    EXTRACT(MONTH FROM GET_JSON_OBJECT(history, '$.date.date')) AS month,
-    EXTRACT(DAY FROM GET_JSON_OBJECT(history, '$.date.date')) AS day
+    CAST(GET_JSON_OBJECT(history, '$.date.date') AS TIMESTAMP) AS ts_action,
+    EXTRACT(YEAR FROM CAST(GET_JSON_OBJECT(history, '$.date.date') AS TIMESTAMP)) AS year,
+    EXTRACT(MONTH FROM CAST(GET_JSON_OBJECT(history, '$.date.date') AS TIMESTAMP)) AS month,
+    EXTRACT(DAY FROM CAST(GET_JSON_OBJECT(history, '$.date.date') AS TIMESTAMP)) AS day
 FROM
     task_status_histories
