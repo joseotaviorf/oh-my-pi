@@ -37,6 +37,7 @@ spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 spectrum_iam_role = config_service.get_config("spectrum_iam_role")
 
 incremental_load_parameters = config_service.get_config("incremental_load_parameters")
+inner_dependencies = config_service.get_config("inner_dependencies")
 partition_cols = incremental_load_parameters["partitions"]
 dw_query_filters = incremental_load_parameters["dw_query_filters"]
 
@@ -70,7 +71,7 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-dw_task_group = DWTaskGroup(
+task_group = DWTaskGroup(
     dag=dag,
     env=ENV,
     dw_bucket=dw_bucket,
@@ -79,14 +80,11 @@ dw_task_group = DWTaskGroup(
     spark_jobs_path=SPARK_JOBS_PATH,
 )
 
-dw_staging_task_group = dw_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.DW_STAGING,
-    is_incremental=True,
-    partitions=partition_cols,
-    extra_query_template_params=dw_query_filters,
+dw_staging_task_group = task_group.build_task_group_from_sql_files(
+    layer=LayerEnum.DW_STAGING, is_incremental=True, partitions=partition_cols
 )
 
-dw_task_group = dw_task_group.build_task_group_from_sql_files(
+dw_task_group = task_group.build_task_group_from_sql_files(
     layer=LayerEnum.DW,
     spectrum_iam_role=spectrum_iam_role,
     is_incremental=True,
@@ -94,8 +92,31 @@ dw_task_group = dw_task_group.build_task_group_from_sql_files(
     extra_query_template_params=dw_query_filters,
 )
 
-create_cluster_task.set_downstream(DWTaskGroup.all_first_tasks(dw_staging_task_group))
+dw_task_group_boundaries = {}
+for table in dw_task_group:
+    initial_tasks = DWTaskGroup.first_tasks(dw_staging_task_group[table])
+    final_tasks = DWTaskGroup.last_tasks(dw_task_group[table])
+    dw_task_group_boundaries[table] = DWTaskGroup.format_tasks_boundaries(
+        initial_tasks=initial_tasks, final_tasks=final_tasks
+    )
+
+(
+    task_groups_boundaries_without_inner_dependencies,
+    inner_dependencies_task_groups_boundaries,
+) = task_group.set_inner_dag_dependencies(
+    task_flow_helper=TaskFlowHelper(),
+    task_groups_boundaries=dw_task_group_boundaries,
+    dag_inner_dependencies=inner_dependencies,
+)
+
+create_cluster_task.set_downstream(
+    DWTaskGroup.all_first_tasks(task_groups_boundaries_without_inner_dependencies)
+    + DWTaskGroup.first_tasks(inner_dependencies_task_groups_boundaries)
+)
 
 TaskFlowHelper.chain_task_groups_via_common_table(dw_staging_task_group, dw_task_group)
 
-terminate_cluster_task.set_upstream(DWTaskGroup.all_last_tasks(dw_task_group))
+terminate_cluster_task.set_upstream(
+    DWTaskGroup.all_last_tasks(task_groups_boundaries_without_inner_dependencies)
+    + DWTaskGroup.last_tasks(inner_dependencies_task_groups_boundaries)
+)

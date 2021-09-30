@@ -51,9 +51,9 @@ agent_contract_rank AS (
 )
 SELECT DISTINCT
     ash.id_agent AS sk_agent,
-    CAST(CAST(ar.id_region AS STRING) || CAST(ash.id_agent AS STRING) AS BIGINT) AS sk_agent_region,
+    CAST(CAST(ash.id_slot_date AS STRING) || CAST(ash.id_agent AS STRING) AS BIGINT) AS sk_agent_region,
     CAST(CAST(ash.id_slot_date AS STRING) || CAST(ash.id_agent AS STRING) AS BIGINT) AS sk_agent_slot_date,
-    CAST(COALESCE(ar.id_region, '-1') AS BIGINT) AS sk_region_code_inspector,
+    CAST(COALESCE(ar.id_region, '-1') AS BIGINT) AS sk_region,
     ash.id_slot_date AS sk_slot_date,
     CAST(DATE_FORMAT(ash.ts_slot_hour,'YMMddHH') AS BIGINT) AS sk_slot_date_hour, 
     CAST(COALESCE(acr.id_work_contract, -1) AS BIGINT) AS sk_work_contract,
