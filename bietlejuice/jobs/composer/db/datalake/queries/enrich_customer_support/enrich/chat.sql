@@ -220,6 +220,7 @@ zendesk_aditional_ticket_info AS (
     tf.contact_motivation_tag,
     tf.contact_theme_tag,
     tf.contact_theme_detail_tag,
+    ftm.ts_created_local AS ts_created,
     ftm.ts_solved_local AS ts_solved
   FROM
     datalake_zendesk_ticket_funnels.ticket_funnel tf
@@ -260,6 +261,7 @@ back_tickets AS (
       NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),
       REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})', 1)
     ) AS front_task,
+    zd.ts_created,
     zd.ts_solved
   FROM
     zendesk_aditional_ticket_info zd
@@ -276,13 +278,14 @@ back_tickets AS (
     (zd.tags LIKE '%tarefa_atendimento_escalado%' OR LOWER(dc.front_or_back) = 'back')
     AND (zd.tags NOT LIKE '%bot_end_conversation%' AND zd.tags NOT LIKE '%closed_by_merge%')
     AND COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(zd.custom_fields, '$.Ticket do contato'), '(WT[a-z0-9]{{20,40}})', 1), ''),REGEXP_EXTRACT(zd.description, '(WT[a-z0-9]{{20,40}})', 1)) != '' 
-  GROUP BY 1,2,3,4,5
+  GROUP BY 1,2,3,4,5,6
 ),
-last_back_ticket_timestamp AS (
+last_and_first_back_tickets_timestamps AS (
   SELECT
     front_ticket,
     CONCAT_WS(',' , COLLECT_SET(back_ticket)) AS back_ticket_list,
     SUM(CAST(back_ticket_status IN ('closed','deleted','solved') AS SMALLINT))/CAST(COUNT(DISTINCT back_ticket) AS FLOAT) != 1 AS is_open_back_ticket,
+    MIN(ts_created) AS ts_first_created,
     MAX(ts_solved) AS ts_last_solved
   FROM
     back_tickets
@@ -292,11 +295,12 @@ last_back_ticket AS (
   SELECT
     bt.*,
     lt.is_open_back_ticket,
-    lt.back_ticket_list
+    lt.back_ticket_list,
+    CAST((TO_UNIX_TIMESTAMP(lt.ts_last_solved) - TO_UNIX_TIMESTAMP(lt.ts_first_created))/60.0 AS DOUBLE) AS total_backoffice_minutes_time
   FROM
     back_tickets bt
   JOIN
-    last_back_ticket_timestamp lt
+    last_and_first_back_tickets_timestamps lt
       ON lt.front_ticket = bt.front_ticket
       AND lt.ts_last_solved = bt.ts_solved
 )
@@ -335,6 +339,7 @@ SELECT DISTINCT
   CAST((TO_UNIX_TIMESTAMP(COALESCE(bt.ts_solved, ct.ts_last_event)) - TO_UNIX_TIMESTAMP(ct.ts_first_event))/60.0 AS DOUBLE) AS frt,
   bt.back_ticket AS last_back_ticket,
   bt.back_ticket_list,
+  bt.total_backoffice_minutes_time,
   ct.seconds_first_reply,
   ct.task_minutes_wait_time AS segment_minutes_wait_time,
   ct.number_of_departments,

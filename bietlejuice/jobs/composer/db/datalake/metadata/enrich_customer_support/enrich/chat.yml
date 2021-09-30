@@ -191,6 +191,10 @@ columns:
     lineage:
       - datalake_zendesk_ticket_funnels.ticket_funnel.status
       - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+  total_backoffice_minutes_time:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_created_local
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_solved_local
   is_csat_answered:
     lineage:
       - datalake_chat_fup_clean.chats_chat.id_ticket

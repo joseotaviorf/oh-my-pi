@@ -219,6 +219,10 @@ columns:
   back_ticket_list:
     lineage:
       - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+  total_backoffice_minutes_time:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_created_local
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_solved_local
   is_csat_answered:
     lineage:
       - datalake_bigfone_twilio.call_ivr_events.csat_2

@@ -139,6 +139,7 @@ back_tickets AS (
       NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(custom_fields, '$.Ticket do contato'), '([0-9]{{8}})', 1), ''),
       REGEXP_EXTRACT(SUBSTRING(SPLIT(REGEXP_REPLACE(description, 'WT[a-z0-9]{{20,40}}',''), 'Ticket do contato')[1], 1, 18), '([0-9]{{8}})', 1)
     ) AS front_ticket,
+    ts_ticket_started,
     ts_ticket_solved
   FROM
     zendesk_email
@@ -150,11 +151,12 @@ back_tickets AS (
     AND (tags NOT LIKE '%bot_end_conversation%' AND tags NOT LIKE '%closed_by_merge%')
     AND COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(custom_fields, '$.Ticket do contato'), '([0-9]{{8}})', 1), ''),REGEXP_EXTRACT(SUBSTRING(SPLIT(REGEXP_REPLACE(description, 'WT[a-z0-9]{{20,40}}',''), 'Ticket do contato')[1], 1, 18), '([0-9]{{8}})', 1)) != ''
 ),
-last_back_ticket_timestamp AS (
+last_and_first_back_tickets_timestamps AS (
   SELECT
     front_ticket,
     CONCAT_WS(',' , COLLECT_SET(back_ticket)) AS back_ticket_list,
     SUM(CAST(back_ticket_status IN ('closed','deleted','solved') AS SMALLINT))/CAST(COUNT(DISTINCT back_ticket) AS FLOAT) != 1 AS is_open_back_ticket,
+    MIN(ts_ticket_started) AS ts_first_created,
     MAX(ts_ticket_solved) AS ts_last_solved
   FROM
     back_tickets
@@ -164,11 +166,12 @@ last_back_ticket AS (
   SELECT
     bt.*,
     lt.is_open_back_ticket,
-    lt.back_ticket_list
+    lt.back_ticket_list,
+    CAST((TO_UNIX_TIMESTAMP(lt.ts_last_solved) - TO_UNIX_TIMESTAMP(lt.ts_first_created))/60.0 AS DOUBLE) AS total_backoffice_minutes_time
   FROM
     back_tickets bt
   JOIN
-    last_back_ticket_timestamp lt
+    last_and_first_back_tickets_timestamps lt
       ON lt.front_ticket = bt.front_ticket
       AND lt.ts_last_solved = bt.ts_ticket_solved
 )
@@ -219,6 +222,7 @@ SELECT DISTINCT
   bt.is_open_back_ticket,
   bt.back_ticket_list,
   bt.back_ticket AS last_back_ticket,
+  bt.total_backoffice_minutes_time,
   cs.ts_first_seen AS ts_csat_first_seen,
   cs.ts_first_response AS ts_csat_first_response,
   ze.ts_initially_assigned_local,
