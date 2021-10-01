@@ -105,6 +105,11 @@ crm_iptu_wave4:
     sheet_name: crm_iptu_wave4
     clean_table_name: crm_iptu_wave4
 
+csat_chaves_onb_iq:
+    sheet_id: 1bMCeibiljXVwL13m-9VZ-TJw39YqH0YkBMLjB2OGXrQ
+    sheet_name: respostas_csat
+    clean_table_name: tenant_onboarding_keys_csat
+
 csat_chaves_off_pp:
     sheet_id: 1mezgNmlXsMgMxPYmDib-av_T3rtKCGbqvyaZlh2z84M
     sheet_name: respostas_csat
