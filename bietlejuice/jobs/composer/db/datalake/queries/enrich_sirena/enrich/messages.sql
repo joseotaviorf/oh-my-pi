@@ -18,8 +18,8 @@ client_info AS (
     SELECT
         id,
         CASE
-            WHEN pr.last_name REGEXP '[0-9]{9}'
-                THEN regexp_extract(pr.last_name, '[0-9]{9}', 0)
+            WHEN pr.last_name REGEXP '[0-9]{{9}}'
+                THEN regexp_extract(pr.last_name, '[0-9]{{9}}', 0)
         END AS id_house,
         CASE label
             WHEN 'warm' THEN 'Seller'
