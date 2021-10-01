@@ -20,7 +20,7 @@ prev_tasks_full AS (
         COALESCE(DATE_FORMAT(tr.ts_action, 'YMMdd'), -1) AS id_task_user_end_date,
         COALESCE(DATE_FORMAT(LAG(tr.ts_action) OVER(PARTITION BY tr.id_task ORDER BY tr.ts_action DESC), 'YMMdd'), -1) AS id_task_user_start_date,
         COALESCE(tr.id_user_action, -1) AS id_user_action,
-        COALESCE(tr.id_workgroup, -1) AS id_workgroup,
+        tr.id_workgroup,
         tr.action_type,
         tr.action_user_name,
         tr.action_type AS task_user_type,
