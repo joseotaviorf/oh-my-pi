@@ -92,6 +92,7 @@ WITH quinto_messenger_tickets AS (
   chatbot_time_metrics AS (
     SELECT
       s.id AS id_session,
+      MIN(s.ts_created) AS ts_reception_started,
       (UNIX_TIMESTAMP(MIN(bot.ts_created)) - UNIX_TIMESTAMP(MIN(s.ts_created)))/60 AS total_minutes_reception_time
     FROM
       datalake_sauron_clean.bot_outgoing_messages AS bot
@@ -158,6 +159,7 @@ WITH quinto_messenger_tickets AS (
       ctm.total_queue_time AS seconds_total_queue_time,
       ctm.total_wrap_up_time AS seconds_total_wrap_up_time,
       ctm.total_handling_time AS seconds_total_handling_time,
+      bot.ts_reception_started,
       t.ts_created,
       t.ts_updated,
       t.ts_task_closed,
@@ -336,7 +338,7 @@ SELECT DISTINCT
   zd.tags,
   zd.status,
   zd.custom_fields,
-  CAST((TO_UNIX_TIMESTAMP(COALESCE(bt.ts_solved, ct.ts_last_event)) - TO_UNIX_TIMESTAMP(ct.ts_first_event))/60.0 AS DOUBLE) AS frt,
+  CAST((TO_UNIX_TIMESTAMP(COALESCE(bt.ts_solved, ct.ts_last_event)) - TO_UNIX_TIMESTAMP(ct.ts_reception_started))/60.0 AS DOUBLE) AS frt,
   bt.back_ticket AS last_back_ticket,
   bt.back_ticket_list,
   bt.total_backoffice_minutes_time,

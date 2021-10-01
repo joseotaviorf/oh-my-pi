@@ -113,6 +113,7 @@ columns:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_solved_local
       - datalake_quinto_messenger.task.ts_created_local
+      - datalake_sauron_clean.session.ts_created
   last_back_ticket:
     lineage:
       - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
