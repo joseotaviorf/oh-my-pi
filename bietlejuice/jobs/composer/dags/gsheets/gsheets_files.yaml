@@ -590,6 +590,11 @@ tratativas_actionline:
     sheet_name: forms_actionline
     clean_table_name: actionline_negotiations
 
+tv_ads:
+    sheet_id: 1HEbApdK1ydVMbAPzmdmN5b850aCVVRhUyjLZp6Ny4kE
+    sheet_name: base_clean
+    clean_table_name: tv_ads
+
 users_cx_plaquinhas:
     sheet_id: 1oiUlhua9uFXbwkaSeF_EYRvaB652JIhOoWDy1bYolK0
     sheet_name: users_cx_plaquinhas

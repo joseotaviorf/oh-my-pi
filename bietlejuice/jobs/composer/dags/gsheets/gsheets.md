@@ -145,6 +145,7 @@ This pipeline produces the following output tables:
     - `taxonomy_portal_casa_mineira`
     - `tenant_entrance_inspection_csat` 
     - `tenant_onboarding_keys_csat`
+    - `tv_ads`
     - `users_cx_plaquinhas`
     - `weekday_demand_share`
     - `weekday_holiday_share`
