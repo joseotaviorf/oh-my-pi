@@ -34,9 +34,6 @@ columns:
   target:
     lineage:
       - datalake_brand_tracking_raw.brandtracking.target
-  dt_load:
-    lineage:
-      - datalake_brand_tracking_raw.brandtracking.dt_load
   year:
     lineage:
       - datalake_brand_tracking_raw.brandtracking.year

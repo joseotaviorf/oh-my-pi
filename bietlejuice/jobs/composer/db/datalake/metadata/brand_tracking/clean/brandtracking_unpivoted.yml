@@ -4,15 +4,12 @@ columns:
   id_respondent:
     lineage:
       - datalake_brand_tracking_raw.brandtracking_unpivoted.respondent_serial
-  wave:
-    lineage:
-      - datalake_brand_tracking_raw.brandtracking_unpivoted.wave
-  dt_load:
-    lineage:
-      - datalake_brand_tracking_raw.brandtracking_unpivoted.dt_load
   id_question:
     lineage:
       - datalake_brand_tracking_raw.brandtracking_unpivoted.id_question
+  wave:
+    lineage:
+      - datalake_brand_tracking_raw.brandtracking_unpivoted.wave
   answer:
     lineage:
       - datalake_brand_tracking_raw.brandtracking_unpivoted.answer
