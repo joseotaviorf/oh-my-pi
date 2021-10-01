@@ -58,6 +58,13 @@ columns:
       - datalake_customer_support.call.zendesk_department
       - datalake_customer_support.chat.zendesk_department
       - datalake_customer_support.email.department
+  sk_main_department:
+    lineage:
+      - datalake_customer_support.call.zendesk_department
+      - datalake_customer_support.call.last_department
+      - datalake_customer_support.chat.zendesk_department
+      - datalake_customer_support.chat.last_department
+      - datalake_customer_support.email.department
   sk_user:
     lineage:
       - datalake_customer_support.call.id_user
@@ -92,6 +99,13 @@ columns:
     lineage:
       - datalake_customer_support.call.zendesk_department
       - datalake_customer_support.chat.zendesk_department
+      - datalake_customer_support.email.department
+  main_department:
+    lineage:
+      - datalake_customer_support.call.zendesk_department
+      - datalake_customer_support.call.last_department
+      - datalake_customer_support.chat.zendesk_department
+      - datalake_customer_support.chat.last_department
       - datalake_customer_support.email.department
   total_departments:
     lineage:

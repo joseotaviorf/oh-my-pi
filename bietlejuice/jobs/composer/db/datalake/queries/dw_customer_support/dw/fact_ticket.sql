@@ -18,6 +18,7 @@ WITH call_tickets AS (
     MD5(first_department) AS sk_first_department,
     MD5(last_department) AS sk_last_department,
     MD5(zendesk_department) AS sk_zendesk_department,
+    COALESCE(MD5(last_department), MD5(zendesk_department)) AS sk_main_department,
     MAX(id_user) AS sk_user,
     id_contract AS sk_contract,
     'call' AS channel,
@@ -26,6 +27,7 @@ WITH call_tickets AS (
     first_department,
     last_department,
     zendesk_department,
+    COALESCE(last_department, zendesk_department) AS main_department,
     number_of_departments AS total_departments,
     number_of_segments AS total_segments,
     frt AS full_resolution_time,
@@ -77,7 +79,7 @@ WITH call_tickets AS (
     NOW() AS ts_load
   FROM
     datalake_customer_support.call
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37
+  GROUP BY 1,2,3,4,5,6,7,8,9,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39
 ),
 chat_tickets AS (
   SELECT
@@ -99,6 +101,7 @@ chat_tickets AS (
     MD5(first_department) AS sk_first_department,
     MD5(last_department) AS sk_last_department,
     MD5(zendesk_department) AS sk_zendesk_department,
+    COALESCE(MD5(last_department), MD5(zendesk_department)) AS sk_main_department,
     MAX(id_user) AS sk_user,
     id_contract AS sk_contract, 
     'chat' AS channel,
@@ -107,6 +110,7 @@ chat_tickets AS (
     first_department,
     last_department,
     zendesk_department,
+    COALESCE(last_department, zendesk_department) AS main_department,
     number_of_departments AS total_departments,
     number_of_segments AS total_segments,
     frt AS full_resolution_time,
@@ -158,7 +162,7 @@ chat_tickets AS (
     NOW() AS ts_load
   FROM
     datalake_customer_support.chat
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37
+  GROUP BY 1,2,3,4,5,6,7,8,9,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39
 ),
 email_tickets AS (
   SELECT
@@ -180,6 +184,7 @@ email_tickets AS (
     MD5(department) AS sk_first_department,
     MD5(department) AS sk_last_department, 
     MD5(department) AS sk_zendesk_department,
+    MD5(department) AS sk_main_department,
     MAX(id_user) AS sk_user,
     id_contract AS sk_contract,
     'email' AS channel,
@@ -188,6 +193,7 @@ email_tickets AS (
     department AS first_department,
     department AS last_department,
     department AS zendesk_department,
+    department AS main_department,
     1 AS total_departments,
     1 AS total_segments,
     frt AS full_resolution_time,
@@ -238,7 +244,7 @@ email_tickets AS (
     NOW() AS ts_load
   FROM 
     datalake_customer_support.email
-  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37
+  GROUP BY 1,2,3,4,5,6,7,8,9,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39
 )
 SELECT 
   *
