@@ -1,0 +1,15 @@
+database_name: datalake_gsheets_clean
+table_name: tenant_onboarding_keys_csat
+columns:
+  improvement_tags:
+    lineage:
+      - datalake_gsheets_raw.csat_chaves_onb_iq.tags
+  comments:
+    lineage:
+      - datalake_gsheets_raw.csat_chaves_onb_iq.comments
+  score:
+    lineage:
+      - datalake_gsheets_raw.csat_chaves_onb_iq.score
+  ts_input:
+    lineage:
+      - datalake_gsheets_raw.csat_chaves_onb_iq.ts_input
