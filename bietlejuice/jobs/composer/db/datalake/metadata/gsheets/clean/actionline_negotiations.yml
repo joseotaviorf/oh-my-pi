@@ -1,0 +1,37 @@
+---
+database_name: datalake_gsheets_clean
+table_name: actionline_negotiations
+columns:
+  id_partner:
+    lineage:
+      - datalake_gsheets_raw.tratativas_actionline.id_ciq
+  attendant:
+    lineage:
+      - datalake_gsheets_raw.tratativas_actionline.analista_responsavel
+  call_result:
+    lineage:
+      - datalake_gsheets_raw.tratativas_actionline.resultado_da_ligacao
+  ciq_feedback:
+    lineage:
+      - datalake_gsheets_raw.tratativas_actionline.ciq_receptivo
+  cluster:
+    lineage:
+      - datalake_gsheets_raw.tratativas_actionline.frente
+  comments:
+    lineage:
+      - datalake_gsheets_raw.tratativas_actionline.comentario
+  current_pitch:
+    lineage:
+      - datalake_gsheets_raw.tratativas_actionline.prioridade_indicada
+  last_pitch:
+    lineage:
+      - datalake_gsheets_raw.tratativas_actionline.pitch_passado
+  macro_sent:
+    lineage:
+      - datalake_gsheets_raw.tratativas_actionline.enviou_macro_Qual
+  opportunity:
+    lineage:
+      - datalake_gsheets_raw.tratativas_actionline.identificou_algum_problema
+  ts_input:
+    lineage:
+      - datalake_gsheets_raw.tratativas_actionline.ts_resposta
