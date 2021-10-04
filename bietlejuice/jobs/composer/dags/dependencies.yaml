@@ -107,8 +107,8 @@ bietlejuice.dw_crm:
   - bietlejuice.dw_offer:load-janus-dim-offer-into-redshift
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
   - bietlejuice.ebdb:create-clean-inspection-in-data-lake
-  - bietlejuice.ebdb:create-clean-pre-proposal-in-datalake
-  - bietlejuice.ebdb:create-clean-proposal-in-datalake
+  - bietlejuice.ebdb:create-clean-pre-proposal-in-data-lake
+  - bietlejuice.ebdb:create-clean-proposal-in-data-lake
   - bietlejuice.ebdb:create-clean-rent-flow-in-data-lake
   - bietlejuice.enrich_crm:load-enrich-workflows-transitions
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-actions-resolutions-flow

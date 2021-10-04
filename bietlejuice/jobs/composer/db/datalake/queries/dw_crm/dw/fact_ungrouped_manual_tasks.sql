@@ -53,7 +53,7 @@ WITH contracts_offers AS (
         AND turf.id_workgroup IS NULL
         AND turf.year = {year}
         AND turf.month = {month}
-        AND turf.day {day}
+        AND turf.day = {day}
 ),
 contract_offer_house_listing AS (
     SELECT
