@@ -24,7 +24,7 @@ columns:
       - datalake_casa_mineira_portal_raw.condominio.slug
   address:
     lineage:
-      - datalake_casa_mineira_portal_raw.condominio.logradouro
+      - datalake_casa_mineira_portal_raw.condominio.logradouro_original
   address_number:
     lineage:
       - datalake_casa_mineira_portal_raw.condominio.numero

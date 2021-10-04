@@ -24,7 +24,7 @@ columns:
       - datalake_casa_mineira_portal_raw.imovel.finalidade
   address:
     lineage:
-      - datalake_casa_mineira_portal_raw.imovel.logradouro
+      - datalake_casa_mineira_portal_raw.imovel.logradouro_original
   zip_code:
     lineage:
       - datalake_casa_mineira_portal_raw.imovel.cep
