@@ -134,8 +134,8 @@ churn_dates AS (
                 THEN ts_event
             WHEN event_type = 'contract ended' AND last_event LIKE 'contract signed%'
                 THEN ts_event
-            WHEN event_type = 'rent_flow' AND DATEDIFF(DAY, ts_event, COALESCE(ts_next_event, CURRENT_DATE)) > 35
-                THEN DATEADD(DAY, 35, ts_event)
+            WHEN event_type = 'rent_flow' AND DATEDIFF(DAY, ts_event, COALESCE(ts_next_event, CURRENT_DATE)) > 28
+                THEN DATEADD(DAY, 28, ts_event)
         END AS ts_churn
     FROM
         events_base AS b
