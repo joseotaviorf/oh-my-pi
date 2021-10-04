@@ -500,27 +500,30 @@ bietlejuice.enrich_ebdb_customer_contact_identification:
   - bietlejuice.ebdb:create-clean-proponent-proposal-aud-in-data-lake
 
 bietlejuice.enrich_ebdb_listing:
-  - bietlejuice.ebdb:create-clean-portability-in-data-lake
+  - bietlejuice.ebdb:create-clean-access-authorization-type-in-data-lake
+  - bietlejuice.ebdb:create-clean-access-type-in-data-lake
+  - bietlejuice.ebdb:create-clean-access-type-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-condo-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-agent-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-agent-key-tracking-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-registration-status-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-special-condition-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-visit-information-in-data-lake
+  - bietlejuice.ebdb:create-clean-key-type-in-data-lake
   - bietlejuice.ebdb:create-clean-listing-business-context-in-data-lake
   - bietlejuice.ebdb:create-clean-listing-business-context-aud-in-data-lake
-  - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
-  - bietlejuice.ebdb:create-clean-house-in-data-lake
-  - bietlejuice.ebdb:create-clean-house-aud-in-data-lake
-  - bietlejuice.ebdb:create-clean-house-special-condition-in-data-lake
+  - bietlejuice.ebdb:create-clean-local-in-data-lake
+  - bietlejuice.ebdb:create-clean-map-region-in-data-lake
+  - bietlejuice.ebdb:create-clean-occupant-type-in-data-lake
+  - bietlejuice.ebdb:create-clean-portability-in-data-lake
+  - bietlejuice.ebdb:create-clean-restriction-type-in-data-lake
   - bietlejuice.ebdb:create-clean-special-condition-in-data-lake
   - bietlejuice.ebdb:create-clean-special-condition-aud-in-data-lake
-  - bietlejuice.ebdb:create-clean-house-visit-information-in-data-lake
   - bietlejuice.ebdb:create-clean-state-in-data-lake
-  - bietlejuice.ebdb:create-clean-map-region-in-data-lake
-  - bietlejuice.ebdb:create-clean-condo-in-data-lake
-  - bietlejuice.ebdb:create-clean-local-in-data-lake
-  - bietlejuice.ebdb:create-clean-access-type-in-data-lake
-  - bietlejuice.ebdb:create-clean-occupant-type-in-data-lake
-  - bietlejuice.ebdb:create-clean-key-type-in-data-lake
-  - bietlejuice.ebdb:create-clean-access-authorization-type-in-data-lake
-  - bietlejuice.ebdb:create-clean-restriction-type-in-data-lake
-  - bietlejuice.ebdb:create-clean-house-registration-status-in-data-lake
-
+  - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
+  
 bietlejuice.enrich_ebdb_listing_jobs:
   - bietlejuice.ebdb:create-clean-house-registration-status-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-inspection-in-data-lake

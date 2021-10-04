@@ -1,13 +1,19 @@
 ---
 database_name: datalake_ebdb_listing
-table_name: non_doorman_listing
+table_name: agents_with_keys
 columns:
+  id_agent:
+    lineage:
+      - datalake_ebdb_clean.house_agent_key_tracking_aud.id_agent
   id_house:
     lineage:
       - datalake_ebdb_listing.house_listing.id_house
   id_house_listing:
     lineage:
       - datalake_ebdb_listing.house_listing.id_house_listing
+  all_id_agents:
+    lineage:
+      - datalake_ebdb_clean.house_agent_key_tracking_aud.id_agent
   first_key_location:
     lineage:
       - datalake_ebdb_clean.access_authorization_type.name
@@ -29,6 +35,9 @@ columns:
   has_keys_with_agent_returned:
     lineage:
       - datalake_ebdb_clean.house_agent_key_tracking.status
+  is_delivered_on_another_listing:
+    lineage:
+      - datalake_ebdb_clean.house_agent_key_tracking_aud.comments
   is_keys_with_agent_opt_in:
     lineage:
       - datalake_ebdb_clean.access_type_aud.has_opted_keys_with_agent
@@ -39,6 +48,21 @@ columns:
       - datalake_ebdb_listing.house.key_location
       - datalake_ebdb_listing.house.occupant_type
       - datalake_ebdb_listing.house.is_for_sale
+  dt_attributed:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  dt_delivered:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  dt_optin:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  dt_publicated:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  dt_returned:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
   ts_listing_version_start:
     lineage:
       - datalake_ebdb_listing.house_listing.ts_listing_version_start

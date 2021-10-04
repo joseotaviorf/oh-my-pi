@@ -12,12 +12,12 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 Produces the following output tables:
 
+- `agents_with_keys`
 - `house`
 - `house_listing`
 - `house_listing_status`
 - `house_status_version_order`
 - `listing_business_context`
-- `non_doorman_listing`
 - `portability`
 
 ### Responsible Data Engineering Team
