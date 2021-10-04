@@ -48,14 +48,10 @@ columns:
       - datalake_ebdb_listing.listing_business_context.is_sale_context
   has_sms_notifications_enabled:
     lineage:
-      - datalake_ebdb_clean.user_preferences.id_user
       - datalake_ebdb_clean.user_preferences.is_receiving_sms
-      - datalake_ebdb_clean.user_preferences.ts_created
   has_whatsapp_notifications_enabled:
     lineage:
-      - datalake_ebdb_clean.user_preferences.id_user
       - datalake_ebdb_clean.user_preferences.is_receiving_whatsapp
-      - datalake_ebdb_clean.user_preferences.ts_created
   dt_birth:
     lineage:
       - datalake_ebdb_user.user.dt_birth

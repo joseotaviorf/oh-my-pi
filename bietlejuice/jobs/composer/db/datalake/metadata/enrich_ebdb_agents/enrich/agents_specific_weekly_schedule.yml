@@ -53,7 +53,5 @@ columns:
       - datalake_ebdb_clean.agent_specific_hour.is_available_between_19_and_20
   ts_updated:
     lineage:
-      - datalake_ebdb_clean.agent_specific_hour.dt_agent_specific_hour
-      - datalake_ebdb_clean.agent_specific_hour.id_agent
       - datalake_ebdb_clean.agent_specific_hour.ts_updated
       

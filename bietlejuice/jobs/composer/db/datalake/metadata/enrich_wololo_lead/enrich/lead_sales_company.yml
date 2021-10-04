@@ -9,6 +9,4 @@ columns:
       - datalake_wololo_clean.prospect_dimension_aud.sales_company
   ts_sales_company_sent:
     lineage:
-      - datalake_wololo_clean.prospect_aud.id_reference
-      - datalake_wololo_clean.prospect_dimension_aud.sales_company
       - datalake_wololo_clean.rev_info.ts_rev

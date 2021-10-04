@@ -19,13 +19,9 @@ columns:
   id_first_agent:
     lineage:
       - datalake_quinto_messenger.task.id_agent
-      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
-      - datalake_quinto_messenger.task_event.ts_created_local
   id_last_agent:
     lineage:
       - datalake_quinto_messenger.task.id_agent
-      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
-      - datalake_quinto_messenger.task_event.ts_created_local
   id_user:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_user
@@ -66,19 +62,9 @@ columns:
   transferred_from_dept:
     lineage:
       - datalake_quinto_messenger.task_event.task_queue_name
-      - datalake_quinto_messenger.task.id_channel
-      - datalake_quinto_messenger.task_event.ts_created_local
   transferred_to_dept:
     lineage:
       - datalake_quinto_messenger.task_event.task_queue_name
-      - datalake_quinto_messenger.task.id_channel
-      - datalake_quinto_messenger.task_event.ts_created_local
-  transference_type:
-    lineage:
-      - datalake_quinto_messenger.task_event.task_queue_name
-      - datalake_quinto_messenger.task.id_channel
-      - datalake_quinto_messenger.task_event.ts_created_local
-      - datalake_quinto_messenger.task.id_agent
   request_type:
     lineage:
       - datalake_zendesk_ticket_funnels.ticket_funnel.request_type
@@ -162,13 +148,9 @@ columns:
   is_last_segment:
     lineage:
       - datalake_quinto_messenger.task.id_task
-      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
-      - datalake_quinto_messenger.task_event.ts_created_local
   is_first_segment:
     lineage:
       - datalake_quinto_messenger.task.id_task
-      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
-      - datalake_quinto_messenger.task_event.ts_created_local
   transference_reason:
     lineage:
       - datalake_insider_clean.review_feature.rating_selected

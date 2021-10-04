@@ -27,13 +27,9 @@ columns:
   id_first_agent:
     lineage:
       - datalake_bigfone_twilio.call_flex_reservations.id_agent
-      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
-      - datalake_bigfone_twilio.call_flex_events.ts_created_local
   id_last_agent:
     lineage:
       - datalake_bigfone_twilio.call_flex_reservations.id_agent
-      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
-      - datalake_bigfone_twilio.call_flex_events.ts_created_local
   id_queue:
     lineage:
       - datalake_bigfone_twilio.call_flex_reservations.id_queue
@@ -64,32 +60,15 @@ columns:
   first_department:
     lineage:
       - datalake_bigfone_twilio.call_flex_reservations.queue_name
-      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
-      - datalake_bigfone_twilio.call_flex_events.ts_created_local
   last_department:
     lineage:
       - datalake_bigfone_twilio.call_flex_reservations.queue_name
-      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
-      - datalake_bigfone_twilio.call_flex_events.ts_created_local
   transferred_from_dept: 
     lineage:
       - datalake_bigfone_twilio.call_flex_reservations.queue_name
-      - datalake_bigfone_twilio.call_flex_reservations.id_call
-      - datalake_bigfone_twilio.call_flex_reservations.id_task
-      - datalake_bigfone_twilio.call_flex_events.ts_created_local
   transferred_to_dept:
     lineage:
       - datalake_bigfone_twilio.call_flex_reservations.queue_name
-      - datalake_bigfone_twilio.call_flex_reservations.id_call
-      - datalake_bigfone_twilio.call_flex_reservations.id_task
-      - datalake_bigfone_twilio.call_flex_events.ts_created_local
-  transference_type:
-    lineage:
-      - datalake_bigfone_twilio.call_flex_reservations.queue_name
-      - datalake_bigfone_twilio.call_flex_reservations.id_queue
-      - datalake_bigfone_twilio.call_flex_reservations.id_call
-      - datalake_bigfone_twilio.call_flex_reservations.id_task
-      - datalake_bigfone_twilio.call_flex_events.ts_created_local
   transference_reason:
     lineage:
       - datalake_insider_clean.review_feature.rating_selected
@@ -174,13 +153,9 @@ columns:
   is_last_segment:
     lineage:
       - datalake_bigfone_twilio.call_flex_reservations.id_reservation
-      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
-      - datalake_bigfone_twilio.call_flex_events.ts_created_local
   is_first_segment:
     lineage:
       - datalake_bigfone_twilio.call_flex_reservations.id_reservation
-      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
-      - datalake_bigfone_twilio.call_flex_events.ts_created_local
   has_back_tickets:
     lineage:
       - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket

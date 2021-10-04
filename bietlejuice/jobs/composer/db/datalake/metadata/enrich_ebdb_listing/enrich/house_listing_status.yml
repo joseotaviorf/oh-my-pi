@@ -20,11 +20,6 @@ columns:
   status_change_reason:
     lineage:
       - datalake_ebdb_listing.house_status_version_order.reason
-  is_last_status_of_day:
-    lineage:
-      - datalake_ebdb_listing.house_status_version_order.ts_status_changed_new
-      - datalake_ebdb_listing.house_status_version_order.id_house
-      - datalake_ebdb_listing.house_status_version_order.order_version
   ts_first_publication:
     lineage:
       - datalake_ebdb_listing.house_status_version_order.ts_first_publication

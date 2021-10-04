@@ -20,7 +20,6 @@ columns:
       - datalake_sale_listings.sale_status_version_order.reason
   is_last_status:
     lineage:
-      - datalake_sale_listings.sale_status_version_order.id_house
       - datalake_sale_listings.sale_status_version_order.ts_status_changed_new
   ts_first_publication:
     lineage:

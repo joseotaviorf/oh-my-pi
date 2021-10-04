@@ -41,13 +41,6 @@ columns:
   is_keys_with_agent_opt_in:
     lineage:
       - datalake_ebdb_clean.access_type_aud.has_opted_keys_with_agent
-  is_keys_with_agent_eligible:
-    lineage:
-      - datalake_ebdb_clean.house_agent_aud.relation_type
-      - datalake_ebdb_listing.house.doorman_type
-      - datalake_ebdb_listing.house.key_location
-      - datalake_ebdb_listing.house.occupant_type
-      - datalake_ebdb_listing.house.is_for_sale
   dt_attributed:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision

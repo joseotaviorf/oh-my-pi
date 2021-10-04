@@ -35,9 +35,3 @@ columns:
   sk_owner_approved_date:
     lineage:
       - datalake_ebdb_clean.inspection.ts_owner_approved
-  booking_retry_rank_by_inspection_type:
-    lineage:
-      - datalake_ebdb_clean.contract.id
-      - datalake_ebdb_clean.inspection.id
-      - datalake_ebdb_clean.inspection.type
-      - datalake_ebdb_clean.booking.id

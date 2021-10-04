@@ -103,7 +103,6 @@ columns:
       - datalake_crm.task_status_histories.action_user_name
       - datalake_crm.task_status_histories.ts_action
       - datalake_crm.tasks_actions.ts_action
-      - datalake_crm.tasks.id
   is_resolved:
     lineage:
       - datalake_crm.tasks.is_resolved
@@ -115,12 +114,10 @@ columns:
     lineage:
       - datalake_crm.task_status_histories.ts_action
       - datalake_crm.tasks_actions.ts_action
-      - datalake_crm.tasks.id
   ts_next_action:
     lineage:
       - datalake_crm.task_status_histories.ts_action
       - datalake_crm.tasks_actions.ts_action
-      - datalake_crm.tasks.id
   ts_created:
     lineage:
       - datalake_crm.tasks.ts_created

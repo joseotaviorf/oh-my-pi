@@ -22,38 +22,21 @@ columns:
   ts_first_publication:
     lineage:
       - datalake_ebdb_clean.house_aud.dt_first_publication
-      - datalake_ebdb_clean.house_aud.id_house
   ts_status_changed:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
   ts_status_changed_new:
     lineage:
-      - datalake_ebdb_clean.house_aud.id_house
-      - datalake_ebdb_clean.house_aud.status
       - datalake_ebdb_clean.house_aud.dt_first_publication
       - datalake_ebdb_clean.user_revision_entity.ts_revision
   ts_status_changed_next:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
-      - datalake_ebdb_clean.house_aud.id_house
-      - datalake_ebdb_clean.house_aud.rev
-  order_status:
-    lineage:
-      - datalake_ebdb_clean.house_aud.id_house
-      - datalake_ebdb_clean.house_aud.rev
-  max_order_status:
-    lineage:
-      - datalake_ebdb_clean.house_aud.id_house
-      - datalake_ebdb_clean.house_aud.rev
   events_change_status:
     lineage:
       - datalake_ebdb_clean.house_aud.status
       - datalake_ebdb_clean.user_revision_entity.ts_revision
   publication_version_date:
     lineage:
-      - datalake_ebdb_clean.house_aud.id_house
-      - datalake_ebdb_clean.house_aud.rev
-      - datalake_ebdb_clean.house_aud.status
       - datalake_ebdb_clean.user_revision_entity.ts_revision
       - datalake_ebdb_clean.house_aud.dt_first_publication
-      - datalake_ebdb_clean.house_aud.status

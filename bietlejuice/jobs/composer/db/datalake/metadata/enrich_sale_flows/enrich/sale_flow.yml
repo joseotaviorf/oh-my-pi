@@ -44,22 +44,6 @@ columns:
       - datalake_booking.booking.ts_created
       - datalake_booking.booking.visit_fup
       - datalake_offer.sale_offer.ts_offer_submitted
-  rank_buyer_sale_flow:
-    lineage:
-      - datalake_amplitude_talk_to_agent.talk_to_agent_events.id_user
-      - datalake_amplitude_talk_to_agent.talk_to_agent_events.ts_event
-      - datalake_booking.booking.id_visitor
-      - datalake_booking.booking.ts_created
-      - datalake_offer.sale_offer.id_buyer
-      - datalake_offer.sale_offer.ts_offer_submitted
-  rank_house_sale_flow:
-    lineage:
-      - datalake_amplitude_talk_to_agent.talk_to_agent_events.id_house
-      - datalake_amplitude_talk_to_agent.talk_to_agent_events.ts_event
-      - datalake_booking.booking.id_house
-      - datalake_booking.booking.ts_created
-      - datalake_offer.sale_offer.id_house
-      - datalake_offer.sale_offer.ts_offer_submitted
   is_buyer_first_sale_flow:
     lineage:
       - datalake_amplitude_talk_to_agent.talk_to_agent_events.id_user
