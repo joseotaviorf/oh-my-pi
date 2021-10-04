@@ -1,0 +1,100 @@
+database_name: dw_crm_migration
+table_name: fact_closing_tasks
+columns:
+  sk_task:
+    lineage:
+      - datalake_crm_tasks_history_flows.tasks_history_users_flow.id_task
+  sk_receiver:
+    lineage:
+      - datalake_crm_tasks_history_flows.tasks_history_users_flow.id_receiver
+  sk_start_date:
+    lineage:
+      - datalake_crm_tasks_history_flows.tasks_history_users_flow.id_start_date
+  sk_completed_date:
+    lineage:
+      - datalake_crm_tasks_history_flows.tasks_history_users_flow.id_completed_date
+  sk_origin:
+    lineage:
+      - datalake_crm_tasks_history_flows.tasks_history_users_flow.id_origin
+  sk_assignee:
+    lineage:
+      - datalake_crm_tasks_history_flows.tasks_history_users_flow.id_assignee
+  sk_user_action:
+    lineage:
+      - datalake_crm_tasks_history_flows.tasks_history_users_flow.id_user_action
+  sk_action_date:
+    lineage:
+      - datalake_crm_tasks_history_flows.tasks_history_users_flow.id_action_date
+  sk_task_action_end_date:
+    lineage:
+      - datalake_crm_tasks_history_flows.tasks_history_users_flow.id_task_user_end_date
+  sk_task_action_start_date:
+    lineage:
+      - datalake_crm_tasks_history_flows.tasks_history_users_flow.id_task_user_start_date
+  sk_offer:
+    lineage:
+      - dw_janus.dim_offer.sk_offer
+      # - dw_janus.fact_listing_rent_flows.sk_offer
+  sk_proposal:
+    lineage:
+      - datalake_ebdb_clean.proposal.id
+      - datalake_ebdb_clean.contract.id_proposal
+      # - dw_janus.fact_listing_rent_flows.sk_proposal
+  sk_contract:
+    lineage:
+      - datalake_ebdb_clean.contract.id
+      # - dw_janus.fact_listing_rent_flows.sk_contract
+  # id_house_listing:
+  #   lineage:
+  #     - dw_janus.fact_listing_rent_flows.sk_house_listing
+  sk_house_owner:
+    lineage:
+      - datalake_ebdb_clean.house.id_user
+      # - dw_janus.fact_listing_rent_flows.sk_owner
+  sk_tenant:
+    lineage:
+      - datalake_ebdb_clean.proposal.id_proponent
+      - datalake_ebdb_clean.contract.id_user
+      # - dw_janus.fact_listing_rent_flows.sk_client
+  # sk_proponent:
+  #   lineage:
+  #     - dw_janus.fact_listing_rent_flows.sk_client
+  task_action_type:
+    lineage:
+      - datalake_crm_tasks_history_flows.tasks_history_users_flow.task_user_type
+  minutes_task_created_to_started:
+    lineage:
+      - datalake_crm_tasks_history_flows.tasks_history_users_flow.minutes_task_created_to_started
+  task_user_action_resolve_hours:
+    lineage:
+      - datalake_crm_tasks_history_flows.tasks_history_users_flow.task_user_resolve_hours
+  action_user_name:
+    lineage:
+      - datalake_crm_tasks_history_flows.tasks_history_users_flow.action_user_name
+  action_type:
+    lineage:
+      - datalake_crm_tasks_history_flows.tasks_history_users_flow.action_type
+  action_reason:
+    lineage:
+      - datalake_crm_tasks_history_flows.tasks_history_users_flow.action_reason
+  task_status:
+    lineage:
+      - datalake_crm_tasks_history_flows.tasks_history_users_flow.task_status
+  ts_action:
+    lineage:
+      - datalake_crm_tasks_history_flows.tasks_history_users_flow.ts_action
+  ts_task_action_start:
+    lineage:
+      - datalake_crm_tasks_history_flows.tasks_history_users_flow.ts_task_user_start
+  ts_task_action_end:
+    lineage:
+      - datalake_crm_tasks_history_flows.tasks_history_users_flow.ts_task_user_end
+  year:
+    lineage:
+      - datalake_crm_tasks_history_flows.tasks_history_users_flow.year
+  month:
+    lineage:
+      - datalake_crm_tasks_history_flows.tasks_history_users_flow.month
+  day:
+    lineage:
+      - datalake_crm_tasks_history_flows.tasks_history_users_flow.day
