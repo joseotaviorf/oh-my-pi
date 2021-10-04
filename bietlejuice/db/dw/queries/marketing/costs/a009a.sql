@@ -2,7 +2,58 @@
  Rateio de acordo com os prospects da última semana, vindos de afiliados que entraram no mês do prospect (new_users),
  com tracking_source facebook ou google e campanha não branded
  */
-with
+with total_prospects as (
+    with rent_prospects as(
+        select
+            f.sk_prospect_date,
+            f.mkt_origin,
+            f.sk_user_lead_affiliate,
+            f.sk_region,
+            f.sk_house_listing_flow
+        from
+            fact_house_listing_flows f
+        left join sale.fact_listing_flows sf
+            on f.sk_house_listing_flow = sf.sk_house_listing_flow
+            and f.sk_prospect_date = sf.sk_prospect_date
+        where f.sk_prospect_date>0
+        and sf.sk_house_listing is null
+    ),
+    sale_prospects as(
+        select
+            sf.sk_prospect_date,
+            sf.mkt_origin,
+            sf.sk_user_lead_affiliate,
+            sf.sk_region,
+            sf.sk_house_listing_flow
+        from
+            sale.fact_listing_flows sf
+        left join fact_house_listing_flows f
+            on f.sk_house_listing_flow = sf.sk_house_listing_flow
+            and f.sk_prospect_date = sf.sk_prospect_date
+        where sf.sk_prospect_date>=20211001 --A regra passa a considerar prospects de ForSale apenas a partir de Out-2021
+        and f.sk_house_listing is null
+    ),
+    hybrid_prospects as(
+        select
+            f.sk_prospect_date,
+            f.mkt_origin,
+            f.sk_user_lead_affiliate,
+            f.sk_region,
+            f.sk_house_listing_flow
+        from
+            fact_house_listing_flows f
+        left join sale.fact_listing_flows sf
+            on f.sk_house_listing_flow = sf.sk_house_listing_flow
+            and f.sk_prospect_date = sf.sk_prospect_date
+        where f.sk_prospect_date>0
+        and sf.sk_house_listing is not null
+    )
+    select * from rent_prospects
+    union all
+    select * from sale_prospects
+    union all
+    select * from hybrid_prospects
+),
 count_prospects as (
 	select
 		dd_p.week_start,
@@ -11,21 +62,21 @@ count_prospects as (
 			else false end  as campaign_is_branded,
 		count(case when dd_p.year_month = dd_aff.year_month then 1 end) new_user_prospects
 	from
-		fact_house_listing_flows f
+		total_prospects  t
 		join dim_date dd_p
-			on dd_p.sk_date =f.sk_prospect_date
+			on dd_p.sk_date = t.sk_prospect_date
 		join dim_user du
-			on f.sk_user_lead_affiliate = du.sk_user
+			on t.sk_user_lead_affiliate = du.sk_user
 		join dim_user_affiliate dua
 			on dua.sk_user_affiliate = du.dados_afiliado_id
 		join dim_date dd_aff
 			on dd_aff.date=date(du.dadosafiliado_inicio_atuacao)
 		join dim_region dr
-			on f.sk_region = dr.sk_region
+			on t.sk_region = dr.sk_region
 	where
-		f.mkt_origin = 'Indica Aí - General'
+		t.mkt_origin = 'Indica Aí - General'
 		and dua.tracking_source ~* '(google)|(facebook)'
-		and f.sk_prospect_date>=20190101
+		and t.sk_prospect_date>=20190101
 		and dr.city_group is not null
 	group by 1,2,3
 	having campaign_is_branded = false
