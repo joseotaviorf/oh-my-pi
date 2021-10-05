@@ -1,0 +1,22 @@
+---
+database_name: datalake_braze_analytics_clean
+table_name: canvas_analytics_indica_ai
+columns:
+  id_canvas:
+    lineage:
+      - datalake_braze_analytics_raw.canvas_analytics_indica_ai.canvas_id
+  canvas_name:
+    lineage:
+      - datalake_braze_analytics_raw.canvas_analytics_indica_ai.name
+  stats:
+    lineage:
+      - datalake_braze_analytics_raw.canvas_analytics_indica_ai.stats
+  year:
+    lineage:
+      - datalake_braze_analytics_raw.canvas_analytics_indica_ai.year
+  month:
+    lineage:
+      - datalake_braze_analytics_raw.canvas_analytics_indica_ai.month
+  day:
+    lineage:
+      - datalake_braze_analytics_raw.canvas_analytics_indica_ai.day

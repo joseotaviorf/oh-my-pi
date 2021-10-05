@@ -4,6 +4,7 @@ class APIEnum:
     the Databricks secrets.
     """
 
+    BRAZE_INDICA_AI = "BRAZE_INDICA_AI_API"
     BRAZE_OWNERS = "BRAZE_OWNERS_API"
     BRAZE_TENANTS = "BRAZE_TENANTS_API"
     CHATTERMILL = "CHATTERMILL_API"

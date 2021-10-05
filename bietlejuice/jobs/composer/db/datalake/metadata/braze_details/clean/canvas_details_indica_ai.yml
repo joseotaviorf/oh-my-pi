@@ -1,0 +1,45 @@
+database_name: datalake_braze_details_clean
+table_name: canvas_details_indica_ai
+columns:
+  id_canvas:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_indica_ai.canvas_id
+  canvas_name:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_indica_ai.name
+  canvas_description:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_indica_ai.description
+  variants:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_indica_ai.variants
+  schedule_type:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_indica_ai.schedule_type
+  steps:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_indica_ai.steps
+  channels:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_indica_ai.channels
+  tags:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_indica_ai.tags
+  archived:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_indica_ai.archived
+  draft:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_indica_ai.draft
+  ts_first_entry:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_indica_ai.first_entry
+  ts_last_entry:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_indica_ai.last_entry
+  ts_created:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_indica_ai.created_at
+  ts_updated:
+    lineage:
+      - datalake_braze_details_raw.canvas_details_indica_ai.updated_at

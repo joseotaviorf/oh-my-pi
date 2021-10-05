@@ -1,0 +1,45 @@
+database_name: datalake_braze_details_clean
+table_name: campaign_details_indica_ai
+columns:
+  id_campaign:
+    lineage:
+      - datalake_braze_details_raw.campaign_details_indica_ai.campaign_id
+  campaign_name:
+    lineage:
+      - datalake_braze_details_raw.campaign_details_indica_ai.name
+  campaign_description:
+    lineage:
+      - datalake_braze_details_raw.campaign_details_indica_ai.description
+  schedule_type:
+    lineage:
+      - datalake_braze_details_raw.campaign_details_indica_ai.schedule_type
+  tags:
+    lineage:
+      - datalake_braze_details_raw.campaign_details_indica_ai.tags
+  channels:
+    lineage:
+      - datalake_braze_details_raw.campaign_details_indica_ai.channels
+  conversion_behaviors:
+    lineage:
+      - datalake_braze_details_raw.campaign_details_indica_ai.conversion_behaviors
+  messages:
+    lineage:
+      - datalake_braze_details_raw.campaign_details_indica_ai.messages
+  archived:
+    lineage:
+      - datalake_braze_details_raw.campaign_details_indica_ai.archived
+  draft:
+    lineage:
+      - datalake_braze_details_raw.campaign_details_indica_ai.draft
+  ts_last_sent:
+    lineage:
+      - datalake_braze_details_raw.campaign_details_indica_ai.last_sent
+  ts_first_sent:
+    lineage:
+      - datalake_braze_details_raw.campaign_details_indica_ai.first_sent
+  ts_created:
+    lineage:
+      - datalake_braze_details_raw.campaign_details_indica_ai.created_at
+  ts_updated:
+    lineage:
+      - datalake_braze_details_raw.campaign_details_indica_ai.updated_at

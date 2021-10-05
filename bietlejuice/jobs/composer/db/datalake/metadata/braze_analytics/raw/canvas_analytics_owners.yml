@@ -1,2 +1,3 @@
+---
 database_name: datalake_braze_analytics_raw
 table_name: canvas_analytics_owners
