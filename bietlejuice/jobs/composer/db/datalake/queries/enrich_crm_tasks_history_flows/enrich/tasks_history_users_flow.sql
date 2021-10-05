@@ -17,11 +17,14 @@ WITH actions AS (
     trh.type,
     ts_action,
     COALESCE(
-        CAST(trh.task_user_resolve_hours AS DOUBLE),
-        ROUND((
-            TO_UNIX_TIMESTAMP(lead(trh.ts_action) OVER (PARTITION BY trh.id_task ORDER BY trh.ts_action), 'yyyy-MM-dd HH:mm:ss')
-            - TO_UNIX_TIMESTAMP(trh.ts_action, 'yyyy-MM-dd HH:mm:ss')
-        )/3600.0, 1)
+        CAST(trh.task_user_resolve_hours AS DECIMAL),
+        CAST(
+          ROUND((
+              TO_UNIX_TIMESTAMP(lead(trh.ts_action) OVER (PARTITION BY trh.id_task ORDER BY trh.ts_action), 'yyyy-MM-dd HH:mm:ss')
+              - TO_UNIX_TIMESTAMP(trh.ts_action, 'yyyy-MM-dd HH:mm:ss')
+          )/3600.0, 1) 
+          AS DECIMAL(10,1)
+        )
     ) AS task_user_resolve_hours,
     trh.ts_action,
     trh.ts_next_action,
@@ -79,9 +82,11 @@ SELECT DISTINCT
   a.action_type,
   a.action_reason,
   a.task_status,
-  ROUND(
-    (TO_UNIX_TIMESTAMP(csa.ts_started_task, 'yyyy-MM-dd HH:mm:ss') - TO_UNIX_TIMESTAMP(csa.ts_created_task, 'yyyy-MM-dd HH:mm:ss'))/60.0,
-    1
+  CAST(
+    ROUND(
+      (TO_UNIX_TIMESTAMP(csa.ts_started_task, 'yyyy-MM-dd HH:mm:ss') - TO_UNIX_TIMESTAMP(csa.ts_created_task, 'yyyy-MM-dd HH:mm:ss'))/60.0,
+      1
+    ) AS DECIMAL(10,1)
   ) AS minutes_task_created_to_started,
   COALESCE(mrbu.task_user_resolve_hours, a.task_user_resolve_hours) AS task_user_resolve_hours,
   COALESCE(mrbu.ts_next_action, a.ts_next_action) AS ts_next_action,

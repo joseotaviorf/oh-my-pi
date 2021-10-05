@@ -102,7 +102,10 @@ SELECT DISTINCT
     t.action_type,
     t.action_user_name,
     t.origin,
-    CAST(COALESCE(mrbu.task_user_resolve_hours, t.task_user_resolve_hours) AS FLOAT) AS task_user_resolve_hours,
+    CASE
+        WHEN t.action_user_name IS NOT NULL THEN CAST(COALESCE(mrbu.task_user_resolve_hours, t.task_user_resolve_hours) AS DECIMAL)
+        ELSE CAST(COALESCE(mrbu.task_user_resolve_hours, t.task_user_resolve_hours) AS DECIMAL(10,1))
+    END AS task_user_resolve_hours,
     t.type, 
     t.action_type AS task_user_type,
     t.dt_partition,

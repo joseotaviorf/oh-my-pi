@@ -37,7 +37,7 @@ SELECT DISTINCT
     ROUND(
       (TO_UNIX_TIMESTAMP(COALESCE(tr.ts_action, t.ts_completed), 'yyyy-MM-dd HH:mm:ss') - TO_UNIX_TIMESTAMP(t.ts_start,'yyyy-MM-dd HH:mm:ss')) / 60.0,
       2
-    ) AS FLOAT
+    ) AS DECIMAL(10,2)
   ) AS hours_task_start_to_completed,
   t.is_resolved,
   COALESCE(tr.is_task_auto_completed, false) AS is_task_auto_completed,  
