@@ -5,7 +5,9 @@ create table if not exists dim_house_listing
  ,id_house bigint   encode lzo
  ,short_id_house bigint   encode lzo
  ,version smallint   encode lzo
+ ,first_key_location varchar(256)   encode lzo
  ,status varchar(256)   encode lzo
+ ,is_keys_with_agent_eligible boolean
  ,ts_listing_version_start timestamp without time zone   encode lzo
  ,ts_listing_version_end timestamp without time zone   encode lzo
  ,ts_house_first_publication timestamp without time zone   encode lzo

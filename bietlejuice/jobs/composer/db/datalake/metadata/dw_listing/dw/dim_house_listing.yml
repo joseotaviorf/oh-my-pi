@@ -13,9 +13,15 @@ columns:
   version:
     lineage:
       - datalake_ebdb_listing.house_listing.version
+  first_key_location:
+    lineage:
+      - datalake_ebdb_listing.agents_with_keys.first_key_location
   status:
     lineage:
       - datalake_ebdb_listing.house_listing.status
+  is_keys_with_agent_eligible:
+    lineage:
+      - datalake_ebdb_listing.agents_with_keys.is_keys_with_agent_eligible
   ts_listing_version_start:
     lineage:
       - datalake_ebdb_listing.house_listing.ts_listing_version_start

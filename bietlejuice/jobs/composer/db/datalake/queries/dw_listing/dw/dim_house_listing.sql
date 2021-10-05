@@ -83,6 +83,15 @@ autonomous_agent_info AS (
         AND h.dt_creation >= partner_agent.ts_created --This rule might change WHEN we start to consider migration
         AND h.id_external IS NOT NULL --This rule might change WHEN we start to consider migration
 ),
+agents_with_keys AS (
+    SELECT
+        id_house_listing,
+        MIN(first_key_location) AS first_key_location,
+        MIN(is_keys_with_agent_eligible) AS is_keys_with_agent_eligible
+    FROM
+        datalake_ebdb_listing.agents_with_keys
+    GROUP BY 1
+),
 house_listings AS (
     WITH lbc AS (
         SELECT
@@ -97,7 +106,9 @@ house_listings AS (
         h.id AS id_house,
         h.id % 892700000 AS short_id_house,
         hl.version,
+        awk.first_key_location,
         CAST(hl.status AS STRING) AS status,
+        awk.is_keys_with_agent_eligible,
         hl.ts_listing_version_start,
         hl.ts_listing_version_end,
         h.dt_first_publication AS ts_house_first_publication,
@@ -167,6 +178,9 @@ house_listings AS (
         ON hl.id_house = h.id
     LEFT JOIN lbc
         ON lbc.id_house = h.id
+    LEFT JOIN
+        agents_with_keys AS awk
+            ON hl.id_house_listing = awk.id_house_listing
 )
 SELECT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
     hl.sk_house_listing,
@@ -174,6 +188,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.id_house,
     hl.short_id_house,
     CAST(hl.version AS SMALLINT) AS version,
+    hl.first_key_location,
     hl.status,
     CAST(hl.rent AS DECIMAL(14, 2)) AS rent,
     CAST(hl.house_rent AS DECIMAL(14, 2)) AS house_rent,
@@ -220,6 +235,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.has_instant_offer_enabled,
     hl.is_house_furnished,
     hl.is_house_registration_verified,
+    hl.is_keys_with_agent_eligible,
     hl.is_last_version,
     hl.is_exclusive,
     (bi.is_b2b OR hp.id_house_listing IS NOT NULL) AS is_b2b,
