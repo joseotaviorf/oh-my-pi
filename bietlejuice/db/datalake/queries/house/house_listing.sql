@@ -8,7 +8,7 @@ WITH agents_with_keys AS (
   GROUP BY 1
 )
 SELECT
-  id_house_listing,
+  hl.id_house_listing,
   id_house,
   version,
   awk.first_key_location,
