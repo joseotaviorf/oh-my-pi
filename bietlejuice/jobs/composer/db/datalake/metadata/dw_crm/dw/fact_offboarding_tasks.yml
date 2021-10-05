@@ -39,10 +39,10 @@ columns:
   #     - dw_janus.fact_listing_rent_flows.sk_tenant
   sk_task_action_start_date:
     lineage:
-      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task_action_start_date
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task_user_start_date
   sk_task_action_end_date:
     lineage:
-      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task_action_end_date
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task_user_end_date
   action_user_name:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.action_user_name

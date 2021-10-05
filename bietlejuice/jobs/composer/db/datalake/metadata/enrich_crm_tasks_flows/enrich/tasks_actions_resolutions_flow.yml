@@ -36,28 +36,24 @@ columns:
   hours_task_started_to_completed:
     lineage:
       - datalake_crm.tasks.ts_start
-      - datalake_crm.tasks_actions.id_task
-      - datalake_crm.tasks_actions.ts_action
+      - datalake_crm.tasks.ts_completed
+      - datalake_crm_tasks_resolution.tasks_resolution.ts_action
   is_resolved:
     lineage:
       - datalake_crm.tasks.is_resolved
   is_task_auto_completed:
     lineage:
-      - datalake_crm.tasks_actions.id_user_action
+      - datalake_crm_tasks_resolution.tasks_resolution.id_user_action
   ts_started:
     lineage:
       - datalake_crm.tasks.ts_start
   ts_completed:
     lineage:
       - datalake_crm.tasks.ts_completed
-      - datalake_crm.tasks_actions.id_task
-      - datalake_crm.tasks_actions.ts_action
+      - datalake_crm_tasks_resolution.tasks_resolution.ts_action
   ts_silenced_until:
     lineage:
       - datalake_crm.tasks.ts_silenced_until
-  ts_analyst_started:
-    lineage:
-      - datalake_crm.tasks_actions.ts_analyst_started
   ts_partition:
     lineage:
       - datalake_crm.tasks.ts_completed

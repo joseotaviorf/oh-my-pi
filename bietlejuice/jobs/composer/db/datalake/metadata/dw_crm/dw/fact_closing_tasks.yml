@@ -85,10 +85,10 @@ columns:
       - datalake_crm_tasks_history_flows.tasks_history_users_flow.ts_action
   ts_task_action_start:
     lineage:
-      - datalake_crm_tasks_history_flows.tasks_history_users_flow.ts_task_user_start
+      - datalake_crm_tasks_history_flows.tasks_history_users_flow.ts_action
   ts_task_action_end:
     lineage:
-      - datalake_crm_tasks_history_flows.tasks_history_users_flow.ts_task_user_end
+      - datalake_crm_tasks_history_flows.tasks_history_users_flow.ts_next_action
   year:
     lineage:
       - datalake_crm_tasks_history_flows.tasks_history_users_flow.year
