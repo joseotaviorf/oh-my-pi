@@ -9,7 +9,7 @@ CREATE TABLE crm_migration.dim_offboarding_task (
 	subject VARCHAR,
 	titles VARCHAR(2000),
 	workgroups VARCHAR(2000),
-	hours_task_start_to_completed FLOAT,
+	hours_task_start_to_completed DECIMAL(10,2),
 	flg_solved BOOLEAN,
 	is_task_auto_completed BOOLEAN,
 	ts_start TIMESTAMP,

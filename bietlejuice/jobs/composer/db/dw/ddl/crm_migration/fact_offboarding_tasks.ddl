@@ -17,7 +17,7 @@ CREATE TABLE crm_migration.fact_offboarding_tasks (
     action_user_name VARCHAR,
     action_type VARCHAR,
     task_action_type VARCHAR,
-    task_user_action_resolve_hours FLOAT, 
+    task_user_action_resolve_hours DECIMAL(10,1), 
     ts_action TIMESTAMP,
     ts_task_action_start TIMESTAMP,
     ts_task_action_end TIMESTAMP,

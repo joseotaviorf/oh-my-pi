@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS crm_migration.dim_closing_task;
 CREATE TABLE crm_migration.dim_closing_task (
     sk_task VARCHAR,
     score_factor INT, 
-    hours_task_start_to_completed FLOAT, 
+    hours_task_start_to_completed DECIMAL(10,2), 
     version INT,
     origin VARCHAR,
     titles VARCHAR(2000),

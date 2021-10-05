@@ -8,3 +8,6 @@ CREATE TABLE crm_migration.dim_closing_task_workflow (
 	ts_load TIMESTAMP
 );
 ALTER TABLE crm_migration.dim_closing_task_workflow OWNER TO airflow;
+CALL grant_all_permissions_on_schema('crm_migration');
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA crm_migration TO GROUP etl;
+GRANT ALL ON SCHEMA crm_migration TO GROUP ETL;
