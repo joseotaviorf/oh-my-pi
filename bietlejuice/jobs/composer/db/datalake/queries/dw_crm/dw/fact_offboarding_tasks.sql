@@ -99,7 +99,7 @@ SELECT DISTINCT
   c.action_user_name,
   c.action_type,
   c.task_action_type,
-  CAST(c.task_user_resolve_hours AS FLOAT) AS task_user_action_resolve_hours,
+  c.task_user_resolve_hours AS task_user_action_resolve_hours,
   c.ts_action,
   c.ts_task_action_start,
   c.ts_task_action_end,
