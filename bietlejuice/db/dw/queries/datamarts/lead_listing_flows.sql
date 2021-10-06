@@ -207,10 +207,16 @@ fact_sale AS (
 	    sor.opportunity_context AS context_opportunity,
 	    sor.first_listing_context AS context_first_listing,
 	    sor.sk_first_photo_job_date AS sk_first_photojob_date_fact_photo_job,
-	    ssf.mkt_origin,
+	    CASE
+            WHEN ssf.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Partners'
+            ELSE ssf.mkt_origin
+        END AS mkt_origin,
 	    ssf.mkt_completion,
 	    ssf.mkt_channel,
-	    ssf.mkt_source,
+	    CASE
+            WHEN ssf.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Spinver'
+            ELSE ssf.mkt_source
+        END AS mkt_source,
 	    ssf.mkt_medium,
 	    sor.sales_company,
 	    sor.sourcing_ops,
@@ -244,10 +250,16 @@ fact_rent AS (
 	    sor.opportunity_context AS context_opportunity,
 	    sor.first_listing_context AS context_first_listing,
 	    sor.sk_first_photo_job_date AS sk_first_photojob_date_fact_photo_job,
-	    hlf.mkt_origin,
+	    CASE
+            WHEN hlf.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Partners'
+            ELSE hlf.mkt_origin
+        END AS mkt_origin,
 	    hlf.mkt_completion,
 	    hlf.mkt_channel,
-	    hlf.mkt_source,
+	    CASE
+            WHEN hlf.sk_user_lead_affiliate IN (360754,912255,1711931,2257503) THEN 'Spinver'
+            ELSE hlf.mkt_source
+        END AS mkt_source,
 	    hlf.mkt_medium,
 	    sor.sales_company,
 	    sor.sourcing_ops,
