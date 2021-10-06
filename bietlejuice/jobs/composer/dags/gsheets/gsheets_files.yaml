@@ -360,6 +360,16 @@ photographer_account:
     sheet_name: photographer_account
     clean_table_name: photographer_account
 
+plaquinhas_installation_targets:
+    sheet_id: 1GEaj4YMe9sgRiJmqgoJuOvkb8H8hjEcEgsTyv9GLzmg
+    sheet_name: targets
+    clean_table_name: plaquinhas_installation_targets
+
+plaquinhas_demand_targets:
+    sheet_id: 1PTguTGckx6mboWC2-AaFSH6yFAYCKBrdEDP1gpF5EUQ
+    sheet_name: targets
+    clean_table_name: plaquinhas_demand_targets
+
 poa_partners:
     sheet_id: 1Tq4Aq6TWz2csI-MTCyy49I63I1amEzn3cmTTyaZDKlU
     sheet_name: poa_partners

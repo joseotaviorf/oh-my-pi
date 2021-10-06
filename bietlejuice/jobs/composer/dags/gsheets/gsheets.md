@@ -96,6 +96,8 @@ This pipeline produces the following output tables:
     - `owner_offboarding_repair_csat`
     - `payments_deals_and_discounts`
     - `photographer_account`
+    - `plaquinhas_installation_targets`
+    - `plaquinhas_demand_targets`
     - `poa_partners`
     - `process_eviction`
     - `projreparos_espelhamento_dl`
