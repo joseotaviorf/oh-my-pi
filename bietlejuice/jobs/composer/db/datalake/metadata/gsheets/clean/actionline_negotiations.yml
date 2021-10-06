@@ -28,7 +28,7 @@ columns:
       - datalake_gsheets_raw.tratativas_actionline.pitch_passado
   macro_sent:
     lineage:
-      - datalake_gsheets_raw.tratativas_actionline.enviou_macro_Qual
+      - datalake_gsheets_raw.tratativas_actionline.enviou_macro_qual
   opportunity:
     lineage:
       - datalake_gsheets_raw.tratativas_actionline.identificou_algum_problema
