@@ -136,6 +136,9 @@ bietlejuice.dw_facebook_insights:
 #   - bietlejuice.ebdb:create-clean-visit-in-data-lake
 #   - bietlejuice.godfather:load-clean-offer
 
+bietlejuice.dw_keys_tracking:
+  - bietlejuice.enrich_ebdb_listing:load-enrich-agents-with-keys
+
 bietlejuice.dw_lead_tracking:
   - bietlejuice.autodialer:load-clean-task-references
   - bietlejuice.autodialer:load-clean-task-reference-inbound-event-histories

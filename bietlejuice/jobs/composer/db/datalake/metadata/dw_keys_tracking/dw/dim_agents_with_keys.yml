@@ -1,0 +1,49 @@
+---
+database_name: keys_tracking
+table_name: dim_agents_with_keys
+columns:
+  sk_house_listing:
+    lineage:
+      - datalake_ebdb_listing.agents_with_keys.id_house_listing
+  sk_agent:
+    lineage:
+      - datalake_ebdb_listing.agents_with_keys.id_agent
+  sk_house:
+    lineage:
+      - datalake_ebdb_listing.agents_with_keys.id_house
+  all_id_agents:
+    lineage:
+      - datalake_ebdb_listing.agents_with_keys.all_id_agents
+  has_keys_with_agent_attributed:
+    lineage:
+      - datalake_ebdb_listing.agents_with_keys.has_keys_with_agent_attributed
+  has_keys_with_agent_delivered:
+    lineage:
+      - datalake_ebdb_listing.agents_with_keys.has_keys_with_agent_delivered
+  has_keys_with_agent_returned:
+    lineage:
+      - datalake_ebdb_listing.agents_with_keys.has_keys_with_agent_returned
+  is_delivered_on_another_listing:
+    lineage:
+      - datalake_ebdb_listing.agents_with_keys.is_delivered_on_another_listing
+  is_keys_with_agent_eligible:
+    lineage:
+      - datalake_ebdb_listing.agents_with_keys.is_keys_with_agent_eligible
+  is_keys_with_agent_opt_in:
+    lineage:
+      - datalake_ebdb_listing.agents_with_keys.is_keys_with_agent_opt_in
+  dt_attributed:
+    lineage:
+      - datalake_ebdb_listing.agents_with_keys.dt_attributed
+  dt_delivered:
+    lineage:
+      - datalake_ebdb_listing.agents_with_keys.dt_delivered
+  dt_optin:
+    lineage:
+      - datalake_ebdb_listing.agents_with_keys.dt_optin
+  dt_publicated:
+    lineage:
+      - datalake_ebdb_listing.agents_with_keys.dt_publicated
+  dt_returned:
+    lineage:
+      - datalake_ebdb_listing.agents_with_keys.dt_returned
