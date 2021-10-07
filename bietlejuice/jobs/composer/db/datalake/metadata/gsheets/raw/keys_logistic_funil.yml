@@ -1,0 +1,33 @@
+database_name: datalake_gsheets_raw
+table_name: keys_logistic_funil
+columns:
+  bairro:
+    tags:
+    - Restricted
+  cep:
+    tags:
+    - Restricted
+  cidade:
+    tags:
+    - Restricted
+  complemento:
+    tags:
+    - Restricted
+  email_ticket:
+    tags:
+    - PII
+    - Confidential
+  endereco:
+    tags:
+    - Restricted
+  nome:
+    tags:
+    - PII
+    - Confidential
+  telefone:
+    tags:
+    - PII
+    - Confidential
+  uf:
+    tags:
+    - Restricted

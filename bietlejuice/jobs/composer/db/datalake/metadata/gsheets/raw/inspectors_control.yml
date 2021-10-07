@@ -1,0 +1,39 @@
+database_name: datalake_gsheets_raw
+table_name: inspectors_control
+columns:
+  beneficiary_document:
+    tags:
+    - PII
+    - Confidential
+  beneficiary_name:
+    tags:
+    - PII
+    - Confidential
+  inspector_cpf:
+    tags:
+    - PII
+    - Confidential
+  inspector_name:
+    tags:
+    - PII
+    - Confidential
+  inspector_phone:
+    tags:
+    - PII
+    - Confidential
+  inspector_rg:
+    tags:
+    - PII
+    - Confidential
+  inspector_secondary_phone:
+    tags:
+    - PII
+    - Confidential
+  insperctor_email:
+    tags:
+    - PII
+    - Confidential
+  sk_inspector:
+    tags:
+    - PII
+    - Confidential

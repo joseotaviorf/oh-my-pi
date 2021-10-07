@@ -1,0 +1,7 @@
+database_name: datalake_gsheets_raw
+table_name: hotjar_demanda_reprimida_fotos
+columns:
+  id_user_hotjar:
+    tags:
+    - PII
+    - Confidential

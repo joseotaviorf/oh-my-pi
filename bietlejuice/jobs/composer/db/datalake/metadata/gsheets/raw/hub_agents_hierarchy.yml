@@ -1,0 +1,23 @@
+database_name: datalake_gsheets_raw
+table_name: hub_agents_hierarchy
+columns:
+  cpf:
+    tags:
+    - PII
+    - Confidential
+  full_name:
+    tags:
+    - PII
+    - Confidential
+  manager:
+    tags:
+    - PII
+    - Confidential
+  personal_number:
+    tags:
+    - PII
+    - Confidential
+  quintoandar_email:
+    tags:
+    - PII
+    - Confidential
