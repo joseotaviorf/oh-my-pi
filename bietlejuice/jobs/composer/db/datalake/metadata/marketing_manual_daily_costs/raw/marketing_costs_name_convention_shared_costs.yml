@@ -1,0 +1,2 @@
+database_name: datalake_marketing_manual_daily_costs_raw
+table_name: marketing_costs_name_convention_shared_costs
