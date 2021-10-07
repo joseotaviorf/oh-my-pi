@@ -1,0 +1,2 @@
+database_name: datalake_gsheets_raw
+table_name: sale_criteo_eng_ab_test

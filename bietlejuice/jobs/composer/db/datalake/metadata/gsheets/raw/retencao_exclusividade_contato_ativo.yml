@@ -1,0 +1,15 @@
+database_name: datalake_gsheets_raw
+table_name: retencao_exclusividade_contato_ativo
+columns:
+  email:
+    tags:
+    - PII
+    - Confidential
+  nome:
+    tags:
+    - PII
+    - Confidential
+  telefone_principal:
+    tags:
+    - PII
+    - Confidential
