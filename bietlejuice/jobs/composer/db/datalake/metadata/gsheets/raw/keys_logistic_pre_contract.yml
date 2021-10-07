@@ -1,0 +1,37 @@
+database_name: datalake_gsheets_raw
+table_name: keys_logistic_pre_contract
+columns:
+  bairro:
+    tags:
+    - Restricted
+  cep:
+    tags:
+    - Restricted
+  cidade:
+    tags:
+    - Restricted
+  complemento:
+    tags:
+    - Restricted
+  cpf:
+    tags:
+    - PII
+    - Confidential
+  email:
+    tags:
+    - PII
+    - Confidential
+  endereco:
+    tags:
+    - Restricted
+  estado:
+    tags:
+    - Restricted
+  name:
+    tags:
+    - PII
+    - Confidential
+  numero:
+    tags:
+    - PII
+    - Restricted

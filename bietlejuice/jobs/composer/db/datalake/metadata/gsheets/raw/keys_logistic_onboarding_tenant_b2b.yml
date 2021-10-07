@@ -1,0 +1,29 @@
+database_name: datalake_gsheets_raw
+table_name: keys_logistic_onboarding_tenant_b2b
+columns:
+  bairro:
+    tags:
+    - Restricted
+  cep:
+    tags:
+    - Restricted
+  cidade:
+    tags:
+    - Restricted
+  complemento:
+    tags:
+    - Restricted
+  endereco:
+    tags:
+    - Restricted
+  nome_iq:
+    tags:
+    - PII
+    - Confidential
+  numero:
+    tags:
+    - Restricted
+  telefone_iq:
+    tags:
+    - PII
+    - Confidential
