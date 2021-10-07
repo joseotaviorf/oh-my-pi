@@ -1,0 +1,7 @@
+database_name: datalake_gsheets_raw
+table_name: csat_reparos_off_pp
+columns:
+  email:
+    tags:
+    - PII
+    - Confidential

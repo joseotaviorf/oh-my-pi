@@ -1,0 +1,11 @@
+database_name: datalake_gsheets_raw
+table_name: csat_vistoria_pp_saida
+columns:
+  email:
+    tags:
+    - PII
+    - Confidential
+  id_csat:
+    tags:
+    - PII
+    - Confidential
