@@ -126,6 +126,7 @@ This pipeline produces the following output tables:
     - `sale_tof_daily_targets`
     - `sale_tof_monthly_targets`
     - `sale_tof_weekly_targets`
+    - `secretariat_hierarchy`
     - `supply_targets_2019`
     - `supply_targets_2020`
     - `supply_targets_2021`

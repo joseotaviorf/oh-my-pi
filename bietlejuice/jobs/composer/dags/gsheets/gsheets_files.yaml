@@ -505,6 +505,11 @@ sale_tof_weekly_targets:
     sheet_name: sale_tof_weekly_targets
     clean_table_name: sale_tof_weekly_targets
 
+secretariat_hierarchy:
+    sheet_id: 1JTWdWtoDrjoSD3pmf_-eks8ycXDN0V776jWegCw_M1M
+    sheet_name: secretariat_hierarchy
+    clean_table_name: secretariat_hierarchy
+
 schedule:
     sheet_id: 1wIwrWi0xlY4TAZnE6JlGm6B0UyezOPxfF5s0_pn-i9E
     sheet_name: Schedule
