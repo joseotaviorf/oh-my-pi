@@ -1,0 +1,55 @@
+database_name: datalake_gsheets_raw
+table_name: closing_analysts_hierarchy
+columns:
+  analyst_3:
+    tags:
+    - PII
+    - Confidential
+  dt_born:
+    tags:
+    - PII
+    - Restricted
+  dt_first_experience_period_end:
+    tags:
+    - Public
+  dt_second_experience_period_end:
+    tags:
+    - Public
+  dt_start:
+    tags:
+    - Public
+  email:
+    tags:
+    - PII
+    - Confidential
+  employee_hiring_type:
+    tags:
+    - Public
+  employee_id:
+    tags:
+    - PII
+    - Confidential
+  group_1:
+    tags:
+    - Public
+  group_2:
+    tags:
+    - Public
+  group_3:
+    tags:
+    - Public
+  managers:
+    tags:
+    - PII
+    - Confidential
+  name:
+    tags:
+    - PII
+    - Confidential
+  name_in_monday:
+    tags:
+    - PII
+    - Confidential
+  status:
+    tags:
+    - Public

@@ -1,0 +1,15 @@
+database_name: datalake_gsheets_raw
+table_name: crm_iptu_wave4
+columns:
+  cpf:
+    tags:
+    - PII
+    - Confidential
+  email:
+    tags:
+    - PII
+    - Confidential
+  id_braze:
+    tags:
+    - PII
+    - Confidential
