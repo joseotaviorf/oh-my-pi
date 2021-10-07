@@ -86,7 +86,7 @@ SELECT DISTINCT
   c.sk_receiver,
   c.sk_start_date,
   c.sk_completed_date,
-  c.sk_origin,
+  COALESCE(CAST(c.sk_origin AS BIGINT), -1) AS sk_origin,
   c.sk_assignee,
   c.sk_user_action,
   c.sk_action_date,

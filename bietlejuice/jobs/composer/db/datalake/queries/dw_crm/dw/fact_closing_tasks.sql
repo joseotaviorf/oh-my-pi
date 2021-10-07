@@ -81,7 +81,7 @@ SELECT DISTINCT
   pc.id_receiver AS sk_receiver,
   pc.id_start_date AS sk_start_date,
   pc.id_completed_date AS sk_completed_date,
-  pc.id_origin AS sk_origin,
+  COALESCE(CAST(pc.id_origin AS BIGINT), -1) AS sk_origin,
   pc.id_assignee AS sk_assignee,
   pc.id_user_action AS sk_user_action,
   pc.id_action_date AS sk_action_date,

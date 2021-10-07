@@ -2,7 +2,7 @@ WITH actions AS (
   SELECT
     trh.id_task,
     COALESCE(CAST(trh.id_receiver AS BIGINT), -1) AS id_receiver,
-    COALESCE(CAST(trh.id_origin AS BIGINT), -1) AS id_origin,
+    COALESCE(trh.id_origin, '-1') AS id_origin,
     COALESCE(CAST(trh.id_assignee AS BIGINT), -1) AS id_assignee,
     COALESCE(CAST(trh.id_user_action AS BIGINT), -1) AS id_user_action,
     COALESCE(trh.id_workgroup, -1) AS id_workgroup,

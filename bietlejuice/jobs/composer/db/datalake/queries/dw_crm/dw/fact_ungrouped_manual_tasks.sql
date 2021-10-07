@@ -6,7 +6,7 @@ WITH contracts_offers AS (
         turf.id_assignee AS sk_assignee,
         CAST(COALESCE(dc.sk_contract, CAST(ec.id AS STRING)) AS BIGINT) AS sk_contract,
         ep.id AS sk_proposal,
-        CAST(eo.sk_offer AS BIGINT) AS sk_offer,
+        CAST(COALESCE(eo.sk_offer, feo.sk_offer) AS BIGINT) AS sk_offer,
         erf.id AS sk_rent_flow,
         turf.id_start_date AS sk_start_date,
         turf.id_completed_date AS sk_completed_date,
@@ -45,6 +45,11 @@ WITH contracts_offers AS (
             ON turf.origin = 'Offer'
                 AND turf.id_origin = eo.id_offer
     LEFT JOIN
+        dw_janus.dim_offer AS feo
+            ON turf.origin = 'Offer'
+                AND RLIKE(turf.id_origin, '\\D') = TRUE
+                AND turf.id_origin = feo.id_firestore
+    LEFT JOIN
         datalake_ebdb_clean.rent_flow AS erf
             ON turf.origin = 'FluxoLocacao'
                 AND turf.id_origin = erf.id
@@ -77,7 +82,7 @@ SELECT DISTINCT
     co.sk_receiver,
     co.sk_start_date,
     co.sk_completed_date,
-    co.sk_origin,
+    COALESCE(CAST(co.sk_origin AS BIGINT), -1) AS sk_origin,
     co.sk_assignee,
     co.sk_user_action,
     COALESCE(co.sk_offer, chl_rent_flow.sk_offer, chl_contract.sk_offer, chl_offer.sk_offer, -1) AS sk_offer,
