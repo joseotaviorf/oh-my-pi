@@ -1,0 +1,2 @@
+database_name: datalake_marketing_offline_costs_raw
+table_name: marketing_offline_manual_costs
