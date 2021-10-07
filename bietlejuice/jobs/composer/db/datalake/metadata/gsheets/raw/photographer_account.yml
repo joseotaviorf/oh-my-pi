@@ -1,0 +1,7 @@
+database_name: datalake_gsheets_raw
+table_name: photographer_account
+columns:
+  photographer_name:
+    tags:
+    - PII
+    - Confidential

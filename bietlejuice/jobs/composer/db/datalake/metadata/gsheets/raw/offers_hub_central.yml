@@ -1,0 +1,19 @@
+database_name: datalake_gsheets_raw
+table_name: offers_hub_central
+columns:
+  agent:
+    tags:
+    - PII
+    - Confidential
+  executive:
+    tags:
+    - PII
+    - Confidential
+  executive_lead:
+    tags:
+    - PII
+    - Confidential
+  id_user_5a:
+    tags:
+    - PII
+    - Confidential

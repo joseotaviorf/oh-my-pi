@@ -1,0 +1,23 @@
+database_name: datalake_gsheets_raw
+table_name: process_eviction
+columns:
+  landlord_emails:
+    tags:
+    - PII
+    - Confidential
+  landlord_names:
+    tags:
+    - PII
+    - Confidential
+  resident_emails:
+    tags:
+    - PII
+    - Confidential
+  tenant_emails:
+    tags:
+    - PII
+    - Confidential
+  tenant_names:
+    tags:
+    - PII
+    - Confidential
