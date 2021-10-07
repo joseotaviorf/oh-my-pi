@@ -1,0 +1,11 @@
+database_name: datalake_gsheets_raw
+table_name: vistoria_bugs_v2
+columns:
+  inspector_name:
+    tags:
+    - PII
+    - Confidential
+  id_inspector:
+    tags:
+    - PII
+    - Confidential

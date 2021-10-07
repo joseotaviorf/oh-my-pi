@@ -1,0 +1,11 @@
+database_name: datalake_gsheets_raw
+table_name: tratativas_actionline
+columns:
+  analista_responsavel:
+    tags:
+    - PII
+    - Confidential
+  id_ciq:
+    tags:
+    - PII
+    - Confidential
