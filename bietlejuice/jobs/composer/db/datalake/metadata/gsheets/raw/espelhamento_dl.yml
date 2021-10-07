@@ -1,0 +1,7 @@
+database_name: datalake_gsheets_raw
+table_name: espelhamento_dl
+columns:
+  analista_responsavel:
+    tags:
+    - PII
+    - Confidential

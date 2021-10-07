@@ -1,0 +1,7 @@
+database_name: datalake_gsheets_raw
+table_name: forms_analise_vistoria
+columns:
+  email:
+    tags:
+    - PII
+    - Confidential

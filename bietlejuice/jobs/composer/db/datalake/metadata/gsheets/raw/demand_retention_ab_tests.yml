@@ -1,0 +1,7 @@
+database_name: datalake_gsheets_raw
+table_name: demand_retention_ab_tests
+columns:
+  id_user:
+    tags:
+    - PII
+    - Confidential
