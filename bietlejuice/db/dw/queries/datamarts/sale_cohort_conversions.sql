@@ -124,15 +124,12 @@ sale_closing AS (
         sk_booking,
         COALESCE(fo.sk_offer, hub.id_offer) AS sk_offer,
         COALESCE(fo.sk_buyer,hub.id_client_cm, hub.id_user_5a) AS sk_buyer,
-        CASE
-            WHEN executive_lead = 'Leonardo Monteiro' OR hub.offer_flow = 'HUB_BV_V0' THEN 'HUB Bela Vista'
-            WHEN executive_lead LIKE '%Muller%' OR executive_lead LIKE '%Muller%' THEN 'HUB Vila Madalena'
-            WHEN LOWER(executive_lead) LIKE '%karina%' THEN 'HUB Perdizes'
-            WHEN executive_lead = 'Rodrigo Pereira' OR hub.offer_flow = 'HUB_VM_V0' THEN 'HUB Vila Mariana'
+        CASE 
             WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'Porto Alegre' THEN 'CENTRAL POA'
             WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'RMSP' THEN 'CENTRAL SP'
             WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'Rio de Janeiro' THEN 'CENTRAL RJ'
-            ELSE 'foraHUB'
+            WHEN hub.offer_flow like '%HUB%' THEN hub.offer_flow
+            ELSE 'DealMaking'
         END AS hub
     FROM
     	sale.fact_offers fo
@@ -152,15 +149,12 @@ sale_closing AS (
         sk_booking,
         COALESCE(fo.sk_offer, hub.id_offer) AS sk_offer,
         COALESCE(fo.sk_buyer,hub.id_client_cm, hub.id_user_5a) AS sk_buyer,
-        CASE
-            WHEN executive_lead = 'Leonardo Monteiro' OR hub.offer_flow = 'HUB_BV_V0' THEN 'HUB Bela Vista'
-            WHEN executive_lead LIKE '%Muller%' OR executive_lead LIKE '%Muller%' THEN 'HUB Vila Madalena'
-            WHEN LOWER(executive_lead) LIKE '%karina%' THEN 'HUB Perdizes'
-            WHEN executive_lead = 'Rodrigo Pereira' OR hub.offer_flow = 'HUB_VM_V0' THEN 'HUB Vila Mariana'
+        CASE 
             WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'Porto Alegre' THEN 'CENTRAL POA'
             WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'RMSP' THEN 'CENTRAL SP'
             WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'Rio de Janeiro' THEN 'CENTRAL RJ'
-            ELSE 'foraHUB'
+            WHEN hub.offer_flow like '%HUB%' THEN hub.offer_flow
+            ELSE 'DealMaking'
         END AS hub
     FROM
         sale.fact_offers fo
@@ -177,15 +171,12 @@ sale_closing AS (
     SELECT
         COALESCE(DATE(NULLIF(sa.ts_sale_agreement_signed,-1)),hub.dt_sale_agreement_signed) AS date,
         COALESCE(fo.sk_offer, hub.id_offer) AS sk_offer,
-        CASE
-            WHEN executive_lead = 'Leonardo Monteiro' OR hub.offer_flow = 'HUB_BV_V0' THEN 'HUB Bela Vista'
-            WHEN executive_lead LIKE '%Muller%' OR executive_lead LIKE '%Muller%' THEN 'HUB Vila Madalena'
-            WHEN LOWER(executive_lead) LIKE '%karina%' THEN 'HUB Perdizes'
-            WHEN executive_lead = 'Rodrigo Pereira' OR hub.offer_flow = 'HUB_VM_V0' THEN 'HUB Vila Mariana'
+        CASE 
             WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'Porto Alegre' THEN 'CENTRAL POA'
             WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'RMSP' THEN 'CENTRAL SP'
             WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'Rio de Janeiro' THEN 'CENTRAL RJ'
-            ELSE 'foraHUB'
+            WHEN hub.offer_flow like '%HUB%' THEN hub.offer_flow
+            ELSE 'DealMaking'
         END AS hub
     FROM
         sale.fact_offers fo
