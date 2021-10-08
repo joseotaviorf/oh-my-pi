@@ -18,7 +18,7 @@ prev_tasks_full AS (
         COALESCE(DATE_FORMAT(tr.ts_start, 'YMMdd'), -1) AS id_start_date,
         tr.id_task AS id_task,
         COALESCE(DATE_FORMAT(tr.ts_action, 'YMMdd'), -1) AS id_task_user_end_date,
-        COALESCE(DATE_FORMAT(LAG(tr.ts_action) OVER(PARTITION BY tr.id_task ORDER BY tr.ts_action), 'YMMdd'), -1) AS id_task_user_start_date,
+        COALESCE(DATE_FORMAT(LAG(tr.ts_action) OVER(PARTITION BY tr.id_task ORDER BY DATE_TRUNC('SECOND', tr.ts_action)), 'YMMdd'), -1) AS id_task_user_start_date,
         COALESCE(tr.id_user_action, -1) AS id_user_action,
         tr.id_workgroup,
         tr.action_type,
@@ -26,7 +26,7 @@ prev_tasks_full AS (
         tr.action_type AS task_user_type,
         tr.origin,
         ROUND((TO_UNIX_TIMESTAMP(tr.ts_action, 'yyyy-MM-dd hh:mm:ss')
-               - TO_UNIX_TIMESTAMP(LAG(tr.ts_action) OVER (PARTITION BY tr.id_task ORDER BY tr.ts_action), 'yyyy-MM-dd hh:mm:ss')) / 3600.0 , 2) AS task_user_resolve_hours,
+               - TO_UNIX_TIMESTAMP(LAG(tr.ts_action) OVER (PARTITION BY tr.id_task ORDER BY DATE_TRUNC('SECOND', tr.ts_action)), 'yyyy-MM-dd hh:mm:ss')) / 3600.0 , 2) AS task_user_resolve_hours,
         tr.type,
         DATE(tr.ts_action) AS dt_partition,
         tr.ts_action,

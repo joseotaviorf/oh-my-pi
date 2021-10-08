@@ -20,7 +20,7 @@ WITH actions AS (
         CAST(trh.task_user_resolve_hours AS DECIMAL),
         CAST(
           ROUND((
-              TO_UNIX_TIMESTAMP(lead(trh.ts_action) OVER (PARTITION BY trh.id_task ORDER BY trh.ts_action), 'yyyy-MM-dd HH:mm:ss')
+              TO_UNIX_TIMESTAMP(lead(trh.ts_action) OVER (PARTITION BY trh.id_task ORDER BY DATE_TRUNC('SECOND', trh.ts_action)), 'yyyy-MM-dd HH:mm:ss')
               - TO_UNIX_TIMESTAMP(trh.ts_action, 'yyyy-MM-dd HH:mm:ss')
           )/3600.0, 1) 
           AS DECIMAL(10,1)
