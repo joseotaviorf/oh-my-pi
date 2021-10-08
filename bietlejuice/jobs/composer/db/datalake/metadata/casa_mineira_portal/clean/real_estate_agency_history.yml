@@ -13,6 +13,9 @@ columns:
   modified_column:
     lineage:
       - datalake_casa_mineira_portal_raw.imobiliaria_historico.campo
+  modified_value:
+    lineage:
+       - datalake_casa_mineira_portal_raw.imobiliaria_historico.valor
   ts_created:
     lineage:
       - datalake_casa_mineira_portal_raw.imobiliaria_historico.criado_em
