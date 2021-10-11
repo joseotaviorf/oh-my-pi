@@ -352,47 +352,101 @@ last_back_ticket AS (
     last_and_first_back_tickets_timestamps lt
       ON lt.front_ticket = bt.front_ticket
       AND lt.ts_last_solved = bt.ts_solved
+),
+conversation_and_segment AS (
+  SELECT 
+    c.id_task AS id_external_service,
+    t.id_reservation,
+    c.id_call,
+    c.sk_call,
+    t.id_agent,
+    t.id_queue,
+    FIRST(t.queue_name) OVER (PARTITION BY c.sk_call ORDER BY t.ts_twilio_created_local ASC) AS first_department,
+    FIRST(t.queue_name) OVER (PARTITION BY c.sk_call ORDER BY t.ts_twilio_created_local DESC) AS last_department,
+    t.agent_email,
+    t.agent_manager,
+    t.agent_company,
+    t.agent_name,
+    t.queue_name,
+    t.transferred_from_dept,
+    t.transferred_to_dept,
+    t.transference_type,
+    t.transference_reason,
+    seconds_total_wait_time,
+    c.total_minutes_reception_time,
+    t.seconds_duration/60.0 AS segment_minutes_duration,
+    t.seconds_wait_time/60.0 AS segment_minutes_wait_time,
+    t.seconds_talk_time/60.0 AS segment_minutes_talk_time,
+    c.seconds_total_talk_time/60.0 AS total_minutes_talk_time,
+    c.seconds_total_queue_time/60.0 AS total_minutes_queue_time,
+    c.seconds_total_wrap_up_time/60.0 AS total_minutes_wrap_up_time,
+    c.seconds_total_handling_time/60.0 AS total_minutes_handling_time,
+    CAST(c.seconds_duration/60.0 AS DOUBLE) AS minutes_full_resolution_time_calendar,
+    CAST(c.number_of_departments AS INT) AS number_of_departments,
+    CAST(c.number_of_tasks AS INT) AS number_of_segments,
+    c.direction,
+    t.is_answered,
+    c.has_ended_in_ura,
+    CASE
+      WHEN c.is_transfered = TRUE THEN TRUE
+      ELSE FALSE
+    END AS has_transfers,
+    c.is_csat_answered,
+    c.is_solved,
+    c.csat_rating,
+    c.ts_csat_answered,
+    t.ts_twilio_created_local,
+    t.ts_twilio_closed_local,
+    c.ts_started,
+    c.ts_ended
+  FROM 
+    conversation c
+  LEFT JOIN 
+    segment t
+      ON t.sk_call = c.sk_call
+      AND t.id_task = c.id_task
 )
 SELECT DISTINCT 
   zd.id_ticket,
-  c.id_task AS id_external_service,
-  t.id_reservation AS id_segment,
+  c.id_external_service,
+  c.id_reservation AS id_segment,
   c.id_call,
   c.sk_call,
-  t.id_agent,
-  FIRST(t.id_agent) OVER (PARTITION BY zd.id_ticket ORDER BY t.ts_twilio_created_local ASC) AS id_first_agent,
-  FIRST(t.id_agent) OVER (PARTITION BY zd.id_ticket ORDER BY t.ts_twilio_created_local DESC) AS id_last_agent,
-  t.id_queue,
+  c.id_agent,
+  FIRST(c.id_agent) OVER (PARTITION BY zd.id_ticket ORDER BY c.ts_twilio_created_local ASC) AS id_first_agent,
+  FIRST(c.id_agent) OVER (PARTITION BY zd.id_ticket ORDER BY c.ts_twilio_created_local DESC) AS id_last_agent,
+  c.id_queue,
   zd.id_user,
   zd.id_contract,
-  t.agent_email,
-  t.agent_manager,
-  t.agent_company,
-  t.agent_name,
-  t.queue_name AS department,
+  c.agent_email,
+  c.agent_manager,
+  c.agent_company,
+  c.agent_name,
+  c.queue_name AS department,
   zd.zendesk_ticket_department AS zendesk_department,
-  FIRST(t.queue_name) OVER (PARTITION BY zd.id_ticket ORDER BY t.ts_twilio_created_local ASC) AS first_department,
-  FIRST(t.queue_name) OVER (PARTITION BY zd.id_ticket ORDER BY t.ts_twilio_created_local DESC) AS last_department,
-  t.transferred_from_dept,
-  t.transferred_to_dept,
-  t.transference_type,
-  t.transference_reason,
+  c.first_department,
+  c.last_department,
+  c.transferred_from_dept,
+  c.transferred_to_dept,
+  c.transference_type,
+  c.transference_reason,
   CASE
-      WHEN seconds_total_wait_time <= 60 AND t.is_answered THEN TRUE
-      WHEN seconds_total_wait_time > 60 AND t.is_answered THEN FALSE
+      WHEN c.seconds_total_wait_time <= 60 AND c.is_answered THEN TRUE
+      WHEN c.seconds_total_wait_time > 60 AND c.is_answered THEN FALSE
       ELSE NULL
-  END AS sla_achieved,
+   END AS sla_achieved,
   c.total_minutes_reception_time,
-  t.seconds_duration/60.0 AS segment_minutes_duration,
-  t.seconds_wait_time/60.0 AS segment_minutes_wait_time,
-  t.seconds_talk_time/60.0 AS segment_minutes_talk_time,
-  c.seconds_total_talk_time/60.0 AS total_minutes_talk_time,
-  c.seconds_total_queue_time/60.0 AS total_minutes_queue_time,
-  c.seconds_total_wrap_up_time/60.0 AS total_minutes_wrap_up_time,
-  c.seconds_total_handling_time/60.0 AS total_minutes_handling_time,
-  CAST(c.seconds_duration/60.0 AS DOUBLE) AS minutes_full_resolution_time_calendar,
-  CAST(c.number_of_departments AS INT) AS number_of_departments,
-  CAST(c.number_of_tasks AS INT) AS number_of_segments,
+  c.segment_minutes_duration,
+  c.segment_minutes_wait_time,
+  c.segment_minutes_talk_time,
+  c.total_minutes_talk_time,
+  c.total_minutes_queue_time,
+  c.total_minutes_wrap_up_time,
+  c.total_minutes_handling_time,
+  c.minutes_full_resolution_time_calendar,
+  bt.total_backoffice_minutes_time,
+  c.number_of_departments,
+  c.number_of_segments,
   c.direction,
   zd.minutes_first_resolution_time_calendar,
   zd.minutes_first_resolution_time_business,
@@ -406,49 +460,42 @@ SELECT DISTINCT
   zd.tags,
   zd.status,
   zd.custom_fields,
-  FIRST(t.id_reservation) OVER (PARTITION BY zd.id_ticket ORDER BY t.ts_twilio_created_local DESC) = t.id_reservation AS is_last_segment,
-  FIRST(t.id_reservation) OVER (PARTITION BY zd.id_ticket ORDER BY t.ts_twilio_created_local ASC) = t.id_reservation AS is_first_segment,
+  FIRST(c.id_reservation) OVER (PARTITION BY zd.id_ticket ORDER BY c.ts_twilio_created_local DESC) = c.id_reservation AS is_last_segment,
+  FIRST(c.id_reservation) OVER (PARTITION BY zd.id_ticket ORDER BY c.ts_twilio_created_local ASC) = c.id_reservation AS is_first_segment,
   bt.front_ticket IS NOT NULL AS has_back_tickets,
   zd.tags LIKE '%bot_end_conversation%' AS is_bot, 
   zd.tags LIKE '%closed_by_merge%' AS is_closed_by_merge,
   CASE 
-    WHEN dc.front_or_back = 'Front' OR NULLIF(dc.front_or_back, '-') IS NULL THEN 'front'
+    WHEN dc.front_or_back = 'Front' THEN 'front'
     WHEN dc.front_or_back = 'Back' OR zd.tags LIKE '%tarefa_atendimento_escalado%' THEN 'back'
+    ELSE 'undefined'
   END AS front_or_back,
-  c.has_ended_in_ura = FALSE AND t.is_answered = TRUE AS is_answered,
+  c.has_ended_in_ura = FALSE AND c.is_answered = TRUE AS is_answered,
   bt.front_ticket IS NOT NULL AS has_back_ticket,
   bt.is_open_back_ticket,
-  CASE
-    WHEN c.is_transfered = TRUE THEN TRUE
-    ELSE FALSE
-  END AS has_transfers,
+  c.has_transfers,
   CAST((TO_UNIX_TIMESTAMP(COALESCE(bt.ts_solved, c.ts_ended)) - TO_UNIX_TIMESTAMP(c.ts_started))/60.0 AS DOUBLE) AS frt,
   bt.back_ticket AS last_back_ticket,
   bt.back_ticket_list,
-  bt.total_backoffice_minutes_time,
   c.is_csat_answered,
   c.is_solved,
   c.csat_rating,
   c.ts_csat_answered,
-  t.ts_twilio_created_local AS ts_segment_created,
-  t.ts_twilio_closed_local AS ts_segment_closed,
+  c.ts_twilio_created_local AS ts_segment_created,
+  c.ts_twilio_closed_local AS ts_segment_closed,
   c.ts_started AS ts_ticket_started,
   c.ts_ended AS ts_ticket_ended
 FROM 
-  conversation c
+  conversation_and_segment c
 JOIN 
   zendesk_aditional_ticket_info zd 
     ON zd.id_call = c.sk_call
 JOIN
   zendesk_tickets_unique ztu
     ON zd.id_ticket = ztu.id_ticket
-LEFT JOIN 
-  segment t
-    ON t.sk_call = c.sk_call
-    AND t.id_task = c.id_task
 LEFT JOIN
   datalake_gsheets_clean.department_control dc
-    ON dc.department = zd.zendesk_ticket_department  
+    ON dc.department = c.last_department  
 LEFT JOIN
   last_back_ticket bt
     ON bt.front_ticket = zd.id_ticket

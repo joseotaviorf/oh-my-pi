@@ -305,6 +305,19 @@ last_back_ticket AS (
     last_and_first_back_tickets_timestamps lt
       ON lt.front_ticket = bt.front_ticket
       AND lt.ts_last_solved = bt.ts_solved
+),
+first_last_department AS (
+  SELECT 
+    ct.id_task,
+    zd.id_ticket,
+    ct.id_session,
+    FIRST(ct.department) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created ASC) AS first_department,
+    FIRST(ct.department) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created DESC) AS last_department
+  FROM 
+    quinto_messenger_tickets ct
+  JOIN
+    zendesk_aditional_ticket_info zd
+      ON zd.id_session = ct.id_session
 )
 SELECT DISTINCT 
   ct.id_task AS id_segment,
@@ -323,8 +336,8 @@ SELECT DISTINCT
   cc.comment AS csat_comment,
   ct.department,
   zd.zendesk_ticket_department AS zendesk_department,
-  FIRST(ct.department) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created ASC) AS first_department,
-  FIRST(ct.department) OVER (PARTITION BY zd.id_ticket ORDER BY ct.ts_task_created DESC) AS last_department,
+  ldep.first_department, 
+  ldep.last_department,
   ct.transferred_from_dept,
   ct.transferred_to_dept,
   ct.transference_type,
@@ -362,8 +375,9 @@ SELECT DISTINCT
   zd.tags LIKE '%bot_end_conversation%' AS is_bot,
   zd.tags LIKE '%closed_by_merge%' AS is_closed_by_merge, 
   CASE 
-    WHEN dc.front_or_back = 'Front' OR NULLIF(dc.front_or_back, '-') IS NULL THEN 'front'
+    WHEN dc.front_or_back = 'Front' THEN 'front'
     WHEN dc.front_or_back = 'Back' OR zd.tags LIKE '%tarefa_atendimento_escalado%' THEN 'back'
+    ELSE 'undefined'
   END AS front_or_back,
   bt.front_ticket IS NOT NULL AS has_back_ticket,
   bt.is_open_back_ticket,
@@ -383,12 +397,15 @@ FROM
 JOIN
   zendesk_aditional_ticket_info zd
     ON zd.id_session = ct.id_session
+JOIN 
+  first_last_department ldep
+    ON ldep.id_session = ct.id_session
 JOIN
   zendesk_tickets_unique ztu
     ON ztu.id_ticket = zd.id_ticket
 LEFT JOIN
   datalake_gsheets_clean.department_control dc
-    ON dc.department = zd.zendesk_ticket_department
+    ON dc.department = ldep.last_department
 LEFT JOIN
   chat_csat cc
     ON cc.id_ticket = zd.id_ticket

@@ -214,8 +214,9 @@ SELECT DISTINCT
   ze.tags LIKE '%bot_end_conversation%' AS is_bot, 
   ze.tags LIKE '%closed_by_merge%' AS is_closed_by_merge,
   CASE 
-    WHEN dc.front_or_back = 'Front' OR NULLIF(dc.front_or_back, '-') IS NULL THEN 'front'
+    WHEN dc.front_or_back = 'Front' THEN 'front'
     WHEN dc.front_or_back = 'Back' OR ze.tags LIKE '%tarefa_atendimento_escalado%' THEN 'back'
+    ELSE 'undefined'
   END AS front_or_back,
   bt.back_ticket IS NOT NULL has_back_ticket,
   CAST((TO_UNIX_TIMESTAMP(COALESCE(bt.ts_ticket_solved, ze.ts_ticket_solved)) - TO_UNIX_TIMESTAMP(ze.ts_ticket_started))/60.0 AS DOUBLE) AS frt,
