@@ -31,7 +31,6 @@ columns:
     - Confidential
   insperctor_email:
     tags:
-    - PII
     - Confidential
   sk_inspector:
     tags:

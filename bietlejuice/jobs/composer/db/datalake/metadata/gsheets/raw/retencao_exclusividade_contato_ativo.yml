@@ -3,7 +3,6 @@ table_name: retencao_exclusividade_contato_ativo
 columns:
   email:
     tags:
-    - PII
     - Confidential
   nome:
     tags:

@@ -7,7 +7,6 @@ columns:
     - Confidential
   email:
     tags:
-    - PII
     - Confidential
   login:
     tags:

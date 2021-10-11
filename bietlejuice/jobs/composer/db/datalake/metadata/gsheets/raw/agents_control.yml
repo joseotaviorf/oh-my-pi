@@ -18,7 +18,6 @@ columns:
     - Public
   email:
     tags:
-    - PII
     - Confidential
   gestores:
     tags:

@@ -19,5 +19,4 @@ columns:
     - Confidential
   quintoandar_email:
     tags:
-    - PII
     - Confidential

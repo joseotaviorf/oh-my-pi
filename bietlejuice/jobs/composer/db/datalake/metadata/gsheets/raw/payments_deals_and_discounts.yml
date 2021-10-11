@@ -3,5 +3,4 @@ table_name: payments_deals_and_discounts
 columns:
   agent_email:
     tags:
-    - PII
     - Confidential

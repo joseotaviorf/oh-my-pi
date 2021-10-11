@@ -19,7 +19,6 @@ columns:
     - Confidential
   email:
     tags:
-    - PII
     - Confidential
   endereco:
     tags:

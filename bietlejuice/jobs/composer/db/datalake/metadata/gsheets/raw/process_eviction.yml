@@ -3,7 +3,6 @@ table_name: process_eviction
 columns:
   landlord_emails:
     tags:
-    - PII
     - Confidential
   landlord_names:
     tags:
@@ -11,11 +10,9 @@ columns:
     - Confidential
   resident_emails:
     tags:
-    - PII
     - Confidential
   tenant_emails:
     tags:
-    - PII
     - Confidential
   tenant_names:
     tags:

@@ -20,7 +20,6 @@ columns:
     - Public
   email:
     tags:
-    - PII
     - Confidential
   employee_hiring_type:
     tags:

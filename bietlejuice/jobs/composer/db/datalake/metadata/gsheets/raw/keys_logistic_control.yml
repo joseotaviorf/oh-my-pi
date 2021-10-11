@@ -3,5 +3,4 @@ table_name: keys_logistic_control
 columns:
   email:
     tags:
-    - PII
     - Confidential

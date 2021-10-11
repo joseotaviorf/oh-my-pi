@@ -3,7 +3,6 @@ table_name: users_cx_plaquinhas
 columns:
   email:
     tags:
-    - PII
     - Confidential
   id_user:
     tags:

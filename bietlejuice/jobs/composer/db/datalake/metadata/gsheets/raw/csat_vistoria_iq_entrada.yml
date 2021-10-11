@@ -3,7 +3,6 @@ table_name: csat_vistoria_iq_entrada
 columns:
   email:
     tags:
-    - PII
     - Confidential
   id_csat:
     tags:
