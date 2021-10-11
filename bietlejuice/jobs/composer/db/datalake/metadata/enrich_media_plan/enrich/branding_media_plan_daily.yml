@@ -1,0 +1,108 @@
+database_name: datalake_media_plan
+table_name: branding_media_plan_daily
+columns:
+  id_date:
+    lineage:
+      - datalake_gsheets_clean.media_plan_current_quarter.dt_started
+      - datalake_media_plan_clean.media_plan.dt_ended
+      - datalake_gsheets_clean.media_plan_current_quarter.dt_insertion_order
+      - datalake_media_plan_clean.media_plan.dt_insertion_order
+  id_insertion_order:
+    lineage:
+      - datalake_gsheets_clean.media_plan_current_quarter.dt_insertion_order
+      - datalake_media_plan_clean.media_plan.dt_insertion_order
+  media:
+    lineage:
+      - datalake_gsheets_clean.media_plan_current_quarter.media
+      - datalake_media_plan_clean.media_plan.media
+  media_mmm:
+    lineage:
+      - datalake_gsheets_clean.media_plan_current_quarter.media
+      - datalake_media_plan_clean.media_plan.media
+  network:
+    lineage:
+      - datalake_gsheets_clean.media_plan_current_quarter.network
+      - datalake_media_plan_clean.media_plan.network
+  short_region_name:
+    lineage:
+      - datalake_gsheets_clean.media_plan_current_quarter.short_region_name
+      - datalake_media_plan_clean.media_plan.short_region_name
+  city_group:
+    lineage:
+      - datalake_marketing_offline_costs_clean.marketing_offline_manual_share_city_group.city_group
+      - datalake_region.region.city_group
+  city_name:
+    lineage:
+      - datalake_gsheets_clean.media_plan_current_quarter.city_name
+      - datalake_media_plan_clean.media_plan.city_name
+  channel:
+    lineage:
+      - datalake_gsheets_clean.media_plan_current_quarter.channel
+      - datalake_media_plan_clean.media_plan.channel
+  program:
+    lineage:
+      - datalake_gsheets_clean.media_plan_current_quarter.program
+      - datalake_media_plan_clean.media_plan.program
+  program_frequency:
+    lineage:
+      - datalake_gsheets_clean.media_plan_current_quarter.program_frequency
+      - datalake_media_plan_clean.media_plan.frequency
+  program_hour_started:
+    lineage:
+      - datalake_gsheets_clean.media_plan_current_quarter.program_hour_started
+      - datalake_media_plan_clean.media_plan.hour_started
+  program_hour_ended:
+    lineage:
+      - datalake_gsheets_clean.media_plan_current_quarter.program_hour_ended
+      - datalake_media_plan_clean.media_plan.hour_ended
+  program_genre:
+    lineage:
+      - datalake_gsheets_clean.media_plan_current_quarter.program_genre
+      - datalake_media_plan_clean.media_plan.genre
+  program_daypart:
+    lineage:
+      - datalake_gsheets_clean.media_plan_current_quarter.program_daypart
+      - datalake_media_plan_clean.media_plan.daypart
+  creative_name:
+    lineage:
+      - datalake_gsheets_clean.media_plan_current_quarter.creative_name
+      - datalake_media_plan_clean.media_plan.creative
+  ad_description:
+    lineage:
+      - datalake_gsheets_clean.media_plan_current_quarter.ad_description
+      - datalake_media_plan_clean.media_plan.ad_description
+  ad_type:
+    lineage:
+      - datalake_gsheets_clean.media_plan_current_quarter.ad_type
+      - datalake_media_plan_clean.media_plan.ad_type
+  daily_cost:
+    lineage:
+      - datalake_gsheets_clean.media_plan_current_quarter.cost
+      - datalake_media_plan_clean.media_plan.cost
+      - datalake_marketing_offline_costs_clean.marketing_offline_manual_share_city_group.share
+  daily_grp:
+    lineage:
+      - datalake_gsheets_clean.media_plan_current_quarter.grp
+      - datalake_media_plan_clean.media_plan.grp
+      - datalake_marketing_offline_costs_clean.marketing_offline_manual_share_city_group.share
+  daily_trp:
+    lineage:
+      - datalake_gsheets_clean.media_plan_current_quarter.trp
+      - datalake_media_plan_clean.media_plan.trp
+      - datalake_marketing_offline_costs_clean.marketing_offline_manual_share_city_group.share
+  dt_insertion_order:
+    lineage:
+      - datalake_gsheets_clean.media_plan_current_quarter.dt_insertion_order
+      - datalake_media_plan_clean.media_plan.dt_insertion_order
+  dt_started:
+    lineage:
+      - datalake_gsheets_clean.media_plan_current_quarter.dt_started
+      - datalake_media_plan_clean.media_plan.dt_started
+      - datalake_gsheets_clean.media_plan_current_quarter.dt_insertion_order
+      - datalake_media_plan_clean.media_plan.dt_insertion_order
+  dt_ended:
+    lineage:
+      - datalake_gsheets_clean.media_plan_current_quarter.dt_ended
+      - datalake_media_plan_clean.media_plan.dt_ended
+      - datalake_gsheets_clean.media_plan_current_quarter.dt_insertion_order
+      - datalake_media_plan_clean.media_plan.dt_insertion_order
