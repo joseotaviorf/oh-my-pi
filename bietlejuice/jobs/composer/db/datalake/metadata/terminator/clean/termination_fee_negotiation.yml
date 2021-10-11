@@ -1,0 +1,30 @@
+database_name: datalake_terminator_clean
+table_name: termination_fee_negotiation
+columns:
+  id:
+    lineage:
+      - datalake_terminator_raw.termination_fee_negotiation.id
+  id_termination_fee:
+    lineage:
+      - datalake_terminator_raw.termination_fee_negotiation.termination_fee_id
+  discount_value:
+    lineage:
+      - datalake_terminator_raw.termination_fee_negotiation.discount_value
+  final_amount:
+    lineage:
+      - datalake_terminator_raw.termination_fee_negotiation.final_amount
+  number_of_installments:
+    lineage:
+      - datalake_terminator_raw.termination_fee_negotiation.number_of_installments
+  payment_option:
+    lineage:
+      - datalake_terminator_raw.termination_fee_negotiation.payment_option
+  status:
+    lineage:
+      - datalake_terminator_raw.termination_fee_negotiation.status
+  ts_created:
+    lineage:
+      - datalake_terminator_raw.termination_fee_negotiation.created_at
+  ts_updated:
+    lineage:
+      - datalake_terminator_raw.termination_fee_negotiation.updated_at

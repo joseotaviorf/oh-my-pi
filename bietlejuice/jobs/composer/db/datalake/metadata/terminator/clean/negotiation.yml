@@ -19,6 +19,9 @@ columns:
   repair_cost:
     lineage:
       - datalake_terminator_raw.negotiation.repair_cost
+  tenant_repair_costs_info:
+    lineage:
+      - datalake_terminator_raw.negotiation.tenant_repair_costs_info
   ts_created:
     lineage:
       - datalake_terminator_raw.negotiation.created_at

@@ -1,6 +1,9 @@
 database_name: datalake_terminator_clean
 table_name: rev_info
 columns:
+  id_user:
+    lineage:
+      - datalake_terminator_raw.revinfo.user_id
   rev:
     lineage:
       - datalake_terminator_raw.revinfo.rev

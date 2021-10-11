@@ -29,6 +29,8 @@ This pipeline produces, via full load:
     - `termination_aud`
     - `termination_fee`
     - `termination_fee_aud`
+    - `termination_fee_negotiation`
+    - `termination_fee_negotiation_aud`
     - `utility_bill`
     - `utility_bill_aud`
 
