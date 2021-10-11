@@ -1,0 +1,44 @@
+---
+raw_partition_cols: ["year", "month", "day"]
+table_name: rtb_campaigns
+account_hashes:
+  - q00nnVyP3JilwoZYlPTp
+metrics:
+  - impsCount
+  - clicksCount
+  - campaignCost
+  - conversionsCount
+  - conversionsValue
+  - cr
+  - ctr
+  # - roas
+group_by:
+  - day
+  - subcampaign
+schema: |
+  accountCountry STRING,
+  accountCreatedAt STRING,
+  accountCurrency STRING,
+  accountFeatures MAP<STRING,ARRAY<STRING>>,
+  accountFeedIdentifier STRING,
+  accountHash STRING,
+  accountName STRING,
+  accountProperties STRUCT<
+    campaignType: STRING,
+    contactPerson: STRING,
+    maximalCpc: DOUBLE,
+    minimalCpc: DOUBLE
+  >,
+  accountStatus STRING,
+  accountUrl STRING,
+  accountVersion STRING,
+  campaignCost DOUBLE,
+  clicksCount DOUBLE,
+  conversionsCount DOUBLE,
+  conversionsValue DOUBLE,
+  cr DOUBLE,
+  ctr DOUBLE,
+  attributionDate STRING,
+  impsCount DOUBLE,
+  subcampaign STRING,
+  subcampaignHash STRING
