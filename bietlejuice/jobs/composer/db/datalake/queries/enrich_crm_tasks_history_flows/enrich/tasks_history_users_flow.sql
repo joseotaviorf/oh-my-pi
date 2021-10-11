@@ -50,7 +50,7 @@ most_recent_completed_task_by_user AS (
     a.task_user_resolve_hours,
     a.ts_next_action,
     a.ts_action,
-    ROW_NUMBER() OVER (PARTITION BY a.id_task, a.id_user_action ORDER BY a.ts_action DESC) AS ranking
+    ROW_NUMBER() OVER (PARTITION BY a.id_task, a.id_user_action ORDER BY DATE_TRUNC('SECOND', a.ts_action) DESC) AS ranking
   FROM
     actions a
   WHERE

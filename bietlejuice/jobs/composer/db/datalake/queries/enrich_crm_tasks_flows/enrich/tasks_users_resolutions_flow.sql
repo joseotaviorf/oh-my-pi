@@ -32,7 +32,7 @@ prev_tasks_full AS (
         tr.ts_action,
         tr.ts_start,
         tr.ts_action AS ts_task_user_end,
-        LAG(tr.ts_action) OVER(PARTITION BY tr.id_task ORDER BY tr.ts_action) AS ts_task_user_start,
+        LAG(tr.ts_action) OVER(PARTITION BY tr.id_task ORDER BY DATE_TRUNC('SECOND', tr.ts_action)) AS ts_task_user_start,
         tr.year,
         tr.month,
         tr.day
