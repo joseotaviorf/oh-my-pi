@@ -114,7 +114,7 @@ for account_type, account_info in accounts.items():
             "output_path": output_path,
         },
         overrides={},
-        aws_conn_id="aws_default",
+        aws_conn_id="aws_prod_data",
         region_name="us-east-1",
     )
 
