@@ -1,0 +1,17 @@
+---
+raw_table_name: campaigns_overview_report
+raw_output_path:
+  "s3://{datalake_bucket}/raw/{source}/{raw_table_name}/acc={account_id}/dt={execution_date}/data.gz"
+clean_tables_list:
+  - mitula_campaigns
+  - trovit_campaigns
+partition_cols:
+  - id_account
+  - dt_loaded
+accounts:
+  sales:
+    account_name: quintoandar_sales_homes_br
+    account_id: 5940223
+  rent:
+    account_name: quintoandar_rent_homes_br
+    account_id: 18263
