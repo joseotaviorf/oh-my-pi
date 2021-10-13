@@ -94,9 +94,9 @@ SELECT DISTINCT
   COALESCE(mrbu.task_user_resolve_hours, a.task_user_resolve_hours) AS task_user_resolve_hours,
   COALESCE(mrbu.ts_next_action, a.ts_next_action) AS ts_next_action,
   COALESCE(mrbu.ts_action, a.ts_action) AS ts_action,
-  COALESCE(mrbu.year, t.year) AS year,
-  COALESCE(mrbu.month, t.month) AS month,
-  COALESCE(mrbu.day, t.day) AS day
+  COALESCE(mrbu.year, a.year) AS year,
+  COALESCE(mrbu.month, a.month) AS month,
+  COALESCE(mrbu.day, a.day) AS day
 FROM
     actions a
 LEFT JOIN
