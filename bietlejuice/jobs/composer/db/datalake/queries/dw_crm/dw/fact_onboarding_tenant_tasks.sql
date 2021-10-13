@@ -88,7 +88,7 @@ contracts AS (
     )
   )
   AND turf.year = {year}
-  AND turf.month = {motnh}
+  AND turf.month = {month}
   AND turf.day = {day}
 ),
 contract_house_listing AS (

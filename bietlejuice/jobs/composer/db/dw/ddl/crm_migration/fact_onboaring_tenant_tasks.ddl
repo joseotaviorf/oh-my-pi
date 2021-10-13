@@ -17,7 +17,7 @@ CREATE TABLE crm_migration.fact_onboarding_tenant_tasks (
     action_user_name VARCHAR,
     action_type VARCHAR,
     task_action_type VARCHAR,
-    task_user_action_resolve_hours DECIMAL(10,2),
+    task_user_action_resolve_hours DECIMAL(11,1),
     ts_task_action_start TIMESTAMP,
     ts_task_action_end TIMESTAMP,
     ts_action TIMESTAMP,
