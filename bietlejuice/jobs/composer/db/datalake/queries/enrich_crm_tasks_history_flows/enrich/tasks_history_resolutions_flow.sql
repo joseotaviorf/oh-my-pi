@@ -2,8 +2,7 @@ WITH task_resolution_ranking AS (
   SELECT
     id_task,
     COALESCE(id_workgroup, -1) AS id_workgroup,
-    type,
-    ROW_NUMBER() OVER (PARTITION BY id_task, id_workgroup, type ORDER BY ts_action DESC) AS ranking,
+    ROW_NUMBER() OVER (PARTITION BY id_task, id_workgroup ORDER BY ts_action DESC) AS ranking,
     NULLIF(id_user_action, '') IS NULL AS is_task_auto_completed,
     ts_action
   FROM
@@ -18,11 +17,10 @@ tasks_max_date AS (
   SELECT
       id,
       COALESCE(id_workgroup, -1) AS id_workgroup,
-      type,
       MAX(DATE(CONCAT(year,'-', month,'-', day))) AS dt_last_updated
   FROM
       datalake_crm.tasks ct
-  GROUP BY 1,2,3
+  GROUP BY 1,2
 )
 SELECT DISTINCT
   t.id AS id_task,
@@ -55,7 +53,6 @@ JOIN
   tasks_max_date md
     ON t.id = md.id
     AND COALESCE(t.id_workgroup, -1) = md.id_workgroup
-    AND t.type = md.type
     AND DATE(CONCAT(year,'-', month,'-', day)) = md.dt_last_updated
 LEFT JOIN
   datalake_crm.workgroups cw
@@ -64,7 +61,6 @@ LEFT JOIN
   task_resolution_ranking tr
     ON tr.id_task = t.id
     AND tr.id_workgroup = COALESCE(t.id_workgroup, -1)
-    AND tr.type = t.type
     AND tr.ranking = 1
 WHERE
   t.year = {year}
