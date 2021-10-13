@@ -33,6 +33,8 @@ SELECT DISTINCT
   t.type AS type,
   SUBSTR(t.description, 1, 4000) AS description,
   t.subject AS subject,
+  COLLECT_SET(COALESCE(t.subject, cw.title)) OVER (PARTITION BY t.id) AS titles,
+  COLLECT_SET(COALESCE(t.id_workgroup, cw.id)) OVER (PARTITION BY t.id) AS workgroups,
   CAST(
     ROUND(
       (TO_UNIX_TIMESTAMP(COALESCE(tr.ts_action, t.ts_completed), 'yyyy-MM-dd HH:mm:ss') - TO_UNIX_TIMESTAMP(t.ts_start,'yyyy-MM-dd HH:mm:ss')) / 60.0,
@@ -41,11 +43,9 @@ SELECT DISTINCT
   ) AS hours_task_start_to_completed,
   t.is_resolved,
   COALESCE(tr.is_task_auto_completed, false) AS is_task_auto_completed,  
-  t.ts_start,
-  t.ts_completed,
-  t.ts_silenced_until,
-  COLLECT_SET(COALESCE(t.subject, cw.title)) OVER (PARTITION BY t.id) AS titles,
-  COLLECT_SET(COALESCE(t.id_workgroup, cw.id)) OVER (PARTITION BY t.id) AS workgroups,
+  DATE_TRUNC('SECOND', t.ts_start) AS ts_start,
+  DATE_TRUNC('SECOND', t.ts_completed) AS ts_completed,
+  DATE_TRUNC('SECOND', t.ts_silenced_until) AS ts_silenced_until,
   t.year,
   t.month,
   t.day
