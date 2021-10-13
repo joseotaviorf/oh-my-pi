@@ -1,0 +1,36 @@
+database_name: datalake_terminator_clean
+table_name: application_user_aud
+columns:
+  id:
+    lineage:
+      - datalake_terminator_raw.application_user_aud.id
+  id_external:
+    lineage:
+      - datalake_terminator_raw.application_user_aud.external_id
+  id_keycloak_token:
+    lineage:
+      - datalake_terminator_raw.application_user_aud.keycloak_token_id
+  rev:
+    lineage:
+      - datalake_terminator_raw.application_user_aud.rev
+  rev_type:
+    lineage:
+      - datalake_terminator_raw.application_user_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_terminator_raw.application_user_aud.revend
+  name:
+    lineage:
+      - datalake_terminator_raw.application_user_aud.name
+  email:
+    lineage:
+      - datalake_terminator_raw.application_user_aud.email
+  phone:
+    lineage:
+      - datalake_terminator_raw.application_user_aud.phone
+  ts_created:
+    lineage:
+      - datalake_terminator_raw.application_user_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_terminator_raw.application_user_aud.updated_at

@@ -16,6 +16,8 @@ This pipeline produces, via full load:
     
 
 2. In datalake clean:
+    - `application_user`
+    - `application_user_aud`
     - `attachment`
     - `attachment_aud`
     - `contract` 

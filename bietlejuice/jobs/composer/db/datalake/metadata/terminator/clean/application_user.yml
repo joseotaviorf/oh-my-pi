@@ -1,0 +1,27 @@
+database_name: datalake_terminator_clean
+table_name: application_user
+columns:
+  id:
+    lineage:
+      - datalake_terminator_raw.application_user.id
+  id_external:
+    lineage:
+      - datalake_terminator_raw.application_user.external_id
+  id_keycloak_token:
+    lineage:
+      - datalake_terminator_raw.application_user.keycloak_token_id
+  name:
+    lineage:
+      - datalake_terminator_raw.application_user.name
+  email:
+    lineage:
+      - datalake_terminator_raw.application_user.email
+  phone:
+    lineage:
+      - datalake_terminator_raw.application_user.phone
+  ts_created:
+    lineage:
+      - datalake_terminator_raw.application_user.created_at
+  ts_updated:
+    lineage:
+      - datalake_terminator_raw.application_user.updated_at
