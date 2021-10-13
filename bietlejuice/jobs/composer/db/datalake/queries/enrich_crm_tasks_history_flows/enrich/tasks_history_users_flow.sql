@@ -50,7 +50,10 @@ most_recent_completed_task_by_user AS (
     a.task_user_resolve_hours,
     a.ts_next_action,
     a.ts_action,
-    ROW_NUMBER() OVER (PARTITION BY a.id_task, a.id_user_action ORDER BY DATE_TRUNC('SECOND', a.ts_action) DESC) AS ranking
+    ROW_NUMBER() OVER (PARTITION BY a.id_task, a.id_user_action ORDER BY DATE_TRUNC('SECOND', a.ts_action) DESC) AS ranking,
+    a.year,
+    a.month,
+    a.day
   FROM
     actions a
   WHERE
@@ -91,10 +94,9 @@ SELECT DISTINCT
   COALESCE(mrbu.task_user_resolve_hours, a.task_user_resolve_hours) AS task_user_resolve_hours,
   COALESCE(mrbu.ts_next_action, a.ts_next_action) AS ts_next_action,
   COALESCE(mrbu.ts_action, a.ts_action) AS ts_action,
-  DATE(CONCAT(year,'-',month,'-',day)) AS dt_partition,
-  year,
-  month,
-  day
+  COALESCE(mrbu.year, t.year) AS year,
+  COALESCE(mrbu.month, t.month) AS month,
+  COALESCE(mrbu.day, t.day) AS day
 FROM
     actions a
 LEFT JOIN

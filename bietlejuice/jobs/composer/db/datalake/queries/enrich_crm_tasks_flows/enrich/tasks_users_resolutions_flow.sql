@@ -75,7 +75,10 @@ max_realized_by_user AS (
         t.ts_action,
         t.ts_start,
         t.ts_task_user_start,
-        t.ts_task_user_end
+        t.ts_task_user_end,
+        t.year,
+        t.month,
+        t.day
     FROM 
         prev_tasks t
     JOIN 
@@ -86,7 +89,6 @@ max_realized_by_user AS (
             AND t.action_type = 'REALIZE'
 )
 SELECT DISTINCT
-    CAST(t.id_action AS STRING) AS id_action,
     CAST(COALESCE(mrbu.id_action_date, t.id_action_date) AS BIGINT) AS id_action_date,
     CAST(t.id_assignee AS BIGINT) AS id_assignee,
     CAST(t.id_completed_date AS BIGINT) AS id_completed_date,
@@ -108,14 +110,13 @@ SELECT DISTINCT
     END AS task_user_resolve_hours,
     t.type, 
     t.action_type AS task_user_type,
-    t.dt_partition,
     COALESCE(mrbu.ts_action, t.ts_action) AS ts_action,
     COALESCE(mrbu.ts_start, t.ts_start) AS ts_start,
     COALESCE(mrbu.ts_task_user_start, t.ts_task_user_start) AS ts_task_user_start,
     COALESCE(mrbu.ts_task_user_end, t.ts_task_user_end) AS ts_task_user_end,
-    year,
-    month,
-    day
+    COALESCE(mrbu.year, t.year) AS year,
+    COALESCE(mrbu.month, t.month) AS month,
+    COALESCE(mrbu.day, t.day) AS day
 FROM 
     prev_tasks t
 LEFT JOIN 
