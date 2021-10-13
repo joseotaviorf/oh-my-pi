@@ -3,7 +3,24 @@ table_name: usuario
 columns:
   unidade_id:
     tags:
-    - Confidential
+      - Confidential
   nivel:
     tags:
-    - Confidential
+      - Public
+  nome:
+    tags:
+      - PII
+      - Confidential
+  nome_completo:
+    tags:
+      - PII
+      - Confidential
+  email:
+    tags:
+      - Confidential
+  telefone:
+    tags:
+      - Confidential
+  grupo_id:
+    tags:
+      - Public

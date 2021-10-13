@@ -17,6 +17,12 @@ columns:
   revisionable_type:
     lineage:
       - datalake_casa_mineira_crm_raw.revisions.revisionable_type
+  old_value:
+    lineage:
+      - datalake_casa_mineira_crm_raw.revisions.old_value
+  new_value:
+    lineage:
+      - datalake_casa_mineira_crm_raw.revisions.new_value
   ts_created:
     lineage:
       - datalake_casa_mineira_crm_raw.revisions.created_at

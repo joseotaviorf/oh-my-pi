@@ -20,6 +20,18 @@ columns:
   level:
     lineage:
       - datalake_casa_mineira_crm_raw.usuario.nivel
+  user_name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario.nome
+  user_full_name:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario.nome_completo
+  email:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario.email
+  phone:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario.telefone
   is_intern:
     lineage:
       - datalake_casa_mineira_crm_raw.usuario.interno

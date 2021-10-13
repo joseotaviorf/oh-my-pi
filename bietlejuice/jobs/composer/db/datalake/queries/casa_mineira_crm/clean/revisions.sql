@@ -4,6 +4,8 @@ SELECT
     user_id AS id_user, 
     `key` AS revision_key,
     revisionable_type,
+    old_value,
+    new_value,
     CAST(created_at AS TIMESTAMP) AS ts_created,
     CAST(updated_at AS TIMESTAMP) AS ts_updated 
 FROM 

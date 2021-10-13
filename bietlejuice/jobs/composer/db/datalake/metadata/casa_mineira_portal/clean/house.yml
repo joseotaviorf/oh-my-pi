@@ -19,6 +19,9 @@ columns:
   id_type:
     lineage:
       - datalake_casa_mineira_portal_raw.imovel.tipo_id
+  code:
+    lineage:
+      - datalake_casa_mineira_portal_raw.imovel.codigo
   goal:
     lineage:
       - datalake_casa_mineira_portal_raw.imovel.finalidade
