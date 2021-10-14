@@ -1,0 +1,9 @@
+database_name: datalake_gsheets_clean
+table_name: cod_locale
+columns:
+  id_locale:
+    lineage:
+      - datalake_gsheets_raw.cod_locale.localidade
+  city:
+    lineage:
+      - datalake_gsheets_raw.cod_locale.cidade

@@ -1,0 +1,18 @@
+database_name: datalake_gsheets_clean
+table_name: agr_account
+columns:
+  id_account:
+    lineage:
+      - datalake_gsheets_raw.agr_account.codigo_conta
+  id_order:
+    lineage:
+      - datalake_gsheets_raw.agr_account.ordem
+  id_line:
+    lineage:
+      - datalake_gsheets_raw.agr_account.lineid
+  group:
+    lineage:
+      - datalake_gsheets_raw.agr_account.agrupador
+  account_description:
+    lineage:
+      - datalake_gsheets_raw.agr_account.descricao_conta

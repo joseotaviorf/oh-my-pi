@@ -29,6 +29,7 @@ This pipeline produces the following output tables:
     - `affiliates_extra_user_bonus`
     - `affiliates_monthly_expected_results`
     - `agents_control`
+    - `agr_account`
     - `aux_agents_sale_hub`
     - `auxiliary_region`
     - `branding_where_is_plaquinha`
@@ -37,6 +38,7 @@ This pipeline produces the following output tables:
     - `ciq_costs`
     - `city_share`
     - `closing_analysts_hierarchy`
+    - `cod_locale`
     - `contact_type_taxonomy`
     - `contract_attribution_models`
     - `costs_allocation_relative_indexes`

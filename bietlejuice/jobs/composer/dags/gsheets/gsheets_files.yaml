@@ -30,6 +30,11 @@ aglomerados_subnormais_2010_limites:
     sheet_name: AglomeradosSubnormais2010_Limites
     clean_table_name: census_subnormal_crowding_areas
 
+agr_account:
+    sheet_id: 1GhZCQssX1zQIj1wpv5hm6iK3_4Hb2EPH251OMyOLJmQ
+    sheet_name: AGR
+    clean_table_name: agr_account
+
 aux_agents_sale_hub:
     sheet_id: 1mom8xcJ4XCpr02S38DgW_cmEDcdzsOiMkW2vSbg0Ra0
     sheet_name: aux_agents_HUB
@@ -59,6 +64,11 @@ casa_mineira_marketing_manual_shared_costs:
     sheet_id: 1IRBcIhdi7V0gXtvoImz7-sA5P38FALN_CgXcpAORzYY
     sheet_name: rateio_manual
     clean_table_name: casa_mineira_marketing_manual_shared_costs
+
+cod_locale:
+    sheet_id: 1GhZCQssX1zQIj1wpv5hm6iK3_4Hb2EPH251OMyOLJmQ
+    sheet_name: LOC (Cidade)
+    clean_table_name: cod_locale
 
 ciq_costs:
     sheet_id: 1ZkPABh53UrzKn4aQudZzr5QpJsBXhCZDnJkDZob2Rqc
