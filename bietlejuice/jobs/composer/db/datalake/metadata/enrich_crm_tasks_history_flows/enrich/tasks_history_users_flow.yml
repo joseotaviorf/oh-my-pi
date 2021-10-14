@@ -59,11 +59,6 @@ columns:
     ts_action:
       lineage:
         - datalake_crm_tasks_resolution.tasks_resolution_history.ts_action
-    dt_partition:
-      lineage:
-        - datalake_crm_tasks_resolution.tasks_resolution_history.year
-        - datalake_crm_tasks_resolution.tasks_resolution_history.month
-        - datalake_crm_tasks_resolution.tasks_resolution_history.day
     year:
       lineage:
         - datalake_crm_tasks_resolution.tasks_resolution_history.year

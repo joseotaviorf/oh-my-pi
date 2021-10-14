@@ -53,9 +53,6 @@ columns:
   task_user_type:
     lineage:
       - datalake_crm_tasks_resolution.tasks_resolution.action_type
-  dt_partition:
-    lineage:
-      - datalake_crm_tasks_resolution.tasks_resolution.ts_action
   ts_action:
     lineage:
       - datalake_crm_tasks_resolution.tasks_resolution.ts_action
