@@ -110,28 +110,99 @@ daily_published_listings_adjusted AS (
     WHERE
         fhs.order_status = 1
         AND fhl.sk_region > 0
+),
+metrics_base AS (
+    SELECT
+        dpla.sk_house_listing/1000 AS id_house,
+        dr.short_region_name,
+        dr.city_group,
+        dr.city_name,
+        dr.name AS subregion_name,
+        dpla.installation_type,
+        dpla.listing_type,
+        dpla.weekday_name,
+        CASE
+            WHEN dpla.id_plaquinha IS NOT NULL 
+                AND dpla.dt_plaquinha <= dpla.date THEN TRUE
+            ELSE FALSE
+        END AS has_plaquinha, -- flag to identify if the house or the house condo has plaquinha
+        CASE
+            WHEN dpla.id_plaquinha_house IS NOT NULL 
+                AND dpla.dt_plaquinha_house <= dpla.date THEN TRUE
+            ELSE FALSE
+        END AS has_plaquinha_house, -- flag to identify if the house has plaquinha
+        dpla.month_end AS dt_month_end,
+        dpla.date AS dt,
+        dpla.dt_plaquinha AS dt_plaquinha_installed,
+        dpla.dt_plaquinha_house AS dt_plaquinha_installed_house,
+        NULL::FLOAT AS new_installed_plaquinhas_target,
+        NULL::FLOAT AS active_plaquinhas_target,
+        NULL::FLOAT AS cover_percent_target
+    FROM
+        daily_published_listings_adjusted dpla
+    LEFT JOIN public.dim_region dr
+        ON dpla.sk_region = dr.sk_region
+    GROUP BY 
+        1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
+),
+targets AS (
+    -------------------------------------
+    -- New installed plaquinhas target --
+    -------------------------------------
+    SELECT 
+        NULL::INT AS id_house,
+        NULL::TEXT AS short_region_name,
+        city_group AS city_group,
+        NULL::TEXT AS city_name,
+        NULL::TEXT AS subregion_name,
+        NULL::TEXT AS installation_type,
+        listing_type AS listing_type,
+        NULL::TEXT AS weekday_name,
+        NULL::BOOL AS has_plaquinha,
+        NULL::BOOL AS has_plaquinha_house,
+        NULL::DATE AS dt_month_end,
+        NULL::DATE AS dt,
+        NULL::DATE AS dt_plaquinha_installed,
+        tgt.dt_target AS dt_plaquinha_installed_house,
+        tgt.new_installed_plaquinhas_target,
+        NULL::FLOAT AS active_plaquinhas_target,
+        NULL::FLOAT AS cover_percent_target
+    FROM 
+        datalake_gsheets_clean_prod.plaquinhas_installation_targets tgt
+    UNION ALL 
+    ------------------------------
+    -- Active plaquinhas target --
+    ------------------------------
+    SELECT 
+        NULL::INT AS id_house,
+        NULL::TEXT AS short_region_name,
+        city_group AS city_group,
+        NULL::TEXT AS city_name,
+        NULL::TEXT AS subregion_name,
+        NULL::TEXT AS installation_type,
+        listing_type AS listing_type,
+        NULL::TEXT AS weekday_name,
+        NULL::BOOL AS has_plaquinha,
+        NULL::BOOL AS has_plaquinha_house,
+        NULL::DATE AS dt_month_end,
+        tgt.dt_target AS dt,
+        NULL::DATE AS dt_plaquinha_installed,
+        NULL::DATE AS dt_plaquinha_installed_house,
+        NULL::FLOAT AS new_installed_plaquinhas_target,
+        tgt.active_plaquinhas_target,
+        tgt.cover_percent_target
+    FROM 
+        datalake_gsheets_clean_prod.plaquinhas_installation_targets tgt
 )
-SELECT
-    dpla.sk_house_listing/1000 AS id_house,
-    dpla.sk_region,
-    dpla.installation_type,
-    dpla.listing_type,
-    dpla.weekday_name,
-    CASE
-        WHEN dpla.id_plaquinha IS NOT NULL 
-            AND dpla.dt_plaquinha <= dpla.date THEN TRUE
-        ELSE FALSE
-    END AS has_plaquinha, -- flag to identify if the house or the house condo has plaquinha
-    CASE
-        WHEN dpla.id_plaquinha_house IS NOT NULL 
-            AND dpla.dt_plaquinha_house <= dpla.date THEN TRUE
-        ELSE FALSE
-    END AS has_plaquinha_house, -- flag to identify if the house has plaquinha
-    dpla.month_end AS dt_month_end,
-    dpla.date AS dt,
-    dpla.dt_plaquinha AS dt_plaquinha_installed,
-    dpla.dt_plaquinha_house AS dt_plaquinha_installed_house
-FROM
-    daily_published_listings_adjusted dpla
-GROUP BY 
-    1,2,3,4,5,6,7,8,9,10,11
+-------------------------------
+-- UNION metrics and targets --
+-------------------------------
+SELECT 
+    mb.*
+FROM 
+    metrics_base mb
+UNION ALL
+SELECT 
+    t.*
+FROM 
+    targets t
