@@ -5,7 +5,7 @@ incremental_load_parameters:
     - month
     - day
   dw_query_filters:
-    "DATE(ts_load)" : "DATE('{year}-{month}-{day}')"
+    "DATE(ts_load)" : "DATE_ADD(DATE('{year}-{month}-{day}'), 1)"
 inner_dependencies:
   fact_inspector_daily_allocations:
     - fact_inspector_hourly_allocations
