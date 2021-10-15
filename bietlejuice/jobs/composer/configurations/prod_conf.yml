@@ -5,6 +5,7 @@ dags_out_of_pattern: [
     "ebdb",
     "criteo_campaigns",
     "dw_contract",
+    "dw_listing_jobs",
     "dw_offer",
     "dw_marketing_costs",
     "enrich_marketing_costs_sharing_rules",

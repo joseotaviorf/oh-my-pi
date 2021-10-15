@@ -105,7 +105,9 @@ bietlejuice.dw_criteo_campaigns:
 bietlejuice.dw_crm:
   - bietlejuice.dw_contract:load-janus-dim-contract-into-redshift
   - bietlejuice.dw_offer:load-janus-dim-offer-into-redshift
+  - bietlejuice.dw_listing_jobs:load-janus-fact-photo-job-into-redshift
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-offer-in-data-lake
   - bietlejuice.ebdb:create-clean-onboarding-in-data-lake
   - bietlejuice.ebdb:create-clean-inspection-in-data-lake
@@ -117,6 +119,7 @@ bietlejuice.dw_crm:
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-users-resolutions-flow
   - bietlejuice.enrich_crm_tasks_transitions:load-enrich-tasks-transitions
   - bietlejuice.enrich_firestore:load-enrich-rent-offer
+  - bietlejuice.heimdall:load-clean-activity
 
 bietlejuice.dw_facebook_insights:
   - bietlejuice.enrich_marketing_costs_facebook_insights
