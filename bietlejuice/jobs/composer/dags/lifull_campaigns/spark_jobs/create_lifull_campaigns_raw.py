@@ -40,6 +40,8 @@ if __name__ == "__main__":
             ("total_cost", "STRING"),
             ("curr_date", "DATE"),
             ("group_name", "STRING"),
+            ("acc", "INT"),
+            ("dt", "DATE"),
         ]
     )
 
@@ -50,6 +52,8 @@ if __name__ == "__main__":
     )
 
     spark_metastore_service = SparkMetastoreService(SparkClient())
+    spark_metastore_service.create_database(database_name)
+
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
     spark_metastore_loader.recreate_table(
         database_name=database_name,
