@@ -1,14 +1,14 @@
 WITH schedule AS (
 SELECT
-	t.agent_id AS sk_agent,
-	COALESCE(to_char(t.slot_dt::DATE,'YYYYMMDD')::INTEGER, -1) AS sk_slot_date,
-  date_trunc('h', t.slot_dt) AS ts_slot_hour,
+	t.id_agent AS sk_agent,
+	COALESCE(to_char(t.ts_slot::DATE,'YYYYMMDD')::INTEGER, -1) AS sk_slot_date,
+  date_trunc('h', t.ts_slot) AS ts_slot_hour,
 	sum(case when coalesce(t.last_change_reason,'') <> 'day off' then cast(t
-.available_slot_24h AS INTEGER) else 0 end) AS allocated_slots,
+.is_available_slot_24h AS INTEGER) else 0 end) AS allocated_slots,
 	sum(case when coalesce(t.last_change_reason,'') <> 'day off' then cast(t
-.specific_slot AS INTEGER) else 0 end) AS allocated_slots_0
-FROM agent.agents_slots t
-WHERE DATE(t.slot_dt) BETWEEN DATE('{0}') AND (DATE('{0}') + INTERVAL '21 days') and t.agent_type = 'SessaoFotos'
+.is_available_specific_slot AS INTEGER) else 0 end) AS allocated_slots_0
+FROM datalake_ebdb_agents_prod.agents_slots t
+WHERE DATE(t.ts_slot) BETWEEN DATE('{0}') AND (DATE('{0}') + INTERVAL '21 days') and t.agent_type = 'SessaoFotos'
 GROUP BY 1, 2, 3
 ),
 agent_contract_rank AS (
