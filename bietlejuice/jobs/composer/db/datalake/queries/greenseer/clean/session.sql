@@ -2,7 +2,7 @@ SELECT
     session_id AS id_session,
     pipeline_id AS id_pipeline,
     language_code,
-    CAST(memory AS VARCHAR(60000)) AS memory,
+    memory,
     current_state,
     beginning_timestamp AS ts_started,
     end_timestamp AS ts_ended
