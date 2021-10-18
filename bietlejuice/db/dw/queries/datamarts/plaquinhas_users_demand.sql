@@ -80,16 +80,110 @@ all_users AS (
     	data_hora::DATE AS dt_interaction 
     FROM
     	datalake_raw.gsheets_users_cx_plaquinhas
+),
+plaquinhas_users AS (
+    SELECT 
+        sk_user AS sk_client,
+        BOOL_OR(is_qr_code_user) AS is_qr_code_user,
+        BOOL_OR(is_phone_user) AS is_phone_user,
+        BOOL_OR(is_chat_user) AS is_chat_user,
+        min(dt_interaction::DATE) AS dt_first_interaction,
+        max(dt_interaction::DATE) AS dt_last_interaction    
+    FROM
+        all_users 
+    WHERE
+        sk_user > 0
+    GROUP BY 1
+),
+metrics_base AS (
+    SELECT
+        u.sk_client,
+        sk_house_listing,
+        id_house,
+        sk_booking,
+        sk_offer,
+        sk_proposal,
+        sk_contract,
+        sk_rf,
+        city_group,
+        flow_event,
+        mkt_origin,
+        mkt_channel,
+        mkt_medium,
+        mkt_source,
+        utm_campaign,
+        utm_term,
+        utm_content,
+        campaign_name,
+        is_qr_code_user,
+        is_phone_user,
+        is_chat_user,
+        rent_flow_order,
+        tenant_prospect_order,
+        dt_first_interaction,
+        dt_last_interaction,
+        dt_event,
+        dt_booking_created,
+        flg_visit_completed,
+        dt_offer_submitted,
+        dt_offer_approved,
+        dt_tenant_first_doc_sent,
+        dt_credit_analysis_approved,
+        dt_contract_signed,
+        NULL::FLOAT AS visits_booked_target
+    FROM 
+        plaquinhas_users u
+    LEFT JOIN datamarts.performance_marketing_metrics_demand pmmd 
+        ON u.sk_client = pmmd.sk_client
+),
+targets AS (
+    SELECT
+        NULL::INT AS sk_client,
+        NULL::INT AS sk_house_listing,
+        NULL::INT AS id_house,
+        NULL::INT AS sk_booking,
+        NULL::INT AS sk_offer,
+        NULL::INT AS sk_proposal,
+        NULL::INT AS sk_contract,
+        NULL AS sk_rf,
+        NULL::TEXT AS city_group,
+        NULL::TEXT AS flow_event,
+        NULL::TEXT AS mkt_origin,
+        NULL::TEXT AS mkt_channel,
+        NULL::TEXT AS mkt_medium,
+        NULL::TEXT AS mkt_source,
+        NULL::TEXT AS utm_campaign,
+        NULL::TEXT AS utm_term,
+        NULL::TEXT AS utm_content,
+        NULL::TEXT AS campaign_name,
+        CASE WHEN tgt.channel = 'QR Code' THEN TRUE else FALSE END AS is_qr_code_user,
+        CASE WHEN tgt.channel = 'Phone' THEN TRUE else FALSE END AS is_phone_user,
+        NULL::BOOL AS is_chat_user,
+        NULL::INT AS rent_flow_order,
+        NULL::INT AS tenant_prospect_order,
+        NULL::DATE AS dt_first_interaction,
+        NULL::DATE AS dt_last_interaction,
+        NULL::DATE AS dt_event,
+        tgt.dt_target AS dt_booking_created,
+        NULL::BOOL AS flg_visit_completed,
+        NULL::DATE AS dt_offer_submitted,
+        NULL::DATE AS dt_offer_approved,
+        NULL::DATE AS dt_tenant_first_doc_sent,
+        NULL::DATE AS dt_credit_analysis_approved,
+        NULL::DATE AS dt_contract_signed,
+        tgt.visits_booked_target
+    FROM 
+        datalake_gsheets_clean_prod.plaquinhas_demand_targets tgt
 )
+-------------------------------
+-- UNION results and targets --
+-------------------------------
 SELECT 
-    sk_user AS sk_client,
-    BOOL_OR(is_qr_code_user) AS is_qr_code_user,
-    BOOL_OR(is_phone_user) AS is_phone_user,
-    BOOL_OR(is_chat_user) AS is_chat_user,
-    min(dt_interaction::DATE) AS dt_first_interaction,
-    max(dt_interaction::DATE) AS dt_last_interaction    
-FROM
-    all_users 
-WHERE
-    sk_user > 0
-GROUP BY 1
+    mb.*
+FROM 
+    metrics_base mb
+UNION ALL
+SELECT 
+    t.*
+FROM 
+    targets t
