@@ -2,6 +2,7 @@ artifacts_bucket: s3://artifacts.s3.data.quintoandar.com.br
 athena_query_results_bucket: s3://5a-datalake/query_results/
 dags_out_of_pattern: [
     "amplitude",
+    "dw_contract",
     "ebdb",
     "criteo_campaigns",
     "dw_contract",

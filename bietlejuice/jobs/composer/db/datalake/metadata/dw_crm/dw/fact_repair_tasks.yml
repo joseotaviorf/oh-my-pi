@@ -1,0 +1,76 @@
+---
+database_name: dw_crm_migration
+table_name: fact_repair_tasks
+columns:
+  sk_action_date:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_action_date
+  sk_assignee:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_assignee
+  sk_completed_date:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_completed_date
+  sk_contract:
+    lineage:
+      - dw_janus.dim_contract.sk_contract
+  # sk_house_listing:
+  #   lineage:
+  #     - dw_janus.fact_listing_rent_flows.sk_house_listing
+  # sk_house_owner:
+  #   lineage:
+  #     - dw_janus.fact_listing_rent_flows.sk_house_owner
+  sk_origin:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_origin
+  sk_receiver:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_receiver
+  sk_start_date:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_start_date
+  sk_task:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task
+  sk_task_action_end_date:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task_user_end_date
+  sk_task_action_start_date:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task_user_start_date
+  # sk_tenant:
+  #   lineage:
+  #     - dw_janus.fact_listing_rent_flows.sk_client
+  sk_user_action:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_user_action
+  action_type:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.action_type
+  action_user_name:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.action_user_name
+  task_action_type:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.task_user_type
+  task_user_action_resolve_hours:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.task_user_resolve_hours
+  ts_action:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.ts_action
+  ts_task_action_end:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.ts_task_user_end
+  ts_task_action_start:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.ts_task_user_start
+  year:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.year
+  month:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.month
+  day:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.day
