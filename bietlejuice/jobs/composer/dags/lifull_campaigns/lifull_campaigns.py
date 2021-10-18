@@ -104,7 +104,7 @@ for account_type, account_info in accounts.items():
         dag=dag,
         task_id=f"load-{account_type}-lifull-campaigns-report",
         job_name="crawler-lifull-{}-{}".format(account_type, "{{ ds }}"),
-        job_definition="5a-data-crawler-lifull:1",
+        job_definition="5a-data-crawler-lifull:2",
         job_queue="5a-data-crawler-mkt-queue",
         parameters={
             "start_date": "start_date={{ ds }}",

@@ -3,6 +3,7 @@ from collections import OrderedDict
 
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat
@@ -16,19 +17,17 @@ logger = QuintoAndarLogger(JOB_NAME)
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
 
-    parser.add_argument("env")
+    parser.add_argument("environment")
     parser.add_argument("datalake_bucket")
     parser.add_argument("source")
 
     args = parser.parse_args()
 
-    env = args.env
+    environment = args.environment
     datalake_bucket = args.datalake_bucket
     source = args.source
 
-    database_name = f"datalake_{source}_raw"
     table_name = "campaigns_overview_report"
-    table_location = f"s3://{datalake_bucket}/raw/{source}"
     table_schema = OrderedDict(
         [
             ("id", "STRING"),
@@ -44,22 +43,24 @@ if __name__ == "__main__":
             ("dt", "DATE"),
         ]
     )
+    
+    spark_client = SparkClient()
+    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
-    logger.info(
-        f"""m=__main__, environment={env}, source={source},
-        datalake_bucket={datalake_bucket},
-        msg=Creating table '{database_name}.{table_name}'..."""
+    datalake_info = DatalakeMetastoreService.get_db_info(
+        environment, source, datalake_bucket
     )
 
-    spark_metastore_service = SparkMetastoreService(SparkClient())
-    spark_metastore_service.create_database(database_name)
+    database_name = datalake_info["db_raw_databricks"]
+    table_path = datalake_info["db_raw_path"]
 
-    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+    spark_metastore_service.create_database(database_name)
     spark_metastore_loader.recreate_table(
         database_name=database_name,
         table_name=table_name,
         new_schema=table_schema,
-        s3_path=table_location,
+        s3_path=f'{table_path}{table_name}',
         format_options=SparkTableStorageFormat.DEFAULT_RAW,
-        partitions=["dt"],
+        partitions=["acc", "dt"],
     )
