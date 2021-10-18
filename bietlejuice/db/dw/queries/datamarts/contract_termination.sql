@@ -36,23 +36,6 @@ WITH
       AND ta1.dt_termination != ta2.dt_termination
     GROUP BY 1
   ),
-  inspections
-  AS
-  (
-    SELECT
-      id,
-      id_contract
-    FROM datalake_terminator_clean_prod.inspection i
-  ),
-  last_inspection
-  AS
-  (
-    SELECT
-      id_contract,
-      max(id) AS id
-    FROM inspections i
-    GROUP BY 1
-  ),
   keys
   AS
   (
@@ -63,28 +46,126 @@ WITH
       owner_keys_location
     FROM datalake_terminator_clean_prod.termination
   ),
-  inspection_tasks
+  completed_utility_attachments
   AS
   (
     SELECT
-      fit.sk_contract,
-      ts_action,
-      action_type
-    FROM crm.fact_inspection_tasks fit
-      JOIN crm.dim_inspection_task dit
-      ON fit.sk_task = dit.sk_task
-    WHERE dit.type IN ('SegundaAnaliseVistoriaSaida','AnaliseVistoriaSaida')
+    DISTINCT id_termination,
+    listagg(type, ', ') within group (order by id_termination, type) as completed_utility_attachments
+    FROM datalake_terminator_clean_prod.utility_bill 
+    WHERE status = 'COMPLETED'
+    GROUP BY id_termination
   ),
-  inspection_task
+  pending_utility_attachments
   AS
   (
     SELECT
-      sk_contract,
-      MAX(CASE WHEN action_type = 'REALIZE' THEN ts_action END) AS ts_task_completed, -- Avoiding duplicated Realize status because of product bug
-      MIN(CASE WHEN action_type = 'CREATE' THEN ts_action END) AS ts_task_created
-    -- Avoiding duplicated tasks per contract because of product bug
-    FROM inspection_tasks
-    GROUP BY 1
+    DISTINCT id_termination,
+    listagg(type, ', ') within group (order by id_termination, type) as pending_utility_attachments
+    FROM datalake_terminator_clean_prod.utility_bill 
+    WHERE status = 'PENDING'
+    GROUP BY id_termination
+  ),
+  utility_in_condominium
+  AS
+  (
+    SELECT
+    DISTINCT id_termination,
+    listagg(type, ', ') within group (order by id_termination, type) as utility_bill_in_condominium
+    FROM datalake_terminator_clean_prod.utility_bill 
+    WHERE is_included_condominium is TRUE
+    GROUP BY id_termination
+  ),
+  total_nps
+  AS
+  (
+    SELECT
+    DISTINCT t.id,
+    100.0*(COUNT(DISTINCT CASE WHEN fnd.score BETWEEN 9 AND 10 THEN fnd.sk_nps_answer END)
+    -COUNT(DISTINCT CASE WHEN fnd.score BETWEEN 0 AND 6 THEN fnd.sk_nps_answer END)
+    )/NULLIF(COUNT(DISTINCT CASE WHEN fnd.sk_nps_answer > 0 THEN fnd.sk_nps_answer END),0) AS NPS
+    FROM datalake_terminator_clean_prod.termination t
+      JOIN tracksale.fact_nps_dispatches fnd
+      ON fnd.sk_contract = t.id_contract
+      LEFT JOIN tracksale.dim_nps_campaign dnc
+      ON dnc.sk_nps_campaign = fnd.sk_nps_campaign
+    WHERE t.status <> 'CANCELED'
+    AND dnc.metric_group IN ('iqoffboarding', 'ppoffboarding', 'offboarding')
+    GROUP BY t.id
+  ),
+  iq_nps
+  AS
+  (
+    SELECT
+    DISTINCT t.id,
+    (CASE WHEN dnc.customer_type = 'IQ' THEN 100.0*(COUNT(DISTINCT CASE WHEN fnd.score BETWEEN 9 AND 10 THEN fnd.sk_nps_answer END)
+    -COUNT(DISTINCT CASE WHEN fnd.score BETWEEN 0 AND 6 THEN fnd.sk_nps_answer END)
+    )/NULLIF(COUNT(DISTINCT CASE WHEN fnd.sk_nps_answer > 0 THEN fnd.sk_nps_answer END),0)END) AS IQ_NPS
+    FROM datalake_terminator_clean_prod.termination t
+      JOIN tracksale.fact_nps_dispatches fnd
+      ON fnd.sk_contract = t.id_contract
+      LEFT JOIN tracksale.dim_nps_campaign dnc
+      ON dnc.sk_nps_campaign = fnd.sk_nps_campaign
+    WHERE t.status <> 'CANCELED'
+    AND dnc.metric_group IN ('iqoffboarding', 'offboarding')
+    AND dnc.customer_type = 'IQ'
+    GROUP BY t.id, dnc.customer_type
+  ),
+  pp_nps
+  AS
+  (
+    SELECT
+    DISTINCT t.id,
+    (CASE WHEN dnc.customer_type = 'PP' THEN 100.0*(COUNT(DISTINCT CASE WHEN fnd.score BETWEEN 9 AND 10 THEN fnd.sk_nps_answer END)
+    -COUNT(DISTINCT CASE WHEN fnd.score BETWEEN 0 AND 6 THEN fnd.sk_nps_answer END)
+    )/NULLIF(COUNT(DISTINCT CASE WHEN fnd.sk_nps_answer > 0 THEN fnd.sk_nps_answer END),0)END) AS PP_NPS
+    FROM datalake_terminator_clean_prod.termination t
+      JOIN tracksale.fact_nps_dispatches fnd
+      ON fnd.sk_contract = t.id_contract
+      LEFT JOIN tracksale.dim_nps_campaign dnc
+      ON dnc.sk_nps_campaign = fnd.sk_nps_campaign
+    WHERE t.status <> 'CANCELED'
+    AND dnc.metric_group IN ('ppoffboarding', 'offboarding')
+    AND dnc.customer_type = 'PP'
+    GROUP BY t.id, dnc.customer_type
+  ),
+  last_inspection_synch
+  AS(
+    SELECT
+    DISTINCT t.id,
+    max(fib.sk_inspected_date) AS dt_last_inspection_synch
+    FROM datalake_terminator_clean_prod.termination t
+    JOIN fact_inspection_bookings fib
+        ON t.id_contract = fib.sk_contract
+    WHERE t.status <> 'CANCELED'
+    AND sk_inspected_date <> -1
+    GROUP BY t.id
+  ),
+  termination_finished_user 
+  AS 
+  (
+  SELECT
+    id AS id_termination,
+    min(rev) AS min_rev,
+    min(ta.ts_updated) AS ts_termination_finished
+  FROM datalake_terminator_clean_prod.termination_aud ta  
+  WHERE ta.status = 'DONE'
+  GROUP BY 1
+  ), 
+  application_user_info 
+  AS 
+  (
+  SELECT
+    id_termination,
+    au.id_external,
+    au.name,
+    au.email
+  FROM termination_finished_user tfu 
+  JOIN datalake_terminator_clean_prod.rev_info ri
+      ON ri.rev = tfu.min_rev
+  LEFT JOIN datalake_terminator_clean_prod.application_user au
+      ON au.id = ri.id_user
+  WHERE id_external IS NOT NULL
   )
 SELECT
   t.id AS sk_termination,
@@ -92,6 +173,7 @@ SELECT
   t.id_exit_inspection AS sk_exit_inspection,
   fhl.sk_house_listing,
   fhl.sk_region,
+  aui.id_external AS sk_application_user,
   tw.id_current_assignee AS sk_workflow_assignee,
   JSON_EXTRACT_PATH_TEXT(t.feedback, 'reason') AS reason,
   t.feedback,
@@ -120,12 +202,21 @@ SELECT
   n.repair_resolution,
   n.repair_cost,
   t.utility_bill_info,
+  c.completed_utility_attachments,
+  p.pending_utility_attachments,
+  u.utility_bill_in_condominium,
+  tn.nps,
+  iqn.iq_nps,
+  ppn.pp_nps,
+  aui.name AS application_user_name,
+  aui.email AS application_user_email,
   DATEDIFF('day', t.ts_created, t.dt_termination) AS leadtime_request_to_vacancy,
   CASE WHEN d.ts_termination_finished <= '2020-07-07' THEN DATEDIFF('day', t.dt_termination, n.ts_updated)
     WHEN d.ts_termination_finished > '2020-07-07' THEN DATEDIFF('day', t.dt_termination, d.ts_termination_finished)
     END AS leadtime_vacancy_to_finish,
   dc.is_b2b,
   (t.ts_created < dc.dt_start) AS is_before_contract_start, 
+  tw.has_automatically_closed_task,
   t.has_exit_inspection,
   n.has_landlord_comment AS has_repairs,
   n.needs_repair_by_tenant AS is_repair_tenant_duty,
@@ -138,6 +229,7 @@ SELECT
   t.is_relisting,
   t.dt_termination,
   m.dt_last_updated AS dt_last_rescheduled,
+  to_date(cast(lis.dt_last_inspection_synch AS text),'YYYYMMDD') AS dt_last_inspection_synched,
   n.ts_updated::date AS dt_negotiation_updated,
   t.ts_created,
   t.ts_canceled,
@@ -152,21 +244,33 @@ FROM datalake_terminator_clean_prod.termination t
     AND t.status = 'DONE'
   LEFT JOIN datalake_terminator_clean_prod.negotiation n
   ON t.id=n.id_termination
-  LEFT JOIN last_inspection i
-  ON i.id_contract = t.id_contract
   LEFT JOIN keys k
   ON k.id = t.id
   LEFT JOIN terminations_modified m
   ON m.id = t.id
   LEFT JOIN dim_contract dc
-  ON dc.sk_contract = t.id_contract
-  LEFT JOIN inspection_task tc
-  ON tc.sk_contract = t.id_contract 
+  ON dc.sk_contract = t.id_contract 
   LEFT JOIN datalake_terminator_clean_prod.termination_workflow tw
   ON t.id = tw.id_termination
   LEFT JOIN (SELECT distinct cast(nullif(ongoing_contracts,'') AS BIGINT) AS sk_contract FROM datalake_raw.gsheets_offboarding_carteirizacao_contratos
             UNION all
             SELECT distinct cast(nullif(finished_contracts,'') AS BIGINT) AS sk_contract FROM datalake_raw.gsheets_offboarding_carteirizacao_contratos) occ 
   ON t.id_contract = occ.sk_contract 
-    LEFT JOIN fact_house_listings fhl
+  LEFT JOIN fact_house_listings fhl
   ON t.id_contract = fhl.sk_contract
+  LEFT JOIN completed_utility_attachments c
+    ON  c.id_termination = t.id
+  LEFT JOIN pending_utility_attachments p
+    ON p.id_termination = t.id
+  LEFT JOIN utility_in_condominium u
+    ON u.id_termination = t.id
+  LEFT JOIN total_nps tn
+    ON tn.id = t.id
+  LEFT JOIN iq_nps iqn
+    ON iqn.id = t.id
+  LEFT JOIN pp_nps ppn
+    ON ppn.id = t.id
+  LEFT JOIN last_inspection_synch lis
+    ON lis.id = t.id
+  LEFT JOIN application_user_info aui
+    on t.id = aui.id_termination
