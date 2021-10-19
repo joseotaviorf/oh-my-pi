@@ -109,10 +109,12 @@ bps_monthly AS (
             WHEN status_month_start IS NULL
                 OR (status_month_end = 'ACTIVE' AND status_detail_month_end = 'First activation in city_group')
                 THEN 'First activation in city_group'
-            WHEN status_month_start IN ('CHURNED', 'SIGNED CCV') AND status_month_end IN ('CHURNED', 'SIGNED CCV')
+            WHEN status_month_start = 'CHURNED' AND status_month_end = 'CHURNED'
                 THEN INITCAP(status_month_start)
-            WHEN status_month_start IN ('CHURNED', 'SIGNED CCV')
+            WHEN status_month_start = 'SIGNED CCV' AND status_month_end = 'SIGNED CCV'
                 THEN 'Signed CCV'
+            WHEN status_month_start IN ('CHURNED', 'SIGNED CCV')
+                THEN 'Recovered'
         END AS status_month_start,
         CASE
             WHEN status_month_end = 'ACTIVE'

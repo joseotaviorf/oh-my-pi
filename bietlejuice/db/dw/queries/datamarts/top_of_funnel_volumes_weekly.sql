@@ -109,10 +109,12 @@ bps_weekly AS (
             WHEN status_week_start IS NULL
                 OR (status_week_end = 'ACTIVE' AND status_detail_week_end = 'First activation in city_group')
                 THEN 'First activation in city_group'
-            WHEN status_week_start IN ('CHURNED', 'SIGNED CCV') AND status_week_end IN ('CHURNED', 'SIGNED CCV')
+            WHEN status_week_start = 'CHURNED' AND status_week_end = 'CHURNED'
                 THEN INITCAP(status_week_start)
-            WHEN status_week_start IN ('CHURNED', 'SIGNED CCV')
+            WHEN status_week_start = 'SIGNED CCV' AND status_week_end = 'SIGNED CCV'
                 THEN 'Signed CCV'
+            WHEN status_week_start IN ('CHURNED', 'SIGNED CCV')
+                THEN 'Recovered'
         END AS status_week_start,
         CASE
             WHEN status_week_end = 'ACTIVE'

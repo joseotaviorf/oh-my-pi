@@ -109,10 +109,12 @@ bps_daily AS (
             WHEN status_date_start IS NULL
                 OR (status_date_end = 'ACTIVE' AND status_detail_date_end = 'First activation in city_group')
                 THEN 'First activation in city_group'
-            WHEN status_date_start IN ('CHURNED', 'SIGNED CCV') AND status_date_end IN ('CHURNED', 'SIGNED CCV')
+            WHEN status_date_start = 'CHURNED' AND status_date_end = 'CHURNED'
                 THEN INITCAP(status_date_start)
-            WHEN status_date_start IN ('CHURNED', 'SIGNED CCV')
+            WHEN status_date_start = 'SIGNED CCV' AND status_date_end = 'SIGNED CCV'
                 THEN 'Signed CCV'
+            WHEN status_date_start IN ('CHURNED', 'SIGNED CCV')
+                THEN 'Recovered'
         END AS status_date_start,
         CASE
             WHEN status_date_end = 'ACTIVE'
