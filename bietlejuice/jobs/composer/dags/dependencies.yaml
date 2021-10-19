@@ -121,6 +121,7 @@ bietlejuice.dw_crm:
   - bietlejuice.enrich_firestore:load-enrich-rent-offer
   - bietlejuice.heimdall:load-clean-activity
 
+
 bietlejuice.dw_facebook_insights:
   - bietlejuice.enrich_marketing_costs_facebook_insights
 
