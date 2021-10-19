@@ -1,0 +1,34 @@
+---
+DOCUMENTATION_BUCKET: data-documentation.s3.forno.data.quintoandar.com.br
+DOCUMENTATION_PATH: documentation/atlas/
+PARTITION_COLUMNS:
+  - year
+  - month
+  - day
+DATABASES_MIGRATED_TO_COMPOSER:
+  - braze
+  - payment
+  - quintoandar
+  - sale
+  - teravoz
+  - tracksale
+DATABASE_SKIP_LIST:
+  - bureaus
+  - datalake_static_files_raw
+  - default
+  - ds4a
+  - credit
+  - girafales
+  - model_academy
+  - smart_pricing
+  - wonka
+  - feature_store
+  - datalake_amplitude_clean_staging
+  - historical_datalake_zendesk
+  - historical_datalake_zendesk_clean
+  - historical_datalake_zendesk_raw
+  - historical_dw_zendesk
+  - listing_crawler
+  - testing_crm_migration
+  - testing_ebdb_agents
+  - testing_map_ods_from_s3

@@ -1,0 +1,5 @@
+---
+partition_cols: ["year", "month", "day"]
+table_names:
+  - tables_documentation_metrics
+  - columns_documentation_metrics
