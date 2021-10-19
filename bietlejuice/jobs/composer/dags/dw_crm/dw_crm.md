@@ -28,6 +28,7 @@ This pipeline produces the following output tables in DW layer, via incremental 
 - `crm_migration.dim_photo_job_task`
 - `crm_migration.fact_closing_tasks_workflows_transitions`
 - `crm_migration.fact_inspection_tasks`
+- `crm_migration.fact_linhadireta_chat_tasks`
 - `crm_migration.fact_credit_tasks`
 - `crm_migration.fact_offboarding_tasks`
 - `crm_migration.fact_payment_tasks`
