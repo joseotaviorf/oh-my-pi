@@ -133,6 +133,7 @@ shared_consolidated_costs AS (
         origin,
         campaign_name,
         campaign_city,
+        sr.city_group as sharing_rules_city_group,
         account_name,
         utm_campaign,
         utm_term,
@@ -267,6 +268,7 @@ SELECT
     origin,
     scc.campaign_name,
     COALESCE(
+        scc.sharing_rules_city_group,
         cgm.city_group_by_manual_convention,
         cgm.city_group_by_campaign_name, 
         cgm.city_group_by_campaign_convention,

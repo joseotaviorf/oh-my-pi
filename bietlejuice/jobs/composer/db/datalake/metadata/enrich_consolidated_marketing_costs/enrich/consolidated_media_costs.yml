@@ -28,6 +28,7 @@ columns:
       - datalake_consolidated_marketing_costs.google_consolidated_costs.campaign_city
       - datalake_consolidated_marketing_costs.facebook_consolidated_costs.campaign_city
       - datalake_gsheets_clean.marketing_manual_campaign_cities.city_group
+      - datalake_marketing_costs_sharing_rules.old_sharing_rules.city_group
   account_name:
     lineage:
       - datalake_consolidated_marketing_costs.google_consolidated_costs.account_name
