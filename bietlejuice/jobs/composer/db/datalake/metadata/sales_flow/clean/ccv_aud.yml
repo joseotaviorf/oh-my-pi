@@ -19,6 +19,9 @@ columns:
   sale_price:
     lineage:
       - datalake_sales_flow_raw.ccv_aud.sale_value
+  ccv_version:
+    lineage:
+      - datalake_sales_flow_raw.ccv_aud.ccv_version
   status:
     lineage:
       - datalake_sales_flow_raw.ccv_aud.status
@@ -46,6 +49,9 @@ columns:
   mod_sale_price:
     lineage:
       - datalake_sales_flow_raw.ccv_aud.sale_value_mod
+  mod_ccv_version:
+    lineage:
+      - datalake_sales_flow_raw.ccv_aud.ccv_version_mod
   mod_status:
     lineage:
       - datalake_sales_flow_raw.ccv_aud.status_mod

@@ -13,6 +13,27 @@ columns:
   payment_model:
     lineage:
       - datalake_sales_flow_raw.payment.payment_model
+  total:
+    lineage:
+      - datalake_sales_flow_raw.payment.total
+  deposit:
+    lineage:
+      - datalake_sales_flow_raw.payment.deposit
+  entry:
+    lineage:
+      - datalake_sales_flow_raw.payment.entry
+  fgts:
+    lineage:
+      - datalake_sales_flow_raw.payment.fgts
+  financing:
+    lineage:
+      - datalake_sales_flow_raw.payment.financing
+  brokerage:
+    lineage:
+      - datalake_sales_flow_raw.payment.brokerage
+  status:
+    lineage:
+      - datalake_sales_flow_raw.payment.status
   ts_created:
     lineage:
       - datalake_sales_flow_raw.payment.created_at
@@ -28,3 +49,4 @@ columns:
   day:
     lineage:
       - datalake_sales_flow_raw.payment.day
+

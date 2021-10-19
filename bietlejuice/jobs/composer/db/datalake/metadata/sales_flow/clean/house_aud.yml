@@ -10,6 +10,15 @@ columns:
   id_address_data:
     lineage:
       - datalake_sales_flow_raw.house_aud.address_data_id
+  has_seller_debt_payments:
+    lineage:
+      - datalake_sales_flow_raw.house_aud.has_seller_debt_payments
+  house_registration_status:
+    lineage:
+      - datalake_sales_flow_raw.house_aud.house_registration_status
+  land_tenure:
+    lineage:
+      - datalake_sales_flow_raw.house_aud.land_tenure
   rev:
     lineage:
       - datalake_sales_flow_raw.house_aud.rev
@@ -25,6 +34,15 @@ columns:
   mod_id_address_data:
     lineage:
       - datalake_sales_flow_raw.house_aud.address_data_id_mod
+  mod_has_seller_debt_payments:
+    lineage:
+      - datalake_sales_flow_raw.house_aud.has_seller_debt_payments_mod
+  mod_house_registration_status:
+    lineage:
+      - datalake_sales_flow_raw.house_aud.house_registration_status_mod
+  mod_land_tenure:
+    lineage:
+      - datalake_sales_flow_raw.house_aud.land_tenure_mod
   ts_created:
     lineage:
       - datalake_sales_flow_raw.house_aud.created_at

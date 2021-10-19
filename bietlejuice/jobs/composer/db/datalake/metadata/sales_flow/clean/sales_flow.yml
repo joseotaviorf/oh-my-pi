@@ -16,6 +16,15 @@ columns:
   id_monday:
     lineage:
       - datalake_sales_flow_raw.sales_flow.monday_id
+  flow_step:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow.flow_step
+  flow_type:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow.flow_type
+  status_closing:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow.status_closing
   status:
     lineage:
       - datalake_sales_flow_raw.sales_flow.status

@@ -22,6 +22,27 @@ columns:
   payment_model:
     lineage:
       - datalake_sales_flow_raw.payment_aud.payment_model
+  total:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.total
+  deposit:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.deposit
+  entry:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.entry
+  fgts:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.fgts
+  financing:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.financing
+  brokerage:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.brokerage
+  status:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.status
   mod_id_sales_flow:
     lineage:
       - datalake_sales_flow_raw.payment_aud.sales_flow_id_mod
@@ -31,6 +52,27 @@ columns:
   mod_payment_model:
     lineage:
       - datalake_sales_flow_raw.payment_aud.payment_model_mod
+  mod_total:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.total_mod
+  mod_deposit:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.deposit_mod
+  mod_entry:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.entry_mod
+  mod_fgts:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.fgts_mod
+  mod_financing:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.financing_mod
+  mod_brokerage:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.brokerage_mod
+  mod_status:
+    lineage:
+      - datalake_sales_flow_raw.payment_aud.status_mod
   ts_created:
     lineage:
       - datalake_sales_flow_raw.payment_aud.created_at

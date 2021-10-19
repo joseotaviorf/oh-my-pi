@@ -19,6 +19,15 @@ columns:
   status:
     lineage:
       - datalake_sales_flow_raw.sales_flow_aud.status
+  flow_step:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.flow_step
+  flow_type:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.flow_type
+  status_closing:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.status_closing
   rev:
     lineage:
       - datalake_sales_flow_raw.sales_flow_aud.rev
@@ -43,6 +52,15 @@ columns:
   mod_status:
     lineage:
       - datalake_sales_flow_raw.sales_flow_aud.status_mod
+  mod_flow_step:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.flow_step_mod
+  mod_flow_type:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.flow_type_mod
+  mod_status_closing:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.status_closing_mod
   ts_created:
     lineage:
       - datalake_sales_flow_raw.sales_flow_aud.created_at

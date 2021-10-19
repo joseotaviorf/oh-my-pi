@@ -10,9 +10,33 @@ columns:
   id_firestore:
     lineage:
       - datalake_sales_flow_raw.offer.firestore_id
+  offer_price:
+    lineage:
+      - datalake_sales_flow_raw.offer.offer_price
+  sale_price:
+    lineage:
+      - datalake_sales_flow_raw.offer.sale_price
+  discard_reason:
+    lineage:
+      - datalake_sales_flow_raw.offer.discard_reason
   status:
     lineage:
       - datalake_sales_flow_raw.offer.status
+  dt_proposed:
+    lineage:
+      - datalake_sales_flow_raw.offer.proposal_date
+  ts_accepted:
+    lineage:
+      - datalake_sales_flow_raw.offer.accepted_at
+  ts_validated:
+    lineage:
+      - datalake_sales_flow_raw.offer.validated_at
+  ts_rejected:
+    lineage:
+      - datalake_sales_flow_raw.offer.rejected_at
+  ts_discarded:
+    lineage:
+      - datalake_sales_flow_raw.offer.discarded_at
   ts_created:
     lineage:
       - datalake_sales_flow_raw.offer.created_at
