@@ -1,5 +1,5 @@
 ---
-database_name: keys_tracking
+database_name: dw_keys_tracking
 table_name: dim_agents_with_keys
 columns:
   sk_house_listing:
