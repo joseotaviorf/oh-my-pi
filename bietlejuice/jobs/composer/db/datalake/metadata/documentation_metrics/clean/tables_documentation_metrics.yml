@@ -1,0 +1,27 @@
+database_name: datalake_documentation_metrics_clean
+table_name: tables_documentation_metrics
+columns:
+  layer:
+    lineage:
+      - datalake_documentation_metrics_raw.tables_documentation_metrics.layer
+  database_name:
+    lineage:
+      - datalake_documentation_metrics_raw.tables_documentation_metrics.database_name
+  table_name:
+    lineage:
+      - datalake_documentation_metrics_raw.tables_documentation_metrics.table_name
+  has_description:
+    lineage:
+      - datalake_documentation_metrics_raw.tables_documentation_metrics.has_description
+  has_owner:
+    lineage:
+      - datalake_documentation_metrics_raw.tables_documentation_metrics.has_owner
+  year:
+    lineage:
+      - datalake_documentation_metrics_raw.tables_documentation_metrics.year
+  month:
+    lineage:
+      - datalake_documentation_metrics_raw.tables_documentation_metrics.month
+  day:
+    lineage:
+      - datalake_documentation_metrics_raw.tables_documentation_metrics.day

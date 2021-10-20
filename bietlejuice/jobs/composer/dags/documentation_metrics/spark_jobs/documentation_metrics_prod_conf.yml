@@ -32,4 +32,3 @@ DATABASE_SKIP_LIST:
   - testing_crm_migration
   - testing_ebdb_agents
   - testing_map_ods_from_s3
-

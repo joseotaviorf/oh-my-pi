@@ -36,6 +36,10 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 
 # ################################  Metastore Data  ##################################
+# TODO: these functions could be in a common place instead of copy-pasted between the following jobs:
+# - load_lineage_and_tags_metrics_to_raw
+# - load_columns_documentation_metrics_to_raw
+# - load_tables_documentation_metrics_to_raw
 
 
 def get_columns_from_metastore(spark_client, schemas_skip_list):

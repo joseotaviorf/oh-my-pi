@@ -1,6 +1,7 @@
 import glob
 from os import listdir
 from os.path import isdir, isfile
+from typing import Generator
 
 import yaml
 from quintoandar_logger import QuintoAndarLogger
@@ -181,3 +182,17 @@ class FileService:
                 if files and files[0]:
                     return True
             return False
+
+    @staticmethod
+    @logger
+    def list_metadata_files() -> Generator[str, None, None]:
+        """
+        Yields all metadata YAML file paths.
+        :return: A generator that yields metadata file paths
+        """
+        for extension in ("*.yml", "*.yaml"):
+            for file in glob.iglob(
+                f"{DATALAKE_METADATA_PATH}/**/{extension}",
+                recursive=True,
+            ):
+                yield file

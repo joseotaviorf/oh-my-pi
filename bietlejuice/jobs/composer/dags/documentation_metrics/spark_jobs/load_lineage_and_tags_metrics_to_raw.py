@@ -1,5 +1,7 @@
-import boto3
+from typing import Dict, Union, List
+
 import logging
+
 import yaml
 
 from datetime import datetime
@@ -7,6 +9,7 @@ from argparse import ArgumentParser
 from pyspark.sql import Row
 from pyspark.sql.functions import udf
 from pyspark.sql.types import StructType, StructField, StringType
+from pyspark.sql.dataframe import DataFrame
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
@@ -16,13 +19,14 @@ from bietlejuice.jobs.composer.base.spark import (
     SparkTableStorageFormat,
 )
 from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
+
+from bietlejuice.jobs.composer.services import FileService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
 
-
-JOB_NAME = "load_tables_documentation_metrics_to_raw"
+JOB_NAME = "load_lineage_and_tags_metrics_to_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -90,72 +94,55 @@ def extract_layer_from_database_name(database_name):
     return ""
 
 
-# ####################################  S3 Data  ######################################
+# ################################ Lineage and Tags Files data  ##################################
 
 
-def get_documentation_from_bucket(bucket, prefix, migrated_databases, spark_client):
-    s3_client = boto3.client("s3")
-    documentation_paths = get_documentation_paths_from_bucket(bucket, prefix, s3_client)
-    documentation_contents = get_content_from_paths(
-        bucket, documentation_paths, migrated_databases, s3_client
-    )
-
-    documentation_df = spark_client.create_dataframe(
-        Row(**doc) for doc in documentation_contents
-    ).drop("columns")
-
-    return documentation_df
+def get_first_key(input_dict: dict) -> str:
+    """
+    returns the first key of a dict
+    it is expected that the key is a string
+    """
+    return next(iter(input_dict))
 
 
-def get_documentation_paths_from_bucket(bucket, prefix, s3_client):
-    pages = s3_client.get_paginator("list_objects_v2").paginate(
-        Bucket=bucket, Prefix=prefix
-    )
+def get_lineage_and_tags_data() -> List[Dict[str, Union[str, bool]]]:
+    yamls_data = []
+    for file in FileService.list_metadata_files():
+        with open(file, "r") as fp:
+            data = yaml.safe_load(fp)
+            db_name = data["database_name"]
+            tb_name = data["table_name"]
+            columns = data.get("columns")
+            if not columns:
+                file_type = "tags"
+            else:
+                first_column_key = get_first_key(columns)
+                file_type = get_first_key(data["columns"][first_column_key])
 
-    bucket_objects = []
-    for page in pages:
-        bucket_objects.extend(page["Contents"])
-
-    documentation_paths = [
-        obj["Key"]
-        for obj in bucket_objects
-        if "documentation/" in obj["Key"] and "/categories/" not in obj["Key"]
-    ]
-
-    return documentation_paths
-
-
-def get_content_from_paths(bucket, documentation_paths, migrated_databases, s3_client):
-    s3_objects = []
-    for file_path in documentation_paths:
-        file_object = s3_client.get_object(Bucket=bucket, Key=file_path)
-        s3_objects.append(file_object["Body"])
-
-    documentation_contents = []
-    for obj in s3_objects:
-        documentation_contents.append(yaml.safe_load(obj))
-
-    for doc in documentation_contents:
-        doc["database_name"] = add_prefix_to_migrated_databases(
-            doc["database_name"], migrated_databases
+        yamls_data.append(
+            {
+                "database_name": db_name,
+                "table_name": tb_name,
+                "has_lineage": file_type == "lineage",
+                "has_tags": file_type == "tags",
+            }
         )
+    return yamls_data
 
-    return documentation_contents
 
-
-def add_prefix_to_migrated_databases(database_name, migrated_databases):
-    if database_name in migrated_databases:
-        return f"dw_{database_name}"
-    return database_name
+def get_lineage_and_tags_df(spark_client: SparkClient) -> DataFrame:
+    yaml_data = get_lineage_and_tags_data()
+    metadata_df = spark_client.create_dataframe(Row(**row) for row in yaml_data).drop(
+        "columns"
+    )
+    return metadata_df
 
 
 # ################################  Comparison  ##################################
 
 
-def compare_documentation_with_metastore(
-    documentation_data, metastore_data, spark_client
-):
-    documentation_data.createOrReplaceTempView("vw_documentation")
+def compare_metadata_with_metastore(metadata_data, metastore_data, spark_client):
+    metadata_data.createOrReplaceTempView("vw_metadata")
     metastore_data.createOrReplaceTempView("vw_metastore")
 
     query = f"""
@@ -163,14 +150,14 @@ def compare_documentation_with_metastore(
             ms.layer,
             ms.database_name,
             ms.table_name,
-            COALESCE(doc.owner != '', FALSE) AS has_owner,
-            COALESCE(doc.description != '', FALSE) AS has_description
+            COALESCE(md.has_lineage, False) as has_lineage,
+            COALESCE(md.has_tags, False) as has_tags
         FROM
             vw_metastore AS ms
         LEFT JOIN
-            vw_documentation AS doc
-                ON ms.database_name = doc.database_name
-                AND ms.table_name = doc.name
+            vw_metadata AS md
+                ON ms.database_name = md.database_name
+                AND ms.table_name = md.table_name
     """
 
     return spark_client.get_records(query)
@@ -199,9 +186,6 @@ if __name__ == "__main__":
     )
 
     config_service = ConfigurationService(source)
-    documentation_bucket = config_service.get_config("DOCUMENTATION_BUCKET")
-    documentation_prefix = config_service.get_config("DOCUMENTATION_PATH")
-    migrated_databases = config_service.get_config("DATABASES_MIGRATED_TO_COMPOSER")
     schemas_skip_list = config_service.get_config("DATABASE_SKIP_LIST")
     partition_cols = config_service.get_config("PARTITION_COLUMNS")
 
@@ -218,15 +202,13 @@ if __name__ == "__main__":
 
     # Creating metrics dataframe
     metastore_tables_df = get_tables_from_metastore(spark_client, schemas_skip_list)
-    documentation_df = get_documentation_from_bucket(
-        documentation_bucket, documentation_prefix, migrated_databases, spark_client
+    lineage_and_tags_df = get_lineage_and_tags_df(spark_client)
+    lineage_and_tags_metrics_df = compare_metadata_with_metastore(
+        lineage_and_tags_df, metastore_tables_df, spark_client
     )
-    documentation_metrics_df = compare_documentation_with_metastore(
-        documentation_df, metastore_tables_df, spark_client
-    )
-    documentation_metrics_df = (
+    lineage_and_tags_metrics_df = (
         SparkDataFrameService()
-        .input(documentation_metrics_df)
+        .input(lineage_and_tags_metrics_df)
         .create_year_month_day_columns_from_date(execution_date)
         .optimize_partitions_by_partition_columns(partition_cols)
         .output()
@@ -234,13 +216,13 @@ if __name__ == "__main__":
 
     # loaders
     s3_loader.load_df(
-        df=documentation_metrics_df,
+        df=lineage_and_tags_metrics_df,
         s3_path=f"{database_location}{table_name}",
         format_options=format_options,
         partitions=partition_cols,
     )
     spark_metastore_loader.update_metastore(
-        documentation_metrics_df,
+        lineage_and_tags_metrics_df,
         database_name,
         table_name,
         format_options,
@@ -250,7 +232,7 @@ if __name__ == "__main__":
     spark_metastore_service.create_new_partitions_from_df(
         database_name=database_name,
         table_name=table_name,
-        df=documentation_metrics_df,
+        df=lineage_and_tags_metrics_df,
         partition_cols=partition_cols,
     )
     spark_metastore_service.refresh_table(database_name, table_name)
