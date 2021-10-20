@@ -36,7 +36,7 @@ quintoandar_consultant_listings_rent as
             WHEN ccf.id_house_external IS NOT NULL THEN 'CIQ_FULL'
             ELSE program.name
         END AS type_big_agent,
-        'RENT' AS businesscontext,
+        lbc.business_context AS businesscontext,
         NULL as businesscontext_detail,
         Agency.dt_since AS dt_ciq_started,
         dp.id_partner
@@ -73,6 +73,10 @@ quintoandar_consultant_listings_rent as
     LEFT JOIN 
         dim_partner dp
             on dp.id_partner=dpa.id_partner
+    INNER JOIN
+        datalake_ebdb_clean_prod.listing_business_context lbc
+            ON lbc.id_house=JSON_EXTRACT_PATH_TEXT(House.details, 'houseExternalId')
+            AND lbc.business_context='RENT'
     ),
 quintoandar_consultant_listings_sale AS
 (
