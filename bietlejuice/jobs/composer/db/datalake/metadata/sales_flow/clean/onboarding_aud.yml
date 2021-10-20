@@ -1,0 +1,79 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: onboarding_aud
+columns:
+  id_onboarding_aud:
+    lineage:
+      - datalake_sales_flow_raw.onboarding_aud.id
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_raw.onboarding_aud.sales_flow_id
+  rev:
+    lineage:
+      - datalake_sales_flow_raw.onboarding_aud.rev
+  rev_type:
+    lineage:
+      - datalake_sales_flow_raw.onboarding_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_sales_flow_raw.onboarding_aud.revend
+  deposit_buyer:
+    lineage:
+      - datalake_sales_flow_raw.onboarding_aud.deposit_buyer
+  documentation_buyer:
+    lineage:
+      - datalake_sales_flow_raw.onboarding_aud.documentation_buyer
+  documentation_seller:
+    lineage:
+      - datalake_sales_flow_raw.onboarding_aud.documentation_seller
+  documentation_house:
+    lineage:
+      - datalake_sales_flow_raw.onboarding_aud.documentation_house
+  deposit_sent:
+    lineage:
+      - datalake_sales_flow_raw.onboarding_aud.deposit_sent
+  status:
+    lineage:
+      - datalake_sales_flow_raw.onboarding_aud.status
+  mod_id_sales_flow:
+    lineage:
+      - datalake_sales_flow_raw.onboarding_aud.sales_flow_id_mod
+  mod_deposit_buyer:
+    lineage:
+      - datalake_sales_flow_raw.onboarding_aud.deposit_buyer_mod
+  mod_documentation_buyer:
+    lineage:
+      - datalake_sales_flow_raw.onboarding_aud.documentation_buyer_mod
+  mod_documentation_seller:
+    lineage:
+      - datalake_sales_flow_raw.onboarding_aud.documentation_seller_mod
+  mod_documentation_house:
+    lineage:
+      - datalake_sales_flow_raw.onboarding_aud.documentation_house_mod
+  mod_deposit_sent:
+    lineage:
+      - datalake_sales_flow_raw.onboarding_aud.deposit_sent_mod
+  mod_status:
+    lineage:
+      - datalake_sales_flow_raw.onboarding_aud.status_mod
+  mod_dt_ended:
+    lineage:
+      - datalake_sales_flow_raw.onboarding_aud.end_date_mod
+  dt_ended:
+    lineage:
+      - datalake_sales_flow_raw.onboarding_aud.end_date
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.onboarding_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.onboarding_aud.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.onboarding_aud.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.onboarding_aud.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.onboarding_aud.day

@@ -1,0 +1,46 @@
+SELECT
+    id AS id_notary_aud,
+    sales_flow_id AS id_sales_flow,
+    specialist_id AS id_specialist,
+    rev,
+    revtype AS rev_type,
+    revend AS rev_end,
+    label,
+    status,
+    protocol,
+    password,
+    available_costs,
+    paid_costs,
+    seller_payment_status,
+    sales_flow_id_mod AS mod_id_sales_flow,
+    specialist_id_mod AS mod_id_specialist,
+    label_mod AS mod_label,
+    status_mod AS mod_status,
+    protocol_mod AS mod_protocol,
+    password_mod AS mod_password,
+    available_costs_mod AS mod_available_costs,
+    paid_costs_mod AS mod_paid_costs,
+    seller_payment_status_mod AS mod_seller_payment_status,
+    started_at_mod AS mod_ts_started,
+    ended_at_mod AS mod_ts_ended,
+    end_prevision_at_mod AS mod_ts_prevision_ended,
+    seller_paid_at_mod AS mod_ts_seller_paid,
+    buyer_received_keys_at_mod AS mod_ts_buyer_received_keys,
+    kit_sent_at_mod AS mod_ts_kit_sent,
+    started_at AS ts_started,
+    ended_at AS ts_ended,
+    end_prevision_at AS ts_prevision_ended,
+    seller_paid_at AS ts_seller_paid,
+    buyer_received_keys_at AS ts_buyer_received_keys,
+    kit_sent_at AS ts_kit_sent,
+    created_at AS ts_created,
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
+FROM
+    datalake_sales_flow_raw.notary_aud
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}

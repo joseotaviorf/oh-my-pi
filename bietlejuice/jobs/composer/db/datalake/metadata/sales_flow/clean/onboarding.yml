@@ -1,0 +1,46 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: onboarding
+columns:
+  id_onboarding:
+    lineage:
+      - datalake_sales_flow_raw.onboarding.id
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_raw.onboarding.sales_flow_id
+  deposit_buyer:
+    lineage:
+      - datalake_sales_flow_raw.onboarding.deposit_buyer
+  documentation_buyer:
+    lineage:
+      - datalake_sales_flow_raw.onboarding.documentation_buyer
+  documentation_seller:
+    lineage:
+      - datalake_sales_flow_raw.onboarding.documentation_seller
+  documentation_house:
+    lineage:
+      - datalake_sales_flow_raw.onboarding.documentation_house
+  deposit_sent:
+    lineage:
+      - datalake_sales_flow_raw.onboarding.deposit_sent
+  status:
+    lineage:
+      - datalake_sales_flow_raw.onboarding.status
+  dt_ended:
+    lineage:
+      - datalake_sales_flow_raw.onboarding.end_date
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.onboarding.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.onboarding.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.onboarding.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.onboarding.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.onboarding.day

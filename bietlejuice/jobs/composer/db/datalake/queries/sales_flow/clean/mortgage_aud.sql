@@ -1,0 +1,44 @@
+SELECT
+    id AS id_mortgage_aud,
+    sales_flow_id AS id_sales_flow,
+    rev,
+    revtype AS rev_type,
+    revend AS rev_end,
+    status,
+    bank,
+    credit_model,
+    credit_status,
+    bank_fee,
+    institution_choice_reason,
+    credit_letter,
+    mortgage_pendency,
+    sales_flow_id_mod AS mod_id_sales_flow,
+    status_mod AS mod_status,
+    bank_mod AS mod_bank,
+    credit_model_mod AS mod_credit_model,
+    credit_status_mod AS mod_credit_status,
+    bank_fee_mod AS mod_bank_fee,
+    institution_choice_reason_mod AS mod_institution_choice_reason,
+    credit_letter_mod AS mod_credit_letter,
+    mortgage_pendency_mod AS mod_mortgage_pendency,
+    credit_start_date_mod AS mod_dt_credit_started,
+    credit_end_date_mod AS mod_dt_credit_ended,
+    bank_start_date_mod AS mod_dt_bank_started,
+    start_date_mod AS mod_dt_started,
+    end_date_mod AS mod_dt_ended,
+    credit_start_date AS dt_credit_started,
+    credit_end_date AS dt_credit_ended,
+    bank_start_date AS dt_bank_started,
+    start_date AS dt_started,
+    end_date AS dt_ended,
+    created_at AS ts_created,
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
+FROM 
+    datalake_sales_flow_raw.mortgage_aud
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}
