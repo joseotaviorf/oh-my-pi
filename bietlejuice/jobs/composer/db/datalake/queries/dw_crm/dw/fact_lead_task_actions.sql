@@ -4,7 +4,7 @@ SELECT
     COALESCE(CAST(turf.id_origin AS BIGINT), -1) AS sk_origin,
     turf.id_assignee AS sk_assignee,
     turf.id_user_action AS sk_user_action,
-    turf.id_origin AS sk_lead,
+    COALESCE(CAST(turf.id_origin AS BIGINT), -1) AS sk_lead,
     turf.id_start_date AS sk_start_date,
     turf.id_completed_date AS sk_completed_date,
     turf.id_action_date AS sk_action_date,
