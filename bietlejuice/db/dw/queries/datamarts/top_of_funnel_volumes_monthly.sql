@@ -167,6 +167,7 @@ events AS (
         COUNT(NULL) AS buyer_prospect_deactivations_by_ccv,
         COUNT(NULL) AS sale_flows,
         COUNT(NULL) AS new_buyer_prospects_target,
+        COUNT(NULL) AS recovered_buyer_prospects_target,
         COUNT(NULL) AS active_tenant_prospects,
         COUNT(NULL) AS ongoing_churned_tenant_prospects,
         COUNT(NULL) AS retained_tenant_prospects,
@@ -177,6 +178,7 @@ events AS (
         COUNT(NULL) AS tenant_prospect_deactivations_by_renting,
         COUNT(NULL) AS rent_flows,
         COUNT(NULL) AS new_tenant_prospects_target,
+        COUNT(NULL) AS recovered_tenant_prospects_target,
         COUNT(NULL) AS tof_users_target
     FROM
         datalake_top_of_funnel_demand_prod.user_interactions AS ui
@@ -213,6 +215,7 @@ events AS (
         COUNT(NULL) AS buyer_prospect_deactivations_by_ccv,
         COUNT(NULL) AS sale_flows,
         COUNT(NULL) AS new_buyer_prospects_target,
+        COUNT(NULL) AS recovered_buyer_prospects_target,
         COUNT(NULL) AS active_tenant_prospects,
         COUNT(NULL) AS ongoing_churned_tenant_prospects,
         COUNT(NULL) AS retained_tenant_prospects,
@@ -223,6 +226,7 @@ events AS (
         COUNT(NULL) AS tenant_prospect_deactivations_by_renting,
         COUNT(NULL) AS rent_flows,
         COUNT(NULL) AS new_tenant_prospects_target,
+        COUNT(NULL) AS recovered_tenant_prospects_target,
         COUNT(NULL) AS tof_users_target
     FROM
         bps_monthly
@@ -266,6 +270,7 @@ events AS (
         COUNT(DISTINCT CASE WHEN pmmd.status = 'SIGNED CCV' THEN pmmd.sk_buyer ELSE NULL END) AS buyer_prospect_deactivations_by_ccv,
         COUNT(DISTINCT pmmd.sk_sale_flow) AS sale_flows,
         SUM(pmmd.new_buyer_prospects_target) AS new_buyer_prospects_target,
+        SUM(pmmd.recovered_buyer_prospects_target) AS recovered_buyer_prospects_target,
         COUNT(NULL) AS active_tenant_prospects,
         COUNT(NULL) AS ongoing_churned_tenant_prospects,
         COUNT(NULL) AS retained_tenant_prospects,
@@ -276,6 +281,7 @@ events AS (
         COUNT(NULL) AS tenant_prospect_deactivations_by_renting,
         COUNT(NULL) AS rent_flows,
         COUNT(NULL) AS new_tenant_prospects_target,
+        COUNT(NULL) AS recovered_tenant_prospects_target,
         COUNT(NULL) AS tof_users_target
     FROM
         datamarts.sale_performance_marketing_metrics_demand AS pmmd
@@ -314,6 +320,7 @@ events AS (
         COUNT(NULL) AS buyer_prospect_deactivations_by_ccv,
         COUNT(NULL) AS sale_flows,
         COUNT(NULL) AS new_buyer_prospects_target,
+        COUNT(NULL) AS recovered_buyer_prospects_target,
         COUNT(DISTINCT CASE WHEN tps.status_month_end = 'Active' THEN tps.sk_client ELSE NULL END) AS active_tenant_prospects,
         COUNT(DISTINCT CASE WHEN tps.status_month_end = 'Churned' THEN tps.sk_client ELSE NULL END) AS ongoing_churned_tenant_prospects,
         COUNT(DISTINCT CASE WHEN tps.status_month_start = 'Active' AND tps.status_month_end != 'Churned' THEN tps.sk_client ELSE NULL END) AS retained_tenant_prospects,
@@ -324,6 +331,7 @@ events AS (
         COUNT(NULL) AS tenant_prospect_deactivations_by_renting,
         COUNT(NULL) AS rent_flows,
         COUNT(NULL) AS new_tenant_prospects_target,
+        COUNT(NULL) AS recovered_tenant_prospects_target,
         COUNT(NULL) AS tof_users_target
     FROM
         tps_monthly AS tps
@@ -367,6 +375,7 @@ events AS (
         COUNT(NULL) AS buyer_prospect_deactivations_by_ccv,
         COUNT(NULL) AS sale_flows,
         COUNT(NULL) AS new_buyer_prospects_target,
+        COUNT(NULL) AS recovered_buyer_prospects_target,
         COUNT(NULL) AS active_tenant_prospects,
         COUNT(NULL) AS ongoing_churned_tenant_prospects,
         COUNT(NULL) AS retained_tenant_prospects,
@@ -377,6 +386,7 @@ events AS (
         COUNT(DISTINCT CASE WHEN pmmd.status = 'RENTED' THEN pmmd.sk_client ELSE NULL END) AS tenant_prospect_deactivations_by_renting,
         COUNT(DISTINCT pmmd.sk_rf) AS rent_flows,
         SUM(pmmd.new_tenant_prospects_target) AS new_tenant_prospects_target,
+        SUM(pmmd.recovered_tenant_prospects_target) AS recovered_tenant_prospects_target,
         COUNT(NULL) AS tof_users_target
     FROM
         datamarts.performance_marketing_metrics_demand AS pmmd
@@ -418,6 +428,7 @@ events AS (
         COUNT(NULL) AS buyer_prospect_deactivations_by_ccv,
         COUNT(NULL) AS sale_flows,
         COUNT(NULL) AS new_buyer_prospects_target,
+        COUNT(NULL) AS recovered_buyer_prospects_target,
         COUNT(NULL) AS active_tenant_prospects,
         COUNT(NULL) AS ongoing_churned_tenant_prospects,
         COUNT(NULL) AS retained_tenant_prospects,
@@ -428,6 +439,7 @@ events AS (
         COUNT(NULL) AS tenant_prospect_deactivations_by_renting,
         COUNT(NULL) AS rent_flows,
         COUNT(NULL) AS new_tenant_prospects_target,
+        COUNT(NULL) AS recovered_tenant_prospects_target,
         SUM(tof_users_target::FLOAT) AS tof_users_target
     FROM
         datalake_gsheets_clean_prod.rental_tof_monthly_targets
@@ -471,6 +483,7 @@ events AS (
         COUNT(NULL) AS buyer_prospect_deactivations_by_ccv,
         COUNT(NULL) AS sale_flows,
         COUNT(NULL) AS new_buyer_prospects_target,
+        COUNT(NULL) AS recovered_buyer_prospects_target,
         COUNT(NULL) AS active_tenant_prospects,
         COUNT(NULL) AS ongoing_churned_tenant_prospects,
         COUNT(NULL) AS retained_tenant_prospects,
@@ -481,6 +494,7 @@ events AS (
         COUNT(NULL) AS tenant_prospect_deactivations_by_renting,
         COUNT(NULL) AS rent_flows,
         COUNT(NULL) AS new_tenant_prospects_target,
+        COUNT(NULL) AS recovered_tenant_prospects_target,
         SUM(tof_users_target::FLOAT) AS tof_users_target
     FROM
         datalake_gsheets_clean_prod.sale_tof_monthly_targets
@@ -514,6 +528,7 @@ SELECT
     SUM(buyer_prospect_deactivations_by_ccv) AS buyer_prospect_deactivations_by_ccv,
     SUM(sale_flows) AS sale_flows,
     SUM(new_buyer_prospects_target) AS new_buyer_prospects_target,
+    SUM(recovered_buyer_prospects_target) AS recovered_buyer_prospects_target,
     SUM(active_tenant_prospects) AS active_tenant_prospects,
     SUM(ongoing_churned_tenant_prospects) AS ongoing_churned_tenant_prospects,
     SUM(retained_tenant_prospects) AS retained_tenant_prospects,
@@ -524,6 +539,7 @@ SELECT
     SUM(tenant_prospect_deactivations_by_renting) AS tenant_prospect_deactivations_by_renting,
     SUM(rent_flows) AS rent_flows,
     SUM(new_tenant_prospects_target) AS new_tenant_prospects_target,
+    SUM(recovered_tenant_prospects_target) AS recovered_tenant_prospects_target,
     SUM(tof_users_target) AS tof_users_target
 FROM
     events

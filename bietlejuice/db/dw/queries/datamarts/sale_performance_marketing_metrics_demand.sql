@@ -224,6 +224,7 @@ sale_flows_funnel_events AS (
         sf.buyer_prospect_order,
         NULL::FLOAT AS budget,
         NULL::FLOAT AS new_buyer_prospects_target,
+        NULL::FLOAT AS recovered_buyer_prospects_target,
         NULL::FLOAT AS sale_flows_target,
         NULL::FLOAT AS marketing_cost
     FROM
@@ -282,6 +283,7 @@ targets AS (
         NULL::INT AS buyer_prospect_order,
         bd.daily__value::FLOAT AS budget,
         NULL::FLOAT AS new_buyer_prospects_target,
+        NULL::FLOAT AS recovered_buyer_prospects_target,
         NULL::FLOAT AS sale_flows_target,
         NULL::FLOAT AS marketing_cost
     FROM
@@ -292,7 +294,7 @@ targets AS (
         LOWER(business) = 'sale'
     UNION ALL
     SELECT
-        bp.date::DATE,
+        bp.dt_target::DATE,
         bp.date::TIMESTAMP AS ts_event,
         NULL::TEXT AS status,
         NULL:: TEXT AS status_detail,
@@ -326,6 +328,7 @@ targets AS (
         NULL::INT AS buyer_prospect_order,
         NULL::FLOAT AS budget,
         bp.nbp_target::FLOAT AS new_buyer_prospects_target,
+        bp.rbp_target::FLOAT AS recovered_buyer_prospects_target,
         NULL::FLOAT AS sale_flows_target,
         NULL::FLOAT AS marketing_cost
     FROM
@@ -366,6 +369,7 @@ targets AS (
         NULL::INT AS buyer_prospect_order,
         NULL::FLOAT AS budget,
         NULL::FLOAT AS new_buyer_prospects_target,
+        NULL::FLOAT AS recovered_buyer_prospects_target,
         sf_target::FLOAT AS sale_flows_target,
         NULL::FLOAT AS marketing_cost
     FROM
@@ -410,6 +414,7 @@ investment AS (
         NULL::INT AS buyer_prospect_order,
         NULL::FLOAT AS budget,
         NULL::FLOAT AS new_buyer_prospects_target,
+        NULL::FLOAT AS recovered_buyer_prospects_target,
         NULL::FLOAT AS sale_flows_target,
         SUM(co.cost::FLOAT) AS marketing_cost
     FROM
@@ -461,6 +466,7 @@ deactivations AS (
         NULL::INT AS buyer_prospect_order,
         NULL::FLOAT AS budget,
         NULL::FLOAT AS new_buyer_prospects_target,
+        NULL::FLOAT AS recovered_buyer_prospects_target,
         NULL::FLOAT AS sale_flows_target,
         0.0 AS marketing_cost
     FROM

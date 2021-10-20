@@ -94,6 +94,7 @@ fact_rent_flows AS (
         0.0 AS marketing_cost,
         0.0 AS new_rent_flows_target,
         0.0 AS new_tenant_prospects_target,
+        0.0 AS recovered_tenant_prospects_target,
         0.0 AS budget
     FROM
         datamarts.rent_flow_interactions AS rf
@@ -155,6 +156,7 @@ demand_daily_spent AS (
         SUM(co.cost::FLOAT) AS marketing_cost,
         COUNT(NULL) AS new_rent_flows_target,
         COUNT(NULL) AS new_tenant_prospects_target,
+        COUNT(NULL) AS recovered_tenant_prospects_target,
         COUNT(NULL) AS budget
     FROM
         marketing.fact_marketing_daily_costs AS co
@@ -186,6 +188,7 @@ target_sheets AS (
         NULLIF(str.mkt_source, '') AS mkt_source,
         NULLIF(str.new_rent_flows_target, '')::FLOAT AS new_rent_flows_target,
         NULLIF(str.new_tenant_prospects_target, '')::FLOAT AS new_tenant_prospects_target,
+        NULL::FLOAT AS recovered_tenant_prospects_target,
         NULLIF(str.budget, '')::FLOAT AS budget
     FROM
         datalake_gsheets_clean_prod.demand_targets_replanning AS str
@@ -203,6 +206,7 @@ target_sheets AS (
         NULLIF(cps.mkt_source, '') AS mkt_source,
         NULL::FLOAT AS new_rent_flows_target,
         NULL::FLOAT AS new_tenant_prospects_target,
+        NULL::FLOAT AS recovered_tenant_prospects_target,
         NULLIF(cps.daily_value, '')::FLOAT AS budget
     FROM datalake_gsheets_clean_prod.mkt_cost_per_source AS cps
         LEFT JOIN taxonomy AS t
@@ -214,7 +218,7 @@ target_sheets AS (
     UNION ALL
 
     SELECT
-        NULLIF(date, '')::date AS dt_event,
+        NULLIF(dt_target, '')::date AS dt_event,
         city_group,
         'Tenants PWA' AS mkt_origin,
         CASE
@@ -225,6 +229,7 @@ target_sheets AS (
         mkt_source,
         NULL::FLOAT AS new_rent_flows_target,
         NULLIF(ntp_target, '')::FLOAT AS new_tenant_prospects_target,
+        NULLIF(rtp_target, '')::FLOAT AS recovered_tenant_prospects_target,
         NULL::FLOAT AS budget
     FROM
         datalake_gsheets_clean_prod.rental_ntp_source_targets
@@ -275,6 +280,7 @@ demand_daily_targets AS (
         0.0 AS marketing_cost,
         new_rent_flows_target,
         new_tenant_prospects_target,
+        recovered_tenant_prospects_target,
         budget
     FROM
         target_sheets
@@ -323,6 +329,7 @@ deactivations AS (
         0.0 AS marketing_cost,
         NULL::INT AS new_rent_flows_target,
         NULL::INT AS new_tenant_prospects_target,
+        NULL::INT AS recovered_tenant_prospects_target,
         NULL::INT AS budget
     FROM
         tenant_prospect_status
