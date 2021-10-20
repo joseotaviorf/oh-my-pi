@@ -36,6 +36,7 @@ This pipeline produces the following output tables in DW layer, via incremental 
 - `crm_migration.fact_repair_tasks`
 - `crm_migration.fact_visit_tasks`
 - `crm_migration.fact_ungrouped_manual_tasks`
+- `crm_migration.fact_lead_task_actions`
 
 ### Responsible Data Teams
 
