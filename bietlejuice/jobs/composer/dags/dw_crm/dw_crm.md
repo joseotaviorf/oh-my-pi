@@ -23,19 +23,20 @@ This pipeline produces the following output tables in DW layer, via incremental 
 - `crm_migration.dim_offboarding_task`
 - `crm_migration.dim_onboarding_tenant_task`
 - `crm_migration.dim_payment_task`
-- `crm_migration.dim_repair_task`
-- `crm_migration.dim_visit_task`
-- `crm_migration.dim_ungrouped_manual_task`
 - `crm_migration.dim_photo_job_task`
+- `crm_migration.dim_repair_task`
+- `crm_migration.dim_ungrouped_manual_task`
+- `crm_migration.dim_visit_task`
 - `crm_migration.fact_closing_tasks_workflows_transitions`
-- `crm_migration.fact_inspection_tasks`
 - `crm_migration.fact_linhadireta_chat_tasks`
 - `crm_migration.fact_credit_tasks`
+- `crm_migration.fact_inspection_tasks`
+- `crm_migration.fact_lead_tasks`
 - `crm_migration.fact_offboarding_tasks`
 - `crm_migration.fact_payment_tasks`
 - `crm_migration.fact_repair_tasks`
-- `crm_migration.fact_visit_tasks`
 - `crm_migration.fact_ungrouped_manual_tasks`
+- `crm_migration.fact_visit_tasks`
 - `crm_migration.fact_lead_task_actions`
 
 ### Responsible Data Teams

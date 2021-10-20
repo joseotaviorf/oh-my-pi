@@ -1,0 +1,12 @@
+---
+full_tables:
+  - fact_lead_tasks
+incremental_load_parameters:
+  dw_query_filters:
+    year: "{year}"
+    month: "{month}"
+    day: "{day}"
+  partitions: [year, month, day]
+inner_dependencies:
+  fact_lead_tasks:
+    - fact_lead_task_actions
