@@ -132,7 +132,7 @@ base AS (
         MAX(ts_last_extraction) AS ts_load
     FROM
         loft_listings_clean
-    GROUP BY 1, 2, 3, 4, 5, 6
+    GROUP BY 1, 2, 3, 4, 5, 7
 )
 SELECT
     id_house,
