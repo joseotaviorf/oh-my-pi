@@ -1,0 +1,49 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: diligence
+columns:
+  id_diligence:
+    lineage:
+      - datalake_sales_flow_raw.diligence.id
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_raw.diligence.sales_flow_id
+  id_specialist:
+    lineage:
+      - datalake_sales_flow_raw.diligence.specialist_id
+  status:
+    lineage:
+      - datalake_sales_flow_raw.diligence.status
+  step:
+    lineage:
+      - datalake_sales_flow_raw.diligence.step
+  ts_partner_started:
+    lineage:
+      - datalake_sales_flow_raw.diligence.partner_started_at
+  ts_partner_ended:
+    lineage:
+      - datalake_sales_flow_raw.diligence.partner_ended_at
+  ts_legal_risk_started:
+    lineage:
+      - datalake_sales_flow_raw.diligence.legal_risk_started_at
+  ts_legal_risk_ended:
+    lineage:
+      - datalake_sales_flow_raw.diligence.legal_risk_ended_at
+  ts_buyer_seller_ended:
+    lineage:
+      - datalake_sales_flow_raw.diligence.buyer_seller_ended_at
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.diligence.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.diligence.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.diligence.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.diligence.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.diligence.day

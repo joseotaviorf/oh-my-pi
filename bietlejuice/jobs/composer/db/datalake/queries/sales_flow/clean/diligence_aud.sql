@@ -1,0 +1,34 @@
+SELECT 
+    id AS id_diligence_aud,
+    sales_flow_id AS id_sales_flow,
+    specialist_id AS id_specialist,
+    rev,
+    revtype AS rev_type,
+    revend AS rev_end,
+    status,
+    step,
+    sales_flow_id_mod AS mod_id_sales_flow,
+    specialist_id_mod AS mod_id_specialist,
+    status_mod AS mod_status,
+    step_mod AS mod_step,
+    partner_started_at_mod AS mod_ts_partner_started,
+    partner_ended_at_mod AS mod_ts_partner_ended,
+    legal_risk_started_at_mod AS mod_ts_legal_risk_started,
+    legal_risk_ended_at_mod AS mod_ts_legal_risk_ended,
+    buyer_seller_ended_at_mod AS mod_ts_buyer_seller_ended,
+    partner_started_at AS ts_partner_started,
+    partner_ended_at AS ts_partner_ended,
+    legal_risk_started_at AS ts_legal_risk_started,
+    legal_risk_ended_at AS ts_legal_risk_ended,
+    buyer_seller_ended_at AS ts_buyer_seller_ended,
+    created_at AS ts_created,
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
+FROM 
+    datalake_sales_flow_raw.diligence_aud
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}

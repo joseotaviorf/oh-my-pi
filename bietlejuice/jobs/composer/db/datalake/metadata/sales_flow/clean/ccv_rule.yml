@@ -1,0 +1,37 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: ccv_rule
+columns:
+  id_ccv_rule:
+    lineage:
+      - datalake_sales_flow_raw.ccv_rule.id
+  ccv_version:
+    lineage:
+      - datalake_sales_flow_raw.ccv_rule.ccv_version
+  type:
+    lineage:
+      - datalake_sales_flow_raw.ccv_rule.type
+  ccv_rule_name:
+    lineage:
+      - datalake_sales_flow_raw.ccv_rule.name
+  storage_hash_token:
+    lineage:
+      - datalake_sales_flow_raw.ccv_rule.storage_hash_token
+  checksum:
+    lineage:
+      - datalake_sales_flow_raw.ccv_rule.checksum
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.ccv_rule.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.ccv_rule.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.ccv_rule.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.ccv_rule.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.ccv_rule.day
