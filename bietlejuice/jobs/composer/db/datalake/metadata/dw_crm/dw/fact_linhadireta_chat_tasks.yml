@@ -67,7 +67,7 @@ columns:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.ts_task_user_start
   year:
     lineage:
-      - datalake_crm_tasks_flows.tasks_users_resolutions_flow..year
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.year
   month:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.month
