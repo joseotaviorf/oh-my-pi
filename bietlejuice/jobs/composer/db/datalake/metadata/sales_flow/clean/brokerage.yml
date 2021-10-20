@@ -1,0 +1,28 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: brokerage
+columns:
+  id_brokerage:
+    lineage:
+      - datalake_sales_flow_raw.brokerage.id
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_raw.brokerage.sales_flow_id
+  quinto_andar_brokerage_split:
+    lineage:
+      - datalake_sales_flow_raw.brokerage.quinto_andar_brokerage_split
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.brokerage.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.brokerage.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.brokerage.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.brokerage.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.brokerage.day

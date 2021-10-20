@@ -1,0 +1,36 @@
+SELECT
+    id AS id_cash_payment_aud,
+    payment_id AS id_payment,
+    partner_notary,
+    status_notary_notes,
+    crn_details,
+    status_fgts,
+    rev,
+    revtype AS rev_type,
+    revend AS rev_end,
+    payment_id_mod AS mod_id_payment,
+    partner_notary_mod AS mod_partner_notary,
+    status_notary_notes_mod AS mod_status_notary_notes,
+    crn_started_at_mod AS mod_ts_crn_started,
+    crn_returned_at_mod AS mod_ts_crn_returned,
+    crn_ended_at_mod AS mod_ts_crn_ended,
+    crn_details_mod AS mod_crn_details,
+    status_fgts_mod AS mod_status_fgts,
+    draft_fgts_started_at_mod AS mod_ts_draft_fgts_started,
+    draft_fgts_ended_at_mod AS mod_ts_draft_fgts_ended,
+    crn_started_at AS ts_crn_started,
+    crn_returned_at AS ts_crn_returned,
+    crn_ended_at AS ts_crn_ended,
+    draft_fgts_started_at AS ts_draft_fgts_started,
+    draft_fgts_ended_at AS ts_draft_fgts_ended,
+    created_at AS ts_created,
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
+FROM
+    datalake_sales_flow_raw.cash_payment_aud
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}

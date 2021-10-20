@@ -1,0 +1,91 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: cash_payment_aud
+columns:
+  id_cash_payment_aud:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.id
+  id_payment:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.payment_id
+  partner_notary:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.partner_notary
+  status_notary_notes:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.status_notary_notes
+  crn_details:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.crn_details
+  status_fgts:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.status_fgts
+  rev:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.rev
+  rev_type:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.revend
+  mod_id_payment:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.payment_id_mod
+  mod_partner_notary:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.partner_notary_mod
+  mod_status_notary_notes:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.status_notary_notes_mod
+  mod_ts_crn_started:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.crn_started_at_mod
+  mod_ts_crn_returned:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.crn_returned_at_mod
+  mod_ts_crn_ended:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.crn_ended_at_mod
+  mod_crn_details:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.crn_details_mod
+  mod_status_fgts:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.status_fgts_mod
+  mod_ts_draft_fgts_started:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.draft_fgts_started_at_mod
+  mod_ts_draft_fgts_ended:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.draft_fgts_ended_at_mod
+  ts_crn_started:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.crn_started_at
+  ts_crn_returned:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.crn_returned_at
+  ts_crn_ended:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.crn_ended_at
+  ts_draft_fgts_started:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.draft_fgts_started_at
+  ts_draft_fgts_ended:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.draft_fgts_ended_at
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.cash_payment_aud.day

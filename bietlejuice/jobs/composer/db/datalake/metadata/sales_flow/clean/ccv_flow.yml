@@ -1,0 +1,34 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: ccv_flow
+columns:
+  id_ccv_flow:
+    lineage:
+      - datalake_sales_flow_raw.ccv_flow.id
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_raw.ccv_flow.sales_flow_id
+  status:
+    lineage:
+      - datalake_sales_flow_raw.ccv_flow.status
+  ts_confection_started:
+    lineage:
+      - datalake_sales_flow_raw.ccv_flow.started_confection_at
+  ts_signed:
+    lineage:
+      - datalake_sales_flow_raw.ccv_flow.signed_at
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.ccv_flow.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.ccv_flow.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.ccv_flow.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.ccv_flow.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.ccv_flow.day
