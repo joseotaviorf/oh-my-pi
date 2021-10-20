@@ -1,0 +1,37 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: specialist
+columns:
+  id_specialist:
+    lineage:
+      - datalake_sales_flow_raw.specialist.id
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_raw.specialist.sales_flow_id
+  id_main_user:
+    lineage:
+      - datalake_sales_flow_raw.specialist.main_user_id
+  kind:
+    lineage:
+      - datalake_sales_flow_raw.specialist.kind
+  email:
+    lineage:
+      - datalake_sales_flow_raw.specialist.email
+  specialist_name:
+    lineage:
+      - datalake_sales_flow_raw.specialist.name
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.specialist.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.specialist.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.specialist.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.specialist.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.specialist.day

@@ -15,19 +15,41 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces, in **datalake raw and clean**, tables via incremental load:
     - `address_data`
     - `address_data_aud`
+    - `brokerage`
+    - `brokerage_aud`
+    - `cash_payment`
+    - `cash_payment_aud`
     - `ccv`
     - `ccv_aud`
+    - `ccv_flow`
+    - `ccv_flow_aud`
     - `ccv_party`
     - `ccv_party_aud`
+    - `ccv_rule`
+    - `ccv_rule_aud`
+    - `dilligence`
+    - `dilligence_aud`
+    - `dilligence_appointment`
+    - `dilligence_appointment_aud`
     - `house`
     - `house_aud`
+    - `mortgage`
+    - `mortgage_aud`
+    - `notary`
+    - `notary_aud`
     - `offer`
     - `offer_aud`
+    - `onboarding`
+    - `onboarding_aud`
     - `payment`
     - `payment_aud`
+    - `rescission`
+    - `rescission_aud`
     - `rev_info`
     - `sales_flow`
     - `sales_flow_aud`
+    - `specialist`
+    - `specialist_aud`
     - `user_sample`
     - `user_sample_aud`
     - `users`

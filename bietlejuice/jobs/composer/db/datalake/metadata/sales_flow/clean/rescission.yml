@@ -1,0 +1,34 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: rescission
+columns:
+  id_rescission:
+    lineage:
+      - datalake_sales_flow_raw.rescission.id
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_raw.rescission.sales_flow_id
+  reason:
+    lineage:
+      - datalake_sales_flow_raw.rescission.reason
+  comment:
+    lineage:
+      - datalake_sales_flow_raw.rescission.comment
+  dt_rescission:
+    lineage:
+      - datalake_sales_flow_raw.rescission.rescission_date
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.rescission.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.rescission.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.rescission.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.rescission.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.rescission.day
