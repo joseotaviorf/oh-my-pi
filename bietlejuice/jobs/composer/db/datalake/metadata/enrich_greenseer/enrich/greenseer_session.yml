@@ -1,0 +1,46 @@
+---
+database_name: datalake_greenseer
+table_name: greenseer_session
+columns:
+  id_session:
+    lineage:
+      - datalake_greenseer_clean.session.id_session
+  id_ticket:
+    lineage:
+      - datalake_customer_support.chat.id_ticket
+  id_user:
+    lineage:
+      - datalake_greenseer_clean.session.memory
+  id_pipeline:
+    lineage:
+      - datalake_greenseer_clean.session.id_pipeline
+  before_reception:
+    lineage:
+      - datalake_greenseer_clean.session.memory
+  after_reception:
+    lineage:
+      - datalake_greenseer_clean.session.memory
+  context_message:
+    lineage:
+      - datalake_greenseer_clean.session.memory
+  created_by_hsm:
+    lineage:
+      - datalake_greenseer_clean.session.memory
+  tags_added:
+    lineage:
+      - datalake_greenseer_clean.session.memory
+  flags:
+    lineage:
+      - datalake_greenseer_clean.session.memory
+  current_state:
+    lineage:
+      - datalake_greenseer_clean.session.current_state
+  more_help_required:
+    lineage:
+      - datalake_greenseer_clean.session.memory
+  ts_started:
+    lineage:
+      - datalake_greenseer_clean.session.ts_started
+  ts_ended:
+    lineage:
+      - datalake_greenseer_clean.session.ts_ended
