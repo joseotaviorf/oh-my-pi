@@ -1,0 +1,15 @@
+SELECT
+    CAST(group AS INT) AS id_group,
+    team,
+    team_leader,
+    company,
+    CAST(target_resolution AS FLOAT) AS target_resolution,
+    CAST(target_csat AS FLOAT) AS target_csat,
+    CAST(target_frt AS FLOAT) AS target_frt,
+    CAST(productivity_target AS INT) AS productivity_target,
+    CAST(ra_would_back_make_business_target AS FLOAT) AS ra_would_back_make_business_target,
+    CAST(ra_target_score AS INT) AS ra_target_score,
+    DATE(start_date) AS dt_start,
+    DATE(end_date) AS dt_end
+FROM
+    datalake_gsheets_raw.agents_ranking_targets

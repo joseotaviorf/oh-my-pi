@@ -29,6 +29,7 @@ This pipeline produces the following output tables:
     - `affiliates_extra_user_bonus`
     - `affiliates_monthly_expected_results`
     - `agents_control`
+    - `agents_ranking_targets`
     - `agr_account`
     - `aux_agents_sale_hub`
     - `auxiliary_region`
