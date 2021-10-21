@@ -1,0 +1,15 @@
+---
+raw_partition_cols: ["acc", "dt"]
+raw_table_name: campaigns_overview_report
+schema:
+  - ["id", "STRING"]
+  - ["name", "STRING"]
+  - ["account_name", "STRING"]
+  - ["clicks", "STRING"]
+  - ["desktop_cost", "STRING"]
+  - ["mobile_cost", "STRING"]
+  - ["total_cost", "STRING"]
+  - ["curr_date", "DATE"]
+  - ["group_name", "STRING"]
+  - ["acc", "INT"]
+  - ["dt", "DATE"]

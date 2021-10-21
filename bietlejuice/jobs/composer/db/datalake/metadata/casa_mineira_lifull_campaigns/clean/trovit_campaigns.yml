@@ -1,0 +1,34 @@
+---
+database_name: datalake_casa_mineira_lifull_campaigns_clean
+table_name: trovit_campaigns
+columns:
+  id_account:
+    lineage:
+      - datalake_casa_mineira_lifull_campaigns_raw.campaigns_overview_report.acc
+  id_campaign:
+    lineage:
+      - datalake_casa_mineira_lifull_campaigns_raw.campaigns_overview_report.id
+  campaign_name:
+    lineage:
+      - datalake_casa_mineira_lifull_campaigns_raw.campaigns_overview_report.name
+  account_name:
+    lineage:
+      - datalake_casa_mineira_lifull_campaigns_raw.campaigns_overview_report.account_name
+  clicks:
+    lineage:
+      - datalake_casa_mineira_lifull_campaigns_raw.campaigns_overview_report.clicks
+  desktop_cost:
+    lineage:
+      - datalake_casa_mineira_lifull_campaigns_raw.campaigns_overview_report.desktop_cost
+  mobile_cost:
+    lineage:
+      - datalake_casa_mineira_lifull_campaigns_raw.campaigns_overview_report.mobile_cost
+  total_cost:
+    lineage:
+      - datalake_casa_mineira_lifull_campaigns_raw.campaigns_overview_report.total_cost
+  dt_loaded:
+    lineage:
+      - datalake_casa_mineira_lifull_campaigns_raw.campaigns_overview_report.curr_date
+  dt_attribution:
+    lineage:
+      - datalake_casa_mineira_lifull_campaigns_raw.campaigns_overview_report.dt

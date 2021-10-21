@@ -16,7 +16,7 @@ from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
 
-SOURCE = "lifull_campaigns"
+SOURCE = "casa_mineira_lifull_campaigns"
 DAG_ID = f"bietlejuice.{SOURCE}"
 ENV = os.environ.get("ENVIRONMENT")
 
