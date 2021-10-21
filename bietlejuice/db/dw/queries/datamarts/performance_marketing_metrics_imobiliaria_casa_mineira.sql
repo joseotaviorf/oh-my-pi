@@ -96,7 +96,8 @@ info_contact as (
         c.id_client,
         COALESCE(MD5(c.email), c.phone_number, c.id_client) as id_prospect,
         COALESCE(MD5(c.email), c.phone_number, c.id_client) || '_' || COALESCE(c.id_house, '') as id_flow,
-        c.id_house,
+        hp.id AS id_house_portal,
+        c.id_house AS id_house_crm,
         MD5(c.email) email_md5,
         c.ts_created,
         c.id_origin,
@@ -112,7 +113,9 @@ info_contact as (
     FROM
         datalake_casa_mineira_crm_clean_prod.contact AS c
         LEFT JOIN datalake_casa_mineira_crm_clean_prod.house AS h
-            ON c.id_house = h.id
+            ON c.id_house = h.id AND hp.id_real_estate_agency = '1'
+        LEFT JOIN datalake_casa_mineira_portal_clean_prod.house AS hp
+            ON c.id_house = hp.code
         LEFT JOIN datalake_casa_mineira_crm_clean_prod.neighborhood AS n
             ON h.id_neighborhood = n.id
         LEFT JOIN datalake_casa_mineira_crm_clean_prod.city AS ct
@@ -137,7 +140,8 @@ contacts as (
         city_name AS city_group,
         --ID DIMENSIONS
         email_md5,
-        id_house,
+        id_house_portal,
+        id_house_crm AS id_house,
         id_client,
         order_new_client,
         id_prospect,
@@ -145,7 +149,7 @@ contacts as (
         id_flow,
         order_new_contact_flow
     FROM info_contact
-        WHERE id_origin not in ('18', '21', '22', '23', '24', '25')
+        WHERE id_origin != '18' AND id_origin::INT < 21
         AND DATE(date_add('hour', 3, ts_created)) BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND DATE_ADD('DAY', -1, CURRENT_DATE)
 ),
 -----------------------------------------------------------------------------------------------------------
@@ -176,6 +180,7 @@ FROM
     contacts as c
     LEFT JOIN events evt
         ON evt.email_md5 = c.email_md5
+        AND evt.id_house = c.id_house_portal
         AND ABS(DATE_DIFF('SECOND', ts_event, ts_contact)) <= 360
     LEFT JOIN taxonomy_portal AS tp
         ON LOWER(COALESCE(tp.app_type, '')) = LOWER(COALESCE(evt.app_type, ''))
