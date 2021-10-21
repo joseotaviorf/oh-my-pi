@@ -580,6 +580,11 @@ bietlejuice.enrich_firestore:
   - bietlejuice.firestore:load-clean-rent-offer
   - bietlejuice.firestore:load-clean-sale-offer
 
+bietlejuice.enrich_greenseer:
+  - bietlejuice.enrich_customer_support:load-enrich-chat
+  - bietlejuice.greenseer:load-clean-session
+  - bietlejuice.sauron:load-clean-session
+
 bietlejuice.enrich_customer_support:
   - bietlejuice.chat_fup:load-clean-chats-chat
   - bietlejuice.chat_fup:load-clean-surveys-answer
