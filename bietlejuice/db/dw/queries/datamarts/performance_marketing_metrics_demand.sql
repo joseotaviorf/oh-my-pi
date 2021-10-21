@@ -234,7 +234,7 @@ target_sheets AS (
     FROM
         datalake_gsheets_clean_prod.rental_ntp_source_targets
     WHERE
-        NULLIF(date, '')::date >= DATE('2021-08-01')
+        NULLIF(dt_target, '')::date >= DATE('2021-08-01')
 ),
 -------------------------------------------------------------------------------------
 -- Query Performance Marketing Rental Demand targets and introduce NULLs for UNION --

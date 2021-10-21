@@ -281,13 +281,13 @@ targets AS (
         NULL::DATE AS dt_visit_completed,
         NULL::INT AS sale_flow_order,
         NULL::INT AS buyer_prospect_order,
-        bd.daily__value::FLOAT AS budget,
+        bd.daily_value::FLOAT AS budget,
         NULL::FLOAT AS new_buyer_prospects_target,
         NULL::FLOAT AS recovered_buyer_prospects_target,
         NULL::FLOAT AS sale_flows_target,
         NULL::FLOAT AS marketing_cost
     FROM
-        datalake_raw.gsheets_mkt_cost_per_source AS bd
+        datalake_gsheets_clean_prod.mkt_cost_per_source AS bd
         LEFT JOIN taxonomy AS t
             ON bd.mkt_medium = t.mkt_medium
     WHERE
@@ -295,7 +295,7 @@ targets AS (
     UNION ALL
     SELECT
         bp.dt_target::DATE,
-        bp.date::TIMESTAMP AS ts_event,
+        bp.dt_target::TIMESTAMP AS ts_event,
         NULL::TEXT AS status,
         NULL:: TEXT AS status_detail,
         NULL:: TEXT AS next_status,
@@ -332,7 +332,7 @@ targets AS (
         NULL::FLOAT AS sale_flows_target,
         NULL::FLOAT AS marketing_cost
     FROM
-        datalake_raw.gsheets_sale_nbp_source_targets AS bp
+        datalake_gsheets_clean_prod.sale_nbp_source_targets AS bp
     UNION ALL
     SELECT
         date::DATE,
@@ -373,7 +373,7 @@ targets AS (
         sf_target::FLOAT AS sale_flows_target,
         NULL::FLOAT AS marketing_cost
     FROM
-        datalake_raw.gsheets_sale_flows_targets
+        datalake_gsheets_clean_prod.sale_flows_targets
 ),
 ----------------------------------------------------------------------------------------------------------------------------
 -- Query Performance Marketing Investment ForSale Demand costs (mkt_origin = 'Tenants PWA') and introduce NULLs for UNION --
