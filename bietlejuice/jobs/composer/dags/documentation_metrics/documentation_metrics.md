@@ -21,6 +21,7 @@ The following tables are created incrementally in the Raw and Clean layers:
 
 - `tables_documentation_metrics`
 - `columns_documentation_metrics`
+- `categories_documentation_metrics`
 - `lineage_and_tags_metrics`
 
 ### Responsible Data Team
