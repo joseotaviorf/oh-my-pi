@@ -3,19 +3,19 @@ table_name: trovit_consolidated_costs
 columns:
   campaign_name:
     lineage:
-      - datalake_trovit_clean.trovit_report.campaign_name
+      - datalake_lifull_campaigns_clean.trovit_campaigns.campaign_name
   account_name:
     lineage:
-      - datalake_trovit_clean.trovit_report.account_name
+      - datalake_lifull_campaigns_clean.trovit_campaigns.account_name
   utm_campaign:
     lineage:
-      - datalake_trovit_clean.trovit_report.campaign_name
+      - datalake_lifull_campaigns_clean.trovit_campaigns.campaign_name
   desktop_cost:
     lineage:
-      - datalake_trovit_clean.trovit_report.desktop_cost
+      - datalake_lifull_campaigns_clean.trovit_campaigns.desktop_cost
   mobile_cost:
     lineage:
-      - datalake_trovit_clean.trovit_report.mobile_cost
+      - datalake_lifull_campaigns_clean.trovit_campaigns.mobile_cost
   total_cost:
     lineage:
-      - datalake_trovit_clean.trovit_report.total_cost
+      - datalake_lifull_campaigns_clean.trovit_campaigns.total_cost

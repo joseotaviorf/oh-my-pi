@@ -7,6 +7,6 @@ SELECT
     mobile_cost,
     total_cost
 FROM
-    datalake_trovit_clean.trovit_report
+    datalake_lifull_campaigns_clean.trovit_campaigns
 WHERE 
-    DATE(dt) = DATE('{year}-{month}-{day}')
+    DATE(dt_attribution) = DATE('{year}-{month}-{day}')

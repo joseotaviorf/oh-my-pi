@@ -4,20 +4,20 @@ table_name: fact_mitula_daily_cost_attributions
 columns:
   sk_mitula_campaign:
     lineage:
-      - datalake_mitula_clean.mitula_report.id
-      - datalake_mitula_clean.mitula_report.curr_dt
+      - datalake_lifull_campaigns_clean.mitula_campaigns.id_campaign
+      - datalake_lifull_campaigns_clean.mitula_campaigns.dt_loaded
   sk_date:
     lineage:
-      - datalake_mitula_clean.mitula_report.curr_dt
+      - datalake_lifull_campaigns_clean.mitula_campaigns.dt_loaded
   clicks:
     lineage:
-      - datalake_mitula_clean.mitula_report.clicks
+      - datalake_lifull_campaigns_clean.mitula_campaigns.clicks
   desktop_cost:
     lineage:
-      - datalake_mitula_clean.mitula_report.desktop_cost
+      - datalake_lifull_campaigns_clean.mitula_campaigns.desktop_cost
   mobile_cost:
     lineage:
-      - datalake_mitula_clean.mitula_report.mobile_cost
+      - datalake_lifull_campaigns_clean.mitula_campaigns.mobile_cost
   total_cost:
     lineage:
-      - datalake_mitula_clean.mitula_report.total_cost
+      - datalake_lifull_campaigns_clean.mitula_campaigns.total_cost

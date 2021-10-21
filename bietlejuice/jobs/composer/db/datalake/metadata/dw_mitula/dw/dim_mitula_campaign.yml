@@ -4,11 +4,11 @@ table_name: dim_mitula_campaign
 columns:
   sk_mitula_campaign:
     lineage:
-      - datalake_mitula_clean.mitula_report.id
-      - datalake_mitula_clean.mitula_report.curr_dt
+      - datalake_lifull_campaigns_clean.mitula_campaigns.id_campaign
+      - datalake_lifull_campaigns_clean.mitula_campaigns.dt_loaded
   campaign_name:
     lineage:
-      - datalake_mitula_clean.mitula_report.campaign_name
+      - datalake_lifull_campaigns_clean.mitula_campaigns.campaign_name
   account_name:
     lineage:
-      - datalake_mitula_clean.mitula_report.account_name
+      - datalake_lifull_campaigns_clean.mitula_campaigns.account_name

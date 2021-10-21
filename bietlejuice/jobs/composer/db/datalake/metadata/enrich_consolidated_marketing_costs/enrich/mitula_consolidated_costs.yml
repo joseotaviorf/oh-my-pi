@@ -3,19 +3,19 @@ table_name: mitula_consolidated_costs
 columns:
   campaign_name:
     lineage:
-      - datalake_mitula_clean.mitula_report.campaign_name
+      - datalake_lifull_campaigns_clean.mitula_campaigns.campaign_name
   account_name:
     lineage:
-      - datalake_mitula_clean.mitula_report.account_name
+      - datalake_lifull_campaigns_clean.mitula_campaigns.account_name
   utm_campaign:
     lineage:
-      - datalake_mitula_clean.mitula_report.campaign_name
+      - datalake_lifull_campaigns_clean.mitula_campaigns.campaign_name
   desktop_cost:
     lineage:
-      - datalake_mitula_clean.mitula_report.desktop_cost
+      - datalake_lifull_campaigns_clean.mitula_campaigns.desktop_cost
   mobile_cost:
     lineage:
-      - datalake_mitula_clean.mitula_report.mobile_cost
+      - datalake_lifull_campaigns_clean.mitula_campaigns.mobile_cost
   total_cost:
     lineage:
-      - datalake_mitula_clean.mitula_report.total_cost
+      - datalake_lifull_campaigns_clean.mitula_campaigns.total_cost

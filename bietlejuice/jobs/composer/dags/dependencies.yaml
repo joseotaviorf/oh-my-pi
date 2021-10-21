@@ -209,7 +209,7 @@ bietlejuice.dw_google_ads:
   - bietlejuice.google_ads:load-clean-videos-performance-report
 
 bietlejuice.dw_mitula:
-  - bietlejuice.mitula:load-clean-mitula-report
+  - bietlejuice.lifull_campaigns:load-clean-mitula-campaigns
 
 bietlejuice.dw_offer:
   - bietlejuice.enrich_ebdb_proposal:load-enrich-pre-proposal
@@ -300,7 +300,7 @@ bietlejuice.dw_tracksale:
   - bietlejuice.enrich_ebdb_customer_contact_identification
 
 bietlejuice.dw_trovit:
-  - bietlejuice.trovit
+  - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns
 
 bietlejuice.dw_user:
   - bietlejuice.ebdb:create-clean-partner-in-data-lake
@@ -438,9 +438,9 @@ bietlejuice.enrich_consolidated_marketing_costs:
   - bietlejuice.google_ads:load-clean-videos-performance-report
   - bietlejuice.criteo_campaigns:load-clean-criteo-campaigns
   - bietlejuice.enrich_marketing_costs_sharing_rules:load-old-sharing-rules-from-redshift-to-datalake
-  - bietlejuice.mitula:load-clean-mitula-report
+  - bietlejuice.lifull_campaigns:load-clean-mitula-campaigns
+  - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns
   - bietlejuice.rtb_campaigns:load-clean-rtb-campaigns
-  - bietlejuice.trovit:load-clean-trovit-report
 
 bietlejuice.enrich_credit_evers:
   - bietlejuice.enrich_invoice:load-enrich-credit-invoice-original-due-date

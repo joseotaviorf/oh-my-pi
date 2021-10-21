@@ -1,6 +1,6 @@
 SELECT
-    BIGINT(string(id) || DATE_FORMAT(DATE(curr_dt), 'yyyyMMdd')) AS sk_mitula_campaign,
-    INT(DATE_FORMAT(DATE(curr_dt), 'yyyyMMdd')) AS sk_date,
+    BIGINT(string(id_campaign) || DATE_FORMAT(DATE(dt_loaded), 'yyyyMMdd')) AS sk_mitula_campaign,
+    INT(DATE_FORMAT(DATE(dt_loaded), 'yyyyMMdd')) AS sk_date,
     clicks,
     desktop_cost,
     mobile_cost,
@@ -10,6 +10,6 @@ SELECT
     {day} AS day,
     NOW() AS ts_load
 FROM 
-    datalake_mitula_clean.mitula_report
+    datalake_lifull_campaigns_clean.mitula_campaigns
 WHERE 
-    DATE(dt) = DATE('{year}-{month}-{day}')
+    DATE(dt_attribution) = DATE('{year}-{month}-{day}')
