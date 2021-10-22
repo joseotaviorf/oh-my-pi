@@ -26,10 +26,12 @@ taxonomy_by_platform AS (
 enriched_consolidated_media_costs AS (
     SELECT
         *,
-        CASE WHEN campaign_name LIKE '%calc%' THEN
-            'Calculator'
-        ELSE
-            'Other'
+        CASE
+            WHEN LOWER(campaign_name) LIKE '%calc%'
+                THEN 'Calculator'
+            WHEN LOWER(campaign_name) LIKE '%newchannel%'
+                THEN 'New Channels'
+            ELSE 'Other'
         END AS campaign_origin_acquisition
     FROM
         datalake_consolidated_marketing_costs.consolidated_media_costs
