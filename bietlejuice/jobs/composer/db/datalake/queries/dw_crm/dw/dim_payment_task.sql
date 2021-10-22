@@ -1,5 +1,13 @@
--- TO DO: After finishing CRM migration, it is necessary to rename columns following our Naming Conventions
-SELECT
+WITH last_updated_task AS (
+    SELECT
+      id,
+      id_state,
+      MAX(DATE(CONCAT(year,'-',month,'-',day))) AS dt_last_updated
+    FROM
+      datalake_crm.tasks
+    GROUP BY 1,2
+)
+SELECT DISTINCT
     tf.id_task AS sk_task,
     tf.score_factor,
     tf.version,
@@ -16,19 +24,16 @@ SELECT
     tf.ts_started AS ts_start,
     tf.ts_completed,
     tf.ts_silenced_until,
-    NOW() AS ts_load,
-    tf.year,
-    tf.month,
-    tf.day
+    NOW() AS ts_load
 FROM
     datalake_crm_tasks_flows.tasks_actions_resolutions_flow AS tf
 JOIN
-    datalake_crm.tasks AS tk
-        ON tf.id_task = tk.id
-        AND DATE(CONCAT(tf.year, '-', tf.month, '-', tf.day)) = DATE(CONCAT(tk.year, '-', tk.month, '-', tk.day))
+    last_updated_task AS lut
+        ON tf.id_task = lut.id
+        AND DATE(CONCAT(tf.year, '-', tf.month, '-', tf.day)) = lut.dt_last_updated
 LEFT JOIN
     datalake_heimdall_clean.activity AS ac
-        ON ac.id = tk.id_state
+        ON ac.id = lut.id_state
 WHERE
     (tf.type IN (
         'AceiteDaAntecipacaoAluguel',
@@ -50,6 +55,3 @@ WHERE
                 )
         )
     )
-    AND tf.year = {year}
-    AND tf.month = {month}
-    AND tf.day = {day}

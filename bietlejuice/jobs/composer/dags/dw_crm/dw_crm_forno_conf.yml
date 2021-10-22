@@ -1,5 +1,6 @@
 ---
 full_tables:
+  - dim_payment_task
   - fact_lead_tasks
 incremental_load_parameters:
   dw_query_filters:

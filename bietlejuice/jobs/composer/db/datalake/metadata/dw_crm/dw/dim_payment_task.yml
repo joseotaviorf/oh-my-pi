@@ -49,12 +49,3 @@ columns:
   ts_silenced_until:
     lineage:
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_silenced_until
-  year:
-    lineage:
-      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.year
-  month:
-    lineage:
-      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.month
-  day:
-    lineage:
-      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.day
