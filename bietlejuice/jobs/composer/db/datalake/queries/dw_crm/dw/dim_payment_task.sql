@@ -1,7 +1,7 @@
 WITH last_updated_task AS (
     SELECT DISTINCT
       id,
-      LAST_VALUE(id_state) OVER(PARTITION BY id ORDER BY DATE(CONCAT(year,'-',month,'-',day)) ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS id_state,
+      LAST_VALUE(id_state) OVER(PARTITION BY id ORDER BY DATE(CONCAT(year, '-', month, '-', day)) ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS id_state,
       MAX(DATE(CONCAT(year, '-', month, '-', day))) OVER (PARTITION BY id) AS dt_last_updated
     FROM
       datalake_crm.tasks
@@ -14,8 +14,8 @@ SELECT DISTINCT
     tf.type,
     tf.description,
     tf.subject,
-    CAST(titles AS STRING) AS titles,
-    CAST(workgroups AS STRING) AS workgroups,
+    CAST(tf.titles AS STRING) AS titles,
+    CAST(tf.workgroups AS STRING) AS workgroups,
     ac.status AS tenant_refund_status,
     tf.hours_task_started_to_completed AS hours_task_start_to_completed,
     tf.is_resolved AS flg_solved,

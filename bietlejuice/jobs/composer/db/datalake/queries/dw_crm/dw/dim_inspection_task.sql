@@ -1,13 +1,13 @@
 WITH last_updated_task AS (
   SELECT
-      id,
+      id_task,
       MAX(DATE(CONCAT(year, '-', month, '-', day))) AS dt_last_updated
     FROM
-      datalake_crm.tasks
+      datalake_crm_tasks_flows.tasks_actions_resolutions_flow
     GROUP BY 1
 )
 SELECT
-    id_task AS sk_task,
+    tarf.id_task AS sk_task,
     score_factor,
     version,
     origin,
@@ -27,7 +27,7 @@ FROM
     datalake_crm_tasks_flows.tasks_actions_resolutions_flow AS tarf
 JOIN
     last_updated_task AS lut
-        ON tarf.id_task = lut.id
+        ON tarf.id_task = lut.id_task
         AND DATE(CONCAT(tarf.year, '-', tarf.month, '-', tarf.day)) = lut.dt_last_updated
 WHERE
     (type IN (
