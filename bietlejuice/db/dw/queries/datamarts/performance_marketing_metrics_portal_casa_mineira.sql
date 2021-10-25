@@ -35,6 +35,7 @@ costs AS (
         NULL::TEXT uf_advertiser,
         NULL::TEXT city_advertiser,
         NULL::TEXT type_advertiser,
+        NULL::TEXT business_context,
         NULL::TEXT uf_listing,
         NULL::TEXT city_listing,
         mkt_origin,
@@ -55,7 +56,7 @@ costs AS (
         LEFT JOIN dim_region dr
             ON ict.city_group_from_campaign=dr.sk_region
     WHERE dt BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND DATE_ADD('DAY', -1, CURRENT_DATE)
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 ----------------------------------------------------
 -- Query Taxonomy Portal Casa Mineira From Sheets --
@@ -137,6 +138,10 @@ contacts as (
             ELSE 'Client'
         END AS type_advertiser,
         --LISTING DIMENSIONS
+        CASE
+            WHEN h.goal='venda' THEN 'Sale'
+            WHEN h.goal='aluguel' THEN 'Rent'
+        END AS business_context,
         uf.uf_initials uf_listing,
         ct.city_name city_listing,
         ct.city_name AS city_group,
@@ -174,6 +179,7 @@ SELECT
     c.uf_advertiser,
     c.city_advertiser,
     c.type_advertiser,
+    c.business_context,
     c.uf_listing,
     c.city_listing,
     COALESCE(t.mkt_origin, 'Portal Casa Mineira') AS mkt_origin,
@@ -202,7 +208,7 @@ FROM
       and LOWER(COALESCE(t.utm_medium, '')) = LOWER(COALESCE(evt.utm_medium, ''))
       and LOWER(COALESCE(t.branded, '')) = LOWER(COALESCE(evt.branded, ''))
 WHERE DATE(c.ts_contact) BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND DATE_ADD('DAY', -1, CURRENT_DATE)
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 )
 -----------------------------
 -- UNION Costs and Results --
