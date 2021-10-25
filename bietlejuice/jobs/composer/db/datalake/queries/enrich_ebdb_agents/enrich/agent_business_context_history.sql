@@ -2,8 +2,8 @@ WITH agent_business_context_aud AS (
     SELECT
         id_agent_data,
         aud.rev_type,
-        aud.business_context
-        FROM_UNIXTIME(CAST(ure.ts_revision AS BIGINT)/1000) AS ts_update,
+        aud.business_context,
+        FROM_UNIXTIME(CAST(ure.ts_revision AS BIGINT)/1000) AS ts_updated,
         TRUNC(FROM_UNIXTIME(CAST(ure.ts_revision AS BIGINT)/1000), 'day') AS dt_updated
     FROM
         datalake_ebdb_clean.agent_data_business_contexts_served_aud AS aud
@@ -15,8 +15,8 @@ agent_business_context_history AS (
     SELECT
         id_agent_data,
         business_context AS agent_business_context,
-        ts_update AS ts_agent_business_context_start,
-        LEAD(ts_update) OVER (PARTITION BY id_agent_data ORDER BY ts_update) AS ts_agent_business_context_end
+        ts_updated AS ts_agent_business_context_started,
+        LEAD(ts_updated) OVER (PARTITION BY id_agent_data ORDER BY ts_updated) AS ts_agent_business_context_ended
     FROM
         agent_business_context_aud
     WHERE

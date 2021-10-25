@@ -478,6 +478,7 @@ bietlejuice.enrich_docx:
 
 bietlejuice.enrich_ebdb_agents:
   - bietlejuice.ebdb:create-clean-agent-data-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-agent-data-business-contexts-served-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-agent-data-types-in-data-lake
   - bietlejuice.ebdb:create-clean-agent-region-data-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-agent-specific-hour-in-data-lake
