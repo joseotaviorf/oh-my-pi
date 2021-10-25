@@ -1,5 +1,7 @@
 ---
 tables:
+  - table_name: agent_business_context_history
+    is_incremental: false
   - table_name: agents_region
     is_incremental: false
   - table_name: agents_specific_weekly_schedule
