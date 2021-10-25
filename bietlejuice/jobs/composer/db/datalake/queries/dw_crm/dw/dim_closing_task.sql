@@ -1,3 +1,11 @@
+WITH last_updated_task AS (
+  SELECT
+      id,
+      MAX(DATE(CONCAT(year, '-', month, '-', day))) AS dt_last_updated
+    FROM
+      datalake_crm.tasks
+    GROUP BY 1
+)
 SELECT
   id_task AS sk_task,
   score_factor,
@@ -14,12 +22,13 @@ SELECT
   ts_start,
   ts_completed,
   ts_silenced_until,
-  NOW() AS ts_load,
-  year,
-  month,
-  day
+  NOW() AS ts_load
 FROM 
-  datalake_crm_tasks_history_flows.tasks_history_resolutions_flow
+  datalake_crm_tasks_history_flows.tasks_history_resolutions_flow AS thf
+JOIN
+    last_updated_task AS lut
+        ON thf.id_task = lut.id
+        AND DATE(CONCAT(thf.year, '-', thf.month, '-', thf.day)) = lut.dt_last_updated
 WHERE
   (
       type IN (
@@ -37,6 +46,3 @@ WHERE
         AND id_workgroup IN ('DEP_CLOSING_ID')
     )
   )
-  AND year = {year}
-  AND month = {month}
-  AND day = {day}

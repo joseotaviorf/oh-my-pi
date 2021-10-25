@@ -1,5 +1,8 @@
 ---
 full_tables:
+  - dim_closing_task
+  - dim_credit_task
+  - dim_inspection_task
   - dim_payment_task
   - fact_lead_tasks
 incremental_load_parameters:

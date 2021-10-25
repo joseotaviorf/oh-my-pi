@@ -1,11 +1,10 @@
 WITH last_updated_task AS (
-    SELECT
+    SELECT DISTINCT
       id,
-      id_state,
-      MAX(DATE(CONCAT(year,'-',month,'-',day))) AS dt_last_updated
+      LAST_VALUE(id_state) OVER(PARTITION BY id ORDER BY DATE(CONCAT(year,'-',month,'-',day)) ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS id_state,
+      MAX(DATE(CONCAT(year, '-', month, '-', day))) OVER (PARTITION BY id) AS dt_last_updated
     FROM
       datalake_crm.tasks
-    GROUP BY 1,2
 )
 SELECT DISTINCT
     tf.id_task AS sk_task,
