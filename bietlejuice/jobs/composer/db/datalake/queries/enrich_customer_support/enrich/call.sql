@@ -31,7 +31,8 @@ WITH segment AS (
       MAX(cfe.agent_email) AS agent_email,
       MAX(GET_JSON_OBJECT(metadata, '$.event_data.WorkerAttributes.location')) AS agent_company,
       MAX(ac.agent_name) AS agent_name,
-      MAX(ac.manager) AS agent_manager
+      MAX(ac.manager) AS agent_manager,
+      MAX(ac.dt_start) AS dt_start
     FROM
       datalake_bigfone_twilio.call_flex_events cfe
     LEFT JOIN
@@ -93,6 +94,7 @@ WITH segment AS (
     lur.dt_last_updated AS dt_updated,
     ts_created,
     ts_ended,
+    dt_start,
     tt.ts_twilio_created_local,
     tt.ts_twilio_created_utc,
     tt.ts_twilio_closed_local,
@@ -367,6 +369,7 @@ conversation_and_segment AS (
     t.agent_manager,
     t.agent_company,
     t.agent_name,
+    t.dt_start,
     t.queue_name,
     t.transferred_from_dept,
     t.transferred_to_dept,
@@ -481,6 +484,7 @@ SELECT DISTINCT
   c.is_solved,
   c.csat_rating,
   c.ts_csat_answered,
+  c.dt_start AS dt_agent_start,
   c.ts_twilio_created_local AS ts_segment_created,
   c.ts_twilio_closed_local AS ts_segment_closed,
   c.ts_started AS ts_ticket_started,
