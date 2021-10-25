@@ -5,6 +5,7 @@ SELECT DISTINCT
     l.id_external,
     l.id_lead_owner,
     user_affiliate.id AS id_user_has_indicated,
+    l.id_affiliate_has_indicated,
     l.address,
     l.house_number,
     l.complement,
@@ -30,6 +31,7 @@ SELECT DISTINCT
     l.source,
     l.unbounce_page_variant,
     l.unbounce_page_name,
+    l.reason AS original_reason,
     COALESCE(lead_reason.reason, l.reason) AS reason,
     -- Consider Old and New reasons
     lead_reason.reason_detail,
@@ -66,6 +68,7 @@ SELECT DISTINCT
     l.has_processed,
     l.has_automatically_discarded,
     l.dt_picked_up,
+    l.dt_ad_created,
     ad.ts_operation_start AS ts_affiliate_operation_start,
     l.ts_created,
     l.ts_updated

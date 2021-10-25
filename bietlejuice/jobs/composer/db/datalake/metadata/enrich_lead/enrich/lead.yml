@@ -19,6 +19,9 @@ columns:
   id_user_has_indicated:
     lineage:
       - datalake_ebdb_clean.user.id
+  id_affiliate_has_indicated:
+    lineage:
+      - datalake_ebdb_clean.lead.id_affiliate_has_indicated
   address:
     lineage:
       - datalake_ebdb_clean.lead.address
@@ -94,6 +97,9 @@ columns:
   unbounce_page_name:
     lineage:
       - datalake_ebdb_clean.lead.unbounce_page_name
+  original_reason:
+    lineage:
+      - datalake_ebdb_clean.lead.reason
   reason:
     lineage:
       - datalake_ebdb_clean.lead.reason
@@ -155,6 +161,9 @@ columns:
   dt_picked_up:
     lineage:
       - datalake_ebdb_clean.lead.dt_picked_up
+  dt_ad_created:
+    lineage:
+      - datalake_ebdb_clean.lead.dt_ad_created
   ts_affiliate_operation_start:
     lineage:
       - datalake_ebdb_clean.affiliate_data.ts_operation_start
