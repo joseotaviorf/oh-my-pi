@@ -3,7 +3,10 @@ full_tables:
   - dim_closing_task
   - dim_credit_task
   - dim_inspection_task
+  - dim_lead
+  - dim_linhadireta_chat
   - dim_payment_task
+  - dim_offboarding
   - dim_onboarding
   - dim_photo_job
   - dim_repair

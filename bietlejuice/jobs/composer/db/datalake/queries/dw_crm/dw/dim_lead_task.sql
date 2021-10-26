@@ -1,6 +1,14 @@
 -- TO DO: After finishing CRM migration, it is necessary to rename columns following our Naming Conventions
+WITH last_updated_task AS (
+    SELECT
+        id_task,
+        MAX(DATE(CONCAT(year, '-', month, '-', day))) AS dt_last_updated
+    FROM
+        datalake_crm_tasks_flows.tasks_actions_resolutions_flow
+    GROUP BY 1
+)
 SELECT
-    id_task AS sk_task,
+    tarf.id_task AS sk_task,
     score_factor,
     version,
     origin,
@@ -15,14 +23,12 @@ SELECT
     ts_started AS ts_start,
     ts_completed,
     ts_silenced_until,
-    NOW() AS ts_load,
-    year,
-    month,
-    day
+    NOW() AS ts_load
 FROM
-    datalake_crm_tasks_flows.tasks_actions_resolutions_flow
+    datalake_crm_tasks_flows.tasks_actions_resolutions_flow AS tarf
+JOIN
+    last_updated_task AS lut 
+        ON tarf.id_task = lut.id_task
+        AND DATE(CONCAT(tarf.year, '-', tarf.month, '-', tarf.day)) = lut.dt_last_updated
 WHERE
     type IN ('ConverterLead', 'ConverterLeadPrioritario')
-    AND year = {year}
-    AND month = {month}
-    AND day = {day}
