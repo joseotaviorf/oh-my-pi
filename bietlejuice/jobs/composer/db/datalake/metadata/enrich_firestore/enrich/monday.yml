@@ -97,6 +97,9 @@ columns:
   status:
     lineage:
       - datalake_firestore_clean.monday.updated_message
+  negotiation_model:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
   offer_status:
     lineage:
       - datalake_firestore_clean.monday.updated_message
