@@ -19,9 +19,6 @@ columns:
   uf:
     lineage:
       - datalake_casa_mineira_portal_raw.imobiliaria.uf
-  city:
-    lineage:
-      - datalake_casa_mineira_portal_raw.imobiliaria.cidade
   neighborhood:
     lineage:
       - datalake_casa_mineira_portal_raw.imobiliaria.bairro
