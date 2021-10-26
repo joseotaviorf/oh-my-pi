@@ -1,0 +1,22 @@
+---
+database_name: datalake_hub_services_clean
+table_name: rev_info
+columns:
+  id:
+    lineage:
+      - datalake_hub_services_raw.revinfo.id
+  id_user:
+    lineage:
+      - datalake_hub_services_raw.revinfo.user_id
+  ts_created:
+    lineage:
+      - datalake_hub_services_raw.revinfo.timestamp
+  year:
+    lineage:
+      - datalake_hub_services_raw.revinfo.year
+  month:
+    lineage:
+      - datalake_hub_services_raw.revinfo.month
+  day:
+    lineage:
+      - datalake_hub_services_raw.revinfo.day

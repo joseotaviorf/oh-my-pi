@@ -1,0 +1,52 @@
+---
+database_name: datalake_hub_services_clean
+table_name: visitor_aud
+columns:
+  id:
+    lineage:
+      - datalake_hub_services_raw.visitor_aud.id
+  rev:
+    lineage:
+      - datalake_hub_services_raw.visitor_aud.rev
+  rev_type:
+    lineage:
+      - datalake_hub_services_raw.visitor_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_hub_services_raw.visitor_aud.revend
+  version:
+    lineage:
+      - datalake_hub_services_raw.visitor_aud.version
+  visitor_name:
+    lineage:
+      - datalake_hub_services_raw.visitor_aud.name
+  email:
+    lineage:
+      - datalake_hub_services_raw.visitor_aud.email
+  phone_number:
+    lineage:
+      - datalake_hub_services_raw.visitor_aud.phone_number
+  mod_visitor_name:
+    lineage:
+      - datalake_hub_services_raw.visitor_aud.name_mod
+  mod_email:
+    lineage:
+      - datalake_hub_services_raw.visitor_aud.email_mod
+  mod_phone_number:
+    lineage:
+      - datalake_hub_services_raw.visitor_aud.phone_number_mod
+  ts_created:
+    lineage:
+      - datalake_hub_services_raw.visitor_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_hub_services_raw.visitor_aud.updated_at
+  year:
+    lineage:
+      - datalake_hub_services_raw.visitor_aud.year
+  month:
+    lineage:
+      - datalake_hub_services_raw.visitor_aud.month
+  day:
+    lineage:
+      - datalake_hub_services_raw.visitor_aud.day

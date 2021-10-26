@@ -1,0 +1,31 @@
+---
+database_name: datalake_hub_services_clean
+table_name: region
+columns:
+  id:
+    lineage:
+      - datalake_hub_services_raw.region.id
+  id_business_unit:
+    lineage:
+      - datalake_hub_services_raw.region.business_unit_id
+  version:
+    lineage:
+      - datalake_hub_services_raw.region.version
+  region_name:
+    lineage:
+      - datalake_hub_services_raw.region.name
+  ts_created:
+    lineage:
+      - datalake_hub_services_raw.region.created_at
+  ts_updated:
+    lineage:
+      - datalake_hub_services_raw.region.updated_at
+  year:
+    lineage:
+      - datalake_hub_services_raw.region.year
+  month:
+    lineage:
+      - datalake_hub_services_raw.region.month
+  day:
+    lineage:
+      - datalake_hub_services_raw.region.day

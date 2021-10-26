@@ -1,0 +1,46 @@
+---
+database_name: datalake_hub_services_clean
+table_name: region_aud
+columns:
+  id:
+    lineage:
+      - datalake_hub_services_raw.region_aud.id
+  id_business_unit:
+    lineage:
+      - datalake_hub_services_raw.region_aud.business_unit_id
+  rev:
+    lineage:
+      - datalake_hub_services_raw.region_aud.rev
+  rev_type:
+    lineage:
+      - datalake_hub_services_raw.region_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_hub_services_raw.region_aud.revend
+  version:
+    lineage:
+      - datalake_hub_services_raw.region_aud.version
+  region_name:
+    lineage:
+      - datalake_hub_services_raw.region_aud.name
+  mod_region_name:
+    lineage:
+      - datalake_hub_services_raw.region_aud.name_mod
+  mod_id_business_unit:
+    lineage:
+      - datalake_hub_services_raw.region_aud.business_unit_id_mod
+  ts_created:
+    lineage:
+      - datalake_hub_services_raw.region_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_hub_services_raw.region_aud.updated_at
+  year:
+    lineage:
+      - datalake_hub_services_raw.region_aud.year
+  month:
+    lineage:
+      - datalake_hub_services_raw.region_aud.month
+  day:
+    lineage:
+      - datalake_hub_services_raw.region_aud.day

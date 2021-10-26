@@ -1,0 +1,27 @@
+---
+tables:
+  - table_name: business_unit
+    date_filter_column: updated_at
+  - table_name: business_unit_aud
+    date_filter_column: created_at
+  - table_name: lead
+    date_filter_column: updated_at
+  - table_name: lead_aud
+    date_filter_column: created_at
+  - table_name: region
+    date_filter_column: updated_at
+  - table_name: region_aud
+    date_filter_column: created_at
+  - table_name: revinfo
+    clean_table_name: rev_info
+    date_filter_column: timestamp
+    unixtime_measure: miliseconds
+  - table_name: user_sample
+    date_filter_column: updated_at
+  - table_name: user_sample_aud
+    date_filter_column: created_at
+  - table_name: visitor
+    date_filter_column: updated_at
+  - table_name: visitor_aud
+    date_filter_column: created_at
+partition_cols: ["year", "month", "day"]

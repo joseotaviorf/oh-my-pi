@@ -1,0 +1,64 @@
+---
+database_name: datalake_hub_services_clean
+table_name: business_unit_aud
+columns:
+  id:
+    lineage:
+      - datalake_hub_services_raw.business_unit_aud.id
+  rev:
+    lineage:
+      - datalake_hub_services_raw.business_unit_aud.rev
+  rev_type:
+    lineage:
+      - datalake_hub_services_raw.business_unit_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_hub_services_raw.business_unit_aud.revend
+  version:
+    lineage:
+      - datalake_hub_services_raw.business_unit_aud.version
+  hub_name:
+    lineage:
+      - datalake_hub_services_raw.business_unit_aud.name
+  business_context:
+    lineage:
+      - datalake_hub_services_raw.business_unit_aud.business_context
+  sdr_type:
+    lineage:
+      - datalake_hub_services_raw.business_unit_aud.sdr_type
+  negotiation_type:
+    lineage:
+      - datalake_hub_services_raw.business_unit_aud.negotiation_type
+  lead_types:
+    lineage:
+      - datalake_hub_services_raw.business_unit_aud.lead_types
+  mod_hub_name:
+    lineage:
+      - datalake_hub_services_raw.business_unit_aud.name_mod
+  mod_business_context:
+    lineage:
+      - datalake_hub_services_raw.business_unit_aud.business_context_mod
+  mod_sdr_type:
+    lineage:
+      - datalake_hub_services_raw.business_unit_aud.sdr_type_mod
+  mod_negotiation_type:
+    lineage:
+      - datalake_hub_services_raw.business_unit_aud.negotiation_type_mod
+  mod_lead_type:
+    lineage:
+      - datalake_hub_services_raw.business_unit_aud.lead_type_mod
+  ts_created:
+    lineage:
+      - datalake_hub_services_raw.business_unit_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_hub_services_raw.business_unit_aud.updated_at
+  year:
+    lineage:
+      - datalake_hub_services_raw.business_unit_aud.year
+  month:
+    lineage:
+      - datalake_hub_services_raw.business_unit_aud.month
+  day:
+    lineage:
+      - datalake_hub_services_raw.business_unit_aud.day

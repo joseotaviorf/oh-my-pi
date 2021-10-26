@@ -1,0 +1,34 @@
+---
+database_name: datalake_hub_services_clean
+table_name: visitor
+columns:
+  id:
+    lineage:
+      - datalake_hub_services_raw.visitor.id
+  version:
+    lineage:
+      - datalake_hub_services_raw.visitor.version
+  visitor_name:
+    lineage:
+      - datalake_hub_services_raw.visitor.name
+  email:
+    lineage:
+      - datalake_hub_services_raw.visitor.email
+  phone_number:
+    lineage:
+      - datalake_hub_services_raw.visitor.phone_number
+  ts_created:
+    lineage:
+      - datalake_hub_services_raw.visitor.created_at
+  ts_updated:
+    lineage:
+      - datalake_hub_services_raw.visitor.updated_at
+  year:
+    lineage:
+      - datalake_hub_services_raw.visitor.year
+  month:
+    lineage:
+      - datalake_hub_services_raw.visitor.month
+  day:
+    lineage:
+      - datalake_hub_services_raw.visitor.day

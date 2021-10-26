@@ -1,0 +1,16 @@
+SELECT
+    id,
+    business_unit_id AS id_business_unit,
+    version,
+    name AS region_name,
+    created_at AS ts_created,
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
+FROM
+    datalake_hub_services_raw.region
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}

@@ -1,0 +1,40 @@
+---
+database_name: datalake_hub_services_clean
+table_name: business_unit
+columns:
+  id:
+    lineage:
+      - datalake_hub_services_raw.business_unit.id
+  version:
+    lineage:
+      - datalake_hub_services_raw.business_unit.version
+  hub_name:
+    lineage:
+      - datalake_hub_services_raw.business_unit.name
+  business_context:
+    lineage:
+      - datalake_hub_services_raw.business_unit.business_context
+  sdr_type:
+    lineage:
+      - datalake_hub_services_raw.business_unit.sdr_type
+  negotiation_type:
+    lineage:
+      - datalake_hub_services_raw.business_unit.negotiation_type
+  lead_types:
+    lineage:
+      - datalake_hub_services_raw.business_unit.lead_types
+  ts_created:
+    lineage:
+      - datalake_hub_services_raw.business_unit.created_at
+  ts_updated:
+    lineage:
+      - datalake_hub_services_raw.business_unit.updated_at
+  year:
+    lineage:
+      - datalake_hub_services_raw.business_unit.year
+  month:
+    lineage:
+      - datalake_hub_services_raw.business_unit.month
+  day:
+    lineage:
+      - datalake_hub_services_raw.business_unit.day
