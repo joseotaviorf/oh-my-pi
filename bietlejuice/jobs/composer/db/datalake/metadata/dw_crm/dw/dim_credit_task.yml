@@ -37,9 +37,6 @@ columns:
   is_task_auto_completed:
     lineage:
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.is_task_auto_completed
-  ts_analyst_started:
-    lineage:
-      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_analyst_started
   ts_start:
     lineage:
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_started

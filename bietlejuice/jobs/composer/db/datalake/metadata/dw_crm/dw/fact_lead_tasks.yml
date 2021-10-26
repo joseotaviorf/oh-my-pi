@@ -1,25 +1,25 @@
 ---
 database_name: dw_crm_migration
 table_name: fact_lead_tasks
-# columns:
-#   sk_created_date:
-#     lineage:
-#       - dw_crm_migration.fact_lead_task_actions.sk_created_date
-#   sk_first_realized_date:
-#     lineage:
-#       - dw_crm_migration.fact_lead_task_actions.sk_created_date
-#   sk_first_resolved_date:
-#     lineage:
-#       - dw_crm_migration.fact_lead_task_actions.sk_created_date
-#   sk_lead:
-#     lineage:
-#       - dw_crm_migration.fact_lead_task_actions.sk_created_date.sk_lead
-#   sk_task:
-#     lineage:
-#       - dw_crm_migration.fact_lead_task_actions.sk_created_date.sk_task
-#   sk_user_first_assignee:
-#     lineage:
-#       - dw_crm_migration.fact_lead_task_actions.sk_created_date.sk_assignee
-#   sk_user_first_resolver:
-#     lineage:
-#       - dw_crm_migration.fact_lead_task_actions.sk_created_date.sk_assignee
+columns:
+  sk_created_date:
+    lineage:
+      - dw_crm_migration.fact_lead_task_actions.sk_action_date
+  sk_first_realized_date:
+    lineage:
+      - dw_crm_migration.fact_lead_task_actions.sk_action_date
+  sk_first_resolved_date:
+    lineage:
+      - dw_crm_migration.fact_lead_task_actions.sk_action_date
+  sk_lead:
+    lineage:
+      - dw_crm_migration.fact_lead_task_actions.sk_created_date.sk_lead
+  sk_task:
+    lineage:
+      - dw_crm_migration.fact_lead_task_actions.sk_created_date.sk_task
+  sk_user_first_assignee:
+    lineage:
+      - dw_crm_migration.fact_lead_task_actions.sk_created_date.sk_assignee
+  sk_user_first_resolver:
+    lineage:
+      - dw_crm_migration.fact_lead_task_actions.sk_created_date.sk_assignee

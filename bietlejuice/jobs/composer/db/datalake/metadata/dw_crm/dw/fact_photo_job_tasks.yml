@@ -5,7 +5,7 @@ columns:
   sk_action_date:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_action_date
-  sk_aasignee:
+  sk_assignee:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_assignee
   sk_completed_date:

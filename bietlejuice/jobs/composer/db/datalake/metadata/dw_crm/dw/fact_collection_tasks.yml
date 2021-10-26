@@ -34,10 +34,10 @@ columns:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task
   sk_task_action_end_date:
     lineage:
-      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task_action_end_date
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task_user_end_date
   sk_task_action_start_date:
     lineage:
-      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task_action_start_date
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task_user_start_date
   # sk_tenant:
   #   lineage:
   #     - dw_janus.fact_listing_rent_flows.sk_tenant
@@ -52,7 +52,7 @@ columns:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.action_user_name
   task_action_type:
     lineage:
-      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.task_action_type
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.task_user_type
   task_user_action_resolve_hours:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.task_user_resolve_hours
