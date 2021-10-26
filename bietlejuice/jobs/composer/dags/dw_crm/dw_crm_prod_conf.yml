@@ -4,6 +4,11 @@ full_tables:
   - dim_credit_task
   - dim_inspection_task
   - dim_payment_task
+  - dim_onboarding
+  - dim_photo_job
+  - dim_repair
+  - dim_ungrouped
+  - dim_visit
   - fact_lead_tasks
 incremental_load_parameters:
   dw_query_filters:
