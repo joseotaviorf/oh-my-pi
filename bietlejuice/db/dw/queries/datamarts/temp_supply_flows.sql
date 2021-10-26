@@ -309,7 +309,7 @@ FROM
     dates_by_context
 GROUP BY 1,2,3,4,5
 ),
-hybrid_dates AS ( -- creating hybrid scenery when Calculadora de Aluguel, IndicaAi
+hybrid_dates AS ( -- creating hybrid scenery when Calculadora de Aluguel, IndicaAi, Spinver
 SELECT
     sk_house_listing_flow,
     sk_house_listing,
@@ -317,99 +317,99 @@ SELECT
     sk_region,
     sk_user_lead_affiliate,
     CASE
-        WHEN mkt_origin_rent IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents') AND mkt_origin_sale IS NULL THEN mkt_origin_rent
+        WHEN mkt_origin_rent IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents','Partners') AND mkt_origin_sale IS NULL THEN mkt_origin_rent
         ELSE mkt_origin_sale
     END AS mkt_origin_sale,
     CASE
-        WHEN mkt_origin_sale IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents') AND mkt_origin_rent IS NULL THEN mkt_origin_sale
+        WHEN mkt_origin_sale IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents','Partners') AND mkt_origin_rent IS NULL THEN mkt_origin_sale
         ELSE mkt_origin_rent
     END AS mkt_origin_rent,
     CASE
-        WHEN mkt_origin_rent IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents') AND mkt_completion_sale IS NULL THEN mkt_completion_rent
+        WHEN mkt_origin_rent IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents','Partners') AND mkt_completion_sale IS NULL THEN mkt_completion_rent
         ELSE mkt_completion_sale
     END AS mkt_completion_sale,
     CASE
-        WHEN mkt_origin_sale IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents') AND mkt_completion_rent IS NULL THEN mkt_completion_sale
+        WHEN mkt_origin_sale IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents','Partners') AND mkt_completion_rent IS NULL THEN mkt_completion_sale
         ELSE mkt_completion_rent
     END AS mkt_completion_rent,
     CASE
-        WHEN mkt_origin_rent IN ('Price Calculator','Indica Aí - General','Indica Aí - Agents') AND mkt_channel_sale IS NULL THEN mkt_channel_rent
+        WHEN mkt_origin_rent IN ('Price Calculator','Indica Aí - General','Indica Aí - Agents','Partners') AND mkt_channel_sale IS NULL THEN mkt_channel_rent
         ELSE mkt_channel_sale
     END AS mkt_channel_sale,
     CASE
-        WHEN mkt_origin_sale IN ('Price Calculator','Indica Aí - General','Indica Aí - Agents') AND mkt_channel_rent IS NULL THEN mkt_channel_sale
+        WHEN mkt_origin_sale IN ('Price Calculator','Indica Aí - General','Indica Aí - Agents','Partners') AND mkt_channel_rent IS NULL THEN mkt_channel_sale
         ELSE mkt_channel_rent
     END AS mkt_channel_rent,
     CASE
-        WHEN mkt_origin_rent IN ('Price Calculator','Indica Aí - General','Indica Aí - Agents') AND mkt_source_sale IS NULL THEN mkt_source_rent
+        WHEN mkt_origin_rent IN ('Price Calculator','Indica Aí - General','Indica Aí - Agents','Partners') AND mkt_source_sale IS NULL THEN mkt_source_rent
         ELSE mkt_source_sale
     END AS mkt_source_sale,
     CASE
-        WHEN mkt_origin_sale IN ('Price Calculator','Indica Aí - General','Indica Aí - Agents') AND mkt_source_rent IS NULL THEN mkt_source_sale
+        WHEN mkt_origin_sale IN ('Price Calculator','Indica Aí - General','Indica Aí - Agents','Partners') AND mkt_source_rent IS NULL THEN mkt_source_sale
         ELSE mkt_source_rent
     END AS mkt_source_rent,
     CASE
-        WHEN mkt_origin_rent IN ('Price Calculator','Indica Aí - General','Indica Aí - Agents') AND mkt_medium_sale IS NULL THEN mkt_medium_rent
+        WHEN mkt_origin_rent IN ('Price Calculator','Indica Aí - General','Indica Aí - Agents','Partners') AND mkt_medium_sale IS NULL THEN mkt_medium_rent
         ELSE mkt_medium_sale
     END AS mkt_medium_sale,
     CASE
-        WHEN mkt_origin_sale IN ('Price Calculator','Indica Aí - General','Indica Aí - Agents') AND mkt_medium_rent IS NULL THEN mkt_medium_sale
+        WHEN mkt_origin_sale IN ('Price Calculator','Indica Aí - General','Indica Aí - Agents','Partners') AND mkt_medium_rent IS NULL THEN mkt_medium_sale
         ELSE mkt_medium_rent
     END AS mkt_medium_rent,
     CASE
-        WHEN mkt_origin_rent IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents') AND sales_company_sale IS NULL THEN sales_company_rent
+        WHEN mkt_origin_rent IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents','Partners') AND sales_company_sale IS NULL THEN sales_company_rent
         ELSE sales_company_sale
     END AS sales_company_sale,
     CASE
-        WHEN mkt_origin_sale IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents') AND sales_company_rent IS NULL THEN sales_company_sale
+        WHEN mkt_origin_sale IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents','Partners') AND sales_company_rent IS NULL THEN sales_company_sale
         ELSE sales_company_rent
     END AS sales_company_rent,
     CASE
-        WHEN mkt_origin_rent IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents') AND sourcing_ops_sale IS NULL THEN sourcing_ops_rent
+        WHEN mkt_origin_rent IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents','Partners') AND sourcing_ops_sale IS NULL THEN sourcing_ops_rent
         ELSE sourcing_ops_sale
     END AS sourcing_ops_sale,
     CASE
-        WHEN mkt_origin_sale IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents') AND sourcing_ops_rent IS NULL THEN sourcing_ops_sale
+        WHEN mkt_origin_sale IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents','Partners') AND sourcing_ops_rent IS NULL THEN sourcing_ops_sale
         ELSE sourcing_ops_rent
     END AS sourcing_ops_rent,
     CASE
-        WHEN mkt_origin_rent IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents') AND lead_origin_sale IS NULL THEN lead_origin_rent
+        WHEN mkt_origin_rent IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents','Partners') AND lead_origin_sale IS NULL THEN lead_origin_rent
         ELSE lead_origin_sale
     END AS lead_origin_sale,
     CASE
-        WHEN mkt_origin_sale IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents') AND lead_origin_rent IS NULL THEN lead_origin_sale
+        WHEN mkt_origin_sale IN ('Price Calculator', 'Indica Aí - General','Indica Aí - Agents','Partners') AND lead_origin_rent IS NULL THEN lead_origin_sale
         ELSE lead_origin_rent
     END AS lead_origin_rent,
     CASE
-        WHEN mkt_origin_rent IN ('Price Calculator', 'Indica Aí - General', 'Indica Aí - Agents') AND funnel_drop_reason_sale IS NULL THEN funnel_drop_reason_rent
+        WHEN mkt_origin_rent IN ('Price Calculator', 'Indica Aí - General', 'Indica Aí - Agents','Partners') AND funnel_drop_reason_sale IS NULL THEN funnel_drop_reason_rent
 		ELSE funnel_drop_reason_sale
 	END AS funnel_drop_reason_sale,
 	CASE
-		WHEN mkt_origin_sale IN ('Price Calculator','Indica Aí - General', 'Indica Aí - Agents') AND funnel_drop_reason_rent IS NULL  THEN funnel_drop_reason_sale
+		WHEN mkt_origin_sale IN ('Price Calculator','Indica Aí - General', 'Indica Aí - Agents','Partners') AND funnel_drop_reason_rent IS NULL  THEN funnel_drop_reason_sale
 		ELSE funnel_drop_reason_rent
 	END AS funnel_drop_reason_rent,
     CASE
-		WHEN mkt_origin_rent IN ('Price Calculator', 'Indica Aí - General', 'Indica Aí - Agents') AND sk_lead_date_sale<0 THEN sk_lead_date_rent
+		WHEN mkt_origin_rent IN ('Price Calculator', 'Indica Aí - General', 'Indica Aí - Agents','Partners') AND sk_lead_date_sale<0 THEN sk_lead_date_rent
 		ELSE sk_lead_date_sale
 	END AS sk_lead_date_sale,
 	CASE
-		WHEN mkt_origin_sale IN ('Price Calculator','Indica Aí - General', 'Indica Aí - Agents') AND sk_lead_date_rent<0 THEN sk_lead_date_sale
+		WHEN mkt_origin_sale IN ('Price Calculator','Indica Aí - General', 'Indica Aí - Agents','Partners') AND sk_lead_date_rent<0 THEN sk_lead_date_sale
 		ELSE sk_lead_date_rent
 	END AS sk_lead_date_rent,
     CASE
-		WHEN mkt_origin_rent IN ('Price Calculator', 'Indica Aí - General', 'Indica Aí - Agents') AND sk_prospect_date_sale<0 THEN sk_prospect_date_rent
+		WHEN mkt_origin_rent IN ('Price Calculator', 'Indica Aí - General', 'Indica Aí - Agents','Partners') AND sk_prospect_date_sale<0 THEN sk_prospect_date_rent
 		ELSE sk_prospect_date_sale
 	END AS sk_prospect_date_sale,
 	CASE
-		WHEN mkt_origin_sale IN ('Price Calculator', 'Indica Aí - General', 'Indica Aí - Agents') AND sk_prospect_date_rent<0 THEN sk_prospect_date_sale
+		WHEN mkt_origin_sale IN ('Price Calculator', 'Indica Aí - General', 'Indica Aí - Agents','Partners') AND sk_prospect_date_rent<0 THEN sk_prospect_date_sale
 		ELSE sk_prospect_date_rent
 	END AS sk_prospect_date_rent,
 	CASE
-		WHEN mkt_origin_rent IN ('Price Calculator','Indica Aí - General', 'Indica Aí - Agents') AND sk_qualified_date_sale<0 THEN sk_qualified_date_rent
+		WHEN mkt_origin_rent IN ('Price Calculator','Indica Aí - General', 'Indica Aí - Agents','Partners') AND sk_qualified_date_sale<0 THEN sk_qualified_date_rent
 		ELSE sk_qualified_date_sale
 	END AS sk_qualified_date_sale,
 	CASE
-		WHEN mkt_origin_sale IN ('Price Calculator','Indica Aí - General', 'Indica Aí - Agents') AND sk_qualified_date_rent<0 THEN sk_qualified_date_sale
+		WHEN mkt_origin_sale IN ('Price Calculator','Indica Aí - General', 'Indica Aí - Agents','Partners') AND sk_qualified_date_rent<0 THEN sk_qualified_date_sale
 		ELSE sk_qualified_date_rent
 	END AS sk_qualified_date_rent,
 	sk_opportunity_date_sale,
@@ -492,7 +492,7 @@ LEFT JOIN
     dim_region dr
     ON llf.sk_region = dr.sk_region
 ),
-adjusting_prospect AS ( --creating prospect date when Indica Ai
+adjusting_prospect AS ( --creating prospect date when Indica Ai and Spinver
 SELECT
     llf.sk_house_listing_flow,
     llf.sk_house_listing,
@@ -520,11 +520,11 @@ SELECT
     llf.sk_lead_date_rent,
     llf.sk_lead_date_sale,
     CASE
-        WHEN (sk_prospect_date_rent<0 AND sk_prospect_date_sale>0 AND mkt_origin_rent IN ('Indica Aí - Agents', 'Indica Aí - General')) THEN sk_prospect_date_sale
+        WHEN (sk_prospect_date_rent<0 AND sk_prospect_date_sale>0 AND mkt_origin_rent IN ('Indica Aí - Agents', 'Indica Aí - General','Partners')) THEN sk_prospect_date_sale
         ELSE sk_prospect_date_rent
     END AS sk_prospect_date_rent,
     CASE
-        WHEN (sk_prospect_date_sale<0 AND sk_prospect_date_rent>0 AND mkt_origin_sale IN ('Indica Aí - Agents', 'Indica Aí - General')
+        WHEN (sk_prospect_date_sale<0 AND sk_prospect_date_rent>0 AND mkt_origin_sale IN ('Indica Aí - Agents', 'Indica Aí - General','Partners')
             AND city_group IN ('RMSP', 'Rio de Janeiro', 'Belo Horizonte', 'Porto Alegre')) THEN sk_prospect_date_rent
         ELSE sk_prospect_date_sale
     END AS sk_prospect_date_sale,
