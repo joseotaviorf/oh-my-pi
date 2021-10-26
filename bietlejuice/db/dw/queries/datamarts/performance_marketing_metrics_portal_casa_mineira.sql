@@ -131,8 +131,8 @@ contacts as (
         --ADVERTISER DIMENSIONS
         rea.id id_advertiser,
         rea.real_estate_agency_name advertiser,
-        rea.uf uf_advertiser,
-        rea.city as city_advertiser,
+        ufa.uf_initials uf_advertiser,
+        cta.city_name as city_advertiser,
         CASE WHEN rea.id IN ('1') THEN 'CM'
             WHEN rea.id IN ('164') THEN '5A'
             ELSE 'Client'
@@ -142,9 +142,9 @@ contacts as (
             WHEN h.goal='venda' THEN 'Sale'
             WHEN h.goal='aluguel' THEN 'Rent'
         END AS business_context,
-        uf.uf_initials uf_listing,
-        ct.city_name city_listing,
-        ct.city_name AS city_group,
+        ufl.uf_initials uf_listing,
+        ctl.city_name city_listing,
+        ctl.city_name AS city_group,
         -- TAXONOMY DIMENSIONS
         CASE
             WHEN rea.id IN ('1') THEN 'imobiliaria'
@@ -163,10 +163,14 @@ contacts as (
             ON h.id_real_estate_agency = rea.id
         LEFT JOIN datalake_casa_mineira_portal_clean_prod.neighborhood AS n
             ON n.id = h.id_neighborhood
-        LEFT JOIN datalake_casa_mineira_portal_clean_prod.city AS ct
-            ON n.id_city = ct.id
-        LEFT JOIN datalake_casa_mineira_portal_clean_prod.uf AS uf
-            ON ct.id_uf = uf.id
+        LEFT JOIN datalake_casa_mineira_portal_clean_prod.city AS ctl
+            ON n.id_city = ctl.id
+        LEFT JOIN datalake_casa_mineira_portal_clean_prod.city AS cta
+            ON rea.id_city = cta.id
+        LEFT JOIN datalake_casa_mineira_portal_clean_prod.uf AS ufl
+            ON ctl.id_uf = ufl.id
+        LEFT JOIN datalake_casa_mineira_portal_clean_prod.uf AS ufa
+            ON cta.id_uf = ufa.id
 ),
 -----------------------------------------------------------------------------------------------------------
 -- Join Contacts from Prod, Events From Amplitude and Taxonomy from Sheets and introduce NULLs for UNION --
@@ -182,13 +186,13 @@ SELECT
     c.business_context,
     c.uf_listing,
     c.city_listing,
-    COALESCE(t.mkt_origin, 'Portal Casa Mineira') AS mkt_origin,
-    COALESCE(t.mkt_channel, 'Other') AS mkt_channel,
+    COALESCE(t.mkt_origin, 'Other') AS mkt_origin,
+    COALESCE(t.mkt_channel, 'Not Mapped') AS mkt_channel,
     COALESCE(t.mkt_medium, 'Not Mapped') AS mkt_medium,
     COALESCE(t.mkt_source, 'Not Mapped') AS mkt_source,
     c.mkt_business,
     c.city_group,
-    COALESCE(evt.utm_campaign, 'Lost Tracking') AS utm_campaign,
+    COALESCE(evt.utm_campaign, '') AS utm_campaign,
     NULL::TEXT AS campaign_name,
     order_new_contact_flow,
     order_new_contact_prospect,
