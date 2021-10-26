@@ -1,0 +1,26 @@
+database_name: datalake_crm_tasks
+table_name: lead_tasks
+columns:
+  id_task:
+    lineage:
+      - datalake_crm.tasks.id
+  id_rep:
+    lineage:
+      - datalake_crm.tasks.id_assignee
+  id_lead:
+    lineage:
+      - datalake_crm.tasks.id_origin
+  id_first_rep:
+    lineage:
+      - datalake_crm.tasks_actions.metadata_old_value
+      - datalake_crm.tasks.id_assignee
+  type:
+    lineage:
+      - datalake_crm.tasks.type
+  ts_created:
+    lineage:
+      - datalake_crm.tasks.ts_start
+  ts_closed:
+    lineage:
+      - datalake_crm.tasks_actions.ts_action
+      - datalake_crm.tasks.ts_completed
