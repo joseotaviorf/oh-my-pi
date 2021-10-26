@@ -4,7 +4,6 @@ SELECT
     nome AS real_estate_agency_name,
     nome_completo AS real_estate_agency_full_name,
     slug AS real_estate_agency_slug_name,
-    uf,
     bairro AS neighborhood,
     logradouro AS address,
     cep AS zip_code,
