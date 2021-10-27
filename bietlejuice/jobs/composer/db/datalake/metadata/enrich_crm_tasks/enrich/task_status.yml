@@ -1,5 +1,5 @@
 database_name: datalake_crm_tasks
-table_name: lead_tasks
+table_name: task_status
 columns:
   id_task:
     lineage:
@@ -7,7 +7,7 @@ columns:
   id_rep:
     lineage:
       - datalake_crm.tasks.id_assignee
-  id_lead:
+  id_origin:
     lineage:
       - datalake_crm.tasks.id_origin
   id_first_rep:

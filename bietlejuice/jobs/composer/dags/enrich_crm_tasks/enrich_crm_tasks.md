@@ -12,7 +12,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 ### Outputs
 
 - In datalake `enrich` layer, via full load:
-    * `datalake_crm_tasks.lead_tasks`
+    * `datalake_crm_tasks.task_status`
     
 ### Responsible Data Team
 ​

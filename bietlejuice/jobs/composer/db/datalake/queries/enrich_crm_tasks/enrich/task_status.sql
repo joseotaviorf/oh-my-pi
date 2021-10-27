@@ -30,7 +30,7 @@ rep_info AS (
 SELECT DISTINCT
   t.id AS id_task,
   CAST(t.id_assignee AS BIGINT) AS id_rep,
-  t.id_origin AS id_lead,
+  t.id_origin,
   CAST(COALESCE(ri.id_first_rep, t.id_assignee, -1) AS BIGINT) AS id_first_rep,
   t.type,
   am.number_of_reschedules,
@@ -54,4 +54,6 @@ LEFT JOIN
   rep_info ri
     ON t.id = ri.id_task
 WHERE
-  t.type IN ("ConverterLead", "ConverterLeadPrioritario")
+  t.type IN (
+    'ConverterLead', 'ConverterLeadPrioritario', 'FupFoto', 'AgendarJobDeFotografo'
+  )
