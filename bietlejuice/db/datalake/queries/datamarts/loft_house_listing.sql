@@ -100,7 +100,7 @@ dataset_distances AS (
 ),
 regions AS (
     SELECT
-        pr.id AS id_neighborhood,
+        r.id AS id_neighborhood,
         r.name AS neighborhood,
         r.city_name AS city,
         ST_POLYGON(pr.polygon) AS geometry

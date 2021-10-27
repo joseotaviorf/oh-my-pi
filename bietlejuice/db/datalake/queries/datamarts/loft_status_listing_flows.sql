@@ -19,7 +19,7 @@ WITH loft_listings_raw AS (
 ),
 regions AS (
     SELECT
-        pr.id AS id_neighborhood,
+        r.id AS id_neighborhood,
         r.name AS neighborhood,
         ST_POLYGON(pr.polygon) AS geometry
     FROM
