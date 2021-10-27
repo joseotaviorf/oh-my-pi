@@ -1,4 +1,5 @@
 SELECT
+    NULLIF(business_context,'') AS business_context,
     NULLIF(city_group,'') AS city_group,
     NULLIF(listing_type,'') AS listing_type,
     NULLIF(FLOAT(new_installed_plaquinhas_target),'') AS new_installed_plaquinhas_target,
