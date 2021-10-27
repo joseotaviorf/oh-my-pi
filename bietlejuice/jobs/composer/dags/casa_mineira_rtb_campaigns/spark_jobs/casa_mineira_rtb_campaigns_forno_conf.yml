@@ -8,9 +8,9 @@ metrics:
   - clicksCount
   - campaignCost
   - conversionsCount
-  - conversionsValue
   - cr
   - ctr
+  # - conversionsValue
   # - roas
 group_by:
   - day
