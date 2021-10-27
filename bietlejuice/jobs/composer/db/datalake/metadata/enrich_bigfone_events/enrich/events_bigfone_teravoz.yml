@@ -1,0 +1,52 @@
+database_name: datalake_bigfone_events
+table_name: events_bigfone_teravoz
+columns:
+  id_event: 
+    lineage:
+      - datalake_bigfone_clean.event.id
+      - datalake_teravoz_clean.calls.id
+  id_call: 
+    lineage:
+      - datalake_bigfone_clean.event.call_id
+      - datalake_bigfone_clean.event.metadata
+      - datalake_teravoz_clean.calls.id
+  direction: 
+    lineage:
+      - datalake_bigfone_clean.event.metadata
+      - datalake_teravoz_clean.calls.call_direction
+  seconds_talk_duration: 
+    lineage:
+      - datalake_teravoz_clean.calls.seconds_talk_duration
+  provider: 
+    lineage:
+      - datalake_bigfone_clean.event.provider
+  event: 
+    lineage:
+      - datalake_bigfone_clean.event.metadata
+      - datalake_teravoz_clean.calls.status
+  ts_created: 
+    lineage:
+      - datalake_bigfone_clean.event.event_timestamp
+      - datalake_teravoz_clean.calls.ts_started_local
+  ts_created_local: 
+    lineage:
+      - datalake_bigfone_clean.event.event_timestamp
+      - datalake_teravoz_clean.calls.ts_started_local
+  ts_received: 
+    lineage:
+      - datalake_bigfone_clean.event.received_timestamp
+  ts_received_local: 
+    lineage:
+      - datalake_bigfone_clean.event.received_timestamp
+  year: 
+    lineage:
+      - datalake_bigfone_clean.event.year
+      - datalake_teravoz_clean.calls.year
+  month: 
+    lineage:
+      - datalake_bigfone_clean.event.month
+      - datalake_teravoz_clean.calls.month
+  day: 
+    lineage:
+      - datalake_bigfone_clean.event.day
+      - datalake_teravoz_clean.calls.day

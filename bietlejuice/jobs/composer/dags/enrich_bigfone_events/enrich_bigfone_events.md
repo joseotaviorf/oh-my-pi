@@ -17,6 +17,7 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output table on enrich layer:
 
 - `events`
+- `events_bigfone_teravoz`
 
 ### Responsible Data Team
 ​
