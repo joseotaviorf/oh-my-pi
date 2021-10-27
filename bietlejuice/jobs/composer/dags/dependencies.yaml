@@ -636,6 +636,15 @@ bietlejuice.enrich_lead_tracking:
   - bietlejuice.ebdb:create-clean-lead-in-data-lake
   - bietlejuice.enrich_amplitude_lead:load-enrich-lead-origin
 
+bietlejuice.enrich_listing_flow:
+  - bietlejuice.ebdb:create-clean-lead-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-photographer-job-in-data-lake
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
+  - bietlejuice.enrich_ebdb_user:load-enrich-user
+  - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
+  - bietlejuice.enrich_lead:load-enrich-conversion-lead
+  - bietlejuice.enrich_lead:load-enrich-lead
+
 bietlejuice.enrich_listing_owners:
   - bietlejuice.ebdb:create-clean-proposal-in-data-lake
   - bietlejuice.enrich_booking:load-enrich-booking

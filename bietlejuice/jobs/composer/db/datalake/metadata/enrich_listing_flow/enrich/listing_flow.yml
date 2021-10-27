@@ -1,0 +1,78 @@
+database_name: datalake_listing_flow
+table_name: listing_flow
+columns:
+  id_lead:
+    lineage:
+      - datalake_lead.lead.id
+  id_conversion:
+    lineage:
+      - datalake_lead.conversion_lead.id
+  id_photo_job:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.id
+  id_house:
+    lineage:
+      - datalake_ebdb_listing.house.id
+  id_rep:
+    lineage:
+      - datalake_ebdb_listing.house.id_user_registrant
+      - datalake_ebdb_user_revision_entity.user_revision_entity.id_user
+  id_isales_registrant:
+    lineage:
+      - datalake_ebdb_listing.house.id_user_registrant
+  id_affiliate:
+    lineage:
+      - datalake_ebdb_user.user.id
+  id_region:
+    lineage:
+      - datalake_ebdb_listing.house.id_region
+      - datalake_lead.lead.id_region
+  id_first_region:
+    lineage:
+      - datalake_ebdb_listing.house.id_region
+      - datalake_ebdb_clean.lead_aud.id_region
+  dt_lead:
+    lineage:
+      - datalake_ebdb_listing.house.dt_creation
+      - datalake_lead.lead.ts_created
+      - datalake_lead.lead.dt_ad_created
+      - datalake_lead.lead.dt_picked_up
+  dt_prospect:
+    lineage:
+      - datalake_ebdb_listing.house.dt_creation
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_lead.lead.ts_updated
+      - datalake_lead.lead.ts_created
+  dt_first_contact:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_lead.conversion_lead.ts_converted
+  dt_conversion:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+      - datalake_ebdb_listing.house.dt_creation
+      - datalake_lead.conversion_lead.ts_converted
+  dt_qualified:
+    lineage:
+      - datalake_lead.conversion_lead.ts_converted
+  dt_opportunity:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_created
+      - datalake_ebdb_clean.photographer_job.ts_scheduled
+      - datalake_ebdb_clean.photographer_job.ts_photographer_accepted
+      - datalake_ebdb_clean.photographer_job.ts_photos_uploaded
+  dt_first_listing:
+    lineage:
+      - datalake_ebdb_listing.house.dt_first_publication
+  dt_discarded:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  id_user_lead_first_discarder:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.id_user
+  id_user_lead_last_discarder:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.id_user
+  funnel_step:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.problem
