@@ -23,7 +23,7 @@ WITH teravoz_events AS (
       bt.seconds_talk_duration,
       bt.direction,
       FIRST_VALUE(q.queue_name) OVER (PARTITION BY bt.id_call ORDER BY q.queue_name IS NULL, bt.ts_created ASC) AS first_queue,
-      FIRST_VALUE(q.queue_name) OVER (PARTITION BY bt.id_call ORDER BY q.queue_name IS NULL, bt.ts_created DESC) AS last_queue
+      FIRST_VALUE(q.queue_name) OVER (PARTITION BY bt.id_call ORDER BY q.queue_name IS NULL, bt.ts_created DESC) AS last_queue,
       bt.ts_created,
       bt.ts_created_local,
       bt.year,
