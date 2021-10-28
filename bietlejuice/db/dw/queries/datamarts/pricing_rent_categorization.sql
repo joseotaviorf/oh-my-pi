@@ -1,32 +1,70 @@
-WITH min_rev_house AS (
-    SELECT
-        ha.id_house,
-        MIN(rev) min_rev
-    FROM
+WITH rent_modifications AS (
+	SELECT
+	    DISTINCT ha.id_house,
+	    ha.rev,
+	    ha.rent,
+	    ha.mod_rent,
+	    DATE(ha.dt_first_publication) AS first_publication,
+	    DATE(FROM_UNIXTIME(ure.ts_revision/1000)) AS modification,
+	    dhl.sk_house_listing,
+	    dhl.ts_publication,
+	    dhl.ts_listing_version_start,
+	    dhl.ts_listing_version_end,
+	    dhl.rent AS last_rent
+	FROM
         datalake_ebdb_clean_prod.house_aud ha
-    WHERE ha.rent > 0
-        AND dt_first_publication  >= '2021-01-01'
-    GROUP BY 1
+	LEFT JOIN
+        datalake_ebdb_clean_prod.user_revision_entity ure
+          ON ure.id = ha.rev
+	LEFT JOIN
+        dim_house_listing dhl
+          ON dhl.id_house = ha.id_house
+          AND dhl.version > 0
+          AND DATE(FROM_UNIXTIME(ure.ts_revision/1000)) BETWEEN DATE(dhl.ts_listing_version_start) AND COALESCE(DATE(dhl.ts_listing_version_end), current_date)
+	WHERE (mod_rent = True
+        OR modification = first_publication
+        OR modification = DATE(dhl.ts_publication))
 ),
-min_price_houses AS (
-    SELECT
-        DISTINCT ha.id_house,
-        ha.dt_first_publication,
-        ha.rent
-    FROM
-        min_rev_house min
-    INNER JOIN
-        datalake_ebdb_clean_prod.house_aud ha
-          ON ha.rev = min_rev
-          AND min.id_house = ha.id_house
+max_min_modification AS (
+	SELECT
+	    sk_house_listing,
+	    MIN(rev) AS min_rev,
+	    MAX(rev) AS max_rev
+	FROM
+        rent_modifications
+	GROUP BY 1
+),
+pricing_changes AS (
+	SELECT
+	    aml.id_house,
+	    aml.sk_house_listing,
+	    MAX(aml.first_publication) AS first_publication,
+	    MAX(aml.ts_publication) AS ts_publication,
+	    MAX(CASE WHEN min_rev = rev THEN aml.rent END) AS first_rent,
+	    MAX(CASE WHEN max_rev = rev THEN last_rent END) AS last_rent,
+	    MAX(CASE WHEN min_rev = rev THEN modification END) AS dt_first_modification,
+	    MAX(CASE WHEN max_rev = rev THEN modification END) AS dt_last_modification
+	FROM
+        rent_modifications aml
+	LEFT JOIN
+        max_min_modification mmm
+          ON mmm.sk_house_listing = aml.sk_house_listing
+          AND (mmm.min_rev = aml.rev OR mmm.max_rev = aml.rev )
+	WHERE mmm.sk_house_listing is not null
+	GROUP BY 1, 2
 ),
 houses_infos AS (
 	SELECT
-	    DISTINCT min.id_house,
-	    min.dt_first_publication,
+	    DISTINCT dhl.id_house,
+	    dhl.sk_house_listing,
+	    pc.first_publication as dt_first_publication,
+	    dhl.ts_publication,
 	    dhl.ts_house_first_publication,
-	    min.rent AS first_rent,
-	    dhl.house_rent AS last_rent,
+	    pc.first_rent,
+	    pc.last_rent,
+	    dhl.house_rent AS last_rent_dim,
+	    pc.dt_last_modification AS dt_last_rent,
+	    pc.dt_first_modification AS dt_first_rent,
 	    dhl.house_predicted_price,
 	    dhl.house_total_area,
 	    dhl.house_type,
@@ -34,8 +72,8 @@ houses_infos AS (
 	FROM
         dim_house_listing dhl
 	INNER JOIN
-        min_price_houses min
-          ON min.id_house = dhl.id_house
+        pricing_changes pc
+          ON pc.sk_house_listing = dhl.sk_house_listing
 	WHERE is_for_rent = true
         AND version > 0
         AND house_total_area > 5
@@ -43,7 +81,7 @@ houses_infos AS (
 ),
 regions AS (
     SELECT
-        DISTINCT sk_house_listing/1000 AS id_house,
+        DISTINCT sk_house_listing,
         fl.sk_region,
         dr.macro_name,
         dr.city_name
@@ -53,43 +91,53 @@ regions AS (
         dim_region  dr
           ON dr.sk_region  = fl.sk_region
 ),
+listing_to_rented AS (
+    SELECT
+        sk_house_listing,
+        MIN(days_house_listing_to_contract_signed) AS days_house_listing_to_contract_signed
+    FROM fact_listing_rent_flows
+    GROUP BY 1
+),
 listings_info AS (
 	SELECT
         hi.*,
-        DATE_TRUNC('month', hi.dt_first_publication) AS month_publication,
+        DATE_TRUNC('month', hi.ts_publication) AS month_publication,
         first_rent/house_total_area AS first_price_m2,
         last_rent/house_total_area AS last_price_m2,
         house_predicted_price/house_total_area AS calculator_price_m2,
         reg.sk_region,
         reg.macro_name,
         reg.city_name,
-        COUNT(DISTINCT sk_rf) AS rent_flows_em_7_dias,
-        COUNT(DISTINCT sk_booking) AS visits_booked_in_7_days,
-        COUNT(DISTINCT dem.sk_contract) AS contracts_signed_from_7_days_events,
-        AVG(rent) AS avg_rent_contracts_signed_from_7_days_events,
-        avg_rent_contracts_signed_from_7_days_events/house_total_area AS avg_rent_contracts_signed_from_7_days_events_m2
+        ltr.days_house_listing_to_contract_signed,
+        COUNT(DISTINCT CASE WHEN DATEDIFF(day, hi.ts_publication, dem.dt_event) <= 7 THEN dem.sk_rf END) AS rent_flows_em_7_dias,
+        COUNT(DISTINCT CASE WHEN DATEDIFF(day, hi.ts_publication, dem.dt_event) <= 7 THEN dem.sk_booking END) AS visits_booked_in_7_days,
+        COUNT(DISTINCT dem.sk_contract) AS contracts_signed,
+        AVG(rent) AS avg_rent_contracts_signed,
+        avg_rent_contracts_signed/house_total_area AS avg_rent_contracts_signed_m2
 	FROM
         houses_infos hi
 	LEFT JOIN
         datamarts.performance_marketing_metrics_demand dem
-          ON dem.id_house = hi.id_house
-          AND DATEDIFF(day, hi.dt_first_publication, dem.dt_event) <= 7
+          ON dem.sk_house_listing = hi.sk_house_listing
 	LEFT JOIN
         dim_contract dc
           ON dc.sk_contract = dem.sk_contract
+    LEFT JOIN
+    	listing_to_rented ltr
+    	  ON ltr.sk_house_listing = hi.sk_house_listing
 	JOIN
         regions reg
-          ON reg.id_house = hi.id_house
-	GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+          ON reg.sk_house_listing = hi.sk_house_listing
+	GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22
 ),
-contracts AS (
+ contracts AS (
     SELECT
         sk_contract,
         rent,
         DATE(ts_signature) AS date_signature
     FROM
         dim_contract
-    WHERE ts_signature >= '2020-09-01'
+    WHERE ts_signature is not null
 ),
 contract_base AS (
     SELECT
@@ -183,10 +231,21 @@ contracts_city_furn_match_avg AS (
         contracts_city_furn_match
 )
 SELECT
-	DISTINCT listings_info.id_house AS sk_house,
+	DISTINCT listings_info.sk_house_listing,
+	listings_info.id_house AS sk_house,
 	listings_info.dt_first_publication,
+	DATE(listings_info.ts_publication) AS dt_publication,
 	listings_info.first_rent AS first_rent_price,
 	listings_info.last_rent AS last_rent_price,
+	listings_info.dt_first_rent,
+	CASE
+	  WHEN listings_info.dt_last_rent = listings_info.dt_first_rent AND listings_info.first_rent = listings_info.last_rent THEN NULL
+	  ELSE listings_info.dt_last_rent
+	END AS dt_last_rent,
+	CASE
+	  WHEN listings_info.dt_last_rent = listings_info.dt_first_rent AND listings_info.first_rent = listings_info.last_rent THEN NULL
+	  ELSE DATEDIFF(day, listings_info.ts_publication, listings_info.dt_last_rent)
+	END AS days_publication_to_last_price_change,
 	listings_info.house_predicted_price AS calculator_price,
 	listings_info.house_total_area,
 	listings_info.house_type,
@@ -199,17 +258,53 @@ SELECT
 	dr.name AS region_name,
 	listings_info.rent_flows_em_7_dias AS rent_flows_in_7_days,
 	listings_info.visits_booked_in_7_days,
+	listings_info.contracts_signed AS listing_contracts_signed,
+    listings_info.avg_rent_contracts_signed AS avg_rent_listing_contracts_signed,
+    listings_info.avg_rent_contracts_signed_m2 AS avg_rent_listing_contracts_signed_m2,
+    listings_info.days_house_listing_to_contract_signed,
 	COALESCE(COALESCE(full_match.price_3mon, reg_furn_match.price_3mon), city_furn_match.price_3mon) AS avg_price_contracts_signed_m2,
 	COALESCE(COALESCE(full_match.contracts_3mon, reg_furn_match.contracts_3mon), city_furn_match.contracts_3mon) AS total_contracts_compared,
 	COALESCE(COALESCE(full_match.match_type, reg_furn_match.match_type), city_furn_match.match_type) AS match_type,
-	(listings_info.first_price_m2-avg_price_contracts_signed_m2)*1.0/avg_price_contracts_signed_m2 AS diff_listing_contracts,
+	(listings_info.first_price_m2-avg_price_contracts_signed_m2)*1.0/avg_price_contracts_signed_m2 AS diff_first_listing_contracts,
 	CASE
-	  WHEN diff_listing_contracts < 0 THEN '1. menor'
-	  WHEN diff_listing_contracts >= 0 AND diff_listing_contracts < 0.05 THEN '2. até 5% maior'
-	  WHEN diff_listing_contracts >= 0.05 AND diff_listing_contracts < 0.1 THEN '3. até 10% maior'
-	  WHEN diff_listing_contracts >= 0.1 AND diff_listing_contracts < 0.15 THEN  '4. até 15% maior'
-	  WHEN diff_listing_contracts >= 0.15 THEN '5. mais que 15%'
-	END AS pricing_group
+	  WHEN listings_info.dt_last_rent = listings_info.dt_first_rent AND listings_info.first_rent = listings_info.last_rent THEN NULL
+	  ELSE (listings_info.last_price_m2-avg_price_contracts_signed_m2)*1.0/avg_price_contracts_signed_m2
+	END AS diff_last_listing_contracts,
+	(listings_info.first_price_m2-calculator_price_m2)*1.0/nullif(calculator_price_m2,0) AS diff_first_listing_calculator,
+	CASE
+	  WHEN listings_info.dt_last_rent = listings_info.dt_first_rent AND listings_info.first_rent = listings_info.last_rent THEN NULL
+	  ELSE (listings_info.last_price_m2-calculator_price_m2)*1.0/nullif(calculator_price_m2,0)
+	END AS diff_last_listing_calculator,
+	CASE
+	  WHEN diff_first_listing_contracts < 0 THEN '1. menor'
+	  WHEN diff_first_listing_contracts >= 0 AND diff_first_listing_contracts < 0.05 THEN '2. até 5% maior'
+	  WHEN diff_first_listing_contracts >= 0.05 AND diff_first_listing_contracts < 0.1 THEN '3. até 10% maior'
+	  WHEN diff_first_listing_contracts >= 0.1 AND diff_first_listing_contracts < 0.15 THEN  '4. até 15% maior'
+	  WHEN diff_first_listing_contracts >= 0.15 THEN '5. mais que 15%'
+	END AS first_pricing_contracts_group,
+	CASE
+	  WHEN days_publication_to_last_price_change IS NULL THEN NULL
+	  WHEN diff_last_listing_contracts < 0 THEN '1. menor'
+	  WHEN diff_last_listing_contracts >= 0 AND diff_last_listing_contracts < 0.05 THEN '2. até 5% maior'
+	  WHEN diff_last_listing_contracts >= 0.05 AND diff_last_listing_contracts < 0.1 THEN '3. até 10% maior'
+	  WHEN diff_last_listing_contracts >= 0.1 AND diff_last_listing_contracts < 0.15 THEN  '4. até 15% maior'
+	  WHEN diff_last_listing_contracts >= 0.15 THEN '5. mais que 15%'
+	END AS last_pricing_contract_group,
+	CASE
+	  WHEN diff_first_listing_calculator < 0 THEN '1. menor'
+	  WHEN diff_first_listing_calculator >= 0 AND diff_first_listing_calculator < 0.05 THEN '2. até 5% maior'
+	  WHEN diff_first_listing_calculator >= 0.05 AND diff_first_listing_calculator < 0.1 THEN '3. até 10% maior'
+	  WHEN diff_first_listing_calculator >= 0.1 AND diff_first_listing_calculator < 0.15 THEN  '4. até 15% maior'
+	  WHEN diff_first_listing_calculator >= 0.15 THEN '5. mais que 15%'
+	END AS first_pricing_calculator_group,
+	CASE
+	  WHEN days_publication_to_last_price_change IS NULL THEN NULL
+	  WHEN diff_last_listing_calculator < 0 THEN '1. menor'
+	  WHEN diff_last_listing_calculator >= 0 AND diff_last_listing_calculator < 0.05 THEN '2. até 5% maior'
+	  WHEN diff_last_listing_calculator >= 0.05 AND diff_last_listing_calculator < 0.1 THEN '3. até 10% maior'
+	  WHEN diff_last_listing_calculator >= 0.1 AND diff_last_listing_calculator < 0.15 THEN  '4. até 15% maior'
+	  WHEN diff_last_listing_calculator >= 0.15 THEN '5. mais que 15%'
+	END AS last_pricing_calculator_group
 FROM
 	listings_info
 LEFT JOIN
