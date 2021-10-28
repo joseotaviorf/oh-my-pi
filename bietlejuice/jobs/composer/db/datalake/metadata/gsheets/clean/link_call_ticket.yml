@@ -1,0 +1,18 @@
+database_name: datalake_gsheets_clean
+table_name: link_call_ticket
+columns:
+  id_ticket:
+    lineage:
+      - datalake_gsheets_raw.links_calls_entre_30ago_01set.ticket_id
+  task_sid:
+    lineage:
+      - datalake_gsheets_raw.links_calls_entre_30ago_01set.task_sid
+  client_phone_number:
+    lineage:
+      - datalake_gsheets_raw.links_calls_entre_30ago_01set.telefone_cliente
+  ts_started:
+    lineage:
+      - datalake_gsheets_raw.links_calls_entre_30ago_01set.inicio_ligacao
+  fim_ligacao:
+    lineage:
+      - datalake_gsheets_raw.links_calls_entre_30ago_01set.ts_ended

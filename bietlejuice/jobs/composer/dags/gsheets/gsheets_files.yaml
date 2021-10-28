@@ -260,6 +260,11 @@ kenshoo_configuration:
     sheet_name: Kenshoo_Configuration
     clean_table_name: marketing_kenshoo_configuration
 
+links_calls_entre_30ago_01set:
+    sheet_id: 1XUKAl5TnIO1eBDkr_kaK-8IWS9APOe02ebMkHUmVluk
+    sheet_name: links_calls_entre_30Ago_01Set
+    clean_table_name: link_call_ticket
+
 local_holidays:
     sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
     sheet_name: local_holidays
