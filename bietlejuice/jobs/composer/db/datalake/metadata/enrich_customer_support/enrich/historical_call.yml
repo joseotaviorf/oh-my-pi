@@ -1,0 +1,118 @@
+database_name: datalake_customer_support
+table_name: historical_call
+columns:
+  id_ticket: 
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+      - datalake_bigfone_events.events_bigfone_teravoz.id_call
+  id_user:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_user
+  id_contract:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_contract
+  id_agent:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.id_assignee
+  id_segment:
+    lineage:
+      - datalake_bigfone_events.events_bigfone_teravoz.id_call
+  id_call:
+    lineage:
+      - datalake_bigfone_events.events_bigfone_teravoz.id_call
+  id_queue:
+    lineage:
+      - datalake_bigfone_clean.queued.queue
+  department:
+    lineage:
+      - datalake_teravoz_clean.queues.name
+  zendesk_department:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.group_name
+  first_department:
+    lineage:
+      - datalake_teravoz_clean.queues.name
+  last_department:
+    lineage:
+      - datalake_teravoz_clean.queues.name
+  agent_name:
+    lineage:
+      - datalake_gsheets_clean.agents_control.agent_name
+  agent_company:
+    lineage:
+      - datalake_gsheets_clean.agents_control.agent_company
+  agent_manager:
+    lineage:
+      - datalake_gsheets_clean.agents_control.manager
+  agent_email:
+    lineage:
+      - datalake_gsheets_clean.agents_control.email
+  provider:
+    lineage:
+      - datalake_bigfone_events.events_bigfone_teravoz.provider
+  direction:
+    lineage:
+      - datalake_bigfone_events.events_bigfone_teravoz.direction
+  total_minutes_talk_time:
+    lineage:
+      - datalake_teravoz_clean.calls.seconds_talk_duration
+  segment_minutes_talk_time:
+    lineage:
+      - datalake_bigfone_events.events_bigfone_teravoz.seconds_talk_duration
+  minutes_first_resolution_time_calendar:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_first_resolution_calendar
+  minutes_first_resolution_time_business:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.event.minutes_first_resolution_business
+  request_type:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.request_type
+  client_type:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.client_type
+  step_tag:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.step_tag
+  customer_type_tag:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.customer_type_tag
+  contact_motivation_tag:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.contact_motivation_tag
+  contact_theme_tag:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.contact_theme_tag
+  contact_theme_detail_tag:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.contact_theme_detail_tag
+  tags:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+  status:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.status
+  front_or_back:
+    lineage:
+      - datalake_gsheets_clean.department_control.front_or_back
+      - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+  is_bot:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+  is_closed_by_merge:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+  ts_last_updated:
+    lineage:
+      - datalake_bigfone_events.events_bigfone_teravoz.year
+      - datalake_bigfone_events.events_bigfone_teravoz.month
+      - datalake_bigfone_events.events_bigfone_teravoz.day
+  ts_segment_created:
+    lineage:
+      - datalake_bigfone_events.events_bigfone_teravoz.ts_created
+  ts_ticket_started:
+    lineage:
+      - datalake_bigfone_events.events_bigfone_teravoz.ts_created
+  ts_ticket_ended:
+    lineage:
+      - datalake_bigfone_events.events_bigfone_teravoz.ts_created

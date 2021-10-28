@@ -594,6 +594,7 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.chat_fup:load-clean-chats-chat
   - bietlejuice.chat_fup:load-clean-surveys-answer
   - bietlejuice.chat_fup:load-clean-surveys-survey
+  - bietlejuice.enrich_bigfone_events:load-enrich-events-bigfone-teravoz 
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-reservations
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-events
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-events
