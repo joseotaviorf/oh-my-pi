@@ -1,0 +1,6 @@
+database_name: datalake_listing_jobs
+table_name: house_photo_job_tasks
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_listing.house.id

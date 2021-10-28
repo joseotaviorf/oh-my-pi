@@ -595,7 +595,7 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.chat_fup:load-clean-chats-chat
   - bietlejuice.chat_fup:load-clean-surveys-answer
   - bietlejuice.chat_fup:load-clean-surveys-survey
-  - bietlejuice.enrich_bigfone_events:load-enrich-events-bigfone-teravoz 
+  - bietlejuice.enrich_bigfone_events:load-enrich-events-bigfone-teravoz
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-reservations
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-events
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-events
@@ -646,6 +646,11 @@ bietlejuice.enrich_listing_flow:
   - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
   - bietlejuice.enrich_lead:load-enrich-conversion-lead
   - bietlejuice.enrich_lead:load-enrich-lead
+
+bietlejuice.enrich_listing_jobs:
+  - bietlejuice.enrich_crm_tasks:load-enrich-task-status
+  - bietlejuice.enrich_ebdb_listing_jobs:load-enrich-photo-job
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
 
 bietlejuice.enrich_listing_owners:
   - bietlejuice.ebdb:create-clean-proposal-in-data-lake
