@@ -1,0 +1,15 @@
+database_name: datalake_crm_lead
+table_name: lead_tasks
+columns:
+  id_lead:
+    lineage:
+      - datalake_crm_tasks.task_status.id_origin
+  id_rep:
+    lineage:
+      - datalake_crm_tasks.task_status.id_rep
+  ts_created:
+    lineage:
+      - datalake_crm_tasks.task_status.ts_created
+  ts_closed:
+    lineage:
+      - datalake_crm_tasks.task_status.ts_closed
