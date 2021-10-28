@@ -26,3 +26,8 @@ columns:
       - datalake_customer_support.call.agent_company
       - datalake_customer_support.chat.agent_company
       - datalake_customer_support.email.agent_company
+  dt_agent_start:
+    lineage:
+      - datalake_customer_support.call.dt_agent_start
+      - datalake_customer_support.chat.dt_agent_start
+      - datalake_customer_support.email.dt_agent_start

@@ -136,6 +136,9 @@ columns:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_created_local
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_solved_local
+  dt_agent_start:
+    lineage:
+      - datalake_gsheets_clean.agents_control.dt_start
   ts_csat_first_seen:
     lineage:
       - datalake_survicate.surveys.ts_first_seen

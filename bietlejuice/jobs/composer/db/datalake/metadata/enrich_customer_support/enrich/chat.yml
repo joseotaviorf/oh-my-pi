@@ -190,6 +190,9 @@ columns:
   group_name:
     lineage:
       - datalake_chat_fup_clean.chats_chat.group_name
+  dt_agent_start:
+    lineage:
+      - datalake_gsheets_clean.agents_control.dt_start
   ts_survey:
     lineage:
       - datalake_chat_fup_clean.chats_chat.ts_attended

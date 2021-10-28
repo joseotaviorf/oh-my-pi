@@ -208,6 +208,9 @@ columns:
   csat_rating:
     lineage:
       - datalake_bigfone_twilio.call_ivr_events.csat_2
+  dt_agent_start:
+    lineage:
+      - datalake_gsheets_clean.agents_control.dt_start
   ts_csat_answered:
     lineage:
       - datalake_bigfone_twilio.call_ivr_events.ts_created_local
