@@ -13,7 +13,22 @@ More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-This pipeline produces, in datalake raw and clean:
+This pipeline produces, in datalake_hub_services_raw:
+
+Via **incremental load**:
+    - `business_unit`
+    - `business_unit_aud`
+    - `lead`
+    - `lead_aud`
+    - `region`
+    - `region_aud`
+    - `revinfo`
+    - `user_sample`
+    - `user_sample_aud`
+    - `visitor`
+    - `visitor_aud`
+
+This pipeline produces, in datalake_hub_services_clean:
 
 Via **incremental load**:
     - `business_unit`
