@@ -80,6 +80,11 @@ ciq_costs:
     sheet_name: ciq_costs
     clean_table_name: ciq_costs
 
+cities_neighborhoods_ibge_qa:
+    sheet_id: 19N1BVZuKcCw1RByXoL3hqaXSmEhdi7_mbtyOVff4oQs
+    sheet_name: ibge_5a_cities
+    clean_table_name: cities_neighborhoods_ibge_qa
+
 city_share:
     sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
     sheet_name: city_share
@@ -240,6 +245,11 @@ hotjar_demanda_reprimida_fotos:
     sheet_name: demanda_reprimida_fotos
     clean_table_name: hotjar_photos_repressed_demand
 
+households_per_city_ibge:
+    sheet_id: 1pziUrjcQhYv0JGdbv9SDaimgn1Wg9uCxNMba-bGzhkY
+    sheet_name: Domicilios_por_Municipio_Censo_2010
+    clean_table_name: households_per_city_ibge
+
 hub_agents_hierarchy:
     sheet_id: 1LCtC41-pZRUM34Y6jyfSSys5zCXcueZ5uDmXVoQ5zVk
     sheet_name: Output
@@ -344,6 +354,16 @@ marketing_social_media_costs:
     sheet_id: 1yleDGeVtbzrT5rM0zo9AomOZKIGTOiYm-FK0_GNnGNs
     sheet_name: social_media_costs
     clean_table_name: marketing_social_media_costs
+
+marketshare_units_and_tenants:
+    sheet_id: 1VGMK09ibXDkB85srTUbD8a4JsX6iA90BFmKWpon5nsE
+    sheet_name: Market Share
+    clean_table_name: marketshare_units_and_tenants
+
+marketshare_seasonality:
+    sheet_id: 1VGMK09ibXDkB85srTUbD8a4JsX6iA90BFmKWpon5nsE
+    sheet_name: Sazonalidade
+    clean_table_name: marketshare_seasonality
 
 media_plan:
     sheet_id: 1aief4f2Iu0vEZ68ZOxq7cRjkzdz1ePOhZf2lN6rcITQ

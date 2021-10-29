@@ -37,6 +37,7 @@ This pipeline produces the following output tables:
     - `census_subnormal_crowding_areas`
     - `casa_mineira_marketing_manual_shared_costs`
     - `ciq_costs`
+    - `cities_neighborhoods_ibge_qa`
     - `city_share`
     - `closing_analysts_hierarchy`
     - `cod_locale`
@@ -62,6 +63,7 @@ This pipeline produces the following output tables:
     - `from_to_cancellation`
     - `google_searches_share_of_interest`    
     - `hotjar_photos_repressed_demand`
+    - `households_per_city_ibge`
     - `hub_agents_hierarchy` 
     - `inspection_analysis_forms`
     - `inspection_bugs`
@@ -86,6 +88,8 @@ This pipeline produces the following output tables:
     - `marketing_manual_campaign_cities`
     - `marketing_manual_costs_google`
     - `marketing_social_media_costs`
+    - `marketshare_units_and_tenants`
+    - `marketshare_seasonality`
     - `media_plan_current_quarter`
     - `mkt_cost_per_source`
     - `mta_budget_october_2020`
