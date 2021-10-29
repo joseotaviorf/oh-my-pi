@@ -5,6 +5,7 @@ SELECT
   CAST(id_house_cm AS BIGINT) AS id_house_cm,
   CAST(id_house_5a AS BIGINT) AS id_house_5a,
   offer_flow,
+  offer_model,
   status,
   agent,
   executive,

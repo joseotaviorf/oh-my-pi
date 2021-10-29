@@ -19,6 +19,9 @@ columns:
   offer_flow:
     lineage:
       - datalake_gsheets_raw.offers_hub_central.offer_flow
+  offer_model:
+    lineage:
+      - datalake_gsheets_raw.offers_hub_central.offer_model
   status:
     lineage:
       - datalake_gsheets_raw.offers_hub_central.status
