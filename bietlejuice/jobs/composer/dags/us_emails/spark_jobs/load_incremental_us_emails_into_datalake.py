@@ -84,7 +84,7 @@ if __name__ == "__main__":
         table_name, date_filter_column, execution_date
     )
 
-    if not df.rdd.isEmpty():
+    if df:
         df = (
             SparkDataFrameService()
             .input(df)
@@ -113,4 +113,9 @@ if __name__ == "__main__":
             table_name=table_name.lower(),
             df=df,
             partition_cols=raw_partition_cols,
+        )
+    else:
+        logger.warning(
+            f"""m=__main__, execution_date={execution_date}, table_name={table_name.lower()},
+            msg=No data returned from database."""
         )
