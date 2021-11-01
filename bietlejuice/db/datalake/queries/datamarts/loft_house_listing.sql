@@ -63,6 +63,7 @@ qa_listings AS (
     WHERE
         bc.business_context = 'SALE'
         AND bc.status = 'PUBLISHED'
+        AND h.type = 'Apartamento'
 ),
 dataset_distances AS (
     WITH  loft_listings_w_latlong AS (
