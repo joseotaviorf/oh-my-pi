@@ -7,6 +7,9 @@ columns:
   covered_amount:
     lineage:
       - datalake_repairs_raw.instant_approval_preference.covered_amount
+  is_consenting:
+    lineage:
+      - datalake_repairs_raw.instant_approval_preference.is_consenting
   ts_created:
     lineage:
       - datalake_repairs_raw.instant_approval_preference.created_at
