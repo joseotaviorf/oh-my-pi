@@ -66,39 +66,21 @@ SELECT
     ac.phone AS agent_phone,
     ac.email AS agent_email,
     intrc.via,
-    CASE intrc.output.message.content
-        WHEN ''
-            THEN 'Anexo'
-        WHEN NULL
+    CASE
+        WHEN intrc.output.message.attachment.type IS NOT NULL 
             THEN 'Anexo'
         ELSE 'Texto'
     END AS message_type,
     intrc.output.message.template,
-    CASE intrc.output.message.content
-        WHEN ''
-            THEN
-                CASE intrc.output.message.attachment.type
-                    WHEN 'AUDIO'
-                        THEN 'ANEXO - áudio'
-                    WHEN 'FILE'
-                        THEN 'ANEXO - arquivo'
-                    WHEN 'IMAGE'
-                        THEN 'ANEXO - imagem'
-                    WHEN 'VIDEO'
-                        THEN 'ANEXO - vídeo'
-                END
-        WHEN NULL
-            THEN
-                CASE intrc.output.message.attachment.type
-                    WHEN 'AUDIO'
-                        THEN 'ANEXO - áudio'
-                    WHEN 'FILE'
-                        THEN 'ANEXO - arquivo'
-                    WHEN 'IMAGE'
-                        THEN 'ANEXO - imagem'
-                    WHEN 'VIDEO'
-                        THEN 'ANEXO - vídeo'
-                END
+    CASE intrc.output.message.attachment.type
+        WHEN 'AUDIO'
+            THEN 'ANEXO - áudio'
+        WHEN 'FILE'
+            THEN 'ANEXO - arquivo'
+        WHEN 'IMAGE'
+            THEN 'ANEXO - imagem'
+        WHEN 'VIDEO'
+            THEN 'ANEXO - vídeo'
         ELSE intrc.output.message.content
     END AS message_content,
     ci.is_client,
@@ -114,5 +96,6 @@ LEFT JOIN
         ON intrc.id_prospect = ci.id
 WHERE
     intrc.via = 'whatsApp'
-    AND intrc.output.message.content NOT LIKE '%Mensagem automática do QuintoAndar%'
-    AND ts_created LIKE '2021%'
+    AND (intrc.output.message.content NOT LIKE '%Mensagem automática do QuintoAndar%'
+        OR intrc.output.message.attachment.type IS NOT NULL)
+    AND ts_created >= '2021-01-01'
