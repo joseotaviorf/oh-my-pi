@@ -1,0 +1,97 @@
+WITH
+login_created AS (
+    SELECT DISTINCT
+        ts_event as ts_login_created,
+        id_user
+    FROM
+        datalake_amplitude_clean_prod.events
+    WHERE
+        event_type = 'login_user_created'
+),
+sale_users AS (
+  SELECT
+    id_user,
+    DATE(ts_event) AS dt_event,
+    COUNT(DISTINCT CASE WHEN LOWER(JSON_EXTRACT_SCALAR(event_properties, '$.business_context')) = 'sale' THEN uuid END)
+      / CAST(COUNT(DISTINCT uuid) AS DOUBLE) AS prop_sale,
+    AVG(
+        COUNT(DISTINCT CASE WHEN LOWER(JSON_EXTRACT_SCALAR(event_properties, '$.business_context')) = 'sale' THEN uuid END)
+            / CAST(COUNT(DISTINCT uuid) AS DOUBLE)
+        ) OVER(PARTITION BY id_user ORDER BY DATE(ts_event) ROWS BETWEEN 7 PRECEDING AND CURRENT ROW) AS prop_sale_7d
+  FROM
+    datalake_amplitude_clean_prod.events
+  WHERE
+    id_app = 170698
+    AND JSON_EXTRACT_SCALAR(event_properties, '$.business_context') IS NOT NULL
+    AND id_user IS NOT NULL
+    AND year >= 2021
+    AND DATE(ts_event) >= DATE('2021-05-01')
+  GROUP BY 1, 2
+  ORDER BY 1, 2
+),
+combo_events AS (
+    SELECT
+        evt.ts_event,
+        COALESCE(lc.ts_login_created, DATE('2000-01-01')) AS ts_login_created,
+        GREATEST(evt.ts_event, DATE_ADD('DAY', 7, COALESCE(lc.ts_login_created, DATE('2000-01-01')))) AS ts_combo_triggered,
+        evt.id_user,
+        evt.event_type,
+        fl.id_region AS sk_region,
+        fl.id_user AS sk_owner,
+        JSON_EXTRACT_SCALAR(evt.event_properties, '$.house_id') AS id_house,
+        event_type || '_' || JSON_EXTRACT_SCALAR(evt.event_properties, '$.house_id') AS sk_event,
+        MIN(ts_event) OVER(PARTITION BY evt.id_user) AS ts_first_combo_event
+    FROM
+        datalake_amplitude_clean_prod.events AS evt
+        LEFT JOIN datalake_ebdb_clean_prod.house fl
+            ON fl.id = CAST(JSON_EXTRACT_SCALAR(evt.event_properties, '$.house_id') AS BIGINT)
+        JOIN sale_users AS su
+            ON evt.id_user = su.id_user
+            AND DATE(evt.ts_event) = su.dt_event
+            AND prop_sale_7d > 0.5
+        LEFT JOIN login_created AS lc
+            ON lc.id_user = evt.id_user
+    WHERE TRUE
+        AND evt.id_app = 170698
+        AND NULLIF(TRIM(JSON_EXTRACT_SCALAR(evt.event_properties, '$.house_id')), '') IS NOT NULL 
+        AND NULLIF(evt.id_user, '') IS NOT NULL
+        AND DATE(evt.ts_event) >= DATE('2021-06-01')
+        AND year >= 2021
+        AND event_type IN ('listing_tab_clicked', 'unavailable_listing_viewed', 'share_listing',
+                           'mtgsimulator_startsimulation_clicked', 'listing_favorite_set', 'homes_subscription_confirmed')
+        AND LOWER(JSON_EXTRACT_SCALAR(evt.event_properties, '$.business_context')) = 'sale'
+),
+clients_scm as (
+    select 
+        id as id_client,
+        '+55'||phone_number as phone_number,
+        ts_created
+    from datalake_casa_mineira_crm_clean_prod.contact
+),
+base AS (
+     SELECT DISTINCT
+        ce.id_user || '_' || ce.id_house AS id_combo_event,
+        ce.id_user,
+        ce.id_house,
+        ce.sk_owner,
+        ce.sk_region,
+        ce.event_type,
+        du.nome AS user_full_name,
+        du.telefone_principal AS phone,
+        ce.ts_combo_triggered,
+        cm.ts_created as ts_secretaria_client_created,
+        DATE(ce.ts_combo_triggered) AS dt_combo_triggered
+     from combo_events AS ce
+        JOIN datalake_clean.ods_dim_user AS du
+            ON ce.id_user = du.sk_user
+        LEFT JOIN clients_scm AS cm 
+            ON cm.phone_number = du.telefone_principal
+     WHERE
+        ts_event = ts_first_combo_event
+        AND ce.ts_combo_triggered >= date('2021-07-01')
+        AND du.telefone_principal IS NOT NULL
+        AND DATE(ce.ts_combo_triggered) < CURRENT_DATE
+)
+SELECT
+    *
+FROM base
