@@ -1,6 +1,7 @@
 SELECT 
     house_id AS id_house,
     covered_amount,
+    is_consenting,
     created_at AS ts_created, 
     updated_at AS ts_updated,
     year, 
