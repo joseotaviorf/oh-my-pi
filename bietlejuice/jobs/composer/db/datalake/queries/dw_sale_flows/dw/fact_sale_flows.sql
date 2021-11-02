@@ -44,8 +44,6 @@ events_taxonomy AS (
     av.utm_campaign,
     av.branded,
     av.app_type,
-    b.first_update_source,
-    b.is_via_reschedule,
     CAST(av.ts_event AS TIMESTAMP) AS ts_event
   FROM
     datalake_amplitude_visit.amplitude_visit AS av
@@ -67,8 +65,6 @@ UNION
     so.utm_campaign,
     so.branded,
     so.app_type,
-    'Inquilinos' AS b.first_update_source,
-    0 AS is_via_reschedule,
     CAST(so.ts_event AS TIMESTAMP) ts_event
   FROM
     datalake_amplitude_offer.sale_offer_raw_events AS so
@@ -81,8 +77,6 @@ UNION
     tta.utm_campaign,
     tta.branded,
     tta.app_type,
-    'Inquilinos' AS b.first_update_source,
-    0 AS is_via_reschedule,
     CAST(ts_event AS TIMESTAMP) AS ts_event
   FROM
     datalake_amplitude_talk_to_agent.talk_to_agent_events AS tta
@@ -122,8 +116,6 @@ sale_flow_taxonomy AS (
       AND LOWER(COALESCE(td.utm_source,'')) = LOWER(COALESCE(et.utm_source,''))
       AND LOWER(COALESCE(td.utm_medium,'')) = LOWER(COALESCE(et.utm_medium,''))
       AND LOWER(COALESCE(td.branded,'')) = LOWER(COALESCE(et.branded,''))
-      AND LOWER(COALESCE(td.first_update_source,'')) = LOWER(COALESCE(et.first_update_source,''))
-      AND LOWER(COALESCE(td.is_via_reschedule,'')) = LOWER(COALESCE(et.is_via_reschedule,''))
 )
 SELECT
   sf.id_sale_flow AS sk_sale_flow,
@@ -190,8 +182,6 @@ SELECT
   COALESCE(tx.utm_source, '') AS utm_source,
   COALESCE(tx.utm_medium, '') AS utm_medium,
   COALESCE(tx.utm_campaign, '') AS utm_campaign,
-  COALESCE(tx.utm_content, '') AS utm_content,
-  COALESCE(tx.utm_term, '') AS utm_term,
   COALESCE(tx.is_branded, FALSE) AS is_branded,
   COALESCE(tx.mkt_category,'Not Mapped') AS mkt_category,
   COALESCE(tx.mkt_flow,'Not Mapped') AS mkt_flow,
@@ -201,8 +191,6 @@ SELECT
   COALESCE(tx.mkt_medium,'Not Mapped') AS mkt_medium,
   COALESCE(tx.mkt_source,'Not Mapped') AS mkt_source,
   COALESCE(tx.mkt_platform,'Not Mapped') AS mkt_platform,
-  --
-  sf.ts_first_event,
   NOW() AS ts_load
 FROM
   datalake_sale_flows.sale_flow AS sf
