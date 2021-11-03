@@ -724,6 +724,11 @@ bietlejuice.enrich_region:
   - bietlejuice.ebdb:create-clean-region-in-data-lake
   - bietlejuice.gsheets:load-clean-auxiliary-region
 
+bietlejuice.enrich_rent_potential_listing:
+  - bietlejuice.enrich_crm_lead:load-enrich-lead-tasks
+  - bietlejuice.enrich_listing_jobs:load-enrich-house-photo-job-tasks
+  - bietlejuice.enrich_listing_flow:load-enrich-listing-flows-with-reprocessed-leads
+
 bietlejuice.enrich_retsuko:
   - bietlejuice.retsuko:load-clean-account
   - bietlejuice.retsuko:load-clean-entry
