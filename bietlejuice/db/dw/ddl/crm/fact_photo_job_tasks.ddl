@@ -1,5 +1,5 @@
-drop table if exists crm.fact_photo_job_tasks;
-create table if not exists crm.fact_photo_job_tasks (
+drop table if exists crm_20211103.fact_photo_job_tasks;
+create table if not exists crm_20211103.fact_photo_job_tasks (
   sk_task varchar,
   sk_receiver bigint,
   sk_start_date integer,

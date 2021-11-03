@@ -1,5 +1,5 @@
-drop table if exists crm.dim_payment_task;
-create table if not exists crm.dim_payment_task (
+drop table if exists crm_20211103.dim_payment_task;
+create table if not exists crm_20211103.dim_payment_task (
   sk_task varchar primary key,
   flg_solved boolean,
   tenant_refund_status varchar,

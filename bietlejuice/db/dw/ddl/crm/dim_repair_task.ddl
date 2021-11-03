@@ -1,5 +1,5 @@
-drop table if exists crm.dim_repair_task;
-create table if not exists crm.dim_repair_task (
+drop table if exists crm_20211103.dim_repair_task;
+create table if not exists crm_20211103.dim_repair_task (
   sk_task varchar primary key,
   flg_solved boolean,
   score_factor numeric(14,2),
