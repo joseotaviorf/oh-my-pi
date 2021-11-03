@@ -642,12 +642,20 @@ bietlejuice.enrich_lead_tracking:
 
 bietlejuice.enrich_listing_flow:
   - bietlejuice.ebdb:create-clean-lead-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-lead-reason-in-data-lake
   - bietlejuice.ebdb:create-clean-photographer-job-in-data-lake
+  - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
+  - bietlejuice.ebdb:create-clean-partner-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-in-data-lake
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
+  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
+  - bietlejuice.enrich_ebdb_listing_jobs:load-enrich-photo-job
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
   - bietlejuice.enrich_lead:load-enrich-conversion-lead
   - bietlejuice.enrich_lead:load-enrich-lead
+  - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
+  - bietlejuice.enrich_wololo_lead:load-enrich-lead-sales-company
 
 bietlejuice.enrich_listing_jobs:
   - bietlejuice.enrich_crm_tasks:load-enrich-task-status
