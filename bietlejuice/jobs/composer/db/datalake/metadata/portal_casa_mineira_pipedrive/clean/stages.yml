@@ -1,0 +1,37 @@
+---
+database_name: datalake_portal_casa_mineira_pipedrive_clean
+table_name: stages
+columns:
+  id_stage:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.stages.id
+  id_pipeline:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.stages.pipeline_id
+  stage_name:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.stages.name
+  pipeline_name:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.stages.pipeline_name
+  order_number:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.stages.order_nr
+  is_active_flag:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.stages.active_flag
+  ts_added:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.stages.add_time
+  ts_updated:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.stages.update_time
+  year:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.stages.year
+  month:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.stages.month
+  day:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.stages.day

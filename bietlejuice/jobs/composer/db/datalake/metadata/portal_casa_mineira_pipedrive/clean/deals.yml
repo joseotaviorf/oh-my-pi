@@ -1,0 +1,247 @@
+---
+database_name: datalake_portal_casa_mineira_pipedrive_clean
+table_name: deals
+columns:
+  id_deal:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.id
+  id_pipeline:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.pipeline_id
+  id_stage:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.stage_id
+  id_next_activity:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.next_activity_id
+  id_last_activity:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.last_activity_id
+  id_group:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.group_id
+  title:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.title
+  value_formatted:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.formatted_value
+  value_formatted_weighted:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.formatted_weighted_value
+  value_currency_weighted:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.weighted_value_currency
+  currency:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.currency
+  label:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.label
+  status:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.status
+  probability:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.probability
+  lost_reason:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.lost_reason
+  visible_to:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.visible_to
+  renewal_type:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.renewal_type
+  plan:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.plano
+  person:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.person_id
+  person_name:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.person_name
+  creator_user:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.creator_user_id
+  user:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.user_id
+  organization:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.org_id
+  organization_name:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.org_name
+  group_name:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.group_name
+  owner_name:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.owner_name
+  consultant_made_call:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.consultor_que_fez_a_ligacao
+  email:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.cc_email
+  realty_xml:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.xml_imoveis
+  total_properties_text:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.numero_imoveis_extenso
+  next_activity_subject:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.next_activity_subject
+  next_activity_type:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.next_activity_type
+  next_activity_duration:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.next_activity_duration
+  next_activity_note:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.next_activity_note
+  source_channel:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.canal_de_origem
+  term_status:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.status_termo
+  integration_system:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.sistema_de_integracao
+  publication_status:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.status_de_publicacao
+  billing_day:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.dia_de_cobranca
+  bonus:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.bonificacao
+  supervisor:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.supervisor
+  campaign:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.campanha
+  value:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.value
+  value_weighted:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.weighted_value
+  total_products:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.products_count
+  total_files:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.files_count
+  total_notes:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.notes_count
+  total_followers:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.followers_count
+  total_email_messages:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.email_messages_count
+  total_activities:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.activities_count
+  total_done_activities:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.done_activities_count
+  total_undone_activities:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.undone_activities_count
+  total_participants:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.participants_count
+  total_properties:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.numero_imoveis
+  stage_order_number:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.stage_order_nr
+  lead_value:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.valor_do_lead
+  is_active:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.active
+  is_deleted:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.deleted
+  is_organization_hidden:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.org_hidden
+  is_person_hidden:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.person_hidden
+  dt_call:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.data_da_ligacao
+  dt_start_billing:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.inicio_da_cobranca
+  dt_welcome_email:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.envio_de_email_de_boas_vindas
+  dt_signature_term:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.data_assinatura_termo
+  dt_next_activity:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.next_activity_date
+  dt_last_activity:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.last_activity_date
+  dt_expected_close:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.expected_close_date
+  ts_updated:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.update_time
+  ts_closed:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.close_time
+  ts_added:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.add_time
+  ts_stage_changed:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.stage_change_time
+  ts_next_activity:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.next_activity_time
+  ts_won:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.won_time
+  ts_first_won:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.first_won_time
+  ts_lost:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.lost_time
+  ts_last_incoming_mail:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.last_incoming_mail_time
+  ts_last_outgoing_mail:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.last_outgoing_mail_time
+  ts_rotten:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.rotten_time
+  year:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.year
+  month:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.month
+  day:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals.day

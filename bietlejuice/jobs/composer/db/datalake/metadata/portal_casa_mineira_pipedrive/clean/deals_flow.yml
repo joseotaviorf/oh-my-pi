@@ -1,0 +1,31 @@
+---
+database_name: datalake_portal_casa_mineira_pipedrive_clean
+table_name: deals_flow
+columns:
+  id_deal_flow:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals_flow.id
+  id_deal:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals_flow.id_deal
+  old_stage:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals_flow.old_stage
+  new_stage:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals_flow.new_stage
+  field_key:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals_flow.field_key
+  ts_log:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals_flow.log_time
+  year:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals_flow.year
+  month:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals_flow.month
+  day:
+    lineage:
+      - datalake_portal_casa_mineira_pipedrive_raw.deals_flow.day

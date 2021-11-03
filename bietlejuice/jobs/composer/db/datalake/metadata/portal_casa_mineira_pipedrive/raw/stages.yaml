@@ -1,0 +1,3 @@
+---
+database_name: datalake_portal_casa_mineira_pipedrive_raw
+table_name: stages

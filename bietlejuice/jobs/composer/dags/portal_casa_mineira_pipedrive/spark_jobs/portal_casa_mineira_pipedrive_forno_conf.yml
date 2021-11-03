@@ -1,0 +1,9 @@
+---
+partition_cols: [year, month, day]
+tables_configurations:
+  deals:
+    column_create_date: "update_time"
+  deals_flow:
+    column_create_date: "log_time"
+  stages:
+    column_create_date: "update_time"

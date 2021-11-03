@@ -13,6 +13,7 @@ dags_out_of_pattern: [
     "enrich_amplitude_partner_taxonomy",
     "marketing_costs_sharing_rules",
     "marketing_costs",
+    "portal_casa_mineira_pipedrive",
     "regions_polygon",
     "rtb_campaigns",
 ]

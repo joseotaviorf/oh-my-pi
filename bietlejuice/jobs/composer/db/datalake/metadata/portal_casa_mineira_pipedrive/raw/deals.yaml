@@ -1,0 +1,20 @@
+---
+database_name: datalake_portal_casa_mineira_pipedrive_raw
+table_name: deals
+columns:
+  person_id:
+    tags:
+      - PII
+      - Confidential
+  title:
+    tags:
+      - PII
+      - Confidential
+  person_name:
+    tags:
+      - PII
+      - Confidential
+  org_name:
+    tags:
+      - PII
+      - Confidential
