@@ -17,7 +17,7 @@ from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
 
-DW_SCHEMA = "crm_migration"
+DW_SCHEMA = "crm"
 CONTEXT = "crm"
 DAG_NAME = f"dw_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"

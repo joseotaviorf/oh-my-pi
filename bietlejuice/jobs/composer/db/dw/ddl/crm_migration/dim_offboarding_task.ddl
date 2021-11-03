@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS crm_migration.dim_offboarding_task;
-CREATE TABLE crm_migration.dim_offboarding_task (
+DROP TABLE IF EXISTS crm.dim_offboarding_task;
+CREATE TABLE crm.dim_offboarding_task (
 	sk_task VARCHAR PRIMARY KEY,
 	score_factor INTEGER,
 	version INTEGER,
@@ -18,7 +18,7 @@ CREATE TABLE crm_migration.dim_offboarding_task (
 	ts_load TIMESTAMP
 );
 
-ALTER TABLE crm_migration.dim_offboarding_task OWNER TO airflow;
-CALL grant_all_permissions_on_schema('crm_migration');
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA crm_migration TO GROUP etl;
-GRANT ALL ON SCHEMA crm_migration TO GROUP ETL;
+ALTER TABLE crm.dim_offboarding_task OWNER TO airflow;
+CALL grant_all_permissions_on_schema('crm');
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA crm TO GROUP etl;
+GRANT ALL ON SCHEMA crm TO GROUP ETL;

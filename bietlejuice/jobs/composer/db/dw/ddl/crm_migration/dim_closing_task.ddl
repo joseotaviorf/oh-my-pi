@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS crm_migration.dim_closing_task;
-CREATE TABLE crm_migration.dim_closing_task (
+DROP TABLE IF EXISTS crm.dim_closing_task;
+CREATE TABLE crm.dim_closing_task (
     sk_task VARCHAR,
     score_factor INT, 
     hours_task_start_to_completed DECIMAL(10,2), 
@@ -17,8 +17,8 @@ CREATE TABLE crm_migration.dim_closing_task (
     ts_silenced_until TIMESTAMP,
     ts_load TIMESTAMP
 );
-ALTER TABLE crm_migration.dim_closing_task OWNER TO airflow;
+ALTER TABLE crm.dim_closing_task OWNER TO airflow;
 
-CALL grant_all_permissions_on_schema('crm_migration');
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA crm_migration TO GROUP etl;
-GRANT ALL ON SCHEMA crm_migration TO GROUP ETL; 
+CALL grant_all_permissions_on_schema('crm');
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA crm TO GROUP etl;
+GRANT ALL ON SCHEMA crm TO GROUP ETL; 

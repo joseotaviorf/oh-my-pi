@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS crm_migration.fact_visit_tasks;
-CREATE TABLE crm_migration.fact_visit_tasks (
+DROP TABLE IF EXISTS crm.fact_visit_tasks;
+CREATE TABLE crm.fact_visit_tasks (
     sk_task VARCHAR,
     sk_booking BIGINT,
     sk_action_date BIGINT,
@@ -23,7 +23,7 @@ CREATE TABLE crm_migration.fact_visit_tasks (
     ts_task_action_start TIMESTAMP,
     ts_load TIMESTAMP
 );
-ALTER TABLE crm_migration.fact_visit_tasks OWNER TO airflow;
-CALL grant_all_permissions_on_schema('crm_migration');
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA crm_migration TO GROUP etl;
-GRANT ALL ON SCHEMA crm_migration TO GROUP ETL;  
+ALTER TABLE crm.fact_visit_tasks OWNER TO airflow;
+CALL grant_all_permissions_on_schema('crm');
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA crm TO GROUP etl;
+GRANT ALL ON SCHEMA crm TO GROUP ETL;  

@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS crm_migration.fact_credit_tasks;
-CREATE TABLE crm_migration.fact_credit_tasks (
+DROP TABLE IF EXISTS crm.fact_credit_tasks;
+CREATE TABLE crm.fact_credit_tasks (
     sk_task VARCHAR,
     sk_receiver BIGINT,
     sk_origin BIGINT,
@@ -24,7 +24,7 @@ CREATE TABLE crm_migration.fact_credit_tasks (
     ts_load TIMESTAMP
 );
 
-ALTER TABLE crm_migration.fact_credit_tasks OWNER TO airflow;
-CALL grant_all_permissions_on_schema('crm_migration');
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA crm_migration TO GROUP etl;
-GRANT ALL ON SCHEMA crm_migration TO GROUP ETL;
+ALTER TABLE crm.fact_credit_tasks OWNER TO airflow;
+CALL grant_all_permissions_on_schema('crm');
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA crm TO GROUP etl;
+GRANT ALL ON SCHEMA crm TO GROUP ETL;

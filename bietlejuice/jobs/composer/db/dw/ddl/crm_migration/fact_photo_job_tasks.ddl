@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS crm_migration.fact_photo_job_tasks;
-CREATE TABLE crm_migration.fact_photo_job_tasks (
+DROP TABLE IF EXISTS crm.fact_photo_job_tasks;
+CREATE TABLE crm.fact_photo_job_tasks (
     sk_task VARCHAR,
     sk_photo_job BIGINT,
     sk_action_date BIGINT,
@@ -23,7 +23,7 @@ CREATE TABLE crm_migration.fact_photo_job_tasks (
     ts_task_user_start TIMESTAMP,
     ts_load TIMESTAMP
 );
-ALTER TABLE crm_migration.fact_photo_job_tasks OWNER TO airflow;
-CALL grant_all_permissions_on_schema('crm_migration');
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA crm_migration TO GROUP etl;
-GRANT ALL ON SCHEMA crm_migration TO GROUP ETL; 
+ALTER TABLE crm.fact_photo_job_tasks OWNER TO airflow;
+CALL grant_all_permissions_on_schema('crm');
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA crm TO GROUP etl;
+GRANT ALL ON SCHEMA crm TO GROUP ETL; 

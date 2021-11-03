@@ -9,7 +9,7 @@ WITH task_metrics AS (
         action_type,
         ROW_NUMBER() OVER(PARTITION BY sk_task ORDER BY ts_action) AS rn
     FROM 
-        dw_crm_migration.fact_lead_task_actions AS flta
+        dw_crm.fact_lead_task_actions AS flta
 ),
 task_dates AS (
     SELECT

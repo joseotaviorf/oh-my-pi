@@ -1,4 +1,4 @@
-database_name: dw_crm_migration
+database_name: dw_crm
 table_name: fact_ungrouped_manual_tasks
 columns:
   sk_task:
