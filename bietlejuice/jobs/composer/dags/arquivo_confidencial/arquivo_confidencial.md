@@ -19,7 +19,11 @@ In datalake raw and clean, via full load:
 - `presumed_income_report_aud`
 
 In datalake raw and clean, via incremental load:
+- `documentation_report`
+- `documents`
+- `emailage_result`
 - `rev_info`
+- `unico_check_document`
 
 ### Responsible Data Teams
 

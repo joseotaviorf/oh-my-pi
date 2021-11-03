@@ -1,0 +1,8 @@
+---
+database_name: datalake_arquivo_confidencial_raw
+table_name: documentation_report
+columns:
+  cpf:
+    tags:
+      - PII
+      - Confidential

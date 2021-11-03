@@ -1,5 +1,14 @@
 ---
 tables:
+  - table_name: documentation_report
+    extraction_type: incremental
+    date_filter_column: updated_at
+  - table_name: documents
+    extraction_type: incremental
+    date_filter_column: updated_at
+  - table_name: emailage_result
+    extraction_type: incremental
+    date_filter_column: updated_at
   - table_name: presumed_income_report
     extraction_type: full
   - table_name: presumed_income_report_aud
@@ -9,5 +18,8 @@ tables:
     date_filter_column: revtstmp
     unixtime_measure: miliseconds
     clean_table_name: rev_info
+  - table_name: unico_check_document
+    extraction_type: incremental
+    date_filter_column: updated_at
   
 partition_columns: [year, month, day]
