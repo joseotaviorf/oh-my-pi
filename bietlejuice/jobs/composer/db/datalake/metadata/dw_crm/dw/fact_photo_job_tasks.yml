@@ -11,13 +11,13 @@ columns:
   sk_completed_date:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_completed_date
-  # sk_house_listing:
-  #   lineage:
-  #     - dw_janus.dim_house_listing.sk_house_listing
-  #     - dw_janus.fact_house_listings.sk_house_listing
-  # sk_house_owner:
-  #   lineage:
-  #     - dw_janus.fact_house_listings.sk_owner
+  sk_house_listing:
+    lineage:
+      - dw_janus.dim_house_listing.sk_house_listing
+      - dw_janus.fact_house_listings.sk_house_listing
+  sk_house_owner:
+    lineage:
+      - dw_janus.fact_house_listings.sk_owner
   sk_origin:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_origin

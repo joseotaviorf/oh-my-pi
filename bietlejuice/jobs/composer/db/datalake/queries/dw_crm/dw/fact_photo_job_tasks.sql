@@ -12,25 +12,25 @@ WITH photo_jobs AS (
       ON turf.origin = 'JobFotografo'
       AND CAST(CAST(turf.id_origin AS DECIMAL) AS BIGINT) = CAST(fpj.id_photo_job AS BIGINT)
   LEFT JOIN 
-    testing_map_ods_from_s3.ods_fact_house_listings fhl_photo
+    dw_janus.fact_house_listings fhl_photo
       ON fhl_photo.sk_house_listing = fpj.sk_house_listing
       AND fhl_photo.sk_house_listing != '-1'
   LEFT JOIN 
-    testing_map_ods_from_s3.ods_dim_house_listing dhl
+    dw_janus.dim_house_listing dhl
       ON turf.origin = 'Imovel'
       AND CAST(CAST(turf.id_origin AS DECIMAL) AS BIGINT) = CAST(dhl.id_house AS BIGINT)
       AND turf.ts_start BETWEEN COALESCE(NULLIF(dhl.ts_listing_version_start,''), turf.ts_start, NOW()) AND COALESCE(NULLIF(dhl.ts_listing_version_end, ''), NOW())
   LEFT JOIN 
-    testing_map_ods_from_s3.ods_fact_house_listings fhl
+    dw_janus.fact_house_listings fhl
       ON fhl.sk_house_listing = dhl.sk_house_listing
       AND fhl.sk_house_listing != '-1'
   LEFT JOIN 
-    testing_map_ods_from_s3.ods_dim_house_listing dhl_no_version
+    dw_janus.dim_house_listing dhl_no_version
       ON (turf.origin) = 'Imovel'
       AND turf.id_origin = dhl_no_version.id_house
       AND dhl_no_version.ts_listing_version_start = ''
   LEFT JOIN 
-    testing_map_ods_from_s3.ods_fact_house_listings fhl_no_version
+    dw_janus.fact_house_listings fhl_no_version
       ON fhl_no_version.sk_house_listing = dhl_no_version.sk_house_listing
   WHERE
     turf.year = {year}
@@ -46,7 +46,7 @@ photo_job_house_listing AS (
     CAST(sk_house_listing AS BIGINT) AS sk_house_listing,
     CAST(sk_owner AS BIGINT) AS sk_house_owner
   FROM 
-    testing_map_ods_from_s3.ods_fact_house_listings
+    dw_janus.fact_house_listings
   WHERE 
     sk_house_listing != '-1'
   GROUP BY 1, 2

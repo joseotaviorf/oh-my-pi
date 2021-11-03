@@ -6,11 +6,11 @@ WITH bookings AS (
     FROM 
         datalake_crm_tasks_flows.tasks_users_resolutions_flow AS turf
     LEFT JOIN
-        dw_janus.dim_booking db
+        testing_map_ods_from_s3.ods_dim_booking db
             ON turf.origin = 'Agendamento'
             AND turf.id_origin = db.sk_booking
     LEFT JOIN 
-        testing_map_ods_from_s3.ods_dim_house_listing dhl
+        dw_janus.dim_house_listing dhl
             ON turf.origin = 'Imovel'
             AND turf.id_origin = dhl.id_house
             AND turf.ts_start BETWEEN dhl.ts_listing_version_start AND COALESCE(NULLIF(dhl.ts_listing_version_end,''), NOW())

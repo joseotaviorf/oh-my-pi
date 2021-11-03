@@ -105,6 +105,8 @@ bietlejuice.dw_criteo_campaigns:
 bietlejuice.dw_crm:
   - bietlejuice.dw_contract:load-janus-dim-contract-into-redshift
   - bietlejuice.dw_offer:load-janus-dim-offer-into-redshift
+  - bietlejuice.dw_listing:load-janus-dim-house-listing-into-redshift
+  - bietlejuice.dw_listing:load-janus-fact-house-listings-into-redshift
   - bietlejuice.dw_listing_jobs:load-janus-fact-photo-job-into-redshift
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
   - bietlejuice.ebdb:create-clean-house-in-data-lake
