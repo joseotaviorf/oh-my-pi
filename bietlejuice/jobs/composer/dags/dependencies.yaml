@@ -726,6 +726,8 @@ bietlejuice.enrich_region:
 
 bietlejuice.enrich_rent_potential_listing:
   - bietlejuice.enrich_crm_lead:load-enrich-lead-tasks
+  - bietlejuice.enrich_lead:load-enrich-lead
+  - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
   - bietlejuice.enrich_listing_jobs:load-enrich-house-photo-job-tasks
   - bietlejuice.enrich_listing_flow:load-enrich-listing-flows-with-reprocessed-leads
 
