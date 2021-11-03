@@ -1,0 +1,42 @@
+database_name: datalake_arquivo_confidencial_clean
+table_name: documents
+columns:
+  id:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documents.id
+  id_documentation_report:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documents.documentation_report_id
+  name:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documents.name
+  url:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documents.url
+  type:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documents.type
+  content_type:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documents.content_type
+  sequence:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documents.sequence
+  version:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documents.version
+  ts_created:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documents.created_at
+  ts_updated:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documents.updated_at
+  year:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documents.year
+  month:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documents.month
+  day:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documents.day

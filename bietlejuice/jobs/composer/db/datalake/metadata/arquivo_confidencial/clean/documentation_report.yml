@@ -1,0 +1,45 @@
+database_name: datalake_arquivo_confidencial_clean
+table_name: documentation_report
+columns:
+  id:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report.id
+  id_proposal:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report.proposal_id
+  id_report:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report.report_id
+  cpf:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report.cpf
+  status:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report.status
+  matrix_name:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report.matrix_name
+  version:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report.version
+  report_result:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report.report_result
+  validations:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report.validations
+  ts_created:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report.created_at
+  ts_updated:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report.updated_at
+  year:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report.year
+  month:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report.month
+  day:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report.day
