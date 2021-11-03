@@ -32,7 +32,7 @@ class CRMTasks(object):
 
     TABLE_NAMES = {"tasks": "crm_tasks", "resolution": "crm_tasks_resolution"}
 
-    SCHEMA_NAMES = {"staging": "staging", "prod": "crm"}
+    SCHEMA_NAMES = {"staging": "staging", "prod": "crm_20211103"}
 
     S3_FILE_NAME = "data"
 

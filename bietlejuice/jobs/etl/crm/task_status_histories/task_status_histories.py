@@ -26,7 +26,7 @@ class CRMTaskStatusHistories(object):
     }
     S3_FILE_NAME = "data"
     TABLE_PARTITION_PARAM = "__PARTITION_DATE__"
-    SCHEMA_NAMES = {"staging": "staging", "prod": "crm"}
+    SCHEMA_NAMES = {"staging": "staging", "prod": "crm_20211103"}
 
     @logger
     def __init__(self, s3_bucket, execution_date, mongo_client_uri=None):

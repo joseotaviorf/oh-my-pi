@@ -11,7 +11,7 @@
 	row_number() over(PARTITION BY sk_task ORDER BY ts_action) as rn,
     action_type,
     sk_assignee
- FROM crm.fact_lead_task_actions flta
+ FROM crm_20211103.fact_lead_task_actions flta
 ),
 task_dates as (
 select 

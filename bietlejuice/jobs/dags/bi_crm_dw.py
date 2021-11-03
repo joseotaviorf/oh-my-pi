@@ -258,7 +258,7 @@ fact_lead_tasks_task = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id='fact_lead_tasks',
     python_callable=BaseETL.move_file_query_data_to_db,
-    op_kwargs={'schema': 'crm',
+    op_kwargs={'schema': 'crm_20211103',
                'file_name': '{}/crm/fact_lead_tasks.sql'.format(DW_QUERIES_DIR),
                'append': False,
                'db_enum_source': EnumDB.BI_DW,
