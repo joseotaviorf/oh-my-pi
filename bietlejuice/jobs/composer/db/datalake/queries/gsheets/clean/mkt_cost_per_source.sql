@@ -2,6 +2,7 @@ SELECT
     business,
     city,
     daily_value,
+    mkt_channel,
     mkt_medium,
     mkt_source,
     week_start,

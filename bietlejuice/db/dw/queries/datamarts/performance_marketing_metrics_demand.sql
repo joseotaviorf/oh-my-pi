@@ -168,16 +168,6 @@ demand_daily_spent AS (
         AND co.mkt_medium != 'Branding'
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36
 ),
-taxonomy AS (
-    SELECT DISTINCT
-        td.Origin as mkt_origin,
-        td.Channel as mkt_channel,
-        td.Medium as mkt_medium
-    FROM
-        datalake_raw.gsheets_taxonomy_demand AS td
-    WHERE
-        td.Channel NOT IN  ('Paid Retention', 'Paid Traffic')
-),
 target_sheets AS (
     SELECT
         NULLIF(str.date, '')::date AS dt_event,
@@ -201,7 +191,7 @@ target_sheets AS (
         NULLIF(cps.date, '')::date AS dt_event,
         NULLIF(cps.city, '') AS city_group,
         'Tenants PWA' AS mkt_origin,
-        NULLIF(t.mkt_channel, '') AS mkt_channel,
+        NULLIF(cps.mkt_channel, '') AS mkt_channel,
         NULLIF(cps.mkt_medium, '') AS mkt_medium,
         NULLIF(cps.mkt_source, '') AS mkt_source,
         NULL::FLOAT AS new_rent_flows_target,
@@ -209,8 +199,6 @@ target_sheets AS (
         NULL::FLOAT AS recovered_tenant_prospects_target,
         NULLIF(cps.daily_value, '')::FLOAT AS budget
     FROM datalake_gsheets_clean_prod.mkt_cost_per_source AS cps
-        LEFT JOIN taxonomy AS t
-            ON cps.mkt_medium = t.mkt_medium
     WHERE
         business = 'Rent'
         AND NULLIF(cps.date, '')::date >= DATE('2021-08-01')

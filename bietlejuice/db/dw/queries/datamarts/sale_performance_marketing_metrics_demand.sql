@@ -22,16 +22,6 @@ dim_house AS (
         datalake_ebdb_clean_prod.house
     GROUP BY 1,2
 ),
-taxonomy AS (
-    SELECT DISTINCT
-        td.Origin as mkt_origin,
-        td.Channel as mkt_channel,
-        td.Medium as mkt_medium
-    FROM
-        datalake_raw.gsheets_taxonomy_demand AS td
-    WHERE
-        td.Channel NOT IN  ('Paid Retention', 'Paid Traffic')
-),
 -----------------------------------------------------------
 -- Query bookings, offers and talk to agent full history --
 -----------------------------------------------------------
@@ -255,11 +245,7 @@ targets AS (
         bd.city AS city_group,
         NULL::TEXT AS flow_event,
         'Tenants PWA' AS mkt_origin,
-        CASE
-            WHEN bd.mkt_medium = 'Not Mapped'
-                THEN 'Not Mapped'
-            ELSE t.mkt_channel
-        END AS mkt_channel,
+        bd.mkt_channel,
         bd.mkt_medium,
         bd.mkt_source,
         NULL::TEXT AS utm_medium,
@@ -288,8 +274,6 @@ targets AS (
         NULL::FLOAT AS marketing_cost
     FROM
         datalake_gsheets_clean_prod.mkt_cost_per_source AS bd
-        LEFT JOIN taxonomy AS t
-            ON bd.mkt_medium = t.mkt_medium
     WHERE
         LOWER(business) = 'sale'
     UNION ALL
