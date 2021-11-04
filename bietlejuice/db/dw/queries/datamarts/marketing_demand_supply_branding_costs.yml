@@ -1,0 +1,6 @@
+# Config for marketing_demand_supply_branding_costs
+---
+streams:
+  - direction: 'upstream'
+    task_ids: ['dw_performance_marketing_promotional_bonus_costs_daily',
+               'dw_performance_marketing_cluster_promotional_bonus_costs']
