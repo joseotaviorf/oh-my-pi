@@ -212,3 +212,4 @@ SELECT
   NOW() AS ts_load
 FROM
   monday AS moa
+WHERE moa.negotiation_model = 'DM' OR moa.negotiation_model IS NULL

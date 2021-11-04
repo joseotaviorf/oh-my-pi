@@ -109,6 +109,7 @@ SELECT
   m.status AS monday_status,
   m.offer_status,
   m.sale_agreement_status,
+  m.negotiation_model,
   m.sale_agreement_cancellation_reason,
   m.drop_reason,
   m.drop_reason_responsible,
@@ -160,3 +161,4 @@ LEFT JOIN relation_booking_offer rbo
   ON rbo.id_offer = so.id
 LEFT JOIN rank_offers rk
   ON rk.id = so.id
+WHERE m.negotiation_model = 'DM' OR m.negotiation_model IS NULL
