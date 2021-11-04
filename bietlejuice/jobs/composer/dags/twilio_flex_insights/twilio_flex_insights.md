@@ -11,7 +11,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 Currently, there is the following output table for both our raw, staging (clean) and clean layers:
 
-- `conversation`
+- `conversation_time_metrics`
 
 ### Responsible Data Team
 ​

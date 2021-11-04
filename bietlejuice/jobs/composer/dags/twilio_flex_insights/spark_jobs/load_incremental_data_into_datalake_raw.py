@@ -107,7 +107,7 @@ if __name__ == "__main__":
             df = (
                 SparkDataFrameService()
                 .input(df)
-                .create_year_month_day_columns_from_dataframe_column("date")
+                .create_year_month_day_columns_from_dataframe_column(column_create_date)
                 .output()
                 )
 
