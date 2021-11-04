@@ -1,0 +1,54 @@
+database_name: datalake_gsheets_clean
+table_name: legacy_doorman
+columns:
+  id_short_house:
+    lineage:
+      - datalake_gsheets_raw.legacy_doorman.id_short_house
+  id_doorman:
+    lineage:
+      - datalake_gsheets_raw.legacy_doorman.id_doorman
+  address:
+    lineage:
+      - datalake_gsheets_raw.legacy_doorman.address
+  status_crm:
+    lineage:
+      - datalake_gsheets_raw.legacy_doorman.status_crm
+  name_doorman:
+    lineage:
+      - datalake_gsheets_raw.legacy_doorman.name_doorman
+  reason:
+    lineage:
+      - datalake_gsheets_raw.legacy_doorman.reason
+  lead_address:
+    lineage:
+      - datalake_gsheets_raw.legacy_doorman.lead_address
+  obs:
+    lineage:
+      - datalake_gsheets_raw.legacy_doorman.obs
+  owner_name:
+    lineage:
+      - datalake_gsheets_raw.legacy_doorman.owner_name
+  owner_phone:
+    lineage:
+      - datalake_gsheets_raw.legacy_doorman.owner_phone
+  wage:
+    lineage:
+      - datalake_gsheets_raw.legacy_doorman.wage
+  motive:
+    lineage:
+      - datalake_gsheets_raw.legacy_doorman.motive
+  status:
+    lineage:
+      - datalake_gsheets_raw.legacy_doorman.status
+  phone:
+    lineage:
+      - datalake_gsheets_raw.legacy_doorman.phone
+  dt_creation:
+    lineage:
+      - datalake_gsheets_raw.legacy_doorman.dt_creation
+  dt_referral:
+    lineage:
+      - datalake_gsheets_raw.legacy_doorman.dt_referral
+  dt_last_iteration:
+    lineage:
+      - datalake_gsheets_raw.legacy_doorman.dt_last_iteration

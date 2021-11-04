@@ -76,6 +76,7 @@ This pipeline produces the following output tables:
     - `keys_logistic_onboarding_tenant_b2b`
     - `keys_logistic_onboarding_tenant`
     - `keys_logistic_pre_contract`
+    - `legacy_doorman`
     - `link_call_ticket`
     - `local_holidays`
     - `marketing_costs_campaign_city`

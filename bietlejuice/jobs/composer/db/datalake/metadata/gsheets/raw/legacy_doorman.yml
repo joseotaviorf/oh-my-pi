@@ -1,0 +1,51 @@
+database_name: datalake_gsheets_raw
+table_name: legacy_doorman
+columns:
+  id_short_house:
+    tags:
+    - PII
+    - Confidential
+  id_doorman:
+    tags:
+    - PII
+    - Confidential
+  address:
+    tags:
+    - PII
+    - Confidential
+  name_doorman:
+    tags:
+    - PII
+    - Confidential
+  lead_address:
+    tags:
+    - PII
+    - Confidential
+  owner_name:
+    tags:
+    - PII
+    - Confidential
+  owner_phone:
+    tags:
+    - PII
+    - Confidential
+  wage:
+    tags:
+    - PII
+    - Confidential
+  status:
+    tags:
+    - Public
+  phone:
+    tags:
+    - PII
+    - Confidential
+  dt_creation:
+    tags:
+    - Public
+  dt_referral:
+    tags:
+    - Public
+  dt_last_iteration:
+    tags:
+    - Public
