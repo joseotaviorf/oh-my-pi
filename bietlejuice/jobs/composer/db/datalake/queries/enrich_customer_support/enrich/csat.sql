@@ -92,12 +92,9 @@ email_total AS (
     csat.ts_first_response AS ts_response
   FROM
     csat
-    JOIN
-      datalake_zendesk_tickets_clean.tickets AS t
-        ON csat.id_ticket = t.id_ticket
-    JOIN
-      datalake_zendesk_ticket_funnels.ticket_funnel AS tf
-        ON tf.id_ticket = t.id_ticket
+  JOIN
+    datalake_zendesk_ticket_funnels.ticket_funnel AS tf
+      ON tf.id_ticket = csat.id_ticket
   WHERE
     tf.channel IN ('email', 'form_faq', 'web', 'other')
     AND COALESCE(CAST(is_solved AS string), CAST(csat_score AS string)) IS NOT NULL
@@ -117,33 +114,6 @@ call_total AS (
   WITH ivr_events AS (
     SELECT
       id_call,
-      MAX(ts_created_local) AS ts_last_event
-    FROM
-      datalake_bigfone_twilio.call_ivr_events
-      GROUP BY 1
-  ),
-  call_events AS (
-    SELECT
-        id_task,
-        id_call,
-        id_conversation
-    FROM
-        datalake_bigfone_twilio.call_flex_events
-    WHERE
-        event_type != 'task.updated'
-        AND (
-          GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.scheduled') IS NULL
-          OR GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.scheduled') <> 'true'
-          OR (
-                GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.scheduled') = 'true' 
-                AND GET_JSON_OBJECT(metadata, '$.event_data.TaskAttributes.conversations.conversation_attribute_1') = 2
-          )
-        )
-        GROUP BY 1,2,3
-  ),
-  csat_events AS (
-    SELECT
-      id_call,
       id_task,
       MAX(csat_1) AS csat_1,
       MAX(csat_2) AS csat_2,
@@ -154,15 +124,6 @@ call_total AS (
     WHERE
       COALESCE(csat_1, csat_2) IS NOT NULL
     GROUP BY 1,2
-  ),
-  call AS (
-    SELECT
-      COALESCE(ie.id_call, fe.id_call, fe.id_conversation, fe.id_task) AS sk_call
-    FROM
-        ivr_events AS ie
-    FULL JOIN
-        call_events AS fe
-            ON fe.id_call = ie.id_call
   ),
   zendesk_tickets_unique AS (
     --this CTE fix the error of multiple tickets openned for a single call
@@ -188,13 +149,10 @@ call_total AS (
     ts_survey,
     ts_response
   FROM
+    ivr_events AS ie
+  JOIN
     zendesk_tickets_unique AS ztu
-  JOIN
-    call AS c
-      ON c.sk_call = ztu.id_call
-  JOIN
-    csat_events AS csat
-      ON csat.id_call = ztu.id_call
+      ON ie.id_call = ztu.id_call
 )
 SELECT
   *
