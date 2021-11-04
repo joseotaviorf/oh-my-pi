@@ -32,8 +32,8 @@ SELECT
         WHEN lf.mkt_channel = 'Paid' AND lf.mkt_origin = 'Owner PWA' THEN 'Paid'
 	END AS mkt_type,
 	CASE
-	    WHEN dr.city_group NOT IN ('RMSP', 'Rio de Janeiro','Belo Horizonte','Porto Alegre') THEN 'Out of coverage area'
-	    WHEN dr.city_group IN ('RMSP', 'Rio de Janeiro','Belo Horizonte','Porto Alegre') THEN dr.city_group
+	    WHEN dr.city_group NOT IN ('RMSP', 'Rio de Janeiro','Belo Horizonte','Porto Alegre','Campinas') THEN 'Out of coverage area'
+	    WHEN dr.city_group IN ('RMSP', 'Rio de Janeiro','Belo Horizonte','Porto Alegre','Campinas') THEN dr.city_group
 	END AS city_group
 FROM
     datamarts.lead_listing_flows lf
@@ -154,10 +154,10 @@ sale_closing AS (
     ),
     fact_oa AS (
     SELECT
-        COALESCE(DATE(NULLIF(sk_offer_accepted_date,-1)),dt_offer_accepted) AS date,
+        COALESCE(dt_offer_accepted,DATE(NULLIF(sk_offer_accepted_date,-1))) AS date,
         sk_house,
         sk_booking,
-        COALESCE(fo.sk_offer, hub.id_offer) AS sk_offer,
+        COALESCE(hub.id_offer,fo.sk_offer) AS sk_offer,
         COALESCE(fo.sk_buyer,hub.id_client_cm, hub.id_user_5a) AS sk_buyer,
         CASE
             WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'Porto Alegre' THEN 'CENTRAL POA'
@@ -179,8 +179,8 @@ sale_closing AS (
     ),
     fact_ccv AS (
     SELECT
-        COALESCE(DATE(NULLIF(sa.ts_sale_agreement_signed,-1)),hub.dt_sale_agreement_signed) AS date,
-        COALESCE(fo.sk_offer, hub.id_offer) AS sk_offer,
+        COALESCE(hub.dt_sale_agreement_signed,DATE(NULLIF(sa.ts_sale_agreement_signed,-1))) AS date,
+        COALESCE(hub.id_offer, fo.sk_offer) AS sk_offer,
         CASE
             WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'Porto Alegre' THEN 'CENTRAL POA'
             WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'RMSP' THEN 'CENTRAL SP'
@@ -330,8 +330,8 @@ SELECT
     sdc.id_buyer,
 	sdc.id_house,
 	CASE
-	    WHEN COALESCE(sdr.city_group,sdc.city_group) NOT IN ('RMSP', 'Rio de Janeiro','Porto Alegre') THEN 'Out of coverage area'
-	    WHEN COALESCE(sdr.city_group,sdc.city_group) IN ('RMSP', 'Rio de Janeiro','Porto Alegre') THEN COALESCE(sdr.city_group,sdc.city_group)
+	    WHEN COALESCE(sdr.city_group,sdc.city_group) NOT IN ('RMSP', 'Rio de Janeiro','Porto Alegre','Campinas') THEN 'Out of coverage area'
+	    WHEN COALESCE(sdr.city_group,sdc.city_group) IN ('RMSP', 'Rio de Janeiro','Porto Alegre','Campinas') THEN COALESCE(sdr.city_group,sdc.city_group)
 	END AS city_group,
 	sdc.form_of_payment,
 	sdc.dt_offer_sent,
