@@ -148,7 +148,7 @@ shared_consolidated_costs AS (
         medias_consolidated mc
         LEFT JOIN datalake_marketing_costs_sharing_rules.old_sharing_rules sr
             ON mc.id_date = sr.id_date 
-            AND split(mc.campaign_name, '\\.')[0] = sr.id_rule
+            AND split(mc.campaign_name, '\\\\.')[0] = sr.id_rule
 ),
 
 -- Next CTE is going to be deprecated soon
