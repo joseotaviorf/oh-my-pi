@@ -69,7 +69,6 @@ tables = config_service.get_config("tables")
 
 for table in tables:
     table_name = table["table_name"]
-    has_ods_migration_test = table.get("has_ods_migration_test", False)
     dw_schema = table.get("schema")
 
     task_group = DWTaskGroup(
@@ -82,7 +81,7 @@ for table in tables:
     )
 
     dw_staging_task_group = task_group.build_dw_staging_task_group(
-        table_name=table_name, has_ods_migration_test=has_ods_migration_test
+        table_name=table_name
     )
 
     dw_task_group = task_group.build_dw_task_group(
