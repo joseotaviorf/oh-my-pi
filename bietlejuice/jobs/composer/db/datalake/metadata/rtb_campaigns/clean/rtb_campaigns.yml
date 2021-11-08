@@ -1,0 +1,58 @@
+---
+database_name: datalake_rtb_campaigns_clean
+table_name: rtb_campaigns
+columns:
+  id_account:
+    lineage:
+      - datalake_rtb_campaigns_raw.rtb_campaigns.accounthash
+  id_sub_campaign:
+    lineage:
+      - datalake_rtb_campaigns_raw.rtb_campaigns.subcampaignhash
+  account_name:
+    lineage:
+      - datalake_rtb_campaigns_raw.rtb_campaigns.accountname
+  account_status:
+    lineage:
+      - datalake_rtb_campaigns_raw.rtb_campaigns.accountstatus
+  sub_campaign_name:
+    lineage:
+      - datalake_rtb_campaigns_raw.rtb_campaigns.subcampaign
+  currency:
+    lineage:
+      - datalake_rtb_campaigns_raw.rtb_campaigns.accountcurrency
+  impressions:
+    lineage:
+      - datalake_rtb_campaigns_raw.rtb_campaigns.impscount
+  clicks:
+    lineage:
+      - datalake_rtb_campaigns_raw.rtb_campaigns.clickscount
+  cost:
+    lineage:
+      - datalake_rtb_campaigns_raw.rtb_campaigns.campaigncost
+  conversions_count:
+    lineage:
+      - datalake_rtb_campaigns_raw.rtb_campaigns.conversionscount
+  conversions_value:
+    lineage:
+      - datalake_rtb_campaigns_raw.rtb_campaigns.conversionsvalue
+  click_through_rate:
+    lineage:
+      - datalake_rtb_campaigns_raw.rtb_campaigns.ctr
+  conversion_rate:
+    lineage:
+      - datalake_rtb_campaigns_raw.rtb_campaigns.cr
+  return_on_advertising_spend:
+    lineage:
+      - datalake_rtb_campaigns_raw.rtb_campaigns.roas
+  dt_attribution:
+    lineage:
+      - datalake_rtb_campaigns_raw.rtb_campaigns.attributiondate
+  year:
+    lineage:
+      - datalake_rtb_campaigns_raw.rtb_campaigns.year
+  month:
+    lineage:
+      - datalake_rtb_campaigns_raw.rtb_campaigns.month
+  day:
+    lineage:
+      - datalake_rtb_campaigns_raw.rtb_campaigns.day

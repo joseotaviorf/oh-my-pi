@@ -1,40 +1,41 @@
+---
 database_name: dw_rtb_campaigns
 table_name: fact_rtb_daily_cost_attributions
 columns:
   sk_sub_campaign:
     lineage:
-      - datalake_marketing_costs_clean.rtb_campaigns.sub_campaign_hash
+      - datalake_rtb_campaigns_clean.rtb_campaigns.id_sub_campaign
   sk_date:
     lineage:
-      - datalake_marketing_costs_clean.rtb_campaigns.cost_attribution_date
+      - datalake_rtb_campaigns_clean.rtb_campaigns.dt_attribution
   clicks:
     lineage:
-      - datalake_marketing_costs_clean.rtb_campaigns.clicks_count
+      - datalake_rtb_campaigns_clean.rtb_campaigns.clicks
   impressions:
     lineage:
-      - datalake_marketing_costs_clean.rtb_campaigns.impressions_count
+      - datalake_rtb_campaigns_clean.rtb_campaigns.impressions
   ctr:
     lineage:
-      - datalake_marketing_costs_clean.rtb_campaigns.ctr
+      - datalake_rtb_campaigns_clean.rtb_campaigns.click_through_rate
   cost:
     lineage:
-      - datalake_marketing_costs_clean.rtb_campaigns.cost
+      - datalake_rtb_campaigns_clean.rtb_campaigns.cost
   conversions_count:
     lineage:
-      - datalake_marketing_costs_clean.rtb_campaigns.conversions_count
-  conversions_rate:
+      - datalake_rtb_campaigns_clean.rtb_campaigns.conversions_count
+  conversion_rate:
     lineage:
-      - datalake_marketing_costs_clean.rtb_campaigns.cr
+      - datalake_rtb_campaigns_clean.rtb_campaigns.conversion_rate
   cpc:
     lineage:
-      - datalake_marketing_costs_clean.rtb_campaigns.cost
-      - datalake_marketing_costs_clean.rtb_campaigns.clicks_count
+      - datalake_rtb_campaigns_clean.rtb_campaigns.cost
+      - datalake_rtb_campaigns_clean.rtb_campaigns.clicks
   year:
     lineage:
-      - datalake_marketing_costs_clean.rtb_campaigns.year
+      - datalake_rtb_campaigns_clean.rtb_campaigns.year
   month:
     lineage:
-      - datalake_marketing_costs_clean.rtb_campaigns.month
+      - datalake_rtb_campaigns_clean.rtb_campaigns.month
   day:
     lineage:
-      - datalake_marketing_costs_clean.rtb_campaigns.day
+      - datalake_rtb_campaigns_clean.rtb_campaigns.day

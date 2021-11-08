@@ -2,7 +2,8 @@
 
 ### Purpose
 
-RTB Campaigns brings our marketing campaigns data from RTB platform. We implemented an [API client](https://github.com/quintoandar/rtb-api-client-python) for usage in raw.
+RTB Campaigns DAG retrieves Quinto Andar's marketing campaign statistics data from RTB platform. It uses data extracted from [RTB Stats API endpoint](https://api.panel.rtbhouse.com/api/docs) using [RTB House SDK for Python](https://github.com/rtbhouse-apps/rtbhouse-python-sdk).
+RTB House is a provider of retargeting technology, leveraging deep learning algorithms to enable its retail clients to deliver digital advertising campaigns to potential customers who have displayed purchase intent.
 <details>
   <summary><strong> > DAG details (click to expand)</strong></summary>
 
@@ -12,10 +13,13 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-Currently, there is the following output table for both our raw and clean layers:
+This pipeline produces, via incremental load:
 
-- `rtb_campaigns`
-
+- In datalake raw:
+    - `rtb_campaigns_raw.rtb_campaigns`
+- In datalake clean:
+    - `rtb_campaigns_clean.rtb_campaigns`
+  
 ### Responsible Data Teams
 For any questions or concerns about this DAG, please contact the Data Engineering Team or 
 the Data Analytics Team responsible listed in the 

@@ -1,30 +1,31 @@
+---
 database_name: dw_rtb_campaigns
 table_name: dim_rtb_campaign
 columns:
   sk_sub_campaign:
     lineage:
-      - datalake_marketing_costs_clean.rtb_campaigns.sub_campaign_hash
+      - datalake_rtb_campaigns_clean.rtb_campaigns.id_sub_campaign
   sk_date:
     lineage:
-      - datalake_marketing_costs_clean.rtb_campaigns.cost_attribution_date
+      - datalake_rtb_campaigns_clean.rtb_campaigns.dt_attribution
+  id_account:
+    lineage:
+      - datalake_rtb_campaigns_clean.rtb_campaigns.id_account
   campaign_name:
     lineage:
-      - datalake_marketing_costs_clean.rtb_campaigns.sub_campaign
-  account_hash:
-    lineage:
-      - datalake_marketing_costs_clean.rtb_campaigns.account_hash
+      - datalake_rtb_campaigns_clean.rtb_campaigns.sub_campaign_name
   account_name:
     lineage:
-      - datalake_marketing_costs_clean.rtb_campaigns.account_name
-  account_currency:
+      - datalake_rtb_campaigns_clean.rtb_campaigns.account_name
+  currency:
     lineage:
-      - datalake_marketing_costs_clean.rtb_campaigns.account_currency
+      - datalake_rtb_campaigns_clean.rtb_campaigns.currency
   year:
     lineage:
-      - datalake_marketing_costs_clean.rtb_campaigns.year
+      - datalake_rtb_campaigns_clean.rtb_campaigns.year
   month:
     lineage:
-      - datalake_marketing_costs_clean.rtb_campaigns.month
+      - datalake_rtb_campaigns_clean.rtb_campaigns.month
   day:
     lineage:
-      - datalake_marketing_costs_clean.rtb_campaigns.day
+      - datalake_rtb_campaigns_clean.rtb_campaigns.day

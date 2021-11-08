@@ -5,10 +5,10 @@ CREATE TABLE IF NOT EXISTS rtb_campaigns.dim_rtb_campaign
 (
 	sk_sub_campaign VARCHAR   ENCODE lzo,
 	sk_date INTEGER   ENCODE az64,
+	id_account VARCHAR(256)   ENCODE lzo,
 	campaign_name VARCHAR(256)   ENCODE lzo,
-	account_hash VARCHAR(256)   ENCODE lzo,
 	account_name VARCHAR(256)   ENCODE lzo,
-	account_currency VARCHAR(256)   ENCODE lzo,
+	currency VARCHAR(256)   ENCODE lzo,
 	ts_load TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
 )
 DISTSTYLE AUTO

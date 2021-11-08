@@ -94,6 +94,5 @@ quintoandar-facebook-api-client==0.1.2
 quintoandar-gsheets-api-client>=0.2.1,<1.0.0
 quintoandar-jira-api-client==0.2.1
 quintoandar-linkedin-client==1.0.2
-quintoandar-rtb-api-client==0.1.6
 quintoandar-tracksale-api-client==0.2.0
 quintoandar-zendesk-client==0.1.2

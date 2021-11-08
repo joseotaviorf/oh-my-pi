@@ -1,54 +1,48 @@
+from datetime import datetime
+from pendulum import timezone
 import os
 
+from airflow.models import DAG, Variable
 from airflow.utils.helpers import chain, cross_downstream
-from datetime import datetime
-import pendulum
-
-from airflow.models import DAG
-from airflow.models import Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
-from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.jobs.composer.base.pipeline import LayerEnum
+from bietlejuice.jobs.composer.services.configuration_service import (
+    ConfigurationService,
+)
 
 # ENV setup
 ENV = os.environ.get("ENVIRONMENT")
 
 # DAG params setup
-CONTEXT = (
-    "marketing_costs"
-)  # TODO: context misapplied here. The context should be 1:1 to each DAG.
-MEDIA = "rtb_campaigns"
-DAG_ID = f"bietlejuice.{MEDIA}"
-DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
-local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
-MAIN_START_DATE = datetime(2019, 6, 1, 0, 0, 0, tzinfo=local_tz)
-MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
+SOURCE = "rtb_campaigns"
+DAG_ID = f"bietlejuice.{SOURCE}"
+MAIN_START_DATE = datetime(2021, 9, 20, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
+MAIN_SCHEDULE_INTERVAL = "0 2 * * *"
+
+config_service = ConfigurationService(SOURCE)
+athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
+datalake_bucket = config_service.get_config("datalake_bucket")
+databricks_bietlejuice_repo_path = config_service.get_config(
+    "databricks_bietlejuice_repo_path"
+)
+spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
+doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 # s3 paths setup
-ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
-ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
-DATALAKE_BUCKET = Variable.get("datalake_bucket")
-S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-RAW_SPARK_JOB_PATH = (
-    S3_PREFIX + f"/spark_jobs/{MEDIA}/load_incremental_data_into_datalake_raw.py"
+RAW_SPARK_JOB_FILE = (
+    f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{SOURCE}_raw.py"
 )
-DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
-LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{DAG_ID}"
-BASE_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/base/"
+BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 
 # cluster setup
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
-CUSTOM_LIBRARIES = [
-    {
-        "whl": f"{ARTIFACTS_S3_BUCKET}/rtb-api-client-python/"
-        f"quintoandar_rtb_api_client-0.1.6-py2.py3-none-any.whl"
-    }
-]
+CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = spark_jobs_logs_path
+CUSTOM_LIBRARIES = [{"pypi": {"package": "rtbhouse_sdk==8.0.0"}}]
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -59,8 +53,8 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(CONTEXT).format(
-        chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
+        chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
 )
 
@@ -78,23 +72,23 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 task_group = DatalakeTaskGroup(
     dag=dag,
     env=ENV,
-    datalake_bucket=DATALAKE_BUCKET,
-    relative_query_path=f"{CONTEXT}/{MEDIA}",  # TODO: Each DAG shall have its own query folder
-    spark_jobs_path=BASE_SPARK_JOB_PATH,
-    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
+    datalake_bucket=datalake_bucket,
+    relative_query_path=SOURCE,
+    spark_jobs_path=BASE_SPARK_JOBS_PATH,
+    athena_query_result_location=athena_query_results_bucket,
 )
 
 raw_task_group = task_group.build_raw_task_group_for_all_tables(
-    source=CONTEXT,
-    target_database_base_name=CONTEXT,
-    extraction_spark_job_file=RAW_SPARK_JOB_PATH,
-    raw_spark_job_extra_args=[CONTEXT, MEDIA, "{{ ds }}"],
+    source=SOURCE,
+    target_database_base_name=SOURCE,
+    extraction_spark_job_file=RAW_SPARK_JOB_FILE,
+    raw_spark_job_extra_args=[SOURCE, "{{ ds }}"],
 )
 
 clean_task_groups = task_group.build_task_group_from_sql_files(
     layer=LayerEnum.CLEAN,
-    source_database_base_name=CONTEXT,
-    target_database_base_name=CONTEXT,
+    source_database_base_name=SOURCE,
+    target_database_base_name=SOURCE,
     is_incremental=True,
     partitions=["year", "month", "day"],
 )

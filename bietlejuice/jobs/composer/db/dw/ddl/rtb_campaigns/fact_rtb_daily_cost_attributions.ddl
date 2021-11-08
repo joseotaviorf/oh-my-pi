@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS rtb_campaigns.fact_rtb_daily_cost_attributions
 	ctr DOUBLE PRECISION   ENCODE RAW,
 	cost DOUBLE PRECISION   ENCODE RAW,
 	conversions_count DOUBLE PRECISION   ENCODE RAW,
-	conversions_rate DOUBLE PRECISION   ENCODE RAW,
+	conversion_rate DOUBLE PRECISION   ENCODE RAW,
 	cpc DOUBLE PRECISION   ENCODE RAW,
 	ts_load TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
 )
