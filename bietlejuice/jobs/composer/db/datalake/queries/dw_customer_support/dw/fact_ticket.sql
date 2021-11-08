@@ -245,6 +245,62 @@ email_tickets AS (
   FROM 
     datalake_customer_support.email
   GROUP BY 1,2,3,4,5,6,7,8,9,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39
+),
+historical_call_tickets AS (
+  SELECT
+    CAST(id_ticket AS BIGINT) AS sk_ticket,
+    MD5(
+      CONCAT(
+        COALESCE(step_tag, ''),
+        COALESCE(customer_type_tag, ''),
+        COALESCE(client_type, ''),
+        COALESCE(request_type, ''),
+        COALESCE(contact_motivation_tag, ''),
+        COALESCE(contact_theme_tag, ''),
+        COALESCE(contact_theme_detail_tag, '')
+      )
+    ) AS sk_taxonomy,
+    MD5(CONCAT('call', COALESCE(direction, ''))) AS sk_channel,
+    NULL AS sk_first_agent,
+    NULL AS sk_last_agent,
+    MD5(first_department) AS sk_first_department,
+    MD5(last_department) AS sk_last_department,
+    MD5(zendesk_department) AS sk_zendesk_department,
+    COALESCE(MD5(last_department), MD5(zendesk_department)) AS sk_main_department,
+    MAX(id_user) AS sk_user,
+    id_contract AS sk_contract,
+    'call' AS channel,
+    NULL AS csat_score,
+    status,
+    first_department,
+    last_department,
+    zendesk_department,
+    COALESCE(last_department, zendesk_department) AS main_department,
+    NULL AS total_departments,
+    NULL AS total_segments,
+    NULL AS full_resolution_time,
+    front_or_back,
+    NULL AS last_back_ticket,
+    NULL AS back_tickets,
+    NULL AS resolution_survey,
+    NULL AS has_answered_csat,
+    NULL AS has_back_ticket,
+    NULL AS is_back_ticket_open,
+    NULL AS is_solved,
+    NULL AS is_fcr,
+    NULL AS has_transfers,
+    NULL AS total_minutes_reception_time,
+    total_minutes_talk_time,
+    NULL AS total_minutes_queue_time,
+    NULL AS total_minutes_wrap_up_time,
+    NULL AS total_minutes_handling_time,
+    NULL AS total_backoffice_minutes_time,
+    ts_ticket_started AS ts_started,
+    ts_ticket_ended AS ts_closed,
+    NOW() AS ts_load
+  FROM
+    datalake_customer_support.historical_call
+  GROUP BY 1,2,3,4,5,6,7,8,9,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39
 )
 SELECT 
   *
@@ -260,3 +316,8 @@ SELECT
   *
 FROM
   chat_tickets
+UNION ALL
+SELECT
+  *
+FROM
+  historical_call_tickets

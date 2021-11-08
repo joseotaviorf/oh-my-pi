@@ -6,6 +6,7 @@ columns:
       - datalake_customer_support.call.id_ticket
       - datalake_customer_support.chat.id_ticket
       - datalake_customer_support.email.id_ticket
+      - datalake_customer_support.historical_call.id_ticket
   sk_taxonomy:
     lineage:
       - datalake_customer_support.call.step_tag
@@ -29,10 +30,18 @@ columns:
       - datalake_customer_support.email.contact_motivation_tag
       - datalake_customer_support.email.contact_theme_tag
       - datalake_customer_support.email.contact_theme_detail_tag
+      - datalake_customer_support.historical_call.step_tag
+      - datalake_customer_support.historical_call.customer_type_tag
+      - datalake_customer_support.historical_call.client_type
+      - datalake_customer_support.historical_call.request_type
+      - datalake_customer_support.historical_call.contact_motivation_tag
+      - datalake_customer_support.historical_call.contact_theme_tag
+      - datalake_customer_support.historical_call.contact_theme_detail_tag
   sk_channel:
     lineage:
       - datalake_customer_support.call.direction
       - datalake_customer_support.email.direction
+      - datalake_customer_support.historical_call.direction
   sk_first_agent:
     lineage:
       - datalake_customer_support.call.id_first_agent
@@ -48,16 +57,19 @@ columns:
       - datalake_customer_support.call.first_department
       - datalake_customer_support.chat.first_department
       - datalake_customer_support.email.department
+      - datalake_customer_support.historical_call.first_department
   sk_last_department:
     lineage:
       - datalake_customer_support.call.last_department
       - datalake_customer_support.chat.last_department
       - datalake_customer_support.email.department
+      - datalake_customer_support.historical_call.last_department
   sk_zendesk_department:
     lineage:
       - datalake_customer_support.call.zendesk_department
       - datalake_customer_support.chat.zendesk_department
       - datalake_customer_support.email.department
+      - datalake_customer_support.historical_call.zendesk_department
   sk_main_department:
     lineage:
       - datalake_customer_support.call.zendesk_department
@@ -65,16 +77,20 @@ columns:
       - datalake_customer_support.chat.zendesk_department
       - datalake_customer_support.chat.last_department
       - datalake_customer_support.email.department
+      - datalake_customer_support.historical_call.last_department
+      - datalake_customer_support.historical_call.zendesk_department
   sk_user:
     lineage:
       - datalake_customer_support.call.id_user
       - datalake_customer_support.chat.id_user
       - datalake_customer_support.email.id_user
+      - datalake_customer_support.historical_call.id_user
   sk_contract:
     lineage:
       - datalake_customer_support.call.id_contract
       - datalake_customer_support.chat.id_contract
       - datalake_customer_support.email.id_contract
+      - datalake_customer_support.historical_call.id_contract
   csat_score:
     lineage:
       - datalake_customer_support.call.csat_rating
@@ -85,21 +101,25 @@ columns:
       - datalake_customer_support.call.status
       - datalake_customer_support.chat.status
       - datalake_customer_support.email.status
+      - datalake_customer_support.historical_call.status
   first_department:
     lineage:
       - datalake_customer_support.call.first_department
       - datalake_customer_support.chat.first_department
       - datalake_customer_support.email.department
+      - datalake_customer_support.historical_call.first_department
   last_department:
     lineage:
       - datalake_customer_support.call.last_department
       - datalake_customer_support.chat.last_department
       - datalake_customer_support.email.department
+      - datalake_customer_support.historical_call.last_department
   zendesk_department:
     lineage:
       - datalake_customer_support.call.zendesk_department
       - datalake_customer_support.chat.zendesk_department
       - datalake_customer_support.email.department
+      - datalake_customer_support.historical_call.zendesk_department
   main_department:
     lineage:
       - datalake_customer_support.call.zendesk_department
@@ -107,6 +127,8 @@ columns:
       - datalake_customer_support.chat.zendesk_department
       - datalake_customer_support.chat.last_department
       - datalake_customer_support.email.department
+      - datalake_customer_support.historical_call.last_department
+      - datalake_customer_support.historical_call.zendesk_department
   total_departments:
     lineage:
       - datalake_customer_support.call.number_of_departments
@@ -125,6 +147,7 @@ columns:
       - datalake_customer_support.call.front_or_back
       - datalake_customer_support.chat.front_or_back
       - datalake_customer_support.email.front_or_back
+      - datalake_customer_support.historical_call.front_or_back
   last_back_ticket:
     lineage:
       - datalake_customer_support.call.last_back_ticket
@@ -211,6 +234,7 @@ columns:
     lineage:
       - datalake_customer_support.call.total_minutes_talk_time
       - datalake_customer_support.chat.total_minutes_talk_time
+      - datalake_customer_support.historical_call.total_minutes_talk_time
   total_minutes_queue_time:
     lineage:
       - datalake_customer_support.call.total_minutes_queue_time
@@ -228,8 +252,10 @@ columns:
       - datalake_customer_support.call.ts_ticket_started
       - datalake_customer_support.chat.ts_ticket_started
       - datalake_customer_support.email.ts_ticket_started
+      - datalake_customer_support.historical_call.ts_ticket_started
   ts_closed:
     lineage:
       - datalake_customer_support.call.ts_ticket_ended
       - datalake_customer_support.chat.ts_ticket_ended
       - datalake_customer_support.email.ts_ticket_ended
+      - datalake_customer_support.historical_call.ts_ticket_ended
