@@ -1,0 +1,16 @@
+SELECT
+    affiliate_type,
+    lead_origin,
+    lead_referring_category,
+    lead_tracking_medium,
+    lead_tracking_source,
+    lead_type,
+    mkt_channel,
+    mkt_medium,
+    mkt_origin,
+    mkt_source
+    is_agent_referral,
+    is_branded,
+    is_ops_direct_register,
+FROM
+    datalake_gsheets_raw.taxonomy_growth

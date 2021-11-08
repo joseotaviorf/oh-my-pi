@@ -1,0 +1,42 @@
+database_name: datalake_gsheets_clean
+table_name: taxonomy_growth
+columns:
+  affiliate_type:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_growth.affiliate_type
+  lead_origin:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_growth.lead_origin
+  lead_referring_category:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_growth.lead_referring_category
+  lead_tracking_medium:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_growth.lead_tracking_medium
+  lead_tracking_source:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_growth.lead_tracking_source
+  lead_type:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_growth.lead_type
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_growth.mkt_channel
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_growth.mkt_medium
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_growth.mkt_origin
+  mkt_source:
+    lineage:
+        - datalake_gsheets_raw.taxonomy_growth.mkt_source
+  is_agent_referral:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_growth.is_agent_referral
+  is_branded:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_growth.is_branded
+  is_ops_direct_register:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_growth.is_ops_direct_register
