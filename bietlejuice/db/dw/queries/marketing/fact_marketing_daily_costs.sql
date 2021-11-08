@@ -171,7 +171,6 @@ affiliates_cost AS (
         'facebook' AS origin,
         'fact_facebook_daily_cost_attributions' AS fact_cost,
         hist.campaign,
-        hist.city_group AS campaign_city,
         df.account_name,
         LOWER(hist.campaign) AS campaign_name_l,
         LOWER(df.account_name) AS account_name_l,
@@ -197,7 +196,6 @@ SELECT
     'google' AS origin,
     'fact_google_daily_cost_attributions' AS fact_cost,
     hist.campaign,
-    hist.city_group AS campaign_city,
     gi.account_name,
     LOWER(hist.campaign) AS campaign_name_l,
     LOWER(gi.account_name) AS account_name_l,
@@ -229,7 +227,6 @@ campaigns_full AS (
                 'facebook'::varchar AS origin,
                 'fact_facebook_daily_cost_attributions'::varchar AS fact_cost,
                 df.campaign_name,
-                LOWER(SPLIT_PART(df.campaign_name, '.', 4)) AS campaign_city,
                 df.account_name,
                 LOWER(df.campaign_name) AS campaign_name_l,
                 LOWER(df.account_name) AS account_name_l,
@@ -261,12 +258,6 @@ campaigns_full AS (
             'google'::varchar AS origin,
             'fact_google_daily_cost_attributions'::varchar AS fact_cost,
             gcc.campaign_name,
-            LOWER(
-                CASE WHEN SPLIT_PART(gcc.campaign_name, '.', 2) ~ '^[0-9]+$' THEN
-                    SPLIT_PART(gcc.campaign_name, '.', 3)
-                ELSE
-                    SPLIT_PART(gcc.campaign_name, '.', 2)
-                END) AS campaign_city,
             gcc.account_name,
             LOWER(gcc.campaign_name) AS campaign_name_l,
             LOWER(gcc.account_name) AS account_name_l,
@@ -303,7 +294,6 @@ campaigns_full AS (
         'trovit'::varchar AS origin,
         'fact_trovit_daily_cost_attributions'::varchar AS fact_cost,
         dtc.campaign_name,
-        NULL::varchar AS campaign_city,
         account_name,
         LOWER(dtc.campaign_name) AS campaign_name_l,
         NULL::varchar(512) AS account_name_l,
@@ -330,7 +320,6 @@ campaigns_full AS (
         'mitula'::varchar AS origin,
         'fact_mitula_daily_cost_attributions'::varchar AS fact_cost,
         campaign_name,
-        NULL::varchar AS campaign_city,
         account_name,
         LOWER(campaign_name) AS campaign_name_l,
         NULL::varchar(512) AS account_name_l,
@@ -357,7 +346,6 @@ campaigns_full AS (
         'criteo'::varchar AS origin,
         'fact_criteo_daily_cost_attributions'::varchar AS fact_cost,
         dct.campaign_name,
-        NULL AS campaign_city,
         advertiser_name AS account_name,
         LOWER(dct.campaign_name) AS campaign_name_l,
         LOWER(advertiser_name) AS account_name_l,
@@ -387,7 +375,6 @@ campaigns_full AS (
         'rtb'::VARCHAR AS origin,
         'fact_rtb_daily_cost_attributions'::VARCHAR AS fact_cost,
         drt.campaign_name,
-        NULL::VARCHAR AS campaign_city,
         drt.account_name AS account_name,
         lower(drt.campaign_name) AS campaign_name_l,
         lower(drt.account_name) AS account_name_l,
@@ -405,7 +392,7 @@ campaigns_full AS (
         ON frt.sk_sub_campaign = drt.sk_sub_campaign
         AND frt.sk_date = drt.sk_date
     WHERE frt.sk_date >= 20180101
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,15,16
     -- TWITTER
     UNION
     SELECT
@@ -413,7 +400,6 @@ campaigns_full AS (
         'twitter'::varchar AS origin,
         'fact_twitter_daily_cost_attributions'::varchar AS fact_cost,
         dtwc.campaign_name,
-        NULL AS campaign_city,
         dtwc.account_name AS account_name,
         LOWER(dtwc.campaign_name) AS campaign_name_l,
         LOWER(dtwc.account_name) AS account_name_l,
@@ -443,8 +429,7 @@ campaigns_full AS (
         7,
         8,
         9,
-        10,
-        11
+        10
         -- LINKEDIN
     UNION
     SELECT
@@ -452,7 +437,6 @@ campaigns_full AS (
         'linkedin'::varchar AS origin,
         'fact_linkedin_daily_cost_attributions'::varchar AS fact_cost,
         dlc.campaign_name,
-        NULL AS campaign_city,
         dlcc.account_name AS account_name,
         LOWER(dlc.campaign_name) AS campaign_name_l,
         LOWER(dlcc.account_name) AS account_name_l,
@@ -482,8 +466,7 @@ campaigns_full AS (
         7,
         8,
         9,
-        10,
-        11
+        10
 )
     SELECT
         NULLIF (REGEXP_SUBSTR (campaign_name, '^([[:alpha:]]\\d{3}[[:alpha:]])'), '')::varchar AS rule_id,
@@ -496,7 +479,7 @@ campaigns_full AS (
             origin,
             fact_cost,
             campaign_name,
-            COALESCE(r.city_group, sh.campaign_city) AS campaign_city,
+            r.city_group AS sharing_rules_city_group,
             account_name,
             campaign_name_l,
             account_name_l,
@@ -523,7 +506,7 @@ campaigns_full AS (
             origin,
             fact_cost,
             campaign_name,
-            campaign_city,
+            sharing_rules_city_group,
             account_name,
             campaign_name_l,
             CASE WHEN campaign_name_l LIKE '%calc%' THEN
@@ -575,8 +558,6 @@ cost_taxonomy AS (
             NULLIF (account_name, '') AS account_name,
             NULLIF (campaign_name, '') AS campaign_name,
             NULLIF (city_group, '') AS cost_city_group,
-            NULL AS city_campaign_mapping_rule,
-            NULL AS campaign_city_matched,
             CASE WHEN LOWER(NULLIF (campaign_name, ''))
             LIKE '%calc%' THEN
                 'Calculator'
@@ -642,8 +623,6 @@ cost_taxonomy AS (
                 NULLIF (account_name, '') AS account_name,
                 NULLIF (campaign_name, '') AS campaign_name,
                 NULLIF (r.city_group, '') AS cost_city_group,
-                NULL AS city_campaign_mapping_rule,
-                NULL AS campaign_city_matched,
                 CASE WHEN LOWER(NULLIF (campaign_name, '')) LIKE '%calc%' THEN
                     'Calculator'
                 WHEN LOWER(NULLIF (campaign_name, '')) LIKE '%newchannel%' THEN
@@ -680,8 +659,6 @@ cost_taxonomy AS (
                     account_name,
                     campaign_name,
                     cost_city_group,
-                    city_campaign_mapping_rule,
-                    campaign_city_matched,
                     campaign_origin_aquisition,
                     mkt_category,
                     mkt_flow,
@@ -736,158 +713,7 @@ cost_taxonomy AS (
             cf.sk_date,
             cf.account_name,
             cf.campaign_name,
-            -- city via manual mapping
-            mccc.city_group AS cost_city_group,
-            -- city via campaign_name full name written
-            CASE WHEN campaign_name_l IN ('florianópolis', 'curitiba', 'goiânia', 'rio de janeiro', 'rmsp', 'belo horizonte', 'brasília', 'campinas', 'porto alegre', 'santos', 'recife', 'salvador', 'são josé dos campos', 'mogi das cruzes', 'vitória', 'itapecerica da serra', 'cotia', 'sorocaba', 'ribeirão preto', 'uberlândia', 'são josé do rio preto', 'belém', 'manaus', 'fortaleza') THEN
-                campaign_name_l
-            WHEN cf.campaign_name_l LIKE '%campinas%' THEN
-                'Campinas'
-            WHEN cf.campaign_name_l LIKE '%s_o_paulo%'
-                OR cf.campaign_name_l LIKE '%sp detailed%' THEN
-                'RMSP'
-            WHEN cf.campaign_name_l LIKE 'sp %' THEN
-                'RMSP'
-            WHEN cf.campaign_name_l LIKE '%all cities%' THEN
-                'RMSP'
-            WHEN cf.campaign_name_l LIKE '%rmsp%' THEN
-                'RMSP'
-            WHEN cf.campaign_name_l LIKE '%guarulhos%' THEN
-                'RMSP'
-            WHEN cf.campaign_name_l LIKE '%abc%' THEN
-                'RMSP'
-            WHEN cf.campaign_name_l LIKE '%barueri%' THEN
-                'RMSP'
-            WHEN cf.campaign_name_l LIKE '%osasco%' THEN
-                'RMSP'
-            WHEN cf.campaign_name_l LIKE '%jundia%' THEN
-                'RMSP'
-            WHEN cf.campaign_name_l LIKE '%santo_andr%' THEN
-                'RMSP'
-            WHEN cf.campaign_name_l LIKE '%s_o_bernardo%' THEN
-                'RMSP'
-            WHEN cf.campaign_name_l LIKE '%s_o_caetano%' THEN
-                'RMSP'
-            WHEN cf.campaign_name_l LIKE '%cotia%' THEN
-                'Cotia'
-            WHEN cf.campaign_name_l LIKE '%rio%de%janeiro%' THEN
-                'Rio de Janeiro'
-            WHEN cf.campaign_name_l LIKE '%niter_i%' THEN
-                'Rio de Janeiro'
-            WHEN cf.campaign_name_l LIKE '%bh%'
-                OR cf.campaign_name_l LIKE '%belo%h%' THEN
-                'Belo Horizonte'
-            WHEN cf.campaign_name_l LIKE '%minas_gerais%' THEN
-                'Belo Horizonte'
-            WHEN cf.campaign_name_l LIKE '%goi_nia%'
-                OR cf.campaign_name_l LIKE '%goi_s%' THEN
-                'Goiânia'
-            WHEN cf.campaign_name_l LIKE '%bras_lia%'
-                OR cf.campaign_name_l LIKE '%distrito_federal%' THEN
-                'Brasília'
-            WHEN cf.campaign_name_l LIKE '%porto%alegre%' THEN
-                'Porto Alegre'
-            WHEN cf.campaign_name_l LIKE '%curitiba%'
-                OR cf.campaign_name_l LIKE '%parana%' THEN
-                'Curitiba'
-            WHEN cf.campaign_name_l LIKE '%florian_polis%'
-                OR cf.campaign_name_l LIKE '%santa_catarina%' THEN
-                'Florianópolis'
-            WHEN cf.campaign_name_l LIKE '%poa%' THEN
-                'Porto Alegre'
-            WHEN cf.campaign_name_l LIKE '%ctba%' THEN
-                'Curitiba'
-            WHEN cf.campaign_name_l LIKE '%fln%' THEN
-                'Florianópolis'
-            WHEN cf.campaign_name_l LIKE '%cps%' THEN
-                'Campinas'
-            WHEN cf.campaign_name_l LIKE '%bsb%' THEN
-                'Brasília'
-            WHEN cf.campaign_name_l LIKE '%rj%' THEN
-                'Rio de Janeiro'
-            WHEN cf.campaign_name_l LIKE '%santos%' THEN
-                'Santos'
-            WHEN cf.campaign_name_l LIKE '%recife%' THEN
-                'Recife'
-            WHEN cf.campaign_name_l LIKE '%salvador%' THEN
-                'Salvador'
-            WHEN cf.campaign_name_l LIKE '%sjc%' THEN
-                'São José dos Campos'
-            WHEN cf.campaign_name_l LIKE '%mogi%' THEN
-                'Mogi das Cruzes'
-            WHEN cf.campaign_name_l LIKE '%vit_ria%'
-                OR cf.campaign_name_l LIKE '%vix%'THEN
-                'Vitória'
-            WHEN cf.campaign_name_l LIKE '%itapecerica%' THEN
-                'Itapecerica da Serra'
-            WHEN cf.campaign_name_l LIKE '%sorocaba%' THEN
-                'Sorocaba'
-            WHEN cf.campaign_name_l LIKE '%ribeir_o%preto%' THEN
-                'Ribeirão Preto'
-            WHEN cf.campaign_name_l LIKE '%sjrp%'
-                OR cf.campaign_name_l LIKE '%s_o%jos_%do%rio%preto%' THEN
-                'São José do Rio Preto'
-            WHEN cf.campaign_name_l LIKE '%uberl_ndia%' THEN
-                'Uberlândia'
-            WHEN cf.campaign_name_l LIKE '%bel_m%' THEN
-                'Belém'
-            WHEN cf.campaign_name_l LIKE '%manaus%' THEN
-                'Manaus'
-            WHEN cf.campaign_name_l LIKE '%fortaleza%' THEN
-                'Fortaleza'
-            END AS city_campaign_mapping_rule,
-            -- city via campaign_name name convention
-            CASE WHEN campaign_city IN ('Florianópolis', 'Curitiba', 'Goiânia', 'Rio de Janeiro', 'RMSP', 'Belo Horizonte', 'Brasília', 'Campinas', 'Porto Alegre', 'Santos', 'Recife', 'Salvador', 'São José dos Campos', 'Mogi das Cruzes', 'Vitória', 'Itapecerica da Serra', 'Cotia', 'Sorocaba', 'Ribeirão Preto', 'Uberlândia', 'São José do Rio Preto', 'Belém', 'Manaus', 'Fortaleza') THEN
-                campaign_city
-            WHEN campaign_city = 'campinas' THEN
-                'Campinas'
-            WHEN campaign_city IN ('sp', 'jui', 'santo_andre', 'guarulhos', 'osasco', 'sao_caetano', 'sao_bernardo', 'barueri', 'rmsp') THEN
-                'RMSP'
-            WHEN campaign_city IN ('rj', 'niteroi', 'rio_de_janeiro', 'rio') THEN
-                'Rio de Janeiro'
-            WHEN campaign_city IN ('bh', 'belo_horizonte') THEN
-                'Belo Horizonte'
-            WHEN campaign_city = 'goiania' THEN
-                'Goiânia'
-            WHEN campaign_city IN ('poa', 'porto_alegre') THEN
-                'Porto Alegre'
-            WHEN campaign_city = 'curitiba' THEN
-                'Curitiba'
-            WHEN campaign_city IN ('fln', 'florianopolis') THEN
-                'Florianópolis'
-            WHEN campaign_city IN ('bsb', 'brasilia') THEN
-                'Brasília'
-            WHEN campaign_city = 'santos' THEN
-                'Santos'
-            WHEN campaign_city = 'recife' THEN
-                'Recife'
-            WHEN campaign_city = 'salvador' THEN
-                'Salvador'
-            WHEN campaign_city IN ('sjc', 'sao_jose_dos_campos') THEN
-                'São José dos Campos'
-            WHEN campaign_city IN ('mogi', 'mogi_das_cruzes') THEN
-                'Mogi das Cruzes'
-            WHEN campaign_city IN ('vitoria', 'vix') THEN
-                'Vitória'
-            WHEN campaign_city IN ('itapecerica', 'itapecerica_da_serra') THEN
-                'Itapecerica da Serra'
-            WHEN campaign_city = 'cotia' THEN
-                'Cotia'
-            WHEN campaign_city = 'sorocaba' THEN
-                'Sorocaba'
-            WHEN campaign_city IN ('ribeirao_preto', 'ribeiraopreto') THEN
-                'Ribeirão Preto'
-            WHEN campaign_city IN ('sjrp', 'sao_jose_do_rio_preto') THEN
-                'São José do Rio Preto'
-            WHEN campaign_city = 'uberlandia' THEN
-                'Uberlândia'
-            WHEN campaign_city = 'belem' THEN
-                'Belém'
-            WHEN campaign_city = 'manaus' THEN
-                'Manaus'
-            WHEN campaign_city = 'fortaleza' THEN
-                'fortaleza'
-            END AS campaign_city_matched,
+            cf.sharing_rules_city_group  as cost_city_group,
             COALESCE(tp.campaign_origin_aquisition, 'Not Mapped') AS campaign_origin_aquisition,
             COALESCE(tp.mkt_category, 'Not Mapped') AS mkt_category,
             COALESCE(tp.mkt_flow, 'Not Mapped') AS mkt_flow,
@@ -918,23 +744,27 @@ cost_taxonomy AS (
             COST,
             -- Funnel side is extracted FROM taxonomy
             COALESCE(tp.side, 'Not Mapped') AS side,
-            dr.city_group AS city_group_by_sk_region
+            dr.city_group AS city_group_by_sk_region,
+            cgh.city_group AS city_group_old_campaigns
         FROM
             campaigns_full cf
-        LEFT JOIN datalake_raw.gsheets_marketing_cost_campaign_city AS mccc ON LOWER(mccc.campaign_name) = cf.campaign_name_l
         LEFT JOIN taxonomy_by_platform AS tp ON COALESCE(cf.account_name, '') = COALESCE(tp.account_name, '')
             AND COALESCE(cf.report_type, '') = COALESCE(tp.report_type, '')
             AND COALESCE(cf.ad_type, '') = COALESCE(tp.ad_type, '')
             AND cf.fact_cost = tp.fact_cost
             AND cf.origin = tp.origin
             AND cf.campaign_origin_aquisition = tp.campaign_origin_aquisition
+        LEFT JOIN marketing.city_group_old_campaigns_historic cgh
+        	ON cgh.campaign_name = cf.campaign_name
         LEFT JOIN dim_region dr
             ON (SPLIT_PART(cf.campaign_name, '.', 1)) = dr.sk_region::VARCHAR
+                AND cf.sk_date >= 20210705 -- date when marketing time started to adopt the new name convention to create new campaigns
             -- Append manual costs
         UNION
         SELECT
             *,
-            NULL AS city_group_by_sk_region
+            NULL AS city_group_by_sk_region,
+            NULL AS city_group_old_campaigns
         FROM
             manual_shared_costs
     WHERE
@@ -943,7 +773,8 @@ cost_taxonomy AS (
     -- Append Name Convetion costs
     SELECT
         *,
-        NULL AS city_group_by_sk_region
+        NULL AS city_group_by_sk_region,
+        NULL AS city_group_old_campaigns
     FROM
         name_convention_shared_costs
     WHERE
@@ -956,8 +787,6 @@ kenshoo_raw AS (
         tp.account_name AS account_name,
         NULL::varchar(256) AS campaign_name,
         cost_city_group,
-        city_campaign_mapping_rule,
-        campaign_city_matched,
         tp.mkt_category,
         tp.mkt_flow,
         tp.mkt_completion,
@@ -988,8 +817,6 @@ kenshoo AS (
         account_name,
         campaign_name,
         cost_city_group,
-        city_campaign_mapping_rule,
-        campaign_city_matched,
         mkt_category,
         mkt_flow,
         mkt_completion,
@@ -1012,8 +839,6 @@ GROUP BY
     account_name,
     campaign_name,
     cost_city_group,
-    city_campaign_mapping_rule,
-    campaign_city_matched,
     mkt_category,
     mkt_flow,
     mkt_completion,
@@ -1033,9 +858,8 @@ final_costs AS (
         account_name::varchar(512),
         campaign_name,
         cost_city_group,
-        city_campaign_mapping_rule,
-        campaign_city_matched,
         city_group_by_sk_region,
+        city_group_old_campaigns,
         mkt_category,
         mkt_flow,
         mkt_completion,
@@ -1058,9 +882,8 @@ final_costs AS (
         account_name::varchar(512),
         campaign_name,
         cost_city_group,
-        city_campaign_mapping_rule,
-        campaign_city_matched,
         NULL AS city_group_by_sk_region,
+        NULL AS city_group_old_campaigns,
         mkt_category,
         mkt_flow,
         mkt_completion,
@@ -1084,9 +907,8 @@ SELECT
     campaign_name,
     -- consolidating final city_group
     COALESCE(
-        cost_city_group, 
-        city_campaign_mapping_rule, 
-        campaign_city_matched, 
+        city_group_old_campaigns,
+        cost_city_group, --sharing_rules
         city_group_by_sk_region,
         'Not Mapped'
     ) AS city_group_final,
