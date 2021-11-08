@@ -656,6 +656,7 @@ bietlejuice.enrich_listing_flow:
   - bietlejuice.enrich_lead:load-enrich-lead
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
   - bietlejuice.enrich_wololo_lead:load-enrich-lead-sales-company
+  - bietlejuice.gsheets:load-clean-legacy-doorman
 
 bietlejuice.enrich_listing_jobs:
   - bietlejuice.enrich_crm_tasks:load-enrich-task-status
