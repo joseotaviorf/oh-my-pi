@@ -31,8 +31,11 @@ This pipeline produces the following output tables:
     - `agents_control`
     - `agents_ranking_targets`
     - `agr_account`
+    - `agreements_discounts_answer_forms`
+    - `agreements_discounts_expenses_created`
     - `aux_agents_sale_hub`
     - `auxiliary_region`
+    - `bandaid_off`
     - `branding_where_is_plaquinha`
     - `census_subnormal_crowding_areas`
     - `casa_mineira_marketing_manual_shared_costs`
@@ -60,6 +63,8 @@ This pipeline produces the following output tables:
     - `department_schedule`
     - `entrance_inspection_csat`
     - `exit_inspection_csat`
+    - `extra_invoice`
+    - `extra_invoice_created_expenses`
     - `from_to_cancellation`
     - `google_searches_share_of_interest`    
     - `hotjar_photos_repressed_demand`
