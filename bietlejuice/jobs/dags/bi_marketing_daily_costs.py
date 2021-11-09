@@ -219,14 +219,6 @@ load_fact_marketing_daily_costs_task = BaseDAG.build_python_operator(
                "file_name": "fact_marketing_daily_costs"},
 )
 
-load_temp_fact_marketing_daily_costs_task = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id="load_temp_fact_marketing_daily_costs",
-    python_callable=move_file_query_data_to_dw,
-    op_kwargs={"schema": "marketing",
-               "file_name": "temp_fact_marketing_daily_costs"},
-)
-
 # trigger bi-marketing-funnels-conversions after all tasks have been successfully completed
 trigger_bi_marketing_funnels_conversions_task = TriggerDagRunOperator(
     dag=main_dag,
@@ -238,11 +230,6 @@ trigger_bi_marketing_funnels_conversions_task = TriggerDagRunOperator(
 load_aux_cost_share_files_into_datalake_task >> load_cost_share_rules_into_dw_task
 
 load_fact_marketing_daily_costs_task.set_upstream([
-    load_cost_share_rules_into_dw_task,
-    load_shared_manual_costs_to_datalake_task
-])
-
-load_temp_fact_marketing_daily_costs_task.set_upstream([
     load_cost_share_rules_into_dw_task,
     load_shared_manual_costs_to_datalake_task
 ])
