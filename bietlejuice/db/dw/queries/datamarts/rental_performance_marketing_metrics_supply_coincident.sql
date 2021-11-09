@@ -791,6 +791,8 @@ affiliates AS (
     FROM
         datamarts.daily_target_volumes_supply str
     WHERE str.date < '2021-04-01'
+        OR (str.date > '2021-04-01'
+        AND str.supply_origin NOT IN ('Owner PWA', 'Price Calculator', 'Price Calculator - Sale', 'New Channels'))
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
 
   UNION ALL
@@ -803,6 +805,8 @@ affiliates AS (
         CASE
             WHEN sct.planning_mkt_level3 = 'PWA - Paid'
                 THEN 'Owner PWA'
+            WHEN sct.planning_mkt_level3 = 'Spinver'
+                THEN 'Partners'
             ELSE sct.planning_mkt_level3
         END AS mkt_origin,
         CASE
@@ -834,6 +838,11 @@ affiliates AS (
         datalake_raw.gsheets_costs_targets sct
     WHERE planning_mkt_level1 = 'Supply'
         AND sct.date < '2021-04-01'
+        AND business = 'Rental'
+        OR (planning_mkt_level1 = 'Supply'
+            AND sct.date >= '2021-04-01'
+            AND business = 'Rental'
+            AND planning_mkt_level3 NOT IN ('PWA - Paid', 'Price Calculator', 'New Channels'))
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
 )
 SELECT

@@ -1063,15 +1063,17 @@ costs_targets_results_combined AS (
     -----------------------------------------
     -- Supply ForSale Funnel Targets - OLD --
     -----------------------------------------
-    SELECT
+(WITH targets AS
+    (SELECT
         TO_CHAR(DATE(NULLIF(str.date, NULL)), 'YYYYMMDD')::INT AS sk_date,
         COALESCE(NULLIF(str.city_group, ''),'Not Mapped')::TEXT AS city_group,
-        channel AS mkt_origin,
         CASE
-            WHEN channel IN ('Lost Tracking','Not Mapped')
-                THEN 'Other'
-            ELSE channel
-        END AS mkt_channel,
+            WHEN str.mkt_channel = 'Spinver' THEN 'Partners'
+            WHEN str.mkt_origin = 'All' AND str.mkt_channel IN ('Organic', 'Paid', 'CRM/Notification') THEN 'Owner PWA'
+            WHEN str.mkt_origin = 'All' AND str.mkt_channel NOT IN ('Organic', 'Paid', 'CRM/Notification')  THEN str.mkt_channel
+            ELSE str.mkt_origin
+        END AS mkt_origin,
+        NULL::TEXT AS  mkt_channel,
         NULL::TEXT AS mkt_medium,
         NULL::TEXT AS mkt_source,
         NULL::TEXT AS utm_campaign,
@@ -1095,9 +1097,9 @@ costs_targets_results_combined AS (
         COUNT(NULL) AS first_listings_hybrid,
         SUM(0::FLOAT) AS cost_sale,
         SUM(0::FLOAT) AS cost_rental,
-        SUM(NULLIF(prospect, '')::FLOAT) AS prospects_target_sale,
-        SUM(NULLIF(qualified, '')::FLOAT) AS qualifieds_target_sale,
-        SUM(0::FLOAT) AS opportunities_target_sale,
+        SUM(NULLIF(prospects, '')::FLOAT) AS prospects_target_sale,
+        SUM(NULLIF(qualifieds, '')::FLOAT) AS qualifieds_target_sale,
+        SUM(NULLIF(opportunities, '')::FLOAT) AS opportunities_target_sale,
         SUM(0::FLOAT) AS first_listings_target_sale,
         SUM(0::FLOAT) AS budget_sale,
         SUM(0::FLOAT) AS prospects_target_rental,
@@ -1106,12 +1108,19 @@ costs_targets_results_combined AS (
         SUM(0::FLOAT) AS first_listings_target_rental,
         SUM(0::FLOAT) AS budget_rental
     FROM
-        datalake_raw.gsheets_sale_mkt_perf_supply_targets str
-    WHERE 
-        str.date < '2021-04-01'
-    GROUP BY 
+        datalake_raw.gsheets_sale_supply_targets str
+    WHERE str.mkt_channel NOT IN ('All', 'Branded')
+    GROUP BY
         1,2,3,4,5,6,7,8,9,10
-    
+    )
+    SELECT
+        *
+    FROM targets
+    WHERE sk_date < 20210401
+    OR (sk_date >= 20210401
+        AND mkt_origin NOT IN ('Owner PWA', 'Price Calculator', 'New Channels'))
+)
+
     UNION ALL
 
   -------------------------------------------
@@ -1159,6 +1168,8 @@ costs_targets_results_combined AS (
         datamarts.daily_target_volumes_supply str
     WHERE 
         str.date < '2021-04-01'
+        OR (str.date > '2021-04-01'
+        AND str.supply_origin NOT IN ('Owner PWA', 'Price Calculator', 'Price Calculator - Sale', 'New Channels'))
     GROUP BY 
         1,2,3,4,5,6,7,8,9,10
     
@@ -1173,6 +1184,8 @@ costs_targets_results_combined AS (
         CASE
             WHEN sct.planning_mkt_level3 = 'PWA - Paid'
                 THEN 'Owner PWA'
+            WHEN sct.planning_mkt_level3 = 'Spinver'
+                THEN 'Partners'
             ELSE sct.planning_mkt_level3
         END AS mkt_origin,
         CASE
@@ -1218,6 +1231,11 @@ costs_targets_results_combined AS (
     WHERE 
         planning_mkt_level1 = 'Supply'
         AND sct.date < '2021-04-01'
+        AND business = 'Sale'
+        OR (planning_mkt_level1 = 'Supply'
+            AND sct.date >= '2021-04-01'
+            AND business = 'Sale'
+            AND planning_mkt_level3 NOT IN ('PWA - Paid', 'Price Calculator', 'New Channels'))
     GROUP BY 
         1,2,3,4,5,6,7,8,9,10
     
@@ -1232,6 +1250,8 @@ costs_targets_results_combined AS (
         CASE
             WHEN sct.planning_mkt_level3 = 'PWA - Paid'
                 THEN 'Owner PWA'
+            WHEN sct.planning_mkt_level3 = 'Spinver'
+                THEN 'Partners
             ELSE sct.planning_mkt_level3
         END AS mkt_origin,
         CASE
@@ -1277,6 +1297,11 @@ costs_targets_results_combined AS (
     WHERE 
         planning_mkt_level1 = 'Supply'
         AND sct.date < '2021-04-01'
+        AND business = 'Rental'
+        OR (planning_mkt_level1 = 'Supply'
+            AND sct.date >= '2021-04-01'
+            AND business = 'Rental'
+            AND planning_mkt_level3 NOT IN ('PWA - Paid', 'Price Calculator', 'New Channels'))
     GROUP BY 
         1,2,3,4,5,6,7,8,9,10
 
