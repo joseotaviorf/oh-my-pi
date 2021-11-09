@@ -1,6 +1,6 @@
 import json
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.consumers.db_consumers.db_consumer import DBConsumer
@@ -28,8 +28,8 @@ class MongoConsumer(DBConsumer):
     @logger
     def _get_collection_names(self):
         """
-            Gets the collection names of a Mongo database.
-            :return: A list of collection names
+        Gets the collection names of a Mongo database.
+        :return: A list of collection names
         """
         query = {
             "listCollections": 1.0,
@@ -167,20 +167,24 @@ class MongoConsumer(DBConsumer):
         # Verifies datatype of the date column:
         if isinstance(column_value, datetime):
             dt_start = execution_datetime.replace(hour=0, minute=0, second=0)
-            dt_end = execution_datetime.replace(hour=23, minute=59, second=59)
+            dt_end = (execution_datetime + timedelta(1)).replace(
+                hour=0, minute=0, second=0
+            )
         elif isinstance(column_value, str):
             dt_start = f"{execution_date}T00:00:00Z"
-            dt_end = f"{execution_date}T23:59:59Z"
+            dt_end = (
+                f"{(execution_datetime + timedelta(1)).strftime('%Y-%m-%d')}T00:00:00Z"
+            )
 
         # Composes a query for a nested or an unnested column:
         if isinstance(nest_value, list):
             query = {
                 nest_field: {
-                    "$elemMatch": {nested_field: {"$gte": dt_start, "$lte": dt_end}}
+                    "$elemMatch": {nested_field: {"$gte": dt_start, "$lt": dt_end}}
                 }
             }
         else:
-            query = {column_name: {"$gte": dt_start, "$lte": dt_end}}
+            query = {column_name: {"$gte": dt_start, "$lt": dt_end}}
 
         df = self.get_data_from_query(table_name, query)
         return df
