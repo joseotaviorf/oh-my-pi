@@ -1251,7 +1251,7 @@ costs_targets_results_combined AS (
             WHEN sct.planning_mkt_level3 = 'PWA - Paid'
                 THEN 'Owner PWA'
             WHEN sct.planning_mkt_level3 = 'Spinver'
-                THEN 'Partners
+                THEN 'Partners'
             ELSE sct.planning_mkt_level3
         END AS mkt_origin,
         CASE
