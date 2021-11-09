@@ -31,6 +31,15 @@ columns:
     lineage:
       - datalake_ebdb_listing.house.id_region
       - datalake_ebdb_clean.lead_aud.id_region
+  id_user_lead_first_discarder:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.id_user
+  id_user_lead_last_discarder:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.id_user
+  funnel_step:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.problem
   dt_lead:
     lineage:
       - datalake_ebdb_listing.house.dt_creation
@@ -67,12 +76,3 @@ columns:
   dt_discarded:
     lineage:
       - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
-  id_user_lead_first_discarder:
-    lineage:
-      - datalake_ebdb_user_revision_entity.user_revision_entity.id_user
-  id_user_lead_last_discarder:
-    lineage:
-      - datalake_ebdb_user_revision_entity.user_revision_entity.id_user
-  funnel_step:
-    lineage:
-      - datalake_ebdb_clean.photographer_job.problem

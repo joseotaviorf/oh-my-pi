@@ -503,17 +503,8 @@ SELECT
     id_affiliate,
     id_region,
     id_first_region,
-    dt_lead,
-    dt_prospect,
-    dt_first_contact,
-    dt_conversion,
-    dt_qualified,
-    dt_opportunity,
-    dt_first_listing,
-    dt_discarded,
     id_user_lead_first_discarder,
     id_user_lead_last_discarder,
-    is_self_service_photo_job_scheduled,
     flow,
     acquisition_method,
     acquisition_channel,
@@ -604,6 +595,7 @@ SELECT
             THEN 'NoPhotoJob'
         ELSE 'NotMapped'
     END AS funnel_step,
+    is_self_service_photo_job_scheduled,
     ROUND(
         (BIGINT(dt_prospect) - BIGINT(dt_lead)) / 3600
         , 1) AS hours_lead_to_prospect,
@@ -657,5 +649,13 @@ SELECT
                     COALESCE(dt_discarded, DATE_ADD(dt_conversion, 1))
                 )) - BIGINT(dt_lead)) / 86400
             , 1)
-        END AS days_lead_to_processing
+        END AS days_lead_to_processing,
+    CAST(dt_lead AS DATE) AS dt_lead,
+    CAST(dt_prospect AS DATE) AS dt_prospect,
+    CAST(dt_first_contact AS DATE) AS dt_first_contact,
+    CAST(dt_conversion AS DATE) AS dt_conversion,
+    CAST(dt_qualified AS DATE) AS dt_qualified,
+    CAST(dt_opportunity AS DATE) AS dt_opportunity,
+    CAST(dt_first_listing AS DATE) AS dt_first_listing,
+    CAST(dt_discarded AS DATE) AS dt_discarded
 FROM base_listing_flows
