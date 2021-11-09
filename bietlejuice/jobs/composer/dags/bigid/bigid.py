@@ -90,7 +90,8 @@ for table_name in table_names:
         table_name=table_name,
         target_database_base_name=SOURCE,
         extraction_spark_job_file=f"{RAW_SPARK_JOB_PATH}load_{table_name}_to_raw.py",
-        raw_spark_job_extra_args=[SOURCE, table_name, "{{ ds }}", database_types],
+        raw_spark_job_extra_args=[SOURCE, table_name, "{{ ds }}", "--database_types"]
+        + database_types,
     )
     raw_task_groups[table_name] = raw_task_group
 
