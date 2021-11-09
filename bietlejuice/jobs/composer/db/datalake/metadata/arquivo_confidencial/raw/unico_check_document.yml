@@ -6,5 +6,4 @@ columns:
     tags:
       - PII
       - Sensitive
-      - Restricted
       - Confidential
