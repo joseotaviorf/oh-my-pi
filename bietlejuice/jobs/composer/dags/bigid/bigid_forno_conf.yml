@@ -1,0 +1,9 @@
+---
+tables:
+  - data_catalog_entities
+database_types:
+  - "rdb-postgresql"
+  - "rdb-mysql"
+  - "mongodb"
+cluster_libs:
+  whl: "s3://artifacts.s3.forno.data.quintoandar.com.br/bigid-api-client-python/quintoandar_bigid_api_client-2.0.0-py2.py3-none-any.whl"

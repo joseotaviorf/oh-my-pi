@@ -1,0 +1,19 @@
+---
+database_name: datalake_bigid_clean
+table_name: data_catalog_entities
+columns:
+  datasource:
+    lineage:
+      - datalake_bigid_raw.data_catalog_entities.datasource
+  table_full_qualified_name:
+    lineage:
+      - datalake_bigid_raw.data_catalog_entities.table_full_qualified_name
+  column_name:
+    lineage:
+      - datalake_bigid_raw.data_catalog_entities.column_name
+  data_type:
+    lineage:
+      - datalake_bigid_raw.data_catalog_entities.data_type
+  classifications:
+    lineage:
+      - datalake_bigid_raw.data_catalog_entities.classifications

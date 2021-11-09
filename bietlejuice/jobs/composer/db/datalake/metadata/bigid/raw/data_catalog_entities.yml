@@ -1,0 +1,3 @@
+---
+database_name: datalake_bigid_raw
+table_name: data_catalog_entities
