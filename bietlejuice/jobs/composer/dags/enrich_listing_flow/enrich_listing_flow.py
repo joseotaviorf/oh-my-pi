@@ -44,7 +44,8 @@ CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
 ] = f"{spark_jobs_logs_path}{DAG_ID}"
 
 # dependent: [dependencies]
-INNER_DEPENDENCIES = {"listing_flows_with_reprocessed_leads": ["listing_flow"]}
+INNER_DEPENDENCIES = {"listing_flows_with_reprocessed_leads": ["listing_flow"],
+                      "sales_listing_flows_with_reprocessed_leads": ["listing_flow"]}
 
 dag = DAG(
     dag_id=DAG_ID,

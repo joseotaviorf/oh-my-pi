@@ -13,6 +13,8 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 Produces the following output tables:
 
 - `listing_flow`
+- `listing_flows_with_reprocessed_leads`
+- `sales_listing_flows_with_reprocessed_leads`
 
 ### Responsible Data Engineering Team
 

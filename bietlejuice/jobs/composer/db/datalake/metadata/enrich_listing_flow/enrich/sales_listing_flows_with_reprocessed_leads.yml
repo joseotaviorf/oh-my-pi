@@ -1,0 +1,99 @@
+database_name: datalake_listing_flow
+table_name: sales_listing_flows_with_reprocessed_leads
+columns:
+  id:
+    lineage:
+      - datalake_listing_flow.listing_flow.id
+  id_lead:
+    lineage:
+      - datalake_listing_flow.listing_flow.id_lead
+  id_conversion:
+    lineage:
+      - datalake_listing_flow.listing_flow.id_conversion
+  id_photo_job:
+    lineage:
+      - datalake_listing_flow.listing_flow.id_photo_job
+  id_house:
+    lineage:
+      - datalake_listing_flow.listing_flow.id_house
+  id_rep:
+    lineage:
+      - datalake_listing_flow.listing_flow.id_rep
+      - datalake_ebdb_listing.listing_business_context.user_listing_registrant_sale
+  id_isales_registrant:
+    lineage:
+      - datalake_listing_flow.listing_flow.id_isales_registrant
+  id_affiliate:
+    lineage:
+      - datalake_listing_flow.listing_flow.id_affiliate
+  id_region:
+    lineage:
+      - datalake_listing_flow.listing_flow.id_region
+  id_partner:
+    lineage:
+      - datalake_ebdb_clean.partner_agent.id_partner
+  id_user_has_indicated:
+    lineage:
+      - datalake_lead.lead.id_user_has_indicated
+  id_user_lead_first_discarder:
+    lineage:
+      - datalake_listing_flow.listing_flow.id_user_lead_first_discarder
+  id_user_lead_last_discarder:
+    lineage:
+      - datalake_listing_flow.listing_flow.id_user_lead_last_discarder
+  is_self_service_photo_job_scheduled:
+    lineage:
+      - datalake_listing_flow.listing_flow.is_self_service_photo_job_scheduled
+  flow:
+    lineage:
+      - datalake_listing_flow.listing_flow.flow
+  acquisition_method:
+    lineage:
+      - datalake_listing_flow.listing_flow.acquisition_method
+  acquisition_channel:
+    lineage:
+      - datalake_listing_flow.listing_flow.acquisition_channel
+  acquisition_source:
+    lineage:
+      - datalake_listing_flow.listing_flow.acquisition_source
+  acquisition_channel_rep:
+    lineage:
+      - datalake_listing_flow.listing_flow.acquisition_channel
+  affiliate_type:
+    lineage:
+      - datalake_lead.lead.affiliate_type
+  dt_opt_out_sale:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context.ts_opt_out_sale
+  dt_lead:
+    lineage:
+      - datalake_listing_flow.listing_flow.dt_lead
+      - datalake_ebdb_listing.listing_business_context.ts_created
+  dt_prospect:
+    lineage:
+      - datalake_listing_flow.listing_flow.dt_prospect
+      - datalake_ebdb_listing.listing_business_context.ts_created
+  dt_first_contact:
+    lineage:
+      - datalake_listing_flow.listing_flow.dt_first_contact
+      - datalake_ebdb_listing.listing_business_context.ts_created
+  dt_conversion:
+    lineage:
+      - datalake_listing_flow.listing_flow.dt_conversion
+  dt_qualified:
+    lineage:
+      - datalake_listing_flow.listing_flow.dt_qualified
+      - datalake_ebdb_listing.listing_business_context.ts_created
+  dt_opportunity:
+    lineage:
+      - datalake_listing_flow.listing_flow.dt_opportunity
+      - datalake_ebdb_listing.listing_business_context.ts_first_listing
+  dt_first_listing:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context.ts_first_listing
+  dt_discarded:
+    lineage:
+      - datalake_listing_flow.listing_flow.dt_discarded
+  ts_sales_company_sent:
+    lineage:
+      - datalake_wololo_lead.lead_sales_company.ts_sales_company_sent
