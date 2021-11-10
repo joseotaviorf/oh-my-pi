@@ -113,9 +113,9 @@ info_contact as (
     FROM
         datalake_casa_mineira_crm_clean_prod.contact AS c
         LEFT JOIN datalake_casa_mineira_crm_clean_prod.house AS h
-            ON c.id_house = h.id AND h.id_real_estate_agency = '1'
+            ON c.id_house = h.id
         LEFT JOIN datalake_casa_mineira_portal_clean_prod.house AS hp
-            ON c.id_house = hp.code
+            ON c.id_house = hp.code AND hp.id_real_estate_agency = '1'
         LEFT JOIN datalake_casa_mineira_crm_clean_prod.neighborhood AS n
             ON h.id_neighborhood = n.id
         LEFT JOIN datalake_casa_mineira_crm_clean_prod.city AS ct
