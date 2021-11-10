@@ -1,0 +1,54 @@
+database_name: datalake_analyst_ranking
+table_name: ranking
+columns:
+  id_agent:
+    lineage:
+      - datalake_customer_support.email.id_agent
+  agent_company:
+    lineage:
+      - datalake_customer_support.email.agent_company
+  agent_manager:
+    lineage:
+      - datalake_customer_support.email.agent_manager
+  department:
+    lineage:
+      - datalake_customer_support.email.department
+  sum_csat_score:
+    lineage:
+      - datalake_customer_support.csat.csat_score
+  total_tickets_resolution:
+    lineage:
+      - datalake_customer_support.csat.resolution_survey
+  total_tickets_answered_resolution:
+    lineage:
+      - datalake_customer_support.csat.resolution_survey
+  total_tickets_with_csat_score:
+    lineage:
+      - datalake_customer_support.csat.csat_score
+  total_tickets:
+    lineage:
+      - datalake_customer_support.email.id_ticket
+  sum_ticket_resolution_time:
+    lineage:
+      - datalake_customer_support.email.minutes_full_resolution_time_business
+  agent_age_in_months:
+    lineage:
+      - datalake_gsheets_clean.agents_control.dt_start
+      - datalake_customer_support.email.ts_ticket_solved
+      - datalake_customer_support.csat.ts_response
+  dt:
+    lineage:
+      - datalake_customer_support.email.ts_ticket_solved
+      - datalake_customer_support.csat.ts_response
+  year:
+    lineage:
+      - datalake_customer_support.email.ts_ticket_solved
+      - datalake_customer_support.csat.ts_response
+  month:
+    lineage:
+      - datalake_customer_support.email.ts_ticket_solved
+      - datalake_customer_support.csat.ts_response
+  day:
+    lineage:
+      - datalake_customer_support.email.ts_ticket_solved
+      - datalake_customer_support.csat.ts_response
