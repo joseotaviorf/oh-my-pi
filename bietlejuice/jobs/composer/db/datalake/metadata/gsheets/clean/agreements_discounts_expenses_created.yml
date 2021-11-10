@@ -1,0 +1,51 @@
+database_name: datalake_gsheets_clean
+table_name: agreements_discounts_expenses_created
+columns:
+  id_request:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_expenses.solicitacao
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_expenses.contrato
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_expenses.imovel
+  expense_name:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_expenses.despesa
+  from_account:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_expenses.de
+  to_account:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_expenses.para
+  tag:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_expenses.tag
+  value:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_expenses.valor
+  accrual_year_month:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_expenses.competencia
+  installments:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_expenses.parcelas
+  invoice_status:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_expenses.status_fatura
+  elapsed_time:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_expenses.tempo_decorrido
+  line:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_expenses.linha
+  has_invoice_update:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_expenses.boleto_update
+  is_closed_invoice:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_expenses.fatura_fechada
+  ts_request:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_expenses.timestamp

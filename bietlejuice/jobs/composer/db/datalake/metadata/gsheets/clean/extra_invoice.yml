@@ -1,0 +1,96 @@
+database_name: datalake_gsheets_clean
+table_name: extra_invoice
+columns:
+  id_request:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.solicitacao
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.contrato
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.imovel
+  id_user_cpf:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.cpf
+  task:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.tarefa
+  analyst:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.analista
+  origin:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.origem
+  expense:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.despesa
+  from_account:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.de
+  to_account:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.para
+  value:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.valor
+  assessment:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.multa
+  installments:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.parcelas
+  ticket:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.ticket
+  summary:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.resumo
+  holder:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.titular
+  bank:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.banco
+  bank_branch_code:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.agencia
+  account_number:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.conta
+  type:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.tipo
+  month_due:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.mes_vencimento
+  line:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.linha
+  note:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.observacao
+  time:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.time
+  is_get_net:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.get_net
+  is_exempt_interest:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.isentar_juros
+  dt_due:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.vencimento
+  dt_ref_month:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.ref_mes
+  ts_canceled:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.cancelado
+  ts_execution:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.execucao
+  ts_request:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice.timestamp

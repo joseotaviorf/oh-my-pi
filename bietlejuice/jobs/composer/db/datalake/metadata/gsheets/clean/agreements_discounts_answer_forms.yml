@@ -1,0 +1,87 @@
+database_name: datalake_gsheets_clean
+table_name: agreements_discounts_answer_forms
+columns:
+  id_request:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.solicitacao
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.contrato
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.imovel
+  task:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.tarefa
+  analyst:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.analista
+  origin:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.origem
+  expenses:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.despesa
+  from_account:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.de
+  to_account:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.para
+  value:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.valor
+  installment_type:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.parcelas
+  ticket:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.ticket
+  summary:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.resumo
+  num_of_months:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.qtde_meses
+  num_of_installments:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.parcelamento
+  note:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.obs
+  task_row:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.task_row
+  exp_num:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.exp_num
+  sla:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.sla_corrido
+  split_queue:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.split_queue
+  bot_mega:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.bot_mega
+  dt_due:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.vencimento
+  dt_ref_month:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.ref_mes
+  dt_initial_ref:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.ref_inicial
+  dt_final_ref:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.ref_final
+  ts_canceled:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.cancelado
+  ts_execution:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.execucao
+  ts_request:
+    lineage:
+      - datalake_gsheets_raw.entry_agreements_discounts_forms.timestamp

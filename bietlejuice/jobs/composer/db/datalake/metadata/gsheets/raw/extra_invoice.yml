@@ -1,0 +1,23 @@
+database_name: datalake_gsheets_raw
+table_name: extra_invoice
+columns:
+  analista:
+    tags:
+      - PII
+      - Confidential
+  titular:
+    tags:
+      - PII
+      - Confidential
+  agencia:
+    tags:
+      - PII
+      - Confidential
+  conta:
+    tags:
+      - PII
+      - Confidential
+  cpf:
+    tags:
+      - PII
+      - Confidential

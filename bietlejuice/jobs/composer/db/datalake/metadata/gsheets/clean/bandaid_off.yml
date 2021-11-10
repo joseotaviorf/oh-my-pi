@@ -1,0 +1,39 @@
+database_name: datalake_gsheets_clean
+table_name: bandaid_off
+columns:
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.bandaid_off.contrato
+  id_issue:
+    lineage:
+      - datalake_gsheets_raw.bandaid_off.key
+  issue_type:
+    lineage:
+      - datalake_gsheets_raw.bandaid_off.issue_type
+  summary:
+    lineage:
+      - datalake_gsheets_raw.bandaid_off.summary
+  reporter:
+    lineage:
+      - datalake_gsheets_raw.bandaid_off.reporter
+  status:
+    lineage:
+      - datalake_gsheets_raw.bandaid_off.status
+  ba_department:
+    lineage:
+      - datalake_gsheets_raw.bandaid_off.ba_departamento
+  ba_total_value:
+    lineage:
+      - datalake_gsheets_raw.bandaid_off.ba_valor_total
+  ba_value_range:
+    lineage:
+      - datalake_gsheets_raw.bandaid_off.ba_faixa_de_valor
+  ba_expense_category:
+    lineage:
+      - datalake_gsheets_raw.bandaid_off.ba_categoria_do_gasto
+  ba_client:
+    lineage:
+      - datalake_gsheets_raw.bandaid_off.ba_cliente_beneficiado
+  ts_created:
+    lineage:
+      - datalake_gsheets_raw.bandaid_off.created

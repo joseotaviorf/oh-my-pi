@@ -1,0 +1,81 @@
+database_name: datalake_gsheets_clean
+table_name: extra_invoices_created_expenses
+columns:
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice_expenses.contrato
+  id_file:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice_expenses.fileid
+  id_ticket:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice_expenses.ticket
+  reason:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice_expenses.reason
+  type:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice_expenses.type
+  account:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice_expenses.account
+  expense:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice_expenses.expense
+  amount:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice_expenses.amount
+  item:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice_expenses.item
+  from_account:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice_expenses.from
+  to_account:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice_expenses.to
+  month_due:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice_expenses.mes_vencimento
+  request:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice_expenses.request
+  ref_month:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice_expenses.ref_month
+  invoice_amount:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice_expenses.invoice_amount
+  machine_use:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice_expenses.machine_use
+  barcode:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice_expenses.barcode
+  invoice_creation_time:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice_expenses.boleto_creation_time
+  time_spent_ticket:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice_expenses.time_spent_ticket
+  row:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice_expenses.row
+  is_protecao5a:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice_expenses.protecao5a
+  dt_due:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice_expenses.due_date
+  dt_result:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice_expenses.result
+  ts_invoice_creation:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice_expenses.invoice_creation
+  ts_invoice_created:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice_expenses.boleto_created_at
+  ts_sent:
+    lineage:
+      - datalake_gsheets_raw.extra_invoice_expenses.sent_at
