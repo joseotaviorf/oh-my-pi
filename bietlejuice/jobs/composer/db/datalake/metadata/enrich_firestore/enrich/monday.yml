@@ -160,6 +160,9 @@ columns:
   land_tenure:
     lineage:
       - datalake_firestore_clean.monday.updated_message
+  has_operation_support:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
   has_seller_debt_payments:
     lineage:
       - datalake_firestore_clean.monday.updated_message

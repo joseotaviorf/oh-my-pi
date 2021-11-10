@@ -59,6 +59,7 @@ SELECT
   GET_JSON_OBJECT(moa.updated_message, '$.status47.value') AS house_occupant,
   GET_JSON_OBJECT(moa.updated_message, '$.status_12.value') AS land_tenure,
   COALESCE(CAST(GET_JSON_OBJECT(moa.updated_message, '$.iq_morando_.value') AS BOOLEAN), FALSE) AS has_seller_debt_payments,
+  GET_JSON_OBJECT(moa.updated_message, '$.status80.value') AS has_operation_support,
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.id_im_vel6.value') AS DATE) AS dt_submitted,
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.data3.value') AS DATE) AS dt_deal_qualified,
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.data_proposta.value') AS DATE) AS dt_accepted,
@@ -166,6 +167,10 @@ SELECT
       (moa.payment_method IS NULL) THEN 'Não definida'
     WHEN moa.payment_method = 7 THEN 'Financiado por fora'
   END AS form_of_payment,
+  CASE
+    WHEN moa.has_operation_support = 'SIM' THEN TRUE
+    ELSE FALSE
+  END AS has_operation_support
   moa.has_seller_debt_payments,
   CASE
     WHEN moa.dt_sale_agreement_signed IS NOT NULL THEN
