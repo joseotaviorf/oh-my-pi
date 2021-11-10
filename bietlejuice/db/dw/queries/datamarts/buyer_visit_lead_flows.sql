@@ -380,6 +380,7 @@ UNION ALL
     WITH all_offers AS (
         SELECT
             uu.user_key,
+            id_secretariat_client,
             fo.sk_house,
             fo.sk_offer,
             CASE
@@ -388,23 +389,29 @@ UNION ALL
                 ELSE 'DealMaking'
             END AS offer_flow,
             fo.sk_region AS sk_region_first_offer,
-            TO_DATE(fo.sk_offer_submitted_date, 'YYYYMMDD') AS dt_offer_submitted,
-            COALESCE(TO_DATE(NULLIF(fo.sk_sale_agreement_signed_date,-1), 'YYYYMMDD'), oh.dt_sale_agreement_signed) AS dt_sale_agreement_signed
+            TO_DATE(dd_os.date, 'YYYY-MM-DD') AS dt_offer_submitted,
+            COALESCE(TO_DATE(dd_ccv.date, 'YYYY-MM-DD'), oh.dt_sale_agreement_signed) AS dt_sale_agreement_signed
         FROM unique_user_client_lead_classifieds uu
         JOIN sale.fact_offers fo
             ON fo.sk_buyer = uu.id_user
         LEFT JOIN datalake_gsheets_clean_prod.offers_hub_central oh
             ON oh.id_offer = fo.sk_offer
+        LEFT JOIN dim_date dd_os
+            ON dd_os.sk_date = fo.sk_offer_submitted_date
+        LEFT JOIN dim_date dd_ccv
+            ON dd_ccv.sk_date = fo.sk_sale_agreement_signed_date
     UNION ALL
         -- HUB v0 offer flow
         SELECT
             uu.user_key,
+            id_secretariat_client,
             fl.sk_house,
             oh.id_offer AS sk_offer,
-            oh.offer_flow,
+            'HUB' AS offer_flow,
             fl.sk_region AS sk_region_first_offer,
-            oh.dt_offer_submitted,
-            oh.dt_sale_agreement_signed
+            TO_DATE(oh.dt_offer_submitted,'YYYY-MM-DD') AS dt_offer_submitted,
+            TO_DATE(oh.dt_sale_agreement_signed,'YYYY-MM-DD') AS dt_sale_agreement_signed
+
         FROM unique_user_client_lead_classifieds uu
         JOIN datalake_gsheets_clean_prod.offers_hub_central oh
             ON uu.id_user = oh.id_user_5a
@@ -414,8 +421,29 @@ UNION ALL
         LEFT JOIN sale.fact_listings fl
             ON fl.sk_house = h.id_house_quintoandar
         WHERE
-            oh.offer_flow in ('HUB_VM_V0','HUB_BV_V0')
+            oh.offer_model = 'v0'
+			AND offer_flow in ('HUB Bela Vista','HUB Vila Mariana')
             AND oh.dt_offer_submitted IS NOT NULL
+    UNION ALL
+        -- CCVS in SCM BH
+        SELECT
+            uu.user_key,
+            id_secretariat_client,
+            id_house_quintoandar::BIGINT AS sk_house,
+            CAST(s.id AS VARCHAR) AS sk_offer,
+            'BH' AS offer_flow,
+            fl.sk_region AS sk_region_first_offer,
+            TO_DATE(s.ts_created, 'YYYY-MM-DD') AS dt_offer_submitted,
+            TO_DATE(s.ts_sold, 'YYYY-MM-DD') AS dt_sale_agreement_signed
+        FROM unique_user_client_lead_classifieds uu
+        JOIN datalake_casa_mineira_crm_clean_prod.sale s
+            ON uu.id_secretariat_client = s.id_client
+        LEFT JOIN datalake_casa_mineira_crm_clean_prod.house h
+            ON s.id_house = h.id
+        LEFT JOIN sale.fact_listings fl
+            ON fl.sk_house = h.id_house_quintoandar::BIGINT
+        WHERE
+            id_client IS NOT NULL
     )
     SELECT
         *,
@@ -530,4 +558,6 @@ UNION ALL
 SELECT
     *
 FROM final_base
-WHERE first_touch IS NOT NULL
+WHERE 
+    first_touch IS NOT NULL 
+    AND ts_first_visit_lead_intent >= '2021-01-01'
