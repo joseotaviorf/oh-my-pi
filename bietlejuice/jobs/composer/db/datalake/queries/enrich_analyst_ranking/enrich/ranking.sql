@@ -54,7 +54,7 @@ csat(
     tickets_info tickets
       ON tickets.id_ticket = csat.id_ticket
   WHERE
-    csat.ts_response = DATE('{year}-{month}-{day}')
+    DATE(csat.ts_response) = DATE('{year}-{month}-{day}')
   GROUP BY 1,2,3,4,5
 )
 SELECT
