@@ -62,3 +62,4 @@ LEFT JOIN
       ON fo.id = m.id_offer
 WHERE
    dt_sale_agreement_signed IS NOT NULL
+   AND (m.negotiation_model = 'DM' OR m.negotiation_model IS NULL)
