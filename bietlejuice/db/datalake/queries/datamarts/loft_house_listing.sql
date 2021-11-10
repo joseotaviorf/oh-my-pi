@@ -45,25 +45,59 @@ qa_listings AS (
             CAST(lng AS VARCHAR) AS lng
         FROM
             datalake_ebdb_raw_prod.imovel
+    ), 
+    only_qa AS (
+        SELECT
+            CAST(h.id AS VARCHAR) AS id,
+            rh.lat,
+            rh.lng,
+            REGEXP_REPLACE(LOWER(address), 'avenida|rua|av.|#|&|1|2|3|4|5|6|7|8|9| da | de | do | das | dos ') AS qa_address_for_join,
+            (CAST(h.sale_price AS INTEGER)/CAST(h.total_area AS DOUBLE)) AS price_m2
+        FROM
+            datalake_ebdb_clean_prod.house AS h
+        LEFT JOIN
+            datalake_ebdb_clean_prod.listing_business_context AS bc
+                ON h.id = bc.id_house
+        LEFT JOIN
+            house_latlong_raw AS rh
+                ON h.id = rh.id
+        WHERE
+            bc.business_context = 'SALE'
+            AND bc.status = 'PUBLISHED'
+            AND h.type IN ('Apartamento', 'StudioOuKitchenette') 
+    
+    ),
+    only_cm AS (
+        SELECT
+            h.id,
+            CAST(lat AS VARCHAR) AS lat,
+            CAST(lng AS VARCHAR) AS lng,
+            REGEXP_REPLACE(LOWER(address), 'avenida|rua|av.|#|&|1|2|3|4|5|6|7|8|9| da | de | do | das | dos ') AS qa_address_for_join,
+            (CAST(price AS INTEGER)/CAST(total_area AS DOUBLE)) AS price_m2
+        FROM
+            datalake_casa_mineira_crm_clean_prod.house AS h
+        LEFT JOIN
+            datalake_casa_mineira_crm_clean_prod.house_type AS t 
+                ON t.id = h.id_type
+        LEFT JOIN
+            datalake_casa_mineira_crm_clean_prod.house_status AS s
+                ON s.id = h.id_status
+        WHERE
+            id_status = '3'
+            AND id_house_quintoandar IS NULL
+            AND t.house_type_name in ('Apartamento', 'Cobertura', 'Flat')
     )
-    SELECT
-        h.id,
-        rh.lat,
-        rh.lng,
-        REGEXP_REPLACE(LOWER(address), 'avenida|rua|av.|#|&|1|2|3|4|5|6|7|8|9| da | de | do | das | dos ') AS qa_address_for_join,
-        (CAST(h.sale_price AS INTEGER)/CAST(h.total_area AS DOUBLE)) AS price_m2
-    FROM
-        datalake_ebdb_clean_prod.house AS h
-    LEFT JOIN
-        datalake_ebdb_clean_prod.listing_business_context AS bc
-            ON h.id = bc.id_house
-    LEFT JOIN
-        house_latlong_raw AS rh
-            ON h.id = rh.id
-    WHERE
-        bc.business_context = 'SALE'
-        AND bc.status = 'PUBLISHED'
-        AND h.type = 'Apartamento'
+    SELECT 
+        *
+    FROM 
+        only_qa 
+    -----------------
+    UNION 
+    -----------------
+    SELECT 
+        *
+    FROM 
+        only_cm
 ),
 dataset_distances AS (
     WITH  loft_listings_w_latlong AS (
