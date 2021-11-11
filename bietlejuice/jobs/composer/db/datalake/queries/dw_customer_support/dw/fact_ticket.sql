@@ -95,7 +95,7 @@ chat_tickets AS (
         COALESCE(contact_theme_detail_tag, '')
       )
     ) AS sk_taxonomy,
-    MD5('chat', 'twilio') AS sk_channel,
+    MD5(CONCAT('chat', 'twilio')) AS sk_channel,
     id_first_agent AS sk_first_agent,
     id_last_agent AS sk_last_agent,
     MD5(first_department) AS sk_first_department,
@@ -316,7 +316,7 @@ historical_chat_tickets AS (
       COALESCE(contact_theme_detail_tag, '')
     )
     ) AS sk_taxonomy,
-    MD5('chat', 'zendesk_chat') AS sk_channel,
+    MD5(CONCAT('chat', 'zendesk_chat')) AS sk_channel,
     id_first_agent AS sk_first_agent,
     id_last_agent AS sk_last_agent,
     MD5(first_department) AS sk_first_department,
