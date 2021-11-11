@@ -1,0 +1,171 @@
+database_name: datalake_customer_support
+table_name: historical_chat
+columns:
+  id_segment:
+    lineage:
+    # - historical_datalake_zendesk.chat_engagements.id
+      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+  id_ticket:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+  # id_chat:
+  #  lineage:
+    # - historical_datalake_zendesk_clean.chats.id
+  id_session:
+    lineage:
+    # - historical_datalake_zendesk_clean.chats.session
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_session
+  id_agent:
+    lineage:
+      - datalake_zendesk_tickets_clean.tickets.id_assignee
+    # - historical_datalake_zendesk.chat_engagements.id_agent
+  id_first_agent:
+    lineage:
+    # - historical_datalake_zendesk.chat_engagements.id_agent
+      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+  id_last_agent:
+    lineage:
+    # - historical_datalake_zendesk.chat_engagements.id_agent
+      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+  id_user:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_user
+  id_contract:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_contract
+  agent_email:
+    lineage:
+      - datalake_gsheets_clean.agents_control.email
+  agent_manager:
+    lineage:
+      - datalake_gsheets_clean.agents_control.manager
+  agent_name:
+    lineage:
+      - datalake_gsheets_clean.agents_control.agent_name
+    # - historical_datalake_zendesk.chat_engagements.agent_name
+  agent_company:
+    lineage:
+      - datalake_gsheets_clean.agents_control.agent_company
+  csat_comment:
+    lineage:
+      - datalake_chat_fup_clean.surveys_answer.comment
+    # - historical_datalake_zendesk.chat_engagements.comment
+  # department:
+  #  lineage:
+    # - historical_datalake_zendesk.chat_engagements.department_name
+  zendesk_department:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.group_name
+  # first_department:
+  #  lineage:
+    # - historical_datalake_zendesk.chat_engagements.department_name
+    # - historical_datalake_zendesk.chat_engagements.id_chat
+  # last_department:
+  #  lineage:
+    # - historical_datalake_zendesk.chat_engagements.department_name
+    # - historical_datalake_zendesk.chat_engagements.id_chat
+  # transferred_from_dept:
+  #  lineage:
+    # - historical_datalake_zendesk.chat_engagements.department_name
+    # - historical_datalake_zendesk.chat_engagements.id_chat
+  # transferred_to_dept:
+  #  lineage:
+    # - historical_datalake_zendesk.chat_engagements.department_name
+    # - historical_datalake_zendesk.chat_engagements.id_chat
+  request_type:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.request_type
+  client_type:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.client_type
+  step_tag:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.step_tag
+  customer_type_tag:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.customer_type_tag
+  contact_motivation_tag:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.contact_motivation_tag
+  contact_theme_tag:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.contact_theme_tag
+  contact_theme_detail_tag:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.contact_theme_detail_tag
+  tags:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+  status:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.status
+  custom_fields:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+  seconds_first_reply:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
+    # - historical_datalake_zendesk.chat_engagements.response_time
+  # number_of_departments:
+  #  lineage:
+    # - historical_datalake_zendesk.chat_engagements.id_department
+  # number_of_segments:
+  #  lineage:
+    # - historical_datalake_zendesk.chat_engagements.id
+  minutes_first_resolution_time_calendar:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_first_resolution_calendar
+  minutes_first_resolution_time_business:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.minutes_first_resolution_business
+  # total_minutes_talk_time:
+  #  lineage:
+    # - historical_datalake_zendesk.chat_engagements.duration
+  # is_last_segment:
+  #  lineage:
+    # - historical_datalake_zendesk.chat_engagements.id
+    # - historical_datalake_zendesk_clean.chats.id
+  # is_first_segment:
+  #  lineage:
+    # - historical_datalake_zendesk.chat_engagements.id
+    # - historical_datalake_zendesk_clean.chats.id
+  is_bot:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+  is_closed_by_merge:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+  front_or_back:
+    lineage:
+      - datalake_gsheets_clean.department_control.front_or_back
+      - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+  is_csat_answered:
+    lineage:
+      - datalake_chat_fup_clean.chats_chat.id_ticket
+  is_solved:
+    lineage:
+      - datalake_chat_fup_clean.surveys_answer.is_solved
+  csat_score:
+    lineage:
+      - datalake_chat_fup_clean.surveys_answer.rating
+  group_name:
+    lineage:
+      - datalake_chat_fup_clean.chats_chat.group_name
+  ts_survey:
+    lineage:
+      - datalake_chat_fup_clean.chats_chat.ts_attended
+  # dt_agent_start:
+  #  lineage:
+    # - historical_datalake_zendesk.chat_engagements.ts_started_utc
+  ts_created:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.ts_created_local
+  ts_updated:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.ts_updated_local
+  # ts_ticket_started:
+  #  lineage:
+    # - historical_datalake_zendesk.chat_engagements.ts_started_utc
+  # ts_ticket_ended:
+  #  lineage:
+    # - historical_datalake_zendesk.chat_engagements.ts_ended_utc
