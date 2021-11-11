@@ -158,109 +158,16 @@ shared_consolidated_costs AS (
 city_group_mappings AS (
     SELECT DISTINCT
         mc.campaign_name,
-        CASE 
-            WHEN LOWER(mc.campaign_name) IN (
-                    'florianópolis', 'curitiba', 'goiânia', 
-                    'rio de janeiro', 'rmsp', 'belo horizonte', 
-                    'brasília', 'campinas', 'porto alegre', 
-                    'santos', 'recife', 'salvador', 
-                    'são josé dos campos', 'mogi das cruzes', 'vitória', 
-                    'itapecerica da serra', 'cotia', 'sorocaba', 
-                    'ribeirão preto', 'uberlândia', 'são josé do rio preto',
-                    'belém', 'manaus', 'fortaleza'
-                ) THEN LOWER(mc.campaign_name)
-            WHEN LOWER(mc.campaign_name) LIKE '%campinas%' THEN 'Campinas'
-            WHEN LOWER(mc.campaign_name) LIKE '%s_o_paulo%'OR LOWER(mc.campaign_name) LIKE '%sp detailed%' THEN'RMSP'
-            WHEN LOWER(mc.campaign_name) LIKE 'sp %' THEN 'RMSP'
-            WHEN LOWER(mc.campaign_name) LIKE '%all cities%' THEN 'RMSP'
-            WHEN LOWER(mc.campaign_name) LIKE '%rmsp%' THEN 'RMSP'
-            WHEN LOWER(mc.campaign_name) LIKE '%guarulhos%' THEN 'RMSP'
-            WHEN LOWER(mc.campaign_name) LIKE '%abc%' THEN 'RMSP'
-            WHEN LOWER(mc.campaign_name) LIKE '%barueri%' THEN 'RMSP'
-            WHEN LOWER(mc.campaign_name) LIKE '%osasco%' THEN 'RMSP'
-            WHEN LOWER(mc.campaign_name) LIKE '%jundia%' THEN 'RMSP'
-            WHEN LOWER(mc.campaign_name) LIKE '%santo_andr%' THEN 'RMSP'
-            WHEN LOWER(mc.campaign_name) LIKE '%s_o_bernardo%' THEN 'RMSP'
-            WHEN LOWER(mc.campaign_name) LIKE '%s_o_caetano%' THEN 'RMSP'
-            WHEN LOWER(mc.campaign_name) LIKE '%cotia%' THEN 'Cotia'
-            WHEN LOWER(mc.campaign_name) LIKE '%rio%de%janeiro%' THEN 'Rio de Janeiro'
-            WHEN LOWER(mc.campaign_name) LIKE '%niter_i%' THEN 'Rio de Janeiro'
-            WHEN LOWER(mc.campaign_name) LIKE '%bh%'OR LOWER(mc.campaign_name) LIKE '%belo%h%' THEN 'Belo Horizonte'
-            WHEN LOWER(mc.campaign_name) LIKE '%minas_gerais%' THEN 'Belo Horizonte'
-            WHEN LOWER(mc.campaign_name) LIKE '%goi_nia%' OR LOWER(mc.campaign_name) LIKE '%goi_s%' THEN 'Goiânia'
-            WHEN LOWER(mc.campaign_name) LIKE '%bras_lia%' OR LOWER(mc.campaign_name) LIKE '%distrito_federal%' THEN 'Brasília'
-            WHEN LOWER(mc.campaign_name) LIKE '%porto%alegre%' THEN 'Porto Alegre'
-            WHEN LOWER(mc.campaign_name) LIKE '%curitiba%' OR LOWER(mc.campaign_name) LIKE '%paran_%' THEN 'Curitiba'
-            WHEN LOWER(mc.campaign_name) LIKE '%florian_polis%' OR LOWER(mc.campaign_name) LIKE '%santa_catarina%' THEN 'Florianópolis'
-            WHEN LOWER(mc.campaign_name) LIKE '%poa%' THEN 'Porto Alegre'
-            WHEN LOWER(mc.campaign_name) LIKE '%ctba%' THEN 'Curitiba'
-            WHEN LOWER(mc.campaign_name) LIKE '%fln%' THEN 'Florianópolis'
-            WHEN LOWER(mc.campaign_name) LIKE '%cps%' THEN 'Campinas'
-            WHEN LOWER(mc.campaign_name) LIKE '%bsb%' THEN 'Brasília'
-            WHEN LOWER(mc.campaign_name) LIKE '%rj%' THEN 'Rio de Janeiro'
-            WHEN LOWER(mc.campaign_name) LIKE '%santos%' THEN 'Santos'
-            WHEN LOWER(mc.campaign_name) LIKE '%recife%' THEN 'Recife'
-            WHEN LOWER(mc.campaign_name) LIKE '%salvador%' THEN 'Salvador'
-            WHEN LOWER(mc.campaign_name) LIKE '%sjc%' THEN 'São José dos Campos'
-            WHEN LOWER(mc.campaign_name) LIKE '%mogi%' THEN 'Mogi das Cruzes'
-            WHEN LOWER(mc.campaign_name) LIKE '%vix%' THEN 'Vitória'
-            WHEN LOWER(mc.campaign_name) LIKE '%itapecerica%' THEN 'Itapecerica da Serra'
-            WHEN LOWER(mc.campaign_name) LIKE '%sorocaba%' THEN 'Sorocaba'
-            WHEN LOWER(mc.campaign_name) LIKE '%ribeir_o%preto%' THEN 'Ribeirão Preto'
-            WHEN LOWER(mc.campaign_name) LIKE '%sjrp%' OR LOWER(mc.campaign_name) LIKE '%s_o%jos_%do%rio%preto%' THEN 'São José do Rio Preto'
-            WHEN LOWER(mc.campaign_name) LIKE '%uberl_ndia%' THEN 'Uberlândia'
-            WHEN LOWER(mc.campaign_name) LIKE '%bel_m%' THEN 'Belém'
-            WHEN LOWER(mc.campaign_name) LIKE '%manaus%' THEN 'Manaus'
-            WHEN LOWER(mc.campaign_name) LIKE '%fortaleza%' THEN 'Fortaleza'
-        END AS city_group_by_campaign_name,
-        CASE 
-            WHEN campaign_city IN (
-                    'Florianópolis', 'Curitiba', 'Goiânia',
-                    'Rio de Janeiro', 'RMSP', 'Belo Horizonte', 
-                    'Brasília', 'Campinas', 'Porto Alegre', 
-                    'Santos', 'Recife', 'Salvador', 
-                    'São José dos Campos', 'Mogi das Cruzes', 'Vitória', 
-                    'Itapecerica da Serra', 'Cotia', 'Sorocaba', 
-                    'Ribeirão Preto', 'São José do Rio Preto', 'Uberlândia',
-                    'Belém', 'Manaus', 'Fortaleza'
-                ) THEN campaign_city
-            WHEN campaign_city = 'campinas' THEN 'Campinas'
-            WHEN campaign_city IN (
-                    'sp', 'jui', 'santo_andre', 
-                    'guarulhos', 'osasco', 'sao_caetano', 
-                    'sao_bernardo', 'barueri', 'rmsp'
-                ) THEN 'RMSP'
-            WHEN campaign_city IN (
-                    'rj', 'niteroi', 'rio_de_janeiro', 
-                    'rio'
-                ) THEN 'Rio de Janeiro'
-            WHEN campaign_city IN ('bh', 'belo_horizonte') THEN 'Belo Horizonte'
-            WHEN campaign_city = 'goiania' THEN 'Goiânia'
-            WHEN campaign_city IN ('poa', 'porto_alegre') THEN 'Porto Alegre'
-            WHEN campaign_city = 'curitiba' THEN 'Curitiba'
-            WHEN campaign_city IN ('fln', 'florianopolis') THEN 'Florianópolis'
-            WHEN campaign_city IN ('bsb', 'brasilia') THEN 'Brasília'
-            WHEN campaign_city = 'santos' THEN 'Santos'
-            WHEN campaign_city = 'recife' THEN 'Recife'
-            WHEN campaign_city = 'salvador' THEN 'Salvador'
-            WHEN campaign_city IN ('sjc', 'sao_jose_dos_campos') THEN 'São José dos Campos'
-            WHEN campaign_city IN ('mogi', 'mogi_das_cruzes') THEN 'Mogi das Cruzes'
-            WHEN campaign_city IN ('vitoria', 'vix') THEN 'Vitória'
-            WHEN campaign_city IN ('itapecerica', 'itapecerica_da_serra') THEN 'Itapecerica da Serra'
-            WHEN campaign_city = 'cotia'THEN 'Cotia'
-            WHEN campaign_city = 'sorocaba'THEN 'Sorocaba'
-            WHEN campaign_city IN ('ribeirao_preto', 'ribeiraopreto') THEN 'Ribeirão Preto'
-            WHEN campaign_city IN ('sjrp', 'sao_jose_do_rio_preto') THEN 'São José do Rio Preto'
-            WHEN campaign_city = 'uberlandia' THEN 'Uberlândia'
-            WHEN campaign_city = 'belém' THEN 'Belém'
-            WHEN campaign_city = 'manaus' THEN 'Manaus'
-            WHEN campaign_city = 'fortaleza' THEN 'Fortaleza'
-        END AS city_group_by_campaign_convention,
-        manual_cities.city_group AS city_group_by_manual_convention
+        cgoch.city_group AS city_group_old_campaigns,
+        dr.city_group AS city_group_by_sk_region
     FROM
         medias_consolidated mc
-        LEFT JOIN datalake_gsheets_clean.marketing_manual_campaign_cities manual_cities
-            ON LOWER(mc.campaign_name) = LOWER(manual_cities.campaign_name)
+        LEFT JOIN datalake_consolidated_marketing_costs.city_group_old_campaigns_historic cgoch
+            ON mc.sk_date = cgoch.sk_date
+                AND LOWER(mc.campaign_name) = LOWER(cgoch.campaign_name)
+        LEFT JOIN datalake_region.region dr
+            ON split(mc.campaign_name, '\\\\.')[0] = dr.id
+                AND mc.id_date >= 20210705
 )
 
 SELECT 
@@ -268,10 +175,9 @@ SELECT
     origin,
     scc.campaign_name,
     COALESCE(
-        scc.sharing_rules_city_group,
-        cgm.city_group_by_manual_convention,
-        cgm.city_group_by_campaign_name, 
-        cgm.city_group_by_campaign_convention,
+        cgm.city_group_old_campaigns,
+        scc.sharing_rules_city_group,        
+        cgm.city_group_by_sk_region,
         'Not Mapped'
     ) AS city_group,
     account_name,
