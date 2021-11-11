@@ -150,6 +150,8 @@ SELECT DISTINCT
     ce.ts_started_utc AS dt_agent_start,
     zd.ts_created,
     zd.ts_updated,
+    ce.ts_started_utc AS ts_segment_created,
+    ce.ts_ended_utc AS ts_segment_closed,
     cd.ts_chat_created AS ts_ticket_started,
     cd.ts_chat_closed AS ts_ticket_ended
 FROM 

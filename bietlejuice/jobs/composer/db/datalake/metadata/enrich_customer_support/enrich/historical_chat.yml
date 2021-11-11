@@ -163,6 +163,12 @@ columns:
   ts_updated:
     lineage:
       - datalake_zendesk_ticket_funnels.ticket_funnel.ts_updated_local
+  # ts_segment_created:
+  #  lineage:
+    # - historical_datalake_zendesk.chat_engagements.ts_started_utc
+  # ts_segment_closed:
+  #  lineage:
+    # - historical_datalake_zendesk.chat_engagements.ts_ended_utc
   # ts_ticket_started:
   #  lineage:
     # - historical_datalake_zendesk.chat_engagements.ts_started_utc
