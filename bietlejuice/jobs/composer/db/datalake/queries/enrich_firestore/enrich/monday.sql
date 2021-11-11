@@ -170,7 +170,7 @@ SELECT
   CASE
     WHEN moa.has_operation_support = 'SIM' THEN TRUE
     ELSE FALSE
-  END AS has_operation_support
+  END AS has_operation_support,
   moa.has_seller_debt_payments,
   CASE
     WHEN moa.dt_sale_agreement_signed IS NOT NULL THEN
