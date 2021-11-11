@@ -787,6 +787,14 @@ bietlejuice.enrich_terminator:
 bietlejuice.enrich_top_of_funnel_demand:
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
 
+bietlejuice.enrich_top_of_funnel_portal_cm:
+  - bietlejuice.gsheets:load-clean-taxonomy-portal-casa-mineira
+  - bietlejuice.casa_mineira_amplitude:load-clean-329001-portal
+  - bietlejuice.casa_mineira_portal:load-clean-house
+  - bietlejuice.casa_mineira_portal:load-clean-neighborhood
+  - bietlejuice.casa_mineira_portal:load-clean-city
+  - bietlejuice.casa_mineira_portal:load-clean-uf
+
 bietlejuice.enrich_tracksale:
   - bietlejuice.tracksale:load-clean-dispatch
   - bietlejuice.tracksale:load-clean-answer
