@@ -48,7 +48,8 @@ combo_events AS (
         JOIN sale_users AS su
             ON evt.id_user = su.id_user
             AND DATE(evt.ts_event) = su.dt_event
-            AND prop_sale_7d > 0.5
+            AND ((prop_sale_7d > 0.5 AND DATE(evt.ts_event) <= DATE('2021-11-11'))
+                 OR (prop_sale_7d > 0.6 AND DATE(evt.ts_event) > DATE('2021-11-11')))
         LEFT JOIN login_created AS lc
             ON lc.id_user = evt.id_user
     WHERE TRUE
@@ -60,6 +61,7 @@ combo_events AS (
         AND event_type IN ('listing_tab_clicked', 'unavailable_listing_viewed', 'share_listing',
                            'mtgsimulator_startsimulation_clicked', 'listing_favorite_set', 'homes_subscription_confirmed')
         AND LOWER(JSON_EXTRACT_SCALAR(evt.event_properties, '$.business_context')) = 'sale'
+        AND CAST(evt.id_user AS BIGINT) != fl.id_user
 ),
 clients_scm as (
     select 
@@ -91,6 +93,8 @@ base AS (
         AND ce.ts_combo_triggered >= date('2021-07-01')
         AND du.telefone_principal IS NOT NULL
         AND DATE(ce.ts_combo_triggered) < CURRENT_DATE
+        AND NOT COALESCE(CAST(NULLIF(du.is_sale_agent, '') AS BOOLEAN), FALSE)
+        AND NOT COALESCE(CAST(NULLIF(du.is_rent_agent, '') AS BOOLEAN), FALSE)
 )
 SELECT
     *
