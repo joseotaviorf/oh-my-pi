@@ -4,12 +4,15 @@ columns:
   id_ticket:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.id_ticket
+      # - historical_datalake_zendesk_clean.chats.id_ticket
   subject:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.subject
+      # - historical_datalake_zendesk_clean.chats.visitor
   description:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.description
+      # - historical_datalake_zendesk_clean.chats.session
   ticket_via:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.ticket_via
@@ -20,6 +23,7 @@ columns:
   group_name:
     lineage:
       - datalake_zendesk_tickets_clean.groups.name
+      # - historical_datalake_zendesk_clean.chats.department_name
   priority:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.priority
@@ -29,6 +33,7 @@ columns:
   tags:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.tags
+      # - historical_datalake_zendesk_clean.chats.tags
   status:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.status
@@ -38,12 +43,14 @@ columns:
   score:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.satisfaction_rating
+      # - historical_datalake_zendesk_clean.chats.rating
   reason:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.satisfaction_rating
   comment:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.satisfaction_rating
+      # - historical_datalake_zendesk_clean.chats.comment
   custom_fields:
     lineage:
       - datalake_zendesk_custom_fields.custom_fields.custom_fields
@@ -71,21 +78,28 @@ columns:
   ts_created:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.ts_created
+      # - historical_datalake_zendesk_clean.chats.ts_created
   ts_created_local:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.ts_created_local
+      # - historical_datalake_zendesk_clean.chats.ts_created
   ts_updated:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.ts_updated
+      # - historical_datalake_zendesk_clean.chats.ts_updated
   ts_updated_local:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.ts_updated
+      # - historical_datalake_zendesk_clean.chats.ts_updated
   year:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.ts_updated
+      # - historical_datalake_zendesk_clean.chats.ts_updated
   month:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.ts_updated
+      # - historical_datalake_zendesk_clean.chats.ts_updated
   day:
     lineage:
       - datalake_zendesk_tickets_clean.tickets.ts_updated
+      # - historical_datalake_zendesk_clean.chats.ts_updated
