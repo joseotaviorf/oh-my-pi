@@ -67,7 +67,8 @@ SELECT
   dd.sk_date,
   dr.city_group,
   COUNT(DISTINCT CASE WHEN tp.interactions_order = 1 THEN tp.sk_client ELSE NULL END)
-    / NULLIF(SUM(COUNT(DISTINCT CASE WHEN tp.interactions_order = 1 THEN tp.sk_client ELSE NULL END)) OVER(PARTITION BY sk_date)::FLOAT, 0)  AS share
+    / NULLIF(SUM(COUNT(DISTINCT CASE WHEN tp.interactions_order = 1 THEN tp.sk_client ELSE NULL END)) OVER(PARTITION BY sk_date)::FLOAT, 0)  AS share, 
+    'demand' AS funnel_side
 FROM
   tenant_prospects AS tp
   JOIN dim_date AS dd
