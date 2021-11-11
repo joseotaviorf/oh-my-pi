@@ -12,63 +12,80 @@ WITH reproc_leads AS (
         ON l.id = rl.id_origin_lead
 ),
 lbc AS (
+    WITH _lbc AS (
+        SELECT
+            id_house,
+            MAX(CAST(business_context = 'SALE' AS INTEGER)) AS is_for_sale,
+            MAX(CAST(business_context = 'RENT' AS INTEGER)) AS is_for_rent,
+            MAX(
+                CASE
+                    WHEN lbc.business_context = 'SALE' THEN lbc.status
+                END
+            ) AS status_sale,
+            MAX(
+                CASE
+                    WHEN lbc.business_context = 'RENT' THEN lbc.status
+                END
+            ) AS status_rent,
+            MAX(
+                CASE
+                    WHEN lbc.business_context = 'SALE' THEN lbc.ts_created
+                END
+            ) AS ts_qualified_sale,
+            MAX(
+                CASE
+                    WHEN lbc.business_context = 'RENT' THEN lbc.ts_created
+                END
+            ) AS ts_qualified_rent,
+            MAX(
+                CASE
+                    WHEN lbc.business_context = 'SALE' THEN lbc.ts_first_listing
+                END
+            ) AS ts_first_listing_sale,
+            MAX(
+                CASE
+                    WHEN lbc.business_context = 'RENT' THEN lbc.ts_first_listing
+                END
+            ) AS ts_first_listing_rent,
+            MAX(
+                CASE
+                    WHEN lbc.business_context = 'SALE' THEN lbc.ts_opt_out_sale
+                END
+            ) AS ts_opt_out_sale,
+            MAX(
+                CASE
+                    WHEN lbc.business_context = 'RENT' THEN lbc.ts_opt_out_rent
+                END
+            ) AS ts_opt_out_rent,
+            MAX(
+                CASE
+                    WHEN lbc.business_context = 'SALE' THEN lbc.user_listing_registrant_sale
+                END
+            ) AS user_registrant_sale,
+            MAX(
+                CASE
+                    WHEN lbc.business_context = 'RENT' THEN lbc.user_listing_registrant_rent
+                END
+            ) AS user_registrant_rent
+        FROM
+           datalake_ebdb_listing.listing_business_context AS lbc
+        GROUP BY 1
+    )
     SELECT
         id_house,
-        CAST(MAX(CAST(business_context = 'SALE' AS INTEGER)) AS BOOLEAN) AS is_for_sale,
-        CAST(MAX(CAST(business_context = 'RENT' AS INTEGER)) AS BOOLEAN) AS is_for_rent,
-        MAX(
-            CASE
-                WHEN lbc.business_context = 'SALE' THEN lbc.status
-            END
-        ) AS status_sale,
-        MAX(
-            CASE
-                WHEN lbc.business_context = 'RENT' THEN lbc.status
-            END
-        ) AS status_rent,
-        MAX(
-            CASE
-                WHEN lbc.business_context = 'SALE' THEN lbc.ts_created
-            END
-        ) AS dt_qualified_sale,
-        MAX(
-            CASE
-                WHEN lbc.business_context = 'RENT' THEN lbc.ts_created
-            END
-        ) AS dt_qualified_rent,
-        MAX(
-            CASE
-                WHEN lbc.business_context = 'SALE' THEN lbc.ts_first_listing
-            END
-        ) AS dt_first_listing_sale,
-        MAX(
-            CASE
-                WHEN lbc.business_context = 'RENT' THEN lbc.ts_first_listing
-            END
-        ) AS dt_first_listing_rent,
-        MAX(
-            CASE
-                WHEN lbc.business_context = 'SALE' THEN lbc.ts_opt_out_sale
-            END
-        ) AS dt_opt_out_sale,
-        MAX(
-            CASE
-                WHEN lbc.business_context = 'RENT' THEN lbc.ts_opt_out_rent
-            END
-        ) AS dt_opt_out_rent,
-        MAX(
-            CASE
-                WHEN lbc.business_context = 'SALE' THEN lbc.user_listing_registrant_sale
-            END
-        ) AS user_registrant_sale,
-        MAX(
-            CASE
-                WHEN lbc.business_context = 'RENT' THEN lbc.user_listing_registrant_rent
-            END
-        ) AS user_registrant_rent
-    FROM
-       datalake_ebdb_listing.listing_business_context AS lbc
-    GROUP BY 1
+        CAST(is_for_sale AS BOOLEAN) AS is_for_sale,
+        CAST(is_for_rent AS BOOLEAN) AS is_for_rent,
+        status_sale,
+        status_rent,
+        CAST(ts_qualified_sale AS DATE) AS dt_qualified_sale,
+        CAST(ts_qualified_rent AS DATE) AS dt_qualified_rent,
+        CAST(ts_first_listing_sale AS DATE) AS dt_first_listing_sale,
+        CAST(ts_first_listing_rent AS DATE) AS dt_first_listing_rent,
+        CAST(ts_opt_out_sale AS DATE) AS dt_opt_out_sale,
+        CAST(ts_opt_out_rent AS DATE) AS dt_opt_out_rent,
+        user_registrant_sale,
+        user_registrant_rent
+    FROM _lbc
 ),
 first_job AS (
     SELECT
@@ -231,7 +248,7 @@ acquisition_channels AS (
         ON pj.id = lf.id_photo_job
     LEFT JOIN first_job
         ON first_job.id_house = h.id
-    LEFT JOIN datalake_ebdb_listing_jobs.photo_job AS fpj -- todo ver se é o mesmo id do pj
+    LEFT JOIN datalake_ebdb_listing_jobs.photo_job AS fpj
         ON fpj.id = first_job.id_job
     WHERE
         (lbc.id_house IS NULL AND h.id IS NOT NULL) -- When house is not in listing_business_context, it is for rent
