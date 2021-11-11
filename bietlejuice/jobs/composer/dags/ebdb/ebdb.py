@@ -23,7 +23,7 @@ ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz)
-MAIN_SCHEDULE_INTERVAL = "0 22 * * *"
+MAIN_SCHEDULE_INTERVAL = "40 21 * * *"
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 # Job params
@@ -202,9 +202,7 @@ def clean_tasks(table_name):
         },
     )
     final_task = sync_metastore_table_task
-    if FileService.metadata_file_exists(
-            SOURCE, LayerEnum.CLEAN.value, table_name
-    ):
+    if FileService.metadata_file_exists(SOURCE, LayerEnum.CLEAN.value, table_name):
         propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
             dag=dag,
             task_id=f"propagate-table-metadata-clean-{slugged_table_name}",
@@ -216,9 +214,9 @@ def clean_tasks(table_name):
                         MetadataTypeEnum.LINEAGE.value,
                         SOURCE,
                         table_name,
-                    ]
+                    ],
                 }
-            }
+            },
         )
 
         sync_metastore_table_task >> propagate_table_metadata_task
@@ -228,10 +226,7 @@ def clean_tasks(table_name):
         clean_table_task, [sync_metastore_table_task, create_clean_external_tables_task]
     )
 
-    return [
-        clean_table_task,
-        [create_clean_external_tables_task, final_task],
-    ]
+    return [clean_table_task, [create_clean_external_tables_task, final_task]]
 
 
 def build_raw_task_list():
