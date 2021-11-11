@@ -12,7 +12,7 @@ WITH call_tickets AS (
         COALESCE(contact_theme_detail_tag, '')
       )
     ) AS sk_taxonomy,
-    MD5(CONCAT('call', COALESCE(direction, ''))) AS sk_channel,
+    MD5(CONCAT('call', 'twilio', COALESCE(direction, ''))) AS sk_channel,
     id_first_agent AS sk_first_agent,
     id_last_agent AS sk_last_agent,
     MD5(first_department) AS sk_first_department,
@@ -95,7 +95,7 @@ chat_tickets AS (
         COALESCE(contact_theme_detail_tag, '')
       )
     ) AS sk_taxonomy,
-    MD5('chat') AS sk_channel,
+    MD5('chat', 'twilio') AS sk_channel,
     id_first_agent AS sk_first_agent,
     id_last_agent AS sk_last_agent,
     MD5(first_department) AS sk_first_department,
@@ -178,7 +178,7 @@ email_tickets AS (
         COALESCE(contact_theme_detail_tag, '')
       )
     ) AS sk_taxonomy,
-    MD5(CONCAT('email', COALESCE(direction, ''))) AS sk_channel,
+    MD5(CONCAT('email', 'zendesk', COALESCE(direction, ''))) AS sk_channel,
     id_agent AS sk_first_agent,
     id_agent AS sk_last_agent,
     MD5(department) AS sk_first_department,
@@ -260,7 +260,7 @@ historical_call_tickets AS (
         COALESCE(contact_theme_detail_tag, '')
       )
     ) AS sk_taxonomy,
-    MD5(CONCAT('call', COALESCE(direction, ''))) AS sk_channel,
+    MD5(CONCAT('call', 'teravoz', COALESCE(direction, ''))) AS sk_channel,
     NULL AS sk_first_agent,
     NULL AS sk_last_agent,
     MD5(first_department) AS sk_first_department,
@@ -316,7 +316,7 @@ historical_chat_tickets AS (
       COALESCE(contact_theme_detail_tag, '')
     )
     ) AS sk_taxonomy,
-    MD5('chat') AS sk_channel,
+    MD5('chat', 'zendesk_chat') AS sk_channel,
     id_first_agent AS sk_first_agent,
     id_last_agent AS sk_last_agent,
     MD5(first_department) AS sk_first_department,
