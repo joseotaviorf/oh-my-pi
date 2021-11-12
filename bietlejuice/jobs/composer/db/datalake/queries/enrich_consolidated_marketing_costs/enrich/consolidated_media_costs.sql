@@ -163,8 +163,7 @@ city_group_mappings AS (
     FROM
         medias_consolidated mc
         LEFT JOIN datalake_consolidated_marketing_costs.city_group_old_campaigns_historic cgoch
-            ON mc.sk_date = cgoch.sk_date
-                AND LOWER(mc.campaign_name) = LOWER(cgoch.campaign_name)
+            ON LOWER(mc.campaign_name) = LOWER(cgoch.campaign_name)
         LEFT JOIN datalake_region.region dr
             ON split(mc.campaign_name, '\\\\.')[0] = dr.id
                 AND mc.id_date >= 20210705
