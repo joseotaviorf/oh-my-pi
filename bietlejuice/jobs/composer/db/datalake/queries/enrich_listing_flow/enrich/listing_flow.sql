@@ -26,18 +26,18 @@ WITH houses_without_lead_conversion AS (
         house.id_user AS id_owner,
         house.id_region AS id_region,
         house.id_region AS id_first_region,
-        house.dt_creation AS dt_lead,
-        house.dt_creation AS dt_prospect,
-        NULL AS dt_first_contact,
-        NULL AS dt_conversion,
+        house.dt_creation AS ts_lead,
+        house.dt_creation AS ts_prospect,
+        NULL AS ts_first_contact,
+        NULL AS ts_conversion,
         CASE
             WHEN (house.id_user_registrant = house.id_user
                 AND user.admin_type = 'Normal'
                 AND user.email NOT LIKE '%quintoandar%')
             THEN ure.ts_revision
             ELSE house.dt_creation
-        END AS dt_qualified,
-        NULL AS dt_discarded,
+        END AS ts_qualified,
+        NULL AS ts_discarded,
         NULL AS id_user_lead_first_discarder,
         NULL AS id_user_lead_last_discarder,
         CASE
@@ -98,12 +98,12 @@ houses_without_lead AS (
         house.id_user AS id_owner,
         house.id_region AS id_region,
         house.id_region AS id_first_region,
-        house.dt_creation AS dt_lead,
-        house.dt_creation AS dt_prospect,
-        ts_converted AS dt_first_contact,
-        ts_converted AS dt_conversion,
-        ts_converted AS dt_qualified,
-        NULL AS dt_discarded,
+        house.dt_creation AS ts_lead,
+        house.dt_creation AS ts_prospect,
+        ts_converted AS ts_first_contact,
+        ts_converted AS ts_conversion,
+        ts_converted AS ts_qualified,
+        NULL AS ts_discarded,
         NULL AS id_user_lead_first_discarder,
         NULL AS id_user_lead_last_discarder,
         'Organic Flow' AS flow,
@@ -222,21 +222,21 @@ houses_with_lead AS (
         house.id_user AS id_owner,
         COALESCE(house.id_region, lead.id_region) as id_region,
         COALESCE(lead_aud_first_region.id_region, house.id_region) AS id_first_region,
-        COALESCE(lead.ts_created, lead.dt_ad_created, lead.dt_picked_up) AS dt_lead,
+        COALESCE(lead.ts_created, lead.dt_ad_created, lead.dt_picked_up) AS ts_lead,
         CASE
             WHEN has_aud.id_lead IS NOT NULL THEN ure.ts_revision
             ELSE COALESCE(lead.ts_updated, lead.ts_created) -- if there is no AUD records, we assume lead update or creation
-        END AS dt_prospect,
-        lfc.ts_revision AS dt_first_contact,
-        cl.ts_converted AS dt_conversion,
+        END AS ts_prospect,
+        lfc.ts_revision AS ts_first_contact,
+        cl.ts_converted AS ts_conversion,
         CASE -- when excluded by specific reasons we count the lead as a qualified lead, even if its discarded
         WHEN cl.id_converted_lead IS NOT NULL
           THEN COALESCE(cl.ts_created, cl.ts_conversion, ure.ts_revision)
         WHEN lead.reason = 'ProprietarioRecusou'
             AND lead.original_reason != 'OWNER_DIDNT_LISTEN_TO_PITCH'
           THEN COALESCE(discard_ure.ts_revision, ure.ts_revision)
-        END AS dt_qualified,
-        discard_ure.ts_revision as dt_discarded,
+        END AS ts_qualified,
+        discard_ure.ts_revision as ts_discarded,
         d_ure.id_user AS id_user_lead_first_discarder,
         d_ure_max.id_user AS user_id_lead_last_discarder,
         CASE
@@ -420,10 +420,19 @@ base_listing_flows AS  (
         listing_flows.id_region,
         listing_flows.id_first_region AS id_first_region,
         photographer.id AS id_photographer,
-        listing_flows.dt_lead,
-        listing_flows.dt_prospect,
-        listing_flows.dt_first_contact,
-        listing_flows.dt_conversion,
+        listing_flows.id_user_lead_first_discarder,
+        listing_flows.id_user_lead_last_discarder,
+        listing_flows.flow,
+        listing_flows.acquisition_method,
+        listing_flows.acquisition_channel,
+        listing_flows.acquisition_source,
+        lead.city,
+        lead.neighborhood,
+        (first_rev_photo_job_user.id IS NOT NULL) AS is_self_service_photo_job_scheduled,
+        listing_flows.ts_lead,
+        listing_flows.ts_prospect,
+        listing_flows.ts_first_contact,
+        listing_flows.ts_conversion,
         CASE
             WHEN (
                 listing_flows.lead_status = 'Descartado'
@@ -438,23 +447,14 @@ base_listing_flows AS  (
                     )
                 )
                 THEN NULL
-            ELSE listing_flows.dt_qualified
-        END AS dt_qualified,
+            ELSE listing_flows.ts_qualified
+        END AS ts_qualified,
         COALESCE(first_pj.ts_created,
                  first_pj.ts_scheduled,
                  first_pj.ts_photographer_accepted,
-                 first_pj.ts_photos_uploaded) AS dt_opportunity,
-        house.dt_first_publication AS dt_first_listing,
-        listing_flows.dt_discarded,
-        listing_flows.id_user_lead_first_discarder,
-        listing_flows.id_user_lead_last_discarder,
-        listing_flows.flow,
-        listing_flows.acquisition_method,
-        listing_flows.acquisition_channel,
-        listing_flows.acquisition_source,
-        lead.city,
-        lead.neighborhood,
-        (first_rev_photo_job_user.id IS NOT NULL) AS is_self_service_photo_job_scheduled
+                 first_pj.ts_photos_uploaded) AS ts_opportunity,
+        house.dt_first_publication AS ts_first_listing,
+        listing_flows.ts_discarded
     FROM
         listing_flows
     LEFT JOIN
@@ -510,60 +510,60 @@ SELECT
     acquisition_channel,
     acquisition_source,
     CASE
-        WHEN dt_first_listing IS NOT NULL
+        WHEN ts_first_listing IS NOT NULL
             THEN 'Listed'
-        WHEN dt_opportunity IS NOT NULL
-            AND dt_first_listing IS NULL
+        WHEN ts_opportunity IS NOT NULL
+            AND ts_first_listing IS NULL
             AND photo_job_status IN ('FotosTiradas','Completado', 'NaoListado')
             THEN 'NotListedYet'
         WHEN
-            dt_opportunity IS NOT NULL
-            AND dt_first_listing IS NULL
+            ts_opportunity IS NOT NULL
+            AND ts_first_listing IS NULL
             AND photo_job_status IN ('Agendado','Iniciado','Novo')
             THEN 'PhotoJobScheduled'
         WHEN
-            dt_opportunity IS NOT NULL
-            AND dt_first_listing IS NULL
+            ts_opportunity IS NOT NULL
+            AND ts_first_listing IS NULL
             AND photo_job_status = 'Cancelado'
             THEN COALESCE(photo_job_reason, 'CancelledPhotoJob')
         WHEN
-            dt_opportunity IS NOT NULL
-            AND dt_first_listing IS NULL
+            ts_opportunity IS NOT NULL
+            AND ts_first_listing IS NULL
             THEN COALESCE(photo_job_reason, 'CancelledPhotoJob')
         WHEN
-            dt_opportunity IS NULL
-            AND dt_qualified IS NOT NULL
+            ts_opportunity IS NULL
+            AND ts_qualified IS NOT NULL
             AND lead_status = 'Descartado'
             THEN 'DiscardedQualified'
         WHEN
-            dt_opportunity IS NULL
-            AND dt_qualified IS NOT NULL
+            ts_opportunity IS NULL
+            AND ts_qualified IS NOT NULL
             AND lead_status = 'Convertido'
             THEN 'NoPhotoJob'
         WHEN
-            dt_opportunity IS NULL
-            AND dt_qualified IS NOT NULL
+            ts_opportunity IS NULL
+            AND ts_qualified IS NOT NULL
             AND id_conversion IS NOT NULL
             THEN 'NoPhotoJob'
         WHEN
-            dt_opportunity IS NULL
+            ts_opportunity IS NULL
             AND lead_reason = 'EmProspeccao'
             THEN 'OnHold'
         WHEN
-            dt_qualified IS NULL
+            ts_qualified IS NULL
             AND lead_status = 'Descartado'
             THEN 'DiscardedProspect'
         WHEN
-            dt_qualified IS NULL
+            ts_qualified IS NULL
             AND lead_status = 'Novo'
             AND city = 'Outra cidade'
             THEN 'NaoProcessadoArea'
-        WHEN dt_qualified IS NULL
+        WHEN ts_qualified IS NULL
             AND lead_status = 'Novo'
             THEN 'NaoProcessado'
         WHEN
             flow = 'Lead Flow' AND
-            dt_qualified IS NULL
+            ts_qualified IS NULL
             THEN 'NaoProcessado'
         WHEN
             lead_status = 'Convertido'
@@ -571,91 +571,62 @@ SELECT
             THEN 'BrokenLeadFlow'
         WHEN
             flow = 'Lead Flow'
-            AND dt_prospect IS NULL
+            AND ts_prospect IS NULL
             AND lead_status IS NULL
             THEN 'DiscardedLead'
         WHEN
             flow = 'Self-Service Flow'
-            AND dt_prospect IS NOT NULL
-            AND dt_qualified IS NULL
+            AND ts_prospect IS NOT NULL
+            AND ts_qualified IS NULL
             THEN 'TermsNotAccepted'
         WHEN flow = 'Self-Service Flow'
-            AND dt_qualified IS NOT NULL
-            AND dt_opportunity IS NULL
+            AND ts_qualified IS NOT NULL
+            AND ts_opportunity IS NULL
             THEN 'NoPhotoJob'
         WHEN
             flow = 'Organic Flow'
-            AND dt_prospect IS NOT NULL
-            AND dt_qualified IS NULL
+            AND ts_prospect IS NOT NULL
+            AND ts_qualified IS NULL
             THEN 'UnfinishedForm'
         WHEN
             flow = 'Organic Flow'
-            AND dt_qualified IS NOT NULL
-            AND dt_opportunity IS NULL
+            AND ts_qualified IS NOT NULL
+            AND ts_opportunity IS NULL
             THEN 'NoPhotoJob'
         ELSE 'NotMapped'
     END AS funnel_step,
     is_self_service_photo_job_scheduled,
-    ROUND(
-        (BIGINT(dt_prospect) - BIGINT(dt_lead)) / 3600
-        , 1) AS hours_lead_to_prospect,
-    ROUND(
-        (BIGINT(dt_qualified) - BIGINT(dt_prospect)) / 3600
-        , 1) AS hours_prospect_to_qualified,
-    ROUND(
-        (BIGINT(dt_first_contact) - BIGINT(dt_lead)) / 3600
-        , 1) AS hours_lead_to_first_contact,
-    ROUND(
-        (BIGINT(dt_first_contact) - BIGINT(dt_prospect)) / 3600
-        , 1) AS hours_prospect_to_first_contact,
-    ROUND(
-        (BIGINT(dt_opportunity) - BIGINT(dt_qualified)) / 3600
-        , 1) AS hours_qualified_to_opportunity,
-    ROUND(
-        (BIGINT(dt_first_listing) - BIGINT(dt_opportunity)) / 3600
-        , 1) AS hours_opportunity_to_listing,
-    ROUND(
-        (BIGINT(dt_first_listing) - BIGINT(dt_lead)) / 3600
-        , 1) AS hours_lead_to_listing,
-    ROUND(
-        (BIGINT(dt_prospect) - BIGINT(dt_lead)) / 86400
-        , 1) AS days_lead_to_prospect,
-    ROUND(
-        (BIGINT(dt_qualified) - BIGINT(dt_prospect)) / 86400
-        , 1) AS days_prospect_to_qualified,
-    ROUND(
-        (BIGINT(dt_first_contact) - BIGINT(dt_lead)) / 86400
-        , 1) AS days_lead_to_first_contact,
-    ROUND(
-        (BIGINT(dt_first_contact) - BIGINT(dt_prospect)) / 86400
-        , 1) AS days_prospect_to_first_contact,
-    ROUND(
-        (BIGINT(dt_opportunity) - BIGINT(dt_qualified)) / 86400
-        , 1) AS days_qualified_to_opportunity,
-    ROUND(
-        (BIGINT(dt_first_listing) - BIGINT(dt_opportunity)) / 86400
-        , 1) AS days_opportunity_to_listing,
-    ROUND(
-        (BIGINT(dt_first_listing) - BIGINT(dt_lead)) / 86400
-        , 1) AS days_lead_to_listing,
+    ROUND((BIGINT(ts_prospect) - BIGINT(ts_lead)) / 3600, 1) AS hours_lead_to_prospect,
+    ROUND((BIGINT(ts_qualified) - BIGINT(ts_prospect)) / 3600, 1) AS hours_prospect_to_qualified,
+    ROUND((BIGINT(ts_first_contact) - BIGINT(ts_lead)) / 3600, 1) AS hours_lead_to_first_contact,
+    ROUND((BIGINT(ts_first_contact) - BIGINT(ts_prospect)) / 3600, 1) AS hours_prospect_to_first_contact,
+    ROUND((BIGINT(ts_opportunity) - BIGINT(ts_qualified)) / 3600, 1) AS hours_qualified_to_opportunity,
+    ROUND((BIGINT(ts_first_listing) - BIGINT(ts_opportunity)) / 3600, 1) AS hours_opportunity_to_listing,
+    ROUND((BIGINT(ts_first_listing) - BIGINT(ts_lead)) / 3600, 1) AS hours_lead_to_listing,
+    ROUND((BIGINT(ts_prospect) - BIGINT(ts_lead)) / 86400, 1) AS days_lead_to_prospect,
+    ROUND((BIGINT(ts_qualified) - BIGINT(ts_prospect)) / 86400, 1) AS days_prospect_to_qualified,
+    ROUND((BIGINT(ts_first_contact) - BIGINT(ts_lead)) / 86400, 1) AS days_lead_to_first_contact,
+    ROUND((BIGINT(ts_first_contact) - BIGINT(ts_prospect)) / 86400, 1) AS days_prospect_to_first_contact,
+    ROUND((BIGINT(ts_opportunity) - BIGINT(ts_qualified)) / 86400, 1) AS days_qualified_to_opportunity,
+    ROUND((BIGINT(ts_first_listing) - BIGINT(ts_opportunity)) / 86400, 1) AS days_opportunity_to_listing,
+    ROUND((BIGINT(ts_first_listing) - BIGINT(ts_lead)) / 86400, 1) AS days_lead_to_listing,
     CASE
-        WHEN dt_conversion IS NULL
-            AND dt_discarded IS NULL
+        WHEN ts_conversion IS NULL AND ts_discarded IS NULL
             THEN NULL
         ELSE
             ROUND(
                 (BIGINT(LEAST(
-                    COALESCE(dt_conversion, DATE_ADD(dt_discarded, 1)),
-                    COALESCE(dt_discarded, DATE_ADD(dt_conversion, 1))
-                )) - BIGINT(dt_lead)) / 86400
+                    COALESCE(ts_conversion, DATE_ADD(ts_discarded, 1)),
+                    COALESCE(ts_discarded, DATE_ADD(ts_conversion, 1))
+                )) - BIGINT(ts_lead)) / 86400
             , 1)
         END AS days_lead_to_processing,
-    CAST(dt_lead AS DATE) AS dt_lead,
-    CAST(dt_prospect AS DATE) AS dt_prospect,
-    CAST(dt_first_contact AS DATE) AS dt_first_contact,
-    CAST(dt_conversion AS DATE) AS dt_conversion,
-    CAST(dt_qualified AS DATE) AS dt_qualified,
-    CAST(dt_opportunity AS DATE) AS dt_opportunity,
-    CAST(dt_first_listing AS DATE) AS dt_first_listing,
-    CAST(dt_discarded AS DATE) AS dt_discarded
+    ts_lead,
+    ts_prospect,
+    ts_first_contact,
+    ts_conversion,
+    ts_qualified,
+    ts_opportunity,
+    ts_first_listing,
+    ts_discarded
 FROM base_listing_flows

@@ -30,32 +30,32 @@ lbc AS (
             CASE
                 WHEN lbc.business_context = 'SALE' THEN lbc.ts_created
             END
-        ) AS dt_qualified_sale,
+        ) AS ts_qualified_sale,
         MAX(
             CASE
                 WHEN lbc.business_context = 'RENT' THEN lbc.ts_created
             END
-        ) AS dt_qualified_rent,
+        ) AS ts_qualified_rent,
         MAX(
             CASE
                 WHEN lbc.business_context = 'SALE' THEN lbc.ts_first_listing
             END
-        ) AS dt_first_listing_sale,
+        ) AS ts_first_listing_sale,
         MAX(
             CASE
                 WHEN lbc.business_context = 'RENT' THEN lbc.ts_first_listing
             END
-        ) AS dt_first_listing_rent,
+        ) AS ts_first_listing_rent,
         MAX(
             CASE
                 WHEN lbc.business_context = 'SALE' THEN lbc.ts_opt_out_sale
             END
-        ) AS dt_opt_out_sale,
+        ) AS ts_opt_out_sale,
         MAX(
             CASE
                 WHEN lbc.business_context = 'RENT' THEN lbc.ts_opt_out_rent
             END
-        ) AS dt_opt_out_rent,
+        ) AS ts_opt_out_rent,
         MAX(
             CASE
                 WHEN lbc.business_context = 'SALE' THEN lbc.user_listing_registrant_sale
@@ -122,45 +122,6 @@ acquisition_channels AS (
         lf.id_region,
         lf.id_user_lead_first_discarder,
         lf.id_user_lead_last_discarder,
-        CASE
-            WHEN l.is_for_sale
-             THEN lf.dt_lead
-            ELSE lbc.dt_qualified_sale
-        END AS dt_lead,
-        CASE
-            WHEN l.is_for_sale
-             THEN lf.dt_prospect
-            ELSE lbc.dt_qualified_sale
-        END AS dt_prospect,
-        CASE
-            WHEN l.is_for_sale
-             THEN lf.dt_first_contact
-            ELSE lbc.dt_qualified_sale
-        END AS dt_first_contact,
-        lf.dt_conversion,
-        CASE
-            WHEN (
-                COALESCE(lr.reason, l.reason) = 'ProprietarioRecusou'
-                AND l.reason != 'OWNER_DIDNT_LISTEN_TO_PITCH'
-                AND lf.id_conversion IS NULL
-            )
-                THEN lf.dt_qualified
-            ELSE lbc.dt_qualified_sale
-        END AS dt_qualified,
-        CASE
-            WHEN (lbc.dt_opt_out_sale < lf.dt_opportunity AND lbc.status_sale = 'OPTED_OUT')
-                THEN NULL
-            WHEN (
-                lf.dt_opportunity >= lbc.dt_qualified_sale
-                AND (lbc.dt_first_listing_sale IS NULL OR lf.dt_opportunity <= lbc.dt_first_listing_sale)
-            )
-                THEN lf.dt_opportunity
-            WHEN lbc.dt_first_listing_sale IS NOT NULL
-                THEN lbc.dt_first_listing_sale
-        END AS dt_opportunity,
-        lbc.dt_first_listing_sale AS dt_first_listing,
-        lf.dt_discarded,
-        lsc.ts_sales_company_sent,
         lf.is_self_service_photo_job_scheduled,
         lf.flow,
         lf.acquisition_method,
@@ -189,7 +150,6 @@ acquisition_channels AS (
         l.city,
         pj.status AS photo_job_status,
         pj.problem AS photo_job_reason,
-        lbc.dt_opt_out_sale,
         CASE
             WHEN l.is_for_sale AND l.is_for_rent
                 THEN 'Hybrid'
@@ -207,7 +167,47 @@ acquisition_channels AS (
             WHEN lbc.status_rent = 'OPTED_OUT'
                 THEN 'Opted Out'
             ELSE 'Once Published'
-        END AS listing_rent_status
+        END AS listing_rent_status,
+        lbc.ts_opt_out_sale,
+        CASE
+            WHEN l.is_for_sale
+             THEN lf.ts_lead
+            ELSE lbc.ts_qualified_sale
+        END AS ts_lead,
+        CASE
+            WHEN l.is_for_sale
+             THEN lf.ts_prospect
+            ELSE lbc.ts_qualified_sale
+        END AS ts_prospect,
+        CASE
+            WHEN l.is_for_sale
+             THEN lf.ts_first_contact
+            ELSE lbc.ts_qualified_sale
+        END AS ts_first_contact,
+        lf.ts_conversion,
+        CASE
+            WHEN (
+                COALESCE(lr.reason, l.reason) = 'ProprietarioRecusou'
+                AND l.reason != 'OWNER_DIDNT_LISTEN_TO_PITCH'
+                AND lf.id_conversion IS NULL
+            )
+                THEN lf.ts_qualified
+            ELSE lbc.ts_qualified_sale
+        END AS ts_qualified,
+        CASE
+            WHEN (lbc.ts_opt_out_sale < lf.ts_opportunity AND lbc.status_sale = 'OPTED_OUT')
+                THEN NULL
+            WHEN (
+                lf.ts_opportunity >= lbc.ts_qualified_sale
+                AND (lbc.ts_first_listing_sale IS NULL OR lf.ts_opportunity <= lbc.ts_first_listing_sale)
+            )
+                THEN lf.ts_opportunity
+            WHEN lbc.ts_first_listing_sale IS NOT NULL
+                THEN lbc.ts_first_listing_sale
+        END AS ts_opportunity,
+        lbc.ts_first_listing_sale AS ts_first_listing,
+        lf.ts_discarded,
+        lsc.ts_sales_company_sent
     FROM datalake_listing_flow.listing_flow AS lf
     LEFT JOIN datalake_lead.lead AS l
         ON l.id = lf.id_lead
@@ -242,18 +242,18 @@ acquisition_channels_dt_diffs AS (
     acquisition_channels.*,
     acquisition_channel_rep NOT LIKE 'Reprocessed%' AS is_not_reprocessed,
     -- SparkSQL's datediff ignores the time part, so we get the seconds diff and after that transform into days, hours, etc difference.
-    CAST(CAST(dt_prospect AS TIMESTAMP) AS LONG) - CAST(CAST(dt_lead AS TIMESTAMP) AS LONG) AS lead_to_prospect_seconds_diff,
-    CAST(CAST(dt_qualified AS TIMESTAMP) AS LONG) - CAST(CAST(dt_prospect AS TIMESTAMP) AS LONG) AS prospect_to_qualified_seconds_diff,
-    CAST(CAST(dt_first_contact AS TIMESTAMP) AS LONG) - CAST(CAST(dt_lead AS TIMESTAMP) AS LONG) AS lead_to_first_contact_seconds_diff,
-    CAST(CAST(dt_first_contact AS TIMESTAMP) AS LONG) - CAST(CAST(dt_prospect AS TIMESTAMP) AS LONG) AS prospect_to_first_contact_seconds_diff,
-    CAST(CAST(dt_opportunity AS TIMESTAMP) AS LONG) - CAST(CAST(dt_qualified AS TIMESTAMP) AS LONG) AS qualified_to_opportunity_seconds_diff,
-    CAST(CAST(dt_first_listing AS TIMESTAMP) AS LONG) - CAST(CAST(dt_opportunity AS TIMESTAMP) AS LONG) AS opportunity_to_listing_seconds_diff,
-    CAST(CAST(dt_first_listing AS TIMESTAMP) AS LONG) - CAST(CAST(dt_lead AS TIMESTAMP) AS LONG) AS lead_to_listing_seconds_diff,
+    CAST(CAST(ts_prospect AS TIMESTAMP) AS LONG) - CAST(CAST(ts_lead AS TIMESTAMP) AS LONG) AS lead_to_prospect_seconds_diff,
+    CAST(CAST(ts_qualified AS TIMESTAMP) AS LONG) - CAST(CAST(ts_prospect AS TIMESTAMP) AS LONG) AS prospect_to_qualified_seconds_diff,
+    CAST(CAST(ts_first_contact AS TIMESTAMP) AS LONG) - CAST(CAST(ts_lead AS TIMESTAMP) AS LONG) AS lead_to_first_contact_seconds_diff,
+    CAST(CAST(ts_first_contact AS TIMESTAMP) AS LONG) - CAST(CAST(ts_prospect AS TIMESTAMP) AS LONG) AS prospect_to_first_contact_seconds_diff,
+    CAST(CAST(ts_opportunity AS TIMESTAMP) AS LONG) - CAST(CAST(ts_qualified AS TIMESTAMP) AS LONG) AS qualified_to_opportunity_seconds_diff,
+    CAST(CAST(ts_first_listing AS TIMESTAMP) AS LONG) - CAST(CAST(ts_opportunity AS TIMESTAMP) AS LONG) AS opportunity_to_listing_seconds_diff,
+    CAST(CAST(ts_first_listing AS TIMESTAMP) AS LONG) - CAST(CAST(ts_lead AS TIMESTAMP) AS LONG) AS lead_to_listing_seconds_diff,
     CAST(
-        CAST(dt_lead AS TIMESTAMP) AS LONG) - CAST(
+        CAST(ts_lead AS TIMESTAMP) AS LONG) - CAST(
             CAST(LEAST(
-                COALESCE(dt_conversion, dt_discarded + INTERVAL 1 DAY),
-                COALESCE(dt_discarded, dt_conversion + INTERVAL 1 DAY)) AS TIMESTAMP
+                COALESCE(ts_conversion, ts_discarded + INTERVAL 1 DAY),
+                COALESCE(ts_discarded, ts_conversion + INTERVAL 1 DAY)) AS TIMESTAMP
             ) AS LONG
     ) AS lead_to_processing_seconds_diff
     FROM acquisition_channels
@@ -319,82 +319,82 @@ SELECT
     acq.lead_context_origin,
     acq.listing_rent_status,
     CASE
-        WHEN (acq.dt_first_listing IS NOT NULL)
+        WHEN (acq.ts_first_listing IS NOT NULL)
             THEN 'Listed'
-        WHEN (acq.dt_opportunity IS NOT NULL
-            AND acq.dt_first_listing IS NULL)
+        WHEN (acq.ts_opportunity IS NOT NULL
+            AND acq.ts_first_listing IS NULL)
             AND acq.photo_job_status IN ('FotosTiradas','Completado', 'NaoListado')
             THEN 'NotListedYet'
-        WHEN (acq.dt_opportunity IS NOT NULL
-            AND acq.dt_opt_out_sale >= acq.dt_opportunity
-            AND acq.dt_first_listing IS NULL)
+        WHEN (acq.ts_opportunity IS NOT NULL
+            AND acq.ts_opt_out_sale >= acq.ts_opportunity
+            AND acq.ts_first_listing IS NULL)
             AND acq.photo_job_status in ('FotosTiradas','Completado', 'NaoListado')
             THEN 'OptedOut Opportunity'
-        WHEN (acq.dt_opportunity IS NOT NULL
-            AND acq.dt_first_listing IS NULL
+        WHEN (acq.ts_opportunity IS NOT NULL
+            AND acq.ts_first_listing IS NULL
             AND acq.photo_job_status in ('Agendado','Iniciado','Novo'))
             THEN 'PhotoJobScheduled'
-        WHEN (acq.dt_opportunity IS NOT NULL
-            AND acq.dt_first_listing IS NULL
+        WHEN (acq.ts_opportunity IS NOT NULL
+            AND acq.ts_first_listing IS NULL
             AND acq.photo_job_status = 'Cancelado')
             THEN COALESCE(acq.photo_job_reason, 'CancelledPhotoJob')
-        WHEN (acq.dt_opportunity IS NOT NULL
-            AND acq.dt_first_listing IS NULL)
+        WHEN (acq.ts_opportunity IS NOT NULL
+            AND acq.ts_first_listing IS NULL)
             THEN COALESCE(acq.photo_job_reason, 'CancelledPhotoJob')
-        WHEN (acq.dt_opportunity IS NULL
-            AND acq.dt_qualified IS NOT NULL
+        WHEN (acq.ts_opportunity IS NULL
+            AND acq.ts_qualified IS NOT NULL
             AND acq.lead_status = 'Descartado')
             THEN 'DiscardedQualified'
-        WHEN (acq.dt_opportunity IS NULL
-            AND acq.dt_qualified IS NOT NULL
+        WHEN (acq.ts_opportunity IS NULL
+            AND acq.ts_qualified IS NOT NULL
             AND acq.lead_status = 'Convertido')
             THEN 'NoPhotoJob'
-        WHEN (acq.dt_opportunity IS NULL
-            AND acq.dt_qualified IS NOT NULL
+        WHEN (acq.ts_opportunity IS NULL
+            AND acq.ts_qualified IS NOT NULL
             AND acq.id_conversion IS NOT NULL)
             THEN 'NoPhotoJob'
-        WHEN (acq.dt_opportunity IS NULL
-            AND acq.dt_qualified IS NOT NULL
-            AND acq.dt_opt_out_sale >= acq.dt_qualified)
+        WHEN (acq.ts_opportunity IS NULL
+            AND acq.ts_qualified IS NOT NULL
+            AND acq.ts_opt_out_sale >= acq.ts_qualified)
             THEN 'OptedOut Qualified'
-        WHEN (acq.dt_opportunity IS NULL
+        WHEN (acq.ts_opportunity IS NULL
             AND acq.lead_reason = 'EmProspeccao')
             THEN 'OnHold'
-        WHEN (acq.dt_qualified IS NULL
+        WHEN (acq.ts_qualified IS NULL
             AND acq.lead_status = 'Descartado')
             THEN 'DiscardedProspect'
-        WHEN (acq.dt_qualified IS NULL
+        WHEN (acq.ts_qualified IS NULL
             AND acq.lead_status = 'Novo'
             AND acq.city = 'Outra cidade')
             THEN 'NaoProcessadoArea'
-        WHEN (acq.dt_qualified IS NULL
+        WHEN (acq.ts_qualified IS NULL
             AND acq.lead_status = 'Novo')
             THEN 'NaoProcessado'
         WHEN (acq.flow = 'Lead Flow'
-            AND acq.dt_qualified IS NULL)
+            AND acq.ts_qualified IS NULL)
             THEN 'NaoProcessado'
         WHEN (acq.lead_status = 'Convertido'
             AND acq.id_conversion IS NULL)
             THEN 'BrokenLeadFlow'
         WHEN (acq.flow = 'Lead Flow'
-            AND acq.dt_prospect IS NULL
+            AND acq.ts_prospect IS NULL
             AND acq.lead_status IS NULL)
             THEN 'DiscardedLead'
         WHEN (acq.flow = 'Self-Service Flow'
-            AND acq.dt_prospect IS NOT NULL
-            AND acq.dt_qualified IS NULL)
+            AND acq.ts_prospect IS NOT NULL
+            AND acq.ts_qualified IS NULL)
             THEN 'TermsNotAccepted'
         WHEN (acq.flow = 'Self-Service Flow'
-            AND acq.dt_qualified IS NOT NULL
-            AND acq.dt_opportunity IS NULL)
+            AND acq.ts_qualified IS NOT NULL
+            AND acq.ts_opportunity IS NULL)
             THEN 'NoPhotoJob'
         WHEN (acq.flow = 'Organic Flow'
-            AND acq.dt_prospect IS NOT NULL
-            AND acq.dt_qualified IS NULL)
+            AND acq.ts_prospect IS NOT NULL
+            AND acq.ts_qualified IS NULL)
             THEN 'UnfinishedForm'
         WHEN (acq.flow = 'Organic Flow'
-            AND acq.dt_qualified IS NOT NULL
-            AND acq.dt_opportunity IS NULL)
+            AND acq.ts_qualified IS NOT NULL
+            AND acq.ts_opportunity IS NULL)
             THEN 'NoPhotoJob'
         ELSE 'NotMapped'
     END AS funnel_step,
@@ -413,19 +413,19 @@ SELECT
     CAST(acq.opportunity_to_listing_seconds_diff / 86400 AS INTEGER) AS days_opportunity_to_listing,
     CAST(acq.lead_to_listing_seconds_diff / 86400 AS INTEGER) AS days_lead_to_listing,
     CASE
-      WHEN (acq.dt_conversion IS NULL AND acq.dt_discarded IS NULL)
+      WHEN (acq.ts_conversion IS NULL AND acq.ts_discarded IS NULL)
         THEN NULL
       ELSE CAST(acq.lead_to_processing_seconds_diff / 86400 AS INTEGER)
     END AS days_lead_to_processing,
-    acq.dt_opt_out_sale,
-    acq.dt_lead,
-    acq.dt_prospect,
-    acq.dt_first_contact,
-    acq.dt_conversion,
-    acq.dt_qualified,
-    acq.dt_opportunity,
-    acq.dt_first_listing,
-    acq.dt_discarded,
+    acq.ts_opt_out_sale,
+    acq.ts_lead,
+    acq.ts_prospect,
+    acq.ts_first_contact,
+    acq.ts_conversion,
+    acq.ts_qualified,
+    acq.ts_opportunity,
+    acq.ts_first_listing,
+    acq.ts_discarded,
     acq.ts_sales_company_sent
 FROM
     acquisition_channels_dt_diffs AS acq

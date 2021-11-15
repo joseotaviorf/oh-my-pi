@@ -29,23 +29,23 @@ SELECT
         ELSE NULL
     END AS first_isales_intervention,
     CASE
-        WHEN btf.ts_created < listing_flow.dt_lead
-            THEN DATE(listing_flow.dt_lead)
+        WHEN btf.ts_created < listing_flow.ts_lead
+            THEN DATE(listing_flow.ts_lead)
         ELSE DATE(btf.ts_created)
         END AS dt_first_task_created_date,
     CASE
-        WHEN btf.ts_closed < listing_flow.dt_lead
-            THEN DATE(listing_flow.dt_lead)
+        WHEN btf.ts_closed < listing_flow.ts_lead
+            THEN DATE(listing_flow.ts_lead)
         ELSE DATE(btf.ts_closed)
         END AS dt_first_task_closed_date,
     CASE
-        WHEN btl.ts_created < listing_flow.dt_lead
-            THEN DATE(listing_flow.dt_lead)
+        WHEN btl.ts_created < listing_flow.ts_lead
+            THEN DATE(listing_flow.ts_lead)
         ELSE DATE(btl.ts_created)
         END AS dt_last_task_created_date,
     CASE
-        WHEN btl.ts_closed < listing_flow.dt_lead
-            THEN DATE(listing_flow.dt_lead)
+        WHEN btl.ts_closed < listing_flow.ts_lead
+            THEN DATE(listing_flow.ts_lead)
         ELSE DATE(btl.ts_closed)
         END AS dt_last_task_closed_date,
     COALESCE(listing_flow.id_isales_registrant, btf.id_rep) IS NOT NULL
