@@ -42,6 +42,7 @@ class ListingFlowsSubDag(BaseSubDag):
         ods_rep_leads_task >> ods_potential_listings_rep_leads_task
 
         ods_listing_flows_with_reprocessed_leads_task.set_downstream([
+            ods_acquisitions_task,
             ods_potential_listings_house_b2b_task,
             ods_potential_listings_lead_tasks_task,
             ods_potential_listings_rep_leads_task
