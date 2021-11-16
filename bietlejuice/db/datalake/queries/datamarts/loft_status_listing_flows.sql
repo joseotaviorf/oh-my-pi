@@ -2,6 +2,7 @@ WITH loft_listings_raw AS (
     SELECT
         CONCAT(id, 'Loft') AS id_house,
         id AS id_house_platform,
+        CONCAT(id, 'Loft', CAST(ROW_NUMBER() OVER (PARTITION BY CONCAT(id, 'Loft') ORDER BY CAST(CONCAT(CAST(year AS VARCHAR), '-', CAST(month AS VARCHAR), '-', CAST(day AS VARCHAR)) AS DATE)) AS VARCHAR)) AS id_status,
         CAST(address.neighborhood AS VARCHAR) AS neighborhood_loft,
         CAST(geolocation.latitude AS VARCHAR) AS lat,
         CAST(geolocation.longitude AS VARCHAR) AS lng,
@@ -35,6 +36,7 @@ loft_listings_clean AS (
         SELECT
             ll.id_house,
             ll.id_house_platform,
+            ll.id_status,
             COALESCE(r.id_neighborhood, -1) AS id_neighborhood,
             IF(r.neighborhood IS NULL, ll.neighborhood_loft, r.neighborhood) AS neighborhood,
             ll.neighborhood_loft,
@@ -58,7 +60,7 @@ loft_listings_clean AS (
     ),
     ids_duplicados AS (
         SELECT
-            id_house
+            id_status
         FROM
             loft_listings_w_correct_region
         GROUP BY 1
@@ -69,6 +71,7 @@ loft_listings_clean AS (
         SELECT
             id_house,
             id_house_platform,
+            id_status,
             id_neighborhood,
             neighborhood,
             neighborhood_loft,
@@ -82,12 +85,13 @@ loft_listings_clean AS (
         FROM
             loft_listings_w_correct_region
         WHERE
-            id_house IN (SELECT id_house FROM ids_duplicados)
+            id_status IN (SELECT id_status FROM ids_duplicados)
             AND neighborhood = neighborhood_loft
     )
     SELECT
         id_house,
         id_house_platform,
+        id_status, 
         id_neighborhood,
         neighborhood,
         status,
@@ -100,13 +104,14 @@ loft_listings_clean AS (
     FROM
         loft_listings_w_correct_region
     WHERE
-        id_house NOT IN (SELECT id_house FROM ids_duplicados)
+        id_status NOT IN (SELECT id_status FROM ids_duplicados)
     --------------
     UNION
     --------------
     SELECT
         id_house,
         id_house_platform,
+        id_status,
         id_neighborhood,
         neighborhood,
         status,
