@@ -148,7 +148,6 @@ houses_with_lead AS (
             MAX(rev) AS rev
         FROM
             datalake_ebdb_clean.lead_aud
-        WHERE mod_status
         GROUP BY 1
     ),
     lead_first_contact AS (
