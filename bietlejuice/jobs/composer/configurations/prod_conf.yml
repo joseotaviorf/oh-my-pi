@@ -8,6 +8,7 @@ dags_out_of_pattern: [
     "dw_listing",
     "dw_listing_jobs",
     "dw_offer",
+    "dw_region",
     "dw_marketing_costs",
     "enrich_marketing_costs_sharing_rules",
     "enrich_amplitude_partner_taxonomy",
