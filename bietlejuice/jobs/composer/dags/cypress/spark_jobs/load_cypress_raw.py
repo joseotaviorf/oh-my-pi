@@ -37,6 +37,7 @@ if __name__ == "__main__":
 
     config_service = ConfigurationService(source)
     raw_partition_cols = config_service.get_config("raw_partition_cols")
+    schema = config_service.get_config("schema")
     cypress_source_bucket = config_service.get_config("cypress_source_bucket")
     cypress_enrich_query = config_service.get_config("cypress_enrich_query")[table_name]
 
@@ -50,7 +51,8 @@ if __name__ == "__main__":
     # Only handle
     try:
         df = (
-            spark_client.conn.read.option("multiLine", True)
+            spark_client.conn.read.schema(schema)
+            .option("multiLine", True)
             .option("mode", "PERMISSIVE")
             .json(f"s3://{cypress_source_bucket}/*/{execution_date}/*/*.json")
         )
