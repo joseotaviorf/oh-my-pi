@@ -460,7 +460,7 @@ SELECT
 	END sk_prospect_date_rent,
 	CASE -- filtering prospect sale
 		WHEN lead_discard_sale IN ('HOUSE_WAS_OUT_OF_HOUSE_SALES_REGIONS', 'ForaArea','DUPLICATED_LEAD','CONTACT_ON_BLOCK_LIST') THEN '-1'
-		WHEN city_group NOT IN ('RMSP', 'Rio de Janeiro', 'Belo Horizonte', 'Porto Alegre') THEN '-1'
+		WHEN city_group NOT IN ('RMSP', 'Rio de Janeiro', 'Belo Horizonte', 'Porto Alegre','Campinas') THEN '-1'
 		ELSE sk_prospect_date_sale
 	END sk_prospect_date_sale,
 	dr.city_group,
@@ -525,7 +525,7 @@ SELECT
     END AS sk_prospect_date_rent,
     CASE
         WHEN (sk_prospect_date_sale<0 AND sk_prospect_date_rent>0 AND mkt_origin_sale IN ('Indica Aí - Agents', 'Indica Aí - General','Partners')
-            AND city_group IN ('RMSP', 'Rio de Janeiro', 'Belo Horizonte', 'Porto Alegre')) THEN sk_prospect_date_rent
+            AND city_group IN ('RMSP', 'Rio de Janeiro', 'Belo Horizonte', 'Porto Alegre','Campinas')) THEN sk_prospect_date_rent
         ELSE sk_prospect_date_sale
     END AS sk_prospect_date_sale,
     city_group,
@@ -650,7 +650,7 @@ SELECT
 	    WHEN prospect_discard_sale IN ('CONTACT_DIDNT_EXIST','HOUSE_ALREADY_PUBLISHED','CONTACT_KNOW_OWNER','CONTACT_WASNT_THE_HOUSE_OWNER','HOUSE_ALREADY_SOLD',
 	    'HOUSE_WAS_A_BUSINESS_REAL_ESTATE','HOUSE_WITH_BAD_CONDITIONS','OWNER_DIDNT_ANSWER_PHONE','OWNER_DIDNT_LISTEN_TO_PITCH','OWNER_DIDNT_WANT_RECEIVE_CALL',
 	    'PROPERTY_IN_OFFPLANT','HOUSE_PRICE_WAS_OUT_OF_BOUNDS','HOUSE_WAS_OUT_OF_HOUSE_SALES_REGIONS') AND sk_opportunity_date_sale<0 THEN '-1'
-	    WHEN city_group NOT IN ('RMSP', 'Rio de Janeiro', 'Belo Horizonte', 'Porto Alegre') THEN '-1'
+	    WHEN city_group NOT IN ('RMSP', 'Rio de Janeiro', 'Belo Horizonte', 'Porto Alegre','Campinas') THEN '-1'
 	    ELSE sk_qualified_date_sale
 	END sk_qualified_date_sale,
     llf.sk_opportunity_date_rent,
