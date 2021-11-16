@@ -49,6 +49,14 @@ columns:
     lineage:
       - datalake_firestore.monday.dt_sale_agreement_cancelled
       - datalake_firestore.monday.dt_sale_agreement_signed
+  days_sale_agreement_signed_to_onboarding_ended:
+    lineage:
+      - datalake_firestore.monday.dt_onboarding_ended
+      - datalake_firestore.monday.dt_sale_agreement_signed
+  days_sale_agreement_signed_to_credit_analysis_started:
+    lineage:
+      - datalake_firestore.monday.dt_sale_agreement_signed
+      - datalake_firestore.monday.dt_credit_analysis_started
   days_sale_agreement_signed_to_house_registry_started:
     lineage:
       - datalake_firestore.monday.dt_house_registry_started
@@ -65,18 +73,42 @@ columns:
     lineage:
       - datalake_firestore.monday.dt_notes_registry_started
       - datalake_firestore.monday.dt_sale_agreement_signed
+  days_legal_risk_ended_to_legal_analysis_ended:
+    lineage:
+      - datalake_firestore.monday.dt_legal_analysis_ended
+      - datalake_firestore.monday.dt_legal_risk_ended
   days_legaut_analysis_started_to_legaut_analysis_ended:
     lineage:
       - datalake_firestore.monday.dt_legaut_analysis_ended
       - datalake_firestore.monday.dt_legaut_analysis_started
+  days_sale_agreement_signed_to_bank_legal_analysis_started:
+    lineage:
+      - datalake_firestore.monday.dt_bank_legal_analysis_started
+      - datalake_firestore.monday.dt_sale_agreement_signed
   days_legal_risk_started_to_legal_risk_ended:
     lineage:
       - datalake_firestore.monday.dt_legal_risk_ended
       - datalake_firestore.monday.dt_legal_risk_started
+  days_legal_analysis_ended_notes_registry_ended:
+    lineage:
+      - datalake_firestore.monday.dt_notes_registry_ended
+      - datalake_firestore.monday.dt_legal_analysis_ended
+  days_bank_legal_analysis_started_to_financing_ended:
+    lineage:
+      - datalake_firestore.monday.dt_financing_ended
+      - datalake_firestore.monday.dt_bank_legal_analysis_started
+  days_bank_legal_analysis_started_to_house_registry_started:
+    lineage:
+      - datalake_firestore.monday.dt_house_registry_started
+      - datalake_firestore.monday.dt_bank_legal_analysis_started
   days_credit_analysis_started_to_credit_analysis_ended:
     lineage:
       - datalake_firestore.monday.dt_credit_analysis_ended
       - datalake_firestore.monday.dt_credit_analysis_started
+  days_credit_analysis_ended_to_bank_legal_analysis_started:
+    lineage:
+      - datalake_firestore.monday.dt_bank_legal_analysis_started
+      - datalake_firestore.monday.dt_credit_analysis_ended
   days_financing_started_to_financing_ended:
     lineage:
       - datalake_firestore.monday.dt_financing_ended
@@ -129,6 +161,9 @@ columns:
   dt_legal_risk_ended:
     lineage:
       - datalake_firestore.monday.dt_legal_risk_ended
+  dt_bank_legal_analysis_started:
+    lineage:
+      - datalake_firestore.monday.dt_bank_legal_analysis_started
   dt_credit_analysis_started:
     lineage:
       - datalake_firestore.monday.dt_credit_analysis_started

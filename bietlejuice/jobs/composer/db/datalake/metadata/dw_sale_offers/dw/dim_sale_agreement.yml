@@ -29,6 +29,9 @@ columns:
   earnest_value:
     lineage:
       - datalake_offer.sale_offer.earnest_value
+  down_payment_amount:
+    lineage:
+      - datalake_offer.sale_offer.payment_entry_amount
   payment_method:
     lineage:
       - datalake_offer.sale_offer.current_payment_method

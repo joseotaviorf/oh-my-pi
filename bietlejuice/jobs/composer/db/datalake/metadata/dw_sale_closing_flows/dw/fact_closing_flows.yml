@@ -38,6 +38,9 @@ columns:
   sk_legal_risk_ended_date:
     lineage:
       - datalake_sale_closing_flows.closing_flow.dt_legal_risk_ended
+  sk_bank_legal_analysis_started:
+    lineage:
+      - datalake_sale_closing_flows.closing_flow.dt_bank_legal_analysis_started
   sk_credit_analysis_started_date:
     lineage:
       - datalake_sale_closing_flows.closing_flow.dt_credit_analysis_started
@@ -104,6 +107,9 @@ columns:
   days_sale_agreement_signed_to_sale_agreement_cancelled:
     lineage:
       - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_sale_agreement_cancelled
+  days_sale_agreement_signed_to_onboarding_ended:
+    lineage:
+      - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_onboarding_ended
   days_sale_agreement_signed_to_credit_analysis_started:
     lineage:
       - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_credit_analysis_started
@@ -119,9 +125,15 @@ columns:
   days_sale_agreement_signed_to_legal_risk_ended:
     lineage:
       - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_legal_risk_ended
+  days_sale_agreement_signed_to_bank_legal_analysis_started:
+    lineage:
+      - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_bank_legal_analysis_started
   days_sale_agreement_signed_to_financing_started:
     lineage:
       - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_financing_started
+  days_legal_risk_ended_to_legal_analysis_ended:
+    lineage:
+      - datalake_sale_closing_flows.closing_flow.days_legal_risk_ended_to_legal_analysis_ended
   days_sale_agreement_signed_to_notes_registry_started:
     lineage:
       - datalake_sale_closing_flows.closing_flow.days_sale_agreement_signed_to_notes_registry_started
@@ -131,12 +143,27 @@ columns:
   days_legaut_analysis_started_to_legaut_analysis_ended:
     lineage:
       - datalake_sale_closing_flows.closing_flow.days_legaut_analysis_started_to_legaut_analysis_ended
+  days_legaut_analysis_ended_to_legal_risk_ended:
+    lineage:
+      - datalake_sale_closing_flows.closing_flow.days_legaut_analysis_ended_to_legal_risk_ended
+  days_legal_analysis_ended_notes_registry_ended:
+    lineage:
+      - datalake_sale_closing_flows.closing_flow.days_legal_analysis_ended_notes_registry_ended
+  days_bank_legal_analysis_started_to_financing_ended:
+    lineage:
+      - datalake_sale_closing_flows.closing_flow.days_bank_legal_analysis_started_to_financing_ended
+  days_bank_legal_analysis_started_to_house_registry_started:
+    lineage:
+      - datalake_sale_closing_flows.closing_flow.days_bank_legal_analysis_started_to_house_registry_started
   days_legal_risk_started_to_legal_risk_ended:
     lineage:
       - datalake_sale_closing_flows.closing_flow.days_legal_risk_started_to_legal_risk_ended
   days_credit_analysis_started_to_credit_analysis_ended:
     lineage:
       - datalake_sale_closing_flows.closing_flow.days_credit_analysis_started_to_credit_analysis_ended
+  days_credit_analysis_ended_to_bank_legal_analysis_started:
+    lineage:
+      - datalake_sale_closing_flows.closing_flow.days_credit_analysis_ended_to_bank_legal_analysis_started
   days_financing_started_to_financing_ended:
     lineage:
       - datalake_sale_closing_flows.closing_flow.days_financing_started_to_financing_ended
