@@ -62,38 +62,38 @@ columns:
   affiliate_type:
     lineage:
       - datalake_lead.lead.affiliate_type
-  dt_opt_out_rent:
+  ts_opt_out_rent:
     lineage:
       - datalake_ebdb_listing.listing_business_context.ts_opt_out_rent
-  dt_lead:
+  ts_lead:
     lineage:
-      - datalake_listing_flow.listing_flow.dt_lead
+      - datalake_listing_flow.listing_flow.ts_lead
       - datalake_ebdb_listing.listing_business_context.ts_created
-  dt_prospect:
+  ts_prospect:
     lineage:
-      - datalake_listing_flow.listing_flow.dt_prospect
+      - datalake_listing_flow.listing_flow.ts_prospect
       - datalake_ebdb_listing.listing_business_context.ts_created
-  dt_first_contact:
+  ts_first_contact:
     lineage:
-      - datalake_listing_flow.listing_flow.dt_first_contact
+      - datalake_listing_flow.listing_flow.ts_first_contact
       - datalake_ebdb_listing.listing_business_context.ts_created
-  dt_conversion:
+  ts_conversion:
     lineage:
-      - datalake_listing_flow.listing_flow.dt_conversion
-  dt_qualified:
+      - datalake_listing_flow.listing_flow.ts_conversion
+  ts_qualified:
     lineage:
-      - datalake_listing_flow.listing_flow.dt_qualified
+      - datalake_listing_flow.listing_flow.ts_qualified
       - datalake_ebdb_listing.listing_business_context.ts_created
-  dt_opportunity:
+  ts_opportunity:
     lineage:
-      - datalake_listing_flow.listing_flow.dt_opportunity
+      - datalake_listing_flow.listing_flow.ts_opportunity
       - datalake_ebdb_listing.listing_business_context.ts_first_listing
-  dt_first_listing:
+  ts_first_listing:
     lineage:
       - datalake_ebdb_listing.listing_business_context.ts_first_listing
-  dt_discarded:
+  ts_discarded:
     lineage:
-      - datalake_listing_flow.listing_flow.dt_discarded
+      - datalake_listing_flow.listing_flow.ts_discarded
   ts_sales_company_sent:
     lineage:
       - datalake_wololo_lead.lead_sales_company.ts_sales_company_sent
