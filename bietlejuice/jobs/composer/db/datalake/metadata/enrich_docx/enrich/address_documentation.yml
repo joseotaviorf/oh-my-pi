@@ -1,0 +1,63 @@
+database_name: datalake_docx
+table_name: address_documentation
+columns:
+  id:
+    lineage:
+      - datalake_docx_clean.document.id
+  id_folder:
+    lineage:
+      - datalake_docx_clean.document.id_folder
+  id_document_type:
+    lineage:
+      - datalake_docx_clean.document.id_document_type
+  id_document_context:
+    lineage:
+      - datalake_docx_clean.document.id_document_context
+  id_context_external:
+    lineage:
+      - datalake_docx_clean.document.id_context_external
+  zip_code:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  state:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  city:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  neighborhood:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  address:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  address_number:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  address_complement:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  years_in_current_residence:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  current_living_situation:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  real_estate_or_owner_name:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  real_estate_or_owner_phone_number:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  attributes:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  attachments:
+    lineage:
+      - datalake_docx_clean.document.attachments
+  ts_created:
+    lineage:
+      - datalake_docx_clean.document.ts_created
+  ts_updated:
+    lineage:
+      - datalake_docx_clean.document.ts_updated

@@ -1,0 +1,42 @@
+database_name: datalake_docx
+table_name: identity_documentation
+columns:
+  id:
+    lineage:
+      - datalake_docx_clean.document.id
+  id_folder:
+    lineage:
+      - datalake_docx_clean.document.id_folder
+  id_document_type:
+    lineage:
+      - datalake_docx_clean.document.id_document_type
+  id_document_context:
+    lineage:
+      - datalake_docx_clean.document.id_document_context
+  id_context_external:
+    lineage:
+      - datalake_docx_clean.document.id_context_external
+  mother_name:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  nationality:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  country_of_origin:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  attributes:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  attachments:
+    lineage:
+      - datalake_docx_clean.document.attachments
+  dt_birth:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  ts_created:
+    lineage:
+      - datalake_docx_clean.document.ts_created
+  ts_updated:
+    lineage:
+      - datalake_docx_clean.document.ts_updated

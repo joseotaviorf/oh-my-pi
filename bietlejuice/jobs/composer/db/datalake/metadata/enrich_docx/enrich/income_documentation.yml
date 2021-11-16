@@ -1,0 +1,63 @@
+database_name: datalake_docx
+table_name: income_documentation
+columns:
+  id:
+    lineage:
+      - datalake_docx_clean.document.id
+  id_folder:
+    lineage:
+      - datalake_docx_clean.document.id_folder
+  id_document_type:
+    lineage:
+      - datalake_docx_clean.document.id_document_type
+  id_document_context:
+    lineage:
+      - datalake_docx_clean.document.id_document_context
+  id_context_external:
+    lineage:
+      - datalake_docx_clean.document.id_context_external
+  monthly_salary:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  company_name:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  company_phone_number:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  emp_link:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  profession:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  additional_income:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  source_of_income:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  documentation_extra_comment:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  payslips:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  ctps_pages:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  bank_statements:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  attributes:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  attachments:
+    lineage:
+      - datalake_docx_clean.document.attachments
+  ts_created:
+    lineage:
+      - datalake_docx_clean.document.ts_created
+  ts_updated:
+    lineage:
+      - datalake_docx_clean.document.ts_updated

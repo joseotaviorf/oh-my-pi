@@ -1,0 +1,51 @@
+database_name: datalake_docx
+table_name: personal_documentation
+columns:
+  id:
+    lineage:
+      - datalake_docx_clean.document.id
+  id_folder:
+    lineage:
+      - datalake_docx_clean.document.id_folder
+  id_document_type:
+    lineage:
+      - datalake_docx_clean.document.id_document_type
+  id_document_context:
+    lineage:
+      - datalake_docx_clean.document.id_document_context
+  id_context_external:
+    lineage:
+      - datalake_docx_clean.document.id_context_external
+  full_name:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  email:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  telephone_number:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  cell_phone_number:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  marital_status:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  rent_reason:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  attributes:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  attachments:
+    lineage:
+      - datalake_docx_clean.document.attachments
+  will_reside:
+    lineage:
+      - datalake_docx_clean.document.attributes
+  ts_created:
+    lineage:
+      - datalake_docx_clean.document.ts_created
+  ts_updated:
+    lineage:
+      - datalake_docx_clean.document.ts_updated
