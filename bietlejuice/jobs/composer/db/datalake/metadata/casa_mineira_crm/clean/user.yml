@@ -32,6 +32,9 @@ columns:
   phone:
     lineage:
       - datalake_casa_mineira_crm_raw.usuario.telefone
+  percentage_comission:
+    lineage:
+      - datalake_casa_mineira_crm_raw.usuario.percentual_comissao
   is_intern:
     lineage:
       - datalake_casa_mineira_crm_raw.usuario.interno

@@ -9,6 +9,7 @@ SELECT
     nome_completo AS user_full_name,
     email AS email,
     telefone AS phone,
+    percentual_comissao AS percentage_comission,
     CAST(interno AS BOOLEAN) AS is_intern, 
     CAST(suspenso AS BOOLEAN) AS is_suspended, 
     CAST(contrato_corretor_data AS DATE) AS dt_agent_contract, 
