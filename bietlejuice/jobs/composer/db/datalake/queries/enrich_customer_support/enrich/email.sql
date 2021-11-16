@@ -168,6 +168,7 @@ last_back_ticket AS (
     bt.*,
     lt.is_open_back_ticket,
     lt.back_ticket_list,
+    lt.ts_first_created,
     CAST((TO_UNIX_TIMESTAMP(lt.ts_last_solved) - TO_UNIX_TIMESTAMP(lt.ts_first_created))/60.0 AS DOUBLE) AS total_backoffice_minutes_time
   FROM
     back_tickets bt
@@ -225,6 +226,7 @@ SELECT DISTINCT
   bt.back_ticket_list,
   bt.back_ticket AS last_back_ticket,
   bt.total_backoffice_minutes_time,
+  CAST((TO_UNIX_TIMESTAMP(bt.ts_first_created) - TO_UNIX_TIMESTAMP(ze.ts_ticket_solved))/60.0 AS DOUBLE) AS total_minutes_front_to_open_back_ticket_time,
   cs.ts_first_seen AS ts_csat_first_seen,
   cs.ts_first_response AS ts_csat_first_response,
   ze.dt_start AS dt_agent_start,

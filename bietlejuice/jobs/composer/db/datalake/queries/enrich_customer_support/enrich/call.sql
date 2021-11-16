@@ -347,6 +347,7 @@ last_back_ticket AS (
     bt.*,
     lt.is_open_back_ticket,
     lt.back_ticket_list,
+    lt.ts_first_created,
     CAST((TO_UNIX_TIMESTAMP(lt.ts_last_solved) - TO_UNIX_TIMESTAMP(lt.ts_first_created))/60.0 AS DOUBLE) AS total_backoffice_minutes_time
   FROM
     back_tickets bt
@@ -448,6 +449,7 @@ SELECT DISTINCT
   c.total_minutes_handling_time,
   c.minutes_full_resolution_time_calendar,
   bt.total_backoffice_minutes_time,
+  CAST((TO_UNIX_TIMESTAMP(bt.ts_first_created) - TO_UNIX_TIMESTAMP(c.ts_ended))/60.0 AS DOUBLE) AS total_minutes_front_to_open_back_ticket_time,
   c.number_of_departments,
   c.number_of_segments,
   c.direction,

@@ -178,6 +178,10 @@ columns:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_created_local
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_solved_local
+  total_minutes_front_to_open_back_ticket_time:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_created_local
+      - datalake_quinto_messenger.task_event.ts_created_local
   is_csat_answered:
     lineage:
       - datalake_chat_fup_clean.chats_chat.id_ticket
