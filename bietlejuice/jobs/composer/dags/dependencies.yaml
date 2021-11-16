@@ -487,6 +487,7 @@ bietlejuice.enrich_crm_tasks_transitions:
 
 bietlejuice.enrich_docx:
   - bietlejuice.docx:load-clean-credit-evaluation
+  - bietlejuice.docx:load-clean-document
 
 bietlejuice.enrich_ebdb_agents:
   - bietlejuice.ebdb:create-clean-agent-data-aud-in-data-lake

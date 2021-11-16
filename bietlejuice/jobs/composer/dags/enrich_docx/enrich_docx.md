@@ -2,7 +2,7 @@
 
 ### Purpose
 
-Creates the enriched table for the context `Docx`.
+Creates the enriched tables for the source `Docx`.
 
 This DAG enriches the credit evaluation data to track the result of the user's credit for a proposal.
 <details>
@@ -16,7 +16,11 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 Produces the following output table:
 
+- `address_documentation`
 - `credit_evaluation`
+- `identity_documentation`
+- `income_documentation`
+- `personal_documentation`
 
 ### Responsible Data Teams
 ​
