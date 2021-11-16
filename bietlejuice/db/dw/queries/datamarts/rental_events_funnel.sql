@@ -793,6 +793,7 @@ JOIN rent_flow_adjusted rf
   ON dd.sk_date = rf.sk_last_doc_analysis_approved
   AND rf.sk_last_doc_analysis_approved > 0
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data FROM 4 years ago
+and sk_offer>0 -- correcting cases with doc approved date but sk_offer = -1
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 ),
 guarantee_paid AS(
