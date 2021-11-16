@@ -9,6 +9,7 @@ SELECT
   eso.financing_bank,
   eso.financing_value,
   eso.earnest_value,
+  eso.payment_entry_amount AS down_payment_amount,
   eso.current_payment_method AS payment_method,
   eso.credit_model,
   eso.closing_status,

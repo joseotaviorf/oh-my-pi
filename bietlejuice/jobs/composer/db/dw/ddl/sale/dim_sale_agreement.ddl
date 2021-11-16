@@ -10,6 +10,7 @@ CREATE TABLE sale.dim_sale_agreement (
     financing_bank VARCHAR,
     financing_value BIGINT,
     earnest_value BIGINT,
+    down_payment_amount BIGINT,
     payment_method VARCHAR,
     credit_model VARCHAR,
     closing_status VARCHAR,
