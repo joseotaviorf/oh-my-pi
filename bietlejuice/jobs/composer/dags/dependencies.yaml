@@ -248,7 +248,7 @@ bietlejuice.dw_rent_listing_flow:
   - bietlejuice.enrich_rent_potential_listing:load-enrich-potential-listings-reprocessed-leads
   - bietlejuice.enrich_rent_potential_listing:load-enrich-potential-listing-b2b
   - bietlejuice.ebdb:create-clean-user-in-data-lake
-  - bietlejuice.ebdb:create-clean-affiliate_data-in-data-lake
+  - bietlejuice.ebdb:create-clean-affiliate-data-in-data-lake
   - bietlejuice.gsheets:load-clean-taxonomy-growth
 
 bietlejuice.dw_reservation:
