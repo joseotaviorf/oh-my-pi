@@ -1,0 +1,36 @@
+---
+tables:
+  - table_name: item_group_type
+    extraction_type: full
+  - table_name: item_group_type_aud
+    extraction_type: incremental
+    date_filter_column: updated_at
+  - table_name: inspection
+    extraction_type: incremental
+    date_filter_column: updated_at
+  - table_name: inspection_aud
+    extraction_type: incremental
+    date_filter_column: updated_at
+  - table_name: access_info
+    extraction_type: incremental
+    date_filter_column: updated_at
+  - table_name: access_info_aud
+    extraction_type: incremental
+    date_filter_column: updated_at
+  - table_name: item_type
+    extraction_type: full
+  - table_name: item_type_aud
+    extraction_type: incremental
+    date_filter_column: updated_at
+  - table_name: room_type
+    extraction_type: full
+  - table_name: room_type_aud
+    extraction_type: incremental
+    date_filter_column: updated_at
+  - table_name: revinfo
+    extraction_type: incremental
+    date_filter_column: revtstmp
+    unixtime_measure: miliseconds
+    clean_table_name: rev_info
+    
+partition_columns: [year, month, day]
