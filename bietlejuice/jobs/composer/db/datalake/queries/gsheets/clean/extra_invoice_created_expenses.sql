@@ -22,8 +22,17 @@ SELECT
     BOOLEAN(NULLIF(protecao5A,'')) As is_protecao5a,
     DATE(NULLIF(due_date,'')) AS dt_due,
     DATE(NULLIF(result,'')) AS dt_result,
-    TO_TIMESTAMP(NULLIF(invoice_creation,''),'MM/dd/yyyy HH:mm:ss') AS ts_invoice_creation,
-    TO_TIMESTAMP(NULLIF(boleto_created_at,''),'MM/dd/yyyy HH:mm:ss') AS ts_invoice_created,
-    TO_TIMESTAMP(NULLIF(sent_at,''),'MM/dd/yyyy HH:mm:ss') AS ts_sent
+    CASE 
+        WHEN invoice_creation IS NOT NULL AND invoice_creation <> '-' THEN TIMESTAMP(invoice_creation)
+        ELSE NULL
+    END AS ts_invoice_creation,
+    CASE 
+        WHEN boleto_created_at IS NOT NULL AND boleto_created_at <> '-' THEN TIMESTAMP(boleto_created_at)
+        ELSE NULL
+    END AS ts_invoice_created,
+    CASE 
+        WHEN sent_at IS NOT NULL AND sent_at <> '-' THEN TIMESTAMP(sent_at)
+        ELSE NULL
+    END AS ts_sent
 FROM 
     datalake_gsheets_raw.extra_invoice_expenses

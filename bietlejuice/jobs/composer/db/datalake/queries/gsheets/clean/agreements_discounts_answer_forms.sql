@@ -24,8 +24,17 @@ SELECT
     DATE(NULLIF(ref_mes,'')) AS dt_ref_month,
     DATE(NULLIF(ref_inicial,'')) AS dt_initial_ref,
     DATE(NULLIF(ref_final,'')) AS dt_final_ref,
-    TO_TIMESTAMP(NULLIF(cancelado,''),'MM/dd/yyyy HH:mm:ss') AS ts_canceled,
-    TO_TIMESTAMP(NULLIF(execucao,''),'MM/dd/yyyy HH:mm:ss') AS ts_execution,
-    TO_TIMESTAMP(NULLIF(timestamp,''),'MM/dd/yyyy HH:mm:ss') AS ts_request
+    CASE 
+        WHEN cancelado IS NOT NULL AND cancelado <> '-' THEN TIMESTAMP(cancelado)
+        ELSE NULL
+    END AS ts_canceled,
+    CASE 
+        WHEN execucao IS NOT NULL AND execucao <> '-' THEN TIMESTAMP(execucao)
+        ELSE NULL
+    END AS ts_execution,
+    CASE 
+        WHEN timestamp IS NOT NULL AND timestamp <> '-' THEN TIMESTAMP(timestamp)
+        ELSE NULL
+    END AS ts_request
 FROM
     datalake_gsheets_raw.entry_agreements_discounts_forms

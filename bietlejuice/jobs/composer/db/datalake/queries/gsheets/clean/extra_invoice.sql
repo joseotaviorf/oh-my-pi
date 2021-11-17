@@ -27,8 +27,17 @@ SELECT
     BOOLEAN(NULLIF(isentar_juros,'')) AS is_exempt_interest,
     DATE(NULLIF(vencimento,'')) AS dt_due,
     DATE(NULLIF(ref_mes,'')) AS dt_ref_month,
-    TO_TIMESTAMP(NULLIF(cancelado,''),'MM/dd/yyyy HH:mm:ss') AS ts_canceled,
-    TO_TIMESTAMP(NULLIF(execucao,''),'MM/dd/yyyy HH:mm:ss') AS ts_execution,
-    TO_TIMESTAMP(NULLIF(timestamp,''),'MM/dd/yyyy HH:mm:ss') AS ts_request
+    CASE 
+        WHEN cancelado IS NOT NULL AND cancelado <> '-' THEN TIMESTAMP(cancelado)
+        ELSE NULL
+    END AS ts_canceled,
+    CASE 
+        WHEN execucao IS NOT NULL AND execucao <> '-' THEN TIMESTAMP(execucao)
+        ELSE NULL
+    END AS ts_execution,
+    CASE 
+        WHEN timestamp IS NOT NULL AND timestamp <> '-' THEN TIMESTAMP(timestamp)
+        ELSE NULL
+    END AS ts_request
 FROM
     datalake_gsheets_raw.extra_invoice

@@ -14,6 +14,9 @@ SELECT
     CAST(NULLIF(linha,'') AS INT) AS line,
     BOOLEAN(NULLIF(boleto_update,'')) AS has_invoice_update,
     BOOLEAN(NULLIF(fatura_fechada,'')) AS is_closed_invoice,
-    TO_TIMESTAMP(NULLIF(timestamp,''),'MM/dd/yyyy HH:mm:ss') AS ts_request
+    CASE 
+        WHEN timestamp IS NOT NULL AND timestamp <> '-' THEN TIMESTAMP(timestamp)
+        ELSE NULL
+    END AS ts_request
 FROM
     datalake_gsheets_raw.entry_agreements_discounts_expenses
