@@ -18,6 +18,8 @@ This pipeline produces the following output tables in `customer_support` schema
 - `fact_ticket`
 - `fact_segment`
 - `fact_csat`
+- `fact_agent_daily_productivity` (incremental load)
+- `dim_ranking_targets`
 - `dim_agent`
 - `dim_department`
 - `dim_taxonomy`

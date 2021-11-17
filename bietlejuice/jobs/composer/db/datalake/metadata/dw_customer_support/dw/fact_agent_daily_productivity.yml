@@ -1,0 +1,39 @@
+database_name: dw_customer_support
+table_name: fact_agent_daily_productivity
+columns:
+  sk_agent:
+    lineage:
+      - datalake_analyst_ranking.ranking.sk_agent
+  sk_agent_manager:
+    lineage:
+      - datalake_analyst_ranking.ranking.agent_manager
+  sk_department:
+    lineage:
+      - datalake_analyst_ranking.ranking.department
+  sk_date:
+    lineage:
+      - datalake_analyst_ranking.ranking.dt
+  total_csat_score:
+    lineage:
+      - datalake_analyst_ranking.ranking.sum_csat_score
+  total_tickets_with_csat_score:
+    lineage:
+      - datalake_analyst_ranking.ranking.total_tickets_with_csat_score
+  total_tickets_resolution:
+    lineage:
+      - datalake_analyst_ranking.ranking.total_tickets_resolution
+  total_tickets_answered_resolution:
+    lineage:
+      - datalake_analyst_ranking.ranking.total_tickets_answered_resolution
+  total_tickets:
+    lineage:
+      - datalake_analyst_ranking.ranking.total_tickets
+  total_minutes_resolution_time:
+    lineage:
+      - datalake_analyst_ranking.ranking.sum_ticket_resolution_time
+  agent_age_in_months:
+    lineage:
+      - datalake_analyst_ranking.ranking.agent_age_in_months
+  dt:
+    lineage:
+      - datalake_analyst_ranking.ranking.dt
