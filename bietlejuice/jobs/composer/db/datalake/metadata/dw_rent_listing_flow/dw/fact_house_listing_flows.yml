@@ -40,7 +40,7 @@ columns:
       - datalake_listing_flow.listing_flows_with_reprocessed_leads.id_region
   sk_city:
     lineage:
-      - dw_janus.dim_region.id_city
+      - dw_janus.dim_region.city_id
       - datalake_lead.lead_city_region.id_region
   sk_partner:
     lineage:
@@ -50,13 +50,13 @@ columns:
       - datalake_rent_potential_listing.potential_listing_b2b.id_autonomous_agent
   sk_lead_date:
     lineage:
-      - datalake_listing_flow.listing_flows_with_reprocessed_leads.dt_lead
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_lead
   sk_sales_company_lead_sent_date:
     lineage:
       - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_sales_company_sent
   sk_prospect_date:
     lineage:
-      - datalake_listing_flow.listing_flows_with_reprocessed_leads.dt_prospect
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_prospect
   sk_first_task_created_date:
     lineage:
       - datalake_rent_potential_listing.potential_listing_lead_tasks.dt_first_task_created_date
@@ -71,22 +71,22 @@ columns:
       - datalake_rent_potential_listing.potential_listing_lead_tasks.dt_last_task_closed_date
   sk_first_contact_date:
     lineage:
-      - datalake_listing_flow.listing_flows_with_reprocessed_leads.dt_first_contact
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_first_contact
   sk_conversion_date:
     lineage:
-      - datalake_listing_flow.listing_flows_with_reprocessed_leads.dt_conversion
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_conversion
   sk_qualified_date:
     lineage:
-      - datalake_listing_flow.listing_flows_with_reprocessed_leads.dt_qualified
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_qualified
   sk_opportunity_date:
     lineage:
-      - datalake_listing_flow.listing_flows_with_reprocessed_leads.dt_opportunity
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_opportunity
   sk_first_listing_date:
     lineage:
-      - datalake_listing_flow.listing_flows_with_reprocessed_leads.dt_first_listing
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_first_listing
   sk_discard_date:
     lineage:
-      - datalake_listing_flow.listing_flows_with_reprocessed_leads.dt_discarded
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_discarded
   sk_user_lead_first_discarder:
     lineage:
       - datalake_listing_flow.listing_flows_with_reprocessed_leads.id_user_lead_first_discarder
@@ -218,4 +218,4 @@ columns:
       - datalake_listing_flow.listing_flows_with_reprocessed_leads.listing_sale_status
   ts_opted_out_rent:
     lineage:
-      - datalake_listing_flow.listing_flows_with_reprocessed_leads.dt_opt_out_rent
+      - datalake_listing_flow.listing_flows_with_reprocessed_leads.ts_opt_out_rent
