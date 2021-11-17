@@ -1,0 +1,19 @@
+database_name: datalake_ebdb_clean
+table_name: user_pro_owner
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.userproowner.id
+  id_user:
+    lineage:
+      - datalake_ebdb_raw.userproowner.user_id
+  is_active:
+    lineage:
+      - datalake_ebdb_raw.userproowner.active
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.userproowner.created_at
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.userproowner.updated_at
+      
