@@ -1,0 +1,31 @@
+---
+database_name: datalake_bigid
+table_name: bigid_entities_access_level
+columns:
+    database_type:
+        lineage:
+            - datalake_bigid_clean.data_catalog_entities.datasource
+    database_name:
+        lineage:
+            - datalake_bigid_clean.data_catalog_entities.datasource
+    table_name:
+        lineage:
+            - datalake_bigid_clean.data_catalog_entities.table_full_qualified_name
+    column_name:
+        lineage:
+            - datalake_bigid_clean.data_catalog_entities.column_name
+    data_type:
+        lineage:
+            - datalake_bigid_clean.data_catalog_entities.data_type
+    is_pii:
+        lineage:
+            - datalake_bigid_clean.data_catalog_entities.classifications
+    is_sensitive:
+        lineage:
+            - datalake_bigid_clean.data_catalog_entities.classifications
+    access_level:
+        lineage:
+            - datalake_bigid_clean.data_catalog_entities.classifications
+    classifications:
+        lineage:
+            - datalake_bigid_clean.data_catalog_entities.classifications
