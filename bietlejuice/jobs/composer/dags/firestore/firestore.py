@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
+from pendulum import timezone
 
-import pendulum
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -15,53 +15,38 @@ from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.jobs.composer.services import ConfigurationService
 
-SOURCE = "firestore"
-CONTEXT = SOURCE
+# ENV setup
+ENV = os.environ.get("ENVIRONMENT")
 
 # DAG params setup
-config_service = ConfigurationService(SOURCE)
-ENV = os.environ.get("ENVIRONMENT")
-DAG_ID = f"bietlejuice.{CONTEXT}"
-LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
-DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
-MAIN_START_DATE = datetime(2020, 8, 29, 0, 0, 0, tzinfo=LOCAL_TZ)
+SOURCE = "firestore"
+DAG_ID = f"bietlejuice.{SOURCE}"
+MAIN_START_DATE = datetime(2021, 9, 20, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "30 0 * * *"
 
+config_service = ConfigurationService(SOURCE)
+athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
+datalake_bucket = config_service.get_config("datalake_bucket")
+artifacts_bucket = config_service.get_config("artifacts_bucket")
+databricks_bietlejuice_repo_path = config_service.get_config(
+    "databricks_bietlejuice_repo_path"
+)
+spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
+doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+
+clean_partition_cols = config_service.get_config("clean_partition_cols")
+subscriptions = config_service.get_config("subscriptions")
+custom_libraries = config_service.get_config("custom_libraries")
+
 # s3 paths setup
-DATALAKE_BUCKET = Variable.get("datalake_bucket")
-S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
-LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{CONTEXT}"
-BASE_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/base/"
-ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
-RAW_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/{CONTEXT}/load_firestore_into_raw.py"
+BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
+RAW_SPARK_JOB_FILE = (
+    f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{SOURCE}_raw.py"
+)
 
 # cluster setup
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
-
-PUBSUB_CREDENTIALS_PATH = Variable.get("pubsub_credentials_path")
-CLUSTER_DESCRIPTION["spark_env_vars"][
-    "GOOGLE_APPLICATION_CREDENTIALS"
-] = PUBSUB_CREDENTIALS_PATH
-
-# job params
-pwa_google_project_id = config_service.get_config("pwa_google_project_id")
-SUBSCRIPTIONS = [
-    {
-        "subscription_id": "domainSaleOffer-audit-data-engineering-subscription",
-        "table_name": "sale_offer",
-    },
-    {
-        "subscription_id": "mondayBoard-audit-data-engineering-subscription",
-        "table_name": "monday",
-    },
-    {
-        "subscription_id": "offers-audit-data-engineering-subscription",
-        "table_name": "rent_offer",
-    },
-]
-
+CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = f"{spark_jobs_logs_path}{DAG_ID}"
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -72,13 +57,16 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(CONTEXT).format(
-        chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
+        chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=CLUSTER_DESCRIPTION,
+    libraries=custom_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -88,36 +76,34 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
 task_group = DatalakeTaskGroup(
     dag=dag,
     env=ENV,
-    datalake_bucket=DATALAKE_BUCKET,
-    relative_query_path=CONTEXT,
-    spark_jobs_path=BASE_SPARK_JOB_PATH,
-    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
+    datalake_bucket=datalake_bucket,
+    relative_query_path=SOURCE,
+    spark_jobs_path=BASE_SPARK_JOBS_PATH,
+    athena_query_result_location=athena_query_results_bucket,
 )
 
 raw_task_groups = {}
-for subscription in SUBSCRIPTIONS:
-    table_name = subscription["table_name"]
+for table_name, subscription_id in subscriptions.items():
+
     raw_task_group = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,
         table_name=table_name,
-        target_database_base_name=CONTEXT,
-        extraction_spark_job_file=RAW_SPARK_JOB_PATH,
+        target_database_base_name=SOURCE,
+        extraction_spark_job_file=RAW_SPARK_JOB_FILE,
         raw_spark_job_extra_args=[
-            CONTEXT,
-            pwa_google_project_id,
-            PUBSUB_CREDENTIALS_PATH,
-            subscription["subscription_id"],
-            subscription["table_name"],
+            SOURCE,
+            subscription_id,
+            table_name,
         ],
     )
     raw_task_groups[table_name] = raw_task_group
 
 clean_task_groups = task_group.build_task_group_from_sql_files(
     layer=LayerEnum.CLEAN,
-    source_database_base_name=CONTEXT,
-    target_database_base_name=CONTEXT,
+    source_database_base_name=SOURCE,
+    target_database_base_name=SOURCE,
     is_incremental=True,
-    partitions=["year", "month", "day"],
+    partitions=clean_partition_cols,
 )
 
 chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(raw_task_groups))

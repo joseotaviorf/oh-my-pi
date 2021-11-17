@@ -7,5 +7,4 @@ class ServiceEnum(Enum):
     the Databricks secrets.
     """
 
-    PUBSUB = "PUBSUB_SERVICE"
     METADATA_PROPAGATOR = "METADATA_PROPAGATOR_SERVICE"

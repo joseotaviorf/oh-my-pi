@@ -1,0 +1,4 @@
+---
+credentials_env_var: GOOGLE_APPLICATION_CREDENTIALS
+project_id: quintoandar-com-br-pwa
+raw_partition_cols: ["year", "month", "day"]

@@ -1,2 +1,11 @@
 ---
-pwa_google_project_id: quintoandar-com-br-pwa
+clean_partition_cols: ["year", "month", "day"]
+subscriptions:
+  sale_offer: "domainSaleOffer-audit-data-engineering-subscription"
+  rent_offer: "offers-audit-data-engineering-subscription"
+  monday: "mondayBoard-audit-data-engineering-subscription"
+custom_libraries: [
+    {
+        "pypi": {"package": "google-cloud-pubsub==2.5.0"}
+    }
+]
