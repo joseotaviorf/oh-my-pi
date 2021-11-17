@@ -1,0 +1,16 @@
+---
+database_name: datalake_inspections_clean
+table_name: item_type
+columns:
+  id:
+    lineage:
+      - datalake_inspections_raw.item_type.id
+  type:
+    lineage:
+      - datalake_inspections_raw.item_type.type
+  ts_created:
+    lineage:
+      - datalake_inspections_raw.item_type.created_at
+  ts_updated:
+    lineage:
+      - datalake_inspections_raw.item_type.updated_at

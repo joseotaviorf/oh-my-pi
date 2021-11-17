@@ -1,0 +1,52 @@
+---
+database_name: datalake_inspections_clean
+table_name: inspection
+columns:
+  id:
+    lineage:
+      - datalake_inspections_raw.inspection.id
+  id_client_side:
+    lineage:
+      - datalake_inspections_raw.inspection.client_side_id
+  id_contract:
+    lineage:
+      - datalake_inspections_raw.inspection.contract_id
+  id_external:
+    lineage:
+      - datalake_inspections_raw.inspection.external_id
+  id_inspector:
+    lineage:
+      - datalake_inspections_raw.inspection.inspector_id
+  id_schedule:
+    lineage:
+      - datalake_inspections_raw.inspection.schedule_id
+  contract:
+    lineage:
+      - datalake_inspections_raw.inspection.contract
+  house:
+    lineage:
+      - datalake_inspections_raw.inspection.house
+  schedule:
+    lineage:
+      - datalake_inspections_raw.inspection.schedule
+  status:
+    lineage:
+      - datalake_inspections_raw.inspection.status
+  type:
+    lineage:
+      - datalake_inspections_raw.inspection.type
+  ts_created:
+    lineage:
+      - datalake_inspections_raw.inspection.created_at
+  ts_updated:
+    lineage:
+      - datalake_inspections_raw.inspection.updated_at
+  year:
+    lineage:
+      - datalake_inspections_raw.inspection.year
+  month:
+    lineage:
+      - datalake_inspections_raw.inspection.month
+  day:
+    lineage:
+      - datalake_inspections_raw.inspection.day
