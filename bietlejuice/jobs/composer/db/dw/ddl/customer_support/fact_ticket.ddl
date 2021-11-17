@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS customer_support.fact_ticket (
     total_minutes_wrap_up_time FLOAT,
     total_minutes_handling_time FLOAT,
     total_backoffice_minutes_time FLOAT,
+    total_minutes_front_to_open_back_ticket_time FLOAT,
     ts_started TIMESTAMP,
     ts_closed TIMESTAMP,
     ts_load TIMESTAMP

@@ -190,6 +190,11 @@ columns:
       - datalake_customer_support.call.total_backoffice_minutes_time
       - datalake_customer_support.chat.total_backoffice_minutes_time
       - datalake_customer_support.email.total_backoffice_minutes_time
+  total_minutes_front_to_open_back_ticket_time:
+    lineage:
+      - datalake_customer_support.call.total_minutes_front_to_open_back_ticket_time
+      - datalake_customer_support.chat.total_minutes_front_to_open_back_ticket_time
+      - datalake_customer_support.email.total_minutes_front_to_open_back_ticket_time
   resolution_survey:
     lineage:
       - datalake_customer_support.call.is_solved
