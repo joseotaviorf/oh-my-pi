@@ -134,8 +134,8 @@ SELECT
   database_type,
   classifications,
   data_type,
-  access_level
+  access_level,
   is_pii,
-  is_sensitive,
+  is_sensitive
 FROM
-  grouped_columns gc
+  grouped_columns
