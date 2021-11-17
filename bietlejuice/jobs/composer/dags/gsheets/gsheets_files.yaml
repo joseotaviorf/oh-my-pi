@@ -30,6 +30,11 @@ agents_ranking_targets:
     sheet_name: Agents Ranking Targets
     clean_table_name: agents_ranking_targets
 
+agents_ranking_offboarding:
+    sheet_id: 1S69O5753T90dbw9KkXdlRMGVL9YThRT08Iae-SK3BSI
+    sheet_name: Ranking Analista x Demanda
+    clean_table_name: agents_ranking_offboarding
+
 aglomerados_subnormais_2010_limites:
     sheet_id: 1fANN7TIDQt7qxQMKV-MbCJEJjqaUHjoowKm2UgnNHH0
     sheet_name: AglomeradosSubnormais2010_Limites

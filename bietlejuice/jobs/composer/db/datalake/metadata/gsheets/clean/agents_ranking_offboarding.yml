@@ -1,0 +1,25 @@
+---
+database_name: datalake_gsheets_clean
+table_name: agents_ranking_offboarding
+columns:
+  agent_name:
+    lineage:
+      - datalake_gsheets_raw.agents_ranking_offboarding.analista
+  email:
+    lineage:
+      - datalake_gsheets_raw.agents_ranking_offboarding.email
+  agent_company:
+    lineage:
+      - datalake_gsheets_raw.agents_ranking_offboarding.empresa
+  activity:
+    lineage:
+      - datalake_gsheets_raw.agents_ranking_offboarding.atividade
+  ranking:
+    lineage:
+      - datalake_gsheets_raw.agents_ranking_offboarding.ranking
+  dt_start:
+    lineage:
+      - datalake_gsheets_raw.agents_ranking_offboarding.data_de_inicio_na_area
+  dt_end:
+    lineage:
+      - datalake_gsheets_raw.agents_ranking_offboarding.data_de_final_na_area
