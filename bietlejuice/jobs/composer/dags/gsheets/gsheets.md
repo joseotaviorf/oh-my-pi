@@ -165,6 +165,8 @@ This pipeline produces the following output tables:
     - `tenant_entrance_inspection_csat` 
     - `tenant_onboarding_keys_csat`
     - `tof_supply_targets`
+    - `tqc_leads`
+    - `tqc_registered_agents`
     - `tv_ads`
     - `users_cx_plaquinhas`
     - `weekday_demand_share`

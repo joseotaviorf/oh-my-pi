@@ -690,6 +690,16 @@ tof_supply_targets:
     sheet_name: tof_supply_paid
     clean_table_name: tof_supply_targets
 
+tqc_leads:
+    sheet_id: 1s1GI7u9oidsTLtW3Z4_e1Go3EfJR2VMva8VgziSA7RU
+    sheet_name: tqc_leads
+    clean_table_name: tqc_leads
+
+tqc_registered_agents:
+    sheet_id: 1FuN5jlN9pDvVfwPDJAqROfqXKF3tIhXDUvR6a6RGqYg
+    sheet_name: tqc_registered_agents
+    clean_table_name: tqc_registered_agents
+
 tratativas_actionline:
     sheet_id: 1ElKBNwteL7B_RQYk62-53qiIbhicjmOiV6VyoaRuOG4
     sheet_name: forms_actionline
