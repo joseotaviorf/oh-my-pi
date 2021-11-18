@@ -405,7 +405,7 @@ conversation_and_segment AS (
     c.ts_ended
   FROM 
     conversation c
-  LEFT JOIN 
+  JOIN 
     segment t
       ON t.sk_call = c.sk_call
       AND t.id_task = c.id_task

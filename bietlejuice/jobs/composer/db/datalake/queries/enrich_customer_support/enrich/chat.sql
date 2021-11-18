@@ -169,15 +169,15 @@ WITH quinto_messenger_tickets AS (
       cm.ts_last_event
     FROM
       datalake_quinto_messenger.channel c
+    JOIN
+      task t
+        ON t.id_channel = c.id_channel
     LEFT JOIN 
       chatbot_time_metrics bot
         ON c.id_source = bot.id_session
     LEFT JOIN
       chat_metrics cm
         ON cm.id_conversation = c.id_source
-    LEFT JOIN
-      task t
-        ON t.id_channel = c.id_channel
     LEFT JOIN
       task_transfer_reason
         ON task_transfer_reason.id_task = t.id_task
