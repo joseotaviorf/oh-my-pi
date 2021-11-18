@@ -1,0 +1,6 @@
+# Config for affiliate_acquisition_metrics
+---
+streams:
+  - direction: 'upstream'
+    task_ids: ['dw_affiliates_clusters',
+               'dw_lead_listing_flows']
