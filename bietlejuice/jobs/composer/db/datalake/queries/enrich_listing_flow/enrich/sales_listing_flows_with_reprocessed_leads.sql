@@ -398,25 +398,27 @@ SELECT
             THEN 'NoPhotoJob'
         ELSE 'NotMapped'
     END AS funnel_step,
-    CAST(acq.lead_to_prospect_seconds_diff / 3600 AS INTEGER) AS hours_lead_to_prospect,
-    CAST(acq.prospect_to_qualified_seconds_diff / 3600 AS INTEGER) AS hours_prospect_to_qualified,
-    CAST(acq.lead_to_first_contact_seconds_diff / 3600 AS INTEGER) AS hours_lead_to_first_contact,
-    CAST(acq.prospect_to_first_contact_seconds_diff / 3600 AS INTEGER) AS hours_prospect_to_first_contact,
-    CAST(acq.qualified_to_opportunity_seconds_diff / 3600 AS INTEGER) AS hours_qualified_to_opportunity,
-    CAST(acq.opportunity_to_listing_seconds_diff / 3600 AS INTEGER) AS hours_opportunity_to_listing,
-    CAST(acq.lead_to_listing_seconds_diff /3600 AS INTEGER) AS hours_lead_to_listing,
-    CAST(acq.lead_to_prospect_seconds_diff / 86400 AS INTEGER) AS days_lead_to_prospect,
-    CAST(acq.prospect_to_qualified_seconds_diff / 86400 AS INTEGER) AS days_prospect_to_qualified,
-    CAST(acq.lead_to_first_contact_seconds_diff / 86400 AS INTEGER) AS days_lead_to_first_contact,
-    CAST(acq.prospect_to_first_contact_seconds_diff / 86400 AS INTEGER) AS days_prospect_to_first_contact,
-    CAST(acq.qualified_to_opportunity_seconds_diff / 86400 AS INTEGER) AS days_qualified_to_opportunity,
-    CAST(acq.opportunity_to_listing_seconds_diff / 86400 AS INTEGER) AS days_opportunity_to_listing,
-    CAST(acq.lead_to_listing_seconds_diff / 86400 AS INTEGER) AS days_lead_to_listing,
-    CASE
+    -- [ODS] It was necessary a ROUND + CAST to DECIMAL(x, 2) to force a round up in the decimal points and match most
+    --  of DW table's values. Some values will yet diverge because this will always round UP. E.g.: 1.64 -> 1.7
+    ROUND(CAST(acq.lead_to_prospect_seconds_diff / 3600 AS DECIMAL(10, 2)), 1) AS hours_lead_to_prospect,
+    ROUND(CAST(acq.prospect_to_qualified_seconds_diff / 3600 AS DECIMAL(10, 2)), 1) AS hours_prospect_to_qualified,
+    ROUND(CAST(acq.lead_to_first_contact_seconds_diff / 3600 AS DECIMAL(10, 2)), 1) AS hours_lead_to_first_contact,
+    ROUND(CAST(acq.prospect_to_first_contact_seconds_diff / 3600 AS DECIMAL(10, 2)), 1) AS hours_prospect_to_first_contact,
+    ROUND(CAST(acq.qualified_to_opportunity_seconds_diff / 3600 AS DECIMAL(10, 2)), 1) AS hours_qualified_to_opportunity,
+    ROUND(CAST(acq.opportunity_to_listing_seconds_diff / 3600 AS DECIMAL(10, 2)), 1) AS hours_opportunity_to_listing,
+    ROUND(CAST(acq.lead_to_listing_seconds_diff /3600 AS DECIMAL(10, 2)), 1) AS hours_lead_to_listing,
+    ROUND(CAST(acq.lead_to_prospect_seconds_diff / 86400 AS DECIMAL(10, 2)), 1) AS days_lead_to_prospect,
+    ROUND(CAST(acq.prospect_to_qualified_seconds_diff / 86400 AS DECIMAL(10, 2)), 1) AS days_prospect_to_qualified,
+    ROUND(CAST(acq.lead_to_first_contact_seconds_diff / 86400 AS DECIMAL(10, 2)), 1) AS days_lead_to_first_contact,
+    ROUND(CAST(acq.prospect_to_first_contact_seconds_diff / 86400 AS DECIMAL(10, 2)), 1) AS days_prospect_to_first_contact,
+    ROUND(CAST(acq.qualified_to_opportunity_seconds_diff / 86400 AS DECIMAL(10, 2)), 1) AS days_qualified_to_opportunity,
+    ROUND(CAST(acq.opportunity_to_listing_seconds_diff / 86400 AS DECIMAL(10, 2)), 1) AS days_opportunity_to_listing,
+    ROUND(CAST(acq.lead_to_listing_seconds_diff / 86400 AS DECIMAL(10, 2)), 1) AS days_lead_to_listing,
+    ROUND(CASE
       WHEN (acq.ts_conversion IS NULL AND acq.ts_discarded IS NULL)
         THEN NULL
-      ELSE CAST(acq.lead_to_processing_seconds_diff / 86400 AS INTEGER)
-    END AS days_lead_to_processing,
+      ELSE CAST(acq.lead_to_processing_seconds_diff / 86400 AS DECIMAL(10, 2))
+    END, 1) AS days_lead_to_processing,
     acq.ts_opt_out_sale,
     acq.ts_lead,
     acq.ts_prospect,
