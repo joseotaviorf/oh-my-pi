@@ -1,9 +1,9 @@
 DROP TABLE IF EXISTS customer_support.dim_ranking_targets;
 CREATE TABLE IF NOT EXISTS customer_support.dim_ranking_targets (
     sk_group INTEGER,
-    sk_team VARCHAR,
+    sk_department VARCHAR,
     sk_team_leader VARCHAR,
-    team VARCHAR,
+    department VARCHAR,
     team_leader VARCHAR,
     company VARCHAR,
     target_resolution FLOAT,

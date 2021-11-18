@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS customer_support.fact_agent_daily_productivity;
 CREATE TABLE IF NOT EXISTS customer_support.fact_agent_daily_productivity (
-    id_agent VARCHAR,
+    sk_agent VARCHAR,
     sk_agent_manager VARCHAR,
     sk_department VARCHAR,
     sk_date BIGINT,
