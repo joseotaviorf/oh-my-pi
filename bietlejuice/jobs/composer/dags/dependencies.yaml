@@ -788,6 +788,14 @@ bietlejuice.enrich_sale_listings:
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
 
+bietlejuice.enrich_sale_potential_listing:
+  - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
+  - bietlejuice.ebdb:create-clean-partner-in-data-lake
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
+  - bietlejuice.enrich_lead:load-enrich-lead
+  - bietlejuice.enrich_listing_flow:load-enrich-sales-listing-flows-with-reprocessed-leads
+
 bietlejuice.enrich_sauron:
   - bietlejuice.sauron:load-clean-session
 

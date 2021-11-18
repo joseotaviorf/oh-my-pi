@@ -1,0 +1,26 @@
+database_name: datalake_sale_potential_listing
+table_name: potential_listing_b2b
+columns:
+  id:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id
+  id_condo:
+    lineage:
+      - datalake_ebdb_listing.house.id_condo_parent
+  id_house_listing:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id_house
+      - datalake_ebdb_listing.house_listing.version
+  id_partner:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id_partner
+      - datalake_ebdb_clean.partner_agent.id_partner
+  id_autonomous_agent:
+    lineage:
+      - datalake_ebdb_clean.partner_agent.id_user
+  id_user_registrant:
+    lineage:
+      - datalake_ebdb_listing.house.id_user_registrant
+  is_exclusive:
+    lineage:
+      - datalake_ebdb_listing.house.is_exclusive
