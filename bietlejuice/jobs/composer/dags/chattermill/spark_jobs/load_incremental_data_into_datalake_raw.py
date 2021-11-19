@@ -22,6 +22,7 @@ JOB_NAME = "load_incremental_data_into_datalake_raw"
 BLOCK_LIST_CAMPAIGN = [
     "[PA] ClimaeEngajamento - Gestor",
     "[PA] ClimaeEngajamento - Colaborador",
+    "[PA] eNPS - Q3",
 ]
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
