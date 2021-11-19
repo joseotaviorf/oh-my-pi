@@ -100,13 +100,13 @@ for table in tables:
         raw_spark_job_extra_args=parameters,
     )
 
-    partition_columns = partition_columns if is_incremental else None
+    partitions = partition_columns if is_incremental else None
     clean_task_group = task_group.build_clean_task_group(
         source_database_base_name=SOURCE,
         target_database_base_name=SOURCE,
         table_name=clean_table_name,
         is_incremental=is_incremental,
-        partitions=partition_columns,
+        partitions=partitions,
     )
 
     create_cluster_task.set_downstream(DatalakeTaskGroup.first_tasks(raw_task_group))
