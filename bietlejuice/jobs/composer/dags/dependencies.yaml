@@ -372,9 +372,15 @@ bietlejuice.enrich_amplitude_visit:
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
 
 bietlejuice.enrich_analyst_ranking:
+  - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_customer_support:load-enrich-csat
   - bietlejuice.enrich_customer_support:load-enrich-email
+  - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-actions-resolutions-flow
+  - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-users-resolutions-flow
   - bietlejuice.gsheets:load-clean-agents-control
+  - bietlejuice.gsheets:load-clean-agents-ranking-offboarding
+  - bietlejuice.terminator:load-clean-termination
+  - bietlejuice.terminator:load-clean-termination-workflow
 
 bietlejuice.enrich_big_agent:
   - bietlejuice.big_agent:load-clean-agency
