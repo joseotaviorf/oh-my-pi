@@ -1,0 +1,18 @@
+database_name: datalake_sale_potential_listing
+table_name: potential_listing_reprocessed_leads
+columns:
+  id:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id
+  lead_type:
+    lineage:
+      - datalake_lead.lead.type
+  lead_origin:
+    lineage:
+      - datalake_lead.lead.source
+  utm_source:
+    lineage:
+      - datalake_lead.lead.utm_source
+  utm_medium:
+    lineage:
+      - datalake_lead.lead.utm_medium

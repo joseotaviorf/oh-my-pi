@@ -1,0 +1,35 @@
+database_name: datalake_sale_potential_listing
+table_name: potential_listing_lead_tasks
+columns:
+  id:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id
+  id_user_sales_rep:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id_rep
+      - datalake_crm_lead.lead_tasks.id_rep
+  id_user_first_task_assignee:
+    lineage:
+      - datalake_crm_lead.lead_tasks.id_rep
+  id_user_last_task_assignee:
+    lineage:
+      - datalake_crm_lead.lead_tasks.id_rep
+  dt_first_task_created_date:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.dt_lead
+      - datalake_crm_lead.lead_tasks.ts_created
+  dt_first_task_closed_date:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.dt_lead
+      - datalake_crm_lead.lead_tasks.ts_created
+  dt_last_task_created_date:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.dt_lead
+      - datalake_crm_lead.lead_tasks.ts_created
+  dt_last_task_closed_date:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.dt_lead
+      - datalake_crm_lead.lead_tasks.ts_created
+  has_fup_photo_task:
+    lineage:
+      - datalake_listing_jobs.house_photo_job_tasks.has_fup_photo

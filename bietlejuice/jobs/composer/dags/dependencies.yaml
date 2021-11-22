@@ -797,10 +797,13 @@ bietlejuice.enrich_sale_listings:
 bietlejuice.enrich_sale_potential_listing:
   - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
   - bietlejuice.ebdb:create-clean-partner-in-data-lake
+  - bietlejuice.enrich_crm_lead:load-enrich-lead-tasks
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_lead:load-enrich-lead
+  - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
   - bietlejuice.enrich_listing_flow:load-enrich-sales-listing-flows-with-reprocessed-leads
+  - bietlejuice.enrich_listing_jobs:load-enrich-house-photo-job-tasks
 
 bietlejuice.enrich_sauron:
   - bietlejuice.sauron:load-clean-session

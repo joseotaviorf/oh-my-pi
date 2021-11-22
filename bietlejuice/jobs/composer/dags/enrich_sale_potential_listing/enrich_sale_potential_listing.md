@@ -16,6 +16,8 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 Produces the following output tables:
 
 - `potential_listing_b2b`
+- `potential_listing_lead_tasks`
+- `potential_listing_reprocessed_leads`
 
 ### Responsible Data Engineering Team
 
