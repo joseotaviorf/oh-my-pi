@@ -490,134 +490,134 @@ costs_targets_results_combined AS (
     SELECT * FROM cluster_promo_bonus
         ),
         ia_fact_affiliate_transposed AS (
-            SELECT 
-                sk_date, 
-                mkt_origin, 
-                NULL::TEXT AS mkt_channel, 
-                NULL::TEXT AS mkt_medium, 
-                NULL::TEXT AS mkt_source, 
-                NULL::TEXT AS utm_campaign, 
-                NULL::TEXT AS utm_content, 
-                NULL::TEXT AS utm_term, 
-                city_group, 
-                'Commission Listing' AS source, 
-                NULL AS business_context, 
-                commission_listing AS cost 
-            FROM 
-                marketing.fact_affiliate_daily_cost_attributions 
-            WHERE 
-                sk_date < 20210125
-
-            UNION ALL
-
-            SELECT 
-                sk_date, 
-                mkt_origin, 
-                NULL::TEXT AS mkt_channel, 
-                NULL::TEXT AS mkt_medium, 
-                NULL::TEXT AS mkt_source, 
-                NULL::TEXT AS utm_campaign, 
-                NULL::TEXT AS utm_content, 
-                NULL::TEXT AS utm_term, 
-                city_group, 
-                'Commission Rent' AS source, 
-                NULL AS business_context, 
-                commission_rent AS cost 
-            FROM   
-                marketing.fact_affiliate_daily_cost_attributions 
-            WHERE 
-                sk_date < 20210125
-
-            UNION ALL
-
-            SELECT 
-                sk_date, 
-                mkt_origin, 
+            SELECT
+                sk_date,
+                mkt_origin,
                 NULL::TEXT AS mkt_channel,
-                NULL::TEXT AS mkt_medium, 
-                NULL::TEXT AS mkt_source, 
-                NULL::TEXT AS utm_campaign, 
-                NULL::TEXT AS utm_content, 
-                NULL::TEXT AS utm_term, city_group, 
-                'Commission MGM' AS source, 
-                NULL AS business_context, 
-                commission_mgm AS cost 
-            FROM 
-                marketing.fact_affiliate_daily_cost_attributions 
-            WHERE 
+                NULL::TEXT AS mkt_medium,
+                NULL::TEXT AS mkt_source,
+                NULL::TEXT AS utm_campaign,
+                NULL::TEXT AS utm_content,
+                NULL::TEXT AS utm_term,
+                city_group,
+                'Commission Listing' AS source,
+                NULL AS business_context,
+                commission_listing AS cost
+            FROM
+                marketing.fact_affiliate_daily_cost_attributions
+            WHERE
                 sk_date < 20210125
 
             UNION ALL
 
-            SELECT 
-                sk_date, 
-                mkt_origin, 
-                NULL::TEXT AS mkt_channel, 
-                NULL::TEXT AS mkt_medium, 
-                NULL::TEXT AS mkt_source, 
-                NULL::TEXT AS utm_campaign, 
-                NULL::TEXT AS utm_content, 
-                NULL::TEXT AS utm_term, 
-                city_group, 
-                'Commission Tradecom' AS source, 
-                NULL AS business_context, 
-                commission_tradecom AS cost 
-            FROM 
+            SELECT
+                sk_date,
+                mkt_origin,
+                NULL::TEXT AS mkt_channel,
+                NULL::TEXT AS mkt_medium,
+                NULL::TEXT AS mkt_source,
+                NULL::TEXT AS utm_campaign,
+                NULL::TEXT AS utm_content,
+                NULL::TEXT AS utm_term,
+                city_group,
+                'Commission Rent' AS source,
+                NULL AS business_context,
+                commission_rent AS cost
+            FROM
+                marketing.fact_affiliate_daily_cost_attributions
+            WHERE
+                sk_date < 20210125
+
+            UNION ALL
+
+            SELECT
+                sk_date,
+                mkt_origin,
+                NULL::TEXT AS mkt_channel,
+                NULL::TEXT AS mkt_medium,
+                NULL::TEXT AS mkt_source,
+                NULL::TEXT AS utm_campaign,
+                NULL::TEXT AS utm_content,
+                NULL::TEXT AS utm_term, city_group,
+                'Commission MGM' AS source,
+                NULL AS business_context,
+                commission_mgm AS cost
+            FROM
+                marketing.fact_affiliate_daily_cost_attributions
+            WHERE
+                sk_date < 20210125
+
+            UNION ALL
+
+            SELECT
+                sk_date,
+                mkt_origin,
+                NULL::TEXT AS mkt_channel,
+                NULL::TEXT AS mkt_medium,
+                NULL::TEXT AS mkt_source,
+                NULL::TEXT AS utm_campaign,
+                NULL::TEXT AS utm_content,
+                NULL::TEXT AS utm_term,
+                city_group,
+                'Commission Tradecom' AS source,
+                NULL AS business_context,
+                commission_tradecom AS cost
+            FROM
                 marketing.fact_affiliate_daily_cost_attributions
 
             UNION ALL
 
-            SELECT 
-                sk_date, 
-                mkt_origin, 
-                NULL::TEXT AS mkt_channel, 
-                NULL::TEXT AS mkt_medium, 
-                NULL::TEXT AS mkt_source, 
-                NULL::TEXT AS utm_campaign, 
-                NULL::TEXT AS utm_content, 
-                NULL::TEXT AS utm_term, 
-                city_group, 
-                'Promo Bonus' AS source, 
-                NULL AS business_context, 
-                promotional_bonus AS cost 
-            FROM 
-                marketing.fact_affiliate_daily_cost_attributions  
-            WHERE 
+            SELECT
+                sk_date,
+                mkt_origin,
+                NULL::TEXT AS mkt_channel,
+                NULL::TEXT AS mkt_medium,
+                NULL::TEXT AS mkt_source,
+                NULL::TEXT AS utm_campaign,
+                NULL::TEXT AS utm_content,
+                NULL::TEXT AS utm_term,
+                city_group,
+                'Promo Bonus' AS source,
+                NULL AS business_context,
+                promotional_bonus AS cost
+            FROM
+                marketing.fact_affiliate_daily_cost_attributions
+            WHERE
                 sk_date < 20210208
 
             UNION ALL
 
-            SELECT 
-                sk_date, 
-                mkt_origin, 
-                NULL::TEXT AS mkt_channel, 
-                NULL::TEXT AS mkt_medium, 
-                NULL::TEXT AS mkt_source, 
-                NULL::TEXT AS utm_campaign, 
-                NULL::TEXT AS utm_content, 
-                NULL::TEXT AS utm_term, 
-                city_group, 
-                'Notification' AS source, 
-                NULL AS business_context, 
-                notification AS cost 
-            FROM 
+            SELECT
+                sk_date,
+                mkt_origin,
+                NULL::TEXT AS mkt_channel,
+                NULL::TEXT AS mkt_medium,
+                NULL::TEXT AS mkt_source,
+                NULL::TEXT AS utm_campaign,
+                NULL::TEXT AS utm_content,
+                NULL::TEXT AS utm_term,
+                city_group,
+                'Notification' AS source,
+                NULL AS business_context,
+                notification AS cost
+            FROM
                 marketing.fact_affiliate_daily_cost_attributions
 
             UNION ALL
 
-            SELECT 
-                sk_date, 
-                mkt_origin, 
-                NULL::TEXT AS mkt_channel, 
-                NULL::TEXT AS mkt_medium, 
-                NULL::TEXT AS mkt_source, 
-                NULL::TEXT AS utm_campaign, 
-                NULL::TEXT AS utm_content, 
-                NULL::TEXT AS utm_term, 
-                city_group, 'Other' AS source, 
-                NULL AS business_context, 
-                other AS cost 
-            FROM 
+            SELECT
+                sk_date,
+                mkt_origin,
+                NULL::TEXT AS mkt_channel,
+                NULL::TEXT AS mkt_medium,
+                NULL::TEXT AS mkt_source,
+                NULL::TEXT AS utm_campaign,
+                NULL::TEXT AS utm_content,
+                NULL::TEXT AS utm_term,
+                city_group, 'Other' AS source,
+                NULL AS business_context,
+                other AS cost
+            FROM
                 marketing.fact_affiliate_daily_cost_attributions
         ),
         ia_provisioned_costs AS (
@@ -669,9 +669,9 @@ costs_targets_results_combined AS (
             WHERE
                 iac.cost IS NOT NULL
                 AND dd.date < CURRENT_DATE
-            GROUP BY 
+            GROUP BY
                 1,2,3,4,5,6,7,8,9,10,11
-            HAVING 
+            HAVING
                 costs>0
         )
         SELECT
@@ -686,9 +686,9 @@ costs_targets_results_combined AS (
             utm_content,
             utm_term,
             SUM(costs) AS costs
-        FROM 
+        FROM
             base
-        GROUP BY 
+        GROUP BY
             1,2,3,4,5,6,7,8,9,10
         ),
         affiliates_sale_cost AS (
@@ -730,12 +730,12 @@ costs_targets_results_combined AS (
                 SUM(0::FLOAT) AS opportunities_target_rental,
                 SUM(0::FLOAT) AS first_listings_target_rental,
                 SUM(0::FLOAT) AS budget_rental
-            FROM 
+            FROM
                 affiliates
-            WHERE 
-                business_context = 'Sale' 
+            WHERE
+                business_context = 'Sale'
                 OR (business_context is NULL AND mkt_origin IN ('Doorman Sale','Indica Aí - Agents Sale','Indica Aí - General Sale'))
-            GROUP BY 
+            GROUP BY
                 1,2,3,4,5,6,7,8,9,10
         ),
         supply_affiliates_cost AS (
@@ -777,12 +777,12 @@ costs_targets_results_combined AS (
                 SUM(0::FLOAT) AS opportunities_target_rental,
                 SUM(0::FLOAT) AS first_listings_target_rental,
                 SUM(0::FLOAT) AS budget_rental
-            FROM 
+            FROM
                 affiliates
-            WHERE 
-                business_context = 'Rent' 
+            WHERE
+                business_context = 'Rent'
                 OR (business_context is NULL AND mkt_origin IN ('Doorman','Indica Aí - Agents','Indica Aí - General'))
-            GROUP BY 
+            GROUP BY
                 1,2,3,4,5,6,7,8,9,10
         ),
         supply_landlords_cost AS (
@@ -824,17 +824,17 @@ costs_targets_results_combined AS (
                 SUM(0::FLOAT) AS opportunities_target_rental,
                 SUM(0::FLOAT) AS first_listings_target_rental,
                 SUM(0::FLOAT) AS budget_rental
-            FROM 
+            FROM
                 marketing.fact_marketing_daily_costs co
-            JOIN 
-                dim_date dbt 
+            JOIN
+                dim_date dbt
                 on dbt.sk_date = co.sk_date
-            WHERE 
+            WHERE
                 co.funnel_side = 'supply'
                 AND dbt.date BETWEEN '2020-01-01' AND (CURRENT_DATE - interval '1 day')
                 AND co.mkt_origin IN ('Owner PWA','Price Calculator','New Channels')
                 AND co.mkt_channel != 'Girafa'
-            GROUP BY 
+            GROUP BY
                 1,2,3,4,5,6,7,8,9,10
         ),
         supply_sale_cost AS (
@@ -876,15 +876,15 @@ costs_targets_results_combined AS (
                 SUM(0::FLOAT) AS opportunities_target_rental,
                 SUM(0::FLOAT) AS first_listings_target_rental,
                 SUM(0::FLOAT) AS budget_rental
-            FROM 
+            FROM
                 marketing.fact_marketing_daily_costs co
-            JOIN 
-                dim_date dbt 
+            JOIN
+                dim_date dbt
                 ON dbt.sk_date = co.sk_date
-            WHERE 
+            WHERE
                 co.account_name IN ('quintoandar_supply_sale_display', 'quintoandar_supply_sale', 'supply_landlords_sale', 'supply_landlords')
                 AND co.mkt_origin IN ('Owner PWA - Sale', 'Price Calculator - Sale')
-            GROUP BY 
+            GROUP BY
                 1,2,3,4,5,6,7,8,9,10
         ),
         supply_ciq_cost AS (
@@ -926,14 +926,14 @@ costs_targets_results_combined AS (
                 SUM(0::FLOAT) AS opportunities_target_rental,
                 SUM(0::FLOAT) AS first_listings_target_rental,
                 SUM(0::FLOAT) AS budget_rental
-            FROM 
+            FROM
                 marketing.fact_marketing_daily_costs co
-            JOIN 
-                dim_date dbt 
+            JOIN
+                dim_date dbt
                 ON dbt.sk_date = co.sk_date
-            WHERE 
+            WHERE
                 co.mkt_origin = 'CIQ'
-            GROUP BY 
+            GROUP BY
                 1,2,3,4,5,6,7,8,9,10
         ),
         cost_union AS (
@@ -948,18 +948,18 @@ costs_targets_results_combined AS (
             SELECT * FROM supply_ciq_cost
         )
 
-        SELECT 
-            * 
-        FROM 
+        SELECT
+            *
+        FROM
             cost_union
-        WHERE 
+        WHERE
             sk_date < TO_CHAR(current_date,'yyyymmdd')::bigint
             AND (cost_sale > 0 OR cost_rental > 0)
             AND (cost_sale IS NOT NULL OR cost_rental IS NOT NULL)
         )
-        
+
     UNION ALL
-    
+
     ------------------------------------------
     -- Supply ForSale Funnel Targets  - NEW --
     ------------------------------------------
@@ -1003,13 +1003,13 @@ costs_targets_results_combined AS (
         SUM(0::FLOAT) AS budget_rental
     FROM
         datalake_raw.gsheets_daily_target_supply_sale str
-    WHERE 
+    WHERE
         str.date >= '2021-04-01'
-    GROUP BY 
+    GROUP BY
         1,2,3,4,5,6,7,8,9,10
-    
+
     UNION ALL
-    
+
     -------------------------------------------
     -- Supply ForRental Funnel Targets - NEW --
     -------------------------------------------
@@ -1053,16 +1053,16 @@ costs_targets_results_combined AS (
         SUM(NULLIF(str.cost_per_source, '')::FLOAT) AS budget_rental
     FROM
         datalake_raw.gsheets_daily_target_supply_rental str
-    WHERE 
+    WHERE
         str.date >= '2021-04-01'
-    GROUP BY 
+    GROUP BY
         1,2,3,4,5,6,7,8,9,10
-    
+
     UNION ALL
-    
-    -----------------------------------------
-    -- Supply ForSale Funnel Targets - OLD --
-    -----------------------------------------
+
+    ---------------------------------------------------------
+    -- Supply ForSale Prospects & Qualifieds Targets - OLD --
+    ---------------------------------------------------------
 (WITH targets AS
     (SELECT
         TO_CHAR(DATE(NULLIF(str.date, NULL)), 'YYYYMMDD')::INT AS sk_date,
@@ -1099,7 +1099,7 @@ costs_targets_results_combined AS (
         SUM(0::FLOAT) AS cost_rental,
         SUM(NULLIF(prospects, '')::FLOAT) AS prospects_target_sale,
         SUM(NULLIF(qualifieds, '')::FLOAT) AS qualifieds_target_sale,
-        SUM(NULLIF(opportunities, '')::FLOAT) AS opportunities_target_sale,
+        SUM(0::FLOAT) AS opportunities_target_sale,
         SUM(0::FLOAT) AS first_listings_target_sale,
         SUM(0::FLOAT) AS budget_sale,
         SUM(0::FLOAT) AS prospects_target_rental,
@@ -1123,8 +1123,61 @@ costs_targets_results_combined AS (
 
     UNION ALL
 
+    ----------------------------------------------------------------
+    -- Supply ForSale Opportunities & First Listing Targets - OLD --
+    ----------------------------------------------------------------
+    SELECT
+        TO_CHAR(DATE(NULLIF(str.date, NULL)), 'YYYYMMDD')::INT AS sk_date,
+        COALESCE(NULLIF(str.city_group, ''),'Not Mapped')::TEXT AS city_group,
+        CASE
+            WHEN str.mkt_channel = 'Spinver' THEN 'Partners'
+            WHEN str.mkt_origin = 'All' AND str.mkt_channel IN ('Organic', 'Paid', 'CRM/Notification') THEN 'Owner PWA'
+            WHEN str.mkt_origin = 'All' AND str.mkt_channel NOT IN ('Organic', 'Paid', 'CRM/Notification')  THEN str.mkt_channel
+            ELSE str.mkt_origin
+        END AS mkt_origin,
+        NULL::TEXT AS  mkt_channel,
+        NULL::TEXT AS mkt_medium,
+        NULL::TEXT AS mkt_source,
+        NULL::TEXT AS utm_campaign,
+        NULL::TEXT AS utm_content,
+        NULL::TEXT AS utm_term,
+        NULL::TEXT AS origin_phone,
+        COUNT(NULL) AS leads_rent,
+        COUNT(NULL) AS leads_sale,
+        COUNT(NULL) AS leads_hybrid,
+        COUNT(NULL) AS prospects_rent,
+        COUNT(NULL) AS prospects_sale,
+        COUNT(NULL) AS prospects_hybrid,
+        COUNT(NULL) AS qualifieds_rent,
+        COUNT(NULL) AS qualifieds_sale,
+        COUNT(NULL) AS qualifieds_hybrid,
+        COUNT(NULL) AS opportunities_rent,
+        COUNT(NULL) AS opportunities_sale,
+        COUNT(NULL) AS opportunities_hybrid,
+        COUNT(NULL) AS first_listings_rent,
+        COUNT(NULL) AS first_listings_sale,
+        COUNT(NULL) AS first_listings_hybrid,
+        SUM(0::FLOAT) AS cost_sale,
+        SUM(0::FLOAT) AS cost_rental,
+        SUM(0::FLOAT) AS prospects_target_sale,
+        SUM(0::FLOAT) AS qualifieds_target_sale,
+        SUM(NULLIF(opportunities, '')::FLOAT) AS opportunities_target_sale,
+        SUM(NULLIF(first_listings, '')::FLOAT) AS first_listings_target_sale,
+        SUM(0::FLOAT) AS budget_sale,
+        SUM(0::FLOAT) AS prospects_target_rental,
+        SUM(0::FLOAT) AS qualifieds_target_rental,
+        SUM(0::FLOAT) AS opportunities_target_rental,
+        SUM(0::FLOAT) AS first_listings_target_rental,
+        SUM(0::FLOAT) AS budget_rental
+    FROM
+        datalake_raw.gsheets_sale_supply_targets str
+    WHERE str.mkt_channel NOT IN ('All', 'Branded')
+    GROUP BY
+        1,2,3,4,5,6,7,8,9,10
+
+    UNION ALL
   -------------------------------------------
-  -- Supply ForRental Funnel Targets - OLD --
+  -- Supply ForRental Prospects & Qualifieds Targets - OLD --
   -------------------------------------------
     SELECT
         TO_CHAR(DATE(NULLIF(str.date, NULL)), 'YYYYMMDD')::INT AS sk_date,
@@ -1161,18 +1214,66 @@ costs_targets_results_combined AS (
         SUM(0::FLOAT) AS budget_sale,
         SUM(NULLIF(str.prospect,'')::float) AS prospects_target_rental,
         SUM(NULLIF(str.qualified,'')::float) AS qualifieds_target_rental,
+        SUM(0::FLOAT) AS opportunities_target_rental,
+        SUM(0::FLOAT) AS first_listings_target_rental,
+        SUM(0::FLOAT) AS budget_rental
+    FROM
+        datamarts.daily_target_volumes_supply str
+    WHERE
+        str.date < '2021-04-01'
+        OR (str.date > '2021-04-01'
+        AND str.supply_origin NOT IN ('Owner PWA', 'Price Calculator', 'Price Calculator - Sale', 'New Channels'))
+    GROUP BY
+        1,2,3,4,5,6,7,8,9,10
+
+    UNION ALL
+
+  ------------------------------------------------------------------
+  -- Supply ForRental Opportunities & First Listing Targets - OLD --
+  ------------------------------------------------------------------
+    SELECT
+        TO_CHAR(DATE(NULLIF(str.date, NULL)), 'YYYYMMDD')::INT AS sk_date,
+        COALESCE(NULLIF(str.city_group,''),'Not Mapped')::varchar AS city_group,
+        NULLIF(str.supply_origin,'')::varchar AS mkt_origin,
+        NULLIF(str.supply_channel,'')::varchar AS mkt_channel,
+        NULL::TEXT AS mkt_medium,
+        NULL::TEXT AS mkt_source,
+        NULL::TEXT AS utm_campaign,
+        NULL::TEXT AS utm_content,
+        NULL::TEXT AS utm_term,
+        NULL::TEXT AS origin_phone,
+        COUNT(NULL) AS leads_rent,
+        COUNT(NULL) AS leads_sale,
+        COUNT(NULL) AS leads_hybrid,
+        COUNT(NULL) AS prospects_rent,
+        COUNT(NULL) AS prospects_sale,
+        COUNT(NULL) AS prospects_hybrid,
+        COUNT(NULL) AS qualifieds_rent,
+        COUNT(NULL) AS qualifieds_sale,
+        COUNT(NULL) AS qualifieds_hybrid,
+        COUNT(NULL) AS opportunities_rent,
+        COUNT(NULL) AS opportunities_sale,
+        COUNT(NULL) AS opportunities_hybrid,
+        COUNT(NULL) AS first_listings_rent,
+        COUNT(NULL) AS first_listings_sale,
+        COUNT(NULL) AS first_listings_hybrid,
+        SUM(0::FLOAT) AS cost_sale,
+        SUM(0::FLOAT) AS cost_rental,
+        SUM(0::FLOAT) AS prospects_target_sale,
+        SUM(0::FLOAT) AS qualifieds_target_sale,
+        SUM(0::FLOAT) AS opportunities_target_sale,
+        SUM(0::FLOAT) AS first_listings_target_sale,
+        SUM(0::FLOAT) AS budget_sale,
+        SUM(0::FLOAT) AS prospects_target_rental,
+        SUM(0::FLOAT) AS qualifieds_target_rental,
         SUM(NULLIF(str.opportunity,'')::float) AS opportunities_target_rental,
         SUM(NULLIF(str.first_listing,'')::float) AS first_listings_target_rental,
         SUM(0::FLOAT) AS budget_rental
     FROM
         datamarts.daily_target_volumes_supply str
-    WHERE 
-        str.date < '2021-04-01'
-        OR (str.date > '2021-04-01'
-        AND str.supply_origin NOT IN ('Owner PWA', 'Price Calculator', 'Price Calculator - Sale', 'New Channels'))
-    GROUP BY 
+   GROUP BY
         1,2,3,4,5,6,7,8,9,10
-    
+
     UNION ALL
 
   ---------------------------------------
@@ -1228,7 +1329,7 @@ costs_targets_results_combined AS (
         SUM(0::FLOAT) AS budget_rental
     FROM
         datalake_raw.gsheets_costs_targets sct
-    WHERE 
+    WHERE
         planning_mkt_level1 = 'Supply'
         AND sct.date < '2021-04-01'
         AND business = 'Sale'
@@ -1236,9 +1337,9 @@ costs_targets_results_combined AS (
             AND sct.date >= '2021-04-01'
             AND business = 'Sale'
             AND planning_mkt_level3 NOT IN ('PWA - Paid', 'Price Calculator', 'New Channels'))
-    GROUP BY 
+    GROUP BY
         1,2,3,4,5,6,7,8,9,10
-    
+
     UNION ALL
 
   -----------------------------------------
@@ -1294,7 +1395,7 @@ costs_targets_results_combined AS (
         SUM(nullif((replace(sct.budget__mensal,',','')),'')::float) AS budget_rental
     FROM
         datalake_raw.gsheets_costs_targets sct
-    WHERE 
+    WHERE
         planning_mkt_level1 = 'Supply'
         AND sct.date < '2021-04-01'
         AND business = 'Rental'
@@ -1302,7 +1403,7 @@ costs_targets_results_combined AS (
             AND sct.date >= '2021-04-01'
             AND business = 'Rental'
             AND planning_mkt_level3 NOT IN ('PWA - Paid', 'Price Calculator', 'New Channels'))
-    GROUP BY 
+    GROUP BY
         1,2,3,4,5,6,7,8,9,10
 
 )
@@ -1361,10 +1462,10 @@ SELECT
     SUM(opportunities_target_rental) AS opportunities_target_rental,
     SUM(first_listings_target_rental) AS first_listings_target_rental,
     SUM(budget_rental) AS budget_rental
-FROM 
+FROM
     costs_targets_results_combined
-JOIN 
+JOIN
     dim_date AS dd
-    USING(sk_date) 
-GROUP BY 
+    USING(sk_date)
+GROUP BY
     1,2,3,4,5,6,7,8,9,10,11

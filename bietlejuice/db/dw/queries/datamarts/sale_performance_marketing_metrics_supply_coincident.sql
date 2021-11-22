@@ -770,9 +770,9 @@ UNION ALL
 
 UNION ALL
 
-  -----------------------------------------
-  -- Supply ForSale Funnel Targets - OLD --
-  -----------------------------------------
+  ---------------------------------------------------------
+  -- Supply ForSale Prospects & Qualifieds Targets - OLD --
+  ---------------------------------------------------------
 (WITH targets AS
     (SELECT
         TO_CHAR(DATE(NULLIF(str.date, NULL)), 'YYYYMMDD')::INT AS sk_date,
@@ -801,7 +801,7 @@ UNION ALL
         SUM(0::FLOAT) AS cost,
         SUM(prospects) AS prospects_target,
         SUM(qualifieds) AS qualifieds_target,
-        SUM(opportunities) AS opportunities_target,
+        SUM(0::FLOAT) AS opportunities_target,
         SUM(0::FLOAT) AS first_listings_target,
         SUM(0::FLOAT) AS budget
     FROM
@@ -816,6 +816,47 @@ UNION ALL
     OR (sk_date >= 20210401
         AND mkt_origin NOT IN ('Owner PWA', 'Price Calculator', 'New Channels'))
 )
+
+UNION ALL
+
+  -----------------------------------------------------
+  -- Supply ForSale Opportunities & FL Targets - OLD --
+  -----------------------------------------------------
+
+    SELECT
+        TO_CHAR(DATE(NULLIF(str.date, NULL)), 'YYYYMMDD')::INT AS sk_date,
+        COALESCE(NULLIF(str.city_group, ''),'Not Mapped')::TEXT AS city_group,
+        CASE
+            WHEN str.mkt_channel = 'Spinver' THEN 'Partners'
+            WHEN str.mkt_origin = 'All' AND str.mkt_channel IN ('Organic', 'Paid', 'CRM/Notification') THEN 'Owner PWA'
+            WHEN str.mkt_origin = 'All' AND str.mkt_channel NOT IN ('Organic', 'Paid', 'CRM/Notification')  THEN str.mkt_channel
+            ELSE str.mkt_origin
+        END AS mkt_origin,
+        NULL::TEXT AS  mkt_channel,
+        NULL::TEXT AS mkt_medium,
+        NULL::TEXT AS mkt_source,
+        NULL::TEXT AS utm_campaign,
+        NULL::TEXT AS utm_content,
+        NULL::TEXT AS utm_term,
+        NULL::TEXT AS origin_phone,
+        'Sale' AS campaign_context,
+        'Sale' AS business_context,
+        COUNT(NULL) AS leads,
+        COUNT(NULL) AS prospects,
+        COUNT(NULL) AS qualifieds,
+        COUNT(NULL) AS opportunities,
+        COUNT(NULL) AS first_listings,
+        COUNT(NULL) AS hybrid_listings,
+        SUM(0::FLOAT) AS cost,
+        SUM(0::FLOAT) AS prospects_target,
+        SUM(0::FLOAT) AS qualifieds_target,
+        SUM(opportunities) AS opportunities_target,
+        SUM(first_listings) AS first_listings_target,
+        SUM(0::FLOAT) AS budget
+    FROM
+        datalake_raw.gsheets_sale_supply_targets str
+    WHERE str.mkt_channel NOT IN ('All', 'Branded')
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
 
 UNION ALL
 

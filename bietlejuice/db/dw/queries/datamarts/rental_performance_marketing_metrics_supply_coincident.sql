@@ -760,9 +760,9 @@ affiliates AS (
 
   UNION ALL
 
-  -------------------------------------------
-  -- Supply ForRental Funnel Targets - OLD --
-  -------------------------------------------
+  -----------------------------------------------------------
+  -- Supply ForRental Prospects & Qualifieds Targets - OLD --
+  -----------------------------------------------------------
     SELECT
         TO_CHAR(DATE(NULLIF(str.date, NULL)), 'YYYYMMDD')::INT AS sk_date,
         COALESCE(NULLIF(str.city_group,''),'Not Mapped')::varchar AS city_group,
@@ -785,8 +785,8 @@ affiliates AS (
         SUM(0::FLOAT) AS cost,
         SUM(NULLIF(str.prospect,'')::float) AS prospects_target,
         SUM(NULLIF(str.qualified,'')::float) AS qualifieds_target,
-        SUM(NULLIF(str.opportunity,'')::float) AS opportunities_target,
-        SUM(NULLIF(str.first_listing,'')::float) AS first_listings_target,
+        SUM(0::FLOAT) AS opportunities_target,
+        SUM(0::FLOAT) AS first_listings_target,
         SUM(0::FLOAT) AS budget
     FROM
         datamarts.daily_target_volumes_supply str
@@ -796,6 +796,41 @@ affiliates AS (
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
 
   UNION ALL
+
+  -------------------------------------------------------
+  -- Supply ForRental Opportunities & FL Targets - OLD --
+  -------------------------------------------------------
+    SELECT
+        TO_CHAR(DATE(NULLIF(str.date, NULL)), 'YYYYMMDD')::INT AS sk_date,
+        COALESCE(NULLIF(str.city_group,''),'Not Mapped')::varchar AS city_group,
+        NULLIF(str.supply_origin,'')::varchar AS mkt_origin,
+        NULLIF(str.supply_channel,'')::varchar AS mkt_channel,
+        NULL::TEXT AS mkt_medium,
+        NULL::TEXT AS mkt_source,
+        NULL::TEXT AS utm_campaign,
+        NULL::TEXT AS utm_content,
+        NULL::TEXT AS utm_term,
+        NULL::TEXT AS origin_phone,
+        NULL::TEXT AS campaign_context,
+        'Rental' AS business_context,
+        COUNT(NULL) AS leads,
+        COUNT(NULL) AS prospects,
+        COUNT(NULL) AS qualifieds,
+        COUNT(NULL) AS opportunities,
+        COUNT(NULL) AS first_listings,
+        COUNT(NULL) AS hybrid_listings,
+        SUM(0::FLOAT) AS cost,
+        SUM(0::FLOAT) AS prospects_target,
+        SUM(0::FLOAT) AS qualifieds_target,
+        SUM(NULLIF(str.opportunity,'')::float) AS opportunities_target,
+        SUM(NULLIF(str.first_listing,'')::float) AS first_listings_target,
+        SUM(0::FLOAT) AS budget
+    FROM
+        datamarts.daily_target_volumes_supply str
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
+
+  UNION ALL
+
   -----------------------------------------
   -- Supply ForRental Cost Targets - OLD --
   -----------------------------------------
