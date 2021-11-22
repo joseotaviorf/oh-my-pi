@@ -1,0 +1,126 @@
+---
+table_name: lost_listings
+enrich_partition_cols: ["year", "month", "day"]
+lost_listings_model_path: /dbfs/FileStore/models/marketing/lost_listings_model.joblib
+segements_mapping:
+  0: 'Pequeno Padrão'
+  1: 'Padrão "Morumbi"'
+  2: 'Studio'
+  3: 'Médios-Grandes'
+  4: 'Completos'
+  5: 'Prédios Simples'
+amenities_query: |
+  WITH
+  amenities AS (
+    SELECT
+      *
+    FROM (
+      SELECT DISTINCT
+        i.imovel_id AS id_house,
+        CASE WHEN i.temcaracteristica = true THEN 1 ELSE 0 END AS temcaracteristica,
+        REPLACE(a.slug, '-', '_') AS slug,
+        ROW_NUMBER() OVER(PARTITION BY i.imovel_id, i.amenidades_id ORDER BY i.atualizadoem DESC) AS rn
+      FROM
+        datalake_ebdb_raw.amenidadesinfo i
+        JOIN datalake_ebdb_raw.amenidades a
+          ON i.amenidades_id = a.id
+      )
+    PIVOT (
+      SUM(temcaracteristica)
+      FOR slug IN ('animais_de_estimacao', 'apartamento_cobertura', 'ar_condicionado', 'varanda_gourmet')
+    )
+    WHERE
+      rn = 1
+  ),
+  condo_amenities AS (
+  SELECT DISTINCT
+      *
+    FROM (
+      SELECT
+        i.imovel_id AS id_house,
+        CASE WHEN i.temcaracteristica = true THEN 1 ELSE 0 END AS temcaracteristica,
+        REPLACE(a.slug, '-', '_') AS slug,
+        ROW_NUMBER() OVER(PARTITION BY i.imovel_id, i.instalacao_id ORDER BY i.atualizadoem DESC) AS rn
+      FROM
+        datalake_ebdb_raw.instalacaoinfo i
+        JOIN datalake_ebdb_raw.instalacao a
+          ON i.instalacao_id = a.id
+      )
+    PIVOT (
+      SUM(temcaracteristica)
+      FOR slug IN ('perto_do_metro', 'piscina_no_condominio')
+    )
+    WHERE
+      rn = 1
+  )
+  SELECT
+    COALESCE(a.id_house, ca.id_house, hc.houseid) AS id_house,
+    hc.maintenancecondition AS house_condition,
+    a.animais_de_estimacao,
+    a.apartamento_cobertura,
+    a.ar_condicionado,
+    a.varanda_gourmet,
+    ca.perto_do_metro,
+    ca.piscina_no_condominio
+  FROM
+    amenities AS a
+    FULL OUTER JOIN condo_amenities as ca
+      ON a.id_house = ca.id_house
+    FULL OUTER JOIN datalake_ebdb_raw.housemaintenancecondition AS hc
+      ON COALESCE(a.id_house, ca.id_house) = hc.houseid
+lost_listings_query: |
+  SELECT
+    DISTINCT dhl.sk_house_listing,
+    NULLIF(dr.region_code, -1) AS region_code,
+    COALESCE(CAST(dhla.animais_de_estimacao AS INT), 0) AS animais_de_estimacao,
+    CAST(dhl.house_total_area AS DOUBLE) AS house_total_area,
+    CASE
+      WHEN CAST(dhl.house_bathrooms AS INT) IN (1, 2, 3, 4)
+        THEN CAST(dhl.house_bathrooms AS INT)
+      WHEN CAST(dhl.house_bathrooms AS INT) > 4
+        THEN 4
+      ELSE 1
+    END AS house_bathrooms,
+    CASE
+      WHEN CAST(dhl.house_bedrooms AS INT) IN (1, 2, 3, 4)
+        THEN CAST(dhl.house_bedrooms AS INT)
+      WHEN CAST(dhl.house_bedrooms AS INT) > 4
+        THEN 4
+      ELSE 1
+    END AS house_bedrooms,
+    CAST(dhl.house_iptu AS DOUBLE) AS house_iptu,
+    CASE WHEN dhl.is_house_furnished = 'True' THEN 1 ELSE 0 END AS is_house_furnished,
+    COALESCE(CAST(dhla.perto_do_metro AS INT), 0) AS perto_do_metro,
+    COALESCE(CAST(dhl.is_originals_active AS INT), 0) AS is_originals_active,
+    CASE
+      WHEN CAST(dhl.house_garages AS INT) IN (1, 2, 3, 4)
+        THEN dhl.house_garages
+      WHEN CAST(dhl.house_garages AS INT) > 4
+        THEN 4
+      ELSE 0
+    END AS house_garages,
+    CAST(dhl.house_rent AS DOUBLE) AS house_rent,
+    CAST(dhl.house_condo AS DOUBLE) AS house_condo,
+    CAST(dhl.house_total_value AS DOUBLE) AS house_total_value,
+    NULLIF(CAST(dhl.house_predicted_price AS DOUBLE), 0) AS house_predicted_price,
+    NULLIF(
+      (CAST(dhl.house_rent AS DOUBLE) - CAST(dhl.house_predicted_price AS DOUBLE)) / NULLIF(CAST(dhl.house_predicted_price AS DOUBLE), 0), -1) AS rent_above_prediction,
+    COALESCE(CAST(dhla.apartamento_cobertura AS INT), 0) AS apartamento_cobertura,
+    COALESCE(CAST(dhla.ar_condicionado AS INT), 0) AS ar_condicionado,
+    COALESCE(CAST(dhla.piscina_no_condominio AS INT), 0) AS piscina_no_condominio,
+    COALESCE(CAST(dhla.varanda_gourmet AS INT), 0) AS varanda_gourmet,
+    CASE WHEN dhl.has_visit_restriction = 'True' THEN 1 ELSE 0 END AS has_visit_restriction,
+    COALESCE(CAST(dhl.house_elevator AS INT), 0) AS house_elevator,
+    dhl.house_entrance,
+    dhl.house_type
+  FROM
+    dw_janus.dim_house_listing AS dhl
+    LEFT JOIN dim_house_listing_amenities AS dhla
+      ON CAST(SUBSTR(dhl.sk_house_listing, 1, 9) AS INT)  = CAST(dhla.id_house AS INT)
+    JOIN dw_janus.fact_house_listings AS fhl
+      ON dhl.sk_house_listing = fhl.sk_house_listing
+    JOIN datalake_region.region dr
+      ON fhl.sk_region = dr.id
+  WHERE
+    dhl.is_for_rent = TRUE
+    AND DATE(dhl.ts_listing_version_start) >= DATE('{execution_date}')
