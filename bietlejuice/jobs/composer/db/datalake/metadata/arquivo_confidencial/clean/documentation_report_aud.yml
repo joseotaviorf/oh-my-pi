@@ -1,0 +1,48 @@
+database_name: datalake_arquivo_confidencial_clean
+table_name: documentation_report_aud
+columns:
+  id:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report_aud.id
+  id_proposal:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report_aud.proposal_id
+  id_report:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report_aud.report_id
+  cpf:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report_aud.cpf
+  rev:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report_aud.rev
+  rev_type:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report_aud.revend
+  status:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report_aud.status
+  matrix_name:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report_aud.matrix_name
+  report_result:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report_aud.report_result
+  validations:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report_aud.validations
+  ts_created:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report_aud.created_at
+  year:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report_aud.year
+  month:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report_aud.month
+  day:
+    lineage:
+      - datalake_arquivo_confidencial_raw.documentation_report_aud.day

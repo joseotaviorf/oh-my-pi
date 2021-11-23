@@ -1,0 +1,33 @@
+database_name: datalake_arquivo_confidencial_clean
+table_name: emailage_result_aud
+columns:
+  id:
+    lineage:
+      - datalake_arquivo_confidencial_raw.emailage_result_aud.id
+  rev:
+    lineage:
+      - datalake_arquivo_confidencial_raw.emailage_result_aud.rev
+  rev_type:
+    lineage:
+      - datalake_arquivo_confidencial_raw.emailage_result_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_arquivo_confidencial_raw.emailage_result_aud.revend
+  email:
+    lineage:
+      - datalake_arquivo_confidencial_raw.emailage_result_aud.email
+  score:
+    lineage:
+      - datalake_arquivo_confidencial_raw.emailage_result_aud.score
+  ts_created:
+    lineage:
+      - datalake_arquivo_confidencial_raw.emailage_result_aud.created_at
+  year:
+    lineage:
+      - datalake_arquivo_confidencial_raw.emailage_result_aud.year
+  month:
+    lineage:
+      - datalake_arquivo_confidencial_raw.emailage_result_aud.month
+  day:
+    lineage:
+      - datalake_arquivo_confidencial_raw.emailage_result_aud.day

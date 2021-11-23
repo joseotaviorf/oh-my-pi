@@ -1,9 +1,0 @@
----
-database_name: datalake_arquivo_confidencial_raw
-table_name: unico_check_document
-columns:
-  ocr:
-    tags:
-      - PII
-      - Sensitive
-      - Confidential

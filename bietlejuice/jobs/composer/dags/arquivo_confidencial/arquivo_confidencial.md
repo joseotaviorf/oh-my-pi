@@ -20,10 +20,13 @@ In datalake raw and clean, via full load:
 
 In datalake raw and clean, via incremental load:
 - `documentation_report`
+- `documentation_report_aud`
 - `documents`
 - `emailage_result`
+- `emailage_result_aud`
 - `rev_info`
 - `unico_check_document`
+- `unico_check_document_aud`
 
 ### Responsible Data Teams
 
