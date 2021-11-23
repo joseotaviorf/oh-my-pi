@@ -1,0 +1,25 @@
+---
+database_name: datalake_casa_mineira_consolidated_marketing_metrics
+table_name: trovit_consolidated_metrics
+columns:
+  campaign_name:
+    lineage:
+      - datalake_casa_mineira_lifull_campaigns_clean.trovit_campaigns.campaign_name
+  account_name:
+    lineage:
+      - datalake_casa_mineira_lifull_campaigns_clean.trovit_campaigns.account_name
+  utm_campaign:
+    lineage:
+      - datalake_casa_mineira_lifull_campaigns_clean.trovit_campaigns.campaign_name
+  desktop_cost:
+    lineage:
+      - datalake_casa_mineira_lifull_campaigns_clean.trovit_campaigns.desktop_cost
+  mobile_cost:
+    lineage:
+      - datalake_casa_mineira_lifull_campaigns_clean.trovit_campaigns.mobile_cost
+  total_cost:
+    lineage:
+      - datalake_casa_mineira_lifull_campaigns_clean.trovit_campaigns.total_cost
+  clicks:
+    lineage:
+      - datalake_casa_mineira_lifull_campaigns_clean.trovit_campaigns.clicks

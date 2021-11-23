@@ -1,0 +1,30 @@
+---
+database_name: datalake_casa_mineira_consolidated_marketing_metrics
+table_name: rtb_consolidated_metrics
+columns:
+  id_date:
+    lineage:
+      - datalake_casa_mineira_rtb_campaigns_clean.rtb_campaigns.year
+      - datalake_casa_mineira_rtb_campaigns_clean.rtb_campaigns.month
+      - datalake_casa_mineira_rtb_campaigns_clean.rtb_campaigns.day
+  campaign_name:
+    lineage:
+      - datalake_casa_mineira_rtb_campaigns_clean.rtb_campaigns.sub_campaign_name
+  account_name:
+    lineage:
+      - datalake_casa_mineira_rtb_campaigns_clean.rtb_campaigns.account_name
+  utm_campaign:
+    lineage:
+      - datalake_casa_mineira_rtb_campaigns_clean.rtb_campaigns.sub_campaign_name
+  other_cost:
+    lineage:
+      - datalake_casa_mineira_rtb_campaigns_clean.rtb_campaigns.cost
+  total_cost:
+    lineage:
+      - datalake_casa_mineira_rtb_campaigns_clean.rtb_campaigns.cost
+  impressions:
+    lineage:
+      - datalake_casa_mineira_rtb_campaigns_clean.rtb_campaigns.impressions
+  clicks:
+    lineage:
+      - datalake_casa_mineira_rtb_campaigns_clean.rtb_campaigns.clicks
