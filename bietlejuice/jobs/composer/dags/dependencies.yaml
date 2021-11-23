@@ -856,3 +856,9 @@ bietlejuice.enrich_zendesk_tickets:
 bietlejuice.regions_polygon:
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.ebdb:create-clean-polygon-region-in-data-lake
+
+bietlejuice.enrich_customer_resolution:
+  - bietlejuice.enrich_customer_support:load-enrich-call
+  - bietlejuice.enrich_customer_support:load-enrich-chat
+  - bietlejuice.enrich_customer_support:load-enrich-email
+  - bietlejuice.enrich_ebdb_user:load-enrich-user

@@ -1,0 +1,23 @@
+database_name: datalake_customer_resolution
+table_name: customer_resolution
+columns:
+  id_ticket:
+    lineage:
+      - datalake_customer_support.call.id_ticket
+      - datalake_customer_support.chat.id_ticket
+      - datalake_customer_support.email.id_ticket
+  id_user:
+    lineage:
+      - datalake_customer_support.call.id_user
+      - datalake_customer_support.chat.id_user
+      - datalake_customer_support.email.id_user
+  ts_ticket_started:
+    lineage:
+      - datalake_customer_support.call.ts_ticket_started
+      - datalake_customer_support.chat.ts_ticket_started
+      - datalake_customer_support.email.ts_ticket_started
+  ts_ticket_ended:
+    lineage:
+      - datalake_customer_support.call.ts_ticket_ended
+      - datalake_customer_support.chat.ts_ticket_ended
+      - datalake_customer_support.email.ts_ticket_ended

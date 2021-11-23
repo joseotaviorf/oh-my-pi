@@ -20,6 +20,7 @@ This pipeline produces the following output table on Enrich layer:
 - `csat`
 - `call`
 - `historical_call`
+- `historical_chat`
 - `email`
 
 ### Disclaimer
