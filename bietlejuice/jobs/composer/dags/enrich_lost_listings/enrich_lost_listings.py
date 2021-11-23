@@ -20,8 +20,8 @@ from bietlejuice.jobs.composer.services.configuration_service import (
 ENV = os.environ.get("ENVIRONMENT")
 
 # DAG params setup
-SOURCE = 'lost_listings'
-CONTEXT = 'marketing_segmentations'
+SOURCE = "lost_listings"
+CONTEXT = "marketing_segmentations"
 DAG_NAME = f"enrich_{SOURCE}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 MAIN_START_DATE = datetime(2021, 11, 1, tzinfo=timezone("America/Sao_Paulo"))
@@ -42,11 +42,13 @@ table_name = config_service.get_config("table_name")
 partition_cols = config_service.get_config("partition_cols")
 
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-ENRICH_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{SOURCE}_enrich.py"
+ENRICH_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{DAG_NAME}/load_{SOURCE}_enrich.py"
 
 # cluster setup
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = f"{spark_jobs_logs_path}{DAG_ID}"
+CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
+    "destination"
+] = f"{spark_jobs_logs_path}{DAG_ID}"
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -66,7 +68,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=custom_libraries
+    libraries=custom_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -79,13 +81,7 @@ load_table_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": ENRICH_SPARK_JOB_PATH,
-            "parameters": [
-                ENV,
-                datalake_bucket,
-                SOURCE,
-                CONTEXT,
-                "{{ ds }}",
-            ],
+            "parameters": [ENV, datalake_bucket, SOURCE, CONTEXT, "{{ ds }}"],
         }
     },
 )
@@ -148,10 +144,6 @@ chain(
     load_table_task,
     sync_metastore_table_task,
     propagate_table_metadata_task,
-    terminate_cluster_task
+    terminate_cluster_task,
 )
-chain(
-    load_table_task,
-    create_external_table_task,
-    terminate_cluster_task
-)
+chain(load_table_task, create_external_table_task, terminate_cluster_task)
