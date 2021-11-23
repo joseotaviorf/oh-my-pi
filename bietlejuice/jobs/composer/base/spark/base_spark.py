@@ -2,6 +2,7 @@ import re
 from urllib.parse import unquote
 
 from pyspark.sql import session, context
+from pyspark.conf import SparkConf
 from pyspark import SparkContext
 
 from quintoandar_logger import QuintoAndarLogger
@@ -79,6 +80,7 @@ class BaseDBUtils:
 
 
 class BaseSparkContext:
-    sc = SparkContext.getOrCreate()
+    conf = SparkConf().set("spark.executor.allowSparkContext", "true")
+    sc = SparkContext.getOrCreate(conf=conf)
     spark = session.SparkSession(sc)
     sqlContext = context.HiveContext(sc)

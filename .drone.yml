@@ -198,7 +198,6 @@ pipeline:
       - export AIRFLOW_GPL_UNIDECODE=yes
       - export AWS_DEFAULT_REGION=us-east-1
       - chmod +x scripts/execute_python3_steps.sh
-      - pip install pip==20.2 # temporary fix to avoid stricter dependencies resolution parser implemented in >20.3 pip versions
       - bash scripts/execute_python3_steps.sh "make requirements-test-python3" "make requirements-python3" "make unit-tests-python3"
     when:
       event: push
