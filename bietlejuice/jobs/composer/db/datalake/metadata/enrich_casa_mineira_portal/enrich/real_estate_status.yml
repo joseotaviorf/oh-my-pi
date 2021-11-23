@@ -1,0 +1,22 @@
+---
+database_name: datalake_casa_mineira_portal
+table_name: real_estate_status
+columns:
+  id_real_estate_agency:
+    lineage:
+      - datalake_casa_mineira_portal_clean.real_estate_agency.id
+      - datalake_casa_mineira_portal_clean.real_estate_agency_history.id_real_estate_agency
+  real_estate_agency_name:
+    lineage:
+      - datalake_casa_mineira_portal_clean.real_estate_agency.real_estate_agency_name
+  real_estate_agency_full_name:
+    lineage:
+      - datalake_casa_mineira_portal_clean.real_estate_agency.real_estate_agency_full_name
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_portal_clean.real_estate_agency.ts_created
+      - datalake_casa_mineira_portal_clean.real_estate_agency_history.ts_created
+  ts_status_ended:
+    lineage:
+      - datalake_casa_mineira_portal_clean.real_estate_agency.ts_created
+      - datalake_casa_mineira_portal_clean.real_estate_agency_history.ts_created
