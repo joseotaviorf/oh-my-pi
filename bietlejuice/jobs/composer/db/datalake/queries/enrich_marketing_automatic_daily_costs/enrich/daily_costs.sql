@@ -77,11 +77,11 @@ media_costs_with_taxonomy AS (
         enriched_consolidated_media_costs ecmc
         LEFT JOIN
             taxonomy_by_platform AS tp 
-                ON COALESCE(ecmc.account_name, '') = COALESCE(tp.account_name, '')
-                    AND COALESCE(ecmc.report_type, '') = COALESCE(tp.report_type, '')
-                    AND COALESCE(ecmc.ad_type, 'other') = COALESCE(tp.ad_type, 'other')
-                    AND ecmc.origin = tp.origin
-                    AND ecmc.campaign_origin_acquisition = tp.campaign_origin_acquisition
+                ON COALESCE(ecmc.account_name, '') = COALESCE(TRIM(tp.account_name), '')
+                    AND COALESCE(ecmc.report_type, '') = COALESCE(TRIM(tp.report_type), '')
+                    AND COALESCE(ecmc.ad_type, 'other') = COALESCE(TRIM(tp.ad_type), 'other')
+                    AND ecmc.origin = TRIM(tp.origin)
+                    AND ecmc.campaign_origin_acquisition = TRIM(tp.campaign_origin_acquisition)
 )
 
 SELECT 
