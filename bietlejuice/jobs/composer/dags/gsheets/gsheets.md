@@ -153,6 +153,11 @@ This pipeline produces the following output tables:
     - `target_sale_cohort_demand`
     - `target_sale_cohort_supply`
     - `targets_avg_ticket_adm_fee`
+    - `targets_casa_mineira_cost`
+    - `targets_casa_mineira_ncp`
+    - `targets_casa_mineira_tof_daily`
+    - `targets_casa_mineira_tof_monthly`
+    - `targets_casa_mineira_tof_weekly`
     - `targets_nr_bf_er_or`
     - `target_supply_and_demand_autonomous_agent`
     - `taxonomy_affiliates`

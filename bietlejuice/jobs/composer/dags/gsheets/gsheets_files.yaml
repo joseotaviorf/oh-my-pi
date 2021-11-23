@@ -655,6 +655,31 @@ targets_avg_ticket_adm_fee:
     sheet_name: targets_avg_ticket_adm_fee
     clean_table_name: targets_avg_ticket_adm_fee
 
+targets_casa_mineira_cost:
+    sheet_id: 1lYMt9heU4DE5wCj_Nu25ClCI25wKWMMHKchzq6pnJl0
+    sheet_name: Cost
+    clean_table_name: targets_casa_mineira_cost
+
+targets_casa_mineira_ncp:
+    sheet_id: 1lYMt9heU4DE5wCj_Nu25ClCI25wKWMMHKchzq6pnJl0
+    sheet_name: NCP
+    clean_table_name: targets_casa_mineira_ncp
+
+targets_casa_mineira_tof_daily:
+    sheet_id: 1lYMt9heU4DE5wCj_Nu25ClCI25wKWMMHKchzq6pnJl0
+    sheet_name: ToF - Daily
+    clean_table_name: targets_casa_mineira_tof_daily
+
+targets_casa_mineira_tof_monthly:
+    sheet_id: 1lYMt9heU4DE5wCj_Nu25ClCI25wKWMMHKchzq6pnJl0
+    sheet_name: ToF - Monthly
+    clean_table_name: targets_casa_mineira_tof_monthly
+
+targets_casa_mineira_tof_weekly:
+    sheet_id: 1lYMt9heU4DE5wCj_Nu25ClCI25wKWMMHKchzq6pnJl0
+    sheet_name: ToF - Weekly
+    clean_table_name: targets_casa_mineira_tof_weekly
+
 targets_nr_bf_er_or:
     sheet_id: 1hJu-ASanek3BV0SPxRqnG0pU0x8wPp-osoWcT14FMCU
     sheet_name: targets_nr_bf_er_or
