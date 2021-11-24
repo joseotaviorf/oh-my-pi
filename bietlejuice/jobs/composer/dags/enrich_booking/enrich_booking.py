@@ -31,9 +31,7 @@ SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base"
 
 LOGS_OUTPUT_PATH = f"s3://{S3_BUCKET}/logs/jobs/{DAG_ID}"
 
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_minimum_resources_cluster", deserialize_json=True
-)
+CLUSTER_DESCRIPTION = Variable.get(f"databricks_default_cluster", deserialize_json=True)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 
 dag = DAG(
