@@ -19,7 +19,7 @@ WITH medias_consolidated AS (
         impressions,
         clicks
     FROM
-        datalake_casa_mineira_consolidated_marketing_costs.google_consolidated_costs
+        datalake_casa_mineira_consolidated_marketing_metrics.google_consolidated_metrics
     WHERE
         id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
     -- CRITEO
@@ -42,7 +42,7 @@ WITH medias_consolidated AS (
         impressions,
         clicks
     FROM
-        datalake_casa_mineira_consolidated_marketing_costs.criteo_consolidated_costs
+        datalake_casa_mineira_consolidated_marketing_metrics.criteo_consolidated_metrics
     WHERE
         id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
     -- RTB
@@ -65,7 +65,7 @@ WITH medias_consolidated AS (
         impressions,
         clicks
     FROM
-        datalake_casa_mineira_consolidated_marketing_costs.rtb_consolidated_costs
+        datalake_casa_mineira_consolidated_marketing_metrics.rtb_consolidated_metrics
     WHERE
         id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
     -- MITULA
@@ -88,7 +88,7 @@ WITH medias_consolidated AS (
         0 AS impressions,
         clicks
     FROM
-        datalake_casa_mineira_consolidated_marketing_costs.mitula_consolidated_costs
+        datalake_casa_mineira_consolidated_marketing_metrics.mitula_consolidated_metrics
     WHERE
         id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
     -- TROVIT
@@ -111,7 +111,7 @@ WITH medias_consolidated AS (
         0 AS impressions,
         clicks
     FROM
-        datalake_casa_mineira_consolidated_marketing_costs.trovit_consolidated_costs
+        datalake_casa_mineira_consolidated_marketing_metrics.trovit_consolidated_metrics
     WHERE
         id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
     -- FACEBOOK
@@ -134,7 +134,7 @@ WITH medias_consolidated AS (
         impressions,
         clicks
     FROM
-        datalake_casa_mineira_consolidated_marketing_costs.facebook_consolidated_costs
+        datalake_casa_mineira_consolidated_marketing_metrics.facebook_consolidated_metrics
     WHERE
         id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
 )
