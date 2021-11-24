@@ -16,3 +16,6 @@ columns:
   utm_medium:
     lineage:
       - datalake_lead.lead.utm_medium
+  is_b2b:
+    lineage:
+      - datalake_lead.lead.is_b2b

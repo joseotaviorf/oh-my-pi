@@ -146,7 +146,8 @@ acquisition_channels AS (
         COALESCE(rl.affiliate_type, l.affiliate_type) AS affiliate_type,
         COALESCE(rl.id_agent, l.id_agent) IS NOT NULL AS is_agent_referral,
         l.status AS lead_status,
-        l.reason AS lead_reason,
+        -- TODO [ODS] Adjust wrong rule, it is impacting the creation of funnel_step
+        COALESCE(l.reason_detail, l.reason) AS lead_reason,
         l.city,
         pj.status AS photo_job_status,
         pj.problem AS photo_job_reason,
@@ -239,23 +240,25 @@ acquisition_channels AS (
 ),
 acquisition_channels_dt_diffs AS (
     SELECT
-    acquisition_channels.*,
-    acquisition_channel_rep NOT LIKE 'Reprocessed%' AS is_not_reprocessed,
-    -- SparkSQL's datediff ignores the time part, so we get the seconds diff and after that transform into days, hours, etc difference.
-    CAST(CAST(ts_prospect AS TIMESTAMP) AS LONG) - CAST(CAST(ts_lead AS TIMESTAMP) AS LONG) AS lead_to_prospect_seconds_diff,
-    CAST(CAST(ts_qualified AS TIMESTAMP) AS LONG) - CAST(CAST(ts_prospect AS TIMESTAMP) AS LONG) AS prospect_to_qualified_seconds_diff,
-    CAST(CAST(ts_first_contact AS TIMESTAMP) AS LONG) - CAST(CAST(ts_lead AS TIMESTAMP) AS LONG) AS lead_to_first_contact_seconds_diff,
-    CAST(CAST(ts_first_contact AS TIMESTAMP) AS LONG) - CAST(CAST(ts_prospect AS TIMESTAMP) AS LONG) AS prospect_to_first_contact_seconds_diff,
-    CAST(CAST(ts_opportunity AS TIMESTAMP) AS LONG) - CAST(CAST(ts_qualified AS TIMESTAMP) AS LONG) AS qualified_to_opportunity_seconds_diff,
-    CAST(CAST(ts_first_listing AS TIMESTAMP) AS LONG) - CAST(CAST(ts_opportunity AS TIMESTAMP) AS LONG) AS opportunity_to_listing_seconds_diff,
-    CAST(CAST(ts_first_listing AS TIMESTAMP) AS LONG) - CAST(CAST(ts_lead AS TIMESTAMP) AS LONG) AS lead_to_listing_seconds_diff,
-    CAST(
-        CAST(ts_lead AS TIMESTAMP) AS LONG) - CAST(
-            CAST(LEAST(
-                COALESCE(ts_conversion, ts_discarded + INTERVAL 1 DAY),
-                COALESCE(ts_discarded, ts_conversion + INTERVAL 1 DAY)) AS TIMESTAMP
-            ) AS LONG
-    ) AS lead_to_processing_seconds_diff
+        acquisition_channels.*,
+        acquisition_channel_rep NOT LIKE 'Reprocessed%' AS is_not_reprocessed,
+        -- SparkSQL's datediff ignores the time part, so we get the seconds diff and after that transform into days, hours, etc difference.
+        CAST(CAST(ts_prospect AS TIMESTAMP) AS LONG) - CAST(CAST(ts_lead AS TIMESTAMP) AS LONG) AS lead_to_prospect_seconds_diff,
+        CAST(CAST(ts_qualified AS TIMESTAMP) AS LONG) - CAST(CAST(ts_prospect AS TIMESTAMP) AS LONG) AS prospect_to_qualified_seconds_diff,
+        CAST(CAST(ts_first_contact AS TIMESTAMP) AS LONG) - CAST(CAST(ts_lead AS TIMESTAMP) AS LONG) AS lead_to_first_contact_seconds_diff,
+        CAST(CAST(ts_first_contact AS TIMESTAMP) AS LONG) - CAST(CAST(ts_prospect AS TIMESTAMP) AS LONG) AS prospect_to_first_contact_seconds_diff,
+        CAST(CAST(ts_opportunity AS TIMESTAMP) AS LONG) - CAST(CAST(ts_qualified AS TIMESTAMP) AS LONG) AS qualified_to_opportunity_seconds_diff,
+        CAST(CAST(ts_first_listing AS TIMESTAMP) AS LONG) - CAST(CAST(ts_opportunity AS TIMESTAMP) AS LONG) AS opportunity_to_listing_seconds_diff,
+        CAST(CAST(ts_first_listing AS TIMESTAMP) AS LONG) - CAST(CAST(ts_lead AS TIMESTAMP) AS LONG) AS lead_to_listing_seconds_diff,
+        CAST(
+            CAST(
+                LEAST(
+                    COALESCE(ts_conversion, ts_discarded + INTERVAL 1 DAY),
+                    COALESCE(ts_discarded, ts_conversion + INTERVAL 1 DAY)
+                    ) AS TIMESTAMP
+            ) AS LONG)
+            - CAST(CAST(ts_lead AS TIMESTAMP) AS LONG
+        ) AS lead_to_processing_seconds_diff
     FROM acquisition_channels
 ),
 legacy_doorman AS (

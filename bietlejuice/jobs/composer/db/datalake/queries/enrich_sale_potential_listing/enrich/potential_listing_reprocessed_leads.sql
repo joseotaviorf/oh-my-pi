@@ -11,6 +11,10 @@ WITH rep_leads AS (
                 AND LOWER(TRIM(lead.utm_campaign)) NOT RLIKE '(non-branded)',
             FALSE
         ) AS branded_lead,
+        (
+            lead.real_estate_agency_code IS NOT NULL
+            OR lead.is_b2b
+        ) AS is_b2b,
         CASE
             WHEN lead.source = 'Reprocessado'
                 THEN rl.id_origin_lead
@@ -27,7 +31,8 @@ WITH rep_leads AS (
       COALESCE(old_bl.utm_source, bl.utm_source) AS utm_source,
       COALESCE(old_bl.utm_medium, bl.utm_medium) AS utm_medium,
       COALESCE(old_bl.branded_lead, bl.branded_lead) AS is_lead_branded,
-      COALESCE(bl.lead_origin = 'Reprocessado', FALSE) AS is_reprocessed
+      COALESCE(bl.lead_origin = 'Reprocessado', FALSE) AS is_reprocessed,
+      COALESCE(old_bl.is_b2b, bl.is_b2b) AS is_b2b
     FROM base_leads bl
     LEFT JOIN base_leads old_bl
       ON old_bl.id_lead = bl.old_id_lead
@@ -39,7 +44,8 @@ SELECT
     rl.utm_source,
     rl.utm_medium,
     rl.is_lead_branded,
-    rl.is_reprocessed
+    rl.is_reprocessed,
+    rl.is_b2b
 FROM datalake_listing_flow.sales_listing_flows_with_reprocessed_leads AS lfrl
 JOIN rep_leads AS rl
     ON rl.id_lead = lfrl.id_lead
