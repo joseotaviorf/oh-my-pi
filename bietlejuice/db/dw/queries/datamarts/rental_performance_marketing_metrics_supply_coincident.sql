@@ -748,11 +748,11 @@ affiliates AS (
         COUNT(NULL) AS first_listings,
         COUNT(NULL) AS hybrid_listings,
         SUM(0::FLOAT) AS cost,
-        SUM(NULLIF(str.prospects, '')::FLOAT) AS prospects_target,
-        SUM(NULLIF(str.qualifieds, '')::FLOAT) AS qualifieds_target,
+        SUM(CAST(REPLACE(str.prospects,',','') AS FLOAT8)) AS prospects_target,
+        SUM(CAST(REPLACE(str.qualifieds,',','') AS FLOAT8)) AS qualifieds_target,
         SUM(0::FLOAT) AS opportunities_target,
         SUM(0::FLOAT) AS first_listings_target,
-        SUM(NULLIF(str.cost_per_source, '')::FLOAT) AS budget
+        SUM(CAST(REPLACE(str.cost_per_source,',','') AS FLOAT8)) AS budget
     FROM
         datalake_raw.gsheets_daily_target_supply_rental str
     WHERE str.date >= '2021-04-01'
@@ -783,8 +783,8 @@ affiliates AS (
         COUNT(NULL) AS first_listings,
         COUNT(NULL) AS hybrid_listings,
         SUM(0::FLOAT) AS cost,
-        SUM(NULLIF(str.prospect,'')::float) AS prospects_target,
-        SUM(NULLIF(str.qualified,'')::float) AS qualifieds_target,
+        SUM(CAST(REPLACE(str.prospect,',','') AS FLOAT8)) AS prospects_target,
+        SUM(CAST(REPLACE(str.qualified,',','') AS FLOAT8)) AS qualifieds_target,
         SUM(0::FLOAT) AS opportunities_target,
         SUM(0::FLOAT) AS first_listings_target,
         SUM(0::FLOAT) AS budget
@@ -822,8 +822,8 @@ affiliates AS (
         SUM(0::FLOAT) AS cost,
         SUM(0::FLOAT) AS prospects_target,
         SUM(0::FLOAT) AS qualifieds_target,
-        SUM(NULLIF(str.opportunity,'')::float) AS opportunities_target,
-        SUM(NULLIF(str.first_listing,'')::float) AS first_listings_target,
+        SUM(CAST(REPLACE(str.opportunity,',','') AS FLOAT8)) AS opportunities_target,
+        SUM(CAST(REPLACE(str.first_listing,',','') AS FLOAT8)) AS first_listings_target,
         SUM(0::FLOAT) AS budget
     FROM
         datamarts.daily_target_volumes_supply str
@@ -868,7 +868,7 @@ affiliates AS (
         SUM(0::FLOAT) AS qualifieds_target,
         SUM(0::FLOAT) AS opportunities_target,
         SUM(0::FLOAT) AS first_listings_target,
-        SUM(nullif((replace(sct.budget__mensal,',','')),'')::float) AS budget
+        SUM(CAST(REPLACE(sct.budget__mensal,',','') AS FLOAT8)) AS budget
     FROM
         datalake_raw.gsheets_costs_targets sct
     WHERE planning_mkt_level1 = 'Supply'
@@ -921,12 +921,12 @@ SELECT
     SUM(opportunities) AS opportunities,
     SUM(first_listings) AS first_listings,
     SUM(hybrid_listings) AS hybrid_listings,
-    SUM(cost) AS cost,
-    SUM(prospects_target) AS prospects_target,
-    SUM(qualifieds_target) AS qualifieds_target,
-    SUM(opportunities_target) AS opportunities_target,
-    SUM(first_listings_target) AS first_listings_target,
-    SUM(budget) AS budget
+    SUM(CAST(cost AS FLOAT8)) AS cost,
+    SUM(CAST(prospects_target AS FLOAT8)) AS prospects_target,
+    SUM(CAST(qualifieds_target AS FLOAT8)) AS qualifieds_target,
+    SUM(CAST(opportunities_target AS FLOAT8)) AS opportunities_target,
+    SUM(CAST(first_listings_target AS FLOAT8)) AS first_listings_target,
+    SUM(CAST(budget AS FLOAT8)) AS budget
 FROM costs_targets_results_combined
   JOIN dim_date AS dd
     USING(sk_date)

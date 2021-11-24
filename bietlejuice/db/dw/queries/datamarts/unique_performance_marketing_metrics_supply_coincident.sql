@@ -991,11 +991,11 @@ costs_targets_results_combined AS (
         COUNT(NULL) AS first_listings_hybrid,
         SUM(0::FLOAT) AS cost_sale,
         SUM(0::FLOAT) AS cost_rental,
-        SUM(NULLIF(str.prospects, '')::FLOAT) AS prospects_target_sale,
-        SUM(NULLIF(str.qualifieds, '')::FLOAT) AS qualifieds_target_sale,
+        SUM(CAST(REPLACE(str.prospects,',','') AS FLOAT8)) AS prospects_target_sale,
+        SUM(CAST(REPLACE(str.qualifieds,',','') AS FLOAT8))AS qualifieds_target_sale,
         SUM(0::FLOAT) AS opportunities_target_sale,
         SUM(0::FLOAT) AS first_listings_target_sale,
-        SUM(NULLIF(str.cost_per_source, '')::FLOAT) AS budget_sale,
+        SUM(CAST(REPLACE(str.cost_per_source,',','') AS FLOAT8)) AS budget_sale,
         SUM(0::FLOAT) AS prospects_target_rental,
         SUM(0::FLOAT) AS qualifieds_target_rental,
         SUM(0::FLOAT) AS opportunities_target_rental,
@@ -1046,11 +1046,11 @@ costs_targets_results_combined AS (
         SUM(0::FLOAT) AS opportunities_target_sale,
         SUM(0::FLOAT) AS first_listings_target_sale,
         SUM(0::FLOAT) AS budget_sale,
-        SUM(NULLIF(str.prospects, '')::FLOAT) AS prospects_target_rental,
-        SUM(NULLIF(str.qualifieds, '')::FLOAT) AS qualifieds_target_rental,
+        SUM(CAST(REPLACE(str.prospects,',','') AS FLOAT8)) AS prospects_target_rental,
+        SUM(CAST(REPLACE(str.qualifieds,',','') AS FLOAT8)) AS qualifieds_target_rental,
         SUM(0::FLOAT) AS opportunities_target_rental,
         SUM(0::FLOAT) AS first_listings_target_rental,
-        SUM(NULLIF(str.cost_per_source, '')::FLOAT) AS budget_rental
+        SUM(CAST(REPLACE(str.cost_per_source,',','') AS FLOAT8)) AS budget_rental
     FROM
         datalake_raw.gsheets_daily_target_supply_rental str
     WHERE
@@ -1097,8 +1097,8 @@ costs_targets_results_combined AS (
         COUNT(NULL) AS first_listings_hybrid,
         SUM(0::FLOAT) AS cost_sale,
         SUM(0::FLOAT) AS cost_rental,
-        SUM(NULLIF(prospects, '')::FLOAT) AS prospects_target_sale,
-        SUM(NULLIF(qualifieds, '')::FLOAT) AS qualifieds_target_sale,
+        SUM(CAST(REPLACE(str.prospects,',','') AS FLOAT8)) AS prospects_target_sale,
+        SUM(CAST(REPLACE(str.qualifieds,',','') AS FLOAT8)) AS qualifieds_target_sale,
         SUM(0::FLOAT) AS opportunities_target_sale,
         SUM(0::FLOAT) AS first_listings_target_sale,
         SUM(0::FLOAT) AS budget_sale,
@@ -1161,8 +1161,8 @@ costs_targets_results_combined AS (
         SUM(0::FLOAT) AS cost_rental,
         SUM(0::FLOAT) AS prospects_target_sale,
         SUM(0::FLOAT) AS qualifieds_target_sale,
-        SUM(NULLIF(opportunities, '')::FLOAT) AS opportunities_target_sale,
-        SUM(NULLIF(first_listings, '')::FLOAT) AS first_listings_target_sale,
+        SUM(CAST(REPLACE(str.opportunities,',','') AS FLOAT8)) AS opportunities_target_sale,
+        SUM(CAST(REPLACE(str.first_listings,',','') AS FLOAT8))AS first_listings_target_sale,
         SUM(0::FLOAT) AS budget_sale,
         SUM(0::FLOAT) AS prospects_target_rental,
         SUM(0::FLOAT) AS qualifieds_target_rental,
@@ -1212,8 +1212,8 @@ costs_targets_results_combined AS (
         SUM(0::FLOAT) AS opportunities_target_sale,
         SUM(0::FLOAT) AS first_listings_target_sale,
         SUM(0::FLOAT) AS budget_sale,
-        SUM(NULLIF(str.prospect,'')::float) AS prospects_target_rental,
-        SUM(NULLIF(str.qualified,'')::float) AS qualifieds_target_rental,
+        SUM(CAST(REPLACE(str.prospect,',','') AS FLOAT8)) AS prospects_target_rental,
+        SUM(CAST(REPLACE(str.qualified,',','') AS FLOAT8)) AS qualifieds_target_rental,
         SUM(0::FLOAT) AS opportunities_target_rental,
         SUM(0::FLOAT) AS first_listings_target_rental,
         SUM(0::FLOAT) AS budget_rental
@@ -1266,8 +1266,8 @@ costs_targets_results_combined AS (
         SUM(0::FLOAT) AS budget_sale,
         SUM(0::FLOAT) AS prospects_target_rental,
         SUM(0::FLOAT) AS qualifieds_target_rental,
-        SUM(NULLIF(str.opportunity,'')::float) AS opportunities_target_rental,
-        SUM(NULLIF(str.first_listing,'')::float) AS first_listings_target_rental,
+        SUM(CAST(REPLACE(str.opportunity,',','') AS FLOAT8)) AS opportunities_target_rental,
+        SUM(CAST(REPLACE(str.first_listing,',','') AS FLOAT8)) AS first_listings_target_rental,
         SUM(0::FLOAT) AS budget_rental
     FROM
         datamarts.daily_target_volumes_supply str
@@ -1321,7 +1321,7 @@ costs_targets_results_combined AS (
         SUM(0::FLOAT) AS qualifieds_target_sale,
         SUM(0::FLOAT) AS opportunities_target_sale,
         SUM(0::FLOAT) AS first_listings_target_sale,
-        SUM(NULLIF((REPLACE(sct.budget__mensal,',','')),'')::FLOAT) AS budget_sale,
+        SUM(CAST(REPLACE(sct.budget__mensal,',','') AS FLOAT8)) AS budget_sale,
         SUM(0::FLOAT) AS prospects_target_rental,
         SUM(0::FLOAT) AS qualifieds_target_rental,
         SUM(0::FLOAT) AS opportunities_target_rental,
@@ -1392,7 +1392,7 @@ costs_targets_results_combined AS (
         SUM(0::FLOAT) AS qualifieds_target_rental,
         SUM(0::FLOAT) AS opportunities_target_rental,
         SUM(0::FLOAT) AS first_listings_target_rental,
-        SUM(nullif((replace(sct.budget__mensal,',','')),'')::float) AS budget_rental
+        SUM(CAST(REPLACE(sct.budget__mensal,',','') AS FLOAT8)) AS budget_rental
     FROM
         datalake_raw.gsheets_costs_targets sct
     WHERE
@@ -1450,18 +1450,18 @@ SELECT
     SUM(first_listings_rent) AS first_listings_rent,
     SUM(first_listings_sale) AS first_listings_sale,
     SUM(first_listings_hybrid) AS first_listings_hybrid,
-    SUM(cost_sale) AS cost_sale,
-    SUM(cost_rental) AS cost_rental,
-    SUM(prospects_target_sale) AS prospects_target_sale,
-    SUM(qualifieds_target_sale) AS qualifieds_target_sale,
-    SUM(opportunities_target_sale) AS opportunities_target_sale,
-    SUM(first_listings_target_sale) AS first_listings_target_sale,
-    SUM(budget_sale) AS budget_sale,
-    SUM(prospects_target_rental) AS prospects_target_rental,
-    SUM(qualifieds_target_rental) AS qualifieds_target_rental,
-    SUM(opportunities_target_rental) AS opportunities_target_rental,
-    SUM(first_listings_target_rental) AS first_listings_target_rental,
-    SUM(budget_rental) AS budget_rental
+    SUM(CAST(cost_sale AS FLOAT8)) AS cost_sale,
+    SUM(CAST(cost_rental AS FLOAT8)) AS cost_rental,
+    SUM(CAST(prospects_target_sale AS FLOAT8)) AS prospects_target_sale,
+    SUM(CAST(qualifieds_target_sale AS FLOAT8)) AS qualifieds_target_sale,
+    SUM(CAST(opportunities_target_sale AS FLOAT8)) AS opportunities_target_sale,
+    SUM(CAST(first_listings_target_sale AS FLOAT8)) AS first_listings_target_sale,
+    SUM(CAST(budget_sale AS FLOAT8)) AS budget_sale,
+    SUM(CAST(prospects_target_rental AS FLOAT8)) AS prospects_target_rental,
+    SUM(CAST(qualifieds_target_rental AS FLOAT8)) AS qualifieds_target_rental,
+    SUM(CAST(opportunities_target_rental AS FLOAT8)) AS opportunities_target_rental,
+    SUM(CAST(first_listings_target_rental AS FLOAT8)) AS first_listings_target_rental,
+    SUM(CAST(budget_rental AS FLOAT8)) AS budget_rental
 FROM
     costs_targets_results_combined
 JOIN
