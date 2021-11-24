@@ -17,4 +17,4 @@ WHERE
     year = {year}
     AND month = {month}
     AND day = {day}
-GROUP BY 1,2,3,4,5,6,7
+GROUP BY 1,2,3,4,5,6
