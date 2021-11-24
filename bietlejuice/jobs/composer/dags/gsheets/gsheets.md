@@ -173,6 +173,7 @@ This pipeline produces the following output tables:
     - `tqc_leads`
     - `tqc_registered_agents`
     - `tv_ads`
+    - `unit_economics_amortization_curve`
     - `users_cx_plaquinhas`
     - `weekday_demand_share`
     - `weekday_holiday_share`

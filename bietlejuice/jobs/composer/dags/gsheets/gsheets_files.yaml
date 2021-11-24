@@ -735,6 +735,11 @@ tv_ads:
     sheet_name: base_clean
     clean_table_name: tv_ads
 
+unit_economics_amortization_curve:
+    sheet_id: 1Xoc-FhCfD3QgXiCSze3XT95BGr1SWqLqLyYTmyUGnHI
+    sheet_name: amortization_curve
+    clean_table_name: unit_economics_amortization_curve
+
 users_cx_plaquinhas:
     sheet_id: 1oiUlhua9uFXbwkaSeF_EYRvaB652JIhOoWDy1bYolK0
     sheet_name: users_cx_plaquinhas
