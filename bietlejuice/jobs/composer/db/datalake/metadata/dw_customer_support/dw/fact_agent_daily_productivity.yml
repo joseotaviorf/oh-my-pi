@@ -3,7 +3,7 @@ table_name: fact_agent_daily_productivity
 columns:
   sk_agent:
     lineage:
-      - datalake_analyst_ranking.ranking.sk_agent
+      - datalake_analyst_ranking.ranking.id_agent
   sk_agent_manager:
     lineage:
       - datalake_analyst_ranking.ranking.agent_manager
