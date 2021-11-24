@@ -7,6 +7,9 @@ columns:
   id_termination_fee:
     lineage:
       - datalake_terminator_raw.termination_fee_negotiation.termination_fee_id
+  discount_percentage:
+    lineage:
+      - datalake_terminator_raw.termination_fee_negotiation.discount_percentage
   discount_value:
     lineage:
       - datalake_terminator_raw.termination_fee_negotiation.discount_value

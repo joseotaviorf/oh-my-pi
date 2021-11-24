@@ -13,10 +13,12 @@ SELECT
     rescheduling_history,
     utility_bill_info,
     last_condominium_responsible, 
+    tenant_pending_tasks,
     exit_inspection_required AS has_exit_inspection,
     relisting_enabled AS is_relisting,
     date AS dt_termination,
     vacancy_date AS dt_vacancy,
+    end_date AS dt_ended_termination,
     canceled_at AS ts_canceled,
     created_at AS ts_created,
     updated_at AS ts_updated

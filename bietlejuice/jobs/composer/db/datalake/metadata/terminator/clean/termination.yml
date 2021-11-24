@@ -43,6 +43,9 @@ columns:
   last_condominium_responsible:
     lineage:
       - datalake_terminator_raw.termination.last_condominium_responsible
+  tenant_pending_tasks:
+    lineage:
+      - datalake_terminator_raw.termination.tenant_pending_tasks
   has_exit_inspection:
     lineage:
       - datalake_terminator_raw.termination.exit_inspection_required
@@ -55,6 +58,9 @@ columns:
   dt_vacancy:
     lineage:
       - datalake_terminator_raw.termination.vacancy_date
+  dt_ended_termination:
+    lineage:
+      - datalake_terminator_raw.termination.end_date
   ts_canceled:
     lineage:
       - datalake_terminator_raw.termination.canceled_at

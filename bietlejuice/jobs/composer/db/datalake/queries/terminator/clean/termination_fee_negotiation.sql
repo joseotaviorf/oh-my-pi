@@ -1,6 +1,7 @@
 SELECT
     id,
     termination_fee_id AS id_termination_fee,
+    discount_percentage,
     discount_value,
     final_amount,
     number_of_installments,
