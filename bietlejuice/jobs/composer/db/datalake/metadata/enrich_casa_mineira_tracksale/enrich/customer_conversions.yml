@@ -1,0 +1,26 @@
+---
+database_name: datalake_casa_mineira_tracksale
+table_name: customer_conversions
+columns:
+  id_dispatch:
+    lineage:
+      - datalake_casa_mineira_tracksale.answer.id
+      - datalake_casa_mineira_tracksale.dispatch.id
+  id_dispatch_lot:
+    lineage:
+      - datalake_casa_mineira_tracksale.dispatch.id
+  id_customer:
+    lineage:
+      - datalake_casa_mineira_tracksale.dispatch.customers
+  customer_email:
+    lineage:
+      - datalake_casa_mineira_tracksale.dispatch.customers
+  customer_phone:
+    lineage:
+      - datalake_casa_mineira_tracksale.dispatch.customers
+  id_answer:
+    lineage:
+      - datalake_casa_mineira_tracksale.answer.id
+  is_customer_identified:
+    lineage:
+      - datalake_casa_mineira_tracksale.dispatch.customers

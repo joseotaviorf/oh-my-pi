@@ -1,0 +1,22 @@
+---
+database_name: datalake_casa_mineira_tracksale
+table_name: dispatch
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.dispatch.id
+  id_campaign:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.dispatch.campaign
+  campaign_name:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.dispatch.campaign
+  customers:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.dispatch.customers
+  status:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.dispatch.status
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.dispatch.ts_created

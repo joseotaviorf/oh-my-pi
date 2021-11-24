@@ -1,0 +1,10 @@
+---
+database_name: datalake_casa_mineira_tracksale
+table_name: answer_justifications
+columns:
+  id_answer:
+    lineage:
+      - datalake_casa_mineira_tracksale.answer.id
+  justification:
+    lineage:
+      - datalake_casa_mineira_tracksale.answer.justifications

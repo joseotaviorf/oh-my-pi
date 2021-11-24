@@ -1,0 +1,11 @@
+---
+database_name: datalake_casa_mineira_tracksale
+table_name: answer_cities
+columns:
+  id_answer:
+    lineage:
+      - datalake_casa_mineira_tracksale.answer_tags.id_answer
+  city:
+    lineage:
+      - datalake_ebdb_clean.house.city
+      - datalake_casa_mineira_tracksale.answer_tags.tag_value

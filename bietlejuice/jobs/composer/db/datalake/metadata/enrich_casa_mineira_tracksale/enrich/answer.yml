@@ -1,0 +1,85 @@
+---
+database_name: datalake_casa_mineira_tracksale
+table_name: answer
+columns:
+  id:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.answer.id
+  id_campaign:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.answer.id_campaign
+  campaign_name:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.answer.campaign_name
+  name:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.answer.name
+  identification:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.answer.identification
+  email:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.answer.email
+  alternative_email:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.answer.alternative_email
+  phone:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.answer.phone
+  alternative_phone:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.answer.alternative_phone
+  priority:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.answer.priority
+  type:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.answer.type
+  status:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.answer.status
+  nps_answer:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.answer.nps_answer
+  score_category:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.answer.nps_answer
+  last_nps_answer:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.answer.last_nps_answer
+  nps_comment:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.answer.nps_comment
+  justifications:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.answer.justifications
+  lot_code:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.answer.lot_code
+  assignee:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.answer.assignee
+  tags:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.answer.tags
+  categories:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.answer.categories
+  seconds_spent_answering:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.answer.seconds_spent_answering
+  ts_deadline:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.answer.ts_deadline
+  ts_reminder:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.answer.ts_reminder
+  ts_dispatch:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.answer.ts_dispatch
+  ts_answer_sent_utc:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.answer.ts_answer_sent
+  ts_answer_sent_local:
+    lineage:
+      - datalake_casa_mineira_tracksale_clean.answer.ts_answer_sent

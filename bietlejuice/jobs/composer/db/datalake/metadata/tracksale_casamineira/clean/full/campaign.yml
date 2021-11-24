@@ -1,0 +1,42 @@
+database_name: datalake_tracksale_casamineira_clean
+table_name: campaign
+columns:
+  id:
+    lineage:
+      - datalake_tracksale_casamineira_raw.campaign.code
+  campaign_name:
+    lineage:
+      - datalake_tracksale_casamineira_raw.campaign.name
+  description:
+    lineage:
+      - datalake_tracksale_casamineira_raw.campaign.description
+  detractors:
+    lineage:
+      - datalake_tracksale_casamineira_raw.campaign.detractors
+  passives:
+    lineage:
+      - datalake_tracksale_casamineira_raw.campaign.passives
+  promoters:
+    lineage:
+      - datalake_tracksale_casamineira_raw.campaign.promoters
+  dispatches:
+    lineage:
+      - datalake_tracksale_casamineira_raw.campaign.dispatches
+  answers:
+    lineage:
+      - datalake_tracksale_casamineira_raw.campaign.answers
+  comments:
+    lineage:
+      - datalake_tracksale_casamineira_raw.campaign.comments
+  main_channel:
+    lineage:
+      - datalake_tracksale_casamineira_raw.campaign.main_channel
+  tags:
+    lineage:
+      - datalake_tracksale_casamineira_raw.campaign.tags
+  questions:
+    lineage:
+      - datalake_tracksale_casamineira_raw.campaign.questions
+  ts_created:
+    lineage:
+      - datalake_tracksale_casamineira_raw.campaign.create_time

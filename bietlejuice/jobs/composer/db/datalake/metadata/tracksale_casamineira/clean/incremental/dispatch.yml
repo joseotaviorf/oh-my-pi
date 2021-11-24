@@ -1,0 +1,27 @@
+database_name: datalake_tracksale_casamineira_clean
+table_name: dispatch
+columns:
+  id:
+    lineage:
+      - datalake_tracksale_casamineira_raw.dispatch.dispatch_code
+  campaign:
+    lineage:
+      - datalake_tracksale_casamineira_raw.dispatch.campaign
+  customers:
+    lineage:
+      - datalake_tracksale_casamineira_raw.dispatch.customers
+  status:
+    lineage:
+      - datalake_tracksale_casamineira_raw.dispatch.status
+  ts_created:
+    lineage:
+      - datalake_tracksale_casamineira_raw.dispatch.create_time
+  year:
+    lineage:
+      - datalake_tracksale_casamineira_raw.dispatch.year
+  month:
+    lineage:
+      - datalake_tracksale_casamineira_raw.dispatch.month
+  day:
+    lineage:
+      - datalake_tracksale_casamineira_raw.dispatch.day
