@@ -2,5 +2,5 @@
 ---
 streams:
   - direction: 'upstream'
-    task_ids: ['dw_lead_listing_flows']
+    task_ids: ['dw_lead_listing_flows', 'dw_temp_sale_offers']
     

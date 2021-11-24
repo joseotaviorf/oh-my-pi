@@ -91,32 +91,32 @@ SELECT
 	fv.sk_offer,
 	fv.is_hub_flow,
 	CASE
-        when is_hub_flow = true AND dr.sk_region in (55, 56, 70, 72, 1329) and date(sk_booking_created_date) between  '2021-04-26' and current_date then 'HUB Bela Vista'
-        when is_hub_flow = true AND dr.sk_region in (1577,54) and  date(sk_booking_created_date) between '2021-08-15' and current_date then 'HUB Bela Vista' -- Liberdade, Centro
-        when is_hub_flow = true AND dr.sk_region in (51, 1281, 1287, 52, 1298, 1300) and date(sk_booking_created_date) between '2021-04-26'and current_date then 'HUB Vila Mariana'
-        when is_hub_flow = true AND dr.sk_region in (1298,1300) and date(sk_booking_created_date) >= '2021-08-15' then 'HUB Vila Mariana'  -- Cambuci, Ipiranga
-        when is_hub_flow = true AND dr.sk_region in (73,1284,1299,69,1286,1285,65,1283,1282,64,68,71) and date(sk_booking_created_date) between '2021-06-18' and current_date then 'HUB Perdizes'
-        when is_hub_flow = true AND dr.sk_region in (61,2345,62,2341,63,46,45,58,47,57,60,59) and date(sk_booking_created_date) between '2021-08-15' and current_date then 'HUB Vila Madalena'
-        when is_hub_flow = true AND dr.sk_region in (2667,2664,1589,2148,1306,1305,1303,1301,2666,2165,1304,2674,1588,1302,2159,1583) and date(sk_booking_created_date) between '2021-10-04' and current_date then 'HUB Tatuapé'
-        when is_hub_flow = true AND dr.sk_region in (1302, 1303, 1304, 1305, 1306, 2148, 2165) and date(sk_booking_created_date) between '2021-10-13' and current_date then 'HUB Tatuapé'
-        when is_hub_flow = true AND dr.sk_region in (1587,1311,1584,1312,2541,1800,1655,1310,2543,1579,1915) and date(sk_booking_created_date) between '2021-10-04' and current_date then 'HUB Santana'
-        when is_hub_flow = true AND dr.sk_region in (1310, 1311, 1655, 2541, 2543) and date(sk_booking_created_date) between '2021-10-13' and current_date then 'HUB Santana'
-        when is_hub_flow = true AND dr.sk_region in (2164,2153,1344,1476,2347,1343,1797,2487,1477,1479,2157,2162,2143,1478,1347,1798) and date(sk_booking_created_date) between '2021-10-18' and current_date then 'HUB Morumbi'
-        when is_hub_flow = true AND dr.sk_region in (43,2423,44,1581,1280,2425,42,1585,2424,2422) and date(sk_booking_created_date) between '2021-10-18'  and current_date then 'HUB Santo Amaro'
+        when is_hub_flow = true AND dr.sk_region in (55, 56, 70, 72, 1329) and date(sk_booking_created_date) between  '2021-04-26' and current_date then 'HUB BELA VISTA'
+        when is_hub_flow = true AND dr.sk_region in (1577,54) and  date(sk_booking_created_date) between '2021-08-15' and current_date then 'HUB BELA VISTA' -- Liberdade, Centro
+        when is_hub_flow = true AND dr.sk_region in (51, 1281, 1287, 52, 1298, 1300) and date(sk_booking_created_date) between '2021-04-26'and current_date then 'HUB VILA MARIANA'
+        when is_hub_flow = true AND dr.sk_region in (1298,1300) and date(sk_booking_created_date) >= '2021-08-15' then 'HUB VILA MARIANA'  -- Cambuci, Ipiranga
+        when is_hub_flow = true AND dr.sk_region in (73,1284,1299,69,1286,1285,65,1283,1282,64,68,71) and date(sk_booking_created_date) between '2021-06-18' and current_date then 'HUB PERDIZES'
+        when is_hub_flow = true AND dr.sk_region in (61,2345,62,2341,63,46,45,58,47,57,60,59) and date(sk_booking_created_date) between '2021-08-15' and current_date then 'HUB VILA MADALENA'
+        when is_hub_flow = true AND dr.sk_region in (2667,2664,1589,2148,1306,1305,1303,1301,2666,2165,1304,2674,1588,1302,2159,1583) and date(sk_booking_created_date) between '2021-10-04' and current_date then 'HUB TATUAPÉ'
+        when is_hub_flow = true AND dr.sk_region in (1302, 1303, 1304, 1305, 1306, 2148, 2165) and date(sk_booking_created_date) between '2021-10-13' and current_date then 'HUB TATUAPÉ'
+        when is_hub_flow = true AND dr.sk_region in (1587,1311,1584,1312,2541,1800,1655,1310,2543,1579,1915) and date(sk_booking_created_date) between '2021-10-04' and current_date then 'HUB SANTANA'
+        when is_hub_flow = true AND dr.sk_region in (1310, 1311, 1655, 2541, 2543) and date(sk_booking_created_date) between '2021-10-13' and current_date then 'HUB SANTANA'
+        when is_hub_flow = true AND dr.sk_region in (2164,2153,1344,1476,2347,1343,1797,2487,1477,1479,2157,2162,2143,1478,1347,1798) and date(sk_booking_created_date) between '2021-10-18' and current_date then 'HUB BUTANTÃ'
+        when is_hub_flow = true AND dr.sk_region in (43,2423,44,1581,1280,2425,42,1585,2424,2422) and date(sk_booking_created_date) between '2021-10-18'  and current_date then 'HUB BROOKLIN'
         when is_hub_flow = true AND dr.sk_region IN (1873, 1874, 1875, 1879, 1881, 1882, 1883, 1885, 1886, 1888, 1892, 1893, 1894, 1896, 1898, 1899, 1900, 1901, 1903, 1907, 1908, 1909, 1911) and
-            date(sk_booking_created_date) between '2021-10-20' and current_date then 'HUB 01'
-        when is_hub_flow = true AND dr.sk_region IN (1880, 1884, 1890, 1891, 1895, 1897, 1902, 1910, 1996, 1998, 1999, 2336, 2337, 2659, 2680, 2681, 5162) and  date(sk_booking_created_date) between '2021-10-20' and current_date then 'HUB 02'
-        when is_hub_flow = true AND dr.sk_region IN (1876, 1877, 1878, 1887, 1889, 1904, 1905, 1906, 1994, 1995, 1997, 2000, 2661, 2662, 2678, 2679, 3923, 3924) and date(sk_booking_created_date) between '2021-10-20' and current_date then 'HUB 03'
+            date(sk_booking_created_date) between '2021-10-20' and current_date then 'HUB PORTO ALEGRE'
+        when is_hub_flow = true AND dr.sk_region IN (1880, 1884, 1890, 1891, 1895, 1897, 1902, 1910, 1996, 1998, 1999, 2336, 2337, 2659, 2680, 2681, 5162) and  date(sk_booking_created_date) between '2021-10-20' and current_date then 'HUB PORTO ALEGRE'
+        when is_hub_flow = true AND dr.sk_region IN (1876, 1877, 1878, 1887, 1889, 1904, 1905, 1906, 1994, 1995, 1997, 2000, 2661, 2662, 2678, 2679, 3923, 3924) and date(sk_booking_created_date) between '2021-10-20' and current_date then 'HUB PORTO ALEGRE'
         when is_hub_flow = true AND dr.sk_region IN (2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2022, 2023, 2024, 2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033, 2034, 2035, 2036,
             2268, 2269, 2270, 2271, 2272, 2273, 2274, 2275, 2301, 2302, 2303, 2427, 2433, 2446, 2447, 2498, 2499, 2500, 2639, 2640, 2641, 2642, 2682, 2683, 2684, 2685, 2686, 2687, 2688, 3918)
-            and date(sk_booking_created_date) between '2021-10-20' and current_date then 'HUB 04'
+            and date(sk_booking_created_date) between '2021-10-20' and current_date then 'HUB PORTO ALEGRE'
         when is_hub_flow = true AND dr.region_code in ('SPO 01', 'SPO 06') and date(sk_booking_created_date) between '2021-04-13' and current_date then 'Lite 1'
         when is_hub_flow = true AND dr.region_code in ('SPO 08', 'STA 01', 'SCA 01','SBE 01', 'DIA 01') and date(sk_booking_created_date) between '2021-05-04' and current_date then 'Lite 2'
         when is_hub_flow = true AND dr.region_code in ('RIO 06','RIO 07','RIO 09') and  date(sk_booking_created_date) between '2021-09-13' and current_date then 'Lite Rio'
         when is_hub_flow = true AND dr.region_code in ('RIO 01','RIO 02','RIO 03') and date(sk_booking_created_date) between '2021-09-13' and  '2021-10-24'then 'Lite Rio'
         when is_hub_flow = true AND dr.city_group = 'Porto Alegre' and  date(sk_booking_created_date) between '2021-07-05' and '2021-11-10' then 'Lite POA'
-        when is_hub_flow = true AND dr.city_group = 'Porto Alegre' and date(sk_booking_created_date) between '2021-11-10' and current_date then 'HUB Porto Alegre'
-        when is_hub_flow = true AND dr.region_code in ('RIO 01','RIO 02','RIO 03') and date(sk_booking_created_date) between '2021-10-25' and current_date then 'HUB RJ Zona Sul'
+        when is_hub_flow = true AND dr.city_group = 'Porto Alegre' and date(sk_booking_created_date) between '2021-11-10' and current_date then 'HUB PORTO ALEGRE'
+        when is_hub_flow = true AND dr.region_code in ('RIO 01','RIO 02','RIO 03') and date(sk_booking_created_date) between '2021-11-17' and current_date then 'HUB RJ ZONA SUL'
     END AS hub_visit,
 	dr.city_group,
 	DATE(NULLIF(fv.sk_booking_created_date,-1)) AS dt_created,
@@ -129,83 +129,52 @@ JOIN dim_region dr
 sale_closing AS (
     WITH fact_os AS (
     SELECT
-        COALESCE(DATE(NULLIF(sk_offer_submitted_date,-1)),dt_offer_submitted) AS date,
+        dd.date,
         sk_house,
-        sk_booking,
-        COALESCE(fo.sk_offer, hub.id_offer) AS sk_offer,
-        COALESCE(fo.sk_buyer,hub.id_client_cm, hub.id_user_5a) AS sk_buyer,
-        CASE
-            WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'Porto Alegre' THEN 'CENTRAL POA'
-            WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'RMSP' THEN 'CENTRAL SP'
-            WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'Rio de Janeiro' THEN 'CENTRAL RJ'
-            WHEN hub.offer_flow like '%HUB%' THEN hub.offer_flow
-            ELSE 'DealMaking'
-        END AS hub
+        fo.sk_offer,
+        fo.sk_buyer AS sk_buyer,
+        business_unit AS hub
     FROM
-    	sale.fact_offers fo
-    FULL OUTER JOIN
-        datalake_gsheets_clean_prod.offers_hub_central hub
-            ON fo.sk_offer = hub.id_offer
+    	datamarts.temp_sale_offers fo
     LEFT JOIN
-        dim_region dr
-        ON dr.sk_region = fo.sk_region
+        dim_date dd
+        ON dd.sk_date = fo.sk_offer_submitted_date
     WHERE
-    	date > 0
+    	sk_offer_submitted_date > 0
     ),
     fact_oa AS (
     SELECT
-        COALESCE(dt_offer_accepted, DATE(NULLIF(sk_offer_accepted_date,-1))) AS date,
+        dd.date,
         sk_house,
-        sk_booking,
-        COALESCE(hub.id_offer, fo.sk_offer) AS sk_offer,
-        COALESCE(fo.sk_buyer,hub.id_client_cm, hub.id_user_5a) AS sk_buyer,
-        CASE
-            WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'Porto Alegre' THEN 'CENTRAL POA'
-            WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'RMSP' THEN 'CENTRAL SP'
-            WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'Rio de Janeiro' THEN 'CENTRAL RJ'
-            WHEN hub.offer_flow like '%HUB%' THEN hub.offer_flow
-            ELSE 'DealMaking'
-        END AS hub
+        fo.sk_offer,
+        fo.sk_buyer AS sk_buyer,
+        business_unit AS hub
     FROM
-        sale.fact_offers fo
-    FULL OUTER JOIN
-        datalake_gsheets_clean_prod.offers_hub_central hub
-            ON fo.sk_offer = hub.id_offer
+    	datamarts.temp_sale_offers fo
     LEFT JOIN
-        dim_region dr
-        ON dr.sk_region = fo.sk_region
+        dim_date dd
+        ON dd.sk_date = fo.sk_offer_accepted_date
     WHERE
-        date > 0
+        sk_offer_accepted_date > 0
     ),
     fact_ccv AS (
     SELECT
-        COALESCE(hub.dt_sale_agreement_signed,DATE(NULLIF(sa.ts_sale_agreement_signed,-1))) AS date,
-        COALESCE(hub.id_offer, fo.sk_offer) AS sk_offer,
-        CASE
-            WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'Porto Alegre' THEN 'CENTRAL POA'
-            WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'RMSP' THEN 'CENTRAL SP'
-            WHEN hub.offer_flow = 'CENTRAL' AND dr.city_group = 'Rio de Janeiro' THEN 'CENTRAL RJ'
-            WHEN hub.offer_flow like '%HUB%' THEN hub.offer_flow
-            ELSE 'DealMaking'
-        END AS hub
+        dd.date,
+        sk_house,
+        fo.sk_offer,
+        fo.sk_buyer AS sk_buyer,
+        business_unit AS hub
     FROM
-        sale.fact_offers fo
-    FULL OUTER JOIN
-        datalake_gsheets_clean_prod.offers_hub_central hub
-            ON fo.sk_offer = hub.id_offer
+    	datamarts.temp_sale_offers fo
     LEFT JOIN
-        sale.dim_sale_agreement sa
-        ON fo.sk_offer = sa.sk_offer
-    LEFT JOIN
-        dim_region dr
-        ON dr.sk_region = fo.sk_region
-    WHERE date>0
+        dim_date dd
+        ON dd.sk_date = fo.sk_sale_agreement_signed_date
+    WHERE sk_sale_agreement_signed_date>0
     )
 SELECT
     COALESCE(COALESCE(fact_os.sk_offer, fact_oa.sk_offer), fact_ccv.sk_offer) AS sk_offer,
-    COALESCE(fact_os.sk_house,fact_oa.sk_house) AS sk_house,
-    COALESCE(fact_os.sk_buyer,fact_oa.sk_buyer) AS sk_buyer,
-    COALESCE(fact_os.sk_booking,fact_oa.sk_booking) AS sk_booking,
+    COALESCE(fact_os.sk_house,fact_oa.sk_house,fact_ccv.sk_house) AS sk_house,
+    COALESCE(fact_os.sk_buyer,fact_oa.sk_buyer,fact_ccv.sk_buyer) AS sk_buyer,
     COALESCE(COALESCE(fact_os.hub, fact_oa.hub), fact_ccv.hub) AS hub_offer,
     MAX(fact_os.date) AS os_date,
     MAX(fact_oa.date) AS oa_date,
@@ -215,12 +184,10 @@ FROM
 FULL OUTER JOIN
     fact_oa
         ON fact_os.sk_offer = fact_oa.sk_offer
-        -- AND fact_os.date = fact_oa.date
 FULL OUTER JOIN
     fact_ccv
         ON fact_os.sk_offer = fact_ccv.sk_offer
-        -- AND fact_os.date = fact_ccv.date
-GROUP BY 1, 2, 3, 4, 5
+GROUP BY 1, 2, 3, 4
 ),
 sale_demand_region AS (
 SELECT
