@@ -11,6 +11,3 @@ from bietlejuice.jobs.composer.consumers.db_consumers.postgres_consumer import (
 from bietlejuice.jobs.composer.consumers.db_consumers.mongo_consumer import (
     MongoConsumer,
 )
-from bietlejuice.jobs.composer.consumers.db_consumers.firestore_consumer import (
-    FirestoreConsumer,
-)

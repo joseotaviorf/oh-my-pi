@@ -1,6 +1,5 @@
 boto3==1.9.183
 deprecated==1.2.10
-firebase_admin==3.0.0
 pconf==1.6.0
 pyspark==2.4.3
 requests>=2.22.0

@@ -7,7 +7,6 @@ boto3==1.9.201
 Click==7.0
 dependency-injector==4.8.2
 deprecated==1.2.10
-firebase_admin==3.0.0
 future==0.16.0
 gitdb2==2.0.5
 GitPython==2.1.11
