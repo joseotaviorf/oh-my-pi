@@ -6,6 +6,7 @@ select
     reason,
     result,
     status,
+    early_result,
     created_at as ts_created,
     updated_at as ts_updated
 from

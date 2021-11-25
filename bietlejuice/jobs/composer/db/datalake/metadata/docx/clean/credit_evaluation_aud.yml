@@ -28,6 +28,9 @@ columns:
   reason:
     lineage:
       - datalake_docx_raw.credit_evaluation_aud.reason
+  early_result:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_aud.early_result
   rev_end:
     lineage:
       - datalake_docx_raw.credit_evaluation_aud.revend
@@ -43,3 +46,6 @@ columns:
   mod_reason:
     lineage:
       - datalake_docx_raw.credit_evaluation_aud.reason_mod
+  mod_early_result:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_aud.early_result_mod

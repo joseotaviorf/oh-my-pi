@@ -8,10 +8,12 @@ select
     status,
     result,
     reason,
+    early_result,
     revend as rev_end,
     user_id_mod as mod_id_user,
     status_mod as mod_status,
     result_mod as mod_result,
-    reason_mod as mod_reason
+    reason_mod as mod_reason,
+    early_result_mod as mod_early_result
 from
     datalake_docx_raw.credit_evaluation_aud

@@ -22,6 +22,9 @@ columns:
   status:
     lineage:
       - datalake_docx_raw.credit_evaluation.status
+  early_result:
+    lineage:
+      - datalake_docx_raw.credit_evaluation.early_result
   ts_created:
     lineage:
       - datalake_docx_raw.credit_evaluation.created_at
