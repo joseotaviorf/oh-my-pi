@@ -17,7 +17,7 @@ last_updated_dispatches AS (
 )
 SELECT DISTINCT
 	d.id,
-	CAST(d.c1 AS INTEGER) AS id_campaign,
+	CONCAT('quintoandar',d.c1) AS id_campaign,
 	d.c0 AS campaign_name,
 	d.customers,
 	d.status,

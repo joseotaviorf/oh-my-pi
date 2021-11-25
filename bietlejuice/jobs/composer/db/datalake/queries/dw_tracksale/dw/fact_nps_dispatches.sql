@@ -14,10 +14,19 @@ WITH customer_conversions AS (
          ROUND(a.seconds_spent_answering/60.0,2) AS minutes_spent_answering,
          d.ts_created,
          a.ts_answer_sent_local
-    FROM datalake_tracksale.customer_conversions cc
-    INNER JOIN datalake_tracksale.dispatch d
+    FROM 
+     (SELECT * FROM datalake_tracksale.customer_conversions
+     UNION ALL
+     SELECT * FROM datalake_casa_mineira_tracksale.customer_conversions) cc
+    INNER JOIN 
+     (SELECT * FROM datalake_tracksale.dispatch
+     UNION ALL
+     SELECT * FROM datalake_casa_mineira_tracksale.dispatch) d
         ON cc.id_dispatch_lot = d.id
-    LEFT JOIN datalake_tracksale.answer a 
+    LEFT JOIN 
+     (SELECT * FROM datalake_tracksale.answer
+     UNION ALL
+     SELECT * FROM datalake_casa_mineira_tracksale.answer) a 
          ON cc.id_answer = a.id
 ),
 answer_keys AS (
@@ -27,7 +36,10 @@ answer_keys AS (
             END) AS id_user,
           MAX(CASE WHEN tag_name = 'CPF' THEN tag_value 
             END) AS cpf
-     FROM datalake_tracksale.answer_tags
+     FROM 
+          (SELECT * FROM datalake_tracksale.answer_tags
+          UNION ALL
+          SELECT * FROM datalake_casa_mineira_tracksale.answer_tags)
      WHERE tag_name IN ('User Id','CPF')
      GROUP BY 1
 ),
@@ -54,7 +66,10 @@ customer_keys AS (
           cc.id_customer,
           MAX(COALESCE(eu.id_user,cci_e.id_user, cci_p.id_user)) AS id_user,
           MAX(COALESCE(ec.cpf,cci_e.cpf,cci_p.cpf)) AS cpf
-     FROM datalake_tracksale.customer_conversions cc
+     FROM 
+          (SELECT * FROM datalake_tracksale.customer_conversions
+          UNION ALL
+          SELECT * FROM datalake_casa_mineira_tracksale.customer_conversions) cc -- we are merging historical data from Casa Mineira's Tracksale account
      LEFT JOIN ebdb_user eu
         ON eu.id_answer = cc.id_answer
      LEFT JOIN ebdb_cpf ec
@@ -99,8 +114,14 @@ LEFT JOIN customer_keys ck
      ON ck.id_customer = cc.id_customer
 LEFT JOIN datalake_nps_answer_drivers.answer_drivers ad
      ON cc.id_answer = ad.id_answer
-LEFT JOIN datalake_tracksale.dispatch_attributes da
+LEFT JOIN 
+     (SELECT * FROM datalake_tracksale.dispatch_attributes
+     UNION ALL
+     SELECT * FROM datalake_casa_mineira_tracksale.dispatch_attributes) da
      ON cc.id_dispatch_lot = da.id
      AND (COALESCE(cc.customer_email, cc.customer_phone) = COALESCE(da.email, da.phone))
-LEFT JOIN datalake_tracksale.answer_cities ac
+LEFT JOIN 
+     (SELECT * FROM datalake_tracksale.answer_cities 
+     UNION ALL
+     SELECT * FROM datalake_casa_mineira_tracksale.answer_cities) ac
      ON ac.id_answer = cc.id_answer

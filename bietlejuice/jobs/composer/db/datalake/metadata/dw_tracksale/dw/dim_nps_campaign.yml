@@ -5,30 +5,40 @@ columns:
   sk_nps_campaign:
     lineage:
       - datalake_tracksale.campaign.id
+      - datalake_casa_mineira_tracksale.campaign.id
   name:
     lineage:
       - datalake_tracksale.campaign.campaign_name
+      - datalake_casa_mineira_tracksale.campaign.campaign_name
   main_channel:
     lineage:
       - datalake_tracksale.campaign.main_channel
+      - datalake_casa_mineira_tracksale.campaign.main_channel
   business_context:
     lineage:
       - datalake_tracksale.campaign.business_context
+      - datalake_casa_mineira_tracksale.campaign.business_context
   customer_journey:
     lineage:
       - datalake_tracksale.campaign.customer_journey
+      - datalake_casa_mineira_tracksale.campaign.customer_journey
   purpose:
     lineage:
       - datalake_tracksale.campaign.purpose
+      - datalake_casa_mineira_tracksale.campaign.purpose
   customer_type:
     lineage:
       - datalake_tracksale.campaign.customer_type
+      - datalake_casa_mineira_tracksale.campaign.customer_type
   partner_name:
     lineage:
       - datalake_tracksale.campaign.partner_name
+      - datalake_casa_mineira_tracksale.campaign.partner_name
   metric_group:
     lineage:
       - datalake_tracksale.campaign.metric_group
+      - datalake_casa_mineira_tracksale.campaign.metric_group
   ts_created:
     lineage:
       - datalake_tracksale.campaign.ts_created
+      - datalake_casa_mineira_tracksale.campaign.ts_created

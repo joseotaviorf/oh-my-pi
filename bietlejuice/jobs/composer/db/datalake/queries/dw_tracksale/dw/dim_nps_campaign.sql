@@ -10,4 +10,7 @@ SELECT
 	metric_group,
 	ts_created,
 	current_timestamp AS ts_load
-FROM datalake_tracksale.campaign
+FROM 
+	(SELECT * FROM datalake_tracksale.campaign
+	UNION ALL
+	SELECT * FROM datalake_casa_mineira_tracksale.campaign) -- we are merging historical data from Casa Mineira's Tracksale account

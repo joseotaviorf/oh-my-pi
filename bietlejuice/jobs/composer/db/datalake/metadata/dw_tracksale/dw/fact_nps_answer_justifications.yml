@@ -5,9 +5,12 @@ columns:
   sk_nps_answer:
     lineage:
       - datalake_tracksale.answer_justifications.id_answer
+      - datalake_casa_mineira_tracksale.answer_justifications.id_answer
   level:
     lineage:
       - datalake_tracksale.answer_justifications.level
+      - datalake_casa_mineira_tracksale.answer_justifications.level
   justification:
     lineage:
       - datalake_tracksale.answer_justifications.justification
+      - datalake_casa_mineira_tracksale.answer_justifications.justification

@@ -3,4 +3,7 @@ SELECT
     level,
     justification,
     current_timestamp AS ts_load
-FROM datalake_tracksale.answer_justifications
+FROM 
+    (SELECT * FROM datalake_tracksale.answer_justifications
+    UNION ALL
+    SELECT * FROM datalake_casa_mineira_tracksale.answer_justifications) -- we are merging historical data from Casa Mineira's Tracksale account

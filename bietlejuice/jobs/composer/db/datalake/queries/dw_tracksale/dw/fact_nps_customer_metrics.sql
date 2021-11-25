@@ -12,15 +12,23 @@ WITH customer_conversions AS (
 		ROUND(a.seconds_spent_answering/60.0,2) AS minutes_spent_answering,
 		d.ts_created
 	FROM
-	    datalake_tracksale.customer_conversions cc
+	    (SELECT * FROM datalake_tracksale.customer_conversions
+		UNION ALL
+		SELECT * FROM datalake_casa_mineira_tracksale.customer_conversions) cc -- we are merging historical data from Casa Mineira's Tracksale account
 	INNER JOIN
-	    datalake_tracksale.dispatch d
+	    (SELECT * FROM datalake_tracksale.dispatch
+		UNION ALL
+		SELECT * FROM datalake_casa_mineira_tracksale.dispatch) d
 		    ON cc.id_dispatch_lot = d.id
 	LEFT JOIN
-	    datalake_tracksale.answer a
+	    (SELECT * FROM datalake_tracksale.answer
+		UNION ALL
+		SELECT * FROM datalake_casa_mineira_tracksale.answer) a
 		    ON cc.id_answer = a.id
 	LEFT JOIN
-	    datalake_tracksale.campaign AS c
+	    (SELECT * FROM datalake_tracksale.campaign
+		UNION ALL
+		SELECT * FROM datalake_casa_mineira_tracksale.campaign) AS c
 		    ON c.id = d.id_campaign
 	WHERE
 	    cc.id_customer != '-1' -- filter out dispatches FROM unidentified customers
@@ -218,7 +226,9 @@ customer_keys AS (
 		MAX(COALESCE(eu.id_user,cci_e.id_user, cci_p.id_user)) AS id_user,
 		MAX(COALESCE(ec.cpf,cci_e.cpf,cci_p.cpf)) AS cpf
 	FROM
-	    datalake_tracksale.customer_conversions cc
+	    (SELECT * FROM datalake_tracksale.customer_conversions
+		UNION ALL
+		SELECT * FROM datalake_casa_mineira_tracksale.customer_conversions) cc
 	LEFT JOIN
 	    ebdb_user eu
 		    ON eu.id_answer = cc.id_answer
