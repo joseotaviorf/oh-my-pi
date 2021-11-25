@@ -5,6 +5,8 @@ WITH giroffer AS (
         id_house AS sk_house,
         id_owner AS sk_owner,
         ts_created AS ts_offer_created,
+        sale_price,
+        first_price_offered_by_buyer,
         last_price_offered_by_buyer
     FROM 
         datalake_firestore_prod.sale_offer fso
@@ -278,6 +280,7 @@ monday_offers AS (
             dt_sale_agreement_signed,
             dt_sale_agreement_cancelled,
             REVERSE(REPLACE(REPLACE(SPLIT_PART(REVERSE(id_consultant),',',1),'[',''),']','')) AS last_id_consultant,
+            price_offered_by_buyer,
             sale_price_agreed
         FROM 
             datalake_firestore_prod.monday
@@ -343,6 +346,8 @@ data_sources AS (
         g.sk_house,
         g.sk_owner,
         g.ts_offer_created,
+        g.sale_price,
+        g.first_price_offered_by_buyer,
         g.last_price_offered_by_buyer,
         COALESCE(rbo.sk_user_agent,-1) AS sk_user_agent,
         COALESCE(wc.sk_agent,-1) AS sk_agent,
@@ -427,6 +432,7 @@ data_sources AS (
         END AS mo_sk_deal_maker,
         mo.status AS monday_offer_status,
         mo.deal_maker_name AS mo_deal_maker_name,
+        mo.price_offered_by_buyer AS mo_price_offered_by_buyer,
         mo.sale_price_agreed AS mo_sale_price_agreed
     FROM 
         giroffer AS g
@@ -549,8 +555,10 @@ business_rules AS (
                     END) 
                 ELSE COALESCE(ds.mo_deal_maker_name,ds.vo_deal_maker_name) 
             END
-        )  AS deal_maker_name, 
-        CASE 
+        )  AS deal_maker_name,
+        sale_price,
+        COALESCE(ds.first_price_offered_by_buyer, ds.mo_price_offered_by_buyer) AS first_price_offered_by_buyer,
+        CASE
             WHEN offer_flow IN ('HUB','CENTRAL') THEN (
                     CASE
                         WHEN ds.is_offer_portfolio AND sk_offer_submitted_date >= sk_offer_portfolio_start_date THEN ds.last_price_offered_by_buyer 
@@ -590,7 +598,17 @@ SELECT
     offer_status,
     agent_name,
     agent_work_contract,
+    sale_price,
+    first_price_offered_by_buyer,
     last_price_offered_by_buyer,
+    CASE
+        WHEN sale_price IS NULL OR first_price_offered_by_buyer IS NULL THEN NULL
+        ELSE 1-1.00*first_price_offered_by_buyer/sale_price
+    END AS first_discount_proposed,
+    CASE
+        WHEN sale_price IS NULL or last_price_offered_by_buyer IS NULL THEN NULL
+        ELSE 1-1.00*last_price_offered_by_buyer/sale_price
+    END AS last_discount_proposed,
     GETDATE() AS ts_load
-FROM 
+FROM
     business_rules
