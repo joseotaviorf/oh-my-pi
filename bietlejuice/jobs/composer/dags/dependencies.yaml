@@ -240,6 +240,9 @@ bietlejuice.dw_region:
 bietlejuice.dw_rent_fact_listing_owners:
   - bietlejuice.enrich_listing_owners:load-enrich-rental-metrics
 
+bietlejuice.dw_rent_flow:
+  - bietlejuice.gsheets:load-clean-taxonomy-demand
+
 bietlejuice.dw_rent_listing_flow:
   - bietlejuice.dw_region:load-janus-dim-region-into-redshift
   - bietlejuice.enrich_ebdb_user:load-enrich-user-doorman

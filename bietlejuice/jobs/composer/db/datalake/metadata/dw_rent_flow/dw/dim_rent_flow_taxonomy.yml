@@ -1,0 +1,33 @@
+database_name: dw_janus
+table_name: dim_rent_flow_taxonomy
+columns:
+  sk_rent_flow_taxonomy:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.id
+  id_rent_flow_taxonomy:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.id
+  mkt_category:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.category
+  mkt_flow:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.flow
+  mkt_completion:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.completion
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.origin
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.channel
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.medium
+  mkt_source:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.source
+  mkt_platform:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.platform
