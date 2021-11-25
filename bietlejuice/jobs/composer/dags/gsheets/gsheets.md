@@ -160,6 +160,7 @@ This pipeline produces the following output tables:
     - `targets_casa_mineira_tof_monthly`
     - `targets_casa_mineira_tof_weekly`
     - `targets_nr_bf_er_or`
+    - `targets_portal_casa_mineira_cost_cf`
     - `target_supply_and_demand_autonomous_agent`
     - `taxonomy_affiliates`
     - `taxonomy_crm_casa_mineira`

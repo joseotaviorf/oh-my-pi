@@ -690,6 +690,11 @@ targets_nr_bf_er_or:
     sheet_name: targets_nr_bf_er_or
     clean_table_name: targets_nr_bf_er_or
 
+targets_portal_casa_mineira:
+    sheet_id: 1KrV8H7PzhUzevUhYHw2ycL9Ai8tTV7uv1aenH5oadvM
+    sheet_name: targets
+    clean_table_name: targets_portal_casa_mineira_cost_cf
+
 taxonomy_affiliates:
     sheet_id: 1e3806Tog1avS6uVO6ACUqqcqRpwcJffDZhRvgE8A3V4
     sheet_name: taxonomy_affiliates
