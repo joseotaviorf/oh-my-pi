@@ -1,0 +1,48 @@
+database_name: datalake_ebdb_clean
+table_name: house_predicted_price
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice.id
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice.houseId
+  business_context:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice.businessContext
+  p_10:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice.p10
+  p_20:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice.p20
+  p_30:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice.p30
+  p_40:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice.p40
+  p_50:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice.p50
+  p_60:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice.p60
+  p_70:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice.p70
+  p_80:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice.p80
+  p_90:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice.p90
+  certainty:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice.certainty
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice.criadoEm
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice.atualizadoEm

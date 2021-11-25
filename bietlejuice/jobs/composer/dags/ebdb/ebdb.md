@@ -80,7 +80,9 @@ Produces the following output tables:
     `house_guarantees_aud`  
     `house_maintenance_condition`  
     `house_maintenance_condition_aud`  
-    `house_media`  
+    `house_media`
+    `house_predicted_price`
+    `house_predicted_price_aud`
     `house_rating`  
     `house_rating_rating_label`  
     `house_registration_status`  

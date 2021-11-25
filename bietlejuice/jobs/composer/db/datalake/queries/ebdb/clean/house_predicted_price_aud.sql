@@ -1,0 +1,28 @@
+SELECT
+  id,
+  houseId AS id_house,
+  rev,
+  revtype AS rev_type,
+  businessContext AS business_context,
+  p10 AS p_10,
+  p20 AS p_20,
+  p30 AS p_30,
+  p40 AS p_40,
+  p50 AS p_50,
+  p60 AS p_60,
+  p70 AS p_70,
+  p80 AS p_80,
+  p90 AS p_90,
+  certainty,
+  p10_MOD AS mod_p_10,
+  p20_MOD AS mod_p_20,
+  p30_MOD AS mod_p_30,
+  p40_MOD AS mod_p_40,
+  p50_MOD AS mod_p_50,
+  p60_MOD AS mod_p_60,
+  p70_MOD AS mod_p_70,
+  p80_MOD AS mod_p_80,
+  p90_MOD AS mod_p_90,
+  certainty_MOD AS mod_certainty
+FROM
+  datalake_ebdb_raw.housepredictedprice_aud

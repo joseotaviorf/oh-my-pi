@@ -1,0 +1,78 @@
+database_name: datalake_ebdb_clean
+table_name: house_predicted_price_aud
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice_aud.id
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice_aud.houseId
+  rev:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice_aud.revtype
+  business_context:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice_aud.businessContext
+  p_10:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice_aud.p10
+  p_20:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice_aud.p20
+  p_30:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice_aud.p30
+  p_40:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice_aud.p40
+  p_50:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice_aud.p50
+  p_60:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice_aud.p60
+  p_70:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice_aud.p70
+  p_80:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice_aud.p80
+  p_90:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice_aud.p90
+  certainty:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice_aud.certainty
+  mod_p_10:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice_aud.p10_MOD
+  mod_p_20:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice_aud.p20_MOD
+  mod_p_30:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice_aud.p30_MOD
+  mod_p_40:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice_aud.p40_MOD
+  mod_p_50:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice_aud.p50_MOD
+  mod_p_60:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice_aud.p60_MOD
+  mod_p_70:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice_aud.p70_MOD
+  mod_p_80:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice_aud.p80_MOD
+  mod_p_90:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice_aud.p90_MOD
+  mod_certainty:
+    lineage:
+      - datalake_ebdb_raw.housepredictedprice_aud.certainty_MOD
