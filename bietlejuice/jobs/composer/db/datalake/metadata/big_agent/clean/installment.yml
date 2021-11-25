@@ -22,6 +22,9 @@ columns:
   amount:
     lineage:
       - datalake_big_agent_raw.installment.amount
+  dt_sent_to_bank:
+    lineage:
+      - datalake_big_agent_raw.installment.send_to_bank_on
   ts_created:
     lineage:
       - datalake_big_agent_raw.installment.created_at

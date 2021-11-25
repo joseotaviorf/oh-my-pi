@@ -43,6 +43,9 @@ columns:
   mod_status:
     lineage:
       - datalake_big_agent_raw.installment_aud.status_mod
+  mod_dt_sent_to_bank:
+    lineage:
+      - datalake_big_agent_raw.installment_aud.send_to_bank_on_mod
   mod_type:
     lineage:
       - datalake_big_agent_raw.installment_aud.type_mod
@@ -55,6 +58,9 @@ columns:
   mod_ts_updated:
     lineage:
       - datalake_big_agent_raw.installment_aud.updated_at_mod
+  dt_sent_to_bank:
+    lineage:
+      - datalake_big_agent_raw.installment_aud.send_to_bank_on
   ts_created:
     lineage:
       - datalake_big_agent_raw.installment_aud.created_at

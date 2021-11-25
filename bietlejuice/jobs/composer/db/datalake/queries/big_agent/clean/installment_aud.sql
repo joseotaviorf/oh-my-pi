@@ -3,28 +3,29 @@ SELECT
     external_invoice_id AS id_external_invoice,
     installment_uuid AS uuid_installment,
     rev,
-    revend AS rev_end,
-    revtype AS rev_type,
-    accrual_year_month,
-    status,
     type,
+    status,
+    revtype AS rev_type,
+    revend AS rev_end,
     amount,
-    installment_uuid_mod AS mod_uuid_installment,
+    accrual_year_month,
     external_invoice_id_mod AS mod_id_external_invoice,
-    accrual_year_month_mod AS mod_accrual_year_month,    
-    status_mod AS mod_status,
+    installment_uuid_mod AS mod_uuid_installment,
     type_mod AS mod_type,
     amount_mod AS mod_amount,
+    accrual_year_month_mod AS mod_accrual_year_month,
+    status_mod AS mod_status,
+    send_to_bank_on_mod AS mod_dt_sent_to_bank,
     created_at_mod AS mod_ts_created,
     updated_at_mod AS mod_ts_updated,
+    send_to_bank_on AS dt_sent_to_bank,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,
     month,
     day
 FROM
-    datalake_big_agent_raw.installment_aud
-
+    datalake_big_agent_raw.Installment_aud
 WHERE
     year = {year}
     AND month = {month}
