@@ -388,8 +388,11 @@ bietlejuice.enrich_analyst_ranking:
 bietlejuice.enrich_big_agent:
   - bietlejuice.big_agent:load-clean-agency
   - bietlejuice.big_agent:load-clean-agent
+  - bietlejuice.big_agent:load-clean-earnings
   - bietlejuice.big_agent:load-clean-enrollment
   - bietlejuice.big_agent:load-clean-house
+  - bietlejuice.big_agent:load-clean-installment
+  - bietlejuice.big_agent:load-clean-external-invoice
   - bietlejuice.big_agent:load-clean-program
 
 bietlejuice.enrich_bigfone_events:
