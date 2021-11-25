@@ -17,8 +17,10 @@ Produces the following output tables:
 
 - `agency`
 - `agent`
+- `earnings`
 - `enrollment`
 - `house`
+- `installment`
 - `program`
 
 ### Responsible Data Engineering Team

@@ -22,9 +22,6 @@ columns:
   accrual_year_month:
     lineage:
       - datalake_big_agent_raw.external_invoice_aud.accrual_year_month
-  due_date:
-    lineage:
-      - datalake_big_agent_raw.external_invoice_aud.due_date
   entries:
     lineage:
       - datalake_big_agent_raw.external_invoice_aud.entries
@@ -40,15 +37,15 @@ columns:
   mod_accrual_year_month:
     lineage:
       - datalake_big_agent_raw.external_invoice_aud.accrual_year_month_mod
-  mod_due_date:
-    lineage:
-      - datalake_big_agent_raw.external_invoice_aud.due_date_mod
   mod_entries:
     lineage:
       - datalake_big_agent_raw.external_invoice_aud.entries_mod
   mod_purpose:
     lineage:
       - datalake_big_agent_raw.external_invoice_aud.purpose_mod
+  mod_dt_due:
+    lineage:
+      - datalake_big_agent_raw.external_invoice_aud.due_date_mod
   mod_ts_created_external:
     lineage:
       - datalake_big_agent_raw.external_invoice_aud.external_created_at_mod
@@ -58,6 +55,9 @@ columns:
   mod_ts_updated:
     lineage:
       - datalake_big_agent_raw.external_invoice_aud.updated_at_mod
+  dt_due:
+    lineage:
+      - datalake_big_agent_raw.external_invoice_aud.due_date
   ts_created_external:
     lineage:
       - datalake_big_agent_raw.external_invoice_aud.external_created_at

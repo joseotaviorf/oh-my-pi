@@ -1,0 +1,42 @@
+database_name: datalake_big_agent
+table_name: external_invoice
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_clean.external_invoice.id
+  id_earning:
+    lineage:
+      - datalake_big_agent_clean.external_invoice.id_earning
+  id_external:
+    lineage:
+      - datalake_big_agent_clean.external_invoice.id_external
+  accrual_year_month:
+    lineage:
+      - datalake_big_agent_clean.external_invoice.accrual_year_month
+  entries:
+    lineage:
+      - datalake_big_agent_clean.external_invoice.entries
+  purpose:
+    lineage:
+      - datalake_big_agent_clean.external_invoice.purpose
+  dt_due:
+    lineage:
+      - datalake_big_agent_clean.external_invoice.dt_due
+  ts_created_external:
+    lineage:
+      - datalake_big_agent_clean.external_invoice.ts_created_external
+  ts_created:
+    lineage:
+      - datalake_big_agent_clean.external_invoice.ts_created
+  ts_updated:
+    lineage:
+      - datalake_big_agent_clean.external_invoice.ts_updated
+  year:
+    lineage:
+      - datalake_big_agent_clean.external_invoice.year
+  month:
+    lineage:
+      - datalake_big_agent_clean.external_invoice.month
+  day:
+    lineage:
+      - datalake_big_agent_clean.external_invoice.day

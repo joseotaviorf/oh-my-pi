@@ -1,0 +1,45 @@
+database_name: datalake_big_agent
+table_name: earnings
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_clean.earnings.id
+  id_agency:
+    lineage:
+      - datalake_big_agent_clean.earnings.id_agency
+  id_agent:
+    lineage:
+      - datalake_big_agent_clean.earnings.id_agent
+  id_program:
+    lineage:
+      - datalake_big_agent_clean.earnings.id_program
+  id_house_external:
+    lineage:
+      - datalake_big_agent_clean.earnings.id_house_external
+  status:
+    lineage:
+      - datalake_big_agent_clean.earnings.status
+  type:
+    lineage:
+      - datalake_big_agent_clean.earnings.type
+  failure_count:
+    lineage:
+      - datalake_big_agent_clean.earnings.failure_count
+  details:
+    lineage:
+      - datalake_big_agent_clean.earnings.details
+  ts_created:
+    lineage:
+      - datalake_big_agent_clean.earnings.ts_created
+  ts_updated:
+    lineage:
+      - datalake_big_agent_clean.earnings.ts_updated
+  year:
+    lineage:
+      - datalake_big_agent_clean.earnings.year
+  month:
+    lineage:
+      - datalake_big_agent_clean.earnings.month
+  day:
+    lineage:
+      - datalake_big_agent_clean.earnings.day

@@ -13,15 +13,15 @@ columns:
   accrual_year_month:
     lineage:
       - datalake_big_agent_raw.external_invoice.accrual_year_month
-  due_date:
-    lineage:
-      - datalake_big_agent_raw.external_invoice.due_date
   entries:
     lineage:
       - datalake_big_agent_raw.external_invoice.entries
   purpose:
     lineage:
       - datalake_big_agent_raw.external_invoice.purpose
+  dt_due:
+    lineage:
+      - datalake_big_agent_raw.external_invoice.due_date
   ts_created_external:
     lineage:
       - datalake_big_agent_raw.external_invoice.external_created_at
