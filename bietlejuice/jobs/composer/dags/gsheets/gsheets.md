@@ -38,6 +38,7 @@ This pipeline produces the following output tables:
     - `bandaid_off`
     - `branding_where_is_plaquinha`
     - `census_subnormal_crowding_areas`
+    - `casa_mineira_inside_sales_pipe`
     - `casa_mineira_marketing_cost_taxonomy`
     - `casa_mineira_marketing_manual_shared_costs`
     - `ciq_costs`

@@ -1,0 +1,19 @@
+---
+database_name: datalake_gsheets_clean
+table_name: casa_mineira_inside_sales_pipe
+columns:
+  id_pipe:
+    lineage:
+      - datalake_gsheets_raw.casa_mineira_inside_sales_pipe.id_pipe
+  consultor:
+    lineage:
+      - datalake_gsheets_raw.casa_mineira_inside_sales_pipe.consultor
+  entry_channel:
+    lineage:
+      - datalake_gsheets_raw.casa_mineira_inside_sales_pipe.entry_channel
+  status:
+    lineage:
+      - datalake_gsheets_raw.casa_mineira_inside_sales_pipe.status
+  ts_lead:
+    lineage:
+      - datalake_gsheets_raw.casa_mineira_inside_sales_pipe.ts_lead

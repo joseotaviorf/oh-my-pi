@@ -70,6 +70,11 @@ branding_where_is_plaquinha:
     sheet_name: branding_where_is_plaquinha
     clean_table_name: branding_where_is_plaquinha
 
+casa_mineira_inside_sales_pipe:
+    sheet_id: 1sV89IeTziUUafu32NxVVBIDcLUQbzlwaZowqDacaPb0
+    sheet_name: negocios
+    clean_table_name: casa_mineira_inside_sales_pipe
+
 casa_mineira_marketing_cost_taxonomy:
     sheet_id: 1F3HTv0rxdInhIs0JNs0GTyCN0_-jsE_3hNSKhzu_RM8
     sheet_name: casa_mineira_marketing_cost_taxonomy
