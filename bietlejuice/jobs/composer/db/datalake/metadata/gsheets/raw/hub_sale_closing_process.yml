@@ -1,0 +1,2 @@
+database_name: datalake_gsheets_raw
+table_name: hub_sale_closing_process

@@ -295,6 +295,11 @@ hub_agents_hierarchy:
     sheet_name: Output
     clean_table_name: hub_agents_hierarchy
 
+hub_sale_closing_process:
+    sheet_id: 1yD11Nsj9Bcl1ugfK-R7e185Vr4wGqo8A3d7K95q6ieE
+    sheet_name: clean
+    clean_table_name: hub_sale_closing_process    
+
 inspectors_control:
     sheet_id: 1cFwadBcEkIoC9zpGQNV7iA1Ii0fZmln5mRbB0LaW4zw
     sheet_name: inspectors_control

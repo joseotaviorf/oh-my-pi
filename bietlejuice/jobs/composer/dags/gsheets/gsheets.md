@@ -72,6 +72,7 @@ This pipeline produces the following output tables:
     - `hotjar_photos_repressed_demand`
     - `households_per_city_ibge`
     - `hub_agents_hierarchy` 
+    - `hub_sale_closing_process`
     - `inspection_analysis_forms`
     - `inspection_bugs`
     - `inspection_bugs_v2`
