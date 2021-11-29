@@ -61,6 +61,17 @@ bietlejuice.dw_call:
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-paths
   - bietlejuice.enrich_bigfone_twilio:load-enrich-inbound-call-locations
 
+bietlejuice.dw_casa_mineira_portal:
+  - bietlejuice.casa_mineira_portal:load-clean-attribute
+  - bietlejuice.casa_mineira_portal:load-clean-attribute-type
+  - bietlejuice.casa_mineira_portal:load-clean-city
+  - bietlejuice.casa_mineira_portal:load-clean-house
+  - bietlejuice.casa_mineira_portal:load-clean-house-attribute
+  - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency
+  - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency-budget
+  - bietlejuice.casa_mineira_portal:load-clean-uf
+  - bietlejuice.enrich_casa_mineira_portal:load-enrich-real-estate-status
+
 bietlejuice.dw_chattermill:
   - bietlejuice.enrich_chattermill:load-enrich-responses
 
