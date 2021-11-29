@@ -1,0 +1,3 @@
+---
+database_name: datalake_casa_mineira_marketing_manual_daily_costs_raw
+table_name: casa_mineira_marketing_manual_shared_costs
