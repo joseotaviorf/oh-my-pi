@@ -1,0 +1,5 @@
+---
+inner_dependencies:
+  affiliate_monthly_category_segmentation:
+    - affiliate_monthly_metrics
+

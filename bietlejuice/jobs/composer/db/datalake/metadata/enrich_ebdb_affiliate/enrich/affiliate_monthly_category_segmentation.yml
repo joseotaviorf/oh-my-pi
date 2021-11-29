@@ -1,0 +1,16 @@
+---
+database_name: datalake_ebdb_affiliate
+table_name: affiliate_monthly_category_segmentation
+columns:
+  id_date:
+    lineage:
+      - datalake_ebdb_affiliate.affiliate_monthly_metrics.id_date
+  id_user_affiliate:
+    lineage:
+      - datalake_ebdb_affiliate.affiliate_monthly_metrics.id_date.id_user_affiliate
+  id_user:
+    lineage:
+      - datalake_ebdb_affiliate.affiliate_monthly_metrics.id_date.id_user
+  is_last_segmentation:
+    lineage:
+      - datalake_ebdb_affiliate.affiliate_monthly_metrics.id_date.is_last_segmentation

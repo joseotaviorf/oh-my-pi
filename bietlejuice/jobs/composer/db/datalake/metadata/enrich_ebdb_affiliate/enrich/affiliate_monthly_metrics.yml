@@ -1,0 +1,25 @@
+---
+database_name: datalake_ebdb_affiliate
+table_name: affiliate_monthly_metrics
+columns:
+  id_date:
+    lineage:
+      - datalake_quintoandar.aux_date.id_date
+  id_user_affiliate:
+    lineage:
+      - datalake_ebdb_user.affiliate_data.id
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.user.id
+  affiliate_type:
+    lineage:
+      - datalake_ebdb_user.affiliate_data.affiliate_type
+  dt_month_end:
+    lineage:
+      - datalake_quintoandar.aux_date.month_end
+  dt_month_start:
+    lineage:
+      - datalake_quintoandar.aux_date.month_start
+  dt_signed:
+    lineage:
+      - datalake_ebdb_user.affiliate_data.ts_operation_start

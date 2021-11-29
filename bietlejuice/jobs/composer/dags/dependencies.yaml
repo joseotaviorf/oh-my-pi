@@ -534,6 +534,11 @@ bietlejuice.enrich_docx:
   - bietlejuice.docx:load-clean-credit-evaluation
   - bietlejuice.docx:load-clean-document
 
+bietlejuice.enrich_ebdb_affiliate:
+  - bietlejuice.ebdb:create-clean-user-in-data-lake
+  - bietlejuice.enrich_ebdb_user:load-enrich-affiliate-data
+  - bietlejuice.enrich_listing_flow:load-enrich-listing-flows-with-reprocessed-leads
+
 bietlejuice.enrich_ebdb_agents:
   - bietlejuice.ebdb:create-clean-agent-data-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-agent-data-business-contexts-served-aud-in-data-lake
