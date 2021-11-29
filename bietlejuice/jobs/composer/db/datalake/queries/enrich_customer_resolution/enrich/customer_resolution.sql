@@ -1,7 +1,7 @@
 WITH front_tickets AS (
   SELECT
     id_ticket,
-    MIN(id_user) AS id_user,
+    MAX(id_user) AS id_user,
     last_back_ticket AS back_ticket,
     direction,
     status,
@@ -30,7 +30,7 @@ WITH front_tickets AS (
   UNION ALL 
   SELECT
     id_ticket,
-    MIN(id_user) AS id_user,
+    MAX(id_user) AS id_user,
     last_back_ticket AS back_ticket,
     "inbound" AS direction,
     status,
@@ -59,7 +59,7 @@ WITH front_tickets AS (
   UNION ALL 
   SELECT
     id_ticket,
-    MIN(id_user) AS id_user,
+    MAX(id_user) AS id_user,
     last_back_ticket AS back_ticket,
     direction,
     status,
