@@ -1,0 +1,22 @@
+---
+database_name: dw_casa_mineira_portal
+table_name: fact_real_estate_status
+columns:
+  sk_real_estate_agency:
+    lineage:
+      - datalake_casa_mineira_portal.real_estate_status.id_real_estate_agency
+  sk_consider_status_started_date:
+    lineage:
+      - datalake_casa_mineira_portal.real_estate_status.dt_consider_status_started
+  sk_consider_status_ended_date:
+    lineage:
+      - datalake_casa_mineira_portal.real_estate_status.dt_consider_status_ended
+  status:
+    lineage:
+      - datalake_casa_mineira_portal.real_estate_status.status
+  dt_consider_status_started:
+    lineage:
+      - datalake_casa_mineira_portal.real_estate_status.dt_consider_status_started
+  dt_consider_status_ended:
+    lineage:
+      - datalake_casa_mineira_portal.real_estate_status.dt_consider_status_ended
