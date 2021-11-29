@@ -16,7 +16,3 @@ columns:
     lineage:
       - datalake_casa_mineira_portal_clean.real_estate_agency.ts_created
       - datalake_casa_mineira_portal_clean.real_estate_agency_history.ts_created
-  ts_status_ended:
-    lineage:
-      - datalake_casa_mineira_portal_clean.real_estate_agency.ts_created
-      - datalake_casa_mineira_portal_clean.real_estate_agency_history.ts_created
