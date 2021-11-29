@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS customer_support.fact_agent_daily_productivity (
     total_tickets BIGINT,
     total_tickets_with_taxonomy BIGINT,
     total_minutes_resolution_time BIGINT,
-    total_tasks_solved_crm BIGINT,
+    total_crm_tasks_solved BIGINT,
     agent_age_in_months INTEGER,
     dt DATE,
     ts_load TIMESTAMP

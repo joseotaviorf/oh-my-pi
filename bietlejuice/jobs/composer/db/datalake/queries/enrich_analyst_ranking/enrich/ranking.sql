@@ -102,7 +102,10 @@ crm_metrics AS (
     datalake_terminator_clean.termination_workflow tw
       ON t.id = tw.id
   WHERE
-    turf.type = 'RevisarPagamentosRescisao'
+    turf.type IN (
+      'RevisarPagamentosRescisao',
+      'RescisaoPreVigencia'
+    )
     AND LOWER(turf.action_type) = 'realize'
     AND DATE(tarf.ts_completed) = DATE('{year}-{month}-{day}')
   GROUP BY 1,2
@@ -123,15 +126,15 @@ SELECT
       THEN aro.ranking
     ELSE COALESCE(ztm.department, csat.department) 
   END AS department,
-  csat.sum_csat_satisfied_score,
-  csat.sum_csat_dissatisfied_score,
-  csat.total_tickets_resolution,
-  csat.total_tickets_answered_resolution,
-  csat.total_tickets_with_csat_score,
-  ztm.total_tickets,
-  ztm.total_tickets_with_taxonomy,
-  ztm.sum_ticket_resolution_time,
-  crm.total_tasks_solved_crm,
+  SUM(csat.sum_csat_satisfied_score) AS sum_csat_satisfied_score,
+  SUM(csat.sum_csat_dissatisfied_score) AS sum_csat_dissatisfied_score,
+  SUM(csat.total_tickets_resolution) AS total_tickets_resolution,
+  SUM(csat.total_tickets_answered_resolution) AS total_tickets_answered_resolution,
+  SUM(csat.total_tickets_with_csat_score) AS total_tickets_with_csat_score,
+  SUM(ztm.total_tickets) AS total_tickets,
+  SUM(ztm.total_tickets_with_taxonomy) AS total_tickets_with_taxonomy,
+  SUM(ztm.sum_ticket_resolution_time) AS sum_ticket_resolution_time,
+  SUM(crm.total_tasks_solved_crm) AS total_crm_tasks_solved,
   CAST(CEIL(MONTHS_BETWEEN(COALESCE(ztm.dt, csat.dt, crm.dt), ac.dt_start)) AS INT) AS agent_age_in_months,
   COALESCE(ztm.dt, csat.dt, crm.dt) AS dt,
   YEAR(COALESCE(ztm.dt, csat.dt, crm.dt)) AS year,
@@ -148,10 +151,11 @@ FULL OUTER JOIN
   crm_metrics crm
     ON crm.id_agent = COALESCE(ztm.id_agent, csat.id_agent)
     AND crm.dt = COALESCE(ztm.dt, csat.dt)
-LEFT JOIN
+JOIN
   datalake_gsheets_clean.agents_control ac
     ON ac.id_assignee = COALESCE(ztm.id_agent, csat.id_agent, crm.id_agent)
 LEFT JOIN
   datalake_gsheets_clean.agents_ranking_offboarding aro
     ON ac.email = aro.email
     AND COALESCE(ztm.dt, csat.dt, crm.dt) BETWEEN aro.dt_start AND COALESCE(aro.dt_end, DATE(NOW()))
+GROUP BY 1,2,3,4,14,15,16,17

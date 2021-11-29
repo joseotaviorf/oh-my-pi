@@ -11,7 +11,7 @@ SELECT
   total_tickets,
   total_tickets_with_taxonomy,
   sum_ticket_resolution_time AS total_minutes_resolution_time,
-  total_tasks_solved_crm,
+  total_crm_tasks_solved,
   agent_age_in_months,
   dt,
   NOW() AS ts_load,
@@ -21,4 +21,7 @@ SELECT
 FROM
   datalake_analyst_ranking.ranking
 WHERE
-  dt = DATE('{year}-{month}-{day}')
+  id_agent IS NOT NULL
+  AND department IS NOT NULL
+  AND agent_manager IS NOT NULL
+  AND dt = DATE('{year}-{month}-{day}')
