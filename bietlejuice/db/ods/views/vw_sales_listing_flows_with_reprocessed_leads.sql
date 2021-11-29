@@ -271,19 +271,26 @@ WITH reproc_leads AS (
         WHEN (flow = 'Organic Flow' AND dt_qualified IS NOT NULL AND dt_opportunity IS NULL) THEN 'NoPhotoJob'
         ELSE 'NotMapped'
     END AS funnel_step,
-    ((DATE_PART('hour', dt_prospect - dt_lead) * 60 +
+    ((DATE_PART('day', dt_prospect - dt_lead) * 1440 +
+      DATE_PART('hour', dt_prospect - dt_lead) * 60 +
       DATE_PART('minute', dt_prospect - dt_lead)) / 60.)::NUMERIC(14,2) AS hours_lead_to_prospect,
-    ((DATE_PART('hour', dt_qualified - dt_prospect) * 60 +
+    ((DATE_PART('day', dt_qualified - dt_prospect) * 1440 +
+      DATE_PART('hour', dt_qualified - dt_prospect) * 60 +
       DATE_PART('minute', dt_qualified - dt_prospect)) / 60.)::NUMERIC(14,2) AS hours_prospect_to_qualified,
-    ((DATE_PART('hour', dt_first_contact - dt_lead) * 60 +
+    ((DATE_PART('day', dt_first_contact - dt_lead) * 1440 +
+      DATE_PART('hour', dt_first_contact - dt_lead) * 60 +
       DATE_PART('minute', dt_first_contact - dt_lead)) / 60.)::NUMERIC(14,2) AS hours_lead_to_first_contact,
-    ((DATE_PART('hour', dt_first_contact - dt_prospect) * 60 +
+    ((DATE_PART('day', dt_first_contact - dt_prospect) * 1440 +
+      DATE_PART('hour', dt_first_contact - dt_prospect) * 60 +
       DATE_PART('minute', dt_first_contact - dt_prospect)) / 60.)::NUMERIC(14,2) AS hours_prospect_to_first_contact,
-    ((DATE_PART('hour', dt_opportunity - dt_qualified) * 60 +
-      DATE_PART('minute', dt_opportunity - dt_qualified)) / 60.)::NUMERIC(14,2) AS hours_qualified_to_opportunity,    
-    ((DATE_PART('hour', dt_first_listing - dt_opportunity) * 60 +
+    ((DATE_PART('day', dt_opportunity - dt_qualified) * 1440 +
+      DATE_PART('hour', dt_opportunity - dt_qualified) * 60 +
+      DATE_PART('minute', dt_opportunity - dt_qualified)) / 60.)::NUMERIC(14,2) AS hours_qualified_to_opportunity,
+    ((DATE_PART('day', dt_first_listing - dt_opportunity) * 1440 +
+      DATE_PART('hour', dt_first_listing - dt_opportunity) * 60 +
       DATE_PART('minute', dt_first_listing - dt_opportunity)) / 60.)::NUMERIC(14,2) AS hours_opportunity_to_listing,
-    ((DATE_PART('hour', dt_first_listing - dt_lead) * 60 +
+    ((DATE_PART('day', dt_first_listing - dt_lead) * 1440 +
+      DATE_PART('hour', dt_first_listing - dt_lead) * 60 +
       DATE_PART('minute', dt_first_listing - dt_lead)) / 60.)::NUMERIC(14,2) AS hours_lead_to_listing,
     ((DATE_PART('day', dt_prospect - dt_lead) * 1440 +
       DATE_PART('hour', dt_prospect - dt_lead) * 60 +
