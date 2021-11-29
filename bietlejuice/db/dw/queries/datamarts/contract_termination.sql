@@ -166,6 +166,41 @@ WITH
   LEFT JOIN datalake_terminator_clean_prod.application_user au
       ON au.id = ri.id_user
   WHERE id_external IS NOT NULL
+  ),
+  negotiation_rank 
+  AS 
+  (
+  SELECT
+      id_termination_fee,
+      id AS id_fee_negotiation,
+      discount_percentage,
+      discount_value,
+      final_amount,
+      number_of_installments,
+      payment_option,
+      status,
+      ts_created,
+      ts_updated,
+      rank() OVER (PARTITION BY id_termination_fee ORDER BY id DESC) AS fee_negotiation_rank
+  FROM datalake_terminator_clean_prod.termination_fee_negotiation 
+  ),
+  last_negotiation
+  AS 
+  (
+  SELECT
+      tf.id_termination,
+      nr.discount_percentage AS fee_discount_percentage,
+      nr.discount_value AS fee_discount_value,
+      nr.final_amount AS fee_final_amount,
+      nr.number_of_installments AS fee_number_of_installments,
+      nr.payment_option AS fee_payment_option,
+      nr.status AS fee_negotiation_status,
+      nr.ts_created AS ts_fee_negotiation_created,
+      nr.ts_updated AS ts_fee_negotiation_updated
+  FROM negotiation_rank nr
+  LEFT JOIN datalake_terminator_clean_prod.termination_fee tf
+      ON nr.id_termination_fee = tf.id 
+  WHERE fee_negotiation_rank = 1
   )
 SELECT
   t.id AS sk_termination,
@@ -210,6 +245,12 @@ SELECT
   ppn.pp_nps,
   aui.name AS application_user_name,
   aui.email AS application_user_email,
+  ln.fee_discount_percentage,
+  ln.fee_discount_value,
+  ln.fee_final_amount,
+  ln.fee_number_of_installments,
+  ln.fee_payment_option,
+  ln.fee_negotiation_status,
   DATEDIFF('day', t.ts_created, t.dt_termination) AS leadtime_request_to_vacancy,
   CASE WHEN d.ts_termination_finished <= '2020-07-07' THEN DATEDIFF('day', t.dt_termination, n.ts_updated)
     WHEN d.ts_termination_finished > '2020-07-07' THEN DATEDIFF('day', t.dt_termination, d.ts_termination_finished)
@@ -231,6 +272,8 @@ SELECT
   m.dt_last_updated AS dt_last_rescheduled,
   to_date(cast(lis.dt_last_inspection_synch AS text),'YYYYMMDD') AS dt_last_inspection_synched,
   n.ts_updated::date AS dt_negotiation_updated,
+  ln.ts_fee_negotiation_created,
+  ln.ts_fee_negotiation_updated,
   t.ts_created,
   t.ts_canceled,
   CASE WHEN d.ts_termination_finished <= '2020-07-07' THEN n.ts_updated
@@ -274,3 +317,5 @@ FROM datalake_terminator_clean_prod.termination t
     ON lis.id = t.id
   LEFT JOIN application_user_info aui
     on t.id = aui.id_termination
+  LEFT JOIN last_negotiation ln
+    on t.id = ln.id_termination
