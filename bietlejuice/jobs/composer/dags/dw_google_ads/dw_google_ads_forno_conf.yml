@@ -1,5 +1,0 @@
----
-partitions_cols: ["dt_loaded"]
-dw_query_filters: {
-  "dt_loaded": "date('{year}-{month}-{day}')"
-}

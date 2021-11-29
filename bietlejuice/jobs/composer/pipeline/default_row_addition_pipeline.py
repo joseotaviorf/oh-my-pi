@@ -1,4 +1,6 @@
-from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat
+from bietlejuice.jobs.composer.base.spark.spark_table_storage_format import (
+    SparkTableStorageFormat,
+)
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import DatabricksConsumer
 from bietlejuice.jobs.composer.loaders import S3Loader

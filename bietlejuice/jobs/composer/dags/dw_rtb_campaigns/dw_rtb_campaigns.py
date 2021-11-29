@@ -11,8 +11,8 @@ from airflow.operators.quintoandar_databricks import (
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.airflow.helpers import TaskFlowHelper
+from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.dags.base.dw_task_group import DWTaskGroup
-from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
@@ -22,9 +22,12 @@ DW_SCHEMA = "rtb_campaigns"
 CONTEXT = "rtb_campaigns"
 DAG_NAME = f"dw_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-
-ENV = os.environ.get("ENVIRONMENT")
-MAIN_START_DATE = datetime(2019, 5, 31, tzinfo=timezone("America/Sao_Paulo"))
+MAIN_START_DATE = datetime(2018, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
+CLUSTER_DESCRIPTION = Variable.get(
+    "databricks_9_1_min_general_cluster", deserialize_json=True
+)
+PARTITION_COLS = ["year", "month", "day"]
+DW_QUERY_FILTERS = {"year": "{year}", "month": "{month}", "day": "{day}"}
 
 config_service = ConfigurationService(DAG_NAME)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
@@ -35,15 +38,10 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 spectrum_iam_role = config_service.get_config("spectrum_iam_role")
 spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+default_libraries = config_service.get_config("default_libraries")
 
-BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base"
-
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_compute_optimized_cluster", deserialize_json=True
-)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{spark_jobs_logs_path}{DAG_ID}"
+ENV = os.environ.get("ENVIRONMENT")
+base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base"
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -60,7 +58,10 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=CLUSTER_DESCRIPTION,
+    libraries=default_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -73,22 +74,22 @@ task_group = DWTaskGroup(
     dw_bucket=dw_bucket,
     dw_schema=DW_SCHEMA,
     relative_query_path=DAG_NAME,
-    spark_jobs_path=BASE_SPARK_JOBS_PATH,
+    spark_jobs_path=base_spark_jobs_path,
 )
 
 dw_staging_task_group = task_group.build_task_group_from_sql_files(
     layer=LayerEnum.DW_STAGING,
     is_incremental=True,
-    partitions=["year", "month", "day"],
-    extra_query_template_params={"year": "{year}", "month": "{month}", "day": "{day}"},
+    partitions=PARTITION_COLS,
+    extra_query_template_params=DW_QUERY_FILTERS,
 )
 
 dw_task_group = task_group.build_task_group_from_sql_files(
     layer=LayerEnum.DW,
     spectrum_iam_role=spectrum_iam_role,
     is_incremental=True,
-    partitions=["year", "month", "day"],
-    extra_query_template_params={"year": "{year}", "month": "{month}", "day": "{day}"},
+    partitions=PARTITION_COLS,
+    extra_query_template_params=DW_QUERY_FILTERS,
 )
 
 chain(create_cluster_task, DWTaskGroup.all_first_tasks(dw_staging_task_group))

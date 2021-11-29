@@ -1,3 +1,4 @@
+---
 artifacts_bucket: s3://artifacts.s3.forno.data.quintoandar.com.br
 athena_query_results_bucket: s3://aws-athena-query-results-713278628093-us-east-1/
 dags_out_of_pattern: [
@@ -25,3 +26,7 @@ dw_bucket: dw.s3.forno.data.quintoandar.com.br
 ods_migration_tests_threshold: { "count_test_min_assert": 0.0, "content_test_max_error": 1.0 }
 spectrum_iam_role: arn:aws:iam::713278628093:role/SpectrumAccess
 spark_jobs_logs_path: s3://databricks.s3.forno.data.quintoandar.com.br/logs/jobs/
+default_libraries: [
+    {"whl": "s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/bi_etl_ejuice-forno-py3-none-any.whl"},
+    {"whl": "s3://artifacts.s3.forno.data.quintoandar.com.br/python-logger/quintoandar_logger-0.8.0-py3-none-any.whl"}
+]
