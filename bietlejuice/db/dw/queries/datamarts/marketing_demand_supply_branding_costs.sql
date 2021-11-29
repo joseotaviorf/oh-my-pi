@@ -332,15 +332,15 @@ affiliates AS (
                         THEN true
                     ELSE false 
                 END AS flag_publication_sale_and_rent_same_month
-            FROM sale.fact_listing_flows lf 
-            LEFT JOIN dim_date dd  
+            FROM sale.fact_listing_flows AS lf 
+            LEFT JOIN dim_date AS dd  
                 ON dd.sk_date = lf.sk_first_listing_date
-            LEFT JOIN dim_region dr 
+            LEFT JOIN dim_region AS dr 
                 ON dr.sk_region = lf.sk_region
-            LEFT JOIN datalake_ebdb_clean_prod.listing_business_context lbc 
+            LEFT JOIN datalake_ebdb_clean_prod.listing_business_context AS lbc 
                 ON lbc.id_house = lf.sk_house_listing/1000
                 AND lbc.business_context = 'SALE'
-            LEFT JOIN lbc_rent rbc 
+            LEFT JOIN lbc_rent AS rbc 
                 ON rbc.id_house = lf.sk_house_listing/1000  
             WHERE lf.sk_first_listing_date > 0
                 AND lf.sk_user_lead_affiliate > 0
@@ -582,7 +582,7 @@ supply_landlords_cost AS (
     WHERE
         co.funnel_side = 'supply'
         AND dbt.date BETWEEN '2020-01-01' AND CURRENT_DATE - 1
-        AND co.mkt_origin IN ('Owner PWA','Price Calculator')
+        AND co.mkt_origin IN ('Owner PWA','Price Calculator','New Channels')
         AND co.mkt_channel != 'Girafa'
     GROUP BY 1, 2, 3, 4, 5, 6
 ),
@@ -601,8 +601,8 @@ branded_costs AS (
         CASE WHEN bmc.mkt_channel = 'Organic' THEN 'Branding' ELSE bmc.mkt_channel END AS planning_mkt_level3,
         sum(replace(replace(nullif(bmc.cost,''),'$',''),',','')::float) AS costs
     FROM 
-        datalake_raw.gsheets_offline_and_branding_marketing_costs bmc
-        JOIN dim_date dbt
+        datalake_raw.gsheets_offline_and_branding_marketing_costs AS bmc
+        JOIN dim_date AS dbt
             ON bmc.sk_date::integer = dbt.sk_date
     GROUP BY 1, 2, 3, 4, 5, 6
     UNION ALL
@@ -616,7 +616,7 @@ branded_costs AS (
         c.cost_category AS planning_mkt_level3,
         SUM(c.cost) AS costs
     FROM
-        datalake_marketing_costs_prod.offline_manual_costs c
+        datalake_marketing_costs_prod.offline_manual_costs AS c
         JOIN dim_date dd
             ON dd.sk_date = c.id_date
     WHERE
@@ -673,7 +673,7 @@ supply_ciq_cost AS (
     FROM
         marketing.fact_marketing_daily_costs AS co
     JOIN
-        dim_date dbt ON dbt.sk_date = co.sk_date
+        dim_date AS dbt ON dbt.sk_date = co.sk_date
     WHERE
         co.mkt_origin = 'CIQ'
     GROUP BY 1, 2, 3, 4, 5, 6
