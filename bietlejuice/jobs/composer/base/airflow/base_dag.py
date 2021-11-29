@@ -5,11 +5,14 @@ from quintoandar_logger import QuintoAndarLogger
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 
+from bietlejuice.jobs.composer.base.airflow.dag_owner_enum import DAGOwnerEnum
+
 logger = QuintoAndarLogger("BaseDAG")
 COMPOSER_DAGS_PATH = path.abspath(path.join(__file__, "../../../dags"))
 
 
 class BaseDAG:
+    # TODO: Keep it until all Composer DAG owners are re-assigned
     DEFAULT_OWNER = "Data Engineering Team"
     OPERATOR_RETRIES = {
         "retries": 3,
@@ -33,7 +36,7 @@ class BaseDAG:
             dag_id=dag_id,
             description=description,
             default_args={
-                "owner": BaseDAG.DEFAULT_OWNER,
+                "owner": DAGOwnerEnum.DEFAULT_OWNER,
                 "wait_for_downstream": wait_for_downstream,
                 "depends_on_past": depends_on_past,
             },
