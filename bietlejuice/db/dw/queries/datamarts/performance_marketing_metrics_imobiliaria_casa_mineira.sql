@@ -22,7 +22,9 @@ costs AS (
         NULL::INT order_new_contact_prospect,
         NULL::TEXT id_flow,
         NULL::INT order_new_contact_flow,
-        SUM(cost) cost
+        SUM(cost) cost,
+        0.0 AS budget,
+        0.0 AS new_contact_prospects_target
     FROM datalake_gsheets_clean_prod.casa_mineira_marketing_manual_shared_costs
     WHERE mkt_business = 'imobiliaria'
         AND dt BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND DATE_ADD('DAY', -1, CURRENT_DATE)
@@ -175,7 +177,9 @@ SELECT
     c.order_new_contact_prospect,
     c.id_flow,
     c.order_new_contact_flow,
-    0.0 AS cost
+    0.0 AS cost,
+    0.0 AS budget,
+    0.0 AS new_contact_prospects_target
 FROM
     contacts as c
     LEFT JOIN events evt
@@ -191,10 +195,74 @@ FROM
         ON LOWER(COALESCE(tc.origin_contact_name, '')) = LOWER(COALESCE(c.origin_contact_name, ''))
     	AND LOWER(COALESCE(tc.media_contact_name, '')) = LOWER(COALESCE(c.media_contact_name, ''))
 GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
+),
+---------------------------------
+--- Query Targets from Sheets ---
+---------------------------------
+targets AS (
+SELECT
+    DATE(dt_target) dt,
+    NULL::TEXT AS mkt_origin,
+    CASE
+        WHEN mkt_channel='Paid' THEN 'Paid Acquisition'
+        ELSE mkt_channel
+    END AS mkt_channel,
+    mkt_medium,
+    mkt_source,
+    NULL::TEXT AS utm_campaign,
+    NULL::TEXT AS campaign_name,
+    NULL::TEXT AS uf_listing,
+    NULL::TEXT AS city_listing,
+    NULL::TEXT AS neighborhood_listing,
+    city_group,
+    NULL::TEXT AS id_house,
+    NULL::TEXT AS id_client,
+    NULL::INT AS order_new_client,
+    NULL::TEXT AS id_prospect,
+    NULL::INT AS order_new_contact_prospect,
+    NULL::TEXT AS id_flow,
+    NULL::INT AS order_new_contact_flow,
+    0.0 AS cost,
+    0.0 AS budget,
+    SUM(ncp_target) AS new_contact_prospects_target
+FROM
+    datalake_gsheets_clean_prod.targets_casa_mineira_ncp
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
+
+UNION ALL
+
+SELECT
+    DATE(dt_target) dt,
+    NULL::TEXT AS mkt_origin,
+    CASE
+        WHEN mkt_channel='Paid' THEN 'Paid Acquisition'
+        ELSE mkt_channel
+    END AS mkt_channel,
+    mkt_medium,
+    mkt_source,
+    NULL::TEXT AS utm_campaign,
+    NULL::TEXT AS campaign_name,
+    NULL::TEXT AS uf_listing,
+    NULL::TEXT AS city_listing,
+    NULL::TEXT AS neighborhood_listing,
+    city_group,
+    NULL::TEXT AS id_house,
+    NULL::TEXT AS id_client,
+    NULL::INT AS order_new_client,
+    NULL::TEXT AS id_prospect,
+    NULL::INT AS order_new_contact_prospect,
+    NULL::TEXT AS id_flow,
+    NULL::INT AS order_new_contact_flow,
+    0.0 AS cost,
+    SUM(cost_target) AS budget,
+    0.0 AS new_contact_prospects_target
+FROM
+    datalake_gsheets_clean_prod.targets_casa_mineira_cost
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 )
------------------------------
--- UNION Costs and Results --
------------------------------
+--------------------------------------
+-- UNION Costs, Results and Targets --
+--------------------------------------
 SELECT
     r.*
 FROM
@@ -206,3 +274,10 @@ SELECT
     ct.*
 FROM
     costs AS ct
+
+UNION ALL
+
+SELECT
+    tgt.*
+FROM
+    targets AS tgt
