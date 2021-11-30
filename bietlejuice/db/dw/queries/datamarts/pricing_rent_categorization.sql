@@ -229,6 +229,38 @@ contracts_city_furn_match_avg AS (
         SUM(amount_contracts) OVER (PARTITION BY city_name,is_house_furnished ORDER BY city_name,is_house_furnished, month  ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS contracts_3mon
     FROM
         contracts_city_furn_match
+),
+first_predicted_price AS (
+    SELECT 
+        id_house,
+        p_10 AS first_prediction_p_10,
+        p_20 AS first_prediction_p_20,
+        p_30 AS first_prediction_p_30,
+        p_40 AS first_prediction_p_40,
+        p_50 AS first_prediction_p_50,
+        p_60 AS first_prediction_p_60,
+        p_70 AS first_prediction_p_70,
+        p_80 AS first_prediction_p_80,
+        p_90 AS first_prediction_p_90,
+        certainty  AS first_prediction_certainty
+    FROM datalake_ebdb_clean_prod.house_predicted_price_aud
+    WHERE rev_type = 0 AND business_context = 'RENT'
+),
+last_predicted_price AS (
+    SELECT 
+        id_house,
+        p_10 AS last_prediction_p_10,
+        p_20 AS last_prediction_p_20,
+        p_30 AS last_prediction_p_30,
+        p_40 AS last_prediction_p_40,
+        p_50 AS last_prediction_p_50,
+        p_60 AS last_prediction_p_60,
+        p_70 AS last_prediction_p_70,
+        p_80 AS last_prediction_p_80,
+        p_90 AS last_prediction_p_90,
+        certainty AS last_prediction_certainty
+    FROM datalake_ebdb_clean_prod.house_predicted_price
+    WHERE business_context = 'RENT'
 )
 SELECT
 	DISTINCT listings_info.sk_house_listing,
@@ -266,6 +298,26 @@ SELECT
 	COALESCE(COALESCE(full_match.contracts_3mon, reg_furn_match.contracts_3mon), city_furn_match.contracts_3mon) AS total_contracts_compared,
 	COALESCE(COALESCE(full_match.match_type, reg_furn_match.match_type), city_furn_match.match_type) AS match_type,
 	(listings_info.first_price_m2-avg_price_contracts_signed_m2)*1.0/avg_price_contracts_signed_m2 AS diff_first_listing_contracts,
+	fpp.first_prediction_p_10,
+	fpp.first_prediction_p_20,
+	fpp.first_prediction_p_30,
+	fpp.first_prediction_p_40,
+	fpp.first_prediction_p_50,
+	fpp.first_prediction_p_60,
+	fpp.first_prediction_p_70,
+	fpp.first_prediction_p_80,
+	fpp.first_prediction_p_90,
+	fpp.first_prediction_certainty,
+	lpp.last_prediction_p_10,
+	lpp.last_prediction_p_20,
+	lpp.last_prediction_p_30,
+	lpp.last_prediction_p_40,
+	lpp.last_prediction_p_50,
+	lpp.last_prediction_p_60,
+	lpp.last_prediction_p_70,
+	lpp.last_prediction_p_80,
+	lpp.last_prediction_p_90,
+	lpp.last_prediction_certainty,
 	CASE
 	  WHEN listings_info.dt_last_rent = listings_info.dt_first_rent AND listings_info.first_rent = listings_info.last_rent THEN NULL
 	  ELSE (listings_info.last_price_m2-avg_price_contracts_signed_m2)*1.0/avg_price_contracts_signed_m2
@@ -328,3 +380,9 @@ LEFT JOIN
 	  ON city_furn_match.month = listings_info.month_publication
 	  AND city_furn_match.city_name = listings_info.city_name
 	  AND city_furn_match.is_house_furnished = listings_info.is_house_furnished
+LEFT JOIN 
+	first_predicted_price fpp
+	  ON fpp.id_house = listings_info.id_house
+LEFT JOIN 
+    	last_predicted_price lpp
+	  ON lpp.id_house = listings_info.id_house
