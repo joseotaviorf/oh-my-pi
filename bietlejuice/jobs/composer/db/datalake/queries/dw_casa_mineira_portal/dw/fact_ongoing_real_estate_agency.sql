@@ -18,7 +18,7 @@ ongoing_real_estate_agency AS (
 )
 SELECT
     CAST(DATE_FORMAT(date, 'yyyyMMdd') AS INT) AS sk_count_evaluated_date,
-    COUNT(id_real_estate_agency) AS ongoing_real_estate_agency,
+    CAST(COUNT(id_real_estate_agency) AS INT) AS ongoing_real_estate_agency,
     date AS dt_count_evaluated,
     NOW() AS ts_load
 FROM
