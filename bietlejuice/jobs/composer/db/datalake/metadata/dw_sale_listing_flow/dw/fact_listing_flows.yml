@@ -1,0 +1,216 @@
+database_name: dw_janus
+table_name: fact_listing_flows
+columns:
+  sk_house_listing_flow:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id
+  sk_condo:
+    lineage:
+      - datalake_sale_potential_listing.potential_listing_b2b.id_condo
+  sk_lead:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id_lead
+  sk_lead_conversion:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id_conversion
+  sk_first_photo_job:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id_photo_job
+  sk_house_listing:
+    lineage:
+      - datalake_sale_potential_listing.potential_listing_b2b.id_house_listing
+  sk_user_house_registrant:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id_rep
+  sk_user_sales_rep:
+    lineage:
+      - datalake_sale_potential_listing.potential_listing_lead_tasks.id_user_sales_rep
+  sk_user_lead_affiliate:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id_affiliate
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id_user_has_indicated
+  sk_user_first_task_assignee:
+    lineage:
+      - datalake_sale_potential_listing.potential_listing_lead_tasks.id_user_first_task_assignee
+  sk_user_last_task_assignee:
+    lineage:
+      - datalake_sale_potential_listing.potential_listing_lead_tasks.id_user_last_task_assignee
+  sk_region:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id_region
+  sk_city:
+    lineage:
+      - dw_janus.dim_region.city_id
+      - datalake_lead.lead_city_region.id_region
+  sk_partner:
+    lineage:
+      - datalake_sale_potential_listing.potential_listing_b2b.id_partner
+  sk_lead_date:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.ts_lead
+  sk_sales_company_lead_sent_date:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.ts_sales_company_sent
+  sk_prospect_date:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.ts_prospect
+  sk_first_task_created_date:
+    lineage:
+      - datalake_sale_potential_listing.potential_listing_lead_tasks.dt_first_task_created_date
+  sk_first_task_closed_date:
+    lineage:
+      - datalake_sale_potential_listing.potential_listing_lead_tasks.dt_first_task_closed_date
+  sk_last_task_created_date:
+    lineage:
+      - datalake_sale_potential_listing.potential_listing_lead_tasks.dt_last_task_created_date
+  sk_last_task_closed_date:
+    lineage:
+      - datalake_sale_potential_listing.potential_listing_lead_tasks.dt_last_task_closed_date
+  sk_first_contact_date:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.ts_first_contact
+  sk_conversion_date:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.ts_conversion
+  sk_qualified_date:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.ts_qualified
+  sk_opportunity_date:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.ts_opportunity
+  sk_first_listing_date:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.ts_first_listing
+  sk_discard_date:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.ts_discarded
+  sk_user_lead_first_discarder:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id_user_lead_first_discarder
+  sk_user_lead_last_discarder:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id_user_lead_last_discarder
+  funnel_drop_reason:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.funnel_step
+  hours_lead_to_prospect:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.hours_lead_to_prospect
+  hours_prospect_to_qualified:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.hours_prospect_to_qualified
+  hours_lead_to_first_contact:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.hours_lead_to_first_contact
+  hours_prospect_to_first_contact:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.hours_prospect_to_first_contact
+  hours_qualified_to_opportunity:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.hours_qualified_to_opportunity
+  hours_opportunity_to_listing:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.hours_opportunity_to_listing
+  hours_lead_to_listing:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.hours_lead_to_listing
+  days_lead_to_prospect:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.days_lead_to_prospect
+  days_prospect_to_qualified:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.days_prospect_to_qualified
+  days_lead_to_first_contact:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.days_lead_to_first_contact
+  days_prospect_to_first_contact:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.days_prospect_to_first_contact
+  days_qualified_to_opportunity:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.days_qualified_to_opportunity
+  days_opportunity_to_listing:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.days_opportunity_to_listing
+  days_lead_to_listing:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.days_lead_to_listing
+  days_lead_to_processing:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.days_lead_to_processing
+  is_exclusive:
+    lineage:
+      - datalake_sale_potential_listing.potential_listing_b2b.is_exclusive
+  first_isales_intervention:
+    lineage:
+      - datalake_sale_potential_listing.potential_listing_lead_tasks.first_isales_intervention
+  lead_type:
+    lineage:
+      - datalake_sale_potential_listing.potential_listing_reprocessed_leads.lead_type
+  lead_origin:
+    lineage:
+      - datalake_sale_potential_listing.potential_listing_reprocessed_leads.lead_origin
+  lead_tracking_source:
+    lineage:
+      - datalake_lead_tracking.lead_first_event_tracking.tracking_source
+      - datalake_sale_potential_listing.potential_listing_reprocessed_leads.utm_source
+  lead_tracking_medium:
+    lineage:
+      - datalake_lead_tracking.lead_first_event_tracking.tracking_medium
+      - datalake_sale_potential_listing.potential_listing_reprocessed_leads.utm_medium
+  lead_tracking_platform:
+    lineage:
+      - datalake_lead_tracking.lead_first_event_tracking.tracking_platform
+  is_b2b:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.is_b2b
+      - datalake_sale_potential_listing.potential_listing_reprocessed_leads.is_b2b
+  is_doorman:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.is_doorman
+  has_isales_intervention:
+    lineage:
+      - datalake_sale_potential_listing.potential_listing_lead_tasks.has_isales_intervention
+  has_fup_photo_task:
+    lineage:
+      - datalake_sale_potential_listing.potential_listing_lead_tasks.has_fup_photo_task
+  is_lead_reprocessed:
+    lineage:
+      - datalake_sale_potential_listing.potential_listing_reprocessed_leads.is_reprocessed
+  affiliate_type:
+    lineage:
+      - datalake_ebdb_clean.affiliate_data.affiliate_type
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.affiliate_type
+  is_agent_referral:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_growth.is_agent_referral
+  lead_referring_domain:
+    lineage:
+      - datalake_lead_tracking.lead_first_event_tracking.tracking_referring_domain
+  lead_referring_category:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_growth.lead_referring_category
+  subscription_source:
+    lineage:
+      - datalake_ebdb_user.user_doorman.subscription_source
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_growth.mkt_origin
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_growth.mkt_channel
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_growth.mkt_medium
+  mkt_source:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_growth.mkt_source
+  lead_context_origin:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.lead_context_origin
+  listing_sale_status:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.listing_sale_status
+  ts_opted_out_rent:
+    lineage:
+      - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.ts_opt_out_rent

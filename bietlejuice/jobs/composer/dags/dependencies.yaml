@@ -285,6 +285,19 @@ bietlejuice.dw_sale_flows:
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
   - bietlejuice.gsheets:load-clean-taxonomy-demand
 
+bietlejuice.dw_sale_listing_flow:
+  - bietlejuice.dw_region:load-janus-dim-region-into-redshift
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-doorman
+  - bietlejuice.enrich_lead:load-enrich-lead-city-region
+  - bietlejuice.enrich_lead_tracking:load-enrich-lead-first-event-tracking
+  - bietlejuice.enrich_listing_flow:load-enrich-sales-listing-flows-with-reprocessed-leads
+  - bietlejuice.enrich_sale_potential_listing:load-enrich-potential-listing-lead-tasks
+  - bietlejuice.enrich_sale_potential_listing:load-enrich-potential-listing-reprocessed-leads
+  - bietlejuice.enrich_sale_potential_listing:load-enrich-potential-listing-b2b
+  - bietlejuice.ebdb:create-clean-user-in-data-lake
+  - bietlejuice.ebdb:create-clean-affiliate-data-in-data-lake
+  - bietlejuice.gsheets:load-clean-taxonomy-growth
+
 bietlejuice.dw_sale_listings:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-house-registration-status-in-data-lake
