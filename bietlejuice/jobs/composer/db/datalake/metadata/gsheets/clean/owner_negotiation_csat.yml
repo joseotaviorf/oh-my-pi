@@ -1,0 +1,18 @@
+database_name: datalake_gsheets_clean
+table_name: owner_negotiation_csat
+columns:
+  id_csat_answer:
+    lineage:
+      - datalake_gsheets_raw.csat_negociacao_pp.token
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.csat_negociacao_pp.contract_id
+  comments:
+    lineage:
+      - datalake_gsheets_raw.csat_negociacao_pp.comments
+  score_text:
+    lineage:
+      - datalake_gsheets_raw.csat_negociacao_pp.score_text
+  ts_submitted:
+    lineage:
+      - datalake_gsheets_raw.csat_negociacao_pp.submitted_at

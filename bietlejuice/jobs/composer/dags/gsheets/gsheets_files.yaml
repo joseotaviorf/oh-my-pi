@@ -150,6 +150,21 @@ csat_chaves_off_pp:
     sheet_name: respostas_csat
     clean_table_name: owner_offboarding_keys_csat
 
+csat_negociacao_iq:
+    sheet_id: 1zhk4z4aCnysNpWfi3VIT153nU7joHiX3toE_Tw3oXZk
+    sheet_name: respostas_csat
+    clean_table_name: tenant_negotiation_csat
+
+csat_negociacao_pp:
+    sheet_id: 17dFkMy8vk2jPgeMlgT0eMS06-c9-1OKBk97p74OML7A
+    sheet_name: respostas_csat
+    clean_table_name: owner_negotiation_csat
+
+csat_reembolso_iq:
+    sheet_id: 1JBUSnsmnWbbH-XypQtmhdEzWEGPdWks8H4-dTTyl_Ic
+    sheet_name: respostas_csat
+    clean_table_name: tenant_reimbursement_csat
+
 csat_reparos_off_pp:
     sheet_id: 1iZ4l6NVakfkSXUebhivPvGeUjmDo2X01gnDUOGnozcE
     sheet_name: respostas_csat

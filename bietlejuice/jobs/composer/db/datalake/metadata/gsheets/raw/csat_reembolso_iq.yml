@@ -1,0 +1,11 @@
+database_name: datalake_gsheets_raw
+table_name: csat_reembolso_iq
+columns:
+  token:
+    tags:
+      - PII
+      - Confidential
+  user_id:
+    tags:
+      - PII
+      - Confidential

@@ -1,0 +1,7 @@
+database_name: datalake_gsheets_raw
+table_name: csat_negociacao_iq
+columns:
+  token:
+    tags:
+      - PII
+      - Confidential

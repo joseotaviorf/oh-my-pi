@@ -109,6 +109,7 @@ This pipeline produces the following output tables:
     - `offline_manual_share_cost_center`
     - `owner_entrance_inspection_csat`
     - `owner_exit_inspection_csat`
+    - `owner_negotiation_csat`
     - `owner_offboarding_keys_csat`
     - `owner_offboarding_repair_csat`
     - `payments_deals_and_discounts`
@@ -170,8 +171,10 @@ This pipeline produces the following output tables:
     - `taxonomy_mkt_cost_new_test`
     - `taxonomy_mkt_cost`
     - `taxonomy_portal_casa_mineira`
-    - `tenant_entrance_inspection_csat` 
+    - `tenant_entrance_inspection_csat`
+    - `tenant_negotiation_csat`
     - `tenant_onboarding_keys_csat`
+    - `tenant_reimbursement_csat`
     - `tof_supply_targets`
     - `tqc_leads`
     - `tqc_registered_agents`
