@@ -47,6 +47,22 @@ tenant_prospect_events AS (
     tta.business_context = 'RENT'
     AND tta.first_message_ts IS NOT NULL
 ),
+--------------------------------------------------------------------------
+-- Creating a list for dates and cities (Brasília, Salvador and Recife) --
+--------------------------------------------------------------------------
+date_region AS (
+  SELECT
+    DATE(evt.ts_event) as date,
+    dr.city_group   
+  FROM 
+    tenant_prospect_events AS evt
+  JOIN 
+    dim_region AS dr 
+    USING(sk_region)
+  WHERE 
+    dr.city_group IN ('Brasília', 'Recife', 'Salvador')   
+  GROUP BY 1, 2
+),
 ------------------------------------------------------------------------------
 -- Order Tenant Prospects events by timestamp to extract only the first one --
 ------------------------------------------------------------------------------
@@ -54,7 +70,7 @@ tenant_prospects AS (
   SELECT
     evt.sk_client,
     evt.ts_event,
-    evt.sk_region,
+    dr.city_group,
     evt.mkt_medium,
     evt.mkt_source,
     DATE(evt.ts_event) AS date,
@@ -62,22 +78,29 @@ tenant_prospects AS (
                       ORDER BY evt.ts_event) AS interactions_order
   FROM
     tenant_prospect_events AS evt
-)
-SELECT
-  dd.sk_date,
-  dr.city_group,
-  COUNT(DISTINCT CASE WHEN tp.interactions_order = 1 THEN tp.sk_client ELSE NULL END)
-    / COALESCE(NULLIF(SUM(COUNT(DISTINCT CASE WHEN tp.interactions_order = 1 THEN tp.sk_client ELSE NULL END)) OVER(PARTITION BY sk_date)::FLOAT, 0),3) AS share, 
-    'demand' AS funnel_side
-FROM
-  tenant_prospects AS tp
-  JOIN dim_date AS dd
-    ON tp.date = dd.date
-  JOIN dim_region AS dr
+  JOIN 
+    dim_region AS dr 
     USING(sk_region)
-WHERE
+  WHERE
     mkt_medium = 'Display'
     AND mkt_source = 'Facebook'
-    AND dr.city_group IN ('Brasília', 'Recife', 'Salvador')
+)
+SELECT
+  dr.date as sk_date,
+  dr.city_group,
+  CASE 
+    WHEN SUM(COUNT(DISTINCT CASE WHEN tp.interactions_order = 1 THEN tp.sk_client ELSE NULL END)) OVER(PARTITION BY dr.date)::FLOAT = 0 
+      THEN 0.33 
+    ELSE
+      COUNT(DISTINCT CASE WHEN tp.interactions_order = 1 THEN tp.sk_client ELSE NULL END)
+      / NULLIF(SUM(COUNT(DISTINCT CASE WHEN tp.interactions_order = 1 THEN tp.sk_client ELSE NULL END)) OVER(PARTITION BY dr.date)::FLOAT, 0)
+  END AS share
+FROM
+  tenant_prospects AS tp
+FULL OUTER JOIN 
+  date_region AS dr
+  ON 
+  tp.date = dr.date 
+  AND dr.city_group = tp.city_group
 GROUP BY
 	1,2
