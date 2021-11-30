@@ -15,10 +15,20 @@ affiliate_type_targets:
     sheet_name: affiliate_type_targets
     clean_table_name: affiliate_type_targets
 
+affiliates_active_segmentation:
+    sheet_id: 1ghRFPWXEYMTJSsMuY_k38HmELWRuzjt1PkfKTe_wR4s
+    sheet_name: ativos
+    clean_table_name: affiliates_active_segmentation
+
 affiliates_extra_user_bonus:
     sheet_id: 1nSCX7SDFFg87Ow3yHGv8j6k_CRv9OYYBeKwhkpilWog
     sheet_name: extra_user_bonus
     clean_table_name: affiliates_extra_user_bonus
+
+affiliates_inactive_segmentation:
+    sheet_id: 1ghRFPWXEYMTJSsMuY_k38HmELWRuzjt1PkfKTe_wR4s
+    sheet_name: inativos
+    clean_table_name: affiliates_inactive_segmentation
 
 agents_control:
     sheet_id: 1wIwrWi0xlY4TAZnE6JlGm6B0UyezOPxfF5s0_pn-i9E

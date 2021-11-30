@@ -1,0 +1,7 @@
+database_name: datalake_gsheets_raw
+table_name: affiliates_inactive_segmentation
+columns:
+  sk_user:
+    tags:
+      - PII
+      - Confidential

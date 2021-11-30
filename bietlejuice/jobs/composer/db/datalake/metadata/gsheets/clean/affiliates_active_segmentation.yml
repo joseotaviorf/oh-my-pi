@@ -1,0 +1,93 @@
+database_name: datalake_gsheets_clean
+table_name: affiliates_active_segmentation
+columns:
+  id_user:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.sk_user
+  type:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.type
+  cluster:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.cluster
+  segment:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.segment
+  recency:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.recency
+  frequency:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.frequency
+  soft_lead_last_month:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.soft_lead_last_month
+  soft_lead_last_three_months:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.soft_lead_last_three_months
+  total_soft_lead:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.total_soft_lead
+  lead_last_month:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.lead_last_month
+  lead_last_three_months:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.lead_last_three_months
+  lead_last_six_months:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.lead_last_six_months
+  lead_last_twelve_months:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.lead_last_twelve_months
+  total_lead:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.total_lead
+  qualified_last_month:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.qualified_last_month
+  qualified_last_three_months:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.qualified_last_three_months
+  qualified_last_six_months:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.qualified_last_six_months
+  qualified_last_twelve_months:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.qualified_last_twelve_months
+  total_qualified:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.total_qualified
+  l2q_lm:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.l2q_lm
+  l2q_l3m:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.l2q_l3m
+  l2q_l6m:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.l2q_l6m
+  l2q_l12m:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.l2q_l12m
+  l2q_total:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.l2q_total
+  recency_score:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.RecencyScore
+  frequency_score:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.FrequencyScore
+  value_score:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.ValueScore
+  rfm:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.rfm
+  dt_joined_program:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.date_joined_program
+  dt_month_joined_program:
+    lineage:
+      - datalake_gsheets_raw.affiliates_active_segmentation.month_joined_program
