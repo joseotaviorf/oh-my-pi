@@ -23,7 +23,7 @@ ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
 SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
 local_tz = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz)
-MAIN_SCHEDULE_INTERVAL = "40 21 * * *"
+MAIN_SCHEDULE_INTERVAL = "10 21 * * *"
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 # Job params
