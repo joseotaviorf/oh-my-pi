@@ -19,9 +19,6 @@ columns:
   rev_type:
     lineage:
       - datalake_big_agent_raw.agency_aud.revtype
-  details:
-    lineage:
-      - datalake_big_agent_raw.agency_aud.details
   since:
     lineage:
       - datalake_big_agent_raw.agency_aud.since
@@ -31,21 +28,24 @@ columns:
   mod_house:
     lineage:
       - datalake_big_agent_raw.agency_aud.house_mod
-  mod_details:
-    lineage:
-      - datalake_big_agent_raw.agency_aud.details_mod
   mod_since:
     lineage:
       - datalake_big_agent_raw.agency_aud.since_mod
   mod_ts_created:
     lineage:
       - datalake_big_agent_raw.agency_aud.created_at_mod
+  mod_ts_deleted:
+    lineage:
+      - datalake_big_agent_raw.agency_aud.deleted_at_mod
   mod_ts_updated:
     lineage:
       - datalake_big_agent_raw.agency_aud.updated_at_mod
   ts_created:
     lineage:
       - datalake_big_agent_raw.agency_aud.created_at
+  ts_deleted:
+    lineage:
+      - datalake_big_agent_raw.agency_aud.deleted_at
   ts_updated:
     lineage:
         - datalake_big_agent_raw.agency_aud.updated_at

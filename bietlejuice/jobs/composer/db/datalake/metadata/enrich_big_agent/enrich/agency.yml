@@ -10,15 +10,15 @@ columns:
   id_enrollment:
     lineage:
       - datalake_big_agent_clean.agency.id_enrollment
-  details:
-    lineage:
-      - datalake_big_agent_clean.agency.details
   dt_since:
     lineage:
       - datalake_big_agent_clean.agency.dt_since
   ts_created:
     lineage:
       - datalake_big_agent_clean.agency.ts_created
+  ts_deleted:
+    lineage:
+      - datalake_big_agent_clean.agency.deleted_at
   ts_updated:
     lineage:
       - datalake_big_agent_clean.agency.ts_updated
