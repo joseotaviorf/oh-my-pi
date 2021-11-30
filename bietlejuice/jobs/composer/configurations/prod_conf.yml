@@ -16,6 +16,7 @@ dags_out_of_pattern: [
     "marketing_costs_sharing_rules",
     "marketing_costs",
     "portal_casa_mineira_pipedrive",
+    "quintoandar",
     "regions_polygon",
     "rtb_campaigns",
 ]
