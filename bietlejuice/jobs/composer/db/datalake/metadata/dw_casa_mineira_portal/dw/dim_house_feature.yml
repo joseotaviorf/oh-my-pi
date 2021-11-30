@@ -1,0 +1,45 @@
+---
+database_name: dw_casa_mineira_portal
+table_name: dim_house_feature
+columns:
+  sk_house:
+    lineage:
+      - datalake_casa_mineira_portal_clean.house_attribute.id_house
+  sk_attribute:
+    lineage:
+      - datalake_casa_mineira_portal_clean.house_attribute.id_attribute
+      - datalake_casa_mineira_portal_clean.attribute.id
+  sk_attribute_type:
+    lineage:
+      - datalake_casa_mineira_portal_clean.attribute.id_attribute_type
+      - datalake_casa_mineira_portal_clean.attribute_type.id
+  sk_attribute_created_date:
+    lineage:
+      - datalake_casa_mineira_portal_clean.attribute.ts_created
+  sk_house_attribute_created_date:
+    lineage:
+      - datalake_casa_mineira_portal_clean.house_attribute.ts_created
+  sk_house_attribute_deleted_date:
+    lineage:
+      - datalake_casa_mineira_portal_clean.house_attribute.ts_deleted
+  attribute_name:
+    lineage:
+      - datalake_casa_mineira_portal_clean.attribute.attribute_name
+  attribute_full_name:
+    lineage:
+      - datalake_casa_mineira_portal_clean.attribute.attribute_full_name
+  attribute_type_name:
+    lineage:
+      - datalake_casa_mineira_portal_clean.attribute_type.attribute_name
+  attribute_type_full_name:
+    lineage:
+      - datalake_casa_mineira_portal_clean.attribute_type.attribute_full_name
+  ts_attribute_created:
+    lineage:
+      - datalake_casa_mineira_portal_clean.attribute.ts_created
+  ts_house_attribute_created:
+    lineage:
+      - datalake_casa_mineira_portal_clean.house_attribute.ts_created
+  ts_house_attribute_deleted:
+    lineage:
+      - datalake_casa_mineira_portal_clean.house_attribute.ts_deleted
