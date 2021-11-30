@@ -11,6 +11,9 @@ columns:
   rev_type:
     lineage:
       - datalake_ebdb_clean.agent_region_data_aud.rev_type
+  region_code:
+    lineage:
+      - datalake_gsheets_clean.auxiliary_region.region_code
   ts_ended:
     lineage:
       - datalake_ebdb_clean.agent_region_data_aud.rev_type

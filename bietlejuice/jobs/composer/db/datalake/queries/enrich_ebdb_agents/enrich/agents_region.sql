@@ -19,13 +19,15 @@ WITH agent_region_hist AS (
       ON aud.rev = ure.id 
 )
 SELECT
-    id_agent,
-    id_region,
-    rev_type,
-    ts_ended,
-    ts_revision,
-    ts_started
+  arh.id_agent,
+  arh.id_region,
+  arh.rev_type,
+  ar.region_code,
+  arh.ts_ended,
+  arh.ts_revision,
+  arh.ts_started
 FROM
   agent_region_hist arh
-  LEFT JOIN datalake_gsheets_clean.auxiliary_region ar 
+LEFT JOIN 
+  datalake_gsheets_clean.auxiliary_region ar 
     ON arh.id_region = ar.id
