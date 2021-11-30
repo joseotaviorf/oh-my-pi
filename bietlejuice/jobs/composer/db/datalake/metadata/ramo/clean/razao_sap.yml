@@ -1,12 +1,12 @@
 database_name: datalake_ramo_clean
 table_name: razao_sap
 columns:
+  id_line:
+    lineage:
+      - datalake_ramo_raw.razao_sap.line_id
   id_trans:
     lineage:
       - datalake_ramo_raw.razao_sap.transid
-  acct_code:
-    lineage:
-      - datalake_ramo_raw.razao_sap.acctcode
   account:
     lineage:
       - datalake_ramo_raw.razao_sap.account

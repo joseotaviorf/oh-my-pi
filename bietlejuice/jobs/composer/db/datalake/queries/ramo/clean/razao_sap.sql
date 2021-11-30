@@ -1,6 +1,6 @@
 SELECT
+    Line_ID AS id_line,
     TransId AS id_trans,
-    AcctCode AS acct_code,
     Account AS account,
     AcctName AS account_name,
     ContraAct AS contract_act,
