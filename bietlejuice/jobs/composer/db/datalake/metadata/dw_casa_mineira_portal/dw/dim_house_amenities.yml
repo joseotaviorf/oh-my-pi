@@ -1,0 +1,36 @@
+---
+database_name: dw_casa_mineira_portal
+table_name: dim_house_amenities
+columns:
+  sk_house:
+    lineage:
+      - datalake_casa_mineira_portal_clean.house.id
+      - datalake_casa_mineira_portal_clean.house_attribute.id_house
+  id_house:
+    lineage:
+      - datalake_casa_mineira_portal_clean.house.id
+      - datalake_casa_mineira_portal_clean.house_attribute.id_house
+  total_area:
+    lineage:
+      - datalake_casa_mineira_portal_clean.house.total_area
+  bathrooms:
+    lineage:
+      - datalake_casa_mineira_portal_clean.house.bathrooms
+  bedrooms:
+    lineage:
+      - datalake_casa_mineira_portal_clean.house.bedrooms
+  living_rooms:
+    lineage:
+      - datalake_casa_mineira_portal_clean.house.living_rooms
+  suites:
+    lineage:
+      - datalake_casa_mineira_portal_clean.house.suites
+  parking_slots:
+    lineage:
+      - datalake_casa_mineira_portal_clean.house.parking_slots
+  liquidity:
+    lineage:
+      - datalake_casa_mineira_portal_clean.house.liquidity
+  ts_created:
+    lineage:
+      - datalake_casa_mineira_portal_clean.house.ts_created
