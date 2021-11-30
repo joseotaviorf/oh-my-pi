@@ -86,21 +86,23 @@ tenant_prospects AS (
     AND mkt_source = 'Facebook'
 )
 SELECT
-  dr.date as sk_date,
+  dd.sk_date,
   dr.city_group,
   CASE 
-    WHEN SUM(COUNT(DISTINCT CASE WHEN tp.interactions_order = 1 THEN tp.sk_client ELSE NULL END)) OVER(PARTITION BY dr.date)::FLOAT = 0 
+    WHEN SUM(COUNT(DISTINCT CASE WHEN tp.interactions_order = 1 THEN tp.sk_client ELSE NULL END)) OVER(PARTITION BY dd.sk_date)::FLOAT = 0 
       THEN 0.33 
     ELSE
-    COUNT(DISTINCT CASE WHEN tp.interactions_order = 1 THEN tp.sk_client ELSE NULL END)
-    / NULLIF(SUM(COUNT(DISTINCT CASE WHEN tp.interactions_order = 1 THEN tp.sk_client ELSE NULL END)) OVER(PARTITION BY dr.date)::FLOAT, 0)
-    END AS share,
-  'demand' AS funnel_side
+      COUNT(DISTINCT CASE WHEN tp.interactions_order = 1 THEN tp.sk_client ELSE NULL END)
+      / NULLIF(SUM(COUNT(DISTINCT CASE WHEN tp.interactions_order = 1 THEN tp.sk_client ELSE NULL END)) OVER(PARTITION BY dd.sk_date)::FLOAT, 0)
+  END AS share
 FROM
   tenant_prospects AS tp
 FULL OUTER JOIN 
   date_region AS dr
   ON tp.date = dr.date 
   AND dr.city_group = tp.city_group
+JOIN
+  dim_date AS dd
+  ON dd.date = dr.date
 GROUP BY
 	1,2
