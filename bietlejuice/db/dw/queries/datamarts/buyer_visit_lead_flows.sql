@@ -30,7 +30,7 @@ WITH all_users_5a AS (
         JOIN datalake_casa_mineira_crm_clean_prod.client c
             ON c.id = ct.id_client
         WHERE
-            ct.ts_created::date >= '2021-04-26' -- start date of hub secretariat in 5A
+            ct.ts_created::date >= '2020-01-01'
             AND ct.contact_type != 'cancelamento'
     UNION ALL
         SELECT
@@ -45,7 +45,7 @@ WITH all_users_5a AS (
         JOIN datalake_casa_mineira_crm_clean_prod.client c
             ON c.id = ct.id_client
         WHERE
-            c.ts_created::date >= '2021-04-26' -- start date of hub secretariat in 5A
+            c.ts_created::date >= '2020-01-01'
             AND ct.contact_type != 'cancelamento'
         )
     SELECT
@@ -381,57 +381,30 @@ UNION ALL
         SELECT
             uu.user_key,
             id_secretariat_client,
-            fo.sk_house,
-            fo.sk_offer,
-            CASE
-                WHEN oh.offer_flow LIKE '%HUB%' THEN 'HUB'
-                WHEN oh.offer_flow = 'CENTRAL' THEN 'CENTRAL'
-                ELSE 'DealMaking'
-            END AS offer_flow,
-            fo.sk_region AS sk_region_first_offer,
+            sfo.sk_house,
+            sfo.sk_offer,
+            offer_flow,
+            business_unit,
+            sfo.sk_region AS sk_region_first_offer,
             TO_DATE(dd_os.date, 'YYYY-MM-DD') AS dt_offer_submitted,
-            COALESCE(TO_DATE(dd_ccv.date, 'YYYY-MM-DD'), oh.dt_sale_agreement_signed) AS dt_sale_agreement_signed
+            COALESCE(TO_DATE(dd_ccv.date, 'YYYY-MM-DD')) AS dt_sale_agreement_signed
         FROM unique_user_client_lead_classifieds uu
-        JOIN sale.fact_offers fo
-            ON fo.sk_buyer = uu.id_user
-        LEFT JOIN datalake_gsheets_clean_prod.offers_hub_central oh
-            ON oh.id_offer = fo.sk_offer
+        JOIN datamarts.temp_sale_offers sfo
+            ON uu.id_user = sfo.sk_buyer
         LEFT JOIN dim_date dd_os
-            ON dd_os.sk_date = fo.sk_offer_submitted_date
+            ON dd_os.sk_date = sfo.sk_offer_submitted_date
         LEFT JOIN dim_date dd_ccv
-            ON dd_ccv.sk_date = fo.sk_sale_agreement_signed_date
-    UNION ALL
-        -- HUB v0 offer flow
-        SELECT
-            uu.user_key,
-            id_secretariat_client,
-            fl.sk_house,
-            oh.id_offer AS sk_offer,
-            'HUB' AS offer_flow,
-            fl.sk_region AS sk_region_first_offer,
-            TO_DATE(oh.dt_offer_submitted,'YYYY-MM-DD') AS dt_offer_submitted,
-            TO_DATE(oh.dt_sale_agreement_signed,'YYYY-MM-DD') AS dt_sale_agreement_signed
+            ON dd_ccv.sk_date = sfo.sk_sale_agreement_signed_date
 
-        FROM unique_user_client_lead_classifieds uu
-        JOIN datalake_gsheets_clean_prod.offers_hub_central oh
-            ON uu.id_user = oh.id_user_5a
-            OR uu.id_secretariat_client = oh.id_client_cm
-        LEFT JOIN datalake_casa_mineira_crm_clean_prod.house h
-            ON h.id = oh.id_house_cm
-        LEFT JOIN sale.fact_listings fl
-            ON fl.sk_house = h.id_house_quintoandar
-        WHERE
-            oh.offer_model = 'v0'
-			AND offer_flow in ('HUB Bela Vista','HUB Vila Mariana')
-            AND oh.dt_offer_submitted IS NOT NULL
-    UNION ALL
-        -- CCVS in SCM BH
+        UNION ALL
+
         SELECT
             uu.user_key,
             id_secretariat_client,
             id_house_quintoandar::BIGINT AS sk_house,
             CAST(s.id AS VARCHAR) AS sk_offer,
             'BH' AS offer_flow,
+            'BH' AS business_unit,
             fl.sk_region AS sk_region_first_offer,
             TO_DATE(s.ts_created, 'YYYY-MM-DD') AS dt_offer_submitted,
             TO_DATE(s.ts_sold, 'YYYY-MM-DD') AS dt_sale_agreement_signed
@@ -521,6 +494,8 @@ UNION ALL
         fbcm.city_first_booking_cm,
         fo.offer_flow,
         fc.offer_flow AS ccv_flow,
+        fo.business_unit AS offer_business_unit,
+        fc.business_unit AS ccv_business_unit,
          LEAST(lci.ts_classified_first_intent, csi.ts_first_secretariat_contact, vie.ts_first_visit_scheduling_event, fbq.ts_booking_created_5a,fo.dt_offer_submitted) AS ts_first_visit_lead_intent,
         lci.ts_classified_first_intent,
         csi.ts_first_secretariat_contact,
@@ -558,6 +533,5 @@ UNION ALL
 SELECT
     *
 FROM final_base
-WHERE 
-    first_touch IS NOT NULL 
-    AND ts_first_visit_lead_intent >= '2021-01-01'
+WHERE 1=1 
+    AND first_touch IS NOT NULL
