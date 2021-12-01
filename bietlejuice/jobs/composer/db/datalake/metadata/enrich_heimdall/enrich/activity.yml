@@ -1,0 +1,106 @@
+---
+database_name: datalake_heimdall
+table_name: activity
+columns:
+  id:
+    lineage:
+      - datalake_heimdall_clean.activity.id
+  id_external_contract:
+    lineage:
+      - datalake_heimdall_clean.activity.id_external_contract
+  id_house:
+    lineage:
+      - datalake_heimdall_clean.activity.id_house
+  id_user:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  id_state:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  id_rent_flow:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  class:
+    lineage:
+      - datalake_heimdall_clean.activity.class
+  previous_status:
+    lineage:
+      - datalake_heimdall_clean.activity.transition_list
+  status:
+    lineage:
+      - datalake_heimdall_clean.activity.status
+  type:
+    lineage:
+      - datalake_heimdall_clean.activity.type
+  user_name:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  condominium_receipt_url:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  condominium_invoice_url:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  description:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  event_name:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  expenses:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  auditable_expenses:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  house_address:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  landlords_contact_info:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  user_email:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  ticket_number:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  discount_months:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  discount_percentage:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  discount_amount:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  discounted_rental:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  rental_amount:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  discount_start_year_month:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  discount_end_year_month:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  dt_contract_started:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  ts_transferred:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  ts_requested:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  ts_transition_created:
+    lineage:
+      - datalake_heimdall_clean.activity.transition_list
+  ts_created:
+    lineage:
+      - datalake_heimdall_clean.activity.ts_created
+  ts_updated:
+    lineage:
+      - datalake_heimdall_clean.activity.ts_updated

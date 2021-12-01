@@ -676,6 +676,9 @@ bietlejuice.enrich_greenseer:
   - bietlejuice.greenseer:load-clean-session
   - bietlejuice.sauron:load-clean-session
 
+bietlejuice.enrich_heimdall:
+  - bietlejuice.heimdall:load-clean-activity
+
 bietlejuice.enrich_customer_support:
   - bietlejuice.chat_fup:load-clean-chats-chat
   - bietlejuice.chat_fup:load-clean-surveys-answer
