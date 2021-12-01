@@ -13,6 +13,8 @@ account_names:
     "517800565488302": "supply_landlords_sale"
     "832880310585080": "supply_agents"
     "2847775308769718": "quintoandar_meu_lugar"
+    "902296353833179": "facebook_demand_retention_for_sale"
+    "1239225476506330": "facebook_demand_retention_for_rent"
 
 breakdowns:
     general: [
