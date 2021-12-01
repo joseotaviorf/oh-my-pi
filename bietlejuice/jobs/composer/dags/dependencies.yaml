@@ -489,6 +489,17 @@ bietlejuice.enrich_buyer_prospect:
   - bietlejuice.enrich_offer:load-enrich-sale-offer
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
 
+bietlejuice.enrich_casa_mineira_consolidated_marketing_metrics:
+  - bietlejuice.casa_mineira_google_ads:load-clean-ads-performance-report
+  - bietlejuice.casa_mineira_google_ads:load-clean-campaigns-performance-report
+  - bietlejuice.casa_mineira_google_ads:load-clean-keywords-performance-report
+  - bietlejuice.casa_mineira_google_ads:load-clean-videos-performance-report
+  - bietlejuice.casa_mineira_criteo_campaigns:load-clean-criteo-campaigns
+  - bietlejuice.enrich_marketing_costs_sharing_rules:load-old-sharing-rules-from-redshift-to-datalake
+  - bietlejuice.casa_mineira_lifull_campaigns:load-clean-mitula-campaigns
+  - bietlejuice.casa_mineira_lifull_campaigns:load-clean-trovit-campaigns
+  - bietlejuice.casa_mineira_rtb_campaigns:load-clean-rtb-campaigns
+
 bietlejuice.enrich_casa_mineira_portal:
   - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency
   - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency-history

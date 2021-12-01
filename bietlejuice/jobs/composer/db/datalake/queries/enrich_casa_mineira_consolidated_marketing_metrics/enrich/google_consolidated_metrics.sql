@@ -62,7 +62,7 @@ report_type_mapping AS (
                 THEN 'KEYWORDS_PERFORMANCE_REPORT'
             WHEN ANY(report_type='AD_PERFORMANCE_REPORT')
                 THEN 'AD_PERFORMANCE_REPORT'
-            WHEN ANY(report_type='CAMPAIGN_PERFORMANCE_REPORT')
+            WHEN EVERY(EVERY(report_type='CAMPAIGN_PERFORMANCE_REPORT')) OVER (PARTITION BY campaign_name, id_campaign)
                 THEN 'CAMPAIGN_PERFORMANCE_REPORT'
         END AS report_type
     FROM

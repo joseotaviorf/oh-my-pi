@@ -18,15 +18,15 @@ from bietlejuice.jobs.composer.services.configuration_service import (
 )
 
 
-ENV = os.environ.get("ENVIRONMENT")
 CONTEXT = "casa_mineira_consolidated_marketing_metrics"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 PARTITION_COLS = ["id_date"]
-
-# DAG params setup
 MAIN_START_DATE = datetime(2021, 6, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = None
+CLUSTER_DESCRIPTION = Variable.get(
+    "databricks_9_1_min_general_cluster", deserialize_json=True
+)
 
 config_service = ConfigurationService(CONTEXT)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
@@ -38,13 +38,8 @@ spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 default_libraries = config_service.get_config("default_libraries")
 
-# s3 paths setup
+ENV = os.environ.get("ENVIRONMENT")
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-
-# cluster setup
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_min_general_cluster", deserialize_json=True
-)
 
 dag = DAG(
     dag_id=DAG_ID,
