@@ -47,6 +47,9 @@ bietlejuice.dw_braze_events_user_centric:
   - bietlejuice.enrich_braze_events_user_centric_periodicity:load-enrich-user-events-all-time-before
 
 bietlejuice.dw_braze_events_user_dispatch:
+  - bietlejuice.braze_details:load-clean-campaign-details-indica-ai
+  - bietlejuice.braze_details:load-clean-campaign-details-owners
+  - bietlejuice.braze_details:load-clean-campaign-details-tenants
   - bietlejuice.enrich_braze_events_dispatches_user:load-enrich-owners-events
   - bietlejuice.enrich_braze_events_dispatches_user:load-enrich-tenants-events
 

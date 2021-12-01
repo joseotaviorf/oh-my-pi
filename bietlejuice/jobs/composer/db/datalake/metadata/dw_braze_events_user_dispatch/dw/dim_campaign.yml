@@ -1,0 +1,54 @@
+---
+database_name: dw_braze
+table_name: dim_campaign
+columns:
+  sk_campaign:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_indica_ai.id_campaign
+      - datalake_braze_details_clean.campaign_details_owners.id_campaign
+      - datalake_braze_details_clean.campaign_details_tenants.id_campaign
+  campaign_name:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_indica_ai.campaign_name
+      - datalake_braze_details_clean.campaign_details_owners.campaign_name
+      - datalake_braze_details_clean.campaign_details_tenants.campaign_name
+  campaign_description:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_indica_ai.campaign_description
+      - datalake_braze_details_clean.campaign_details_owners.campaign_description
+      - datalake_braze_details_clean.campaign_details_tenants.campaign_description
+  schedule_type:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_indica_ai.schedule_type
+      - datalake_braze_details_clean.campaign_details_owners.schedule_type
+      - datalake_braze_details_clean.campaign_details_tenants.schedule_type
+  is_archived:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_indica_ai.archived
+      - datalake_braze_details_clean.campaign_details_owners.archived
+      - datalake_braze_details_clean.campaign_details_tenants.archived
+  is_draft:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_indica_ai.draft
+      - datalake_braze_details_clean.campaign_details_owners.draft
+      - datalake_braze_details_clean.campaign_details_tenants.draft
+  ts_first_sent:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_indica_ai.ts_first_sent
+      - datalake_braze_details_clean.campaign_details_owners.ts_first_sent
+      - datalake_braze_details_clean.campaign_details_tenants.ts_first_sent
+  ts_last_sent:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_indica_ai.ts_last_sent
+      - datalake_braze_details_clean.campaign_details_owners.ts_last_sent
+      - datalake_braze_details_clean.campaign_details_tenants.ts_last_sent
+  ts_created:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_indica_ai.ts_created
+      - datalake_braze_details_clean.campaign_details_owners.ts_created
+      - datalake_braze_details_clean.campaign_details_tenants.ts_created
+  ts_updated:
+    lineage:
+      - datalake_braze_details_clean.campaign_details_indica_ai.ts_updated
+      - datalake_braze_details_clean.campaign_details_owners.ts_updated
+      - datalake_braze_details_clean.campaign_details_tenants.ts_updated

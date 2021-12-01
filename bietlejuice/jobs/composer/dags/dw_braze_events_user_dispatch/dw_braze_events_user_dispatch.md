@@ -14,9 +14,13 @@ More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 ​
-This pipeline produces in DW, schema `braze`, via incremental load:
-    - `fact_braze_campaign_user_dispatch`
-    - `fact_braze_canvas_user_dispatch`
+This pipeline produces in DW schema `braze`:
+    - incremental load:
+        - `fact_braze_campaign_user_dispatch`
+        - `fact_braze_canvas_user_dispatch`
+    - full load:
+        - `dim_campaign`
+        - `dim_canvas`
 ​
 ### Responsible Data Teams
 ​
