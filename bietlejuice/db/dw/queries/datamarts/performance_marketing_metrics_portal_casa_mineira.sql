@@ -20,7 +20,7 @@ info_costs AS (
         mkt_channel,
         mkt_medium,
         mkt_source,
-        SUM(cost) cost
+        SUM(cost) AS cost
     FROM datalake_gsheets_clean_prod.casa_mineira_marketing_manual_shared_costs
     GROUP BY 1,2,3,4,5,6,7,8,9
 ),
@@ -30,28 +30,31 @@ info_costs AS (
 costs AS (
     SELECT
         dt,
-        NULL::TEXT id_advertiser,
-        NULL::TEXT advertiser,
-        NULL::TEXT uf_advertiser,
-        NULL::TEXT city_advertiser,
-        NULL::TEXT type_advertiser,
-        NULL::TEXT business_context,
-        NULL::TEXT uf_listing,
-        NULL::TEXT city_listing,
+        NULL::INT AS id_advertiser,
+        NULL::TEXT AS advertiser,
+        NULL::TEXT AS uf_advertiser,
+        NULL::TEXT AS city_advertiser,
+        NULL::TEXT AS type_advertiser,
+        NULL::TEXT AS business_context,
+        NULL::TEXT AS uf_listing,
+        NULL::TEXT AS city_listing,
         mkt_origin,
         mkt_channel,
         mkt_medium,
         mkt_source,
         mkt_business,
-        COALESCE(dr.city_group, ict.city_group_from_campaign) city_group,
-        NULL::TEXT utm_campaign,
+        COALESCE(dr.city_group, ict.city_group_from_campaign) AS city_group,
+        NULL::TEXT AS utm_campaign,
         campaign_name,
-        NULL::INT order_new_contact_flow,
-        NULL::INT order_new_contact_prospect,
-        NULL::TEXT id_house,
-        NULL::TEXT id_prospect,
-        NULL::TEXT contact_flow,
-        SUM(cost) cost
+        NULL::INT AS order_new_contact_flow,
+        NULL::INT AS order_new_contact_prospect,
+        NULL::TEXT AS id_house,
+        NULL::TEXT AS id_prospect,
+        NULL::TEXT AS contact_flow,
+        NULL::FLOAT AS budget_advertiser,
+        SUM(cost) AS cost,
+        NULL::FLOAT AS budget,
+        NULL::FLOAT AS contact_flow_target
     FROM info_costs ict
         LEFT JOIN dim_region dr
             ON ict.city_group_from_campaign=dr.sk_region
@@ -127,12 +130,12 @@ events AS (
 ----------------------------------------------------------------
 contacts as (
     SELECT
-        date_add('hour', 3, c.ts_created) ts_contact, --INTO UTC--
+        date_add('hour', 3, c.ts_created) AS ts_contact, --INTO UTC--
         --ADVERTISER DIMENSIONS
-        rea.id id_advertiser,
-        rea.real_estate_agency_name advertiser,
-        ufa.uf_initials uf_advertiser,
-        cta.city_name as city_advertiser,
+        rea.id AS id_advertiser,
+        rea.real_estate_agency_name AS advertiser,
+        ufa.uf_initials AS uf_advertiser,
+        cta.city_name AS city_advertiser,
         CASE WHEN rea.id IN ('1') THEN 'CM'
             WHEN rea.id IN ('164') THEN '5A'
             ELSE 'Client'
@@ -142,8 +145,8 @@ contacts as (
             WHEN h.goal='venda' THEN 'Sale'
             WHEN h.goal='aluguel' THEN 'Rent'
         END AS business_context,
-        ufl.uf_initials uf_listing,
-        ctl.city_name city_listing,
+        ufl.uf_initials AS uf_listing,
+        ctl.city_name AS city_listing,
         ctl.city_name AS city_group,
         -- TAXONOMY DIMENSIONS
         CASE
@@ -151,8 +154,8 @@ contacts as (
             ELSE 'portal'
         END AS mkt_business,
         --ID DIMENSIONS
-        MD5(c.email) || '_' || c.id_house as id_contact,
-        MD5(c.email) email_md5,
+        MD5(c.email) || '_' || c.id_house AS id_contact,
+        MD5(c.email) AS email_md5,
         c.id_house,
         ROW_NUMBER() OVER(PARTITION BY c.email, c.id_house ORDER BY c.ts_created) AS order_new_contact_flow,
         ROW_NUMBER() OVER(PARTITION BY c.email ORDER BY c.ts_created) AS order_new_contact_prospect
@@ -177,8 +180,8 @@ contacts as (
 -----------------------------------------------------------------------------------------------------------
 results AS (
 SELECT
-    DATE(c.ts_contact) dt,
-    c.id_advertiser,
+    DATE(c.ts_contact) AS dt,
+    c.id_advertiser::INT,
     c.advertiser,
     c.uf_advertiser,
     c.city_advertiser,
@@ -199,7 +202,10 @@ SELECT
     c.id_house,
     c.email_md5 AS id_prospect,
     id_contact AS contact_flow,
-    0.0 AS cost
+    NULL::FLOAT AS budget_advertiser,
+    NULL::FLOAT AS cost,
+    NULL::FLOAT AS budget,
+    NULL::FLOAT AS contact_flow_target
 FROM
     contacts as c
     LEFT JOIN events evt
@@ -213,10 +219,95 @@ FROM
       and LOWER(COALESCE(t.branded, '')) = LOWER(COALESCE(evt.branded, ''))
 WHERE DATE(c.ts_contact) BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND DATE_ADD('DAY', -1, CURRENT_DATE)
 GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+),
+-------------------------------------------------------------
+-- Query targets from sheets and introduce NULLs for UNION --
+-------------------------------------------------------------
+targets AS (
+    SELECT
+        dt_target AS dt,
+        NULL::INT AS id_advertiser,
+        NULL::TEXT AS advertiser,
+        NULL::TEXT AS uf_advertiser,
+        NULL::TEXT AS city_advertiser,
+        NULL::TEXT AS type_advertiser,
+        NULL::TEXT AS business_context,
+        NULL::TEXT AS uf_listing,
+        NULL::TEXT AS city_listing,
+        NULL::TEXT AS mkt_origin,
+        NULL::TEXT AS mkt_channel,
+        mkt_medium,
+        mkt_source,
+        'portal' AS mkt_business,
+        NULL::TEXT AS city_group,
+        NULL::TEXT AS utm_campaign,
+        NULL::TEXT AS campaign_name,
+        NULL::INT AS order_new_contact_flow,
+        NULL::INT AS order_new_contact_prospect,
+        NULL::TEXT AS id_house,
+        NULL::TEXT AS id_prospect,
+        NULL::TEXT AS contact_flow,
+        NULL::FLOAT AS budget_advertiser,
+        NULL::FLOAT AS cost,
+        SUM(cost_target) AS budget,
+        SUM(contact_flow_target) AS contact_flow_target
+    FROM datalake_gsheets_clean_prod.targets_portal_casa_mineira_cost_cf
+    WHERE dt_target BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND DATE_ADD('DAY', -1, CURRENT_DATE)
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
+),
+info_budget AS (
+    SELECT  
+        b.id_real_estate_agency::INT,
+        b.ts_created,
+        r.ts_disabled,
+        b.budget_value,
+        r.real_estate_agency_name,
+        uf.uf_initials,
+        ct.city_name,
+        LEAD(b.ts_created) OVER(PARTITION BY b.id_real_estate_agency ORDER BY b.ts_created) AS ts_next_change
+    FROM datalake_casa_mineira_portal_clean_prod.real_estate_agency_budget b
+        JOIN datalake_casa_mineira_portal_clean_prod.real_estate_agency r
+            ON r.id=b.id_real_estate_agency
+        LEFT JOIN datalake_casa_mineira_portal_clean_prod.city AS ct
+            ON r.id_city = ct.id
+        LEFT JOIN datalake_casa_mineira_portal_clean_prod.uf AS uf
+            ON ct.id_uf = uf.id
+),
+budget as (
+    SELECT
+        date AS dt,
+        id_real_estate_agency AS id_advertiser,
+        real_estate_agency_name AS advertiser,
+        uf_initials AS uf_advertiser,
+        city_name AS city_advertiser,
+        NULL::TEXT AS type_advertiser,
+        NULL::TEXT AS business_context,
+        NULL::TEXT AS uf_listing,
+        NULL::TEXT AS city_listing,
+        NULL::TEXT AS mkt_origin,
+        NULL::TEXT AS mkt_channel,
+        NULL::TEXT AS mkt_medium,
+        NULL::TEXT AS mkt_source,
+        'portal' AS mkt_business,
+        NULL::TEXT AS city_group,
+        NULL::TEXT AS utm_campaign,
+        NULL::TEXT AS campaign_name,
+        NULL::INT AS order_new_contact_flow,
+        NULL::INT AS order_new_contact_prospect,
+        NULL::TEXT AS id_house,
+        NULL::TEXT AS id_prospect,
+        NULL::TEXT AS contact_flow,
+        budget_value / (DATE_DIFF('DAY', month_start, month_end) + 1)::FLOAT AS budget_advertiser,
+        NULL::FLOAT AS cost,
+        NULL::FLOAT AS budget,
+        NULL::FLOAT AS contact_flow_target
+    FROM info_budget b
+        JOIN dim_date
+            ON date BETWEEN ts_created::DATE AND COALESCE(ts_next_change::DATE, ts_disabled::DATE, CURRENT_DATE) - 1
 )
------------------------------
--- UNION Costs and Results --
------------------------------
+---------------------------------------------------------
+-- UNION Costs, Results, Targets and Advertiser Budget --
+---------------------------------------------------------
 SELECT
     r.*
 FROM
@@ -228,3 +319,17 @@ SELECT
     ct.*
 FROM
     costs AS ct
+
+UNION ALL
+
+SELECT
+    tgt.*
+FROM
+    targets AS tgt
+
+UNION ALL
+
+SELECT
+    bud.*
+FROM
+    budget AS bud
