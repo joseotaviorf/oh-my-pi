@@ -94,7 +94,8 @@ SELECT
     ELSE
       COUNT(DISTINCT CASE WHEN tp.interactions_order = 1 THEN tp.sk_client ELSE NULL END)
       / NULLIF(SUM(COUNT(DISTINCT CASE WHEN tp.interactions_order = 1 THEN tp.sk_client ELSE NULL END)) OVER(PARTITION BY dd.sk_date)::FLOAT, 0)
-  END AS share
+  END AS share,
+  'demand' AS funnel_side
 FROM
   tenant_prospects AS tp
 FULL OUTER JOIN 
