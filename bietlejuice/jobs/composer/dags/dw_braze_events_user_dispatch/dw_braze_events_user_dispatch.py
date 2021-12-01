@@ -3,7 +3,7 @@ from pendulum import timezone
 import os
 
 from airflow.models import DAG, Variable
-from airflow.utils.helpers import chain
+from airflow.utils.helpers import chain, cross_downstream
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -83,22 +83,43 @@ task_group = DWTaskGroup(
 )
 
 for incremental_table_name in INCREMENTAL_TABLE_NAMES:
-    dw_task_group_incremental = task_group.build_dw_task_group(
+    task_group_staging_incremental = task_group.build_dw_staging_task_group(
+        table_name=incremental_table_name,
+        partitions=INCREMENTAL_PARTITIONS,
+        is_incremental=True,
+        extra_query_template_params=INCREMENTAL_QUERY_FILTERS,
+    )
+
+    task_group_incremental = task_group.build_dw_task_group(
         table_name=incremental_table_name,
         partitions=INCREMENTAL_PARTITIONS,
         spectrum_iam_role=spectrum_iam_role,
         is_incremental=True,
         extra_query_template_params=INCREMENTAL_QUERY_FILTERS,
     )
-    chain(create_cluster_task, DWTaskGroup.first_tasks(dw_task_group_incremental))
-    chain(DWTaskGroup.last_tasks(dw_task_group_incremental), terminate_cluster_task)
+
+    chain(create_cluster_task, DWTaskGroup.first_tasks(task_group_staging_incremental))
+    cross_downstream(
+        DWTaskGroup.last_tasks(task_group_staging_incremental),
+        DWTaskGroup.first_tasks(task_group_incremental),
+    )
+    chain(DWTaskGroup.last_tasks(task_group_incremental), terminate_cluster_task)
 
 for full_table_name in FULL_TABLE_NAMES:
-    dw_task_group_full = task_group.build_dw_task_group(
+    task_group_staging_full = task_group.build_dw_staging_task_group(
+        table_name=full_table_name, partitions=FULL_PARTITIONS, is_incremental=False
+    )
+
+    task_group_full = task_group.build_dw_task_group(
         table_name=full_table_name,
         partitions=FULL_PARTITIONS,
         spectrum_iam_role=spectrum_iam_role,
         is_incremental=False,
     )
-    chain(create_cluster_task, DWTaskGroup.first_tasks(dw_task_group_full))
-    chain(DWTaskGroup.last_tasks(dw_task_group_full), terminate_cluster_task)
+
+    chain(create_cluster_task, DWTaskGroup.first_tasks(task_group_staging_full))
+    cross_downstream(
+        DWTaskGroup.last_tasks(task_group_staging_full),
+        DWTaskGroup.first_tasks(task_group_full),
+    )
+    chain(DWTaskGroup.last_tasks(task_group_full), terminate_cluster_task)
