@@ -33,8 +33,13 @@ SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base"
 
 LOGS_OUTPUT_PATH = f"s3://{Variable.get('databricks_s3_bucket')}/logs/jobs/{DAG_ID}"
 
-CLUSTER_DESCRIPTION = Variable.get("databricks_small_memory_optimized_cluster", deserialize_json=True)
+CLUSTER_DESCRIPTION = Variable.get(
+    "databricks_small_memory_optimized_cluster", deserialize_json=True
+)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+CLUSTER_DESCRIPTION["spark_conf"].update(
+    {"spark.sql.autoBroadcastJoinThreshold": -1}
+)  # Turn off broadcast join
 
 dag = DAG(
     dag_id=DAG_ID,
