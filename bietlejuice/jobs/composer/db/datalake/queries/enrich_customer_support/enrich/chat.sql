@@ -18,7 +18,7 @@ WITH quinto_messenger_tickets AS (
       datalake_insider_clean.review r
     JOIN
       datalake_insider_clean.review_feature rf
-        ON r.id = rf.id
+        ON r.id = rf.id_review
     JOIN
       datalake_insider_clean.feature f
         ON rf.id_feature = f.id
