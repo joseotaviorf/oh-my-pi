@@ -25,6 +25,7 @@ CREATE TABLE sale.fact_closing_flows (
   sk_sale_transaction_paid_date BIGINT,
   --
   id_closing_specialist BIGINT,
+  id_legal_risk_analyst BIGINT,
   id_pre_specialist BIGINT,
   id_post_specialist BIGINT,
   id_start_financing_specialist BIGINT,

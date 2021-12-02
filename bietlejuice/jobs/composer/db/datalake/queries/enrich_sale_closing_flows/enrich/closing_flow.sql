@@ -4,6 +4,7 @@ SELECT
  fo.id_owner,
  fo.id_house,
  m.id_closing_specialist,
+ m.id_legal_risk_analyst,
  m.id_pre_specialist,
  m.id_post_specialist,
  m.id_start_financing_specialist,

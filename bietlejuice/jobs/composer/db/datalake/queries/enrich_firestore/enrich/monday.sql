@@ -25,6 +25,7 @@ SELECT
   CAST(REGEXP_EXTRACT(GET_JSON_OBJECT(moa.updated_message, '$.pessoas5.value'), '(\\w+)') AS BIGINT) AS id_real_estate_register_specialist,
   CAST(REGEXP_EXTRACT(GET_JSON_OBJECT(moa.updated_message, '$.lista_suspensa.value'), '(\\w+)') AS BIGINT) AS real_estate_register_office_number,
   CAST(REGEXP_EXTRACT(GET_JSON_OBJECT(moa.updated_message, '$.forma_de_pagamento4.value'), '(\\w+)') AS BIGINT) AS payment_method,
+  CAST(REGEXP_EXTRACT(GET_JSON_OBJECT(moa.updated_message, '$.status07.value'), '(\\w+)') AS BIGINT) AS payment_model,
   GET_JSON_OBJECT(moa.updated_message, '$.status06.value') AS credit_model,
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.numbers.value') AS FLOAT) AS offer_acceptance_probability,
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.valor_do_an_ncio.value') AS FLOAT) AS listing_sale_price,
@@ -48,6 +49,7 @@ SELECT
   GET_JSON_OBJECT(moa.updated_message, '$.status4.value') AS house_dilligence_status,
   GET_JSON_OBJECT(moa.updated_message, '$.status15.value') AS report_dilligence_status,
   GET_JSON_OBJECT(moa.updated_message, '$.status6.value') AS seller_dilligence_status,
+  GET_JSON_OBJECT(moa.updated_message, '$.dropdown1.value') AS diligence_appointment_reason,
   GET_JSON_OBJECT(moa.updated_message, '$.status.value') AS sale_agreement_status,
   GET_JSON_OBJECT(moa.updated_message, '$.ccv.value') AS payment_status,
   GET_JSON_OBJECT(moa.updated_message, '$.status2.value') AS seller_payment_status,
@@ -58,6 +60,7 @@ SELECT
   CAST(REGEXP_EXTRACT(GET_JSON_OBJECT(moa.updated_message, '$.motivos_de_descarte__dm_.value'), '(\\w+)') AS BIGINT) AS current_drop_reason,
   GET_JSON_OBJECT(moa.updated_message, '$.status47.value') AS house_occupant,
   GET_JSON_OBJECT(moa.updated_message, '$.status_12.value') AS land_tenure,
+  GET_JSON_OBJECT(moa.updated_message, '$.text07.value') AS tags_from_salesflow,
   COALESCE(CAST(GET_JSON_OBJECT(moa.updated_message, '$.iq_morando_.value') AS BOOLEAN), FALSE) AS has_seller_debt_payments,
   GET_JSON_OBJECT(moa.updated_message, '$.status80.value') AS has_operation_support,
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.id_im_vel6.value') AS DATE) AS dt_submitted,
@@ -118,6 +121,7 @@ SELECT
   moa.id_legal_risk_analyst,
   moa.real_estate_register_office_number,
   moa.payment_method,
+  moa.payment_model,
   moa.credit_model,
   moa.offer_acceptance_probability,
   moa.listing_sale_price,
@@ -141,6 +145,7 @@ SELECT
   moa.house_dilligence_status,
   moa.seller_dilligence_status,
   moa.report_dilligence_status,
+  moa.diligence_appointment_reason,
   moa.sale_agreement_status,
   moa.payment_status,
   moa.seller_payment_status,
@@ -158,6 +163,7 @@ SELECT
   END AS drop_reason_responsible,
   moa.house_occupant,
   moa.land_tenure,
+  moa.tags_from_salesflow,
   CASE
     WHEN moa.payment_method = 2 THEN 'Á vista'
     WHEN moa.payment_method = 3 THEN 'Á vista + FGTS'

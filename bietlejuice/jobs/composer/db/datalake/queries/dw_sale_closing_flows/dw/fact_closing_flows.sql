@@ -24,6 +24,7 @@ SELECT
   COALESCE(CAST(REPLACE(SUBSTRING(dt_sale_transacton_paid,1, 10),'-','') AS BIGINT), -1) AS sk_sale_transaction_paid_date,
   --
   id_closing_specialist,
+  id_legal_risk_analyst,
   id_pre_specialist,
   id_post_specialist,
   id_start_financing_specialist,
