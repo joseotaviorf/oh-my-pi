@@ -792,7 +792,8 @@ affiliates AS (
         datamarts.daily_target_volumes_supply str
     WHERE str.date < '2021-04-01'
         OR (str.date > '2021-04-01'
-        AND str.supply_origin NOT IN ('Owner PWA', 'Price Calculator', 'Price Calculator - Sale', 'New Channels'))
+        AND str.supply_origin NOT IN ('Price Calculator', 'Price Calculator - Sale', 'New Channels')
+        AND NOT(str.supply_origin='Owner PWA' AND str.supply_channel='Paid'))
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
 
   UNION ALL
@@ -897,7 +898,6 @@ SELECT
         WHEN mkt_origin = 'Doorman Sale' THEN 'Doorman'
         WHEN mkt_origin = 'Indica Aí - Agents Sale' THEN 'Indica Aí - Agents'
         WHEN mkt_origin = 'Indica Aí - General Sale' THEN 'Indica Aí - General'
-        WHEN mkt_origin = 'Price Calculator - Sale' THEN 'Price Calculator'
         WHEN mkt_origin IN ('CR', 'Autonomous Agent', 'Autonomuos Agent') THEN 'CIQ'
         ELSE mkt_origin
     END AS planning_mkt_channel,

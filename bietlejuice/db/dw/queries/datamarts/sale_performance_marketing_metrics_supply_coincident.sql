@@ -814,7 +814,8 @@ UNION ALL
     FROM targets
     WHERE sk_date < 20210401
     OR (sk_date >= 20210401
-        AND mkt_origin NOT IN ('Owner PWA', 'Price Calculator', 'New Channels'))
+        AND mkt_origin NOT IN ('Price Calculator', 'New Channels')
+        AND NOT(mkt_origin='Owner PWA' AND mkt_channel='Paid'))
 )
 
 UNION ALL
@@ -924,7 +925,6 @@ SELECT
         WHEN mkt_origin = 'Doorman Sale' THEN 'Doorman'
         WHEN mkt_origin = 'Indica Aí - Agents Sale' THEN 'Indica Aí - Agents'
         WHEN mkt_origin = 'Indica Aí - General Sale' THEN 'Indica Aí - General'
-        WHEN mkt_origin = 'Price Calculator - Sale' THEN 'Price Calculator'
         WHEN mkt_origin IN ('CR', 'Autonomous Agent', 'Autonomuos Agent') THEN 'CIQ'
         ELSE mkt_origin
     END AS planning_mkt_channel,
