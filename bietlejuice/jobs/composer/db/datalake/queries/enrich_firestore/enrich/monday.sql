@@ -25,7 +25,7 @@ SELECT
   CAST(REGEXP_EXTRACT(GET_JSON_OBJECT(moa.updated_message, '$.pessoas5.value'), '(\\w+)') AS BIGINT) AS id_real_estate_register_specialist,
   CAST(REGEXP_EXTRACT(GET_JSON_OBJECT(moa.updated_message, '$.lista_suspensa.value'), '(\\w+)') AS BIGINT) AS real_estate_register_office_number,
   CAST(REGEXP_EXTRACT(GET_JSON_OBJECT(moa.updated_message, '$.forma_de_pagamento4.value'), '(\\w+)') AS BIGINT) AS payment_method,
-  CAST(REGEXP_EXTRACT(GET_JSON_OBJECT(moa.updated_message, '$.status07.value'), '(\\w+)') AS BIGINT) AS payment_model,
+  REGEXP_EXTRACT(GET_JSON_OBJECT(moa.updated_message, '$.status07.value'), '(\\w+)')) AS payment_model,
   GET_JSON_OBJECT(moa.updated_message, '$.status06.value') AS credit_model,
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.numbers.value') AS FLOAT) AS offer_acceptance_probability,
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.valor_do_an_ncio.value') AS FLOAT) AS listing_sale_price,
