@@ -24,7 +24,7 @@ SOURCE = "lost_listings"
 CONTEXT = "marketing_segmentations"
 DAG_NAME = f"enrich_{SOURCE}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-MAIN_START_DATE = datetime(2021, 11, 1, tzinfo=timezone("America/Sao_Paulo"))
+MAIN_START_DATE = datetime(2021, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 10 * * *"
 
 config_service = ConfigurationService(DAG_NAME)
@@ -42,7 +42,9 @@ table_name = config_service.get_config("table_name")
 partition_cols = config_service.get_config("partition_cols")
 
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-ENRICH_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{DAG_NAME}/load_{SOURCE}_enrich.py"
+ENRICH_SPARK_JOB_PATH = (
+    f"{databricks_bietlejuice_repo_path}/spark_jobs/{DAG_NAME}/load_{SOURCE}_enrich.py"
+)
 
 # cluster setup
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
@@ -57,6 +59,7 @@ dag = DAG(
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
+    catchup=True,
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
     doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
