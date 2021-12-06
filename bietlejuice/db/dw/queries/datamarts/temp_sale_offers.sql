@@ -161,7 +161,7 @@ vendas_flow_type AS (
             ON sf.id = o.id_sales_flow AND sf.row=1
     GROUP BY 1,2
 ),
- vendas_offers AS (
+vendas_offers AS (
     WITH last_offer_entry AS (
         SELECT 
             ROW_NUMBER() OVER (PARTITION BY id_firestore ORDER BY ts_updated DESC) AS row,
@@ -204,26 +204,7 @@ vendas_specialists AS (
         tl.specialist_name AS team_lead_name,
         tl.email AS team_lead_email,
         tl.id_main_user AS sk_user_team_lead,
-        tl.id_specialist AS sk_team_lead, 
-        
-        CASE 
-            WHEN deal_maker_email IN ('daniel.fernandes@corretores.quintoandar.com.br','eduardo.marcello@corretores.quintoandar.com.br','josue.junior@corretores.quintoandar.com.br',
-            'karina.nAScimento@corretores.quintoandar.com.br','leandro.falveno@corretores.quintoandar.com.br','renato.lacerda@corretores.quintoandar.com.br','roberta.brisolla@corretores.quintoandar.com.br',
-            'vinicius.dias@corretores.quintoandar.com.br','claudia.moraes@corretores.quintoandar.com.br','izidro.martins@corretores.quintoandar.com.br','julio.linhares@corretores.quintoandar.com.br',
-            'leonardo.monteiro@corretores.quintoandar.com.br','rafael.maciel@corretores.quintoandar.com.br','raquel.xavier@corretores.quintoandar.com.br','silvana.sousa@corretores.quintoandar.com.br',
-            'tiago.lopes@corretores.quintoandar.com.br') THEN true
-            ELSE false 
-        END AS is_offer_portfolio,
-            
-        CASE 
-            WHEN deal_maker_email IN ('daniel.fernandes@corretores.quintoandar.com.br','eduardo.marcello@corretores.quintoandar.com.br','josue.junior@corretores.quintoandar.com.br',
-            'karina.nAScimento@corretores.quintoandar.com.br','leandro.falveno@corretores.quintoandar.com.br','renato.lacerda@corretores.quintoandar.com.br','roberta.brisolla@corretores.quintoandar.com.br',
-            'vinicius.dias@corretores.quintoandar.com.br') THEN to_date('2021-11-01','yyyy-mm-dd') 
-            WHEN deal_maker_email IN ('claudia.moraes@corretores.quintoandar.com.br','izidro.martins@corretores.quintoandar.com.br','julio.linhares@corretores.quintoandar.com.br',
-            'leonardo.monteiro@corretores.quintoandar.com.br','rafael.maciel@corretores.quintoandar.com.br','raquel.xavier@corretores.quintoandar.com.br','silvana.sousa@corretores.quintoandar.com.br',
-            'tiago.lopes@corretores.quintoandar.com.br') THEN to_date('2021-11-04','yyyy-mm-dd')
-        END AS offer_portfolio_start_date
-        
+        tl.id_specialist AS sk_team_lead
     FROM 
         offers AS o
     LEFT JOIN 
@@ -280,8 +261,8 @@ monday_offers AS (
             dt_sale_agreement_signed,
             dt_sale_agreement_cancelled,
             REVERSE(REPLACE(REPLACE(SPLIT_PART(REVERSE(id_consultant),',',1),'[',''),']','')) AS last_id_consultant,
-            price_offered_by_buyer,
-            sale_price_agreed
+            sale_price_agreed,
+            price_offered_by_buyer
         FROM 
             datalake_firestore_prod.monday
     ),
@@ -346,9 +327,9 @@ data_sources AS (
         g.sk_house,
         g.sk_owner,
         g.ts_offer_created,
+        g.last_price_offered_by_buyer,
         g.sale_price,
         g.first_price_offered_by_buyer,
-        g.last_price_offered_by_buyer,
         COALESCE(rbo.sk_user_agent,-1) AS sk_user_agent,
         COALESCE(wc.sk_agent,-1) AS sk_agent,
         rbo.agent_name,
@@ -389,18 +370,7 @@ data_sources AS (
             WHEN vft.flow_type LIKE '%CENTRAL%' THEN 'CENTRAL'
             WHEN vft.flow_type = 'DEFAULT' THEN 'DEAL_MAKING' 
         END AS vendas_offer_flow,
-        CASE 
-            WHEN vs.is_offer_portfolio THEN 'PORTFOLIO_NEGOCIACAO'
-            WHEN ohc.id_offer IS NOT NULL THEN 
-                (CASE 
-                    WHEN ohc.offer_model IS NOT NULL THEN UPPER(ohc.offer_model)
-                    ELSE 'GSHEETS'
-                 END)
-            WHEN vo.sk_offer IS NOT NULL THEN 'VENDAS'
-            WHEN mo.sk_offer IS NOT NULL THEN 'MONDAY'
-            WHEN g.sk_offer IS NOT NULL THEN 'GIROFFER'
-            ELSE 'NOT DEFINED' 
-        END AS offer_platform,
+        ohc.offer_model AS ohc_offer_model,
         ohc.executive AS ohc_deal_maker_name,
         ohc.executive_lead AS ohc_team_lead_name,
         ohc.sale_price_agreed AS ohc_sale_price_agreed,
@@ -412,12 +382,11 @@ data_sources AS (
         to_char(vo.ts_accepted,'yyyymmdd')::INT vo_sk_offer_accepted_date,
         to_char(vo.ts_discarded,'yyyymmdd')::INT AS vo_sk_offer_dismissed_date,
         to_char(vccv.ts_signed,'yyyymmdd')::INT AS vccv_sk_sale_agreement_signed_date,
-        to_char(offer_portfolio_start_date,'yyyymmdd')::INT AS sk_offer_portfolio_start_date,
         to_char(mo.dt_offer_accepted,'yyyymmdd')::INT mo_sk_offer_accepted_date,
         to_char(mo.dt_offer_dismissed,'yyyymmdd')::INT AS mo_sk_offer_dismissed_date,
         to_char(mo.dt_sale_agreement_signed,'yyyymmdd')::INT AS mo_sk_sale_agreement_signed_date,
-        is_offer_portfolio,
         vo.status AS vendas_offer_status,
+        vo.sk_offer AS vo_sk_offer,
         vo.id_sales_flow AS sk_sales_flow,
         vs.deal_maker_name AS vo_deal_maker_name,
         vs.team_lead_name AS vo_team_lead_name,
@@ -431,8 +400,9 @@ data_sources AS (
             WHEN mo.sk_deal_maker IS NOT NULL THEN 'ID_MONDAY_' || mo.sk_deal_maker 
         END AS mo_sk_deal_maker,
         mo.status AS monday_offer_status,
-        mo.deal_maker_name AS mo_deal_maker_name,
         mo.price_offered_by_buyer AS mo_price_offered_by_buyer,
+        mo.sk_offer AS mo_sk_offer,
+        mo.deal_maker_name AS mo_deal_maker_name,
         mo.sale_price_agreed AS mo_sale_price_agreed
     FROM 
         giroffer AS g
@@ -475,11 +445,10 @@ business_rules AS (
         COALESCE(ds.sk_agent,-1) AS sk_agent,
         CASE 
             WHEN ds.ohc_offer_flow IS NOT NULL THEN ds.ohc_offer_flow -- Offers que estão na planilha de trabalho
-            WHEN ds.is_offer_portfolio = true THEN 'HUB' -- Offers que estão no portfólio de negociação
             WHEN mo_sk_deal_maker IS NOT NULL THEN 'DEAL_MAKING' -- Offers que tem deal maker Associado
             WHEN ds.vendas_offer_flow = 'DEAL_MAKING' THEN 'DEAL_MAKING' -- Offers que não estão na planilha de trabalho e o Vendas diz ser DM
-            WHEN ds.offer_platform = 'MONDAY' THEN 'DEAL_MAKING' -- Offers que não estão na planiha de trabalho e estão apenas no monday
-            ELSE 'NOT DEFINED' -- Offers que não estão na planilha de trabalho, não foram atribuidAS a um deal maker e possuem offer_flows diferentes de DM no Vendas.
+            WHEN ds.mo_sk_offer IS NOT NULL AND COALESCE(ds.vo_sk_offer,ds.ohc_sk_offer) IS NULL THEN 'DEAL_MAKING' -- Offers que não estão na planiha de trabalho e estão apenas no monday
+            ELSE COALESCE(ds.vendas_offer_flow,'NOT DEFINED') -- Offers que não estão na planilha de trabalho, não foram atribuidas a um deal maker e possuem offer_flows diferentes de DM no Vendas.
         END AS offer_flow,
         REPLACE(UPPER(
             CASE 
@@ -487,16 +456,41 @@ business_rules AS (
                 WHEN offer_flow = 'CENTRAL' AND dr.city_group = 'RMSP' THEN 'CENTRAL SP'
                 WHEN offer_flow = 'CENTRAL' AND dr.city_group = 'Rio de Janeiro' THEN 'CENTRAL RJ'
                 WHEN offer_flow = 'CENTRAL' THEN 'CENTRAL NO INFO'
-                WHEN offer_flow = 'HUB' THEN (CASE WHEN ds.ohc_offer_flow_detail is null AND offer_platform = 'PORTFOLIO_NEGOCIACAO' THEN wc_hub_name_ajs ELSE ds.ohc_offer_flow_detail END)
+                WHEN offer_flow = 'HUB' THEN (CASE WHEN ds.ohc_offer_flow_detail IS NULL AND ds.vo_sk_offer IS NOT NULL THEN wc_hub_name_ajs ELSE ds.ohc_offer_flow_detail END)
                 ELSE offer_flow 
             END
         ), '  ',' ') AS business_unit,
+        CASE 
+            WHEN business_unit = 'HUB PERDIZES' THEN 20211101
+            WHEN business_unit = 'HUB BELA VISTA' THEN 20211104
+            WHEN business_unit in ('HUB RIO DE JANEIRO','HUB VILA MADALENA','HUB SANTANA','HUB BROOKLIN') THEN 20211201
+            WHEN business_unit = 'HUB PORTO ALEGRE' THEN 20211203
+            WHEN business_unit in ('HUB SAÚDE','HUB VILA MARIANA','HUB TATUAPÉ')  THEN 20211207
+            WHEN business_unit in ('HUB BUTANTÃ') or offer_flow = 'HUB'  THEN 20211209
+            WHEN offer_flow = 'HUB'  THEN 20220101
+        END AS sk_offer_portfolio_start_date,
+        CASE 
+            WHEN vo_sk_team_lead IS NOT NULL AND to_char(GETDATE(),'yyyymmdd')::INT >= sk_offer_portfolio_start_date THEN true
+            ELSE false
+        END AS is_offer_portfolio,
+        CASE 
+            WHEN is_offer_portfolio THEN 'PORTFOLIO_NEGOCIACAO'
+            WHEN ds.ohc_sk_offer IS NOT NULL THEN 
+                (CASE 
+                    WHEN ds.ohc_offer_model IS NOT NULL THEN UPPER(ds.ohc_offer_model)
+                    ELSE 'GSHEETS'
+                 END)
+            WHEN ds.vo_sk_offer IS NOT NULL THEN 'VENDAS'
+            WHEN ds.mo_sk_offer IS NOT NULL THEN 'MONDAY'
+            WHEN ds.sk_offer IS NOT NULL THEN 'GIROFFER'
+            ELSE 'NOT DEFINED' 
+        END AS offer_platform,
         ohc_offer_flow_detail,
         COALESCE(ds.g_sk_offer_submitted_date, ds.ohc_sk_offer_submitted_date,-1) AS sk_offer_submitted_date,
         CASE 
             WHEN offer_flow IN ('HUB','CENTRAL') THEN (
                     CASE 
-                        WHEN ds.is_offer_portfolio AND sk_offer_submitted_date >= sk_offer_portfolio_start_date THEN COALESCE(ds.vo_sk_offer_accepted_date,ds.ohc_sk_offer_accepted_date,-1) 
+                        WHEN is_offer_portfolio AND sk_offer_submitted_date >= sk_offer_portfolio_start_date THEN COALESCE(ds.vo_sk_offer_accepted_date,ds.ohc_sk_offer_accepted_date,-1) 
                         ELSE COALESCE(ds.ohc_sk_offer_accepted_date,ds.vo_sk_offer_accepted_date,-1) 
                     END) 
             ELSE COALESCE(ds.mo_sk_offer_accepted_date,ds.vo_sk_offer_accepted_date,-1) 
@@ -504,7 +498,7 @@ business_rules AS (
         CASE 
             WHEN offer_flow IN ('HUB','CENTRAL') THEN (
                     CASE
-                        WHEN ds.is_offer_portfolio AND sk_offer_submitted_date >= sk_offer_portfolio_start_date THEN COALESCE(ds.vo_sk_offer_dismissed_date,ds.ohc_sk_offer_dismissed_date,-1) 
+                        WHEN is_offer_portfolio AND sk_offer_submitted_date >= sk_offer_portfolio_start_date THEN COALESCE(ds.vo_sk_offer_dismissed_date,ds.ohc_sk_offer_dismissed_date,-1) 
                         ELSE COALESCE(ds.ohc_sk_offer_dismissed_date,ds.vo_sk_offer_dismissed_date,-1) 
                     END) 
             ELSE COALESCE(ds.mo_sk_offer_dismissed_date,ds.vo_sk_offer_dismissed_date,-1) 
@@ -512,7 +506,7 @@ business_rules AS (
         CASE
             WHEN offer_flow IN ('HUB','CENTRAL') THEN (
                     CASE
-                        WHEN ds.is_offer_portfolio AND sk_offer_submitted_date >= sk_offer_portfolio_start_date THEN COALESCE(ds.vccv_sk_sale_agreement_signed_date,ds.ohc_sk_sale_agreement_signed_date,-1) 
+                        WHEN is_offer_portfolio AND sk_offer_submitted_date >= sk_offer_portfolio_start_date THEN COALESCE(ds.vccv_sk_sale_agreement_signed_date,ds.ohc_sk_sale_agreement_signed_date,-1) 
                         ELSE COALESCE(ds.ohc_sk_sale_agreement_signed_date,ds.vccv_sk_sale_agreement_signed_date,-1)
                     END) 
             ELSE COALESCE(ds.mo_sk_sale_agreement_signed_date,ds.vccv_sk_sale_agreement_signed_date,-1) 
@@ -521,7 +515,7 @@ business_rules AS (
             CASE 
                 WHEN offer_flow IN ('HUB','CENTRAL') THEN (
                     CASE 
-                        WHEN ds.is_offer_portfolio AND sk_offer_submitted_date >= sk_offer_portfolio_start_date THEN ds.vendas_offer_status 
+                        WHEN is_offer_portfolio AND sk_offer_submitted_date >= sk_offer_portfolio_start_date THEN ds.vendas_offer_status 
                     ELSE COALESCE(ds.ohc_status,ds.vendas_offer_status) 
                 END) 
                 ELSE COALESCE(ds.monday_offer_status,ds.vendas_offer_status) 
@@ -529,13 +523,12 @@ business_rules AS (
         ) AS offer_status, 
         UPPER(ds.agent_name) AS agent_name,
         UPPER(ds.agent_work_contract) AS agent_work_contract,
-        ds.offer_platform,
         ds.vo_sk_team_lead AS id_team_lead,
         UPPER(
             CASE 
                 WHEN offer_flow IN ('HUB','CENTRAL') THEN (
                         CASE
-                            WHEN ds.is_offer_portfolio AND sk_offer_submitted_date >= sk_offer_portfolio_start_date THEN ds.vo_team_lead_name 
+                            WHEN is_offer_portfolio AND sk_offer_submitted_date >= sk_offer_portfolio_start_date THEN ds.vo_team_lead_name 
                             ELSE COALESCE(ds.ohc_team_lead_name,ds.vo_team_lead_name) 
                         END) 
                 ELSE ds.vo_team_lead_name 
@@ -550,25 +543,25 @@ business_rules AS (
             CASE 
                 WHEN offer_flow IN ('HUB','CENTRAL') THEN (
                     CASE 
-                        WHEN ds.is_offer_portfolio AND sk_offer_submitted_date >= sk_offer_portfolio_start_date THEN ds.vo_deal_maker_name 
+                        WHEN is_offer_portfolio AND sk_offer_submitted_date >= sk_offer_portfolio_start_date THEN ds.vo_deal_maker_name 
                         ELSE COALESCE(ds.ohc_deal_maker_name,ds.vo_deal_maker_name) 
                     END) 
                 ELSE COALESCE(ds.mo_deal_maker_name,ds.vo_deal_maker_name) 
             END
-        )  AS deal_maker_name,
-        sale_price,
-        COALESCE(ds.first_price_offered_by_buyer, ds.mo_price_offered_by_buyer) AS first_price_offered_by_buyer,
-        CASE
+        )  AS deal_maker_name, 
+        CASE 
             WHEN offer_flow IN ('HUB','CENTRAL') THEN (
                     CASE
-                        WHEN ds.is_offer_portfolio AND sk_offer_submitted_date >= sk_offer_portfolio_start_date THEN ds.last_price_offered_by_buyer 
+                        WHEN is_offer_portfolio AND sk_offer_submitted_date >= sk_offer_portfolio_start_date THEN ds.last_price_offered_by_buyer 
                         ELSE (CASE
                                 WHEN UPPER(ds.ohc_status) IN ('CONTRATO ASSINADO','DESCARTADO') THEN ds.ohc_sale_price_agreed 
                                 ELSE COALESCE(ds.last_price_offered_by_buyer,ds.ohc_sale_price_agreed) 
                               END)
                     END) 
             ELSE COALESCE(ds.last_price_offered_by_buyer,ds.mo_sale_price_agreed) 
-        END AS last_price_offered_by_buyer
+        END AS last_price_offered_by_buyer,
+        COALESCE(ds.first_price_offered_by_buyer, ds.mo_price_offered_by_buyer) AS first_price_offered_by_buyer,
+        ds.sale_price
     FROM 
         data_sources AS ds
     LEFT JOIN 
@@ -610,5 +603,5 @@ SELECT
         ELSE 1-1.00*last_price_offered_by_buyer/sale_price
     END AS last_discount_proposed,
     GETDATE() AS ts_load
-FROM
+FROM 
     business_rules
