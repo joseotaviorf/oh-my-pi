@@ -73,10 +73,11 @@ WITH call_tickets AS (
     total_minutes_front_to_open_back_ticket_time,
     ts_ticket_started AS ts_started,
     ts_ticket_ended AS ts_closed,
+    ts_ticket_ended AS ts_solved,
     NOW() AS ts_load
   FROM
     datalake_customer_support.call
-  GROUP BY 1,2,3,4,5,6,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37
+  GROUP BY 1,2,3,4,5,6,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38
 ),
 chat_tickets AS (
   SELECT
@@ -153,10 +154,11 @@ chat_tickets AS (
     total_minutes_front_to_open_back_ticket_time,
     ts_ticket_started AS ts_started,
     ts_ticket_ended AS ts_closed,
+    ts_ticket_ended AS ts_solved,
     NOW() AS ts_load
   FROM
     datalake_customer_support.chat
-  GROUP BY 1,2,3,4,5,6,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37
+  GROUP BY 1,2,3,4,5,6,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38
 ),
 email_tickets AS (
   SELECT
@@ -232,10 +234,11 @@ email_tickets AS (
     total_minutes_front_to_open_back_ticket_time,
     ts_ticket_started AS ts_started,
     ts_ticket_ended AS ts_closed,
+    ts_ticket_solved AS ts_solved,
     NOW() AS ts_load
   FROM 
     datalake_customer_support.email
-  GROUP BY 1,2,3,4,5,6,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37
+  GROUP BY 1,2,3,4,5,6,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38
 ),
 historical_call_tickets AS (
   SELECT
@@ -285,10 +288,11 @@ historical_call_tickets AS (
     NULL AS total_minutes_front_to_open_back_ticket_time,
     ts_ticket_started AS ts_started,
     ts_ticket_ended AS ts_closed,
+    ts_ticket_ended AS ts_solved,
     NOW() AS ts_load
   FROM
     datalake_customer_support.historical_call
-  GROUP BY 1,2,3,4,5,6,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37
+  GROUP BY 1,2,3,4,5,6,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38
 ),
 historical_chat_tickets AS (
   SELECT
@@ -363,10 +367,11 @@ historical_chat_tickets AS (
     NULL AS total_minutes_front_to_open_back_ticket_time,
     ts_ticket_started AS ts_started,
     ts_ticket_ended AS ts_closed,
+    ts_ticket_ended AS ts_solved,
     NOW() AS ts_load
   FROM
     datalake_customer_support.historical_chat
-  GROUP BY 1,2,3,4,5,6,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37
+  GROUP BY 1,2,3,4,5,6,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38
 )
 SELECT 
   *

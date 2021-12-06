@@ -268,5 +268,11 @@ columns:
       - datalake_customer_support.chat.ts_ticket_ended
       - datalake_customer_support.email.ts_ticket_ended
       - datalake_customer_support.historical_call.ts_ticket_ended
-      - datalake_customer_support.email.ts_ticket_ended
+      - datalake_customer_support.historical_chat.ts_ticket_ended
+  ts_solved:
+    lineage:
+      - datalake_customer_support.call.ts_ticket_ended
+      - datalake_customer_support.chat.ts_ticket_ended
+      - datalake_customer_support.email.ts_ticket_solved
+      - datalake_customer_support.historical_call.ts_ticket_ended
       - datalake_customer_support.historical_chat.ts_ticket_ended
