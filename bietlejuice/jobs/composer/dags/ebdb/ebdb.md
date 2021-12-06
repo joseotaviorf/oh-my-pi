@@ -129,13 +129,14 @@ Produces the following output tables:
     `pre_proposal`  
     `pre_proposal_aud`  
     `pre_proposal_condition`  
+    `proponent_info_resend_request` 
     `proponent_proposal`  
     `proponent_proposal_aud`  
     `proposal`  
     `proposal_aud`  
     `proposal_condition`  
     `proposal_condition_aud`  
-    `proposal_document`  
+    `proposal_document`
     `proposal_resident`  
     `rating_label`  
     `real_estate_agency_lead`  

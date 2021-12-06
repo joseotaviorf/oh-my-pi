@@ -1,0 +1,24 @@
+database_name: datalake_ebdb_clean
+table_name: proponent_info_resend_request
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.proponentinforesendrequest.id
+  id_proponent_proposal:
+    lineage:
+      - datalake_ebdb_raw.proponentinforesendrequest.proposalProponentId
+  id_proposal_document:
+    lineage:
+      - datalake_ebdb_raw.proponentinforesendrequest.proposalDocumentId
+  proponent_info_type:
+    lineage:
+      - datalake_ebdb_raw.proponentinforesendrequest.proponentInfoType
+  description:
+    lineage:
+      - datalake_ebdb_raw.proponentinforesendrequest.description
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.proponentinforesendrequest.criadoEm
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.proponentinforesendrequest.atualizadoEm
