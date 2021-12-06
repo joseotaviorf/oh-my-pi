@@ -1,6 +1,9 @@
 ## BigID
 ### Purpose
-Retrieves data from [BigID API](https://github.com/quintoandar/bigid-api-client-python). BigID is a data governance tool used to catalog product databases and automatically classify if their data is PII, sensitive, etc.
+Retrieves data from [BigID API](https://github.com/quintoandar/bigid-api-client-python).
+
+BigID is a data governance tool used to catalog product databases and automatically classify if 
+their data is PII, sensitive, etc.
 
 <details>
   <summary><strong> > DAG details (click to expand)</strong></summary>

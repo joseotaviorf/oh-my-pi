@@ -1,14 +1,19 @@
-## Enrich BigID
+## Catalog Product Entities
 
 ### Purpose
-
-Creates enriched tables for `BigID`.
 
 BigID is a data governance tool used to catalog product databases and automatically classify if 
 their data is PII, sensitive, etc.
 
-This enrich DAG output is used by the `catalog_product_entities` DAG to create product entities in 
-the data catalog. 
+This DAG pulls data from `datalake_bigid.bigid_product_entities_access_level`
+and sends it to Metadata Propagator. Then, Metadata Propagator will create those entities in our
+Data Catalog.
+
+The data used from `bigid_product_entities_access_level` is:
+
+* Database, table and column names,
+* If the columns have PII or sensitive information
+* The columns access level (Public, Restricted or Confidential)
 
 <details>
   <summary><strong> > DAG details (click to expand)</strong></summary>
@@ -19,9 +24,9 @@ Weekly. More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-Produces the following output tables (full load):
+Sends requests to Metadata Propagator with extracted data. The expected outputs are new entities in Apache Atlas.
 
-- `bigid_entities_access_level`
+There is no output in the Datalake or in the DW.
 
 ### Responsible Data Engineering Team
 
