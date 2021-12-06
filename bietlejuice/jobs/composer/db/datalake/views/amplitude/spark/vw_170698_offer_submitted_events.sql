@@ -7,7 +7,7 @@ AS
         STRING(TRIM(GET_JSON_OBJECT(event_properties, '$.house_id'))) AS id_house,
         STRING(TRIM(COALESCE(
             GET_JSON_OBJECT(event_properties, '$.offer_id'),
-            REGEXP_EXTRACT(GET_JSON_OBJECT(event_properties, '$.uri'),'(?<=\/(offer|aluguel)\/).*(?=\/)', 0)
+            REGEXP_EXTRACT(GET_JSON_OBJECT(event_properties, '$.uri'),'(?<=\/(offer|aluguel)\/).*?(?=\/)', 0)
         ))) AS id_firestore,
         STRING(GET_JSON_OBJECT(user_properties, '$.platform')) AS app_type,
         STRING(GET_JSON_OBJECT(user_properties, '$.utm_source')) AS utm_source,
