@@ -1,0 +1,43 @@
+---
+database_name: datalake_jaiminho_clean
+table_name: user_notifications
+columns:
+  id:
+    lineage:
+      - datalake_jaiminho_raw.user_notifications_view.id
+  id_user:
+    lineage:
+      - datalake_jaiminho_raw.user_notifications_view.user_id
+  id_event:
+    lineage:
+      - datalake_jaiminho_raw.user_notifications_view.event_id
+  action:
+    lineage:
+      - datalake_jaiminho_raw.user_notifications_view.action
+  status:
+    lineage:
+      - datalake_jaiminho_raw.user_notifications_view.status
+  channel:
+    lineage:
+      - datalake_jaiminho_raw.user_notifications_view.channel
+  tags:
+    lineage:
+      - datalake_jaiminho_raw.user_notifications_view.tags
+  ts_sent:
+    lineage:
+      - datalake_jaiminho_raw.user_notifications_view.sent_at
+  ts_created:
+    lineage:
+      - datalake_jaiminho_raw.user_notifications_view.created_at
+  ts_updated:
+    lineage:
+      - datalake_jaiminho_raw.user_notifications_view.updated_at
+  year:
+    lineage:
+      - datalake_jaiminho_raw.user_notifications_view.year
+  month:
+    lineage:
+      - datalake_jaiminho_raw.user_notifications_view.month
+  day:
+    lineage:
+      - datalake_jaiminho_raw.user_notifications_view.day
