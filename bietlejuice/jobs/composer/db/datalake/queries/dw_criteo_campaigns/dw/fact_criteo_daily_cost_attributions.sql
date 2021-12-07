@@ -7,14 +7,14 @@ SELECT
     cost,
     all_sales,
     revenue,
-    composition_win,
+    competition_win,
     cost_per_click,
     year,
     month,
     day,
     CURRENT_TIMESTAMP AS ts_load
 FROM
-    datalake_marketing_costs_clean.criteo_campaigns
+    datalake_criteo_campaigns_clean.criteo_campaigns
 WHERE
     year = {year}
     AND month = {month}

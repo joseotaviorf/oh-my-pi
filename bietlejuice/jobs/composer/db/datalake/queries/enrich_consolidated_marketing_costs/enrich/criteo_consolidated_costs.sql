@@ -6,7 +6,7 @@ SELECT
     cost AS other_cost,
     cost AS total_cost
 FROM
-    datalake_marketing_costs_clean.criteo_campaigns
+    datalake_criteo_campaigns_clean.criteo_campaigns
 WHERE
     year = {year}
     AND month = {month}

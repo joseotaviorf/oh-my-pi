@@ -1,0 +1,23 @@
+---
+raw_partition_cols: ["year", "month", "day"]
+table_name: criteo_campaigns
+request_headers:
+  Content-Type: "application/json"
+  Accept: "application/octet-stream"
+request_body:
+  startDate: ""
+  endDate: ""
+  dimensions: ["AdsetId", "Day", "Advertiser"]
+  metrics: [
+    "Clicks",
+    "Displays",
+    "Audience",
+    "AdvertiserCost",
+    "SalesAllPc1d",
+    "RevenueGeneratedPc1d",
+    "OverallCompetitionWin",
+    "ECpc",
+  ]
+  format: json
+  timezone: GMT
+  currency: BRL

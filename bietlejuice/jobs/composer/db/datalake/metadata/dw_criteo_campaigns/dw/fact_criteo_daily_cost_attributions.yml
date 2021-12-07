@@ -3,43 +3,43 @@ table_name: fact_criteo_daily_cost_attributions
 columns:
   sk_criteo_campaign:
     lineage:
-      - datalake_marketing_costs_clean.criteo_campaigns.id_campaign
-      - datalake_marketing_costs_clean.criteo_campaigns.campaign_name
+      - datalake_criteo_campaigns_clean.criteo_campaigns.id_campaign
+      - datalake_criteo_campaigns_clean.criteo_campaigns.campaign_name
   sk_date:
     lineage:
-      - datalake_marketing_costs_clean.criteo_campaigns.day
-      - datalake_marketing_costs_clean.criteo_campaigns.month
-      - datalake_marketing_costs_clean.criteo_campaigns.year
+      - datalake_criteo_campaigns_clean.criteo_campaigns.day
+      - datalake_criteo_campaigns_clean.criteo_campaigns.month
+      - datalake_criteo_campaigns_clean.criteo_campaigns.year
   clicks:
     lineage:
-      - datalake_marketing_costs_clean.criteo_campaigns.clicks
+      - datalake_criteo_campaigns_clean.criteo_campaigns.clicks
   impressions:
     lineage:
-      - datalake_marketing_costs_clean.criteo_campaigns.impressions
+      - datalake_criteo_campaigns_clean.criteo_campaigns.impressions
   audience:
     lineage:
-      - datalake_marketing_costs_clean.criteo_campaigns.audience
+      - datalake_criteo_campaigns_clean.criteo_campaigns.audience
   cost:
     lineage:
-      - datalake_marketing_costs_clean.criteo_campaigns.cost
+      - datalake_criteo_campaigns_clean.criteo_campaigns.cost
   all_sales:
     lineage:
-      - datalake_marketing_costs_clean.criteo_campaigns.all_sales
+      - datalake_criteo_campaigns_clean.criteo_campaigns.all_sales
   revenue:
     lineage:
-      - datalake_marketing_costs_clean.criteo_campaigns.revenue
-  composition_win:
+      - datalake_criteo_campaigns_clean.criteo_campaigns.revenue
+  competition_win:
     lineage:
-      - datalake_marketing_costs_clean.criteo_campaigns.composition_win
+      - datalake_criteo_campaigns_clean.criteo_campaigns.competition_win
   cost_per_click:
     lineage:
-      - datalake_marketing_costs_clean.criteo_campaigns.cost_per_click
+      - datalake_criteo_campaigns_clean.criteo_campaigns.cost_per_click
   year:
     lineage:
-      - datalake_marketing_costs_clean.criteo_campaigns.year
+      - datalake_criteo_campaigns_clean.criteo_campaigns.year
   month:
     lineage:
-      - datalake_marketing_costs_clean.criteo_campaigns.month
+      - datalake_criteo_campaigns_clean.criteo_campaigns.month
   day:
     lineage:
-      - datalake_marketing_costs_clean.criteo_campaigns.day
+      - datalake_criteo_campaigns_clean.criteo_campaigns.day

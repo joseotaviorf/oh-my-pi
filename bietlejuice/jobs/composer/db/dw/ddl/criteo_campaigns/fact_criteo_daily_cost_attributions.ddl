@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS criteo_campaigns.fact_criteo_daily_cost_attributions 
     cost DOUBLE PRECISION,
     all_sales VARCHAR,
     revenue DOUBLE PRECISION,
-    composition_win DOUBLE PRECISION,
+    competition_win DOUBLE PRECISION,
     cost_per_click DOUBLE PRECISION,
     ts_load TIMESTAMP
 );
