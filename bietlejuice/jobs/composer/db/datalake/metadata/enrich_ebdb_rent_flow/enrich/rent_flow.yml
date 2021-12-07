@@ -1,0 +1,79 @@
+database_name: datalake_ebdb_rent_flow
+table_name: rent_flow
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.contract.id_house
+      - datalake_ebdb_clean.house.id
+  id_booking:
+    lineage:
+      - datalake_ebdb_clean.booking.id
+  id_owner:
+    lineage:
+      - datalake_ebdb_clean.house.id_user
+  id_user_agent:
+    lineage:
+      - datalake_ebdb_clean.user.id
+  id_client:
+    lineage:
+      - datalake_ebdb_clean.rent_flow.id_client
+  id_visit:
+    lineage:
+      - datalake_ebdb_clean.visit.id
+  id_rent_flow:
+    lineage:
+      - datalake_ebdb_clean.rent_flow.id
+  id_offer:
+    lineage:
+      - datalake_ebdb_clean.proposal.id_offer
+      - datalake_ebdb_clean.offer.id
+  id_pre_proposal:
+    lineage:
+      - datalake_ebdb_clean.proposal.id_pre_proposal
+      - datalake_ebdb_clean.pre_proposal.id
+  id_proposal:
+    lineage:
+      - datalake_ebdb_clean.contract.id_proposal
+      - datalake_ebdb_clean.proposal.id
+  id_contract:
+    lineage:
+      - datalake_ebdb_clean.contract.id
+  visit_created_type:
+    lineage:
+      - datalake_ebdb_clean.visit_origin.name
+  is_visit_created_from_app:
+    lineage:
+      - datalake_ebdb_clean.visit_origin.is_app
+  is_visit_last_updated_from_app:
+    lineage:
+      - datalake_ebdb_clean.visit_origin.is_app
+  dt_proposal_approved:
+    lineage:
+      - datalake_ebdb_clean.proposal.ts_approved
+  dt_house_first_listing:
+    lineage:
+      - datalake_ebdb_clean.house.dt_first_publication
+  dt_booking_created:
+    lineage:
+      - datalake_ebdb_clean.booking.ts_created
+  dt_visit:
+    lineage:
+      - datalake_ebdb_clean.booking.dt_booking
+  dt_client_sign_up:
+    lineage:
+      - datalake_ebdb_clean.user.ts_created
+  dt_agent_sign_up:
+    lineage:
+      - datalake_ebdb_clean.user.ts_created
+  dt_rent_flow_created:
+    lineage:
+      - datalake_ebdb_clean.rent_flow.ts_created
+  dt_contract_created:
+    lineage:
+      - datalake_ebdb_clean.contract.ts_created
+  dt_contract_signed:
+    lineage:
+      - datalake_ebdb_clean.contract.ts_signed
+  dt_contract_annulment:
+    lineage:
+      - datalake_ebdb_clean.contract.dt_termination
