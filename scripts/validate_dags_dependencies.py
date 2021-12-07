@@ -1,8 +1,9 @@
 import os.path
 import re
 import sys
-from os.path import isfile
+import glob
 
+from typing import List
 
 BI_ETL_EJUICE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BI_ETL_EJUICE_ROOT)
@@ -10,6 +11,8 @@ sys.path.append(BI_ETL_EJUICE_ROOT)
 from bietlejuice.jobs.composer.base.db import QUERIES_DATALAKE_PATH
 from bietlejuice.jobs.composer.dags import COMPOSER_DAGS_PATH
 from bietlejuice.jobs.composer.services import FileService, ConfigurationService
+
+LAYERS = ['clean','enrich','dw','raw']
 
 PRINT_ALL_PARSING_ERRORS = False
 COMPOSER_FILES_ROOT = f"{BI_ETL_EJUICE_ROOT}/bietlejuice/jobs/composer"
@@ -52,8 +55,7 @@ class CrossDAGDependenciesValidator:
         if table:
             self.invalid_entities[dag].append(table)
 
-    @staticmethod
-    def extract_dag_and_table_from_file(file_path):
+    def extract_dag_and_table_from_file(self,file_path):
         """
         Extracts the DAG and table names from the SparkSQL query file path.
 
@@ -63,22 +65,15 @@ class CrossDAGDependenciesValidator:
         :rtype: str, str
         """
         table_name = None
-        match = re.search(
-            "queries\/(\w*)\/(dw\/|enrich\/|clean\/|raw\/|incremental\/|full\/)*(\w*)\.sql",
-            file_path,
-        )
-        if match is None:
-            match_dag_name = re.search("queries\/(\w*)\/", file_path)
-            dag_name = match_dag_name.group(1)
+        queries_index = file_path.index('queries')
+        queries_path = file_path[queries_index:]
+        dag_items = queries_path.split('/')[1:]
+        if  dag_items[1] not in LAYERS:
+            dag_name = dag_items[0]
         else:
-            dag_name = match.group(1)
-            match_layer = re.search("(dw|enrich|clean|raw)", file_path)
-            if match_layer is None:
-                return dag_name, None
-
-            layer = match_layer.group(1)
-            table_name = f"{layer}:{match.group(3)}"
-
+            dag_name = self.build_dag_name(dag_items[:-1])
+            layer = dag_items[1]
+            table_name = f'{layer}:{dag_items[-1].replace(".sql","")}'
         return dag_name, table_name
 
     def load_tables_from_db_folder(self):
@@ -90,7 +85,7 @@ class CrossDAGDependenciesValidator:
         """
         all_query_files = FileService.list_all_files_recursively(QUERIES_DATALAKE_PATH)
         for file_path in all_query_files:
-            dag_name, table_name = self.extract_dag_and_table_from_file(file_path)
+            dag_name, table_name = self.extract_dag_and_table_from_file(file_path = file_path)
             if not table_name:
                 self.register_into_invalid_list(dag_name)
                 self.log_msg(
@@ -115,7 +110,6 @@ class CrossDAGDependenciesValidator:
         for dag_name in dependencies_dict.keys():
             match = re.search("bietlejuice\.(\w*)", dag_name)
             dependent_dags.append(match.group(1))
-
         return dependent_dags
 
     @staticmethod
@@ -154,7 +148,6 @@ class CrossDAGDependenciesValidator:
         layer = match_layer.group(1)
         table_name = match.group(3).replace("-", "_")
         table_name = f"{layer}:{table_name}"
-
         return dag_name, table_name
 
     def extract_dependency_dags_and_tables_from_dependencies(self, dependencies):
@@ -188,7 +181,6 @@ class CrossDAGDependenciesValidator:
                     match_dag_name = re.search("bietlejuice\.(.*)", dependency_name)
                     dag_name = match_dag_name.group(1)
                     dags_without_tasks_in_dependencies_file.append(dag_name)
-
         return dags_without_tasks_in_dependencies_file, tables_by_dag
 
     def get_tables_from_dependency_file(self):
@@ -214,6 +206,20 @@ class CrossDAGDependenciesValidator:
         return dags_without_tasks_in_dependencies_file, tables_by_dag
 
     @staticmethod
+    def build_dag_name(dag_items: List[str]) -> str:
+        """
+        Extracts the DAG name of the query file path.
+
+        :param dag_items: An array that contains the path of the dag splitted
+        :return: the name of the dag
+        """
+        dag_name = dag_items[0]
+        if len(dag_items) >= 3:
+            if dag_items[2] != 'full' and dag_items[2]!= 'incremental':
+                dag_name = dag_items[-1]
+        return dag_name
+
+    @staticmethod
     def dag_file_exists(dag_name):
         """
         Verifies if the DAG has a declaration file in the DAGs' path.
@@ -222,10 +228,9 @@ class CrossDAGDependenciesValidator:
         :type dag_name: str
         :rtype: bool
         """
-        dag_file = f"{COMPOSER_FILES_ROOT}/dags/{dag_name}/{dag_name}.py"
-
-        return isfile(dag_file)
-
+        dag_file = f"{COMPOSER_FILES_ROOT}/dags/**/{dag_name}.py"
+        validate_dag_file = glob.glob(dag_file, recursive= True)
+        return len(validate_dag_file) != 0 
     def table_query_exists(self, dag, table):
         """
         Verifies if the table has a respective query file.
