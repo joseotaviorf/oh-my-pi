@@ -1,0 +1,5 @@
+# Config for marketing_demand_supply_branding_costs
+---
+streams:
+  - direction: 'upstream'
+    task_ids: ['dw_marketing_demand_supply_branding_costs']
