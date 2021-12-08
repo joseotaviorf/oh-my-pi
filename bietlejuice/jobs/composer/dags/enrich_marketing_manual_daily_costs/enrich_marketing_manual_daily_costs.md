@@ -14,7 +14,7 @@ Daily after enrich layers. More information about run time [here]({chart_url}{da
 
 ### Outputs
 
-- `datalake_marketing_costs.datalake_marketing_costs.daily_costs`
+- `datalake_marketing_costs.daily_costs`
 
 ### Responsible Data Team
 ​

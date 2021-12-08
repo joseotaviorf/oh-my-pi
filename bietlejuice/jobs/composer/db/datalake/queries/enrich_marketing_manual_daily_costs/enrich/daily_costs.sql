@@ -32,8 +32,6 @@ manual_costs AS (
         cost_share_other
     FROM
         datalake_marketing_manual_daily_costs_clean.marketing_costs_manual_shared_costs
-    WHERE
-        DATE(dt_cost) = DATE('{year}-{month}-{day}')
 ),
 
 city_group_share_rules AS (
@@ -61,8 +59,6 @@ city_group_share_rules AS (
             ON INT(REPLACE(dt_cost, '-', '')) = r.id_date
             AND s.id_rule = r.id_rule
             AND s.side = r.funnel_side
-    WHERE
-        DATE(dt_cost) = DATE('{year}-{month}-{day}')
 ),
 
 enriched_manual_costs AS (
