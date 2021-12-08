@@ -46,6 +46,7 @@ WHERE
         'FollowUpVistoriaEntrada',
         'FollowUpVistoriaPreSaida',
         'FollowUpVistoriaSaida',
+        'InspectionRescheduled',
         'PrimeiraAnaliseVistoriaSaida',
         'SegundaAnaliseVistoriaSaida'
         )

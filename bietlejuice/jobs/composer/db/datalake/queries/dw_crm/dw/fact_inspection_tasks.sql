@@ -52,6 +52,7 @@ WITH contracts AS (
             'FollowUpVistoriaEntrada',
             'FollowUpVistoriaPreSaida',
             'FollowUpVistoriaSaida',
+            'InspectionRescheduled',
             'PrimeiraAnaliseVistoriaSaida',
             'SegundaAnaliseVistoriaSaida'
         ) 
