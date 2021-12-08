@@ -1,93 +1,4 @@
-WITH contract_with_rent_flow_portability AS (
-    SELECT
-        contract.id_house AS id_house,
-        house.dt_first_publication AS dt_house_first_listing,
-        NULL AS id_booking,
-        NULL AS dt_booking_created,
-        NULL AS dt_visit,
-        NULL AS is_visit_completed,
-        NULL AS is_visit_performed,
-        house.id_user AS id_owner,
-        NULL AS id_user_agent,
-        rf.id_client AS id_client,
-        NULL AS dt_client_sign_up,
-        NULL AS dt_agent_sign_up,
-        NULL AS id_visit,
-        NULL AS is_visit_created_from_app,
-        NULL AS visit_created_type,
-        NULL AS is_visit_last_updated_from_app,
-        rf.id AS id_rent_flow,
-        rf.ts_created AS dt_rent_flow_created,
-        proposal.id_offer AS id_offer,
-        NULL AS id_pre_proposal,
-        contract.id AS offer_id_contract,
-        NULL AS pp_id_contract,
-        contract.id_proposal AS id_proposal,
-        proposal.ts_approved AS dt_proposal_approved,
-        contract.id AS id_contract,
-        contract.ts_created AS dt_contract_created,
-        contract.ts_signed AS dt_contract_signed,
-        contract.dt_termination AS dt_contract_annulment
-    FROM datalake_ebdb_clean.contract
-    JOIN datalake_ebdb_clean.rent_flow rf
-        ON contract.id_house = rf.id_house
-        AND contract.id_user = rf.id_client
-    JOIN datalake_ebdb_clean.house
-        ON house.id = rf.id_house
-    JOIN datalake_ebdb_clean.portability
-        ON portability.id_flow = rf.id
-    LEFT JOIN datalake_ebdb_clean.proposal
-        ON contract.id_proposal = proposal.id
-    LEFT JOIN datalake_ebdb_clean.offer
-        ON offer.id = proposal.id_offer
-),
-contract_with_rent_flow AS (
-    SELECT
-        contract.id_house AS id_house,
-        house.dt_first_publication AS dt_house_first_listing,
-        NULL AS id_booking,
-        NULL AS dt_booking_created,
-        NULL AS dt_visit,
-        NULL AS is_visit_completed,
-        NULL AS is_visit_performed,
-        house.id_user AS id_owner,
-        NULL AS id_user_agent,
-        rf.id_client AS id_client,
-        NULL AS dt_client_sign_up,
-        NULL AS dt_agent_sign_up,
-        NULL AS id_visit,
-        NULL AS is_visit_created_from_app,
-        NULL AS visit_created_type,
-        NULL AS is_visit_last_updated_from_app,
-        rf.id AS id_rent_flow,
-        rf.ts_created AS dt_rent_flow_created,
-        proposal.id_offer AS id_offer,
-        proposal.id_pre_proposal AS id_pre_proposal,
-        NULL AS offer_id_contract,
-        contract.id AS pp_id_contract,
-        contract.id_proposal AS id_proposal,
-        proposal.ts_approved AS dt_proposal_approved,
-        contract.id AS id_contract,
-        contract.ts_created AS dt_contract_created,
-        contract.ts_signed AS dt_contract_signed,
-        contract.dt_termination AS dt_contract_annulment
-    FROM
-        datalake_ebdb_clean.contract
-    JOIN datalake_ebdb_clean.rent_flow rf
-        ON contract.id_house = rf.id_house
-        AND contract.id_user = rf.id_client
-    JOIN datalake_ebdb_clean.house
-        ON house.id = rf.id_house
-    LEFT JOIN datalake_ebdb_clean.proposal
-        ON contract.id_proposal = proposal.id
-    WHERE (proposal.id  IS NULL) OR
-        (
-            proposal.id  IS NOT NULL
-            AND proposal.id_offer  IS NULL
-            AND proposal.id_pre_proposal  IS NULL
-        )
-),
-rent_flow_offer_and_pre_proposal AS (
+WITH rent_flow_offer_and_pre_proposal AS (
     WITH pre_proposal_with_visits AS (
         SELECT
             pp.id AS id_pp,
@@ -341,30 +252,28 @@ rent_flow_offer_and_pre_proposal AS (
     )
     SELECT
         o.id_house,
-        o.dt_house_first_listing,
         o.id_booking,
-        o.dt_booking_created,
-        o.dt_visit,
-        o.is_visit_completed,
-        o.is_visit_performed,
         o.id_owner,
         o.id_user_agent,
         o.id_client,
-        o.dt_client_sign_up,
-        o.dt_agent_sign_up,
         o.id_visit,
-        o.is_visit_created_from_app,
-        o.visit_created_type,
-        o.is_visit_last_updated_from_app,
         o.id_rent_flow,
-        o.dt_rent_flow_created,
         o.id_offer,
         pp.id_pre_proposal,
-        o.id_contract AS offer_id_contract,
-        pp.id_contract AS pp_id_contract,
         COALESCE(o.id_proposal, pp.id_proposal) AS id_proposal,
-        COALESCE(o.dt_proposal_approved, pp.dt_proposal_approved) AS dt_proposal_approved,
         COALESCE(o.id_contract, pp.id_contract) AS id_contract,
+        o.visit_created_type,
+        o.is_visit_created_from_app,
+        o.is_visit_last_updated_from_app,
+        o.is_visit_completed,
+        o.is_visit_performed,
+        COALESCE(o.dt_proposal_approved, pp.dt_proposal_approved) AS dt_proposal_approved,
+        o.dt_house_first_listing,
+        o.dt_booking_created,
+        o.dt_visit,
+        o.dt_client_sign_up,
+        o.dt_agent_sign_up,
+        o.dt_rent_flow_created,
         COALESCE(o.dt_contract_created, pp.dt_contract_created) AS dt_contract_created,
         COALESCE(o.dt_contract_signed, pp.dt_contract_signed) AS dt_contract_signed,
         COALESCE(o.dt_contract_annulment, pp.dt_contract_annulment) AS dt_contract_annulment
@@ -373,6 +282,91 @@ rent_flow_offer_and_pre_proposal AS (
         ON pp.id_house = o.id_house
         AND pp.id_rent_flow = o.id_rent_flow
         AND IF(pp.id_booking IS NOT NULL, pp.id_booking = o.id_booking, TRUE)
+),
+contract_with_rent_flow_portability AS (
+    SELECT
+        contract.id_house AS id_house,
+        NULL AS id_booking,
+        house.id_user AS id_owner,
+        NULL AS id_user_agent,
+        rf.id_client AS id_client,
+        NULL AS id_visit,
+        rf.id AS id_rent_flow,
+        proposal.id_offer AS id_offer,
+        NULL AS id_pre_proposal,
+        contract.id_proposal AS id_proposal,
+        contract.id AS id_contract,
+        NULL AS visit_created_type,
+        NULL AS is_visit_created_from_app,
+        NULL AS is_visit_last_updated_from_app,
+        NULL AS is_visit_completed,
+        NULL AS is_visit_performed,
+        proposal.ts_approved AS dt_proposal_approved,
+        house.dt_first_publication AS dt_house_first_listing,
+        NULL AS dt_booking_created,
+        NULL AS dt_visit,
+        NULL AS dt_client_sign_up,
+        NULL AS dt_agent_sign_up,
+        rf.ts_created AS dt_rent_flow_created,
+        contract.ts_created AS dt_contract_created,
+        contract.ts_signed AS dt_contract_signed,
+        contract.dt_termination AS dt_contract_annulment
+    FROM datalake_ebdb_clean.contract
+    JOIN datalake_ebdb_clean.rent_flow rf
+        ON contract.id_house = rf.id_house
+        AND contract.id_user = rf.id_client
+    JOIN datalake_ebdb_clean.house
+        ON house.id = rf.id_house
+    JOIN datalake_ebdb_clean.portability
+        ON portability.id_flow = rf.id
+    LEFT JOIN datalake_ebdb_clean.proposal
+        ON contract.id_proposal = proposal.id
+    LEFT JOIN datalake_ebdb_clean.offer
+        ON offer.id = proposal.id_offer
+),
+contract_with_rent_flow AS (
+    SELECT
+        contract.id_house AS id_house,
+        NULL AS id_booking,
+        house.id_user AS id_owner,
+        NULL AS id_user_agent,
+        rf.id_client AS id_client,
+        NULL AS id_visit,
+        rf.id AS id_rent_flow,
+        proposal.id_offer AS id_offer,
+        proposal.id_pre_proposal AS id_pre_proposal,
+        contract.id_proposal AS id_proposal,
+        contract.id AS id_contract,
+        NULL AS visit_created_type,
+        NULL AS is_visit_created_from_app,
+        NULL AS is_visit_last_updated_from_app,
+        NULL AS is_visit_completed,
+        NULL AS is_visit_performed,
+        proposal.ts_approved AS dt_proposal_approved,
+        house.dt_first_publication AS dt_house_first_listing,
+        NULL AS dt_booking_created,
+        NULL AS dt_visit,
+        NULL AS dt_client_sign_up,
+        NULL AS dt_agent_sign_up,
+        rf.ts_created AS dt_rent_flow_created,
+        contract.ts_created AS dt_contract_created,
+        contract.ts_signed AS dt_contract_signed,
+        contract.dt_termination AS dt_contract_annulment
+    FROM
+        datalake_ebdb_clean.contract
+    JOIN datalake_ebdb_clean.rent_flow rf
+        ON contract.id_house = rf.id_house
+        AND contract.id_user = rf.id_client
+    JOIN datalake_ebdb_clean.house
+        ON house.id = rf.id_house
+    LEFT JOIN datalake_ebdb_clean.proposal
+        ON contract.id_proposal = proposal.id
+    WHERE (proposal.id  IS NULL) OR
+        (
+            proposal.id  IS NOT NULL
+            AND proposal.id_offer  IS NULL
+            AND proposal.id_pre_proposal  IS NULL
+        )
 ),
 all_rent_flows AS (
     SELECT * FROM rent_flow_offer_and_pre_proposal
