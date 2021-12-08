@@ -97,7 +97,7 @@ keywords_metrics AS (
         datalake_casa_mineira_google_ads_clean.keywords_performance_report gkpr
     JOIN
         report_type_mapping rtm
-            ON rtm.id_campaign = gkpr.id_campaign
+            ON rtm.campaign_name = gkpr.campaign_name
             AND rtm.ad_group_name = gkpr.ad_group_name
             AND rtm.report_type = 'KEYWORDS_PERFORMANCE_REPORT'
     WHERE
@@ -131,7 +131,7 @@ ads_metrics AS (
         datalake_casa_mineira_google_ads_clean.ads_performance_report gapr
     JOIN
         report_type_mapping rtm
-            ON rtm.id_campaign = gapr.id_campaign
+            ON rtm.campaign_name = gapr.campaign_name
             AND rtm.ad_group_name = gapr.ad_group_name
             AND rtm.report_type = 'AD_PERFORMANCE_REPORT'
     LEFT JOIN
@@ -168,7 +168,7 @@ campaigns_metrics AS (
         datalake_casa_mineira_google_ads_clean.campaigns_performance_report gcpr
     JOIN
         report_type_mapping rtm
-            ON rtm.id_campaign = gcpr.id_campaign
+            ON rtm.campaign_name = gcpr.campaign_name
             AND rtm.report_type = 'CAMPAIGN_PERFORMANCE_REPORT'
     WHERE
         dt_loaded = DATE('{year}-{month}-{day}')
@@ -201,7 +201,7 @@ videos_metrics AS (
         datalake_casa_mineira_google_ads_clean.videos_performance_report gvpr
     JOIN
         report_type_mapping rtm
-            ON rtm.id_campaign = gvpr.id_campaign
+            ON rtm.campaign_name = gvpr.campaign_name
             AND rtm.ad_group_name = gvpr.ad_group_name
             AND rtm.report_type = 'VIDEO_PERFORMANCE_REPORT'
     WHERE
