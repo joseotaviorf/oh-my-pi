@@ -1,4 +1,5 @@
 ---
+lineage_product_database_name: riskandmortgage
 tables:
   - table_name: bank_application
     date_filter_column: updated_at
