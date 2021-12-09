@@ -22,7 +22,7 @@ tables:
   - table_name: revinfo
     extraction_type: incremental
     date_filter_column: revtstmp
-    unixtime_measure: miliseconds
+    unixtime_measure: milliseconds
     clean_table_name: rev_info
   - table_name: unico_check_document
     extraction_type: incremental
