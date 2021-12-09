@@ -1,0 +1,19 @@
+---
+database_name: datalake_consolidated_marketing_metrics
+table_name: facebook_consolidated_metrics
+columns:
+  campaign_name:
+    lineage:
+      - datalake_facebook_insights_clean.facebook_insights.campaign_name
+  account_name:
+    lineage:
+      - datalake_facebook_insights_clean.facebook_insights.account_name
+  utm_campaign:
+    lineage:
+      - datalake_facebook_insights_clean.facebook_insights.campaign_name
+  utm_term:
+    lineage:
+      - datalake_facebook_insights_clean.facebook_insights.adset_name
+  utm_content:
+    lineage:
+      - datalake_facebook_insights_clean.facebook_insights.ad_name

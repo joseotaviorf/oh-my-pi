@@ -166,7 +166,6 @@ city_group_mappings AS (
             ON LOWER(mc.campaign_name) = LOWER(cgoch.campaign_name)
         LEFT JOIN datalake_region.region dr
             ON split(mc.campaign_name, '\\\\.')[0] = dr.id
-                AND mc.id_date >= 20210705
 )
 
 SELECT 

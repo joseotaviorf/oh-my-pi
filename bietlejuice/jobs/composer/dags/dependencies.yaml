@@ -526,6 +526,17 @@ bietlejuice.enrich_consolidated_marketing_costs:
   - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns
   - bietlejuice.rtb_campaigns:load-clean-rtb-campaigns
 
+bietlejuice.enrich_consolidated_marketing_metrics:
+  - bietlejuice.criteo_campaigns:load-clean-criteo-campaigns
+  - bietlejuice.enrich_marketing_costs_sharing_rules:load-old-sharing-rules-from-redshift-to-datalake
+  - bietlejuice.google_ads:load-clean-ads-performance-report
+  - bietlejuice.google_ads:load-clean-campaigns-performance-report
+  - bietlejuice.google_ads:load-clean-keywords-performance-report
+  - bietlejuice.google_ads:load-clean-videos-performance-report
+  - bietlejuice.lifull_campaigns:load-clean-mitula-campaigns
+  - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns
+  - bietlejuice.rtb_campaigns:load-clean-rtb-campaigns
+
 bietlejuice.enrich_credit_evers:
   - bietlejuice.enrich_invoice:load-enrich-credit-invoice-original-due-date
   - bietlejuice.enrich_invoice:load-enrich-credit-invoice
