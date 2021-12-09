@@ -1,4 +1,5 @@
 ---
+lineage_product_database_name: godfather
 schemas: [
   "audit",
   "business"
