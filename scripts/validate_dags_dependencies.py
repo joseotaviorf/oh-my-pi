@@ -210,12 +210,12 @@ class CrossDAGDependenciesValidator:
         """
         Extracts the DAG name of the query file path.
 
-        :param dag_items: An array that contains the path of the dag splitted
+        :param dag_items: An array that contains the path of the dag splitted e.g [risk_and_mortgage,clean, xpto.sql]
         :return: the name of the dag
         """
         dag_name = dag_items[0]
-        if len(dag_items) >= 3:
-            if dag_items[2] != 'full' and dag_items[2]!= 'incremental':
+        # This validation gets all folder who has legacy pattern using full and incremental and will get the dag name from subfolders
+        if len(dag_items) >= 3 and dag_items[2] not in ('full', 'incremental'):
                 dag_name = dag_items[-1]
         return dag_name
 
