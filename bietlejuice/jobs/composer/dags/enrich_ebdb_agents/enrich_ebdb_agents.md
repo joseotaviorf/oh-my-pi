@@ -14,6 +14,7 @@ Produces the following output tables, via full load:
 
 - `agent_business_context_history`
 - `agents_region`
+- `agents_review`
 - `agents_specific_weekly_schedule`
 - `agents_weekly_schedule_history`
 - `slots_base_time`
