@@ -1,4 +1,4 @@
-# Config for new_tenant_activations
+# Config for tenant_prospects_activations
 ---
 streams:
   - direction: 'upstream'
