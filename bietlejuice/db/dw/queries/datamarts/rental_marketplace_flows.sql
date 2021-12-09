@@ -363,31 +363,35 @@ tenant_prospect_interactions AS (
 activation_periods AS (
     SELECT
         status,
+        city_group,
         sk_client,
         ts_start,
         dd.date,
-        dd.week_start
+        dd.week_start,
+        MAX(ts_start) OVER(PARTITION BY sk_client, city_group, week_start) AS last_status_start
     FROM
         datamarts.tenant_prospect_status AS tps
         JOIN dim_date AS dd
             ON dd.sk_date BETWEEN sk_start_date
                                   AND COALESCE(sk_end_date::INT, TO_CHAR(CURRENT_DATE - 1, 'YYYYMMDD')::INT)
     WHERE
-        status = 'ACTIVE'
-        AND dd.week_start >= DATE('2019-12-30')
+        dd.week_start >= DATE('2019-12-30')
 ),
 active_tp_interactions AS (
     SELECT DISTINCT
         ap.week_start,
         tpi.sk_region,
         tpi.sk_house_listing,
-        tpi.sk_client
+        COALESCE(tpi.sk_client, ap.sk_client) AS sk_client
     FROM
         activation_periods AS ap
         LEFT JOIN tenant_prospect_interactions AS tpi
             ON ap.sk_client = tpi.sk_client
-            AND DATEDIFF('DAY', tpi.dt_event, ap.date) BETWEEN 0 AND 35 --Tenant Prospects are considered "active" if their last rent flow occurred within 35 days
-)
+            AND DATEDIFF('DAY', tpi.dt_event, ap.date) BETWEEN 0 AND 28 --Tenant Prospects are considered "active" if their last rent flow occurred within 28 days
+    		AND tpi.dt_event >= ap.ts_start
+    WHERE ts_start = last_status_start
+         AND city_group IS NOT NULL
+         AND status = 'ACTIVE')
 ----------------------------------------------------
 -- Join listing status with demand and active TPs --
 ----------------------------------------------------
