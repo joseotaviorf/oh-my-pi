@@ -1,4 +1,5 @@
 ---
+lineage_product_database_name: usemails
 tables:
   - table_name: emails
     extraction_type: incremental
