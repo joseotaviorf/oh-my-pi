@@ -362,6 +362,25 @@ sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
+propagate_table_lineage_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
+    task_id=f"propagate-table-metadata-raw",
+    json={
+        "spark_python_task": {
+            "python_file": f"{BASE_SPARK_JOBS_PATH}/propagate_raw_tables_metadata.py",
+            "parameters": [
+                LayerEnum.RAW.value,
+                MetadataTypeEnum.FULL_CONTENT_LINEAGE.value,
+                SOURCE,
+                SOURCE,
+                "--product-database-name",
+                "ebdb",
+                "--all-tables",
+            ],
+        }
+    },
+)
+
 raw_task_list = build_raw_task_list()
 clean_task_list = build_layer_task_list("clean")
 dw_sub_dags = build_layer_task_list("dw")
@@ -374,6 +393,9 @@ create_cluster_task >> [
 
 # raw >> hive sync
 chain(task_list_first_task(raw_task_list), sync_metastore_table_task)
+
+# hive sync raw >> propagate metadata for raw
+chain(sync_metastore_table_task, propagate_table_lineage_task)
 
 # raw >> clean
 chain(
@@ -436,7 +458,7 @@ cross_downstream(
 
 # upstream >> terminate-cluster
 cross_downstream(
-    [sync_metastore_table_task] + task_list_last_tasks(raw_task_list),
+    [propagate_table_lineage_task] + task_list_last_tasks(raw_task_list),
     terminate_cluster_task,
 )
 
