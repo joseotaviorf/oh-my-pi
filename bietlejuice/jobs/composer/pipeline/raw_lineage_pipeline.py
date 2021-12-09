@@ -11,7 +11,7 @@ class RawLineagePipeline(MetadataPropagatorPipeline):
         database_name,
         table_name,
         table_schema,
-        source_name,
+        product_database_name,
     ):
         super(RawLineagePipeline, self).__init__(
             metadata_propagator_host,
@@ -20,7 +20,7 @@ class RawLineagePipeline(MetadataPropagatorPipeline):
             MetadataTypeEnum.FULL_CONTENT_LINEAGE,
         )
         self.table_schema = table_schema
-        self.source_name = source_name
+        self.product_database_name = product_database_name
 
     def build_metadata_propagator_payload(self):
         payload = {
@@ -32,7 +32,9 @@ class RawLineagePipeline(MetadataPropagatorPipeline):
         columns = {}
         for col_name, col_type in self.table_schema.items():
             columns[col_name] = {
-                "lineage": [f"{self.source_name}.{self.table_name}.{col_name}"]
+                "lineage": [
+                    f"{self.product_database_name}.{self.table_name}.{col_name}"
+                ]
             }
         payload["columns"] = columns
 

@@ -5,12 +5,15 @@ import airflow.utils.helpers as airflow_helpers
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
+from quintoandar_logger import QuintoAndarLogger
+
+logger = QuintoAndarLogger("DatalakeTaskGroup")
 
 from bietlejuice.jobs.composer.base.airflow import BaseTaskGroup
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.jobs.composer.formatters import StringFormatter
-from bietlejuice.jobs.composer.services import FileService
+from bietlejuice.jobs.composer.services import FileService, ConfigurationService
 
 AIRFLOW_DEFAULT_POOL = "default_pool"  # TODO: Add to parameter service to be created
 
@@ -63,7 +66,6 @@ class DatalakeTaskGroup(BaseTaskGroup):
         extraction_spark_job_file,
         table_name=None,
         raw_spark_job_extra_args=None,
-        create_lineage=False,
         pool=AIRFLOW_DEFAULT_POOL,
     ):
         """
@@ -83,9 +85,6 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :param raw_spark_job_extra_args: extra arguments to be passed to the spark job,
             default spark job parameters are [env, bucket]
         :type raw_spark_job_extra_args: list[str]
-        :param create_lineage: if task group should have a
-            task to automatically generate the table/tables lineage.
-        :type create_lineage: bool
         :param pool: airflow's pool name
         :type pool: str
         :return: initial and final tasks of the created task group
@@ -138,11 +137,20 @@ class DatalakeTaskGroup(BaseTaskGroup):
         airflow_helpers.chain(load_table_task, sync_metastore_tables_task)
 
         metadata_type = None
+        try:
+            config_service = ConfigurationService(source)
+            product_db_name = config_service.get_config("lineage_product_database_name")
+        except IndexError:
+            logger.warning(
+                f"m=_build_raw_task_group, msg=could not find lineage_product_database_name in configs"
+            )
+            product_db_name = ""
+
         if FileService.metadata_file_exists(
             self.relative_query_path, layer, table_name, sync_mode == self.ALL_TABLES
         ):
             metadata_type = MetadataTypeEnum.TAGS.value
-        elif create_lineage:
+        elif product_db_name:
             metadata_type = MetadataTypeEnum.FULL_CONTENT_LINEAGE.value
 
         if metadata_type:
@@ -157,6 +165,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
                             metadata_type,
                             target_database_base_name,
                             self.relative_query_path,
+                            "--product-database-name",
+                            product_db_name,
                             sync_mode,
                         ]
                         + table_name_arg,
@@ -167,6 +177,10 @@ class DatalakeTaskGroup(BaseTaskGroup):
             sync_metastore_tables_task.set_downstream([propagate_table_lineage_task])
             final_tasks = [propagate_table_lineage_task]
         else:
+            logger.warning(
+                f"m=_build_raw_task_group, target_database_base_name={target_database_base_name}, "
+                f"msg=Could not infer metadata type, skipping propagate metadata task"
+            )
             final_tasks = [sync_metastore_tables_task]
 
         return DatalakeTaskGroup.format_tasks_boundaries(
@@ -179,7 +193,6 @@ class DatalakeTaskGroup(BaseTaskGroup):
         target_database_base_name,
         extraction_spark_job_file,
         raw_spark_job_extra_args=None,
-        create_lineage=False,
         pool=AIRFLOW_DEFAULT_POOL,
     ):
         """
@@ -195,9 +208,6 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :param raw_spark_job_extra_args: extra arguments to be passed to the spark job,
             default spark job parameters are [env, bucket]
         :type raw_spark_job_extra_args: list[str]
-        :param create_lineage: if task group should have a
-            task to automatically generate the table lineage
-        :type create_lineage: bool
         :param pool: airflow's pool name
         :type pool: str
         :return: initial and final tasks of the created task group
@@ -208,7 +218,6 @@ class DatalakeTaskGroup(BaseTaskGroup):
             target_database_base_name=target_database_base_name,
             extraction_spark_job_file=extraction_spark_job_file,
             raw_spark_job_extra_args=raw_spark_job_extra_args,
-            create_lineage=create_lineage,
             pool=pool,
         )
 
@@ -219,7 +228,6 @@ class DatalakeTaskGroup(BaseTaskGroup):
         table_name,
         extraction_spark_job_file,
         raw_spark_job_extra_args=None,
-        create_lineage=False,
         pool=AIRFLOW_DEFAULT_POOL,
     ):
         """
@@ -237,9 +245,6 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :param raw_spark_job_extra_args: extra arguments to be passed to the spark job,
             default spark job parameters are [env, bucket]
         :type raw_spark_job_extra_args: list[str]
-        :param create_lineage: if task group should have a
-            task to automatically generate the table lineage
-        :type create_lineage: bool
         :param pool: airflow's pool name
         :type pool: str
         :return: initial and final tasks of the created task group
@@ -251,7 +256,6 @@ class DatalakeTaskGroup(BaseTaskGroup):
             extraction_spark_job_file=extraction_spark_job_file,
             table_name=table_name,
             raw_spark_job_extra_args=raw_spark_job_extra_args,
-            create_lineage=create_lineage,
             pool=pool,
         )
 
