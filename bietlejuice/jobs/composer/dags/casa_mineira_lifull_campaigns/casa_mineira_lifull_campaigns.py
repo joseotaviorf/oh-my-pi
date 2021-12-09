@@ -35,7 +35,7 @@ raw_output_path = config_service.get_config("raw_output_path")
 clean_tables_list = config_service.get_config("clean_tables_list")
 partition_cols = config_service.get_config("partition_cols")
 
-MAIN_START_DATE = datetime(2021, 9, 1, tzinfo=timezone("America/Sao_Paulo"))
+MAIN_START_DATE = datetime(2021, 8, 26, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 2 * * *"
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 RAW_SPARK_JOB_FILE = (
@@ -55,6 +55,7 @@ dag = DAG(
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
+    catchup=True,
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
     doc_md=BaseDAG.get_dag_doc(SOURCE).format(

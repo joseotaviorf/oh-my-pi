@@ -21,7 +21,7 @@ ENV = os.environ.get("ENVIRONMENT")
 # DAG params setup
 SOURCE = "casa_mineira_criteo_campaigns"
 DAG_ID = f"bietlejuice.{SOURCE}"
-MAIN_START_DATE = datetime(2021, 8, 1, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
+MAIN_START_DATE = datetime(2021, 8, 21, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 2 * * *"
 
 config_service = ConfigurationService(SOURCE)
@@ -57,6 +57,7 @@ dag = DAG(
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
+    catchup=True,
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
     doc_md=BaseDAG.get_dag_doc(SOURCE).format(
