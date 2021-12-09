@@ -141,11 +141,11 @@ task_group = DatalakeTaskGroup(
 )
 
 
-for table in tables:
-    table_name = table["table_name"]
-    is_incremental = table.get("is_incremental", False)
-    is_partitioned = table.get("is_partitioned")
-    has_query = table.get("has_query")
+for table_name, table_config in tables.items():
+    table_config = table_config if table_config else {}
+    is_incremental = table_config.get("is_incremental", False)
+    is_partitioned = table_config.get("is_partitioned")
+    has_query = table_config.get("has_query")
     extraction_type = "incremental" if is_incremental else "full"
 
     load_raw_to_s3_task = create_extraction_tasks(

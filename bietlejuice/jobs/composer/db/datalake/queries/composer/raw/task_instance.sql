@@ -11,4 +11,4 @@ SELECT
 FROM
     task_instance
 WHERE
-    DATE(execution_date) >= NOW() - INTERVAL 2 MONTH -- DATE('{{ ds }}')
+    DATE(execution_date) = DATE('{{ ds }}')

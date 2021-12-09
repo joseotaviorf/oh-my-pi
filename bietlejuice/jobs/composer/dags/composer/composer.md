@@ -2,7 +2,8 @@
 
 ### Purpose
 
-Dumps the Composer Airflow database into S3.
+Dumps the Composer Airflow database into S3. To know more about airflow's tables
+take a look [here](https://www.astronomer.io/guides/airflow-database).
 
 ​<details>
   <summary><strong> > DAG details (click to expand)</strong></summary>
