@@ -18,6 +18,7 @@ We are not dumping all Airflow tables. This currently produces the following out
  - `dag` - Information about the DAG
  - `dag_run` - DAG runs historic
  - `task_fail` - Information about failed tasks (subset of Airflow task_instances table)
+ - `task_instance` - Information about the task run (like duration, try_numbers, etc)
 
 ### Responsible Data Engineering Team
 

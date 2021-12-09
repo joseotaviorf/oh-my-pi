@@ -1,0 +1,10 @@
+---
+clean_partition_cols: [year, month, day]
+tables:
+  - table_name: dag 
+  - table_name: dag_run
+  - table_name: task_fail
+  - table_name: task_instance
+    is_incremental: True
+    is_partitioned: True
+    has_query: True

@@ -1,32 +1,58 @@
 from datetime import datetime
 
-import airflow.utils.helpers as airflow_helpers
+from airflow.utils.helpers import cross_downstream
 import pendulum
 import os
 from airflow.models import DAG, Variable
-from airflow.operators.quintoandar_athena import (
-    QuintoAndarCreateAthenaExternalTableOperator,
+from airflow.operators.quintoandar_databricks import (
+    QuintoAndarDatabricksCreateClusterOperator,
+    QuintoAndarDatabricksTerminateClusterOperator,
 )
 from airflow.operators.quintoandar_transfer_data import QuintoAndarMySqlToS3Operator
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.db import DATALAKE_SQL_DIR
-from bietlejuice.jobs.composer.base.pipeline import (
-    EnvironmentEnum,
-)  # TODO Create an Airflow environment enum and use here (instead of using Spark code)
+from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.jobs.composer.formatters import StringFormatter
 from bietlejuice.jobs.composer.services import FileService
+from bietlejuice.jobs.composer.services.configuration_service import (
+    ConfigurationService,
+)
 
-DAG_NAME = "composer"
-DAG_ID = f"bietlejuice.{DAG_NAME}"
+SOURCE = "composer"
+CONTEXT = SOURCE
+DAG_ID = f"bietlejuice.{SOURCE}"
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2019, 8, 21, 0, 0, 0, tzinfo=LOCAL_TZ)
 SCHEDULE_INTERVAL = "*/15 6-18 * * *"
 
 ENV = os.environ.get("ENVIRONMENT")
-S3_BUCKET = Variable.get("datalake_bucket")
-DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
+
+
+config_service = ConfigurationService(SOURCE)
+athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
+datalake_bucket = config_service.get_config("datalake_bucket")
+databricks_bietlejuice_repo_path = config_service.get_config(
+    "databricks_bietlejuice_repo_path"
+)
+spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
+doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+
+clean_partition_cols = config_service.get_config("clean_partition_cols")
+tables = config_service.get_config("tables")
+
+BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
+RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{{extraction_type}}_{SOURCE}_into_datalake.py"
+
+CLUSTER_DESCRIPTION = Variable.get(f"databricks_default_cluster", deserialize_json=True)
+CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
+CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
+    "destination"
+] = f"{spark_jobs_logs_path}{DAG_ID}"
+
+
+QUERY_PATH = "{datalake_sql_dir}/queries/composer/raw/{table_name}.sql"
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -37,48 +63,124 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
-        chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
+        chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
 )
 
 
-def create_extraction_tasks(table_name):
+def get_sql_from_table_name(table_name):
+    """
+    Search and get a sql given a table_name
+
+    :param table_name: table name
+    :type table_name: str
+    :return: the query to built the given table.
+    :rtype: str
+    """
+    sql = FileService.get_query_from_file_name(
+        QUERY_PATH.format(datalake_sql_dir=DATALAKE_SQL_DIR, table_name=table_name)
+    )
+    return sql
+
+
+def create_extraction_tasks(table_name, has_query=False, is_incremental=False):
+    """
+    Create a task to load table from Airflow database to S3. 
+    In this way, the first step of raw creation is executed
+    outside a spark job.
+
+    :param table_name: table name
+    :type table_name: str
+    :param has_query: if a query will be used or the table will be consumed asis
+    :type has_query: bool
+    :param is_incremental: if this table will be consumed incremental
+    :type is_incremental: bool
+    :return: An airflow task 
+    :rtype: BaseOperator
+    """
     slugged_table_name = StringFormatter.slugify(table_name)
+    sql = get_sql_from_table_name(table_name) if has_query else None
+
+    if is_incremental:
+        s3_suffix = "/year={{ execution_date.year }}/month={{ execution_date.month }}/day={{ execution_date.day }}"
+    else:
+        s3_suffix = ""
+
     load_table_task = QuintoAndarMySqlToS3Operator(
         dag=dag,
         table=table_name,
-        task_id=f"load-raw-{slugged_table_name}",
-        bucket=S3_BUCKET,
+        sql=sql,
+        task_id=f"load-raw-to-s3-{slugged_table_name}",
+        bucket=datalake_bucket,
         filename="data.json",
-        s3_file_path="raw/composer/{}".format(table_name),
+        s3_file_path="raw/composer/{table_name}{s3_suffix}".format(
+            table_name=table_name, s3_suffix=s3_suffix
+        ),
         mysql_conn_id="airflow_db",
     )
 
-    if ENV == EnvironmentEnum.FORNO:
-        schema_suffix = ""
-    else:
-        schema_suffix = f"_{ENV}"
-    database = f"datalake_composer_raw{schema_suffix}"
+    return load_table_task
 
-    ddl_query_raw = FileService.get_query_from_file_name(
-        "{}/ddl/raw/composer/{}.ddl".format(DATALAKE_SQL_DIR, table_name)
-    ).format(BUCKET=S3_BUCKET, DATABASE=database)
 
-    create_external_table_task = QuintoAndarCreateAthenaExternalTableOperator(
-        dag=dag,
-        task_id=f"create-raw-{slugged_table_name}-external-table",
-        database=database,
-        table=table_name,
-        ddl_query=ddl_query_raw,
-        output_location="s3://{}/query_results/".format(S3_BUCKET),
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
+    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+)
+
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    dag=dag, task_id="terminate-cluster"
+)
+
+task_group = DatalakeTaskGroup(
+    dag=dag,
+    env=ENV,
+    datalake_bucket=datalake_bucket,
+    relative_query_path=CONTEXT,
+    spark_jobs_path=BASE_SPARK_JOBS_PATH,
+    athena_query_result_location=athena_query_results_bucket,
+)
+
+
+for table in tables:
+    table_name = table["table_name"]
+    is_incremental = table.get("is_incremental", False)
+    is_partitioned = table.get("is_partitioned")
+    has_query = table.get("has_query")
+    extraction_type = "incremental" if is_incremental else "full"
+
+    load_raw_to_s3_task = create_extraction_tasks(
+        table_name=table_name, is_incremental=is_incremental, has_query=has_query
     )
 
-    airflow_helpers.chain(load_table_task, create_external_table_task)
+    parameters = [SOURCE, table_name]
+    if is_incremental:
+        parameters.append("{{ ds }}")
 
-    return [load_table_task, create_external_table_task]
+    raw_task_group = task_group.build_raw_task_group_for_single_table(
+        source=SOURCE,
+        target_database_base_name=SOURCE,
+        table_name=table_name,
+        extraction_spark_job_file=RAW_SPARK_JOB_PATH.format(
+            extraction_type=extraction_type
+        ),
+        raw_spark_job_extra_args=parameters,
+    )
 
+    partitions = clean_partition_cols if is_partitioned else None
+    clean_task_group = task_group.build_clean_task_group(
+        source_database_base_name=SOURCE,
+        target_database_base_name=SOURCE,
+        table_name=table_name,
+        is_incremental=is_incremental,
+        partitions=partitions,
+    )
 
-dag_table_tasks = create_extraction_tasks(table_name="dag")
-dag_run_table_tasks = create_extraction_tasks(table_name="dag_run")
-task_fail_table_tasks = create_extraction_tasks(table_name="task_fail")
+    create_cluster_task.set_upstream(load_raw_to_s3_task)
+    create_cluster_task.set_downstream(DatalakeTaskGroup.first_tasks(raw_task_group))
+
+    cross_downstream(
+        DatalakeTaskGroup.last_tasks(raw_task_group),
+        DatalakeTaskGroup.first_tasks(clean_task_group),
+    )
+
+    terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_group))

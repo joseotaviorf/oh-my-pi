@@ -1,0 +1,25 @@
+---
+database_name: datalake_composer_raw
+table_name: task_fail
+columns:
+  id_fail:
+    lineage:
+      - datalake_composer_raw.task_fail.id
+  id_dag:
+    lineage:
+      - datalake_composer_raw.task_fail.dag_id
+  id_task:
+    lineage:
+      - datalake_composer_raw.task_fail.task_id
+  duration:
+    lineage:
+      - datalake_composer_raw.task_fail.duration
+  ts_ended:
+    lineage:
+      - datalake_composer_raw.task_fail.end_date
+  ts_executed:
+    lineage:
+      - datalake_composer_raw.task_fail.execution_date
+  ts_started:
+    lineage:
+      - datalake_composer_raw.task_fail.start_date
