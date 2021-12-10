@@ -5,7 +5,10 @@ select
     cast(json_extract_scalar(user_properties , '$.platform') as varchar) as app_type,
     ev.id_user as id_user,
     cast(trim(json_extract_scalar(event_properties, '$.house_id')) as varchar) as id_house,
-    cast(trim(json_extract_scalar(event_properties, '$.offer_id')) as varchar) as id_firestore,
+    CAST(TRIM(COALESCE(
+        JSON_EXTRACT_SCALAR(event_properties, '$.offer_id'),
+        REGEXP_EXTRACT(JSON_EXTRACT_SCALAR(event_properties, '$.uri'),'(?<=\/offer|aluguel\/).*?(?=\/)', 0)
+    )) AS VARCHAR) AS id_firestore,
     cast(json_extract_scalar(user_properties, '$.utm_source') as varchar) as utm_source,
     cast(json_extract_scalar(user_properties, '$.utm_medium') as varchar) as utm_medium,
     cast(json_extract_scalar(user_properties, '$.utm_campaign') as varchar) as utm_campaign,
