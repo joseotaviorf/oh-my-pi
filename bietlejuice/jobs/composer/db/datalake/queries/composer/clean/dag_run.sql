@@ -1,4 +1,5 @@
 SELECT
+    id,
     dag_id AS id_dag,
     run_id AS id_run,
     conf AS configuration,

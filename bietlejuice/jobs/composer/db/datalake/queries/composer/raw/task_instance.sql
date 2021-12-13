@@ -11,4 +11,4 @@ SELECT
 FROM
     task_instance
 WHERE
-    DATE(execution_date) = DATE('{{ ds }}')
+    DATE(execution_date) = DATE('{execution_date}')

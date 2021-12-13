@@ -14,6 +14,4 @@ SELECT
 FROM
     datalake_composer_raw.task_instance
 WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+    DATE(execution_date) >= DATE(CONCAT({year}, '-', {month}, '-', {day}))

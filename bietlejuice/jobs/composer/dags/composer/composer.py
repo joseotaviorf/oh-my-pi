@@ -25,7 +25,7 @@ DAG_ID = f"bietlejuice.{SOURCE}"
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2019, 8, 21, 0, 0, 0, tzinfo=LOCAL_TZ)
-SCHEDULE_INTERVAL = "*/15 6-18 * * *"
+SCHEDULE_INTERVAL = "30 8 * * *"
 
 ENV = os.environ.get("ENVIRONMENT")
 
@@ -45,7 +45,9 @@ tables = config_service.get_config("tables")
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{{extraction_type}}_{SOURCE}_into_datalake.py"
 
-CLUSTER_DESCRIPTION = Variable.get(f"databricks_default_cluster", deserialize_json=True)
+CLUSTER_DESCRIPTION = Variable.get(
+    "databricks_minimum_resources_cluster", deserialize_json=True
+)
 CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
     "destination"
@@ -88,7 +90,10 @@ def create_extraction_tasks(table_name, has_query=False, is_incremental=False):
     """
     Create a task to load table from Airflow database to S3. 
     In this way, the first step of raw creation is executed
-    outside a spark job.
+    outside a spark job. When incremental is used, this functions
+    breaks the load in two to keep a d-1 ingestion, but to add
+    a fraction of today data (This happens to keep data fresh for
+    some pulses).
 
     :param table_name: table name
     :type table_name: str
@@ -100,27 +105,41 @@ def create_extraction_tasks(table_name, has_query=False, is_incremental=False):
     :rtype: BaseOperator
     """
     slugged_table_name = StringFormatter.slugify(table_name)
-    sql = get_sql_from_table_name(table_name) if has_query else None
+    raw_tasks = []
 
     if is_incremental:
-        s3_suffix = "/year={{ execution_date.year }}/month={{ execution_date.month }}/day={{ execution_date.day }}"
+        s3_suffix_yesterday = "/year={{ execution_date.year }}/month={{ execution_date.month }}/day={{ execution_date.day }}"
+        s3_suffix_today = "/year={{ next_execution_date.year }}/month={{ next_execution_date.month }}/day={{ next_execution_date.day }}"
+        s3_suffixes = [s3_suffix_yesterday, s3_suffix_today]
     else:
-        s3_suffix = ""
+        s3_suffixes = [""]
 
-    load_table_task = QuintoAndarMySqlToS3Operator(
-        dag=dag,
-        table=table_name,
-        sql=sql,
-        task_id=f"load-raw-to-s3-{slugged_table_name}",
-        bucket=datalake_bucket,
-        filename="data.json",
-        s3_file_path="raw/composer/{table_name}{s3_suffix}".format(
-            table_name=table_name, s3_suffix=s3_suffix
-        ),
-        mysql_conn_id="airflow_db",
-    )
+    for s3_suffix in s3_suffixes:
+        sql = get_sql_from_table_name(table_name) if has_query else None
+        task_id_suffix = "-today" if "next" in s3_suffix else ""
 
-    return load_table_task
+        if sql and is_incremental:
+            sql_placeholder = (
+                "{{ macros.ds_add(ds, 1) }}" if "next" in s3_suffix else "{{ ds }}"
+            )
+            sql = sql.format(execution_date=sql_placeholder)
+
+        load_table_task = QuintoAndarMySqlToS3Operator(
+            dag=dag,
+            table=table_name,
+            sql=sql,
+            task_id=f"load-raw-to-s3-{slugged_table_name}{task_id_suffix}",
+            bucket=datalake_bucket,
+            filename="data.json",
+            s3_file_path="raw/composer/{table_name}{s3_suffix}".format(
+                table_name=table_name, s3_suffix=s3_suffix
+            ),
+            mysql_conn_id="airflow_db",
+        )
+
+        raw_tasks.append(load_table_task)
+
+    return raw_tasks
 
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
