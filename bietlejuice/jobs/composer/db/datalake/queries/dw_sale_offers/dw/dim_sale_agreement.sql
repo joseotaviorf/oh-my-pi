@@ -13,6 +13,7 @@ SELECT
   eso.current_payment_method AS payment_method,
   eso.payment_model,
   eso.credit_model,
+  eso.early_keys_status,
   eso.closing_status,
   eso.house_dilligence_status,
   eso.seller_dilligence_status,

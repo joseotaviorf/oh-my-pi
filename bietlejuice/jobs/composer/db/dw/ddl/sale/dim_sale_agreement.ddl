@@ -14,6 +14,7 @@ CREATE TABLE sale.dim_sale_agreement (
     payment_method VARCHAR,
     payment_model VARCHAR,
     credit_model VARCHAR,
+    early_keys_status VARCHAR,
     closing_status VARCHAR,
     house_dilligence_status VARCHAR,
     seller_dilligence_status VARCHAR,

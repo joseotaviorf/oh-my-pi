@@ -107,6 +107,7 @@ SELECT
   so.current_payment_method,
   m.payment_model,
   m.financing_bank,
+  m.early_keys_status,
   m.status AS monday_status,
   m.offer_status,
   m.sale_agreement_status,
