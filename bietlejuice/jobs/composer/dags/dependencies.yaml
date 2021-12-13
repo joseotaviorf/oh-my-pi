@@ -955,3 +955,6 @@ bietlejuice.enrich_customer_resolution:
   - bietlejuice.enrich_customer_support:load-enrich-chat
   - bietlejuice.enrich_customer_support:load-enrich-email
   - bietlejuice.enrich_ebdb_user:load-enrich-user
+
+bietlejuice.enrich_gsheets:
+  - bietlejuice.gsheets:load-clean-offers-hub-central
