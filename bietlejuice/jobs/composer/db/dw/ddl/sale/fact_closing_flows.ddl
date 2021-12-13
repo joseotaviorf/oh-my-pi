@@ -53,6 +53,7 @@ CREATE TABLE sale.fact_closing_flows (
   days_legaut_analysis_started_to_legaut_analysis_ended INTEGER,
   days_legaut_analysis_ended_to_legal_risk_ended INTEGER,
   days_legal_analysis_ended_notes_registry_ended INTEGER,
+  days_legal_analysis_ended_to_bank_legal_analysis_started INTEGER,
   days_bank_legal_analysis_started_to_financing_ended INTEGER,
   days_bank_legal_analysis_started_to_house_registry_started INTEGER,
   days_credit_analysis_started_to_credit_analysis_ended INTEGER,

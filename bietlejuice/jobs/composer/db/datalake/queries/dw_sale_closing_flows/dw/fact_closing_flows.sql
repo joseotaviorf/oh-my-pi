@@ -52,6 +52,7 @@ SELECT
   days_legaut_analysis_started_to_legaut_analysis_ended,
   days_legaut_analysis_ended_to_legal_risk_ended,
   days_legal_analysis_ended_notes_registry_ended,
+  days_legal_analysis_ended_to_bank_legal_analysis_started,
   days_bank_legal_analysis_started_to_financing_ended,
   days_bank_legal_analysis_started_to_house_registry_started,
   days_credit_analysis_started_to_credit_analysis_ended,
