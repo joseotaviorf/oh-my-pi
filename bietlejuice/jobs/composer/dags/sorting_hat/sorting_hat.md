@@ -15,12 +15,6 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 Currently, there is the following output table for both our raw and clean layers:
 
-- `best_subset`
-- `best_subset_5a`
-- `best_subset_5aversion`
-- `best_subset_cardif`
-- `best_subset_cardif_version`
-- `best_subset_version`
 - `credit_analysis`
 - `credit_analysis_version`
 - `early_credit_analysis`

@@ -1,9 +1,0 @@
-database_name: datalake_sorting_hat_clean
-table_name: best_subset_version
-columns:
-  id_proposal:
-    lineage:
-      - datalake_sorting_hat_raw.bestsubsetversion.proposal_id
-  id_proponent:
-    lineage:
-      - datalake_sorting_hat_raw.bestsubsetversion.proponent_id
