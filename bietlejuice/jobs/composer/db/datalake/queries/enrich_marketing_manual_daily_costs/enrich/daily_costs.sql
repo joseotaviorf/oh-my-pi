@@ -146,4 +146,4 @@ FROM
     enriched_manual_costs
 WHERE
     (raw_cost * cost_factor) > 0
-    AND LOWER(SUBSTRING(campaign_name, 1, 3)) <> 'dsa'
+    AND LOWER(SUBSTRING(NVL(campaign_name, ''), 1, 3)) <> 'dsa'
