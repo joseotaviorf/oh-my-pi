@@ -65,6 +65,12 @@ class PostgresConsumer(DBConsumer):
                 information_schema.tables
             WHERE
                 table_schema = '{schema}'
+                AND table_name NOT IN (
+                    'change_owner_control',
+                    'flyway_schema_history',
+                    'pg_stat_statements',
+                    'schema_migrations'
+                )
             ORDER BY
                 size DESC
         """.format(
