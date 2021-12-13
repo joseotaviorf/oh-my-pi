@@ -80,6 +80,11 @@ branding_where_is_plaquinha:
     sheet_name: branding_where_is_plaquinha
     clean_table_name: branding_where_is_plaquinha
 
+business_unit_region:
+    sheet_id: 1AqaMTw8A6QXW4UExztYWQpBLPNfn04kafXvEPwEhqps
+    sheet_name: business_unit_region
+    clean_table_name: business_unit_region
+
 casa_mineira_inside_sales_pipe:
     sheet_id: 1sV89IeTziUUafu32NxVVBIDcLUQbzlwaZowqDacaPb0
     sheet_name: negocios

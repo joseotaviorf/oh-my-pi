@@ -39,6 +39,7 @@ This pipeline produces the following output tables:
     - `auxiliary_region`
     - `bandaid_off`
     - `branding_where_is_plaquinha`
+    - `business_unit_region`
     - `census_subnormal_crowding_areas`
     - `casa_mineira_inside_sales_pipe`
     - `casa_mineira_marketing_cost_taxonomy`
