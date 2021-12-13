@@ -14,8 +14,8 @@ with fact as  (
 		mkt.utm_term,
 		mkt.utm_content,
 		sum(coalesce(mkt.cost,0)) as cost
-	from marketing.fact_marketing_daily_costs mkt
-	join public.dim_date dd on dd.sk_date =  mkt.sk_date
+	from datalake_marketing_costs_prod.daily_costs mkt
+	join public.dim_date dd on dd.sk_date =  mkt.id_date
     where funnel_side = 'demand'
 	group by 1,2,3,4,5,6,7,8,9,10,11,12,13
 ),

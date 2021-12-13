@@ -13,9 +13,9 @@ demand_cost AS (
         co.mkt_medium AS planning_mkt_level3,
         SUM(co.cost) AS costs
     FROM
-        marketing.fact_marketing_daily_costs AS co
+        datalake_marketing_costs_prod.daily_costs AS co
     JOIN dim_date AS dbt
-        ON dbt.sk_date = co.sk_date
+        ON dbt.sk_date = co.id_date
     WHERE
         co.funnel_side = 'demand'
         AND dbt.date BETWEEN '2019-01-01' AND CURRENT_DATE - 1
@@ -27,7 +27,7 @@ affiliates AS (
     WITH 
     ia_fact_cost AS (
         SELECT
-            fc.sk_date, 
+            fc.id_date as sk_date, 
             'fact_cost' AS table_origin, 
             mkt_origin, 
             fc.city_group,
@@ -46,7 +46,7 @@ affiliates AS (
             NULL AS business_context,
             fc.cost
         FROM
-            marketing.fact_marketing_daily_costs AS fc
+            datalake_marketing_costs_prod.daily_costs AS fc
         WHERE
             fc.mkt_origin = 'Indica Aí - General' 
     ),
@@ -576,9 +576,9 @@ supply_landlords_cost AS (
         END AS planning_mkt_level3,
         SUM(co.cost) AS costs
     FROM
-        marketing.fact_marketing_daily_costs AS co
+        datalake_marketing_costs_prod.daily_costs AS co
     JOIN dim_date AS dbt
-        ON dbt.sk_date = co.sk_date
+        ON dbt.sk_date = co.id_date
     WHERE
         co.funnel_side = 'supply'
         AND dbt.date BETWEEN '2020-01-01' AND CURRENT_DATE - 1
@@ -633,9 +633,9 @@ demand_sale_cost AS (
         co.mkt_medium AS planning_mkt_level3,
         SUM(co.cost) AS costs
     FROM
-        marketing.fact_marketing_daily_costs AS co
+        datalake_marketing_costs_prod.daily_costs AS co
     JOIN dim_date AS dbt
-        ON dbt.sk_date = co.sk_date
+        ON dbt.sk_date = co.id_date
     WHERE co.funnel_side = 'demand'
         AND dbt.date BETWEEN '2019-01-01' AND CURRENT_DATE - 1
         AND co.mkt_medium != 'Social'
@@ -653,9 +653,9 @@ supply_sale_cost AS (
         co.mkt_origin AS planning_mkt_level3,
         sum(co.cost) AS costs
     FROM
-        marketing.fact_marketing_daily_costs AS co
+        datalake_marketing_costs_prod.daily_costs AS co
     JOIN dim_date dbt
-        ON dbt.sk_date = co.sk_date
+        ON dbt.sk_date = co.id_date
     WHERE
         co.account_name IN ('quintoandar_supply_sale_display', 'quintoandar_supply_sale', 'supply_landlords_sale', 'supply_landlords') 
         AND co.mkt_origin IN ('Owner PWA - Sale', 'Price Calculator - Sale')
@@ -671,9 +671,9 @@ supply_ciq_cost AS (
         co.mkt_origin AS planning_mkt_level3,
         sum(co.cost) AS costs
     FROM
-        marketing.fact_marketing_daily_costs AS co
+        datalake_marketing_costs_prod.daily_costs AS co
     JOIN
-        dim_date AS dbt ON dbt.sk_date = co.sk_date
+        dim_date AS dbt ON dbt.sk_date = co.id_date
     WHERE
         co.mkt_origin = 'CIQ'
     GROUP BY 1, 2, 3, 4, 5, 6

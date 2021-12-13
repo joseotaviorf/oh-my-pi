@@ -159,9 +159,9 @@ demand_daily_spent AS (
         COUNT(NULL) AS recovered_tenant_prospects_target,
         COUNT(NULL) AS budget
     FROM
-        marketing.fact_marketing_daily_costs AS co
+        datalake_marketing_costs_prod.daily_costs AS co
         JOIN dim_date AS dd
-            ON dd.sk_date = co.sk_date
+            ON dd.sk_date = co.id_date
     WHERE
         co.mkt_origin = 'Tenants PWA'
         AND dd.date >= DATE('2018-01-01')

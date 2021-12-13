@@ -170,7 +170,7 @@ results as ( --coincident funnel
 ),
 costs as (
 	select
-		date(nullif(mkt.sk_date, -1)) date,
+		date(nullif(mkt.id_date, -1)) date,
 		coalesce(mkt.city_group, 'Not Mapped') city_group,
 		coalesce(mkt.mkt_origin,'') mkt_origin,
 		coalesce(mkt.mkt_channel,'') mkt_channel,
@@ -181,7 +181,7 @@ costs as (
 		coalesce(mkt.utm_term,'') utm_term,
 		sum(coalesce(mkt.cost,0)) as cost
 	from
-		marketing.fact_marketing_daily_costs mkt
+		datalake_marketing_costs_prod.daily_costs mkt
 	where
 		mkt.mkt_origin in ('Owner PWA', 'Price Calculator')
 	group by 1,2,3,4,5,6,7,8,9

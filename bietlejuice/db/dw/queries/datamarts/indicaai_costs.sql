@@ -1,7 +1,7 @@
 WITH
 ia_fact_cost AS (
 	SELECT
-		fc.sk_date,
+		fc.id_date as sk_date,
 		'fact_cost' AS table,
 		mkt_origin,
 		fc.city_group,
@@ -18,7 +18,7 @@ ia_fact_cost AS (
 		NULL as business_context,
 		fc.cost
 	FROM
-		marketing.fact_marketing_daily_costs fc
+		datalake_marketing_costs_prod.daily_costs fc
 	WHERE fc.mkt_origin = 'Indica Aí - General'
 	AND fc.mkt_source <> 'Spinver'
 ),

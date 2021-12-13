@@ -68,7 +68,7 @@ costs_targets_results_combined AS (
   -- Supply ForSale Marketing Investment --
   -----------------------------------------
   SELECT
-    DATE(NULLIF(mkt.sk_date, -1)) AS lead_date,
+    DATE(NULLIF(mkt.id_date, -1)) AS lead_date,
     COALESCE(mkt.city_group, 'Not Mapped') AS city_group,
     REPLACE(mkt.mkt_origin, ' - Sale', '') AS mkt_origin,
     mkt.mkt_channel,
@@ -99,7 +99,7 @@ costs_targets_results_combined AS (
     SUM(0::FLOAT) AS first_listings_target,
     SUM(0::FLOAT) AS budget
   FROM
-    marketing.fact_marketing_daily_costs mkt
+    datalake_marketing_costs_prod.daily_costs mkt
   WHERE
       mkt.mkt_origin IN ('Price Calculator - Sale', 'Owner PWA - Sale')
   GROUP BY 1,2,3,4,5,6,7,8,9,10

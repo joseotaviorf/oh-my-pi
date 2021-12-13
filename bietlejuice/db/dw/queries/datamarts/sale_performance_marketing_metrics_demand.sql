@@ -402,9 +402,9 @@ investment AS (
         NULL::FLOAT AS sale_flows_target,
         SUM(co.cost::FLOAT) AS marketing_cost
     FROM
-        marketing.fact_marketing_daily_costs AS co
+        datalake_marketing_costs_prod.daily_costs AS co
     JOIN dim_date AS dd
-        ON dd.sk_date = co.sk_date
+        ON dd.sk_date = co.id_date
     WHERE
         co.mkt_origin = 'Tenants PWA - Sale'
         AND dd.date >= DATE('2020-01-01')

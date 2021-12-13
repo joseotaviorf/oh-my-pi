@@ -318,7 +318,7 @@ affiliates AS (
 ---------------------------
 online_costs AS (
     SELECT
-        sk_date,
+        id_date as sk_date,
         funnel_side,
         city_group,
         mkt_category,
@@ -331,9 +331,9 @@ online_costs AS (
         utm_campaign,
         SUM(CASE WHEN mkt_origin ~* ' \- sale' THEN 0::FLOAT ELSE cost END) AS cost_fr,
         SUM(CASE WHEN mkt_origin ~* ' \- sale' THEN cost ELSE 0::FLOAT END) AS cost_fs
-    FROM marketing.fact_marketing_daily_costs
+    FROM datalake_marketing_costs_prod.daily_costs
     WHERE
-        sk_date >= 20190101
+        id_date >= 20190101
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11
     HAVING
         cost_fr > 0

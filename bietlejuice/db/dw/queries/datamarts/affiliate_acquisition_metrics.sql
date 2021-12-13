@@ -160,9 +160,9 @@ UNION ALL
         SUM(0::FLOAT) AS target_oau,
         SUM(0::FLOAT) AS new_target_nau 
     FROM
-        marketing.fact_marketing_daily_costs mkt
+        datalake_marketing_costs_prod.daily_costs mkt
     JOIN public.dim_date dd
-        ON dd.sk_date =  mkt.sk_date
+        ON dd.sk_date =  mkt.id_date
     WHERE mkt.funnel_side IN ('supply','affiliates')
         AND mkt.mkt_origin = 'Indica Aí - General'
         AND mkt.mkt_channel IN ('Paid', 'Organic')

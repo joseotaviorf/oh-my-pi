@@ -320,7 +320,7 @@ costs_targets_results_combined AS (
         WITH
         ia_fact_cost AS (
             SELECT
-                fc.sk_date,
+                fc.id_date as sk_date,
                 mkt_origin,
                 mkt_channel,
                 mkt_medium,
@@ -336,7 +336,7 @@ costs_targets_results_combined AS (
                 NULL AS business_context,
                 fc.cost
             FROM
-                marketing.fact_marketing_daily_costs fc
+                datalake_marketing_costs_prod.daily_costs fc
             WHERE fc.mkt_origin = 'Indica Aí - General'
             AND fc.mkt_source <> 'Spinver'
         ),
@@ -825,10 +825,10 @@ costs_targets_results_combined AS (
                 SUM(0::FLOAT) AS first_listings_target_rental,
                 SUM(0::FLOAT) AS budget_rental
             FROM
-                marketing.fact_marketing_daily_costs co
+                datalake_marketing_costs_prod.daily_costs co
             JOIN
                 dim_date dbt
-                on dbt.sk_date = co.sk_date
+                on dbt.sk_date = co.id_date
             WHERE
                 co.funnel_side = 'supply'
                 AND dbt.date BETWEEN '2020-01-01' AND (CURRENT_DATE - interval '1 day')
@@ -877,10 +877,10 @@ costs_targets_results_combined AS (
                 SUM(0::FLOAT) AS first_listings_target_rental,
                 SUM(0::FLOAT) AS budget_rental
             FROM
-                marketing.fact_marketing_daily_costs co
+                datalake_marketing_costs_prod.daily_costs co
             JOIN
                 dim_date dbt
-                ON dbt.sk_date = co.sk_date
+                ON dbt.sk_date = co.id_date
             WHERE
                 co.account_name IN ('quintoandar_supply_sale_display', 'quintoandar_supply_sale', 'supply_landlords_sale', 'supply_landlords')
                 AND co.mkt_origin IN ('Owner PWA - Sale', 'Price Calculator - Sale')
@@ -927,10 +927,10 @@ costs_targets_results_combined AS (
                 SUM(0::FLOAT) AS first_listings_target_rental,
                 SUM(0::FLOAT) AS budget_rental
             FROM
-                marketing.fact_marketing_daily_costs co
+                datalake_marketing_costs_prod.daily_costs co
             JOIN
                 dim_date dbt
-                ON dbt.sk_date = co.sk_date
+                ON dbt.sk_date = co.id_date
             WHERE
                 co.mkt_origin = 'CIQ'
             GROUP BY
