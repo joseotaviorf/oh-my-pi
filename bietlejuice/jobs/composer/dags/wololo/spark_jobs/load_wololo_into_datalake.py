@@ -21,10 +21,20 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
+    parser.add_argument("source")
+
     args = parser.parse_args()
+
     environment = args.env
     datalake_bucket = args.datalake_bucket
-    source = "wololo"
+    source = args.source
+
+    logger.info(
+        f"""
+                m=__main__, environment={environment}, datalake_bucket={datalake_bucket},
+                source={source}, msg=Starting spark job...
+        """
+    )
 
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
@@ -50,14 +60,13 @@ if __name__ == "__main__":
             database_name = db_info["db_raw_databricks"]
             format_options = SparkTableStorageFormat.DEFAULT_RAW
             database_location = db_info["db_raw_path"]
-            # the table names in the datalake must be lowercase
-            s3_loader.load_full_table(
+            
+            s3_loader.load_df(
                 df=df,
-                database_name=database_name,
-                table_name=table.table_name.lower(),
+                s3_path=f"{database_location}{table.table_name.lower()}",
                 format_options=format_options,
-                database_location=database_location,
             )
+            
             spark_metastore_loader.update_metastore(
                 df,
                 database_name,
