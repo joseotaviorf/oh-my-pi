@@ -388,6 +388,13 @@ SELECT
     id_pre_proposal,
     id_proposal,
     id_contract,
+    CASE
+        WHEN id_offer > 0
+          THEN (id_offer * 100) + 2
+        WHEN id_pre_proposal > 0
+          THEN (id_pre_proposal * 100) + 1
+        ELSE NULL
+    END AS id_offer_context,
     visit_created_type,
     is_visit_created_from_app,
     is_visit_last_updated_from_app,

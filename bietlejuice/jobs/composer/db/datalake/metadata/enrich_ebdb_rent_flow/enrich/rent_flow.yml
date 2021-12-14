@@ -38,6 +38,12 @@ columns:
   id_contract:
     lineage:
       - datalake_ebdb_clean.contract.id
+  id_offer_context:
+    lineage:
+      - datalake_ebdb_clean.offer.id
+      - datalake_ebdb_clean.pre_proposal.id
+      - datalake_ebdb_clean.proposal.id_offer
+      - datalake_ebdb_clean.proposal.id_pre_proposal
   visit_created_type:
     lineage:
       - datalake_ebdb_clean.visit_origin.name
