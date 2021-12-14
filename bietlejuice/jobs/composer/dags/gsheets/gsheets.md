@@ -174,6 +174,7 @@ This pipeline produces the following output tables:
     - `taxonomy_mkt_cost_new_test`
     - `taxonomy_mkt_cost`
     - `taxonomy_portal_casa_mineira`
+    - `taxonomy_sla`
     - `tenant_entrance_inspection_csat`
     - `tenant_negotiation_csat`
     - `tenant_onboarding_keys_csat`

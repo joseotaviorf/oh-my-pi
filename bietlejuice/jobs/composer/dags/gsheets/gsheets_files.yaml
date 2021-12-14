@@ -755,6 +755,11 @@ taxonomy_portal_casa_mineira:
     sheet_name: taxonomy_portal_casa_mineira
     clean_table_name: taxonomy_portal_casa_mineira
 
+taxonomy_sla:
+    sheet_id: 14nTGh2MBuVMKk5GlxDLVdpewMHLBx-a6SJhmEfVAsVY
+    sheet_name: base consolidada
+    clean_table_name: taxonomy_sla
+
 tof_supply_targets:
     sheet_id: 13iYK42dvdIiMG5DEsjhMPP5BbYo5S15ytRztLGiGUfY
     sheet_name: tof_supply_paid
