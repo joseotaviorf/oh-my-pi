@@ -1,0 +1,6 @@
+# Config for marketing_allocated_costs
+---
+streams:
+  - direction: 'upstream'
+    task_ids: ['dw_talk_to_agent',
+               'dw_marketing_campaigns_costs_and_volumes']
