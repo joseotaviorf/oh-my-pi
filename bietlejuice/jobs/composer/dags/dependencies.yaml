@@ -958,3 +958,15 @@ bietlejuice.enrich_customer_resolution:
 
 bietlejuice.enrich_gsheets:
   - bietlejuice.gsheets:load-clean-offers-hub-central
+
+bietlejuice.enrich_vendas:
+  - bietlejuice.sales_flow:load-clean-sales-flow
+  - bietlejuice.sales_flow:load-clean-offer
+  - bietlejuice.sales_flow:load-clean-ccv-flow
+  - bietlejuice.sales_flow:load-clean-specialist
+  - bietlejuice.sales_flow:load-clean-mortgage
+  - bietlejuice.sales_flow:load-clean-payment
+  - bietlejuice.sales_flow:load-clean-cash-payment
+  - bietlejuice.sales_flow:load-clean-notary
+  - bietlejuice.sales_flow:load-clean-diligence
+  - bietlejuice.sales_flow:load-clean-house

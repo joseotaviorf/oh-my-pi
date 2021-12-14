@@ -1,0 +1,151 @@
+---
+database_name: datalake_vendas
+table_name: vendas
+columns:
+  id_offer:
+    lineage:
+      - datalake_sales_flow_clean.offer.id_firestore
+  id_user_consultant:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_main_user
+  id_consultant:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_specialist
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_clean.offer.id_sales_flow
+  sk_user_team_lead:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_main_user
+  sk_team_lead:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_specialist
+  financing_bank:
+    lineage:
+      - datalake_sales_flow_clean.mortgage.bank
+  flow_step:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.flow_step
+  vendas_offer_status:
+    lineage:
+      - datalake_sales_flow_clean.offer.status
+  sale_agreement_status:
+    lineage:
+      - datalake_sales_flow_clean.ccv_flow.status
+  negotiation_model:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.status
+  flow_type:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.flow_type
+  vendas_offer_flow:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.flow_type
+  sale_agreement_cancellation_reason:
+    lineage:
+      - datalake_sales_flow_clean.rescission.comment
+  drop_reason:
+    lineage:
+      - datalake_sales_flow_clean.offer.discard_reason
+  drop_reason_responsible:
+    lineage:
+      - datalake_sales_flow_clean.offer.discard_reason
+  credit_model:
+    lineage:
+      - datalake_sales_flow_clean.mortgage.credit_model
+  consultant_name:
+    lineage:
+      - datalake_sales_flow_clean.specialist.specialist_name
+  consultant_email:
+    lineage:
+      - datalake_sales_flow_clean.specialist.email
+  team_lead_name:
+    lineage:
+      - datalake_sales_flow_clean.specialist.specialist_name
+  team_lead_email:
+    lineage:
+      - datalake_sales_flow_clean.specialist.email
+  closing_status:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.status_closing
+  house_dilligence_status:
+    lineage:
+      - datalake_sales_flow_clean.diligence.status
+  seller_dilligence_status:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.status
+  report_dilligence_status:
+    lineage:
+      - datalake_sales_flow_clean.diligence.step
+  bank_analysis_status:
+    lineage:
+      - datalake_sales_flow_clean.mortgage.status
+  payment_status:
+    lineage:
+      - datalake_sales_flow_clean.payment.status
+  credit_status:
+    lineage:
+      - datalake_sales_flow_clean.mortgage.credit_status
+  notary_office_status:
+    lineage:
+      - datalake_sales_flow_clean.notary.status
+  real_estate_register_office_status:
+    lineage:
+      - datalake_sales_flow_clean.cash_payment.crn_details
+  sale_price_agreed:
+    lineage:
+      - datalake_sales_flow_clean.offer.sale_price
+  days_offer_accepted_to_offer_dismissed:
+    lineage:
+      - datalake_sales_flow_clean.offer.ts_discarded
+      - datalake_sales_flow_clean.offer.ts_accepted
+  days_offer_accepted_to_sale_agreement_created:
+    lineage:
+      - datalake_sales_flow_clean.ccv_flow.ts_confection_started
+      - datalake_sales_flow_clean.offer.ts_accepted
+  days_offer_accepted_to_sale_agreement_signed:
+    lineage:
+      - datalake_sales_flow_clean.ccv_flow.ts_signed
+      - datalake_sales_flow_clean.offer.ts_accepted
+  days_sale_agreement_created_to_sale_agreement_signed:
+    lineage:
+      - datalake_sales_flow_clean.ccv_flow.ts_signed
+      - datalake_sales_flow_clean.ccv_flow.ts_confection_started
+  has_seller_debt_payments:
+    lineage:
+      - datalake_sales_flow_clean.house.has_seller_debt_payments
+  is_ccv_canceled:
+    lineage:
+      - datalake_sales_flow_clean.ccv_flow.ts_signed
+      - datalake_sales_flow_clean.sales_flow.flow_step
+  dt_sale_agreement_created:
+    lineage:
+      - datalake_sales_flow_clean.ccv_flow.ts_confection_started
+  dt_sale_agreement_signed:
+    lineage:
+      - datalake_sales_flow_clean.ccv_flow.ts_signed
+  dt_sale_agreement_cancelled:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow.flow_step
+      - datalake_sales_flow_clean.offer.ts_discarded
+  dt_house_registry_started:
+    lineage:
+      - datalake_sales_flow_clean.cash_payment.ts_crn_started
+  dt_house_registry_ended:
+    lineage:
+      - datalake_sales_flow_clean.cash_payment.ts_crn_ended
+  dt_sale_transacton_paid:
+    lineage:
+      - datalake_sales_flow_clean.notary.ts_seller_paid
+  ts_accepted:
+    lineage:
+      - datalake_sales_flow_clean.offer.ts_accepted
+  ts_discarded:
+    lineage:
+      - datalake_sales_flow_clean.offer.ts_discarded
+  ts_signed:
+    lineage:
+      - datalake_sales_flow_clean.ccv_flow.ts_signed
+  ts_created:
+    lineage:
+      - datalake_sales_flow_clean.ccv_flow.ts_created
