@@ -286,7 +286,7 @@ class PostgresConsumer(DBConsumer):
         :param table_name: Name of the table
         :param date_filter_column: Name of the column to make the filter
         :param date_filter_value: Value of the column
-        :param unixtime_measure: unix time measure to be seted as miliseconds or seconds
+        :param unixtime_measure: unix time measure to be seted as milliseconds or seconds
         :param partition_granularity: Granularity which the date column will be
         truncated to fetch the partition data - default value 'day'
         :return: A Spark DataFrame with the table data
@@ -303,7 +303,7 @@ class PostgresConsumer(DBConsumer):
 
         dt_filter_value = datetime.strptime(date_filter_value, "%Y-%m-%d")
 
-        if unixtime_measure == "miliseconds":
+        if unixtime_measure == "milliseconds":
             date_filter_column = f"TO_TIMESTAMP({date_filter_column}/1000)"
         elif unixtime_measure == "seconds":
             date_filter_column = f"TO_TIMESTAMP({date_filter_column})"

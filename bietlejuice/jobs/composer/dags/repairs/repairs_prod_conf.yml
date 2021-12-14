@@ -32,6 +32,6 @@ tables:
     clean_table_name: rev_info
     extraction_type: incremental
     date_filter_column: revtstmp
-    unixtime_measure: miliseconds
+    unixtime_measure: milliseconds
 
 clean_partition_columns: [year, month, day]

@@ -75,7 +75,7 @@ if __name__ == "__main__":
     for table in tables:
         if table.table_name not in BLOCK_LIST:
             unixtime_measure = (
-                "miliseconds" if table.table_name in UNIX_FORMAT_TABLES else None
+                "milliseconds" if table.table_name in UNIX_FORMAT_TABLES else None
             )
             df = postgres_consumer.get_incremental_data_by_granularity_from_table(
                 table.table_name,

@@ -16,7 +16,7 @@ tables:
     clean_table_name: rev_info
     extraction_type: incremental
     date_filter_column: revtstmp
-    unixtime_measure: miliseconds
+    unixtime_measure: milliseconds
   - table_name: risk_category_aud
     extraction_type: full
   - table_name: risk_category

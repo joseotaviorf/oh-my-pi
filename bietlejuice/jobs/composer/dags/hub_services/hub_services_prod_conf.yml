@@ -15,7 +15,7 @@ tables:
   - table_name: revinfo
     clean_table_name: rev_info
     date_filter_column: timestamp
-    unixtime_measure: miliseconds
+    unixtime_measure: milliseconds
   - table_name: user_sample
     date_filter_column: updated_at
   - table_name: user_sample_aud
