@@ -39,6 +39,8 @@ This pipeline produces the following output tables:
     - `auxiliary_region`
     - `bandaid_off`
     - `branding_where_is_plaquinha`
+    - `braze_campaign_creative`
+    - `braze_canvas_creative`
     - `business_unit_region`
     - `census_subnormal_crowding_areas`
     - `casa_mineira_inside_sales_pipe`

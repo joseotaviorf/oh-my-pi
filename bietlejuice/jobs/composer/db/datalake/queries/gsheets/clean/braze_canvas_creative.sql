@@ -1,0 +1,13 @@
+SELECT
+  sk_canvas,
+  sk_variant_canvas,
+  sk_step_canvas,
+  canvas_name,
+  message_size,
+  message_type,
+  subject_type,
+  image_type,
+  colors,
+  cta
+FROM
+  datalake_gsheets_raw.braze_canvas_creative
