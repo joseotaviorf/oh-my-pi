@@ -756,8 +756,8 @@ taxonomy_portal_casa_mineira:
     clean_table_name: taxonomy_portal_casa_mineira
 
 taxonomy_sla:
-    sheet_id: 14nTGh2MBuVMKk5GlxDLVdpewMHLBx-a6SJhmEfVAsVY
-    sheet_name: base consolidada
+    sheet_id: 1XB_PyWLyETfwUoJYyLDDF_PZ97swuTJExAjfhLfM7eo
+    sheet_name: SLA por taxonomias
     clean_table_name: taxonomy_sla
 
 tof_supply_targets:
