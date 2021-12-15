@@ -260,6 +260,15 @@ bietlejuice.dw_rent_fact_listing_owners:
   - bietlejuice.enrich_listing_owners:load-enrich-rental-metrics
 
 bietlejuice.dw_rent_flow:
+  - bietlejuice.enrich_ebdb_agents:load-enrich-agents-review
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
+  - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
+  - bietlejuice.enrich_kill_queue:load-enrich-reservation
+  - bietlejuice.dw_booking:load-dw-janus-dim-booking
+  - bietlejuice.dw_contract:load-dw-janus-dim-contract
+  - bietlejuice.dw_listing:load-dw-janus-dim-house-listing
+  - bietlejuice.dw_offer:load-dw-janus-dim-offer
+  - bietlejuice.dw_proposal:load-dw-janus-dim-proposal
   - bietlejuice.gsheets:load-clean-taxonomy-demand
 
 bietlejuice.dw_rent_listing_flow:

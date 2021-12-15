@@ -1,0 +1,215 @@
+database_name: dw_janus
+table_name: fact_listing_rent_flows
+columns:
+  ods_id:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.id_house_rent_flow
+  sk_house_listing:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.id_house
+      - dw_janus.dim_house_listing.version
+  sk_region:
+    lineage:
+      - datalake_ebdb_listing.house.id_region
+  sk_condo:
+    lineage:
+      - datalake_ebdb_listing.house.id_condo_parent
+  sk_rent_flow:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.id_rent_flow
+  sk_booking:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.id_booking
+  sk_tenant_booking_review:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.id_booking
+  sk_owner:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.id_owner
+  sk_user_agent:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.id_user_agent
+  sk_client:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.id_client
+  sk_visit:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.id_visit
+  sk_offer:
+    lineage:
+      - dw_janus.dim_offer.sk_offer
+  sk_reservation:
+    lineage:
+      - datalake_kill_queue.reservation.id_reservation
+  sk_proposal:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.id_proposal
+  sk_contract:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.id_contract
+  sk_rent_flow_taxonomy:
+    lineage:
+      - dw_janus.dim_booking.sk_rent_flow_taxonomy
+  sk_house_first_listing_date:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.dt_house_first_listing
+  sk_house_listing_date:
+    lineage:
+      - dw_janus.dim_house_listing.ts_listing_version_start
+  sk_house_listing_de_publication_date:
+    lineage:
+      - dw_janus.dim_house_listing.ts_last_de_publication
+  sk_house_listing_first_offer_submitted_date:
+    lineage:
+      - dw_janus.dim_offer.dt_created
+  sk_booking_created_date:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.dt_booking_created
+  sk_visit_date:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.dt_visit
+  sk_agent_sign_up_date:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.dt_agent_sign_up
+  sk_client_sign_up_date:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.dt_client_sign_up
+  sk_offer_submitted_date:
+    lineage:
+      - dw_janus.dim_offer.dt_first_sent
+  sk_min_offer_submitted_date:
+    lineage:
+      - dw_janus.dim_offer.dt_first_sent
+  sk_offer_approved_date:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.dt_analysis
+  sk_reservation_created_date:
+    lineage:
+      - datalake_kill_queue.reservation.ts_created
+  sk_proposal_approved_date:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.dt_proposal_approved
+  sk_proposal_processed_date:
+    lineage:
+      - dw_janus.dim_proposal.ts_processed
+  sk_tenant_first_doc_sent_date:
+    lineage:
+      - dw_janus.dim_proposal.dt_tenant_first_document_sent
+      - dw_janus.dim_proposal.dt_tenant_auto_first_doc_sent
+  sk_tenant_manual_first_doc_sent_date:
+    lineage:
+      - dw_janus.dim_proposal.dt_tenant_first_document_sent
+  sk_tenant_auto_first_doc_sent_date:
+    lineage:
+      - dw_janus.dim_proposal.dt_tenant_auto_first_doc_sent
+  sk_tenant_first_doc_complete_date:
+    lineage:
+      - dw_janus.dim_proposal.dt_tenant_first_doc_complete
+  sk_tenant_last_doc_complete_date:
+    lineage:
+      - dw_janus.dim_proposal.dt_tenant_last_doc_complete
+  sk_tenant_doc_complete_date:
+    lineage:
+      - dw_janus.dim_proposal.dt_tenant_doc_complete
+  sk_contract_created_date:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.dt_contract_created
+  sk_contract_signed_date:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.dt_contract_signed
+  sk_contract_annulment_date:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.dt_contract_annulment
+  sk_contract_canceled_date:
+    lineage:
+      - dw_janus.dim_contract.ts_canceled
+  sk_credit_analysis_first_init_date:
+    lineage:
+      - dw_janus.dim_proposal.dt_credit_analysis_first_init
+  sk_credit_analysis_last_init_date:
+    lineage:
+      - dw_janus.dim_proposal.dt_credit_analysis_last_init
+  sk_credit_analysis_init_date:
+    lineage:
+      - dw_janus.dim_proposal.dt_credit_analysis_init
+  sk_credit_analysis_first_end_date:
+    lineage:
+      - dw_janus.dim_proposal.dt_credit_analysis_first_end
+  sk_credit_analysis_last_end_date:
+    lineage:
+      - dw_janus.dim_proposal.dt_credit_analysis_last_end
+  sk_credit_analysis_end_date:
+    lineage:
+      - dw_janus.dim_proposal.dt_credit_analysis_end
+  sk_credit_analysis_approved_date:
+    lineage:
+      - dw_janus.dim_proposal.dt_credit_last_approved
+  sk_first_credit_evaluation_init:
+    lineage:
+      - dw_janus.dim_proposal.dt_first_credit_evaluation_init
+  sk_last_credit_evaluation_init:
+    lineage:
+      - dw_janus.dim_proposal.dt_last_credit_evaluation_init
+  sk_first_credit_evaluation_positive:
+    lineage:
+      - dw_janus.dim_proposal.dt_first_credit_evaluation_positive
+  sk_last_credit_evaluation_positive:
+    lineage:
+      - dw_janus.dim_proposal.dt_last_credit_evaluation_positive
+  sk_first_credit_evaluation_negative:
+    lineage:
+      - dw_janus.dim_proposal.dt_first_credit_evaluation_negative
+  sk_last_credit_evaluation_negative:
+    lineage:
+      - dw_janus.dim_proposal.dt_last_credit_evaluation_negative
+  sk_guarantee_date:
+    lineage:
+      - dw_janus.dim_proposal.dt_guarantee
+  sk_first_doc_analysis_approved:
+    lineage:
+      - dw_janus.dim_proposal.dt_first_doc_analysis_approved
+  sk_last_doc_analysis_approved:
+    lineage:
+      - dw_janus.dim_proposal.dt_last_doc_analysis_approved
+  sk_first_doc_analysis_rejected:
+    lineage:
+      - dw_janus.dim_proposal.dt_first_doc_analysis_rejected
+  sk_last_doc_analysis_rejected:
+    lineage:
+      - dw_janus.dim_proposal.dt_last_doc_analysis_rejected
+  sk_guarantee_paid_date:
+    lineage:
+      - dw_janus.dim_proposal.dt_guarantee_paid
+  sk_agent_review_rating_date:
+    lineage:
+      - datalake_ebdb_agents.agents_review.ts_rating_created
+  visit_created_type:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.visit_created_type
+  booking_utm_campaign:
+    lineage:
+      - dw_janus.dim_booking.utm_campaign
+  booking_utm_content:
+    lineage:
+      - dw_janus.dim_booking.utm_content
+  booking_utm_term:
+    lineage:
+      - dw_janus.dim_booking.utm_term
+  funnel_step_drop_reason:
+    lineage:
+      - dw_janus.dim_contract.cancellation_reason
+      - dw_janus.dim_offer.rejection_reason
+      - dw_janus.dim_proposal.rejection_reason
+      - dw_janus.dim_booking.cancellation_reason
+  flg_visit_completed:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.is_visit_completed
+  flg_visit_performed:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.is_visit_performed
+  flg_visit_created_from_app:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.is_visit_created_from_app
+  flg_visit_last_updated_from_app:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.is_visit_last_updated_from_app
