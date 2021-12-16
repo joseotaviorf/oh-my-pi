@@ -9,6 +9,7 @@ from airflow.operators.quintoandar_databricks import (
 )
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 from airflow.utils.helpers import chain
@@ -16,7 +17,7 @@ from airflow.utils.helpers import chain
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2021, 12, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
 
-CONTEXT = "vendas"
+CONTEXT = "sale_offer_flows"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = os.environ.get("ENVIRONMENT")
@@ -42,7 +43,7 @@ LIBRARIES_DESCRIPTION = Variable.get(
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": BaseDAG.DEFAULT_OWNER,
+        "owner": DAGOwnerEnum.DATA_FOR_SALE,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },

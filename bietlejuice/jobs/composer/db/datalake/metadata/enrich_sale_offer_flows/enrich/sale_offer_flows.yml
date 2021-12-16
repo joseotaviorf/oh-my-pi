@@ -1,6 +1,6 @@
 ---
-database_name: datalake_vendas
-table_name: vendas
+database_name: datalake_sale_offer_flows
+table_name: sale_offer_flows
 columns:
   id_offer:
     lineage:

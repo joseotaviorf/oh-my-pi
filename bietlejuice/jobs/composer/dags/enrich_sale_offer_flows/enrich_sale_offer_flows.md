@@ -1,8 +1,8 @@
-## Enrich Offer
+## Enrich Sale Offer Flows
 
 ### Purpose
 
-Creates enriched tables for the context `Vendas` enriching from sales_flow.
+Creates enriched tables for the context `sale_offer_flows` enriching from sale_flows.
 
 ### Execution Interval
 
@@ -12,7 +12,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 Produces the following output tables:
 
-- `vendas`
+- `sale_offer_flows`
 
 ### Responsible Data Engineering Team
 

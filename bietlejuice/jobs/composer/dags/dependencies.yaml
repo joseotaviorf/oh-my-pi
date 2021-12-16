@@ -836,6 +836,8 @@ bietlejuice.enrich_offer:
   - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
   - bietlejuice.enrich_firestore
   - bietlejuice.godfather:load-clean-offer
+  - bietlejuice.enrich_gsheets
+  - bietlejuice.enrich_sale_offer_flows
 
 bietlejuice.enrich_owner_fees:
   - bietlejuice.owner_fees:load-clean-contract
@@ -968,7 +970,7 @@ bietlejuice.enrich_customer_resolution:
 bietlejuice.enrich_gsheets:
   - bietlejuice.gsheets:load-clean-offers-hub-central
 
-bietlejuice.enrich_vendas:
+bietlejuice.enrich_sale_offer_flows:
   - bietlejuice.sales_flow:load-clean-sales-flow
   - bietlejuice.sales_flow:load-clean-offer
   - bietlejuice.sales_flow:load-clean-ccv-flow
