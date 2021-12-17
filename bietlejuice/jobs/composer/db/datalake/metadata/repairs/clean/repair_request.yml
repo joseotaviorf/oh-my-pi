@@ -19,6 +19,9 @@ columns:
   allow_personal_info_sharing:
     lineage:
       - datalake_repairs_raw.repair_request.allow_personal_info_sharing
+  status:
+    lineage:
+      - datalake_repairs_raw.repair_request.status
   third_party_crm:
     lineage:
       - datalake_repairs_raw.repair_request.third_party_crm

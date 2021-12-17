@@ -4,6 +4,9 @@
 
 This DAG handles the ingestion of the raw and clean data for our Repairs Service, which is a Service that was created to make repairs experience faster and easier for Tenants and Landlords. Check [its own repository](https://github.com/quintoandar/repairs) for more informations.
 
+<details>
+  <summary><strong> > DAG details (click to expand)</strong></summary>
+
 ### Execution Interval
 
 This DAG is triggered daily.
@@ -29,8 +32,10 @@ More information about run time [here]({chart_url}{dag_id}).
     - `repair_request_item_aud`
     - `repair_request_item`
     - `rev_info`
+    - `service_request_aud`
+    - `service_request`
     
 ### Responsible Data Engineering Team
 
-For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the
-[DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
+For any questions or concerns about this DAG, please contact its owner.
+</details>

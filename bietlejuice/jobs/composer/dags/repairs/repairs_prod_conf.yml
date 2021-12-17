@@ -33,5 +33,10 @@ tables:
     extraction_type: incremental
     date_filter_column: revtstmp
     unixtime_measure: milliseconds
+  - table_name: service_request
+    extraction_type: incremental
+    date_filter_column: updated_at
+  - table_name: service_request_aud
+    extraction_type: full
 
 clean_partition_columns: [year, month, day]
