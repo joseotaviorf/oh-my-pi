@@ -517,6 +517,9 @@ bietlejuice.enrich_casa_mineira_consolidated_marketing_metrics:
   - bietlejuice.casa_mineira_lifull_campaigns:load-clean-trovit-campaigns
   - bietlejuice.casa_mineira_rtb_campaigns:load-clean-rtb-campaigns
 
+bietlejuice.enrich_casa_mineira_marketing_automatic_daily_costs:
+  - bietlejuice.enrich_casa_mineira_consolidated_marketing_metrics:load-enrich-consolidated-media-metrics
+
 bietlejuice.enrich_casa_mineira_portal:
   - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency
   - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency-history

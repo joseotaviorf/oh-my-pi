@@ -1,0 +1,80 @@
+---
+database_name: datalake_marketing_costs
+table_name: daily_costs
+columns:
+  id_date:
+    lineage:
+      - datalake_casa_mineira_consolidated_marketing_metrics.consolidated_media_metrics.id_date
+      - datalake_casa_mineira_marketing_manual_daily_costs_clean.casa_mineira_marketing_manual_shared_costs.dt_cost
+  origin:
+    lineage:
+      - datalake_casa_mineira_consolidated_marketing_metrics.consolidated_media_metrics.origin
+  account_name:
+    lineage:
+      - datalake_casa_mineira_consolidated_marketing_metrics.consolidated_media_metrics.account_name
+      - datalake_casa_mineira_marketing_manual_daily_costs_clean.casa_mineira_marketing_manual_shared_costs.account_name
+  campaign_name:
+    lineage:
+      - datalake_casa_mineira_consolidated_marketing_metrics.consolidated_media_metrics.campaign_name
+      - datalake_casa_mineira_marketing_manual_daily_costs_clean.casa_mineira_marketing_manual_shared_costs.campaign_name
+  utm_campaign:
+    lineage:
+      - datalake_casa_mineira_consolidated_marketing_metrics.consolidated_media_metrics.utm_campaign
+      - datalake_casa_mineira_marketing_manual_daily_costs_clean.casa_mineira_marketing_manual_shared_costs.campaign_name
+  utm_term:
+    lineage:
+      - datalake_casa_mineira_consolidated_marketing_metrics.consolidated_media_metrics.utm_term
+      - datalake_casa_mineira_marketing_manual_daily_costs_clean.casa_mineira_marketing_manual_shared_costs.utm_term
+  utm_content:
+    lineage:
+      - datalake_casa_mineira_consolidated_marketing_metrics.consolidated_media_metrics.utm_content
+      - datalake_casa_mineira_marketing_manual_daily_costs_clean.casa_mineira_marketing_manual_shared_costs.utm_content
+  city_group:
+    lineage:
+      - datalake_casa_mineira_consolidated_marketing_metrics.consolidated_media_metrics.city_group
+      - datalake_casa_mineira_marketing_manual_daily_costs_clean.casa_mineira_marketing_manual_shared_costs.city_group
+      - datalake_marketing_costs_sharing_rules.old_sharing_rules.city_group
+  campaign_origin_acquisition:
+    lineage:
+      - datalake_gsheets_clean.casa_mineira_marketing_cost_taxonomy.campaign_origin_acquisition
+  mkt_category:
+    lineage:
+      - datalake_gsheets_clean.casa_mineira_marketing_cost_taxonomy.mkt_category
+  mkt_flow:
+    lineage:
+      - datalake_gsheets_clean.casa_mineira_marketing_cost_taxonomy.mkt_flow
+  mkt_completion:
+    lineage:
+      - datalake_gsheets_clean.casa_mineira_marketing_cost_taxonomy.mkt_completion
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_clean.casa_mineira_marketing_cost_taxonomy.mkt_origin
+      - datalake_casa_mineira_marketing_manual_daily_costs_clean.casa_mineira_marketing_manual_shared_costs.mkt_origin
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_clean.casa_mineira_marketing_cost_taxonomy.mkt_channel
+      - datalake_casa_mineira_marketing_manual_daily_costs_clean.casa_mineira_marketing_manual_shared_costs.mkt_channel
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_clean.casa_mineira_marketing_cost_taxonomy.mkt_medium
+      - datalake_casa_mineira_marketing_manual_daily_costs_clean.casa_mineira_marketing_manual_shared_costs.mkt_medium
+  mkt_source:
+    lineage:
+      - datalake_gsheets_clean.casa_mineira_marketing_cost_taxonomy.mkt_source
+      - datalake_casa_mineira_marketing_manual_daily_costs_clean.casa_mineira_marketing_manual_shared_costs.mkt_source
+  cost:
+    lineage:
+      - datalake_casa_mineira_consolidated_marketing_metrics.consolidated_media_metrics.desktop_cost
+      - datalake_casa_mineira_consolidated_marketing_metrics.consolidated_media_metrics.mobile_cost
+      - datalake_casa_mineira_consolidated_marketing_metrics.consolidated_media_metrics.other_cost
+      - datalake_casa_mineira_consolidated_marketing_metrics.consolidated_media_metrics.total_cost
+      - datalake_casa_mineira_marketing_manual_daily_costs_clean.casa_mineira_marketing_manual_shared_costs.cost
+      - datalake_casa_mineira_marketing_manual_daily_costs_clean.casa_mineira_marketing_manual_shared_costs.cost_share_desktop
+      - datalake_casa_mineira_marketing_manual_daily_costs_clean.casa_mineira_marketing_manual_shared_costs.cost_share_mobile
+      - datalake_casa_mineira_marketing_manual_daily_costs_clean.casa_mineira_marketing_manual_shared_costs.cost_share_other
+      - datalake_gsheets_clean.casa_mineira_marketing_cost_taxonomy.cost_factor
+      - datalake_marketing_costs_sharing_rules.old_sharing_rules.share
+  funnel_side:
+    lineage:
+      - datalake_casa_mineira_marketing_manual_daily_costs_clean.casa_mineira_marketing_manual_shared_costs.side
+      - datalake_gsheets_clean.casa_mineira_marketing_cost_taxonomy.side
