@@ -47,22 +47,6 @@ tenant_prospect_events AS (
     tta.business_context = 'RENT'
     AND tta.first_message_ts IS NOT NULL
 ),
------------------------------------------------------------------------------
--- Creating a list for dates and cities (Brasília, Salvador and Recife) -----
------------------------------------------------------------------------------
-date_region AS (
-  SELECT
-    DATE(evt.ts_event) as date,
-    dr.city_group   
-  FROM 
-    tenant_prospect_events AS evt
-  JOIN 
-    dim_region AS dr 
-    USING(sk_region) 
-  WHERE 
-    dr.city_group IN ('Brasília', 'Recife', 'Salvador')  
-  GROUP BY 1, 2
-),
 ------------------------------------------------------------------------------
 -- Order Tenant Prospects events by timestamp to extract only the first one --
 ------------------------------------------------------------------------------
@@ -73,37 +57,48 @@ tenant_prospects AS (
     dr.city_group,
     evt.mkt_medium,
     evt.mkt_source,
-    DATE(evt.ts_event) AS date,
     ROW_NUMBER() OVER(PARTITION BY evt.sk_client
                       ORDER BY evt.ts_event) AS interactions_order
   FROM
     tenant_prospect_events AS evt
-  JOIN 
-    dim_region AS dr 
-    USING(sk_region)  
-  WHERE
-    mkt_medium = 'Display'
-    AND mkt_source = 'Facebook'
+  JOIN
+    dim_region AS dr
+    USING(sk_region)
+), grouped_tenant_prospects AS (
+    SELECT
+        DATE(ts_event) as dt_event,
+        city_group,
+        COUNT(CASE WHEN interactions_order = 1 THEN sk_client ELSE NULL END) AS nTP
+    FROM tenant_prospects
+    WHERE mkt_medium = 'Display'
+        AND mkt_source = 'Facebook'
+        AND city_group IN ('Brasília', 'Recife', 'Salvador')
+    GROUP BY 1,2
+), date_region AS (
+    SELECT
+        DATE(evt.ts_event) as dt_event,
+        dr.city_group
+    FROM
+        tenant_prospect_events AS evt
+    JOIN
+        dim_region AS dr
+        USING(sk_region)
+    WHERE
+        dr.city_group IN ('Brasília', 'Recife', 'Salvador')
+    GROUP BY 1, 2
 )
 SELECT
-  dd.sk_date,
+  dr.dt_event as sk_date,
   dr.city_group,
-  CASE 
-    WHEN SUM(COUNT(DISTINCT CASE WHEN tp.interactions_order = 1 THEN tp.sk_client ELSE NULL END)) OVER(PARTITION BY dd.sk_date)::FLOAT = 0 
-      THEN 0.33 
-    ELSE
-      COUNT(DISTINCT CASE WHEN tp.interactions_order = 1 THEN tp.sk_client ELSE NULL END)
-      / NULLIF(SUM(COUNT(DISTINCT CASE WHEN tp.interactions_order = 1 THEN tp.sk_client ELSE NULL END)) OVER(PARTITION BY dd.sk_date)::FLOAT, 0)
-  END AS share,
-  'demand' AS funnel_side
+  CASE
+        WHEN SUM(COALESCE(tp.nTP, 0)) OVER(PARTITION BY dr.dt_event)::FLOAT = 0
+            THEN 0.33
+        ELSE
+            COALESCE(tp.nTP, 0)
+                / NULLIF(SUM(COALESCE(tp.nTP, 0)) OVER(PARTITION BY dr.dt_event)::FLOAT, 0)
+   END AS share,
+   'demand' AS funnel_side
 FROM
-  tenant_prospects AS tp
-FULL OUTER JOIN 
-  date_region AS dr
-  ON tp.date = dr.date 
-  AND dr.city_group = tp.city_group
-JOIN
-  dim_date AS dd
-  ON dd.date = dr.date
-GROUP BY
-	1,2
+  grouped_tenant_prospects AS tp
+  FULL OUTER JOIN date_region AS dr
+    ON tp.dt_event = dr.dt_event AND dr.city_group = tp.city_group
