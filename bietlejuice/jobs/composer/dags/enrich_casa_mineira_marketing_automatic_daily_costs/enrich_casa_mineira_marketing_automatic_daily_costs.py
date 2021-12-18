@@ -18,7 +18,7 @@ from bietlejuice.jobs.composer.services.configuration_service import (
 
 ENV = os.environ.get("ENVIRONMENT")
 CONTEXT = "casa_mineira_marketing_costs"
-DAG_NAME = "enrich_marketing_automatic_daily_costs"
+DAG_NAME = "enrich_casa_mineira_marketing_automatic_daily_costs"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 PARTITION_COLS = ["id_date", "flow_type"]
 
@@ -26,7 +26,7 @@ PARTITION_COLS = ["id_date", "flow_type"]
 MAIN_START_DATE = datetime(2021, 5, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = None
 
-config_service = ConfigurationService(CONTEXT)
+config_service = ConfigurationService(DAG_NAME)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
