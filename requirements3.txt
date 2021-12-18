@@ -5,6 +5,7 @@
 botocore==1.12.201
 boto3==1.9.201
 Click==7.0
+deepmerge==0.3.0
 dependency-injector==4.8.2
 deprecated==1.2.10
 future==0.16.0
