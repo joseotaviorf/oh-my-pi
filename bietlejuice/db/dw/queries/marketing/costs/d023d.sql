@@ -53,7 +53,7 @@ tenant_prospect_events AS (
 tenant_prospects AS (
   SELECT
     evt.sk_client,
-    TO_CHAR(ts_event, 'YYYYMMDD') as sk_date,
+    TO_CHAR(ts_event, 'YYYYMMDD')::INTEGER as sk_date,
     dr.city_group,
     evt.mkt_medium,
     evt.mkt_source,
@@ -78,7 +78,7 @@ grouped_tenant_prospects AS (
 ),
 date_region AS (
     SELECT
-        TO_CHAR(evt.ts_event, 'YYYYMMDD') as sk_date,
+        TO_CHAR(evt.ts_event, 'YYYYMMDD')::INTEGER as sk_date,
         dr.city_group
     FROM
         tenant_prospect_events AS evt
