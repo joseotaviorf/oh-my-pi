@@ -24,7 +24,7 @@ DAG_NAME = f"dw_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 MAIN_START_DATE = datetime(2018, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
 CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_min_general_cluster", deserialize_json=True
+    "databricks_9_1_med_general_cluster", deserialize_json=True
 )
 PARTITION_COLS = ["dt_loaded"]
 DW_QUERY_FILTERS = {"dt_loaded": "date('{year}-{month}-{day}')"}
