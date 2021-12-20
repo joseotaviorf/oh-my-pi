@@ -1,100 +1,97 @@
 ---
 database_name: datalake_heimdall
-table_name: activity
+table_name: auditable_expenses
 columns:
   id:
     lineage:
+      - datalake_heimdall_clean.activity.metadata
+  id_activity:
+    lineage:
       - datalake_heimdall_clean.activity.id
-  id_external_contract:
-    lineage:
-      - datalake_heimdall_clean.activity.id_external_contract
-  id_house:
-    lineage:
-      - datalake_heimdall_clean.activity.id_house
-  id_user:
+  id_entity:
     lineage:
       - datalake_heimdall_clean.activity.metadata
-  id_state:
+  agreement_channel:
     lineage:
       - datalake_heimdall_clean.activity.metadata
-  id_rent_flow:
+  agreement_description:
     lineage:
       - datalake_heimdall_clean.activity.metadata
-  class:
+  agreement_evidences_files_urls:
     lineage:
-      - datalake_heimdall_clean.activity.class
-  previous_status:
+      - datalake_heimdall_clean.activity.metadata
+  entity_type:
     lineage:
-      - datalake_heimdall_clean.activity.transition_list
+      - datalake_heimdall_clean.activity.metadata
+  invoices_files_urls:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  invoice_file_password:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  receipt_file_url:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  recurrence_class:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  recurrence_description:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  rejection_reason:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  rejection_comment:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
   status:
     lineage:
-      - datalake_heimdall_clean.activity.status
+      - datalake_heimdall_clean.activity.metadata
+  text:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
   type:
     lineage:
-      - datalake_heimdall_clean.activity.type
-  user_name:
+      - datalake_heimdall_clean.activity.metadata
+  is_custom_text:
     lineage:
       - datalake_heimdall_clean.activity.metadata
-  condominium_receipt_url:
+  is_full_refund:
     lineage:
       - datalake_heimdall_clean.activity.metadata
-  condominium_invoice_url:
+  is_idempotent_creation:
     lineage:
       - datalake_heimdall_clean.activity.metadata
-  description:
+  is_validated_by_instant_refund:
     lineage:
       - datalake_heimdall_clean.activity.metadata
-  event_name:
+  initial_month:
     lineage:
       - datalake_heimdall_clean.activity.metadata
-  house_address:
+  final_month:
     lineage:
       - datalake_heimdall_clean.activity.metadata
-  landlords_contact_info:
+  initial_year:
     lineage:
       - datalake_heimdall_clean.activity.metadata
-  user_email:
+  final_year:
     lineage:
       - datalake_heimdall_clean.activity.metadata
-  ticket_number:
+  recurrence_current:
     lineage:
       - datalake_heimdall_clean.activity.metadata
-  discount_months:
+  recurrence_total:
     lineage:
       - datalake_heimdall_clean.activity.metadata
-  discount_percentage:
+  amount:
     lineage:
       - datalake_heimdall_clean.activity.metadata
-  discount_amount:
+  dt_invoice_due:
     lineage:
       - datalake_heimdall_clean.activity.metadata
-  discounted_rental:
+  dt_invoice_accrual:
     lineage:
       - datalake_heimdall_clean.activity.metadata
-  rental_amount:
+  ts_status_changed:
     lineage:
       - datalake_heimdall_clean.activity.metadata
-  discount_start_year_month:
-    lineage:
-      - datalake_heimdall_clean.activity.metadata
-  discount_end_year_month:
-    lineage:
-      - datalake_heimdall_clean.activity.metadata
-  dt_contract_started:
-    lineage:
-      - datalake_heimdall_clean.activity.metadata
-  ts_transferred:
-    lineage:
-      - datalake_heimdall_clean.activity.metadata
-  ts_requested:
-    lineage:
-      - datalake_heimdall_clean.activity.metadata
-  ts_transition_created:
-    lineage:
-      - datalake_heimdall_clean.activity.transition_list
-  ts_created:
-    lineage:
-      - datalake_heimdall_clean.activity.ts_created
-  ts_updated:
-    lineage:
-      - datalake_heimdall_clean.activity.ts_updated

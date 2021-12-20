@@ -25,8 +25,6 @@ SELECT
     GET_JSON_OBJECT(dl.metadata,'$.email'), 
     REPLACE(REPLACE(GET_JSON_OBJECT(dl.metadata,'$.emails'), '["' ), '"]')
   ) AS user_email,
-  FROM_JSON(GET_JSON_OBJECT(dl.metadata,'$.expenses'), 'ARRAY<STRING>') AS expenses,
-  FROM_JSON(GET_JSON_OBJECT(dl.metadata,'$.auditableExpenses'), 'ARRAY<STRING>') AS auditable_expenses,
   CAST(GET_JSON_OBJECT(dl.metadata,'$.ticket_number') AS BIGINT) AS ticket_number,
   CAST(GET_JSON_OBJECT(dl.metadata,'$.discount_months') AS BIGINT) AS discount_months,
   CAST(GET_JSON_OBJECT(dl.metadata,'$.discount_percentage') AS DECIMAL(6,6)) AS discount_percentage,
@@ -48,7 +46,12 @@ SELECT
     )
   ) AS ts_transferred,
   COALESCE(
-    TO_TIMESTAMP(GET_JSON_OBJECT(dl.metadata,'$.request_date'), 'dd/MM/yyyy HH:mm'),
+    CASE
+      WHEN GET_JSON_OBJECT(dl.metadata,'$.request_date') LIKE '%PM%' 
+        OR GET_JSON_OBJECT(dl.metadata,'$.request_date') LIKE '%AM%'
+        THEN TO_TIMESTAMP(GET_JSON_OBJECT(dl.metadata,'$.request_date'), 'dd/MM/yyyy h:mm a')
+      ELSE TO_TIMESTAMP(GET_JSON_OBJECT(dl.metadata,'$.request_date'), 'dd/MM/yyyy HH:mm')
+    END,
     TO_TIMESTAMP(GET_JSON_OBJECT(dl.metadata,'$.requestedAt.$date')),
     TO_TIMESTAMP(GET_JSON_OBJECT(dl.metadata,'$.requested_date'), 'yyyy-MM-dd')
   ) AS ts_requested,

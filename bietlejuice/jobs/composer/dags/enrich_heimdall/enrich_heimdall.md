@@ -16,6 +16,8 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 Produces the following output table on Enrich layer (via full load):
 
 - `activity`
+- `auditable_expenses`
+- `expenses`
 
 ### Responsible Data Engineering Team
 

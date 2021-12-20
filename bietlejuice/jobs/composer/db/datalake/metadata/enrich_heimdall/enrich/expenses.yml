@@ -1,0 +1,52 @@
+---
+database_name: datalake_heimdall
+table_name: expenses
+columns:
+  id:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  id_activity:
+    lineage:
+      - datalake_heimdall_clean.activity.id
+  agreement_channel:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  agreement_description:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  agreement_evidences_files_urls:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  invoice_file_password:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  invoices_files_urls:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  receipt_file_url:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  recurrence_class:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  recurrence_description:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  text:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  is_custom_text:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  recurrence_current:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  recurrence_total:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  amount:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  dt_invoice_due:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
