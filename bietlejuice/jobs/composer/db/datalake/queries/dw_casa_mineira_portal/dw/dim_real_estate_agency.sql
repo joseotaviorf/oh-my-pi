@@ -1,7 +1,7 @@
 SELECT 
     CAST(rea.id AS INT) AS sk_real_estate_agency,
-    COALESCE(CAST(DATE_FORMAT(rea.ts_created, 'yyyyMMdd') AS BIGINT), -1) AS sk_real_estate_agency_created_date,
-    COALESCE(CAST(DATE_FORMAT(rea.ts_disabled, 'yyyyMMdd') AS BIGINT), -1) AS sk_real_estate_agency_disabled_date,
+    COALESCE(CAST(DATE_FORMAT(rea.ts_created, 'yyyyMMdd') AS INT), -1) AS sk_real_estate_agency_created_date,
+    COALESCE(CAST(DATE_FORMAT(rea.ts_disabled, 'yyyyMMdd') AS INT), -1) AS sk_real_estate_agency_disabled_date,
     CAST(rea.id AS INT) AS id_real_estate_agency,
     rea.real_estate_agency_name,
     rea.real_estate_agency_full_name,
