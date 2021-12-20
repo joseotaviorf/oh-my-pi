@@ -98,7 +98,8 @@ SELECT
         ELSE
             COALESCE(tp.nTP, 0)
                 / NULLIF(SUM(COALESCE(tp.nTP, 0)) OVER(PARTITION BY dr.sk_date)::FLOAT, 0)
-   END AS share
+   END AS share,
+   'demand' AS funnel_side
 FROM
   grouped_tenant_prospects AS tp
   FULL OUTER JOIN date_region AS dr
