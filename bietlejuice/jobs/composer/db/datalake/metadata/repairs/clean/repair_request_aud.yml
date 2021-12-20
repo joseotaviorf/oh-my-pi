@@ -28,6 +28,9 @@ columns:
   allow_personal_info_sharing:
     lineage:
       - datalake_repairs_raw.repair_request_aud.allow_personal_info_sharing
+  status:
+    lineage:
+      - datalake_repairs_raw.repair_request_aud.status
   third_party_crm:
     lineage:
       - datalake_repairs_raw.repair_request_aud.third_party_crm
@@ -43,6 +46,9 @@ columns:
   mod_id_third_party_crm_ticket_external:
     lineage:
       - datalake_repairs_raw.repair_request_aud.third_party_crm_ticket_external_id_mod
+  mod_status:
+    lineage:
+      - datalake_repairs_raw.repair_request_aud.status_mod
   mod_third_party_crm:
     lineage:
       - datalake_repairs_raw.repair_request_aud.third_party_crm_mod
