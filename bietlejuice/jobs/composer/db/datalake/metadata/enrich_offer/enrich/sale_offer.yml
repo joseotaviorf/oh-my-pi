@@ -4,42 +4,156 @@ columns:
   id_offer:
     lineage:
       - datalake_firestore.sale_offer.id
+      - datalake_gsheets.sale_hub_offer.id_offer
   id_sale_flow:
     lineage:
-      - datalake_firestore.sale_offer.id_sale_flow
+      - datalake_sale_offer_flows.sale_offer_flows.id_sales_flow
   id_buyer:
     lineage:
       - datalake_firestore.sale_offer.id_buyer
+      - datalake_gsheets.sale_hub_offer.id_buyer
   id_house:
     lineage:
       - datalake_firestore.sale_offer.id_house
+      - datalake_gsheets.sale_hub_offer.id_house
   id_owner:
     lineage:
       - datalake_firestore.sale_offer.id_owner
-  id_closing_specialist:
+      - datalake_gsheets.sale_hub_offer.id_owner
+  id_region:
     lineage:
-      - datalake_firestore.monday.id_closing_specialist
-  id_consultant:
-    lineage:
-      - datalake_firestore.monday.id_consultant
-  id_booking:
-    lineage:
-      - datalake_booking.booking.id
+      - datalake_firestore.sale_offer.id_region
+      - datalake_gsheets.sale_hub_offer.id_region
   id_agent:
     lineage:
       - datalake_booking.booking.id_agent
+  id_team_lead:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.sk_team_lead
+  id_consultant:
+    lineage:
+      - datalake_firestore.monday.id_consultant
+      - datalake_sale_offer_flows.sale_offer_flows.id_consultant
+  id_booking:
+    lineage:
+      - datalake_booking.booking.id
+  id_closing_specialist:
+    lineage:
+      - datalake_firestore.monday.id_closing_specialist
+      - datalake_sale_offer_flows.sale_offer_flows.id_closing_specialist
+  team_lead_name:
+    lineage:
+      - datalake_gsheets.sale_hub_offer.team_lead_name
+      - datalake_sale_offer_flows.sale_offer_flows.team_lead_name
+  offer_flow:
+    lineage:
+      - datalake_gsheets.sale_hub_offer.offer_flow
+      - datalake_sale_offer_flows.sale_offer_flows.offer_flow
+  business_unit:
+    lineage:
+      - datalake_ebdb_clean.work_contract.contract_name
+      - datalake_gsheets.sale_hub_offer.offer_flow
+  offer_platform:
+    lineage:
+      - datalake_gsheets.sale_hub_offer.offer_model
+  offer_status:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.offer_status
+      - datalake_firestore.monday.offer_status
+      - datalake_gsheets.sale_hub_offer.status
+  monday_status:
+    lineage:
+      - datalake_firestore.monday.status
+  credit_model:
+    lineage:
+      - datalake_firestore.monday.credit_model
+      - datalake_sale_offer_flows.sale_offer_flows.credit_model
+  closing_status:
+    lineage:
+      - datalake_firestore.monday.closing_status
+      - datalake_sale_offer_flows.sale_offer_flows.closing_status
+  house_dilligence_status:
+    lineage:
+      - datalake_firestore.monday.house_dilligence_status
+      - datalake_sale_offer_flows.sale_offer_flows.house_dilligence_status
+  seller_dilligence_status:
+    lineage:
+      - datalake_firestore.monday.seller_dilligence_status
+      - datalake_sale_offer_flows.sale_offer_flows.seller_dilligence_status
+  report_dilligence_status:
+    lineage:
+      - datalake_firestore.monday.report_dilligence_status
+      - datalake_sale_offer_flows.sale_offer_flows.report_dilligence_status
+  bank_analysis_status:
+    lineage:
+      - datalake_firestore.monday.bank_analysis_status
+      - datalake_sale_offer_flows.sale_offer_flows.bank_analysis_status
+  payment_status:
+    lineage:
+      - datalake_firestore.monday.payment_status
+      - datalake_sale_offer_flows.sale_offer_flows.payment_status
+  credit_status:
+    lineage:
+      - datalake_firestore.monday.credit_status
+      - datalake_sale_offer_flows.sale_offer_flows.credit_status
+  notary_office_status:
+    lineage:
+      - datalake_firestore.monday.notary_office_status
+      - datalake_sale_offer_flows.sale_offer_flows.notary_office_status
+  real_estate_register_office_status:
+    lineage:
+      - datalake_firestore.monday.real_estate_register_office_status
+      - datalake_sale_offer_flows.sale_offer_flows.real_estate_register_office_status
+  sale_agreement_status:
+    lineage:
+      - datalake_firestore.monday.sale_agreement_status
+      - datalake_sale_offer_flows.sale_offer_flows.sale_agreement_status
+  agent_work_contract:
+    lineage:
+      - datalake_ebdb_clean.work_contract.contract_name
+  financing_bank:
+    lineage:
+      - datalake_firestore.monday.financing_bank
+      - datalake_sale_offer_flows.sale_offer_flows.financing_bank
+  negotiation_model:
+    lineage:
+      - datalake_firestore.monday.negotiation_model
+      - datalake_sale_offer_flows.sale_offer_flows.negotiation_model
+  sale_agreement_cancellation_reason:
+    lineage:
+      - datalake_firestore.monday.sale_agreement_cancellation_reason
+      - datalake_sale_offer_flows.sale_offer_flows.sale_agreement_cancellation_reason
+  drop_reason:
+    lineage:
+      - datalake_firestore.monday.drop_reason
+      - datalake_sale_offer_flows.sale_offer_flows.drop_reason
+  drop_reason_responsible:
+    lineage:
+      - datalake_firestore.monday.drop_reason_responsible
+      - datalake_sale_offer_flows.sale_offer_flows.drop_reason_responsible
+  current_payment_method:
+    lineage:
+      - datalake_firestore.sale_offer.current_payment_method
+  offer_acceptance_probability:
+    lineage:
+      - datalake_firestore.monday.offer_acceptance_probability
   sale_price:
     lineage:
       - datalake_firestore.sale_offer.sale_price
   first_price_offered_by_buyer:
     lineage:
       - datalake_firestore.sale_offer.first_price_offered_by_buyer
+      - datalake_firestore.monday.price_offered_by_buyer
   last_price_offered_by_buyer:
     lineage:
       - datalake_firestore.sale_offer.last_price_offered_by_buyer
+      - datalake_firestore.monday.sale_price_agreed
+      - datalake_gsheets.sale_hub_offer.sale_price_agreed
   sale_price_agreed:
     lineage:
+      - datalake_firestore.sale_offer.last_price_offered_by_buyer
       - datalake_firestore.monday.sale_price_agreed
+      - datalake_gsheets.sale_hub_offer.sale_price_agreed
   brokerage_fee:
     lineage:
       - datalake_firestore.sale_offer.brokerage_fee
@@ -64,63 +178,6 @@ columns:
   planned_payment_method:
     lineage:
       - datalake_firestore.sale_offer.planned_payment_method
-  current_payment_method:
-    lineage:
-      - datalake_firestore.sale_offer.current_payment_method
-  financing_bank:
-    lineage:
-      - datalake_firestore.monday.financing_bank
-  monday_status:
-    lineage:
-      - datalake_firestore.monday.status
-  offer_status:
-    lineage:
-      - datalake_firestore.monday.offer_status
-  sale_agreement_status:
-    lineage:
-      - datalake_firestore.monday.sale_agreement_status
-  sale_agreement_cancellation_reason:
-    lineage:
-      - datalake_firestore.monday.sale_agreement_cancellation_reason
-  drop_reason:
-    lineage:
-      - datalake_firestore.monday.drop_reason
-  drop_reason_responsible:
-    lineage:
-      - datalake_firestore.monday.drop_reason_responsible
-  offer_acceptance_probability:
-    lineage:
-      - datalake_firestore.monday.offer_acceptance_probability
-  credit_model:
-    lineage:
-      - datalake_firestore.monday.credit_model
-  closing_status:
-    lineage:
-      - datalake_firestore.monday.closing_status
-  house_dilligence_status:
-    lineage:
-      - datalake_firestore.monday.house_dilligence_status
-  seller_dilligence_status:
-    lineage:
-      - datalake_firestore.monday.seller_dilligence_status
-  report_dilligence_status:
-    lineage:
-      - datalake_firestore.monday.report_dilligence_status
-  bank_analysis_status:
-    lineage:
-      - datalake_firestore.monday.bank_analysis_status
-  payment_status:
-    lineage:
-      - datalake_firestore.monday.payment_status
-  credit_status:
-    lineage:
-      - datalake_firestore.monday.credit_status
-  notary_office_status:
-    lineage:
-      - datalake_firestore.monday.notary_office_status
-  real_estate_register_office_status:
-    lineage:
-      - datalake_firestore.monday.real_estate_register_office_status
   first_discount_proposed:
     lineage:
       - datalake_firestore.sale_offer.first_discount_proposed
@@ -138,31 +195,46 @@ columns:
   days_offer_submitted_to_offer_accepted:
     lineage:
       - datalake_firestore.monday.dt_accepted
+      - datalake_sale_offer_flows.sale_offer_flows.ts_accepted
+      - datalake_gsheets.sale_hub_offer.dt_offer_accepted
       - datalake_firestore.sale_offer.ts_created
+      - datalake_gsheets.sale_hub_offer.dt_offer_submitted
   days_offer_submitted_to_offer_dismissed:
     lineage:
       - datalake_firestore.monday.dt_offer_dismissed
+      - datalake_sale_offer_flows.sale_offer_flows.ts_discarded
+      - datalake_gsheets.sale_hub_offer.dt_offer_dismissed
       - datalake_firestore.sale_offer.ts_created
+      - datalake_gsheets.sale_hub_offer.dt_offer_submitted
   days_offer_submitted_to_sale_agreement_created:
     lineage:
       - datalake_firestore.monday.dt_sale_agreement_created
+      - datalake_sale_offer_flows.sale_offer_flows.dt_sale_agreement_created
       - datalake_firestore.sale_offer.ts_created
+      - datalake_gsheets.sale_hub_offer.dt_offer_submitted
   days_offer_submitted_to_sale_agreement_signed:
     lineage:
       - datalake_firestore.monday.dt_sale_agreement_signed
+      - datalake_sale_offer_flows.sale_offer_flows.dt_sale_agreement_signed
+      - datalake_gsheets.sale_hub_offer.dt_sale_agreement_signed
       - datalake_firestore.sale_offer.ts_created
+      - datalake_gsheets.sale_hub_offer.dt_offer_submitted
   days_offer_accepted_to_offer_dismissed:
     lineage:
       - datalake_firestore.monday.days_offer_accepted_to_offer_dismissed
+      - datalake_sale_offer_flows.sale_offer_flows.days_offer_accepted_to_offer_dismissed
   days_offer_accepted_to_sale_agreement_created:
     lineage:
       - datalake_firestore.monday.days_offer_accepted_to_sale_agreement_created
+      - datalake_sale_offer_flows.sale_offer_flows.days_offer_accepted_to_sale_agreement_created
   days_offer_accepted_to_sale_agreement_signed:
     lineage:
       - datalake_firestore.monday.days_offer_accepted_to_sale_agreement_signed
+      - datalake_sale_offer_flows.sale_offer_flows.days_offer_accepted_to_sale_agreement_signed
   days_sale_agreement_created_to_sale_agreement_signed:
     lineage:
       - datalake_firestore.monday.days_sale_agreement_created_to_sale_agreement_signed
+      - datalake_sale_offer_flows.sale_offer_flows.days_sale_agreement_created_to_sale_agreement_signed
   has_used_negotiation_chat:
     lineage:
       - datalake_firestore.sale_offer.has_used_negotiation_chat
@@ -172,36 +244,50 @@ columns:
   has_seller_debt_payments:
     lineage:
       - datalake_firestore.monday.has_seller_debt_payments
+      - datalake_sale_offer_flows.sale_offer_flows.has_seller_debt_payments
   is_ccv_canceled:
     lineage:
       - datalake_firestore.monday.is_ccv_canceled
+      - datalake_sale_offer_flows.sale_offer_flows.is_ccv_canceled
   dt_offer_accepted:
     lineage:
       - datalake_firestore.monday.dt_accepted
+      - datalake_sale_offer_flows.sale_offer_flows.ts_accepted
+      - datalake_gsheets.sale_hub_offer.dt_offer_accepted
   dt_offer_dismissed:
     lineage:
       - datalake_firestore.monday.dt_offer_dismissed
+      - datalake_sale_offer_flows.sale_offer_flows.ts_discarded
+      - datalake_gsheets.sale_hub_offer.dt_offer_dismissed
   dt_sale_agreement_created:
     lineage:
       - datalake_firestore.monday.dt_sale_agreement_created
+      - datalake_sale_offer_flows.sale_offer_flows.dt_sale_agreement_created
   dt_sale_agreement_signed:
     lineage:
       - datalake_firestore.monday.dt_sale_agreement_signed
+      - datalake_sale_offer_flows.sale_offer_flows.dt_sale_agreement_signed
+      - datalake_gsheets.sale_hub_offer.dt_sale_agreement_signed
   dt_sale_agreement_cancelled:
     lineage:
       - datalake_firestore.monday.dt_sale_agreement_cancelled
+      - datalake_sale_offer_flows.sale_offer_flows.dt_sale_agreement_cancelled
   dt_house_registry_started:
     lineage:
       - datalake_firestore.monday.dt_house_registry_started
+      - datalake_sale_offer_flows.sale_offer_flows.dt_house_registry_started
   dt_house_registry_ended:
     lineage:
       - datalake_firestore.monday.dt_house_registry_ended
+      - datalake_sale_offer_flows.sale_offer_flows.dt_house_registry_ended
   dt_sale_transacton_paid:
     lineage:
       - datalake_firestore.monday.dt_sale_transacton_paid
+      - datalake_sale_offer_flows.sale_offer_flows.dt_sale_transacton_paid
   ts_offer_submitted:
     lineage:
       - datalake_firestore.sale_offer.ts_created
+      - datalake_gsheets.sale_hub_offer.dt_offer_submitted
   ts_updated:
     lineage:
       - datalake_firestore.sale_offer.ts_updated

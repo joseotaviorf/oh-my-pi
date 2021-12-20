@@ -20,6 +20,21 @@ columns:
   payment_method:
     lineage:
       - datalake_offer.sale_offer.current_payment_method
+  business_unit:
+    lineage:
+      - datalake_offer.sale_offer.business_unit
+  offer_platform:
+    lineage:
+      - datalake_offer.sale_offer.offer_platform
+  offer_flow:
+    lineage:
+      - datalake_offer.sale_offer.offer_flow
+  agent_work_contract:
+    lineage:
+      - datalake_offer.sale_offer.agent_work_contract
+  team_lead_name:
+    lineage:
+      - datalake_offer.sale_offer.team_lead_name
   sale_price:
     lineage:
       - datalake_offer.sale_offer.sale_price
