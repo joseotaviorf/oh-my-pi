@@ -53,7 +53,7 @@ tenant_prospect_events AS (
 tenant_prospects AS (
   SELECT
     evt.sk_client,
-    evt.ts_event,
+    TO_CHAR(ts_event, 'YYYYMMDD')::INTEGER as sk_date,
     dr.city_group,
     evt.mkt_medium,
     evt.mkt_source,
@@ -64,9 +64,10 @@ tenant_prospects AS (
   JOIN
     dim_region AS dr
     USING(sk_region)
-), grouped_tenant_prospects AS (
+),
+grouped_tenant_prospects AS (
     SELECT
-        DATE(ts_event) as dt_event,
+        sk_date,
         city_group,
         COUNT(CASE WHEN interactions_order = 1 THEN sk_client ELSE NULL END) AS nTP
     FROM tenant_prospects
@@ -74,9 +75,10 @@ tenant_prospects AS (
         AND mkt_source = 'Facebook'
         AND city_group IN ('Brasília', 'Recife', 'Salvador')
     GROUP BY 1,2
-), date_region AS (
+),
+date_region AS (
     SELECT
-        DATE(evt.ts_event) as dt_event,
+        TO_CHAR(evt.ts_event, 'YYYYMMDD')::INTEGER as sk_date,
         dr.city_group
     FROM
         tenant_prospect_events AS evt
@@ -88,17 +90,16 @@ tenant_prospects AS (
     GROUP BY 1, 2
 )
 SELECT
-  dr.dt_event as sk_date,
+  dr.sk_date,
   dr.city_group,
   CASE
-        WHEN SUM(COALESCE(tp.nTP, 0)) OVER(PARTITION BY dr.dt_event)::FLOAT = 0
+        WHEN SUM(COALESCE(tp.nTP, 0)) OVER(PARTITION BY dr.sk_date)::FLOAT = 0
             THEN 0.33
         ELSE
             COALESCE(tp.nTP, 0)
-                / NULLIF(SUM(COALESCE(tp.nTP, 0)) OVER(PARTITION BY dr.dt_event)::FLOAT, 0)
-   END AS share,
-   'demand' AS funnel_side
+                / NULLIF(SUM(COALESCE(tp.nTP, 0)) OVER(PARTITION BY dr.sk_date)::FLOAT, 0)
+   END AS share
 FROM
   grouped_tenant_prospects AS tp
   FULL OUTER JOIN date_region AS dr
-    ON tp.dt_event = dr.dt_event AND dr.city_group = tp.city_group
+    ON tp.sk_date = dr.sk_date AND dr.city_group = tp.city_group
