@@ -293,6 +293,14 @@ bietlejuice.dw_rtb_campaigns:
 bietlejuice.dw_sale_closing_flows:
   - bietlejuice.enrich_sale_closing_flows:load-enrich-closing-flow
 
+bietlejuice.dw_sale_flow:
+  - bietlejuice.enrich_ebdb_agents:load-enrich-agents-review
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
+  - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
+  - bietlejuice.enrich_kill_queue:load-enrich-reservation
+  - bietlejuice.dw_booking:load-dw-janus-dim-booking
+  - bietlejuice.dw_listing:load-dw-janus-dim-house-listing
+
 bietlejuice.dw_sale_flows:
   - bietlejuice.ebdb:create-clean-visit-in-data-lake
   - bietlejuice.enrich_amplitude_offer:load-enrich-sale-offer-raw-events

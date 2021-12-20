@@ -1,0 +1,67 @@
+database_name: dw_janus
+table_name: fact_listing_sale_flows
+columns:
+  ods_id:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.id_house_rent_flow
+  sk_house_listing:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.id_house
+      - dw_janus.dim_house_listing.version
+  sk_region:
+    lineage:
+      - datalake_ebdb_listing.house.id_region
+  sk_sale_flow:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.id_rent_flow
+  sk_booking:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.id_booking
+  sk_owner:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.id_owner
+  sk_user_agent:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.id_user_agent
+  sk_client:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.id_client
+  sk_visit:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.id_visit
+  sk_house_first_listing_date:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.dt_house_first_listing
+  sk_house_listing_date:
+    lineage:
+      - dw_janus.dim_house_listing.ts_listing_version_start
+  sk_house_listing_de_publication_date:
+    lineage:
+      - dw_janus.dim_house_listing.ts_last_de_publication
+  sk_booking_created_date:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.dt_booking_created
+  sk_visit_date:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.dt_visit
+  sk_agent_review_rating_date:
+    lineage:
+      - datalake_ebdb_agents.agents_review.ts_rating_created
+  visit_created_type:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.visit_created_type
+  funnel_step_drop_reason:
+    lineage:
+      - dw_janus.dim_booking.cancellation_reason
+  flg_visit_completed:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.is_visit_completed
+  flg_visit_performed:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.is_visit_performed
+  flg_visit_created_from_app:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.is_visit_created_from_app
+  flg_visit_last_updated_from_app:
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.is_visit_last_updated_from_app
