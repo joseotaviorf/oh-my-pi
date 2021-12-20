@@ -16,15 +16,16 @@ from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
 
-ENV = os.environ.get("ENVIRONMENT")
+# Pipeline inputs
 CONTEXT = "casa_mineira_marketing_costs"
 DAG_NAME = "enrich_casa_mineira_marketing_automatic_daily_costs"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-PARTITION_COLS = ["id_date", "flow_type"]
-
-# DAG params setup
 MAIN_START_DATE = datetime(2021, 5, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = None
+PARTITION_COLS = ["id_date", "flow_type"]
+CLUSTER_DESCRIPTION = Variable.get(
+    "databricks_9_1_min_memory_cluster", deserialize_json=True
+)
 
 config_service = ConfigurationService(DAG_NAME)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
@@ -32,20 +33,10 @@ datalake_bucket = config_service.get_config("datalake_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
-spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
-# s3 paths setup
+ENV = os.environ.get("ENVIRONMENT")
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-
-# cluster setup
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_memory_optimized_cluster_spark_3", deserialize_json=True
-)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{spark_jobs_logs_path}{DAG_ID}"
-
 
 dag = DAG(
     dag_id=DAG_ID,

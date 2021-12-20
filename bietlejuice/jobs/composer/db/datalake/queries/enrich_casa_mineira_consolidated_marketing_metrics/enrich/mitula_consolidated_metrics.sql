@@ -1,5 +1,5 @@
 SELECT
-    INT({year}*10000 + {month}*100 + {day}) AS id_date,
+    INT(YEAR(dt_attribution)*10000 + MONTH(dt_attribution)*100 + DAY(dt_attribution)) AS id_date,
     campaign_name,
     account_name,
     campaign_name AS utm_campaign,
