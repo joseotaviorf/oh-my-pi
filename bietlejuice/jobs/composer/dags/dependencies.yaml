@@ -8,8 +8,8 @@
 
 ############### Place the dependencies sorted alphabetically ##################
 
-bietlejuice.catalog_product_entities:
-  - bietlejuice.enrich_bigid:load-enrich-bigid-entities-access-level
+#bietlejuice.catalog_product_entities:
+#  - bietlejuice.enrich_bigid:load-enrich-bigid-entities-access-level
 
 bietlejuice.dw_affiliate_costs:
   - bietlejuice.enrich_robin_hood
