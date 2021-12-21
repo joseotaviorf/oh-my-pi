@@ -4,7 +4,7 @@ WITH
 ---------------------------------------------------------------------------------------------------------
 costs AS (
     SELECT
-        dt,
+        DATE(NULLIF(id_date, -1)) AS dt,
         mkt_origin,
         mkt_channel,
         mkt_medium,
@@ -14,7 +14,7 @@ costs AS (
         NULL::TEXT uf_listing,
         NULL::TEXT city_listing,
         NULL::TEXT neighborhood_listing,
-        COALESCE(city_group, 'Belo Horizonte') AS city_group,
+        city_group,
         NULL::TEXT id_house,
         NULL::TEXT id_client,
         NULL::INT order_new_client,
@@ -25,9 +25,9 @@ costs AS (
         SUM(cost) cost,
         0.0 AS budget,
         0.0 AS new_contact_prospects_target
-    FROM datalake_gsheets_clean_prod.casa_mineira_marketing_manual_shared_costs
-    WHERE mkt_business = 'imobiliaria'
-        AND dt BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND DATE_ADD('DAY', -1, CURRENT_DATE)
+    FROM datalake_casa_mineira_marketing_costs_prod.daily_costs
+    WHERE funnel_side = 'imobiliaria'
+        AND DATE(NULLIF(id_date, -1)) BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND DATE_ADD('DAY', -1, CURRENT_DATE)
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 ),
 ----------------------------------------------------

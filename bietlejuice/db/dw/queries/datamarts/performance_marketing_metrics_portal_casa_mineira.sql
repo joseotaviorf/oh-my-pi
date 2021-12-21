@@ -1,35 +1,10 @@
 WITH
----------------------------------------------------------------------------------------------------------
--- Query Casa Mineira Marketing Manual Shared Costs From Sheets (Will be used after for History input) --
----------------------------------------------------------------------------------------------------------
-info_costs AS (
-    SELECT
-        dt,
-        city_group,
-        campaign_name,
-        CASE
-            WHEN city_group = '-' THEN 'Nacional'
-            WHEN city_group IS NOT NULL THEN city_group
-            WHEN mkt_business = 'imobiliaria' THEN '1535'
-            WHEN campaign_name ~ '^(\\d+).' THEN SPLIT_PART(campaign_name, '.', 1)
-            WHEN campaign_name ~ '^(\\D\\d{3}\\D).' THEN 'Nacional'
-            ELSE city_group
-        END AS city_group_from_campaign,
-        mkt_business,
-        mkt_origin,
-        mkt_channel,
-        mkt_medium,
-        mkt_source,
-        SUM(cost) AS cost
-    FROM datalake_gsheets_clean_prod.casa_mineira_marketing_manual_shared_costs
-    GROUP BY 1,2,3,4,5,6,7,8,9
-),
-----------------------------------------------------------------
--- Query costs, join dim_region and introduce NULLs for UNION --
-----------------------------------------------------------------
+------------------------------
+-- Query Casa Mineira Costs --
+------------------------------
 costs AS (
     SELECT
-        dt,
+        DATE(NULLIF(id_date, -1)) AS dt,
         NULL::INT AS id_advertiser,
         NULL::TEXT AS advertiser,
         NULL::TEXT AS uf_advertiser,
@@ -42,8 +17,8 @@ costs AS (
         mkt_channel,
         mkt_medium,
         mkt_source,
-        mkt_business,
-        COALESCE(dr.city_group, ict.city_group_from_campaign) AS city_group,
+        funnel_side AS mkt_business,
+        city_group,
         NULL::TEXT AS utm_campaign,
         campaign_name,
         NULL::INT AS order_new_contact_flow,
@@ -55,10 +30,8 @@ costs AS (
         SUM(cost) AS cost,
         NULL::FLOAT AS budget,
         NULL::FLOAT AS contact_flow_target
-    FROM info_costs ict
-        LEFT JOIN dim_region dr
-            ON ict.city_group_from_campaign=dr.sk_region
-    WHERE dt BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND DATE_ADD('DAY', -1, CURRENT_DATE)
+    FROM datalake_casa_mineira_marketing_costs_prod.daily_costs
+    WHERE DATE(NULLIF(id_date, -1)) BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND DATE_ADD('DAY', -1, CURRENT_DATE)
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
 ----------------------------------------------------
