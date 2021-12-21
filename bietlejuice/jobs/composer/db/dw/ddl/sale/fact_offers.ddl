@@ -8,7 +8,7 @@ CREATE TABLE sale.fact_offers (
 	sk_region BIGINT,
 	sk_booking BIGINT,
 	sk_agent BIGINT,
-	sk_consultant BIGINT,
+	sk_consultant VARCHAR,
 	sk_closing_specialist BIGINT,
 	sk_offer_submitted_date BIGINT,
 	sk_offer_accepted_date BIGINT,
