@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS sale.fact_offers;
 CREATE TABLE sale.fact_offers (
 	sk_offer VARCHAR PRIMARY KEY,
-	sk_sale_flow VARCHAR,
+	sk_sale_flow BIGINT,
 	sk_house BIGINT,
 	sk_buyer BIGINT,
 	sk_owner BIGINT,
@@ -19,8 +19,8 @@ CREATE TABLE sale.fact_offers (
 	is_house_first_offer BOOLEAN,
 	has_completed_visit_before_offer BOOLEAN,
 	has_booking_before_offer BOOLEAN,
-	first_price_offered_by_buyer BIGINT,
-	last_price_offered_by_buyer BIGINT,
+	first_price_offered_by_buyer FLOAT,
+	last_price_offered_by_buyer FLOAT,
 	first_discount_proposed FLOAT,
 	last_discount_proposed FLOAT,
 	days_offer_submitted_to_offer_accepted INTEGER,
