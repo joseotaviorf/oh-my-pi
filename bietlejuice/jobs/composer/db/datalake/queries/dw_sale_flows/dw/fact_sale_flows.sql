@@ -198,3 +198,6 @@ LEFT JOIN
   sale_flow_taxonomy AS tx
     ON sf.id_sale_flow = tx.id_sale_flow
     AND tx.rn_sale_flow = 1
+-- This filter was needed because the datalake_gsheets.sale_hub_offer table has no information about id_sale_flow.
+-- TODO: The idea is to transform the datalake_gsheets.sale_hub_offer into a static table in the future to fill in this information and remove this filter.
+WHERE sf.id_sale_flow IS NOT NULL

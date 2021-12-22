@@ -80,3 +80,6 @@ SELECT
   current_timestamp AS ts_load
 FROM
   datalake_buyer_prospect.buyer_prospect bp
+-- This filter was needed because the datalake_gsheets.sale_hub_offer table has no information about id_buyer.
+-- TODO: The idea is to transform the datalake_gsheets.sale_hub_offer into a static table in the future to fill in this information and remove this filter.
+WHERE bp.id_buyer IS NOT NULL
