@@ -65,7 +65,8 @@ class CreateExternalTablePipeline(AbstractPipeline):
             format_options=self.format_options,
         )
 
-        if self.is_incremental:
+        # TODO:  Map other points where is_incremental instead of partitions is determining if a msck repair table happens
+        if self.partitions:
             athena_metastore_service.repair_table_partitions(
                 self.athena_database_name, self.table_name
             )
