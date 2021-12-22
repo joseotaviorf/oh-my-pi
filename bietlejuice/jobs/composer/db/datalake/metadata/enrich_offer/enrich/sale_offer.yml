@@ -7,7 +7,7 @@ columns:
       - datalake_gsheets.sale_hub_offer.id_offer
   id_sale_flow:
     lineage:
-      - datalake_sale_offer_flows.sale_offer_flows.id_sales_flow
+      - datalake_firestore.sale_offer.id_sale_flow
   id_buyer:
     lineage:
       - datalake_firestore.sale_offer.id_buyer
@@ -41,6 +41,9 @@ columns:
     lineage:
       - datalake_firestore.monday.id_closing_specialist
       - datalake_sale_offer_flows.sale_offer_flows.id_closing_specialist
+  id_vendas:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.id_sales_flow
   team_lead_name:
     lineage:
       - datalake_gsheets.sale_hub_offer.team_lead_name

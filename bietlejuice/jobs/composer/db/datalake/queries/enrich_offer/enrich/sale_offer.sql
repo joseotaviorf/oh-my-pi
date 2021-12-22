@@ -256,6 +256,7 @@ data_sources AS (
         g.fgts_value,
         g.earnest_value,
         g.brokerage_fee,
+        g.id_sale_flow,
         -- data from relation_booking_offer
         rbo.id_user_agent,
         rbo.id_booking,
@@ -270,7 +271,7 @@ data_sources AS (
         ohc.status AS ohc_status,
         ohc.offer_model AS ohc_offer_model,
         -- data from work_contract
-        coalesce(wc.id_agent, -1) AS id_agent,
+        wc.id_agent AS id_agent,
         wc.contract_name AS agent_work_contract,
         CASE
             WHEN wc.contract_name LIKE '%HUB%' 
@@ -307,7 +308,7 @@ data_sources AS (
         --data from vendas
         vo.id_offer AS vo_id_offer,
         vo.vendas_offer_status,
-        vo.id_sales_flow,
+        vo.id_sales_flow AS id_vendas,
         vo.ts_accepted AS vo_offer_accepted_date,
         vo.ts_discarded AS vo_offer_dismissed_date,
         vo.ts_signed AS vo_sale_agreement_signed_date,
@@ -509,13 +510,14 @@ rank_offers AS (
 business_rules AS (
     SELECT 
         COALESCE(ds.id_offer,ds.ohc_id_offer) AS id_offer,
-        COALESCE(ds.id_sales_flow,-1) AS id_sale_flow,
-        COALESCE(ds.id_buyer,ds.ohc_id_buyer,-1) AS id_buyer,
-        COALESCE(ds.id_house,ds.ohc_id_house,-1) AS id_house,
-        COALESCE(dr.id_owner,-1) AS id_owner,
-        COALESCE(dr.id_region,-1) AS id_region,
-        COALESCE(ds.id_agent,-1) AS id_agent,
+        ds.id_sale_flow,
+        COALESCE(ds.id_buyer,ds.ohc_id_buyer) AS id_buyer,
+        COALESCE(ds.id_house,ds.ohc_id_house) AS id_house,
+        dr.id_owner AS id_owner,
+        dr.id_region AS id_region,
+        ds.id_agent AS id_agent,
         ds.id_booking,
+        ds.id_vendas,
         has_used_fgts_in_payment,
         has_used_negotiation_chat,
         last_discount_proposed,

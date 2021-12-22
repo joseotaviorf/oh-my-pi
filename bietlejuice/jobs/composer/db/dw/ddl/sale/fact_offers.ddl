@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS sale.fact_offers;
 CREATE TABLE sale.fact_offers (
 	sk_offer VARCHAR PRIMARY KEY,
-	sk_sale_flow BIGINT,
+	sk_sale_flow VARCHAR,
 	sk_house BIGINT,
 	sk_buyer BIGINT,
 	sk_owner BIGINT,
