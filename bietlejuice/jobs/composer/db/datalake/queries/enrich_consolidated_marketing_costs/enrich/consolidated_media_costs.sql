@@ -148,7 +148,7 @@ shared_consolidated_costs AS (
         medias_consolidated mc
         LEFT JOIN datalake_marketing_costs_sharing_rules.old_sharing_rules sr
             ON mc.id_date = sr.id_date 
-            AND split(mc.campaign_name, '\\\\.')[0] = sr.id_rule
+            AND split(mc.campaign_name, '[.]')[0] = sr.id_rule
 ),
 
 -- Next CTE is going to be deprecated soon
@@ -165,7 +165,7 @@ city_group_mappings AS (
         LEFT JOIN datalake_consolidated_marketing_costs.city_group_old_campaigns_historic cgoch
             ON LOWER(mc.campaign_name) = LOWER(cgoch.campaign_name)
         LEFT JOIN datalake_region.region dr
-            ON split(mc.campaign_name, '\\\\.')[0] = dr.id
+            ON split(mc.campaign_name, '[.]')[0] = dr.id
 )
 
 SELECT 

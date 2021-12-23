@@ -153,11 +153,11 @@ FROM
     consolidated_sources mc
 LEFT JOIN 
     datalake_marketing_costs_sharing_rules.old_sharing_rules sr
-        ON SPLIT(mc.campaign_name, '\\\\.')[0] = sr.id_rule
+        ON SPLIT(mc.campaign_name, '[.]')[0] = sr.id_rule
         AND mc.id_date = sr.id_date 
 LEFT JOIN
     datalake_consolidated_marketing_costs.city_group_old_campaigns_historic ch
         ON LOWER(mc.campaign_name) = LOWER(ch.campaign_name)
 LEFT JOIN 
     datalake_region.region dr
-        ON SPLIT(mc.campaign_name, '\\\\.')[0] = dr.id
+        ON SPLIT(mc.campaign_name, '[.]')[0] = dr.id

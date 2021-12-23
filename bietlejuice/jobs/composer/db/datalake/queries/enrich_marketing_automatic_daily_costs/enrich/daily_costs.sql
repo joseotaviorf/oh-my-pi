@@ -90,4 +90,4 @@ FROM
     media_costs_with_taxonomy 
 WHERE
     cost > 0
-    AND LOWER(SPLIT(campaign_name, '\\\\.')[0]) <> 'zebra'
+    AND LOWER(SPLIT(campaign_name, '[.]')[0]) <> 'zebra'

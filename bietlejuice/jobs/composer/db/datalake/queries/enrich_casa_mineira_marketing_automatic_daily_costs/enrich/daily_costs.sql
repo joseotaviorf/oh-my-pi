@@ -45,7 +45,7 @@ filtered_media_costs AS (
         datalake_casa_mineira_consolidated_marketing_metrics.consolidated_media_metrics
     WHERE
         total_cost > 0
-        AND LOWER(SPLIT(campaign_name, '\\\\.')[0]) <> 'zebra'
+        AND LOWER(SPLIT(campaign_name, '[.]')[0]) <> 'zebra'
         AND id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
 )
 
