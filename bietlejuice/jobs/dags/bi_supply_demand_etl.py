@@ -700,14 +700,6 @@ trigger_bi_growth_dag_task = TriggerDagRunOperator(
     execution_date="{{ execution_date }}",
 )
 
-# trigger bi-crm-load dag after all tasks have been successfully completed
-trigger_bi_crm_dw_dag_task = TriggerDagRunOperator(
-    dag=main_dag,
-    task_id="trigger_bi_crm_dw_dag",
-    trigger_dag_id="bi-crm-dw",
-    execution_date="{{ execution_date }}",
-)
-
 # TODO Recreate tasks flow after the data flow is fully fixed
 # xcom_amplitude_task.set_downstream([booking_dag, affiliate_dag])
 affiliate_dag.set_upstream([region_dag, user_dag])
@@ -792,7 +784,4 @@ trigger_bi_growth_dag_task.set_upstream(
         fact_listing_rent_flows,
         dw_fact_house_listing_status_task,
     ]
-)
-trigger_bi_crm_dw_dag_task.set_upstream(
-    [listing_flows_dag, fact_house_listings, fact_listing_rent_flows]
 )
