@@ -267,6 +267,8 @@ if __name__ == "__main__":
     deals_ids = deals_df.select('id').rdd.map(lambda row : row[0]).collect()
 
     total_deals = deals_df.count()
+    deals_flow_total = 0
+    stages_total = 0
 
     for table_name, table_config in config_service.get_config("tables_configurations").items():
 
@@ -330,7 +332,7 @@ if __name__ == "__main__":
                 f"""m=__main__, table_name={table_name},
                 msg=No data returned from API."""
             )
-    
+
     
     logger.info(
         f"""
