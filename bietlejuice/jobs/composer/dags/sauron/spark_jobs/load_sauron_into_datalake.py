@@ -75,9 +75,6 @@ if __name__ == "__main__":
     for datalake_table_name, table_info in TABLES_DICT.items():
         sauron_table_name = table_info.get("table_name")
         if table_info.get("partitioned_table"):
-            # TODO: remove this once the table permission has been fixed for 2022-01 tables
-            if dt_execution.year == 2022 and dt_execution.month == 1:
-                continue
             sauron_table_name = sauron_table_name.format(
                 year=dt_execution.year, month="{:02d}".format(dt_execution.month)
             )
