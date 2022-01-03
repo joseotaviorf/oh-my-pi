@@ -946,6 +946,13 @@ bietlejuice.enrich_top_of_funnel_portal_cm:
   - bietlejuice.casa_mineira_portal:load-clean-city
   - bietlejuice.casa_mineira_portal:load-clean-uf
 
+bietlejuice.enrich_top_of_funnel_supply:
+  - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
+  - bietlejuice.enrich_marketing_automatic_daily_costs:load-enrich-daily-costs
+  - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.gsheets:load-clean-marketing-costs-campaign-city
+  - bietlejuice.gsheets:load-clean-tof-supply-targets
+
 bietlejuice.enrich_tracksale:
   - bietlejuice.tracksale:load-clean-dispatch
   - bietlejuice.tracksale:load-clean-answer
