@@ -5,6 +5,7 @@ job_extra_args:
     format: csv
     options:
       header: "true"
+      escape: "\""
   custom_records_per_file:
     imovel_ponto_interesse: 2500000
     imovel_historico: 2500000

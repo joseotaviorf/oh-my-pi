@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS casa_mineira_portal.dim_house (
     goal VARCHAR(7),
     price FLOAT,
     address VARCHAR(255),
-    zip_code VARCHAR,
+    zip_code VARCHAR(8),
     lat FLOAT,
     lng FLOAT,
     is_duplicated BOOLEAN,
