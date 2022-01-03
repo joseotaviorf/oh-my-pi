@@ -1,0 +1,37 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: tag_aud
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_raw.tag_aud.id
+  rev:
+    lineage:
+      - datalake_sales_flow_raw.tag_aud.rev
+  rev_type:
+    lineage:
+      - datalake_sales_flow_raw.tag_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_sales_flow_raw.tag_aud.revend
+  label:
+    lineage:
+      - datalake_sales_flow_raw.tag_aud.label
+  mod_label:
+    lineage:
+      - datalake_sales_flow_raw.tag_aud.label_mod
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.tag_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.tag_aud.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.tag_aud.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.tag_aud.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.tag_aud.day

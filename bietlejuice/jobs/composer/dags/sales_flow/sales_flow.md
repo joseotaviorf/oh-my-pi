@@ -48,8 +48,12 @@ This pipeline produces, in **datalake raw and clean**, tables via incremental lo
     - `rev_info`
     - `sales_flow`
     - `sales_flow_aud`
+    - `sales_flow_tag`
+    - `sales_flow_tag_aud`
     - `specialist`
     - `specialist_aud`
+    - `tag`
+    - `tag_aud`
     - `user_sample`
     - `user_sample_aud`
     - `users`
