@@ -147,7 +147,85 @@ SELECT
   moa.house_dilligence_status,
   moa.seller_dilligence_status,
   moa.report_dilligence_status,
-  moa.diligence_appointment_reason,
+  RTRIM(' -',
+    REPLACE(
+        REPLACE(
+            REPLACE(
+                REPLACE(
+                    REPLACE(
+                        REPLACE(
+                            REPLACE(
+                                REPLACE(
+                                    REPLACE(
+                                        REPLACE(
+                                            REPLACE(
+                                                REPLACE(
+                                                    REPLACE(
+                                                        REPLACE(
+                                                            REPLACE(
+                                                                REPLACE(
+                                                                    REPLACE(
+                                                                        REPLACE(
+                                                                            REPLACE(
+                                                                                REPLACE(
+                                                                                    REPLACE(
+                                                                                        REPLACE(
+                                                                                            REPLACE(
+                                                                                                REPLACE(
+                                                                                                    REPLACE(
+                                                                                                        REPLACE(
+                                                                                                            REPLACE(
+                                                                                                                REPLACE(
+                                                                                                                    REPLACE(
+                                                                                                                        REPLACE(
+                                                                                                                            REPLACE(
+                                                                                                                                REPLACE(
+                                                                                                                                    REPLACE(
+                                                                                                                                        REPLACE(
+                                                                                                                                            REPLACE(
+                                                                                                                                                REPLACE(
+                                                                                                                                                    REPLACE(
+                                                                                                                                                        REPLACE(
+                                                                                                                                                            REPLACE(moa.diligence_appointment_reason,']',',')
+                                                                                                                                                            ,'[', ',')
+                                                                                                                                                        , ',', ',,')
+                                                                                                                                                    , ',1,' ,'imóvel_divergência metragem - ')
+                                                                                                                                                , ',2,' ,'imóvel_débito ascendente - ')
+                                                                                                                                            , ',3,' ,'imóvel_débito foro - ')
+                                                                                                                                        , ',4,' ,'imóvel_débito iptu - ')
+                                                                                                                                    , ',5,' ,'pp_tributos federais - ')
+                                                                                                                                , ',6,' ,'pp_tributos estaduais - ')
+                                                                                                                            , ',7,' ,'pp_ações trabalhistas - ')
+                                                                                                                        , ',8,' ,'pp_ações cíveis - ')
+                                                                                                                    , ',9,' ,'pp_execuções fiscais - ')
+                                                                                                                , ',10,' ,'pp_protesto - ')
+                                                                                                            , ',11,' ,'pj_tributos federais - ')
+                                                                                                        , ',12,' ,'pj_tributos estaduais - ')
+                                                                                                    , ',13,' ,'pj_ações trabalhistas - ')
+                                                                                                , ',14,' ,'pj_ações cíveis - ')
+                                                                                            , ',15,' ,'pj_execuções fiscais - ')
+                                                                                        , ',16,' ,'pj_protesto - ')
+                                                                                    , ',17,' ,'ap_tributos federais - ')
+                                                                                , ',18,' ,'ap_tributos estaduais - ')
+                                                                            , ',19,' ,'ap_ações trabalhistas - ')
+                                                                        , ',20,' ,'ap_ações cíveis - ')
+                                                                    , ',21,' ,'ap_ execuções fiscais - ')
+                                                                , ',22,' ,'ap_protesto - ')
+                                                            , ',23,' ,'pj_tributos municipais - ')
+                                                        , ',24,' ,'pj_fgts - ')
+                                                    , ',25,' ,'apontamentos objetivos - ')
+                                                , ',26,' ,'SLPJ_sócio_ações cíveis - ')
+                                            , ',27,' ,'SLPJ_sócio_ações trabalhistas - ')
+                                        , ',28,' ,'SLPJ_sócio_execuções fiscais - ')
+                                    , ',29,' ,'SLPJ_sócio_protesto - ')
+                                , ',30,' ,'SLPJ_sócio_tributos estaduais - ')
+                            , ',31,' ,'SLPJ_sócio_tributos federais - ')
+                        , ',32,' ,'imóvel_débitos funesbom - ')
+                    , ',33,' ,'imóvel_divergência nome contrib. - ')
+                , ',34,' ,'imóvel_divergência nº contribuinte - ')
+            , ',35,' ,'imóvel_contribuinte não individ. - ')
+        ,',', ' ')
+    ) AS diligence_appointment_reason,
   moa.sale_agreement_status,
   moa.payment_status,
   moa.seller_payment_status,
