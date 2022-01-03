@@ -13,51 +13,59 @@ More information about run time [here]({chart_url}{dag_id}).
 ### Outputs
 
 This pipeline produces, in **datalake raw and clean**, tables via incremental load:
-    - `address_data`
-    - `address_data_aud`
-    - `brokerage`
-    - `brokerage_aud`
-    - `cash_payment`
-    - `cash_payment_aud`
-    - `ccv`
-    - `ccv_aud`
-    - `ccv_flow`
-    - `ccv_flow_aud`
-    - `ccv_party`
-    - `ccv_party_aud`
-    - `ccv_rule`
-    - `ccv_rule_aud`
-    - `dilligence`
-    - `dilligence_aud`
-    - `dilligence_appointment`
-    - `dilligence_appointment_aud`
-    - `house`
-    - `house_aud`
-    - `mortgage`
-    - `mortgage_aud`
-    - `notary`
-    - `notary_aud`
-    - `offer`
-    - `offer_aud`
-    - `onboarding`
-    - `onboarding_aud`
-    - `payment`
-    - `payment_aud`
-    - `rescission`
-    - `rescission_aud`
-    - `rev_info`
-    - `sales_flow`
-    - `sales_flow_aud`
-    - `sales_flow_tag`
-    - `sales_flow_tag_aud`
-    - `specialist`
-    - `specialist_aud`
-    - `tag`
-    - `tag_aud`
-    - `user_sample`
-    - `user_sample_aud`
-    - `users`
-    - `users_aud`
+<div style="overflow-x: scroll; height: 200px">
+
+`address_data`  
+`address_data_aud`  
+`brokerage`     
+`brokerage_aud`     
+`cash_payment`  
+`cash_payment_aud`  
+`ccv`   
+`ccv_aud`   
+`ccv_flow`  
+`ccv_flow_aud`  
+`ccv_party`     
+`ccv_party_aud`     
+`ccv_rule`  
+`ccv_rule_aud`  
+`contact`   
+`contact_aud`   
+`dilligence`    
+`dilligence_aud`    
+`dilligence_appointment`    
+`dilligence_appointment_aud`    
+`house`     
+`house_aud`     
+`mortgage`  
+`mortgage_aud`  
+`notary`    
+`notary_aud`    
+`offer`     
+`offer_aud`     
+`onboarding`    
+`onboarding_aud`    
+`payment`   
+`payment_aud`   
+`rescission`    
+`rescission_aud`    
+`rev_info`  
+`sales_flow`    
+`sales_flow_aud`    
+`sales_flow_contact`    
+`sales_flow_contact_aud`    
+`sales_flow_tag`    
+`sales_flow_tag_aud`    
+`specialist`    
+`specialist_aud`    
+`tag`   
+`tag_aud`   
+`user_sample`   
+`user_sample_aud`   
+`users`     
+`users_aud` 
+    
+</div>
 
 If you need to add a new table that does not have an `updated_at` timestamp/date column, you must update the
 raw spark job (load_incremental_sales_flow_into_datalake), adding the raw table name and the respective unix
