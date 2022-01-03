@@ -4,7 +4,7 @@ SELECT
     mkt_channel,
     mkt_medium,
     mkt_source,
-    tof_users_target,
+    CAST(replace(tof_users_target, ',', '') AS FLOAT) AS tof_users_target,
     week_start,
     month,
     year,
