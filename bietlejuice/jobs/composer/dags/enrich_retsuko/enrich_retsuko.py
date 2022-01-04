@@ -13,6 +13,7 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 
+
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 8, 29, 0, 0, 0, tzinfo=LOCAL_TZ)
 
@@ -27,6 +28,7 @@ DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 LOGS_OUTPUT_PATH = f"s3://{Variable.get('databricks_s3_bucket')}/logs/jobs/{DAG_ID}"
+
 
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
@@ -52,6 +54,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
+
 
 datalake_task_group = DatalakeTaskGroup(
     dag=dag,
