@@ -19,7 +19,7 @@ CREATE TABLE sale.dim_sale_agreement (
     house_dilligence_status VARCHAR,
     seller_dilligence_status VARCHAR,
     report_dilligence_status VARCHAR,
-    diligence_appointment_reason VARCHAR,
+    diligence_appointment_reason VARCHAR(500),
     bank_analysis_status VARCHAR,
     payment_status VARCHAR,
     credit_status VARCHAR,
