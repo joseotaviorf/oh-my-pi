@@ -19,6 +19,7 @@ bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 MAIN_DAG_NAME = 'bi-marketing-funnels-conversions'
 MAIN_START_DATE = datetime(2019, 1, 5)
+MAIN_SCHEDULE_INTERVAL = env.convert_to_utc_schedule("0 7,13 * * *")
 
 logger = QuintoAndarLogger(MAIN_DAG_NAME)
 
@@ -32,7 +33,7 @@ main_dag = DAG(
         'depends_on_past': False
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=None,  # will get triggered by bi-marketing-daily-costs
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,  # depends on datalake_marketing_costs_prod.daily_costs, which finishes at ~5h30 and ~12h00
     max_active_runs=1,
     catchup=False,
     orientation='TB'
