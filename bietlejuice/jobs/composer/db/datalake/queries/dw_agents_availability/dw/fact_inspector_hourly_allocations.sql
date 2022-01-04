@@ -1,7 +1,7 @@
 WITH agents_slots_hourly AS (
     SELECT
         id_agent,
-        COALESCE(CAST(DATE_FORMAT(ts_slot_hour,'YMMdd') AS BIGINT), -1) AS id_slot_date,
+        COALESCE(CAST(DATE_FORMAT(ts_slot_hour,'yyyyMMdd') AS BIGINT), -1) AS id_slot_date,
         agent_type,
         day_of_week,
         allocated_slots,
@@ -55,7 +55,7 @@ SELECT DISTINCT
     CAST(CAST(ash.id_slot_date AS STRING) || CAST(ash.id_agent AS STRING) AS BIGINT) AS sk_agent_slot_date,
     CAST(COALESCE(ar.id_region, '-1') AS BIGINT) AS sk_region,
     ash.id_slot_date AS sk_slot_date,
-    CAST(DATE_FORMAT(ash.ts_slot_hour,'YMMddHH') AS BIGINT) AS sk_slot_date_hour, 
+    CAST(DATE_FORMAT(ash.ts_slot_hour,'yyyyMMddHH') AS BIGINT) AS sk_slot_date_hour, 
     CAST(COALESCE(acr.id_work_contract, -1) AS BIGINT) AS sk_work_contract,
     ash.agent_type,
     CAST(ash.allocated_slots AS SMALLINT) AS allocated_slots,
