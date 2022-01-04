@@ -1,5 +1,5 @@
 ---
-database_name: datalake_composer_raw
+database_name: datalake_composer_clean
 table_name: task_fail
 columns:
   id_fail:

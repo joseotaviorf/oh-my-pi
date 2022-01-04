@@ -1,5 +1,5 @@
 database_name: datalake_gsheets_clean
-table_name: extra_invoices_created_expenses
+table_name: extra_invoice_created_expenses
 columns:
   id_contract:
     lineage:

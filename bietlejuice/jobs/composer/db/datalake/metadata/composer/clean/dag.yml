@@ -1,5 +1,5 @@
 ---
-database_name: datalake_composer_raw
+database_name: datalake_composer_clean
 table_name: dag
 columns:
   id_dag:
@@ -11,6 +11,9 @@ columns:
   id_root_dag:
     lineage:
       - datalake_composer_raw.dag.root_dag_id
+  default_view:
+    lineage:
+      - datalake_composer_raw.dag.default_view
   description:
     lineage:
       - datalake_composer_raw.dag.description
@@ -32,9 +35,6 @@ columns:
   is_active:
     lineage:
       - datalake_composer_raw.dag.is_active
-  is_default_view:
-    lineage:
-      - datalake_composer_raw.dag.default_view
   is_paused:
     lineage:
       - datalake_composer_raw.dag.is_paused

@@ -1,5 +1,5 @@
 ---
-database_name: datalake_composer_raw
+database_name: datalake_composer_clean
 table_name: task_instance
 columns:
   id_dag:
@@ -14,9 +14,9 @@ columns:
   duration:
     lineage:
       - datalake_composer_raw.task_instance.duration
-  max_retries:
+  max_tries:
     lineage:
-      - datalake_composer_raw.task_instance.max_retries
+      - datalake_composer_raw.task_instance.max_tries
   try_number:
     lineage:
       - datalake_composer_raw.task_instance.try_number

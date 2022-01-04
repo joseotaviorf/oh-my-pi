@@ -17,12 +17,12 @@ Currently, there is the following output table for both our raw and clean layers
 
 - `charge_aud`
 - `charge`
+- `documentation_aud`
+- `documentation`
 - `house_aud`
 - `house`
-- `rent_flow`
-- `rent_flow_aud`
-- `reservation`
 - `reservation_aud`
+- `reservation`
 - `rev_info`
 - `user`
 
