@@ -1,5 +1,4 @@
 SELECT
-    id AS id_sales_flow_tag_aud,
     sales_flow_id AS id_sales_flow,
     tag_id AS id_tag,
     rev,
