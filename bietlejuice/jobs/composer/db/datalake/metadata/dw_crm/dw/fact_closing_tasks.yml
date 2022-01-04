@@ -33,7 +33,7 @@ columns:
       - datalake_crm_tasks_history_flows.tasks_history_users_flow.id_action_date
   sk_offer:
     lineage:
-      - dw_janus.dim_offer.sk_offer
+      - dw_public.dim_offer.sk_offer
       # - dw_janus.fact_listing_rent_flows.sk_offer
   sk_proposal:
     lineage:

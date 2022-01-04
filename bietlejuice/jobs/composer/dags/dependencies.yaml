@@ -125,7 +125,7 @@ bietlejuice.dw_criteo_campaigns:
 
 bietlejuice.dw_crm:
   - bietlejuice.dw_contract:load-janus-dim-contract-into-redshift
-  - bietlejuice.dw_offer:load-janus-dim-offer-into-redshift
+  - bietlejuice.dw_offer:load-public-dim-offer-into-redshift
   - bietlejuice.dw_listing:load-janus-dim-house-listing-into-redshift
   - bietlejuice.dw_listing:load-janus-fact-house-listings-into-redshift
   - bietlejuice.dw_listing_jobs:load-janus-fact-photo-job-into-redshift
@@ -267,7 +267,7 @@ bietlejuice.dw_rent_flow:
   - bietlejuice.dw_booking:load-dw-janus-dim-booking
   - bietlejuice.dw_contract:load-dw-janus-dim-contract
   - bietlejuice.dw_listing:load-dw-janus-dim-house-listing
-  - bietlejuice.dw_offer:load-dw-janus-dim-offer
+  - bietlejuice.dw_offer:load-dw-public-dim-offer
   - bietlejuice.dw_proposal:load-dw-janus-dim-proposal
   - bietlejuice.gsheets:load-clean-taxonomy-demand
 

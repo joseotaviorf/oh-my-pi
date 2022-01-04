@@ -1,0 +1,148 @@
+---
+database_name: dw_public
+table_name: dim_offer
+columns:
+  sk_offer:
+    lineage:
+      - datalake_offer.offer.id_offer_context
+      - datalake_ebdb_proposal.pre_proposal.id_offer_context
+  id_offer:
+    lineage:
+      - datalake_offer.offer.id
+      - datalake_ebdb_proposal.pre_proposal.id
+  id_godfather:
+    lineage:
+      - datalake_offer.offer.id_godfather
+  id_firestore:
+    lineage:
+      - datalake_offer.offer.id_firestore
+  id_user:
+    lineage:
+      - datalake_offer.offer.id_client
+      - datalake_ebdb_proposal.pre_proposal.id_user
+  id_property:
+    lineage:
+      - datalake_offer.offer.id_house
+      - datalake_ebdb_proposal.pre_proposal.id_house
+  editing:
+    lineage:
+      - datalake_offer.offer.turn
+      - datalake_ebdb_proposal.pre_proposal.edition
+  status:
+    lineage:
+      - datalake_offer.offer.status
+      - datalake_ebdb_proposal.pre_proposal.status
+  rejection_reason:
+    lineage:
+      - datalake_offer.offer.rejection_reason
+      - datalake_ebdb_proposal.pre_proposal.rejection_reason
+  type:
+    lineage:
+      - datalake_offer.offer.type
+  app_type:
+    lineage:
+      - datalake_amplitude_clean.170698_offer_submitted_events.app_type
+      - datalake_amplitude_clean.170135_offer_submitted_events.app_type
+      - datalake_amplitude_clean.183049_offer_submitted_events.app_type
+  utm_source:
+    lineage:
+      - datalake_amplitude_clean.170698_offer_submitted_events.utm_source
+      - datalake_amplitude_clean.170135_offer_submitted_events.utm_source
+      - datalake_amplitude_clean.183049_offer_submitted_events.utm_source
+  utm_medium:
+    lineage:
+      - datalake_amplitude_clean.170698_offer_submitted_events.utm_medium
+      - datalake_amplitude_clean.170135_offer_submitted_events.utm_medium
+      - datalake_amplitude_clean.183049_offer_submitted_events.utm_medium
+  utm_campaign:
+    lineage:
+      - datalake_amplitude_clean.170698_offer_submitted_events.utm_campaign
+      - datalake_amplitude_clean.170135_offer_submitted_events.utm_campaign
+      - datalake_amplitude_clean.183049_offer_submitted_events.utm_campaign
+  utm_content:
+    lineage:
+      - datalake_amplitude_clean.170698_offer_submitted_events.utm_content
+      - datalake_amplitude_clean.170135_offer_submitted_events.utm_content
+      - datalake_amplitude_clean.183049_offer_submitted_events.utm_content
+  utm_term:
+    lineage:
+      - datalake_amplitude_clean.170698_offer_submitted_events.utm_term
+      - datalake_amplitude_clean.170135_offer_submitted_events.utm_term
+      - datalake_amplitude_clean.183049_offer_submitted_events.utm_term
+  mkt_category:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.category
+  mkt_flow:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.flow
+  mkt_completion:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.completion
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.origin
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.channel
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.medium
+  mkt_source:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.source
+  mkt_platform:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.platform
+  last_offered_rent:
+    lineage:
+      - datalake_offer.offer.last_offered_rent
+      - datalake_ebdb_proposal.pre_proposal.rent
+  original_rent:
+    lineage:
+      - datalake_offer.offer.original_rent
+      - datalake_ebdb_proposal.pre_proposal.original_rent
+  original_condo:
+    lineage:
+      - datalake_offer.offer.original_condo
+      - datalake_ebdb_proposal.pre_proposal.original_condo
+  is_instant_offer:
+    lineage:
+      - datalake_offer.offer.is_instant_offer
+  first_rent_offered_by_tenant:
+    lineage:
+      - datalake_offer.offer.first_rent_offered_by_tenant
+  first_rent_offered_by_owner:
+    lineage:
+      - datalake_offer.offer.first_rent_offered_by_owner
+  last_rent_offered_by_tenant:
+    lineage:
+      - datalake_offer.offer.last_rent_offered_by_tenant
+      - datalake_ebdb_proposal.pre_proposal_aud.rent
+  last_rent_offered_by_owner:
+    lineage:
+      - datalake_offer.offer.last_rent_offered_by_owner
+      - datalake_ebdb_proposal.pre_proposal_aud.rent
+  last_updated_date:
+    lineage:
+      - datalake_offer.offer.ts_updated
+      - datalake_ebdb_proposal.pre_proposal.ts_updated
+  expiration_date:
+    lineage:
+      - datalake_offer.offer.ts_expired
+      - datalake_ebdb_proposal.pre_proposal_aud.ts_expired
+  dt_analysis:
+    lineage:
+      - datalake_offer.offer.ts_analyzed
+      - datalake_ebdb_proposal.pre_proposal.ts_last_analysis
+  dt_first_sent:
+    lineage:
+      - datalake_offer.offer.ts_first_sent
+      - datalake_ebdb_proposal.pre_proposal.ts_first_sent
+  dt_created:
+    lineage:
+      - datalake_offer.offer.ts_created
+      - datalake_ebdb_proposal.pre_proposal.ts_created
+  dt_updated:
+    lineage:
+      - datalake_offer.offer.ts_updated
+      - datalake_ebdb_proposal.pre_proposal.ts_updated

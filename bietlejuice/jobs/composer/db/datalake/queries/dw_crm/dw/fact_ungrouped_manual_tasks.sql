@@ -41,11 +41,11 @@ WITH contracts_offers AS (
         datalake_ebdb_clean.contract AS ec
             ON ep.id = ec.id_proposal
     LEFT JOIN
-        dw_janus.dim_offer AS eo
+        dw_public.dim_offer AS eo
             ON turf.origin = 'Offer'
                 AND turf.id_origin = eo.id_offer
     LEFT JOIN
-        dw_janus.dim_offer AS feo
+        dw_public.dim_offer AS feo
             ON turf.origin = 'Offer'
                 AND RLIKE(turf.id_origin, '\\D') = TRUE
                 AND turf.id_origin = feo.id_firestore

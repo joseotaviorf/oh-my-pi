@@ -1,54 +1,55 @@
 drop table if exists datalake_clean.ods_dim_offer;
 create external table if not exists datalake_clean.ods_dim_offer (
-  sk_offer string,
-  id_offer string,
-  id_godfather string,
-  id_firestore string,
-  last_offered_rent string,
-  original_rent string,
-  original_condo string,
-  dt_analysis string,
-  editing string,
-  status string,
-  id_user string,
-  id_property string,
-  dt_created string,
-  dt_updated string,
-  dt_string string,
-  offer_submitted string,
-  dt_first_sent string,
-  last_updated_date string,
-  expiration_date string,
-  first_rent_offered_by_tenant string,
-  first_rent_offered_by_owner string,
-  last_rent_offered_by_tenant string,
-  last_rent_offered_by_owner string,
-  rejection_reason string,
-  type string,
-  is_instant_offer string,
-  app_type string,
-  utm_source string,
-  utm_medium string,
-  utm_campaign string,
-  utm_content string,
-  utm_term string,
-  flg_branded string,
-  mkt_category string,
-  mkt_flow string,
-  mkt_completion string,
-  mkt_origin string,
-  mkt_channel string,
-  mkt_medium string,
-  mkt_source string,
-  mkt_platform string
+  sk_offer integer,
+  id_offer integer,
+  id_godfather integer,
+  id_firestore varchar(255),
+  id_user integer,
+  id_property integer,
+  editing varchar,
+  status varchar,
+  rejection_reason varchar(255),
+  type varchar(255),
+  app_type varchar(255),
+  utm_source varchar(255),
+  utm_medium varchar(255),
+  utm_campaign varchar(2000),
+  utm_content varchar(255),
+  utm_term varchar(255),
+  mkt_category varchar(255),
+  mkt_flow varchar(255),
+  mkt_completion varchar(255),
+  mkt_origin varchar(255),
+  mkt_channel varchar(255),
+  mkt_medium varchar(255),
+  mkt_source varchar(255),
+  mkt_platform varchar(255),
+  last_offered_rent integer,
+  original_rent integer,
+  original_condo integer,
+  is_instant_offer boolean,
+  flg_branded boolean,
+  offer_submitted boolean,
+  first_rent_offered_by_tenant decimal(18,4),
+  first_rent_offered_by_owner decimal(18,4),
+  last_rent_offered_by_tenant decimal(18,4),
+  last_rent_offered_by_owner decimal(18,4),
+  last_updated_date timestamp,
+  expiration_date timestamp,
+  dt_analysis timestamp,
+  dt_first_sent timestamp,
+  dt_created timestamp,
+  dt_updated timestamp,
+  dt_timestamp timestamp
 )
-row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
-with serdeproperties (
-  'separatorChar' = ',',
-  'quoteChar' = '\"'
-)
-location 's3://5a-datalake/clean/ods/offer'
-tblproperties (
-  'skip.header.line.count' = '1'
-)
-;
+ROW FORMAT SERDE
+  'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
+STORED AS INPUTFORMAT
+  'org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat'
+OUTPUTFORMAT
+  'org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat'
+LOCATION
+  's3://dw.s3.data.quintoandar.com.br/public/dim_offer'
+TBLPROPERTIES (
+  'parquet.compress'='SNAPPY')
+

@@ -37,7 +37,7 @@ columns:
       - datalake_ebdb_rent_flow.rent_flow.id_visit
   sk_offer:
     lineage:
-      - dw_janus.dim_offer.sk_offer
+      - dw_public.dim_offer.sk_offer
   sk_reservation:
     lineage:
       - datalake_kill_queue.reservation.id_reservation
@@ -61,7 +61,7 @@ columns:
       - dw_janus.dim_house_listing.ts_last_de_publication
   sk_house_listing_first_offer_submitted_date:
     lineage:
-      - dw_janus.dim_offer.dt_created
+      - dw_public.dim_offer.dt_created
   sk_booking_created_date:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.dt_booking_created
@@ -76,10 +76,10 @@ columns:
       - datalake_ebdb_rent_flow.rent_flow.dt_client_sign_up
   sk_offer_submitted_date:
     lineage:
-      - dw_janus.dim_offer.dt_first_sent
+      - dw_public.dim_offer.dt_first_sent
   sk_min_offer_submitted_date:
     lineage:
-      - dw_janus.dim_offer.dt_first_sent
+      - dw_public.dim_offer.dt_first_sent
   sk_offer_approved_date:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.dt_analysis
@@ -198,7 +198,7 @@ columns:
   funnel_step_drop_reason:
     lineage:
       - dw_janus.dim_contract.cancellation_reason
-      - dw_janus.dim_offer.rejection_reason
+      - dw_public.dim_offer.rejection_reason
       - dw_janus.dim_proposal.rejection_reason
       - dw_janus.dim_booking.cancellation_reason
   flg_visit_completed:

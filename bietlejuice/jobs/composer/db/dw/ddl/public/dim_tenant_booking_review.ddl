@@ -1,5 +1,5 @@
-drop table if exists dim_tenant_booking_review;
-create table dim_tenant_booking_review (
+drop table if exists public.dim_tenant_booking_review;
+create table public.dim_tenant_booking_review (
     sk_tenant_booking_review bigint primary key,
     id_tenant_booking_review bigint,
     review_status varchar,
@@ -19,4 +19,6 @@ create table dim_tenant_booking_review (
     does_want_same_agent boolean,
     visit_type varchar(50),
     comment varchar(510)
-)
+);
+
+ALTER TABLE public.dim_tenant_booking_review OWNER TO databricks;

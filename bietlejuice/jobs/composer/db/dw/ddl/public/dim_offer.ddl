@@ -1,5 +1,5 @@
-drop table if exists janus.dim_offer;
-create table janus.dim_offer (
+drop table if exists public.dim_offer;
+create table public.dim_offer (
   sk_offer integer primary key,
   id_offer integer,
   id_godfather integer,
@@ -43,4 +43,4 @@ create table janus.dim_offer (
   dt_timestamp timestamp
 );
 
-ALTER TABLE janus.dim_offer OWNER TO airflow;
+ALTER TABLE public.dim_offer OWNER TO databricks;

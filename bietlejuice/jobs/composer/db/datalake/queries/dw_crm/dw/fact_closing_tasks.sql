@@ -51,11 +51,11 @@ WITH proposals_contracts AS (
     datalake_ebdb_clean.house epi
       ON epi.id = epc.id_house
   LEFT JOIN
-    dw_janus.dim_offer eo
+    dw_public.dim_offer eo
       ON ct.origin = 'Offer'
       AND CAST(CAST(ct.id_origin AS DECIMAL) AS BIGINT) = CAST(eo.id_offer AS BIGINT)
   LEFT JOIN
-    dw_janus.dim_offer feo
+    dw_public.dim_offer feo
       ON ct.origin = 'Offer'
       AND ct.id_origin = feo.id_firestore
 ),
