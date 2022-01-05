@@ -1,0 +1,7 @@
+---
+database_name: datalake_invoice
+table_name: invoice_revenues
+columns:
+  id_invoice_entry:
+    lineage:
+      - datalake_invoice.invoice_all.id_invoice_entry

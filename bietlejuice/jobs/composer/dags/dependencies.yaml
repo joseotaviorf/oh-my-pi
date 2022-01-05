@@ -762,10 +762,12 @@ bietlejuice.enrich_customer_support:
 
 bietlejuice.enrich_invoice:
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
+  - bietlejuice.enrich_retsuko
   - bietlejuice.retsuko:load-clean-account
   - bietlejuice.retsuko:load-clean-contract
   - bietlejuice.retsuko:load-clean-entry
   - bietlejuice.retsuko:load-clean-invoice
+
 
 bietlejuice.enrich_kill_queue:
   - bietlejuice.kill_queue:load-clean-house

@@ -16,6 +16,9 @@ This pipeline produces the following output table:
 
 1. In data lake enrich:
 - `credit_invoice`
+- `invoice_all`
+- `invoice_entries`
+- `invoice_revenues`
 
 ### Responsible Data Teams
 For any questions or concerns about this DAG, please contact the Data Engineering Team or 

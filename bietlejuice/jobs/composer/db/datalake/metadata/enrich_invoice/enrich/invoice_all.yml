@@ -1,0 +1,66 @@
+---
+database_name: datalake_invoice
+table_name: invoice_all
+columns:
+  id_invoice_entry:
+    lineage:
+      - datalake_invoice.invoice_entries.id
+  id_region:
+    lineage:
+      - datalake_invoice.invoice_entries.id_region
+  id_contract:
+    lineage:
+      - datalake_ebdb_contract.contract.id
+  rent:
+    lineage:
+      - datalake_ebdb_contract.contract.rent
+  version:
+    lineage:
+      - datalake_ebdb_contract.contract.contract_version
+  guarantee:
+    lineage:
+      - datalake_ebdb_contract.contract.guarantee
+  description:
+    lineage:
+      - datalake_retsuko.invoice_entry.description
+  bill_item:
+    lineage:
+      - datalake_retsuko.invoice_entry.entry_type
+  frequency:
+    lineage:
+      - datalake_retsuko.invoice.invoice_frequency
+  status:
+    lineage:
+      - datalake_retsuko.invoice.payment_status
+  invoice_account_type:
+    lineage:
+      - datalake_retsuko.invoice.user
+  is_b2b:
+    lineage:
+      - datalake_ebdb_contract.contract_b2b.is_b2b
+  dt_contract_month_signed:
+    lineage:
+      - datalake_ebdb_contract.contract.ts_signed
+  dt_contract_month_started:
+    lineage:
+      - datalake_ebdb_contract.contract.dt_started
+  dt_invoice_paid:
+    lineage:
+      - datalake_invoice.invoice_entries.id_paid_date
+  accrual_year_month:
+    lineage:
+      - datalake_retsuko.invoice_entry.accrual_year_month
+  dt_next_accrual:
+    lineage:
+      - datalake_retsuko.invoice_entry.accrual_year_month
+  ts_created:
+    lineage:
+      - datalake_retsuko.invoice.ts_created
+      - datalake_invoice.invoice_entries.id_created_date
+  dt_created_for_filter:
+    lineage:
+      - datalake_invoice.invoice_entries.id_created_date
+  dt_third_business_day:
+    lineage:
+      - datalake_quintoandar.aux_date.date
+  
