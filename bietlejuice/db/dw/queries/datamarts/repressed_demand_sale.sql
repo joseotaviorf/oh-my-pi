@@ -175,6 +175,7 @@ with house_available_hours as (
         AND json_extract_path_text(event_properties, 'house_id') <> ''
         AND id_user <> ''
         AND ts_event >= '2020-01-13'
+        AND id_app = 170698
 )
 , encaixes_raw as (
     select

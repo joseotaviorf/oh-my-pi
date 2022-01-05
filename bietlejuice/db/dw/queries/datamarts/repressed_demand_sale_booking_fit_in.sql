@@ -204,6 +204,7 @@ WITH house_available_hours AS (
         AND json_extract_path_text(event_properties, 'house_id') <> ''
         AND id_user <> ''
         AND ts_event >= DATE_TRUNC('week', current_date) - interval '10 week'
+        AND id_app = 170698
 )
 -- Business rule to confirm if a fitting request has a booking created after request date, if so the fitting was realized
 , encaixes_raw AS (
