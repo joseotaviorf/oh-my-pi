@@ -122,7 +122,7 @@ def create_extraction_tasks(table_name, has_query=False, is_incremental=False):
             sql_placeholder = (
                 "{{ macros.ds_add(ds, 1) }}" if "next" in s3_suffix else "{{ ds }}"
             )
-            sql = sql.format(execution_date=sql_placeholder)
+            sql = sql.format(start_date=sql_placeholder)
 
         load_table_task = QuintoAndarMySqlToS3Operator(
             dag=dag,
