@@ -4,7 +4,6 @@
 # and it is manually placed inside 5a-artifacts/bi-etl-ejuice
 
 echo "Installing libs"
-/databricks/python/bin/pip install pip==18.1
 /databricks/python/bin/pip install amqp==2.6.1
 /databricks/python/bin/pip install awscli
 

@@ -4,7 +4,7 @@ __package_name__ = "bi-etl-ejuice"
 __version__ = "0.1.0"
 __repository_url__ = "https://github.com/quintoandar/bi-etl-ejuice"
 
-with open('requirements3.txt') as f:
+with open('requirements3-freeze.txt') as f:
     all_requirements = [line for line in f.read().splitlines() if len(line) > 0]
 
 external_requirements = []

@@ -137,3 +137,6 @@ logs/
 
 
 dag_dummy_pipedrive.py
+
+# build byproduct requirement file
+requirements3-freeze.txt

@@ -164,6 +164,12 @@ check-style-python3:
 
 .PHONY: package-python3
 package-python3:
+	@make requirements-python3
+	@echo ""
+	@echo "Creating 'requirements3-freeze.txt' to prepare building dependencies"
+	@echo "=========="
+	@echo ""
+	@python -m pip freeze > requirements3-freeze.txt
 	@echo ""
 	@echo "Creating wheel for bi-etl-ejuice"
 	@echo "=========="
