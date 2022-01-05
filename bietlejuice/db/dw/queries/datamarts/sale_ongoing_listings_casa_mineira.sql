@@ -153,7 +153,7 @@ SELECT
     region,
     city_name,
     city_group,
-    date AS dt_count_evaluated,
+    date,
     weekday_name,
     week_start,
     COUNT(DISTINCT id_house) AS ongoing_listings
@@ -164,6 +164,6 @@ GROUP BY
     region,
     city_name,
     city_group,
-    dt_count_evaluated, 
+    date, 
     weekday_name,
     week_start
