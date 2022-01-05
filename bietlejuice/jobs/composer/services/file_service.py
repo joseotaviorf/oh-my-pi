@@ -1,6 +1,7 @@
 import glob
 from os import listdir
 from os.path import isdir, isfile
+import re
 from typing import Generator
 
 import yaml
@@ -9,6 +10,7 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.jobs.composer.base.db import (
     QUERIES_DATALAKE_PATH,
     DATALAKE_METADATA_PATH,
+    DATA_QUALITY_TESTS_PATH,
 )
 
 logger = QuintoAndarLogger("FileService")
@@ -185,6 +187,55 @@ class FileService:
 
     @staticmethod
     @logger
+    def data_quality_tests_file_exists(
+        relative_file_path: str, layer: str, table_name
+    ) -> bool:
+        """
+        Checks if a data quality tests file for a given table exists.
+        :param relative_file_path: the relative path to the file.
+            This should be the same as the relative_query_path used in other tasks
+            e.g:
+            `dw_smart_price`, `dw_marketing_costs/google`, etc
+        :param layer: the layer that the file is related to.
+        :param table_name: the name of the table that the file is related to
+        :return: True if the file exists, False if no file is found
+        """
+        for extension in ("yml", "yaml"):
+            files = glob.glob(
+                f"{DATA_QUALITY_TESTS_PATH}/{relative_file_path}/{layer}/**/{table_name}."
+                f"{extension}",
+                recursive=True,
+            )
+            if files and files[0]:
+                return True
+        return False
+
+    @staticmethod
+    @logger
+    def list_data_quality_tests_files(relative_file_path: str, layer: str) -> list:
+        """
+        Lists all data quality tests files for a given relative file path.
+        :param relative_file_path: The relative path to lists files to.
+        :param layer: the layer that the file is related to.
+        :return: the list of files for the given relative file path.
+        """
+        filename_regex = re.compile(
+            rf".*/{relative_file_path}/{layer}/([a-z0-9_-]+)(?:\.yml|\.yaml)"
+        )
+        table_names = []
+        for extension in ("*.yml", "*.yaml"):
+            files = glob.glob(
+                f"{DATA_QUALITY_TESTS_PATH}/{relative_file_path}/{layer}/**/{extension}",
+                recursive=True,
+            )
+            if files:
+                for file_path in files:
+                    table_names.append(re.search(filename_regex, file_path).group(1))
+
+        return table_names
+
+    @staticmethod
+    @logger
     def list_metadata_files() -> Generator[str, None, None]:
         """
         Yields all metadata YAML file paths.
@@ -192,7 +243,6 @@ class FileService:
         """
         for extension in ("*.yml", "*.yaml"):
             for file in glob.iglob(
-                f"{DATALAKE_METADATA_PATH}/**/{extension}",
-                recursive=True,
+                f"{DATALAKE_METADATA_PATH}/**/{extension}", recursive=True
             ):
                 yield file

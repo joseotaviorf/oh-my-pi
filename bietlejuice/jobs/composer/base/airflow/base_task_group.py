@@ -16,6 +16,7 @@ class BaseTaskGroup(object):
     DEFAULT_EXECUTION_TIMEOUT_HOURS = 2
     TASK_GROUP_INITIAL_TASKS_DICT_KEY = "initial_tasks"
     TASK_GROUP_FINAL_TASKS_DICT_KEY = "final_tasks"
+    TASK_GROUP_INDEPENDENT_TASKS_DICT_KEY = "independent_tasks"
 
     def __init__(
         self,
@@ -87,7 +88,7 @@ class BaseTaskGroup(object):
         )
 
     @staticmethod
-    def format_tasks_boundaries(initial_tasks, final_tasks):
+    def format_tasks_boundaries(initial_tasks, final_tasks, independent_tasks=None):
         """
         Format the tasks to a dict considering the supplied hierarchy:
             initial bound and final bound of the task group, so we can apply
@@ -97,14 +98,22 @@ class BaseTaskGroup(object):
         :type initial_tasks: list[airflow.models.BaseOperator]
         :param final_tasks: the last tasks in the task group, hierarchically
         :type final_tasks: list[airflow.models.BaseOperator]
+        :param independent_tasks: the independent tasks in the task group, i.e., the tasks that are
+        not dependencies for any other tasks or task groups
+        :type independent_tasks: list[airflow.models.BaseOperator]
         :return: formatted dict with initial tasks and final tasks keys
         :rtype: dict
         """
-
-        return {
+        tasks_boundaries = {
             BaseTaskGroup.TASK_GROUP_INITIAL_TASKS_DICT_KEY: initial_tasks,
             BaseTaskGroup.TASK_GROUP_FINAL_TASKS_DICT_KEY: final_tasks,
         }
+
+        if independent_tasks:
+            tasks_boundaries[
+                BaseTaskGroup.TASK_GROUP_INDEPENDENT_TASKS_DICT_KEY
+            ] = independent_tasks
+        return tasks_boundaries
 
     @staticmethod
     def first_tasks(task_group_boundaries):
@@ -131,6 +140,21 @@ class BaseTaskGroup(object):
         :rtype: list[airflow.models.BaseOperator]
         """
         return task_group_boundaries.get(BaseTaskGroup.TASK_GROUP_FINAL_TASKS_DICT_KEY)
+
+    @staticmethod
+    def independent_tasks(task_group_boundaries):
+        """
+        Gets the independent tasks from a task group i.e., the tasks that are
+        not dependencies for any other tasks or task groups
+
+        :param task_group_boundaries: dict of boundaries from task group
+        :type task_group_boundaries: dict
+        :return: independent tasks of the task group
+        :rtype: list[airflow.models.BaseOperator]
+        """
+        return task_group_boundaries.get(
+            BaseTaskGroup.TASK_GROUP_INDEPENDENT_TASKS_DICT_KEY
+        )
 
     @staticmethod
     def all_first_tasks(task_group_boundaries):
@@ -161,6 +185,24 @@ class BaseTaskGroup(object):
         tasks_list = []
         for task_group in task_group_boundaries.values():
             tasks_list.extend(BaseTaskGroup.last_tasks(task_group))
+
+        return tasks_list
+
+    @staticmethod
+    def all_independent_tasks(task_group_boundaries):
+        """
+       Gets the independent tasks of every task group as a single list.
+
+       :param task_group_boundaries: dict of task groups containing tasks boundaries
+       :type task_group_boundaries: dict
+       :return: list of independent tasks of every task group
+       :rtype: list[airflow.models.BaseOperator]
+       """
+        tasks_list = []
+        for task_group in task_group_boundaries.values():
+            independent_tasks = BaseTaskGroup.independent_tasks(task_group)
+            if independent_tasks:
+                tasks_list.extend(independent_tasks)
 
         return tasks_list
 

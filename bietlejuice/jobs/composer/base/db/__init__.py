@@ -19,6 +19,7 @@ from bietlejuice.jobs.composer.base.db.dw_metastore_service import DWMetastoreSe
 DB_SQL_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../db")
 
 DATALAKE_METADATA_PATH = f"{DB_SQL_PATH}/datalake/metadata"
+DATA_QUALITY_TESTS_PATH = f"{DB_SQL_PATH}/datalake/data_quality"
 DATALAKE_SQL_DIR = f"{DB_SQL_PATH}/datalake"  # TODO: refactor to DATALAKE_SQL_PATH
 QUERIES_DATALAKE_PATH = (
     DATALAKE_SQL_DIR + "/queries/"
