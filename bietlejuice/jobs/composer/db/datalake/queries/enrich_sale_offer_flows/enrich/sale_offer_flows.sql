@@ -329,6 +329,8 @@ notary AS (
         n.id_notary,
         n.id_sales_flow,
         n.status,
+        DATE(n.ts_started) AS dt_started,
+        DATE(n.ts_ended) AS dt_ended,
         DATE(n.ts_seller_paid) AS dt_seller_paid
     FROM
         datalake_sales_flow_clean.notary AS n
@@ -486,8 +488,8 @@ SELECT
         WHEN sf.flow_step = 'CANCELED_CCV' 
         THEN DATE(off.ts_discarded)
     END AS dt_sale_agreement_cancelled,
-    cp.dt_crn_started AS dt_house_registry_started,
-    cp.dt_crn_ended AS dt_house_registry_ended,
+    n.dt_started AS dt_house_registry_started,
+    n.dt_ended AS dt_house_registry_ended,
     n.dt_seller_paid AS dt_sale_transacton_paid,
     off.ts_accepted,
     off.ts_discarded,
