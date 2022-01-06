@@ -5,24 +5,7 @@ WITH
             DATE(DATE_TRUNC('WEEK', ts_event)) AS week,
             MONTH(ts_event) AS month,
             EXTRACT(QUARTER FROM ts_event) AS quarter,
-            GET_JSON_OBJECT(event_properties, '$.uri') as uri,
-            CASE 
-                WHEN event_type = 'landing_page_viewed'
-                    THEN 'OwnerPWA'
-                WHEN event_type = 'price_suggestion_page_viewed'
-                    THEN 'Price Calculator'
-                WHEN event_type = 'price_suggestion_sale_page_viewed'
-                    THEN 'Price Calculator - Sale'
-                WHEN CAST(GET_JSON_OBJECT(user_properties, '$.uri') AS STRING) like '%mkt.quintoandar.com.br/ebook-altaigpm%'
-                    THEN 'New Channels'
-                WHEN CAST(GET_JSON_OBJECT(user_properties, '$.uri') AS STRING) like '%mkt.quintoandar.com.br/ebook-top10itens%'
-                    THEN 'New Channels'
-                ELSE NULL
-            END AS origin,
-            CAST(GET_JSON_OBJECT(user_properties, '$.utm_source') AS STRING) AS utm_source,
-            CAST(GET_JSON_OBJECT(user_properties, '$.utm_medium') AS STRING) AS utm_medium,
             CAST(GET_JSON_OBJECT(user_properties, '$.utm_campaign') AS STRING) AS utm_campaign,
-            SPLIT(CAST(GET_JSON_OBJECT(user_properties, '$.utm_campaign') AS STRING), '\\\\.')[0] AS sk_region,
             COUNT(distinct id_amplitude) AS unique_user
         FROM
             datalake_amplitude_clean.events
@@ -35,120 +18,76 @@ WITH
             AND LOWER(CAST(GET_JSON_OBJECT(user_properties, '$.utm_campaign') AS STRING)) NOT LIKE '%branded%' 
             AND LOWER(CAST(GET_JSON_OBJECT(user_properties, '$.utm_campaign') AS STRING)) NOT LIKE '%demand%'
         GROUP BY 
-            1,2,3,4,5,6,7,8,9,10
-    ),
-    old_campaigns AS (
-        SELECT
-            DISTINCT
-                campaign_name,
-                city_group
-        FROM
-            datalake_consolidated_marketing_costs.city_group_old_campaigns_historic
-        UNION
-        SELECT
-            DISTINCT
-                campaign_name,
-                city_group
-        FROM
-            datalake_gsheets_clean.marketing_costs_campaign_city
+            1,2,3,4,5
     ),
     regions AS (
-        SELECT
-            sk_region,
-            city_group,
-            tier
-        FROM (
             SELECT
-                id AS sk_region,
-                city_group,
-                tier,
-                ROW_NUMBER() OVER (PARTITION BY city_group ORDER BY id DESC) AS order_l
+                DISTINCT
+                    city_group,
+                    tier
             FROM
                 datalake_region.region
-            GROUP BY
-                1, 2, 3
-            ) AS filter
-        WHERE
-            order_l = 1
     ),
     taxonomy AS (
         SELECT
-            DISTINCT
-                campaign_name,
-                mkt_origin,
-                mkt_channel,
-                mkt_medium,
-                mkt_source
-        FROM (
-            SELECT
-                id_date,
-                campaign_name,
-                mkt_origin,
-                mkt_channel,
-                mkt_medium,
-                mkt_source,
-                ROW_NUMBER() OVER (PARTITION BY campaign_name ORDER BY id_date DESC) AS order_l
-            FROM
-                datalake_marketing_costs.daily_costs
-            WHERE
-                mkt_origin IN ('Owner PWA', 'Price Calculator', 'Owner PWA - Sale', 'Price Calculator - Sale', 'New Channels')
-            GROUP BY
-                1, 2, 3, 4, 5, 6
-        )
+            id_date, 
+            account_name, 
+            utm_campaign, 
+            utm_term, 
+            utm_content, 
+            city_group, 
+            campaign_origin_acquisition, 
+            mkt_category,
+            mkt_flow,
+            mkt_completion,
+            campaign_name, 
+            mkt_origin, 
+            mkt_channel, 
+            mkt_medium, 
+            mkt_source, 
+            mkt_platform, 
+            funnel_side, 
+            flow_type, 
+            ROW_NUMBER() OVER (PARTITION BY utm_campaign ORDER BY id_date DESC) AS order_l
+        FROM
+            datalake_marketing_costs.daily_costs
         WHERE
-            order_l = 1
-    ),
-    total AS (
-        SELECT 
-            cte.date,
-            cte.week,
-            cte.month,
-            cte.quarter,
-            IF(cte.quarter < 3, 1, 2) AS half_year,
-            COALESCE(b.city_group, a.city_group) AS city_group,
-            COALESCE(b.tier, a.tier) AS tier,
-            t.mkt_origin,
-            t.mkt_medium,
-            t.mkt_source,
-            t.mkt_channel,
-            SUM(unique_user) as traffic
-        FROM events cte 
-        LEFT JOIN old_campaigns hc
-            ON cte.utm_campaign = hc.campaign_name
-        LEFT JOIN datalake_region.region a
-            ON a.id = cte.sk_region
-        LEFT JOIN regions b 
-            ON b.city_group = hc.city_group
-        LEFT JOIN taxonomy t
-            ON TRIM(t.campaign_name) = TRIM(cte.utm_campaign)
-        GROUP BY 
-            1,2,3,4,5,6,7,8,9,10,11
+            mkt_origin IN ('Owner PWA', 'Price Calculator', 'Owner PWA - Sale', 'Price Calculator - Sale', 'New Channels')
+        GROUP BY
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
     )
-SELECT 
-    total.date AS dt_event,
-    total.week AS week_start_event,
-    total.month AS month_event,
-    total.quarter AS quarter_event,
-    total.half_year AS half_year_event,
-    total.city_group,
-    total.tier,
-    mkt_origin,
-    mkt_medium,
-    mkt_source,
-    mkt_channel,
-    ta.traffic AS traffic_target,
-    total.traffic,
-    year(total.date) as year,
-    month(total.date) as month,
-    day(total.date) as day
-FROM 
-    total
-LEFT JOIN datalake_gsheets_clean.tof_supply_targets ta
-    ON ta.dt_target = total.date
-        AND ta.city_group = total.city_group
-        AND ta.supply_origin = total.mkt_origin
-        AND ta.supply_channel = total.mkt_channel
-        AND ta.supply_medium = total.mkt_medium
-        AND ta.supply_source  = total.mkt_source
-WHERE 
-    total.city_group IS NOT NULL
+SELECT
+    t.campaign_name,
+    t.account_name,
+    t.utm_campaign,
+    t.utm_term,
+    t.utm_content,
+    t.city_group,
+    r.tier,
+    t.campaign_origin_acquisition,
+    t.mkt_category,
+    t.mkt_flow,
+    t.mkt_completion,
+    t.mkt_origin,
+    t.mkt_medium,
+    t.mkt_source,
+    t.mkt_channel,
+    t.mkt_platform,
+    t.funnel_side,
+    t.flow_type,
+    cte.date AS dt_event,
+    cte.week AS week_start_event,
+    cte.month AS month_event,
+    cte.quarter AS quarter_event,
+    IF(cte.quarter < 3, 1, 2) AS half_year_event,
+    SUM(cte.unique_user) AS traffic
+FROM events cte 
+LEFT JOIN taxonomy t
+    ON t.order_l = 1
+        AND t.utm_campaign = cte.utm_campaign
+LEFT JOIN regions r
+    ON t.city_group = r.city_group
+WHERE
+    t.utm_campaign IS NOT NULL
+GROUP BY 
+    1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23

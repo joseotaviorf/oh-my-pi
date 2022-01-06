@@ -1,0 +1,70 @@
+database_name: datalake_top_of_funnel_supply
+table_name: top_of_funnel_supply
+columns:
+  campaign_name:
+    lineage:
+      - datalake_marketing_costs.daily_costs.campaign_name
+  account_name:
+    lineage:
+      - datalake_marketing_costs.daily_costs.account_name
+  utm_campaign:
+    lineage:
+      - datalake_marketing_costs.daily_costs.utm_campaign
+  utm_term:
+    lineage:
+      - datalake_marketing_costs.daily_costs.utm_term
+  utm_content:
+    lineage:
+      - datalake_marketing_costs.daily_costs.utm_content
+  city_group:
+    lineage:
+      - datalake_marketing_costs.daily_costs.city_group
+  tier:
+    lineage:
+      - datalake_region.region.tier
+  campaign_origin_acquisition:
+    lineage:
+      - datalake_marketing_costs.daily_costs.campaign_origin_acquisition
+  mkt_category:
+    lineage:
+      - datalake_marketing_costs.daily_costs.mkt_category
+  mkt_flow:
+    lineage:
+      - datalake_marketing_costs.daily_costs.mkt_flow
+  mkt_completion:
+    lineage:
+      - datalake_marketing_costs.daily_costs.mkt_completion
+  mkt_origin:
+    lineage:
+      - datalake_marketing_costs.daily_costs.mkt_origin
+  mkt_medium:
+    lineage:
+      - datalake_marketing_costs.daily_costs.mkt_medium
+  mkt_source:
+    lineage:
+      - datalake_marketing_costs.daily_costs.mkt_source
+  mkt_channel:
+    lineage:
+      - datalake_marketing_costs.daily_costs.mkt_channel
+  mkt_platform:
+    lineage:
+      - datalake_marketing_costs.daily_costs.mkt_platform
+  funnel_side:
+    lineage:
+      - datalake_marketing_costs.daily_costs.funnel_side
+  flow_type:
+    lineage:
+      - datalake_marketing_costs.daily_costs.flow_type
+  dt_event:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+  week_start_event:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+  month_event:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+  quarter_event:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+  
