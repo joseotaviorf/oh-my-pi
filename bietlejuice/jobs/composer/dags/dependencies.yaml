@@ -843,6 +843,7 @@ bietlejuice.enrich_nps_answer_drivers:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
 
 bietlejuice.enrich_offer:
+  - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.ebdb:create-clean-offer-in-data-lake
   - bietlejuice.ebdb:create-clean-offer-aud-in-data-lake
   - bietlejuice.enrich_booking:load-enrich-booking

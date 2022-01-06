@@ -15,6 +15,7 @@ dags_out_of_pattern: [
     "dw_rent_flow",
     "dw_sale_flow",
     "dw_marketing_costs",
+    "dw_user",
     "enrich_marketing_costs_sharing_rules",
     "enrich_amplitude_partner_taxonomy",
     "marketing_costs_sharing_rules",
