@@ -1,13 +1,15 @@
+import argparse
 import glob
-import re
 import os
+import re
+
 import pyaml
 
 from sql_metadata import Parser
 
 
 def create_yml_for_table(sql, database_name, table_name):
-    parser = Parser(sql)
+    sql_parser = Parser(sql)
     print('{"vendor": ["atlas"],"database_name": "' + database_name + '", "table_name": "' + table_name + '"},')
     yml_body = {"database_name": database_name,
                 "table_name": table_name,
@@ -15,16 +17,16 @@ def create_yml_for_table(sql, database_name, table_name):
                 }
 
     alias_columns = {}
-    for alias, column in parser.columns_aliases.items():
+    for alias, column in sql_parser.columns_aliases.items():
         if isinstance(column, list):
             if len(column) > 0:
                 alias_columns[column[0]] = alias
         else:
             alias_columns[column] = alias
 
-    for column in parser.columns:
+    for column in sql_parser.columns:
         alias = alias_columns.get(column) or column
-        yml_body["columns"][alias.lower()] = {"lineage": [f"{parser.tables[0].lower()}.{column.lower()}"]}
+        yml_body["columns"][alias.lower()] = {"lineage": [f"{sql_parser.tables[0].lower()}.{column.lower()}"]}
 
     return yml_body
 
@@ -42,14 +44,18 @@ if __name__ == "__main__":
     To use the script, first run the following command:
     make requirements-scripts-python3
     """
+    arg_parser = argparse.ArgumentParser()
+    arg_parser.add_argument('--folder','-f', required=True, help='dag name folder')
+    arg_parser.add_argument('--table','-t', help='Specific table to create the lineage')
 
-    # adjust path to point to specific dag folder or leave it empty for all clean sql files
-    dag_name_path = "gsheets"  # use "ebdb", "autodialer", for instance
+    args = arg_parser.parse_args()
     path = f"../bietlejuice/jobs/composer/db/datalake/queries/"
 
-    for file_path in glob.iglob(f"{path}{dag_name_path}/**/*.sql", recursive=True):
+    dag_name_path = args.folder  # use "ebdb", "autodialer", for instance
+    table = args.table if args.table != None else '*'
+    
+    for file_path in glob.iglob(f"{path}{dag_name_path}/**/{table}.sql", recursive=True):
         if "/clean/" in file_path:
-
             regex = f"{path}(.*)/clean(.*)/(.*).sql"
             database_name = re.search(regex, file_path).group(1)
             table_name = re.search(regex, file_path).group(3)
