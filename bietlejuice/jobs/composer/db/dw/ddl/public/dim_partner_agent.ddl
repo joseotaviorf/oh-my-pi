@@ -1,5 +1,5 @@
-drop table if exists janus.dim_partner_agent;
-create table janus.dim_partner_agent (
+drop table if exists public.dim_partner_agent;
+create table public.dim_partner_agent (
     sk_partner_agent bigint primary key,
     id_partner_agent bigint,
     id_user bigint,
@@ -11,4 +11,4 @@ create table janus.dim_partner_agent (
     ts_load timestamp
 );
 
-ALTER TABLE janus.dim_partner_agent OWNER TO airflow;
+ALTER TABLE public.dim_partner_agent OWNER TO databricks;

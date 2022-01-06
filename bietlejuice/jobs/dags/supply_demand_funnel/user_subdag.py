@@ -25,4 +25,4 @@ class UserSubDag(DimSubDag):
         file_path = '{}/ebdb/supply_demand_funnel/{}.sql'.format(SOURCE_QUERIES_DIR, 'user')
         query = BaseETL.get_query_from_file_name(file_name=file_path)
 
-        return self.build_with_tests(source_command=query, table_name='usuario')
+        return self.build_with_tests(source_command=query, table_name='usuario', remove_redshift_load=True)

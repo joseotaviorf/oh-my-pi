@@ -24,4 +24,4 @@ class DoormanSubDag(DimSubDag):
         file_path = '{}/ebdb/supply_demand_funnel/{}.sql'.format(SOURCE_QUERIES_DIR, self.ods_stg_table_name)
         query = BaseETL.get_query_from_file_name(file_name=file_path)
 
-        return self.build_with_tests(source_command=query)
+        return self.build_with_tests(source_command=query, remove_redshift_load=True)

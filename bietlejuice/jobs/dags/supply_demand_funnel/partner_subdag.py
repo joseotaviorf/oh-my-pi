@@ -25,4 +25,4 @@ class PartnerSubDag(DimSubDag):
         file_path = '{}/ebdb/supply_demand_funnel/{}.sql'.format(SOURCE_QUERIES_DIR, 'partner')
         query = BaseETL.get_query_from_file_name(file_name=file_path)
 
-        return self.build_with_tests(source_command=query)
+        return self.build_with_tests(source_command=query, remove_redshift_load=True)

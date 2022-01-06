@@ -1,5 +1,5 @@
-drop table if exists janus.dim_partner;
-create table janus.dim_partner (
+drop table if exists public.dim_partner;
+create table public.dim_partner (
     sk_partner bigint primary key,
     id_partner bigint,
     id_amplitude_device varchar(255),
@@ -20,4 +20,4 @@ create table janus.dim_partner (
     ts_load timestamp
 );
 
-ALTER TABLE janus.dim_partner OWNER TO airflow;
+ALTER TABLE public.dim_partner OWNER TO databricks;

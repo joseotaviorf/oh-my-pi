@@ -1,34 +1,34 @@
 drop table if exists datalake_clean.ods_dim_user_doorman;
 create external table if not exists datalake_clean.ods_dim_user_doorman (
-    sk_user_doorman string,
-    id_user_doorman string,
-    work_address string,
-    work_street string,
-    work_house_number string,
-    work_neighbourhood string,
-    work_city string,
-    work_state string,
-    work_lat string,
-    work_lng string,
-    work_place_id string,
-    recruiter string,
-    subscription_source string,
-    occupation_id string,
-    occupation_name string,
-    ts_updated string,
-    ts_created string,
-    ts_joined_program string,
-    sk_user_affiliate string,
-    is_active string,
-    ts_load string
+    sk_user_doorman bigint,
+    sk_user_affiliate bigint,
+    id_user_doorman bigint,
+    occupation_id bigint,
+    work_place_id varchar(255),
+    work_address varchar(1024),
+    work_street varchar(255),
+    work_house_number varchar(255),
+    work_neighbourhood varchar(255),
+    work_city varchar(255),
+    work_state varchar(255),
+    work_lat decimal(18),
+    work_lng decimal(18),
+    recruiter varchar(255),
+    subscription_source varchar(255),
+    occupation_name varchar(255),
+    is_active boolean,
+    ts_created timestamp,
+    ts_updated timestamp,
+    ts_joined_program timestamp,
+    ts_load timestamp
 )
-row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
-with serdeproperties (
-  'separatorChar' = ',',
-  'quoteChar' = '\"'
-)
-location 's3://5a-datalake/clean/ods/user_doorman'
-tblproperties (
-  'skip.header.line.count' = '1'
-)
-;
+ROW FORMAT SERDE
+  'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
+STORED AS INPUTFORMAT
+  'org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat'
+OUTPUTFORMAT
+  'org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat'
+LOCATION
+  's3://dw.s3.data.quintoandar.com.br/public/dim_user_doorman'
+TBLPROPERTIES (
+  'parquet.compress'='SNAPPY')

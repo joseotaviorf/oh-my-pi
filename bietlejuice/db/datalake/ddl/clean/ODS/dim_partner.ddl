@@ -1,29 +1,31 @@
 drop table if exists datalake_clean.ods_dim_partner;
 create external table if not exists datalake_clean.ods_dim_partner (
-    sk_partner string,
-    id_partner string,
-    id_amplitude_device string,
-    name string,
-    trade_name string,
-    phone string,
-    email string,
-    cnpj string,
-    creci string,
-    type string,
-    city string,
-    ts_joined_partnership string,
-    ts_updated string,
-    ts_created string,
-    ts_load string
+    sk_partner bigint,
+    id_partner bigint,
+    id_amplitude_device varchar(255),
+    name varchar(255),
+    trade_name varchar(255),
+    phone varchar(255),
+    email varchar(255),
+    cnpj varchar(255),
+    creci varchar(255),
+    type varchar(255),
+    city varchar(255),
+    utm_campaign varchar(255),
+    utm_medium varchar(255),
+    utm_source varchar(255),
+    ts_joined_partnership timestamp,
+    ts_created timestamp,
+    ts_updated timestamp,
+    ts_load timestamp
 )
-
-row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
-with serdeproperties (
-  'separatorChar' = ',',
-  'quoteChar' = '\"'
-)
-
-location 's3://5a-datalake/clean/ods/partner'
-tblproperties (
-  'skip.header.line.count' = '1'
-);
+ROW FORMAT SERDE
+  'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
+STORED AS INPUTFORMAT
+  'org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat'
+OUTPUTFORMAT
+  'org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat'
+LOCATION
+  's3://dw.s3.data.quintoandar.com.br/public/dim_partner'
+TBLPROPERTIES (
+  'parquet.compress'='SNAPPY')

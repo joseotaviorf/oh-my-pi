@@ -1,3 +1,0 @@
-# Migration file for dim_user_doorman
-dw_schema: public
-base_date_column: ts_created

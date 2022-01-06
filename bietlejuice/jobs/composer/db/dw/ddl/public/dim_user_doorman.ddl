@@ -1,5 +1,5 @@
-drop table if exists janus.dim_user_doorman;
-create table janus.dim_user_doorman(
+drop table if exists public.dim_user_doorman;
+create table public.dim_user_doorman(
     sk_user_doorman bigint primary key,
     sk_user_affiliate bigint,
     id_user_doorman bigint,
@@ -23,4 +23,4 @@ create table janus.dim_user_doorman(
     ts_load timestamp
 );
 
-ALTER TABLE janus.dim_user_doorman OWNER TO airflow;
+ALTER TABLE public.dim_user_doorman OWNER TO databricks;
