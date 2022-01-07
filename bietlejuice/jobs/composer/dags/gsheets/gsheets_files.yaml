@@ -195,6 +195,11 @@ csat_reembolso_iq:
     sheet_name: respostas_csat
     clean_table_name: tenant_reimbursement_csat
 
+csat_reembolso_pos_rescisao:
+    sheet_id: 1dIIH6pSvq6JXRBClDaKG3TXVfKx6mKbmljIjctVlpkQ
+    sheet_name: reembolso_pos_rescisao
+    clean_table_name: refund_after_termination_csat
+
 csat_reparos_off_pp:
     sheet_id: 1iZ4l6NVakfkSXUebhivPvGeUjmDo2X01gnDUOGnozcE
     sheet_name: respostas_csat

@@ -1,0 +1,16 @@
+---
+database_name: datalake_gsheets_clean
+table_name: refund_after_termination_csat
+columns:
+  satisfaction_level:
+    lineage:
+      - datalake_gsheets_raw.csat_reembolso_pos_rescisao.satisfaction_level
+  points_improvement:
+    lineage:
+      - datalake_gsheets_raw.csat_reembolso_pos_rescisao.points_improvement
+  comment:
+    lineage:
+      - datalake_gsheets_raw.csat_reembolso_pos_rescisao.comment
+  ts_submitted:
+    lineage:
+      - datalake_gsheets_raw.csat_reembolso_pos_rescisao.timestamp
