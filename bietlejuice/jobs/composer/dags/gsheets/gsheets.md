@@ -82,6 +82,7 @@ This pipeline produces the following output tables:
     - `inspection_bugs`
     - `inspection_bugs_v2`
     - `inspectors_control`
+    - `invoices_csat`
     - `ipsos_brandtracking_questions`
     - `keys_logistic_control`
     - `keys_logistic_funnel`

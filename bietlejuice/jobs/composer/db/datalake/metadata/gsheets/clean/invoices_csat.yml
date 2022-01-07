@@ -1,0 +1,25 @@
+---
+database_name: datalake_gsheets_clean
+table_name: invoices_csat
+columns:
+  id:
+    lineage:
+      - datalake_gsheets_raw.csat_faturas.uid
+  token:
+    lineage:
+      - datalake_gsheets_raw.csat_faturas.token
+  satisfaction_level:
+    lineage:
+      - datalake_gsheets_raw.csat_faturas.satisfaction_level
+  points_improvement:
+    lineage:
+      - datalake_gsheets_raw.csat_faturas.points_improvement
+  comment:
+    lineage:
+      - datalake_gsheets_raw.csat_faturas.comment
+  answered:
+    lineage:
+      - datalake_gsheets_raw.csat_faturas.is_answered
+  dt_submitted:
+    lineage:
+      - datalake_gsheets_raw.csat_faturas.submitted_at

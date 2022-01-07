@@ -175,6 +175,11 @@ csat_chaves_off_pp:
     sheet_name: respostas_csat
     clean_table_name: owner_offboarding_keys_csat
 
+csat_faturas:
+    sheet_id: 1dIIH6pSvq6JXRBClDaKG3TXVfKx6mKbmljIjctVlpkQ
+    sheet_name: faturas
+    clean_table_name: invoices_csat
+
 csat_negociacao_iq:
     sheet_id: 1zhk4z4aCnysNpWfi3VIT153nU7joHiX3toE_Tw3oXZk
     sheet_name: respostas_csat

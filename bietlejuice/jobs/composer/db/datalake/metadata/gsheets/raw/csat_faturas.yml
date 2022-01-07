@@ -1,0 +1,12 @@
+---
+database_name: datalake_gsheets_raw
+table_name: csat_faturas
+columns:
+  uid:
+    tags:
+      - PII
+      - Confidential
+  token:
+    tags:
+      - PII
+      - Confidential
