@@ -74,6 +74,9 @@ columns:
   id_closing_specialist:
     lineage:
       - datalake_sale_closing_flows.closing_flow.id_closing_specialist
+  id_legal_risk_analyst:
+    lineage:
+      - datalake_sale_closing_flows.closing_flow.id_legal_risk_analyst
   id_pre_specialist:
     lineage:
       - datalake_sale_closing_flows.closing_flow.id_pre_specialist
@@ -149,6 +152,9 @@ columns:
   days_legal_analysis_ended_notes_registry_ended:
     lineage:
       - datalake_sale_closing_flows.closing_flow.days_legal_analysis_ended_notes_registry_ended
+  days_legal_analysis_ended_to_bank_legal_analysis_started:
+    lineage:
+      - datalake_sale_closing_flows.closing_flow.days_legal_analysis_ended_to_bank_legal_analysis_started
   days_bank_legal_analysis_started_to_financing_ended:
     lineage:
       - datalake_sale_closing_flows.closing_flow.days_bank_legal_analysis_started_to_financing_ended
