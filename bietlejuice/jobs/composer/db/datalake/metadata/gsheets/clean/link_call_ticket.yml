@@ -13,6 +13,6 @@ columns:
   ts_started:
     lineage:
       - datalake_gsheets_raw.links_calls_entre_30ago_01set.inicio_ligacao
-  fim_ligacao:
+  ts_ended:
     lineage:
-      - datalake_gsheets_raw.links_calls_entre_30ago_01set.ts_ended
+      - datalake_gsheets_raw.links_calls_entre_30ago_01set.fim_ligacao

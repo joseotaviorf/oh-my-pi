@@ -1,0 +1,18 @@
+database_name: datalake_gsheets_clean
+table_name: plaquinhas_demand_targets
+columns:
+  business_context:
+    lineage:
+      - datalake_gsheets_raw.plaquinhas_demand_targets.business_context
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.plaquinhas_demand_targets.city_group
+  channel:
+    lineage:
+      - datalake_gsheets_raw.plaquinhas_demand_targets.channel
+  visits_booked_target:
+    lineage:
+      - datalake_gsheets_raw.plaquinhas_demand_targets.visits_booked_target
+  dt_target:
+    lineage:
+      - datalake_gsheets_raw.plaquinhas_demand_targets.date

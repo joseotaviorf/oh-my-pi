@@ -1,0 +1,45 @@
+database_name: datalake_gsheets_clean
+table_name: casa_mineira_marketing_cost_taxonomy
+columns:
+  account_name:
+    lineage:
+      - datalake_gsheets_raw.casa_mineira_marketing_cost_taxonomy.account_name
+  report_type:
+    lineage:
+      - datalake_gsheets_raw.casa_mineira_marketing_cost_taxonomy.report_type
+  ad_type:
+    lineage:
+      - datalake_gsheets_raw.casa_mineira_marketing_cost_taxonomy.ad_type
+  campaign_origin_acquisition:
+    lineage:
+      - datalake_gsheets_raw.casa_mineira_marketing_cost_taxonomy.campaign_origin_aquisition
+  origin:
+    lineage:
+      - datalake_gsheets_raw.casa_mineira_marketing_cost_taxonomy.origin
+  side:
+    lineage:
+      - datalake_gsheets_raw.casa_mineira_marketing_cost_taxonomy.side
+  mkt_category:
+    lineage:
+      - datalake_gsheets_raw.casa_mineira_marketing_cost_taxonomy.mkt_category
+  mkt_flow:
+    lineage:
+      - datalake_gsheets_raw.casa_mineira_marketing_cost_taxonomy.mkt_flow
+  mkt_completion:
+    lineage:
+      - datalake_gsheets_raw.casa_mineira_marketing_cost_taxonomy.mkt_completion
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_raw.casa_mineira_marketing_cost_taxonomy.mkt_origin
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_raw.casa_mineira_marketing_cost_taxonomy.mkt_channel
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_raw.casa_mineira_marketing_cost_taxonomy.mkt_medium
+  mkt_source:
+    lineage:
+      - datalake_gsheets_raw.casa_mineira_marketing_cost_taxonomy.mkt_source
+  cost_factor:
+    lineage:
+      - datalake_gsheets_raw.casa_mineira_marketing_cost_taxonomy.cost_factor

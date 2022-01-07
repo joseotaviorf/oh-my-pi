@@ -7,6 +7,12 @@ columns:
   city_group:
     lineage:
       - datalake_gsheets_raw.mta_budget.city_group
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_raw.mta_budget.mkt_origin
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_raw.mta_budget.mkt_channel
   mkt_medium:
     lineage:
       - datalake_gsheets_raw.mta_budget.mkt_medium

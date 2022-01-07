@@ -10,6 +10,9 @@ columns:
   daily_value:
     lineage:
       - datalake_gsheets_raw.mkt_cost_per_source.daily_value
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_raw.mkt_cost_per_source.mkt_channel
   mkt_medium:
     lineage:
       - datalake_gsheets_raw.mkt_cost_per_source.mkt_medium

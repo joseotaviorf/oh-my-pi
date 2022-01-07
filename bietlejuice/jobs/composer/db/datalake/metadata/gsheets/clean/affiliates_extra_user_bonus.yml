@@ -1,0 +1,15 @@
+database_name: datalake_gsheets_clean
+table_name: affiliates_extra_user_bonus
+columns:
+  sk_user:
+    lineage:
+      - datalake_gsheets_raw.affiliates_extra_user_bonus.sk_user
+  business_context:
+    lineage:
+      - datalake_gsheets_raw.affiliates_extra_user_bonus.business_context
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.affiliates_extra_user_bonus.city_group
+  bonus:
+    lineage:
+      - datalake_gsheets_raw.affiliates_extra_user_bonus.bonus

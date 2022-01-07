@@ -4,6 +4,9 @@ columns:
   city_name:
     lineage:
       - datalake_gsheets_raw.marketing_social_media_costs.city_name
+  media:
+    lineage:
+      - datalake_gsheets_raw.marketing_social_media_costs.media
   network:
     lineage:
       - datalake_gsheets_raw.marketing_social_media_costs.network

@@ -1,0 +1,36 @@
+database_name: datalake_gsheets_clean
+table_name: cities_neighborhoods_ibge_qa
+columns:
+  city_name_qa:
+    lineage:
+      - datalake_gsheets_raw.cities_neighborhoods_ibge_qa.city_name
+  city_group_qa:
+    lineage:
+      - datalake_gsheets_raw.cities_neighborhoods_ibge_qa.city_group
+  region_code_qa:
+    lineage:
+      - datalake_gsheets_raw.cities_neighborhoods_ibge_qa.region_code
+  neighborhood_name_qa:
+    lineage:
+      - datalake_gsheets_raw.cities_neighborhoods_ibge_qa.name
+  neighborhood_name_ibge:
+    lineage:
+      - datalake_gsheets_raw.cities_neighborhoods_ibge_qa.nm_bairro
+  city_name_ibge:
+    lineage:
+      - datalake_gsheets_raw.cities_neighborhoods_ibge_qa.nm_municip
+  microregion_name_ibge:
+    lineage:
+      - datalake_gsheets_raw.cities_neighborhoods_ibge_qa.nm_micro
+  total_private_households:
+    lineage:
+      - datalake_gsheets_raw.cities_neighborhoods_ibge_qa.v002
+  rented_private_households:
+    lineage:
+      - datalake_gsheets_raw.cities_neighborhoods_ibge_qa.v008
+  apartment_rented_private_households:
+    lineage:
+      - datalake_gsheets_raw.cities_neighborhoods_ibge_qa.v180
+  dt_reference:
+    lineage:
+      - datalake_gsheets_raw.cities_neighborhoods_ibge_qa.date

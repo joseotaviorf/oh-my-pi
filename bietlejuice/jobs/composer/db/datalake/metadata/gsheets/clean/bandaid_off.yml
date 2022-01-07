@@ -3,37 +3,37 @@ table_name: bandaid_off
 columns:
   id_contract:
     lineage:
-      - datalake_gsheets_raw.bandaid_off.contrato
+      - datalake_gsheets_raw.jira_extraction_ba_sf.contrato
   id_issue:
     lineage:
-      - datalake_gsheets_raw.bandaid_off.key
+      - datalake_gsheets_raw.jira_extraction_ba_sf.key
   issue_type:
     lineage:
-      - datalake_gsheets_raw.bandaid_off.issue_type
+      - datalake_gsheets_raw.jira_extraction_ba_sf.issue_type
   summary:
     lineage:
-      - datalake_gsheets_raw.bandaid_off.summary
+      - datalake_gsheets_raw.jira_extraction_ba_sf.summary
   reporter:
     lineage:
-      - datalake_gsheets_raw.bandaid_off.reporter
+      - datalake_gsheets_raw.jira_extraction_ba_sf.reporter
   status:
     lineage:
-      - datalake_gsheets_raw.bandaid_off.status
+      - datalake_gsheets_raw.jira_extraction_ba_sf.status
   ba_department:
     lineage:
-      - datalake_gsheets_raw.bandaid_off.ba_departamento
+      - datalake_gsheets_raw.jira_extraction_ba_sf.ba_departamento
   ba_total_value:
     lineage:
-      - datalake_gsheets_raw.bandaid_off.ba_valor_total
+      - datalake_gsheets_raw.jira_extraction_ba_sf.ba_valor_total
   ba_value_range:
     lineage:
-      - datalake_gsheets_raw.bandaid_off.ba_faixa_de_valor
+      - datalake_gsheets_raw.jira_extraction_ba_sf.ba_faixa_de_valor
   ba_expense_category:
     lineage:
-      - datalake_gsheets_raw.bandaid_off.ba_categoria_do_gasto
+      - datalake_gsheets_raw.jira_extraction_ba_sf.ba_categoria_do_gasto
   ba_client:
     lineage:
-      - datalake_gsheets_raw.bandaid_off.ba_cliente_beneficiado
+      - datalake_gsheets_raw.jira_extraction_ba_sf.ba_cliente_beneficiado
   ts_created:
     lineage:
-      - datalake_gsheets_raw.bandaid_off.created
+      - datalake_gsheets_raw.jira_extraction_ba_sf.created

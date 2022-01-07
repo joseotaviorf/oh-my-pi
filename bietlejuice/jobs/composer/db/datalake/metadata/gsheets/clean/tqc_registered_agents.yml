@@ -1,0 +1,15 @@
+database_name: datalake_gsheets_clean
+table_name: tqc_registered_agents
+columns:
+  agent_email:
+    lineage:
+      - datalake_gsheets_raw.tqc_registered_agents.agent_email
+  agent_cpf:
+    lineage:
+      - datalake_gsheets_raw.tqc_registered_agents.agent_cpf
+  program_phase:
+    lineage:
+      - datalake_gsheets_raw.tqc_registered_agents.program_phase
+  ts_subscription:
+    lineage:
+      - datalake_gsheets_raw.tqc_registered_agents.subscription_date

@@ -1,0 +1,27 @@
+database_name: datalake_gsheets_clean
+table_name: marketshare_units_and_tenants
+columns:
+  cluster:
+    lineage:
+      - datalake_gsheets_raw.marketshare_units_and_tenants.cluster
+  microregion:
+    lineage:
+      - datalake_gsheets_raw.marketshare_units_and_tenants.microregion
+  state_uf:
+    lineage:
+      - datalake_gsheets_raw.marketshare_units_and_tenants.state
+  macroregion:
+    lineage:
+      - datalake_gsheets_raw.marketshare_units_and_tenants.macroregion
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.marketshare_units_and_tenants.city_group
+  vacant_residential_units:
+    lineage:
+      - datalake_gsheets_raw.marketshare_units_and_tenants.vacant_residential_units
+  available_tenants:
+    lineage:
+      - datalake_gsheets_raw.marketshare_units_and_tenants.available_tenants
+  year:
+    lineage:
+      - datalake_gsheets_raw.marketshare_units_and_tenants.year

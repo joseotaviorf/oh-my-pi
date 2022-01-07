@@ -1,0 +1,60 @@
+database_name: datalake_gsheets_clean
+table_name: sale_closing_ops_targets
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.sale_closing_ops_targets.city_group
+  payment_method:
+    lineage:
+      - datalake_gsheets_raw.sale_closing_ops_targets.payment_method
+  metric_name:
+    lineage:
+      - datalake_gsheets_raw.sale_closing_ops_targets.metric_name
+  metric_flux:
+    lineage:
+      - datalake_gsheets_raw.sale_closing_ops_targets.metric_flux
+  sla_target_backlog:
+    lineage:
+      - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_backlog
+  sla_target_202201:
+    lineage:
+      - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202201
+  sla_target_202202:
+    lineage:
+      - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202202
+  sla_target_202203:
+    lineage:
+      - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202203
+  sla_target_202204:
+    lineage:
+      - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202204
+  sla_target_202205:
+    lineage:
+      - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202205
+  sla_target_202206:
+    lineage:
+      - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202206
+  sla_target_202207:
+    lineage:
+      - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202207
+  sla_target_202208:
+    lineage:
+      - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202208
+  sla_target_202209:
+    lineage:
+      - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202209
+  sla_target_202210:
+    lineage:
+      - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202210
+  sla_target_202211:
+    lineage:
+      - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202211
+  sla_target_202212:
+    lineage:
+      - datalake_gsheets_raw.sale_closing_ops_targets.sla_target_202212
+  has_used_fgts_in_payment:
+    lineage:
+      - datalake_gsheets_raw.sale_closing_ops_targets.has_used_fgts_in_payment
+  has_seller_debt_payments:
+    lineage:
+      - datalake_gsheets_raw.sale_closing_ops_targets.has_seller_debt_payments

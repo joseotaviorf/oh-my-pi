@@ -1,0 +1,18 @@
+database_name: datalake_gsheets_clean
+table_name: business_unit_region
+columns:
+  id_region:
+    lineage:
+      - datalake_gsheets_raw.business_unit_region.id_region
+  business_model:
+    lineage:
+      - datalake_gsheets_raw.business_unit_region.business_model
+  business_unit:
+    lineage:
+      - datalake_gsheets_raw.business_unit_region.business_unit
+  dt_start:
+    lineage:
+      - datalake_gsheets_raw.business_unit_region.start_date
+  dt_end:
+    lineage:
+      - datalake_gsheets_raw.business_unit_region.end_date

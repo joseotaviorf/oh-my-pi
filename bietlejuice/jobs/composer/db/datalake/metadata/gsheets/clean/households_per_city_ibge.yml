@@ -1,0 +1,24 @@
+database_name: datalake_gsheets_clean
+table_name: households_per_city_ibge
+columns:
+  cities:
+    lineage:
+      - datalake_gsheets_raw.households_per_city_ibge.cities
+  state_uf:
+    lineage:
+      - datalake_gsheets_raw.households_per_city_ibge.state_uf
+  state_name:
+    lineage:
+      - datalake_gsheets_raw.households_per_city_ibge.state_name
+  microregion_name:
+    lineage:
+      - datalake_gsheets_raw.households_per_city_ibge.microregion_name
+  territory_planning:
+    lineage:
+      - datalake_gsheets_raw.households_per_city_ibge.territory_planning
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.households_per_city_ibge.city_group
+  households:
+    lineage:
+      - datalake_gsheets_raw.households_per_city_ibge.households

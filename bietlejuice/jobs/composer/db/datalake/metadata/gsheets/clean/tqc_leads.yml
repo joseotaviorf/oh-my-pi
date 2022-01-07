@@ -1,0 +1,24 @@
+database_name: datalake_gsheets_clean
+table_name: tqc_leads
+columns:
+  agent_email:
+    lineage:
+      - datalake_gsheets_raw.tqc_leads.agent_email
+  agent_cpf:
+    lineage:
+      - datalake_gsheets_raw.tqc_leads.agent_cpf
+  lead_phone:
+    lineage:
+      - datalake_gsheets_raw.tqc_leads.lead_phone
+  lead_email:
+    lineage:
+      - datalake_gsheets_raw.tqc_leads.lead_email
+  program_phase:
+    lineage:
+      - datalake_gsheets_raw.tqc_leads.program_phase
+  ts_appointment:
+    lineage:
+      - datalake_gsheets_raw.tqc_leads.appointment_date
+  ts_new_lead:
+    lineage:
+      - datalake_gsheets_raw.tqc_leads.new_lead_date

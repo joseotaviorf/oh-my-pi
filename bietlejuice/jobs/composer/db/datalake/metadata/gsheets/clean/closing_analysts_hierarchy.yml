@@ -1,0 +1,51 @@
+database_name: datalake_gsheets_clean
+table_name: closing_analysts_hierarchy
+columns:
+  name:
+    lineage:
+      - datalake_gsheets_raw.closing_analysts_hierarchy.name
+  employee_id:
+    lineage:
+      - datalake_gsheets_raw.closing_analysts_hierarchy.employee_id
+  group_1:
+    lineage:
+      - datalake_gsheets_raw.closing_analysts_hierarchy.group_1
+  group_2:
+    lineage:
+      - datalake_gsheets_raw.closing_analysts_hierarchy.group_2
+  group_3:
+    lineage:
+      - datalake_gsheets_raw.closing_analysts_hierarchy.group_3
+  employee_hiring_type:
+    lineage:
+      - datalake_gsheets_raw.closing_analysts_hierarchy.employee_hiring_type
+  analyst_3:
+    lineage:
+      - datalake_gsheets_raw.closing_analysts_hierarchy.analyst_3
+  managers:
+    lineage:
+      - datalake_gsheets_raw.closing_analysts_hierarchy.managers
+  email:
+    lineage:
+      - datalake_gsheets_raw.closing_analysts_hierarchy.email
+  name_in_monday:
+    lineage:
+      - datalake_gsheets_raw.closing_analysts_hierarchy.name_in_monday
+  status:
+    lineage:
+      - datalake_gsheets_raw.closing_analysts_hierarchy.status
+  is_trust_employee:
+    lineage:
+      - datalake_gsheets_raw.closing_analysts_hierarchy.is_trust_employee
+  dt_start:
+    lineage:
+      - datalake_gsheets_raw.closing_analysts_hierarchy.dt_start
+  dt_first_experience_period_end:
+    lineage:
+      - datalake_gsheets_raw.closing_analysts_hierarchy.dt_first_experience_period_end
+  dt_second_experience_period_end:
+    lineage:
+      - datalake_gsheets_raw.closing_analysts_hierarchy.dt_second_experience_period_end
+  dt_born:
+    lineage:
+      - datalake_gsheets_raw.closing_analysts_hierarchy.dt_born

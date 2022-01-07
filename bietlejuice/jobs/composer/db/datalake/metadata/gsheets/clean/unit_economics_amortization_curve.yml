@@ -1,0 +1,21 @@
+database_name: datalake_gsheets_clean
+table_name: unit_economics_amortization_curve
+columns:
+  business:
+    lineage:
+      - datalake_gsheets_raw.unit_economics_amortization_curve.business
+  classification:
+    lineage:
+      - datalake_gsheets_raw.unit_economics_amortization_curve.classificacao
+  month_amortization:
+    lineage:
+      - datalake_gsheets_raw.unit_economics_amortization_curve.amortizacao_mes
+  metric_amortization:
+    lineage:
+      - datalake_gsheets_raw.unit_economics_amortization_curve.metrica_amortizacao
+  dt_term_start:
+    lineage:
+      - datalake_gsheets_raw.unit_economics_amortization_curve.ym_inicio_vigencia
+  dt_term_end:
+    lineage:
+      - datalake_gsheets_raw.unit_economics_amortization_curve.ym_fim_vigencia

@@ -1,0 +1,30 @@
+database_name: datalake_gsheets_clean
+table_name: braze_campaign_creative
+columns:
+  sk_campaign:
+    lineage:
+      - datalake_gsheets_raw.braze_campaign_creative.sk_campaign
+  sk_variant_campaign:
+    lineage:
+      - datalake_gsheets_raw.braze_campaign_creative.sk_variant_campaign
+  campaign_name:
+    lineage:
+      - datalake_gsheets_raw.braze_campaign_creative.campaign_name
+  message_size:
+    lineage:
+      - datalake_gsheets_raw.braze_campaign_creative.message_size
+  message_type:
+    lineage:
+      - datalake_gsheets_raw.braze_campaign_creative.message_type
+  subject_type:
+    lineage:
+      - datalake_gsheets_raw.braze_campaign_creative.subject_type
+  image_type:
+    lineage:
+      - datalake_gsheets_raw.braze_campaign_creative.image_type
+  colors:
+    lineage:
+      - datalake_gsheets_raw.braze_campaign_creative.colors
+  cta:
+    lineage:
+      - datalake_gsheets_raw.braze_campaign_creative.cta

@@ -1,0 +1,12 @@
+database_name: datalake_gsheets_clean
+table_name: marketshare_seasonality
+columns:
+  category:
+    lineage:
+      - datalake_gsheets_raw.marketshare_seasonality.category
+  correction_factor:
+    lineage:
+      - datalake_gsheets_raw.marketshare_seasonality.correction_factor
+  week_month_number:
+    lineage:
+      - datalake_gsheets_raw.marketshare_seasonality.week_month_number

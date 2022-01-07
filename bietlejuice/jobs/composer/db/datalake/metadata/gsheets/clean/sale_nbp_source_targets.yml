@@ -19,6 +19,9 @@ columns:
   nbp_target:
     lineage:
       - datalake_gsheets_raw.sale_nbp_source_targets.nbp_target
+  rbp_target:
+    lineage:
+      - datalake_gsheets_raw.sale_nbp_source_targets.rbp_target
   week_start:
     lineage:
       - datalake_gsheets_raw.sale_nbp_source_targets.week_start
@@ -28,6 +31,6 @@ columns:
   year:
     lineage:
       - datalake_gsheets_raw.sale_nbp_source_targets.year
-  date:
+  dt_target:
     lineage:
       - datalake_gsheets_raw.sale_nbp_source_targets.date

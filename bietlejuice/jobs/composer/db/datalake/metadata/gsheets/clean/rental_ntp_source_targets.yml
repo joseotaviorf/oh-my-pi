@@ -1,9 +1,6 @@
 database_name: datalake_gsheets_clean
 table_name: rental_ntp_source_targets
 columns:
-  ntp_target:
-    lineage:
-      - datalake_gsheets_raw.rental_ntp_source_targets.ntp_target
   tier:
     lineage:
       - datalake_gsheets_raw.rental_ntp_source_targets.tier
@@ -19,6 +16,12 @@ columns:
   mkt_source:
     lineage:
       - datalake_gsheets_raw.rental_ntp_source_targets.mkt_source
+  ntp_target:
+    lineage:
+      - datalake_gsheets_raw.rental_ntp_source_targets.ntp_target
+  rtp_target:
+    lineage:
+      - datalake_gsheets_raw.rental_ntp_source_targets.rtp_target
   week_start:
     lineage:
       - datalake_gsheets_raw.rental_ntp_source_targets.week_start
@@ -28,6 +31,6 @@ columns:
   year:
     lineage:
       - datalake_gsheets_raw.rental_ntp_source_targets.year
-  date:
+  dt_target:
     lineage:
       - datalake_gsheets_raw.rental_ntp_source_targets.date

@@ -1,22 +1,21 @@
----
 database_name: datalake_gsheets_clean
 table_name: hub_sale_closing_process
 columns:
   id_house:
     lineage:
-      - datalake_gsheets_raw.hub_sale_closing_process.id_house
+      - datalake_gsheets_raw.hub_sale_closing_process.sk_house
   id_owner:
     lineage:
-      - datalake_gsheets_raw.hub_sale_closing_process.id_owner
+      - datalake_gsheets_raw.hub_sale_closing_process.sk_owner
   hub_offer:
     lineage:
-      - datalake_gsheets_raw.hub_sale_closing_process.hub_offer
+      - datalake_gsheets_raw.hub_sale_closing_process.hub
   city_group:
     lineage:
-      - datalake_gsheets_raw.hub_sale_closing_process.city_group
+      - datalake_gsheets_raw.hub_sale_closing_process.city
   state_name:
     lineage:
-      - datalake_gsheets_raw.hub_sale_closing_process.state_name
+      - datalake_gsheets_raw.hub_sale_closing_process.state
   sale_price_agreed:
     lineage:
       - datalake_gsheets_raw.hub_sale_closing_process.sale_price_agreed
@@ -29,7 +28,7 @@ columns:
   brokerage_fee:
     lineage:
       - datalake_gsheets_raw.hub_sale_closing_process.brokerage_fee
-  dt_process_start:
+  dt_process_started:
     lineage:
       - datalake_gsheets_raw.hub_sale_closing_process.dt_process_start
   dt_sale:

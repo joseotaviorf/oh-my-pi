@@ -3,19 +3,19 @@ table_name: taxonomy_sla
 columns:
   journey_step:
     lineage:
-      - datalake_gsheets_raw.jornada
+      - datalake_gsheets_raw.taxonomy_sla.jornada
   team:
     lineage:
-      - datalake_gsheets_raw.time
+      - datalake_gsheets_raw.taxonomy_sla.time
   de_para_team:
     lineage:
-      - datalake_gsheets_raw.de_para_team_looker
+      - datalake_gsheets_raw.taxonomy_sla.de_para_team_looker
   contact_theme_tag:
     lineage:
-      - datalake_gsheets_raw.codigo_assunto
+      - datalake_gsheets_raw.taxonomy_sla.codigo_assunto
   contact_theme_detail_tag:
     lineage:
-      - datalake_gsheets_raw.codigo_detalhe_do_assunto
+      - datalake_gsheets_raw.taxonomy_sla.codigo_detalhe_do_assunto
   sla_in_days:
     lineage:
-      - datalake_gsheets_raw.sla_visao_operacao_em_dias_uteis
+      - datalake_gsheets_raw.taxonomy_sla.sla_visao_operacao_em_dias_uteis

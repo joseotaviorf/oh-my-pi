@@ -30,7 +30,7 @@ columns:
       - datalake_gsheets_raw.taxonomy_growth.mkt_origin
   mkt_source:
     lineage:
-        - datalake_gsheets_raw.taxonomy_growth.mkt_source
+      - datalake_gsheets_raw.taxonomy_growth.mkt_source
   is_agent_referral:
     lineage:
       - datalake_gsheets_raw.taxonomy_growth.is_agent_referral

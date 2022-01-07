@@ -1,0 +1,27 @@
+database_name: datalake_gsheets_clean
+table_name: targets_casa_mineira_ncp
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.targets_casa_mineira_ncp.city_group
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_raw.targets_casa_mineira_ncp.mkt_channel
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_raw.targets_casa_mineira_ncp.mkt_medium
+  mkt_source:
+    lineage:
+      - datalake_gsheets_raw.targets_casa_mineira_ncp.mkt_source
+  ncp_target:
+    lineage:
+      - datalake_gsheets_raw.targets_casa_mineira_ncp.daily_target
+  week_start:
+    lineage:
+      - datalake_gsheets_raw.targets_casa_mineira_ncp.week
+  month_target:
+    lineage:
+      - datalake_gsheets_raw.targets_casa_mineira_ncp.month
+  dt_target:
+    lineage:
+      - datalake_gsheets_raw.targets_casa_mineira_ncp.day

@@ -75,13 +75,13 @@ columns:
       - datalake_gsheets_raw.affiliates_inactive_segmentation.l2q_total
   recency_score:
     lineage:
-      - datalake_gsheets_raw.affiliates_inactive_segmentation.RecencyScore
+      - datalake_gsheets_raw.affiliates_inactive_segmentation.recencyscore
   frequency_score:
     lineage:
-      - datalake_gsheets_raw.affiliates_inactive_segmentation.FrequencyScore
+      - datalake_gsheets_raw.affiliates_inactive_segmentation.frequencyscore
   value_score:
     lineage:
-      - datalake_gsheets_raw.affiliates_inactive_segmentation.ValueScore
+      - datalake_gsheets_raw.affiliates_inactive_segmentation.valuescore
   rfm:
     lineage:
       - datalake_gsheets_raw.affiliates_inactive_segmentation.rfm
