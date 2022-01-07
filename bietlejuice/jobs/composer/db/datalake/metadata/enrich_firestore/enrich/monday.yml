@@ -55,6 +55,9 @@ columns:
   payment_method:
     lineage:
       - datalake_firestore_clean.monday.updated_message
+  payment_model:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
   credit_model:
     lineage:
       - datalake_firestore_clean.monday.updated_message
@@ -94,6 +97,9 @@ columns:
   financing_bank:
     lineage:
       - datalake_firestore_clean.monday.updated_message
+  early_keys_status:
+    lineage:
+      - datalake_firestore_clean.monday.early_keys_status
   status:
     lineage:
       - datalake_firestore_clean.monday.updated_message
@@ -133,6 +139,9 @@ columns:
   seller_payment_status:
     lineage:
       - datalake_firestore_clean.monday.updated_message
+  diligence_appointment_reason:
+    lineage:
+      - datalake_firestore_clean.monday.diligence_appointment_reason
   closing_status:
     lineage:
       - datalake_firestore_clean.monday.updated_message
@@ -158,6 +167,9 @@ columns:
     lineage:
       - datalake_firestore_clean.monday.updated_message
   land_tenure:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
+  tags_from_salesflow:
     lineage:
       - datalake_firestore_clean.monday.updated_message
   has_operation_support:
