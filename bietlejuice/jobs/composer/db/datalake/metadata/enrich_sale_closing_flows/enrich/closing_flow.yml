@@ -17,6 +17,9 @@ columns:
   id_closing_specialist:
     lineage:
       - datalake_firestore.monday.id_closing_specialist
+  id_legal_risk_analyst:
+    lineage:
+      - datalake_firestore.monday.id_legal_risk_analyst
   id_pre_specialist:
     lineage:
       - datalake_firestore.monday.id_pre_specialist
