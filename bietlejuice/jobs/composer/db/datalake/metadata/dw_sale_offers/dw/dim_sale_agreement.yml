@@ -8,6 +8,9 @@ columns:
   sale_agreement_status:
     lineage:
       - datalake_offer.sale_offer.sale_agreement_status
+  negotiation_model:
+    lineage:
+      - datalake_offer.sale_offer.negotiation_model
   sale_agreement_cancellation_reason:
     lineage:
       - datalake_offer.sale_offer.sale_agreement_cancellation_reason
@@ -35,9 +38,15 @@ columns:
   payment_method:
     lineage:
       - datalake_offer.sale_offer.current_payment_method
+  payment_model:
+    lineage:
+      - datalake_offer.sale_offer.payment_model
   credit_model:
     lineage:
       - datalake_offer.sale_offer.credit_model
+  early_keys_status:
+    lineage:
+      - datalake_offer.sale_offer.early_keys_status
   closing_status:
     lineage:
       - datalake_offer.sale_offer.closing_status
@@ -50,6 +59,9 @@ columns:
   report_dilligence_status:
     lineage:
       - datalake_offer.sale_offer.report_dilligence_status
+  diligence_appointment_reason:
+    lineage:
+      - datalake_offer.sale_offer.diligence_appointment_reason
   bank_analysis_status:
     lineage:
       - datalake_offer.sale_offer.bank_analysis_status
@@ -65,6 +77,9 @@ columns:
   real_estate_register_office_status:
     lineage:
       - datalake_offer.sale_offer.real_estate_register_office_status
+  tags_from_salesflow:
+    lineage:
+      - datalake_offer.sale_offer.tags_from_salesflow
   has_used_fgts_in_payment:
     lineage:
       - datalake_offer.sale_offer.has_used_fgts_in_payment
