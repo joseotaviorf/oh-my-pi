@@ -5,6 +5,6 @@ SELECT
     points_improvement,
     comment,
     answered,
-    DATE(submitted_at) AS dt_submitted
+    TO_TIMESTAMP(submitted_at, 'dd/MM/yyyy HH:mm:ss') AS ts_submitted
 FROM
     datalake_gsheets_raw.csat_faturas

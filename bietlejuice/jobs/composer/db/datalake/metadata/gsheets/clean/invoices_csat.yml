@@ -20,6 +20,6 @@ columns:
   answered:
     lineage:
       - datalake_gsheets_raw.csat_faturas.is_answered
-  dt_submitted:
+  ts_submitted:
     lineage:
       - datalake_gsheets_raw.csat_faturas.submitted_at
