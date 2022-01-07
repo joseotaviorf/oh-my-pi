@@ -7,6 +7,7 @@ create table if not exists payment.dim_invoice_entry (
     accounting_account varchar(50),
     producer varchar(255),
     description varchar(350),
+    invoice_revenue varchar(200),
     accrual_year_month int,
     ts_load timestamp
 )

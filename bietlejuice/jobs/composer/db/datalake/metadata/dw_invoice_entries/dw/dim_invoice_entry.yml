@@ -4,25 +4,28 @@ table_name: dim_invoice_entry
 columns:
   sk_invoice_entry:
     lineage:
-      - datalake_retsuko_clean.entry.id_external
+      - datalake_retsuko.invoice_entry.id
   entry_type:
     lineage:
-      - datalake_retsuko_clean.entry.bill_item
+      - datalake_retsuko.invoice_entry.entry_type
   from_account_type:
     lineage:
-      - datalake_retsuko_clean.account.type
+      - datalake_retsuko.invoice_entry.from_account_type
   to_account_type:
     lineage:
-      - datalake_retsuko_clean.account.type
+      - datalake_retsuko.invoice_entry.to_account_type
   accounting_account:
     lineage:
-      - datalake_retsuko_clean.entry.bill_item
+      - datalake_retsuko.invoice_entry.accounting_account
   producer:
     lineage:
-      - datalake_retsuko_clean.entry.producer
+      - datalake_retsuko.invoice_entry.producer
   description:
     lineage:
-      - datalake_retsuko_clean.entry.description
+      - datalake_retsuko.invoice_entry.description
+  invoice_entry_revenue:
+    lineage:
+      - datalake_invoice.invoice_revenues.invoice_entry_revenue
   accrual_year_month:
     lineage:
-      - datalake_retsuko_clean.entry.accrual_year_month
+      - datalake_retsuko.invoice_entry.accrual_year_month

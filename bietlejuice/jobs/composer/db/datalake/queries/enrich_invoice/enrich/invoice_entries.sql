@@ -74,7 +74,7 @@ INNER JOIN
     datalake_retsuko_clean.account AS at 
         ON e.id_to_account = at.id
 LEFT JOIN datalake_retsuko_clean.contract AS c_rtsk 
-        ON i.id_contract = c_rtsk.id
+        ON e.id_contract = c_rtsk.id
 LEFT JOIN datalake_ebdb_clean.contract AS c_ebdb
         ON c_rtsk.id_external = c_ebdb.id
 LEFT JOIN datalake_ebdb_clean.house AS h
