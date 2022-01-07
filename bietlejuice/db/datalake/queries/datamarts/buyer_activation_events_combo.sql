@@ -85,7 +85,7 @@ base AS (
         DATE(ce.ts_combo_triggered) AS dt_combo_triggered
      from combo_events AS ce
         JOIN datalake_clean.ods_dim_user AS du
-            ON ce.id_user = du.sk_user
+            ON CAST(ce.id_user AS INTEGER) = du.sk_user
         LEFT JOIN clients_scm AS cm 
             ON cm.phone_number = du.telefone_principal
      WHERE
@@ -93,8 +93,8 @@ base AS (
         AND ce.ts_combo_triggered >= date('2021-07-01')
         AND du.telefone_principal IS NOT NULL
         AND DATE(ce.ts_combo_triggered) < CURRENT_DATE
-        AND NOT COALESCE(CAST(NULLIF(du.is_sale_agent, '') AS BOOLEAN), FALSE)
-        AND NOT COALESCE(CAST(NULLIF(du.is_rent_agent, '') AS BOOLEAN), FALSE)
+        AND NOT COALESCE(du.is_sale_agent, FALSE)
+        AND NOT COALESCE(du.is_rent_agent, FALSE)
 )
 SELECT
     *

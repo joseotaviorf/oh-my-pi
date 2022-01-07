@@ -101,12 +101,12 @@ bookings_agent_tenant as(
 
     from datalake_clean.ods_dim_booking db
     left join datalake_clean.ods_dim_user u
-        on id_agent=u.dados_agente_id
+        on id_agent=CAST(u.dados_agente_id AS VARCHAR)
 
     where db.dt_created > '2020-03-01' --After feature has started
         and db.first_update_source='Corretores' --Bookings created by Agents
 
-        and u.id <> ''
+        and u.id IS NOT NULL
         and id_visitor <> ''
         and id_property <> ''
 
@@ -144,7 +144,7 @@ registered_tta as (
     join listing l
         on cast(h.sk_house_listing as bigint) = cast(l.sk_house_listing as bigint)
     where h.id_house > ''
-        and u.dados_agente_id > ''
+        and u.dados_agente_id IS NOT NULL
         and a.status = 'COMPLETE' --here at this stage of Prod. Dev. we want to account only for Completed Talk to Agents
     group by 1,2,3 -- Only count one attendance for the triple agent-tenant-house
 ),
@@ -253,15 +253,15 @@ left join talk_to_agent_completed t
     and t.house=e.house_id
 
 left join datalake_clean.ods_dim_user u
-    on cast(nullif(u.id,'') as integer)=e.tenant_id
+    on u.id=e.tenant_id
 
 left join house_properties h
     on cast(h.sk_house_listing as integer) = e.house_id
 
 -- identifies the agent context with the booleans columns in user dimension: is_sale_agent
 left join datalake_clean.ods_dim_user sa
-    on e.agent_id = cast(sa.id as integer)
-    and sa.is_sale_agent = 'True'
+    on CAST(e.agent_id AS INTEGER) = cast(sa.id as integer)
+    and sa.is_sale_agent
 
 -- version of the moment the tenant has sent the message
 join datalake_clean.ods_dim_house_listing m

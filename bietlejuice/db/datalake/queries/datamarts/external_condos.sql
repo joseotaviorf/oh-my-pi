@@ -283,15 +283,15 @@ select
     trim(dhl.house_lat) as house_lat,
     trim(dhl.house_lng) as house_lng,
     trim(dhl.house_number) as house_number,
-    count(case when dud.sk_user_affiliate > '0' then 0 end) doormen,
+    count(case when CAST(dud.sk_user_affiliate AS VARCHAR) > '0' then 0 end) doormen,
     array_agg(distinct du.telefone_principal) as telephone,
     array_agg(distinct du.nome) as name,
     array_agg(distinct du.email) as email
 from datalake_clean.ods_fact_house_listing_flows fhlf
 join datalake_clean.ods_dim_house_listing dhl on dhl.sk_house_listing = fhlf.sk_house_listing
-join datalake_clean.ods_dim_user_doorman dud on dud.sk_user_affiliate = fhlf.sk_user_lead_affiliate
+join datalake_clean.ods_dim_user_doorman dud on dud.sk_user_affiliate = CAST(fhlf.sk_user_lead_affiliate AS INTEGER)
 join datalake_clean.ods_dim_user du on du.sk_user = dud.sk_user_affiliate
-where du.dadosafiliado_ativo = '1'
+where du.dadosafiliado_ativo = 1
 group by 1,2,3
 )
 , base_interna as (

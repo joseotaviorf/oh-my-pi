@@ -48,7 +48,7 @@ house_info as (
     dhl.house_city
   from datalake_clean.ods_fact_house_listings fhl
   left join datalake_clean.ods_dim_house_listing dhl on fhl.sk_house_listing = dhl.sk_house_listing
-  left join datalake_clean.ods_dim_user owner on fhl.sk_owner = owner.sk_user
+  left join datalake_clean.ods_dim_user owner on CAST(fhl.sk_owner AS INTEGER) = owner.sk_user
   where try(cast(dhl.is_last_version as boolean)) = true
     and coalesce(dhl.ts_publication, '') != ''
   group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11

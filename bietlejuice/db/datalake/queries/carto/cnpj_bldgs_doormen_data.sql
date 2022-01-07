@@ -68,18 +68,16 @@ doorman AS (
       ELSE trim(regexp_replace(regexp_replace(d.work_address, regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$')), '[,;\-\.]')) || ', ' || regexp_extract(regexp_replace(trim(d.work_address), '[,;\-\.]'), '\d+$') || ' ' || d.work_city
     END AS formatted_address,
     COALESCE(a.google_formatted_address, d.work_address) AS google_formatted_address,
-    COALESCE(a.lat, d.work_lat) AS lat,
-    COALESCE(a.lng, d.work_lng) AS lng,
+    COALESCE(a.lat, CAST(d.work_lat AS VARCHAR)) AS lat,
+    COALESCE(a.lng, CAST(d.work_lng AS VARCHAR)) AS lng,
     u.telefone_principal,
     u.nome,
     u.dadosafiliado_ativo,
-    CASE WHEN COALESCE(d.ts_joined_program, '') != '' THEN
-      CAST(d.ts_joined_program as timestamp)
-    ELSE NULL END AS ts_joined_program_timestamp,
+    d.ts_joined_program AS ts_joined_program_timestamp,
     leads.lead_activity
   FROM datalake_clean.ods_dim_user_doorman d
-  LEFT JOIN datalake_raw.doorman_geocoded_addresses a ON d.id_user_doorman = a.id_user_doorman
-  JOIN datalake_clean.ods_dim_user u ON CAST(d.sk_user_affiliate AS VARCHAR) = u.dados_afiliado_id
+  LEFT JOIN datalake_raw.doorman_geocoded_addresses a ON d.id_user_doorman = CAST(a.id_user_doorman AS INTEGER)
+  JOIN datalake_clean.ods_dim_user u ON d.sk_user_affiliate = u.dados_afiliado_id
   LEFT JOIN (
       SELECT dim_user_affiliate.sk_user AS sk_user,
              max(DATE(dim_date_lead.date)) AS last_date_lead,
@@ -95,7 +93,7 @@ doorman AS (
       FULL OUTER JOIN
         (SELECT *
          FROM datalake_clean.ods_dim_user
-         WHERE dados_afiliado_id IS NOT NULL) AS dim_user_affiliate ON fact_house_listing_flows_affiliates.sk_user_lead_affiliate = dim_user_affiliate.sk_user
+         WHERE dados_afiliado_id IS NOT NULL) AS dim_user_affiliate ON CAST(fact_house_listing_flows_affiliates.sk_user_lead_affiliate AS INTEGER) = dim_user_affiliate.sk_user
       LEFT JOIN datalake_clean.ods_dim_date AS dim_date_lead ON dim_date_lead.sk_date = fact_house_listing_flows_affiliates.sk_lead_date
       WHERE fact_house_listing_flows_affiliates.sk_lead_date != '-1'
       GROUP BY dim_user_affiliate.sk_user
