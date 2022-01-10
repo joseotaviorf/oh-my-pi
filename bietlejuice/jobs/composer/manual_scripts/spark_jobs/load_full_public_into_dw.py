@@ -6,7 +6,7 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.jobs.composer.base.athena import TableStorageFormat
 from bietlejuice.jobs.composer.base.db import (
     DatabaseEnum,
-    DatalakeMetastoreService,
+    DWMetastoreService,
     DW_QUERY_PATH,
 )
 from bietlejuice.jobs.composer.base.pipeline import EnvironmentEnum, LayerEnum
@@ -27,7 +27,7 @@ from bietlejuice.jobs.composer.services import ConfigurationService, FileService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 
-JOB_NAME = "load_full_quintoandar_into_dw"
+JOB_NAME = "load_full_public_into_dw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -59,7 +59,7 @@ def sync_hive(schema, layer, datalake_bucket, all_tables=True) -> None:
 environment = EnvironmentEnum.FORNO  # Change to the environment where you will run it.
 os.environ["ENVIRONMENT"] = environment  # Necessary to use the ConfigurationService.
 layer = LayerEnum.DW.value
-schema = "quintoandar"
+schema = "public"
 queries_path = f"{DW_QUERY_PATH}{schema}/"
 
 config_service = ConfigurationService(schema)
@@ -67,7 +67,7 @@ dw_bucket = config_service.get_config("dw_bucket")
 
 logger.info(
     f"""
-m=load_full_quintoandar_into_dw, environment={environment}, dw_bucket={dw_bucket},
+m=load_full_public_into_dw, environment={environment}, dw_bucket={dw_bucket},
 , schema={schema}, msg=Starting spark job...
 """
 )
@@ -81,10 +81,10 @@ tables = [
 ]
 
 # Get standard names for database
-db_info = DatalakeMetastoreService.get_db_info(environment, schema, dw_bucket)
-database_name = db_info[f"db_{layer}_databricks"]
+db_info = DWMetastoreService.get_db_info(environment, schema, dw_bucket)
+database_name = db_info[f"dw_schema_databricks"]
 format_options = SparkTableStorageFormat.DEFAULT_DW
-database_location = db_info[f"db_{layer}_path"]
+database_location = db_info[f"dw_schema_path"]
 
 spark_client = SparkClient()
 metastore_service = SparkMetastoreService(spark_client)
