@@ -52,9 +52,7 @@ This pipeline produces, in **datalake raw and clean**, tables via incremental lo
 `rev_info`  
 `sales_flow`    
 `sales_flow_aud`    
-`sales_flow_contact`    
-`sales_flow_contact_aud`    
-`sales_flow_tag`    
+`sales_flow_contact_aud`        
 `sales_flow_tag_aud`    
 `specialist`    
 `specialist_aud`    
@@ -67,10 +65,15 @@ This pipeline produces, in **datalake raw and clean**, tables via incremental lo
     
 </div>
 
-If you need to add a new table that does not have an `updated_at` timestamp/date column, you must update the
-raw spark job (load_incremental_sales_flow_into_datalake), adding the raw table name and the respective unix
-timestamp column name for the incremental load on the `COLUMN_MAPPING` dict and also add the raw table name
-on the `UNIX_FORMAT_TABLES`. Then, create the incremental clean query. 
+This pipeline produces, in **datalake raw and clean**, tables via full load:
+ - `sales_flow_contact`    
+ - `sales_flow_tag`
+
+If you need to add a new table, you must update the configuration file `sales_flow_[env]_conf.yml`. By default, all incremental tables use `updated_at` as a date filter, but if you need a different one, add the property `date_filter_column`. If the date filter column isn't actually a date type, you must add the property `unixtime_measure` specifying seconds or milliseconds. If the table_name in the raw layer is different to the one in the clean layer, add the property `clean_table_name`. For an example of all of these properties, search for `revinfo` on the config file.
+
+Then, create the clean query.
+
+If the table isn't found in the configuration file, it will still be ingested to raw incrementally, using `updated_at` as a date filter. It WILL NOT be ingested to clean, even if you add the query.
 
 ### Responsible Data Teams
 For any questions or concerns about this DAG and data, please contact the Data Engineering Team or

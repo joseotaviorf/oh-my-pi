@@ -17,12 +17,3 @@ columns:
   ts_updated:
     lineage:
       - datalake_sales_flow_raw.sales_flow_tag.updated_at
-  year:
-    lineage:
-      - datalake_sales_flow_raw.sales_flow_tag.year
-  month:
-    lineage:
-      - datalake_sales_flow_raw.sales_flow_tag.month
-  day:
-    lineage:
-      - datalake_sales_flow_raw.sales_flow_tag.day

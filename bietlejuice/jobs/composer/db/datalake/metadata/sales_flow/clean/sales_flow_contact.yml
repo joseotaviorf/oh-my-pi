@@ -23,12 +23,3 @@ columns:
   ts_updated:
     lineage:
       - datalakes_sales_flow_raw.sales_flow_contact.updated_at
-  year:
-    lineage:
-      - datalakes_sales_flow_raw.sales_flow_contact.year
-  month:
-    lineage:
-      - datalakes_sales_flow_raw.sales_flow_contact.month
-  day:
-    lineage:
-      - datalakes_sales_flow_raw.sales_flow_contact.day

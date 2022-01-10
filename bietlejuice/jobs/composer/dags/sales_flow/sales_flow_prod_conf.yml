@@ -1,0 +1,111 @@
+---
+block_list:
+  - change_owner_control
+  - flyway_schema_history
+tables:
+  address_data:
+    extraction_type: incremental
+  address_data_aud:
+    extraction_type: incremental
+  brokerage:
+    extraction_type: incremental
+  brokerage_aud:
+    extraction_type: incremental
+  cash_payment:
+    extraction_type: incremental
+  cash_payment_aud:
+    extraction_type: incremental
+  ccv:
+    extraction_type: incremental
+  ccv_aud:
+    extraction_type: incremental
+  ccv_flow:
+    extraction_type: incremental
+  ccv_flow_aud:
+    extraction_type: incremental
+  ccv_party:
+    extraction_type: incremental
+  ccv_party_aud:
+    extraction_type: incremental
+  ccv_rule:
+    extraction_type: incremental
+  ccv_rule_aud:
+    extraction_type: incremental
+  contact:
+    extraction_type: incremental
+  contact_aud:
+    extraction_type: incremental
+  diligence:
+    extraction_type: incremental
+  diligence_appointment:
+    extraction_type: incremental
+  diligence_appointment_aud:
+    extraction_type: incremental
+  diligence_aud:
+    extraction_type: incremental
+  house:
+    extraction_type: incremental
+  house_aud:
+    extraction_type: incremental
+  mortgage:
+    extraction_type: incremental
+  mortgage_aud:
+    extraction_type: incremental
+  notary:
+    extraction_type: incremental
+  notary_aud:
+    extraction_type: incremental
+  offer:
+    extraction_type: incremental
+  offer_aud:
+    extraction_type: incremental
+  onboarding:
+    extraction_type: incremental
+  onboarding_aud:
+    extraction_type: incremental
+  payment:
+    extraction_type: incremental
+  payment_aud:
+    extraction_type: incremental
+  rescission:
+    extraction_type: incremental
+  rescission_aud:
+    extraction_type: incremental
+  revinfo:
+    clean_table_name: rev_info
+    extraction_type: incremental
+    unixtime_measure: milliseconds
+    date_filter_column: timestamp
+  sales_flow:
+    extraction_type: incremental
+  sales_flow_aud:
+    extraction_type: incremental
+  sales_flow_contact:
+    extraction_type: full
+  sales_flow_contact_aud:
+    extraction_type: incremental
+  sales_flow_tag:
+    extraction_type: full
+  sales_flow_tag_aud:
+    extraction_type: incremental
+  specialist:
+    extraction_type: incremental
+  specialist_aud:
+    extraction_type: incremental
+  tag:
+    extraction_type: incremental
+  tag_aud:
+    extraction_type: incremental
+  user_sample:
+    extraction_type: incremental
+  user_sample_aud:
+    extraction_type: incremental
+  users:
+    extraction_type: incremental
+  users_aud:
+    extraction_type: incremental
+  visit_lead:
+    extraction_type: incremental
+  visit_lead_aud:
+    extraction_type: incremental
+partition_cols: ["year", "month", "day"]

@@ -10,8 +10,12 @@ from airflow.operators.quintoandar_databricks import (
 from airflow.utils.helpers import chain, cross_downstream
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.jobs.composer.services.configuration_service import (
+    ConfigurationService,
+)
 
 # dag vars
 SOURCE = "sales_flow"
@@ -24,27 +28,33 @@ MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
 
 # airflow vars
 ENV = os.environ.get("ENVIRONMENT")
-DATALAKE_BUCKET = Variable.get("datalake_bucket")
-ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
-DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
-S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
+
+CONFIG_SERVICE = ConfigurationService(SOURCE)
+DATALAKE_BUCKET = CONFIG_SERVICE.get_config("datalake_bucket")
+ATHENA_QUERY_RESULT_LOCATION = CONFIG_SERVICE.get_config("athena_query_results_bucket")
+S3_PREFIX = CONFIG_SERVICE.get_config(
+    "databricks_bietlejuice_repo_path"
+)
+DOC_MD_BASE_URL = CONFIG_SERVICE.get_config("doc_md_chart_url")
 
 # spark and databricks vars
 BASE_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 RAW_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/{CONTEXT}"
-RAW_INCREMENTAL_LOAD_SPARK_JOB_PATH = (
-    f"{RAW_SPARK_JOB_PATH}/load_incremental_sales_flow_into_datalake.py"
+RAW_LOAD_SPARK_JOB_PATH = (
+    f"{RAW_SPARK_JOB_PATH}/load_sales_flow_into_datalake.py"
 )
 
-LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{CONTEXT}"
+LOGS_OUTPUT_PATH = CONFIG_SERVICE.get_config("spark_jobs_logs_path")
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = f'{LOGS_OUTPUT_PATH}{CONTEXT}'
+
+TABLES = CONFIG_SERVICE.get_config("tables")
+PARTITION_COLS = CONFIG_SERVICE.get_config("partition_cols")
 
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": BaseDAG.DEFAULT_OWNER,
+        "owner": DAGOwnerEnum.DATA_FOR_SALE,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
@@ -75,23 +85,30 @@ task_group = DatalakeTaskGroup(
 raw_task_group = task_group.build_raw_task_group_for_all_tables(
     source=SOURCE,
     target_database_base_name=CONTEXT,
-    extraction_spark_job_file=RAW_INCREMENTAL_LOAD_SPARK_JOB_PATH,
+    extraction_spark_job_file=RAW_LOAD_SPARK_JOB_PATH,
     raw_spark_job_extra_args=[SOURCE, "{{ds}}"],
-)
-
-clean_task_groups = task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.CLEAN,
-    source_database_base_name=CONTEXT,
-    target_database_base_name=CONTEXT,
-    is_incremental=True,
-    partitions=["year", "month", "day"],
 )
 
 chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
 
-cross_downstream(
-    DatalakeTaskGroup.last_tasks(raw_task_group),
-    DatalakeTaskGroup.all_first_tasks(clean_task_groups),
-)
+for table_name, table_config in TABLES.items():
+    extraction_type = table_config["extraction_type"]
+    clean_table_name = table_config.get("clean_table_name", table_name)
 
-terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
+    is_incremental = table_config.get("extraction_type") == "incremental"
+    partitions = PARTITION_COLS if is_incremental else None
+
+    clean_task_group = task_group.build_clean_task_group(
+        source_database_base_name=CONTEXT,
+        target_database_base_name=CONTEXT,
+        table_name=clean_table_name,
+        is_incremental=is_incremental,
+        partitions=partitions,
+    )
+
+    cross_downstream(
+        DatalakeTaskGroup.last_tasks(raw_task_group),
+        DatalakeTaskGroup.first_tasks(clean_task_group),
+    )
+
+    terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_group))

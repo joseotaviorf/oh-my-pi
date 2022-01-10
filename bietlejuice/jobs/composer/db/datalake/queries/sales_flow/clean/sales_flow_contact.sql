@@ -5,13 +5,6 @@ SELECT
     type,
     default_type AS is_default_type,
     created_at AS ts_created,
-    updated_at AS ts_updated,
-    year,
-    month,
-    day
+    updated_at AS ts_updated
 FROM
     datalake_sales_flow_raw.sales_flow_contact
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
