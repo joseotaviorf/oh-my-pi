@@ -38,7 +38,7 @@ BASE_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 
 # cluster setup
 CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_minimum_resources_cluster", deserialize_json=True
+    "databricks_9_1_min_general_cluster", deserialize_json=True
 )
 
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
