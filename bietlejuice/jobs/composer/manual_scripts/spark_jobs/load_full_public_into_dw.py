@@ -27,7 +27,7 @@ from bietlejuice.jobs.composer.services import ConfigurationService, FileService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 
-JOB_NAME = "load_full_public_into_dw"
+JOB_NAME = "load_full_quintoandar_into_dw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -59,7 +59,7 @@ def sync_hive(schema, layer, datalake_bucket, all_tables=True) -> None:
 environment = EnvironmentEnum.FORNO  # Change to the environment where you will run it.
 os.environ["ENVIRONMENT"] = environment  # Necessary to use the ConfigurationService.
 layer = LayerEnum.DW.value
-schema = "public"
+schema = "quintoandar"
 queries_path = f"{DW_QUERY_PATH}{schema}/"
 
 config_service = ConfigurationService(schema)
