@@ -36,7 +36,7 @@ all_users AS (
     	datalake_amplitude_clean_prod.events e
     WHERE
     	e.id_app = 170698
-    	AND e.year = 2021
+    	AND e.year >= 2021
     	AND CAST(JSON_EXTRACT_PATH_TEXT(e.user_properties, 'utm_source') AS VARCHAR) LIKE '%plaquinhas%'
     	AND COALESCE(e.id_user,'') <> ''
     	AND CAST(e.ts_event AS DATE) >= '2021-02-19'
@@ -135,7 +135,7 @@ metrics_base AS (
     FROM 
         plaquinhas_users u
     LEFT JOIN datamarts.performance_marketing_metrics_demand pmmd 
-        ON u.sk_client = pmmd.sk_client
+        ON u.sk_client = pmmd.sk_client AND pmmd.dt_event BETWEEN u.dt_first_interaction AND dateadd(day, 90, u.dt_last_interaction)
 ),
 targets AS (
     SELECT
