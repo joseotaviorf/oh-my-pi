@@ -3,13 +3,13 @@ import os
 import logging
 
 from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.jobs.composer.base.athena import TableStorageFormat
 from bietlejuice.jobs.composer.base.db import (
     DatabaseEnum,
     DWMetastoreService,
     DW_QUERY_PATH,
 )
-from bietlejuice.jobs.composer.base.pipeline import EnvironmentEnum, LayerEnum
+
+from bietlejuice.jobs.composer.base.pipeline import EnvironmentEnum
 from bietlejuice.jobs.composer.base.spark import (
     BaseSparkContext,
     SparkMetastoreHelper,
@@ -20,9 +20,6 @@ from bietlejuice.jobs.composer.dags.base.spark_jobs.sync_metastore_tables import
     HiveMetastoreSynchronization,
 )
 from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
-from bietlejuice.jobs.composer.pipeline.create_external_table_pipeline import (
-    CreateExternalTablePipeline,
-)
 from bietlejuice.jobs.composer.services import ConfigurationService, FileService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
@@ -58,7 +55,6 @@ def sync_hive(schema, layer, datalake_bucket, all_tables=True) -> None:
 
 environment = EnvironmentEnum.FORNO  # Change to the environment where you will run it.
 os.environ["ENVIRONMENT"] = environment  # Necessary to use the ConfigurationService.
-layer = LayerEnum.DW.value
 schema = "public"
 queries_path = f"{DW_QUERY_PATH}{schema}/"
 
