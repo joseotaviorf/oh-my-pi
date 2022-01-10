@@ -83,7 +83,7 @@ tables = [
 # Get standard names for database
 db_info = DatalakeMetastoreService.get_db_info(environment, schema, dw_bucket)
 database_name = db_info[f"db_{layer}_databricks"]
-format_options = SparkTableStorageFormat.DEFAULT_RAW
+format_options = SparkTableStorageFormat.DEFAULT_DW
 database_location = db_info[f"db_{layer}_path"]
 
 spark_client = SparkClient()
