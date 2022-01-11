@@ -4,6 +4,8 @@ SELECT
     hub AS hub_offer,
     city AS city_group,
     state AS state_name,
+    seller_name,
+    seller_cpf_cnpj,
     CAST(sale_price_agreed AS FLOAT) AS sale_price_agreed,
     CAST(brokerage_fee_quintoandar AS FLOAT) AS brokerage_fee_quintoandar,
     CAST(brokerage_fee_partner AS FLOAT) AS brokerage_fee_partner,

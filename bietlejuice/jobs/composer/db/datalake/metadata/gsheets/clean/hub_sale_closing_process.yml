@@ -16,6 +16,12 @@ columns:
   state_name:
     lineage:
       - datalake_gsheets_raw.hub_sale_closing_process.state
+  seller_name:
+    lineage:
+      - datalake_gsheets_raw.hub_sale_closing_process.seller_name
+  seller_cpf_cnpj:
+    lineage:
+      - datalake_gsheets_raw.hub_sale_closing_process.seller_cpf_cnpj
   sale_price_agreed:
     lineage:
       - datalake_gsheets_raw.hub_sale_closing_process.sale_price_agreed
