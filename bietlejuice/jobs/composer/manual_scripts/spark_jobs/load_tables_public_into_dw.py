@@ -40,12 +40,16 @@ def sync_hive(schema, layer, datalake_bucket, tables, all_tables=True) -> None:
     )
     spark_ms.validate_table_arguments()
 
+    tables_metadata = spark_ms.get_all_tables_metadata()
+
     hms_sync = HiveMetastoreSynchronization(
         _hms_host, layer, spark_ms.spark_database_name, spark_ms.database_location
     )
 
     rdd = BaseSparkContext.sc.parallelize(tables)
-    rdd.foreach(lambda _table_name: hms_sync.sync_table(_table_name))
+    rdd.foreach(
+        lambda _table_name: hms_sync.sync_table(tables_metadata.get(_table_name))
+    )
 
 
 environment = EnvironmentEnum.FORNO  # Change to the environment where you will run it.
