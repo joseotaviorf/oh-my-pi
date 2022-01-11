@@ -63,11 +63,10 @@ dw_bucket = config_service.get_config("dw_bucket")
 
 logger.info(
     f"""
-m=load_full_public_into_dw, environment={environment}, dw_bucket={dw_bucket},
-, schema={schema}, msg=Starting spark job...
-"""
+    m=load_full_public_into_dw, environment={environment}, dw_bucket={dw_bucket},
+    , schema={schema}, msg=Starting spark job...
+    """
 )
-
 
 # Get tables from sql files
 logger.info(f"""msg=Getting tables from schema {schema}...""")
