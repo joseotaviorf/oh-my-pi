@@ -30,7 +30,7 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def sync_hive(schema, layer, datalake_bucket, all_tables=True) -> None:
+def sync_hive(schema, layer, datalake_bucket, tables, all_tables=True) -> None:
     hm_confs = dbutils.secrets.get("quintoandar", DatabaseEnum.HIVE_METASTORE)
     hm_confs_json = json.loads(hm_confs)
     _hms_host = hm_confs_json["host"]
@@ -40,17 +40,12 @@ def sync_hive(schema, layer, datalake_bucket, all_tables=True) -> None:
     )
     spark_ms.validate_table_arguments()
 
-    tables_metadata = spark_ms.get_all_tables_metadata()
-    spark_table_names = list(tables_metadata.keys())
-
     hms_sync = HiveMetastoreSynchronization(
         _hms_host, layer, spark_ms.spark_database_name, spark_ms.database_location
     )
 
-    rdd = BaseSparkContext.sc.parallelize(spark_table_names)
-    rdd.foreach(
-        lambda _table_name: hms_sync.sync_table(tables_metadata.get(_table_name))
-    )
+    rdd = BaseSparkContext.sc.parallelize(tables)
+    rdd.foreach(lambda _table_name: hms_sync.sync_table(_table_name))
 
 
 environment = EnvironmentEnum.FORNO  # Change to the environment where you will run it.
@@ -69,12 +64,8 @@ logger.info(
     """
 )
 
-# Get tables from sql files
-logger.info(f"""msg=Getting tables from schema {schema}...""")
-tables = [
-    FileService.remove_file_extension(file)
-    for file in FileService.list_files(queries_path)
-]
+# List of tables that were created and is going to be sync with Hive  - Insert here all tables that has to be created and sync
+tables = ["dim_date"]
 
 # Get standard names for database
 db_info = DWMetastoreService.get_db_info(environment, schema, dw_bucket)
@@ -103,6 +94,6 @@ for table in tables:
     )
 
 # Sync Hive Metastore
-sync_hive(schema, layer, dw_bucket)
+sync_hive(schema, layer, dw_bucket, tables)
 
 logger.info(f"m={JOB_NAME}, msg=Finished synchronization.")
