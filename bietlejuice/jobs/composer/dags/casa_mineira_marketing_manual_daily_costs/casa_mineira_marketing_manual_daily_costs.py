@@ -27,10 +27,6 @@ MAIN_SCHEDULE_INTERVAL = "0 11 * * *"
 CLUSTER_DESCRIPTION = Variable.get(
     "databricks_9_1_min_general_cluster", deserialize_json=True
 )
-CUSTOM_LIBRARIES = {
-    "whl": "{artifacts_bucket}/gsheets-api-client-python/"
-    f"quintoandar_gsheets_api_client-0.2.1-py2.py3-none-any.whl"
-}
 
 config_service = ConfigurationService(CONTEXT)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
@@ -40,19 +36,15 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 )
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 artifacts_bucket = config_service.get_config("artifacts_bucket")
-default_libraries = config_service.get_config("default_libraries")
-default_libraries.append(
-    {
-        src: lib.format(artifacts_bucket=artifacts_bucket) if src == "whl" else lib
-        for src, lib in CUSTOM_LIBRARIES.items()
-    }
-)
-
 sheets_list = config_service.get_config("sheets_list")
 
 ENV = os.environ["ENVIRONMENT"]
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 GSHEETS_RAW_FILE_PATH = f"{BASE_SPARK_JOBS_PATH}load_gsheets_into_datalake_raw.py"
+CUSTOM_LIBRARIES = {
+    "whl": f"{artifacts_bucket}/gsheets-api-client-python/"
+    f"quintoandar_gsheets_api_client-0.2.1-py2.py3-none-any.whl"
+}
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -72,7 +64,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=default_libraries,
+    libraries=CUSTOM_LIBRARIES,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
