@@ -9,7 +9,7 @@ from bietlejuice.jobs.composer.base.db import (
     DW_QUERY_PATH,
 )
 
-from bietlejuice.jobs.composer.base.pipeline import EnvironmentEnum
+from bietlejuice.jobs.composer.base.pipeline import EnvironmentEnum, LayerEnum
 from bietlejuice.jobs.composer.base.spark import (
     BaseSparkContext,
     SparkMetastoreHelper,
@@ -55,6 +55,7 @@ def sync_hive(schema, layer, datalake_bucket, all_tables=True) -> None:
 
 environment = EnvironmentEnum.FORNO  # Change to the environment where you will run it.
 os.environ["ENVIRONMENT"] = environment  # Necessary to use the ConfigurationService.
+layer = LayerEnum.DW.value
 schema = "public"
 queries_path = f"{DW_QUERY_PATH}{schema}/"
 
