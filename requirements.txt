@@ -78,4 +78,4 @@ snakebite==2.11.0
 sshtunnel==0.1.4
 configparser==3.5.0b2
 apache-airflow==1.10.2
-git+git://github.com/quintoandar/python-utils.git@v0.4.2
+qa-python-utils==0.4.2
