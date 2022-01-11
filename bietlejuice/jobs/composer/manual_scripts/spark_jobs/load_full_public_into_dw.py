@@ -94,6 +94,8 @@ for table in tables:
     )
 
 # Sync Hive Metastore
+logger.info(f"m={JOB_NAME}, msg=Starting tables synchronization...")
+
 sync_hive(schema, layer, dw_bucket, tables)
 
 logger.info(f"m={JOB_NAME}, msg=Finished synchronization.")
