@@ -33,7 +33,6 @@ S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
 DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
-LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{DAG_ID}"
 BASE_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 
 # cluster setup
@@ -41,15 +40,12 @@ CLUSTER_DESCRIPTION = Variable.get(
     "databricks_9_1_min_general_cluster", deserialize_json=True
 )
 
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
-DEFAULT_LIBRARIES = Variable.get("bietlejuice_default_libraries", deserialize_json=True)
 CUSTOM_LIBRARIES = [
     {
         "whl": f"{ARTIFACTS_S3_BUCKET}/jira-api-client-python/"
         f"quintoandar_jira_api_client-0.2.1-py2.py3-none-any.whl"
     }
 ]
-LIBRARIES_DESCRIPTION = DEFAULT_LIBRARIES + CUSTOM_LIBRARIES
 
 # Job params
 JOB_PARAMS = [
@@ -77,7 +73,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     dag=dag,
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
-    libraries=LIBRARIES_DESCRIPTION,
+    libraries=CUSTOM_LIBRARIES,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
