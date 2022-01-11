@@ -68,7 +68,7 @@ logger.info(
 tables = ["dim_date"]
 
 # Get standard names for database
-db_info = DWMetastoreService.get_db_info(environment, schema, dw_bucket)
+db_info = DWMetastoreService.get_dw_info(environment, schema, dw_bucket)
 database_name = db_info[f"dw_schema_databricks"]
 format_options = SparkTableStorageFormat.DEFAULT_DW
 database_location = db_info[f"dw_schema_path"]
