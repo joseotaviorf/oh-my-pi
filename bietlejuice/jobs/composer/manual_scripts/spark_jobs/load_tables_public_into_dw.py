@@ -24,7 +24,7 @@ from bietlejuice.jobs.composer.services import ConfigurationService, FileService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 
-JOB_NAME = "load_full_public_into_dw"
+JOB_NAME = "load_tables_public_into_dw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -59,7 +59,7 @@ dw_bucket = config_service.get_config("dw_bucket")
 
 logger.info(
     f"""
-    m=load_full_public_into_dw, environment={environment}, dw_bucket={dw_bucket},
+    m=load_tables_public_into_dw, environment={environment}, dw_bucket={dw_bucket},
     , schema={schema}, msg=Starting spark job...
     """
 )
