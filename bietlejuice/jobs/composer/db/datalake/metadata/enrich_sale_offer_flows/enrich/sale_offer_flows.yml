@@ -70,7 +70,7 @@ columns:
       - datalake_sales_flow_clean.sales_flow.status_closing
   house_dilligence_status:
     lineage:
-      - datalake_sales_flow_clean.diligence.status
+      - datalake_sales_flow_clean.diligence.classification
   seller_dilligence_status:
     lineage:
       - datalake_sales_flow_clean.sales_flow.status

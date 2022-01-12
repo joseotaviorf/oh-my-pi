@@ -356,7 +356,7 @@ diligence AS (
     SELECT
         d.id_diligence,
         d.id_sales_flow,
-        d.status,
+        d.classification,
         d.step
     FROM
         datalake_sales_flow_clean.diligence AS d
@@ -447,7 +447,7 @@ SELECT
     sp.team_lead_name,
     sp.team_lead_email,
     sf.status_closing AS closing_status,
-    d.status AS house_dilligence_status,
+    d.classification AS house_dilligence_status,
     sf.status AS seller_dilligence_status,
     d.step AS report_dilligence_status,
     mg.status AS bank_analysis_status,

@@ -20,9 +20,9 @@ columns:
   rev_end:
     lineage:
       - datalake_sales_flow_raw.diligence_aud.revend
-  status:
+  classification:
     lineage:
-      - datalake_sales_flow_raw.diligence_aud.status
+      - datalake_sales_flow_raw.diligence_aud.classification
   step:
     lineage:
       - datalake_sales_flow_raw.diligence_aud.step
@@ -32,9 +32,9 @@ columns:
   mod_id_specialist:
     lineage:
       - datalake_sales_flow_raw.diligence_aud.specialist_id_mod
-  mod_status:
+  mod_classification:
     lineage:
-      - datalake_sales_flow_raw.diligence_aud.status_mod
+      - datalake_sales_flow_raw.diligence_aud.classification_mod
   mod_step:
     lineage:
       - datalake_sales_flow_raw.diligence_aud.step_mod

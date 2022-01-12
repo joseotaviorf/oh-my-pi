@@ -11,9 +11,9 @@ columns:
   id_specialist:
     lineage:
       - datalake_sales_flow_raw.diligence.specialist_id
-  status:
+  classification:
     lineage:
-      - datalake_sales_flow_raw.diligence.status
+      - datalake_sales_flow_raw.diligence.classification
   step:
     lineage:
       - datalake_sales_flow_raw.diligence.step
