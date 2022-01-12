@@ -34,13 +34,13 @@ discarded_leads AS (
     fact_house_listing_flows.lead_type AS "lead_type",
     user_affiliate.dados_afiliado_id AS "dados_afiliado_id"
   FROM datalake_clean.ods_fact_house_listing_flows AS fact_house_listing_flows
-  LEFT JOIN datalake_clean.ods_dim_lead AS dim_lead ON fact_house_listing_flows.sk_lead = dim_lead.sk_lead
-  LEFT JOIN datalake_clean.ods_dim_region AS dim_region ON dim_region.sk_region = fact_house_listing_flows.sk_region
+  LEFT JOIN datalake_clean.ods_dim_lead AS dim_lead ON fact_house_listing_flows.sk_lead = CAST(dim_lead.sk_lead AS BIGINT)
+  LEFT JOIN datalake_clean.ods_dim_region AS dim_region ON CAST(dim_region.sk_region AS BIGINT) = fact_house_listing_flows.sk_region
   FULL OUTER JOIN user_affiliate ON CAST(fact_house_listing_flows.sk_user_lead_affiliate AS INTEGER) = user_affiliate.sk_user
-  LEFT JOIN datalake_clean.ods_dim_date AS dim_date_lead ON dim_date_lead.sk_date = fact_house_listing_flows.sk_lead_date
+  LEFT JOIN datalake_clean.ods_dim_date AS dim_date_lead ON CAST(dim_date_lead.sk_date AS BIGINT) = fact_house_listing_flows.sk_lead_date
   WHERE (dim_lead.reason = 'ForaArea') AND (dim_lead.status = 'Descartado')
     AND TRY(DATE(dim_date_lead.date))  >= CURRENT_DATE - INTERVAL '30' day
-    AND fact_house_listing_flows.sk_prospect_date = '-1'
+    AND fact_house_listing_flows.sk_prospect_date = -1
   GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 subregions AS (

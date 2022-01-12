@@ -38,7 +38,7 @@ WITH doorman AS (
         (SELECT *
          FROM datalake_clean.ods_dim_user
          WHERE dados_afiliado_id IS NOT NULL) AS dim_user_affiliate ON CAST(fact_house_listing_flows_affiliates.sk_user_lead_affiliate AS INTEGER) = dim_user_affiliate.sk_user
-      LEFT JOIN datalake_clean.ods_dim_date AS dim_date_lead ON dim_date_lead.sk_date = fact_house_listing_flows_affiliates.sk_lead_date
+      LEFT JOIN datalake_clean.ods_dim_date AS dim_date_lead ON CAST(dim_date_lead.sk_date AS BIGINT) = fact_house_listing_flows_affiliates.sk_lead_date
       WHERE dim_date_lead.date != '' AND dim_date_lead.date IS NOT NULL
       GROUP BY dim_user_affiliate.sk_user
     ) AS leads

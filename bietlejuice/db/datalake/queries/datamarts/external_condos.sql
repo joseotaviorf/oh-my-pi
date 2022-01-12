@@ -270,11 +270,11 @@ select
     trim(dhl.house_lat) as house_lat, 
     trim(dhl.house_lng) as house_lng, 
     trim(dhl.house_number) as house_number,
-    count(case when fhlf.sk_conversion_date > '0' then 0 end) as converted_leads,
+    count(case when fhlf.sk_conversion_date > 0 then 0 end) as converted_leads,
     count(0) leads
 from datalake_clean.ods_fact_house_listing_flows fhlf
-join datalake_clean.ods_dim_house_listing  dhl on dhl.sk_house_listing = fhlf.sk_house_listing
-join datalake_clean.ods_dim_date dd on fhlf.sk_lead_date = dd.sk_date
+join datalake_clean.ods_dim_house_listing  dhl on CAST(dhl.sk_house_listing AS BIGINT) = fhlf.sk_house_listing
+join datalake_clean.ods_dim_date dd on fhlf.sk_lead_date = CAST(dd.sk_date AS BIGINT)
 where try_cast(dd."date" as date) > current_date - interval '120' day and trim(dhl.house_lat) != '' and trim(dhl.house_lng) != ''
 group by 1,2,3
 ) 
@@ -288,7 +288,7 @@ select
     array_agg(distinct du.nome) as name,
     array_agg(distinct du.email) as email
 from datalake_clean.ods_fact_house_listing_flows fhlf
-join datalake_clean.ods_dim_house_listing dhl on dhl.sk_house_listing = fhlf.sk_house_listing
+join datalake_clean.ods_dim_house_listing dhl on CAST(dhl.sk_house_listing AS BIGINT) = fhlf.sk_house_listing
 join datalake_clean.ods_dim_user_doorman dud on dud.sk_user_affiliate = CAST(fhlf.sk_user_lead_affiliate AS INTEGER)
 join datalake_clean.ods_dim_user du on du.sk_user = dud.sk_user_affiliate
 where du.dadosafiliado_ativo = 1
