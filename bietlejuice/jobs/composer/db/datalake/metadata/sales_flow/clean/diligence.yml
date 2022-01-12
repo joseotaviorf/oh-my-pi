@@ -8,9 +8,6 @@ columns:
   id_sales_flow:
     lineage:
       - datalake_sales_flow_raw.diligence.sales_flow_id
-  id_specialist:
-    lineage:
-      - datalake_sales_flow_raw.diligence.specialist_id
   classification:
     lineage:
       - datalake_sales_flow_raw.diligence.classification

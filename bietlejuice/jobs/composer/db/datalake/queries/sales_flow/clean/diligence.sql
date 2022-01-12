@@ -1,7 +1,6 @@
 SELECT 
     id AS id_diligence,
     sales_flow_id AS id_sales_flow,
-    specialist_id AS id_specialist,
     classification,
     step,
     partner_started_at AS ts_partner_started,

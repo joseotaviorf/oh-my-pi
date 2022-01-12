@@ -8,9 +8,6 @@ columns:
   id_sales_flow:
     lineage:
       - datalake_sales_flow_raw.diligence_aud.sales_flow_id
-  id_specialist:
-    lineage:
-      - datalake_sales_flow_raw.diligence_aud.specialist_id
   rev:
     lineage:
       - datalake_sales_flow_raw.diligence_aud.rev
@@ -29,9 +26,6 @@ columns:
   mod_id_sales_flow:
     lineage:
       - datalake_sales_flow_raw.diligence_aud.sales_flow_id_mod
-  mod_id_specialist:
-    lineage:
-      - datalake_sales_flow_raw.diligence_aud.specialist_id_mod
   mod_classification:
     lineage:
       - datalake_sales_flow_raw.diligence_aud.classification_mod
