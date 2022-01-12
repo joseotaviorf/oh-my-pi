@@ -28,13 +28,12 @@ class VisitSubDag(DimSubDag):
     def build_visit_with_tests(self):
         visit_dag = self._build_local_dag()
 
-        visits, staging_dim_visit_task, dim_visit = self.__build_data_tasks(visit_dag)
+        visits, staging_dim_visit_task = self.__build_data_tasks(visit_dag)
 
         tests_tasks = self.build_tests_tasks(visit_dag)
 
         visits >> staging_dim_visit_task
         staging_dim_visit_task.set_downstream(tests_tasks)
-        dim_visit.set_upstream(tests_tasks)
 
         return visit_dag
 
@@ -70,14 +69,4 @@ class VisitSubDag(DimSubDag):
             }
         )
 
-        dim_visit = BaseDAG.build_python_operator(
-            task_id='DW_dim_visit',
-            dag=dag,
-            python_callable=utils.load_dim_from_staging_to_dw,
-            op_kwargs={
-                'dim_name': 'visit',
-                'bucket': self.bucket
-            }
-        )
-
-        return visits, staging_dim_visit_task, dim_visit
+        return visits, staging_dim_visit_task

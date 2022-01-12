@@ -1,5 +1,5 @@
-drop table if exists janus.dim_visit;
-create table janus.dim_visit (
+drop table if exists public.dim_visit;
+create table public.dim_visit (
   sk_visit integer primary key,
   id_visit integer,
   cd_visit varchar(200),
@@ -14,4 +14,4 @@ create table janus.dim_visit (
   dt_timestamp timestamp without time zone
 );
 
-ALTER TABLE janus.dim_visit OWNER TO airflow;
+ALTER TABLE public.dim_visit OWNER TO databricks;
