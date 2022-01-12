@@ -1,19 +1,13 @@
-drop table if exists dim_user_affiliate;
+drop table if exists public.dim_user_affiliate;
 create table public.dim_user_affiliate (
     sk_user_affiliate bigint primary key,
     sk_user bigint,
     id_user_affiliate bigint,
     sk_user_indicated_by bigint,
-    ts_joined_program timestamp,
-    is_active boolean,
-    ts_updated timestamp,
-    ts_created timestamp,
     origin varchar(255),
     type varchar(255),
     marketing_city_group varchar(255),
     regional varchar(255),
-    is_realstate_agent boolean,
-    is_photographer boolean,
     tracking_source varchar(255),
     tracking_medium varchar(255),
     tracking_campaign varchar(255),
@@ -28,5 +22,13 @@ create table public.dim_user_affiliate (
     mkt_channel varchar(255),
     mkt_medium varchar(255),
     mkt_source varchar(255),
-    ts_load timestamp without time zone
+    is_realstate_agent boolean,
+    is_photographer boolean,
+    is_active boolean,
+    ts_joined_program timestamp,
+    ts_created timestamp,
+    ts_updated timestamp,
+    ts_load timestamp
 );
+
+ALTER TABLE public.dim_user_affiliate OWNER TO databricks;

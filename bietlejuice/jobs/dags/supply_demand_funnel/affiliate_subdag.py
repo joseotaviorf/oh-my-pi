@@ -27,14 +27,13 @@ class AffiliateSubDag(DimSubDag):
     def build_affiliate_with_tests(self):
         affiliate_dag = self._build_local_dag()
 
-        ods_affiliate_origin_task, ods_affiliate_task, staging_dim_affiliate_task, \
-            dw_dim_affiliate_task = self.__build_data_tasks(affiliate_dag)
+        ods_affiliate_origin_task, ods_affiliate_task, \
+            staging_dim_affiliate_task = self.__build_data_tasks(affiliate_dag)
 
         tests_tasks = self.build_tests_tasks(affiliate_dag)
 
         airflow_helpers.chain(ods_affiliate_origin_task, ods_affiliate_task, staging_dim_affiliate_task)
         staging_dim_affiliate_task.set_downstream(tests_tasks)
-        dw_dim_affiliate_task.set_upstream(tests_tasks)
 
         return affiliate_dag
 
@@ -81,14 +80,4 @@ class AffiliateSubDag(DimSubDag):
             }
         )
 
-        dw_dim_affiliate_task = BaseDAG.build_python_operator(
-            dag=dag,
-            task_id='DW_dim_user_affiliate',
-            python_callable=utils.load_dim_from_staging_to_dw,
-            op_kwargs={
-                'dim_name': self.ods_stg_table_name,
-                'bucket': self.bucket
-            }
-        )
-
-        return ods_affiliate_origin_task, ods_affiliate_task, staging_dim_affiliate_task, dw_dim_affiliate_task
+        return ods_affiliate_origin_task, ods_affiliate_task, staging_dim_affiliate_task

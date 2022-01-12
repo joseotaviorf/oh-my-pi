@@ -14,7 +14,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 ### Outputs
 This pipeline produces the following output tables in DW layer:
 
-- `janus.dim_user_affiliate`
+- `public.dim_user_affiliate`
 
 ### Responsible Data Engineering Team
 
