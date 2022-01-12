@@ -97,7 +97,6 @@ for table in tables:
         df, database_name, table, format_options, database_location
     )
 
-# Sync Hive Metastore
 logger.info(f"m={JOB_NAME}, msg=Starting tables synchronization...")
 
 sync_hive(schema, layer, dw_bucket, tables)
