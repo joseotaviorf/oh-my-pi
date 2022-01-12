@@ -73,7 +73,7 @@ def sync_hive(schema, layer, datalake_bucket, tables, all_tables=True) -> None:
 logger.info(
     f"""
     m=load_tables_public_into_dw, environment={environment}, dw_bucket={dw_bucket},
-    , schema={schema}, msg=Starting spark job...
+    schema={schema}, msg=Starting spark job.
     """
 )
 
