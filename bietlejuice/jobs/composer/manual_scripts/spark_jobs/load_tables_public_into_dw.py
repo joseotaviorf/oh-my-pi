@@ -26,6 +26,24 @@ from bietlejuice.jobs.composer.services.metastore_services import SparkMetastore
 
 JOB_NAME = "load_tables_public_into_dw"
 
+environment = EnvironmentEnum.FORNO  # Change to the environment where you will run it.
+os.environ["ENVIRONMENT"] = environment  # Necessary to use the ConfigurationService.
+layer = LayerEnum.DW.value
+schema = "public"
+queries_path = f"{DW_QUERY_PATH}{schema}/"
+
+config_service = ConfigurationService(schema)
+dw_bucket = config_service.get_config("dw_bucket")
+
+# List of tables that were created and is going to be sync with Hive  - Insert here all tables that has to be created and sync
+tables = ["dim_date"]
+
+# Get standard names for database
+db_info = DWMetastoreService.get_dw_info(environment, schema, dw_bucket)
+database_name = db_info[f"dw_schema_databricks"]
+format_options = SparkTableStorageFormat.DEFAULT_DW
+database_location = db_info[f"dw_schema_path"]
+
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
@@ -52,30 +70,12 @@ def sync_hive(schema, layer, datalake_bucket, tables, all_tables=True) -> None:
     )
 
 
-environment = EnvironmentEnum.FORNO  # Change to the environment where you will run it.
-os.environ["ENVIRONMENT"] = environment  # Necessary to use the ConfigurationService.
-layer = LayerEnum.DW.value
-schema = "public"
-queries_path = f"{DW_QUERY_PATH}{schema}/"
-
-config_service = ConfigurationService(schema)
-dw_bucket = config_service.get_config("dw_bucket")
-
 logger.info(
     f"""
     m=load_tables_public_into_dw, environment={environment}, dw_bucket={dw_bucket},
     , schema={schema}, msg=Starting spark job...
     """
 )
-
-# List of tables that were created and is going to be sync with Hive  - Insert here all tables that has to be created and sync
-tables = ["dim_date"]
-
-# Get standard names for database
-db_info = DWMetastoreService.get_dw_info(environment, schema, dw_bucket)
-database_name = db_info[f"dw_schema_databricks"]
-format_options = SparkTableStorageFormat.DEFAULT_DW
-database_location = db_info[f"dw_schema_path"]
 
 spark_client = SparkClient()
 metastore_service = SparkMetastoreService(spark_client)
