@@ -31,8 +31,7 @@ class ListingFlowsSubDag(BaseSubDag):
             ods_potential_listings_rep_leads_task,
             ods_potential_listings_house_b2b_task,
             ods_potential_listings_task,
-            ods_lead_city_region_task,
-            dw_fact_house_listing_flows) = self.__build_data_tasks(listing_flows_dag)
+            ods_lead_city_region_task) = self.__build_data_tasks(listing_flows_dag)
 
         ods_potential_listings_lead_tasks_task.set_upstream([
             ods_base_photo_tasks_task,
@@ -55,8 +54,6 @@ class ListingFlowsSubDag(BaseSubDag):
             ods_acquisitions_task,
             ods_listing_flows_with_reprocessed_leads_task
         ])
-
-        dw_fact_house_listing_flows.set_upstream([ods_potential_listings_task, ods_lead_city_region_task])
 
         return listing_flows_dag
 
@@ -152,18 +149,6 @@ class ListingFlowsSubDag(BaseSubDag):
             }
         )
 
-        dw_fact_house_listing_flows = BaseDAG.build_python_operator(
-            dag=dag,
-            task_id="DW_Fact_House_Listing_Flows",
-            python_callable=utils.load_dim_from_ods_to_dw,
-            op_kwargs={
-                "dim_name": "house_listing_flows",
-                "is_fact": True,
-                "bucket": self.bucket,
-                "insert_dummy": False,
-            }
-        )
-
         return (
             ods_listing_flows_with_reprocessed_leads_task,
             ods_acquisitions_task,
@@ -175,5 +160,4 @@ class ListingFlowsSubDag(BaseSubDag):
             ods_potential_listings_house_b2b_task,
             ods_potential_listings_task,
             ods_lead_city_region_task,
-            dw_fact_house_listing_flows
         )
