@@ -27,7 +27,7 @@ class BookingSubDag(DimSubDag):
     def build_booking_with_tests(self):
         booking_dag = self._build_local_dag()
 
-        bookings, property_booking_information, staging_dim_booking_task, dim_bookings = self.__build_data_tasks(
+        bookings, property_booking_information, staging_dim_booking_task = self.__build_data_tasks(
             booking_dag)
 
         tests_tasks = self.build_tests_tasks(booking_dag)
@@ -35,7 +35,6 @@ class BookingSubDag(DimSubDag):
         property_booking_information >> bookings
         bookings >> staging_dim_booking_task
         staging_dim_booking_task.set_downstream(tests_tasks)
-        dim_bookings.set_upstream(tests_tasks)
 
         return booking_dag
 
@@ -82,14 +81,5 @@ class BookingSubDag(DimSubDag):
             }
         )
 
-        dim_booking_task = BaseDAG.build_python_operator(
-            task_id='DW_dim_booking',
-            dag=dag,
-            python_callable=utils.load_dim_from_staging_to_dw,
-            op_kwargs={
-                'dim_name': 'booking',
-                'bucket': self.bucket
-            }
-        )
 
-        return booking, booking_media_sources_task, staging_dim_booking_task, dim_booking_task
+        return booking, booking_media_sources_task, staging_dim_booking_task

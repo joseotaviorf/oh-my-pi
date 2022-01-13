@@ -49,7 +49,7 @@ columns:
       - datalake_ebdb_rent_flow.rent_flow.id_contract
   sk_rent_flow_taxonomy:
     lineage:
-      - dw_janus.dim_booking.sk_rent_flow_taxonomy
+      - dw_public.dim_booking.sk_rent_flow_taxonomy
   sk_house_first_listing_date:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.dt_house_first_listing
@@ -188,19 +188,19 @@ columns:
       - datalake_ebdb_rent_flow.rent_flow.visit_created_type
   booking_utm_campaign:
     lineage:
-      - dw_janus.dim_booking.utm_campaign
+      - dw_public.dim_booking.utm_campaign
   booking_utm_content:
     lineage:
-      - dw_janus.dim_booking.utm_content
+      - dw_public.dim_booking.utm_content
   booking_utm_term:
     lineage:
-      - dw_janus.dim_booking.utm_term
+      - dw_public.dim_booking.utm_term
   funnel_step_drop_reason:
     lineage:
       - dw_janus.dim_contract.cancellation_reason
       - dw_public.dim_offer.rejection_reason
       - dw_janus.dim_proposal.rejection_reason
-      - dw_janus.dim_booking.cancellation_reason
+      - dw_public.dim_booking.cancellation_reason
   flg_visit_completed:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.is_visit_completed

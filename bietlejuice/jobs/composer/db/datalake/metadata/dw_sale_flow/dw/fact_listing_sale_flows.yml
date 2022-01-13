@@ -52,7 +52,7 @@ columns:
       - datalake_ebdb_rent_flow.rent_flow.visit_created_type
   funnel_step_drop_reason:
     lineage:
-      - dw_janus.dim_booking.cancellation_reason
+      - dw_public.dim_booking.cancellation_reason
   flg_visit_completed:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.is_visit_completed

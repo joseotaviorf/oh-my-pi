@@ -6,7 +6,7 @@ WITH bookings AS (
     FROM 
         datalake_crm_tasks_flows.tasks_users_resolutions_flow AS turf
     LEFT JOIN
-        testing_map_ods_from_s3.ods_dim_booking db
+        dw_public.dim_booking db
             ON turf.origin = 'Agendamento'
             AND turf.id_origin = db.sk_booking
     LEFT JOIN 

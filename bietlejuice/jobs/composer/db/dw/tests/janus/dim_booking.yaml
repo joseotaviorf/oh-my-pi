@@ -1,3 +1,0 @@
-# Migration file for dim_booking
-dw_schema: public
-base_date_column: dt_created

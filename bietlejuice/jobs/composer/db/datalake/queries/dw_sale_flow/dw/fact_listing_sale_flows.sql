@@ -74,7 +74,7 @@ WITH listing_rent_flows AS (
             AND reservation.ts_created BETWEEN
                 COALESCE(dim_house_listing.ts_listing_version_start, '1900-01-01')
                 AND COALESCE(dim_house_listing.ts_listing_version_end, NOW())
-        LEFT JOIN dw_janus.dim_booking
+        LEFT JOIN dw_public.dim_booking
             ON dim_booking.sk_booking = rent_flow.id_booking
         WHERE dim_house_listing.is_for_sale
             AND dim_booking.visit_intent = 'SALE'

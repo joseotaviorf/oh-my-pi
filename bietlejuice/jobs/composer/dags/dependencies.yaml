@@ -124,6 +124,7 @@ bietlejuice.dw_criteo_campaigns:
   - bietlejuice.criteo_campaigns:load-clean-criteo-campaigns
 
 bietlejuice.dw_crm:
+  - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_contract:load-janus-dim-contract-into-redshift
   - bietlejuice.dw_offer:load-public-dim-offer-into-redshift
   - bietlejuice.dw_listing:load-janus-dim-house-listing-into-redshift
@@ -264,7 +265,7 @@ bietlejuice.dw_rent_flow:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
   - bietlejuice.enrich_kill_queue:load-enrich-reservation
-  - bietlejuice.dw_booking:load-dw-janus-dim-booking
+  - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_contract:load-dw-janus-dim-contract
   - bietlejuice.dw_listing:load-dw-janus-dim-house-listing
   - bietlejuice.dw_offer:load-dw-public-dim-offer
@@ -298,7 +299,7 @@ bietlejuice.dw_sale_flow:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
   - bietlejuice.enrich_kill_queue:load-enrich-reservation
-  - bietlejuice.dw_booking:load-dw-janus-dim-booking
+  - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_listing:load-dw-janus-dim-house-listing
 
 bietlejuice.dw_sale_flows:

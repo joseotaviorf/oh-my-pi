@@ -1,5 +1,5 @@
-drop table if exists janus.dim_booking;
-create table if not exists janus.dim_booking
+drop table if exists public.dim_booking;
+create table if not exists public.dim_booking
 ( 
   sk_booking integer not null encode az64,
   sk_rent_flow_taxonomy bigint encode az64,
@@ -74,4 +74,4 @@ diststyle key
 distkey (sk_booking)
 ;
 
-ALTER TABLE janus.dim_booking OWNER TO airflow;
+ALTER TABLE public.dim_booking OWNER TO databricks;
