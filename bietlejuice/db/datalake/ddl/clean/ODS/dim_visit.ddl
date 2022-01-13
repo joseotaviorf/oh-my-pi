@@ -7,14 +7,13 @@ create external table if not exists datalake_clean.ods_dim_visit (
   day_visit date,
   slot int,
   slot_count int,
-  type integer,
-  status int,
+  type int,
+  status varchar(50),
   booking_type varchar(255),
   dt_created timestamp,
   dt_updated timestamp,
   dt_timestamp timestamp
-);
-
+)
 ROW FORMAT SERDE
   'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
 STORED AS INPUTFORMAT
@@ -24,4 +23,4 @@ OUTPUTFORMAT
 LOCATION
   's3://dw.s3.data.quintoandar.com.br/public/dim_visit'
 TBLPROPERTIES (
-  'parquet.compress'='SNAPPY')
+  'parquet.compress'='SNAPPY');
