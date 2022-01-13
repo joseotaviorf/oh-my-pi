@@ -97,18 +97,18 @@ bookings_agent_tenant as(
         cast(id_visitor as integer) as tenant,
         cast(id_property as integer) as house,
         count(distinct db.sk_booking) as bookings_by_agent,
-        min(db.dt_created) as first_agent_booking_ts
+        min(CAST(db.dt_created AS varchar)) as first_agent_booking_ts
 
     from datalake_clean.ods_dim_booking db
     left join datalake_clean.ods_dim_user u
-        on id_agent=CAST(u.dados_agente_id AS VARCHAR)
+        on id_agent=CAST(u.dados_agente_id AS BIGINT)
 
-    where db.dt_created > '2020-03-01' --After feature has started
+    where db.dt_created > DATE('2020-03-01') --After feature has started
         and db.first_update_source='Corretores' --Bookings created by Agents
 
         and u.id IS NOT NULL
-        and id_visitor <> ''
-        and id_property <> ''
+        and id_visitor IS NOT NULL
+        and id_property IS NOT NULL
 
         --considering also "Agendamentos" when the Agent schedule a Visit
         --and date_trunc('day',cast(db.dt_created as timestamp))=date_trunc('day',cast(db.dt_scheduling as timestamp)) --Bookings registered by Agents = they have the same created and scheduling day

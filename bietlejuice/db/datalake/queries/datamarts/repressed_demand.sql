@@ -125,14 +125,14 @@ with house_available_hours as (
         id_property as house_id,
         cast(slot_dia as bigint) as slot_dia,
         dt_scheduling,
-        date(date_parse(dt_scheduling, '%Y-%m-%d %H:%i:%s')) as visit_date,
+        date(dt_scheduling) as visit_date,
         visit_intent,
         status
 	from datalake_clean.ods_dim_booking
 	where type = 'Visita'
 		and visit_intent = 'SALE'
 		and (status = 'Realizado' OR status = 'Marcado' OR            
-                    (status = 'Cancelado' and date(date_parse(dt_scheduling, '%Y-%m-%d %H:%i:%s')) = try_cast(try_cast(substring(dt_cancel,1,19) as timestamp) as date)))
+                    (status = 'Cancelado' and date(dt_scheduling) = DATE(dt_cancel)))
 )
 , encaixes_raw as (
     select
@@ -145,7 +145,7 @@ with house_available_hours as (
         case when etb.user_id is not null then 1 else 0 end as encaixe_realizado,
         rank() over (partition by trim(evt.id_user), trim(coalesce(evt.ep_house_id, '')) order by evt.ts_event desc) as rank_enc
         from datalake_amplitude_clean_prod."170698_visit_hoursalert_confirmed_events" as evt
-    left join encaixe_to_booking etb on etb.user_id = trim(evt.id_user) and etb.house_id = trim(coalesce(evt.ep_house_id, ''))
+    left join encaixe_to_booking etb on etb.user_id = CAST(trim(evt.id_user) AS bigint) and CAST(etb.house_id AS varchar) = trim(coalesce(evt.ep_house_id, ''))
     where cast(evt.year as varchar) || '-' || lpad(cast(evt.month as varchar), 2 , '0') >= '2019-01'
     	and cast(json_extract(event_properties, '$.business_context') as varchar) != 'sale'
 )
@@ -203,7 +203,7 @@ with house_available_hours as (
 		id_property as house_id,
 		cast(slot_dia as bigint) as slot_dia,
 		dt_scheduling,
-		date(date_parse(dt_scheduling, '%Y-%m-%d %H:%i:%s')) as visit_date,
+		date(dt_scheduling) as visit_date,
 		status
 	from datalake_clean.ods_dim_booking
 		where type = 'Visita'
@@ -298,7 +298,7 @@ with house_available_hours as (
 	select
 		bk.id_visitor as user_id,
        	bk.id_property as house_id,
-       	date(date_parse(bk.dt_scheduling, '%Y-%m-%d %H:%i:%s')) as visit_date,
+       	date(bk.dt_scheduling) as visit_date,
        	cast(bk.slot_dia as integer) as slot,
        	i.regiao_id as region_id,
        	rank() over (partition by bk.id_visitor, bk.id_property order by bk.dt_created desc) as rank_bkg
@@ -313,10 +313,10 @@ with house_available_hours as (
     	region_id,
         visit_date,
         slot,
-        count(distinct user_id || house_id) as unique_bookings
+        count(distinct CAST(user_id AS varchar) || CAST(house_id AS varchar)) as unique_bookings
     from bookings_raw
     where rank_bkg = 1
-    	and user_id != ''
+    	and user_id IS NOT NULL
         and region_id is not null
 	group by 1, 2, 3
 )
