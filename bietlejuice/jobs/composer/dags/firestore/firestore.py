@@ -31,7 +31,6 @@ artifacts_bucket = config_service.get_config("artifacts_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
-spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 clean_partition_cols = config_service.get_config("clean_partition_cols")
@@ -45,8 +44,7 @@ RAW_SPARK_JOB_FILE = (
 )
 
 # cluster setup
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = f"{spark_jobs_logs_path}{DAG_ID}"
+CLUSTER_DESCRIPTION = Variable.get("databricks_9_1_med_general_cluster", deserialize_json=True)
 
 dag = DAG(
     dag_id=DAG_ID,
