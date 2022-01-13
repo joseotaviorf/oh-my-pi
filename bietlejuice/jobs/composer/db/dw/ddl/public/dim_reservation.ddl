@@ -1,5 +1,5 @@
-drop table if exists janus.dim_reservation;
-create table janus.dim_reservation (
+drop table if exists public.dim_reservation;
+create table public.dim_reservation (
   sk_reservation bigint primary key,
   id_reservation bigint,
   version int4,
@@ -13,4 +13,4 @@ create table janus.dim_reservation (
   ts_updated timestamp
 );
 
-ALTER TABLE janus.dim_reservation OWNER TO airflow;
+ALTER TABLE public.dim_reservation OWNER TO databricks;

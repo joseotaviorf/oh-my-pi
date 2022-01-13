@@ -53,22 +53,10 @@ class ReservationSubDag(BaseSubDag):
         #     dag=reservation_dag,
         # )
 
-        dim_reservation_task = BaseDAG.build_python_operator(
-            task_id='dw-dim-reservation',
-            dag=reservation_dag,
-            python_callable=utils.load_dim_from_staging_to_dw,
-            op_kwargs={
-                'dim_name': 'reservation',
-                'bucket': self.bucket
-            }
-        )
-
         reservation_to_ods_task.set_upstream(
             [house_to_datalake_task, rent_flow_to_datalake_task, reservation_to_datalake_task, reservation_aud_to_datalake_task])
         reservation_to_ods_task.set_downstream(staging_dim_reservation_task)
-        staging_dim_reservation_task >> dim_reservation_task
         # staging_dim_reservation_task.set_downstream(tests_tasks)
-        # dim_reservation_task.set_upstream(tests_tasks)
 
         return reservation_dag
 

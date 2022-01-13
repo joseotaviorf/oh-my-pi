@@ -1,20 +1,24 @@
 drop table if exists datalake_clean.ods_dim_reservation;
 create external table if not exists datalake_clean.ods_dim_reservation(
-  sk_reservation string,
-  id_reservation string,
-  ts_created     string,
-  ts_updated     string,
-  version        string,
-  attempt        string,
-  status         string,
-  cancellation_reason         string,
-  value          string,
-  is_ongoing     string,
-  installments   string
+  sk_reservation bigint,
+  id_reservation bigint,
+  ts_created timestamp,
+  ts_updated timestamp,
+  version int,
+  attempt int,
+  status varchar(255),
+  cancellation_reason varchar(255),
+  value decimal(19, 2),
+  is_ongoing int,
+  installments int
 )
-row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde' with serdeproperties (
-'separatorChar' = ',',
-'quoteChar' = '\"'
-) location 's3://5a-datalake/clean/ods/reservation' tblproperties (
-'skip.header.line.count' = '1'
-);
+ROW FORMAT SERDE
+  'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
+STORED AS INPUTFORMAT
+  'org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat'
+OUTPUTFORMAT
+  'org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat'
+LOCATION
+  's3://dw.s3.data.quintoandar.com.br/public/dim_reservation'
+TBLPROPERTIES (
+  'parquet.compress'='SNAPPY')
