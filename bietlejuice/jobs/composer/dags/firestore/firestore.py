@@ -44,7 +44,7 @@ RAW_SPARK_JOB_FILE = (
 )
 
 # cluster setup
-CLUSTER_DESCRIPTION = Variable.get("databricks_9_1_med_general_cluster", deserialize_json=True)
+CLUSTER_DESCRIPTION = Variable.get("databricks_firestore_cluster", deserialize_json=True)
 
 dag = DAG(
     dag_id=DAG_ID,
