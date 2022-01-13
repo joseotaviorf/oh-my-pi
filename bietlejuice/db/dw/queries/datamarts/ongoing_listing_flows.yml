@@ -1,5 +1,0 @@
-# Config for ongoing_listing_flows
----
-streams:
-  - direction: 'upstream'
-    task_ids: ['dw_quintoandar_consultant_listings']
