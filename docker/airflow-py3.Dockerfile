@@ -1,4 +1,4 @@
-FROM python:3.6.6-slim
+FROM python:3.6.10-slim
 
 LABEL maintainer='Data Engineer Team'
 

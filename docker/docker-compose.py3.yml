@@ -5,6 +5,11 @@ services:
     image: redis:5.0.5-alpine
     ports:
       - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - airflow_postgres_py3
 
@@ -15,7 +20,12 @@ services:
     environment:
       POSTGRES_PASSWORD: postgres
     volumes:
-      - /home/PostgreSQL/airflow_py3:/var/lib/postgresql/data
+      - /tmp/PostgreSQL/airflow_py3:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - airflow_postgres_py3
 
@@ -25,16 +35,16 @@ services:
       context: ..
       dockerfile: docker/airflow-py3.Dockerfile
       args:
-         GITHUB_TOKEN: ${GITHUB_TOKEN}
+        GITHUB_TOKEN: ${GITHUB_TOKEN}
     environment:
       - ENVIRONMENT=forno
     ports:
       - "8080:8080"
     volumes:
-      - /home/${USERNAME}/.aws:/root/.aws
       - ${PROJECT_PATH}/bietlejuice:/bi-etl-ejuice/bietlejuice
     depends_on:
-      - postgres_airflow_py3
+      postgres_airflow_py3:
+        condition: service_healthy
     networks:
       - airflow_postgres_py3
 
@@ -50,7 +60,11 @@ services:
       - ${PROJECT_PATH}/bietlejuice/jobs/composer/dags:/bi-etl-ejuice/bietlejuice/jobs/composer/dags
     entrypoint: airflow worker -cn worker_1
     healthcheck:
-      test: ["CMD-SHELL", "[ -f /bi-etl-ejuice/airflow_python3/airflow-worker.pid ]"]
+      test:
+        [
+          "CMD-SHELL",
+          "[ -f /bi-etl-ejuice/airflow_python3/airflow-worker.pid ]"
+        ]
       interval: 30s
       timeout: 30s
       retries: 3
@@ -69,7 +83,11 @@ services:
       - ${PROJECT_PATH}/bietlejuice/jobs/composer/dags:/bi-etl-ejuice/bietlejuice/jobs/composer/dags
     entrypoint: airflow worker -cn worker_2
     healthcheck:
-      test: ["CMD-SHELL", "[ -f /bi-etl-ejuice/airflow_python3/airflow-worker.pid ]"]
+      test:
+        [
+          "CMD-SHELL",
+          "[ -f /bi-etl-ejuice/airflow_python3/airflow-worker.pid ]"
+        ]
       interval: 30s
       timeout: 30s
       retries: 3
