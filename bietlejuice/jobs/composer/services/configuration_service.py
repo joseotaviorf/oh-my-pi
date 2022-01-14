@@ -111,7 +111,7 @@ class ConfigurationService:
         :param config_file_path: DAG's or Spark Job's configuration file path
         """
         if not os.path.isfile(config_file_path):
-            logger.warning(
+            logger.debug(
                 f"dag_name={self._dag_name}, "
                 f"ENV={self._env}, "
                 f"expected_file={config_file_path}, "

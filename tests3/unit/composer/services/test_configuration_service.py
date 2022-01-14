@@ -209,9 +209,7 @@ class TestConfigurationService:
         # assert
         assert returned_files == expected_files
 
-    @mock.patch(
-        "bietlejuice.jobs.composer.services.configuration_service.logger.warning"
-    )
+    @mock.patch("bietlejuice.jobs.composer.services.configuration_service.logger.debug")
     @mock.patch(
         "bietlejuice.jobs.composer.services.configuration_service.os.path.isfile"
     )

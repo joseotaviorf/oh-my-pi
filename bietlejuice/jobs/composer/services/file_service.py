@@ -18,7 +18,6 @@ logger = QuintoAndarLogger("FileService")
 
 class FileService:
     @staticmethod
-    @logger
     def get_query_from_file_name(file_name):
         try:
             with open(file_name) as f:
@@ -121,7 +120,6 @@ class FileService:
         return files
 
     @staticmethod
-    @logger
     def layer_table_sql_file_exists(source, layer, file_name, schema=None):
         """
         Checks for existence of enrichment query file for given source and schema
@@ -135,7 +133,6 @@ class FileService:
         return isfile(f"{layer_queries_path}/{file_name}.sql")
 
     @staticmethod
-    @logger
     def table_dim_query_exists(source, schema, table_name):
         """
         Checks for existence of query file for given source and schema
@@ -154,7 +151,6 @@ class FileService:
         return file_name[:ext_pos]
 
     @staticmethod
-    @logger
     def metadata_file_exists(
         relative_file_path: str, layer: str, table_name, check_all_tables=False
     ) -> bool:
@@ -186,7 +182,6 @@ class FileService:
             return False
 
     @staticmethod
-    @logger
     def data_quality_tests_file_exists(
         relative_file_path: str, layer: str, table_name
     ) -> bool:
@@ -211,7 +206,6 @@ class FileService:
         return False
 
     @staticmethod
-    @logger
     def list_data_quality_tests_files(relative_file_path: str, layer: str) -> list:
         """
         Lists all data quality tests files for a given relative file path.
@@ -235,7 +229,6 @@ class FileService:
         return table_names
 
     @staticmethod
-    @logger
     def list_metadata_files() -> Generator[str, None, None]:
         """
         Yields all metadata YAML file paths.

@@ -141,7 +141,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             config_service = ConfigurationService(source)
             product_db_name = config_service.get_config("lineage_product_database_name")
         except IndexError:
-            logger.warning(
+            logger.debug(
                 f"m=_build_raw_task_group, msg=could not find lineage_product_database_name in configs"
             )
             product_db_name = ""
@@ -177,7 +177,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             sync_metastore_tables_task.set_downstream([propagate_table_lineage_task])
             final_tasks = [propagate_table_lineage_task]
         else:
-            logger.warning(
+            logger.debug(
                 f"m=_build_raw_task_group, target_database_base_name={target_database_base_name}, "
                 f"msg=Could not infer metadata type, skipping propagate metadata task"
             )
