@@ -8,10 +8,10 @@ SELECT
     utm_campaign,
     utm_term,
     utm_content,
-    CAST(desktop_cost AS FLOAT8) AS desktop_cost,
-    CAST(mobile_cost AS FLOAT8) AS mobile_cost,
-    CAST(other_cost AS FLOAT8) AS other_cost,
-    CAST(total_cost AS FLOAT8) AS total_cost,
+    CAST(desktop_cost AS REAL) AS desktop_cost,
+    CAST(mobile_cost AS REAL) AS mobile_cost,
+    CAST(other_cost AS REAL) AS other_cost,
+    CAST(total_cost AS REAL) AS total_cost,
     CAST(impressions AS INT) AS impressions,
     CAST(clicks AS INT) AS clicks
 FROM 
