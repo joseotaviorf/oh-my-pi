@@ -50,7 +50,7 @@ dag = DAG(
         'retry_delay': timedelta(minutes=30),
     },
     start_date=datetime(2018, 7, 10, 0, 0, 0),
-    schedule_interval='0 9 * * *',
+    schedule_interval='0 10 * * *',
     max_active_runs=1
 )
 
@@ -60,7 +60,7 @@ bdg_listing_rent_flows_agent_xcom_dependencies = BaseDAG.build_python_operator(
     task_id='bdg_demand_agent_xcom_dependencies',
     provide_context=True,
     python_callable=xcom_dependencies,
-    op_kwargs={'task_id': ['XCom_fact_agent_daily_allocations', 'XCom_fact_listing_rent_flows'],
+    op_kwargs={'task_id': ['XCom_fact_agent_daily_allocations'],
                'dag_id': ['bi-load-agent_model', 'bi-supply-demand-etl']}
 )
 
