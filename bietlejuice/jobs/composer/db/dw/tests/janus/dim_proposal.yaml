@@ -1,4 +1,0 @@
-# Migration file for dim_proposal
-dw_schema: public
-base_date_column: dt_created
-sample_size_months: 6

@@ -160,7 +160,7 @@ WITH listing_rent_flows AS (
         LEFT JOIN dw_public.dim_offer
             ON dim_offer.sk_offer = COALESCE(rent_flow.id_offer_context, -1)
             AND dim_offer.sk_offer != -1
-        LEFT JOIN dw_janus.dim_proposal
+        LEFT JOIN dw_public.dim_proposal
             ON rent_flow.id_proposal = dim_proposal.id_proposal
         LEFT JOIN dw_janus.dim_contract
             ON rent_flow.id_contract = dim_contract.id_contract
