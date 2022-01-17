@@ -34,6 +34,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         relative_query_path,
         spark_jobs_path,
         athena_query_result_location,
+        tree_path = "",
         execution_timeout_hours=BaseTaskGroup.DEFAULT_EXECUTION_TIMEOUT_HOURS,
     ):
         """
@@ -50,6 +51,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type spark_jobs_path: str
         :param athena_query_result_location: athena query results location
         :type athena_query_result_location: str
+        :param tree_path: The rest of the path, used for full or incremental ingestions or specific contextual ingestions e:g crawlers listings
+        :type schema: str
         :param execution_timeout_hours: timeout in hours to be set to the tasks
         :type execution_timeout_hours: int
         """
@@ -304,6 +307,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         # 'schema' parameter could be replaced by source or target database_base_name.
         # However, since we have out of pattern paths in our project directory we
         # cannot chose only one now, we would need a refactoring first.
+        tree_path="",
     ):
         """
         Create a task group containing 4 tasks:
@@ -361,6 +365,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                         json.dumps(cluster_config_params),
                         str(extra_query_template_params),
                         schema,
+                        tree_path
                     ],
                 }
             },
@@ -468,6 +473,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         cluster_config_params={},
         extra_query_template_params=None,
         schema="",
+        tree_path= "",
     ):
         """
         Build a task group for clean layer
@@ -493,6 +499,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type schema: str
         :rtype: list[BaseOperator]
         """
+        
         return self._build_task_group(
             LayerEnum.CLEAN,
             source_database_base_name,
@@ -503,6 +510,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             cluster_config_params,
             extra_query_template_params,
             schema,
+            tree_path,
         )
 
     def build_enrich_task_group(

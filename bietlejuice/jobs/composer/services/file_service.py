@@ -72,19 +72,19 @@ class FileService:
         return listdir(path)
 
     @staticmethod
-    def list_layer_sql_files(source, layer, schema=None):
+    def list_layer_sql_files(source, layer, tree_path=None):
         """
-        Return the SQL files for a given layer and schema (if specified)
+        Return the SQL files for a given layer and tree_path (if specified)
 
         :param source: the source's directory name on db directory. E.g:
          autodialer, godfather, oscar.
         :param layer: the data lake layer
-        :param schema: Source schema name
+        :param tree_path: The rest of the path, used for full or incremental ingestions or specific contextual ingestions e:g crawlers listings
         :return: Tables SQL files list
         """
         raw_to_clean_path = f"{QUERIES_DATALAKE_PATH}{source}/{layer}"
-        if schema:
-            raw_to_clean_path = f"{raw_to_clean_path}/{schema}"
+        if tree_path:
+            raw_to_clean_path = f"{raw_to_clean_path}/{tree_path}"
 
         return FileService.list_files(raw_to_clean_path)
 
@@ -105,30 +105,30 @@ class FileService:
         return files
 
     @staticmethod
-    def list_sql_files_without_extension_from_layer(source, layer, schema=None):
+    def list_sql_files_without_extension_from_layer(source, layer, tree_path=None):
         """
-        Return the SQL files without extension for a given layer and schema (if specified)
+        Return the SQL files without extension for a given layer and tree_path (if specified)
 
         :param source: the database base name for the table
         :param layer: the data lake layer
-        :param schema: Source schema name
+        :param tree_path: The rest of the path, used for full or incremental ingestions or specific contextual ingestions e:g crawlers listings
         :return: Tables SQL files list without extension
         """
         files = []
-        for file in FileService.list_layer_sql_files(source, layer, schema):
+        for file in FileService.list_layer_sql_files(source, layer, tree_path):
             files.append(FileService.remove_file_extension(file))
         return files
 
     @staticmethod
-    def layer_table_sql_file_exists(source, layer, file_name, schema=None):
+    def layer_table_sql_file_exists(source, layer, file_name, tree_path=None):
         """
-        Checks for existence of enrichment query file for given source and schema
+        Checks for existence of enrichment query file for given source and tree_path
 
         :return: boolean
         """
         layer_queries_path = f"{QUERIES_DATALAKE_PATH}{source}/{layer}"
-        if schema:
-            layer_queries_path = f"{layer_queries_path}/{schema}"
+        if tree_path:
+            layer_queries_path = f"{layer_queries_path}/{tree_path}"
 
         return isfile(f"{layer_queries_path}/{file_name}.sql")
 

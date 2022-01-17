@@ -56,6 +56,12 @@ if __name__ == "__main__":
         help="table schema used in the query path",
     )
 
+    parser.add_argument(
+        "tree_path",
+        type=lambda arg: None if not arg else arg,
+        help="path to reach the query place",
+    )
+
     args = parser.parse_args()
 
     env = args.env
@@ -64,6 +70,7 @@ if __name__ == "__main__":
     database_base_name = args.database_base_name
     relative_query_path = args.relative_query_path
     schema = args.schema
+    tree_path = args.tree_path
     table_name = args.table_name
     execution_date = args.execution_date
     target_database_base_name = args.target_database_base_name
@@ -76,7 +83,7 @@ if __name__ == "__main__":
     logger.info(
         f"m={JOB_NAME}, env={env}, datalake_bucket={datalake_bucket}, layer={layer}, "
         + f"database_base_name={database_base_name}, relative_query_path={relative_query_path}, "
-        + f"table_name={table_name}, schema={schema}, msg=Job execution started"
+        + f"table_name={table_name}, schema={schema}, tree_path={tree_path}, msg=Job execution started"
     )
 
     dt_datetime = datetime.strptime(execution_date, "%Y-%m-%d")
@@ -105,10 +112,11 @@ if __name__ == "__main__":
         env, target_database_base_name, datalake_bucket, layer
     )
 
+    intermediate_path = schema if schema else tree_path
     query_path = (
         # TODO: maybe we can remove the line below since we do not have schemas on the queries folder anymore
-        f"{QUERIES_DATALAKE_PATH}{relative_query_path}/{layer}/{schema}/{table_name}.sql"
-        if schema
+        f"{QUERIES_DATALAKE_PATH}{relative_query_path}/{layer}/{intermediate_path}/{table_name}.sql".replace('//','/')
+        if intermediate_path
         else f"{QUERIES_DATALAKE_PATH}{relative_query_path}/{layer}/{table_name}.sql"
     )
 

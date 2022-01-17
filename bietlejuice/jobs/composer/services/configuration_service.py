@@ -21,7 +21,7 @@ class ConfigurationService:
     VALID_ENVIRONMENTS = ["forno", "prod"]
 
     def __init__(
-        self, dag_name: str = None, inverse_file_config_order: bool = False
+        self, dag_name: str = None, inverse_file_config_order: bool = False, intermediate_path: str = None
     ) -> None:
         """
         Constructor.
@@ -34,17 +34,25 @@ class ConfigurationService:
           can switch where to look for the configs first. Global configs are
           always the last to be read.
           The first to be read has the priority when getting a config by key.
+        :param intermediate_path: If there is a nested folder in your dag, add this path here
         """
         self._dag_name = dag_name
         self._env = self._get_environment()
         self._config_file_name = f"{self._env}_conf.yml"
 
         self._general_configuration_file = f"{os.path.dirname(os.path.realpath(__file__))}/../configurations/{self._config_file_name}"
-        self._dag_configuration_file = (
-            f"{COMPOSER_DAGS_PATH}/{dag_name}/{dag_name}_{self._config_file_name}"
-        )
-        self._spark_job_configuration_file = f"{COMPOSER_DAGS_PATH}/{dag_name}/spark_jobs/{dag_name}_{self._config_file_name}"
-
+    
+        if intermediate_path:
+            self._dag_configuration_file = (
+                f"{COMPOSER_DAGS_PATH}/{intermediate_path}/{dag_name}_{self._config_file_name}"
+            )    
+            self._spark_job_configuration_file = f"{COMPOSER_DAGS_PATH}/{intermediate_path}/spark_jobs/{dag_name}_{self._config_file_name}"
+        else:
+            self._dag_configuration_file = (
+                f"{COMPOSER_DAGS_PATH}/{dag_name}/{dag_name}_{self._config_file_name}"
+            )    
+            self._spark_job_configuration_file = f"{COMPOSER_DAGS_PATH}/{dag_name}/spark_jobs/{dag_name}_{self._config_file_name}"
+    
         self._configuration_files = self._get_configuration_files(
             inverse_file_config_order
         )
