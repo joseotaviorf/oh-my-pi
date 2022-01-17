@@ -1,0 +1,21 @@
+database_name: datalake_gsheets_clean
+table_name: target_service_kpis
+columns:
+  metric_name:
+    lineage:
+      - datalake_gsheets_raw.target_service_kpis.metrica
+  team:
+    lineage:
+      - datalake_gsheets_raw.target_service_kpis.time
+  granularity:
+    lineage:
+      - datalake_gsheets_raw.target_service_kpis.granularidade
+  target:
+    lineage:
+      - datalake_gsheets_raw.target_service_kpis.target
+  dt_start:
+    lineage:
+      - datalake_gsheets_raw.target_service_kpis.inicio_vigencia
+  dt_end:
+    lineage:
+      - datalake_gsheets_raw.target_service_kpis.fim_vigencia

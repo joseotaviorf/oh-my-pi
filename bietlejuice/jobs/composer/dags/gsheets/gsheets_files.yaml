@@ -755,6 +755,16 @@ targets_portal_casa_mineira:
     sheet_name: targets
     clean_table_name: targets_portal_casa_mineira_cost_cf
 
+target_service_kpis:
+    sheet_id: 1G6O5w3Ue5K2cyutyOUZM3_ToqU1xnFCz2ORwCvuYPaY
+    sheet_name: Export
+    clean_table_name: target_service_kpis
+
+target_support_kpis:
+    sheet_id: 1ru-UFI4ji3fR-EV7rvpb1NFxz2IOWoWB-L1pUwZvekM
+    sheet_name: TARGET
+    clean_table_name: target_support_kpis
+
 taxonomy_affiliates:
     sheet_id: 1e3806Tog1avS6uVO6ACUqqcqRpwcJffDZhRvgE8A3V4
     sheet_name: taxonomy_affiliates
