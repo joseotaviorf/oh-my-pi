@@ -1,6 +1,6 @@
-DROP TABLE IF EXISTS janus.dim_rent_flow_taxonomy;
+DROP TABLE IF EXISTS public.dim_rent_flow_taxonomy;
 
-CREATE TABLE IF NOT EXISTS janus.dim_rent_flow_taxonomy
+CREATE TABLE IF NOT EXISTS public.dim_rent_flow_taxonomy
 ( 
     sk_rent_flow_taxonomy BIGINT PRIMARY KEY,
     id_rent_flow_taxonomy BIGINT,
@@ -15,4 +15,4 @@ CREATE TABLE IF NOT EXISTS janus.dim_rent_flow_taxonomy
     ts_load TIMESTAMP
 )
 
-ALTER TABLE janus.dim_rent_flow_taxonomy OWNER TO databricks;
+ALTER TABLE public.dim_rent_flow_taxonomy OWNER TO databricks;

@@ -1,6 +1,6 @@
-DROP TABLE IF EXISTS janus.fact_listing_rent_flows;
+DROP TABLE IF EXISTS public.fact_listing_rent_flows;
 
-CREATE TABLE IF NOT EXISTS janus.fact_listing_rent_flows
+CREATE TABLE IF NOT EXISTS public.fact_listing_rent_flows
 (
     ods_id BIGINT ENCODE AZ64,
     sk_house_listing BIGINT ENCODE AZ64,
@@ -107,4 +107,4 @@ DISTSTYLE key
 DISTKEY (sk_booking)
 ;
 
-ALTER TABLE janus.fact_listing_rent_flows OWNER TO databricks;
+ALTER TABLE public.fact_listing_rent_flows OWNER TO databricks;

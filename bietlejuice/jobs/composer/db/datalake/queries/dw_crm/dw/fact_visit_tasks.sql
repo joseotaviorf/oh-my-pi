@@ -33,7 +33,7 @@ listing_rent_flows AS (
         CAST(sk_owner AS BIGINT) AS sk_house_owner,
         CAST(sk_client AS BIGINT) AS sk_visitor
     FROM 
-        testing_map_ods_from_s3.ods_fact_listing_rent_flows
+        dw_public.fact_listing_rent_flows
     GROUP BY 1, 2, 3, 4
 )
 SELECT DISTINCT

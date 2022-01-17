@@ -36,7 +36,7 @@ from bietlejuice.jobs.dags.supply_demand_funnel import (
     LeadConversionSubDag,
     SpecialConditionSubDag,
     ListingFlowsSubDag,
-    SalesListingFlowsSubDag
+    SalesListingFlowsSubDag,
 )
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
@@ -45,8 +45,14 @@ from qa_python_utils.aws.athena import AthenaClient
 
 logger = QuintoAndarLogger("bi-supply-demand-etl")
 
-env.set_airflow_var_to_local_env("BI_DW", "BI_ODS", "EBDB", "GODFATHER", "DATA_ACC_AWS_ACCESS_KEY_ID",
-                                 "DATA_ACC_AWS_SECRET_ACCESS_KEY")
+env.set_airflow_var_to_local_env(
+    "BI_DW",
+    "BI_ODS",
+    "EBDB",
+    "GODFATHER",
+    "DATA_ACC_AWS_ACCESS_KEY_ID",
+    "DATA_ACC_AWS_SECRET_ACCESS_KEY",
+)
 bucket = env.get_airflow_env_var("bi-datalake-s3-bucket")
 
 MAIN_DAG_NAME = "bi-supply-demand-etl"
@@ -129,9 +135,11 @@ def create_table_in_db_from_datalake(table_name, query_params, **kwargs):
     file_path = "{}/{}{}.sql".format(
         DATALAKE_QUERIES_DIR, kwargs.get("file_path", ""), table_name
     )
-    data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
-    data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
-    athena_client = AthenaClient(bucket, data_acc_aws_access_key_id, data_acc_aws_secret_access_key)
+    data_acc_aws_access_key_id = os.environ.get("DATA_ACC_AWS_ACCESS_KEY_ID")
+    data_acc_aws_secret_access_key = os.environ.get("DATA_ACC_AWS_SECRET_ACCESS_KEY")
+    athena_client = AthenaClient(
+        bucket, data_acc_aws_access_key_id, data_acc_aws_secret_access_key
+    )
 
     # executing methods
     df = athena_client.execute_file_query_and_return_dataframe(
@@ -240,7 +248,7 @@ def reservation_sub_dag(sub_dag_name):
         sub_dag_name=sub_dag_name,
         dag_name=MAIN_DAG_NAME,
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
-        start_date=MAIN_START_DATE
+        start_date=MAIN_START_DATE,
     )
     return sub_dag.build_tasks_with_tests()
 
@@ -341,11 +349,6 @@ def condo_sub_dag(sub_dag_name):
     return sub_dag.build_condo_with_tests()
 
 
-def xcom_fact_listing_rent_flows_task(**kwargs):
-    exec_date = str(datetime.date(kwargs["execution_date"]))
-    xcom.xcom_push(kwargs["ti"], exec_date)
-
-
 def bank_sub_dag(sub_dag_name):
     sub_dag = BankSubDag(
         bucket=bucket,
@@ -441,13 +444,13 @@ def sales_listing_flows_sub_dag(sub_dag_name):
 
 amplitude_partner_taxonomy = BaseDAG.build_python_operator(
     dag=main_dag,
-    task_id='ODS_amplitude_partner_taxonomy',
+    task_id="ODS_amplitude_partner_taxonomy",
     python_callable=utils.load_athena_file_query_to_ods,
     op_kwargs={
         "table_name": "amplitude_partner_taxonomy",
         "file_name": "amplitude_partner_taxonomy.sql",
         "bucket": bucket,
-    }
+    },
 )
 
 
@@ -480,13 +483,6 @@ fact_photo_job = BaseDAG.build_python_operator(
         "bucket": bucket,
         "insert_dummy": False,
     },
-)
-
-fact_listing_rent_flows = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id="DW_fact_listing_rent_flows",
-    python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={"dim_name": "listing_rent_flows", "is_fact": True, "bucket": bucket},
 )
 
 ods_fact_house_listing_status_task = BaseDAG.build_python_operator(
@@ -523,18 +519,6 @@ ods_house_listing_flows = BaseDAG.build_python_operator(
     python_callable=extract_query_dim_from_ebdb_to_ods,
     execution_timeout=timedelta(hours=7),
     op_kwargs={"table_name": "fact_house_listing_flows"},
-)
-
-dw_rent_flow_taxonomy_task = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id="DW_Rent_Flow_Taxonomy",
-    python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={
-        "dim_name": "rent_flow_taxonomy",
-        "bucket": bucket,
-        "insert_dummy": True,
-        "post_command_file": True,
-    },
 )
 
 fact_lead_task_contact_flows_task = BaseDAG.build_python_operator(
@@ -655,14 +639,9 @@ listing_flows_dag = BaseSubDag.get_sub_dag_operator(
 )
 
 dw_sale_fact_listing_flows_dag = BaseSubDag.get_sub_dag_operator(
-    dag=main_dag, sub_dag_func=sales_listing_flows_sub_dag, sub_dag_name="SalesListingFlows"
-)
-
-xcom_fact_listing_rent_flows = BaseDAG.build_python_operator(
     dag=main_dag,
-    task_id="XCom_fact_listing_rent_flows",
-    python_callable=xcom_fact_listing_rent_flows_task,
-    provide_context=True,
+    sub_dag_func=sales_listing_flows_sub_dag,
+    sub_dag_name="SalesListingFlows",
 )
 
 # TODO Recreate amplitude xcom after the data flow is fully fixed
@@ -691,26 +670,6 @@ trigger_bi_growth_dag_task = TriggerDagRunOperator(
 # xcom_amplitude_task.set_downstream([booking_dag, affiliate_dag])
 affiliate_dag.set_upstream([region_dag, user_dag])
 [lead_conversion_dag, special_condition_dag] >> house_dag
-
-fact_listing_rent_flows.set_upstream(
-    [
-        reservation_dag,
-        booking_dag,
-        visit_dag,
-        offer_dag,
-        proposal_dag,
-        contract_dag,
-        user_dag,
-        house_dag,
-        ods_house_rent_flow,
-        condo_dag,
-        affiliate_dag,
-        doorman_dag,
-        dw_rent_flow_taxonomy_task,
-    ]
-)
-
-fact_listing_rent_flows >> xcom_fact_listing_rent_flows
 
 house_dag >> fact_photo_job
 ods_fact_house_listing_status_task >> dw_fact_house_listing_status_task
@@ -757,10 +716,6 @@ inspection_dag >> fact_inspection_bookings_task
 ods_credit_evaluation_task >> proposal_dag
 
 trigger_bi_growth_dag_task.set_upstream(
-    [
-        listing_flows_dag,
-        fact_house_listings,
-        fact_listing_rent_flows,
-        dw_fact_house_listing_status_task,
-    ]
+    [listing_flows_dag, fact_house_listings, dw_fact_house_listing_status_task]
 )
+

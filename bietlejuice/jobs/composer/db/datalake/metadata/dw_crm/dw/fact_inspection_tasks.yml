@@ -23,15 +23,15 @@ columns:
     lineage:
       - datalake_ebdb_clean.contract.id
       - datalake_ebdb_clean.inspection.id_contract
-#  sk_house_listing:
-#    lineage:
-#      - testing_map_ods_from_s3.ods_fact_listing_rent_flows.sk_house_listing
-#  sk_house_owner:
-#    lineage:
-#      - testing_map_ods_from_s3.ods_fact_listing_rent_flows.sk_owner
-#  sk_tenant:
-#    lineage:
-#      - testing_map_ods_from_s3.ods_fact_listing_rent_flows.sk_client
+  sk_house_listing:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_house_listing
+  sk_house_owner:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_owner
+  sk_tenant:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_client
   sk_start_date:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_start_date

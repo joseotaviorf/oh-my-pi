@@ -46,7 +46,7 @@ proposal_house_listing AS (
         CAST(sk_proposal AS BIGINT) AS sk_proposal,
         CAST(sk_client AS BIGINT) AS sk_proponent
     FROM
-        testing_map_ods_from_s3.ods_fact_listing_rent_flows
+        dw_public.fact_listing_rent_flows
     WHERE
         sk_proposal != '-1'
     GROUP BY 1, 2, 3

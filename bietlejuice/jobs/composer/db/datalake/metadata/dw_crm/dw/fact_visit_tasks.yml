@@ -17,10 +17,10 @@ columns:
   sk_house_listing:
     lineage:
       - dw_janus.dim_house_listing.sk_house_listing
-#      - dw_janus.fact_listing_rent_flows.sk_house_listing
-#  sk_house_owner:
-#    lineage:
-#      - dw_janus.fact_listing_rent_flows.sk_owner
+      - dw_public.fact_listing_rent_flows.sk_house_listing
+  sk_house_owner:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_owner
   sk_origin:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_origin
@@ -42,9 +42,9 @@ columns:
   sk_user_action:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_user_action
-  # sk_visitor:
-  #   lineage:
-  #     - dw_janus.fact_listing_rent_flows.sk_house_listing,sk_visitor
+  sk_visitor:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_client
   action_type:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.action_type

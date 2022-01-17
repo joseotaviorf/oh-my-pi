@@ -69,7 +69,7 @@ contract_proposal_house_listing AS (
     CAST(COALESCE(if(sk_proposal != '-1',sk_client, NULL),'-1') AS BIGINT) AS sk_proponent,
     MAX(CAST(sk_contract AS BIGINT)) AS sk_contract
   FROM 
-    testing_map_ods_from_s3.ods_fact_listing_rent_flows
+    dw_public.fact_listing_rent_flows
   WHERE 
     sk_contract != '-1'
     OR sk_proposal != '-1'

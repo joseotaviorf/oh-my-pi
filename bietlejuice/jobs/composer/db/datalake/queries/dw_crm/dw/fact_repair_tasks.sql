@@ -44,7 +44,7 @@ contract_house_listing AS (
         CAST(sk_owner AS BIGINT) AS sk_house_owner,
         CAST(sk_client AS BIGINT) AS sk_tenant
     FROM 
-        testing_map_ods_from_s3.ods_fact_listing_rent_flows
+        dw_public.fact_listing_rent_flows
     WHERE 
         sk_contract != '-1'
     GROUP BY 1, 2, 3, 4

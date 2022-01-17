@@ -31,15 +31,15 @@ columns:
       - datalake_ebdb_clean.onboarding.id_contrato
       - datalake_ebdb_clean.inspection.id_contract
       - datalake_ebdb_clean.contract.id
-  # sk_house_listing:
-  #   lineage:
-  #     - dw_janus.fact_listing_rent_flows.sk_house_listing
-  # sk_house_owner:
-  #   lineage:
-  #     - dw_janus.fact_listing_rent_flows.sk_house_owner
-  # sk_tenant:
-  #   lineage:
-  #     - dw_janus.fact_listing_rent_flows.sk_tenant
+  sk_house_listing:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_house_listing
+  sk_house_owner:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_owner
+  sk_tenant:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_client
   sk_task_action_start_date:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task_user_start_date

@@ -34,31 +34,31 @@ columns:
   sk_offer:
     lineage:
       - dw_public.dim_offer.sk_offer
-      # - dw_janus.fact_listing_rent_flows.sk_offer
+      - dw_public.fact_listing_rent_flows.sk_offer
   sk_proposal:
     lineage:
       - datalake_ebdb_clean.proposal.id
       - datalake_ebdb_clean.contract.id_proposal
-      # - dw_janus.fact_listing_rent_flows.sk_proposal
+      - dw_public.fact_listing_rent_flows.sk_proposal
   sk_contract:
     lineage:
       - datalake_ebdb_clean.contract.id
-      # - dw_janus.fact_listing_rent_flows.sk_contract
-  # id_house_listing:
-  #   lineage:
-  #     - dw_janus.fact_listing_rent_flows.sk_house_listing
+      - dw_public.fact_listing_rent_flows.sk_contract
+  id_house_listing:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_house_listing
   sk_house_owner:
     lineage:
       - datalake_ebdb_clean.house.id_user
-      # - dw_janus.fact_listing_rent_flows.sk_owner
+      - dw_public.fact_listing_rent_flows.sk_owner
   sk_tenant:
     lineage:
       - datalake_ebdb_clean.proposal.id_proponent
       - datalake_ebdb_clean.contract.id_user
-      # - dw_janus.fact_listing_rent_flows.sk_client
-  # sk_proponent:
-  #   lineage:
-  #     - dw_janus.fact_listing_rent_flows.sk_client
+      - dw_public.fact_listing_rent_flows.sk_client
+  sk_proponent:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_client
   task_action_type:
     lineage:
       - datalake_crm_tasks_history_flows.tasks_history_users_flow.action_type
