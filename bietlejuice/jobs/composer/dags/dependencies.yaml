@@ -937,6 +937,10 @@ bietlejuice.enrich_sirena:
 bietlejuice.enrich_survicate:
   - bietlejuice.survicate:load-clean-surveys
 
+bietlejuice.enrich_support_and_service_kpis_targets:
+  - bietlejuice.gsheets:load-clean-target-service-kpis
+  - bietlejuice.gsheets:load-clean-target-support-kpis
+
 bietlejuice.enrich_terminator:
   - bietlejuice.terminator:load-clean-termination-aud
 

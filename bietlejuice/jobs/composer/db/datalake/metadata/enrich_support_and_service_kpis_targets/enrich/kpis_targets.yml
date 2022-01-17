@@ -1,0 +1,20 @@
+---
+database_name: datalake_support_and_service_kpis_targets
+table_name: kpis_targets
+columns:
+  metric_name:
+    lineage:
+      - datalake_gsheets_clean.target_service_kpis.metric_name
+      - datalake_gsheets_clean.target_support_kpis.metric_name
+  team:
+    lineage:
+      - datalake_gsheets_clean.target_service_kpis.team
+      - datalake_gsheets_clean.target_support_kpis.team
+  granularity:
+    lineage:
+      - datalake_gsheets_clean.target_service_kpis.granularity
+      - datalake_gsheets_clean.target_support_kpis.granularity
+  target:
+    lineage:
+      - datalake_gsheets_clean.target_service_kpis.target
+      - datalake_gsheets_clean.target_support_kpis.target
