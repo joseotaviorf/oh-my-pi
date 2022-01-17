@@ -126,12 +126,12 @@ bietlejuice.dw_criteo_campaigns:
 
 bietlejuice.dw_crm:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
-  - bietlejuice.dw_contract:load-janus-dim-contract-into-redshift
-  - bietlejuice.dw_offer:load-public-dim-offer-into-redshift
-  - bietlejuice.dw_listing:load-janus-dim-house-listing-into-redshift
-  - bietlejuice.dw_listing:load-janus-fact-house-listings-into-redshift
-  - bietlejuice.dw_listing_jobs:load-janus-fact-photo-job-into-redshift
-  - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
+  - bietlejuice.dw_contract:load-dw-janus-dim-contract
+  - bietlejuice.dw_offer:load-dw-public-dim-offer
+  - bietlejuice.dw_listing:load-dw-janus-dim-house-listing
+  - bietlejuice.dw_listing:load-dw-janus-fact-house-listings
+  - bietlejuice.dw_listing_jobs:load-dw-janus-fact-photo-job
+  - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-offer-in-data-lake
