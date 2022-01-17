@@ -29,7 +29,8 @@ costs AS (
         NULL::FLOAT AS budget_advertiser,
         SUM(cost) AS cost,
         NULL::FLOAT AS budget,
-        NULL::FLOAT AS contact_flow_target
+        NULL::FLOAT AS contact_flow_target,
+        NULL::FLOAT AS tof_users_target
     FROM datalake_casa_mineira_marketing_costs_prod.daily_costs
     WHERE DATE(NULLIF(id_date, -1)) BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND DATE_ADD('DAY', -1, CURRENT_DATE)
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
@@ -178,7 +179,8 @@ SELECT
     NULL::FLOAT AS budget_advertiser,
     NULL::FLOAT AS cost,
     NULL::FLOAT AS budget,
-    NULL::FLOAT AS contact_flow_target
+    NULL::FLOAT AS contact_flow_target,
+    NULL::FLOAT AS tof_users_target
 FROM
     contacts as c
     LEFT JOIN events evt
@@ -223,7 +225,8 @@ targets AS (
         NULL::FLOAT AS budget_advertiser,
         NULL::FLOAT AS cost,
         SUM(cost_target) AS budget,
-        SUM(contact_flow_target) AS contact_flow_target
+        SUM(contact_flow_target) AS contact_flow_target,
+        SUM(top_of_funnel_target) AS tof_users_target
     FROM datalake_gsheets_clean_prod.targets_portal_casa_mineira_cost_cf
     WHERE dt_target BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND DATE_ADD('DAY', -1, CURRENT_DATE)
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
@@ -273,7 +276,8 @@ budget as (
         budget_value / (DATE_DIFF('DAY', month_start, month_end) + 1)::FLOAT AS budget_advertiser,
         NULL::FLOAT AS cost,
         NULL::FLOAT AS budget,
-        NULL::FLOAT AS contact_flow_target
+        NULL::FLOAT AS contact_flow_target,
+        NULL::FLOAT AS tof_users_target
     FROM info_budget b
         JOIN dim_date
             ON date BETWEEN ts_created::DATE AND COALESCE(ts_next_change::DATE, ts_disabled::DATE, CURRENT_DATE) - 1

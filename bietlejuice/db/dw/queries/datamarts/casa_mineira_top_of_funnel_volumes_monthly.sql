@@ -131,7 +131,7 @@ events AS (
         SUM(budget) AS budget,
         COUNT(NULL) AS new_contact_prospects_target,
         SUM(contact_flow_target) AS contact_flow_target,
-        COUNT(NULL) AS tof_users_target
+        SUM(tof_users_target) AS tof_users_target
 FROM
     datamarts.performance_marketing_metrics_portal_casa_mineira
     WHERE
