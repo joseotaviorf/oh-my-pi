@@ -21,7 +21,7 @@ from bietlejuice.jobs.composer.services.configuration_service import (
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2021, 11, 14, 0, 0, 0, tzinfo=LOCAL_TZ)
 
-DW_SCHEMA = "janus"
+DW_SCHEMA = "sale"
 CONTEXT = "sale_flow"
 DAG_NAME = f"dw_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
@@ -45,7 +45,7 @@ CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_AVAILABILITY,
+        "owner": DAGOwnerEnum.DATA_FOR_SALE,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },

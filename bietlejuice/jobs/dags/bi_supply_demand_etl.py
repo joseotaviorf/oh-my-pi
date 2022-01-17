@@ -547,19 +547,6 @@ fact_lead_task_contact_flows_task = BaseDAG.build_python_operator(
     },
 )
 
-dw_sale_fact_listing_sale_flows = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id="DW_sale_fact_listing_sale_flows",
-    python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={
-        "dim_name": "listing_sale_flows",
-        "is_fact": True,
-        "bucket": bucket,
-        "insert_dummy": False,
-        "schema_source": "sale",
-        "schema_dest": "sale",
-    },
-)
 
 ods_credit_evaluation_task = BaseDAG.build_python_operator(
     dag=main_dag,
@@ -760,14 +747,6 @@ dw_sale_fact_listing_flows_dag.set_upstream(
     ]
 )
 
-dw_sale_fact_listing_sale_flows.set_upstream(
-    [
-        ods_house_rent_flow,
-        booking_dag,
-        reservation_dag,
-        house_dag,
-    ]
-)
 
 # finance flow
 user_dag.set_downstream([bank_dag, bank_account_dag])
