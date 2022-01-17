@@ -92,6 +92,7 @@ fact_rent_flows AS (
         frf.dt_credit_analysis_approved,
         frf.dt_contract_signed,
         0.0 AS marketing_cost,
+        0.0 AS rent_flows_target,
         0.0 AS new_rent_flows_target,
         0.0 AS new_tenant_prospects_target,
         0.0 AS recovered_tenant_prospects_target,
@@ -154,6 +155,7 @@ demand_daily_spent AS (
         NULL::DATE AS dt_credit_analysis_approved,
         NULL::DATE AS dt_contract_signed,
         SUM(co.cost::FLOAT) AS marketing_cost,
+        COUNT(NULL) AS rent_flows_target,
         COUNT(NULL) AS new_rent_flows_target,
         COUNT(NULL) AS new_tenant_prospects_target,
         COUNT(NULL) AS recovered_tenant_prospects_target,
@@ -176,6 +178,7 @@ target_sheets AS (
         NULLIF(str.mkt_channel, '') AS mkt_channel,
         NULLIF(str.mkt_medium, '') AS mkt_medium,
         NULLIF(str.mkt_source, '') AS mkt_source,
+        NULL::FLOAT AS rent_flows_target,
         NULLIF(str.new_rent_flows_target, '')::FLOAT AS new_rent_flows_target,
         NULLIF(str.new_tenant_prospects_target, '')::FLOAT AS new_tenant_prospects_target,
         NULL::FLOAT AS recovered_tenant_prospects_target,
@@ -194,6 +197,7 @@ target_sheets AS (
         NULLIF(cps.mkt_channel, '') AS mkt_channel,
         NULLIF(cps.mkt_medium, '') AS mkt_medium,
         NULLIF(cps.mkt_source, '') AS mkt_source,
+        NULL::FLOAT AS rent_flows_target,
         NULL::FLOAT AS new_rent_flows_target,
         NULL::FLOAT AS new_tenant_prospects_target,
         NULL::FLOAT AS recovered_tenant_prospects_target,
@@ -215,6 +219,7 @@ target_sheets AS (
         END AS mkt_channel,
         mkt_medium,
         mkt_source,
+        NULL::FLOAT AS rent_flows_target,
         NULL::FLOAT AS new_rent_flows_target,
         NULLIF(ntp_target, '')::FLOAT AS new_tenant_prospects_target,
         NULLIF(rtp_target, '')::FLOAT AS recovered_tenant_prospects_target,
@@ -223,6 +228,23 @@ target_sheets AS (
         datalake_gsheets_clean_prod.rental_ntp_source_targets
     WHERE
         NULLIF(dt_target, '')::date >= DATE('2021-08-01')
+    
+    UNION ALL
+
+    SELECT
+        NULLIF(date, '')::date AS dt_event,
+        city_group,
+        'Tenants PWA' AS mkt_origin,
+        NULL::TEXT AS mkt_channel,
+        NULL::TEXT AS mkt_medium,
+        NULL::TEXT AS mkt_source,
+        NULLIF(rf_target, '')::FLOAT AS rent_flows_target,
+        NULL::FLOAT AS new_rent_flows_target,
+        NULL::FLOAT AS new_tenant_prospects_target,
+        NULL::FLOAT AS recovered_tenant_prospects_target,
+        NULL::FLOAT AS budget
+    FROM
+        datalake_gsheets_clean_prod.rental_flows_targets
 ),
 -------------------------------------------------------------------------------------
 -- Query Performance Marketing Rental Demand targets and introduce NULLs for UNION --
@@ -266,6 +288,7 @@ demand_daily_targets AS (
         NULL::DATE AS dt_credit_analysis_approved,
         NULL::DATE AS dt_contract_signed,
         0.0 AS marketing_cost,
+        rent_flows_target,
         new_rent_flows_target,
         new_tenant_prospects_target,
         recovered_tenant_prospects_target,
@@ -315,6 +338,7 @@ deactivations AS (
         NULL::DATE AS dt_credit_analysis_approved,
         NULL::DATE AS dt_contract_signed,
         0.0 AS marketing_cost,
+        NULL::INT AS rent_flows_target,
         NULL::INT AS new_rent_flows_target,
         NULL::INT AS new_tenant_prospects_target,
         NULL::INT AS recovered_tenant_prospects_target,

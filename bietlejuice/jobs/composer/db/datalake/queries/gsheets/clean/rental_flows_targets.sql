@@ -1,6 +1,6 @@
 SELECT
     city_group,
-    rf_target,
+    CAST(REPLACE(rf_target, ',', '') AS FLOAT) AS rf_target,
     rf_type,
     week_start,
     date
