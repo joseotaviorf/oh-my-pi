@@ -28,8 +28,7 @@ class SalesListingFlowsSubDag(BaseSubDag):
             ods_sales_leads_b2b_task,
             ods_sales_rep_leads_task,
             ods_sales_rn_lead_task,
-            ods_sales_potential_listings_task,
-            dw_sale_fact_listing_flows) = self.__build_data_tasks(sales_listing_flows_dag)
+            ods_sales_potential_listings_task) = self.__build_data_tasks(sales_listing_flows_dag)
 
         ods_sales_listing_flows_with_reprocessed_leads_task >> ods_sales_acquisitions_task
 
@@ -40,8 +39,6 @@ class SalesListingFlowsSubDag(BaseSubDag):
             ods_sales_rep_leads_task,
             ods_sales_rn_lead_task
         ])
-
-        ods_sales_potential_listings_task >> dw_sale_fact_listing_flows
 
         return sales_listing_flows_dag
 
@@ -110,20 +107,6 @@ class SalesListingFlowsSubDag(BaseSubDag):
             }
         )
 
-        dw_sale_fact_listing_flows = BaseDAG.build_python_operator(
-            dag=dag,
-            task_id="DW_Sale_Fact_Listing_Flows",
-            python_callable=utils.load_dim_from_ods_to_dw,
-            op_kwargs={
-                "dim_name": "listing_flows",
-                "is_fact": True,
-                "bucket": self.bucket,
-                "insert_dummy": False,
-                "schema_source": "sale",
-                "schema_dest": "sale",
-            }
-        )
-
         return (
             ods_sales_listing_flows_with_reprocessed_leads_task,
             ods_sales_acquisitions_task,
@@ -131,6 +114,5 @@ class SalesListingFlowsSubDag(BaseSubDag):
             ods_sales_leads_b2b_task,
             ods_sales_rep_leads_task,
             ods_sales_rn_lead_task,
-            ods_sales_potential_listings_task,
-            dw_sale_fact_listing_flows
+            ods_sales_potential_listings_task
         )

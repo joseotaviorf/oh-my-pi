@@ -1,4 +1,4 @@
-database_name: dw_janus
+database_name: dw_sale
 table_name: fact_listing_flows
 columns:
   sk_house_listing_flow:

@@ -1,6 +1,6 @@
-DROP TABLE IF EXISTS janus.fact_listing_flows;
+DROP TABLE IF EXISTS sale.fact_listing_flows;
 
-CREATE TABLE IF NOT EXISTS janus.fact_listing_flows (
+CREATE TABLE IF NOT EXISTS sale.fact_listing_flows (
     sk_house_listing_flow BIGINT,
     sk_condo BIGINT,
     sk_lead INTEGER,
@@ -84,4 +84,4 @@ CREATE TABLE IF NOT EXISTS janus.fact_listing_flows (
     ts_load TIMESTAMP
 );
 
-ALTER TABLE janus.fact_listing_flows OWNER TO databricks;
+ALTER TABLE sale.fact_listing_flows OWNER TO databricks;

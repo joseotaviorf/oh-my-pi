@@ -77,4 +77,4 @@ CREATE TABLE sale.fact_sale_flows (
   )
 ;
 
-ALTER TABLE sale.fact_sale_flows OWNER TO airflow;
+ALTER TABLE sale.fact_sale_flows OWNER TO databricks;
