@@ -1,4 +1,4 @@
 ---
 loft:
-  - origin: 'loft'
+  origin: 'loft'
 partition_cols: ["city", "year", "month", "day"]
