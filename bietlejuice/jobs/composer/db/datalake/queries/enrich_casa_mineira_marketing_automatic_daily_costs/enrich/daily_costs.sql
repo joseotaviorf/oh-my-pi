@@ -15,7 +15,7 @@ WITH taxonomy_by_platform AS (
         origin,
         INLINE_OUTER(ARRAYS_ZIP(
             COALESCE(SPLIT(cost_factor, ';'), ARRAY(NULL)),
-            ARRAY("Desktop", "Mobile", "Other")
+            ARRAY('Desktop', 'Mobile', 'Other')
         )) AS (platform_cost_factor, mkt_platform)
     FROM
         datalake_gsheets_clean.casa_mineira_marketing_cost_taxonomy
@@ -68,10 +68,14 @@ SELECT
     COALESCE(tp.mkt_medium, 'Not Mapped') AS mkt_medium,
     COALESCE(tp.mkt_source, 'Not Mapped') AS mkt_source,
     COALESCE(tp.mkt_platform, 'Not Mapped') AS mkt_platform,
-    COALESCE(tp.side, 'Not Mapped') AS funnel_side,
+    COALESCE(CASE
+        WHEN tp.mkt_source='RTB House'
+        THEN IF(fmc.utm_campaign RLIKE '^(1535|Campanha Casa Mineira Imóveis)', 'imobiliaria', 'portal')
+        ELSE tp.side
+        END, 'Not Mapped') AS funnel_side,
     COALESCE(
         fmc.total_cost * FLOAT(tp.platform_cost_factor),
-        CASE 
+        CASE
             WHEN tp.mkt_platform = 'Mobile' THEN fmc.mobile_cost
             WHEN tp.mkt_platform = 'Desktop' THEN fmc.desktop_cost
             WHEN tp.mkt_platform = 'Other' THEN fmc.other_cost
@@ -81,7 +85,7 @@ SELECT
 FROM
     filtered_media_costs fmc
 LEFT JOIN
-    taxonomy_by_platform AS tp 
+    taxonomy_by_platform AS tp
         ON COALESCE(fmc.account_name, '') = COALESCE(tp.account_name, '')
         AND COALESCE(fmc.report_type, '') = COALESCE(tp.report_type, '')
         AND COALESCE(fmc.ad_type, 'other') = COALESCE(tp.ad_type, 'other')
