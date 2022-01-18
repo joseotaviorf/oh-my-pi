@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS call.dim_call_agent (
 	full_name VARCHAR(100),
 	email VARCHAR(100),
 	location VARCHAR(25),
-	skills VARCHAR(2000),
+	skills VARCHAR(2500),
 	ts_created TIMESTAMP,
 	ts_updated TIMESTAMP,
   	ts_load TIMESTAMP
