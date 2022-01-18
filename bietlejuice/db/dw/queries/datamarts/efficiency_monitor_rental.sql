@@ -24,7 +24,7 @@ rentals_and_tickets AS (
     	SUM(rent) AS total_ticket_new_rentals,
     	SUM(CASE WHEN n_order_c = 1 THEN rent END) AS total_ticket_new_first_rentals
     FROM rentals_and_tickets
-    WHERE dt_reference >= '2020-01-01'
+    WHERE dt_reference >= '2020-01-01' AND city_group IS NOT NULL
     GROUP BY 1, 2
 ), base_act AS (
     SELECT 
@@ -39,8 +39,7 @@ rentals_and_tickets AS (
         business = 'Rental'
         AND dt_cost BETWEEN DATE('2020-01-01') AND LAST_DAY(CURRENT_DATE)
     GROUP by 1,2,3,4,5
-),
-base_tgt as(
+), base_tgt as(
     SELECT 
         CAST("date" AS DATE) AS dt_reference,
         city_group,
@@ -106,8 +105,7 @@ base_tgt as(
         SUM(branding_budget) AS branding_budget
     FROM marketing_costs
     GROUP BY 1,2
-),
-supply_metric_amortization AS (
+), supply_metric_amortization AS (
     SELECT
         mc.dt_month_start,
         mc.city_group,
@@ -142,22 +140,72 @@ FROM
         (m0_supply_cost + m1_supply_cost + m2_supply_cost) AS amortized_supply_cost,
         (m0_supply_budget + m1_supply_budget + m2_supply_budget) AS amortized_supply_budget
     FROM supply_per_month_amortization
+), branding_amortized AS (
+    SELECT
+        dt_month_start,
+        city_group,
+        SUM(branding_cost/12) OVER (PARTITION BY city_group ORDER BY dt_month_start ROWS 11 PRECEDING) AS amortized_brand_cost,
+        SUM(branding_budget/12) OVER (PARTITION BY city_group ORDER BY dt_month_start ROWS 11 PRECEDING) AS amortized_brand_budget
+    FROM
+        marketing_costs
+    WHERE classification = 'Branded'
+), amortized_cost AS (
+    SELECT
+        dt_month_start,
+        amortized_brand_cost
+    FROM branding_amortized
+    WHERE city_group = 'Brasil'
+), total_rentals AS (
+    SELECT
+        dt_month_start,
+        SUM(new_rentals) AS new_rentals,
+        SUM(new_first_rentals) AS new_first_rentals
+    FROM
+        grouped_rentals_and_tickets
+    GROUP BY 1
+), branding_base_brasil AS (
+    SELECT
+        COALESCE(ac.dt_month_start, tr.dt_month_start) AS dt_month_start,
+        ac.amortized_brand_cost,
+        tr.new_rentals,
+        tr.new_first_rentals
+    FROM amortized_cost AS ac
+    FULL OUTER JOIN
+        total_rentals AS tr
+        ON ac.dt_month_start = tr.dt_month_start
+), branding_demand_supply_base AS (
+    SELECT
+        ba.dt_month_start,
+        ba.city_group,
+        SUM(new_rentals) AS new_rentals,
+        SUM(new_first_rentals) AS new_first_rentals,
+        SUM(amortized_brand_cost) AS amortized_brand_cost
+    FROM
+        branding_amortized AS ba
+    LEFT JOIN
+        grouped_rentals_and_tickets AS gr
+        ON ba.dt_month_start = gr.dt_month_start AND ba.city_group = gr.city_group
+    GROUP BY 1,2
 ), branding_demand_amortized AS (
     SELECT
-        dt_month_start,
-        city_group,
-        SUM(demand_cost/24) OVER (PARTITION BY city_group ORDER BY dt_month_start ROWS BETWEEN 12 PRECEDING AND 1 PRECEDING) AS amortized_brand_demand_cost
+        bd.dt_month_start,
+        bd.city_group,
+        ((bd.amortized_brand_cost+bb.amortized_brand_cost*bd.new_rentals/bb.new_rentals)*0.5) AS amortized_brand_demand_cost
     FROM
-        marketing_costs
-    WHERE classification = 'Demand'
+        branding_demand_supply_base AS bd
+    LEFT JOIN
+        branding_base_brasil AS bb
+        ON bd.dt_month_start = bb.dt_month_start
 ), branding_supply_amortized AS (
     SELECT
-        dt_month_start,
-        city_group,
-        SUM(supply_cost/24) OVER (PARTITION BY city_group ORDER BY dt_month_start ROWS BETWEEN 12 PRECEDING AND 1 PRECEDING) AS amortized_brand_supply_cost
+        bd.dt_month_start,
+        bd.city_group,
+        ((bd.amortized_brand_cost+bb.amortized_brand_cost*bd.new_first_rentals/bb.new_first_rentals)*0.5) AS amortized_brand_supply_cost
     FROM
-        marketing_costs
-    WHERE classification = 'Supply'
+        branding_demand_supply_base AS bd
+    LEFT JOIN
+        branding_base_brasil AS bb
+        ON bd.dt_month_start = bb.dt_month_start
 ), brand_supply_metric_amortization_amortization AS (
     SELECT
         ba.dt_month_start,
@@ -188,8 +236,8 @@ FROM
     FROM brand_supply_per_month_amortization_amortization
 )
 SELECT
-    COALESCE(rt.dt_month_start, mc.dt_month_start, sa.dt_month_start, ba.dt_month_start, bd.dt_month_start, bs.dt_month_start) AS dt_month_start,
-    COALESCE(rt.city_group, mc.city_group, sa.city_group, ba.city_group, bd.city_group, bs.city_group) AS city_group,
+    COALESCE(rt.dt_month_start, mc.dt_month_start, sa.dt_month_start, br.dt_month_start, ba.dt_month_start, bd.dt_month_start, bs.dt_month_start) AS dt_month_start,
+    COALESCE(rt.city_group, mc.city_group, sa.city_group, br.city_group, ba.city_group, bd.city_group, bs.city_group) AS city_group,
     rt.new_rentals,
     rt.new_first_rentals,
     rt.total_ticket_new_rentals,
@@ -202,6 +250,8 @@ SELECT
     mc.branding_budget,
     sa.amortized_supply_cost,
     sa.amortized_supply_budget,
+    br.amortized_brand_cost,
+    br.amortized_brand_budget,
     ba.amortized_brand_supply_cost,
     bd.amortized_brand_demand_cost,
     bs.amortized_amortized_brand_supply_cost
@@ -210,6 +260,8 @@ FULL OUTER JOIN marketing_costs_date_city AS mc
     ON rt.dt_month_start = mc.dt_month_start AND rt.city_group = mc.city_group
 FULL OUTER JOIN supply_amortized AS sa
     ON rt.dt_month_start = sa.dt_month_start AND rt.city_group = sa.city_group
+FULL OUTER JOIN branding_amortized AS br
+    ON rt.dt_month_start = br.dt_month_start AND rt.city_group = br.city_group
 FULL OUTER JOIN branding_supply_amortized AS ba
     ON rt.dt_month_start = ba.dt_month_start AND rt.city_group = ba.city_group
 FULL OUTER JOIN branding_demand_amortized AS bd
