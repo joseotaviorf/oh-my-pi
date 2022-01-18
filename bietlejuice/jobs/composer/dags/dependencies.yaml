@@ -121,9 +121,6 @@ bietlejuice.dw_contract:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_listing:load-enrich-portability
 
-bietlejuice.dw_criteo_campaigns:
-  - bietlejuice.criteo_campaigns:load-clean-criteo-campaigns
-
 bietlejuice.dw_crm:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_contract:load-dw-janus-dim-contract
@@ -146,10 +143,6 @@ bietlejuice.dw_crm:
   - bietlejuice.enrich_crm_tasks_transitions:load-enrich-tasks-transitions
   - bietlejuice.enrich_firestore:load-enrich-rent-offer
   - bietlejuice.heimdall:load-clean-activity
-
-
-bietlejuice.dw_facebook_insights:
-  - bietlejuice.enrich_marketing_costs_facebook_insights
 
 # bietlejuice.dw_fact_conversion_metrics:
 #   - bietlejuice.ebdb:create-clean-booking-in-data-lake
@@ -228,15 +221,6 @@ bietlejuice.dw_listing_owners:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_user:load-enrich-user
 
-bietlejuice.dw_google_ads:
-  - bietlejuice.google_ads:load-clean-ads-performance-report
-  - bietlejuice.google_ads:load-clean-campaigns-performance-report
-  - bietlejuice.google_ads:load-clean-keywords-performance-report
-  - bietlejuice.google_ads:load-clean-videos-performance-report
-
-bietlejuice.dw_mitula:
-  - bietlejuice.lifull_campaigns:load-clean-mitula-campaigns
-
 bietlejuice.dw_offer:
   - bietlejuice.enrich_ebdb_proposal:load-enrich-pre-proposal
   - bietlejuice.enrich_ebdb_proposal:load-enrich-pre-proposal-aud
@@ -289,9 +273,6 @@ bietlejuice.dw_rent_listing_flow:
 
 bietlejuice.dw_reservation:
   - bietlejuice.enrich_kill_queue
-
-bietlejuice.dw_rtb_campaigns:
-  - bietlejuice.rtb_campaigns
 
 bietlejuice.dw_sale_closing_flows:
   - bietlejuice.enrich_sale_closing_flows:load-enrich-closing-flow
@@ -370,9 +351,6 @@ bietlejuice.dw_tracksale:
   - bietlejuice.enrich_tracksale
   - bietlejuice.enrich_nps_answer_drivers:load-enrich-answer-drivers
   - bietlejuice.enrich_ebdb_customer_contact_identification
-
-bietlejuice.dw_trovit:
-  - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns
 
 bietlejuice.dw_user:
   - bietlejuice.ebdb:create-clean-partner-in-data-lake
@@ -671,7 +649,7 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb:create-clean-special-condition-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-state-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
-  
+
 bietlejuice.enrich_ebdb_listing_jobs:
   - bietlejuice.ebdb:create-clean-house-registration-status-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-inspection-in-data-lake
@@ -770,7 +748,6 @@ bietlejuice.enrich_invoice:
   - bietlejuice.retsuko:load-clean-contract
   - bietlejuice.retsuko:load-clean-entry
   - bietlejuice.retsuko:load-clean-invoice
-
 
 bietlejuice.enrich_kill_queue:
   - bietlejuice.kill_queue:load-clean-house
@@ -934,7 +911,7 @@ bietlejuice.enrich_sirena:
   - bietlejuice.sirena:load-clean-groups
   - bietlejuice.sirena:load-clean-interactions
   - bietlejuice.sirena:load-clean-prospects
-  
+
 bietlejuice.enrich_survicate:
   - bietlejuice.survicate:load-clean-surveys
 
