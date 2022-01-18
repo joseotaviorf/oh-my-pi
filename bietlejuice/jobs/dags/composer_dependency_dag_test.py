@@ -35,8 +35,8 @@ check_s3_objects_task = S3KeySensor(
     poke_interval=3*60,
     timeout=10*60,
     aws_conn_id="aws_default",
-    bucket_name='datalake-old.s3.forno.data.quintoandar.com.br',
-    bucket_key="test/bietlejuice/dag_teste",
+    bucket_name='5a-datalake-forno',
+    bucket_key="teste/bietlejuice/dag_teste",
     dag=dag
 )
 
