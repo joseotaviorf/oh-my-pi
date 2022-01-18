@@ -10,4 +10,4 @@ JOIN datalake_ebdb_clean_prod.user AS u
     ON u.id_agent = ad.id
 JOIN datalake_ebdb_clean_prod.work_contract AS wc
     ON ad.id_work_contract = wc.id
-WHERE wc.contract_name LIKE '[3P-%]'
+WHERE wc.contract_name LIKE '%[3P-%]%'

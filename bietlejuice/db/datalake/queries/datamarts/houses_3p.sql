@@ -5,4 +5,4 @@ SELECT
 FROM
     datalake_ebdb_listing_prod.house AS h
 WHERE
-    h.internal_admin_info LIKE '[3P-%]'
+    h.internal_admin_info LIKE '%[3P-%]%'
