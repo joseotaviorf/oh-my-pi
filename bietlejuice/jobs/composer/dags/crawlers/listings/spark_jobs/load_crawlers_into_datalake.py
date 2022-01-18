@@ -15,7 +15,7 @@ from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
 
-JOB_NAME = "load_crawlers_into_datalake"
+JOB_NAME = "load_crawler_listings_loft_into_datalake"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -25,6 +25,7 @@ if __name__ == "__main__":
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
     parser.add_argument("source")
+    parser.add_argument("context")
     parser.add_argument("table_name")
     parser.add_argument("origin", type = str, help= 'Name of crawled source')
     parser.add_argument("execution_date")
@@ -33,11 +34,12 @@ if __name__ == "__main__":
     environment = args.env
     datalake_bucket = args.datalake_bucket
     source = args.source
+    context = args.context
     table_name = args.table_name
     origin = args.origin
     execution_date_str = args.execution_date
 
-    config_service = ConfigurationService(source)
+    config_service = ConfigurationService(source, intermediate_path= f'{source}/{context}/spark_jobs')
     source_root_path = config_service.get_config("root_path")
     job_extra_args = config_service.get_config("job_extra_args")
     consumer_extra_args = job_extra_args.get('consumer')
@@ -46,7 +48,7 @@ if __name__ == "__main__":
 
     logger.info(
         f"""
-                m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket}, origin={origin},
+                m=__main__, environment={environment}, source={source}, context = {context},datalake_bucket={datalake_bucket}, origin={origin},
                 source_root_path={source_root_path}, table_name={table_name}, execution_date={execution_date_str} msg=Starting spark job...
         """
     )
@@ -57,14 +59,13 @@ if __name__ == "__main__":
     spark_client = SparkClient()
     s3_consumer = S3Consumer(spark_client)
     path = source_root_path + f'origin={origin}/year={execution_date.year}/month={execution_date.month}/day={execution_date.day}/'
-
     df = s3_consumer.get_data_from_file(path=path, **consumer_extra_args)
     df = df.withColumn('year', lit(execution_date.year)) \
                 .withColumn('month', lit(execution_date.month)) \
                 .withColumn('day', lit(execution_date.day))
 
     db_info = DatalakeMetastoreService.get_db_info(
-        environment, source, datalake_bucket
+        environment, f'{source}_{context}', datalake_bucket
     )
     spark_metastore_service = SparkMetastoreService(spark_client)
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)

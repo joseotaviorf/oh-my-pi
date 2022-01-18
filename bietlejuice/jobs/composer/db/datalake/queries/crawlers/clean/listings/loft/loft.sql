@@ -18,7 +18,7 @@ SELECT
     month,
     day
 FROM
-    datalake_crawlers_raw.loft_listings
+    datalake_crawlers_listings_raw.loft
 WHERE
     year={year}
     AND month={month}

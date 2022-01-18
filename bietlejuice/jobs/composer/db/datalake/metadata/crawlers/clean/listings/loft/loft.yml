@@ -1,6 +1,6 @@
 ---
-database_name: datalake_crawlers_clean
-table_name: loft_listings
+database_name: datalake_crawlers_listings_clean
+table_name: loft
 columns:
   id:
     lineage:

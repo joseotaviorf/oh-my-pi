@@ -1,4 +1,4 @@
-## Crawlers Loft
+## Loft
 ### Purpose
 This dag ingests data from loft crawler made by our partners. The data is placed on a s3 bucket and this day get the JSONs imputed with one week of interval(D-7).
 
@@ -18,7 +18,7 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces, in datalake raw and clean:
 
 Via **full load**:
-    - `loft_listings`
+    - `loft`
 
 ### Responsible Data Teams
 For any questions or concerns about this DAG and data, please contact the Data Engineering Team or
