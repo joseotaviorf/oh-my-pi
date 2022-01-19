@@ -45,8 +45,7 @@ class RegionSubDag(DimSubDag):
          save_polygons_geojson_to_local,
          convert_polygons_geojson_to_topojson,
          upload_polygons_topojson_to_s3,
-         dim_region,
-         load_region) = self.__build_data_tasks(region_dag)
+         dim_region) = self.__build_data_tasks(region_dag)
 
         tests_tasks = self.build_tests_tasks(region_dag)
 
@@ -56,7 +55,6 @@ class RegionSubDag(DimSubDag):
                               upload_polygons_topojson_to_s3)
         dim_region.set_upstream([agent_region, region])
         dim_region.set_downstream(tests_tasks)
-        load_region.set_upstream(tests_tasks)
 
         return region_dag
 
@@ -129,24 +127,13 @@ class RegionSubDag(DimSubDag):
             }
         )
 
-        load_region = BaseDAG.build_python_operator(
-            dag=dag,
-            task_id='DW_dim_region',
-            python_callable=utils.load_dim_from_staging_to_dw,
-            op_kwargs={
-                'dim_name': 'region',
-                'bucket': self.bucket
-            }
-        )
-
         return (agent_region,
                 region,
                 polygon_region,
                 save_polygons_geojson_to_local,
                 convert_polygons_geojson_to_topojson,
                 upload_polygons_topojson_to_s3,
-                dim_region,
-                load_region
+                dim_region
                 )
 
     @logger

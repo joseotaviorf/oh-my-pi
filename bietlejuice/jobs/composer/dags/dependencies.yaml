@@ -259,7 +259,7 @@ bietlejuice.dw_rent_flow:
   - bietlejuice.gsheets:load-clean-taxonomy-demand
 
 bietlejuice.dw_rent_listing_flow:
-  - bietlejuice.dw_region:load-janus-dim-region-into-redshift
+  - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.enrich_ebdb_user:load-enrich-user-doorman
   - bietlejuice.enrich_lead:load-enrich-lead-city-region
   - bietlejuice.enrich_lead_tracking:load-enrich-lead-first-event-tracking
@@ -295,7 +295,7 @@ bietlejuice.dw_sale_flows:
   - bietlejuice.gsheets:load-clean-taxonomy-demand
 
 bietlejuice.dw_sale_listing_flow:
-  - bietlejuice.dw_region:load-janus-dim-region-into-redshift
+  - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.enrich_ebdb_user:load-enrich-user-doorman
   - bietlejuice.enrich_lead:load-enrich-lead-city-region
   - bietlejuice.enrich_lead_tracking:load-enrich-lead-first-event-tracking

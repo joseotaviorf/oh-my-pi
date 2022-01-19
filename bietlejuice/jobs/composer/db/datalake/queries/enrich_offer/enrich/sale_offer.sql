@@ -227,7 +227,7 @@ regions AS (
     FROM
         aux
     LEFT JOIN 
-        dw_janus.dim_region AS dr 
+        dw_public.dim_region AS dr
             ON dr.sk_region = aux.id_region
 ),
 -- DATA SOURCES

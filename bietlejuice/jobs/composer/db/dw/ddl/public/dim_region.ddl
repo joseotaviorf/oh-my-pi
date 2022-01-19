@@ -1,12 +1,12 @@
-drop table if exists dim_region;
-create table if not exists dim_region (
+drop table if exists public.dim_region;
+create table if not exists public.dim_region (
   sk_region integer primary key,
   id integer,
+  macro_id integer,
+  city_id integer,
   level varchar,
   name varchar,
-  macro_id integer,
   macro_name varchar,
-  city_id integer,
   city_name varchar,
   city_group varchar,
   city_ddd varchar(2),
@@ -19,9 +19,11 @@ create table if not exists dim_region (
   regional_deprecated varchar,
   regional_inspection varchar,
   tier integer,
+  dt_first_booking timestamp,
+  dt_first_property_created timestamp,
   dt_created timestamp without time zone,
   dt_updated timestamp without time zone,
-  dt_timestamp timestamp without time zone,
-  dt_first_property_created timestamp,
-  dt_first_booking timestamp
+  dt_timestamp timestamp without time zone
 );
+
+ALTER TABLE public.dim_region OWNER TO databricks;

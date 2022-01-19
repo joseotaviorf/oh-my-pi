@@ -111,7 +111,7 @@ WITH potential_listings AS (
         ON pllt.id = lfrl.id
       LEFT JOIN datalake_rent_potential_listing.potential_listings_reprocessed_leads plrl
         ON plrl.id = lfrl.id
-      LEFT JOIN dw_janus.dim_region dr
+      LEFT JOIN dw_public.dim_region dr
         ON dr.sk_region = lfrl.id_region
       LEFT JOIN datalake_rent_potential_listing.potential_listing_b2b plb2b
         ON plb2b.id = lfrl.id

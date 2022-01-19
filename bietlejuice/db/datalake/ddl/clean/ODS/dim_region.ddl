@@ -1,12 +1,12 @@
 drop table if exists datalake_clean.ods_dim_region;
 create external table if not exists datalake_clean.ods_dim_region (
-  sk_region string,
-  id string,
+  sk_region bigint,
+  id bigint,
   level string,
   name string,
-  macro_id string,
+  macro_id bigint,
   macro_name string,
-  city_id string,
+  city_id bigint,
   city_name string,
   city_group string,
   city_ddd string,
@@ -19,19 +19,19 @@ create external table if not exists datalake_clean.ods_dim_region (
   regional_deprecated string,
   regional_inspection string,
   tier string,
-  dt_created string,
-  dt_updated string,
-  dt_timestamp string,
-  dt_first_property_created string,
-  dt_first_booking string
+  dt_created timestamp,
+  dt_updated timestamp,
+  dt_timestamp timestamp,
+  dt_first_property_created timestamp,
+  dt_first_booking timestamp
 )
-row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
-with serdeproperties (
-  'separatorChar' = ',',
-  'quoteChar' = '\"'
-)
-location 's3://5a-datalake/clean/ods/region'
-tblproperties (
-  'skip.header.line.count' = '1'
-)
-;
+ROW FORMAT SERDE
+  'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
+STORED AS INPUTFORMAT
+  'org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat'
+OUTPUTFORMAT
+  'org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat'
+LOCATION
+  's3://dw.s3.data.quintoandar.com.br/public/dim_region'
+TBLPROPERTIES (
+  'parquet.compress'='SNAPPY')

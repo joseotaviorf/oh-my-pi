@@ -40,7 +40,7 @@ columns:
       - datalake_listing_flow.sales_listing_flows_with_reprocessed_leads.id_region
   sk_city:
     lineage:
-      - dw_janus.dim_region.city_id
+      - dw_public.dim_region.city_id
       - datalake_lead.lead_city_region.id_region
   sk_partner:
     lineage:
