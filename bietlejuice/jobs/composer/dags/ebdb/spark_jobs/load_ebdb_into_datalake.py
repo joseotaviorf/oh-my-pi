@@ -31,9 +31,9 @@ VIEW_ALLOW_LIST = ["MapRegiao", "vw_lead_reason"]
 BLOCK_LIST = ["PoligonoRegiao"]
 
 # todo: check this value and argument the choice
-PARTITION_SIZE = 100
+PARTITION_SIZE = 1024
 # todo: check this value and argument the choice
-SIZE_THRESHOLD = PARTITION_SIZE * 4
+SIZE_THRESHOLD = PARTITION_SIZE * 8
 # todo: check this value and argument the choice
 NB_THREADS = 15
 
