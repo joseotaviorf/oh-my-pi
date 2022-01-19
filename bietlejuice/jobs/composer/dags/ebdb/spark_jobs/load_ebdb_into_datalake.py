@@ -15,14 +15,25 @@ from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_ebdb_into_datalake"
-TABLE_BLOCK_LIST = ["ENT_REVTYPE", "REVCHANGES", "_UsuarioRevisionEntity_new"]
+TABLE_BLOCK_LIST = [
+    "date_range",
+    "ENT_REVTYPE",
+    "REVCHANGES",
+    "schema_version",
+    "test",
+    "test_filho",
+    "tmp_condominio",
+    "tmp_update",
+    "tmp_update_AUD_01",
+    "_UsuarioRevisionEntity_new",
+]
 VIEW_ALLOW_LIST = ["MapRegiao", "vw_lead_reason"]
 BLOCK_LIST = ["PoligonoRegiao"]
 
 # todo: check this value and argument the choice
-PARTITION_SIZE = 1024
+PARTITION_SIZE = 100
 # todo: check this value and argument the choice
-SIZE_THRESHOLD = PARTITION_SIZE * 8
+SIZE_THRESHOLD = PARTITION_SIZE * 4
 # todo: check this value and argument the choice
 NB_THREADS = 15
 
