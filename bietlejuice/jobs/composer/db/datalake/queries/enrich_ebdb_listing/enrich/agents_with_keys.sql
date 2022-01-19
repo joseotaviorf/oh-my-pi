@@ -131,11 +131,11 @@ keys_attributions AS (
                 WHEN status = 'NO_OPT_IN' THEN FALSE
             END 
         ) AS is_keys_with_agent_opt_in,
-        MIN(IF(status = 'NOT_DELIVERED', DATE(ts_revision),NULL)) AS dt_attributed,
-        MIN(IF(status = 'DELIVERED', DATE(ts_revision),NULL)) AS dt_delivered,
-        MIN(IF(status IN ('OPT_IN', 'NO_OPT_IN'), DATE(ts_revision),NULL)) AS dt_optin,
-        DATE(ts_listing_version_start) AS dt_publicated,
-        MIN(IF(status = 'RETURNED', DATE(ts_revision),NULL)) AS dt_returned
+        MIN(IF(status = 'NOT_DELIVERED', ts_revision,NULL)) AS ts_attributed,
+        MIN(IF(status = 'DELIVERED', ts_revision,NULL)) AS ts_delivered,
+        MIN(IF(status IN ('OPT_IN', 'NO_OPT_IN'), ts_revision,NULL)) AS ts_optin,
+        ts_listing_version_start AS ts_publicated,
+        MIN(IF(status = 'RETURNED', ts_revision,NULL)) AS ts_returned
 
     FROM
         keys_closer_listings
@@ -152,8 +152,10 @@ non_doorman_listing AS (
         h.key_location AS house_key_location,
         LAST_VALUE(kla.access_type_name) OVER (PARTITION BY hl.id_house_listing ORDER BY kla.key_location_rev RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS last_key_location,
         h.occupant_type AS who_is_living,
-        MAX(aa.is_keys_with_agent_eligible) OVER(PARTITION BY hl.id_house_listing) AS is_keys_with_agent_eligible,
         h.is_for_sale,
+        IF(h.id_user = h.id_user_registrant, TRUE, FALSE) AS is_fss,
+        MAX(aa.is_keys_with_agent_eligible) OVER(PARTITION BY hl.id_house_listing) AS is_keys_with_agent_eligible,
+        hl.ts_contract_signed AS ts_contract_signed,
         hl.ts_listing_version_start,
         hl.ts_listing_version_end
     FROM
@@ -179,10 +181,15 @@ SELECT DISTINCT
     ndl.house_key_location,
     ndl.last_key_location,
     ndl.who_is_living,
+    CASE
+        WHEN ndl.ts_contract_signed IS NOT NULL AND ka.has_keys_with_agent_delivered THEN CAST((TO_UNIX_TIMESTAMP(ka.ts_returned) - TO_UNIX_TIMESTAMP(ndl.ts_contract_signed))/86400 AS DECIMAL(7,2))
+    END AS days_cs_to_return,
+    CAST((TO_UNIX_TIMESTAMP(ka.ts_attributed) - TO_UNIX_TIMESTAMP(ka.ts_publicated))/86400 AS DECIMAL(7,2)) AS days_publication_to_attribution,
     ka.has_keys_with_agent_attributed,
     ka.has_keys_with_agent_delivered,
     ka.has_keys_with_agent_returned,
     ka.is_delivered_on_another_listing,
+    ndl.is_fss,
     ka.is_keys_with_agent_opt_in,
     CASE
         WHEN ndl.is_keys_with_agent_eligible = TRUE THEN TRUE
@@ -192,13 +199,17 @@ SELECT DISTINCT
                 AND ndl.is_for_sale = FALSE THEN TRUE
         ELSE FALSE
     END AS is_keys_with_agent_eligible,
-    ka.dt_attributed,
-    ka.dt_delivered,
-    ka.dt_optin,
-    ka.dt_publicated,
-    ka.dt_returned,
+    CASE
+        WHEN ndl.ts_contract_signed IS NOT NULL AND ka.has_keys_with_agent_delivered THEN (TO_UNIX_TIMESTAMP(ka.ts_returned) - TO_UNIX_TIMESTAMP(ndl.ts_contract_signed))/86400 <= 3 
+    END AS is_returned_on_time,
+    ka.ts_attributed,
+    ndl.ts_contract_signed,
+    ka.ts_delivered,
     ndl.ts_listing_version_start,
-    ndl.ts_listing_version_end
+    ndl.ts_listing_version_end,
+    ka.ts_optin,
+    ka.ts_publicated,
+    ka.ts_returned
 FROM
     non_doorman_listing AS ndl
 LEFT JOIN
