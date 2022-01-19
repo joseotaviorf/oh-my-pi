@@ -19,6 +19,21 @@ columns:
   amount:
     lineage:
       - datalake_monopoly_raw.income.amount
+  payer_info:
+    lineage:
+      - datalake_monopoly_raw.income.payer_info
+  invoice_link:
+    lineage:
+      - datalake_monopoly_raw.income.invoice_link
+  dt_due:
+    lineage:
+      - datalake_monopoly_raw.income.due_date
+  dt_expiration:
+    lineage:
+      - datalake_monopoly_raw.income.expiration_date
   ts_created:
     lineage:
       - datalake_monopoly_raw.income.created_at
+  ts_updated:
+    lineage:
+      - datalake_monopoly_raw.income.updated_at
