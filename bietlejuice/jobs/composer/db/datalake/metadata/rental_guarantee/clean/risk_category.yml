@@ -4,12 +4,21 @@ columns:
   id:
     lineage:
       - datalake_rental_guarantee_raw.risk_category.id
+  category_description:
+    lineage:
+      - datalake_rental_guarantee_raw.risk_category.category_description
   category_level:
     lineage:
       - datalake_rental_guarantee_raw.risk_category.category_level
-  factor:
+  deposit_factor:
+    lineage:
+      - datalake_rental_guarantee_raw.risk_category.deposit_factor
+  guarantee_factor:
     lineage:
       - datalake_rental_guarantee_raw.risk_category.factor
+  is_deposit_allowed:
+    lineage:
+      - datalake_rental_guarantee_raw.risk_category.allow_deposit
   is_guarantee_allowed:
     lineage:
       - datalake_rental_guarantee_raw.risk_category.allow_guarantee
