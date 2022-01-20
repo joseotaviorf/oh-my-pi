@@ -30,13 +30,23 @@ t1 = DummyOperator(
     dag=dag
 )
 
-check_s3_objects_task = S3KeySensor(
-    task_id="check-s3-objects",
+first_dep = S3KeySensor(
+    task_id="first_dep",
     poke_interval=3*60,
-    timeout=10*60,
+    timeout=2*60*60,
     aws_conn_id="aws_default",
-    bucket_name='5a-datalake-forno',
-    bucket_key="teste/bietlejuice/dag_teste",
+    bucket_name='5a-datalake-prod',
+    bucket_key="dags_execution_logs/2022-01-20/bietlejuice.enrich_ebdb_agents.SUCCESS",
+    dag=dag
+)
+
+second_dep = S3KeySensor(
+    task_id="second_dep",
+    poke_interval=3*60,
+    timeout=2*60*60,
+    aws_conn_id="aws_default",
+    bucket_name='5a-datalake-prod',
+    bucket_key="dags_execution_logs/2022-01-20/bietlejuice.docx.SUCCESS",
     dag=dag
 )
 
@@ -45,6 +55,4 @@ t3 = DummyOperator(
     dag=dag
 )
 
-
-t1.set_downstream(check_s3_objects_task)
-check_s3_objects_task.set_downstream(t3)
+t1 >> [first_dep,second_dep] >> t3
