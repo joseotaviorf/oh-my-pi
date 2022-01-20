@@ -91,7 +91,7 @@ rentals_and_tickets AS (
         SUM(CASE WHEN planning_mkt_level1 = 'Branded' THEN cost_budget_mensal ELSE 0 END) AS branding_budget
   FROM
     base_costs
-  WHERE dt_reference <= date_trunc('week',CURRENT_DATE)  
+  WHERE dt_reference < date_trunc('week',CURRENT_DATE)  
   GROUP BY 1, 2, 3
 ), marketing_costs_date_city AS (
     SELECT
