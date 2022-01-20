@@ -281,7 +281,7 @@ enrich_ebdb_agents_dep = S3KeySensor(
 )
 
 enrich_ebdb_agents_dep >> update_agent_region_ods
-enrich_ebdb_agents_dep >> create_dim_agent_region_dw
+enrich_ebdb_agents_dep >> create_dim_agent_review
 enrich_ebdb_agents_dep >> create_agent_contract_dw
 
 update_agent_region_ods >> group_agent_region_ods >> load_group_agent_region_dw >> create_dim_agent_region_dw
