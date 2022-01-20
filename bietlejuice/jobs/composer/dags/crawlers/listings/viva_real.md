@@ -15,10 +15,11 @@ More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-This pipeline produces, in datalake raw and clean:
+This pipeline produces, via **full load**, on raw layer:
+    - `datalake_crawlers_listings_raw.vivareal`
 
-Via **full load**:
-    - `datalake_crawlers_listings.viva_real`
+And on clean layer:
+    - `datalake_crawlers_listings_clean.viva_real`
 
 ### Responsible Data Teams
 For any questions or concerns about this DAG and data, please contact the Data Engineering Team or

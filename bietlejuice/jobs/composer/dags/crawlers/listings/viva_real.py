@@ -31,8 +31,8 @@ MAIN_SCHEDULE_INTERVAL = "0 3 * * 1"
 
 config_service = ConfigurationService(dag_name = CONFIG_NAME, intermediate_path=INTERMEDIATE_PATH)
 
-loft_configs = config_service.get_config("loft")
-origin = loft_configs["origin"]
+viva_real_configs = config_service.get_config("viva_real")
+origin = viva_real_configs["origin"]
 
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 datalake_bucket = config_service.get_config("datalake_bucket")
