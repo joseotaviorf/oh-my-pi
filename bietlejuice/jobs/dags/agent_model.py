@@ -3,6 +3,7 @@ import json
 from datetime import datetime, date, timedelta
 
 from airflow.models import DAG
+from airflow.operators.sensors import S3KeySensor
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
