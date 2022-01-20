@@ -1,5 +1,5 @@
 ---
-database_name: dw_janus
+database_name: dw_public
 table_name: dim_lead
 columns:
   sk_lead:

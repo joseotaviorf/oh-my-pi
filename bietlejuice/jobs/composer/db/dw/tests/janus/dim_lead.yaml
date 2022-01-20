@@ -1,4 +1,0 @@
-# Migration file for dim_lead
-dw_schema: public
-base_date_column: criado_em
-sample_size_months: 6

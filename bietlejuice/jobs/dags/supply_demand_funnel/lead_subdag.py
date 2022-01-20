@@ -29,7 +29,7 @@ class LeadSubDag(DimSubDag):
 
         ods_lead_sales_company_task, ods_reprocessed_lead_task, ods_lead_score_factor_task, \
             ods_lead_origin_task, ods_lead_first_event_tracking_task, ods_lead_task, \
-            staging_dim_lead_task, dw_dim_lead_task = self.__build_data_tasks(lead_dag)
+            staging_dim_lead_task = self.__build_data_tasks(lead_dag)
 
         tests_tasks = self.build_tests_tasks(lead_dag)
 
@@ -38,7 +38,6 @@ class LeadSubDag(DimSubDag):
              ods_lead_sales_company_task])
         airflow_helpers.chain(ods_lead_task, ods_lead_first_event_tracking_task, staging_dim_lead_task)
         staging_dim_lead_task.set_downstream(tests_tasks)
-        dw_dim_lead_task.set_upstream(tests_tasks)
 
         return lead_dag
 
@@ -128,16 +127,5 @@ class LeadSubDag(DimSubDag):
             }
         )
 
-        dw_dim_lead_task = BaseDAG.build_python_operator(
-            dag=dag,
-            task_id='DW_dim_lead',
-            python_callable=utils.load_dim_from_staging_to_dw,
-            op_kwargs={
-                'dim_name': 'lead',
-                'bucket': self.bucket
-            }
-        )
-
         return ods_lead_sales_company_task, ods_reprocessed_lead_task, ods_lead_score_factor_task, \
-            ods_lead_origin_task, ods_lead_first_event_tracking_task, ods_lead, staging_dim_lead_task, \
-            dw_dim_lead_task
+            ods_lead_origin_task, ods_lead_first_event_tracking_task, ods_lead, staging_dim_lead_task

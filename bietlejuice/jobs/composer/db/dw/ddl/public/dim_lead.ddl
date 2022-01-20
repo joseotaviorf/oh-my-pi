@@ -1,5 +1,5 @@
-drop table if exists janus.dim_lead;
-create table if not exists janus.dim_lead
+drop table if exists public.dim_lead;
+create table if not exists public.dim_lead
 (
  sk_lead bigint,
  id bigint,
@@ -67,4 +67,4 @@ create table if not exists janus.dim_lead
  load_timestamp timestamp without time zone
 );
 
-ALTER TABLE janus.dim_lead OWNER TO airflow;
+ALTER TABLE public.dim_lead OWNER TO databricks;
