@@ -121,8 +121,8 @@ listing as (
     select cast(id_house as bigint) as id_house,
         cast(max(sk_house_listing) as bigint) as sk_house_listing
     from datalake_clean.ods_dim_house_listing
-    where sk_house_listing > ''
-        and id_house > ''
+    where cast(sk_house_listing as varchar) > ''
+        and cast(id_house as varchar) > ''
     group by 1),
 
 -- Completed Talk to Agent accounting from AgentSupport (mainly after 2020/05/20)
@@ -143,7 +143,7 @@ registered_tta as (
         on cast(u.dados_agente_id as bigint) = a.agent_id
     join listing l
         on cast(h.sk_house_listing as bigint) = cast(l.sk_house_listing as bigint)
-    where h.id_house > ''
+    where cast(h.id_house as varchar) > ''
         and u.dados_agente_id IS NOT NULL
         and a.status = 'COMPLETE' --here at this stage of Prod. Dev. we want to account only for Completed Talk to Agents
     group by 1,2,3 -- Only count one attendance for the triple agent-tenant-house
@@ -265,9 +265,9 @@ left join datalake_clean.ods_dim_user sa
 
 -- version of the moment the tenant has sent the message
 join datalake_clean.ods_dim_house_listing m
-    on e.house_id = cast(nullif(m.id_house,'') as bigint)
-    and ts_listing_version_start <  e.first_message_ts
-    and (ts_listing_version_end='' or ts_listing_version_end > e.first_message_ts)
+    on e.house_id = cast(nullif(cast(m.id_house as varchar),'') as bigint)
+    and cast(ts_listing_version_start as varchar) <  e.first_message_ts
+    and (cast(ts_listing_version_end as varchar)='' or cast(ts_listing_version_end as varchar) > e.first_message_ts)
 
 -- marketing taxonomy
 join tta_taxonomy mkt

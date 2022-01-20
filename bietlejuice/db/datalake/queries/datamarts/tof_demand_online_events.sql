@@ -3,10 +3,10 @@ last_version_listings as (
 select
 	id_house,
 	sk_house_listing,
-	cast(nullif(ts_listing_version_start, '') as timestamp) as ts_listing_version_start,
-	cast(nullif(ts_listing_version_end, '') as timestamp) as ts_listing_version_end
+	cast(nullif(cast(ts_listing_version_start as varchar), '') as timestamp) as ts_listing_version_start,
+	cast(nullif(cast(ts_listing_version_end as varchar), '') as timestamp) as ts_listing_version_end
 from datalake_clean.ods_dim_house_listing
-where cast(nullif(version, '') as bigint) > 0
+where cast(nullif(cast(version as varchar), '') as bigint) > 0
 )
 select
   date_trunc('week', date(ts_event)) as event_week,
@@ -30,7 +30,7 @@ select
 	cast(json_extract_scalar(user_properties, '$.utm_term') as varchar) as utm_term
 from datalake_amplitude_clean_prod.events ev
 left join last_version_listings lvl
-  on trim(json_extract_scalar(ev.event_properties, '$["house_id"]'))  = lvl.id_house
+  on trim(json_extract_scalar(ev.event_properties, '$["house_id"]'))  = cast(lvl.id_house as varchar)
   and ts_event between ts_listing_version_start and (coalesce(ts_listing_version_end, current_timestamp) - interval '1' second)
 where
 	date(ts_event) >= current_date - interval '45' day
