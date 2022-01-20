@@ -134,12 +134,13 @@ who_is_living_base as (
 ),
 house_weekly_entrance as (
 select
-    hds.id_house,
-    hds.week_start,
-    hds.week_end,
-    klb.key_location_history,
-    ktb.key_type_history,
-    wlb.who_is_living_history
+    CAST(hds.id_house AS VARCHAR) AS id_house,
+    CAST(hds.week_start AS VARCHAR) AS week_start,
+    CAST(hds.week_end AS VARCHAR) AS week_end,
+    CAST(klb.key_location_history AS VARCHAR) AS key_location_history,
+    CAST(ktb.key_type_history AS VARCHAR) AS key_type_history,
+    CAST(wlb.who_is_living_history AS VARCHAR) AS who_is_living_history,
+    CAST(NOW() AS VARCHAR) AS ts_load
 from house_date_series hds
 left join key_location_base klb
     on klb.id_house = hds.id_house and hds.week_end = klb.week_end
