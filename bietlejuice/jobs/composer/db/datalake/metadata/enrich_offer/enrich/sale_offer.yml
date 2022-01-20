@@ -41,6 +41,9 @@ columns:
     lineage:
       - datalake_firestore.monday.id_closing_specialist
       - datalake_sale_offer_flows.sale_offer_flows.id_closing_specialist
+  id_vendas:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.id_sales_flow
   team_lead_name:
     lineage:
       - datalake_gsheets.sale_hub_offer.team_lead_name
@@ -64,6 +67,7 @@ columns:
   monday_status:
     lineage:
       - datalake_firestore.monday.status
+      - datalake_sale_offer_flows.sale_offer_flows.flow_step
   credit_model:
     lineage:
       - datalake_firestore.monday.credit_model
@@ -95,6 +99,7 @@ columns:
   payment_model:
     lineage:
       - datalake_firestore.monday.payment_model
+      - datalake_sale_offer_flows.sale_offer_flows.payment_model
   credit_status:
     lineage:
       - datalake_firestore.monday.credit_status
@@ -113,6 +118,7 @@ columns:
   tags_from_salesflow:
     lineage:
       - datalake_firestore.monday.tags_from_salesflow
+      - datalake_sale_offer_flows.sale_offer_flows.tags_from_salesflow
   sale_agreement_status:
     lineage:
       - datalake_firestore.monday.sale_agreement_status
@@ -143,6 +149,7 @@ columns:
   diligence_appointment_reason:
     lineage:
       - datalake_firestore.monday.diligence_appointment_reason
+      - datalake_sale_offer_flows.sale_offer_flows.diligence_appointment_reason
   current_payment_method:
     lineage:
       - datalake_firestore.sale_offer.current_payment_method

@@ -110,7 +110,6 @@ work_contract AS (
             du.id AS user_id,
             contract.contract_name,
             agent_contract_timestamp,
-            du.dadosagente_ativo,
             RANK() OVER (
                 PARTITION BY agent_id
                 ORDER BY
@@ -162,7 +161,6 @@ work_contract AS (
             ORDER BY
                 r DESC
             ) AS ts_work_contract_end,
-        dadosagente_ativo,
         r
     FROM
         base_agents
@@ -308,6 +306,7 @@ data_sources AS (
         --data from vendas
         vo.id_offer AS vo_id_offer,
         vo.vendas_offer_status,
+        vo.flow_step AS vo_flow_step,
         vo.id_sales_flow AS id_vendas,
         vo.ts_accepted AS vo_offer_accepted_date,
         vo.ts_discarded AS vo_offer_dismissed_date,
@@ -322,16 +321,19 @@ data_sources AS (
         vo.sale_agreement_cancellation_reason AS vo_sale_agreement_cancellation_reason,
         vo.drop_reason AS vo_drop_reason,
         vo.drop_reason_responsible AS vo_drop_reason_responsible,
+        vo.diligence_appointment_reason AS vo_diligence_appointment_reason,
         vo.credit_model AS vo_credit_model,
         vo.closing_status AS vo_closing_status,
         vo.house_dilligence_status AS vo_house_dilligence_status,
         vo.seller_dilligence_status AS vo_seller_dilligence_status,
         vo.report_dilligence_status AS vo_report_dilligence_status,
         vo.bank_analysis_status AS vo_bank_analysis_status,
+        vo.payment_model AS vo_payment_model, 
         vo.payment_status AS vo_payment_status,
         vo.credit_status AS vo_credit_status,
         vo.notary_office_status AS vo_notary_office_status,
         vo.real_estate_register_office_status AS vo_real_estate_register_office_status,
+        vo.tags_from_salesflow AS vo_tags_from_salesflow,
         vo.has_seller_debt_payments AS vo_has_seller_debt_payments,
         vo.is_ccv_canceled AS vo_is_ccv_canceled,
         vo.dt_sale_transacton_paid AS vo_dt_sale_transacton_paid,
@@ -534,7 +536,7 @@ business_rules AS (
         off.offer_flow,
         bu.business_unit,
         ofp.offer_portfolio_start_date,
-        monday_status,
+        COALESCE(vo_flow_step, monday_status) AS monday_status,
         id_user_agent,
         CASE 
             WHEN (vo_sk_team_lead IS NOT NULL 
@@ -638,12 +640,12 @@ business_rules AS (
         COALESCE(vo_report_dilligence_status, mo_report_dilligence_status) AS report_dilligence_status,
         COALESCE(vo_bank_analysis_status, mo_bank_analysis_status) AS bank_analysis_status,
         COALESCE(vo_payment_status, mo_payment_status) AS payment_status,
-        mo_payment_model AS payment_model,
+        COALESCE(vo_payment_model, mo_payment_model) AS payment_model,
         COALESCE(vo_credit_status, mo_credit_status) AS credit_status,
         COALESCE(vo_notary_office_status, mo_notary_office_status) AS notary_office_status,
         COALESCE(vo_real_estate_register_office_status, mo_real_estate_register_office_status) AS real_estate_register_office_status,
         mo_early_keys_status AS early_keys_status,
-        mo_tags_from_salesflow AS tags_from_salesflow,
+        COALESCE(vo_tags_from_salesflow, mo_tags_from_salesflow) AS tags_from_salesflow,
         COALESCE(vo_has_seller_debt_payments, mo_has_seller_debt_payments) AS has_seller_debt_payments,
         COALESCE(vo_is_ccv_canceled, mo_is_ccv_canceled) AS is_ccv_canceled,
         COALESCE(vo_dt_sale_transacton_paid, mo_dt_sale_transacton_paid) AS dt_sale_transacton_paid,
@@ -667,7 +669,7 @@ business_rules AS (
                 THEN 'Seller'
             ELSE 'Other'
         END AS drop_reason_responsible,
-        mo_diligence_appointment_reason AS diligence_appointment_reason,
+        COALESCE(vo_diligence_appointment_reason, mo_diligence_appointment_reason) AS diligence_appointment_reason,
         CASE 
             WHEN rk.buyer_rank_offers = 1 
                 THEN TRUE 
@@ -729,6 +731,7 @@ SELECT
     id_consultant,
     id_booking,
     id_closing_specialist,
+    id_vendas,
     current_payment_method,
     planned_payment_method,
     team_lead_name,

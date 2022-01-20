@@ -279,7 +279,7 @@ payment AS (
         p.id as id_payment,
         p.id_sales_flow,
         p.status,
-        p.payment_method
+        p.payment_model
     FROM
         datalake_sales_flow_clean.payment AS p
     INNER JOIN 
@@ -368,6 +368,28 @@ diligence AS (
         ON d.id_diligence = lud.id_diligence
         AND d.ts_updated = lud.ts_last_updated
 ),
+-- DILIGENCE APPOINTMENT
+last_update_diligence_appointment AS (
+    SELECT
+        id_diligence_appointment,
+        MAX(ts_updated) AS ts_last_updated
+    FROM
+        datalake_sales_flow_clean.diligence_appointment
+    GROUP BY
+        id_diligence_appointment
+),
+diligence_appointment AS (
+  SELECT
+      da.id_diligence,
+      concat_ws(' - ',collect_set(appointment)) AS appointment
+  FROM
+      datalake_sales_flow_clean.diligence_appointment as da
+  INNER JOIN 
+      last_update_diligence_appointment AS luda
+        ON da.id_diligence_appointment = luda.id_diligence_appointment
+        AND da.ts_updated = luda.ts_last_updated        
+  GROUP BY id_diligence
+),
 -- HOUSE CTE
 last_update_house AS (
     SELECT
@@ -410,6 +432,32 @@ rescission AS (
         last_update_rescission AS lur 
         ON r.id_rescission = lur.id_rescission
         AND r.ts_updated = lur.ts_last_updated
+),
+-- TAG CTE
+last_update_tag AS (
+    SELECT
+        id,
+        MAX(ts_updated) AS ts_last_updated
+    FROM
+        datalake_sales_flow_clean.tag
+    GROUP BY
+        id
+),
+tag AS (
+    SELECT
+        id_sales_flow,
+        concat_ws('; ',collect_set(concat('#',label))) AS label
+    FROM
+        datalake_sales_flow_clean.sales_flow_tag AS sftag
+    INNER JOIN
+        datalake_sales_flow_clean.tag AS tag
+            ON sftag.id_tag = tag.id
+    INNER JOIN 
+        last_update_tag AS lut
+            ON tag.id = lut.id
+            AND tag.ts_updated = lut.ts_last_updated
+    GROUP BY
+        id_sales_flow
 )
 SELECT
     off.id_offer,
@@ -419,7 +467,29 @@ SELECT
     sp.sk_user_team_lead,
     sp.sk_team_lead,
     mg.bank AS financing_bank,
-    sf.flow_step,
+    CASE  
+        WHEN sf.flow_step = 'CANCELED_ON_NEGOTIATION'
+        THEN 'Canceladas em negociação'
+        WHEN sf.flow_step = 'PROPOSAL_ON_VALIDATION'
+        THEN 'Propostas em validação'
+        WHEN sf.flow_step = 'PURCHASE_SALE_COMPLETED'
+        THEN 'Compra e Venda Concluídas'
+        WHEN sf.flow_step = 'POST_CCV'
+        THEN 'Pós CCV'
+        WHEN sf.flow_step = 'CANCELED_ON_VALIDATION'
+        THEN 'Canceladas em validação'
+        WHEN sf.flow_step = 'CANCELED_POST_ACCEPTED'
+        THEN 'Canceladas pós Aceite'
+        WHEN sf.flow_step = 'CANCELED_CCV'
+        THEN 'CCV - Cancelado'
+        WHEN sf.flow_step = 'PROPOSAL_ONGOING'
+        THEN 'Propostas Ongoing'
+        WHEN sf.flow_step = 'PROPOSAL_ACCEPTED'
+        THEN 'Propostas Aceitas'
+        WHEN sf.flow_step = 'POST_CCV_HUB_CT'
+        THEN 'Pós CCV Hub CT'
+        ELSE sf.flow_step
+    END AS flow_step,
     off.status as vendas_offer_status,
     ccvf.status AS sale_agreement_status,
     sf.flow_type AS negotiation_model,
@@ -442,12 +512,14 @@ SELECT
         ELSE 'Other'
     END AS drop_reason_responsible,
     mg.credit_model AS credit_model,
+    p.payment_model,
     sp.consultant_name,
     sp.consultant_email,
     sp.team_lead_name,
     sp.team_lead_email,
     sf.status_closing AS closing_status,
     d.classification AS house_dilligence_status,
+    da.appointment AS diligence_appointment_reason,
     sf.status AS seller_dilligence_status,
     d.step AS report_dilligence_status,
     mg.status AS bank_analysis_status,
@@ -455,6 +527,7 @@ SELECT
     mg.credit_status AS credit_status,
     n.status AS notary_office_status,
     cp.crn_details AS real_estate_register_office_status,
+    tag.label AS tags_from_salesflow,
     off.sale_price AS sale_price_agreed,
     CASE
         WHEN DATE(off.ts_accepted) <= DATE(off.ts_discarded) 
@@ -516,7 +589,7 @@ LEFT JOIN
     ccv_flow AS ccvf 
         ON ccvf.id_sales_flow = off.id_sales_flow
 LEFT JOIN 
-    payment AS p 
+    payment AS p
         ON p.id_sales_flow = off.id_sales_flow
 LEFT JOIN 
     cash_payment AS cp 
@@ -527,9 +600,15 @@ LEFT JOIN
 LEFT JOIN 
     diligence AS d 
         ON d.id_sales_flow = off.id_sales_flow
+LEFT JOIN
+    diligence_appointment AS da
+        ON da.id_diligence = d.id_diligence
 LEFT JOIN 
     house AS h 
         ON h.id = sf.id_house
 LEFT JOIN 
     rescission AS r 
         ON r.id_sales_flow = off.id_sales_flow
+LEFT JOIN
+    tag
+        ON tag.id_sales_flow = off.id_sales_flow

@@ -984,3 +984,6 @@ bietlejuice.enrich_sale_offer_flows:
   - bietlejuice.sales_flow:load-clean-notary
   - bietlejuice.sales_flow:load-clean-diligence
   - bietlejuice.sales_flow:load-clean-house
+  - bietlejuice.sales_flow:load-clean-tag
+  - bietlejuice.sales_flow:load-clean-sales-flow-tag
+  - bietlejuice.sales_flow:load-clean-diligence-appointment

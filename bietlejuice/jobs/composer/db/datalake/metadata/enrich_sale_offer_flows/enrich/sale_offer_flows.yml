@@ -53,6 +53,9 @@ columns:
   credit_model:
     lineage:
       - datalake_sales_flow_clean.mortgage.credit_model
+  payment_model:
+    lineage:
+      - datalake_sales_flow_clean.payment.payment_model
   consultant_name:
     lineage:
       - datalake_sales_flow_clean.specialist.specialist_name
@@ -71,6 +74,9 @@ columns:
   house_dilligence_status:
     lineage:
       - datalake_sales_flow_clean.diligence.classification
+  diligence_appointment_reason:
+    lineage:
+      - datalake_sales_flow_clean.diligence_appointment.appointment
   seller_dilligence_status:
     lineage:
       - datalake_sales_flow_clean.sales_flow.status
@@ -92,6 +98,9 @@ columns:
   real_estate_register_office_status:
     lineage:
       - datalake_sales_flow_clean.cash_payment.crn_details
+  tags_from_salesflow:
+    lineage:
+      - datalake_sales_flow_clean.tag.label
   sale_price_agreed:
     lineage:
       - datalake_sales_flow_clean.offer.sale_price
