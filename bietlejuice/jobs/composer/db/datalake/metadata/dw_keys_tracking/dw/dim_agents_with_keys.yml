@@ -14,6 +14,12 @@ columns:
   all_id_agents:
     lineage:
       - datalake_ebdb_listing.agents_with_keys.all_id_agents
+  days_cs_to_return:
+    lineage:
+      - datalake_ebdb_listing.agents_with_keys.days_cs_to_return
+  days_publication_to_attribution:
+    lineage:
+      - datalake_ebdb_listing.agents_with_keys.days_publication_to_attribution
   has_keys_with_agent_attributed:
     lineage:
       - datalake_ebdb_listing.agents_with_keys.has_keys_with_agent_attributed
@@ -32,18 +38,30 @@ columns:
   is_keys_with_agent_opt_in:
     lineage:
       - datalake_ebdb_listing.agents_with_keys.is_keys_with_agent_opt_in
-  dt_attributed:
+  is_fss:
     lineage:
-      - datalake_ebdb_listing.agents_with_keys.dt_attributed
-  dt_delivered:
+      - datalake_ebdb_listing.agents_with_keys.is_fss
+  ts_attributed:
     lineage:
-      - datalake_ebdb_listing.agents_with_keys.dt_delivered
-  dt_optin:
+      - datalake_ebdb_listing.agents_with_keys.ts_attributed
+  ts_contract_signed:
     lineage:
-      - datalake_ebdb_listing.agents_with_keys.dt_optin
-  dt_publicated:
+      - datalake_ebdb_listing.agents_with_keys.ts_contract_signed
+  ts_delivered:
     lineage:
-      - datalake_ebdb_listing.agents_with_keys.dt_publicated
-  dt_returned:
+      - datalake_ebdb_listing.agents_with_keys.ts_delivered
+  ts_first_vc:
     lineage:
-      - datalake_ebdb_listing.agents_with_keys.dt_returned
+      - dw_public.dim_booking.dt_scheduling
+  ts_first_vc_attributed:
+    lineage:
+      - dw_public.dim_booking.dt_scheduling
+  ts_optin:
+    lineage:
+      - datalake_ebdb_listing.agents_with_keys.ts_optin
+  ts_publicated:
+    lineage:
+      - datalake_ebdb_listing.agents_with_keys.ts_publicated
+  ts_returned:
+    lineage:
+      - datalake_ebdb_listing.agents_with_keys.ts_returned
