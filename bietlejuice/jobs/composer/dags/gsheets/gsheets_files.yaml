@@ -650,15 +650,20 @@ sale_tof_weekly_targets:
     sheet_name: sale_tof_weekly_targets
     clean_table_name: sale_tof_weekly_targets
 
+schedule:
+    sheet_id: 1wIwrWi0xlY4TAZnE6JlGm6B0UyezOPxfF5s0_pn-i9E
+    sheet_name: Schedule
+    clean_table_name: department_schedule
+
 secretariat_hierarchy:
     sheet_id: 1JTWdWtoDrjoSD3pmf_-eks8ycXDN0V776jWegCw_M1M
     sheet_name: secretariat_hierarchy
     clean_table_name: secretariat_hierarchy
 
-schedule:
-    sheet_id: 1wIwrWi0xlY4TAZnE6JlGm6B0UyezOPxfF5s0_pn-i9E
-    sheet_name: Schedule
-    clean_table_name: department_schedule
+service_city_holidays:
+    sheet_id: 1wSYZjHde5RuFJQRigRFFIDiW4hpSOAtk88i6bkuwocI
+    sheet_name: data_extraction
+    clean_table_name: service_city_holidays
 
 supply_targets_2019:
     sheet_id: 1Nxh1_mAsyr3tkChizMyYc4QIg3jTR1YNGAenjy9NWKQ

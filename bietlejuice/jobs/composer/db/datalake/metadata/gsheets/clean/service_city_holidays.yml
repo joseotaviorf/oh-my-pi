@@ -1,0 +1,25 @@
+---
+database_name: datalake_gsheets_clean
+table_name: service_city_holidays
+columns:
+  id_city:
+    lineage:
+      - datalake_gsheets_raw.service_city_holidays.id_city
+  category:
+    lineage:
+      - datalake_gsheets_raw.service_city_holidays.Categoria
+  city:
+    lineage:
+      - datalake_gsheets_raw.service_city_holidays.Cidade
+  description:
+    lineage:
+      - datalake_gsheets_raw.service_city_holidays.Feriado_Nome
+  regional:
+    lineage:
+      - datalake_gsheets_raw.service_city_holidays.Regional
+  state:
+    lineage:
+      - datalake_gsheets_raw.service_city_holidays.Estado
+  dt_holiday:
+    lineage:
+      - datalake_gsheets_raw.service_city_holidays.Data
