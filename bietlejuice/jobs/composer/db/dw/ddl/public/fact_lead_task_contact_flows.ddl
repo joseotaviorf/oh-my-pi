@@ -1,4 +1,5 @@
-DROP TABLE IF EXISTS public.fact_lead_task_contact_flows ;
+DROP TABLE IF EXISTS public.fact_lead_task_contact_flows;
+
 CREATE TABLE public.fact_lead_task_contact_flows (
     sk_lead BIGINT,
     sk_task VARCHAR(64),
@@ -14,5 +15,7 @@ CREATE TABLE public.fact_lead_task_contact_flows (
     ts_first_connection TIMESTAMP,
     is_mailing_active BOOLEAN,
     is_mailing_paused BOOLEAN,
-    ts_load TIMESTAMP default getdate()
+    ts_load TIMESTAMP
 );
+
+ALTER TABLE public.fact_lead_task_contact_flows OWNER TO databricks;

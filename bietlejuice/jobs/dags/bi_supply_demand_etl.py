@@ -505,17 +505,6 @@ ods_house_listing_flows = BaseDAG.build_python_operator(
     op_kwargs={"table_name": "fact_house_listing_flows"},
 )
 
-fact_lead_task_contact_flows_task = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id="Fact_Lead_Task_Contact_Flows",
-    python_callable=create_table_in_db_from_datalake,
-    op_kwargs={
-        "query_params": {"task_types": "'ConverterLead', 'ConverterLeadPrioritario'"},
-        "table_name": "fact_lead_task_contact_flows",
-    },
-)
-
-
 ods_credit_evaluation_task = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id="ODS_credit_evaluation",
