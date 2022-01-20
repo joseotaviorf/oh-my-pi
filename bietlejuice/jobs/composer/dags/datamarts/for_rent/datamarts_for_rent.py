@@ -10,47 +10,53 @@ from airflow.operators.quintoandar_databricks import (
 )
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
+from bietlejuice.jobs.composer.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.jobs.composer.services import FileService
+from bietlejuice.jobs.composer.services.configuration_service import (
+    ConfigurationService,
+)
 
 # DAG params
-DAG_NAME = "datamarts"
-DAG_ID = f"bietlejuice.{DAG_NAME}"
+SCHEMA = "datamarts"
+CONTEXT = "for_rent"
+DAG_NAME = f"{SCHEMA}_{CONTEXT}"
+DAG_ID = f"bietlejuice.{SCHEMA}_{CONTEXT}"
+INTERMEDIATE_PATH = f'{SCHEMA}/{CONTEXT}'
 ENV = os.environ.get("ENVIRONMENT")
-SPECTRUM_IAM_ROLE = Variable.get("spectrum_iam_role")
-DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
+
+config_service = ConfigurationService(dag_name=DAG_NAME, intermediate_path=INTERMEDIATE_PATH)
+athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
+dw_bucket = config_service.get_config("dw_bucket")
+databricks_bietlejuice_repo_path = config_service.get_config(
+    "databricks_bietlejuice_repo_path"
+)
+spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
+spectrum_iam_role = config_service.get_config("spectrum_iam_role")
+doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+
 
 local_tz = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 1, 15, 0, 0, 0, tzinfo=local_tz)
-MAIN_SCHEDULE_INTERVAL = "0 9 * * *"
 
 # S3 paths setup
-S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/{DAG_NAME}/"
-BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
-LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
-    Variable.get("databricks_s3_bucket"), DAG_NAME
-)
+SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{INTERMEDIATE_PATH}/"
+BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 
 # cluster setup
 CLUSTER_DESCRIPTION = Variable.get(
     "databricks_datamarts_cluster", deserialize_json=True
 )
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
+    "destination"
+] = f"{spark_jobs_logs_path}{DAG_ID}"
 LIBRARIES_DESCRIPTION = Variable.get(
     "bietlejuice_default_libraries", deserialize_json=True
 )
 
-config_file_path = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), f"{DAG_NAME}.yml"
-)
-pipeline_config = FileService.get_dict_from_yaml_file(config_file_path).get(
-    "pipeline", {}
-)
+pipeline_config = config_service.get_config('pipeline') or {}
 
-DW_BUCKET = Variable.get("dw_bucket")
 DW_SCHEMA = "datamarts"
-
 
 def validate_pipeline_steps(entity_name, entity_pipeline):
     if "dw" not in entity_pipeline:
@@ -83,7 +89,7 @@ def build_entity_subdag(subdag_name, entity_name, entity_pipeline):
     entity_subdag = BaseSubDAG(
         sub_dag_name=subdag_name,
         dag_name=DAG_ID,
-        schedule_interval=MAIN_SCHEDULE_INTERVAL,
+        schedule_interval=None,
         start_date=MAIN_START_DATE,
     )._build_local_dag()
 
@@ -94,6 +100,7 @@ def build_entity_subdag(subdag_name, entity_name, entity_pipeline):
     schema = get_option(
         entity_pipeline["dw"], "schema"
     )  # TODO this value is not used in the job
+    runs_on = get_option(entity_pipeline["dw"], "runs_on")
 
     slugged_table_name = table.replace("_", "-")
     create_table_in_datalake_task = QuintoAndarDatabricksSubmitRunOperator(
@@ -102,7 +109,7 @@ def build_entity_subdag(subdag_name, entity_name, entity_pipeline):
         json={
             "spark_python_task": {
                 "python_file": f"{SPARK_JOBS_PATH}create_datamart_table_in_datalake.py",
-                "parameters": [ENV, DW_BUCKET, DW_SCHEMA, schema, table, sql_file],
+                "parameters": [ENV, dw_bucket, athena_query_results_bucket, DW_SCHEMA, schema, table, sql_file, runs_on],
             }
         },
     )
@@ -113,7 +120,7 @@ def build_entity_subdag(subdag_name, entity_name, entity_pipeline):
         json={
             "spark_python_task": {
                 "python_file": f"{SPARK_JOBS_PATH}load_datamart_table_into_redshift.py",
-                "parameters": [ENV, DW_BUCKET, SPECTRUM_IAM_ROLE, DW_SCHEMA, table],
+                "parameters": [ENV, dw_bucket, spectrum_iam_role, DW_SCHEMA, table],
             }
         },
     )
@@ -125,7 +132,7 @@ def build_entity_subdag(subdag_name, entity_name, entity_pipeline):
             "spark_python_task": {
                 "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables.py",
                 "parameters": [
-                    DW_BUCKET,
+                    dw_bucket,
                     LayerEnum.DW.value,
                     DW_SCHEMA,
                     "--table-name",
@@ -146,14 +153,14 @@ def build_entity_subdag(subdag_name, entity_name, entity_pipeline):
 DAG = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": BaseDAG.DEFAULT_OWNER,
+        "owner": DAGOwnerEnum.DATA_FOR_RENT,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    schedule_interval=None,
     doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
-        chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
+        chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
 )
 

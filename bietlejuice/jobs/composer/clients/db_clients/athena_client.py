@@ -67,7 +67,7 @@ class AthenaClient(DBClient):
         return result
 
     @logger
-    def run(self, command, autocommit=False, parameters=None):
+    def run(self, command, autocommit=False, parameters=None, return_query_id=False):
         response = self.conn.start_query_execution(
             QueryString=command,
             QueryExecutionContext=self.query_context,
@@ -84,6 +84,9 @@ class AthenaClient(DBClient):
                 "m=run, query_execution_id={}, msg=Query "
                 "failed, e={}".format(query_execution_id, reason)
             )
+
+        if return_query_id:
+            return query_execution_id
 
     def _poll_query_status(self, query_execution_id, max_tries=None):
         """

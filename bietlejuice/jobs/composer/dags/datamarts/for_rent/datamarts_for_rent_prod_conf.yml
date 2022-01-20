@@ -1,0 +1,20 @@
+pipeline:
+  ##<KEEP THIS COMMENTED AS A TEMPLATE>
+  # <task-name-like-attribution-conversion-paths>:
+  #   dw:
+  #     sql_file: <query-file E.g: dw/queries/datamarts/offer_attribution_conversion_paths_demand.sql>
+  #     table: <targe-table-name>
+  #     schema: <target-schema-name> # TODO this will always be `datamart` (for both datalake and dw). This var is not used anymore
+  #     runs_on: <backend-to-run-the-query> E.g: redshift or athena
+  weekly_demand_metrics:
+    dw:
+      sql_file: dw/queries/datamarts/for_rent/weekly_demand_metrics.sql
+      table: weekly_demand_metrics
+      schema: datamarts
+      runs_on: redshift
+  house_weekly_entrance_info:
+    dw:
+      sql_file: dw/queries/datamarts/for_rent/house_weekly_entrance_info.sql
+      table: house_weekly_entrance_info
+      schema: datamarts
+      runs_on: athena

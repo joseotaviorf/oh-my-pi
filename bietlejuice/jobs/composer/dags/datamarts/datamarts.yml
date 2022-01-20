@@ -1,7 +1,0 @@
-pipeline:
-  ##<KEEP THIS COMMENTED AS A TEMPLATE>
-  # <task-name-like-attribution-conversion-paths>:
-  #   dw:
-  #     sql_file: <query-file E.g: dw/queries/datamarts/offer_attribution_conversion_paths_demand.sql>
-  #     table: <targe-table-name>
-  #     schema: <target-schema-name> # TODO this will always be `datamart` (for both datalake and dw). This var is not used anymore

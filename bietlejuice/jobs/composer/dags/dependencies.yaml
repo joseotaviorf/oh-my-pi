@@ -12,6 +12,16 @@
 bietlejuice.catalog_product_entities:
   - bietlejuice.enrich_bigid:load-enrich-bigid-entities-access-level
 
+bietlejuice.datamarts_for_rent:
+  - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
+  - bietlejuice.ebdb:create-clean-access-authorization-type-in-data-lake
+  - bietlejuice.ebdb:create-clean-access-type-in-data-lake
+  - bietlejuice.ebdb:create-clean-access-type-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.ebdb:create-clean-key-type-in-data-lake
+  - bietlejuice.ebdb:create-clean-occupant-type-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
+
 bietlejuice.dw_affiliate_costs:
   - bietlejuice.enrich_robin_hood
 

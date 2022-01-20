@@ -1,8 +1,8 @@
-## Datamarts
+## Datamarts For Rent
 
 ### Purpose
 
-Creates/updates the datamart tables in data lake and DW.
+Creates/updates the datamart tables, for the context of Rental, in data lake and DW.
 
 ### Execution Interval
 
