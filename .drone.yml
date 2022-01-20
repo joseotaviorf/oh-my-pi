@@ -208,8 +208,7 @@ pipeline:
     environment:
       ENVIRONMENT: forno
     commands:
-      - make requirements-python3
-      - make requirements-test-python3
+      - make requirements-scripts-python3
       - make validate-dags-dependencies
     when:
       event: push
@@ -223,8 +222,7 @@ pipeline:
     environment:
       ENVIRONMENT: prod
     commands:
-      - make requirements-python3
-      - make requirements-test-python3
+      - make requirements-scripts-python3
       - make validate-dags-dependencies
     when:
       event: push

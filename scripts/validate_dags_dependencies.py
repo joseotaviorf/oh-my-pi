@@ -8,11 +8,11 @@ from typing import List
 BI_ETL_EJUICE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BI_ETL_EJUICE_ROOT)
 
-from bietlejuice.jobs.composer.base.db import QUERIES_DATALAKE_PATH
+from bietlejuice.jobs.composer.base.paths import QUERIES_DATALAKE_PATH
 from bietlejuice.jobs.composer.dags import COMPOSER_DAGS_PATH
 from bietlejuice.jobs.composer.services import FileService, ConfigurationService
 
-LAYERS = ['clean','enrich','dw','raw']
+LAYERS = ["clean", "enrich", "dw", "raw"]
 
 PRINT_ALL_PARSING_ERRORS = False
 COMPOSER_FILES_ROOT = f"{BI_ETL_EJUICE_ROOT}/bietlejuice/jobs/composer"
@@ -31,10 +31,13 @@ class CrossDAGDependenciesValidator:
     A task is valid if it has a SparkSQL file and the task name in dependency
      files follows the patterns.
     """
+
     def __init__(self) -> None:
         self.all_tables_by_dag_from_files = {}
         self.invalid_entities = {}
-        self.dags_out_of_pattern = ConfigurationService().get_config("dags_out_of_pattern")
+        self.dags_out_of_pattern = ConfigurationService().get_config(
+            "dags_out_of_pattern"
+        )
 
     @staticmethod
     def log_msg(msg, force_log=False):
@@ -55,7 +58,7 @@ class CrossDAGDependenciesValidator:
         if table:
             self.invalid_entities[dag].append(table)
 
-    def extract_dag_and_table_from_file(self,file_path):
+    def extract_dag_and_table_from_file(self, file_path):
         """
         Extracts the DAG and table names from the SparkSQL query file path.
 
@@ -65,10 +68,10 @@ class CrossDAGDependenciesValidator:
         :rtype: str, str
         """
         table_name = None
-        queries_index = file_path.index('queries')
+        queries_index = file_path.index("queries")
         queries_path = file_path[queries_index:]
-        dag_items = queries_path.split('/')[1:]
-        if  dag_items[1] not in LAYERS:
+        dag_items = queries_path.split("/")[1:]
+        if dag_items[1] not in LAYERS:
             dag_name = dag_items[0]
         else:
             dag_name = self.build_dag_name(dag_items[:-1])
@@ -85,7 +88,9 @@ class CrossDAGDependenciesValidator:
         """
         all_query_files = FileService.list_all_files_recursively(QUERIES_DATALAKE_PATH)
         for file_path in all_query_files:
-            dag_name, table_name = self.extract_dag_and_table_from_file(file_path = file_path)
+            dag_name, table_name = self.extract_dag_and_table_from_file(
+                file_path=file_path
+            )
             if not table_name:
                 self.register_into_invalid_list(dag_name)
                 self.log_msg(
@@ -194,8 +199,8 @@ class CrossDAGDependenciesValidator:
             DAGS_CROSS_DEPENDENCIES_FILE_PATH
         )
 
-        dags_without_tasks_in_dependencies_file = self.extract_dependent_dags_from_dependencies(
-            dependencies
+        dags_without_tasks_in_dependencies_file = (
+            self.extract_dependent_dags_from_dependencies(dependencies)
         )
 
         dags, tables_by_dag = self.extract_dependency_dags_and_tables_from_dependencies(
@@ -215,8 +220,8 @@ class CrossDAGDependenciesValidator:
         """
         dag_name = dag_items[0]
         # This validation gets all folder who has legacy pattern using full and incremental and will get the dag name from subfolders
-        if len(dag_items) >= 3 and dag_items[2] not in ('full', 'incremental'):
-                dag_name = dag_items[-1]
+        if len(dag_items) >= 3 and dag_items[2] not in ("full", "incremental"):
+            dag_name = dag_items[-1]
         return dag_name
 
     @staticmethod
@@ -229,8 +234,9 @@ class CrossDAGDependenciesValidator:
         :rtype: bool
         """
         dag_file = f"{COMPOSER_FILES_ROOT}/dags/**/{dag_name}.py"
-        validate_dag_file = glob.glob(dag_file, recursive= True)
-        return len(validate_dag_file) != 0 
+        validate_dag_file = glob.glob(dag_file, recursive=True)
+        return len(validate_dag_file) != 0
+
     def table_query_exists(self, dag, table):
         """
         Verifies if the table has a respective query file.
@@ -242,8 +248,8 @@ class CrossDAGDependenciesValidator:
         :rtype: bool
         """
         return (
-                dag in self.all_tables_by_dag_from_files
-                and table in self.all_tables_by_dag_from_files[dag]
+            dag in self.all_tables_by_dag_from_files
+            and table in self.all_tables_by_dag_from_files[dag]
         )
 
     def validate_dags(self, dags):
@@ -290,7 +296,10 @@ class CrossDAGDependenciesValidator:
         )
 
         self.load_tables_from_db_folder()
-        dags_without_tasks_in_file, tables_in_file = self.get_tables_from_dependency_file()
+        (
+            dags_without_tasks_in_file,
+            tables_in_file,
+        ) = self.get_tables_from_dependency_file()
 
         self.validate_dags(dags_without_tasks_in_file)
         self.validate_tables(tables_in_file)

@@ -1,2 +1,4 @@
+quintoandar-logger>=0.4.0
 sql-metadata==2.3.0
 yamale==3.0.8
+pconf==1.6.0

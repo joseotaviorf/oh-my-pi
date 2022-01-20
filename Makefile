@@ -141,7 +141,7 @@ requirements-scripts-python3:
 	@echo "Installing scripts packages"
 	@echo "=========="
 	@echo ""
-	@python -m pip install -r requirements3_scripts.txt
+	@python -m pip install -U -r requirements3_scripts.txt --extra-index-url https://quintoandar.github.io/python-package-server/
 
 .PHONY: lint-python3
 ## run black to fix code style
@@ -198,7 +198,7 @@ validate-dags-dependencies:
 	@echo "Validating DAGs dependencies"
 	@echo "=========="
 	@echo ""
-	@python scripts/validate_dags_dependencies.py
+	@PYTHONPATH=. python3 scripts/validate_dags_dependencies.py
 
 .PHONY: validate-atlas-metadata-files
 validate-atlas-metadata-files:
@@ -207,7 +207,7 @@ validate-atlas-metadata-files:
 	@echo "=========="
 	@echo ""
 	@git fetch --no-tags origin +refs/heads/master
-	@python scripts/atlas_metadata_validation/validate_atlas_metadata.py  "$(DRONE_BRANCH)"
+	@PYTHONPATH=. python3 scripts/atlas_metadata_validation/validate_atlas_metadata.py  "$(DRONE_BRANCH)"
 
 ############# common commands #######################
 

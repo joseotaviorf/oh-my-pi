@@ -7,7 +7,7 @@ from typing import Generator
 import yaml
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.db import (
+from bietlejuice.jobs.composer.base.paths import (
     QUERIES_DATALAKE_PATH,
     DATALAKE_METADATA_PATH,
     DATA_QUALITY_TESTS_PATH,
