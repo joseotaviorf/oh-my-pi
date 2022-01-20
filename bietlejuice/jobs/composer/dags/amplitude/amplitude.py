@@ -10,6 +10,9 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
 )
+from airflow.operators.quintoandar_dag_logger import (
+    QuintoAndarSuccessLoggerOperator,
+)
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
@@ -395,3 +398,12 @@ airflow_helpers.chain(
     update_clean_staging_subpartitioned_tables_athena_task,
     terminate_cluster_task,
 )
+
+
+# EC2 temporary dependency
+success_logger = QuintoAndarSuccessLoggerOperator(
+    dag=dag,
+    bucket="5a-datalake-prod",
+    aws_conn_id="aws_prod_data",
+)
+terminate_cluster_task >> success_logger

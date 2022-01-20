@@ -7,6 +7,9 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
+from airflow.operators.quintoandar_dag_logger import (
+    QuintoAndarSuccessLoggerOperator,
+)
 from airflow.utils.helpers import chain
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
@@ -28,6 +31,7 @@ DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = os.environ.get("ENVIRONMENT")
 
 config_service = ConfigurationService(DAG_NAME)
+datalake_bucket = config_service.get_config("datalake_bucket")
 spectrum_iam_role = config_service.get_config("spectrum_iam_role")
 dw_bucket = config_service.get_config("dw_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
@@ -86,3 +90,11 @@ chain(create_cluster_task, DWTaskGroup.all_first_tasks(dw_staging_task_group))
 TaskFlowHelper.chain_task_groups_via_common_table(dw_staging_task_group, dw_task_group)
 
 chain(DWTaskGroup.all_last_tasks(dw_task_group), terminate_cluster_task)
+
+# EC2 temporary dependency
+success_logger = QuintoAndarSuccessLoggerOperator(
+    dag=dag,
+    bucket="5a-datalake-prod",
+    aws_conn_id="aws_prod_data",
+)
+terminate_cluster_task >> success_logger

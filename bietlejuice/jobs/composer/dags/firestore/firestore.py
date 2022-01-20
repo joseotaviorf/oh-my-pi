@@ -7,6 +7,10 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
+from airflow.operators.quintoandar_dag_logger import (
+    QuintoAndarSuccessLoggerOperator,
+)
+
 from airflow.utils.helpers import chain
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
@@ -45,6 +49,7 @@ RAW_SPARK_JOB_FILE = (
 
 # cluster setup
 CLUSTER_DESCRIPTION = Variable.get("databricks_firestore_cluster", deserialize_json=True)
+CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = f"{spark_jobs_logs_path}{DAG_ID}"
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -109,3 +114,11 @@ chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(raw_task_groups))
 TaskFlowHelper.chain_task_groups_via_common_table(raw_task_groups, clean_task_groups)
 
 terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
+
+# EC2 temporary dependency
+success_logger = QuintoAndarSuccessLoggerOperator(
+    dag=dag,
+    bucket="5a-datalake-prod",
+    aws_conn_id="aws_prod_data",
+)
+terminate_cluster_task >> success_logger
