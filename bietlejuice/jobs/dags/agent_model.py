@@ -1,6 +1,6 @@
 import datetime as dt
 import json
-from datetime import datetime
+from datetime import datetime, date, timedelta
 
 from airflow.models import DAG
 
@@ -267,6 +267,21 @@ update_agent_region_ods = BaseDAG.build_python_operator(
     python_callable=upd_agent_region,
     op_kwargs=None
 )
+
+last_dep_execution_date = str(date.today() - timedelta(days=1))
+enrich_ebdb_agents_dep = S3KeySensor(
+    task_id="enrich_ebdb_agents_dep",
+    poke_interval=3*60,
+    timeout=2*60*60,
+    aws_conn_id="aws_prod_data",
+    bucket_name='5a-datalake-prod',
+    bucket_key="dags_execution_logs/{execution_date}/{dependency_dag}.SUCCESS".format(execution_date=last_dep_execution_date, dependency_dag='bietlejuice.enrich_ebdb_agents'),
+    dag=dag
+)
+
+enrich_ebdb_agents_dep >> update_agent_region_ods
+enrich_ebdb_agents_dep >> create_dim_agent_region_dw
+enrich_ebdb_agents_dep >> create_agent_contract_dw
 
 update_agent_region_ods >> group_agent_region_ods >> load_group_agent_region_dw >> create_dim_agent_region_dw
 create_dim_agent_region_dw.set_downstream(
