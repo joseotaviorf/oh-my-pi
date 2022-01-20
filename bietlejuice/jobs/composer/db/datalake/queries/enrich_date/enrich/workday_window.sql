@@ -65,7 +65,7 @@ SELECT
     CAST(id_date AS BIGINT) AS id_date,
     CAST(id_city AS BIGINT) AS id_city,
     city,
-    dt_reference,
+    dt_ref,
     MAX(CASE WHEN count_workdays = 1 THEN dt_workday ELSE NULL END) AS dt_start,
     MAX(CASE WHEN count_workdays = 1 THEN dt_workday ELSE NULL END) AS dt_end_1,
     MAX(CASE WHEN count_workdays = 2 THEN dt_workday ELSE NULL END) AS dt_end_2,

@@ -11,7 +11,7 @@ columns:
   city:
     lineage:
       - datalake_region.region.name
-  dt_reference:
+  dt_ref:
     lineage:
       - datalake_quintoandar.aux_date.date
   dt_start:
