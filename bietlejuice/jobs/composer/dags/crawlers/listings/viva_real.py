@@ -27,7 +27,7 @@ CONFIG_NAME = 'crawlers_listings'
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 ENV = os.environ.get("ENVIRONMENT")
 MAIN_START_DATE = datetime(2021, 8, 23, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "0 3 * * 1"
+MAIN_SCHEDULE_INTERVAL = "0 3 * * 3"
 
 config_service = ConfigurationService(dag_name = CONFIG_NAME, intermediate_path=INTERMEDIATE_PATH)
 
