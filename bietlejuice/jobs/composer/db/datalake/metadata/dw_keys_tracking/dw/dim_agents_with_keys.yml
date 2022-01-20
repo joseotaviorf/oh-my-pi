@@ -41,6 +41,9 @@ columns:
   is_fss:
     lineage:
       - datalake_ebdb_listing.agents_with_keys.is_fss
+  is_returned_on_time:
+    lineage:
+      - datalake_ebdb_listing.agents_with_keys.is_returned_on_time  
   ts_attributed:
     lineage:
       - datalake_ebdb_listing.agents_with_keys.ts_attributed

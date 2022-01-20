@@ -62,14 +62,15 @@ SELECT
     awk.is_keys_with_agent_eligible,
     awk.is_keys_with_agent_opt_in,
     awk.is_fss,
-    awk.ts_attributed,
-    awk.ts_contract_signed,
-    awk.ts_delivered,
-    uls.ts_first_scheduling AS ts_first_vc,
-    uls.ts_agent_scheduled AS ts_first_vc_attributed,
-    awk.ts_optin,
-    awk.ts_publicated,
-    awk.ts_returned,
+    awk.is_returned_on_time,
+    CAST(awk.ts_attributed AS TIMESTAMP) AS ts_attributed,
+    CAST(awk.ts_contract_signed AS TIMESTAMP) AS ts_contract_signed,
+    CAST(awk.ts_delivered AS TIMESTAMP) AS ts_delivered,
+    CAST(uls.ts_first_scheduling AS TIMESTAMP) AS ts_first_vc,
+    CAST(uls.ts_agent_scheduled AS TIMESTAMP) AS ts_first_vc_attributed,
+    CAST(awk.ts_optin AS TIMESTAMP) AS ts_optin,
+    CAST(awk.ts_publicated AS TIMESTAMP) AS ts_publicated,
+    CAST(awk.ts_returned AS TIMESTAMP) AS ts_returned,
     NOW() AS ts_load
 FROM
     datalake_ebdb_listing.agents_with_keys AS awk

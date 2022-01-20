@@ -202,14 +202,14 @@ SELECT DISTINCT
     CASE
         WHEN ndl.ts_contract_signed IS NOT NULL AND ka.has_keys_with_agent_delivered THEN (TO_UNIX_TIMESTAMP(ka.ts_returned) - TO_UNIX_TIMESTAMP(ndl.ts_contract_signed))/86400 <= 3 
     END AS is_returned_on_time,
-    ka.ts_attributed,
-    ndl.ts_contract_signed,
-    ka.ts_delivered,
-    ndl.ts_listing_version_start,
-    ndl.ts_listing_version_end,
-    ka.ts_optin,
-    ka.ts_publicated,
-    ka.ts_returned
+    CAST(ka.ts_attributed AS TIMESTAMP) AS ts_attributed,
+    CAST(ndl.ts_contract_signed AS TIMESTAMP) AS ts_contract_signed,
+    CAST(ka.ts_delivered AS TIMESTAMP) AS ts_delivered,
+    CAST(ndl.ts_listing_version_start AS TIMESTAMP) AS ts_listing_version_start,
+    CAST(ndl.ts_listing_version_end AS TIMESTAMP) AS ts_listing_version_end,
+    CAST(ka.ts_optin AS TIMESTAMP) AS ts_optin,
+    CAST(ka.ts_publicated AS TIMESTAMP) AS ts_publicated,
+    CAST(ka.ts_returned AS TIMESTAMP) AS ts_returned
 FROM
     non_doorman_listing AS ndl
 LEFT JOIN
