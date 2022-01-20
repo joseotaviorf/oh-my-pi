@@ -181,7 +181,7 @@ house_properties as(
         r.region_code
     from datalake_ebdb_clean_prod.house h
     left join datalake_clean.ods_dim_region r
-        on cast(nullif(r.id,'') as bigint)=h.id_region
+        on cast(r.id as bigint)=h.id_region
 ),
 
 -- Events (current registry for every Talk to Agent started)

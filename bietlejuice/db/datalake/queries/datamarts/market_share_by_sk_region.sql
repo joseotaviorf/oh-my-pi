@@ -51,7 +51,7 @@ SELECT
         COUNT(distinct dhl.id_house) AS n_ongoing_listings
 FROM datalake_clean.ods_dim_house_listing AS dhl
 JOIN datalake_clean.ods_fact_house_listings f ON dhl.sk_house_listing = f.sk_house_listing
-JOIN qa_subregions r ON r.sk_region = f.sk_region
+JOIN qa_subregions r ON r.sk_region = CAST(f.sk_region AS BIGINT)
 LEFT JOIN datalake_ebdb_clean_prod.polygon_region p ON cast(r.sk_region as bigint) = p.id_region
 WHERE house_status = 'publicado'
 AND substring(dhl.sk_house_listing,10,12) <> '000' AND r.sk_region is not null AND (dhl.house_type='Apartamento' OR dhl.house_type='StudioOuKitchenette') AND dhl.is_for_rent='True'
@@ -66,7 +66,7 @@ GROUP BY 1,2,3
         , COUNT(distinct dhl.id_house) AS n_ongoing_contracts
   FROM datalake_clean.ods_dim_house_listing AS dhl
   JOIN datalake_clean.ods_fact_house_listings f ON dhl.sk_house_listing = f.sk_house_listing
-  JOIN qa_subregions r ON r.sk_region = f.sk_region
+  JOIN qa_subregions r ON r.sk_region = CAST(f.sk_region AS BIGINT)
   WHERE house_status = 'alugado' AND (dhl.house_type='Apartamento' OR dhl.house_type='StudioOuKitchenette') AND dhl.is_for_rent='True'
   AND r.sk_region is not NULL
   GROUP BY 1,2,3
