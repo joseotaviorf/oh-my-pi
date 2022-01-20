@@ -1,7 +1,9 @@
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, date, timedelta
 
 from airflow.models import DAG
+from airflow.operators.sensors import S3KeySensor
+
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.dags.util import environment as env
@@ -155,7 +157,18 @@ data_integrity_dim_agentreview_booking = BaseDAG.build_python_operator(
                'type': 'delete'}
 )
 
-(bdg_listing_rent_flows_agent_xcom_dependencies >> bdg_listing_rent_flows_agent_daily_allocations >>
+last_dep_execution_date = str(date.today() - timedelta(days=1))
+dw_rent_flow_dep = S3KeySensor(
+    task_id="dw_rent_flow_dep",
+    poke_interval=3*60,
+    timeout=2*60*60,
+    aws_conn_id="aws_prod_data",
+    bucket_name='5a-datalake-prod',
+    bucket_key="dags_execution_logs/{execution_date}/{dependency_dag}.SUCCESS".format(execution_date=last_dep_execution_date, dependency_dag='bietlejuice.dw_rent_flow'),
+    dag=dag
+)
+
+(dw_rent_flow_dep >> bdg_listing_rent_flows_agent_xcom_dependencies >> bdg_listing_rent_flows_agent_daily_allocations >>
  data_integrity_bdg_fact_agent_daily_allocations >> data_integrity_bdg_dim_date >> data_integrity_bdg_dim_user >>
  data_integrity_dim_agentreview_booking >> data_integrity_fact_listing_rent_flows_dim_booking >>
  data_integrity_bdg_fact_listing_rent_flows)
