@@ -101,7 +101,8 @@ clean_task_group = task_group.build_task_group_from_sql_files(
     layer=LayerEnum.CLEAN,
     source_database_base_name=SOURCE_WITH_CONTEXT,
     target_database_base_name=SOURCE_WITH_CONTEXT,
-    tree_path = f'{CONTEXT}/{DAG_NAME}/'
+    tree_path = f'{CONTEXT}/{DAG_NAME}/',
+    partitions=partition_cols
 )
 
 chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
