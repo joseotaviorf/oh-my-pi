@@ -1,4 +1,0 @@
-# Migration file for dim_house_listing
-dw_schema: public
-base_date_column: ts_house_update
-sample_size_months: 6

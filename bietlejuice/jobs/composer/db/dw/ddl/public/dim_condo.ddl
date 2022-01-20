@@ -1,5 +1,5 @@
-drop table if exists janus.dim_condo;
-create table janus.dim_condo (
+drop table if exists public.dim_condo;
+create table public.dim_condo (
     sk_condo bigint primary key,
     id_condo bigint,
     neighborhood varchar,
@@ -15,4 +15,4 @@ create table janus.dim_condo (
     ts_load timestamp
 );
 
-ALTER TABLE janus.dim_condo OWNER TO airflow;
+ALTER TABLE public.dim_condo OWNER TO databricks;

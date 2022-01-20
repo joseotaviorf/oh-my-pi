@@ -1,5 +1,5 @@
-drop table if exists janus.dim_house_listing;
-create table if not exists janus.dim_house_listing
+drop table if exists public.dim_house_listing;
+create table if not exists public.dim_house_listing
 (
  sk_house_listing bigint not null,
  sk_autonomous_agent bigint,
@@ -76,4 +76,4 @@ create table if not exists janus.dim_house_listing
  ts_load timestamp
 );
 
-ALTER TABLE janus.dim_house_listing OWNER TO airflow;
+ALTER TABLE public.dim_house_listing OWNER TO databricks;

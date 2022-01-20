@@ -114,10 +114,10 @@ lost_listings_query: |
     dhl.house_entrance,
     dhl.house_type
   FROM
-    dw_janus.dim_house_listing AS dhl
+    dw_public.dim_house_listing AS dhl
     LEFT JOIN dim_house_listing_amenities AS dhla
       ON CAST(SUBSTR(dhl.sk_house_listing, 1, 9) AS INT)  = CAST(dhla.id_house AS INT)
-    JOIN dw_janus.fact_house_listings AS fhl
+    JOIN dw_public.fact_house_listings AS fhl
       ON dhl.sk_house_listing = fhl.sk_house_listing
     JOIN datalake_region.region dr
       ON fhl.sk_region = dr.id

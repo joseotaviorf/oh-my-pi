@@ -10,7 +10,7 @@ WITH bookings AS (
             ON turf.origin = 'Agendamento'
             AND turf.id_origin = db.sk_booking
     LEFT JOIN 
-        dw_janus.dim_house_listing dhl
+        dw_public.dim_house_listing dhl
             ON turf.origin = 'Imovel'
             AND turf.id_origin = dhl.id_house
             AND turf.ts_start BETWEEN dhl.ts_listing_version_start AND COALESCE(NULLIF(dhl.ts_listing_version_end,''), NOW())

@@ -7,7 +7,7 @@ columns:
   sk_house_listing:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.id_house
-      - dw_janus.dim_house_listing.version
+      - dw_public.dim_house_listing.version
   sk_region:
     lineage:
       - datalake_ebdb_listing.house.id_region
@@ -34,10 +34,10 @@ columns:
       - datalake_ebdb_rent_flow.rent_flow.dt_house_first_listing
   sk_house_listing_date:
     lineage:
-      - dw_janus.dim_house_listing.ts_listing_version_start
+      - dw_public.dim_house_listing.ts_listing_version_start
   sk_house_listing_de_publication_date:
     lineage:
-      - dw_janus.dim_house_listing.ts_last_de_publication
+      - dw_public.dim_house_listing.ts_last_de_publication
   sk_booking_created_date:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.dt_booking_created

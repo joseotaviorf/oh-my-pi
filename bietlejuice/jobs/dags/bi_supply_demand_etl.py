@@ -461,18 +461,6 @@ ods_house_rent_flow = BaseDAG.build_python_operator(
     op_kwargs={"table_name": "house_rent_flow"},
 )
 
-fact_house_listings = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id="DW_Fact_House_Listings",
-    python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={
-        "dim_name": "house_listings",
-        "is_fact": True,
-        "bucket": bucket,
-        "insert_dummy": False,
-    },
-)
-
 fact_photo_job = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id="DW_fact_photo_job",
@@ -495,13 +483,6 @@ ods_fact_house_listing_status_task = BaseDAG.build_python_operator(
         "query_params": None,
         "enum_db": EnumDB.BI_ODS,
     },
-)
-
-dw_fact_house_listing_status_task = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id="DW_fact_house_listing_status",
-    python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={"dim_name": "house_listing_status", "is_fact": True, "bucket": bucket},
 )
 
 fact_inspection_bookings_task = BaseDAG.build_python_operator(
@@ -672,12 +653,11 @@ affiliate_dag.set_upstream([region_dag, user_dag])
 [lead_conversion_dag, special_condition_dag] >> house_dag
 
 house_dag >> fact_photo_job
-ods_fact_house_listing_status_task >> dw_fact_house_listing_status_task
 
 photo_job_dag >> fact_photo_job
 amplitude_partner_taxonomy >> partner_dag
 
-fact_house_listings.set_upstream(
+trigger_bi_growth_dag_task.set_upstream(
     [condo_dag, partner_dag, house_dag, partner_agent_dag, contract_dag]
 )
 
@@ -716,6 +696,6 @@ inspection_dag >> fact_inspection_bookings_task
 ods_credit_evaluation_task >> proposal_dag
 
 trigger_bi_growth_dag_task.set_upstream(
-    [listing_flows_dag, fact_house_listings, dw_fact_house_listing_status_task]
+    [listing_flows_dag, ods_fact_house_listing_status_task]
 )
 

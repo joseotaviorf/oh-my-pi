@@ -4,56 +4,56 @@ table_name: lost_listings
 columns:
   sk_house_listing:
     lineage:
-      - dw_janus.dim_house_listing.sk_house_listing
+      - dw_public.dim_house_listing.sk_house_listing
   region_code:
     lineage:
       - datalake_region.region.region_code
   house_total_area:
     lineage:
-      - dw_janus.dim_house_listing.house_total_area
+      - dw_public.dim_house_listing.house_total_area
   house_bathrooms:
     lineage:
-      - dw_janus.dim_house_listing.house_bathrooms
+      - dw_public.dim_house_listing.house_bathrooms
   house_bedrooms:
     lineage:
-      - dw_janus.dim_house_listing.house_bedrooms
+      - dw_public.dim_house_listing.house_bedrooms
   house_iptu:
     lineage:
-      - dw_janus.dim_house_listing.house_iptu
+      - dw_public.dim_house_listing.house_iptu
   is_house_furnished:
     lineage:
-      - dw_janus.dim_house_listing.is_house_furnished
+      - dw_public.dim_house_listing.is_house_furnished
   is_originals_active:
     lineage:
-      - dw_janus.dim_house_listing.is_originals_active
+      - dw_public.dim_house_listing.is_originals_active
   house_garages:
     lineage:
-      - dw_janus.dim_house_listing.house_garages
+      - dw_public.dim_house_listing.house_garages
   house_rent:
     lineage:
-      - dw_janus.dim_house_listing.house_rent
+      - dw_public.dim_house_listing.house_rent
   house_condo:
     lineage:
-      - dw_janus.dim_house_listing.house_condo
+      - dw_public.dim_house_listing.house_condo
   house_total_value:
     lineage:
-      - dw_janus.dim_house_listing.house_total_value
+      - dw_public.dim_house_listing.house_total_value
   house_predicted_price:
     lineage:
-      - dw_janus.dim_house_listing.house_predicted_price
+      - dw_public.dim_house_listing.house_predicted_price
   rent_above_prediction:
     lineage:
-      - dw_janus.dim_house_listing.house_rent
-      - dw_janus.dim_house_listing.house_predicted_price
+      - dw_public.dim_house_listing.house_rent
+      - dw_public.dim_house_listing.house_predicted_price
   has_visit_restriction:
     lineage:
-      - dw_janus.dim_house_listing.has_visit_restriction
+      - dw_public.dim_house_listing.has_visit_restriction
   house_elevator:
     lineage:
-      - dw_janus.dim_house_listing.house_elevator
+      - dw_public.dim_house_listing.house_elevator
   house_entrance:
     lineage:
-      - dw_janus.dim_house_listing.house_entrance
+      - dw_public.dim_house_listing.house_entrance
   house_type:
     lineage:
-      - dw_janus.dim_house_listing.house_type
+      - dw_public.dim_house_listing.house_type

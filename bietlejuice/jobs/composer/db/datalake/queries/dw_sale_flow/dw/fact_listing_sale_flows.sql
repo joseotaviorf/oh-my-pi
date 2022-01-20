@@ -58,7 +58,7 @@ WITH listing_rent_flows AS (
             CAST(reservation.reservation_attempts AS SMALLINT) AS reservation_attempts,
             CAST(NOW() AS TIMESTAMP) AS ts_load
         FROM datalake_ebdb_rent_flow.rent_flow
-        JOIN dw_janus.dim_house_listing
+        JOIN dw_public.dim_house_listing
             ON dim_house_listing.id_house = rent_flow.id_house
             AND COALESCE(rent_flow.dt_rent_flow_created, '1900-01-01') BETWEEN
                 COALESCE(dim_house_listing.ts_listing_version_start, '1900-01-01')

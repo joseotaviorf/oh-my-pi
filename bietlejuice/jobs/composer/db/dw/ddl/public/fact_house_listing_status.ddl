@@ -1,6 +1,6 @@
-DROP TABLE IF EXISTS janus.fact_house_listing_status;
+DROP TABLE IF EXISTS public.fact_house_listing_status;
 
-CREATE TABLE IF NOT EXISTS janus.fact_house_listing_status (
+CREATE TABLE IF NOT EXISTS public.fact_house_listing_status (
   sk_house_listing BIGINT,
   sk_region BIGINT,
   sk_first_publication_date BIGINT,
@@ -14,4 +14,4 @@ CREATE TABLE IF NOT EXISTS janus.fact_house_listing_status (
   ts_load TIMESTAMP
 );
 
-ALTER TABLE janus.fact_house_listing_status OWNER TO airflow;
+ALTER TABLE public.fact_house_listing_status OWNER TO databricks;
