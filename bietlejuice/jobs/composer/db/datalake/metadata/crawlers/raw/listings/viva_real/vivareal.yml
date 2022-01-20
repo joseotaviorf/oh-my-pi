@@ -1,0 +1,8 @@
+---
+database_name: datalake_crawlers_listings_raw
+table_name: vivareal
+columns:
+  contact_information:
+    tags:
+      - PII
+      - Confidential

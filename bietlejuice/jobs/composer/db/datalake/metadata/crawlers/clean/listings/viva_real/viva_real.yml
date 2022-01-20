@@ -1,0 +1,55 @@
+---
+database_name: datalake_crawlers_listings_clean
+table_name: viva_real
+columns:
+  id:
+    lineage:
+      - datalake_crawlers_raw.vivareal.id
+  origin:
+    lineage:
+      - datalake_crawlers_raw.vivareal.origin
+  address:
+    lineage:
+      - datalake_crawlers_raw.vivareal.address
+  region:
+    lineage:
+      - datalake_crawlers_raw.vivareal.region
+  geolocation:
+    lineage:
+      - datalake_crawlers_raw.vivareal.geolocation
+  listing_name:
+    lineage:
+      - datalake_crawlers_raw.vivareal.name
+  crawl_metadata:
+    lineage:
+      - datalake_crawlers_raw.vivareal.crawl_metadata
+  house_info:
+    lineage:
+      - datalake_crawlers_raw.vivareal.house_info
+  type:
+    lineage:
+      - datalake_crawlers_raw.vivareal.type
+  image_urls:
+    lineage:
+      - datalake_crawlers_raw.vivareal.image_urls
+  contact_information:
+    lineage:
+      - datalake_crawlers_raw.vivareal.contact_information
+  price:
+    lineage:
+      - datalake_crawlers_raw.vivareal.price
+  date_info:
+    lineage:
+      - datalake_crawlers_raw.vivareal.date_info
+  city:
+    lineage:
+      - datalake_crawlers_raw.vivareal.city
+  year:
+    lineage:
+      - datalake_crawlers_raw.vivareal.year
+  month:
+    lineage:
+      - datalake_crawlers_raw.vivareal.month
+  day:
+    lineage:
+      - datalake_crawlers_raw.vivareal.day

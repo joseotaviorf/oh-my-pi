@@ -1,4 +1,6 @@
 ---
 loft:
   origin: 'loft'
+viva_real:
+  origin: 'vivareal'
 partition_cols: ["city", "year", "month", "day"]

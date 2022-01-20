@@ -18,7 +18,7 @@ from bietlejuice.jobs.composer.services.configuration_service import (
 
 SOURCE = "crawlers"
 CONTEXT = f"listings"
-ORIGIN = f"loft"
+ORIGIN = f"viva_real"
 DAG_NAME = f'{ORIGIN}'
 SOURCE_WITH_CONTEXT = f'{SOURCE}_{CONTEXT}'
 DAG_ID = f"bietlejuice.{DAG_NAME}"
@@ -26,7 +26,7 @@ INTERMEDIATE_PATH = f'{SOURCE}/{CONTEXT}'
 CONFIG_NAME = 'crawlers_listings'
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 ENV = os.environ.get("ENVIRONMENT")
-MAIN_START_DATE = datetime(2021, 6, 10, 0, 0, 0, tzinfo=LOCAL_TZ)
+MAIN_START_DATE = datetime(2021, 8, 23, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 3 * * 1"
 
 config_service = ConfigurationService(dag_name = CONFIG_NAME, intermediate_path=INTERMEDIATE_PATH)
@@ -54,7 +54,7 @@ CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_FOR_SALE,
+        "owner": DAGOwnerEnum.DATA_FOR_RENT,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
