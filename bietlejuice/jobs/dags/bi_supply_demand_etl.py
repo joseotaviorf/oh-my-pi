@@ -1,8 +1,11 @@
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, date, timedelta
 
 import bietlejuice.jobs.base.new_base_etl as utils
+
 from airflow.operators.dagrun_operator import TriggerDagRunOperator
+from airflow.operators.sensors import S3KeySensor
+
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.base_etl import BaseETL
 from bietlejuice.jobs.base.base_sub_dag import BaseSubDag
@@ -647,6 +650,90 @@ trigger_bi_growth_dag_task = TriggerDagRunOperator(
     execution_date="{{ execution_date }}",
 )
 
+
+# TODO Remove these file sensors
+last_dep_execution_date = str(date.today() - timedelta(days=1))
+
+amplitude_dep = S3KeySensor(
+    task_id="amplitude_dep",
+    poke_interval=3*60,
+    timeout=2*60*60,
+    aws_conn_id="aws_prod_data",
+    bucket_name='5a-datalake-prod',
+    bucket_key="dags_execution_logs/{execution_date}/{dependency_dag}.SUCCESS".format(execution_date=last_dep_execution_date, dependency_dag='bietlejuice.amplitude'),
+    dag=main_dag
+)
+
+enrich_amplitude_partner_taxonomy_dep = S3KeySensor(
+    task_id="enrich_amplitude_partner_taxonomy_dep",
+    poke_interval=3*60,
+    timeout=2*60*60,
+    aws_conn_id="aws_prod_data",
+    bucket_name='5a-datalake-prod',
+    bucket_key="dags_execution_logs/{execution_date}/{dependency_dag}.SUCCESS".format(execution_date=last_dep_execution_date, dependency_dag='bietlejuice.enrich_amplitude_partner_taxonomy'),
+    dag=main_dag
+)
+
+ebdb_dep = S3KeySensor(
+    task_id="ebdb_dep",
+    poke_interval=3*60,
+    timeout=2*60*60,
+    aws_conn_id="aws_prod_data",
+    bucket_name='5a-datalake-prod',
+    bucket_key="dags_execution_logs/{execution_date}/{dependency_dag}.SUCCESS".format(execution_date=last_dep_execution_date, dependency_dag='bietlejuice.ebdb'),
+    dag=main_dag
+)
+
+docx_dep = S3KeySensor(
+    task_id="docx_dep",
+    poke_interval=3*60,
+    timeout=2*60*60,
+    aws_conn_id="aws_prod_data",
+    bucket_name='5a-datalake-prod',
+    bucket_key="dags_execution_logs/{execution_date}/{dependency_dag}.SUCCESS".format(execution_date=last_dep_execution_date, dependency_dag='bietlejuice.docx'),
+    dag=main_dag
+)
+
+autodialer_dep = S3KeySensor(
+    task_id="autodialer_dep",
+    poke_interval=3*60,
+    timeout=2*60*60,
+    aws_conn_id="aws_prod_data",
+    bucket_name='5a-datalake-prod',
+    bucket_key="dags_execution_logs/{execution_date}/{dependency_dag}.SUCCESS".format(execution_date=last_dep_execution_date, dependency_dag='bietlejuice.autodialer'),
+    dag=main_dag
+)
+
+rene_descartes_dep = S3KeySensor(
+    task_id="rene_descartes_dep",
+    poke_interval=3*60,
+    timeout=2*60*60,
+    aws_conn_id="aws_prod_data",
+    bucket_name='5a-datalake-prod',
+    bucket_key="dags_execution_logs/{execution_date}/{dependency_dag}.SUCCESS".format(execution_date=last_dep_execution_date, dependency_dag='bietlejuice.rene_descartes'),
+    dag=main_dag
+)
+
+godfather_dep = S3KeySensor(
+    task_id="godfather_dep",
+    poke_interval=3*60,
+    timeout=2*60*60,
+    aws_conn_id="aws_prod_data",
+    bucket_name='5a-datalake-prod',
+    bucket_key="dags_execution_logs/{execution_date}/{dependency_dag}.SUCCESS".format(execution_date=last_dep_execution_date, dependency_dag='bietlejuice.godfather'),
+    dag=main_dag
+)
+
+firestore_dep = S3KeySensor(
+    task_id="firestore_dep",
+    poke_interval=3*60,
+    timeout=2*60*60,
+    aws_conn_id="aws_prod_data",
+    bucket_name='5a-datalake-prod',
+    bucket_key="dags_execution_logs/{execution_date}/{dependency_dag}.SUCCESS".format(execution_date=last_dep_execution_date, dependency_dag='bietlejuice.firestore'),
+    dag=main_dag
+)
+
 # TODO Recreate tasks flow after the data flow is fully fixed
 # xcom_amplitude_task.set_downstream([booking_dag, affiliate_dag])
 affiliate_dag.set_upstream([region_dag, user_dag])
@@ -699,3 +786,48 @@ trigger_bi_growth_dag_task.set_upstream(
     [listing_flows_dag, ods_fact_house_listing_status_task]
 )
 
+# Marketing Dependencies Flow
+special_condition_dag.set_upstream(
+    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,autodialer_dep,rene_descartes_dep,godfather_dep,firestore_dep]
+)
+
+lead_conversion_dag.set_upstream(
+    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,autodialer_dep,rene_descartes_dep,godfather_dep,firestore_dep]
+)
+
+
+contract_dag.set_upstream(
+    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,autodialer_dep,rene_descartes_dep,godfather_dep,firestore_dep]
+)
+
+house_dag.set_upstream(
+    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,autodialer_dep,rene_descartes_dep,godfather_dep,firestore_dep]
+)
+
+region_dag.set_upstream(
+    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,autodialer_dep,rene_descartes_dep,godfather_dep,firestore_dep]
+)
+
+user_dag.set_upstream(
+    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,autodialer_dep,rene_descartes_dep,godfather_dep,firestore_dep]
+)
+
+condo_dag.set_upstream(
+    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,autodialer_dep,rene_descartes_dep,godfather_dep,firestore_dep]
+)
+
+photo_job_dag.set_upstream(
+    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,autodialer_dep,rene_descartes_dep,godfather_dep,firestore_dep]
+)
+
+lead_dag.set_upstream(
+    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,autodialer_dep,rene_descartes_dep,godfather_dep,firestore_dep]
+)
+
+ods_fact_house_listing_status_task.set_upstream(
+    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,autodialer_dep,rene_descartes_dep,godfather_dep,firestore_dep]
+)
+
+amplitude_partner_taxonomy.set_upstream(
+    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,autodialer_dep,rene_descartes_dep,godfather_dep,firestore_dep]
+)
