@@ -1,0 +1,43 @@
+---
+database_name: datalake_date
+table_name: workday_window
+columns:
+  id_date:
+    lineage:
+      - datalake_quintoandar.aux_date.id_date
+  id_city:
+    lineage:
+      - datalake_region.region.id
+  city:
+    lineage:
+      - datalake_region.region.name
+  dt_reference:
+    lineage:
+      - datalake_quintoandar.aux_date.date
+  dt_start:
+    lineage:
+      - datalake_quintoandar.aux_date.date
+  dt_end_1:
+    lineage:
+      - datalake_quintoandar.aux_date.date
+  dt_end_2:
+    lineage:
+      - datalake_quintoandar.aux_date.date
+  dt_end_3:
+    lineage:
+      - datalake_quintoandar.aux_date.date
+  dt_end_4:
+    lineage:
+      - datalake_quintoandar.aux_date.date
+  dt_end_5:
+    lineage:
+      - datalake_quintoandar.aux_date.date
+  dt_end_6:
+    lineage:
+      - datalake_quintoandar.aux_date.date
+  dt_end_7:
+    lineage:
+      - datalake_quintoandar.aux_date.date
+  dt_end_15:
+    lineage:
+      - datalake_quintoandar.aux_date.date

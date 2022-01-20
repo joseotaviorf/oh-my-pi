@@ -584,6 +584,10 @@ bietlejuice.enrich_crm_tasks_transitions:
   - bietlejuice.enrich_crm:load-enrich-tasks
   - bietlejuice.enrich_crm:load-enrich-workflows-transitions
 
+bietlejuice.enrich_date:
+  - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.gsheets:load-clean-service-city-holidays
+
 bietlejuice.enrich_docx:
   - bietlejuice.docx:load-clean-credit-evaluation
   - bietlejuice.docx:load-clean-document
