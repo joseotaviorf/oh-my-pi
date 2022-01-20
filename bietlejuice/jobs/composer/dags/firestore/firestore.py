@@ -49,7 +49,6 @@ RAW_SPARK_JOB_FILE = (
 
 # cluster setup
 CLUSTER_DESCRIPTION = Variable.get("databricks_firestore_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = f"{spark_jobs_logs_path}{DAG_ID}"
 
 dag = DAG(
     dag_id=DAG_ID,

@@ -31,7 +31,6 @@ DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = os.environ.get("ENVIRONMENT")
 
 config_service = ConfigurationService(DAG_NAME)
-datalake_bucket = config_service.get_config("datalake_bucket")
 spectrum_iam_role = config_service.get_config("spectrum_iam_role")
 dw_bucket = config_service.get_config("dw_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
