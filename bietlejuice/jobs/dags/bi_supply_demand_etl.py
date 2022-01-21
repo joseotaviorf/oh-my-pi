@@ -723,6 +723,18 @@ firestore_dep = S3KeySensor(
     dag=main_dag
 )
 
+
+enrich_ebdb_listings_dep = S3KeySensor(
+    task_id="enrich_ebdb_listings_dep",
+    poke_interval=3*60,
+    timeout=2*60*60,
+    aws_conn_id="aws_prod_data",
+    bucket_name='5a-datalake-prod',
+    bucket_key="dags_execution_logs/{execution_date}/{dependency_dag}.SUCCESS".format(execution_date=last_dep_execution_date, dependency_dag='bietlejuice.enrich_ebdb_listings'),
+    dag=main_dag
+)
+
+
 # TODO Recreate tasks flow after the data flow is fully fixed
 # xcom_amplitude_task.set_downstream([booking_dag, affiliate_dag])
 affiliate_dag.set_upstream([region_dag, user_dag])
@@ -790,7 +802,7 @@ contract_dag.set_upstream(
 )
 
 house_dag.set_upstream(
-    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,autodialer_dep,rene_descartes_dep,godfather_dep,firestore_dep]
+    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,autodialer_dep,rene_descartes_dep,godfather_dep,firestore_dep,enrich_ebdb_listings_dep]
 )
 
 region_dag.set_upstream(
