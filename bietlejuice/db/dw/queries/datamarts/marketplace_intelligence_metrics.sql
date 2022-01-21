@@ -45,10 +45,10 @@ last_version_listings as (
 select
   id_house,
   sk_house_listing,
-  cast(nullif(ts_listing_version_start, '') as timestamp) as ts_listing_version_start,
-  cast(nullif(ts_listing_version_end, '') as timestamp) as ts_listing_version_end
+  ts_listing_version_start,
+  ts_listing_version_end
 from datalake_clean.ods_dim_house_listing
-where cast(nullif(version, '') as bigint) > 0
+where version > 0
 ),
 events as (
   select
