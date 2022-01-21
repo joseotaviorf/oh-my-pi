@@ -1,0 +1,3 @@
+streams:
+  - direction: 'upstream'
+    task_ids: ['dw_datamarts.funnel_demand_flows']

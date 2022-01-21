@@ -21,71 +21,34 @@ WITH rent_flows_base AS (
         funnel_step
     FROM 
         fact_listing_rent_flows AS f
-    INNER JOIN 
-        dim_date AS dd
-            ON f.sk_offer_approved_date = dd.sk_date
     WHERE
-        dd.date >= '2020-01-01'
+        sk_offer_approved_date >= 20200101
     ),
-
 events_dates AS (
     SELECT
         rfb.sk_proposal,
-        dd_os.date AS offer_submitted_date,
-        dd_oa.date AS offer_approved_date,
-        dd_es.date AS last_evaluation_started_date,
+        TO_DATE(NULLIF(sk_offer_submitted_date, -1)::TEXT, 'YYYYMMDD') AS offer_submitted_date,
+        TO_DATE(NULLIF(sk_offer_approved_date, -1)::TEXT, 'YYYYMMDD') AS offer_approved_date,
+        TO_DATE(NULLIF(sk_last_credit_evaluation_init, -1)::TEXT, 'YYYYMMDD') AS last_evaluation_started_date,
         COALESCE(
-            dd_evp.date,
+            TO_DATE(NULLIF(sk_last_credit_evaluation_positive, -1)::TEXT, 'YYYYMMDD'),
             CASE
                 WHEN sk_last_credit_evaluation_positive < 0 
                 AND sk_last_credit_evaluation_negative > 0 
-                AND dp.guarantee = 'RentalGuarantee' THEN dd_evn.date 
+                AND dp.guarantee = 'RentalGuarantee' THEN TO_DATE(NULLIF(sk_last_credit_evaluation_negative, -1)::TEXT, 'YYYYMMDD')
             END
         ) AS evaluation_approved_date,
-        dd_ds.date AS document_first_sent_date,
-        dd_dc.date AS document_completed_date,
-        dd_da.date AS credit_analysis_approved_date,
-        dd_guarantee.date AS guarantee_paid_date,
-        dd_cc.date AS contract_created_date,
-        dd_cs.date AS contract_signed_date
+        TO_DATE(NULLIF(sk_tenant_first_doc_sent_date, -1)::TEXT, 'YYYYMMDD') AS document_first_sent_date,
+        TO_DATE(NULLIF(sk_tenant_doc_complete_date, -1)::TEXT, 'YYYYMMDD') AS document_completed_date,
+        TO_DATE(NULLIF(sk_credit_analysis_approved_date, -1)::TEXT, 'YYYYMMDD') AS credit_analysis_approved_date,
+        TO_DATE(NULLIF(sk_guarantee_paid_date, -1)::TEXT, 'YYYYMMDD') AS guarantee_paid_date,
+        TO_DATE(NULLIF(sk_contract_created_date, -1)::TEXT, 'YYYYMMDD') AS contract_created_date,
+        TO_DATE(NULLIF(sk_contract_signed_date, -1)::TEXT, 'YYYYMMDD') AS contract_signed_date
     FROM 
         rent_flows_base AS rfb
     INNER JOIN 
         dim_proposal AS dp
             ON rfb.sk_proposal = dp.sk_proposal
-    INNER JOIN 
-        dim_date AS dd_os
-            ON rfb.sk_offer_submitted_date = dd_os.sk_date
-    INNER JOIN 
-        dim_date AS dd_oa
-            ON rfb.sk_offer_approved_date = dd_oa.sk_date
-    INNER JOIN 
-        dim_date AS dd_es
-            ON rfb.sk_last_credit_evaluation_init = dd_es.sk_date
-    INNER JOIN 
-        dim_date AS dd_evp
-            ON rfb.sk_last_credit_evaluation_positive = dd_evp.sk_date
-    INNER JOIN 
-        dim_date AS dd_evn
-            ON rfb.sk_last_credit_evaluation_negative = dd_evn.sk_date
-    INNER JOIN 
-        dim_date AS dd_ds 
-            ON rfb.sk_tenant_first_doc_sent_date = dd_ds.sk_date 
-    INNER JOIN 
-        dim_date AS dd_dc
-            ON rfb.sk_tenant_doc_complete_date = dd_dc.sk_date
-    INNER JOIN
-        dim_date AS dd_da
-            ON rfb.sk_credit_analysis_approved_date = dd_da.sk_date
-    INNER JOIN 
-        dim_date AS dd_guarantee
-            ON rfb.sk_guarantee_paid_date = dd_guarantee.sk_date
-    INNER JOIN 
-        dim_date AS dd_cc
-            ON rfb.sk_contract_created_date = dd_cc.sk_date
-    INNER JOIN 
-        dim_date AS dd_cs
-            ON rfb.sk_contract_signed_date = dd_cs.sk_date
     ),
     
 days_diff_and_cohorts_maturation AS (
