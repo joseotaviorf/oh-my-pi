@@ -23,7 +23,7 @@ taxonomy_by_platform AS (
             platforms AS p
 ),
 
-enriched_consolidated_media_costs AS (
+enriched_consolidated_media_metrics AS (
     SELECT
         *,
         CASE
@@ -34,22 +34,22 @@ enriched_consolidated_media_costs AS (
             ELSE 'Other'
         END AS campaign_origin_acquisition
     FROM
-        datalake_consolidated_marketing_costs.consolidated_media_costs
+        datalake_consolidated_marketing_metrics.consolidated_media_metrics
     WHERE
         id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
 ),
 
 media_costs_with_taxonomy AS (
     SELECT
-        ecmc.id_date,
+        ecmm.id_date,
         'automatic' AS flow_type,
-        ecmc.origin,
-        ecmc.account_name,
-        ecmc.campaign_name,
-        ecmc.utm_campaign,
-        ecmc.utm_term,
-        ecmc.utm_content,
-        ecmc.city_group,
+        ecmm.origin,
+        ecmm.account_name,
+        ecmm.campaign_name,
+        ecmm.utm_campaign,
+        ecmm.utm_term,
+        ecmm.utm_content,
+        ecmm.city_group,
         COALESCE(tp.campaign_origin_acquisition, 'Not Mapped') AS campaign_origin_acquisition,
         COALESCE(tp.mkt_category, 'Not Mapped') AS mkt_category,
         COALESCE(tp.mkt_flow, 'Not Mapped') AS mkt_flow,
@@ -74,14 +74,14 @@ media_costs_with_taxonomy AS (
                 total_cost * tp.cost_factor_enriched
         END AS cost
     FROM
-        enriched_consolidated_media_costs ecmc
+        enriched_consolidated_media_metrics ecmm
         LEFT JOIN
             taxonomy_by_platform AS tp 
-                ON COALESCE(ecmc.account_name, '') = COALESCE(TRIM(tp.account_name), '')
-                    AND COALESCE(ecmc.report_type, '') = COALESCE(TRIM(tp.report_type), '')
-                    AND COALESCE(ecmc.ad_type, 'other') = COALESCE(TRIM(tp.ad_type), 'other')
-                    AND ecmc.origin = TRIM(tp.origin)
-                    AND ecmc.campaign_origin_acquisition = TRIM(tp.campaign_origin_acquisition)
+                ON COALESCE(ecmm.account_name, '') = COALESCE(TRIM(tp.account_name), '')
+                    AND COALESCE(ecmm.report_type, '') = COALESCE(TRIM(tp.report_type), '')
+                    AND COALESCE(ecmm.ad_type, 'other') = COALESCE(TRIM(tp.ad_type), 'other')
+                    AND ecmm.origin = TRIM(tp.origin)
+                    AND ecmm.campaign_origin_acquisition = TRIM(tp.campaign_origin_acquisition)
 )
 
 SELECT 

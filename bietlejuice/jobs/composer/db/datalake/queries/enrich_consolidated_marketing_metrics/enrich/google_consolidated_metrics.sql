@@ -20,6 +20,7 @@ WITH campaign_reports AS (
         datalake_google_ads_clean.keywords_performance_report
     WHERE
         dt_loaded = DATE('{year}-{month}-{day}')
+        AND id_keyword NOT BETWEEN 3000000 AND 3000006 -- these campaigns should be extracted from ADS report
 
     UNION ALL
 
@@ -76,7 +77,7 @@ keywords_metrics AS (
     SELECT
         INT(REPLACE(gkpr.dt_loaded, '-', '')) AS id_date,
         gkpr.campaign_name,
-        gkpr.account_descriptive_name AS account_name,
+        gkpr.account_snake_case AS account_name,
         gkpr.report_type,
         NULL AS ad_type,
         criteria || '_' || LOWER(LEFT(match_type, 1)) AS utm_term,
@@ -110,7 +111,7 @@ ads_metrics AS (
     SELECT
         INT(REPLACE(gapr.dt_loaded, '-', '')) AS id_date,
         gapr.campaign_name,
-        gapr.account_descriptive_name AS account_name,
+        gapr.account_snake_case AS account_name,
         gapr.report_type,
         COALESCE(ad_types.flag, 'other') AS ad_type,
         STRING(gapr.ad_group_name) AS utm_term,
@@ -147,7 +148,7 @@ campaigns_metrics AS (
     SELECT
         INT(REPLACE(gcpr.dt_loaded, '-', '')) AS id_date,
         gcpr.campaign_name,
-        gcpr.account_descriptive_name AS account_name,
+        gcpr.account_snake_case AS account_name,
         gcpr.report_type,
         NULL AS ad_type,
         NULL AS utm_term,
@@ -180,7 +181,7 @@ videos_metrics AS (
     SELECT
         INT(REPLACE(gvpr.dt_loaded, '-', '')) AS id_date,
         gvpr.campaign_name,
-        gvpr.account_descriptive_name AS account_name,
+        gvpr.account_snake_case AS account_name,
         gvpr.report_type,
         NULL AS ad_type,
         NULL AS utm_term,

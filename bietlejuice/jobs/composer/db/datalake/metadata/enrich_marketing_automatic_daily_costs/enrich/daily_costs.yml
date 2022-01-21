@@ -3,28 +3,28 @@ table_name: daily_costs
 columns:
   id_date:
     lineage:
-      - datalake_consolidated_marketing_costs.consolidated_media_costs.id_date
+      - datalake_consolidated_marketing_metrics.consolidated_media_metrics.id_date
   origin:
     lineage:
-      - datalake_consolidated_marketing_costs.consolidated_media_costs.origin
+      - datalake_consolidated_marketing_metrics.consolidated_media_metrics.origin
   account_name:
     lineage:
-      - datalake_consolidated_marketing_costs.consolidated_media_costs.account_name
+      - datalake_consolidated_marketing_metrics.consolidated_media_metrics.account_name
   campaign_name:
     lineage:
-      - datalake_consolidated_marketing_costs.consolidated_media_costs.campaign_name
+      - datalake_consolidated_marketing_metrics.consolidated_media_metrics.campaign_name
   utm_campaign:
     lineage:
-      - datalake_consolidated_marketing_costs.consolidated_media_costs.utm_campaign
+      - datalake_consolidated_marketing_metrics.consolidated_media_metrics.utm_campaign
   utm_term:
     lineage:
-      - datalake_consolidated_marketing_costs.consolidated_media_costs.utm_term
+      - datalake_consolidated_marketing_metrics.consolidated_media_metrics.utm_term
   utm_content:
     lineage:
-      - datalake_consolidated_marketing_costs.consolidated_media_costs.utm_content
+      - datalake_consolidated_marketing_metrics.consolidated_media_metrics.utm_content
   city_group:
     lineage:
-      - datalake_consolidated_marketing_costs.consolidated_media_costs.city_group
+      - datalake_consolidated_marketing_metrics.consolidated_media_metrics.city_group
   campaign_origin_acquisition:
     lineage:
       - datalake_gsheets_clean.marketing_costs_full_taxonomy.campaign_origin_acquisition
@@ -51,10 +51,10 @@ columns:
       - datalake_gsheets_clean.marketing_costs_full_taxonomy.mkt_source
   cost:
     lineage:
-      - datalake_consolidated_marketing_costs.consolidated_media_costs.mobile_cost
-      - datalake_consolidated_marketing_costs.consolidated_media_costs.desktop_cost
-      - datalake_consolidated_marketing_costs.consolidated_media_costs.other_cost
-      - datalake_consolidated_marketing_costs.consolidated_media_costs.total_cost
+      - datalake_consolidated_marketing_metrics.consolidated_media_metrics.mobile_cost
+      - datalake_consolidated_marketing_metrics.consolidated_media_metrics.desktop_cost
+      - datalake_consolidated_marketing_metrics.consolidated_media_metrics.other_cost
+      - datalake_consolidated_marketing_metrics.consolidated_media_metrics.total_cost
       - datalake_gsheets_clean.marketing_costs_full_taxonomy.cost_factor
   funnel_side:
     lineage:
