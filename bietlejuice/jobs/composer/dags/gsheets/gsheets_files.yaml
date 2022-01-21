@@ -766,8 +766,8 @@ target_service_kpis:
     clean_table_name: target_service_kpis
 
 target_support_kpis:
-    sheet_id: 1ru-UFI4ji3fR-EV7rvpb1NFxz2IOWoWB-L1pUwZvekM
-    sheet_name: TARGET
+    sheet_id: 1S3HB6hPfDHcbg23cZWR5xcukhF_nJcWHy5pBGHFqxlI
+    sheet_name: TARGET - S&S
     clean_table_name: target_support_kpis
 
 taxonomy_affiliates:
