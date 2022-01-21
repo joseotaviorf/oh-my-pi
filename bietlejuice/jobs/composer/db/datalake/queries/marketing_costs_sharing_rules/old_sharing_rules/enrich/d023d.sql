@@ -90,7 +90,7 @@ date_region AS (
     GROUP BY 1, 2
 )
 SELECT
-  dr.sk_date,
+  dr.sk_date AS id_date,
   dr.city_group,
   CASE
         WHEN SUM(COALESCE(tp.nTP, 0)) OVER(PARTITION BY dr.sk_date)::FLOAT = 0
