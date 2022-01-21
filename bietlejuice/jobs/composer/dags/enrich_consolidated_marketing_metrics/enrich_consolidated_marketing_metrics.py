@@ -54,9 +54,7 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag,
-    task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
+    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
@@ -78,6 +76,7 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     target_database_base_name=CONTEXT,
     is_incremental=True,
     partitions=PARTITION_COLS,
+    cluster_config_params={"udfs": ["SF_ALPHANUMERIC_SNAKE_CASE"]},
 )
 
 INNER_DEPENDENCIES = {

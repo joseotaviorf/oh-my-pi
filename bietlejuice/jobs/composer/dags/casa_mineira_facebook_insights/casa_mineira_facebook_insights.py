@@ -61,7 +61,7 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(DAG_ID).format(
+    doc_md=BaseDAG.get_dag_doc(SOURCE).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
 )

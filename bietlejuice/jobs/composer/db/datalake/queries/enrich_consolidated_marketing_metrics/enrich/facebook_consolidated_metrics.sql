@@ -1,7 +1,7 @@
-SELECT    
+SELECT
     INT(year*10000 + month*100 + day) AS id_date,
     campaign_name,
-    account_name,
+    SF_ALPHANUMERIC_SNAKE_CASE(account_name) AS account_name,
     campaign_name AS utm_campaign,
     adset_name AS utm_term,
     ad_name AS utm_content,
@@ -11,7 +11,7 @@ SELECT
     SUM(spend) AS total_cost,
     SUM(impressions) AS impressions,
     SUM(clicks) AS clicks
-FROM 
+FROM
     datalake_marketing_costs_clean.facebook_insights
 WHERE
     year = {year}
