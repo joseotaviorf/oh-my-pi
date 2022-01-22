@@ -724,13 +724,13 @@ firestore_dep = S3KeySensor(
 )
 
 
-enrich_ebdb_listings_dep = S3KeySensor(
-    task_id="enrich_ebdb_listings_dep",
+enrich_ebdb_listing_dep = S3KeySensor(
+    task_id="enrich_ebdb_listing_dep",
     poke_interval=3*60,
     timeout=2*60*60,
     aws_conn_id="aws_prod_data",
     bucket_name='5a-datalake-prod',
-    bucket_key="dags_execution_logs/{execution_date}/{dependency_dag}.SUCCESS".format(execution_date=last_dep_execution_date, dependency_dag='bietlejuice.enrich_ebdb_listings'),
+    bucket_key="dags_execution_logs/{execution_date}/{dependency_dag}.SUCCESS".format(execution_date=last_dep_execution_date, dependency_dag='bietlejuice.enrich_ebdb_listing'),
     dag=main_dag
 )
 
