@@ -201,7 +201,7 @@ target_sheets AS (
         NULL::FLOAT AS new_rent_flows_target,
         NULL::FLOAT AS new_tenant_prospects_target,
         NULL::FLOAT AS recovered_tenant_prospects_target,
-        NULLIF(cps.daily_value, '')::FLOAT AS budget
+        NULLIF(REPLACE(cps.daily_value, ',',''), '')::FLOAT AS budget
     FROM datalake_gsheets_clean_prod.mkt_cost_per_source AS cps
     WHERE
         business = 'Rent'

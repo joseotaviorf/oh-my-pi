@@ -267,7 +267,7 @@ targets AS (
         NULL::DATE AS dt_visit_completed,
         NULL::INT AS sale_flow_order,
         NULL::INT AS buyer_prospect_order,
-        bd.daily_value::FLOAT AS budget,
+        REPLACE(bd.daily_value, ',', '')::FLOAT AS budget,
         NULL::FLOAT AS new_buyer_prospects_target,
         NULL::FLOAT AS recovered_buyer_prospects_target,
         NULL::FLOAT AS sale_flows_target,
