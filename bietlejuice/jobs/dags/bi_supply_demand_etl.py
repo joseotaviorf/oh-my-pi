@@ -802,7 +802,7 @@ contract_dag.set_upstream(
 )
 
 house_dag.set_upstream(
-    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,autodialer_dep,rene_descartes_dep,godfather_dep,firestore_dep,enrich_ebdb_listings_dep]
+    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,autodialer_dep,rene_descartes_dep,godfather_dep,firestore_dep,enrich_ebdb_listing_dep]
 )
 
 region_dag.set_upstream(
