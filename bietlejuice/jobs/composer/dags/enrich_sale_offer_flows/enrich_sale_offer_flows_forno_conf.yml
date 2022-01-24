@@ -1,0 +1,4 @@
+---
+inner_dependencies:
+  sale_offer_flows:
+    - offer_specialists

@@ -1,0 +1,139 @@
+---
+database_name: datalake_sales_flow
+table_name: offer_specialists
+columns:
+  id_offer:
+    lineage:
+      - datalake_sales_flow_clean.offer.id_firestore
+  id_user_consultant:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_main_user
+  id_consultant:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_specialist
+  id_user_team_lead:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_main_user
+  id_team_lead:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_specialist
+  id_user_pre_specialist:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_main_user
+  id_pre_specialist:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_specialist
+  id_user_post_specialist:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_main_user
+  id_post_specialist:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_specialist
+  id_user_credit_specialist:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_main_user
+  id_credit_specialist:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_specialist
+  id_user_start_financing_specialist:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_main_user
+  id_start_financing_specialist:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_specialist
+  id_user_follow_up_financing_specialist:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_main_user
+  id_follow_up_financing_specialist:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_specialist
+  id_user_end_financing_specialist:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_main_user
+  id_end_financing_specialist:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_specialist
+  id_user_notes_registry_specialist:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_main_user
+  id_notes_registry_specialist:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_specialist
+  id_user_real_estate_register_specialist:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_main_user
+  id_real_estate_register_specialist:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_specialist
+  id_user_legal_risk_analyst:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_main_user
+  id_legal_risk_analyst:
+    lineage:
+      - datalake_sales_flow_clean.specialist.id_specialist
+  consultant_name:
+    lineage:
+      - datalake_sales_flow_clean.specialist.specialist_name
+  consultant_email:
+    lineage:
+      - datalake_sales_flow_clean.specialist.email
+  team_lead_name:
+    lineage:
+      - datalake_sales_flow_clean.specialist.specialist_name
+  team_lead_email:
+    lineage:
+      - datalake_sales_flow_clean.specialist.email
+  pre_specialist_name:
+    lineage:
+      - datalake_sales_flow_clean.specialist.specialist_name
+  pre_specialist_email:
+    lineage:
+      - datalake_sales_flow_clean.specialist.email
+  post_specialist_name:
+    lineage:
+      - datalake_sales_flow_clean.specialist.specialist_name
+  post_specialist_email:
+    lineage:
+      - datalake_sales_flow_clean.specialist.email
+  credit_specialist_name:
+    lineage:
+      - datalake_sales_flow_clean.specialist.specialist_name
+  credit_specialist_email:
+    lineage:
+      - datalake_sales_flow_clean.specialist.email
+  start_financing_specialist_name:
+    lineage:
+      - datalake_sales_flow_clean.specialist.specialist_name
+  start_financing_specialist_email:
+    lineage:
+      - datalake_sales_flow_clean.specialist.email
+  follow_up_financing_specialist_name:
+    lineage:
+      - datalake_sales_flow_clean.specialist.specialist_name
+  follow_up_financing_specialist_email:
+    lineage:
+      - datalake_sales_flow_clean.specialist.email
+  end_financing_specialist_name:
+    lineage:
+      - datalake_sales_flow_clean.specialist.specialist_name
+  end_financing_specialist_email:
+    lineage:
+      - datalake_sales_flow_clean.specialist.email
+  notes_registry_specialist_name:
+    lineage:
+      - datalake_sales_flow_clean.specialist.specialist_name
+  notes_registry_specialist_email:
+    lineage:
+      - datalake_sales_flow_clean.specialist.email
+  real_estate_register_specialist_name:
+    lineage:
+      - datalake_sales_flow_clean.specialist.specialist_name
+  real_estate_register_specialist_email:
+    lineage:
+      - datalake_sales_flow_clean.specialist.email
+  legal_risk_analyst_name:
+    lineage:
+      - datalake_sales_flow_clean.specialist.specialist_name
+  legal_risk_analyst_email:
+    lineage:
+      - datalake_sales_flow_clean.specialist.email

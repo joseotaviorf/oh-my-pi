@@ -12,6 +12,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 Produces the following output tables:
 
+- `offer_specialists`
 - `sale_offer_flows`
 
 ### Responsible Data Engineering Team
