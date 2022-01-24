@@ -578,6 +578,17 @@ bietlejuice.enrich_date:
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.gsheets:load-clean-service-city-holidays
 
+bietlejuice.enrich_customer_demand:
+  - bietlejuice.enrich_customer_support:load-enrich-email
+  - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-actions-resolutions-flow
+  - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-users-resolutions-flow
+  - bietlejuice.enrich_heimdall:load-enrich-activity
+  - bietlejuice.enrich_heimdall:load-enrich-auditable-expenses
+  - bietlejuice.enrich_heimdall:load-enrich-expenses
+  - bietlejuice.terminator:load-clean-negotiation
+  - bietlejuice.terminator:load-clean-termination
+  - bietlejuice.terminator:load-clean-termination-aud
+
 bietlejuice.enrich_docx:
   - bietlejuice.docx:load-clean-credit-evaluation
   - bietlejuice.docx:load-clean-document
