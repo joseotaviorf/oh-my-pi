@@ -188,54 +188,6 @@ ccv_flow AS (
         ON ccv_flow.id_ccv_flow = lucf.id_ccv_flow
         AND ccv_flow.ts_updated = lucf.ts_last_updated
 ),
--- VENDAS SPECIALIST CTE
-specialists AS (
-    WITH last_specialist AS (
-        SELECT
-            row_number() OVER (
-                PARTITION BY 
-                id_sales_flow,
-                kind
-                ORDER BY
-                ts_updated DESC
-            ) AS ROW,
-            *
-        FROM
-            datalake_sales_flow_clean.specialist
-    ),
-    offers_specialists AS (
-        SELECT
-            id_firestore AS id_offer,
-            id_sales_flow
-        FROM
-            datalake_sales_flow_clean.offer AS o
-        GROUP BY
-            1,
-            2
-    )
-    SELECT
-        id_offer,
-        dm.id_main_user AS id_user_consultant,
-        dm.specialist_name AS consultant_name,
-        dm.id_specialist AS id_consultant,
-        dm.email AS consultant_email,
-        tl.specialist_name AS team_lead_name,
-        tl.email AS team_lead_email,
-        tl.id_main_user AS sk_user_team_lead,
-        tl.id_specialist AS sk_team_lead
-    FROM
-        offers_specialists AS o
-    LEFT JOIN 
-        last_specialist AS dm 
-        ON dm.id_sales_flow = o.id_sales_flow
-        AND dm.kind = 'DEAL_MAKER'
-        AND dm.row = 1
-    LEFT JOIN 
-        last_specialist AS tl 
-        ON tl.id_sales_flow = o.id_sales_flow
-        AND tl.kind = 'TEAM_LEAD'
-        AND tl.row = 1
-),
 -- MORTGAGE CTE
 last_update_mortgage AS (
     SELECT
@@ -253,7 +205,12 @@ mortgage AS (
         mg.bank,
         mg.status,
         mg.credit_model,
-        mg.credit_status
+        mg.credit_status,
+        mg.dt_bank_started,
+        mg.dt_credit_started,
+        mg.dt_credit_ended,
+        mg.dt_started,
+        mg.dt_ended
     FROM
         datalake_sales_flow_clean.mortgage AS mg
     INNER JOIN 
@@ -331,7 +288,8 @@ notary AS (
         n.status,
         DATE(n.ts_started) AS dt_started,
         DATE(n.ts_ended) AS dt_ended,
-        DATE(n.ts_seller_paid) AS dt_seller_paid
+        DATE(n.ts_seller_paid) AS dt_seller_paid,
+        DATE(n.ts_buyer_received_keys) AS dt_buyer_received_keys
     FROM
         datalake_sales_flow_clean.notary AS n
     INNER JOIN 
@@ -357,7 +315,12 @@ diligence AS (
         d.id_diligence,
         d.id_sales_flow,
         d.classification,
-        d.step
+        d.step,
+        d.ts_buyer_seller_ended,
+        d.ts_partner_started,
+        d.ts_partner_ended,
+        d.ts_legal_risk_started,
+        d.ts_legal_risk_ended
     FROM
         datalake_sales_flow_clean.diligence AS d
     INNER JOIN 
@@ -433,6 +396,34 @@ rescission AS (
         ON r.id_rescission = lur.id_rescission
         AND r.ts_updated = lur.ts_last_updated
 ),
+-- ONBOARDING CTE
+status_closing_changes AS (
+    SELECT 
+        id,
+        ts_updated,
+        LAG(status_closing)
+        OVER (
+            PARTITION BY
+                id 
+            ORDER BY 
+                ts_updated
+        ) AS previous_status
+    FROM
+        datalake_sales_flow_clean.sales_flow_aud 
+    WHERE
+        mod_status_closing
+),
+onboarding AS (
+    SELECT 
+        id AS id_sales_flow,
+        DATE(MAX(ts_updated)) AS dt_ended
+    FROM
+        status_closing_changes
+    WHERE
+        previous_status = 'ONBOARDING'
+    GROUP BY
+        id_sales_flow
+),
 -- TAG CTE
 last_update_tag AS (
     SELECT
@@ -464,8 +455,26 @@ SELECT
     sp.id_user_consultant,
     sp.id_consultant,
     off.id_sales_flow,
-    sp.sk_user_team_lead,
-    sp.sk_team_lead,
+    sp.id_user_team_lead AS sk_user_team_lead,
+    sp.id_team_lead AS sk_team_lead,
+    sp.id_user_pre_specialist,
+    sp.id_pre_specialist,
+    sp.id_user_post_specialist,
+    sp.id_post_specialist,
+    sp.id_user_credit_specialist,
+    sp.id_credit_specialist,
+    sp.id_user_start_financing_specialist,
+    sp.id_start_financing_specialist,
+    sp.id_user_follow_up_financing_specialist,
+    sp.id_follow_up_financing_specialist,
+    sp.id_user_end_financing_specialist,
+    sp.id_end_financing_specialist,
+    sp.id_user_notes_registry_specialist,
+    sp.id_notes_registry_specialist,
+    sp.id_user_real_estate_register_specialist,
+    sp.id_real_estate_register_specialist,
+    sp.id_user_legal_risk_analyst,
+    sp.id_legal_risk_analyst,
     mg.bank AS financing_bank,
     CASE  
         WHEN sf.flow_step = 'CANCELED_ON_NEGOTIATION'
@@ -517,6 +526,24 @@ SELECT
     sp.consultant_email,
     sp.team_lead_name,
     sp.team_lead_email,
+    sp.pre_specialist_name,
+    sp.pre_specialist_email,
+    sp.post_specialist_name,
+    sp.post_specialist_email,
+    sp.credit_specialist_name,
+    sp.credit_specialist_email,
+    sp.start_financing_specialist_name,
+    sp.start_financing_specialist_email,
+    sp.follow_up_financing_specialist_name,
+    sp.follow_up_financing_specialist_email,
+    sp.end_financing_specialist_name,
+    sp.end_financing_specialist_email,
+    sp.notes_registry_specialist_name,
+    sp.notes_registry_specialist_email,
+    sp.real_estate_register_specialist_name,
+    sp.real_estate_register_specialist_email,
+    sp.legal_risk_analyst_name,
+    sp.legal_risk_analyst_email,
     sf.status_closing AS closing_status,
     d.classification AS house_dilligence_status,
     da.appointment AS diligence_appointment_reason,
@@ -561,9 +588,23 @@ SELECT
         WHEN sf.flow_step = 'CANCELED_CCV' 
         THEN DATE(off.ts_discarded)
     END AS dt_sale_agreement_cancelled,
+    o.dt_ended AS dt_onboarding_ended,
+    DATE(d.ts_buyer_seller_ended) AS dt_legal_analysis_ended,
+    DATE(d.ts_partner_started) AS dt_legaut_analysis_started,
+    DATE(d.ts_partner_ended) AS dt_legaut_analysis_ended,
+    DATE(d.ts_legal_risk_started) AS dt_legal_risk_started,
+    DATE(d.ts_legal_risk_ended) AS dt_legal_risk_ended,
+    DATE(mg.dt_bank_started) AS dt_bank_legal_analysis_started,
+    DATE(mg.dt_credit_started) AS dt_credit_analysis_started,
+    DATE(mg.dt_credit_ended) AS dt_credit_analysis_ended,
+    DATE(mg.dt_started) AS dt_financing_started,
+    DATE(mg.dt_ended) AS dt_financing_ended,
+    cp.dt_crn_started AS dt_notes_registry_started,
+    cp.dt_crn_ended AS dt_notes_registry_ended,
     n.dt_started AS dt_house_registry_started,
     n.dt_ended AS dt_house_registry_ended,
     n.dt_seller_paid AS dt_sale_transacton_paid,
+    n.dt_buyer_received_keys AS dt_sale_key_delivered,
     off.ts_accepted,
     off.ts_discarded,
     ccv.ts_signed,
@@ -580,7 +621,7 @@ LEFT JOIN
     ccvs AS ccv 
         ON ccv.id_offer = off.id_offer
 LEFT JOIN 
-    specialists AS sp 
+    datalake_sale_offer_flows.offer_specialists AS sp 
         ON sp.id_offer = off.id_offer
 LEFT JOIN 
     mortgage AS mg 
@@ -609,6 +650,9 @@ LEFT JOIN
 LEFT JOIN 
     rescission AS r 
         ON r.id_sales_flow = off.id_sales_flow
+LEFT JOIN
+    onboarding AS o
+        ON o.id_sales_flow = off.id_sales_flow
 LEFT JOIN
     tag
         ON tag.id_sales_flow = off.id_sales_flow
