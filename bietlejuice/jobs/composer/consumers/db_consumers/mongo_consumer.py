@@ -3,12 +3,31 @@ import json
 from datetime import datetime, timedelta
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 from bietlejuice.jobs.composer.consumers.db_consumers.db_consumer import DBConsumer
 from bietlejuice.jobs.composer.services import JsonService
 
 from bson.json_util import dumps as bson_dumps, RELAXED_JSON_OPTIONS
 
 logger = QuintoAndarLogger("MongoConsumer")
+
+
+def convert_columns_to_string_type(data):
+    """
+    Converts all columns of a dict or a list of dict to string type.
+    :param data: the data that must be converted.
+    :type data: dict or list of dict
+    """
+    converted_data = []
+    if isinstance(data, list):
+        for item in data:
+            converted_data.append(
+                JsonService.transform_columns_type_to_string(item)
+            )
+    else:
+        converted_data.append(JsonService.transform_columns_type_to_string(data))
+
+    return converted_data
 
 
 class MongoConsumer(DBConsumer):
@@ -68,47 +87,6 @@ class MongoConsumer(DBConsumer):
             for coll_name in collection_names
         ]
         df = self.spark_client.create_dataframe(collections)
-        return df
-
-    @logger(exclude="data", exclude_return=True)
-    def __convert_columns_to_string_type(self, data):
-        """
-        Converts all columns of a dict or a list of dict to string type.
-        :param data: the data that must be converted.
-        :type data: dict or list of dict
-        """
-        converted_data = []
-        if isinstance(data, list):
-            for item in data:
-                converted_data.append(
-                    JsonService.transform_columns_type_to_string(item)
-                )
-        else:
-            converted_data.append(JsonService.transform_columns_type_to_string(data))
-
-        return converted_data
-
-    @logger(exclude_return=True)
-    def __convert_bson_documents_to_spark_dataframe(self, documents):
-        """
-        Converts [a list of] bson documents to spark_dataframe using bson_dumps
-        :param documents: return get_documents method in MongoClient
-        :type documents: list of bson documents or a bson document
-        :return: A Spark DataFrame with all columns of the string type
-        """
-        # documents are a list of Bson (Mongo format), it's necessary to convert to dict.
-        # convert  bson -> json_string -> dict
-        data = json.loads(bson_dumps(documents, json_options=RELAXED_JSON_OPTIONS))
-        converted_data = self.__convert_columns_to_string_type(data)
-
-        try:
-            df = self.spark_client.create_dataframe(converted_data)
-        except ValueError:
-            logger.warning(
-                "m=__convert_bson_documents_to_spark_dataframe, msg=Spark DataFrame is empty"
-            )
-            df = None
-
         return df
 
     @logger(exclude_return=True)
@@ -200,7 +178,17 @@ class MongoConsumer(DBConsumer):
         OBS: ALL fields are converted to string type
         """
         documents = self.mongo_client.get_documents(table_name, query)
-        df = self.__convert_bson_documents_to_spark_dataframe(documents)
+
+        try:
+            rdd = BaseSparkContext.sc.parallelize(documents)
+            rdd = rdd.map(lambda document: convert_columns_to_string_type(json.loads(bson_dumps(document)))[0]).collect()
+            df = self.spark_client.create_dataframe(rdd)
+        except ValueError:
+            logger.warning(
+                "m=get_data_from_query, msg=Spark DataFrame is empty"
+            )
+            df = None
+            
         return df
 
     @logger
