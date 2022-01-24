@@ -306,7 +306,7 @@ with house_available_hours as (
   	join datalake_ebdb_raw_prod.imovel i on i.id = cast(bk.id_property as bigint)
   	where type = 'Visita'
 		and visit_intent = 'RENT'
-		and cancellation_reason != 'CANCELED_CANT_FIND_ANOTHER_AGENT' -- removing all bookings that were cancelled with this reason, so we can count them as still repressed demand
+		and (cancellation_reason IS NULL OR cancellation_reason != 'CANCELED_CANT_FIND_ANOTHER_AGENT') -- removing all bookings that were cancelled with this reason, so we can count them as still repressed demand
 )
 , bookings_clean as (
 	select
