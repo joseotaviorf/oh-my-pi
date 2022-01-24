@@ -131,12 +131,49 @@ events AS (
         SUM(budget) AS budget,
         COUNT(NULL) AS new_contact_prospects_target,
         SUM(contact_flow_target) AS contact_flow_target,
-        SUM(tof_users_target) AS tof_users_target
+        COUNT(NULL) AS tof_users_target
 FROM
     datamarts.performance_marketing_metrics_portal_casa_mineira
     WHERE
         dt >= CURRENT_DATE - INTERVAL '360 DAY'
         AND mkt_business = 'portal'
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
+    UNION ALL
+    -----------------------------
+    -- ToF Portal Targets --
+    -----------------------------
+    SELECT
+        DATE_TRUNC('MONTH', dt_target) AS month_start,
+        NULL::INT AS id_advertiser,
+        NULL::TEXT AS advertiser,
+        NULL::TEXT AS uf_advertiser,
+        NULL::TEXT AS city_advertiser,
+        NULL::TEXT AS type_advertiser,
+        NULL::TEXT AS business_context,
+        NULL::TEXT AS uf_listing,
+        NULL::TEXT AS city_listing,
+        NULL::TEXT AS mkt_origin,
+        NULL::TEXT AS mkt_channel,
+        mkt_medium,
+        mkt_source,
+        'portal' AS mkt_business,
+        NULL::TEXT AS city_group,
+        NULL::TEXT AS status_month_end,
+        NULL::TEXT AS status_month_start,
+        NULL::INT AS listings_month_end,
+        NULL::INT AS listings_month_start,
+        COUNT(NULL) AS budget_advertiser,
+        0 AS listings_contacted,
+        0 AS contact_flows,
+        0 AS new_contact_prospects,
+        0 AS contact_prospects,
+        COUNT(NULL) AS tof_users,
+        0.0 AS cost,
+        COUNT(NULL) AS budget,
+        COUNT(NULL) AS new_contact_prospects_target,
+        COUNT(NULL) AS contact_flow_target,
+        SUM(top_of_funnel_target) AS tof_users_target
+    FROM datalake_gsheets_clean_prod.targets_portal_casa_mineira_cost_cf
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
     UNION ALL
     --------------------------------------------
