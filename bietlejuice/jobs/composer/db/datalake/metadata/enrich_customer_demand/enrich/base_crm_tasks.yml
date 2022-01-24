@@ -1,0 +1,35 @@
+---
+database_name: datalake_customer_demand
+table_name: base_crm_tasks
+columns:
+  id_task:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.id_task
+  id_contract:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_contract
+  type:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.type
+  action_type:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.action_type
+  is_resolved:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.is_resolved
+  dt_start:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_started
+  dt_completed:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_completed
+  dt_termination_requested:
+    lineage:
+      - datalake_terminator_clean.termination.ts_created
+  dt_termination:
+    lineage:
+      - datalake_terminator_clean.termination.dt_termination
+  dt_termination_finished:
+    lineage:
+      - datalake_terminator_clean.termination_aud.ts_updated
+      - datalake_terminator_clean.negotiation.ts_updated
