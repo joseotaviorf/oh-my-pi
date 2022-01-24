@@ -15,6 +15,14 @@ WITH termination_finished AS (
   WHERE
     status = 'DONE'
   GROUP BY 1
+),
+last_updated_task AS (
+  SELECT
+    id_task,
+    MAX(DATE(CONCAT(year, '-', month, '-', day))) AS dt_last_updated
+  FROM
+    datalake_crm_tasks_flows.tasks_actions_resolutions_flow
+  GROUP BY 1
 )
 SELECT
   tarf.id_task,
@@ -29,6 +37,10 @@ SELECT
   MAX(DATE(tf.ts_termination_finished)) AS dt_termination_finished
 FROM 
   datalake_crm_tasks_flows.tasks_actions_resolutions_flow tarf
+JOIN
+  last_updated_task lut
+    ON tarf.id_task = lut.id_task
+    AND DATE(CONCAT(year, '-', month, '-', day)) = lut.dt_last_updated
 LEFT JOIN
   datalake_crm_tasks_flows.tasks_users_resolutions_flow turf
     ON tarf.id_task = turf.id_task
