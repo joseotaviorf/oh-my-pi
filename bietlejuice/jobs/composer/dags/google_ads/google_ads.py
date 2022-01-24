@@ -53,15 +53,13 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-)
-
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag,
-    task_id="create-cluster",
-    cluster_configuration=CLUSTER_DESCRIPTION,
     doc_md=BaseDAG.get_dag_doc(SOURCE).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
+)
+
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
+    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
