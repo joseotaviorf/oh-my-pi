@@ -14,8 +14,8 @@ WITH cities_calendar AS (
         datalake_quintoandar.aux_date ad
     LEFT JOIN
         datalake_gsheets_clean.service_city_holidays sch
-            ON r.id = sch.id_city 
-            AND ad.date = sch.dt_holiday
+            ON ad.date = sch.dt_holiday 
+            AND (r.id = sch.id_city OR sch.category = 'Nacional')
     WHERE 
         r.level = 'Cidade'
 ),
