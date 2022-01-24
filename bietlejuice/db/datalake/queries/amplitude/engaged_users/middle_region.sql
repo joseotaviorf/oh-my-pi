@@ -15,5 +15,5 @@ listings as (
   join datalake_clean.ods_fact_house_listings fhl
     on dhl.sk_house_listing = fhl.sk_house_listing
   left join datalake_clean.ods_dim_region dr
-    on fhl.sk_region = cast(dr.sk_region as varchar)
+    on cast(fhl.sk_region as varchar) = cast(dr.sk_region as varchar)
 ),
