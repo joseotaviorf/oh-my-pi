@@ -1,9 +1,11 @@
 CREATE SCHEMA IF NOT EXISTS braze;
 DROP TABLE IF EXISTS braze.dim_canvas;
 CREATE TABLE braze.dim_canvas (
+  sk_variant_canvas VARCHAR,
   sk_canvas VARCHAR,
   user_type VARCHAR,
   canvas_name VARCHAR,
+  variant_name VARCHAR,
   canvas_description VARCHAR,
   schedule_type VARCHAR,
   is_archived BOOLEAN,
