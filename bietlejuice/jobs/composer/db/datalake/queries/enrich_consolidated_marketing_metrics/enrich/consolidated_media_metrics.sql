@@ -132,7 +132,7 @@ WITH consolidated_sources AS (
         id_date = INT(REPLACE(DATE('{year}-{month}-{day}'), '-', ''))
 )
 
-SELECT 
+SELECT
     mc.id_date,
     origin,
     account_name,
@@ -157,7 +157,7 @@ LEFT JOIN
         AND mc.id_date = sr.id_date 
 LEFT JOIN
     datalake_consolidated_marketing_costs.city_group_old_campaigns_historic ch
-        ON LOWER(mc.campaign_name) = LOWER(ch.campaign_name)
+        ON mc.campaign_name = ch.campaign_name
 LEFT JOIN 
     datalake_region.region dr
         ON SPLIT(mc.campaign_name, '[.]')[0] = dr.id
