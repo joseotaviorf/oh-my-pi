@@ -1,0 +1,52 @@
+---
+database_name: datalake_inmetro_clean
+table_name: data_validations
+columns:
+  suite_name:
+    lineage:
+      - datalake_inmetro_raw.metadata
+  layer:
+    lineage:
+      - datalake_inmetro_raw.layer
+  database:
+    lineage:
+      - datalake_inmetro_raw.database
+  table:
+    lineage:
+      - datalake_inmetro_raw.table
+  suite_result:
+    lineage:
+      - datalake_inmetro_raw.metadata
+  validations_count:
+    lineage:
+      - datalake_inmetro_raw.metadata
+  success_count:
+    lineage:
+      - datalake_inmetro_raw.metadata
+  failure_count:
+    lineage:
+      - datalake_inmetro_raw.metadata
+  success_rate:
+    lineage:
+      - datalake_inmetro_raw.metadata
+  metadata:
+    lineage:
+      - datalake_inmetro_raw.metadata
+  validations:
+    lineage:
+      - datalake_inmetro_raw.validations
+  ts_execution_utc:
+    lineage:
+      - datalake_inmetro_raw.metadata
+  ts_execution_local:
+    lineage:
+      - datalake_inmetro_raw.metadata
+  year:
+    lineage:
+      - datalake_inmetro_raw.year
+  month:
+    lineage:
+      - datalake_inmetro_raw.month
+  day:
+    lineage:
+      - datalake_inmetro_raw.day
