@@ -24,12 +24,12 @@ demand_cost AS (
     GROUP BY 1, 2, 3, 4, 5, 6
 ),
 affiliates AS (
-    WITH 
+    WITH
     ia_fact_cost AS (
-        SELECT
-            fc.id_date as sk_date, 
-            'fact_cost' AS table_origin, 
-            mkt_origin, 
+        (SELECT
+            fc.id_date as sk_date,
+            'fact_cost' AS table_origin,
+            mkt_origin,
             fc.city_group,
             CASE
                 WHEN fc.utm_campaign ~* '(acq)' OR fc.mkt_source = 'Bing'
@@ -48,7 +48,41 @@ affiliates AS (
         FROM
             datalake_marketing_costs_prod.daily_costs AS fc
         WHERE
-            fc.mkt_origin = 'Indica Aí - General' 
+            fc.mkt_origin = 'Indica Aí - General'
+            AND flow_type <> 'historical'
+            AND fc.id_date BETWEEN 20210101 AND 20210701
+            OR(fc.mkt_origin = 'Indica Aí - General'
+                AND flow_type <> 'historical'
+                AND fc.id_date >= 20210701
+                AND fc.mkt_source <> 'Spinver')
+        )
+
+        UNION ALL
+
+        (SELECT
+            fc.id_date as sk_date,
+            'fact_cost' AS table_origin,
+            mkt_origin,
+            fc.city_group,
+            CASE
+                WHEN fc.utm_campaign ~* '(acq)' OR fc.mkt_source = 'Bing'
+                    THEN 'acquisition'
+                WHEN fc.utm_campaign ~* '(eng)'
+                    THEN 'engagement'
+                ELSE NULL
+            END AS vertical,
+            CASE
+                WHEN fc.mkt_source IN ('Twilio', 'Movile')
+                    THEN 'Notification'
+                ELSE mkt_source
+            END AS source,
+            NULL AS business_context,
+            fc.cost
+        FROM
+        	datalake_marketing_costs_prod.daily_costs fc
+        WHERE fc.mkt_origin = 'Indica Aí - General'
+        AND fc.id_date < 20210101
+        )
     ),
     ia_affiliate_commission_costs AS (
         WITH
@@ -65,6 +99,9 @@ affiliates AS (
                 quintoandar.fact_affiliate_costs AS f
             LEFT JOIN quintoandar.dim_affiliate_cost AS d
                 ON f.sk_rh_accounting_entry = d.sk_rh_accounting_entry
+            WHERE f.sk_date < 20210701
+                OR (f.sk_date >= 20210701
+                    AND sk_user NOT IN (360754,912255,1711931,2257503))
         )
         SELECT 
             cc.sk_date,
@@ -179,12 +216,62 @@ affiliates AS (
             WHERE final_bonus_sale > 0
             AND sk_date >= 20210701
             GROUP BY 1,2,3,4,5,6,7
-        )
+        ),
+    extra_promotional_bonus_rent AS(
+        SELECT
+            TO_CHAR(NULLIF(eb.date,'')::DATE,'yyyymmdd')::BIGINT AS sk_date,
+            'extra_bonus' AS table,
+            CASE
+                WHEN dua.type = 'Standard' THEN 'Indica Aí - General'
+                WHEN dua.type = 'Agent' THEN 'Indica Aí - Agents'
+                ELSE dua.type
+            END AS mkt_origin,
+            eb.city_group,
+            'engagement' AS vertical,
+            'Promotional Bonus' AS source,
+            'rent' AS business_context,
+            SUM(CASE WHEN eb.business_context = 'rent' THEN bonus WHEN eb.business_context = 'hybrid' THEN 0.5 * bonus ELSE 0 END) AS cost
+        FROM
+            datalake_gsheets_clean_prod.affiliates_extra_user_bonus eb
+        LEFT JOIN dim_user_affiliate dua
+            ON dua.sk_user = eb.sk_user
+        WHERE eb.business_context IN ('rent', 'hybrid')
+        GROUP BY 1,2,3,4,5,6,7
+    ),
+    extra_promotional_bonus_sale AS(
+        SELECT
+            TO_CHAR(NULLIF(eb.date,'')::DATE,'yyyymmdd')::BIGINT AS sk_date,
+            'extra_bonus' AS table,
+            CASE
+                WHEN dua.type = 'Standard' THEN 'Indica Aí - General'
+                WHEN dua.type = 'Agent' THEN 'Indica Aí - Agents'
+                ELSE dua.type
+            END AS mkt_origin,
+            eb.city_group,
+            'engagement' AS vertical,
+            'Promotional Bonus' AS source,
+            'sale' AS business_context,
+            SUM(CASE WHEN eb.business_context = 'sale' THEN bonus WHEN eb.business_context = 'hybrid' THEN 0.5 * bonus ELSE 0 END) AS cost
+        FROM
+            datalake_gsheets_clean_prod.affiliates_extra_user_bonus eb
+        LEFT JOIN dim_user_affiliate dua
+            ON dua.sk_user = eb.sk_user
+        WHERE eb.business_context IN ('sale', 'hybrid')
+        GROUP BY 1,2,3,4,5,6,7
+    )
         SELECT * FROM segmentation_promo_bonus
 
         UNION ALL 
 
         SELECT * FROM cluster_promo_bonus
+
+        UNION ALL
+
+        SELECT * FROM extra_promotional_bonus_rent
+
+        UNION ALL
+
+        SELECT * FROM extra_promotional_bonus_sale
     ),
     ia_fact_affiliate_transposed AS (
         SELECT
@@ -342,9 +429,13 @@ affiliates AS (
                 AND lbc.business_context = 'SALE'
             LEFT JOIN lbc_rent AS rbc 
                 ON rbc.id_house = lf.sk_house_listing/1000  
-            WHERE lf.sk_first_listing_date > 0
+            WHERE lf.sk_first_listing_date BETWEEN 0 AND 20210630
                 AND lf.sk_user_lead_affiliate > 0
                 AND lf.mkt_origin IN ('Doorman', 'Indica Aí - Agents', 'Indica Aí - General')
+                OR(lf.sk_first_listing_date >= 20210701
+                    AND lf.sk_user_lead_affiliate > 0
+                    AND lf.mkt_origin IN ('Doorman', 'Indica Aí - Agents', 'Indica Aí - General')
+                    AND lf.sk_user_lead_affiliate NOT IN (360754,912255,1711931,2257503))
         )
         (SELECT
             sk_first_listing_date,
@@ -433,9 +524,13 @@ affiliates AS (
             LEFT JOIN lbc_sale AS sbc 
                 ON sbc.id_house = lf.sk_house_listing/1000
             WHERE 
-                lf.sk_first_listing_date > 0
+                lf.sk_first_listing_date BETWEEN 0 AND 20210630
                 AND lf.sk_user_lead_affiliate > 0
                 AND lf.mkt_origin = 'Doorman'
+                OR(lf.sk_first_listing_date >= 20210701
+                    AND lf.sk_user_lead_affiliate > 0
+                    AND lf.mkt_origin = 'Doorman'
+                    AND lf.sk_user_lead_affiliate NOT IN (360754,912255,1711931,2257503))
         )
         SELECT
             sk_first_listing_date,
@@ -691,6 +786,173 @@ supply_ciq_cost_comission AS (
         datalake_gsheets_clean_prod.ciq_costs AS co
     GROUP BY 1,2,3,4,5,6
 ),
+supply_ciq_cost_comission_sale AS (
+    SELECT
+        data::DATE AS dt_cost,
+        co.city AS city_group,
+        'Sale' AS business,
+        'Supply' AS planning_mkt_level1,
+        'Affiliates' AS planning_mkt_level2,
+        'CIQ' AS planning_mkt_level3,
+        SUM(co.comission_listing_fs::FLOAT) AS costs
+    FROM
+        datalake_gsheets_clean_prod.ciq_costs AS co
+    GROUP BY 1,2,3,4,5,6
+),
+supply_spinver_cost AS(
+    WITH spinver_costs AS(
+        WITH spinver_qualifieds AS(
+            SELECT
+                dd.month_start,
+                dd.year_month,
+                dr.city_group,
+                COUNT(DISTINCT (CASE WHEN llf.context_qualified = 'Rent' THEN llf.sk_house_listing_flow ELSE NULL END)) rent_qualified,
+                COUNT(DISTINCT (CASE WHEN llf.context_qualified = 'Sale' THEN llf.sk_house_listing_flow ELSE NULL END)) sale_qualified,
+                COUNT(DISTINCT (CASE WHEN llf.context_qualified = 'Hybrid' THEN llf.sk_house_listing_flow ELSE NULL END)) hybrid_qualified,
+                COUNT(DISTINCT llf.sk_house_listing_flow ) total_qualified
+            FROM datamarts.lead_listing_flows llf
+            LEFT JOIN dim_date dd
+                ON dd.sk_date = llf.sk_qualified_date
+            LEFT JOIN dim_region dr
+                ON dr.sk_region = llf.sk_region
+            WHERE aux_rn_qualified = 1
+            AND llf.sk_qualified_date > 0
+            AND llf.sk_user_lead_affiliate IN (360754,912255,1711931,2257503)
+            AND dd.date >= '2021-07-01'
+            AND dr.city_group IS NOT NULL
+            GROUP BY 1,2,3
+            ORDER BY 1 DESC
+        ),
+        operation_costs_by_qualified AS(
+            SELECT
+                month_start,
+                SUM(total_qualified),
+                CASE
+                    WHEN SUM(total_qualified) BETWEEN 0 AND 1600 THEN (40)::float
+                    WHEN SUM(total_qualified) BETWEEN 1601 AND 1900 THEN (55)::float
+                    WHEN SUM(total_qualified) BETWEEN 1901 AND 2300 THEN (61)::float
+                    WHEN SUM(total_qualified) BETWEEN 2301 AND 2700 THEN (67)::float
+                    WHEN SUM(total_qualified) BETWEEN 2701 AND 3200 THEN (75)::float
+                    WHEN SUM(total_qualified) BETWEEN 3201 AND 3900 THEN (83)::float
+                    WHEN SUM(total_qualified) > 3900 THEN (94)::float
+                    ELSE NULL
+                END AS operation_cost_by_qualified
+            FROM spinver_qualifieds
+            GROUP BY 1
+        ),
+        operation_costs AS (
+            WITH rent_op_costs AS(
+                SELECT
+                sq.month_start,
+                sq.year_month,
+                sq.city_group,
+                'Rent' AS business_context,
+                sq.rent_qualified AS qualifieds,
+                CASE
+                    WHEN sq.city_group in ('Belo Horizonte', 'RMSP', 'Rio de Janeiro', 'Porto Alegre') THEN sq.hybrid_qualified/2.0
+                    ELSE sq.hybrid_qualified
+                END AS hybrid_qualifieds,
+                CASE
+                    WHEN sq.city_group in ('Belo Horizonte', 'RMSP', 'Rio de Janeiro', 'Porto Alegre') THEN ((sq.rent_qualified + (sq.hybrid_qualified/2.0)) * obq.operation_cost_by_qualified)::float
+                    ELSE ((sq.rent_qualified + (sq.hybrid_qualified)) * obq.operation_cost_by_qualified)::float
+                END AS operation_cost
+            FROM
+                spinver_qualifieds sq
+            LEFT JOIN operation_costs_by_qualified obq
+                ON sq.month_start = obq.month_start
+            ),
+            sale_op_costs AS(
+                SELECT
+                sq.month_start,
+                sq.year_month,
+                sq.city_group,
+                'Sale' AS business_context,
+                sq.sale_qualified AS qualifieds,
+                CASE
+                    WHEN sq.city_group in ('Belo Horizonte', 'RMSP', 'Rio de Janeiro', 'Porto Alegre') THEN sq.hybrid_qualified/2.0
+                    ELSE 0
+                END AS hybrid_qualifieds,
+                CASE
+                    WHEN sq.city_group in ('Belo Horizonte', 'RMSP', 'Rio de Janeiro', 'Porto Alegre') THEN ((sq.sale_qualified + (sq.hybrid_qualified/2.0)) * obq.operation_cost_by_qualified)::float
+                    ELSE 0
+                END AS operation_cost
+            FROM
+                spinver_qualifieds sq
+            LEFT JOIN operation_costs_by_qualified obq
+                ON sq.month_start = obq.month_start
+            )
+        SELECT * FROM rent_op_costs
+        union all
+        SELECT * FROM sale_op_costs
+        ),
+        exclusivity_costs AS (
+            WITH ex_cost_calc AS (
+                SELECT
+                    month_start,
+                    CASE
+                        WHEN SUM(rent_qualified + hybrid_qualified) BETWEEN 0 AND 1100 THEN SUM(rent_qualified + sale_qualified + hybrid_qualified) * 64.5
+                        WHEN SUM(rent_qualified + hybrid_qualified) BETWEEN 1101 AND 1300 THEN 100000
+                        WHEN SUM(rent_qualified + hybrid_qualified) BETWEEN 1301 AND 1450 THEN 140000
+                        WHEN SUM(rent_qualified + hybrid_qualified) > 1450 THEN 180000
+                        ELSE NULL
+                    END as rent_spinver_exclusivity_cost,
+                    CASE
+                        WHEN SUM(sale_qualified + hybrid_qualified) BETWEEN 0 AND 450 THEN SUM(rent_qualified + sale_qualified + hybrid_qualified) * 64.5
+                        WHEN SUM(sale_qualified + hybrid_qualified) BETWEEN 451 AND 550 THEN 100000
+                        WHEN SUM(sale_qualified + hybrid_qualified) BETWEEN 551 AND 610 THEN 140000
+                        WHEN SUM(sale_qualified + hybrid_qualified) > 611 THEN 180000
+                        ELSE NULL
+                    END AS sale_spinver_exclusivity_cost,
+                    SUM(rent_qualified + sale_qualified + hybrid_qualified) AS calc_qualified
+                FROM spinver_qualifieds
+                GROUP BY 1
+            )
+            SELECT
+                ec.month_start,
+                sq.year_month,
+                sq.city_group,
+                CASE
+                    WHEN ec.calc_qualified = 0 THEN 0
+                    WHEN ec.rent_spinver_exclusivity_cost < ec.sale_spinver_exclusivity_cost OR ec.sale_spinver_exclusivity_cost = 0 THEN ec.rent_spinver_exclusivity_cost/ec.calc_qualified
+                    ELSE ec.sale_spinver_exclusivity_cost/ec.calc_qualified
+                END AS exclusivity_cost_per_qualified
+            FROM
+                ex_cost_calc ec
+            LEFT JOIN spinver_qualifieds sq
+                on ec.month_start = sq.month_start
+        )
+        SELECT
+            oc.month_start,
+            oc.year_month,
+            oc.city_group,
+            oc.business_context,
+            oc.qualifieds,
+            oc.hybrid_qualifieds,
+            (oc.qualifieds + oc.hybrid_qualifieds) AS total_qualified,
+            oc.operation_cost,
+            (ef.exclusivity_cost_per_qualified * (oc.qualifieds + oc.hybrid_qualifieds)) AS exclusivity_fee
+        FROM
+            operation_costs oc
+        JOIN exclusivity_costs ef
+            ON oc.month_start = ef.month_start
+                AND oc.year_month = ef.year_month
+                AND oc.city_group = ef.city_group
+        WHERE qualifieds > 0
+        ORDER BY 1 DESC, 7 DESC
+    )
+    SELECT
+        month_start AS dt_cost,
+        city_group,
+        business_context AS business,
+        'Supply' AS planning_mkt_level1,
+        'Affiliates' AS planning_mkt_level2,
+        'Partners' AS planning_mkt_level3,
+        SUM(operation_cost::FLOAT + exclusivity_fee::FLOAT) AS costs
+    FROM
+        spinver_costs
+    WHERE month_start <= '2022-01-01'
+    GROUP BY 1,2,3,4,5,6
+),
 cost_union AS (
     SELECT * FROM demand_cost
     UNION ALL
@@ -713,6 +975,10 @@ cost_union AS (
     SELECT * FROM supply_ciq_cost
     UNION ALL
     SELECT * FROM supply_ciq_cost_comission
+    UNION ALL
+    SELECT * FROM supply_ciq_cost_comission_sale
+    UNION ALL
+    SELECT * FROM supply_spinver_cost
 )
 SELECT 
     to_char(dt_cost,'YYYY-MM-DD') AS dt_cost, 
@@ -764,6 +1030,6 @@ LEFT JOIN (
 ) AS dr
     ON cst.city_group = dr.city_group
 WHERE
-    dt_cost < current_date 
+    dt_cost < current_date
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,13
 ORDER BY 1 DESC, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
