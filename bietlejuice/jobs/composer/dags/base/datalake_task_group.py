@@ -201,19 +201,25 @@ class DatalakeTaskGroup(BaseTaskGroup):
         quality_tasks = []
         for tb_name in tb_names:
             table_name_suffix = StringFormatter.slugify(f"-{tb_name}")
-            data_quality_tests_table_task = QuintoAndarDatabricksSubmitRunOperator(
+            data_quality_tests_task = QuintoAndarDatabricksSubmitRunOperator(
                 dag=self.dag,
                 task_id=f"data-quality-tests-{layer}-{source}{table_name_suffix}",
                 json={
                     "spark_python_task": {
-                        "python_file": f"{self.spark_jobs_path}/data_quality_tests_table.py",
-                        "parameters": [],
+                        "python_file": f"{self.spark_jobs_path}/data_quality_tests.py",
+                        "parameters": [
+                            self.env,
+                            self.datalake_bucket,
+                            layer.value,
+                            self.relative_query_path,
+                            table_name,
+                        ],
                     }
                 },
                 execution_timeout=timedelta(hours=self.execution_timeout_hours),
             )
-            load_table_task.set_downstream([data_quality_tests_table_task])
-            quality_tasks.append(data_quality_tests_table_task)
+            load_table_task.set_downstream([data_quality_tests_task])
+            quality_tasks.append(data_quality_tests_task)
 
         return DatalakeTaskGroup.format_tasks_boundaries(
             initial_tasks=[load_table_task],
@@ -443,19 +449,25 @@ class DatalakeTaskGroup(BaseTaskGroup):
         if FileService.data_quality_tests_file_exists(
             self.relative_query_path, layer.value, table_name
         ):
-            data_quality_tests_table_task = QuintoAndarDatabricksSubmitRunOperator(
+            data_quality_tests_task = QuintoAndarDatabricksSubmitRunOperator(
                 dag=self.dag,
                 task_id=f"data-quality-tests-{layer.value}-{slugged_table_name}",
                 json={
                     "spark_python_task": {
-                        "python_file": f"{self.spark_jobs_path}/data_quality_tests_table.py",
-                        "parameters": [],
+                        "python_file": f"{self.spark_jobs_path}/data_quality_tests.py",
+                        "parameters": [
+                            self.env,
+                            self.datalake_bucket,
+                            layer.value,
+                            self.relative_query_path,
+                            table_name,
+                        ],
                     }
                 },
                 execution_timeout=timedelta(hours=self.execution_timeout_hours),
             )
-            load_table_task.set_downstream([data_quality_tests_table_task])
-            quality_tasks = [data_quality_tests_table_task]
+            load_table_task.set_downstream([data_quality_tests_task])
+            quality_tasks = [data_quality_tests_task]
 
         return DatalakeTaskGroup.format_tasks_boundaries(
             initial_tasks=[load_table_task],
