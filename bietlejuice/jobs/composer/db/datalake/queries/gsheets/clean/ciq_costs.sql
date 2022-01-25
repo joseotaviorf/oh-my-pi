@@ -3,6 +3,7 @@ SELECT
     comission_cs_ciq_full,
     comission_cs_ciq_manager,
     comission_listing,
+    comission_listing_fs,
     data,
     impostos,
     month,

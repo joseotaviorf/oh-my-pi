@@ -13,6 +13,9 @@ columns:
   comission_listing:
     lineage:
       - datalake_gsheets_raw.ciq_costs.comission_listing
+  comission_listing_fs:
+    lineage:
+      - datalake_gsheets_raw.ciq_costs.comission_listing_fs
   data:
     lineage:
       - datalake_gsheets_raw.ciq_costs.data
