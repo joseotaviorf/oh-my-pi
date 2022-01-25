@@ -12,14 +12,41 @@ bietlejuice.catalog_product_entities:
   - bietlejuice.enrich_bigid:load-enrich-bigid-entities-access-level
 
 # bietlejuice.datamarts_for_rent:
+#   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
+#   - bietlejuice.big_agent:load-clean-agency
+#   - bietlejuice.big_agent:load-clean-agent
+#   - bietlejuice.big_agent:load-clean-enrollment
+#   - bietlejuice.big_agent:load-clean-house
+#   - bietlejuice.big_agent:load-clean-program
+#   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
+#   - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
+#   - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
+#   - bietlejuice.dw_listing_jobs:load-janus-dim-photo-job-into-redshift
+#   - bietlejuice.dw_offer:load-public-dim-offer-into-redshift
+#   - bietlejuice.dw_region:load-public-dim-region-into-redshift
 #   - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
+#   - bietlejuice.dw_sale_listings:load-sale-dim-listing-into-redshift
+#   - bietlejuice.dw_sale_listing_flow:load-sale-fact-listing-flows-into-redshift
+#   - bietlejuice.dw_tenant_booking_review:load-public-dim-tenant-booking-review-into-redshift
+#   - bietlejuice.dw_user:load-public-dim-partner-into-redshift
+#   - bietlejuice.dw_user:load-public-dim-partner-agent-into-redshift
+#   - bietlejuice.dw_user:load-public-dim-user-into-redshift
 #   - bietlejuice.ebdb:create-clean-access-authorization-type-in-data-lake
 #   - bietlejuice.ebdb:create-clean-access-type-in-data-lake
 #   - bietlejuice.ebdb:create-clean-access-type-aud-in-data-lake
+#   - bietlejuice.ebdb:create-clean-agent-support-in-data-lake
+#   - bietlejuice.ebdb:create-clean-booking-in-data-lake
+#   - bietlejuice.ebdb:create-clean-follow-up-details-in-data-lake
 #   - bietlejuice.ebdb:create-clean-house-in-data-lake
+#   - bietlejuice.ebdb:create-clean-house-aud-in-data-lake
+#   - bietlejuice.ebdb:create-clean-house-visit-status-aud-in-data-lake
+#   - bietlejuice.ebdb:create-clean-house-weekly-schedule-aud-in-data-lake
 #   - bietlejuice.ebdb:create-clean-key-type-in-data-lake
+#   - bietlejuice.ebdb:create-clean-listing-business-context-in-data-lake
 #   - bietlejuice.ebdb:create-clean-occupant-type-in-data-lake
 #   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
+#   - bietlejuice.gsheets:load-clean-taxonomy-demand
+
 
 bietlejuice.dw_affiliate_costs:
   - bietlejuice.enrich_robin_hood

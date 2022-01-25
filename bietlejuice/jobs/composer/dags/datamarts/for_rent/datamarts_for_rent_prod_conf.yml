@@ -1,3 +1,4 @@
+# Merge Keys are available only in Yaml 1.1.
 pipeline:
   ##<KEEP THIS COMMENTED AS A TEMPLATE>
   # <task-name-like-attribution-conversion-paths>:
@@ -6,15 +7,52 @@ pipeline:
   #     table: <targe-table-name>
   #     schema: <target-schema-name> # TODO this will always be `datamart` (for both datalake and dw). This var is not used anymore
   #     runs_on: <backend-to-run-the-query> E.g: redshift or athena
-  weekly_demand_metrics:
-    dw:
-      sql_file: dw/queries/datamarts/for_rent/weekly_demand_metrics.sql
-      table: weekly_demand_metrics
+  redshift_template:
+    dw: &redshift_anchor
+      sql_file: dw/queries/datamarts/for_rent/override_me.sql
+      table: overrride_me
       schema: datamarts
       runs_on: redshift
-  house_weekly_entrance_info:
-    dw:
-      sql_file: dw/queries/datamarts/for_rent/house_weekly_entrance_info.sql
-      table: house_weekly_entrance_info
+  athena_template:
+    dw: &athena_anchor
+      sql_file: dw/queries/datamarts/for_rent/override_me.sql
+      table: overrride_me
       schema: datamarts
       runs_on: athena
+  weekly_demand_metrics:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_rent/weekly_demand_metrics.sql
+      table: weekly_demand_metrics
+  house_weekly_entrance_info:
+    dw:
+      <<: *athena_anchor
+      sql_file: dw/queries/datamarts/for_rent/house_weekly_entrance_info.sql
+      table: house_weekly_entrance_info
+  talk_to_agent:
+    dw:
+      <<: *athena_anchor
+      sql_file: dw/queries/datamarts/for_rent/talk_to_agent.sql
+      table: talk_to_agent
+  funnel_demand_flows:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_rent/funnel_demand_flows.sql
+      table: funnel_demand_flows
+      depends_on:
+        - talk_to_agent
+  datamart_opportunity:
+      dw:
+        <<: *redshift_anchor
+        sql: dw/queries/datamarts/for_rent/datamart_opportunity.sql
+        table: datamart_opportunity
+  quintoandar_consultant_listings:
+      dw:
+        <<: *redshift_anchor
+        sql: dw/queries/datamarts/for_rent/quintoandar_consultant_listings.sql
+        table: quintoandar_consultant_listings
+  repressed_demand:
+      dw:
+        <<: *athena_anchor
+        sql: dw/queries/datamarts/for_rent/repressed_demand.sql
+        table: repressed_demand
