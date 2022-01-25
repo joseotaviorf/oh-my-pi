@@ -690,6 +690,11 @@ survival_estimation_new_version:
     sheet_name: survival_estimation_new_version
     clean_table_name: survival_estimation_new_version
 
+tag_sla_target:
+    sheet_id: 1XB_PyWLyETfwUoJYyLDDF_PZ97swuTJExAjfhLfM7eo
+    sheet_name: SLA por tag
+    clean_table_name: tag_sla_target
+
 target_nps_weekly:
     sheet_id: 17hx0dsLK4CJ-sivMf7w1L54LMpZgkHboKpuI0S1Di3o
     sheet_name: target_nps_weekly

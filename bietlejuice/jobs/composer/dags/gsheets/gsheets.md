@@ -159,6 +159,7 @@ This pipeline produces the following output tables:
     - `supply_targets_2021`
     - `survival_estimation_new_version`
     - `survival_estimation`
+    - `tag_sla_target`
     - `targets_acquisition_cumulative_autonomous_agent`
     - `targets_agents_engagement`
     - `target_nps_weekly`

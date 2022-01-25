@@ -1,0 +1,19 @@
+---
+database_name: datalake_gsheets_clean
+table_name: tag_sla_target
+columns:
+  journey:
+    lineage:
+      - datalake_gsheets_raw.tag_sla_target.jornada
+  tag:
+    lineage:
+      - datalake_gsheets_raw.tag_sla_target.tag
+  sla:
+    lineage:
+      - datalake_gsheets_raw.tag_sla_target.sla
+  dt_start,:
+    lineage:
+      - datalake_gsheets_raw.tag_sla_target.data_inicio
+  dt_end:
+    lineage:
+      - datalake_gsheets_raw.tag_sla_target.data_fim

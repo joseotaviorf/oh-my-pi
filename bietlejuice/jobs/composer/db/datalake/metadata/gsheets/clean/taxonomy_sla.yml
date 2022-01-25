@@ -19,3 +19,9 @@ columns:
   sla_in_days:
     lineage:
       - datalake_gsheets_raw.taxonomy_sla.sla_visao_operacao_em_dias_uteis
+  dt_start:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_sla.data_inicio
+  dt_end:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_sla.data_fim
