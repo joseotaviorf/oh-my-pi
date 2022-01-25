@@ -27,7 +27,7 @@ columns:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_action_date
   sk_contract:
     lineage:
-      - dw_janus.dim_contract.sk_contract
+      - dw_public.dim_contract.sk_contract
       - datalake_ebdb_clean.onboarding.id_contrato
       - datalake_ebdb_clean.inspection.id_contract
       - datalake_ebdb_clean.contract.id

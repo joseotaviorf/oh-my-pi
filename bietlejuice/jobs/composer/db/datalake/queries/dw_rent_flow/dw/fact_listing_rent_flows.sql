@@ -162,7 +162,7 @@ WITH listing_rent_flows AS (
             AND dim_offer.sk_offer != -1
         LEFT JOIN dw_public.dim_proposal
             ON rent_flow.id_proposal = dim_proposal.id_proposal
-        LEFT JOIN dw_janus.dim_contract
+        LEFT JOIN dw_public.dim_contract
             ON rent_flow.id_contract = dim_contract.id_contract
         LEFT JOIN datalake_ebdb_agents.agents_review ar
             ON rent_flow.id_booking = ar.id_booking

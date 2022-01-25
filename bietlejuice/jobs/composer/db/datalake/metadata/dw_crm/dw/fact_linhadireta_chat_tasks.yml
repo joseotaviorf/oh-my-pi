@@ -13,7 +13,7 @@ columns:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_completed_date
   sk_contract:
     lineage:
-      - dw_janus.dim_contract.sk_contract
+      - dw_public.dim_contract.sk_contract
   sk_house_listing:
     lineage:
       - dw_public.fact_listing_rent_flows.sk_house_listing

@@ -9,11 +9,9 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 
-from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.jobs.composer.dags.base.dw_task_group import DWTaskGroup
-from bietlejuice.jobs.composer.services.configuration_service import (
-    ConfigurationService,
-)
+from bietlejuice.jobs.composer.services.configuration_service import ConfigurationService
 
 # This DAG is part of ODS migration but also loads models that are already created on Composer.
 # Schemas can be found on Config files, since we use `janus` and `quintoandar_temp`, in order to
@@ -22,7 +20,6 @@ from bietlejuice.jobs.composer.services.configuration_service import (
 CONTEXT = "contract"
 DAG_NAME = f"dw_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-
 
 config_service = ConfigurationService(DAG_NAME)
 
@@ -46,7 +43,7 @@ CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": BaseDAG.DEFAULT_OWNER,
+        "owner": DAGOwnerEnum.DATA_FOR_RENT,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },

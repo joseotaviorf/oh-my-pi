@@ -32,7 +32,7 @@ columns:
       - dw_public.fact_listing_rent_flows.sk_proposal
   sk_contract:
     lineage:
-      - dw_janus.dim_contract.sk_contract
+      - dw_public.dim_contract.sk_contract
       - datalake_ebdb_clean.contract.id
       - dw_public.fact_listing_rent_flows.sk_contract
   sk_house_listing:

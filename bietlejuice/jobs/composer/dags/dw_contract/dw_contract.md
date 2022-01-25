@@ -14,7 +14,7 @@ This DAG is triggered daily, via Mediator. More information about run time [here
 
 This pipeline produces the following output table in DW, via full load: 
 
-- `janus.dim_contract`
+- `dw_public.dim_contract`
 - `quintoandar_temp.dim_contract_person`
 - `quintoandar_temp.fact_contract_people`
 

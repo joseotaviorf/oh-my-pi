@@ -1,7 +1,7 @@
 ---
 tables:
   - table_name: dim_contract
-    schema: janus
+    schema: public
   - table_name: dim_contract_person
     schema: quintoandar_temp
   - table_name: fact_contract_people

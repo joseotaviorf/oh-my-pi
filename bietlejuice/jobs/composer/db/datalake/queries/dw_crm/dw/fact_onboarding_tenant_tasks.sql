@@ -35,7 +35,7 @@ contracts AS (
   FROM
     datalake_crm_tasks_flows.tasks_users_resolutions_flow turf
   LEFT JOIN 
-    dw_janus.dim_contract dc
+    dw_public.dim_contract dc
       ON turf.origin = 'Contrato'
       AND turf.id_origin = dc.sk_contract
   LEFT JOIN 

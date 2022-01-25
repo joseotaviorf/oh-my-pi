@@ -1,5 +1,5 @@
-drop table if exists dim_contract;
-create table dim_contract (
+drop table if exists public.dim_contract;
+create table public.dim_contract (
   sk_contract bigint primary key,
   id_contract bigint,
   rent numeric(14,2),
@@ -7,12 +7,6 @@ create table dim_contract (
   guarantee varchar,
   type varchar,
   status varchar,
-  dt_start date,
-  ts_signature timestamp,
-  ts_draft_approved timestamp,
-  dt_entrance date,
-  dt_intended_end date,
-  dt_annulment date,
   condo_payer varchar,
   condo_responsible varchar,
   iptu_payer varchar,
@@ -26,20 +20,27 @@ create table dim_contract (
   condo numeric(14,2),
   iptu numeric(14,2),
   tenant_service_fee numeric(5,2),
-  is_tenant_service_fee_opt_out boolean,
-  ts_tenant_service_fee_opt_out timestamp,
   signature_type varchar,
   closing_status varchar,
-  ts_created timestamp,
-  ts_updated timestamp,
-  ts_canceled timestamp,
   cancellation_reason varchar,
+  version varchar,
   is_b2b boolean,
   b2b_type varchar,
   b2b_prime_type varchar,
-  ts_analyst_annulment_input timestamp,
-  version varchar,
   is_ongoing_contract boolean,
+  is_tenant_service_fee_opt_out boolean,
+  dt_start date,
+  dt_entrance date,
+  dt_intended_end date,
+  dt_annulment date,
+  ts_created timestamp,
+  ts_updated timestamp,
+  ts_signature timestamp,
+  ts_draft_approved timestamp,
+  ts_canceled timestamp,
+  ts_tenant_service_fee_opt_out timestamp,
+  ts_analyst_annulment_input timestamp,
   ts_load timestamp
-)
-;
+);
+
+ALTER TABLE public.dim_contract OWNER TO databricks;

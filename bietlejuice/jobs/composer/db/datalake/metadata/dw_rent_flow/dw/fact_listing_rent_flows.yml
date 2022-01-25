@@ -122,7 +122,7 @@ columns:
       - datalake_ebdb_rent_flow.rent_flow.dt_contract_annulment
   sk_contract_canceled_date:
     lineage:
-      - dw_janus.dim_contract.ts_canceled
+      - dw_public.dim_contract.ts_canceled
   sk_credit_analysis_first_init_date:
     lineage:
       - dw_public.dim_proposal.dt_credit_analysis_first_init
@@ -197,7 +197,7 @@ columns:
       - dw_public.dim_booking.utm_term
   funnel_step_drop_reason:
     lineage:
-      - dw_janus.dim_contract.cancellation_reason
+      - dw_public.dim_contract.cancellation_reason
       - dw_public.dim_offer.rejection_reason
       - dw_public.dim_proposal.rejection_reason
       - dw_public.dim_booking.cancellation_reason

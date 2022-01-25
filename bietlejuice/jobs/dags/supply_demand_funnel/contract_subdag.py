@@ -24,7 +24,7 @@ class ContractSubDag(DimSubDag):
     def build_contract_with_tests(self):
         contract_dag = self._build_local_dag()
 
-        (contract_task, staging_dim_contract_task, dim_contract) = self.__build_data_tasks(contract_dag)
+        (contract_task, staging_dim_contract_task) = self.__build_data_tasks(contract_dag)
 
         # TODO: put tests back to flow
         # tests_tasks = self.build_tests_tasks(contract_dag)
@@ -32,7 +32,6 @@ class ContractSubDag(DimSubDag):
         contract_task >> staging_dim_contract_task
         # staging_dim_contracttask.set_downstream(tests_tasks)
         # dim_contract.set_upstream(tests_tasks)
-        staging_dim_contract_task >> dim_contract
 
         return contract_dag
 
@@ -57,14 +56,4 @@ class ContractSubDag(DimSubDag):
             }
         )
 
-        dim_contract = BaseDAG.build_python_operator(
-            dag=dag,
-            task_id='DW_dim_contract',
-            python_callable=utils.load_dim_from_staging_to_dw,
-            op_kwargs={
-                'dim_name': 'contract',
-                'bucket': self.bucket
-            }
-        )
-
-        return (contract_task, staging_dim_contract_task, dim_contract)
+        return (contract_task, staging_dim_contract_task)
