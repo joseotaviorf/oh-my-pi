@@ -456,3 +456,18 @@ class TestHiveMetastoreService:
         mocked_open_conn.bulk_drop_partitions.assert_called_once_with(
             database_name, table_name, partition_list
         )
+
+    def test_drop_table(self, hive_metastore_service):
+        # arrange
+        database_name = "datalake_bla"
+        table_name = "foo_table"
+
+        mocked_open_conn = self._mock_open_connection_helper(hive_metastore_service)
+
+        # act
+        hive_metastore_service.drop_table(database_name, table_name)
+
+        # assert
+        mocked_open_conn.drop_table.assert_called_once_with(
+            database_name, table_name
+        )

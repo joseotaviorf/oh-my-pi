@@ -128,7 +128,15 @@ class HiveMetastoreService(MetastoreService):
         )
 
     def drop_table(self, database_name, table_name):
-        raise NotImplementedError("m=drop_table, msg=method not implemented")
+        """
+        Drops the table in the Hive Metastore.
+
+        :param database_name: the database name
+        :param table_name: the table name
+        :return:
+        """
+        with self.client as conn:
+            return conn.drop_table(database_name, table_name)
 
     def get_table_names(self, database_name, regex="*"):
         """
