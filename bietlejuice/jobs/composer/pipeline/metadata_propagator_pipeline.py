@@ -11,8 +11,9 @@ logger = QuintoAndarLogger("MetadataPropagatorPipeline")
 class MetadataPropagatorPipeline(AbstractPipeline):
 
     ENDPOINT_MAP = {
-        MetadataTypeEnum.LINEAGE.value: "/lineage",
         MetadataTypeEnum.FULL_CONTENT_LINEAGE.value: "/fullContentLineage",
+        MetadataTypeEnum.QUALITY_METRICS.value: "/qualityMetrics",
+        MetadataTypeEnum.LINEAGE.value: "/lineage",
         MetadataTypeEnum.TAGS.value: "/tags",
     }
 
