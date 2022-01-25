@@ -237,6 +237,15 @@ pipeline:
     when:
       event: push
 
+  validate-metadata-files-exist:
+    group: tests
+    image: python:3.7.3
+    commands:
+      - make requirements-scripts-python3
+      - make validate-metadata-files-exist
+    when:
+      event: push
+
   make-package-python3:
     group: package
     image: python:3.7.3

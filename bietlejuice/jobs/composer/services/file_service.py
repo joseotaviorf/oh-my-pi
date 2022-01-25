@@ -2,7 +2,7 @@ import glob
 from os import listdir
 from os.path import isdir, isfile
 import re
-from typing import Generator
+from typing import Generator, Tuple
 
 import yaml
 from quintoandar_logger import QuintoAndarLogger
@@ -239,3 +239,56 @@ class FileService:
                 f"{DATALAKE_METADATA_PATH}/**/{extension}", recursive=True
             ):
                 yield file
+
+    @staticmethod
+    def get_table_info_from_path(path: str) -> Tuple[str, str, str, str, str, str]:
+        """
+        Given a query/metadata table file path, get informations about that table
+        The informations are:
+        :param path: path to a SQL or metadata file
+            e.g. classified_leads/clean/lead_reply.sql or classified_leads/clean/lead_reply.yaml
+        :returns: source, layer, context, dag, ingestion_type, table
+        :rtype: Tuple[str, str, str, str, str, str]
+        """
+        path_tree = path.split(".")[0].split("/")
+        source = path_tree[0]
+        layer = path_tree[1]
+
+        # default values
+        ingestion_type = "full"
+        dag = source
+        context = source
+        table = None
+
+        if len(path_tree) < 3:
+            raise ValueError(
+                f"m=get_table_info_from_path, path={path},"
+                f" msg=Cannot infer table info from path: not enough levels"
+            )
+        elif len(path_tree) > 6:
+            raise ValueError(
+                f"m=get_table_info_from_path, path={path},"
+                f" msg=Cannot infer table info from path: too many levels"
+            )
+        elif len(path_tree) == 3:
+            table = path_tree[2]
+        elif len(path_tree) == 4:
+            if path_tree[2] in {"full", "incremental"}:
+                ingestion_type = path_tree[2]
+            else:
+                context = path_tree[2]
+            table = path_tree[3]
+        elif len(path_tree) == 5:
+            context = path_tree[2]
+            if path_tree[3] in {"full", "incremental"}:
+                ingestion_type = path_tree[3]
+            else:
+                dag = path_tree[3]
+            table = path_tree[4]
+        elif len(path_tree) == 6:
+            context = path_tree[2]
+            dag = path_tree[3]
+            ingestion_type = path_tree[4]
+            table = path_tree[5]
+
+        return source, layer, context, dag, ingestion_type, table

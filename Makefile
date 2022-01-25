@@ -209,6 +209,15 @@ validate-atlas-metadata-files:
 	@git fetch --no-tags origin +refs/heads/master
 	@PYTHONPATH=. python3 scripts/atlas_metadata_validation/validate_atlas_metadata.py  "$(DRONE_BRANCH)"
 
+.PHONY: validate-metadata-files-exist
+validate-metadata-files-exist:
+	@echo ""
+	@echo "Validating if new/modified query files have corresponding tags/lineage metadata defined"
+	@echo "=========="
+	@echo ""
+	@git fetch --no-tags origin +refs/heads/master
+	@PYTHONPATH=. python3 scripts/atlas_metadata_validation/validate_metadata_files_exist.py  "$(DRONE_BRANCH)"
+
 ############# common commands #######################
 
 .PHONY: cov-badge
