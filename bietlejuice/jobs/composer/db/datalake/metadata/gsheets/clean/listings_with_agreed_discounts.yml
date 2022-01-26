@@ -1,0 +1,31 @@
+---
+database_name: datalake_gsheets_clean
+table_name: listings_with_agreed_discounts
+columns:
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.listings_with_agreed_discounts.house_id
+  discounted_fee:
+    lineage:
+      - datalake_gsheets_raw.listings_with_agreed_discounts.discounted_fee
+  discount_mode:
+    lineage:
+      - datalake_gsheets_raw.listings_with_agreed_discounts.discount_mode
+  discount_reason:
+    lineage:
+      - datalake_gsheets_raw.listings_with_agreed_discounts.discount_reason
+  responsible_team:
+    lineage:
+      - datalake_gsheets_raw.listings_with_agreed_discounts.responsible_team
+  user_email:
+    lineage:
+      - datalake_gsheets_raw.listings_with_agreed_discounts.user_email
+  comments:
+    lineage:
+      - datalake_gsheets_raw.listings_with_agreed_discounts.comments
+  fee_value:
+    lineage:
+      - datalake_gsheets_raw.listings_with_agreed_discounts.fee_value
+  dt_discount_registered:
+    lineage:
+       - datalake_gsheets_raw.listings_with_agreed_discounts.dt_discount_registered

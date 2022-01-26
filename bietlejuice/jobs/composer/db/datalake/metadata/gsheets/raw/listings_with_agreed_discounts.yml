@@ -1,0 +1,7 @@
+---
+database_name: datalake_gsheets_raw
+table_name: listings_with_agreed_discounts
+columns:
+  user_email:
+    tags:
+      - Confidential
