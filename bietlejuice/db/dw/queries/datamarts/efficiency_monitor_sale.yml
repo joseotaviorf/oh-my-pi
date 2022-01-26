@@ -1,4 +1,4 @@
-# Config for efficiency_monitor_rental
+# Config for efficiency_monitor_sale
 ---
 streams:
   - direction: 'upstream'
