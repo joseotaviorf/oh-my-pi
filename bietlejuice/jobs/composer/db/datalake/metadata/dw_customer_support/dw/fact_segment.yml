@@ -48,6 +48,9 @@ columns:
       - datalake_customer_support.email.department
       - datalake_customer_support.historical_call.department
       - datalake_customer_support.historical_chat.department
+  completion_reason:
+    lineage:
+      - datalake_customer_support.chat.completion_reason
   transferred_from_dept:
     lineage:
       - datalake_customer_support.call.transferred_from_dept

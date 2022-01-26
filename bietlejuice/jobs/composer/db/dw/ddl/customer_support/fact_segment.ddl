@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS customer_support.fact_segment (
     sk_channel VARCHAR(40),
     sk_external_service VARCHAR,
     department VARCHAR(100),
+    completion_reason VARCHAR(40),
     transferred_from_dept VARCHAR(100),
     transferred_to_dept VARCHAR(100),
     transference_type VARCHAR(25),
