@@ -43,6 +43,6 @@ WHERE
     ) 
     OR (
         type = 'Manual' 
-        AND id_workgroup IN ('DEP_CLOSING_ID')
+        AND id_workgroup IN ('DEP_CLOSING_ID','DEP_AGREEMENT_MANUAL_TASK_ID')
     )
   )
