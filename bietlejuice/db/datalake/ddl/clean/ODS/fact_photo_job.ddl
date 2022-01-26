@@ -1,52 +1,53 @@
 drop table if exists datalake_clean.ods_fact_photo_job;
 create external table datalake_clean.ods_fact_photo_job (
-  id_photo_job string,
-  sk_house_listing string,
-  sk_region string,
-  sk_user_cancel string,
-  sk_user_photographer string,
-  sk_user_rep string,
-  job_status string,
-  creation_origin string,
-  flexible_schedule string,
-  is_same_day_upload string,
-  is_anticipated string,
-  flg_job_on_time string,
-  sk_date_photographer_accepted string,
-  sk_date_job_created string,
-  sk_date_job_issued string,
-  sk_date_shoot_started string,
-  sk_date_job_scheduled string,
-  sk_date_photos_uploaded string,
-  sk_date_updated string,
-  sk_date_photographer_start string,
-  sk_date_user_cancel string,
-  sk_date_problem_reported string,
-  photo_shoot_contact_name string,
-  photo_shoot_email string,
-  photo_shoot_phone string,
-  photo_shoot_second_phone string,
-  approved string,
-  confirmed string,
-  lockbox string,
-  key_withdraw string,
-  key_comments string,
-  photographer_contract_type string,
-  photographer_problem_reason string,
-  cancel_reason string,
-  rescheduled string,
-  user_cancel_type string,
-  creation_to_scheduling_diff_minutes string,
-  creation_to_scheduling_diff_hours string,
-  creation_to_scheduling_diff_days string
+  id_photo_job int,
+  sk_house_listing int,
+  sk_region int,
+  sk_user_cancel int,
+  sk_user_photographer int,
+  sk_user_rep int,
+  job_status varchar(255),
+  creation_origin varchar(255),
+  photo_shoot_contact_name varchar(255),
+  photo_shoot_email varchar(255),
+  photo_shoot_phone varchar(255),
+  photo_shoot_second_phone varchar(255),
+  key_withdraw varchar(255),
+  key_comments varchar(255),
+  photographer_contract_type varchar(255),
+  photographer_problem_reason varchar(255),
+  cancel_reason varchar(255),
+  user_cancel_type varchar(255),
+  flexible_schedule int,
+  is_same_day_upload boolean,
+  is_anticipated boolean,
+  flg_job_on_time boolean,
+  approved int,
+  confirmed int,
+  lockbox int,
+  rescheduled boolean,
+  sk_date_photographer_accepted int,
+  sk_date_job_created int,
+  sk_date_job_issued int,
+  sk_date_shoot_started int,
+  sk_date_job_scheduled int,
+  sk_date_photos_uploaded int,
+  sk_date_updated int,
+  sk_date_photographer_start int,
+  sk_date_user_cancel int,
+  sk_date_problem_reported int,
+  creation_to_scheduling_diff_minutes decimal(10,1),
+  creation_to_scheduling_diff_hours decimal(10,1),
+  creation_to_scheduling_diff_days decimal(10,1)
 )
-row format serde 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
-with serdeproperties (
-  'separatorChar' = ',',
-  'quoteChar' = '\"'
-)
-location 's3://5a-datalake/clean/ods/photo_job'
-tblproperties (
-  'skip.header.line.count' = '1'
-)
+ROW FORMAT SERDE
+  'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
+STORED AS INPUTFORMAT
+  'org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat'
+OUTPUTFORMAT
+  'org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat'
+LOCATION
+  's3://dw.s3.data.quintoandar.com.br/public/fact_photo_job'
+TBLPROPERTIES (
+  'parquet.compress'='SNAPPY')
 ;

@@ -8,7 +8,7 @@ WITH photo_jobs AS (
   FROM
     datalake_crm_tasks_flows.tasks_users_resolutions_flow AS turf
   LEFT JOIN 
-    dw_janus.fact_photo_job fpj
+    dw_public.fact_photo_job fpj
       ON turf.origin = 'JobFotografo'
       AND CAST(CAST(turf.id_origin AS DECIMAL) AS BIGINT) = CAST(fpj.id_photo_job AS BIGINT)
   LEFT JOIN 

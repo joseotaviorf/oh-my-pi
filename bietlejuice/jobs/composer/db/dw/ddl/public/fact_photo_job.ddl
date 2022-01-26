@@ -1,6 +1,6 @@
-drop table janus.fact_photo_job;
+drop table public.fact_photo_job;
 
-create table janus.fact_photo_job(
+create table public.fact_photo_job(
   id_photo_job int8,
   sk_house_listing int8,
   sk_region int8,
@@ -42,4 +42,4 @@ create table janus.fact_photo_job(
   creation_to_scheduling_diff_days decimal(10,1)
 )
 
-ALTER TABLE janus.fact_photo_job OWNER TO airflow;
+ALTER TABLE public.fact_photo_job OWNER TO databricks;

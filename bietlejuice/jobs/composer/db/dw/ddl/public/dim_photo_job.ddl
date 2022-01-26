@@ -1,6 +1,6 @@
-DROP TABLE IF EXISTS janus.dim_photo_job;
+DROP TABLE IF EXISTS public.dim_photo_job;
 
-CREATE TABLE janus.dim_photo_job (
+CREATE TABLE public.dim_photo_job (
     sk_photo_job bigint primary key,
     id bigint,
     imovel_id bigint,
@@ -48,4 +48,4 @@ CREATE TABLE janus.dim_photo_job (
     creation_to_scheduling_diff_days decimal(10,1)
 )
 
-ALTER TABLE janus.dim_photo_job OWNER TO airflow;
+ALTER TABLE public.dim_photo_job OWNER TO databricks;

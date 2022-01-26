@@ -1,4 +1,4 @@
-database_name: dw_janus
+database_name: dw_public
 table_name: fact_photo_job
 columns:
   id_photo_job:

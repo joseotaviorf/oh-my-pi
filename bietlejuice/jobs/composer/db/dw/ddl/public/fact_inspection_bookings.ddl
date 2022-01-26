@@ -1,5 +1,5 @@
-drop table if exists fact_inspection_bookings;
-create table if not exists fact_inspection_bookings (
+drop table if exists public.fact_inspection_bookings;
+create table if not exists public.fact_inspection_bookings (
   sk_inspection bigint,
   sk_booking bigint,
   sk_house_listing bigint,
@@ -14,3 +14,5 @@ create table if not exists fact_inspection_bookings (
   booking_retry_rank_by_inspection_type smallint,
   ts_load timestamp
 );
+
+ALTER TABLE public.fact_inspection_bookings OWNER TO databricks;

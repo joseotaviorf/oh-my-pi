@@ -23,7 +23,7 @@ columns:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_origin
   sk_photo_job:
     lineage:
-      - dw_janus.fact_photo_job.id_photo_job
+      - dw_public.fact_photo_job.id_photo_job
   sk_receiver:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_receiver
@@ -44,7 +44,7 @@ columns:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_user_action
   sk_user_sales_rep:
     lineage:
-      - dw_janus.fact_photo_job.sk_user_rep
+      - dw_public.fact_photo_job.sk_user_rep
   action_type:
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.action_type
