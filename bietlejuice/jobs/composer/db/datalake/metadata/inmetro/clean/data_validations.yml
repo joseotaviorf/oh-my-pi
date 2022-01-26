@@ -4,49 +4,49 @@ table_name: data_validations
 columns:
   suite_name:
     lineage:
-      - datalake_inmetro_raw.metadata
+      - datalake_inmetro_raw.data_validations.metadata
   layer:
     lineage:
-      - datalake_inmetro_raw.layer
+      - datalake_inmetro_raw.data_validations.layer
   database:
     lineage:
-      - datalake_inmetro_raw.database
+      - datalake_inmetro_raw.data_validations.database
   table:
     lineage:
-      - datalake_inmetro_raw.table
+      - datalake_inmetro_raw.data_validations.table
   suite_result:
     lineage:
-      - datalake_inmetro_raw.metadata
+      - datalake_inmetro_raw.data_validations.metadata
   validations_count:
     lineage:
-      - datalake_inmetro_raw.metadata
+      - datalake_inmetro_raw.data_validations.metadata
   success_count:
     lineage:
-      - datalake_inmetro_raw.metadata
+      - datalake_inmetro_raw.data_validations.metadata
   failure_count:
     lineage:
-      - datalake_inmetro_raw.metadata
+      - datalake_inmetro_raw.data_validations.metadata
   success_rate:
     lineage:
-      - datalake_inmetro_raw.metadata
+      - datalake_inmetro_raw.data_validations.metadata
   metadata:
     lineage:
-      - datalake_inmetro_raw.metadata
+      - datalake_inmetro_raw.data_validations.metadata
   validations:
     lineage:
-      - datalake_inmetro_raw.validations
+      - datalake_inmetro_raw.data_validations.validations
   ts_execution_utc:
     lineage:
-      - datalake_inmetro_raw.metadata
+      - datalake_inmetro_raw.data_validations.metadata
   ts_execution_local:
     lineage:
-      - datalake_inmetro_raw.metadata
+      - datalake_inmetro_raw.data_validations.metadata
   year:
     lineage:
-      - datalake_inmetro_raw.year
+      - datalake_inmetro_raw.data_validations.year
   month:
     lineage:
-      - datalake_inmetro_raw.month
+      - datalake_inmetro_raw.data_validations.month
   day:
     lineage:
-      - datalake_inmetro_raw.day
+      - datalake_inmetro_raw.data_validations.day
