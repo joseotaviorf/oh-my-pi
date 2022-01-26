@@ -375,6 +375,11 @@ links_calls_entre_30ago_01set:
     sheet_name: links_calls_entre_30Ago_01Set
     clean_table_name: link_call_ticket
 
+listings_with_agreed_discounts:
+    sheet_id: 1Y6Z4CV1aDMey8vWnWqUZzpzPBz9os1shJ2anLtLT0Ds
+    sheet_name: db_discounts_fr
+    clean_table_name: listings_with_agreed_discounts
+
 local_holidays:
     sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
     sheet_name: local_holidays

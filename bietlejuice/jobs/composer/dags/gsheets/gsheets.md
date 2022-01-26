@@ -92,6 +92,7 @@ This pipeline produces the following output tables:
     - `keys_logistic_pre_contract`
     - `legacy_doorman`
     - `link_call_ticket`
+    - `listings_with_agreed_discounts`
     - `local_holidays`
     - `marketing_costs_campaign_city`
     - `marketing_costs_full_taxonomy`
