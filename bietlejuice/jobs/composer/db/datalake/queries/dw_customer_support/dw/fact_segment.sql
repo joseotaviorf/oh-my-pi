@@ -23,7 +23,7 @@ WITH call_segments AS (
         datalake_customer_support.call c
     WHERE
         id_segment IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 ),
 chat_segments AS (
     SELECT 
@@ -50,7 +50,7 @@ chat_segments AS (
         datalake_customer_support.chat c
     WHERE
         id_segment IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 ),
 email_segments AS (
     SELECT 
@@ -77,7 +77,7 @@ email_segments AS (
         datalake_customer_support.email
     WHERE
         id_ticket IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 ),
 historical_call_segments AS (
     SELECT 
@@ -104,7 +104,7 @@ historical_call_segments AS (
         datalake_customer_support.historical_call
     WHERE
         id_segment IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 ),
 historical_chat_segments AS (
     SELECT 
@@ -131,7 +131,7 @@ historical_chat_segments AS (
         datalake_customer_support.historical_chat
     WHERE
         id_segment IS NOT NULL
-    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 )
 SELECT
     *
