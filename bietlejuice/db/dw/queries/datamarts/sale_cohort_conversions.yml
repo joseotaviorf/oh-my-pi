@@ -2,5 +2,8 @@
 ---
 streams:
   - direction: 'upstream'
-    task_ids: ['dw_lead_listing_flows', 'dw_temp_sale_offers']
+    task_ids: ['dw_lead_listing_flows',
+               'dw_temp_sale_offers',
+               'athena_houses_3p',
+               'athena_agents_3p']
     

@@ -1,6 +1,8 @@
 with daily_published_listings as (
 select
         f.sk_sale_listing,
+        CASE WHEN hp.sk_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
+        hp.partner AS supply_3p_partner,
         f.status_history,
         d.date,
         d.week_start,
@@ -13,11 +15,15 @@ from sale.fact_listing_status f
 join dim_date d
     on d.sk_date BETWEEN NULLIF(f.sk_status_start_date,-1) 
     and coalesce(NULLIF(sk_status_end_date, -1), CAST(REPLACE(CAST(current_date AS VARCHAR), '-', '') AS BIGINT) - 1)
+LEFT JOIN datamarts.houses_3p AS hp
+    ON f.sk_sale_listing / 1000 = hp.sk_house
 where f.status_history = 'PUBLISHED'
 )
 , daily_published_listings_with_region as (
 select
     fhs.sk_sale_listing,
+    fhs.is_3p_supply,
+    fhs.supply_3p_partner,
     fhs.date,
     fhs.week_start,
     fhs.weekday_name,
@@ -40,6 +46,8 @@ select
     region,
     city_name,
     city_group,
+    supply_3p_partner,
+    is_3p_supply,
     count(distinct sk_sale_listing) as ongoing_listings
 from daily_published_listings_with_region
-group by 1, 2, 3, 4 ,5, 6, 7
+group by 1, 2, 3, 4 ,5, 6, 7, 8, 9

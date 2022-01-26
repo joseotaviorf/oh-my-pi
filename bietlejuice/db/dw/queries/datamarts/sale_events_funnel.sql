@@ -1,96 +1,103 @@
 WITH
 sale_listing_flows_adjust AS (
 SELECT
-	lf.sk_lead_date,
-	lf.sk_lead,
-	lf.sk_first_contact_date,
-	lf.sk_prospect_date,
-	lf.sk_qualified_date,
-	lf.sk_opportunity_date,
-	lf.sk_first_listing_date,
-	lf.sk_house_listing,
-	lf.mkt_origin,
-	lf.mkt_channel,
-	lf.sales_company,
-	CASE
-	    WHEN lf.mkt_origin = 'B2B' OR lf.mkt_origin = 'CIQ' THEN lf.mkt_origin
-	    WHEN lf.mkt_completion = 'Full Self-Service' THEN 'FSS'
-	    ELSE 'IS'
-	END AS lead_context,
-	CASE
-    	    WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other') AND lead_context IN ('FSS','IS') THEN 'IS'
-	    ELSE sourcing_ops
-        END AS lead_processing_operation,
-	CASE
-	    WHEN lf.lead_context_origin = 'Organic' THEN 'Branded'
+    lf.sk_lead_date,
+    lf.sk_lead,
+    lf.sk_first_contact_date,
+    lf.sk_prospect_date,
+    lf.sk_qualified_date,
+    lf.sk_opportunity_date,
+    lf.sk_first_listing_date,
+    lf.sk_house_listing,
+    lf.mkt_origin,
+    lf.mkt_channel,
+    lf.sales_company,
+    CASE WHEN hp.sk_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
+    hp.partner AS supply_3p_partner,
+    CASE
+        WHEN lf.mkt_origin = 'B2B' OR lf.mkt_origin = 'CIQ' THEN lf.mkt_origin
+        WHEN lf.mkt_completion = 'Full Self-Service' THEN 'FSS'
+        ELSE 'IS'
+    END AS lead_context,
+    CASE
+        WHEN sourcing_ops IN ('IS Ext', 'IS Int', 'FSS IS PhotoJob', 'Other') AND lead_context IN ('FSS','IS') THEN 'IS'
+        ELSE sourcing_ops
+    END AS lead_processing_operation,
+    CASE
+        WHEN lf.lead_context_origin = 'Organic' THEN 'Branded'
         ELSE lead_context_origin
-	END AS mkt_campaign_context,
-	CASE
-	    WHEN lf.mkt_origin IN ('Indica Aí - Agents','Indica Aí - General', 'Price Calculator', 'B2B', 'CIQ', 'Doorman') THEN 'Paid'
-	    WHEN lf.mkt_origin IN ('Other', 'Backend','Inbound') THEN 'Non Paid'
+    END AS mkt_campaign_context,
+    CASE
+        WHEN lf.mkt_origin IN ('Indica Aí - Agents','Indica Aí - General', 'Price Calculator', 'B2B', 'CIQ', 'Doorman') THEN 'Paid'
+        WHEN lf.mkt_origin IN ('Other', 'Backend','Inbound') THEN 'Non Paid'
         WHEN lf.mkt_channel IN ('CRM/Notification', 'LeadEnrichment', 'Organic') AND lf.mkt_origin = 'Owner PWA' THEN 'Non Paid'
         WHEN lf.mkt_channel = 'Paid' AND lf.mkt_origin = 'Owner PWA' THEN 'Paid'
-	END AS mkt_type,
-	CASE
-	    WHEN dr.city_group NOT IN ('RMSP', 'Rio de Janeiro','Belo Horizonte','Porto Alegre','Campinas') THEN 'Out of coverage area'
-	    WHEN dr.city_group IN ('RMSP', 'Rio de Janeiro','Belo Horizonte','Porto Alegre','Campinas') THEN dr.city_group
-	END AS city_group
+    END AS mkt_type,
+    CASE
+        WHEN dr.city_group NOT IN ('RMSP', 'Rio de Janeiro','Belo Horizonte','Porto Alegre','Campinas') THEN 'Out of coverage area'
+        WHEN dr.city_group IN ('RMSP', 'Rio de Janeiro','Belo Horizonte','Porto Alegre','Campinas') THEN dr.city_group
+    END AS city_group
 FROM
     datamarts.lead_listing_flows lf
 LEFT JOIN
     dim_region dr
         ON dr.sk_region = lf.sk_region
+LEFT JOIN
+    datamarts.houses_3p AS hp
+    ON hp.sk_house = lf.sk_house_listing / 1000 
 WHERE lf.origin_table = 'Sale'
 ),
 monday_adjusted AS (
 -- data from datalake_firestore_prod.monday
 SELECT
-	mo.id_offer,
-	mo.id_buyer||'_'||mo.id_house AS sale_flow,
-	mo.id_house,
-	mo.id_buyer AS id_user,
-	CASE
-	    WHEN mo.payment_method IN ('1', '7') THEN 'Financiado'
-	    WHEN mo.payment_method = '2' THEN 'À Vista'
-	    WHEN mo.payment_method = '3' THEN 'À Vista + FGTS'
-	    WHEN mo.payment_method = '4' THEN 'Financiado + FGTS'
+    mo.id_offer,
+    mo.id_buyer||'_'||mo.id_house AS sale_flow,
+    mo.id_house,
+    mo.id_buyer AS id_user,
+    mo.id_agent,
+    CASE
+        WHEN mo.payment_method IN ('1', '7') THEN 'Financiado'
+        WHEN mo.payment_method = '2' THEN 'À Vista'
+        WHEN mo.payment_method = '3' THEN 'À Vista + FGTS'
+        WHEN mo.payment_method = '4' THEN 'Financiado + FGTS'
 	ELSE 'Other'END AS form_of_payment,
-	mo.dt_submitted AS dt_offer_sent,
-	mo.dt_deal_qualified AS dt_deal_qualified,
-	mo.dt_accepted AS dt_offer_accepted,
-	mo.dt_sale_agreement_signed AS dt_ccv_signed,
-	mo.dt_offer_dismissed AS dt_offer_rejected,
-	mo.dt_legaut_analysis_started AS dt_diligence_started_legaut,
-	mo.dt_legaut_analysis_ended AS dt_diligence_ended_legaut,
-	mo.dt_legal_analysis_ended AS dt_diligence_ended,
-	mo.dt_legal_risk_started AS dt_diligence_started_legal,
-	mo.dt_legal_risk_ended AS dt_diligence_ended_legal,
-	mo.dt_credit_analysis_started AS dt_credit_started,
-	mo.dt_credit_analysis_ended AS dt_credit_approved,
-	mo.dt_sale_transacton_paid AS dt_payment_concluded,
-	mo.dt_notes_registry_started AS dt_notes_registry_started,
-	mo.dt_notes_registry_ended AS dt_notes_registry_ended,
-	mo.dt_house_registry_started AS dt_matricula_inicio,
-	mo.dt_house_registry_ended AS dt_matricula_atualizada,
-	mo.dt_sale_key_delivered AS dt_entrega_chaves,
-	mo.dt_financing_started AS dt_finan_started,
-	mo.dt_financing_ended AS dt_finan_ended,
-	drop_reason_before_acceptance AS offer_rejection_reason,
-	drop_reason_after_acceptance AS offer_accepted_drop_reason,
-	mo.listing_sale_price AS sale_listing_price,
-	mo.price_offered_by_buyer AS buyer_offer_price,
-	(mo.listing_sale_price - mo.price_offered_by_buyer)/mo.listing_sale_price AS offer_discount
+    mo.dt_submitted AS dt_offer_sent,
+    mo.dt_deal_qualified AS dt_deal_qualified,
+    mo.dt_accepted AS dt_offer_accepted,
+    mo.dt_sale_agreement_signed AS dt_ccv_signed,
+    mo.dt_offer_dismissed AS dt_offer_rejected,
+    mo.dt_legaut_analysis_started AS dt_diligence_started_legaut,
+    mo.dt_legaut_analysis_ended AS dt_diligence_ended_legaut,
+    mo.dt_legal_analysis_ended AS dt_diligence_ended,
+    mo.dt_legal_risk_started AS dt_diligence_started_legal,
+    mo.dt_legal_risk_ended AS dt_diligence_ended_legal,
+    mo.dt_credit_analysis_started AS dt_credit_started,
+    mo.dt_credit_analysis_ended AS dt_credit_approved,
+    mo.dt_sale_transacton_paid AS dt_payment_concluded,
+    mo.dt_notes_registry_started AS dt_notes_registry_started,
+    mo.dt_notes_registry_ended AS dt_notes_registry_ended,
+    mo.dt_house_registry_started AS dt_matricula_inicio,
+    mo.dt_house_registry_ended AS dt_matricula_atualizada,
+    mo.dt_sale_key_delivered AS dt_entrega_chaves,
+    mo.dt_financing_started AS dt_finan_started,
+    mo.dt_financing_ended AS dt_finan_ended,
+    drop_reason_before_acceptance AS offer_rejection_reason,
+    drop_reason_after_acceptance AS offer_accepted_drop_reason,
+    mo.listing_sale_price AS sale_listing_price,
+    mo.price_offered_by_buyer AS buyer_offer_price,
+    (mo.listing_sale_price - mo.price_offered_by_buyer)/mo.listing_sale_price AS offer_discount
 FROM
 	datalake_firestore_prod.monday AS mo
 ),
 sale_bookings AS (
 SELECT
-	fv.sk_house AS id_property,
-	fv.sk_buyer AS id_visitor,
-	fv.sk_offer,
-	fv.sk_booking,
-	fv.is_hub_flow,
-	CASE
+    fv.sk_house AS id_property,
+    fv.sk_buyer AS id_visitor,
+    fv.sk_agent AS id_agent,
+    fv.sk_offer,
+    fv.sk_booking,
+    fv.is_hub_flow,
+    CASE
         when is_hub_flow = true AND dr.sk_region in (55, 56, 70, 72, 1329) and date(sk_booking_created_date) between  '2021-04-26' and current_date then 'HUB BELA VISTA'
         when is_hub_flow = true AND dr.sk_region in (1577,54) and  date(sk_booking_created_date) between '2021-08-15' and current_date then 'HUB BELA VISTA' -- Liberdade, Centro
         when is_hub_flow = true AND dr.sk_region in (51, 1281, 1287, 52, 1298, 1300) and date(sk_booking_created_date) between '2021-04-26'and current_date then 'HUB VILA MARIANA'
@@ -118,9 +125,9 @@ SELECT
         when is_hub_flow = true AND dr.city_group = 'Porto Alegre' and date(sk_booking_created_date) between '2021-11-10' and current_date then 'HUB PORTO ALEGRE'
         when is_hub_flow = true AND dr.region_code in ('RIO 01','RIO 02','RIO 03') and date(sk_booking_created_date) between '2021-11-17' and current_date then 'HUB RJ ZONA SUL'
     END AS hub_visit,
-	dr.city_group,
-	DATE(NULLIF(fv.sk_booking_created_date,-1)) AS dt_created,
-	DATE(NULLIF(fv.sk_visit_completed_date,-1)) AS dt_completed
+    dr.city_group,
+    DATE(NULLIF(fv.sk_booking_created_date,-1)) AS dt_created,
+    DATE(NULLIF(fv.sk_visit_completed_date,-1)) AS dt_completed
 FROM
     sale.fact_visits fv
 JOIN dim_region dr
@@ -133,14 +140,15 @@ sale_closing AS (
         sk_house,
         fo.sk_offer,
         fo.sk_buyer AS sk_buyer,
+        fo.sk_agent AS id_agent,
         business_unit AS hub
     FROM
-    	datamarts.temp_sale_offers fo
+        datamarts.temp_sale_offers fo
     LEFT JOIN
         dim_date dd
         ON dd.sk_date = fo.sk_offer_submitted_date
     WHERE
-    	sk_offer_submitted_date > 0
+        sk_offer_submitted_date > 0
     ),
     fact_oa AS (
     SELECT
@@ -148,9 +156,10 @@ sale_closing AS (
         sk_house,
         fo.sk_offer,
         fo.sk_buyer AS sk_buyer,
+        fo.sk_agent AS id_agent,
         business_unit AS hub
     FROM
-    	datamarts.temp_sale_offers fo
+        datamarts.temp_sale_offers fo
     LEFT JOIN
         dim_date dd
         ON dd.sk_date = fo.sk_offer_accepted_date
@@ -163,9 +172,10 @@ sale_closing AS (
         sk_house,
         fo.sk_offer,
         fo.sk_buyer AS sk_buyer,
+        fo.sk_agent AS id_agent,
         business_unit AS hub
     FROM
-    	datamarts.temp_sale_offers fo
+        datamarts.temp_sale_offers fo
     LEFT JOIN
         dim_date dd
         ON dd.sk_date = fo.sk_sale_agreement_signed_date
@@ -175,6 +185,7 @@ SELECT
     COALESCE(COALESCE(fact_os.sk_offer, fact_oa.sk_offer), fact_ccv.sk_offer) AS sk_offer,
     COALESCE(fact_os.sk_house,fact_oa.sk_house,fact_ccv.sk_house) AS sk_house,
     COALESCE(fact_os.sk_buyer,fact_oa.sk_buyer,fact_ccv.sk_buyer) AS sk_buyer,
+    COALESCE(fact_os.id_agent,fact_oa.id_agent,fact_ccv.id_agent) AS id_agent,
     COALESCE(COALESCE(fact_os.hub, fact_oa.hub), fact_ccv.hub) AS hub_offer,
     MAX(fact_os.date) AS os_date,
     MAX(fact_oa.date) AS oa_date,
@@ -187,13 +198,14 @@ FULL OUTER JOIN
 FULL OUTER JOIN
     fact_ccv
         ON fact_os.sk_offer = fact_ccv.sk_offer
-GROUP BY 1, 2, 3, 4
+GROUP BY 1, 2, 3, 4, 5
 
 ),
 sale_tta AS (
 SELECT
 	tta.house_id::BIGINT AS house_id,
 	tta.tenant_id::BIGINT AS tenant_id,
+	tta.agent_id AS id_agent,
 	(tta.sk_house_listing || tta.tenant_id || tta.agent_id) AS tta_id,
 	tta.first_message_ts,
 	tta.first_attendance_ts
@@ -205,7 +217,7 @@ WHERE
 sale_demand_region AS (
 SELECT
 	fsf.sk_house::VARCHAR AS id_house,
-	dr.city_group
+    dr.city_group
 FROM
     sale.fact_sale_flows fsf
 JOIN
@@ -216,31 +228,32 @@ sale_demand_events AS (
 SELECT
 	COALESCE(offers.id_user, sc.sk_buyer, tta.tenant_id::BIGINT) AS id_buyer,
 	COALESCE(offers.id_house, sc.sk_house, tta.house_id::BIGINT, sc.sk_house) AS id_house,
+    COALESCE(offers.id_agent, sc.id_agent) AS id_agent,
 	offers.form_of_payment,
 	offers.dt_deal_qualified,
 	sc.sk_offer AS id_offer,
-	offers.dt_diligence_started_legaut,
-	offers.dt_diligence_ended_legaut,
-	offers.dt_diligence_ended,
-	offers.dt_diligence_started_legal,
-	offers.dt_diligence_ended_legal,
-	offers.dt_credit_started,
-	offers.dt_credit_approved,
-	offers.dt_payment_concluded,
-	offers.dt_notes_registry_started,
-	offers.dt_notes_registry_ended,
-	offers.dt_matricula_inicio,
-	offers.dt_matricula_atualizada,
-	offers.dt_entrega_chaves,
-	offers.dt_finan_started,
-	offers.dt_finan_ended,
+    offers.dt_diligence_started_legaut,
+    offers.dt_diligence_ended_legaut,
+    offers.dt_diligence_ended,
+    offers.dt_diligence_started_legal,
+    offers.dt_diligence_ended_legal,
+    offers.dt_credit_started,
+    offers.dt_credit_approved,
+    offers.dt_payment_concluded,
+    offers.dt_notes_registry_started,
+    offers.dt_notes_registry_ended,
+    offers.dt_matricula_inicio,
+    offers.dt_matricula_atualizada,
+    offers.dt_entrega_chaves,
+    offers.dt_finan_started,
+    offers.dt_finan_ended,
 	tta.tta_id,
 	tta.first_message_ts::TIMESTAMP AS tta_started,
 	tta.first_attendance_ts::TIMESTAMP AS tta_completed,
-	sc.os_date,
-	sc.oa_date,
-	sc.ccv_date,
-	sc.hub_offer
+    sc.os_date,
+    sc.oa_date,
+    sc.ccv_date,
+    sc.hub_offer
 FROM
     monday_adjusted offers
 FULL OUTER JOIN
@@ -248,43 +261,44 @@ FULL OUTER JOIN
         ON (offers.id_house = tta.house_id AND offers.id_user = tta.tenant_id)
 FULL OUTER JOIN
 	sale_closing AS sc
-		ON offers.id_offer = sc.sk_offer
+        ON offers.id_offer = sc.sk_offer
 ),
 
 sale_demand_events_complete AS (
 SELECT
     COALESCE(sde.id_buyer, db.id_visitor) AS id_buyer,
 	COALESCE(sde.id_house, db.id_property) AS id_house,
+    COALESCE(sde.id_agent, db.id_agent) AS id_agent,
 	sde.id_offer,
-	sde.form_of_payment,
-	sde.os_date AS dt_offer_sent,
-	sde.dt_deal_qualified,
-	sde.oa_date AS dt_offer_accepted,
-	sde.ccv_date AS dt_ccv_signed,
-	sde.dt_diligence_started_legaut,
-	sde.dt_diligence_ended_legaut,
-	sde.dt_diligence_ended,
-	sde.dt_diligence_started_legal,
-	sde.dt_diligence_ended_legal,
-	sde.dt_credit_started,
-	sde.dt_credit_approved,
-	sde.dt_payment_concluded,
-	sde.dt_notes_registry_started,
-	sde.dt_notes_registry_ended,
-	sde.dt_matricula_inicio,
-	sde.dt_matricula_atualizada,
-	sde.dt_entrega_chaves,
-	sde.dt_finan_started,
-	sde.dt_finan_ended,
+    sde.form_of_payment,
+    sde.os_date AS dt_offer_sent,
+    sde.dt_deal_qualified,
+    sde.oa_date AS dt_offer_accepted,
+    sde.ccv_date AS dt_ccv_signed,
+    sde.dt_diligence_started_legaut,
+    sde.dt_diligence_ended_legaut,
+    sde.dt_diligence_ended,
+    sde.dt_diligence_started_legal,
+    sde.dt_diligence_ended_legal,
+    sde.dt_credit_started,
+    sde.dt_credit_approved,
+    sde.dt_payment_concluded,
+    sde.dt_notes_registry_started,
+    sde.dt_notes_registry_ended,
+    sde.dt_matricula_inicio,
+    sde.dt_matricula_atualizada,
+    sde.dt_entrega_chaves,
+    sde.dt_finan_started,
+    sde.dt_finan_ended,
 	sde.tta_id,
 	sde.tta_started,
 	sde.tta_completed,
-	db.sk_booking,
-	db.dt_created,
-	db.dt_completed,
-	db.city_group,
-	db.hub_visit,
-	sde.hub_offer
+    db.sk_booking,
+    db.dt_created,
+    db.dt_completed,
+    db.city_group,
+    db.hub_visit,
+    sde.hub_offer
 FROM
     sale_demand_events sde
 FULL OUTER JOIN
@@ -295,11 +309,15 @@ sale_demand_classification AS (
 SELECT
     sdc.id_buyer,
 	sdc.id_house,
-	CASE
-	    WHEN COALESCE(sdr.city_group,sdc.city_group) NOT IN ('RMSP', 'Rio de Janeiro','Porto Alegre','Campinas') THEN 'Out of coverage area'
-	    WHEN COALESCE(sdr.city_group,sdc.city_group) IN ('RMSP', 'Rio de Janeiro','Porto Alegre','Campinas') THEN COALESCE(sdr.city_group,sdc.city_group)
-	END AS city_group,
-	sdc.form_of_payment,
+    CASE WHEN ap.id_user IS NOT NULL THEN 1 ELSE 0 END AS is_3p_demand,
+    ap.partner AS demand_3p_partner,
+    CASE WHEN hp.sk_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
+    hp.partner AS supply_3p_partner,
+    CASE
+        WHEN COALESCE(sdr.city_group,sdc.city_group) NOT IN ('RMSP', 'Rio de Janeiro','Porto Alegre','Campinas') THEN 'Out of coverage area'
+        WHEN COALESCE(sdr.city_group,sdc.city_group) IN ('RMSP', 'Rio de Janeiro','Porto Alegre','Campinas') THEN COALESCE(sdr.city_group,sdc.city_group)
+    END AS city_group,
+    sdc.form_of_payment,
 	sdc.dt_offer_sent,
 	sdc.dt_deal_qualified,
 	sdc.dt_offer_accepted,
@@ -311,35 +329,41 @@ SELECT
 	sdc.tta_id,
 	sdc.tta_started,
 	sdc.tta_completed,
-	sdc.dt_diligence_started_legaut,
-	sdc.dt_diligence_ended_legaut,
-	sdc.dt_diligence_ended,
-	sdc.dt_diligence_started_legal,
-	sdc.dt_diligence_ended_legal,
-	sdc.dt_credit_started,
-	sdc.dt_credit_approved,
-	sdc.dt_payment_concluded,
-	sdc.dt_notes_registry_started,
-	sdc.dt_notes_registry_ended,
-	sdc.dt_matricula_inicio,
-	sdc.dt_matricula_atualizada,
-	sdc.dt_entrega_chaves,
-	sdc.dt_finan_started,
-	sdc.dt_finan_ended,
-	fsf.first_event AS first_touchpoint,
-	fsf.higher_intent_before_offer,
-	fsf.higher_intent_after_offer,
-	sdc.hub_offer,
-	sdc.hub_visit
+    sdc.dt_diligence_started_legaut,
+    sdc.dt_diligence_ended_legaut,
+    sdc.dt_diligence_ended,
+    sdc.dt_diligence_started_legal,
+    sdc.dt_diligence_ended_legal,
+    sdc.dt_credit_started,
+    sdc.dt_credit_approved,
+    sdc.dt_payment_concluded,
+    sdc.dt_notes_registry_started,
+    sdc.dt_notes_registry_ended,
+    sdc.dt_matricula_inicio,
+    sdc.dt_matricula_atualizada,
+    sdc.dt_entrega_chaves,
+    sdc.dt_finan_started,
+    sdc.dt_finan_ended,
+    fsf.first_event AS first_touchpoint,
+    fsf.higher_intent_before_offer,
+    fsf.higher_intent_after_offer,
+    sdc.hub_offer,
+    sdc.hub_visit
 FROM
     sale_demand_events_complete sdc
 LEFT JOIN
 	sale.fact_sale_flows AS fsf
-		ON sdc.id_buyer = fsf.sk_buyer::VARCHAR
-		AND sdc.id_house = fsf.sk_house::VARCHAR
+        ON sdc.id_buyer = fsf.sk_buyer::VARCHAR
+        AND sdc.id_house = fsf.sk_house::VARCHAR
 LEFT JOIN
     sale_demand_region sdr
         ON sdr.id_house::VARCHAR = sdc.id_house
+LEFT JOIN
+    datamarts.agents_3p AS ap
+    ON ap.id_agent = sdc.id_agent
+LEFT JOIN
+    datamarts.houses_3p AS hp
+    ON hp.sk_house = sdc.id_house
 ),
 lead_ AS (
 SELECT
@@ -352,6 +376,10 @@ SELECT
     slf.mkt_type,
     slf.sales_company,
     slf.lead_processing_operation,
+    slf.is_3p_supply,
+    slf.supply_3p_partner,
+    0::INT AS is_3p_demand,
+    0::VARCHAR AS demand_3p_partner,
 	NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
@@ -391,7 +419,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_lead_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 prospect AS (
 SELECT
@@ -404,6 +432,10 @@ SELECT
     slf.mkt_type,
     slf.sales_company,
     slf.lead_processing_operation,
+    slf.is_3p_supply,
+    slf.supply_3p_partner,
+    0::INT AS is_3p_demand,
+    0::VARCHAR AS demand_3p_partner,
     NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
@@ -443,7 +475,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_prospect_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 first_contacts AS (
 SELECT
@@ -456,6 +488,10 @@ SELECT
     slf.mkt_type,
     slf.sales_company,
     slf.lead_processing_operation,
+    slf.is_3p_supply,
+    slf.supply_3p_partner,
+    0::INT AS is_3p_demand,
+    0::VARCHAR AS demand_3p_partner,
     NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
@@ -495,7 +531,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_first_contact_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 qualified AS (
 SELECT
@@ -508,6 +544,10 @@ SELECT
     slf.mkt_type,
     slf.sales_company,
     slf.lead_processing_operation,
+    slf.is_3p_supply,
+    slf.supply_3p_partner,
+    0::INT AS is_3p_demand,
+    0::VARCHAR AS demand_3p_partner,
     NULL AS first_origin_demand,
     NULL AS origin_before_offer,
     NULL AS origin_after_offer,
@@ -547,7 +587,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_qualified_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 opportunity AS (
 SELECT
@@ -560,6 +600,10 @@ SELECT
     slf.mkt_type,
     slf.sales_company,
     slf.lead_processing_operation,
+    slf.is_3p_supply,
+    slf.supply_3p_partner,
+    0::INT AS is_3p_demand,
+    0::VARCHAR AS demand_3p_partner,
     NULL AS first_origin_demand,
     NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
@@ -599,7 +643,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_opportunity_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 first_listing AS (
 SELECT
@@ -612,6 +656,10 @@ SELECT
 	slf.mkt_type,
 	slf.sales_company,
 	slf.lead_processing_operation,
+    slf.is_3p_supply,
+    slf.supply_3p_partner,
+    0::INT AS is_3p_demand,
+    0::VARCHAR AS demand_3p_partner,
     NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
@@ -651,7 +699,7 @@ FROM
     sale_listing_flows_adjust AS slf
 WHERE
     slf.sk_first_listing_date > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 tta_sent AS (
 SELECT
@@ -664,6 +712,10 @@ SELECT
     NULL AS mkt_type,
     NULL AS sales_company,
     NULL AS lead_processing_operation,
+    is_3p_supply,
+    supply_3p_partner,
+    is_3p_demand,
+    demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -703,7 +755,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(tta_started) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 tta_completed AS (
 SELECT
@@ -716,6 +768,10 @@ SELECT
     NULL AS mkt_type,
     NULL AS sales_company,
     NULL AS lead_processing_operation,
+    is_3p_supply,
+    supply_3p_partner,
+    is_3p_demand,
+    demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -755,7 +811,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(tta_started) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 visits_booked AS (
 SELECT
@@ -768,6 +824,10 @@ SELECT
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
+    is_3p_supply,
+    supply_3p_partner,
+    is_3p_demand,
+    demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -807,7 +867,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_created) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 order by 1 desc
 ),
 visits_completed AS (
@@ -821,6 +881,10 @@ SELECT
     NULL AS mkt_type,
     NULL AS sales_company,
     NULL AS lead_processing_operation,
+    is_3p_supply,
+    supply_3p_partner,
+    is_3p_demand,
+    demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -860,7 +924,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_completed) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 offers_sent AS (
 SELECT
@@ -873,6 +937,10 @@ SELECT
     NULL AS mkt_type,
     NULL AS sales_company,
     NULL AS lead_processing_operation,
+    is_3p_supply,
+    supply_3p_partner,
+    is_3p_demand,
+    demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -912,7 +980,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_offer_sent) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 offers_deal_qualified AS (
 SELECT
@@ -925,6 +993,10 @@ SELECT
     NULL AS mkt_type,
     NULL AS sales_company,
     NULL AS lead_processing_operation,
+    is_3p_supply,
+    supply_3p_partner,
+    is_3p_demand,
+    demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -964,7 +1036,7 @@ FROM
 	sale_demand_classification
 WHERE
 	DATE(dt_deal_qualified) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 offers_accepted AS (
 SELECT
@@ -977,6 +1049,10 @@ SELECT
     NULL AS mkt_type,
     NULL AS sales_company,
     NULL AS lead_processing_operation,
+    is_3p_supply,
+    supply_3p_partner,
+    is_3p_demand,
+    demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -1016,7 +1092,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_offer_accepted) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 ccv_signed AS (
 SELECT
@@ -1029,6 +1105,10 @@ SELECT
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
+    is_3p_supply,
+    supply_3p_partner,
+    is_3p_demand,
+    demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -1068,7 +1148,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_ccv_signed) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 diligence_started_legaut AS (
 SELECT
@@ -1081,6 +1161,10 @@ SELECT
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
+    is_3p_supply,
+    supply_3p_partner,
+    is_3p_demand,
+    demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -1120,7 +1204,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_diligence_started_legaut) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 diligence_ended_legaut AS (
 SELECT
@@ -1133,6 +1217,10 @@ SELECT
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
+    is_3p_supply,
+    supply_3p_partner,
+    is_3p_demand,
+    demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -1172,7 +1260,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_diligence_ended_legaut) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 diligence_ended AS (
 SELECT
@@ -1185,6 +1273,10 @@ SELECT
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
+    is_3p_supply,
+    supply_3p_partner,
+    is_3p_demand,
+    demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -1224,7 +1316,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_diligence_ended) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 diligence_started_legal AS (
 SELECT
@@ -1237,6 +1329,10 @@ SELECT
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
+    is_3p_supply,
+    supply_3p_partner,
+    is_3p_demand,
+    demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -1276,7 +1372,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_diligence_started_legal) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 diligence_ended_legal AS (
 SELECT
@@ -1289,6 +1385,10 @@ SELECT
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
+    is_3p_supply,
+    supply_3p_partner,
+    is_3p_demand,
+    demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -1328,7 +1428,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_diligence_ended_legal) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 credit_sent AS (
 SELECT
@@ -1341,6 +1441,10 @@ SELECT
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
+    is_3p_supply,
+    supply_3p_partner,
+    is_3p_demand,
+    demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -1380,7 +1484,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_credit_started) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 credit_approved AS (
 SELECT
@@ -1393,6 +1497,10 @@ SELECT
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
+    is_3p_supply,
+    supply_3p_partner,
+    is_3p_demand,
+    demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -1432,7 +1540,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_credit_approved) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 finan_started AS (
 SELECT
@@ -1445,6 +1553,10 @@ SELECT
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
+    is_3p_supply,
+    supply_3p_partner,
+    is_3p_demand,
+    demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -1484,7 +1596,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_finan_started) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 finan_ended AS (
 SELECT
@@ -1497,6 +1609,10 @@ SELECT
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
+    is_3p_supply,
+    supply_3p_partner,
+    is_3p_demand,
+    demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -1536,7 +1652,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_finan_ended) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 payment_concluded AS (
 SELECT
@@ -1549,6 +1665,10 @@ SELECT
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
+    is_3p_supply,
+    supply_3p_partner,
+    is_3p_demand,
+    demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -1588,7 +1708,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_payment_concluded) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 notes_registry_started AS (
 SELECT
@@ -1601,6 +1721,10 @@ SELECT
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
+    is_3p_supply,
+    supply_3p_partner,
+    is_3p_demand,
+    demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -1640,7 +1764,7 @@ FROM
 	sale_demand_classification
 WHERE
 	DATE(dt_notes_registry_started) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 notes_registry_ended AS (
 SELECT
@@ -1653,6 +1777,10 @@ SELECT
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
+    is_3p_supply,
+    supply_3p_partner,
+    is_3p_demand,
+    demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -1692,7 +1820,7 @@ FROM
 	sale_demand_classification
 WHERE
 	DATE(dt_notes_registry_ended) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 matricula_inicio AS (
 SELECT
@@ -1705,6 +1833,10 @@ SELECT
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
+    is_3p_supply,
+    supply_3p_partner,
+    is_3p_demand,
+    demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -1744,7 +1876,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_matricula_inicio) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 matricula_atualizada AS (
 SELECT
@@ -1757,6 +1889,10 @@ SELECT
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
+    is_3p_supply,
+    supply_3p_partner,
+    is_3p_demand,
+    demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -1796,7 +1932,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_matricula_atualizada) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 entrega_chave AS (
 SELECT
@@ -1809,6 +1945,10 @@ SELECT
 	NULL AS mkt_type,
 	NULL AS sales_company,
 	NULL AS lead_processing_operation,
+    is_3p_supply,
+    supply_3p_partner,
+    is_3p_demand,
+    demand_3p_partner,
 	first_touchpoint AS first_origin_demand,
 	higher_intent_before_offer AS origin_before_offer,
 	higher_intent_after_offer AS origin_after_offer,
@@ -1848,7 +1988,7 @@ FROM
     sale_demand_classification
 WHERE
     DATE(dt_entrega_chaves) > 0
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
 ),
 union_all AS (
 SELECT * FROM lead_
@@ -1916,6 +2056,10 @@ SELECT
 	dd.month,
 	dd.quarter,
 	ua.city_group,
+    ua.is_3p_supply,
+    ua.supply_3p_partner,
+    ua.is_3p_demand,
+    ua.demand_3p_partner,
 	ua.lead_context,
 	ua.mkt_campaign_context,
 	ua.mkt_origin,
@@ -1986,6 +2130,10 @@ SELECT
 	form_of_payment,
 	hub_visit,
 	hub_offer,
+    supply_3p_partner,
+    demand_3p_partner,
+    is_3p_supply,
+    is_3p_demand,
 	SUM(leads) AS leads,
     SUM(prospects) AS prospects,
     SUM(first_contacts) AS first_contacts,
@@ -2036,5 +2184,8 @@ GROUP BY
 	 origin_after_offer,
 	 form_of_payment,
 	 hub_visit,
-	 hub_offer
-ORDER BY 1 desc
+	 hub_offer,
+     supply_3p_partner,
+     demand_3p_partner,
+     is_3p_supply,
+     is_3p_demand
