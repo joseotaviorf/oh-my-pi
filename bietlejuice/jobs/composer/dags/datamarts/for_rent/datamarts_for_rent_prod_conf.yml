@@ -1,4 +1,12 @@
 # Merge Keys are available only in Yaml 1.1.
+redshift_template:
+  dw: &redshift_anchor
+    schema: datamarts
+    runs_on: redshift
+athena_template:
+  dw: &athena_anchor
+    schema: datamarts
+    runs_on: athena
 pipeline:
   ##<KEEP THIS COMMENTED AS A TEMPLATE>
   # <task-name-like-attribution-conversion-paths>:
@@ -7,18 +15,6 @@ pipeline:
   #     table: <targe-table-name>
   #     schema: <target-schema-name> # TODO this will always be `datamart` (for both datalake and dw). This var is not used anymore
   #     runs_on: <backend-to-run-the-query> E.g: redshift or athena
-  redshift_template:
-    dw: &redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent/override_me.sql
-      table: overrride_me
-      schema: datamarts
-      runs_on: redshift
-  athena_template:
-    dw: &athena_anchor
-      sql_file: dw/queries/datamarts/for_rent/override_me.sql
-      table: overrride_me
-      schema: datamarts
-      runs_on: athena
   weekly_demand_metrics:
     dw:
       <<: *redshift_anchor
@@ -42,17 +38,17 @@ pipeline:
       depends_on:
         - talk_to_agent
   datamart_opportunity:
-      dw:
-        <<: *redshift_anchor
-        sql: dw/queries/datamarts/for_rent/datamart_opportunity.sql
-        table: datamart_opportunity
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_rent/datamart_opportunity.sql
+      table: datamart_opportunity
   quintoandar_consultant_listings:
-      dw:
-        <<: *redshift_anchor
-        sql: dw/queries/datamarts/for_rent/quintoandar_consultant_listings.sql
-        table: quintoandar_consultant_listings
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_rent/quintoandar_consultant_listings.sql
+      table: quintoandar_consultant_listings
   repressed_demand:
-      dw:
-        <<: *athena_anchor
-        sql: dw/queries/datamarts/for_rent/repressed_demand.sql
-        table: repressed_demand
+    dw:
+      <<: *athena_anchor
+      sql_file: dw/queries/datamarts/for_rent/repressed_demand.sql
+      table: repressed_demand

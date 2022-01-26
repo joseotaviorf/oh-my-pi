@@ -315,7 +315,8 @@ select
     CAST(mkt_platform AS VARCHAR) AS mkt_platform,
     CAST(utm_campaign AS VARCHAR) AS utm_campaign,
     CAST(utm_term AS VARCHAR) AS utm_term,
-    CAST(utm_content AS VARCHAR) AS utm_content
+    CAST(utm_content AS VARCHAR) AS utm_content,
+    CAST(NOW() AS VARCHAR) AS ts_load
 from 
     final 
 order by first_message_ts desc

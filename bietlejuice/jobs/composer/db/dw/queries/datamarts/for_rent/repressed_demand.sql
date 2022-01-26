@@ -341,7 +341,8 @@ select
     CAST(sum(enc.share_encaixes_nao_realizados_por_bloqueio_suspensao_agenda) AS VARCHAR) as sum_encaixes_nao_realizados_por_bloqueio_suspensao_agenda,
     CAST(sum(enc.encaixes_em_imovel_sem_slot_disponivel_target_date) AS VARCHAR) as sum_encaixes_em_imovel_sem_slot_disponivel_target_date,
     CAST(sum(enc.share_encaixes_nao_realizados_por_visita_sale) AS VARCHAR) as sum_encaixes_nao_realizados_por_visita_sale,
-	CAST(sum(enc.share_encaixes_nao_realizados_por_agent) AS VARCHAR) as sum_encaixes_nao_realizados_por_agent
+	CAST(sum(enc.share_encaixes_nao_realizados_por_agent) AS VARCHAR) as sum_encaixes_nao_realizados_por_agent,
+	MAX(CAST(NOW() AS VARCHAR)) AS ts_load
 from dimensions d
 left join bookings_clean bk
 	on bk.region_id = cast(d.region_id as bigint)
