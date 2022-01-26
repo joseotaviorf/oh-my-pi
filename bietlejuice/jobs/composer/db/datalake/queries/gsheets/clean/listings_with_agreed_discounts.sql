@@ -7,6 +7,6 @@ SELECT
     user_email,
     comments,
     CAST(fee_value AS FLOAT) AS fee_value,
-    DATE(dt_discount_registered) AS dt_discount_registered
+    TO_DATE(dt_discount_registered, 'dd/MM/yyyy') AS dt_discount_registered
 FROM
     datalake_gsheets_raw.listings_with_agreed_discounts
