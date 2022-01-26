@@ -17,17 +17,6 @@ pipeline:
     when:
       event: push
 
-  validate-tables-ddl-ods-migration:
-    group: ec2-tests
-    image: python:2.7.12
-    commands:
-      - apt-get update
-      - apt-get install -y git > /dev/null
-      - pip install -r requirements_ods_migration_test.txt
-      - python scripts/compare_tables_ddl.py
-    when:
-      event: push
-
   unit-tests-python2:
     group: ec2-tests
     image: python:2.7.12
