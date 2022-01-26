@@ -2,8 +2,8 @@
 -- TODO: add B2B owner
   select
     t.*,
-    cast(coalesce(fpj.id_photo_job, '-1') as bigint) as sk_photo_job,
-    cast(coalesce(fpj.sk_user_rep, '-1') as bigint) as sk_user_sales_rep,
+    coalesce(fpj.id_photo_job, -1) as sk_photo_job,
+    coalesce(fpj.sk_user_rep, -1) as sk_user_sales_rep,
     cast(coalesce(dhl.sk_house_listing, dhl_no_version.sk_house_listing, fhl_photo.sk_house_listing, '-1') as bigint) as sk_house_listing,
     cast(coalesce(fhl_photo.sk_owner, fhl.sk_owner, fhl_no_version.sk_owner, '-1') as bigint) as sk_house_owner
 	from tasks t
@@ -11,7 +11,7 @@
     on t.sk_task = trim(ct.id)
   left join datalake_clean.ods_fact_photo_job fpj
     on trim(ct.origin) = 'JobFotografo'
-      and try_cast(try_cast(ct.id_origin as decimal) as bigint) = try_cast(fpj.id_photo_job as bigint)
+      and try_cast(try_cast(ct.id_origin as decimal) as bigint) = fpj.id_photo_job
   left join datalake_clean.ods_fact_house_listings fhl_photo
   	on fhl_photo.sk_house_listing = fpj.sk_house_listing
   	  and fhl_photo.sk_house_listing != '-1'
