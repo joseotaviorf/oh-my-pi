@@ -32,7 +32,7 @@ photo_jobs_base as (
       coalesce(dt_problem_reported, user_cancel_dt) as dt_canceled,
       lead(dt_job_created,1) over (partition by imovel_id order by sk_photo_job) as dt_next_photo_job,
       min(sk_photo_job) over (partition by imovel_id) as "sk_first_photo_job"
-    from dw_janus.dim_photo_job -- voltar para public/remover o schema quando a migração da dag dw_listing_jobs ocorrer
+    from public.dim_photo_job 
     group by 1,2,3, dt_problem_reported, user_cancel_dt
 ),
 
@@ -44,7 +44,7 @@ first_photo_job_base as (
       dpj.creation_origin,
       dpj.dt_job_scheduled as dt_first_job_scheduled
     from photo_jobs_base pjb
-    left join dw_janus.dim_photo_job dpj
+    left join public.dim_photo_job dpj
       on dpj.sk_photo_job = pjb.sk_first_photo_job
     
 ),
