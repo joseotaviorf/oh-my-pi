@@ -30,13 +30,13 @@ pipeline:
       <<: *athena_anchor
       sql_file: dw/queries/datamarts/for_rent/talk_to_agent.sql
       table: talk_to_agent
-  funnel_demand_flows:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent/funnel_demand_flows.sql
-      table: funnel_demand_flows
-      depends_on:
-        - talk_to_agent
+  # funnel_demand_flows:
+  #   dw:
+  #     <<: *redshift_anchor
+  #     sql_file: dw/queries/datamarts/for_rent/funnel_demand_flows.sql
+  #     table: funnel_demand_flows
+  #     depends_on:
+  #       - talk_to_agent
   datamart_opportunity:
     dw:
       <<: *redshift_anchor
