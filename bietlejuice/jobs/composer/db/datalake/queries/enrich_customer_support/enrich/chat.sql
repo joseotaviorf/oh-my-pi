@@ -10,6 +10,16 @@ WITH quinto_messenger_tickets AS (
       FROM datalake_quinto_messenger.task
       GROUP BY 1
   ),
+  task_outcome AS (
+    SELECT
+        id_task,
+        task_completion_reason
+    FROM
+        datalake_quinto_messenger.task_event
+    WHERE
+        type = 'reservation.completed'
+        AND channel_name = 'chat'
+  ),
   task_transfer_reason AS (
     SELECT DISTINCT
       id_reviewed AS id_task,
@@ -139,6 +149,7 @@ WITH quinto_messenger_tickets AS (
       t.seconds_to_first_response AS seconds_first_reply,
       t.seconds_to_first_response/60.0 AS task_minutes_wait_time,
       t.department,
+      to.task_completion_reason AS completion_reason,
       t.transferred_from_dept,
       t.transferred_to_dept,
       t.transference_type,
@@ -178,6 +189,9 @@ WITH quinto_messenger_tickets AS (
     LEFT JOIN
       chat_metrics cm
         ON cm.id_conversation = c.id_source
+    LEFT JOIN
+        task_outcome AS to
+            ON to.id_task = t.id_task
     LEFT JOIN
       task_transfer_reason
         ON task_transfer_reason.id_task = t.id_task
@@ -340,6 +354,7 @@ SELECT DISTINCT
   zd.zendesk_ticket_department AS zendesk_department,
   ldep.first_department, 
   ldep.last_department,
+  ct.completion_reason,
   ct.transferred_from_dept,
   ct.transferred_to_dept,
   ct.transference_type,

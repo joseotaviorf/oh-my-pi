@@ -59,6 +59,9 @@ columns:
       - datalake_quinto_messenger.task_event.task_queue_name
       - datalake_zendesk_ticket_funnels.ticket_funnel.id_ticket
       - datalake_quinto_messenger.task_event.ts_created_local
+  completion_reason:
+    lineage:
+      - datalake_quinto_messenger.task_event.task_completion_reason
   transferred_from_dept:
     lineage:
       - datalake_quinto_messenger.task_event.task_queue_name
