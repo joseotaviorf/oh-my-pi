@@ -1,0 +1,52 @@
+---
+database_name: datalake_crawlers_listings_clean
+table_name: olx
+columns:
+  id:
+    lineage:
+      - datalake_crawlers_raw.olx.id
+  origin:
+    lineage:
+      - datalake_crawlers_raw.olx.origin
+  address:
+    lineage:
+      - datalake_crawlers_raw.olx.address
+  region:
+    lineage:
+      - datalake_crawlers_raw.olx.region
+  listing_name:
+    lineage:
+      - datalake_crawlers_raw.olx.name
+  crawl_metadata:
+    lineage:
+      - datalake_crawlers_raw.olx.crawl_metadata
+  house_info:
+    lineage:
+      - datalake_crawlers_raw.olx.house_info
+  type:
+    lineage:
+      - datalake_crawlers_raw.olx.type
+  image_urls:
+    lineage:
+      - datalake_crawlers_raw.olx.image_urls
+  contact_information:
+    lineage:
+      - datalake_crawlers_raw.olx.contact_information
+  price:
+    lineage:
+      - datalake_crawlers_raw.olx.price
+  date_info:
+    lineage:
+      - datalake_crawlers_raw.olx.date_info
+  city:
+    lineage:
+      - datalake_crawlers_raw.olx.city
+  year:
+    lineage:
+      - datalake_crawlers_raw.olx.year
+  month:
+    lineage:
+      - datalake_crawlers_raw.olx.month
+  day:
+    lineage:
+      - datalake_crawlers_raw.olx.day

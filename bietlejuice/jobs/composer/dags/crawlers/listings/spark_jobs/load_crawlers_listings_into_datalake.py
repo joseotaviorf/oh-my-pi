@@ -15,7 +15,7 @@ from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
 
-JOB_NAME = "load_crawler_listings_loft_into_datalake"
+JOB_NAME = "load_crawler_listings_into_datalake"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)

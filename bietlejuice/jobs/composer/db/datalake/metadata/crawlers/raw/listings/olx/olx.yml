@@ -1,6 +1,6 @@
 ---
 database_name: datalake_crawlers_listings_raw
-table_name: loft
+table_name: olx
 columns:
   contact_information:
     tags:

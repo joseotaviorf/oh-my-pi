@@ -1,6 +1,8 @@
 ---
 loft:
   origin: 'loft'
+olx:
+  origin: 'olx'
 viva_real:
   origin: 'vivareal'
 partition_cols: ["city", "year", "month", "day"]

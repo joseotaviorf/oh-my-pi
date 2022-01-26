@@ -85,7 +85,7 @@ task_group = DatalakeTaskGroup(
 partition_cols = config_service.get_config("partition_cols")
 
 
-raw_spark_job_path = f"{RAW_SPARK_JOB_PATH}/load_crawlers_into_datalake.py"
+raw_spark_job_path = f"{RAW_SPARK_JOB_PATH}/load_crawlers_listings_into_datalake.py"
 parameters = [SOURCE,CONTEXT, origin, origin, "{{ds}}"]
 
 
