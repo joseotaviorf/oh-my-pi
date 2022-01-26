@@ -14,6 +14,7 @@ WITH data_amenities AS (
             datalake_casa_mineira_portal_clean.house AS house
         WHERE
             house.id IS NOT NULL
+            AND house.id NOT REGEXP '[a-zA-Z]'
     ), 
     data_house_attributes AS (
         SELECT *

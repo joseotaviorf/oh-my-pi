@@ -18,3 +18,6 @@ SELECT
     NOW() AS ts_load
 FROM   
     datalake_casa_mineira_portal_clean.house AS house 
+WHERE
+    house.id IS NOT NULL
+    AND house.id NOT REGEXP '[a-zA-Z]'
