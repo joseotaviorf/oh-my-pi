@@ -18,29 +18,86 @@ class HiveMetastoreLoader:
         """
         self.hive_metastore_service = metastore_service
 
-    def compare_table_schema(self, database_name, table_name, source_schema):
+    def sync_metastore(
+        self,
+        database_name,
+        table_name,
+        database_location,
+        table_schema,
+        partition_keys,
+        format_info,
+        source_schema,
+    ):
         """
-        Compare the table schema from Spark Metastore (in Databricks) with Hive
-         Metastore.
+        Updates the table schema and partition keys in the Hive Metastore based in Spark Metastore values sent via
+         arguments.
 
-        :param database_name: the database name of the table
+        :param database_name: the database name
         :type database_name: str
         :param table_name: the table name
         :type table_name: str
+        :param database_location: s3 path where the database is located.
+         E.g: s3://some/path/
+        :type database_location: str
+        :param table_schema: an ordered dict containing the columns name and
+         type (including partitioning columns).
+        :type table_schema: collections.OrderedDict
+        :param partition_keys: a list of tuples containing respectively the
+        columns name and type for the partition keys. A table can have one or
+        more partitions keys. A separate data directory is created for each
+        specified combination, which can improve query performance in some
+        circumstances. Partitioned columns don't exist within the table data
+        itself.
+        :type partition_keys: List[Tuple(string, string)]
+        :param format_info: one of TableStorageDescriptor valid layers format.
+         This gives information about the table storage parameters.
+         E.g. TableStorageDescriptor.RAW_FORMAT
+        :type format_info: bietlejuice.jobs.composer.base.hive.TableFormatInfo
         :param source_schema: columns to compare the table schema with
         :type source_schema: collections.OrderedDict
-        :return: a list with new columns and another list with the removed ones
-        :rtype: List[FieldSchema], List[str]
         """
-        hive_table_columns = self.hive_metastore_service.get_table_columns(
-            database_name, table_name, ignore_partition_keys=True
-        )
+        source_table_partition_keys = partition_keys or []
+        table_s3_path = database_location + table_name
 
-        added_columns, removed_columns = self._get_tables_difference(
-            source_schema, hive_table_columns
-        )
-
-        return added_columns, removed_columns
+        if self._is_table_in_metastore(database_name, table_name):
+            schema_changes = self._get_table_schema_changes(
+                database_name, table_name, source_schema
+            )
+            has_partition_keys_changed = not self._partition_keys_match(
+                database_name, table_name, source_table_partition_keys
+            )
+            if schema_changes or has_partition_keys_changed:
+                logger.info(
+                    f"m=sync_metastore, db={database_name}, table={table_name}, "
+                    "msg=Table already exists in metastore. Syncing with spark metastore."
+                )
+                self.update_table(
+                    database_name,
+                    table_name,
+                    table_s3_path,
+                    table_schema,
+                    partition_keys,
+                    format_info,
+                    schema_changes,
+                )
+            else:
+                logger.info(
+                    f"m=sync_metastore, db={database_name}, table={table_name}, "
+                    "msg=Tables are already synced in both metastores"
+                )
+        else:
+            logger.info(
+                f"m=sync_metastore, db={database_name}, table={table_name}, "
+                "msg=Table does not exist in metastore. Syncing with spark metastore."
+            )
+            self.create_table(
+                database_name,
+                table_name,
+                table_s3_path,
+                table_schema,
+                partition_keys,
+                format_info,
+            )
 
     def create_table(
         self,
@@ -90,124 +147,74 @@ class HiveMetastoreLoader:
             format_info,
         )
 
-    def update_metastore(
+    def update_table(
         self,
         database_name,
         table_name,
-        database_location,
+        table_location,
         table_schema,
-        partition_keys,
+        source_partition_keys,
         format_info,
-        source_schema,
+        schema_changes,
     ):
         """
+        Updates the table in the Hive Metastore.
+        If the table is not partitioned, then the table's schema is updated.
+        If the table is partitioned or a partition key is modified, then the table needs to be recreated.
 
-        :param database_name: the database name
+        :param database_name: database name
         :type database_name: str
-        :param table_name: the table name
+        :param table_name: table name
         :type table_name: str
-        :param database_location: s3 path where the database is located.
-         E.g: s3://some/path/
-        :type database_location: str
+        :param table_location: specifies the location of the underlying data in
+         S3 from which the table is created, for example, 's3://mystorage/'
+        :type table_location: str
         :param table_schema: an ordered dict containing the columns name and
          type (including partitioning columns).
         :type table_schema: collections.OrderedDict
-        :param partition_keys: a list of tuples containing respectively the
+        :param source_partition_keys: a list of tuples containing respectively the
         columns name and type for the partition keys. A table can have one or
         more partitions keys. A separate data directory is created for each
         specified combination, which can improve query performance in some
         circumstances. Partitioned columns don't exist within the table data
         itself.
-        :type partition_keys: List[Tuple(string, string)]
+        :type source_partition_keys: List[(string, string)]
         :param format_info: one of TableStorageDescriptor valid layers format.
-         This gives information about the table storage parameters.
-         E.g. TableStorageDescriptor.RAW_FORMAT
+        This gives information about the table storage parameters.
         :type format_info: bietlejuice.jobs.composer.base.hive.TableFormatInfo
-        :param source_schema: columns to compare the table schema with
-        :type source_schema: collections.OrderedDict
+        :param schema_changes: The table added and removed columns
+        :type schema_changes: Dict[str, List]
+
         """
-        partition_keys = partition_keys or []
-        table_s3_path = database_location + table_name
-
-        if self.is_table_in_metastore(database_name, table_name):
+        if source_partition_keys or self._is_table_partitioned(
+            database_name, table_name
+        ):
+            # It is necessary to recreate the table if it is partitioned in some of metastores
             logger.info(
-                f"m=update_metastore, db={database_name}, table={table_name}, "
-                "msg=Table already exists in metastore. Syncing with spark metastore."
+                f"m=update_table, db={database_name}, table={table_name}, msg=The table is partitioned, recreating "
+                "instead of update"
             )
+            logger.info(
+                f"m=update_table, db={database_name}, table={table_name}, msg=Dropping table from Hive Metastore"
+            )
+            self.hive_metastore_service.drop_table(database_name, table_name)
 
-            self._check_partition_keys(database_name, table_name, partition_keys)
-            self._update_table_in_metastore(database_name, table_name, source_schema)
-        else:
-            self.create_table(
+            logger.info(
+                f"m=update_table, db={database_name}, table={table_name}, msg=Recreating table in Metastore"
+            )
+            self.hive_metastore_service.create_external_table(
                 database_name,
                 table_name,
-                table_s3_path,
+                table_location,
                 table_schema,
-                partition_keys,
+                source_partition_keys,
                 format_info,
             )
-
-    @staticmethod
-    def _get_tables_difference(spark_table_columns, metastore_table_columns):
-        """
-        Identifies the columns that were added and removed from the table in Spark Metastore.
-
-        :param spark_table_columns: the most updated columns list from table in Spark Metastore
-        :type spark_table_columns: collections.OrderedDict
-        :param metastore_table_columns: the columns list from table's data lake metastore
-        :type metastore_table_columns: Dict[str, str]
-        :return: a list with new columns and another list with the removed ones
-        :rtype: List[FieldSchema], List[str]
-        """
-        metastore_columns_names = list(metastore_table_columns.keys())
-        removed_columns = metastore_columns_names
-        added_columns = []
-        for col_name, col_type in spark_table_columns.items():
-            if (
-                col_name in metastore_columns_names
-                and col_type == metastore_table_columns[col_name]
-            ):
-                removed_columns.remove(col_name)
-            else:
-                added_columns.append(ColumnBuilder(col_name, col_type).build())
-
-        return added_columns, removed_columns
-
-    def is_table_in_metastore(self, database_name, table_name):
-        """
-        Checks whether table exists in Hive Metastore.
-
-        :param database_name:
-        :param table_name:
-        :rtype: boolean
-        """
-        return table_name in self.hive_metastore_service.get_table_names(database_name)
-
-    def _update_table_in_metastore(self, database_name, table_name, source_schema):
-        logger.info(
-            f"m=_update_table_in_metastore, db={database_name}, table={table_name}, "
-            "msg=Comparing table columns."
-        )
-
-        added_columns, removed_columns = self.compare_table_schema(
-            database_name, table_name, source_schema
-        )
-        if removed_columns:
+        else:
             logger.info(
-                f"m=_update_table_in_metastore, db={database_name}, table={table_name}, "
-                f"removed_columns={removed_columns}, msg=Dropping columns."
+                f"m=update_table, db={database_name}, table={table_name}, msg=Updating non-partitioned table"
             )
-            self.hive_metastore_service.drop_columns_from_table(
-                database_name, table_name, removed_columns
-            )
-        if added_columns:
-            logger.info(
-                f"m=_update_table_in_metastore, db={database_name}, table={table_name}, "
-                f"added_columns={[col.name for col in added_columns]}, msg=Adding columns."
-            )
-            self.hive_metastore_service.add_columns_to_table(
-                database_name, table_name, added_columns
-            )
+            self._update_table_in_metastore(database_name, table_name, schema_changes)
 
     def update_table_partitions(self, database_name, table_name, partition_values):
         """
@@ -236,7 +243,7 @@ class HiveMetastoreLoader:
         metastore_part_values = self.hive_metastore_service.get_partition_values(
             database_name, table_name
         )
-        new_partitions, dropped_partitions = self._get_partitions_difference(
+        new_partitions, dropped_partitions = self._map_partition_values_difference(
             database_name, table_name, partition_values, metastore_part_values
         )
 
@@ -263,7 +270,117 @@ class HiveMetastoreLoader:
             )
 
     @staticmethod
-    def _get_partitions_difference(
+    def _get_tables_difference(spark_table_columns, metastore_table_columns):
+        """
+        Identifies the columns that were added and removed from the table in Spark Metastore.
+
+        :param spark_table_columns: the most updated columns list from table in Spark Metastore
+        :type spark_table_columns: collections.OrderedDict
+        :param metastore_table_columns: the columns list from table's data lake metastore
+        :type metastore_table_columns: Dict[str, str]
+        :return: a list with new columns and another list with the removed ones
+        :rtype: List[FieldSchema], List[str]
+        """
+        metastore_columns_names = list(metastore_table_columns.keys())
+        removed_columns = metastore_columns_names
+        added_columns = []
+        for col_name, col_type in spark_table_columns.items():
+            if (
+                col_name in metastore_columns_names
+                and col_type == metastore_table_columns[col_name]
+            ):
+                removed_columns.remove(col_name)
+            else:
+                added_columns.append(ColumnBuilder(col_name, col_type).build())
+
+        return added_columns, removed_columns
+
+    def _get_table_schema_changes(self, database_name, table_name, source_schema):
+        """
+        Returns the table new columns and the removed columns in Spark Metastore.
+
+        :param database_name: the database name
+        :type: str
+        :param table_name: the table name
+        :type: str
+        :param source_schema: the table schema in Spark Metastore
+        :rtype: Dict[str, List]
+        :return: added and removed columns
+        """
+        hive_table_columns = self.hive_metastore_service.get_table_columns(
+            database_name, table_name, ignore_partition_keys=True
+        )
+
+        added_columns, removed_columns = self._get_tables_difference(
+            source_schema, hive_table_columns
+        )
+
+        changes = {}
+        if added_columns or removed_columns:
+            changes["added_columns"] = added_columns
+            changes["removed_columns"] = removed_columns
+
+        return changes
+
+    def _is_table_in_metastore(self, database_name, table_name):
+        """
+        Checks whether table exists in Hive Metastore.
+
+        :param database_name: the database name
+        :type: str
+        :param table_name: the table name
+        :type: str
+        :rtype: boolean
+        """
+        return table_name in self.hive_metastore_service.get_table_names(database_name)
+
+    def _is_table_partitioned(self, database_name, table_name):
+        """
+        Checks if table is partitioned in Hive Metastore.
+
+        :param database_name: the database name
+        :type: str
+        :param table_name: the table name
+        :rtype: bool
+        """
+        return self.hive_metastore_service.get_partition_keys(database_name, table_name)
+
+    def _update_table_in_metastore(self, database_name, table_name, schema_changes):
+        """
+        Perform an alterantive alter table in the Hive Metastore's table via add and drop commands.
+
+        :param database_name: the database name
+        :type: str
+        :param table_name: the table name
+        :type: str
+        :param schema_changes: The table added and removed columns
+        :type schema_changes: Dict[str, List]
+        :return:
+        """
+        logger.info(
+            f"m=_update_table_in_metastore, db={database_name}, table={table_name}, "
+            "msg=Comparing table columns."
+        )
+
+        if schema_changes.get("removed_columns"):
+            logger.info(
+                f"m=_update_table_in_metastore, db={database_name}, table={table_name}, "
+                f"removed_columns={schema_changes.get('removed_columns')}, msg=Dropping columns."
+            )
+            self.hive_metastore_service.drop_columns_from_table(
+                database_name, table_name, schema_changes.get("removed_columns")
+            )
+        if schema_changes.get("added_columns"):
+            logger.info(
+                f"m=_update_table_in_metastore, db={database_name}, table={table_name}, "
+                f"added_columns={[col.name for col in schema_changes.get('added_columns')]}, msg=Adding columns."
+            )
+            self.hive_metastore_service.add_columns_to_table(
+                database_name, table_name, schema_changes.get("added_columns")
+            )
+
+    @staticmethod
+    def _map_partition_values_difference(
         database_name, table_name, spark_partition_values, metastore_partition_values
     ):
         """
@@ -292,13 +409,11 @@ class HiveMetastoreLoader:
 
         return added_partitions, removed_partitions
 
-    def _check_partition_keys(
+    def _partition_keys_match(
         self, database_name, table_name, source_table_partition_keys
     ):
         """
-        Verifies if partition keys of Spark Metastore and Hive Metastore tables match.
-
-        Throws an error if partitions differs.
+        Verifies if table's partition keys of Spark Metastore and Hive Metastore match.
 
         :param database_name: the metastore database name
         :type database_name: str
@@ -307,22 +422,19 @@ class HiveMetastoreLoader:
         :param source_table_partition_keys: a list of tuples containing respectively the
         columns name and type for the Spark metastore table partition keys.
         :type source_table_partition_keys: List[Tuple(string, string)]
-        :rtype: None
-        :raises: ValueError
+        :rtype: Boolean
+        :return: whether exists a difference in the table partition keys
         """
-        logger.info(
-            f"m=_check_partition_keys, db={database_name}, table={table_name}, "
-            "msg=Checking partitions keys."
-        )
-
         hive_table_partition_keys = self.hive_metastore_service.get_partition_keys(
             database_name, table_name
         )
 
-        if hive_table_partition_keys != source_table_partition_keys:
-            raise ValueError(
-                f"m=_check_partition_keys, spark_partitions={source_table_partition_keys},"
-                f" hive_partition_keys={hive_table_partition_keys}, msg=The partition keys in Spark and Hive metastores"
-                f" are not matching. Probably because the partition keys changed in Spark Metastore. First the table must be "
-                f"manually dropped in the in in-house metastore, so it will be recreated."
-            )
+        are_partition_keys_matching = (
+            source_table_partition_keys == hive_table_partition_keys
+        )
+
+        logger.info(
+            f"m=partition_keys_match, db={database_name}, table={table_name}, partition_keys_match={are_partition_keys_matching}, "
+            "msg=Comparing table partition keys in Spark Metastore with Hive Metastore"
+        )
+        return are_partition_keys_matching

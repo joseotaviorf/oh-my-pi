@@ -71,7 +71,7 @@ class MetastoreExternalTablePipeline(AbstractPipeline):
         hms_service.create_database(self.database_name)
 
         hms_loader = HiveMetastoreLoader(hms_service)
-        hms_loader.update_metastore(
+        hms_loader.sync_metastore(
             database_name=self.database_name,
             table_name=self.table_name,
             database_location=self.database_location,
@@ -81,8 +81,9 @@ class MetastoreExternalTablePipeline(AbstractPipeline):
             source_schema=self.table_schema,
         )
 
-        hms_loader.update_table_partitions(
-            database_name=self.database_name,
-            table_name=self.table_name,
-            partition_values=self.partition_values,
-        )
+        if self.partition_keys:
+            hms_loader.update_table_partitions(
+                database_name=self.database_name,
+                table_name=self.table_name,
+                partition_values=self.partition_values,
+            )

@@ -56,7 +56,7 @@ class HiveMetastoreSynchronization:
 
         QuintoAndarLogger(JOB_NAME).info(
             f"m={JOB_NAME}, layer={self.layer}, database_name={self.spark_database_name}, "
-            f"table_name={table_spark_metadata['name']}, msg=Table synchronized."
+            f"table_name={table_spark_metadata['name']}, msg=Completed table synchronization"
         )
 
 

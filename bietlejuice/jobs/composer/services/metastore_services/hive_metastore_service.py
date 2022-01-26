@@ -127,16 +127,19 @@ class HiveMetastoreService(MetastoreService):
             "m=repair_table_partitions, msg=method not implemented"
         )
 
-    def drop_table(self, database_name, table_name):
+    def drop_table(self, database_name, table_name, delete_data=False):
         """
         Drops the table in the Hive Metastore.
 
         :param database_name: the database name
+        :type: str
         :param table_name: the table name
-        :return:
+        :type: str
+        :param delete_data: whether the data should be deleted (for managed tables)
+        :type: bool
         """
         with self.client as conn:
-            return conn.drop_table(database_name, table_name)
+            return conn.drop_table(database_name, table_name, delete_data)
 
     def get_table_names(self, database_name, regex="*"):
         """

@@ -461,13 +461,14 @@ class TestHiveMetastoreService:
         # arrange
         database_name = "datalake_bla"
         table_name = "foo_table"
+        delete_data = mock.ANY
 
         mocked_open_conn = self._mock_open_connection_helper(hive_metastore_service)
 
         # act
-        hive_metastore_service.drop_table(database_name, table_name)
+        hive_metastore_service.drop_table(database_name, table_name, delete_data)
 
         # assert
         mocked_open_conn.drop_table.assert_called_once_with(
-            database_name, table_name
+            database_name, table_name, delete_data
         )
