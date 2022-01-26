@@ -6,6 +6,7 @@ job_extra_args:
     options:
       header: "true"
       escape: "\""
+      multiLine: "true"
   custom_records_per_file:
     imovel_ponto_interesse: 2500000
     imovel_historico: 2500000
