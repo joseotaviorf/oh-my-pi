@@ -22,8 +22,8 @@ WITH visit_before_offer AS (
                 ON bs.id_house = so.id_house
                 AND bs.id_visitor = so.id_buyer
         LEFT JOIN 
-            dw_public.dim_user AS du
-                ON bs.id_agent = du.dados_agente_id
+            datalake_ebdb_user.user AS du
+                ON bs.id_agent = du.id_agent
         WHERE
             bs.visit_intent = 'SALE'
             AND bs.type = 'Visita'
@@ -60,8 +60,8 @@ booking_before_offer AS (
                 ON bs.id_house = so.id_house
                 AND bs.id_visitor = so.id_buyer
         LEFT JOIN 
-            dw_public.dim_user AS du
-                ON bs.id_agent = du.dados_agente_id
+            datalake_ebdb_user.user AS du
+                ON bs.id_agent = du.id_agent
         WHERE
             bs.visit_intent = 'SALE'
             AND bs.type = 'Visita'
@@ -118,8 +118,8 @@ work_contract AS (
         FROM
             agent_contract AS ac
         INNER JOIN 
-            dw_public.dim_user du
-                ON du.dados_agente_id = ac.agent_id
+            datalake_ebdb_user.user du
+                ON du.id_agent = ac.agent_id
         INNER JOIN 
             datalake_ebdb_clean.work_contract AS contract 
                 ON ac.workcontract_id = contract.id
