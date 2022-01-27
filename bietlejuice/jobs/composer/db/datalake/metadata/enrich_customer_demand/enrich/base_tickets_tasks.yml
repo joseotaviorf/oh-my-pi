@@ -14,6 +14,9 @@ columns:
   theme_detail:
     lineage:
       - datalake_customer_support.email.contact_theme_detail_tag
+  tags:
+    lineage:
+      - datalake_customer_support.email.tags
   has_scale_midia_tag:
     lineage:
       - datalake_customer_support.email.tags
@@ -41,12 +44,12 @@ columns:
   dt_budgeting:
     lineage:
       - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
-  dt_start:
+  ts_started:
     lineage:
       - datalake_customer_support.email.ts_ticket_started
-  dt_end:
+  ts_ended:
     lineage:
       - datalake_customer_support.email.ts_ticket_ended
-  dt_solve:
+  ts_solved:
     lineage:
       - datalake_customer_support.email.ts_ticket_solved

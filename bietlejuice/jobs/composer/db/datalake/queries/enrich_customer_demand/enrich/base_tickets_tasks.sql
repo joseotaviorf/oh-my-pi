@@ -3,6 +3,7 @@ SELECT DISTINCT
   e.department AS main_department,
   e.contact_theme_tag AS theme,
   e.contact_theme_detail_tag AS theme_detail,
+  e.tags,
   (e.tags LIKE '%escalar_back_midias%' OR e.tags LIKE '%escalar_ouvidoria_hard_cases%') AS has_scale_midia_tag,
   e.tags LIKE '%tarefa_atendimento_escalado%' AS has_scaled_service_task_tag,
   e.tags LIKE '%orçamentação_realizada%' AS has_budgeting_tag,
@@ -17,9 +18,9 @@ SELECT DISTINCT
       '$.Data Orçamentação realizada '
     )
   ) AS dt_budgeting,
-  DATE(e.ts_ticket_started) AS dt_start,
-  DATE(e.ts_ticket_ended) AS dt_end,
-  DATE(e.ts_ticket_solved) AS dt_solve
+  e.ts_ticket_started AS ts_started,
+  e.ts_ticket_ended AS ts_ended,
+  e.ts_ticket_solved AS ts_solved
 FROM
   datalake_customer_support.email e
 LEFT JOIN

@@ -54,9 +54,9 @@ columns:
   is_custom_expense:
     lineage:
       - datalake_heimdall.expenses.is_custom_text
-  dt_requested:
+  ts_requested:
     lineage:
       - datalake_heimdall.activity.ts_requested
-  dt_analyzed:
+  ts_analyzed:
     lineage:
       - datalake_heimdall.activity.ts_transition_created

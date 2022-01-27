@@ -30,11 +30,11 @@ SELECT
   tarf.type,
   turf.action_type,
   tarf.is_resolved,
-  DATE(tarf.ts_started) AS dt_start,
-  DATE(tarf.ts_completed) AS dt_completed,
-  MIN(DATE(tm.ts_created)) AS dt_termination_requested,
   MAX(tm.dt_termination) AS dt_termination,
-  MAX(DATE(tf.ts_termination_finished)) AS dt_termination_finished
+  tarf.ts_started,
+  tarf.ts_completed,
+  MIN(tm.ts_created) AS ts_termination_requested,
+  MAX(tf.ts_termination_finished) AS ts_termination_finished
 FROM 
   datalake_crm_tasks_flows.tasks_actions_resolutions_flow tarf
 JOIN
@@ -53,4 +53,4 @@ LEFT JOIN
 WHERE
   tarf.type = 'RevisarPagamentosRescisao'
   AND turf.action_type = 'CREATE'
-GROUP BY 1,2,3,4,5,6,7
+GROUP BY 1,2,3,4,5,7,8

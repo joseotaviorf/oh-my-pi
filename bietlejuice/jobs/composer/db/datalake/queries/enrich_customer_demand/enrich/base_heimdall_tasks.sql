@@ -16,8 +16,8 @@ SELECT
   e.recurrence_total AS total_installments,
   DATEDIFF(DATE(a.ts_requested),DATE(a.ts_transition_created)) AS days_requested_to_analyze,
   e.is_custom_text AS is_custom_expense,
-  DATE(a.ts_requested) AS dt_requested,
-  DATE(a.ts_transition_created) AS dt_analyzed
+  a.ts_requested,
+  a.ts_transition_created AS ts_analyzed
 FROM
   datalake_heimdall.activity a
 JOIN
