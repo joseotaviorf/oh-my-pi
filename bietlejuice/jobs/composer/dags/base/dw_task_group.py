@@ -242,16 +242,42 @@ class DWTaskGroup(BaseTaskGroup):
             execution_timeout=timedelta(hours=self.execution_timeout_hours),
         )
 
+        quality_tasks = []
+        if FileService.data_quality_tests_file_exists(
+                self.relative_query_path, layer, table_name
+        ):
+            data_quality_tests_task = QuintoAndarDatabricksSubmitRunOperator(
+                dag=self.dag,
+                task_id=f"data-quality-tests-{slugged_layer}-{slugged_dw_schema}-{slugged_table_name}",
+                json={
+                    "spark_python_task": {
+                        "python_file": f"{self.spark_jobs_path}/data_quality_tests.py",
+                        "parameters": [
+                            self.env,
+                            self.dw_bucket,
+                            layer,
+                            self.relative_query_path,
+                            table_name,
+                        ],
+                    }
+                },
+                execution_timeout=timedelta(hours=self.execution_timeout_hours),
+            )
+            load_table_to_dw_staging_schema_task.set_downstream([data_quality_tests_task])
+            quality_tasks = [data_quality_tests_task]
+
         if is_incremental:
             return DWTaskGroup.format_tasks_boundaries(
                 initial_tasks=[load_table_to_dw_staging_schema_task],
                 final_tasks=[load_table_to_dw_staging_schema_task],
+                independent_tasks=quality_tasks,
             )
         else:
             return self._build_dw_staging_full_load_extra_tasks(
                 load_table_to_dw_staging_schema_task=load_table_to_dw_staging_schema_task,
                 table_name=table_name,
                 has_ods_migration_test=has_ods_migration_test,
+                independent_tasks=quality_tasks,
             )
 
     def _build_dw_staging_full_load_extra_tasks(
@@ -259,6 +285,7 @@ class DWTaskGroup(BaseTaskGroup):
         load_table_to_dw_staging_schema_task,
         table_name: str,
         has_ods_migration_test: bool = False,
+        independent_tasks: list = [],
     ) -> dict:
         """
         For full load pipelines, it builds the additional tasks:
@@ -279,6 +306,7 @@ class DWTaskGroup(BaseTaskGroup):
         slugged_dw_schema = StringFormatter.slugify(self.dw_schema)
         slugged_table_name = StringFormatter.slugify(table_name)
 
+    # TODO: Remove this test once we decide that our Data Quality validations will block downstream tasks
         emptiness_test_task = QuintoAndarDatabricksSubmitRunOperator(
             dag=self.dag,
             task_id=f"test-{slugged_layer}-{slugged_dw_schema}-{slugged_table_name}-emptiness",
@@ -340,7 +368,9 @@ class DWTaskGroup(BaseTaskGroup):
             airflow_helpers.chain(load_table_to_dw_staging_schema_task, test_tasks)
 
         return DWTaskGroup.format_tasks_boundaries(
-            initial_tasks=[load_table_to_dw_staging_schema_task], final_tasks=test_tasks
+            initial_tasks=[load_table_to_dw_staging_schema_task],
+            final_tasks=test_tasks,
+            independent_tasks=independent_tasks
         )
 
     @staticmethod
