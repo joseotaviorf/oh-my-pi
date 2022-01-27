@@ -101,7 +101,7 @@ class IncrementalDWSubDAG(DWStagingSubDAG):
             task_id="sync-hive-metastore-table",
             json={
                 "spark_python_task": {
-                    "python_file": f"{self.spark_job_path}/sync_metastore_tables.py",
+                    "python_file": f"{self.spark_job_path}/sync_metastore_tables_structure.py",
                     "parameters": [
                         self.dw_bucket,
                         LayerEnum.DW.value,

@@ -16,7 +16,7 @@ from bietlejuice.jobs.composer.base.spark import (
     SparkTableStorageFormat,
 )
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
-from bietlejuice.jobs.composer.dags.base.spark_jobs.sync_metastore_tables import (
+from bietlejuice.jobs.composer.dags.base.spark_jobs.sync_metastore_tables_structure import (
     HiveMetastoreSynchronization,
 )
 from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader

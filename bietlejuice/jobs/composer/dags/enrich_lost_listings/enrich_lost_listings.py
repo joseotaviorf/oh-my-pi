@@ -114,7 +114,7 @@ sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id=f"sync-hive-metastore-{LayerEnum.ENRICH.value}-{slugged_table_name}",
     json={
         "spark_python_task": {
-            "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables.py",
+            "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables_structure.py",
             "parameters": [
                 datalake_bucket,
                 LayerEnum.ENRICH.value,

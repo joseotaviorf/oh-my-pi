@@ -6,7 +6,6 @@ from airflow.operators.quintoandar_databricks import (
 from bietlejuice.jobs.composer.base.airflow import BaseSubDAG
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 
-
 DEFAULT_EXECUTION_TIMEOUT_HOURS = 2
 
 
@@ -158,7 +157,7 @@ class DatalakeSubDAG(BaseSubDAG):
             task_id="sync-hive-metastore-table",
             json={
                 "spark_python_task": {
-                    "python_file": f"{self.spark_job_paths}/sync_metastore_tables.py",
+                    "python_file": f"{self.spark_job_paths}/sync_metastore_tables_structure.py",
                     "parameters": [
                         self.datalake_bucket,
                         self.layer.value,

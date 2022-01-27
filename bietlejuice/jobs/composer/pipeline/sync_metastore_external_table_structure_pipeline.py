@@ -5,7 +5,7 @@ from bietlejuice.jobs.composer.pipeline.abstract_pipeline import AbstractPipelin
 from bietlejuice.jobs.composer.services.metastore_services import HiveMetastoreService
 
 
-class MetastoreExternalTablePipeline(AbstractPipeline):
+class SyncMetastoreExternalTableStructurePipeline(AbstractPipeline):
     """Class to create an external table in Hive metastore."""
 
     def __init__(

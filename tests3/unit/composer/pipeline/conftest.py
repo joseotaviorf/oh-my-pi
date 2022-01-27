@@ -2,12 +2,12 @@ from unittest.mock import Mock
 
 import pytest
 
-from bietlejuice.jobs.composer.pipeline import MetastoreExternalTablePipeline
+from bietlejuice.jobs.composer.pipeline import SyncMetastoreExternalTableStructurePipeline
 
 
 @pytest.fixture()
 def metastore_external_table_pipeline():
-    return MetastoreExternalTablePipeline(
+    return SyncMetastoreExternalTableStructurePipeline(
         metastore_host=Mock(),
         database_name=Mock(),
         table_name=Mock(),

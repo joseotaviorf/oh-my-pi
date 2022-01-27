@@ -125,7 +125,7 @@ def dw_tasks(table_name):
         task_id=f"sync-hive-metastore-dw-{slugged_table_name}",
         json={
             "spark_python_task": {
-                "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables.py",
+                "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables_structure.py",
                 "parameters": [
                     DW_BUCKET,
                     LayerEnum.DW.value,
@@ -193,7 +193,7 @@ def clean_tasks(table_name):
         task_id=f"sync-hive-metastore-clean-{slugged_table_name}",
         json={
             "spark_python_task": {
-                "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables.py",
+                "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables_structure.py",
                 "parameters": [
                     DATALAKE_BUCKET,
                     LayerEnum.CLEAN.value,
@@ -354,7 +354,7 @@ sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id=f"sync-hive-metastore-raw",
     json={
         "spark_python_task": {
-            "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables.py",
+            "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables_structure.py",
             "parameters": [
                 DATALAKE_BUCKET,
                 LayerEnum.RAW.value,

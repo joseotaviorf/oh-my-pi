@@ -125,7 +125,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             dag=self.dag,
             json={
                 "spark_python_task": {
-                    "python_file": self.spark_jobs_path + "sync_metastore_tables.py",
+                    "python_file": self.spark_jobs_path + "sync_metastore_tables_structure.py",
                     "parameters": [
                         self.datalake_bucket,
                         layer,
@@ -404,7 +404,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             task_id=f"sync-hive-metastore-{layer.value}-{slugged_table_name}",
             json={
                 "spark_python_task": {
-                    "python_file": f"{self.spark_jobs_path}/sync_metastore_tables.py",
+                    "python_file": f"{self.spark_jobs_path}/sync_metastore_tables_structure.py",
                     "parameters": [
                         self.datalake_bucket,
                         layer.value,

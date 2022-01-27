@@ -13,7 +13,7 @@ from bietlejuice.jobs.composer.pipeline.incremental_table_loader_pipeline import
 from bietlejuice.jobs.composer.pipeline.load_table_to_redshift_pipeline import (
     LoadTableToRedshiftPipeline,
 )
-from bietlejuice.jobs.composer.pipeline.metastore_external_table_pipeline import (
-    MetastoreExternalTablePipeline,
+from bietlejuice.jobs.composer.pipeline.sync_metastore_external_table_structure_pipeline import (
+    SyncMetastoreExternalTableStructurePipeline,
 )
 from bietlejuice.jobs.composer.pipeline.table_loader_pipeline import TableLoaderPipeline

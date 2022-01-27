@@ -18,10 +18,10 @@ from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.base.spark.spark_metastore_helper import (
     SparkMetastoreHelper,
 )
-from bietlejuice.jobs.composer.pipeline import MetastoreExternalTablePipeline
+from bietlejuice.jobs.composer.pipeline import SyncMetastoreExternalTableStructurePipeline
 from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 
-JOB_NAME = "sync_metastore_tables"
+JOB_NAME = "sync_metastore_tables_structure"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 
@@ -43,7 +43,7 @@ class HiveMetastoreSynchronization:
             f"table_name={table_spark_metadata['name']}, msg=Starting table synchronization."
         )
 
-        MetastoreExternalTablePipeline(
+        SyncMetastoreExternalTableStructurePipeline(
             metastore_host=self.hms_host,
             database_name=self.spark_database_name,
             table_name=table_spark_metadata["name"],

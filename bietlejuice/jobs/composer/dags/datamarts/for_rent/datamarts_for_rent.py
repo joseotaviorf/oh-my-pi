@@ -12,7 +12,6 @@ from airflow.operators.quintoandar_databricks import (
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
 from bietlejuice.jobs.composer.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
-from bietlejuice.jobs.composer.services import FileService
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
@@ -130,7 +129,7 @@ def build_entity_subdag(subdag_name, entity_name, entity_pipeline):
         dag=entity_subdag,
         json={
             "spark_python_task": {
-                "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables.py",
+                "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables_structure.py",
                 "parameters": [
                     dw_bucket,
                     LayerEnum.DW.value,

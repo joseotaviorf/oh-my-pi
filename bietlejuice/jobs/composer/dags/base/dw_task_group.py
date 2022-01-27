@@ -9,7 +9,6 @@ from bietlejuice.jobs.composer.base.pipeline.metadata_type_enum import MetadataT
 from bietlejuice.jobs.composer.formatters import StringFormatter
 
 import airflow.utils.helpers as airflow_helpers
-from airflow.models import Variable
 
 from bietlejuice.jobs.composer.services import FileService, ConfigurationService
 
@@ -135,7 +134,7 @@ class DWTaskGroup(BaseTaskGroup):
             task_id=f"sync-hive-metastore-{layer}-{slugged_table_name}",
             json={
                 "spark_python_task": {
-                    "python_file": f"{self.spark_jobs_path}/sync_metastore_tables.py",
+                    "python_file": f"{self.spark_jobs_path}/sync_metastore_tables_structure.py",
                     "parameters": [
                         self.dw_bucket,
                         layer,

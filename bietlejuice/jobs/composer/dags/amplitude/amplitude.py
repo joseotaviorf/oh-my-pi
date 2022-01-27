@@ -110,7 +110,7 @@ sync_metastore_raw_events_task = QuintoAndarDatabricksSubmitRunOperator(
     dag=dag,
     json={
         "spark_python_task": {
-            "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables.py",
+            "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables_structure.py",
             "parameters": [
                 DATALAKE_BUCKET,
                 LayerEnum.RAW.value,
@@ -164,7 +164,7 @@ sync_metastore_clean_events_task = QuintoAndarDatabricksSubmitRunOperator(
     dag=dag,
     json={
         "spark_python_task": {
-            "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables.py",
+            "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables_structure.py",
             "parameters": [
                 DATALAKE_BUCKET,
                 LayerEnum.CLEAN.value,
@@ -311,7 +311,7 @@ sync_metastore_clean_staging_tables_task = QuintoAndarDatabricksSubmitRunOperato
     dag=dag,
     json={
         "spark_python_task": {
-            "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables.py",
+            "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables_structure.py",
             "parameters": [
                 DATALAKE_BUCKET,
                 LayerEnum.CLEAN_STAGING.value,
