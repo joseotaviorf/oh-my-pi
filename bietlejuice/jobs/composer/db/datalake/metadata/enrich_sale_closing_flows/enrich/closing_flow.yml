@@ -4,202 +4,252 @@ table_name: closing_flow
 columns:
   id_offer:
     lineage:
-      - datalake_firestore.monday.id_offer
+      - datalake_offer.sale_offer.id_offer
   id_buyer:
     lineage:
-      - datalake_firestore.sale_offer.id_buyer
+      - datalake_offer.sale_offer.id_buyer
   id_owner:
     lineage:
-      - datalake_firestore.sale_offer.id_owner
+      - datalake_offer.sale_offer.id_owner
   id_house:
     lineage:
-      - datalake_firestore.sale_offer.id_house
+      - datalake_offer.sale_offer.id_house
   id_closing_specialist:
     lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.id_consultant
       - datalake_firestore.monday.id_closing_specialist
   id_legal_risk_analyst:
     lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.id_legal_risk_analyst
       - datalake_firestore.monday.id_legal_risk_analyst
   id_pre_specialist:
     lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.id_pre_specialist
       - datalake_firestore.monday.id_pre_specialist
   id_post_specialist:
     lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.id_post_specialist
       - datalake_firestore.monday.id_post_specialist
   id_start_financing_specialist:
     lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.id_start_financing_specialist
       - datalake_firestore.monday.id_start_financing_specialist
   id_follow_up_financing_specialist:
     lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.id_follow_up_financing_specialist
       - datalake_firestore.monday.id_follow_up_financing_specialist
   id_end_financing_specialist:
     lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.id_end_financing_specialist
       - datalake_firestore.monday.id_end_financing_specialist
   id_credit_specialist:
     lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.id_credit_specialist
       - datalake_firestore.monday.id_credit_specialist
   id_notes_registry_specialist:
     lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.id_notes_registry_specialist
       - datalake_firestore.monday.id_notes_registry_specialist
   id_real_estate_register_specialist:
     lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.id_real_estate_register_specialist
       - datalake_firestore.monday.id_real_estate_register_specialist
   days_sale_agreement_signed_to_house_registry_ended:
     lineage:
-      - datalake_firestore.monday.dt_house_registry_ended
-      - datalake_firestore.monday.dt_sale_agreement_signed
+      - datalake_offer.sale_offer.dt_house_registry_ended
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
   days_sale_agreement_signed_to_sale_agreement_cancelled:
     lineage:
-      - datalake_firestore.monday.dt_sale_agreement_cancelled
-      - datalake_firestore.monday.dt_sale_agreement_signed
+      - datalake_offer.sale_offer.dt_sale_agreement_cancelled
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
   days_sale_agreement_signed_to_onboarding_ended:
     lineage:
       - datalake_firestore.monday.dt_onboarding_ended
-      - datalake_firestore.monday.dt_sale_agreement_signed
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_sale_offer_flows.sale_offer_flows.dt_onboarding_ended
   days_sale_agreement_signed_to_credit_analysis_started:
     lineage:
-      - datalake_firestore.monday.dt_sale_agreement_signed
       - datalake_firestore.monday.dt_credit_analysis_started
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_sale_offer_flows.sale_offer_flows.dt_credit_analysis_started
   days_sale_agreement_signed_to_house_registry_started:
     lineage:
-      - datalake_firestore.monday.dt_house_registry_started
-      - datalake_firestore.monday.dt_sale_agreement_signed
+      - datalake_offer.sale_offer.dt_house_registry_started
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
   days_sale_agreement_signed_to_credit_analysis_ended:
     lineage:
       - datalake_firestore.monday.dt_credit_analysis_ended
-      - datalake_firestore.monday.dt_sale_agreement_signed
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_sale_offer_flows.sale_offer_flows.dt_credit_analysis_ended
   days_sale_agreement_signed_to_financing_started:
     lineage:
       - datalake_firestore.monday.dt_financing_started
-      - datalake_firestore.monday.dt_sale_agreement_signed
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_sale_offer_flows.sale_offer_flows.dt_financing_started
   days_sale_agreement_signed_to_notes_registry_started:
     lineage:
       - datalake_firestore.monday.dt_notes_registry_started
-      - datalake_firestore.monday.dt_sale_agreement_signed
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_sale_offer_flows.sale_offer_flows.dt_notes_registry_started
   days_legal_risk_ended_to_legal_analysis_ended:
     lineage:
       - datalake_firestore.monday.dt_legal_analysis_ended
       - datalake_firestore.monday.dt_legal_risk_ended
+      - datalake_sale_offer_flows.sale_offer_flows.dt_legal_analysis_ended
+      - datalake_sale_offer_flows.sale_offer_flows.dt_legal_risk_ended
   days_legaut_analysis_started_to_legaut_analysis_ended:
     lineage:
       - datalake_firestore.monday.dt_legaut_analysis_ended
       - datalake_firestore.monday.dt_legaut_analysis_started
+      - datalake_sale_offer_flows.sale_offer_flows.dt_legaut_analysis_ended
+      - datalake_sale_offer_flows.sale_offer_flows.dt_legaut_analysis_started
   days_sale_agreement_signed_to_bank_legal_analysis_started:
     lineage:
       - datalake_firestore.monday.dt_bank_legal_analysis_started
-      - datalake_firestore.monday.dt_sale_agreement_signed
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_sale_offer_flows.sale_offer_flows.dt_bank_legal_analysis_started
   days_legal_risk_started_to_legal_risk_ended:
     lineage:
       - datalake_firestore.monday.dt_legal_risk_ended
       - datalake_firestore.monday.dt_legal_risk_started
+      - datalake_sale_offer_flows.sale_offer_flows.dt_legal_risk_ended
+      - datalake_sale_offer_flows.sale_offer_flows.dt_legal_risk_started
   days_legal_analysis_ended_notes_registry_ended:
     lineage:
       - datalake_firestore.monday.dt_notes_registry_ended
       - datalake_firestore.monday.dt_legal_analysis_ended
+      - datalake_sale_offer_flows.sale_offer_flows.dt_notes_registry_ended
+      - datalake_sale_offer_flows.sale_offer_flows.dt_legal_analysis_ended
   days_bank_legal_analysis_started_to_financing_ended:
     lineage:
       - datalake_firestore.monday.dt_financing_ended
       - datalake_firestore.monday.dt_bank_legal_analysis_started
+      - datalake_sale_offer_flows.sale_offer_flows.dt_financing_ended
+      - datalake_sale_offer_flows.sale_offer_flows.dt_bank_legal_analysis_started
   days_bank_legal_analysis_started_to_house_registry_started:
     lineage:
-      - datalake_firestore.monday.dt_house_registry_started
       - datalake_firestore.monday.dt_bank_legal_analysis_started
+      - datalake_offer.sale_offer.dt_house_registry_started
+      - datalake_sale_offer_flows.sale_offer_flows.dt_bank_legal_analysis_started
   days_credit_analysis_started_to_credit_analysis_ended:
     lineage:
       - datalake_firestore.monday.dt_credit_analysis_ended
       - datalake_firestore.monday.dt_credit_analysis_started
+      - datalake_sale_offer_flows.sale_offer_flows.dt_credit_analysis_ended
+      - datalake_sale_offer_flows.sale_offer_flows.dt_credit_analysis_started
   days_credit_analysis_ended_to_bank_legal_analysis_started:
     lineage:
       - datalake_firestore.monday.dt_bank_legal_analysis_started
       - datalake_firestore.monday.dt_credit_analysis_ended
+      - datalake_sale_offer_flows.sale_offer_flows.dt_bank_legal_analysis_started
+      - datalake_sale_offer_flows.sale_offer_flows.dt_credit_analysis_ended
   days_financing_started_to_financing_ended:
     lineage:
       - datalake_firestore.monday.dt_financing_ended
       - datalake_firestore.monday.dt_financing_started
+      - datalake_sale_offer_flows.sale_offer_flows.dt_financing_ended
+      - datalake_sale_offer_flows.sale_offer_flows.dt_financing_started
   days_notes_registry_started_to_notes_registry_ended:
     lineage:
       - datalake_firestore.monday.dt_notes_registry_ended
       - datalake_firestore.monday.dt_notes_registry_started
+      - datalake_sale_offer_flows.sale_offer_flows.dt_notes_registry_ended
+      - datalake_sale_offer_flows.sale_offer_flows.dt_notes_registry_started
   days_house_registry_started_to_house_registry_ended:
     lineage:
-      - datalake_firestore.monday.dt_house_registry_ended
-      - datalake_firestore.monday.dt_house_registry_started
+      - datalake_offer.sale_offer.dt_house_registry_ended
+      - datalake_offer.sale_offer.dt_house_registry_started
   days_notes_registry_ended_to_house_registry_started:
     lineage:
-      - datalake_firestore.monday.dt_house_registry_started
       - datalake_firestore.monday.dt_notes_registry_ended
+      - datalake_offer.sale_offer.dt_house_registry_started
+      - datalake_sale_offer_flows.sale_offer_flows.dt_notes_registry_ended
   days_notes_registry_ended_to_house_registry_ended:
     lineage:
-      - datalake_firestore.monday.dt_house_registry_ended
       - datalake_firestore.monday.dt_notes_registry_ended
+      - datalake_offer.sale_offer.dt_house_registry_ended
+      - datalake_sale_offer_flows.sale_offer_flows.dt_notes_registry_ended
   days_financing_ended_to_house_registry_ended:
     lineage:
-      - datalake_firestore.monday.dt_house_registry_ended
       - datalake_firestore.monday.dt_financing_ended
+      - datalake_offer.sale_offer.dt_house_registry_ended
+      - datalake_sale_offer_flows.sale_offer_flows.dt_financing_ended
   days_financing_ended_to_house_registry_started:
     lineage:
-      - datalake_firestore.monday.dt_house_registry_started
       - datalake_firestore.monday.dt_financing_ended
+      - datalake_offer.sale_offer.dt_house_registry_started
+      - datalake_sale_offer_flows.sale_offer_flows.dt_financing_ended
   dt_sale_agreement_signed:
     lineage:
-      - datalake_firestore.monday.dt_sale_agreement_signed
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
   dt_sale_agreement_cancelled:
     lineage:
-      - datalake_firestore.monday.dt_sale_agreement_cancelled
+      - datalake_offer.sale_offer.dt_sale_agreement_cancelled
   dt_onboarding_ended:
     lineage:
       - datalake_firestore.monday.dt_onboarding_ended
+      - datalake_sale_offer_flows.sale_offer_flows.dt_onboarding_ended
   dt_legal_analysis_ended:
     lineage:
       - datalake_firestore.monday.dt_legal_analysis_ended
+      - datalake_sale_offer_flows.sale_offer_flows.dt_legal_analysis_ended
   dt_legaut_analysis_started:
     lineage:
       - datalake_firestore.monday.dt_legaut_analysis_started
+      - datalake_sale_offer_flows.sale_offer_flows.dt_legaut_analysis_started
   dt_legaut_analysis_ended:
     lineage:
       - datalake_firestore.monday.dt_legaut_analysis_ended
+      - datalake_sale_offer_flows.sale_offer_flows.dt_legaut_analysis_ended
   dt_legal_risk_started:
     lineage:
       - datalake_firestore.monday.dt_legal_risk_started
+      - datalake_sale_offer_flows.sale_offer_flows.dt_legal_risk_started
   dt_legal_risk_ended:
     lineage:
       - datalake_firestore.monday.dt_legal_risk_ended
+      - datalake_sale_offer_flows.sale_offer_flows.dt_legal_risk_ended
   dt_bank_legal_analysis_started:
     lineage:
       - datalake_firestore.monday.dt_bank_legal_analysis_started
+      - datalake_sale_offer_flows.sale_offer_flows.dt_bank_legal_analysis_started
   dt_credit_analysis_started:
     lineage:
       - datalake_firestore.monday.dt_credit_analysis_started
+      - datalake_sale_offer_flows.sale_offer_flows.dt_credit_analysis_started
   dt_credit_analysis_ended:
     lineage:
       - datalake_firestore.monday.dt_credit_analysis_ended
+      - datalake_sale_offer_flows.sale_offer_flows.dt_credit_analysis_ended
   dt_financing_started:
     lineage:
       - datalake_firestore.monday.dt_financing_started
+      - datalake_sale_offer_flows.sale_offer_flows.dt_financing_started
   dt_financing_ended:
     lineage:
       - datalake_firestore.monday.dt_financing_ended
+      - datalake_sale_offer_flows.sale_offer_flows.dt_financing_ended
   dt_notes_registry_started:
     lineage:
       - datalake_firestore.monday.dt_notes_registry_started
+      - datalake_sale_offer_flows.sale_offer_flows.dt_notes_registry_started
   dt_notes_registry_ended:
     lineage:
       - datalake_firestore.monday.dt_notes_registry_ended
+      - datalake_sale_offer_flows.sale_offer_flows.dt_notes_registry_ended
   dt_house_registry_started:
     lineage:
-      - datalake_firestore.monday.dt_house_registry_started
+      - datalake_offer.sale_offer.dt_house_registry_started
   dt_house_registry_ended:
     lineage:
-      - datalake_firestore.monday.dt_house_registry_ended
+      - datalake_offer.sale_offer.dt_house_registry_ended
   dt_sale_key_delivered:
     lineage:
       - datalake_firestore.monday.dt_sale_key_delivered
+      - datalake_sale_offer_flows.sale_offer_flows.dt_sale_key_delivered
   dt_sale_transacton_paid:
     lineage:
-      - datalake_firestore.monday.dt_sale_transacton_paid
+      - datalake_offer.sale_offer.dt_sale_transacton_paid
   ts_updated:
     lineage:
-      - datalake_firestore.monday.ts_updated
-  ts_load:
-    lineage:
-      - datalake_firestore.monday.ts_load
+      - datalake_offer.sale_offer.ts_updated
