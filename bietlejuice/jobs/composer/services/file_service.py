@@ -2,7 +2,7 @@ import glob
 from os import listdir
 from os.path import isdir, isfile
 import re
-from typing import Generator, Tuple
+from typing import Generator, Tuple, List
 
 import yaml
 from quintoandar_logger import QuintoAndarLogger
@@ -12,6 +12,7 @@ from bietlejuice.jobs.composer.base.paths import (
     DATALAKE_METADATA_PATH,
     DATA_QUALITY_TESTS_PATH,
 )
+from bietlejuice.jobs.composer.dags import COMPOSER_DAGS_PATH
 
 logger = QuintoAndarLogger("FileService")
 
@@ -308,3 +309,22 @@ class FileService:
             table = path_tree[5]
 
         return source, layer, context, dag, ingestion_type, table
+
+    @staticmethod
+    def list_dag_files() -> List[str]:
+        """
+        List all composer dag file paths.
+        :return: a list of dag file paths
+            e.g.
+            - '/Users/my-user/bi-etl-ejuice/bietlejuice/jobs/composer/dags/source/dag_file.py'
+            - '/Users/my-user/bi-etl-ejuice/bietlejuice/jobs/composer/dags/source/context/dag_file.py'
+        :rtype: List[str]
+        """
+        all_files = glob.glob(f"{COMPOSER_DAGS_PATH}/**/*.py", recursive=True)
+        filtered_files = []
+        for file in all_files:
+            split = file.split("/")
+            if "spark_jobs" in split or "__init__.py" in split:
+                continue
+            filtered_files.append(file)
+        return filtered_files

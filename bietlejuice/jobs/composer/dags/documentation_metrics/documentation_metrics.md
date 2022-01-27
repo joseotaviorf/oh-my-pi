@@ -17,6 +17,11 @@ Weekly. More information about run time [here]({chart_url}{dag_id}).
 This DAG compares data from our spark metastore with our documentation available in the data-documentation S3 bucket, 
 as well as in the lineage and tag files created for our other DAGs.
 
+Creates tables in schemas:
+
+- `datalake_documentation_metrics_raw`
+- `datalake_documentation_metrics_clean`
+
 The following tables are created incrementally in the Raw and Clean layers:
 
 - `tables_documentation_metrics`
