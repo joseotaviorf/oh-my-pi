@@ -93,10 +93,10 @@ if __name__ == "__main__":
         metastore_service=metastore_service,
         source_schema=dw_info["dw_schema_databricks"],
         source_table_name=table_name,
-        target_schema=dw_schema,
+        target_schema="datamarts",
         target_table_name=table_name,
         overwrite=True,
     )
 
     # load validation
-    validate_load(dw_info["dw_schema_databricks"], dw_schema, table_name)
+    validate_load(dw_info["dw_schema_databricks"], "datamarts", table_name)

@@ -6,6 +6,7 @@ dags_out_of_pattern:
         "amplitude",
         "dw_booking",
         "dw_contract",
+        "dw_datamarts_for_rent",
         "dw_listing",
         "dw_listing_jobs",
         "dw_offer",

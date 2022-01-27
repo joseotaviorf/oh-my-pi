@@ -277,7 +277,17 @@ FROM
 )
 
 SELECT
-    *
+    sk_house_listing,
+    id_house,
+    sk_quintoandar_consultant,
+    mkt_origin_ciq,
+    is_ciq_origin,
+    is_account_manager,
+    type_big_agent,
+    businesscontext,
+    businesscontext_detail,
+    CAST(dt_ciq_started AS TIMESTAMP) AS dt_ciq_started,
+    id_partner
 FROM
     quintoandar_consultant_listings
 ORDER BY
