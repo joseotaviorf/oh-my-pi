@@ -8,7 +8,7 @@ create external table if not exists datalake_clean.ods_dim_photo_job (
     user_cancel_id bigint,
     job_status varchar(255),
     creation_origin varchar(20),
-    scheduling_instructions varchar,
+    scheduling_instructions varchar(255),
     photo_shoot_contact_name varchar(255),
     photo_shoot_email varchar(255),
     photo_shoot_phone varchar(20),
