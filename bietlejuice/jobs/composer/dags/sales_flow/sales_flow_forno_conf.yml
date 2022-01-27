@@ -12,6 +12,10 @@ tables:
     extraction_type: incremental
   brokerage_aud:
     extraction_type: incremental
+  card_noting:
+    extraction_type: incremental
+  card_noting_aud:
+    extraction_type: incremental
   cash_payment:
     extraction_type: incremental
   cash_payment_aud:

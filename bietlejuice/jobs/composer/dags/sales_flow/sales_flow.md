@@ -18,7 +18,9 @@ This pipeline produces, in **datalake raw and clean**, tables via incremental lo
 `address_data`  
 `address_data_aud`  
 `brokerage`     
-`brokerage_aud`     
+`brokerage_aud`
+`card_noting`
+`card_noting_aud`  
 `cash_payment`  
 `cash_payment_aud`  
 `ccv`   
