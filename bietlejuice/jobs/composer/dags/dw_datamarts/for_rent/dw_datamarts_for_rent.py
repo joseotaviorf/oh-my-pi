@@ -19,9 +19,9 @@ from bietlejuice.jobs.composer.services.configuration_service import (
 # DAG params
 SCHEMA = "datamarts"
 CONTEXT = "for_rent"
-DAG_NAME = f"DW_{SCHEMA}_{CONTEXT}"
-DAG_ID = f"bietlejuice.DW_{SCHEMA}_{CONTEXT}"
-INTERMEDIATE_PATH = f'DW_{SCHEMA}/{CONTEXT}'
+DAG_NAME = f"dw_{SCHEMA}_{CONTEXT}"
+DAG_ID = f"bietlejuice.dw_{SCHEMA}_{CONTEXT}"
+INTERMEDIATE_PATH = f'dw_{SCHEMA}/{CONTEXT}'
 ENV = os.environ.get("ENVIRONMENT")
 
 config_service = ConfigurationService(dag_name=DAG_NAME, intermediate_path=INTERMEDIATE_PATH)
