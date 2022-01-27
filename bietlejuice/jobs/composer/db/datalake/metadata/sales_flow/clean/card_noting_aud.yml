@@ -1,0 +1,48 @@
+database_name: datalake_sales_flow_clean
+table_name: card_noting_aud
+columns:
+  id_card_noting:
+    lineage:
+      - datalake_sales_flow_raw.card_noting_aud.id
+  rev:
+    lineage:
+      - datalake_sales_flow_raw.card_noting_aud.rev
+  rev_type:
+    lineage:
+      - datalake_sales_flow_raw.card_noting_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_sales_flow_raw.card_noting_aud.revend
+  buyer_and_seller:
+    lineage:
+      - datalake_sales_flow_raw.card_noting_aud.buyer_and_seller
+  commitment_closing_transfer:
+    lineage:
+      - datalake_sales_flow_raw.card_noting_aud.commitment_closing_transfer
+  negotiation_note:
+    lineage:
+      - datalake_sales_flow_raw.card_noting_aud.negotiation_note
+  buyer_and_seller_mod:
+    lineage:
+      - datalake_sales_flow_raw.card_noting_aud.buyer_and_seller_mod
+  commitment_closing_transfer_mod:
+    lineage:
+      - datalake_sales_flow_raw.card_noting_aud.commitment_closing_transfer_mod
+  negotiation_note_mod:
+    lineage:
+      - datalake_sales_flow_raw.card_noting_aud.negotiation_note_mod
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.card_noting_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.card_noting_aud.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.card_noting_aud.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.card_noting_aud.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.card_noting_aud.day
