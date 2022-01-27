@@ -3,6 +3,7 @@ block_list:
   - change_owner_control
   - flyway_schema_history
   - message
+  - mortgage_options_aud
 tables:
   address_data:
     extraction_type: incremental
