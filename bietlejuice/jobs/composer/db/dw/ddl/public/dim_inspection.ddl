@@ -2,9 +2,9 @@ drop table if exists public.dim_inspection;
 create table if not exists public.dim_inspection (
   sk_inspection bigint primary key,
   id_inspection bigint,
-  type varchar,
   mode varchar,
   status varchar,
+  type varchar,
   is_tenant_approved boolean,
   is_owner_approved boolean,
   has_inspector_comment boolean,
