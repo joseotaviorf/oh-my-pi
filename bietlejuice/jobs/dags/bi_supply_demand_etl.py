@@ -646,7 +646,7 @@ last_dep_execution_date = str(date.today() - timedelta(days=1))
 amplitude_dep = S3KeySensor(
     task_id="amplitude_dep",
     poke_interval=3*60,
-    timeout=2*60*60,
+    timeout=5*60*60,
     aws_conn_id="aws_prod_data",
     bucket_name='5a-datalake-prod',
     bucket_key="dags_execution_logs/{execution_date}/{dependency_dag}.SUCCESS".format(execution_date=last_dep_execution_date, dependency_dag='bietlejuice.amplitude'),
@@ -656,7 +656,7 @@ amplitude_dep = S3KeySensor(
 enrich_amplitude_partner_taxonomy_dep = S3KeySensor(
     task_id="enrich_amplitude_partner_taxonomy_dep",
     poke_interval=3*60,
-    timeout=2*60*60,
+    timeout=5*60*60,
     aws_conn_id="aws_prod_data",
     bucket_name='5a-datalake-prod',
     bucket_key="dags_execution_logs/{execution_date}/{dependency_dag}.SUCCESS".format(execution_date=last_dep_execution_date, dependency_dag='bietlejuice.enrich_amplitude_partner_taxonomy'),
@@ -666,7 +666,7 @@ enrich_amplitude_partner_taxonomy_dep = S3KeySensor(
 ebdb_dep = S3KeySensor(
     task_id="ebdb_dep",
     poke_interval=3*60,
-    timeout=2*60*60,
+    timeout=5*60*60,
     aws_conn_id="aws_prod_data",
     bucket_name='5a-datalake-prod',
     bucket_key="dags_execution_logs/{execution_date}/{dependency_dag}.SUCCESS".format(execution_date=last_dep_execution_date, dependency_dag='bietlejuice.ebdb'),
@@ -676,7 +676,7 @@ ebdb_dep = S3KeySensor(
 docx_dep = S3KeySensor(
     task_id="docx_dep",
     poke_interval=3*60,
-    timeout=2*60*60,
+    timeout=5*60*60,
     aws_conn_id="aws_prod_data",
     bucket_name='5a-datalake-prod',
     bucket_key="dags_execution_logs/{execution_date}/{dependency_dag}.SUCCESS".format(execution_date=last_dep_execution_date, dependency_dag='bietlejuice.docx'),
@@ -686,7 +686,7 @@ docx_dep = S3KeySensor(
 autodialer_dep = S3KeySensor(
     task_id="autodialer_dep",
     poke_interval=3*60,
-    timeout=2*60*60,
+    timeout=5*60*60,
     aws_conn_id="aws_prod_data",
     bucket_name='5a-datalake-prod',
     bucket_key="dags_execution_logs/{execution_date}/{dependency_dag}.SUCCESS".format(execution_date=last_dep_execution_date, dependency_dag='bietlejuice.autodialer'),
@@ -696,7 +696,7 @@ autodialer_dep = S3KeySensor(
 rene_descartes_dep = S3KeySensor(
     task_id="rene_descartes_dep",
     poke_interval=3*60,
-    timeout=2*60*60,
+    timeout=5*60*60,
     aws_conn_id="aws_prod_data",
     bucket_name='5a-datalake-prod',
     bucket_key="dags_execution_logs/{execution_date}/{dependency_dag}.SUCCESS".format(execution_date=last_dep_execution_date, dependency_dag='bietlejuice.rene_descartes'),
@@ -706,7 +706,7 @@ rene_descartes_dep = S3KeySensor(
 godfather_dep = S3KeySensor(
     task_id="godfather_dep",
     poke_interval=3*60,
-    timeout=2*60*60,
+    timeout=5*60*60,
     aws_conn_id="aws_prod_data",
     bucket_name='5a-datalake-prod',
     bucket_key="dags_execution_logs/{execution_date}/{dependency_dag}.SUCCESS".format(execution_date=last_dep_execution_date, dependency_dag='bietlejuice.godfather'),
@@ -716,7 +716,7 @@ godfather_dep = S3KeySensor(
 firestore_dep = S3KeySensor(
     task_id="firestore_dep",
     poke_interval=3*60,
-    timeout=2*60*60,
+    timeout=5*60*60,
     aws_conn_id="aws_prod_data",
     bucket_name='5a-datalake-prod',
     bucket_key="dags_execution_logs/{execution_date}/{dependency_dag}.SUCCESS".format(execution_date=last_dep_execution_date, dependency_dag='bietlejuice.firestore'),
@@ -727,7 +727,7 @@ firestore_dep = S3KeySensor(
 enrich_ebdb_listing_dep = S3KeySensor(
     task_id="enrich_ebdb_listing_dep",
     poke_interval=3*60,
-    timeout=2*60*60,
+    timeout=5*60*60,
     aws_conn_id="aws_prod_data",
     bucket_name='5a-datalake-prod',
     bucket_key="dags_execution_logs/{execution_date}/{dependency_dag}.SUCCESS".format(execution_date=last_dep_execution_date, dependency_dag='bietlejuice.enrich_ebdb_listing'),
