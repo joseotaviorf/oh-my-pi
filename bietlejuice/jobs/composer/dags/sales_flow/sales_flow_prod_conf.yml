@@ -4,6 +4,7 @@ block_list:
   - flyway_schema_history
   - message
   - mortgage_options_aud
+  - credit_application_aud
 tables:
   address_data:
     extraction_type: incremental
