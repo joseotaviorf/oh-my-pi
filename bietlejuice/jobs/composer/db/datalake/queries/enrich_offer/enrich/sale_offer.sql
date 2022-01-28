@@ -225,8 +225,8 @@ regions AS (
     FROM
         aux
     LEFT JOIN 
-        dw_public.dim_region AS dr
-            ON dr.sk_region = aux.id_region
+        datalake_region.region AS dr
+            ON dr.id = aux.id_region
 ),
 -- DATA SOURCES
 data_sources AS (
