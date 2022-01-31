@@ -1,0 +1,27 @@
+database_name: datalake_arquivo_confidencial_clean
+table_name: integration_report_aud
+columns:
+  id:
+    lineage:
+      - datalake_arquivo_confidencial_raw.integration_report_aud.id
+  cpf:
+    lineage:
+      - datalake_arquivo_confidencial_raw.integration_report_aud.cpf
+  rev:
+    lineage:
+      - datalake_arquivo_confidencial_raw.integration_report_aud.rev
+  rev_type:
+    lineage:
+      - datalake_arquivo_confidencial_raw.integration_report_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_arquivo_confidencial_raw.integration_report_aud.revend
+  integration_provider:
+    lineage:
+      - datalake_arquivo_confidencial_raw.integration_report_aud.integration_provider
+  raw_data:
+    lineage:
+      - datalake_arquivo_confidencial_raw.integration_report_aud.raw_data
+  attributes:
+    lineage:
+      - datalake_arquivo_confidencial_raw.integration_report_aud.attributes

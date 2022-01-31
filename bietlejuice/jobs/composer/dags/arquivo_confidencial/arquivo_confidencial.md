@@ -15,6 +15,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 ### Outputs
 
 In datalake raw and clean, via full load:
+- `integration_report_aud`
 - `presumed_income_report`
 - `presumed_income_report_aud`
 
@@ -24,6 +25,7 @@ In datalake raw and clean, via incremental load:
 - `documents`
 - `emailage_result`
 - `emailage_result_aud`
+- `integration_report`
 - `rev_info`
 - `unico_check_document`
 - `unico_check_document_aud`

@@ -15,6 +15,11 @@ tables:
   - table_name: emailage_result_aud
     extraction_type: incremental
     date_filter_column: created_at
+  - table_name: integration_report
+    extraction_type: incremental
+    date_filter_column: created_at
+  - table_name: integration_report_aud
+    extraction_type: full
   - table_name: presumed_income_report
     extraction_type: full
   - table_name: presumed_income_report_aud
