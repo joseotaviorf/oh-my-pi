@@ -11,6 +11,9 @@ columns:
   negotiation_model:
     lineage:
       - datalake_offer.sale_offer.negotiation_model
+  business_unit:
+    lineage:
+      - datalake_offer.sale_offer.business_unit
   sale_agreement_cancellation_reason:
     lineage:
       - datalake_offer.sale_offer.sale_agreement_cancellation_reason

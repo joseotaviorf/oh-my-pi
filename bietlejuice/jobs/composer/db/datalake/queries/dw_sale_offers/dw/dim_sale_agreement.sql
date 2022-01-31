@@ -2,6 +2,7 @@ SELECT
   eso.id_offer AS sk_offer,
   eso.sale_agreement_status,
   eso.negotiation_model,
+  eso.business_unit,
   eso.sale_agreement_cancellation_reason,
   eso.sale_price_agreed,
   eso.brokerage_fee,
