@@ -129,9 +129,9 @@ class DWTaskGroup(BaseTaskGroup):
             execution_timeout=timedelta(hours=self.execution_timeout_hours),
         )
 
-        sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        sync_metastore_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
             dag=self.dag,
-            task_id=f"sync-hive-metastore-{layer}-{slugged_table_name}",
+            task_id=f"sync-hive-metastore-{layer}-{slugged_table_name}-structure",
             json={
                 "spark_python_task": {
                     "python_file": f"{self.spark_jobs_path}/sync_metastore_tables_structure.py",
@@ -147,7 +147,25 @@ class DWTaskGroup(BaseTaskGroup):
             execution_timeout=timedelta(hours=self.execution_timeout_hours),
         )
 
-        final_tasks = [load_table_to_redshift_task, sync_metastore_table_task]
+        sync_metastore_tables_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
+            dag=self.dag,
+            task_id=f"sync-hive-metastore-{layer}-{slugged_table_name}-partitions",
+            json={
+                "spark_python_task": {
+                    "python_file": f"{self.spark_jobs_path}/sync_metastore_tables_partitions.py",
+                    "parameters": [
+                        self.dw_bucket,
+                        layer,
+                        self.dw_schema,
+                        "--table-name",
+                        table_name,
+                    ],
+                }
+            },
+            execution_timeout=timedelta(hours=self.execution_timeout_hours),
+        )
+
+        final_tasks = [load_table_to_redshift_task, sync_metastore_tables_partitions_task]
 
         if FileService.metadata_file_exists(
             self.relative_query_path, layer, table_name
@@ -168,12 +186,15 @@ class DWTaskGroup(BaseTaskGroup):
                 },
                 execution_timeout=timedelta(hours=self.execution_timeout_hours),
             )
-            sync_metastore_table_task.set_downstream([propagate_table_metadata_task])
+            sync_metastore_tables_partitions_task.set_downstream([propagate_table_metadata_task])
             final_tasks = [load_table_to_redshift_task, propagate_table_metadata_task]
 
-        load_table_to_dw_final_schema_task.set_downstream(
-            [sync_metastore_table_task, load_table_to_redshift_task]
+        airflow_helpers.chain(
+            load_table_to_dw_final_schema_task,
+            sync_metastore_table_structure_task,
+            sync_metastore_tables_partitions_task
         )
+        load_table_to_dw_final_schema_task.set_downstream(load_table_to_redshift_task)
 
         return DWTaskGroup.format_tasks_boundaries(
             initial_tasks=[load_table_to_dw_final_schema_task], final_tasks=final_tasks

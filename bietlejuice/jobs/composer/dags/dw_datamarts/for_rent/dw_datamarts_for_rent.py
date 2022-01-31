@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 
+import airflow.utils.helpers as airflow_helpers
 import pendulum
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
@@ -9,7 +10,7 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
 
-from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseSubDAG
+from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.jobs.composer.services.configuration_service import (
@@ -118,8 +119,8 @@ def build_table_tasks(entity_name, entity_pipeline):
         },
     )
 
-    sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
-        task_id=f"sync-hive-metastore-{slugged_table_name}-table",
+    sync_metastore_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
+        task_id=f"sync-hive-metastore-{slugged_table_name}-table-structure",
         dag=DAG,
         json={
             "spark_python_task": {
@@ -135,11 +136,39 @@ def build_table_tasks(entity_name, entity_pipeline):
         },
     )
 
-    create_table_in_datalake_task.set_downstream(
-        [sync_metastore_table_task, load_table_into_redshift_task]
+    sync_metastore_table_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
+        task_id=f"sync-hive-metastore-{slugged_table_name}-table-partitions",
+        dag=DAG,
+        json={
+            "spark_python_task": {
+                "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables_partitions.py",
+                "parameters": [
+                    dw_bucket,
+                    LayerEnum.DW.value,
+                    DW_SCHEMA,
+                    "--table-name",
+                    table,
+                ],
+            }
+        },
     )
 
-    return {entity_name: {"first_task": create_table_in_datalake_task, "last_tasks": [sync_metastore_table_task, load_table_into_redshift_task]}}
+    airflow_helpers.chain(
+        create_table_in_datalake_task,
+        sync_metastore_table_structure_task,
+        sync_metastore_table_partitions_task
+    )
+    create_table_in_datalake_task.set_downstream(load_table_into_redshift_task)
+
+    return {
+        entity_name: {
+            "first_task": create_table_in_datalake_task,
+            "last_tasks": [
+                sync_metastore_table_partitions_task,
+                load_table_into_redshift_task
+            ]
+        }
+    }
 
 
 # DAG definition

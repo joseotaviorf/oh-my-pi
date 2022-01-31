@@ -109,12 +109,29 @@ create_external_table_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+sync_metastore_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
     dag=dag,
-    task_id=f"sync-hive-metastore-{LayerEnum.ENRICH.value}-{slugged_table_name}",
+    task_id=f"sync-hive-metastore-{LayerEnum.ENRICH.value}-{slugged_table_name}-structure",
     json={
         "spark_python_task": {
             "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables_structure.py",
+            "parameters": [
+                datalake_bucket,
+                LayerEnum.ENRICH.value,
+                CONTEXT,
+                "--table-name",
+                table_name,
+            ],
+        }
+    },
+)
+
+sync_metastore_table_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
+    task_id=f"sync-hive-metastore-{LayerEnum.ENRICH.value}-{slugged_table_name}-partitions",
+    json={
+        "spark_python_task": {
+            "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables_partitions.py",
             "parameters": [
                 datalake_bucket,
                 LayerEnum.ENRICH.value,
@@ -145,7 +162,8 @@ propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
 chain(
     create_cluster_task,
     load_table_task,
-    sync_metastore_table_task,
+    sync_metastore_table_structure_task,
+    sync_metastore_table_partitions_task,
     propagate_table_metadata_task,
     terminate_cluster_task,
 )

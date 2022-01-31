@@ -17,7 +17,10 @@ from bietlejuice.jobs.composer.base.spark import (
 )
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.dags.base.spark_jobs.sync_metastore_tables_structure import (
-    HiveMetastoreSynchronization,
+    HiveMetastoreSynchronization as HiveMetastoreStructureSynchronization,
+)
+from bietlejuice.jobs.composer.dags.base.spark_jobs.sync_metastore_tables_partitions import (
+    HiveMetastoreSynchronization as HiveMetastorePartitionsSynchronization,
 )
 from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.pipeline.create_external_table_pipeline import (
@@ -46,13 +49,23 @@ def sync_hive(schema, layer, datalake_bucket, all_tables=True) -> None:
     tables_metadata = spark_ms.get_all_tables_metadata()
     spark_table_names = list(tables_metadata.keys())
 
-    hms_sync = HiveMetastoreSynchronization(
+    hms_sync_structure = HiveMetastoreStructureSynchronization(
         _hms_host, layer, spark_ms.spark_database_name, spark_ms.database_location
     )
 
+    # Sync structure
     rdd = BaseSparkContext.sc.parallelize(spark_table_names)
     rdd.foreach(
-        lambda _table_name: hms_sync.sync_table(tables_metadata.get(_table_name))
+        lambda _table_name: hms_sync_structure.sync_table(tables_metadata.get(_table_name))
+    )
+
+    # Sync partitions
+    hms_sync_partitions = HiveMetastorePartitionsSynchronization(
+        _hms_host, layer, spark_ms.spark_database_name
+    )
+
+    rdd.foreach(
+        lambda _table_name: hms_sync_partitions.sync_table_partitions(tables_metadata.get(_table_name))
     )
 
 

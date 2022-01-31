@@ -5,6 +5,7 @@ import airflow.utils.helpers as airflow_helpers
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
+from airflow.utils.helpers import chain
 from quintoandar_logger import QuintoAndarLogger
 
 logger = QuintoAndarLogger("DatalakeTaskGroup")
@@ -120,8 +121,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
             },
         )
 
-        sync_metastore_tables_task = QuintoAndarDatabricksSubmitRunOperator(
-            task_id=f"sync-hive-metastore-{layer}{tasks_name_suffix}",
+        sync_metastore_tables_structure_task = QuintoAndarDatabricksSubmitRunOperator(
+            task_id=f"sync-hive-metastore-{layer}{tasks_name_suffix}-structure",
             dag=self.dag,
             json={
                 "spark_python_task": {
@@ -137,7 +138,29 @@ class DatalakeTaskGroup(BaseTaskGroup):
             },
         )
 
-        airflow_helpers.chain(load_table_task, sync_metastore_tables_task)
+        sync_metastore_tables_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
+            task_id=f"sync-hive-metastore-{layer}{tasks_name_suffix}-partitions",
+            dag=self.dag,
+            json={
+                "spark_python_task": {
+                    "python_file": self.spark_jobs_path
+                    + "sync_metastore_tables_partitions.py",
+                    "parameters": [
+                        self.datalake_bucket,
+                        layer,
+                        target_database_base_name,
+                        sync_mode,
+                    ]
+                    + table_name_arg,
+                }
+            },
+        )
+
+        airflow_helpers.chain(
+            load_table_task,
+            sync_metastore_tables_structure_task,
+            sync_metastore_tables_partitions_task,
+        )
 
         metadata_type = None
         try:
@@ -177,14 +200,16 @@ class DatalakeTaskGroup(BaseTaskGroup):
                 },
                 execution_timeout=timedelta(hours=self.execution_timeout_hours),
             )
-            sync_metastore_tables_task.set_downstream([propagate_table_lineage_task])
+            sync_metastore_tables_partitions_task.set_downstream(
+                [propagate_table_lineage_task]
+            )
             final_tasks = [propagate_table_lineage_task]
         else:
             logger.debug(
                 f"m=_build_raw_task_group, target_database_base_name={target_database_base_name}, "
                 f"msg=Could not infer metadata type, skipping propagate metadata task"
             )
-            final_tasks = [sync_metastore_tables_task]
+            final_tasks = [sync_metastore_tables_partitions_task]
 
         if (
             sync_mode == self.SINGLE_TABLE
@@ -399,9 +424,9 @@ class DatalakeTaskGroup(BaseTaskGroup):
             execution_timeout=timedelta(hours=self.execution_timeout_hours),
         )
 
-        sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        sync_metastore_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
             dag=self.dag,
-            task_id=f"sync-hive-metastore-{layer.value}-{slugged_table_name}",
+            task_id=f"sync-hive-metastore-{layer.value}-{slugged_table_name}-structure",
             json={
                 "spark_python_task": {
                     "python_file": f"{self.spark_jobs_path}/sync_metastore_tables_structure.py",
@@ -417,11 +442,28 @@ class DatalakeTaskGroup(BaseTaskGroup):
             execution_timeout=timedelta(hours=self.execution_timeout_hours),
         )
 
-        load_table_task.set_downstream(
-            [create_external_table_task, sync_metastore_table_task]
+        sync_metastore_table_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
+            dag=self.dag,
+            task_id=f"sync-hive-metastore-{layer.value}-{slugged_table_name}-partitions",
+            json={
+                "spark_python_task": {
+                    "python_file": f"{self.spark_jobs_path}/sync_metastore_tables_partitions.py",
+                    "parameters": [
+                        self.datalake_bucket,
+                        layer.value,
+                        target_database_base_name,
+                        "--table-name",
+                        table_name,
+                    ],
+                }
+            },
+            execution_timeout=timedelta(hours=self.execution_timeout_hours),
         )
 
-        final_tasks = [create_external_table_task, sync_metastore_table_task]
+        chain(load_table_task, sync_metastore_table_structure_task, sync_metastore_table_partitions_task)
+        load_table_task.set_downstream(create_external_table_task)
+
+        final_tasks = [create_external_table_task, sync_metastore_table_partitions_task]
 
         if FileService.metadata_file_exists(
             self.relative_query_path, layer.value, table_name
@@ -442,7 +484,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                 },
                 execution_timeout=timedelta(hours=self.execution_timeout_hours),
             )
-            sync_metastore_table_task.set_downstream([propagate_table_metadata_task])
+            sync_metastore_table_partitions_task.set_downstream(propagate_table_metadata_task)
             final_tasks = [create_external_table_task, propagate_table_metadata_task]
 
         quality_tasks = []
@@ -511,7 +553,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type schema: str
         :rtype: list[BaseOperator]
         """
-        
+
         return self._build_task_group(
             LayerEnum.CLEAN,
             source_database_base_name,

@@ -19,8 +19,8 @@ def sync_metastore(table_name, table_task):
 
     slugged_table_name = table_name.replace("_", "-")
 
-    sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
-        task_id=f"sync-{slugged_table_name}-hive-metastore",
+    sync_metastore_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
+        task_id=f"sync-{slugged_table_name}-hive-metastore-structure",
         dag=dag,
         json={
             "spark_python_task": {
@@ -36,9 +36,27 @@ def sync_metastore(table_name, table_task):
         },
     )
 
+    sync_metastore_table_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
+        task_id=f"sync-{slugged_table_name}-hive-metastore-partitions",
+        dag=dag,
+        json={
+            "spark_python_task": {
+                "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables_partitions.py",
+                "parameters": [
+                    DATALAKE_BUCKET,
+                    LayerEnum.ENRICH.value,
+                    SOURCE,
+                    "--table-name",
+                    table_name,
+                ],
+            }
+        },
+    )
+
     airflow_helpers.chain(
         table_task,
-        sync_metastore_table_task,
+        sync_metastore_table_structure_task,
+        sync_metastore_table_partitions_task,
         terminate_cluster_task,
     )
 

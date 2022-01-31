@@ -120,9 +120,9 @@ def dw_tasks(table_name):
         },
     )
 
-    sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+    sync_metastore_dw_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
         dag=dag,
-        task_id=f"sync-hive-metastore-dw-{slugged_table_name}",
+        task_id=f"sync-hive-metastore-dw-{slugged_table_name}-structure",
         json={
             "spark_python_task": {
                 "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables_structure.py",
@@ -137,9 +137,26 @@ def dw_tasks(table_name):
         },
     )
 
-    chain(dim_table_task, [sync_metastore_table_task, load_dim_table_task])
+    sync_metastore_dw_table_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=dag,
+        task_id=f"sync-hive-metastore-dw-{slugged_table_name}-partitions",
+        json={
+            "spark_python_task": {
+                "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables_partitions.py",
+                "parameters": [
+                    DW_BUCKET,
+                    LayerEnum.DW.value,
+                    DW_SCHEMA,
+                    "--table-name",
+                    table_name,
+                ],
+            }
+        },
+    )
 
-    return [dim_table_task, [load_dim_table_task, sync_metastore_table_task]]
+    chain(dim_table_task, [sync_metastore_dw_table_structure_task, sync_metastore_dw_table_partitions_task, load_dim_table_task])
+
+    return [dim_table_task, [load_dim_table_task, sync_metastore_dw_table_partitions_task]]
 
 
 def clean_tasks(table_name):
@@ -188,9 +205,9 @@ def clean_tasks(table_name):
         },
     )
 
-    sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+    sync_metastore_clean_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
         dag=dag,
-        task_id=f"sync-hive-metastore-clean-{slugged_table_name}",
+        task_id=f"sync-hive-metastore-clean-{slugged_table_name}-structure",
         json={
             "spark_python_task": {
                 "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables_structure.py",
@@ -204,7 +221,25 @@ def clean_tasks(table_name):
             }
         },
     )
-    final_task = sync_metastore_table_task
+
+    sync_metastore_clean_table_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=dag,
+        task_id=f"sync-hive-metastore-clean-{slugged_table_name}-partitions",
+        json={
+            "spark_python_task": {
+                "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables_partitions.py",
+                "parameters": [
+                    DATALAKE_BUCKET,
+                    LayerEnum.CLEAN.value,
+                    SOURCE,
+                    "--table-name",
+                    table_name,
+                ],
+            }
+        },
+    )
+
+    final_task = sync_metastore_clean_table_partitions_task
     if FileService.metadata_file_exists(SOURCE, LayerEnum.CLEAN.value, table_name):
         propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
             dag=dag,
@@ -222,12 +257,11 @@ def clean_tasks(table_name):
             },
         )
 
-        sync_metastore_table_task >> propagate_table_metadata_task
+        sync_metastore_clean_table_partitions_task >> propagate_table_metadata_task
         final_task = propagate_table_metadata_task
 
-    chain(
-        clean_table_task, [sync_metastore_table_task, create_clean_external_tables_task]
-    )
+    chain(clean_table_task, sync_metastore_clean_table_structure_task, sync_metastore_clean_table_partitions_task)
+    clean_table_task >> create_clean_external_tables_task
 
     return [clean_table_task, [create_clean_external_tables_task, final_task]]
 
@@ -349,12 +383,28 @@ polygon_region_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-sync_metastore_table_task = QuintoAndarDatabricksSubmitRunOperator(
+sync_metastore_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
     dag=dag,
-    task_id=f"sync-hive-metastore-raw",
+    task_id=f"sync-hive-metastore-raw-structure",
     json={
         "spark_python_task": {
             "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables_structure.py",
+            "parameters": [
+                DATALAKE_BUCKET,
+                LayerEnum.RAW.value,
+                SOURCE,
+                "--all-tables",
+            ],
+        }
+    },
+)
+
+sync_metastore_table_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
+    task_id=f"sync-hive-metastore-raw-partitions",
+    json={
+        "spark_python_task": {
+            "python_file": f"{BASE_SPARK_JOBS_PATH}/sync_metastore_tables_partitions.py",
             "parameters": [
                 DATALAKE_BUCKET,
                 LayerEnum.RAW.value,
@@ -395,10 +445,10 @@ create_cluster_task >> [
 ]
 
 # raw >> hive sync
-chain(task_list_first_task(raw_task_list), sync_metastore_table_task)
+chain(task_list_first_task(raw_task_list), sync_metastore_table_structure_task, sync_metastore_table_partitions_task)
 
 # hive sync raw >> propagate metadata for raw
-chain(sync_metastore_table_task, propagate_table_lineage_task)
+chain(sync_metastore_table_partitions_task, propagate_table_lineage_task)
 
 # raw >> clean
 chain(
