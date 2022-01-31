@@ -27,7 +27,7 @@ if __name__ == "__main__":
     parser.add_argument("source")
     parser.add_argument("context")
     parser.add_argument("table_name")
-    parser.add_argument("origin", type = str, help= 'Name of crawled source')
+    parser.add_argument("origin", type=str, help="Name of crawled source")
     parser.add_argument("execution_date")
 
     args = parser.parse_args()
@@ -39,12 +39,14 @@ if __name__ == "__main__":
     origin = args.origin
     execution_date_str = args.execution_date
 
-    config_service = ConfigurationService(source, intermediate_path= f'{source}/{context}/spark_jobs')
+    config_service = ConfigurationService(
+        source, intermediate_path=f"{source}/{context}/spark_jobs"
+    )
     source_root_path = config_service.get_config("root_path")
     job_extra_args = config_service.get_config("job_extra_args")
-    consumer_extra_args = job_extra_args.get('consumer')
+    consumer_extra_args = job_extra_args.get("consumer")
     custom_records_per_file = job_extra_args.get("custom_records_per_file")
-    partitions = config_service.get_config('partition_cols')
+    partitions = config_service.get_config("partition_cols")
 
     logger.info(
         f"""
@@ -53,26 +55,29 @@ if __name__ == "__main__":
         """
     )
 
-    execution_date = datetime.strptime(execution_date_str, '%Y-%m-%d')
+    execution_date = datetime.strptime(execution_date_str, "%Y-%m-%d")
 
     # Initializing clients
     spark_client = SparkClient()
     s3_consumer = S3Consumer(spark_client)
-    path = source_root_path + f'origin={origin}/year={execution_date.year}/month={execution_date.month}/day={execution_date.day}/'
+    path = (
+        source_root_path
+        + f"origin={origin}/year={execution_date.year}/month={execution_date.month}/day={execution_date.day}/"
+    )
     df = s3_consumer.get_data_from_file(path=path, **consumer_extra_args)
-    df = df.withColumn('year', lit(execution_date.year)) \
-                .withColumn('month', lit(execution_date.month)) \
-                .withColumn('day', lit(execution_date.day))
+    df = (
+        df.withColumn("year", lit(execution_date.year))
+        .withColumn("month", lit(execution_date.month))
+        .withColumn("day", lit(execution_date.day))
+    )
 
     db_info = DatalakeMetastoreService.get_db_info(
-        environment, f'{source}_{context}', datalake_bucket
+        environment, f"{source}_{context}", datalake_bucket
     )
     spark_metastore_service = SparkMetastoreService(spark_client)
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
-    logger.info(
-        "m=__main__, msg=Creating database in Spark Metastore if not exists..."
-    )
+    logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
     database_name = db_info["db_raw_databricks"]
     format_options = SparkTableStorageFormat.DEFAULT_RAW
     database_location = db_info["db_raw_path"]
@@ -91,18 +96,18 @@ if __name__ == "__main__":
     )
 
     spark_metastore_loader.update_metastore(
-        df, 
-        database_name, 
-        table_name, 
-        format_options, 
-        database_location, 
+        df,
+        database_name,
+        table_name,
+        format_options,
+        database_location,
         partitions,
-        force_recreate=False
+        force_recreate=False,
     )
 
     spark_metastore_service.create_new_partitions_from_df(
-            database_name=database_name,
-            table_name=table_name,
-            df=df,
-            partition_cols=partitions,
+        database_name=database_name,
+        table_name=table_name,
+        df=df,
+        partition_cols=partitions,
     )

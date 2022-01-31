@@ -10,12 +10,16 @@ from inmetro.config_reader import ConfigReader
 from inmetro.messengers.slack_messenger import SlackMessenger
 from inmetro.validators.pydeequ_validator import PyDeequValidator
 from inmetro.clients.spark_client import SparkClient as InmetroSparkClient
-from inmetro.builders.validations.pydeequ.validation_suite_builder import ValidationSuiteBuilder
+from inmetro.builders.validations.pydeequ.validation_suite_builder import (
+    ValidationSuiteBuilder,
+)
 
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.jobs.composer.services import FileService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
-from bietlejuice.jobs.composer.pipeline.atlas_quality_metrics_pipeline import AtlasQualityMetricsPipeline
+from bietlejuice.jobs.composer.pipeline.atlas_quality_metrics_pipeline import (
+    AtlasQualityMetricsPipeline,
+)
 from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
@@ -59,17 +63,17 @@ def create_message_from_validation_results(validation_results):
     )
     for column in failed_columns:
         message += f"\t• *`{column}`*\n"
-        
+
     return message
 
 
 def write_results_to_datalake(
-        env,
-        datalake_bucket,
-        result_layer,
-        result_database,
-        result_table,
-        validation_results,
+    env,
+    datalake_bucket,
+    result_layer,
+    result_database,
+    result_table,
+    validation_results,
 ):
     source = "inmetro"
     table_name = "data_validations"
@@ -169,7 +173,7 @@ def parse_args():
         "relative_file_path",
         type=str,
         help="The `source` name for clean layer."
-             " The `source` and/or `context` name for enrich layer. The `schema` for DW layer."
+        " The `source` and/or `context` name for enrich layer. The `schema` for DW layer.",
     )
     parser.add_argument("table_name", type=str)
 
@@ -181,23 +185,11 @@ def parse_args():
     relative_file_path = args.relative_file_path
     table_name = args.table_name
 
-    return(
-        env,
-        datalake_bucket,
-        layer,
-        relative_file_path,
-        table_name
-    )
+    return (env, datalake_bucket, layer, relative_file_path, table_name)
 
 
 if __name__ == "__main__":
-    (
-        env,
-        datalake_bucket,
-        layer,
-        relative_file_path,
-        table_name
-    ) = parse_args()
+    (env, datalake_bucket, layer, relative_file_path, table_name) = parse_args()
 
     logger.info(
         f"m={JOB_NAME}, env={env}, datalake_bucket={datalake_bucket}, layer={layer}, "
@@ -206,21 +198,29 @@ if __name__ == "__main__":
 
     # ############################# Getting Validation Results ###############################
 
-    validation_file = FileService.get_data_quality_test_file(relative_file_path, layer, table_name)
+    validation_file = FileService.get_data_quality_test_file(
+        relative_file_path, layer, table_name
+    )
     input_config = ConfigReader(validation_file).read()
 
     spark_client = InmetroSparkClient()
     validation_suite_builder = ValidationSuiteBuilder(spark_client.conn)
-    validation_suite = validation_suite_builder.build_validation_suite_from_input_config(input_config)
+    validation_suite = validation_suite_builder.build_validation_suite_from_input_config(
+        input_config
+    )
 
-    database_name, table_name = parse_complete_table_name(input_config.get("table_name"))
+    database_name, table_name = parse_complete_table_name(
+        input_config.get("table_name")
+    )
     pydeequ_validator = PyDeequValidator(
         suite_name=f"Pipeline Validations: {database_name}.{table_name}",
         validation_suite=validation_suite,
         client=spark_client,
     )
 
-    input_df = spark_client.read_table(database_name=database_name, table_name=table_name)
+    input_df = spark_client.read_table(
+        database_name=database_name, table_name=table_name
+    )
     validation_results = pydeequ_validator.execute_and_parse(input_df)
 
     # ################################ Data Lake Ingestion ##################################
@@ -242,8 +242,7 @@ if __name__ == "__main__":
 
     metadata_propagator_credentials = json.loads(
         dbutils.secrets.get(
-            scope="quintoandar",
-            key=ServiceEnum.METADATA_PROPAGATOR.value
+            scope="quintoandar", key=ServiceEnum.METADATA_PROPAGATOR.value
         )
     )
     AtlasQualityMetricsPipeline(
@@ -251,19 +250,20 @@ if __name__ == "__main__":
         database_name=database_name,
         table_name=table_name,
         metadata_type=MetadataTypeEnum.QUALITY_METRICS,
-        validation_results=validation_results
+        validation_results=validation_results,
     ).run()
 
     # #################################### Slack Alert ######################################
 
     if validation_results["metadata"]["suite_result"] != "SUCCESS":
         slack_webhook = dbutils.secrets.get(
-            scope="quintoandar",
-            key=APIEnum.AIRFLOW_ALERTS_INMETRO_SLACK_WEBHOOK
+            scope="quintoandar", key=APIEnum.AIRFLOW_ALERTS_INMETRO_SLACK_WEBHOOK
         )
 
         messenger = SlackMessenger(slack_webhook)
         message = create_message_from_validation_results(validation_results)
         messenger.send_message(message)
 
-    logger.info(f"m={JOB_NAME}, msg=Data quality tests executed for table {table_name}.")
+    logger.info(
+        f"m={JOB_NAME}, msg=Data quality tests executed for table {table_name}."
+    )

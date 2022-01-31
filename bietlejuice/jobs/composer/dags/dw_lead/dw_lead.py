@@ -35,7 +35,9 @@ env = os.environ.get("ENVIRONMENT")
 
 spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base"
 logs_output_path = f"{spark_jobs_logs_path}{DAG_ID}"
-cluster_description = Variable.get("databricks_memory_optimized_cluster", deserialize_json=True)
+cluster_description = Variable.get(
+    "databricks_memory_optimized_cluster", deserialize_json=True
+)
 cluster_description["cluster_log_conf"]["s3"]["destination"] = logs_output_path
 
 local_tz = pendulum.timezone("America/Sao_Paulo")

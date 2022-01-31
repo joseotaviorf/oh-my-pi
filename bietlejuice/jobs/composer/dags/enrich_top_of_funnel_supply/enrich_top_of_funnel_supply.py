@@ -35,7 +35,9 @@ DOC_MD_CHART_URL = config_service.get_config("doc_md_chart_url")
 PARTITION_COLS = config_service.get_config("partition_cols")
 
 BASE_SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
-CLUSTER_DESCRIPTION = Variable.get("databricks_compute_optimized_cluster", deserialize_json=True)
+CLUSTER_DESCRIPTION = Variable.get(
+    "databricks_compute_optimized_cluster", deserialize_json=True
+)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
     "destination"
 ] = f"{SPARK_JOBS_LOGS_PATH}{DAG_ID}"

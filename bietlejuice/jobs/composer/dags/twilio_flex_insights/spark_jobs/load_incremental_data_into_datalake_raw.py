@@ -58,11 +58,11 @@ if __name__ == "__main__":
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
-    
+
     json_credentials = dbutils.secrets.get(
         scope=DATABRICKS_SCOPE, key=APIEnum.TWILIO_FLEX_INSIGHTS
     )
-    
+
     credentials = json.loads(json_credentials)
     twilio_flex_insights_client = TwilioFlexInsightsClient(
         {"email": credentials["email"], "pwd": credentials["pwd"]}
@@ -83,11 +83,13 @@ if __name__ == "__main__":
     format_options = SparkTableStorageFormat.DEFAULT_RAW
     database_location = datalake_info["db_raw_path"]
     spark_metastore_service.create_database(database_name)
-    
+
     config_service = ConfigurationService(context)
     partition_cols = config_service.get_config("partition_cols")
 
-    for table_name, table_config in config_service.get_config("tables_configurations").items():
+    for table_name, table_config in config_service.get_config(
+        "tables_configurations"
+    ).items():
         workspace_id = table_config["workspace_id"]
         object_id = table_config["object_id"]
         column_create_date = table_config["column_create_date"]
@@ -95,30 +97,35 @@ if __name__ == "__main__":
         consumer.client.refresh_token()
 
         uri = consumer.get_report_link(workspace_id, object_id)
-        response = consumer.sync(uri).split('\r\n')
-        response = [tuple(row.replace('"','').split(',')) for row in response]
-        schema = [StringFormatter.set_snake_case(column_name) for column_name in response[0]]
+        response = consumer.sync(uri).split("\r\n")
+        response = [tuple(row.replace('"', "").split(",")) for row in response]
+        schema = [
+            StringFormatter.set_snake_case(column_name) for column_name in response[0]
+        ]
         api_response = response[1:-1]
-        
-        if api_response: 
+
+        if api_response:
 
             df = spark_client.create_dataframe(data=api_response, schema=schema)
-            df = df.withColumn(column_create_date, to_date(to_timestamp(unix_timestamp(column_create_date, "MM/dd/yyyy"))))
+            df = df.withColumn(
+                column_create_date,
+                to_date(to_timestamp(unix_timestamp(column_create_date, "MM/dd/yyyy"))),
+            )
             df = (
                 SparkDataFrameService()
                 .input(df)
                 .create_year_month_day_columns_from_dataframe_column(column_create_date)
                 .output()
-                )
+            )
 
             # loaders
             s3_loader.load_incremental_table(
                 df=df,
-                database_name = database_name,
-                table_name = table_name,
-                database_location = database_location,
-                format_options = format_options,
-                partition_cols = partition_cols,
+                database_name=database_name,
+                table_name=table_name,
+                database_location=database_location,
+                format_options=format_options,
+                partition_cols=partition_cols,
             )
             spark_metastore_loader.update_metastore(
                 df,
@@ -140,5 +147,5 @@ if __name__ == "__main__":
                 f"""m=__main__, table_name={table_name},
                 msg=No data returned from API."""
             )
-        
+
     consumer.client.close()

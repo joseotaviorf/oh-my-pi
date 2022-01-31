@@ -19,7 +19,7 @@ JOB_NAME = "load_full_insepections_into_datalake"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-if __name__ == "__main__":  
+if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
@@ -67,7 +67,9 @@ if __name__ == "__main__":
 
     if not df.rdd.isEmpty():
         s3_loader.load_df(
-            df=df, s3_path=f"{database_location}{table_name}", format_options=format_options
+            df=df,
+            s3_path=f"{database_location}{table_name}",
+            format_options=format_options,
         )
         spark_metastore_loader.update_metastore(
             df, database_name, table_name.lower(), format_options, database_location

@@ -115,7 +115,9 @@ if __name__ == "__main__":
     intermediate_path = schema if schema else tree_path
     query_path = (
         # TODO: maybe we can remove the line below since we do not have schemas on the queries folder anymore
-        f"{QUERIES_DATALAKE_PATH}{relative_query_path}/{layer}/{intermediate_path}/{table_name}.sql".replace('//','/')
+        f"{QUERIES_DATALAKE_PATH}{relative_query_path}/{layer}/{intermediate_path}/{table_name}.sql".replace(
+            "//", "/"
+        )
         if intermediate_path
         else f"{QUERIES_DATALAKE_PATH}{relative_query_path}/{layer}/{table_name}.sql"
     )

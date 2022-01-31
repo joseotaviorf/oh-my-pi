@@ -33,19 +33,19 @@ config_service = ConfigurationService(DAG_NAME)
 ATHENA_QUERY_RESULT_LOCATION = config_service.get_config("athena_query_results_bucket")
 ARTIFACTS_DEFAULT_BUCKET = config_service.get_config("artifacts_bucket")
 DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
-S3_PREFIX = config_service.get_config(
-    "databricks_bietlejuice_repo_path"
-)
+S3_PREFIX = config_service.get_config("databricks_bietlejuice_repo_path")
 RAW_SPARK_JOB_PATH = (
     S3_PREFIX + f"/spark_jobs/{SOURCE}/load_incremental_data_into_datalake_raw.py"
 )
-LOGS_OUTPUT_PATH = config_service.get_config("spark_jobs_logs_path") 
+LOGS_OUTPUT_PATH = config_service.get_config("spark_jobs_logs_path")
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
-DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url") 
+DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url")
 
 # cluster setup
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = f"{LOGS_OUTPUT_PATH}{DAG_ID}"
+CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
+    "destination"
+] = f"{LOGS_OUTPUT_PATH}{DAG_ID}"
 CUSTOM_LIBRARIES = [
     {
         "whl": f"{ARTIFACTS_DEFAULT_BUCKET}/pipedrive-api-client-python/"
@@ -89,7 +89,12 @@ raw_task_groups = task_group.build_raw_task_group_for_all_tables(
     source=SOURCE,
     target_database_base_name=SOURCE,
     extraction_spark_job_file=RAW_SPARK_JOB_PATH,
-    raw_spark_job_extra_args=[SOURCE, CONTEXT, "{{ds}}", "{{dag_run.conf['execution_date']}}"],
+    raw_spark_job_extra_args=[
+        SOURCE,
+        CONTEXT,
+        "{{ds}}",
+        "{{dag_run.conf['execution_date']}}",
+    ],
 )
 
 clean_task_groups = task_group.build_task_group_from_sql_files(

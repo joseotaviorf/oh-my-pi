@@ -28,7 +28,9 @@ DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
 DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
 BASE_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/base/"
-CLUSTER_DESCRIPTION = Variable.get("databricks_9_1_med_general_cluster", deserialize_json=True)
+CLUSTER_DESCRIPTION = Variable.get(
+    "databricks_9_1_med_general_cluster", deserialize_json=True
+)
 
 # dag params
 DAG_ID = f"bietlejuice.{SOURCE}"

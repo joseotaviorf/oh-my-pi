@@ -4,7 +4,11 @@ from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.db import DB_SQL_PATH, DatabaseEnum, DWMetastoreService
+from bietlejuice.jobs.composer.base.db import (
+    DB_SQL_PATH,
+    DatabaseEnum,
+    DWMetastoreService,
+)
 from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient, AthenaClient
@@ -47,19 +51,21 @@ if __name__ == "__main__":
     spark_client = SparkClient()
     # TODO: Needs refactoring. We're using default here because the consumer requests a
     #  database. Please check on DatabricksConsumer.__init__ comments for more
-    if runs_on == 'athena':
+    if runs_on == "athena":
         athena_client = AthenaClient(athena_query_results_bucket)
         query_execution_id = athena_client.run(s3_query, return_query_id=True)
         s3_result_path = f"{athena_client.output_location}/{query_execution_id}.csv"
-        dm_table_df = spark_client.conn.read.format('csv').option("header","true").load(s3_result_path)
-    elif runs_on == 'redshift':
+        dm_table_df = (
+            spark_client.conn.read.format("csv")
+            .option("header", "true")
+            .load(s3_result_path)
+        )
+    elif runs_on == "redshift":
         base_dbutils = BaseDBUtils()
         if base_dbutils.get_dbutils() is not None:
             dbutils = base_dbutils.get_dbutils()
 
-        conn_config_json = dbutils.secrets.get(
-            scope="quintoandar", key=DatabaseEnum.DW
-        )
+        conn_config_json = dbutils.secrets.get(scope="quintoandar", key=DatabaseEnum.DW)
         conn_config = json.loads(conn_config_json)
         postgres_consumer = PostgresConsumer(conn_config, spark_client)
         dm_table_df = postgres_consumer.get_data_from_query(s3_query)

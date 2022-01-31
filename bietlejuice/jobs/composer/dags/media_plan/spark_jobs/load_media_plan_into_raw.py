@@ -17,12 +17,14 @@ JOB_NAME = "load_media_plan_into_raw"
 
 logger = QuintoAndarLogger(JOB_NAME)
 
+
 def __columns_to_alphanumeric_snake_case(df):
     old_columns = df.columns
     new_columns = [
         StringFormatter.set_alphanumeric_snake_case(column) for column in old_columns
     ]
     return df.toDF(*new_columns)
+
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
@@ -66,19 +68,12 @@ if __name__ == "__main__":
     df = (
         spark_client.conn.read.option("header", "true")
         .option("escape", "\"")
-        .option(
-            "basePath",
-            f"s3://{media_plan_bucket}/{file_to_ingest_base_path}",
-        )
+        .option("basePath", f"s3://{media_plan_bucket}/{file_to_ingest_base_path}")
         .csv(
             f"s3://{media_plan_bucket}/{file_to_ingest_base_path}{file_to_ingest_prefix}{year_previous_quarter}Q{previous_quarter}.csv"
         )
-        .withColumn(
-            "year", lit(year_previous_quarter)
-        )
-        .withColumn(
-            "quarter", lit(previous_quarter)
-        )
+        .withColumn("year", lit(year_previous_quarter))
+        .withColumn("quarter", lit(previous_quarter))
     )
 
     df = __columns_to_alphanumeric_snake_case(df)

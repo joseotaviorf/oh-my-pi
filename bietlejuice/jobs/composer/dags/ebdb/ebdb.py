@@ -8,9 +8,7 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from airflow.operators.quintoandar_dag_logger import (
-    QuintoAndarSuccessLoggerOperator,
-)
+from airflow.operators.quintoandar_dag_logger import QuintoAndarSuccessLoggerOperator
 from airflow.utils.helpers import cross_downstream, chain
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
@@ -154,9 +152,19 @@ def dw_tasks(table_name):
         },
     )
 
-    chain(dim_table_task, [sync_metastore_dw_table_structure_task, sync_metastore_dw_table_partitions_task, load_dim_table_task])
+    chain(
+        dim_table_task,
+        [
+            sync_metastore_dw_table_structure_task,
+            sync_metastore_dw_table_partitions_task,
+            load_dim_table_task,
+        ],
+    )
 
-    return [dim_table_task, [load_dim_table_task, sync_metastore_dw_table_partitions_task]]
+    return [
+        dim_table_task,
+        [load_dim_table_task, sync_metastore_dw_table_partitions_task],
+    ]
 
 
 def clean_tasks(table_name):
@@ -260,7 +268,11 @@ def clean_tasks(table_name):
         sync_metastore_clean_table_partitions_task >> propagate_table_metadata_task
         final_task = propagate_table_metadata_task
 
-    chain(clean_table_task, sync_metastore_clean_table_structure_task, sync_metastore_clean_table_partitions_task)
+    chain(
+        clean_table_task,
+        sync_metastore_clean_table_structure_task,
+        sync_metastore_clean_table_partitions_task,
+    )
     clean_table_task >> create_clean_external_tables_task
 
     return [clean_table_task, [create_clean_external_tables_task, final_task]]
@@ -445,7 +457,11 @@ create_cluster_task >> [
 ]
 
 # raw >> hive sync
-chain(task_list_first_task(raw_task_list), sync_metastore_table_structure_task, sync_metastore_table_partitions_task)
+chain(
+    task_list_first_task(raw_task_list),
+    sync_metastore_table_structure_task,
+    sync_metastore_table_partitions_task,
+)
 
 # hive sync raw >> propagate metadata for raw
 chain(sync_metastore_table_partitions_task, propagate_table_lineage_task)
@@ -524,8 +540,6 @@ for task_list in dw_sub_dags.values():
 
 # EC2 temporary dependency
 success_logger = QuintoAndarSuccessLoggerOperator(
-    dag=dag,
-    bucket="5a-datalake-prod",
-    aws_conn_id="aws_prod_data",
+    dag=dag, bucket="5a-datalake-prod", aws_conn_id="aws_prod_data"
 )
 terminate_cluster_task >> success_logger

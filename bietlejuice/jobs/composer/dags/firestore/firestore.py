@@ -7,9 +7,7 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from airflow.operators.quintoandar_dag_logger import (
-    QuintoAndarSuccessLoggerOperator,
-)
+from airflow.operators.quintoandar_dag_logger import QuintoAndarSuccessLoggerOperator
 
 from airflow.utils.helpers import chain
 
@@ -48,7 +46,9 @@ RAW_SPARK_JOB_FILE = (
 )
 
 # cluster setup
-CLUSTER_DESCRIPTION = Variable.get("databricks_firestore_cluster", deserialize_json=True)
+CLUSTER_DESCRIPTION = Variable.get(
+    "databricks_firestore_cluster", deserialize_json=True
+)
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -92,11 +92,7 @@ for table_name, subscription_id in subscriptions.items():
         table_name=table_name,
         target_database_base_name=SOURCE,
         extraction_spark_job_file=RAW_SPARK_JOB_FILE,
-        raw_spark_job_extra_args=[
-            SOURCE,
-            subscription_id,
-            table_name,
-        ],
+        raw_spark_job_extra_args=[SOURCE, subscription_id, table_name],
     )
     raw_task_groups[table_name] = raw_task_group
 
@@ -116,8 +112,6 @@ terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_
 
 # EC2 temporary dependency
 success_logger = QuintoAndarSuccessLoggerOperator(
-    dag=dag,
-    bucket="5a-datalake-prod",
-    aws_conn_id="aws_prod_data",
+    dag=dag, bucket="5a-datalake-prod", aws_conn_id="aws_prod_data"
 )
 terminate_cluster_task >> success_logger

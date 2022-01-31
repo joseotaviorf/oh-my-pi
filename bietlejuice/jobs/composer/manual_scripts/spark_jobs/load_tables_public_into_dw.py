@@ -72,7 +72,9 @@ def sync_hive(schema, layer, datalake_bucket, tables, all_tables=True) -> None:
 
     rdd = BaseSparkContext.sc.parallelize(tables)
     rdd.foreach(
-        lambda _table_name: hms_sync_structure.sync_table(tables_metadata.get(_table_name))
+        lambda _table_name: hms_sync_structure.sync_table(
+            tables_metadata.get(_table_name)
+        )
     )
 
     # Sync partitions
@@ -81,7 +83,9 @@ def sync_hive(schema, layer, datalake_bucket, tables, all_tables=True) -> None:
     )
 
     rdd.foreach(
-        lambda _table_name: hms_sync_partitions.sync_table_partitions(tables_metadata.get(_table_name))
+        lambda _table_name: hms_sync_partitions.sync_table_partitions(
+            tables_metadata.get(_table_name)
+        )
     )
 
 

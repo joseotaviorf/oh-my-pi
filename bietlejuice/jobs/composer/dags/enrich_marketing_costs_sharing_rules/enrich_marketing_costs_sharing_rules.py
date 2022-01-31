@@ -24,7 +24,8 @@ def sync_metastore(table_name, table_task):
         dag=dag,
         json={
             "spark_python_task": {
-                "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables_structure.py",
+                "python_file": BASE_SPARK_JOBS_PATH
+                + "sync_metastore_tables_structure.py",
                 "parameters": [
                     DATALAKE_BUCKET,
                     LayerEnum.ENRICH.value,
@@ -41,7 +42,8 @@ def sync_metastore(table_name, table_task):
         dag=dag,
         json={
             "spark_python_task": {
-                "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables_partitions.py",
+                "python_file": BASE_SPARK_JOBS_PATH
+                + "sync_metastore_tables_partitions.py",
                 "parameters": [
                     DATALAKE_BUCKET,
                     LayerEnum.ENRICH.value,

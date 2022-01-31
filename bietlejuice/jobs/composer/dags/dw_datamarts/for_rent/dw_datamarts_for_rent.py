@@ -22,10 +22,12 @@ SCHEMA = "datamarts"
 CONTEXT = "for_rent"
 DAG_NAME = f"dw_{SCHEMA}_{CONTEXT}"
 DAG_ID = f"bietlejuice.dw_{SCHEMA}_{CONTEXT}"
-INTERMEDIATE_PATH = f'dw_{SCHEMA}/{CONTEXT}'
+INTERMEDIATE_PATH = f"dw_{SCHEMA}/{CONTEXT}"
 ENV = os.environ.get("ENVIRONMENT")
 
-config_service = ConfigurationService(dag_name=DAG_NAME, intermediate_path=INTERMEDIATE_PATH)
+config_service = ConfigurationService(
+    dag_name=DAG_NAME, intermediate_path=INTERMEDIATE_PATH
+)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
 dw_bucket = config_service.get_config("dw_bucket")
 databricks_bietlejuice_repo_path = config_service.get_config(
@@ -54,9 +56,10 @@ LIBRARIES_DESCRIPTION = Variable.get(
     "bietlejuice_default_libraries", deserialize_json=True
 )
 
-pipeline_config = config_service.get_config('pipeline') or {}
+pipeline_config = config_service.get_config("pipeline") or {}
 
 DW_SCHEMA = f"{SCHEMA}_{CONTEXT}"
+
 
 def validate_pipeline_steps(entity_name, entity_pipeline):
     if "dw" not in entity_pipeline:
@@ -103,7 +106,16 @@ def build_table_tasks(entity_name, entity_pipeline):
         json={
             "spark_python_task": {
                 "python_file": f"{SPARK_JOBS_PATH}create_datamart_table_in_datalake.py",
-                "parameters": [ENV, dw_bucket, athena_query_results_bucket, DW_SCHEMA, schema, table, sql_file, runs_on],
+                "parameters": [
+                    ENV,
+                    dw_bucket,
+                    athena_query_results_bucket,
+                    DW_SCHEMA,
+                    schema,
+                    table,
+                    sql_file,
+                    runs_on,
+                ],
             }
         },
     )
@@ -124,7 +136,8 @@ def build_table_tasks(entity_name, entity_pipeline):
         dag=DAG,
         json={
             "spark_python_task": {
-                "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables_structure.py",
+                "python_file": BASE_SPARK_JOBS_PATH
+                + "sync_metastore_tables_structure.py",
                 "parameters": [
                     dw_bucket,
                     LayerEnum.DW.value,
@@ -141,7 +154,8 @@ def build_table_tasks(entity_name, entity_pipeline):
         dag=DAG,
         json={
             "spark_python_task": {
-                "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables_partitions.py",
+                "python_file": BASE_SPARK_JOBS_PATH
+                + "sync_metastore_tables_partitions.py",
                 "parameters": [
                     dw_bucket,
                     LayerEnum.DW.value,
@@ -156,7 +170,7 @@ def build_table_tasks(entity_name, entity_pipeline):
     airflow_helpers.chain(
         create_table_in_datalake_task,
         sync_metastore_table_structure_task,
-        sync_metastore_table_partitions_task
+        sync_metastore_table_partitions_task,
     )
     create_table_in_datalake_task.set_downstream(load_table_into_redshift_task)
 
@@ -165,8 +179,8 @@ def build_table_tasks(entity_name, entity_pipeline):
             "first_task": create_table_in_datalake_task,
             "last_tasks": [
                 sync_metastore_table_partitions_task,
-                load_table_into_redshift_task
-            ]
+                load_table_into_redshift_task,
+            ],
         }
     }
 
@@ -213,18 +227,20 @@ def build_tasks_dependency(create_cluster_task, terminate_cluster_task, entities
     for entity_name, entity_pipeline in pipeline_config.items():
         dependencies = entity_pipeline["dw"].get("depends_on", [])
         dependencies_list += dependencies
-        entity_task = entities_tasks[entity_name]       #DAG.task_dict[entity_name]
+        entity_task = entities_tasks[entity_name]  # DAG.task_dict[entity_name]
 
         if not dependencies:
             create_cluster_task >> entity_task["first_task"]
         else:
             for dep_entity_name in dependencies:
-                dep_task = entities_tasks[dep_entity_name] #DAG.task_dict[dep_entity_name]
+                dep_task = entities_tasks[
+                    dep_entity_name
+                ]  # DAG.task_dict[dep_entity_name]
                 entity_task["first_task"].set_upstream(dep_task["last_tasks"])
 
     dependencies_list = list(set(dependencies_list))
     for entity_name, entity_pipeline in pipeline_config.items():
-        entity_task = entities_tasks[entity_name]  #DAG.task_dict[entity_name]
+        entity_task = entities_tasks[entity_name]  # DAG.task_dict[entity_name]
         if entity_name not in dependencies_list:
             terminate_cluster_task.set_upstream(entity_task["last_tasks"])
 

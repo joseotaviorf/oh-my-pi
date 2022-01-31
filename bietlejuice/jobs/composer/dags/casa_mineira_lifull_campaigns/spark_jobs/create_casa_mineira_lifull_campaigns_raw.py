@@ -51,7 +51,7 @@ if __name__ == "__main__":
         database_name=database_name,
         table_name=table_name,
         new_schema=table_schema,
-        s3_path=f'{table_path}{table_name}',
+        s3_path=f"{table_path}{table_name}",
         format_options=SparkTableStorageFormat.DEFAULT_RAW,
         partitions=raw_partition_cols,
     )

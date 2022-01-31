@@ -32,7 +32,9 @@ RAW_SPARK_JOB_PATH = (
 
 # cluster params
 ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
-CLUSTER_DESCRIPTION = Variable.get("databricks_9_1_med_general_cluster", deserialize_json=True)
+CLUSTER_DESCRIPTION = Variable.get(
+    "databricks_9_1_med_general_cluster", deserialize_json=True
+)
 
 # cluster libraries
 CUSTOM_LIBRARIES = [

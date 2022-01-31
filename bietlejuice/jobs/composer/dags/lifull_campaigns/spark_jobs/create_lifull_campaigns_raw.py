@@ -43,7 +43,7 @@ if __name__ == "__main__":
             ("dt", "DATE"),
         ]
     )
-    
+
     spark_client = SparkClient()
     spark_metastore_service = SparkMetastoreService(spark_client)
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
@@ -60,7 +60,7 @@ if __name__ == "__main__":
         database_name=database_name,
         table_name=table_name,
         new_schema=table_schema,
-        s3_path=f'{table_path}{table_name}',
+        s3_path=f"{table_path}{table_name}",
         format_options=SparkTableStorageFormat.DEFAULT_RAW,
         partitions=["acc", "dt"],
     )

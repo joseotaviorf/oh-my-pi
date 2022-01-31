@@ -32,8 +32,10 @@ spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/"\
-                        "load_hub_services_raw.py"
+RAW_SPARK_JOB_PATH = (
+    f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/"
+    "load_hub_services_raw.py"
+)
 
 CLUSTER_DESCRIPTION = Variable.get(f"databricks_default_cluster", deserialize_json=True)
 CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
@@ -80,7 +82,11 @@ for table in tables:
     clean_table_name = table.get("clean_table_name", table_name)
     parameters = [SOURCE, table_name]
 
-    extended_parameters = [table["date_filter_column"], "{{ ds }}", table.get("unixtime_measure", None)]
+    extended_parameters = [
+        table["date_filter_column"],
+        "{{ ds }}",
+        table.get("unixtime_measure", None),
+    ]
 
     extended_parameters = list(filter(None, extended_parameters))
     parameters.extend(extended_parameters)

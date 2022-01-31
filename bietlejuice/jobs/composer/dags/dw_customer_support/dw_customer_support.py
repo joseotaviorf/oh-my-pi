@@ -83,9 +83,7 @@ for table in tables:
     partitions = ["year", "month", "day"] if is_incremental else None
 
     dw_staging_task_group[table] = task_group.build_dw_staging_task_group(
-        table_name=table,
-        is_incremental=is_incremental,
-        partitions=partitions,
+        table_name=table, is_incremental=is_incremental, partitions=partitions
     )
 
     dw_task_group[table] = task_group.build_dw_task_group(

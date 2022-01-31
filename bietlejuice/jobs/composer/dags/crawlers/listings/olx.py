@@ -19,17 +19,19 @@ from bietlejuice.jobs.composer.services.configuration_service import (
 SOURCE = "crawlers"
 CONTEXT = f"listings"
 ORIGIN = f"olx"
-DAG_NAME = f'{ORIGIN}'
-SOURCE_WITH_CONTEXT = f'{SOURCE}_{CONTEXT}'
+DAG_NAME = f"{ORIGIN}"
+SOURCE_WITH_CONTEXT = f"{SOURCE}_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-INTERMEDIATE_PATH = f'{SOURCE}/{CONTEXT}'
-CONFIG_NAME = 'crawlers_listings'
+INTERMEDIATE_PATH = f"{SOURCE}/{CONTEXT}"
+CONFIG_NAME = "crawlers_listings"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 ENV = os.environ.get("ENVIRONMENT")
 MAIN_START_DATE = datetime(2021, 7, 20, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 3 * * 5"
 
-config_service = ConfigurationService(dag_name = CONFIG_NAME, intermediate_path=INTERMEDIATE_PATH)
+config_service = ConfigurationService(
+    dag_name=CONFIG_NAME, intermediate_path=INTERMEDIATE_PATH
+)
 
 olx_configs = config_service.get_config("olx")
 origin = olx_configs["origin"]
@@ -43,7 +45,9 @@ spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{INTERMEDIATE_PATH}"
+RAW_SPARK_JOB_PATH = (
+    f"{databricks_bietlejuice_repo_path}/spark_jobs/{INTERMEDIATE_PATH}"
+)
 
 CLUSTER_DESCRIPTION = Variable.get(f"databricks_default_cluster", deserialize_json=True)
 CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
@@ -86,7 +90,7 @@ partition_cols = config_service.get_config("partition_cols")
 
 
 raw_spark_job_path = f"{RAW_SPARK_JOB_PATH}/load_crawlers_listings_into_datalake.py"
-parameters = [SOURCE,CONTEXT, origin, origin, "{{ds}}"]
+parameters = [SOURCE, CONTEXT, origin, origin, "{{ds}}"]
 
 
 raw_task_group = task_group.build_raw_task_group_for_single_table(
@@ -101,8 +105,8 @@ clean_task_group = task_group.build_task_group_from_sql_files(
     layer=LayerEnum.CLEAN,
     source_database_base_name=SOURCE_WITH_CONTEXT,
     target_database_base_name=SOURCE_WITH_CONTEXT,
-    tree_path = f'{CONTEXT}/{DAG_NAME}/',
-    partitions=partition_cols
+    tree_path=f"{CONTEXT}/{DAG_NAME}/",
+    partitions=partition_cols,
 )
 
 chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))

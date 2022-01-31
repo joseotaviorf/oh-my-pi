@@ -5,11 +5,16 @@ from argparse import ArgumentParser
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
-from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat, SparkDataFrameService
+from bietlejuice.jobs.composer.base.spark import (
+    SparkTableStorageFormat,
+    SparkDataFrameService,
+)
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
-from bietlejuice.jobs.composer.services.configuration_service import ConfigurationService
+from bietlejuice.jobs.composer.services.configuration_service import (
+    ConfigurationService,
+)
 
 
 JOB_NAME = "load_lost_listings_enrich"
@@ -55,11 +60,13 @@ if __name__ == "__main__":
 
     model = joblib.load(lost_listings_model_path)
 
-    lost_listings_df_pd = spark_client.conn.sql(lost_listings_query.format(
-        execution_date=execution_date)
+    lost_listings_df_pd = spark_client.conn.sql(
+        lost_listings_query.format(execution_date=execution_date)
     ).toPandas()
     lost_listings_df_pd["cluster"] = model.predict(lost_listings_df_pd.iloc[:, 1:])
-    lost_listings_df_pd["cluster"] = lost_listings_df_pd["cluster"].map(segements_mapping)
+    lost_listings_df_pd["cluster"] = lost_listings_df_pd["cluster"].map(
+        segements_mapping
+    )
 
     dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
     df = spark_client.create_dataframe(lost_listings_df_pd)

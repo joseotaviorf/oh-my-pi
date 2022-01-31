@@ -66,8 +66,7 @@ if __name__ == "__main__":
     credentials = json.loads(credentials_str)
 
     rtb_client = ReportsApiSession(
-        username=credentials["client_id"],
-        password=credentials["client_secret"]
+        username=credentials["client_id"], password=credentials["client_secret"]
     )
 
     stats = []
@@ -84,14 +83,18 @@ if __name__ == "__main__":
         )
         account_details = rtb_client.get_advertiser(adv_hash=account_hash)
         # Appends string "account" into all keys from account_details dict:
-        account_details = {"account"+k[0].upper()+k[1:]:v for k, v in account_details.items()}
-        stats_response = list(map(lambda record: {**record,**account_details}, stats_response))
+        account_details = {
+            "account" + k[0].upper() + k[1:]: v for k, v in account_details.items()
+        }
+        stats_response = list(
+            map(lambda record: {**record, **account_details}, stats_response)
+        )
         stats += stats_response
 
     if stats:
         spark_client = SparkClient()
         df = spark_client.create_dataframe(stats, schema=schema)
-        df = df.withColumnRenamed("day","attributionDate")
+        df = df.withColumnRenamed("day", "attributionDate")
         df = (
             SparkDataFrameService()
             .input(df)

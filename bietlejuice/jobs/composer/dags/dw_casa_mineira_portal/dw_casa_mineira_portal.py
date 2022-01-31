@@ -18,7 +18,6 @@ from bietlejuice.jobs.composer.services.configuration_service import (
 )
 
 
-
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 8, 29, 0, 0, 0, tzinfo=LOCAL_TZ)
 
@@ -42,7 +41,9 @@ SPARK_JOBS_LOGS_PATH = config_service.get_config("spark_jobs_logs_path")
 
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
 CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = f"{SPARK_JOBS_LOGS_PATH}{DAG_ID}"
+CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
+    "destination"
+] = f"{SPARK_JOBS_LOGS_PATH}{DAG_ID}"
 
 dag = DAG(
     dag_id=DAG_ID,

@@ -17,12 +17,14 @@ JOB_NAME = "load_brand_tracking_into_raw"
 
 logger = QuintoAndarLogger(JOB_NAME)
 
+
 def __columns_to_alphanumeric_snake_case(df):
     old_columns = df.columns
     new_columns = [
         StringFormatter.set_alphanumeric_snake_case(column) for column in old_columns
     ]
     return df.toDF(*new_columns)
+
 
 def __get_unpivoted_table(df, ignore_cols_list=[]):
     all_columns = """"""
@@ -32,7 +34,8 @@ def __get_unpivoted_table(df, ignore_cols_list=[]):
 
     stack = f"stack({len(df.columns) - len(ignore_cols_list)}, {all_columns[:-1]}) as (id_question, answer)"
 
-    return df.select('respondent_serial', 'wave', 'year', 'quarter', expr(stack))
+    return df.select("respondent_serial", "wave", "year", "quarter", expr(stack))
+
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
@@ -77,27 +80,22 @@ if __name__ == "__main__":
 
     df = (
         spark_client.conn.read.option("header", "true")
-        .option("multiLine", "true") \
-        .option("quote", "\"") \
-        .option("escape", "\"") \
-        .option(
-            "basePath",
-            f"s3://{brand_tracking_bucket}/{file_to_ingest_base_path}",
-        )
+        .option("multiLine", "true")
+        .option("quote",  "\"")
+        .option("escape",  "\"")
+        .option("basePath", f"s3://{brand_tracking_bucket}/{file_to_ingest_base_path}")
         .csv(
             f"s3://{brand_tracking_bucket}/{file_to_ingest_base_path}{file_to_ingest_prefix}{year_previous_quarter}q{previous_quarter}.csv"
         )
-        .withColumn(
-            "year", lit(year_previous_quarter)
-        )
-        .withColumn(
-            "quarter", lit(previous_quarter)
-        )
+        .withColumn("year", lit(year_previous_quarter))
+        .withColumn("quarter", lit(previous_quarter))
     )
 
     df = __columns_to_alphanumeric_snake_case(df)
 
-    if table_name.find("unpivoted") >= 0: # if table name contains the word unpivoted, table should be unpivoted
+    if (
+        table_name.find("unpivoted") >= 0
+    ):  # if table name contains the word unpivoted, table should be unpivoted
         df = __get_unpivoted_table(df, ignore_cols_list)
 
     s3_loader.load_df(

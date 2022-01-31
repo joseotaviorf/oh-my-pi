@@ -29,8 +29,13 @@ if __name__ == "__main__":
     parser.add_argument("table_name")
     parser.add_argument("date_filter_column", help="Date filter column")
     parser.add_argument("execution_date", type=str, help="DAG execution date")
-    parser.add_argument("unixtime_measure", nargs='?', default=None, type=str, 
-                                            help="Unix time measure -> milliseconds, seconds or None")
+    parser.add_argument(
+        "unixtime_measure",
+        nargs="?",
+        default=None,
+        type=str,
+        help="Unix time measure -> milliseconds, seconds or None",
+    )
 
     args = parser.parse_args()
     environment = args.env

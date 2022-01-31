@@ -107,4 +107,3 @@ chain(
     + datalake_task_group.last_tasks(inner_dependencies_task_groups_boundaries),
     terminate_cluster_task,
 )
-

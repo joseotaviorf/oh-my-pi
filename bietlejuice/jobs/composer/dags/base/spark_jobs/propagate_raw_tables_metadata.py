@@ -30,8 +30,8 @@ def get_all_tables_metadata(spark_metastore_helper, metadata_type, relative_file
     for table_name in spark_metastore_helper.get_table_names():
 
         if metadata_type == MetadataTypeEnum.FULL_CONTENT_LINEAGE:
-            spark_ms_table_columns = (
-                spark_metastore_helper.get_spark_metastore_table_columns(table_name)
+            spark_ms_table_columns = spark_metastore_helper.get_spark_metastore_table_columns(
+                table_name
             )
             tables_spark_metadata[table_name] = dict()
             tables_spark_metadata[table_name]["name"] = table_name

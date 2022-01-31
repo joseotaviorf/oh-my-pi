@@ -32,15 +32,15 @@ config_service = ConfigurationService(DAG_NAME)
 DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
 ATHENA_QUERY_RESULT_LOCATION = config_service.get_config("athena_query_results_bucket")
 
-S3_PREFIX = config_service.get_config(
-    "databricks_bietlejuice_repo_path"
-)
+S3_PREFIX = config_service.get_config("databricks_bietlejuice_repo_path")
 SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base"
 LOGS_OUTPUT_PATH = config_service.get_config("spark_jobs_logs_path")
 DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url")
 
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = f"{LOGS_OUTPUT_PATH}{DAG_ID}"
+CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
+    "destination"
+] = f"{LOGS_OUTPUT_PATH}{DAG_ID}"
 
 dag = DAG(
     dag_id=DAG_ID,

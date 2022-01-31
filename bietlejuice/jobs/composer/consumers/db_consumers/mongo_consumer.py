@@ -200,7 +200,7 @@ class MongoConsumer(DBConsumer):
         OBS: ALL fields are converted to string type
         """
         documents = self.mongo_client.get_documents(table_name, query)
-        df = self.__convert_bson_documents_to_spark_dataframe(documents) 
+        df = self.__convert_bson_documents_to_spark_dataframe(documents)
         return df
 
     @logger

@@ -52,21 +52,18 @@ dag = DAG(
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=MAIN_SCHEDULE_INTERVAL, 
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
     doc_md=BaseDAG.get_dag_doc(SOURCE).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag,
-    task_id="create-cluster", 
-    cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-    dag=dag,
-    task_id="terminate-cluster"
+    dag=dag, task_id="terminate-cluster"
 )
 
 task_group = DatalakeTaskGroup(
@@ -89,7 +86,7 @@ for table in tables:
         parameters.append(table["date_filter_column"])
         parameters.append(table.get("unixtime_measure", "date"))
         parameters.append("{{ ds }}")
-    
+
     raw_task_group = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,
         target_database_base_name=SOURCE,

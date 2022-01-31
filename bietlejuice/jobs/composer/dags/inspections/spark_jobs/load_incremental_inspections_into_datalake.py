@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
     conn_config_json = dbutils.secrets.get(
         scope="quintoandar", key=DatabaseEnum.INSPECTIONS
-        )
+    )
     conn_config = json.loads(conn_config_json)
     spark_client = SparkClient()
     postgres_consumer = PostgresConsumer(conn_config, spark_client)
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     spark_metastore_service.create_database(database_name)
 
     df = postgres_consumer.get_incremental_data_by_granularity_from_table(
-         table_name, data_column, execution_date, unixtime_measure=unixtime_measure
+        table_name, data_column, execution_date, unixtime_measure=unixtime_measure
     )
 
     if not df.rdd.isEmpty():
@@ -82,10 +82,10 @@ if __name__ == "__main__":
             partitions=PARTITIONS,
         )
         spark_metastore_loader.update_metastore(
-            df, 
+            df,
             database_name,
-            table_name, 
-            format_options, 
+            table_name,
+            format_options,
             database_location,
             PARTITIONS,
             force_recreate=False,
@@ -102,4 +102,3 @@ if __name__ == "__main__":
             f"""m=__main__, table_name={table_name}, execution_date={execution_date},
             msg=No data returned from Production database."""
         )
-

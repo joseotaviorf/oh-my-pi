@@ -34,7 +34,9 @@ LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in loc
 MAIN_START_DATE = datetime(2021, 1, 20, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 7,13 * * *"
 
-CLUSTER_DESCRIPTION = Variable.get("databricks_9_1_min_general_cluster", deserialize_json=True)
+CLUSTER_DESCRIPTION = Variable.get(
+    "databricks_9_1_min_general_cluster", deserialize_json=True
+)
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 
 dag = DAG(

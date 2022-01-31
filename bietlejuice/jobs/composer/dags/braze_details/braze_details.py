@@ -109,9 +109,7 @@ clean_task_groups = task_group.build_task_group_from_sql_files(
     target_database_base_name=SOURCE,
 )
 
-chain(
-    create_cluster_task, DatalakeTaskGroup.all_first_tasks(raw_task_groups)
-)
+chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(raw_task_groups))
 
 TaskFlowHelper.chain_task_groups_via_common_table(raw_task_groups, clean_task_groups)
 

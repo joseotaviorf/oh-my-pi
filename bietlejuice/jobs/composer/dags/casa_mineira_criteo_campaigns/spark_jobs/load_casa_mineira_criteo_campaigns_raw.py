@@ -73,7 +73,7 @@ if __name__ == "__main__":
     if api_response:
         spark_client = SparkClient()
         df = spark_client.create_dataframe(api_response)
-        df = df.withColumnRenamed("Day","AttributionDate")
+        df = df.withColumnRenamed("Day", "AttributionDate")
         dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
         df = (
             SparkDataFrameService()

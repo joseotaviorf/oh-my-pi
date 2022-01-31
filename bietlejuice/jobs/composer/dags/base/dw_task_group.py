@@ -165,7 +165,10 @@ class DWTaskGroup(BaseTaskGroup):
             execution_timeout=timedelta(hours=self.execution_timeout_hours),
         )
 
-        final_tasks = [load_table_to_redshift_task, sync_metastore_tables_partitions_task]
+        final_tasks = [
+            load_table_to_redshift_task,
+            sync_metastore_tables_partitions_task,
+        ]
 
         if FileService.metadata_file_exists(
             self.relative_query_path, layer, table_name
@@ -186,13 +189,15 @@ class DWTaskGroup(BaseTaskGroup):
                 },
                 execution_timeout=timedelta(hours=self.execution_timeout_hours),
             )
-            sync_metastore_tables_partitions_task.set_downstream([propagate_table_metadata_task])
+            sync_metastore_tables_partitions_task.set_downstream(
+                [propagate_table_metadata_task]
+            )
             final_tasks = [load_table_to_redshift_task, propagate_table_metadata_task]
 
         airflow_helpers.chain(
             load_table_to_dw_final_schema_task,
             sync_metastore_table_structure_task,
-            sync_metastore_tables_partitions_task
+            sync_metastore_tables_partitions_task,
         )
         load_table_to_dw_final_schema_task.set_downstream(load_table_to_redshift_task)
 
@@ -265,7 +270,7 @@ class DWTaskGroup(BaseTaskGroup):
 
         quality_tasks = []
         if FileService.data_quality_tests_file_exists(
-                self.relative_query_path, layer, table_name
+            self.relative_query_path, layer, table_name
         ):
             data_quality_tests_task = QuintoAndarDatabricksSubmitRunOperator(
                 dag=self.dag,
@@ -284,7 +289,9 @@ class DWTaskGroup(BaseTaskGroup):
                 },
                 execution_timeout=timedelta(hours=self.execution_timeout_hours),
             )
-            load_table_to_dw_staging_schema_task.set_downstream([data_quality_tests_task])
+            load_table_to_dw_staging_schema_task.set_downstream(
+                [data_quality_tests_task]
+            )
             quality_tasks = [data_quality_tests_task]
 
         if is_incremental:
@@ -327,7 +334,7 @@ class DWTaskGroup(BaseTaskGroup):
         slugged_dw_schema = StringFormatter.slugify(self.dw_schema)
         slugged_table_name = StringFormatter.slugify(table_name)
 
-    # TODO: Remove this test once we decide that our Data Quality validations will block downstream tasks
+        # TODO: Remove this test once we decide that our Data Quality validations will block downstream tasks
         emptiness_test_task = QuintoAndarDatabricksSubmitRunOperator(
             dag=self.dag,
             task_id=f"test-{slugged_layer}-{slugged_dw_schema}-{slugged_table_name}-emptiness",
@@ -343,7 +350,9 @@ class DWTaskGroup(BaseTaskGroup):
         test_tasks = [emptiness_test_task]
         if has_ods_migration_test:
             config_service = ConfigurationService()
-            ods_migration_tests_threshold = config_service.get_config("ods_migration_tests_threshold")
+            ods_migration_tests_threshold = config_service.get_config(
+                "ods_migration_tests_threshold"
+            )
             test_entity_ods_migration_task = QuintoAndarDatabricksSubmitRunOperator(
                 dag=self.dag,
                 task_id=f"test-{slugged_layer}-{slugged_dw_schema}-{slugged_table_name}-ods-migration",
@@ -391,7 +400,7 @@ class DWTaskGroup(BaseTaskGroup):
         return DWTaskGroup.format_tasks_boundaries(
             initial_tasks=[load_table_to_dw_staging_schema_task],
             final_tasks=test_tasks,
-            independent_tasks=independent_tasks
+            independent_tasks=independent_tasks,
         )
 
     @staticmethod

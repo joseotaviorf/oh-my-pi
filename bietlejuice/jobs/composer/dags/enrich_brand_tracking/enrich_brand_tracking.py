@@ -21,11 +21,14 @@ from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
 
+
 def get_date_from_previous_quarter(execution_date):
     return datetime.strptime(execution_date, "%Y-%m-%d") - relativedelta(months=3)
 
+
 def get_previous_quarter(execution_date):
-    return math.ceil( (get_date_from_previous_quarter(execution_date).month) / 3)
+    return math.ceil((get_date_from_previous_quarter(execution_date).month) / 3)
+
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 7, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
@@ -54,9 +57,7 @@ CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
     "destination"
 ] = f"{SPARK_JOBS_LOGS_PATH}{DAG_ID}"
 
-INNER_DEPENDENCIES = {
-    "brandtracking_lean": ["brandtracking_full"],
-}
+INNER_DEPENDENCIES = {"brandtracking_lean": ["brandtracking_full"]}
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -102,7 +103,7 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     cluster_config_params={"udfs": ["SF_ALPHANUMERIC_SNAKE_CASE"]},
     extra_query_template_params={
         "year_previous_quarter": "{{ get_date_from_previous_quarter(ds).year }}",
-        "previous_quarter": "{{ get_previous_quarter(ds) }}"
+        "previous_quarter": "{{ get_previous_quarter(ds) }}",
     },
 )
 

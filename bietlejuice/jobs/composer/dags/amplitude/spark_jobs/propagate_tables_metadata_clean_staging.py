@@ -51,7 +51,9 @@ def is_new_table(execution_date, table_created_time):
 def get_all_new_tables(spark_metastore_helper, execution_date):
     spark_metastore_service = SparkMetastoreService(SparkClient())
 
-    all_table_names = list(set(spark_metastore_helper.get_table_names()) - set(BLOCK_LIST))
+    all_table_names = list(
+        set(spark_metastore_helper.get_table_names()) - set(BLOCK_LIST)
+    )
 
     new_tables = []
     for table_name in all_table_names:
@@ -118,7 +120,9 @@ if __name__ == "__main__":
     if table_names:
         columns_lineage = get_all_columns_lineage_from_events_table(spark_ms)
         metadata_propagator = MetadataPropagator(
-            get_metadata_propagator_host(), spark_ms.spark_database_name, columns_lineage
+            get_metadata_propagator_host(),
+            spark_ms.spark_database_name,
+            columns_lineage,
         )
 
         rdd = BaseSparkContext.sc.parallelize(table_names)

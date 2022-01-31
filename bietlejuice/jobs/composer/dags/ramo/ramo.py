@@ -46,7 +46,9 @@ DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
 BASE_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 
 # cluster setup
-CLUSTER_DESCRIPTION = Variable.get("databricks_9_1_med_general_cluster", deserialize_json=True)
+CLUSTER_DESCRIPTION = Variable.get(
+    "databricks_9_1_med_general_cluster", deserialize_json=True
+)
 
 dag = DAG(
     dag_id=DAG_ID,

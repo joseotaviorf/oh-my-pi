@@ -74,7 +74,7 @@ class BaseTaskGroup(object):
 
         return task_groups
 
-    def _get_table_names_from_sql_files(self, layer, tree_path = None):
+    def _get_table_names_from_sql_files(self, layer, tree_path=None):
         """
         Auxiliary method to adjust the layer and fetch table names from queries
          within the DAG's queries folder via FileService

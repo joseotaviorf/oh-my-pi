@@ -35,7 +35,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         relative_query_path,
         spark_jobs_path,
         athena_query_result_location,
-        tree_path = "",
+        tree_path="",
         execution_timeout_hours=BaseTaskGroup.DEFAULT_EXECUTION_TIMEOUT_HOURS,
     ):
         """
@@ -126,7 +126,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
             dag=self.dag,
             json={
                 "spark_python_task": {
-                    "python_file": self.spark_jobs_path + "sync_metastore_tables_structure.py",
+                    "python_file": self.spark_jobs_path
+                    + "sync_metastore_tables_structure.py",
                     "parameters": [
                         self.datalake_bucket,
                         layer,
@@ -396,7 +397,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                         json.dumps(cluster_config_params),
                         str(extra_query_template_params),
                         schema,
-                        tree_path
+                        tree_path,
                     ],
                 }
             },
@@ -460,7 +461,11 @@ class DatalakeTaskGroup(BaseTaskGroup):
             execution_timeout=timedelta(hours=self.execution_timeout_hours),
         )
 
-        chain(load_table_task, sync_metastore_table_structure_task, sync_metastore_table_partitions_task)
+        chain(
+            load_table_task,
+            sync_metastore_table_structure_task,
+            sync_metastore_table_partitions_task,
+        )
         load_table_task.set_downstream(create_external_table_task)
 
         final_tasks = [create_external_table_task, sync_metastore_table_partitions_task]
@@ -484,7 +489,9 @@ class DatalakeTaskGroup(BaseTaskGroup):
                 },
                 execution_timeout=timedelta(hours=self.execution_timeout_hours),
             )
-            sync_metastore_table_partitions_task.set_downstream(propagate_table_metadata_task)
+            sync_metastore_table_partitions_task.set_downstream(
+                propagate_table_metadata_task
+            )
             final_tasks = [create_external_table_task, propagate_table_metadata_task]
 
         quality_tasks = []
@@ -527,7 +534,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         cluster_config_params={},
         extra_query_template_params=None,
         schema="",
-        tree_path= "",
+        tree_path="",
     ):
         """
         Build a task group for clean layer

@@ -242,7 +242,9 @@ class FileService:
         return table_names
 
     @staticmethod
-    def get_data_quality_test_file(relative_file_path: str, layer: str, table_name: str) -> str:
+    def get_data_quality_test_file(
+        relative_file_path: str, layer: str, table_name: str
+    ) -> str:
         file_search_path = f"{DATA_QUALITY_TESTS_PATH}/{relative_file_path}/{layer}/**/{table_name}.y*ml"
         files = glob.glob(file_search_path, recursive=True)
 

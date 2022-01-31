@@ -14,13 +14,17 @@ from bietlejuice.jobs.composer.services.metastore_services import SparkMetastore
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
-from bietlejuice.jobs.composer.pipeline import IncrementalTableLoaderPipeline, FullTableLoaderPipeline
+from bietlejuice.jobs.composer.pipeline import (
+    IncrementalTableLoaderPipeline,
+    FullTableLoaderPipeline,
+)
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 
 JOB_NAME = "load_sales_flow_into_datalake_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+
 
 def parse_arguments():
     parser = ArgumentParser(description=JOB_NAME)
@@ -30,6 +34,7 @@ def parse_arguments():
     parser.add_argument("execution_date")
 
     return parser.parse_args()
+
 
 def get_conn_config():
     base_dbutils = BaseDBUtils()
@@ -43,17 +48,23 @@ def get_conn_config():
 
     return json.loads(conn_config_json)
 
+
 def get_table_config(table_name, table_configs):
     if table_name not in table_configs:
         unixtime_measure = None
         is_incremental = True
         date_filter_column = "updated_at"
     else:
-        unixtime_measure =  table_configs[table_name].get("unixtime_measure")
-        is_incremental = table_configs[table_name].get("extraction_type") == "incremental"
-        date_filter_column = table_configs[table_name].get("date_filter_column", "updated_at")
+        unixtime_measure = table_configs[table_name].get("unixtime_measure")
+        is_incremental = (
+            table_configs[table_name].get("extraction_type") == "incremental"
+        )
+        date_filter_column = table_configs[table_name].get(
+            "date_filter_column", "updated_at"
+        )
 
-    return unixtime_measure, is_incremental, date_filter_column 
+    return unixtime_measure, is_incremental, date_filter_column
+
 
 def main():
     args = parse_arguments()
@@ -99,7 +110,9 @@ def main():
         if table_name in block_list:
             continue
 
-        unixtime_measure, is_incremental, date_filter_column = get_table_config(table_name, table_configs)
+        unixtime_measure, is_incremental, date_filter_column = get_table_config(
+            table_name, table_configs
+        )
 
         if is_incremental:
             df = postgres_consumer.get_incremental_data_by_granularity_from_table(
@@ -114,17 +127,14 @@ def main():
                 database_location,
                 LayerEnum.RAW,
                 None,
-                partition_cols
+                partition_cols,
             ).load_and_register(df, format_options)
         else:
             df = postgres_consumer.get_data_from_table(table_name)
             FullTableLoaderPipeline(
-                database_name,
-                table_name,
-                database_location,
-                LayerEnum.RAW,
-                None
+                database_name, table_name, database_location, LayerEnum.RAW, None
             ).load_and_register(df, format_options)
+
 
 if __name__ == "__main__":
     main()

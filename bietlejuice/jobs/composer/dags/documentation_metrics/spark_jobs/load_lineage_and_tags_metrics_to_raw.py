@@ -172,10 +172,8 @@ def get_lineage_from_product_data(
                 database_name = f"datalake_{source}_raw"
                 source_with_context = f"source={source}"
 
-            has_lineage_from_product = (
-                metadata_service.dag_has_lineage_from_product_config(
-                    source, context, dag, environment
-                )
+            has_lineage_from_product = metadata_service.dag_has_lineage_from_product_config(
+                source, context, dag, environment
             )
             logger.info(
                 f"m=get_lineage_from_product_data, {source_with_context}, database_name={database_name}, "
@@ -206,10 +204,7 @@ def get_lineage_from_product_df(
 
 
 def compare_metadata_with_metastore(
-    metadata_data,
-    metastore_data,
-    lineage_from_product_data,
-    spark_client,
+    metadata_data, metastore_data, lineage_from_product_data, spark_client
 ):
     metadata_data.createOrReplaceTempView("vw_metadata")
     metastore_data.createOrReplaceTempView("vw_metastore")

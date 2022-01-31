@@ -540,11 +540,12 @@ class TestHiveMetastoreLoader:
         )
 
     @pytest.mark.parametrize(
-        "source_partition_keys, is_table_partitioned_in_hive", [
+        "source_partition_keys, is_table_partitioned_in_hive",
+        [
             (["a", "b"], False),  # table partitioned in spark (partitions added)
             ([], True),  # table partitioned in hive (partitions removed)
             (["a"], True),  # partitions updated
-        ]
+        ],
     )
     @mock.patch.object(HiveMetastoreLoader, "_update_table_in_metastore")
     @mock.patch.object(HiveMetastoreLoader, "_is_table_partitioned")
@@ -578,7 +579,9 @@ class TestHiveMetastoreLoader:
         )
 
         # assert
-        hive_metastore_loader.hive_metastore_service.drop_table.assert_called_once_with(database_name, table_name)
+        hive_metastore_loader.hive_metastore_service.drop_table.assert_called_once_with(
+            database_name, table_name
+        )
         hive_metastore_loader.hive_metastore_service.create_external_table.assert_called_once_with(
             database_name,
             table_name,

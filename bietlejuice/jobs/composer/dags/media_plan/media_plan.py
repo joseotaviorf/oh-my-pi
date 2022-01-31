@@ -18,11 +18,14 @@ from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
 
+
 def get_date_from_previous_quarter(execution_date):
     return datetime.strptime(execution_date, "%Y-%m-%d") - relativedelta(months=3)
 
+
 def get_previous_quarter(execution_date):
-    return math.ceil( (get_date_from_previous_quarter(execution_date).month) / 3)
+    return math.ceil((get_date_from_previous_quarter(execution_date).month) / 3)
+
 
 SOURCE = "media_plan"
 DAG_ID = f"bietlejuice.{SOURCE}"
@@ -42,9 +45,7 @@ TABLE_NAME = config_service.get_config("table_name")
 
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = None
-RAW_SPARK_JOB_FILE = (
-    f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/{SOURCE}/load_media_plan_into_raw.py"
-)
+RAW_SPARK_JOB_FILE = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/{SOURCE}/load_media_plan_into_raw.py"
 BASE_SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
 
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
@@ -93,7 +94,7 @@ raw_task_group = task_group.build_raw_task_group_for_all_tables(
     target_database_base_name=SOURCE,
     extraction_spark_job_file=RAW_SPARK_JOB_FILE,
     raw_spark_job_extra_args=[
-        SOURCE, 
+        SOURCE,
         "{{ get_date_from_previous_quarter(ds).year }}",
         "{{ get_previous_quarter(ds) }}",
     ],
@@ -107,14 +108,11 @@ clean_task_groups = task_group.build_task_group_from_sql_files(
     partitions=PARTITION_COLS,
     extra_query_template_params={
         "year_previous_quarter": "{{ get_date_from_previous_quarter(ds).year }}",
-        "previous_quarter": "{{ get_previous_quarter(ds) }}"
+        "previous_quarter": "{{ get_previous_quarter(ds) }}",
     },
 )
 
-chain(
-    create_cluster_task,
-    DatalakeTaskGroup.first_tasks(raw_task_group)
-)
+chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
 
 cross_downstream(
     DatalakeTaskGroup.last_tasks(raw_task_group),

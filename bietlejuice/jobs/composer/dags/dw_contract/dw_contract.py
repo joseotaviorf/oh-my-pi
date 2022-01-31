@@ -11,7 +11,9 @@ from airflow.operators.quintoandar_databricks import (
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.jobs.composer.dags.base.dw_task_group import DWTaskGroup
-from bietlejuice.jobs.composer.services.configuration_service import ConfigurationService
+from bietlejuice.jobs.composer.services.configuration_service import (
+    ConfigurationService,
+)
 
 # This DAG is part of ODS migration but also loads models that are already created on Composer.
 # Schemas can be found on Config files, since we use `janus` and `quintoandar_temp`, in order to

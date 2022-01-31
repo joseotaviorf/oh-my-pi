@@ -19,7 +19,6 @@ from bietlejuice.jobs.composer.services.configuration_service import (
 )
 
 
-
 SOURCE = "sirena"
 DAG_ID = f"bietlejuice.{SOURCE}"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
@@ -39,7 +38,9 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}"
 
-CLUSTER_DESCRIPTION = Variable.get(f"databricks_9_1_med_general_cluster", deserialize_json=True)
+CLUSTER_DESCRIPTION = Variable.get(
+    f"databricks_9_1_med_general_cluster", deserialize_json=True
+)
 CUSTOM_LIBRARIES = [
     {
         "whl": f"{artifacts_s3_bucket}/sirena-api-client-python/"
@@ -69,8 +70,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-    dag=dag, 
-    task_id="terminate-cluster"
+    dag=dag, task_id="terminate-cluster"
 )
 
 task_group = DatalakeTaskGroup(
@@ -82,28 +82,29 @@ task_group = DatalakeTaskGroup(
     athena_query_result_location=athena_query_results_bucket,
 )
 
-endpoints = config_service.get_config('endpoints')
+endpoints = config_service.get_config("endpoints")
 partition_cols = config_service.get_config("partition_cols")
 
 raw_task_groups = {}
 
 for endpoint in endpoints:
-    endpoint_name = endpoint['endpoint']
-    extraction_type = endpoint['extraction_type']
+    endpoint_name = endpoint["endpoint"]
+    extraction_type = endpoint["extraction_type"]
     parameters = [SOURCE, endpoint_name]
 
-    if extraction_type == 'incremental':
+    if extraction_type == "incremental":
         parameters.extend(["{{ ds }}"])
-    
 
-    raw_spark_job_path = f'{RAW_SPARK_JOB_PATH}/load_sirena_{endpoint_name}_into_datalake.py'
-    
+    raw_spark_job_path = (
+        f"{RAW_SPARK_JOB_PATH}/load_sirena_{endpoint_name}_into_datalake.py"
+    )
+
     raw_task_group = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,
         table_name=endpoint_name,
         target_database_base_name=SOURCE,
         extraction_spark_job_file=raw_spark_job_path,
-        raw_spark_job_extra_args=parameters
+        raw_spark_job_extra_args=parameters,
     )
     raw_task_groups[endpoint_name] = raw_task_group
 
@@ -112,16 +113,16 @@ incremental_clean_task_groups = task_group.build_task_group_from_sql_files(
     layer=LayerEnum.CLEAN,
     source_database_base_name=SOURCE,
     target_database_base_name=SOURCE,
-    schema="incremental", 
+    schema="incremental",
     is_incremental=True,
     partitions=partition_cols,
-    )
+)
 
 full_clean_task_groups = task_group.build_task_group_from_sql_files(
     layer=LayerEnum.CLEAN,
     source_database_base_name=SOURCE,
     target_database_base_name=SOURCE,
-    schema="full", 
+    schema="full",
 )
 
 

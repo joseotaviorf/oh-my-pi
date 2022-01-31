@@ -32,21 +32,19 @@ ENV = os.environ.get("ENVIRONMENT")
 CONFIG_SERVICE = ConfigurationService(SOURCE)
 DATALAKE_BUCKET = CONFIG_SERVICE.get_config("datalake_bucket")
 ATHENA_QUERY_RESULT_LOCATION = CONFIG_SERVICE.get_config("athena_query_results_bucket")
-S3_PREFIX = CONFIG_SERVICE.get_config(
-    "databricks_bietlejuice_repo_path"
-)
+S3_PREFIX = CONFIG_SERVICE.get_config("databricks_bietlejuice_repo_path")
 DOC_MD_BASE_URL = CONFIG_SERVICE.get_config("doc_md_chart_url")
 
 # spark and databricks vars
 BASE_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 RAW_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/{CONTEXT}"
-RAW_LOAD_SPARK_JOB_PATH = (
-    f"{RAW_SPARK_JOB_PATH}/load_sales_flow_into_datalake.py"
-)
+RAW_LOAD_SPARK_JOB_PATH = f"{RAW_SPARK_JOB_PATH}/load_sales_flow_into_datalake.py"
 
 LOGS_OUTPUT_PATH = CONFIG_SERVICE.get_config("spark_jobs_logs_path")
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = f'{LOGS_OUTPUT_PATH}{CONTEXT}'
+CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
+    "destination"
+] = f"{LOGS_OUTPUT_PATH}{CONTEXT}"
 
 TABLES = CONFIG_SERVICE.get_config("tables")
 PARTITION_COLS = CONFIG_SERVICE.get_config("partition_cols")
