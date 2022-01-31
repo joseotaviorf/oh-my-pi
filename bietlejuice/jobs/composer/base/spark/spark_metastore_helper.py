@@ -198,11 +198,12 @@ class SparkMetastoreHelper:
         df_databricks_tables = databricks_consumer.get_table_names_and_sizes()
         return [row.table_name for row in df_databricks_tables.collect()]
 
-    def get_all_tables_metadata(self):
+    def get_all_tables_metadata(self, get_partition_values=False):
         """
         Fetches all database tables metadata.
         This metadata will be shared during the parallelized processing of table names RDD.
 
+        :param get_partition_values: whether to get each table partition values or not
         :return: table schema and partition information
         :rtype: dict
         """
@@ -214,7 +215,7 @@ class SparkMetastoreHelper:
             )
 
             spark_ms_table_partition_values = []
-            if spark_ms_table_partition_keys:
+            if get_partition_values and spark_ms_table_partition_keys:
                 spark_ms_table_partition_values = self.get_spark_metastore_table_partition_values(
                     table_name
                 )
