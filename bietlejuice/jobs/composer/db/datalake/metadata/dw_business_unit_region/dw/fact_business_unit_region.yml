@@ -1,0 +1,25 @@
+---
+database_name: dw_sale
+table_name: fact_business_unit_region
+columns:
+  sk_region:
+    lineage:
+      - datalake_gsheets_clean.business_unit_region.id_region
+  sk_coverage_started_date:
+    lineage:
+      - datalake_gsheets_clean.business_unit_region.dt_start
+  sk_coverage_ended_date:
+    lineage:
+      - datalake_gsheets_clean.business_unit_region.dt_end
+  business_model:
+    lineage:
+      - datalake_gsheets_clean.business_unit_region.business_model
+  business_unit:
+    lineage:
+      - datalake_gsheets_clean.business_unit_region.business_unit
+  dt_coverage_started:
+    lineage:
+      - datalake_gsheets_clean.business_unit_region.start_date
+  dt_coverage_ended:
+    lineage:
+      - datalake_gsheets_clean.business_unit_region.end_date

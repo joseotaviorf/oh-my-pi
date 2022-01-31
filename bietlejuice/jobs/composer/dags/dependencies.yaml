@@ -96,6 +96,9 @@ bietlejuice.dw_braze_events_user_dispatch:
 bietlejuice.dw_buyer_prospect:
   - bietlejuice.enrich_buyer_prospect:load-enrich-buyer-prospect
 
+bietlejuice.dw_business_unit_region:
+  - bietlejuice.gsheets:load-clean-business-unit-region
+
 bietlejuice.dw_call:
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-agents
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-events
