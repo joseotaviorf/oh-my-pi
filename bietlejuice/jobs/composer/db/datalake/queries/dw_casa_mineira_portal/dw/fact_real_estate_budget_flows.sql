@@ -44,7 +44,7 @@ budget AS (
             AND (
                     CASE
                         WHEN dt_deactivation IS NULL
-                            THEN DATE_SUB(COALESCE(CAST(dt_next_month_started AS DATE), CURRENT_DATE), 1)
+                            THEN COALESCE(DATE_SUB(CAST(dt_next_month_started AS DATE), 1), ADD_MONTHS(DATE_TRUNC('MONTH', CURRENT_DATE), 1))
                         ELSE DATE_SUB(COALESCE(CAST(dt_next_month_started AS DATE), CAST(dt_deactivation AS DATE)), 1)
                     END
                 )
@@ -59,7 +59,7 @@ budget_flows AS (
             ON budget.sk_real_estate_agency = deactivation_period.id_real_estate_agency
                 AND (budget.dt_month_started
                         BETWEEN deactivation_period.dt_consider_status_started
-                        AND COALESCE(deactivation_period.dt_consider_status_ended, CURRENT_DATE) 
+                        AND COALESCE(deactivation_period.dt_consider_status_ended, ADD_MONTHS(DATE_TRUNC('MONTH', CURRENT_DATE), 1)) 
                     ) 
 )
 SELECT 
