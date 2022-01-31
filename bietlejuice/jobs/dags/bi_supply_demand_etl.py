@@ -464,18 +464,6 @@ ods_house_rent_flow = BaseDAG.build_python_operator(
     op_kwargs={"table_name": "house_rent_flow"},
 )
 
-fact_photo_job = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id="DW_fact_photo_job",
-    python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={
-        "dim_name": "photo_job",
-        "is_fact": True,
-        "bucket": bucket,
-        "insert_dummy": False,
-    },
-)
-
 ods_fact_house_listing_status_task = BaseDAG.build_python_operator(
     dag=main_dag,
     task_id="ODS_fact_house_listing_status",
@@ -486,13 +474,6 @@ ods_fact_house_listing_status_task = BaseDAG.build_python_operator(
         "query_params": None,
         "enum_db": EnumDB.BI_ODS,
     },
-)
-
-fact_inspection_bookings_task = BaseDAG.build_python_operator(
-    dag=main_dag,
-    task_id="DW_fact_inspection_bookings",
-    python_callable=load_dim_from_ods_to_dw,
-    op_kwargs={"dim_name": "inspection_bookings", "is_fact": True, "bucket": bucket},
 )
 
 # new 'supply' flow
@@ -740,9 +721,6 @@ enrich_ebdb_listing_dep = S3KeySensor(
 affiliate_dag.set_upstream([region_dag, user_dag])
 [lead_conversion_dag, special_condition_dag] >> house_dag
 
-house_dag >> fact_photo_job
-
-photo_job_dag >> fact_photo_job
 amplitude_partner_taxonomy >> partner_dag
 
 trigger_bi_growth_dag_task.set_upstream(
@@ -778,8 +756,6 @@ dw_sale_fact_listing_flows_dag.set_upstream(
 # finance flow
 user_dag.set_downstream([bank_dag, bank_account_dag])
 bank_transaction_dag.set_upstream([bank_dag, bank_account_dag])
-
-inspection_dag >> fact_inspection_bookings_task
 
 ods_credit_evaluation_task >> proposal_dag
 
