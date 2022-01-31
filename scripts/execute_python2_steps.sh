@@ -6,7 +6,16 @@ if [ ${#CHANGED_PATHS} -eq 0 ]; then
   exit 0
 else
   echo "Changes in Airflow EC2 files detected! Executing step..."
-  $1 # command 1
-  $2 # command 2
-  $3 # command 3
+  echo "### Executing command 1"
+  $1
+
+  if [ -n "$2" ]; then
+    echo "### Executing command 2"
+    $2 || exit 1
+  fi
+
+  if [ -n "$3" ]; then
+    echo "### Executing command 3"
+    $3 || exit 1
+  fi
 fi

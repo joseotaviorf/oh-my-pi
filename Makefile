@@ -159,7 +159,7 @@ check-style-python3:
 	@echo "Running Check Style"
 	@echo "=========="
 	@echo ""
-	@python -m black --check bietlejuice/jobs/composer/ tests3/unit/composer/
+	@python -m black --check bietlejuice/jobs/composer/ tests3/unit/composer/ && echo "\n\nSuccess\n" || (echo "\n\nFailure\n\nRun \"make lint-python3\" to apply style formatting to your code\n" && exit 1)
 	@python -m flake8 --config=setup3.cfg bietlejuice/jobs/composer/ tests3/unit/composer/
 
 .PHONY: package-python3
