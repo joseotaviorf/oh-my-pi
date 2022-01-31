@@ -24,7 +24,7 @@ demand_cost AS (
     GROUP BY 1, 2, 3, 4, 5, 6
 ),
 affiliates AS (
-    WITH
+   WITH
     ia_fact_cost AS (
         (SELECT
             fc.id_date as sk_date,
@@ -56,9 +56,7 @@ affiliates AS (
                 AND fc.id_date >= 20210701
                 AND fc.mkt_source <> 'Spinver')
         )
-
         UNION ALL
-
         (SELECT
             fc.id_date as sk_date,
             'fact_cost' AS table_origin,
@@ -260,17 +258,11 @@ affiliates AS (
         GROUP BY 1,2,3,4,5,6,7
     )
         SELECT * FROM segmentation_promo_bonus
-
         UNION ALL 
-
         SELECT * FROM cluster_promo_bonus
-
         UNION ALL
-
         SELECT * FROM extra_promotional_bonus_rent
-
         UNION ALL
-
         SELECT * FROM extra_promotional_bonus_sale
     ),
     ia_fact_affiliate_transposed AS (
@@ -287,9 +279,7 @@ affiliates AS (
             marketing.fact_affiliate_daily_cost_attributions
         WHERE
             sk_date < 20210125
-
         UNION ALL
-
         SELECT
             sk_date,
             'fact_affiliate' AS table_origin,
@@ -303,9 +293,7 @@ affiliates AS (
             marketing.fact_affiliate_daily_cost_attributions
         WHERE
             sk_date < 20210125
-
         UNION ALL
-
         SELECT
             sk_date,
             'fact_affiliate' AS table_origin,
@@ -319,9 +307,7 @@ affiliates AS (
             marketing.fact_affiliate_daily_cost_attributions
         WHERE
             sk_date < 20210125
-
         UNION ALL
-
         SELECT
             sk_date,
             'fact_affiliate' AS table_origin,
@@ -332,9 +318,7 @@ affiliates AS (
             commission_tradecom AS cost
         FROM
             marketing.fact_affiliate_daily_cost_attributions
-
         UNION ALL
-
         SELECT
             sk_date,
             'fact_affiliate' AS table_origin,
@@ -348,9 +332,7 @@ affiliates AS (
             marketing.fact_affiliate_daily_cost_attributions
         WHERE
             sk_date < 20210208
-
         UNION ALL
-
         SELECT
             sk_date,
             'fact_affiliate' AS table_origin,
@@ -364,7 +346,6 @@ affiliates AS (
             marketing.fact_affiliate_daily_cost_attributions
         
         UNION ALL
-
         SELECT
             sk_date,
             'fact_affiliate' AS table_origin,
@@ -589,17 +570,66 @@ affiliates AS (
         WHERE
             iac.cost IS NOT NULL
             AND dd.month_start >= date_trunc('month',CURRENT_DATE) - interval '24 month'
-        GROUP BY 1,2,3,4,5,6,7,8,9,11
-        HAVING costs>0
+         GROUP BY 1,2,3,4,5,6,7,8,9,11
+         HAVING costs>0
+     ),
+     
+    sale_rent_cities AS (
+        SELECT DISTINCT
+            dr.city_group
+        FROM sale.fact_listings AS sfl
+        INNER JOIN dim_region AS dr 
+            ON sfl.sk_region = dr.sk_region
     )
-    SELECT 
-        date, 
-        city_group,
-        business_context,
-        mkt_origin,
-        SUM(costs) AS costs
-    FROM base
-    GROUP BY 1, 2, 3, 4 
+     
+     SELECT 
+         date, 
+         base.city_group,
+         business_context,
+         mkt_origin,
+         SUM(costs) AS costs
+     FROM base
+     LEFT JOIN sale_rent_cities
+        ON base.city_group = sale_rent_cities.city_group
+     WHERE vertical <> 'acquisition' 
+        OR vertical IS NULL
+        OR (vertical = 'acquisition' AND date <= 20211231)
+        OR (vertical = 'acquisition' AND sale_rent_cities.city_group IS NULL)
+     GROUP BY 1, 2, 3, 4
+
+     UNION ALL
+
+     --RENT
+
+     SELECT 
+         date, 
+         base.city_group,
+         'rent' AS business_context,
+         mkt_origin,
+         SUM(costs) * 0.80 AS costs
+     FROM base
+     INNER JOIN sale_rent_cities
+        ON base.city_group = sale_rent_cities.city_group
+     WHERE vertical = 'acquisition'
+        AND date > 20211231
+     GROUP BY 1, 2, 3, 4
+
+     UNION ALL
+
+     --SALE
+
+         SELECT 
+         date, 
+         base.city_group,
+         'sale' AS business_context,
+         mkt_origin,
+         SUM(costs) * 0.20 AS costs
+     FROM base
+     INNER JOIN sale_rent_cities
+        ON base.city_group = sale_rent_cities.city_group
+     WHERE vertical = 'acquisition'
+        AND date > 20211231
+     GROUP BY 1, 2, 3, 4
 ),
 affiliates_sale_cost AS (
     SELECT 
@@ -1004,7 +1034,11 @@ SELECT
         ELSE cst.city_group
     END AS city_group,
     dr.tier,
-    cst.business,
+    CASE 
+        WHEN cst.business ILIKE '%rent%' 
+            THEN 'Rental' 
+        ELSE cst.business 
+    END AS business,
     planning_mkt_level1,
     CASE
         WHEN planning_mkt_level3 = 'Online Classifieds'
