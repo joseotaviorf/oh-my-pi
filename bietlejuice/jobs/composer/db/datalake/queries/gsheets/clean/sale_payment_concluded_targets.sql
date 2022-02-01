@@ -14,7 +14,7 @@ SELECT
     diligencia_fim,
     diligencia_inicio,
     financiamento_fim,
-    financiamento_inicio,
+    banco_inicio as financiamento_inicio,
     halfyear,
     quarter,
     week,
