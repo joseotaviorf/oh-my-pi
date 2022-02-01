@@ -36,33 +36,33 @@ def fetch_bigid_source_scans_result(host, username, password):
 
 
 def create_df_from_results(results, spark_client):
-  rows = []
-  for scan in results:
-    rows.append(
-        Row(
-            _id = str(scan.get("_id")),
-            hashId = str(scan.get("hashId")),
-            attribute = str(scan.get("attribute")),
-            attributeRecordsCount = str(scan.get("attributeRecordsCount")),
-            avgRisk = str(scan.get("avgRisk")),
-            fieldName = str(scan.get("fieldName")),
-            object = str(scan.get("object")),
-            owner = str(scan.get("owner")),
-            source = str(scan.get("source")),
-            update_date = str(scan.get("update_date")),
-            pii_investigation_join_field = str(
-                scan.get("pii_investigation_join_field")
-            ),
-            attribute_original_name = str(scan.get("attribute_original_name")),
-            attribute_name = str(scan.get("attribute_name")),
-            tags = str(scan.get("tags")),
-            comment = str(scan.get("comment")),
-            type = str(scan.get("type")),
-            last_scan_at = str(scan.get("last_scan_at")),
+    rows = []
+    for scan in results:
+        rows.append(
+            Row(
+                _id=str(scan.get("_id")),
+                hashId=str(scan.get("hashId")),
+                attribute=str(scan.get("attribute")),
+                attributeRecordsCount=str(scan.get("attributeRecordsCount")),
+                avgRisk=str(scan.get("avgRisk")),
+                fieldName=str(scan.get("fieldName")),
+                object=str(scan.get("object")),
+                owner=str(scan.get("owner")),
+                source=str(scan.get("source")),
+                update_date=str(scan.get("update_date")),
+                pii_investigation_join_field=str(
+                    scan.get("pii_investigation_join_field")
+                ),
+                attribute_original_name=str(scan.get("attribute_original_name")),
+                attribute_name=str(scan.get("attribute_name")),
+                tags=str(scan.get("tags")),
+                comment=str(scan.get("comment")),
+                type=str(scan.get("type")),
+                last_scan_at=str(scan.get("last_scan_at")),
+            )
         )
-    )
-    
-  return spark_client.create_dataframe(rows)
+
+    return spark_client.create_dataframe(rows)
 
 
 if __name__ == "__main__":
