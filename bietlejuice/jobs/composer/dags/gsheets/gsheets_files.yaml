@@ -130,6 +130,11 @@ city_share:
     sheet_name: city_share
     clean_table_name: city_share
 
+classifieds_fup_history:
+    sheet_id: 1gFTC74jXxin6HiopkVGZQ6k96J1rr5w5emG8SlSerGM
+    sheet_name: classifieds_fup_history
+    clean_table_name: classifieds_fup_history
+
 closing_analysts_hierarchy:
     sheet_id: 1iG68JgfjlWezT1d5rMiCIQIoN3fgskXLpqnKs9OltyA
     sheet_name: clean
@@ -490,6 +495,11 @@ mkt_cost_per_source:
     sheet_name: mkt_cost_per_source
     clean_table_name: mkt_cost_per_source
 
+offer_fup_history:
+    sheet_id: 1Kb7_0e1tOFphQExk9QTUf8Ui0cR5tXhm_1losgLruHU
+    sheet_name: offer_fup_history
+    clean_table_name: offer_fup_history
+
 offline_and_branding_marketing_costs:
     sheet_id: 14la3wTA9DitbyiJ8Lb4X7FnyAMsSE32ICzwPBPD2j4E
     sheet_name: offline_and_branding_marketing_costs
@@ -664,6 +674,11 @@ secretariat_hierarchy:
     sheet_id: 1JTWdWtoDrjoSD3pmf_-eks8ycXDN0V776jWegCw_M1M
     sheet_name: secretariat_hierarchy
     clean_table_name: secretariat_hierarchy
+
+secretary_info:
+    sheet_id: 1KfGHse9VvHc5Uq-rgOnUQ9uBsD9_iFtTXkojhlqdNjw
+    sheet_name: secretary_info
+    clean_table_name: secretariat_info
 
 service_city_holidays:
     sheet_id: 1wSYZjHde5RuFJQRigRFFIDiW4hpSOAtk88i6bkuwocI
@@ -844,6 +859,11 @@ users_cx_plaquinhas:
     sheet_id: 1oiUlhua9uFXbwkaSeF_EYRvaB652JIhOoWDy1bYolK0
     sheet_name: users_cx_plaquinhas
     clean_table_name: users_cx_plaquinhas
+
+visits_fup_history:
+    sheet_id: 1_drr7S6OWThtI5zdyxV5fs78QFls9muxMaahGUHNs_k
+    sheet_name: visits_fup_history
+    clean_table_name: visits_fup_history
 
 vistoria_bugs:  # to be excluded @Set,01
     sheet_id: 1-cuOGaxOf4hfqs1rhz6XUGv4y8r-0HbJv6YHGMRMkyc

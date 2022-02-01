@@ -1,0 +1,31 @@
+---
+database_name: datalake_gsheets_clean
+table_name: offer_fup_history
+columns:
+  sk_user_lead:
+    lineage:
+       - datalake_gsheets_raw.offer_fup_history.sk_user_lead
+  sk_user_secretary:
+    lineage:
+      - datalake_gsheets_raw.offer_fup_history.sk_user_secretary
+  id_secretary:
+    lineage:
+      - datalake_gsheets_raw.offer_fup_history.id_secretary
+  lead_email:
+    lineage:
+      - datalake_gsheets_raw.offer_fup_history.lead_email 
+  lead_name:
+    lineage:
+      - datalake_gsheets_raw.offer_fup_history.lead_name
+  lead_phone_number:
+    lineage:
+      - datalake_gsheets_raw.offer_fup_history.lead_phone_number
+  lead_secretary_type:
+    lineage:
+      - datalake_gsheets_raw.offer_fup_history.lead_secretary_type
+  secretary_email:
+    lineage:
+      - datalake_gsheets_raw.offer_fup_history.secretary_email
+  dt_contact:
+    lineage:
+      - datalake_gsheets_raw.offer_fup_history.dt_contact

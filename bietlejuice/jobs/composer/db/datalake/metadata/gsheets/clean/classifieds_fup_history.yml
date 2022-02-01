@@ -1,0 +1,36 @@
+database_name: datalake_gsheets_clean
+table_name: classifieds_fup_history
+columns:
+  sk_user_lead:
+    lineage:
+       - datalake_gsheets_raw.classifieds_fup_history.sk_user_lead
+  sk_user_secretary:
+    lineage:
+      - datalake_gsheets_raw.classifieds_fup_history.sk_user_secretary
+  id_property:
+    lineage:
+      - datalake_gsheets_raw.classifieds_fup_history.id_property
+  id_secretary:
+    lineage:
+      - datalake_gsheets_raw.classifieds_fup_history.id_secretary
+  lead_email:
+    lineage:
+      - datalake_gsheets_raw.classifieds_fup_history.lead_email 
+  lead_name:
+    lineage:
+      - datalake_gsheets_raw.classifieds_fup_history.lead_name
+  lead_phone_number:
+    lineage:
+      - datalake_gsheets_raw.classifieds_fup_history.lead_phone_number
+  lead_secretary_type:
+    lineage:
+      - datalake_gsheets_raw.classifieds_fup_history.lead_secretary_type
+  secretary_email:
+    lineage:
+      - datalake_gsheets_raw.classifieds_fup_history.secretary_email
+  origin_partner:
+    lineage:
+      - datalake_gsheets_raw.classifieds_fup_history.origin_partner
+  dt_contact:
+    lineage:
+      - datalake_gsheets_raw.classifieds_fup_history.dt_contact

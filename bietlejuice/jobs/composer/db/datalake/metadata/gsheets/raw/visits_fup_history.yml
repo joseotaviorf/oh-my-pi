@@ -1,0 +1,16 @@
+database_name: datalake_gsheets_raw
+table_name: visits_fup_history
+columns:
+  email_secretary:
+    tags:
+      - Confidential
+  lead_email:
+    tags:
+      - Confidential
+  lead_name:
+    tags:
+      - Confidential
+      - PII
+  lead_phone_number:
+    tags:
+      - Confidential

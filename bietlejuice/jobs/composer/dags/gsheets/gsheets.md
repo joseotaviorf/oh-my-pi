@@ -49,6 +49,7 @@ This pipeline produces the following output tables:
     - `ciq_costs`
     - `cities_neighborhoods_ibge_qa`
     - `city_share`
+    - `classifieds_fup_history`
     - `closing_analysts_hierarchy`
     - `cod_locale`
     - `contact_type_taxonomy`
@@ -109,6 +110,7 @@ This pipeline produces the following output tables:
     - `media_plan_current_quarter`
     - `mkt_cost_per_source`
     - `mta_budget_october_2020`
+    - `offer_fup_history`
     - `offers_hub_central`
     - `offline_and_branding_marketing_costs`
     - `offline_manual_costs`
@@ -154,6 +156,7 @@ This pipeline produces the following output tables:
     - `sale_tof_monthly_targets`
     - `sale_tof_weekly_targets`
     - `secretariat_hierarchy`
+    - `secretariat_info`
     - `service_city_holidays`
     - `supply_targets_2019`
     - `supply_targets_2020`
@@ -193,6 +196,7 @@ This pipeline produces the following output tables:
     - `tv_ads`
     - `unit_economics_amortization_curve`
     - `users_cx_plaquinhas`
+    - `visits_fup_history`
     - `weekday_demand_share`
     - `weekday_holiday_share`
     - `weekday_holiday_share_supply`

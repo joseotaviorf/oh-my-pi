@@ -1,0 +1,16 @@
+database_name: datalake_gsheets_raw
+table_name: classifieds_fup_history
+columns:
+  lead_email:
+    tags:
+      - Confidential
+  lead_name:
+    tags:
+      - Confidential
+      - PII
+  lead_phone_number:
+    tags:
+      - Confidential
+  secretary_email:
+    tags:
+      - Confidential
