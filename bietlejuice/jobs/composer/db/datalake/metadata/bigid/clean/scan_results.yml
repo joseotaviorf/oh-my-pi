@@ -1,0 +1,55 @@
+---
+database_name: datalake_bigid_clean
+table_name: scan_results
+columns:
+  id:
+    lineage:
+      - datalake_bigid_raw.scan_results._id
+  hash_id:
+    lineage:
+      - datalake_bigid_raw.scan_results.hashId
+  attribute:
+    lineage:
+      - datalake_bigid_raw.scan_results.attribute
+  field_name:
+    lineage:
+      - datalake_bigid_raw.scan_results.fieldName
+  object:
+    lineage:
+      - datalake_bigid_raw.scan_results.object
+  owner:
+    lineage:
+      - datalake_bigid_raw.scan_results.owner
+  source:
+    lineage:
+      - datalake_bigid_raw.scan_results.source
+  pii_investigation_join_field:
+    lineage:
+      - datalake_bigid_raw.scan_results.pii_investigation_join_field
+  attribute_original_name:
+    lineage:
+      - datalake_bigid_raw.scan_results.attribute_original_name
+  attribute_name:
+    lineage:
+      - datalake_bigid_raw.scan_results.attribute_name
+  tags:
+    lineage:
+      - datalake_bigid_raw.scan_results.tags
+  comment:
+    lineage:
+      - datalake_bigid_raw.scan_results.comment  
+  type:
+    lineage:
+     - datalake_bigid_raw.scan_results.type   
+  count_attribute_records:
+    lineage:
+      - datalake_bigid_raw.scan_results.attributeRecordsCount
+  avg_risk:
+    lineage:
+      - datalake_bigid_raw.scan_results.avgRisk
+  ts_updated:
+    lineage:
+      - datalake_bigid_raw.scan_results.update_date
+  ts_last_scan:
+    lineage:
+      - datalake_bigid_raw.scan_results.last_scan_at

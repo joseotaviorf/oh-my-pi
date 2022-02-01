@@ -1,0 +1,13 @@
+---
+database_name: datalake_bigid_clean
+table_name: scan_details
+columns:
+  id:
+    lineage:
+      - datalake_bigid_raw.scan_details.scanner_id
+  name:
+    lineage:
+      - datalake_bigid_raw.scan_details.scanner_name
+  group:
+    lineage:
+      - datalake_bigid_raw.scan_details.scanner_group
