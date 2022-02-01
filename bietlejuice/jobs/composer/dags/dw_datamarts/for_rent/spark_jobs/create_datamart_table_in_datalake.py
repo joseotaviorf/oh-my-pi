@@ -11,14 +11,28 @@ from bietlejuice.jobs.composer.base.db import (
 )
 from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils, SparkTableStorageFormat
-from bietlejuice.jobs.composer.clients.db_clients import SparkClient, AthenaClient
+from bietlejuice.jobs.composer.clients.db_clients import (
+    SparkClient,
+    AthenaClient,
+    PostgresClient,
+)
 from bietlejuice.jobs.composer.consumers.db_consumers import PostgresConsumer
 from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.services.file_service import FileService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
+from pyspark.sql.functions import col
 
 
 JOB_NAME = "create_datamart_table_in_datalake"
+
+DW_QUERY_TEMPLATE = f"""
+DROP TABLE IF EXISTS datamarts.{{table_name}};
+CREATE TABLE datamarts.{{table_name}} AS ({{query}});
+CALL grant_all_permissions_on_schema('datamarts');
+"""
+
+SELECT_FROM_DW = "SELECT * FROM datamarts.{table_name}"
+
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -55,10 +69,20 @@ if __name__ == "__main__":
         athena_client = AthenaClient(athena_query_results_bucket)
         query_execution_id = athena_client.run(s3_query, return_query_id=True)
         s3_result_path = f"{athena_client.output_location}/{query_execution_id}.csv"
+        csv_options = {
+            "header": "true",
+            "multiLine": "true",
+            "escape": '"',
+            "quote": '"',
+        }
         dm_table_df = (
             spark_client.conn.read.format("csv")
-            .option("header", "true")
+            .options(**csv_options)
             .load(s3_result_path)
+        )
+        # Force all the columns to be string to keep datamarts as is.
+        dm_table_df = dm_table_df.select(
+            [col(c).cast("string") for c in dm_table_df.columns]
         )
     elif runs_on == "redshift":
         base_dbutils = BaseDBUtils()
@@ -66,9 +90,20 @@ if __name__ == "__main__":
             dbutils = base_dbutils.get_dbutils()
 
         conn_config_json = dbutils.secrets.get(scope="quintoandar", key=DatabaseEnum.DW)
+        create_query = DW_QUERY_TEMPLATE.format(table_name=table, query=s3_query)
+        select_query = SELECT_FROM_DW.format(table_name=table)
         conn_config = json.loads(conn_config_json)
+        postgres_client = PostgresClient(
+            dbname=conn_config["db"],
+            host=conn_config["host"],
+            port=conn_config["port"],
+            user=conn_config["user"],
+            password=conn_config["pwd"],
+            keepalives_idle=200,
+        )
         postgres_consumer = PostgresConsumer(conn_config, spark_client)
-        dm_table_df = postgres_consumer.get_data_from_query(s3_query)
+        postgres_client.run(create_query)
+        dm_table_df = postgres_consumer.get_data_from_query(select_query)
     else:
         raise Exception(f"datamarts must be defined with a runs_on athena or redshift.")
 

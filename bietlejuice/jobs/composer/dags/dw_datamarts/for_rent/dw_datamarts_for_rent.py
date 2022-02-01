@@ -120,17 +120,6 @@ def build_table_tasks(entity_name, entity_pipeline):
         },
     )
 
-    load_table_into_redshift_task = QuintoAndarDatabricksSubmitRunOperator(
-        dag=DAG,
-        task_id=f"load-{slugged_table_name}-into-redshift",
-        json={
-            "spark_python_task": {
-                "python_file": f"{SPARK_JOBS_PATH}load_datamart_table_into_redshift.py",
-                "parameters": [ENV, dw_bucket, spectrum_iam_role, DW_SCHEMA, table],
-            }
-        },
-    )
-
     sync_metastore_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
         task_id=f"sync-hive-metastore-{slugged_table_name}-table-structure",
         dag=DAG,
@@ -172,15 +161,30 @@ def build_table_tasks(entity_name, entity_pipeline):
         sync_metastore_table_structure_task,
         sync_metastore_table_partitions_task,
     )
-    create_table_in_datalake_task.set_downstream(load_table_into_redshift_task)
+
+    if runs_on == "athena":
+        load_table_into_redshift_task = QuintoAndarDatabricksSubmitRunOperator(
+            dag=DAG,
+            task_id=f"load-{slugged_table_name}-into-redshift",
+            json={
+                "spark_python_task": {
+                    "python_file": f"{SPARK_JOBS_PATH}load_datamart_table_into_redshift.py",
+                    "parameters": [ENV, dw_bucket, spectrum_iam_role, DW_SCHEMA, table],
+                }
+            },
+        )
+        create_table_in_datalake_task.set_downstream(load_table_into_redshift_task)
+        last_tasks = [
+            sync_metastore_table_partitions_task,
+            load_table_into_redshift_task,
+        ]
+    else:
+        last_tasks = [sync_metastore_table_partitions_task]
 
     return {
         entity_name: {
             "first_task": create_table_in_datalake_task,
-            "last_tasks": [
-                sync_metastore_table_partitions_task,
-                load_table_into_redshift_task,
-            ],
+            "last_tasks": last_tasks,
         }
     }
 
