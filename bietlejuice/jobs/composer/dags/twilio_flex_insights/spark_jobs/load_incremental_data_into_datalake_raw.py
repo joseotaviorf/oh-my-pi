@@ -50,7 +50,7 @@ if __name__ == "__main__":
 
     logger.info(
         f"""
-            m={JOB_NAME}, environment={environment}, datalake_bucket={datalake_bucket}, 
+            m={JOB_NAME}, environment={environment}, datalake_bucket={datalake_bucket},
             source={source}, context={context}, msg=print spark jobs args"
         """
     )

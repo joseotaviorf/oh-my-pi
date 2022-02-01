@@ -5,7 +5,6 @@ from unittest.mock import Mock
 import pytest
 from hive_metastore_client.builders import ColumnBuilder
 from hive_metastore_client.builders import PartitionBuilder
-from pytest import raises
 
 from bietlejuice.jobs.composer.loaders import HiveMetastoreLoader
 

@@ -63,7 +63,7 @@ if __name__ == "__main__":
             "basePath",
             f"s3://{ads_performance_bucket}/google-reports/report={report_folder}",
         )
-        .option("escape", "\"")
+        .option("escape", '"')
         .csv(
             f"s3://{ads_performance_bucket}/google-reports/report={report_folder}/*/dt={execution_date}"
         )

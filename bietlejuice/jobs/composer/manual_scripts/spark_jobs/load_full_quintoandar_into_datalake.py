@@ -37,7 +37,9 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 
 def sync_hive(schema, layer, datalake_bucket, all_tables=True) -> None:
-    hm_confs = dbutils.secrets.get("quintoandar", DatabaseEnum.HIVE_METASTORE)
+    hm_confs = dbutils.secrets.get(  # noqa: F821
+        "quintoandar", DatabaseEnum.HIVE_METASTORE
+    )
     hm_confs_json = json.loads(hm_confs)
     _hms_host = hm_confs_json["host"]
 

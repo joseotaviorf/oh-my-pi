@@ -1,33 +1,26 @@
-import boto3
 import logging
-import yaml
-
-from datetime import datetime
 from argparse import ArgumentParser
+from datetime import datetime
+
+import boto3
+import yaml
 from pyspark.sql import Row
+from pyspark.sql.functions import udf, lit, explode_outer, map_keys, map_values
 from pyspark.sql.types import StructType, StructField, StringType
-from pyspark.sql.functions import (
-    udf,
-    lit,
-    explode_outer,
-    map_keys,
-    map_values,
-    coalesce,
-)
 from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.jobs.composer.clients.db_clients import SparkClient
+
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.jobs.composer.base.spark import (
     SparkDataFrameService,
     SparkTableStorageFormat,
 )
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
-from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
-
+from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_columns_documentation_metrics_to_raw"
 

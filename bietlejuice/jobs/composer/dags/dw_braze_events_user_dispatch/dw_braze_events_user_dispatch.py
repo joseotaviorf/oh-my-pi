@@ -1,22 +1,19 @@
-from datetime import datetime
-from pendulum import timezone
 import os
+from datetime import datetime
 
 from airflow.models import DAG, Variable
-from airflow.utils.helpers import chain, cross_downstream
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
+from airflow.utils.helpers import chain, cross_downstream
+from pendulum import timezone
 
-from bietlejuice.jobs.composer.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.dags.base.dw_task_group import DWTaskGroup
-from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
-
 
 DW_SCHEMA = "braze"
 CONTEXT = "braze_events_user_dispatch"

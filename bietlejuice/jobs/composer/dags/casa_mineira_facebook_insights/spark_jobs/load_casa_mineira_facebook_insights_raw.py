@@ -1,23 +1,20 @@
 import json
-import logging
-
 from argparse import ArgumentParser
 from datetime import datetime
 
-from quintoandar_logger import QuintoAndarLogger
 from quintoandar_facebook_api_client.clients import FacebookClient
+from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat, BaseDBUtils
-from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.base.api import APIEnum
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
-from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
+from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat, BaseDBUtils
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient
+from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
-
-from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
+from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_casa_mineira_facebook_insights_raw"
 

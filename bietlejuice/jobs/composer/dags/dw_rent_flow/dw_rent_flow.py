@@ -1,20 +1,20 @@
-from datetime import datetime
-import pendulum
 import os
+from datetime import datetime
 
+import pendulum
 from airflow.models import DAG, Variable
+from airflow.operators.quintoandar_dag_logger import QuintoAndarSuccessLoggerOperator
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from airflow.operators.quintoandar_dag_logger import QuintoAndarSuccessLoggerOperator
 from airflow.utils.helpers import chain
 
-from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
-from bietlejuice.jobs.composer.base.airflow.helpers import TaskFlowHelper
-from bietlejuice.jobs.composer.dags.base.dw_task_group import DWTaskGroup
-from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.airflow.dag_owner_enum import DAGOwnerEnum
+from bietlejuice.jobs.composer.base.airflow.helpers import TaskFlowHelper
+from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.jobs.composer.dags.base.dw_task_group import DWTaskGroup
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )

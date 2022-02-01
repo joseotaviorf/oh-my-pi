@@ -8,13 +8,13 @@ from airflow.operators.quintoandar_databricks import (
 from airflow.utils.helpers import chain
 from quintoandar_logger import QuintoAndarLogger
 
-logger = QuintoAndarLogger("DatalakeTaskGroup")
-
 from bietlejuice.jobs.composer.base.airflow import BaseTaskGroup
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.jobs.composer.formatters import StringFormatter
 from bietlejuice.jobs.composer.services import FileService, ConfigurationService
+
+logger = QuintoAndarLogger("DatalakeTaskGroup")
 
 AIRFLOW_DEFAULT_POOL = "default_pool"  # TODO: Add to parameter service to be created
 

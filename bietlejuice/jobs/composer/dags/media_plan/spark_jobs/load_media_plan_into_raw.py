@@ -67,7 +67,7 @@ if __name__ == "__main__":
 
     df = (
         spark_client.conn.read.option("header", "true")
-        .option("escape", "\"")
+        .option("escape", '"')
         .option("basePath", f"s3://{media_plan_bucket}/{file_to_ingest_base_path}")
         .csv(
             f"s3://{media_plan_bucket}/{file_to_ingest_base_path}{file_to_ingest_prefix}{year_previous_quarter}Q{previous_quarter}.csv"

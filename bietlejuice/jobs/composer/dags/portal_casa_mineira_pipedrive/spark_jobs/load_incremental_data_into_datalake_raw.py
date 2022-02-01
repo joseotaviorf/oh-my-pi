@@ -1,22 +1,19 @@
 import json
 import logging
 from argparse import ArgumentParser
+
+from pyspark.sql.functions import unix_timestamp, to_timestamp, to_date
+from pyspark.sql.types import StringType
 from pyspark.sql.types import StructField
 from pyspark.sql.types import StructType
-from pyspark.sql.types import StringType
-from pyspark.sql.functions import unix_timestamp, to_timestamp, to_date
-
 from quintoandar_logger import QuintoAndarLogger
 from quintoandar_pipedrive_api_client.clients import PipedriveClient
+from quintoandar_pipedrive_api_client.constants.endpoint_enum import EndpointEnum
 from quintoandar_pipedrive_api_client.consumers import PipedrivePagedConsumer
 from quintoandar_pipedrive_api_client.consumers.pipedrive_parallel_consumer import (
     PipedriveParallelConsumer,
 )
-from quintoandar_pipedrive_api_client.constants.endpoint_enum import EndpointEnum
 
-from bietlejuice.jobs.composer.clients.db_clients import SparkClient
-from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
-from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.base.api.api_enum import APIEnum
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.spark import (
@@ -24,10 +21,12 @@ from bietlejuice.jobs.composer.base.spark import (
     SparkTableStorageFormat,
     SparkDataFrameService,
 )
-from bietlejuice.jobs.composer.formatters import StringFormatter
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient
+from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
+from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_incremental_data_into_datalake_raw"
@@ -231,8 +230,8 @@ if __name__ == "__main__":
 
     logger.info(
         f"""
-            m={JOB_NAME}, environment={environment}, datalake_bucket={datalake_bucket}, 
-            source={source}, context={context}, execution_date={execution_date}, 
+            m={JOB_NAME}, environment={environment}, datalake_bucket={datalake_bucket},
+            source={source}, context={context}, execution_date={execution_date},
             full_load={full_load_execution_date}, msg=print spark jobs args"
         """
     )
@@ -249,7 +248,7 @@ if __name__ == "__main__":
 
     logger.info(
         f"""
-            m={JOB_NAME}, environment={environment}, datalake_bucket={datalake_bucket}, 
+            m={JOB_NAME}, environment={environment}, datalake_bucket={datalake_bucket},
             source={source}, context={context}, msg=API Client created!"
         """
     )
@@ -376,28 +375,28 @@ if __name__ == "__main__":
 
     logger.info(
         f"""
-            m={JOB_NAME}, environment={environment}, datalake_bucket={datalake_bucket}, 
+            m={JOB_NAME}, environment={environment}, datalake_bucket={datalake_bucket},
             source={source}, context={context}, msg=Total of deals is " {total_deals_normilize}
         """
     )
 
     logger.info(
         f"""
-            m={JOB_NAME}, environment={environment}, datalake_bucket={datalake_bucket}, 
+            m={JOB_NAME}, environment={environment}, datalake_bucket={datalake_bucket},
             source={source}, context={context}, msg=Total of deals is " {total_deals}
         """
     )
 
     logger.info(
         f"""
-            m={JOB_NAME}, environment={environment}, datalake_bucket={datalake_bucket}, 
+            m={JOB_NAME}, environment={environment}, datalake_bucket={datalake_bucket},
             source={source}, context={context}, msg=Total of deals flow is " {deals_flow_total}
         """
     )
 
     logger.info(
         f"""
-            m={JOB_NAME}, environment={environment}, datalake_bucket={datalake_bucket}, 
+            m={JOB_NAME}, environment={environment}, datalake_bucket={datalake_bucket},
             source={source}, context={context}, msg=Total of stages is " {stages_total}
         """
     )

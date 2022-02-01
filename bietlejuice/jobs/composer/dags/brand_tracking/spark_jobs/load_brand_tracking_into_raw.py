@@ -81,8 +81,8 @@ if __name__ == "__main__":
     df = (
         spark_client.conn.read.option("header", "true")
         .option("multiLine", "true")
-        .option("quote",  "\"")
-        .option("escape",  "\"")
+        .option("quote", '"')
+        .option("escape", '"')
         .option("basePath", f"s3://{brand_tracking_bucket}/{file_to_ingest_base_path}")
         .csv(
             f"s3://{brand_tracking_bucket}/{file_to_ingest_base_path}{file_to_ingest_prefix}{year_previous_quarter}q{previous_quarter}.csv"

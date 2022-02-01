@@ -58,7 +58,7 @@ class BaseTaskGroup(object):
         schema = kwargs.get("schema")
         tree_path = kwargs.get("tree_path")
         # To avoid legacy codes who uses full / incremental on schema variable
-        path_variable = schema if schema != None else tree_path
+        path_variable = schema if schema is not None else tree_path
 
         table_names = self._get_table_names_from_sql_files(
             layer=layer, tree_path=path_variable

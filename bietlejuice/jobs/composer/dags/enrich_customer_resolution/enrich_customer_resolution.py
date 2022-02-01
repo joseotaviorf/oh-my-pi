@@ -1,20 +1,17 @@
-from datetime import datetime
-from bietlejuice.jobs.composer.dags.enrich_customer_support.enrich_customer_support import (
-    LOGS_OUTPUT_PATH,
-)
-import pendulum
 import os
+from datetime import datetime
 
+import pendulum
 from airflow.models import DAG, Variable
-from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
+from airflow.utils.helpers import chain
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
-from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )

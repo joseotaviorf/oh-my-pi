@@ -1,4 +1,5 @@
-from airflow.models import Variable
+import json
+
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
@@ -103,7 +104,9 @@ class DWStagingSubDAG(BaseSubDAG):
                         "parameters": [
                             self.env,
                             table_name,
-                            json.dumps(ods_migration_tests_threshold),
+                            json.dumps(
+                                ods_migration_tests_threshold
+                            ),  # TODO [ODS] Remove this task
                             "{{ ds }}",
                         ],
                     }

@@ -1,17 +1,14 @@
 import logging
-
 from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.jobs.composer.clients.db_clients import SparkClient
+
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
-from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
+from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat
+from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.s3_consumer import S3Consumer
 from bietlejuice.jobs.composer.loaders import SparkMetastoreLoader
-from bietlejuice.jobs.composer.base.spark import (
-    SparkTableStorageFormat,
-    SparkDataFrameService,
-)
+from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_full_composer_into_datalake_raw"

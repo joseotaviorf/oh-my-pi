@@ -1,14 +1,14 @@
+import os
 from datetime import datetime
 
-from airflow.utils.helpers import cross_downstream
 import pendulum
-import os
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 from airflow.operators.quintoandar_transfer_data import QuintoAndarMySqlToS3Operator
+from airflow.utils.helpers import cross_downstream
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.db import DATALAKE_SQL_DIR
@@ -88,7 +88,7 @@ def get_sql_from_table_name(table_name):
 
 def create_extraction_tasks(table_name, has_query=False, is_incremental=False):
     """
-    Create a task to load table from Airflow database to S3. 
+    Create a task to load table from Airflow database to S3.
     In this way, the first step of raw creation is executed
     outside a spark job. When incremental is used, this functions
     breaks the load in two to keep a d-1 ingestion, but to add
@@ -101,7 +101,7 @@ def create_extraction_tasks(table_name, has_query=False, is_incremental=False):
     :type has_query: bool
     :param is_incremental: if this table will be consumed incremental
     :type is_incremental: bool
-    :return: An airflow task 
+    :return: An airflow task
     :rtype: BaseOperator
     """
     slugged_table_name = StringFormatter.slugify(table_name)

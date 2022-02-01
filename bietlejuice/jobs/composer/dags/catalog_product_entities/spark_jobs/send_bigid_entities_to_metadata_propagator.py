@@ -1,6 +1,5 @@
 import json
 import logging
-import time
 from argparse import ArgumentParser
 from datetime import datetime
 
