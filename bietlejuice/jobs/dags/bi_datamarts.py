@@ -106,7 +106,7 @@ def config_task(dag, queries_dir, python_callable, db, table_name, file_name):
     file_path = '{}/{}/{}'.format(queries_dir, DATAMARTS_SCHEMA, file_name)
     with open(file_path, 'r') as stream:
         config = yaml.safe_load(stream)
-        streams = config['streams']
+        streams = config.get('streams', [])
         for stream in streams:
             direction = stream['direction']
             task_ids = stream['task_ids']
@@ -114,9 +114,9 @@ def config_task(dag, queries_dir, python_callable, db, table_name, file_name):
             for id in task_ids:
                 logger.info('m=config_task, msg=setting {} {} of {}'.format(task_id, direction, id))
                 set_stream_method(dag.task_dict[id])
-            for dependency_dag_name in config.get("composer_dependencies", []):
-                dependency_task = get_sensor(dag, dependency_dag_name)
-                dependency_task.set_downstream(current_task)
+        for dependency_dag_name in config.get("composer_dependencies", []):
+            dependency_task = get_sensor(dag, dependency_dag_name)
+            dependency_task.set_downstream(current_task)
 
 
 # Setting dependencies for datamarts that depends on datamarts
@@ -124,12 +124,13 @@ def config_task(dag, queries_dir, python_callable, db, table_name, file_name):
 def get_sensor(dag, dependency_dag_name):
     """Create or return a sensor task if it already exists."""
 
-    if dag.has_task(f"{dependency_dag_name}_dep"):
-        dependency_task = dag.task_dict[f"{dependency_dag_name}_dep"]
+    task_id = "{dependency_dag_name}_dep".format(dependency_dag_name=dependency_dag_name)
+    if dag.has_task(task_id):
+        dependency_task = dag.task_dict[task_id]
     else:
         last_dep_execution_date = str(date.today() - timedelta(days=1))
         dependency_task = S3KeySensor(
-                        task_id=f"{dependency_dag_name}_dep",
+                        task_id=task_id,
                         poke_interval=3*60,
                         timeout=2*60*60,
                         aws_conn_id="aws_prod_data",
