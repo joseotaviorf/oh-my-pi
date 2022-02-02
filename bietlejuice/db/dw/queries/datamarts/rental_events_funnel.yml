@@ -3,4 +3,6 @@
 streams:
   - direction: 'upstream'
     task_ids: ['athena_talk_to_agent', 'dw_funnel_demand_flows',
-               'dw_lead_listing_flows','dw_quintoandar_consultant_listings']
+               'dw_lead_listing_flows']
+composer_dependencies:
+ - dw_datamarts_for_rent

@@ -1,8 +1,9 @@
 import os
-from datetime import datetime
+from datetime import datetime, date, timedelta
 import yaml
 
 from airflow.models import DAG
+from airflow.operators.sensors import S3KeySensor
 from qa_python_utils import QuintoAndarLogger
 from qa_python_utils.aws.athena import AthenaClient
 
@@ -113,6 +114,31 @@ def config_task(dag, queries_dir, python_callable, db, table_name, file_name):
             for id in task_ids:
                 logger.info('m=config_task, msg=setting {} {} of {}'.format(task_id, direction, id))
                 set_stream_method(dag.task_dict[id])
+            for dependency_dag_name in config.get("composer_dependencies", []):
+                dependency_task = get_sensor(dag, dependency_dag_name)
+                dependency_task.set_downstream(current_task)
+
+
+# Setting dependencies for datamarts that depends on datamarts
+#that already was migrated to Composer
+def get_sensor(dag, dependency_dag_name):
+    """Create or return a sensor task if it already exists."""
+
+    if dag.has_task(f"{dependency_dag_name}_dep"):
+        dependency_task = dag.task_dict[f"{dependency_dag_name}_dep"]
+    else:
+        last_dep_execution_date = str(date.today() - timedelta(days=1))
+        dependency_task = S3KeySensor(
+                        task_id=f"{dependency_dag_name}_dep",
+                        poke_interval=3*60,
+                        timeout=2*60*60,
+                        aws_conn_id="aws_prod_data",
+                        bucket_name='5a-datalake-prod',
+                        bucket_key="dags_execution_logs/{execution_date}/bietlejuice.{dependency_dag}.SUCCESS".format(execution_date=last_dep_execution_date, dependency_dag=dependency_dag_name),
+                        dag=main_dag
+                        )
+
+    return dependency_task
 
 
 # dags
@@ -178,6 +204,7 @@ for query in queries:
         pool=query['pool']
     )
 
+
 # configure tasks
 for task_config in task_configs:
     config_task(
@@ -188,3 +215,4 @@ for task_config in task_configs:
         table_name=task_config['table_name'],
         file_name=task_config['file_name']
     )
+
