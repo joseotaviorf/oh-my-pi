@@ -131,10 +131,10 @@ costs_targets_results_combined AS (
     COUNT(NULL) AS first_listings,
     COUNT(NULL) AS hybrid_listings,
     SUM(0::FLOAT) AS cost,
-    SUM(NULLIF(prospects, '')::FLOAT) AS prospects_target,
-    SUM(NULLIF(qualifieds, '')::FLOAT) AS qualifieds_target,
-    SUM(NULLIF(opportunities, '')::FLOAT) AS opportunities_target,
-    SUM(NULLIF(first_listings, '')::FLOAT) AS first_listings_target,
+    SUM(NULLIF(REPLACE(prospects,',',''), '')::FLOAT) AS prospects_target,
+    SUM(NULLIF(REPLACE(qualifieds,',',''), '')::FLOAT) AS qualifieds_target,
+    SUM(NULLIF(REPLACE(opportunities,',',''), '')::FLOAT) AS opportunities_target,
+    SUM(NULLIF(REPLACE(first_listings,',',''), '')::FLOAT) AS first_listings_target,
     SUM(0::FLOAT) AS budget
   FROM
     datalake_raw.gsheets_sale_supply_targets AS str
