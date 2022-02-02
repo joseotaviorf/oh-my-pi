@@ -1,0 +1,22 @@
+select
+    id,
+    description,
+    label,
+    rating_reference,
+    rating_target,
+    order,
+    has_complementary_info_requirement,
+    is_active,
+    label = 'Pontualidade' as is_label_punctuality,
+    label = 'Corretor bem informado' as is_label_agent_well_informed,
+    label = 'Gentileza' as is_label_kindness,
+    label = 'Corretor não foi gentil' as is_label_no_kindness,
+    label = 'Imóvel igual ao anúncio' as is_label_house_as_listing,
+    label = 'Imóvel não corresponde ao anúncio' as is_label_house_not_as_listing,
+    label = 'Outro motivo (por fav as)' as is_label_other_reason_positive,
+    label = 'Outro motivo (por fav as)' as is_label_other_reason_negative,
+    label = 'Corretor se atrasou' as is_label_agent_late,
+    label = 'Corretor sem informações' as is_label_agent_with_no_info,
+    ts_created,
+    ts_updated
+from datalake_ebdb_clean.rating_label

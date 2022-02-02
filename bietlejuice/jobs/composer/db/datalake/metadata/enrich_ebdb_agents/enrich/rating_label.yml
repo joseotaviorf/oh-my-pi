@@ -1,0 +1,64 @@
+---
+database_name: datalake_ebdb_agents
+table_name: rating_label
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_clean.rating_label.id
+  description:
+    lineage:
+      - datalake_ebdb_clean.rating_label.description
+  label:
+    lineage:
+      - datalake_ebdb_clean.rating_label.label
+  rating_reference:
+    lineage:
+      - datalake_ebdb_clean.rating_label.rating_reference
+  rating_target:
+    lineage:
+      - datalake_ebdb_clean.rating_label.rating_target
+  order:
+    lineage:
+      - datalake_ebdb_clean.rating_label.order
+  has_complementary_info_requirement:
+    lineage:
+      - datalake_ebdb_clean.rating_label.has_complementary_info_requirement
+  is_active:
+    lineage:
+      - datalake_ebdb_clean.rating_label.is_active
+  is_label_punctuality:
+    lineage:
+      - datalake_ebdb_clean.rating_label.label
+  is_label_agent_well_informed:
+    lineage:
+      - datalake_ebdb_clean.rating_label.label
+  is_label_kindness:
+    lineage:
+      - datalake_ebdb_clean.rating_label.label
+  is_label_no_kindness:
+    lineage:
+      - datalake_ebdb_clean.rating_label.label
+  is_label_house_as_listing:
+    lineage:
+      - datalake_ebdb_clean.rating_label.label
+  is_label_house_not_as_listing:
+    lineage:
+      - datalake_ebdb_clean.rating_label.label
+  is_label_other_reason_positive:
+    lineage:
+      - datalake_ebdb_clean.rating_label.label
+  is_label_other_reason_negative:
+    lineage:
+      - datalake_ebdb_clean.rating_label.label
+  is_label_agent_late:
+    lineage:
+      - datalake_ebdb_clean.rating_label.label
+  is_label_agent_with_no_info:
+    lineage:
+      - datalake_ebdb_clean.rating_label.label
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.rating_label.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.rating_label.ts_updated

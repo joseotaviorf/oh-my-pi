@@ -18,3 +18,5 @@ tables:
   - table_name: agents_slots_hourly
     is_incremental: true
     partitions: [year, month, day]
+  - table_name: rating_label
+    is_incremental: false
