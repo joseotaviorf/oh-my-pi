@@ -9,7 +9,7 @@ from airflow.operators.quintoandar_databricks import (
 from airflow.utils.helpers import chain, cross_downstream
 from pendulum import timezone
 
-from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.jobs.composer.dags.base.dw_task_group import DWTaskGroup
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
@@ -48,7 +48,7 @@ BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": BaseDAG.DEFAULT_OWNER,
+        "owner": DAGOwnerEnum.DATA_FOR_RENT,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },

@@ -11,7 +11,7 @@ from airflow.operators.quintoandar_databricks import (
 from airflow.operators.quintoandar_dag_logger import QuintoAndarSuccessLoggerOperator
 from airflow.utils.helpers import cross_downstream, chain
 
-from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.jobs.composer.services.file_service import FileService
@@ -69,7 +69,7 @@ RAW_EXECUTION_TIMEOUT_HOURS = 3.5
 dag = DAG(
     dag_id=FULL_DAG_ID,
     default_args={
-        "owner": BaseDAG.DEFAULT_OWNER,
+        "owner": DAGOwnerEnum.DATA_FOR_RENT,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
