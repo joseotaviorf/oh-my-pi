@@ -11,7 +11,7 @@ from airflow.operators.quintoandar_dag_logger import QuintoAndarSuccessLoggerOpe
 
 from airflow.utils.helpers import chain
 
-from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseTaskGroup
+from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseTaskGroup, DAGOwnerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.jobs.composer.base.airflow.helpers.task_flow_helper import (
     TaskFlowHelper,
@@ -60,7 +60,7 @@ INNER_DEPENDENCIES = {
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": BaseDAG.DEFAULT_OWNER,
+        "owner": DAGOwnerEnum.DATA_FOR_RENT,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
