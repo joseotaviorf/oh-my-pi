@@ -29,6 +29,8 @@ DW_QUERY_TEMPLATE = f"""
 DROP TABLE IF EXISTS datamarts.{{table_name}};
 CREATE TABLE datamarts.{{table_name}} AS ({{query}});
 CALL grant_all_permissions_on_schema('datamarts');
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA datamarts TO GROUP etl;
+GRANT ALL ON SCHEMA datamarts TO GROUP ETL;
 """
 
 SELECT_FROM_DW = "SELECT * FROM datamarts.{table_name}"
