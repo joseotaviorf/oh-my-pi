@@ -6,16 +6,17 @@ WITH loft_listings_raw AS (
         CAST(address.neighborhood AS VARCHAR) AS neighborhood_loft,
         CAST(geolocation.latitude AS VARCHAR) AS lat,
         CAST(geolocation.longitude AS VARCHAR) AS lng,
-        CAST(SUBSTR(CAST(date_info.created_at AS VARCHAR), 1, 10) AS DATE) AS ts_created,
         CASE
             WHEN ROW_NUMBER() OVER (PARTITION BY id ORDER BY CAST(CONCAT(CAST(year AS VARCHAR), '-', CAST(month AS VARCHAR), '-', CAST(day AS VARCHAR)) AS DATE) DESC) = 1 THEN TRUE 
             ELSE FALSE
         END AS is_last_status,
+        CASE
+            WHEN ROW_NUMBER() OVER (PARTITION BY id ORDER BY CAST(CONCAT(CAST(year AS VARCHAR), '-', CAST(month AS VARCHAR), '-', CAST(day AS VARCHAR)) AS DATE)) = 1 THEN TRUE 
+            ELSE FALSE
+        END AS is_first_status,
         CAST(CONCAT(CAST(year AS VARCHAR), '-', CAST(month AS VARCHAR), '-', CAST(day AS VARCHAR)) AS DATE) AS ts_updated,
         FIRST_VALUE(CAST(CONCAT(CAST(year AS VARCHAR), '-', CAST(month AS VARCHAR), '-', CAST(day AS VARCHAR)) AS DATE)) OVER (PARTITION BY id ORDER BY CAST(CONCAT(CAST(year AS VARCHAR), '-', CAST(month AS VARCHAR), '-', CAST(day AS VARCHAR)) AS DATE)) AS ts_first_publication,
-        FIRST_VALUE(CAST(CONCAT(CAST(year AS VARCHAR), '-', CAST(month AS VARCHAR), '-', CAST(day AS VARCHAR)) AS DATE)) OVER (PARTITION BY id ORDER BY CAST(CONCAT(CAST(year AS VARCHAR), '-', CAST(month AS VARCHAR), '-', CAST(day AS VARCHAR)) AS DATE) DESC) AS ts_last_publication,
-        FIRST_VALUE(CAST(CONCAT(CAST(year AS VARCHAR), '-', CAST(month AS VARCHAR), '-', CAST(day AS VARCHAR)) AS DATE)) OVER (PARTITION BY 1 ORDER BY CAST(CONCAT(CAST(year AS VARCHAR), '-', CAST(month AS VARCHAR), '-', CAST(day AS VARCHAR)) AS DATE) DESC) AS ts_last_extraction,
-        LAG(CAST(CONCAT(CAST(year AS VARCHAR), '-', CAST(month AS VARCHAR), '-', CAST(day AS VARCHAR)) AS DATE)) OVER (PARTITION BY id ORDER BY CAST(CONCAT(CAST(year AS VARCHAR), '-', CAST(month AS VARCHAR), '-', CAST(day AS VARCHAR)) AS DATE)) AS ts_last_update 
+        FIRST_VALUE(CAST(CONCAT(CAST(year AS VARCHAR), '-', CAST(month AS VARCHAR), '-', CAST(day AS VARCHAR)) AS DATE)) OVER (PARTITION BY 1 ORDER BY CAST(CONCAT(CAST(year AS VARCHAR), '-', CAST(month AS VARCHAR), '-', CAST(day AS VARCHAR)) AS DATE) DESC) AS ts_last_extraction
     FROM
         datalake_crawlers_listings_clean_prod.loft
 ),
@@ -41,19 +42,11 @@ loft_listings_clean AS (
             COALESCE(r.id_neighborhood, -1) AS id_neighborhood,
             IF(r.neighborhood IS NULL, ll.neighborhood_loft, r.neighborhood) AS neighborhood,
             ll.neighborhood_loft,
-            CASE
-                WHEN ll.is_last_status = TRUE 
-                    AND ll.ts_last_publication = ll.ts_last_extraction THEN 'Publicado'
-                WHEN ll.is_last_status = FALSE THEN 'Publicado'
-                ELSE 'Despublicado'
-            END AS status,
             ll.is_last_status,
-            ll.ts_created,
+            LL.is_first_status,
             ll.ts_first_publication,
-            ll.ts_last_publication,
             ll.ts_updated,
-            ll.ts_last_extraction,
-            ll.ts_last_update
+            ll.ts_last_extraction
         FROM
             loft_listings_raw AS ll
         LEFT JOIN
@@ -77,14 +70,11 @@ loft_listings_clean AS (
             id_neighborhood,
             neighborhood,
             neighborhood_loft,
-            status,
             is_last_status,
-            ts_created,
+            is_first_status,
             ts_first_publication,
-            ts_last_publication,
             ts_updated,
-            ts_last_extraction,
-            ts_last_update
+            ts_last_extraction
         FROM
             loft_listings_w_correct_region
         WHERE
@@ -94,17 +84,13 @@ loft_listings_clean AS (
     SELECT
         id_house,
         id_house_platform,
-        id_status, 
         id_neighborhood,
         neighborhood,
-        status,
         is_last_status,
-        ts_created,
+        is_first_status,
         ts_first_publication,
-        ts_last_publication,
         ts_updated,
-        ts_last_extraction,
-        ts_last_update
+        ts_last_extraction
     FROM
         loft_listings_w_correct_region
     WHERE
@@ -115,76 +101,145 @@ loft_listings_clean AS (
     SELECT
         id_house,
         id_house_platform,
-        id_status,
         id_neighborhood,
         neighborhood,
-        status,
         is_last_status,
-        ts_created,
+        is_first_status,
         ts_first_publication,
-        ts_last_publication,
         ts_updated,
-        ts_last_extraction,
-        ts_last_update
+        ts_last_extraction
     FROM
         correct_duplicated_values
     ),
-base AS (
-    SELECT
-        id_house,
-        id_house_platform,
-        id_neighborhood,
-        neighborhood,
-        status AS status_history,
-        MAX(is_last_status) AS is_last_status,
-        ts_created AS ts_created_listing,
-        MIN(ts_updated) AS ts_status_started,
-        MAX(ts_last_update) AS ts_last_update,
-        MAX(ts_last_extraction) AS ts_load
-    FROM
-        loft_listings_clean
-    GROUP BY 1, 2, 3, 4, 5, 7
-), 
-aux AS ( 
-    SELECT
-    id_house,
-    id_house_platform,
-    id_neighborhood,
-    neighborhood,
-    status_history,
-    is_last_status,
-    ts_created_listing,
-    ts_status_started,
-    LEAD(ts_status_started) OVER (PARTITION BY id_house ORDER BY ts_status_started) AS ts_status_ended,
-    ts_last_update, 
-    ts_load
-FROM
-    base
-)
+    dim_date_aux AS (
+        SELECT  
+            week_start
+        FROM 
+            datalake_raw.dim_date 
+        WHERE 
+            CAST(date AS DATE) BETWEEN CAST('2021-06-01' AS DATE) AND (SELECT ts_last_extraction FROM loft_listings_clean LIMIT 1)
+        GROUP BY 
+            1
+    ),
+    df_cross_join_aux AS (
+        SELECT 
+            id_house, 
+            id_house_platform, 
+            id_neighborhood, 
+            neighborhood, 
+            ts_first_publication 
+        FROM 
+            loft_listings_clean 
+        GROUP BY 
+            1, 2, 3, 4, 5
+    ),
+    timeline AS (
+        SELECT  
+            d.week_start,
+            l.id_house,
+            l.id_house_platform,
+            l.id_neighborhood,
+            l.neighborhood,
+            CASE 
+                WHEN CAST(d.week_start AS DATE) >= l.ts_first_publication THEN 1 
+                ELSE NULL 
+            END AS check_date,
+            l.ts_first_publication
+        FROM 
+            dim_date_aux AS d
+        CROSS JOIN 
+            df_cross_join_aux AS l
+    ),
+    df_status_change_aux AS (
+        SELECT 
+            CAST(t.week_start AS DATE) AS week_start,
+            t.id_house_platform,
+            t.check_date,
+            t.id_house, 
+            t.id_neighborhood,
+            t.neighborhood,
+            CASE 
+                WHEN (l.is_first_status IS NULL AND l.is_last_status IS NULL) 
+                    AND (LEAD(l.ts_updated) OVER (PARTITION BY t.id_house_platform ORDER BY t.week_start) IS NOT NULL)  
+                    AND (lAG(l.ts_updated) OVER (PARTITION BY t.id_house_platform ORDER BY t.week_start) IS NOT NULL) THEN 1
+                WHEN (l.is_first_status IS NOT NULL AND l.is_last_status IS NOT NULL) 
+                     AND (LAG(l.ts_updated) OVER (PARTITION BY t.id_house_platform ORDER BY t.week_start) IS NULL) THEN 1
+                WHEN (l.is_first_status IS NULL AND l.is_last_status IS NULL) 
+                    AND (LAG(l.ts_updated) OVER (PARTITION BY t.id_house_platform ORDER BY t.week_start) IS NOT NULL) THEN 1
+                ELSE 0 
+            END AS status_change_aux,
+            l.is_last_status,
+            l.is_first_status,
+            l.ts_first_publication,
+            l.ts_updated,
+            l.ts_last_extraction
+        FROM 
+            timeline AS t 
+        LEFT JOIN 
+            loft_listings_clean AS l
+                ON CAST(t.week_start AS DATE) = l.ts_updated 
+                AND t.id_house_platform = l.id_house_platform
+        WHERE 
+            t.check_date = 1
+    ),
+    df_status_change AS (
+        SELECT
+            week_start,
+            id_house_platform,
+            check_date,
+            id_house, 
+            id_neighborhood,
+            neighborhood,
+            CASE 
+                WHEN ts_updated IS NOT NULL THEN 'Publicado'
+                ELSE 'Despublicado'
+            END AS status_history,
+            SUM(status_change_aux) OVER (PARTITION BY id_house_platform ORDER BY week_start ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS status_change,
+            status_change_aux,
+            is_last_status,
+            is_first_status,
+            ts_first_publication,
+            ts_updated,
+            ts_last_extraction
+        FROM 
+            df_status_change_aux
+    ),
+    df_grouping AS (
+        SELECT 
+            id_house,
+            id_house_platform,
+            id_neighborhood,
+            neighborhood,
+            status_history,
+            status_change,
+            MIN(week_start) AS ts_started_date,
+            MAX(week_start) AS ts_ended_date
+        FROM 
+            df_status_change 
+        GROUP BY 
+            1, 2, 3, 4, 5, 6
+    )
 SELECT
     id_house,
     id_house_platform,
     id_neighborhood,
     neighborhood,
     status_history,
-    COALESCE(
-        CASE
-            WHEN status_history = 'Publicado' THEN DATE_DIFF('week', ts_created_listing, COALESCE(ts_status_ended, CURRENT_DATE))
-            WHEN status_history = 'Despublicado' THEN DATE_DIFF('week', ts_created_listing, LAG(ts_status_started) OVER (PARTITION BY id_house ORDER BY ts_status_started))
-        END
-    , 1) AS weeks_published,
-    CASE
-        WHEN status_history = 'Despublicado' THEN DATE_DIFF('week', ts_status_started, NOW())
-    END AS weeks_unpublished,
-    is_last_status,
+    FIRST_VALUE(ts_started_date) OVER (PARTITION BY id_house ORDER BY ts_started_date DESC) = ts_started_date AS is_last_status,
     CASE 
-        WHEN status_history = 'Publicado' AND DATE_DIFF('day', ts_last_update, ts_load) > 7 AND is_last_status = TRUE THEN TRUE 
-        ELSE FALSE 
-    END AS is_republished, 
-    ts_status_started,
-    ts_status_ended,
-    ts_last_update, 
-    ts_load
-FROM
-    aux
+        WHEN status_history = 'Publicado' THEN IF(DATE_DIFF('week', ts_started_date, ts_ended_date) = 0, 1, DATE_DIFF('week', ts_started_date, ts_ended_date))
+        ELSE NULL 
+    END AS weeks_published,
+    CASE 
+        WHEN status_history = 'Despublicado' THEN IF(DATE_DIFF('week', ts_started_date, ts_ended_date) = 0, 1, DATE_DIFF('week', ts_started_date, ts_ended_date))
+        ELSE NULL 
+    END AS weeks_unpublished,
+    ts_started_date,
+    CASE 
+        WHEN ts_ended_date = FIRST_VALUE(ts_ended_date) OVER (PARTITION BY 1 ORDER BY ts_ended_date DESC) THEN NULL 
+        ELSE ts_ended_date
+    END AS ts_ended_date, 
+    FIRST_VALUE(ts_ended_date) OVER (PARTITION BY 1 ORDER BY ts_ended_date DESC) AS ts_load 
+FROM 
+    df_grouping 
 
