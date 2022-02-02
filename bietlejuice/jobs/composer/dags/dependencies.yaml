@@ -19,10 +19,14 @@ bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.big_agent:load-clean-house
   - bietlejuice.big_agent:load-clean-program
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
+  - bietlejuice.dw_contract:load-public-dim-contract-into-redshift
+  - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
   - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
   - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
   - bietlejuice.dw_listing_jobs:load-public-dim-photo-job-into-redshift
+  - bietlejuice.dw_listing_jobs:load-public-fact-photo-job-into-redshift
   - bietlejuice.dw_offer:load-public-dim-offer-into-redshift
+  - bietlejuice.dw_proposal:load-public-dim-proposal-into-redshift
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
   - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
   - bietlejuice.dw_sale_listings:load-sale-dim-listing-into-redshift
@@ -31,6 +35,7 @@ bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.dw_user:load-public-dim-partner-into-redshift
   - bietlejuice.dw_user:load-public-dim-partner-agent-into-redshift
   - bietlejuice.dw_user:load-public-dim-user-into-redshift
+  - bietlejuice.dw_user_sales_rep:load-quintoandar-dim-user-sales-rep-into-redshift
   - bietlejuice.ebdb:create-clean-access-authorization-type-in-data-lake
   - bietlejuice.ebdb:create-clean-access-type-in-data-lake
   - bietlejuice.ebdb:create-clean-access-type-aud-in-data-lake

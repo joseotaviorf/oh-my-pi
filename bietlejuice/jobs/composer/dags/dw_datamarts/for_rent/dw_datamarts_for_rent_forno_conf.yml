@@ -52,3 +52,34 @@ pipeline:
       <<: *athena_anchor
       sql_file: dw/queries/datamarts/for_rent/repressed_demand.sql
       table: repressed_demand
+  credit_proposal_attribute:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_rent/credit_proposal_attribute.sql
+      table: credit_proposal_attribute
+  funnel_credit_event_flows:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_rent/funnel_credit_event_flows.sql
+      table: funnel_credit_event_flows
+  funnel_weekly_credit_user_flow:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_rent/funnel_weekly_credit_user_flow.sql
+      table: funnel_weekly_credit_user_flow
+      depends_on:
+        - funnel_demand_flows
+  funnel_monthly_credit_user_flow:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_rent/funnel_monthly_credit_user_flow.sql
+      table: funnel_monthly_credit_user_flow
+      depends_on:
+        - funnel_demand_flows
+  lead_listing_flows:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_rent/lead_listing_flows.sql
+      table: lead_listing_flows
+      depends_on:
+        - quintoandar_consultant_listings
