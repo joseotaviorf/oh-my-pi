@@ -489,6 +489,7 @@ bietlejuice.enrich_booking:
   - bietlejuice.ebdb:create-clean-visit-in-data-lake
   - bietlejuice.ebdb:create-clean-visit-origin-in-data-lake
   - bietlejuice.ebdb:create-clean-visitor-in-data-lake
+  - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.gsheets:load-clean-from-to-cancellation
 
 bietlejuice.enrich_brand_tracking:
