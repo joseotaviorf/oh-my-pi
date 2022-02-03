@@ -40,7 +40,7 @@ pipeline:
         target: github_access_token
     when:
       event: push
-      branch: [ forno, master ]
+      branch: [ forno, master, hotfix/* ]
 
   install-dependencies-ec2-forno:
     group: ec2-install
@@ -92,7 +92,7 @@ pipeline:
     secrets: [ rsync_key ]
     when:
       event: push
-      branch: [ master ]
+      branch: [ master, hotfix/* ]
 
   load-jobs-ec2-forno:
     group: ec2-updated_jobs
@@ -122,7 +122,7 @@ pipeline:
     secrets: [ rsync_key ]
     when:
       event: push
-      branch: [ master ]
+      branch: [ master, hotfix/* ]
 
   load-plugins-ec2-forno:
     group: ec2-updated_jobs
@@ -150,7 +150,7 @@ pipeline:
     secrets: [ rsync_key ]
     when:
       event: push
-      branch: [ master ]
+      branch: [ master, hotfix/* ]
 
 #  =======================================================================
 # =============================== PYTHON 3 ===============================
@@ -203,6 +203,7 @@ pipeline:
       branch:
         exclude:
           - master
+          - hotfix/*
 
   validate-dags-dependencies-prod:
     group: tests
@@ -214,7 +215,7 @@ pipeline:
       - make validate-dags-dependencies
     when:
       event: push
-      branch: master
+      branch: [master, hotfix/*]
 
   validate-atlas-metadata-files:
     group: tests
@@ -224,6 +225,9 @@ pipeline:
       - make validate-atlas-metadata-files
     when:
       event: push
+      branch:
+        exclude:
+          - hotfix/* # excluding this branch since the process validates master's code
 
   validate-metadata-files-exist:
     group: tests
@@ -233,6 +237,9 @@ pipeline:
       - make validate-metadata-files-exist
     when:
       event: push
+      branch:
+        exclude:
+          - hotfix/* # excluding this branch since the process validates master's code
 
   make-package-python3:
     group: package
@@ -241,7 +248,7 @@ pipeline:
       - make package-python3
     when:
       event: [ push, tag ]
-      branch: [ master, forno ]
+      branch: [ master, forno, hotfix/* ]
 
   prepare-release-python3-forno:
     group: release
@@ -259,7 +266,7 @@ pipeline:
       - find . -wholename "./dist/bi_etl_ejuice-*-py3-none-any.whl" -exec cp '{}' ./dist/bi_etl_ejuice-latest-py3-none-any.whl \;
     when:
       event: [ push, tag ]
-      branch: master
+      branch: [master, hotfix/*]
 
   export-releases-to-s3-prod:
     group: export
@@ -273,7 +280,7 @@ pipeline:
     cache_control: no-cache
     when:
       event: [ push, tag ]
-      branch: master
+      branch: [master, hotfix/*]
 
   export-releases-to-s3-new-prod-account:
     group: export
@@ -287,7 +294,7 @@ pipeline:
     cache_control: no-cache
     when:
       event: [ push, tag ]
-      branch: master
+      branch: [master, hotfix/*]
 
   export-releases-to-s3-forno:
     group: export
@@ -333,7 +340,7 @@ pipeline:
         target: google_application_credentials
     when:
       event: push
-      branch: [ master ]
+      branch: [master, hotfix/*]
 
   load-spark-jobs-s3-forno:
     group: update_jobs
@@ -363,7 +370,7 @@ pipeline:
       - python scripts/upload_spark_jobs_to_s3.py 5a-databricks
     when:
       event: push
-      branch: master
+      branch: [master, hotfix/*]
 
   load-spark-jobs-s3-new-prod-account:
     group: update_jobs
@@ -373,7 +380,7 @@ pipeline:
       - python scripts/upload_spark_jobs_to_s3.py databricks.s3.data.quintoandar.com.br
     when:
       event: push
-      branch: master
+      branch: [master, hotfix/*]
 
   load-atlas-metadata-files-to-s3-forno:
     group: update_jobs
@@ -393,7 +400,7 @@ pipeline:
       - python scripts/upload_atlas_metadata_files_to_s3.py data-documentation.s3.data.quintoandar.com.br
     when:
       event: push
-      branch: master
+      branch: [master, hotfix/*]
 
 #  =======================================================================
 # =============================== Common ===============================
@@ -420,7 +427,7 @@ pipeline:
     secrets: [ sonar_password, github_access_token ]
     when:
       event: pull_request
-      branch: [ master ]
+      branch: [ master, hotfix/* ]
 
   sonar-report:
     group: common-sonar
@@ -443,4 +450,4 @@ pipeline:
     secrets: [ sonar_password, github_access_token ]
     when:
       event: push
-      branch: [ master ]
+      branch: [ master, hotfix/* ]

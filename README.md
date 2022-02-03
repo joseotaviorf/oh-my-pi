@@ -507,6 +507,18 @@ Furthermore:
 
 You can enable some extra features like an _Auto Refresh_ button on the DAG's page with [this chrome extension](https://chrome.google.com/webstore/detail/airflow-lifunf/eloabhccocaamibhganmeogabcenidfa)
 
+### Hotfixes :fire:
+If you need to urgent deploy a change you can use the _hotfix_ flow:
+1. Create a branch named `hotfix/<your_fix_name>` from the **most recent master version** and implement your fixes.
+2. Verify that all the automated checks and validation are passing for your branch.
+3. Push it to origin: `git push --set-upstream origin hotfix/<your_fix_name>`. 
+_Note: Once you pushed your branch to origin, it
+will be deployed to production environments, therefore **do it wisely**. Also an alert will be thrown in 
+chanel [#de-warroom](https://quintoandar.slack.com/archives/G016M1LEX7Y)_
+4. Open a PR with your modifications following our normal PR's pair revisions flow.
+5. After the PR is reviewed, merge it to master (this step only guarantees our pair quality check. Since your 
+modifications are already in master and prod envs =] ).
+
 ## Folders structure
 
 ```
