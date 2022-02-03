@@ -84,33 +84,6 @@ def create_fact_agent_allocations(table_name, execution_date, **kwargs):
                     schema='agent')
 
 
-def create_dim_agent_review(**kwargs):
-    exec_date = kwargs['execution_date']
-    ar = Agent(bucket_datalake)
-    ar.truncate_table(schema='public',
-                      table='agent_review',
-                      enumdb=EnumDB.BI_ODS)
-    rev_data = ar.get_agent_data(table_name='agent_review',
-                                 db_enum=EnumDB.QuintoAndar_ebdb,
-                                 dt=exec_date)
-    ar.move_data_to_destination(data=rev_data, table_name='agent_review')
-
-
-def load_dim_agent_review_dw():
-    ar = Agent(bucket_datalake)
-    ar.truncate_table(schema='public',
-                      table='dim_agent_review',
-                      enumdb=EnumDB.BI_DW)
-    BaseETL.move_table_to_dw('vw_dim_agent_review',
-                             EnumDB.BI_ODS,
-                             EnumDB.BI_DW,
-                             table_name_dest='public.dim_agent_review',
-                             append=False)
-    ar.insert_dummy(table_name='dim_agent_review',
-                    key_column='sk_agentreview, sk_booking',
-                    value='-1,-1')
-
-
 def xcom_fact_agent_daily_allocations(**kwargs):
     exec_date = str(datetime.date(kwargs['execution_date']))
     xcom.xcom_push(kwargs['ti'], exec_date)
@@ -235,23 +208,6 @@ create_fact_photographer_hourly_allocations = BaseDAG.build_python_operator(
     }
 )
 
-# Creates dim_agent_review in ODS
-create_dim_agent_review = BaseDAG.build_python_operator(
-    dag=dag,
-    task_id='create_dim_agent_review',
-    provide_context=True,
-    python_callable=create_dim_agent_review,
-    op_kwargs=None
-)
-
-# Moves dim_agent_review from ODS to DW
-load_dim_agent_review_dw = BaseDAG.build_python_operator(
-    dag=dag,
-    task_id='load_dim_agent_review_dw',
-    python_callable=load_dim_agent_review_dw,
-    op_kwargs=None
-)
-
 # Creates push xcom
 xcom_fact_agent_daily_allocations = BaseDAG.build_python_operator(
     dag=dag,
@@ -281,7 +237,6 @@ enrich_ebdb_agents_dep = S3KeySensor(
 )
 
 enrich_ebdb_agents_dep >> update_agent_region_ods
-enrich_ebdb_agents_dep >> create_dim_agent_review
 enrich_ebdb_agents_dep >> create_agent_contract_dw
 
 update_agent_region_ods >> group_agent_region_ods >> load_group_agent_region_dw >> create_dim_agent_region_dw
@@ -295,4 +250,3 @@ create_agent_contract_dw.set_downstream(
      create_fact_photographer_hourly_allocations]
 )
 create_fact_agent_daily_allocations >> xcom_fact_agent_daily_allocations
-create_dim_agent_review >> load_dim_agent_review_dw

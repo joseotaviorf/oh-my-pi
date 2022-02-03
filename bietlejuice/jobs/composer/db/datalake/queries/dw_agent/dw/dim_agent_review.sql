@@ -1,6 +1,6 @@
 SELECT -- TODO [ODS] we are following ODS current structure. The table structure should be updated later
     id_booking AS sk_agentreview,
-    id_booking,
+    id_booking AS sk_booking,
     rating,
     tag_other,
     CAST(is_punctual AS INTEGER) AS flg_punctuality,
