@@ -1,5 +1,0 @@
-# Config for buyer_visit_lead_flows
----
-streams:
-  - direction: 'upstream'
-    task_ids: ['dw_temp_sale_offers']

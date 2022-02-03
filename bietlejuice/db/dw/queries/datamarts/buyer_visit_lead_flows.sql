@@ -384,17 +384,19 @@ UNION ALL
             sfo.sk_house,
             sfo.sk_offer,
             offer_flow,
-            business_unit,
+            sdo.business_unit,
             sfo.sk_region AS sk_region_first_offer,
             TO_DATE(dd_os.date, 'YYYY-MM-DD') AS dt_offer_submitted,
             COALESCE(TO_DATE(dd_ccv.date, 'YYYY-MM-DD')) AS dt_sale_agreement_signed
         FROM unique_user_client_lead_classifieds uu
-        JOIN datamarts.temp_sale_offers sfo
+        JOIN sale.fact_offers sfo
             ON uu.id_user = sfo.sk_buyer
         LEFT JOIN dim_date dd_os
             ON dd_os.sk_date = sfo.sk_offer_submitted_date
         LEFT JOIN dim_date dd_ccv
             ON dd_ccv.sk_date = sfo.sk_sale_agreement_signed_date
+        INNER JOIN sale.dim_offer sdo
+            ON sdo.sk_offer = sfo.sk_offer
 
         UNION ALL
 
