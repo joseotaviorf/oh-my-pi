@@ -2,8 +2,7 @@
 ---
 streams:
   - direction: 'upstream'
-    task_ids: ['dw_temp_sale_offers',
-               'athena_houses_3p',
+    task_ids: ['athena_houses_3p',
                'athena_agents_3p']
 composer_dependencies:
  - dw_datamarts_for_rent
