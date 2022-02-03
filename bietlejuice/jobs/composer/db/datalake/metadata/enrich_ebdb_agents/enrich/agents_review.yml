@@ -14,3 +14,33 @@ columns:
   ts_rating_created:
     lineage:
       - datalake_ebdb_clean.real_estate_agent_rating.ts_created
+  is_punctual:
+    lineage:
+      - datalake_ebdb_agents.rating_label.is_label_punctuality
+  is_agent_well_informed:
+    lineage:
+      - datalake_ebdb_agents.rating_label.is_label_agent_well_informed
+  is_kind:
+    lineage:
+      - datalake_ebdb_agents.rating_label.is_label_kindness
+  is_not_kind:
+    lineage:
+      - datalake_ebdb_agents.rating_label.is_label_no_kindness
+  is_house_as_listing:
+    lineage:
+      - datalake_ebdb_agents.rating_label.is_label_house_as_listing
+  is_house_not_as_listing:
+    lineage:
+      - datalake_ebdb_agents.rating_label.is_label_house_not_as_listing
+  is_other_positive_reason:
+    lineage:
+      - datalake_ebdb_agents.rating_label.is_label_other_reason_positive
+  is_other_negative_reason:
+    lineage:
+      - datalake_ebdb_agents.rating_label.is_label_other_reason_negative
+  is_agent_late:
+    lineage:
+      - datalake_ebdb_agents.rating_label.is_label_agent_late
+  is_agent_without_info:
+    lineage:
+      - datalake_ebdb_agents.rating_label.is_label_agent_with_no_info

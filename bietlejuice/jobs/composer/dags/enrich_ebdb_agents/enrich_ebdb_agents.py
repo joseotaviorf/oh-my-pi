@@ -47,7 +47,7 @@ CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
     "destination"
 ] = f"{spark_jobs_logs_path}{DAG_ID}"
 
-
+# dependent: [dependencies]
 INNER_DEPENDENCIES = {
     "agents_slots": [
         "agents_specific_weekly_schedule",
@@ -55,6 +55,7 @@ INNER_DEPENDENCIES = {
     ],
     "agents_slots_hourly": ["agents_slots"],
     "agents_weekly_schedule_history": ["slots_base_time"],
+    "agents_review": ["rating_label"],
 }
 
 dag = DAG(
