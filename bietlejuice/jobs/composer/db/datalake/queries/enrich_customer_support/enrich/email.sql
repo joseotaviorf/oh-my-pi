@@ -67,6 +67,9 @@ WITH zendesk_email AS (
   LEFT JOIN
     datalake_zendesk_tickets_clean.groups g
       ON g.id_group = t.id_group
+  WHERE
+    tfm.id_session IS NULL
+    AND tfm.id_call IS NULL
 ),
 csat AS (
     WITH last_update_ticket AS (
