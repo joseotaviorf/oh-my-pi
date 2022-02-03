@@ -1,7 +1,7 @@
 # Config for rental_cohort_conversions
 ---
-streams:
-  - direction: 'upstream'
-    task_ids: ['dw_funnel_demand_flows', 'dw_lead_listing_flows']
+# streams:
+#   - direction: 'upstream'
+#     task_ids: ['dw_lead_listing_flows']
 composer_dependencies: 
   - dw_datamarts_for_rent

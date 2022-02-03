@@ -2,5 +2,6 @@
 ---
 streams:
   - direction: 'upstream'
-    task_ids: ['dw_affiliates_clusters',
-               'dw_lead_listing_flows']
+    task_ids: ['dw_affiliates_clusters']
+composer_dependencies:
+ - dw_datamarts_for_rent

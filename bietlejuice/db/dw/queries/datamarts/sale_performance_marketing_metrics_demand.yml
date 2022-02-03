@@ -2,4 +2,6 @@
 ---
 streams:
   - direction: 'upstream'
-    task_ids: ['athena_talk_to_agent', 'dw_buyer_prospect_status']
+    task_ids: ['dw_buyer_prospect_status']
+composer_dependencies: 
+  - dw_datamarts_for_rent

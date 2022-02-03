@@ -1,5 +1,7 @@
 # Config for temp_supply_flows
 ---
-streams:
-  - direction: 'upstream'
-    task_ids: ['dw_lead_listing_flows']
+# streams:
+#   - direction: 'upstream'
+#     task_ids: ['dw_lead_listing_flows']
+composer_dependencies:
+ - dw_datamarts_for_rent

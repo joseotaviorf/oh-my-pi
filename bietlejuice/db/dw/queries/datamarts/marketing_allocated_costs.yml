@@ -2,5 +2,6 @@
 ---
 streams:
   - direction: 'upstream'
-    task_ids: ['athena_talk_to_agent',
-               'dw_marketing_campaigns_costs_and_volumes']
+    task_ids: ['dw_marketing_campaigns_costs_and_volumes']
+composer_dependencies: 
+  - dw_datamarts_for_rent
