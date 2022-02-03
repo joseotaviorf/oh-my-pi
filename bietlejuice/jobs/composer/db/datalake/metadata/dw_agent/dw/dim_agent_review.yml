@@ -1,0 +1,49 @@
+---
+database_name: dw_public
+table_name: dim_agent_review
+columns:
+  sk_agentreview:
+    lineage:
+      - datalake_ebdb_agents.agents_review.id_booking
+  id_booking:
+    lineage:
+      - datalake_ebdb_agents.agents_review.id_booking
+  rating:
+    lineage:
+      - datalake_ebdb_agents.agents_review.rating
+  tag_other:
+    lineage:
+      - datalake_ebdb_agents.agents_review.tag_other
+  flg_punctuality:
+    lineage:
+      - datalake_ebdb_agents.agents_review.is_punctual
+  flg_agent_well_informed:
+    lineage:
+      - datalake_ebdb_agents.agents_review.is_agent_well_informed
+  flg_kindness:
+    lineage:
+      - datalake_ebdb_agents.agents_review.is_kind
+  flg_no_kindness:
+    lineage:
+      - datalake_ebdb_agents.agents_review.is_not_kind
+  flg_house_as_listing:
+    lineage:
+      - datalake_ebdb_agents.agents_review.is_house_as_listing
+  flg_house_not_as_listing:
+    lineage:
+      - datalake_ebdb_agents.agents_review.is_house_not_as_listing
+  flg_other_reason_positive:
+    lineage:
+      - datalake_ebdb_agents.agents_review.is_other_positive_reason
+  flg_other_reason_negative:
+    lineage:
+      - datalake_ebdb_agents.agents_review.is_other_negative_reason
+  flg_agent_late:
+    lineage:
+      - datalake_ebdb_agents.agents_review.is_agent_late
+  flg_agent_with_no_info:
+    lineage:
+      - datalake_ebdb_agents.agents_review.is_agent_without_inf
+  dt_rating:
+    lineage:
+      - datalake_ebdb_agents.agents_review.ts_rating_created

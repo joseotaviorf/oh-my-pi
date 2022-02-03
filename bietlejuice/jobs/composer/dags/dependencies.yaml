@@ -56,6 +56,9 @@ bietlejuice.dw_datamarts_for_rent:
 bietlejuice.dw_affiliate_costs:
   - bietlejuice.enrich_robin_hood
 
+bietlejuice.dw_agent:
+  - bietlejuice.enrich_ebdb_agents:load-enrich-agents-review
+
 bietlejuice.dw_agents_availability:
   - bietlejuice.ebdb:create-clean-agent-data-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-booking-in-data-lake
