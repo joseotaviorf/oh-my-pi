@@ -270,13 +270,13 @@ loft_part AS (
             f.id_house,
             f.status_history,
             f.weeks_published, 
-            ROW_NUMBER() OVER (PARTITION BY id_house, status_history, week_start ORDER BY ts_status_started) AS order_status
+            ROW_NUMBER() OVER (PARTITION BY id_house, status_history, week_start ORDER BY ts_started_date) AS order_status
         FROM 
             datamarts.loft_status_listing_flows AS f
         JOIN 
             dim_date AS d
-                ON d.sk_date BETWEEN NULLIF(CAST(TO_CHAR(DATE(ts_status_started),'YYYYMMDD') AS BIGINT),-1) 
-                AND coalesce(NULLIF(CAST(TO_CHAR(DATE(ts_status_ended),'YYYYMMDD') AS BIGINT), -1), CAST(TO_CHAR(date(ts_load),'YYYYMMDD') AS BIGINT))
+                ON d.sk_date BETWEEN NULLIF(CAST(TO_CHAR(DATE(ts_started_date),'YYYYMMDD') AS BIGINT),-1) 
+                AND coalesce(NULLIF(CAST(TO_CHAR(DATE(ts_ended_date),'YYYYMMDD') AS BIGINT), -1), CAST(TO_CHAR(date(ts_load),'YYYYMMDD') AS BIGINT))
         WHERE 
             d.date = d.week_start
     ),
@@ -343,8 +343,8 @@ loft_part AS (
                 id_neighborhood,
                 neighborhood,
                 status_history,
-                ROW_NUMBER() OVER (PARTITION BY id_house, status_history ORDER BY ts_status_ended DESC) AS order_status,
-                ts_status_started
+                ROW_NUMBER() OVER (PARTITION BY id_house, status_history ORDER BY ts_ended_date DESC) AS order_status,
+                ts_started_date
             FROM datamarts.loft_status_listing_flows
         )
         SELECT 
@@ -357,7 +357,7 @@ loft_part AS (
             base
         JOIN 
             dim_date AS d
-                ON d.sk_date = CAST(TO_CHAR(DATE(ts_status_started),'YYYYMMDD') AS BIGINT)
+                ON d.sk_date = CAST(TO_CHAR(DATE(ts_started_date),'YYYYMMDD') AS BIGINT)
         WHERE 
             order_status = 1 
             AND status_history = 'Publicado'
@@ -374,7 +374,7 @@ loft_part AS (
             datamarts.loft_status_listing_flows
         JOIN 
             dim_date AS d
-                ON d.sk_date = CAST(TO_CHAR(date(ts_status_started),'YYYYMMDD') AS BIGINT)
+                ON d.sk_date = CAST(TO_CHAR(date(ts_started_date),'YYYYMMDD') AS BIGINT)
         WHERE 
             status_history = 'Despublicado'
             AND d.date = d.week_start
