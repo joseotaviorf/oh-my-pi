@@ -98,11 +98,13 @@ def build_table_tasks(entity_name, entity_pipeline):
         entity_pipeline["dw"], "schema"
     )  # TODO this value is not used in the job
     runs_on = get_option(entity_pipeline["dw"], "runs_on")
+    pool = "datamarts_redshift" if runs_on == "redshift" else "datamarts_athena"
 
     slugged_table_name = table.replace("_", "-")
     create_table_in_datalake_task = QuintoAndarDatabricksSubmitRunOperator(
         dag=DAG,
         task_id=f"create-{slugged_table_name}-in-datalake",
+        pool=pool,
         json={
             "spark_python_task": {
                 "python_file": f"{SPARK_JOBS_PATH}create_datamart_table_in_datalake.py",
