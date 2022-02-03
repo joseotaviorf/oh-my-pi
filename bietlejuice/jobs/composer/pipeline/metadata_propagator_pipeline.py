@@ -43,15 +43,15 @@ class MetadataPropagatorPipeline(AbstractPipeline):
                 f"Metadata sent to metadata-propagator service, payload={payload}, "
                 f"response={response}"
             )
-        except RequestException as exception:
-            if exception.response is not None:
-                logger.error(
+        except Exception as e:
+            if isinstance(e, RequestException) and e.response is not None:
+                raise RequestException(
                     f"Exception trying to call metadata-propagator service, "
-                    f"status_code={exception.response.status_code}, "
-                    f"error_message={exception.response.text}"
+                    f"status_code={e.response.status_code}, "
+                    f"error_message={e.response.text}"
                 )
             else:
-                logger.error(
+                raise Exception(
                     f"Exception trying to call metadata-propagator service, "
-                    f"exception={exception}"
+                    f"exception={e}"
                 )
