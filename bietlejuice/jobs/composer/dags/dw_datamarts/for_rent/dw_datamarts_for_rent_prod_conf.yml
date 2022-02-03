@@ -57,11 +57,15 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/for_rent/credit_proposal_attribute.sql
       table: credit_proposal_attribute
+      depends_on:
+        - quintoandar_consultant_listings       
   funnel_credit_event_flows:
     dw:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/for_rent/funnel_credit_event_flows.sql
       table: funnel_credit_event_flows
+      depends_on:
+        - funnel_demand_flows
   funnel_weekly_credit_user_flow:
     dw:
       <<: *redshift_anchor
