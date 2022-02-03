@@ -12,7 +12,7 @@ SELECT -- TODO [ODS] we are following ODS current structure. The table structure
     is_other_positive_reason AS flg_other_reason_positive,
     is_other_negative_reason AS flg_other_reason_negative,
     is_agent_late AS flg_agent_late,
-    is_agent_without_inf AS flg_agent_with_no_info,
+    is_agent_without_info AS flg_agent_with_no_info,
     ts_rating_created AS dt_rating,
     now() AS dt_timestamp
 FROM
