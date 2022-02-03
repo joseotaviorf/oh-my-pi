@@ -1,7 +1,7 @@
 SELECT
   eso.id_offer AS sk_offer,
   eso.sale_agreement_status,
-  eso.negotiation_model,
+  eso.offer_flow,
   eso.business_unit,
   eso.sale_agreement_cancellation_reason,
   eso.sale_price_agreed,
@@ -35,5 +35,7 @@ SELECT
   CAST(eso.dt_house_registry_ended AS TIMESTAMP) AS ts_house_registry_ended,
   CAST(eso.dt_sale_transacton_paid AS TIMESTAMP) AS ts_sale_transaction_paid,
   NOW() AS ts_load
-FROM datalake_offer.sale_offer eso
-WHERE eso.dt_sale_agreement_signed IS NOT NULL
+FROM
+  datalake_offer.sale_offer eso
+WHERE
+  eso.dt_sale_agreement_signed IS NOT NULL

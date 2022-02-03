@@ -8,9 +8,9 @@ columns:
   sale_agreement_status:
     lineage:
       - datalake_offer.sale_offer.sale_agreement_status
-  negotiation_model:
+  offer_flow:
     lineage:
-      - datalake_offer.sale_offer.negotiation_model
+      - datalake_offer.sale_offer.offer_flow
   business_unit:
     lineage:
       - datalake_offer.sale_offer.business_unit

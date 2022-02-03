@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS sale.dim_sale_agreement;
 CREATE TABLE sale.dim_sale_agreement (
     sk_offer VARCHAR PRIMARY KEY,
     sale_agreement_status VARCHAR,
-    negotiation_model VARCHAR,
+    offer_flow VARCHAR,
     business_unit VARCHAR,
     sale_agreement_cancellation_reason VARCHAR,
     sale_price_agreed FLOAT,

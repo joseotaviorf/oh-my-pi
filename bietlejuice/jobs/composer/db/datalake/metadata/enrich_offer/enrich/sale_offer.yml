@@ -130,10 +130,6 @@ columns:
     lineage:
       - datalake_firestore.monday.financing_bank
       - datalake_sale_offer_flows.sale_offer_flows.financing_bank
-  negotiation_model:
-    lineage:
-      - datalake_firestore.monday.negotiation_model
-      - datalake_sale_offer_flows.sale_offer_flows.negotiation_model
   sale_agreement_cancellation_reason:
     lineage:
       - datalake_firestore.monday.sale_agreement_cancellation_reason
