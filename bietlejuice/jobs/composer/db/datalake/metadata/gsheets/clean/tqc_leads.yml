@@ -16,6 +16,9 @@ columns:
   program_phase:
     lineage:
       - datalake_gsheets_raw.tqc_leads.program_phase
+  is_valid_lead:
+    lineage:
+      - datalake_gsheets_raw.tqc_leads.is_valid_lead
   ts_appointment:
     lineage:
       - datalake_gsheets_raw.tqc_leads.appointment_date
