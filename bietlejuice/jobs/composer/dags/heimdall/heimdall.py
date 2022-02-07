@@ -37,7 +37,7 @@ CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "30 4 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
 
 dag = DAG(
     dag_id=DAG_ID,
