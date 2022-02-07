@@ -3,7 +3,7 @@ import pendulum
 import os
 
 from airflow.utils.helpers import chain
-from airflow.models import DAG
+from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -30,17 +30,15 @@ config_service = ConfigurationService(DAG_NAME)
 
 SPECTRUM_IAM_ROLE = config_service.get_config("spectrum_iam_role")
 DATALAKE_BUCKET = config_service.get_config("datalake_bucket")
-ATHENA_QUERY_RESULT_LOCATION = config_service.get_config("athena_query_result_location")
-DOC_MD_BASE_URL = config_service.get_config("DOC_MD_BASE_URL")
+ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
+DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
 
-S3_PREFIX = config_service.get_config("databricks_bietlejuice_s3_prefix")
-SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base"
+REPO_PATH = config_service.get_config("databricks_bietlejuice_repo_path")
+SPARK_JOBS_PATH = f"{REPO_PATH}/spark_jobs/base"
 
-LOGS_OUTPUT_PATH = (
-    f"s3://{config_service.get_config('databricks_s3_bucket')}/logs/jobs/{DAG_ID}"
-)
+LOGS_OUTPUT_PATH = f"s3://{Variable.get('databricks_s3_bucket')}/logs/jobs/{DAG_ID}"
 
-CLUSTER_DESCRIPTION = config_service.get_config("databricks_default_cluster")
+CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 
 dag = DAG(
