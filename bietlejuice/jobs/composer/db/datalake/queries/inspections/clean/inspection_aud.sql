@@ -1,22 +1,31 @@
 SELECT
     id,
+    rev,
+    revtype AS rev_type,
+    revend AS rev_end,
     client_side_id AS id_client_side,
     contract_id AS id_contract,
     external_id AS id_external,
     inspector_id AS id_inspector,
     schedule_id AS id_schedule,
-    rev,
-    revtype AS rev_type,
+    contract,
+    house,
+    schedule,
     status,
     type,
+    contract_id_mod AS mod_id_contract,
+    external_id_mod AS mod_id_external,
+    inspector_id_mod AS mod_id_inspector,
+    schedule_id_mod AS mod_id_schedule,
+    contract_mod AS mod_contract,
+    house_mod AS mod_house,
+    schedule_mod AS mod_schedule,
+    status_mod AS mod_status,
+    type_mod AS mod_type,
+    uuid_mod AS mod_uuid,
+    created_at_mod AS mod_ts_created,
+    updated_at_mod AS mod_ts_updated,
     created_at AS ts_created,
-    updated_at AS ts_updated,
-    year,
-    month,
-    day
+    updated_at AS ts_updated
 FROM
     datalake_inspections_raw.inspection_aud
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

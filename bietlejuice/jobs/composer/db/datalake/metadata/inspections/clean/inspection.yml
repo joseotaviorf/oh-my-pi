@@ -41,12 +41,3 @@ columns:
   ts_updated:
     lineage:
       - datalake_inspections_raw.inspection.updated_at
-  year:
-    lineage:
-      - datalake_inspections_raw.inspection.year
-  month:
-    lineage:
-      - datalake_inspections_raw.inspection.month
-  day:
-    lineage:
-      - datalake_inspections_raw.inspection.day

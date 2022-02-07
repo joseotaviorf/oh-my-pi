@@ -12,25 +12,18 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-We load the following tables into the datalake Raw and Clean:
+We load the following tables into the datalake Raw and Clean via Full load:
 
-1. Via full load:
+- `inspection`
+- `inspection_aud`
+- `issue_type`
 - `item_group_type`
 - `item_type`
 - `room_type`
-
-2. Via incremental load:
-- `access_info`
-- `access_info_aud`
-- `inspection`
-- `inspection_aud`
-- `item_group_type_aud`
-- `item_type_aud`
 - `rev_info`
-- `room_type_aud`
 
 ### Responsible Data Team
 ​
-For any questions or concerns about this DAG, please contact the Data Engineering or Data Analytics team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
+For any questions or concerns about this DAG, please contact its owner.
 
 </details>

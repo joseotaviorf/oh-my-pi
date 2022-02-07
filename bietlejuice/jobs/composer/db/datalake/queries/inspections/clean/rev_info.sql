@@ -1,12 +1,5 @@
 SELECT
     rev,
-    TO_TIMESTAMP(revtstmp/1000) AS ts_created,
-    year,
-    month,
-    day
+    TO_TIMESTAMP(revtstmp/1000) AS ts_created
 FROM
     datalake_inspections_raw.revinfo
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

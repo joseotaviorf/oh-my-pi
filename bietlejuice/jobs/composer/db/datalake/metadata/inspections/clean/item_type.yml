@@ -5,9 +5,24 @@ columns:
   id:
     lineage:
       - datalake_inspections_raw.item_type.id
+  id_item_group_type:
+    lineage:
+      - datalake_inspections_raw.item_type.item_group_type_id
+  display_type:
+    lineage:
+      - datalake_inspections_raw.item_type.display_type
+  media_type:
+    lineage:
+      - datalake_inspections_raw.item_type.media_type
   type:
     lineage:
       - datalake_inspections_raw.item_type.type
+  allow_comments:
+    lineage:
+      - datalake_inspections_raw.item_type.allow_comments
+  allow_media:
+    lineage:
+      - datalake_inspections_raw.item_type.allow_media
   ts_created:
     lineage:
       - datalake_inspections_raw.item_type.created_at

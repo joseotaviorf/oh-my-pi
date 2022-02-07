@@ -1,0 +1,40 @@
+---
+database_name: datalake_inspections_clean
+table_name: issue_type
+columns:
+  id:
+    lineage:
+      - datalake_inspections_raw.issue_type.id
+  id_item_type:
+    lineage:
+      - datalake_inspections_raw.issue_type.item_type_id
+  inspection_type:
+    lineage:
+      - datalake_inspections_raw.issue_type.inspection_type
+  protected:
+    lineage:
+      - datalake_inspections_raw.issue_type.protected
+  repair_suggestion:
+    lineage:
+      - datalake_inspections_raw.issue_type.repair_suggestion
+  responsibility:
+    lineage:
+      - datalake_inspections_raw.issue_type.responsibility
+  severity:
+    lineage:
+      - datalake_inspections_raw.issue_type.severity
+  type:
+    lineage:
+      - datalake_inspections_raw.issue_type.type
+  enabled:
+    lineage:
+      - datalake_inspections_raw.issue_type.enabled
+  require_manual_analysis:
+    lineage:
+      - datalake_inspections_raw.issue_type.require_manual_analysis
+  ts_created:
+    lineage:
+      - datalake_inspections_raw.issue_type.created_at
+  ts_updated:
+    lineage:
+      - datalake_inspections_raw.issue_type.updated_at
