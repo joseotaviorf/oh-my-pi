@@ -803,6 +803,9 @@ bietlejuice.enrich_invoice:
   - bietlejuice.retsuko:load-clean-entry
   - bietlejuice.retsuko:load-clean-invoice
 
+bietlejuice.enrich_jira:
+  - bietlejuice.jira:load-clean-issues
+
 bietlejuice.enrich_kill_queue:
   - bietlejuice.kill_queue:load-clean-house
   - bietlejuice.kill_queue:load-clean-reservation

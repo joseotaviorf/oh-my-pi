@@ -1,0 +1,37 @@
+---
+database_name: datalake_jira
+table_name: issue_status_changes
+columns:
+  id_issue:
+    lineage:
+      - datalake_jira_clean.issues.key
+  id_change:
+    lineage:
+      - datalake_jira_clean.issues.change_log
+  id_author:
+    lineage:
+      - datalake_jira_clean.issues.change_log
+  field:
+    lineage:
+      - datalake_jira_clean.issues.change_log
+  field_type:
+    lineage:
+      - datalake_jira_clean.issues.change_log
+  from_queue:
+    lineage:
+      - datalake_jira_clean.issues.change_log
+  to_queue:
+    lineage:
+      - datalake_jira_clean.issues.change_log
+  author_email:
+    lineage:
+      - datalake_jira_clean.issues.change_log
+  author_name:
+    lineage:
+      - datalake_jira_clean.issues.change_log
+  is_author_active:
+    lineage:
+      - datalake_jira_clean.issues.change_log
+  ts_updated:
+    lineage:
+      - datalake_jira_clean.issues.change_log
