@@ -109,6 +109,7 @@ This pipeline produces the following output tables:
     - `marketshare_seasonality`
     - `media_plan_current_quarter`
     - `mkt_cost_per_source`
+    - `monday_users`
     - `mta_budget_october_2020`
     - `offer_fup_history`
     - `offers_hub_central`

@@ -1,0 +1,15 @@
+---
+database_name: datalake_gsheets_raw
+table_name: monday_users
+columns:
+  id_monday:
+    tags:
+      - PII
+      - Confidential
+  name:
+    tags:
+      - PII
+      - Confidential
+  email:
+    tags:
+      - Confidential

@@ -480,6 +480,11 @@ media_plan:
     sheet_name: media_plan
     clean_table_name: media_plan_current_quarter
 
+monday_users:
+    sheet_id: 1vB3GrQGLnx5fzJuVAjMVb2XzHpYepsfoSwN81rE1d-w
+    sheet_name: depara_monday_id_name
+    clean_table_name: monday_users
+
 mta_budget:
     sheet_id: 16HF0DnPTkCIG8oexncHizjhmoGyAJapvGVeA46mUCa4
     sheet_name: mta_budget

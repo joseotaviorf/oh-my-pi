@@ -1,0 +1,13 @@
+---
+database_name: datalake_gsheets_clean
+table_name: monday_users
+columns:
+  id_monday:
+    lineage:
+      - datalake_gsheets_raw.id_monday
+  user_name:
+    lineage:
+      - datalake_gsheets_raw.name
+  user_email:
+    lineage:
+      - datalake_gsheets_raw.email
