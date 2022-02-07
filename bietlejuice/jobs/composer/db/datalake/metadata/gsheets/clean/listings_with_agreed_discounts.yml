@@ -26,6 +26,6 @@ columns:
   fee_value:
     lineage:
       - datalake_gsheets_raw.listings_with_agreed_discounts.fee_value
-  dt_discount_registered:
+  ts_discount_registered:
     lineage:
        - datalake_gsheets_raw.listings_with_agreed_discounts.dt_discount_registered
