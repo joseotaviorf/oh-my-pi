@@ -12,10 +12,10 @@ with agents_class AS (
         datalake_sirena_clean.groups AS gr
             ON ag.id_group = gr.id
     WHERE
-        gr.group_name IN ('Closing', 'Deal Making')
+        gr.group_name IN ('Closing', 'Deal Making','QuintoAndar Expert','Casa Mineira','QuintoAndar Assessor','QuintoAndar Consultor')
 ),
 client_info AS (
-    SELECT
+    SELECT  
         id,
         CASE
             WHEN pr.last_name REGEXP '[0-9]{{9}}'
