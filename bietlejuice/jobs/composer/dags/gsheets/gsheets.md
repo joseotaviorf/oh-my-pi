@@ -117,6 +117,7 @@ This pipeline produces the following output tables:
     - `offline_manual_costs`
     - `offline_manual_share_city_group`
     - `offline_manual_share_cost_center`
+    - `ongoing_contracts_2020`
     - `owner_entrance_inspection_csat`
     - `owner_exit_inspection_csat`
     - `owner_negotiation_csat`

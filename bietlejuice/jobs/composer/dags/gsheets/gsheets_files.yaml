@@ -510,6 +510,11 @@ offline_and_branding_marketing_costs:
     sheet_name: offline_and_branding_marketing_costs
     clean_table_name: offline_and_branding_marketing_costs
 
+ongoing_contracts_2020:
+    sheet_id: 15I0puraewbgIZVwsfT6CEc0E4fewxbVxtINbQouOZBs
+    sheet_name: Query result
+    clean_table_name: ongoing_contracts_2020
+
 payments_deals_and_discounts:
     sheet_id: 1j0zGI74gyA6e4PWjk7yegpz5no6A102qHaIIvC1viCk
     sheet_name: form_requests
