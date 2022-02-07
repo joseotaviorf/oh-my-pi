@@ -515,6 +515,11 @@ ongoing_contracts_2020:
     sheet_name: Query result
     clean_table_name: ongoing_contracts_2020
 
+ongoing_contracts_2021:
+    sheet_id: 18bvm9oFbRcgF8XjMyP0zTTLgo_Zf2Qqu5HqalObHZ_4
+    sheet_name: Query result
+    clean_table_name: ongoing_contracts_2021
+
 payments_deals_and_discounts:
     sheet_id: 1j0zGI74gyA6e4PWjk7yegpz5no6A102qHaIIvC1viCk
     sheet_name: form_requests

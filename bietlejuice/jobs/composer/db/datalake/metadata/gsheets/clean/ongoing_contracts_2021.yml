@@ -1,0 +1,27 @@
+database_name: datalake_gsheets_clean
+table_name: ongoing_contracts_2021
+columns:
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.ongoing_contracts_2021.sk_contract
+  id_user:
+    lineage:
+      - datalake_gsheets_raw.ongoing_contracts_2021.sk_user
+  first_name:
+    lineage:
+      - datalake_gsheets_raw.ongoing_contracts_2021.first_name
+  email:
+    lineage:
+      - datalake_gsheets_raw.ongoing_contracts_2021.email
+  city:
+    lineage:
+      - datalake_gsheets_raw.ongoing_contracts_2021.cidade
+  state_abbreviation:
+    lineage:
+      - datalake_gsheets_raw.ongoing_contracts_2021.estado_abreviacao
+  contract_city:
+    lineage:
+      - datalake_gsheets_raw.ongoing_contracts_2021.contract_city
+  dt_started:
+    lineage:
+      - datalake_gsheets_raw.ongoing_contracts_2021.dt_start
