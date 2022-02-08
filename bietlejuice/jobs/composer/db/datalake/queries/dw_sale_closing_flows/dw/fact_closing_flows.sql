@@ -3,6 +3,7 @@ SELECT
   id_buyer AS sk_buyer,
   id_owner AS sk_owner,
   id_house AS sk_house,
+  COALESCE(CAST(REPLACE(SUBSTRING(dt_sale_agreement_created,1, 10),'-','') AS BIGINT), -1) AS sk_sale_agreement_created_date,
   COALESCE(CAST(REPLACE(SUBSTRING(dt_sale_agreement_signed,1, 10),'-','') AS BIGINT), -1) AS sk_sale_agreement_signed_date,
   COALESCE(CAST(REPLACE(SUBSTRING(dt_onboarding_ended,1, 10),'-','') AS BIGINT), -1) AS sk_onboarding_ended_date,
   COALESCE(CAST(REPLACE(SUBSTRING(dt_sale_agreement_cancelled,1, 10),'-','') AS BIGINT), -1) AS sk_sale_agreement_cancelled_date,
@@ -34,6 +35,7 @@ SELECT
   id_notes_registry_specialist,
   id_real_estate_register_specialist,
   --
+  days_sale_agreement_created_to_legaut_analysis_started,
   days_sale_agreement_signed_to_house_registry_started,
   days_sale_agreement_signed_to_house_registry_ended,
   days_sale_agreement_signed_to_sale_agreement_cancelled,

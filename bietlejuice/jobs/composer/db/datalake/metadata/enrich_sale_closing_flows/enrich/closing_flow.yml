@@ -54,6 +54,10 @@ columns:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.id_real_estate_register_specialist
       - datalake_firestore.monday.id_real_estate_register_specialist
+  days_sale_agreement_created_to_legaut_analysis_started:
+    lineage:
+      - datalake_offer.sale_offer.dt_sale_agreement_created
+      - datalake_sale_offer_flows.sale_offer_flows.dt_legaut_analysis_started
   days_sale_agreement_signed_to_house_registry_ended:
     lineage:
       - datalake_offer.sale_offer.dt_house_registry_ended
@@ -179,6 +183,9 @@ columns:
       - datalake_firestore.monday.dt_financing_ended
       - datalake_offer.sale_offer.dt_house_registry_started
       - datalake_sale_offer_flows.sale_offer_flows.dt_financing_ended
+  dt_sale_agreement_created:
+    lineage:
+      - datalake_offer.sale_offer.dt_sale_agreement_created
   dt_sale_agreement_signed:
     lineage:
       - datalake_offer.sale_offer.dt_sale_agreement_signed

@@ -4,6 +4,7 @@ CREATE TABLE sale.fact_closing_flows (
   sk_buyer BIGINT,
   sk_owner BIGINT,
   sk_house BIGINT,
+  sk_sale_agreement_created_date BIGINT,
   sk_sale_agreement_signed_date BIGINT,
   sk_onboarding_ended_date BIGINT,
   sk_sale_agreement_cancelled_date BIGINT,
@@ -35,6 +36,7 @@ CREATE TABLE sale.fact_closing_flows (
   id_notes_registry_specialist VARCHAR,
   id_real_estate_register_specialist VARCHAR,
   --
+  days_sale_agreement_created_to_legaut_analysis_started INTEGER,
   days_sale_agreement_signed_to_house_registry_started INTEGER,
   days_sale_agreement_signed_to_house_registry_ended INTEGER,
   days_sale_agreement_signed_to_sale_agreement_cancelled INTEGER,
