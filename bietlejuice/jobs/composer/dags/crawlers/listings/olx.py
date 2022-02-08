@@ -20,7 +20,7 @@ from bietlejuice.jobs.composer.services.configuration_service import (
 SOURCE = "crawlers"
 CONTEXT = f"listings"
 ORIGIN = f"olx"
-DAG_NAME = f"{ORIGIN}"
+DAG_NAME = f"{CONTEXT}.{ORIGIN}"
 SOURCE_WITH_CONTEXT = f"{SOURCE}_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 INTERMEDIATE_PATH = f"{SOURCE}/{CONTEXT}"
@@ -65,7 +65,7 @@ dag = DAG(
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
-    doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
+    doc_md=BaseDAG.get_dag_doc(ORIGIN).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
 )
@@ -106,7 +106,7 @@ clean_task_group = task_group.build_task_group_from_sql_files(
     layer=LayerEnum.CLEAN,
     source_database_base_name=SOURCE_WITH_CONTEXT,
     target_database_base_name=SOURCE_WITH_CONTEXT,
-    tree_path=f"{CONTEXT}/{DAG_NAME}/",
+    tree_path=f"{CONTEXT}/{ORIGIN}/",
     partitions=partition_cols,
 )
 
