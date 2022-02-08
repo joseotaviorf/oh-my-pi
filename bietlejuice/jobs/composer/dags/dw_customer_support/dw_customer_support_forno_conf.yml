@@ -1,6 +1,7 @@
 ---
 incremental_tables:
   - fact_agent_daily_productivity
+  - fact_agent_daily_achievement
 inner_dependencies:
   fact_agent_daily_achievement:
     - fact_agent_daily_productivity
