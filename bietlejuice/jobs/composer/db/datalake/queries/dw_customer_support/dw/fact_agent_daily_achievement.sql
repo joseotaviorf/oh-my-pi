@@ -9,7 +9,10 @@ WITH achievement AS (
         ap.total_tickets_resolution/rt.target_resolution AS resolution_rate_target_achievement,
         ap.total_tickets/rt.target_productivity AS closed_tickets_target_achievement,
         ap.avg_days_resolution_time/rt.target_frt AS avg_days_resolution_target_achievement,
-        ap.dt
+        ap.dt,
+        ap.year,
+        ap.month,
+        ap.day
     FROM 
         dw_customer_support.fact_agent_daily_productivity ap
     LEFT JOIN 
@@ -41,7 +44,10 @@ SELECT
     RANK() OVER (PARTITION BY s.dt ORDER BY s.achievement_weighted_score DESC) AS ranking_position,
     RANK() OVER (PARTITION BY s.dt, sk_department ORDER BY s.achievement_weighted_score DESC) AS department_ranking_position,
     s.dt,
-    NOW() AS ts_load
+    NOW() AS ts_load,
+    year,
+    month,
+    day
 FROM 
     score s
 LEFT JOIN

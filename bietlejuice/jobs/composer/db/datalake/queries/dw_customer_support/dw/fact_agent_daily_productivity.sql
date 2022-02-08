@@ -11,7 +11,7 @@ SELECT
   total_tickets,
   total_tickets_with_taxonomy,
   sum_ticket_resolution_time AS total_minutes_resolution_time,
-  (sum_ticket_resolution_time/total_tickets)/1440 AS avg_days_resolution_time,
+  CAST((sum_ticket_resolution_time/total_tickets)/1440 AS FLOAT) AS avg_days_resolution_time,
   total_crm_tasks_solved,
   agent_age_in_months,
   dt,
