@@ -29,6 +29,7 @@ dags_out_of_pattern:
         "portal_casa_mineira_pipedrive",
         "quintoandar",
         "regions_polygon",
+        "reverse_tracksale",
     ]
 databricks_bietlejuice_repo_path: s3://5a-databricks/github-repos/bi-etl-ejuice
 datalake_bucket: 5a-datalake-prod
