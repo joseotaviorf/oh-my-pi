@@ -37,6 +37,10 @@ columns:
   total_minutes_resolution_time:
     lineage:
       - datalake_analyst_ranking.ranking.sum_ticket_resolution_time
+  avg_days_resolution_time:
+    lineage:
+      - datalake_analyst_ranking.ranking.sum_ticket_resolution_time
+      - datalake_analyst_ranking.ranking.total_tickets
   total_crm_tasks_solved:
     lineage:
       - datalake_analyst_ranking.ranking.total_crm_tasks_solved
