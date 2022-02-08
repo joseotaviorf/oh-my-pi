@@ -1,0 +1,49 @@
+---
+database_name: datalake_crawlers_listings_clean
+table_name: em_casa
+columns:
+  id:
+    lineage:
+      - datalake_crawlers_listings_raw.emcasa.id
+  image_urls:
+    lineage:
+      - datalake_crawlers_listings_raw.emcasa.image_urls
+  geolocation:
+    lineage:
+      - datalake_crawlers_listings_raw.emcasa.geolocation
+  listing_name:
+    lineage:
+      - datalake_crawlers_listings_raw.emcasa.name
+  address:
+    lineage:
+      - datalake_crawlers_listings_raw.emcasa.address
+  crawl_metadata:
+    lineage:
+      - datalake_crawlers_listings_raw.emcasa.crawl_metadata
+  metadata:
+    lineage:
+      - datalake_crawlers_listings_raw.emcasa.metadata
+  price:
+    lineage:
+      - datalake_crawlers_listings_raw.emcasa.price
+  type:
+    lineage:
+      - datalake_crawlers_listings_raw.emcasa.type
+  house_info:
+    lineage:
+      - datalake_crawlers_listings_raw.emcasa.house_info
+  date_info:
+    lineage:
+      - datalake_crawlers_listings_raw.emcasa.date_info
+  city:
+    lineage:
+      - datalake_crawlers_listings_raw.emcasa.city
+  year:
+    lineage:
+      - datalake_crawlers_listings_raw.emcasa.year
+  month:
+    lineage:
+      - datalake_crawlers_listings_raw.emcasa.month
+  day:
+    lineage:
+      - datalake_crawlers_listings_raw.emcasa.day

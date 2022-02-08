@@ -5,4 +5,6 @@ olx:
   origin: 'olx'
 viva_real:
   origin: 'vivareal'
+em_casa:
+  origin: 'emcasa'
 partition_cols: ["city", "year", "month", "day"]
