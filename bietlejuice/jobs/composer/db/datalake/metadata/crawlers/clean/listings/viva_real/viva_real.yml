@@ -4,52 +4,52 @@ table_name: viva_real
 columns:
   id:
     lineage:
-      - datalake_crawlers_raw.vivareal.id
+      - datalake_crawlers_listings_raw.vivareal.id
   origin:
     lineage:
-      - datalake_crawlers_raw.vivareal.origin
+      - datalake_crawlers_listings_raw.vivareal.origin
   address:
     lineage:
-      - datalake_crawlers_raw.vivareal.address
+      - datalake_crawlers_listings_raw.vivareal.address
   region:
     lineage:
-      - datalake_crawlers_raw.vivareal.region
+      - datalake_crawlers_listings_raw.vivareal.region
   geolocation:
     lineage:
-      - datalake_crawlers_raw.vivareal.geolocation
+      - datalake_crawlers_listings_raw.vivareal.geolocation
   listing_name:
     lineage:
-      - datalake_crawlers_raw.vivareal.name
+      - datalake_crawlers_listings_raw.vivareal.name
   crawl_metadata:
     lineage:
-      - datalake_crawlers_raw.vivareal.crawl_metadata
+      - datalake_crawlers_listings_raw.vivareal.crawl_metadata
   house_info:
     lineage:
-      - datalake_crawlers_raw.vivareal.house_info
+      - datalake_crawlers_listings_raw.vivareal.house_info
   type:
     lineage:
-      - datalake_crawlers_raw.vivareal.type
+      - datalake_crawlers_listings_raw.vivareal.type
   image_urls:
     lineage:
-      - datalake_crawlers_raw.vivareal.image_urls
+      - datalake_crawlers_listings_raw.vivareal.image_urls
   contact_information:
     lineage:
-      - datalake_crawlers_raw.vivareal.contact_information
+      - datalake_crawlers_listings_raw.vivareal.contact_information
   price:
     lineage:
-      - datalake_crawlers_raw.vivareal.price
+      - datalake_crawlers_listings_raw.vivareal.price
   date_info:
     lineage:
-      - datalake_crawlers_raw.vivareal.date_info
+      - datalake_crawlers_listings_raw.vivareal.date_info
   city:
     lineage:
-      - datalake_crawlers_raw.vivareal.city
+      - datalake_crawlers_listings_raw.vivareal.city
   year:
     lineage:
-      - datalake_crawlers_raw.vivareal.year
+      - datalake_crawlers_listings_raw.vivareal.year
   month:
     lineage:
-      - datalake_crawlers_raw.vivareal.month
+      - datalake_crawlers_listings_raw.vivareal.month
   day:
     lineage:
-      - datalake_crawlers_raw.vivareal.day
+      - datalake_crawlers_listings_raw.vivareal.day
