@@ -91,7 +91,7 @@ events_base AS (
         JOIN dim_region AS dr
             USING(sk_region)
     WHERE
-        dsa.sale_agreement_status = 'Assinado'
+        sk_sale_agreement_signed_date > 0
 ),
 churn_dates AS (
     SELECT
