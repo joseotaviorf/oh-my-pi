@@ -8,7 +8,7 @@ WITH achievement AS (
         ap.total_csat_satisfied_score/rt.target_csat AS csat_satisfied_target_achievement,
         ap.total_tickets_resolution/rt.target_resolution AS resolution_rate_target_achievement,
         ap.total_tickets/rt.target_productivity AS closed_tickets_target_achievement,
-        ap.avg_days_resolution_time/rt.target_frt AS avg_days_resolution_target_achievement,
+        ((ap.total_minutes_resolution_time/ap.total_tickets)/1440.0)/rt.target_frt AS avg_days_resolution_target_achievement,
         ap.dt,
         ap.year,
         ap.month,
