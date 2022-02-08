@@ -13,7 +13,6 @@ from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
-from bietlejuice.jobs.composer.dags.crawlers.listings.loft import ORIGIN
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
@@ -23,7 +22,7 @@ CRAWLER_ORIGIN = f"em_casa"
 
 SOURCE = "crawlers"
 CONTEXT = SOURCE
-DAG_NAME = f"{CRAWLER_CONTEXT}.{ORIGIN}"
+DAG_NAME = f"{CRAWLER_CONTEXT}.{CRAWLER_ORIGIN}"
 
 SOURCE_WITH_CONTEXT = f"{SOURCE}_{CRAWLER_CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
