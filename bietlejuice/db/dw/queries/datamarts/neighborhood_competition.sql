@@ -9,7 +9,6 @@ WITH qa_part AS (
             CAST(h.lng AS VARCHAR) AS lng,
             l.price AS price,
             l.price/NULLIF(h.total_area::FLOAT, 0) AS price_m2,
-            h.type AS type,
             FALSE AS is_platform_property,
             h.ts_updated
         FROM 
@@ -19,6 +18,7 @@ WITH qa_part AS (
                 ON h.sk_house = l.sk_house 
         WHERE 
             l.status IN ('PUBLISHED', 'UNPUBLISHED')
+            AND h.type IN ('Apartamento', 'StudioOuKitchenette') 
     ),
     loft_listings_to_distance AS ( 
         SELECT 
@@ -66,8 +66,7 @@ WITH qa_part AS (
             dd.nearby_other_platform_houses,
             dd.avg_nearby_price_m2,
             dd.avg_distance,
-            q.ts_updated,
-            q.type
+            q.ts_updated
         FROM
             qa_listings_raw AS q
         LEFT JOIN
@@ -85,7 +84,6 @@ WITH qa_part AS (
             d.week_start,
             d.weekday_name,
             h.price_m2,
-            h.type, 
             ROW_NUMBER() OVER(PARTITION BY f.sk_sale_listing, d.date ORDER BY f.ts_status_started DESC) AS order_status,
             h.is_platform_property,
             h.is_exclusive
@@ -139,8 +137,7 @@ WITH qa_part AS (
         FROM  
             ol
         WHERE 
-            type IN ('Apartamento', 'StudioOuKitchenette') 
-            AND TRUNC(week_start) >= TO_DATE('2021-08-1', 'YYYY-MM-DD')
+            TRUNC(week_start) >= TO_DATE('2021-08-1', 'YYYY-MM-DD')
         GROUP BY 
             1, 2
     ),
@@ -152,8 +149,7 @@ WITH qa_part AS (
         FROM  
             ol
         WHERE 
-            type IN ('Apartamento', 'StudioOuKitchenette') 
-            AND TRUNC(week_start) >= TO_DATE('2021-08-1', 'YYYY-MM-DD')
+            TRUNC(week_start) >= TO_DATE('2021-08-1', 'YYYY-MM-DD')
         GROUP BY 
             1, 2
     ),
@@ -230,12 +226,14 @@ WITH qa_part AS (
         r.city_name AS city,
         r.name AS neighborhood, 
         me.ongoing_listings,
-        (CAST((me.ongoing_listings - LAG(me.ongoing_listings, 1) OVER (PARTITION by r.sk_region ORDER BY me.week_start)) AS FLOAT)/NULLIF(me.ongoing_listings, 0)) * 100 AS ol_variation,
+        COALESCE((CAST((me.ongoing_listings - LAG(me.ongoing_listings, 1) OVER (PARTITION by r.sk_region ORDER BY me.week_start)) AS FLOAT)/NULLIF(me.ongoing_listings, 0)) * 100, 0) AS ol_variation,
         me.property_listings,
         me.exclusive_listings AS uniqueness_listings,
-        (CAST((me.exclusive_listings - LAG(me.exclusive_listings, 1) OVER (PARTITION by r.sk_region ORDER BY me.week_start)) AS FLOAT)/NULLIF(me.exclusive_listings, 0)) * 100 AS uniqueness_variation,
-        CAST(me.exclusive_listings AS FLOAT)/NULLIF(me.ongoing_listings, 0) AS proportion_uniqueness_listings,
+        COALESCE((CAST((me.exclusive_listings - LAG(me.exclusive_listings, 1) OVER (PARTITION by r.sk_region ORDER BY me.week_start)) AS FLOAT)/NULLIF(me.exclusive_listings, 0)) * 100, 0) AS uniqueness_variation,
+        COALESCE(CAST(me.exclusive_listings AS FLOAT)/NULLIF(me.ongoing_listings, 0), 0) AS proportion_uniqueness_listings,
+        COALESCE(pb.publications, 0) AS publications,
         COALESCE(fl.first_listings, 0) AS first_listings,
+        (COALESCE(pb.publications, 0) - COALESCE(fl.first_listings, 0)) AS republications,
         COALESCE(dp.depublication, 0) AS depublication,
         COALESCE(dp.depublication, 0)/NULLIF(me.ongoing_listings, 0) AS unpl_by_ol,
         CAST(COALESCE(pb.publications, 0) - COALESCE(dp.depublication, 0) AS FLOAT)/NULLIF(me.ongoing_listings, 0) AS pl_variation,
@@ -266,118 +264,107 @@ WITH qa_part AS (
 loft_part AS (
     WITH base AS (
         SELECT 
-            d.week_start,
-            f.id_house,
-            f.status_history,
-            f.weeks_published, 
-            ROW_NUMBER() OVER (PARTITION BY id_house, status_history, week_start ORDER BY ts_started_date) AS order_status
+            id_house, 
+            id_neighborhood,
+            neighborhood,
+            status_history,
+            is_last_status, 
+            ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY ts_started_date) AS order_status,
+            ts_started_date,
+            ts_ended_date 
         FROM 
-            datamarts.loft_status_listing_flows AS f
+            datamarts.loft_status_listing_flows
+    ), 
+    ongoing_listings AS (
+        SELECT 
+            d.week_start,
+            b.id_house, 
+            b.id_neighborhood,
+            b.neighborhood, 
+            b.status_history, 
+            b.is_last_status, 
+            b.order_status, 
+            b.ts_started_date,
+            b.ts_ended_date
+        FROM 
+            base AS b
         JOIN 
-            dim_date AS d
-                ON d.sk_date BETWEEN NULLIF(CAST(TO_CHAR(DATE(ts_started_date),'YYYYMMDD') AS BIGINT),-1) 
-                AND coalesce(NULLIF(CAST(TO_CHAR(DATE(ts_ended_date),'YYYYMMDD') AS BIGINT), -1), CAST(TO_CHAR(date(ts_load),'YYYYMMDD') AS BIGINT))
-        WHERE 
-            d.date = d.week_start
+           dim_date AS d
+               ON d.sk_date BETWEEN NULLIF(CAST(TO_CHAR(DATE(b.ts_started_date),'YYYYMMDD') AS BIGINT),-1) 
+               AND coalesce(NULLIF(CAST(TO_CHAR(DATE(b.ts_ended_date),'YYYYMMDD') AS BIGINT), -1), CAST(TO_CHAR(CURRENT_DATE, 'YYYYMMDD') AS BIGINT) - 1)
+        GROUP BY 
+            1, 2, 3, 4, 5, 6, 7, 8, 9
     ),
     metrics AS (
         SELECT 
-            b.week_start,
-            l.id_neighborhood, 
-            l.neighborhood,
-            l.city, 
+            ol.week_start,
+            ol.id_neighborhood, 
+            h.city, 
+            ol.neighborhood,
             COUNT(
                 DISTINCT 
                     CASE 
-                        WHEN status_history = 'Publicado' THEN b.id_house 
+                        WHEN ol.status_history = 'Publicado' THEN ol.id_house 
                         ELSE NULL 
                     END) AS ongoing_listings,
             COUNT(
                 DISTINCT 
                     CASE 
-                        WHEN status_history = 'Despublicado' THEN b.id_house 
-                        ELSE 
-                    NULL END) AS base_unpublished_listings,
-            COUNT(
-                DISTINCT 
-                    CASE 
-                        WHEN is_platform_property = 'True' AND status_history = 'Publicado' THEN b.id_house 
+                        WHEN (ol.status_history = 'Publicado' AND  h.is_platform_property = 'True') THEN ol.id_house 
                         ELSE NULL 
                     END) AS property_listings,
             COUNT(
                 DISTINCT 
                     CASE 
-                        WHEN is_exclusive = 'True' AND status_history = 'Publicado' THEN b.id_house 
+                        WHEN (ol.status_history = 'Publicado' AND h.is_exclusive = 'True') THEN ol.id_house 
                         ELSE NULL 
-                    END) AS exclusive_listings,
+                    END) AS uniqueness_listings,
+            COUNT(
+                DISTINCT 
+                    CASE 
+                        WHEN (ol.status_history = 'Publicado' AND ol.ts_started_date = week_start) THEN ol.id_house 
+                        ELSE NULL 
+                    END) AS publications,
+            COUNT(
+                DISTINCT 
+                    CASE 
+                        WHEN (ol.status_history = 'Publicado' AND ol.ts_started_date = ol.week_start AND ol.order_status = 1) THEN ol.id_house 
+                        ELSE NULL 
+                    END) AS first_listings,
+            COUNT(
+                DISTINCT 
+                    CASE 
+                        WHEN (ol.status_history = 'Publicado' AND ol.ts_started_date = ol.week_start AND ol.order_status > 2) THEN ol.id_house 
+                        ELSE NULL 
+                    END) AS republications,
+            COUNT(
+                DISTINCT 
+                    CASE 
+                        WHEN (ol.status_history = 'Despublicado' AND ol.ts_started_date = ol.week_start) THEN ol.id_house 
+                        ELSE NULL 
+                    END) AS depublications,
             AVG(price_m2) AS mean_price_m2
-        FROM
-            base AS b 
+        FROM 
+            ongoing_listings AS ol 
         LEFT JOIN 
-            datamarts.loft_house_listing AS l
-                ON b.id_house = l.id_house
-        WHERE 
-            b.order_status = 1
+            datamarts.loft_house_listing AS h
+                ON ol.id_house = h.id_house
         GROUP BY 
-            1, 2, 3, 4 
+            1, 2, 3, 4
     ),
     median_price AS (
         SELECT
-            week_start,
-            id_neighborhood,
-            neighborhood,
-            MEDIAN(price_m2::FLOAT) AS median_price_m2
+            ol.week_start,
+            ol.id_neighborhood,
+            ol.neighborhood,
+            MEDIAN(h.price_m2::FLOAT) AS median_price_m2
         FROM
-            base AS b 
+            ongoing_listings AS ol
         LEFT JOIN 
-            datamarts.loft_house_listing AS l
-                ON b.id_house = l.id_house
+            datamarts.loft_house_listing AS h
+                ON ol.id_house = h.id_house
         WHERE 
-            b.order_status = 1
-        GROUP BY 
-            1, 2, 3
-    ),
-    first_listings AS (
-        WITH base AS (
-            SELECT 
-                id_neighborhood,
-                neighborhood,
-                status_history,
-                ROW_NUMBER() OVER (PARTITION BY id_house, status_history ORDER BY ts_ended_date DESC) AS order_status,
-                ts_started_date
-            FROM datamarts.loft_status_listing_flows
-        )
-        SELECT 
-            d.week_start,
-            id_neighborhood,
-            neighborhood,
-            COUNT(*) AS first_listings,
-            COUNT(*) AS publications
-        FROM 
-            base
-        JOIN 
-            dim_date AS d
-                ON d.sk_date = CAST(TO_CHAR(DATE(ts_started_date),'YYYYMMDD') AS BIGINT)
-        WHERE 
-            order_status = 1 
-            AND status_history = 'Publicado'
-        GROUP BY 
-            1, 2, 3
-    ),
-    despublications AS (
-        SELECT 
-            d.week_start,
-            id_neighborhood,
-            neighborhood,
-            COUNT(*) AS depublication
-        FROM 
-            datamarts.loft_status_listing_flows
-        JOIN 
-            dim_date AS d
-                ON d.sk_date = CAST(TO_CHAR(date(ts_started_date),'YYYYMMDD') AS BIGINT)
-        WHERE 
-            status_history = 'Despublicado'
-            AND d.date = d.week_start
+            ol.order_status = 1
         GROUP BY 
             1, 2, 3
     )
@@ -385,20 +372,22 @@ loft_part AS (
         me.week_start::DATE,
         'Loft' AS platform,
         me.id_neighborhood::BIGINT AS sk_region,
-        COALESCE(r.city_name::VARCHAR, me.city) AS city, 
+        COALESCE(r.city_name::VARCHAR, me.city) AS city,
         me.neighborhood::VARCHAR,
-        me.ongoing_listings::BIGINT,
-        (CAST((me.ongoing_listings - LAG(me.ongoing_listings, 1) OVER (PARTITION by r.sk_region, me.neighborhood ORDER BY me.week_start)) AS FLOAT)/NULLIF(me.ongoing_listings, 0)) * 100 AS ol_variation,
-        me.property_listings::BIGINT,
-        me.exclusive_listings::BIGINT AS uniqueness_listings,
-        (CAST((me.exclusive_listings - LAG(me.exclusive_listings, 1) OVER (PARTITION by r.sk_region, me.neighborhood ORDER BY me.week_start)) AS FLOAT)/NULLIF(me.exclusive_listings, 0)) * 100 AS uniqueness_variation,
-        CAST(me.exclusive_listings AS FLOAT)/NULLIF(me.ongoing_listings, 0) AS proportion_uniqueness_listings,
-        COALESCE(fl.first_listings, 0) AS first_listings,
-        COALESCE(LAG(dp.depublication, 1) OVER (ORDER BY me.week_start), 0) AS depublication,
-        CAST(COALESCE(dp.depublication, 0) AS FLOAT)/NULLIF(me.ongoing_listings, 0) AS unpl_by_ol,
-        CAST(COALESCE(fl.publications, 0) - COALESCE(LAG(dp.depublication, 1) OVER (ORDER BY me.week_start), 0) AS FLOAT)/NULLIF(me.ongoing_listings, 0) AS pl_variation,
-        mean_price_m2::FLOAT,
-        median_price_m2::FLOAT
+        COALESCE(me.ongoing_listings::BIGINT, 0) AS ongoing_listings,
+        COALESCE((CAST((me.ongoing_listings - LAG(me.ongoing_listings, 1) OVER (PARTITION by r.sk_region, me.neighborhood ORDER BY me.week_start)) AS FLOAT)/NULLIF(me.ongoing_listings, 0)) * 100, 0) AS ol_variation,
+        COALESCE(me.property_listings::BIGINT, 0) AS property_listings,
+        COALESCE(me.uniqueness_listings::BIGINT, 0) AS uniqueness_listings,
+        COALESCE((CAST((me.uniqueness_listings - LAG(me.uniqueness_listings, 1) OVER (PARTITION by r.sk_region, me.neighborhood ORDER BY me.week_start)) AS FLOAT)/NULLIF(me.uniqueness_listings, 0)) * 100, 0) AS uniqueness_variation,
+        me.uniqueness_listings::FLOAT/NULLIF(me.ongoing_listings, 0) AS proportion_uniqueness_listings,
+        COALESCE(me.publications, 0) AS publications,
+        COALESCE(me.first_listings, 0) AS first_listings,
+        COALESCE(me.republications, 0) AS republications, 
+        COALESCE(me.depublications, 0) AS depublications,
+        COALESCE(me.depublications, 0)::FLOAT/NULLIF(me.ongoing_listings, 0) AS unpl_by_ol,
+        COALESCE(me.publications, 0) - COALESCE(LAG(me.depublications, 1) OVER (ORDER BY me.week_start), 0)::FLOAT/NULLIF(me.ongoing_listings, 0) AS pl_variation,
+        me.mean_price_m2::FLOAT,
+        mp.median_price_m2::FLOAT
     FROM 
         metrics AS me 
     LEFT JOIN 
@@ -406,34 +395,23 @@ loft_part AS (
             ON  me.id_neighborhood = r.id
             AND me.neighborhood = r.name
     LEFT JOIN 
-        first_listings AS fl 
-            ON me.week_start = fl.week_start
-            AND me.id_neighborhood = fl.id_neighborhood
-            AND me.neighborhood = fl.neighborhood
-    LEFT JOIN 
-        despublications AS dp 
-            ON me.week_start = dp.week_start
-            AND me.id_neighborhood = dp.id_neighborhood
-            AND me.neighborhood = dp.neighborhood
-    LEFT JOIN 
         median_price AS mp 
             ON me.week_start = mp.week_start
             AND me.id_neighborhood = mp.id_neighborhood
-            AND me.neighborhood = mp.neighborhood
-
+            AND me.neighborhood = mp.neighborhood    
 ), 
 union_clean AS (
-SELECT 
-    * 
-FROM 
-    loft_part
--------------------------
-UNION
--------------------------
-SELECT 
-    * 
-FROM 
-    qa_part
+    SELECT 
+        * 
+    FROM 
+        loft_part
+    -------------------------
+    UNION
+    -------------------------
+    SELECT 
+        * 
+    FROM 
+        qa_part
 )
 SELECT 
     week_start,
@@ -447,13 +425,13 @@ SELECT
     uniqueness_listings,
     uniqueness_variation,
     proportion_uniqueness_listings,
+    publications,
     first_listings,
-    depublication,
+    republications, 
+    depublications,
     unpl_by_ol,
     pl_variation,
     mean_price_m2,
     median_price_m2 
 FROM 
     union_clean
-
-
