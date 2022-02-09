@@ -67,7 +67,8 @@ firestore_offers as (
     select
         offer.id as id_offer,
         max(coalesce(offer.id_godfather, g_offer.id))
-            over (partition by offer.id_firestore) as id_offer_godfather
+            over (partition by offer.id_firestore) as id_offer_godfather,
+        offer.id_firestore
     from datalake_ebdb_clean.offer
     left join datalake_godfather_clean.offer g_offer
         on offer.id_firestore = g_offer.id_firestore
@@ -76,7 +77,9 @@ firestore_offers as (
   instant_offer_firestore as (
       select distinct
         id_firestore,
-        is_instant_offer
+        is_instant_offer,
+        ts_first_sent,
+        ts_last_sent
       from datalake_firestore.rent_offer fo
       where status not in ('Draft','DismissedDraft')
   )
@@ -84,15 +87,15 @@ firestore_offers as (
     o_firestore.id_offer,
     bo_godfather.id_firestore,
     bo_godfather.id,
-    bo_godfather.ts_first_sent,
-    bo_godfather.ts_last_sent,
+    COALESCE(bo_godfather.ts_first_sent, io_firestore.ts_first_sent) AS ts_first_sent,
+    COALESCE(bo_godfather.ts_last_sent, io_firestore.ts_last_sent) AS ts_last_sent,
     bo_godfather.type,
     io_firestore.is_instant_offer
   from offer_firestore o_firestore
-  join datalake_godfather_clean.offer bo_godfather
+  LEFT join datalake_godfather_clean.offer bo_godfather
     on bo_godfather.id = o_firestore.id_offer_godfather
   left join instant_offer_firestore io_firestore
-    on bo_godfather.id_firestore = io_firestore.id_firestore
+    on o_firestore.id_firestore = io_firestore.id_firestore
 )
 select distinct
   offer.id,
@@ -111,7 +114,7 @@ select distinct
   offer.turn,
   offer.rejection_reason,
   offer.iteration,
-  coalesce(bus_offer.type, firestore.type) as type,
+  coalesce(bus_offer.type, firestore.type, offer.type) as type,
   offer.rent as last_offered_rent,
   negotiation.first_rent_offered_by_tenant,
   negotiation.first_rent_offered_by_owner,
