@@ -1,4 +1,4 @@
-## Tracksale
+## Reverse Tracksale
 ### Purpose
 This DAG collects customer data from our DW layer and sends it to the Tracksale API in order to schedule NPS survey dispatches.
 
@@ -19,6 +19,4 @@ This pipeline also POST data to the Tracksale API (endpoint: `dispatches`) aimin
 
 For further information, please read [this documentation](https://docs.google.com/document/d/15YEa41mdZ2YRUgpKpMNK63sIrHhCSXAYuf2QbW_Df7E).
 
-### Responsible Data Team
-For any questions or concerns about this DAG, please contact the Data Engineering or Data Analytics team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
 </details>

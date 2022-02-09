@@ -63,7 +63,7 @@ if __name__ == "__main__":
         f"m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket}, campaign_code={campaign_code}, campaign_query={campaign_query}, tags={tags}, execution_date={execution_date}"
     )
 
-    execution_date = datetime.strptime(execution_date, "%Y-%m-%d")
+    execution_date = datetime.strptime(execution_date, "%Y-%m-%d") + timedelta(days=1)
     schedule_time = int(
         datetime(
             execution_date.year, execution_date.month, execution_date.day, 17, 0, 0
