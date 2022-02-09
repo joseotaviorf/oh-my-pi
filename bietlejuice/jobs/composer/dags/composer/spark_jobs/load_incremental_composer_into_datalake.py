@@ -1,7 +1,7 @@
 import logging
 
 from argparse import ArgumentParser
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
@@ -49,10 +49,7 @@ if __name__ == "__main__":
     spark_client = SparkClient()
     s3_consumer = S3Consumer(spark_client)
 
-    dt_execution_yesterdey = datetime.strptime(execution_date, "%Y-%m-%d")
-    dt_execution_today = dt_execution_yesterdey + timedelta(days=1)
-    dt_executions = [dt_execution_yesterdey, dt_execution_today]
-
+    dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
     db_info = DatalakeMetastoreService.get_db_info(
         environment, context, datalake_bucket
     )
@@ -66,32 +63,31 @@ if __name__ == "__main__":
     format_options = SparkTableStorageFormat.DEFAULT_RAW
     database_location = db_info["db_raw_path"]
 
-    for dt_execution in dt_executions:
-        df = s3_consumer.get_data_from_file(
-            path=f"{database_location}{table_name}/year={dt_execution.year}/month={dt_execution.month}/day={dt_execution.day}/",
-            format="json",
-        )
+    df = s3_consumer.get_data_from_file(
+        path=f"{database_location}{table_name}/year={dt_execution.year}/month={dt_execution.month}/day={dt_execution.day}/",
+        format="json",
+    )
 
-        df = (
-            SparkDataFrameService()
-            .input(df)
-            .create_year_month_day_columns_from_date(dt_execution)
-            .output()
-        )
+    df = (
+        SparkDataFrameService()
+        .input(df)
+        .create_year_month_day_columns_from_date(dt_execution)
+        .output()
+    )
 
-        spark_metastore_loader.update_metastore(
-            df,
-            database_name,
-            table_name,
-            format_options,
-            database_location,
-            partition_cols,
-            force_recreate=False,
-        )
+    spark_metastore_loader.update_metastore(
+        df,
+        database_name,
+        table_name,
+        format_options,
+        database_location,
+        partition_cols,
+        force_recreate=False,
+    )
 
-        spark_metastore_service.create_new_partitions_from_df(
-            database_name=database_name,
-            table_name=table_name,
-            df=df,
-            partition_cols=partition_cols,
-        )
+    spark_metastore_service.create_new_partitions_from_df(
+        database_name=database_name,
+        table_name=table_name,
+        df=df,
+        partition_cols=partition_cols,
+    )
