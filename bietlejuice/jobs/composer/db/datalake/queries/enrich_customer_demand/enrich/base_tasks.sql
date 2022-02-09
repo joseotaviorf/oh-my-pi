@@ -1,8 +1,8 @@
-
 WITH base_crm_analyst_info AS (
   SELECT DISTINCT
     turf.id_task,
-    ac.id_assignee AS id_agent
+    ac.id_assignee AS id_agent,
+    action_type
   FROM
     datalake_crm_tasks_flows.tasks_users_resolutions_flow turf
   JOIN
@@ -37,12 +37,9 @@ crm_tasks AS (
   JOIN
     base_crm_analyst_info bca
       ON tarf.id_task = bca.id_task
-  LEFT JOIN
-    datalake_crm_tasks_flows.tasks_users_resolutions_flow turf
-      ON tarf.id_task = turf.id_task
   WHERE
     tarf.type = 'RevisarPagamentosRescisao'
-    AND turf.action_type = 'CREATE'
+    AND bca.action_type = 'CREATE'
     AND tarf.ts_started >= '2021-01-01'
 ),
 ticket_tasks AS (
@@ -102,17 +99,13 @@ heimdall_tasks AS (
   WITH crm_last_task_updated AS (
     SELECT DISTINCT
       id,
-      id_agent,
       LAST_VALUE(id_state) OVER(PARTITION BY id ORDER BY DATE(CONCAT(year,'-',month,'-',day)) ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS id_state
     FROM
       datalake_crm.tasks t
-    JOIN
-      base_crm_analyst_info bca
-        ON t.id = bca.id_task
   )
   SELECT DISTINCT
     CONCAT(a.id, e.id) AS id_task,
-    crm.id_agent,
+    bca.id_agent,
     a.type,
     2 AS sla_target,
     a.ts_requested AS ts_started,
@@ -122,6 +115,9 @@ heimdall_tasks AS (
   JOIN
     crm_last_task_updated crm
         ON a.id = crm.id_state
+  JOIN
+    base_crm_analyst_info bca
+      ON crm.id = bca.id_task
   LEFT JOIN
     datalake_heimdall.expenses e
       ON e.id_activity = a.id

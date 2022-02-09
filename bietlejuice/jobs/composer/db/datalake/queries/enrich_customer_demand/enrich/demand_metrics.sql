@@ -54,7 +54,6 @@ sla AS (
   SELECT
     ti.id_agent,
     ti.type,
-    DATE(ti.ts_completed) AS dt_metric_reference,
     SUM(
       CASE 
         WHEN IF(ti.days_worked < 0, 0, ti.days_worked) <= sla_target THEN 1
@@ -79,32 +78,33 @@ sla AS (
         ELSE 0
       END
     ) AS time_spent_on_tickets_not_solved_in_time,
-    SUM(IF(ti.days_worked < 0, 0, ti.days_worked)) AS total_time_spent
+    SUM(IF(ti.days_worked < 0, 0, ti.days_worked)) AS total_time_spent,
+    DATE(ti.ts_completed) AS dt_metric_reference
   FROM
     task_info ti
   WHERE
     ts_completed IS NOT NULL
-  GROUP BY 1,2,3
+  GROUP BY 1,2,8
 ),
 received_demand AS (
   SELECT
     id_agent,
-    DATE(ts_started) AS dt_metric_reference,
     type,
-    COUNT(1) AS received_demand
+    COUNT(1) AS received_demand,
+    DATE(ts_started) AS dt_metric_reference
   FROM
     datalake_customer_demand.base_tasks
-  GROUP BY 1,2,3
+  GROUP BY 1,2,4
 ),
 solved_demand AS (
   SELECT
     id_agent,
-    DATE(ts_completed) AS dt_metric_reference,
     type,
-    COUNT(1) AS solved_demand
+    COUNT(1) AS solved_demand,
+    DATE(ts_completed) AS dt_metric_reference
   FROM
     datalake_customer_demand.base_tasks
-  GROUP BY 1,2,3
+  GROUP BY 1,2,4
 )
 SELECT
   id_agent,

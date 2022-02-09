@@ -44,7 +44,6 @@ days_off AS (
 )
 SELECT
   eb.id_agent,
-  dt_interval AS dt_metric_reference,
   eb.type,
   DAYOFWEEK(dt_interval) = 1 AS is_sunday,
   COUNT(1) AS daily_backlog,
@@ -60,7 +59,8 @@ SELECT
       WHEN (TO_UNIX_TIMESTAMP(dt_interval) - TO_UNIX_TIMESTAMP(ts_started))/(86400) - 1 - COALESCE(do.days_off, 0) > sla_target THEN 1
       ELSE 0
     END
-  ) AS backlog_not_in_time
+  ) AS backlog_not_in_time,
+  dt_interval AS dt_metric_reference
 FROM
   exploded_backlog eb
 LEFT JOIN
@@ -74,4 +74,4 @@ WHERE
     )
     AND eb.id_agent IS NOT NULL
     AND eb.type IS NOT NULL
-GROUP BY 1,2,3,4
+GROUP BY 1,2,3,7

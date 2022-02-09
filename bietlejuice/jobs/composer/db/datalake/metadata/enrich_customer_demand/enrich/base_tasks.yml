@@ -15,7 +15,7 @@ columns:
   type:
     lineage:
       - datalake_heimdall.activity.type
-      - datalake_customer_support.department
+      - datalake_customer_support.email.department
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.type
   sla_target:
     lineage:
