@@ -887,6 +887,7 @@ bietlejuice.enrich_offer:
   - bietlejuice.enrich_sale_offer_flows
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.godfather:load-clean-offer
+  - bietlejuice.gsheets:load-clean-monday-users
   
 bietlejuice.enrich_owner_fees:
   - bietlejuice.owner_fees:load-clean-contract

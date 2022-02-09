@@ -73,6 +73,8 @@ SELECT
 	eso.offer_flow,
 	eso.agent_work_contract,
 	eso.team_lead_name,
+	eso.consultant_name AS deal_maker_name,
+	eso.agent_name,
 	eso.sale_price,
 	eso.registry_price,
 	eso.itbi_price,

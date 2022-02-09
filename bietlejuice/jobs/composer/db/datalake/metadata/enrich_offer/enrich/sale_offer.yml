@@ -48,6 +48,14 @@ columns:
     lineage:
       - datalake_gsheets.sale_hub_offer.team_lead_name
       - datalake_sale_offer_flows.sale_offer_flows.team_lead_name
+  consultant_name:
+    lineage:
+      - datalake_gsheets.sale_hub_offer.executive
+      - datalake_gsheets_clean.monday_users.user_name
+      - datalake_sale_offer_flows.sale_offer_flows.consultant_name
+  agent_name:
+    lineage:
+      - datalake_ebdb_user.user.name
   offer_flow:
     lineage:
       - datalake_gsheets.sale_hub_offer.offer_flow

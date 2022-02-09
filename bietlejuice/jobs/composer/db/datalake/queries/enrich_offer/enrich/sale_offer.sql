@@ -6,6 +6,7 @@ WITH visit_before_offer AS (
             bs.id AS id_booking,
             bs.id_agent,
             du.id as id_user_agent,
+            du.name AS agent_name,
             TRUE AS flg_visit_completed_before_offer,
             (unix_timestamp(so.ts_created)-unix_timestamp(bs.ts_created))/(3600) AS hours_booking_to_offer,
             (unix_timestamp(so.ts_created)-unix_timestamp(bs.ts_booking_utc))/(3600) AS hours_visit_to_offer,
@@ -44,6 +45,7 @@ booking_before_offer AS (
             bs.id AS id_booking,
             bs.id_agent,
             du.id as id_user_agent,
+            du.name AS agent_name,
             TRUE AS flg_booking_before_offer,
             (unix_timestamp(so.ts_created)-unix_timestamp(bs.ts_created))/(3600) AS hours_booking_to_offer,
             (unix_timestamp(so.ts_created)-unix_timestamp(bs.ts_booking_utc))/(3600) AS hours_visit_to_offer,
@@ -81,6 +83,7 @@ relation_booking_offer AS (
         COALESCE(vo.id_booking, bo.id_booking) AS id_booking,
         COALESCE(vo.id_agent, bo.id_agent) AS id_agent,
         COALESCE(vo.id_user_agent, bo.id_user_agent) AS id_user_agent,
+        COALESCE(vo.agent_name, bo.agent_name) AS agent_name,
         COALESCE(vo.hours_booking_to_offer, bo.hours_booking_to_offer) AS hours_booking_to_offer,
         COALESCE(vo.hours_visit_to_offer, bo.hours_visit_to_offer) AS hours_visit_to_offer,
         COALESCE(bo.flg_booking_before_offer,vo.flg_visit_completed_before_offer) AS flg_booking_before_offer,
@@ -228,6 +231,13 @@ regions AS (
         datalake_region.region AS dr
             ON dr.id = aux.id_region
 ),
+aux_monday_users AS (
+    SELECT 
+        gmu.*,
+        ROW_NUMBER() OVER (PARTITION BY gmu.id_monday ORDER BY user_name) AS row
+    FROM 
+        datalake_gsheets_clean.monday_users AS gmu
+),
 -- DATA SOURCES
 data_sources AS (
     SELECT
@@ -258,6 +268,7 @@ data_sources AS (
         -- data from relation_booking_offer
         rbo.id_user_agent,
         rbo.id_booking,
+        UPPER(rbo.agent_name) AS agent_name,
         COALESCE(rbo.flg_booking_before_offer,FALSE) AS flg_booking_before_offer,
         COALESCE(rbo.flg_visit_completed_before_offer,FALSE) AS flg_visit_completed_before_offer,
         rbo.hours_booking_to_offer,
@@ -393,9 +404,7 @@ data_sources AS (
         mo.days_offer_accepted_to_sale_agreement_signed AS mo_days_offer_accepted_to_sale_agreement_signed,
         mo.days_offer_accepted_to_sale_agreement_created AS mo_days_offer_accepted_to_sale_agreement_created,
         mo.days_offer_accepted_to_offer_dismissed AS mo_days_offer_accepted_to_offer_dismissed,
-        replace(
-            replace(reverse(split(mo.id_consultant, ',')) [0], '[', ''),']',''
-            ) AS last_id_consultant,
+        amu.user_name AS mo_consultant_name,
         CASE
             WHEN mo.id_consultant IS NOT NULL 
                 THEN 'ID_MONDAY_' || mo.id_consultant
@@ -405,19 +414,35 @@ data_sources AS (
     LEFT JOIN 
         relation_booking_offer AS rbo 
             ON rbo.id_offer = g.id 
-    FULL OUTER JOIN datalake_gsheets.sale_hub_offer AS ohc 
-        ON ohc.id_offer = g.id
-    LEFT JOIN datalake_sale_offer_flows.sale_offer_flows AS vo 
-        ON vo.id_offer = g.id
-    LEFT JOIN datalake_firestore.monday AS mo 
-        ON mo.id_offer = g.id
-    LEFT JOIN work_contract AS wc 
-        ON wc.id_user_agent = rbo.id_user_agent 
-        AND g.ts_created >= wc.ts_work_contract_start
-        AND (
-            (g.ts_created <= wc.ts_work_contract_end)
-            OR (wc.ts_work_contract_end IS NULL)
-        )
+    FULL OUTER JOIN 
+        datalake_gsheets.sale_hub_offer AS ohc 
+            ON ohc.id_offer = g.id
+    LEFT JOIN
+        datalake_sale_offer_flows.sale_offer_flows AS vo 
+            ON vo.id_offer = g.id
+    LEFT JOIN
+        datalake_firestore.monday AS mo 
+            ON mo.id_offer = g.id
+    LEFT JOIN
+        work_contract AS wc 
+            ON wc.id_user_agent = rbo.id_user_agent 
+            AND g.ts_created >= wc.ts_work_contract_start
+            AND (
+                (g.ts_created <= wc.ts_work_contract_end)
+                OR (wc.ts_work_contract_end IS NULL)
+            )
+    LEFT JOIN 
+        aux_monday_users AS amu
+            ON amu.id_monday = REPLACE(
+                REPLACE(
+                    REVERSE(SPLIT(mo.id_consultant, ',')) [0],
+                    '[', 
+                    ''
+                ),
+                ']',
+                ''
+            )
+            AND amu.row = 1
 ),
 -- OFFER FLOW CTE
 offer_flow AS (
@@ -538,7 +563,7 @@ business_rules AS (
         id_user_agent,
         CASE 
             WHEN (vo_sk_team_lead IS NOT NULL 
-                AND current_timestamp() >= ofp.offer_portfolio_start_date) 
+                AND CURRENT_TIMESTAMP() >= ofp.offer_portfolio_start_date) 
                     THEN true
             ELSE false
         END AS is_offer_portfolio,
@@ -547,7 +572,7 @@ business_rules AS (
         CASE 
             WHEN off.offer_flow IN ('HUB','CENTRAL') THEN (
                     CASE 
-                        WHEN (vo_sk_team_lead IS NOT NULL AND current_timestamp() >= ofp.offer_portfolio_start_date) 
+                        WHEN (vo_sk_team_lead IS NOT NULL AND CURRENT_TIMESTAMP() >= ofp.offer_portfolio_start_date) 
                             AND COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= offer_portfolio_start_date 
                                 THEN COALESCE(ds.vo_offer_accepted_date, ds.ohc_offer_accepted_date) 
                         ELSE COALESCE(ds.ohc_offer_accepted_date, ds.vo_offer_accepted_date) 
@@ -557,7 +582,7 @@ business_rules AS (
         CASE 
             WHEN off.offer_flow IN ('HUB','CENTRAL') THEN (
                     CASE
-                        WHEN (vo_sk_team_lead IS NOT NULL AND current_timestamp() >= ofp.offer_portfolio_start_date) 
+                        WHEN (vo_sk_team_lead IS NOT NULL AND CURRENT_TIMESTAMP() >= ofp.offer_portfolio_start_date) 
                             AND COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= offer_portfolio_start_date 
                                 THEN COALESCE(ds.vo_offer_dismissed_date,ds.ohc_offer_dismissed_date) 
                         ELSE COALESCE(ds.ohc_offer_dismissed_date, ds.vo_offer_dismissed_date) 
@@ -567,7 +592,7 @@ business_rules AS (
         CASE
             WHEN off.offer_flow IN ('HUB','CENTRAL') THEN (
                     CASE
-                        WHEN (vo_sk_team_lead IS NOT NULL AND current_timestamp() >= ofp.offer_portfolio_start_date) 
+                        WHEN (vo_sk_team_lead IS NOT NULL AND CURRENT_TIMESTAMP() >= ofp.offer_portfolio_start_date) 
                             AND COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= offer_portfolio_start_date 
                                 THEN COALESCE(ds.vo_sale_agreement_signed_date, ds.ohc_sale_agreement_signed_date) 
                         ELSE COALESCE(ds.ohc_sale_agreement_signed_date, ds.vo_sale_agreement_signed_date)
@@ -578,7 +603,7 @@ business_rules AS (
             CASE 
                 WHEN off.offer_flow IN ('HUB','CENTRAL') THEN (
                     CASE 
-                        WHEN (vo_sk_team_lead IS NOT NULL AND current_timestamp() >= ofp.offer_portfolio_start_date) 
+                        WHEN (vo_sk_team_lead IS NOT NULL AND CURRENT_TIMESTAMP() >= ofp.offer_portfolio_start_date) 
                             AND COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= offer_portfolio_start_date 
                                 THEN ds.vendas_offer_status 
                     ELSE COALESCE(ds.ohc_status,ds.vendas_offer_status) 
@@ -592,7 +617,7 @@ business_rules AS (
             CASE 
                 WHEN off.offer_flow IN ('HUB','CENTRAL') THEN (
                         CASE
-                            WHEN (vo_sk_team_lead IS NOT NULL AND current_timestamp() >= ofp.offer_portfolio_start_date) 
+                            WHEN (vo_sk_team_lead IS NOT NULL AND CURRENT_TIMESTAMP() >= ofp.offer_portfolio_start_date) 
                                 AND COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= offer_portfolio_start_date 
                                     THEN ds.vo_team_lead_name 
                             ELSE COALESCE(ds.ohc_team_lead_name,ds.vo_team_lead_name) 
@@ -606,12 +631,25 @@ business_rules AS (
                 ELSE COALESCE(ds.vo_id_consultant,ds.mo_id_consultant) 
             END
         ) AS id_consultant,
+        UPPER(
+            CASE 
+                WHEN off.offer_flow IN ('HUB','CENTRAL') THEN (
+                    CASE 
+                        WHEN (vo_sk_team_lead IS NOT NULL AND CURRENT_TIMESTAMP() >= ofp.offer_portfolio_start_date) 
+                            AND COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= offer_portfolio_start_date 
+                                THEN ds.vo_consultant_name 
+                        ELSE COALESCE(ds.ohc_consultant_name,ds.vo_consultant_name) 
+                    END) 
+                ELSE COALESCE(ds.mo_consultant_name, ds.vo_consultant_name) 
+            END
+        )  AS consultant_name,
+        agent_name,
         sale_price,
         COALESCE(ds.first_price_offered_by_buyer, ds.mo_price_offered_by_buyer) AS first_price_offered_by_buyer,
         CASE
             WHEN off.offer_flow IN ('HUB','CENTRAL') THEN (
                     CASE
-                        WHEN (vo_sk_team_lead IS NOT NULL AND current_timestamp() >= ofp.offer_portfolio_start_date) 
+                        WHEN (vo_sk_team_lead IS NOT NULL AND CURRENT_TIMESTAMP() >= ofp.offer_portfolio_start_date) 
                             AND COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= offer_portfolio_start_date 
                                 THEN ds.last_price_offered_by_buyer 
                         ELSE (
@@ -678,7 +716,7 @@ business_rules AS (
             ELSE FALSE 
         END AS is_house_first_offer,
         CASE
-            WHEN (vo_sk_team_lead IS NOT NULL AND current_timestamp() >= ofp.offer_portfolio_start_date) 
+            WHEN (vo_sk_team_lead IS NOT NULL AND CURRENT_TIMESTAMP() >= ofp.offer_portfolio_start_date) 
                 THEN 'PORTFOLIO_NEGOCIACAO'
             WHEN ds.ohc_id_offer IS NOT NULL 
                 THEN (
@@ -705,8 +743,9 @@ business_rules AS (
         offer_flow AS off
             ON off.id_offer = COALESCE(ds.id_offer,ds.ohc_id_offer) 
                 OR off.ohc_id_offer = COALESCE(ds.id_offer,ds.ohc_id_offer)
-    LEFT JOIN rank_offers AS rk
-        ON rk.id = ds.id_offer
+    LEFT JOIN
+        rank_offers AS rk
+            ON rk.id = ds.id_offer
     LEFT JOIN 
         business_unit AS bu
             ON bu.id_offer = COALESCE(ds.id_offer,ds.ohc_id_offer) 
@@ -732,6 +771,8 @@ SELECT
     current_payment_method,
     planned_payment_method,
     team_lead_name,
+    consultant_name,
+    agent_name,
     offer_flow,
     business_unit,
     offer_platform,
@@ -821,7 +862,7 @@ SELECT
     dt_offer_accepted,
     dt_offer_dismissed,
     dt_sale_agreement_signed,
-    current_timestamp() AS ts_load,
+    CURRENT_TIMESTAMP() AS ts_load,
     ts_offer_submitted,
     ts_updated
 FROM

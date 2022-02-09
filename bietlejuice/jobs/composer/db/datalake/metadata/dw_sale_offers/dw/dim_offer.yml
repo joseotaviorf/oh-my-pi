@@ -35,6 +35,12 @@ columns:
   team_lead_name:
     lineage:
       - datalake_offer.sale_offer.team_lead_name
+  deal_maker_name:
+    lineage:
+      - datalake_offer.sale_offer.consultant_name
+  agent_name:
+    lineage:
+      - datalake_offer.sale_offer.agent_name
   sale_price:
     lineage:
       - datalake_offer.sale_offer.sale_price

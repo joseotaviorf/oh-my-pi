@@ -11,6 +11,8 @@ CREATE TABLE sale.dim_offer (
 	offer_flow VARCHAR,
 	agent_work_contract VARCHAR,
 	team_lead_name VARCHAR,
+	deal_maker_name VARCHAR,
+	agent_name VARCHAR,
 	sale_price BIGINT,
 	registry_price BIGINT,
 	itbi_price BIGINT,
