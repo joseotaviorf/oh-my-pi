@@ -1,0 +1,26 @@
+---
+database_name: datalake_customer_demand
+table_name: demand_metrics
+columns:
+  id_agent:
+    lineage:
+      - datalake_customer_demand.base_tasks.id_agent
+  type:
+    lineage:
+      - datalake_customer_demand.base_tasks.type
+  time_spent_on_tickets_solved_in_time:
+    lineage:
+      - datalake_customer_demand.base_tasks.ts_started
+      - datalake_customer_demand.base_tasks.ts_completed
+  time_spent_on_tickets_not_solved_in_time:
+    lineage:
+      - datalake_customer_demand.base_tasks.ts_started
+      - datalake_customer_demand.base_tasks.ts_completed
+  total_time_spent:
+    lineage:
+      - datalake_customer_demand.base_tasks.ts_started
+      - datalake_customer_demand.base_tasks.ts_completed
+  dt_metric_reference:
+    lineage:
+      - datalake_customer_demand.base_tasks.ts_started
+      - datalake_customer_demand.base_tasks.ts_completed

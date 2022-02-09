@@ -14,9 +14,9 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 This pipeline produces the following output table on Enrich layer:
 
-- `base_crm_tasks` (full load)
-- `base_heimdall_tasks` (full load)
-- `base_tickets_tasks` (full load)
+- `base_tasks` (full load)
+- `demand_metrics` (full load)
+- `backlog_metrics` (full load)
 
 ### Responsible Data Team
 ​

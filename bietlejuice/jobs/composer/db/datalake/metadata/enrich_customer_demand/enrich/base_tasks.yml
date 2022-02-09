@@ -1,0 +1,34 @@
+---
+database_name: datalake_customer_demand
+table_name: base_tasks
+columns:
+  id_task:
+    lineage:
+      - datalake_heimdall.activity.id
+      - datalake_heimdall.expenses.id
+      - datalake_customer_support.email.id_ticket
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.id_task
+  id_agent:
+    lineage:
+      - datalake_gsheets_clean.agents_control.id_assignee
+      - datalake_customer_support.email.id_agent
+  type:
+    lineage:
+      - datalake_heimdall.activity.type
+      - datalake_customer_support.department
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.type
+  sla_target:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_sla.sla_in_days
+      - datalake_gsheets_clean.tag_sla_target.sla
+  ts_started:
+    lineage:
+      - datalake_heimdall.activity.ts_requested
+      - datalake_customer_support.email.ts_ticket_started
+      - datalake_zendesk_ticket_funnels.ticket_funnel.custom_fields
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_started
+  ts_completed:
+    lineage:
+      - datalake_heimdall.activity.ts_transition_created
+      - datalake_customer_support.email.ts_ticket_solved
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_completed

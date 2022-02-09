@@ -1,0 +1,160 @@
+
+WITH base_crm_analyst_info AS (
+  SELECT DISTINCT
+    turf.id_task,
+    ac.id_assignee AS id_agent
+  FROM
+    datalake_crm_tasks_flows.tasks_users_resolutions_flow turf
+  JOIN
+    datalake_ebdb_user.user du
+      ON du.id = turf.id_assignee
+  JOIN
+    datalake_gsheets_clean.agents_control ac
+      ON ac.email = du.email
+),
+crm_tasks AS (
+  WITH last_updated_task AS (
+    SELECT
+      id_task,
+      MAX(DATE(CONCAT(year, '-', month, '-', day))) AS dt_last_updated
+    FROM
+      datalake_crm_tasks_flows.tasks_actions_resolutions_flow
+    GROUP BY 1
+  )
+  SELECT DISTINCT
+    tarf.id_task,
+    bca.id_agent,
+    tarf.type,
+    5 AS sla_target,
+    tarf.ts_started,
+    tarf.ts_completed
+  FROM 
+    datalake_crm_tasks_flows.tasks_actions_resolutions_flow tarf
+  JOIN
+    last_updated_task lut
+      ON tarf.id_task = lut.id_task
+      AND DATE(CONCAT(year, '-', month, '-', day)) = lut.dt_last_updated
+  JOIN
+    base_crm_analyst_info bca
+      ON tarf.id_task = bca.id_task
+  LEFT JOIN
+    datalake_crm_tasks_flows.tasks_users_resolutions_flow turf
+      ON tarf.id_task = turf.id_task
+  WHERE
+    tarf.type = 'RevisarPagamentosRescisao'
+    AND turf.action_type = 'CREATE'
+    AND tarf.ts_started >= '2021-01-01'
+),
+ticket_tasks AS (
+  WITH ticket_started AS (
+    SELECT
+      e.id_ticket,
+      e.id_agent,
+      e.department,
+      e.tags,
+      e.contact_theme_detail_tag,
+      CASE
+        WHEN 
+          DATE(GET_JSON_OBJECT(REPLACE(REPLACE(tf.custom_fields, '[', ''), ']', ''),'$.Data Orçamentação realizada ')) IS NOT NULL
+          AND DATE(GET_JSON_OBJECT(REPLACE(REPLACE(tf.custom_fields, '[', ''), ']', ''),'$.Data Orçamentação realizada ')) < e.ts_ticket_started 
+        THEN CAST(GET_JSON_OBJECT(REPLACE(REPLACE(tf.custom_fields, '[', ''), ']', ''),'$.Data Orçamentação realizada ') AS TIMESTAMP)
+        ELSE e.ts_ticket_started  
+      END AS ts_started,
+      ts_ticket_solved AS ts_completed
+    FROM
+      datalake_customer_support.email e
+    LEFT JOIN
+      datalake_zendesk_ticket_funnels.ticket_funnel tf
+        ON e.id_ticket = tf.id_ticket
+  )
+  SELECT DISTINCT
+    t.id_ticket AS id_task,
+    t.id_agent,
+    t.department AS type,
+    COALESCE(ts.sla_in_days, tst.sla) AS sla_target,
+    t.ts_started,
+    t.ts_completed
+  FROM
+    ticket_started t
+  LEFT JOIN
+    datalake_gsheets_clean.department_control dc
+      ON t.department = dc.department
+  LEFT JOIN
+    datalake_gsheets_clean.taxonomy_sla ts
+      ON dc.journey_step = ts.journey_step
+      AND t.contact_theme_detail_tag = ts.contact_theme_detail_tag
+      AND NOT t.tags LIKE '%orçamentação_realizada%'
+      AND t.ts_started BETWEEN ts.dt_start AND ts.dt_end
+  LEFT JOIN
+    datalake_gsheets_clean.tag_sla_target tst
+      ON dc.journey_step = ts.journey_step
+      AND t.tags LIKE '%orçamentação_realizada%'
+      AND t.tags LIKE CONCAT('%', tst.tag, '%')
+      AND t.ts_started BETWEEN tst.dt_start AND tst.dt_end
+  WHERE
+    t.ts_started >= '2021-01-01'
+    AND (
+      (t.department = 'Midias Ops [POS] [BACK]' AND (t.tags LIKE '%escalar_back_midias%' OR t.tags LIKE '%escalar_ouvidoria_hard_cases%'))
+      OR t.department <> 'Midias Ops [POS] [BACK]'
+    )
+),
+heimdall_tasks AS (
+  WITH crm_last_task_updated AS (
+    SELECT DISTINCT
+      id,
+      id_agent,
+      LAST_VALUE(id_state) OVER(PARTITION BY id ORDER BY DATE(CONCAT(year,'-',month,'-',day)) ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS id_state
+    FROM
+      datalake_crm.tasks t
+    JOIN
+      base_crm_analyst_info bca
+        ON t.id = bca.id_task
+  )
+  SELECT DISTINCT
+    CONCAT(a.id, e.id) AS id_task,
+    crm.id_agent,
+    a.type,
+    2 AS sla_target,
+    a.ts_requested AS ts_started,
+    a.ts_transition_created AS ts_completed
+  FROM
+    datalake_heimdall.activity a
+  JOIN
+    crm_last_task_updated crm
+        ON a.id = crm.id_state
+  LEFT JOIN
+    datalake_heimdall.expenses e
+      ON e.id_activity = a.id
+  WHERE
+    a.type = 'TENANT_REFUND_REPAIR'
+    AND a.ts_requested >= '2021-01-01'
+)
+SELECT
+  id_task,
+  id_agent,
+  type,
+  sla_target,
+  ts_started,
+  ts_completed
+FROM
+  crm_tasks
+UNION ALL
+SELECT
+  id_task,
+  id_agent,
+  type,
+  sla_target,
+  ts_started,
+  ts_completed
+FROM
+  ticket_tasks
+UNION ALL
+SELECT
+  id_task,
+  id_agent,
+  type,
+  sla_target,
+  ts_started,
+  ts_completed
+FROM
+  heimdall_tasks

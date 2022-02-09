@@ -618,6 +618,7 @@ bietlejuice.enrich_date:
   - bietlejuice.gsheets:load-clean-service-city-holidays
 
 bietlejuice.enrich_customer_demand:
+  - bietlejuice.ebdb:create-clean-user-in-data-lake
   - bietlejuice.enrich_customer_support:load-enrich-email
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-actions-resolutions-flow
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-users-resolutions-flow
