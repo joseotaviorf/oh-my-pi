@@ -71,6 +71,10 @@ if __name__ == "__main__":
         .withColumn("day", lit(execution_date.day))
     )
 
+    if origin == "emcasa":
+        str_schema = "struct<typename:string,itbi:string,propertydeed:string,propertyregistration:string>"
+        df = df.withColumn("metadata", df["metadata"].cast(str_schema))
+
     db_info = DatalakeMetastoreService.get_db_info(
         environment, f"{source}_{context}", datalake_bucket
     )
