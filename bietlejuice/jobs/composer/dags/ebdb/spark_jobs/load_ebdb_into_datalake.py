@@ -67,9 +67,11 @@ def load_relation_into_datalake(args):
 
     if num_partitions > 1:
         df = consumer.get_data_from_table_in_parallel(
-            rel.name, num_partitions, partition_columns
+            rel.name, num_partitions * 3, partition_columns
         )
-        max_records_per_file = int(math.ceil(float(rel.rows_count) / num_partitions))
+        max_records_per_file = int(
+            math.ceil(float(rel.rows_count) / num_partitions * 6)
+        )
     else:
         df = consumer.get_data_from_table(rel.name)
 
