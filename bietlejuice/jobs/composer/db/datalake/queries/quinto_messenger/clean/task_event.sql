@@ -12,4 +12,6 @@ SELECT
 FROM
     datalake_quinto_messenger_raw.taskevent
 WHERE
-    DATE(updated_at) = DATE('{year}-{month}-{day}')
+    year = {year}
+    AND month = {month}
+    AND day = {day}
