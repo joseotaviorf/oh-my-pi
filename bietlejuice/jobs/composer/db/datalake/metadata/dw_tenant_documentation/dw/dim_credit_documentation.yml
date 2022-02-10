@@ -1,0 +1,19 @@
+database_name: dw_quintoandar
+table_name: dim_credit_documentation
+columns:
+  sk_proposal:
+    lineage:
+      - datalake_ebdb_clean.proposal.id
+  sk_credit_evaluation:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.id
+  documents:
+    lineage:
+      - datalake_ebdb_clean.proposal_document.type
+  ts_credit_started:
+    lineage:
+      - datalake_ebdb_clean.credit_evaluation.ts_created
+  ts_credit_updated:
+    lineage:
+      - datalake_ebdb_clean.credit_evaluation.ts_updated
+  

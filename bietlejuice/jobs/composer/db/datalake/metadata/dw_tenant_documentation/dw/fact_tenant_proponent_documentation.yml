@@ -1,0 +1,28 @@
+database_name: dw_quintoandar
+table_name: fact_tenant_proponent_documentation
+columns:
+  sk_proponent:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.id
+  sk_proposal:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.id_proposal
+  sk_first_document_sent_date:
+    lineage:
+      - datalake_ebdb_clean.proposal_document.ts_created
+  sk_first_document_resent_date:
+    lineage:
+      - datalake_ebdb_clean.proponent_info_resend_request.ts_created
+  sk_last_document_resent_date:
+    lineage:
+      - datalake_ebdb_clean.proponent_info_resend_request.ts_created
+  ts_first_documents_sent:
+    lineage:
+      - datalake_ebdb_clean.proposal_document.ts_created
+  ts_first_document_resent:
+    lineage:
+      - datalake_ebdb_clean.proponent_info_resend_request.ts_created
+  ts_last_document_resent:
+    lineage:
+      - datalake_ebdb_clean.proponent_info_resend_request.ts_created
+  
