@@ -4,6 +4,7 @@ SELECT
     table_name,
     has_lineage,
     has_tags,
+    owner,
     year,
     month,
     day

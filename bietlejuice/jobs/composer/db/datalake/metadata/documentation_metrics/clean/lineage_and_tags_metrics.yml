@@ -16,6 +16,9 @@ columns:
   has_tags:
     lineage:
       - datalake_documentation_metrics_raw.lineage_and_tags_metrics.has_tags
+  owner:
+    lineage:
+      - datalake_documentation_metrics_raw.lineage_and_tags_metrics.owner
   year:
     lineage:
       - datalake_documentation_metrics_raw.lineage_and_tags_metrics.year
