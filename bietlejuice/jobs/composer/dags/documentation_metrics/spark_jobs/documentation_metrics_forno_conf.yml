@@ -42,3 +42,11 @@ LINEAGE_FROM_PRODUCT_SOURCES_SKIP_LIST:
   - twitter
   - linkedin
   - facebook_insights
+DAG_METADATA_MANUAL_MAPPING:
+  ebdb:
+    raw:
+      database_name: datalake_ebdb_raw
+    clean:
+      database_name: datalake_ebdb_clean
+    dw:
+      database_name: dw_quintoandar

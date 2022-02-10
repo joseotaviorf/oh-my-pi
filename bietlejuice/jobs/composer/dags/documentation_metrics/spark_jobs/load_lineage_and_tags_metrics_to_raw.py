@@ -1,4 +1,3 @@
-import re
 from typing import Dict, Union, List, Set
 
 import logging
@@ -22,7 +21,8 @@ from bietlejuice.jobs.composer.base.spark import (
 from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 
 from bietlejuice.jobs.composer.services import FileService
-from bietlejuice.jobs.composer.services.metadata_service import MetadataService
+
+from bietlejuice.jobs.composer.services.dag_metadata_service import DAGMetadataService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
@@ -140,62 +140,41 @@ def get_lineage_and_tags_df(spark_client: SparkClient) -> DataFrame:
     return metadata_df
 
 
-def should_skip_source(source, skip_list):
-    if source in skip_list or source.startswith("dw_") or source.startswith("enrich_"):
-        return True
-    return False
-
-
-def get_lineage_from_product_data(
-    lineage_from_product_skip_list: Set[str], environment: str
+def get_dag_metadata(
+    lineage_from_product_skip_list: Set[str], dag_manual_mapping: Dict, environment: str
 ) -> List[Dict[str, str]]:
-    dags_data = []
-    metadata_service = MetadataService()
-    dag_regex = re.compile(
-        r"dags/(?P<source>\w+)(?:/(?P<context>\w+))?/(?P<dag>\w+)\.py"
-    )
+    dags = []
+    metadata_service = DAGMetadataService(dag_manual_mapping)
     for file in FileService.list_dag_files():
-        match = re.search(dag_regex, file).groupdict()
-        dag = match["dag"]
-        source = match["source"]
-        context = match["context"]
-        if (
-            source
-            and dag
-            and not should_skip_source(source, lineage_from_product_skip_list)
-        ):
-            if context:
-                source_with_context = f"source={source} context={context}"
-                database_name = f"datalake_{source}_{context}_raw"
-            else:
-                context = source
-                database_name = f"datalake_{source}_raw"
-                source_with_context = f"source={source}"
-
-            has_lineage_from_product = metadata_service.dag_has_lineage_from_product_config(
-                source, context, dag, environment
-            )
-            logger.info(
-                f"m=get_lineage_from_product_data, {source_with_context}, database_name={database_name}, "
-                f"has_lineage_from_product={has_lineage_from_product} "
-            )
-            dags_data.append(
-                {
-                    "database_name": database_name,
-                    "has_lineage_from_product": has_lineage_from_product,
-                }
-            )
-    return dags_data
+        source, context, dag = metadata_service.get_dag_info_from_path(file)
+        if source not in lineage_from_product_skip_list:
+            layers = metadata_service.get_dag_layers(source, context, dag)
+            for layer in layers:
+                dags.append(
+                    {
+                        "database": metadata_service.get_dag_database_name(
+                            source, context, dag, layer
+                        ),
+                        "has_lineage_from_product": metadata_service.dag_has_lineage_from_product_config(
+                            source, context, dag, environment
+                        ),
+                        "owner": metadata_service.get_dag_owner(source, context, dag),
+                    }
+                )
+    return dags
 
 
-def get_lineage_from_product_df(
-    spark_client: SparkClient, lineage_from_product_skip_list: Set[str], env: str
+def get_dag_metadata_df(
+    spark_client: SparkClient,
+    lineage_from_product_skip_list: Set[str],
+    dag_manual_mapping: Dict,
+    env: str,
 ) -> DataFrame:
-    lineage_from_product_data = get_lineage_from_product_data(
-        lineage_from_product_skip_list, env
+    dag_metadata_data = get_dag_metadata(
+        lineage_from_product_skip_list, dag_manual_mapping, env
     )
     metadata_df = spark_client.create_dataframe(
-        Row(**row) for row in lineage_from_product_data
+        Row(**row) for row in dag_metadata_data
     ).drop("columns")
     return metadata_df
 
@@ -204,18 +183,19 @@ def get_lineage_from_product_df(
 
 
 def compare_metadata_with_metastore(
-    metadata_data, metastore_data, lineage_from_product_data, spark_client
+    metadata_data, metastore_data, dag_metadata, spark_client
 ):
     metadata_data.createOrReplaceTempView("vw_metadata")
     metastore_data.createOrReplaceTempView("vw_metastore")
-    lineage_from_product_data.createOrReplaceTempView("vw_lineage_from_product")
+    dag_metadata.createOrReplaceTempView("vw_dag_info")
 
     query = f"""
       SELECT
           ms.layer,
           ms.database_name,
           ms.table_name,
-          COALESCE(md.has_lineage, lfp.has_lineage_from_product, False) as has_lineage,
+          di.owner,
+          COALESCE(md.has_lineage, di.has_lineage_from_product, False) as has_lineage,
           COALESCE(md.has_tags, False) as has_tags
       FROM
           vw_metastore AS ms
@@ -224,8 +204,8 @@ def compare_metadata_with_metastore(
               ON ms.database_name = md.database_name
               AND ms.table_name = md.table_name
       LEFT JOIN
-          vw_lineage_from_product as lfp
-              ON ms.database_name = lfp.database_name
+          vw_dag_info as di
+              ON ms.database_name = di.database
     """
 
     return spark_client.get_records(query)
@@ -259,6 +239,7 @@ if __name__ == "__main__":
     lineage_from_product_source_skip_list = set(
         config_service.get_config("LINEAGE_FROM_PRODUCT_SOURCES_SKIP_LIST")
     )
+    dag_manual_mapping = config_service.get_config("DAG_METADATA_MANUAL_MAPPING")
 
     s3_loader = S3Loader()
     spark_client = SparkClient()
@@ -274,11 +255,11 @@ if __name__ == "__main__":
     # Creating metrics dataframe
     metastore_tables_df = get_tables_from_metastore(spark_client, schemas_skip_list)
     lineage_and_tags_df = get_lineage_and_tags_df(spark_client)
-    lineage_from_product_df = get_lineage_from_product_df(
-        spark_client, lineage_from_product_source_skip_list, env
+    dag_metadata_df = get_dag_metadata_df(
+        spark_client, lineage_from_product_source_skip_list, dag_manual_mapping, env
     )
     lineage_and_tags_metrics_df = compare_metadata_with_metastore(
-        lineage_and_tags_df, metastore_tables_df, lineage_from_product_df, spark_client
+        lineage_and_tags_df, metastore_tables_df, dag_metadata_df, spark_client
     )
     lineage_and_tags_metrics_df = (
         SparkDataFrameService()
