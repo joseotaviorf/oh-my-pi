@@ -3,7 +3,7 @@ taxonomy_demand as (
 	with taxonomy_min_ids as (
 		select
 		  min(id) as id
-		from datalake_raw.gsheets_taxonomy_demand
+		from datalake_gsheets_clean.taxonomy_demand
 		where first_update_source = 'Inquilinos'
 		    and flg_via_reschedule = '0'
 		group by
@@ -28,7 +28,7 @@ taxonomy_demand as (
 		td.Origin as mkt_origin,
 		td.Source as mkt_source,
 		td.Platform as mkt_platform
-	from datalake_raw.gsheets_taxonomy_demand td
+	from datalake_gsheets_clean.taxonomy_demand td
 	join taxonomy_min_ids td_min
 		on td.id = td_min.id
 ),
