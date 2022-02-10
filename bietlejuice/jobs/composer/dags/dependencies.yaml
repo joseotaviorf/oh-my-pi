@@ -977,6 +977,9 @@ bietlejuice.enrich_sirena:
   - bietlejuice.sirena:load-clean-interactions
   - bietlejuice.sirena:load-clean-prospects
 
+bietlejuice.enrich_sorting_hat:
+  - bietlejuice.sorting_hat:load-clean-early-credit-analysis
+
 bietlejuice.enrich_survicate:
   - bietlejuice.survicate:load-clean-surveys
 

@@ -1,0 +1,64 @@
+---
+database_name: datalake_sorting_hat
+table_name: early_credit_analysis
+columns:
+  id:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.id
+  id_credit_evaluation:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.id_credit_evaluation
+  id_user:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.id_user
+  id_house:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.id_house
+  id_variant:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.id_variant
+  id_model_variant:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.result
+  city:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.city
+  score:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.result
+  bypass:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.result
+  errors:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.result
+  result:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.result
+  category:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.result
+  range_start:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.result
+  range_end:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.result
+  model_variant:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.result
+  risk_category:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.result
+  rejection_reason:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.result
+  version:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.version
+  ts_created:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.ts_created
+  ts_expired:
+    lineage:
+      - datalake_sorting_hat_clean.early_credit_analysis.ts_expired
