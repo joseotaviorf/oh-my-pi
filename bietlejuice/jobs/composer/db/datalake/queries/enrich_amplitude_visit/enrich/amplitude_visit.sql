@@ -25,7 +25,7 @@ with cross_platform as (
       order by cast(ts_event as date)
     ) as rn
   from
-    datalake_amplitude_clean.170698_visit_schedule_confirmed_events
+    datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events
 )
 select
   id_app,
@@ -64,4 +64,4 @@ from
   cross_platform
 where
   rn = 1
-  and id_visit is not null
+  and id_visit is not null;

@@ -51,7 +51,7 @@ if __name__ == "__main__":
 
     query_path = QUERIES_DATALAKE_PATH + source + "/{}.sql".format(table_name)
     query = FileService.get_query_from_file_name(query_path).format(
-        db=db_info["db_raw_databricks"], year=year, month=month, day=day
+        year=year, month=month, day=day
     )
 
     # create df
