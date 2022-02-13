@@ -1,4 +1,12 @@
 WITH
+--------------------------------------------
+-- Query user_attendence_5a at Secretary --
+--------------------------------------------
+users_secretaria AS (
+    SELECT 
+        id_user_5a::BIGINT AS id_user_attendence_5a
+    FROM datalake_gsheets_clean_prod.secretariat_hierarchy
+),
 buyer_prospect_status as (
     SELECT
         sk_buyer,
@@ -31,7 +39,7 @@ events AS (
         fsf.sk_buyer,
         fsf.sk_house,
         fsf.sk_region,
-        db.mkt_origin,
+        CASE WHEN fv.sk_user_creation = us.id_user_attendence_5a THEN 'Secretaria' ELSE db.mkt_origin END as mkt_origin,
         db.mkt_channel,
         db.mkt_medium,
         db.mkt_source,
@@ -48,6 +56,8 @@ events AS (
             USING(sk_booking)
         JOIN sale.fact_sale_flows AS fsf
             ON fsf.sk_sale_flow = fv.sk_sale_flow
+        LEFT JOIN users_secretaria AS us  
+            ON us.id_user_attendence_5a = fv.sk_user_creation
     WHERE
         db.sk_booking > 0
         AND db.visit_intent = 'SALE'
