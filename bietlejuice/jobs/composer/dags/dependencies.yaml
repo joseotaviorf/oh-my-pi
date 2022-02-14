@@ -53,7 +53,13 @@ bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.gsheets:load-clean-taxonomy-demand
 
 bietlejuice.dw_datamarts_for_sale:
-  - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark  
+  - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
+  - bietlejuice.casa_mineira_crm:load-clean-city
+  - bietlejuice.casa_mineira_crm:load-clean-house
+  - bietlejuice.casa_mineira_crm:load-clean-house-status
+  - bietlejuice.casa_mineira_crm:load-clean-neighborhood
+  - bietlejuice.casa_mineira_crm:load-clean-revisions
+  - bietlejuice.casa_mineira_crm:load-clean-uf
   - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
   - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
   - bietlejuice.dw_region:load-public-dim-region-into-redshift

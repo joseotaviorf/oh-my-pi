@@ -24,6 +24,11 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/for_sale/deal_making_funnel.sql
       table: deal_making_funnel
+  sale_ongoing_listings_casa_mineira:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_sale/sale_ongoing_listings_casa_mineira.sql
+      table: sale_ongoing_listings_casa_mineira
   temp_autonomous_agents_listings:
     dw:
       <<: *redshift_anchor
