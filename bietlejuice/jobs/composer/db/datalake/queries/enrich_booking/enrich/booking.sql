@@ -144,6 +144,19 @@ visitor_fixed_agent as (
     WHERE
       pfa_aud.mod_is_enabled = true
     GROUP BY 1
+  ),
+  preferred_fixed_agent AS (
+    SELECT 
+      id,
+      id_user_visit_preferences,
+      id_agent_data,
+      id_region,
+      business_context,
+      ROW_NUMBER() OVER (PARTITION BY id_user_visit_preferences ORDER BY ts_updated DESC) AS rw_number,
+      is_enabled,
+      ts_created
+    FROM 
+      datalake_ebdb_clean.preferred_fixed_agent AS a 
   )
   -- Looks the booking date and find which agent was linked to the buyer at the period
   -- Buyers can have different fixed agents in each city, so it has to match the id_city of the house visited
@@ -155,7 +168,7 @@ visitor_fixed_agent as (
   FROM
     datalake_ebdb_clean.user_visit_preferences uvp
   JOIN
-    datalake_ebdb_clean.preferred_fixed_agent pfa
+    preferred_fixed_agent AS pfa
       ON pfa.id_user_visit_preferences = uvp.id
   LEFT JOIN
     fixed_agent_disabled fad
@@ -174,7 +187,8 @@ visitor_fixed_agent as (
     -- If the fixed_agent is active it compares bookings from pfa creation until now
     -- Otherwise it compares bookings from pfa creation until pfa disabled
     b.ts_created BETWEEN pfa.ts_created AND IF(pfa.is_enabled = TRUE, NOW(), fad.ts_fixed_agent_disabled)
-    AND r.id_city = pfa.id_region -- id_region from pfa it's actually the id_city
+    AND r.id_city = pfa.id_region -- id_region from pfa it's actually the id_city]
+    AND pfa.rw_number = 1
 ),
 booking_in_rented_house AS (
 -- Track if the sale visit was in a house with rental contract active
@@ -244,6 +258,16 @@ booking_hub_agent AS (
     -- Date that the visits in HUB flow started
     AND CAST(b.ts_created AS DATE) >= '2021-07-19'
 ),
+
+secretariat_users AS (
+  SELECT 
+    id_user_5a 
+  FROM
+    datalake_gsheets_clean.secretariat_hierarchy
+  GROUP BY
+    id_user_5a
+),
+
 base_booking AS (
   SELECT
     b.id,
@@ -254,7 +278,9 @@ base_booking AS (
     cd.id_user_cancelation,
     b.id_house,
     b.id_agent,
+    ua.id AS id_user_sale_agent,
     b.id_attendant,
+    su.id_user_5a AS id_user_sale_attendence_5a,
     b.id_rent_flow,
     IF(b.business_context = 'SALE',
       CONCAT(b.id_visitor, '_', b.id_house),
@@ -270,6 +296,7 @@ base_booking AS (
     b.visit_fup,
     b.slot_day,
     b.checkin_status,
+    u.email AS user_creation_email,
     vo.last_update_source,
     vo.first_update_source,
     vo.is_visit_created_from_app,
@@ -357,6 +384,19 @@ base_booking AS (
       ),
       'Unknown')
     AS reason_category,
+    IF(
+      b.business_context = 'SALE', 
+        (
+          CASE
+            WHEN fba.id_user_creation = ua.id THEN 'Agent'
+            WHEN fba.id_user_creation = b.id_visitor THEN 'Buyer'
+            WHEN fba.id_user_creation = su.id_user_5a THEN 'Secretaria'
+            WHEN u.email LIKE '%quintoandar.com.br' THEN 'Admin/CX'
+            ELSE 'Other'
+          END
+        ),
+        NULL
+    ) AS user_sale_booking_creator,
     bha.contract_name AS hub_agent_region,
     b.ts_visit_fup,
     b.ts_created,
@@ -432,14 +472,23 @@ base_booking AS (
     first_booking_author AS fba
       ON fba.id_booking = b.id
   LEFT JOIN
-    visitor_fixed_agent vfa
+    visitor_fixed_agent AS vfa
       ON vfa.id_booking = b.id
   LEFT JOIN
-    booking_in_rented_house brh
+    booking_in_rented_house AS brh
       ON brh.id = b.id
   LEFT JOIN
-    booking_hub_agent bha
+    booking_hub_agent AS bha
       ON bha.id = b.id
+  LEFT JOIN
+    datalake_ebdb_clean.user AS ua
+      ON ua.id_agent = b.id_agent
+  LEFT JOIN
+    secretariat_users AS su
+      ON su.id_user_5a = fba.id_user_creation
+  LEFT JOIN
+    datalake_ebdb_user.user AS u
+      ON u.id = fba.id_user_creation
 )
 -- custom columns that need pre-calculated ones
 SELECT

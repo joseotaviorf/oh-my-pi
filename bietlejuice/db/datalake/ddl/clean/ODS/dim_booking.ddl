@@ -41,6 +41,7 @@ create external table if not exists datalake_clean.ods_dim_booking (
   owner_missing_reason varchar(255),
   troublesome_entrance varchar(255),
   checkin_status varchar(255),
+  user_sale_booking_creator varchar(255),
   app_type varchar(255),
   media_source varchar(255),
   adjust_network varchar(255),

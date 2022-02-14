@@ -42,6 +42,7 @@ create table if not exists public.dim_booking
   owner_missing_reason varchar(255) encode lzo,
   troublesome_entrance varchar(255) encode lzo,
   checkin_status varchar(255) encode lzo,
+  user_sale_booking_creator varchar(255) encode lzo,
   app_type varchar(255) encode lzo,
   media_source varchar(255) encode lzo,
   adjust_network varchar(255) encode lzo,

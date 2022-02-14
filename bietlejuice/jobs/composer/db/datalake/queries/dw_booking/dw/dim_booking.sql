@@ -78,6 +78,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   b.owner_missing_reason,
   b.troublesome_entrance_problem AS troublesome_entrance,
   b.checkin_status,
+  b.user_sale_booking_creator,
   src.app_type,
   -- TODO [ODS] review this rule
   COALESCE(src.media_source, "Unknown") AS media_source,

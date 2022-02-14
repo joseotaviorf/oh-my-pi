@@ -124,6 +124,9 @@ columns:
   checkin_status:
     lineage:
       - datalake_booking.booking.checkin_status
+  user_sale_booking_creator:
+    lineage:
+      - datalake_booking.booking.user_sale_booking_creator
   app_type:
     lineage:
       - datalake_amplitude_visit.amplitude_visit.app_type

@@ -25,9 +25,15 @@ columns:
   id_agent:
     lineage:
       - datalake_ebdb_clean.booking.id_agent
+  id_user_sale_agent:
+    lineage:
+      - datalake_ebdb_clean.user.id
   id_attendant:
     lineage:
       - datalake_ebdb_clean.booking.id_attendant
+  id_user_sale_attendence_5a:
+    lineage:
+      - datalake_gsheets_clean.secretariat_hierarchy.id_user_5a
   id_rent_flow:
     lineage:
       - datalake_ebdb_clean.booking.id_rent_flow
@@ -65,6 +71,9 @@ columns:
   checkin_status:
     lineage:
       - datalake_ebdb_clean.booking.checkin_status
+  user_creation_email:
+    lineage:
+      - datalake_ebdb_user.user.email
   last_update_source:
     lineage:
       - datalake_ebdb_clean.visit_origin.name
