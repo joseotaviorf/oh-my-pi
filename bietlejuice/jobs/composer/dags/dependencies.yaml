@@ -892,17 +892,25 @@ bietlejuice.enrich_nps_answer_drivers:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
 
 bietlejuice.enrich_offer:
+  - bietlejuice.ebdb:create-clean-agent-data-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-offer-in-data-lake
   - bietlejuice.ebdb:create-clean-offer-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
+  - bietlejuice.ebdb:create-clean-workcontract-in-data-lake
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
-  - bietlejuice.enrich_firestore
-  - bietlejuice.enrich_gsheets
-  - bietlejuice.enrich_sale_offer_flows
+  - bietlejuice.enrich_firestore:load-enrich-monday
+  - bietlejuice.enrich_firestore:load-enrich-rent-offer
+  - bietlejuice.enrich_firestore:load-enrich-sale-offer
+  - bietlejuice.enrich_gsheets:load-enrich-sale-hub-offer
   - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.enrich_sale_listings:load-enrich-sale-listing
+  - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-flows
   - bietlejuice.godfather:load-clean-offer
   - bietlejuice.gsheets:load-clean-monday-users
+  - bietlejuice.gsheets:load-clean-offers-hub-central
   
 bietlejuice.enrich_owner_fees:
   - bietlejuice.owner_fees:load-clean-contract
