@@ -52,6 +52,11 @@ bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
   - bietlejuice.gsheets:load-clean-taxonomy-demand
 
+bietlejuice.dw_datamarts_for_sale:
+  - bietlejuice.enrich_firestore:load-enrich-monday
+  - bietlejuice.enrich_firestore:load-enrich-sale-offer
+  - bietlejuice.gsheets:load-clean-monday-users
+  
 
 bietlejuice.dw_affiliate_costs:
   - bietlejuice.enrich_robin_hood
