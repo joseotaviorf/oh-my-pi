@@ -3,13 +3,13 @@ amenities AS (
   WITH
   most_recent_amenities AS (
     SELECT
-      i.imovel_id,
-      i.amenidades_id,
-      i.temcaracteristica,
+      i.id_house AS imovel_id,
+      i.id_amenities AS amenidades_id ,
+      i.has_characteristic AS temcaracteristica,
       a.slug,
-      ROW_NUMBER() OVER(PARTITION BY i.imovel_id, i.amenidades_id ORDER BY i.atualizadoem DESC) AS rn
-    FROM datalake_ebdb_raw_prod.amenidadesinfo i
-    JOIN datalake_ebdb_raw_prod.amenidades a ON i.amenidades_id = a.id
+      ROW_NUMBER() OVER(PARTITION BY i.id_house, i.id_amenities ORDER BY i.ts_updated DESC) AS rn
+    FROM datalake_ebdb_clean_prod.info_amenities i
+    JOIN datalake_ebdb_clean_prod.amenities a ON i.id_amenities = a.id
   )
   SELECT
     imovel_id as id_house,
@@ -24,13 +24,13 @@ condo_amenities AS (
   WITH
   most_recent_condo_amenities AS (
     SELECT
-      i.imovel_id,
-      i.instalacao_id,
-      i.temcaracteristica,
+      i.id_house AS imovel_id,
+      i.id_condo_amenities AS instalacao_id,
+      i.has_characteristic AS temcaracteristica,
       a.slug,
-      ROW_NUMBER() OVER(PARTITION BY i.imovel_id, i.instalacao_id ORDER BY i.atualizadoem DESC) AS rn
-    FROM datalake_ebdb_raw_prod.instalacaoinfo i
-    JOIN datalake_ebdb_raw_prod.instalacao a ON i.instalacao_id = a.id
+      ROW_NUMBER() OVER(PARTITION BY i.id_house, i.id_condo_amenities ORDER BY i.ts_updated DESC) AS rn
+    FROM datalake_ebdb_clean_prod.info_condo_amenities i
+    JOIN datalake_ebdb_clean_prod.condo_amenities a ON i.id_condo_amenities = a.id_condo_amenity
   )
   SELECT
     imovel_id as id_house,
@@ -42,10 +42,10 @@ condo_amenities AS (
 )
 
 SELECT
-    COALESCE(a.id_house, 
+    CAST(COALESCE(a.id_house, 
              ca.id_house,
-             house_condition.houseid)     AS id_house,
-    CASE
+             house_condition.id_house) AS VARCHAR )   AS id_house,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 1)
         THEN 1
         ELSE CASE
@@ -53,8 +53,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  hidromassagem,
-    CASE
+        END AS VARCHAR) AS  hidromassagem,
+   CAST(CASE
         WHEN CONTAINS(amenities_with, 2)
         THEN 1
         ELSE CASE
@@ -62,8 +62,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  box_blindex,
-    CASE
+        END AS VARCHAR)AS  box_blindex,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 3)
         THEN 1
         ELSE CASE
@@ -71,8 +71,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  varanda,
-    CASE
+        END                               AS VARCHAR )AS  varanda,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 4)
         THEN 1
         ELSE CASE
@@ -80,8 +80,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  fogao_geladeira,
-    CASE
+        END                               AS VARCHAR )AS  fogao_geladeira,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 5)
         THEN 1
         ELSE CASE
@@ -89,8 +89,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  piscina_privativa,
-    CASE
+        END                               AS VARCHAR )AS  piscina_privativa,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 6)
         THEN 1
         ELSE CASE
@@ -98,8 +98,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  churrasqueira_privativa,
-    CASE
+        END                               AS VARCHAR )AS  churrasqueira_privativa,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 7)
         THEN 1
         ELSE CASE
@@ -107,8 +107,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  armarios_no_quarto,
-    CASE
+        END                               AS VARCHAR )AS  armarios_no_quarto,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 8)
         THEN 1
         ELSE CASE
@@ -116,8 +116,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  armarios_no_banheiro,
-    CASE
+        END                               AS VARCHAR )AS  armarios_no_banheiro,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 9)
         THEN 1
         ELSE CASE
@@ -125,8 +125,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  armarios_na_cozinha,
-    CASE
+        END                               AS VARCHAR )AS  armarios_na_cozinha,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 10)
         THEN 1
         ELSE CASE
@@ -134,8 +134,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  ar_condicionado,
-    CASE
+        END                               AS VARCHAR )AS  ar_condicionado,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 11)
         THEN 1
         ELSE CASE
@@ -143,8 +143,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  internet,
-    CASE
+        END                               AS VARCHAR )AS  internet,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 12)
         THEN 1
         ELSE CASE
@@ -152,8 +152,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  chuveiro_a_gas,
-    CASE
+        END                               AS VARCHAR )AS  chuveiro_a_gas,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 13)
         THEN 1
         ELSE CASE
@@ -161,8 +161,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  animais_de_estimacao,
-    CASE
+        END                               AS VARCHAR )AS  animais_de_estimacao,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 14)
         THEN 1
         ELSE CASE
@@ -170,8 +170,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  quarto_de_servico,
-    CASE
+        END                               AS VARCHAR )AS  quarto_de_servico,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 15)
         THEN 1
         ELSE CASE
@@ -179,8 +179,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  banheiro_de_servico,
-    CASE
+        END                               AS VARCHAR )AS  banheiro_de_servico,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 16)
         THEN 1
         ELSE CASE
@@ -188,8 +188,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  garagem_fixa,
-    CASE
+        END                               AS VARCHAR )AS  garagem_fixa,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 17)
         THEN 1
         ELSE CASE
@@ -197,8 +197,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  varanda_gourmet,
-    CASE
+        END                               AS VARCHAR )AS  varanda_gourmet,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 18)
         THEN 1
         ELSE CASE
@@ -206,8 +206,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  apartamento_cobertura,
-    CASE
+        END                               AS VARCHAR )AS  apartamento_cobertura,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 19)
         THEN 1
         ELSE CASE
@@ -215,8 +215,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  quarto_extra_reversivel,
-    CASE
+        END                               AS VARCHAR )AS  quarto_extra_reversivel,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 20)
         THEN 1
         ELSE CASE
@@ -224,8 +224,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  fogao,
-    CASE
+        END                               AS VARCHAR )AS  fogao,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 21)
         THEN 1
         ELSE CASE
@@ -233,8 +233,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  geladeira,
-    CASE
+        END                               AS VARCHAR )AS  geladeira,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 22)
         THEN 1
         ELSE CASE
@@ -242,8 +242,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  sol_da_manha,
-    CASE
+        END                               AS VARCHAR )AS  sol_da_manha,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 23)
         THEN 1
         ELSE CASE
@@ -251,8 +251,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  sol_da_tarde,
-    CASE
+        END                               AS VARCHAR )AS  sol_da_tarde,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 24)
         THEN 1
         ELSE CASE
@@ -260,8 +260,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  cortinas_black_out,
-    CASE
+        END                               AS VARCHAR )AS  cortinas_black_out,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 25)
         THEN 1
         ELSE CASE
@@ -269,8 +269,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  cortinas_decorativas,
-    CASE
+        END                               AS VARCHAR )AS  cortinas_decorativas,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 26)
         THEN 1
         ELSE CASE
@@ -278,8 +278,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  janela_anti_ruido,
-    CASE
+        END                               AS VARCHAR )AS  janela_anti_ruido,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 27)
         THEN 1
         ELSE CASE
@@ -287,8 +287,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  ventilador_de_teto,
-    CASE
+        END                               AS VARCHAR )AS  ventilador_de_teto,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 28)
         THEN 1
         ELSE CASE
@@ -296,8 +296,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  luminosidade_natural,
-    CASE
+        END                               AS VARCHAR )AS  luminosidade_natural,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 29)
         THEN 1
         ELSE CASE
@@ -305,8 +305,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  vista_livre,
-    CASE
+        END                               AS VARCHAR )AS  vista_livre,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 30)
         THEN 1
         ELSE CASE
@@ -314,8 +314,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  rua_silenciosa,
-    CASE
+        END                               AS VARCHAR )AS  rua_silenciosa,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 31)
         THEN 1
         ELSE CASE
@@ -323,8 +323,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  chuveiro_eletrico,
-    CASE
+        END                               AS VARCHAR )AS  chuveiro_eletrico,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 32)
         THEN 1
         ELSE CASE
@@ -332,8 +332,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  microondas,
-    CASE
+        END                               AS VARCHAR )AS  microondas,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 33)
         THEN 1
         ELSE CASE
@@ -341,8 +341,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  sofa,
-    CASE
+        END                               AS VARCHAR )AS  sofa,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 34)
         THEN 1
         ELSE CASE
@@ -350,8 +350,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  maquina_de_lavar,
-    CASE
+        END                               AS VARCHAR )AS  maquina_de_lavar,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 35)
         THEN 1
         ELSE CASE
@@ -359,8 +359,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  secadora,
-    CASE
+        END                               AS VARCHAR )AS  secadora,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 36)
         THEN 1
         ELSE CASE
@@ -368,8 +368,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  lava_e_seca,
-    CASE
+        END                               AS VARCHAR )AS  lava_e_seca,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 37)
         THEN 1
         ELSE CASE
@@ -377,8 +377,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  tanque,
-    CASE
+        END                               AS VARCHAR )AS  tanque,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 38)
         THEN 1
         ELSE CASE
@@ -386,8 +386,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  rede_de_protecao,
-    CASE
+        END                               AS VARCHAR )AS  rede_de_protecao,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 39)
         THEN 1
         ELSE CASE
@@ -395,8 +395,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  varal_de_roupas,
-    CASE
+        END                               AS VARCHAR )AS  varal_de_roupas,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 40)
         THEN 1
         ELSE CASE
@@ -404,8 +404,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  tomadas_novas,
-    CASE
+        END                               AS VARCHAR )AS  tomadas_novas,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 41)
         THEN 1
         ELSE CASE
@@ -413,8 +413,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  televisao,
-    CASE
+        END                               AS VARCHAR )AS  televisao,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 42)
         THEN 1
         ELSE CASE
@@ -422,8 +422,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  mesa_e_cadeiras,
-    CASE
+        END                               AS VARCHAR )AS  mesa_e_cadeiras,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 43)
         THEN 1
         ELSE CASE
@@ -431,8 +431,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  cafeteira,
-    CASE
+        END                               AS VARCHAR )AS  cafeteira,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 44)
         THEN 1
         ELSE CASE
@@ -440,8 +440,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  churrasqueira,
-    CASE
+        END                               AS VARCHAR )AS  churrasqueira,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 45)
         THEN 1
         ELSE CASE
@@ -449,8 +449,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  acesso_sem_degraus,
-    CASE
+        END                               AS VARCHAR )AS  acesso_sem_degraus,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 46)
         THEN 1
         ELSE CASE
@@ -458,8 +458,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  cooktop,
-    CASE
+        END                               AS VARCHAR )AS  cooktop,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 47)
         THEN 1
         ELSE CASE
@@ -467,8 +467,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  utensilios_de_cozinha,
-    CASE
+        END                               AS VARCHAR )AS  utensilios_de_cozinha,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 48)
         THEN 1
         ELSE CASE
@@ -476,8 +476,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  cama_de_casal,
-    CASE
+        END                               AS VARCHAR )AS  cama_de_casal,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 49)
         THEN 1
         ELSE CASE
@@ -485,8 +485,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  cama_de_solteiro,
-    CASE
+        END                               AS VARCHAR )AS  cama_de_solteiro,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 50)
         THEN 1
         ELSE CASE
@@ -494,8 +494,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  espelho_no_banheiro,
-    CASE
+        END                               AS VARCHAR )AS  espelho_no_banheiro,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 51)
         THEN 1
         ELSE CASE
@@ -503,8 +503,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  fechadura_eletronica,
-    CASE
+        END                               AS VARCHAR )AS  fechadura_eletronica,
+    CAST(CASE
         WHEN CONTAINS(amenities_with, 52)
         THEN 1
         ELSE CASE
@@ -512,8 +512,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  energia,
-    CASE
+        END                               AS VARCHAR )AS  energia,
+    CAST(CASE
         WHEN CONTAINS(condo_amenities_with, 1)
         THEN 1
         ELSE CASE
@@ -521,8 +521,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  playground,
-    CASE
+        END                               AS VARCHAR )AS  playground,
+    CAST(CASE
         WHEN CONTAINS(condo_amenities_with, 2)
         THEN 1
         ELSE CASE
@@ -530,8 +530,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  piscina_no_condominio,
-    CASE
+        END                               AS VARCHAR )AS  piscina_no_condominio,
+    CAST(CASE
         WHEN CONTAINS(condo_amenities_with, 3)
         THEN 1
         ELSE CASE
@@ -539,8 +539,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  churrasqueira_no_condominio,
-    CASE
+        END                               AS VARCHAR )AS  churrasqueira_no_condominio,
+    CAST(CASE
         WHEN CONTAINS(condo_amenities_with, 4)
         THEN 1
         ELSE CASE
@@ -548,8 +548,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  quadra_esportiva,
-    CASE
+        END                               AS VARCHAR )AS  quadra_esportiva,
+    CAST(CASE
         WHEN CONTAINS(condo_amenities_with, 5)
         THEN 1
         ELSE CASE
@@ -557,8 +557,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  academia,
-    CASE
+        END                               AS VARCHAR )AS  academia,
+    CAST(CASE
         WHEN CONTAINS(condo_amenities_with, 6)
         THEN 1
         ELSE CASE
@@ -566,8 +566,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  salao_de_festas,
-    CASE
+        END                               AS VARCHAR )AS  salao_de_festas,
+    CAST(CASE
         WHEN CONTAINS(condo_amenities_with, 7)
         THEN 1
         ELSE CASE
@@ -575,8 +575,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  sauna,
-    CASE
+        END                               AS VARCHAR )AS  sauna,
+    CAST(CASE
         WHEN CONTAINS(condo_amenities_with, 8)
         THEN 1
         ELSE CASE
@@ -584,8 +584,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  lavanderia,
-    CASE
+        END                               AS VARCHAR )AS  lavanderia,
+    CAST(CASE
         WHEN CONTAINS(condo_amenities_with, 9)
         THEN 1
         ELSE CASE
@@ -593,8 +593,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  gas_encanado,
-    CASE
+        END                               AS VARCHAR )AS  gas_encanado,
+    CAST(CASE
         WHEN CONTAINS(condo_amenities_with, 10)
         THEN 1
         ELSE CASE
@@ -602,8 +602,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  portao_automatico,
-    CASE
+        END                               AS VARCHAR )AS  portao_automatico,
+    CAST(CASE
         WHEN CONTAINS(condo_amenities_with, 11)
         THEN 1
         ELSE CASE
@@ -611,8 +611,8 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  espaco_gourmet,
-    CASE
+        END                               AS VARCHAR )AS  espaco_gourmet,
+    CAST(CASE
         WHEN CONTAINS(condo_amenities_with, 12)
         THEN 1
         ELSE CASE
@@ -620,10 +620,11 @@ SELECT
                 THEN 0
                 ELSE NULL
                 END
-        END                               AS  perto_do_metro,
-    house_condition.maintenancecondition  AS  house_condition
+        END                               AS VARCHAR ) AS  perto_do_metro,
+    house_condition.maintenance_condition  AS  house_condition,
+    CAST(NOW() AS VARCHAR) AS ts_load
 FROM amenities a
 FULL JOIN condo_amenities ca
   ON a.id_house = ca.id_house
-FULL JOIN datalake_ebdb_raw_prod.housemaintenancecondition house_condition
-  ON COALESCE(a.id_house, ca.id_house) = house_condition.houseid
+FULL JOIN datalake_ebdb_clean_prod.house_maintenance_condition house_condition
+  ON COALESCE(a.id_house, ca.id_house) = house_condition.id_house

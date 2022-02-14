@@ -19,6 +19,11 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/for_sale/buyer_first_visit_intent.sql
       table: buyer_first_visit_intent
+  dim_house_listing_amenities:
+    dw:
+      <<: *athena_anchor
+      sql_file: dw/queries/datamarts/for_sale/dim_house_listing_amenities.sql
+      table: dim_house_listing_amenities
   deal_making_funnel:
     dw:
       <<: *redshift_anchor
@@ -29,16 +34,16 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/for_sale/sale_agents_weekly_performance.sql
       table: sale_agents_weekly_performance
-  repressed_demand_sale_booking_fit_in:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_sale/repressed_demand_sale_booking_fit_in.sql
-      table: repressed_demand_sale_booking_fit_in
   sale_ongoing_listings_casa_mineira:
     dw:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/for_sale/sale_ongoing_listings_casa_mineira.sql
       table: sale_ongoing_listings_casa_mineira
+  repressed_demand_sale_booking_fit_in:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_sale/repressed_demand_sale_booking_fit_in.sql
+      table: repressed_demand_sale_booking_fit_in
   temp_autonomous_agents_listings:
     dw:
       <<: *redshift_anchor
