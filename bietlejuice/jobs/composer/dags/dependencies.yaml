@@ -82,9 +82,9 @@ bietlejuice.dw_banking_file_payments:
   - bietlejuice.vans:load-clean-bank-payment
 
 bietlejuice.dw_booking:
-  - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.ebdb:create-clean-visit-in-data-lake
-  - bietlejuice.enrich_amplitude_visit
+  - bietlejuice.enrich_amplitude_visit:load-enrich-amplitude-visit
+  - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.gsheets:load-clean-taxonomy-demand
 
 bietlejuice.dw_braze_events_user_centric:
@@ -286,9 +286,9 @@ bietlejuice.dw_quinto_messenger:
   - bietlejuice.enrich_quinto_messenger
 
 bietlejuice.dw_region:
-  - bietlejuice.enrich_region
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
+  - bietlejuice.enrich_region:load-enrich-region
 
 bietlejuice.dw_rent_fact_listing_owners:
   - bietlejuice.enrich_listing_owners:load-enrich-rental-metrics
@@ -319,7 +319,7 @@ bietlejuice.dw_rent_listing_flow:
   - bietlejuice.gsheets:load-clean-taxonomy-growth
 
 bietlejuice.dw_reservation:
-  - bietlejuice.enrich_kill_queue
+  - bietlejuice.enrich_kill_queue:load-enrich-reservation
 
 bietlejuice.dw_sale_closing_flows:
   - bietlejuice.enrich_sale_closing_flows:load-enrich-closing-flow
@@ -589,7 +589,11 @@ bietlejuice.enrich_credit_evers:
   - bietlejuice.enrich_invoice:load-enrich-credit-invoice
 
 bietlejuice.enrich_crm:
-  - bietlejuice.crm
+  - bietlejuice.crm:load-clean-task-status-histories
+  - bietlejuice.crm:load-clean-task-titles
+  - bietlejuice.crm:load-clean-tasks
+  - bietlejuice.crm:load-clean-workgroups
+  - bietlejuice.crm:load-clean-workflows
 
 bietlejuice.enrich_crm_lead:
   - bietlejuice.enrich_crm:load-enrich-tasks
