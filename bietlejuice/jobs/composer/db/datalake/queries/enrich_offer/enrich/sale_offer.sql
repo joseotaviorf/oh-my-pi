@@ -187,6 +187,17 @@ regions AS (
         FROM
             datalake_firestore.sale_offer AS fso
     ),
+    aux_sale_listings AS (
+        SELECT
+            sl.id_house AS sk_house,
+            h.id_user AS sk_owner,
+            h.id_region AS sk_region
+        FROM
+            datalake_sale_listings.sale_listing AS sl
+        JOIN 
+            datalake_ebdb_clean.house AS h
+                ON sl.id_house = h.id
+              ),
     aux AS (
         SELECT
             coalesce(g.id_offer, ohc.id_offer) AS id_offer,
@@ -204,7 +215,7 @@ regions AS (
                 sk_region,
                 sk_owner
             FROM
-                dw_sale.fact_listings
+                aux_sale_listings
             ) AS fl_ohc 
                 ON fl_ohc.sk_house = ohc.id_house_5a
         LEFT JOIN (
@@ -213,7 +224,7 @@ regions AS (
                 sk_region,
                 sk_owner
             FROM
-                dw_sale.fact_listings
+                aux_sale_listings
             ) AS fl_girofer 
                 ON fl_girofer.sk_house = g.id_house
         GROUP BY
