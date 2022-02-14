@@ -60,6 +60,15 @@ tickets_by_ticket_session AS (
     FROM
         ticket_sessions
     GROUP BY 1, 2
+),
+ticket_recontact_list AS (
+    SELECT 
+        ticket_session,
+        ticket_user,
+        LISTAGG(sk_ticket, ',') WITHIN GROUP (ORDER BY sk_ticket) AS ticket_recontact_list
+    FROM
+        ticket_sessions
+	GROUP BY 1,2
 )
 SELECT
     tts.ticket_session AS sk_ticket,
@@ -78,10 +87,15 @@ SELECT
         THEN FALSE
         ELSE TRUE
     END AS is_fcr,
+    trl.ticket_recontact_list,
     ft.ts_started,
     ft.ts_closed
 FROM
     tickets_by_ticket_session AS tts
+LEFT JOIN
+    ticket_recontact_list AS trl
+        ON tts.ticket_session = trl.ticket_session
+        AND tts.ticket_user = trl.ticket_user
 LEFT JOIN
     front_tickets AS ft
         ON ft.sk_ticket = tts.ticket_session
