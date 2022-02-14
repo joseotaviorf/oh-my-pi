@@ -19,3 +19,8 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/for_sale/deal_making_funnel.sql
       table: deal_making_funnel
+  temp_autonomous_agents_listings:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_sale/temp_autonomous_agents_listings.sql
+      table: temp_autonomous_agents_listings

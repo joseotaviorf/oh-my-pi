@@ -53,6 +53,14 @@ bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.gsheets:load-clean-taxonomy-demand
 
 bietlejuice.dw_datamarts_for_sale:
+  - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
+  - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
+  - bietlejuice.dw_user:load-public-dim-partner-agent-into-redshift
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-listing-business-context-in-data-lake
+  - bietlejuice.ebdb:create-clean-partner-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
   - bietlejuice.enrich_firestore:load-enrich-monday
   - bietlejuice.enrich_firestore:load-enrich-sale-offer
   - bietlejuice.gsheets:load-clean-monday-users
