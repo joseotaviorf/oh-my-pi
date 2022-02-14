@@ -53,8 +53,11 @@ bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.gsheets:load-clean-taxonomy-demand
 
 bietlejuice.dw_datamarts_for_sale:
+  - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark  
   - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
   - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
+  - bietlejuice.dw_region:load-public-dim-region-into-redshift
+  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings
   - bietlejuice.dw_user:load-public-dim-partner-agent-into-redshift
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-house-aud-in-data-lake

@@ -14,6 +14,11 @@ pipeline:
   #     table: <targe-table-name>
   #     schema: <target-schema-name> # TODO this will always be `datamart` (for both datalake and dw). This var is not used anymore
   #     runs_on: <backend-to-run-the-query> E.g: redshift or athena
+  buyer_first_visit_intent:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_sale/buyer_first_visit_intent.sql
+      table: buyer_first_visit_intent
   deal_making_funnel:
     dw:
       <<: *redshift_anchor
