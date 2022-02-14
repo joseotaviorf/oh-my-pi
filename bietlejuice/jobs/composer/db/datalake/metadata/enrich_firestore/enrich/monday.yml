@@ -217,6 +217,9 @@ columns:
   dt_sale_agreement_signed:
     lineage:
       - datalake_firestore_clean.monday.updated_message
+  dt_sale_agreement_signed_sent:
+    lineage:
+      - datalake_firestore_clean.monday.updated_message
   dt_sale_agreement_cancelled:
     lineage:
       - datalake_firestore_clean.monday.updated_message

@@ -74,6 +74,7 @@ SELECT
   --
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.data_assinatura_ccv4.value') AS DATE) AS dt_sale_agreement_created,
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.data27.value') AS DATE) AS dt_sale_agreement_signed,
+  CAST(GET_JSON_OBJECT(moa.updated_message, '$.date_12.value') AS DATE) AS dt_sale_agreement_signed_sent,
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.date4.value') AS DATE) AS dt_onboarding_ended,
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.data0.value') AS DATE) AS dt_bank_legal_analysis_started,
   CAST(GET_JSON_OBJECT(moa.updated_message, '$.data15.value') AS DATE) AS dt_financing_started,
@@ -279,6 +280,7 @@ SELECT
   moa.dt_last_seller_follow_up,
   moa.dt_sale_agreement_created,
   moa.dt_sale_agreement_signed,
+  moa.dt_sale_agreement_signed_sent,
   CASE WHEN moa.status = 'CCV - Cancelado' THEN moa.dt_offer_dismissed END AS dt_sale_agreement_cancelled,
   moa.dt_onboarding_ended,
   moa.dt_bank_legal_analysis_started,
