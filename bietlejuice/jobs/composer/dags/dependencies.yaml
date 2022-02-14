@@ -60,13 +60,17 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.casa_mineira_crm:load-clean-neighborhood
   - bietlejuice.casa_mineira_crm:load-clean-revisions
   - bietlejuice.casa_mineira_crm:load-clean-uf
+  - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
   - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
   - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
-  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings
+  - bietlejuice.dw_sale_listings:load-sale-fact-listings-into-redshift
+  - bietlejuice.dw_sale_visits:load-sale-fact-visits-into-redshift
   - bietlejuice.dw_user:load-public-dim-partner-agent-into-redshift
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-house-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-visit-status-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-weekly-schedule-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-listing-business-context-in-data-lake
   - bietlejuice.ebdb:create-clean-partner-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake

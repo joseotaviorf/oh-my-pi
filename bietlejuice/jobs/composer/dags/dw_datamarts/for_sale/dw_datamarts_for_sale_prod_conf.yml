@@ -24,6 +24,11 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/for_sale/deal_making_funnel.sql
       table: deal_making_funnel
+  repressed_demand_sale_booking_fit_in:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_sale/repressed_demand_sale_booking_fit_in.sql
+      table: repressed_demand_sale_booking_fit_in
   sale_ongoing_listings_casa_mineira:
     dw:
       <<: *redshift_anchor
