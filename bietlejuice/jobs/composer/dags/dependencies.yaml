@@ -63,9 +63,16 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
   - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
   - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
-  - bietlejuice.dw_region:load-public-dim-region-into-redshift
   - bietlejuice.dw_sale_listings:load-sale-fact-listings-into-redshift
   - bietlejuice.dw_sale_visits:load-sale-fact-visits-into-redshift
+  - bietlejuice.dw_offer:load-dw-dim-offer-into-redshift
+  - bietlejuice.dw_offer:load-dw-dim-sale-agreement-into-redshift
+  - bietlejuice.dw_offer:load-fact-offers-into-redshift
+  - bietlejuice.dw_region:load-dim-region-into-redshift
+  - bietlejuice.dw_tenant_booking_review:load-public-dim-tenant-booking-review-into-redshift
+  - bietlejuice.dw_tracksale:load-dim-nps-answer-into-redshift
+  - bietlejuice.dw_tracksale:load-dim-nps-campaign-into-redshift
+  - bietlejuice.dw_tracksale:load-fact-nps-dispatches-into-redshift
   - bietlejuice.dw_user:load-public-dim-partner-agent-into-redshift
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-house-aud-in-data-lake
@@ -74,10 +81,11 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.ebdb:create-clean-listing-business-context-in-data-lake
   - bietlejuice.ebdb:create-clean-partner-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
+  - bietlejuice.ebdb:create-clean-work-contract-in-data-lake
+  - bietlejuice.enrich_ebdb_agents:load-enrich-agents-review
   - bietlejuice.enrich_firestore:load-enrich-monday
   - bietlejuice.enrich_firestore:load-enrich-sale-offer
   - bietlejuice.gsheets:load-clean-monday-users
-  
 
 bietlejuice.dw_affiliate_costs:
   - bietlejuice.enrich_robin_hood
