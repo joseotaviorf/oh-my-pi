@@ -161,8 +161,6 @@ bietlejuice.dw_customer_support:
   - bietlejuice.enrich_customer_support:load-enrich-csat
   - bietlejuice.enrich_customer_support:load-enrich-chat
   - bietlejuice.enrich_customer_support:load-enrich-email
-  - bietlejuice.enrich_customer_support:load-enrich-historical-call
-  - bietlejuice.enrich_customer_support:load-enrich-historical-chat
   - bietlejuice.gsheets:load-clean-department-control
   - bietlejuice.gsheets:load-clean-agents-ranking-targets
   - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
