@@ -1,4 +1,3 @@
-import datetime as dt
 import json
 from datetime import datetime, date, timedelta
 
@@ -6,7 +5,7 @@ from airflow.models import DAG
 from airflow.operators.sensors import S3KeySensor
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
-from bietlejuice.jobs.base.base_etl import BaseETL, EnumDB
+from bietlejuice.jobs.base.base_etl import EnumDB
 from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.dags.util import xcom as xcom
 from bietlejuice.jobs.etl.agents.agent_model import Agent
@@ -17,41 +16,6 @@ bucket_datalake = env.get_airflow_env_var('bi-datalake-s3-bucket')
 GOOGLE_S_A_CREDENTIALS = json.loads(
     env.get_airflow_env_var('GOOGLE_SERVICE_ACCOUNT_CREDENTIALS'))
 GOOGLE_API_SCOPE = env.get_airflow_env_var('GOOGLE_API_SCOPE')
-
-
-def group_agent_region(**kwargs):
-    exec_date = kwargs['execution_date']
-    ar = Agent(bucket_datalake)
-    ar.clean_daily_data_in_table(enum=EnumDB.BI_ODS,
-                                 schema='public',
-                                 dim_name='agent_region_group',
-                                 date_column='dt',
-                                 dt=exec_date,
-                                 format='YYYY-MM-DD')
-    group_data = ar.get_agent_data(table_name='agent_region_group',
-                                   db_enum=EnumDB.BI_ODS,
-                                   dt=exec_date)
-    ar.move_data_to_destination(data=group_data,
-                                table_name='agent_region_group')
-
-
-def load_group_agent_region_dw():
-    BaseETL.move_table_to_dw('agent_region_group',
-                             EnumDB.BI_ODS,
-                             EnumDB.BI_DW,
-                             table_name_dest='staging.agent_region_group',
-                             append=False)
-
-
-def create_dim_agent_region_dw():
-    ar = Agent(bucket_datalake)
-    ar.truncate_table(schema='public',
-                      table='dim_agent_region',
-                      enumdb=EnumDB.BI_DW)
-    ar.create_table_dw(table_name='dim_agent_region', append=False)
-    ar.insert_dummy(table_name='dim_agent_region',
-                    key_column='sk_agent_region',
-                    previous_check=True)
 
 
 def create_agent_contract_dw():
@@ -89,35 +53,6 @@ def xcom_fact_agent_daily_allocations(**kwargs):
     xcom.xcom_push(kwargs['ti'], exec_date)
 
 
-def upd_agent_region(**kwargs):
-    exec_date = kwargs['execution_date']
-    exec_date_max = exec_date + dt.timedelta(days=1)
-    ar = Agent(bucket_datalake)
-
-    ar.clean_daily_data_in_table(enum=EnumDB.BI_ODS,
-                                 schema='public',
-                                 dim_name='agent_region_hist',
-                                 date_column='dt_start',
-                                 dt=exec_date,
-                                 format='YYYY-MM-DD')
-
-    ar.reprocess_old_records(exec_dt=exec_date)
-
-    new_data = ar.get_agent_data(table_name='etl_agent_region_daily',
-                                 db_enum=EnumDB.QuintoAndar_ebdb,
-                                 dt=exec_date,
-                                 dtmax=exec_date_max)
-    inserted_data, updated_data = ar.split_new_rows(new_data=new_data,
-                                                    dt=exec_date)
-    ar.move_data_to_destination(data=inserted_data,
-                                table_name='agent_region_hist')
-    ar.update_data(data=updated_data,
-                   db='public',
-                   table='agent_region_hist',
-                   enumdb=EnumDB.BI_ODS,
-                   date=exec_date)
-
-
 dag = DAG(
     dag_id='bi-load-agent_model',
     default_args={
@@ -131,30 +66,6 @@ dag = DAG(
     orientation='TB'
 )
 
-# Get ODS data of Agent_Region per day and groups into ODS
-group_agent_region_ods = BaseDAG.build_python_operator(
-    dag=dag,
-    task_id='group_agent_region_ods',
-    provide_context=True,
-    python_callable=group_agent_region,
-    op_kwargs=None
-)
-
-# Get ODS grouped data to DW
-load_group_agent_region_dw = BaseDAG.build_python_operator(
-    dag=dag,
-    task_id='load_group_agent_region_dw',
-    python_callable=load_group_agent_region_dw,
-    op_kwargs=None
-)
-
-# Creates dim_agent_region in DW
-create_dim_agent_region_dw = BaseDAG.build_python_operator(
-    dag=dag,
-    task_id='create_dim_agent_region_dw',
-    python_callable=create_dim_agent_region_dw,
-    op_kwargs=None
-)
 
 # Creates agent_contract in DW
 create_agent_contract_dw = BaseDAG.build_python_operator(
@@ -216,15 +127,6 @@ xcom_fact_agent_daily_allocations = BaseDAG.build_python_operator(
     python_callable=xcom_fact_agent_daily_allocations
 )
 
-# Get EBDB data of Agent_Region per day and updates into ODS
-update_agent_region_ods = BaseDAG.build_python_operator(
-    dag=dag,
-    task_id='update_agent_region_ods',
-    provide_context=True,
-    python_callable=upd_agent_region,
-    op_kwargs=None
-)
-
 last_dep_execution_date = str(date.today() - timedelta(days=1))
 enrich_ebdb_agents_dep = S3KeySensor(
     task_id="enrich_ebdb_agents_dep",
@@ -236,14 +138,8 @@ enrich_ebdb_agents_dep = S3KeySensor(
     dag=dag
 )
 
-enrich_ebdb_agents_dep >> update_agent_region_ods
 enrich_ebdb_agents_dep >> create_agent_contract_dw
 
-update_agent_region_ods >> group_agent_region_ods >> load_group_agent_region_dw >> create_dim_agent_region_dw
-create_dim_agent_region_dw.set_downstream(
-    [create_fact_photographer_daily_allocations, create_fact_agent_daily_allocations,
-     create_fact_agent_hourly_allocations,
-     create_fact_photographer_hourly_allocations])
 create_agent_contract_dw.set_downstream(
     [create_fact_photographer_daily_allocations, create_fact_agent_daily_allocations,
      create_fact_agent_hourly_allocations,
