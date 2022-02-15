@@ -19,14 +19,17 @@ columns:
   csat_satisfied_target_achievement:
     lineage:
       - dw_customer_support.fact_agent_daily_productivity.total_csat_satisfied_score
+      - dw_customer_support.fact_agent_daily_productivity.total_tickets_with_csat_score
       - dw_customer_support.dim_ranking_targets.target_csat
   resolution_rate_target_achievement:
     lineage:
       - dw_customer_support.fact_agent_daily_productivity.total_tickets_resolution
+      - dw_customer_support.fact_agent_daily_productivity.total_tickets_answered_resolution
       - dw_customer_support.dim_ranking_targets.target_resolution
   closed_tickets_target_achievement:
     lineage:
       - dw_customer_support.fact_agent_daily_productivity.total_tickets
+      - dw_customer_support.fact_agent_daily_productivity.total_crm_tasks_solved
       - dw_customer_support.dim_ranking_targets.target_productivity
   avg_days_resolution_target_achievement:
     lineage:
