@@ -1,9 +1,6 @@
 # Config for sale_cohort_conversions
 ---
-streams:
-  - direction: 'upstream'
-    task_ids: ['athena_houses_3p',
-               'athena_agents_3p']
 composer_dependencies:
  - dw_datamarts_for_rent
+ - dw_datamarts_for_sale
     

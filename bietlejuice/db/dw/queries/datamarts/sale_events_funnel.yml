@@ -1,8 +1,5 @@
 # Config for sale_events_funnel
 ---
-streams:
-  - direction: 'upstream'
-    task_ids: ['athena_houses_3p',
-               'athena_agents_3p']
 composer_dependencies:
  - dw_datamarts_for_rent
+ - dw_datamarts_for_sale
