@@ -89,9 +89,13 @@ events AS (
         COUNT(DISTINCT id_device) AS tof_users,
         0.0 AS cost,
         COUNT(NULL) AS budget,
+        COUNT(NULL) AS budget_full_month,
         COUNT(NULL) AS new_contact_prospects_target,
         COUNT(NULL) AS contact_flow_target,
-        COUNT(NULL) AS tof_users_target
+        COUNT(NULL) AS tof_users_target,
+        COUNT(NULL) AS new_contact_prospects_target_full_month,
+        COUNT(NULL) AS contact_flow_target_full_month,
+        COUNT(NULL) AS tof_users_target_full_month
     FROM
         datalake_top_of_funnel_portal_cm_prod.top_of_funnel_users_portal_casa_mineira
     WHERE
@@ -122,20 +126,24 @@ events AS (
         NULL::INT AS listings_month_end,
         NULL::INT AS listings_month_start,
         COUNT(NULL) AS budget_advertiser,
-        COUNT(DISTINCT CASE WHEN (order_new_contact_flow  = 1) THEN id_house ELSE NULL END) AS listings_contacted,
-        COUNT(DISTINCT CASE WHEN (order_new_contact_flow  = 1) THEN contact_flow ELSE NULL END) AS contact_flows,
-        COUNT(DISTINCT CASE WHEN (order_new_contact_prospect  = 1) THEN id_prospect ELSE NULL END) AS new_contact_prospects,
-        COUNT(DISTINCT id_prospect) AS contact_prospects,
+        COUNT(DISTINCT CASE WHEN (order_new_contact_flow  = 1) AND dt < CURRENT_DATE THEN id_house ELSE NULL END) AS listings_contacted,
+        COUNT(DISTINCT CASE WHEN (order_new_contact_flow  = 1) AND dt < CURRENT_DATE THEN contact_flow ELSE NULL END) AS contact_flows,
+        COUNT(DISTINCT CASE WHEN (order_new_contact_prospect  = 1) AND dt < CURRENT_DATE THEN id_prospect ELSE NULL END) AS new_contact_prospects,
+        COUNT(DISTINCT CASE WHEN dt < CURRENT_DATE THEN id_prospect ELSE NULL END) AS contact_prospects,
         COUNT(NULL) AS tof_users,
-        SUM(cost) AS cost,
-        SUM(budget) AS budget,
+        SUM(CASE WHEN dt < CURRENT_DATE THEN cost ELSE NULL END) AS cost,
+        SUM(CASE WHEN dt < CURRENT_DATE THEN budget ELSE NULL END) AS budget,
+        SUM(budget) AS budget_full_month,
         COUNT(NULL) AS new_contact_prospects_target,
-        SUM(contact_flow_target) AS contact_flow_target,
-        COUNT(NULL) AS tof_users_target
+        SUM(CASE WHEN dt < CURRENT_DATE THEN contact_flow_target ELSE NULL END) AS contact_flow_target,
+        COUNT(NULL) AS tof_users_target,
+        COUNT(NULL) AS new_contact_prospects_target_full_month,
+        SUM(contact_flow_target) AS contact_flow_target_full_month,
+        COUNT(NULL) AS tof_users_target_full_month
 FROM
     datamarts.performance_marketing_metrics_portal_casa_mineira
     WHERE
-        dt >= CURRENT_DATE - INTERVAL '360 DAY'
+        dt >= LAST_DAY(CURRENT_DATE) - INTERVAL '360 DAY'
         AND mkt_business = 'portal'
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
     UNION ALL
@@ -170,10 +178,16 @@ FROM
         COUNT(NULL) AS tof_users,
         0.0 AS cost,
         COUNT(NULL) AS budget,
+        COUNT(NULL) AS budget_full_month,
         COUNT(NULL) AS new_contact_prospects_target,
         COUNT(NULL) AS contact_flow_target,
-        SUM(top_of_funnel_target) AS tof_users_target
+        SUM(CASE WHEN dt_target < CURRENT_DATE THEN top_of_funnel_target ELSE NULL END) AS tof_users_target,
+        COUNT(NULL) AS new_contact_prospects_target_full_month,
+        COUNT(NULL) AS contact_flow_target_full_month,
+        SUM(top_of_funnel_target) AS tof_users_target_full_month
     FROM datalake_gsheets_clean_prod.targets_portal_casa_mineira_cost_cf
+    WHERE
+        dt_target >= LAST_DAY(CURRENT_DATE) - INTERVAL '360 DAY'
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
     UNION ALL
     --------------------------------------------
@@ -200,20 +214,24 @@ FROM
         NULL::INT AS listings_month_end,
         NULL::INT AS listings_month_start,
         COUNT(NULL) AS budget_advertiser,
-        COUNT(DISTINCT CASE WHEN (order_new_contact_flow  = 1) THEN id_house ELSE NULL END) AS listings_contacted,
-        COUNT(DISTINCT CASE WHEN (order_new_contact_flow  = 1) THEN id_flow ELSE NULL END) AS contact_flows,
-        COUNT(DISTINCT CASE WHEN (order_new_contact_prospect  = 1) THEN id_prospect ELSE NULL END) AS new_contact_prospects,
+        COUNT(DISTINCT CASE WHEN (order_new_contact_flow  = 1) AND dt < CURRENT_DATE THEN id_house ELSE NULL END) AS listings_contacted,
+        COUNT(DISTINCT CASE WHEN (order_new_contact_flow  = 1) AND dt < CURRENT_DATE  THEN id_flow ELSE NULL END) AS contact_flows,
+        COUNT(DISTINCT CASE WHEN (order_new_contact_prospect  = 1) AND dt < CURRENT_DATE  THEN id_prospect ELSE NULL END) AS new_contact_prospects,
         COUNT(DISTINCT id_prospect) AS contact_prospects,
         COUNT(NULL) AS tof_users,
-        SUM(cost) AS cost,
-        SUM(budget) AS budget,
-        SUM(new_contact_prospects_target) AS new_contact_prospects_target,
+        SUM(CASE WHEN dt < CURRENT_DATE THEN cost ELSE NULL END) AS cost,
+        SUM(CASE WHEN dt < CURRENT_DATE THEN budget ELSE NULL END) AS budget,
+        SUM(budget) AS budget_full_month,
+        SUM(CASE WHEN dt < CURRENT_DATE THEN new_contact_prospects_target ELSE NULL END) AS new_contact_prospects_target,
         COUNT(NULL) AS contact_flow_target,
-        COUNT(NULL) AS tof_users_target
+        COUNT(NULL) AS tof_users_target,
+        SUM(new_contact_prospects_target) AS new_contact_prospects_target_full_month,
+        COUNT(NULL) AS contact_flow_target_full_month,
+        COUNT(NULL) AS tof_users_target_full_month
 FROM
     datamarts.performance_marketing_metrics_imobiliaria_casa_mineira
     WHERE
-        dt >= CURRENT_DATE - INTERVAL '360 DAY'
+        dt >= LAST_DAY(CURRENT_DATE) - INTERVAL '360 DAY'
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
     UNION ALL
     -----------------------------
@@ -250,9 +268,13 @@ FROM
         COUNT(NULL) AS tof_users,
         0.0 AS cost,
         COUNT(NULL) AS budget,
+        COUNT(NULL) AS budget_full_month,
         COUNT(NULL) AS new_contact_prospects_target,
         COUNT(NULL) AS contact_flow_target,
-        SUM(tof_monthly_target) AS tof_users_target
+        SUM(tof_monthly_target) AS tof_users_target,
+        COUNT(NULL) AS new_contact_prospects_target_full_month,
+        COUNT(NULL) AS contact_flow_target_full_month,
+        COUNT(NULL) AS tof_users_target_full_month
     FROM datalake_gsheets_clean_prod.targets_casa_mineira_tof_monthly
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
     UNION ALL
@@ -293,9 +315,13 @@ FROM
         COUNT(NULL) AS tof_users,
         0.0 AS cost,
         COUNT(NULL) AS budget,
+        COUNT(NULL) AS budget_full_month,
         COUNT(NULL) AS new_contact_prospects_target,
         COUNT(NULL) AS contact_flow_target,
-        COUNT(NULL) AS tof_users_target
+        COUNT(NULL) AS tof_users_target,
+        COUNT(NULL) AS new_contact_prospects_target_full_month,
+        COUNT(NULL) AS contact_flow_target_full_month,
+        COUNT(NULL) AS tof_users_target_full_month
     FROM
         status
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
@@ -337,9 +363,13 @@ FROM
         COUNT(NULL) AS tof_users,
         0.0 AS cost,
         COUNT(NULL) AS budget,
+        COUNT(NULL) AS budget_full_month,
         COUNT(NULL) AS new_contact_prospects_target,
         COUNT(NULL) AS contact_flow_target,
-        COUNT(NULL) AS tof_users_target
+        COUNT(NULL) AS tof_users_target,
+        COUNT(NULL) AS new_contact_prospects_target_full_month,
+        COUNT(NULL) AS contact_flow_target_full_month,
+        COUNT(NULL) AS tof_users_target_full_month
     FROM
         datamarts.portal_casa_mineira_advertiser_metrics
     WHERE
@@ -384,9 +414,13 @@ FROM
         COUNT(NULL) AS tof_users,
         0.0 AS cost,
         COUNT(NULL) AS budget,
+        COUNT(NULL) AS budget_full_month,
         COUNT(NULL) AS new_contact_prospects_target,
         COUNT(NULL) AS contact_flow_target,
-        COUNT(NULL) AS tof_users_target
+        COUNT(NULL) AS tof_users_target,
+        COUNT(NULL) AS new_contact_prospects_target_full_month,
+        COUNT(NULL) AS contact_flow_target_full_month,
+        COUNT(NULL) AS tof_users_target_full_month
     FROM
         listings
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
@@ -420,9 +454,13 @@ SELECT
     SUM(tof_users) AS tof_users,
     SUM(cost) AS cost,
     SUM(budget) AS budget,
+    SUM(budget_full_month) AS budget_full_month,
     SUM(new_contact_prospects_target) AS new_contact_prospects_target,
     SUM(contact_flow_target) AS contact_flow_target,
-    SUM(tof_users_target) AS tof_users_target
+    SUM(tof_users_target) AS tof_users_target,
+    SUM(new_contact_prospects_target_full_month) AS new_contact_prospects_target_full_month,
+    SUM(contact_flow_target_full_month) AS contact_flow_target_full_month,
+    SUM(tof_users_target_full_month) AS tof_users_target_full_month
 FROM
     events
 GROUP BY 2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
