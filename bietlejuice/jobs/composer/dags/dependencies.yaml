@@ -42,6 +42,8 @@ bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.ebdb:create-clean-access-authorization-type-in-data-lake
   - bietlejuice.ebdb:create-clean-access-type-in-data-lake
   - bietlejuice.ebdb:create-clean-access-type-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-agent-data-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-agent-data-types-in-data-lake
   - bietlejuice.ebdb:create-clean-agent-support-in-data-lake
   - bietlejuice.ebdb:create-clean-booking-in-data-lake
   - bietlejuice.ebdb:create-clean-follow-up-details-in-data-lake
@@ -53,7 +55,9 @@ bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.ebdb:create-clean-key-type-in-data-lake
   - bietlejuice.ebdb:create-clean-listing-business-context-in-data-lake
   - bietlejuice.ebdb:create-clean-occupant-type-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
+  - bietlejuice.ebdb:create-clean-work-contract-in-data-lake
   - bietlejuice.gsheets:load-clean-taxonomy-demand
   - bietlejuice.terminator:load-clean-application-user
   - bietlejuice.terminator:load-clean-negotiation
