@@ -24,7 +24,8 @@ pipeline:
   #     <<: *athena_anchor
   #     sql_file: dw/queries/datamarts/for_rent/house_weekly_entrance_info.sql
   #     table: house_weekly_entrance_info
-  dw:
-    <<: *athena_anchor
-    sql_file: dw/queries/datamarts/support_and_service/ongoing_refund_requests.sql
-    table: ongoing_refund_requests
+  ongoing_refund_requests:
+    dw:
+      <<: *athena_anchor
+      sql_file: dw/queries/datamarts/support_and_service/ongoing_refund_requests.sql
+      table: ongoing_refund_requests
