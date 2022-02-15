@@ -103,7 +103,10 @@ bietlejuice.dw_affiliate_costs:
   - bietlejuice.enrich_robin_hood
 
 bietlejuice.dw_agent:
+  - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.enrich_ebdb_agents:load-enrich-agents-review
+  - bietlejuice.enrich_ebdb_agents:load-enrich-agent-region-group
+  - bietlejuice.gsheets:load-clean-auxiliary-region
 
 bietlejuice.dw_agents_availability:
   - bietlejuice.ebdb:create-clean-agent-data-aud-in-data-lake

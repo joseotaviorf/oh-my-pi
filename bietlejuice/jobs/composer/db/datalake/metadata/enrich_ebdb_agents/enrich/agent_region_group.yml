@@ -1,0 +1,27 @@
+---
+database_name: datalake_ebdb_agents
+table_name: agent_region_group
+columns:
+  dt:
+    lineage:
+      - datalake_ebdb_agents.agents_slots.ts_slot
+  dadosagente_id:
+    lineage:
+      - dw_public.dim_user.dados_agente_id
+      - datalake_ebdb_clean_prod.agent_region_data_aud.id_agent_data
+  regions:
+    lineage:
+      - datalake_ebdb_agents.agents_region.id_region
+      - datalake_ebdb_clean_prod.agent_region_data_aud.id_region
+  area:
+    lineage:
+      - datalake_gsheets_clean.auxiliary_region.region_code
+  secondary_area:
+    lineage:
+      - datalake_gsheets_clean.auxiliary_region.region_code
+  area_deprecated:
+    lineage:
+      - datalake_gsheets_clean.auxiliary_region.region_code_deprecated
+  secondary_area_deprecated:
+    lineage:
+      - datalake_gsheets_clean.auxiliary_region.region_code_deprecated

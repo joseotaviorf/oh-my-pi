@@ -1,0 +1,30 @@
+---
+database_name: dw_public
+table_name: dim_agent_region
+columns:
+  sk_agent_region:
+    lineage:
+      - datalake_ebdb_agents.agent_region_group.dt
+      - datalake_ebdb_agents.agent_region_group.dadosagente_id
+  sk_regions_date:
+    lineage:
+      - datalake_ebdb_agents.agent_region_group.dt
+  sk_agent:
+    lineage:
+      - datalake_ebdb_agents.agent_region_group.dadosagente_id
+  regioes:
+    lineage:
+      - datalake_ebdb_agents.agent_region_group.regioes
+  area:
+    lineage:
+      - datalake_ebdb_agents.agent_region_group.area
+  secondary_area:
+    lineage:
+      - datalake_ebdb_agents.agent_region_group.secondary_area
+  area_deprecated:
+    lineage:
+      - datalake_ebdb_agents.agent_region_group.area_deprecated
+  secondary_area_deprecated:
+    lineage:
+      - datalake_ebdb_agents.agent_region_group.secondary_area_deprecated
+  
