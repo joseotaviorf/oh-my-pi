@@ -68,5 +68,6 @@ online_metrics as (
   WHERE (m.event_date >= DATE_ADD('week', -24, CURRENT_DATE) OR DATE_TRUNC('week', m.event_date) = DATE_TRUNC('week', CURRENT_DATE))
 )
 SELECT
-  om.*
+  om.*,
+  NOW() AS ts_load
 FROM online_metrics om

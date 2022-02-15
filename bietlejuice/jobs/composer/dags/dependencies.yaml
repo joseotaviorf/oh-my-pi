@@ -11,6 +11,9 @@
 bietlejuice.catalog_product_entities:
   - bietlejuice.enrich_bigid:load-enrich-bigid-entities-access-level
 
+bietlejuice.dw_datamarts_bedrock:
+  - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
+
 bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
   - bietlejuice.big_agent:load-clean-agency
