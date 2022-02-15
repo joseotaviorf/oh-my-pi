@@ -24,6 +24,7 @@ bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
   - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
   - bietlejuice.dw_listing_jobs:load-public-dim-photo-job-into-redshift
+  - bietlejuice.dw_listing_jobs:load-public-fact-inspection-bookings-into-redshift
   - bietlejuice.dw_listing_jobs:load-public-fact-photo-job-into-redshift
   - bietlejuice.dw_offer:load-public-dim-offer-into-redshift
   - bietlejuice.dw_proposal:load-public-dim-proposal-into-redshift
@@ -32,6 +33,8 @@ bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.dw_sale_listings:load-sale-dim-listing-into-redshift
   - bietlejuice.dw_sale_listing_flow:load-sale-fact-listing-flows-into-redshift
   - bietlejuice.dw_tenant_booking_review:load-public-dim-tenant-booking-review-into-redshift
+  - bietlejuice.dw_tracksale:load-tracksale-dim-nps-campaign-into-redshift
+  - bietlejuice.dw_tracksale:load-tracksale-fact-nps-dispatches-into-redshift
   - bietlejuice.dw_user:load-public-dim-partner-into-redshift
   - bietlejuice.dw_user:load-public-dim-partner-agent-into-redshift
   - bietlejuice.dw_user:load-public-dim-user-into-redshift
@@ -52,6 +55,15 @@ bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.ebdb:create-clean-occupant-type-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
   - bietlejuice.gsheets:load-clean-taxonomy-demand
+  - bietlejuice.terminator:load-clean-application-user
+  - bietlejuice.terminator:load-clean-negotiation
+  - bietlejuice.terminator:load-clean-rev-info
+  - bietlejuice.terminator:load-clean-termination
+  - bietlejuice.terminator:load-clean-termination-aud
+  - bietlejuice.terminator:load-clean-termination-fee
+  - bietlejuice.terminator:load-clean-termination-fee-negotiation
+  - bietlejuice.terminator:load-clean-termination-workflow
+  - bietlejuice.terminator:load-clean-utility-bill
 
 bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark

@@ -19,6 +19,7 @@ dags_out_of_pattern:
         "dw_sale_listing_flow",
         "dw_sale_visits",
         "dw_tenant_booking_review",
+        "dw_tracksale",
         "dw_user",
         "dw_user_sales_rep",
         "ebdb",

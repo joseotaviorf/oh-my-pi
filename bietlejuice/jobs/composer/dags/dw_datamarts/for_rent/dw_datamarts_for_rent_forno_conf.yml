@@ -102,3 +102,8 @@ pipeline:
         - lead_listing_flows
         - quintoandar_consultant_listings
         - talk_to_agent
+  contract_termination:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_rent/contract_termination.sql
+      table: contract_termination
