@@ -78,6 +78,7 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.dw_user:load-public-dim-partner-agent-into-redshift
   - bietlejuice.dw_user:load-public-dim-user-into-redshift
   - bietlejuice.ebdb:create-clean-agent-data-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-agent-data-in-data-lake
   - bietlejuice.ebdb:create-clean-amenities-in-data-lake
   - bietlejuice.ebdb:create-clean-condo-amenities-in-data-lake
   - bietlejuice.ebdb:create-clean-info-condo-amenities-in-data-lake
@@ -89,6 +90,7 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.ebdb:create-clean-house-weekly-schedule-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-listing-business-context-in-data-lake
   - bietlejuice.ebdb:create-clean-partner-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
   - bietlejuice.ebdb:create-clean-work-contract-in-data-lake
   - bietlejuice.enrich_ebdb_agents:load-enrich-agents-review
