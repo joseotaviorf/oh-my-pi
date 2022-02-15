@@ -76,8 +76,8 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
   - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
   - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
-  - bietlejuice.dw_region:load-dim-region-into-redshift
-  - bietlejuice.dw_rent_flow:load-fact-listing-rent-flows-into-redshift
+  - bietlejuice.dw_region:load-public-dim-region-into-redshift
+  - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
   - bietlejuice.dw_sale_listings:load-sale-fact-listings-into-redshift
   - bietlejuice.dw_sale_listings:load-sale-fact-listing-status-into-redshift
   - bietlejuice.dw_sale_offers:load-sale-dim-offer-into-redshift
@@ -85,9 +85,9 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.dw_sale_offers:load-sale-fact-offers-into-redshift
   - bietlejuice.dw_sale_visits:load-sale-fact-visits-into-redshift
   - bietlejuice.dw_tenant_booking_review:load-public-dim-tenant-booking-review-into-redshift
-  - bietlejuice.dw_tracksale:load-dim-nps-answer-into-redshift
-  - bietlejuice.dw_tracksale:load-dim-nps-campaign-into-redshift
-  - bietlejuice.dw_tracksale:load-fact-nps-dispatches-into-redshift
+  - bietlejuice.dw_tracksale:load-tracksale-dim-nps-answer-into-redshift
+  - bietlejuice.dw_tracksale:load-tracksale-dim-nps-campaign-into-redshift
+  - bietlejuice.dw_tracksale:load-tracksale-fact-nps-dispatches-into-redshift
   - bietlejuice.dw_user:load-public-dim-partner-agent-into-redshift
   - bietlejuice.dw_user:load-public-dim-user-into-redshift
   - bietlejuice.ebdb:create-clean-agent-data-aud-in-data-lake
