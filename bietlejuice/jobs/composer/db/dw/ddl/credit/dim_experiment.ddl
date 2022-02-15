@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS credit.dim_experiment;
 CREATE TABLE credit.dim_experiment (
     id_experiment INTEGER,
     experiment_name VARCHAR,
-    experiment_description VARCHAR,
+    experiment_description VARCHAR(500),
     is_experiment_running BOOLEAN,
     has_experiment_ran_last_month BOOLEAN,
     has_experiment_ran_last_3_months BOOLEAN,

@@ -1,7 +1,7 @@
 SELECT
     id AS id_experiment,
     name AS experiment_name,
-    description AS experiment_description,
+    SUBSTRING(description, 1, 500) AS experiment_description,
     IF(ts_started IS NOT NULL AND ts_ended IS NULL, TRUE, FALSE) AS is_experiment_running,
     CASE 
         WHEN ts_started IS NOT NULL AND (ts_ended IS NULL OR ts_ended >= CURRENT_DATE() - INTERVAL 1 MONTH) THEN TRUE
