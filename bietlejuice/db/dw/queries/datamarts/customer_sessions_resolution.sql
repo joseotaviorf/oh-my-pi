@@ -20,7 +20,6 @@ WITH front_tickets AS (
     WHERE
         sk_user > -1
         AND (front_or_back = 'front' OR front_or_back IS NULL)
-        AND ts_started IS NOT NULL
     GROUP BY 1,2,4,5,6,7,8,9,10,11,12
 ),
 user_recontacts AS (
