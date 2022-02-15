@@ -44,7 +44,7 @@ qa_listings AS (
             CAST(lat AS VARCHAR) AS lat,
             CAST(lng AS VARCHAR) AS lng
         FROM
-            datalake_ebdb_raw_prod.imovel
+            datalake_ebdb_clean_prod.house
     ), 
     only_qa AS (
         SELECT
@@ -444,6 +444,7 @@ SELECT
     avg_distance,
     is_platform_property,
     is_exclusive,
-    ts_updated
+    ts_updated,
+    NOW() AS ts_load
 FROM
     loft_listings_clean

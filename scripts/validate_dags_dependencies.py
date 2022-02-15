@@ -145,7 +145,9 @@ class CrossDAGDependenciesValidator:
             return dag_name, None
 
         dag_name = match.group(1)
-
+        ## This validation handle with nested dags e.g listings.something
+        dot_position = dag_name.find(".")
+        dag_name = dag_name if dot_position == -1 else dag_name[dot_position+1:]
         match_layer = re.search("(dw|enrich|clean|raw)", task_name)
         if match_layer is None:
             return dag_name, None

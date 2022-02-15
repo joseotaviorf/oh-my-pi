@@ -79,6 +79,7 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.casa_mineira_crm:load-clean-contact
   - bietlejuice.casa_mineira_crm:load-clean-house
   - bietlejuice.casa_mineira_crm:load-clean-house-status
+  - bietlejuice.casa_mineira_crm:load-clean-house-type
   - bietlejuice.casa_mineira_crm:load-clean-media-contact
   - bietlejuice.casa_mineira_crm:load-clean-neighborhood
   - bietlejuice.casa_mineira_crm:load-clean-origin-contact
@@ -119,7 +120,9 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.ebdb:create-clean-info-condo-amenities-in-data-lake
   - bietlejuice.ebdb:create-clean-listing-business-context-in-data-lake
   - bietlejuice.ebdb:create-clean-listing-business-context-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-map-region-in-data-lake
   - bietlejuice.ebdb:create-clean-partner-in-data-lake
+  - bietlejuice.ebdb:create-clean-polygon-region-in-data-lake
   - bietlejuice.ebdb:create-clean-user-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-user-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
@@ -130,6 +133,7 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.enrich_firestore:load-enrich-sale-offer
   - bietlejuice.gsheets:load-clean-monday-users
   - bietlejuice.gsheets:load-clean-offers-hub-central
+  - bietlejuice.listings.loft:load-clean-loft
   - bietlejuice.sales_flow:load-clean-ccv-flow
   - bietlejuice.sales_flow:load-clean-offer
   - bietlejuice.sales_flow:load-clean-sales-flow
