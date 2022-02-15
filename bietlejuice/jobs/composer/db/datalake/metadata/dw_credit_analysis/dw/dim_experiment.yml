@@ -1,0 +1,19 @@
+---
+database_name: dw_credit
+table_name: dim_experiment
+columns:
+  id_experiment:
+    lineage:
+      - datalake_sorting_hat_clean.experiment.id
+  experiment_name:
+    lineage:
+      - datalake_sorting_hat_clean.experiment.name
+  experiment_description:
+    lineage:
+      - datalake_sorting_hat_clean.experiment.description
+  ts_experiment_started:
+    lineage:
+      - datalake_sorting_hat_clean.experiment.ts_started
+  ts_experiment_ended:
+    lineage:
+      - datalake_sorting_hat_clean.experiment.ts_ended

@@ -1,0 +1,37 @@
+---
+database_name: dw_credit
+table_name: dim_credit_analysis
+columns:
+  id_credit_analysis:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.id_credit_analysis
+  id_analyst:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.id_analyst
+  documentation_policy:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.type
+  bypass:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.bypass
+  risk_category:
+    lineage:
+      - datalake_sorting_hat_clean.screening_result.risk_category
+  internal_score:
+    lineage:
+      - datalake_sorting_hat_clean.screening_result.score
+  liquidity:
+    lineage:
+      - datalake_sorting_hat_clean.screening_result.liquidity
+  reason:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.reason
+  result:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.result
+  level:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.level
+  ts_credit_analysis_created:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.ts_created

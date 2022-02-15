@@ -1,0 +1,31 @@
+---
+database_name: dw_credit
+table_name: dim_guarantee_policy
+columns:
+  id_guarantee_category:
+    lineage:
+      - datalake_rental_guarantee_clean.risk_category.category_level
+  id_risk_category:
+    lineage:
+      - datalake_rental_guarantee_clean.risk_category.id
+  guarantee_factor:
+    lineage:
+      - datalake_rental_guarantee_clean.risk_category.guarantee_factor
+  deposit_factor:
+    lineage:
+      - datalake_rental_guarantee_clean.risk_category.deposit_factor
+  category_description:
+    lineage:
+      - datalake_rental_guarantee_clean.risk_category.category_description
+  is_guarantee_allowed:
+    lineage:
+      - datalake_rental_guarantee_clean.risk_category.is_guarantee_allowed
+  is_deposit_allowed:
+    lineage:
+      - datalake_rental_guarantee_clean.risk_category.is_deposit_allowed
+  ts_guarantee_category_created:
+    lineage:
+      - datalake_rental_guarantee_clean.risk_category.ts_created
+  ts_guarantee_category_updated:
+    lineage:
+      - datalake_rental_guarantee_clean.risk_category.ts_updated

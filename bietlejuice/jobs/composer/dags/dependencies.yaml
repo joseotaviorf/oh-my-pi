@@ -240,6 +240,13 @@ bietlejuice.dw_contract:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_listing:load-enrich-portability
 
+bietlejuice.dw_credit_analysis:
+  - bietlejuice.rental_guarantee:load-clean-risk-category
+  - bietlejuice.sorting_hat:load-clean-credit-analysis
+  - bietlejuice.sorting_hat:load-clean-experiment
+  - bietlejuice.sorting_hat:load-clean-screening-result
+  - bietlejuice.sorting_hat:load-clean-variant
+
 bietlejuice.dw_crm:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_contract:load-dw-public-dim-contract

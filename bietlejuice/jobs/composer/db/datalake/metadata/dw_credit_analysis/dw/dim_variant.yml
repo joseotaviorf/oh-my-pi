@@ -1,0 +1,19 @@
+---
+database_name: dw_credit
+table_name: dim_variant
+columns:
+  id_variant:
+    lineage:
+      - datalake_sorting_hat_clean.variant.id
+  id_experiment:
+    lineage:
+      - datalake_sorting_hat_clean.variant.id_experiment
+  variant_name:
+    lineage:
+      - datalake_sorting_hat_clean.variant.name
+  variant_description:
+    lineage:
+      - datalake_sorting_hat_clean.variant.description
+  variant_percentage_paticipation_on_test:
+    lineage:
+      - datalake_sorting_hat_clean.variant.percentage
