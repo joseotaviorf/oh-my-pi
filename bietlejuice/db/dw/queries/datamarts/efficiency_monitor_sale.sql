@@ -43,48 +43,49 @@ WITH sale_volumes AS (
     from sale_volumes
     where dt_ccv >= '2020-01-01' AND city_group IS NOT NULL AND city_group <> 'Not Mapped'
     group by 1, 2
+), sale_targets AS (
+    SELECT
+        date_trunc('month',DATE(date)) as month_start,
+        cidade AS city_group,
+        SUM(ccv) AS ccv_target,
+        ROUND(SUM(ccv) * 0.7960, 0) AS potential_closed_deals_target
+    FROM datalake_gsheets_clean_prod.sale_demand_targets
+    WHERE cidade != 'Belo Horizonte' AND "date" BETWEEN '2020-01-01' AND date_trunc('week',CURRENT_DATE)
+    GROUP BY 1,2
 ), base_act AS (
     SELECT
         DATE(dt_cost) AS dt_cost,
         city_group,
         planning_mkt_level1,
-        planning_mkt_level2,
-        planning_mkt_level3,
         SUM(costs) AS costs
     FROM datamarts.marketing_demand_supply_branding_costs
     WHERE 
         dt_cost BETWEEN '2020-01-01' AND date_trunc('week',CURRENT_DATE)
         AND business = 'Sale'
-    GROUP BY 1,2,3,4,5
+    GROUP BY 1,2,3
 ), base_tgt AS (
     SELECT
         DATE(date) AS dt_cost,
         city_group,
         planning_mkt_level1,
-        planning_mkt_level2,
-        planning_mkt_level3,
         SUM(budget__mensal) AS budget_mensal
     FROM datalake_raw.gsheets_costs_targets
     WHERE date BETWEEN '2020-07-01' AND date_trunc('week',CURRENT_DATE)
         AND business = 'Sale'
-    GROUP BY 1,2,3,4,5
+    GROUP BY 1,2,3
 ), base_costs AS (
     SELECT
         COALESCE(a.dt_cost, t.dt_cost) AS dt_reference,
         COALESCE(a.city_group,t.city_group) AS city_group,
         COALESCE(a.planning_mkt_level1, t.planning_mkt_level1) AS planning_mkt_level1,
-        COALESCE(a.planning_mkt_level2,t.planning_mkt_level2) AS planning_mkt_level2,
-        COALESCE(a.planning_mkt_level3,t.planning_mkt_level3) AS planning_mkt_level3,
         SUM(a.costs) AS cost_act,
         SUM(t.budget_mensal) AS budget_mensal
     FROM base_act AS a
-     FULL OUTER JOIN base_tgt AS t 
+    FULL OUTER JOIN base_tgt AS t 
         ON a.dt_cost = t.dt_cost
         AND a.city_group=t.city_group
         AND a.planning_mkt_level1=t.planning_mkt_level1
-        AND a.planning_mkt_level2=t.planning_mkt_level2
-        AND a.planning_mkt_level3=t.planning_mkt_level3
-    GROUP BY 1,2,3,4,5
+    GROUP BY 1,2,3
 ), marketing_costs AS (
     SELECT
         date_trunc('month',dt_reference) as dt_month_start,
@@ -98,7 +99,7 @@ WITH sale_volumes AS (
         SUM(CASE WHEN planning_mkt_level1 = 'Branded' THEN budget_mensal ELSE 0 END) AS branding_budget
   FROM
     base_costs
-  WHERE dt_reference < date_trunc('week',CURRENT_DATE)  
+  WHERE dt_reference <= date_trunc('week',CURRENT_DATE)  
   GROUP BY 1, 2, 3
 ), marketing_costs_date_city AS (
     SELECT
@@ -265,43 +266,56 @@ FROM
 ), branding_cost AS (
     SELECT
         dt_month_start,
-        branding_cost
+        branding_cost,
+        branding_budget
     FROM marketing_costs
     WHERE city_group = 'Brasil'
-), total_rentals AS (
+), total_sales AS (
     SELECT
-        dt_ccv AS dt_month_start,
-        SUM(potential_closed_deals) AS potential_closed_deals
+        COALESCE(gv.dt_ccv, st.month_start) AS dt_month_start,
+        SUM(gv.potential_closed_deals) AS potential_closed_deals,
+        SUM(st.potential_closed_deals_target) AS potential_closed_deals_target
     FROM
-        grouped_sale_volumes
+        grouped_sale_volumes as gv
+    LEFT JOIN
+        sale_targets AS st
+        ON gv.dt_ccv = st.month_start
     GROUP BY 1
 ), branding_base_brasil AS (
     SELECT
-        COALESCE(bc.dt_month_start, tr.dt_month_start) AS dt_month_start,
+        COALESCE(bc.dt_month_start, ts.dt_month_start) AS dt_month_start,
         bc.branding_cost,
-        tr.potential_closed_deals
+        bc.branding_budget,
+        ts.potential_closed_deals,
+        ts.potential_closed_deals_target
     FROM branding_cost AS bc
     FULL OUTER JOIN
-        total_rentals AS tr
-        ON bc.dt_month_start = tr.dt_month_start
+        total_sales AS ts
+        ON bc.dt_month_start = ts.dt_month_start
 ), branding_demand_supply_base AS (
     SELECT
         mc.dt_month_start,
         mc.city_group,
         SUM(potential_closed_deals) AS potential_closed_deals,
-        SUM(branding_cost) AS branding_cost
+        SUM(potential_closed_deals_target) AS potential_closed_deals_target,
+        SUM(branding_cost) AS branding_cost,
+        SUM(branding_budget) AS branding_budget
     FROM
         marketing_costs AS mc
     LEFT JOIN
         grouped_sale_volumes AS gr
         ON mc.dt_month_start = gr.dt_ccv AND mc.city_group = gr.city_group
+    LEFT JOIN
+        sale_targets AS st
+        ON mc.dt_month_start = st.month_start  AND mc.city_group = st.city_group
     WHERE mc.classification = 'Branded'
     GROUP BY 1,2
 ), branding_demand_supply_share AS (
     SELECT
         bd.dt_month_start,
         bd.city_group,
-        ((bd.branding_cost+bb.branding_cost*bd.potential_closed_deals/bb.potential_closed_deals)*0.5) AS branding_demand_supply_share
+        ((bd.branding_cost+COALESCE(bb.branding_cost, 0)*bd.potential_closed_deals/bb.potential_closed_deals)*0.5) AS branding_demand_supply_share,
+        ((bd.branding_budget+COALESCE(bb.branding_budget, 0)*bd.potential_closed_deals_target/bb.potential_closed_deals_target)*0.5) AS branding_demand_supply_budget
     FROM
         branding_demand_supply_base AS bd
     LEFT JOIN
@@ -323,7 +337,20 @@ FROM
         SUM(CASE WHEN ac.month_amortization = 'M+9' THEN (ac.metric_amortization * bs.branding_demand_supply_share) ELSE 0 END) AS cost_amortized_m9,
         SUM(CASE WHEN ac.month_amortization = 'M+10' THEN (ac.metric_amortization * bs.branding_demand_supply_share) ELSE 0 END) AS cost_amortized_m10,
         SUM(CASE WHEN ac.month_amortization = 'M+11' THEN (ac.metric_amortization * bs.branding_demand_supply_share) ELSE 0 END) AS cost_amortized_m11,
-        SUM(CASE WHEN ac.month_amortization = 'M+12' THEN (ac.metric_amortization * bs.branding_demand_supply_share) ELSE 0 END) AS cost_amortized_m12
+        SUM(CASE WHEN ac.month_amortization = 'M+12' THEN (ac.metric_amortization * bs.branding_demand_supply_share) ELSE 0 END) AS cost_amortized_m12,
+        SUM(CASE WHEN ac.month_amortization = 'M+0' THEN (ac.metric_amortization * bs.branding_demand_supply_budget) ELSE 0 END) AS budget_amortized_m0,
+        SUM(CASE WHEN ac.month_amortization = 'M+1' THEN (ac.metric_amortization * bs.branding_demand_supply_budget) ELSE 0 END) AS budget_amortized_m1,
+        SUM(CASE WHEN ac.month_amortization = 'M+2' THEN (ac.metric_amortization * bs.branding_demand_supply_budget) ELSE 0 END) AS budget_amortized_m2,
+        SUM(CASE WHEN ac.month_amortization = 'M+3' THEN (ac.metric_amortization * bs.branding_demand_supply_budget) ELSE 0 END) AS budget_amortized_m3,
+        SUM(CASE WHEN ac.month_amortization = 'M+4' THEN (ac.metric_amortization * bs.branding_demand_supply_budget) ELSE 0 END) AS budget_amortized_m4,
+        SUM(CASE WHEN ac.month_amortization = 'M+5' THEN (ac.metric_amortization * bs.branding_demand_supply_budget) ELSE 0 END) AS budget_amortized_m5,
+        SUM(CASE WHEN ac.month_amortization = 'M+6' THEN (ac.metric_amortization * bs.branding_demand_supply_budget) ELSE 0 END) AS budget_amortized_m6,
+        SUM(CASE WHEN ac.month_amortization = 'M+7' THEN (ac.metric_amortization * bs.branding_demand_supply_budget) ELSE 0 END) AS budget_amortized_m7,
+        SUM(CASE WHEN ac.month_amortization = 'M+8' THEN (ac.metric_amortization * bs.branding_demand_supply_budget) ELSE 0 END) AS budget_amortized_m8,
+        SUM(CASE WHEN ac.month_amortization = 'M+9' THEN (ac.metric_amortization * bs.branding_demand_supply_budget) ELSE 0 END) AS budget_amortized_m9,
+        SUM(CASE WHEN ac.month_amortization = 'M+10' THEN (ac.metric_amortization * bs.branding_demand_supply_budget) ELSE 0 END) AS budget_amortized_m10,
+        SUM(CASE WHEN ac.month_amortization = 'M+11' THEN (ac.metric_amortization * bs.branding_demand_supply_budget) ELSE 0 END) AS budget_amortized_m11,
+        SUM(CASE WHEN ac.month_amortization = 'M+12' THEN (ac.metric_amortization * bs.branding_demand_supply_budget) ELSE 0 END) AS budget_amortized_m12
     FROM branding_demand_supply_share AS bs
     LEFT JOIN datalake_gsheets_clean_prod.unit_economics_amortization_curve AS ac
         ON TRIM('amortização ' FROM ac.classification) = 'demand'
@@ -346,14 +373,28 @@ SELECT
     COALESCE((LAG(cost_amortized_m9,9) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m9_branding_demand_cost,
     COALESCE((LAG(cost_amortized_m10,10) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m10_branding_demand_cost,
     COALESCE((LAG(cost_amortized_m11,11) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m11_branding_demand_cost,
-    COALESCE((LAG(cost_amortized_m12,12) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m12_branding_demand_cost
+    COALESCE((LAG(cost_amortized_m12,12) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m12_branding_demand_cost,
+    budget_amortized_m0 AS m0_branding_demand_budget,
+    COALESCE((LAG(budget_amortized_m1,1) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m1_branding_demand_budget,
+    COALESCE((LAG(budget_amortized_m2,2) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m2_branding_demand_budget,
+    COALESCE((LAG(budget_amortized_m3,3) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m3_branding_demand_budget,
+    COALESCE((LAG(budget_amortized_m4,4) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m4_branding_demand_budget,
+    COALESCE((LAG(budget_amortized_m5,5) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m5_branding_demand_budget,
+    COALESCE((LAG(budget_amortized_m6,6) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m6_branding_demand_budget,
+    COALESCE((LAG(budget_amortized_m7,7) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m7_branding_demand_budget,
+    COALESCE((LAG(budget_amortized_m8,8) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m8_branding_demand_budget,
+    COALESCE((LAG(budget_amortized_m9,9) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m9_branding_demand_budget,
+    COALESCE((LAG(budget_amortized_m10,10) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m10_branding_demand_budget,
+    COALESCE((LAG(budget_amortized_m11,11) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m11_branding_demand_budget,
+    COALESCE((LAG(budget_amortized_m12,12) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m12_branding_demand_budget
 FROM
     branding_demand_metric
 ), amortized_branding_demand_share AS (
     SELECT
         dt_month_start,
         city_group,
-        (m0_branding_demand_cost + m1_branding_demand_cost + m2_branding_demand_cost + m3_branding_demand_cost + m4_branding_demand_cost + m5_branding_demand_cost + m6_branding_demand_cost + m7_branding_demand_cost + m8_branding_demand_cost + m9_branding_demand_cost + m10_branding_demand_cost + m11_branding_demand_cost + m12_branding_demand_cost) AS amortized_branding_demand_share
+        (m0_branding_demand_cost + m1_branding_demand_cost + m2_branding_demand_cost + m3_branding_demand_cost + m4_branding_demand_cost + m5_branding_demand_cost + m6_branding_demand_cost + m7_branding_demand_cost + m8_branding_demand_cost + m9_branding_demand_cost + m10_branding_demand_cost + m11_branding_demand_cost + m12_branding_demand_cost) AS amortized_branding_demand_share,
+        (m0_branding_demand_budget + m1_branding_demand_budget + m2_branding_demand_budget + m3_branding_demand_budget + m4_branding_demand_budget + m5_branding_demand_budget + m6_branding_demand_budget + m7_branding_demand_budget + m8_branding_demand_budget + m9_branding_demand_budget + m10_branding_demand_budget + m11_branding_demand_budget + m12_branding_demand_budget) AS amortized_branding_demand_budget
     FROM branding_demand_per_month
 ), branding_supply_metric AS (
     SELECT
@@ -371,7 +412,20 @@ FROM
         SUM(CASE WHEN ac.month_amortization = 'M+9' THEN (ac.metric_amortization * bs.branding_demand_supply_share) ELSE 0 END) AS cost_amortized_m9,
         SUM(CASE WHEN ac.month_amortization = 'M+10' THEN (ac.metric_amortization * bs.branding_demand_supply_share) ELSE 0 END) AS cost_amortized_m10,
         SUM(CASE WHEN ac.month_amortization = 'M+11' THEN (ac.metric_amortization * bs.branding_demand_supply_share) ELSE 0 END) AS cost_amortized_m11,
-        SUM(CASE WHEN ac.month_amortization = 'M+12' THEN (ac.metric_amortization * bs.branding_demand_supply_share) ELSE 0 END) AS cost_amortized_m12
+        SUM(CASE WHEN ac.month_amortization = 'M+12' THEN (ac.metric_amortization * bs.branding_demand_supply_share) ELSE 0 END) AS cost_amortized_m12,
+        SUM(CASE WHEN ac.month_amortization = 'M+0' THEN (ac.metric_amortization * bs.branding_demand_supply_budget) ELSE 0 END) AS budget_amortized_m0,
+        SUM(CASE WHEN ac.month_amortization = 'M+1' THEN (ac.metric_amortization * bs.branding_demand_supply_budget) ELSE 0 END) AS budget_amortized_m1,
+        SUM(CASE WHEN ac.month_amortization = 'M+2' THEN (ac.metric_amortization * bs.branding_demand_supply_budget) ELSE 0 END) AS budget_amortized_m2,
+        SUM(CASE WHEN ac.month_amortization = 'M+3' THEN (ac.metric_amortization * bs.branding_demand_supply_budget) ELSE 0 END) AS budget_amortized_m3,
+        SUM(CASE WHEN ac.month_amortization = 'M+4' THEN (ac.metric_amortization * bs.branding_demand_supply_budget) ELSE 0 END) AS budget_amortized_m4,
+        SUM(CASE WHEN ac.month_amortization = 'M+5' THEN (ac.metric_amortization * bs.branding_demand_supply_budget) ELSE 0 END) AS budget_amortized_m5,
+        SUM(CASE WHEN ac.month_amortization = 'M+6' THEN (ac.metric_amortization * bs.branding_demand_supply_budget) ELSE 0 END) AS budget_amortized_m6,
+        SUM(CASE WHEN ac.month_amortization = 'M+7' THEN (ac.metric_amortization * bs.branding_demand_supply_budget) ELSE 0 END) AS budget_amortized_m7,
+        SUM(CASE WHEN ac.month_amortization = 'M+8' THEN (ac.metric_amortization * bs.branding_demand_supply_budget) ELSE 0 END) AS budget_amortized_m8,
+        SUM(CASE WHEN ac.month_amortization = 'M+9' THEN (ac.metric_amortization * bs.branding_demand_supply_budget) ELSE 0 END) AS budget_amortized_m9,
+        SUM(CASE WHEN ac.month_amortization = 'M+10' THEN (ac.metric_amortization * bs.branding_demand_supply_budget) ELSE 0 END) AS budget_amortized_m10,
+        SUM(CASE WHEN ac.month_amortization = 'M+11' THEN (ac.metric_amortization * bs.branding_demand_supply_budget) ELSE 0 END) AS budget_amortized_m11,
+        SUM(CASE WHEN ac.month_amortization = 'M+12' THEN (ac.metric_amortization * bs.branding_demand_supply_budget) ELSE 0 END) AS budget_amortized_m12
     FROM branding_demand_supply_share AS bs
     LEFT JOIN datalake_gsheets_clean_prod.unit_economics_amortization_curve AS ac
         ON TRIM('amortização ' FROM ac.classification) = 'supply'
@@ -394,21 +448,38 @@ SELECT
     COALESCE((LAG(cost_amortized_m9,9) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m9_branding_supply_cost,
     COALESCE((LAG(cost_amortized_m10,10) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m10_branding_supply_cost,
     COALESCE((LAG(cost_amortized_m11,11) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m11_branding_supply_cost,
-    COALESCE((LAG(cost_amortized_m12,12) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m12_branding_supply_cost
+    COALESCE((LAG(cost_amortized_m12,12) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m12_branding_supply_cost,
+    budget_amortized_m0 AS m0_branding_supply_budget,
+    COALESCE((LAG(budget_amortized_m1,1) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m1_branding_supply_budget,
+    COALESCE((LAG(budget_amortized_m2,2) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m2_branding_supply_budget,
+    COALESCE((LAG(budget_amortized_m3,3) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m3_branding_supply_budget,
+    COALESCE((LAG(budget_amortized_m4,4) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m4_branding_supply_budget,
+    COALESCE((LAG(budget_amortized_m5,5) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m5_branding_supply_budget,
+    COALESCE((LAG(budget_amortized_m6,6) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m6_branding_supply_budget,
+    COALESCE((LAG(budget_amortized_m7,7) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m7_branding_supply_budget,
+    COALESCE((LAG(budget_amortized_m8,8) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m8_branding_supply_budget,
+    COALESCE((LAG(budget_amortized_m9,9) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m9_branding_supply_budget,
+    COALESCE((LAG(budget_amortized_m10,10) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m10_branding_supply_budget,
+    COALESCE((LAG(budget_amortized_m11,11) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m11_branding_supply_budget,
+    COALESCE((LAG(budget_amortized_m12,12) OVER(PARTITION BY city_group ORDER BY dt_month_start)), 0) AS m12_branding_supply_budget
 FROM
     branding_supply_metric
 ), amortized_branding_supply_share AS (
     SELECT
         dt_month_start,
         city_group,
-        (m0_branding_supply_cost + m1_branding_supply_cost + m2_branding_supply_cost + m3_branding_supply_cost + m4_branding_supply_cost + m5_branding_supply_cost + m6_branding_supply_cost + m7_branding_supply_cost + m8_branding_supply_cost + m9_branding_supply_cost + m10_branding_supply_cost + m11_branding_supply_cost + m12_branding_supply_cost) AS amortized_branding_supply_share
+        (m0_branding_supply_cost + m1_branding_supply_cost + m2_branding_supply_cost + m3_branding_supply_cost + m4_branding_supply_cost + m5_branding_supply_cost + m6_branding_supply_cost + m7_branding_supply_cost + m8_branding_supply_cost + m9_branding_supply_cost + m10_branding_supply_cost + m11_branding_supply_cost + m12_branding_supply_cost) AS amortized_branding_supply_share,
+        (m0_branding_supply_budget + m1_branding_supply_budget + m2_branding_supply_budget + m3_branding_supply_budget + m4_branding_supply_budget + m5_branding_supply_budget + m6_branding_supply_budget + m7_branding_supply_budget + m8_branding_supply_budget + m9_branding_supply_budget + m10_branding_supply_budget + m11_branding_supply_budget + m12_branding_supply_budget) AS amortized_branding_supply_budget
     FROM branding_supply_per_month
 )
 SELECT
-    COALESCE(sv.dt_ccv, mc.dt_month_start, sa.dt_month_start, da.dt_month_start, ab.dt_month_start, abd.dt_month_start) AS dt_month_start,
-    COALESCE(sv.city_group, mc.city_group, sa.city_group, da.city_group, ab.city_group, abd.city_group) AS city_group,
+    COALESCE(sv.dt_ccv, st.month_start, mc.dt_month_start, sa.dt_month_start, da.dt_month_start, ab.dt_month_start, abd.dt_month_start) AS dt_month_start,
+    COALESCE(sv.city_group, st.city_group, mc.city_group, sa.city_group, da.city_group, ab.city_group, abd.city_group) AS city_group,
+    sv.ccv,
     sv.potential_closed_deals,
     sv.sale_price_agreed,
+    st.ccv_target,
+    st.potential_closed_deals_target,
     mc.demand_cost,
     mc.supply_cost,
     mc.branding_cost,
@@ -420,8 +491,12 @@ SELECT
     da.amortized_demand_cost,
     da.amortized_demand_budget,
     ab.amortized_branding_supply_share,
-    abd.amortized_branding_demand_share
+    abd.amortized_branding_demand_share,
+    ab.amortized_branding_supply_budget,
+    abd.amortized_branding_demand_budget
 FROM grouped_sale_volumes AS sv
+FULL OUTER JOIN sale_targets AS st
+    ON sv.ccv = st.month_start AND sv.city_group = st.city_group
 FULL OUTER JOIN marketing_costs_date_city AS mc
     ON sv.dt_ccv = mc.dt_month_start AND sv.city_group = mc.city_group
 FULL OUTER JOIN supply_amortized AS sa
