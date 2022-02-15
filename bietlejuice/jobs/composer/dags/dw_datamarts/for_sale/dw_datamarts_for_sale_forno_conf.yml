@@ -24,6 +24,11 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/for_sale/buyer_first_visit_intent.sql
       table: buyer_first_visit_intent
+  buyer_visit_lead_flows:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_sale/buyer_visit_lead_flows.sql
+      table: buyer_visit_lead_flows 
   dim_house_listing_amenities:
     dw:
       <<: *athena_anchor
