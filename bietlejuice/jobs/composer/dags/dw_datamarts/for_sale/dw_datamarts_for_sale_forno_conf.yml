@@ -29,6 +29,11 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/for_sale/deal_making_funnel.sql
       table: deal_making_funnel
+  house_3p:
+    dw:
+      <<: *athena
+      sql_file: dw/queries/datamarts/for_sale/house_3p.sql
+      table: house_3p
   liquidity_by_sk_region:
     dw:
       <<: *redshift_anchor

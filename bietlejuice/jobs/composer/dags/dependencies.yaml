@@ -91,6 +91,7 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
   - bietlejuice.ebdb:create-clean-work-contract-in-data-lake
   - bietlejuice.enrich_ebdb_agents:load-enrich-agents-review
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_firestore:load-enrich-monday
   - bietlejuice.enrich_firestore:load-enrich-sale-offer
   - bietlejuice.gsheets:load-clean-monday-users
