@@ -122,6 +122,9 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.sales_flow:load-clean-sales-flow
   - bietlejuice.sales_flow:load-clean-specialist
 
+bietlejuice.dw_datamarts_support_and_service:
+  - bietlejuice.heimdall:load-clean-activity
+
 bietlejuice.dw_affiliate_costs:
   - bietlejuice.enrich_robin_hood
 

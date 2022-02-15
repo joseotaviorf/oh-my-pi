@@ -11,7 +11,7 @@ select
 from datalake_heimdall_clean_prod.activity
 where type in ('TENANT_REFUND_CONDOMINIUM','TENANT_REFUND_REPAIR')
 )
-select 
+select DISTINCT
 	orr.id_request,
 	cast(json_extract(t.expense,'$._id') as varchar) as id_expense,
 	orr.id_contract,
@@ -30,7 +30,8 @@ select
 	cast(json_extract(t.expense,'$.isCustomText') as boolean) as is_custom_expense,
 	date_diff('day', orr.dt_requested, orr.dt_analyzed) as days_requested_to_analyzed,
 	orr.dt_requested,
-	orr.dt_analyzed
+	orr.dt_analyzed,
+	NOW() as ts_load
 from ongoing_refunds_requests orr
 cross join unnest(expenses) as t(expense)
 cross join unnest(auditable_expenses) as u(auditable)
