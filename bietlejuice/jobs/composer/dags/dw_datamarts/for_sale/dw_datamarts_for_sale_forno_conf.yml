@@ -42,8 +42,18 @@ pipeline:
   liquidity_by_sk_region:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_sale/liquidity_by_sk_region
+      sql_file: dw/queries/datamarts/for_sale/liquidity_by_sk_region.sql
       table: liquidity_by_sk_region
+  repressed_demand_sale:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_sale/repressed_demand_sale.sql
+      table: repressed_demand_sale
+  repressed_demand_sale_booking_fit_in:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_sale/repressed_demand_sale_booking_fit_in.sql
+      table: repressed_demand_sale_booking_fit_in
   sale_agents_weekly_performance:
     dw:
       <<: *redshift_anchor
@@ -61,11 +71,6 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/for_sale/sale_ongoing_listings_casa_mineira.sql
       table: sale_ongoing_listings_casa_mineira
-  repressed_demand_sale_booking_fit_in:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_sale/repressed_demand_sale_booking_fit_in.sql
-      table: repressed_demand_sale_booking_fit_in
   temp_autonomous_agents_listings:
     dw:
       <<: *redshift_anchor

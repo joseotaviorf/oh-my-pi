@@ -17,6 +17,7 @@ dags_out_of_pattern:
         "dw_sale_flow",
         "dw_sale_listings",
         "dw_sale_listing_flow",
+        "dw_sale_offers",
         "dw_sale_visits",
         "dw_tenant_booking_review",
         "dw_tracksale",

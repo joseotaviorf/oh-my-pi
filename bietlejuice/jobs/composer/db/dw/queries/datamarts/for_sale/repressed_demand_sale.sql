@@ -3,30 +3,30 @@ with house_available_hours as (
 		select
         	CAST(from_unixtime(cast(ts_revision as bigint)/1000) AS TIMESTAMP) as date_time,
         	hou.*
-		from datalake_ebdb_raw_prod.horariosemanalimovel_aud hou
+		from datalake_ebdb_clean_prod.house_weekly_schedule_aud hou
 			join datalake_ebdb_clean_prod.user_revision_entity ure
 				on hou.rev = ure.id
 			join datalake_ebdb_clean_prod.listing_business_context lbc 
-	            ON hou.imovel_id = lbc.id_house AND business_context = 'SALE'
+	            ON hou.id_house = lbc.id_house AND business_context = 'SALE'
 	),
 	house_available as (
 		select
-        	ia.imovel_id as id_house,
+        	ia.id_house,
 			ia.date_time as available_started_date,
-			lead(date_time) over(partition by imovel_id, diadasemana order by rev) as available_ended_date,
-			ia.diadasemana as day_of_week,
-			horarios_disponivel08as09 as hours_available_08to09,
-			horarios_disponivel09as10 as hours_available_09to10,
-			horarios_disponivel10as11 as hours_available_10to11,
-			horarios_disponivel11as12 as hours_available_11to12,
-			horarios_disponivel12as13 as hours_available_12to13,
-			horarios_disponivel13as14 as hours_available_13to14,
-			horarios_disponivel14as15 as hours_available_14to15,
-			horarios_disponivel15as16 as hours_available_15to16,
-			horarios_disponivel16as17 as hours_available_16to17,
-			horarios_disponivel17as18 as hours_available_17to18,
-			horarios_disponivel18as19 as hours_available_18to19,
-			horarios_disponivel19as20 as hours_available_19to20
+			lead(date_time) over(partition by id_house, ia.weekday order by rev) as available_ended_date,
+			ia.weekday as day_of_week,
+			is_available_between_08_and_09 as hours_available_08to09,
+			is_available_between_09_and_10 as hours_available_09to10,
+			is_available_between_10_and_11 as hours_available_10to11,
+			is_available_between_11_and_12 as hours_available_11to12,
+			is_available_between_12_and_13 as hours_available_12to13,
+			is_available_between_13_and_14 as hours_available_13to14,
+			is_available_between_14_and_15 as hours_available_14to15,
+			is_available_between_15_and_16 as hours_available_15to16,
+			is_available_between_16_and_17 as hours_available_16to17,
+			is_available_between_17_and_18 as hours_available_17to18,
+			is_available_between_18_and_19 as hours_available_18to19,
+			is_available_between_19_and_20 as hours_available_19to20
 		from imovel_aud ia
 	)
 	select
@@ -235,15 +235,15 @@ with house_available_hours as (
 		*
     from (
           	select
-				laud.imovelid as house_id,
+				laud.id_house as house_id,
 				laud.status,
 				CAST(from_unixtime(CAST(r.ts_revision / 1000 AS BIGINT)) AS TIMESTAMP) as init,
-				coalesce(lead(CAST(from_unixtime(CAST(r.ts_revision / 1000 AS BIGINT)) AS TIMESTAMP)) over (partition by imovelid order by r.ts_revision), current_date) as "end"
-			  from datalake_ebdb_raw_prod.listingbusinesscontext_aud laud
+				coalesce(lead(CAST(from_unixtime(CAST(r.ts_revision / 1000 AS BIGINT)) AS TIMESTAMP)) over (partition by laud.id_house order by r.ts_revision), current_date) as "end"
+			  from datalake_ebdb_clean_prod.listing_business_context_aud laud
 			  join datalake_ebdb_clean_prod.user_revision_entity r 
 				on laud.rev = r.id 
-				and laud.status_mod = '1'
-			WHERE laud.businessContext = 'SALE'
+				and laud.mod_status = '1'
+			WHERE laud.business_context = 'SALE'
       	)
   where status = 'SUSPENDED'
 )
