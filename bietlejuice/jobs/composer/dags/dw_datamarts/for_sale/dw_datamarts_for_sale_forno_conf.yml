@@ -29,6 +29,11 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/for_sale/deal_making_funnel.sql
       table: deal_making_funnel
+  liquidity_by_sk_region:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_sale/liquidity_by_sk_region
+      table: liquidity_by_sk_region
   sale_agents_weekly_performance:
     dw:
       <<: *redshift_anchor

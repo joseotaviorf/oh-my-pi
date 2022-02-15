@@ -69,6 +69,7 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.dw_sale_listings:load-sale-fact-listings-into-redshift
   - bietlejuice.dw_sale_visits:load-sale-fact-visits-into-redshift
   - bietlejuice.dw_region:load-dim-region-into-redshift
+  - bietlejuice.dw_rent_flow:load-fact-listing-rent-flows-into-redshift
   - bietlejuice.dw_tenant_booking_review:load-public-dim-tenant-booking-review-into-redshift
   - bietlejuice.dw_tracksale:load-dim-nps-answer-into-redshift
   - bietlejuice.dw_tracksale:load-dim-nps-campaign-into-redshift
