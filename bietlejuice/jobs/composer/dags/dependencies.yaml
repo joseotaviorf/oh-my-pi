@@ -74,6 +74,8 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.dw_tracksale:load-dim-nps-campaign-into-redshift
   - bietlejuice.dw_tracksale:load-fact-nps-dispatches-into-redshift
   - bietlejuice.dw_user:load-public-dim-partner-agent-into-redshift
+  - bietlejuice.dw_user:load-public-dim-user-into-redshift
+  - bietlejuice.ebdb:create-clean-agent-data-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-amenities-in-data-lake
   - bietlejuice.ebdb:create-clean-condo-amenities-in-data-lake
   - bietlejuice.ebdb:create-clean-info-condo-amenities-in-data-lake
@@ -91,6 +93,11 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.enrich_firestore:load-enrich-monday
   - bietlejuice.enrich_firestore:load-enrich-sale-offer
   - bietlejuice.gsheets:load-clean-monday-users
+  - bietlejuice.gsheets:load-clean-offers-hub-central
+  - bietlejuice.sales_flow:load-clean-ccv-flow
+  - bietlejuice.sales_flow:load-clean-offer
+  - bietlejuice.sales_flow:load-clean-sales-flow
+  - bietlejuice.sales_flow:load-clean-specialist
 
 bietlejuice.dw_affiliate_costs:
   - bietlejuice.enrich_robin_hood

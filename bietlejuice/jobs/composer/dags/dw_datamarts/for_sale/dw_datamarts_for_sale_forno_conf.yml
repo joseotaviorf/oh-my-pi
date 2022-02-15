@@ -49,3 +49,8 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/for_sale/temp_autonomous_agents_listings.sql
       table: temp_autonomous_agents_listings
+  temp_sale_offers:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_sale/temp_sale_offers.sql
+      table: temp_sale_offers

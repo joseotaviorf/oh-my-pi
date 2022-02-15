@@ -87,20 +87,32 @@ relation_booking_offer AS (
         booking_before_offer AS bbr
             ON bbr.sk_offer = g.sk_offer
 ),
+agent_contract AS (
+    SELECT
+        aud.id,
+        FROM_UNIXTIME(ure.ts_revision/1000) AS timestamp,
+        id_work_contract AS workcontract_id
+    FROM
+        datalake_ebdb_clean_prod.agent_data_aud AS aud
+    JOIN
+        datalake_ebdb_clean_prod.user_revision_entity AS ure
+            ON aud.rev = ure.id
+    ORDER BY 1, 2
+),
 work_contract AS (
     WITH contract_aud AS (
         SELECT
-            agent_id,
+            ac.id AS agent_id,
             du.id AS user_id,
             contract.contract_name AS contract_name,
             "timestamp",
             du.dadosagente_ativo,
-            RANK() OVER (PARTITION BY agent_id ORDER BY timestamp DESC) AS r
+            RANK() OVER (PARTITION BY ac.id ORDER BY timestamp DESC) AS r
         FROM
-            agent.agent_contract AS ac
+            agent_contract AS ac
         JOIN
             dim_user AS du
-                ON du.dados_agente_id = ac.agent_id
+                ON du.dados_agente_id = ac.id
         LEFT JOIN
             datalake_ebdb_clean_prod.work_contract AS contract 
                 ON ac.workcontract_id = contract.id
@@ -270,11 +282,11 @@ monday_offers AS (
         SELECT 
             gmu.*,
             ROW_NUMBER() OVER (PARTITION BY gmu.id_monday) AS row
-        FROM datalake_raw.gsheets_monday_users AS gmu
+        FROM datalake_gsheets_clean_prod.monday_users AS gmu
     )
     SELECT 
         mo.*,
-        au.name AS deal_maker_name
+        au.user_name AS deal_maker_name
     FROM 
         mo
     LEFT JOIN 
