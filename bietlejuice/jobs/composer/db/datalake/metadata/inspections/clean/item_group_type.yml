@@ -5,9 +5,6 @@ columns:
   id:
     lineage:
       - datalake_inspections_raw.item_group_type.id
-  id_room_type:
-    lineage:
-      - datalake_inspections_raw.item_group_type.room_type_id
   type:
     lineage:
       - datalake_inspections_raw.item_group_type.type
