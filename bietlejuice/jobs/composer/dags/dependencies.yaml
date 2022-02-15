@@ -185,6 +185,8 @@ bietlejuice.dw_chattermill:
 
 bietlejuice.dw_customer_support:
   - bietlejuice.enrich_analyst_ranking:load-enrich-ranking
+  - bietlejuice.enrich_customer_demand:load-enrich-backlog-metrics
+  - bietlejuice.enrich_customer_demand:load-enrich-demand-metrics
   - bietlejuice.enrich_customer_support:load-enrich-call
   - bietlejuice.enrich_customer_support:load-enrich-csat
   - bietlejuice.enrich_customer_support:load-enrich-chat

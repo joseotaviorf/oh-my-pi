@@ -1,0 +1,57 @@
+---
+database_name: dw_customer_support
+table_name: fact_demand_metrics
+columns:
+  sk_agent:
+    lineage:
+      - datalake_customer_demand.demand_metrics.id_agent
+      - datalake_customer_demand.backlog_metrics.id_agent
+  sk_demand_type:
+    lineage:
+      - datalake_customer_demand.demand_metrics.type
+      - datalake_customer_demand.backlog_metrics.type
+  sk_metric_reference_date:
+    lineage:
+      - datalake_customer_demand.demand_metrics.dt_metric_reference
+      - datalake_customer_demand.backlog_metrics.dt_metric_reference
+  demand_type:
+    lineage:
+      - datalake_customer_demand.demand_metrics.type
+      - datalake_customer_demand.backlog_metrics.type
+  received_demand:
+    lineage:
+      - datalake_customer_demand.demand_metrics.received_demand
+  solved_demand:
+    lineage:
+      - datalake_customer_demand.demand_metrics.solved_demand
+  tickets_solved_within_sla:
+    lineage:
+      - datalake_customer_demand.demand_metrics.tickets_solved_in_time
+  tickets_solved_with_exceed_sla:
+    lineage:
+      - datalake_customer_demand.demand_metrics.tickets_not_solved_in_time
+  days_spent_on_solved_tickets_within_sla:
+    lineage:
+      - datalake_customer_demand.demand_metrics.time_spent_on_tickets_solved_in_time
+  days_spent_on_solved_tickets_with_exceed_sla:
+    lineage:
+      - datalake_customer_demand.demand_metrics.time_spent_on_tickets_not_solved_in_time
+  total_time_spent:
+    lineage:
+      - datalake_customer_demand.demand_metrics.total_days_spent
+  daily_backlog:
+    lineage:
+      - datalake_customer_demand.backlog_metrics.daily_backlog
+  backlog_within_sla:
+    lineage:
+      - datalake_customer_demand.backlog_metrics.backlog_in_time
+  backlog_with_exceed_sla:
+    lineage:
+      - datalake_customer_demand.backlog_metrics.backlog_not_in_time
+  is_sunday:
+    lineage:
+      - datalake_customer_demand.backlog_metrics.is_sunday
+  dt_metric_reference:
+    lineage:
+      - datalake_customer_demand.demand_metrics.dt_metric_reference
+      - datalake_customer_demand.backlog_metrics.dt_metric_reference
