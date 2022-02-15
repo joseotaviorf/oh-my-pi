@@ -45,6 +45,7 @@ bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-house-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-house-visit-status-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-weekly-schedule-in-data-lake
   - bietlejuice.ebdb:create-clean-house-weekly-schedule-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-key-type-in-data-lake
   - bietlejuice.ebdb:create-clean-listing-business-context-in-data-lake

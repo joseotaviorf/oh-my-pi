@@ -20,6 +20,11 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/for_rent/weekly_demand_metrics.sql
       table: weekly_demand_metrics
+  house_available_hours:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_rent/house_available_hours.sql
+      table: house_available_hours
   house_weekly_entrance_info:
     dw:
       <<: *athena_anchor
