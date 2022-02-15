@@ -16,7 +16,7 @@ pipeline:
   #     runs_on: <backend-to-run-the-query> E.g: redshift or athena
   agents_3p:
     dw:
-      <<: *athena
+      <<: *athena_anchor
       sql_file: dw/queries/datamarts/for_sale/agents_3p.sql
       table: agents_3p
   buyer_first_visit_intent:
@@ -34,11 +34,11 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/for_sale/deal_making_funnel.sql
       table: deal_making_funnel
-  house_3p:
+  houses_3p:
     dw:
-      <<: *athena
-      sql_file: dw/queries/datamarts/for_sale/house_3p.sql
-      table: house_3p
+      <<: *athena_anchor
+      sql_file: dw/queries/datamarts/for_sale/houses_3p.sql
+      table: houses_3p
   liquidity_by_sk_region:
     dw:
       <<: *redshift_anchor
@@ -49,6 +49,13 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/for_sale/sale_agents_weekly_performance.sql
       table: sale_agents_weekly_performance
+  sale_ongoing_listings:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_sale/sale_ongoing_listings.sql
+      table: sale_ongoing_listings
+      depends_on:
+        - houses_3p
   sale_ongoing_listings_casa_mineira:
     dw:
       <<: *redshift_anchor

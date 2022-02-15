@@ -1,5 +1,0 @@
-# Config for sale_ongoing_listings
----
-streams:
-  - direction: 'upstream'
-    task_ids: ['athena_houses_3p']
