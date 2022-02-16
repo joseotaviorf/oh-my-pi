@@ -5,7 +5,7 @@ last_version_listings as (
 		sk_house_listing,
 		cast(nullif(cast(ts_listing_version_start as varchar), '') as timestamp) as ts_listing_version_start,
 		cast(nullif(cast(ts_listing_version_end as varchar), '') as timestamp) as ts_listing_version_end
-	from public.dim_house_listing
+	from datalake_clean.ods_dim_house_listing
 	where cast(nullif(cast(version as varchar), '') as bigint) > 0
 )
 select
