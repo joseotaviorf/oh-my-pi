@@ -147,7 +147,12 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.sales_flow:load-clean-specialist
 
 bietlejuice.dw_datamarts_support_and_service:
-  - bietlejuice.heimdall:load-clean-activity
+  - bietlejuice.heimdall:create-clean-activity-external-table
+  - bietlejuice.kodak:create-clean-photo-sphere-external-table
+  - bietlejuice.kodak:create-clean-photo-sphere-aud-external-table
+  - bietlejuice.kodak:create-clean-user-revision-entity-external-table
+  - bietlejuice.kodak:create-clean-video-external-table
+  - bietlejuice.kodak:create-clean-video-aud-external-table
 
 bietlejuice.dw_affiliate_costs:
   - bietlejuice.enrich_robin_hood
