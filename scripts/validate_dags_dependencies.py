@@ -136,9 +136,12 @@ class CrossDAGDependenciesValidator:
         :type task_name: str
         :return: str, str
         """
-        match = re.search(
-            "bietlejuice\.(.*):load-(enrich|raw|clean|dw)*-(.*)", task_name
-        )
+        if task_name.endswith("-external-table"):
+            task_name_pattern = "bietlejuice\.(.*):create-(enrich|raw|clean|dw)*-(.*)-external-table"
+        else:
+            task_name_pattern = "bietlejuice\.(.*):load-(enrich|raw|clean|dw)*-(.*)"
+
+        match = re.search(task_name_pattern, task_name)
         if match is None:
             match_dag_name = re.search("bietlejuice\.(\w*):(.*)", task_name)
             dag_name = match_dag_name.group(1)
