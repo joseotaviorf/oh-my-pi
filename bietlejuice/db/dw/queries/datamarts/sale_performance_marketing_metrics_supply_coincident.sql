@@ -783,7 +783,10 @@ UNION ALL
             WHEN str.mkt_origin = 'All' AND str.mkt_channel NOT IN ('Organic', 'Paid', 'CRM/Notification')  THEN str.mkt_channel
             ELSE str.mkt_origin
         END AS mkt_origin,
-        NULL::TEXT AS  mkt_channel,
+        CASE 
+            WHEN mkt_origin = 'Owner PWA' THEN mkt_channel 
+            ELSE NULL::TEXT
+        END AS mkt_channel,
         NULL::TEXT AS mkt_medium,
         NULL::TEXT AS mkt_source,
         NULL::TEXT AS utm_campaign,
@@ -832,7 +835,10 @@ UNION ALL
             WHEN str.mkt_origin = 'All' AND str.mkt_channel NOT IN ('Organic', 'Paid', 'CRM/Notification')  THEN str.mkt_channel
             ELSE str.mkt_origin
         END AS mkt_origin,
-        NULL::TEXT AS  mkt_channel,
+        CASE 
+            WHEN mkt_origin = 'Owner PWA' THEN mkt_channel 
+            ELSE NULL::TEXT
+        END AS mkt_channel,
         NULL::TEXT AS mkt_medium,
         NULL::TEXT AS mkt_source,
         NULL::TEXT AS utm_campaign,
