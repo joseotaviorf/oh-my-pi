@@ -82,22 +82,22 @@ bietlejuice.dw_datamarts_for_rent:
 
 bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
-  - bietlejuice.casa_mineira_crm:load-clean-city
-  - bietlejuice.casa_mineira_crm:load-clean-client
-  - bietlejuice.casa_mineira_crm:load-clean-contact
-  - bietlejuice.casa_mineira_crm:load-clean-house
-  - bietlejuice.casa_mineira_crm:load-clean-house-status
-  - bietlejuice.casa_mineira_crm:load-clean-house-type
-  - bietlejuice.casa_mineira_crm:load-clean-media-contact
-  - bietlejuice.casa_mineira_crm:load-clean-neighborhood
-  - bietlejuice.casa_mineira_crm:load-clean-origin-contact
-  - bietlejuice.casa_mineira_crm:load-clean-revisions
-  - bietlejuice.casa_mineira_crm:load-clean-sale
-  - bietlejuice.casa_mineira_crm:load-clean-uf
-  - bietlejuice.casa_mineira_crm:load-clean-visit
-  - bietlejuice.classified_leads:load-clean-lead-contact
-  - bietlejuice.classified_leads:load-clean-lead-reply-email
-  - bietlejuice.classified_leads:load-clean-lead-reply-whatsapp
+  - bietlejuice.casa_mineira_crm:create-clean-city-external-table
+  - bietlejuice.casa_mineira_crm:create-clean-client-external-table
+  - bietlejuice.casa_mineira_crm:create-clean-contact-external-table
+  - bietlejuice.casa_mineira_crm:create-clean-house-external-table
+  - bietlejuice.casa_mineira_crm:create-clean-house-status-external-table
+  - bietlejuice.casa_mineira_crm:create-clean-house-type-external-table
+  - bietlejuice.casa_mineira_crm:create-clean-media-contact-external-table
+  - bietlejuice.casa_mineira_crm:create-clean-neighborhood-external-table
+  - bietlejuice.casa_mineira_crm:create-clean-origin-contact-external-table
+  - bietlejuice.casa_mineira_crm:create-clean-revisions-external-table
+  - bietlejuice.casa_mineira_crm:create-clean-sale-external-table
+  - bietlejuice.casa_mineira_crm:create-clean-uf-external-table
+  - bietlejuice.casa_mineira_crm:create-clean-visit-external-table
+  - bietlejuice.classified_leads:create-clean-lead-contact-external-table
+  - bietlejuice.classified_leads:create-clean-lead-reply-email-external-table
+  - bietlejuice.classified_leads:create-clean-lead-reply-whatsapp-external-table
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
   - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
   - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
@@ -115,36 +115,36 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.dw_tracksale:load-tracksale-fact-nps-dispatches-into-redshift
   - bietlejuice.dw_user:load-public-dim-partner-agent-into-redshift
   - bietlejuice.dw_user:load-public-dim-user-into-redshift
-  - bietlejuice.ebdb:create-clean-agent-data-aud-in-data-lake
-  - bietlejuice.ebdb:create-clean-agent-data-in-data-lake
-  - bietlejuice.ebdb:create-clean-amenities-in-data-lake
-  - bietlejuice.ebdb:create-clean-condo-amenities-in-data-lake
-  - bietlejuice.ebdb:create-clean-house-aud-in-data-lake
-  - bietlejuice.ebdb:create-clean-house-in-data-lake
-  - bietlejuice.ebdb:create-clean-house-maintenance-condition-in-data-lake
-  - bietlejuice.ebdb:create-clean-house-visit-status-aud-in-data-lake
-  - bietlejuice.ebdb:create-clean-house-weekly-schedule-aud-in-data-lake
-  - bietlejuice.ebdb:create-clean-info-amenities-in-data-lake
-  - bietlejuice.ebdb:create-clean-info-condo-amenities-in-data-lake
-  - bietlejuice.ebdb:create-clean-listing-business-context-in-data-lake
-  - bietlejuice.ebdb:create-clean-listing-business-context-aud-in-data-lake
-  - bietlejuice.ebdb:create-clean-map-region-in-data-lake
-  - bietlejuice.ebdb:create-clean-partner-in-data-lake
-  - bietlejuice.ebdb:create-clean-polygon-region-in-data-lake
-  - bietlejuice.ebdb:create-clean-user-aud-in-data-lake
-  - bietlejuice.ebdb:create-clean-user-in-data-lake
-  - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
-  - bietlejuice.ebdb:create-clean-work-contract-in-data-lake
-  - bietlejuice.enrich_ebdb_agents:load-enrich-agents-review
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house
-  - bietlejuice.enrich_firestore:load-enrich-monday
-  - bietlejuice.enrich_firestore:load-enrich-sale-offer
-  - bietlejuice.gsheets:load-clean-monday-users
-  - bietlejuice.gsheets:load-clean-offers-hub-central
-  - bietlejuice.sales_flow:load-clean-ccv-flow
-  - bietlejuice.sales_flow:load-clean-offer
-  - bietlejuice.sales_flow:load-clean-sales-flow
-  - bietlejuice.sales_flow:load-clean-specialist
+  - bietlejuice.ebdb:create-agent-data-aud-clean-external-table
+  - bietlejuice.ebdb:create-agent-data-clean-external-table
+  - bietlejuice.ebdb:create-amenities-clean-external-table
+  - bietlejuice.ebdb:create-condo-amenities-clean-external-table
+  - bietlejuice.ebdb:create-house-aud-clean-external-table
+  - bietlejuice.ebdb:create-house-clean-external-table
+  - bietlejuice.ebdb:create-house-maintenance-condition-clean-external-table
+  - bietlejuice.ebdb:create-house-visit-status-aud-clean-external-table
+  - bietlejuice.ebdb:create-house-weekly-schedule-aud-clean-external-table
+  - bietlejuice.ebdb:create-info-amenities-clean-external-table
+  - bietlejuice.ebdb:create-info-condo-amenities-clean-external-table
+  - bietlejuice.ebdb:create-listing-business-context-clean-external-table
+  - bietlejuice.ebdb:create-listing-business-context-aud-clean-external-table
+  - bietlejuice.ebdb:create-map-region-clean-external-table
+  - bietlejuice.ebdb:create-partner-clean-external-table
+  - bietlejuice.ebdb:create-polygon-region-clean-external-table
+  - bietlejuice.ebdb:create-user-aud-clean-external-table
+  - bietlejuice.ebdb:create-user-clean-external-table
+  - bietlejuice.ebdb:create-user-revision-entity-clean-external-table
+  - bietlejuice.ebdb:create-work-contract-clean-external-table
+  - bietlejuice.enrich_ebdb_agents:create-enrich-agents-review-external-table
+  - bietlejuice.enrich_ebdb_listing:create-enrich-house-external-table
+  - bietlejuice.enrich_firestore:create-enrich-monday-external-table
+  - bietlejuice.enrich_firestore:create-enrich-sale-offer-external-table
+  - bietlejuice.gsheets:create-clean-monday-users-external-table
+  - bietlejuice.gsheets:create-clean-offers-hub-central-external-table
+  - bietlejuice.sales_flow:create-clean-ccv-flow-external-table
+  - bietlejuice.sales_flow:create-clean-offer-external-table
+  - bietlejuice.sales_flow:create-clean-sales-flow-external-table
+  - bietlejuice.sales_flow:create-clean-specialist-external-table
 
 bietlejuice.dw_datamarts_support_and_service:
   - bietlejuice.heimdall:create-clean-activity-external-table
