@@ -1,8 +1,8 @@
-## Datamarts For Sale
+## Datamarts For Sale Cross
 
 ### Purpose
 
-Creates/updates the datamart tables that don't have cross squad dependencies, for the context of Sales, in data lake and DW.
+Creates/updates the datamart tables with cross squad datamart dependencies, for the context of Sales, in data lake and DW.
 
 ### Execution Interval
 
