@@ -24,3 +24,8 @@ pipeline:
   #     <<: *athena_anchor
   #     sql_file: dw/queries/datamarts/for_rent/house_weekly_entrance_info.sql
   #     table: house_weekly_entrance_info
+  tof_demand_online_events:
+    dw:
+      <<: *athena_anchor
+      sql_file: dw/queries/datamarts/growth/tof_demand_online_events.sql
+      table: tof_demand_online_events

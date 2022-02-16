@@ -13,8 +13,6 @@ bietlejuice.catalog_product_entities:
 
 bietlejuice.dw_datamarts_bedrock:
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
-  - bietlejuice.dw_listing:load-dw-public-dim-house-listing
-  - bietlejuice.amplitude:events-raw-to-clean
   - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency-history
   - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency
   - bietlejuice.casa_mineira_portal:load-clean-city
@@ -145,6 +143,10 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.sales_flow:create-clean-offer-external-table
   - bietlejuice.sales_flow:create-clean-sales-flow-external-table
   - bietlejuice.sales_flow:create-clean-specialist-external-table
+
+bietlejuice.dw_datamarts_growth:
+  - bietlejuice.dw_listing:load-dw-public-dim-house-listing
+  - bietlejuice.amplitude:events-raw-to-clean
 
 bietlejuice.dw_datamarts_support_and_service:
   - bietlejuice.heimdall:create-clean-activity-external-table
