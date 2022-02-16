@@ -66,7 +66,6 @@ WITH
             ar.id_region IS NOT NULL
             AND us.dados_agente_id IS NOT NULL
             AND ag.is_available_slot = TRUE
-            AND	cast(ag.ts_slot as date) = DATE(TO_TIMESTAMP(current_date, 'YYYY-MM-DD HH:mm:ss'))
             AND DATE(TO_TIMESTAMP(current_date, 'YYYY-MM-DD HH:mm:ss')) >= DATE('2018-01-31 00:00:00')  -- limit date, where aud started to be implemented
     ),
     region_records_agg AS (
