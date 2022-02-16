@@ -29,8 +29,3 @@ pipeline:
       <<: *athena_anchor
       sql_file: dw/queries/datamarts/bedrock/users_online_metrics.sql
       table: users_online_metrics
-  portal_casa_mineira_advertiser_metrics:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/bedrock/portal_casa_mineira_advertiser_metrics.sql
-      table: portal_casa_mineira_advertiser_metrics

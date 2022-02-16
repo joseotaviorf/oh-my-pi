@@ -7,4 +7,4 @@ streams:
       'dw_performance_marketing_metrics_imobiliaria_casa_mineira'
     ]
 composer_dependencies:
-  - dw_datamarts_bedrock
+  - dw_datamarts_growth
