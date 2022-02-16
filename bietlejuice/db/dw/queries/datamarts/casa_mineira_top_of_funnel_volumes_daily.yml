@@ -1,9 +1,4 @@
 # Config for casa_mineira_top_of_funnel_volumes_daily
 ---
-streams:
-  - direction: 'upstream'
-    task_ids: [
-      'dw_portal_casa_mineira_advertiser_metrics',
-      'dw_performance_marketing_metrics_portal_casa_mineira',
-      'dw_performance_marketing_metrics_imobiliaria_casa_mineira'
-    ]
+composer_dependencies:
+  - dw_datamarts_bedrock
