@@ -13,3 +13,19 @@ SELECT
   NOW() AS ts_load
 FROM 
   datalake_gsheets_clean.department_control
+UNION ALL
+SELECT DISTINCT
+  MD5(ranking) AS sk_department,
+  ranking AS department,
+  NULL AS board,
+  NULL AS team,
+  "Offboarding" AS journey_step,
+  NULL AS channel,
+  NULL AS front_or_back,
+  NULL AS area,
+  NULL AS concentrix_area_name,
+  NULL AS is_concentrix,
+  NULL AS is_active,
+  NOW() AS ts_load
+FROM
+  datalake_gsheets_clean.agents_ranking_offboarding
