@@ -1105,6 +1105,10 @@ bietlejuice.enrich_support_and_service_kpis_targets:
 bietlejuice.enrich_terminator:
   - bietlejuice.terminator:load-clean-termination-aud
 
+bietlejuice.enrich_top_of_funnel_affiliates:
+  - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
+  - bietlejuice.gsheets:load-clean-taxonomy-affiliates
+
 bietlejuice.enrich_top_of_funnel_demand:
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
 

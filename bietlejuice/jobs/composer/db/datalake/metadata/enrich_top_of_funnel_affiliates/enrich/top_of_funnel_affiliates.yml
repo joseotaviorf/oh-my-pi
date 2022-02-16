@@ -1,0 +1,42 @@
+database_name: datalake_top_of_funnel_affiliates
+table_name: top_of_funnel_affiliates
+columns:
+  city:
+    lineage:
+      - datalake_amplitude_clean.events.city
+  utm_source:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  utm_medium:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  utm_campaign:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  utm_content:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  utm_term:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_affiliates.mkt_channel
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_affiliates.mkt_medium
+  mkt_source:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_affiliates.mkt_source
+  dt_event:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+  year:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+  month:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+  day:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
