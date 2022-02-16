@@ -13,6 +13,8 @@ bietlejuice.catalog_product_entities:
 
 bietlejuice.dw_datamarts_bedrock:
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
+  - bietlejuice.dw_listing:load-dw-public-dim-house-listing
+  - bietlejuice.amplitude:events-raw-to-clean
 
 bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
