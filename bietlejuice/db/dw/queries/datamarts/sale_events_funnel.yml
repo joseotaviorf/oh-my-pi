@@ -2,4 +2,4 @@
 ---
 composer_dependencies:
  - dw_datamarts_for_rent
- - dw_datamarts_for_sale
+ - dw_datamarts_for_sale_cross

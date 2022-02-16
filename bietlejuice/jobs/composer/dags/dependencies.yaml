@@ -108,7 +108,6 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.dw_user:load-public-dim-partner-agent-into-redshift
   - bietlejuice.dw_user:load-public-dim-user-into-redshift
   - bietlejuice.ebdb:create-agent-data-aud-clean-external-table
-  - bietlejuice.ebdb:create-agent-data-clean-external-table
   - bietlejuice.ebdb:create-amenities-clean-external-table
   - bietlejuice.ebdb:create-condo-amenities-clean-external-table
   - bietlejuice.ebdb:create-house-aud-clean-external-table
@@ -128,7 +127,6 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.ebdb:create-user-revision-entity-clean-external-table
   - bietlejuice.ebdb:create-work-contract-clean-external-table
   - bietlejuice.enrich_ebdb_agents:create-enrich-agents-review-external-table
-  - bietlejuice.enrich_ebdb_listing:create-enrich-house-external-table
   - bietlejuice.enrich_firestore:create-enrich-monday-external-table
   - bietlejuice.enrich_firestore:create-enrich-sale-offer-external-table
   - bietlejuice.gsheets:create-clean-monday-users-external-table
@@ -137,6 +135,12 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.sales_flow:create-clean-offer-external-table
   - bietlejuice.sales_flow:create-clean-sales-flow-external-table
   - bietlejuice.sales_flow:create-clean-specialist-external-table
+
+bietlejuice.dw_datamarts_for_sale_cross:
+  - bietlejuice.ebdb:create-agent-data-clean-external-table
+  - bietlejuice.ebdb:create-user-clean-external-table
+  - bietlejuice.ebdb:create-work-contract-clean-external-table
+  - bietlejuice.enrich_ebdb_listing:create-enrich-house-external-table
 
 bietlejuice.dw_datamarts_growth:
   - bietlejuice.amplitude:events-raw-to-clean
