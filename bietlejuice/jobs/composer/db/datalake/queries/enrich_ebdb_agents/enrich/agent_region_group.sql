@@ -5,7 +5,7 @@ WITH
         FROM 
             datalake_ebdb_user_revision_entity.user_revision_entity b
         WHERE 
-            b.ts_revision >= date_add(current_date, -1)
+            b.ts_revision >= date_add(DATE('{year}-{month}-{day}'), -1)
     ),
     agent_region_daily AS (
 
@@ -29,7 +29,7 @@ WITH
     ),
     daily_region AS (
         SELECT 
-            DATE(TO_TIMESTAMP(current_date, 'YYYY-MM-DD HH:mm:ss'))  AS ts_slot,
+            DATE(TO_TIMESTAMP(DATE('{year}-{month}-{day}'), 'YYYY-MM-DD HH:mm:ss'))  AS ts_slot,
             t_out.id_agent,
             t_out.id_region,
             aux.region_code,
@@ -39,7 +39,7 @@ WITH
         LEFT join
             datalake_gsheets_clean.auxiliary_region aux ON aux.id = t_out.id_region
         WHERE
-            TO_TIMESTAMP(current_date, 'YYYY-MM-DD HH:mm:ss') > TO_TIMESTAMP('2018-01-31 00:00:00', 'YYYY-MM-DD HH:mm:ss')  -- limit date, where aud started to be implemented
+            TO_TIMESTAMP(DATE('{year}-{month}-{day}'), 'YYYY-MM-DD HH:mm:ss') > TO_TIMESTAMP('2018-01-31 00:00:00', 'YYYY-MM-DD HH:mm:ss')  -- limit date, where aud started to be implemented
         ORDER BY 2, 4
     ),
     region_records_union AS (
@@ -66,8 +66,8 @@ WITH
             ar.id_region IS NOT NULL
             AND us.dados_agente_id IS NOT NULL
             AND ag.is_available_slot = TRUE
-            AND	cast(ag.ts_slot as date) = DATE(TO_TIMESTAMP(current_date, 'YYYY-MM-DD HH:mm:ss'))
-            AND DATE(TO_TIMESTAMP(current_date, 'YYYY-MM-DD HH:mm:ss')) >= DATE('2018-01-31 00:00:00')  -- limit date, where aud started to be implemented
+            AND	cast(ag.ts_slot as date) = DATE(TO_TIMESTAMP(DATE('{year}-{month}-{day}'), 'YYYY-MM-DD HH:mm:ss'))
+            AND DATE(TO_TIMESTAMP(DATE('{year}-{month}-{day}'), 'YYYY-MM-DD HH:mm:ss')) >= DATE('2018-01-31 00:00:00')  -- limit date, where aud started to be implemented
     ),
     region_records_agg AS (
         SELECT
