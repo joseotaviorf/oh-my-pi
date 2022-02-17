@@ -138,8 +138,8 @@ WITH
             arh.ts_slot,
             arh.id_agent
     )
-SELECT
-	g.ts_slot AS dt,
+SELECT DISTINCT
+	DATE(g.ts_slot) AS dt,
 	g.id_agent AS dadosagente_id,
 	list.regions,
 	g.region_code AS area,
