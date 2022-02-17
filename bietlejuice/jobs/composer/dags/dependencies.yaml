@@ -11,6 +11,37 @@
 bietlejuice.catalog_product_entities:
   - bietlejuice.enrich_bigid:load-enrich-bigid-entities-access-level
 
+bietlejuice.dw_datamarts_cross:
+  - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
+  - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
+  - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
+  - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
+  - bietlejuice.dw_listing_jobs:load-public-fact-photo-job-into-redshift
+  - bietlejuice.dw_offer:load-public-dim-offer-into-redshift
+  - bietlejuice.dw_region:load-public-dim-region-into-redshift
+  - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
+  - bietlejuice.dw_rent_listing_flow:load-public-fact-house-listing-flows-into-redshift
+  - bietlejuice.dw_sale_listings:load-sale-dim-listing-into-redshift
+  - bietlejuice.dw_sale_listing_flow:load-sale-fact-listing-flows-into-redshift
+  - bietlejuice.dw_tenant_booking_review:load-public-dim-tenant-booking-review-into-redshift
+  - bietlejuice.dw_user:load-public-dim-user-into-redshift
+  - bietlejuice.dw_user:load-public-dim-partner-into-redshift
+  - bietlejuice.dw_user:load-public-dim-partner-agent-into-redshift
+  - bietlejuice.dw_user_sales_rep:load-quintoandar-dim-user-sales-rep-into-redshift
+  - bietlejuice.ebdb:create-agent-support-clean-external-table
+  - bietlejuice.ebdb:create-booking-clean-external-table
+  - bietlejuice.ebdb:create-follow-up-details-clean-external-table
+  - bietlejuice.ebdb:create-house-clean-external-table
+  - bietlejuice.ebdb:create-house-aud-clean-external-table
+  - bietlejuice.ebdb:create-listing-business-context-clean-external-table
+  - bietlejuice.ebdb:create-user-revision-entity-clean-external-table
+  - bietlejuice.enrich_big_agent:create-enrich-agency-external-table
+  - bietlejuice.enrich_big_agent:create-enrich-agent-external-table
+  - bietlejuice.enrich_big_agent:create-enrich-enrollment-external-table
+  - bietlejuice.enrich_big_agent:create-enrich-house-external-table
+  - bietlejuice.enrich_big_agent:create-enrich-program-external-table
+  - bietlejuice.gsheets:create-clean-taxonomy-demand-external-table
+
 bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
   - bietlejuice.big_agent:load-clean-agency

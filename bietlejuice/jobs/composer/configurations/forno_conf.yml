@@ -14,6 +14,7 @@ dags_out_of_pattern:
         "dw_proposal",
         "dw_region",
         "dw_rent_flow",
+        "dw_rent_listing_flow",
         "dw_sale_flow",
         "dw_sale_listings",
         "dw_sale_listing_flow",

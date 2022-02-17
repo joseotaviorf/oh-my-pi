@@ -1,0 +1,41 @@
+---
+redshift_template:
+  dw: &redshift_anchor
+    schema: datamarts
+    runs_on: redshift
+athena_template:
+  dw: &athena_anchor
+    schema: datamarts
+    runs_on: athena
+pipeline:
+  ##<KEEP THIS COMMENTED AS A TEMPLATE>
+  # <task-name-like-attribution-conversion-paths>:
+  #   dw:
+  #     sql_file: <query-file E.g: dw/queries/datamarts/offer_attribution_conversion_paths_demand.sql>
+  #     table: <targe-table-name>
+  #     schema: <target-schema-name> # TODO this will always be `datamart` (for both datalake and dw). This var is not used anymore
+  #     runs_on: <backend-to-run-the-query> E.g: redshift or athena
+  funnel_demand_flows:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/cross/funnel_demand_flows.sql
+      table: funnel_demand_flows
+      depends_on:
+        - talk_to_agent
+  lead_listing_flows:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/cross/lead_listing_flows.sql
+      table: lead_listing_flows
+      depends_on:
+        - quintoandar_consultant_listings
+  quintoandar_consultant_listings:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/cross/quintoandar_consultant_listings.sql
+      table: quintoandar_consultant_listings
+  talk_to_agent:
+    dw:
+      <<: *athena_anchor
+      sql_file: dw/queries/datamarts/cross/talk_to_agent.sql
+      table: talk_to_agent

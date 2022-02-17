@@ -80,7 +80,7 @@ quintoandar_consultant_listings_rent as
     ),
 quintoandar_consultant_listings_sale AS
 (
-    SELECT distinct
+    SELECT DISTINCT
     dl.sk_sale_listing AS sk_house_listing,
     i.id AS id_house,
     pa.id_user AS sk_quintoandar_consultant,
@@ -93,8 +93,8 @@ quintoandar_consultant_listings_sale AS
 FROM
     datalake_ebdb_clean_prod.house i
 LEFT JOIN
-    datalake_ebdb_raw_prod.listingbusinesscontext lbc
-        ON i.id=lbc.imovelid
+    datalake_ebdb_clean_prod.listing_business_context lbc
+        ON i.id=lbc.id_house
 INNER JOIN
     dim_partner_agent pa
         ON pa.id_user=i.id_user_registrant
