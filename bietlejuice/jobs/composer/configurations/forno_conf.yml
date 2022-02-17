@@ -36,7 +36,6 @@ dags_out_of_pattern:
         "portal_casa_mineira_pipedrive",
         "quintoandar",
         "regions_polygon",
-        "dw_tracksale",
         "reverse_tracksale",
     ]
 databricks_bietlejuice_repo_path: s3://databricks.s3.forno.data.quintoandar.com.br/github-repos/bi-etl-ejuice
