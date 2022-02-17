@@ -19,11 +19,6 @@ pipeline:
       <<: *athena_anchor
       sql_file: dw/queries/datamarts/for_sale_cross/agents_3p.sql
       table: agents_3p
-  buyer_prospect_status:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_sale_cross/buyer_prospect_status.sql
-      table: buyer_prospect_status
   houses_3p:
     dw:
       <<: *athena_anchor

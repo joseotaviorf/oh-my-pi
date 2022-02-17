@@ -21,8 +21,12 @@ bietlejuice.dw_datamarts_cross:
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
   - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
   - bietlejuice.dw_rent_listing_flow:load-public-fact-house-listing-flows-into-redshift
+  - bietlejuice.dw_sale_offers:load-sale-dim-offer-into-redshift
+  - bietlejuice.dw_sale_offers:load-sale-dim-sale-agreement-into-redshift
+  - bietlejuice.dw_sale_offers:load-sale-fact-offers-into-redshift
   - bietlejuice.dw_sale_listings:load-sale-dim-listing-into-redshift
   - bietlejuice.dw_sale_listing_flow:load-sale-fact-listing-flows-into-redshift
+  - bietlejuice.dw_sale_visits:load-sale-fact-visits-into-redshift
   - bietlejuice.dw_tenant_booking_review:load-public-dim-tenant-booking-review-into-redshift
   - bietlejuice.dw_user:load-public-dim-user-into-redshift
   - bietlejuice.dw_user:load-public-dim-partner-into-redshift
@@ -170,13 +174,7 @@ bietlejuice.dw_datamarts_for_sale_cross:
   - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
   - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
-  - bietlejuice.dw_sale_flows:load-sale-fact-sale-flows-into-redshift
-  - bietlejuice.dw_sale_offers:load-sale-dim-offer-into-redshift
-  - bietlejuice.dw_sale_offers:load-sale-dim-sale-agreement-into-redshift
-  - bietlejuice.dw_sale_offers:load-sale-fact-offers-into-redshift
-  - bietlejuice.dw_sale_visits:load-sale-fact-visits-into-redshift
   - bietlejuice.ebdb:create-agent-data-clean-external-table
-  - bietlejuice.ebdb:create-house-clean-external-table
   - bietlejuice.ebdb:create-user-clean-external-table
   - bietlejuice.ebdb:create-work-contract-clean-external-table
   - bietlejuice.enrich_ebdb_listing:create-enrich-house-external-table

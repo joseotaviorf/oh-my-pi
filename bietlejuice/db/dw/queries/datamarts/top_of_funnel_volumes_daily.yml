@@ -5,5 +5,5 @@ streams:
     task_ids: ['dw_performance_marketing_metrics_demand',
                'dw_sale_performance_marketing_metrics_demand']
 composer_dependencies:
+  - dw_datamarts_cross
   - dw_datamarts_growth_cross
-  - dw_datamarts_for_sale_cross
