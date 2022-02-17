@@ -1,0 +1,18 @@
+SELECT
+  city_group,
+  tier,
+  campaign,
+  business,
+  planning_mkt_level1,
+  planning_mkt_level2,
+  planning_mkt_level3,
+  budget_quarter,
+  budget_mensal,
+  halfyear,
+  quarter,
+  date,
+  week,
+  year,
+  month
+FROM
+  datalake_gsheets_raw.costs_targets

@@ -30,13 +30,13 @@ WITH holidays_by_city_name AS (
 			 ELSE NULL END AS first_listings_share_holiday
 	FROM dim_date dd
 	CROSS JOIN dim_region dr
-	LEFT JOIN datalake_raw.gsheets_local_holidays lh
+	LEFT JOIN datalake_gsheets_clean_prod.local_holidays lh
 	  ON dd.date = DATE(REPLACE(lh.date,'-',''))
 	  AND (lh.short_region_name = dr.short_region_name
 	  	OR lh.city_group = dr.city_group)
-	LEFT JOIN datalake_raw.gsheets_city_share cs
+	LEFT JOIN datalake_gsheets_clean_prod.city_share cs
 	  ON COALESCE(NULLIF(lh.city_name, ''), dr.city_name) = NULLIF(cs.city_name, '')
-	LEFT JOIN datalake_raw.gsheets_weekday_holiday_share_supply hs
+	LEFT JOIN datalake_gsheets_clean_prod.weekday_holiday_share_supply hs
 	  ON hs.weekday_name = dd.weekday_name
 	WHERE dd.date BETWEEN '2018-12-31' AND CURRENT_DATE + INTERVAL '6 months'
 	GROUP BY dd.date,
@@ -84,7 +84,7 @@ SELECT DISTINCT
 	CAST(REPLACE(wscs.first_listing,',','') AS FLOAT) AS final_share_wo_holiday_first_listings,
 	CAST(REPLACE(wscs.first_listing,',','') AS FLOAT) * lhc.share_holiday_first_listings AS final_share_first_listings
 FROM share_local_holidays_by_city_group lhc
-LEFT JOIN datalake_raw.gsheets_weekday_supply_channel_share wscs
+LEFT JOIN datalake_gsheets_clean_prod.weekday_supply_channel_share wscs
   ON wscs.weekday = lhc.weekday_name AND wscs.city_group = lhc.city_group AND wscs.mkt_channel = lhc.mkt_channel
 ), diff_w_and_wo_holiday_share AS (
 SELECT
@@ -107,7 +107,7 @@ SELECT
 	SUM(fsh.final_share_first_listings * CAST(REPLACE(gwvs.first_listing,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.mkt_channel, gwvs.mkt_origin, fsh.lead_context) AS total_first_listing_daily,
 	SUM(fsh.final_share_wo_holiday_first_listings * CAST(REPLACE(gwvs.first_listing,',','') AS FLOAT)) OVER(PARTITION BY fsh.week_start, fsh.city_group, fsh.mkt_channel, gwvs.mkt_origin, fsh.lead_context) AS total_first_listing_daily_wo_holiday
 FROM final_shares fsh
-JOIN datalake_raw.gsheets_week_volumes_supply gwvs
+JOIN datalake_gsheets_clean_prod.week_volumes_supply gwvs
   ON fsh.mkt_channel = gwvs.mkt_channel
   	AND fsh.lead_context = gwvs.lead_context
   	AND fsh.week_start = gwvs.week_start
@@ -141,11 +141,11 @@ FROM diff_w_and_wo_holiday_share
 ), gsheets_supply_target_adjusted AS (
 	WITH
 	supply_targets AS (
-		SELECT * FROM datalake_raw.gsheets_supply_targets_2021 
+		SELECT * FROM datalake_gsheets_clean_prod.supply_targets_2021 
 	    UNION ALL
-	    	SELECT * FROM datalake_raw.gsheets_supply_targets_2020 
+	    	SELECT * FROM datalake_gsheets_clean_prod.supply_targets_2020 
 	    UNION ALL
-	        SELECT * FROM datalake_raw.gsheets_supply_targets_2019
+	        SELECT * FROM datalake_gsheets_clean_prod.supply_targets_2019
 	)
 	SELECT
 	  	CAST(REPLACE(date,'-','') AS date) AS date,
@@ -294,4 +294,4 @@ SELECT
 	CASE WHEN first_listing <= 0 THEN 0 ELSE first_listing + COALESCE(nt.fl_negative,0) * first_listing/(SUM(CASE WHEN first_listing > 0 THEN first_listing END) OVER(PARTITION BY dt.date)) END AS first_listing
 FROM daily_target_shares_adjusted dt
 JOIN negative_targets nt
-  ON dt.date = nt.date;
+  ON dt.date = nt.date

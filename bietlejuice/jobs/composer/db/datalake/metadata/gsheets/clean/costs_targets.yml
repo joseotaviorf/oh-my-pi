@@ -1,0 +1,48 @@
+database_name: datalake_gsheets_clean
+table_name: costs_targets
+columns:
+  date:
+    lineage:
+      - datalake_gsheets_raw.costs_targets.date
+  week:
+    lineage:
+      - datalake_gsheets_raw.costs_targets.week
+  month:
+    lineage:
+      - datalake_gsheets_raw.costs_targets.month
+  quarter:
+    lineage:
+      - datalake_gsheets_raw.costs_targets.quarter
+  halfyear:
+    lineage:
+      - datalake_gsheets_raw.costs_targets.halfyear
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.costs_targets.city_group
+  tier:
+    lineage:
+      - datalake_gsheets_raw.costs_targets.tier
+  campaign:
+    lineage:
+      - datalake_gsheets_raw.costs_targets.campaign
+  business:
+    lineage:
+      - datalake_gsheets_raw.costs_targets.business
+  planning_mkt_level1:
+    lineage:
+      - datalake_gsheets_raw.costs_targets.planning_mkt_level1
+  planning_mkt_level2:
+    lineage:
+      - datalake_gsheets_raw.costs_targets.planning_mkt_level2
+  planning_mkt_level3:
+    lineage:
+      - datalake_gsheets_raw.costs_targets.planning_mkt_level3
+  budget_quarter:
+    lineage:
+      - datalake_gsheets_raw.costs_targets.budget_quarter
+  budget_mensal:
+    lineage:
+      - datalake_gsheets_raw.costs_targets.budget_mensal
+  year:
+    lineage:
+      - datalake_gsheets_raw.costs_targets.year

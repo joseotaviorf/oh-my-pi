@@ -56,6 +56,7 @@ This pipeline produces the following output tables:
     - `contact_type_taxonomy`
     - `contract_attribution_models`
     - `costs_allocation_relative_indexes`
+    - `costs_targets`
     - `criteo_abtest_rj`
     - `credit_analysis_fraudsters`
     - `crm_iptu_wave4`

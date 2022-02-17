@@ -1,7 +1,8 @@
 # Config for affiliate_acquisition_metrics
 ---
-streams:
-  - direction: 'upstream'
-    task_ids: ['dw_affiliates_clusters']
+# streams:
+#   - direction: 'upstream'
+#     task_ids: ['dw_affiliates_clusters']
 composer_dependencies:
- - dw_datamarts_for_rent
+ - dw_datamarts_cross
+ - dw_datamarts_growth_cross

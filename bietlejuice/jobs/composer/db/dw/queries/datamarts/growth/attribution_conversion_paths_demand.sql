@@ -122,7 +122,8 @@ select
   sk_region,
   -- Using the coalesced id
   cast(id_amplitude * 1000 + nst_conversion as bigint) as unique_conversion_id,
-  cast(array_join(array_agg(utm_source_medium_branded), '; ') as varchar(20000)) as path_utm_source_medium_branded
+  cast(array_join(array_agg(utm_source_medium_branded), '; ') as varchar(20000)) as path_utm_source_medium_branded,
+  NOW() AS ts_load
 from touchpoints
 where conversion_time >= current_date - interval '3' month
   and date_diff('month', session_start_time, conversion_time) <= 6

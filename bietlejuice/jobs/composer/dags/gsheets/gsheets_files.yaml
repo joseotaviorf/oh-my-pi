@@ -160,6 +160,11 @@ costs_allocation_relative_indexes:
     sheet_name: costs_allocation_relative_indexes
     clean_table_name: costs_allocation_relative_indexes
 
+costs_targets:
+    sheet_id: 1g_HngmcykZuj-c5PfhGeBo0m969ipBEQ04Hy2diIns4
+    sheet_name: costs_targets
+    clean_table_name: costs_targets
+
 criteo_abtest_rj:
     sheet_id: 1nwZh9Z-1t2HFLCsxqUThGpgdgbjHCVlhsKVK_mt-IkQ
     sheet_name: criteo_abtest_rj

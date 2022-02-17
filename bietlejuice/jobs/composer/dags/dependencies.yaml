@@ -77,6 +77,23 @@ bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.terminator:create-clean-termination-workflow-external-table
   - bietlejuice.terminator:create-clean-utility-bill-external-table
 
+bietlejuice.dw_datamarts_for_rent_cross:
+  - bietlejuice.dw_datamarts_cross:create-funnel-demand-flows-in-datalake
+  - bietlejuice.dw_datamarts_cross:create-lead-listing-flows-in-datalake
+  - bietlejuice.dw_datamarts_cross:create-quintoandar-consultant-listings-in-datalake
+  - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
+  - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
+  - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
+  - bietlejuice.dw_offer:load-public-dim-offer-into-redshift
+  - bietlejuice.dw_proposal:load-dw-public-dim-proposal
+  - bietlejuice.dw_region:load-public-dim-region-into-redshift
+  - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
+  - bietlejuice.ebdb:create-proponent-proposal-clean-external-table
+  - bietlejuice.sorting_hat:create-clean-credit-analysis-external-table
+  - bietlejuice.sorting_hat:create-clean-proponent-external-table
+  - bietlejuice.sorting_hat:create-clean-proposal-external-table
+  - bietlejuice.sorting_hat:create-clean-screening-result-external-table
+
 bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
   - bietlejuice.casa_mineira_crm:create-clean-city-external-table
@@ -163,6 +180,13 @@ bietlejuice.dw_datamarts_for_sale_cross:
   - bietlejuice.wololo:create-clean-prospect-external-table
 
 bietlejuice.dw_datamarts_growth:
+  # attribution_conversion_paths_demand
+  - bietlejuice.dw_listing:load-dw-public-fact-house-listings
+  - bietlejuice.enrich_amplitude_page_viewed_events:create-enrich-contract-docusign-signed-events-external-table
+  - bietlejuice.enrich_amplitude_page_viewed_events:create-enrich-home-page-viewed-external-table
+  - bietlejuice.enrich_amplitude_page_viewed_events:create-enrich-listing-page-viewed-external-table
+  - bietlejuice.enrich_amplitude_page_viewed_events:create-enrich-schedule-page-viewed-external-table
+  - bietlejuice.enrich_amplitude_page_viewed_events:create-enrich-search-results-page-viewed-external-table
   # buyer_activation_events_combo
   - bietlejuice.amplitude:update-clean-events-daily-partition-athena
   - bietlejuice.casa_mineira_crm:create-clean-contact-external-table
@@ -188,6 +212,16 @@ bietlejuice.dw_datamarts_growth:
   # tof_demand_online_events
   - bietlejuice.amplitude:events-raw-to-clean
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
+  # daily_target_volumes_supply
+  - bietlejuice.dw_region:load-public-dim-region-into-redshift
+  - bietlejuice.gsheets:create-clean-city-share-external-table
+  - bietlejuice.gsheets:create-clean-local-holidays-external-table
+  - bietlejuice.gsheets:create-clean-supply-targets-2019-external-table
+  - bietlejuice.gsheets:create-clean-supply-targets-2020-external-table
+  - bietlejuice.gsheets:create-clean-supply-targets-2021-external-table
+  - bietlejuice.gsheets:create-clean-weekday-holiday-share-supply-external-table
+  - bietlejuice.gsheets:create-clean-weekday-supply-channel-share-external-table
+  - bietlejuice.gsheets:create-clean-week-volumes-supply-external-table
   # users_online_metrics
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
 

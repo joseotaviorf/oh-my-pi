@@ -24,11 +24,21 @@ pipeline:
   #     <<: *athena_anchor
   #     sql_file: dw/queries/datamarts/for_rent/house_weekly_entrance_info.sql
   #     table: house_weekly_entrance_info
+  attribution_conversion_paths_demand:
+    dw:
+      <<: *athena_anchor
+      sql_file: dw/queries/datamarts/growth/attribution_conversion_paths_demand.sql
+      table: attribution_conversion_paths_demand
   buyer_activation_events_combo:
     dw:
       <<: *athena_anchor
       sql_file: dw/queries/datamarts/growth/buyer_activation_events_combo.sql
       table: buyer_activation_events_combo
+  daily_target_volumes_supply:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth/daily_target_volumes_supply.sql
+      table: daily_target_volumes_supply
   portal_casa_mineira_advertiser_metrics:
     dw:
       <<: *redshift_anchor
