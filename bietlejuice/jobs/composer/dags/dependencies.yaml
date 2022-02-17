@@ -143,7 +143,7 @@ bietlejuice.dw_datamarts_for_sale:
 
 bietlejuice.dw_datamarts_for_sale_cross:
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
-  - bietlejuice.dw_datamarts_cross:load-lead-listing-flows-into-redshift
+  - bietlejuice.dw_datamarts_cross:create-lead-listing-flows-in-datalake
   - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
   - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
