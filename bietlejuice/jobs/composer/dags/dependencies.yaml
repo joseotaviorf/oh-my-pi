@@ -59,15 +59,15 @@ bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
   - bietlejuice.ebdb:create-clean-work-contract-in-data-lake
   - bietlejuice.gsheets:load-clean-taxonomy-demand
-  - bietlejuice.terminator:load-clean-application-user
-  - bietlejuice.terminator:load-clean-negotiation
-  - bietlejuice.terminator:load-clean-rev-info
-  - bietlejuice.terminator:load-clean-termination
-  - bietlejuice.terminator:load-clean-termination-aud
-  - bietlejuice.terminator:load-clean-termination-fee
-  - bietlejuice.terminator:load-clean-termination-fee-negotiation
-  - bietlejuice.terminator:load-clean-termination-workflow
-  - bietlejuice.terminator:load-clean-utility-bill
+  - bietlejuice.terminator:create-clean-application-user-external-table
+  - bietlejuice.terminator:create-clean-negotiation-external-table
+  - bietlejuice.terminator:create-clean-rev-info-external-table
+  - bietlejuice.terminator:create-clean-termination-workflow-external-table
+  - bietlejuice.terminator:create-clean-termination-aud-external-table
+  - bietlejuice.terminator:create-clean-termination-fee-external-table
+  - bietlejuice.terminator:create-clean-termination-fee-negotiation-external-table
+  - bietlejuice.terminator:create-clean-termination-workflow-external-table
+  - bietlejuice.terminator:create-clean-utility-bill-external-table
 
 bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
