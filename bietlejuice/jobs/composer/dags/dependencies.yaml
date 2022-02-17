@@ -231,11 +231,14 @@ bietlejuice.dw_datamarts_growth:
 
 bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
+  - bietlejuice.dw_contract:load-public-dim-contract-into-redshift
   - bietlejuice.dw_datamarts_cross:create-lead-listing-flows-in-datalake
   - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
   - bietlejuice.dw_offer:load-public-dim-offer-into-redshift
+  - bietlejuice.dw_region:load-public-dim-region-into-redshift
   - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
   - bietlejuice.dw_user_affiliate:load-public-dim-user-affiliate-into-redshift
+  - bietlejuice.ebdb:create-dw-quintoandar-fact-contract-people-in-datalake
   - bietlejuice.gsheets:create-clean-promotional-bonus-cluster-targets-external-table
   - bietlejuice.gsheets:create-clean-promotional-bonus-user-cluster-targets-external-table
 
