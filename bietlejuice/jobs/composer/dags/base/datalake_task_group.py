@@ -212,6 +212,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             )
             final_tasks = [sync_metastore_tables_partitions_task]
 
+        tb_names = []
         if (
             sync_mode == self.SINGLE_TABLE
             and FileService.data_quality_tests_file_exists(
@@ -219,7 +220,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             )
         ):
             tb_names = [table_name]
-        else:
+        elif sync_mode == self.ALL_TABLES:
             tb_names = FileService.list_data_quality_tests_files(
                 self.relative_query_path, layer
             )
@@ -236,7 +237,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                         "parameters": [
                             self.env,
                             self.datalake_bucket,
-                            layer.value,
+                            layer,
                             self.relative_query_path,
                             table_name,
                         ],
