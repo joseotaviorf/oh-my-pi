@@ -57,3 +57,8 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/for_rent/weekly_demand_metrics.sql
       table: weekly_demand_metrics
+  ongoing_listed_suspended_listings:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_rent/ongoing_listed_suspended_listings.sql
+      table: ongoing_listed_suspended_listings

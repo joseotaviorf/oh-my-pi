@@ -47,6 +47,8 @@ bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
   - bietlejuice.dw_contract:load-public-dim-contract-into-redshift
   - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
+  - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
+  - bietlejuice.dw_listing:load-public-fact-house-listing-status-into-redshift
   - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
   - bietlejuice.dw_listing_jobs:load-public-dim-photo-job-into-redshift
   - bietlejuice.dw_listing_jobs:load-public-fact-inspection-bookings-into-redshift
