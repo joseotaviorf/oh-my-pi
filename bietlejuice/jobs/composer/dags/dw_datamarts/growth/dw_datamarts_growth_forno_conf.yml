@@ -54,13 +54,13 @@ pipeline:
       <<: *athena_anchor
       sql_file: dw/queries/datamarts/growth/users_online_metrics.sql
       table: users_online_metrics
+  sale_performance_marketing_metrics_supply_cohort:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth/sale_performance_marketing_metrics_supply_cohort.sql
+      table: sale_performance_marketing_metrics_supply_cohort
   tof_demand_online_events:
     dw:
       <<: *athena_anchor
       sql_file: dw/queries/datamarts/growth/tof_demand_online_events.sql
       table: tof_demand_online_events
-  market_share_by_sk_region:
-  dw:
-    <<: *athena_anchor
-    sql_file: dw/queries/datamarts/growth/datamart_market_share_by_sk_region.sql
-    table: datamart_market_share_by_sk_region

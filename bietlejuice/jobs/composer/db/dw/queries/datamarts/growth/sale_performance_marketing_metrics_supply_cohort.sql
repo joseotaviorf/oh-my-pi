@@ -137,7 +137,7 @@ costs_targets_results_combined AS (
     SUM(NULLIF(REPLACE(first_listings,',',''), '')::FLOAT) AS first_listings_target,
     SUM(0::FLOAT) AS budget
   FROM
-    datalake_raw.gsheets_sale_supply_targets AS str
+    datalake_gsheets_clean_prod.sale_supply_targets AS str
   WHERE
     mkt_origin != 'All'
   GROUP BY 1,2,3,4,5,6,7,8,9,10
@@ -173,8 +173,8 @@ costs_targets_results_combined AS (
     SUM(0::FLOAT) AS qualifieds_target,
     SUM(0::FLOAT) AS opportunities_target,
     SUM(0::FLOAT) AS first_listings_target,
-    SUM(NULLIF(ct.budget__mensal, '')::FLOAT) AS budget
-  FROM datalake_raw.gsheets_costs_targets AS ct
+    SUM(NULLIF(ct.budget_mensal, '')::FLOAT) AS budget
+  FROM datalake_gsheets_clean_prod.costs_targets AS ct
   WHERE
     business = 'Sales'
     AND planning_mkt_level1 = 'Supply'

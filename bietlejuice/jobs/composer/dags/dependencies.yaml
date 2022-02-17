@@ -204,7 +204,7 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.casa_mineira_portal:create-clean-real-estate-agency-external-table
   - bietlejuice.casa_mineira_portal:create-clean-real-estate-agency-history-external-table
   - bietlejuice.casa_mineira_portal:create-clean-uf-external-table
-  #unique_owners
+  #unique_owners, sale_performance_marketing_metrics_supply_cohort
   - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
   - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
   - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
@@ -214,7 +214,11 @@ bietlejuice.dw_datamarts_growth:
   # tof_demand_online_events
   - bietlejuice.amplitude:events-raw-to-clean
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
-  # daily_target_volumes_supply
+  # sale_performance_marketing_metrics_supply_cohort
+  - bietlejuice.enrich_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
+  - bietlejuice.enrich_marketing_manual_daily_costs:create-enrich-daily-costs-external-table
+  - bietlejuice.gsheets:create-clean-sale-supply-targets-external-table
+  # daily_target_volumes_supply, sale_performance_marketing_metrics_supply_cohort
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
   - bietlejuice.gsheets:create-clean-city-share-external-table
   - bietlejuice.gsheets:create-clean-local-holidays-external-table
