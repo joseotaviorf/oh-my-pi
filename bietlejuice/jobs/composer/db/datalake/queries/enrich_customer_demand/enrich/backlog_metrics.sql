@@ -72,6 +72,5 @@ WHERE
       dt_final IS NULL
       OR dt_interval <> dt_final
     )
-    AND eb.id_agent IS NOT NULL
     AND eb.type IS NOT NULL
 GROUP BY 1,2,3,7

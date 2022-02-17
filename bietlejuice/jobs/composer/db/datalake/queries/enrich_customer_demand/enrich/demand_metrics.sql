@@ -127,5 +127,4 @@ FULL OUTER JOIN
     USING(id_agent, dt_metric_reference, type) 
 WHERE
   dt_metric_reference IS NOT NULL
-  AND id_agent IS NOT NULL
   AND type IS NOT NULL
