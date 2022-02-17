@@ -29,6 +29,14 @@ pipeline:
       <<: *athena_anchor
       sql_file: dw/queries/datamarts/for_sale_cross/houses_3p.sql
       table: houses_3p
+  sale_cohort_conversions:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_sale_cross/sale_cohort_conversions.sql
+      table: sale_cohort_conversions
+      depends_on:
+        - agents_3p
+        - houses_3p
   sale_ongoing_listings:
     dw:
       <<: *redshift_anchor

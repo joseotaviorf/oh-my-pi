@@ -165,6 +165,7 @@ bietlejuice.dw_datamarts_for_sale:
 
 bietlejuice.dw_datamarts_for_sale_cross:
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
+  - bietlejuice.dw_business_unit_region:load-sale-fact-business-unit-region-into-redshift
   - bietlejuice.dw_datamarts_cross:create-lead-listing-flows-in-datalake
   - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
   - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
@@ -179,6 +180,7 @@ bietlejuice.dw_datamarts_for_sale_cross:
   - bietlejuice.ebdb:create-user-clean-external-table
   - bietlejuice.ebdb:create-work-contract-clean-external-table
   - bietlejuice.enrich_ebdb_listing:create-enrich-house-external-table
+  - bietlejuice.enrich_firestore:create-enrich-monday-external-table
   - bietlejuice.rene_descartes:create-clean-lead-rejection-external-table
   - bietlejuice.wololo:create-clean-context-discard-external-table
   - bietlejuice.wololo:create-clean-conversion-external-table

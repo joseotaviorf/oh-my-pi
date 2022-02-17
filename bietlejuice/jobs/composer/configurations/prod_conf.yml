@@ -5,6 +5,7 @@ dags_out_of_pattern:
     [
         "amplitude",
         "dw_booking",
+        "dw_business_unit_region",
         "dw_contract",
         "dw_datamarts_cross",
         "dw_datamarts_for_rent",
