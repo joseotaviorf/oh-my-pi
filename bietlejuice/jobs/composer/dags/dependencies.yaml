@@ -175,6 +175,13 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.casa_mineira_portal:create-clean-real-estate-agency-external-table
   - bietlejuice.casa_mineira_portal:create-clean-real-estate-agency-history-external-table
   - bietlejuice.casa_mineira_portal:create-clean-uf-external-table
+  #unique_owners
+  - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
+  - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
+  - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
+  - bietlejuice.dw_rent_listing_flow:load-public-fact-house-listing-flows-into-redshift
+  - bietlejuice.dw_sale_listing_flow:load-sale-fact-listing-flows-into-redshift
+  - bietlejuice.dw_user:load-public-dim-user-into-redshift
   # tof_demand_online_events
   - bietlejuice.amplitude:events-raw-to-clean
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
