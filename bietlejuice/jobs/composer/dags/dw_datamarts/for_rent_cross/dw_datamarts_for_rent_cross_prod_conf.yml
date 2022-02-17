@@ -18,25 +18,25 @@ pipeline:
   credit_proposal_attribute:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent/credit_proposal_attribute.sql
+      sql_file: dw/queries/datamarts/for_rent_cross/credit_proposal_attribute.sql
       table: credit_proposal_attribute   
   funnel_credit_event_flows:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent/funnel_credit_event_flows.sql
+      sql_file: dw/queries/datamarts/for_rent_cross/funnel_credit_event_flows.sql
       table: funnel_credit_event_flows
   funnel_weekly_credit_user_flow:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent/funnel_weekly_credit_user_flow.sql
+      sql_file: dw/queries/datamarts/for_rent_cross/funnel_weekly_credit_user_flow.sql
       table: funnel_weekly_credit_user_flow
   funnel_monthly_credit_user_flow:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent/funnel_monthly_credit_user_flow.sql
+      sql_file: dw/queries/datamarts/for_rent_cross/funnel_monthly_credit_user_flow.sql
       table: funnel_monthly_credit_user_flow
   rental_events_funnel:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent/rental_events_funnel.sql
+      sql_file: dw/queries/datamarts/for_rent_cross/rental_events_funnel.sql
       table: rental_events_funnel
