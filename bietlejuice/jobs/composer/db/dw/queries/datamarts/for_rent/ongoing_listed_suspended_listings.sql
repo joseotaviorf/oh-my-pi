@@ -50,4 +50,4 @@ SELECT
 	sk_house_listing,
     current_timestamp AS ts_load
 FROM 
-    daily_published_suspended_listings_adjusted;
+    daily_published_suspended_listings_adjusted
