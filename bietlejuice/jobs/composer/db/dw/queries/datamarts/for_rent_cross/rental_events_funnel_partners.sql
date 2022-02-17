@@ -962,4 +962,4 @@ group by "date", city_group, partner
 select
 	*,
 	current_timestamp as ts_load
-from agg_all;
+from agg_all
