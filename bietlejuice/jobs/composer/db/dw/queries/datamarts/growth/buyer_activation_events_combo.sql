@@ -97,5 +97,6 @@ base AS (
         AND NOT COALESCE(du.is_rent_agent, FALSE)
 )
 SELECT
-    *
+    *,
+    NOW() AS ts_load
 FROM base
