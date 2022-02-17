@@ -1,4 +1,44 @@
-with cross_platform as (
+with extra_debug as (
+
+  SELECT d.*
+  FROM  datalake_amplitude_clean.170698_visit_schedule_confirmed_events as v
+  RIGHT JOIN datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events as d
+  ON v.ep_visit_code = d.ep_visit_code AND v.id_user = d.id_user
+  WHERE v.ep_visit_code IS NULL
+  
+),
+
+cross_platform as (
+ select
+    '170698' as id_app,
+    ts_event,
+    up_platform as app_type,
+    ep_visit_code as id_visit,
+    up_utm_source as utm_source,
+    up_utm_medium as utm_medium,
+    up_utm_campaign as utm_campaign,
+    up_utm_content as utm_content,
+    up_utm_term as utm_term,
+    up_adjust_network as adjust_network,
+    coalesce(
+      nullif(
+        case
+          when up_platform in ("web_desktop", "web_mobile")
+            then up_utm_source
+          else up_adjust_network
+        end,
+      "Organic"),
+    "organic")
+    as media_source,
+    row_number() over (
+      partition by ep_visit_code
+      order by cast(ts_event as date)
+    ) as rn
+  from
+    datalake_amplitude_clean.170698_visit_schedule_confirmed_events
+    
+  union all
+  
   select
     '170698' as id_app,
     ts_event,
@@ -25,7 +65,7 @@ with cross_platform as (
       order by cast(ts_event as date)
     ) as rn
   from
-    datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events
+    extra_debug
 )
 select
   id_app,
