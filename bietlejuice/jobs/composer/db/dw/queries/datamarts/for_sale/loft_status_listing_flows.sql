@@ -234,12 +234,13 @@ SELECT
         WHEN status_history = 'Despublicado' THEN IF(DATE_DIFF('week', ts_started_date, ts_ended_date) = 0, 1, DATE_DIFF('week', ts_started_date, ts_ended_date))
         ELSE NULL 
     END AS weeks_unpublished,
+    FIRST_VALUE(ts_ended_date) OVER (PARTITION BY 1 ORDER BY ts_ended_date DESC) AS ts_last_extraction,
     ts_started_date,
     CASE 
         WHEN ts_ended_date = FIRST_VALUE(ts_ended_date) OVER (PARTITION BY 1 ORDER BY ts_ended_date DESC) THEN NULL 
         ELSE ts_ended_date
     END AS ts_ended_date, 
-    FIRST_VALUE(ts_ended_date) OVER (PARTITION BY 1 ORDER BY ts_ended_date DESC) AS ts_load 
+    NOW() AS ts_load
 FROM 
     df_grouping 
 
