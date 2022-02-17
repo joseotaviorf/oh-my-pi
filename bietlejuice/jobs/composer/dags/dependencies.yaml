@@ -196,7 +196,6 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
   - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
   - bietlejuice.ebdb:create-house-clean-external-table
-  #market_share_by_sk_region
   - bietlejuice.ebdb:create-polygon-region-clean-external-table
   # portal_casa_mineira_advertiser_metrics
   - bietlejuice.casa_mineira_portal:create-clean-city-external-table
