@@ -1,5 +1,4 @@
-WITH
-tps_contracts AS (
+WITH tps_contracts AS (
     SELECT DISTINCT
         flrf.sk_client,
         dr.city_group,
