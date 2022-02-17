@@ -1,4 +1,7 @@
 # Config for rental_marketplace_flows
 ---
+streams:
+  - direction: 'upstream'
+    task_ids: ['dw_tenant_prospect_status']
 composer_dependencies:
   - dw_datamarts_growth_cross
