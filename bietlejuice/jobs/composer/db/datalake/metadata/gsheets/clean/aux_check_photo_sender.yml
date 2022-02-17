@@ -1,0 +1,31 @@
+---
+database_name: datalake_gsheets_clean
+table_name: aux_check_photo_sender
+columns:
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.aux_check_photo_sender.house_id
+  id_photo_job:
+    lineage:
+      - datalake_gsheets_raw.aux_check_photo_sender.job_id_fl
+  analyzed_by:
+    lineage:
+      - datalake_gsheets_raw.aux_check_photo_sender.analisado_por
+  final_user_sender:
+    lineage:
+      - datalake_gsheets_raw.aux_check_photo_sender.user_sender_final
+  final_classification:
+    lineage:
+      - datalake_gsheets_raw.aux_check_photo_sender.classificacao_final
+  final_classification_reason:
+    lineage:
+      - datalake_gsheets_raw.aux_check_photo_sender.classificacao_motivo_final
+  final_classification_comments:
+    lineage:
+      - datalake_gsheets_raw.aux_check_photo_sender.classificacao_comentarios_final
+  sign_placement:
+    lineage:
+      - datalake_gsheets_raw.aux_check_photo_sender.tem_plaquinha
+  dt_analyzed:
+    lineage:
+      - datalake_gsheets_raw.aux_check_photo_sender.analisado_em

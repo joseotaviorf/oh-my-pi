@@ -60,6 +60,11 @@ aux_agents_sale_hub:
     sheet_name: aux_agents_HUB
     clean_table_name: aux_agents_sale_hub
 
+aux_check_photo_sender:
+    sheet_id: 10dUA-ED5cqd8qEHrMC-iXjPio0WBEUP-dZGkcPwP6WU
+    sheet_name: aux_check_photo_sender
+    clean_table_name: aux_check_photo_sender
+
 aux_regiao:
     sheet_id: 1gh8S0xVQ9HsTs6EkvE0BcXvh5_cfaG3aUpIgrluqqlM
     sheet_name: aux_regiao

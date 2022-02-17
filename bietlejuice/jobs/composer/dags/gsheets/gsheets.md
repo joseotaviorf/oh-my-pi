@@ -36,6 +36,7 @@ This pipeline produces the following output tables:
     - `agreements_discounts_answer_forms`
     - `agreements_discounts_expenses_created`
     - `aux_agents_sale_hub`
+    - `aux_check_photo_sender`
     - `auxiliary_region`
     - `bandaid_off`
     - `branding_where_is_plaquinha`

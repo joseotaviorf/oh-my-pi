@@ -1,0 +1,8 @@
+---
+database_name: datalake_gsheets_raw
+table_name: aux_check_photo_sender
+columns:
+  analisado_por:
+    tags:
+      - PII
+      - Confidential
