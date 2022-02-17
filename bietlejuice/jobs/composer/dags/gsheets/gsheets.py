@@ -45,11 +45,9 @@ LOAD_GSHEETS_INTO_DATALAKE_RAW_FILE_PATH = (
     f"{BASE_SPARK_JOBS_PATH}load_gsheets_into_datalake_raw.py"
 )
 
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{spark_jobs_logs_path}{DAG_ID}"
+CLUSTER_DESCRIPTION = Variable.get(
+    "databricks_9_1_med_general_cluster ", deserialize_json=True
+)
 
 CUSTOM_LIBRARIES = [
     {
@@ -112,6 +110,9 @@ for TABLE_NAME, SHEET_DETAILS in GOOGLE_FILES.items():
     raw_task_groups[SHEET_DETAILS["clean_table_name"]] = raw_task_group
 
     create_cluster_task >> DatalakeTaskGroup.first_tasks(raw_task_group)
+    independent_tasks = DatalakeTaskGroup.independent_tasks(raw_task_group)
+    if independent_tasks:
+        terminate_cluster_task.set_upstream(independent_tasks)
 
 clean_task_groups = task_group.build_task_group_from_sql_files(
     layer=LayerEnum.CLEAN,
