@@ -128,14 +128,52 @@ class CrossDAGDependenciesValidator:
         """
         return dependency_name.find(":") != -1
 
-    @staticmethod
-    def extract_dag_and_table_from_task_name(task_name):
+    def _get_table_name_from_redshift_task(self, dag_name, layer, redshift_task):
+        """
+        Clean the redshift task in order to retrieve the table name being loaded
+
+        :type dag_name: str
+        :type layer: str
+        :type redshift_task: str
+        :return: str
+        """
+        dag_context = dag_name.replace(f"{layer}_", "")
+        table_name = redshift_task.replace("-", "_").replace(f"{dag_context}_", "")
+        return table_name
+    
+    def _extract_dag_and_table_from_redshift_task(self, task_name):
+        """
+        Parses the DAG and table name from load into redshift tasks
+
+        :type task_name: str
+        :return: str, str
+        """
+        match = re.search("bietlejuice\.(.*):load-(public)?(.*)-into-redshift", task_name)
+
+        if not match:
+            match_dag_name = re.search("bietlejuice\.(\w*):(.*)", task_name)
+            dag_name = match_dag_name.group(1)
+            return dag_name, None
+
+        layer = "dw"
+        dag_name = match.group(1)
+        redshift_task = match.group(3)
+
+        table_name = self._get_table_name_from_redshift_task(dag_name, layer, redshift_task)
+        table_name = f"{layer}:{table_name}"
+
+        return dag_name, table_name
+
+    def extract_dag_and_table_from_task_name(self, task_name):
         """
         Parses the DAG and table name from task name
 
         :type task_name: str
         :return: str, str
         """
+        if task_name.endswith("-into-redshift"):
+            return self._extract_dag_and_table_from_redshift_task(task_name)
+
         if task_name.endswith("-external-table"):
             task_name_pattern = "bietlejuice\.(.*):create-(enrich|raw|clean|dw)*-(.*)-external-table"
         else:
