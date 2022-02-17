@@ -17,7 +17,7 @@ pipeline:
   # example_redshift_weekly_demand_metrics:
   #   dw:
   #     <<: *redshift_anchor
-  #     sql_file: dw/queries/datamarts/for_rent/weekly_demand_metrics.sql
+  #     sql_file: dw/queries/datamarts/support_and_service/weekly_demand_metrics.sql
   #     table: weekly_demand_metrics
   # example_athena_house_weekly_entrance_info:
   #   dw:
@@ -34,3 +34,8 @@ pipeline:
       <<: *athena_anchor
       sql_file: dw/queries/datamarts/support_and_service/house_media.sql
       table: house_media
+  repressed_demand_booking_fit_in:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/support_and_service/repressed_demand_booking_fit_in.sql
+      table: repressed_demand_booking_fit_in

@@ -34,3 +34,8 @@ pipeline:
       <<: *athena_anchor
       sql_file: dw/queries/datamarts/support_and_service/house_media.sql
       table: house_media
+  repressed_demand_booking_fit_in:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/support_and_service/repressed_demand_booking_fit_in.sql
+      table: repressed_demand_booking_fit_in
