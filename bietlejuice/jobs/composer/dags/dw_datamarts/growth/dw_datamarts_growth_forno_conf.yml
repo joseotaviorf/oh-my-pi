@@ -24,6 +24,11 @@ pipeline:
   #     <<: *athena_anchor
   #     sql_file: dw/queries/datamarts/for_rent/house_weekly_entrance_info.sql
   #     table: house_weekly_entrance_info
+  attribution_conversion_paths_demand:
+    dw:
+      <<: *athena_anchor
+      sql_file: dw/queries/datamarts/growth/attribution_conversion_paths_demand.sql
+      table: attribution_conversion_paths_demand
   buyer_activation_events_combo:
     dw:
       <<: *athena_anchor
