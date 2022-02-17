@@ -48,15 +48,7 @@ CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
 ] = f"{spark_jobs_logs_path}{DAG_ID}"
 
 # dependent: [dependencies]
-INNER_DEPENDENCIES = {
-    "agents_slots": [
-        "agents_specific_weekly_schedule",
-        "agents_weekly_schedule_history",
-    ],
-    "agents_slots_hourly": ["agents_slots"],
-    "agents_weekly_schedule_history": ["slots_base_time"],
-    "agents_review": ["rating_label"],
-}
+inner_dependencies = config_service.get_config("inner_dependencies")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -110,7 +102,7 @@ for table in tables:
 ) = datalake_task_group.set_inner_dag_dependencies(
     task_flow_helper=TaskFlowHelper(),
     task_groups_boundaries=enrich_task_groups,
-    dag_inner_dependencies=INNER_DEPENDENCIES,
+    dag_inner_dependencies=inner_dependencies,
 )
 
 chain(
