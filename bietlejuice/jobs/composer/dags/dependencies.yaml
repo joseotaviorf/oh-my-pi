@@ -209,6 +209,16 @@ bietlejuice.dw_datamarts_growth:
   # tof_demand_online_events
   - bietlejuice.amplitude:events-raw-to-clean
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
+  # daily_target_volumes_supply
+  - bietlejuice.dw_region:load-public-dim-region-into-redshift
+  - bietlejuice.gsheets:create-clean-city-share-external-table
+  - bietlejuice.gsheets:create-clean-local-holidays-external-table
+  - bietlejuice.gsheets:create-clean-supply-targets-2019-external-table
+  - bietlejuice.gsheets:create-clean-supply-targets-2020-external-table
+  - bietlejuice.gsheets:create-clean-supply-targets-2021-external-table
+  - bietlejuice.gsheets:create-clean-weekday-holiday-share-supply-external-table
+  - bietlejuice.gsheets:create-clean-weekday-supply-channel-share-external-table
+  - bietlejuice.gsheets:create-clean-week-volumes-supply-external-table
   # users_online_metrics
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
 
