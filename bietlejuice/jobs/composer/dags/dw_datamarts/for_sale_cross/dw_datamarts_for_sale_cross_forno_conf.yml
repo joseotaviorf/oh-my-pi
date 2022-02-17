@@ -36,3 +36,8 @@ pipeline:
       table: sale_ongoing_listings
       depends_on:
         - houses_3p
+  temp_supply_flows:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_sale_cross/temp_supply_flows.sql
+      table: temp_supply_flows

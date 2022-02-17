@@ -166,7 +166,10 @@ bietlejuice.dw_datamarts_for_sale:
 
 bietlejuice.dw_datamarts_for_sale_cross:
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
+  - bietlejuice.dw_datamarts_cross:load-lead-listing-flows-into-redshift
   - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
+  - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
+  - bietlejuice.dw_region:load-public-dim-region-into-redshift
   - bietlejuice.dw_sale_flows:load-sale-fact-sale-flows-into-redshift
   - bietlejuice.dw_sale_offers:load-sale-dim-offer-into-redshift
   - bietlejuice.dw_sale_offers:load-sale-dim-sale-agreement-into-redshift
@@ -177,6 +180,10 @@ bietlejuice.dw_datamarts_for_sale_cross:
   - bietlejuice.ebdb:create-user-clean-external-table
   - bietlejuice.ebdb:create-work-contract-clean-external-table
   - bietlejuice.enrich_ebdb_listing:create-enrich-house-external-table
+  - bietlejuice.rene_descartes:create-clean-lead-rejection-external-table
+  - bietlejuice.wololo:create-clean-context-discard-external-table
+  - bietlejuice.wololo:create-clean-conversion-external-table
+  - bietlejuice.wololo:create-clean-prospect-external-table
 
 bietlejuice.dw_datamarts_growth:
   - bietlejuice.amplitude:events-raw-to-clean
