@@ -20,11 +20,16 @@ pipeline:
       <<: *athena_anchor
       sql_file: dw/queries/datamarts/for_rent/agents_activations_suspensions_contracts_changes.sql
       table: agents_activations_suspensions_contracts_changes
-  weekly_demand_metrics:
+  contract_termination:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent/weekly_demand_metrics.sql
-      table: weekly_demand_metrics
+      sql_file: dw/queries/datamarts/for_rent/contract_termination.sql
+      table: contract_termination
+  datamart_opportunity:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_rent/datamart_opportunity.sql
+      table: datamart_opportunity
   house_available_hours:
     dw:
       <<: *redshift_anchor
@@ -42,80 +47,13 @@ pipeline:
       <<: *athena_anchor
       sql_file: dw/queries/datamarts/for_rent/house_weekly_entrance_info.sql
       table: house_weekly_entrance_info
-  talk_to_agent:
-    dw:
-      <<: *athena_anchor
-      sql_file: dw/queries/datamarts/for_rent/talk_to_agent.sql
-      table: talk_to_agent
-  funnel_demand_flows:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent/funnel_demand_flows.sql
-      table: funnel_demand_flows
-      depends_on:
-        - talk_to_agent
-  datamart_opportunity:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent/datamart_opportunity.sql
-      table: datamart_opportunity
-  quintoandar_consultant_listings:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent/quintoandar_consultant_listings.sql
-      table: quintoandar_consultant_listings
   repressed_demand:
     dw:
       <<: *athena_anchor
       sql_file: dw/queries/datamarts/for_rent/repressed_demand.sql
       table: repressed_demand
-  credit_proposal_attribute:
+  weekly_demand_metrics:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent/credit_proposal_attribute.sql
-      table: credit_proposal_attribute
-      depends_on:
-        - quintoandar_consultant_listings       
-  funnel_credit_event_flows:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent/funnel_credit_event_flows.sql
-      table: funnel_credit_event_flows
-      depends_on:
-        - funnel_demand_flows
-  funnel_weekly_credit_user_flow:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent/funnel_weekly_credit_user_flow.sql
-      table: funnel_weekly_credit_user_flow
-      depends_on:
-        - funnel_demand_flows
-  funnel_monthly_credit_user_flow:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent/funnel_monthly_credit_user_flow.sql
-      table: funnel_monthly_credit_user_flow
-      depends_on:
-        - funnel_demand_flows
-  lead_listing_flows:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent/lead_listing_flows.sql
-      table: lead_listing_flows
-      depends_on:
-        - quintoandar_consultant_listings
-  rental_events_funnel:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent/rental_events_funnel.sql
-      table: rental_events_funnel
-      depends_on: 
-        - funnel_demand_flows
-        - lead_listing_flows
-        - quintoandar_consultant_listings
-        - talk_to_agent
-  contract_termination:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/for_rent/contract_termination.sql
-      table: contract_termination
+      sql_file: dw/queries/datamarts/for_rent/weekly_demand_metrics.sql
+      table: weekly_demand_metrics

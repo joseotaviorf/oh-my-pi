@@ -44,78 +44,38 @@ bietlejuice.dw_datamarts_cross:
 
 bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
-  - bietlejuice.big_agent:load-clean-agency
-  - bietlejuice.big_agent:load-clean-agent
-  - bietlejuice.big_agent:load-clean-enrollment
-  - bietlejuice.big_agent:load-clean-house
-  - bietlejuice.big_agent:load-clean-program
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
   - bietlejuice.dw_contract:load-public-dim-contract-into-redshift
   - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
-  - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
   - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
   - bietlejuice.dw_listing_jobs:load-public-dim-photo-job-into-redshift
   - bietlejuice.dw_listing_jobs:load-public-fact-inspection-bookings-into-redshift
-  - bietlejuice.dw_listing_jobs:load-public-fact-photo-job-into-redshift
-  - bietlejuice.dw_offer:load-public-dim-offer-into-redshift
-  - bietlejuice.dw_proposal:load-public-dim-proposal-into-redshift
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
   - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
-  - bietlejuice.dw_sale_listings:load-sale-dim-listing-into-redshift
-  - bietlejuice.dw_sale_listing_flow:load-sale-fact-listing-flows-into-redshift
-  - bietlejuice.dw_tenant_booking_review:load-public-dim-tenant-booking-review-into-redshift
   - bietlejuice.dw_tracksale:load-tracksale-dim-nps-campaign-into-redshift
   - bietlejuice.dw_tracksale:load-tracksale-fact-nps-dispatches-into-redshift
-  - bietlejuice.dw_user:load-public-dim-partner-into-redshift
-  - bietlejuice.dw_user:load-public-dim-partner-agent-into-redshift
-  - bietlejuice.dw_user:load-public-dim-user-into-redshift
-  - bietlejuice.dw_user_sales_rep:load-quintoandar-dim-user-sales-rep-into-redshift
-  - bietlejuice.ebdb:create-clean-access-authorization-type-in-data-lake
-  - bietlejuice.ebdb:create-clean-access-type-in-data-lake
-  - bietlejuice.ebdb:create-clean-access-type-aud-in-data-lake
-  - bietlejuice.ebdb:create-clean-agent-data-aud-in-data-lake
-  - bietlejuice.ebdb:create-clean-agent-data-types-in-data-lake
-  - bietlejuice.ebdb:create-clean-agent-support-in-data-lake
-  - bietlejuice.ebdb:create-clean-booking-in-data-lake
-  - bietlejuice.ebdb:create-clean-follow-up-details-in-data-lake
-  - bietlejuice.ebdb:create-clean-house-in-data-lake
-  - bietlejuice.ebdb:create-clean-house-aud-in-data-lake
-  - bietlejuice.ebdb:create-clean-house-visit-status-aud-in-data-lake
-  - bietlejuice.ebdb:create-clean-house-weekly-schedule-in-data-lake
-  - bietlejuice.ebdb:create-clean-house-weekly-schedule-aud-in-data-lake
-  - bietlejuice.ebdb:create-clean-key-type-in-data-lake
-  - bietlejuice.ebdb:create-clean-listing-business-context-in-data-lake
-  - bietlejuice.ebdb:create-clean-occupant-type-in-data-lake
-  - bietlejuice.ebdb:create-clean-user-in-data-lake
-  - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
-  - bietlejuice.ebdb:create-clean-work-contract-in-data-lake
-  - bietlejuice.gsheets:load-clean-taxonomy-demand
+  - bietlejuice.ebdb:create-access-authorization-type-clean-external-table
+  - bietlejuice.ebdb:create-access-type-clean-external-table
+  - bietlejuice.ebdb:create-access-type-aud-clean-external-table
+  - bietlejuice.ebdb:create-agent-data-aud-clean-external-table
+  - bietlejuice.ebdb:create-agent-data-types-clean-external-table
+  - bietlejuice.ebdb:create-house-clean-external-table
+  - bietlejuice.ebdb:create-house-weekly-schedule-clean-external-table
+  - bietlejuice.ebdb:create-house-weekly-schedule-aud-clean-external-table
+  - bietlejuice.ebdb:create-key-type-clean-external-table
+  - bietlejuice.ebdb:create-occupant-type-clean-external-table
+  - bietlejuice.ebdb:create-house-user-clean-external-table
+  - bietlejuice.ebdb:create-user-revision-entity-clean-external-table
+  - bietlejuice.ebdb:create-work-contract-clean-external-table
   - bietlejuice.terminator:create-clean-application-user-external-table
   - bietlejuice.terminator:create-clean-negotiation-external-table
   - bietlejuice.terminator:create-clean-rev-info-external-table
-  - bietlejuice.terminator:create-clean-termination-workflow-external-table
+  - bietlejuice.terminator:create-clean-termination-external-table
   - bietlejuice.terminator:create-clean-termination-aud-external-table
   - bietlejuice.terminator:create-clean-termination-fee-external-table
   - bietlejuice.terminator:create-clean-termination-fee-negotiation-external-table
   - bietlejuice.terminator:create-clean-termination-workflow-external-table
   - bietlejuice.terminator:create-clean-utility-bill-external-table
-
-bietlejuice.dw_datamarts_for_rent_cross:
-  - bietlejuice.dw_datamarts_cross:create-funnel-demand-flows-in-datalake
-  - bietlejuice.dw_datamarts_cross:create-lead-listing-flows-in-datalake
-  - bietlejuice.dw_datamarts_cross:create-quintoandar-consultant-listings-in-datalake
-  - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
-  - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
-  - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
-  - bietlejuice.dw_offer:load-public-dim-offer-into-redshift
-  - bietlejuice.dw_proposal:load-dw-public-dim-proposal
-  - bietlejuice.dw_region:load-public-dim-region-into-redshift
-  - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
-  - bietlejuice.ebdb:create-proponent-proposal-clean-external-table
-  - bietlejuice.sorting_hat:create-clean-credit-analysis-external-table
-  - bietlejuice.sorting_hat:create-clean-proponent-external-table
-  - bietlejuice.sorting_hat:create-clean-proposal-external-table
-  - bietlejuice.sorting_hat:create-clean-screening-result-external-table
 
 bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
