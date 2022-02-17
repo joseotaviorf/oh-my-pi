@@ -25,6 +25,7 @@ dags_out_of_pattern:
         "dw_tenant_booking_review",
         "dw_tracksale",
         "dw_user",
+        "dw_user_affiliate",
         "dw_user_sales_rep",
         "ebdb",
         "enrich_amplitude_partner_taxonomy",

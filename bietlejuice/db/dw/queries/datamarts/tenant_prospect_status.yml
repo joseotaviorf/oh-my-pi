@@ -1,5 +1,4 @@
 # Config for tenant_prospect_status
 ---
-streams:
-  - direction: 'upstream'
-    task_ids: ['dw_rent_flow_interactions']
+composer_dependencies:
+ - dw_datamarts_growth_cross
