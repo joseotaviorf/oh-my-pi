@@ -1,0 +1,26 @@
+---
+database_name: datalake_sale_lead_flows
+table_name: classified_lead_flow
+columns:
+  id_classified_lead:
+    lineage:
+      - datalake_classified_leads_clean.lead_contact.id
+  id_region:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+  id_house:
+    lineage:
+      - datalake_classified_leads_clean.lead_contact.id_property
+  email:
+    lineage:
+      - datalake_classified_leads_clean.lead_contact.user_email
+  phone_number:
+    lineage:
+      - datalake_classified_leads_clean.lead_contact.user_phone_number
+      - datalake_classified_leads_clean.lead_contact.user_ddd
+  origin_partner:
+    lineage:
+      - datalake_classified_leads_clean.lead_contact.origin_partner
+  ts_intent:
+    lineage:
+      - datalake_classified_leads_clean.lead_contact.ts_received
