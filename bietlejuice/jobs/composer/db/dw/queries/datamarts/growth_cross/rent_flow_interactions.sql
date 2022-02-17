@@ -1,8 +1,7 @@
-WITH
 -----------------------------------------------------------
 -- Query bookings, offers and talk to agent full history --
 -----------------------------------------------------------
-events AS (
+WITH events AS (
     SELECT
         flrf.sk_client,
         flrf.sk_house_listing,
