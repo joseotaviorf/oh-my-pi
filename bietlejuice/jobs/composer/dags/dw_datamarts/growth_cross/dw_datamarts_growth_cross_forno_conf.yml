@@ -46,3 +46,8 @@ pipeline:
       table: tenant_prospect_status
       depends_on:
         - rent_flow_interactions
+  user_funnel:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/user_funnel.sql
+      table: user_funnel
