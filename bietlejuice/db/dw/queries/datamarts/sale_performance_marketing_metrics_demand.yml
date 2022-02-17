@@ -1,7 +1,5 @@
 # Config for sale_performance_marketing_metrics_demand
 ---
-streams:
-  - direction: 'upstream'
-    task_ids: ['dw_buyer_prospect_status']
 composer_dependencies: 
-  - dw_datamarts_for_rent
+  - dw_datamarts_cross
+  - dw_datamarts_for_sale_cross

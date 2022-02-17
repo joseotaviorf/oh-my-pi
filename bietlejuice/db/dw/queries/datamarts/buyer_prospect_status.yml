@@ -1,7 +1,0 @@
-# Config for tenant_prospect_status
----
-# streams:
-#   - direction: 'upstream'
-#     task_ids: ['athena_talk_to_agent']
-composer_dependencies: 
-  - dw_datamarts_for_rent

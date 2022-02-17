@@ -165,7 +165,15 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.sales_flow:create-clean-specialist-external-table
 
 bietlejuice.dw_datamarts_for_sale_cross:
+  - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
+  - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
+  - bietlejuice.dw_sale_flows:load-sale-fact-sale-flows-into-redshift
+  - bietlejuice.dw_sale_offers:load-sale-dim-offer-into-redshift
+  - bietlejuice.dw_sale_offers:load-sale-dim-sale-agreement-into-redshift
+  - bietlejuice.dw_sale_offers:load-sale-fact-offers-into-redshift
+  - bietlejuice.dw_sale_visits:load-sale-fact-visits-into-redshift
   - bietlejuice.ebdb:create-agent-data-clean-external-table
+  - bietlejuice.ebdb:create-house-clean-external-table
   - bietlejuice.ebdb:create-user-clean-external-table
   - bietlejuice.ebdb:create-work-contract-clean-external-table
   - bietlejuice.enrich_ebdb_listing:create-enrich-house-external-table
