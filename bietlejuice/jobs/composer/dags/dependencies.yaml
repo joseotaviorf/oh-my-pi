@@ -100,6 +100,23 @@ bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.terminator:create-clean-termination-workflow-external-table
   - bietlejuice.terminator:create-clean-utility-bill-external-table
 
+bietlejuice.dw_datamarts_for_rent_cross:
+  - bietlejuice.dw_datamarts_cross:create-funnel-demand-flows-in-datalake
+  - bietlejuice.dw_datamarts_cross:create-lead-listing-flows-in-datalake
+  - bietlejuice.dw_datamarts_cross:create-quintoandar-consultant-listings-in-datalake
+  - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
+  - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
+  - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
+  - bietlejuice.dw_offer:load-public-dim-offer-into-redshift
+  - bietlejuice.dw_proposal:load-dw-public-dim-proposal
+  - bietlejuice.dw_region:load-public-dim-region-into-redshift
+  - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
+  - bietlejuice.ebdb:create-proponent-proposal-clean-external-table
+  - bietlejuice.sorting_hat:create-clean-credit-analysis-external-table
+  - bietlejuice.sorting_hat:create-clean-proponent-external-table
+  - bietlejuice.sorting_hat:create-clean-proposal-external-table
+  - bietlejuice.sorting_hat:create-clean-screening-result-external-table
+
 bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
   - bietlejuice.casa_mineira_crm:create-clean-city-external-table

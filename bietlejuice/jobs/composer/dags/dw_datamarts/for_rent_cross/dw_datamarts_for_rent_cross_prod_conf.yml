@@ -1,0 +1,42 @@
+# Merge Keys are available only in Yaml 1.1.
+redshift_template:
+  dw: &redshift_anchor
+    schema: datamarts
+    runs_on: redshift
+athena_template:
+  dw: &athena_anchor
+    schema: datamarts
+    runs_on: athena
+pipeline:
+  ##<KEEP THIS COMMENTED AS A TEMPLATE>
+  # <task-name-like-attribution-conversion-paths>:
+  #   dw:
+  #     sql_file: <query-file E.g: dw/queries/datamarts/offer_attribution_conversion_paths_demand.sql>
+  #     table: <targe-table-name>
+  #     schema: <target-schema-name> # TODO this will always be `datamart` (for both datalake and dw). This var is not used anymore
+  #     runs_on: <backend-to-run-the-query> E.g: redshift or athena
+  credit_proposal_attribute:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_rent/credit_proposal_attribute.sql
+      table: credit_proposal_attribute   
+  funnel_credit_event_flows:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_rent/funnel_credit_event_flows.sql
+      table: funnel_credit_event_flows
+  funnel_weekly_credit_user_flow:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_rent/funnel_weekly_credit_user_flow.sql
+      table: funnel_weekly_credit_user_flow
+  funnel_monthly_credit_user_flow:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_rent/funnel_monthly_credit_user_flow.sql
+      table: funnel_monthly_credit_user_flow
+  rental_events_funnel:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_rent/rental_events_funnel.sql
+      table: rental_events_funnel
