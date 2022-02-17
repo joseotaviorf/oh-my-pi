@@ -11,9 +11,6 @@
 bietlejuice.catalog_product_entities:
   - bietlejuice.enrich_bigid:load-enrich-bigid-entities-access-level
 
-bietlejuice.dw_datamarts_bedrock:
-  - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
-
 bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
   - bietlejuice.big_agent:load-clean-agency
@@ -144,6 +141,7 @@ bietlejuice.dw_datamarts_for_sale_cross:
 
 bietlejuice.dw_datamarts_growth:
   - bietlejuice.amplitude:events-raw-to-clean
+  - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
   - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency-history
   - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency
   - bietlejuice.casa_mineira_portal:load-clean-city
