@@ -1,4 +1,0 @@
-# Config for tenant_prospect_status
----
-composer_dependencies:
- - dw_datamarts_growth_cross
