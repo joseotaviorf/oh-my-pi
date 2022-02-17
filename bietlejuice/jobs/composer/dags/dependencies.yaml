@@ -193,7 +193,10 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.amplitude:update-clean-events-daily-partition-athena
   - bietlejuice.casa_mineira_crm:create-clean-contact-external-table
   - bietlejuice.dw_user:load-dw-public-dim-user
+  - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
+  - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
   - bietlejuice.ebdb:create-house-clean-external-table
+  - bietlejuice.ebdb:create-polygon-region-clean-external-table
   # portal_casa_mineira_advertiser_metrics
   - bietlejuice.casa_mineira_portal:create-clean-city-external-table
   - bietlejuice.casa_mineira_portal:create-clean-house-external-table
