@@ -67,5 +67,5 @@ pipeline:
   market_share_by_sk_region:
   dw:
     <<: *athena_anchor
-    sql_file: dw/queries/datamarts/growth/datamart_market_share_by_sk_region.sql
+    sql_file: dw/queries/datamarts/growth/market_share_by_sk_region.sql
     table: datamart_market_share_by_sk_region
