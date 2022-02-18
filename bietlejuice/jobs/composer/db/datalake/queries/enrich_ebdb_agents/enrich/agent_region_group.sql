@@ -137,35 +137,50 @@ WITH
         GROUP BY
             arh.ts_slot,
             arh.id_agent
-    )
-SELECT DISTINCT
-	DATE(g.ts_slot) AS dt,
-	g.id_agent AS dadosagente_id,
-	list.regions,
-	g.region_code AS area,
-	r2.secondary_area,
-    gn.region_code_deprecated as area_deprecated,
-    ng2.secondary_area_deprecated
+    ),
+agent_region_group AS (
+    SELECT
+        DATE(g.ts_slot) AS dt,
+        g.id_agent AS dadosagente_id,
+        list.regions,
+        g.region_code AS area,
+        r2.secondary_area,
+        gn.region_code_deprecated as area_deprecated,
+        ng2.secondary_area_deprecated,
+        ROW_NUMBER() OVER(PARTITION BY g.id_agent, DATE(g.ts_slot) ORDER BY g.region_code) AS row_n -- temporary fix. We need to find why this table is duplicating
+    FROM 
+        region_records_agg g
+    LEFT JOIN
+        region_list list
+            ON list.ts_slot = g.ts_slot 
+                AND list.id_agent = g.id_agent
+    LEFT JOIN
+        region_deprecated_records_agg gn
+            ON gn.ts_slot = g.ts_slot 
+                AND gn.id_agent = g.id_agent 
+                AND gn.ranking = 1
+    LEFT JOIN
+        secondary_area r2
+            ON r2.id_agent = g.id_agent
+                AND r2.ts_slot = g.ts_slot
+                AND r2.times = g.times
+    LEFT JOIN
+        secondary_area_deprecated ng2
+            ON ng2.id_agent = g.id_agent
+                AND ng2.ts_slot = g.ts_slot
+                AND ng2.times = g.times
+    WHERE 
+        g.ranking = 1
+)
+SELECT 
+    dt,
+    dadosagente_id,
+    regions,
+    area,
+    secondary_area,
+    area_deprecated,
+    secondary_area_deprecated
 FROM 
-    region_records_agg g
-LEFT JOIN
-	region_list list
-        ON list.ts_slot = g.ts_slot 
-            AND list.id_agent = g.id_agent
-LEFT JOIN
-    region_deprecated_records_agg gn
-        ON gn.ts_slot = g.ts_slot 
-            AND gn.id_agent = g.id_agent 
-            AND gn.ranking = 1
-LEFT JOIN
-    secondary_area r2
-        ON r2.id_agent = g.id_agent
-            AND r2.ts_slot = g.ts_slot
-            AND r2.times = g.times
-LEFT JOIN
-    secondary_area_deprecated ng2
-        ON ng2.id_agent = g.id_agent
-            AND ng2.ts_slot = g.ts_slot
-            AND ng2.times = g.times
+    agent_region_group
 WHERE 
-    g.ranking = 1
+    row_n = 1

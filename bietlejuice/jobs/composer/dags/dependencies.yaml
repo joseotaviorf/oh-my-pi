@@ -47,6 +47,8 @@ bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
   - bietlejuice.dw_contract:load-public-dim-contract-into-redshift
   - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
+  - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
+  - bietlejuice.dw_listing:load-public-fact-house-listing-status-into-redshift
   - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
   - bietlejuice.dw_listing_jobs:load-public-dim-photo-job-into-redshift
   - bietlejuice.dw_listing_jobs:load-public-fact-inspection-bookings-into-redshift
@@ -202,7 +204,7 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.casa_mineira_portal:create-clean-real-estate-agency-external-table
   - bietlejuice.casa_mineira_portal:create-clean-real-estate-agency-history-external-table
   - bietlejuice.casa_mineira_portal:create-clean-uf-external-table
-  #unique_owners
+  #unique_owners, sale_performance_marketing_metrics_supply_cohort
   - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
   - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
   - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
@@ -212,7 +214,11 @@ bietlejuice.dw_datamarts_growth:
   # tof_demand_online_events
   - bietlejuice.amplitude:events-raw-to-clean
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
-  # daily_target_volumes_supply
+  # sale_performance_marketing_metrics_supply_cohort
+  - bietlejuice.enrich_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
+  - bietlejuice.enrich_marketing_manual_daily_costs:create-enrich-daily-costs-external-table
+  - bietlejuice.gsheets:create-clean-sale-supply-targets-external-table
+  # daily_target_volumes_supply, sale_performance_marketing_metrics_supply_cohort
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
   - bietlejuice.gsheets:create-clean-city-share-external-table
   - bietlejuice.gsheets:create-clean-local-holidays-external-table
@@ -228,6 +234,19 @@ bietlejuice.dw_datamarts_growth:
   # - bietlejuice.ebdb:create-polygon-region-clean-external-table
   # - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
   # - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
+
+bietlejuice.dw_datamarts_growth_cross:
+  - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
+  - bietlejuice.dw_contract:load-public-dim-contract-into-redshift
+  - bietlejuice.dw_datamarts_cross:create-lead-listing-flows-in-datalake
+  - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
+  - bietlejuice.dw_offer:load-public-dim-offer-into-redshift
+  - bietlejuice.dw_region:load-public-dim-region-into-redshift
+  - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
+  - bietlejuice.dw_user_affiliate:load-public-dim-user-affiliate-into-redshift
+  - bietlejuice.ebdb:create-dw-quintoandar-fact-contract-people-in-datalake
+  - bietlejuice.gsheets:create-clean-promotional-bonus-cluster-targets-external-table
+  - bietlejuice.gsheets:create-clean-promotional-bonus-user-cluster-targets-external-table
 
 bietlejuice.dw_datamarts_support_and_service:
   - bietlejuice.amplitude:update-clean-events-daily-partition-athena
