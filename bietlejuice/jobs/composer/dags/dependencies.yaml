@@ -216,7 +216,6 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
   # sale_performance_marketing_metrics_supply_cohort
   - bietlejuice.enrich_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
-  - bietlejuice.enrich_marketing_manual_daily_costs:create-enrich-daily-costs-external-table
   - bietlejuice.gsheets:create-clean-sale-supply-targets-external-table
   # daily_target_volumes_supply, sale_performance_marketing_metrics_supply_cohort
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
