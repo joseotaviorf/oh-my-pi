@@ -4,4 +4,4 @@ streams:
   - direction: 'upstream'
     task_ids: ['dw_marketing_campaigns_costs_and_volumes']
 composer_dependencies: 
-  - dw_datamarts_for_rent
+  - dw_datamarts_cross
