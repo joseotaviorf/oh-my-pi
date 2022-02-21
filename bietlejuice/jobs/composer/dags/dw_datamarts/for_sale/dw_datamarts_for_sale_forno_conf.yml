@@ -39,6 +39,11 @@ pipeline:
       <<: *athena_anchor
       sql_file: dw/queries/datamarts/for_sale/em_casa_house_listing.sql
       table: em_casa_house_listing
+  em_casa_house_listing_flows:
+    dw:
+      <<: *athena_anchor
+      sql_file: dw/queries/datamarts/for_sale/em_casa_house_listing_flows.sql
+      table: em_casa_house_listing_flows
   liquidity_by_sk_region:
     dw:
       <<: *redshift_anchor
