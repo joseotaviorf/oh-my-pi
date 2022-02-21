@@ -176,6 +176,10 @@ bietlejuice.dw_datamarts_for_sale_cross:
   - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
   - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
+  - bietlejuice.dw_sale_flows:load-sale-fact-sale-flows-into-redshift
+  - bietlejuice.dw_sale_offers:load-sale-dim-offer-into-redshift
+  - bietlejuice.dw_sale_offers:load-sale-fact-offers-into-redshift
+  - bietlejuice.dw_sale_visits:load-sale-fact-visits-into-redshift
   - bietlejuice.ebdb:create-agent-data-clean-external-table
   - bietlejuice.ebdb:create-user-clean-external-table
   - bietlejuice.ebdb:create-work-contract-clean-external-table
