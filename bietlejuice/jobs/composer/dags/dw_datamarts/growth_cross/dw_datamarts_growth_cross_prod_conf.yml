@@ -47,6 +47,14 @@ pipeline:
       depends_on:
         - affiliates_clusters
         - performance_marketing_cluster_promotional_bonus
+  performance_marketing_metrics_demand:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/performance_marketing_metrics_demand.sql
+      table: performance_marketing_metrics_demand
+      depends_on:
+        - tenant_prospect_status
+        - rent_flow_interactions
   rent_flow_interactions:
     dw:
       <<: *redshift_anchor

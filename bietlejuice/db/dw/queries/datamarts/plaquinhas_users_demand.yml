@@ -1,5 +1,8 @@
-# Config for plaquinhas_users_demand
----
-streams:
-  - direction: 'upstream'
-    task_ids: ['dw_performance_marketing_metrics_demand']
+# # Config for plaquinhas_users_demand
+# ---
+# streams:
+#   - direction: "upstream"
+#     task_ids: ["dw_performance_marketing_metrics_demand"]
+
+composer_dependencies:
+  - dw_datamarts_growth_cross

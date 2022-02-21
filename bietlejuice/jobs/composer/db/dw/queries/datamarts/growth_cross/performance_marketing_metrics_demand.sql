@@ -373,4 +373,4 @@ UNION ALL
 SELECT
     d.*
 FROM
-    deactivations AS d;
+    deactivations AS d
