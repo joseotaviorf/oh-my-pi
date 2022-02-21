@@ -44,6 +44,11 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/growth/performance_marketing_metrics_portal_casa_mineira.sql
       table: performance_marketing_metrics_portal_casa_mineira
+  performance_marketing_metrics_supply:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth/performance_marketing_metrics_supply.sql
+      table: performance_marketing_metrics_supply
   portal_casa_mineira_advertiser_metrics:
     dw:
       <<: *redshift_anchor
