@@ -216,4 +216,4 @@ left join all_re_rental_adm_fee rr_af
   on fr.city_group = rr_af.city_group
   and fr.contract_start_month = rr_af.contract_start_month
   and fr.months_after_first_contract = rr_af.months_after_first_contract
-order by 1, 2 desc, 3;
+order by 1, 2 desc, 3
