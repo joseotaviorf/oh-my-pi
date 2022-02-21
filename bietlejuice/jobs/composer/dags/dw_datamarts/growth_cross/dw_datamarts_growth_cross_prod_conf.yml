@@ -20,6 +20,11 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/growth_cross/affiliates_clusters.sql
       table: affiliates_clusters
+  inbound_attendance_leads_flows:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/inbound_attendance_leads_flows.sql
+      table: inbound_attendance_leads_flows
   house_demand_trends:
     dw:
       <<: *redshift_anchor
