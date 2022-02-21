@@ -275,4 +275,4 @@ SELECT
 	sum(users_w_contract_signed) AS users_w_contract_signed
 FROM union_all_date
 WHERE week_start >= '2020-01-01'
-GROUP BY 1, 2, 3, 4, 5;
+GROUP BY 1, 2, 3, 4, 5

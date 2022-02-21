@@ -50,3 +50,8 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/for_rent_cross/rental_events_funnel_partners.sql
       table: rental_events_funnel_partners
+  user_cohort_rental_demand_conversion:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_rent_cross/user_cohort_rental_demand_conversion.sql
+      table: user_cohort_rental_demand_conversion
