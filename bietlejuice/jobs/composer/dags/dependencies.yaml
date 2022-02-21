@@ -200,9 +200,9 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.ebdb:create-house-clean-external-table
   #plaquinhas_houses
   - bietlejuice.dw_listing_jobs:load-public-dim-photo-job-into-redshift
-  - bietlejuice.dw_listing:load-public-fact-house-listings-status-into-redshift
+  - bietlejuice.dw_listing:load-public-fact-house-listing-status-into-redshift
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
-  - bietlejuice.dw_sale_listing_flow:load-sale-fact-listing-status-into-redshift
+  - bietlejuice.dw_sale_listings:load-sale-fact-listing-status-into-redshift
   - bietlejuice.gsheets:create-clean-aux-check-photo-sender-external-table
   - bietlejuice.gsheets:create-clean-branding-where-is-plaquinha-external-table
   # portal_casa_mineira_advertiser_metrics
