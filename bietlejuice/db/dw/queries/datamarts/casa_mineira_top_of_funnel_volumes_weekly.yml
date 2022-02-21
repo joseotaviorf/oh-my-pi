@@ -3,7 +3,6 @@
 streams:
   - direction: 'upstream'
     task_ids: [
-      'dw_performance_marketing_metrics_portal_casa_mineira',
       'dw_performance_marketing_metrics_imobiliaria_casa_mineira'
     ]
 composer_dependencies:
