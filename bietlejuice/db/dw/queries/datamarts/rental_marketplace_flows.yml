@@ -1,4 +1,0 @@
-# Config for rental_marketplace_flows
----
-composer_dependencies:
-  - dw_datamarts_growth_cross

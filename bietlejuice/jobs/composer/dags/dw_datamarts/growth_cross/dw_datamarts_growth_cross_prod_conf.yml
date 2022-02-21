@@ -40,6 +40,14 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/growth_cross/rent_flow_interactions.sql
       table: rent_flow_interactions
+  rental_marketplace_flows:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/rental_marketplace_flows.sql
+      table: rental_marketplace_flows
+      depends_on:
+        - rent_flow_interactions
+        - tenant_prospect_status
   tenant_prospects_activations:
     dw:
       <<: *redshift_anchor
