@@ -101,6 +101,15 @@ pipeline:
       table: tenant_prospect_status
       depends_on:
         - rent_flow_interactions
+  top_of_funnel_volumes_daily:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/top_of_funnel_volumes_daily.sql
+      table: top_of_funnel_volumes_daily
+      depends_on:
+        - performance_marketing_metrics_demand
+        - sale_performance_marketing_metrics_demand
+        - tenant_prospect_status
   unique_supply_events_funnel:
     dw:
       <<: *redshift_anchor

@@ -297,12 +297,15 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.ebdb:create-user-revision-entity-clean-external-table
   - bietlejuice.enrich_amplitude_page_viewed_events:create-enrich-listing-page-viewed-external-table
   - bietlejuice.enrich_bigfone_twilio:create-enrich-call-flex-events-external-table
+  - bietlejuice.enrich_top_of_funnel_demand:create-enrich-user-interactions-external-table
   - bietlejuice.gsheets:create-clean-aux-check-photo-sender-external-table
   - bietlejuice.gsheets:create-clean-branding-where-is-plaquinha-external-table
   - bietlejuice.gsheets:create-clean-promotional-bonus-cluster-targets-external-table
   - bietlejuice.gsheets:create-clean-promotional-bonus-user-cluster-targets-external-table
+  - bietlejuice.gsheets:create-clean-rental-tof-daily-targets-external-table
   - bietlejuice.gsheets:create-clean-sale-nbp-source-targets-external-table
   - bietlejuice.gsheets:create-clean-sale-flows-targets-external-table
+  - bietlejuice.gsheets:create-clean-sale-tof-daily-targets-external-table
   - bietlejuice.gsheets:create-clean-secretariat-hierarchy-external-table
   - bietlejuice.gsheets:create-clean-users-cx-plaquinhas-external-table
   - bietlejuice.wololo:create-clean-context-discard-external-table
