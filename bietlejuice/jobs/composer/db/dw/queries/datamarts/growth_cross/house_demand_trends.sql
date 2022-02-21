@@ -1,8 +1,7 @@
-WITH
 ----------------------------------
 -- All Rent Flows base query --
 ----------------------------------
-rent_flows AS (
+WITH rent_flows AS (
     SELECT
         f.week_start,
         dr.macro_id,

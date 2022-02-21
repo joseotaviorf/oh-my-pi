@@ -1,5 +1,0 @@
-# Config for house_demand_trends
----
-streams:
-  - direction: 'upstream'
-    task_ids: ['dw_rental_marketplace_flows']

@@ -261,6 +261,7 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.dw_user:load-public-dim-user-into-redshift
   - bietlejuice.dw_user_affiliate:load-public-dim-user-affiliate-into-redshift
   - bietlejuice.ebdb:create-dw-quintoandar-fact-contract-people-in-datalake
+  - bietlejuice.enrich_amplitude_page_viewed_events:create-enrich-listing-page-viewed-external-table
   - bietlejuice.gsheets:create-clean-promotional-bonus-cluster-targets-external-table
   - bietlejuice.gsheets:create-clean-promotional-bonus-user-cluster-targets-external-table
 

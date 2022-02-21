@@ -20,6 +20,13 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/growth_cross/affiliates_clusters.sql
       table: affiliates_clusters
+  house_demand_trends:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/house_demand_trends.sql
+      table: house_demand_trends
+      depends_on:
+        - rental_marketplace_flows
   performance_marketing_cluster_promotional_bonus:
     dw:
       <<: *redshift_anchor
