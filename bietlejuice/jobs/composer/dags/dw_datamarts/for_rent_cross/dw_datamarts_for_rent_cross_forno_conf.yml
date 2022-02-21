@@ -35,6 +35,11 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/for_rent_cross/funnel_monthly_credit_user_flow.sql
       table: funnel_monthly_credit_user_flow
+  rental_demand_events_funnel_flows:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_rent_cross/rental_demand_events_funnel_flows.sql
+      table: rental_demand_events_funnel_flows
   rental_events_funnel:
     dw:
       <<: *redshift_anchor
