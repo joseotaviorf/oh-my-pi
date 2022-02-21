@@ -159,4 +159,4 @@ select
 from users_funnel
 )
 select *
-from days_user
+from days_userg
