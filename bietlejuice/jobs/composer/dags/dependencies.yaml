@@ -284,8 +284,8 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.dw_rent_listing_flow:load-public-fact-house-listing-flows-into-redshift
   - bietlejuice.dw_sale_flows:load-sale-fact-sale-flows-into-redshift
   - bietlejuice.dw_sale_listing_flow:load-sale-fact-listing-flows-into-redshift
-  - bietlejuice.dw_sale_visits:load-sale-dim-offer-into-redshift
-  - bietlejuice.dw_sale_visits:load-sale-fact-offers-into-redshift
+  - bietlejuice.dw_sale_offers:load-sale-dim-offer-into-redshift
+  - bietlejuice.dw_sale_offers:load-sale-fact-offers-into-redshift
   - bietlejuice.dw_sale_visits:load-sale-fact-visits-into-redshift
   - bietlejuice.dw_user:load-public-dim-user-into-redshift
   - bietlejuice.dw_user_affiliate:load-public-dim-user-affiliate-into-redshift
