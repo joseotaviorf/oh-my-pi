@@ -34,6 +34,11 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/for_sale/deal_making_funnel.sql
       table: deal_making_funnel
+  em_casa_house_listing:
+    dw:
+      <<: *athena_anchor
+      sql_file: dw/queries/datamarts/for_sale/em_casa_house_listing.sql
+      table: em_casa_house_listing
   liquidity_by_sk_region:
     dw:
       <<: *redshift_anchor
