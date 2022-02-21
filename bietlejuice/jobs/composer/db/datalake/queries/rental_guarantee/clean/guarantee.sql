@@ -11,6 +11,7 @@ SELECT
     status AS guarantee_status,
     base_value,
     final_value,
+    type AS guarantee_type,
     created_at AS ts_created,
     updated_at AS ts_updated,
     cancellation_requested_at AS ts_cancellation_requested,
