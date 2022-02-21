@@ -74,6 +74,11 @@ pipeline:
       table: tenant_prospect_status
       depends_on:
         - rent_flow_interactions
+  unique_supply_events_funnel:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/unique_supply_events_funnel.sql
+      table: unique_supply_events_funnel
   unique_supply_cohort_conversions:
     dw:
       <<: *redshift_anchor

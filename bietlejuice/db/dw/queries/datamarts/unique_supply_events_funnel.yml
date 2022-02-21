@@ -1,7 +1,0 @@
-# Config for unique_supply_events_funnel
----
-# streams:
-#   - direction: 'upstream'
-#     task_ids: ['dw_lead_listing_flows']
-composer_dependencies:
- - dw_datamarts_cross
