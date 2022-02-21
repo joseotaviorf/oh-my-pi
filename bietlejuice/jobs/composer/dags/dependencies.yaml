@@ -58,6 +58,7 @@ bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.dw_listing_jobs:load-public-fact-inspection-bookings-into-redshift
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
   - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
+  - bietlejuice.dw_rent_listing_flow:load-public-fact-house-listing-flows-into-redshift
   - bietlejuice.dw_tracksale:load-tracksale-dim-nps-campaign-into-redshift
   - bietlejuice.dw_tracksale:load-tracksale-fact-nps-dispatches-into-redshift
   - bietlejuice.ebdb:create-access-authorization-type-clean-external-table

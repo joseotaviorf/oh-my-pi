@@ -400,4 +400,4 @@ full outer join listing_to_contract_signed l2cs
   on l2cs.publication_week = dm.week_date and dr.city_name = l2cs.city_name
 full outer join visits_booked_per_ongoing_listings vb_ol
   on vb_ol.week_start = dm.week_date and dr.city_name = vb_ol.city_name
-group by 1, 2, 3, 4, 14, 15, 16;
+group by 1, 2, 3, 4, 14, 15, 16
