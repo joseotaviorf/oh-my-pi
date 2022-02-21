@@ -27,6 +27,14 @@ pipeline:
       table: performance_marketing_cluster_promotional_bonus
       depends_on:
         - affiliates_clusters
+  performance_marketing_cluster_promotional_bonus_costs:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/performance_marketing_cluster_promotional_bonus_costs.sql
+      table: performance_marketing_cluster_promotional_bonus_costs
+      depends_on:
+        - affiliates_clusters
+        - performance_marketing_cluster_promotional_bonus
   rent_flow_interactions:
     dw:
       <<: *redshift_anchor

@@ -1,3 +1,5 @@
+# Config for rental_performance_marketing_metrics_supply_coincident
 ---
 composer_dependencies:
  - dw_datamarts_growth 
+ - dw_datamarts_growth_cross
