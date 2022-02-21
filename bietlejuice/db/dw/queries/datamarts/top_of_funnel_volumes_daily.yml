@@ -1,8 +1,5 @@
 # Config for top_of_funnel_volumes_daily
 ---
-streams:
-  - direction: "upstream"
-    task_ids: ["dw_sale_performance_marketing_metrics_demand"]
 composer_dependencies:
   - dw_datamarts_cross
   - dw_datamarts_growth_cross

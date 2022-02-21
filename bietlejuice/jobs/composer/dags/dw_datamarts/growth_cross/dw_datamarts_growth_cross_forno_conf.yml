@@ -82,6 +82,11 @@ pipeline:
       depends_on:
         - rent_flow_interactions
         - tenant_prospect_status
+  sale_performance_marketing_metrics_demand:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/sale_performance_marketing_metrics_demand.sql
+      table: sale_performance_marketing_metrics_demand
   tenant_prospects_activations:
     dw:
       <<: *redshift_anchor

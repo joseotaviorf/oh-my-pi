@@ -487,4 +487,4 @@ UNION ALL
 SELECT
     *
 FROM
-    deactivations;
+    deactivations
