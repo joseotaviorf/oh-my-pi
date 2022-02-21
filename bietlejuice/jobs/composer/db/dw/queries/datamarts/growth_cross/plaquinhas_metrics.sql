@@ -73,7 +73,7 @@ all_users AS (
 	CASE WHEN canal = 'Telefone' THEN true ELSE NULL END AS is_phone_user,
 	CASE WHEN canal = 'Chat' THEN true ELSE NULL END AS is_chat_user
     FROM
-    	datalake_raw.gsheets_users_cx_plaquinhas
+    	datalake_gsheets_clean_prod.users_cx_plaquinhas
 ),
 user_by_channel AS (
     SELECT 
@@ -241,7 +241,7 @@ plaquinhas AS (
         dr.city_group,
         date::DATE AS dt_plaquinha
     FROM
-    	datalake_raw.gsheets_branding_where_is_plaquinha p
+    	datalake_gsheets_clean_prod.branding_where_is_plaquinha p
     JOIN fact_house_listings fhl
     	ON p.id_house = substring(fhl.sk_house_listing,1,9)
     JOIN dim_region dr
@@ -250,19 +250,19 @@ plaquinhas AS (
     	1,2,3
     UNION 
     SELECT 
-        gsps.house_id::BIGINT AS id_house,
+        gsps.id_house,
         dr.city_group,
         dpj.dt_photos_uploaded AS dt_plaquinha
     FROM 
-        datalake_raw.gsheets_aux_check_photo_sender gsps
+        datalake_gsheets_clean_prod.aux_check_photo_sender gsps
     LEFT JOIN dim_photo_job dpj 
-        ON dpj.sk_photo_job = gsps.job_id_fl
+        ON dpj.sk_photo_job = gsps.id_photo_job
     LEFT JOIN fact_house_listings fhl
-    	ON gsps.house_id = substring(fhl.sk_house_listing,1,9)
+    	ON CAST(gsps.id_house AS VARCHAR) = substring(fhl.sk_house_listing,1,9)
     LEFT JOIN dim_region dr
     	ON fhl.sk_region = dr.sk_region
     WHERE 
-        gsps.tem_plaquinha <> ''
+        gsps.sign_placement <> ''
     GROUP BY 
     	1,2,3
 ),

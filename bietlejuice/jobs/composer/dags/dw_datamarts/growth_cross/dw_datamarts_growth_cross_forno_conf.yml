@@ -39,13 +39,6 @@ pipeline:
       table: performance_marketing_cluster_promotional_bonus
       depends_on:
         - affiliates_clusters
-  pricing_rent_categorization:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth_cross/pricing_rent_categorization.sql
-      table: pricing_rent_categorization
-      depends_on:
-        - performance_marketing_metrics_demand
   performance_marketing_cluster_promotional_bonus_costs:
     dw:
       <<: *redshift_anchor
@@ -62,6 +55,20 @@ pipeline:
       depends_on:
         - tenant_prospect_status
         - rent_flow_interactions
+  plaquinhas_metrics:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/plaquinhas_metrics.sql
+      table: plaquinhas_metrics
+      depends_on:
+        - performance_marketing_metrics_demand
+  pricing_rent_categorization:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/pricing_rent_categorization.sql
+      table: pricing_rent_categorization
+      depends_on:
+        - performance_marketing_metrics_demand
   rent_flow_interactions:
     dw:
       <<: *redshift_anchor
