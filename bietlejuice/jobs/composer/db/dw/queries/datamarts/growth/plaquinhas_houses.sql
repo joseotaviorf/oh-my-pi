@@ -9,7 +9,7 @@ houses_w_plaquinhas AS (
         installation_type,
         listing_type
     FROM
-        datalake_raw.gsheets_branding_where_is_plaquinha p
+        datalake_gsheets_clean_prod.branding_where_is_plaquinha p
     GROUP BY
         1,2,3,4
     UNION
@@ -17,16 +17,16 @@ houses_w_plaquinhas AS (
 -- Plaquinhas installed by photographers --
 -------------------------------------------
     SELECT
-        gsps.house_id::BIGINT AS id_house,
+        gsps.id_house::BIGINT AS id_house,
         dpj.dt_photos_uploaded::DATE AS dt_plaquinha,
         'Photographer' AS installation_type,
         'New Listing' AS listing_type
     FROM
-        datalake_raw.gsheets_aux_check_photo_sender gsps
+        datalake_gsheets_clean_prod.aux_check_photo_sender gsps
     LEFT JOIN dim_photo_job dpj
-        ON dpj.sk_photo_job = gsps.job_id_fl
+        ON dpj.sk_photo_job = gsps.id_photo_job
     WHERE
-        gsps.tem_plaquinha <> ''
+        gsps.sign_placement <> ''
     GROUP BY
         1,2,3,4
 ),

@@ -44,6 +44,11 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/growth/portal_casa_mineira_advertiser_metrics.sql
       table: portal_casa_mineira_advertiser_metrics
+  plaquinhas_houses:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth/plaquinhas_houses.sql
+      table: plaquinhas_houses
   unique_owners:
     dw:
       <<: *redshift_anchor
