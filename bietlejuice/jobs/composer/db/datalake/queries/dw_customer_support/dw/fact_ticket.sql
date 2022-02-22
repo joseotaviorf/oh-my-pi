@@ -12,6 +12,7 @@ WITH call_tickets AS (
         COALESCE(contact_theme_detail_tag, '')
       )
     ) AS sk_taxonomy,
+    MD5(tags) AS sk_tags,
     MD5(CONCAT('call', 'twilio', COALESCE(direction, ''))) AS sk_channel,
     id_first_agent AS sk_first_agent,
     id_last_agent AS sk_last_agent,
@@ -77,7 +78,7 @@ WITH call_tickets AS (
     NOW() AS ts_load
   FROM
     datalake_customer_support.call
-  GROUP BY 1,2,3,4,5,6,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38
 ),
 chat_tickets AS (
   SELECT
@@ -93,6 +94,7 @@ chat_tickets AS (
         COALESCE(contact_theme_detail_tag, '')
       )
     ) AS sk_taxonomy,
+    MD5(tags) AS sk_tags,
     MD5(CONCAT('chat', 'twilio')) AS sk_channel,
     id_first_agent AS sk_first_agent,
     id_last_agent AS sk_last_agent,
@@ -158,7 +160,7 @@ chat_tickets AS (
     NOW() AS ts_load
   FROM
     datalake_customer_support.chat
-  GROUP BY 1,2,3,4,5,6,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38
 ),
 email_tickets AS (
   SELECT
@@ -174,6 +176,7 @@ email_tickets AS (
         COALESCE(contact_theme_detail_tag, '')
       )
     ) AS sk_taxonomy,
+    MD5(tags) AS sk_tags,
     MD5(CONCAT('email', 'zendesk', COALESCE(direction, ''))) AS sk_channel,
     id_agent AS sk_first_agent,
     id_agent AS sk_last_agent,
@@ -238,7 +241,7 @@ email_tickets AS (
     NOW() AS ts_load
   FROM 
     datalake_customer_support.email
-  GROUP BY 1,2,3,4,5,6,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38
 ),
 historical_call_tickets AS (
   SELECT
@@ -254,6 +257,7 @@ historical_call_tickets AS (
         COALESCE(contact_theme_detail_tag, '')
       )
     ) AS sk_taxonomy,
+    NULL AS sk_tags,
     MD5(CONCAT('call', 'teravoz', COALESCE(direction, ''))) AS sk_channel,
     NULL AS sk_first_agent,
     NULL AS sk_last_agent,
@@ -292,7 +296,7 @@ historical_call_tickets AS (
     NOW() AS ts_load
   FROM
     datalake_customer_support.historical_call
-  GROUP BY 1,2,3,4,5,6,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38
 ),
 historical_chat_tickets AS (
   SELECT
@@ -308,6 +312,7 @@ historical_chat_tickets AS (
       COALESCE(contact_theme_detail_tag, '')
     )
     ) AS sk_taxonomy,
+    NULL AS sk_tags,
     MD5(CONCAT('chat', 'zendesk_chat')) AS sk_channel,
     id_first_agent AS sk_first_agent,
     id_last_agent AS sk_last_agent,
@@ -371,7 +376,7 @@ historical_chat_tickets AS (
     NOW() AS ts_load
   FROM
     datalake_customer_support.historical_chat
-  GROUP BY 1,2,3,4,5,6,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38
+  GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38
 )
 SELECT 
   *

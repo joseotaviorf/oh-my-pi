@@ -1,0 +1,14 @@
+---
+database_name: dw_customer_support
+table_name: dim_ticket_tags
+columns:
+  sk_tags:
+    lineage:
+      - datalake_customer_support.call.tags
+      - datalake_customer_support.chat.tags
+      - datalake_customer_support.email.tags
+  tags:
+    lineage:
+      - datalake_customer_support.call.tags
+      - datalake_customer_support.chat.tags
+      - datalake_customer_support.email.tags

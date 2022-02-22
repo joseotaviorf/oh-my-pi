@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS customer_support.fact_ticket;
 CREATE TABLE IF NOT EXISTS customer_support.fact_ticket (
     sk_ticket BIGINT,
     sk_taxonomy VARCHAR(40),
+    sk_tags VARCHAR(40),
     sk_channel VARCHAR(40),
     sk_first_agent VARCHAR(40),
     sk_last_agent VARCHAR(40),
