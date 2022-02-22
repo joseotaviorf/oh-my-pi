@@ -34,6 +34,15 @@ pipeline:
       <<: *athena_anchor
       sql_file: dw/queries/datamarts/growth/buyer_activation_events_combo.sql
       table: buyer_activation_events_combo
+  casa_mineira_top_of_funnel_volumes_daily:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth/casa_mineira_top_of_funnel_volumes_daily.sql
+      table: casa_mineira_top_of_funnel_volumes_daily
+      depends_on:
+        - performance_marketing_metrics_imobiliaria_casa_mineira
+        - performance_marketing_metrics_portal_casa_mineira
+        - portal_casa_mineira_advertiser_metrics
   daily_target_volumes_supply:
     dw:
       <<: *redshift_anchor
