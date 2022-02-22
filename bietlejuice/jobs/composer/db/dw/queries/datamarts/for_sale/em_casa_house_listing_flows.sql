@@ -1,4 +1,4 @@
-ITH listings_raw AS (
+WITH listings_raw AS (
     SELECT
         CONCAT(id, 'Emcasa') AS id_house,
         id AS id_house_platform,
