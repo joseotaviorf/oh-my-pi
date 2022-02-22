@@ -15,6 +15,11 @@ affiliate_type_targets:
     sheet_name: affiliate_type_targets
     clean_table_name: affiliate_type_targets
 
+affiliates_acquisition_targets:
+    sheet_id: 1Ln23SA7YQ-OhfZ49BEmoT_mm-kDbNC-HdMt9thTzbDM
+    sheet_name: target_nau_budget_daily
+    clean_table_name: affiliates_acquisition_targets
+
 affiliates_active_segmentation:
     sheet_id: 1ghRFPWXEYMTJSsMuY_k38HmELWRuzjt1PkfKTe_wR4s
     sheet_name: ativos

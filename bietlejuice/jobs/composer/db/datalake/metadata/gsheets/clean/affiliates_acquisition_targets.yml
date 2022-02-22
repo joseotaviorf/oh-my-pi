@@ -1,0 +1,33 @@
+database_name: datalake_gsheets_clean
+table_name: affiliates_acquisition_targets
+columns:
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_raw.affiliates_acquisition_targets.mkt_origin
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_raw.affiliates_acquisition_targets.mkt_channel
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_raw.affiliates_acquisition_targets.mkt_medium
+  mkt_source:
+    lineage:
+      - datalake_gsheets_raw.affiliates_acquisition_targets.mkt_source
+  target_nau:
+    lineage:
+      - datalake_gsheets_raw.affiliates_acquisition_targets.target_nau
+  budget:
+    lineage:
+      - datalake_gsheets_raw.affiliates_acquisition_targets.budget
+  target_nu:
+    lineage:
+      - datalake_gsheets_raw.affiliates_acquisition_targets.target_nu
+  target_oau:
+    lineage:
+      - datalake_gsheets_raw.affiliates_acquisition_targets.target_oau
+  new_target_nau:
+    lineage:
+      - datalake_gsheets_raw.affiliates_acquisition_targets.new_target_nau
+  dt_target:
+    lineage:
+      - datalake_gsheets_raw.affiliates_acquisition_targets.data
