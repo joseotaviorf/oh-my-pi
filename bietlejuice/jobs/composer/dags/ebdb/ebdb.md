@@ -161,6 +161,7 @@ Produces the following output tables:
     `user_merge_aud`  
     `user_preferences`  
     `user_pro_owner`  
+    `user_pro_owner_aud`  
     `user_revision_entity`  
     `visit`  
     `visit_aud`  
