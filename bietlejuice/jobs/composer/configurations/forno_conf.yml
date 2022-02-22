@@ -4,6 +4,7 @@ athena_query_results_bucket: s3://aws-athena-query-results-713278628093-us-east-
 dags_out_of_pattern:
     [
         "amplitude",
+        "dw_affiliate_costs",
         "dw_booking",
         "dw_business_unit_region",
         "dw_call",

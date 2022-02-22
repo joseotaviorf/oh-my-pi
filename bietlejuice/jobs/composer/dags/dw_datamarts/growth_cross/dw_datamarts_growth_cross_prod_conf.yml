@@ -125,3 +125,10 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/growth_cross/user_funnel.sql
       table: user_funnel
+  sale_performance_marketing_metrics_supply_coincident:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/sale_performance_marketing_metrics_supply_coincident.sql
+      table: sale_performance_marketing_metrics_supply_coincident
+      depends_on:
+        - performance_marketing_cluster_promotional_bonus_costs

@@ -264,6 +264,8 @@ bietlejuice.dw_datamarts_growth:
 
 bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
+  - bietlejuice.dw_affiliate_costs:load-quintoandar-dim-affiliate-cost-into-redshift
+  - bietlejuice.dw_affiliate_costs:load-quintoandar-fact-affiliate-costs-into-redshift
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
   - bietlejuice.dw_call:load-call-dim-call-agent-into-redshift
   - bietlejuice.dw_call:load-call-dim-call-into-redshift
@@ -302,6 +304,7 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.ebdb:create-user-revision-entity-clean-external-table
   - bietlejuice.enrich_amplitude_page_viewed_events:create-enrich-listing-page-viewed-external-table
   - bietlejuice.enrich_bigfone_twilio:create-enrich-call-flex-events-external-table
+  - bietlejuice.enrich_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
   - bietlejuice.enrich_top_of_funnel_demand:create-enrich-user-interactions-external-table
   - bietlejuice.gsheets:create-clean-aux-check-photo-sender-external-table
   - bietlejuice.gsheets:create-clean-branding-where-is-plaquinha-external-table
@@ -313,15 +316,24 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.gsheets:create-clean-sale-tof-daily-targets-external-table
   - bietlejuice.gsheets:create-clean-secretariat-hierarchy-external-table
   - bietlejuice.gsheets:create-clean-users-cx-plaquinhas-external-table
-  - bietlejuice.wololo:create-clean-context-discard-external-table
-  - bietlejuice.wololo:create-clean-conversion-external-table
-  - bietlejuice.wololo:create-clean-prospect-external-table
     # performance_marketing_metrics_demand
-  - bietlejuice.enrich_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
   - bietlejuice.gsheets:create-clean-demand-targets-replanning-external-table
   - bietlejuice.gsheets:create-clean-mkt-cost-per-source-external-table
   - bietlejuice.gsheets:create-clean-rental-ntp-source-targets-external-table
   - bietlejuice.gsheets:create-clean-rental-flows-targets-external-table
+  - bietlejuice.dw_sale_listing_flow:load-sale-fact-listing-flows-into-redshift
+  - bietlejuice.dw_user_affiliate:load-public-dim-user-affiliate-into-redshift
+  - bietlejuice.ebdb:create-dw-quintoandar-fact-contract-people-in-datalake
+  - bietlejuice.enrich_marketing_automatic_daily_costs:load-enrich-daily-costs
+  - bietlejuice.gsheets:create-clean-costs-targets-external-table
+  - bietlejuice.gsheets:create-clean-daily-target-supply-sale-external-table
+  - bietlejuice.gsheets:create-clean-promotional-bonus-cluster-targets-external-table
+  - bietlejuice.gsheets:create-clean-promotional-bonus-user-cluster-targets-external-table
+  # - bietlejuice.gsheets:create-clean-provisioned-costs-import-external-table mysterious sheet that doesnt exist anymore, but is used in some datamarts
+  - bietlejuice.gsheets:create-clean-sale-supply-targets-external-table
+  - bietlejuice.wololo:create-clean-context-discard-external-table
+  - bietlejuice.wololo:create-clean-conversion-external-table
+  - bietlejuice.wololo:create-clean-prospect-external-table
 
 bietlejuice.dw_datamarts_support_and_service:
   - bietlejuice.amplitude:update-clean-events-daily-partition-athena
