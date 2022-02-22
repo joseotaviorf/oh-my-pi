@@ -1206,6 +1206,17 @@ bietlejuice.enrich_offer:
 bietlejuice.enrich_owner_fees:
   - bietlejuice.owner_fees:load-clean-contract
 
+bietlejuice.enrich_pro_owners:
+  - bietlejuice.ebdb:create-clean-conversion-lead-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.ebdb:create-clean-lead-in-data-lake
+  - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
+  - bietlejuice.ebdb:create-clean-partner-in-data-lake
+  - bietlejuice.ebdb:create-clean-portability-in-data-lake
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status
+  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
+
 bietlejuice.enrich_proposal:
   - bietlejuice.ebdb:create-clean-proposal-in-data-lake
   - bietlejuice.ebdb:create-clean-proposal-aud-in-data-lake
