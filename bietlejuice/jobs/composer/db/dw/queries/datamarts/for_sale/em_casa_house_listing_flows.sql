@@ -36,13 +36,13 @@ listings_raw_correct_date AS (
     FROM 
         listings_raw
     LEFT JOIN 
-        dim_date AS d_update  
+        datalake_raw.dim_date AS d_update  
             ON CAST(d_update.date AS DATE) = ts_updated
     LEFT JOIN 
-        dim_date AS d_f_publication 
+        datalake_raw.dim_date AS d_f_publication 
             ON CAST(d_f_publication.date AS DATE) = ts_first_publication
     LEFT JOIN 
-        dim_date AS d_l_explication  
+        datalake_raw.dim_date AS d_l_explication  
             ON CAST(d_l_explication.date AS DATE) = ts_last_extraction
 ),
 regions AS (
@@ -140,7 +140,7 @@ listings_clean AS (
         SELECT  
             week_start
         FROM 
-            dim_date 
+            datalake_raw.dim_date 
         WHERE 
             CAST(date AS DATE) BETWEEN CAST('2022-01-01' AS DATE) AND (SELECT ts_last_extraction FROM listings_clean LIMIT 1)
         GROUP BY 
