@@ -76,6 +76,7 @@ This pipeline produces the following output tables:
     - `exit_inspection_csat`
     - `extra_invoice`
     - `extra_invoice_created_expenses`
+    - `forbrokers_3p_partner_conditions`
     - `from_to_cancellation`
     - `google_searches_share_of_interest`    
     - `hotjar_photos_repressed_demand`

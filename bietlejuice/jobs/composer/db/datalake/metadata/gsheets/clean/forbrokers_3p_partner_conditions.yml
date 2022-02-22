@@ -1,0 +1,75 @@
+database_name: datalake_gsheets_clean
+table_name: forbrokers_3p_partner_conditions
+columns:
+  partner:
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.partner
+  partner_short_name:
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.partner_short_name
+  state:
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.state
+  city:
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.city
+  brokerage:
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.brokerage
+  platform_fee:
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.platform_fee
+  partnership_model:
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.partnership_model
+  revenue_share:
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.revenue_share
+  payment_moment:
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.payment_moment
+  campaign:
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.campaign
+  payment_by_listing:
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.payment_by_listing
+  frequency_of_payment:
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.frequency_of_payment
+  has_payment_for_partner:
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.has_payment_for_partner
+  has_payment_for_broker:
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.has_payment_for_broker
+  observations:
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.observations
+  adm_5a:
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.adm_5a
+  hub_associate_executive_fee:
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.hub_associate_executive_fee
+  hub_negociation_executive_fee:
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.hub_negociation_executive_fee
+  hub_broker_fee:
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.hub_broker_fee
+  dealmaking_broker_fee:
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.dealmaking_broker_fee
+  demand_partner_revenue_share:
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.demand_partner_revenue_share
+  supply_partner_revenue_share:
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.supply_partner_revenue_share
+  dt_term_signature:
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.dt_term_signature
+  dt_payment:
+    lineage:
+      - datalake_gsheets_raw.forbrokers_3p_partner_conditions.dt_payment
