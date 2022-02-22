@@ -1,6 +1,0 @@
-# Config for sale_cohort_conversions
----
-composer_dependencies:
- - dw_datamarts_for_rent
- - dw_datamarts_for_sale_cross
-    

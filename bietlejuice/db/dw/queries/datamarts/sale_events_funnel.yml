@@ -1,5 +1,0 @@
-# Config for sale_events_funnel
----
-composer_dependencies:
- - dw_datamarts_for_rent
- - dw_datamarts_for_sale_cross

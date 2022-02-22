@@ -34,6 +34,16 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/for_sale/deal_making_funnel.sql
       table: deal_making_funnel
+  em_casa_house_listing:
+    dw:
+      <<: *athena_anchor
+      sql_file: dw/queries/datamarts/for_sale/em_casa_house_listing.sql
+      table: em_casa_house_listing
+  em_casa_house_listing_flows:
+    dw:
+      <<: *athena_anchor
+      sql_file: dw/queries/datamarts/for_sale/em_casa_house_listing_flows.sql
+      table: em_casa_house_listing_flows
   liquidity_by_sk_region:
     dw:
       <<: *redshift_anchor
@@ -49,6 +59,14 @@ pipeline:
       <<: *athena_anchor
       sql_file: dw/queries/datamarts/for_sale/loft_status_listing_flows.sql
       table: loft_status_listing_flows
+  neighborhood_competition:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_sale/neighborhood_competition.sql
+      table: neighborhood_competition
+      depends_on:
+        - loft_house_listing
+        - loft_status_listing_flows
   repressed_demand_sale:
     dw:
       <<: *redshift_anchor

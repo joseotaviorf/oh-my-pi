@@ -45,6 +45,11 @@ columns:
       - datalake_customer_support.historical_chat.contact_motivation_tag
       - datalake_customer_support.historical_chat.contact_theme_tag
       - datalake_customer_support.historical_chat.contact_theme_detail_tag
+  sk_tags:
+    lineage:
+      - datalake_customer_support.call.tags
+      - datalake_customer_support.chat.tags
+      - datalake_customer_support.email.tags
   sk_channel:
     lineage:
       - datalake_customer_support.call.direction

@@ -1,5 +1,0 @@
-# Config for pricing_rent_categorization
----
-streams:
-  - direction: 'upstream'
-    task_ids: ['dw_performance_marketing_metrics_demand']

@@ -1,0 +1,130 @@
+---
+database_name: datalake_sale_lead_flows
+table_name: casa_mineira_lead_flow
+columns:
+  id_secretariat_client:
+    lineage:
+      - datalake_casa_mineira_crm_clean.client.id
+      - datalake_casa_mineira_crm_clean.contact.id_client
+  id_first_region_contact_prospect:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+  id_last_region_contact_prospect:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+  id_first_region_booking:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+  id_last_region_booking:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+  id_first_region_offer:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+  id_last_region_offer:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+  id_first_house_5a_secretariat_contact:
+    lineage:
+      - datalake_casa_mineira_crm_clean.house.id_house_quintoandar
+  id_first_house_cm_secretariat_contact:
+    lineage:
+      - datalake_casa_mineira_crm_clean.house.id
+  id_last_house_5a_secretariat_contact:
+    lineage:
+      - datalake_casa_mineira_crm_clean.house.id_house_quintoandar
+  id_last_house_cm_secretariat_contact:
+    lineage:
+      - datalake_casa_mineira_crm_clean.house.id
+  id_first_house_5a_booking:
+    lineage:
+      - datalake_casa_mineira_crm_clean.house.id_house_quintoandar
+  id_first_house_cm_booking:
+    lineage:
+      - datalake_casa_mineira_crm_clean.house.id
+  id_last_house_5a_booking:
+    lineage:
+      - datalake_casa_mineira_crm_clean.house.id_house_quintoandar
+  id_last_house_cm_booking:
+    lineage:
+      - datalake_casa_mineira_crm_clean.house.id
+  id_first_house_cm_offer:
+    lineage:
+      - datalake_casa_mineira_crm_clean.house.id
+  id_last_house_cm_offer:
+    lineage:
+      - datalake_casa_mineira_crm_clean.house.id
+  id_first_house_cm_sale_agreement:
+    lineage:
+      - datalake_casa_mineira_crm_clean.house.id
+  id_last_house_cm_sale_agreement:
+    lineage:
+      - datalake_casa_mineira_crm_clean.house.id
+  list_emails:
+    lineage:
+      - datalake_casa_mineira_crm_clean.client.email
+      - datalake_casa_mineira_crm_clean.contact.email
+  list_phone_numbers:
+    lineage:
+      - datalake_casa_mineira_crm_clean.client.phone_number
+      - datalake_casa_mineira_crm_clean.contact.phone_number
+  first_city_contact_prospect:
+    lineage:
+      - datalake_casa_mineira_crm_clean.city.city_name
+  last_city_contact_prospect:
+    lineage:
+      - datalake_casa_mineira_crm_clean.city.city_name
+  first_secretariat_contact_origin:
+    lineage:
+      - datalake_casa_mineira_crm_clean.origin_contact.origin_contact_name
+  last_secretariat_contact_origin:
+    lineage:
+      - datalake_casa_mineira_crm_clean.origin_contact.origin_contact_name
+  first_secretariat_contact_media:
+    lineage:
+      - datalake_casa_mineira_crm_clean.media_contact
+  last_secretariat_contact_media:
+    lineage:
+      - datalake_casa_mineira_crm_clean.media_contact
+  first_city_booking:
+    lineage:
+      - datalake_casa_mineira_crm_clean.city.city_name
+  last_city_booking:
+    lineage:
+      - datalake_casa_mineira_crm_clean.city.city_name
+  ts_first_contact_prospect:
+    lineage:
+      - datalake_casa_mineira_crm_clean.contact.ts_created
+  ts_last_contact_prospect:
+    lineage:
+      - datalake_casa_mineira_crm_clean.contact.ts_created
+  ts_first_combo_event_contact_prospect:
+    lineage:
+      - datalake_casa_mineira_crm_clean.contact.ts_created
+  ts_last_combo_event_contact_prospect:
+    lineage:
+      - datalake_casa_mineira_crm_clean.contact.ts_created
+  ts_first_booking_created:
+    lineage:
+      - datalake_casa_mineira_crm_clean.visit.ts_created
+  ts_last_booking_created:
+    lineage:
+      - datalake_casa_mineira_crm_clean.visit.ts_created
+  ts_first_visit_completed:
+    lineage:
+      - datalake_casa_mineira_crm_clean.visit.ts_visited
+  ts_last_visit_completed:
+    lineage:
+      - datalake_casa_mineira_crm_clean.visit.ts_visited
+  dt_first_offer_submitted:
+    lineage:
+      - datalake_casa_mineira_crm_clean.sale.ts_created
+  dt_last_offer_submitted:
+    lineage:
+      - datalake_casa_mineira_crm_clean.sale.ts_created
+  dt_first_sale_agreement_signed:
+    lineage:
+      - datalake_casa_mineira_crm_clean.sale.ts_sold
+  dt_last_sale_agreement_signed:
+    lineage:
+      - datalake_casa_mineira_crm_clean.sale.ts_sold

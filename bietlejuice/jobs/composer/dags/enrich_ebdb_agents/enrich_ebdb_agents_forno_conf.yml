@@ -22,3 +22,17 @@ tables:
     partitions: [year, month, day]
   - table_name: rating_label
     is_incremental: false
+
+inner_dependencies:
+  agents_slots:
+    - agents_specific_weekly_schedule
+    - agents_weekly_schedule_history
+  agents_slots_hourly: 
+    - agents_slots
+  agents_weekly_schedule_history:
+    - slots_base_time
+  agents_review:
+    - rating_label
+  agent_region_group:
+    - agents_region
+    - agents_slots

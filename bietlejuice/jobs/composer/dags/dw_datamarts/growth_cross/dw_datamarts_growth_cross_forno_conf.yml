@@ -20,6 +20,18 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/growth_cross/affiliates_clusters.sql
       table: affiliates_clusters
+  inbound_attendance_leads_flows:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/inbound_attendance_leads_flows.sql
+      table: inbound_attendance_leads_flows
+  house_demand_trends:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/house_demand_trends.sql
+      table: house_demand_trends
+      depends_on:
+        - rental_marketplace_flows
   performance_marketing_cluster_promotional_bonus:
     dw:
       <<: *redshift_anchor
@@ -27,11 +39,54 @@ pipeline:
       table: performance_marketing_cluster_promotional_bonus
       depends_on:
         - affiliates_clusters
+  performance_marketing_cluster_promotional_bonus_costs:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/performance_marketing_cluster_promotional_bonus_costs.sql
+      table: performance_marketing_cluster_promotional_bonus_costs
+      depends_on:
+        - affiliates_clusters
+        - performance_marketing_cluster_promotional_bonus
+  performance_marketing_metrics_demand:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/performance_marketing_metrics_demand.sql
+      table: performance_marketing_metrics_demand
+      depends_on:
+        - tenant_prospect_status
+        - rent_flow_interactions
+  plaquinhas_metrics:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/plaquinhas_metrics.sql
+      table: plaquinhas_metrics
+      depends_on:
+        - performance_marketing_metrics_demand
+  pricing_rent_categorization:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/pricing_rent_categorization.sql
+      table: pricing_rent_categorization
+      depends_on:
+        - performance_marketing_metrics_demand
   rent_flow_interactions:
     dw:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/growth_cross/rent_flow_interactions.sql
       table: rent_flow_interactions
+  rental_marketplace_flows:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/rental_marketplace_flows.sql
+      table: rental_marketplace_flows
+      depends_on:
+        - rent_flow_interactions
+        - tenant_prospect_status
+  sale_performance_marketing_metrics_demand:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/sale_performance_marketing_metrics_demand.sql
+      table: sale_performance_marketing_metrics_demand
   tenant_prospects_activations:
     dw:
       <<: *redshift_anchor
@@ -46,3 +101,27 @@ pipeline:
       table: tenant_prospect_status
       depends_on:
         - rent_flow_interactions
+  top_of_funnel_volumes_daily:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/top_of_funnel_volumes_daily.sql
+      table: top_of_funnel_volumes_daily
+      depends_on:
+        - performance_marketing_metrics_demand
+        - sale_performance_marketing_metrics_demand
+        - tenant_prospect_status
+  unique_supply_events_funnel:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/unique_supply_events_funnel.sql
+      table: unique_supply_events_funnel
+  unique_supply_cohort_conversions:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/unique_supply_cohort_conversions.sql
+      table: unique_supply_cohort_conversions
+  user_funnel:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/user_funnel.sql
+      table: user_funnel

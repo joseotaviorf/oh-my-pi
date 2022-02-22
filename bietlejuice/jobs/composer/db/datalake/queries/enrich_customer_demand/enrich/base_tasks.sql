@@ -63,6 +63,17 @@ ticket_tasks AS (
     LEFT JOIN
       datalake_zendesk_ticket_funnels.ticket_funnel tf
         ON e.id_ticket = tf.id_ticket
+  ),
+  unique_taxonomy_sla_target AS (
+    SELECT DISTINCT
+      journey_step,
+      contact_theme_detail_tag,
+      sla_in_days,
+      EXPLODE(SEQUENCE(dt_start, COALESCE(dt_end, DATE(NOW())))) AS dt_reference
+    FROM
+      datalake_gsheets_clean.taxonomy_sla
+    WHERE
+      dt_target_invalidated IS NULL
   )
   SELECT DISTINCT
     t.id_ticket AS id_task,
@@ -77,17 +88,17 @@ ticket_tasks AS (
     datalake_gsheets_clean.department_control dc
       ON t.department = dc.department
   LEFT JOIN
-    datalake_gsheets_clean.taxonomy_sla ts
+    unique_taxonomy_sla_target ts
       ON dc.journey_step = ts.journey_step
       AND t.contact_theme_detail_tag = ts.contact_theme_detail_tag
       AND NOT t.tags LIKE '%orçamentação_realizada%'
-      AND t.ts_started BETWEEN ts.dt_start AND ts.dt_end
+      AND DATE(t.ts_started) = ts.dt_reference
   LEFT JOIN
     datalake_gsheets_clean.tag_sla_target tst
       ON dc.journey_step = ts.journey_step
       AND t.tags LIKE '%orçamentação_realizada%'
       AND t.tags LIKE CONCAT('%', tst.tag, '%')
-      AND t.ts_started BETWEEN tst.dt_start AND tst.dt_end
+      AND t.ts_started BETWEEN tst.dt_start AND COALESCE(tst.dt_end, NOW())
   WHERE
     t.ts_started >= '2021-01-01'
     AND (

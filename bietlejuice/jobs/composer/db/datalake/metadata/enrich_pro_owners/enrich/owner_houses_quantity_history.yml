@@ -1,0 +1,13 @@
+---
+database_name: datalake_pro_owners
+table_name: owner_houses_quantity_history
+columns:
+  id_owner:
+    lineage:
+      - datalake_ebdb_clean.house.id_user
+  ts_house_number_ended:
+    lineage:
+      - datalake_ebdb_listing.house_listing_status.ts_status_started
+  ts_house_number_started:
+    lineage:
+      - datalake_ebdb_listing.house_listing_status.ts_status_started

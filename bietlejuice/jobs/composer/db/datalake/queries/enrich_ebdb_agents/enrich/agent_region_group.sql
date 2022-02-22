@@ -1,46 +1,30 @@
-WITH 
-    agent_region_date_filter AS (
-        SELECT  
-            *
-        FROM 
-            datalake_ebdb_user_revision_entity.user_revision_entity b
-        WHERE 
-            b.ts_revision >= date_add(DATE('{year}-{month}-{day}'), -1)
-    ),
-    agent_region_daily AS (
-
-        SELECT 
-            a.id_agent_data AS id_agent,
-            a.id_region,
-            MAX(CASE WHEN a.rev_type = 0 THEN b.ts_revision ELSE null END) AS dt_start,
-            COALESCE(MAX(CASE WHEN a.rev_type = 2 THEN b.ts_revision ELSE null END), '2099-12-31 00:00:00') AS dt_end,
-            MIN(a.rev_type) AS rev_type
-        FROM 
-            datalake_ebdb_clean.agent_region_data_aud a
-        JOIN 
-            agent_region_date_filter b
-                ON a.rev = b.id
-        WHERE 
-            a.rev_type IN (0, 2)
-        GROUP BY 
-            1, 2
-        HAVING 
-            MIN(a.rev_type) = 0
-    ),
-    daily_region AS (
-        SELECT 
-            DATE(TO_TIMESTAMP(DATE('{year}-{month}-{day}'), 'YYYY-MM-DD HH:mm:ss'))  AS ts_slot,
-            t_out.id_agent,
-            t_out.id_region,
-            aux.region_code,
-            aux.region_code_deprecated
-        FROM
-            agent_region_daily t_out
-        LEFT join
-            datalake_gsheets_clean.auxiliary_region aux ON aux.id = t_out.id_region
-        WHERE
-            TO_TIMESTAMP(DATE('{year}-{month}-{day}'), 'YYYY-MM-DD HH:mm:ss') > TO_TIMESTAMP('2018-01-31 00:00:00', 'YYYY-MM-DD HH:mm:ss')  -- limit date, where aud started to be implemented
-        ORDER BY 2, 4
+WITH agents_region_aud AS (
+    SELECT
+        id_agent,
+        id_region,
+        ts_started,
+        COALESCE(LEAD(ts_ended) OVER(PARTITION BY id_agent, id_region ORDER BY ts_revision), '2099-12-31 00:00:00') AS ts_ended
+    FROM
+        datalake_ebdb_agents.agents_region
+    WHERE
+        rev_type IN (0,2)
+),
+daily_region AS (
+    SELECT
+        DATE(TO_TIMESTAMP(DATE('{year}-{month}-{day}'), 'YYYY-MM-DD HH:mm:ss'))  AS ts_slot,
+        ara.id_agent,
+        ara.id_region,
+        aux.region_code,
+        aux.region_code_deprecated 
+    FROM
+        agents_region_aud AS ara
+    LEFT JOIN
+        datalake_gsheets_clean.auxiliary_region aux
+            ON aux.id = ara.id_region
+    WHERE
+        ara.ts_started IS NOT NULL
+        AND TO_TIMESTAMP(DATE('{year}-{month}-{day}'), 'YYYY-MM-DD HH:mm:ss') BETWEEN ara.ts_started AND ara.ts_ended
+        AND TO_TIMESTAMP(DATE('{year}-{month}-{day}'), 'YYYY-MM-DD HH:mm:ss') > TO_TIMESTAMP(DATE('2018-01-31 00:00:00'), 'YYYY-MM-DD HH:mm:ss')  -- limit date, where aud started to be implemented
     ),
     region_records_union AS (
         SELECT
@@ -52,22 +36,21 @@ WITH
             ag.ts_slot,
             us.dados_agente_id AS id_agent,
             ar.id_region,
-            aux.region_code,
-            aux.region_code_deprecated
+            ar.region_code,
+            ar.region_code_deprecated
         FROM
             datalake_ebdb_agents.agents_slots ag
-        LEFT JOIN datalake_ebdb_agents.agents_region ar
+        LEFT JOIN 
+          daily_region ar
             ON ag.id_agent = ar.id_agent
-        LEFT JOIN dw_public.dim_user us
-            ON us.dados_agente_id = ag.id_agent
-        LEFT JOIN datalake_gsheets_clean.auxiliary_region aux
-            ON aux.id = ar.id_region
+        LEFT JOIN 
+          dw_public.dim_user us
+              ON us.dados_agente_id = ag.id_agent
         WHERE
             ar.id_region IS NOT NULL
             AND us.dados_agente_id IS NOT NULL
-            AND ag.is_available_slot = TRUE
             AND	cast(ag.ts_slot as date) = DATE(TO_TIMESTAMP(DATE('{year}-{month}-{day}'), 'YYYY-MM-DD HH:mm:ss'))
-            AND DATE(TO_TIMESTAMP(DATE('{year}-{month}-{day}'), 'YYYY-MM-DD HH:mm:ss')) >= DATE('2018-01-31 00:00:00')  -- limit date, where aud started to be implemented
+            AND DATE(TO_TIMESTAMP(DATE('{year}-{month}-{day}'), 'YYYY-MM-DD HH:mm:ss')) <= DATE('2018-01-31 00:00:00')  -- limit date, where aud started to be implemented
     ),
     region_records_agg AS (
         SELECT

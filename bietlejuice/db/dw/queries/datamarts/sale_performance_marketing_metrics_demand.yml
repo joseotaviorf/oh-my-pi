@@ -1,5 +1,0 @@
-# Config for sale_performance_marketing_metrics_demand
----
-composer_dependencies: 
-  - dw_datamarts_cross
-  - dw_datamarts_for_sale_cross

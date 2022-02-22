@@ -21,8 +21,12 @@ bietlejuice.dw_datamarts_cross:
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
   - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
   - bietlejuice.dw_rent_listing_flow:load-public-fact-house-listing-flows-into-redshift
+  - bietlejuice.dw_sale_offers:load-sale-dim-offer-into-redshift
+  - bietlejuice.dw_sale_offers:load-sale-dim-sale-agreement-into-redshift
+  - bietlejuice.dw_sale_offers:load-sale-fact-offers-into-redshift
   - bietlejuice.dw_sale_listings:load-sale-dim-listing-into-redshift
   - bietlejuice.dw_sale_listing_flow:load-sale-fact-listing-flows-into-redshift
+  - bietlejuice.dw_sale_visits:load-sale-fact-visits-into-redshift
   - bietlejuice.dw_tenant_booking_review:load-public-dim-tenant-booking-review-into-redshift
   - bietlejuice.dw_user:load-public-dim-user-into-redshift
   - bietlejuice.dw_user:load-public-dim-partner-into-redshift
@@ -53,7 +57,10 @@ bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.dw_listing_jobs:load-public-dim-photo-job-into-redshift
   - bietlejuice.dw_listing_jobs:load-public-fact-inspection-bookings-into-redshift
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
+  - bietlejuice.dw_rent_listing_flow:load-public-fact-house-listing-flows-into-redshift
   - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
+  - bietlejuice.dw_sale_listing_flow:load-sale-fact-listing-flows-into-redshift
+  - bietlejuice.dw_tenant_booking_review:load-public-dim-tenant-booking-review-into-redshift
   - bietlejuice.dw_tracksale:load-tracksale-dim-nps-campaign-into-redshift
   - bietlejuice.dw_tracksale:load-tracksale-fact-nps-dispatches-into-redshift
   - bietlejuice.ebdb:create-access-authorization-type-clean-external-table
@@ -86,10 +93,13 @@ bietlejuice.dw_datamarts_for_rent_cross:
   - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
   - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
+  - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
   - bietlejuice.dw_offer:load-public-dim-offer-into-redshift
   - bietlejuice.dw_proposal:load-dw-public-dim-proposal
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
   - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
+  - bietlejuice.dw_rent_listing_flow:load-public-fact-house-listing-flows-into-redshift
+  - bietlejuice.dw_user:load-public-dim-partner-into-redshift
   - bietlejuice.ebdb:create-proponent-proposal-clean-external-table
   - bietlejuice.sorting_hat:create-clean-credit-analysis-external-table
   - bietlejuice.sorting_hat:create-clean-proponent-external-table
@@ -115,6 +125,7 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.classified_leads:create-clean-lead-reply-email-external-table
   - bietlejuice.classified_leads:create-clean-lead-reply-whatsapp-external-table
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
+  - bietlejuice.dw_house:load-quintoandar-dim-house-into-redshift
   - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
   - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
@@ -134,6 +145,7 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.ebdb:create-agent-data-aud-clean-external-table
   - bietlejuice.ebdb:create-amenities-clean-external-table
   - bietlejuice.ebdb:create-condo-amenities-clean-external-table
+  - bietlejuice.ebdb:create-full-contract-clean-external-table
   - bietlejuice.ebdb:create-house-aud-clean-external-table
   - bietlejuice.ebdb:create-house-clean-external-table
   - bietlejuice.ebdb:create-house-maintenance-condition-clean-external-table
@@ -162,20 +174,21 @@ bietlejuice.dw_datamarts_for_sale:
 
 bietlejuice.dw_datamarts_for_sale_cross:
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
+  - bietlejuice.dw_business_unit_region:load-sale-fact-business-unit-region-into-redshift
   - bietlejuice.dw_datamarts_cross:create-lead-listing-flows-in-datalake
+  - bietlejuice.dw_datamarts_cross:create-quintoandar-consultant-listings-in-datalake
   - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
   - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
   - bietlejuice.dw_sale_flows:load-sale-fact-sale-flows-into-redshift
   - bietlejuice.dw_sale_offers:load-sale-dim-offer-into-redshift
-  - bietlejuice.dw_sale_offers:load-sale-dim-sale-agreement-into-redshift
   - bietlejuice.dw_sale_offers:load-sale-fact-offers-into-redshift
   - bietlejuice.dw_sale_visits:load-sale-fact-visits-into-redshift
   - bietlejuice.ebdb:create-agent-data-clean-external-table
-  - bietlejuice.ebdb:create-house-clean-external-table
   - bietlejuice.ebdb:create-user-clean-external-table
   - bietlejuice.ebdb:create-work-contract-clean-external-table
   - bietlejuice.enrich_ebdb_listing:create-enrich-house-external-table
+  - bietlejuice.enrich_firestore:create-enrich-monday-external-table
   - bietlejuice.rene_descartes:create-clean-lead-rejection-external-table
   - bietlejuice.wololo:create-clean-context-discard-external-table
   - bietlejuice.wololo:create-clean-conversion-external-table
@@ -198,30 +211,37 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.ebdb:create-house-clean-external-table
   #market_share_by_sk_region
   - bietlejuice.ebdb:create-polygon-region-clean-external-table
+  # casa_mineira_top_of_funnel_volumes_daily
+  - bietlejuice.enrich_top_of_funnel_portal_cm:create-enrich-top-of-funnel-users-portal-casa-mineira-external-table
+  - bietlejuice.gsheets:create-clean-targets-casa-mineira-tof-daily-external-table
+  #plaquinhas_houses
+  - bietlejuice.dw_listing_jobs:load-public-dim-photo-job-into-redshift
+  - bietlejuice.dw_listing:load-public-fact-house-listing-status-into-redshift
+  - bietlejuice.dw_region:load-public-dim-region-into-redshift
+  - bietlejuice.dw_sale_listings:load-sale-fact-listing-status-into-redshift
+  - bietlejuice.gsheets:create-clean-aux-check-photo-sender-external-table
+  - bietlejuice.gsheets:create-clean-branding-where-is-plaquinha-external-table
   # portal_casa_mineira_advertiser_metrics
-  - bietlejuice.casa_mineira_portal:create-clean-city-external-table
+  - bietlejuice.casa_mineira_portal:create-clean-real-estate-agency-history-external-table
+  # portal_casa_mineira_advertiser_metrics, performance_marketing_metrics_portal_casa_mineira
   - bietlejuice.casa_mineira_portal:create-clean-house-external-table
+  - bietlejuice.casa_mineira_portal:create-clean-city-external-table
   - bietlejuice.casa_mineira_portal:create-clean-real-estate-agency-budget-external-table
   - bietlejuice.casa_mineira_portal:create-clean-real-estate-agency-external-table
-  - bietlejuice.casa_mineira_portal:create-clean-real-estate-agency-history-external-table
   - bietlejuice.casa_mineira_portal:create-clean-uf-external-table
-  #unique_owners, sale_performance_marketing_metrics_supply_cohort
+  #unique_owners, plaquinhas_houses, sale_performance_marketing_metrics_supply_cohort
   - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
   # market_share_by_sk_region
   - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
   - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
-  - bietlejuice.dw_rent_listing_flow:load-public-fact-house-listing-flows-into-redshift
   - bietlejuice.dw_sale_listing_flow:load-sale-fact-listing-flows-into-redshift
   - bietlejuice.dw_user:load-public-dim-user-into-redshift
   # tof_demand_online_events
   - bietlejuice.amplitude:events-raw-to-clean
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
   # sale_performance_marketing_metrics_supply_cohort
-  - bietlejuice.enrich_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
-  - bietlejuice.enrich_marketing_manual_daily_costs:create-enrich-daily-costs-external-table
   - bietlejuice.gsheets:create-clean-sale-supply-targets-external-table
   # daily_target_volumes_supply, sale_performance_marketing_metrics_supply_cohort
-  - bietlejuice.dw_region:load-public-dim-region-into-redshift
   - bietlejuice.gsheets:create-clean-city-share-external-table
   - bietlejuice.gsheets:create-clean-local-holidays-external-table
   - bietlejuice.gsheets:create-clean-supply-targets-2019-external-table
@@ -232,24 +252,89 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.gsheets:create-clean-week-volumes-supply-external-table
   # users_online_metrics
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
+  #performance_marketing_metrics_supply, unique_owners, sale_performance_marketing_metrics_supply_cohort
+  - bietlejuice.dw_rent_listing_flow:load-public-fact-house-listing-flows-into-redshift
+  - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
+  #performance_marketing_metrics_supply, daily_target_volumes_supply, sale_performance_marketing_metrics_supply_cohort
+  - bietlejuice.dw_region:load-public-dim-region-into-redshift
+  #performance_marketing_metrics_supply, sale_performance_marketing_metrics_supply_cohort
+  - bietlejuice.enrich_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
+  # performance_marketing_metrics_portal_casa_mineira
+  - bietlejuice.casa_mineira_amplitude:create-clean-329001-portal-external-table
+  - bietlejuice.casa_mineira_portal:create-clean-contact-external-table
+  - bietlejuice.casa_mineira_portal:create-clean-neighborhood-external-table
+  - bietlejuice.enrich_casa_mineira_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
+  - bietlejuice.gsheets:create-clean-targets-portal-casa-mineira-cost-cf-external-table
+  - bietlejuice.gsheets:create-clean-taxonomy-portal-casa-mineira-external-table
 
 bietlejuice.dw_datamarts_growth_cross:
+  - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
+  - bietlejuice.dw_call:load-call-dim-call-agent-into-redshift
+  - bietlejuice.dw_call:load-call-dim-call-into-redshift
+  - bietlejuice.dw_call:load-call-dim-call-task-into-redshift
+  - bietlejuice.dw_call:load-call-fact-call-tasks-into-redshift
+  - bietlejuice.dw_call:load-call-fact-calls-into-redshift
   - bietlejuice.dw_contract:load-public-dim-contract-into-redshift
+  - bietlejuice.dw_datamarts_cross:create-buyer-prospect-status-in-datalake
   - bietlejuice.dw_datamarts_cross:create-lead-listing-flows-in-datalake
   - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
+  - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
+  - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
+  - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
+  - bietlejuice.dw_listing:load-public-fact-house-listing-status-into-redshift
+  - bietlejuice.dw_listing_jobs:load-public-dim-photo-job-into-redshift
   - bietlejuice.dw_offer:load-public-dim-offer-into-redshift
+  - bietlejuice.dw_quinto_messenger:load-quinto-messenger-dim-chat-into-redshift
+  - bietlejuice.dw_quinto_messenger:load-quinto-messenger-dim-task-into-redshift
+  - bietlejuice.dw_quinto_messenger:load-quinto-messenger-dim-quinto-messenger-agent-into-redshift
+  - bietlejuice.dw_quinto_messenger:load-quinto-messenger-fact-tasks-into-redshift
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
   - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
+  - bietlejuice.dw_rent_listing_flow:load-public-fact-house-listing-flows-into-redshift
+  - bietlejuice.dw_sale_flows:load-sale-fact-sale-flows-into-redshift
+  - bietlejuice.dw_sale_listing_flow:load-sale-fact-listing-flows-into-redshift
+  - bietlejuice.dw_sale_offers:load-sale-dim-offer-into-redshift
+  - bietlejuice.dw_sale_offers:load-sale-fact-offers-into-redshift
+  - bietlejuice.dw_sale_visits:load-sale-fact-visits-into-redshift
+  - bietlejuice.dw_user:load-public-dim-user-into-redshift
   - bietlejuice.dw_user_affiliate:load-public-dim-user-affiliate-into-redshift
   - bietlejuice.ebdb:create-dw-quintoandar-fact-contract-people-in-datalake
+  - bietlejuice.ebdb:create-house-aud-clean-external-table
+  - bietlejuice.ebdb:create-house-clean-external-table
+  - bietlejuice.ebdb:create-house-predicted-price-clean-external-table
+  - bietlejuice.ebdb:create-house-predicted-price-aud-clean-external-table
+  - bietlejuice.ebdb:create-user-revision-entity-clean-external-table
+  - bietlejuice.enrich_amplitude_page_viewed_events:create-enrich-listing-page-viewed-external-table
+  - bietlejuice.enrich_bigfone_twilio:create-enrich-call-flex-events-external-table
+  - bietlejuice.enrich_top_of_funnel_demand:create-enrich-user-interactions-external-table
+  - bietlejuice.gsheets:create-clean-aux-check-photo-sender-external-table
+  - bietlejuice.gsheets:create-clean-branding-where-is-plaquinha-external-table
   - bietlejuice.gsheets:create-clean-promotional-bonus-cluster-targets-external-table
   - bietlejuice.gsheets:create-clean-promotional-bonus-user-cluster-targets-external-table
+  - bietlejuice.gsheets:create-clean-rental-tof-daily-targets-external-table
+  - bietlejuice.gsheets:create-clean-sale-nbp-source-targets-external-table
+  - bietlejuice.gsheets:create-clean-sale-flows-targets-external-table
+  - bietlejuice.gsheets:create-clean-sale-tof-daily-targets-external-table
+  - bietlejuice.gsheets:create-clean-secretariat-hierarchy-external-table
+  - bietlejuice.gsheets:create-clean-users-cx-plaquinhas-external-table
+  - bietlejuice.wololo:create-clean-context-discard-external-table
+  - bietlejuice.wololo:create-clean-conversion-external-table
+  - bietlejuice.wololo:create-clean-prospect-external-table
+    # performance_marketing_metrics_demand
+  - bietlejuice.enrich_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
+  - bietlejuice.gsheets:create-clean-demand-targets-replanning-external-table
+  - bietlejuice.gsheets:create-clean-mkt-cost-per-source-external-table
+  - bietlejuice.gsheets:create-clean-rental-ntp-source-targets-external-table
+  - bietlejuice.gsheets:create-clean-rental-flows-targets-external-table
 
 bietlejuice.dw_datamarts_support_and_service:
   - bietlejuice.amplitude:update-clean-events-daily-partition-athena
-  - bietlejuice.dw_booking:load-dw-public-dim-booking
-  - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
+  - bietlejuice.dw_customer_support:load-customer-support-dim-channel-into-redshift
+  - bietlejuice.dw_customer_support:load-customer-support-fact-ticket-into-redshift
+  - bietlejuice.dw_region:load-public-dim-region-into-redshift
+  - bietlejuice.dw_user:load-public-dim-user-into-redshift
   - bietlejuice.ebdb:create-clean-house-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-house-visit-status-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-house-weekly-schedule-aud-in-data-lake
@@ -858,6 +943,10 @@ bietlejuice.enrich_customer_demand:
   - bietlejuice.enrich_heimdall:load-enrich-activity
   - bietlejuice.enrich_heimdall:load-enrich-auditable-expenses
   - bietlejuice.enrich_heimdall:load-enrich-expenses
+  - bietlejuice.gsheets:load-clean-agents-control
+  - bietlejuice.gsheets:load-clean-department-control
+  - bietlejuice.gsheets:load-clean-tag-sla-target
+  - bietlejuice.gsheets:load-clean-taxonomy-sla
   - bietlejuice.terminator:load-clean-negotiation
   - bietlejuice.terminator:load-clean-termination
   - bietlejuice.terminator:load-clean-termination-aud
@@ -1130,9 +1219,20 @@ bietlejuice.enrich_offer:
   - bietlejuice.godfather:load-clean-offer
   - bietlejuice.gsheets:load-clean-monday-users
   - bietlejuice.gsheets:load-clean-offers-hub-central
-  
+
 bietlejuice.enrich_owner_fees:
   - bietlejuice.owner_fees:load-clean-contract
+
+bietlejuice.enrich_pro_owners:
+  - bietlejuice.ebdb:create-clean-conversion-lead-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.ebdb:create-clean-lead-in-data-lake
+  - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
+  - bietlejuice.ebdb:create-clean-partner-in-data-lake
+  - bietlejuice.ebdb:create-clean-portability-in-data-lake
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status
+  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
 
 bietlejuice.enrich_proposal:
   - bietlejuice.ebdb:create-clean-proposal-in-data-lake

@@ -1,4 +1,0 @@
-# Config for performance_marketing_metrics_demand
----
-composer_dependencies:
-  - dw_datamarts_growth_cross

@@ -57,8 +57,18 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/for_rent/contract_termination.sql
       table: contract_termination
+  datamart_kpi_weekly:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_rent/datamart_kpi_weekly.sql
+      table: datamart_kpi_weekly
   ongoing_listed_suspended_listings:
     dw:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/for_rent/ongoing_listed_suspended_listings.sql
       table: ongoing_listed_suspended_listings
+  datamart_cohort_rentals:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_rent/datamart_cohort_rentals.sql
+      table: datamart_cohort_rentals
