@@ -69,7 +69,7 @@ ticket_tasks AS (
       journey_step,
       contact_theme_detail_tag,
       sla_in_days,
-      EXPLODE(SEQUENCE(dt_start, COALESCE(dt_end, DATE(NOW()))) AS dt_reference
+      EXPLODE(SEQUENCE(dt_start, COALESCE(dt_end, DATE(NOW())))) AS dt_reference
     FROM
       datalake_gsheets_clean.taxonomy_sla
     WHERE

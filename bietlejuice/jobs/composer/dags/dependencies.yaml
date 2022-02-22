@@ -933,6 +933,10 @@ bietlejuice.enrich_customer_demand:
   - bietlejuice.enrich_heimdall:load-enrich-activity
   - bietlejuice.enrich_heimdall:load-enrich-auditable-expenses
   - bietlejuice.enrich_heimdall:load-enrich-expenses
+  - bietlejuice.gsheets:load-clean-agents-control
+  - bietlejuice.gsheets:load-clean-department-control
+  - bietlejuice.gsheets:load-clean-tag-sla-target
+  - bietlejuice.gsheets:load-clean-taxonomy-sla
   - bietlejuice.terminator:load-clean-negotiation
   - bietlejuice.terminator:load-clean-termination
   - bietlejuice.terminator:load-clean-termination-aud
