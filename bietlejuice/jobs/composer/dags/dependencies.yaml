@@ -207,9 +207,6 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.casa_mineira_crm:create-clean-contact-external-table
   - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.ebdb:create-house-clean-external-table
-  # casa_mineira_top_of_funnel_volumes_daily
-  - bietlejuice.enrich_top_of_funnel_portal_cm:create-enrich-top-of-funnel-users-portal-casa-mineira-external-table
-  - bietlejuice.gsheets:create-clean-targets-casa-mineira-tof-daily-external-table
   #plaquinhas_houses
   - bietlejuice.dw_listing_jobs:load-public-dim-photo-job-into-redshift
   - bietlejuice.dw_listing:load-public-fact-house-listing-status-into-redshift
