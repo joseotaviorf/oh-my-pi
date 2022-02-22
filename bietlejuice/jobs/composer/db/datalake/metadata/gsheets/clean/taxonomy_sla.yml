@@ -25,3 +25,6 @@ columns:
   dt_end:
     lineage:
       - datalake_gsheets_raw.taxonomy_sla.data_fim
+  dt_target_invalidated:
+    lineage:
+      - datalake_gsheets_raw.taxonomy_sla.invalidado
