@@ -59,6 +59,14 @@ pipeline:
       <<: *athena_anchor
       sql_file: dw/queries/datamarts/for_sale/loft_status_listing_flows.sql
       table: loft_status_listing_flows
+  neighborhood_competition:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_sale/neighborhood_competition.sql
+      table: neighborhood_competition
+      depends_on:
+        - loft_house_listing
+        - loft_status_listing_flows
   repressed_demand_sale:
     dw:
       <<: *redshift_anchor

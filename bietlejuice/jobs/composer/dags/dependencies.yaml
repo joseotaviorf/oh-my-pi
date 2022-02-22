@@ -59,7 +59,8 @@ bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
   - bietlejuice.dw_rent_listing_flow:load-public-fact-house-listing-flows-into-redshift
   - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
-  - bietlejuice.dw_rent_listing_flow:load-public-fact-house-listing-flows-into-redshift
+  - bietlejuice.dw_sale_listing_flow:load-sale-fact-listing-flows-into-redshift
+  - bietlejuice.dw_tenant_booking_review:load-public-dim-tenant-booking-review-into-redshift
   - bietlejuice.dw_tracksale:load-tracksale-dim-nps-campaign-into-redshift
   - bietlejuice.dw_tracksale:load-tracksale-fact-nps-dispatches-into-redshift
   - bietlejuice.ebdb:create-access-authorization-type-clean-external-table
@@ -124,6 +125,7 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.classified_leads:create-clean-lead-reply-email-external-table
   - bietlejuice.classified_leads:create-clean-lead-reply-whatsapp-external-table
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
+  - bietlejuice.dw_house:load-quintoandar-dim-house-into-redshift
   - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
   - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
   - bietlejuice.dw_region:load-public-dim-region-into-redshift

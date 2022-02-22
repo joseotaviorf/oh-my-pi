@@ -10,6 +10,7 @@ dags_out_of_pattern:
         "dw_contract",
         "dw_datamarts_cross",
         "dw_datamarts_for_rent",
+        "dw_house",
         "dw_lead",
         "dw_listing",
         "dw_listing_jobs",
