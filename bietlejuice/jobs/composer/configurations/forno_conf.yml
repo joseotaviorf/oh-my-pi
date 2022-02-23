@@ -34,6 +34,7 @@ dags_out_of_pattern:
         "dw_user_sales_rep",
         "ebdb",
         "enrich_amplitude_partner_taxonomy",
+        "enrich_marketing_costs_offline",
         "enrich_marketing_costs_sharing_rules",
         "facebook_insights",
         "marketing_costs",

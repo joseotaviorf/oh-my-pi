@@ -726,7 +726,7 @@ branded_costs AS (
         CASE WHEN bmc.mkt_channel = 'Organic' THEN 'Branding' ELSE bmc.mkt_channel END AS planning_mkt_level3,
         sum(replace(replace(nullif(bmc.cost,''),'$',''),',','')::float) AS costs
     FROM 
-        datalake_raw.gsheets_offline_and_branding_marketing_costs AS bmc
+        datalake_gsheets_clean_prod.offline_and_branding_marketing_costs AS bmc
         JOIN dim_date AS dbt
             ON bmc.sk_date::integer = dbt.sk_date
     GROUP BY 1, 2, 3, 4, 5, 6

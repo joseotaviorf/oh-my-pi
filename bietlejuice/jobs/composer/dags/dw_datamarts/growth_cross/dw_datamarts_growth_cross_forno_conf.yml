@@ -20,11 +20,6 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/growth_cross/affiliates_clusters.sql
       table: affiliates_clusters
-  inbound_attendance_leads_flows:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth_cross/inbound_attendance_leads_flows.sql
-      table: inbound_attendance_leads_flows
   house_demand_trends:
     dw:
       <<: *redshift_anchor
@@ -32,6 +27,18 @@ pipeline:
       table: house_demand_trends
       depends_on:
         - rental_marketplace_flows
+  inbound_attendance_leads_flows:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/inbound_attendance_leads_flows.sql
+      table: inbound_attendance_leads_flows
+  marketing_demand_supply_branding_costs:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/marketing_demand_supply_branding_costs.sql
+      table: marketing_demand_supply_branding_costs
+      depends_on:
+        - performance_marketing_cluster_promotional_bonus_costs
   performance_marketing_cluster_promotional_bonus:
     dw:
       <<: *redshift_anchor
@@ -139,7 +146,6 @@ pipeline:
       sql_file: dw/queries/datamarts/growth_cross/sale_performance_marketing_metrics_supply_coincident.sql
       table: sale_performance_marketing_metrics_supply_coincident
       depends_on:
-        - performance_marketing_promotional_bonus_costs_daily
         - performance_marketing_cluster_promotional_bonus_costs
   top_of_funnel_volumes_weekly:
     dw:
