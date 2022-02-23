@@ -4,12 +4,12 @@ columns:
   id:
     lineage:
       - datalake_ebdb_raw.contractpartnershipdata.id
-  ts_updated:
+  id_contract:
     lineage:
-      - datalake_ebdb_raw.contractpartnershipdata.atualizadoem
-  ts_created:
+      - datalake_ebdb_raw.contractpartnershipdata.contract_id
+  id_partner:
     lineage:
-      - datalake_ebdb_raw.contractpartnershipdata.criadoem
+      - datalake_ebdb_raw.contractpartnershipdata.partner_id
   administration_split_percentage:
     lineage:
       - datalake_ebdb_raw.contractpartnershipdata.administrationsplitpercentage
@@ -19,9 +19,15 @@ columns:
   contract_plan:
     lineage:
       - datalake_ebdb_raw.contractpartnershipdata.contractplan
-  id_contract:
+  partner_type:
     lineage:
-      - datalake_ebdb_raw.contractpartnershipdata.contract_id
-  id_partner:
+      - datalake_ebdb_raw.contractpartnershipdata.partnertype
+  trade_name:
     lineage:
-      - datalake_ebdb_raw.contractpartnershipdata.partner_id
+      - datalake_ebdb_raw.contractpartnershipdata.tradename
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.contractpartnershipdata.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.contractpartnershipdata.criadoem
