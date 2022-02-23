@@ -236,7 +236,7 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
   # sale_performance_marketing_metrics_supply_cohort
   - bietlejuice.gsheets:create-clean-sale-supply-targets-external-table
-  # daily_target_volumes_supply, sale_performance_marketing_metrics_supply_cohort
+  # sale_performance_marketing_metrics_supply_cohort
   - bietlejuice.gsheets:create-clean-city-share-external-table
   - bietlejuice.gsheets:create-clean-local-holidays-external-table
   - bietlejuice.gsheets:create-clean-supply-targets-2019-external-table
@@ -250,7 +250,7 @@ bietlejuice.dw_datamarts_growth:
   #performance_marketing_metrics_supply, unique_owners, sale_performance_marketing_metrics_supply_cohort
   - bietlejuice.dw_rent_listing_flow:load-public-fact-house-listing-flows-into-redshift
   - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
-  #performance_marketing_metrics_supply, daily_target_volumes_supply, sale_performance_marketing_metrics_supply_cohort
+  #performance_marketing_metrics_supply, sale_performance_marketing_metrics_supply_cohort
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
   #performance_marketing_metrics_supply, sale_performance_marketing_metrics_supply_cohort
   - bietlejuice.enrich_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
@@ -325,7 +325,23 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.gsheets:create-clean-sale-tof-weekly-targets-external-table
   - bietlejuice.gsheets:create-clean-secretariat-hierarchy-external-table
   - bietlejuice.gsheets:create-clean-users-cx-plaquinhas-external-table
-    # performance_marketing_metrics_demand
+  # daily_target_volumes_supply
+  - bietlejuice.gsheets:create-clean-city-share-external-table
+  - bietlejuice.gsheets:create-clean-local-holidays-external-table
+  - bietlejuice.gsheets:create-clean-supply-targets-2019-external-table
+  - bietlejuice.gsheets:create-clean-supply-targets-2020-external-table
+  - bietlejuice.gsheets:create-clean-supply-targets-2021-external-table
+  - bietlejuice.gsheets:create-clean-weekday-holiday-share-supply-external-table
+  - bietlejuice.gsheets:create-clean-weekday-supply-channel-share-external-table
+  - bietlejuice.gsheets:create-clean-week-volumes-supply-external-table
+  # unique_performance_marketing_metrics_supply_coincident
+  # - bietlejuice.enrich_marketing_manual_daily_costs:create-enrich-daily-costs-external-table
+  - bietlejuice.enrich_top_of_funnel_supply:create-enrich-top-of-funnel-supply-external-table
+  - bietlejuice.gsheets:create-clean-daily-target-supply-sale-external-table
+  - bietlejuice.gsheets:create-clean-sale-supply-targets-external-table
+  - bietlejuice.gsheets:create-clean-tof-supply-targets-external-table
+  - bietlejuice.wololo:create-clean-prospect-external-table
+  # performance_marketing_metrics_demand
   - bietlejuice.gsheets:create-clean-demand-targets-replanning-external-table
   - bietlejuice.gsheets:create-clean-mkt-cost-per-source-external-table
   - bietlejuice.gsheets:create-clean-rental-ntp-source-targets-external-table

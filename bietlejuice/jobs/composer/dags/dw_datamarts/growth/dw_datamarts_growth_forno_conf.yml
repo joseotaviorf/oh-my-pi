@@ -34,11 +34,6 @@ pipeline:
       <<: *athena_anchor
       sql_file: dw/queries/datamarts/growth/buyer_activation_events_combo.sql
       table: buyer_activation_events_combo
-  daily_target_volumes_supply:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth/daily_target_volumes_supply.sql
-      table: daily_target_volumes_supply
   performance_marketing_metrics_portal_casa_mineira:
     dw:
       <<: *redshift_anchor

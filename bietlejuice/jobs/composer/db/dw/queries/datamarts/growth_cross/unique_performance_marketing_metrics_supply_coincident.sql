@@ -1192,7 +1192,7 @@ costs_targets_results_combined AS (
         SUM(0::FLOAT) AS first_listings_target_rental,
         SUM(0::FLOAT) AS budget_rental
     FROM
-        datalake_raw.gsheets_daily_target_supply_sale str
+        datalake_gsheets_clean_prod.daily_target_supply_sale str
     WHERE
         str.date >= '2021-04-01'
     GROUP BY
@@ -1245,7 +1245,7 @@ costs_targets_results_combined AS (
         SUM(0::FLOAT) AS first_listings_target_rental,
         SUM(CAST(REPLACE(str.cost_per_source,',','') AS FLOAT8)) AS budget_rental
     FROM
-        datalake_raw.gsheets_daily_target_supply_rental str
+        datalake_gsheets_clean_prod.daily_target_supply_rental str
     WHERE
         str.date >= '2021-04-01'
     GROUP BY
@@ -1304,7 +1304,7 @@ costs_targets_results_combined AS (
         SUM(0::FLOAT) AS first_listings_target_rental,
         SUM(0::FLOAT) AS budget_rental
     FROM
-        datalake_raw.gsheets_sale_supply_targets str
+        datalake_gsheets_clean_prod.sale_supply_targets str
     WHERE str.mkt_channel NOT IN ('All', 'Branded')
     GROUP BY
         1,2,3,4,5,6,7,8,9,10
@@ -1370,7 +1370,7 @@ costs_targets_results_combined AS (
         SUM(0::FLOAT) AS first_listings_target_rental,
         SUM(0::FLOAT) AS budget_rental
     FROM
-        datalake_raw.gsheets_sale_supply_targets str
+        datalake_gsheets_clean_prod.sale_supply_targets str
     WHERE str.mkt_channel NOT IN ('All', 'Branded')
     GROUP BY
         1,2,3,4,5,6,7,8,9,10
@@ -1531,14 +1531,14 @@ costs_targets_results_combined AS (
         SUM(0::FLOAT) AS qualifieds_target_sale,
         SUM(0::FLOAT) AS opportunities_target_sale,
         SUM(0::FLOAT) AS first_listings_target_sale,
-        SUM(CAST(REPLACE(sct.budget__mensal,',','') AS FLOAT8)) AS budget_sale,
+        SUM(CAST(REPLACE(sct.budget_mensal,',','') AS FLOAT8)) AS budget_sale,
         SUM(0::FLOAT) AS prospects_target_rental,
         SUM(0::FLOAT) AS qualifieds_target_rental,
         SUM(0::FLOAT) AS opportunities_target_rental,
         SUM(0::FLOAT) AS first_listings_target_rental,
         SUM(0::FLOAT) AS budget_rental
     FROM
-        datalake_raw.gsheets_costs_targets sct
+        datalake_gsheets_clean_prod.costs_targets sct
     WHERE
         planning_mkt_level1 = 'Supply'
         AND sct.date < '2021-04-01'
@@ -1605,9 +1605,9 @@ costs_targets_results_combined AS (
         SUM(0::FLOAT) AS qualifieds_target_rental,
         SUM(0::FLOAT) AS opportunities_target_rental,
         SUM(0::FLOAT) AS first_listings_target_rental,
-        SUM(CAST(REPLACE(sct.budget__mensal,',','') AS FLOAT8)) AS budget_rental
+        SUM(CAST(REPLACE(sct.budget_mensal,',','') AS FLOAT8)) AS budget_rental
     FROM
-        datalake_raw.gsheets_costs_targets sct
+        datalake_gsheets_clean_prod.costs_targets sct
     WHERE
         planning_mkt_level1 = 'Supply'
         AND sct.date < '2021-04-01'
