@@ -46,9 +46,9 @@ rentals_and_tickets AS (
         planning_mkt_level1,
         CASE WHEN planning_mkt_level2 = 'Organic' THEN 'Branded' ELSE planning_mkt_level2 END AS planning_mkt_level2,
         planning_mkt_level3,
-        SUM(budget__quarter) AS cost_budget_quarter,
-        SUM(budget__mensal) AS cost_budget_mensal
-    FROM datalake_raw.gsheets_costs_targets 
+        SUM(budget_quarter) AS cost_budget_quarter,
+        SUM(budget_mensal) AS cost_budget_mensal
+    FROM datalake_gsheets_clean_prod.costs_targets 
     WHERE 
         business = 'Rental'
         AND date BETWEEN date('2020-01-01') AND LAST_DAY(CURRENT_DATE)
