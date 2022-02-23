@@ -141,3 +141,12 @@ pipeline:
       depends_on:
         - performance_marketing_promotional_bonus_costs_daily
         - performance_marketing_cluster_promotional_bonus_costs
+  top_of_funnel_volumes_weekly:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/top_of_funnel_volumes_weekly.sql
+      table: top_of_funnel_volumes_weekly
+      depends_on:
+        - tenant_prospect_status
+        - sale_performance_marketing_metrics_demand
+        - performance_marketing_metrics_demand
