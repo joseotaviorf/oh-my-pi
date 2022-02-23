@@ -23,8 +23,6 @@ Via **incremental load**:
     - `region`
     - `region_aud`
     - `revinfo`
-    - `user_sample`
-    - `user_sample_aud`
     - `visitor`
     - `visitor_aud`
 
@@ -38,8 +36,6 @@ Via **incremental load**:
     - `region`
     - `region_aud`
     - `rev_info`
-    - `user_sample`
-    - `user_sample_aud`
     - `visitor`
     - `visitor_aud`
 
