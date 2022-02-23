@@ -33,11 +33,15 @@ databricks_bietlejuice_repo_path = config_service.get_config(
     "databricks_bietlejuice_repo_path"
 )
 base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
+spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_med_general_cluster", deserialize_json=True
+    "databricks_bietlejuice_enrich_amplitude", deserialize_json=True
 )
+CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
+    "destination"
+] = f"{spark_jobs_logs_path}{DAG_ID}"
 
 dag = DAG(
     dag_id=DAG_ID,
