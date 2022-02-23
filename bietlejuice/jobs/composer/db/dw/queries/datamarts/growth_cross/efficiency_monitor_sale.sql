@@ -68,8 +68,8 @@ WITH sale_volumes AS (
         DATE(date) AS dt_cost,
         city_group,
         planning_mkt_level1,
-        SUM(budget__mensal) AS budget_mensal
-    FROM datalake_raw.gsheets_costs_targets
+        SUM(budget_mensal) AS budget_mensal
+    FROM datalake_gsheets_clean_prod.costs_targets
     WHERE date BETWEEN '2020-07-01' AND date_trunc('week',CURRENT_DATE)
         AND business = 'Sale'
     GROUP BY 1,2,3

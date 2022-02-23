@@ -264,6 +264,7 @@ bietlejuice.dw_datamarts_growth:
 
 bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
+  - bietlejuice.casa_mineira_crm:create-clean-house-external-table
   - bietlejuice.dw_affiliate_costs:load-quintoandar-dim-affiliate-cost-into-redshift
   - bietlejuice.dw_affiliate_costs:load-quintoandar-fact-affiliate-costs-into-redshift
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
@@ -293,6 +294,7 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.dw_sale_listing_flow:load-sale-fact-listing-flows-into-redshift
   - bietlejuice.dw_sale_listings:load-sale-fact-listings-into-redshift
   - bietlejuice.dw_sale_offers:load-sale-dim-offer-into-redshift
+  - bietlejuice.dw_sale_offers:load-sale-dim-sale-agreement-into-redshift
   - bietlejuice.dw_sale_offers:load-sale-fact-offers-into-redshift
   - bietlejuice.dw_sale_visits:load-sale-fact-visits-into-redshift
   - bietlejuice.dw_user:load-public-dim-user-into-redshift
@@ -314,16 +316,19 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.gsheets:create-clean-ciq-costs-external-table
   - bietlejuice.gsheets:create-clean-costs-targets-external-table
   - bietlejuice.gsheets:create-clean-daily-target-supply-rental-external-table
+  - bietlejuice.gsheets:create-clean-offers-hub-central-external-table
   - bietlejuice.gsheets:create-clean-offline-and-branding-marketing-costs-external-table
   - bietlejuice.gsheets:create-clean-promotional-bonus-cluster-targets-external-table
   - bietlejuice.gsheets:create-clean-promotional-bonus-user-cluster-targets-external-table
   - bietlejuice.gsheets:create-clean-rental-tof-daily-targets-external-table
   - bietlejuice.gsheets:create-clean-rental-tof-weekly-targets-external-table
-  - bietlejuice.gsheets:create-clean-sale-nbp-source-targets-external-table
+  - bietlejuice.gsheets:create-clean-sale-demand-targets-external-table
   - bietlejuice.gsheets:create-clean-sale-flows-targets-external-table
+  - bietlejuice.gsheets:create-clean-sale-nbp-source-targets-external-table
   - bietlejuice.gsheets:create-clean-sale-tof-daily-targets-external-table
   - bietlejuice.gsheets:create-clean-sale-tof-weekly-targets-external-table
   - bietlejuice.gsheets:create-clean-secretariat-hierarchy-external-table
+  - bietlejuice.gsheets:create-clean-unit-economics-amortization-curve-external-table
   - bietlejuice.gsheets:create-clean-users-cx-plaquinhas-external-table
   # daily_target_volumes_supply
   - bietlejuice.gsheets:create-clean-city-share-external-table

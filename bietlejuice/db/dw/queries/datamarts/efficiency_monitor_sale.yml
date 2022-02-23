@@ -1,4 +1,0 @@
-# Config for efficiency_monitor_sale
----
-composer_dependencies:
-  - dw_datamarts_growth
