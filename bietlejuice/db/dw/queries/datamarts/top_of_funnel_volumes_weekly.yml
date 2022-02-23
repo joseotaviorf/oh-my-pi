@@ -1,5 +1,0 @@
-# Config for top_of_funnel_volumes_weekly
----
-composer_dependencies:
-  - dw_datamarts_cross
-  - dw_datamarts_growth_cross
