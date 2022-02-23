@@ -25,6 +25,13 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/growth_cross/daily_target_volumes_supply.sql
       table: daily_target_volumes_supply
+  efficiency_monitor_rental:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/efficiency_monitor_rental.sql
+      table: efficiency_monitor_rental
+      depends_on:
+        - marketing_demand_supply_branding_costs
   efficiency_monitor_sale:
     dw:
       <<: *redshift_anchor

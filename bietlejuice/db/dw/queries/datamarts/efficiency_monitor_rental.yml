@@ -1,4 +1,0 @@
-# Config for efficiency_monitor_rental
----
-composer_dependencies:
-  - dw_datamarts_cross
