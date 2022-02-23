@@ -2,6 +2,7 @@ SELECT
     id,
     sales_flow_id AS id_sales_flow,
     firestore_id AS id_firestore,
+    reject_reason_id AS id_reject_reason,
     offer_price,
     sale_price,
     discard_reason,

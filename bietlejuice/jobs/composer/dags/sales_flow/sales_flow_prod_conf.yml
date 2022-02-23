@@ -74,6 +74,10 @@ tables:
     extraction_type: incremental
   payment_aud:
     extraction_type: incremental
+  reject_reason:
+    extraction_type: incremental
+  reject_reason_aud:
+    extraction_type: incremental
   rescission:
     extraction_type: incremental
   rescission_aud:

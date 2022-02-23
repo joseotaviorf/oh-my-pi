@@ -10,6 +10,9 @@ columns:
   id_firestore:
     lineage:
       - datalake_sales_flow_raw.offer.firestore_id
+  id_reject_reason:
+    lineage: 
+      - datalake_sales_flow_raw.offer.reject_reason_id
   offer_price:
     lineage:
       - datalake_sales_flow_raw.offer.offer_price

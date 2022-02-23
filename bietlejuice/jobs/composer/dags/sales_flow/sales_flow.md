@@ -48,7 +48,9 @@ This pipeline produces, in **datalake raw and clean**, tables via incremental lo
 `onboarding`    
 `onboarding_aud`    
 `payment`   
-`payment_aud`   
+`payment_aud`
+`reject_reason`  
+`reject_reason_aud`  
 `rescission`    
 `rescission_aud`    
 `rev_info`  

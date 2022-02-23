@@ -7,6 +7,9 @@ columns:
   id_sales_flow:
     lineage:
       - datalake_sales_flow_raw.offer_aud.sales_flow_id
+  id_reject_reason:
+    lineage:
+      - datalake_sales_flow_raw.offer_aud.reject_reason_id
   rev:
     lineage:
       - datalake_sales_flow_raw.offer_aud.rev
@@ -37,6 +40,9 @@ columns:
   mod_id_firestore:
     lineage:
       - datalake_sales_flow_raw.offer_aud.firestore_id_mod
+  mod_id_reject_reason:
+    lineage:
+      - datalake_sales_flow_raw.offer_aud.reject_reason_id_mod
   mod_dt_proposed:
     lineage:
       - datalake_sales_flow_raw.offer_aud.proposal_date_mod

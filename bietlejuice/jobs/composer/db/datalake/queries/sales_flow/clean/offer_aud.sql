@@ -1,6 +1,7 @@
 SELECT
     id,
     sales_flow_id AS id_sales_flow,
+    reject_reason_id AS id_reject_reason,
     rev,
     revtype AS rev_type,
     revend AS rev_end,
@@ -12,6 +13,7 @@ SELECT
     status,
     sales_flow_id_mod AS mod_id_sales_flow,
     firestore_id_mod AS mod_id_firestore,
+    reject_reason_id_mod AS mod_id_reject_reason,
     offer_price_mod AS mod_offer_price,
     sale_price_mod AS mod_sale_price,
     preemptive_right_mod AS mod_preemptive_right,
