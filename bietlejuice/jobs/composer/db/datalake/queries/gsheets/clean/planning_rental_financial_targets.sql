@@ -10,8 +10,8 @@ SELECT
     CAST(ended_rentals AS FLOAT) AS ended_rentals,
     CAST(new_rentals AS FLOAT) AS new_rentals,
     CAST(ongoing_rentals AS FLOAT) AS ongoing_rentals,
-    fy As year,
-    quarter,
-    month
+    CAST(fy AS INT) As year,
+    CAST(quarter AS INT) AS quarter,
+    CAST(month AS INT) AS month
 FROM
     datalake_gsheets_raw.planning_rental_financial_targets
