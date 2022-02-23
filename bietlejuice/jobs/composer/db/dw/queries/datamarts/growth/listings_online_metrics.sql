@@ -81,7 +81,8 @@ online_metrics as (
 )
 SELECT
   om.*,
-  pp.days_published_in_period
+  pp.days_published_in_period,
+  NOW() as ts_load
 FROM online_metrics om
 LEFT JOIN days_published_in_period pp
   ON pp.sk_house_listing = om.sk_house_listing AND pp.date_period = om.date_period

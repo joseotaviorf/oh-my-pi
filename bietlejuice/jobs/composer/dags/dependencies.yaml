@@ -195,7 +195,7 @@ bietlejuice.dw_datamarts_for_sale_cross:
   - bietlejuice.wololo:create-clean-prospect-external-table
 
 bietlejuice.dw_datamarts_growth:
-  # attribution_conversion_paths_demand
+  # attribution_conversion_paths_demand, listings-online-metrics
   - bietlejuice.dw_listing:load-dw-public-fact-house-listings
   - bietlejuice.enrich_amplitude_page_viewed_events:create-enrich-contract-docusign-signed-events-external-table
   - bietlejuice.enrich_amplitude_page_viewed_events:create-enrich-home-page-viewed-external-table
@@ -216,6 +216,8 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.dw_sale_listings:load-sale-fact-listing-status-into-redshift
   - bietlejuice.gsheets:create-clean-aux-check-photo-sender-external-table
   - bietlejuice.gsheets:create-clean-branding-where-is-plaquinha-external-table
+  #market_share_by_sk_region
+  - bietlejuice.ebdb:create-polygon-region-clean-external-table
   # portal_casa_mineira_advertiser_metrics
   - bietlejuice.casa_mineira_portal:create-clean-real-estate-agency-history-external-table
   # portal_casa_mineira_advertiser_metrics, performance_marketing_metrics_portal_casa_mineira
@@ -237,6 +239,9 @@ bietlejuice.dw_datamarts_growth:
   # sale_performance_marketing_metrics_supply_cohort
   - bietlejuice.gsheets:create-clean-sale-supply-targets-external-table
   # sale_performance_marketing_metrics_supply_cohort
+  - bietlejuice.enrich_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
+  - bietlejuice.gsheets:create-clean-sale-supply-targets-external-table
+  # daily_target_volumes_supply, sale_performance_marketing_metrics_supply_cohort
   - bietlejuice.gsheets:create-clean-city-share-external-table
   - bietlejuice.gsheets:create-clean-local-holidays-external-table
   - bietlejuice.gsheets:create-clean-supply-targets-2019-external-table
@@ -245,7 +250,7 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.gsheets:create-clean-weekday-holiday-share-supply-external-table
   - bietlejuice.gsheets:create-clean-weekday-supply-channel-share-external-table
   - bietlejuice.gsheets:create-clean-week-volumes-supply-external-table
-  # users_online_metrics
+  # users_online_metrics, listings-online-metrics
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
   #performance_marketing_metrics_supply, unique_owners, sale_performance_marketing_metrics_supply_cohort
   - bietlejuice.dw_rent_listing_flow:load-public-fact-house-listing-flows-into-redshift
