@@ -281,6 +281,7 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.dw_contract:load-public-dim-contract-into-redshift
   - bietlejuice.dw_datamarts_cross:create-buyer-prospect-status-in-datalake
   - bietlejuice.dw_datamarts_cross:create-lead-listing-flows-in-datalake
+  - bietlejuice.dw_datamarts_cross:create-funnel-demand-flows-in-datalake
   - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
   - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
   - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
@@ -288,6 +289,7 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.dw_listing:load-public-fact-house-listing-status-into-redshift
   - bietlejuice.dw_listing_jobs:load-public-dim-photo-job-into-redshift
   - bietlejuice.dw_offer:load-public-dim-offer-into-redshift
+  - bietlejuice.dw_proposal:load-public-dim-proposal-into-redshift
   - bietlejuice.dw_quinto_messenger:load-quinto-messenger-dim-chat-into-redshift
   - bietlejuice.dw_quinto_messenger:load-quinto-messenger-dim-task-into-redshift
   - bietlejuice.dw_quinto_messenger:load-quinto-messenger-dim-quinto-messenger-agent-into-redshift

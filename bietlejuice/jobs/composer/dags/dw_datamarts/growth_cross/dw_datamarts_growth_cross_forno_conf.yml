@@ -167,6 +167,11 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/growth_cross/user_funnel.sql
       table: user_funnel
+  rental_cohort_conversions:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/rental_cohort_conversions.sql
+      table: rental_cohort_conversions
   sale_performance_marketing_metrics_supply_coincident:
     dw:
       <<: *redshift_anchor
