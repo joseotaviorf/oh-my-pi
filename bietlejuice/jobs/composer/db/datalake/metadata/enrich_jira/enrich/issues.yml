@@ -1,0 +1,28 @@
+---
+database_name: datalake_jira
+table_name: issues
+columns:
+  id_issue:
+    lineage:
+      - datalake_jira_clean.issues.key
+  id_parent_issue:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  summary:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  issue_description:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  issue_type:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  current_status:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  ts_created:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  ts_resolved:
+    lineage:
+      - datalake_jira_clean.issues.fields

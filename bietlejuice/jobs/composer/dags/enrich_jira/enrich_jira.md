@@ -15,6 +15,7 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output table: 
 
 1. In data lake enrich:
+- `issues`
 - `issue_status_changes`
 
 ### Responsible Data Teams
