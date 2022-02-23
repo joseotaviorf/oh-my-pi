@@ -550,6 +550,11 @@ photographer_account:
     sheet_name: photographer_account
     clean_table_name: photographer_account
 
+planning_rental_financial_targets:
+    sheet_id: 1fynS0LI9FIwWJCeHsBKvs63P630ZNMaecyljsv17PZ8
+    sheet_name: "Output FP&A (FIX) --> Inputs P&P"
+    clean_table_name: planning_rental_financial_targets
+
 plaquinhas_installation_targets:
     sheet_id: 1GEaj4YMe9sgRiJmqgoJuOvkb8H8hjEcEgsTyv9GLzmg
     sheet_name: targets

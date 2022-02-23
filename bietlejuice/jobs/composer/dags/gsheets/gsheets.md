@@ -130,6 +130,7 @@ This pipeline produces the following output tables:
     - `owner_offboarding_repair_csat`
     - `payments_deals_and_discounts`
     - `photographer_account`
+    - `planning_rental_financial_targets`
     - `plaquinhas_installation_targets`
     - `plaquinhas_demand_targets`
     - `poa_partners`
