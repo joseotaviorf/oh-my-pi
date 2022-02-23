@@ -1,0 +1,16 @@
+---
+database_name: datalake_amplitude_sale_visit_intent
+table_name: amplitude_sale_visit_intent
+columns:
+  id_user:
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+  id_app:
+    lineage:
+      - datalake_amplitude_clean.events.id_app
+  id_house:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  ts_visit_intent:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
