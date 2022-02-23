@@ -72,8 +72,7 @@ online_metrics as (
     dp.sk_house_listing,
     m.listing_page_views,
     m.schedule_page_views,
-    m.tips_page_views,
-    NOW() as ts_load
+    m.tips_page_views
   FROM pre_online_metrics m
   JOIN days_published dp
     ON m.house_id = dp.sk_house AND m.event_date BETWEEN dp.min_status_date AND dp.max_status_date
