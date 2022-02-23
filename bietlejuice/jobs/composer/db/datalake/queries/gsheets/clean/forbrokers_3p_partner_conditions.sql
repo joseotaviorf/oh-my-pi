@@ -1,0 +1,27 @@
+SELECT
+    NULLIF(partner, '') AS partner,
+    NULLIF(partner_short_name, '') AS partner_short_name,
+    NULLIF(state, '') AS state,
+    NULLIF(city, '') AS city,
+    CAST(NULLIF(brokerage, '') AS FLOAT) AS brokerage,
+    CAST(NULLIF(platform_fee, '') AS FLOAT) AS platform_fee,
+    NULLIF(partnership_model, '') AS partnership_model,
+    NULLIF(revenue_share, '') AS revenue_share,
+    NULLIF(payment_moment, '') AS payment_moment,
+    NULLIF(campaign, '') AS campaign,
+    NULLIF(payment_by_listing, '') AS payment_by_listing,
+    NULLIF(frequency_of_payment, '') AS frequency_of_payment,
+    NULLIF(has_payment_for_partner, '') AS has_payment_for_partner,
+    NULLIF(has_payment_for_broker, '') AS has_payment_for_broker,
+    NULLIF(observations, '') AS observations,
+    CAST(NULLIF(adm_5a, '') AS FLOAT) AS adm_5a,
+    CAST(NULLIF(hub_associate_executive_fee, '') AS FLOAT) AS hub_associate_executive_fee,
+    CAST(NULLIF(hub_negociation_executive_fee, '') AS FLOAT) AS hub_negociation_executive_fee,
+    CAST(NULLIF(hub_broker_fee, '') AS FLOAT) AS hub_broker_fee,
+    CAST(NULLIF(dealmaking_broker_fee, '') AS FLOAT) AS dealmaking_broker_fee,
+    CAST(NULLIF(demand_partner_revenue_share, '') AS FLOAT) AS demand_partner_revenue_share,
+    CAST(NULLIF(supply_partner_revenue_share, '') AS FLOAT) AS supply_partner_revenue_share,
+    CAST(NULLIF(dt_term_signature, '') AS DATE) AS dt_term_signature,
+    CAST(NULLIF(dt_payment, '') AS DATE) AS dt_payment
+FROM
+    datalake_gsheets_raw.forbrokers_3p_partner_conditions

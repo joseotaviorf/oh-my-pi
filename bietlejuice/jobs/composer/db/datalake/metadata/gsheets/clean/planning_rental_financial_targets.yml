@@ -1,0 +1,45 @@
+database_name: datalake_gsheets_clean
+table_name: planning_rental_financial_targets
+columns:
+  city:
+    lineage:
+      - datalake_gsheets_raw.planning_rental_financial_targets.city
+  model:
+    lineage:
+      - datalake_gsheets_raw.planning_rental_financial_targets.model
+  adm_fee_new_rental:
+    lineage:
+      - datalake_gsheets_raw.planning_rental_financial_targets.adm_fee_new_rental
+  adm_fee_ongoing_rental:
+    lineage:
+      - datalake_gsheets_raw.planning_rental_financial_targets.adm_fee_ongoing_rental
+  avg_ticket_new_rental:
+    lineage:
+      - datalake_gsheets_raw.planning_rental_financial_targets.avg_ticket_new_rental
+  avg_ticket_ongoing_rental:
+    lineage:
+      - datalake_gsheets_raw.planning_rental_financial_targets.avg_ticket_ongoing_rental
+  bookerage_fee:
+    lineage:
+      - datalake_gsheets_raw.planning_rental_financial_targets.bookerage_fee
+  contract_signed:
+    lineage:
+      - datalake_gsheets_raw.planning_rental_financial_targets.contract_signed
+  ended_rentals:
+    lineage:
+      - datalake_gsheets_raw.planning_rental_financial_targets.ended_rentals
+  new_rentals:
+    lineage:
+      - datalake_gsheets_raw.planning_rental_financial_targets.new_rentals
+  ongoing_rentals:
+    lineage:
+      - datalake_gsheets_raw.planning_rental_financial_targets.ongoing_rentals
+  year:
+    lineage:
+      - datalake_gsheets_raw.planning_rental_financial_targets.fy
+  quarter:
+    lineage:
+      - datalake_gsheets_raw.planning_rental_financial_targets.quarter
+  month:
+    lineage:
+      - datalake_gsheets_raw.planning_rental_financial_targets.month

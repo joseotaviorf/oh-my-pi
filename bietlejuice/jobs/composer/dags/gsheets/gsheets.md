@@ -76,6 +76,7 @@ This pipeline produces the following output tables:
     - `exit_inspection_csat`
     - `extra_invoice`
     - `extra_invoice_created_expenses`
+    - `forbrokers_3p_partner_conditions`
     - `from_to_cancellation`
     - `google_searches_share_of_interest`    
     - `hotjar_photos_repressed_demand`
@@ -129,6 +130,7 @@ This pipeline produces the following output tables:
     - `owner_offboarding_repair_csat`
     - `payments_deals_and_discounts`
     - `photographer_account`
+    - `planning_rental_financial_targets`
     - `plaquinhas_installation_targets`
     - `plaquinhas_demand_targets`
     - `poa_partners`

@@ -656,3 +656,6 @@ LEFT JOIN
 LEFT JOIN
     tag
         ON tag.id_sales_flow = off.id_sales_flow
+WHERE 
+    tag.label IS NULL 
+    OR tag.label NOT LIKE '%#offertestedeproduto%'
