@@ -79,3 +79,8 @@ pipeline:
       <<: *athena_anchor
       sql_file: dw/queries/datamarts/growth/market_share_by_sk_region.sql
       table: market_share_by_sk_region
+  listings_online_metrics:
+    dw:
+      <<: *athena_anchor
+      sql_file: dw/queries/datamarts/growth/listings_online_metrics.sql
+      table: listings_online_metrics
