@@ -1,5 +1,4 @@
-WITH
-tp_status AS (
+WITH tp_status AS(
     SELECT DISTINCT
         dd.month_start,
         ts_start,
@@ -12,29 +11,31 @@ tp_status AS (
         MAX(ts_start) OVER(PARTITION BY sk_client, city_group, month_start) AS last_status_start
     FROM
         datamarts.tenant_prospect_status AS tps
-        JOIN dim_date AS dd
+    JOIN 
+        public.dim_date AS dd
             ON dd.sk_date BETWEEN sk_start_date
-                                  AND COALESCE(sk_end_date::INT, TO_CHAR(CURRENT_DATE, 'YYYYMMDD')::INT)
+                AND COALESCE(sk_end_date::INT, TO_CHAR(CURRENT_DATE, 'YYYYMMDD')::INT)
     WHERE
         dd.month_start >= DATE_TRUNC('MONTH', CURRENT_DATE - INTERVAL '25 MONTH')
         AND ts_start >= ts_first_activation
 ),
-monthly_tp_status as (
-    select
+monthly_tp_status AS(
+    SELECT
         month_start,
         city_group,
         sk_client,
         city_group_first_activation,
         status AS status_month_end,
         status_detail AS status_detail_month_end,
-        lag(status) over(partition by sk_client, city_group order by month_start) as status_month_start,
-        lag(status_detail) over(partition by sk_client, city_group order by month_start) as status_detail_month_start
-    from tp_status
-    where
+        LAG(status) OVER(PARTITION BY sk_client, city_group ORDER BY month_start) AS status_month_start,
+        LAG(status_detail) OVER(PARTITION BY sk_client, city_group ORDER BY month_start) AS status_detail_month_start
+    FROM 
+        tp_status
+    WHERE
         ts_start = last_status_start
 ),
 tps_monthly AS (
-    select distinct
+    SELECT DISTINCT
         month_start,
         city_group,
         CASE
@@ -60,7 +61,8 @@ tps_monthly AS (
                 THEN 'Rented'
         END AS status_month_end,
         sk_client
-    from monthly_tp_status
+    FROM 
+        monthly_tp_status
 ),
 bp_status AS (
     SELECT DISTINCT
@@ -75,29 +77,31 @@ bp_status AS (
         MAX(ts_start) OVER(PARTITION BY sk_buyer, city_group, month_start) AS last_status_start
     FROM
         datamarts.buyer_prospect_status
-        JOIN dim_date AS dd
+    JOIN 
+        public.dim_date AS dd
             ON dd.sk_date BETWEEN sk_start_date
-                                  AND COALESCE(sk_end_date::INT, TO_CHAR(CURRENT_DATE, 'YYYYMMDD')::INT)
+                AND COALESCE(sk_end_date::INT, TO_CHAR(CURRENT_DATE, 'YYYYMMDD')::INT)
     WHERE
         dd.month_start >= DATE_TRUNC('MONTH', CURRENT_DATE - INTERVAL '25 MONTH')
         AND ts_start >= ts_first_activation
 ),
 monthly_bp_status as (
-    select
+    SELECT
         month_start,
         city_group,
         sk_buyer,
         city_group_first_activation,
         status AS status_month_end,
         status_detail AS status_detail_month_end,
-        lag(status) over(partition by sk_buyer, city_group order by month_start) as status_month_start,
-        lag(status_detail) over(partition by sk_buyer, city_group order by month_start) as status_detail_month_start
-    from bp_status
-    where
+        LAG(status) OVER(partition by sk_buyer, city_group ORDER BY month_start) AS status_month_start,
+        LAG(status_detail) OVER(partition by sk_buyer, city_group ORDER BY month_start) AS status_detail_month_start
+    FROM 
+        bp_status
+    WHERE
         ts_start = last_status_start
 ),
 bps_monthly AS (
-    select distinct
+    SELECT DISTINCT
         month_start,
         city_group,
         CASE
@@ -125,7 +129,8 @@ bps_monthly AS (
                 THEN 'Signed CCV'
         END AS status_month_end,
         sk_buyer
-    from monthly_bp_status
+    FROM 
+        monthly_bp_status
 ),
 events AS (
     -------------------------
@@ -183,7 +188,8 @@ events AS (
         COUNT(NULL) AS tof_users_target
     FROM
         datalake_top_of_funnel_demand_prod.user_interactions AS ui
-        LEFT JOIN dim_region AS dr
+    LEFT JOIN 
+        public.dim_region AS dr
             ON ui.sk_region::INT = dr.sk_region
     WHERE
         ui.dt_event >= DATE_TRUNC('MONTH', CURRENT_DATE - INTERVAL '24 MONTH')
@@ -288,10 +294,11 @@ events AS (
         COUNT(NULL) AS tof_users_target
     FROM
         datamarts.sale_performance_marketing_metrics_demand AS pmmd
-        LEFT JOIN bps_monthly AS bps
+    LEFT JOIN 
+        bps_monthly AS bps
             ON bps.sk_buyer = pmmd.sk_buyer
-            AND bps.city_group = pmmd.city_group
-            AND bps.month_start = DATE_TRUNC('MONTH', pmmd.dt_event)
+                AND bps.city_group = pmmd.city_group
+                AND bps.month_start = DATE_TRUNC('MONTH', pmmd.dt_event)
     WHERE
         dt_event >= DATE_TRUNC('MONTH', CURRENT_DATE - INTERVAL '24 MONTH')
     GROUP BY 1,2,3,4,5,6,7,8,9,10
@@ -310,8 +317,8 @@ events AS (
         NULL::TEXT AS mkt_channel,
         NULL::TEXT AS mkt_medium,
         NULL::TEXT AS mkt_source,
-        COUNT(NULL) as marketing_cost,
-        COUNT(NULL) as budget,
+        COUNT(NULL) AS marketing_cost,
+        COUNT(NULL) AS budget,
         COUNT(NULL) AS tof_users,
         COUNT(NULL) AS tof_events,
         COUNT(NULL) AS active_buyer_prospects,
@@ -366,8 +373,8 @@ events AS (
         pmmd.mkt_channel,
         pmmd.mkt_medium,
         pmmd.mkt_source,
-        SUM(pmmd.marketing_cost) as marketing_cost,
-        SUM(pmmd.budget) as budget,
+        SUM(pmmd.marketing_cost) AS marketing_cost,
+        SUM(pmmd.budget) AS budget,
         COUNT(NULL) AS tof_users,
         COUNT(NULL) AS tof_events,
         COUNT(NULL) AS active_buyer_prospects,
@@ -395,10 +402,11 @@ events AS (
         COUNT(NULL) AS tof_users_target
     FROM
         datamarts.performance_marketing_metrics_demand AS pmmd
-        LEFT JOIN tps_monthly AS tps
+    LEFT JOIN 
+        tps_monthly AS tps
             ON tps.sk_client = pmmd.sk_client
-            AND tps.city_group = pmmd.city_group
-            AND tps.month_start = DATE_TRUNC('MONTH', pmmd.dt_event)
+                AND tps.city_group = pmmd.city_group
+                AND tps.month_start = DATE_TRUNC('MONTH', pmmd.dt_event)
     WHERE
         DATE_TRUNC('MONTH', pmmd.dt_event) >= DATE_TRUNC('MONTH', CURRENT_DATE - INTERVAL '24 MONTH')
     GROUP BY 1,2,3,4,5,6,7,8,9,10
@@ -406,7 +414,7 @@ events AS (
     ------------------------
     -- ToF Rental Targets --
     ------------------------
-    select
+    SELECT
         month_start::DATE,
         city_group,
         NULL::TEXT AS status_start,
@@ -417,11 +425,11 @@ events AS (
         CASE mkt_channel
             WHEN 'Paid' THEN 'Paid Acquisition'
             ELSE mkt_channel
-        END as mkt_channel,
+        END AS mkt_channel,
         mkt_medium,
         mkt_source,
-        COUNT(NULL) as marketing_cost,
-        COUNT(NULL) as budget,
+        COUNT(NULL) AS marketing_cost,
+        COUNT(NULL) AS budget,
         COUNT(NULL) AS tof_users,
         COUNT(NULL) AS tof_events,
         COUNT(NULL) AS active_buyer_prospects,

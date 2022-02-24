@@ -188,3 +188,13 @@ pipeline:
         - tenant_prospect_status
         - sale_performance_marketing_metrics_demand
         - performance_marketing_metrics_demand
+  top_of_funnel_volumes_monthly:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/top_of_funnel_volumes_monthly.sql
+      table: top_of_funnel_volumes_monthly
+      depends_on:
+        - tenant_prospect_status
+        - buyer_prospect_status
+        - sale_performance_marketing_metrics_demand
+        - performance_marketing_metrics_demand
