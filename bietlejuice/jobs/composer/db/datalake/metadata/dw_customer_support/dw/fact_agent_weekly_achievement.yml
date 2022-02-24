@@ -1,0 +1,96 @@
+database_name: dw_customer_support
+table_name: fact_agent_weekly_achievement
+columns:
+  sk_achievement:
+    lineage:
+      - dw_customer_support.fact_agent_daily_productivity.sk_agent
+      - dw_customer_support.fact_agent_daily_productivity.sk_date
+      - dw_customer_support.fact_agent_daily_productivity.sk_agent_manager
+  sk_agent:
+    lineage:
+      - dw_customer_support.fact_agent_daily_productivity.sk_agent
+  sk_agent_manager:
+    lineage:
+      - dw_customer_support.fact_agent_daily_productivity.sk_agent_manager
+  sk_department:
+    lineage:
+      - dw_customer_support.fact_agent_daily_productivity.sk_department
+  total_departments:
+    lineage:
+      - dw_customer_support.fact_agent_daily_productivity.sk_department
+  achievement_weighted_score:
+    lineage:
+      - dw_customer_support.fact_agent_daily_productivity.total_csat_satisfied_score
+      - dw_customer_support.fact_agent_daily_productivity.total_tickets_with_csat_score
+      - dw_customer_support.fact_agent_daily_productivity.total_tickets_resolution
+      - dw_customer_support.fact_agent_daily_productivity.total_tickets_answered_resolution
+      - dw_customer_support.fact_agent_daily_productivity.total_tickets
+      - dw_customer_support.fact_agent_daily_productivity.total_crm_tasks_solved
+      - dw_customer_support.fact_agent_daily_productivity.total_minutes_resolution_time
+      - dw_customer_support.fact_agent_daily_productivity.total_tickets
+      - dw_customer_support.dim_ranking_targets.target_frt
+      - dw_customer_support.dim_ranking_targets.target_productivity
+      - dw_customer_support.dim_ranking_targets.target_resolution
+      - dw_customer_support.dim_ranking_targets.target_csat
+  csat_satisfied_target_achievement:
+    lineage:
+      - dw_customer_support.fact_agent_daily_productivity.total_csat_satisfied_score
+      - dw_customer_support.fact_agent_daily_productivity.total_tickets_with_csat_score
+      - dw_customer_support.dim_ranking_targets.target_csat
+  resolution_rate_target_achievement:
+    lineage:
+      - dw_customer_support.fact_agent_daily_productivity.total_tickets_resolution
+      - dw_customer_support.fact_agent_daily_productivity.total_tickets_answered_resolution
+      - dw_customer_support.dim_ranking_targets.target_resolution
+  closed_tickets_target_achievement:
+    lineage:
+      - dw_customer_support.fact_agent_daily_productivity.total_tickets
+      - dw_customer_support.fact_agent_daily_productivity.total_crm_tasks_solved
+      - dw_customer_support.dim_ranking_targets.target_productivity
+  avg_days_resolution_target_achievement:
+    lineage:
+      - dw_customer_support.fact_agent_daily_productivity.total_minutes_resolution_time
+      - dw_customer_support.fact_agent_daily_productivity.total_tickets
+      - dw_customer_support.dim_ranking_targets.target_frt
+  ranking_quartile:
+    lineage:
+      - dw_customer_support.fact_agent_daily_productivity.total_csat_satisfied_score
+      - dw_customer_support.fact_agent_daily_productivity.total_tickets_resolution
+      - dw_customer_support.fact_agent_daily_productivity.total_tickets
+      - dw_customer_support.fact_agent_daily_productivity.total_minutes_resolution_time
+      - dw_customer_support.dim_ranking_targets.target_productivity
+      - dw_customer_support.dim_ranking_targets.target_resolution
+      - dw_customer_support.dim_ranking_targets.target_csat
+      - dw_customer_support.dim_ranking_targets.target_frt
+  ranking_percent_position:
+    lineage:
+      - dw_customer_support.fact_agent_daily_productivity.total_csat_satisfied_score
+      - dw_customer_support.fact_agent_daily_productivity.total_tickets_resolution
+      - dw_customer_support.fact_agent_daily_productivity.total_tickets
+      - dw_customer_support.fact_agent_daily_productivity.total_minutes_resolution_time
+      - dw_customer_support.dim_ranking_targets.target_productivity
+      - dw_customer_support.dim_ranking_targets.target_resolution
+      - dw_customer_support.dim_ranking_targets.target_csat
+      - dw_customer_support.dim_ranking_targets.target_frt
+  ranking_position:
+    lineage:
+      - dw_customer_support.fact_agent_daily_productivity.total_csat_satisfied_score
+      - dw_customer_support.fact_agent_daily_productivity.total_tickets_resolution
+      - dw_customer_support.fact_agent_daily_productivity.total_tickets
+      - dw_customer_support.fact_agent_daily_productivity.total_minutes_resolution_time
+      - dw_customer_support.dim_ranking_targets.target_productivity
+      - dw_customer_support.dim_ranking_targets.target_resolution
+      - dw_customer_support.dim_ranking_targets.target_csat
+      - dw_customer_support.dim_ranking_targets.target_frt
+  dt_week_started:
+    lineage:
+      - dw_customer_support.fact_agent_daily_productivity.dt
+  year:
+    lineage:
+      - dw_customer_support.fact_agent_daily_productivity.dt
+  month:
+    lineage:
+      - dw_customer_support.fact_agent_daily_productivity.dt
+  day:
+    lineage:
+      - dw_customer_support.fact_agent_daily_productivity.dt
