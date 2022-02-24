@@ -1,0 +1,63 @@
+database_name: datalake_hub_services_clean
+table_name: observation_aud
+columns:
+  id:
+    lineage:
+      - datalake_hub_services_raw.observation_aud.id
+  id_visitor:
+    lineage:
+      - datalake_hub_services_raw.observation_aud.visitor_id
+  rev:
+    lineage:
+      - datalake_hub_services_raw.observation_aud.rev
+  rev_type:
+    lineage:
+      - datalake_hub_services_raw.observation_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_hub_services_raw.observation_aud.revend
+  version:
+    lineage:
+      - datalake_hub_services_raw.observation_aud.version
+  creator_email:
+    lineage:
+      - datalake_hub_services_raw.observation_aud.creator_email
+  created_by:
+    lineage:
+      - datalake_hub_services_raw.observation_aud.created_by
+  creator_name:
+    lineage:
+      - datalake_hub_services_raw.observation_aud.creator_name
+  value:
+    lineage:
+      - datalake_hub_services_raw.observation_aud.value
+  mod_value:
+    lineage:
+      - datalake_hub_services_raw.observation_aud.value_mod
+  mod_id_visitor:
+    lineage:
+      - datalake_hub_services_raw.observation_aud.visitor_id_mod
+  mod_created_by:
+    lineage:
+      - datalake_hub_services_raw.observation_aud.created_by_mod
+  mod_creator_name:
+    lineage:
+      - datalake_hub_services_raw.observation_aud.creator_name_mod
+  mod_creator_email:
+    lineage:
+      - datalake_hub_services_raw.observation_aud.creator_email_mod
+  ts_created:
+    lineage:
+      - datalake_hub_services_raw.observation_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_hub_services_raw.observation_aud.updated_at
+  year:
+    lineage:
+      - datalake_hub_services_raw.observation_aud.year
+  month:
+    lineage:
+      - datalake_hub_services_raw.observation_aud.month
+  day:
+    lineage:
+      - datalake_hub_services_raw.observation_aud.day

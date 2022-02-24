@@ -1,0 +1,39 @@
+database_name: datalake_hub_services_clean
+table_name: observation
+columns:
+  id:
+    lineage:
+      - datalake_hub_services_raw.observation.id
+  id_visitor:
+    lineage:
+      - datalake_hub_services_raw.observation.visitor_id
+  version:
+    lineage:
+      - datalake_hub_services_raw.observation.version
+  created_by:
+    lineage:
+      - datalake_hub_services_raw.observation.created_by
+  creator_name:
+    lineage:
+      - datalake_hub_services_raw.observation.creator_name
+  value:
+    lineage:
+      - datalake_hub_services_raw.observation.value
+  creator_email:
+    lineage:
+      - datalake_hub_services_raw.observation.creator_email
+  ts_created:
+    lineage:
+      - datalake_hub_services_raw.observation.created_at
+  ts_updated:
+    lineage:
+      - datalake_hub_services_raw.observation.updated_at
+  year:
+    lineage:
+      - datalake_hub_services_raw.observation.year
+  month:
+    lineage:
+      - datalake_hub_services_raw.observation.month
+  day:
+    lineage:
+      - datalake_hub_services_raw.observation.day

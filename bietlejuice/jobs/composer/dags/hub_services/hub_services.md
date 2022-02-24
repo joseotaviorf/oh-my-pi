@@ -20,8 +20,12 @@ Via **incremental load**:
     - `business_unit_aud`
     - `lead`
     - `lead_aud`
+    - `observation`
+    - `observation_aud`
     - `region`
     - `region_aud`
+    - `responsible`
+    - `responsible_aud`
     - `revinfo`
     - `visitor`
     - `visitor_aud`

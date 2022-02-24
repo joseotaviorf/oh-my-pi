@@ -1,0 +1,87 @@
+database_name: datalake_hub_services_clean
+table_name: responsible_aud
+columns:
+  id:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.id
+  id_lead:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.lead_id
+  id_responsible:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.responsible_id
+  id_distributor:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.distributor_id
+  rev:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.rev
+  rev_type:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.revend
+  responsible_name:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.responsible_name
+  responsible_email:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.responsible_email
+  distributor_email:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.distributor_email
+  distributor_name:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.distributor_name
+  version:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.version
+  is_active:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.active
+  mod_id_lead:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.lead_id_mod
+  mod_is_active:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.active_mod
+  mod_id_distributor:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.distributor_id_mod
+  mod_responsible_name:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.responsible_name_mod
+  mod_id_responsible:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.responsible_id_mod
+  mod_ts_assigned:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.assigned_at_mod
+  mod_ts_unassigned:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.unassigned_at_mod
+  mod_distributor_name:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.distributor_name_mod
+  ts_assigned:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.assigned_at
+  ts_unassigned:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.unassigned_at
+  ts_created:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.updated_at
+  year:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.year
+  month:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.month
+  day:
+    lineage:
+      - datalake_hub_services_raw.responsible_aud.day

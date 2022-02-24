@@ -8,9 +8,17 @@ tables:
     date_filter_column: updated_at
   - table_name: lead_aud
     date_filter_column: created_at
+  - table_name: observation
+    date_filter_column: updated_at
+  - table_name: observation_aud
+    date_filter_column: created_at
   - table_name: region
     date_filter_column: updated_at
   - table_name: region_aud
+    date_filter_column: created_at
+  - table_name: responsible
+    date_filter_column: updated_at
+  - table_name: responsible_aud
     date_filter_column: created_at
   - table_name: revinfo
     clean_table_name: rev_info
