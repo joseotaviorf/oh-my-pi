@@ -367,6 +367,22 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.wololo:create-clean-conversion-external-table
   - bietlejuice.wololo:create-clean-prospect-external-table
 
+bietlejuice.dw_datamarts_growth_dep_manual_costs:
+  - bietlejuice.enrich_marketing_manual_daily_costs:create-enrich-daily-costs-external-table
+  # dependencies to avoid same datamarts updating at the same time
+  - bietlejuice.dw_datamarts_growth_cross:create-affiliate-acquisition-metrics-in-datalake
+  - bietlejuice.dw_datamarts_growth_cross:create-indicaai-costs-in-datalake
+  - bietlejuice.dw_datamarts_growth_cross:create-marketing-allocated-costs-in-datalake
+  - bietlejuice.dw_datamarts_growth_cross:create-marketing-campaigns-costs-and-volumes-in-datalake
+  - bietlejuice.dw_datamarts_growth_cross:create-marketing-demand-supply-branding-costs-in-datalake
+  - bietlejuice.dw_datamarts_growth_cross:create-performance-marketing-metrics-demand-in-datalake
+  - bietlejuice.dw_datamarts_growth:create-performance-marketing-metrics-supply-in-datalake
+  - bietlejuice.dw_datamarts_growth_cross:create-rental-performance-marketing-metrics-supply-coincident-in-datalake
+  - bietlejuice.dw_datamarts_growth_cross:create-sale-performance-marketing-metrics-demand-in-datalake
+  - bietlejuice.dw_datamarts_growth_cross:create-sale-performance-marketing-metrics-supply-coincident-in-datalake
+  - bietlejuice.dw_datamarts_growth_cross:create-unique-performance-marketing-metrics-supply-coincident-in-datalake
+  - bietlejuice.dw_datamarts_growth:create-sale-performance-marketing-metrics-supply-cohort-in-datalake
+
 bietlejuice.dw_datamarts_support_and_service:
   - bietlejuice.amplitude:update-clean-events-daily-partition-athena
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift

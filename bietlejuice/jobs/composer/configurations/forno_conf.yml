@@ -11,6 +11,8 @@ dags_out_of_pattern:
         "dw_contract",
         "dw_datamarts_cross",
         "dw_datamarts_for_rent",
+        "dw_datamarts_growth",
+        "dw_datamarts_growth_cross",
         "dw_house",
         "dw_lead",
         "dw_listing",

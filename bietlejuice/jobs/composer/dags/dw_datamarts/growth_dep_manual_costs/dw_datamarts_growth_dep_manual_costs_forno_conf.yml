@@ -1,0 +1,79 @@
+# Merge Keys are available only in Yaml 1.1.
+redshift_template:
+  dw: &redshift_anchor
+    schema: datamarts
+    runs_on: redshift
+athena_template:
+  dw: &athena_anchor
+    schema: datamarts
+    runs_on: athena
+pipeline:
+  ##<KEEP THIS COMMENTED AS A TEMPLATE>
+  # <task-name-like-attribution-conversion-paths>:
+  #   dw:
+  #     sql_file: <query-file E.g: dw/queries/datamarts/offer_attribution_conversion_paths_demand.sql>
+  #     table: <targe-table-name>
+  #     schema: <target-schema-name> # TODO this will always be `datamart` (for both datalake and dw). This var is not used anymore
+  #     runs_on: <backend-to-run-the-query> E.g: redshift or athena
+  affiliate_acquisition_metrics:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/affiliate_acquisition_metrics.sql
+      table: affiliate_acquisition_metrics
+  indicaai_costs:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/indicaai_costs.sql
+      table: indicaai_costs
+  marketing_allocated_costs:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/marketing_allocated_costs.sql
+      table: marketing_allocated_costs
+      depends_on:
+        - marketing_campaigns_costs_and_volumes
+  marketing_campaigns_costs_and_volumes:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/marketing_campaigns_costs_and_volumes.sql
+      table: marketing_campaigns_costs_and_volumes
+  marketing_demand_supply_branding_costs:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/marketing_demand_supply_branding_costs.sql
+      table: marketing_demand_supply_branding_costs
+  performance_marketing_metrics_demand:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/performance_marketing_metrics_demand.sql
+      table: performance_marketing_metrics_demand
+  performance_marketing_metrics_supply:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth/performance_marketing_metrics_supply.sql
+      table: performance_marketing_metrics_supply
+  rental_performance_marketing_metrics_supply_coincident:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/rental_performance_marketing_metrics_supply_coincident.sql
+      table: rental_performance_marketing_metrics_supply_coincident
+  sale_performance_marketing_metrics_demand:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/sale_performance_marketing_metrics_demand.sql
+      table: sale_performance_marketing_metrics_demand
+  sale_performance_marketing_metrics_supply_coincident:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/sale_performance_marketing_metrics_supply_coincident.sql
+      table: sale_performance_marketing_metrics_supply_coincident
+  unique_performance_marketing_metrics_supply_coincident:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/unique_performance_marketing_metrics_supply_coincident.sql
+      table: unique_performance_marketing_metrics_supply_coincident
+  sale_performance_marketing_metrics_supply_cohort:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth/sale_performance_marketing_metrics_supply_cohort.sql
+      table: sale_performance_marketing_metrics_supply_cohort
