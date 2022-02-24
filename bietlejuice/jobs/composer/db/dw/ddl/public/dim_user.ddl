@@ -57,6 +57,7 @@ create table public.dim_user (
   visits_booked integer,
   visits_realized integer,
   visits_expected_to_happen integer,
+  houses_owned integer,
   data_nascimento date,
   first_visit_date timestamp,
   first_visit_confirmed_date timestamp,

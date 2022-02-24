@@ -172,6 +172,9 @@ columns:
   visits_expected_to_happen:
     lineage:
       - datalake_booking.booking.visit_fup
+  houses_owned:
+    lineage:
+      - datalake_pro_owners.owner_houses_quantity_history.houses
   data_nascimento:
     lineage:
       - datalake_ebdb_user.user.dt_birth

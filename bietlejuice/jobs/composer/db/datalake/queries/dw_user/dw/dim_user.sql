@@ -34,6 +34,14 @@ booking_counts AS (
         CAST(SUM(if(visit_fup IS NOT NULL, 1, 0)) AS INTEGER) AS visits_expected_to_happen
     FROM datalake_booking.booking
     GROUP BY id_visitor
+ ),
+ house_counts AS (
+    SELECT
+        id_owner,
+        houses
+    FROM datalake_pro_owners.owner_houses_quantity_history
+    WHERE
+        ts_house_number_ended IS NULL
  )
 SELECT -- [ODS] This table was migrated FROM ODS flow and needs a future refactoring to remove castings and renamings
     u.id AS sk_user,
@@ -93,6 +101,7 @@ SELECT -- [ODS] This table was migrated FROM ODS flow and needs a future refacto
     b_counts.visits_booked,
     b_counts.visits_realized,
     b_counts.visits_expected_to_happen,
+    CAST(hc.houses AS INTEGER) AS houses_owned,
     u.dt_birth AS data_nascimento,
     CAST(user_dates.dt_first_visit AS TIMESTAMP) AS first_visit_date,
     CAST(user_dates.dt_first_visit_confirmed AS TIMESTAMP) AS first_visit_confirmed_date,
@@ -130,3 +139,5 @@ LEFT JOIN datalake_ebdb_clean.sales_rep sr
     on sr.id = u.id_sales_rep
 LEFT JOIN datalake_ebdb_user.affiliate_data ad
     on ad.id = u.id_affiliates
+LEFT JOIN house_counts hc
+    on hc.id_owner = u.id
