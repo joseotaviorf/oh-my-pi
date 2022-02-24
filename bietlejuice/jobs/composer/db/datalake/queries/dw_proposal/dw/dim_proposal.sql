@@ -24,6 +24,22 @@ sorting_hat_proposal AS (
   FROM datalake_sorting_hat_clean.proposal p
 	LEFT JOIN datalake_sorting_hat_clean.proposal_version pv
 		ON p.id = pv.id_proposal
+),
+dti AS (
+    SELECT
+        p.id AS id_proposal,
+        NULLIF(SUM(p2.monthly_income),0) AS income,
+        MAX(p.rent_value + COALESCE(p.condo_value,0) + COALESCE(p.iptu_value,0) + COALESCE(p.home_insurance_value,0)) AS package,
+        CASE 
+            WHEN SUM(p2.monthly_income) != 0 THEN CAST(MAX(p.rent_value + COALESCE(p.condo_value,0) + COALESCE(p.iptu_value,0) + COALESCE(p.home_insurance_value,0))/SUM(p2.monthly_income) AS DECIMAL(9,2))
+            ELSE NULL 
+        END AS dti
+    FROM
+        datalake_sorting_hat_clean.proposal p 
+    LEFT JOIN 
+        datalake_sorting_hat_clean.proponent p2 
+            ON p.id = p2.id_proposal 
+    GROUP BY 1
 )
 SELECT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
   CAST(p.id AS INTEGER) AS sk_proposal,
@@ -35,6 +51,9 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   p.rejection_reason,
   ce.proposal_last_result AS result_credit_evaluation,
   NULLIF(sh.status, '') AS status_sortinghat,
+  d.dti,
+  CAST(d.income AS INTEGER) AS monthly_income_declared,
+  CAST(d.package AS INTEGER) AS package_amount,
   p.rent_proposal AS renting_proposal_value,
   CAST(p.tenant_doc_sent_count AS INTEGER) AS tenant_document_sent_count,
   CAST(ce.proposal_number_evaluations AS INTEGER) AS credit_evaluation_count,
@@ -83,3 +102,6 @@ LEFT JOIN credit_evaluation ce
 LEFT JOIN sorting_hat_proposal sh
   ON sh.proposal_version_row_number = 1
      AND sh.id = p.id
+LEFT JOIN 
+  dti AS d
+    ON d.id_proposal = p.id

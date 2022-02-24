@@ -637,6 +637,7 @@ bietlejuice.dw_offer:
 bietlejuice.dw_proposal:
   - bietlejuice.enrich_proposal:load-enrich-proposal
   - bietlejuice.enrich_docx:load-enrich-credit-evaluation
+  - bietlejuice.sorting_hat:load-clean-proponent
   - bietlejuice.sorting_hat:load-clean-proposal
   - bietlejuice.sorting_hat:load-clean-proposal-version
 
