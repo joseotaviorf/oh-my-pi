@@ -5,13 +5,11 @@ import yaml
 from airflow.models import DAG
 from airflow.operators.sensors import S3KeySensor
 from qa_python_utils import QuintoAndarLogger
-from qa_python_utils.aws.athena import AthenaClient
 
 from bietlejuice.jobs.base.base_dag import BaseDAG
 from bietlejuice.jobs.base.enum_db import EnumDB
 from bietlejuice.jobs.base.new_base_etl import BaseETL
 from bietlejuice.jobs.dags import DW_QUERIES_DIR
-from bietlejuice.jobs.dags import DATALAKE_QUERIES_DIR
 from bietlejuice.jobs.dags.util import environment as env
 
 # env vars
@@ -45,49 +43,6 @@ def create_datamart_from_dw(table_name, **kwargs):
         encoding='utf-8',
         commit=True
     )
-
-
-def create_datamart_from_athena(table_name, **kwargs):
-    data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
-    data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
-    athena = AthenaClient(s3_bucket, data_acc_aws_access_key_id, data_acc_aws_secret_access_key)
-    query = BaseETL.get_query_from_file_name('{}/{}/{}.sql'.format(DATALAKE_QUERIES_DIR, DATAMARTS_SCHEMA, table_name))
-
-    logger.info('m=create_datamart_from_athena, table_name={}, msg=Reading data'.format(table_name))
-    df = athena.execute_query_and_return_dataframe(sql=query)
-
-    if df.empty:
-        raise ValueError('table_name={}, msg=Query returned zero rows'.format(table_name))
-    if 'ts_load' not in df.columns.values:
-        df['ts_load'] = datetime.now()
-
-    logger.info('m=create_datamart_from_athena, table_name={}, msg=Dropping table'.format(table_name))
-    BaseETL.execute_command(
-        command='drop table if exists {}.{}'.format(DATAMARTS_SCHEMA, table_name),
-        db_enum=EnumDB.BI_DW,
-        encoding='utf-8',
-        commit=True
-    )
-
-    logger.info('m=create_datamart_from_athena, table_name={}, msg=Creating table in datamart'.format(table_name))
-    BaseETL.create_table_from_dataframe(
-        enum_db=EnumDB.BI_DW,
-        df=df,
-        table_name='{}.{}'.format(DATAMARTS_SCHEMA, table_name),
-        encoding='utf-8',
-        commit=True
-    )
-
-    logger.info('m=create_datamart_from_athena, table_name={}, msg=Writing data to datamart'.format(table_name))
-    BaseETL.dataframe_to_db(
-        enum_db=EnumDB.BI_DW,
-        df=df,
-        table_name='{}.{}'.format(DATAMARTS_SCHEMA, table_name),
-        encoding='utf-8',
-        append=False,
-        commit=True
-    )
-
 
 def create_task(dag, python_callable, db, table_name, pool):
     BaseDAG.build_python_operator(
@@ -163,12 +118,6 @@ operators = [
         'python_callable': create_datamart_from_dw,
         'db': 'dw',
         'pool': 'redshift_connections'
-    },
-    {
-        'queries_dir': DATALAKE_QUERIES_DIR,
-        'python_callable': create_datamart_from_athena,
-        'db': 'athena',
-        'pool': 'athena_connections'
     }
 ]
 
