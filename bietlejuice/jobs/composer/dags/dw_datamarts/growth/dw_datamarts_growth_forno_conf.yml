@@ -1,3 +1,4 @@
+---
 redshift_template:
   dw: &redshift_anchor
     schema: datamarts
