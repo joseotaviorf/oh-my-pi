@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS customer_support.fact_agent_weekly_achievement (
     sk_department VARCHAR,
     total_departments BIGINT,
     achievement_weighted_score FLOAT,
-    ranking_quartile FLOAT,
+    ranking_quartile VARCHAR,
     ranking_percent_position FLOAT,
     ranking_position INTEGER,
     closed_tickets_target_achievement FLOAT,
