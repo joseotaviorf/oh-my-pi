@@ -1,5 +1,5 @@
 SELECT
-    city, 
+    city_group, 
     model,
     adm_fee_new_rental,
     adm_fee_ongoing_rental,
@@ -12,6 +12,8 @@ SELECT
     CAST(ongoing_rentals AS FLOAT) AS ongoing_rentals,
     CAST(fy AS INT) As year,
     CAST(quarter AS INT) AS quarter,
-    CAST(month AS INT) AS month
+    CAST(month AS INT) AS month,
+    CAST(week AS INT) AS week,
+    CAST(day AS INT) AS day
 FROM
     datalake_gsheets_raw.planning_rental_financial_targets

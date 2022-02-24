@@ -1,9 +1,9 @@
 database_name: datalake_gsheets_clean
 table_name: planning_rental_financial_targets
 columns:
-  city:
+  city_group:
     lineage:
-      - datalake_gsheets_raw.planning_rental_financial_targets.city
+      - datalake_gsheets_raw.planning_rental_financial_targets.city_group
   model:
     lineage:
       - datalake_gsheets_raw.planning_rental_financial_targets.model
@@ -43,3 +43,9 @@ columns:
   month:
     lineage:
       - datalake_gsheets_raw.planning_rental_financial_targets.month
+  week:
+    lineage:
+      - datalake_gsheets_raw.planning_rental_financial_targets.week
+  day:
+    lineage:
+      - datalake_gsheets_raw.planning_rental_financial_targets.day
