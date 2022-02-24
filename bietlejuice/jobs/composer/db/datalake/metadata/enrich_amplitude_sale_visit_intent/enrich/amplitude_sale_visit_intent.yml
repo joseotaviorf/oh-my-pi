@@ -14,3 +14,12 @@ columns:
   ts_visit_intent:
     lineage:
       - datalake_amplitude_clean.events.ts_event
+  year:
+    lineage:
+      - datalake_amplitude_clean.events.year
+  month:
+    lineage:
+      - datalake_amplitude_clean.events.month
+  day:
+    lineage:
+      - datalake_amplitude_clean.events.day
