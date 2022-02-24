@@ -29,8 +29,9 @@ columns:
   author_name:
     lineage:
       - datalake_jira_clean.issues.change_log
-  is_author_active:
+  minutes_in_origin_queue:
     lineage:
+      - datalake_jira.issues.ts_created
       - datalake_jira_clean.issues.change_log
   ts_updated:
     lineage:
