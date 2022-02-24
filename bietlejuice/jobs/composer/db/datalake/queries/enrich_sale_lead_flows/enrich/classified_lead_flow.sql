@@ -48,7 +48,8 @@ clean_leads AS (
     FROM
         leads AS l
     WHERE
-        RIGHT(user_phone_number, 7) 
+        user_phone_number IS NULL
+        OR RIGHT(user_phone_number, 7) 
             NOT IN (
                 '1111111',
                 '9999999',
