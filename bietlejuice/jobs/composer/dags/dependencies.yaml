@@ -327,6 +327,16 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.gsheets:create-clean-offline-and-branding-marketing-costs-external-table
   - bietlejuice.gsheets:create-clean-promotional-bonus-cluster-targets-external-table
   - bietlejuice.gsheets:create-clean-promotional-bonus-user-cluster-targets-external-table
+  # plaquinhas_users_demand
+  - bietlejuice.amplitude:create-clean-staging-events
+  - bietlejuice.dw_call:load-call-dim-call-into-redshift
+  - bietlejuice.dw_quinto_messenger:load-quinto-messenger-dim-chat-into-redshift
+  - bietlejuice.dw_quinto_messenger:load-quinto-messenger-dim-task-into-redshift
+  - bietlejuice.dw_quinto_messenger:load-quinto-messenger-fact-tasks-into-redshift
+  - bietlejuice.dw_user:load-public-dim-user-into-redshift
+  - bietlejuice.gsheets:create-clean-plaquinhas-demand-targets-external-table
+  - bietlejuice.gsheets:create-clean-users-cx-plaquinhas-external-table
+
   - bietlejuice.gsheets:create-clean-rental-tof-daily-targets-external-table
   - bietlejuice.gsheets:create-clean-rental-tof-monthly-targets-external-table
   - bietlejuice.gsheets:create-clean-rental-tof-weekly-targets-external-table
