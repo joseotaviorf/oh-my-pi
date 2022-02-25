@@ -6,8 +6,8 @@ WITH phone_users_number AS (
         call.dim_call dc
     WHERE
         dc.to_phone_number in ('+5511933058701', '+5531933007908', '+5540202507')
-    GROUP BY 1,2
-),
+    GROUP BY 1,2 
+), 
 chat_users_number AS (
     SELECT
         dc.customer_phone,
@@ -32,7 +32,7 @@ all_users AS (
     	NULL::BOOL AS is_phone_user,
     	NULL::BOOL AS is_chat_user,
     	CAST(e.ts_event AS DATE) AS dt_interaction
-    FROM
+    FROM 
     	datalake_amplitude_clean_prod.events e
     WHERE
     	e.id_app = 170698
@@ -65,7 +65,7 @@ all_users AS (
     	true AS is_chat_user,
     	dt_interaction
     FROM
-    	public.dim_user
+    	public.dim_user 
     JOIN chat_users_number
         ON chat_users_number.customer_phone = public.dim_user.telefone_principal
 	UNION ALL
@@ -77,20 +77,20 @@ all_users AS (
     	NULL::BOOL AS is_qr_code_user,
     	CASE WHEN canal = 'Telefone' THEN true ELSE NULL END AS is_phone_user,
     	CASE WHEN canal = 'Chat' THEN true ELSE NULL END AS is_chat_user,
-    	data_hora::DATE AS dt_interaction
+    	data_hora::DATE AS dt_interaction 
     FROM
-    	datalake_gsheets_clean_prod.users_cx_plaquinhas
+    	datalake_raw.gsheets_users_cx_plaquinhas
 ),
 plaquinhas_users AS (
-    SELECT
+    SELECT 
         sk_user AS sk_client,
         BOOL_OR(is_qr_code_user) AS is_qr_code_user,
         BOOL_OR(is_phone_user) AS is_phone_user,
         BOOL_OR(is_chat_user) AS is_chat_user,
         min(dt_interaction::DATE) AS dt_first_interaction,
-        max(dt_interaction::DATE) AS dt_last_interaction
+        max(dt_interaction::DATE) AS dt_last_interaction    
     FROM
-        all_users
+        all_users 
     WHERE
         sk_user > 0
     GROUP BY 1
@@ -132,9 +132,9 @@ metrics_base AS (
         dt_credit_analysis_approved,
         dt_contract_signed,
         NULL::FLOAT AS visits_booked_target
-    FROM
+    FROM 
         plaquinhas_users u
-    LEFT JOIN datamarts.performance_marketing_metrics_demand pmmd
+    LEFT JOIN datamarts.performance_marketing_metrics_demand pmmd 
         ON u.sk_client = pmmd.sk_client AND pmmd.dt_event BETWEEN u.dt_first_interaction AND dateadd(day, 90, u.dt_last_interaction)
 ),
 targets AS (
@@ -174,18 +174,18 @@ targets AS (
         NULL::DATE AS dt_credit_analysis_approved,
         NULL::DATE AS dt_contract_signed,
         tgt.visits_booked_target
-    FROM
+    FROM 
         datalake_gsheets_clean_prod.plaquinhas_demand_targets tgt
 )
 -------------------------------
 -- UNION results and targets --
 -------------------------------
-SELECT
+SELECT 
     mb.*
-FROM
+FROM 
     metrics_base mb
 UNION ALL
-SELECT
+SELECT 
     t.*
-FROM
+FROM 
     targets t
