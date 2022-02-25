@@ -14,6 +14,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 We incrementally load the following table into the Datalake Reverse bucket, for backup pourposes:
 
 - `lost_iq_rejected`
+- `lost_iq_visitas`
 
 This pipeline also POST data to the Tracksale API (endpoint: `dispatches`) aiming to schedule NPS survey dispatches.
 
