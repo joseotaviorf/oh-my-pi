@@ -15,16 +15,16 @@ pipeline:
   #     table: <targe-table-name>
   #     schema: <target-schema-name> # TODO this will always be `datamart` (for both datalake and dw). This var is not used anymore
   #     runs_on: <backend-to-run-the-query> E.g: redshift or athena
-  affiliate_acquisition_metrics:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth_cross/affiliate_acquisition_metrics.sql
-      table: affiliate_acquisition_metrics
-  indicaai_costs:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth_cross/indicaai_costs.sql
-      table: indicaai_costs
+  # affiliate_acquisition_metrics:
+  #   dw:
+  #     <<: *redshift_anchor
+  #     sql_file: dw/queries/datamarts/growth_cross/affiliate_acquisition_metrics.sql
+  #     table: affiliate_acquisition_metrics
+  # indicaai_costs:
+  #   dw:
+  #     <<: *redshift_anchor
+  #     sql_file: dw/queries/datamarts/growth_cross/indicaai_costs.sql
+  #     table: indicaai_costs
   marketing_allocated_costs:
     dw:
       <<: *redshift_anchor
@@ -32,11 +32,11 @@ pipeline:
       table: marketing_allocated_costs
       depends_on:
         - marketing_campaigns_costs_and_volumes
-  marketing_campaigns_costs_and_volumes:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth_cross/marketing_campaigns_costs_and_volumes.sql
-      table: marketing_campaigns_costs_and_volumes
+  # marketing_campaigns_costs_and_volumes:
+  #   dw:
+  #     <<: *redshift_anchor
+  #     sql_file: dw/queries/datamarts/growth_cross/marketing_campaigns_costs_and_volumes.sql
+  #     table: marketing_campaigns_costs_and_volumes
   marketing_demand_supply_branding_costs:
     dw:
       <<: *redshift_anchor
