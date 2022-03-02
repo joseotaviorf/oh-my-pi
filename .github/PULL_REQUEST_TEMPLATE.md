@@ -14,7 +14,17 @@ _How about some cool checkboxes?_
 - [ ] _..._
 
 ### How everything was tested?
-_Is there any alternative flow in the testing process that you want to describe?_
+_Please, describe the tests that you ran to verify your changes. Also, list any relevant details of your test configuration._
+
+_If changes are related to table modifications, a simple **count**, **select** or statistics are suffice;_
+
+_If a new DAG is being created, a successful run image is a good proof to be displayed._
+
+_Else, make use of your creativity in order to add the necessary information on how well this request has been tested._ 
+
+#### Screenshots
+_Much appreciated images detailing the output of the requested change._
+
 
 ### !Attention Points!
 _Replace me for what the reviewer will need to pay attention to in the PR or just to cover any concerns after the merge._
