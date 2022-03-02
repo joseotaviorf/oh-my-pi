@@ -226,7 +226,7 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.casa_mineira_portal:create-clean-real-estate-agency-budget-external-table
   - bietlejuice.casa_mineira_portal:create-clean-real-estate-agency-external-table
   - bietlejuice.casa_mineira_portal:create-clean-uf-external-table
-  #unique_owners, plaquinhas_houses, sale_performance_marketing_metrics_supply_cohort
+  # unique_owners, plaquinhas_houses, sale_performance_marketing_metrics_supply_cohort
   - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
   # market_share_by_sk_region
   - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
@@ -268,6 +268,17 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.gsheets:create-clean-taxonomy-portal-casa-mineira-external-table
 
 bietlejuice.dw_datamarts_growth_cross:
+  # affiliate_acquisition_metrics
+  - bietlejuice.gsheets:create-clean-affiliates-acquisition-targets-external-table
+  # affiliate_acquisition_metrics, rent_flow_interactions
+  - bietlejuice.dw_datamarts_cross:create-lead-listing-flows-in-datalake
+  - bietlejuice.dw_user_affiliate:load-public-dim-user-affiliate-into-redshift
+  # tenant_prospect_status
+  - bietlejuice.dw_contract:load-public-dim-contract-into-redshift
+  - bietlejuice.ebdb:create-dw-quintoandar-fact-contract-people-in-datalake
+  - bietlejuice.dw_region:load-public-dim-region-into-redshift
+  # rent_flow_interactions
+  - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
   - bietlejuice.casa_mineira_crm:create-clean-house-external-table
   - bietlejuice.dw_affiliate_costs:load-quintoandar-dim-affiliate-cost-into-redshift
@@ -289,6 +300,7 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.dw_listing:load-public-fact-house-listing-status-into-redshift
   - bietlejuice.dw_listing_jobs:load-public-dim-photo-job-into-redshift
   - bietlejuice.dw_offer:load-public-dim-offer-into-redshift
+  - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
   - bietlejuice.dw_proposal:load-public-dim-proposal-into-redshift
   - bietlejuice.dw_quinto_messenger:load-quinto-messenger-dim-chat-into-redshift
   - bietlejuice.dw_quinto_messenger:load-quinto-messenger-dim-task-into-redshift
@@ -370,7 +382,7 @@ bietlejuice.dw_datamarts_growth_cross:
 bietlejuice.dw_datamarts_growth_dep_manual_costs:
   - bietlejuice.enrich_marketing_manual_daily_costs:create-enrich-daily-costs-external-table
   # dependencies to avoid same datamarts updating at the same time
-  # - bietlejuice.dw_datamarts_growth_cross:create-affiliate-acquisition-metrics-in-datalake
+  - bietlejuice.dw_datamarts_growth_cross:create-affiliate-acquisition-metrics-in-datalake
   # - bietlejuice.dw_datamarts_growth_cross:create-indicaai-costs-in-datalake
   # - bietlejuice.dw_datamarts_growth_cross:create-marketing-allocated-costs-in-datalake
   # - bietlejuice.dw_datamarts_growth_cross:create-marketing-campaigns-costs-and-volumes-in-datalake

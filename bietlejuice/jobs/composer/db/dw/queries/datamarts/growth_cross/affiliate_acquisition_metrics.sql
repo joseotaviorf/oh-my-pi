@@ -374,7 +374,7 @@ UNION ALL
         SUM(tgt.target_oau::FLOAT) AS target_oau,
         SUM(tgt.new_target_nau::FLOAT) AS new_target_nau 
     FROM
-        datalake_raw.gsheets_marketing_affiliates_acquisition_targets tgt
+        datalake_gsheets_clean_prod.affiliates_acquisition_targets tgt
     GROUP BY 1,2,3,4,5,6,7,8,9
 )
 SELECT
