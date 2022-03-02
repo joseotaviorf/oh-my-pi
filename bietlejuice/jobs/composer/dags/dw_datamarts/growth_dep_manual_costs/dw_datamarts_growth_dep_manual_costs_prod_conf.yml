@@ -30,8 +30,8 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/growth_cross/marketing_allocated_costs.sql
       table: marketing_allocated_costs
-      depends_on:
-        - marketing_campaigns_costs_and_volumes
+      # depends_on:
+      #   - marketing_campaigns_costs_and_volumes
   # marketing_campaigns_costs_and_volumes:
   #   dw:
   #     <<: *redshift_anchor
