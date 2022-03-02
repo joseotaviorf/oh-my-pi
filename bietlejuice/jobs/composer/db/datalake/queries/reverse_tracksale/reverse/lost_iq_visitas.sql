@@ -161,7 +161,8 @@ SELECT
 	u.sk_user AS id_user,
 	'lost' AS campaign_type,
 	'booking' AS driver_type,
-	CAST(v.sk_booking AS CHAR(7)) AS id_driver
+	CAST(v.sk_booking AS CHAR(7)) AS id_driver,
+    NOW() AS ts_load
 FROM visitors v 
 INNER JOIN dw_public.dim_user u 
 	ON u.sk_user = v.sk_client
@@ -176,7 +177,8 @@ SELECT
 	u.sk_user AS id_user,
 	'lost' AS campaign_type,
 	'talk to agent' AS driver_type,
-	vt.sk_tta AS id_driver
+	vt.sk_tta AS id_driver,
+    NOW() AS ts_load
 FROM visitors_tta vt 
 INNER JOIN dw_public.dim_user u 
 	ON u.sk_user = vt.sk_client
