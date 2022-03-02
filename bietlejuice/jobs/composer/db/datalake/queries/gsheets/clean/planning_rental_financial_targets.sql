@@ -13,7 +13,7 @@ SELECT
     CAST(year AS INT) As year,
     CAST(quarter AS INT) AS quarter,
     CAST(month AS INT) AS month,
-    CAST(week AS INT) AS week,
-    CAST(day AS INT) AS day
+    TO_DATE(day, 'MM/dd/yyyy') AS dt_day,
+    TO_DATE(week, 'MM/dd/yyyy') AS dt_week
 FROM
     datalake_gsheets_raw.planning_rental_financial_targets

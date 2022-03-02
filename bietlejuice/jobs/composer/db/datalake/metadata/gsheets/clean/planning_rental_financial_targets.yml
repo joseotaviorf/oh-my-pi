@@ -1,3 +1,4 @@
+---
 database_name: datalake_gsheets_clean
 table_name: planning_rental_financial_targets
 columns:
@@ -43,9 +44,10 @@ columns:
   month:
     lineage:
       - datalake_gsheets_raw.planning_rental_financial_targets.month
-  week:
-    lineage:
-      - datalake_gsheets_raw.planning_rental_financial_targets.week
-  day:
+  dt_day:
     lineage:
       - datalake_gsheets_raw.planning_rental_financial_targets.day
+  dt_week:
+    lineage:
+      - datalake_gsheets_raw.planning_rental_financial_targets.week
+
