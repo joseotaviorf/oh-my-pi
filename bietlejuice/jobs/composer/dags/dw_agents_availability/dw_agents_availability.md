@@ -2,7 +2,7 @@
 
 ### Purpose
 
-This DAG creates tables that summarize the agent availability. For while, there are two tables - fact_inspector_hourly_allocations that has information about agents slots with one hour as grain, and fact_inspector_daily_allocations with day as grain.
+This DAG creates tables that summarize the agent availability. For while, there are six tables that has information about agents and photographer slots, with one hour as grain and a day as grain.
 
 <details>
   <summary><strong> > DAG details (click to expand)</strong></summary>
@@ -16,6 +16,10 @@ This pipeline produces the following output tables:
 
 - `agents_availability.fact_inspector_daily_allocations`
 - `agents_availability.fact_inspector_hourly_allocations`
+- `agent.fact_agent_daily_allocations`
+- `agent.fact_agent_hourly_allocations`
+- `agent.fact_photographer_daily_allocations`
+- `agent.fact_photographer_hourly_allocations`
 
 ### Responsible Data Teams
 

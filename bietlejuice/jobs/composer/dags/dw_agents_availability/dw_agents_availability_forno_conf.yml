@@ -9,3 +9,20 @@ incremental_load_parameters:
 inner_dependencies:
   fact_inspector_daily_allocations:
     - fact_inspector_hourly_allocations
+  fact_agent_daily_allocations:
+    - fact_agent_hourly_allocations
+  fact_photographer_daily_allocations:
+    - fact_photographer_hourly_allocations
+tables:
+  - table_name: fact_inspector_hourly_allocations
+    schema: agents_availability
+  - table_name: fact_inspector_daily_allocations
+    schema: agents_availability
+  - table_name: fact_agent_hourly_allocations
+    schema: agent
+  - table_name: fact_agent_daily_allocations
+    schema: agent
+  - table_name: fact_photographer_hourly_allocations
+    schema: agent
+  - table_name: fact_photographer_daily_allocations
+    schema: agent

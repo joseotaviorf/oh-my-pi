@@ -3,6 +3,7 @@ from datetime import datetime
 
 import pendulum
 from airflow.models import DAG, Variable
+from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -10,7 +11,6 @@ from airflow.operators.quintoandar_databricks import (
 
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.jobs.composer.base.airflow.helpers import TaskFlowHelper
-from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.jobs.composer.dags.base.dw_task_group import DWTaskGroup
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
@@ -19,7 +19,6 @@ from bietlejuice.jobs.composer.services.configuration_service import (
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 2, 20, 0, 0, 0, tzinfo=LOCAL_TZ)
 
-DW_SCHEMA = "agents_availability"
 CONTEXT = "agents_availability"
 DAG_NAME = f"dw_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
@@ -71,26 +70,37 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
-task_group = DWTaskGroup(
-    dag=dag,
-    env=ENV,
-    dw_bucket=dw_bucket,
-    dw_schema=DW_SCHEMA,
-    relative_query_path=DAG_NAME,
-    spark_jobs_path=SPARK_JOBS_PATH,
-)
+tables = config_service.get_config("tables")
 
-dw_staging_task_group = task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.DW_STAGING, is_incremental=True, partitions=partition_cols
-)
+dw_staging_task_group = {}
+dw_task_group = {}
+for table in tables:
+    table_name = table["table_name"]
+    dw_schema = table.get("schema")
 
-dw_task_group = task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.DW,
-    spectrum_iam_role=spectrum_iam_role,
-    is_incremental=True,
-    partitions=partition_cols,
-    extra_query_template_params=dw_query_filters,
-)
+    task_group = DWTaskGroup(
+        dag=dag,
+        env=ENV,
+        dw_bucket=dw_bucket,
+        dw_schema=dw_schema,
+        relative_query_path=DAG_NAME,
+        spark_jobs_path=SPARK_JOBS_PATH,
+    )
+
+    dw_staging_task_group[table_name] = task_group.build_dw_staging_task_group(
+        table_name=table_name,
+        is_incremental=True,
+        partitions=partition_cols,
+        extra_query_template_params=dw_query_filters,
+    )
+
+    dw_task_group[table_name] = task_group.build_dw_task_group(
+        table_name=table_name,
+        spectrum_iam_role=spectrum_iam_role,
+        is_incremental=True,
+        partitions=partition_cols,
+        extra_query_template_params=dw_query_filters,
+    )
 
 dw_task_group_boundaries = {}
 for table in dw_task_group:
@@ -109,14 +119,13 @@ for table in dw_task_group:
     dag_inner_dependencies=inner_dependencies,
 )
 
-create_cluster_task.set_downstream(
+
+chain(
+    create_cluster_task,
     DWTaskGroup.all_first_tasks(task_groups_boundaries_without_inner_dependencies)
-    + DWTaskGroup.first_tasks(inner_dependencies_task_groups_boundaries)
+    + DWTaskGroup.first_tasks(inner_dependencies_task_groups_boundaries),
 )
 
 TaskFlowHelper.chain_task_groups_via_common_table(dw_staging_task_group, dw_task_group)
 
-terminate_cluster_task.set_upstream(
-    DWTaskGroup.all_last_tasks(task_groups_boundaries_without_inner_dependencies)
-    + DWTaskGroup.last_tasks(inner_dependencies_task_groups_boundaries)
-)
+chain(DWTaskGroup.all_last_tasks(dw_task_group), terminate_cluster_task)

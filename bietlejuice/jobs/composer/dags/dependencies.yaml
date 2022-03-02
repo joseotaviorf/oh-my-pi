@@ -417,6 +417,7 @@ bietlejuice.dw_agents_availability:
   - bietlejuice.ebdb:create-clean-mask-weekly-hour-in-data-lake
   - bietlejuice.enrich_ebdb_agents:load-enrich-agents-region
   - bietlejuice.enrich_ebdb_agents:load-enrich-agents-slots-hourly
+  - bietlejuice.dw_booking:load-dw-public-dim-booking
 
 bietlejuice.dw_banking:
   - bietlejuice.ebdb:create-clean-bank-in-data-lake
