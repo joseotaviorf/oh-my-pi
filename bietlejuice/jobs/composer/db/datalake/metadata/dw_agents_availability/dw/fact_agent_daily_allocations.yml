@@ -1,0 +1,48 @@
+---
+database_name: dw_agents_availability
+table_name: fact_agent_daily_allocations
+columns:
+  sk_agent:
+    lineage:
+      - dw_agents_availability.fact_agent_hourly_allocations.sk_agent
+  sk_slot_date:
+    lineage:
+      - dw_agents_availability.fact_agent_hourly_allocations.sk_slot_date
+  sk_agent_region:
+    lineage:
+      - dw_agents_availability.fact_agent_hourly_allocations.sk_agent_region
+  sk_slot_date_agent:
+    lineage:
+      - dw_agents_availability.fact_agent_hourly_allocations.sk_slot_date_agent
+  id_work_contract:
+    lineage:
+      - dw_agents_availability.fact_agent_hourly_allocations.id_work_contract
+  max_slots_allocation_available:
+    lineage:
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_08_and_09_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_09_and_10_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_10_and_11_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_11_and_12_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_12_and_13_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_13_and_14_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_14_and_15_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_15_and_16_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_16_and_17_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_17_and_18_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_18_and_19_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_19_and_20_available
+  area:
+    lineage:
+      - dw_agents_availability.fact_agent_hourly_allocations.area
+  ts_first_visit:
+    lineage:
+      - dw_agents_availability.fact_agent_hourly_allocations.ts_first_visit
+  year:
+    lineage:
+      - dw_agents_availability.fact_agent_hourly_allocations.year
+  month:
+    lineage:
+      - dw_agents_availability.fact_agent_hourly_allocations.month
+  day:
+    lineage:
+      - dw_agents_availability.fact_agent_hourly_allocations.day
