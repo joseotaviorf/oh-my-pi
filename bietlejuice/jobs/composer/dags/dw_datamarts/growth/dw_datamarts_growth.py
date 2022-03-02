@@ -13,9 +13,11 @@ from airflow.operators.quintoandar_databricks import (
 from bietlejuice.jobs.composer.base.airflow import BaseDAG
 from bietlejuice.jobs.composer.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.jobs.composer.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
+from bietlejuice.jobs.composer.services.file_service import FileService
 
 # DAG params
 SCHEMA = "datamarts"
@@ -158,6 +160,28 @@ def build_table_tasks(entity_name, entity_pipeline):
         },
     )
 
+    if FileService.metadata_file_exists(DAG_NAME, LayerEnum.DW.value, table):
+        propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
+            dag=DAG,
+            task_id=f"propagate-table-metadata-dw-{slugged_table_name}",
+            json={
+                "spark_python_task": {
+                    "python_file": f"{BASE_SPARK_JOBS_PATH}/propagate_table_metadata.py",
+                    "parameters": [
+                        LayerEnum.DW.value,
+                        MetadataTypeEnum.LINEAGE.value,
+                        DAG_NAME,
+                        table,
+                    ],
+                }
+            },
+        )
+
+        sync_metastore_table_partitions_task >> propagate_table_metadata_task
+        last_tasks = [propagate_table_metadata_task]
+    else:
+        last_tasks = [sync_metastore_table_partitions_task]
+
     airflow_helpers.chain(
         create_table_in_datalake_task,
         sync_metastore_table_structure_task,
@@ -176,12 +200,7 @@ def build_table_tasks(entity_name, entity_pipeline):
             },
         )
         create_table_in_datalake_task.set_downstream(load_table_into_redshift_task)
-        last_tasks = [
-            sync_metastore_table_partitions_task,
-            load_table_into_redshift_task,
-        ]
-    else:
-        last_tasks = [sync_metastore_table_partitions_task]
+        last_tasks.append(load_table_into_redshift_task)
 
     return {
         entity_name: {
