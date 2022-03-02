@@ -197,3 +197,10 @@ pipeline:
         - tenant_prospect_status
         - sale_performance_marketing_metrics_demand
         - performance_marketing_metrics_demand
+  indicaai_costs:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/indicaai_costs.sql
+      table: indicaai_costs
+      depends_on:
+        - performance_marketing_cluster_promotional_bonus_costs
