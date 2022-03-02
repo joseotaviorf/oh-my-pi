@@ -220,7 +220,7 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.ebdb:create-polygon-region-clean-external-table
   # portal_casa_mineira_advertiser_metrics
   - bietlejuice.casa_mineira_portal:create-clean-real-estate-agency-history-external-table
-  # portal_casa_mineira_advertiser_metrics, performance_marketing_metrics_portal_casa_mineira
+  # portal_casa_mineira_advertiser_metrics, performance_marketing_metrics_*_casa_mineira
   - bietlejuice.casa_mineira_portal:create-clean-house-external-table
   - bietlejuice.casa_mineira_portal:create-clean-city-external-table
   - bietlejuice.casa_mineira_portal:create-clean-real-estate-agency-budget-external-table
@@ -259,13 +259,28 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
   #performance_marketing_metrics_supply, sale_performance_marketing_metrics_supply_cohort
   - bietlejuice.enrich_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
+  # performance_marketing_metrics_portal_casa_mineira, performance_marketing_metrics_imobiliaria_casa_mineira
+  - bietlejuice.enrich_casa_mineira_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
+  - bietlejuice.gsheets:create-clean-taxonomy-portal-casa-mineira-external-table
   # performance_marketing_metrics_portal_casa_mineira
   - bietlejuice.casa_mineira_amplitude:create-clean-329001-portal-external-table
   - bietlejuice.casa_mineira_portal:create-clean-contact-external-table
   - bietlejuice.casa_mineira_portal:create-clean-neighborhood-external-table
-  - bietlejuice.enrich_casa_mineira_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
   - bietlejuice.gsheets:create-clean-targets-portal-casa-mineira-cost-cf-external-table
-  - bietlejuice.gsheets:create-clean-taxonomy-portal-casa-mineira-external-table
+  # performance_marketing_metrics_imobiliaria_casa_mineira
+  - bietlejuice.casa_mineira_amplitude:create-clean-329001-portal-external-table
+  - bietlejuice.casa_mineira_crm:create-clean-city-external-table
+  - bietlejuice.casa_mineira_crm:create-clean-contact-external-table
+  - bietlejuice.casa_mineira_crm:create-clean-house-external-table
+  - bietlejuice.casa_mineira_crm:create-clean-house-type-external-table
+  - bietlejuice.casa_mineira_crm:create-clean-media-contact-external-table
+  - bietlejuice.casa_mineira_crm:create-clean-neighborhood-external-table
+  - bietlejuice.casa_mineira_crm:create-clean-origin-contact-external-table
+  - bietlejuice.casa_mineira_crm:create-clean-uf-external-table
+  - bietlejuice.casa_mineira_crm:create-clean-visit-external-table
+  - bietlejuice.gsheets:create-clean-targets-casa-mineira-cost-external-table
+  - bietlejuice.gsheets:create-clean-targets-casa-mineira-ncp-external-table
+  - bietlejuice.gsheets:create-clean-taxonomy-crm-casa-mineira-external-table
 
 bietlejuice.dw_datamarts_growth_cross:
   # affiliate_acquisition_metrics

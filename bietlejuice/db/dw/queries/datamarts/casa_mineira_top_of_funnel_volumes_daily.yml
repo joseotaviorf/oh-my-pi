@@ -1,4 +1,4 @@
-# Config for casa_mineira_top_of_funnel_volumes_weekly
+# Config for casa_mineira_top_of_funnel_volumes_daily
 ---
 # streams:
 #   - direction: 'upstream'

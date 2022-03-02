@@ -85,3 +85,8 @@ pipeline:
       <<: *athena_anchor
       sql_file: dw/queries/datamarts/growth/listings_online_metrics.sql
       table: listings_online_metrics
+  performance_marketing_metrics_imobiliaria_casa_mineira:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth/performance_marketing_metrics_imobiliaria_casa_mineira.sql
+      table: performance_marketing_metrics_imobiliaria_casa_mineira
