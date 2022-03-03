@@ -51,6 +51,7 @@ databricks_bietlejuice_repo_path: s3://databricks.s3.forno.data.quintoandar.com.
 datalake_bucket: datalake.s3.forno.data.quintoandar.com.br
 doc_md_chart_url: https://de1a6b4bd8430e163-tp.appspot.com/admin/airflow/chart?chart_id=3&iteration_no=0&dag_id=
 dw_bucket: dw.s3.forno.data.quintoandar.com.br
+inmetro_bucket: s3://inmetro-s3-forno-quintoandar-com-br
 ods_migration_tests_threshold:
     { "count_test_min_assert": 0.0, "content_test_max_error": 1.0 }
 spectrum_iam_role: arn:aws:iam::713278628093:role/SpectrumAccess

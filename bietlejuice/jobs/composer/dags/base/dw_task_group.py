@@ -272,6 +272,9 @@ class DWTaskGroup(BaseTaskGroup):
         if FileService.data_quality_tests_file_exists(
             self.relative_query_path, layer, table_name
         ):
+            config_service = ConfigurationService()
+            inmetro_bucket = config_service.get_config("inmetro_bucket")
+
             data_quality_tests_task = QuintoAndarDatabricksSubmitRunOperator(
                 dag=self.dag,
                 task_id=f"data-quality-tests-{slugged_layer}-{slugged_dw_schema}-{slugged_table_name}",
@@ -280,7 +283,7 @@ class DWTaskGroup(BaseTaskGroup):
                         "python_file": f"{self.spark_jobs_path}/data_quality_tests.py",
                         "parameters": [
                             self.env,
-                            self.dw_bucket,
+                            inmetro_bucket,
                             layer,
                             self.relative_query_path,
                             table_name,

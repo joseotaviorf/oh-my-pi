@@ -163,9 +163,9 @@ class DatalakeTaskGroup(BaseTaskGroup):
             sync_metastore_tables_partitions_task,
         )
 
+        config_service = ConfigurationService(source)
         metadata_type = None
         try:
-            config_service = ConfigurationService(source)
             product_db_name = config_service.get_config("lineage_product_database_name")
         except IndexError:
             logger.debug(
@@ -227,7 +227,9 @@ class DatalakeTaskGroup(BaseTaskGroup):
 
         quality_tasks = []
         for tb_name in tb_names:
+            inmetro_bucket = config_service.get_config("inmetro_bucket")
             table_name_suffix = StringFormatter.slugify(f"-{tb_name}")
+
             data_quality_tests_task = QuintoAndarDatabricksSubmitRunOperator(
                 dag=self.dag,
                 task_id=f"data-quality-tests-{layer}-{source}{table_name_suffix}",
@@ -236,7 +238,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                         "python_file": f"{self.spark_jobs_path}/data_quality_tests.py",
                         "parameters": [
                             self.env,
-                            self.datalake_bucket,
+                            inmetro_bucket,
                             layer,
                             self.relative_query_path,
                             table_name,
@@ -245,6 +247,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                 },
                 execution_timeout=timedelta(hours=self.execution_timeout_hours),
             )
+
             load_table_task.set_downstream([data_quality_tests_task])
             quality_tasks.append(data_quality_tests_task)
 
@@ -499,6 +502,9 @@ class DatalakeTaskGroup(BaseTaskGroup):
         if FileService.data_quality_tests_file_exists(
             self.relative_query_path, layer.value, table_name
         ):
+            config_service = ConfigurationService()
+            inmetro_bucket = config_service.get_config("inmetro_bucket")
+
             data_quality_tests_task = QuintoAndarDatabricksSubmitRunOperator(
                 dag=self.dag,
                 task_id=f"data-quality-tests-{layer.value}-{slugged_table_name}",
@@ -507,7 +513,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                         "python_file": f"{self.spark_jobs_path}/data_quality_tests.py",
                         "parameters": [
                             self.env,
-                            self.datalake_bucket,
+                            inmetro_bucket,
                             layer.value,
                             self.relative_query_path,
                             table_name,
@@ -516,6 +522,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                 },
                 execution_timeout=timedelta(hours=self.execution_timeout_hours),
             )
+
             load_table_task.set_downstream([data_quality_tests_task])
             quality_tasks = [data_quality_tests_task]
 

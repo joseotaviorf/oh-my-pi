@@ -1,38 +1,30 @@
-import glob
 import json
 import logging
 
-from datetime import datetime
 from argparse import ArgumentParser
-from pyspark.sql.functions import lit
 
+from inmetro.messengers import SlackMessenger
 from inmetro.config_reader import ConfigReader
-from inmetro.messengers.slack_messenger import SlackMessenger
-from inmetro.validators.pydeequ_validator import PyDeequValidator
-from inmetro.clients.spark_client import SparkClient as InmetroSparkClient
+from inmetro.validators import PyDeequValidator
+from inmetro.loaders import S3Loader as InmetroS3Loader
 from inmetro.builders.validations.pydeequ.validation_suite_builder import (
     ValidationSuiteBuilder,
+)
+from inmetro.clients import (
+    SparkClient as InmetroSparkClient,
+    S3Client as InmetroS3Client,
 )
 
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.jobs.composer.services import FileService
-from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
-from bietlejuice.jobs.composer.pipeline.atlas_quality_metrics_pipeline import (
-    AtlasQualityMetricsPipeline,
-)
-from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
-from bietlejuice.jobs.composer.clients.db_clients import SparkClient
-from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.service import ServiceEnum
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum, MetadataTypeEnum
 from bietlejuice.jobs.composer.base.api import APIEnum
-from bietlejuice.jobs.composer.base.spark import (
-    SparkTableStorageFormat,
-    SparkDataFrameService,
-    BaseDBUtils,
-    spark,
-    sc,
+from bietlejuice.jobs.composer.base.spark import BaseDBUtils
+from bietlejuice.jobs.composer.pipeline.atlas_quality_metrics_pipeline import (
+    AtlasQualityMetricsPipeline,
 )
+
 
 JOB_NAME = "data_quality_tests"
 
@@ -67,73 +59,6 @@ def create_message_from_validation_results(validation_results):
     return message
 
 
-def write_results_to_datalake(
-    env,
-    datalake_bucket,
-    result_layer,
-    result_database,
-    result_table,
-    validation_results,
-):
-    source = "inmetro"
-    table_name = "data_validations"
-    timestamp_execution = datetime.now()
-    partition_cols = ["year", "month", "day"]
-
-    s3_loader = S3Loader()
-    spark_client = SparkClient()
-    spark_metastore_service = SparkMetastoreService(spark_client)
-    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
-
-    format_options = SparkTableStorageFormat.DEFAULT_RAW
-    (
-        spark_database_name,
-        database_location,
-        _,
-    ) = DatalakeMetastoreService.get_layer_info(
-        env, source, datalake_bucket, LayerEnum.RAW.value
-    )
-
-    results_json = json.dumps(validation_results)
-    results_df = (
-        spark.read.json(sc.parallelize([results_json]))
-        .withColumn("layer", lit(result_layer))
-        .withColumn("database", lit(result_database))
-        .withColumn("table", lit(result_table))
-    )
-    results_df = (
-        SparkDataFrameService()
-        .input(results_df)
-        .create_year_month_day_columns_from_date(timestamp_execution)
-        .output()
-    )
-
-    spark_metastore_service.create_database(spark_database_name)
-
-    s3_loader.load_df(
-        df=results_df,
-        s3_path=f"{database_location}{table_name}",
-        format_options=format_options,
-        partitions=partition_cols,
-        write_mode="append",
-    )
-    spark_metastore_loader.update_metastore(
-        results_df,
-        spark_database_name,
-        table_name,
-        format_options,
-        database_location,
-        partition_cols,
-    )
-    spark_metastore_service.create_new_partitions_from_df(
-        database_name=spark_database_name,
-        table_name=table_name,
-        df=results_df,
-        partition_cols=partition_cols,
-    )
-    spark_metastore_service.refresh_table(spark_database_name, table_name)
-
-
 def parse_complete_table_name(complete_table_name):
     name_components = complete_table_name.split(".")
     if len(name_components) != 2:
@@ -149,25 +74,14 @@ def parse_complete_table_name(complete_table_name):
     return database_name, table_name
 
 
-def get_validation_file(file_search_path):
-    files = glob.glob(file_search_path, recursive=True)
-
-    if files and files[0]:
-        return files[0]
-
-    error_msg = (
-        f"m={JOB_NAME}, file_search_path={file_search_path}, "
-        f"msg=The validation file for this table could not be reached. "
-        f"Check if it is in the right folder and has the same name as the table. "
-        f"Expeted location: (composer/base/db/datalake/data_quality/{{context}}/{{layer}}/)"
-    )
-    raise FileNotFoundError(error_msg)
-
-
 def parse_args():
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env", type=str, help="Environment where the task is executing")
-    parser.add_argument("datalake_bucket", type=str)
+    parser.add_argument(
+        "inmetro_bucket",
+        type=str,
+        help="Bucket that stores all the Inmetro's validation data",
+    )
     parser.add_argument("layer", type=str, help="One of LayerEnum values")
     parser.add_argument(
         "relative_file_path",
@@ -180,19 +94,19 @@ def parse_args():
     args = parser.parse_args()
 
     env = args.env
-    datalake_bucket = args.datalake_bucket
+    inmetro_bucket = args.inmetro_bucket.replace("s3://", "")
     layer = LayerEnum(args.layer).value
     relative_file_path = args.relative_file_path
     table_name = args.table_name
 
-    return (env, datalake_bucket, layer, relative_file_path, table_name)
+    return env, inmetro_bucket, layer, relative_file_path, table_name
 
 
 if __name__ == "__main__":
-    (env, datalake_bucket, layer, relative_file_path, table_name) = parse_args()
+    (env, inmetro_bucket, layer, relative_file_path, table_name) = parse_args()
 
     logger.info(
-        f"m={JOB_NAME}, env={env}, datalake_bucket={datalake_bucket}, layer={layer}, "
+        f"m={JOB_NAME}, env={env}, inmetro_bucket={inmetro_bucket}, layer={layer}, "
         f"relative_file_path={relative_file_path}, table_name={table_name},  msg=Job execution started."
     )
 
@@ -212,26 +126,27 @@ if __name__ == "__main__":
     database_name, table_name = parse_complete_table_name(
         input_config.get("table_name")
     )
+    input_df = spark_client.read_table(
+        database_name=database_name, table_name=table_name
+    )
     pydeequ_validator = PyDeequValidator(
         suite_name=f"Pipeline Validations: {database_name}.{table_name}",
         validation_suite=validation_suite,
         client=spark_client,
     )
 
-    input_df = spark_client.read_table(
-        database_name=database_name, table_name=table_name
-    )
     validation_results = pydeequ_validator.execute_and_parse(input_df)
 
-    # ################################ Data Lake Ingestion ##################################
+    # ################################ Writing to Inmetro's S3 Bucket ##################################
 
-    write_results_to_datalake(
-        env=env,
-        datalake_bucket=datalake_bucket,
-        result_layer=layer,
-        result_database=database_name,
-        result_table=table_name,
-        validation_results=validation_results,
+    s3_client = InmetroS3Client()
+    s3_loader = InmetroS3Loader(bucket=inmetro_bucket, file_name=f"{table_name}.json")
+    destination_directory = f"bietlejuice/{database_name}/{table_name}/validation"
+
+    s3_loader.upload(
+        client=s3_client,
+        output_parser=validation_results,
+        path_name=destination_directory,
     )
 
     # ############################## Metadata Propagator Call ################################
