@@ -1,0 +1,94 @@
+---
+database_name: datalake_sale_lead_flows
+table_name: quinto_andar_lead_flow
+columns:
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.user_aud.id_user
+  id_region_first_booking:
+    lineage:
+      - datalake_booking.house.id_region
+  id_region_last_booking:
+    lineage:
+      - datalake_booking.house.id_region
+  id_region_first_visit_intent:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+  id_region_last_visit_intent:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+  id_first_region:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+  id_first_house:
+    lineage:
+      - datalake_booking.booking.id_house
+  email:
+    lineage:
+      - datalake_ebdb_clean.user_aud.email
+  phone_number:
+    lineage:
+      - datalake_ebdb_clean.user_aud.phone_number
+  first_offer_flow:
+    lineage:
+      - datalake_offer.sale_offer.offer_flow
+  first_ccv_flow:
+    lineage:
+      - datalake_offer.sale_offer.offer_flow
+  first_offer_business_unit:
+    lineage:
+      - datalake_offer.sale_offer.business_unit
+  first_ccv_business_unit:
+    lineage:
+      - datalake_offer.sale_offer.business_unit
+  first_business_unit_region_new_buyer_prospect:
+    lineage:
+      - datalake_gsheets_clean.business_unit_region.business_unit
+  last_business_unit_region_new_buyer_prospect:
+    lineage:
+      - datalake_gsheets_clean.business_unit_region.business_unit
+  first_business_unit_region_intent_lead:
+    lineage:
+      - datalake_gsheets_clean.business_unit_region.business_unit
+  last_business_unit_region_intent_lead:
+    lineage:
+      - datalake_gsheets_clean.business_unit_region.business_unit
+  ts_first_event:
+    lineage:
+      - datalake_sale_flows.sale_flow.ts_first_event
+  ts_first_visit_scheduling_event:
+    lineage:
+      - datalake_amplitude_sale_visit_intent.amplitude_sale_visit_intent.ts_visit_intent
+  ts_last_visit_scheduling_event:
+    lineage:
+      - datalake_amplitude_sale_visit_intent.amplitude_sale_visit_intent.ts_visit_intent
+  ts_first_sale_agreement_signed:
+    lineage:
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+  ts_last_sale_agreement_signed:
+    lineage:
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+  ts_first_offer_submitted:
+    lineage:
+      - datalake_offer.sale_offer.ts_offer_submitted
+  ts_last_offer_submitted:
+    lineage:
+      - datalake_offer.sale_offer.ts_offer_submitted
+  ts_first_offer_accepted:
+    lineage:
+      - datalake_offer.sale_offer.dt_offer_accepted
+  ts_last_offer_accepted:
+    lineage:
+      - datalake_offer.sale_offer.dt_offer_accepted
+  ts_first_booking_created:
+    lineage:
+      - datalake_booking.booking.ts_created
+  ts_last_booking_created:
+    lineage:
+      - datalake_booking.booking.ts_created
+  ts_first_visit_completed:
+    lineage:
+      - datalake_booking.booking.ts_booking_utc
+  ts_last_visit_completed:
+    lineage:
+      - datalake_booking.booking.ts_booking_utc

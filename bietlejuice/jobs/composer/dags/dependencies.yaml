@@ -1381,8 +1381,18 @@ bietlejuice.enrich_sale_lead_flows:
   - bietlejuice.classified_leads:load-clean-lead-contact
   - bietlejuice.classified_leads:load-clean-lead-reply-email
   - bietlejuice.classified_leads:load-clean-lead-reply-whatsapp
+  - bietlejuice.ebdb:create-clean-contract-in-data-lake
+  - bietlejuice.ebdb:create-clean-contract-person-in-data-lake
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-region-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-aud-in-data-lake
+  - bietlejuice.enrich_amplitude_sale_visit_intent:load-enrich-amplitude-sale-visit-intent
+  - bietlejuice.enrich_booking:load-enrich-booking
+  - bietlejuice.enrich_offer:load-enrich-offer
+  - bietlejuice.enrich_offer:load-enrich-sale-offer
+  - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
+  - bietlejuice.gsheets:load-clean-business-unit-region
   - bietlejuice.hub_services:load-clean-business-unit
   - bietlejuice.hub_services:load-clean-lead
   - bietlejuice.hub_services:load-clean-visitor
