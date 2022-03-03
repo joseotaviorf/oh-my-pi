@@ -18,10 +18,10 @@ agent AS (
         dw_agent.fact_agent_daily_allocations a
 )
 SELECT
-    COALESCE(lrf.sk_listing_rent_flow, -1) AS sk_listing_rent_flow,
-    COALESCE(lrf.sk_date, agent.sk_date, -1) AS sk_date,
-    COALESCE(lrf.sk_agent, agent.sk_agent, -1) AS sk_agent,
-    COALESCE(agent.sk_slot_date_agent, -1) AS sk_slot_date_agent,
+    CAST(COALESCE(lrf.sk_listing_rent_flow, -1) AS BIGINT) AS sk_listing_rent_flow,
+    CAST(COALESCE(lrf.sk_date, agent.sk_date, -1) AS INT) AS sk_date,
+    CAST(COALESCE(lrf.sk_agent, agent.sk_agent, -1) AS INT) AS sk_agent,
+    CAST(COALESCE(agent.sk_slot_date_agent, -1) AS BIGINT) AS sk_slot_date_agent,
     NOW() as ts_load
 FROM 
     listing_rent_flow lrf
