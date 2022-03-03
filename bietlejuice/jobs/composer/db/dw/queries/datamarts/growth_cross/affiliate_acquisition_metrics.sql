@@ -337,7 +337,7 @@ UNION ALL
 -- Affiliates Acquisition Targets --
 -------------------------------------
     SELECT
-        DATE(tgt.data) as date,
+        DATE(tgt.dt_target) as date,
         NULL::TEXT AS city_group,
         tgt.mkt_origin AS mkt_origin,
         tgt.mkt_channel AS mkt_channel,
