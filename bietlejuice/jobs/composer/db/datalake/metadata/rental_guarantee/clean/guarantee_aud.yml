@@ -40,6 +40,9 @@ columns:
   guarantee_status:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.status
+  guarantee_type:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.type
   base_value:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.base_value
@@ -73,6 +76,9 @@ columns:
   mod_guarantee_status:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.status_mod
+  mod_guarantee_type:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee_aud.type_mod
   mod_base_value:
     lineage:
       - datalake_rental_guarantee_raw.guarantee_aud.base_value_mod
