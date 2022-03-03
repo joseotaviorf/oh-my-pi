@@ -1,0 +1,29 @@
+---
+database_name: datalake_inmetro_clean
+table_name: data_profiles
+columns:
+  repo:
+    lineage:
+      - datalake_inmetro_raw.data_profiles.repo
+  layer:
+    lineage:
+      - datalake_inmetro_raw.data_profiles.repo
+      - datalake_inmetro_raw.data_profiles.database
+  database:
+    lineage:
+      - datalake_inmetro_raw.data_profiles.database
+  table:
+    lineage:
+      - datalake_inmetro_raw.data_profiles.table
+  inmetro_info:
+    lineage:
+      - datalake_inmetro_raw.data_profiles.inmetro_info
+  year:
+    lineage:
+      - datalake_inmetro_raw.data_profiles.year
+  month:
+    lineage:
+      - datalake_inmetro_raw.data_profiles.month
+  day:
+    lineage:
+      - datalake_inmetro_raw.data_profiles.day

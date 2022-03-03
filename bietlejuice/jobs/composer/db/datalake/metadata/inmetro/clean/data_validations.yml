@@ -2,18 +2,22 @@
 database_name: datalake_inmetro_clean
 table_name: data_validations
 columns:
-  suite_name:
+  repo:
     lineage:
-      - datalake_inmetro_raw.data_validations.metadata
+      - datalake_inmetro_raw.data_validations.repo
   layer:
     lineage:
-      - datalake_inmetro_raw.data_validations.layer
+      - datalake_inmetro_raw.data_validations.repo
+      - datalake_inmetro_raw.data_validations.database
   database:
     lineage:
       - datalake_inmetro_raw.data_validations.database
   table:
     lineage:
       - datalake_inmetro_raw.data_validations.table
+  suite_name:
+    lineage:
+      - datalake_inmetro_raw.data_validations.metadata
   suite_result:
     lineage:
       - datalake_inmetro_raw.data_validations.metadata

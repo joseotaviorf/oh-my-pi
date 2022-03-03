@@ -1,0 +1,4 @@
+---
+serialize_columns_from_directory:
+  validation: False
+  profile: True
