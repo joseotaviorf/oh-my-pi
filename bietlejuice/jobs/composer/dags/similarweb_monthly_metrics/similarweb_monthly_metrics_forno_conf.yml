@@ -1,0 +1,8 @@
+---
+tables:
+  traffic:
+    clean_partition_cols: ["year", "month", "dt_traffic", "domain", "platform"]
+  traffic_sources:
+    clean_partition_cols: ["year", "month", "dt_traffic", "domain", "platform", "source_type"]
+cluster_libs:
+  whl: "s3://artifacts.s3.forno.data.quintoandar.com.br/similarweb-api-client-python/quintoandar_similarweb_api_client-0.1.0-py2.py3-none-any.whl"

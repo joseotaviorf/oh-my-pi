@@ -1,0 +1,30 @@
+database_name: datalake_similarweb_monthly_metrics_clean
+table_name: traffic_sources
+columns:
+  domain:
+    lineage:
+      - datalake_similarweb_monthly_metrics_raw.traffic_sources.main_domain
+  platform:
+    lineage:
+      - datalake_similarweb_monthly_metrics_raw.traffic_sources.platform
+  source_type:
+    lineage:
+      - datalake_similarweb_monthly_metrics_raw.traffic_sources.source_type
+  domain_share:
+    lineage:
+      - datalake_similarweb_monthly_metrics_raw.traffic_sources.domain_share
+  share:
+    lineage:
+      - datalake_similarweb_monthly_metrics_raw.traffic_sources.share
+  visits:
+    lineage:
+      - datalake_similarweb_monthly_metrics_raw.traffic_sources.visits
+  dt_traffic:
+    lineage:
+      - datalake_similarweb_monthly_metrics_raw.traffic_sources.date
+  year:
+    lineage:
+      - datalake_similarweb_monthly_metrics_raw.traffic_sources.date
+  month:
+    lineage:
+      - datalake_similarweb_monthly_metrics_raw.traffic_sources.date

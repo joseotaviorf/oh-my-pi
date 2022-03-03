@@ -1,0 +1,72 @@
+---
+traffic_configs:
+  raw_partition_cols: ["date", "main_domain", "platform"]
+  domains:
+    - quintoandar.com.br
+    - loft.com.br
+    - imovelweb.com.br
+    - vivareal.com.br
+    - zapimoveis.com.br
+    - wimoveis.com.br
+    - housi.com
+    - emcasa.com
+    - casamineira.com.br
+    - olx.com.br
+    - lopes.com.br
+    - netimoveis.com
+    - chavesnamao.com.br
+  platforms:
+    total:
+      metrics:
+        visits-split:
+          cols_to_select:
+            - desktop_visit_share
+            - mobile_web_visit_share
+            - date
+            - main_domain
+            - platform
+
+traffic_sources_configs:
+  raw_partition_cols: ["date", "main_domain", "platform", "source_type"]
+  domains:
+    - quintoandar.com.br
+    - loft.com.br
+    - imovelweb.com.br
+    - vivareal.com.br
+    - zapimoveis.com.br
+  platforms:
+    desktopweb:
+      metrics:
+        overview:
+          col_to_explode: "overview"
+          cols_to_select:
+            - overview.domain
+            - overview.source_type
+            - overview.share
+            - visits
+            - main_domain
+            - platform
+            - date
+          cols_to_rename:
+            overview.domain: domain_share
+            overview.source_type: source_type
+            overview.share: share
+            visits: desktopweb_visits
+    mobileweb:
+      metrics:
+        mobile-overview-share:
+          col_to_explode: "visits"
+          cols_to_select:
+            - visits.date
+            - visits.visits
+            - source_type
+            - main_domain
+            - platform
+          cols_to_rename:
+            visits.date: date
+            visits.visits: mobileweb_visits
+  join_on_list:
+    - date
+    - main_domain
+    - platform
+    - source_type

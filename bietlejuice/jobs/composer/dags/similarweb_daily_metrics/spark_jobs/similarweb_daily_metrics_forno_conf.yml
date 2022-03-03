@@ -1,0 +1,119 @@
+---
+traffic_configs:
+  raw_partition_cols: ["date", "domain", "platform"]
+  domains:
+    - quintoandar.com.br
+    - loft.com.br
+    - imovelweb.com.br
+    - vivareal.com.br
+    - zapimoveis.com.br
+    - wimoveis.com.br
+    - housi.com
+    - emcasa.com
+    - casamineira.com.br
+    - olx.com.br
+    - lopes.com.br
+    - netimoveis.com
+    - chavesnamao.com.br
+  platforms:
+    - total
+    - desktop
+    - mobileweb
+  metrics:
+    visits:
+      cols_to_select:
+        - date
+        - visits
+        - domain
+        - platform
+    pages-per-visit:
+      cols_to_select:
+        - date
+        - pages_per_visit
+        - domain
+        - platform
+    average-visit-duration:
+      cols_to_select:
+        - date
+        - average_visit_duration
+        - domain
+        - platform
+    bounce-rate:
+      cols_to_select:
+        - date
+        - bounce_rate
+        - domain
+        - platform
+    unique-visitors:
+      cols_to_select:
+        - date
+        - unique_visitors
+        - domain
+        - platform
+  join_on_list:
+    - date
+    - domain
+    - platform
+
+traffic_sources_configs:
+  raw_partition_cols: ["date", "domain", "platform", "source_type"]
+  domains:
+    - quintoandar.com.br
+    - loft.com.br
+    - imovelweb.com.br
+    - vivareal.com.br
+    - zapimoveis.com.br
+  platforms:
+    - desktopweb
+  metrics:
+    overview-share:
+      col_to_explode: "visits"
+      cols_to_select:
+        - visits.date
+        - visits.organic
+        - visits.paid
+        - source_type
+        - domain
+        - platform
+      cols_to_rename:
+        visits.date: date
+        visits.organic: visits_organic
+        visits.paid: visits_paid
+    pages-per-visit:
+      col_to_explode: "values"
+      cols_to_select:
+        - values.date
+        - values.value
+        - source_type
+        - domain
+        - platform
+      cols_to_rename:
+        values.date: date
+        values.value: pages_per_visit
+    average-duration:
+      col_to_explode: "values"
+      cols_to_select:
+        - values.date
+        - values.value
+        - source_type
+        - domain
+        - platform
+      cols_to_rename:
+        values.date: date
+        values.value: average_duration
+    bounce-rate:
+      col_to_explode: "values"
+      cols_to_select:
+        - values.date
+        - values.value
+        - source_type
+        - domain
+        - platform
+      cols_to_rename:
+        values.date: date
+        values.value: bounce_rate
+  join_on_list:
+    - date
+    - domain
+    - platform
+    - source_type

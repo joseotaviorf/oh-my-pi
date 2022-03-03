@@ -1,0 +1,24 @@
+database_name: datalake_similarweb_monthly_metrics_clean
+table_name: traffic
+columns:
+  domain:
+    lineage:
+      - datalake_similarweb_monthly_metrics_raw.traffic.domain
+  platform:
+    lineage:
+      - datalake_similarweb_monthly_metrics_raw.traffic.platform
+  desktop_visit_share:
+    lineage:
+      - datalake_similarweb_monthly_metrics_raw.traffic.desktop_visit_share
+  mobile_web_visit_share:
+    lineage:
+      - datalake_similarweb_monthly_metrics_raw.traffic.mobile_web_visit_share
+  dt_traffic:
+    lineage:
+      - datalake_similarweb_monthly_metrics_raw.traffic.date
+  year:
+    lineage:
+      - datalake_similarweb_monthly_metrics_raw.traffic.date
+  month:
+    lineage:
+      - datalake_similarweb_monthly_metrics_raw.traffic.date
