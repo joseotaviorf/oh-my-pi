@@ -80,6 +80,15 @@ pipeline:
       <<: *athena_anchor
       sql_file: dw/queries/datamarts/growth/market_share_by_sk_region.sql
       table: market_share_by_sk_region
+  casa_mineira_top_of_funnel_volumes_monthly:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth/casa_mineira_top_of_funnel_volumes_monthly.sql
+      table: casa_mineira_top_of_funnel_volumes_monthly
+      depends_on:
+        - performance_marketing_metrics_imobiliaria_casa_mineira
+        - performance_marketing_metrics_portal_casa_mineira
+        - portal_casa_mineira_advertiser_metrics
   listings_online_metrics:
     dw:
       <<: *athena_anchor
