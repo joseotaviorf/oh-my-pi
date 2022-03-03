@@ -49,6 +49,7 @@ This pipeline produces the following output tables:
     - `casa_mineira_marketing_cost_taxonomy`
     - `casa_mineira_marketing_manual_shared_costs`
     - `ciq_costs`
+    - `ciq_training`
     - `cities_neighborhoods_ibge_qa`
     - `city_share`
     - `classifieds_fup_history`
@@ -136,6 +137,7 @@ This pipeline produces the following output tables:
     - `poa_partners`
     - `process_eviction`
     - `projreparos_espelhamento_dl`
+    - `proj_agent_manager`
     - `promotional_bonus_cluster_targets`
     - `promotional_bonus_segmentation_targets`
     - `promotional_bonus_user_cluster_targets`

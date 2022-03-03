@@ -1,0 +1,33 @@
+database_name: datalake_gsheets_clean
+table_name: proj_agent_manager
+columns:
+  id_user:
+    lineage:
+      - datalake_gsheets_raw.estrutura_gerente_corretor.IdUser
+  id_user_supervisor:
+    lineage:
+      - datalake_gsheets_raw.estrutura_gerente_corretor.IdUserSupervisor
+  condition:
+    lineage:
+      - datalake_gsheets_raw.estrutura_gerente_corretor.Condicao
+  dt_started:
+    lineage:
+      - datalake_gsheets_raw.estrutura_gerente_corretor.DataInicioCarteira
+  dt_mentorship_nh_ended:
+    lineage:
+      - datalake_gsheets_raw.estrutura_gerente_corretor.DataFimMentoriaNH
+  dt_entrance:
+    lineage:
+      - datalake_gsheets_raw.estrutura_gerente_corretor.DataEntradaCarteira
+  dt_ended:
+    lineage:
+      - datalake_gsheets_raw.estrutura_gerente_corretor.DataSaidaCarteira
+  weeks:
+    lineage:
+      - datalake_gsheets_raw.estrutura_gerente_corretor.Semanas
+  mentorship_status:
+    lineage:
+      - datalake_gsheets_raw.estrutura_gerente_corretor.StatusMentoria
+  abandonment_reason:
+    lineage:
+      - datalake_gsheets_raw.estrutura_gerente_corretor.MotivoAbandono

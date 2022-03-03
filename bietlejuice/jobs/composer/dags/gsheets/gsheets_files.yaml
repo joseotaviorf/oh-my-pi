@@ -130,6 +130,11 @@ ciq_costs:
     sheet_name: ciq_costs
     clean_table_name: ciq_costs
 
+ciq_training:
+    sheet_id: 1YsdJ-JHbCFlBL1_6XdiKScJGNrbbBPFglm_rn18iODA
+    sheet_name: Página1
+    clean_table_name: ciq_training
+
 cities_neighborhoods_ibge_qa:
     sheet_id: 19N1BVZuKcCw1RByXoL3hqaXSmEhdi7_mbtyOVff4oQs
     sheet_name: ibge_5a_cities
@@ -309,6 +314,11 @@ espelhamento_dl:
     sheet_id: 14sgdtouI0lnxTDHsYH0ySt_R1nvMu4W0Qa8QJmg9mVI
     sheet_name: Espelhamento_DL
     clean_table_name: projreparos_espelhamento_dl
+
+estrutura_gerente_corretor:
+    sheet_id: 1ytcDCgwYO0hs2vEexqx8XlJe8etbg7yhLi44z2ja1zw
+    sheet_name: Base
+    clean_table_name: proj_agent_manager
 
 extra_invoice_expenses:
     sheet_id: 1t9_oW9mXtRuXcw2l_Xh0JVnu1S1BGdcwEWnUG1HkYTk

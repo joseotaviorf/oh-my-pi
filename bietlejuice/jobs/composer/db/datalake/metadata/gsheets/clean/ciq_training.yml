@@ -1,0 +1,12 @@
+database_name: datalake_gsheets_clean
+table_name: ciq_training
+columns:
+  event:
+    lineage:
+      - datalake_gsheets_raw.ciq_training.evento
+  id_ciq:
+    lineage:
+      - datalake_gsheets_raw.ciq_training.id_ciq
+  dt_training:
+    lineage:
+      - datalake_gsheets_raw.ciq_training.data_treinamento
