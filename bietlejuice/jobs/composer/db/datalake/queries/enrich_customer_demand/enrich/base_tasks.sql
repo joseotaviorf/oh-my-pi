@@ -23,7 +23,7 @@ crm_tasks AS (
   )
   SELECT DISTINCT
     tarf.id_task,
-    bca.id_agent,
+    COALESCE(bca.id_agent, '-1') AS id_agent,
     tarf.type,
     5 AS sla_target,
     tarf.ts_started,
@@ -34,7 +34,7 @@ crm_tasks AS (
     last_updated_task lut
       ON tarf.id_task = lut.id_task
       AND DATE(CONCAT(year, '-', month, '-', day)) = lut.dt_last_updated
-  JOIN
+  LEFT JOIN
     base_crm_analyst_info bca
       ON tarf.id_task = bca.id_task
   WHERE
@@ -77,7 +77,7 @@ ticket_tasks AS (
   )
   SELECT DISTINCT
     t.id_ticket AS id_task,
-    t.id_agent,
+    COALESCE(t.id_agent, '-1') AS id_agent,
     t.department AS type,
     COALESCE(ts.sla_in_days, tst.sla) AS sla_target,
     t.ts_started,
@@ -101,9 +101,14 @@ ticket_tasks AS (
       AND t.ts_started BETWEEN tst.dt_start AND COALESCE(tst.dt_end, NOW())
   WHERE
     t.ts_started >= '2021-01-01'
+    AND t.tags NOT LIKE '%robotserviceaccount02%'
     AND (
       (t.department = 'Midias Ops [POS] [BACK]' AND (t.tags LIKE '%escalar_back_midias%' OR t.tags LIKE '%escalar_ouvidoria_hard_cases%'))
       OR t.department <> 'Midias Ops [POS] [BACK]'
+    )
+    AND (
+      (t.department = 'Offboarding Reparos [OFF] [POS] [BACK]' AND t.tags LIKE '%orçamentação_realizada%')
+      OR t.department <> 'Offboarding Reparos [OFF] [POS] [BACK]'
     )
 ),
 heimdall_tasks AS (
@@ -116,17 +121,17 @@ heimdall_tasks AS (
   )
   SELECT DISTINCT
     CONCAT(a.id, e.id) AS id_task,
-    bca.id_agent,
+    COALESCE(bca.id_agent, '-1') AS id_agent,
     a.type,
     2 AS sla_target,
     a.ts_requested AS ts_started,
     a.ts_transition_created AS ts_completed
   FROM
     datalake_heimdall.activity a
-  JOIN
+  LEFT JOIN
     crm_last_task_updated crm
         ON a.id = crm.id_state
-  JOIN
+  LEFT JOIN
     base_crm_analyst_info bca
       ON crm.id = bca.id_task
   LEFT JOIN
