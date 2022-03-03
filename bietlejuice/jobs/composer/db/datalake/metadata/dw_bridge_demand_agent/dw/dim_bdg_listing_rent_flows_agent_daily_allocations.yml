@@ -1,0 +1,18 @@
+---
+database_name: dw_agent
+table_name: dim_bdg_listing_rent_flows_agent_daily_allocations
+columns:
+  sk_listing_rent_flow:
+    lineage:
+      - dw_agent.fact_listing_rent_flows.ods_id
+  sk_date:
+    lineage:
+      - dw_agent.fact_agent_daily_allocations.sk_slot_date
+      - dw_agent.fact_listing_rent_flows.sk_visit_date
+  sk_agent:
+    lineage:
+      - dw_agent.fact_listing_rent_flows.dados_agente_id
+      - dw_agent.fact_agent_daily_allocations.sk_agent
+  sk_slot_date_agent:
+    lineage:
+      - dw_agent.fact_agent_daily_allocations.sk_slot_date_agent
