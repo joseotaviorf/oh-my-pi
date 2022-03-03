@@ -40,7 +40,9 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 inner_dependencies = config_service.get_config("inner_dependencies")
 
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
+CLUSTER_DESCRIPTION = Variable.get(
+    "databricks_memory_optimized_cluster_spark_3", deserialize_json=True
+)
 CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
     "destination"
