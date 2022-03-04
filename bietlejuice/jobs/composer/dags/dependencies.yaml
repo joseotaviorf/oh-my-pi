@@ -272,6 +272,9 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.enrich_top_of_funnel_portal_cm:create-enrich-top-of-funnel-users-portal-casa-mineira-external-table
   - bietlejuice.gsheets:create-clean-targets-casa-mineira-tof-monthly-external-table
   - bietlejuice.gsheets:create-clean-targets-portal-casa-mineira-cost-cf-external-table
+  # casa_mineira_top_of_funnel_volumes_weekly
+  - bietlejuice.enrich_top_of_funnel_portal_cm:create-enrich-top-of-funnel-users-portal-casa-mineira-external-table
+  - bietlejuice.gsheets:create-clean-targets-casa-mineira-tof-weekly-external-table
   # performance_marketing_metrics_imobiliaria_casa_mineira
   - bietlejuice.casa_mineira_amplitude:create-clean-329001-portal-external-table
   - bietlejuice.casa_mineira_crm:create-clean-city-external-table

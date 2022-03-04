@@ -85,6 +85,11 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/growth/casa_mineira_top_of_funnel_volumes_monthly.sql
       table: casa_mineira_top_of_funnel_volumes_monthly
+  casa_mineira_top_of_funnel_volumes_weekly:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth/casa_mineira_top_of_funnel_volumes_weekly.sql
+      table: casa_mineira_top_of_funnel_volumes_weekly
       depends_on:
         - performance_marketing_metrics_imobiliaria_casa_mineira
         - performance_marketing_metrics_portal_casa_mineira
