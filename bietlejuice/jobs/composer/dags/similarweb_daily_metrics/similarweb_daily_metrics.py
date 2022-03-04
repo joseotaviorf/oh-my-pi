@@ -97,7 +97,7 @@ table_names = config_service.get_config("tables")
 
 raw_task_groups = {}
 clean_task_groups = {}
-for table_name in table_names.keys():
+for table_name in table_names:
     raw_task_group = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,
         table_name=table_name,
