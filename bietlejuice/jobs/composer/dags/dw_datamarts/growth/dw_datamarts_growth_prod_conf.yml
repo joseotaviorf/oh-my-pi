@@ -104,3 +104,8 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/growth/performance_marketing_metrics_imobiliaria_casa_mineira.sql
       table: performance_marketing_metrics_imobiliaria_casa_mineira
+  marketplace_intelligence_metrics:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth/marketplace_intelligence_metrics.sql
+      table: marketplace_intelligence_metrics
