@@ -40,7 +40,7 @@ task_info AS (
     ((
         TO_UNIX_TIMESTAMP(COALESCE(ts_completed,NOW()))
         - TO_UNIX_TIMESTAMP(ts_started)
-    )/(86400)) -1 - COALESCE(do.days_off, 0) AS days_worked,
+    )/(86400)) - COALESCE(do.days_off, 0) AS days_worked,
     bt.sla_target,
     bt.ts_completed,
     bt.ts_started
