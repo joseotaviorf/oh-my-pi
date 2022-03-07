@@ -128,17 +128,17 @@ class CrossDAGDependenciesValidator:
         """
         return dependency_name.find(":") != -1
 
-    def _get_table_name_from_redshift_task(self, dag_name, layer, redshift_task):
+    def _get_table_name_from_dw_task(self, dag_name, layer, task):
         """
-        Clean the redshift task in order to retrieve the table name being loaded
+        Clean the DW task in order to retrieve the table name being loaded
 
         :type dag_name: str
         :type layer: str
-        :type redshift_task: str
+        :type task: str
         :return: str
         """
         dag_context = dag_name.replace(f"{layer}_", "")
-        table_name = redshift_task.replace("-", "_").replace(f"{dag_context}_", "")
+        table_name = task.replace("-", "_").replace(f"{dag_context}_", "")
         return table_name
     
     def _extract_dag_and_table_from_redshift_task(self, task_name):
@@ -159,7 +159,7 @@ class CrossDAGDependenciesValidator:
         dag_name = match.group(1)
         redshift_task = match.group(3)
 
-        table_name = self._get_table_name_from_redshift_task(dag_name, layer, redshift_task)
+        table_name = self._get_table_name_from_dw_task(dag_name, layer, redshift_task)
         table_name = f"{layer}:{table_name}"
 
         return dag_name, table_name
@@ -192,7 +192,11 @@ class CrossDAGDependenciesValidator:
             return dag_name, None
 
         layer = match_layer.group(1)
-        table_name = match.group(3).replace("-", "_")
+        if layer == "dw":
+            table_name = self._get_table_name_from_dw_task(dag_name, layer, match.group(3))
+        else:
+            table_name = match.group(3).replace("-", "_")
+
         table_name = f"{layer}:{table_name}"
         return dag_name, table_name
 
