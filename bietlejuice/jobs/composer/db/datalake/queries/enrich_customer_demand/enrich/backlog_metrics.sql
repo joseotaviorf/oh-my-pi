@@ -32,7 +32,7 @@ exploded_backlog AS (
     datalake_customer_demand.base_tasks
 ),
 days_off AS (
-  SELECT
+  SELECT /*+ RANGE_JOIN(eb, 150) */
     id_task,
     dt_interval,
     COUNT(1) AS days_off
