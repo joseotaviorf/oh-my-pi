@@ -3,5 +3,5 @@ table_name: datalake_gsheets_raw.tqc_leads
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
-    greater_than: 500
+    greater_than: 570
     severity_level: Error
