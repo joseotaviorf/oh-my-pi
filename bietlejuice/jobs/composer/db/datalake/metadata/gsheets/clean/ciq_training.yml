@@ -3,7 +3,7 @@ table_name: ciq_training
 columns:
   event:
     lineage:
-      - datalake_gsheets_raw.ciq_training.evento
+      - datalake_gsheets_raw.ciq_training.event
   id_ciq:
     lineage:
       - datalake_gsheets_raw.ciq_training.id_ciq
