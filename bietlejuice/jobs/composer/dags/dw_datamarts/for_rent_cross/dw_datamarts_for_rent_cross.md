@@ -10,12 +10,16 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-This pipeline creates the tables in the schema `dw_datamart` of data lake and `datamarts` of DW.
+This pipeline creates the following full tables in the schema `dw_datamart` of data lake and `datamarts` of DW.
 
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the 
-[DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
+- `credit_proposal_attribute`
+- `funnel_credit_event_flows`
+- `funnel_monthly_credit_user_flow`
+- `funnel_weekly_credit_user_flow`
+- `rental_demand_events_funnel_flows`
+- `rental_events_funnel_partners`
+- `rental_events_funnel`
+- `user_cohort_rental_demand_conversion`
 
 ### Additional Information
 

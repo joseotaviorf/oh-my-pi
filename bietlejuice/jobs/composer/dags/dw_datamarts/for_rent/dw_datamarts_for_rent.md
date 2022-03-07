@@ -10,13 +10,20 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-This pipeline creates the tables in the schema `dw_datamart` of data lake and `datamarts` of DW.
+This pipeline creates the following full tables in the schema `dw_datamart` of data lake and `datamarts` of DW:
 
-### Responsible Data Engineering Team
-
-For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the 
-[DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
-
+- `agents_activations_suspensions_contracts_changes`
+- `contract_termination`
+- `datamart_cohort_rentals`
+- `datamart_kpi_weekly`
+- `datamart_opportunity`
+- `house_available_hours`
+- `house_weekly_available_hours`
+- `house_weekly_entrance_info`
+- `ongoing_listed_suspended_listings`
+- `repressed_demand`
+- `weekly_demand_metrics`
+  
 ### Additional Information
 
 The file [datamarts.yaml](https://github.com/quintoandar/bi-etl-ejuice/blob/master/bietlejuice/jobs/composer/dags/datamarts/datamarts.yml)
