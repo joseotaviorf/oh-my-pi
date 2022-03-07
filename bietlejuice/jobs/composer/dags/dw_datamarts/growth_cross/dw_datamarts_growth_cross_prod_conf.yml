@@ -211,3 +211,10 @@ pipeline:
       table: indicaai_costs
       depends_on:
         - performance_marketing_cluster_promotional_bonus_costs
+  demand_housing_cluster_changes:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/demand_housing_cluster_changes.sql
+      table: demand_housing_cluster_changes
+      depends_on:
+        - performance_marketing_metrics_demand

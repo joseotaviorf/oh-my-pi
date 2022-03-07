@@ -289,6 +289,8 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.gsheets:create-clean-targets-casa-mineira-cost-external-table
   - bietlejuice.gsheets:create-clean-targets-casa-mineira-ncp-external-table
   - bietlejuice.gsheets:create-clean-taxonomy-crm-casa-mineira-external-table
+  # demand_housing_cluster_changes
+  - bietlejuice.enrich_lost_listings:create-enrich-lost-listings-external-table
 
 bietlejuice.dw_datamarts_growth_cross:
   # affiliate_acquisition_metrics
