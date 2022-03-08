@@ -218,3 +218,10 @@ pipeline:
       table: demand_housing_cluster_changes
       depends_on:
         - performance_marketing_metrics_demand
+  plaquinhas_users_demand:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/plaquinhas_users_demand.sql
+      table: plaquinhas_users_demand
+      depends_on:
+        - performance_marketing_metrics_demand

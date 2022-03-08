@@ -403,6 +403,8 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.wololo:create-clean-context-discard-external-table
   - bietlejuice.wololo:create-clean-conversion-external-table
   - bietlejuice.wololo:create-clean-prospect-external-table
+  # plaquinhas_users_demand
+  - bietlejuice.gsheets:create-clean-plaquinhas-demand-targets-external-table
 
 bietlejuice.dw_datamarts_growth_dep_manual_costs:
   - bietlejuice.enrich_marketing_manual_daily_costs:create-enrich-daily-costs-external-table
