@@ -209,6 +209,8 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
   - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
   - bietlejuice.ebdb:create-house-clean-external-table
+  # casa_mineira_top_of_funnel_volumes_daily
+  - bietlejuice.gsheets:create-clean-targets-casa-mineira-tof-daily-external-table
   #plaquinhas_houses
   - bietlejuice.dw_listing_jobs:load-public-dim-photo-job-into-redshift
   - bietlejuice.dw_listing:load-public-fact-house-listing-status-into-redshift
