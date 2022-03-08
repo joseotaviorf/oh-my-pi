@@ -304,13 +304,28 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.dw_contract:load-public-dim-contract-into-redshift
   - bietlejuice.ebdb:create-dw-quintoandar-fact-contract-people-in-datalake
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
-  # rent_flow_interactions
+  # marketing_allocated_costs, rent_flow_interactions, rental_cohort_conversions, rental_marketplace_flows, sale_performance_marketing_metrics_demand
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
+  # marketing_allocated_costs, performance_marketing_metrics_demand, pricing_rent_categorization, rent_flow_interactions,
+  # rental_cohort_conversions, rental_marketplace_flows, tenant_prospect_status, tenant_prospect_activations, user_funnel
+  - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
+  # efficiency_monitor_rental, house_demand_trends, marketing_allocated_costs, plaquinhas_metrics, pricing_rent_categorization,
+  # rent_flow_interactions, rental_marketplace_flows, user_funnel
+  - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
+  # inbound_attendance_leads_flows, marketing_allocated_costs, performance_marketing_cluster_promotional_bonus_costs, performance_marketing_cluster_promotional_bonus
+  # rental_performance_marketing_metrics_supply_coincident, sale_performance_marketing_metrics_supply_coincident, unique_performance_marketing_metrics_supply_coincident
+  - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
+  # indicaai_costs, marketing_allocated_costs, marketing_demand_supply_branding_costs, performance_marketing_cluster_promotional_bonus_costs,
+  # rental_performance_marketing_metrics_supply_coincident, sale_performance_marketing_metrics_supply_coincident
+  - bietlejuice.dw_sale_listing_flow:load-sale-fact-listing-flows-into-redshift
+  # affiliate_acquisition_metrics, indicaai_costs, marketing_allocated_costs, marketing_demand_supply_branding_costs, performance_marketing_metrics_demand,
+  # rental_performance_marketing_metrics_supply_coincident, sale_performance_marketing_metrics_demand, sale_performance_marketing_metrics_supply_coincident, unique_performance_marketing_metrics_supply_coincident
+  - bietlejuice.enrich_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
+  # rent_flow_interactions
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
   - bietlejuice.casa_mineira_crm:create-clean-house-external-table
   - bietlejuice.dw_affiliate_costs:load-quintoandar-dim-affiliate-cost-into-redshift
   - bietlejuice.dw_affiliate_costs:load-quintoandar-fact-affiliate-costs-into-redshift
-  - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
   - bietlejuice.dw_call:load-call-dim-call-agent-into-redshift
   - bietlejuice.dw_call:load-call-dim-call-into-redshift
   - bietlejuice.dw_call:load-call-dim-call-task-into-redshift
@@ -320,13 +335,10 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.dw_datamarts_cross:create-buyer-prospect-status-in-datalake
   - bietlejuice.dw_datamarts_cross:create-funnel-demand-flows-in-datalake
   - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
-  - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
   - bietlejuice.dw_listing:load-public-dim-house-listing-into-redshift
-  - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
   - bietlejuice.dw_listing:load-public-fact-house-listing-status-into-redshift
   - bietlejuice.dw_listing_jobs:load-public-dim-photo-job-into-redshift
   - bietlejuice.dw_offer:load-public-dim-offer-into-redshift
-  - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
   - bietlejuice.dw_proposal:load-public-dim-proposal-into-redshift
   - bietlejuice.dw_quinto_messenger:load-quinto-messenger-dim-chat-into-redshift
   - bietlejuice.dw_quinto_messenger:load-quinto-messenger-dim-task-into-redshift
@@ -335,7 +347,6 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
   - bietlejuice.dw_rent_listing_flow:load-public-fact-house-listing-flows-into-redshift
   - bietlejuice.dw_sale_flows:load-sale-fact-sale-flows-into-redshift
-  - bietlejuice.dw_sale_listing_flow:load-sale-fact-listing-flows-into-redshift
   - bietlejuice.dw_sale_listings:load-sale-fact-listings-into-redshift
   - bietlejuice.dw_sale_offers:load-sale-dim-offer-into-redshift
   - bietlejuice.dw_sale_offers:load-sale-dim-sale-agreement-into-redshift
@@ -352,7 +363,6 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.ebdb:create-user-revision-entity-clean-external-table
   - bietlejuice.enrich_amplitude_page_viewed_events:create-enrich-listing-page-viewed-external-table
   - bietlejuice.enrich_bigfone_twilio:create-enrich-call-flex-events-external-table
-  - bietlejuice.enrich_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
   - bietlejuice.enrich_top_of_funnel_demand:create-enrich-user-interactions-external-table
   - bietlejuice.gsheets:create-clean-affiliates-extra-user-bonus-external-table
   - bietlejuice.gsheets:create-clean-aux-check-photo-sender-external-table
@@ -408,6 +418,10 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.gsheets:create-clean-plaquinhas-demand-targets-external-table
   # performance_marketing_metrics_imobiliaria_casa_mineira
   # migration pending: marketing.fact_affiliate_daily_cost_attributions
+  # marketing_allocated_costs
+  - bietlejuice.dw_offer:load-public-dim-offer-into-redshift
+  - bietlejuice.dw_user_affiliate:load-dw-public-dim-user-affiliate
+  - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
 
 bietlejuice.dw_datamarts_growth_dep_manual_costs:
   - bietlejuice.enrich_marketing_manual_daily_costs:create-enrich-daily-costs-external-table

@@ -1,8 +1,0 @@
-# Config for marketing_allocated_costs
----
-streams:
-  - direction: "upstream"
-    task_ids: []
-composer_dependencies:
-  - dw_datamarts_cross
-  - dw_datamarts_growth_cross
