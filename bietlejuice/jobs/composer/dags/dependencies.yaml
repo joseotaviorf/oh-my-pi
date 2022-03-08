@@ -316,7 +316,6 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.dw_call:load-call-fact-calls-into-redshift
   - bietlejuice.dw_contract:load-public-dim-contract-into-redshift
   - bietlejuice.dw_datamarts_cross:create-buyer-prospect-status-in-datalake
-  - bietlejuice.dw_datamarts_cross:create-lead-listing-flows-in-datalake
   - bietlejuice.dw_datamarts_cross:create-funnel-demand-flows-in-datalake
   - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
   - bietlejuice.dw_lead:load-public-dim-lead-into-redshift
@@ -332,7 +331,6 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.dw_quinto_messenger:load-quinto-messenger-dim-quinto-messenger-agent-into-redshift
   - bietlejuice.dw_quinto_messenger:load-quinto-messenger-fact-tasks-into-redshift
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
-  - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
   - bietlejuice.dw_rent_listing_flow:load-public-fact-house-listing-flows-into-redshift
   - bietlejuice.dw_sale_flows:load-sale-fact-sale-flows-into-redshift
   - bietlejuice.dw_sale_listing_flow:load-sale-fact-listing-flows-into-redshift
@@ -361,7 +359,6 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.gsheets:create-clean-costs-targets-external-table
   - bietlejuice.gsheets:create-clean-daily-target-supply-rental-external-table
   - bietlejuice.gsheets:create-clean-offers-hub-central-external-table
-  - bietlejuice.gsheets:create-clean-offline-and-branding-marketing-costs-external-table
   - bietlejuice.gsheets:create-clean-promotional-bonus-cluster-targets-external-table
   - bietlejuice.gsheets:create-clean-promotional-bonus-user-cluster-targets-external-table
   - bietlejuice.gsheets:create-clean-rental-tof-daily-targets-external-table
@@ -376,6 +373,8 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.gsheets:create-clean-secretariat-hierarchy-external-table
   - bietlejuice.gsheets:create-clean-unit-economics-amortization-curve-external-table
   - bietlejuice.gsheets:create-clean-users-cx-plaquinhas-external-table
+  # rent_flow_interactions, performance_marketing_metrics_imobiliaria_casa_mineira
+  - bietlejuice.gsheets:create-clean-offline-and-branding-marketing-costs-external-table
   # daily_target_volumes_supply
   - bietlejuice.gsheets:create-clean-city-share-external-table
   - bietlejuice.gsheets:create-clean-local-holidays-external-table
@@ -405,6 +404,8 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.wololo:create-clean-prospect-external-table
   # plaquinhas_users_demand
   - bietlejuice.gsheets:create-clean-plaquinhas-demand-targets-external-table
+  # performance_marketing_metrics_imobiliaria_casa_mineira
+  # migration pending: marketing.fact_affiliate_daily_cost_attributions
 
 bietlejuice.dw_datamarts_growth_dep_manual_costs:
   - bietlejuice.enrich_marketing_manual_daily_costs:create-enrich-daily-costs-external-table

@@ -225,3 +225,8 @@ pipeline:
       table: plaquinhas_users_demand
       depends_on:
         - performance_marketing_metrics_demand
+  marketing_campaigns_costs_and_volumes:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/marketing_campaigns_costs_and_volumes.sql
+      table: marketing_campaigns_costs_and_volumes

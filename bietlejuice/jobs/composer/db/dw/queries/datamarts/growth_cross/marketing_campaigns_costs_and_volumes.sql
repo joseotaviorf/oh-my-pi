@@ -228,7 +228,7 @@ supply_funnel AS (
     FROM
         qualifieds_fs
 
-    UNION ALL 
+    UNION ALL
 
     SELECT
         *
@@ -250,7 +250,7 @@ rental_affiliates_qualifieds AS (
         add_months(dd.month_start, 1) AS month_start,
         dr.city_group,
         COUNT(DISTINCT CASE WHEN sk_qualified_date > 0 THEN sk_house_listing_flow ELSE NULL END) AS qualifieds_rent
-    FROM 
+    FROM
         fact_house_listing_flows AS rf
         JOIN dim_date AS dd
             ON dd.sk_date = rf.sk_qualified_date
@@ -259,7 +259,7 @@ rental_affiliates_qualifieds AS (
     WHERE
         rf.sk_qualified_date > 20181201
         AND rf.mkt_origin IN ('Indica Aí - General','Doorman','Indica Aí - Agents')
-        AND dr.city_group IS NOT NULL 
+        AND dr.city_group IS NOT NULL
     GROUP BY 1,2
 ),
 sale_affiliates_qualifieds AS (
@@ -267,7 +267,7 @@ sale_affiliates_qualifieds AS (
         add_months(dd.month_start, 1) AS month_start,
         dr.city_group,
         COUNT(DISTINCT CASE WHEN sk_qualified_date > 0 THEN sk_house_listing_flow ELSE NULL END) AS qualifieds_sale
-    FROM 
+    FROM
         sale.fact_listing_flows as sf
         JOIN dim_date AS dd
             ON dd.sk_date = sf.sk_qualified_date
@@ -276,7 +276,7 @@ sale_affiliates_qualifieds AS (
     WHERE
         sf.sk_qualified_date > 20181201
         AND sf.mkt_origin IN ('Indica Aí - General','Doorman','Indica Aí - Agents')
-        AND dr.city_group IS NOT NULL 
+        AND dr.city_group IS NOT NULL
     GROUP BY 1,2
 ),
 affiliates_proportion AS (
@@ -305,7 +305,7 @@ affiliates AS (
         dua.mkt_source,
         dua.tracking_campaign AS utm_campaign,
         COUNT(DISTINCT dua.sk_user) AS event_quantity
-    FROM 
+    FROM
         dim_user_affiliate AS dua
         JOIN dim_date AS dd
             ON date(dua.ts_joined_program) = dd.date
@@ -459,7 +459,7 @@ affiliate_costs AS (
         0::FLOAT AS cost_fs
     FROM
         ia_fact_affiliate_transposed AS iac
-    WHERE 
+    WHERE
         iac.cost IS NOT null
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11
     HAVING
@@ -480,7 +480,7 @@ branding_costs AS (
         utm_campaign,
         SUM(CASE WHEN lower(trim(business_context)) = 'rent' THEN cost::FLOAT ELSE 0::FLOAT END) AS cost_fr,
         SUM(CASE WHEN lower(trim(business_context)) = 'sale' THEN cost::FLOAT ELSE 0::FLOAT END) AS cost_fs
-    FROM datalake_raw.gsheets_offline_and_branding_marketing_costs
+    FROM datalake_gsheets_clean_prod.offline_and_branding_marketing_costs
     WHERE
         sk_date >= 20190101
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11
@@ -581,7 +581,7 @@ marketing_campaigns_costs_and_volumes AS (
 
     UNION ALL
 
-    SELECT 
+    SELECT
         a.sk_date,
         a.event_type,
         ap.city_group,
