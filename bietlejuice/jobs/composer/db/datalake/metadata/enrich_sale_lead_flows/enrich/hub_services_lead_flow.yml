@@ -5,6 +5,9 @@ columns:
   id_visitor:
     lineage:
       - datalake_hub_services_clean.lead.id_visitor
+  id_external:
+    lineage:
+      - datalake_hub_services_clean.visitor.id_external
   id_first_house:
     lineage:
       - datalake_ebdb_clean.house.id

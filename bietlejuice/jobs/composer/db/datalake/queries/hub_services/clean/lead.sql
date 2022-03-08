@@ -9,6 +9,7 @@ SELECT
     lead_type,
     lead_status,
     cancellation AS is_cancellation,
+    is_secretariat,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,

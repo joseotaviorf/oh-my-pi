@@ -5,6 +5,9 @@ columns:
   id:
     lineage:
       - datalake_hub_services_raw.visitor.id
+  id_external:
+    lineage:
+      - datalake_hub_services_raw.visitor.external_id
   version:
     lineage:
       - datalake_hub_services_raw.visitor.version

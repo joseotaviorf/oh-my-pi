@@ -1,5 +1,6 @@
 SELECT
     id,
+    external_id AS id_external,
     version,
     name AS visitor_name,
     email,

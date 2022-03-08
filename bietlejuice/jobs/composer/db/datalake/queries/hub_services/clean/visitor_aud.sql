@@ -1,5 +1,6 @@
 SELECT
     id,
+    external_id AS id_external,
     rev,
     revtype AS rev_type,
     revend AS rev_end,
@@ -7,6 +8,7 @@ SELECT
     name AS visitor_name,
     email,
     phone_number,
+    id_mod AS mod_id,
     name_mod AS mod_visitor_name,
     email_mod AS mod_email,
     phone_number_mod AS mod_phone_number,

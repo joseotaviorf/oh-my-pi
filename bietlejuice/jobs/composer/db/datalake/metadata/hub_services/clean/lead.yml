@@ -32,6 +32,9 @@ columns:
   is_cancellation:
     lineage:
       - datalake_hub_services_raw.lead.cancellation
+  is_secretariat:
+    lineage:
+      - datalake_hub_services_raw.lead.is_secretariat
   ts_created:
     lineage:
       - datalake_hub_services_raw.lead.created_at

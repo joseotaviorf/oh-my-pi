@@ -2,6 +2,7 @@
 WITH visitor AS (
   SELECT
     id,
+    id_external,
     email,
     phone_number,
     ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated) AS rw_asc
@@ -104,6 +105,7 @@ last_contact_prospect AS (
 leads AS (
   SELECT 
     l.id_visitor,
+    v.id_external,
     l.id_house,
     h.id_region,
     l.id_business_unit,
@@ -150,6 +152,7 @@ last_lead AS (
 
 SELECT 
   fl.id_visitor,
+  fl.id_external,
   fl.id_house AS id_first_house,
   ll.id_house AS id_last_house,
   fl.id_region AS id_first_region,
