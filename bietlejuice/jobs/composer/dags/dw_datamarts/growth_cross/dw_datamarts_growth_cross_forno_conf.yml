@@ -58,6 +58,13 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/growth_cross/inbound_attendance_leads_flows.sql
       table: inbound_attendance_leads_flows
+  marketing_allocated_costs:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/marketing_allocated_costs.sql
+      table: marketing_allocated_costs
+      depends_on:
+        - marketing_campaigns_costs_and_volumes
   marketing_demand_supply_branding_costs:
     dw:
       <<: *redshift_anchor
