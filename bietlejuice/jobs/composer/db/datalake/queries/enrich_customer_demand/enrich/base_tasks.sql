@@ -95,7 +95,7 @@ ticket_tasks AS (
       AND DATE(t.ts_started) = ts.dt_reference
   LEFT JOIN
     datalake_gsheets_clean.tag_sla_target tst
-      ON dc.journey_step = ts.journey_step
+      ON dc.journey_step = tst.journey
       AND t.tags LIKE '%orçamentação_realizada%'
       AND t.tags LIKE CONCAT('%', tst.tag, '%')
       AND t.ts_started BETWEEN tst.dt_start AND COALESCE(tst.dt_end, NOW())
