@@ -1,0 +1,28 @@
+---
+database_name: datalake_pro_owners
+table_name: pro_owner_history
+columns:
+  id_owner:
+    lineage:
+      - datalake_ebdb_clean.user_pro_owner_aud.id_user
+  id_account_manager:
+    lineage:
+      - datalake_ebdb_clean.user_pro_owner_aud.id_account_manager
+  is_pro_owner:
+    lineage:
+      - datalake_ebdb_clean.user_pro_owner_aud.is_active
+  ts_event:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  ts_pro_owner_started:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  ts_pro_owner_ended:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  ts_account_manager_started:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  ts_account_manager_ended:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision

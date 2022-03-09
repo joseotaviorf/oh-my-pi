@@ -1,0 +1,4 @@
+---
+inner_dependencies:
+  pro_owner_history:
+    - owner_houses_quantity_history
