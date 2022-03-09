@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 from functools import reduce
+import json
 
 from pyspark.sql.functions import col, lit, explode
 from pyspark.sql import DataFrame
@@ -43,7 +44,7 @@ def create_df_from_result(
     col_to_explode=None,
 ):
     sc = BaseSparkContext.sc
-    df = spark_client.conn.read.json(sc.parallelize([result]))
+    df = spark_client.conn.read.json(sc.parallelize([json.dumps(result)]))
 
     df = df.withColumn("main_domain", lit(domain)).withColumn("platform", lit(platform))
     if col_to_explode:
