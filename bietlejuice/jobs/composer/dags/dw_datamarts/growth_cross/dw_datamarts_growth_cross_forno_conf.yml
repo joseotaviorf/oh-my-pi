@@ -72,13 +72,6 @@ pipeline:
       table: marketing_demand_supply_branding_costs
       depends_on:
         - performance_marketing_cluster_promotional_bonus_costs
-  marketing_allocated_costs:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth_cross/marketing_allocated_costs.sql
-      table: marketing_allocated_costs
-      depends_on:
-        - marketing_campaigns_costs_and_volumes
   performance_marketing_cluster_promotional_bonus:
     dw:
       <<: *redshift_anchor
