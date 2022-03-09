@@ -1,6 +1,6 @@
 ---
 database_name: datalake_sale_lead_flows
-table_name: quinto_andar_lead_flow
+table_name: quintoandar_lead_flow
 columns:
   id_user:
     lineage:
@@ -17,9 +17,18 @@ columns:
   id_region_last_visit_intent:
     lineage:
       - datalake_ebdb_clean.house.id_region
+  id_region_first_offer:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+  id_region_last_offer:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
   id_first_region:
     lineage:
       - datalake_ebdb_clean.house.id_region
+  id_house_first_sale_agreement:
+    lineage:
+      - datalake_booking.booking.id_house
   id_first_house:
     lineage:
       - datalake_booking.booking.id_house

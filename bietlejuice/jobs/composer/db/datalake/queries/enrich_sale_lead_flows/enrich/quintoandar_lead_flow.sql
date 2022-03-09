@@ -354,13 +354,18 @@ SELECT
     lb.id_region AS id_region_last_booking,
     fvi.id_region_visit_intent AS id_region_first_visit_intent,
     lvi.id_region_visit_intent AS id_region_last_visit_intent,
-    CASE
-        WHEN fvi.ts_first_visit_scheduling_event > fb.ts_booking_created THEN fvi.id_region_visit_intent
-        ELSE fb.id_region
+    fo.id_region AS id_region_first_offer,
+    lo.id_region AS id_region_last_offer,
+    CASE LEAST(fvi.ts_first_visit_scheduling_event, fb.ts_booking_created, fo.ts_offer_submitted)
+        WHEN fvi.ts_first_visit_scheduling_event THEN fvi.id_region_visit_intent
+        WHEN fb.ts_booking_created THEN fb.id_region
+        WHEN fo.ts_offer_submitted THEN fo.id_region
     END AS id_first_region,
-    CASE
-        WHEN fvi.ts_first_visit_scheduling_event > fb.ts_booking_created THEN fvi.id_house
-        ELSE fb.id_house
+    fc.id_house AS id_house_first_sale_agreement,
+    CASE LEAST(fvi.ts_first_visit_scheduling_event, fb.ts_booking_created, fo.ts_offer_submitted)
+        WHEN fvi.ts_first_visit_scheduling_event THEN fvi.id_house
+        WHEN fb.ts_booking_created THEN fb.id_house
+        WHEN fo.ts_offer_submitted THEN fo.id_house
     END AS id_first_house,
     fo.offer_flow AS first_offer_flow,
     fc.offer_flow AS first_ccv_flow,

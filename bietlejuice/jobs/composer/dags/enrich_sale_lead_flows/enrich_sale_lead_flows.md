@@ -14,7 +14,7 @@ Produces the following output tables:
 - `casa_mineira_lead_flow`
 - `classified_lead_flow`
 - `hub_services_lead_flow`
-- `quinto_andar_lead_flow`
+- `quintoandar_lead_flow`
 
 ### Responsible Data Engineering Team
 
