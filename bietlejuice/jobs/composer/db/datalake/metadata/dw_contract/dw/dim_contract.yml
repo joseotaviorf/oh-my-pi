@@ -76,12 +76,21 @@ columns:
   is_b2b:
     lineage:
       - datalake_ebdb_contract.contract_b2b.is_b2b
+  is_contract_b2b:
+    lineage:
+      - datalake_ebdb_contract.contract_b2b.is_contract_b2b
+  contract_partner_type:
+    lineage:
+      - datalake_ebdb_contract.contract_b2b.contract_partner_type
   b2b_type:
     lineage:
       - datalake_ebdb_contract.contract_b2b.b2b_type
   b2b_prime_type:
     lineage:
       - datalake_ebdb_contract.contract_b2b.b2b_prime_type
+  contract_plan:
+    lineage:
+      - datalake_ebdb_contract.contract_b2b.contract_plan
   is_ongoing_contract:
     lineage:
       - datalake_ebdb_contract.contract.contract_is_ongoing_contract

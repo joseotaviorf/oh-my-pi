@@ -1101,6 +1101,7 @@ bietlejuice.enrich_ebdb_agents:
 bietlejuice.enrich_ebdb_contract:
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
   - bietlejuice.ebdb:create-clean-contract-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-contract-partnership-data-in-data-lake
   - bietlejuice.ebdb:create-clean-contract-person-in-data-lake
   - bietlejuice.ebdb:create-clean-contract-version-in-data-lake
   - bietlejuice.ebdb:create-clean-full-contract-in-data-lake
