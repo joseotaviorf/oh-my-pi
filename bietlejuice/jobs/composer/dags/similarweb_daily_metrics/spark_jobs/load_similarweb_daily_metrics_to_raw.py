@@ -66,7 +66,11 @@ def list_to_dict(response):
 
 def fetch_similarweb_metrics(consumer_instance, domain, platform, metrics):
     return consumer_instance.sync(
-        domain=domain, platform=platform, metrics_list=metrics
+        domain=domain,
+        platform=platform,
+        metrics_list=metrics,
+        executor_type="spark",
+        executor_spark_context=BaseSparkContext.sc,
     )
 
 
