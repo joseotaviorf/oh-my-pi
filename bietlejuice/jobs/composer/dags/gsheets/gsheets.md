@@ -154,6 +154,7 @@ This pipeline produces the following output tables:
     - `rental_tof_weekly_targets`
     - `retention_exclusivity_active_contact`
     - `sale_closing_ops_targets`
+    - `sale_closing_ops_targets_extra_slas_tags`
     - `sale_criteo_eng_ab_test`
     - `sale_demand_targets`
     - `sale_flows_targets`

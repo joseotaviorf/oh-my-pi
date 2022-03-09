@@ -1,0 +1,12 @@
+database_name: datalake_gsheets_clean
+table_name: sale_closing_ops_targets_extra_slas_tags
+columns:
+  tag_salesflow:
+    lineage:
+      - datalake_gsheets_raw.sale_closing_ops_targets_extra_slas_tags.tag_salesflow
+  sla_extra:
+    lineage:
+      - datalake_gsheets_raw.sale_closing_ops_targets_extra_slas_tags.sla_extra
+  metric_name:
+    lineage:
+      - datalake_gsheets_raw.sale_closing_ops_targets_extra_slas_tags.metric_name
