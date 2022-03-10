@@ -116,15 +116,15 @@ columns:
   ts_last_visit_completed:
     lineage:
       - datalake_casa_mineira_crm_clean.visit.ts_visited
-  dt_first_offer_submitted:
+  ts_first_offer_submitted:
     lineage:
       - datalake_casa_mineira_crm_clean.sale.ts_created
-  dt_last_offer_submitted:
+  ts_last_offer_submitted:
     lineage:
       - datalake_casa_mineira_crm_clean.sale.ts_created
-  dt_first_sale_agreement_signed:
+  ts_first_sale_agreement_signed:
     lineage:
       - datalake_casa_mineira_crm_clean.sale.ts_sold
-  dt_last_sale_agreement_signed:
+  ts_last_sale_agreement_signed:
     lineage:
       - datalake_casa_mineira_crm_clean.sale.ts_sold

@@ -310,8 +310,8 @@ offers_and_ccvs AS (
                 s.ts_sold
             DESC
         ) AS rw_ccv_desc,
-        TO_DATE(s.ts_created, 'YYYY-MM-DD') AS dt_offer_submitted,
-        TO_DATE(s.ts_sold, 'YYYY-MM-DD') AS dt_sale_agreement_signed
+        s.ts_created AS ts_offer_submitted,
+        s.ts_sold AS ts_sale_agreement_signed
     FROM
         unique_users_list_ids AS uu
     JOIN
@@ -332,7 +332,7 @@ offers_and_ccvs_statistics AS (
         COUNT(*) AS total_offers_submitted,
         COUNT(
             CASE
-                WHEN dt_sale_agreement_signed IS NOT NULL THEN 1
+                WHEN ts_sale_agreement_signed IS NOT NULL THEN 1
             END
         ) AS total_sale_agreements_signed
     FROM
@@ -360,7 +360,7 @@ first_ccv AS (
         offers_and_ccvs
     WHERE
         rw_ccv_asc = 1
-        AND dt_sale_agreement_signed IS NOT NULL
+        AND ts_sale_agreement_signed IS NOT NULL
 ),
 last_ccv AS (
     SELECT *
@@ -368,7 +368,7 @@ last_ccv AS (
         offers_and_ccvs
     WHERE
         rw_ccv_desc = 1
-        AND dt_sale_agreement_signed IS NOT NULL
+        AND ts_sale_agreement_signed IS NOT NULL
 )
 SELECT
     uu.id_secretariat_client,
@@ -394,32 +394,32 @@ SELECT
     uu.list_phone_numbers,
     CASE
         WHEN GREATEST(fsc.ts_secretariat_contact,
-                      fc.dt_sale_agreement_signed,
-                      fo.dt_offer_submitted,
+                      fc.ts_sale_agreement_signed,
+                      fo.ts_offer_submitted,
                       fv.ts_visit_completed,
                       fb.ts_booking_created) = fsc.ts_secretariat_contact
             THEN 'lead_submission'
         WHEN GREATEST(fsc.ts_secretariat_contact,
-                      fc.dt_sale_agreement_signed,
-                      fo.dt_offer_submitted,
+                      fc.ts_sale_agreement_signed,
+                      fo.ts_offer_submitted,
                       fv.ts_visit_completed,
-                      fb.ts_booking_created) = fc.dt_sale_agreement_signed
+                      fb.ts_booking_created) = fc.ts_sale_agreement_signed
             THEN 'sale_agreement_signed'
         WHEN GREATEST(fsc.ts_secretariat_contact,
-                      fc.dt_sale_agreement_signed, 
-                      fo.dt_offer_submitted,
+                      fc.ts_sale_agreement_signed, 
+                      fo.ts_offer_submitted,
                       fv.ts_visit_completed, 
-                      fb.ts_booking_created) = fo.dt_offer_submitted
+                      fb.ts_booking_created) = fo.ts_offer_submitted
             THEN 'offer_submitted'
         WHEN GREATEST(fsc.ts_secretariat_contact,
-                      fc.dt_sale_agreement_signed, 
-                      fo.dt_offer_submitted,
+                      fc.ts_sale_agreement_signed, 
+                      fo.ts_offer_submitted,
                       fv.ts_visit_completed, 
                       fb.ts_booking_created) = fv.ts_visit_completed
             THEN 'visit_completed'
         WHEN GREATEST(fsc.ts_secretariat_contact,
-                      fc.dt_sale_agreement_signed, 
-                      fo.dt_offer_submitted,
+                      fc.ts_sale_agreement_signed, 
+                      fo.ts_offer_submitted,
                       fv.ts_visit_completed, 
                       fb.ts_booking_created) = fb.ts_booking_created
             THEN 'booking_created'
@@ -458,10 +458,10 @@ SELECT
     lb.ts_booking_created AS ts_last_booking_created,
     fv.ts_visit_completed AS ts_first_visit_completed,
     lv.ts_visit_completed AS ts_last_visit_completed,
-    fo.dt_offer_submitted AS dt_first_offer_submitted,
-    lo.dt_offer_submitted AS dt_last_offer_submitted,
-    fc.dt_sale_agreement_signed AS dt_first_sale_agreement_signed,
-    lc.dt_sale_agreement_signed AS dt_last_sale_agreement_signed
+    fo.ts_offer_submitted AS ts_first_offer_submitted,
+    lo.ts_offer_submitted AS ts_last_offer_submitted,
+    fc.ts_sale_agreement_signed AS ts_first_sale_agreement_signed,
+    lc.ts_sale_agreement_signed AS ts_last_sale_agreement_signed
 FROM
     unique_users_list_ids AS uu
 LEFT JOIN
