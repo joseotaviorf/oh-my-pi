@@ -24,11 +24,11 @@ pipeline:
   #     <<: *athena_anchor
   #     sql_file: dw/queries/datamarts/for_rent/house_weekly_entrance_info.sql
   #     table: house_weekly_entrance_info
-  customer_sessions_resolution_cmp:
+  customer_sessions_resolution:
     dw:
       <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/support_and_service/customer_sessions_resolution_cmp.sql
-      table: customer_sessions_resolution_cmp
+      sql_file: dw/queries/datamarts/support_and_service/customer_sessions_resolution.sql
+      table: customer_sessions_resolution
   ongoing_refund_requests:
     dw:
       <<: *athena_anchor
