@@ -1,0 +1,50 @@
+---
+database_name: datalake_survicate
+table_name: keys_surveys
+columns:
+  id_contract:
+    lineage:
+      - datalake_survicate_clean.surveys.page_url
+  email:
+    lineage:
+      - datalake_survicate_clean.surveys.page_url
+  satisfaction_rating:
+    lineage:
+      - datalake_survicate_clean.surveys.answers
+      - datalake_gsheets_clean.tenant_onboarding_keys_csat.score
+      - datalake_gsheets_clean.owner_offboarding_keys_csat.score
+  improvement_tags:
+    lineage:
+      - datalake_survicate_clean.surveys.answers
+      - datalake_gsheets_clean.tenant_onboarding_keys_csat.improvement_tags
+      - datalake_gsheets_clean.owner_offboarding_keys_csat.improvement_tags
+  user_comment:
+    lineage:
+      - datalake_survicate_clean.surveys.answers
+      - datalake_gsheets_clean.tenant_onboarding_keys_csat.comments
+      - datalake_gsheets_clean.owner_offboarding_keys_csat.comments
+  ts_first_seen:
+    lineage:
+      - datalake_survicate_clean.surveys.ts_first_seen
+      - datalake_gsheets_clean.tenant_onboarding_keys_csat.ts_input
+      - datalake_gsheets_clean.owner_offboarding_keys_csat.ts_input
+  ts_first_response:
+    lineage:
+      - datalake_survicate_clean.surveys.ts_first_response
+      - datalake_gsheets_clean.tenant_onboarding_keys_csat.ts_input
+      - datalake_gsheets_clean.owner_offboarding_keys_csat.ts_input
+  year:
+    lineage:
+      - datalake_survicate_clean.surveys.year
+      - datalake_gsheets_clean.tenant_onboarding_keys_csat.ts_input
+      - datalake_gsheets_clean.owner_offboarding_keys_csat.ts_input
+  month:
+    lineage:
+      - datalake_survicate_clean.surveys.month
+      - datalake_gsheets_clean.tenant_onboarding_keys_csat.ts_input
+      - datalake_gsheets_clean.owner_offboarding_keys_csat.ts_input
+  day:
+    lineage:
+      - datalake_survicate_clean.surveys.day
+      - datalake_gsheets_clean.tenant_onboarding_keys_csat.ts_input
+      - datalake_gsheets_clean.owner_offboarding_keys_csat.ts_input

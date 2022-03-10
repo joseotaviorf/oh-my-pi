@@ -1467,6 +1467,8 @@ bietlejuice.enrich_sorting_hat:
   - bietlejuice.sorting_hat:load-clean-early-credit-analysis
 
 bietlejuice.enrich_survicate:
+  - bietlejuice.gsheets:load-clean-owner-offboarding-keys-csat
+  - bietlejuice.gsheets:load-clean-tenant-onboarding-keys-csat
   - bietlejuice.survicate:load-clean-surveys
 
 bietlejuice.enrich_support_and_service_kpis_targets:
