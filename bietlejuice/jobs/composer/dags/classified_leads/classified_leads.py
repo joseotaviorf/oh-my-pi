@@ -44,7 +44,7 @@ LIBRARIES_DESCRIPTION = Variable.get(
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=LOCAL_TZ)
-MAIN_SCHEDULE_INTERVAL = "0 6 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
 
 dag = DAG(
     dag_id=DAG_ID,
