@@ -25,7 +25,7 @@ CONTEXT = "marketing_segmentations"
 DAG_NAME = f"enrich_{SOURCE}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 MAIN_START_DATE = datetime(2021, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "0 10 * * *"
+MAIN_SCHEDULE_INTERVAL = None
 
 config_service = ConfigurationService(DAG_NAME)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")

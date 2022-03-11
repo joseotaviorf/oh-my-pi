@@ -306,7 +306,7 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
   # marketing_allocated_costs, rent_flow_interactions, rental_cohort_conversions, rental_marketplace_flows, sale_performance_marketing_metrics_demand
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
-  # marketing_allocated_costs, performance_marketing_metrics_demand, pricing_rent_categorization, rent_flow_interactions, 
+  # marketing_allocated_costs, performance_marketing_metrics_demand, pricing_rent_categorization, rent_flow_interactions,
   # rental_cohort_conversions, rental_marketplace_flows, tenant_prospect_status, tenant_prospect_activations, user_funnel
   - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
   # efficiency_monitor_rental, house_demand_trends, marketing_allocated_costs, plaquinhas_metrics, pricing_rent_categorization,
@@ -1266,6 +1266,16 @@ bietlejuice.enrich_lead:
 bietlejuice.enrich_lead_tracking:
   - bietlejuice.ebdb:create-clean-lead-in-data-lake
   - bietlejuice.enrich_amplitude_lead:load-enrich-lead-origin
+
+bietlejuice.enrich_lost_listings:
+  - bietlejuice.dw_listing:load-dw-public-dim-house-listing
+  - bietlejuice.dw_listing:load-dw-public-fact-house-listings
+  - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.ebdb:create-clean-info-amenities-in-data-lake
+  - bietlejuice.ebdb:create-clean-amenities-in-data-lake
+  - bietlejuice.ebdb:create-clean-info-condo-amenities-in-data-lake
+  - bietlejuice.ebdb:create-clean-condo-amenities-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-maintenance-condition-in-data-lake
 
 bietlejuice.enrich_listing_flow:
   - bietlejuice.ebdb:create-clean-lead-aud-in-data-lake

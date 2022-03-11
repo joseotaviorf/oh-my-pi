@@ -3,12 +3,12 @@ table_name: lost_listings
 enrich_partition_cols: ["year", "month", "day"]
 lost_listings_model_path: /dbfs/FileStore/models/marketing/lost_listings_model.joblib
 segements_mapping:
-  0: 'Pequeno Padrão'
+  0: "Pequeno Padrão"
   1: 'Padrão "Morumbi"'
-  2: 'Studio'
-  3: 'Médios-Grandes'
-  4: 'Completos'
-  5: 'Prédios Simples'
+  2: "Studio"
+  3: "Médios-Grandes"
+  4: "Completos"
+  5: "Prédios Simples"
 amenities_query: |
   WITH
   amenities AS (
@@ -16,14 +16,14 @@ amenities_query: |
       *
     FROM (
       SELECT DISTINCT
-        i.imovel_id AS id_house,
-        CASE WHEN i.temcaracteristica = true THEN 1 ELSE 0 END AS temcaracteristica,
+        i.id_house AS id_house,
+        CASE WHEN i.has_characteristic = true THEN 1 ELSE 0 END AS temcaracteristica,
         REPLACE(a.slug, '-', '_') AS slug,
-        ROW_NUMBER() OVER(PARTITION BY i.imovel_id, i.amenidades_id ORDER BY i.atualizadoem DESC) AS rn
+        ROW_NUMBER() OVER(PARTITION BY i.id_house, i.id_amenities ORDER BY i.ts_updated DESC) AS rn
       FROM
-        datalake_ebdb_raw.amenidadesinfo i
-        JOIN datalake_ebdb_raw.amenidades a
-          ON i.amenidades_id = a.id
+        datalake_ebdb_clean.info_amenities i
+        JOIN datalake_ebdb_clean.amenities a
+            ON i.id_amenities = a.id
       )
     PIVOT (
       SUM(temcaracteristica)
@@ -37,14 +37,14 @@ amenities_query: |
       *
     FROM (
       SELECT
-        i.imovel_id AS id_house,
-        CASE WHEN i.temcaracteristica = true THEN 1 ELSE 0 END AS temcaracteristica,
+        i.id_house AS id_house,
+        CASE WHEN i.has_characteristic = true THEN 1 ELSE 0 END AS temcaracteristica,
         REPLACE(a.slug, '-', '_') AS slug,
-        ROW_NUMBER() OVER(PARTITION BY i.imovel_id, i.instalacao_id ORDER BY i.atualizadoem DESC) AS rn
+        ROW_NUMBER() OVER(PARTITION BY i.id_house, i.id_condo_amenities ORDER BY i.ts_updated DESC) AS rn
       FROM
-        datalake_ebdb_raw.instalacaoinfo i
-        JOIN datalake_ebdb_raw.instalacao a
-          ON i.instalacao_id = a.id
+        datalake_ebdb_clean.info_condo_amenities i
+        JOIN datalake_ebdb_clean.condo_amenities a
+            ON i.id_condo_amenities = a.id_condo_amenity
       )
     PIVOT (
       SUM(temcaracteristica)
@@ -54,8 +54,8 @@ amenities_query: |
       rn = 1
   )
   SELECT
-    COALESCE(a.id_house, ca.id_house, hc.houseid) AS id_house,
-    hc.maintenancecondition AS house_condition,
+    COALESCE(a.id_house, ca.id_house, hc.id_house) AS id_house,
+    hc.maintenance_condition AS house_condition,
     a.animais_de_estimacao,
     a.apartamento_cobertura,
     a.ar_condicionado,
@@ -66,8 +66,8 @@ amenities_query: |
     amenities AS a
     FULL OUTER JOIN condo_amenities as ca
       ON a.id_house = ca.id_house
-    FULL OUTER JOIN datalake_ebdb_raw.housemaintenancecondition AS hc
-      ON COALESCE(a.id_house, ca.id_house) = hc.houseid
+    FULL OUTER JOIN datalake_ebdb_clean.house_maintenance_condition AS hc
+      ON COALESCE(a.id_house, ca.id_house) = hc.id_house
 lost_listings_query: |
   SELECT
     DISTINCT dhl.sk_house_listing,
