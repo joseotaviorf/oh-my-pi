@@ -151,10 +151,10 @@ offers AS (
         sf.ts_offer_submitted,
         sf.dt_sale_agreement_signed,
         sf.dt_offer_accepted,
-        ROW_NUMBER() OVER (PARTITION BY u.id_user ORDER BY sf.ts_offer_submitted) AS rw_offer_asc,
-        ROW_NUMBER() OVER (PARTITION BY u.id_user ORDER BY sf.ts_offer_submitted DESC) AS rw_offer_desc,
-        ROW_NUMBER() OVER (PARTITION BY u.id_user ORDER BY sf.dt_sale_agreement_signed) AS rw_ccv_asc,
-        ROW_NUMBER() OVER (PARTITION BY u.id_user ORDER BY sf.dt_sale_agreement_signed DESC) AS rw_ccv_desc
+        ROW_NUMBER() OVER (PARTITION BY u.id_user ORDER BY sf.ts_offer_submitted NULLS LAST) AS rw_offer_asc,
+        ROW_NUMBER() OVER (PARTITION BY u.id_user ORDER BY sf.ts_offer_submitted DESC NULLS LAST) AS rw_offer_desc,
+        ROW_NUMBER() OVER (PARTITION BY u.id_user ORDER BY sf.dt_sale_agreement_signed NULLS LAST) AS rw_ccv_asc,
+        ROW_NUMBER() OVER (PARTITION BY u.id_user ORDER BY sf.dt_sale_agreement_signed DESC NULLS LAST) AS rw_ccv_desc
     FROM 
         all_users AS u
     JOIN 
@@ -380,47 +380,47 @@ SELECT
     u.phone_number,
     CASE
         WHEN GREATEST(lvi.ts_last_visit_scheduling_event, sf.ts_last_sale_flow, lv.ts_created, lv.ts_visit_completed,
-              lo.ts_offer_submitted, lo.dt_offer_accepted, lo.dt_sale_agreement_signed) = lvi.ts_last_visit_scheduling_event
+              lo.ts_offer_submitted, lo.dt_offer_accepted, lc.dt_sale_agreement_signed) = lvi.ts_last_visit_scheduling_event
             THEN 'lead_submission'
         WHEN GREATEST(lvi.ts_last_visit_scheduling_event, sf.ts_last_sale_flow, lv.ts_created, lv.ts_visit_completed,
-              lo.ts_offer_submitted, lo.dt_offer_accepted, lo.dt_sale_agreement_signed) = lv.ts_created
+              lo.ts_offer_submitted, lo.dt_offer_accepted, lc.dt_sale_agreement_signed) = lv.ts_created
             THEN 'booking_created'
         WHEN GREATEST(lvi.ts_last_visit_scheduling_event, sf.ts_last_sale_flow, lv.ts_created, lv.ts_visit_completed,
-              lo.ts_offer_submitted, lo.dt_offer_accepted, lo.dt_sale_agreement_signed) = lv.ts_visit_completed
+              lo.ts_offer_submitted, lo.dt_offer_accepted, lc.dt_sale_agreement_signed) = lv.ts_visit_completed
             THEN 'visit_completed'
         WHEN GREATEST(lvi.ts_last_visit_scheduling_event, sf.ts_last_sale_flow, lv.ts_created, lv.ts_visit_completed,
-              lo.ts_offer_submitted, lo.dt_offer_accepted, lo.dt_sale_agreement_signed) = lo.ts_offer_submitted
+              lo.ts_offer_submitted, lo.dt_offer_accepted, lc.dt_sale_agreement_signed) = lo.ts_offer_submitted
             THEN 'offer_submitted'
         WHEN GREATEST(lvi.ts_last_visit_scheduling_event, sf.ts_last_sale_flow, lv.ts_created, lv.ts_visit_completed,
-              lo.ts_offer_submitted, lo.dt_offer_accepted, lo.dt_sale_agreement_signed) = lo.dt_offer_accepted
+              lo.ts_offer_submitted, lo.dt_offer_accepted, lc.dt_sale_agreement_signed) = lo.dt_offer_accepted
             THEN 'offer_accepted'
         WHEN GREATEST(lvi.ts_last_visit_scheduling_event, sf.ts_last_sale_flow, lv.ts_created, lv.ts_visit_completed,
-              lo.ts_offer_submitted, lo.dt_offer_accepted, lo.dt_sale_agreement_signed) = lo.dt_sale_agreement_signed
+              lo.ts_offer_submitted, lo.dt_offer_accepted, lc.dt_sale_agreement_signed) = lc.dt_sale_agreement_signed
             THEN 'sale_agreement_signed'
         WHEN GREATEST(lv.ts_created, lo.ts_offer_submitted) != sf.ts_last_sale_flow
               OR fe.event = 'talk_to_agent'
             THEN 'talk_to_agent'
     END AS last_event,
     CASE
-        WHEN COALESCE(fvi.ts_first_visit_scheduling_event, fo.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
+        WHEN COALESCE(fvi.ts_first_visit_scheduling_event, fc.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
                     fv.ts_visit_completed, fv.ts_created) = fvi.ts_first_visit_scheduling_event
             THEN 'lead_submission'
-        WHEN COALESCE(fvi.ts_first_visit_scheduling_event, fo.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
-                    fv.ts_visit_completed, fv.ts_created) = fo.dt_sale_agreement_signed
+        WHEN COALESCE(fvi.ts_first_visit_scheduling_event, fc.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
+                    fv.ts_visit_completed, fv.ts_created) = fc.dt_sale_agreement_signed
             THEN 'sale_agreement_signed'
-        WHEN COALESCE(fvi.ts_first_visit_scheduling_event, fo.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
+        WHEN COALESCE(fvi.ts_first_visit_scheduling_event, fc.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
                     fv.ts_visit_completed, fv.ts_created) = fo.dt_offer_accepted
             THEN 'offer_accepted'
-        WHEN COALESCE(fvi.ts_first_visit_scheduling_event, fo.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
+        WHEN COALESCE(fvi.ts_first_visit_scheduling_event, fc.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
                     fv.ts_visit_completed, fv.ts_created) = fo.ts_offer_submitted
             THEN 'offer_submitted'
-        WHEN COALESCE(fvi.ts_first_visit_scheduling_event, fo.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
+        WHEN COALESCE(fvi.ts_first_visit_scheduling_event, fc.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
                     fv.ts_visit_completed, fv.ts_created) = fv.ts_visit_completed
             THEN 'visit_completed'
-        WHEN COALESCE(fvi.ts_first_visit_scheduling_event, fo.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
+        WHEN COALESCE(fvi.ts_first_visit_scheduling_event, fc.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
                     fv.ts_visit_completed, fv.ts_created) = fv.ts_created
             THEN 'booking_created'
-        WHEN COALESCE(fvi.ts_first_visit_scheduling_event, fo.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
+        WHEN COALESCE(fvi.ts_first_visit_scheduling_event, fc.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
                     fv.ts_visit_completed, fv.ts_created) IS NULL
             THEN 'talk_to_agent'
     END AS further_funnel_step,
@@ -448,8 +448,8 @@ SELECT
     lo.ts_offer_submitted AS ts_last_offer_submitted,
     fo.dt_offer_accepted AS ts_first_offer_accepted,
     lo.dt_offer_accepted AS ts_last_offer_accepted,
-    fo.dt_sale_agreement_signed AS ts_first_sale_agreement_signed,
-    lo.dt_sale_agreement_signed AS ts_last_sale_agreement_signed,
+    fc.dt_sale_agreement_signed AS ts_first_sale_agreement_signed,
+    lc.dt_sale_agreement_signed AS ts_last_sale_agreement_signed,
     fe.ts_first_event AS ts_first_event
 FROM
     all_users AS u
@@ -480,6 +480,9 @@ LEFT JOIN
 LEFT JOIN
     first_ccv AS fc
         ON fc.id_user = u.id_user
+LEFT JOIN
+    last_ccv AS lc
+        ON lc.id_user = u.id_user
 LEFT JOIN
     offers_statistics AS os
         ON os.id_user = u.id_user
