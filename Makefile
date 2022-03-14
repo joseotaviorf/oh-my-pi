@@ -218,6 +218,15 @@ validate-metadata-files-exist:
 	@git fetch --no-tags origin +refs/heads/master
 	@PYTHONPATH=. python3 scripts/atlas_metadata_validation/validate_metadata_files_exist.py  "$(DRONE_BRANCH)"
 
+.PHONY: validate-datamarts-metadata-files-exist
+validate-datamarts-metadata-files-exist:
+	@echo ""
+	@echo "Validating if new/modified datamarts have corresponding lineage metadata defined"
+	@echo "=========="
+	@echo ""
+	@git fetch --no-tags origin +refs/heads/master
+	@PYTHONPATH=. python3 scripts/atlas_metadata_validation/validate_datamarts_metadata_files_exist.py  "$(DRONE_BRANCH)"
+
 ############# common commands #######################
 
 .PHONY: cov-badge

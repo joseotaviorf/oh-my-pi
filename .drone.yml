@@ -241,6 +241,18 @@ pipeline:
         exclude:
           - hotfix/* # excluding this branch since the process validates master's code
 
+  validate-datamarts-metadata-files-exist:
+    group: tests
+    image: python:3.7.3
+    commands:
+      - make requirements-scripts-python3
+      - make validate-datamarts-metadata-files-exist
+    when:
+      event: push
+      branch:
+        exclude:
+          - hotfix/* # excluding this branch since the process validates master's code
+
   make-package-python3:
     group: package
     image: python:3.7.3
