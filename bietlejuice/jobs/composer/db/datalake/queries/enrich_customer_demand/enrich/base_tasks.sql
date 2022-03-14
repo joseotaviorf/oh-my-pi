@@ -50,6 +50,7 @@ ticket_tasks AS (
       e.department,
       e.tags,
       e.contact_theme_detail_tag,
+      e.contact_theme_tag,
       CASE
         WHEN 
           DATE(GET_JSON_OBJECT(REPLACE(REPLACE(tf.custom_fields, '[', ''), ']', ''),'$.Data Orçamentação realizada ')) IS NOT NULL
@@ -67,19 +68,41 @@ ticket_tasks AS (
   unique_taxonomy_sla_target AS (
     SELECT DISTINCT
       journey_step,
-      contact_theme_detail_tag,
+      contact_theme_detail_tag AS taxonomy_tag,
       sla_in_days,
       EXPLODE(SEQUENCE(dt_start, COALESCE(dt_end, DATE(NOW())))) AS dt_reference
     FROM
       datalake_gsheets_clean.taxonomy_sla
     WHERE
       dt_target_invalidated IS NULL
+    UNION ALL
+    SELECT
+      journey_step,
+      contact_theme_tag AS taxonomy_tag,
+      MIN(sla_in_days) AS sla_in_days,
+      EXPLODE(SEQUENCE(dt_start, COALESCE(dt_end, DATE(NOW())))) AS dt_reference
+    FROM
+      datalake_gsheets_clean.taxonomy_sla
+    WHERE
+      dt_target_invalidated IS NULL
+    GROUP BY 1,2,4
+  ),
+  unique_journey_sla_target AS (
+    SELECT
+      journey_step,
+      MIN(sla_in_days) AS sla_in_days,
+      EXPLODE(SEQUENCE(dt_start, COALESCE(dt_end, DATE(NOW())))) AS dt_reference
+    FROM
+      datalake_gsheets_clean.taxonomy_sla
+    WHERE
+      dt_target_invalidated IS NULL
+    GROUP BY 1,3
   )
   SELECT DISTINCT
     t.id_ticket AS id_task,
     COALESCE(t.id_agent, '-1') AS id_agent,
     t.department AS type,
-    COALESCE(ts.sla_in_days, tst.sla) AS sla_target,
+    COALESCE(ts.sla_in_days, ujst.sla_in_days, tst.sla) AS sla_target,
     t.ts_started,
     t.ts_completed
   FROM
@@ -90,9 +113,17 @@ ticket_tasks AS (
   LEFT JOIN
     unique_taxonomy_sla_target ts
       ON dc.journey_step = ts.journey_step
-      AND t.contact_theme_detail_tag = ts.contact_theme_detail_tag
+      AND (
+        t.contact_theme_detail_tag = ts.taxonomy_tag
+        OR (t.contact_theme_detail_tag IS NULL AND t.contact_theme_tag = ts.taxonomy_tag)
+      )
       AND NOT t.tags LIKE '%orçamentação_realizada%'
       AND DATE(t.ts_started) = ts.dt_reference
+  LEFT JOIN
+    unique_journey_sla_target ujst
+      ON dc.journey_step = ujst.journey_step
+      AND NOT t.tags LIKE '%orçamentação_realizada%'
+      AND DATE(t.ts_started) = ujst.dt_reference
   LEFT JOIN
     datalake_gsheets_clean.tag_sla_target tst
       ON dc.journey_step = tst.journey
