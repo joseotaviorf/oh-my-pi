@@ -1,0 +1,19 @@
+---
+database_name: dw_datamarts_for_sale
+table_name: liquidity_by_sk_region
+columns:
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
+  region_code:
+    lineage:
+      - dw_public.dim_region.region_code
+  sk_region:
+    lineage:
+      - dw_public.dim_region.sk_region
+  min_bedrooms:
+    lineage:
+      - dw_public.dim_house_listing.house_bedrooms
+  max_bedrooms:
+    lineage:
+      - dw_public.dim_house_listing.house_bedrooms
