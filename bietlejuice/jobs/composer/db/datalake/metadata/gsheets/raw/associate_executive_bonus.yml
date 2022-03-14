@@ -1,0 +1,6 @@
+database_name: datalake_gsheets_raw
+table_name: associate_executive_bonus
+columns:
+  associate_executive:
+    tags:
+    - PII

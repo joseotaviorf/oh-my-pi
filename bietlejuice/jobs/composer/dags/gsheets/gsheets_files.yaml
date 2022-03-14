@@ -10,6 +10,11 @@ acquisition_target_per_source:
     sheet_name: acquisition_target_per_source
     clean_table_name: acquisition_target_per_source
 
+associate_executive_bonus:
+    sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
+    sheet_name: associate_executive_bonus
+    clean_table_name: associate_executive_bonus
+
 affiliate_type_targets:
     sheet_id: 1dK5zcAgTcFg8KaNU3FEiZbHJOBw1DuTwdFhiqGZBETE
     sheet_name: affiliate_type_targets
@@ -100,10 +105,20 @@ braze_canvas_creative:
     sheet_name: canvas_dimensions
     clean_table_name: braze_canvas_creative
 
+business_rules_bonus:
+    sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
+    sheet_name: business_rules_bonus
+    clean_table_name: business_rules_bonus
+
 business_unit_region:
     sheet_id: 1AqaMTw8A6QXW4UExztYWQpBLPNfn04kafXvEPwEhqps
     sheet_name: business_unit_region
     clean_table_name: business_unit_region
+
+campaign_bonus:
+    sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
+    sheet_name: campaign_bonus
+    clean_table_name: campaign_bonus
 
 casa_mineira_inside_sales_pipe:
     sheet_id: 1sV89IeTziUUafu32NxVVBIDcLUQbzlwaZowqDacaPb0
@@ -379,6 +394,11 @@ hub_agents_hierarchy:
     sheet_id: 1LCtC41-pZRUM34Y6jyfSSys5zCXcueZ5uDmXVoQ5zVk
     sheet_name: Output
     clean_table_name: hub_agents_hierarchy
+
+hub_bonus:
+    sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
+    sheet_name: hub_bonus
+    clean_table_name: hub_bonus
 
 hub_sale_closing_process:
     sheet_id: 1yD11Nsj9Bcl1ugfK-R7e185Vr4wGqo8A3d7K95q6ieE

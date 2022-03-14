@@ -1,0 +1,16 @@
+---
+database_name: datalake_gsheets_clean
+table_name: associate_executive_bonus
+columns:
+  hub:
+    lineage:
+      - datalake_gsheets_raw.associate_executive_bonus.hub
+  associate_executive:
+    lineage:
+      - datalake_gsheets_raw.associate_executive_bonus.associate_executive
+  bonus_value:
+    lineage:
+      - datalake_gsheets_raw.associate_executive_bonus.bonus_value
+  dt_bonus:
+    lineage:
+      - datalake_gsheets_raw.associate_executive_bonus.dt_bonus

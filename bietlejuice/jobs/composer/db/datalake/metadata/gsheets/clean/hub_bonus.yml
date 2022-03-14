@@ -1,0 +1,16 @@
+---
+database_name: datalake_gsheets_clean
+table_name: hub_bonus
+columns:
+  hub:
+    lineage:
+      - datalake_gsheets_raw.hub_bonus.hub
+  bonus_fee:
+    lineage:
+      - datalake_gsheets_raw.hub_bonus.bonus_fee
+  dt_opening:
+    lineage:
+      - datalake_gsheets_raw.hub_bonus.dt_opening
+  dt_bonus_cutoff:
+    lineage:
+      - datalake_gsheets_raw.hub_bonus.dt_bonus_cutoff

@@ -1,0 +1,6 @@
+database_name: datalake_gsheets_raw
+table_name: campaign_bonus
+columns:
+  agent_full_name:
+    tags:
+    - PII

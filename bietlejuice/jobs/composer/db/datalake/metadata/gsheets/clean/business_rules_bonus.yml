@@ -1,0 +1,22 @@
+---
+database_name: datalake_gsheets_clean
+table_name: business_rules_bonus
+columns:
+  service_line:
+    lineage:
+      - datalake_gsheets_raw.business_rules_bonus.service_line
+  offer_flow:
+    lineage:
+      - datalake_gsheets_raw.business_rules_bonus.offer_flow
+  partner_type:
+    lineage:
+      - datalake_gsheets_raw.business_rules_bonus.partner_type
+  brokerage_fee_partner:
+    lineage:
+      - datalake_gsheets_raw.business_rules_bonus.brokerage_fee_partner
+  dt_started:
+    lineage:
+      - datalake_gsheets_raw.business_rules_bonus.dt_started
+  dt_ended:
+    lineage:
+      - datalake_gsheets_raw.business_rules_bonus.dt_ended

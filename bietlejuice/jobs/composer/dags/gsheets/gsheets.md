@@ -39,15 +39,18 @@ This pipeline produces the following output tables:
     - `aux_agents_sale_hub`
     - `aux_check_photo_sender`
     - `auxiliary_region`
+    - `associate_executive_bonus`
     - `bandaid_off`
     - `branding_where_is_plaquinha`
     - `braze_campaign_creative`
     - `braze_canvas_creative`
+    - `business_rules_bonus`
     - `business_unit_region`
-    - `census_subnormal_crowding_areas`
+    - `campaign_bonus`
     - `casa_mineira_inside_sales_pipe`
     - `casa_mineira_marketing_cost_taxonomy`
     - `casa_mineira_marketing_manual_shared_costs`
+    - `census_subnormal_crowding_areas`
     - `ciq_costs`
     - `ciq_training`
     - `cities_neighborhoods_ibge_qa`
@@ -83,6 +86,7 @@ This pipeline produces the following output tables:
     - `hotjar_photos_repressed_demand`
     - `households_per_city_ibge`
     - `hub_agents_hierarchy` 
+    - `hub_bonus` 
     - `hub_sale_closing_process`
     - `inspection_analysis_forms`
     - `inspection_bugs`
