@@ -120,12 +120,12 @@ heimdall_tasks AS (
       datalake_crm.tasks t
   )
   SELECT DISTINCT
-    a.id AS id_task,
+    a.id_external_contract AS id_task,
     MAX(COALESCE(bca.id_agent, '-1')) AS id_agent,
     a.type,
     2 AS sla_target,
-    MIN(a.ts_requested) AS ts_started,
-    MAX(a.ts_transition_created) AS ts_completed
+    DATE_TRUNC('DAY', a.ts_requested) AS ts_started,
+    DATE_TRUNC('DAY', a.ts_transition_created) AS ts_completed
   FROM
     datalake_heimdall.activity a
   LEFT JOIN
@@ -141,7 +141,7 @@ heimdall_tasks AS (
     a.type = 'TENANT_REFUND_REPAIR'
     AND (bca.id_task IS NULL OR bca.action_type = 'CREATE')
     AND a.ts_requested >= '2021-01-01'
-  GROUP BY 1,3,4
+  GROUP BY 1,3,4,5,6
 )
 SELECT
   id_task,
