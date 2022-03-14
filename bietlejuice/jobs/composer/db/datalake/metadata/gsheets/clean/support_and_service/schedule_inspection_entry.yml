@@ -1,0 +1,97 @@
+---
+database_name: datalake_gsheets_clean
+table_name: schedule_inspection_entry
+columns:
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.contrato
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.imovel
+  house_district:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.bairro
+  house_city:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.cidade
+  hsl_or_5a:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.hsl_5a
+  status_vt:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.status_vt
+  late_update:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.atualizacao_tarde
+  status_ct:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.status_ct
+  served_by_network:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.atendida_pela_rede
+  serverd_by_randstad:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.atendida_pela_randstad
+  cancellation_reason:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.motivo_cancelamento
+  agent_name:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.analista
+  reasons_not_scheduling:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.motivo_nao_agendamento
+  sem_contato_com_pp_iq:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.no_contact_with_pp_iq
+  number_of_attempts:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.n_tentativas_ligacoes
+  whatsapp_number:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.whatsapp
+  email:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.email
+  response_channel:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.canal_resposta
+  sla_response:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.qual_sla
+  sla_reason:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.motivo_sla
+  load_period:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.periodo
+  contact_with_pp:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.existiu_contato_com_pp
+  needed_rehandle_inspection:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.precisou_remanejar_vistoria
+  scheduled:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.agendado
+  b2b:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.b2b
+  dt_last_scheduled:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.ultimo_agendamento
+  dt_effectived:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.vigencia
+  ts_load:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.ts_load
+  year:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.year
+  month:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.month
+  day:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_entrada.day

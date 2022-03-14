@@ -1,0 +1,103 @@
+---
+database_name: datalake_gsheets_clean
+table_name: schedule_inspection_departure
+columns:
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.contrato
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.imovel
+  house_district:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.bairro
+  house_city:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.cidade
+  house_address:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.bairro_cidade
+  crm_url:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.link_crm
+  company:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.foxter_cia_imobiliaria
+  hsl_or_5a:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.hsl_5a
+  status_ct:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.status_ct
+  status_vt:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.status_vt
+  leadtime:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.leadtime
+  late_update:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.atualizacao_tarde
+  cancellation_reason:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.motivo_cancelamento
+  agent_name:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.analista
+  reasons_not_scheduling:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.motivos_nao_agendamento
+  escort_in_inspection:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.acompanhante_vistoria
+  summary_case:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.resumo_caso
+  regional_description:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.regional
+  contacted_PP:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.contantou_PP
+  number_of_attempts:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.numero_tentativas
+  whatsapp_number:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.whatsapp
+  email:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.email
+  response_channel:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.canal_resposta
+  load_period:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.load
+  scheduled:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.agendado
+  b2b:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.b2b
+  open_task:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.tarefa_aberta
+  dt_departured:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.data_saida
+  dt_rescission:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.data_recisao
+  ts_load:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.ts_load
+  year:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.year
+  month:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.month
+  day:
+    lineage:
+      - datalake_gsheets_raw.agendamento_vistoria_saida.day

@@ -1,0 +1,16 @@
+---
+database_name: datalake_gsheets_raw
+table_name: agendamento_vistoria_saida
+columns:
+  bairro:
+    tags:
+      - Restricted
+  cidade:
+    tags:
+      - Restricted
+  bairro_cidade:
+    tags:
+      - Restricted
+  regiao:
+    tags:
+      - Restricted

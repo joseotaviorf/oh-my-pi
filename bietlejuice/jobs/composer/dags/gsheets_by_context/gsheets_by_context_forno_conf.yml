@@ -1,0 +1,10 @@
+---
+# entry example:
+# dags:
+#   <dag_name>:
+#     main_schedule_interval: <main_schedule_interval>
+#     dag_owner: <dag_owner>
+dags:
+  support_and_service:
+    main_schedule_interval: 0 3 * * 5
+    dag_owner: Data S&S

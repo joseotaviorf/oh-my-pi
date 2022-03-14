@@ -1,0 +1,23 @@
+---
+# entry example:
+
+# <raw_table_name>:
+#     sheet_id: <sheet_id>
+#     sheet_name: <sheet_name>
+#     clean_table_name: <clean_table_name>
+#     sheet_context: <sheet_context>
+#     partitioned: <partitioned>
+
+agendamento_vistoria_saida:
+    sheet_id: 1LHcKqdrbTWNvRBT7TGVEbKhIrtqaqSxVVaeKsIcJZus
+    sheet_name: agendamento_saida
+    clean_table_name: schedule_inspection_departure
+    sheet_context: support_and_service
+    partitioned: True    
+
+agendamento_vistoria_entrada:
+    sheet_id: 1LHcKqdrbTWNvRBT7TGVEbKhIrtqaqSxVVaeKsIcJZus
+    sheet_name: agendamento_entrada
+    clean_table_name: schedule_inspection_entry
+    sheet_context: support_and_service
+    partitioned: True
