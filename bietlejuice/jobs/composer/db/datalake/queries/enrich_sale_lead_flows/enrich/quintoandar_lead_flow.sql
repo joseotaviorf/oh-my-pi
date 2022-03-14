@@ -361,7 +361,14 @@ SELECT
         WHEN fb.ts_booking_created THEN fb.id_region
         WHEN fo.ts_offer_submitted THEN fo.id_region
     END AS id_first_region,
+    fb.id_house AS id_house_first_booking,
+    lb.id_house AS id_house_last_booking,
+    fvi.id_house AS id_house_first_visit_intent,
+    lvi.id_house AS id_house_last_visit_intent,
+    fo.id_house AS id_house_first_offer,
+    lo.id_house AS id_house_last_offer,
     fc.id_house AS id_house_first_sale_agreement,
+    lc.id_house AS id_house_last_sale_agreement,
     CASE LEAST(fvi.ts_first_visit_scheduling_event, fb.ts_booking_created, fo.ts_offer_submitted)
         WHEN fvi.ts_first_visit_scheduling_event THEN fvi.id_house
         WHEN fb.ts_booking_created THEN fb.id_house
