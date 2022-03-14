@@ -1319,6 +1319,20 @@ bietlejuice.enrich_marketing_costs_offline:
   - bietlejuice.marketing_offline_costs:load-clean-marketing-offline-manual-share-city-group
   - bietlejuice.marketing_offline_costs:load-clean-marketing-offline-manual-share-cost-center
 
+bietlejuice.enrich_marketing_costs_sharing_rules:
+  # TO DO: migrate and add dependency to datalake_raw.gsheets_marketing_affiliates_targets_replanning
+  - bietlejuice.dw_user_affiliate:load-public-dim-user-affiliate-into-redshift
+  - bietlejuice.dw_user:load-public-dim-user-into-redshift
+  - bietlejuice.dw_rent_listing_flow:load-public-fact-house-listing-flows-into-redshift
+  - bietlejuice.dw_listing:load-public-fact-house-listing-status-into-redshift
+  - bietlejuice.dw_sale_listings:load-sale-fact-listing-status-into-redshift
+  - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
+  - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
+  - bietlejuice.dw_offer:load-public-dim-offer-into-redshift
+  - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
+  - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
+  - bietlejuice.ebdb:create-partner-clean-external-table
+
 bietlejuice.enrich_marketing_manual_daily_costs:
   - bietlejuice.marketing_manual_daily_costs:load-clean-marketing-costs-name-convention-shared-costs
   - bietlejuice.marketing_manual_daily_costs:load-clean-marketing-costs-manual-shared-costs

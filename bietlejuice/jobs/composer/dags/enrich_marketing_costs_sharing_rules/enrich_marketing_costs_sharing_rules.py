@@ -92,7 +92,6 @@ CUSTOM_LIBRARIES = [
 
 local_tz = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2019, 5, 31, 0, 0, 0, tzinfo=local_tz)
-MAIN_SCHEDULE_INTERVAL = "55 3 * * *"
 
 cost_types = ["online", "offline"]
 
@@ -104,7 +103,7 @@ dag = DAG(
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=MAIN_SCHEDULE_INTERVAL,
+    schedule_interval=None,
     doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
         chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
     ),
