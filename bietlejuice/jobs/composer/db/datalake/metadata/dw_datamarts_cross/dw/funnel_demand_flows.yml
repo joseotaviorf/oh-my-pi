@@ -1,0 +1,36 @@
+---
+database_name: dw_datamarts_cross
+table_name: funnel_demand_flows
+columns:
+  sk_rent_flow:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_rent_flow
+  sk_house_listing:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_house_listing
+  sk_client:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_client
+  first_ts:
+    lineage:
+      - dw_public.dim_booking.dt_created
+      - dw_public.dim_offer.dt_first_sent
+      - dw_datamarts_cross.talk_to_agent.first_message_ts
+  dt_first_direct_offer:
+    lineage:
+      - dw_public.dim_offer.dt_first_sent
+  dt_first_offer:
+    lineage:
+      - dw_public.dim_offer.dt_first_sent
+  dt_first_tta:
+    lineage:
+      - dw_datamarts_cross.talk_to_agent.first_message_ts
+  dt_first_visit_booked:
+    lineage:
+      - dw_public.dim_booking.dt_created
+  dt_first_visit_completed:
+    lineage:
+      - dw_public.dim_booking.dt_created
+  dt_first_presential_visit:
+    lineage:
+      - dw_public.dim_booking.dt_created
