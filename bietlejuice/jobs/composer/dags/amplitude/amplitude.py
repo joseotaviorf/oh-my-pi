@@ -59,6 +59,9 @@ UPDATE_CLEAN_STAGING_SUBPARTITIONED_TABLES_FILE_PATH = (
 PROPAGATE_TABLES_METADATA_CLEAN_STAGING_FILE_PATH = (
     AMPLITUDE_SPARK_JOBS_PATH + "propagate_tables_metadata_clean_staging.py"
 )
+LOAD_EVENTS_TABLES_CLEAN_FILE_PATH = (
+    AMPLITUDE_SPARK_JOBS_PATH + "load_events_tables_clean.py"
+)
 LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
     Variable.get("databricks_s3_bucket"), DAG_ID
 )
@@ -224,23 +227,25 @@ propagate_table_metadata_clean_events_task = QuintoAndarDatabricksSubmitRunOpera
     },
 )
 
-update_clean_events_daily_partition_athena_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="update-clean-events-daily-partition-athena",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": UPDATE_ATHENA_TABLE_DAILY_PARTITION_FILE_PATH,
-            "parameters": [
-                "{{ ds }}",
-                ENV,
-                DATALAKE_BUCKET,
-                ATHENA_QUERY_RESULT_LOCATION,
-                "amplitude",
-                "events",
-                "clean",
-            ],
-        }
-    },
+update_clean_events_daily_partition_athena_task = (
+    QuintoAndarDatabricksSubmitRunOperator(
+        task_id="update-clean-events-daily-partition-athena",
+        dag=dag,
+        json={
+            "spark_python_task": {
+                "python_file": UPDATE_ATHENA_TABLE_DAILY_PARTITION_FILE_PATH,
+                "parameters": [
+                    "{{ ds }}",
+                    ENV,
+                    DATALAKE_BUCKET,
+                    ATHENA_QUERY_RESULT_LOCATION,
+                    "amplitude",
+                    "events",
+                    "clean",
+                ],
+            }
+        },
+    )
 )
 
 create_clean_staging_events_task = QuintoAndarDatabricksSubmitRunOperator(
@@ -282,92 +287,104 @@ update_clean_staging_subpartitions_values_task = QuintoAndarDatabricksSubmitRunO
     },
 )
 
-create_clean_staging_subpartitioned_tables_spark_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="create-clean-staging-subpartitioned-tables-spark",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": CREATE_CLEAN_STAGING_SUBPARTITIONED_TABLES_FILE_PATH,
-            "parameters": [
-                "{{ ds }}",
-                ENV,
-                DATALAKE_BUCKET,
-                ATHENA_QUERY_RESULT_LOCATION,
-                "amplitude",
-                "events",
-                "--spark",
-            ],
-        }
-    },
+create_clean_staging_subpartitioned_tables_spark_task = (
+    QuintoAndarDatabricksSubmitRunOperator(
+        task_id="create-clean-staging-subpartitioned-tables-spark",
+        dag=dag,
+        json={
+            "spark_python_task": {
+                "python_file": CREATE_CLEAN_STAGING_SUBPARTITIONED_TABLES_FILE_PATH,
+                "parameters": [
+                    "{{ ds }}",
+                    ENV,
+                    DATALAKE_BUCKET,
+                    ATHENA_QUERY_RESULT_LOCATION,
+                    "amplitude",
+                    "events",
+                    "--spark",
+                ],
+            }
+        },
+    )
 )
 
-create_clean_staging_subpartitioned_tables_athena_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="create-clean-staging-subpartitioned-tables-athena",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": CREATE_CLEAN_STAGING_SUBPARTITIONED_TABLES_FILE_PATH,
-            "parameters": [
-                "{{ ds }}",
-                ENV,
-                DATALAKE_BUCKET,
-                ATHENA_QUERY_RESULT_LOCATION,
-                "amplitude",
-                "events",
-                "--athena",
-            ],
-        }
-    },
+create_clean_staging_subpartitioned_tables_athena_task = (
+    QuintoAndarDatabricksSubmitRunOperator(
+        task_id="create-clean-staging-subpartitioned-tables-athena",
+        dag=dag,
+        json={
+            "spark_python_task": {
+                "python_file": CREATE_CLEAN_STAGING_SUBPARTITIONED_TABLES_FILE_PATH,
+                "parameters": [
+                    "{{ ds }}",
+                    ENV,
+                    DATALAKE_BUCKET,
+                    ATHENA_QUERY_RESULT_LOCATION,
+                    "amplitude",
+                    "events",
+                    "--athena",
+                ],
+            }
+        },
+    )
 )
 
-update_clean_staging_subpartitioned_tables_spark_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="update-clean-staging-subpartitioned-tables-spark",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": UPDATE_CLEAN_STAGING_SUBPARTITIONED_TABLES_FILE_PATH,
-            "parameters": [
-                "{{ ds }}",
-                ENV,
-                DATALAKE_BUCKET,
-                ATHENA_QUERY_RESULT_LOCATION,
-                "amplitude",
-                "--spark",
-            ],
-        }
-    },
+update_clean_staging_subpartitioned_tables_spark_task = (
+    QuintoAndarDatabricksSubmitRunOperator(
+        task_id="update-clean-staging-subpartitioned-tables-spark",
+        dag=dag,
+        json={
+            "spark_python_task": {
+                "python_file": UPDATE_CLEAN_STAGING_SUBPARTITIONED_TABLES_FILE_PATH,
+                "parameters": [
+                    "{{ ds }}",
+                    ENV,
+                    DATALAKE_BUCKET,
+                    ATHENA_QUERY_RESULT_LOCATION,
+                    "amplitude",
+                    "--spark",
+                ],
+            }
+        },
+    )
 )
 
-sync_metastore_clean_staging_tables_structure_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="sync-hive-metastore-clean-staging-tables-structure",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables_structure.py",
-            "parameters": [
-                DATALAKE_BUCKET,
-                LayerEnum.CLEAN_STAGING.value,
-                DAG_NAME,
-                "--all-tables",
-            ],
-        }
-    },
+sync_metastore_clean_staging_tables_structure_task = (
+    QuintoAndarDatabricksSubmitRunOperator(
+        task_id="sync-hive-metastore-clean-staging-tables-structure",
+        dag=dag,
+        json={
+            "spark_python_task": {
+                "python_file": BASE_SPARK_JOBS_PATH
+                + "sync_metastore_tables_structure.py",
+                "parameters": [
+                    DATALAKE_BUCKET,
+                    LayerEnum.CLEAN_STAGING.value,
+                    DAG_NAME,
+                    "--all-tables",
+                ],
+            }
+        },
+    )
 )
 
-sync_metastore_clean_staging_tables_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="sync-hive-metastore-clean-staging-tables-partitions",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables_partitions.py",
-            "parameters": [
-                DATALAKE_BUCKET,
-                LayerEnum.CLEAN_STAGING.value,
-                DAG_NAME,
-                "--all-tables",
-            ],
-        }
-    },
+sync_metastore_clean_staging_tables_partitions_task = (
+    QuintoAndarDatabricksSubmitRunOperator(
+        task_id="sync-hive-metastore-clean-staging-tables-partitions",
+        dag=dag,
+        json={
+            "spark_python_task": {
+                "python_file": BASE_SPARK_JOBS_PATH
+                + "sync_metastore_tables_partitions.py",
+                "parameters": [
+                    DATALAKE_BUCKET,
+                    LayerEnum.CLEAN_STAGING.value,
+                    DAG_NAME,
+                    "--all-tables",
+                ],
+            }
+        },
+    )
 )
 
 propagate_tables_metadata_clean_staging_task = QuintoAndarDatabricksSubmitRunOperator(
@@ -381,20 +398,40 @@ propagate_tables_metadata_clean_staging_task = QuintoAndarDatabricksSubmitRunOpe
     },
 )
 
-update_clean_staging_subpartitioned_tables_athena_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="update-clean-staging-subpartitioned-tables-athena",
+update_clean_staging_subpartitioned_tables_athena_task = (
+    QuintoAndarDatabricksSubmitRunOperator(
+        task_id="update-clean-staging-subpartitioned-tables-athena",
+        dag=dag,
+        json={
+            "spark_python_task": {
+                "python_file": UPDATE_CLEAN_STAGING_SUBPARTITIONED_TABLES_FILE_PATH,
+                "parameters": [
+                    "{{ ds }}",
+                    ENV,
+                    DATALAKE_BUCKET,
+                    ATHENA_QUERY_RESULT_LOCATION,
+                    "amplitude",
+                    "--athena",
+                ],
+            }
+        },
+    )
+)
+
+load_events_tables_clean = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="load-events-tables-clean",
     dag=dag,
     json={
         "spark_python_task": {
-            "python_file": UPDATE_CLEAN_STAGING_SUBPARTITIONED_TABLES_FILE_PATH,
+            "python_file": LOAD_EVENTS_TABLES_CLEAN_FILE_PATH,
             "parameters": [
                 "{{ ds }}",
                 ENV,
                 DATALAKE_BUCKET,
-                ATHENA_QUERY_RESULT_LOCATION,
                 "amplitude",
-                "--athena",
-            ],
+                "--partition_by",
+            ]
+            + DEFAULT_PARTITION_BY,
         }
     },
 )
