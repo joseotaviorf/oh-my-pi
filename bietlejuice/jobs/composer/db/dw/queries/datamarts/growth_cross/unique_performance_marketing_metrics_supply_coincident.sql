@@ -1066,7 +1066,7 @@ costs_targets_results_combined AS (
                 dim_date dbt
                 ON dbt.sk_date = co.id_date
             WHERE
-                co.account_name IN ('quintoandar_supply_sale_display', 'quintoandar_supply_sale', 'supply_landlords_sale', 'supply_landlords')
+                co.account_name IN ('quintoandar_supply_sale_display', 'quintoandar_supply_sale', 'supply_landlords_sale', 'supply_landlords', 'imovelweb_supply')
                 AND co.mkt_origin IN ('Owner PWA - Sale', 'Price Calculator - Sale')
             GROUP BY
                 1,2,3,4,5,6,7,8,9,10
