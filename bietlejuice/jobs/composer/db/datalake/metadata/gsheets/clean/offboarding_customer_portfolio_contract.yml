@@ -1,0 +1,13 @@
+---
+database_name: datalake_gsheets_clean
+table_name: offboarding_customer_portfolio_contract
+columns:
+  id_canceled_contract:
+    lineage:
+      - datalake_gsheets_raw.offboarding_customer_portfolio_contract.canceled_contracts
+  id_finished_contract:
+    lineage:
+      - datalake_gsheets_raw.offboarding_customer_portfolio_contract.finished_contracts
+  id_ongoing_contract:
+    lineage:
+      - datalake_gsheets_raw.offboarding_customer_portfolio_contract.ongoing_contracts
