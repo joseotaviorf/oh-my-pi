@@ -64,8 +64,7 @@ if __name__ == "__main__":
         df = SparkDataFrameService(df).optimize_partition(250000).output()
 
         # load df
-        # this spark job only saves the files in S3, it does not call SparkMetastoreLoader to update metastore
-        # it is the same behaviour as before S3Loader refactoring
+        # this spark job only saves the files in S3
         s3_loader.load_df(
             df=df,
             s3_path=f"{database_location}{table_name}",
