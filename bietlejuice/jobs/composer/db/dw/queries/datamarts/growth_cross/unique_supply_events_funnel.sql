@@ -13,6 +13,8 @@ SELECT
 	origin_table,
 	lead_origin,
 	funnel_drop_reason,
+	hp.partner AS supply_3p_partner,
+	CASE WHEN hp.sk_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
   	COUNT(lf.sk_lead_date) AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS qualifieds,
@@ -24,9 +26,10 @@ JOIN datamarts.lead_listing_flows lf
   AND lf.sk_lead_date > 0
 LEFT JOIN dim_region dr
   ON dr.sk_region = lf.sk_region
+LEFT JOIN datamarts.houses_3p AS hp
+  ON hp.sk_house = lf.sk_house_listing / 1000
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
-ORDER BY 1 DESC
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
 ),
 prospect AS (
 SELECT
@@ -42,6 +45,8 @@ SELECT
 	origin_table,
 	lead_origin,
 	funnel_drop_reason,
+	hp.partner AS supply_3p_partner,
+	CASE WHEN hp.sk_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
 	NULL::BIGINT AS leads,
 	COUNT(lf.sk_prospect_date) AS prospects, -- this count is done on the prospect date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
 	NULL::BIGINT AS qualifieds,
@@ -53,8 +58,10 @@ JOIN datamarts.lead_listing_flows lf
   AND lf.sk_prospect_date > 0
 LEFT JOIN dim_region dr
   ON dr.sk_region = lf.sk_region
+LEFT JOIN datamarts.houses_3p AS hp
+  ON hp.sk_house = lf.sk_house_listing / 1000
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE-- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
 ),
 qualified AS (
 SELECT
@@ -70,6 +77,8 @@ SELECT
 	origin_table,
 	lead_origin,
 	funnel_drop_reason,
+	hp.partner AS supply_3p_partner,
+	CASE WHEN hp.sk_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	COUNT(lf.sk_qualified_date) AS qualifieds, -- this count is done on the qualified date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
@@ -81,8 +90,10 @@ JOIN datamarts.lead_listing_flows lf
   AND lf.sk_qualified_date > 0
 LEFT JOIN dim_region dr
   ON dr.sk_region = lf.sk_region
+LEFT JOIN datamarts.houses_3p AS hp
+  ON hp.sk_house = lf.sk_house_listing / 1000
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
 ),
 opportunity AS (
 SELECT
@@ -98,6 +109,8 @@ SELECT
 	origin_table,
 	lead_origin,
 	funnel_drop_reason,
+	hp.partner AS supply_3p_partner,
+	CASE WHEN hp.sk_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS qualifieds,
@@ -109,8 +122,10 @@ JOIN datamarts.lead_listing_flows lf
   AND lf.sk_opportunity_date > 0
 LEFT JOIN dim_region dr
   ON dr.sk_region = lf.sk_region
+LEFT JOIN datamarts.houses_3p AS hp
+  ON hp.sk_house = lf.sk_house_listing / 1000
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
 ),
 listing AS (
 SELECT
@@ -126,6 +141,8 @@ SELECT
 	origin_table,
 	lead_origin,
 	funnel_drop_reason,
+	hp.partner AS supply_3p_partner,
+	CASE WHEN hp.sk_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
   	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS qualifieds,
@@ -137,8 +154,10 @@ JOIN datamarts.lead_listing_flows lf
   AND lf.sk_first_listing_date > 0
 LEFT JOIN dim_region dr
   ON dr.sk_region = lf.sk_region
+LEFT JOIN datamarts.houses_3p AS hp
+  ON hp.sk_house = lf.sk_house_listing / 1000
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
 ),
 union_all AS (
   SELECT * FROM lead_
@@ -164,6 +183,8 @@ SELECT
   ua.origin_table,
   ua.lead_origin,
   ua.funnel_drop_reason,
+  ua.supply_3p_partner,
+  ua.is_3p_supply,
   ua.leads,
   ua.prospects,
   ua.qualifieds,
@@ -196,6 +217,8 @@ SELECT
     origin_table,
     lead_origin,
     funnel_drop_reason,
+    supply_3p_partner,
+    is_3p_supply,
     SUM(COALESCE(leads,0)) AS leads,
     SUM(COALESCE(prospects,0)) AS prospects,
     SUM(COALESCE(qualifieds,0)) AS qualifieds,
@@ -203,4 +226,4 @@ SELECT
     SUM(COALESCE(first_listings,0)) AS first_listings,
     current_timestamp AS ts_load
 FROM union_all_date
-GROUP BY "date", city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+GROUP BY "date", city_group, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
