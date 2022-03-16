@@ -61,16 +61,22 @@ status_changes AS (
     FROM
         house_listing_owners_status
     WHERE
-        is_for_rent = True
-        AND is_b2b = False
-        AND id_owner > 0 
+        -- is_for_rent = True
+        -- AND is_b2b = False
+        id_owner > 0 
     GROUP BY 1, 2
 ),
-qtd_houses_changes AS (
+houses_changes_filter AS (
     SELECT
         sc.id_owner,
         sc.ts_status_started,
-        COUNT(DISTINCT hlos.id_house) AS houses
+        CASE
+          WHEN hlos.status_history IN ('alugado', 'publicado', 'suspenso') 
+              AND hlos.is_for_rent = True
+              AND is_b2b = False
+              AND hlos.id_owner > 0 THEN hlos.id_house
+          ELSE NULL
+        END AS id_house
     FROM
         status_changes AS sc
     JOIN
@@ -78,12 +84,15 @@ qtd_houses_changes AS (
             ON hlos.id_owner = sc.id_owner
             AND hlos.ts_status_started <= sc.ts_status_started 
             AND (hlos.ts_status_ended > sc.ts_status_started OR hlos.ts_status_ended IS NULL)
-    WHERE
-        hlos.status_history IN ('alugado', 'publicado', 'suspenso')
-        AND hlos.is_for_rent = True
-        AND hlos.is_b2b = False
-        AND hlos.id_owner > 0 
-    GROUP BY 1, 2
+),
+qtd_houses_changes AS (
+  SELECT 
+    id_owner,
+    ts_status_started,
+    COUNT(DISTINCT id_house) AS houses
+  FROM
+    houses_changes_filter
+  GROUP BY 1, 2
 ),
 /*Same qtd could appear in sequence. If one house has status changing between
 alugado, publicado, suspenso the qtd won't change, so we will just store
@@ -108,4 +117,4 @@ FROM
     qtd_houses_changes_trimmed
 WHERE
     houses != COALESCE(previous_houses, -1)
-    AND ts_status_started < CURRENT_DATE() -- To avoid a retroactive change we only retrieve D-1 data.
+    AND ts_status_started <= DATE_ADD(DATE('{year}-{month}-{day}'),1) -- To avoid a retroactive change we only retrieve D-1 data.
