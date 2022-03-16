@@ -51,8 +51,9 @@ if __name__ == "__main__":
     format_options = SparkTableStorageFormat.DEFAULT_CLEAN
     database_location = db_info["db_clean_path"]
 
-    incremental_tables = FileService.list_files(QUERIES_DATALAKE_PATH + source)
-
+    incremental_tables = FileService.list_files(QUERIES_DATALAKE_PATH + source + "/clean")
+    incremental_tables = [table_name.replace(".sql") for table_name in incremental_tables]
+    
     for table_name in incremental_tables:
         query_path = QUERIES_DATALAKE_PATH + source + "/{}.sql".format(table_name)
         query = FileService.get_query_from_file_name(query_path).format(
