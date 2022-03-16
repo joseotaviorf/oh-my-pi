@@ -19,10 +19,10 @@ columns:
       - dw_public.fact_listing_rent_flows.sk_client
   offer_submitted_date:
     lineage:
-      - dw_public.fact_listing_rent_flows.offer_submitted_date
+      - dw_public.fact_listing_rent_flows.sk_offer_submitted_date
   offer_approved_date:
     lineage:
-      - dw_public.fact_listing_rent_flows.offer_approved_date
+      - dw_public.fact_listing_rent_flows.sk_offer_approved_date
   last_evaluation_started_date:
     lineage:
       - dw_public.fact_listing_rent_flows.sk_last_credit_evaluation_init
