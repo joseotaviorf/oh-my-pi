@@ -239,6 +239,7 @@ pipeline:
       event: push
       branch:
         exclude:
+          - forno
           - hotfix/* # excluding this branch since the process validates master's code
 
   validate-datamarts-metadata-files-exist:
@@ -251,6 +252,7 @@ pipeline:
       event: push
       branch:
         exclude:
+          - forno
           - hotfix/* # excluding this branch since the process validates master's code
 
   make-package-python3:

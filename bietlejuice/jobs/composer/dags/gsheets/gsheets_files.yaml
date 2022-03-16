@@ -550,6 +550,11 @@ mkt_cost_per_source:
     sheet_name: mkt_cost_per_source
     clean_table_name: mkt_cost_per_source
 
+offboarding_customer_portfolio_contract:
+    sheet_id: 1x2dgpr3eemxnYft80JKRr3K_zlvgjvc-BjpIKaT2fe8
+    sheet_name: contracts
+    clean_table_name: offboarding_customer_portfolio_contract
+
 offer_fup_history:
     sheet_id: 1Kb7_0e1tOFphQExk9QTUf8Ui0cR5tXhm_1losgLruHU
     sheet_name: offer_fup_history

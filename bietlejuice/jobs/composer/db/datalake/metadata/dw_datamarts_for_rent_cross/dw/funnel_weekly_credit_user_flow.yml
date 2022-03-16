@@ -1,0 +1,59 @@
+---
+database_name: dw_datamarts_for_rent_cross
+table_name: funnel_weekly_credit_user_flow
+columns:
+  sk_proposal:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_proposal
+  sk_offer_approved_date:
+    lineage:
+      - dw_public.fact_listing_rent_flows..sk_offer_approved_date
+  sk_contract:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_contract
+  sk_house_listing:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_house_listing
+  sk_client:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_client
+  offer_submitted_date:
+    lineage:
+      - dw_public.fact_listing_rent_flows.offer_submitted_date
+  offer_approved_date:
+    lineage:
+      - dw_public.fact_listing_rent_flows.offer_approved_date
+  last_evaluation_started_date:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_last_credit_evaluation_init
+  evaluation_approved_date:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_last_credit_evaluation_positive
+      - dw_public.fact_listing_rent_flows.sk_last_credit_evaluation_negative
+  document_first_sent_date:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_tenant_first_doc_sent_date
+  document_completed_date:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_tenant_doc_complete_date
+  credit_analysis_approved_date:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_credit_analysis_approved_date
+  guarantee_paid_date:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_guarantee_paid_date
+  contract_created_date:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_contract_created_date
+  contract_signed_date:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_contract_signed_date
+  flow_type:
+    lineage:
+      - dw_datamarts_cross.funnel_demand_flows.flow_type
+  funnel_flow:
+    lineage:
+      - dw_datamarts_cross.funnel_demand_flows.funnel_flow
+  funnel_step:
+    lineage:
+      - dw_public.fact_listing_rent_flows.funnel_step

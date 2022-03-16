@@ -88,14 +88,22 @@ ticket_tasks AS (
     GROUP BY 1,2,4
   ),
   unique_journey_sla_target AS (
+    WITH exploded_journey_taxonomy AS (
+      SELECT
+        journey_step,
+        sla_in_days,
+        EXPLODE(SEQUENCE(dt_start, COALESCE(dt_end, DATE(NOW())))) AS dt_reference
+      FROM
+        datalake_gsheets_clean.taxonomy_sla
+      WHERE
+        dt_target_invalidated IS NULL
+    )
     SELECT
       journey_step,
       MIN(sla_in_days) AS sla_in_days,
-      EXPLODE(SEQUENCE(dt_start, COALESCE(dt_end, DATE(NOW())))) AS dt_reference
+      dt_reference
     FROM
-      datalake_gsheets_clean.taxonomy_sla
-    WHERE
-      dt_target_invalidated IS NULL
+      exploded_journey_taxonomy
     GROUP BY 1,3
   )
   SELECT DISTINCT
