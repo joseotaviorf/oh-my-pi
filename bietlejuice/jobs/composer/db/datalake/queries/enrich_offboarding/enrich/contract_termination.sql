@@ -259,7 +259,7 @@ last_inspection_synch AS(
 ),
 application_user_info AS (
     SELECT
-        id AS id_termination,
+        tf.id AS id_termination,
         au.id_external,
         au.name,
         au.email
