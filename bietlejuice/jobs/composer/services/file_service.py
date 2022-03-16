@@ -69,8 +69,7 @@ class FileService:
             raise RuntimeError(
                 f"m=list_files path={path}, msg=Given path does not exist"
             )
-
-        return listdir(path)
+        return [file for file in listdir(path) if isfile(f"{path}/{file}")]
 
     @staticmethod
     def list_layer_sql_files(source, layer, tree_path=None):
