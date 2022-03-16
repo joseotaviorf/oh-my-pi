@@ -1,0 +1,22 @@
+---
+database_name: datalake_gsheets_clean
+table_name: support_agents_department
+columns:
+  id_agent:
+    lineage:
+      - datalake_gsheets_raw.support_agents_department.agent_id
+  departament:
+    lineage:
+      - datalake_gsheets_raw.support_agents_department.departament
+  email:
+    lineage:
+      - datalake_gsheets_raw.support_agents_department.email
+  valid_department:
+    lineage:
+      - datalake_gsheets_raw.support_agents_department.valid_department
+  dt_start:
+    lineage:
+      - datalake_gsheets_raw.support_agents_department.start_date
+  dt_end:
+    lineage:
+      - datalake_gsheets_raw.support_agents_department.end_date

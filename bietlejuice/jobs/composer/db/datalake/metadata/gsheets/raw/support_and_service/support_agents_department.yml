@@ -1,0 +1,11 @@
+---
+database_name: datalake_gsheets_raw
+table_name: support_agents_department
+columns:
+  agent_id:
+    tags:
+      - PII
+      - Confidential
+  email:
+    tags:
+      - Confidential
