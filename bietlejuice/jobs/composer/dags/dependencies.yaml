@@ -1345,6 +1345,28 @@ bietlejuice.enrich_nps_answer_drivers:
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
 
+bietlejuice.enrich_offboarding:
+  - bietlejuice.ebdb:create-clean-contract-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.ebdb:create-clean-inspection-in-data-lake
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract-b2b
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
+  - bietlejuice.enrich_ebdb_listing:load-enrich-portability
+  - bietlejuice.enrich_nps_answer_drivers:load-enrich-answer-drivers
+  - bietlejuice.enrich_tracksale:load-enrich-answer
+  - bietlejuice.enrich_tracksale:load-enrich-campaign
+  - bietlejuice.enrich_tracksale:load-enrich-customer-conversions
+  - bietlejuice.enrich_tracksale:load-enrich-dispatch
+  - bietlejuice.terminator:load-clean-application-user
+  - bietlejuice.terminator:load-clean-negotiation
+  - bietlejuice.terminator:load-clean-termination
+  - bietlejuice.terminator:load-clean-termination-aud
+  - bietlejuice.terminator:load-clean-termination-fee
+  - bietlejuice.terminator:load-clean-termination-fee-negotiation
+  - bietlejuice.terminator:load-clean-termination-workflow
+  - bietlejuice.terminator:load-clean-rev-info
+  - bietlejuice.terminator:load-clean-utility-bill
+
 bietlejuice.enrich_offer:
   - bietlejuice.ebdb:create-clean-agent-data-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-house-in-data-lake
