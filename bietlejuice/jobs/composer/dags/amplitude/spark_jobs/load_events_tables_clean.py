@@ -1,3 +1,12 @@
+"""
+    This script intend to increment events tables that are on clean layer.
+    There is some tables with name like: {id_app}_{event_type}_events and those
+    tables are an extraction from clean_staging tables.
+
+    Since amplitude updates its values everyday, we need to load those clean tables
+    in order to update its values.
+"""
+
 import logging
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
@@ -51,6 +60,7 @@ if __name__ == "__main__":
     format_options = SparkTableStorageFormat.DEFAULT_CLEAN
     database_location = db_info["db_clean_path"]
 
+    # get queries that its results going to be used to update tables
     incremental_tables = FileService.list_files(QUERIES_DATALAKE_PATH + source + "/clean")
     incremental_tables = [table_name.replace(".sql") for table_name in incremental_tables]
     
@@ -65,7 +75,7 @@ if __name__ == "__main__":
         df = SparkDataFrameService(df).optimize_partition(250000).output()
 
         # load df
-        # this spark job only saves the files in S3
+        # this spark job only saves the files in S3 and update on metastore
         s3_loader.load_df(
             df=df,
             s3_path=f"{database_location}{table_name}",
