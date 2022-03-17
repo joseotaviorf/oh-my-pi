@@ -1,5 +1,5 @@
 """
-    This script intend to increment events tables that are on clean layer.
+    This job intend to increment events tables that are on clean layer.
     There is some tables with name like: {id_app}_{event_type}_events and those
     tables are an extraction from clean_staging tables.
 
@@ -46,6 +46,7 @@ if __name__ == "__main__":
         "m=__main__, date={}, source={}, msg=Job started".format(execution_date, source)
     )
 
+    # Get partiton from the day before
     date = datetime.strptime(execution_date, "%Y-%m-%d") - timedelta(days=1)
     year, month, day = date.year, date.month, date.day
 
