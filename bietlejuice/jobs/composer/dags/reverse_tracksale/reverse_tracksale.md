@@ -13,8 +13,13 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 ### Outputs
 We incrementally load the following table into the Datalake Reverse bucket, for backup pourposes:
 
+- `lost_buyer_proposals`
+- `lost_buyer_visits`
+- `lost_iq_proposals`
 - `lost_iq_rejected`
 - `lost_iq_visitas`
+- `lost_pp`
+- `lost_seller_unpublished`
 
 This pipeline also POST data to the Tracksale API (endpoint: `dispatches`) aiming to schedule NPS survey dispatches.
 

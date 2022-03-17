@@ -1,0 +1,22 @@
+---
+database_name: datalake_tracksale_reverse
+table_name: lost_buyer_proposals
+columns:
+  customer_name:
+    lineage:
+      - dw_public.dim_user.nome
+  customer_email:
+    lineage:
+      - dw_public.dim_user.email
+  customer_phone:
+    lineage:
+      - dw_public.dim_user.customer_phone
+  customer_cpf:
+    lineage:
+      - dw_public.dim_user.cpf
+  id_user:
+    lineage:
+      - dw_public.fact_sale_flows.sk_buyer
+  id_driver:
+    lineage:
+      - dw_public.fact_sale_flows.sk_offer
