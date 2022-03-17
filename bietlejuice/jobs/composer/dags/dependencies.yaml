@@ -165,6 +165,7 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.enrich_ebdb_agents:create-enrich-agents-review-external-table
   - bietlejuice.enrich_firestore:create-enrich-monday-external-table
   - bietlejuice.enrich_firestore:create-enrich-sale-offer-external-table
+  - bietlejuice.enrich_sale_lead_flows:load-enrich-lead-flow
   - bietlejuice.gsheets:create-clean-monday-users-external-table
   - bietlejuice.gsheets:create-clean-offers-hub-central-external-table
   - bietlejuice.sales_flow:create-clean-ccv-flow-external-table
