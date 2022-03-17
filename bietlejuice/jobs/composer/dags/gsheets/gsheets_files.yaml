@@ -10,6 +10,11 @@ acquisition_target_per_source:
     sheet_name: acquisition_target_per_source
     clean_table_name: acquisition_target_per_source
 
+advance_base:
+    sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
+    sheet_name: advance_base
+    clean_table_name: advance_base
+
 associate_executive_bonus:
     sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
     sheet_name: associate_executive_bonus
