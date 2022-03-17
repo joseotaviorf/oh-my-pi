@@ -70,8 +70,9 @@ if __name__ == "__main__":
             df=df,
             s3_path=f"{database_location}{table_name}",
             format_options=format_options,
+            partitions=partition_cols,
             database_location=database_location,
         )
         spark_metastore_loader.update_metastore(
-            df, database_name, table_name, format_options, database_location
+            df, database_name, table_name, format_options, database_location, partition_cols
         )
