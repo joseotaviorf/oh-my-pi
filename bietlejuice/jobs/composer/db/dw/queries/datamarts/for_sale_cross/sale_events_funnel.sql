@@ -233,7 +233,7 @@ sale_demand_events AS (
 SELECT
 	COALESCE(offers.id_user, sc.sk_buyer, tta.tenant_id::BIGINT) AS id_buyer,
 	COALESCE(offers.id_house, sc.sk_house, tta.house_id::BIGINT, sc.sk_house) AS id_house,
-    COALESCE(offers.id_agent, sc.id_agent) AS id_agent,
+	sc.id_agent AS id_agent, -- Using only sale_closing becaus monday's sk_agent is not trustworthy
 	offers.form_of_payment,
 	offers.dt_deal_qualified,
 	sc.sk_offer AS id_offer,
