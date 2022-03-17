@@ -159,7 +159,7 @@ SELECT
   resend_document_reason,
   CAST(resend_rank AS INTEGER) AS resend_rank,
   DATEDIFF(ts_document_status, LAG(ts_document_status, 1) OVER (PARTITION BY sk_document ORDER BY ts_document_status)) AS days_between_current_and_last_doc_status,
-  ts_document_status,
+  TIMESTAMP(ts_document_status) AS ts_document_status,
   NOW() AS ts_load
 FROM 
   tenant_documentation_status
