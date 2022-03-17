@@ -816,8 +816,10 @@ bietlejuice.dw_tenant_documentation:
   - bietlejuice.docx:load-clean-credit-evaluation
   - bietlejuice.ebdb:create-clean-proponent-info-resend-request-in-data-lake
   - bietlejuice.ebdb:create-clean-proponent-proposal-in-data-lake
+  - bietlejuice.ebdb:create-clean-proposal-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-proposal-in-data-lake
   - bietlejuice.ebdb:create-clean-proposal-document-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
 
 bietlejuice.dw_tickets:
   - bietlejuice.enrich_zendesk_ticket_funnels
