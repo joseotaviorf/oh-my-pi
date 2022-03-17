@@ -197,13 +197,13 @@ class BaseTaskGroup(object):
     @staticmethod
     def all_independent_tasks(task_group_boundaries):
         """
-       Gets the independent tasks of every task group as a single list.
+        Gets the independent tasks of every task group as a single list.
 
-       :param task_group_boundaries: dict of task groups containing tasks boundaries
-       :type task_group_boundaries: dict
-       :return: list of independent tasks of every task group
-       :rtype: list[airflow.models.BaseOperator]
-       """
+        :param task_group_boundaries: dict of task groups containing tasks boundaries
+        :type task_group_boundaries: dict
+        :return: list of independent tasks of every task group
+        :rtype: list[airflow.models.BaseOperator]
+        """
         tasks_list = []
         for task_group in task_group_boundaries.values():
             independent_tasks = BaseTaskGroup.independent_tasks(task_group)

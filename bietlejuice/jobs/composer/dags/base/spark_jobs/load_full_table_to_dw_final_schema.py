@@ -36,9 +36,10 @@ if __name__ == "__main__":
         env, dw_schema, dw_bucket, "schema"
     )
 
-    database_name_staging, database_location_staging = DWMetastoreService.get_layer_info(
-        env, dw_schema, dw_bucket, "staging"
-    )
+    (
+        database_name_staging,
+        database_location_staging,
+    ) = DWMetastoreService.get_layer_info(env, dw_schema, dw_bucket, "staging")
 
     query = f"SELECT * FROM {database_name_staging}.{table_name}"
 

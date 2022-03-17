@@ -78,11 +78,11 @@ class MongoClient(DBClient):
     @logger(exclude_return=True)
     def run(self, command, parameters=None):
         """
-            Execute command in Database
-            :param command: command content
-            :type command: dict
-            :param parameters: optional parameters
-            :type command: dict
+        Execute command in Database
+        :param command: command content
+        :type command: dict
+        :param parameters: optional parameters
+        :type command: dict
         """
         with self.conn as conn:
             if parameters is not None:

@@ -1,0 +1,58 @@
+---
+database_name: datalake_hub_services_clean
+table_name: users_aud
+columns:
+  id:
+    lineage:
+      - datalake_hub_services_raw.users_aud.id
+  rev:
+    lineage:
+      - datalake_hub_services_raw.users_aud.rev
+  rev_end:
+    lineage:
+      - datalake_hub_services_raw.users_aud.revend
+  rev_type:
+    lineage:
+      - datalake_hub_services_raw.users_aud.revtype
+  version:
+    lineage:
+      - datalake_hub_services_raw.users_aud.version
+  id_external:
+    lineage:
+      - datalake_hub_services_raw.users_aud.external_id
+  hub_name:
+    lineage:
+      - datalake_hub_services_raw.users_aud.name
+  email:
+    lineage:
+      - datalake_hub_services_raw.users_aud.email
+  phone_number:
+    lineage:
+      - datalake_hub_services_raw.users_aud.phone_number
+  mod_email:
+    lineage:
+      - datalake_hub_services_raw.users_aud.email_mod
+  mod_name:
+    lineage:
+      - datalake_hub_services_raw.users_aud.name_mod
+  mod_phone_number:
+    lineage:
+      - datalake_hub_services_raw.users_aud.phone_number_mod
+  mod_id_external:
+    lineage:
+      - datalake_hub_services_raw.users_aud.external_id_mod
+  ts_created:
+    lineage:
+      - datalake_hub_services_raw.users_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_hub_services_raw.users_aud.updated_at
+  year:
+    lineage:
+      - datalake_hub_services_raw.users_aud.year
+  month:
+    lineage:
+      - datalake_hub_services_raw.users_aud.month
+  day:
+    lineage:
+      - datalake_hub_services_raw.users_aud.day

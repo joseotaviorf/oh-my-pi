@@ -22,9 +22,10 @@ class SparkMetastoreHelper:
         self.db_name_part = db_name_part
         self.table_name = table_name
         self.all_tables = all_tables
-        self.spark_database_name, self.database_location = (
-            self.get_metastores_metadata()
-        )
+        (
+            self.spark_database_name,
+            self.database_location,
+        ) = self.get_metastores_metadata()
         self.spark_metastore_service = SparkMetastoreService(SparkClient())
 
     def get_metastores_metadata(self):

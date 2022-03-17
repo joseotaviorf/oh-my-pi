@@ -1,0 +1,36 @@
+database_name: datalake_hub_services_clean
+table_name: users
+columns:
+  id:
+    lineage:
+      - datalake_hub_services_raw.users.id
+  id_external:
+    lineage:
+      - datalake_hub_services_raw.users.external_id
+  version:
+    lineage:
+      - datalake_hub_services_raw.users.version
+  hub_name:
+    lineage:
+      - datalake_hub_services_raw.users.name
+  email:
+    lineage:
+      - datalake_hub_services_raw.users.email
+  phone_number:
+    lineage:
+      - datalake_hub_services_raw.users.phone_number
+  ts_created:
+    lineage:
+      - datalake_hub_services_raw.users.created_at
+  ts_updated:
+    lineage:
+      - datalake_hub_services_raw.users.updated_at
+  year:
+    lineage:
+      - datalake_hub_services_raw.users.year
+  month:
+    lineage:
+      - datalake_hub_services_raw.users.month
+  day:
+    lineage:
+      - datalake_hub_services_raw.users.day

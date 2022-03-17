@@ -78,7 +78,11 @@ if __name__ == "__main__":
     spark_client = SparkClient()
     GeoSparkRegistrator.registerAll(spark_client.conn)
 
-    database_name, database_location, athena_database_name = DatalakeMetastoreService.get_layer_info(
+    (
+        database_name,
+        database_location,
+        athena_database_name,
+    ) = DatalakeMetastoreService.get_layer_info(
         env, SOURCE, datalake_bucket, LayerEnum.CLEAN.value
     )
 

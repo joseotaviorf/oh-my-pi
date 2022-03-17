@@ -7,7 +7,7 @@ This DAG imports the tables from [HubServices](https://github.com/quintoandar/hu
   <summary><strong> > DAG details (click to expand)</strong></summary>
 
 ### Execution Interval
-This DAG is triggered daily. 
+This DAG is triggered daily.
 
 More information about run time [here]({chart_url}{dag_id}).
 
@@ -20,6 +20,8 @@ Via **incremental load**:
     - `business_unit_aud`
     - `lead`
     - `lead_aud`
+    - `member_profile`
+    - `member_profile_aud`
     - `observation`
     - `observation_aud`
     - `region`
@@ -27,6 +29,8 @@ Via **incremental load**:
     - `responsible`
     - `responsible_aud`
     - `revinfo`
+    - `users`
+    - `users_aud`
     - `visitor`
     - `visitor_aud`
 
@@ -37,6 +41,8 @@ Via **incremental load**:
     - `business_unit_aud`
     - `lead`
     - `lead_aud`
+    - `member_profile`
+    - `member_profile_aud`
     - `observation`
     - `observation_aud`
     - `region`
@@ -44,9 +50,14 @@ Via **incremental load**:
     - `responsible`
     - `responsible_aud`
     - `rev_info`
+    - `users`
+    - `users_aud`
     - `visitor`
     - `visitor_aud`
 
 ### Responsible Data Teams
+For any questions or concerns about this DAG and data, please contact the Data Engineering Team or
+Data Analytics Team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
+</details>
 For any questions or concerns about this DAG and data, please contact the Data For Sale Team.
 </details>

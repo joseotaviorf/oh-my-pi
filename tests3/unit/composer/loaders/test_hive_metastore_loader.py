@@ -425,7 +425,10 @@ class TestHiveMetastoreLoader:
         hive_metastore_loader,
     ):
         # act
-        added_partitions, removed_partitions = hive_metastore_loader._map_partition_values_difference(
+        (
+            added_partitions,
+            removed_partitions,
+        ) = hive_metastore_loader._map_partition_values_difference(
             mock.ANY, mock.ANY, spark_partition_values, metastore_partition_values
         )
 

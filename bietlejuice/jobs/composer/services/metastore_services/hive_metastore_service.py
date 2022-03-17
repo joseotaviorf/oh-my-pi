@@ -310,11 +310,11 @@ class HiveMetastoreService(MetastoreService):
 
     def get_partition_values(self, database_name, table_name):
         """
-       Gets the partition values from Metastore table.
+        Gets the partition values from Metastore table.
 
-       :param database_name: the database name
-       :param table_name: the table name
-       :rtype: List[List[str]]
-       """
+        :param database_name: the database name
+        :param table_name: the table name
+        :rtype: List[List[str]]
+        """
         with self.client as conn:
             return conn.get_partition_values_from_table(database_name, table_name)

@@ -8,6 +8,10 @@ tables:
     date_filter_column: updated_at
   - table_name: lead_aud
     date_filter_column: created_at
+  - table_name: member_profile
+    date_filter_column: updated_at
+  - table_name: member_profile_aud
+    date_filter_column: created_at
   - table_name: observation
     date_filter_column: updated_at
   - table_name: observation_aud
@@ -24,6 +28,10 @@ tables:
     clean_table_name: rev_info
     date_filter_column: timestamp
     unixtime_measure: milliseconds
+  - table_name: users
+    date_filter_column: updated_at
+  - table_name: users_aud
+    date_filter_column: created_at
   - table_name: visitor
     date_filter_column: updated_at
   - table_name: visitor_aud

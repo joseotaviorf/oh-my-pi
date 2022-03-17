@@ -50,10 +50,10 @@ class OdsMigrationValidation:
 
     def validate_counts(self):
         """
-          Check if the counts of the table in DW and in Janus matches.
-          If table has a date column specified in the migration file so it
-          will count only the data before the job execution day, due to the
-          scheduling difference between the old and new DAGs.
+        Check if the counts of the table in DW and in Janus matches.
+        If table has a date column specified in the migration file so it
+        will count only the data before the job execution day, due to the
+        scheduling difference between the old and new DAGs.
         """
         base_query = "select count(1) from {schema}." + self.table_name
         if self.date_column:
@@ -94,9 +94,9 @@ class OdsMigrationValidation:
 
     def validate_content(self):
         """
-         Check if the content of the table in DW and in Janus matches.
-         If table has a date column in specified in the migration file, so this
-         column will be used to get a sample rather than testing the entire table.
+        Check if the content of the table in DW and in Janus matches.
+        If table has a date column in specified in the migration file, so this
+        column will be used to get a sample rather than testing the entire table.
         """
         base_query = "select * from {schema}." + self.table_name
 
