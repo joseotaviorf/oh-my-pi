@@ -1,0 +1,16 @@
+---
+database_name: dw_datamarts_for_rent
+table_name: ongoing_listed_suspended_listings
+columns:
+  week_start:
+    lineage:
+      - dw_public.dim_date.week_start
+  status_history:
+    lineage:
+      - dw_public.fact_house_listing_status.status_history
+  status_change_reason:
+    lineage:
+      - dw_public.fact_house_listing_status.status_change_reason
+  sk_house_listing:
+    lineage:
+      - dw_public.fact_house_listing_status.sk_house_listing
