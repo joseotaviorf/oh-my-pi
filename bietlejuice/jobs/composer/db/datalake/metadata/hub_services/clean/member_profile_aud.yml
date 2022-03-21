@@ -29,7 +29,7 @@ columns:
   profile:
     lineage:
       - datalake_hub_services_raw.member_profile_aud.profile
-  active:
+  is_active:
     lineage:
       - datalake_hub_services_raw.member_profile_aud.active
   mod_id_business_unit:

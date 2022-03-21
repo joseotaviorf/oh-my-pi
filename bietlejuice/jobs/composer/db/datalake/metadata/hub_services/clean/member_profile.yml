@@ -20,7 +20,7 @@ columns:
   profile:
     lineage:
       - datalake_hub_services_raw.member_profile.profile
-  active:
+  is_active:
     lineage:
       - datalake_hub_services_raw.member_profile.active
   ts_created:
