@@ -1,0 +1,26 @@
+---
+database_name: dw_datamarts_growth_cross
+table_name: marketing_demand_supply_branding_costs
+columns:
+  dt_cost:
+    lineage:
+      - dw_public.dim_date.date
+  city_group:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_cluster_promotional_bonus_costs.city_group
+      - datalake_gsheets_clean.affiliates_extra_user_bonus.city_group
+      - datalake_gsheets_clean.ciq_costs.city
+      - datalake_gsheets_clean.offline_and_branding_marketing_costs.city_group
+      - datalake_marketing_costs.daily_costs.city_group
+      - datalake_marketing_costs.offline_manual_costs.city_group
+      - dw_public.dim_region.city_group
+      - dw_quintoandar.dim_affiliate_cost.city_group
+  tier:
+    lineage:
+      - dw_public.dim_region.tier
+  planning_mkt_level3:
+    lineage:
+      - datalake_gsheets_clean.offline_and_branding_marketing_costs.mkt_channel
+      - datalake_marketing_costs.daily_costs.mkt_medium
+      - datalake_marketing_costs.daily_costs.mkt_origin
+      - datalake_marketing_costs.offline_manual_costs.cost_category
