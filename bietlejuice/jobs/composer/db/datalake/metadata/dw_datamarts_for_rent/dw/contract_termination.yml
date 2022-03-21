@@ -101,7 +101,7 @@ columns:
   fee_discount_value:
     lineage:
       - datalake_terminator_clean.termination_fee_negotiation.discount_value
-  fee_final_amout:
+  fee_final_amount:
     lineage:
       - datalake_terminator_clean.termination_fee_negotiation.final_amount
   fee_number_of_installments:
