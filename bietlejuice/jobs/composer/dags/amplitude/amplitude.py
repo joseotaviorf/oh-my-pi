@@ -468,7 +468,6 @@ airflow_helpers.chain(
         create_clean_staging_subpartitioned_tables_athena_task,
         update_clean_staging_subpartitioned_tables_spark_task,
     ],
-    load_events_tables_clean,
     terminate_cluster_task,
 )
 
@@ -483,6 +482,12 @@ airflow_helpers.chain(
 airflow_helpers.chain(
     create_clean_staging_subpartitioned_tables_athena_task,
     update_clean_staging_subpartitioned_tables_athena_task,
+    terminate_cluster_task,
+)
+
+airflow_helpers.chain(
+    update_clean_staging_subpartitioned_tables_spark_task,
+    load_events_tables_clean,
     terminate_cluster_task,
 )
 
