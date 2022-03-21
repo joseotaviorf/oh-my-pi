@@ -4,7 +4,7 @@ table_name: sale_ongoing_listings_casa_mineira
 columns:
   sk_region:
     lineage:
-      - dw_sale.fact_listings_status.sk_region
+      - dw_sale.fact_listing_status.sk_region
   region:
     lineage:
       - dw_public.dim_region.name
@@ -19,7 +19,7 @@ columns:
       - dw_public.dim_date.date
   weekday_name:
     lineage:
-      - dw_public.dim_date.week_name
+      - dw_public.dim_date.weekday_name
   week_start:
     lineage:
       - dw_public.dim_date.week_start
