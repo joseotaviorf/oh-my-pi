@@ -119,18 +119,6 @@ columns:
   context_first_listing_rent:
     lineage:
       - dw_datamarts_cross.lead_listing_flows.context_first_listing
-  lead_discard_sale:
-    lineage:
-      - datalake_rene_descartes_clean.lead_rejection.reason
-  lead_discard_rent:
-    lineage:
-      - datalake_rene_descartes_clean.lead_rejection.reason
-  prospect_discard_sale:
-    lineage:
-      - dw_datamarts_cross.lead_listing_flows.prospect_discard
-  prospect_discard_rent:
-    lineage:
-      - dw_datamarts_cross.lead_listing_flows.prospect_discard
   prospect_status:
     lineage:
       - datalake_wololo_clean.prospect.status

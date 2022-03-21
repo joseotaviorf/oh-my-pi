@@ -4,7 +4,7 @@ table_name: deal_making_funnel
 columns:
   id_offer:
     lineage:
-      - datalake_firestore.sale_offer.id_offer
+      - datalake_firestore.sale_offer.id
   id_consultant_adjusted:
     lineage:
       - datalake_firestore.monday.id_consultant
