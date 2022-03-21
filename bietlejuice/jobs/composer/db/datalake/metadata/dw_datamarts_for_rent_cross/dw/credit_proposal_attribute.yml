@@ -1,0 +1,76 @@
+---
+database_name: dw_datamarts_for_rent_cross
+table_name: credit_proposal_attribute
+columns:
+  sk_proposal:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_proposal
+  status_proposal:
+    lineage:
+      - dw_public.dim_proposal.status
+  status_sortinghat:
+    lineage:
+      - dw_public.dim_proposal.status_sortinghat
+  status_doc_tenant:
+    lineage:
+      - dw_public.dim_proposal.status_doc_tenant
+  proposal_rejection_reason:
+    lineage:
+      - dw_public.dim_proposal.rejection_reason
+  proposal_guarantee:
+    lineage:
+      - dw_public.dim_proposal.guarantee
+  contract_cancellation_reason:
+    lineage:
+      - dw_public.dim_contract.cancellation_reason
+  type:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.type
+  level:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.level
+  result:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.result
+  reason:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.reason
+  id_analyst:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.id_analyst
+  analyst_name:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.analyst_name
+  automatic_decision_reason:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.automatic_decision_reason
+  bypass:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.bypass
+  is_a_potential_interview:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.is_a_potential_interview
+  category:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.category
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
+  city_name:
+    lineage:
+      - dw_public.dim_region.city_name
+  risk_category:
+    lineage:
+      - datalake_sorting_hat_clean.screening_result.risk_category
+  score:
+    lineage:
+      - datalake_sorting_hat_clean.screening_result.score
+  is_instant_offer:
+    lineage:
+      - dw_public.dim_offer.is_instant_offer
+  offer_type:
+    lineage:
+      - dw_public.dim_offer.type
+  house_origin_type:
+    lineage:
+      - dw_datamarts_cross.quintoandar_consultant_listings.type_big_agent
