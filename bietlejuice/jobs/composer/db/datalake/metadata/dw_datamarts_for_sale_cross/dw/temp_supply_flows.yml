@@ -1,0 +1,139 @@
+---
+database_name: dw_datamarts_for_sale_cross
+table_name: temp_supply_flows
+columns:
+  sk_house_listing_flow:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.sk_house_listing_flow
+  sk_lead:
+    lineage:
+      - dw_public.dim_lead.sk_lead
+  sk_house_listing:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.sk_house_listing
+  sk_region:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.sk_region
+  sk_user_lead_affiliate:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.sk_user_lead_affiliate
+  mkt_origin_rent:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.mkt_origin
+  mkt_origin_sale:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.mkt_origin
+  mkt_completion_rent:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.mkt_completion
+  mkt_completion_sale:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.mkt_completion
+  mkt_channel_rent:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.mkt_channel
+  mkt_channel_sale:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.mkt_channel
+  mkt_source_rent:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.mkt_source
+  mkt_source_sale:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.mkt_source
+  mkt_medium_rent:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.mkt_medium
+  mkt_medium_sale:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.mkt_medium
+  sales_company_rent:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.sales_company
+  sales_company_sale:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.sales_company
+  sourcing_ops_rent:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.sourcing_ops
+  sourcing_ops_sale:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.sourcing_ops
+  lead_origin_rent:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.lead_origin
+  lead_origin_sale:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.lead_origin
+  funnel_drop_reason_rent:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.funnel_drop_reason
+  funnel_drop_reason_sale:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.funnel_drop_reason
+  sk_lead_date_rent:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.sk_lead_date
+  sk_lead_date_sale:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.sk_lead_date
+  sk_prospect_date_rent:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.sk_prospect_date
+  sk_prospect_date_sale:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.sk_prospect_date
+  sk_qualified_date_rent:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.sk_qualified_date
+  sk_qualified_date_sale:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.sk_qualified_date
+  sk_available_qualified_date_rent:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.sk_qualified_date
+  sk_available_qualified_date_sale:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.sk_qualified_date
+  sk_opportunity_date_rent:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.sk_opportunity_date
+  sk_opportunity_date_sale:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.sk_opportunity_date
+  sk_first_listing_date_rent:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.sk_first_listing_date
+  sk_first_listing_date_sale:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.sk_first_listing_date
+  context_opportunity_sale:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.context_opportunity
+  context_opportunity_rent:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.context_opportunity
+  context_first_listing_sale:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.context_first_listing
+  context_first_listing_rent:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.context_first_listing
+  lead_discard_sale:
+    lineage:
+      - datalake_rene_descartes_clean.lead_rejection.reason
+  lead_discard_rent:
+    lineage:
+      - datalake_rene_descartes_clean.lead_rejection.reason
+  prospect_discard_sale:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.prospect_discard
+  prospect_discard_rent:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.prospect_discard
+  prospect_status:
+    lineage:
+      - datalake_wololo_clean.prospect.status
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
