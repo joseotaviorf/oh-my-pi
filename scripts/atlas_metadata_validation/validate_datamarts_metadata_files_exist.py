@@ -23,6 +23,8 @@ SKIP_LIST = {
         "lead_listing_flows",
         "buyer_prospect_status",
         "quintoandar_consultant_listings",
+        "houses_3p",
+        "agents_3p",
     },
     "dw_datamarts/growth": {
         "marketplace_intelligence_metrics",
@@ -57,11 +59,9 @@ SKIP_LIST = {
     },
     "dw_datamarts/for_sale_cross": {
         "sale_ongoing_listings",
-        "houses_3p",
         "sale_events_funnel",
         "temp_supply_flows",
         "sale_cohort_conversions",
-        "agents_3p",
     },
     "dw_datamarts/growth_dep_manual_costs": {
         "performance_marketing_metrics_demand",
