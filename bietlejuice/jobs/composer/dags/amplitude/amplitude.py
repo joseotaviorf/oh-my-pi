@@ -224,6 +224,75 @@ propagate_table_metadata_clean_events_task = QuintoAndarDatabricksSubmitRunOpera
     },
 )
 
+user_merge_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="user-merge-raw-to-clean",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": EVENTS_RAW_TO_CLEAN_FILE_PATH,
+            "parameters": [
+                "{{ ds }}",
+                ENV,
+                DATALAKE_BUCKET,
+                "amplitude",
+                "170698_user_merge",
+                "--partition_by",
+            ]
+            + ["id_amplitude_merged"],
+        }
+    },
+)
+
+sync_metastore_clean_user_merge_structure_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="sync-hive-metastore-clean-user-merge-structure",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables_structure.py",
+            "parameters": [
+                DATALAKE_BUCKET,
+                LayerEnum.CLEAN.value,
+                DAG_NAME,
+                "--table-name",
+                "170698_user_merge",
+            ],
+        }
+    },
+)
+
+sync_metastore_clean_user_merge_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="sync-hive-metastore-clean-user-merge-partitions",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": BASE_SPARK_JOBS_PATH + "sync_metastore_tables_partitions.py",
+            "parameters": [
+                DATALAKE_BUCKET,
+                LayerEnum.CLEAN.value,
+                DAG_NAME,
+                "--table-name",
+                "170698_user_merge",
+            ],
+        }
+    },
+)
+
+propagate_table_metadata_clean_user_merge_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
+    task_id=f"propagate-table-metadata-clean-user-merge",
+    json={
+        "spark_python_task": {
+            "python_file": BASE_SPARK_JOBS_PATH + "propagate_table_metadata.py",
+            "parameters": [
+                LayerEnum.CLEAN.value,
+                MetadataTypeEnum.LINEAGE.value,
+                DAG_NAME,
+                "170698_user_merge",
+            ],
+        }
+    },
+)
+
 update_clean_events_daily_partition_athena_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id="update-clean-events-daily-partition-athena",
     dag=dag,
@@ -414,6 +483,15 @@ airflow_helpers.chain(
     sync_metastore_clean_events_structure_task,
     sync_metastore_clean_events_partitions_task,
     propagate_table_metadata_clean_events_task,
+    terminate_cluster_task,
+)
+
+airflow_helpers.chain(
+    events_to_datalake_raw_task,
+    user_merge_raw_to_clean_task,
+    sync_metastore_clean_user_merge_structure_task,
+    sync_metastore_clean_user_merge_partitions_task,
+    propagate_table_metadata_clean_user_merge_task,
     terminate_cluster_task,
 )
 
