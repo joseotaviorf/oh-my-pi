@@ -1,0 +1,19 @@
+---
+database_name: dw_datamarts_for_rent
+table_name: repressed_demand
+columns:
+  region_code:
+    lineage:
+      - dw_public.dim_region.region_code
+  city_name:
+    lineage:
+      - dw_public.dim_region.city_name
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
+  date:
+    lineage:
+      - dw_public.dim_date.date
+  week_start:
+    lineage:
+      - dw_public.dim_date.week_start
