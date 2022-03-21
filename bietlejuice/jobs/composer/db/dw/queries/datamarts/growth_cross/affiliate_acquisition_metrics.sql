@@ -27,8 +27,7 @@ WITH dist_affiliates AS (
     LEFT JOIN public.dim_date AS dt_qualified
         ON f.sk_qualified_date = dt_qualified.sk_date
     WHERE 
-        dua.type = 'Standard'
-        AND f.sk_prospect_date <> -1
+        f.sk_prospect_date <> -1
     GROUP BY 
         1,2,3,4,5,6,7,8,9,10
 )
@@ -114,7 +113,6 @@ affiliates_acquisition_funnel as (
         ON f.sk_prospect_date = dt_prospect.sk_date
     LEFT JOIN public.dim_date AS dt_qualified
         ON f.sk_qualified_date = dt_qualified.sk_date
-    WHERE dua.type = 'Standard'
     GROUP BY 1,2,3,4,5,6,7,8,9
     
 UNION ALL
@@ -164,7 +162,7 @@ UNION ALL
     JOIN public.dim_date dd
         ON dd.sk_date =  mkt.id_date
     WHERE mkt.funnel_side IN ('supply','affiliates')
-        AND mkt.mkt_origin = 'Indica Aí - General'
+        AND mkt.mkt_origin IN ('Indica Aí - General', 'Indica Aí - Agents')
         AND mkt.mkt_channel IN ('Paid', 'Organic')
     GROUP BY 1,2,3,4,5,6,7,8,9
 
