@@ -8,9 +8,6 @@
 
 ############### Place the dependencies sorted alphabetically ##################
 ---
-bietlejuice.catalog_product_entities:
-  - bietlejuice.enrich_bigid:load-enrich-bigid-entities-access-level
-
 bietlejuice.dw_datamarts_cross:
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
