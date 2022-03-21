@@ -1,0 +1,14 @@
+---
+database_name: dw_datamarts_for_rent
+table_name: weekly_demand_metrics
+columns:
+  id_house:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_house_listing
+  id_house_week:
+    lineage:
+      - dw_public.fact_house_listing_status.sk_house_listing
+      - dw_public.dim_date.week_start
+  week_start:
+    lineage:
+      - dw_public.dim_date.week_start
