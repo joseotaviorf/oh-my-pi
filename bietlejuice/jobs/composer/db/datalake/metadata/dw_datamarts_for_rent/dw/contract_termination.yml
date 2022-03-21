@@ -1,0 +1,164 @@
+---
+database_name: dw_datamarts_for_rent
+table_name: contract_termination
+columns:
+  sk_termination:
+    lineage:
+      - datalake_terminator_clean.termination.id
+  sk_contract:
+    lineage:
+      - datalake_terminator_clean.termination.id_contract
+  sk_exit_inspection:
+    lineage:
+      - datalake_terminator_clean.termination.id_exit_inspection
+  sk_house_listing:
+    lineage:
+      - dw_public.fact_house_listings.sk_house_listing
+  sk_region:
+    lineage:
+      - dw_public.fact_house_listings.sk_region
+  sk_application_user:
+    lineage:
+      - datalake_terminator_clean.application_user.id_external
+  sk_workflow_assignee:
+    lineage:
+      - datalake_terminator_clean.termination_workflow.id_current_assignee
+  reason:
+    lineage:
+      - datalake_terminator_clean.termination.feedback
+  feedback:
+    lineage:
+      - datalake_terminator_clean.termination.feedback
+  requested_by:
+    lineage:
+      - datalake_terminator_clean.termination.requested_by
+  status:
+    lineage:
+      - datalake_terminator_clean.termination.status
+  source:
+    lineage:
+      - datalake_terminator_clean.termination.source
+  cancellation_info:
+    lineage:
+      - datalake_terminator_clean.termination.cancellation_info
+  rescheduling_history:
+    lineage:
+      - datalake_terminator_clean.termination.rescheduling_history
+  churn_reason:
+    lineage:
+      - datalake_terminator_clean.termination.feedback
+  next_property:
+    lineage:
+      - datalake_terminator_clean.termination.feedback
+  property_issue:
+    lineage:
+      - datalake_terminator_clean.termination.feedback
+  b2b_type:
+    lineage:
+      - dw_public.dim_contract.b2b_type
+  b2b_prime_type:
+    lineage:
+      - dw_public.dim_contract.b2b_prime_type
+  workflow_current_step:
+    lineage:
+      - datalake_terminator_clean.termination_workflow.current_step
+  tenant_key_location:
+    lineage:
+      - datalake_terminator_clean.termination.tenant_keys_location
+  tenant_key_detail:
+    lineage:
+      - datalake_terminator_clean.termination.tenant_keys_location
+  owner_key_detail:
+    lineage:
+      - datalake_terminator_clean.termination.owner_keys_location
+  repair_resolution:
+    lineage:
+      - datalake_terminator_clean.negotiation.repair_resolution
+  repair_cost:
+    lineage:
+      - datalake_terminator_clean.negotiation.repair_cost
+  utility_bill_info:
+    lineage:
+      - datalake_termiantor_clean.termination.utility_bill_info
+  completed_utility_attachments:
+    lineage:
+      - datalake_terminator_clean.utility_bill.type
+  pending_utility_attachments:
+    lineage:
+      - datalake_terminator_clean.utility_bill.type
+  utility_bill_in_condominium:
+    lineage:
+      - datalake_terminator_clean.utility_bill.type
+  application_user_name:
+    lineage:
+      - datalake_terminator_clean.application_user.name
+  application_user_email:
+    lineage:
+      - datalake_terminator_clean_prod.application_user.email
+  fee_discount_percentage:
+    lineage:
+      - datalake_terminator_clean.termination_fee_negotiation.discount_percentage
+  fee_discount_value:
+    lineage:
+      - datalake_terminator_clean.termination_fee_negotiation.discount_value
+  fee_final_amout:
+    lineage:
+      - datalake_terminator_clean.termination_fee_negotiation.final_amount
+  fee_number_of_installments:
+    lineage:
+      - datalake_terminator_clean.termination_fee_negotiation.number_of_installments
+  fee_payment_option:
+    lineage:
+      - datalake_terminator_clean.termination_fee_negotiation.payment_option
+  fee_negotiation_status:
+    lineage:
+      - datalake_terminator_clean.termination_fee_negotiation.status
+  is_b2b:
+    lineage:
+      - dw_public.dim_contract.is_b2b
+  has_automatically_closed_task:
+    lineage:
+      - datalake_terminator_clean.termination_workflow.has_automatically_closed_task
+  has_exit_inspection:
+    lineage:
+      - datalake_terminator_clean.termination.has_exit_inspection
+  has_repairs:
+    lineage:
+      - datalake_terminator_clean.negotiation.has_landlord_comment
+  is_repair_tenant_duty:
+    lineage:
+      - datalake_terminator_clean.negotiation.needs_repair_by_tenant
+  is_relisting:
+    lineage:
+      - datalake_terminator_clean.termination.is_relisting
+  dt_termination:
+    lineage:
+      - datalake_terminator_clean.termination.dt_termination
+  dt_last_rescheduled:
+    lineage:
+      - datalake_terminator_clean.termination_aud.ts_updated
+  dt_last_inspection_synched:
+    lineage:
+      - dw_public.fact_inspection_bookings.sk_inspected_date
+  dt_negotiation_updated:
+    lineage:
+      - datalake_terminator_clean.negotiation.ts_updated
+  ts_fee_negotiation_created:
+    lineage:
+      - datalake_terminator_clean.termination_fee_negotiation.ts_created
+  ts_fee_negotiation_updated:
+    lineage:
+      - datalake_terminator_clean.termination_fee_negotiation.ts_updated
+  ts_created:
+    lineage:
+      - datalake_terminator_clean.termination.ts_created
+  ts_canceled:
+    lineage:
+      - datalake_terminator_clean.termination.ts_canceled
+  ts_termination_finished:
+    lineage:
+      - datalake_terminator_clean.negotiation.ts_updated
+      - datalake_terminator_clean.termination_aud.ts_updated
+  ts_updated:
+    lineage:
+      - datalake_terminator_clean.termination.ts_updated
