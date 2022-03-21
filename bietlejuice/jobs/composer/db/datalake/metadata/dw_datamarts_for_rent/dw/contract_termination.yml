@@ -79,7 +79,7 @@ columns:
       - datalake_terminator_clean.negotiation.repair_cost
   utility_bill_info:
     lineage:
-      - datalake_termiantor_clean.termination.utility_bill_info
+      - datalake_terminator_clean.termination.utility_bill_info
   completed_utility_attachments:
     lineage:
       - datalake_terminator_clean.utility_bill.type
@@ -94,7 +94,7 @@ columns:
       - datalake_terminator_clean.application_user.name
   application_user_email:
     lineage:
-      - datalake_terminator_clean_prod.application_user.email
+      - datalake_terminator_clean.application_user.email
   fee_discount_percentage:
     lineage:
       - datalake_terminator_clean.termination_fee_negotiation.discount_percentage
