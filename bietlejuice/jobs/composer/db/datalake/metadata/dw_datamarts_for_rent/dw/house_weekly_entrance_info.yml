@@ -1,0 +1,22 @@
+---
+database_name: dw_datamarts_for_rent
+table_name: house_weekly_entrance_info
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.house.id
+  week_start:
+    lineage:
+      - dw_public.dim_date.week_start
+  week_end:
+    lineage:
+      - dw_public.dim_date.week_end
+  key_location_history:
+    lineage:
+      - datalake_ebdb_clean.access_authorization_type.name
+  key_type_history:
+    lineage:
+      - datalake_ebdb_clean.key_type.name
+  who_is_living_history:
+    lineage:
+      - datalake_ebdb_clean.occupant_type.name
