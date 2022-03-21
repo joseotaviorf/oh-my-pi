@@ -1,0 +1,13 @@
+---
+database_name: dw_datamarts_for_sale
+table_name: sale_agents_weekly_performance
+columns:
+  sk_agent:
+    lineage:
+      - dw_sale.fact_visits.sk_agent
+  week:
+    lineage:
+      - dw_public.dim_date.week_start
+  work_contract:
+    lineage:
+      - datalake_ebdb_clean.work_contract.contract_name
