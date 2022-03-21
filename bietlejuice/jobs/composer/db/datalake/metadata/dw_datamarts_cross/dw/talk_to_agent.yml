@@ -1,0 +1,50 @@
+---
+database_name: dw_datamarts_cross
+table_name: talk_to_agent
+columns:
+  tenant_id:
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+  sk_house_listing:
+    lineage:
+      - dw_public.dim_house_listing.sk_house_listing
+  tenant_name:
+    lineage:
+      - dw_public.dim_user.nome
+  tenant_phone:
+    lineage:
+      - dw_public.dim_user.telefone_principal
+  tenant_email:
+    lineage:
+      - dw_public.dim_user.email
+  region_code:
+    lineage:
+      - dw_public.dim_region.region_code
+  first_attendance_ts:
+    lineage:
+      - dw_public.dim_booking.dt_created
+      - datalake_ebdb_clean.agent_support.ts_created
+  mkt_category:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.category
+  mkt_flow:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.flow
+  mkt_completion:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.completion
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.channel
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.medium
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.origin
+  mkt_source:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.source
+  mkt_platform:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand.platform
