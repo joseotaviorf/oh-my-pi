@@ -1,0 +1,45 @@
+---
+database_name: dw_datamarts_cross
+table_name: buyer_prospect_status
+columns:
+  sk_buyer:
+    lineage:
+      - dw_datamarts_cross.talk_to_agent.tenant_id
+      - dw_sale.fact_offers.sk_buyer
+      - dw_sale.fact_sale_flows.sk_buyer
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
+  ts_start:
+    lineage:
+      - dw_datamarts_cross.talk_to_agent.first_message_ts
+      - dw_public.dim_booking.dt_created
+      - dw_sale.dim_offer.ts_offer_submitted
+      - dw_sale.dim_sale_agreement.ts_sale_agreement_signed
+  ts_end:
+    lineage:
+      - dw_datamarts_cross.talk_to_agent.first_message_ts
+      - dw_public.dim_booking.dt_created
+      - dw_sale.dim_offer.ts_offer_submitted
+      - dw_sale.dim_sale_agreement.ts_sale_agreement_signed
+  sk_start_date:
+    lineage:
+      - dw_datamarts_cross.talk_to_agent.first_message_ts
+      - dw_public.dim_booking.dt_created
+      - dw_sale.dim_offer.ts_offer_submitted
+      - dw_sale.dim_sale_agreement.ts_sale_agreement_signed
+  sk_end_date:
+    lineage:
+      - dw_datamarts_cross.talk_to_agent.first_message_ts
+      - dw_public.dim_booking.dt_created
+      - dw_sale.dim_offer.ts_offer_submitted
+      - dw_sale.dim_sale_agreement.ts_sale_agreement_signed
+  ts_first_activation:
+    lineage:
+      - dw_datamarts_cross.talk_to_agent.first_message_ts
+      - dw_public.dim_booking.dt_created
+      - dw_sale.dim_offer.ts_offer_submitted
+      - dw_sale.dim_sale_agreement.ts_sale_agreement_signed
+  city_group_first_activation:
+    lineage:
+      - dw_public.dim_region.city_group
