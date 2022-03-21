@@ -1,0 +1,25 @@
+---
+database_name: dw_datamarts_for_sale
+table_name: sale_ongoing_listings_casa_mineira
+columns:
+  sk_region:
+    lineage:
+      - dw_sale.fact_listings_status.sk_region
+  region:
+    lineage:
+      - dw_public.dim_region.name
+  city_name:
+    lineage:
+      - dw_public.dim_region.city_name
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
+  date:
+    lineage:
+      - dw_public.dim_date.date
+  weekday_name:
+    lineage:
+      - dw_public.dim_date.week_name
+  week_start:
+    lineage:
+      - dw_public.dim_date.week_start
