@@ -1355,6 +1355,7 @@ bietlejuice.enrich_offboarding:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-b2b
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_listing:load-enrich-portability
+  - bietlejuice.enrich_ebdb_listing_jobs:load-enrich-inspection
   - bietlejuice.enrich_nps_answer_drivers:load-enrich-answer-drivers
   - bietlejuice.enrich_tracksale:load-enrich-answer
   - bietlejuice.enrich_tracksale:load-enrich-campaign

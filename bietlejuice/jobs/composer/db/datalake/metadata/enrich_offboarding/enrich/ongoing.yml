@@ -1,0 +1,50 @@
+---
+database_name: datalake_offboarding
+table_name: ongoing
+columns:
+  id:
+    lineage:
+      - datalake_offboarding.contract_termination.sk_termination
+  id_contract:
+    lineage:
+      - datalake_offboarding.contract_termination.sk_contract
+  id_house:
+    lineage:
+      - datalake_offboarding.contract_termination.id_house
+  id_exit_inspection:
+    lineage:
+      - datalake_offboarding.contract_termination.sk_exit_inspection
+      - datalake_ebdb_listing_jobs.inspection.id
+  status:
+    lineage:
+      - datalake_offboarding.contract_termination.status
+  workflow_current_step:
+    lineage:
+      - datalake_offboarding.contract_termination.workflow_current_step
+  reason:
+    lineage:
+      - datalake_offboarding.contract_termination.reason
+  repair_resolution:
+    lineage:
+      - datalake_offboarding.contract_termination.repair_resolution
+  repair_cost:
+    lineage:
+      - datalake_offboarding.contract_termination.repair_cost
+  has_repairs:
+    lineage:
+      - datalake_offboarding.contract_termination.has_repairs
+  is_repair_tenant_duty:
+    lineage:
+      - datalake_offboarding.contract_termination.is_repair_tenant_duty
+  is_workflow:
+    lineage:
+      - datalake_offboarding.contract_termination.is_workflow
+  dt_termination:
+    lineage:
+      - datalake_offboarding.contract_termination.dt_termination
+  ts_termination_request:
+    lineage:
+      - datalake_offboarding.contract_termination.ts_created
+  ts_termination_finished:
+    lineage:
+      - datalake_offboarding.contract_termination.ts_termination_finished

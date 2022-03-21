@@ -328,6 +328,7 @@ contract_info AS (
     ) 
     SELECT
         ctr.id AS id_contract,
+        ctr.id_house,
         hl.id_house_listing,
         contract_b2b.b2b_type,
         contract_b2b.b2b_prime_type,
@@ -363,6 +364,7 @@ SELECT
     aui.id_external AS sk_application_user,
     term.id_contract AS sk_contract,
     term.id_exit_inspection AS sk_exit_inspection,
+    ci.id_house,
     ci.id_house_listing AS sk_house_listing,
     COALESCE(house.id_region, -1) AS sk_region,
     tw.id_current_assignee AS sk_workflow_assignee,
