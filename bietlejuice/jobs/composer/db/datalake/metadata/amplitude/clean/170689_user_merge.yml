@@ -16,3 +16,12 @@ columns:
   ts_server_merge:
     lineage:
       - datalake_amplitude_raw.170689_user_merge.merge_server_time
+  year:
+    lineage:
+      - datalake_amplitude_raw.170689_user_merge.merge_time
+  month:
+    lineage:
+      - datalake_amplitude_raw.170689_user_merge.merge_time
+  day:
+    lineage:
+      - datalake_amplitude_raw.170689_user_merge.merge_time

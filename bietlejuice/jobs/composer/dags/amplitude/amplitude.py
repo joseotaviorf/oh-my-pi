@@ -238,7 +238,7 @@ user_merge_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
                 "170698_user_merge",
                 "--partition_by",
             ]
-            + ["id_amplitude_merged"],
+            + ["id_amplitude_merged", "year", "month", "day"],
         }
     },
 )
