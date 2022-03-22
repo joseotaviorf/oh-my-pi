@@ -406,7 +406,7 @@ update_clean_staging_subpartitioned_tables_athena_task = QuintoAndarDatabricksSu
     },
 )
 
-load_events_tables_clean = QuintoAndarDatabricksSubmitRunOperator(
+load_events_tables_clean_task = QuintoAndarDatabricksSubmitRunOperator(
     task_id="load-events-tables-clean",
     dag=dag,
     json={
@@ -518,7 +518,7 @@ airflow_helpers.chain(
 
 airflow_helpers.chain(
     update_clean_staging_subpartitioned_tables_spark_task,
-    load_events_tables_clean,
+    load_events_tables_clean_task,
     sync_metastore_clean_events_tables_structure_task,
     sync_metastore_clean_events_tables_partitions_task,
     propagate_tables_metadata_clean_task,

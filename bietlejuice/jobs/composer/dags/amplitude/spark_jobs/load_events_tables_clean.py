@@ -66,7 +66,7 @@ if __name__ == "__main__":
         QUERIES_DATALAKE_PATH + source + "/clean"
     )
     incremental_tables = [
-        table_name.replace(".sql") for table_name in incremental_tables
+        table_name.replace(".sql", "") for table_name in incremental_tables
     ]
 
     for table_name in incremental_tables:
