@@ -27,14 +27,14 @@ logger = QuintoAndarLogger(JOB_NAME)
 BLOCK_LIST = ["subpartitions_values"]
 
 
-def get_all_columns_lineage_from_events_table(spark_metastore_helper):
+def get_all_columns_lineage_from_clean_tables(spark_metastore_helper, table_name: str):
     spark_ms_table_columns = spark_metastore_helper.get_spark_metastore_table_columns(
-        "events"
+        table_name
     )
     columns_lineage = {}
     for col_name, col_type in spark_ms_table_columns.items():
         columns_lineage[col_name] = {
-            "lineage": [f"datalake_amplitude_clean.events.{col_name}"]
+            "lineage": [f"datalake_amplitude_clean.{table_name}.{col_name}"]
         }
     return columns_lineage
 
@@ -115,15 +115,16 @@ if __name__ == "__main__":
 
     table_names = get_all_new_tables(spark_ms, execution_date)
 
-    if table_names:
-        columns_lineage = get_all_columns_lineage_from_events_table(spark_ms)
+    for table_name in table_names:
+        columns_lineage = get_all_columns_lineage_from_clean_tables(
+            spark_ms, table_name
+        )
         metadata_propagator = MetadataPropagator(
             get_metadata_propagator_host(),
             spark_ms.spark_database_name,
             columns_lineage,
         )
 
-        rdd = BaseSparkContext.sc.parallelize(table_names)
-        rdd.foreach(lambda table_name: metadata_propagator.propagate_table(table_name))
+        metadata_propagator.propagate_table(table_name)
 
     logger.info(f"m={JOB_NAME}, msg=Job finished.")
