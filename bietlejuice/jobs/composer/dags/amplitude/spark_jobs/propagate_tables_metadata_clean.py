@@ -7,7 +7,6 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.base.service import ServiceEnum
-from bietlejuice.jobs.composer.base.spark import BaseSparkContext
 from bietlejuice.jobs.composer.base.spark.spark_metastore_helper import (
     SparkMetastoreHelper,
 )
