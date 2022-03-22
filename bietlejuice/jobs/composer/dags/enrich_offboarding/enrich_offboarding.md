@@ -15,7 +15,9 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 Produces the following output table on Enrich layer (via full load):
 
+- `budgeting_window`
 - `contract_termination`
+- `inspection_analysis`
 
 
 ### Responsible Data Engineering Team

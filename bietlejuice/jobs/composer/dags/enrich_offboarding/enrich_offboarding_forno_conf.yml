@@ -2,3 +2,5 @@
 inner_dependencies:
   ongoing:
     - contract_termination
+  inspection_analysis:
+    - ongoing

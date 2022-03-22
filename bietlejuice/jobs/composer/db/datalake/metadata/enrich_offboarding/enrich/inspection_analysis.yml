@@ -1,0 +1,18 @@
+---
+database_name: datalake_offboarding
+table_name: inspection_analysis
+columns:
+  id_contract:
+    lineage:
+      - datalake_offboarding.ongoing.id_contract
+  days_leadtime:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_start_date
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_completed_date
+  dt_start_date:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_start_date
+  dt_completed_date:
+    lineage:
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_completed_date
+  
