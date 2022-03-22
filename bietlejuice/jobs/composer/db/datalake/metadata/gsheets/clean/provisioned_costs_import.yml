@@ -1,0 +1,22 @@
+---
+database_name: datalake_gsheets_clean
+table_name: provisioned_costs_import
+columns:
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_raw.provisioned_costs_import.cost_origin
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.provisioned_costs_import.city_group
+  source: 
+    lineage: 
+      - datalake_gsheets_raw.provisioned_costs_import.cost_type
+  cost: 
+    lineage: 
+      - datalake_gsheets_raw.provisioned_costs_import.cost 
+  has_real_cost:
+    lineage: 
+      - datalake_gsheets_raw.provisioned_costs_import.has_real_cost 
+  dt_created:
+    lineage:
+      - datalake_gsheets_raw.provisioned_costs_import.date

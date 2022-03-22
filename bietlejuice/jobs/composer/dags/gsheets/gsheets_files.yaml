@@ -635,6 +635,11 @@ promotional_bonus_user_targets:
     sheet_name: promotional_bonus_user_targets
     clean_table_name: promotional_bonus_user_targets
 
+provisioned_costs_import:
+    sheet_id: 1KZWx_b3tn754ImagBnGj4rJo16kXgxzg-lQFpYTolOs
+    sheet_name: provisioned_costs_import
+    clean_table_name: provisioned_costs_import
+
 rent_criteo_eng_ab_test:
     sheet_id: 17PonK69vjOYru-xD0acbVqD0bkl_LPuGodhR2AHmn5I
     sheet_name: rent_criteo_eng_ab_test
