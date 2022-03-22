@@ -1,0 +1,106 @@
+---
+database_name: datalake_offboarding
+table_name: budgeting_window
+columns:
+  custom_fields:
+    lineage:
+      - datalake_customer_support.email.custom_fields
+  id_contract:
+    lineage:
+      - datalake_customer_support.email.custom_fields
+  id_house:
+    lineage:
+      - datalake_customer_support.email.custom_fields
+  agent_email:
+    lineage:
+      - datalake_customer_support.email.agent_email
+  agent_name:
+    lineage:
+      - datalake_customer_support.email.agent_name
+  agent_company:
+    lineage:
+      - datalake_customer_support.email.agent_company
+  department:
+    lineage:
+      - datalake_customer_support.email.department
+  demand_type:
+    lineage:
+      - datalake_customer_support.email.custom_fields
+  process_type:
+    lineage:
+      - datalake_customer_support.email.custom_fields
+  client_type:
+    lineage:
+      - datalake_customer_support.email.custom_fields
+  client_description:
+    lineage:
+      - datalake_customer_support.email.custom_fields
+  repairs_sent_pp:
+    lineage:
+      - datalake_customer_support.email.custom_fields
+  reanalysis_repairs:
+    lineage:
+      - datalake_customer_support.email.custom_fields
+  interaction_pp:
+    lineage:
+      - datalake_customer_support.email.custom_fields
+  budgeting_performed:
+    lineage:
+      - datalake_customer_support.email.custom_fields
+  budgeting_sent_pp:
+    lineage:
+      - datalake_customer_support.email.custom_fields
+  budgeting_sent_iq:
+    lineage:
+      - datalake_customer_support.email.custom_fields
+  intermediation_with_parties:
+    lineage:
+      - datalake_customer_support.email.custom_fields
+  agreement_execution:
+    lineage:
+      - datalake_customer_support.email.custom_fields
+  finishing:
+    lineage:
+      - datalake_customer_support.email.custom_fields
+  budget_value:
+    lineage:
+      - datalake_customer_support.email.custom_fields
+  budget_range:
+    lineage:
+      - datalake_customer_support.email.custom_fields
+  agreement_between_parties:
+    lineage:
+      - datalake_customer_support.email.custom_fields
+  is_solved:
+    lineage:
+      - datalake_customer_support.email.is_solved
+  dt_communicated_iq:
+    lineage:
+      - datalake_customer_support.email.custom_fields
+  dt_intermediate:
+    lineage:
+      - datalake_customer_support.email.custom_fields
+  dt_agreement_executed:
+    lineage:
+      - datalake_customer_support.email.custom_fields
+  dt_finished:
+    lineage:
+      - datalake_customer_support.email.custom_fields
+  dt_return:
+    lineage:
+      - datalake_customer_support.email.custom_fields
+  dt_budgeted:
+    lineage:
+      - datalake_customer_support.email.custom_fields
+  dt_analysis:
+    lineage:
+      - datalake_customer_support.email.custom_fields
+  dt_reanalysis:
+    lineage:
+      - datalake_customer_support.email.custom_fields
+  ts_ticket_started:
+    lineage:
+      - datalake_customer_support.email.dt_started
+  ts_ticket_ended:
+    lineage:
+      - datalake_customer_support.email.dt_closed
