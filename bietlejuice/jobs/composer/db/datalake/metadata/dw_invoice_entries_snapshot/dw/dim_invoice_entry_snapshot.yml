@@ -1,0 +1,34 @@
+---
+database_name: dw_payment_snapshot
+table_name: dim_invoice_entry_snapshot
+columns:
+  sk_invoice_entry:
+    lineage:
+      - dw_payment.dim_invoice_entry.sk_invoice_entry
+  entry_type:
+    lineage:
+      - dw_payment.dim_invoice_entry.entry_type
+  from_account_type:
+    lineage:
+      - dw_payment.dim_invoice_entry.from_account_type
+  to_account_type:
+    lineage:
+      - dw_payment.dim_invoice_entry.to_account_type
+  accounting_account:
+    lineage:
+      - dw_payment.dim_invoice_entry.accounting_account
+  producer:
+    lineage:
+      - dw_payment.dim_invoice_entry.producer
+  description:
+    lineage:
+      - dw_payment.dim_invoice_entry.description
+  invoice_entry_revenue:
+    lineage:
+      - dw_payment.dim_invoice_entry.invoice_entry_revenue
+  accrual_year_month:
+    lineage:
+      - dw_payment.dim_invoice_entry.accrual_year_month
+  ts_snapshot:
+    lineage:
+      - dw_payment.dim_invoice_entry.ts_load

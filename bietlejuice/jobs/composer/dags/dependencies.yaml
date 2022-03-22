@@ -573,6 +573,11 @@ bietlejuice.dw_invoice_entries:
   - bietlejuice.retsuko:load-clean-invoice
   - bietlejuice.enrich_retsuko:load-enrich-invoice
 
+bietlejuice.dw_invoice_entries_snapshot:
+  - bietlejuice.dw_invoice_entries:load-dw-invoice-entries-dim-invoice
+  - bietlejuice.dw_invoice_entries:load-dw-invoice-entries-dim-invoice-entry
+  - bietlejuice.dw_invoice_entries:load-dw-invoice-entries-fact-invoice-entries
+
 bietlejuice.dw_contract:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
