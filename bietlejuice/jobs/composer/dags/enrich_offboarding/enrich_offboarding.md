@@ -19,7 +19,8 @@ Produces the following output table on Enrich layer (via full load):
 - `contract_termination`
 - `inspection_analysis`
 - `nps`
-
+- `nps_agg`
+  
 ### Responsible Data Engineering Team
 
 For any questions or concerns about this DAG, please contact its owner.

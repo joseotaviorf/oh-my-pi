@@ -1,0 +1,22 @@
+---
+database_name: datalake_offboarding
+table_name: nps_agg
+columns:
+  id_contract:
+    lineage:
+      - datalake_offboarding.nps.id_contract
+  number_of_responses:
+    lineage:
+      - datalake_offboarding.nps.id_nps_answer
+  number_of_responses_iq:
+    lineage:
+      - datalake_offboarding.nps.id_nps_answer
+  number_of_responses_pp:
+    lineage:
+      - datalake_offboarding.nps.id_nps_answer
+  nps_iq:
+    lineage:
+      - datalake_offboarding.nps.score
+  nps_pp:
+    lineage:
+      - datalake_offboarding.nps.score
