@@ -1,0 +1,18 @@
+---
+database_name: dw_datamarts_for_sale
+table_name: neighborhood_competition
+columns:
+  week_start:
+    lineage:
+      - dw_public.dim_date.week_start
+  sk_region:
+    lineage:
+      - dw_datamarts_for_sale.loft_house_listing.id_neighborhood
+  city:
+    lineage:
+      - dw_public.dim_region.city_name
+      - dw_datamarts_for_sale.loft_house_listing.city
+  neighborhood:
+    lineage:
+      - dw_public.dim_region.name
+      - dw_datamarts_for_sale.loft_status_listing_flows.neighborhood
