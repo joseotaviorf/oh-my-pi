@@ -310,7 +310,7 @@ visits_booked_per_ongoing_listings AS (
 			JOIN 
 				dim_date AS d
 				ON d.sk_date BETWEEN NULLIF(f.sk_status_start_date,-1) 
-				AND COALESCE(TO_CHAR(TTO_DATE(NULLIF(sk_status_end_date,-1),'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, TO_CHAR(CURRENT_DATE -1, 'YYYYMMDD')::bigint)
+				AND COALESCE(TO_CHAR(TO_DATE(NULLIF(sk_status_end_date,-1),'YYYYMMDD') - 1, 'YYYYMMDD')::bigint, TO_CHAR(CURRENT_DATE -1, 'YYYYMMDD')::bigint)
 			WHERE
 				f.status_history = 'publicado' -- consider only published status
 				AND SUBSTRING(sk_house_listing,10,12) <> '000' -- consider only listings that already started publication
