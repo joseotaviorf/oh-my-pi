@@ -1,4 +1,8 @@
 ## SimilarWeb Daily Metrics
+
+### Attention Point!!!
+Do not clear raw tasks that have finished successfully. We have a limited number of API credits and these tasks run a high number of API requests.
+
 ### Purpose
 Retrieves data from [SimilarWeb API](https://github.com/quintoandar/similarweb-api-client-python).
 

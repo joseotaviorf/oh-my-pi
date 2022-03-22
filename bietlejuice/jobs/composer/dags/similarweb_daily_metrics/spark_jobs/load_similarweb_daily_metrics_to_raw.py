@@ -129,6 +129,10 @@ if __name__ == "__main__":
             if platform == "total":
                 metrics_list.remove("unique-visitors")
 
+            # TO-DO: refactor SimilarWeb Api Client
+            if domain == "housi.com" and platform == "mobileweb":
+                metrics_list.remove("average-visit-duration")
+
             response = fetch_similarweb_metrics(
                 consumer_instance, domain, platform, metrics_list
             )
@@ -182,6 +186,16 @@ if __name__ == "__main__":
                 """
                 all_metrics_joined = all_metrics_joined.withColumn(
                     "unique_visitors", lit(None)
+                )
+
+            if domain == "housi.com" and platform == "mobileweb":
+                """
+              turns possible the union of dataframes across different platforms,
+              as the domain housi.com doesn't have average-visit-duration metric
+              for mobileweb platform
+              """
+                all_metrics_joined = all_metrics_joined.withColumn(
+                    "average-visit-duration", lit(None)
                 )
 
             dfs_platforms.append(all_metrics_joined)
