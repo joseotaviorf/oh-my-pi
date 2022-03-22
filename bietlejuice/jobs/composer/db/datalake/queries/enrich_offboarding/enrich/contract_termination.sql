@@ -94,6 +94,7 @@ customer_conversions AS (
             nps_answer,
             nps_comment,
             seconds_spent_answering,
+            score_category,
             ts_answer_sent_local
         FROM 
             datalake_tracksale.answer
@@ -103,6 +104,7 @@ customer_conversions AS (
             nps_answer,
             nps_comment,
             seconds_spent_answering,
+            score_category,
             ts_answer_sent_local 
         FROM
             datalake_casa_mineira_tracksale.answer
@@ -117,9 +119,11 @@ customer_conversions AS (
         cc.customer_email,
         cc.customer_phone,
         disp.status,
+        ans.score_category,
         ans.nps_answer,
         ans.nps_comment,
         ROUND(ans.seconds_spent_answering/60.0,2) AS minutes_spent_answering,
+        cc.id_answer IS NOT NULL AS is_answered,
         cc.is_customer_identified,
         disp.ts_created,
         ans.ts_answer_sent_local
@@ -139,6 +143,7 @@ campaign AS (
     SELECT 
         id,
         customer_type,
+        campaign_name,
         metric_group 
     FROM 
         datalake_tracksale.campaign
@@ -146,6 +151,7 @@ campaign AS (
     SELECT 
         id,
         customer_type,
+        campaign_name,
         metric_group
     FROM 
         datalake_casa_mineira_tracksale.campaign
@@ -368,6 +374,15 @@ SELECT
     ci.id_house_listing AS sk_house_listing,
     COALESCE(house.id_region, -1) AS sk_region,
     tw.id_current_assignee AS sk_workflow_assignee,
+    cc.id_nps_answer,
+    cc.id_dispatch_lot,
+    cc.score_category,
+    cc.customer_email,
+    cc.customer_phone,
+    cc.nps_comment,
+    cc.status AS dispatch_status,
+    cmp.customer_type,
+    cmp.campaign_name,
     term.cancellation_info,
     term.feedback,
     GET_JSON_OBJECT(term.feedback, '$.churnInfo.reason') AS churn_reason,
@@ -425,6 +440,7 @@ SELECT
     (term.ts_canceled IS NOT NULL) AS is_termination_canceled,
     (tw.id IS NOT NULL) AS is_workflow,
     term.is_relisting,
+    cc.is_answered,
     tw.has_automatically_closed_task,
     term.dt_termination,
     tm.dt_last_updated AS dt_last_rescheduled,
@@ -490,3 +506,9 @@ LEFT JOIN
 LEFT JOIN 
     last_negotiation AS ln
         ON term.id = ln.id_termination
+LEFT JOIN 
+    customer_conversions AS cc
+        ON cc.id_contract = term.id_contract
+LEFT JOIN 
+    campaign AS cmp
+        ON cc.id_campaign = cmp.id
