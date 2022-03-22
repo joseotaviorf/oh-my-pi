@@ -827,6 +827,8 @@ supply_ciq_cost_comission_sale AS (
         SUM(co.comission_listing_fs::FLOAT) AS costs
     FROM
         datalake_gsheets_clean_prod.ciq_costs AS co
+    WHERE
+        REGEXP_INSTR(comission_listing_fs, '#') = 0
     GROUP BY 1,2,3,4,5,6
 ),
 supply_spinver_cost AS(
@@ -1066,4 +1068,4 @@ LEFT JOIN (
 WHERE
     dt_cost < current_date
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,13
-ORDER BY 1 DESC, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+ORDER BY 1 DESC, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 
