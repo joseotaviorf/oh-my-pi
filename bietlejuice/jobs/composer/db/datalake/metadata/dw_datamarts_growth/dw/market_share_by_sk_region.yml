@@ -1,0 +1,10 @@
+---
+database_name: dw_datamarts_growth
+table_name: market_share_by_sk_region
+columns:
+  name:
+    lineage:
+      - dw_public.dim_region.name
+  city_name:
+    lineage:
+      - dw_public.dim_region.city_name
