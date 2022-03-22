@@ -15,6 +15,7 @@ dags_out_of_pattern:
         "dw_datamarts_growth",
         "dw_datamarts_growth_cross",
         "dw_house",
+        "dw_invoice_entries",
         "dw_lead",
         "dw_listing",
         "dw_listing_jobs",

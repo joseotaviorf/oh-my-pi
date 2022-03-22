@@ -574,9 +574,9 @@ bietlejuice.dw_invoice_entries:
   - bietlejuice.enrich_retsuko:load-enrich-invoice
 
 bietlejuice.dw_invoice_entries_snapshot:
-  - bietlejuice.dw_invoice_entries:load-dw-invoice-entries-dim-invoice
-  - bietlejuice.dw_invoice_entries:load-dw-invoice-entries-dim-invoice-entry
-  - bietlejuice.dw_invoice_entries:load-dw-invoice-entries-fact-invoice-entries
+  - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice
+  - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice-entry
+  - bietlejuice.dw_invoice_entries:load-dw-payment-fact-invoice-entries
 
 bietlejuice.dw_contract:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
