@@ -517,7 +517,7 @@ airflow_helpers.chain(
 )
 
 airflow_helpers.chain(
-    update_clean_staging_subpartitioned_tables_spark_task,
+    create_clean_staging_subpartitioned_tables_spark_task,
     load_events_tables_clean_task,
     sync_metastore_clean_events_tables_structure_task,
     sync_metastore_clean_events_tables_partitions_task,
