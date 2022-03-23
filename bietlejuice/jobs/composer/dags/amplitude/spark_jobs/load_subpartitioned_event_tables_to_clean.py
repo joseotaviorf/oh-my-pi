@@ -1,9 +1,9 @@
 """
-    This job intend to increment events tables that are on clean layer.
-    There is some tables with name like: {id_app}_{event_type}_events and those
-    tables are an extraction from clean_staging tables.
+    This job intends to increment events tables that are on the clean layer.
+    There are some tables with name like: {id_app}_{event_type}_events that sums
+    up informations from events table by id_app and event_type with some extractions.
 
-    Since amplitude updates its values everyday, we need to load those clean tables
+    Since amplitude updates its values every day, we need to load those clean tables
     in order to update its values.
 """
 
@@ -34,7 +34,6 @@ parser.add_argument("--partition_by", nargs="+", dest="partition_by", required=F
 
 
 if __name__ == "__main__":
-    # args
     args = parser.parse_args()
     execution_date = args.execution_date
     env = args.env
@@ -46,43 +45,37 @@ if __name__ == "__main__":
         "m=__main__, date={}, source={}, msg=Job started".format(execution_date, source)
     )
 
-    # Get partiton from the day before
-    date = datetime.strptime(execution_date, "%Y-%m-%d") - timedelta(days=1)
-    year, month, day = date.year, date.month, date.day
+    previous_date = datetime.strptime(execution_date, "%Y-%m-%d") - timedelta(days=1)
+    partition_year, partition_month, partition_day = (
+        previous_date.year,
+        previous_date.month,
+        previous_date.day,
+    )
 
-    # setup
     db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
     spark_client = SparkClient()
     metastore_service = SparkMetastoreService(spark_client)
     s3_loader = S3Loader()
     spark_metastore_loader = SparkMetastoreLoader(metastore_service)
 
-    database_name = db_info["db_clean_databricks"]
+    amplitude_clean_database_name = db_info["db_clean_databricks"]
     format_options = SparkTableStorageFormat.DEFAULT_CLEAN
     database_location = db_info["db_clean_path"]
 
-    # get queries that its results going to be used to update tables
-    incremental_tables = FileService.list_files(
-        QUERIES_DATALAKE_PATH + source + "/clean"
-    )
-    incremental_tables = [
-        table_name.replace(".sql", "") for table_name in incremental_tables
-    ]
+    incremental_tables_queries = FileService.list_layer_sql_files(source, "clean")
 
-    for table_name in incremental_tables:
+    for table_name in incremental_tables_queries:
+        table_name = table_name.replace(".sql", "")
         query_path = (
             QUERIES_DATALAKE_PATH + source + "/clean" + "/{}.sql".format(table_name)
         )
         query = FileService.get_query_from_file_name(query_path).format(
-            year, month, day
+            partition_year, partition_month, partition_day
         )
 
-        # create df
         df = spark_client.get_records(query)
         df = SparkDataFrameService(df).optimize_partition(250000).output()
 
-        # load df
-        # this spark job only saves the files in S3 and update on metastore
         s3_loader.load_df(
             df=df,
             s3_path=f"{database_location}{table_name}",
@@ -92,7 +85,7 @@ if __name__ == "__main__":
         )
         spark_metastore_loader.update_metastore(
             df,
-            database_name,
+            amplitude_clean_database_name,
             table_name,
             format_options,
             database_location,
