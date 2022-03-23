@@ -59,8 +59,8 @@ UPDATE_CLEAN_STAGING_SUBPARTITIONED_TABLES_FILE_PATH = (
 PROPAGATE_TABLES_METADATA_CLEAN_STAGING_FILE_PATH = (
     AMPLITUDE_SPARK_JOBS_PATH + "propagate_tables_metadata_clean_staging.py"
 )
-LOAD_EVENTS_TABLES_CLEAN_FILE_PATH = (
-    AMPLITUDE_SPARK_JOBS_PATH + "load_events_tables_clean.py"
+LOAD_SUBPARTITIONED_EVENT_TABLES_TO_CLEAN_FILE_PATH = (
+    AMPLITUDE_SPARK_JOBS_PATH + "load_subpartitioned_event_tables_to_clean.py"
 )
 PROPAGATE_TABLES_METADATA_CLEAN_FILE_PATH = (
     AMPLITUDE_SPARK_JOBS_PATH + "propagate_tables_metadata_clean.py"
@@ -406,12 +406,12 @@ update_clean_staging_subpartitioned_tables_athena_task = QuintoAndarDatabricksSu
     },
 )
 
-load_events_tables_clean_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="load-events-tables-clean",
+load_subpartitioned_event_tables_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="load-subpartitioned-event-tables-to-clean",
     dag=dag,
     json={
         "spark_python_task": {
-            "python_file": LOAD_EVENTS_TABLES_CLEAN_FILE_PATH,
+            "python_file": LOAD_SUBPARTITIONED_EVENT_TABLES_TO_CLEAN_FILE_PATH,
             "parameters": [
                 "{{ ds }}",
                 ENV,
@@ -518,7 +518,7 @@ airflow_helpers.chain(
 
 airflow_helpers.chain(
     create_clean_staging_subpartitioned_tables_spark_task,
-    load_events_tables_clean_task,
+    load_subpartitioned_event_tables_to_clean_task,
     sync_metastore_clean_events_tables_structure_task,
     sync_metastore_clean_events_tables_partitions_task,
     propagate_tables_metadata_clean_task,
