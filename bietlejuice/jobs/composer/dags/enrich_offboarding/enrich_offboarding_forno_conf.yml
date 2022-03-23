@@ -8,3 +8,5 @@ inner_dependencies:
     - nps
   inspection_analysis:
     - ongoing
+  tickets:
+    - ongoing
