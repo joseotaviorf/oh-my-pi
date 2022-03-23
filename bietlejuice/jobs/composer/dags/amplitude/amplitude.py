@@ -424,8 +424,8 @@ load_subpartitioned_event_tables_to_clean_task = QuintoAndarDatabricksSubmitRunO
     },
 )
 
-sync_metastore_clean_events_tables_structure_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="sync-metastore-clean-events-tables-structure",
+sync_metastore_clean_subpartitioned_events_tables_structure_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="sync-metastore-clean-subpartitioned-event-tables-structure",
     dag=dag,
     json={
         "spark_python_task": {
@@ -440,8 +440,8 @@ sync_metastore_clean_events_tables_structure_task = QuintoAndarDatabricksSubmitR
     },
 )
 
-sync_metastore_clean_events_tables_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="sync-hive-metastore-clean-events-tables-partitions",
+sync_metastore_clean_subpartitioned_events_tables_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
+    task_id="sync-hive-metastore-clean-subpartitioned-events-tables-partitions",
     dag=dag,
     json={
         "spark_python_task": {
@@ -457,7 +457,7 @@ sync_metastore_clean_events_tables_partitions_task = QuintoAndarDatabricksSubmit
 )
 
 propagate_clean_tables_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="propagate-clean-tables-metadatatask",
+    task_id="propagate-clean-tables-metadata-task",
     dag=dag,
     json={
         "spark_python_task": {
@@ -519,8 +519,8 @@ airflow_helpers.chain(
 airflow_helpers.chain(
     create_clean_staging_subpartitioned_tables_spark_task,
     load_subpartitioned_event_tables_to_clean_task,
-    sync_metastore_clean_events_tables_structure_task,
-    sync_metastore_clean_events_tables_partitions_task,
+    sync_metastore_clean_subpartitioned_events_tables_structure_task,
+    sync_metastore_clean_subpartitioned_events_tables_partitions_task,
     propagate_clean_tables_metadata_task,
     terminate_cluster_task,
 )
