@@ -794,20 +794,20 @@ costs_targets_results_combined AS (
         ),
         ia_provisioned_costs AS (
             SELECT
-                TO_CHAR(NULLIF(DATE,'')::DATE,'yyyymmdd')::BIGINT AS sk_date,
-                NULLIF(cost_origin,'')::VARCHAR AS mkt_origin,
+                TO_CHAR(dt_created, 'yyyymmdd')::BIGINT AS sk_date,
+                mkt_origin,
                 NULL::TEXT AS mkt_channel,
                 NULL::TEXT AS mkt_medium,
                 NULL::TEXT AS mkt_source,
                 NULL::TEXT AS utm_campaign,
                 NULL::TEXT AS utm_content,
                 NULL::TEXT AS utm_term,
-                NULLIF(city_group,'')::VARCHAR AS city_group,
-                NULLIF(cost_type,'')::VARCHAR AS source,
+                city_group,
+                source,
                 NULL AS business_context,
-                NULLIF(cost,'')::float AS cost
+                cost
             FROM
-                datalake_raw.gsheets_provisioned_costs_import
+                datalake_gsheets_clean_prod.provisioned_costs_import
         ),
         ia_total_cost AS (
             SELECT  * FROM ia_fact_cost
