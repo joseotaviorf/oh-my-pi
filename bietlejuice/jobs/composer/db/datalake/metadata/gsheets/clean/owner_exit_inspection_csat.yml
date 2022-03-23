@@ -16,6 +16,9 @@ columns:
   general_satisfaction_evaluation:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_pp_saida.avaliacao_csat
+  general_satisfaction_house:
+    lineage:
+      - datalake_gsheets_raw.csat_vistoria_pp_saida.nota_pp_imovel
   ts_submitted:
     lineage:
       - datalake_gsheets_raw.csat_vistoria_pp_saida.submitted_at
