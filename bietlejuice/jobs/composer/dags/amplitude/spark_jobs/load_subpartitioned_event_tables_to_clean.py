@@ -23,9 +23,9 @@ from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
-logger = QuintoAndarLogger("load-events-tables-clean")
+logger = QuintoAndarLogger("load-subpartitioned-event-tables-to-clean")
 
-parser = ArgumentParser(description="load-events-tables-clean")
+parser = ArgumentParser(description="load-subpartitioned-event-tables-to-clean")
 parser.add_argument("execution_date")
 parser.add_argument("env")
 parser.add_argument("datalake_bucket")

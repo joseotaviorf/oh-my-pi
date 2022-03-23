@@ -18,7 +18,7 @@ from bietlejuice.jobs.composer.services.metastore_services import SparkMetastore
 
 DAYS_TO_CHECK_FOR_NEW_TABLES = 4
 
-JOB_NAME = "propagate_tables_metadata_clean_staging"
+JOB_NAME = "propagate_clean_tables_metadata"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
