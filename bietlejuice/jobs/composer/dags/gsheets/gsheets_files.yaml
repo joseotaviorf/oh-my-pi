@@ -20,6 +20,11 @@ associate_executive_bonus:
     sheet_name: associate_executive_bonus
     clean_table_name: associate_executive_bonus
 
+associate_executive_correction:
+    sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
+    sheet_name: associate_executive_correction
+    clean_table_name: associate_executive_correction
+
 affiliate_type_targets:
     sheet_id: 1dK5zcAgTcFg8KaNU3FEiZbHJOBw1DuTwdFhiqGZBETE
     sheet_name: affiliate_type_targets
@@ -554,6 +559,16 @@ mkt_cost_per_source:
     sheet_id: 1kHFTMdaRTYyLa6e6FY6G2i1UpCkivcpmxZvYqVrqe5o
     sheet_name: mkt_cost_per_source
     clean_table_name: mkt_cost_per_source
+
+negotiation_executive_bonus:
+    sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
+    sheet_name: negotiation_executive_bonus
+    clean_table_name: negotiation_executive_bonus
+
+negotiation_executive_correction:
+    sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
+    sheet_name: negotiation_executive_correction
+    clean_table_name: negotiation_executive_correction
 
 offboarding_customer_portfolio_contract:
     sheet_id: 1x2dgpr3eemxnYft80JKRr3K_zlvgjvc-BjpIKaT2fe8
