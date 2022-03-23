@@ -50,14 +50,13 @@ SELECT
   COUNT(1) AS daily_backlog,
   SUM(
     CASE 
-      WHEN (TO_UNIX_TIMESTAMP(DATE_TRUNC('day',eb.dt_interval)) + 86399 - TO_UNIX_TIMESTAMP(ts_started))/(86400) - COALESCE(do.days_off, 0) < 0 THEN 1
-      WHEN (TO_UNIX_TIMESTAMP(DATE_TRUNC('day',eb.dt_interval)) + 86399 - TO_UNIX_TIMESTAMP(ts_started))/(86400) - COALESCE(do.days_off, 0) <= sla_target THEN 1
+      WHEN DATEDIFF(DATE(eb.dt_interval), DATE(ts_started)) - COALESCE(do.days_off, 0) <= sla_target THEN 1
       ELSE 0 
     END
   ) AS backlog_in_time,
   SUM(
     CASE 
-      WHEN (TO_UNIX_TIMESTAMP(DATE_TRUNC('day',eb.dt_interval)) + 86399 - TO_UNIX_TIMESTAMP(ts_started))/(86400) - COALESCE(do.days_off, 0) > sla_target THEN 1
+      WHEN DATEDIFF(DATE(eb.dt_interval), DATE(ts_started)) - COALESCE(do.days_off, 0) > sla_target THEN 1
       ELSE 0
     END
   ) AS backlog_not_in_time,
