@@ -1,0 +1,13 @@
+---
+database_name: dw_datamarts_growth_cross
+table_name: efficiency_monitor_rental
+columns:
+  dt_month_start:
+    lineage:
+      - dw_public.dim_contract.dt_start
+      - dw_public.dim_contract.dt_entrance
+      - dw_datamarts_growth_cross.marketing_demand_supply_branding_costs.dt_cost
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
+      - dw_datamarts_growth_cross.marketing_demand_supply_branding_costs.city_group
