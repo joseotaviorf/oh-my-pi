@@ -467,6 +467,7 @@ bietlejuice.dw_agent:
   - bietlejuice.gsheets:load-clean-auxiliary-region
 
 bietlejuice.dw_agents_availability:
+  - bietlejuice.dw_agent:load-dw-public-dim-agent-region
   - bietlejuice.ebdb:create-clean-agent-data-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-booking-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake

@@ -5,6 +5,7 @@ dags_out_of_pattern:
     [
         "amplitude",
         "dw_affiliate_costs",
+        "dw_agent",
         "dw_agents_availability",
         "dw_booking",
         "dw_business_unit_region",
