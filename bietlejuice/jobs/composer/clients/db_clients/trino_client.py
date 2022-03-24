@@ -14,23 +14,26 @@ class TrinoClient(DBClient):
      and returning query results.
     """
 
-    def __init__(self, host, port, user, catalog="hive", **conn_params):
+    def __init__(
+        self,
+        host: str,
+        port: int,
+        user: str,
+        password: str,
+        catalog: str = "hive",
+        **conn_params: dict,
+    ):
         """
         :param host: the server host address
-        :type host: str
         :param port: server host port
-        :type port: int
-        :param user: the username
-        :type user: str
         :param catalog: metastore catalog to connect in. Hive is set as default
-        :type catalog: str
         :param conn_params: The parameters can be found in trino.dbapi.Connection
-        :type conn_params: dict
         """
         params = {
             "host": host,
             "port": port,
             "user": user,
+            "auth": trino.auth.BasicAuthentication(user, password),
             "catalog": catalog,
             "http_scheme": constants.HTTPS,
         }
@@ -46,12 +49,11 @@ class TrinoClient(DBClient):
         return self.connection
 
     @logger
-    def get_records(self, query, parameters=None):
+    def get_records(self, query: str, parameters=None):
         """
         Executes a query in Trino and returns the result.
 
         :param query: query to be run
-        :type query: str
         :param parameters: query parameter values
         :type parameters: list or tuple
         :return: query result set
@@ -68,15 +70,13 @@ class TrinoClient(DBClient):
             return result
 
     @logger
-    def run(self, command, parameters=None):
+    def run(self, command: str, parameters=None) -> None:
         """
         Executes a command in Trino without returning results.
 
         :param command: the command to be run
-        :type command: str
         :param parameters: query parameter values
         :type parameters: list or tuple
-        :return: None
         """
         with self.conn as conn:
             cur = conn.cursor()

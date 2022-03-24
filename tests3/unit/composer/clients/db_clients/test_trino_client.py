@@ -8,7 +8,9 @@ from bietlejuice.jobs.composer.clients.db_clients import TrinoClient
 class TestTrinoClient:
     def test_conn(self):
         # arrange
-        mocked_trino_client = TrinoClient(host="host", port=443, user="jose.silva")
+        mocked_trino_client = TrinoClient(
+            host="host", port=443, user="jose.silva", password="pwd"
+        )
 
         # act
         conn = mocked_trino_client.conn
