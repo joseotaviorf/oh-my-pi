@@ -1,0 +1,10 @@
+---
+database_name: dw_datamarts_growth
+table_name: users_online_metrics
+columns:
+  date_period:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+  user_id:
+    lineage:
+      - datalake_amplitude_clean.events.id_user
