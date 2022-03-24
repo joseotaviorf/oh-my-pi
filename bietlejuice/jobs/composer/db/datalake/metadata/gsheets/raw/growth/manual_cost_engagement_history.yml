@@ -1,0 +1,31 @@
+---
+database_name: datalake_gsheets_raw
+table_name: manual_cost_engagement_history
+columns:
+  city_group:
+    tags:
+      - Confidential
+  mkt_origin:
+    tags:
+      - Confidential
+  commission_listing:
+    tags:
+      - Confidential
+  commission_rent:
+    tags:
+      - Confidential
+  commission_mgm:
+    tags:
+      - Confidential
+  promotional_bonus:
+    tags:
+      - Confidential
+  notification:
+    tags:
+      - Confidential
+  other:
+    tags:
+      - Confidential
+  date:
+    tags:
+      - Confidential

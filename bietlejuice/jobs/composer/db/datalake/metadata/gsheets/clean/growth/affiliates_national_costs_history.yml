@@ -1,0 +1,19 @@
+---
+database_name: datalake_gsheets_clean
+table_name: affiliates_national_costs_history
+columns:
+  campaign:
+    lineage:
+      - datalake_gsheets_raw.historic_national_costs.campaign
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.historic_national_costs.city_group
+  mkt_source:
+    lineage:
+      - datalake_gsheets_raw.historic_national_costs.mkt_source
+  cost:
+    lineage:
+      - datalake_gsheets_raw.historic_national_costs.cost
+  dt_cost:
+    lineage:
+      - datalake_gsheets_raw.historic_national_costs.cost_date

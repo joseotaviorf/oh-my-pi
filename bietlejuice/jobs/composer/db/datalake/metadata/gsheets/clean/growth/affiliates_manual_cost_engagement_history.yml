@@ -1,0 +1,31 @@
+---
+database_name: datalake_gsheets_clean
+table_name: affiliates_manual_cost_engagement_history
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.manual_cost_engagement_history.city_group
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_raw.manual_cost_engagement_history.mkt_origin
+  commission_listing_cost:
+    lineage:
+      - datalake_gsheets_raw.manual_cost_engagement_history.commission_listing
+  commission_rent_cost:
+    lineage:
+      - datalake_gsheets_raw.manual_cost_engagement_history.commission_rent
+  commission_mgm_cost:
+    lineage:
+      - datalake_gsheets_raw.manual_cost_engagement_history.commission_mgm
+  promotional_bonus_cost:
+    lineage:
+      - datalake_gsheets_raw.manual_cost_engagement_history.promotional_bonus
+  notification_cost:
+    lineage:
+      - datalake_gsheets_raw.manual_cost_engagement_history.notification
+  other_cost:
+    lineage:
+      - datalake_gsheets_raw.manual_cost_engagement_history.other
+  dt_cost:
+    lineage:
+      - datalake_gsheets_raw.manual_cost_engagement_history.date

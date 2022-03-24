@@ -1,0 +1,13 @@
+---
+database_name: datalake_gsheets_clean
+table_name: affiliates_cost_tradecom_configuration
+columns:
+  commission_rate:
+    lineage:
+      - datalake_gsheets_raw.tradecom_configuration.rate
+  dt_from:
+    lineage:
+      - datalake_gsheets_raw.tradecom_configuration.date_from
+  dt_until:
+    lineage:
+      - datalake_gsheets_raw.tradecom_configuration.date_until

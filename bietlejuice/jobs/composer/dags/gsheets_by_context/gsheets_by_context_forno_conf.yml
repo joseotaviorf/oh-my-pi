@@ -8,3 +8,6 @@ dags:
   support_and_service:
     main_schedule_interval: 0 3 * * *
     dag_owner: Data S&S
+  growth:
+    main_schedule_interval: 0 3 * * *
+    dag_owner: Data Growth

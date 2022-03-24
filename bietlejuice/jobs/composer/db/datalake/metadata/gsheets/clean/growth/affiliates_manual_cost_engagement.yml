@@ -1,0 +1,22 @@
+---
+database_name: datalake_gsheets_clean
+table_name: affiliates_manual_cost_engagement
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.manual_cost_engagement.city_group
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_raw.manual_cost_engagement.mkt_origin
+  promotional_bonus_cost:
+    lineage:
+      - datalake_gsheets_raw.manual_cost_engagement.promotional_bonus
+  notification_cost:
+    lineage:
+      - datalake_gsheets_raw.manual_cost_engagement.notification
+  other_cost:
+    lineage:
+      - datalake_gsheets_raw.manual_cost_engagement.other
+  dt_cost:
+    lineage:
+      - datalake_gsheets_raw.manual_cost_engagement.date

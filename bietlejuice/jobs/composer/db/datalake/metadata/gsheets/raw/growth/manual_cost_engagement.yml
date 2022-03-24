@@ -1,0 +1,22 @@
+---
+database_name: datalake_gsheets_raw
+table_name: manual_cost_engagement
+columns:
+  city_group:
+    tags:
+      - Confidential
+  mkt_origin:
+    tags:
+      - Confidential
+  promotional_bonus:
+    tags:
+      - Confidential
+  notification:
+    tags:
+      - Confidential
+  other:
+    tags:
+      - Confidential
+  date:
+    tags:
+      - Confidential

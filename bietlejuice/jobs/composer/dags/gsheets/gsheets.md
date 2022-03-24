@@ -8,7 +8,7 @@ If you need information to understand how you can add your sheet, check our [Goo
 
 <details>
   <summary><strong> > DAG details (click to expand)</strong></summary>
-  
+
 ### Execution Interval
 
 This DAG is trigged daily.
@@ -85,11 +85,11 @@ This pipeline produces the following output tables:
     - `extra_invoice_created_expenses`
     - `forbrokers_3p_partner_conditions`
     - `from_to_cancellation`
-    - `google_searches_share_of_interest`    
+    - `google_searches_share_of_interest`
     - `hotjar_photos_repressed_demand`
     - `households_per_city_ibge`
-    - `hub_agents_hierarchy` 
-    - `hub_bonus` 
+    - `hub_agents_hierarchy`
+    - `hub_bonus`
     - `hub_sale_closing_process`
     - `inspection_analysis_forms`
     - `inspection_bugs`
@@ -112,7 +112,6 @@ This pipeline produces the following output tables:
     - `marketing_costs_google_ad_type_flags`
     - `marketing_costs_kenshoo_configuration`
     - `marketing_costs_manual_costs_google`
-    - `marketing_costs_national_affiliate_historical_costs`
     - `marketing_kenshoo_configuration`
     - `marketing_manual_campaign_cities`
     - `marketing_manual_costs_google`

@@ -1,8 +1,0 @@
-SELECT
-    campaign,
-    CAST(cost AS FLOAT) AS cost,
-    city_group,
-    mkt_source,
-    CAST(FROM_UNIXTIME(UNIX_TIMESTAMP(cost_date, 'MM/dd/yyyy'), 'yyyyMMdd') AS INTEGER) AS dt_cost
-FROM
-    datalake_gsheets_raw.marketing_costs_national_affiliate_historical_costs

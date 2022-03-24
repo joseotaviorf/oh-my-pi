@@ -13,7 +13,7 @@ agendamento_vistoria_saida:
     sheet_name: agendamento_saida
     clean_table_name: schedule_inspection_departure
     sheet_context: support_and_service
-    partitioned: True    
+    partitioned: True
 
 agendamento_vistoria_entrada:
     sheet_id: 1LHcKqdrbTWNvRBT7TGVEbKhIrtqaqSxVVaeKsIcJZus
@@ -27,3 +27,27 @@ support_agents_department:
     sheet_name: Agents Main Department
     clean_table_name: support_agents_department
     sheet_context: support_and_service
+
+historic_national_costs:
+    sheet_id: 1mcTp6mmjNBpsaEiwn1ZepnhkyGozDEC5HAmVWeeArGA
+    sheet_name: historic_national_costs
+    clean_table_name: affiliates_national_costs_history
+    sheet_context: growth
+
+manual_cost_engagement:
+    sheet_id: 1Op2q1c9biiiTGBYd1Mai967yPFkIrHYOKUWaXFOovY4
+    sheet_name: manual_cost_engagement
+    clean_table_name: affiliates_manual_cost_engagement
+    sheet_context: growth
+
+manual_cost_engagement_history:
+    sheet_id: 1Op2q1c9biiiTGBYd1Mai967yPFkIrHYOKUWaXFOovY4
+    sheet_name: manual_cost_engagement_history
+    clean_table_name: affiliates_manual_cost_engagement_history
+    sheet_context: growth
+
+tradecom_configuration:
+    sheet_id: 1Op2q1c9biiiTGBYd1Mai967yPFkIrHYOKUWaXFOovY4
+    sheet_name: tradecom_configuration
+    clean_table_name: affiliates_cost_tradecom_configuration
+    sheet_context: growth

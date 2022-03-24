@@ -88,7 +88,7 @@ aux_check_photo_sender:
 aux_regiao:
     sheet_id: 1gh8S0xVQ9HsTs6EkvE0BcXvh5_cfaG3aUpIgrluqqlM
     sheet_name: aux_regiao
-    clean_table_name: auxiliary_region # This name is different to the EC2 name
+    clean_table_name: auxiliary_region
 
 base_supply_souce_for_rent:
     sheet_id: 1Gxp4StsJFhnqI5ogSHzlTaSPiDJF6kmQMXPSjK3dBUM
@@ -260,7 +260,8 @@ csat_reparos_off_pp:
     sheet_name: respostas_csat
     clean_table_name: owner_offboarding_repair_csat
 
-csat_vistoria_entrada:  # to be excluded @Set,01
+# to be excluded @Set,01
+csat_vistoria_entrada:
     sheet_id: 1ZTI-1XhPJey4o0e0IVfOVEeTeoWr7Vd10u-1TEZfIcc
     sheet_name: entrada
     clean_table_name: entrance_inspection_csat
@@ -280,7 +281,8 @@ csat_vistoria_pp_saida:
     sheet_name: saida_pp
     clean_table_name: owner_exit_inspection_csat
 
-csat_vistoria_saida:  # to be excluded @Set,01
+# to be excluded @Set,01
+csat_vistoria_saida:
     sheet_id: 1ZTI-1XhPJey4o0e0IVfOVEeTeoWr7Vd10u-1TEZfIcc
     sheet_name: saida
     clean_table_name: exit_inspection_csat
@@ -371,9 +373,9 @@ forbrokers_3p_partner_conditions:
     clean_table_name: forbrokers_3p_partner_conditions
 
 forms_analise_vistoria:
-     sheet_id: 1htuLjT4tBXbVl3TLP375CWKZDV7jIDtFFjpZNl7xH6w
-     sheet_name: inspection_analysis_forms
-     clean_table_name: inspection_analysis_forms
+    sheet_id: 1htuLjT4tBXbVl3TLP375CWKZDV7jIDtFFjpZNl7xH6w
+    sheet_name: inspection_analysis_forms
+    clean_table_name: inspection_analysis_forms
 
 full_taxonomy_new_test:
     sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
@@ -418,7 +420,7 @@ hub_bonus:
 hub_sale_closing_process:
     sheet_id: 1yD11Nsj9Bcl1ugfK-R7e185Vr4wGqo8A3d7K95q6ieE
     sheet_name: clean
-    clean_table_name: hub_sale_closing_process    
+    clean_table_name: hub_sale_closing_process
 
 inspectors_control:
     sheet_id: 1cFwadBcEkIoC9zpGQNV7iA1Ii0fZmln5mRbB0LaW4zw
@@ -503,17 +505,12 @@ marketing_costs_full_taxonomy:
 marketing_costs_campaign_city:
     sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
     sheet_name: Campaign_City
-    clean_table_name: marketing_costs_campaign_city  # No Athena está no singular
+    clean_table_name: marketing_costs_campaign_city
 
 marketing_costs_kenshoo_configuration:
     sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
     sheet_name: Kenshoo_Configuration
     clean_table_name: marketing_costs_kenshoo_configuration
-
-marketing_costs_national_affiliate_historical_costs:
-    sheet_id: 1mcTp6mmjNBpsaEiwn1ZepnhkyGozDEC5HAmVWeeArGA
-    sheet_name: historic_national_costs
-    clean_table_name: marketing_costs_national_affiliate_historical_costs
 
 marketing_costs_google_ad_type_flags:
     sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
@@ -975,7 +972,8 @@ visits_fup_history:
     sheet_name: visits_fup_history
     clean_table_name: visits_fup_history
 
-vistoria_bugs:  # to be excluded @Set,01
+# to be excluded @Set,01
+vistoria_bugs:
     sheet_id: 1-cuOGaxOf4hfqs1rhz6XUGv4y8r-0HbJv6YHGMRMkyc
     sheet_name: vistoria_bugs
     clean_table_name: inspection_bugs
