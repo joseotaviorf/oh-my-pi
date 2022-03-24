@@ -811,7 +811,7 @@ supply_ciq_cost_comission AS (
         'Supply' AS planning_mkt_level1,
         'Affiliates' AS planning_mkt_level2,
         'CIQ' AS planning_mkt_level3,
-        SUM(co.comission_cs_ciq_full::FLOAT + co.comission_cs_ciq_manager::FLOAT + co.comission_listing::FLOAT + (CASE WHEN co.impostos = '#DIV/0!' THEN '0' ELSE co.impostos END) ::FLOAT) AS costs
+        SUM(REPLACE(co.comission_cs_ciq_full, ',', '')::FLOAT + REPLACE(co.comission_cs_ciq_manager, ',', '')::FLOAT + REPLACE(co.comission_listing, ',', '')::FLOAT + (CASE WHEN co.impostos = '#DIV/0!' THEN '0' ELSE REPLACE(co.impostos, ',', '') END) ::FLOAT) AS costs
     FROM
         datalake_gsheets_clean_prod.ciq_costs AS co
     GROUP BY 1,2,3,4,5,6
@@ -824,7 +824,7 @@ supply_ciq_cost_comission_sale AS (
         'Supply' AS planning_mkt_level1,
         'Affiliates' AS planning_mkt_level2,
         'CIQ' AS planning_mkt_level3,
-        SUM(co.comission_listing_fs::FLOAT) AS costs
+        SUM(REPLACE(co.comission_listing_fs, ',', '')::FLOAT) AS costs
     FROM
         datalake_gsheets_clean_prod.ciq_costs AS co
     WHERE
