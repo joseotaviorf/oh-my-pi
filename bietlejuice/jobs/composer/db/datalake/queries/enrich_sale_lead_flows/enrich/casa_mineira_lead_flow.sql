@@ -73,14 +73,12 @@ secretariat_contact AS (
         cth.city_name AS city_secretariat_contact,
         CASE
             WHEN oc.origin_contact_name IN ('Combo de Eventos Hub', 'Quinto Andar Lite - Combo de eventos') THEN 'Combo de Eventos'
-            WHEN oc.origin_contact_name IN ('Quinto Andar - Placas') THEN 'Placas'
-            WHEN oc.origin_contact_name IN ('Quinto Andar - Traz quem compra') THEN 'TQC'
             WHEN oc.origin_contact_name IN ('Quinto Andar Classificados Hub','Quinto Andar Classificados Lite') THEN 'Classificados'
-            WHEN oc.origin_contact_name IN ('Quinto Andar Lite', 'QuintoAndar') THEN 'QuintoAndar'
-            ELSE 'Other'
+            WHEN oc.origin_contact_name IN ('Quinto Andar Lite', 'QuintoAndar') THEN 'Visit Intent Clicked'
+            ELSE oc.origin_contact_name
         END AS secretariat_contact_origin,
         mc.media_contact_name AS secretariat_contact_media,
-        'BH' AS business_unit,
+        COALESCE(bur.business_unit, 'BH') AS business_unit,
         ROW_NUMBER() OVER (
             PARTITION BY 
                 uu.id_secretariat_client
@@ -118,6 +116,10 @@ secretariat_contact AS (
     LEFT JOIN
         datalake_ebdb_clean.house AS qah
             ON qah.id = h.id_house_quintoandar
+    LEFT JOIN
+        datalake_gsheets_clean.business_unit_region AS bur
+            ON qah.id_region = bur.id_region
+            AND (DATE(c.ts_created) BETWEEN bur.dt_start AND COALESCE(bur.dt_end, DATE_SUB(CURRENT_DATE(), 1)))
 ),
 first_secretariat_contact AS (
     SELECT *
@@ -157,12 +159,13 @@ last_combo_contact AS (
 ),
 booking AS (
     SELECT
+        v.id AS id_visit,
         uu.id_secretariat_client,
         v.id_house AS id_house_cm,
         CAST(h.id_house_quintoandar AS BIGINT) AS id_house_5a,
         qah.id_region AS id_region_booking,
         cth.city_name AS city_booking,
-        'BH' AS business_unit,
+        COALESCE(bur.business_unit, 'BH') AS business_unit,
         validation_type,
         ROW_NUMBER() OVER (
             PARTITION BY
@@ -195,6 +198,10 @@ booking AS (
     LEFT JOIN
         datalake_ebdb_clean.house AS qah
             ON qah.id = h.id_house_quintoandar
+    LEFT JOIN
+        datalake_gsheets_clean.business_unit_region AS bur
+            ON qah.id_region = bur.id_region
+            AND (DATE(v.ts_created) BETWEEN bur.dt_start AND COALESCE(bur.dt_end, DATE_SUB(CURRENT_DATE(), 1)))
 ),
 first_booking AS (
     SELECT *
@@ -213,10 +220,10 @@ last_booking AS (
 booking_statistics AS (
     SELECT
         id_secretariat_client,
-        COUNT(*) AS total_bookings_created,
-        COUNT(
+        COUNT(DISTINCT id_visit) AS total_bookings_created,
+        COUNT(DISTINCT
             CASE
-                WHEN validation_type='cancelado' THEN 1
+                WHEN validation_type='cancelado' THEN id_visit
             END
         ) AS total_bookings_canceled
     FROM
@@ -423,6 +430,8 @@ SELECT
                       fv.ts_visit_completed, 
                       fb.ts_booking_created) = fb.ts_booking_created
             THEN 'booking_created'
+        ELSE
+            'not_mapped'
     END AS further_funnel_step,
     fsc.city_secretariat_contact AS first_city_contact_prospect,
     lsc.city_secretariat_contact AS last_city_contact_prospect,

@@ -134,6 +134,9 @@ columns:
   days_first_visit_intent_to_first_contact_prospect:
     lineage:
       - datalake_sale_lead_flows.lead_flow.days_first_visit_intent_to_first_contact_prospect
+  days_first_visit_intent_to_new_buyer_prospect:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.days_first_visit_intent_to_new_buyer_prospect
   days_first_visit_intent_to_first_booking_created:
     lineage:
       - datalake_sale_lead_flows.lead_flow.days_first_visit_intent_to_first_booking_created
@@ -200,6 +203,12 @@ columns:
   ts_last_visit_scheduling_event:
     lineage:
       - datalake_sale_lead_flows.lead_flow.ts_last_visit_scheduling_event
+  ts_first_tta_message_sent:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_first_tta_message_sent
+  ts_last_tta_message_sent:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_last_tta_message_sent
   ts_first_booking_created_5a:
     lineage:
       - datalake_sale_lead_flows.lead_flow.ts_first_booking_created_5a
@@ -224,6 +233,9 @@ columns:
   ts_last_visit_completed_cm:
     lineage:
       - datalake_sale_lead_flows.lead_flow.ts_last_visit_completed_cm
+  ts_new_buyer_prospect:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_new_buyer_prospect
   ts_first_booking_created:
     lineage:
       - datalake_sale_lead_flows.lead_flow.ts_first_booking_created

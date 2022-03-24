@@ -111,7 +111,7 @@ leads AS (
     l.id_business_unit,
     v.email,
     v.phone_number,
-    bu.hub_name AS business_unit_hub_name, 
+    COALESCE(bur.business_unit, 'not_mapped') AS business_unit_hub_name, 
     l.lead_type,
     l.lead_status,
     l.ts_created,
@@ -127,8 +127,9 @@ leads AS (
     house AS h
       ON l.id_house = h.id
   LEFT JOIN
-    datalake_hub_services_clean.business_unit AS bu
-      ON l.id_business_unit = bu.id
+    datalake_gsheets_clean.business_unit_region AS bur
+      ON h.id_region = bur.id_region
+      AND (DATE(l.ts_created) BETWEEN bur.dt_start AND COALESCE(bur.dt_end, DATE_SUB(CURRENT_DATE, 1)))
   WHERE 
     l.business_context = 'SALE'
     AND v.rw_asc = 1

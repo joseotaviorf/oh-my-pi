@@ -341,14 +341,14 @@ final_base AS (
             WHEN hb.ts_first_contact_prospect THEN hb.first_contact_prospect_city_name
             ELSE fcm_cp.first_city_contact_prospect
         END AS first_city_contact_prospect,
-        CASE LEAST(hb.ts_first_contact_prospect, fcm_cp.ts_first_contact_prospect)
+        COALESCE(CASE LEAST(hb.ts_first_contact_prospect, fcm_cp.ts_first_contact_prospect)
             WHEN hb.ts_first_contact_prospect THEN hb.first_contact_prospect_origin
             ELSE fcm_cp.first_secretariat_contact_origin
-        END AS first_contact_prospect_origin,
-        CASE GREATEST(hb.ts_last_contact_prospect, lcm_cp.ts_last_contact_prospect)
+        END, 'NOT_SENT_SV') AS first_contact_prospect_origin,
+        COALESCE(CASE GREATEST(hb.ts_last_contact_prospect, lcm_cp.ts_last_contact_prospect)
             WHEN hb.ts_last_contact_prospect THEN hb.last_contact_prospect_origin
             ELSE lcm_cp.last_secretariat_contact_origin
-        END AS last_contact_prospect_origin,
+        END, 'NOT_SENT_SV') AS last_contact_prospect_origin,
         CASE LEAST(hb.ts_first_contact_prospect, fcm_cp.ts_first_contact_prospect)
             WHEN hb.ts_first_contact_prospect THEN hb.first_contact_prospect_midia
             ELSE fcm_cp.first_secretariat_contact_media
@@ -399,6 +399,8 @@ final_base AS (
                 THEN 'lead_submission'
             WHEN qa.further_funnel_step = 'talk_to_agent'
                 THEN 'talk_to_agent' 
+            ELSE
+                'not_mapped'
         END AS further_funnel_step,          
         GREATEST(uu.casa_mineira_has_secretariat_contact_created, hb.has_secretariat_contact_created) AS has_secretariat_contact_created,
         CASE
@@ -429,7 +431,8 @@ final_base AS (
             qa.ts_first_booking_created,
             qa.ts_first_offer_submitted,
             fcm_o.ts_first_offer_submitted,
-            hb.ts_first_visit_lead_intent
+            hb.ts_first_visit_lead_intent,
+            qa.ts_first_tta_message_sent
         ) AS ts_first_visit_lead_intent,
         GREATEST(
             lcl.ts_intent,
@@ -438,7 +441,8 @@ final_base AS (
             qa.ts_last_booking_created,
             qa.ts_last_offer_submitted,
             lcm_o.ts_last_offer_submitted,
-            hb.ts_last_visit_lead_intent
+            hb.ts_last_visit_lead_intent,
+            qa.ts_last_tta_message_sent
         ) AS ts_last_visit_lead_intent,
         LEAST(fcm_cp.ts_first_contact_prospect, hb.ts_first_contact_prospect) AS ts_first_contact_prospect,
         GREATEST(lcm_cp.ts_last_contact_prospect, hb.ts_last_contact_prospect) AS ts_last_contact_prospect,
@@ -446,6 +450,8 @@ final_base AS (
         lcl.ts_intent AS ts_last_classified_intent,
         qa.ts_first_visit_scheduling_event,
         qa.ts_last_visit_scheduling_event,
+        qa.ts_first_tta_message_sent,
+        qa.ts_last_tta_message_sent,
         qa.ts_first_booking_created AS ts_first_booking_created_5a,
         qa.ts_last_booking_created AS ts_last_booking_created_5a,
         qa.ts_first_visit_completed AS ts_first_visit_completed_5a,
@@ -454,6 +460,7 @@ final_base AS (
         lcm_bk.ts_last_booking_created AS ts_last_booking_created_cm,
         fcm_v.ts_first_visit_completed AS ts_first_visit_completed_cm,
         lcm_v.ts_last_visit_completed AS ts_last_visit_completed_cm,
+        LEAST(qa.ts_first_event, fcm_bk.ts_first_booking_created) AS ts_new_buyer_prospect,
         LEAST(qa.ts_first_booking_created, fcm_bk.ts_first_booking_created) AS ts_first_booking_created,
         GREATEST(qa.ts_last_booking_created, lcm_bk.ts_last_booking_created) AS ts_last_booking_created,
         LEAST(qa.ts_first_visit_completed, fcm_v.ts_first_visit_completed) AS ts_first_visit_completed,
@@ -576,6 +583,7 @@ SELECT
     total_offer_submitted,
     total_sale_agreement_signed,
     DATEDIFF(DATE(ts_first_contact_prospect), DATE(ts_first_visit_lead_intent)) AS days_first_visit_intent_to_first_contact_prospect,
+    DATEDIFF(DATE(ts_new_buyer_prospect), DATE(ts_first_visit_lead_intent)) AS days_first_visit_intent_to_new_buyer_prospect,
     DATEDIFF(DATE(ts_first_booking_created), DATE(ts_first_visit_lead_intent)) AS days_first_visit_intent_to_first_booking_created,
     DATEDIFF(DATE(ts_first_visit_completed), DATE(ts_first_visit_lead_intent)) AS days_first_visit_intent_to_first_visit_completed,
     DATEDIFF(DATE(ts_first_visit_completed), DATE(ts_first_booking_created)) AS days_first_booking_created_to_first_visit_completed,
@@ -598,6 +606,8 @@ SELECT
     ts_last_classified_intent,
     ts_first_visit_scheduling_event,
     ts_last_visit_scheduling_event,
+    ts_first_tta_message_sent,
+    ts_last_tta_message_sent,
     ts_first_booking_created_5a,
     ts_last_booking_created_5a,
     ts_first_visit_completed_5a,
@@ -606,6 +616,7 @@ SELECT
     ts_last_booking_created_cm,
     ts_first_visit_completed_cm,
     ts_last_visit_completed_cm,
+    ts_new_buyer_prospect,
     ts_first_booking_created,
     ts_last_booking_created,
     ts_first_visit_completed,
