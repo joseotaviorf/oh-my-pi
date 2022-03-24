@@ -17,9 +17,12 @@ Produces the following output table on Enrich layer (via full load):
 
 - `budgeting_window`
 - `contract_termination`
+- `customer_support`
 - `inspection_analysis`
 - `nps`
 - `nps_agg`
+- `ongoing`
+- `tickets`
   
 ### Responsible Data Engineering Team
 

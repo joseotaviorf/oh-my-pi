@@ -37,9 +37,7 @@ DATABRICKS_BIETLEJUICE_REPO_PATH = config_service.get_config(
 BASE_SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
 DOC_MD_CHART_URL = config_service.get_config("doc_md_chart_url")
 
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_med_memory_cluster", deserialize_json=True
-)
+CLUSTER_DESCRIPTION = Variable.get("databricks_9_1_offboarding", deserialize_json=True)
 CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
 
 inner_dependencies = config_service.get_config("inner_dependencies")
