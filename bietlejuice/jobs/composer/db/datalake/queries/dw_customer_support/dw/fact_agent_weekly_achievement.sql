@@ -1,30 +1,15 @@
 WITH weekly_results AS (
-    WITH total_departments AS (
-        SELECT
-            sk_agent,
-            DATE_TRUNC('week', dt) AS week_start,
-            COUNT(DISTINCT sk_department) AS total_departments
-        FROM 
-            dw_customer_support.fact_agent_daily_productivity ap
-        GROUP BY 1,2
-    )
     SELECT
-        MD5(CONCAT(ap.sk_agent, ap.sk_agent_manager, ap.sk_department, td.week_start)) AS sk_achievement,
+        MD5(CONCAT(ap.sk_agent, ap.sk_department, DATE_TRUNC('week', dt_metric_reference))) AS sk_achievement,
         ap.sk_agent,
-        sk_agent_manager,
-        DATE_TRUNC('week', dt) AS week_start,
-        MAX(sk_department) AS sk_department,
-        MAX(total_departments) AS total_departments,
+        DATE_TRUNC('week', dt_metric_reference) AS week_start,
+        sk_department AS sk_department,
         SUM(COALESCE(ap.total_tickets,0))+SUM(COALESCE(ap.total_crm_tasks_solved,0)) AS total_productivity_result,
         SUM(COALESCE(ap.total_csat_satisfied_score,0))/SUM(COALESCE(ap.total_tickets_with_csat_score,0)) AS avg_csat_satisfied_result,
         SUM(COALESCE(ap.total_tickets_resolution,0))/SUM(COALESCE(ap.total_tickets_answered_resolution,0)) AS avg_resolution_rate_result,
         (SUM(ap.total_minutes_resolution_time)/1440.0)/SUM(ap.total_tickets) AS avg_days_resolution_result
     FROM
         dw_customer_support.fact_agent_daily_productivity ap
-    LEFT JOIN
-        total_departments td
-            ON td.sk_agent = ap.sk_agent
-            AND DATE_TRUNC('week', ap.dt) = td.week_start
     GROUP BY 1,2,3,4
 ),
 achievement AS (
@@ -48,16 +33,13 @@ achievement AS (
         dw_customer_support.dim_ranking_targets tg
     LEFT JOIN
         weekly_results rt
-            ON rt.sk_agent_manager = tg.sk_team_leader
-            AND rt.sk_department = tg.sk_department
+            ON rt.sk_department = tg.sk_department
             AND rt.week_start BETWEEN tg.dt_start AND tg.dt_end
 )
 SELECT
     ac.sk_achievement,
     wr.sk_agent,
-    wr.sk_agent_manager,
     wr.sk_department,
-    wr.total_departments,
     ac.achievement_weighted_score,
     CASE 
         WHEN PERCENT_RANK() OVER (PARTITION BY wr.week_start ORDER BY ac.achievement_weighted_score) < 0.25 THEN 'Q4'

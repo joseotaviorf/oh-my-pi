@@ -7,9 +7,6 @@ columns:
   team:
     lineage:
       - datalake_gsheets_raw.agents_ranking_targets.team
-  team_leader:
-    lineage:
-      - datalake_gsheets_raw.agents_ranking_targets.team_leader
   company:
     lineage:
       - datalake_gsheets_raw.agents_ranking_targets.company

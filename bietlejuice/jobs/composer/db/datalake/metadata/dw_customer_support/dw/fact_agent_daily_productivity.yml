@@ -4,12 +4,9 @@ columns:
   sk_agent:
     lineage:
       - datalake_analyst_ranking.ranking.id_agent
-  sk_agent_manager:
-    lineage:
-      - datalake_analyst_ranking.ranking.agent_manager
   sk_department:
     lineage:
-      - datalake_analyst_ranking.ranking.department
+      - datalake_gsheets_clean.support_agents_department.department
   sk_date:
     lineage:
       - datalake_analyst_ranking.ranking.dt
@@ -47,6 +44,6 @@ columns:
   agent_age_in_months:
     lineage:
       - datalake_analyst_ranking.ranking.agent_age_in_months
-  dt:
+  dt_metric_reference:
     lineage:
       - datalake_analyst_ranking.ranking.dt

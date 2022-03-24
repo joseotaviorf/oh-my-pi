@@ -14,7 +14,7 @@ columns:
   department:
     lineage:
       - datalake_customer_support.email.department
-      - datalake_gsheets_clean.agents_ranking_offboarding.ranking
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.type
   sum_csat_satisfied_score:
     lineage:
       - datalake_customer_support.csat.csat_score

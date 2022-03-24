@@ -551,9 +551,9 @@ bietlejuice.dw_customer_support:
   - bietlejuice.enrich_customer_support:load-enrich-csat
   - bietlejuice.enrich_customer_support:load-enrich-chat
   - bietlejuice.enrich_customer_support:load-enrich-email
-  - bietlejuice.gsheets:load-clean-department-control
-  - bietlejuice.gsheets:load-clean-agents-ranking-offboarding
   - bietlejuice.gsheets:load-clean-agents-ranking-targets
+  - bietlejuice.gsheets:load-clean-department-control
+  - bietlejuice.gsheets.support_and_service:load-clean-support-agents-department
   - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
 
 bietlejuice.dw_house:
@@ -898,7 +898,6 @@ bietlejuice.enrich_analyst_ranking:
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-actions-resolutions-flow
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-users-resolutions-flow
   - bietlejuice.gsheets:load-clean-agents-control
-  - bietlejuice.gsheets:load-clean-agents-ranking-offboarding
   - bietlejuice.terminator:load-clean-termination
   - bietlejuice.terminator:load-clean-termination-workflow
 

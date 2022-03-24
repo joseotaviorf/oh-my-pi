@@ -7,15 +7,9 @@ columns:
   sk_department:
     lineage:
       - datalake_gsheets_clean.agents_ranking_targets.team
-  sk_team_leader:
-    lineage:
-      - datalake_gsheets_clean.agents_ranking_targets.team_leader
   department:
     lineage:
       - datalake_gsheets_clean.agents_ranking_targets.team
-  team_leader:
-    lineage:
-      - datalake_gsheets_clean.agents_ranking_targets.team_leader
   company:
     lineage:
       - datalake_gsheets_clean.agents_ranking_targets.company

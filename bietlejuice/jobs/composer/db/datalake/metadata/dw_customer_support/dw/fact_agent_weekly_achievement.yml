@@ -4,18 +4,12 @@ columns:
   sk_achievement:
     lineage:
       - dw_customer_support.fact_agent_daily_productivity.sk_agent
-      - dw_customer_support.fact_agent_daily_productivity.sk_date
-      - dw_customer_support.fact_agent_daily_productivity.sk_agent_manager
+      - dw_customer_support.fact_agent_daily_productivity.sk_department
+      - dw_customer_support.fact_agent_daily_productivity.dt_metric_reference
   sk_agent:
     lineage:
       - dw_customer_support.fact_agent_daily_productivity.sk_agent
-  sk_agent_manager:
-    lineage:
-      - dw_customer_support.fact_agent_daily_productivity.sk_agent_manager
   sk_department:
-    lineage:
-      - dw_customer_support.fact_agent_daily_productivity.sk_department
-  total_departments:
     lineage:
       - dw_customer_support.fact_agent_daily_productivity.sk_department
   achievement_weighted_score:
@@ -84,13 +78,13 @@ columns:
       - dw_customer_support.dim_ranking_targets.target_frt
   dt_week_started:
     lineage:
-      - dw_customer_support.fact_agent_daily_productivity.dt
+      - dw_customer_support.fact_agent_daily_productivity.dt_metric_reference
   year:
     lineage:
-      - dw_customer_support.fact_agent_daily_productivity.dt
+      - dw_customer_support.fact_agent_daily_productivity.dt_metric_reference
   month:
     lineage:
-      - dw_customer_support.fact_agent_daily_productivity.dt
+      - dw_customer_support.fact_agent_daily_productivity.dt_metric_reference
   day:
     lineage:
-      - dw_customer_support.fact_agent_daily_productivity.dt
+      - dw_customer_support.fact_agent_daily_productivity.dt_metric_reference

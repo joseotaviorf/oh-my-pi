@@ -1,7 +1,6 @@
 SELECT
     CAST(group AS INT) AS id_group,
     team,
-    team_leader,
     company,
     CAST(target_resolution AS FLOAT) AS target_resolution,
     CAST(target_csat AS FLOAT) AS target_csat,

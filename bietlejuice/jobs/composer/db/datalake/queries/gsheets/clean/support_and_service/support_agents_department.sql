@@ -1,6 +1,6 @@
 SELECT
     agent_id AS id_agent,
-    departament,
+    department,
     email,
     valid_department,
     TO_DATE(start_date, 'MM/dd/yyyy') AS dt_start,

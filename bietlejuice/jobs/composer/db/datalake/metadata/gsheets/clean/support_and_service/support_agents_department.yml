@@ -5,9 +5,9 @@ columns:
   id_agent:
     lineage:
       - datalake_gsheets_raw.support_agents_department.agent_id
-  departament:
+  department:
     lineage:
-      - datalake_gsheets_raw.support_agents_department.departament
+      - datalake_gsheets_raw.support_agents_department.department
   email:
     lineage:
       - datalake_gsheets_raw.support_agents_department.email
