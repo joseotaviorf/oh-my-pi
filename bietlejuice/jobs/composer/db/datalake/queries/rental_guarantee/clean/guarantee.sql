@@ -14,6 +14,7 @@ SELECT
     type AS guarantee_type,
     created_at AS ts_created,
     updated_at AS ts_updated,
+    billed_at AS ts_billed,
     cancellation_requested_at AS ts_cancellation_requested,
     expires_at AS ts_expired,
     paid_at AS ts_paid,
