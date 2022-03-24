@@ -59,9 +59,10 @@ if __name__ == "__main__":
         env, dw_schema, dw_bucket, "schema"
     )
 
-    database_name_staging, database_location_staging = DWMetastoreService.get_layer_info(
-        env, dw_schema, dw_bucket, "staging"
-    )
+    (
+        database_name_staging,
+        database_location_staging,
+    ) = DWMetastoreService.get_layer_info(env, dw_schema, dw_bucket, "staging")
 
     dt_datetime = datetime.strptime(execution_date, "%Y-%m-%d")
     query_template_params = {

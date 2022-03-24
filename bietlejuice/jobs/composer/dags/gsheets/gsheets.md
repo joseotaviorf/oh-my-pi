@@ -25,6 +25,7 @@ This pipeline produces the following output tables:
 2. Data lake clean:
     - `acquisition_target_per_source`
     - `actionline_negotiations`
+    - `advance_base`
     - `affiliate_type_targets`
     - `affiliates_acquisition_targets`
     - `affiliates_extra_user_bonus`
@@ -36,11 +37,13 @@ This pipeline produces the following output tables:
     - `agr_account`
     - `agreements_discounts_answer_forms`
     - `agreements_discounts_expenses_created`
+    - `associate_executive_bonus`
+    - `associate_executive_correction`
     - `aux_agents_sale_hub`
     - `aux_check_photo_sender`
     - `auxiliary_region`
-    - `associate_executive_bonus`
     - `bandaid_off`
+    - `bbb22_promocode_sale_users`
     - `branding_where_is_plaquinha`
     - `braze_campaign_creative`
     - `braze_canvas_creative`
@@ -120,6 +123,8 @@ This pipeline produces the following output tables:
     - `mkt_cost_per_source`
     - `monday_users`
     - `mta_budget_october_2020`
+    - `negotiation_executive_bonus`
+    - `negotiation_executive_correction`
     - `offer_fup_history`
     - `offers_hub_central`
     - `offline_and_branding_marketing_costs`
@@ -146,6 +151,7 @@ This pipeline produces the following output tables:
     - `promotional_bonus_segmentation_targets`
     - `promotional_bonus_user_cluster_targets`
     - `promotional_bonus_user_targets`
+    - `provisioned_costs_import`
     - `refund_after_termination_csat`
     - `rent_criteo_eng_ab_test`
     - `rental_cohort_demand`

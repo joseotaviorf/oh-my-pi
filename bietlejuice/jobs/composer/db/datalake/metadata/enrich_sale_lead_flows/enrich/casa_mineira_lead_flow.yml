@@ -92,6 +92,15 @@ columns:
   last_city_booking:
     lineage:
       - datalake_casa_mineira_crm_clean.city.city_name
+  first_business_unit_region_intent_lead:
+    lineage:
+      - datalake_gsheets_clean.business_unit_region.business_unit
+  last_business_unit_region_intent_lead:
+    lineage:
+      - datalake_gsheets_clean.business_unit_region.business_unit
+  first_business_unit_region_new_buyer_prospect:
+    lineage:
+      - datalake_gsheets_clean.business_unit_region.business_unit
   ts_first_contact_prospect:
     lineage:
       - datalake_casa_mineira_crm_clean.contact.ts_created

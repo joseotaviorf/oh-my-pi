@@ -97,3 +97,8 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/for_sale/temp_sale_offers.sql
       table: temp_sale_offers
+  sale_lead_flow:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_sale/sale_lead_flow.sql
+      table: sale_lead_flow

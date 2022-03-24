@@ -1,7 +1,6 @@
 DROP TABLE IF EXISTS customer_support.fact_agent_daily_productivity;
 CREATE TABLE IF NOT EXISTS customer_support.fact_agent_daily_productivity (
     sk_agent VARCHAR,
-    sk_agent_manager VARCHAR,
     sk_department VARCHAR,
     sk_date BIGINT,
     total_csat_satisfied_score BIGINT,
@@ -14,7 +13,7 @@ CREATE TABLE IF NOT EXISTS customer_support.fact_agent_daily_productivity (
     total_minutes_resolution_time BIGINT,
     total_crm_tasks_solved BIGINT,
     agent_age_in_months INTEGER,
-    dt DATE,
+    dt_metric_reference DATE,
     ts_load TIMESTAMP
 );
 ALTER TABLE customer_support.fact_agent_daily_productivity OWNER TO airflow;

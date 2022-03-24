@@ -1,0 +1,25 @@
+---
+database_name: datalake_offboarding
+table_name: customer_support
+columns:
+  id_contract:
+    lineage:
+      - datalake_offboarding.ongoing.id_contract
+  department:
+    lineage:
+      - datalake_customer_support.email.department
+  front_or_back:
+    lineage:
+      - datalake_customer_support.email.front_or_back
+  num_ticket_satisfied:
+    lineage:
+      - datalake_customer_support.email.id_ticket
+      - datalake_customer_support.email.csat_score
+  num_ticket_neutral:
+    lineage:
+      - datalake_customer_support.email.id_ticket
+      - datalake_customer_support.email.csat_score
+  num_ticket_dissatisfied:
+    lineage:
+      - datalake_customer_support.email.id_ticket
+      - datalake_customer_support.email.csat_score

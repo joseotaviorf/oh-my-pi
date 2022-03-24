@@ -1,0 +1,274 @@
+---
+database_name: dw_datamarts_for_sale
+table_name: sale_lead_flow
+columns:
+  sk_lead:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.id_lead
+  sk_user:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.id_user
+  sk_visitor_hub_service:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.id_visitor_hub_service
+  sk_secretariat_client:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.id_secretariat_client
+  sk_classified_lead:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.id_classified_lead
+  sk_region_classified:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.id_region_classified
+  sk_region_contact_prospect:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.id_region_contact_prospect
+  sk_region_booking_cm:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.id_region_booking_cm
+  sk_region_booking_5a:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.id_region_booking_5a
+  sk_region_visit_intent:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.id_region_visit_intent
+  sk_first_region:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.id_first_region
+  sk_first_house:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.id_first_house
+  sk_first_house_sale_agreement:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.id_first_house_sale_agreement
+  first_touch:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.first_touch
+  first_classified_partner:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.first_classified_partner
+  first_business_unit_region_intent_lead:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.first_business_unit_region_intent_lead
+  last_business_unit_region_intent_lead:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.last_business_unit_region_intent_lead
+  first_business_unit_region_new_buyer_prospect:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.first_business_unit_region_new_buyer_prospect
+  first_city_booking_cm:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.first_city_booking_cm
+  first_city_contact_prospect:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.first_city_contact_prospect
+  first_contact_prospect_origin:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.first_contact_prospect_origin
+  last_contact_prospect_origin:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.last_contact_prospect_origin
+  first_contact_prospect_media:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.first_contact_prospect_media
+  last_contact_prospect_media:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.last_contact_prospect_media
+  first_offer_flow:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.first_offer_flow
+  first_ccv_flow:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.first_ccv_flow
+  first_offer_business_unit:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.first_offer_business_unit
+  first_ccv_business_unit:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.first_ccv_business_unit
+  first_booking_creator_5a:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.first_booking_creator_5a
+  further_funnel_step:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.further_funnel_step
+  has_first_booking:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.has_first_booking
+  has_secretariat_contact_created:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.has_secretariat_contact_created
+  has_booking_before_secretariat_contact:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.has_booking_before_secretariat_contact
+  has_tenant_rental_contract:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.has_tenant_rental_contract
+  is_ongoing_tenant_rental_contract:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.is_ongoing_tenant_rental_contract
+  has_owner_rental_contract:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.has_owner_rental_contract
+  has_rental_visit_intent:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.has_rental_visit_intent
+  total_bookings_created_by_secretariat:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.total_bookings_created_by_secretariat
+  total_bookings_created:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.total_bookings_created
+  total_bookings_canceled:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.total_bookings_canceled
+  total_visits_completed:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.total_visits_completed
+  total_offer_submitted:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.total_offer_submitted
+  total_sale_agreement_signed:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.total_sale_agreement_signed
+  days_first_visit_intent_to_first_contact_prospect:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.days_first_visit_intent_to_first_contact_prospect
+  days_first_visit_intent_to_new_buyer_prospect:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.days_first_visit_intent_to_new_buyer_prospect
+  days_first_visit_intent_to_first_booking_created:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.days_first_visit_intent_to_first_booking_created
+  days_first_visit_intent_to_first_visit_completed:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.days_first_visit_intent_to_first_visit_completed
+  days_first_booking_created_to_first_visit_completed:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.days_first_booking_created_to_first_visit_completed
+  days_first_booking_created_to_first_offer_submitted:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.days_first_booking_created_to_first_offer_submitted
+  days_first_booking_created_to_first_offer_accepted:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.days_first_booking_created_to_first_offer_accepted
+  days_first_booking_created_to_first_sale_agreement_signed:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.days_first_booking_created_to_first_sale_agreement_signed
+  days_first_visit_completed_to_first_offer_submitted:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.days_first_visit_completed_to_first_offer_submitted
+  days_first_visit_completed_to_first_offer_accepted:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.days_first_visit_completed_to_first_offer_accepted
+  days_first_visit_completed_to_first_sale_agreement_signed:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.days_first_visit_completed_to_first_sale_agreement_signed
+  days_first_offer_submitted_to_first_offer_accepted:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.days_first_offer_submitted_to_first_offer_accepted
+  days_first_offer_submitted_to_first_sale_agreement_signed:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.days_first_offer_submitted_to_first_sale_agreement_signed
+  days_first_offer_accepted_to_first_sale_agreement_signed:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.days_first_offer_accepted_to_first_sale_agreement_signed
+  ts_first_talk_to_secretariat:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_first_talk_to_secretariat
+  ts_last_talk_to_secretariat:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_last_talk_to_secretariat
+  ts_first_visit_lead_intent:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_first_visit_lead_intent
+  ts_last_visit_lead_intent:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_last_visit_lead_intent
+  ts_first_contact_prospect:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_first_contact_prospect
+  ts_last_contact_prospect:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_last_contact_prospect
+  ts_first_classified_intent:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_first_classified_intent
+  ts_last_classified_intent:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_last_classified_intent
+  ts_first_visit_scheduling_event:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_first_visit_scheduling_event
+  ts_last_visit_scheduling_event:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_last_visit_scheduling_event
+  ts_first_tta_message_sent:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_first_tta_message_sent
+  ts_last_tta_message_sent:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_last_tta_message_sent
+  ts_first_booking_created_5a:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_first_booking_created_5a
+  ts_last_booking_created_5a:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_last_booking_created_5a
+  ts_first_visit_completed_5a:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_first_visit_completed_5a
+  ts_last_visit_completed_5a:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_last_visit_completed_5a
+  ts_first_booking_created_cm:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_first_booking_created_cm
+  ts_last_booking_created_cm:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_last_booking_created_cm
+  ts_first_visit_completed_cm:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_first_visit_completed_cm
+  ts_last_visit_completed_cm:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_last_visit_completed_cm
+  ts_new_buyer_prospect:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_new_buyer_prospect
+  ts_first_booking_created:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_first_booking_created
+  ts_last_booking_created:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_last_booking_created
+  ts_first_visit_completed:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_first_visit_completed
+  ts_last_visit_completed:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_last_visit_completed
+  ts_first_offer_submitted:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_first_offer_submitted
+  ts_last_offer_submitted:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_last_offer_submitted
+  ts_first_offer_accepted:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_first_offer_accepted
+  ts_last_offer_accepted:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_last_offer_accepted
+  ts_first_sale_agreement_signed:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_first_sale_agreement_signed
+  ts_last_sale_agreement_signed:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_last_sale_agreement_signed
+  ts_first_combo_event_contact_prospect:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_first_combo_event_contact_prospect
+  ts_last_combo_event_contact_prospect:
+    lineage:
+      - datalake_sale_lead_flows.lead_flow.ts_last_combo_event_contact_prospect

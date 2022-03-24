@@ -128,7 +128,7 @@ if __name__ == "__main__":
 
     df = df.withColumn("ts_load", functions.current_timestamp())
 
-    if sheet_details["partitioned"]:
+    if sheet_details.get("partitioned"):
         df = (
             SparkDataFrameService()
             .input(df)
@@ -143,7 +143,7 @@ if __name__ == "__main__":
         df=df,
         s3_path=f"{database_location}{table_name}",
         format_options=format_options,
-        partitions=partitions_cols if sheet_details["partitioned"] else None,
+        partitions=partitions_cols if sheet_details.get("partitioned") else None,
     )
 
     spark_metastore_loader.update_metastore(

@@ -1,0 +1,14 @@
+---
+inner_dependencies:
+  customer_support:
+    - ongoing
+  ongoing:
+    - contract_termination
+  nps:
+    - contract_termination
+  nps_agg:
+    - nps
+  inspection_analysis:
+    - ongoing
+  tickets:
+    - ongoing

@@ -15,5 +15,6 @@ More information about run time [here]({chart_url}{dag_id}).
 ​
 This pipeline produces in DW, schema quintoandar, via full load:
     - `dim_credit_documentation`
+    - `fact_tenant_document_status`
     - `fact_tenant_proponent_documentation`
 ​

@@ -134,8 +134,10 @@ for table_name, sheet_details in GOOGLE_FILES.items():
     )
     raw_task_groups[sheet_details["clean_table_name"]] = raw_task_group
 
-    create_cluster_task >> skip_run_task >> DatalakeTaskGroup.first_tasks(
-        raw_task_group
+    (
+        create_cluster_task
+        >> skip_run_task
+        >> DatalakeTaskGroup.first_tasks(raw_task_group)
     )
 
 

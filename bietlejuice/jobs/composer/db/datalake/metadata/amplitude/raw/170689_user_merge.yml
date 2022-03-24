@@ -1,0 +1,18 @@
+database_name: datalake_amplitude_raw
+table_name: 170689_user_merge
+columns:
+  scope:
+    tags:
+      - Confidential
+  merge_time:
+    tags:
+      - Confidential
+  merge_server_time:
+    tags:
+      - Confidential
+  amplitude_id:
+    tags:
+      - Confidential
+  merged_amplitude_id:
+    tags:
+      - Confidential

@@ -63,11 +63,11 @@ class Transformer:
     @logger
     def create_athena_table(self, table_name, datalake_layer, partition_by=None):
         """
-            Parameters:
-                - table_name = table name to be created on Athena
-                - datalake_layer = 'raw' or 'clean'
-                - partition_by = list with columns name to partition
-                   -- for example: partition_by = ['year', 'month', 'day']
+        Parameters:
+            - table_name = table name to be created on Athena
+            - datalake_layer = 'raw' or 'clean'
+            - partition_by = list with columns name to partition
+               -- for example: partition_by = ['year', 'month', 'day']
         """
         database = self._get_athena_schema(datalake_layer)
         s3_base_path = self._get_s3_base_path(datalake_layer)
@@ -90,11 +90,11 @@ class Transformer:
     ):
 
         """
-            Parameters:
-                - table_name = table name to be created on Athena
-                - datalake_layer = 'raw' or 'clean'
-                - partition_by = list with columns name to partition
-                   -- for example: partition_by = ['year', 'month', 'day']
+        Parameters:
+            - table_name = table name to be created on Athena
+            - datalake_layer = 'raw' or 'clean'
+            - partition_by = list with columns name to partition
+               -- for example: partition_by = ['year', 'month', 'day']
         """
         if not table_location:
             s3_base_path = self._get_s3_base_path(datalake_layer)
@@ -117,15 +117,15 @@ class Transformer:
     @logger
     def add_partition(self, table_name, datalake_layer, partition_by_dict):
         """
-            Parameters:
-                - table_name = table name to be partitioned on Athena
-                - datalake_layer = 'raw' or 'clean'
-                - partition_by_dict = dict with columns name and values to partition
-                   -- (example) partition_by_dict = {
-                       year: 2019,
-                       month: 08,
-                       day: 28
-                   }
+        Parameters:
+            - table_name = table name to be partitioned on Athena
+            - datalake_layer = 'raw' or 'clean'
+            - partition_by_dict = dict with columns name and values to partition
+               -- (example) partition_by_dict = {
+                   year: 2019,
+                   month: 08,
+                   day: 28
+               }
         """
 
         database = self._get_athena_schema(datalake_layer)

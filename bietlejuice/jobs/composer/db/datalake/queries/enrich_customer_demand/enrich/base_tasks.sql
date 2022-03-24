@@ -65,7 +65,7 @@ ticket_tasks AS (
       datalake_zendesk_ticket_funnels.ticket_funnel tf
         ON e.id_ticket = tf.id_ticket
   ),
-  unique_taxonomy_sla_target AS (
+  unique_theme_detail_sla_target AS (
     SELECT DISTINCT
       journey_step,
       contact_theme_detail_tag AS taxonomy_tag,
@@ -75,16 +75,26 @@ ticket_tasks AS (
       datalake_gsheets_clean.taxonomy_sla
     WHERE
       dt_target_invalidated IS NULL
-    UNION ALL
+  ),
+  unique_theme_sla_target AS (
+    WITH exploded_theme_sla AS (
+      SELECT
+        journey_step,
+        contact_theme_tag AS taxonomy_tag,
+        sla_in_days,
+        EXPLODE(SEQUENCE(dt_start, COALESCE(dt_end, DATE(NOW())))) AS dt_reference
+      FROM
+        datalake_gsheets_clean.taxonomy_sla
+      WHERE
+        dt_target_invalidated IS NULL
+    )
     SELECT
       journey_step,
-      contact_theme_tag AS taxonomy_tag,
+      taxonomy_tag,
       MIN(sla_in_days) AS sla_in_days,
-      EXPLODE(SEQUENCE(dt_start, COALESCE(dt_end, DATE(NOW())))) AS dt_reference
+      dt_reference
     FROM
-      datalake_gsheets_clean.taxonomy_sla
-    WHERE
-      dt_target_invalidated IS NULL
+      exploded_theme_sla
     GROUP BY 1,2,4
   ),
   unique_journey_sla_target AS (
@@ -110,7 +120,7 @@ ticket_tasks AS (
     t.id_ticket AS id_task,
     COALESCE(t.id_agent, '-1') AS id_agent,
     t.department AS type,
-    COALESCE(ts.sla_in_days, ujst.sla_in_days, tst.sla) AS sla_target,
+    COALESCE(tds.sla_in_days,ts.sla_in_days, ujst.sla_in_days, tst.sla) AS sla_target,
     t.ts_started,
     t.ts_completed
   FROM
@@ -119,12 +129,15 @@ ticket_tasks AS (
     datalake_gsheets_clean.department_control dc
       ON t.department = dc.department
   LEFT JOIN
-    unique_taxonomy_sla_target ts
+    unique_theme_detail_sla_target tds
+      ON dc.journey_step = tds.journey_step
+      AND t.contact_theme_detail_tag = tds.taxonomy_tag
+      AND NOT t.tags LIKE '%orçamentação_realizada%'
+      AND DATE(t.ts_started) = tds.dt_reference
+  LEFT JOIN
+    unique_theme_sla_target ts
       ON dc.journey_step = ts.journey_step
-      AND (
-        t.contact_theme_detail_tag = ts.taxonomy_tag
-        OR (t.contact_theme_detail_tag IS NULL AND t.contact_theme_tag = ts.taxonomy_tag)
-      )
+      AND t.contact_theme_detail_tag = ts.taxonomy_tag
       AND NOT t.tags LIKE '%orçamentação_realizada%'
       AND DATE(t.ts_started) = ts.dt_reference
   LEFT JOIN

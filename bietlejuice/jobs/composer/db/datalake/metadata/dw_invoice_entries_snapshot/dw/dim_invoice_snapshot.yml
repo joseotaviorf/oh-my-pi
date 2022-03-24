@@ -1,0 +1,40 @@
+---
+database_name: dw_payment_snapshot
+table_name: dim_invoice_snapshot
+columns:
+  sk_invoice:
+    lineage:
+      - dw_payment.dim_invoice.sk_invoice
+  frequency:
+    lineage:
+      - dw_payment.dim_invoice.frequency
+  payment_status:
+    lineage:
+      - dw_payment.dim_invoice.payment_status
+  user:
+    lineage:
+      - dw_payment.dim_invoice.user
+  due_amount:
+    lineage:
+      - dw_payment.dim_invoice.due_amount
+  paid_amount:
+    lineage:
+      - dw_payment.dim_invoice.paid_amount
+  accrual_year_month:
+    lineage:
+      - dw_payment.dim_invoice.accrual_year_month
+  ts_created:
+    lineage:
+      - dw_payment.dim_invoice.ts_created
+  dt_sent:
+    lineage:
+      - dw_payment.dim_invoice.dt_sent
+  dt_due:
+    lineage:
+      - dw_payment.dim_invoice.dt_due
+  dt_paid:
+    lineage:
+      - dw_payment.dim_invoice.dt_paid
+  ts_snapshot:
+    lineage:
+      - dw_payment.dim_invoice.ts_load

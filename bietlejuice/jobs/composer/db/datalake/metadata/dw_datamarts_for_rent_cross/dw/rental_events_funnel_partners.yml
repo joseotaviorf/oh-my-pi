@@ -1,0 +1,12 @@
+database_name: dw_datamarts_for_rent_cross
+table_name: rental_events_funnel_partners
+columns:
+  date:
+    lineage:
+      - dw_public.dim_date.date
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
+  partner:
+    lineage:
+      - dw_public.dim_partner.trade_name

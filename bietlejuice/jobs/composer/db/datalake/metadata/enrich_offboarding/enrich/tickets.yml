@@ -1,0 +1,33 @@
+---
+database_name: datalake_offboarding
+table_name: tickets
+columns:
+  id:
+    lineage:
+      - datalake_offboarding.ongoing.id_contract
+  id_ticket:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.id_ticket
+  group_name:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.group_name
+  lead_time_activation:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_closed
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_created_local
+  is_activation_protection:
+    lineage:
+      - datalake_zendesk_ticket_funnels.ticket_funnel.client_type
+      - datalake_zendesk_ticket_funnels.ticket_funnel.tags
+  dt_created_budgeting:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_created_local
+  dt_started_budgeting:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_initially_assigned_local
+  dt_solved_budgeting:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_solved_local
+  dt_completed_budgeting:
+    lineage:
+      - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_closed

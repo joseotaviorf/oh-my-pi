@@ -1,0 +1,13 @@
+---
+database_name: datalake_gsheets_clean
+table_name: negotiation_executive_bonus
+columns:
+  hub:
+    lineage:
+      - datalake_gsheets_raw.negotiation_executive_bonus.hub
+  bonus_value:
+    lineage:
+      - datalake_gsheets_raw.negotiation_executive_bonus.bonus_value
+  dt_bonus:
+    lineage:
+      - datalake_gsheets_raw.negotiation_executive_bonus.dt_bonus

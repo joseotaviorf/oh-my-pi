@@ -10,10 +10,20 @@ acquisition_target_per_source:
     sheet_name: acquisition_target_per_source
     clean_table_name: acquisition_target_per_source
 
+advance_base:
+    sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
+    sheet_name: advance_base
+    clean_table_name: advance_base
+
 associate_executive_bonus:
     sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
     sheet_name: associate_executive_bonus
     clean_table_name: associate_executive_bonus
+
+associate_executive_correction:
+    sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
+    sheet_name: associate_executive_correction
+    clean_table_name: associate_executive_correction
 
 affiliate_type_targets:
     sheet_id: 1dK5zcAgTcFg8KaNU3FEiZbHJOBw1DuTwdFhiqGZBETE
@@ -89,6 +99,11 @@ base_supply_souce_for_sale:
     sheet_id: 1UO0kxwf-fXm6nhSFSZg3GTGFF61ZAJiRlAqI-FAr-GE
     sheet_name: Base_Supply_Souce_For_Sale
     clean_table_name: daily_target_supply_sale
+
+bbb22_coupon_for_sale:
+    sheet_id: 1ZnRK-EXvUVNneRtoyCZ0y1ET-Cc859JokFIEFZUfacQ
+    sheet_name: users
+    clean_table_name: bbb22_coupon_sale_users
 
 branding_where_is_plaquinha:
     sheet_id: 1_jHpsbQx1J24l7TNxoMgHH-FgAgQMphVLW9_HVgQi-4
@@ -550,6 +565,16 @@ mkt_cost_per_source:
     sheet_name: mkt_cost_per_source
     clean_table_name: mkt_cost_per_source
 
+negotiation_executive_bonus:
+    sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
+    sheet_name: negotiation_executive_bonus
+    clean_table_name: negotiation_executive_bonus
+
+negotiation_executive_correction:
+    sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
+    sheet_name: negotiation_executive_correction
+    clean_table_name: negotiation_executive_correction
+
 offboarding_customer_portfolio_contract:
     sheet_id: 1x2dgpr3eemxnYft80JKRr3K_zlvgjvc-BjpIKaT2fe8
     sheet_name: contracts
@@ -629,6 +654,11 @@ promotional_bonus_user_targets:
     sheet_id: 15SKrchR92WDs0I4Ia5_qmfkYl8jS6sutsAiX2HB445E
     sheet_name: promotional_bonus_user_targets
     clean_table_name: promotional_bonus_user_targets
+
+provisioned_costs_import:
+    sheet_id: 1KZWx_b3tn754ImagBnGj4rJo16kXgxzg-lQFpYTolOs
+    sheet_name: provisioned_costs_import
+    clean_table_name: provisioned_costs_import
 
 rent_criteo_eng_ab_test:
     sheet_id: 17PonK69vjOYru-xD0acbVqD0bkl_LPuGodhR2AHmn5I

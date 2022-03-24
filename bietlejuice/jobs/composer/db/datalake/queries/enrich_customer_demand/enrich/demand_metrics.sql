@@ -16,7 +16,12 @@ WITH weekends_and_holidays AS (
 task_days_until_solved AS (
   SELECT
     id_task,
-    EXPLODE(SEQUENCE(ts_started,COALESCE(ts_completed, NOW()))) AS ts_interval
+    EXPLODE(
+      SEQUENCE(
+        DATE(ts_started),
+        DATE(COALESCE(ts_completed, NOW()))
+      )
+    ) AS ts_interval
   FROM
     datalake_customer_demand.base_tasks
 ),
@@ -37,10 +42,7 @@ task_info AS (
     bt.id_agent,
     bt.type,
     do.days_off,
-    ((
-        TO_UNIX_TIMESTAMP(COALESCE(ts_completed,NOW()))
-        - TO_UNIX_TIMESTAMP(ts_started)
-    )/(86400)) - COALESCE(do.days_off, 0) AS days_worked,
+    DATEDIFF(DATE(ts_completed), DATE(ts_started)) - COALESCE(do.days_off, 0) AS days_worked,
     bt.sla_target,
     bt.ts_completed,
     bt.ts_started
@@ -49,6 +51,8 @@ task_info AS (
   LEFT JOIN
     days_off do
       ON bt.id_task = do.id_task
+  WHERE
+    bt.ts_completed IS NOT NULL
 ),
 sla AS (
   SELECT
@@ -82,8 +86,6 @@ sla AS (
     DATE(ti.ts_completed) AS dt_metric_reference
   FROM
     task_info ti
-  WHERE
-    ts_completed IS NOT NULL
   GROUP BY 1,2,8
 ),
 received_demand AS (

@@ -1,0 +1,40 @@
+---
+database_name: dw_payment_snapshot
+table_name: fact_invoice_entries_snapshot
+columns:
+  sk_invoice_entry:
+    lineage:
+      - dw_payment.fact_invoice_entries.sk_invoice_entry
+  sk_invoice:
+    lineage:
+      - dw_payment.fact_invoice_entries.sk_invoice
+  sk_contract:
+    lineage:
+      - dw_payment.fact_invoice_entries.sk_contract
+  sk_contract_user:
+    lineage:
+      - dw_payment.fact_invoice_entries.sk_contract_user
+  sk_region:
+    lineage:
+      - dw_payment.fact_invoice_entries.sk_region
+  sk_created_date:
+    lineage:
+      - dw_payment.fact_invoice_entries.sk_created_date
+  sk_due_date:
+    lineage:
+      - dw_payment.fact_invoice_entries.sk_due_date
+  sk_paid_date:
+    lineage:
+      - dw_payment.fact_invoice_entries.sk_paid_date
+  brl_entry_due_amount:
+    lineage:
+      - dw_payment.fact_invoice_entries.brl_entry_due_amount
+  brl_entry_paid_amount:
+    lineage:
+      - dw_payment.fact_invoice_entries.brl_entry_paid_amount
+  ts_created:
+    lineage:
+      - dw_payment.fact_invoice_entries.ts_created
+  ts_snapshot:
+    lineage:
+      - dw_payment.fact_invoice_entries.ts_load

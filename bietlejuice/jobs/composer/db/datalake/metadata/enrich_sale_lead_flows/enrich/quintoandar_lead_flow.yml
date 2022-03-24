@@ -92,6 +92,12 @@ columns:
   ts_last_visit_scheduling_event:
     lineage:
       - datalake_amplitude_sale_visit_intent.amplitude_sale_visit_intent.ts_visit_intent
+  ts_first_tta_message_sent:
+    lineage:
+      - datalake_amplitude_talk_to_agent.talk_to_agent_events.ts_event
+  ts_last_tta_message_sent:
+    lineage:
+      - datalake_amplitude_talk_to_agent.talk_to_agent_events.ts_event
   ts_first_sale_agreement_signed:
     lineage:
       - datalake_offer.sale_offer.dt_sale_agreement_signed

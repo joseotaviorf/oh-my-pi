@@ -1,0 +1,40 @@
+---
+database_name: datalake_hub_services_clean
+table_name: member_profile
+columns:
+  id:
+    lineage:
+      - datalake_hub_services_raw.member_profile.id
+  id_business_unit:
+    lineage:
+      - datalake_hub_services_raw.member_profile.business_unit_id
+  id_user:
+    lineage:
+      - datalake_hub_services_raw.member_profile.user_id
+  version:
+    lineage:
+      - datalake_hub_services_raw.member_profile.version
+  id_parent_member_profile:
+    lineage:
+      - datalake_hub_services_raw.member_profile.parent_member_profile_id
+  profile:
+    lineage:
+      - datalake_hub_services_raw.member_profile.profile
+  is_active:
+    lineage:
+      - datalake_hub_services_raw.member_profile.active
+  ts_created:
+    lineage:
+      - datalake_hub_services_raw.member_profile.created_at
+  ts_updated:
+    lineage:
+      - datalake_hub_services_raw.member_profile.updated_at
+  year:
+    lineage:
+      - datalake_hub_services_raw.member_profile.year
+  month:
+    lineage:
+      - datalake_hub_services_raw.member_profile.month
+  day:
+    lineage:
+      - datalake_hub_services_raw.member_profile.day

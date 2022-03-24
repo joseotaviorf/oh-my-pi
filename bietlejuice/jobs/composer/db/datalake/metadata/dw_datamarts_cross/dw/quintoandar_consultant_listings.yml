@@ -1,0 +1,33 @@
+---
+database_name: dw_datamarts_cross
+table_name: quintoandar_consultant_listings
+columns:
+  sk_house_listing:
+    lineage:
+      - dw_public.dim_house_listing.sk_house_listing
+      - dw_sale.dim_listing.sk_sale_listing
+  id_house:
+    lineage:
+      - datalake_big_agent.house.details
+      - datalake_ebdb_clean.house_aud.id_house
+  sk_quintoandar_consultant:
+    lineage:
+      - datalake_big_agent.agent.details
+  type_big_agent:
+    lineage:
+      - datalake_big_agent.program.name
+  businesscontext:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.business_context
+  dt_ciq_started:
+    lineage:
+      - datalake_big_agent.agency.dt_since
+  id_partner:
+    lineage:
+      - dw_public.dim_partner.id_partner
+  dt_sale:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  dt_rent:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision

@@ -21,3 +21,9 @@ agendamento_vistoria_entrada:
     clean_table_name: schedule_inspection_entry
     sheet_context: support_and_service
     partitioned: True
+
+support_agents_department:
+    sheet_id: 1wIwrWi0xlY4TAZnE6JlGm6B0UyezOPxfF5s0_pn-i9E
+    sheet_name: Agents Main Department
+    clean_table_name: support_agents_department
+    sheet_context: support_and_service

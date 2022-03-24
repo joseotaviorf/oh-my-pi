@@ -1,0 +1,25 @@
+---
+database_name: dw_datamarts_for_sale_cross
+table_name: sale_ongoing_listings
+columns:
+  weekday_name:
+    lineage:
+      - dw_public.dim_date.weekday_name
+  week_start:
+    lineage:
+      - dw_public.dim_date.week_start
+  sk_region:
+    lineage:
+      - dw_sale.fact_listing_status.sk_region
+  region:
+    lineage:
+      - dw_public.dim_region.name
+  city_name:
+    lineage:
+      - dw_public.dim_region.city_name
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
+  supply_3p_partner:
+    lineage:
+      - dw_datamarts_cross.houses_3p.partner

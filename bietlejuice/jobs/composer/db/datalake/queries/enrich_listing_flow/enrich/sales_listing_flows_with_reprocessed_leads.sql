@@ -436,3 +436,10 @@ FROM
     acquisition_channels_dt_diffs AS acq
 LEFT JOIN legacy_doorman AS ld
     ON acq.id_house = ld.id_house
+-- Filter to remove Casa Mineira listings included in Quinto Andar tables due to the BBB 22 campaign
+LEFT JOIN
+  datalake_ebdb_listing.house AS h
+    ON h.id = acq.id_house
+      AND h.internal_admin_info = '3P\n[FS-CM]'
+WHERE
+  h.id IS NULL

@@ -20,6 +20,7 @@ ENV = os.environ.get("ENVIRONMENT")
 CONTEXT = "catalog_product_entities"
 DAG_ID = f"bietlejuice.{CONTEXT}"
 MAIN_START_DATE = datetime(2021, 10, 1, tzinfo=timezone("America/Sao_Paulo"))
+MAIN_SCHEDULE_INTERVAL = "0 13 * * wed"
 
 config_service = ConfigurationService(CONTEXT)
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
@@ -46,7 +47,7 @@ dag = DAG(
         "depends_on_past": False,
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=None,
+    schedule_interval=MAIN_SCHEDULE_INTERVAL,
     doc_md=BaseDAG.get_dag_doc(CONTEXT).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),

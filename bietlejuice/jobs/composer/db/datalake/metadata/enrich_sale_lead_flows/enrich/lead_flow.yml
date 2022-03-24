@@ -1,0 +1,268 @@
+---
+database_name: datalake_sale_lead_flows
+table_name: lead_flow
+columns:
+  id_lead:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.id_secretariat_client
+      - datalake_sale_lead_flows.classified_lead_flow.id_classified_lead
+      - datalake_sale_lead_flows.quintoandar_lead_flow.id_user
+  id_user:
+    lineage:
+      - datalake_sale_lead_flows.quintoandar_lead_flow.id_user
+  id_secretariat_client:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.id_secretariat_client
+  id_classified_lead:
+    lineage:
+      - datalake_sale_lead_flows.classified_lead_flow.id_classified_lead
+  id_visitor_hub_service:
+    lineage:
+      - datalake_sale_lead_flows.hub_services_lead_flow.id_visitor
+  id_region_classified:
+    lineage:
+      - datalake_sale_lead_flows.classified_lead_flow.id_region
+  id_region_contact_prospect:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.id_first_region_contact_prospect
+      - datalake_sale_lead_flows.hub_services_lead_flow.id_first_contact_prospect_region
+  id_region_booking_cm:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.id_first_region_booking
+  id_region_visit_intent:
+    lineage:
+      - datalake_sale_lead_flows.quintoandar_lead_flow.id_region_first_visit_intent
+  id_region_booking_5a:
+    lineage:
+      - datalake_sale_lead_flows.quintoandar_lead_flow.id_region_first_booking
+  id_first_region:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.id_first_region_contact_prospect
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.id_first_region_booking
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.id_first_region_offer
+      - datalake_sale_lead_flows.classified_lead_flow.id_region
+      - datalake_sale_lead_flows.hub_services_lead_flow.id_first_region
+      - datalake_sale_lead_flows.quintoandar_lead_flow.id_region_first_booking
+      - datalake_sale_lead_flows.quintoandar_lead_flow.id_region_first_offer
+      - datalake_sale_lead_flows.quintoandar_lead_flow.id_region_first_visit_intent
+  id_first_house:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.id_first_house_5a_secretariat_contact
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.id_first_house_5a_booking
+      - datalake_sale_lead_flows.classified_lead_flow.id_house
+      - datalake_sale_lead_flows.hub_services_lead_flow.id_first_house
+      - datalake_sale_lead_flows.quintoandar_lead_flow.id_house_first_booking
+      - datalake_sale_lead_flows.quintoandar_lead_flow.id_house_first_offer
+      - datalake_sale_lead_flows.quintoandar_lead_flow.id_house_first_visit_intent
+  id_first_house_sale_agreement:
+    lineage:
+      - datalake_sale_lead_flows.quintoandar_lead_flow.id_house_first_sale_agreement
+  first_classified_partner:
+    lineage:
+      - datalake_sale_lead_flows.classified_lead_flow.origin_partner
+  first_business_unit_region_intent_lead:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.first_business_unit_region_intent_lead
+      - datalake_sale_lead_flows.hub_services_lead_flow.first_business_unit_hub_name
+      - datalake_sale_lead_flows.quintoandar_lead_flow.first_business_unit_region_intent_lead
+  last_business_unit_region_intent_lead:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.last_business_unit_region_intent_lead
+      - datalake_sale_lead_flows.hub_services_lead_flow.last_business_unit_hub_name
+      - datalake_sale_lead_flows.quintoandar_lead_flow.last_business_unit_region_intent_lead
+  first_business_unit_region_new_buyer_prospect:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.first_business_unit_region_new_buyer_prospect
+      - datalake_sale_lead_flows.quintoandar_lead_flow.first_business_unit_region_new_buyer_prospect
+  first_city_booking_cm:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.first_city_booking
+  first_city_contact_prospect:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.first_city_contact_prospect
+      - datalake_sale_lead_flows.hub_services_lead_flow.first_contact_prospect_city_name
+  first_contact_prospect_origin:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.first_secretariat_contact_origin
+      - datalake_sale_lead_flows.hub_services_lead_flow.first_contact_prospect_origin
+  last_contact_prospect_origin:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.last_secretariat_contact_origin
+      - datalake_sale_lead_flows.hub_services_lead_flow.last_contact_prospect_origin
+  first_contact_prospect_media:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.first_secretariat_contact_media
+      - datalake_sale_lead_flows.hub_services_lead_flow.first_contact_prospect_midia
+  last_contact_prospect_media:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.last_secretariat_contact_media
+      - datalake_sale_lead_flows.hub_services_lead_flow.last_contact_prospect_midia
+  first_offer_flow:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.first_offer_flow
+      - datalake_sale_lead_flows.quintoandar_lead_flow.first_offer_flow
+  first_ccv_flow:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.first_ccv_flow
+      - datalake_sale_lead_flows.quintoandar_lead_flow.first_ccv_flow
+  first_offer_business_unit:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.first_offer_business_unit
+      - datalake_sale_lead_flows.quintoandar_lead_flow.first_offer_business_unit
+  first_ccv_business_unit:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.first_ccv_business_unit
+      - datalake_sale_lead_flows.quintoandar_lead_flow.first_ccv_business_unit
+  last_event:
+    lineage:
+      - datalake_sale_lead_flows.quintoandar_lead_flow.last_event
+  first_booking_creator_5a:
+    lineage:
+      - datalake_sale_lead_flows.quintoandar_lead_flow.first_booking_creator_5a
+  has_secretariat_contact_created:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.has_secretariat_contact_created
+      - datalake_sale_lead_flows.hub_services_lead_flow.has_secretariat_contact_created
+  has_first_booking:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.has_first_booking
+      - datalake_sale_lead_flows.quintoandar_lead_flow.has_first_booking
+  has_tenant_rental_contract:
+    lineage:
+      - datalake_sale_lead_flows.quintoandar_lead_flow.has_tenant_rental_contract
+  is_ongoing_tenant_rental_contract:
+    lineage:
+      - datalake_sale_lead_flows.quintoandar_lead_flow.is_ongoing_tenant_rental_contract
+  has_owner_rental_contract:
+    lineage:
+      - datalake_sale_lead_flows.quintoandar_lead_flow.has_owner_rental_contract
+  has_rental_visit_intent:
+    lineage:
+      - datalake_sale_lead_flows.quintoandar_lead_flow.has_rental_visit
+  total_bookings_created_by_secretariat:
+    lineage:
+      - datalake_sale_lead_flows.quintoandar_lead_flow.total_bookings_created_by_secretariat
+  ts_first_talk_to_secretariat:
+    lineage:
+      - datalake_sale_lead_flows.hub_services_lead_flow.ts_first_talk_to_secretariat
+  ts_last_talk_to_secretariat:
+    lineage:
+      - datalake_sale_lead_flows.hub_services_lead_flow.ts_last_talk_to_secretariat
+  ts_first_visit_lead_intent:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_contact_prospect
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_offer_submitted
+      - datalake_sale_lead_flows.classified_lead_flow.ts_intent
+      - datalake_sale_lead_flows.hub_services_lead_flow.ts_first_visit_lead_intent
+      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_visit_scheduling_event
+      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_booking_created
+      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_offer_submitted
+  ts_last_visit_lead_intent:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_contact_prospect
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_offer_submitted
+      - datalake_sale_lead_flows.classified_lead_flow.ts_intent
+      - datalake_sale_lead_flows.hub_services_lead_flow.ts_last_visit_lead_intent
+      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_visit_scheduling_event
+      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_booking_created
+      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_offer_submitted
+  ts_first_contact_prospect:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_contact_prospect
+      - datalake_sale_lead_flows.hub_services_lead_flow.ts_first_contact_prospect
+  ts_last_contact_prospect:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_contact_prospect
+      - datalake_sale_lead_flows.hub_services_lead_flow.ts_last_contact_prospect
+  ts_first_classified_intent:
+    lineage:
+      - datalake_sale_lead_flows.classified_lead_flow.ts_intent
+  ts_last_classified_intent:
+    lineage:
+      - datalake_sale_lead_flows.classified_lead_flow.ts_intent
+  ts_first_visit_scheduling_event:
+    lineage:
+      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_visit_scheduling_event
+  ts_last_visit_scheduling_event:
+    lineage:
+      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_visit_scheduling_event
+  ts_first_tta_message_sent:
+    lineage:
+      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_tta_message_sent
+  ts_last_tta_message_sent:
+    lineage:
+      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_tta_message_sent
+  ts_first_booking_created_5a:
+    lineage:
+      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_booking_created
+  ts_last_booking_created_5a:
+    lineage:
+      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_booking_created
+  ts_first_visit_completed_5a:
+    lineage:
+      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_visit_completed
+  ts_last_visit_completed_5a:
+    lineage:
+      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_visit_completed
+  ts_first_booking_created_cm:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_booking_created
+  ts_last_booking_created_cm:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_booking_created
+  ts_first_visit_completed_cm:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_visit_completed
+  ts_last_visit_completed_cm:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_visit_completed
+  ts_new_buyer_prospect:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_booking_created
+      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_event
+  ts_first_booking_created:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_booking_created
+      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_booking_created
+  ts_last_booking_created:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_booking_created
+      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_booking_created
+  ts_first_visit_completed:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_visit_completed
+      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_visit_completed
+  ts_last_visit_completed:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_visit_completed
+      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_visit_completed
+  ts_first_offer_submitted:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_offer_submitted
+      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_offer_submitted
+  ts_last_offer_submitted:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_offer_submitted
+      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_offer_submitted
+  ts_first_offer_accepted:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_sale_agreement_signed
+      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_offer_accepted
+  ts_last_offer_accepted:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_sale_agreement_signed
+      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_offer_accepted
+  ts_first_sale_agreement_signed:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_sale_agreement_signed
+      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_first_sale_agreement_signed
+  ts_last_sale_agreement_signed:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_sale_agreement_signed
+      - datalake_sale_lead_flows.quintoandar_lead_flow.ts_last_sale_agreement_signed
+  ts_first_combo_event_contact_prospect:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_first_combo_event_contact_prospect
+  ts_last_combo_event_contact_prospect:
+    lineage:
+      - datalake_sale_lead_flows.casa_mineira_lead_flow.ts_last_combo_event_contact_prospect

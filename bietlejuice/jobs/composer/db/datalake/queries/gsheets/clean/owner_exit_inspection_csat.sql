@@ -4,6 +4,7 @@ SELECT
     NULLIF(pontos_de_melhoria,'') AS improvement_tags,
     NULLIF(campo_aberto,'') AS comments,
     INT(avaliacao_csat) AS general_satisfaction_evaluation,
+    INT(nota_pp_imovel) AS general_satisfaction_house,
     TIMESTAMP(submitted_at) AS ts_submitted
 FROM 
     datalake_gsheets_raw.csat_vistoria_pp_saida

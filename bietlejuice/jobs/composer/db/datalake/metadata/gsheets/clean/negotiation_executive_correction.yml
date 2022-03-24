@@ -1,0 +1,28 @@
+---
+database_name: datalake_gsheets_clean
+table_name: negotiation_executive_correction
+columns:
+  id_negotiation_executive:
+    lineage:
+      - datalake_gsheets_raw.negotiation_executive_correction.id_negotiation_executive
+  id_associate_executive:
+    lineage:
+      - datalake_gsheets_raw.negotiation_executive_correction.id_associate_executive
+  incorrect_negociation_executive:
+    lineage:
+      - datalake_gsheets_raw.negotiation_executive_correction.incorrect_negociation_executive
+  negotiation_executive:
+    lineage:
+      - datalake_gsheets_raw.negotiation_executive_correction.negotiation_executive
+  executive_position:
+    lineage:
+      - datalake_gsheets_raw.negotiation_executive_correction.executive_position
+  associate_executive:
+    lineage:
+      - datalake_gsheets_raw.negotiation_executive_correction.associate_executive
+  hub:
+    lineage:
+      - datalake_gsheets_raw.negotiation_executive_correction.hub
+  dt_month_ref:
+    lineage:
+      - datalake_gsheets_raw.negotiation_executive_correction.dt_month_ref

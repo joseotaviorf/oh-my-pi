@@ -1,0 +1,16 @@
+---
+database_name: dw_datamarts_for_sale
+table_name: buyer_first_visit_intent
+columns:
+  id_user:
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+  sk_region:
+    lineage:
+      - dw_public.dim_region.sk_region
+  city_name:
+    lineage:
+      - dw_public.dim_region.city_name
+  ts_first_visit_intent:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event

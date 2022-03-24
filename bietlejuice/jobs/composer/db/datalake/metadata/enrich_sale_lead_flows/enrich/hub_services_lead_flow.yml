@@ -58,10 +58,10 @@ columns:
       - datalake_ebdb_clean.house.city
   first_business_unit_hub_name:
     lineage:
-      - datalake_hub_services_clean.business_unit.hub_name
+      - datalake_gsheets_clean.business_unit_region.business_unit
   last_business_unit_hub_name:
     lineage:
-      - datalake_hub_services_clean.business_unit.hub_name
+      - datalake_gsheets_clean.business_unit_region.business_unit
   ts_first_visit_lead_intent:
     lineage:
       - datalake_hub_services_clean.lead.ts_created

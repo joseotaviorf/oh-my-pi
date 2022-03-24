@@ -15,6 +15,11 @@ pipeline:
   #     table: <targe-table-name>
   #     schema: <target-schema-name> # TODO this will always be `datamart` (for both datalake and dw). This var is not used anymore
   #     runs_on: <backend-to-run-the-query> E.g: redshift or athena
+  agents_3p:
+    dw:
+      <<: *athena_anchor
+      sql_file: dw/queries/datamarts/cross/agents_3p.sql
+      table: agents_3p
   buyer_prospect_status:
     dw:
       <<: *redshift_anchor
@@ -29,6 +34,11 @@ pipeline:
       table: funnel_demand_flows
       depends_on:
         - talk_to_agent
+  houses_3p:
+    dw:
+      <<: *athena_anchor
+      sql_file: dw/queries/datamarts/cross/houses_3p.sql
+      table: houses_3p
   lead_listing_flows:
     dw:
       <<: *redshift_anchor

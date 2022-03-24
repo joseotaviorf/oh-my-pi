@@ -1,0 +1,31 @@
+---
+database_name: dw_datamarts_growth
+table_name: casa_mineira_top_of_funnel_volumes_weekly
+columns:
+  week_start:
+    lineage:
+      - datalake_top_of_funnel_portal_cm.top_of_funnel_users_portal_casa_mineira.dt_event
+  uf_listing:
+    lineage:
+      - datalake_top_of_funnel_portal_cm.top_of_funnel_users_portal_casa_mineira.uf_initials
+  city_listing:
+    lineage:
+      - datalake_top_of_funnel_portal_cm.top_of_funnel_users_portal_casa_mineira.city_listing
+  mkt_origin:
+    lineage:
+      - datalake_top_of_funnel_portal_cm.top_of_funnel_users_portal_casa_mineira.mkt_origin
+  mkt_channel:
+    lineage:
+      - datalake_top_of_funnel_portal_cm.top_of_funnel_users_portal_casa_mineira.mkt_channel
+  mkt_medium:
+    lineage:
+      - datalake_top_of_funnel_portal_cm.top_of_funnel_users_portal_casa_mineira.mkt_medium
+  mkt_source:
+    lineage:
+      - datalake_top_of_funnel_portal_cm.top_of_funnel_users_portal_casa_mineira.mkt_source
+  mkt_business:
+    lineage:
+      - datalake_top_of_funnel_portal_cm.top_of_funnel_users_portal_casa_mineira.mkt_business
+  city_group:
+    lineage:
+      - datalake_top_of_funnel_portal_cm.top_of_funnel_users_portal_casa_mineira.city_listing

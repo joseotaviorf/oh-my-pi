@@ -2,9 +2,7 @@ DROP TABLE IF EXISTS customer_support.fact_agent_weekly_achievement;
 CREATE TABLE IF NOT EXISTS customer_support.fact_agent_weekly_achievement (
     sk_achievement VARCHAR,
     sk_agent VARCHAR,
-    sk_agent_manager VARCHAR,
     sk_department VARCHAR,
-    total_departments BIGINT,
     achievement_weighted_score FLOAT,
     ranking_quartile VARCHAR,
     ranking_percent_position FLOAT,

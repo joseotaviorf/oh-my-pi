@@ -1,0 +1,22 @@
+---
+database_name: datalake_tracksale_reverse
+table_name: lost_pp
+columns:
+  customer_name:
+    lineage:
+      - dw_public.dim_user.nome
+  customer_email:
+    lineage:
+      - dw_public.dim_user.email
+  customer_phone:
+    lineage:
+      - dw_public.dim_user.customer_phone
+  customer_cpf:
+    lineage:
+      - dw_public.dim_user.cpf
+  id_user:
+    lineage:
+      - dw_public.dim_user.sk_user
+  id_driver:
+    lineage:
+      - dw_public.fact_house_listings.sk_house_listing

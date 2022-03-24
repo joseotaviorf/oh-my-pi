@@ -1,0 +1,37 @@
+---
+database_name: datalake_composer_clean
+table_name: log
+columns:
+  id_log:
+    lineage:
+      - datalake_composer_raw.log.id
+  id_dag:
+    lineage:
+      - datalake_composer_raw.log.dag_id
+  id_task:
+    lineage:
+      - datalake_composer_raw.log.task_id
+  event:
+    lineage:
+      - datalake_composer_raw.log.event
+  extra:
+    lineage:
+      - datalake_composer_raw.log.extra
+  owner:
+    lineage:
+      - datalake_composer_raw.log.owner
+  ts_event:
+    lineage:
+      - datalake_composer_raw.log.dttm
+  ts_executed:
+    lineage:
+      - datalake_composer_raw.log.execution_date
+  year:
+    lineage:
+      - datalake_composer_raw.log.year
+  month:
+    lineage:
+      - datalake_composer_raw.log.month
+  day:
+    lineage:
+      - datalake_composer_raw.log.day

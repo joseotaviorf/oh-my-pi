@@ -1,0 +1,40 @@
+---
+database_name: dw_datamarts_for_rent
+table_name: agents_activations_suspensions_contracts_changes
+columns:
+  rev:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.rev
+  agent_id:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.id
+  agent_active:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.is_active
+  agent_name:
+    lineage:
+      - datalake_ebdb_clean.user.name
+  agent_type:
+    lineage:
+      - datalake_ebdb_clean.agent_data_types.types
+  workcontract_id:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.id_work_contract
+  workcontract_name:
+    lineage:
+      - datalake_ebdb_clean.work_contract.contract_name
+  previous_workcontract_id:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.id_work_contract
+  previous_workcontract_name:
+    lineage:
+      - datalake_ebdb_clean.work_contract.contract_name
+  user_change_id:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.id_user
+  user_change_name:
+    lineage:
+      - datalake_ebdb_clean.user.name
+  user_change_email:
+    lineage:
+      - datalake_ebdb_clean.user.email

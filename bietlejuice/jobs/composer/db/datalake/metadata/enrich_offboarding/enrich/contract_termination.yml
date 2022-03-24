@@ -1,0 +1,230 @@
+---
+database_name: datalake_offboarding
+table_name: contract_termination
+columns:
+  sk_termination:
+    lineage:
+      - datalake_terminator_clean.termination.id
+  sk_application_user:
+    lineage:
+      - datalake_terminator_clean.application_user.id_external
+  sk_contract:
+    lineage:
+      - datalake_terminator_clean.termination.id_contract
+  sk_exit_inspection:
+    lineage:
+      - datalake_terminator_clean.termination.id_exit_inspection
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.contract.id_house
+  sk_house_listing:
+    lineage:
+      - datalake_ebdb_clean.contract.id
+      - datalake_ebdb_clean.contract.id_contract_version
+  sk_region:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+  sk_workflow_assignee:
+    lineage:
+      - datalake_terminator_clean.termination_workflow.id_current_assignee
+  cancellation_info:
+    lineage:
+      - datalake_terminator_clean.termination.source
+  feedback:
+    lineage:
+      - datalake_terminator_clean.termination.feedback
+  churn_reason:
+    lineage:
+      - datalake_terminator_clean.termination.feedback
+  next_property:
+    lineage:
+      - datalake_terminator_clean.termination.feedback
+  property_issue:
+    lineage:
+      - datalake_terminator_clean.termination.feedback
+  reason:
+    lineage:
+      - datalake_terminator_clean.termination.feedback
+  requested_by:
+    lineage:
+      - datalake_terminator_clean.termination.requested_by
+  rescheduling_history:
+    lineage:
+      - datalake_terminator_clean.termination.rescheduling_history
+  status:
+    lineage:
+      - datalake_terminator_clean.termination.status
+  source:
+    lineage:
+      - datalake_terminator_clean.termination.source
+  type:
+    lineage:
+      - datalake_terminator_clean.termination.feedback
+      - datalake_terminator_clean.termination.source
+      - datalake_terminator_clean.termination.dt_termination
+      - datalake_terminator_clean.termination.ts_created
+      - datalake_ebdb_clean.contract.dt_entered
+      - datalake_ebdb_contract.contract_b2b.is_b2b
+      - datalake_ebdb_listing.house_listing.id_house_listing
+  tenant_key_location:
+    lineage:
+      - datalake_terminator_clean.termination.tenant_keys_location
+  tenant_key_detail:
+    lineage:
+      - datalake_terminator_clean.termination.tenant_keys_location
+  owner_key_detail:
+    lineage:
+      - datalake_terminator_clean.termination.owner_keys_location
+  utility_bill_info:
+    lineage:
+      - datalake_terminator_clean.termination.utility_bill_info
+  application_user_name:
+    lineage:
+      - datalake_terminator_clean.application_user.name
+  application_user_email:
+    lineage:
+      - datalake_terminator_clean.application_user.email
+  b2b_type:
+    lineage:
+      - datalake_ebdb_contract.contract_b2b.b2b_type
+  b2b_prime_type:
+    lineage:
+      - datalake_ebdb_contract.contract_b2b.b2b_prime_type
+  repair_resolution:
+    lineage:
+      - datalake_terminator_clean.negotiation.repair_resolution
+  fee_payment_option:
+    lineage:
+      - datalake_terminator_clean.termination_fee_negotiation.fee_payment_option
+  fee_negotiation_status:
+    lineage:
+      - datalake_terminator_clean.termination_fee_negotiation.fee_negotiation_status
+  completed_utility_attachments:
+    lineage:
+      - datalake_terminator_clean.utility_bill.type
+  pending_utility_attachments:
+    lineage:
+      - datalake_terminator_clean.utility_bill.type
+  utility_bill_in_condominium:
+    lineage:
+      - datalake_terminator_clean.utility_bill.type
+  workflow_current_step:
+    lineage:
+      - datalake_terminator_clean.termination_workflow.current_step
+  nps:
+    lineage:
+      - datalake_tracksale.answer.nps_answer
+      - datalake_tracksale.campaign.metric_group
+      - datalake_casa_mineira_tracksale.answer.nps_answer
+      - datalake_casa_mineira_tracksale.campaign.metric_group
+      - datalake_terminator_clean.termination.status
+  iq_nps:
+    lineage:
+      - datalake_tracksale.answer.nps_answer
+      - datalake_tracksale.campaign.metric_group
+      - datalake_casa_mineira_tracksale.answer.nps_answer
+      - datalake_casa_mineira_tracksale.campaign.customer_type
+      - datalake_casa_mineira_tracksale.campaign.metric_group
+      - datalake_terminator_clean.termination.status
+  pp_nps:
+    lineage:
+      - datalake_tracksale.answer.nps_answer
+      - datalake_tracksale.campaign.metric_group
+      - datalake_casa_mineira_tracksale.answer.nps_answer
+      - datalake_casa_mineira_tracksale.campaign.customer_type
+      - datalake_casa_mineira_tracksale.campaign.metric_group
+      - datalake_terminator_clean.termination.status
+  repair_cost:
+    lineage:
+      - datalake_terminator_clean.negotiation.repair_cost
+  fee_discount_percentage:
+    lineage:
+      - datalake_terminator_clean.termination_fee_negotiation.fee_discount_percentage
+  fee_discount_value:
+    lineage:
+      - datalake_terminator_clean.termination_fee_negotiation.fee_discount_value
+  fee_final_amount:
+    lineage:
+      - datalake_terminator_clean.termination_fee_negotiation.fee_final_amount
+  fee_number_of_installments:
+    lineage:
+      - datalake_terminator_clean.termination_fee_negotiation.fee_number_of_installments
+  leadtime_request_to_vacancy:
+    lineage:
+      - datalake_terminator_clean.termination.dt_termination
+      - datalake_terminator_clean.termination.ts_created
+  leadtime_vacancy_to_finish:
+    lineage:
+      - datalake_terminator_clean.termination.dt_termination
+      - datalake_terminator_clean.termination_aud.ts_termination_finished
+      - datalake_terminator_clean.negotiation.ts_updated
+  is_b2b:
+    lineage:
+      - datalake_ebdb_contract.contract_b2b.is_b2b
+  is_before_contract_start:
+    lineage:
+      - datalake_terminator_clean.termination.ts_created
+      - datalake_ebdb_clean.contract.dt_started
+  has_exit_inspection:
+    lineage:
+      - datalake_terminator_clean.termination.has_exit_inspection
+  has_repairs:
+    lineage:
+      - datalake_terminator_clean.negotiation.has_landlord_comment
+  is_repair_tenant_duty:
+    lineage:
+      - datalake_terminator_clean.negotiation.needs_repair_by_tenant
+  has_prior_notice_fine:
+    lineage:
+      - datalake_terminator_clean.termination.dt_termination
+      - datalake_terminator_clean.termination.ts_created
+  has_one_year_fine:
+    lineage:
+      - datalake_terminator_clean.termination.dt_termination
+      - datalake_ebdb_clean.contract.dt_started
+  has_been_rescheduled:
+    lineage:
+      - datalake_terminator_clean.termination_aud.id
+  is_termination_canceled:
+    lineage:
+      - datalake_terminator_clean.termination.ts_canceled
+  is_workflow:
+    lineage:
+      - datalake_terminator_clean.termination_workflow.has_automatically_closed_task
+  is_relisting:
+    lineage:
+      - datalake_terminator_clean.termination.is_relisting
+  has_automatically_closed_task:
+    lineage:
+      - datalake_terminator_clean.termination_workflow.has_automatically_closed_task
+  dt_termination:
+    lineage:
+      - datalake_terminator_clean.termination.dt_termination
+  dt_last_rescheduled:
+    lineage:
+      - datalake_terminator_clean.termination_aud.ts_updated
+  dt_last_inspection_synched:
+    lineage:
+      - datalake_ebdb_clean.inspection.dt_inspected
+  dt_negotiation_updated:
+    lineage:
+      - datalake_terminator_clean.negotiation.ts_updated
+  ts_fee_negotiation_created:
+    lineage:
+      - datalake_terminator_clean.termination_fee_negotiation.ts_created
+  ts_fee_negotiation_updated:
+    lineage:
+      - datalake_terminator_clean.termination_fee_negotiation.ts_updated
+  ts_created:
+    lineage:
+      - datalake_terminator_clean.termination.ts_created
+  ts_canceled:
+    lineage:
+      - datalake_terminator_clean.termination.ts_canceled
+  ts_termination_finished:
+    lineage:
+      - datalake_terminator_clean.negotiation.ts_updated
+      - datalake_terminator_clean.termination.ts_canceled
+  ts_updated:
+    lineage:
+      - datalake_terminator_clean.termination.ts_updated

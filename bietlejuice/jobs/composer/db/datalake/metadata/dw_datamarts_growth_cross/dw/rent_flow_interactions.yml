@@ -1,0 +1,84 @@
+---
+database_name: dw_datamarts_growth_cross
+table_name: rent_flow_interactions
+columns:
+  ts_event:
+    lineage:
+      - dw_datamarts_cross.talk_to_agent.first_message_ts
+      - dw_public.dim_booking.dt_created
+      - dw_public.dim_offer.dt_first_sent
+  dt_event:
+    lineage:
+      - dw_datamarts_cross.talk_to_agent.first_message_ts
+      - dw_public.dim_booking.dt_created
+      - dw_public.dim_offer.dt_first_sent
+  sk_client:
+    lineage:
+      - dw_datamarts_cross.talk_to_agent.tenant_id
+      - dw_public.fact_listing_rent_flows.sk_client
+  sk_house_listing:
+    lineage:
+      - dw_datamarts_cross.talk_to_agent.sk_house_listing
+      - dw_public.fact_listing_rent_flows.sk_house_listing
+  id_house:
+    lineage:
+      - dw_datamarts_cross.talk_to_agent.house_id
+      - dw_public.dim_booking.id_property
+      - dw_public.dim_offer.id_property
+  sk_rf:
+    lineage:
+      - dw_datamarts_cross.talk_to_agent.house_id
+      - dw_datamarts_cross.talk_to_agent.tenant_id
+      - dw_public.dim_booking.id_property
+      - dw_public.dim_offer.id_property
+      - dw_public.fact_listing_rent_flows.sk_client
+      
+  sk_region:
+    lineage:
+      - dw_public.fact_house_listings.sk_region
+      - dw_public.fact_listing_rent_flows.sk_region
+  mkt_origin:
+    lineage:
+      - dw_datamarts_cross.talk_to_agent.mkt_origin
+      - dw_public.dim_booking.mkt_origin
+      - dw_public.dim_offer.mkt_origin
+  mkt_channel:
+    lineage:
+      - dw_datamarts_cross.talk_to_agent.mkt_channel
+      - dw_public.dim_booking.mkt_channel
+      - dw_public.dim_offer.mkt_channel
+  mkt_medium:
+    lineage:
+      - dw_datamarts_cross.talk_to_agent.mkt_medium
+      - dw_public.dim_booking.mkt_medium
+      - dw_public.dim_offer.mkt_medium
+  mkt_source:
+    lineage:
+      - dw_datamarts_cross.talk_to_agent.mkt_source
+      - dw_public.dim_booking.mkt_source
+      - dw_public.dim_offer.mkt_source
+  utm_medium:
+    lineage:
+      - dw_datamarts_cross.talk_to_agent.utm_medium
+      - dw_public.dim_booking.utm_medium
+      - dw_public.dim_offer.utm_medium
+  utm_source:
+    lineage:
+      - dw_datamarts_cross.talk_to_agent.utm_source
+      - dw_public.dim_booking.utm_source
+      - dw_public.dim_offer.utm_source
+  utm_campaign:
+    lineage:
+      - dw_datamarts_cross.talk_to_agent.utm_campaign
+      - dw_public.dim_booking.utm_campaign
+      - dw_public.dim_offer.utm_campaign
+  utm_term:
+    lineage:
+      - dw_datamarts_cross.talk_to_agent.utm_term
+      - dw_public.dim_booking.utm_term
+      - dw_public.dim_offer.utm_term
+  utm_content:
+    lineage:
+      - dw_datamarts_cross.talk_to_agent.utm_content
+      - dw_public.dim_booking.utm_content
+      - dw_public.dim_offer.utm_content

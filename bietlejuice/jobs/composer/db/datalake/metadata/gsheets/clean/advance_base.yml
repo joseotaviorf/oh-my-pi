@@ -1,0 +1,19 @@
+---
+database_name: datalake_gsheets_clean
+table_name: advance_base
+columns:
+  id_offer:
+    lineage:
+      - datalake_gsheets_raw.advance_base.id_offer
+  id_agent:
+    lineage:
+      - datalake_gsheets_raw.advance_base.id_agent
+  agent_full_name:
+    lineage:
+      - datalake_gsheets_raw.advance_base.agent_full_name
+  partner_type:
+    lineage:
+      - datalake_gsheets_raw.advance_base.partner_type
+  gross_advance:
+    lineage:
+      - datalake_gsheets_raw.advance_base.gross_advance

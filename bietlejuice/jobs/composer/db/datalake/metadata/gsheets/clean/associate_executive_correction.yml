@@ -1,0 +1,22 @@
+---
+database_name: datalake_gsheets_clean
+table_name: associate_executive_correction
+columns:
+  id_associate_executive:
+    lineage:
+      - datalake_gsheets_raw.associate_executive_correction.id_associate_executive
+  incorrect_associate_executive:
+    lineage:
+      - datalake_gsheets_raw.associate_executive_correction.incorrect_associate_executive
+  associate_executive:
+    lineage:
+      - datalake_gsheets_raw.associate_executive_correction.associate_executive
+  executive_position:
+    lineage:
+      - datalake_gsheets_raw.associate_executive_correction.executive_position
+  hub:
+    lineage:
+      - datalake_gsheets_raw.associate_executive_correction.hub
+  dt_month_ref:
+    lineage:
+      - datalake_gsheets_raw.associate_executive_correction.dt_month_ref

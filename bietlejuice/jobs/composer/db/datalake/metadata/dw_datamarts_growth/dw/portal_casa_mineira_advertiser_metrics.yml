@@ -1,0 +1,26 @@
+---
+database_name: dw_datamarts_growth
+table_name: portal_casa_mineira_advertiser_metrics
+columns:
+  date:
+    lineage:
+      - dw_public.dim_date.date
+  week_start:
+    lineage:
+      - dw_public.dim_date.week_start
+  month_start:
+    lineage:
+      - dw_public.dim_date.month_start
+  advertiser_id:
+    lineage:
+      - datalake_casa_mineira_portal_clean.real_estate_agency_history.id_real_estate_agency
+      - datalake_casa_mineira_portal_clean.real_estate_agency.id
+  advertiser_name:
+    lineage:
+      - datalake_casa_mineira_portal_clean.real_estate_agency.real_estate_agency_name
+  advertiser_uf:
+    lineage:
+      - datalake_casa_mineira_portal_clean.uf.uf_initials
+  advertiser_city:
+    lineage:
+      - datalake_casa_mineira_portal_clean.city.city_name

@@ -1,0 +1,3 @@
+---
+database_name: datalake_composer_raw
+table_name: log

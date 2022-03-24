@@ -23,4 +23,4 @@ def mocked_spark_client():
 
 @pytest.fixture
 def mocked_trino_client():
-    return TrinoClient(host="host", port=443, user="jose.silva")
+    return TrinoClient(host="host", port=443, user="jose.silva", password="pwd")

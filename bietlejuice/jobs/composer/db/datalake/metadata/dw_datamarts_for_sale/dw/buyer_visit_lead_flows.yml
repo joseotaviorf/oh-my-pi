@@ -1,0 +1,87 @@
+---
+database_name: dw_datamarts_for_sale
+table_name: buyer_visit_lead_flows
+columns:
+  user_key:
+    lineage:
+      - datalake_ebdb_clean.user_aud.id_user
+      - datalake_casa_mineira_crm_clean.contact.id_client
+      - datalake_classified_leads_clean.lead_reply_whatsapp.id_lead
+      - datalake_classified_leads_clean.lead_contact.id
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.user_aud.id_user
+  id_secretariat_client:
+    lineage:
+      - datalake_casa_mineira_crm_clean.contact.id_client
+  sk_region_classified:
+    lineage:
+      - dw_sale.fact_listings.sk_region
+  sk_region_secretariat_contact:
+    lineage:
+      - dw_sale.fact_listings.sk_region
+  sk_region_booking_cm:
+    lineage:
+      - dw_sale.fact_listings.sk_region
+  sk_region_visit_intent:
+    lineage:
+      - dw_public.dim_region.sk_region
+  sk_region_booking_5a:
+    lineage:
+      - dw_sale.fact_visits.sk_region
+  sk_first_region:
+    lineage:
+      - dw_sale.fact_listings.sk_region
+      - dw_sale.fact_visits.sk_region
+  sk_first_house:
+    lineage:
+      - datalake_classified_leads_clean.lead_contact.id_property
+      - datalake_casa_mineira_crm_clean.house.id_house_quintoandar
+      - datalake_amplitude_clean.events.event_properties
+      - dw_sale.fact_visits.sk_house
+  sk_house_sale_agreement:
+    lineage:
+      - datalake_casa_mineira_crm_clean.house.id_house_quintoandar
+      - dw_sale.fact_offers.sk_house
+  city_secretariat_contact:
+    lineage:
+      - datalake_casa_mineira_crm_clean.city.city_name
+  secretariat_contact_origin:
+    lineage:
+      - datalake_casa_mineira_crm_clean.origin_contact.origin_contact_name
+  secretariat_contact_midia:
+    lineage:
+      - datalake_casa_mineira_crm_clean.media_contact.media_contact_name
+  city_first_booking_cm:
+    lineage:
+      - datalake_casa_mineira_crm_clean.city.city_name
+  ts_first_visit_lead_intent:
+    lineage:
+      - datalake_classified_leads_clean.lead_contact.ts_received
+      - datalake_amplitude_clean.events.ts_event
+      - dw_public.dim_booking.dt_created
+      - dw_public.dim_date.date
+  ts_classified_first_intent:
+    lineage:
+      - datalake_classified_leads_clean.lead_contact.ts_received
+  ts_first_visit_scheduling_event:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+  ts_first_booking_created_5a:
+    lineage:
+      - dw_public.dim_booking.dt_created
+  ts_first_visit_completed_5a:
+    lineage:
+      - dw_public.dim_booking.dt_scheduling
+  ts_first_booking:
+    lineage:
+      - dw_public.dim_booking.dt_created
+  ts_first_visit_completed:
+    lineage:
+      - dw_public.dim_booking.dt_scheduling
+  dt_first_offer_submitted:
+    lineage:
+      - dw_public.dim_date.date
+  dt_sale_agreement_signed:
+    lineage:
+      - dw_public.dim_date.date

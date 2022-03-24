@@ -1,0 +1,28 @@
+---
+database_name: dw_datamarts_for_sale
+table_name: deal_making_funnel
+columns:
+  id_offer:
+    lineage:
+      - datalake_firestore.sale_offer.id
+  id_consultant_adjusted:
+    lineage:
+      - datalake_firestore.monday.id_consultant
+  id_closing_specialist:
+    lineage:
+      - datalake_gsheets_clean.monday_users.id_monday
+  name_consultant:
+    lineage:
+      - datalake_gsheets_clean.monday_users.user_name
+  closing_specialist_email:
+    lineage:
+      - datalake_gsheets_clean.monday_users.user_email
+  sale_agreement_status:
+    lineage:
+      - datalake_firestore.monday.sale_agreement_status
+  dt_offer_dismissed_qualified:
+    lineage:
+      - datalake_firestore.monday.dt_offer_dismissed
+  dt_offer_dismissed_unqualified:
+    lineage:
+      - datalake_firestore.monday.dt_offer_dismissed

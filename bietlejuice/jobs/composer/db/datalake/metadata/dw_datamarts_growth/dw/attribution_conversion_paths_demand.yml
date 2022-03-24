@@ -1,0 +1,17 @@
+---
+database_name: dw_datamarts_growth
+table_name: attribution_conversion_paths_demand
+columns:
+  sk_conversion_date:
+    lineage:
+      - datalake_amplitude_page_viewed_events.contract_docusign_signed_events.ts_event
+  sk_region:
+    lineage:
+      - dw_public.fact_house_listings.sk_region
+  unique_conversion_id:
+    lineage:
+      - datalake_amplitude_page_viewed_events.listing_page_viewed.id_amplitude
+      - datalake_amplitude_page_viewed_events.home_page_viewed.id_amplitude
+      - datalake_amplitude_page_viewed_events.search_results_page_viewed.id_amplitude
+      - datalake_amplitude_page_viewed_events.schedule_page_viewed.id_amplitude
+      - datalake_amplitude_page_viewed_events.contract_docusign_signed_events.id_amplitude

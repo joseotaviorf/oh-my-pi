@@ -1,0 +1,56 @@
+---
+database_name: dw_datamarts_growth
+table_name: plaquinhas_houses
+columns:
+  id_house:
+    lineage:
+      - dw_public.fact_house_listing_status.sk_house_listing
+      - dw_sale.fact_listing_status.sk_sale_listing
+  business_context:
+    lineage:
+      - datalake_gsheets_clean.plaquinhas_installation_targets.business_context
+  short_region_name:
+    lineage:
+      - dw_public.dim_region.short_region_name
+  city_group:
+    lineage:
+      - datalake_gsheets_clean.plaquinhas_installation_targets.city_group
+      - dw_public.dim_region.city_group
+  city_name:
+    lineage:
+      - dw_public.dim_region.city_name
+  subregion_name:
+    lineage:
+      - dw_public.dim_region.name
+  installation_type:
+    lineage:
+      - datalake_gsheets_clean.branding_where_is_plaquinha.installation_type
+  listing_type:
+    lineage:
+      - datalake_gsheets_clean.branding_where_is_plaquinha.listing_type
+  weekday_name:
+    lineage:
+      - dw_public.dim_date.weekday_name
+  dt_month_end:
+    lineage:
+      - dw_public.dim_date.month_end
+  dt:
+    lineage:
+      - dw_public.dim_date.date
+  dt_plaquinha_installed:
+    lineage:
+      - datalake_gsheets_clean.branding_where_is_plaquinha.date
+      - dw_public.dim_photo_job.dt_photos_uploaded
+  dt_plaquinha_installed_house:
+    lineage:
+      - datalake_gsheets_clean.branding_where_is_plaquinha.date
+      - dw_public.dim_photo_job.dt_photos_uploaded
+  new_installed_plaquinhas_target:
+    lineage:
+      - datalake_gsheets_clean.plaquinhas_installation_targets.new_installed_plaquinhas_target
+  active_plaquinhas_target:
+    lineage:
+      - datalake_gsheets_clean.plaquinhas_installation_targets.active_plaquinhas_target
+  cover_percent_target:
+    lineage:
+      - datalake_gsheets_clean.plaquinhas_installation_targets.cover_percent_target

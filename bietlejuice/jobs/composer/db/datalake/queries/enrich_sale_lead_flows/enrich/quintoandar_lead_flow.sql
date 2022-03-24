@@ -26,6 +26,7 @@ WITH all_users AS (
 -- BOOKING EVENTS
 booking AS (
     SELECT
+        b.id AS id_booking,
         b.id_visitor AS id_user,
         b.id_house AS id_house,
         h.id_region,
@@ -69,15 +70,15 @@ last_booking AS (
 booking_statistics AS (
     SELECT
         id_user,
-        COUNT(*) AS total_bookings_created,
-        COUNT(
+        COUNT(DISTINCT id_booking) AS total_bookings_created,
+        COUNT(DISTINCT
             CASE
-                WHEN is_canceled=true THEN 1
+                WHEN is_canceled=true THEN id_booking
             END
         ) AS total_bookings_canceled,
-        COUNT(
+        COUNT(DISTINCT
             CASE
-                WHEN UPPER(user_sale_booking_creator) = 'SECRETARIA' THEN 1
+                WHEN UPPER(user_sale_booking_creator) = 'SECRETARIA' THEN id_booking
             END
         ) AS total_bookings_created_by_secretariat
     FROM
@@ -213,6 +214,24 @@ offers_statistics AS (
         offers
     GROUP BY 
         id_user
+),
+
+-- TTA Events
+sale_talk_to_agent AS (
+    SELECT
+        evt.id_user,
+        MIN(CAST(evt.ts_event AS TIMESTAMP)) AS ts_first_tta_message_sent,
+        MAX(CAST(evt.ts_event AS TIMESTAMP)) AS ts_last_tta_message_sent
+    FROM 
+        datalake_amplitude_talk_to_agent.talk_to_agent_events AS evt
+    JOIN
+        datalake_ebdb_listing.listing_business_context AS lbc
+            ON evt.id_house = lbc.id_house
+    WHERE
+        CAST(ts_event AS DATE) > DATE('2020-03-01') -- month_start of tta event
+        AND evt.business_context = 'SALE'
+        AND lbc.business_context = 'SALE'
+  GROUP BY 1
 ),
 
 -- SALES FLOW
@@ -409,27 +428,29 @@ SELECT
             THEN 'talk_to_agent'
     END AS last_event,
     CASE
-        WHEN COALESCE(fvi.ts_first_visit_scheduling_event, fc.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
-                    fv.ts_visit_completed, fv.ts_created) = fvi.ts_first_visit_scheduling_event
-            THEN 'lead_submission'
-        WHEN COALESCE(fvi.ts_first_visit_scheduling_event, fc.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
-                    fv.ts_visit_completed, fv.ts_created) = fc.dt_sale_agreement_signed
+        WHEN COALESCE(fc.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
+                    fv.ts_visit_completed, fv.ts_created, fvi.ts_first_visit_scheduling_event, tta.ts_first_tta_message_sent) = fc.dt_sale_agreement_signed
             THEN 'sale_agreement_signed'
-        WHEN COALESCE(fvi.ts_first_visit_scheduling_event, fc.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
-                    fv.ts_visit_completed, fv.ts_created) = fo.dt_offer_accepted
+        WHEN COALESCE(fc.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
+                    fv.ts_visit_completed, fv.ts_created, fvi.ts_first_visit_scheduling_event, tta.ts_first_tta_message_sent) = fo.dt_offer_accepted
             THEN 'offer_accepted'
-        WHEN COALESCE(fvi.ts_first_visit_scheduling_event, fc.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
-                    fv.ts_visit_completed, fv.ts_created) = fo.ts_offer_submitted
+        WHEN COALESCE(fc.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
+                    fv.ts_visit_completed, fv.ts_created, fvi.ts_first_visit_scheduling_event, tta.ts_first_tta_message_sent) = fo.ts_offer_submitted
             THEN 'offer_submitted'
-        WHEN COALESCE(fvi.ts_first_visit_scheduling_event, fc.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
-                    fv.ts_visit_completed, fv.ts_created) = fv.ts_visit_completed
+        WHEN COALESCE(fc.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
+                    fv.ts_visit_completed, fv.ts_created, fvi.ts_first_visit_scheduling_event, tta.ts_first_tta_message_sent) = fv.ts_visit_completed
             THEN 'visit_completed'
-        WHEN COALESCE(fvi.ts_first_visit_scheduling_event, fc.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
-                    fv.ts_visit_completed, fv.ts_created) = fv.ts_created
+        WHEN COALESCE(fc.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
+                    fv.ts_visit_completed, fv.ts_created, fvi.ts_first_visit_scheduling_event, tta.ts_first_tta_message_sent) = fv.ts_created
             THEN 'booking_created'
-        WHEN COALESCE(fvi.ts_first_visit_scheduling_event, fc.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
-                    fv.ts_visit_completed, fv.ts_created) IS NULL
+        WHEN COALESCE(fc.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
+                    fv.ts_visit_completed, fv.ts_created, fvi.ts_first_visit_scheduling_event, tta.ts_first_tta_message_sent) = fvi.ts_first_visit_scheduling_event
+            THEN 'lead_submission'
+        WHEN COALESCE(fc.dt_sale_agreement_signed, fo.dt_offer_accepted, fo.ts_offer_submitted,
+                    fv.ts_visit_completed, fv.ts_created, fvi.ts_first_visit_scheduling_event, tta.ts_first_tta_message_sent) = tta.ts_first_tta_message_sent
             THEN 'talk_to_agent'
+        ELSE
+            'not_mapped'
     END AS further_funnel_step,
     CASE 
         WHEN fb.ts_booking_created IS NOT NULL THEN TRUE
@@ -447,6 +468,8 @@ SELECT
     COALESCE(os.total_sale_agreement_signed, 0) AS total_sale_agreement_signed,
     fvi.ts_first_visit_scheduling_event,
     lvi.ts_last_visit_scheduling_event,
+    tta.ts_first_tta_message_sent,
+    tta.ts_last_tta_message_sent,
     fb.ts_booking_created AS ts_first_booking_created,
     lb.ts_booking_created AS ts_last_booking_created,
     fv.ts_visit_completed AS ts_first_visit_completed,
@@ -511,3 +534,6 @@ LEFT JOIN
 LEFT JOIN 
     last_visit_intent AS lvi
         ON lvi.id_user = u.id_user
+LEFT JOIN
+    sale_talk_to_agent AS tta
+        ON tta.id_user = u.id_user

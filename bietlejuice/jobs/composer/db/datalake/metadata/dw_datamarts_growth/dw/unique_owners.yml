@@ -1,0 +1,73 @@
+---
+database_name: dw_datamarts_growth
+table_name: unique_owners
+columns:
+  id_proprietario:
+    lineage:
+      - dw_public.dim_user.telefone_principal
+      - dw_public.dim_lead.telefone_anunciante
+  sk_date_cadastro:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_lead_date
+      - dw_public.fact_house_listing_flows.sk_lead_date
+  sk_lead:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_lead
+      - dw_public.fact_house_listing_flows.sk_lead
+  sk_house_listing:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_house_listing
+      - dw_public.fact_house_listing_flows.sk_house_listing
+  id_house:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_house_listing
+      - dw_public.fact_house_listing_flows.sk_house_listing
+  sk_user:
+    lineage:
+      - dw_public.fact_house_listings.sk_owner
+  nome:
+    lineage:
+      - dw_public.dim_user.nome
+  email:
+    lineage:
+      - dw_public.dim_user.email
+  telefone:
+    lineage:
+      - dw_public.dim_user.telefone_principal
+      - dw_public.dim_lead.telefone_anunciante
+  mkt_origin:
+    lineage:
+      - dw_sale.fact_listing_flows.mkt_origin
+      - dw_public.fact_house_listing_flows.mkt_origin
+  mkt_channel:
+    lineage:
+      - dw_sale.fact_listing_flows.mkt_channel
+      - dw_public.fact_house_listing_flows.mkt_channel
+  mkt_medium:
+    lineage:
+      - dw_sale.fact_listing_flows.mkt_medium
+      - dw_public.fact_house_listing_flows.mkt_medium
+  mkt_source:
+    lineage:
+      - dw_sale.fact_listing_flows.mkt_source
+      - dw_public.fact_house_listing_flows.mkt_source
+  sk_lead_date:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_lead_date
+      - dw_public.fact_house_listing_flows.sk_lead_date
+  sk_prospect_date:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_prospect_date
+      - dw_public.fact_house_listing_flows.sk_prospect_date
+  sk_qualified_date:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_qualified_date
+      - dw_public.fact_house_listing_flows.sk_qualified_date
+  sk_opportunity_date:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_opportunity_date
+      - dw_public.fact_house_listing_flows.sk_opportunity_date
+  sk_first_listing_date:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_first_listing_date
+      - dw_public.fact_house_listing_flows.sk_first_listing_date

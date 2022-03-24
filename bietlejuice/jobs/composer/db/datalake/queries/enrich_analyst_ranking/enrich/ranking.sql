@@ -78,6 +78,7 @@ crm_metrics AS (
   )
   SELECT
     ac.id_assignee AS id_agent,
+    turf.type,
     DATE(tarf.ts_completed) AS dt,
     COUNT(1) AS total_tasks_solved_crm
   FROM
@@ -108,24 +109,13 @@ crm_metrics AS (
     )
     AND LOWER(turf.action_type) = 'realize'
     AND DATE(tarf.ts_completed) = DATE('{year}-{month}-{day}')
-  GROUP BY 1,2
+  GROUP BY 1,2,3
 )
 SELECT
   COALESCE(ztm.id_agent, csat.id_agent, crm.id_agent) AS id_agent,
   ac.agent_company,
   ac.manager AS agent_manager,
-  CASE 
-    WHEN 
-      COALESCE(ztm.department, csat.department) IN (
-        'Offboarding [OFF] [POS] [BACK]', 
-        'Proteção QuintoAndar [OFF] [POS] [BACK]', 
-        'Rescisão - Despejo [OFF][POS][BACK]', 
-        'Offboarding Reparos [OFF] [POS] [BACK]'
-      )
-      OR COALESCE(ztm.department, csat.department) IS NULL
-      THEN aro.ranking
-    ELSE COALESCE(ztm.department, csat.department) 
-  END AS department,
+  COALESCE(ztm.department, csat.department, crm.type) AS department,
   SUM(csat.sum_csat_satisfied_score) AS sum_csat_satisfied_score,
   SUM(csat.sum_csat_dissatisfied_score) AS sum_csat_dissatisfied_score,
   SUM(csat.total_tickets_resolution) AS total_tickets_resolution,
@@ -154,8 +144,4 @@ FULL OUTER JOIN
 JOIN
   datalake_gsheets_clean.agents_control ac
     ON ac.id_assignee = COALESCE(ztm.id_agent, csat.id_agent, crm.id_agent)
-LEFT JOIN
-  datalake_gsheets_clean.agents_ranking_offboarding aro
-    ON ac.email = aro.email
-    AND COALESCE(ztm.dt, csat.dt, crm.dt) BETWEEN aro.dt_start AND COALESCE(aro.dt_end, DATE(NOW()))
 GROUP BY 1,2,3,4,14,15,16,17

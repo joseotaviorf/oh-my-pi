@@ -4,11 +4,9 @@ columns:
   sk_department:
     lineage:
       - datalake_gsheets_clean.department_control.department
-      - datalake_gsheets_clean.agents_ranking_offboarding.ranking
   department:
     lineage:
       - datalake_gsheets_clean.department_control.department
-      - datalake_gsheets_clean.agents_ranking_offboarding.ranking
   board:
     lineage:
       - datalake_gsheets_clean.department_control.board

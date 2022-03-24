@@ -1,0 +1,32 @@
+database_name: dw_quintoandar
+table_name: fact_tenant_document_status
+columns:
+  sk_document:
+    lineage:
+      - datalake_ebdb_clean.proposal_document.id
+      - datalake_ebdb_clean.proponent_info_resend_request_aud.id_proposal_document
+  sk_proponent:
+    lineage:
+      - datalake_ebdb_clean.proponent_info_resend_request_aud.id_proponent_proposal
+      - datalake_ebdb_clean.proponent_proposal.id
+  sk_proposal:
+    lineage:
+      - datalake_ebdb_clean.proponent_proposal.id_proposal
+      - datalake_ebdb_clean.proposal_aud.id_proposal
+  sk_document_status_date:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  document_type:
+    lineage:
+      - datalake_ebdb_clean.proposal_document.type
+      - datalake_ebdb_clean.proponent_info_resend_request_aud.proponent_info_type
+  status:
+    lineage:
+      - datalake_ebdb_clean.proposal_aud.tenant_documentation_status
+  resend_document_reason:
+    lineage:
+      - datalake_ebdb_clean.proponent_info_resend_request_aud.resend_document_reason
+  ts_document_status:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  

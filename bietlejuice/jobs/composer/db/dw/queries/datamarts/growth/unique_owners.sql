@@ -1,12 +1,12 @@
 WITH proprietarios AS(
     SELECT
-        distinct
+        DISTINCT
             du.sk_user AS sk_user,
             du.nome AS nome,
             du.email AS email,
             du.telefone_principal AS telefone_principal
     FROM
-        dim_user du
+        dim_user AS du
 
 ),
 leads AS (
@@ -27,11 +27,12 @@ leads AS (
             fhlf.mkt_source AS mkt_source,
             'sale' AS business_context
         FROM
-            dim_lead dl
+            dim_lead AS dl
         JOIN
-            sale.fact_listing_flows fhlf
-                ON fhlf.sk_lead = dl.sk_lead
-        WHERE sk_lead_date > 0
+            sale.fact_listing_flows AS fhlf
+            ON fhlf.sk_lead = dl.sk_lead
+        WHERE
+            sk_lead_date > 0
         )
 
         UNION ALL
@@ -52,19 +53,22 @@ leads AS (
             fhlf.mkt_source AS mkt_source,
             'rent' AS business_context
         FROM
-            dim_lead dl
+            dim_lead AS dl
         JOIN
-            fact_house_listing_flows fhlf
-                ON fhlf.sk_lead = dl.sk_lead
-        WHERE sk_lead_date > 0
+            fact_house_listing_flows AS fhlf
+            ON fhlf.sk_lead = dl.sk_lead
+        WHERE
+            sk_lead_date > 0
         )
     ),
     count_context AS
         (SELECT
             id_house AS id_house_cc,
-            COUNT(distinct business_context) context_count
-        FROM leads_with_business_context
-        WHERE id_house > 0
+            COUNT(DISTINCT business_context) context_count
+        FROM
+            leads_with_business_context
+        WHERE
+            id_house > 0
         GROUP BY 1
         ),
 
@@ -72,16 +76,26 @@ leads AS (
         (SELECT
             *,
             ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY sk_lead_date ASC) AS first_lead
-        FROM leads_with_business_context lbc
-        LEFT JOIN count_context cc
-            ON  cc.id_house_cc = lbc.id_house
-        WHERE id_house > 0
+        FROM
+            leads_with_business_context AS lbc
+        LEFT JOIN
+            count_context AS cc
+            ON cc.id_house_cc = lbc.id_house
+        WHERE
+            id_house > 0
         )
 
-    (SELECT
-        *
-    FROM leads_with_business_context
-    WHERE id_house NOT IN (SELECT id_house FROM ranking)
+    (
+        SELECT *
+        FROM
+            leads_with_business_context
+        WHERE
+            id_house NOT IN (
+                SELECT
+                    id_house
+                FROM
+                ranking
+                )
     )
     UNION ALL
     (SELECT
@@ -102,20 +116,22 @@ leads AS (
             WHEN context_count = 2 THEN 'hybrid'
             ELSE business_context
         END AS business_context
-    FROM ranking
-    WHERE first_lead = 1
+    FROM
+        ranking
+    WHERE
+        first_lead = 1
     )
 ),
 house_listings AS (
     SELECT
-        distinct
+        DISTINCT
             dhl.id_house AS id_house,
             fhl.sk_owner AS sk_owner
     FROM
-        dim_house_listing dhl
+        dim_house_listing AS dhl
     JOIN
-        fact_house_listings fhl
-            ON dhl.sk_house_listing = fhl.sk_house_listing
+        fact_house_listings AS fhl
+        ON dhl.sk_house_listing = fhl.sk_house_listing
 
 ),
 visao_pp AS(
@@ -141,18 +157,19 @@ visao_pp AS(
         l.sk_opportunity_date,
         l.sk_first_listing_date
     FROM
-        leads l
+        leads AS l
     LEFT JOIN
-        house_listings hl
-            ON l.id_house = hl.id_house
+        house_listings AS hl
+        ON l.id_house = hl.id_house
     LEFT JOIN
-        proprietarios p
-            ON hl.sk_owner = p.sk_user
+        proprietarios AS p
+        ON hl.sk_owner = p.sk_user
 
 )
 SELECT
     SHA2(telefone, 256) AS id_proprietario,
     * ,
-    min(sk_lead_date) OVER (PARTITION BY telefone) sk_date_cadastro
-FROM visao_pp
+    min(sk_lead_date) OVER (PARTITION BY telefone) AS sk_date_cadastro
+FROM
+    visao_pp
 ORDER BY 1

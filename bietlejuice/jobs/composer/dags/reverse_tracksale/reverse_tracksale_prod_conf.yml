@@ -1,11 +1,26 @@
 ---
 campaigns:
+  - campaign_code: 253
+    query: lost_buyer_proposals
+    tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"},{"name": "Fluxo_5A","value": "business_context"}]'
+  - campaign_code: 251
+    query: lost_buyer_visits
+    tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"},{"name": "Fluxo_5A","value": "business_context"}]'
+  - campaign_code: 117
+    query: lost_iq_proposals
+    tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"}]'
   - campaign_code: 238
     query: lost_iq_rejected
     tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"}]'
   - campaign_code: 116
     query: lost_iq_visitas
     tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"}]'
+  - campaign_code: 104
+    query: lost_pp
+    tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"}]'
+  - campaign_code: 249
+    query: lost_seller_unpublished
+    tags: '[{"name": "Telefone","value": "customer_phone"},{"name": "Etapa","value": "campaign_step"},{"name": "Tipo de Cliente","value": "customer_type"},{"name": "CPF","value": "customer_cpf"},{"name": "User Id","value": "id_user"},{"name": "Tipo de Campanha","value": "campaign_type"},{"name": "Driver","value": "driver_type"},{"name": "Driver Id","value": "id_driver"},{"name": "Fluxo_5A","value": "business_context"}]'
 datalake_bucket_reverse: s3://5a-datalake-prod/reverse/tracksale/
 cluster_libs:
   whl: "s3://5a-artifacts/tracksale-api-client-python/quintoandar_tracksale_api_client-0.3.0-py2.py3-none-any.whl"

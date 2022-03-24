@@ -1,0 +1,16 @@
+---
+database_name: dw_datamarts_for_rent_cross
+table_name: user_cohort_rental_demand_conversion
+columns:
+  week_start:
+    lineage:
+      - dw_public.dim_date.week_start
+  month:
+    lineage:
+      - dw_public.dim_date.date
+  quarter:
+    lineage:
+      - dw_public.dim_date.quarter
+  funnel_first_touchpoint:
+    lineage:
+      - dw_datamarts_cross.funnel_demand_flows.funnel_first_touchpoint

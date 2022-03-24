@@ -46,6 +46,9 @@ columns:
   ts_updated:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.updated_at
+  ts_billed:
+    lineage:
+      - datalake_rental_guarantee_raw.guarantee.billed_at
   ts_cancellation_requested:
     lineage:
       - datalake_rental_guarantee_raw.guarantee.cancellation_requested_at

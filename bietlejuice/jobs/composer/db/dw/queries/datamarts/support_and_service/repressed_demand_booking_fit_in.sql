@@ -176,9 +176,9 @@ visit_hoursalert_confirmed AS (
         ts_event AS event_date,
         CAST(id_user AS BIGINT) AS user_id,
         CAST(json_extract_path_text(event_properties,'house_id') AS BIGINT) AS house_id,
-        CAST(COALESCE(json_extract_path_text(event_properties,'alert_target_date'), '') AS DATE) AS target_date,
-        CAST(COALESCE(json_extract_path_text(event_properties,'alert_slot_from'), '') AS BIGINT) AS alert_slot_from,
-        CAST(COALESCE(json_extract_path_text(event_properties,'alert_slot_to'), '') AS BIGINT) AS alert_slot_to
+        TO_DATE(COALESCE(json_extract_path_text(event_properties,'alert_target_date'),''),'XX, DD Mon YYYY') AS target_date,
+        COALESCE(CAST(NULLIF(json_extract_path_text(event_properties,'alert_slot_from'), '') AS BIGINT), -1) AS alert_slot_from,
+        COALESCE(CAST(NULLIF(json_extract_path_text(event_properties,'alert_slot_to'), '') AS BIGINT), -1) AS alert_slot_to
     FROM
         datalake_amplitude_clean_prod.events
     WHERE

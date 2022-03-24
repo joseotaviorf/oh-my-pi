@@ -1,0 +1,28 @@
+---
+database_name: dw_datamarts_growth_cross
+table_name: plaquinhas_metrics
+columns:
+  city_group:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.city_group
+  mkt_origin:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.mkt_origin
+  mkt_channel:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.mkt_channel
+  mkt_medium:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.mkt_medium
+  mkt_source:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.mkt_source
+  utm_campaign:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.utm_campaign
+  utm_term:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.utm_term
+  utm_content:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.utm_content

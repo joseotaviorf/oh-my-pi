@@ -5,6 +5,7 @@ dags_out_of_pattern:
     [
         "amplitude",
         "dw_affiliate_costs",
+        "dw_agent",
         "dw_agents_availability",
         "dw_booking",
         "dw_business_unit_region",
@@ -15,6 +16,7 @@ dags_out_of_pattern:
         "dw_datamarts_growth",
         "dw_datamarts_growth_cross",
         "dw_house",
+        "dw_invoice_entries",
         "dw_lead",
         "dw_listing",
         "dw_listing_jobs",
@@ -41,6 +43,7 @@ dags_out_of_pattern:
         "enrich_marketing_costs_offline",
         "enrich_marketing_costs_sharing_rules",
         "facebook_insights",
+        "gsheets.support_and_service",
         "marketing_costs",
         "marketing_costs_sharing_rules",
         "portal_casa_mineira_pipedrive",

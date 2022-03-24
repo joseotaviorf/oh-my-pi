@@ -1,0 +1,33 @@
+---
+database_name: datalake_offboarding
+table_name: nps
+columns:
+  id_contract:
+    lineage:
+      - datalake_nps_answer_drivers.answer_drivers.id_contract
+  id_nps_answer:
+    lineage:
+      - datalake_tracksale.answer.id
+      - datalake_casa_mineira_tracksale.answer.id
+  score:
+    lineage:
+      - datalake_tracksale.answer.score_category
+      - datalake_casa_mineira_tracksale.answer.score_category
+  customer_type:
+    lineage:
+      - datalake_tracksale.campaign.customer_type
+      - datalake_casa_mineira_tracksale.campaign.customer_type
+  comment:
+    lineage:
+      - datalake_tracksale.answer.nps_comment
+      - datalake_casa_mineira_tracksale.answer.nps_comment
+  dt_sent:
+    lineage:
+      - datalake_tracksale.dispatch_attributes.dispatch_time
+      - datalake_casa_mineira_tracksale.dispatch_attributes.dispatch_time
+  dt_termination:
+    lineage:
+      - datalake_offboarding.contract_termination.dt_termination
+  dt_termination_finished:
+    lineage:
+      - datalake_offboarding.contract_termination.ts_termination_finished

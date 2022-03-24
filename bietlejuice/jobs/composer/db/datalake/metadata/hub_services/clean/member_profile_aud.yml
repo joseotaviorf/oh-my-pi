@@ -1,0 +1,64 @@
+---
+database_name: datalake_hub_services_clean
+table_name: member_profile_aud
+columns:
+  id:
+    lineage:
+      - datalake_hub_services_raw.member_profile_aud.id
+  rev:
+    lineage:
+      - datalake_hub_services_raw.member_profile_aud.rev
+  rev_type:
+    lineage:
+      - datalake_hub_services_raw.member_profile_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_hub_services_raw.member_profile_aud.revend
+  id_business_unit:
+    lineage:
+      - datalake_hub_services_raw.member_profile_aud.business_unit_id
+  id_user:
+    lineage:
+      - datalake_hub_services_raw.member_profile_aud.user_id
+  version:
+    lineage:
+      - datalake_hub_services_raw.member_profile_aud.version
+  id_parent_member_profile:
+    lineage:
+      - datalake_hub_services_raw.member_profile_aud.parent_member_profile_id
+  profile:
+    lineage:
+      - datalake_hub_services_raw.member_profile_aud.profile
+  is_active:
+    lineage:
+      - datalake_hub_services_raw.member_profile_aud.active
+  mod_id_business_unit:
+    lineage:
+      - datalake_hub_services_raw.member_profile_aud.business_unit_id_mod
+  mod_id_user:
+    lineage:
+      - datalake_hub_services_raw.member_profile_aud.user_id_mod
+  mod_profile:
+    lineage:
+      - datalake_hub_services_raw.member_profile_aud.profile_mod
+  mod_active:
+    lineage:
+      - datalake_hub_services_raw.member_profile_aud.active_mod
+  mod_id_parent_member_profile:
+    lineage:
+      - datalake_hub_services_raw.member_profile_aud.parent_member_profile_id_mod
+  ts_created:
+    lineage:
+      - datalake_hub_services_raw.member_profile_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_hub_services_raw.member_profile_aud.updated_at
+  year:
+    lineage:
+      - datalake_hub_services_raw.member_profile_aud.year
+  month:
+    lineage:
+      - datalake_hub_services_raw.member_profile_aud.month
+  day:
+    lineage:
+      - datalake_hub_services_raw.member_profile_aud.day

@@ -8,9 +8,6 @@
 
 ############### Place the dependencies sorted alphabetically ##################
 ---
-bietlejuice.catalog_product_entities:
-  - bietlejuice.enrich_bigid:load-enrich-bigid-entities-access-level
-
 bietlejuice.dw_datamarts_cross:
   - bietlejuice.amplitude:update-clean-staging-subpartitioned-tables-spark
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
@@ -32,6 +29,7 @@ bietlejuice.dw_datamarts_cross:
   - bietlejuice.dw_user:load-public-dim-partner-into-redshift
   - bietlejuice.dw_user:load-public-dim-partner-agent-into-redshift
   - bietlejuice.dw_user_sales_rep:load-quintoandar-dim-user-sales-rep-into-redshift
+  - bietlejuice.ebdb:create-agent-data-clean-external-table
   - bietlejuice.ebdb:create-agent-support-clean-external-table
   - bietlejuice.ebdb:create-booking-clean-external-table
   - bietlejuice.ebdb:create-follow-up-details-clean-external-table
@@ -39,11 +37,14 @@ bietlejuice.dw_datamarts_cross:
   - bietlejuice.ebdb:create-house-aud-clean-external-table
   - bietlejuice.ebdb:create-listing-business-context-clean-external-table
   - bietlejuice.ebdb:create-user-revision-entity-clean-external-table
+  - bietlejuice.ebdb:create-user-clean-external-table
+  - bietlejuice.ebdb:create-work-contract-clean-external-table
   - bietlejuice.enrich_big_agent:create-enrich-agency-external-table
   - bietlejuice.enrich_big_agent:create-enrich-agent-external-table
   - bietlejuice.enrich_big_agent:create-enrich-enrollment-external-table
   - bietlejuice.enrich_big_agent:create-enrich-house-external-table
   - bietlejuice.enrich_big_agent:create-enrich-program-external-table
+  - bietlejuice.enrich_ebdb_listing:create-enrich-house-external-table
   - bietlejuice.gsheets:create-clean-taxonomy-demand-external-table
 
 bietlejuice.dw_datamarts_for_rent:
@@ -165,6 +166,7 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.enrich_ebdb_agents:create-enrich-agents-review-external-table
   - bietlejuice.enrich_firestore:create-enrich-monday-external-table
   - bietlejuice.enrich_firestore:create-enrich-sale-offer-external-table
+  - bietlejuice.enrich_sale_lead_flows:load-enrich-lead-flow
   - bietlejuice.gsheets:create-clean-monday-users-external-table
   - bietlejuice.gsheets:create-clean-offers-hub-central-external-table
   - bietlejuice.sales_flow:create-clean-ccv-flow-external-table
@@ -175,6 +177,8 @@ bietlejuice.dw_datamarts_for_sale:
 bietlejuice.dw_datamarts_for_sale_cross:
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
   - bietlejuice.dw_business_unit_region:load-sale-fact-business-unit-region-into-redshift
+  - bietlejuice.dw_datamarts_cross:create-agents-3p-in-datalake
+  - bietlejuice.dw_datamarts_cross:create-houses-3p-in-datalake
   - bietlejuice.dw_datamarts_cross:create-lead-listing-flows-in-datalake
   - bietlejuice.dw_datamarts_cross:create-quintoandar-consultant-listings-in-datalake
   - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
@@ -184,10 +188,6 @@ bietlejuice.dw_datamarts_for_sale_cross:
   - bietlejuice.dw_sale_offers:load-sale-dim-offer-into-redshift
   - bietlejuice.dw_sale_offers:load-sale-fact-offers-into-redshift
   - bietlejuice.dw_sale_visits:load-sale-fact-visits-into-redshift
-  - bietlejuice.ebdb:create-agent-data-clean-external-table
-  - bietlejuice.ebdb:create-user-clean-external-table
-  - bietlejuice.ebdb:create-work-contract-clean-external-table
-  - bietlejuice.enrich_ebdb_listing:create-enrich-house-external-table
   - bietlejuice.enrich_firestore:create-enrich-monday-external-table
   - bietlejuice.rene_descartes:create-clean-lead-rejection-external-table
   - bietlejuice.wololo:create-clean-context-discard-external-table
@@ -467,6 +467,7 @@ bietlejuice.dw_agent:
   - bietlejuice.gsheets:load-clean-auxiliary-region
 
 bietlejuice.dw_agents_availability:
+  - bietlejuice.dw_agent:load-dw-public-dim-agent-region
   - bietlejuice.ebdb:create-clean-agent-data-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-booking-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
@@ -550,9 +551,9 @@ bietlejuice.dw_customer_support:
   - bietlejuice.enrich_customer_support:load-enrich-csat
   - bietlejuice.enrich_customer_support:load-enrich-chat
   - bietlejuice.enrich_customer_support:load-enrich-email
-  - bietlejuice.gsheets:load-clean-department-control
-  - bietlejuice.gsheets:load-clean-agents-ranking-offboarding
   - bietlejuice.gsheets:load-clean-agents-ranking-targets
+  - bietlejuice.gsheets:load-clean-department-control
+  - bietlejuice.gsheets.support_and_service:load-clean-support-agents-department
   - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
 
 bietlejuice.dw_house:
@@ -572,6 +573,11 @@ bietlejuice.dw_invoice_entries:
   - bietlejuice.retsuko:load-clean-entry
   - bietlejuice.retsuko:load-clean-invoice
   - bietlejuice.enrich_retsuko:load-enrich-invoice
+
+bietlejuice.dw_invoice_entries_snapshot:
+  - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice
+  - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice-entry
+  - bietlejuice.dw_invoice_entries:load-dw-payment-fact-invoice-entries
 
 bietlejuice.dw_contract:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
@@ -816,8 +822,10 @@ bietlejuice.dw_tenant_documentation:
   - bietlejuice.docx:load-clean-credit-evaluation
   - bietlejuice.ebdb:create-clean-proponent-info-resend-request-in-data-lake
   - bietlejuice.ebdb:create-clean-proponent-proposal-in-data-lake
+  - bietlejuice.ebdb:create-clean-proposal-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-proposal-in-data-lake
   - bietlejuice.ebdb:create-clean-proposal-document-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
 
 bietlejuice.dw_tickets:
   - bietlejuice.enrich_zendesk_ticket_funnels
@@ -890,7 +898,6 @@ bietlejuice.enrich_analyst_ranking:
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-actions-resolutions-flow
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-users-resolutions-flow
   - bietlejuice.gsheets:load-clean-agents-control
-  - bietlejuice.gsheets:load-clean-agents-ranking-offboarding
   - bietlejuice.terminator:load-clean-termination
   - bietlejuice.terminator:load-clean-termination-workflow
 
@@ -1345,6 +1352,37 @@ bietlejuice.enrich_nps_answer_drivers:
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
 
+bietlejuice.enrich_offboarding:
+  - bietlejuice.ebdb:create-clean-contract-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.ebdb:create-clean-inspection-in-data-lake
+  - bietlejuice.enrich_customer_support:load-enrich-email
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract-b2b
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
+  - bietlejuice.enrich_ebdb_listing:load-enrich-portability
+  - bietlejuice.enrich_ebdb_listing_jobs:load-enrich-inspection
+  - bietlejuice.enrich_ebdb_user:load-enrich-user
+  - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-actions-resolutions-flow
+  - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-users-resolutions-flow
+  - bietlejuice.enrich_nps_answer_drivers:load-enrich-answer-drivers
+  - bietlejuice.enrich_tracksale:load-enrich-answer
+  - bietlejuice.enrich_tracksale:load-enrich-campaign
+  - bietlejuice.enrich_tracksale:load-enrich-customer-conversions
+  - bietlejuice.enrich_tracksale:load-enrich-dispatch
+  - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-ticket-funnel
+  - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
+  - bietlejuice.gsheets:load-clean-department-control
+  - bietlejuice.terminator:load-clean-application-user
+  - bietlejuice.terminator:load-clean-negotiation
+  - bietlejuice.terminator:load-clean-termination
+  - bietlejuice.terminator:load-clean-termination-aud
+  - bietlejuice.terminator:load-clean-termination-fee
+  - bietlejuice.terminator:load-clean-termination-fee-negotiation
+  - bietlejuice.terminator:load-clean-termination-workflow
+  - bietlejuice.terminator:load-clean-rev-info
+  - bietlejuice.terminator:load-clean-utility-bill
+
 bietlejuice.enrich_offer:
   - bietlejuice.ebdb:create-clean-agent-data-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-house-in-data-lake
@@ -1427,6 +1465,7 @@ bietlejuice.enrich_sale_closing_flows:
 
 bietlejuice.enrich_sale_flows:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_offer:load-enrich-sale-offer
 
@@ -1450,6 +1489,7 @@ bietlejuice.enrich_sale_lead_flows:
   - bietlejuice.ebdb:create-clean-user-aud-in-data-lake
   - bietlejuice.enrich_amplitude_sale_visit_intent:load-enrich-amplitude-sale-visit-intent
   - bietlejuice.enrich_booking:load-enrich-booking
+  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_offer:load-enrich-offer
   - bietlejuice.enrich_offer:load-enrich-sale-offer
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
@@ -1464,6 +1504,7 @@ bietlejuice.enrich_sale_listings:
   - bietlejuice.ebdb:create-clean-listing-business-context-in-data-lake
   - bietlejuice.ebdb:create-clean-listing-business-context-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
 

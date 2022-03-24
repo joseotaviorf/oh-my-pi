@@ -117,14 +117,27 @@ house_status_version_order_not_null_publi_date AS (
         house_status_version_first_publi
     WHERE 
         first_publication_change_version IS NOT NULL
+),
+
+final_base AS (
+  SELECT
+      *
+  FROM
+      house_status_version_order_null_publi_date
+  UNION ALL
+  SELECT
+      *
+  FROM
+      house_status_version_order_not_null_publi_date
 )
 
-SELECT
-    *
-FROM
-    house_status_version_order_null_publi_date
-UNION ALL
-SELECT
-    *
-FROM
-    house_status_version_order_not_null_publi_date
+SELECT fb.*
+FROM 
+    final_base AS fb
+-- Filter to remove Casa Mineira listings included in Quinto Andar tables due to the BBB 22 campaign
+LEFT JOIN
+  datalake_ebdb_listing.house AS h
+    ON h.id = fb.id_house
+      AND h.internal_admin_info = '3P\n[FS-CM]'
+WHERE
+  h.id IS NULL
