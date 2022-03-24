@@ -1,0 +1,25 @@
+---
+database_name: dw_datamarts_growth_cross
+table_name: performance_marketing_cluster_promotional_bonus_costs
+columns:
+  sk_user:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_cluster_promotional_bonus.sk_user
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
+  sk_date:
+    lineage:
+      - dw_public.dim_date.sk_date
+  listing_date:
+    lineage:
+      - dw_public.dim_date.date
+  listing_week_start:
+    lineage:
+      - dw_public.dim_date.week_start
+  year_month:
+    lineage:
+      - dw_public.dim_date.year_month
+  affiliate_type:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_cluster_promotional_bonus.affiliate_type
