@@ -2,7 +2,6 @@ SELECT
   id_group AS sk_group,
   MD5(team) AS sk_department,
   team AS department,
-  company,
   target_resolution,
   target_csat,
   target_frt,

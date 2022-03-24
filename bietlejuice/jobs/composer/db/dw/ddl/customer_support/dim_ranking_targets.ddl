@@ -3,7 +3,6 @@ CREATE TABLE IF NOT EXISTS customer_support.dim_ranking_targets (
     sk_group INTEGER,
     sk_department VARCHAR,
     department VARCHAR,
-    company VARCHAR,
     target_resolution FLOAT,
     target_csat FLOAT,
     target_frt FLOAT,
