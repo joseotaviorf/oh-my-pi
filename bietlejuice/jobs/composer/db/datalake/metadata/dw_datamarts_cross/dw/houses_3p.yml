@@ -1,0 +1,13 @@
+---
+database_name: dw_datamarts_cross
+table_name: houses_3p
+columns:
+  sk_house:
+    lineage:
+      - datalake_ebdb_listing.house.id
+  internal_admin_info:
+    lineage:
+      - datalake_ebdb_listing.house.internal_admin_info
+  partner:
+    lineage:
+      - datalake_ebdb_listing.house.internal_admin_info
