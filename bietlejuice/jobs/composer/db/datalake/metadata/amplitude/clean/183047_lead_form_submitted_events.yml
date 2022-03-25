@@ -1,0 +1,192 @@
+database_name: datalake_amplitude_clean
+table_name: 183047_lead_form_submitted_events
+columns:
+  id_amplitude:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.amplitude_id
+  ids_amplitude_attributed:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.amplitude_attribution_ids
+  adid:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.adid
+  amplitude_event_type:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.amplitude_event_type
+  id_app:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.app
+  city:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.city
+  ts_client_event:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.client_event_time
+  ts_client_uploaded:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.client_upload_time
+  country:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.country
+  data:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.data
+  ts_server_received:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.server_received_time
+  device_brand:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.device_brand
+  device_carrier:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.device_carrier
+  device_family:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.device_family
+  id_device:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.device_id
+  device_manufacturer:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.device_manufacturer
+  device_model:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.device_model
+  device_type:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.device_type
+  dma:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.dma
+  id_event:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.event_id
+  ts_event:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.event_time
+  event_type:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.event_type
+  event_properties:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.event_properties
+  is_attribution_event:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.is_attribution_event
+  idfa:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.idfa
+  ip_address:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.ip_address
+  location_lat:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.location_lat
+  location_lng:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.location_lng
+  os_name:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.os_name
+  os_version:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.os_version
+  platform:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.platform
+  library:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.library
+  is_paying:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.paying
+  region:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.region
+  ts_server_uploaded:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.server_upload_time
+  id_session:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.session_id
+  start_version:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.start_version
+  ts_user_created:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.user_creation_time
+  id_user:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.user_id
+  user_properties:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.user_properties
+  language:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.language
+  uuid:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.uuid
+  version_name:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.version_name
+  id_schema:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.schema
+  ts_processed:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.processed_time
+  id_inserted:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.insert_id
+  sample_rate:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.sample_rate
+  year:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.year
+  month:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.month
+  day:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.day
+  up_initial_utm_campaign:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.user_properties
+  up_initial_utm_medium:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.user_properties
+  up_initial_utm_source:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.user_properties
+  up_initial_utm_content:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.user_properties
+  up_initial_utm_term:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.user_properties
+  up_utm_campaign:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.user_properties
+  up_utm_medium:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.user_properties
+  up_utm_source:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.user_properties
+  up_utm_content:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.user_properties
+  up_utm_term:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.user_properties
+  up_platform:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.user_properties
+  up_referring_domain:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.user_properties
+  ep_formfield_lead_uuid:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_lead_form_submitted_events.event_properties
