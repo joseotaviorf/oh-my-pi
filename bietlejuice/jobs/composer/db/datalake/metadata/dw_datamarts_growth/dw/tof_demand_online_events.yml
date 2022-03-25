@@ -1,0 +1,46 @@
+---
+database_name: dw_datamarts_growth
+table_name: tof_demand_online_events
+columns:
+  event_week:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+  event_date:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+  event_timestamp:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+  id_user:
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+  id_amplitude:
+    lineage:
+      - datalake_amplitude_clean.events.id_amplitude
+  house_id:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  sk_house_listing:
+    lineage:
+      - dw_public.dim_house_listing.sk_house_listing
+  agent_id:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  talk_to_agent_message_content:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  utm_source:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  utm_medium:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  utm_campaign:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  utm_content:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  utm_term:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
