@@ -1,0 +1,29 @@
+---
+database_name: dw_datamarts_for_sale
+table_name: loft_status_listing_flows
+columns:
+  id_house:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.id
+  id_house_platform:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.id
+  id_neighborhood:
+    lineage:
+      - datalake_ebdb_clean.map_region.id
+  neighborhood:
+    lineage:
+      - datalake_ebdb_clean.map_region.name
+      - datalake_crawlers_listings_clean.loft.address
+  is_last_status:
+    lineage:
+      - dw_public.dim_date.week_start
+  ts_last_extraction:
+    lineage:
+      - dw_public.dim_date.week_start
+  ts_started_date:
+    lineage:
+      - dw_public.dim_date.week_start
+  ts_ended_date:
+    lineage:
+      - dw_public.dim_date.week_start
