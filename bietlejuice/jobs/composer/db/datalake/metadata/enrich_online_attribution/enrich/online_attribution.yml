@@ -1,0 +1,146 @@
+---
+database_name: datalake_online_attribution
+table_name: online_attribution
+columns:
+  event_type:
+    lineage:
+      - datalake_amplitude_clean.events
+  ts_event:
+    lineage:
+      - datalake_amplitude_clean.events
+  id_user:
+    lineage:
+      - datalake_amplitude_clean.events
+  id_amplitude:
+    lineage:
+      - datalake_amplitude_clean.events
+      - datalake_amplitude_clean.170698_user_merge
+  id_session:
+    lineage:
+      - datalake_amplitude_clean.events
+  id_house:
+    lineage:
+      - datalake_amplitude_clean.events
+  id_firestore:
+    lineage:
+      - datalake_amplitude_clean.events
+  visit_code:
+    lineage:
+      - datalake_amplitude_clean.events
+  entrance_uri:
+    lineage:
+      - datalake_amplitude_clean.events
+  uri_event_property:
+    lineage:
+      - datalake_amplitude_clean.events
+  web_medium:
+    lineage:
+      - datalake_amplitude_clean.events
+  web_source:
+    lineage:
+      - datalake_amplitude_clean.events
+  web_campaign:
+    lineage:
+      - datalake_amplitude_clean.events
+  web_content:
+    lineage:
+      - datalake_amplitude_clean.events
+  web_term:
+    lineage:
+      - datalake_amplitude_clean.events
+  web_last_medium:
+    lineage:
+      - datalake_amplitude_clean.events
+  web_last_source:
+    lineage:
+      - datalake_amplitude_clean.events
+  web_last_campaign:
+    lineage:
+      - datalake_amplitude_clean.events
+  web_last_content:
+    lineage:
+      - datalake_amplitude_clean.events
+  web_last_term:
+    lineage:
+      - datalake_amplitude_clean.events
+  adjust_adgroup:
+    lineage:
+      - datalake_amplitude_clean.events
+  adjust_campaign:
+    lineage:
+      - datalake_amplitude_clean.events
+  adjust_creative:
+    lineage:
+      - datalake_amplitude_clean.events
+  adjust_impression_based:
+    lineage:
+      - datalake_amplitude_clean.events
+  adjust_installed_at:
+    lineage:
+      - datalake_amplitude_clean.events
+  adjust_is_organic:
+    lineage:
+      - datalake_amplitude_clean.events
+  adjust_network:
+    lineage:
+      - datalake_amplitude_clean.events
+  platform:
+    lineage:
+      - datalake_amplitude_clean.events
+  web_branded:
+    lineage:
+      - datalake_amplitude_clean.events
+  ts_web_attribution:
+    lineage:
+      - datalake_amplitude_clean.events
+  app_source:
+    lineage:
+      - datalake_amplitude_clean.events
+  app_medium:
+    lineage:
+      - datalake_amplitude_clean.events
+  app_branded:
+    lineage:
+      - datalake_amplitude_clean.events
+  ts_app_attribution:
+    lineage:
+      - datalake_amplitude_clean.events
+  utm_source:
+    lineage:
+      - datalake_amplitude_clean.events
+  utm_medium:
+    lineage:
+      - datalake_amplitude_clean.events
+  mkt_flow:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand
+  mkt_completion:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand
+  mkt_source:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand
+  mkt_plataform:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_demand
+  branded:
+    lineage:
+      - datalake_amplitude_clean.events
+  visit_rn:
+    lineage:
+      - datalake_amplitude_clean.events
+  offer_rn_without_id_firestore:
+    lineage:
+      - datalake_amplitude_clean.events
+  offer_rn_id_firestore:
+    lineage:
+      - datalake_amplitude_clean.events

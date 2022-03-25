@@ -1,0 +1,7 @@
+---
+partition_cols:
+  - event_type
+  - year
+  - month
+  - day
+  
