@@ -41,61 +41,61 @@ WITH app_205027 AS (
 ),
 app_183047 AS (
     SELECT
-        formfield_lead_uuid,
+        ep_formfield_lead_uuid AS formfield_lead_uuid,
         event_properties,
         ts_event,
-        utm_campaign,
-        utm_medium,
-        utm_source,
-        utm_content,
-        utm_term,
-        app_type,
-        referring_domain,
+        up_utm_campaign AS utm_campaign,
+        up_utm_medium AS utm_medium,
+        up_utm_source AS utm_source,
+        up_utm_content AS utm_content,
+        up_utm_term AS utm_term,
+        up_platform AS app_type,
+        up_referring_domain AS referring_domain,
         region,
         city,
         uuid
     FROM
         datalake_amplitude_clean.183047_lead_form_submitted_events
     WHERE
-        formfield_lead_uuid IS NOT NULL
+        ep_formfield_lead_uuid IS NOT NULL
     UNION
     SELECT
-        formfield_lead_uuid,
+        ep_formfield_lead_uuid AS formfield_lead_uuid,
         event_properties,
         ts_event,
-        utm_campaign,
-        utm_medium,
-        utm_source,
-        utm_content,
-        utm_term,
-        app_type,
-        referring_domain,
+        up_utm_campaign AS utm_campaign,
+        up_utm_medium AS utm_medium,
+        up_utm_source AS utm_source,
+        up_utm_content AS utm_content,
+        up_utm_term AS utm_term,
+        up_platform AS app_type,
+        up_referring_domain AS referring_domain,
         region,
         city,
         uuid
     FROM
         datalake_amplitude_clean.183047_price_suggestion_form_submitted_events
     WHERE
-        formfield_lead_uuid IS NOT NULL
+        ep_formfield_lead_uuid IS NOT NULL
     UNION
     SELECT
-        formfield_lead_uuid,
+        ep_formfield_lead_uuid AS formfield_lead_uuid,
         event_properties,
         ts_event,
-        utm_campaign,
-        utm_medium,
-        utm_source,
-        utm_content,
-        utm_term,
-        app_type,
-        referring_domain,
+        up_utm_campaign AS utm_campaign,
+        up_utm_medium AS utm_medium,
+        up_utm_source AS utm_source,
+        up_utm_content AS utm_content,
+        up_utm_term AS utm_term,
+        up_platform AS app_type,
+        up_referring_domain AS referring_domain,
         region,
         city,
         uuid
     FROM
         datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events
     WHERE
-        formfield_lead_uuid IS NOT NULL
+        ep_formfield_lead_uuid IS NOT NULL
 ),
 prep_ref AS (
     select
