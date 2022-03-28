@@ -49,7 +49,7 @@ columns:
   sk_discard_date:
     lineage:
       - dw_sale.fact_listing_flows.sk_discard_date
-      - dw_public.fact_house_listing_flows.sk_discard_date	    
+      - dw_public.fact_house_listing_flows.sk_discard_date    
   sk_first_photojob_date_fact_photo_job:
     lineage:
       - dw_public.fact_photo_job.sk_date_job_created
