@@ -1,0 +1,62 @@
+---
+database_name: dw_datamarts_support_and_service
+table_name: ongoing_refund_requests
+columns:
+  id_request:
+    lineage:
+      - datalake_heimdall_clean.activity.id
+  id_expense:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  id_contract:
+    lineage:
+      - datalake_heimdall_clean.activity.id_external_contract
+  request_status:
+    lineage:
+      - datalake_heimdall_clean.activity.status
+  refund_type:
+    lineage:
+      - datalake_heimdall_clean.activity.type
+  expense_type:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  expense_group:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  expense_agreement_channel:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  expense_amount:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  expense_reccurence_type:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  current_installment:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  total_installments:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  expense_status:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  expense_rejection_reason:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  expense_rejection_comment:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  is_custom_expense:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  days_requested_to_analyzed:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+      - datalake_heimdall_clean.activity.transition_list
+  dt_requested:
+    lineage:
+      - datalake_heimdall_clean.activity.metadata
+  dt_analyzed:
+    lineage:
+      - datalake_heimdall_clean.activity.transition_list
