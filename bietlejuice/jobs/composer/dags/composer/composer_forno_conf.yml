@@ -4,7 +4,7 @@ tables:
   dag:
   dag_run:
   log:
-    is_incremental: False
+    is_incremental: True
     is_partitioned: True
     has_query: True
   task_fail:
