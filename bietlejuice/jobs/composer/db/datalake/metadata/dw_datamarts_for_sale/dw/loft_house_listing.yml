@@ -1,0 +1,108 @@
+---
+database_name: dw_datamarts_for_sale
+table_name: loft_house_listing
+columns:
+  sk_house:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.id
+  id_house:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.id
+  id_house_platform:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.id
+  id_neighborhood:
+    lineage:
+      - datalake_ebdb_clean.map_region.id
+  city:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.address
+      - datalake_ebdb_clean.map_region.city_name
+  city_group:
+    lineage:
+      - datalake_clean.ods_dim_region.city_group
+  neighborhood:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.address
+      - datalake_ebdb_clean.map_region.name
+  state:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.address
+  lat:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.geolocation
+  lng:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.geolocation
+  address:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.address
+  st_number:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.address
+  zip_code:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.address
+  floors:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.house_info
+  num_floors:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.house_info
+  total_area:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.house_info
+  bedrooms:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.house_info
+  suites:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.house_info
+  parking_spaces:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.house_info
+  bathrooms:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.house_info
+  year_built:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.house_info
+  unit_type:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.house_info
+  usage_type:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.house_info
+  price:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.price
+  price_m2:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.price
+      - datalake_crawlers_listings_clean.loft.house_info
+  condo_fee:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.price
+  iptu:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.price
+  nearby_other_platform_houses:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.id
+  avg_nearby_price_m2:
+    lineage:
+      - datalake_ebdb_clean.house.sale_price
+      - datalake_ebdb_clean.house.total_area
+      - datalake_casa_mineira_crm_clean.house.price
+      - datalake_casa_mineira_crm_clean.house.total_area
+  avg_distance:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.geolocation
+  is_platform_property:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.metadata
+  ts_updated:
+    lineage:
+      - datalake_crawlers_listings_clean.loft.year
+      - datalake_crawlers_listings_clean.loft.month
+      - datalake_crawlers_listings_clean.loft.day
