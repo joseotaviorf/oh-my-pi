@@ -12,7 +12,7 @@ SELECT
     day
 FROM
     datalake_composer_raw.log
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+-- WHERE
+--     year = {year}
+--     AND month = {month}
+--     AND day = {day}

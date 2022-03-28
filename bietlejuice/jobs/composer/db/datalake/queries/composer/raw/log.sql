@@ -6,9 +6,12 @@ SELECT
     event,
     execution_date,
     owner,
-    extra
+    extra,
+    YEAR(dttm) AS year,
+    MONTH(dttm) AS month,
+    DAY(dttm) AS day
 FROM
     log
 WHERE
-    DATE(dttm) = DATE('{start_date}')
+    DATE(dttm) >= DATE('2022-01-01') -- DATE('{start_date}')
     AND dag_id REGEXP 'bietlejuice'
