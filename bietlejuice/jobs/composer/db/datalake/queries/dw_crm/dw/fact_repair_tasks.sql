@@ -1,4 +1,4 @@
-WITH contracts AS (
+    WITH contracts AS (
     SELECT
         turf.id_action_date AS sk_action_date,
         turf.id_assignee AS sk_assignee,
