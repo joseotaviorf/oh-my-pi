@@ -25,7 +25,7 @@ exploded_backlog AS (
         DATE(COALESCE(ts_completed, NOW()))
       )
     ) AS dt_interval,
-    DATE_TRUNC('week', ts_completed) as dt_final,
+    DATE(ts_completed) AS dt_final,
     ts_started,
     ts_completed
   FROM
