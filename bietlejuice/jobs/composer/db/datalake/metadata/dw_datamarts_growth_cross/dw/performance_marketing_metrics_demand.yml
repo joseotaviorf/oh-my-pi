@@ -160,7 +160,7 @@ columns:
       - datalake_gsheets_clean.rental_ntp_source_targets.ntp_target
   recovered_tenant_prospects_target:
     lineage:
-      - datalake_gsheets_clean.rental_ntp_source_targets.recovered_tenant_prospects_target
+      - datalake_gsheets_clean.rental_ntp_source_targets.rtp_target
   budget:
     lineage:
       - datalake_gsheets_clean.demand_targets_replanning.budget
