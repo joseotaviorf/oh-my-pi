@@ -63,7 +63,7 @@ rent_flows AS (
 		    ON evt.sk_region = dr.sk_region
 )
 SELECT
-    sk_date,
+    sk_date AS id_date,
     city_group,
     COUNT(DISTINCT sk_client) /
         NULLIF(SUM(COUNT(DISTINCT sk_client)) OVER(PARTITION BY sk_date), 0)::FLOAT AS share,
