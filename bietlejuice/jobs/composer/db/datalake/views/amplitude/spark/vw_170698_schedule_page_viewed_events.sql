@@ -2,7 +2,7 @@ DROP VIEW IF EXISTS datalake_amplitude_clean.170698_schedule_page_viewed_events;
 CREATE OR REPLACE VIEW datalake_amplitude_clean.170698_schedule_page_viewed_events
 AS
   SELECT
-    GET_JSON_OBJECT(event_properties, '$.house_id') AS id_house,
+    GET_JSON_OBJECT(event_properties, '$.house_id') AS ep_house_id,
     *,
     COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(user_properties, '$.entrance_uri'), 'utm_source=([^&|$]+)', 1), ''), 'direct') AS up_utm_source,
     COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(user_properties, '$.entrance_uri'), 'utm_medium=([^&|$]+)', 1), ''), 'direct') AS up_utm_medium,
