@@ -1,0 +1,107 @@
+---
+database_name: dw_datamarts_cross
+table_name: lead_listing_flows
+columns:
+  sk_house_listing_flow:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_house_listing_flow
+      - dw_public.fact_house_listing_flows.sk_house_listing_flow
+  sk_lead:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_lead
+      - dw_public.fact_house_listing_flows.sk_lead
+  sk_house_listing:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_house_listing
+      - dw_public.fact_house_listing_flows.sk_house_listing
+  sk_region:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_region
+      - dw_public.fact_house_listing_flows.sk_region
+  sk_lead_date:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_lead_date
+      - dw_public.fact_house_listing_flows.sk_lead_date
+  sk_first_contact_date:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_first_contact_date
+      - dw_public.fact_house_listing_flows.sk_first_contact_date
+  sk_prospect_date:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_prospect_date
+      - dw_public.fact_house_listing_flows.sk_prospect_date
+  sk_qualified_date:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_qualified_date
+      - dw_public.fact_house_listing_flows.sk_qualified_date
+  sk_opportunity_date:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_opportunity_date
+      - dw_public.fact_house_listing_flows.sk_opportunity_date
+  sk_first_listing_date:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_first_listing_date
+      - dw_public.fact_house_listing_flows.sk_first_listing_date
+  sk_conversion_date:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_conversion_date
+      - dw_public.fact_house_listing_flows.sk_conversion_date
+  sk_discard_date:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_discard_date
+      - dw_public.fact_house_listing_flows.sk_discard_date	    
+  sk_first_photojob_date_fact_photo_job:
+    lineage:
+      - dw_public.fact_photo_job.sk_date_job_created
+  mkt_completion:
+    lineage:
+      - dw_sale.fact_listing_flows.mkt_completion
+      - dw_public.fact_house_listing_flows.mkt_completion
+  mkt_channel:
+    lineage:
+      - dw_sale.fact_listing_flows.mkt_channel
+      - dw_public.fact_house_listing_flows.mkt_channel
+  mkt_medium:
+    lineage:
+      - dw_sale.fact_listing_flows.mkt_medium
+      - dw_public.fact_house_listing_flows.mkt_medium
+  sales_company:
+    lineage:
+      - dw_public.dim_lead.sales_company
+      - dw_quintoandar.dim_user_sales_rep.sales_company
+  lead_origin:
+    lineage:
+      - dw_sale.fact_listing_flows.lead_origin
+      - dw_public.fact_house_listing_flows.lead_origin
+  funnel_drop_reason:
+    lineage:
+      - dw_sale.fact_listing_flows.funnel_drop_reason
+      - dw_public.fact_house_listing_flows.funnel_drop_reason
+  lead_context_origin:
+    lineage:
+      - dw_sale.fact_listing_flows.lead_context_origin
+      - dw_public.fact_house_listing_flows.lead_context_origin
+  has_isales_intervention:
+    lineage:
+      - dw_sale.fact_listing_flows.has_isales_intervention
+      - dw_public.fact_house_listing_flows.has_isales_intervention
+  sk_user_lead_affiliate:
+    lineage:
+      - dw_sale.fact_listing_flows.sk_user_lead_affiliate
+      - dw_public.fact_house_listing_flows.sk_user_lead_affiliate
+  first_prospect_date:
+    lineage:
+      - dw_public.fact_house_listing_flows.sk_prospect_date
+      - dw_sale.fact_listing_flows.sk_prospect_date
+  last_prospect_date:
+    lineage:
+      - dw_public.fact_house_listing_flows.sk_prospect_date
+      - dw_sale.fact_listing_flows.sk_prospect_date
+  first_qualified_date:
+    lineage:
+      - dw_public.fact_house_listing_flows.sk_qualified_date
+      - dw_sale.fact_listing_flows.sk_qualified_date
+  last_qualified_date:
+    lineage:
+      - dw_public.fact_house_listing_flows.sk_qualified_date
+      - dw_sale.fact_listing_flows.sk_qualified_date
