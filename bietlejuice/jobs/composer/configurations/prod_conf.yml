@@ -19,7 +19,6 @@ dags_out_of_pattern:
         "dw_invoice_entries",
         "dw_lead",
         "dw_listing",
-        "dw_listing_jobs",
         "dw_offer",
         "dw_proposal",
         "dw_quinto_messenger",
