@@ -13,6 +13,5 @@ SELECT
 FROM
     log
 WHERE
-    DATE(dttm) >= DATE('2021-10-01') -- DATE('{start_date}')
-    AND DATE(dttm) < DATE('2022-01-01')
+    DATE(dttm) >= DATE('2022-01-01') -- DATE('{start_date}')
     AND dag_id REGEXP 'bietlejuice'
