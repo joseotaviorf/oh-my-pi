@@ -155,16 +155,16 @@ pipeline:
 #  =======================================================================
 # =============================== PYTHON 3 ===============================
 #  =======================================================================
-#  check-style-python3:
-#    group: tests
-#    image: python:3.7.3
-#    commands:
-#      - apt-get update
-#      - apt-get install -y git > /dev/null
-#      - chmod +x scripts/execute_python3_steps.sh
-#      - bash scripts/execute_python3_steps.sh "make requirements-lint-python3" "make check-style-python3"
-#    when:
-#      event: push
+  check-style-python3:
+    group: tests
+    image: python:3.7.3
+    commands:
+      - apt-get update
+      - apt-get install -y git > /dev/null
+      - chmod +x scripts/execute_python3_steps.sh
+      - bash scripts/execute_python3_steps.sh "make requirements-lint-python3" "make check-style-python3"
+    when:
+      event: push
 
   files-validation-python3:
     group: tests
