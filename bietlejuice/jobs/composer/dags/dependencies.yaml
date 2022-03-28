@@ -560,19 +560,10 @@ bietlejuice.dw_house:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
 
 bietlejuice.dw_invoice_entries:
-  - bietlejuice.ebdb:create-clean-affiliate-data-in-data-lake
-  - bietlejuice.ebdb:create-clean-contract-in-data-lake
-  - bietlejuice.ebdb:create-clean-conversion-lead-in-data-lake
-  - bietlejuice.ebdb:create-clean-house-in-data-lake
-  - bietlejuice.ebdb:create-clean-lead-in-data-lake
-  - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
-  - bietlejuice.ebdb:create-clean-rent-flow-in-data-lake
-  - bietlejuice.ebdb:create-clean-user-in-data-lake
-  - bietlejuice.retsuko:load-clean-account
-  - bietlejuice.retsuko:load-clean-contract
-  - bietlejuice.retsuko:load-clean-entry
-  - bietlejuice.retsuko:load-clean-invoice
+  - bietlejuice.enrich_invoice:load-enrich-invoice-entries
+  - bietlejuice.enrich_invoice:load-enrich-invoice-revenues
   - bietlejuice.enrich_retsuko:load-enrich-invoice
+  - bietlejuice.enrich_retsuko:load-enrich-invoice-entry
 
 bietlejuice.dw_invoice_entries_snapshot:
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice
@@ -834,9 +825,17 @@ bietlejuice.dw_tickets:
   - bietlejuice.zendesk_tickets:load-clean-users
 
 bietlejuice.dw_tracksale:
-  - bietlejuice.enrich_tracksale
+  - bietlejuice.enrich_tracksale:load-enrich-answer
+  - bietlejuice.enrich_tracksale:load-enrich-answer-cities
+  - bietlejuice.enrich_tracksale:load-enrich-answer-justifications
+  - bietlejuice.enrich_tracksale:load-enrich-answer-tags
+  - bietlejuice.enrich_tracksale:load-enrich-campaign
+  - bietlejuice.enrich_tracksale:load-enrich-customer-conversions
+  - bietlejuice.enrich_tracksale:load-enrich-dispatch
+  - bietlejuice.enrich_tracksale:load-enrich-dispatch-attributes
   - bietlejuice.enrich_nps_answer_drivers:load-enrich-answer-drivers
-  - bietlejuice.enrich_ebdb_customer_contact_identification
+  - bietlejuice.ebdb:create-clean-user-in-data-lake
+  - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification
 
 bietlejuice.dw_user:
   - bietlejuice.ebdb:create-clean-partner-in-data-lake
@@ -1250,8 +1249,19 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.twilio_flex_insights:load-clean-conversation-time-metrics
 
 bietlejuice.enrich_invoice:
+  - bietlejuice.ebdb:create-clean-affiliate-data-in-data-lake
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
-  - bietlejuice.enrich_retsuko
+  - bietlejuice.ebdb:create-clean-conversion-lead-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.ebdb:create-clean-lead-in-data-lake
+  - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake
+  - bietlejuice.ebdb:create-clean-rent-flow-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-in-data-lake
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
+  - bietlejuice.enrich_ebdb_listing:load-enrich-portability
+  - bietlejuice.enrich_retsuko:load-enrich-invoice
+  - bietlejuice.enrich_retsuko:load-enrich-invoice-entry
   - bietlejuice.retsuko:load-clean-account
   - bietlejuice.retsuko:load-clean-contract
   - bietlejuice.retsuko:load-clean-entry
