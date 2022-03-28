@@ -1,6 +1,11 @@
 SELECT
     *,
     GET_JSON_OBJECT(user_properties, '$.entrance_uri') as up_entrance_uri,
+    GET_JSON_OBJECT(user_properties, '$.utm_source') as up_utm_source,
+    GET_JSON_OBJECT(user_properties, '$.utm_medium') as up_utm_medium,
+    GET_JSON_OBJECT(user_properties, '$.utm_campaign') as up_utm_campaign,
+    GET_JSON_OBJECT(user_properties, '$.utm_content') as up_utm_content,
+    GET_JSON_OBJECT(user_properties, '$.utm_term') as up_utm_term,
     GET_JSON_OBJECT(event_properties, '$.search_dropdown_value') as ep_search_dropdown_value,
     GET_JSON_OBJECT(event_properties, '$.filter_value_valor_type') as ep_filter_value_valor_type,
     GET_JSON_OBJECT(event_properties, '$.filter_value_valor_min') as ep_filter_value_valor_min,
