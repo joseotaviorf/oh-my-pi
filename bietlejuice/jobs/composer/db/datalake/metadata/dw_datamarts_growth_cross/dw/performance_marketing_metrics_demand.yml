@@ -150,7 +150,7 @@ columns:
       - datalake_marketing_costs.daily_costs.marketing_cost
   rent_flows_target:
     lineage:
-      - datalake_gsheets_clean.rental_flows_targets.rent_flows_target
+      - datalake_gsheets_clean.rental_flows_targets.rf_target
   new_rent_flows_target:
     lineage:
       - datalake_gsheets_clean.demand_targets_replanning.new_rent_flows_target
