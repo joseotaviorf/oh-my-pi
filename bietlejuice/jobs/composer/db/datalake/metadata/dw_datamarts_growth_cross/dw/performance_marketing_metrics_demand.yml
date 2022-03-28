@@ -145,9 +145,6 @@ columns:
   dt_contract_signed:
     lineage:
       - dw_public.dim_date.date
-  marketing_cost:
-    lineage:
-      - datalake_marketing_costs.daily_costs.marketing_cost
   rent_flows_target:
     lineage:
       - datalake_gsheets_clean.rental_flows_targets.rf_target
