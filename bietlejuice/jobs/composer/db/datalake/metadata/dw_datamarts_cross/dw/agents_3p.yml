@@ -1,0 +1,19 @@
+---
+database_name: dw_datamarts_cross
+table_name: agents_3p
+columns:
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.user.id
+  id_agent:
+    lineage:
+      - datalake_ebdb_clean.user.id_agent
+  id_work_contract:
+    lineage:
+      - datalake_ebdb_clean.agent_data.id_work_contract
+  contract_name:
+    lineage:
+      - datalake_ebdb_clean.work_contract.contract_name
+  partner:
+    lineage:
+      - datalake_ebdb_clean.work_contract.contract_name
