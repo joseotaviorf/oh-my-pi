@@ -1,0 +1,51 @@
+database_name: datalake_gsheets_clean
+table_name: responses_action_line_ciq_full
+columns:
+  id_ciq:
+    lineage:
+      - datalake_gsheets_raw.tratativas_actionline_ciq_full_responses.id_ciq
+  id_ciq_elegibles_houses:
+    lineage:
+      - datalake_gsheets_raw.tratativas_actionline_ciq_full_responses.id_ciq_com_imoveis_elegiveis
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.tratativas_actionline_ciq_full_responses.id_imovel_
+  analista_responsavel:
+    lineage:
+      - datalake_gsheets_raw.tratativas_actionline_ciq_full_responses.analista_responsavel
+  front:
+    lineage:
+      - datalake_gsheets_raw.tratativas_actionline_ciq_full_responses.frente
+  indicated_priority:
+    lineage:
+      - datalake_gsheets_raw.tratativas_actionline_ciq_full_responses.prioridade_indicada
+  previous_pitch:
+    lineage:
+      - datalake_gsheets_raw.tratativas_actionline_ciq_full_responses.pitch_passado
+  call_results:
+    lineage:
+      - datalake_gsheets_raw.tratativas_actionline_ciq_full_responses.resultado_da_ligacao_
+  receptive_ciq:
+    lineage:
+      - datalake_gsheets_raw.tratativas_actionline_ciq_full_responses.ciq_receptivo
+  identify_problem:
+    lineage:
+      - datalake_gsheets_raw.tratativas_actionline_ciq_full_responses.identificou_algum_problema
+  comment:
+    lineage:
+      - datalake_gsheets_raw.tratativas_actionline_ciq_full_responses.comentario
+  macro_sent:
+    lineage:
+      - datalake_gsheets_raw.tratativas_actionline_ciq_full_responses.enviou_macro_qual
+  best_time_to_contact:
+    lineage:
+      - datalake_gsheets_raw.tratativas_actionline_ciq_full_responses.melhor_periodo_para_contato
+  frequency_to_recieve_our_contact:
+    lineage:
+      - datalake_gsheets_raw.tratativas_actionline_ciq_full_responses.qual_frequencia_voce_deseja_receber_nosso_contato
+  receive_attendiment_specific_analyst:
+    lineage:
+      - datalake_gsheets_raw.tratativas_actionline_ciq_full_responses.gostaria_de_ser_atendido_por_um_analista_especifico
+  ts_created:
+    lineage:
+      - datalake_gsheets_raw.tratativas_actionline_ciq_full_responses.timestamp

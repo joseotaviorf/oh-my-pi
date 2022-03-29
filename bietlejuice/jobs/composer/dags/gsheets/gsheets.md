@@ -162,6 +162,7 @@ This pipeline produces the following output tables:
     - `rental_tof_daily_targets`
     - `rental_tof_monthly_targets`
     - `rental_tof_weekly_targets`
+    - `responses_action_line_ciq_full`
     - `retention_exclusivity_active_contact`
     - `sale_closing_ops_targets`
     - `sale_closing_ops_targets_extra_slas_tags`

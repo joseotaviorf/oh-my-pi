@@ -957,6 +957,11 @@ tratativas_actionline:
     sheet_name: forms_actionline
     clean_table_name: actionline_negotiations
 
+tratativas_actionline_ciq_full_responses:
+    sheet_id: 1PNFjoLH0RvuQv5u8n4nYzDKF9RrRE2d1jTDPFJeBxA8
+    sheet_name: Form Responses 1
+    clean_table_name: responses_action_line_ciq_full
+
 tv_ads:
     sheet_id: 1HEbApdK1ydVMbAPzmdmN5b850aCVVRhUyjLZp6Ny4kE
     sheet_name: base_clean
