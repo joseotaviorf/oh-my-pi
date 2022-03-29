@@ -9,17 +9,17 @@
 
 import logging
 from argparse import ArgumentParser
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.db import DatalakeMetastoreService
 from bietlejuice.jobs.composer.base.db import QUERIES_DATALAKE_PATH
-from bietlejuice.jobs.composer.services import FileService
+from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
 from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
-from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
+from bietlejuice.jobs.composer.services import FileService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
@@ -45,13 +45,7 @@ if __name__ == "__main__":
         "m=__main__, date={}, source={}, msg=Job started".format(execution_date, source)
     )
 
-    previous_date = datetime.strptime(execution_date, "%Y-%m-%d") - timedelta(days=1)
-    partition_year, partition_month, partition_day = (
-        previous_date.year,
-        previous_date.month,
-        previous_date.day,
-    )
-
+    execution_date = datetime.strptime(execution_date, "%Y-%m-%d")
     db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
     spark_client = SparkClient()
     metastore_service = SparkMetastoreService(spark_client)
@@ -61,7 +55,6 @@ if __name__ == "__main__":
     amplitude_clean_database_name = db_info["db_clean_databricks"]
     format_options = SparkTableStorageFormat.DEFAULT_CLEAN
     database_location = db_info["db_clean_path"]
-
     incremental_tables_queries = FileService.list_layer_sql_files(source, "clean")
 
     for table_name in incremental_tables_queries:
@@ -70,7 +63,7 @@ if __name__ == "__main__":
             QUERIES_DATALAKE_PATH + source + "/clean" + "/{}.sql".format(table_name)
         )
         query = FileService.get_query_from_file_name(query_path).format(
-            partition_year, partition_month, partition_day
+            execution_date.year, execution_date.month, execution_date.day
         )
 
         df = spark_client.get_records(query)
