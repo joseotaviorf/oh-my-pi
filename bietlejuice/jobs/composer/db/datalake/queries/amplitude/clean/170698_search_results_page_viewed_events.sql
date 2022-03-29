@@ -1,22 +1,11 @@
 SELECT
     *,
-    GET_JSON_OBJECT(user_properties, '$.entrance_uri') as up_entrance_uri,
-    GET_JSON_OBJECT(user_properties, '$.utm_source') as up_utm_source,
-    GET_JSON_OBJECT(user_properties, '$.utm_medium') as up_utm_medium,
-    GET_JSON_OBJECT(user_properties, '$.utm_campaign') as up_utm_campaign,
-    GET_JSON_OBJECT(user_properties, '$.utm_content') as up_utm_content,
-    GET_JSON_OBJECT(user_properties, '$.utm_term') as up_utm_term,
-    GET_JSON_OBJECT(event_properties, '$.search_dropdown_value') as ep_search_dropdown_value,
-    GET_JSON_OBJECT(event_properties, '$.filter_value_valor_type') as ep_filter_value_valor_type,
-    GET_JSON_OBJECT(event_properties, '$.filter_value_valor_min') as ep_filter_value_valor_min,
-    GET_JSON_OBJECT(event_properties, '$.filter_value_valor_max') as ep_filter_value_valor_max,
-    GET_JSON_OBJECT(event_properties, '$.filter_value_furnished') as ep_filter_value_furnished,
-    GET_JSON_OBJECT(event_properties, '$.filter_value_metro') as ep_filter_value_metro,
-    CAST(GET_JSON_OBJECT(event_properties, '$.filter_list_rooms') AS STRING) as ep_filter_list_rooms,
-    CAST(GET_JSON_OBJECT(event_properties, '$.filter_list_apartment') AS STRING) as ep_filter_list_apartment,
-    CAST(GET_JSON_OBJECT(event_properties, '$.search_results_list') AS STRING) as ep_search_results_list,
-    GET_JSON_OBJECT(event_properties, '$.house_id') as ep_house_id,
-    GET_JSON_OBJECT(user_properties, '$.ab_search_ranking') as up_ab_search_ranking
+    coalesce(nullif(regexp_extract(get_json_object(user_properties, '$.entrance_uri'), 'utm_source=([^&|$]+)', 1), ''), 'direct') as up_utm_source,
+    coalesce(nullif(regexp_extract(get_json_object(user_properties, '$.entrance_uri'), 'utm_medium=([^&|$]+)', 1), ''), 'direct') as up_utm_medium,
+    coalesce(nullif(regexp_extract(get_json_object(user_properties, '$.entrance_uri'), 'utm_campaign=([^&|$]+)', 1), ''), 'direct') as up_utm_campaign,
+    coalesce(nullif(regexp_extract(get_json_object(user_properties, '$.entrance_uri'), 'utm_content=([^&|$]+)', 1), ''), 'direct') as up_utm_content,
+    coalesce(nullif(regexp_extract(get_json_object(user_properties, '$.entrance_uri'), 'utm_term=([^&|$]+)', 1), ''), 'direct') as up_utm_term,
+    get_json_object(event_properties, '$.house_id') as ep_house_id
 FROM
     datalake_amplitude_clean_staging.170698_search_results_page_viewed_events
 where
