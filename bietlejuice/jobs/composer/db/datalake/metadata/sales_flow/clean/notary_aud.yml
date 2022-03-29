@@ -77,9 +77,6 @@ columns:
   mod_ts_prevision_ended:
     lineage:
       - datalake_sales_flow_raw.notary_aud.end_prevision_at_mod
-  mod_ts_seller_paid:
-    lineage:
-      - datalake_sales_flow_raw.notary_aud.seller_paid_at_mod
   mod_ts_buyer_received_keys:
     lineage:
       - datalake_sales_flow_raw.notary_aud.buyer_received_keys_at_mod
@@ -95,9 +92,6 @@ columns:
   ts_prevision_ended:
     lineage:
       - datalake_sales_flow_raw.notary_aud.end_prevision_at
-  ts_seller_paid:
-    lineage:
-      - datalake_sales_flow_raw.notary_aud.seller_paid_at
   ts_buyer_received_keys:
     lineage:
       - datalake_sales_flow_raw.notary_aud.buyer_received_keys_at

@@ -47,6 +47,9 @@ columns:
   dt_ended:
     lineage:
       - datalake_sales_flow_raw.mortgage.end_date
+  ts_seller_paid:
+    lineage:
+      - datalake_sales_flow_raw.mortgage.seller_paid_at
   ts_created:
     lineage:
       - datalake_sales_flow_raw.mortgage.created_at

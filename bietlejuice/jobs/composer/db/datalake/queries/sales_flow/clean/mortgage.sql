@@ -14,6 +14,7 @@ SELECT
     bank_start_date AS dt_bank_started,
     start_date AS dt_started,
     end_date AS dt_ended,
+    seller_paid_at AS ts_seller_paid,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,
