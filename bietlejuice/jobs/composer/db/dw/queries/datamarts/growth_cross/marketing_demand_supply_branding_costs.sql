@@ -360,16 +360,16 @@ affiliates AS (
     ),
     ia_provisioned_costs AS (
         SELECT
-            TO_CHAR(NULLIF(date,'')::DATE,'yyyymmdd')::BIGINT AS sk_date,
+            TO_CHAR(dt_created::DATE,'yyyymmdd')::BIGINT AS sk_date,
             'sheets' AS table_origin,
-            NULLIF(cost_origin,'')::VARCHAR AS mkt_origin,
+            NULLIF(mkt_origin,'')::VARCHAR AS mkt_origin,
             NULLIF(city_group,'')::VARCHAR AS city_group,
             NULL::text AS vertical,
-            NULLIF(cost_type,'')::VARCHAR AS source,
+            NULLIF(source,'')::VARCHAR AS source,
             NULL as business_context,
             NULLIF(cost,'')::FLOAT AS cost
         FROM
-            datalake_raw.gsheets_provisioned_costs_import
+            datalake_gsheets_clean_prod.provisioned_costs_import
     ),
     ia_sale_costs AS (
         WITH lbc_rent AS (

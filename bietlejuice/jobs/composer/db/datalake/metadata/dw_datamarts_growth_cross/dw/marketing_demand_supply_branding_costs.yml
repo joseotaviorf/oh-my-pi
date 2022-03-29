@@ -11,6 +11,7 @@ columns:
       - datalake_gsheets_clean.affiliates_extra_user_bonus.city_group
       - datalake_gsheets_clean.ciq_costs.city
       - datalake_gsheets_clean.offline_and_branding_marketing_costs.city_group
+      - datalake_gsheets_clean_prod.provisioned_costs_import.city_group
       - datalake_marketing_costs.daily_costs.city_group
       - datalake_marketing_costs.offline_manual_costs.city_group
       - dw_public.dim_region.city_group
@@ -21,6 +22,7 @@ columns:
   planning_mkt_level3:
     lineage:
       - datalake_gsheets_clean.offline_and_branding_marketing_costs.mkt_channel
+      - datalake_gsheets_clean_prod.provisioned_costs_import.mkt_origin
       - datalake_marketing_costs.daily_costs.mkt_medium
       - datalake_marketing_costs.daily_costs.mkt_origin
       - datalake_marketing_costs.offline_manual_costs.cost_category
