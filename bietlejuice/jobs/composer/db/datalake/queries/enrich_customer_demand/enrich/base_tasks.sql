@@ -121,7 +121,10 @@ ticket_tasks AS (
     t.id_ticket AS id_task,
     COALESCE(t.id_agent, '-1') AS id_agent,
     t.department AS type,
-    COALESCE(tds.sla_in_days,ts.sla_in_days, ujst.sla_in_days, tst.sla) AS sla_target,
+    CASE 
+      WHEN t.department IN ('Proteção QuintoAndar [OFF] [POS] [BACK]', 'Rescisão - Despejo [OFF][POS][BACK]') THEN 21
+      ELSE COALESCE(tds.sla_in_days,ts.sla_in_days, ujst.sla_in_days, tst.sla) 
+    END AS sla_target,
     t.ts_started,
     t.ts_completed
   FROM
