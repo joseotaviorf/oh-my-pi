@@ -1,10 +1,10 @@
 WITH
     events AS (
         SELECT
-            DATE(ts_event) AS date,
-            DATE(DATE_TRUNC('WEEK', ts_event)) AS week,
+            DATE(ts_event) AS dt_event,
+            DATE(DATE_TRUNC('WEEK', ts_event)) AS week_start_event,
             MONTH(ts_event) AS month,
-            EXTRACT(QUARTER FROM ts_event) AS quarter,
+            EXTRACT(QUARTER FROM ts_event) AS quarter_event,
             CAST(GET_JSON_OBJECT(user_properties, '$.utm_campaign') AS STRING) AS utm_campaign,
             COUNT(distinct id_amplitude) AS unique_user
         FROM
@@ -12,11 +12,13 @@ WITH
         WHERE
             event_type IN ('landing_page_viewed', 'price_suggestion_page_viewed', 'price_suggestion_sale_page_viewed') 
             AND id_app = 183047
-            AND DATE(ts_event) = DATE('{year}-{month}-{day}')
             AND CAST(GET_JSON_OBJECT(user_properties, '$.utm_source') AS STRING) in ('google', 'facebook')
             AND CAST(GET_JSON_OBJECT(user_properties, '$.utm_medium') AS STRING) in ('cpc', 'display', 'performance_max')
             AND LOWER(CAST(GET_JSON_OBJECT(user_properties, '$.utm_campaign') AS STRING)) NOT LIKE '%branded%' 
             AND LOWER(CAST(GET_JSON_OBJECT(user_properties, '$.utm_campaign') AS STRING)) NOT LIKE '%demand%'
+            AND year = {year}
+            AND month = {month}
+            AND day = {day}
         GROUP BY 
             1,2,3,4,5
     ),
@@ -57,39 +59,39 @@ WITH
             1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
     )
 SELECT
-    t.campaign_name,
-    t.account_name,
-    t.utm_campaign,
-    t.utm_term,
-    t.utm_content,
-    t.city_group,
-    r.tier,
-    t.campaign_origin_acquisition,
-    t.mkt_category,
-    t.mkt_flow,
-    t.mkt_completion,
-    t.mkt_origin,
-    t.mkt_medium,
-    t.mkt_source,
-    t.mkt_channel,
-    t.mkt_platform,
-    t.funnel_side,
-    t.flow_type,
-    cte.date AS dt_event,
-    cte.week AS week_start_event,
-    cte.quarter AS quarter_event,
-    IF(cte.quarter < 3, 1, 2) AS half_year_event,
-    SUM(cte.unique_user) AS traffic,
-    year(cte.date) as year,
-    cte.month AS month,
-    day(cte.date) as day
-FROM events cte 
-LEFT JOIN taxonomy t
-    ON t.order_l = 1
-        AND t.utm_campaign = cte.utm_campaign
-LEFT JOIN regions r
-    ON t.city_group = r.city_group
+    txn.campaign_name,
+    txn.account_name,
+    txn.utm_campaign,
+    txn.utm_term,
+    txn.utm_content,
+    txn.city_group,
+    rgn.tier,
+    txn.campaign_origin_acquisition,
+    txn.mkt_category,
+    txn.mkt_flow,
+    txn.mkt_completion,
+    txn.mkt_origin,
+    txn.mkt_medium,
+    txn.mkt_source,
+    txn.mkt_channel,
+    txn.mkt_platform,
+    txn.funnel_side,
+    txn.flow_type,
+    evt.dt_event,
+    evt.week_start_event,
+    evt.quarter_event,
+    IF(evt.quarter_event < 3, 1, 2) AS half_year_event,
+    SUM(evt.unique_user) AS traffic,
+    YEAR(evt.dt_event) as year,
+    evt.month,
+    DAY(evt.dt_event) as day
+FROM events evt 
+LEFT JOIN taxonomy txn
+    ON txn.order_l = 1
+        AND txn.utm_campaign = evt.utm_campaign
+LEFT JOIN regions rgn
+    ON txn.city_group = rgn.city_group
 WHERE
-    t.utm_campaign IS NOT NULL
+    txn.utm_campaign IS NOT NULL
 GROUP BY 
     1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,24,25,26
