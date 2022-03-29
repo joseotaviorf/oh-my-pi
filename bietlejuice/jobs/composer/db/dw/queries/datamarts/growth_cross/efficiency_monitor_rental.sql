@@ -41,17 +41,17 @@ rentals_and_tickets AS (
     GROUP by 1,2,3,4,5
 ), base_tgt as(
     SELECT 
-        CAST("date" AS DATE) AS dt_reference,
+        CAST("dt_created" AS DATE) AS dt_reference,
         city_group,
         planning_mkt_level1,
         CASE WHEN planning_mkt_level2 = 'Organic' THEN 'Branded' ELSE planning_mkt_level2 END AS planning_mkt_level2,
         planning_mkt_level3,
-        SUM(budget_quarter) AS cost_budget_quarter,
-        SUM(budget_mensal) AS cost_budget_mensal
+        SUM(quarterly_budget) AS cost_budget_quarter,
+        SUM(monthly_budget) AS cost_budget_mensal
     FROM datalake_gsheets_clean_prod.costs_targets 
     WHERE 
         business = 'Rental'
-        AND date BETWEEN date('2020-01-01') AND LAST_DAY(CURRENT_DATE)
+        AND dt_created BETWEEN date('2020-01-01') AND LAST_DAY(CURRENT_DATE)
     GROUP BY 1,2,3,4,5
 ), base_costs AS (
     SELECT

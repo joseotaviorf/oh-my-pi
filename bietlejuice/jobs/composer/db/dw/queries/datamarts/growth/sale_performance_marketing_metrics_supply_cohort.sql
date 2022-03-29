@@ -148,7 +148,7 @@ costs_targets_results_combined AS (
   -- Supply ForSale Cost Targets --
   ---------------------------------
   SELECT
-    DATE(NULLIF(ct.date, '')) AS lead_date,
+    DATE(NULLIF(ct.dt_created, '')) AS lead_date,
     COALESCE(NULLIF(ct.city_group, ''), 'Not Mapped')::TEXT AS city_group,
     CASE
       WHEN ct.planning_mkt_level3 = 'PWA - Paid'
@@ -173,7 +173,7 @@ costs_targets_results_combined AS (
     SUM(0::FLOAT) AS qualifieds_target,
     SUM(0::FLOAT) AS opportunities_target,
     SUM(0::FLOAT) AS first_listings_target,
-    SUM(NULLIF(ct.budget_mensal, '')::FLOAT) AS budget
+    SUM(NULLIF(ct.monthly_budget, '')::FLOAT) AS budget
   FROM datalake_gsheets_clean_prod.costs_targets AS ct
   WHERE
     business = 'Sales'

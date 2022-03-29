@@ -836,7 +836,7 @@ affiliates AS (
   -- Supply ForRental Cost Targets - OLD --
   -----------------------------------------
     SELECT
-        TO_CHAR(DATE(NULLIF(sct.date, NULL)), 'YYYYMMDD')::INT AS sk_date,
+        TO_CHAR(DATE(NULLIF(sct.dt_created, NULL)), 'YYYYMMDD')::INT AS sk_date,
         COALESCE(nullif(sct.city_group,''),'Not Mapped')::varchar AS city_group,
         CASE
             WHEN sct.planning_mkt_level3 = 'PWA - Paid'
@@ -869,14 +869,14 @@ affiliates AS (
         SUM(0::FLOAT) AS qualifieds_target,
         SUM(0::FLOAT) AS opportunities_target,
         SUM(0::FLOAT) AS first_listings_target,
-        SUM(CAST(REPLACE(sct.budget_mensal,',','') AS FLOAT8)) AS budget
+        SUM(CAST(REPLACE(sct.monthly_budget,',','') AS FLOAT8)) AS budget
     FROM
         datalake_gsheets_clean_prod.costs_targets sct
     WHERE planning_mkt_level1 = 'Supply'
-        AND sct.date < '2021-04-01'
+        AND sct.dt_created < '2021-04-01'
         AND business = 'Rental'
         OR (planning_mkt_level1 = 'Supply'
-            AND sct.date >= '2021-04-01'
+            AND sct.dt_created >= '2021-04-01'
             AND business = 'Rental'
             AND planning_mkt_level3 NOT IN ('PWA - Paid', 'Price Calculator', 'New Channels'))
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12

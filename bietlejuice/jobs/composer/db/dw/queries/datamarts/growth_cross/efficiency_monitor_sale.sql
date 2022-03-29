@@ -65,12 +65,12 @@ WITH sale_volumes AS (
     GROUP BY 1,2,3
 ), base_tgt AS (
     SELECT
-        DATE(date) AS dt_cost,
+        DATE(dt_created) AS dt_cost,
         city_group,
         planning_mkt_level1,
-        SUM(budget_mensal) AS budget_mensal
+        SUM(monthly_budget) AS budget_mensal
     FROM datalake_gsheets_clean_prod.costs_targets
-    WHERE date BETWEEN '2020-07-01' AND date_trunc('week',CURRENT_DATE)
+    WHERE dt_created BETWEEN '2020-07-01' AND date_trunc('week',CURRENT_DATE)
         AND business = 'Sale'
     GROUP BY 1,2,3
 ), base_costs AS (
