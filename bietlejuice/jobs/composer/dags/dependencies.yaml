@@ -1370,6 +1370,7 @@ bietlejuice.enrich_offboarding:
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-inspection-in-data-lake
   - bietlejuice.enrich_customer_support:load-enrich-email
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-b2b
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing

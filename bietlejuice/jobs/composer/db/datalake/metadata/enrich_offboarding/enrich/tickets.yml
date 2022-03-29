@@ -19,15 +19,15 @@ columns:
     lineage:
       - datalake_zendesk_ticket_funnels.ticket_funnel.client_type
       - datalake_zendesk_ticket_funnels.ticket_funnel.tags
-  dt_created_budgeting:
+  dt_created:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_created_local
-  dt_started_budgeting:
+  dt_started:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_initially_assigned_local
-  dt_solved_budgeting:
+  dt_solved:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_solved_local
-  dt_completed_budgeting:
+  dt_completed:
     lineage:
       - datalake_zendesk_ticket_funnels.tickets_funnel_metrics.ts_closed

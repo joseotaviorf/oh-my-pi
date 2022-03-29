@@ -21,10 +21,10 @@ SELECT
                 AND CONCAT_WS(' ',COLLECT_LIST(tf.tags)) NOT LIKE '%proteção_5a_cancelada%') THEN TRUE
         ELSE FALSE
     END AS is_activation_protection,
-    MIN(tfma.dt_created_date_local) AS dt_created_budgeting,
-    MIN(tfma.dt_initially_assigned_local) AS dt_started_budgeting,
-    MAX(tfma.dt_solved_date_local) AS dt_solved_budgeting,
-    MAX(tfma.dt_closed_date) AS dt_completed_budgeting
+    MIN(tfma.dt_created_date_local) AS dt_created,
+    MIN(tfma.dt_initially_assigned_local) AS dt_started,
+    MAX(tfma.dt_solved_date_local) AS dt_solved,
+    MAX(tfma.dt_closed_date) AS dt_completed
 FROM 
     datalake_offboarding.ongoing AS ong 
 LEFT JOIN

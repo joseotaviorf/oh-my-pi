@@ -251,7 +251,7 @@ pp_nps AS (
 last_inspection_synch AS(
     SELECT
         term.id,
-        MAX(COALESCE(CAST(DATE_FORMAT(insp.dt_inspected, 'yyyyMMdd') AS BIGINT), -1)) AS id_last_inspection_synch
+        MAX(insp.dt_inspected) AS dt_last_inspection_synch
     FROM 
         datalake_terminator_clean.termination AS term
     JOIN 
@@ -259,7 +259,7 @@ last_inspection_synch AS(
             ON term.id_contract = insp.id_contract
     WHERE 
         term.status <> 'CANCELED'
-        AND CAST(DATE_FORMAT(insp.dt_inspected, 'yyyyMMdd') AS BIGINT) IS NOT NULL
+        AND insp.dt_inspected IS NOT NULL
     GROUP BY 
         term.id
 ),
@@ -341,10 +341,11 @@ contract_info AS (
         (hp.id_house_listing IS NOT NULL) OR contract_b2b.is_b2b AS is_b2b,
         ctr.dt_started AS dt_start,
         ctr.dt_entered AS dt_entrance,
+        TO_TIMESTAMP(ctr.ts_analyst_annulment_input) AS ts_analyst_annulment_input,
         ctr.ts_created,
         ctr.ts_updated
     FROM 
-        datalake_ebdb_clean.contract ctr
+        datalake_ebdb_contract.contract ctr
     LEFT JOIN 
         datalake_ebdb_listing.house_listing hl
             ON ctr.id = hl.id_contract
@@ -444,8 +445,11 @@ SELECT
     tw.has_automatically_closed_task,
     term.dt_termination,
     tm.dt_last_updated AS dt_last_rescheduled,
-    TO_DATE(CAST(lis.id_last_inspection_synch AS STRING), 'yyyyMMdd') AS dt_last_inspection_synched,
-    neg.ts_updated::DATE AS dt_negotiation_updated,
+    TO_DATE(lis.dt_last_inspection_synch) AS dt_last_inspection_synched,
+    ci.dt_start AS dt_contract_started,
+    ci.dt_entrance AS dt_contract_entrance,
+    ci.ts_analyst_annulment_input,
+    neg.ts_updated AS ts_negotiation_updated,
     ln.ts_fee_negotiation_created,
     ln.ts_fee_negotiation_updated,
     term.ts_created,

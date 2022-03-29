@@ -39,12 +39,30 @@ columns:
   is_workflow:
     lineage:
       - datalake_offboarding.contract_termination.is_workflow
+  is_b2b:
+    lineage:
+      - datalake_offboarding.contract_termination.is_b2b
+  dt_contract_started:
+    lineage:
+      - datalake_offboarding.contract_termination.dt_contract_started
+  dt_contract_entrance:
+    lineage:
+      - datalake_offboarding.contract_termination.dt_contract_entrance
+  dt_last_inspection_synched:
+    lineage:
+      - datalake_offboarding.contract_termination.dt_last_inspection_synched
   dt_termination:
     lineage:
       - datalake_offboarding.contract_termination.dt_termination
+  ts_created_inspection:
+    lineage:
+      - datalake_offboarding.contract_termination.ts_created_inspection
   ts_termination_request:
     lineage:
       - datalake_offboarding.contract_termination.ts_created
   ts_termination_finished:
     lineage:
       - datalake_offboarding.contract_termination.ts_termination_finished
+  ts_analyst_annulment_input:
+    lineage:
+      - datalake_offboarding.contract_termination.ts_analyst_annulment_input
