@@ -1,0 +1,16 @@
+---
+database_name: datalake_gsheets_raw
+table_name: de_para_analistas_proowner
+columns:
+  email_:
+    tags:
+    - Confidential
+  nomes_twillio:
+    tags:
+    - PII
+  nomes_sirena:
+    tags:
+    - PII
+  nome_metabase_:
+    tags:
+    - PII

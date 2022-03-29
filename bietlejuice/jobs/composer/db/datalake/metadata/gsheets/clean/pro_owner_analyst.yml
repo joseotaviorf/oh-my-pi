@@ -1,0 +1,42 @@
+database_name: datalake_gsheets_clean
+table_name: pro_owner_analyst
+columns:
+  id_cluster:
+    lineage:
+      - datalake_gsheets_raw.de_para_analistas_proowner.id_clusterizacao_
+  id_metabase:
+    lineage:
+      - datalake_gsheets_raw.de_para_analistas_proowner.id_metabase_
+  id_sirena:
+    lineage:
+      - datalake_gsheets_raw.de_para_analistas_proowner.id_sirena_
+  id_twilio:
+    lineage:
+      - datalake_gsheets_raw.de_para_analistas_proowner.id_twilio_
+  email:
+    lineage:
+      - datalake_gsheets_raw.de_para_analistas_proowner.email_
+  twilio_name:
+    lineage:
+      - datalake_gsheets_raw.de_para_analistas_proowner.nomes_twillio
+  sirena_name:
+    lineage:
+      - datalake_gsheets_raw.de_para_analistas_proowner.nomes_sirena
+  metabase_name:
+    lineage:
+      - datalake_gsheets_raw.de_para_analistas_proowner.nome_metabase_
+  cluster:
+    lineage:
+      - datalake_gsheets_raw.de_para_analistas_proowner.clusterizacao
+  type:
+    lineage:
+      - datalake_gsheets_raw.de_para_analistas_proowner.tipo_
+  team:
+    lineage:
+      - datalake_gsheets_raw.de_para_analistas_proowner.time_
+  tl:
+    lineage:
+      - datalake_gsheets_raw.de_para_analistas_proowner.tl_
+  fh_team:
+    lineage:
+      - datalake_gsheets_raw.de_para_analistas_proowner.time_fh

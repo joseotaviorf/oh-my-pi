@@ -287,6 +287,11 @@ csat_vistoria_saida:
     sheet_name: saida
     clean_table_name: exit_inspection_csat
 
+de_para_analistas_proowner:
+    sheet_id: 1qXhl565T30pxSCrd5zkq2m9Ch6way4_p9J4v9mjKS1c
+    sheet_name: Página1
+    clean_table_name: pro_owner_analyst
+
 de_para_cancelamento:
     sheet_id: 1Om2IjwtSPHfg4GRq2IPKGshHLBdXnP0bCMBPbOrh5fc
     sheet_name: de_para_cancelamento

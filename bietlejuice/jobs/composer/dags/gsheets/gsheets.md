@@ -143,6 +143,7 @@ This pipeline produces the following output tables:
     - `plaquinhas_installation_targets`
     - `plaquinhas_demand_targets`
     - `poa_partners`
+    - `pro_owner_analyst`
     - `process_eviction`
     - `projreparos_espelhamento_dl`
     - `proj_agent_manager`
