@@ -13,6 +13,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 Produces the following output tables, via full load:
 
 - `agent_business_context_history`
+- `agent_contract`
 - `agent_region_group`
 - `agents_region`
 - `agents_review`

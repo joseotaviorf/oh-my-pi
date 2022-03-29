@@ -18,6 +18,7 @@ GOOGLE_S_A_CREDENTIALS = json.loads(
 GOOGLE_API_SCOPE = env.get_airflow_env_var('GOOGLE_API_SCOPE')
 
 
+ # Migrated to composer/db/datalake/queries/enrich_ebdb_agents/enrich/agent_contract.sql with extra fields
 def create_agent_contract_dw():
     ar = Agent(bucket_datalake)
     ar.truncate_table(schema='agent',

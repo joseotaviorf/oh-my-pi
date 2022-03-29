@@ -1104,6 +1104,7 @@ bietlejuice.enrich_ebdb_agents:
   - bietlejuice.ebdb:create-clean-user-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
   - bietlejuice.ebdb:create-clean-visit-in-data-lake
+  - bietlejuice.ebdb:create-clean-work-contract-in-data-lake
   - bietlejuice.gsheets:load-clean-auxiliary-region
 
 bietlejuice.enrich_ebdb_contract:

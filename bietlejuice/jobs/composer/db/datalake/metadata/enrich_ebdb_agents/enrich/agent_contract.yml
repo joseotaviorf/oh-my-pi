@@ -1,0 +1,34 @@
+---
+database_name: datalake_ebdb_agents
+table_name: agent_contract
+columns:
+  id_agent:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.id_agent
+  id_user_agent:
+    lineage:
+      - datalake_ebdb_clean.user.id
+  id_previous_work_contract:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.id_work_contract
+  id_work_contract:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.id_work_contract
+  id_current_work_contract:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.id_work_contract
+  previous_work_contract_name:
+    lineage:
+      - datalake_ebdb_clean.work_contract.contract_name
+  work_contract_name:
+    lineage:
+      - datalake_ebdb_clean.work_contract.contract_name
+  current_work_contract_name:
+    lineage:
+      - datalake_ebdb_clean.work_contract.contract_name
+  ts_work_contract_started:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  ts_work_contract_ended:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision

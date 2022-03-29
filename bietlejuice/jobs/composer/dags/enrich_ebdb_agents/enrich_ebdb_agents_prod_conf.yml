@@ -2,6 +2,8 @@
 tables:
   - table_name: agent_business_context_history
     is_incremental: false
+  - table_name: agent_contract
+    is_incremental: false
   - table_name: agent_region_group
     is_incremental: false
   - table_name: agents_region
