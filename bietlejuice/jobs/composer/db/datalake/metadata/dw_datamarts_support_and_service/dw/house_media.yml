@@ -11,7 +11,7 @@ columns:
       - datalake_kodak_clean.photo_sphere.metadata
   ts_video_last_updated:
     lineage:
-      - datalake_kodak_clean.video_aud.ts_revised
+      - datalake_kodak_clean.user_revision_entity.ts_revised
   ts_360_photos_last_updated:
     lineage:
-      - datalake_kodak_clean.photo_sphere_aud.ts_revised
+      - datalake_kodak_clean.user_revision_entity.ts_revised
