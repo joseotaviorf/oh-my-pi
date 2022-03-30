@@ -54,7 +54,7 @@ FROM
 ),
 events_filtered AS (
     SELECT
-        evt.event_type,
+        REPLACE(event_type,"[adjust] ","adjust_") AS event_type,
         evt.ts_event,
         evt.id_user,
         COALESCE(imc.merged_amplitude_id, evt.id_amplitude) as id_amplitude,
@@ -102,7 +102,7 @@ events_filtered AS (
     INNER JOIN
         ids_mapped_from_conversions AS imc 
     ON
-        imc.id_amplitude = evt.id_amplitude  -- somente para cargas diárias de usuários que converteram
+        imc.id_amplitude = evt.id_amplitude
     WHERE
       id_app = 170698
       AND year >= EXTRACT(year FROM (DATE('{year}-{month}-{day}') - interval '4' month))

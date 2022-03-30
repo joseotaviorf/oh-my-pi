@@ -13,6 +13,10 @@ The enrich `online attribute` table is partitioned by year, month, and day from 
 ​<details>
   <summary><strong> > DAG details (click to expand)</strong></summary>
 
+### Atention Points
+
+* We add sanitization to `event_type` column. There are some spelling problems with adjust event types that cause some erros in hive sync, so we fix it (ex: [adjust] Session -> adjust_Session).
+* We extract the column `app_platform` from the `3fbf25d58c3cce92f0e6609904a37cc9` component of `user_properties`. The column have a very strange spelling, but means the platform of the mobile app (ex: IOS).
 ### Execution Interval
 
 Daily. More information about run time [here]({chart_url}{dag_id}).
