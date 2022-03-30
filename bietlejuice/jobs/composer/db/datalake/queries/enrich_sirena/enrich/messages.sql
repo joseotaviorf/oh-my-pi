@@ -12,7 +12,7 @@ with agents_class AS (
         datalake_sirena_clean.groups AS gr
             ON ag.id_group = gr.id
     WHERE
-        gr.group_name IN ('Closing', 'Deal Making','QuintoAndar Expert','Casa Mineira','QuintoAndar Assessor','QuintoAndar Consultor')
+        gr.group_name IN ('Closing', 'Deal Making','QuintoAndar Expert','Casa Mineira','QuintoAndar Assessor','QuintoAndar Consultor','QuintoAndar - Assessoria de Proprietários ForSale')
 ),
 client_info AS (
     SELECT  
