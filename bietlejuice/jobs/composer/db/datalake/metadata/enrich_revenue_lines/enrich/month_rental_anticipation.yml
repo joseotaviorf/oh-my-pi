@@ -1,0 +1,34 @@
+---
+database_name: datalake_revenue_lines
+table_name: month_rental_anticipation
+columns:
+  id_mra:
+    lineage:
+      - datalake_fastforward_clean.anticipation.id
+  id_contract_ebdb:
+    lineage:
+      - datalake_fastforward_clean.contract.id_external
+  prod_theorical_amount:
+    lineage:
+      - datalake_fastforward_clean.anticipation.amount
+  prod_theorical_fee:
+    lineage:
+      - datalake_fastforward_clean.anticipation.fee
+  accrual_year_month:
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+  dt_created:
+    lineage:
+      - datalake_fastforward_clean.anticipation.ts_created
+  dt_accepted:
+    lineage:
+      - datalake_fastforward_clean.anticipation.ts_accepted
+  dt_first_accepted:
+    lineage:
+      - datalake_fastforward_clean.anticipation.ts_accepted
+  dt_due_fee:
+    lineage:
+      - datalake_quintoandar.aux_date.date
+  dt_paid_fee:
+    lineage:
+      - datalake_quintoandar.aux_date.date

@@ -1,0 +1,37 @@
+---
+database_name: datalake_revenue_lines
+table_name: rental_guarantee
+columns:
+  id_guarantee:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.id
+  id_contract_ebdb:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.id_contract_ebdb
+  id_charge:
+    lineage:
+      - datalake_rental_guarantee_clean.charge.id
+  guarantee_status:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.guarantee_status
+  charge_status:
+    lineage:
+      - datalake_rental_guarantee_clean.charge.charge_status
+  charge_type:
+    lineage:
+      - datalake_rental_guarantee_clean.charge.charge_type
+  total_installments:
+    lineage:
+      - datalake_rental_guarantee_clean.charge.installments
+  accrual_year_month:
+    lineage:
+      - datalake_quintoandar.aux_date.month_start
+  ts_guarantee_created:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.ts_created
+  ts_charge_created:
+    lineage:
+      - datalake_rental_guarantee_clean.charge.ts_created
+  ts_guarantee_paid:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.ts_paid

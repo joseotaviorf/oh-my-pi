@@ -1,0 +1,22 @@
+---
+database_name: datalake_revenue_lines
+table_name: reservation
+columns:
+  id_reservation:
+    lineage:
+      - datalake_kill_queue.reservation.id_reservation
+  status:
+    lineage:
+      - datalake_kill_queue.reservation.status
+  installments:
+    lineage:
+      - datalake_kill_queue.reservation.installments
+  cancellation_reason:
+    lineage:
+      - datalake_kill_queue.reservation.cancellation_reason
+  value:
+    lineage:
+      - datalake_kill_queue.reservation.value
+  ts_created:
+    lineage:
+      - datalake_kill_queue.reservation.ts_created

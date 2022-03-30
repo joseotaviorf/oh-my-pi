@@ -1,0 +1,31 @@
+---
+database_name: datalake_revenue_lines
+table_name: late_payments
+columns:
+  id_late_payments:
+    lineage:
+      - datalake_invoice.invoice_entries.id_invoice_entry
+      - datalake_invoice.invoice_entries.id_contract
+      - datalake_invoice.invoice_entries.datalake_retsuko_clean.invoice
+  id_contract:
+    lineage:
+      - datalake_invoice.invoice_entries.id_contract
+  invoice_theorical_amount:
+    lineage:
+      - datalake_invoice.invoice_entries.brl_entry_due_amount
+  invoice_paid_amount:
+    lineage:
+      - datalake_invoice.invoice_entries.brl_entry_due_amount
+      - datalake_invoice.invoice_entries.brl_entry_paid_amount
+  accrual_year_month:
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+  dt_created:
+    lineage:
+      - datalake_invoice.invoice_entries.ts_created
+  dt_due:
+    lineage:
+      - datalake_quintoandar.aux_date.date
+  dt_paid:
+    lineage:
+      - datalake_quintoandar.aux_date.date

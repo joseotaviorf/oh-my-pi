@@ -1472,6 +1472,24 @@ bietlejuice.enrich_retsuko:
   - bietlejuice.retsuko:load-clean-entry
   - bietlejuice.retsuko:load-clean-invoice
 
+bietlejuice.enrich_revenue_lines:
+  - bietlejuice.enrich_kill_queue:load-enrich-reservation
+  - bietlejuice.enrich_invoice:load-enrich-invoice-entries
+  - bietlejuice.enrich_retsuko:load-enrich-invoice
+  - bietlejuice.enrich_retsuko:load-enrich-invoice-entry
+  - bietlejuice.fastforward:load-clean-anticipation
+  - bietlejuice.fastforward:load-clean-contract
+  - bietlejuice.fastforward:load-clean-long-term-anticipation
+  - bietlejuice.fastforward:load-clean-lra-installment
+  - bietlejuice.fastforward:load-clean-lra-installment-option
+  - bietlejuice.owner_fees:load-clean-contract
+  - bietlejuice.owner_fees:load-clean-contract-brokerage-fee
+  - bietlejuice.rental_guarantee:load-clean-charge
+  - bietlejuice.rental_guarantee:load-clean-guarantee
+  - bietlejuice.retsuko:load-clean-contract
+  - bietlejuice.retsuko:load-clean-credit-card-payment
+  - bietlejuice.retsuko:load-clean-invoice
+
 bietlejuice.enrich_robin_hood:
   - bietlejuice.robin_hood:load-clean-accounting-entry
   - bietlejuice.robin_hood:load-clean-payee

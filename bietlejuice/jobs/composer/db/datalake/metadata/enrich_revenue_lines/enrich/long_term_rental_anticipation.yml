@@ -1,0 +1,46 @@
+---
+database_name: datalake_revenue_lines
+table_name: long_term_rental_anticipation
+columns:
+  id_lra:
+    lineage:
+      - datalake_fastforward_clean.long_term_anticipation.id
+  id_contract_ebdb:
+    lineage:
+      - ddatalake_fastforward_clean.contract.id_external
+  months_anticipated:
+    lineage:
+      - datalake_fastforward_clean.lra_installment_option.months_anticipated
+  installment:
+    lineage:
+      - datalake_fastforward_clean.lra_installment.installment_number
+  total_installments:
+    lineage:
+      - datalake_fastforward_clean.lra_installment_option.installments
+  total_rent:
+    lineage:
+      - datalake_fastforward_clean.long_term_anticipation.total_rent
+  prod_theorical_amount:
+    lineage:
+      - datalake_fastforward_clean.long_term_anticipation.prod_theorical_amount
+  prod_theorical_fee:
+    lineage:
+      - datalake_fastforward_clean.lra_installment.interest_value
+  invoice_theorical_amount:
+    lineage:
+      - datalake_fastforward_clean.lra_installment_option.months_anticipated
+  accrual_year_month:
+    lineage:
+      - datalake_fastforward_clean.lra_installment.ts_expected_due
+  ts_created:
+    lineage:
+      - datalake_fastforward_clean.long_term_anticipation.ts_created
+  ts_signed:
+    lineage:
+      - datalake_fastforward_clean.long_term_anticipation.ts_signed
+  dt_due:
+    lineage:
+      - datalake_quintoandar.aux_date.date
+  dt_paid:
+    lineage:
+      - datalake_quintoandar.aux_date.date

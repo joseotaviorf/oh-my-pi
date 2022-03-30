@@ -1,0 +1,37 @@
+---
+database_name: datalake_revenue_lines
+table_name: credit_card_payment
+columns:
+  id_ccp:
+    lineage:
+      - datalake_retsuko_clean.credit_card_payment.id
+  id_contract_ebdb:
+    lineage:
+      - datalake_retsuko_clean.contract.id_external
+  status:
+    lineage:
+      - datalake_retsuko_clean.credit_card_payment.status
+  brand_name:
+    lineage:
+      - datalake_retsuko_clean.credit_card_payment.brand_name
+  installments:
+    lineage:
+      - datalake_retsuko_clean.credit_card_payment.installments
+  invoice_theorical_amount:
+    lineage:
+      - datalake_retsuko_clean.invoice.due_amount
+  invoice_paid_amount:
+    lineage:
+      - datalake_retsuko_clean.invoice.paid_amount
+  accrual_year_month:
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+  dt_ccp_created:
+    lineage:
+      - datalake_retsuko_clean.credit_card_payment.ts_created
+  dt_due:
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_due
+  dt_paid:
+    lineage:
+      - datalake_retsuko_clean.invoice.ts_paid

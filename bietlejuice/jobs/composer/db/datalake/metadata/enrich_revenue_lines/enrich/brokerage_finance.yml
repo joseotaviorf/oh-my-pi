@@ -1,0 +1,32 @@
+---
+database_name: datalake_revenue_lines
+table_name: brokerage_finance
+columns:
+  id_bfi:
+    lineage:
+      - datalake_owner_fees_clean.contract_brokerage_fee.id
+  id_contract_ebdb:
+    lineage:
+      - datalake_owner_fees_clean.contract.id_external
+  total_installments:
+    lineage:
+      - datalake_owner_fees_clean.contract_brokerage_fee.installment_number
+  premium_fee:
+    lineage:
+      - datalake_owner_fees_clean.contract_brokerage_fee.premium_fee
+  real_state_agent_share:
+    lineage:
+      - datalake_ebdb_clean.contract.agent_brokerage_share
+      - datalake_owner_fees_clean.contract.real_state_agent_share
+  accrual_year_month:
+    lineage:
+      - datalake_retsuko_clean.invoice.accrual_year_month
+  dt_bf_created:
+    lineage:
+      - datalake_owner_fees_clean.contract_brokerage_fee.ts_created
+  dt_due_fee:
+    lineage:
+      - ddatalake_quintoandar.aux_date.date
+  dt_paid_fee:
+    lineage:
+      - ddatalake_quintoandar.aux_date.date
