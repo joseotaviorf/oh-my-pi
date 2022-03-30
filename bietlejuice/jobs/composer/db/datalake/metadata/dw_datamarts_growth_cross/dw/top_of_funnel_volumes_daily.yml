@@ -1,0 +1,54 @@
+---
+database_name: dw_datamarts_growth_cross
+table_name: top_of_funnel_volumes_daily
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_clean.sale_tof_daily_targets.city
+      - datalake_gsheets_clean.rental_tof_daily_targets.city_group
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.city_group
+      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.city_group
+      - datalake_top_of_funnel_demand.user_interactions.city_group
+      - dw_datamarts_cross.buyer_prospect_status.city_group
+      - dw_datamarts_growth_cross.tenant_prospect_status.city_group
+  business_context:
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.business_context
+  campaign_context:
+    lineage:
+      - datalake_gsheets_clean.sale_tof_daily_targets.context
+      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.campaign_context
+  mkt_origin:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.mkt_origin
+      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.mkt_origin
+      - datalake_top_of_funnel_demand.user_interactions.mkt_origin
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_clean.sale_tof_daily_targets.mkt_channel
+      - datalake_gsheets_clean.rental_tof_daily_targets.mkt_channel
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.mkt_channel
+      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.mkt_channel
+      - datalake_top_of_funnel_demand.user_interactions.mkt_channel
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_clean.sale_tof_daily_targets.mkt_medium
+      - datalake_gsheets_clean.rental_tof_daily_targets.mkt_medium
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.mkt_medium
+      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.mkt_medium
+      - datalake_top_of_funnel_demand.user_interactions.mkt_medium
+  mkt_source:
+    lineage:
+      - datalake_gsheets_clean.sale_tof_daily_targets.mkt_source
+      - datalake_gsheets_clean.rental_tof_daily_targets.mkt_source
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.mkt_source
+      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.mkt_source
+      - datalake_top_of_funnel_demand.user_interactions.mkt_source
+  dt_event:
+    lineage:
+      - datalake_gsheets_clean.sale_tof_daily_targets.date
+      - datalake_gsheets_clean.rental_tof_daily_targets.date
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.dt_event
+      - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.dt_event
+      - datalake_top_of_funnel_demand.user_interactions.dt_event
+      - dw_public.dim_date.date
