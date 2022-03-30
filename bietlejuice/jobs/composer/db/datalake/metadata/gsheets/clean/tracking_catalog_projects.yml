@@ -1,0 +1,15 @@
+database_name: datalake_gsheets_clean
+table_name: tracking_catalog_projects
+columns:
+  id_app:
+    lineage:
+      - datalake_gsheets_raw.tracking_catalog_projects.id_app
+  project_name:
+    lineage:
+      - datalake_gsheets_raw.tracking_catalog_projects.project_name
+  description:
+    lineage:
+      - datalake_gsheets_raw.tracking_catalog_projects.description
+  owner:
+    lineage:
+      - datalake_gsheets_raw.tracking_catalog_projects.owner
