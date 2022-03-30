@@ -32,7 +32,7 @@ columns:
   dt_created:
     lineage:
       - datalake_gsheets_raw.forecast_diario_demanda.date
-  dt_started_week:
+  dt_week_start:
     lineage:
       - datalake_gsheets_raw.forecast_diario_demanda.week_start
   year:

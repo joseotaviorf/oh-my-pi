@@ -9,7 +9,7 @@ SELECT
     CAST(vb AS DECIMAL(12,4)) AS vb,
     CAST(vc AS DECIMAL(12,4)) AS vc,
     TO_DATE(date, 'M/dd/yyyy') AS dt_created,
-    TO_DATE(week_start, 'M/dd/yyyy') AS dt_started_week,
+    TO_DATE(week_start, 'M/dd/yyyy') AS dt_week_start,
     CAST(year AS INT) AS year,
     CAST(halfyear AS INT) AS semester,
     CAST(quarter AS INT) AS quarter,

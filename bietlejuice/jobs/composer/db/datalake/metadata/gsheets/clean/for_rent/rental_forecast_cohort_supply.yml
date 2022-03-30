@@ -26,7 +26,7 @@ columns:
   week_origin:
     lineage:
       - datalake_gsheets_raw.forecast_cohort_supply.week_origin
-  dt_started_week:
+  dt_week_start:
     lineage:
       - datalake_gsheets_raw.forecast_cohort_supply.week_start
  

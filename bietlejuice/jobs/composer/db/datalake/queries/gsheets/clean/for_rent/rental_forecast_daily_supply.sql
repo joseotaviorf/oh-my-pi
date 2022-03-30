@@ -7,7 +7,7 @@ SELECT
     CAST(opp AS DECIMAL(12,4)) AS opp,
     CAST(q AS DECIMAL(12,4)) AS q,    
     TO_DATE(date, 'M/d/yyyy') AS dt_created,
-    TO_DATE(week_start, 'M/d/yyyy') AS dt_started_week,
+    TO_DATE(week_start, 'M/d/yyyy') AS dt_week_start,
     CAST(year AS INT) AS year,
     CAST(halfyear AS INT) AS semester,
     CAST(quarter AS INT) AS quarter,
