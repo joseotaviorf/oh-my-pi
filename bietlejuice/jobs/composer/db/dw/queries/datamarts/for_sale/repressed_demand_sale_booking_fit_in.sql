@@ -193,7 +193,7 @@ WITH house_available_hours AS (
         ts_event AS event_date,
         CAST(id_user AS BIGINT) AS user_id,
         CAST(json_extract_path_text(event_properties, 'house_id') AS BIGINT) AS house_id,
-        CAST(COALESCE(json_extract_path_text(event_properties, 'alert_target_date'), '') AS DATE) AS target_date,
+        CAST(NULLIF(json_extract_path_text(event_properties, 'alert_target_date'), '') AS DATE) AS target_date,
         CAST(COALESCE(json_extract_path_text(event_properties, 'alert_slot_from'), '') AS BIGINT) AS alert_slot_from,
         CAST(COALESCE(json_extract_path_text(event_properties, 'alert_slot_to'), '') AS BIGINT) AS alert_slot_to
     FROM
