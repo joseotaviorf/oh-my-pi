@@ -85,7 +85,7 @@ columns:
       - datalake_sales_flow_raw.mortgage_aud.end_date_mod
   mod_ts_seller_paid:
     lineage:
-      - datalake_sales_flow_raw.mortgage_aud.mod_seller_paid_at
+      - datalake_sales_flow_raw.mortgage_aud.seller_paid_at_mod
   dt_credit_started:
     lineage:
       - datalake_sales_flow_raw.mortgage_aud.credit_start_date

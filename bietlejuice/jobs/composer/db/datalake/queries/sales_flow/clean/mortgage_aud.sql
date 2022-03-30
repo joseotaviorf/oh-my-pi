@@ -26,7 +26,7 @@ SELECT
     bank_start_date_mod AS mod_dt_bank_started,
     start_date_mod AS mod_dt_started,
     end_date_mod AS mod_dt_ended,
-    mod_seller_paid_at AS mod_ts_seller_paid,
+    seller_paid_at_mod AS mod_ts_seller_paid,
     credit_start_date AS dt_credit_started,
     credit_end_date AS dt_credit_ended,
     bank_start_date AS dt_bank_started,
