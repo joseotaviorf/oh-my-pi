@@ -1,0 +1,50 @@
+---
+database_name: datalake_gsheets_clean
+table_name: rental_forecast_daily_demand
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.forecast_diario_demanda.city_group
+  acquisition_channel:
+    lineage:
+      - datalake_gsheets_raw.forecast_diario_demanda.acquisition_channel
+  first_touchpoint:
+    lineage:
+      - datalake_gsheets_raw.forecast_diario_demanda.first_touchpoint
+  ca:
+    lineage:
+      - datalake_gsheets_raw.forecast_diario_demanda.ca
+  cs:
+    lineage:
+      - datalake_gsheets_raw.forecast_diario_demanda.cs
+  oa:
+    lineage:
+      - datalake_gsheets_raw.forecast_diario_demanda.oa
+  os:
+    lineage:
+      - datalake_gsheets_raw.forecast_diario_demanda.os
+  vb:
+    lineage:
+      - datalake_gsheets_raw.forecast_diario_demanda.vb
+  vc:
+    lineage:
+      - datalake_gsheets_raw.forecast_diario_demanda.vc
+  dt_created:
+    lineage:
+      - datalake_gsheets_raw.forecast_diario_demanda.date
+  dt_started_week:
+    lineage:
+      - datalake_gsheets_raw.forecast_diario_demanda.week_start
+  year:
+    lineage:
+      - datalake_gsheets_raw.forecast_diario_demanda.year
+  semester:
+    lineage:
+      - datalake_gsheets_raw.forecast_diario_demanda.halfyear
+  quarter:
+    lineage:
+      - datalake_gsheets_raw.forecast_diario_demanda.quarter
+  month:
+    lineage:
+      - datalake_gsheets_raw.forecast_diario_demanda.month
+  

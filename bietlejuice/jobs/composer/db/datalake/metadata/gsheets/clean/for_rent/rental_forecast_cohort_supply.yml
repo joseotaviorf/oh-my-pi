@@ -1,0 +1,32 @@
+---
+database_name: datalake_gsheets_clean
+table_name: rental_forecast_cohort_supply
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.forecast_cohort_supply.city_group
+  lead:
+    lineage:
+      - datalake_gsheets_raw.forecast_cohort_supply.lead
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_raw.forecast_cohort_supply.mkt_channel
+  fl:
+    lineage:
+      - datalake_gsheets_raw.forecast_cohort_supply.fl
+  op2q:
+    lineage:
+      - datalake_gsheets_raw.forecast_cohort_supply.op2q
+  opp2fl:
+    lineage:
+      - datalake_gsheets_raw.forecast_cohort_supply.opp2fl
+  q2opp:
+    lineage:
+      - datalake_gsheets_raw.forecast_cohort_supply.q2opp
+  week_origin:
+    lineage:
+      - datalake_gsheets_raw.forecast_cohort_supply.week_origin
+  dt_started_week:
+    lineage:
+      - datalake_gsheets_raw.forecast_cohort_supply.week_start
+ 

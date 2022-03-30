@@ -1,0 +1,38 @@
+---
+database_name: datalake_gsheets_clean
+table_name: rental_forecast_cohort_demand
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.forecast_cohort_demanda.city_group
+  acquisition_channel:
+    lineage:
+      - datalake_gsheets_raw.forecast_cohort_demanda.acquisition_channel
+  first_touchpoint:
+    lineage:
+      - datalake_gsheets_raw.forecast_cohort_demanda.first_touchpoint
+  ca2cs:
+    lineage:
+      - datalake_gsheets_raw.forecast_cohort_demanda.ca2cs
+  cs:
+    lineage:
+      - datalake_gsheets_raw.forecast_cohort_demanda.cs
+  oa2ca:
+    lineage:
+      - datalake_gsheets_raw.forecast_cohort_demanda.oa2ca
+  os2oa:
+    lineage:
+      - datalake_gsheets_raw.forecast_cohort_demanda.os2oa
+  vb2vc:
+    lineage:
+      - datalake_gsheets_raw.forecast_cohort_demanda.vb2vc
+  vc2os:
+    lineage:
+      - datalake_gsheets_raw.forecast_cohort_demanda.vc2os
+  week_origin:
+    lineage:
+      - datalake_gsheets_raw.forecast_cohort_demanda.week_origin
+  dt_started_week:
+    lineage:
+      - datalake_gsheets_raw.forecast_cohort_demanda.week_start
+ 

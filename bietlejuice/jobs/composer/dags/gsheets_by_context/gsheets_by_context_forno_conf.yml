@@ -11,3 +11,6 @@ dags:
   growth:
     main_schedule_interval: 0 3 * * *
     dag_owner: Data Growth
+  for_rent:
+    main_schedule_interval: 0 3 * * *
+    dag_owner: Data ForRent

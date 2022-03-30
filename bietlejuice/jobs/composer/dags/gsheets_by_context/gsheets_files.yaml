@@ -51,3 +51,27 @@ tradecom_configuration:
     sheet_name: tradecom_configuration
     clean_table_name: affiliates_cost_tradecom_configuration
     sheet_context: growth
+
+forecast_cohort_demanda:
+    sheet_id: 1X8kklNtizTnKJ8zI4XMLaI3H31YU3Oq36VmFxmhwLD0
+    sheet_name: forecast_cohort_demanda
+    clean_table_name: rental_forecast_cohort_demand
+    sheet_context: for_rent
+
+forecast_diario_demanda:
+    sheet_id: 1X8kklNtizTnKJ8zI4XMLaI3H31YU3Oq36VmFxmhwLD0
+    sheet_name: forecast_diário_demanda
+    clean_table_name: rental_forecast_daily_demand
+    sheet_context: for_rent
+
+forecast_cohort_supply:
+    sheet_id: 1X8kklNtizTnKJ8zI4XMLaI3H31YU3Oq36VmFxmhwLD0
+    sheet_name: forecast_cohort_supply
+    clean_table_name: rental_forecast_cohort_supply
+    sheet_context: for_rent
+
+forecast_diario_supply:
+    sheet_id: 1X8kklNtizTnKJ8zI4XMLaI3H31YU3Oq36VmFxmhwLD0
+    sheet_name: forecast_diário_supply
+    clean_table_name: rental_forecast_daily_supply
+    sheet_context: for_rent
