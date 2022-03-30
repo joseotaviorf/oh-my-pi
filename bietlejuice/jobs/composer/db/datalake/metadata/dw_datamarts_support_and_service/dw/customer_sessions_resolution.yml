@@ -1,0 +1,40 @@
+---
+database_name: dw_datamarts_support_and_service
+table_name: customer_sessions_resolution
+columns:
+  sk_ticket:
+    lineage:
+      - dw_customer_support.fact_ticket.sk_ticket
+  sk_user:
+    lineage:
+      - dw_customer_support.fact_ticket.sk_user
+      - dw_public.dim_user.telefone_principal
+      - dw_public.dim_user.cpf
+      - dw_customer_support.fact_ticket.sk_contract
+  sk_contract:
+    lineage:
+      - dw_customer_support.fact_ticket.sk_contract
+  channel:
+    lineage:
+      - dw_customer_support.fact_ticket.channel
+  back_ticket:
+    lineage:
+      - dw_customer_support.fact_ticket.last_back_ticket
+  has_transfers:
+    lineage:
+      - dw_customer_support.fact_ticket.has_transfers
+  total_departments:
+    lineage:
+      - dw_customer_support.fact_ticket.total_departments
+  is_solved:
+    lineage:
+      - dw_customer_support.fact_ticket.is_solved
+  ticket_recontact_list:
+    lineage:
+      - dw_customer_support.fact_ticket.sk_ticket
+  ts_started:
+    lineage:
+      - dw_customer_support.fact_ticket.ts_started
+  ts_closed:
+    lineage:
+      - dw_customer_support.fact_ticket.ts_closed
