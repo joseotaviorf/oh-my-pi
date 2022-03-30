@@ -91,6 +91,7 @@ This pipeline produces the following output tables:
     - `hub_agents_hierarchy`
     - `hub_bonus`
     - `hub_sale_closing_process`
+    - `inside_sale_supply_targets`
     - `inspection_analysis_forms`
     - `inspection_bugs`
     - `inspection_bugs_v2`

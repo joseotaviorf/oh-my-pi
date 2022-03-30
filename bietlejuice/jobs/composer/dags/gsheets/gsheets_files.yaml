@@ -427,6 +427,11 @@ hub_sale_closing_process:
     sheet_name: clean
     clean_table_name: hub_sale_closing_process
 
+inside_sale_supply_targets:
+    sheet_id: 1AMY3biIPE8bD32xaYVv7lh-LbSZNGhA8P9L7kse3Poc
+    sheet_name: inside_sale_supply_targets
+    clean_table_name: inside_sale_supply_targets
+
 inspectors_control:
     sheet_id: 1cFwadBcEkIoC9zpGQNV7iA1Ii0fZmln5mRbB0LaW4zw
     sheet_name: inspectors_control
