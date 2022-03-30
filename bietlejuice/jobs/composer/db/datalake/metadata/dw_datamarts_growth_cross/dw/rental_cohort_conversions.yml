@@ -1,0 +1,60 @@
+---
+database_name: dw_datamarts_growth_cross
+table_name: rental_cohort_conversions
+columns:
+  date:
+    lineage:
+      - dw_public.dim_date.date
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
+  supply_mkt_origin:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.mkt_origin
+  supply_mkt_origin_detailed:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.mkt_origin
+      - dw_datamarts_cross.lead_listing_flows.mkt_channel
+  lead_context:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.mkt_origin
+  lead_processing_operation:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.sourcing_ops
+  demand_mkt_channel:
+    lineage:
+      - dw_public.dim_booking.mkt_channel
+      - dw_public.dim_offer.mkt_channel
+  demand_mkt_channel_detailed:
+    lineage:
+      - dw_public.dim_offer.mkt_medium
+      - dw_public.dim_booking.mkt_medium
+      - dw_public.dim_booking.mkt_channel
+      - dw_public.dim_offer.mkt_channel
+  first_touchpoint:
+    lineage:
+      - dw_datamarts_cross.funnel_demand_flows.funnel_first_touchpoint
+  is_b2b_demand:
+    lineage:
+      - dw_datamarts_cross.quintoandar_consultant_listings.type_big_agent
+  weeks_conversion:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.sk_lead_date
+      - dw_datamarts_cross.lead_listing_flows.sk_prospect_date
+      - dw_datamarts_cross.lead_listing_flows.sk_qualified_date
+      - dw_datamarts_cross.lead_listing_flows.sk_opportunity_date
+      - dw_datamarts_cross.lead_listing_flows.sk_first_listing_date
+      - dw_public.fact_listing_rent_flows.sk_booking_created_date
+      - dw_public.fact_listing_rent_flows.sk_visit_date
+      - dw_public.fact_listing_rent_flows.sk_offer_submitted_date
+      - dw_public.fact_listing_rent_flows.sk_offer_approved_date
+      - dw_public.fact_listing_rent_flows.sk_first_credit_evaluation_init
+      - dw_public.fact_listing_rent_flows.sk_last_doc_analysis_approved
+      - dw_public.fact_listing_rent_flows.sk_credit_analysis_approved_date
+      - dw_public.fact_listing_rent_flows.sk_tenant_first_doc_sent_date
+      - dw_public.fact_listing_rent_flows.sk_first_credit_evaluation_positive
+      - dw_public.fact_listing_rent_flows.sk_guarantee_date
+      - dw_public.fact_listing_rent_flows.sk_contract_created_date
+      - dw_public.fact_listing_rent_flows.sk_guarantee_paid_date
+      - dw_public.fact_listing_rent_flows.sk_contract_signed_date
+      - dw_public.fact_listing_rent_flows.sk_contract_annulment_date
