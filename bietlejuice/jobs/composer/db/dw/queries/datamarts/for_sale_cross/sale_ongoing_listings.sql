@@ -34,6 +34,8 @@ FROM
     datamarts.quintoandar_consultant_listings 
 WHERE 
     businesscontext = 'SALE'
+    AND dt_sale > dt_ciq_started 
+    OR type_big_agent='CIQ_FULL'
 ),
 
 daily_published_listings_with_region AS (
@@ -76,7 +78,7 @@ SELECT
     COUNT(DISTINCT sk_sale_listing) AS ongoing_listings,
     COUNT(DISTINCT ciq_assignment) AS ciq_listing
 FROM 
-    daily_published_listings_with_region
+    daily_published_listings_with_region 
 GROUP BY 
     1, 
     2, 
