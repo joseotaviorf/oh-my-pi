@@ -13,7 +13,6 @@ columns:
       - datalake_gsheets_clean.daily_target_supply_rental.city_group
       - datalake_gsheets_clean.daily_target_supply_sale.city_group
       - datalake_marketing_costs.daily_costs.city_group
-      - datalake_raw.gsheets_provisioned_costs_import.city_group
       - dw_datamarts_growth_cross.performance_marketing_cluster_promotional_bonus_costs.city_group
       - dw_quintoandar.dim_affiliate_cost.city_group
       - dw_public.dim_region.city_group
@@ -29,7 +28,6 @@ columns:
       - datalake_gsheets_clean.daily_target_supply_sale.supply_origin
       - datalake_marketing_costs.daily_costs.mkt_origin
       - datalake_marketing_costs.daily_costs.mkt_channel
-      - datalake_raw.gsheets_provisioned_costs_import.cost_origin
       - dw_datamarts_growth_cross.performance_marketing_cluster_promotional_bonus_costs.affiliate_type
       - dw_quintoandar.dim_affiliate_cost.mkt_origin
       - dw_datamarts_cross.lead_listing_flows.mkt_origin
@@ -58,7 +56,6 @@ columns:
       - datalake_gsheets_clean.daily_target_supply_sale.supply_channel
       - datalake_marketing_costs.daily_costs.mkt_origin
       - datalake_marketing_costs.daily_costs.mkt_channel
-      - datalake_raw.gsheets_provisioned_costs_import.cost_origin
       - dw_datamarts_growth_cross.performance_marketing_cluster_promotional_bonus_costs.affiliate_type
       - dw_quintoandar.dim_affiliate_cost.mkt_origin
       - dw_datamarts_cross.lead_listing_flows.mkt_origin
