@@ -1,0 +1,17 @@
+---
+database_name: dw_datamarts_growth_cross
+table_name: demand_housing_cluster_changes
+columns:
+  week_event:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.dt_contract_signed
+  sk_client:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.dt_event
+  cluster:
+    lineage:
+      - datalake_marketing_segmentations.lost_listings.cluster
+  week_event_end:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.dt_contract_signed
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.dt_event
