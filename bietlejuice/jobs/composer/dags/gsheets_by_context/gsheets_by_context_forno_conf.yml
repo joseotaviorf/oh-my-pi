@@ -14,3 +14,6 @@ dags:
   for_rent:
     main_schedule_interval: 0 3 * * *
     dag_owner: Data ForRent
+  bedrock:
+    main_schedule_interval: 0 3 * * *
+    dag_owner: Data Bedrock

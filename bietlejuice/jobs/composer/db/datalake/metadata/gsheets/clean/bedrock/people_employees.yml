@@ -1,0 +1,19 @@
+---
+database_name: datalake_gsheets_clean
+table_name: people_employees
+columns:
+  email:
+    lineage:
+      - datalake_gsheets_raw.people_data.email
+  role_name:
+    lineage:
+      - datalake_gsheets_raw.people_data.cargo
+  department_name:
+    lineage:
+      - datalake_gsheets_raw.people_data.departamento
+  dt_admission:
+    lineage:
+      - datalake_gsheets_raw.people_data.dt_inicio
+  dt_resignation:
+    lineage:
+      - datalake_gsheets_raw.people_data.dt_desligamento

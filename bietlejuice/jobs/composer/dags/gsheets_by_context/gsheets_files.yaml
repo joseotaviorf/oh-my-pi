@@ -52,6 +52,12 @@ tradecom_configuration:
     clean_table_name: affiliates_cost_tradecom_configuration
     sheet_context: growth
 
+people_data:
+    sheet_id: 1bFPTfQjfxtl97QamwKK7ofmYOz7j8_hSLjUmOawF7xg
+    sheet_name: people_data
+    clean_table_name: people_employees
+    sheet_context: bedrock
+    
 forecast_cohort_demanda:
     sheet_id: 1X8kklNtizTnKJ8zI4XMLaI3H31YU3Oq36VmFxmhwLD0
     sheet_name: forecast_cohort_demanda
