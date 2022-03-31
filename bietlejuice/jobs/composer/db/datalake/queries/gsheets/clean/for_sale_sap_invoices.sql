@@ -1,0 +1,9 @@
+SELECT
+    document_number,
+    item,
+    description,
+    canceled,
+    amount_after_discount,
+    dt_launch
+FROM
+    datalake_gsheets_raw.for_sale_invoices_20220225

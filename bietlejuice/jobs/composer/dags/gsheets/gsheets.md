@@ -85,6 +85,8 @@ This pipeline produces the following output tables:
     - `extra_invoice`
     - `extra_invoice_created_expenses`
     - `forbrokers_3p_partner_conditions`
+    - `for_sale_financial_flow`
+    - `for_sale_sap_invoices`   
     - `from_to_cancellation`
     - `google_searches_share_of_interest`
     - `hotjar_photos_repressed_demand`

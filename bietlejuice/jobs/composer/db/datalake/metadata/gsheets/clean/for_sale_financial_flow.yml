@@ -1,0 +1,67 @@
+database_name: datalake_gsheets_clean
+table_name: for_sale_financial_flow
+columns:
+  month:
+    lineage:
+      - datalake_gsheets_raw.for_sale_financial_flow_raw.month
+  account_number:
+    lineage:
+      - datalake_gsheets_raw.for_sale_financial_flow_raw.account_number
+  description:
+    lineage:
+      - datalake_gsheets_raw.for_sale_financial_flow_raw.description
+  dt_launch:
+    lineage:
+      - datalake_gsheets_raw.for_sale_financial_flow_raw.dt_launch
+  dt_due:
+    lineage:
+      - datalake_gsheets_raw.for_sale_financial_flow_raw.dt_due
+  serie:
+    lineage:
+      - datalake_gsheets_raw.for_sale_financial_flow_raw.serie
+  document_number:
+    lineage:
+      - datalake_gsheets_raw.for_sale_financial_flow_raw.document_number
+  transaction_number:
+    lineage:
+      - datalake_gsheets_raw.for_sale_financial_flow_raw.transaction_number
+  observations:
+    lineage:
+      - datalake_gsheets_raw.for_sale_financial_flow_raw.observations
+  counterpart:
+    lineage:
+      - datalake_gsheets_raw.for_sale_financial_flow_raw.counterpart
+  counterpart_account:
+    lineage:
+      - datalake_gsheets_raw.for_sale_financial_flow_raw.counterpart_account
+  amount:
+    lineage:
+      - datalake_gsheets_raw.for_sale_financial_flow_raw.amount
+  balance:
+    lineage:
+      - datalake_gsheets_raw.for_sale_financial_flow_raw.balance
+  id_region:
+    lineage:
+      - datalake_gsheets_raw.for_sale_financial_flow_raw.id_region
+  cost_center:
+    lineage:
+      - datalake_gsheets_raw.for_sale_financial_flow_raw.cost_center
+  id_offer:
+    lineage:
+      - datalake_gsheets_raw.for_sale_financial_flow_raw.id_offer
+  payment_method:
+    lineage:
+      - datalake_gsheets_raw.for_sale_financial_flow_raw.payment_method
+  dt_business:
+    lineage:
+      - datalake_gsheets_raw.for_sale_financial_flow_raw.dt_business
+  invoice_number:
+    lineage:
+      - datalake_gsheets_raw.for_sale_financial_flow_raw.invoice_number
+  id_flow:
+    lineage:
+      - datalake_gsheets_raw.for_sale_financial_flow_raw.id_flow
+  event:
+    lineage:
+      - datalake_gsheets_raw.for_sale_financial_flow_raw.event
+

@@ -387,6 +387,16 @@ forms_analise_vistoria:
     sheet_name: inspection_analysis_forms
     clean_table_name: inspection_analysis_forms
 
+for_sale_financial_flow_raw:
+    sheet_id: 1wduO27OMWmNLN4kIRN2p_5E3-sV4wxEJDf8ECDkIsL0
+    sheet_name: Base
+    clean_table_name: for_sale_financial_flow
+
+for_sale_invoices_20220225:
+    sheet_id: 1xemQxfpH5VuOyAXzUcYL1SfdP0T1gnJZy62AhmVxKdY
+    sheet_name: bd_sap
+    clean_table_name: for_sale_sap_invoices
+
 full_taxonomy_new_test:
     sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
     sheet_name: Full_Taxonomy_New_Test

@@ -1,0 +1,21 @@
+database_name: datalake_gsheets_clean
+table_name: for_sale_sap_invoices
+columns:
+  document_number:
+    lineage:
+      - datalake_gsheets_raw.for_sale_invoices_20220225.document_number
+  dt_launch:
+    lineage:
+      - datalake_gsheets_raw.for_sale_invoices_20220225.dt_launch
+  item:
+    lineage:
+      - datalake_gsheets_raw.for_sale_invoices_20220225.item
+  description:
+    lineage:
+      - datalake_gsheets_raw.for_sale_invoices_20220225.description
+  amount_after_discount:
+    lineage:
+      - datalake_gsheets_raw.for_sale_invoices_20220225.amount_after_discount
+  canceled:
+    lineage:
+      - datalake_gsheets_raw.for_sale_invoices_20220225.canceled

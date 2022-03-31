@@ -1,0 +1,23 @@
+SELECT
+    id_offer,
+    id_flow,
+    id_region,
+    document_number,
+    transaction_number,
+    account_number,
+    invoice_number,
+    counterpart,
+    counterpart_account,
+    cost_center,
+    serie,
+    description,
+    observations,
+    payment_method,
+    event,
+    amount,
+    balance,
+    dt_business,
+    dt_launch,
+    dt_due
+FROM
+    datalake_gsheets_raw.for_sale_financial_flow_raw
