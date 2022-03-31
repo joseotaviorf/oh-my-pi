@@ -1,0 +1,13 @@
+SELECT
+    user_name,
+    email,
+    phone,
+    city,
+    user_knew_quintoandar,
+    user_moving_date,
+    people_living_with,
+    house_rented_or_owned,
+    is_landlord,
+    dt_user_created
+FROM
+    datalake_gsheets_raw.bbb22_giveaway_for_rent 

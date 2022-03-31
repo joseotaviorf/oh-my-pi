@@ -1,0 +1,14 @@
+database_name: datalake_gsheets_raw
+table_name: bbb22_giveaway_for_rent
+columns:
+  user_name:
+    tags:
+    - PII
+    - Confidential
+  email:
+    tags:
+    - Confidential
+  phone:
+    tags:
+    - PII
+    - Confidential
