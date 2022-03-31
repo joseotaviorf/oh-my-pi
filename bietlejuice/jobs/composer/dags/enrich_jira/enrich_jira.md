@@ -16,6 +16,7 @@ This pipeline produces the following output table:
 
 1. In data lake enrich:
 - `issues`
+- `issues_itops`
 - `issue_status_changes`
 
 ### Responsible Data Teams

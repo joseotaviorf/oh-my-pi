@@ -1,0 +1,130 @@
+---
+database_name: datalake_jira
+table_name: issues_itops
+columns:
+  id:
+    lineage:
+      - datalake_jira_clean.issues.id
+  id_issue:
+    lineage:
+      - datalake_jira_clean.issues.key
+  request_type:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  summary:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  issue_description:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  category:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  current_status:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  reporter_name:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  reporter_email:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  creator_name:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  creator_email:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  departament:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  service_location:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  assignee_name:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  assignee_email:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  support_level:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  priority_defined_by_support:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  qtd_comments:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  satisfaction:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  sub_category:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  incident_type_old:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  software_incident_old:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  incident_computer_os:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  software_access_old:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  software_category_old:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  access_software_name_others:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  access_temporary_access:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  access_software_name:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  access_approval_groups:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  sla_time_first_response_hours_ongoing:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  sla_time_first_response_hours_completed:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  sla_hours_ongoing:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  sla_hours_completed:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  sla_access_approval_hours_ongoing:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  sla_access_approval_hours_completed:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  sla_renewal_hours_ongoing:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  sla_renewal_hours_completed:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  ts_first_response:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  ts_status_category_changed:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  ts_created:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  ts_resolved:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  ts_updated:
+    lineage:
+      - datalake_jira_clean.issues.fields
