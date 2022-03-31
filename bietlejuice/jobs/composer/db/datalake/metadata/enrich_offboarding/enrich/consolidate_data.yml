@@ -1,0 +1,165 @@
+---
+database_name: datalake_offboarding
+table_name: consolidate_data
+columns:
+  id:
+    lineage:
+      - datalake_offboarding.ongoing.id
+  id_contract:
+    lineage:
+      - datalake_offboarding.ongoing.id_contract
+  id_house:
+    lineage:
+      - datalake_offboarding.ongoing.id_house
+  repair_resolution:
+    lineage:
+      - datalake_offboarding.ongoing.repair_resolution
+  repair_cost:
+    lineage:
+      - datalake_offboarding.ongoing.repair_cost
+  frt_ldt_greater_than_0:
+    lineage:
+      - datalake_offboarding.ongoing.ts_termination_finished
+      - datalake_offboarding.ongoing.dt_termination
+  frt:
+    lineage:
+      - datalake_offboarding.ongoing.ts_termination_finished
+      - datalake_offboarding.ongoing.dt_termination
+  number_of_responses_iq_nps:
+    lineage:
+      - datalake_offboarding.nps_agg.number_of_responses
+  number_of_responses_pp:
+    lineage:
+      - datalake_offboarding.nps_agg.number_of_responses_pp
+  number_of_responses_iq:
+    lineage:
+      - datalake_offboarding.nps_agg.number_of_responses_iq
+  nps_pp:
+    lineage:
+      - datalake_offboarding.nps_agg.nps_pp
+  nps_iq:
+    lineage:
+      - datalake_offboarding.nps_agg.nps_iq
+  an_vt1_flag:
+    lineage:
+      - datalake_gsheets_clean.inspection_analysis_forms.status
+  contract_lifetime:
+    lineage:
+      - datalake_offboarding.ongoing.dt_termination
+      - datalake_offboarding.ongoing.dt_contract_entrance
+      - datalake_offboarding.ongoing.dt_contract_started
+  ldt_td_inspect:
+    lineage:
+      - datalake_offboarding.ongoing.dt_last_inspection_synched
+      - datalake_offboarding.ongoing.dt_termination
+  ldt_erc_insp:
+    lineage:
+      - datalake_offboarding.ongoing.ts_analyst_annulment_input
+      - datalake_offboarding.ongoing.dt_last_inspection_synched
+  ldt_an_vt2_Insp:
+    lineage:
+      - datalake_offboarding.inspection_analysis.dt_completed_date
+      - datalake_offboarding.ongoing.dt_last_inspection_synched
+  ldt_tf_an_vt2:
+    lineage:
+      - datalake_offboarding.ongoing.ts_termination_finished
+      - datalake_offboarding.inspection_analysis.dt_completed_date
+  ldt_erc_tf:
+    lineage:
+      - datalake_offboarding.ongoing.ts_termination_finished
+      - datalake_offboarding.ongoing.ts_analyst_annulment_input
+  ldt_td_erc:
+    lineage:
+      - datalake_offboarding.ongoing.ts_analyst_annulment_input
+      - datalake_offboarding.ongoing.dt_termination
+  ldt_erc_an_vt_end:
+    lineage:
+      - datalake_offboarding.inspection_analysis.dt_completed_date
+      - datalake_offboarding.ongoing.ts_analyst_annulment_input
+  ldt_td_an_vt2:
+    lineage:
+      - datalake_offboarding.inspection_analysis.dt_completed_date
+      - datalake_offboarding.ongoing.dt_termination
+  today_td:
+    lineage:
+      - datalake_offboarding.ongoing.dt_termination
+  interaction_pp:
+    lineage:
+      - datalake_offboarding.budgeting_window.interaction_pp
+  is_b2b:
+    lineage:
+      - datalake_offboarding.ongoing.is_b2b
+  is_repair_tenant_duty:
+    lineage:
+      - datalake_offboarding.ongoing.is_repair_tenant_duty
+  is_workflow:
+    lineage:
+      - datalake_offboarding.ongoing.is_workflow
+  dt_inspected:
+    lineage:
+      - datalake_offboarding.ongoing.dt_last_inspection_synched
+  dt_insp_analysis_completed:
+    lineage:
+      - datalake_offboarding.inspection_analysis.dt_completed_date
+  dt_created_budgeting_app:
+    lineage:
+      - datalake_offboarding.tickets.dt_created
+  dt_solved_budgeting_app:
+    lineage:
+      - datalake_offboarding.tickets.dt_solved
+  dt_created_budgeting:
+    lineage:
+      - datalake_offboarding.tickets.dt_created
+  dt_solved_budgeting:
+    lineage:
+      - datalake_offboarding.tickets.dt_solved
+  dt_ap_start:
+    lineage:
+      - datalake_offboarding.tickets.dt_created
+  dt_ap_solved:
+    lineage:
+      - datalake_offboarding.tickets.dt_solved
+  dt_tf_v2:
+    lineage:
+      - datalake_offboarding.ongoing.ts_analyst_annulment_input
+      - datalake_offboarding.ongoing.ts_termination_finished
+      - datalake_offboarding.inspection_analysis.dt_completed_date
+  dt_analysis_1:
+    lineage:
+      - datalake_offboarding.budgeting_window.dt_analysis
+  dt_analysis_2:
+    lineage:
+      - datalake_offboarding.budgeting_window.dt_reanalysis
+  dt_budgeted:
+    lineage:
+      - datalake_offboarding.budgeting_window.dt_budgeted
+  dt_communicated_iq:
+    lineage:
+      - datalake_offboarding.budgeting_window.dt_communicated_iq
+  dt_intermediate:
+    lineage:
+      - datalake_offboarding.budgeting_window.dt_intermediate
+  dt_agreement_executed:
+    lineage:
+      - datalake_offboarding.budgeting_window.dt_agreement_executed
+  dt_finished:
+    lineage:
+      - datalake_offboarding.budgeting_window.dt_finished
+  dt_termination:
+    lineage:
+      - datalake_offboarding.ongoing.dt_termination
+  ts_an_vt1:
+    lineage:
+      - datalake_gsheets_clean.inspection_analysis_forms.ts_input
+  ts_termination_request:
+    lineage:
+      - datalake_offboarding.ongoing.ts_termination_request
+  ts_termination_finished:
+    lineage:
+      - datalake_offboarding.ongoing.ts_termination_finished
+  ts_ended_confirmed:
+    lineage:
+      - datalake_offboarding.ongoing.ts_analyst_annulment_input
+  ts_created_inspection:
+    lineage:
+      - datalake_offboarding.ongoing.ts_created_inspection

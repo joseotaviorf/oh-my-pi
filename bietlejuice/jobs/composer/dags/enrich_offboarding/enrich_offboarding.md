@@ -16,6 +16,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 Produces the following output table on Enrich layer (via full load):
 
 - `budgeting_window`
+- `consolidate_data`
 - `contract_termination`
 - `customer_support`
 - `inspection_analysis`

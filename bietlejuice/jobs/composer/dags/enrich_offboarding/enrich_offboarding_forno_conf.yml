@@ -2,13 +2,20 @@
 inner_dependencies:
   customer_support:
     - ongoing
+  consolidate_data:
+    - budgeting_window
+    - customer_support
+    - inspection_analysis
+    - ongoing
+    - tickets
+    - nps_agg
+  inspection_analysis:
+    - ongoing
   ongoing:
     - contract_termination
   nps:
     - contract_termination
   nps_agg:
     - nps
-  inspection_analysis:
-    - ongoing
   tickets:
     - ongoing
