@@ -1,0 +1,36 @@
+---
+database_name: dw_datamarts_growth_cross
+table_name: indicaai_costs
+columns:
+  date:
+    lineage:
+      - dw_public.dim_date.date
+  week_start:
+    lineage:
+      - dw_public.dim_date.week_start
+  year_month:
+    lineage:
+      - dw_public.dim_date.year_month
+  mkt_origin:
+    lineage:
+      - datalake_marketing_costs.daily_costs.mkt_origin
+      - dw_quintoandar.dim_affiliate_cost.mkt_origin
+      - dw_sale.fact_listing_flows.mkt_origin
+      - dw_public.fact_house_listing_flows.mkt_origin
+  city_group:
+    lineage:
+      - datalake_marketing_costs.daily_costs.city_group
+      - dw_quintoandar.dim_affiliate_cost.city_group
+      - datalake_gsheets_clean.affiliates_extra_user_bonus.city_group
+      - datalake_gsheets_clean.provisioned_costs_import.city_group
+      - dw_public.dim_region.city_group
+  source:
+    lineage:
+      - dw_quintoandar.dim_affiliate_cost.commission_type
+      - datalake_gsheets_clean.provisioned_costs_import.source
+  business_context:
+    lineage:
+      - datalake_gsheets_clean.affiliates_extra_user_bonus.business_context
+  month_num:
+    lineage:
+      - dw_public.dim_date.date
