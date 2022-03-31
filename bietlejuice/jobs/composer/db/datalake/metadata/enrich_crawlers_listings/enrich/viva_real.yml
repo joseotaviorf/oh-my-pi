@@ -1,0 +1,111 @@
+---
+database_name: datalake_crawlers_listings
+table_name: viva_real
+columns:
+  id_house_platform:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.id
+  id_house:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.id
+  platform:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.origin
+  country:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.address
+  state:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.address
+  city:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.address
+  neighborhood:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.address
+  street:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.address
+  st_number:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.address
+  zip_code:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.address
+  latitude:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.geolocation
+  longitude:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.geolocation
+  listing_name:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.listing_name
+  total_area:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.house_info
+  amenities:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.house_info
+  bathrooms:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.house_info
+  bedrooms:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.house_info
+  floors:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.house_info
+  parking_spaces:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.house_info
+  suites:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.house_info
+  unit_type:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.house_info
+  usage_type:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.house_info
+  is_for_rent:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.type
+  is_for_sale:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.type
+  advertiser_name:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.contact_information
+  advertiser_phone:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.contact_information
+  condo_fee:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.price.rent
+      - datalake_crawlers_listings_clean.viva_real.price.sale
+  iptu:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.price.rent
+      - datalake_crawlers_listings_clean.viva_real.price.sale
+  price_rental:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.price.rent
+  price_sale:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.price.sale
+  ts_created:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.date_info
+  ts_updated:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.date_info
+  year:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.year
+  month:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.month
+  day:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.day
