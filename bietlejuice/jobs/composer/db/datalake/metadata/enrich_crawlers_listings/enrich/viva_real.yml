@@ -82,18 +82,16 @@ columns:
       - datalake_crawlers_listings_clean.viva_real.contact_information
   condo_fee:
     lineage:
-      - datalake_crawlers_listings_clean.viva_real.price.rent
-      - datalake_crawlers_listings_clean.viva_real.price.sale
+      - datalake_crawlers_listings_clean.viva_real.price
   iptu:
     lineage:
-      - datalake_crawlers_listings_clean.viva_real.price.rent
-      - datalake_crawlers_listings_clean.viva_real.price.sale
+      - datalake_crawlers_listings_clean.viva_real.price
   price_rental:
     lineage:
-      - datalake_crawlers_listings_clean.viva_real.price.rent
+      - datalake_crawlers_listings_clean.viva_real.price
   price_sale:
     lineage:
-      - datalake_crawlers_listings_clean.viva_real.price.sale
+      - datalake_crawlers_listings_clean.viva_real.price
   ts_created:
     lineage:
       - datalake_crawlers_listings_clean.viva_real.date_info

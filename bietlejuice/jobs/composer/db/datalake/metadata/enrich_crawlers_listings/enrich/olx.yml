@@ -73,18 +73,16 @@ columns:
       - datalake_crawlers_listings_clean.olx.contact_information
   condo_fee:
     lineage:
-      - datalake_crawlers_listings_clean.olx.price.rent
-      - datalake_crawlers_listings_clean.olx.price.sale
+      - datalake_crawlers_listings_clean.olx.price
   iptu:
     lineage:
-      - datalake_crawlers_listings_clean.olx.price.rent
-      - datalake_crawlers_listings_clean.olx.price.sale
+      - datalake_crawlers_listings_clean.olx.price
   price_rental:
     lineage:
-      - datalake_crawlers_listings_clean.olx.price.rent
+      - datalake_crawlers_listings_clean.olx.price
   price_sale:
     lineage:
-      - datalake_crawlers_listings_clean.olx.price.sale
+      - datalake_crawlers_listings_clean.olx.price
   ts_created:
     lineage:
       - datalake_crawlers_listings_clean.olx.date_info
