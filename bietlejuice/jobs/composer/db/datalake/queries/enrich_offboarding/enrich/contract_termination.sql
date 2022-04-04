@@ -449,6 +449,7 @@ SELECT
     ci.dt_start AS dt_contract_started,
     ci.dt_entrance AS dt_contract_entrance,
     ci.ts_analyst_annulment_input,
+    cc.ts_answer_sent_local AS ts_nps_answer_sent,
     neg.ts_updated AS ts_negotiation_updated,
     ln.ts_fee_negotiation_created,
     ln.ts_fee_negotiation_updated,

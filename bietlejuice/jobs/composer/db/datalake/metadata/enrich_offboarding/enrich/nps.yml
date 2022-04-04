@@ -21,6 +21,14 @@ columns:
     lineage:
       - datalake_tracksale.answer.nps_comment
       - datalake_casa_mineira_tracksale.answer.nps_comment
+  ldt_dt_termination_to_answer:
+    lineage:
+      - datalake_offboarding.contract_termination.ts_nps_answer_sent
+      - datalake_offboarding.contract_termination.dt_termination
+  ldt_termination_finished_to_answer:
+    lineage:
+      - datalake_offboarding.contract_termination.ts_nps_answer_sent
+      - datalake_offboarding.contract_termination.ts_termination_finished
   dt_sent:
     lineage:
       - datalake_tracksale.dispatch_attributes.dispatch_time
@@ -31,3 +39,6 @@ columns:
   dt_termination_finished:
     lineage:
       - datalake_offboarding.contract_termination.ts_termination_finished
+  ts_answer_sent:
+    lineage:
+      - datalake_offboarding.contract_termination.ts_nps_answer_sent

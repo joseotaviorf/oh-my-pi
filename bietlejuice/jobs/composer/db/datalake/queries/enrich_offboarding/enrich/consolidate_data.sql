@@ -120,7 +120,7 @@ SELECT DISTINCT
             AND ong.dt_termination IS NOT NULL THEN DATEDIFF(ong.ts_termination_finished,ong.dt_termination)
         ELSE NULL
     END AS frt,
-    COALESCE(nps_agg.number_of_responses, 0) AS number_of_responses_iq_nps,
+    COALESCE(nps_agg.number_of_responses, 0) AS number_of_responses_nps,
     COALESCE(nps_agg.number_of_responses_pp, 0) AS number_of_responses_pp,
     COALESCE(nps_agg.number_of_responses_iq, 0) AS number_of_responses_iq,
     nps_agg.nps_pp AS nps_pp,
@@ -136,7 +136,6 @@ SELECT DISTINCT
     DATEDIFF(ia.dt_completed_date, ong.ts_analyst_annulment_input) AS ldt_erc_an_vt_end,
     DATEDIFF(ia.dt_completed_date, ong.dt_termination) AS ldt_td_an_vt2,
     DATEDIFF(ong.dt_termination,NOW()) AS today_td,
-    bw.interaction_pp,
     tkt_v2.num_ticket_satisfied AS num_ticket_v2_satisfied,
     tkt_v2.num_ticket_neutral AS num_ticket_v2_neutral,
     tkt_v2.num_ticket_dissatisfied AS num_ticket_v2_dissatisfied,
@@ -144,6 +143,7 @@ SELECT DISTINCT
     tkt_off.num_ticket_satisfied AS num_ticket_off_front_satisfied,
     tkt_off.num_ticket_neutral AS num_ticket_off_front_neutral,
     tkt_off.num_ticket_dissatisfied AS num_ticket_off_front_dissatisfied,
+    bw.interaction_pp AS is_interaction_pp,
     ong.is_b2b,
     ong.is_repair_tenant_duty,
     ong.is_workflow,

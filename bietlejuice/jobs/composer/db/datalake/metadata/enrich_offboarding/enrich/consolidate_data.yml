@@ -25,7 +25,7 @@ columns:
     lineage:
       - datalake_offboarding.ongoing.ts_termination_finished
       - datalake_offboarding.ongoing.dt_termination
-  number_of_responses_iq_nps:
+  number_of_responses_nps:
     lineage:
       - datalake_offboarding.nps_agg.number_of_responses
   number_of_responses_pp:
@@ -83,7 +83,7 @@ columns:
   today_td:
     lineage:
       - datalake_offboarding.ongoing.dt_termination
-  interaction_pp:
+  is_interaction_pp:
     lineage:
       - datalake_offboarding.budgeting_window.interaction_pp
   is_b2b:

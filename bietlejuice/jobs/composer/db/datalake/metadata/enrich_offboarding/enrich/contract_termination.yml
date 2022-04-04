@@ -214,6 +214,10 @@ columns:
   ts_analyst_annulment_input:
     lineage:
       - datalake_ebdb_contract.contract.ts_analyst_annulment_input
+  ts_nps_answer_sent:
+    lineage:
+      - datalake_tracksale.answer.ts_answer_sent_local
+      - datalake_casa_mineira_tracksale.answer.ts_answer_sent_local
   ts_negotiation_updated:
     lineage:
       - datalake_terminator_clean.negotiation.ts_updated
