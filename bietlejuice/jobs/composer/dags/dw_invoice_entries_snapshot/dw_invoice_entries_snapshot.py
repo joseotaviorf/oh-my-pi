@@ -20,7 +20,7 @@ from bietlejuice.jobs.composer.services.configuration_service import (
 
 
 def check_valid_run_date(dag_execution_date):
-    if datetime.strptime(dag_execution_date, "%Y-%m-%d").day in [4, 13]:
+    if datetime.strptime(dag_execution_date, "%Y-%m-%d").day in [3, 12]:
         return True
 
 
