@@ -24,6 +24,9 @@ columns:
   ts_slot_hour:
     lineage:
       - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+  agent_business_context:
+    lineage:
+      - datalake_ebdb_agents.agent_business_context_history.agent_business_context
   is_allocation_available:
     lineage:
       - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_08_and_09_available

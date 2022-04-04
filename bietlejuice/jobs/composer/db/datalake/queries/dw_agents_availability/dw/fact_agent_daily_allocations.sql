@@ -5,6 +5,7 @@ WITH agents_slots_daily AS ( -- TODO [ODS] we are following ODS current structur
         sk_agent_region,
         sk_slot_date_agent,
         id_work_contract,
+        agent_business_context,
         DAYOFWEEK(ts_slot_hour) - 1 AS day_of_week,
         area,
         ts_first_visit,
@@ -17,7 +18,7 @@ WITH agents_slots_daily AS ( -- TODO [ODS] we are following ODS current structur
         dw_agent.fact_agent_hourly_allocations
     WHERE
         DATE(ts_slot_hour) BETWEEN DATE('{year}-{month}-{day}') AND (DATE('{year}-{month}-{day}') + INTERVAL 21 DAYS)
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 13
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14
 )
 SELECT
 	asd.sk_agent,
@@ -27,6 +28,7 @@ SELECT
 	asd.id_work_contract,
 	CAST(asd.allocated_slots AS INT) AS allocated_slots,
 	CAST(asd.allocated_slots_0 AS INT) AS allocated_slots_0,
+    asd.agent_business_context,
     (
         COALESCE(CAST(mwh.has_hours_between_08_and_09_available AS INTEGER), 0)
         + COALESCE(CAST(mwh.has_hours_between_09_and_10_available AS INTEGER),0)

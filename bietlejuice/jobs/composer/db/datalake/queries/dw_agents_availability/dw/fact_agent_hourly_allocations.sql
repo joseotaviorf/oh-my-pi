@@ -34,6 +34,18 @@ agent_contract_rank AS (
                 ON aud.rev = ure.id
     WHERE
         ure.ts_revision <= 1000*TO_UNIX_TIMESTAMP(DATE('{year}-{month}-{day}'), 'yyyy-MM-dd')
+),
+-- A few percentage of agents has two business lines at the same period. 
+-- But for the OPS team these cases should be ignored
+agent_business_context AS (
+    SELECT
+        id_agent_data AS id_agent,
+        MAX(agent_business_context) AS agent_business_context
+    FROM
+        datalake_ebdb_agents.agent_business_context_history
+    WHERE
+        DATE('{year}-{month}-{day}') BETWEEN ts_agent_business_context_started AND COALESCE(ts_agent_business_context_ended, DATE('{year}-{month}-{day}'))
+    GROUP BY 1
 )
 SELECT
 	CAST(ash.id_agent AS INT) AS sk_agent,
@@ -45,6 +57,7 @@ SELECT
 	ash.ts_slot_hour,
     CAST(ash.allocated_slots AS INT) AS allocated_slots,
     CAST(ash.specific_allocated_slots AS INT) AS allocated_slots_0,
+    abc.agent_business_context,
 	CASE HOUR(ash.ts_slot_hour)
 		WHEN  8 THEN COALESCE(mwh.has_hours_between_08_and_09_available,FALSE)
 		WHEN  9 THEN COALESCE(mwh.has_hours_between_09_and_10_available,FALSE)
@@ -75,6 +88,9 @@ LEFT JOIN dw_public.dim_agent_region a
 		AND a.sk_agent = ash.id_agent
 LEFT JOIN first_visits fv
 	ON fv.id_agent = ash.id_agent
+LEFT JOIN
+    agent_business_context AS abc
+        ON abc.id_agent = ash.id_agent
 LEFT JOIN agent_contract_rank acr
     ON acr.id_agent = ash.id_agent 
 LEFT JOIN 

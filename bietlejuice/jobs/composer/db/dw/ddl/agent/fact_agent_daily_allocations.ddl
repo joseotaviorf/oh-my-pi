@@ -7,11 +7,12 @@ CREATE TABLE agent.fact_agent_daily_allocations (
     id_work_contract INTEGER,
     allocated_slots INTEGER,
     allocated_slots_0 INTEGER,
+    agent_business_context VARCHAR(10),
     max_slots_allocation_available INTEGER,
     area VARCHAR(50),
     ts_first_visit TIMESTAMP,
     ts_load TIMESTAMP,
-    CONSTRAINT fact_agent_daily_allocations PRIMARY KEY(sk_slot_date_agent)
+    PRIMARY KEY(sk_slot_date_agent)
 );
 
 ALTER TABLE agent.fact_agent_daily_allocations OWNER TO databricks;
