@@ -3,7 +3,9 @@ import re
 import sys
 import glob
 
-from typing import List
+from typing import List, Tuple, Dict
+import collections
+import json
 
 BI_ETL_EJUICE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BI_ETL_EJUICE_ROOT)
@@ -20,6 +22,7 @@ DAGS_CROSS_DEPENDENCIES_FILE_NAME = "dependencies.yaml"
 DAGS_CROSS_DEPENDENCIES_FILE_PATH = (
     f"{COMPOSER_DAGS_PATH}/{DAGS_CROSS_DEPENDENCIES_FILE_NAME}"
 )
+VALIDATION_LOG_SEPARATOR = "=" * 150
 
 
 class CrossDAGDependenciesValidator:
@@ -32,12 +35,14 @@ class CrossDAGDependenciesValidator:
      files follows the patterns.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, assert_tasks_only: bool, check_duplicates: bool) -> None:
         self.all_tables_by_dag_from_files = {}
         self.invalid_entities = {}
         self.dags_out_of_pattern = ConfigurationService().get_config(
             "dags_out_of_pattern"
         )
+        self.assert_tasks_only = assert_tasks_only
+        self.check_duplicates = check_duplicates
 
     @staticmethod
     def log_msg(msg, force_log=False):
@@ -140,7 +145,7 @@ class CrossDAGDependenciesValidator:
         dag_context = dag_name.replace(f"{layer}_", "")
         table_name = task.replace("-", "_").replace(f"{dag_context}_", "")
         return table_name
-    
+
     def _extract_dag_and_table_from_redshift_task(self, task_name):
         """
         Parses the DAG and table name from load into redshift tasks
@@ -253,6 +258,8 @@ class CrossDAGDependenciesValidator:
         )
         dags_without_tasks_in_dependencies_file.extend(dags)
 
+        self.dependencies_raw = dependencies
+
         return dags_without_tasks_in_dependencies_file, tables_by_dag
 
     @staticmethod
@@ -324,7 +331,152 @@ class CrossDAGDependenciesValidator:
                     if not self.table_query_exists(dag, table):
                         self.register_into_invalid_list(dag, table)
 
-    def validate(self):
+    @staticmethod
+    def get_dependency_values_without_tasks(dependencies: List[str]) -> List[str]:
+        """
+        Reads the list of dependencies and identifies the ones without task declaration. In other words, the dependencies which are entire DAGs.
+
+        :param dependencies: List of dependencies.
+        :type dependencies: list
+
+        :return: Returns a list of dependencies without tasks in declaration. If they have tasks, it will return an empty list.
+        """
+        dependencies_without_tasks = []
+        for dependent in dependencies:
+            dependency_without_task = getattr(re.search('bietlejuice.[^:]*$', dependent), 'string', '')
+            dependency_without_task_name = dependency_without_task.split(".")[-1]
+            if dependency_without_task and dependency_without_task_name not in dependencies_without_tasks:
+                dependencies_without_tasks.append(dependency_without_task_name)
+        return dependencies_without_tasks
+
+    @staticmethod
+    def get_duplicate_dependencies(dependencies: List[Tuple[str, str]]) -> List[Tuple[str, str]]:
+        """
+        Receives the dependencies list and returns the dependency names which appear more than once.
+
+        :param: dependencies: List of tuples with dependencies. E.g.: ("DAG_DEPENDENT", "TASK_DEPENDENCY")
+        :type dependencies: list
+
+        :return: Dependencies that appear more than once.
+        :rtype: list(tuple)
+        """
+        return [item for item, count in collections.Counter(dependencies).items() if count > 1]
+
+    @staticmethod
+    def list_dependencies_to_dict(dependencies: List[Tuple[str, str]]) -> Dict[str, List[str]]:
+        """
+        Transform a list of dependencies into a dictionary
+
+        :param: dependencies: List of dependencies that will be transformed.
+        :type dependencies: list
+
+        :return: Dictionary with dependent DAG and dependencies.
+        :rtype: dict(str:list)
+        """
+        hold = {}
+        for d in dependencies:
+            dag_name = d[0].split(".")[-1]
+            task_name = d[1].split(".")[-1]
+            hold.setdefault(dag_name, [])
+            if task_name not in hold[dag_name]:
+                hold[dag_name].append(task_name)
+        return hold
+
+    @staticmethod
+    def pretty_print_dict(data: dict) -> str:
+        """
+        Receives a dictionary and print it prettiable
+
+        :param: data: Python dictionary to be printed.
+        :type: dict
+
+        :return: Pretty string in JSON format.
+        :rtype: str
+        """
+        return json.dumps(data, indent=4, sort_keys=True)
+
+    def is_dag_out_of_pattern(self, dag: str) -> bool:
+        """
+        Checks if DAG is out of pattern.
+
+        :param dag: DAG name.
+        :type dag: str
+
+        :return: Boolean indicating if DAG is out of pattern.
+        :rtype: bool
+        """
+        return dag in self.dags_out_of_pattern
+
+    def concat_dependent_and_dependencies_to_msg(self, data: Dict[str, List[str]], msg: str) -> str:
+        """
+        Receives a dictionary with dependent (key) and dependencies list (values) and creates a log.
+
+        :param data: Python dictionary to be printed
+        :type data: Dict[str, List[str]]
+
+        :param msg: Message with strings and placeholder for 'dependent' and 'dependency'.
+        :type msg: str
+
+        :return: Concatenated message with all dependents and dependencies which will be logged.
+        :rtype: str
+        """
+        str_concat = ""
+        for dependent in data:
+            for dependency in data[dependent]:
+                str_concat += "\n" + msg.format(dependent=dependent, dependency=dependency)
+        return str_concat
+
+    def validate_only_tasks_in_dependencies_file(self) -> None:
+        """
+        Validates if dependencies in the dependencies file have tasks declared more than once for the same dependent DAG.
+        """
+
+        self.log_msg(msg=f"\n{VALIDATION_LOG_SEPARATOR}", force_log=True)
+        starting_validaton_message = f"Validation to check if there are dependencies without tasks defined is running..."
+        self.log_msg(msg=f"msg={starting_validaton_message}", force_log=True)
+
+        dag_dependencies_without_tasks = {}
+        for dependent in self.dependencies_raw:
+            dag_dependencies = self.dependencies_raw[dependent]
+            dependent_name = dependent.split(".")[-1]
+            dependencies_without_tasks = self.get_dependency_values_without_tasks(dag_dependencies)
+
+            if dependencies_without_tasks and not self.is_dag_out_of_pattern(dependent_name):
+                dag_dependencies_without_tasks[dependent_name] = dependencies_without_tasks
+                [self.register_into_invalid_list(dag=dependent_name, table=table) for table in dependencies_without_tasks]
+
+        if dag_dependencies_without_tasks:
+
+            validation_message = "The DAG/Table '{dependent}' has the dependency '{dependency}' without a task defined."
+
+            msg = f"There are DAGs or Tables dependencies without tasks defined in dependencies. You must declare a `dependency` with DAG and Task, using the following standards: 'bietlejuice.DAG_NAME:TASK_NAME':{self.concat_dependent_and_dependencies_to_msg(dag_dependencies_without_tasks, validation_message)}"
+            self.log_msg(msg=f"msg={msg}", force_log=True)
+
+    def validate_repeated(self) -> None:
+        """
+        Validates if dependencies in dependecies file has repeated dependencies in the same DAG.
+        """
+        self.log_msg(msg=f"\n{VALIDATION_LOG_SEPARATOR}", force_log=True)
+        starting_validaton_message = f"Validation to check if there are repeated dependencies is running..."
+        self.log_msg(msg=f"msg={starting_validaton_message}", force_log=True)
+
+        dependent_dependencies = []
+        for dependent in self.dependencies_raw:
+            dependencies = self.dependencies_raw[dependent]
+            if self.is_dag_out_of_pattern(dependent):
+                continue
+            [dependent_dependencies.append((dependent, dependency)) for dependency in dependencies]
+        duplicates = self.get_duplicate_dependencies(dependent_dependencies)
+        [self.register_into_invalid_list(tup[0], tup[1]) for tup in duplicates]
+
+        if duplicates:
+            dict_dup = self.list_dependencies_to_dict(duplicates)
+
+            validation_message = "The DAG/Table '{dependent}' has repeated declarations for dependency '{dependency}'."
+            msg = f"There are DAGs or Tables dependencies with repeated dependencies. There must be only one declaration per DAG/Table. {self.concat_dependent_and_dependencies_to_msg(dict_dup, validation_message)}"
+            self.log_msg(msg=f"msg={msg}", force_log=True)
+
+    def validate(self) -> int:
         """
         Main validation method.
 
@@ -346,19 +498,27 @@ class CrossDAGDependenciesValidator:
             tables_in_file,
         ) = self.get_tables_from_dependency_file()
 
+        if self.check_duplicates:
+            self.validate_repeated()
+        if self.assert_tasks_only:
+            self.validate_only_tasks_in_dependencies_file()
         self.validate_dags(dags_without_tasks_in_file)
         self.validate_tables(tables_in_file)
 
-        msg = "msg=All the dependencies are valid."
+        msg = "All the dependencies are valid."
         status = 0
         if self.invalid_entities:
-            msg = f"invalid_dags_or_tables={self.invalid_entities}, msg=These DAGs or tables set in the dependency file are invalid."
+            self.log_msg(msg=f"\n{VALIDATION_LOG_SEPARATOR}", force_log=True)
+            msg = f"invalid_dags_or_tables={self.pretty_print_dict(self.invalid_entities)}, msg=These DAGs or tables set in the dependency file are invalid."
             status = 1
 
-        self.log_msg(msg=f"msg={msg}", force_log=True)
+        self.log_msg(msg=f"{msg}", force_log=True)
         return status
 
 
-dependencies_validator = CrossDAGDependenciesValidator()
+dependencies_validator = CrossDAGDependenciesValidator(
+    assert_tasks_only=True,
+    check_duplicates=True
+)
 validation_status = dependencies_validator.validate()
 exit(validation_status)
