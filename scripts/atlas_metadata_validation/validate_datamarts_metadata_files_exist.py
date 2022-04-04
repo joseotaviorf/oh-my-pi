@@ -121,7 +121,6 @@ SKIP_LIST = {
     "dw_datamarts/for_sale": {
         "repressed_demand_sale",
         "neighborhood_competition",
-        "temp_sale_offers",
         "temp_autonomous_agents_listings",
         "sale_agents_weekly_performance",
         "dim_house_listing_amenities",
