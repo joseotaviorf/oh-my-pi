@@ -75,6 +75,10 @@ if __name__ == "__main__":
         str_schema = "struct<typename:string,itbi:string,propertydeed:string,propertyregistration:string>"
         df = df.withColumn("metadata", df["metadata"].cast(str_schema))
 
+    if origin == "loft":
+        str_schema = "struct<amenities:array<string>,area:string,bathrooms:string,bedrooms:string,description:string,features:array<string>,floor:string,num_floors:string,parking_spaces:string,suites:string,total_area:string,unit_type:string,usage_type:array<string>,year_built:string>"
+        df = df.withColumn("house_info", df["house_info"].cast(str_schema))
+
     db_info = DatalakeMetastoreService.get_db_info(
         environment, f"{source}_{context}", datalake_bucket
     )
