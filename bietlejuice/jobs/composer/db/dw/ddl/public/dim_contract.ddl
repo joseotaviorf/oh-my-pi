@@ -3,6 +3,7 @@ create table public.dim_contract (
   sk_contract bigint primary key,
   id_contract bigint,
   rent numeric(14,2),
+  first_rent_charged numeric(14,2),
   day_month_due smallint,
   guarantee varchar,
   type varchar,

@@ -13,6 +13,9 @@ columns:
   rent:
     lineage:
       - datalake_ebdb_clean.contract.rent
+  first_rent_charged:
+    lineage:
+      - datalake_ebdb_clean.contract_aud.rent
   billing_day_of_month:
     lineage:
       - datalake_ebdb_clean.contract.billing_day_of_month

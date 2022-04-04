@@ -16,6 +16,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   c.id AS sk_contract,
   c.id AS id_contract,
   CAST(c.rent AS DECIMAL(14, 2)) AS rent,
+  CAST(c.first_rent_charged AS DECIMAL(14, 2)) AS first_rent_charged,
   CAST(c.billing_day_of_month AS SMALLINT) AS day_month_due,
   c.guarantee_type AS guarantee,
   c.type,

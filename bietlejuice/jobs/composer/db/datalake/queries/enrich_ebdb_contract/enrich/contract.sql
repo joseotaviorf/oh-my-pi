@@ -131,12 +131,22 @@ tenant_service_fee_opt_out_info as (
     from tenant_service_fee_history sfh
     where sfh.first_tenant_service_fee != 0
     and sfh.last_tenant_service_fee = 0
+),
+first_rent AS (
+  SELECT DISTINCT 
+    ca.id_contract,
+    FIRST_VALUE(rent) OVER (partition by id_contract ORDER BY rev rows BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) first_rent
+  FROM
+    datalake_ebdb_clean.contract_aud AS ca
+  WHERE
+    status_closing = 'ContratoAssinado' 
 )
 select
   c.id,
   c.id_proposal,
   c.id_house,
   c.rent,
+  fre.first_rent AS first_rent_charged,
   c.billing_day_of_month,
   c.guarantee_type,
   c.type,
@@ -192,3 +202,5 @@ left join datalake_ebdb_clean.full_contract fc
     on fc.id = c.id
 left join tenant_service_fee_opt_out_info as sfo 
   on c.id = sfo.id_contract
+LEFT JOIN first_rent fre
+  ON fre.id_contract = c.id

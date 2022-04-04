@@ -10,6 +10,9 @@ columns:
   rent:
     lineage:
       - datalake_ebdb_contract.contract.rent
+  first_rent_charged:
+    lineage:
+      - datalake_ebdb_contract.contract.first_rent_charged
   day_month_due:
     lineage:
       - datalake_ebdb_contract.contract.billing_day_of_month
