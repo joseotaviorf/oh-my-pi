@@ -1,0 +1,49 @@
+---
+database_name: dw_revenue_lines
+table_name: dim_month_rental_anticipation
+columns:
+  sk_month_rental_anticipation:
+    lineage:
+      - datalake_revenue_lines.month_rental_anticipation.id_mra
+  id_contract_ebdb:
+    lineage:
+      - datalake_revenue_lines.month_rental_anticipation.id_contract_ebdb
+  nbr_transactions_accepted:
+    lineage:
+      - datalake_revenue_lines.month_rental_anticipation.nbr_transactions_accepted
+  prod_theorical_amount:
+    lineage:
+      - datalake_revenue_lines.month_rental_anticipation.prod_theorical_amount
+  prod_theorical_fee:
+    lineage:
+      - datalake_revenue_lines.month_rental_anticipation.prod_theorical_fee
+  invoice_theorical_amount:
+    lineage:
+      - datalake_revenue_lines.month_rental_anticipation.invoice_theorical_amount
+  invoice_theorical_fee:
+    lineage:
+      - datalake_revenue_lines.month_rental_anticipation.invoice_theorical_fee
+  invoice_paid_amount:
+    lineage:
+      - datalake_revenue_lines.month_rental_anticipation.invoice_paid_amount
+  invoice_paid_fee:
+    lineage:
+      - datalake_revenue_lines.month_rental_anticipation.invoice_paid_fee
+  accrual_year_month:
+    lineage:
+      - datalake_revenue_lines.month_rental_anticipation.accrual_year_month
+  dt_created:
+    lineage:
+      - datalake_revenue_lines.month_rental_anticipation.dt_created
+  dt_accepted:
+    lineage:
+      - datalake_revenue_lines.month_rental_anticipation.dt_accepted
+  dt_first_accepted:
+    lineage:
+      - datalake_revenue_lines.month_rental_anticipation.dt_first_accepted
+  dt_due_fee:
+    lineage:
+      - datalake_revenue_lines.month_rental_anticipation.dt_due_fee
+  dt_paid_fee:
+    lineage:
+      - datalake_revenue_lines.month_rental_anticipation.dt_paid_fee

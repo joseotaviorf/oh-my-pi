@@ -1,0 +1,52 @@
+---
+database_name: dw_revenue_lines
+table_name: dim_brokerage_finance
+columns:
+  sk_brokerage_finance:
+    lineage:
+      - datalake_revenue_lines.brokerage_finance.id_bfi
+  id_contract_ebdb:
+    lineage:
+      - datalake_revenue_lines.brokerage_finance.id_contract_ebdb
+  prod_theorical_amount:
+    lineage:
+      - datalake_revenue_lines.brokerage_finance.prod_theorical_amount
+  prod_theorical_fee:
+    lineage:
+      - datalake_revenue_lines.brokerage_finance.prod_theorical_fee
+  invoice_theorical_amount:
+    lineage:
+      - datalake_revenue_lines.brokerage_finance.invoice_theorical_amount
+  invoice_paid_amount:
+    lineage:
+      - datalake_revenue_lines.brokerage_finance.invoice_paid_amount
+  invoice_theorical_fee:
+    lineage:
+      - datalake_revenue_lines.brokerage_finance.invoice_theorical_fee
+  invoice_paid_fee:
+    lineage:
+      - datalake_revenue_lines.brokerage_finance.invoice_paid_fee
+  installment:
+    lineage:
+      - datalake_revenue_lines.brokerage_finance.installment
+  total_installments:
+    lineage:
+      - datalake_revenue_lines.brokerage_finance.total_installments
+  premium_fee:
+    lineage:
+      - datalake_revenue_lines.brokerage_finance.premium_fee
+  real_state_agent_share:
+    lineage:
+      - datalake_revenue_lines.brokerage_finance.real_state_agent_share
+  accrual_year_month:
+    lineage:
+      - datalake_revenue_lines.brokerage_finance.accrual_year_month
+  dt_bf_created:
+    lineage:
+      - datalake_revenue_lines.brokerage_finance.dt_bf_created
+  dt_due_fee:
+    lineage:
+      - datalake_revenue_lines.brokerage_finance.dt_due_fee
+  dt_paid_fee:
+    lineage:
+      - datalake_revenue_lines.brokerage_finance.dt_paid_fee

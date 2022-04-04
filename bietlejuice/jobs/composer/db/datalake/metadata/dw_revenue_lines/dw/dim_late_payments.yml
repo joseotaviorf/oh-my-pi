@@ -1,0 +1,31 @@
+---
+database_name: dw_revenue_lines
+table_name: dim_late_payments
+columns:
+  sk_late_payments:
+    lineage:
+      - datalake_revenue_lines.late_payments.id_late_payments
+  id_contract:
+    lineage:
+      - datalake_revenue_lines.late_payments.id_contract
+  type_late:
+    lineage:
+      - datalake_revenue_lines.late_payments.type_late
+  invoice_theorical_amount:
+    lineage:
+      - datalake_revenue_lines.late_payments.invoice_theorical_amount
+  invoice_paid_amount:
+    lineage:
+      - datalake_revenue_lines.late_payments.invoice_paid_amount
+  accrual_year_month:
+    lineage:
+      - datalake_revenue_lines.late_payments.accrual_year_month
+  dt_created:
+    lineage:
+      - datalake_revenue_lines.late_payments.dt_created
+  dt_due:
+    lineage:
+      - datalake_revenue_lines.late_payments.dt_due
+  dt_paid:
+    lineage:
+      - datalake_revenue_lines.late_payments.dt_paid

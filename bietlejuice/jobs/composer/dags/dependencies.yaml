@@ -721,6 +721,15 @@ bietlejuice.dw_rent_listing_flow:
 bietlejuice.dw_reservation:
   - bietlejuice.enrich_kill_queue:load-enrich-reservation
 
+bietlejuice.dw_revenue_lines:
+  - bietlejuice.enrich_revenue_lines:load-enrich-brokerage-finance
+  - bietlejuice.enrich_revenue_lines:load-enrich-credit-card-payment
+  - bietlejuice.enrich_revenue_lines:load-enrich-late-payments
+  - bietlejuice.enrich_revenue_lines:load-enrich-long-term-rental-anticipation
+  - bietlejuice.enrich_revenue_lines:load-enrich-month-rental-anticipation
+  - bietlejuice.enrich_revenue_lines:load-enrich-rental-guarantee
+  - bietlejuice.enrich_revenue_lines:load-enrich-reservation
+
 bietlejuice.dw_sale_closing_flows:
   - bietlejuice.enrich_sale_closing_flows:load-enrich-closing-flow
 

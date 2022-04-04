@@ -1,0 +1,52 @@
+---
+database_name: dw_revenue_lines
+table_name: dim_long_term_rental_anticipation
+columns:
+  sk_long_term_rental_anticipation:
+    lineage:
+      - datalake_revenue_lines.long_term_rental_anticipation.id_lra
+  id_contract_ebdb:
+    lineage:
+      - datalake_revenue_lines.long_term_rental_anticipation.id_contract_ebdb
+  months_anticipated:
+    lineage:
+      - datalake_revenue_lines.long_term_rental_anticipation.months_anticipated
+  installment:
+    lineage:
+      - datalake_revenue_lines.long_term_rental_anticipation.installment
+  total_installments:
+    lineage:
+      - datalake_revenue_lines.long_term_rental_anticipation.total_installments
+  total_rent:
+    lineage:
+      - datalake_revenue_lines.long_term_rental_anticipation.total_rent
+  nbr_transactions_signed:
+    lineage:
+      - datalake_revenue_lines.long_term_rental_anticipation.nbr_transactions_signed
+  prod_theorical_amount:
+    lineage:
+      - datalake_revenue_lines.long_term_rental_anticipation.prod_theorical_amount
+  prod_theorical_fee:
+    lineage:
+      - datalake_revenue_lines.long_term_rental_anticipation.prod_theorical_fee
+  invoice_theorical_amount:
+    lineage:
+      - datalake_revenue_lines.long_term_rental_anticipation.invoice_theorical_amount
+  invoice_paid_amount:
+    lineage:
+      - datalake_revenue_lines.long_term_rental_anticipation.invoice_paid_amount
+  accrual_year_month:
+    lineage:
+      - datalake_revenue_lines.long_term_rental_anticipation.accrual_year_month
+  dt_due:
+    lineage:
+      - datalake_revenue_lines.long_term_rental_anticipation.dt_due
+  dt_paid:
+    lineage:
+      - datalake_revenue_lines.long_term_rental_anticipation.dt_paid
+  ts_created:
+    lineage:
+      - datalake_revenue_lines.long_term_rental_anticipation.ts_created
+  ts_signed:
+    lineage:
+      - datalake_revenue_lines.long_term_rental_anticipation.ts_signed

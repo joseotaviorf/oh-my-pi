@@ -1,0 +1,43 @@
+---
+database_name: dw_revenue_lines
+table_name: dim_credit_card_payment
+columns:
+  sk_credit_card_payment:
+    lineage:
+      - datalake_revenue_lines.credit_card_payment.id_ccp
+  id_contract_ebdb:
+    lineage:
+      - datalake_revenue_lines.credit_card_payment.id_contract_ebdb
+  status:
+    lineage:
+      - datalake_revenue_lines.credit_card_payment.status
+  brand_name:
+    lineage:
+      - datalake_revenue_lines.credit_card_payment.brand_name
+  type_paid:
+    lineage:
+      - datalake_revenue_lines.credit_card_payment.type_paid
+  installments:
+    lineage:
+      - datalake_revenue_lines.credit_card_payment.installments
+  invoice_theorical_amount:
+    lineage:
+      - datalake_revenue_lines.credit_card_payment.invoice_theorical_amount
+  invoice_paid_amount:
+    lineage:
+      - datalake_revenue_lines.credit_card_payment.invoice_paid_amount
+  invoice_paid_fee:
+    lineage:
+      - datalake_revenue_lines.credit_card_payment.invoice_paid_fee
+  accrual_year_month:
+    lineage:
+      - datalake_revenue_lines.credit_card_payment.accrual_year_month
+  dt_ccp_created:
+    lineage:
+      - datalake_revenue_lines.credit_card_payment.dt_ccp_created
+  dt_due:
+    lineage:
+      - datalake_revenue_lines.credit_card_payment.dt_due
+  dt_paid:
+    lineage:
+      - datalake_revenue_lines.credit_card_payment.dt_paid

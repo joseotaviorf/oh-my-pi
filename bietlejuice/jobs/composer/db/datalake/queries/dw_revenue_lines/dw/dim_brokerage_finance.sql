@@ -1,0 +1,19 @@
+SELECT
+  id_bfi AS sk_brokerage_finance,   
+  id_contract_ebdb,
+  prod_theorical_amount,
+  prod_theorical_fee,
+  invoice_theorical_amount,
+  invoice_paid_amount,
+  invoice_theorical_fee,
+  invoice_paid_fee,
+  installment,
+  total_installments,
+  premium_fee,
+  real_state_agent_share,
+  accrual_year_month,
+  dt_bf_created,
+  dt_due_fee,
+  dt_paid_fee
+FROM
+  datalake_revenue_lines.brokerage_finance

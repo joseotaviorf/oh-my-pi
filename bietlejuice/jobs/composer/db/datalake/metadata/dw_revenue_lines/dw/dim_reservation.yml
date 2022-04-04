@@ -1,0 +1,25 @@
+---
+database_name: dw_revenue_lines
+table_name: dim_reservation
+columns:
+  sk_reservation:
+    lineage:
+      - datalake_revenue_lines.reservation.id_reservation
+  id_contract:
+    lineage:
+      - dw_public.fact_listing_rent_flows.sk_contract
+  status:
+    lineage:
+      - datalake_revenue_lines.reservation.status
+  installments:
+    lineage:
+      - datalake_revenue_lines.reservation.installments
+  cancellation_reason:
+    lineage:
+      - datalake_revenue_lines.reservation.cancellation_reason
+  value:
+    lineage:
+      - datalake_revenue_lines.reservation.value
+  ts_created:
+    lineage:
+      - datalake_revenue_lines.reservation.ts_created
