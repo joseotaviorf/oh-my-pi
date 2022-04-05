@@ -18,3 +18,4 @@ This pipeline produces the following output table in DW, via full load:
 - `credit.dim_experiment`
 - `credit.dim_guarantee_policy`
 - `credit.dim_variant`
+- `credit.fact_proposal_credit_flows`

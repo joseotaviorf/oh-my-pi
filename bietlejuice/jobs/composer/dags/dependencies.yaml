@@ -562,6 +562,8 @@ bietlejuice.dw_contract:
   - bietlejuice.enrich_ebdb_listing:load-enrich-portability
 
 bietlejuice.dw_credit_analysis:
+  - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
+  - bietlejuice.ebdb:create-clean-proposal-in-data-lake
   - bietlejuice.rental_guarantee:load-clean-risk-category
   - bietlejuice.sorting_hat:load-clean-credit-analysis
   - bietlejuice.sorting_hat:load-clean-experiment
