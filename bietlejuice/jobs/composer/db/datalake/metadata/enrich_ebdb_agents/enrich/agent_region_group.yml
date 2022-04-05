@@ -25,3 +25,12 @@ columns:
   secondary_area_deprecated:
     lineage:
       - datalake_gsheets_clean.auxiliary_region.region_code_deprecated
+  year:
+    lineage:
+      - datalake_ebdb_agents.agents_slots.ts_slot
+  month:
+    lineage:
+      - datalake_ebdb_agents.agents_slots.ts_slot
+  day:
+    lineage:
+      - datalake_ebdb_agents.agents_slots.ts_slot

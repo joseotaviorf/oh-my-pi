@@ -162,7 +162,10 @@ SELECT
     area,
     secondary_area,
     area_deprecated,
-    secondary_area_deprecated
+    secondary_area_deprecated,
+    EXTRACT(YEAR FROM dt) AS year,
+    EXTRACT(MONTH FROM dt) AS month,
+    EXTRACT(DAY FROM dt) AS day
 FROM 
     agent_region_group
 WHERE 
