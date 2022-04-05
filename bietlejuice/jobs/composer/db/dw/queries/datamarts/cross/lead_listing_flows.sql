@@ -121,7 +121,7 @@ SELECT
 	hl.sk_user_house_registrant,
 	hl.is_b2b,
     CASE
-        WHEN  ciq.type_big_agent = 'CIQ_FULL'
+        WHEN  ciq.type_big_agent = 'CIQ_FULL' OR (type_big_agent='CIQ_MANAGER' AND dt_sale > dt_ciq_started)
             THEN 'CIQ'
         ELSE hl.mkt_origin
     END AS mkt_origin
