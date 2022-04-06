@@ -142,7 +142,7 @@ class GsheetsDAGFactory:
         dag_name = f"{self.source}.{dag_context}"
         dag_id = f"bietlejuice.{dag_name}"
 
-        main_schedule_interval = dag_details["main_schedule_interval"]
+        main_schedule_interval = dag_details.get("main_schedule_interval")
 
         self.CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
             "destination"
