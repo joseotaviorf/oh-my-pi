@@ -2,6 +2,7 @@ SELECT
     il.id_invoice AS sk_invoice,
     il.invoice_frequency AS frequency,
     il.payment_status,
+    il.negotiation_status,
     il.invoice_user AS user,
     i.due_amount AS due_amount,
     i.paid_amount AS paid_amount,   

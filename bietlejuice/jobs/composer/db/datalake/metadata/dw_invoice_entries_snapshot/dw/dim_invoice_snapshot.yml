@@ -11,6 +11,9 @@ columns:
   payment_status:
     lineage:
       - dw_payment.dim_invoice.payment_status
+  negotiation_status:
+    lineage:
+      - dw_payment.dim_invoice.negotiation_status
   user:
     lineage:
       - dw_payment.dim_invoice.user

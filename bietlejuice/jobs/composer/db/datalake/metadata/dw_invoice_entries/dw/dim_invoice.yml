@@ -11,6 +11,9 @@ columns:
   payment_status:
     lineage:
       - datalake_retsuko.invoice.payment_status
+  negotiation_status:
+    lineage:
+      - datalake_retsuko.invoice.negotiation_status
   user:
     lineage:
       - datalake_retsuko.invoice.invoice_user

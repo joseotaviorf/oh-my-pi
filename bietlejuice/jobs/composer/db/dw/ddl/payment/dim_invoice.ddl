@@ -3,6 +3,7 @@ CREATE TABLE if not exists payment.dim_invoice (
     sk_invoice BIGINT primary key,
     frequency VARCHAR(50),
     payment_status VARCHAR(50),
+    negotiation_status VARCHAR(255),
     "user" VARCHAR(50),
     due_amount DECIMAL(13,2),
     paid_amount DECIMAL(13,2),
@@ -14,4 +15,4 @@ CREATE TABLE if not exists payment.dim_invoice (
     ts_load TIMESTAMP
 );
 
-ALTER TABLE payment.dim_invoice OWNER TO airflow;
+ALTER TABLE payment.dim_invoice OWNER TO databricks;

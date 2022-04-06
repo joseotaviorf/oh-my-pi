@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS payment_snapshot.dim_invoice_snapshot
 	sk_invoice BIGINT NOT 
 	,frequency VARCHAR(50)
 	,payment_status VARCHAR(50)
+	,negotiation_status VARCHAR(255)
 	,"user" VARCHAR(50)
 	,due_amount NUMERIC(13,2)
 	,paid_amount NUMERIC(13,2)

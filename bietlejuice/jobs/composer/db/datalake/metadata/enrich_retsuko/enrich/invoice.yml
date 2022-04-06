@@ -10,6 +10,9 @@ columns:
   payment_status:
     lineage:
       - datalake_retsuko_clean.invoice.status
+  negotiation_status:
+    lineage:
+      - datalake_retsuko_clean.invoice.negotiation_status
   invoice_user:
     lineage:
       - datalake_retsuko_clean.account.type
