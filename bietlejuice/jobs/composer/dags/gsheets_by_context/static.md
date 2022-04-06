@@ -20,7 +20,8 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output tables:
 
 1. Data lake raw:
-
+    - `survival_estimation`
 2. Data lake clean:
+    - `survival_estimation`
 
 </details>

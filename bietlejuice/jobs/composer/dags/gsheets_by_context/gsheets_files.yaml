@@ -81,3 +81,9 @@ forecast_diario_supply:
     sheet_name: forecast_diário_supply
     clean_table_name: rental_forecast_daily_supply
     sheet_context: for_rent
+
+survival_estimation:
+    sheet_id: 1hBZp2g6smNXBRFnITrihnwzztkFRr7q_IF5sSBgSQKo
+    sheet_name: survival_estimation
+    clean_table_name: survival_estimation
+    sheet_context: static

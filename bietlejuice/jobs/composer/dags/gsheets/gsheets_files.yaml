@@ -837,11 +837,6 @@ supply_targets_2021:
     sheet_name: supply_targets_2021
     clean_table_name: supply_targets_2021
 
-survival_estimation:
-    sheet_id: 1hBZp2g6smNXBRFnITrihnwzztkFRr7q_IF5sSBgSQKo
-    sheet_name: survival_estimation
-    clean_table_name: survival_estimation
-
 survival_estimation_new_version:
     sheet_id: 1hBZp2g6smNXBRFnITrihnwzztkFRr7q_IF5sSBgSQKo
     sheet_name: survival_estimation_new_version
