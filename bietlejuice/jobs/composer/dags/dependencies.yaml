@@ -1412,9 +1412,9 @@ bietlejuice.enrich_offer:
   - bietlejuice.gsheets:load-clean-monday-users
   - bietlejuice.gsheets:load-clean-offers-hub-central
 
-bietlejuice.enrich_online_attribution:
-  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-  - bietlejuice.gsheets:create-clean-taxonomy-demand-external-table
+# bietlejuice.enrich_online_attribution:
+#   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+#   - bietlejuice.gsheets:create-clean-taxonomy-demand-external-table
 
 bietlejuice.enrich_owner_fees:
   - bietlejuice.owner_fees:load-clean-contract
