@@ -77,10 +77,25 @@ columns:
   software_category_old:
     lineage:
       - datalake_jira_clean.issues.fields
-  access_software_name_others:
+  company:
     lineage:
       - datalake_jira_clean.issues.fields
-  access_temporary_access:
+  service_category:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  sla_time_first_response_hours:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  sla_hours:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  sla_access_approval_hours:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  sla_renewal_hours:
+    lineage:
+      - datalake_jira_clean.issues.fields
+  access_software_name_others:
     lineage:
       - datalake_jira_clean.issues.fields
   access_software_name:
@@ -89,28 +104,7 @@ columns:
   access_approval_groups:
     lineage:
       - datalake_jira_clean.issues.fields
-  sla_time_first_response_hours_ongoing:
-    lineage:
-      - datalake_jira_clean.issues.fields
-  sla_time_first_response_hours_completed:
-    lineage:
-      - datalake_jira_clean.issues.fields
-  sla_hours_ongoing:
-    lineage:
-      - datalake_jira_clean.issues.fields
-  sla_hours_completed:
-    lineage:
-      - datalake_jira_clean.issues.fields
-  sla_access_approval_hours_ongoing:
-    lineage:
-      - datalake_jira_clean.issues.fields
-  sla_access_approval_hours_completed:
-    lineage:
-      - datalake_jira_clean.issues.fields
-  sla_renewal_hours_ongoing:
-    lineage:
-      - datalake_jira_clean.issues.fields
-  sla_renewal_hours_completed:
+  is_temporary_access:
     lineage:
       - datalake_jira_clean.issues.fields
   ts_first_response:

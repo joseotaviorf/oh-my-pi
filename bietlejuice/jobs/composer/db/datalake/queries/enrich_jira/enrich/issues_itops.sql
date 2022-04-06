@@ -27,15 +27,23 @@ WITH record_selection AS (
         GET_JSON_OBJECT(fields,'$.customfield_10529.value') AS support_level,
         GET_JSON_OBJECT(fields,'$.customfield_10659.value') AS priority_defined_by_support,
         CAST(GET_JSON_OBJECT(fields,'$.comment.total') AS INT) AS qtd_comments,
-        CAST(CAST(GET_JSON_OBJECT(fields,'$.customfield_10222.ongoingCycle.remainingTime.millis') AS DOUBLE)/3600000 AS DECIMAL(10,2)) AS sla_time_first_response_hours_ongoing,
-        CAST(CAST(GET_JSON_OBJECT(fields,'$.customfield_10222.completedCycles[0].remainingTime.millis') AS DOUBLE)/3600000 AS DECIMAL(10,2)) AS sla_time_first_response_hours_completed,
-        CAST(CAST(GET_JSON_OBJECT(fields,'$.customfield_10660.ongoingCycle.remainingTime.millis') AS DOUBLE)/3600000 AS DECIMAL(10,2)) AS sla_hours_ongoing,
-        CAST(CAST(GET_JSON_OBJECT(fields,'$.customfield_10660.completedCycles[0].remainingTime.millis') AS DOUBLE)/3600000 AS DECIMAL(10,2)) AS sla_hours_completed,	
-        CAST(CAST(GET_JSON_OBJECT(fields,'$.customfield_11974.ongoingCycle.remainingTime.millis') AS DOUBLE)/3600000 AS DECIMAL(10,2)) AS sla_access_approval_hours_ongoing,
-        CAST(CAST(GET_JSON_OBJECT(fields,'$.customfield_11974.completedCycles[0].remainingTime.millis') AS DOUBLE)/3600000 AS DECIMAL(10,2)) AS sla_access_approval_hours_completed,
-        CAST(CAST(GET_JSON_OBJECT(fields,'$.customfield_12006.ongoingCycle.remainingTime.millis') AS DOUBLE)/3600000 AS DECIMAL(10,2)) AS sla_renewal_hours_ongoing,
-        CAST(CAST(GET_JSON_OBJECT(fields,'$.customfield_12006.completedCycles[0].remainingTime.millis') AS DOUBLE)/3600000 AS DECIMAL(10,2)) AS sla_renewal_hours_completed,
-        GET_JSON_OBJECT(fields,'$.customfield_10202.rating') AS satisfaction,
+        COALESCE(
+          CAST(CAST(GET_JSON_OBJECT(fields,'$.customfield_10222.ongoingCycle.remainingTime.millis') AS DOUBLE)/3600000 AS DECIMAL(10,2)),
+          CAST(CAST(GET_JSON_OBJECT(fields,'$.customfield_10222.completedCycles[0].remainingTime.millis') AS DOUBLE)/3600000 AS DECIMAL(10,2))
+        ) AS sla_time_first_response_hours,
+        COALESCE(
+          CAST(CAST(GET_JSON_OBJECT(fields,'$.customfield_10660.ongoingCycle.remainingTime.millis') AS DOUBLE)/3600000 AS DECIMAL(10,2)),
+          CAST(CAST(GET_JSON_OBJECT(fields,'$.customfield_10660.completedCycles[0].remainingTime.millis') AS DOUBLE)/3600000 AS DECIMAL(10,2))
+        ) AS sla_hours,	
+        COALESCE(
+          CAST(CAST(GET_JSON_OBJECT(fields,'$.customfield_11974.ongoingCycle.remainingTime.millis') AS DOUBLE)/3600000 AS DECIMAL(10,2)),
+          CAST(CAST(GET_JSON_OBJECT(fields,'$.customfield_11974.completedCycles[0].remainingTime.millis') AS DOUBLE)/3600000 AS DECIMAL(10,2))
+        ) AS sla_access_approval_hours,
+        COALESCE(
+          CAST(CAST(GET_JSON_OBJECT(fields,'$.customfield_12006.ongoingCycle.remainingTime.millis') AS DOUBLE)/3600000 AS DECIMAL(10,2)),
+          CAST(CAST(GET_JSON_OBJECT(fields,'$.customfield_12006.completedCycles[0].remainingTime.millis') AS DOUBLE)/3600000 AS DECIMAL(10,2))
+        ) AS sla_renewal_hours,
+        CAST(GET_JSON_OBJECT(fields,'$.customfield_10202.rating') AS INT) AS satisfaction,
         GET_JSON_OBJECT(fields,'$.customfield_11270.value') AS sub_category,
         GET_JSON_OBJECT(fields,'$.customfield_11300.value') AS incident_type_old,
         GET_JSON_OBJECT(fields,'$.customfield_11442.value') AS software_incident_old,
@@ -43,9 +51,14 @@ WITH record_selection AS (
         GET_JSON_OBJECT(fields,'$.customfield_11321.value') AS software_access_old,
         GET_JSON_OBJECT(fields,'$.customfield_11302.value') AS software_category_old,
         GET_JSON_OBJECT(fields,'$.customfield_11977') AS access_software_name_others,
-        GET_JSON_OBJECT(fields,'$.customfield_11860.value') AS access_temporary_access,
+        CASE 
+          WHEN GET_JSON_OBJECT(fields,'$.customfield_11860.value') = 'Sim' THEN True
+          ELSE False 
+        END AS is_temporary_access,
         GET_JSON_OBJECT(fields,'$.customfield_11589.value') AS access_software_name,
         GET_JSON_OBJECT(fields,'$.customfield_11693[0].name') AS access_approval_groups,
+        GET_JSON_OBJECT(fields,'$.customfield_11476.value') as company,
+        GET_JSON_OBJECT(fields,'$.customfield_12455.value') as service_category,
         ROW_NUMBER() OVER (PARTITION BY key ORDER BY GET_JSON_OBJECT(fields,'$.updated') DESC) AS row_num
     FROM
         datalake_jira_clean.issues
@@ -79,18 +92,16 @@ SELECT
     incident_computer_os,
     software_access_old,
     software_category_old,
+    company,
+    service_category,
+    sla_time_first_response_hours,
+    sla_hours,
+    sla_access_approval_hours,
+    sla_renewal_hours,
     access_software_name_others,
-    access_temporary_access,
     access_software_name,
     access_approval_groups,
-    sla_time_first_response_hours_ongoing,
-    sla_time_first_response_hours_completed,
-    sla_hours_ongoing,
-    sla_hours_completed, 
-    sla_access_approval_hours_ongoing,
-    sla_access_approval_hours_completed,
-    sla_renewal_hours_ongoing,
-    sla_renewal_hours_completed,
+    is_temporary_access,
     ts_first_response,
     ts_status_category_changed,
     ts_created,
