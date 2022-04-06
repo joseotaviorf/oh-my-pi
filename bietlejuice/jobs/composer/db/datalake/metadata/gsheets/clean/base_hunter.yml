@@ -1,0 +1,15 @@
+database_name: datalake_gsheets_clean
+table_name: base_hunter
+columns:
+  id_owner:
+    lineage:
+      - datalake_gsheets_raw.base_hunter.sk_pp
+  prospects:
+    lineage:
+      - datalake_gsheets_raw.base_hunter.prospects
+  cluster:
+    lineage:
+      - datalake_gsheets_raw.base_hunter.cluster
+  dt_message_sent:
+    lineage:
+      - datalake_gsheets_raw.base_hunter.data_envio_msg

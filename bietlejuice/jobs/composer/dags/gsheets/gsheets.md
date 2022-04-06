@@ -43,6 +43,7 @@ This pipeline produces the following output tables:
     - `aux_check_photo_sender`
     - `auxiliary_region`
     - `bandaid_off`
+    - `base_hunter`
     - `bbb22_coupon_sale_users`
     - `bbb22_giveaway_rent_users`
     - `branding_where_is_plaquinha`

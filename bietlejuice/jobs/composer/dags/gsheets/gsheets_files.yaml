@@ -90,6 +90,11 @@ aux_regiao:
     sheet_name: aux_regiao
     clean_table_name: auxiliary_region
 
+base_hunter:
+    sheet_id: 1gFxBxHVnmIveohw9fmRspW4ImPYSglH7dEITpFc17DI
+    sheet_name: Página1
+    clean_table_name: base_hunter
+
 base_supply_souce_for_rent:
     sheet_id: 1Gxp4StsJFhnqI5ogSHzlTaSPiDJF6kmQMXPSjK3dBUM
     sheet_name: Base_Supply_Souce_For_Rent
