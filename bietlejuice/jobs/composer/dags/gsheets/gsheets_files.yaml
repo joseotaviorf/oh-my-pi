@@ -85,6 +85,11 @@ aux_check_photo_sender:
     sheet_name: aux_check_photo_sender
     clean_table_name: aux_check_photo_sender
 
+aux_commission:
+    sheet_id: 1IbmJlF7YNGA6xaApwFVGMyupJzwsAcD7uJDD0qvrCGg
+    sheet_name: aux_commission
+    clean_table_name: aux_commission
+
 aux_regiao:
     sheet_id: 1gh8S0xVQ9HsTs6EkvE0BcXvh5_cfaG3aUpIgrluqqlM
     sheet_name: aux_regiao

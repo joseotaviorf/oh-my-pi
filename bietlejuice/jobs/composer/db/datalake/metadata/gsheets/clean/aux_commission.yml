@@ -1,0 +1,28 @@
+---
+database_name: datalake_gsheets_clean
+table_name: aux_commission
+columns:
+  commission_type:
+    lineage:
+      - datalake_gsheets_raw.aux_commission.commission_type
+  region:
+    lineage:
+      - datalake_gsheets_raw.aux_commission.region
+  range_20:
+    lineage:
+      - datalake_gsheets_raw.aux_commission.faixa_20
+  range_30:
+    lineage:
+      - datalake_gsheets_raw.aux_commission.faixa_30
+  range_40:
+    lineage:
+      - datalake_gsheets_raw.aux_commission.faixa_40
+  range_50:
+    lineage:
+      - datalake_gsheets_raw.aux_commission.faixa_50
+  dt_started_validity:
+    lineage:
+      - datalake_gsheets_raw.aux_commission.inicio_vigencia
+  dt_ended_validity:
+    lineage:
+      - datalake_gsheets_raw.aux_commission.fim_vigencia

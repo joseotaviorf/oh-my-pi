@@ -41,6 +41,7 @@ This pipeline produces the following output tables:
     - `associate_executive_correction`
     - `aux_agents_sale_hub`
     - `aux_check_photo_sender`
+    - `aux_commission`
     - `auxiliary_region`
     - `bandaid_off`
     - `base_hunter`
