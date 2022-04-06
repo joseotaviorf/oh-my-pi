@@ -105,9 +105,7 @@ events_filtered AS (
         imc.id_amplitude = evt.id_amplitude
     WHERE
       id_app = 170698
-      AND year >= EXTRACT(year FROM (DATE('{year}-{month}-{day}') - interval '4' month))
-      AND month >= EXTRACT(month FROM (DATE('{year}-{month}-{day}') - interval '4' month))
-      AND day >= EXTRACT(day FROM (DATE('{year}-{month}-{day}') - interval '4' month))
+      AND DATE(CONCAT_WS("-",evt.year, evt.month, evt.day)) > DATE('{year}-{month}-{day}') - INTERVAL '4' month
 ),
 events_exploded_properties AS (
     SELECT
