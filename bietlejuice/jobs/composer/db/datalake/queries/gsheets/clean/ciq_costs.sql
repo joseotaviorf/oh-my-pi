@@ -10,6 +10,8 @@ SELECT
     other,
     revshare_cs_ciq_full,
     revshare_cs_ciq_manager,
+    total_costs_ciq_full_for_rent,
+    total_costs_ciq_full_for_sale,
     week_start,
     year
 FROM

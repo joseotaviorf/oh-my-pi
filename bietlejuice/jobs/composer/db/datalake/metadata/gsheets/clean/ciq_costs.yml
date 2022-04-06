@@ -34,6 +34,12 @@ columns:
   revshare_cs_ciq_manager:
     lineage:
       - datalake_gsheets_raw.ciq_costs.revshare_cs_ciq_manager
+  total_costs_ciq_full_for_rent:
+    lineage:
+      - datalake_gsheets_raw.ciq_costs.total_costs_ciq_full_for_rent
+  total_costs_ciq_full_for_sale:
+    lineage:
+      - datalake_gsheets_raw.ciq_costs.total_costs_ciq_full_for_sale
   week_start:
     lineage:
       - datalake_gsheets_raw.ciq_costs.week_start
