@@ -17,5 +17,8 @@ dags:
   bedrock:
     main_schedule_interval: 0 3 * * *
     dag_owner: Data Bedrock
+  for_sale:
+    main_schedule_interval: 0 3 * * *
+    dag_owner: Data ForSale
   static:
     dag_owner: Data Engineering
