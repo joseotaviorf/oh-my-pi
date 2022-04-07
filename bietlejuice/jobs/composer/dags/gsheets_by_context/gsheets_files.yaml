@@ -8,6 +8,10 @@
 #     sheet_context: <sheet_context>
 #     partitioned: <partitioned>
 
+#########################
+# S&S SHEETS
+###################
+
 agendamento_vistoria_saida:
     sheet_id: 1LHcKqdrbTWNvRBT7TGVEbKhIrtqaqSxVVaeKsIcJZus
     sheet_name: agendamento_saida
@@ -27,6 +31,10 @@ support_agents_department:
     sheet_name: Agents Main Department
     clean_table_name: support_agents_department
     sheet_context: support_and_service
+
+#########################
+# GROWTH SHEETS
+###################
 
 historic_national_costs:
     sheet_id: 1mcTp6mmjNBpsaEiwn1ZepnhkyGozDEC5HAmVWeeArGA
@@ -51,6 +59,10 @@ tradecom_configuration:
     sheet_name: tradecom_configuration
     clean_table_name: affiliates_cost_tradecom_configuration
     sheet_context: growth
+
+#########################
+# BEDROCK SHEETS
+###################
 
 people_data:
     sheet_id: 1bFPTfQjfxtl97QamwKK7ofmYOz7j8_hSLjUmOawF7xg
