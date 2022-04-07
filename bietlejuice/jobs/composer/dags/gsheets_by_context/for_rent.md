@@ -20,12 +20,14 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output tables:
 
 1. Data lake raw:
+    - `aux_agents`
     - `forecast_cohort_demanda`
     - `forecast_cohort_supply`
     - `forecast_diario_demanda`
     - `forecast_diario_supply`
 
 2. Data lake clean:
+    - `aux_agents`
     - `rental_forecast_cohort_demand`
     - `rental_forecast_cohort_supply`
     - `rental_forecast_daily_demand`

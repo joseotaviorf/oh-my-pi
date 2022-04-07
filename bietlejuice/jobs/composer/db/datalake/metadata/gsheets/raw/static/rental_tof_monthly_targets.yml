@@ -1,0 +1,3 @@
+---
+database_name: datalake_gsheets_raw
+table_name: rental_tof_monthly_targets

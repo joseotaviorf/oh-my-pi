@@ -58,6 +58,16 @@ people_data:
     clean_table_name: people_employees
     sheet_context: bedrock
     
+#########################
+# FOR RENT SHEETS
+###################
+
+aux_agents:
+    sheet_id: 13LTRNCzLk1BcGcccDqvzG75d97NUwVt6CGYw6RxeBUk
+    sheet_name: aux_agents
+    clean_table_name: aux_agents
+    sheet_context: for_rent
+
 forecast_cohort_demanda:
     sheet_id: 1X8kklNtizTnKJ8zI4XMLaI3H31YU3Oq36VmFxmhwLD0
     sheet_name: forecast_cohort_demanda
@@ -82,8 +92,18 @@ forecast_diario_supply:
     clean_table_name: rental_forecast_daily_supply
     sheet_context: for_rent
 
+#########################
+# STATIC SHEETS
+###################
+
 survival_estimation:
     sheet_id: 1hBZp2g6smNXBRFnITrihnwzztkFRr7q_IF5sSBgSQKo
     sheet_name: survival_estimation
     clean_table_name: survival_estimation
+    sheet_context: static
+
+rental_tof_monthly_targets:
+    sheet_id: 1fMYV90b5hkmkRFspX6JRT9_yc4OjLB9AdPPGDvmu-Iw
+    sheet_name: rental_tof_monthly_targets
+    clean_table_name: rental_tof_monthly_targets
     sheet_context: static
