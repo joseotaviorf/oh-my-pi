@@ -1,0 +1,34 @@
+---
+database_name: datalake_gsheets_clean
+table_name: for_sale_bandaids
+columns:
+  id:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bandaids.id
+  status:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bandaids.status
+  id_property:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bandaids.id_property
+  dt_created:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bandaids.dt_created
+  type:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bandaids.type
+  forsale_type:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bandaids.forsale_type
+  amount:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bandaids.amount
+  client:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bandaids.client
+  category:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bandaids.category
+  bandaid_cause:
+    lineage:
+      - datalake_gsheets_raw.for_sale_bandaids.bandaid_cause

@@ -397,6 +397,11 @@ forms_analise_vistoria:
     sheet_name: inspection_analysis_forms
     clean_table_name: inspection_analysis_forms
 
+for_sale_bandaids:
+    sheet_id: 1LPSu9lbDddTiHk9EtVKwQKsAVzgzuIwG-nMGcYiP2dA
+    sheet_name: forsale
+    clean_table_name: for_sale_bandaids
+
 for_sale_financial_flow_raw:
     sheet_id: 1wduO27OMWmNLN4kIRN2p_5E3-sV4wxEJDf8ECDkIsL0
     sheet_name: Base
