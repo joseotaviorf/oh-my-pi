@@ -3,4 +3,5 @@ table_name: associate_executive_bonus
 columns:
   associate_executive:
     tags:
-    - PII
+      - PII
+      - Confidential

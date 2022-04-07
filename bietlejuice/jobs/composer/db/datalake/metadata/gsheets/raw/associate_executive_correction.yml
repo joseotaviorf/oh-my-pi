@@ -1,0 +1,12 @@
+---
+database_name: datalake_gsheets_raw
+table_name: associate_executive_correction
+columns:
+  incorrect_associate_executive:
+    tags:
+      - PII
+      - Confidential
+  associate_executive:
+    tags:
+      - PII
+      - Confidential

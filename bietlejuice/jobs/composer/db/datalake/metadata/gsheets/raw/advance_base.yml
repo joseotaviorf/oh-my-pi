@@ -1,6 +1,8 @@
+---
 database_name: datalake_gsheets_raw
 table_name: advance_base
 columns:
   agent_full_name:
     tags:
-    - PII
+      - PII
+      - Confidential

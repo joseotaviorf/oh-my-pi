@@ -1,0 +1,16 @@
+---
+database_name: datalake_gsheets_raw
+table_name: negotiation_executive_correction
+columns:
+  incorrect_negociation_executive:
+    tags:
+      - PII
+      - Confidential
+  negotiation_executive:
+    tags:
+      - PII
+      - Confidential
+  associate_executive:
+    tags:
+      - PII
+      - Confidential
