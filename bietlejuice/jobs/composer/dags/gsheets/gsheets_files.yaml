@@ -777,11 +777,6 @@ sale_closing_ops_targets_extra_slas_tags:
     sheet_name: sale_closing_ops_targets_extra_slas_tags
     clean_table_name: sale_closing_ops_targets_extra_slas_tags
 
-sale_ongoing_listings_targets:
-    sheet_id: 1w6mujHGpk5nvL_N6AWVwO6z8xRISLSq1Vu4p3U3SM9Y
-    sheet_name: sale_ongoing_listings_targets
-    clean_table_name: sale_ongoing_listings_targets
-
 sale_payment_concluded_targets:
     sheet_id: 1nwIPhFWSYwHoN5dWsl9hjOLoxQZRufRmKXVz6mB3nBI
     sheet_name: sale_payment_concluded_targets
