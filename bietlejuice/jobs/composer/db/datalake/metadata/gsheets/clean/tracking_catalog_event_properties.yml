@@ -1,0 +1,37 @@
+---
+database_name: datalake_gsheets_clean
+table_name: tracking_catalog_event_properties
+columns:
+  id_app:
+    lineage:
+      - datalake_gsheets_raw.tracking_catalog_event_properties.id_app
+  project_name:
+    lineage:
+      - datalake_gsheets_raw.tracking_catalog_event_properties.project_name
+  description:
+    lineage:
+      - datalake_gsheets_raw.tracking_catalog_event_properties.description
+  owner:
+    lineage:
+      - datalake_gsheets_raw.tracking_catalog_event_properties.owner
+  event_type:
+    lineage:
+      - datalake_gsheets_raw.tracking_catalog_event_properties.event_type
+  event_property:
+    lineage:
+      - datalake_gsheets_raw.tracking_catalog_event_properties.event_property
+  platform:
+    lineage:
+      - datalake_gsheets_raw.tracking_catalog_event_properties.platform
+  type:
+    lineage:
+      - datalake_gsheets_raw.tracking_catalog_event_properties.type
+  status:
+    lineage:
+      - datalake_gsheets_raw.tracking_catalog_event_properties.status
+  first_seen:
+    lineage:
+      - datalake_gsheets_raw.tracking_catalog_event_properties.first_seen
+  last_seen:
+    lineage:
+      - datalake_gsheets_raw.tracking_catalog_event_properties.last_seen

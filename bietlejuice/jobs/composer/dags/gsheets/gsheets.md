@@ -220,6 +220,7 @@ This pipeline produces the following output tables:
     - `tof_supply_targets`
     - `tqc_leads`
     - `tqc_registered_agents`
+    - `tracking_catalog_event_properties`
     - `tracking_catalog_projects`
     - `tv_ads`
     - `unit_economics_amortization_curve`

@@ -988,6 +988,11 @@ tratativas_actionline_ciq_full_responses:
     sheet_name: Form Responses 1
     clean_table_name: responses_action_line_ciq_full
 
+tracking_catalog_event_properties:
+    sheet_id: 1vczbGi8fyT1AhuCkejL9xROs3d-87WToqUYBMAtoAKU
+    sheet_name: event_properties
+    clean_table_name: tracking_catalog_event_properties
+
 tracking_catalog_projects:
     sheet_id: 1vczbGi8fyT1AhuCkejL9xROs3d-87WToqUYBMAtoAKU
     sheet_name: projects
