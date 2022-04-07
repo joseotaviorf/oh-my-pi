@@ -22,7 +22,7 @@ MAIN_SCHEDULE_INTERVAL = "0 6 * * 3,5"
 CONTEXT = "crawlers_listings"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-
+PARTITION_COLS = ["address_city", "year", "month", "day"]
 ENV = os.environ.get("ENVIRONMENT")
 
 config_service = ConfigurationService(DAG_NAME)
@@ -76,6 +76,8 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     layer=LayerEnum.ENRICH,
     source_database_base_name=CONTEXT,
     target_database_base_name=CONTEXT,
+    is_incremental=True,
+    partitions=PARTITION_COLS,
 )
 
 chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(enrich_task_groups))

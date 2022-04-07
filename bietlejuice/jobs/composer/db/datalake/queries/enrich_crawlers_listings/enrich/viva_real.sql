@@ -3,6 +3,7 @@ WITH json_select AS(
         id AS id_house_platform,
         CONCAT(id, 'VivaReal') AS id_house,
         COALESCE(origin, 'VivaReal') AS platform,
+        city,
         TO_JSON(address) AS address,
         TO_JSON(geolocation) AS geolocation,
         listing_name AS listing_name,
@@ -23,7 +24,8 @@ WITH json_select AS(
         platform,
         GET_JSON_OBJECT(address,'$.country') AS country,
         GET_JSON_OBJECT(address,'$.state') AS state,
-        GET_JSON_OBJECT(address,'$.city') AS city,
+        COALESCE(GET_JSON_OBJECT(address,'$.city'), city) AS address_city,
+        city AS city,
         GET_JSON_OBJECT(address,'$.neighborhood') AS neighborhood,
         GET_JSON_OBJECT(address,'$.street') AS street,
         GET_JSON_OBJECT(address,'$.number') AS st_number,
@@ -62,3 +64,7 @@ WITH json_select AS(
         day
     FROM
         json_select
+    WHERE 
+        year = {year}
+        AND month = {month}
+        AND day = {day}

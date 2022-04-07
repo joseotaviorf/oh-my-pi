@@ -190,10 +190,10 @@ if __name__ == "__main__":
 
             if domain == "housi.com" and platform == "mobileweb":
                 """
-              turns possible the union of dataframes across different platforms,
-              as the domain housi.com doesn't have average-visit-duration metric
-              for mobileweb platform
-              """
+                turns possible the union of dataframes across different platforms,
+                as the domain housi.com doesn't have average-visit-duration metric
+                for mobileweb platform
+                """
                 all_metrics_joined = all_metrics_joined.withColumn(
                     "average-visit-duration", lit(None)
                 )

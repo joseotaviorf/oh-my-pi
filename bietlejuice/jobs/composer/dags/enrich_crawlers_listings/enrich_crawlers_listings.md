@@ -2,12 +2,12 @@
 
 ### Purpose
 
-Creates enriched tables for the context `Crawlers Listings` from OLX and VivaReal. This schema has tables that
-extract data from both websites. 
+Creates enriched tables for the context `Crawlers Listings` from OLX and VivaReal. This schema has tables that extract data from both websites.
+The ingestion is incremental, partitioned on city, year, month and day columns.
 
 ### Execution Interval
 
-Weekly. More information about run time [here]({chart_url}{dag_id}).
+Twice a week. More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
