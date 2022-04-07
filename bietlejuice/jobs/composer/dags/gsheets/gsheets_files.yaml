@@ -732,11 +732,6 @@ rental_tof_daily_targets:
     sheet_name: rental_tof_daily_targets
     clean_table_name: rental_tof_daily_targets
 
-rental_tof_monthly_targets:
-    sheet_id: 1fMYV90b5hkmkRFspX6JRT9_yc4OjLB9AdPPGDvmu-Iw
-    sheet_name: rental_tof_monthly_targets
-    clean_table_name: rental_tof_monthly_targets
-
 rental_tof_weekly_targets:
     sheet_id: 1M3yd-RpHMDwnEdWs18sf0oCEHDhmz_Y_9O4zSEcD1nU
     sheet_name: rental_tof_weekly_targets

@@ -415,7 +415,7 @@ events AS (
     -- ToF Rental Targets --
     ------------------------
     SELECT
-        month_start::DATE,
+        dt_month_started::DATE AS month_start,
         city_group,
         NULL::TEXT AS status_start,
         NULL::TEXT AS status_end,

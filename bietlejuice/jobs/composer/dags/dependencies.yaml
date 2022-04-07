@@ -360,7 +360,6 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.gsheets:create-clean-promotional-bonus-cluster-targets-external-table
   - bietlejuice.gsheets:create-clean-promotional-bonus-user-cluster-targets-external-table
   - bietlejuice.gsheets:create-clean-rental-tof-daily-targets-external-table
-  - bietlejuice.gsheets:create-clean-rental-tof-monthly-targets-external-table
   - bietlejuice.gsheets:create-clean-rental-tof-weekly-targets-external-table
   - bietlejuice.gsheets:create-clean-sale-demand-targets-external-table
   - bietlejuice.gsheets:create-clean-sale-flows-targets-external-table
