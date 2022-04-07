@@ -2,3 +2,11 @@
 inner_dependencies:
   pro_owner_history:
     - owner_houses_quantity_history
+  tracking_weekly_changes:
+    - owner_houses_quantity_history
+incremental_tables:
+  - tracking_weekly_changes
+partition_cols:
+  - year
+  - month
+  - day
