@@ -1,0 +1,49 @@
+---
+database_name: datalake_gsheets_clean
+table_name: ongoing_listings_target
+columns:
+  business_context:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets.business_context
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets.city_group
+  tier:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets.tier
+  depublications:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets.depublications
+  ongoing_listings:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets.ongoing_listings
+  recovered:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets.recovered
+  relisting:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets.relisting
+  relistings_recovered:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets.relistings_recovered
+  suspensions:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets.suspensions
+  dt_created:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets.date
+  dt_week_start:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets.week_start
+  year:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets.year
+  semester:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets.halfyear
+  quarter:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets.quarter
+  month:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets.month

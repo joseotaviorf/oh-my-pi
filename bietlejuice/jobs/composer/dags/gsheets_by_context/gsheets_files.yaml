@@ -92,6 +92,12 @@ forecast_diario_supply:
     clean_table_name: rental_forecast_daily_supply
     sheet_context: for_rent
 
+ongoing_listings_targets:
+    sheet_id: 16BHKdlbn4stT8q4bdoGJ_0Fo9i4Z_ibOFevsBR4lD5s
+    sheet_name: ongoing_listings_target
+    clean_table_name: ongoing_listings_target
+    sheet_context: for_rent
+
 #########################
 # STATIC SHEETS
 ###################
