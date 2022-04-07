@@ -1,0 +1,112 @@
+---
+database_name: dw_datamarts_growth_cross
+table_name: pricing_rent_categorization
+columns:
+  sk_house_listing:
+    lineage:
+      - dw_public.dim_house_listing.sk_house_listing
+  sk_house:
+    lineage:
+      - dw_public.dim_house_listing.id_house
+  dt_first_publication:
+    lineage:
+      - datalake_ebdb_clean.house_aud.dt_first_publication
+  dt_publication:
+    lineage:
+      - dw_public.dim_house_listing.ts_publication
+  first_rent_price:
+    lineage:
+      - datalake_ebdb_clean.house_aud.rent
+  last_rent_price:
+    lineage:
+      - dw_public.dim_house_listing.rent
+  dt_first_rent:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  dt_last_rent:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  calculator_price:
+    lineage:
+      - dw_public.dim_house_listing.house_predicted_price
+  house_total_area:
+    lineage:
+      - dw_public.dim_house_listing.house_total_area
+  house_type:
+    lineage:
+      - dw_public.dim_house_listing.house_type
+  is_house_furnished:
+    lineage:
+      - dw_public.dim_house_listing.is_house_furnished
+  city_name:
+    lineage:
+      - dw_public.dim_region.city_name
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
+  region_name:
+    lineage:
+      - dw_public.dim_region.name
+  days_house_listing_to_contract_signed:
+    lineage:
+      - dw_public.fact_listing_rent_flows.days_house_listing_to_contract_signed
+  first_prediction_p_10:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price_aud.p_10
+  first_prediction_p_20:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price_aud.p_20
+  first_prediction_p_30:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price_aud.p_30
+  first_prediction_p_40:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price_aud.p_40
+  first_prediction_p_50:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price_aud.p_50
+  first_prediction_p_60:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price_aud.p_60
+  first_prediction_p_70:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price_aud.p_70
+  first_prediction_p_80:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price_aud.p_80
+  first_prediction_p_90:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price_aud.p_90
+  first_prediction_certainty:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price_aud.certainty
+  last_prediction_p_10:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price.p_10
+  last_prediction_p_20:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price.p_20
+  last_prediction_p_30:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price.p_30
+  last_prediction_p_40:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price.p_40
+  last_prediction_p_50:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price.p_50
+  last_prediction_p_60:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price.p_60
+  last_prediction_p_70:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price.p_70
+  last_prediction_p_80:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price.p_80
+  last_prediction_p_90:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price.p_90
+  last_prediction_certainty:
+    lineage:
+      - datalake_ebdb_clean.house_predicted_price.certainty
