@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 
 from argparse import ArgumentParser
 
@@ -49,6 +50,24 @@ def __get_auth(dbutils):
     return credentials, scope
 
 
+def __preload_gsheet(sheet_details):
+    """
+    This method makes an API call to preload the gsheet, and then waits the amount of seconds
+    specified by sheet_details['preload_time_in_seconds']
+    @param sheet_details: dict
+    """
+    preload_client_response = client.get_data_from_sheet(
+        sheet_details["sheet_name"], sheet_details["sheet_id"]
+    )
+    logger.info(
+        f"""
+        m=__preload_gsheet, msg=Initial length of {len(preload_client_response)}. Waiting for
+        {sheet_details["preload_time_in_seconds"]} seconds to preload the gsheet {sheet_details["sheet_name"]}"
+    """
+    )
+    time.sleep(sheet_details["preload_time_in_seconds"])
+
+
 if __name__ == "__main__":
 
     parser = ArgumentParser(description=JOB_NAME)
@@ -57,7 +76,10 @@ if __name__ == "__main__":
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
     parser.add_argument("source", help="name of the source")
     parser.add_argument("table_name", help="table name to insert into datalake")
-    parser.add_argument("sheet_details", help="gsheets sheet name and sheet id")
+    parser.add_argument(
+        "sheet_details",
+        help="gsheets sheet name, sheet id, and (optional) preload time in seconds",
+    )
 
     args = parser.parse_args()
 
@@ -93,6 +115,9 @@ if __name__ == "__main__":
 
     database_location = datalake_info["db_raw_path"]
     format_options = SparkTableStorageFormat.DEFAULT_RAW
+
+    if "preload_time_in_seconds" in sheet_details:
+        __preload_gsheet(sheet_details)
 
     client_response = client.get_data_from_sheet(
         sheet_details["sheet_name"], sheet_details["sheet_id"]

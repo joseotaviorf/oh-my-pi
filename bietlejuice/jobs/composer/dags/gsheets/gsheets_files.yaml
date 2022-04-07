@@ -971,6 +971,7 @@ tqc_leads:
     sheet_id: 1s1GI7u9oidsTLtW3Z4_e1Go3EfJR2VMva8VgziSA7RU
     sheet_name: tqc_leads
     clean_table_name: tqc_leads
+    preload_time_in_seconds: 30
 
 tqc_registered_agents:
     sheet_id: 1FuN5jlN9pDvVfwPDJAqROfqXKF3tIhXDUvR6a6RGqYg
