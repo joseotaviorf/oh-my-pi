@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS revenue_lines.dim_month_rental_anticipation
 	,dt_first_accepted DATE
 	,dt_due_fee DATE
 	,dt_paid_fee DATE
+	,ts_load TIMESTAMP
 	,PRIMARY KEY (sk_month_rental_anticipation)
 )
 DISTSTYLE KEY

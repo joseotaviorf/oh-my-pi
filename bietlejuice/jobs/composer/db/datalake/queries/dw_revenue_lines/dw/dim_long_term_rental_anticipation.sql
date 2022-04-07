@@ -14,6 +14,7 @@ SELECT
     dt_due,
     dt_paid,
     ts_created,
-    ts_signed
+    ts_signed,
+    NOW() AS ts_load
 FROM
     datalake_revenue_lines.long_term_rental_anticipation

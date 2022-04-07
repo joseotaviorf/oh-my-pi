@@ -1,11 +1,12 @@
 CREATE TABLE IF NOT EXISTS revenue_lines.dim_reservation
 (
-	sk_reservation BIGINT NOT NULL  ENCODE az64
-	,status VARCHAR(255)   ENCODE lzo
-	,installments INTEGER   ENCODE az64
-	,cancellation_reason VARCHAR(255)   ENCODE lzo
-	,value NUMERIC(19,2)   ENCODE az64
-	,ts_created TIMESTAMP WITHOUT TIME ZONE   ENCODE az64
+	sk_reservation BIGINT NOT NULL
+	,status VARCHAR(255)
+	,installments INTEGER
+	,cancellation_reason VARCHAR(255)
+	,value NUMERIC(19,2)
+	,ts_created TIMESTAMP
+	,ts_load TIMESTAMP
 	,PRIMARY KEY (sk_reservation)
 )
 DISTSTYLE KEY

@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS revenue_lines.dim_credit_card_payment
 	,dt_ccp_created DATE
 	,dt_due DATE
 	,dt_paid DATE
+	,ts_load TIMESTAMP
 	,PRIMARY KEY (sk_credit_card_payment)
 )
 DISTSTYLE KEY

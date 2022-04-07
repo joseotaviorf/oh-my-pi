@@ -13,6 +13,7 @@ SELECT
     dt_accepted,
     dt_first_accepted,
     dt_due_fee,
-    dt_paid_fee
+    dt_paid_fee,
+    NOW() AS ts_load
 FROM
     datalake_revenue_lines.month_rental_anticipation

@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS revenue_lines.dim_rental_guarantee
 	,ts_guarantee_created TIMESTAMP
 	,ts_charge_created TIMESTAMP
 	,ts_guarantee_paid TIMESTAMP
+	,ts_load TIMESTAMP
 	,PRIMARY KEY (sk_rental_guarantee)
 )
 DISTSTYLE KEY

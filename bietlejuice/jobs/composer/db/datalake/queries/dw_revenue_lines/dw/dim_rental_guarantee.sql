@@ -11,6 +11,7 @@ SELECT
     accrual_year_month,
     ts_guarantee_created,
     ts_charge_created,
-    ts_guarantee_paid
+    ts_guarantee_paid,
+    NOW() AS ts_load
 FROM
     datalake_revenue_lines.rental_guarantee

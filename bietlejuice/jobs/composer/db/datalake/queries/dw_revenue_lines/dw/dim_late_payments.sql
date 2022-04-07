@@ -7,6 +7,7 @@ SELECT
     accrual_year_month,
     dt_created,
     dt_due,
-    dt_paid
+    dt_paid,
+    NOW() AS ts_load
 FROM
     datalake_revenue_lines.late_payments

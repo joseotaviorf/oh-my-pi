@@ -5,7 +5,8 @@ SELECT
     r.installments,
     r.cancellation_reason,
     r.value,
-    r.ts_created
+    r.ts_created,
+    NOW() AS ts_load
 FROM
     datalake_revenue_lines.reservation r
 LEFT JOIN

@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS revenue_lines.dim_brokerage_finance
 	,dt_bf_created DATE
 	,dt_due_fee DATE
 	,dt_paid_fee DATE
+	,ts_load TIMESTAMP
 	,PRIMARY KEY (sk_brokerage_finance)
 )
 DISTSTYLE KEY

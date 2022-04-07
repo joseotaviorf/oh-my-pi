@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS revenue_lines.dim_late_payments
 	,dt_created DATE
 	,dt_due DATE
 	,dt_paid DATE
+	,ts_load TIMESTAMP
 	,PRIMARY KEY (sk_late_payments)
 )
 DISTSTYLE KEY
