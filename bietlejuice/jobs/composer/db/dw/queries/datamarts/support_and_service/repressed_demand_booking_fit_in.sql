@@ -176,7 +176,12 @@ visit_hoursalert_confirmed AS (
         ts_event AS event_date,
         CAST(id_user AS BIGINT) AS user_id,
         CAST(json_extract_path_text(event_properties,'house_id') AS BIGINT) AS house_id,
-        TO_DATE(COALESCE(json_extract_path_text(event_properties,'alert_target_date'),''),'XX, DD Mon YYYY') AS target_date,
+        COALESCE(json_extract_path_text(event_properties,'alert_target_date'),'') AS target_date_raw,
+        CASE
+            WHEN target_date_raw LIKE '__, __ ___ ____' THEN TO_DATE(target_date_raw, 'XX, DD Mon YYYY')
+            WHEN target_date_raw LIKE '____-__-__' THEN TO_DATE(target_date_raw, 'YYYY-MM-DD')
+            ELSE NULL
+        END AS target_date,
         COALESCE(CAST(NULLIF(json_extract_path_text(event_properties,'alert_slot_from'), '') AS BIGINT), -1) AS alert_slot_from,
         COALESCE(CAST(NULLIF(json_extract_path_text(event_properties,'alert_slot_to'), '') AS BIGINT), -1) AS alert_slot_to
     FROM
