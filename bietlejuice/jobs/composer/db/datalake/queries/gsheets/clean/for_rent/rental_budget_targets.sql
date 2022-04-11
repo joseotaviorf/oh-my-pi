@@ -1,0 +1,28 @@
+
+SELECT
+    contact_onboarding_moving_actual,
+    contact_onboarding_moving_target,
+    contact_ongoing_repair_actual,
+    contact_ongoing_repair_target,
+    contact_payments_actual,
+    contact_payments_target,
+    contract_signed_target,
+    first_listing_pro_owners_target,
+    first_listing_target,
+    net_churn_coincident_actual
+    net_churn_coincident_first_listing_target,
+    net_churn_coincident_relisting_target,
+    net_churn_coincident_suspended_target,
+    net_churn_coincident_suspended_unpublished_target,
+    net_churn_coincident_target,
+    new_tenant_prospect_target,
+    offboarding_actual,
+    offboarding_target,
+    recovered_listing_target,
+    recovered_tenant_prospects_target,
+    relisting_target,
+    tenant_prospects_target,
+    total_listing_target,
+    TO_DATE(month_start,'dd/MM/yyyy') AS dt_month_start
+FROM
+    datalake_gsheets_raw.rental_budget_targets

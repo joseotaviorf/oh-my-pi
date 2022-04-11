@@ -26,6 +26,7 @@ This pipeline produces the following output tables:
     - `forecast_diario_demanda`
     - `forecast_diario_supply`
     - `ongoing_listings_target`
+    - `rental_budget_targets`
 
 2. Data lake clean:
     - `aux_agents`
@@ -34,5 +35,6 @@ This pipeline produces the following output tables:
     - `rental_forecast_daily_demand`
     - `rental_forecast_daily_supply`
     - `ongoing_listings_target`
+    - `rental_budget_targets`
 
 </details>

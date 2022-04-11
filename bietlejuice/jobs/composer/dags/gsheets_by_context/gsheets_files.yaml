@@ -110,6 +110,12 @@ ongoing_listings_targets:
     clean_table_name: ongoing_listings_target
     sheet_context: for_rent
 
+rental_budget_targets:
+    sheet_id: 1LwQpjKEeRCIJ4FcKrUpHTLfEaRn2jV6lG33I-9Ie13c
+    sheet_name: db_budget_targets
+    clean_table_name: rental_budget_targets
+    sheet_context: for_rent
+
 #########################
 # FOR SALE SHEETS
 ###################
