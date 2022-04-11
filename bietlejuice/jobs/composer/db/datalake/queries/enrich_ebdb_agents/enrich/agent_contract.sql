@@ -5,7 +5,7 @@ WITH agent_contract AS (
         aud.id_work_contract,
         ct.contract_name AS work_contract_name,
         ROW_NUMBER() OVER (PARTITION BY aud.id ORDER BY ure.ts_revision DESC) AS r,
-        FROM_UNIXTIME(ure.ts_revision / 1000) AS ts_work_contract_started
+        CAST(FROM_UNIXTIME(ure.ts_revision / 1000) AS TIMESTAMP) AS ts_work_contract_started
     FROM
         datalake_ebdb_clean.agent_data_aud AS aud
     JOIN 
