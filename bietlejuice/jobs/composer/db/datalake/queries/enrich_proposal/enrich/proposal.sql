@@ -128,6 +128,13 @@ sortinghat_proposal as (
         coalesce(ts_analyzed_version, ts_analyzed) as ts_first_analyzed
     from sortinghat_proposal_prev
     where rn = 1
+),
+rental_guarantee_proposal AS (
+    SELECT
+        id_documentation_ebdb as id_proposal,
+        LAST_VALUE(ts_paid) OVER (PARTITION BY id_documentation_ebdb ORDER BY ts_updated ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS ts_paid
+    FROM
+        datalake_rental_guarantee_clean.guarantee
 )
 select
     p.id,
@@ -183,7 +190,7 @@ select
     aud_analysis.ts_doc_analysis_last_approved,
     aud_analysis.ts_doc_analysis_first_rejected,
     aud_analysis.ts_doc_analysis_last_rejected,
-    p.ts_guarantee_paid
+    rg.ts_paid AS ts_guarantee_paid
 from datalake_ebdb_clean.proposal p
 left join aud_analysis
     on aud_analysis.id_aud = p.id
@@ -193,3 +200,6 @@ left join aud_guarantee
     on aud_guarantee.id_aud = p.id
 left join sortinghat_proposal shp
         on shp.id = p.id
+LEFT JOIN 
+    rental_guarantee_proposal rg 
+        ON p.id = rg.id_proposal

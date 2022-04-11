@@ -2,8 +2,7 @@
 
 ### Purpose
 
-Creates enriched tables for the context `Proposal` enriching from ebdb 
-and sorting hat.
+Creates enriched tables for the context `Proposal` enriching from EBDB, Sorting Hat and Rental Guarantee.
 
 ### Execution Interval
 
