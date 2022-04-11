@@ -1,0 +1,36 @@
+---
+database_name: dw_datamarts_growth_cross
+table_name: tenant_prospect_status
+columns:
+  sk_client:
+    lineage:
+      - dw_datamarts_growth_cross.rent_flow_interactions.sk_client
+      - dw_public.fact_listing_rent_flows.sk_client
+      - dw_quintoandar.fact_contract_people.sk_user
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
+  ts_start:
+    lineage:
+      - dw_datamarts_growth_cross.rent_flow_interactions.ts_event
+      - dw_public.dim_contract.ts_signature
+  ts_end:
+    lineage:
+      - dw_datamarts_growth_cross.rent_flow_interactions.ts_event
+      - dw_public.dim_contract.ts_signature
+  sk_start_date:
+    lineage:
+      - dw_datamarts_growth_cross.rent_flow_interactions.ts_event
+      - dw_public.dim_contract.ts_signature
+  sk_end_date:
+    lineage:
+      - dw_datamarts_growth_cross.rent_flow_interactions.ts_event
+      - dw_public.dim_contract.ts_signature
+  ts_first_activation:
+    lineage:
+      - dw_datamarts_growth_cross.rent_flow_interactions.ts_event
+      - dw_public.dim_contract.ts_signature
+      - dw_public.dim_contract.dt_annulment
+  city_group_first_activation:
+    lineage:
+      - dw_public.dim_region.city_group
