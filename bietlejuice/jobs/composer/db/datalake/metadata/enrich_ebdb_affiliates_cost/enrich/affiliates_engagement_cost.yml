@@ -1,0 +1,29 @@
+---
+database_name: datalake_ebdb_affiliates_cost
+table_name: affiliates_engagement_cost
+columns:
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.user.id
+  id_region:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+  id_affiliates:
+    lineage:
+      - datalake_ebdb_clean.user.id_affiliates
+  id_agent:
+    lineage:
+      - datalake_ebdb_clean.lead.id_agent
+      - datalake_ebdb_clean.user.id_agent
+  affiliate_type:
+    lineage:
+      - datalake_ebdb_clean.lead.affiliate_type
+  commission_type:
+    lineage:
+      - datalake_ebdb_clean.account_transaction.type
+  commission_cost:
+    lineage:
+      - datalake_ebdb_clean.account_transaction.value
+  ts_commission_cost:
+    lineage:
+      - datalake_ebdb_clean.account_transaction.ts_transaction
