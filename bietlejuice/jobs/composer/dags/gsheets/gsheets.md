@@ -174,7 +174,6 @@ This pipeline produces the following output tables:
     - `sale_demand_targets`
     - `sale_flows_targets`
     - `sale_nbp_source_targets`
-    - `sale_payment_concluded_targets`
     - `sale_rbp_targets`
     - `sale_supply_targets`
     - `sale_tof_daily_targets`

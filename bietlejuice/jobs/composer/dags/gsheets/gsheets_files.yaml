@@ -762,11 +762,6 @@ sale_closing_ops_targets_extra_slas_tags:
     sheet_name: sale_closing_ops_targets_extra_slas_tags
     clean_table_name: sale_closing_ops_targets_extra_slas_tags
 
-sale_payment_concluded_targets:
-    sheet_id: 1nwIPhFWSYwHoN5dWsl9hjOLoxQZRufRmKXVz6mB3nBI
-    sheet_name: sale_payment_concluded_targets
-    clean_table_name: sale_payment_concluded_targets
-
 sale_rbp_targets:
     sheet_id: 1dbPJT39JNkgakOE95INVipThMe-vLDDXHZ4aOp3q4pg
     sheet_name: sale_rbp_targets
