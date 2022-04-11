@@ -22,6 +22,9 @@ columns:
   dt_ended:
     lineage:
       - datalake_gsheets_raw.estrutura_gerente_corretor.DataSaidaCarteira
+  responsible_analyst:
+    lineage:
+      - datalake_gsheets_raw.estrutura_gerente_corretor.AnalistaResponsavel
   weeks:
     lineage:
       - datalake_gsheets_raw.estrutura_gerente_corretor.Semanas

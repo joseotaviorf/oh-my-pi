@@ -4,6 +4,7 @@ SELECT
     Condicao AS condition,
     StatusMentoria AS mentorship_status,
     MotivoAbandono AS abandonment_reason,
+    AnalistaResponsavel AS responsible_analyst,
     CAST(Semanas AS SMALLINT) AS weeks,
     TO_DATE(DataInicioCarteira,'dd/MM/yyyy') AS dt_started,
     TO_DATE(DataEntradaCarteira,'dd/MM/yyyy') AS dt_entrance,
