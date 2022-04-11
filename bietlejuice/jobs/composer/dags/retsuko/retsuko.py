@@ -12,7 +12,7 @@ from airflow.operators.quintoandar_databricks import (
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
-from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
 
 
 SOURCE = "retsuko"
@@ -49,7 +49,7 @@ MAIN_SCHEDULE_INTERVAL = "0 8 * * *"
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": BaseDAG.DEFAULT_OWNER,
+        "owner": DAGOwnerEnum.DATA_BEDROCK,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },

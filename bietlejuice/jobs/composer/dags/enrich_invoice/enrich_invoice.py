@@ -9,7 +9,7 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 
-from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseTaskGroup
+from bietlejuice.jobs.composer.base.airflow import BaseDAG, BaseTaskGroup, DAGOwnerEnum
 from bietlejuice.jobs.composer.base.airflow.helpers.task_flow_helper import (
     TaskFlowHelper,
 )
@@ -45,7 +45,7 @@ CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": BaseDAG.DEFAULT_OWNER,
+        "owner": DAGOwnerEnum.DATA_BEDROCK,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
