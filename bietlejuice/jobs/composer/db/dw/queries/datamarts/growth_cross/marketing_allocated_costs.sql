@@ -693,10 +693,11 @@ affiliates_aquisiton AS (
             then (cast(sum_events_quantity_fs as float)/cast(relative_value_fr_fs as float)) / (sum_events_quantity_fr + (cast(sum_events_quantity_fs as float)/cast(relative_value_fr_fs as float))) * sum_cost_total 
             else sum_cost_fs end as "allocated_cost_fs"
     FROM base b 
-    LEFT JOIN datalake_raw.gsheets_costs_allocation_relative_indexes gc 
-        on gc.mkt_origin = b.mkt_origin
-        AND gc.cost_definition = 'Affiliates acquisition'
-        AND b.month_start BETWEEN gc.month_start AND month_end 
+    LEFT JOIN
+        datalake_gsheets_clean_prod.costs_allocation_relative_indexes AS gc 
+            ON gc.mkt_origin = b.mkt_origin
+            AND gc.cost_definition = 'Affiliates acquisition'
+            AND b.month_start BETWEEN CAST(gc.dt_month_started AS VARCHAR) AND CAST(dt_month_ended AS VARCHAR)
 ),
 
 affiliates_engagement AS (
@@ -741,10 +742,11 @@ affiliates_engagement AS (
             then (cast(sum_events_quantity_fs as float)/cast(relative_value_fr_fs as float)) / (sum_events_quantity_fr + (cast(sum_events_quantity_fs as float)/cast(relative_value_fr_fs as float))) * sum_cost_total 
             else sum_cost_fs end as "allocated_cost_fs"
     FROM base b 
-    LEFT JOIN datalake_raw.gsheets_costs_allocation_relative_indexes gc 
-        on gc.mkt_origin = b.mkt_origin
-        AND gc.cost_definition = 'Other engag. & acq. costs'
-        AND b.month_start BETWEEN gc.month_start AND month_end 
+    LEFT JOIN 
+        datalake_gsheets_clean_prod.costs_allocation_relative_indexes AS gc 
+            ON gc.mkt_origin = b.mkt_origin
+            AND gc.cost_definition = 'Other engag. & acq. costs'
+            AND b.month_start BETWEEN CAST(gc.dt_month_started AS VARCHAR) AND CAST(gc.dt_month_ended AS VARCHAR)
 ),
 
 affiliates_comission AS (
@@ -788,10 +790,11 @@ affiliates_comission AS (
             then (cast(sum_events_quantity_fs as float)/cast(relative_value_fr_fs as float)) / (sum_events_quantity_fr + (cast(sum_events_quantity_fs as float)/cast(relative_value_fr_fs as float))) * sum_cost_total 
             else sum_cost_fs end as "allocated_cost_fs"
     FROM base b 
-    LEFT JOIN datalake_raw.gsheets_costs_allocation_relative_indexes gc 
-        on gc.mkt_origin = b.mkt_origin
-        AND gc.cost_type = 'Comission'
-        AND b.month_start BETWEEN gc.month_start AND month_end 
+    LEFT JOIN 
+        datalake_gsheets_clean_prod.costs_allocation_relative_indexes AS gc 
+            ON gc.mkt_origin = b.mkt_origin
+            AND gc.cost_type = 'Comission'
+            AND b.month_start BETWEEN CAST(gc.dt_month_started AS VARCHAR) AND CAST(dt_month_ended AS VARCHAR)
 ),
 
 demand AS (
@@ -835,9 +838,10 @@ demand AS (
             then (cast(sum_events_quantity_fs as float)/cast(relative_value_fr_fs as float)) / (sum_events_quantity_fr + (cast(sum_events_quantity_fs as float)/cast(relative_value_fr_fs as float))) * sum_cost_total 
             else sum_cost_fs end as "allocated_cost_fs"
     FROM base b 
-    LEFT JOIN datalake_raw.gsheets_costs_allocation_relative_indexes gc 
-        on gc.mkt_origin = b.mkt_origin
-        AND b.month_start BETWEEN gc.month_start AND month_end 
+    LEFT JOIN 
+        datalake_gsheets_clean_prod.costs_allocation_relative_indexes AS gc 
+            ON gc.mkt_origin = b.mkt_origin
+            AND b.month_start BETWEEN CAST(gc.dt_month_started AS VARCHAR) AND CAST(gc.dt_month_ended AS VARCHAR)
 ),
 
 supply AS (
@@ -881,9 +885,10 @@ supply AS (
             then (cast(sum_events_quantity_fs as float)/cast(relative_value_fr_fs as float)) / (sum_events_quantity_fr + (cast(sum_events_quantity_fs as float)/cast(relative_value_fr_fs as float))) * sum_cost_total 
             else sum_cost_fs end as "allocated_cost_fs"
     FROM base b 
-    LEFT JOIN datalake_raw.gsheets_costs_allocation_relative_indexes gc 
-        on gc.mkt_origin = b.mkt_origin
-        AND b.month_start BETWEEN gc.month_start AND month_end 
+    LEFT JOIN
+        datalake_gsheets_clean_prod.costs_allocation_relative_indexes AS gc 
+            ON gc.mkt_origin = b.mkt_origin
+            AND b.month_start BETWEEN CAST(gc.dt_month_started AS VARCHAR) AND CAST(gc.dt_month_ended AS VARCHAR)
 )
 
 SELECT 

@@ -210,11 +210,6 @@ contract_attribution_models:
     sheet_name: contract_attribution_models
     clean_table_name: contract_attribution_models
 
-costs_allocation_relative_indexes:
-    sheet_id: 1f9Iyshj2N-jIbO-YIXs_CxCnDKq4aLEfBcS6dcN-qgM
-    sheet_name: costs_allocation_relative_indexes
-    clean_table_name: costs_allocation_relative_indexes
-
 costs_targets:
     sheet_id: 1g_HngmcykZuj-c5PfhGeBo0m969ipBEQ04Hy2diIns4
     sheet_name: costs_targets

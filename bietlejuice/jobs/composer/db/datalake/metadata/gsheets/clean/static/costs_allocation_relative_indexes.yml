@@ -16,9 +16,9 @@ columns:
   relative_value_fr_fs:
     lineage:
       - datalake_gsheets_raw.costs_allocation_relative_indexes.relative_value_fr_fs
-  month_start:
+  dt_month_started:
     lineage:
       - datalake_gsheets_raw.costs_allocation_relative_indexes.month_start
-  month_end:
+  dt_month_ended:
     lineage:
       - datalake_gsheets_raw.costs_allocation_relative_indexes.month_end
