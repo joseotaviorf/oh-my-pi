@@ -1,0 +1,151 @@
+---
+database_name: dw_datamarts_growth_cross
+table_name: sale_performance_marketing_metrics_demand
+columns:
+  dt_event:
+    lineage:
+      - dw_public.dim_booking.dt_created
+      - dw_sale.dim_offer.ts_offer_submitted
+      - dw_datamarts_cross.talk_to_agent.first_message_ts
+      - dw_datamarts_cross.buyer_prospect_status.ts_start
+  ts_event:
+    lineage:
+      - dw_public.dim_booking.dt_created
+      - dw_sale.dim_offer.ts_offer_submitted
+      - dw_datamarts_cross.talk_to_agent.first_message_ts
+      - datalake_gsheets_clean.mkt_cost_per_source.date
+      - datalake_gsheets_clean.sale_nbp_source_targets.dt_target
+      - datalake_gsheets_clean.sale_flows_targets.date
+      - dw_public.dim_date.date
+      - dw_datamarts_cross.buyer_prospect_status.ts_start
+  status:
+    lineage:
+      - dw_datamarts_cross.buyer_prospect_status.status
+  status_detail:
+    lineage:
+      - dw_datamarts_cross.buyer_prospect_status.status_detail
+  ts_status_start:
+    lineage:
+      - dw_datamarts_cross.buyer_prospect_status.ts_start
+  ts_status_end:
+    lineage:
+      - dw_datamarts_cross.buyer_prospect_status.ts_end
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
+      - dw_datamarts_cross.buyer_prospect_status.city_group
+      - datalake_gsheets_clean.mkt_cost_per_source.city
+      - datalake_gsheets_clean.sale_nbp_source_targets.city_group
+      - datalake_gsheets_clean.sale_flows_targets.city_group
+      - datalake_marketing_costs.daily_costs.city_group
+  mkt_origin:
+    lineage:
+      - dw_sale.dim_offer.mkt_origin
+      - dw_datamarts_cross.talk_to_agent.mkt_origin
+  mkt_channel:
+    lineage:
+      - dw_public.dim_booking.mkt_channel
+      - dw_sale.dim_offer.mkt_channel
+      - dw_datamarts_cross.talk_to_agent.mkt_channel
+      - datalake_gsheets_clean.mkt_cost_per_source.mkt_channel
+      - datalake_gsheets_clean.sale_nbp_source_targets.mkt_channel
+      - datalake_marketing_costs.daily_costs.mkt_channel
+  mkt_medium:
+    lineage:
+      - dw_public.dim_booking.mkt_medium
+      - dw_sale.dim_offer.mkt_medium
+      - dw_datamarts_cross.talk_to_agent.mkt_medium
+      - datalake_gsheets_clean.mkt_cost_per_source.mkt_medium
+      - datalake_gsheets_clean.sale_nbp_source_targets.mkt_medium
+      - datalake_marketing_costs.daily_costs.mkt_medium
+  mkt_source:
+    lineage:
+      - dw_public.dim_booking.mkt_source
+      - dw_sale.dim_offer.mkt_source
+      - dw_datamarts_cross.talk_to_agent.mkt_source
+      - datalake_gsheets_clean.mkt_cost_per_source.mkt_source
+      - datalake_gsheets_clean.sale_nbp_source_targets.mkt_source
+      - datalake_marketing_costs.daily_costs.mkt_source
+  utm_medium:
+    lineage:
+      - dw_public.dim_booking.utm_medium
+      - dw_sale.dim_offer.utm_medium
+      - dw_datamarts_cross.talk_to_agent.utm_medium
+  utm_source:
+    lineage:
+      - dw_public.dim_booking.utm_source
+      - dw_sale.dim_offer.utm_source
+      - dw_datamarts_cross.talk_to_agent.utm_source
+  campaign_name:
+    lineage:
+      - dw_public.dim_booking.utm_campaign
+      - dw_sale.dim_offer.utm_campaign
+      - dw_datamarts_cross.talk_to_agent.utm_campaign
+      - datalake_marketing_costs.daily_costs.campaign_name
+  utm_campaign:
+    lineage:
+      - dw_public.dim_booking.utm_campaign
+      - dw_sale.dim_offer.utm_campaign
+      - dw_datamarts_cross.talk_to_agent.utm_campaign
+      - datalake_marketing_costs.daily_costs.utm_campaign
+  utm_term:
+    lineage:
+      - dw_public.dim_booking.utm_term
+      - dw_datamarts_cross.talk_to_agent.utm_term
+      - datalake_marketing_costs.daily_costs.utm_term
+  utm_content:
+    lineage:
+      - dw_public.dim_booking.utm_content
+      - dw_datamarts_cross.talk_to_agent.utm_content
+      - datalake_marketing_costs.daily_costs.utm_content
+  sk_sale_flow:
+    lineage:
+      - dw_sale.fact_sale_flows.sk_sale_flow
+      - dw_datamarts_cross.talk_to_agent.tenant_id
+      - dw_datamarts_cross.talk_to_agent.house_id
+  sk_buyer:
+    lineage:
+      - dw_datamarts_cross.buyer_prospect_status.sk_buyer
+      - dw_sale.fact_sale_flows.sk_buyer
+      - dw_datamarts_cross.talk_to_agent.tenant_id
+  sk_house:
+    lineage:
+      - datalake_ebdb_clean.house.id
+      - dw_sale.fact_sale_flows.sk_house
+  sk_offer:
+    lineage:
+      - dw_sale.fact_offers.sk_offer
+  sk_booking:
+    lineage:
+      - dw_sale.fact_visits.sk_booking
+  dt_offer_submitted:
+    lineage:
+      - dw_public.dim_date.date
+  dt_offer_accepted:
+    lineage:
+      - dw_public.dim_date.date
+  dt_sale_agreement_signed:
+    lineage:
+      - dw_public.dim_date.date
+  dt_booking_created:
+    lineage:
+      - dw_public.dim_date.date
+  dt_visit_completed:
+    lineage:
+      - dw_public.dim_date.date
+  sale_flow_order:
+    lineage:
+      - dw_sale.fact_sale_flows.sk_sale_flow
+      - dw_datamarts_cross.talk_to_agent.tenant_id
+      - dw_datamarts_cross.talk_to_agent.house_id
+      - dw_public.dim_booking.dt_created
+      - dw_sale.dim_offer.ts_offer_submitted
+      - dw_datamarts_cross.talk_to_agent.first_message_ts
+  buyer_prospect_order:
+    lineage:
+      - dw_datamarts_cross.buyer_prospect_status.sk_buyer
+      - dw_sale.fact_sale_flows.sk_buyer
+      - dw_datamarts_cross.talk_to_agent.tenant_id
+      - dw_public.dim_booking.dt_created
+      - dw_sale.dim_offer.ts_offer_submitted
+      - dw_datamarts_cross.talk_to_agent.first_message_ts
