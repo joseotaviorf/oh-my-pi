@@ -124,6 +124,12 @@ sale_ongoing_listings_targets:
 # STATIC SHEETS
 ###################
 
+offline_and_branding_marketing_costs:
+    sheet_id: 14la3wTA9DitbyiJ8Lb4X7FnyAMsSE32ICzwPBPD2j4E
+    sheet_name: offline_and_branding_marketing_costs
+    clean_table_name: offline_and_branding_marketing_costs
+    sheet_context: static
+
 autonomous_agent_payment_data_form_origin:
     sheet_id: 1BUfkgVHITraPf1vees0v8Ykj2C6ZpcOaRfaB4U8yMnY
     sheet_name: autonomous_agent_payment_data_form_origin

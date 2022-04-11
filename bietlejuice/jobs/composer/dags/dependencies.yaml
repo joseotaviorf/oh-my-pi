@@ -371,7 +371,6 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.gsheets:create-clean-unit-economics-amortization-curve-external-table
   - bietlejuice.gsheets:create-clean-users-cx-plaquinhas-external-table
   # rent_flow_interactions, performance_marketing_metrics_imobiliaria_casa_mineira
-  - bietlejuice.gsheets:create-clean-offline-and-branding-marketing-costs-external-table
   # daily_target_volumes_supply
   - bietlejuice.gsheets:create-clean-city-share-external-table
   - bietlejuice.gsheets:create-clean-local-holidays-external-table

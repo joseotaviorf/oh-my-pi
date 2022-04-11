@@ -133,7 +133,6 @@ This pipeline produces the following output tables:
     - `negotiation_executive_correction`
     - `offer_fup_history`
     - `offers_hub_central`
-    - `offline_and_branding_marketing_costs`
     - `offline_manual_costs`
     - `offline_manual_share_city_group`
     - `offline_manual_share_cost_center`

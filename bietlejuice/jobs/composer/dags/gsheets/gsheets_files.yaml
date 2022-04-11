@@ -622,11 +622,6 @@ offer_fup_history:
     sheet_name: offer_fup_history
     clean_table_name: offer_fup_history
 
-offline_and_branding_marketing_costs:
-    sheet_id: 14la3wTA9DitbyiJ8Lb4X7FnyAMsSE32ICzwPBPD2j4E
-    sheet_name: offline_and_branding_marketing_costs
-    clean_table_name: offline_and_branding_marketing_costs
-
 ongoing_contracts_2020:
     sheet_id: 15I0puraewbgIZVwsfT6CEc0E4fewxbVxtINbQouOZBs
     sheet_name: Query result
