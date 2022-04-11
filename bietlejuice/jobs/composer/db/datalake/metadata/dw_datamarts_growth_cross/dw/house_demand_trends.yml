@@ -1,0 +1,18 @@
+---
+database_name: dw_datamarts_growth_cross
+table_name: house_demand_trends
+columns:
+  week:
+    lineage:
+      - datalake_amplitude_page_viewed_events.listing_page_viewed.ts_event
+      - dw_datamarts_growth_cross.rental_marketplace_flows.week_start
+  macro_id:
+    lineage:
+      - dw_public.dim_region.macro_id
+  sk_house:
+    lineage:
+      - dw_datamarts_growth_cross.rental_marketplace_flows.sk_house_listing
+      - datalake_amplitude_page_viewed_events.listing_page_viewed.id_house
+  status_short:
+    lineage:
+      - dw_datamarts_growth_cross.rental_marketplace_flows.status_short
