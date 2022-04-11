@@ -1,0 +1,25 @@
+---
+database_name: datalake_condominium_payments_clean
+table_name: non_payment_report
+columns:
+  id:
+    lineage:
+      - datalake_condominium_payments_raw.non_payment_report.id
+  id_contract:
+    lineage:
+      - datalake_condominium_payments_raw.non_payment_report.contract_id
+  expense_type:
+    lineage:
+      - datalake_condominium_payments_raw.non_payment_report.expense_type
+  created_by:
+    lineage:
+      - datalake_condominium_payments_raw.non_payment_report.created_by
+  notification_source:
+    lineage:
+      - datalake_condominium_payments_raw.non_payment_report.notification_source
+  ts_created:
+    lineage:
+      - datalake_condominium_payments_raw.non_payment_report.created_at
+  ts_updated:
+    lineage:
+      - datalake_condominium_payments_raw.non_payment_report.updated_at

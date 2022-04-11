@@ -1,0 +1,6 @@
+---
+tables_list:
+  - attachment
+  - internalization
+  - non_payment_report
+  - non_payment_report_invoice
