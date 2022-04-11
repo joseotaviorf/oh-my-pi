@@ -21,7 +21,9 @@ This pipeline produces the following output tables:
 
 1. Data lake raw:
     - `sale_ongoing_listings_targets`
+    - `target_sale_cohort_supply`
 2. Data lake clean:
     - `sale_ongoing_listings_targets`
+    - `target_sale_cohort_supply`
 
 </details>

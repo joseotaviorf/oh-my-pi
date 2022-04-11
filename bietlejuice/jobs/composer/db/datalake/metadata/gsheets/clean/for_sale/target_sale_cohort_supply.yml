@@ -4,7 +4,7 @@ columns:
   op:
     lineage:
       - datalake_gsheets_raw.target_sale_cohort_supply.op
-  cidade:
+  city:
     lineage:
       - datalake_gsheets_raw.target_sale_cohort_supply.cidade
   first_listing:
@@ -13,7 +13,7 @@ columns:
   mkt_origin:
     lineage:
       - datalake_gsheets_raw.target_sale_cohort_supply.mkt_origin
-  operacao:
+  operation:
     lineage:
       - datalake_gsheets_raw.target_sale_cohort_supply.operacao
   opportunity:
@@ -22,7 +22,7 @@ columns:
   qualified:
     lineage:
       - datalake_gsheets_raw.target_sale_cohort_supply.qualified
-  week:
+  dt_week:
     lineage:
       - datalake_gsheets_raw.target_sale_cohort_supply.week
   week_origin:
