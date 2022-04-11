@@ -1,0 +1,25 @@
+---
+database_name: datalake_gsheets_clean
+table_name: autonomous_agent_payment_data_form_origin
+columns:
+  name:
+    lineage:
+      - datalake_gsheets_raw.autonomous_agent_payment_data_form_origin.nome
+  email:
+    lineage:
+      - datalake_gsheets_raw.autonomous_agent_payment_data_form_origin.email
+  cpf:
+    lineage:
+      - datalake_gsheets_raw.autonomous_agent_payment_data_form_origin.cpf
+  pis:
+    lineage:
+      - datalake_gsheets_raw.autonomous_agent_payment_data_form_origin.pis
+  mothers_name:
+    lineage:
+      - datalake_gsheets_raw.autonomous_agent_payment_data_form_origin.nome_mae
+  fathers_name:
+    lineage:
+      - datalake_gsheets_raw.autonomous_agent_payment_data_form_origin.nome_pai
+  marital_status:
+    lineage:
+      - datalake_gsheets_raw.autonomous_agent_payment_data_form_origin.estado_civil

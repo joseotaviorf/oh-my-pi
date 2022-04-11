@@ -124,6 +124,18 @@ sale_ongoing_listings_targets:
 # STATIC SHEETS
 ###################
 
+autonomous_agent_payment_data_form_origin:
+    sheet_id: 1BUfkgVHITraPf1vees0v8Ykj2C6ZpcOaRfaB4U8yMnY
+    sheet_name: autonomous_agent_payment_data_form_origin
+    clean_table_name: autonomous_agent_payment_data_form_origin
+    sheet_context: static
+
+autonomous_agent_payment_data_lead_origin:
+    sheet_id: 1BUfkgVHITraPf1vees0v8Ykj2C6ZpcOaRfaB4U8yMnY
+    sheet_name: autonomous_agent_payment_data_lead_origin
+    clean_table_name: autonomous_agent_payment_data_lead_origin
+    sheet_context: static
+
 survival_estimation:
     sheet_id: 1hBZp2g6smNXBRFnITrihnwzztkFRr7q_IF5sSBgSQKo
     sheet_name: survival_estimation

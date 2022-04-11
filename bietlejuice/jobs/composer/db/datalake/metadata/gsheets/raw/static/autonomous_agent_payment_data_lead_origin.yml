@@ -1,0 +1,31 @@
+---
+database_name: datalake_gsheets_raw
+table_name: autonomous_agent_payment_data_lead_origin
+columns:
+  nome:
+    tags:
+      - PII
+      - Confidential
+  email:
+    tags:
+      - PII
+      - Confidential
+  cpf:
+    tags:
+      - PII
+      - Confidential
+  pis:
+    tags:
+      - PII
+      - Confidential
+  nome_mae:
+    tags:
+      - PII
+      - Confidential
+  nome_pai:
+    tags:
+      - PII
+      - Confidential
+  estado_civil:
+    tags:
+      - PII

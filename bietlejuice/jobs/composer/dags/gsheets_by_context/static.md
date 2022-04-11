@@ -20,9 +20,13 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output tables:
 
 1. Data lake raw:
+    - `autonomous_agent_payment_data_form_origin`
+    - `autonomous_agent_payment_data_lead_origin`
     - `rental_tof_daily_targets`
     - `survival_estimation`
 2. Data lake clean:
+    - `autonomous_agent_payment_data_form_origin`
+    - `autonomous_agent_payment_data_lead_origin`
     - `rental_tof_daily_targets`
     - `survival_estimation`
 
