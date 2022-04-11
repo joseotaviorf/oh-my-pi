@@ -1,0 +1,81 @@
+---
+database_name: dw_datamarts_growth_cross
+table_name: rental_performance_marketing_metrics_supply_coincident
+columns:
+  date:
+    lineage:
+      - dw_public.dim_date.date
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
+      - datalake_gsheets_clean.daily_target_supply_rental.city_group
+      - dw_datamarts_growth_cross.daily_target_volumes_supply.city_group
+      - datalake_gsheets_clean.costs_targets.city_group
+      - datalake_marketing_costs.daily_costs.city_group
+      - datalake_gsheets_clean.provisioned_costs_import.city_group
+      - dw_quintoandar.dim_affiliate_cost.city_group
+      # - marketing.fact_affiliate_daily_cost_attributions.city_group
+      # - datamarts.performance_marketing_promotional_bonus_costs_daily.city_group
+      # - datamarts.performance_marketing_cluster_promotional_bonus_costs.city_group
+  mkt_origin:
+    lineage:
+      - dw_public.fact_house_listing_flows.mkt_origin
+      - datalake_gsheets_clean.daily_target_supply_rental.supply_origin
+      - dw_datamarts_growth_cross.daily_target_volumes_supply.supply_origin
+      - datalake_marketing_costs.daily_costs.mkt_origin
+      - dw_quintoandar.dim_affiliate_cost.mkt_origin
+      - datalake_gsheets_clean.provisioned_costs_import.mkt_origin
+      - datalake_gsheets_clean.costs_targets.planning_mkt_level3
+      # - marketing.fact_affiliate_daily_cost_attributions.mkt_origin
+      # - datamarts.performance_marketing_promotional_bonus_costs_daily.affiliate_type
+      # - datamarts.performance_marketing_cluster_promotional_bonus_costs.affiliate_type
+  mkt_channel:
+    lineage:
+      - dw_public.fact_house_listing_flows.mkt_channel
+      - datalake_gsheets_clean.daily_target_supply_rental.supply_channel
+      - dw_datamarts_growth_cross.daily_target_volumes_supply.supply_channel
+      - datalake_gsheets_clean.costs_targets.planning_mkt_level3
+      - datalake_marketing_costs.daily_costs.mkt_channel
+  planning_mkt_channel:
+    lineage:
+      - dw_public.fact_house_listing_flows.mkt_origin
+      - datalake_gsheets_clean.daily_target_supply_rental.supply_origin
+      - dw_datamarts_growth_cross.daily_target_volumes_supply.supply_origin
+      - datalake_marketing_costs.daily_costs.mkt_origin
+      - dw_quintoandar.dim_affiliate_cost.mkt_origin
+      - datalake_gsheets_clean.provisioned_costs_import.mkt_origin
+      - datalake_gsheets_clean.costs_targets.planning_mkt_level3
+      # - marketing.fact_affiliate_daily_cost_attributions.mkt_origin
+      # - datamarts.performance_marketing_promotional_bonus_costs_daily.affiliate_type
+      # - datamarts.performance_marketing_cluster_promotional_bonus_costs.affiliate_type
+  mkt_medium:
+    lineage:
+      - dw_public.fact_house_listing_flows.mkt_medium
+      - datalake_gsheets_clean.daily_target_supply_rental.supply_medium
+      - datalake_marketing_costs.daily_costs.mkt_medium
+  mkt_source:
+    lineage:
+      - dw_public.fact_house_listing_flows.mkt_source
+      - datalake_marketing_costs.daily_costs.mkt_source
+      - datalake_gsheets_clean.daily_target_supply_rental.supply_source
+  utm_campaign:
+    lineage:
+      - dw_public.dim_lead.utm_campaign
+      - datalake_marketing_costs.daily_costs.utm_campaign
+  utm_content:
+    lineage:
+      - dw_public.dim_lead.utm_content
+      - datalake_marketing_costs.daily_costs.utm_content
+  utm_term:
+    lineage:
+      - dw_public.dim_lead.utm_term
+      - datalake_marketing_costs.daily_costs.utm_term
+  origin_phone:
+    lineage:
+      - datalake_wololo_clean.prospect.origin_phone
+  campaign_context:
+    lineage:
+      - datalake_gsheets_clean.costs_targets.campaign
+  business_context:
+    lineage:
+      - datalake_gsheets_clean.costs_targets.business
