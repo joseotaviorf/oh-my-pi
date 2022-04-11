@@ -5,6 +5,12 @@ columns:
   sk_offer:
     lineage:
       - datalake_offer.sale_offer.id_offer
+  pendency:
+    lineage:
+      - datalake_offer.sale_offer.pendency
+  pendency_type:
+    lineage:
+      - datalake_offer.sale_offer.pendency_type
   sale_agreement_status:
     lineage:
       - datalake_offer.sale_offer.sale_agreement_status
@@ -107,3 +113,6 @@ columns:
   ts_sale_transaction_paid:
     lineage:
       - datalake_offer.sale_offer.dt_sale_transacton_paid
+  ts_last_updated_pendency:
+    lineage:
+      - datalake_offer.sale_offer.ts_last_updated_pendency

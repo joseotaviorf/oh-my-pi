@@ -44,6 +44,15 @@ columns:
   id_vendas:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.id_sales_flow
+  id_pendency:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.id_pendency
+  pendency:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.pendency
+  pendency_type:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.pendency_type
   team_lead_name:
     lineage:
       - datalake_gsheets.sale_hub_offer.team_lead_name
@@ -311,6 +320,9 @@ columns:
     lineage:
       - datalake_firestore.sale_offer.ts_created
       - datalake_gsheets.sale_hub_offer.dt_offer_submitted
+  ts_last_updated_pendency:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.ts_last_updated_pendency
   ts_updated:
     lineage:
       - datalake_firestore.sale_offer.ts_updated

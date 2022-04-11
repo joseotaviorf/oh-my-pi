@@ -1,6 +1,8 @@
 DROP TABLE IF EXISTS sale.dim_sale_agreement;
 CREATE TABLE sale.dim_sale_agreement (
     sk_offer VARCHAR PRIMARY KEY,
+    pendency VARCHAR,
+    pendency_type VARCHAR,
     sale_agreement_status VARCHAR,
     offer_flow VARCHAR,
     business_unit VARCHAR,
@@ -35,6 +37,7 @@ CREATE TABLE sale.dim_sale_agreement (
     ts_house_registry_started TIMESTAMP,
     ts_house_registry_ended TIMESTAMP,
     ts_sale_transaction_paid TIMESTAMP,
+    ts_last_updated_pendency TIMESTAMP,
     ts_load TIMESTAMP
 );
 ALTER TABLE sale.dim_sale_agreement OWNER TO airflow;

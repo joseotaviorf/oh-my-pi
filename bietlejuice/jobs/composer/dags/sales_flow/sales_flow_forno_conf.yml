@@ -95,6 +95,10 @@ tables:
     extraction_type: full
   sales_flow_contact_aud:
     extraction_type: incremental
+  sales_flow_pendency:
+    extraction_type: incremental
+  sales_flow_pendency_aud:
+    extraction_type: incremental
   sales_flow_tag:
     extraction_type: full
   sales_flow_tag_aud:

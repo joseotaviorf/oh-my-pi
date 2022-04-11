@@ -1,0 +1,22 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: sales_flow_pendency
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_pendency.id
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_pendency.sales_flow_id
+  pendency:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_pendency.pendency
+  type:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_pendency.type
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_pendency.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_pendency.updated_at

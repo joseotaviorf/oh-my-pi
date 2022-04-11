@@ -74,6 +74,12 @@ columns:
   id_legal_risk_analyst:
     lineage:
       - datalake_sales_flow.offer_specialists.id_legal_risk_analyst
+  id_pendency:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow_pendency.id
+  pendency_type:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow_pendency.type
   financing_bank:
     lineage:
       - datalake_sales_flow_clean.mortgage.bank
@@ -308,3 +314,6 @@ columns:
   ts_created:
     lineage:
       - datalake_sales_flow_clean.ccv_flow.ts_created
+  ts_last_updated_pendency:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow_pendency.ts_updated

@@ -3,7 +3,7 @@ WITH flow_type AS (
     WITH last_sf_entry AS (
         SELECT
             row_number() OVER (
-                PARTITION BY 
+                PARTITION BY
                 id
                 ORDER BY
                 ts_updated DESC
@@ -18,8 +18,8 @@ WITH flow_type AS (
         sf.flow_type
     FROM
         datalake_sales_flow_clean.offer AS o
-    LEFT JOIN 
-        last_sf_entry AS sf 
+    LEFT JOIN
+        last_sf_entry AS sf
             ON sf.id = o.id_sales_flow
             AND sf.row = 1
     GROUP BY
@@ -31,7 +31,7 @@ offers AS (
     WITH last_offer_entry AS (
         SELECT
             row_number() OVER (
-                PARTITION BY 
+                PARTITION BY
                 id_firestore
                 ORDER BY
                 ts_updated DESC
@@ -73,11 +73,11 @@ sales_flow AS (
         sf.status_closing
     FROM
         datalake_sales_flow_clean.sales_flow AS sf
-    INNER JOIN 
-        offers sfo 
+    INNER JOIN
+        offers sfo
             ON sfo.id_sales_flow = sf.id
-    INNER JOIN 
-        last_update_sales_flow AS lusf 
+    INNER JOIN
+        last_update_sales_flow AS lusf
             ON sf.id = lusf.id
             AND sf.ts_updated = lusf.ts_last_updated
 ),
@@ -134,33 +134,33 @@ ccvs AS (
             dm.id_specialist AS id_consultant
         FROM
             offers_specialists AS o
-        LEFT JOIN 
-            last_specialist AS dm 
+        LEFT JOIN
+            last_specialist AS dm
                 ON dm.id_sales_flow = o.id_sales_flow
                 AND dm.kind = 'DEAL_MAKER'
                 AND dm.row = 1
-        LEFT JOIN 
-            last_specialist AS tl 
+        LEFT JOIN
+            last_specialist AS tl
                 ON tl.id_sales_flow = o.id_sales_flow
                 AND tl.kind = 'TEAM_LEAD'
                 AND tl.row = 1
     )
 
-    SELECT 
+    SELECT
         o.id_offer,
         lce.ts_signed,
         lce.ts_created
-    FROM 
+    FROM
         offers_ccvs AS o
     LEFT JOIN
         specialists_ccvs AS s
             ON s.id_offer = o.id_offer
-    INNER JOIN 
+    INNER JOIN
         last_ccv_entry AS lce
             ON lce.id_sales_flow = o.id_sales_flow
-            AND lce.row =1 
+            AND lce.row =1
             AND (
-                    (unix_timestamp(lce.ts_signed) - unix_timestamp(lce.ts_created)) > 0 
+                    (unix_timestamp(lce.ts_signed) - unix_timestamp(lce.ts_created)) > 0
                     OR (s.id_consultant IS NOT NULL AND lce.status = 'SIGNED' )
                 )
 ),
@@ -183,10 +183,32 @@ ccv_flow AS (
         DATE(ts_signed) AS dt_sale_agreement_signed
     FROM
         datalake_sales_flow_clean.ccv_flow AS ccv_flow
-    INNER JOIN 
-        last_update_ccv_flow AS lucf 
+    INNER JOIN
+        last_update_ccv_flow AS lucf
         ON ccv_flow.id_ccv_flow = lucf.id_ccv_flow
         AND ccv_flow.ts_updated = lucf.ts_last_updated
+),
+-- PENDENCY CTE
+last_update_pendency AS (
+    SELECT
+        id_sales_flow,
+        MAX(ts_updated) as ts_last_updated
+    FROM datalake_sales_flow_clean.sales_flow_pendency
+    GROUP BY 1
+),
+pendency AS (
+    SELECT
+        sfp.id,
+        sfp.id_sales_flow,
+        pendency,
+        type,
+        ts_last_updated
+    FROM
+        datalake_sales_flow_clean.sales_flow_pendency as sfp
+    INNER JOIN
+        last_update_pendency as lup
+        ON lup.ts_last_updated = sfp.ts_updated
+        AND sfp.id_sales_flow = lup.id_sales_flow
 ),
 -- MORTGAGE CTE
 last_update_mortgage AS (
@@ -213,11 +235,11 @@ mortgage AS (
         mg.dt_ended
     FROM
         datalake_sales_flow_clean.mortgage AS mg
-    INNER JOIN 
-        offers AS sfo 
+    INNER JOIN
+        offers AS sfo
         ON sfo.id_sales_flow = mg.id_sales_flow
-    INNER JOIN 
-        last_update_mortgage AS lum 
+    INNER JOIN
+        last_update_mortgage AS lum
         ON mg.id_mortgage = lum.id_mortgage
         AND mg.ts_updated = lum.ts_last_updated
 ),
@@ -239,11 +261,11 @@ payment AS (
         p.payment_model
     FROM
         datalake_sales_flow_clean.payment AS p
-    INNER JOIN 
-        offers AS sfo 
+    INNER JOIN
+        offers AS sfo
         ON sfo.id_sales_flow = p.id_sales_flow
-    INNER JOIN 
-        last_update_payment AS lup 
+    INNER JOIN
+        last_update_payment AS lup
         ON p.id_sales_flow = lup.id_sales_flow
         AND p.ts_updated = lup.ts_last_updated
 ),
@@ -266,8 +288,8 @@ cash_payment AS (
         DATE(cp.ts_crn_ended) AS dt_crn_ended
     FROM
         datalake_sales_flow_clean.cash_payment AS cp
-    INNER JOIN 
-        last_update_cash_payment AS lucp 
+    INNER JOIN
+        last_update_cash_payment AS lucp
         ON cp.id_cash_payment = lucp.id_cash_payment
         AND cp.ts_updated = lucp.ts_last_updated
 ),
@@ -292,11 +314,11 @@ notary AS (
         DATE(n.ts_buyer_received_keys) AS dt_buyer_received_keys
     FROM
         datalake_sales_flow_clean.notary AS n
-    INNER JOIN 
-        offers AS sfo 
+    INNER JOIN
+        offers AS sfo
         ON sfo.id_sales_flow = n.id_sales_flow
-    INNER JOIN 
-        last_update_notary AS lun 
+    INNER JOIN
+        last_update_notary AS lun
         ON n.id_notary = lun.id_notary
         AND n.ts_updated = lun.ts_last_updated
 ),
@@ -323,11 +345,11 @@ diligence AS (
         d.ts_legal_risk_ended
     FROM
         datalake_sales_flow_clean.diligence AS d
-    INNER JOIN 
-        offers AS sfo 
+    INNER JOIN
+        offers AS sfo
         ON sfo.id_sales_flow = d.id_sales_flow
-    INNER JOIN 
-        last_update_diligence AS lud 
+    INNER JOIN
+        last_update_diligence AS lud
         ON d.id_diligence = lud.id_diligence
         AND d.ts_updated = lud.ts_last_updated
 ),
@@ -347,10 +369,10 @@ diligence_appointment AS (
       concat_ws(' - ',collect_set(appointment)) AS appointment
   FROM
       datalake_sales_flow_clean.diligence_appointment as da
-  INNER JOIN 
+  INNER JOIN
       last_update_diligence_appointment AS luda
         ON da.id_diligence_appointment = luda.id_diligence_appointment
-        AND da.ts_updated = luda.ts_last_updated        
+        AND da.ts_updated = luda.ts_last_updated
   GROUP BY id_diligence
 ),
 -- HOUSE CTE
@@ -369,8 +391,8 @@ house AS (
         h.has_seller_debt_payments
     FROM
         datalake_sales_flow_clean.house AS h
-    INNER JOIN 
-        last_update_house AS luh 
+    INNER JOIN
+        last_update_house AS luh
         ON h.id = luh.id
         AND h.ts_updated = luh.ts_last_updated
 ),
@@ -391,30 +413,30 @@ rescission AS (
         r.comment
     FROM
         datalake_sales_flow_clean.rescission AS r
-    INNER JOIN 
-        last_update_rescission AS lur 
+    INNER JOIN
+        last_update_rescission AS lur
         ON r.id_rescission = lur.id_rescission
         AND r.ts_updated = lur.ts_last_updated
 ),
 -- ONBOARDING CTE
 status_closing_changes AS (
-    SELECT 
+    SELECT
         id,
         ts_updated,
         LAG(status_closing)
         OVER (
             PARTITION BY
-                id 
-            ORDER BY 
+                id
+            ORDER BY
                 ts_updated
         ) AS previous_status
     FROM
-        datalake_sales_flow_clean.sales_flow_aud 
+        datalake_sales_flow_clean.sales_flow_aud
     WHERE
         mod_status_closing
 ),
 onboarding AS (
-    SELECT 
+    SELECT
         id AS id_sales_flow,
         DATE(MAX(ts_updated)) AS dt_ended
     FROM
@@ -443,7 +465,7 @@ tag AS (
     INNER JOIN
         datalake_sales_flow_clean.tag AS tag
             ON sftag.id_tag = tag.id
-    INNER JOIN 
+    INNER JOIN
         last_update_tag AS lut
             ON tag.id = lut.id
             AND tag.ts_updated = lut.ts_last_updated
@@ -475,8 +497,11 @@ SELECT
     sp.id_real_estate_register_specialist,
     sp.id_user_legal_risk_analyst,
     sp.id_legal_risk_analyst,
+    sfp.id as id_pendency,
+    sfp.pendency,
+    sfp.type as pendency_type,
     mg.bank AS financing_bank,
-    CASE  
+    CASE
         WHEN sf.flow_step = 'CANCELED_ON_NEGOTIATION'
         THEN 'Canceladas em negociação'
         WHEN sf.flow_step = 'PROPOSAL_ON_VALIDATION'
@@ -504,19 +529,19 @@ SELECT
     sf.flow_type AS negotiation_model,
     ft.flow_type,
     CASE
-        WHEN ft.flow_type LIKE '%HUB%' 
+        WHEN ft.flow_type LIKE '%HUB%'
         THEN 'HUB'
-        WHEN ft.flow_type LIKE '%CENTRAL%' 
+        WHEN ft.flow_type LIKE '%CENTRAL%'
         THEN 'CENTRAL'
-        WHEN ft.flow_type = 'DEFAULT' 
+        WHEN ft.flow_type = 'DEFAULT'
         THEN 'DEAL_MAKING'
     END AS vendas_offer_flow,
     r.comment AS sale_agreement_cancellation_reason,
     off.discard_reason AS drop_reason,
     CASE
-        WHEN LOWER(off.discard_reason) LIKE '%buyer%' 
+        WHEN LOWER(off.discard_reason) LIKE '%buyer%'
         THEN 'Buyer'
-        WHEN LOWER(off.discard_reason) LIKE '%seller%' 
+        WHEN LOWER(off.discard_reason) LIKE '%seller%'
         THEN 'Seller'
         ELSE 'Other'
     END AS drop_reason_responsible,
@@ -557,7 +582,7 @@ SELECT
     tag.label AS tags_from_salesflow,
     off.sale_price AS sale_price_agreed,
     CASE
-        WHEN DATE(off.ts_accepted) <= DATE(off.ts_discarded) 
+        WHEN DATE(off.ts_accepted) <= DATE(off.ts_discarded)
         THEN DATEDIFF(DATE(off.ts_discarded), DATE(off.ts_accepted))
     END AS days_offer_accepted_to_offer_dismissed,
     DATEDIFF(
@@ -574,8 +599,8 @@ SELECT
     ) AS days_sale_agreement_created_to_sale_agreement_signed,
     h.has_seller_debt_payments,
     CASE
-        WHEN ccvf.dt_sale_agreement_signed IS NOT NULL 
-        THEN 
+        WHEN ccvf.dt_sale_agreement_signed IS NOT NULL
+        THEN
             CASE
             WHEN sf.flow_step = 'CANCELED_CCV' THEN TRUE
             ELSE FALSE
@@ -585,7 +610,7 @@ SELECT
     ccvf.dt_confection_started AS dt_sale_agreement_created,
     ccvf.dt_sale_agreement_signed AS dt_sale_agreement_signed,
     CASE
-        WHEN sf.flow_step = 'CANCELED_CCV' 
+        WHEN sf.flow_step = 'CANCELED_CCV'
         THEN DATE(off.ts_discarded)
     END AS dt_sale_agreement_cancelled,
     o.dt_ended AS dt_onboarding_ended,
@@ -608,47 +633,48 @@ SELECT
     off.ts_accepted,
     off.ts_discarded,
     ccv.ts_signed,
-    ccv.ts_created    
+    ccv.ts_created,
+    sfp.ts_last_updated as ts_last_updated_pendency
 FROM
     offers AS off
-LEFT JOIN 
-    sales_flow AS sf 
+LEFT JOIN
+    sales_flow AS sf
         ON sf.id = off.id_sales_flow
-LEFT JOIN 
-    flow_type AS ft 
+LEFT JOIN
+    flow_type AS ft
         ON ft.id_offer = off.id_offer
-LEFT JOIN 
-    ccvs AS ccv 
+LEFT JOIN
+    ccvs AS ccv
         ON ccv.id_offer = off.id_offer
-LEFT JOIN 
-    datalake_sale_offer_flows.offer_specialists AS sp 
+LEFT JOIN
+    datalake_sale_offer_flows.offer_specialists AS sp
         ON sp.id_offer = off.id_offer
-LEFT JOIN 
-    mortgage AS mg 
+LEFT JOIN
+    mortgage AS mg
         ON mg.id_sales_flow = off.id_sales_flow
-LEFT JOIN 
-    ccv_flow AS ccvf 
+LEFT JOIN
+    ccv_flow AS ccvf
         ON ccvf.id_sales_flow = off.id_sales_flow
-LEFT JOIN 
+LEFT JOIN
     payment AS p
         ON p.id_sales_flow = off.id_sales_flow
-LEFT JOIN 
-    cash_payment AS cp 
+LEFT JOIN
+    cash_payment AS cp
         ON cp.id_payment = p.id_payment
-LEFT JOIN 
-    notary AS n 
+LEFT JOIN
+    notary AS n
         ON n.id_sales_flow = off.id_sales_flow
-LEFT JOIN 
-    diligence AS d 
+LEFT JOIN
+    diligence AS d
         ON d.id_sales_flow = off.id_sales_flow
 LEFT JOIN
     diligence_appointment AS da
         ON da.id_diligence = d.id_diligence
-LEFT JOIN 
-    house AS h 
+LEFT JOIN
+    house AS h
         ON h.id = sf.id_house
-LEFT JOIN 
-    rescission AS r 
+LEFT JOIN
+    rescission AS r
         ON r.id_sales_flow = off.id_sales_flow
 LEFT JOIN
     onboarding AS o
@@ -656,6 +682,9 @@ LEFT JOIN
 LEFT JOIN
     tag
         ON tag.id_sales_flow = off.id_sales_flow
-WHERE 
-    tag.label IS NULL 
+LEFT JOIN
+    pendency AS sfp
+        ON sfp.id_sales_flow = off.id_sales_flow
+WHERE
+    tag.label IS NULL
     OR tag.label NOT LIKE '%#offertestedeproduto%'

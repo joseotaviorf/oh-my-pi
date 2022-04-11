@@ -1,5 +1,7 @@
 SELECT
   eso.id_offer AS sk_offer,
+  eso.pendency,
+  eso.pendency_type,
   eso.sale_agreement_status,
   eso.offer_flow,
   eso.business_unit,
@@ -34,6 +36,7 @@ SELECT
   CAST(eso.dt_house_registry_started AS TIMESTAMP) AS ts_house_registry_started,
   CAST(eso.dt_house_registry_ended AS TIMESTAMP) AS ts_house_registry_ended,
   CAST(eso.dt_sale_transacton_paid AS TIMESTAMP) AS ts_sale_transaction_paid,
+  ts_last_updated_pendency,
   NOW() AS ts_load
 FROM
   datalake_offer.sale_offer eso
