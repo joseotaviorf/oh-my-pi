@@ -142,7 +142,7 @@ listings_clean AS (
         FROM 
             datalake_raw.dim_date 
         WHERE 
-            CAST(date AS DATE) BETWEEN CAST('2022-01-01' AS DATE) AND (SELECT ts_last_extraction FROM listings_clean LIMIT 1)
+            CAST(date AS DATE) BETWEEN CAST('2021-06-01' AS DATE) AND (SELECT ts_last_extraction FROM listings_clean LIMIT 1)
         GROUP BY 
             1
     ),
