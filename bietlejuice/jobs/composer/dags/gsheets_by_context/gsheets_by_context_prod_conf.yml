@@ -22,3 +22,6 @@ dags:
     dag_owner: Data ForSale
   static:
     dag_owner: Data Engineering
+  general:
+    dag_owner: Data Engineering
+    main_schedule_interval: 0 3 * * *

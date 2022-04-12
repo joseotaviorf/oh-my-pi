@@ -189,3 +189,13 @@ supply_targets_2021:
     sheet_name: supply_targets_2021
     clean_table_name: supply_targets_2021
     sheet_context: static
+
+#########################
+# GENERAL SHEETS
+###################
+
+carteira_ciq:
+    sheet_id: 1-1lJbv5430DWWVswf9AHTsi4dzAXvL2VBRqoaSv0j-A
+    sheet_name: carteira_ciq
+    clean_table_name: ciq_wallet
+    sheet_context: general
