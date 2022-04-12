@@ -1,0 +1,104 @@
+---
+database_name: dw_datamarts_growth_cross
+table_name: plaquinhas_users_demand
+columns:
+  sk_client:
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+      - dw_public.dim_user.sk_user
+      - datalake_gsheets_clean.users_cx_plaquinhas.id_user
+  sk_house_listing:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.sk_house_listing
+  id_house:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.id_house
+  sk_booking:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.sk_booking
+  sk_offer:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.sk_offer
+  sk_proposal:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.sk_proposal
+  sk_contract:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.sk_contract
+  sk_rf:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.sk_rf
+  city_group:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.city_group
+  flow_event:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.flow_event
+  mkt_origin:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.mkt_origin
+  mkt_channel:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.mkt_channel
+  mkt_medium:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.mkt_medium
+  mkt_source:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.mkt_source
+  utm_campaign:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.utm_campaign
+  utm_term:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.utm_term
+  utm_content:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.utm_content
+  campaign_name:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.campaign_name
+  status:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.status
+  rent_flow_order:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.rent_flow_order
+  tenant_prospect_order:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.tenant_prospect_order
+  dt_first_interaction:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+      - datalake_gsheets_clean.users_cx_plaquinhas.data_hora
+  dt_last_interaction:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+      - datalake_gsheets_clean.users_cx_plaquinhas.data_hora
+  dt_event:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.dt_event
+  dt_booking_created:
+    lineage:
+      - datalake_gsheets_clean.plaquinhas_demand_targets.dt_target
+  flg_visit_completed:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.flg_visit_completed
+  dt_offer_submitted:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.dt_offer_submitted
+  dt_offer_approved:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.dt_offer_approved
+  dt_tenant_first_doc_sent:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.dt_tenant_first_doc_sent
+  dt_credit_analysis_approved:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.dt_credit_analysis_approved
+  dt_contract_signed:
+    lineage:
+      - dw_datamarts_growth_cross.performance_marketing_metrics_demand.dt_contract_signed
+  visits_booked_target:
+    lineage:
+      - datalake_gsheets_clean.plaquinhas_demand_targets.visits_booked_target
