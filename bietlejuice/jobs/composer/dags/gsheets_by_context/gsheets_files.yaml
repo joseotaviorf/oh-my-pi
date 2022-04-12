@@ -160,6 +160,12 @@ costs_allocation_relative_indexes:
     clean_table_name: costs_allocation_relative_indexes
     sheet_context: static
 
+dados_docato:
+    sheet_id: 1wValHoubCG72NQZkOAGMJyBQM26Dkd4QwzKW1IXhSTw
+    sheet_name: dados_docato
+    clean_table_name: legal_base_docato
+    sheet_context: static
+
 offline_and_branding_marketing_costs:
     sheet_id: 14la3wTA9DitbyiJ8Lb4X7FnyAMsSE32ICzwPBPD2j4E
     sheet_name: offline_and_branding_marketing_costs

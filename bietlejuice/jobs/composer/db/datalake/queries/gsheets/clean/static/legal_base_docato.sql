@@ -1,0 +1,57 @@
+SELECT
+    13o AS bonus_salary,
+    acordao AS judgment,
+    acordo_em AS agreement_in,
+    acordo_sem_vinculo AS no_strings_attached_agreement,
+    adicional_de_periculosidade AS hazard_pay,
+    adicional_noturno AS night_surcharge,
+    aviso_previo AS advance_notice,
+    cargo_exercido AS position_held,
+    comarca AS county,
+    desembargador_relator AS judge_rapporteur,
+    desvio_de_funcao AS function_desviation,
+    diferenca_em_comissoes AS commissions_difference,
+    distribuicao AS distribuition,
+    duracao_processual AS procedural_duration,
+    duracao_processual_ate_sentenca AS procedural_duration_until_sentencing,
+    ferias_13 AS vacations,
+    gratificacao_cct AS cct_gratification,
+    honorarios_sucumbencia AS succumbence_fees,
+    hora_extra_8a44a AS overtime_8_44,
+    hora_extra_intrajornada AS working_hours_overtime,
+    hora_extra_noturna_reduzida AS reduced_nighttime_overtime,
+    CASE 
+        WHEN houve_reversao_da_sentenca = 'Sim' THEN True
+        ELSE False
+    END AS is_sentence_reverted,
+    indenizacao_dano_material AS compensation_material_damage,
+    indenizacao_dano_moral AS compensation_moral_damage,
+    indenizacao_estabilidade_gestante AS compensation_pregnant_stability,
+    juiz AS judge,
+    labor_domingos_e_feriados_100 AS sunday_holliday_labor,
+    multa_467_clt AS fine_467_clt,
+    multa_477_clt AS fine_477_clt,
+    multa_cct AS fine_cct,
+    processo AS judicial_process,
+    reconhecimento_de_vinculo_empregaticio AS employment_relationship_recognition,
+    repeticao_descontos_indevidos AS undue_discounts_repeat,
+    responsabilidade_solidaria_ou_subsidiaria AS joint_or_subsidiary_liability,
+    retificacao_ctps AS ctps_retification,
+    rsr AS rsr,
+    salario_minimo_nos_meses_que_nao_houve_pagamento_de_comissoes AS minimum_wage_in_month_without_commissions_payment,
+    status,
+    segmento AS segment,
+    sentenca AS verdict,
+    tempo_entre_a_demissao_e_a_distribuicao AS time_between_dismissal_and_distribution,
+    tempo_entre_a_demissao_e_a_distribuicao_agrupado AS grouped_time_between_dismissal_and_distribution,
+    trt,
+    CASE
+        WHEN usuario_ativo_na_plataforma = 'Sim' THEN True
+        ELSE False
+    END AS is_active_platform_user,
+    CAST(REPLACE(REPLACE(valor_acao, 'R$', ''), ',', '') AS NUMERIC(10,2)) AS lawsuit_value,
+    CAST(valor_condenacao_acordao AS NUMERIC(10,2)) AS condemnation_judgment_value,
+    CAST(REPLACE(REPLACE(valor_final_execucao, 'R$', ''), ',', '') AS NUMERIC(10,2)) AS final_execution,
+    CAST(valor_sentenca AS NUMERIC(10,2)) AS verdict_value
+FROM
+    datalake_gsheets_raw.dados_docato

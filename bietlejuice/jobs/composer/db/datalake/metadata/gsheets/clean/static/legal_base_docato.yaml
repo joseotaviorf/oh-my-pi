@@ -1,0 +1,136 @@
+---
+database_name: datalake_gsheets_clean
+table_name: legal_base_docato
+columns:
+  bonus_salary:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.13o
+  judgment:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.acordao
+  agreement_in:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.acordo_em
+  no_strings_attached_agreement:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.acordo_sem_vinculo
+  hazard_pay:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.adicional_de_periculosidade
+  night_surcharge:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.adicional_noturno
+  advance_notice:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.aviso_previo
+  position_held:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.cargo_exercido
+  county:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.comarca
+  judge_rapporteur:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.desembargador_relator
+  function_desviation:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.desvio_de_funcao
+  commissions_difference:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.diferenca_em_comissoes
+  distribuition:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.distribuicao
+  procedural_duration:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.duracao_processual
+  procedural_duration_until_sentencing:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.duracao_processual_ate_sentenca
+  vacations:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.ferias_13
+  cct_gratification:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.gratificacao_cct
+  succumbence_fees:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.honorarios_sucumbencia
+  overtime_8_44:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.hora_extra_8a44a
+  working_hours_overtime:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.hora_extra_intrajornada
+  reduced_nighttime_overtime:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.hora_extra_noturna_reduzida
+  compensation_material_damage:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.indenizacao_dano_material
+  compensation_moral_damage:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.indenizacao_dano_moral
+  compensation_pregnant_stability:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.indenizacao_estabilidade_gestante
+  judge:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.juiz
+  sunday_holliday_labor:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.labor_domingos_e_feriados_100
+  fine_467_clt:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.multa_467_clt
+  fine_477_clt:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.multa_477_clt
+  fine_cct:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.multa_cct
+  judicial_process:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.processo
+  employment_relationship_recognition:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.reconhecimento_de_vinculo_empregaticio
+  undue_discounts_repeat:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.repeticao_descontos_indevidos
+  joint_or_subsidiary_liability:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.responsabilidade_solidaria_ou_subsidiaria
+  ctps_retification:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.retificacao_ctps
+  rsr:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.rsr
+  minimum_wage_in_month_without_commissions_payment:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.salario_minimo_nos_meses_que_nao_houve_pagamento_de_comissoes
+  status:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.status
+  segment:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.segmento
+  verdict:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.sentenca
+  time_between_dismissal_and_distribution:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.tempo_entre_a_demissao_e_a_distribuicao
+  grouped_time_between_dismissal_and_distribution:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.tempo_entre_a_demissao_e_a_distribuicao_agrupado
+  trt:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.trt
+  condemnation_judgment_value:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.valor_condenacao_acordao
+  verdict_value:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.valor_sentenca

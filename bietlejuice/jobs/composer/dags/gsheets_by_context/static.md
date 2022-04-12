@@ -23,6 +23,7 @@ This pipeline produces the following output tables:
     - `autonomous_agent_payment_data_form_origin`
     - `autonomous_agent_payment_data_lead_origin`
     - `costs_allocation_relative_indexes`
+    - `dados_docato`
     - `offline_and_branding_marketing_costs`
     - `rental_tof_daily_targets`
     - `survival_estimation`
@@ -30,6 +31,7 @@ This pipeline produces the following output tables:
     - `autonomous_agent_payment_data_form_origin`
     - `autonomous_agent_payment_data_lead_origin`
     - `costs_allocation_relative_indexes`
+    - `legal_base_docato`
     - `offline_and_branding_marketing_costs`
     - `rental_tof_daily_targets`
     - `survival_estimation`
