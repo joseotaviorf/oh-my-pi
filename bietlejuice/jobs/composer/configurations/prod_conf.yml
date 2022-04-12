@@ -41,6 +41,7 @@ dags_out_of_pattern:
         "enrich_marketing_costs_offline",
         "enrich_marketing_costs_sharing_rules",
         "facebook_insights",
+        "gsheets.for_sale",
         "gsheets.support_and_service",
         "marketing_costs",
         "marketing_costs_sharing_rules",

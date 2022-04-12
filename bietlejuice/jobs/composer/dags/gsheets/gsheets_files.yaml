@@ -772,11 +772,6 @@ sale_supply_targets:
     sheet_name: sale_supply_targets
     clean_table_name: sale_supply_targets
 
-sale_tof_daily_targets:
-    sheet_id: 1u6wcCnO1HPl30mq34iR9VoWcD2z6XWYW8erXpLnXXKo
-    sheet_name: sale_tof_daily_targets
-    clean_table_name: sale_tof_daily_targets
-
 sale_tof_monthly_targets:
     sheet_id: 1wIlVgN-OFXxZS8T54-ga4dvHnZxJqBBGPSl-wpu-Pug
     sheet_name: sale_tof_monthly_targets

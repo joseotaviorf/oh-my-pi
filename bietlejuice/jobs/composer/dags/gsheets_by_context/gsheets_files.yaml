@@ -138,6 +138,12 @@ sale_payment_concluded_targets:
     clean_table_name: sale_payment_concluded_targets
     sheet_context: for_sale
 
+sale_tof_daily_targets:
+    sheet_id: 1u6wcCnO1HPl30mq34iR9VoWcD2z6XWYW8erXpLnXXKo
+    sheet_name: sale_tof_daily_targets
+    clean_table_name: sale_tof_daily_targets
+    sheet_context: for_sale
+
 target_sale_cohort_supply:
     sheet_id: 1rd3uFtw61jj3rLmxCs1XmDo1ZFd_HNrGv9eDVI25v5w
     sheet_name: target_sale_cohort_supply
