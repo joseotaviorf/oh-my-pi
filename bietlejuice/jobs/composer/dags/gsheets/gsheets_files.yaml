@@ -817,11 +817,6 @@ supply_targets_2020:
     sheet_name: supply_targets_2020
     clean_table_name: supply_targets_2020
 
-supply_targets_2021:
-    sheet_id: 1LwTojiD_NXervUoR_RW1pNWGjWcvB_Nx0prnpZYwP4g
-    sheet_name: supply_targets_2021
-    clean_table_name: supply_targets_2021
-
 survival_estimation_new_version:
     sheet_id: 1hBZp2g6smNXBRFnITrihnwzztkFRr7q_IF5sSBgSQKo
     sheet_name: survival_estimation_new_version

@@ -183,3 +183,9 @@ rental_tof_monthly_targets:
     sheet_name: rental_tof_monthly_targets
     clean_table_name: rental_tof_monthly_targets
     sheet_context: static
+
+supply_targets_2021:
+    sheet_id: 1LwTojiD_NXervUoR_RW1pNWGjWcvB_Nx0prnpZYwP4g
+    sheet_name: supply_targets_2021
+    clean_table_name: supply_targets_2021
+    sheet_context: static

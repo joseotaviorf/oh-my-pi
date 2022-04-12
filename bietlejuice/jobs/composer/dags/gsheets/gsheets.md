@@ -184,7 +184,6 @@ This pipeline produces the following output tables:
     - `service_city_holidays`
     - `supply_targets_2019`
     - `supply_targets_2020`
-    - `supply_targets_2021`
     - `survival_estimation_new_version`
     - `tag_sla_target`
     - `targets_acquisition_cumulative_autonomous_agent`

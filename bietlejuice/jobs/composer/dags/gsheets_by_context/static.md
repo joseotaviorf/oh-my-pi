@@ -26,6 +26,7 @@ This pipeline produces the following output tables:
     - `dados_docato`
     - `offline_and_branding_marketing_costs`
     - `rental_tof_daily_targets`
+    - `supply_targets_2021`
     - `survival_estimation`
 2. Data lake clean:
     - `autonomous_agent_payment_data_form_origin`
@@ -34,6 +35,7 @@ This pipeline produces the following output tables:
     - `legal_base_docato`
     - `offline_and_branding_marketing_costs`
     - `rental_tof_daily_targets`
+    - `supply_targets_2021`
     - `survival_estimation`
 
 </details>

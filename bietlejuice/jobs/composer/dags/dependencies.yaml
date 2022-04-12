@@ -245,7 +245,6 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.gsheets:create-clean-local-holidays-external-table
   - bietlejuice.gsheets:create-clean-supply-targets-2019-external-table
   - bietlejuice.gsheets:create-clean-supply-targets-2020-external-table
-  - bietlejuice.gsheets:create-clean-supply-targets-2021-external-table
   - bietlejuice.gsheets:create-clean-weekday-holiday-share-supply-external-table
   - bietlejuice.gsheets:create-clean-weekday-supply-channel-share-external-table
   - bietlejuice.gsheets:create-clean-week-volumes-supply-external-table
@@ -376,7 +375,6 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.gsheets:create-clean-local-holidays-external-table
   - bietlejuice.gsheets:create-clean-supply-targets-2019-external-table
   - bietlejuice.gsheets:create-clean-supply-targets-2020-external-table
-  - bietlejuice.gsheets:create-clean-supply-targets-2021-external-table
   - bietlejuice.gsheets:create-clean-weekday-holiday-share-supply-external-table
   - bietlejuice.gsheets:create-clean-weekday-supply-channel-share-external-table
   - bietlejuice.gsheets:create-clean-week-volumes-supply-external-table
