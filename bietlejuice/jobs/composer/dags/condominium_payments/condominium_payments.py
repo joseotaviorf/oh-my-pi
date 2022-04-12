@@ -45,7 +45,7 @@ BASE_SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
 RAW_SPARK_JOB_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/{SOURCE}/load_condominium_payments_into_datalake.py"
 
 CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_med_memory_cluster", deserialize_json=True
+    "databricks_9_1_min_memory_cluster", deserialize_json=True
 )
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
     "destination"
