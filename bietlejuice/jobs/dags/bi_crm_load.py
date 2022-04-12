@@ -22,7 +22,7 @@ from bietlejuice.jobs.etl.crm.task_status_histories import CRMTaskStatusHistorie
 # ---------------------------------------------------------------
 
 # env vars
-env.set_airflow_var_to_local_env('BI_DW', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
+env.set_airflow_var_to_local_env('BI_DW', 'DATA_AWS_ACCESS_KEY_ID', 'DATA_AWS_SECRET_ACCESS_KEY')
 s3_bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 mongo_client_uri = env.get_airflow_env_var('MONGODB_CRM_URI')
 

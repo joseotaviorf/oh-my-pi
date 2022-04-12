@@ -49,9 +49,9 @@ class CRMTasks(object):
         self.execution_date_to = execution_date.replace(
             hour=23, minute=59, second=59, microsecond=59
         )
-        data_acc_aws_access_key_id = os.environ.get("DATA_ACC_AWS_ACCESS_KEY_ID")
+        data_acc_aws_access_key_id = os.environ.get("DATA_AWS_ACCESS_KEY_ID")
         data_acc_aws_secret_access_key = os.environ.get(
-            "DATA_ACC_AWS_SECRET_ACCESS_KEY"
+            "DATA_AWS_SECRET_ACCESS_KEY"
         )
         self.athena_client = AthenaClient(
             self.s3_bucket, data_acc_aws_access_key_id, data_acc_aws_secret_access_key

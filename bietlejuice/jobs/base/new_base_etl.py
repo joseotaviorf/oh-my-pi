@@ -75,8 +75,8 @@ def extract_table_dim_from_ebdb_to_ods(dim_name, bucket, table_name, add_timesta
 
 
 def load_athena_query_to_ods(dim_name, bucket, fname, append=False):
-    data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
-    data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
+    data_acc_aws_access_key_id = os.environ.get('DATA_AWS_ACCESS_KEY_ID')
+    data_acc_aws_secret_access_key = os.environ.get('DATA_AWS_SECRET_ACCESS_KEY')
     athena = AthenaClient(bucket, data_acc_aws_access_key_id, data_acc_aws_secret_access_key)
     filename = '{}/{}.sql'.format(QUERIES_DIR, fname)
     logger.info("Reading from S3: {} file:{}".format(datetime.utcnow(), filename))
@@ -212,8 +212,8 @@ def insert_into_table_from_view_ods(view_name):
 
 
 def load_athena_file_query_to_ods(table_name, file_name, bucket, append=False):
-    data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
-    data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
+    data_acc_aws_access_key_id = os.environ.get('DATA_AWS_ACCESS_KEY_ID')
+    data_acc_aws_secret_access_key = os.environ.get('DATA_AWS_SECRET_ACCESS_KEY')
     athena = AthenaClient(bucket, data_acc_aws_access_key_id, data_acc_aws_secret_access_key)
     df = athena.execute_file_query_and_return_dataframe('{}/{}'.format(QUERIES_DIR, file_name))
     __df_to_db(enum_db=EnumDB.BI_ODS, df=df, table_name=table_name, append=append)

@@ -9,7 +9,7 @@ from bietlejuice.jobs.etl.sorting_hat import SortingHat
 from qa_python_utils import QuintoAndarLogger
 
 # env vars
-env.set_airflow_var_to_local_env('SORTINGHAT', 'BI_ODS', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
+env.set_airflow_var_to_local_env('SORTINGHAT', 'BI_ODS', 'DATA_AWS_ACCESS_KEY_ID', 'DATA_AWS_SECRET_ACCESS_KEY')
 MAIN_DAG_NAME = 'bi-sorting-hat'
 MAIN_START_DATE = datetime(2018, 1, 14, 0, 0, 0)
 MAIN_SCHEDULE_INTERVAL = '0 4 * * *'

@@ -6,7 +6,7 @@ from bietlejuice.jobs.dags.util import environment as env
 from bietlejuice.jobs.etl.s3_files_to_ods import S3ToODS
 
 # env vars
-env.set_airflow_var_to_local_env('BI_ODS', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
+env.set_airflow_var_to_local_env('BI_ODS', 'DATA_AWS_ACCESS_KEY_ID', 'DATA_AWS_SECRET_ACCESS_KEY')
 
 
 # functions

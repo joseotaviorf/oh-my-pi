@@ -21,8 +21,8 @@ from petl.io.db import create_table
 from unidecode import unidecode
 import yaml
 
-data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
-data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
+data_acc_aws_access_key_id = os.environ.get('DATA_AWS_ACCESS_KEY_ID')
+data_acc_aws_secret_access_key = os.environ.get('DATA_AWS_SECRET_ACCESS_KEY')
 
 
 class BaseETL(object):

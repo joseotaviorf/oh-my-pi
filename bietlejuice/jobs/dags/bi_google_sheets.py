@@ -18,12 +18,12 @@ GOOGLE_S_A_CREDENTIALS = json.loads(env.get_airflow_env_var('GOOGLE_SERVICE_ACCO
 GOOGLE_API_SCOPE = env.get_airflow_env_var('GOOGLE_API_SCOPE')
 GOOGLE_SHEETS_FILES = json.loads(env.get_airflow_env_var('GOOGLE_SHEETS_FILES'))
 
-env.set_airflow_var_to_local_env('BI_ODS', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
+env.set_airflow_var_to_local_env('BI_ODS', 'DATA_AWS_ACCESS_KEY_ID', 'DATA_AWS_SECRET_ACCESS_KEY')
 
 
 def load_google_sheet_files_to_datalake(file):
-    data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
-    data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
+    data_acc_aws_access_key_id = os.environ.get('DATA_AWS_ACCESS_KEY_ID')
+    data_acc_aws_secret_access_key = os.environ.get('DATA_AWS_SECRET_ACCESS_KEY')
     athena_client = AthenaClient(s3_bucket, data_acc_aws_access_key_id, data_acc_aws_secret_access_key)
     gs = GoogleSheets(s3_bucket=s3_bucket, google_s_a_credentials=GOOGLE_S_A_CREDENTIALS,
                       google_api_scope=GOOGLE_API_SCOPE)

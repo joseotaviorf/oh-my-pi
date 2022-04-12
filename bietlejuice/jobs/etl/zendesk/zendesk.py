@@ -18,8 +18,8 @@ class Zendesk(object):
     def __init__(self, s3_bucket, execution_date):
         self.s3_bucket = s3_bucket
         self.execution_date = execution_date.strftime("%Y-%m-%d")
-        data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
-        data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
+        data_acc_aws_access_key_id = os.environ.get('DATA_AWS_ACCESS_KEY_ID')
+        data_acc_aws_secret_access_key = os.environ.get('DATA_AWS_SECRET_ACCESS_KEY')
         self.athena_client = AthenaClient(self.s3_bucket, data_acc_aws_access_key_id, data_acc_aws_secret_access_key)
         if data_acc_aws_access_key_id is not None and data_acc_aws_secret_access_key is not None:
             self.s3_resource = boto3.resource('s3', aws_access_key_id=data_acc_aws_access_key_id, aws_secret_access_key=data_acc_aws_secret_access_key)

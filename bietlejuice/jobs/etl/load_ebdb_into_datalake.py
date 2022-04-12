@@ -31,8 +31,8 @@ class EBDBDatalake(object):
     def __init__(self, bucket_datalake, incremental_date=None):
         self.bucket_datalake = bucket_datalake
         self.s3_client = boto3.resource('s3')
-        data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
-        data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
+        data_acc_aws_access_key_id = os.environ.get('DATA_AWS_ACCESS_KEY_ID')
+        data_acc_aws_secret_access_key = os.environ.get('DATA_AWS_SECRET_ACCESS_KEY')
         self.athena_client = AthenaClient(bucket_datalake, data_acc_aws_access_key_id, data_acc_aws_secret_access_key)
         self.incremental_date = incremental_date
 

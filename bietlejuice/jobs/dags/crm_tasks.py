@@ -9,7 +9,7 @@ from bietlejuice.jobs.dags.util import environment as env
 from pymongo import MongoClient
 from qa_python_utils import QuintoAndarLogger
 
-env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
+env.set_airflow_var_to_local_env('BI_DW', 'BI_ODS', 'DATA_AWS_ACCESS_KEY_ID', 'DATA_AWS_SECRET_ACCESS_KEY')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 uri = env.get_airflow_env_var('MONGODB_CRM_URI')
 

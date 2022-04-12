@@ -17,7 +17,7 @@ from bietlejuice.jobs.etl.amplitude.schedule_page_views import SchedulePageViews
 from bietlejuice.jobs.etl.growth.incurred import Growth
 from bietlejuice.jobs.etl.growth.prediction import GrowthPrediction
 
-env.set_airflow_var_to_local_env('BI_DW', 'DATA_ACC_AWS_ACCESS_KEY_ID', 'DATA_ACC_AWS_SECRET_ACCESS_KEY')
+env.set_airflow_var_to_local_env('BI_DW', 'DATA_AWS_ACCESS_KEY_ID', 'DATA_AWS_SECRET_ACCESS_KEY')
 bucket = env.get_airflow_env_var('bi-datalake-s3-bucket')
 
 MAIN_DAG_NAME = 'bi-growth'

@@ -30,8 +30,8 @@ class BaseTest(object):
             return None
 
         if from_athena:
-            data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
-            data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
+            data_acc_aws_access_key_id = os.environ.get('DATA_AWS_ACCESS_KEY_ID')
+            data_acc_aws_secret_access_key = os.environ.get('DATA_AWS_SECRET_ACCESS_KEY')
             return AthenaClient('5a-datalake', data_acc_aws_access_key_id, data_acc_aws_secret_access_key)\
                 .execute_query_and_return_dataframe(query)
 

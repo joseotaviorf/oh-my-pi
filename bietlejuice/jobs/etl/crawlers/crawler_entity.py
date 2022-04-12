@@ -21,8 +21,8 @@ logger = QuintoAndarLogger('CrawlerEntity')
 class CrawlerEntity(object):
 
     def __init__(self, s3_bucket, google_maps_api_key, get_polygons=True):
-        data_acc_aws_access_key_id = os.environ.get('DATA_ACC_AWS_ACCESS_KEY_ID')
-        data_acc_aws_secret_access_key = os.environ.get('DATA_ACC_AWS_SECRET_ACCESS_KEY')
+        data_acc_aws_access_key_id = os.environ.get('DATA_AWS_ACCESS_KEY_ID')
+        data_acc_aws_secret_access_key = os.environ.get('DATA_AWS_SECRET_ACCESS_KEY')
         self.athena_client = AthenaClient(s3_bucket, data_acc_aws_access_key_id, data_acc_aws_secret_access_key)
         self.bucket = s3_bucket
         if google_maps_api_key is not None:
