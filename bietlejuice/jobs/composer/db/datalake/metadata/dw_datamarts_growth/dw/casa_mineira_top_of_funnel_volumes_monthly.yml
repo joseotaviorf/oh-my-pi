@@ -44,7 +44,6 @@ columns:
     lineage:
       - datalake_top_of_funnel_portal_cm.top_of_funnel_users_portal_casa_mineira.mkt_business
       - dw_datamarts_growth.performance_marketing_metrics_portal_casa_mineira.mkt_business
-      - dw_datamarts_growth.performance_marketing_metrics_imobiliaria_casa_mineira.mkt_business
   city_group:
     lineage:
       - datalake_top_of_funnel_portal_cm.top_of_funnel_users_portal_casa_mineira.city_listing
