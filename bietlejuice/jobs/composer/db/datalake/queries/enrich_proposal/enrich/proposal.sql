@@ -130,7 +130,7 @@ sortinghat_proposal as (
     where rn = 1
 ),
 rental_guarantee_proposal AS (
-    SELECT
+    SELECT DISTINCT
         id_documentation_ebdb as id_proposal,
         LAST_VALUE(ts_paid) OVER (PARTITION BY id_documentation_ebdb ORDER BY ts_updated ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS ts_paid
     FROM
