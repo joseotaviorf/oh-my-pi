@@ -2,6 +2,7 @@ import json
 from datetime import timedelta
 
 import airflow.utils.helpers as airflow_helpers
+from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
@@ -164,7 +165,6 @@ class DatalakeTaskGroup(BaseTaskGroup):
         )
 
         config_service = ConfigurationService(source)
-        metadata_type = None
         try:
             product_db_name = config_service.get_config("lineage_product_database_name")
         except IndexError:
@@ -173,6 +173,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             )
             product_db_name = ""
 
+        metadata_type = None
         if FileService.metadata_file_exists(
             self.relative_query_path, layer, table_name, sync_mode == self.ALL_TABLES
         ):
@@ -201,10 +202,19 @@ class DatalakeTaskGroup(BaseTaskGroup):
                 },
                 execution_timeout=timedelta(hours=self.execution_timeout_hours),
             )
-            sync_metastore_tables_partitions_task.set_downstream(
-                [propagate_table_lineage_task]
+
+            bypass_task = DummyOperator(
+                dag=self.dag,
+                task_id=f"propagation-bypass-{layer}-{source}{tasks_name_suffix}",
+                trigger_rule="all_done",
             )
-            final_tasks = [propagate_table_lineage_task]
+
+            airflow_helpers.chain(
+                sync_metastore_tables_partitions_task,
+                propagate_table_lineage_task,
+                bypass_task,
+            )
+            final_tasks = [sync_metastore_tables_partitions_task, bypass_task]
         else:
             logger.debug(
                 f"m=_build_raw_task_group, target_database_base_name={target_database_base_name}, "
@@ -493,10 +503,23 @@ class DatalakeTaskGroup(BaseTaskGroup):
                 },
                 execution_timeout=timedelta(hours=self.execution_timeout_hours),
             )
-            sync_metastore_table_partitions_task.set_downstream(
-                propagate_table_metadata_task
+
+            bypass_task = DummyOperator(
+                dag=self.dag,
+                task_id=f"propagation-bypass-{layer.value}-{slugged_table_name}",
+                trigger_rule="all_done",
             )
-            final_tasks = [create_external_table_task, propagate_table_metadata_task]
+
+            airflow_helpers.chain(
+                sync_metastore_table_partitions_task,
+                propagate_table_metadata_task,
+                bypass_task,
+            )
+            final_tasks = [
+                create_external_table_task,
+                sync_metastore_table_partitions_task,
+                bypass_task,
+            ]
 
         quality_tasks = []
         if FileService.data_quality_tests_file_exists(

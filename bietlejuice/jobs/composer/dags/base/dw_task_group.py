@@ -1,4 +1,5 @@
 from datetime import timedelta
+from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksSubmitRunOperator,
 )
@@ -189,10 +190,23 @@ class DWTaskGroup(BaseTaskGroup):
                 },
                 execution_timeout=timedelta(hours=self.execution_timeout_hours),
             )
-            sync_metastore_tables_partitions_task.set_downstream(
-                [propagate_table_metadata_task]
+
+            dummy_task = DummyOperator(
+                dag=self.dag,
+                task_id=f"bridge-{layer}-{slugged_table_name}",
+                trigger_rule="all_done",
             )
-            final_tasks = [load_table_to_redshift_task, propagate_table_metadata_task]
+
+            airflow_helpers.chain(
+                sync_metastore_tables_partitions_task,
+                propagate_table_metadata_task,
+                dummy_task,
+            )
+            final_tasks = [
+                load_table_to_redshift_task,
+                sync_metastore_tables_partitions_task,
+                dummy_task,
+            ]
 
         airflow_helpers.chain(
             load_table_to_dw_final_schema_task,
