@@ -1,4 +1,3 @@
-
 SELECT
     contact_onboarding_moving_actual,
     contact_onboarding_moving_target,
@@ -9,7 +8,7 @@ SELECT
     contract_signed_target,
     first_listing_pro_owners_target,
     first_listing_target,
-    net_churn_coincident_actual
+    net_churn_coincident_actual,
     net_churn_coincident_first_listing_target,
     net_churn_coincident_relisting_target,
     net_churn_coincident_suspended_target,
@@ -23,6 +22,7 @@ SELECT
     relisting_target,
     tenant_prospects_target,
     total_listing_target,
-    TO_DATE(month_start,'dd/MM/yyyy') AS dt_month_start
+    TO_DATE(month_start,'dd/MM/yyyy') AS dt_month_start,
+    CAST(ts_load AS TIMESTAMP) AS ts_load
 FROM
     datalake_gsheets_raw.rental_budget_targets

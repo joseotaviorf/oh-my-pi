@@ -74,3 +74,6 @@ columns:
   dt_month_start:
     lineage:
       - datalake_gsheets_raw.rental_budget_targets.month_start
+  ts_load:
+    lineage:
+      - datalake_gsheets_raw.rental_budget_targets.ts_load
