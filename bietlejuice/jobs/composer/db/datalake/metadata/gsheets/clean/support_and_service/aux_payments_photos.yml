@@ -1,0 +1,22 @@
+---
+database_name: datalake_gsheets_clean
+table_name: aux_payments_photos
+columns:
+  id_year_month:
+    lineage:
+      - datalake_gsheets_raw.aux_payments_photos.year_month
+  region_code_deprecated:
+    lineage:
+      - datalake_gsheets_raw.aux_payments_photos.region_code_deprecated
+  limit1:
+    lineage:
+      - datalake_gsheets_raw.aux_payments_photos.limit1
+  limit2:
+    lineage:
+      - datalake_gsheets_raw.aux_payments_photos.limit2
+  limit3:
+    lineage:
+      - datalake_gsheets_raw.aux_payments_photos.limit3
+  limit4:
+    lineage:
+      - datalake_gsheets_raw.aux_payments_photos.limit4
