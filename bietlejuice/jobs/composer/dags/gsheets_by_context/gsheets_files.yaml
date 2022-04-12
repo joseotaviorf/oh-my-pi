@@ -190,6 +190,12 @@ supply_targets_2021:
     clean_table_name: supply_targets_2021
     sheet_context: static
 
+autonomous_agent_listing:
+    sheet_id: 1VWXMApErzzt-rRvXaqajNu0s4MRrdss1mthYrxZL9qs
+    sheet_name: autonomous_agent_listing
+    clean_table_name: autonomous_agent_listing
+    sheet_context: static
+    
 #########################
 # GENERAL SHEETS
 ###################

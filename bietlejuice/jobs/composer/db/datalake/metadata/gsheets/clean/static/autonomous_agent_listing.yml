@@ -1,0 +1,52 @@
+---
+database_name: datalake_gsheets_clean
+table_name: autonomous_agent_listing
+columns:
+  id_user_lead:
+    lineage:
+      - datalake_gsheets_raw.autonomous_agent_listing.id_user_lead
+  id_partner:
+    lineage:
+      - datalake_gsheets_raw.autonomous_agent_listing.id_partner
+  user_email:
+    lineage:
+      - datalake_gsheets_raw.autonomous_agent_listing.user_email
+  user_name:
+    lineage:
+      - datalake_gsheets_raw.autonomous_agent_listing.user_name
+  phone:
+    lineage:
+      - datalake_gsheets_raw.autonomous_agent_listing.phone
+  lead_origin:
+    lineage:
+      - datalake_gsheets_raw.autonomous_agent_listing.lead_origin
+  utm_source:
+    lineage:
+      - datalake_gsheets_raw.autonomous_agent_listing.utm_source
+  utm_campaing:
+    lineage:
+      - datalake_gsheets_raw.autonomous_agent_listing.utm_campaing
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.autonomous_agent_listing.city_group
+  dt_visitor:
+    lineage:
+      - datalake_gsheets_raw.autonomous_agent_listing.dt_visitor
+  dt_lead:
+    lineage:
+      - datalake_gsheets_raw.autonomous_agent_listing.dt_lead
+  dt_qualified_lead:
+    lineage:
+      - datalake_gsheets_raw.autonomous_agent_listing.dt_qualified_lead
+  dt_qualified_registred:
+    lineage:
+      - datalake_gsheets_raw.autonomous_agent_listing.dt_qualified_registred
+  dt_term_sent:
+    lineage:
+      - datalake_gsheets_raw.autonomous_agent_listing.dt_term_sent
+  dt_term_signed:
+    lineage:
+      - datalake_gsheets_raw.autonomous_agent_listing.dt_term_signed
+  dt_logged_in:
+    lineage:
+      - datalake_gsheets_raw.autonomous_agent_listing.dt_logged_in

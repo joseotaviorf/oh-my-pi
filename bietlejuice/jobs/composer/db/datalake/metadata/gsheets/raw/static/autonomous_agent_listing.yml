@@ -1,0 +1,19 @@
+---
+database_name: datalake_gsheets_raw
+table_name: autonomous_agent_listing
+columns:
+  id_user_lead:
+    tags:
+      - Confidential
+  id_partner:
+    tags:
+      - Confidential
+  user_email:
+    tags:
+      - Confidential
+  user_name:
+    tags:
+      - Confidential
+  phone:
+    tags:
+      - Confidential
