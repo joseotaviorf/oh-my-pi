@@ -1,0 +1,13 @@
+---
+database_name: datalake_3p
+table_name: houses_3p_bh
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_listing.house.id
+  internal_admin_info:
+    lineage:
+      - datalake_ebdb_listing.house.internal_admin_info
+  partner:
+    lineage:
+      - datalake_ebdb_listing.house.internal_admin_info

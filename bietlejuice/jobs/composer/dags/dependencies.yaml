@@ -859,6 +859,12 @@ bietlejuice.dw_user_sales_rep:
 bietlejuice.dw_visit:
   - bietlejuice.ebdb:create-clean-visit-in-data-lake
 
+bietlejuice.enrich_3p:
+  - bietlejuice.ebdb:create-clean-agent-data-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-in-data-lake
+  - bietlejuice.ebdb:create-clean-work-contract-in-data-lake
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
+
 bietlejuice.enrich_amplitude_lead:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.rene_descartes:load-clean-house-lead
