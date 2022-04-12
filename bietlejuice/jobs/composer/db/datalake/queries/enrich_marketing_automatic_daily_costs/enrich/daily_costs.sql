@@ -31,6 +31,10 @@ enriched_consolidated_media_metrics AS (
                 THEN 'Calculator'
             WHEN LOWER(campaign_name) LIKE '%newchannel%'
                 THEN 'New Channels'
+            WHEN LOWER(campaign_name) LIKE '%agents%'
+                THEN 'Agents'
+            WHEN LOWER(campaign_name) LIKE '%doorman%'
+                THEN 'Doorman'
             ELSE 'Other'
         END AS campaign_origin_acquisition
     FROM
