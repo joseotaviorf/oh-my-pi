@@ -60,7 +60,8 @@ Produces the following output tables:
     `contract_person`  
     `contract_person_aud`  
     `contract_version`  
-    `conversion_lead`  
+    `conversion_lead`
+    `conversion_lead_aud`
     `device`  
     `doorman_affiliate_data`  
     `doorman_affiliate_occupation`  
