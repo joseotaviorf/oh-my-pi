@@ -772,11 +772,6 @@ sale_supply_targets:
     sheet_name: sale_supply_targets
     clean_table_name: sale_supply_targets
 
-sale_tof_weekly_targets:
-    sheet_id: 1a2UYkFZS6LsBZuduYtKpQPuKr1rUM5aQBnN3aBdEIAU
-    sheet_name: sale_tof_weekly_targets
-    clean_table_name: sale_tof_weekly_targets
-
 schedule:
     sheet_id: 1wIwrWi0xlY4TAZnE6JlGm6B0UyezOPxfF5s0_pn-i9E
     sheet_name: Schedule

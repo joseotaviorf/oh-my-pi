@@ -362,12 +362,12 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.gsheets:create-clean-sale-demand-targets-external-table
   - bietlejuice.gsheets:create-clean-sale-flows-targets-external-table
   - bietlejuice.gsheets:create-clean-sale-nbp-source-targets-external-table
-  - bietlejuice.gsheets:create-clean-sale-tof-weekly-targets-external-table
   - bietlejuice.gsheets:create-clean-secretariat-hierarchy-external-table
   - bietlejuice.gsheets:create-clean-unit-economics-amortization-curve-external-table
   - bietlejuice.gsheets:create-clean-users-cx-plaquinhas-external-table
   - bietlejuice.gsheets.for_sale:create-clean-sale-tof-daily-targets-external-table
   - bietlejuice.gsheets.for_sale:create-clean-sale-tof-monthly-targets-external-table
+  - bietlejuice.gsheets.for_sale:create-clean-sale-tof-weekly-targets-external-table
   # rent_flow_interactions, performance_marketing_metrics_imobiliaria_casa_mineira
   # daily_target_volumes_supply
   - bietlejuice.gsheets:create-clean-city-share-external-table
