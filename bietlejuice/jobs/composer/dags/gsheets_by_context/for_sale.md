@@ -25,6 +25,7 @@ This pipeline produces the following output tables:
     - `sale_tof_daily_targets`
     - `sale_tof_monthly_targets`
     - `sale_tof_weekly_targets`
+    - `target_sale_cohort_demand`
     - `target_sale_cohort_supply`
 2. Data lake clean:
     - `sale_ongoing_listings_targets`
@@ -32,6 +33,7 @@ This pipeline produces the following output tables:
     - `sale_tof_daily_targets`
     - `sale_tof_monthly_targets`
     - `sale_tof_weekly_targets`
+    - `target_sale_cohort_demand`
     - `target_sale_cohort_supply`
 
 </details>

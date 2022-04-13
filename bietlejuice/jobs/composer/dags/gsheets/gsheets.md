@@ -185,7 +185,6 @@ This pipeline produces the following output tables:
     - `targets_acquisition_cumulative_autonomous_agent`
     - `targets_agents_engagement`
     - `target_nps_weekly`
-    - `target_sale_cohort_demand`
     - `targets_avg_ticket_adm_fee`
     - `targets_casa_mineira_cost`
     - `targets_casa_mineira_ncp`

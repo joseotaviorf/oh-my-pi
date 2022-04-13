@@ -162,6 +162,12 @@ sale_tof_weekly_targets:
     clean_table_name: sale_tof_weekly_targets
     sheet_context: for_sale
 
+target_sale_cohort_demand:
+    sheet_id: 1IzXMT2uzLovZ6sI30a_dfFsBuWaffBAoid6rFdIszC0
+    sheet_name: target_sale_cohort_demand
+    clean_table_name: target_sale_cohort_demand
+    sheet_context: for_sale
+
 target_sale_cohort_supply:
     sheet_id: 1rd3uFtw61jj3rLmxCs1XmDo1ZFd_HNrGv9eDVI25v5w
     sheet_name: target_sale_cohort_supply

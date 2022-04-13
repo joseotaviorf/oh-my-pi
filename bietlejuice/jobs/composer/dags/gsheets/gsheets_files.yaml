@@ -807,11 +807,6 @@ target_nps_weekly:
     sheet_name: target_nps_weekly
     clean_table_name: target_nps_weekly
 
-target_sale_cohort_demand:
-    sheet_id: 1IzXMT2uzLovZ6sI30a_dfFsBuWaffBAoid6rFdIszC0
-    sheet_name: target_sale_cohort_demand
-    clean_table_name: target_sale_cohort_demand
-
 target_supply_and_demand_autonomous_agent:
     sheet_id: 1i2cHxc4h9c8FKEORH4K_0n_ho-3haXH04fWhdDHE2nU
     sheet_name: target_supply_and_demand_autonomous_agent
