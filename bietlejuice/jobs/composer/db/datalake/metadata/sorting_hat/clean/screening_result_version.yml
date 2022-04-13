@@ -1,24 +1,39 @@
 database_name: datalake_sorting_hat_clean
 table_name: screening_result_version
 columns:
-  id:
-    lineage:
-      - datalake_sorting_hat_raw.screeningresultversion.id
   id_screening_result:
     lineage:
-      - datalake_sorting_hat_raw.screeningresultversion.screening_result_id
-  score:
+      - datalake_sorting_hat_raw.screeningresult_version.id
+  id_end_transaction:
     lineage:
-      - datalake_sorting_hat_raw.screeningresultversion.score
-  risk_category:
+      - datalake_sorting_hat_raw.screeningresult_version.end_transaction_id
+  id_transaction:
     lineage:
-      - datalake_sorting_hat_raw.screeningresultversion.risk_category
-  liquidity:
-    lineage:
-      - datalake_sorting_hat_raw.screeningresultversion.liquidity
+      - datalake_sorting_hat_raw.screeningresult_version.transaction_id
   id_proposal:
     lineage:
-      - datalake_sorting_hat_raw.screeningresultversion.proposal_id
-  ts_versioned:
+      - datalake_sorting_hat_raw.screeningresult_version.proposal_id
+  liquidity:
     lineage:
-      - datalake_sorting_hat_raw.screeningresultversion.versioned_at
+      - datalake_sorting_hat_raw.screeningresult_version.liquidity
+  operation_type:
+    lineage:
+      - datalake_sorting_hat_raw.screeningresult_version.operation_type
+  risk_category:
+    lineage:
+      - datalake_sorting_hat_raw.screeningresult_version.risk_category
+  score:
+    lineage:
+      - datalake_sorting_hat_raw.screeningresult_version.score
+  mod_id_proposal:
+    lineage:
+      - datalake_sorting_hat_raw.screeningresult_version.proposal_id_mod
+  mod_liquidity:
+    lineage:
+      - datalake_sorting_hat_raw.screeningresult_version.liquidity_mod
+  mod_risk_category:
+    lineage:
+      - datalake_sorting_hat_raw.screeningresult_version.risk_category_mod
+  mod_score:
+    lineage:
+      - datalake_sorting_hat_raw.screeningresult_version.score_mod
