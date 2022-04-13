@@ -283,7 +283,6 @@ bietlejuice.dw_datamarts_growth:
 
 bietlejuice.dw_datamarts_growth_cross:
   # affiliate_acquisition_metrics
-  - bietlejuice.gsheets:create-clean-affiliates-acquisition-targets-external-table
   - bietlejuice.gsheets:create-clean-provisioned-costs-import-external-table
   # affiliate_acquisition_metrics, rent_flow_interactions
   - bietlejuice.dw_datamarts_cross:create-lead-listing-flows-in-datalake

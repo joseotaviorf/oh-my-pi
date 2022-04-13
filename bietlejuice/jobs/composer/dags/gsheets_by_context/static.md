@@ -20,6 +20,7 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output tables:
 
 1. Data lake raw:
+    - `affiliates_acquisition_targets`
     - `autonomous_agent_listing`
     - `autonomous_agent_payment_data_form_origin`
     - `autonomous_agent_payment_data_lead_origin`
@@ -33,6 +34,7 @@ This pipeline produces the following output tables:
     - `supply_targets_2021`
     - `survival_estimation`
 2. Data lake clean:
+    - `affiliates_acquisition_targets`
     - `autonomous_agent_listing`
     - `autonomous_agent_payment_data_form_origin`
     - `autonomous_agent_payment_data_lead_origin`

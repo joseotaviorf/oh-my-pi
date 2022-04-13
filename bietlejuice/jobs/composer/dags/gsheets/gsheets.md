@@ -27,7 +27,6 @@ This pipeline produces the following output tables:
     - `actionline_negotiations`
     - `advance_base`
     - `affiliate_type_targets`
-    - `affiliates_acquisition_targets`
     - `affiliates_extra_user_bonus`
     - `affiliates_active_segmentation`
     - `affiliates_inactive_segmentation`

@@ -202,6 +202,12 @@ target_sale_cohort_supply:
 # STATIC SHEETS
 ###################
 
+affiliates_acquisition_targets:
+    sheet_id: 1Ln23SA7YQ-OhfZ49BEmoT_mm-kDbNC-HdMt9thTzbDM
+    sheet_name: target_nau_budget_daily
+    clean_table_name: affiliates_acquisition_targets
+    sheet_context: static
+
 autonomous_agent_payment_data_form_origin:
     sheet_id: 1BUfkgVHITraPf1vees0v8Ykj2C6ZpcOaRfaB4U8yMnY
     sheet_name: autonomous_agent_payment_data_form_origin
