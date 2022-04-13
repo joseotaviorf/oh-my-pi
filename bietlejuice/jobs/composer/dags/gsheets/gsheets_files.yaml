@@ -90,11 +90,6 @@ aux_commission:
     sheet_name: aux_commission
     clean_table_name: aux_commission
 
-aux_regiao:
-    sheet_id: 1gh8S0xVQ9HsTs6EkvE0BcXvh5_cfaG3aUpIgrluqqlM
-    sheet_name: aux_regiao
-    clean_table_name: auxiliary_region
-
 base_hunter:
     sheet_id: 1gFxBxHVnmIveohw9fmRspW4ImPYSglH7dEITpFc17DI
     sheet_name: Página1

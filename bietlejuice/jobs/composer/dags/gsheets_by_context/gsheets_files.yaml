@@ -92,6 +92,12 @@ aux_agents:
     clean_table_name: aux_agents
     sheet_context: for_rent
 
+aux_regiao:
+    sheet_id: 1gh8S0xVQ9HsTs6EkvE0BcXvh5_cfaG3aUpIgrluqqlM
+    sheet_name: aux_regiao
+    clean_table_name: auxiliary_region
+    sheet_context: for_rent
+
 forecast_cohort_demanda:
     sheet_id: 1X8kklNtizTnKJ8zI4XMLaI3H31YU3Oq36VmFxmhwLD0
     sheet_name: forecast_cohort_demanda

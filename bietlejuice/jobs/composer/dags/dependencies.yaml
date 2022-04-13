@@ -439,7 +439,7 @@ bietlejuice.dw_agent:
   - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.enrich_ebdb_agents:load-enrich-agents-review
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-region-group
-  - bietlejuice.gsheets:load-clean-auxiliary-region
+  - bietlejuice.gsheets.for_rent:load-clean-auxiliary-region
 
 bietlejuice.dw_agents_availability:
   - bietlejuice.dw_agent:load-dw-public-dim-agent-region
@@ -1106,7 +1106,7 @@ bietlejuice.enrich_ebdb_agents:
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
   - bietlejuice.ebdb:create-clean-visit-in-data-lake
   - bietlejuice.ebdb:create-clean-work-contract-in-data-lake
-  - bietlejuice.gsheets:load-clean-auxiliary-region
+  - bietlejuice.gsheets.for_rent:load-clean-auxiliary-region
 
 bietlejuice.enrich_ebdb_contract:
   - bietlejuice.ebdb:create-clean-contract-in-data-lake
@@ -1456,7 +1456,7 @@ bietlejuice.enrich_quinto_messenger:
 
 bietlejuice.enrich_region:
   - bietlejuice.ebdb:create-clean-region-in-data-lake
-  - bietlejuice.gsheets:load-clean-auxiliary-region
+  - bietlejuice.gsheets.for_rent:load-clean-auxiliary-region
 
 bietlejuice.enrich_rent_potential_listing:
   - bietlejuice.ebdb:create-clean-partner-agent-in-data-lake

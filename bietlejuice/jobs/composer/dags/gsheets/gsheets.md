@@ -42,7 +42,6 @@ This pipeline produces the following output tables:
     - `aux_agents_sale_hub`
     - `aux_check_photo_sender`
     - `aux_commission`
-    - `auxiliary_region`
     - `bandaid_off`
     - `base_hunter`
     - `bbb22_coupon_sale_users`
