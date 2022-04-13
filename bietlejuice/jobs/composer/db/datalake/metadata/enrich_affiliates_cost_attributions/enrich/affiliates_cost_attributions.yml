@@ -1,0 +1,51 @@
+---
+database_name: datalake_affiliates_cost_attributions
+table_name: affiliates_cost_attributions
+columns:
+  id_date:
+    lineage:
+      - datalake_ebdb_affiliates_cost.affiliates_engagement_cost.ts_commission_cost
+      - datalake_gsheets_clean.affiliates_manual_cost_engagement.dt_cost
+      - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.dt_cost
+  city_group:
+    lineage:
+      - datalake_region.region.city_group
+      - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.city_group
+      - datalake_gsheets_clean.affiliates_manual_cost_engagement.city_group
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.mkt_origin
+      - datalake_gsheets_clean.affiliates_manual_cost_engagement.mkt_origin
+  commission_listing_cost:
+    lineage:
+      - datalake_ebdb_affiliates_cost.affiliates_engagement_cost.commission_cost
+      - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.commission_listing_cost
+  commission_rent_cost:
+    lineage:
+      - datalake_ebdb_affiliates_cost.affiliates_engagement_cost.commission_cost
+      - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.commission_rent_cost
+  commission_mgm_cost:
+    lineage:
+      - datalake_ebdb_affiliates_cost.affiliates_engagement_cost.commission_cost
+      - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.commission_mgm_cost
+  promotional_bonus_cost:
+    lineage:
+      - datalake_gsheets_clean.affiliates_manual_cost_engagement.promotional_bonus_cost
+      - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.promotional_bonus_cost
+  notification_cost:
+    lineage:
+      - datalake_gsheets_clean.affiliates_manual_cost_engagement.notification_cost
+      - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.notification_cost
+  other_cost:
+    lineage:
+      - datalake_gsheets_clean.affiliates_manual_cost_engagement.other_cost
+      - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.other_cost
+  commission_tradecom:
+    lineage:
+      - datalake_ebdb_affiliates_cost.affiliates_engagement_cost.commission_cost
+      - datalake_gsheets_clean.affiliates_manual_cost_engagement.promotional_bonus_cost
+      - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.commission_listing_cost
+      - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.commission_rent_cost
+      - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.commission_mgm_cost
+      - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.promotional_bonus_cost
+      - datalake_gsheets_clean.affiliates_cost_tradecom_configuration.commission_rate
