@@ -30,6 +30,7 @@ This pipeline produces the following output tables:
     - `de_para_cancelamento`
     - `offline_and_branding_marketing_costs`
     - `rental_tof_daily_targets`
+    - `supply_targets_2019`
     - `supply_targets_2020`
     - `supply_targets_2021`
     - `survival_estimation`
@@ -44,6 +45,7 @@ This pipeline produces the following output tables:
     - `legal_base_docato`
     - `offline_and_branding_marketing_costs`
     - `rental_tof_daily_targets`
+    - `supply_targets_2019`
     - `supply_targets_2020`
     - `supply_targets_2021`
     - `survival_estimation`

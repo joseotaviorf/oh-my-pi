@@ -250,6 +250,12 @@ offline_and_branding_marketing_costs:
     clean_table_name: offline_and_branding_marketing_costs
     sheet_context: static
 
+supply_targets_2019:
+    sheet_id: 1Nxh1_mAsyr3tkChizMyYc4QIg3jTR1YNGAenjy9NWKQ
+    sheet_name: supply_targets_2019
+    clean_table_name: supply_targets_2019
+    sheet_context: static
+
 survival_estimation:
     sheet_id: 1hBZp2g6smNXBRFnITrihnwzztkFRr7q_IF5sSBgSQKo
     sheet_name: survival_estimation

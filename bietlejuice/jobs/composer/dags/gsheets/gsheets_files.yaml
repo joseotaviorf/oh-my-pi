@@ -762,11 +762,6 @@ service_city_holidays:
     sheet_name: data_extraction
     clean_table_name: service_city_holidays
 
-supply_targets_2019:
-    sheet_id: 1Nxh1_mAsyr3tkChizMyYc4QIg3jTR1YNGAenjy9NWKQ
-    sheet_name: supply_targets_2019
-    clean_table_name: supply_targets_2019
-
 survival_estimation_new_version:
     sheet_id: 1hBZp2g6smNXBRFnITrihnwzztkFRr7q_IF5sSBgSQKo
     sheet_name: survival_estimation_new_version

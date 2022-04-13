@@ -243,7 +243,6 @@ bietlejuice.dw_datamarts_growth:
   # daily_target_volumes_supply, sale_performance_marketing_metrics_supply_cohort
   - bietlejuice.gsheets:create-clean-city-share-external-table
   - bietlejuice.gsheets:create-clean-local-holidays-external-table
-  - bietlejuice.gsheets:create-clean-supply-targets-2019-external-table
   - bietlejuice.gsheets:create-clean-weekday-holiday-share-supply-external-table
   - bietlejuice.gsheets:create-clean-weekday-supply-channel-share-external-table
   - bietlejuice.gsheets:create-clean-week-volumes-supply-external-table
@@ -371,7 +370,6 @@ bietlejuice.dw_datamarts_growth_cross:
   # daily_target_volumes_supply
   - bietlejuice.gsheets:create-clean-city-share-external-table
   - bietlejuice.gsheets:create-clean-local-holidays-external-table
-  - bietlejuice.gsheets:create-clean-supply-targets-2019-external-table
   - bietlejuice.gsheets:create-clean-weekday-holiday-share-supply-external-table
   - bietlejuice.gsheets:create-clean-weekday-supply-channel-share-external-table
   - bietlejuice.gsheets:create-clean-week-volumes-supply-external-table
