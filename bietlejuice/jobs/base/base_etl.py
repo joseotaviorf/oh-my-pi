@@ -24,7 +24,7 @@ import yaml
 data_acc_aws_access_key_id = os.environ.get('DATA_AWS_ACCESS_KEY_ID')
 data_acc_aws_secret_access_key = os.environ.get('DATA_AWS_SECRET_ACCESS_KEY')
 
-print("base_etl: using {} as aws key id".format(data_acc_aws_access_key_id[14:])
+print("base_etl: using {} as aws key id".format(data_acc_aws_access_key_id[14:]))
 
 
 class BaseETL(object):
