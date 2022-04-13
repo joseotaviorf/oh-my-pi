@@ -119,7 +119,8 @@ Produces the following output tables:
     `onboarding`  
     `ownerlead`  
     `partner`  
-    `partner_agent`  
+    `partner_agent`
+    `partner_agent_aud`  
     `photographer_data`  
     `photographer_job`  
     `photographer_job_aud`  
