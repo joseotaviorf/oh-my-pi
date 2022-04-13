@@ -34,6 +34,7 @@ This pipeline produces the following output tables:
     - `supply_targets_2020`
     - `supply_targets_2021`
     - `survival_estimation`
+    - `users_cx_plaquinhas`
 2. Data lake clean:
     - `affiliates_acquisition_targets`
     - `autonomous_agent_listing`
@@ -49,5 +50,6 @@ This pipeline produces the following output tables:
     - `supply_targets_2020`
     - `supply_targets_2021`
     - `survival_estimation`
+    - `users_cx_plaquinhas`
 
 </details>
