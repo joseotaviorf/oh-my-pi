@@ -1,0 +1,40 @@
+---
+database_name: datalake_label_studio_clean
+table_name: annotations
+columns:
+  id_annotation:
+    lineage:
+      - datalake_label_studio_raw.label_studio.id
+  project_name:
+    lineage:
+      - datalake_label_studio_raw.label_studio.project_name
+  created_username:
+    lineage:
+      - datalake_label_studio_raw.label_studio.created_username
+  created_ago:
+    lineage:
+      - datalake_label_studio_raw.label_studio.created_ago
+  completed_by:
+    lineage:
+      - datalake_label_studio_raw.label_studio.completed_by
+  task:
+    lineage:
+      - datalake_label_studio_raw.label_studio.task
+  result:
+    lineage:
+      - datalake_label_studio_raw.label_studio.result
+  is_cancelled:
+    lineage:
+      - datalake_label_studio_raw.label_studio.was_cancelled
+  is_ground_truth:
+    lineage:
+      - datalake_label_studio_raw.label_studio.ground_truth
+  lead_time:
+    lineage:
+      - datalake_label_studio_raw.label_studio.lead_time
+  ts_created:
+    lineage:
+      - datalake_label_studio_raw.label_studio.created_at
+  ts_updated:
+    lineage:
+      - datalake_label_studio_raw.label_studio.updated_at  

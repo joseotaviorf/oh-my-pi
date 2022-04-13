@@ -1,0 +1,16 @@
+---
+database_name: datalake_label_studio_raw
+table_name: label_studio
+columns:
+  project_name:
+    tags:
+      - Confidential
+  created_username:
+    tags:
+      - Confidential
+  completed_by:
+    tags:
+      - Confidential
+  task:
+    tags:
+      - Confidential

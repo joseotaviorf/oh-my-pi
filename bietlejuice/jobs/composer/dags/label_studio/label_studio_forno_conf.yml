@@ -1,0 +1,3 @@
+---
+endpoint: "https://quinturk.forno.quintoandar.com.br/api/"
+parse_column: "task"
