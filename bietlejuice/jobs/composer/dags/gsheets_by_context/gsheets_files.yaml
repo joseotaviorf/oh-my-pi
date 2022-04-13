@@ -38,6 +38,12 @@ support_agents_department:
     clean_table_name: support_agents_department
     sheet_context: support_and_service
 
+department_control:
+    sheet_id: 1wIwrWi0xlY4TAZnE6JlGm6B0UyezOPxfF5s0_pn-i9E
+    sheet_name: Department/Channel
+    clean_table_name: department_control
+    sheet_context: support_and_service
+
 #########################
 # GROWTH SHEETS
 ###################

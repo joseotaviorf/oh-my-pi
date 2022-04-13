@@ -342,11 +342,6 @@ demand_targets_replanning:
     sheet_name: demand_targets_replanning
     clean_table_name: demand_targets_replanning
 
-department_control:
-    sheet_id: 1wIwrWi0xlY4TAZnE6JlGm6B0UyezOPxfF5s0_pn-i9E
-    sheet_name: Department/Channel
-    clean_table_name: department_control
-
 entry_agreements_discounts_forms:
     sheet_id: 19WtCrggLFO61vUJ8yOTFiikOLuXXWVcPzHk0grKcgbI
     sheet_name: agreements_discounts_answer_forms

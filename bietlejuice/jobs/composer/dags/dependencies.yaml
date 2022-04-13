@@ -528,7 +528,7 @@ bietlejuice.dw_customer_support:
   - bietlejuice.enrich_customer_support:load-enrich-chat
   - bietlejuice.enrich_customer_support:load-enrich-email
   - bietlejuice.gsheets:load-clean-agents-ranking-targets
-  - bietlejuice.gsheets:load-clean-department-control
+  - bietlejuice.gsheets.support_and_service:load-clean-department-control
   - bietlejuice.gsheets.support_and_service:load-clean-support-agents-department
   - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
 
@@ -1066,7 +1066,7 @@ bietlejuice.enrich_customer_demand:
   - bietlejuice.enrich_heimdall:load-enrich-auditable-expenses
   - bietlejuice.enrich_heimdall:load-enrich-expenses
   - bietlejuice.gsheets:load-clean-agents-control
-  - bietlejuice.gsheets:load-clean-department-control
+  - bietlejuice.gsheets.support_and_service:load-clean-department-control
   - bietlejuice.gsheets:load-clean-tag-sla-target
   - bietlejuice.gsheets:load-clean-taxonomy-sla
   - bietlejuice.terminator:load-clean-negotiation
@@ -1244,7 +1244,7 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-ticket-funnel
   - bietlejuice.gsheets:load-clean-agents-control
-  - bietlejuice.gsheets:load-clean-department-control
+  - bietlejuice.gsheets.support_and_service:load-clean-department-control
   - bietlejuice.insider:load-clean-feature
   - bietlejuice.insider:load-clean-review
   - bietlejuice.insider:load-clean-review-feature
@@ -1388,7 +1388,7 @@ bietlejuice.enrich_offboarding:
   - bietlejuice.enrich_tracksale:load-enrich-dispatch
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-ticket-funnel
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
-  - bietlejuice.gsheets:load-clean-department-control
+  - bietlejuice.gsheets.support_and_service:load-clean-department-control
   - bietlejuice.gsheets:load-clean-inspection-analysis-forms
   - bietlejuice.terminator:load-clean-application-user
   - bietlejuice.terminator:load-clean-negotiation
@@ -1668,4 +1668,4 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
   - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.ebdb:create-clean-house-in-data-lake
-  - bietlejuice.gsheets:load-clean-department-control
+  - bietlejuice.gsheets.support_and_service:load-clean-department-control
