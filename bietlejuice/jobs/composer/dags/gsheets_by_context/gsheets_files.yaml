@@ -104,6 +104,12 @@ aux_regiao:
     clean_table_name: auxiliary_region
     sheet_context: for_rent
 
+demand_targets_2022:
+    sheet_id: 1XL8xkxFzf4Zy-0ehrPR9HJc38_rtpVWsLRMNW6ORI8c
+    sheet_name: demand_targets_2022
+    clean_table_name: demand_targets_2022
+    sheet_context: for_rent
+
 forecast_cohort_demanda:
     sheet_id: 1X8kklNtizTnKJ8zI4XMLaI3H31YU3Oq36VmFxmhwLD0
     sheet_name: forecast_cohort_demanda
@@ -138,6 +144,12 @@ rental_budget_targets:
     sheet_id: 1LwQpjKEeRCIJ4FcKrUpHTLfEaRn2jV6lG33I-9Ie13c
     sheet_name: db_budget_targets
     clean_table_name: rental_budget_targets
+    sheet_context: for_rent
+
+supply_targets_2022:
+    sheet_id: 1rU-ptg-ZtD0WdnbXnUVpGw8Lrf-0grc2IitwEmn2yZ0
+    sheet_name: supply_targets_2022
+    clean_table_name: supply_targets_2022
     sheet_context: for_rent
 
 #########################
