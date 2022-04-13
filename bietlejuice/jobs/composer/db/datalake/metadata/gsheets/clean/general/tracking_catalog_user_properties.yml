@@ -1,0 +1,31 @@
+---
+database_name: datalake_gsheets_clean
+table_name: tracking_catalog_user_properties
+columns:
+  project_name:
+    lineage:
+      - datalake_gsheets_raw.user_properties.project_name
+  id_app:
+    lineage:
+      - datalake_gsheets_raw.user_properties.id_app
+  user_property:
+    lineage:
+      - datalake_gsheets_raw.user_properties.user_property
+  first_seen:
+    lineage:
+      - datalake_gsheets_raw.user_properties.first_seen
+  last_seen:
+    lineage:
+      - datalake_gsheets_raw.user_properties.last_seen
+  description:
+    lineage:
+      - datalake_gsheets_raw.user_properties.description
+  type:
+    lineage:
+      - datalake_gsheets_raw.user_properties.type
+  status:
+    lineage:
+      - datalake_gsheets_raw.user_properties.status
+  owner:
+    lineage:
+      - datalake_gsheets_raw.user_properties.owner

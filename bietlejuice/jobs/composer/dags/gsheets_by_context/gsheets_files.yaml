@@ -271,3 +271,9 @@ carteira_ciq:
     sheet_name: carteira_ciq
     clean_table_name: ciq_wallet
     sheet_context: general
+
+user_properties:
+    sheet_id: 1vczbGi8fyT1AhuCkejL9xROs3d-87WToqUYBMAtoAKU
+    sheet_name: user_properties
+    clean_table_name: tracking_catalog_user_properties
+    sheet_context: general
