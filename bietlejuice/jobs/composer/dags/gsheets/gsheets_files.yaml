@@ -302,11 +302,6 @@ de_para_analistas_proowner:
     sheet_name: Página1
     clean_table_name: pro_owner_analyst
 
-de_para_cancelamento:
-    sheet_id: 1Om2IjwtSPHfg4GRq2IPKGshHLBdXnP0bCMBPbOrh5fc
-    sheet_name: de_para_cancelamento
-    clean_table_name: from_to_cancellation
-
 deduplicate_batch_listings_forsale:
     sheet_id: 18zKmMCSdcZSttLhj0Kb8qqU4-_yCt2njKurjxhZrSc4
     sheet_name: deduplicate_batch_listings_forsale

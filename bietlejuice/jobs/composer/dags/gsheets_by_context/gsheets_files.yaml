@@ -202,6 +202,12 @@ dados_docato:
     clean_table_name: legal_base_docato
     sheet_context: static
 
+de_para_cancelamento:
+    sheet_id: 1Om2IjwtSPHfg4GRq2IPKGshHLBdXnP0bCMBPbOrh5fc
+    sheet_name: de_para_cancelamento
+    clean_table_name: from_to_cancellation
+    sheet_context: static
+
 offline_and_branding_marketing_costs:
     sheet_id: 14la3wTA9DitbyiJ8Lb4X7FnyAMsSE32ICzwPBPD2j4E
     sheet_name: offline_and_branding_marketing_costs
