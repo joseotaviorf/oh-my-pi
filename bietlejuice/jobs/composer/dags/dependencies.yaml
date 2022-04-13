@@ -891,7 +891,7 @@ bietlejuice.enrich_analyst_ranking:
   - bietlejuice.enrich_customer_support:load-enrich-email
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-actions-resolutions-flow
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-users-resolutions-flow
-  - bietlejuice.gsheets:load-clean-agents-control
+  - bietlejuice.gsheets.support_and_service:load-clean-agents-control
   - bietlejuice.terminator:load-clean-termination
   - bietlejuice.terminator:load-clean-termination-workflow
 
@@ -1064,8 +1064,9 @@ bietlejuice.enrich_customer_demand:
   - bietlejuice.enrich_heimdall:load-enrich-activity
   - bietlejuice.enrich_heimdall:load-enrich-auditable-expenses
   - bietlejuice.enrich_heimdall:load-enrich-expenses
-  - bietlejuice.gsheets:load-clean-agents-control
+  - bietlejuice.gsheets.support_and_service:load-clean-agents-control
   - bietlejuice.gsheets.support_and_service:load-clean-department-control
+
   - bietlejuice.gsheets:load-clean-tag-sla-target
   - bietlejuice.gsheets:load-clean-taxonomy-sla
   - bietlejuice.terminator:load-clean-negotiation
@@ -1242,7 +1243,7 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.enrich_survicate:load-enrich-surveys
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-tickets-funnel-metrics
   - bietlejuice.enrich_zendesk_ticket_funnels:load-enrich-ticket-funnel
-  - bietlejuice.gsheets:load-clean-agents-control
+  - bietlejuice.gsheets.support_and_service:load-clean-agents-control
   - bietlejuice.gsheets.support_and_service:load-clean-department-control
   - bietlejuice.insider:load-clean-feature
   - bietlejuice.insider:load-clean-review

@@ -1,35 +1,36 @@
+---
 database_name: datalake_gsheets_raw
 table_name: agents_control
 columns:
   assignee_id:
     tags:
-    - PII
-    - Confidential
+      - PII
+      - Confidential
   assignee_name:
     tags:
-    - PII
-    - Confidential
+      - PII
+      - Confidential
   cpf:
     tags:
-    - PII
-    - Confidential
+      - PII
+      - Confidential
   departamento:
     tags:
-    - Public
+      - Public
   email:
     tags:
-    - Confidential
+      - Confidential
   gestores:
     tags:
-    - PII
-    - Confidential
+      - PII
+      - Confidential
   matricula:
     tags:
-    - Public
+      - Public
   nome:
     tags:
-    - PII
-    - Confidential
+      - PII
+      - Confidential
   situacao:
     tags:
-    - Public
+      - Public
