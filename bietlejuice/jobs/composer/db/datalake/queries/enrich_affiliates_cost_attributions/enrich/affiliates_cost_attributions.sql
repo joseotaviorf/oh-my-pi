@@ -25,7 +25,7 @@ WITH affiliates_engagement_cost AS (
 	GROUP BY
 		1,2,3,4,5,6
 )
-#============== STATIC HISTORY COST ===================#
+------- STATIC HISTORY COST -------
 SELECT
 	amch.dt_cost AS id_date,
     COALESCE(amch.city_group, 'Not Mapped') AS city_group,
@@ -48,7 +48,7 @@ LEFT JOIN
 GROUP BY
     1,2,3
 UNION
-#============== DYNAMIC DAILY COST ===================#
+------- DYNAMIC DAILY COST -------
 SELECT
 	COALESCE(aec.dt_commission_cost, amce.dt_cost) AS id_date,
 	COALESCE(aec.city_group, amce.city_group, 'Not Mapped') AS city_group,
