@@ -75,7 +75,7 @@ people_data:
     sheet_name: people_data
     clean_table_name: people_employees
     sheet_context: bedrock
-    
+
 #########################
 # FOR RENT SHEETS
 ###################
@@ -171,7 +171,7 @@ autonomous_agent_payment_data_lead_origin:
     sheet_name: autonomous_agent_payment_data_lead_origin
     clean_table_name: autonomous_agent_payment_data_lead_origin
     sheet_context: static
-    
+
 costs_allocation_relative_indexes:
     sheet_id: 1f9Iyshj2N-jIbO-YIXs_CxCnDKq4aLEfBcS6dcN-qgM
     sheet_name: costs_allocation_relative_indexes
@@ -202,6 +202,12 @@ rental_tof_monthly_targets:
     clean_table_name: rental_tof_monthly_targets
     sheet_context: static
 
+supply_targets_2020:
+    sheet_id: 1jPCEFt6ECCt1KSuiitqGh7fgPSh7TV0DIZsTLdE-U0k
+    sheet_name: supply_targets_2020
+    clean_table_name: supply_targets_2020
+    sheet_context: static
+
 supply_targets_2021:
     sheet_id: 1LwTojiD_NXervUoR_RW1pNWGjWcvB_Nx0prnpZYwP4g
     sheet_name: supply_targets_2021
@@ -213,7 +219,7 @@ autonomous_agent_listing:
     sheet_name: autonomous_agent_listing
     clean_table_name: autonomous_agent_listing
     sheet_context: static
-    
+
 #########################
 # GENERAL SHEETS
 ###################

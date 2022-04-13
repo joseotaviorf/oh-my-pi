@@ -802,11 +802,6 @@ supply_targets_2019:
     sheet_name: supply_targets_2019
     clean_table_name: supply_targets_2019
 
-supply_targets_2020:
-    sheet_id: 1jPCEFt6ECCt1KSuiitqGh7fgPSh7TV0DIZsTLdE-U0k
-    sheet_name: supply_targets_2020
-    clean_table_name: supply_targets_2020
-
 survival_estimation_new_version:
     sheet_id: 1hBZp2g6smNXBRFnITrihnwzztkFRr7q_IF5sSBgSQKo
     sheet_name: survival_estimation_new_version

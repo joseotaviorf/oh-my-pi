@@ -86,9 +86,9 @@ This pipeline produces the following output tables:
     - `extra_invoice`
     - `extra_invoice_created_expenses`
     - `forbrokers_3p_partner_conditions`
-    - `for_sale_bandaids`   
+    - `for_sale_bandaids`
     - `for_sale_financial_flow`
-    - `for_sale_sap_invoices`   
+    - `for_sale_sap_invoices`
     - `from_to_cancellation`
     - `google_searches_share_of_interest`
     - `hotjar_photos_repressed_demand`
@@ -181,7 +181,6 @@ This pipeline produces the following output tables:
     - `secretariat_info`
     - `service_city_holidays`
     - `supply_targets_2019`
-    - `supply_targets_2020`
     - `survival_estimation_new_version`
     - `tag_sla_target`
     - `targets_acquisition_cumulative_autonomous_agent`

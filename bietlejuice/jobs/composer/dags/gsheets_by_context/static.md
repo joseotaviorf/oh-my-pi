@@ -8,7 +8,7 @@ If you need information to understand how you can add your sheet, check our [Goo
 
 <details>
   <summary><strong> > DAG details (click to expand)</strong></summary>
-  
+
 ### Execution Interval
 
 This DAG does not have an automatic trigger. It is run manually when necessary.
@@ -18,7 +18,7 @@ More information about run time [here]({chart_url}{dag_id}).
 ### Outputs
 
 This pipeline produces the following output tables:
-  
+
 1. Data lake raw:
     - `autonomous_agent_listing`
     - `autonomous_agent_payment_data_form_origin`
@@ -27,6 +27,7 @@ This pipeline produces the following output tables:
     - `dados_docato`
     - `offline_and_branding_marketing_costs`
     - `rental_tof_daily_targets`
+    - `supply_targets_2020`
     - `supply_targets_2021`
     - `survival_estimation`
 2. Data lake clean:
@@ -37,6 +38,7 @@ This pipeline produces the following output tables:
     - `legal_base_docato`
     - `offline_and_branding_marketing_costs`
     - `rental_tof_daily_targets`
+    - `supply_targets_2020`
     - `supply_targets_2021`
     - `survival_estimation`
 
