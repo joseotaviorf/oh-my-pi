@@ -43,6 +43,7 @@ dags_out_of_pattern:
         "facebook_insights",
         "gsheets.for_rent",
         "gsheets.for_sale",
+        "gsheets.growth",
         "gsheets.support_and_service",
         "marketing_costs",
         "marketing_costs_sharing_rules",

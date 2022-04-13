@@ -862,6 +862,13 @@ bietlejuice.enrich_3p:
   - bietlejuice.ebdb:create-clean-work-contract-in-data-lake
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
 
+bietlejuice.enrich_affiliates_cost_attributions:
+  - bietlejuice.enrich_ebdb_affiliates_cost:load-enrich-affiliates-engagement-cost
+  - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.gsheets.growth:load-clean-affiliates-cost-tradecom-configuration
+  - bietlejuice.gsheets.growth:load-clean-affiliates-manual-cost-engagement-history
+  - bietlejuice.gsheets.growth:load-clean-affiliates-manual-cost-engagement
+
 bietlejuice.enrich_amplitude_lead:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.rene_descartes:load-clean-house-lead
