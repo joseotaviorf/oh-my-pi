@@ -144,6 +144,12 @@ sale_tof_daily_targets:
     clean_table_name: sale_tof_daily_targets
     sheet_context: for_sale
 
+sale_tof_monthly_targets:
+    sheet_id: 1wIlVgN-OFXxZS8T54-ga4dvHnZxJqBBGPSl-wpu-Pug
+    sheet_name: sale_tof_monthly_targets
+    clean_table_name: sale_tof_monthly_targets
+    sheet_context: for_sale
+
 target_sale_cohort_supply:
     sheet_id: 1rd3uFtw61jj3rLmxCs1XmDo1ZFd_HNrGv9eDVI25v5w
     sheet_name: target_sale_cohort_supply

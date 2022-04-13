@@ -23,11 +23,13 @@ This pipeline produces the following output tables:
     - `sale_ongoing_listings_targets`
     - `sale_payment_concluded_targets`
     - `sale_tof_daily_targets`
+    - `sale_tof_monthly_targets`
     - `target_sale_cohort_supply`
 2. Data lake clean:
     - `sale_ongoing_listings_targets`
     - `sale_payment_concluded_targets`
     - `sale_tof_daily_targets`
+    - `sale_tof_monthly_targets`
     - `target_sale_cohort_supply`
 
 </details>
