@@ -190,6 +190,12 @@ autonomous_agent_payment_data_lead_origin:
     clean_table_name: autonomous_agent_payment_data_lead_origin
     sheet_context: static
 
+demand_targets_2019:
+    sheet_id: 1PQfAlpy2YhUKg_qn786_4xQ5E1cW2-YSpz1NJ1lVruA
+    sheet_name: demand_targets_2019
+    clean_table_name: demand_targets_2019
+    sheet_context: static
+
 costs_allocation_relative_indexes:
     sheet_id: 1f9Iyshj2N-jIbO-YIXs_CxCnDKq4aLEfBcS6dcN-qgM
     sheet_name: costs_allocation_relative_indexes

@@ -317,11 +317,6 @@ demand_retention_ab_tests:
     sheet_name: demand_retention_ab_tests
     clean_table_name: demand_retention_ab_tests
 
-demand_targets_2019:
-    sheet_id: 1PQfAlpy2YhUKg_qn786_4xQ5E1cW2-YSpz1NJ1lVruA
-    sheet_name: demand_targets_2019
-    clean_table_name: demand_targets_2019
-
 demand_targets_2020:
     sheet_id: 1rIFNs-Wy6glWjeclgUTUukjS2hJUu5BCSZh6N7Vy5dk
     sheet_name: demand_targets_2020
