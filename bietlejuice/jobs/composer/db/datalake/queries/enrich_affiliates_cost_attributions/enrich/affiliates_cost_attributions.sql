@@ -27,7 +27,7 @@ WITH affiliates_engagement_cost AS (
 )
 ------- STATIC HISTORY COST -------
 SELECT
-	amch.dt_cost AS id_date,
+	INT(REPLACE(amch.dt_cost,'-','')) AS id_date,
     COALESCE(amch.city_group, 'Not Mapped') AS city_group,
     COALESCE(amch.mkt_origin, 'Not Mapped') AS mkt_origin,
 	SUM(amch.commission_listing_cost) AS commission_listing_cost,
@@ -39,7 +39,7 @@ SELECT
 	SUM(amch.commission_listing_cost * COALESCE(tcm.commission_rate, 0)
 		+ amch.commission_rent_cost * COALESCE(tcm.commission_rate, 0)
 		+ amch.commission_mgm_cost * COALESCE(tcm.commission_rate, 0)
-		+ amch.promotional_bonus_cost * COALESCE(tcm.commission_rate, 0)) AS commission_tradecom
+		+ amch.promotional_bonus_cost * COALESCE(tcm.commission_rate, 0)) AS commission_tradecom_cost
 FROM
     datalake_gsheets_clean.affiliates_manual_cost_engagement_history amch
 LEFT JOIN
@@ -50,7 +50,7 @@ GROUP BY
 UNION
 ------- DYNAMIC DAILY COST -------
 SELECT
-	COALESCE(aec.dt_commission_cost, amce.dt_cost) AS id_date,
+	INT(REPLACE(COALESCE(aec.dt_commission_cost, amce.dt_cost),'-','')) AS id_date,
 	COALESCE(aec.city_group, amce.city_group, 'Not Mapped') AS city_group,
 	COALESCE(aec.mkt_origin, amce.mkt_origin, 'Not Mapped') AS mkt_origin,
 	SUM(COALESCE(aec.commission_listing_cost, 0)) AS commission_listing_cost,
@@ -62,7 +62,7 @@ SELECT
 	SUM(COALESCE(aec.commission_listing_cost, 0) * COALESCE(tcm.commission_rate, 0)
 	  + COALESCE(aec.commission_rent_cost, 0) * COALESCE(tcm.commission_rate, 0)
 	  + COALESCE(aec.commission_mgm_cost, 0) * COALESCE(tcm.commission_rate, 0)
-	  + COALESCE(amce.promotional_bonus_cost, 0) * COALESCE(tcm.commission_rate, 0)) AS commission_tradecom
+	  + COALESCE(amce.promotional_bonus_cost, 0) * COALESCE(tcm.commission_rate, 0)) AS commission_tradecom_cost
 FROM
 	affiliates_engagement_cost aec
 FULL OUTER JOIN

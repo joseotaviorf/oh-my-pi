@@ -40,7 +40,7 @@ columns:
     lineage:
       - datalake_gsheets_clean.affiliates_manual_cost_engagement.other_cost
       - datalake_gsheets_clean.affiliates_manual_cost_engagement_history.other_cost
-  commission_tradecom:
+  commission_tradecom_cost:
     lineage:
       - datalake_ebdb_affiliates_cost.affiliates_engagement_cost.commission_cost
       - datalake_gsheets_clean.affiliates_manual_cost_engagement.promotional_bonus_cost
