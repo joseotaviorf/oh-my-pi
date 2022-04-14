@@ -4,15 +4,15 @@ table_name: daily_target_volumes_supply
 columns:
   date:
     lineage:
-      - datalake_gsheets_clean.supply_targets_2019.date
-      - datalake_gsheets_clean.supply_targets_2020.date
-      - datalake_gsheets_clean.supply_targets_2021.date
+      - datalake_gsheets_clean.supply_targets_2019.dt_target
+      - datalake_gsheets_clean.supply_targets_2020.dt_target
+      - datalake_gsheets_clean.supply_targets_2021.dt_target
       - dw_public.dim_date.date
   week_start:
     lineage:
-      - datalake_gsheets_clean.supply_targets_2019.week_start
-      - datalake_gsheets_clean.supply_targets_2020.week_start
-      - datalake_gsheets_clean.supply_targets_2021.week_start
+      - datalake_gsheets_clean.supply_targets_2019.dt_week_started
+      - datalake_gsheets_clean.supply_targets_2020.dt_week_started
+      - datalake_gsheets_clean.supply_targets_2021.dt_week_started
       - dw_public.dim_date.week_start
   city_group:
     lineage:

@@ -148,8 +148,8 @@ FROM diff_w_and_wo_holiday_share
 	        SELECT * FROM datalake_gsheets_clean_prod.supply_targets_2019
 	)
 	SELECT
-	  	CAST(REPLACE(date,'-','') AS date) AS date,
-		CAST(REPLACE(week_start,'-','') AS date) AS week_start,
+	  	dt_target AS date,
+		dt_week_started AS week_start,
 		NULLIF(city_group, '') AS city_group,
 		NULLIF(supply_channel, '') AS mkt_channel,
 		NULLIF(supply_origin, '') AS mkt_origin,
@@ -159,7 +159,7 @@ FROM diff_w_and_wo_holiday_share
 		CAST(REPLACE(opportunities,',','') AS FLOAT) AS opportunity,
 		CAST(REPLACE(first_listings,',','') AS FLOAT) AS first_listing
 	FROM supply_targets
-	WHERE DATE_TRUNC('month', CAST(REPLACE(date,'-','') AS date)) <= DATE_TRUNC('month', CURRENT_DATE)
+	WHERE DATE_TRUNC('month', dt_target) <= DATE_TRUNC('month', CURRENT_DATE)
 ), past_targets AS (
 SELECT
 	week_start,
