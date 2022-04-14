@@ -231,7 +231,7 @@ UNION ALL
         ),
         ia_fact_affiliate AS (
             SELECT
-                id_date,
+                id_date AS sk_date,
                 city_group AS city_group,
                 mkt_origin AS mkt_origin,
                 NULL::TEXT AS mkt_channel,
