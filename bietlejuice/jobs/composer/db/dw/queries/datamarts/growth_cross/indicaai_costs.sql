@@ -178,85 +178,85 @@ SELECT * FROM extra_promotional_bonus
 ),
 ia_fact_affiliate_transposed AS (
     SELECT
-        sk_date,
+        id_date AS sk_date,
         'fact_affiliate' AS table,
         mkt_origin,
         city_group,
         'engagement' AS vertical,
          'Commission Listing' AS source,
          NULL AS business_context,
-         commission_listing AS cost
-    FROM marketing.fact_affiliate_daily_cost_attributions
-    WHERE sk_date < 20210125
+         commission_listing_cost AS cost
+    FROM datalake_affiliates_cost_attributions_prod.affiliates_cost_attributions
+    WHERE id_date < 20210125
 	UNION ALL
 	SELECT
-	    sk_date,
+	    id_date AS sk_date,
 	    'fact_affiliate' AS table,
 	    mkt_origin,
 	    city_group,
 	    'engagement' AS vertical,
 	    'Commission Rent' AS source,
 	    NULL AS business_context,
-	    commission_rent AS cost
-    FROM marketing.fact_affiliate_daily_cost_attributions
-    WHERE sk_date < 20210125
+	    commission_rent_cost AS cost
+    FROM datalake_affiliates_cost_attributions_prod.affiliates_cost_attributions
+    WHERE id_date < 20210125
 	UNION ALL
 	SELECT
-	    sk_date,
+	    id_date AS sk_date,
 	    'fact_affiliate' AS table,
 	    mkt_origin,
 	    city_group,
 	    'acquisition' AS vertical,
 	    'Commission MGM' AS source,
 	    NULL AS business_context,
-	    commission_mgm AS cost
-    FROM marketing.fact_affiliate_daily_cost_attributions
-    WHERE sk_date < 20210125
+	    commission_mgm_cost AS cost
+    FROM datalake_affiliates_cost_attributions_prod.affiliates_cost_attributions
+    WHERE id_date < 20210125
 	UNION ALL
 	SELECT
-	    sk_date,
+	    id_date AS sk_date,
 	    'fact_affiliate' AS table,
 	    mkt_origin,
 	    city_group,
 	    'engagement' AS vertical,
 	    'Commission Tradecom' AS source,
 	    NULL AS business_context,
-	    commission_tradecom AS cost
-    FROM marketing.fact_affiliate_daily_cost_attributions
+	    commission_tradecom_cost AS cost
+    FROM datalake_affiliates_cost_attributions_prod.affiliates_cost_attributions
 	UNION ALL
 	SELECT
-	    sk_date,
+	    id_date AS sk_date,
 	    'fact_affiliate' AS table,
 	    mkt_origin,
 	    city_group,
 	    'engagement' AS vertical,
 	    'Promotional Bonus' AS source,
 	    NULL AS business_context,
-	    promotional_bonus AS cost
-    FROM marketing.fact_affiliate_daily_cost_attributions
-    WHERE sk_date < 20210208
+	    promotional_bonus_cost AS cost
+    FROM datalake_affiliates_cost_attributions_prod.affiliates_cost_attributions
+    WHERE id_date < 20210208
 	UNION ALL
 	SELECT
-	    sk_date,
+	    id_date AS sk_date,
 	    'fact_affiliate' AS table,
 	    mkt_origin,
 	    city_group,
 	    'engagement' AS vertical,
 	    'Notification' AS source,
 	    NULL AS business_context,
-	    notification AS cost
-    FROM marketing.fact_affiliate_daily_cost_attributions
+	    notification_cost AS cost
+    FROM datalake_affiliates_cost_attributions_prod.affiliates_cost_attributions
 	UNION ALL
 	SELECT
-	    sk_date,
+	    id_date AS sk_date,
 	    'fact_affiliate' AS table,
 	    mkt_origin,
 	    city_group,
 	    'engagement' AS vertical,
 	    'Other' AS source,
 	    NULL AS business_context,
-	    other AS cost
-    FROM marketing.fact_affiliate_daily_cost_attributions
+	    other_cost AS cost
+    FROM datalake_affiliates_cost_attributions_prod.affiliates_cost_attributions
 ),
 ia_provisioned_costs AS (
 	SELECT

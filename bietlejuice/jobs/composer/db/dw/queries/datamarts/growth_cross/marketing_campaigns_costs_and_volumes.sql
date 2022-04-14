@@ -343,105 +343,105 @@ affiliate_costs AS (
     WITH
     ia_fact_affiliate_transposed AS (
         SELECT
-            sk_date,
+            id_date AS sk_date,
             'fact_affiliate' AS table,
             mkt_origin, city_group,
             'engagement' AS vertical,
             'Commission Listing' AS source,
-            commission_listing AS cost
+            commission_listing_cost AS cost
         FROM
-            marketing.fact_affiliate_daily_cost_attributions
+            datalake_affiliates_cost_attributions_prod.affiliates_cost_attributions
         WHERE
-            sk_date >= 20190101
+            id_date >= 20190101
 
         UNION ALL
 
         SELECT
-            sk_date,
+            id_date AS sk_date,
             'fact_affiliate' AS table,
             mkt_origin, city_group,
             'engagement' AS vertical,
             'Commission Rent' AS source,
-            commission_rent AS cost
+            commission_rent_cost AS cost
         FROM
-            marketing.fact_affiliate_daily_cost_attributions
+            datalake_affiliates_cost_attributions_prod.affiliates_cost_attributions
         WHERE
-            sk_date >= 20190101
+            id_date >= 20190101
 
         UNION ALL
 
         SELECT
-            sk_date,
+            id_date AS sk_date,
             'fact_affiliate' AS table,
             mkt_origin,
             city_group,
             'acquisition' AS vertical,
             'Commission MGM' AS source,
-            commission_mgm AS cost
+            commission_mgm_cost AS cost
         FROM
-            marketing.fact_affiliate_daily_cost_attributions
+            datalake_affiliates_cost_attributions_prod.affiliates_cost_attributions
         WHERE
-            sk_date >= 20190101
+            id_date >= 20190101
 
         UNION ALL
 
         SELECT
-            sk_date,
+            id_date AS sk_date,
             'fact_affiliate' AS table,
             mkt_origin,
             city_group,
             'engagement' AS vertical,
             'Commission Tradecom' AS source,
-            commission_tradecom AS cost
+            commission_tradecom_cost AS cost
         FROM
-            marketing.fact_affiliate_daily_cost_attributions
+            datalake_affiliates_cost_attributions_prod.affiliates_cost_attributions
         WHERE
-            sk_date >= 20190101
+            id_date >= 20190101
 
         UNION ALL
 
         SELECT
-            sk_date,
+            id_date AS sk_date,
             'fact_affiliate' AS table,
             mkt_origin,
             city_group,
             'engagement' AS vertical,
             'Promotional Bonus' AS source,
-            promotional_bonus AS cost
+            promotional_bonus_cost AS cost
         FROM
-            marketing.fact_affiliate_daily_cost_attributions
+            datalake_affiliates_cost_attributions_prod.affiliates_cost_attributions
         WHERE
-            sk_date >= 20190101
+            id_date >= 20190101
 
         UNION ALL
 
         SELECT
-            sk_date,
+            id_date AS sk_date,
             'fact_affiliate' AS table,
             mkt_origin,
             city_group,
             'engagement' AS vertical,
             'Notification' AS source,
-            notification AS cost
+            notification_cost AS cost
         FROM
-            marketing.fact_affiliate_daily_cost_attributions
+            datalake_affiliates_cost_attributions_prod.affiliates_cost_attributions
         WHERE
-            sk_date >= 20190101
+            id_date >= 20190101
 
         UNION ALL
 
         SELECT
-            sk_date,
+            id_date AS sk_date,
             'fact_affiliate' AS table,
             mkt_origin,
             city_group,
             'engagement' AS vertical,
             'Other' AS source,
-            other AS cost
+            other_cost AS cost
         FROM
-            marketing.fact_affiliate_daily_cost_attributions
+            datalake_affiliates_cost_attributions_prod.affiliates_cost_attributions
         WHERE
-            sk_date >= 20190101
+            id_date >= 20190101
     )
     SELECT
         sk_date,

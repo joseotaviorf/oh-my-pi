@@ -390,7 +390,7 @@ bietlejuice.dw_datamarts_growth_cross:
   # plaquinhas_users_demand
   - bietlejuice.gsheets:create-clean-plaquinhas-demand-targets-external-table
   # performance_marketing_metrics_imobiliaria_casa_mineira
-  # migration pending: marketing.fact_affiliate_daily_cost_attributions
+  - bietlejuice.enrich_affiliates_cost_attributions:create-enrich-affiliates-cost-attributions-external-table
   # marketing_allocated_costs
   - bietlejuice.dw_user_affiliate:load-dw-public-dim-user-affiliate
 

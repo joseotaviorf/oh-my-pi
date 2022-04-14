@@ -663,7 +663,7 @@ costs_targets_results_combined AS (
         ),
         ia_fact_affiliate_transposed AS (
             SELECT
-                sk_date,
+                id_date AS sk_date,
                 mkt_origin,
                 NULL::TEXT AS mkt_channel,
                 NULL::TEXT AS mkt_medium,
@@ -674,16 +674,16 @@ costs_targets_results_combined AS (
                 city_group,
                 'Commission Listing' AS source,
                 NULL AS business_context,
-                commission_listing AS cost
+                commission_listing_cost AS cost
             FROM
-                marketing.fact_affiliate_daily_cost_attributions
+                datalake_affiliates_cost_attributions_prod.affiliates_cost_attributions
             WHERE
-                sk_date < 20210125
+                id_date < 20210125
 
             UNION ALL
 
             SELECT
-                sk_date,
+                id_date AS sk_date,
                 mkt_origin,
                 NULL::TEXT AS mkt_channel,
                 NULL::TEXT AS mkt_medium,
@@ -694,16 +694,16 @@ costs_targets_results_combined AS (
                 city_group,
                 'Commission Rent' AS source,
                 NULL AS business_context,
-                commission_rent AS cost
+                commission_rent_cost AS cost
             FROM
-                marketing.fact_affiliate_daily_cost_attributions
+                datalake_affiliates_cost_attributions_prod.affiliates_cost_attributions
             WHERE
-                sk_date < 20210125
+                id_date < 20210125
 
             UNION ALL
 
             SELECT
-                sk_date,
+                id_date AS sk_date,
                 mkt_origin,
                 NULL::TEXT AS mkt_channel,
                 NULL::TEXT AS mkt_medium,
@@ -713,16 +713,16 @@ costs_targets_results_combined AS (
                 NULL::TEXT AS utm_term, city_group,
                 'Commission MGM' AS source,
                 NULL AS business_context,
-                commission_mgm AS cost
+                commission_mgm_cost AS cost
             FROM
-                marketing.fact_affiliate_daily_cost_attributions
+                datalake_affiliates_cost_attributions_prod.affiliates_cost_attributions
             WHERE
-                sk_date < 20210125
+                id_date < 20210125
 
             UNION ALL
 
             SELECT
-                sk_date,
+                id_date AS sk_date,
                 mkt_origin,
                 NULL::TEXT AS mkt_channel,
                 NULL::TEXT AS mkt_medium,
@@ -733,14 +733,14 @@ costs_targets_results_combined AS (
                 city_group,
                 'Commission Tradecom' AS source,
                 NULL AS business_context,
-                commission_tradecom AS cost
+                commission_tradecom_cost AS cost
             FROM
-                marketing.fact_affiliate_daily_cost_attributions
+                datalake_affiliates_cost_attributions_prod.affiliates_cost_attributions
 
             UNION ALL
 
             SELECT
-                sk_date,
+                id_date AS sk_date,
                 mkt_origin,
                 NULL::TEXT AS mkt_channel,
                 NULL::TEXT AS mkt_medium,
@@ -751,16 +751,16 @@ costs_targets_results_combined AS (
                 city_group,
                 'Promo Bonus' AS source,
                 NULL AS business_context,
-                promotional_bonus AS cost
+                promotional_bonus_cost AS cost
             FROM
-                marketing.fact_affiliate_daily_cost_attributions
+                datalake_affiliates_cost_attributions_prod.affiliates_cost_attributions
             WHERE
-                sk_date < 20210208
+                id_date < 20210208
 
             UNION ALL
 
             SELECT
-                sk_date,
+                id_date AS sk_date,
                 mkt_origin,
                 NULL::TEXT AS mkt_channel,
                 NULL::TEXT AS mkt_medium,
@@ -771,14 +771,14 @@ costs_targets_results_combined AS (
                 city_group,
                 'Notification' AS source,
                 NULL AS business_context,
-                notification AS cost
+                notification_cost AS cost
             FROM
-                marketing.fact_affiliate_daily_cost_attributions
+                datalake_affiliates_cost_attributions_prod.affiliates_cost_attributions
 
             UNION ALL
 
             SELECT
-                sk_date,
+                id_date AS sk_date,
                 mkt_origin,
                 NULL::TEXT AS mkt_channel,
                 NULL::TEXT AS mkt_medium,
@@ -788,9 +788,9 @@ costs_targets_results_combined AS (
                 NULL::TEXT AS utm_term,
                 city_group, 'Other' AS source,
                 NULL AS business_context,
-                other AS cost
+                other_cost AS cost
             FROM
-                marketing.fact_affiliate_daily_cost_attributions
+                datalake_affiliates_cost_attributions_prod.affiliates_cost_attributions
         ),
         ia_provisioned_costs AS (
             SELECT

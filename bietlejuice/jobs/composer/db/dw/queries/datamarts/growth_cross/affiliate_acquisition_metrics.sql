@@ -231,8 +231,8 @@ UNION ALL
         ),
         ia_fact_affiliate AS (
             SELECT
-                sk_date AS sk_date ,
-                city_group AS city_group ,
+                id_date,
+                city_group AS city_group,
                 mkt_origin AS mkt_origin,
                 NULL::TEXT AS mkt_channel,
                 NULL::TEXT AS mkt_medium,
@@ -261,15 +261,15 @@ UNION ALL
                 COUNT(NULL) AS first_listings_rent,
         		COUNT(NULL) AS first_listings_sale,
         		COUNT(NULL) AS first_listings_hybrid,
-                SUM(commission_mgm) AS cost,
+                SUM(commission_mgm_cost) AS cost,
                 SUM(0::FLOAT) AS active_affiliate_prospect_d1_target,
                 SUM(0::FLOAT) AS budget,
                 SUM(0::FLOAT) AS target_nu,
                 SUM(0::FLOAT) AS target_oau,
-                SUM(0::FLOAT) AS new_target_nau 
+                SUM(0::FLOAT) AS new_target_nau
             FROM
-                marketing.fact_affiliate_daily_cost_attributions
-            WHERE sk_date < 20210125
+                datalake_affiliates_cost_attributions_prod.affiliates_cost_attributions
+            WHERE id_date < 20210125
             GROUP BY 1,2,3,4,5,6,7,8,9
             ),
             ia_total_cost AS (
