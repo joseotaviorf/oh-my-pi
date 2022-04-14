@@ -34,7 +34,7 @@ columns:
   quarter:
     lineage:
       - datalake_gsheets_raw.supply_targets_2021.quarter
-  week_start:
+  dt_week_started:
     lineage:
       - datalake_gsheets_raw.supply_targets_2021.week_start
   month:
@@ -43,6 +43,6 @@ columns:
   year:
     lineage:
       - datalake_gsheets_raw.supply_targets_2021.year
-  date:
+  dt_target:
     lineage:
       - datalake_gsheets_raw.supply_targets_2021.date
