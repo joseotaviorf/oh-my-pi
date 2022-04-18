@@ -1280,6 +1280,9 @@ bietlejuice.enrich_kill_queue:
   - bietlejuice.kill_queue:load-clean-house
   - bietlejuice.kill_queue:load-clean-reservation
 
+bietlejuice.enrich_label_studio:
+  - bietlejuice.label_studio:load-clean-annotations
+
 bietlejuice.enrich_lead:
   - bietlejuice.ebdb:create-clean-affiliate-data-in-data-lake
   - bietlejuice.ebdb:create-clean-conversion-lead-in-data-lake
