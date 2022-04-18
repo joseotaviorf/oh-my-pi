@@ -156,6 +156,12 @@ supply_targets_2022:
 # FOR SALE SHEETS
 ###################
 
+sale_demand_targets:
+    sheet_id: 1NlB0E3Gd7HFmgzvB8GIQte_i18SxV5Uw1A5lNihXd08
+    sheet_name: sale_demand_targets
+    clean_table_name: sale_demand_targets
+    sheet_context: for_sale
+
 sale_ongoing_listings_targets:
     sheet_id: 1w6mujHGpk5nvL_N6AWVwO6z8xRISLSq1Vu4p3U3SM9Y
     sheet_name: sale_ongoing_listings_targets

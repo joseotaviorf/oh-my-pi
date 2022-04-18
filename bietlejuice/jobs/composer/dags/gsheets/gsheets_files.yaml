@@ -707,11 +707,6 @@ sale_criteo_eng_ab_test:
     sheet_name: sale_criteo_eng_ab_test
     clean_table_name: sale_criteo_eng_ab_test
 
-sale_demand_targets:
-    sheet_id: 1NlB0E3Gd7HFmgzvB8GIQte_i18SxV5Uw1A5lNihXd08
-    sheet_name: sale_demand_targets
-    clean_table_name: sale_demand_targets
-
 sale_flows_targets:
     sheet_id: 1V316dJUIlf4xv3tOBVRIGdSn38NqKRPcS1emTCQlBYE
     sheet_name: sale_flows_targets
