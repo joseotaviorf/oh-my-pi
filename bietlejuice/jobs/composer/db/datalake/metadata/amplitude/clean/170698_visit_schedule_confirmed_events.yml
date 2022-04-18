@@ -3,10 +3,10 @@ table_name: 170698_visit_schedule_confirmed_events
 columns:
   id_amplitude:
     lineage:
-      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.amplitude_id
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.id_amplitude
   ids_amplitude_attributed:
     lineage:
-      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.amplitude_attribution_ids
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.ids_amplitude_attributed
   adid:
     lineage:
       - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.adid
@@ -15,16 +15,16 @@ columns:
       - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.amplitude_event_type
   id_app:
     lineage:
-      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.app
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.id_app
   city:
     lineage:
       - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.city
   ts_client_event:
     lineage:
-      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.client_event_time
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.ts_client_event
   ts_client_uploaded:
     lineage:
-      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.client_upload_time
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.ts_client_uploaded
   country:
     lineage:
       - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.country
@@ -33,7 +33,7 @@ columns:
       - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.data
   ts_server_received:
     lineage:
-      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.server_received_time
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.ts_server_received
   device_brand:
     lineage:
       - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.device_brand
@@ -45,7 +45,7 @@ columns:
       - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.device_family
   id_device:
     lineage:
-      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.device_id
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.id_device
   device_manufacturer:
     lineage:
       - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.device_manufacturer
@@ -60,10 +60,10 @@ columns:
       - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.dma
   id_event:
     lineage:
-      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.event_id
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.id_event
   ts_event:
     lineage:
-      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.event_time
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.ts_event
   event_type:
     lineage:
       - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.event_type
@@ -99,25 +99,25 @@ columns:
       - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.library
   is_paying:
     lineage:
-      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.paying
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.is_paying
   region:
     lineage:
       - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.region
   ts_server_uploaded:
     lineage:
-      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.server_upload_time
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.ts_server_uploaded
   id_session:
     lineage:
-      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.session_id
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.id_session
   start_version:
     lineage:
       - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.start_version
   ts_user_created:
     lineage:
-      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.user_creation_time
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.ts_user_created
   id_user:
     lineage:
-      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.user_id
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.id_user
   user_properties:
     lineage:
       - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.user_properties
@@ -132,13 +132,13 @@ columns:
       - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.version_name
   id_schema:
     lineage:
-      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.schema
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.id_schema
   ts_processed:
     lineage:
-      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.processed_time
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.ts_processed
   id_inserted:
     lineage:
-      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.insert_id
+      - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.id_inserted
   sample_rate:
     lineage:
       - datalake_amplitude_clean_staging.170698_visit_schedule_confirmed_events.sample_rate

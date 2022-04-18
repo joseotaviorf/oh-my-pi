@@ -151,42 +151,42 @@ columns:
   day:
     lineage:
       - datalake_amplitude_clean_staging.183047_price_suggestion_sale_form_submitted_events.day
-  up_initial_utm_campaign:
+  initial_utm_campaign:
     lineage:
       - datalake_amplitude_clean_staging.183047_price_suggestion_sale_form_submitted_events.user_properties
-  up_initial_utm_medium:
+  initial_utm_medium:
     lineage:
       - datalake_amplitude_clean_staging.183047_price_suggestion_sale_form_submitted_events.user_properties
-  up_initial_utm_source:
+  initial_utm_source:
     lineage:
       - datalake_amplitude_clean_staging.183047_price_suggestion_sale_form_submitted_events.user_properties
-  up_initial_utm_content:
+  initial_utm_content:
     lineage:
       - datalake_amplitude_clean_staging.183047_price_suggestion_sale_form_submitted_events.user_properties
-  up_initial_utm_term:
+  initial_utm_term:
     lineage:
       - datalake_amplitude_clean_staging.183047_price_suggestion_sale_form_submitted_events.user_properties
-  up_utm_campaign:
+  utm_campaign:
     lineage:
       - datalake_amplitude_clean_staging.183047_price_suggestion_sale_form_submitted_events.user_properties
-  up_utm_medium:
+  utm_medium:
     lineage:
       - datalake_amplitude_clean_staging.183047_price_suggestion_sale_form_submitted_events.user_properties
-  up_utm_source:
+  utm_source:
     lineage:
       - datalake_amplitude_clean_staging.183047_price_suggestion_sale_form_submitted_events.user_properties
-  up_utm_content:
+  utm_content:
     lineage:
       - datalake_amplitude_clean_staging.183047_price_suggestion_sale_form_submitted_events.user_properties
-  up_utm_term:
+  utm_term:
     lineage:
       - datalake_amplitude_clean_staging.183047_price_suggestion_sale_form_submitted_events.user_properties
-  up_platform:
+  app_type:
     lineage:
       - datalake_amplitude_clean_staging.183047_price_suggestion_sale_form_submitted_events.user_properties
-  up_referring_domain:
+  referring_domain:
     lineage:
       - datalake_amplitude_clean_staging.183047_price_suggestion_sale_form_submitted_events.user_properties
-  ep_formfield_lead_uuid:
+  formfield_lead_uuid:
     lineage:
       - datalake_amplitude_clean_staging.183047_price_suggestion_sale_form_submitted_events.event_properties
