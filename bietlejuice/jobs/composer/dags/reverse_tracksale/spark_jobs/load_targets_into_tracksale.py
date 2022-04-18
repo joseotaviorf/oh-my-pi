@@ -29,11 +29,9 @@ def create_tags_dict():
 
 
 def send_targets_to_tracksale(token, campaign_code, payload):
-
     tracksale_client = TracksaleClient(api_token=token)
     requester_instance = REQUESTERS["dispatch"](tracksale_client)
     send_data = requester_instance.sync(campaign_code, payload)
-
     return send_data
 
 
@@ -63,7 +61,15 @@ if __name__ == "__main__":
         f"m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket}, campaign_code={campaign_code}, campaign_query={campaign_query}, tags={tags}, execution_date={execution_date}"
     )
 
-    execution_date = datetime.strptime(execution_date, "%Y-%m-%d") + timedelta(days=1)
+    if datetime.now().hour < 17:
+        execution_date = datetime.strptime(execution_date, "%Y-%m-%d") + timedelta(
+            days=1
+        )
+    else:
+        execution_date = datetime.strptime(execution_date, "%Y-%m-%d") + timedelta(
+            days=2
+        )
+
     schedule_time = int(
         datetime(
             execution_date.year, execution_date.month, execution_date.day, 17, 0, 0
@@ -78,30 +84,43 @@ if __name__ == "__main__":
     spark_client = SparkClient()
     s3_consumer = S3Consumer(spark_client)
 
-    df = s3_consumer.get_data_from_file(path=path, format="parquet").collect()
+    df = (
+        s3_consumer.get_data_from_file(path=path, format="parquet")
+        .filter("is_dispatched = false")
+        .collect()
+    )
 
-    tags = json.loads(tags)
+    if len(df) > 0:
 
-    payload = {"customers": [], "schedule_time": schedule_time, "finish_time": end_time}
-    for row in df:
-        payload["customers"].append(
-            {
-                "name": row.customer_name,
-                "email": row.customer_email,
-                "phone": row.customer_phone,
-                "tags": create_tags_dict(),
-            }
+        tags = json.loads(tags)
+
+        payload = {
+            "customers": [],
+            "schedule_time": schedule_time,
+            "finish_time": end_time,
+        }
+        for row in df:
+            payload["customers"].append(
+                {
+                    "name": row.customer_name,
+                    "email": row.customer_email,
+                    "phone": row.customer_phone,
+                    "tags": create_tags_dict(),
+                }
+            )
+
+        base_dbutils = BaseDBUtils()
+        if base_dbutils.get_dbutils() is not None:
+            dbutils = base_dbutils.get_dbutils()
+
+        json_credentials = dbutils.secrets.get(
+            scope=DATABRICKS_SCOPE, key=APIEnum.TRACKSALE
+        )
+        credentials = json.loads(json_credentials)
+
+        api_response = send_targets_to_tracksale(
+            credentials["token"], campaign_code, payload
         )
 
-    base_dbutils = BaseDBUtils()
-    if base_dbutils.get_dbutils() is not None:
-        dbutils = base_dbutils.get_dbutils()
-
-    json_credentials = dbutils.secrets.get(
-        scope=DATABRICKS_SCOPE, key=APIEnum.TRACKSALE
-    )
-    credentials = json.loads(json_credentials)
-
-    api_response = send_targets_to_tracksale(
-        credentials["token"], campaign_code, payload
-    )
+    else:
+        pass
