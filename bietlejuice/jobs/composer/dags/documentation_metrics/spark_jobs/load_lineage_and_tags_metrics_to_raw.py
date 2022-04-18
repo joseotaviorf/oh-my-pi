@@ -190,22 +190,43 @@ def compare_metadata_with_metastore(
     dag_metadata.createOrReplaceTempView("vw_dag_info")
 
     query = f"""
+      WITH aggregated_dag_info as (
       SELECT
-          ms.layer,
-          ms.database_name,
-          ms.table_name,
-          di.owner,
-          COALESCE(md.has_lineage, di.has_lineage_from_product, False) as has_lineage,
-          COALESCE(md.has_tags, False) as has_tags
+        database,
+        collect_set(owner) as owners,
+        collect_set(has_lineage_from_product) as has_lineage_from_product
       FROM
-          vw_metastore AS ms
-      LEFT JOIN
-          vw_metadata AS md
-              ON ms.database_name = md.database_name
-              AND ms.table_name = md.table_name
-      LEFT JOIN
-          vw_dag_info as di
-              ON ms.database_name = di.database
+        vw_dag_info as di
+      GROUP BY
+        database
+    ),
+    dag_info as (
+      SELECT
+        database,
+        array_join(owners, ", ") as owners,
+        CASE
+          WHEN size(has_lineage_from_product) > 1 THEN null
+          ELSE has_lineage_from_product[0]
+        END as has_lineage_from_product
+      FROM
+        aggregated_dag_info as adi
+    )
+    SELECT
+        ms.layer,
+        ms.database_name,
+        ms.table_name,
+        di.owners,
+        COALESCE(md.has_lineage, di.has_lineage_from_product, False) as has_lineage,
+        COALESCE(md.has_tags, False) as has_tags
+    FROM
+        vw_metastore AS ms
+    LEFT JOIN
+        vw_metadata AS md
+            ON ms.database_name = md.database_name
+            AND ms.table_name = md.table_name
+    LEFT JOIN
+        dag_info as di
+            ON ms.database_name = di.database
     """
 
     return spark_client.get_records(query)
@@ -213,11 +234,11 @@ def compare_metadata_with_metastore(
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
-    parser.add_argument("env")
-    parser.add_argument("datalake_bucket")
-    parser.add_argument("source")
-    parser.add_argument("table_name")
-    parser.add_argument("execution_date_str")
+    parser.add_argument("env", type=str)
+    parser.add_argument("datalake_bucket", type=str)
+    parser.add_argument("source", type=str)
+    parser.add_argument("table_name", type=str)
+    parser.add_argument("execution_date_str", type=str)
 
     args = parser.parse_args()
     env = args.env

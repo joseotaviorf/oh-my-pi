@@ -42,6 +42,7 @@ CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
     "destination"
 ] = f"{spark_jobs_logs_path}{DAG_ID}"
+EXECUTION_DATE = datetime.today().strftime("%Y-%m-%d")
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -84,7 +85,7 @@ for table_name in table_names:
         table_name=table_name,
         target_database_base_name=SOURCE,
         extraction_spark_job_file=f"{RAW_SPARK_JOB_PATH}load_{table_name}_to_raw.py",
-        raw_spark_job_extra_args=[SOURCE, table_name, "{{ ds }}"],
+        raw_spark_job_extra_args=[SOURCE, table_name, EXECUTION_DATE],
     )
     raw_task_groups[table_name] = raw_task_group
 
@@ -94,6 +95,7 @@ clean_task_groups = task_group.build_task_group_from_sql_files(
     target_database_base_name=SOURCE,
     is_incremental=True,
     partitions=partition_cols,
+    execution_date=EXECUTION_DATE,
 )
 
 chain(create_cluster_task, DatalakeTaskGroup.all_first_tasks(raw_task_groups))

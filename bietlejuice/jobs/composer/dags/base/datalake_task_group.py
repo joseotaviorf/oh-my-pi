@@ -347,13 +347,14 @@ class DatalakeTaskGroup(BaseTaskGroup):
         table_name,
         partitions=None,
         is_incremental=False,
-        cluster_config_params={},
+        cluster_config_params=None,
         extra_query_template_params=None,
         schema="",  # TODO: Remove schema param after dags are all in pattern
         # 'schema' parameter could be replaced by source or target database_base_name.
         # However, since we have out of pattern paths in our project directory we
         # cannot chose only one now, we would need a refactoring first.
         tree_path="",
+        execution_date="{{ ds }}",
     ):
         """
         Create a task group containing 4 tasks:
@@ -383,11 +384,14 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type extra_query_template_params: dict
         :param schema: db schema where the table is at. Used in the query path
         :type schema: str
+        :param execution_date: job execution date. Defaults to the airflow run date {{ ds }}
+        :type execution_date: str
         :return: dict with initial and final tasks of the created task group
         :rtype: dict
         """
         slugged_table_name = StringFormatter.slugify(table_name)
         partitions = partitions or []
+        cluster_config_params = cluster_config_params or {}
         extra_query_template_params = extra_query_template_params or {}
 
         load_table_mode = "incremental" if is_incremental else "full"
@@ -407,7 +411,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                         self.relative_query_path,
                         table_name,
                         str(partitions),
-                        "{{ ds }}",
+                        execution_date,
                         json.dumps(cluster_config_params),
                         str(extra_query_template_params),
                         schema,
@@ -562,10 +566,11 @@ class DatalakeTaskGroup(BaseTaskGroup):
         table_name,
         partitions=None,
         is_incremental=False,
-        cluster_config_params={},
+        cluster_config_params=None,
         extra_query_template_params=None,
         schema="",
         tree_path="",
+        execution_date="{{ ds }}",
     ):
         """
         Build a task group for clean layer
@@ -589,6 +594,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type extra_query_template_params: dict
         :param schema: db schema where the table is at. Used in the query path
         :type schema: str
+        :param execution_date: job execution date. Defaults to the airflow run date {{ ds }}
+        :type execution_date: str
         :rtype: list[BaseOperator]
         """
 
@@ -603,6 +610,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             extra_query_template_params,
             schema,
             tree_path,
+            execution_date,
         )
 
     def build_enrich_task_group(
@@ -612,9 +620,10 @@ class DatalakeTaskGroup(BaseTaskGroup):
         table_name,
         partitions=None,
         is_incremental=False,
-        cluster_config_params={},
+        cluster_config_params=None,
         extra_query_template_params=None,
         schema="",
+        execution_date="{{ ds }}",
     ):
         """
         Build a task group for enrich layer
@@ -638,6 +647,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type extra_query_template_params: dict
         :param schema: db schema where the table is at. Used in the query path
         :type schema: str
+        :param execution_date: job execution date. Defaults to the airflow run date {{ ds }}
+        :type execution_date: str
         :rtype: list[BaseOperator]
         """
         return self._build_task_group(
@@ -650,4 +661,5 @@ class DatalakeTaskGroup(BaseTaskGroup):
             cluster_config_params,
             extra_query_template_params,
             schema,
+            execution_date=execution_date,
         )

@@ -141,11 +141,11 @@ def extract_layer_from_database_name(database_name):
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
-    parser.add_argument("env")
-    parser.add_argument("datalake_bucket")
-    parser.add_argument("source")
-    parser.add_argument("table_name")
-    parser.add_argument("execution_date_str")
+    parser.add_argument("env", type=str)
+    parser.add_argument("datalake_bucket", type=str)
+    parser.add_argument("source", type=str)
+    parser.add_argument("table_name", type=str)
+    parser.add_argument("execution_date_str", type=str)
 
     args = parser.parse_args()
     env = args.env
