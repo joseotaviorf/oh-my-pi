@@ -232,6 +232,12 @@ demand_targets_2019:
     clean_table_name: demand_targets_2019
     sheet_context: static
 
+demand_targets_2020:
+    sheet_id: 1rIFNs-Wy6glWjeclgUTUukjS2hJUu5BCSZh6N7Vy5dk
+    sheet_name: demand_targets_2020
+    clean_table_name: demand_targets_2020
+    sheet_context: static
+
 costs_allocation_relative_indexes:
     sheet_id: 1f9Iyshj2N-jIbO-YIXs_CxCnDKq4aLEfBcS6dcN-qgM
     sheet_name: costs_allocation_relative_indexes

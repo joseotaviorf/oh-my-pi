@@ -73,7 +73,6 @@ This pipeline produces the following output tables:
     - `deduplicate_batch_listings_forsale`
     - `demand_channel_share`
     - `demand_retention_ab_tests`
-    - `demand_targets_2020`
     - `demand_targets_2021`
     - `demand_targets_replanning`
     - `department_control`
