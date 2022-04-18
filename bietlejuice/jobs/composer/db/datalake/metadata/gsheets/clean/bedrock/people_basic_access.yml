@@ -1,0 +1,13 @@
+---
+database_name: datalake_gsheets_clean
+table_name: people_basic_access
+columns:
+  teams:
+    lineage:
+      - datalake_gsheets_raw.basic_access.teams
+  roles:
+    lineage:
+      - datalake_gsheets_raw.basic_access.roles
+  group:
+    lineage:
+      - datalake_gsheets_raw.basic_access.group

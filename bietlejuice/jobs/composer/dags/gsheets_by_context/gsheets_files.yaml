@@ -88,6 +88,12 @@ people_data:
     clean_table_name: people_employees
     sheet_context: bedrock
 
+basic_access:
+    sheet_id: 1bFPTfQjfxtl97QamwKK7ofmYOz7j8_hSLjUmOawF7xg
+    sheet_name: basic_access
+    clean_table_name: people_basic_access
+    sheet_context: bedrock
+
 #########################
 # FOR RENT SHEETS
 ###################
