@@ -109,7 +109,7 @@ for table in tables:
 
     chain(
         DatalakeTaskGroup.last_tasks(raw_task_group),
-        DatalakeTaskGroup.first_tasks(clean_task_group),
+        *DatalakeTaskGroup.first_tasks(clean_task_group),
     )
 
     terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_group))

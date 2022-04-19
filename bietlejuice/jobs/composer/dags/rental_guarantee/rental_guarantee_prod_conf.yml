@@ -1,4 +1,5 @@
 ---
+lineage_product_database_name: guarantee
 tables:
   - table_name: charge_aud
     extraction_type: full
