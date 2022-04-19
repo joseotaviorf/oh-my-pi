@@ -24,7 +24,11 @@ WITH json_select AS(
         platform,
         GET_JSON_OBJECT(address,'$.country') AS country,
         GET_JSON_OBJECT(address,'$.state') AS state,
-        COALESCE(GET_JSON_OBJECT(address,'$.city'), city) AS address_city,
+        CASE
+            WHEN GET_JSON_OBJECT(address,'$.city') REGEXP '\,' 
+                THEN COALESCE(REGEXP_EXTRACT(GET_JSON_OBJECT(address,'$.city'), ',\s(.*)'), city)
+            ELSE COALESCE(GET_JSON_OBJECT(address,'$.city'), city)
+        END AS address_city,
         city AS city,
         GET_JSON_OBJECT(address,'$.neighborhood') AS neighborhood,
         GET_JSON_OBJECT(address,'$.street') AS street,
