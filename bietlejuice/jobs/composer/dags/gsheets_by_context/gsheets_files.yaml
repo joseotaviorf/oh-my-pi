@@ -280,6 +280,12 @@ survival_estimation:
     clean_table_name: survival_estimation
     sheet_context: static
 
+survival_estimation_new_version:
+    sheet_id: 1hBZp2g6smNXBRFnITrihnwzztkFRr7q_IF5sSBgSQKo
+    sheet_name: survival_estimation_new_version
+    clean_table_name: survival_estimation_new_version
+    sheet_context: static
+
 rental_tof_monthly_targets:
     sheet_id: 1fMYV90b5hkmkRFspX6JRT9_yc4OjLB9AdPPGDvmu-Iw
     sheet_name: rental_tof_monthly_targets

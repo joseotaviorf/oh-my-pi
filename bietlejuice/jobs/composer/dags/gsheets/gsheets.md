@@ -174,7 +174,6 @@ This pipeline produces the following output tables:
     - `secretariat_hierarchy`
     - `secretariat_info`
     - `service_city_holidays`
-    - `survival_estimation_new_version`
     - `tag_sla_target`
     - `targets_acquisition_cumulative_autonomous_agent`
     - `targets_agents_engagement`

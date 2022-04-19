@@ -752,11 +752,6 @@ service_city_holidays:
     sheet_name: data_extraction
     clean_table_name: service_city_holidays
 
-survival_estimation_new_version:
-    sheet_id: 1hBZp2g6smNXBRFnITrihnwzztkFRr7q_IF5sSBgSQKo
-    sheet_name: survival_estimation_new_version
-    clean_table_name: survival_estimation_new_version
-
 tag_sla_target:
     sheet_id: 1XB_PyWLyETfwUoJYyLDDF_PZ97swuTJExAjfhLfM7eo
     sheet_name: SLA por tag

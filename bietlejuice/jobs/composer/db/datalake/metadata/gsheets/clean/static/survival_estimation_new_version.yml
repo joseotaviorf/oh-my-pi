@@ -4,10 +4,10 @@ columns:
   first_rentals:
     lineage:
       - datalake_gsheets_raw.survival_estimation_new_version.first_rentals
-  contract_start_month:
+  dt_contract_started_month:
     lineage:
       - datalake_gsheets_raw.survival_estimation_new_version.contract_start_month
-  months_after:
+  dt_month_after:
     lineage:
       - datalake_gsheets_raw.survival_estimation_new_version.months_after
   months_after_first_contract:
