@@ -13,7 +13,7 @@ SELECT
     CAST(quarter AS INTEGER) AS quarter,
     CAST(year AS INTEGER) AS year,
     CAST(month AS INTEGER) AS month,
-    TO_DATE(week, 'yyyy-MM-dd') AS dt_week,
-    TO_DATE(date, 'yyyy-MM-dd') AS dt_target
+    week,
+    date
 FROM
     datalake_gsheets_raw.sale_supply_targets

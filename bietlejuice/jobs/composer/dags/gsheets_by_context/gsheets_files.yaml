@@ -181,7 +181,7 @@ sale_payment_concluded_targets:
     sheet_context: for_sale
 
 sale_supply_targets:
-    sheet_id: 1nwIPhFWSYwHoN5dWsl9hjOLoxQZRufRmKXVz6mB3nBI
+    sheet_id: 1D0ocZdAiabVBMg9lp3KTuACv5mgG7ninW3zdgXLuFiU
     sheet_name: sale_supply_targets
     clean_table_name: sale_supply_targets
     sheet_context: for_sale
