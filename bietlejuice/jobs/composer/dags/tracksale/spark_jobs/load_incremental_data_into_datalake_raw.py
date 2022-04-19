@@ -10,6 +10,14 @@ from quintoandar_tracksale_api_client.consumers import CONSUMERS
 
 from bietlejuice.jobs.composer.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
+from pyspark.sql.types import (
+    ArrayType,
+    LongType,
+    StructField,
+    MapType,
+    StringType,
+    StructType,
+)
 
 from bietlejuice.jobs.composer.services.json_service import JsonService
 from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
@@ -80,10 +88,25 @@ if __name__ == "__main__":
     spark_client = SparkClient()
     api_response = get_api_response(credentials["token"], endpoint_name, api_params)
 
+    if endpoint_name == "dispatch":  # TODO: Create a more beautiful way to pass schema
+        schema = StructType(
+            [
+                StructField("campaign", MapType(StringType(), StringType(), True)),
+                StructField("create_time", LongType(), True),
+                StructField(
+                    "customers", ArrayType(MapType(StringType(), StringType(), True))
+                ),
+                StructField("dispatch_code", StringType(), True),
+                StructField("status", StringType(), True),
+            ]
+        )
+    else:
+        schema = None
+
     if api_response:
 
         try:
-            df = spark_client.create_dataframe(api_response)
+            df = spark_client.create_dataframe(api_response, schema=schema)
         except ValueError:
             df = spark_client.create_dataframe(
                 JsonService.transform_json_list_terms(api_response)
