@@ -87,7 +87,7 @@ for campaign in campaigns:
             "spark_python_task": {
                 "python_file": REVERSE_SPARK_JOB_PATH
                 + "load_incremental_data_into_datalake_reverse.py",
-                "parameters": [ENV, datalake_bucket, SOURCE, table_name],
+                "parameters": [ENV, datalake_bucket, SOURCE, table_name, "{{ds}}"],
             }
         },
     )
