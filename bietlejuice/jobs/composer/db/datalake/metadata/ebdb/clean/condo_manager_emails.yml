@@ -1,0 +1,10 @@
+---
+database_name: datalake_ebdb_clean
+table_name: condo_manager_emails
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.condomanageremails.id
+  email:
+    lineage:
+      - datalake_ebdb_raw.condomanageremails.email

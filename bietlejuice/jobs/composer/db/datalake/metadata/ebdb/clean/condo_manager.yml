@@ -1,0 +1,37 @@
+---
+database_name: datalake_ebdb_clean
+table_name: condo_manager
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.condomanager.id
+  id_state:
+    lineage:
+      - datalake_ebdb_raw.condomanager.state_id
+  condo_manager_name:
+    lineage:
+      - datalake_ebdb_raw.condomanager.name
+  email:
+    lineage:
+      - datalake_ebdb_raw.condomanager.email
+  city:
+    lineage:
+      - datalake_ebdb_raw.condomanager.city
+  observation:
+    lineage:
+      - datalake_ebdb_raw.condomanager.observation
+  system_login:
+    lineage:
+      - datalake_ebdb_raw.condomanager.loginSystem
+  system_password:
+    lineage:
+      - datalake_ebdb_raw.condomanager.passwordSystem
+  system_url:
+    lineage:
+      - datalake_ebdb_raw.condomanager.systemUrl
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.condomanager.criadoEm
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.condomanager.atualizadoEm
