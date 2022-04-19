@@ -232,7 +232,8 @@ mortgage AS (
         mg.dt_credit_started,
         mg.dt_credit_ended,
         mg.dt_started,
-        mg.dt_ended
+        mg.dt_ended,
+        DATE(mg.ts_seller_paid) AS dt_seller_paid
     FROM
         datalake_sales_flow_clean.mortgage AS mg
     INNER JOIN
@@ -628,7 +629,7 @@ SELECT
     cp.dt_crn_ended AS dt_notes_registry_ended,
     n.dt_started AS dt_house_registry_started,
     n.dt_ended AS dt_house_registry_ended,
-    n.dt_seller_paid AS dt_sale_transacton_paid,
+    COALESCE(mg.dt_seller_paid, n.dt_seller_paid) AS dt_sale_transacton_paid,
     n.dt_buyer_received_keys AS dt_sale_key_delivered,
     off.ts_accepted,
     off.ts_discarded,

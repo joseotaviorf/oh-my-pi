@@ -298,6 +298,7 @@ columns:
       - datalake_sales_flow_clean.notary.ts_ended
   dt_sale_transacton_paid:
     lineage:
+      - datalake_sales_flow_clean.mortgage.ts_seller_paid
       - datalake_sales_flow_clean.notary.ts_seller_paid
   dt_sale_key_delivered:
     lineage:
