@@ -1,2 +1,3 @@
 ---
 clean_partition_cols: [year, month, day]
+lineage_product_database_name: bigagent
