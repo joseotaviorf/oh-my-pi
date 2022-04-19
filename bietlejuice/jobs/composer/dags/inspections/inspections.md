@@ -14,6 +14,8 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 
 We load the following tables into the datalake Raw and Clean via Full load:
 
+- `assessment`
+- `assessment_aud`
 - `inspection`
 - `inspection_aud`
 - `issue_type`

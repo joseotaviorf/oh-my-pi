@@ -1,0 +1,70 @@
+---
+database_name: datalake_inspections_clean
+table_name: assessment_aud
+columns:
+  id:
+    lineage:
+      - datalake_inspections_raw.assessment_aud.id
+  id_inspection:
+    lineage:
+      - datalake_inspections_raw.assessment_aud.inspection_id
+  rev:
+    lineage:
+      - datalake_inspections_raw.assessment_aud.rev
+  rev_type:
+    lineage:
+      - datalake_inspections_raw.assessment_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_inspections_raw.assessment_aud.revend
+  id_previous_assessment:
+    lineage:
+      - datalake_inspections_raw.assessment_aud.previous_assessment_id
+  key_location:
+    lineage:
+      - datalake_inspections_raw.assessment_aud.key_location
+  key_location_details:
+    lineage:
+      - datalake_inspections_raw.assessment_aud.key_location_details
+  mod_inspection:
+    lineage:
+      - datalake_inspections_raw.assessment_aud.inspection_mod
+  mod_id_previous_assessment:
+    lineage:
+      - datalake_inspections_raw.assessment_aud.previous_assessment_id_mod
+  mod_key_location:
+    lineage:
+      - datalake_inspections_raw.assessment_aud.key_location_mod
+  mod_key_location_details:
+    lineage:
+      - datalake_inspections_raw.assessment_aud.key_location_details_mod
+  mod_dt_revision_limit:
+    lineage:
+      - datalake_inspections_raw.assessment_aud.limit_revision_date_mod
+  mod_ts_created:
+    lineage:
+      - datalake_inspections_raw.assessment_aud.created_at_mod
+  mod_ts_finished:
+    lineage:
+      - datalake_inspections_raw.assessment_aud.finished_at_mod
+  mod_ts_started:
+    lineage:
+      - datalake_inspections_raw.assessment_aud.started_at_mod
+  mod_ts_updated:
+    lineage:
+      - datalake_inspections_raw.assessment_aud.updated_at_mod
+  dt_revision_limit:
+    lineage:
+      - datalake_inspections_raw.assessment_aud.limit_revision_date
+  ts_created:
+    lineage:
+      - datalake_inspections_raw.assessment_aud.created_at
+  ts_finished:
+    lineage:
+      - datalake_inspections_raw.assessment_aud.finished_at
+  ts_started:
+    lineage:
+      - datalake_inspections_raw.assessment_aud.started_at
+  ts_updated:
+    lineage:
+      - datalake_inspections_raw.assessment_aud.updated_at

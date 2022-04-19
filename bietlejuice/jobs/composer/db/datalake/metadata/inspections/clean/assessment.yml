@@ -1,0 +1,34 @@
+---
+database_name: datalake_inspections_clean
+table_name: assessment
+columns:
+  id:
+    lineage:
+      - datalake_inspections_raw.assessment.id
+  id_inspection:
+    lineage:
+      - datalake_inspections_raw.assessment.inspection_id
+  id_previous_assessment:
+    lineage:
+      - datalake_inspections_raw.assessment.previous_assessment_id
+  key_location:
+    lineage:
+      - datalake_inspections_raw.assessment.key_location
+  key_location_details:
+    lineage:
+      - datalake_inspections_raw.assessment.key_location_details
+  dt_revision_limit:
+    lineage:
+      - datalake_inspections_raw.assessment.limit_revision_date
+  ts_created:
+    lineage:
+      - datalake_inspections_raw.assessment.created_at
+  ts_finished:
+    lineage:
+      - datalake_inspections_raw.assessment.finished_at
+  ts_started:
+    lineage:
+      - datalake_inspections_raw.assessment.started_at
+  ts_updated:
+    lineage:
+      - datalake_inspections_raw.assessment.updated_at

@@ -1,5 +1,9 @@
 ---
 tables:
+  - table_name: assessment
+    extraction_type: full
+  - table_name: assessment_aud
+    extraction_type: full
   - table_name: inspection
     extraction_type: full
   - table_name: inspection_aud
