@@ -1,0 +1,40 @@
+---
+database_name: datalake_gsheets_clean
+table_name: aux_agents_sale
+columns:
+    id_agent:
+        lineage:
+            - datalake_gsheets_raw.aux_agents_sale.id
+    permanent_disaccreditation:
+        lineage:
+            - datalake_gsheets_raw.aux_agents_sale.descred_permanente
+    days_since_activation:
+        lineage:
+            - datalake_gsheets_raw.aux_agents_sale.dias_desde_ativacao
+    reason_disqualification:
+        lineage:
+            - datalake_gsheets_raw.aux_agents_sale.motivo_descredenciamento
+    suspension_reason:
+        lineage:
+            - datalake_gsheets_raw.aux_agents_sale.motivo_suspensao
+    status:
+        lineage:
+            - datalake_gsheets_raw.aux_agents_sale.status
+    agent_type:
+        lineage:
+            - datalake_gsheets_raw.aux_agents_sale.tipo_agent
+    dt_activation:
+        lineage:
+            - datalake_gsheets_raw.aux_agents_sale.data_ativacao
+    dt_last_deaccreditation:
+        lineage:
+            - datalake_gsheets_raw.aux_agents_sale.data_last_descredenciamento
+    dt_last_return_deaccreditation:
+        lineage:
+            - datalake_gsheets_raw.aux_agents_sale.data_last_retorno_descredenciamento
+    dt_last_return_suspension:
+        lineage:
+            - datalake_gsheets_raw.aux_agents_sale.data_last_retorno_suspensao
+    dt_week_accreditation:
+        lineage:
+            - datalake_gsheets_raw.aux_agents_sale.semana_credenciamento

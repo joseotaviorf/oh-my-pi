@@ -24,6 +24,7 @@ This pipeline produces the following output tables:
     - `autonomous_agent_listing`
     - `autonomous_agent_payment_data_form_origin`
     - `autonomous_agent_payment_data_lead_origin`
+    - `aux_agents_sale`
     - `demand_targets_2019`
     - `costs_allocation_relative_indexes`
     - `dados_docato`
@@ -42,6 +43,7 @@ This pipeline produces the following output tables:
     - `autonomous_agent_listing`
     - `autonomous_agent_payment_data_form_origin`
     - `autonomous_agent_payment_data_lead_origin`
+    - `aux_agents_sale`
     - `demand_targets_2019`
     - `demand_targets_2020`
     - `costs_allocation_relative_indexes`
