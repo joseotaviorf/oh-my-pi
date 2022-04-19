@@ -170,7 +170,6 @@ This pipeline produces the following output tables:
     - `sale_flows_targets`
     - `sale_nbp_source_targets`
     - `sale_rbp_targets`
-    - `sale_supply_targets`
     - `secretariat_hierarchy`
     - `secretariat_info`
     - `service_city_holidays`

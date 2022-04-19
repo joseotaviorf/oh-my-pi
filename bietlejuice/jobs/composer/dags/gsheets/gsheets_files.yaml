@@ -727,11 +727,6 @@ sale_rbp_targets:
     sheet_name: sale_rbp_targets
     clean_table_name: sale_rbp_targets
 
-sale_supply_targets:
-    sheet_id: 1D0ocZdAiabVBMg9lp3KTuACv5mgG7ninW3zdgXLuFiU
-    sheet_name: sale_supply_targets
-    clean_table_name: sale_supply_targets
-
 schedule:
     sheet_id: 1wIwrWi0xlY4TAZnE6JlGm6B0UyezOPxfF5s0_pn-i9E
     sheet_name: Schedule

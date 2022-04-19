@@ -237,7 +237,6 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.amplitude:events-raw-to-clean
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
   # sale_performance_marketing_metrics_supply_cohort
-  - bietlejuice.gsheets:create-clean-sale-supply-targets-external-table
   # sale_performance_marketing_metrics_supply_cohort
   - bietlejuice.enrich_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
   # daily_target_volumes_supply, sale_performance_marketing_metrics_supply_cohort
@@ -246,6 +245,7 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.gsheets:create-clean-weekday-holiday-share-supply-external-table
   - bietlejuice.gsheets:create-clean-weekday-supply-channel-share-external-table
   - bietlejuice.gsheets:create-clean-week-volumes-supply-external-table
+  - bietlejuice.gsheets.for_sale:create-clean-sale-supply-targets-external-table
   # users_online_metrics, listings-online-metrics
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   #performance_marketing_metrics_supply, unique_owners, sale_performance_marketing_metrics_supply_cohort
@@ -376,7 +376,6 @@ bietlejuice.dw_datamarts_growth_cross:
   # - bietlejuice.enrich_marketing_manual_daily_costs:create-enrich-daily-costs-external-table
   - bietlejuice.enrich_top_of_funnel_supply:create-enrich-top-of-funnel-supply-external-table
   - bietlejuice.gsheets:create-clean-daily-target-supply-sale-external-table
-  - bietlejuice.gsheets:create-clean-sale-supply-targets-external-table
   - bietlejuice.gsheets:create-clean-tof-supply-targets-external-table
   - bietlejuice.wololo:create-clean-prospect-external-table
   # performance_marketing_metrics_demand

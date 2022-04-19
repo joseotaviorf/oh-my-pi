@@ -37,7 +37,7 @@ columns:
   quarter:
     lineage:
       - datalake_gsheets_raw.sale_supply_targets.quarter
-  week:
+  dt_week:
     lineage:
       - datalake_gsheets_raw.sale_supply_targets.week
   year:
@@ -46,6 +46,6 @@ columns:
   month:
     lineage:
       - datalake_gsheets_raw.sale_supply_targets.month
-  date:
+  dt_target:
     lineage:
       - datalake_gsheets_raw.sale_supply_targets.date
