@@ -3,118 +3,247 @@ table_name: proponent_version
 columns:
   id:
     lineage:
-      - datalake_sorting_hat_raw.proponentversion.id
-  id_proponent:
+      - datalake_sorting_hat_raw.proponent_version.id
+  id_end_transaction:
     lineage:
-      - datalake_sorting_hat_raw.proponentversion.proponent_id
-  name:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.name
-  cpf:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.cpf
-  income_nature:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.income_nature
-  marital_status:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.marital_status
-  gender:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.gender
-  dt_admitted:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.admission_date
-  cell_phone:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.cell_phone
-  phone:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.phone
-  email:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.email
-  monthly_income:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.monthly_income
-  is_going_to_reside:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.will_reside
-  location_motive:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.location_motive
-  second_doc_type:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.second_doc_type
-  second_doc_number:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.second_doc_number
-  second_doc_issuer:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.second_doc_issuer
-  dt_second_doc_issued:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.second_doc_issue_date
-  nationality:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.nationality
-  dt_birthday:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.birthday
-  mother_name:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.mother_name
-  zipcode:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.zipcode
-  address:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.address
-  address_number:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.address_number
-  complement:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.complement
-  neighborhood:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.bairro
-  city:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.city
-  state:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.state
-  residence_condition:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.residence_condition
-  residence_time:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.residence_time
-  profession:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.profession
-  employer_name:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.employer_name
-  employer_phone:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.employer_phone
-  extra_income_origin:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.extra_income_origin
-  extra_income_value:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.extra_income_value
+      - datalake_sorting_hat_raw.proponent_version.end_transaction_id
   id_proposal:
     lineage:
-      - datalake_sorting_hat_raw.proponentversion.proposal_id
-  boavista_score:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.boavista_score
-  serasa_score:
-    lineage:
-      - datalake_sorting_hat_raw.proponentversion.serasa_score
+      - datalake_sorting_hat_raw.proponent_version.proposal_id
   id_screening_result:
     lineage:
-      - datalake_sorting_hat_raw.proponentversion.screening_result_id
+      - datalake_sorting_hat_raw.proponent_version.screening_result_id
+  id_transaction:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.transaction_id
+  address:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.address
+  address_number:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.address_number
+  bairro:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.bairro
+  cell_phone:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.cell_phone
+  city:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.city
+  complement:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.complement
+  cpf:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.cpf
+  documentation_analysis:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.documentation_analysis
+  email:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.email
+  employer_name:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.employer_name
+  employer_phone:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.employer_phone
+  extra_income_origin:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.extra_income_origin
+  gender:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.gender
+  income_nature:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.income_nature
+  location_nature:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.location_nature
+  marital_status:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.marital_status
+  mother_name:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.mother_name
+  name:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.name
+  nationality:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.nationality
+  occupation_area:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.occupation_area
+  operation_type:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.operation_type
+  phone:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.phone
+  profession:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.profession
+  residence_condition:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.residence_condition
+  second_doc_issuer:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.second_doc_issuer
+  second_doc_number:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.second_doc_number
+  second_doc_type:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.second_doc_type
+  state:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.state
+  zipcode:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.zipcode
+  boavista_score:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.boavista_score
+  extra_income_value:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.extra_income_value
+  monthly_income:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.monthly_income
+  residence_time:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.residence_time
+  serasa_score:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.serasa_score
+  dt_admitted:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.admission_date
+  dt_birthday:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.birthday
+  dt_second_doc_issued:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.second_doc_issue_date
+  is_going_to_reside:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.will_reside
+  mod_address:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.address_mod
+  mod_address_number:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.address_number_mod
+  mod_admission_date:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.admission_date_mod
+  mod_bairro:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.bairro_mod
+  mod_birthday:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.birthday_mod
+  mod_boavista_score:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.boavista_score_mod
+  mod_cell_phone:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.cell_phone_mod
+  mod_city:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.city_mod
+  mod_complement:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.complement_mod
+  mod_cpf:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.cpf_mod
+  mod_documentation_analysis:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.documentation_analysis_mod
+  mod_email:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.email_mod
+  mod_employer_name:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.employer_name_mod
+  mod_employer_phone:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.employer_phone_mod
+  mod_extra_income_origin:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.extra_income_origin_mod
+  mod_extra_income_value:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.extra_income_value_mod
+  mod_gender:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.gender_mod
+  mod_income_nature:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.income_nature_mod
+  mod_location_motive:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.location_motive_mod
+  mod_marital_status:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.marital_status_mod
+  mod_monthly_income:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.monthly_income_mod
+  mod_mother_name:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.mother_name_mod
+  mod_name:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.name_mod
+  mod_nationality:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.nationality_mod
+  mod_occupation_area:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.occupation_area_mod
+  mod_phone:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.phone_mod
+  mod_profession:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.profession_mod
+  mod_proposal_id:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.proposal_id_mod
+  mod_residence_condition:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.residence_condition_mod
+  mod_residence_time:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.residence_time_mod
+  mod_screening_result_id:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.screening_result_id_mod
+  mod_second_doc_issue_date:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.second_doc_issue_date_mod
+  mod_second_doc_issuer:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.second_doc_issuer_mod
+  mod_second_doc_number:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.second_doc_number_mod
+  mod_second_doc_type:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.second_doc_type_mod
+  mod_serasa_score:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.serasa_score_mod
+  mod_state:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.state_mod
+  mod_is_going_to_reside:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.will_reside_mod
+  mod_zipcode:
+    lineage:
+      - datalake_sorting_hat_raw.proponent_version.zipcode_mod
