@@ -1,16 +1,15 @@
-WITH house_portability AS (
+WITH event_bus AS (
     SELECT
-        hl.id_house_listing
-    FROM 
-        datalake_ebdb_listing.house_listing hl
-    JOIN 
-        datalake_ebdb_clean.house h
-            ON h.id = hl.id_house
-    JOIN 
-        datalake_ebdb_clean.portability por
-            ON por.id_house = hl.id_house 
-            AND por.owner_type = 'B2B'
-    WHERE por.ts_created BETWEEN COALESCE(hl.ts_listing_version_start, '1900-01-01 00:00:00') AND COALESCE(hl.ts_listing_version_end, NOW())
+        id_house,
+        ts_status_started AS ts_event
+    FROM
+        datalake_ebdb_listing.house_listing_status
+    UNION
+    SELECT
+        id_house,
+        ts_started AS ts_event
+    FROM
+        datalake_pro_owners.house_b2b_history
 ),
 lbc AS (
     SELECT
@@ -26,50 +25,55 @@ house_listing_owners_status AS (
         hls.id_house,
         h.id_user AS id_owner,
         hls.status_history,
-        IF((l.affiliate_type = 'B2BPartner') OR (partner_agent.id IS NOT NULL AND partner.type = 'PRIME') OR (hp.id_house_listing IS NOT NULL), TRUE, FALSE) AS is_b2b,
+        IF((hbh.affiliate_type = 'B2BPartner') OR (hbh.id_partner IS NOT NULL AND partner.type = 'PRIME') OR (hbh.id_house_listing IS NOT NULL), TRUE, FALSE) AS is_b2b,
         IF(lbc.is_for_rent OR lbc.id_house IS NULL, TRUE, FALSE) AS is_for_rent,
         hls.ts_status_ended,
         hls.ts_status_started
-    FROM 
+     FROM
+        event_bus AS eb
+    JOIN
         datalake_ebdb_clean.house h
+            ON eb.id_house = h.id
     JOIN
         datalake_ebdb_listing.house_listing_status AS hls
-            ON hls.id_house = h.id
+            ON eb.id_house = hls.id_house
+            AND eb.ts_event >= hls.ts_status_started
+            AND eb.ts_event < COALESCE(hls.ts_status_ended, '2100-12-31')
     LEFT JOIN 
-        datalake_ebdb_clean.conversion_lead cl
-            ON cl.id_house = h.id
-    LEFT JOIN 
-        datalake_ebdb_clean.lead l
-            ON l.id = cl.id_converted_lead
-    LEFT JOIN
-        datalake_ebdb_clean.partner_agent partner_agent
-            ON partner_agent.id_user = h.id_user
+        datalake_pro_owners.house_b2b_history AS hbh
+            ON eb.id_house = hbh.id_house
+            AND eb.ts_event >= hbh.ts_started
+            AND eb.ts_event < COALESCE(hbh.ts_ended, '2100-12-31')
     LEFT JOIN
         datalake_ebdb_clean.partner partner
-            ON partner.id = partner_agent.id_partner
-    LEFT JOIN
-        house_portability AS hp
-            ON hp.id_house_listing = hls.id_house_listing
+            ON partner.id = hbh.id_partner
     LEFT JOIN 
         lbc AS lbc
             ON lbc.id_house = h.id
+    WHERE
+        eb.ts_event IS NOT NULL
 ),
 status_changes AS (
   SELECT
         id_owner,
-        ts_status_started
-    FROM
-        house_listing_owners_status
-    WHERE
-        -- is_for_rent = True
-        -- AND is_b2b = False
-        id_owner > 0 
-    GROUP BY 1, 2
+        ts_status_started AS ts_event
+  FROM
+      house_listing_owners_status
+  WHERE
+      id_owner > 0 
+  UNION
+  SELECT
+      id_owner,
+      ts_status_ended AS ts_event
+  FROM
+      house_listing_owners_status
+  WHERE
+      id_owner > 0
 ),
 houses_changes_filter AS (
     SELECT
         sc.id_owner,
-        sc.ts_status_started,
+        sc.ts_event AS ts_status_started,
         CASE
           WHEN hlos.status_history IN ('alugado', 'publicado', 'suspenso') 
               AND hlos.is_for_rent = True
@@ -79,11 +83,13 @@ houses_changes_filter AS (
         END AS id_house
     FROM
         status_changes AS sc
-    JOIN
+    LEFT JOIN
         house_listing_owners_status AS hlos
             ON hlos.id_owner = sc.id_owner
-            AND hlos.ts_status_started <= sc.ts_status_started 
-            AND (hlos.ts_status_ended > sc.ts_status_started OR hlos.ts_status_ended IS NULL)
+            AND hlos.ts_status_started <= sc.ts_event
+            AND (hlos.ts_status_ended > sc.ts_event OR hlos.ts_status_ended IS NULL)
+    WHERE
+        sc.ts_event IS NOT NULL
 ),
 qtd_houses_changes AS (
   SELECT 
