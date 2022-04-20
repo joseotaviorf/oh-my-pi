@@ -19,7 +19,7 @@ sorting_hat_proposal AS (
     p.status,
     row_number() over (
     -- TODO [ODS] Check if it makes sense to shift to last version instead of first
-      partition BY p.id ORDER BY pv.id
+      partition BY p.id ORDER BY pv.ts_analyzed
     ) AS proposal_version_row_number
   FROM datalake_sorting_hat_clean.proposal p
 	LEFT JOIN datalake_sorting_hat_clean.proposal_version pv

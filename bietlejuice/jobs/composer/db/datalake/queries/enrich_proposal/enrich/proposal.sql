@@ -115,7 +115,7 @@ sortinghat_proposal as (
             p.status,
             p.ts_processed,
             pv.ts_analyzed as ts_analyzed_version,
-            row_number() over (partition by p.id order by pv.id) as rn
+            row_number() over (partition by p.id order by pv.ts_analyzed) as rn
         from datalake_sorting_hat_clean.proposal p
         left join datalake_sorting_hat_clean.proposal_version pv
             on p.id = pv.id_proposal
