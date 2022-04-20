@@ -1643,6 +1643,8 @@ bietlejuice.enrich_customer_resolution:
 
 bietlejuice.enrich_gsheets:
   - bietlejuice.gsheets:load-clean-offers-hub-central
+  - bietlejuice.gsheets.for_rent:load-clean-demand-targets-2022
+  - bietlejuice.gsheets.for_rent:load-clean-supply-targets-2022
 
 bietlejuice.enrich_sale_offer_flows:
   - bietlejuice.sales_flow:load-clean-cash-payment

@@ -10,7 +10,6 @@ SELECT
     credit_approved,
     doc_completed,
     doc_sent,
-    guarantee,
     offer_accepted,
     offer_sent,
     visits_booked,
@@ -20,6 +19,7 @@ SELECT
     CAST(quarter AS INTEGER) AS quarter,
     CAST(month AS INTEGER) AS month,
     CAST(year AS INTEGER) AS year,
+    BOOLEAN(guarantee) AS has_guarantee,
     TO_DATE(week_start, 'yyyy-MM-dd') AS dt_week_started,
     TO_DATE(date, 'yyyy-MM-dd') AS dt_target
 FROM

@@ -1,0 +1,64 @@
+---
+database_name: datalake_gsheets
+table_name: rental_supply_targets
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2022.city_group
+      - datalake_static_files.rental_supply_targets.city_group
+  first_listings:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2022.first_listings
+      - datalake_static_files.rental_supply_targets.first_listings
+  lead_context:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2022.lead_context
+      - datalake_static_files.rental_supply_targets.lead_context
+  opportunities:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2022.opportunities
+      - datalake_static_files.rental_supply_targets.opportunities
+  prospects:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2022.prospects
+      - datalake_static_files.rental_supply_targets.prospects
+  qualifieds:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2022.qualifieds
+      - datalake_static_files.rental_supply_targets.qualifieds
+  supply_channel:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2022.supply_channel
+      - datalake_static_files.rental_supply_targets.supply_channel
+  supply_origin:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2022.supply_origin
+      - datalake_static_files.rental_supply_targets.supply_origin
+  tier:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2022.tier
+      - datalake_static_files.rental_supply_targets.tier
+  halfyear:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2022.halfyear
+      - datalake_static_files.rental_supply_targets.halfyear
+  quarter:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2022.quarter
+      - datalake_static_files.rental_supply_targets.quarter
+  month:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2022.month
+      - datalake_static_files.rental_supply_targets.month
+  year:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2022.year
+      - datalake_static_files.rental_supply_targets.year
+  dt_week_started:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2022.dt_week_started
+      - datalake_static_files.rental_supply_targets.dt_week_started
+  dt_target:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2022.dt_target
+      - datalake_static_files.rental_supply_targets.dt_target

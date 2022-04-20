@@ -35,7 +35,7 @@ columns:
   doc_sent:
     lineage:
       - datalake_gsheets_raw.demand_targets_2022.doc_sent
-  guarantee:
+  has_guarantee:
     lineage:
       - datalake_gsheets_raw.demand_targets_2022.guarantee
   offer_accepted:

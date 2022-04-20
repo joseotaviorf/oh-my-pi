@@ -13,6 +13,8 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 Produces the following output tables:
 
 - `sale_hub_offer`
+- `rental_demand_targets`
+- `rental_supply_targets`
 
 ### Responsible Data Engineering Team
 
