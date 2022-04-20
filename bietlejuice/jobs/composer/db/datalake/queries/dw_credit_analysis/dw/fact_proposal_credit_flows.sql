@@ -35,8 +35,9 @@ SELECT
               CASE 
                   WHEN flrf.sk_last_credit_evaluation_positive < 0 
                   AND flrf.sk_last_credit_evaluation_negative > 0 
+                  AND cal.category IS NOT NULL
                   AND cal.guarantee = 'RentalGuarantee' THEN flrf.sk_last_credit_evaluation_negative 
-              END, 1) sk_credit_evaluation_approved_date,
+              END, -1) sk_credit_evaluation_approved_date,
     flrf.sk_tenant_first_doc_sent_date,
     flrf.sk_tenant_doc_complete_date,
     flrf.sk_credit_analysis_approved_date,
