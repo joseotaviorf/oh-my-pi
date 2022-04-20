@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 
+from airflow.utils.helpers import chain
 from airflow.models import DAG, Variable
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -11,6 +12,9 @@ from pendulum import timezone
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.jobs.composer.base.airflow.helpers.task_flow_helper import (
+    TaskFlowHelper,
+)
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
@@ -35,11 +39,13 @@ PARTITION_COLS = config_service.get_config("partition_cols")
 
 BASE_SPARK_JOBS_PATH = f"{DATABRICKS_BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
 CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_compute_optimized_cluster", deserialize_json=True
+    "databricks_memory_optimized_cluster", deserialize_json=True
 )
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
     "destination"
 ] = f"{SPARK_JOBS_LOGS_PATH}{DAG_ID}"
+
+INNER_DEPENDENCIES = {"online_attribution": ["events_exploded"]}
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -79,11 +85,30 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
     target_database_base_name=CONTEXT,
     is_incremental=True,
     partitions=PARTITION_COLS,
+    cluster_config_params={"udfs": ["SF_ALPHANUMERIC_SNAKE_CASE"]},
 )
 
-create_cluster_task.set_downstream(
-    DatalakeTaskGroup.all_first_tasks(enrich_task_groups)
+(
+    task_groups_boundaries_without_inner_dependencies,
+    inner_dependencies_task_groups_boundaries,
+) = datalake_task_group.set_inner_dag_dependencies(
+    task_flow_helper=TaskFlowHelper(),
+    task_groups_boundaries=enrich_task_groups,
+    dag_inner_dependencies=INNER_DEPENDENCIES,
 )
-terminate_cluster_task.set_upstream(
-    DatalakeTaskGroup.all_last_tasks(enrich_task_groups)
+
+chain(
+    create_cluster_task,
+    datalake_task_group.all_first_tasks(
+        task_groups_boundaries_without_inner_dependencies
+    )
+    + datalake_task_group.first_tasks(inner_dependencies_task_groups_boundaries),
+)
+
+chain(
+    datalake_task_group.all_last_tasks(
+        task_groups_boundaries_without_inner_dependencies
+    )
+    + datalake_task_group.last_tasks(inner_dependencies_task_groups_boundaries),
+    terminate_cluster_task,
 )

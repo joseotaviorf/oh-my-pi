@@ -4,143 +4,128 @@ table_name: online_attribution
 columns:
   event_type:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.event_type
   ts_event:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.ts_event
   id_user:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.id_user
   id_amplitude:
     lineage:
-      - datalake_amplitude_clean.events
-      - datalake_amplitude_clean.170698_user_merge
+      - datalake_online_attribution.events_exploded.id_amplitude
+      - datalake_amplitude_clean.170698_user_merge.id_amplitude_merged
   id_session:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.id_session
   id_house:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.id_house
   id_firestore:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.id_firestore
   visit_code:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.visit_code
   entrance_uri:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.entrance_uri
   uri_event_property:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.uri_event_property
   web_medium:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.web_medium
   web_source:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.web_source
   web_campaign:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.web_campaign
   web_content:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.web_content
   web_term:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.web_term
   web_last_medium:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.web_last_medium
   web_last_source:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.web_last_source
   web_last_campaign:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.web_last_campaign
   web_last_content:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.web_last_content
   web_last_term:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.web_last_term
   adjust_adgroup:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.adjust_adgroup
   adjust_campaign:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.adjust_campaign
   adjust_creative:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.adjust_creative
   adjust_impression_based:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.adjust_impression_based
   adjust_installed_at:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.adjust_installed_at
   adjust_is_organic:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.adjust_is_organic
   adjust_network:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.adjust_network
   platform:
     lineage:
-      - datalake_amplitude_clean.events
-  web_branded:
-    lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.platform
   ts_web_attribution:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.ts_event
   app_source:
     lineage:
-      - datalake_amplitude_clean.events
-  app_medium:
-    lineage:
-      - datalake_amplitude_clean.events
-  app_branded:
-    lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.adjust_network
   ts_app_attribution:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.ts_event
   utm_source:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.app_source
+      - datalake_online_attribution.events_exploded.web_source
   utm_medium:
     lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.app_medium
+      - datalake_online_attribution.events_exploded.web_medium
   mkt_flow:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand
+      - datalake_gsheets_clean.taxonomy_demand.Flow
   mkt_completion:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand
+      - datalake_gsheets_clean.taxonomy_demand.Completion
   mkt_origin:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand
+      - datalake_gsheets_clean.taxonomy_demand.Origin
   mkt_channel:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand
+      - datalake_gsheets_clean.taxonomy_demand.Channel
   mkt_medium:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand
+      - datalake_gsheets_clean.taxonomy_demand.Medium
   mkt_source:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand
+      - datalake_gsheets_clean.taxonomy_demand.Source
   mkt_plataform:
     lineage:
-      - datalake_gsheets_clean.taxonomy_demand
+      - datalake_gsheets_clean.taxonomy_demand.Plataform
   branded:
     lineage:
-      - datalake_amplitude_clean.events
-  visit_rn:
-    lineage:
-      - datalake_amplitude_clean.events
-  offer_rn_without_id_firestore:
-    lineage:
-      - datalake_amplitude_clean.events
-  offer_rn_id_firestore:
-    lineage:
-      - datalake_amplitude_clean.events
+      - datalake_online_attribution.events_exploded.app_branded
+      - datalake_online_attribution.events_exploded.web_branded

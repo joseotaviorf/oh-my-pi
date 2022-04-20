@@ -1,0 +1,118 @@
+---
+database_name: datalake_online_attribution
+table_name: events_exploded
+columns:
+  event_type:
+    lineage:
+      - datalake_amplitude_clean.events.event_type
+  ts_event:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+  id_user:
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+  id_amplitude:
+    lineage:
+      - datalake_amplitude_clean.events.id_amplitude
+  id_session:
+    lineage:
+      - datalake_amplitude_clean.events.id_session
+  id_house:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  id_firestore:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  amplitude_platform:
+    lineage:
+      - datalake_amplitude_clean.events.platform
+  visit_code:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  entrance_uri:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  uri_event_property:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  web_medium:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  web_source:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  web_campaign:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  web_content:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  web_term:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  web_last_medium:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  web_last_source:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  web_last_campaign:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  web_last_conten:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  web_last_term:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  adjust_app_version:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  adjust_adgroup:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  adjust_campaign:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  adjust_city:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  adjust_country:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  adjust_creative:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  adjust_impression_based:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  adjust_reattributed_at:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  adjust_installed_at:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  adjust_is_organic:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  adjust_tracking_enabled:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  adjust_tracking_limited:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  adjust_network:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  web_platform:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  app_platform:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+  gclid:
+    lineage:
+      - datalake_amplitude_clean.events.gclid
+  referrer:
+    lineage:
+      - datalake_amplitude_clean.events.referrer
