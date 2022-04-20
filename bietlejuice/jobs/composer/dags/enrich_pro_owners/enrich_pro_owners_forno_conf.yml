@@ -1,5 +1,7 @@
 ---
 inner_dependencies:
+  # owner_houses_quantity_history:
+  #   - house_b2b_history
   pro_owner_history:
     - owner_houses_quantity_history
   tracking_weekly_changes:

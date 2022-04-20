@@ -1,0 +1,30 @@
+---
+database_name: datalake_pro_owners
+table_name: house_b2b_history
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.conversion_lead_aud.id_house
+      - datalake_ebdb_clean.house.id
+      - datalake_ebdb_clean.house_aud.id_house
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.house_aud.id_user
+  id_converted_lead:
+    lineage:
+      - datalake_ebdb_clean.conversion_lead_aud.id_converted_lead
+  id_house_listing:
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_house_listing
+  id_partner:
+    lineage:
+      - datalake_ebdb_clean.partner_agent_aud.id_partner
+  affiliate_type:
+    lineage:
+      - datalake_ebdb_clean.lead_aud.affiliate_type
+  ts_started:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
+  ts_ended:
+    lineage:
+      - datalake_ebdb_user_revision_entity.user_revision_entity.ts_revision
