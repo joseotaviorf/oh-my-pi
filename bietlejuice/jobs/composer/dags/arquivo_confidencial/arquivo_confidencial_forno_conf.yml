@@ -37,3 +37,4 @@ tables:
     date_filter_column: created_at
   
 partition_columns: [year, month, day]
+lineage_product_database_name: arquivoconfidencial
