@@ -10,16 +10,16 @@ columns:
   atendimento_plaquinha:
     lineage:
       - datalake_gsheets_raw.users_cx_plaquinhas.atendimento_plaquinha
-  neighborhood:
+  bairro:
     lineage:
       - datalake_gsheets_raw.users_cx_plaquinhas.bairro
-  channel:
+  canal:
     lineage:
       - datalake_gsheets_raw.users_cx_plaquinhas.canal
-  knew_5a_previously:
+  conhecia_5a:
     lineage:
       - datalake_gsheets_raw.users_cx_plaquinhas.conhecia_5a
-  knew_5a_previously_2:
+  conhecia_5a_2:
     lineage:
       - datalake_gsheets_raw.users_cx_plaquinhas.conhecia_5a_2
   email:
@@ -31,6 +31,6 @@ columns:
   has_visit_booked:
     lineage:
       - datalake_gsheets_raw.users_cx_plaquinhas.has_visit_booked
-  ts_input:
+  data_hora:
     lineage:
       - datalake_gsheets_raw.users_cx_plaquinhas.data_hora
