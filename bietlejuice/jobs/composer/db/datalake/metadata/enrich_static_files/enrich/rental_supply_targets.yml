@@ -1,0 +1,79 @@
+---
+database_name: datalake_static_files
+table_name: rental_supply_targets
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2019.city_group
+      - datalake_gsheets_clean.supply_targets_2020.city_group
+      - datalake_gsheets_clean.supply_targets_2021.city_group
+  first_listings:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2019.first_listings
+      - datalake_gsheets_clean.supply_targets_2020.first_listings
+      - datalake_gsheets_clean.supply_targets_2021.first_listings
+  lead_context:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2019.lead_context
+      - datalake_gsheets_clean.supply_targets_2020.lead_context
+      - datalake_gsheets_clean.supply_targets_2021.lead_context
+  opportunities:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2019.opportunities
+      - datalake_gsheets_clean.supply_targets_2020.opportunities
+      - datalake_gsheets_clean.supply_targets_2021.opportunities
+  prospects:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2019.prospects
+      - datalake_gsheets_clean.supply_targets_2020.prospects
+      - datalake_gsheets_clean.supply_targets_2021.prospects
+  qualifieds:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2019.qualifieds
+      - datalake_gsheets_clean.supply_targets_2020.qualifieds
+      - datalake_gsheets_clean.supply_targets_2021.qualifieds
+  supply_channel:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2019.supply_channel
+      - datalake_gsheets_clean.supply_targets_2020.supply_channel
+      - datalake_gsheets_clean.supply_targets_2021.supply_channel
+  supply_origin:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2019.supply_origin
+      - datalake_gsheets_clean.supply_targets_2020.supply_origin
+      - datalake_gsheets_clean.supply_targets_2021.supply_origin
+  tier:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2019.tier
+      - datalake_gsheets_clean.supply_targets_2020.tier
+      - datalake_gsheets_clean.supply_targets_2021.tier
+  halfyear:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2019.halfyear
+      - datalake_gsheets_clean.supply_targets_2020.halfyear
+      - datalake_gsheets_clean.supply_targets_2021.halfyear
+  quarter:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2019.quarter
+      - datalake_gsheets_clean.supply_targets_2020.quarter
+      - datalake_gsheets_clean.supply_targets_2021.quarter
+  month:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2019.month
+      - datalake_gsheets_clean.supply_targets_2020.month
+      - datalake_gsheets_clean.supply_targets_2021.month
+  year:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2019.year
+      - datalake_gsheets_clean.supply_targets_2020.year
+      - datalake_gsheets_clean.supply_targets_2021.year
+  dt_week_started:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2019.dt_week_started
+      - datalake_gsheets_clean.supply_targets_2020.dt_week_started
+      - datalake_gsheets_clean.supply_targets_2021.dt_week_started
+  dt_target:
+    lineage:
+      - datalake_gsheets_clean.supply_targets_2019.dt_target
+      - datalake_gsheets_clean.supply_targets_2020.dt_target
+      - datalake_gsheets_clean.supply_targets_2021.dt_target

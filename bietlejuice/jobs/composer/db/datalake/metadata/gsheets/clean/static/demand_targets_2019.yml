@@ -14,12 +14,6 @@ columns:
   funnel_origin:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.funnel_origin
-  tier:
-    lineage:
-      - datalake_gsheets_raw.demand_targets_2019.tier
-  halfyear:
-    lineage:
-      - datalake_gsheets_raw.demand_targets_2019.halfyear
   evaluation_positive:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.evaluation_positive
@@ -56,18 +50,24 @@ columns:
   visits_completed:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.visits_completed
+  tier:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2019.tier
+  halfyear:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2019.halfyear
   quarter:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.quarter
-  week_start:
-    lineage:
-      - datalake_gsheets_raw.demand_targets_2019.week_start
   month:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.month
   year:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.year
-  date:
+  dt_week_started:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2019.week_start
+  dt_target:
     lineage:
       - datalake_gsheets_raw.demand_targets_2019.date

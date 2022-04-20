@@ -3,8 +3,6 @@ SELECT
     demand_channel,
     demand_channel_type,
     funnel_origin,
-    tier,
-    halfyear,
     evaluation_positive,
     evaluation_started,
     new_tenant_prospects,
@@ -17,10 +15,12 @@ SELECT
     offer_sent,
     visits_booked,
     visits_completed,
-    quarter,
-    week_start,
-    month,
-    year,
-    date
+    CAST(tier AS INTEGER) AS tier,
+    CAST(halfyear AS INTEGER) AS halfyear,
+    CAST(quarter AS INTEGER) AS quarter,
+    CAST(month AS INTEGER) AS month,
+    CAST(year AS INTEGER) AS year,
+    TO_DATE(week_start, 'yyyy-MM-dd') AS dt_week_started,
+    TO_DATE(date, 'yyyy-MM-dd') AS dt_target
 FROM
     datalake_gsheets_raw.demand_targets_2019
