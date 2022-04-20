@@ -23,9 +23,11 @@ This pipeline produces the following output tables:
     - `agendamento_vistoria_entrada`
     - `agendamento_vistoria_saida`
     - `aux_payments_photos`
+    - `regional_inspection_q12022`
     - `support_agents_department`
 2. Data lake clean:
     - `aux_payments_photos`
+    - `regional_inspection_q1_2022`
     - `schedule_inspection_departure`
     - `schedule_inspection_entry`
     - `support_agents_department`

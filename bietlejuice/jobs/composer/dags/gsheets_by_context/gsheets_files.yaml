@@ -291,7 +291,13 @@ survival_estimation:
     sheet_name: survival_estimation
     clean_table_name: survival_estimation
     sheet_context: static
-
+    
+regional_inspection_q1_2022:
+    sheet_id: 1ZSkD8Zucf8EFHAUweJiIk20VA3qAcuEshl_LtuOMX2E
+    sheet_name: aux_regiao_regional_inspection
+    clean_table_name: regional_inspection_q1_2022
+    sheet_context: static
+    
 survival_estimation_new_version:
     sheet_id: 1hBZp2g6smNXBRFnITrihnwzztkFRr7q_IF5sSBgSQKo
     sheet_name: survival_estimation_new_version

@@ -1,0 +1,13 @@
+---
+database_name: datalake_gsheets_clean
+table_name: regional_inspection_q1_2022
+columns:
+  id:
+    lineage:
+      - datalake_gsheets_raw.regional_inspection_q1_2022.id
+  neighbourhood:
+    lineage:
+      - datalake_gsheets_raw.regional_inspection_q1_2022.neighbourhood
+  regional_inspection:
+    lineage:
+      - datalake_gsheets_raw.regional_inspection_q1_2022.regional_inspection

@@ -1,0 +1,14 @@
+---
+database_name: datalake_gsheets_raw
+table_name: regional_inspection_q1_2022
+columns:
+  id:
+    tags:
+      - PII
+      - Confidential
+  neighbourhood:
+    tags:
+      - Restricted
+  regional_inspection:
+    tags:
+      - Restricted
