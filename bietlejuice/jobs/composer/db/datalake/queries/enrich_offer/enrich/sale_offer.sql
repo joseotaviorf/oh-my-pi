@@ -795,7 +795,7 @@ SELECT
     id_region,
     id_agent,
     id_team_lead,
-    id_user_consultant,
+    CAST(id_user_consultant AS BIGINT) AS id_user_consultant,
     id_consultant,
     id_booking,
     id_closing_specialist,
