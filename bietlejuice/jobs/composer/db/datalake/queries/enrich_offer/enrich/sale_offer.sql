@@ -244,10 +244,14 @@ regions AS (
 ),
 aux_monday_users AS (
     SELECT
+        us.id,
         gmu.*,
         ROW_NUMBER() OVER (PARTITION BY gmu.id_monday ORDER BY user_name) AS row
     FROM
         datalake_gsheets_clean.monday_users AS gmu
+    LEFT JOIN 
+        datalake_ebdb_user.user AS us
+            ON gmu.user_email = us.email
 ),
 -- DATA SOURCES
 data_sources AS (
@@ -419,6 +423,7 @@ data_sources AS (
         mo.days_offer_accepted_to_sale_agreement_signed AS mo_days_offer_accepted_to_sale_agreement_signed,
         mo.days_offer_accepted_to_sale_agreement_created AS mo_days_offer_accepted_to_sale_agreement_created,
         mo.days_offer_accepted_to_offer_dismissed AS mo_days_offer_accepted_to_offer_dismissed,
+        amu.id AS mo_id_user_consultant,
         amu.user_name AS mo_consultant_name,
         CASE
             WHEN mo.id_consultant IS NOT NULL
@@ -651,6 +656,13 @@ business_rules AS (
         ) AS id_consultant,
         UPPER(
             CASE
+                WHEN ds.ohc_id_offer IS NOT NULL
+                    THEN NULL
+                ELSE COALESCE(ds.vo_id_user_consultant,ds.mo_id_user_consultant)
+            END
+        ) AS id_user_consultant,
+        UPPER(
+            CASE
                 WHEN off.offer_flow IN ('HUB','CENTRAL') THEN (
                     CASE
                         WHEN (vo_sk_team_lead IS NOT NULL AND CURRENT_TIMESTAMP() >= ofp.offer_portfolio_start_date)
@@ -783,6 +795,7 @@ SELECT
     id_region,
     id_agent,
     id_team_lead,
+    id_user_consultant,
     id_consultant,
     id_booking,
     id_closing_specialist,

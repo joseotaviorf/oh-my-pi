@@ -26,6 +26,9 @@ columns:
   sk_agent:
     lineage:
       - datalake_offer.sale_offer.id_agent
+  sk_user_consultant:
+    lineage:
+      - datalake_offer.sale_offer.id_user_consultant
   sk_consultant:
     lineage:
       - datalake_offer.sale_offer.id_consultant

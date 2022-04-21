@@ -2,14 +2,18 @@ WITH last_specialist AS (
     SELECT
         ROW_NUMBER() OVER (
             PARTITION BY 
-            id_sales_flow,
-            kind
+                id_sales_flow,
+                kind
             ORDER BY
-            ts_updated DESC
+                sp.ts_updated DESC
         ) AS row,
-        *
+        sp.*,
+        us.id AS id_user
     FROM
-        datalake_sales_flow_clean.specialist
+        datalake_sales_flow_clean.specialist AS sp
+    LEFT JOIN 
+        datalake_ebdb_clean.user AS us
+            ON sp.id_main_user = us.id
 ),
 offers_specialists AS (
     SELECT
@@ -23,27 +27,27 @@ offers_specialists AS (
 )
 SELECT
     id_offer,
-    dm.id_main_user AS id_user_consultant,
+    dm.id_user AS id_user_consultant,
     dm.id_specialist AS id_consultant,
-    tl.id_main_user AS id_user_team_lead,
+    tl.id_user AS id_user_team_lead,
     tl.id_specialist AS id_team_lead,
-    pre.id_main_user AS id_user_pre_specialist,
+    pre.id_user AS id_user_pre_specialist,
     pre.id_specialist AS id_pre_specialist,
-    post.id_main_user AS id_user_post_specialist,
+    post.id_user AS id_user_post_specialist,
     post.id_specialist AS id_post_specialist,
-    credit.id_main_user AS id_user_credit_specialist,
+    credit.id_user AS id_user_credit_specialist,
     credit.id_specialist AS id_credit_specialist,
-    ms.id_main_user AS id_user_start_financing_specialist,
+    ms.id_user AS id_user_start_financing_specialist,
     ms.id_specialist AS id_start_financing_specialist,
-    mfup.id_main_user AS id_user_follow_up_financing_specialist,
+    mfup.id_user AS id_user_follow_up_financing_specialist,
     mfup.id_specialist AS id_follow_up_financing_specialist,
-    me.id_main_user AS id_user_end_financing_specialist,
+    me.id_user AS id_user_end_financing_specialist,
     me.id_specialist AS id_end_financing_specialist,
-    crn.id_main_user AS id_user_notes_registry_specialist,
+    crn.id_user AS id_user_notes_registry_specialist,
     crn.id_specialist AS id_notes_registry_specialist,
-    cri.id_main_user AS id_user_real_estate_register_specialist,
+    cri.id_user AS id_user_real_estate_register_specialist,
     cri.id_specialist AS id_real_estate_register_specialist,
-    lr.id_main_user AS id_user_legal_risk_analyst,
+    lr.id_user AS id_user_legal_risk_analyst,
     lr.id_specialist AS id_legal_risk_analyst,
     dm.specialist_name AS consultant_name,
     dm.email AS consultant_email,

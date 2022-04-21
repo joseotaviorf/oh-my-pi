@@ -7,67 +7,67 @@ columns:
       - datalake_sales_flow_clean.offer.id_firestore
   id_user_consultant:
     lineage:
-      - datalake_sales_flow_clean.specialist.id_main_user
+      - datalake_ebdb_clean.user.id
   id_consultant:
     lineage:
       - datalake_sales_flow_clean.specialist.id_specialist
   id_user_team_lead:
     lineage:
-      - datalake_sales_flow_clean.specialist.id_main_user
+      - datalake_ebdb_clean.user.id
   id_team_lead:
     lineage:
       - datalake_sales_flow_clean.specialist.id_specialist
   id_user_pre_specialist:
     lineage:
-      - datalake_sales_flow_clean.specialist.id_main_user
+      - datalake_ebdb_clean.user.id
   id_pre_specialist:
     lineage:
       - datalake_sales_flow_clean.specialist.id_specialist
   id_user_post_specialist:
     lineage:
-      - datalake_sales_flow_clean.specialist.id_main_user
+      - datalake_ebdb_clean.user.id
   id_post_specialist:
     lineage:
       - datalake_sales_flow_clean.specialist.id_specialist
   id_user_credit_specialist:
     lineage:
-      - datalake_sales_flow_clean.specialist.id_main_user
+      - datalake_ebdb_clean.user.id
   id_credit_specialist:
     lineage:
       - datalake_sales_flow_clean.specialist.id_specialist
   id_user_start_financing_specialist:
     lineage:
-      - datalake_sales_flow_clean.specialist.id_main_user
+      - datalake_ebdb_clean.user.id
   id_start_financing_specialist:
     lineage:
       - datalake_sales_flow_clean.specialist.id_specialist
   id_user_follow_up_financing_specialist:
     lineage:
-      - datalake_sales_flow_clean.specialist.id_main_user
+      - datalake_ebdb_clean.user.id
   id_follow_up_financing_specialist:
     lineage:
       - datalake_sales_flow_clean.specialist.id_specialist
   id_user_end_financing_specialist:
     lineage:
-      - datalake_sales_flow_clean.specialist.id_main_user
+      - datalake_ebdb_clean.user.id
   id_end_financing_specialist:
     lineage:
       - datalake_sales_flow_clean.specialist.id_specialist
   id_user_notes_registry_specialist:
     lineage:
-      - datalake_sales_flow_clean.specialist.id_main_user
+      - datalake_ebdb_clean.user.id
   id_notes_registry_specialist:
     lineage:
       - datalake_sales_flow_clean.specialist.id_specialist
   id_user_real_estate_register_specialist:
     lineage:
-      - datalake_sales_flow_clean.specialist.id_main_user
+      - datalake_ebdb_clean.user.id
   id_real_estate_register_specialist:
     lineage:
       - datalake_sales_flow_clean.specialist.id_specialist
   id_user_legal_risk_analyst:
     lineage:
-      - datalake_sales_flow_clean.specialist.id_main_user
+      - datalake_ebdb_clean.user.id
   id_legal_risk_analyst:
     lineage:
       - datalake_sales_flow_clean.specialist.id_specialist

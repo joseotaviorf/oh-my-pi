@@ -7,6 +7,7 @@ SELECT
 	COALESCE(h.id_region,-1) AS sk_region,
   	COALESCE(eso.id_booking,-1) AS sk_booking,
   	COALESCE(eso.id_agent,-1) AS sk_agent,
+	eso.id_user_consultant AS sk_user_consultant,
   	eso.id_consultant AS sk_consultant,
   	COALESCE(eso.id_closing_specialist, -1) AS sk_closing_specialist,
 	COALESCE(CAST(REPLACE(substring(eso.ts_offer_submitted,1, 10),'-','') AS BIGINT), -1) AS sk_offer_submitted_date,

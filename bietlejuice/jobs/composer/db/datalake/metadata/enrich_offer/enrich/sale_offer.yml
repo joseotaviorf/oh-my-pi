@@ -30,6 +30,10 @@ columns:
   id_team_lead:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.sk_team_lead
+  id_user_consultant:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.id_user_consultant
+      - datalake_ebdb_user.user.id
   id_consultant:
     lineage:
       - datalake_firestore.monday.id_consultant
