@@ -14,6 +14,9 @@ columns:
   repair_resolution:
     lineage:
       - datalake_offboarding.ongoing.repair_resolution
+  client_type:
+    lineage:
+      - datalake_offboarding.budgeting_window.client_type
   repair_cost:
     lineage:
       - datalake_offboarding.ongoing.repair_cost

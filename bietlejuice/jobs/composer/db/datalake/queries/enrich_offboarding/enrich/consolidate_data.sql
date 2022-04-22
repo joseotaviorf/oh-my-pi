@@ -51,8 +51,8 @@ flow AS (
                         'B2B [POS] [OFF] [BACK]','Rescisão Prime [Casa Mineira]',
                         'B2B Prime [OFF] [POS] [BACK]')
                         AND bw.budget_range IN ('até_750','de_r__750_a_r__1.000',
-                            'de_1.000_a_r__2.500',
-                            'acima_de_2.500'))
+                            'de_1.000_a_r__2.500', 'acima_de_2.500',
+                            'intermediação_1','intermediação_2','absorção_de_custo'))
                 ) THEN 'V2 Off'
             WHEN bw.id_contract IS NOT NULL 
                 AND bw.department = 'Rescisão - Despejo [OFF][POS][BACK]' THEN 'Despejo'
@@ -78,11 +78,15 @@ SELECT DISTINCT
     ong.id_house,
     flow.flow AS flow,
     ong.repair_resolution,
+    bw.client_type,
     CASE
         WHEN bw.budget_range = 'até_750'
             OR bw.budget_range = 'de_r__750_a_r__1.000' THEN 'Ate 1000'
         WHEN bw.budget_range = 'de_1.000_a_r__2.500' THEN 'De 1000 a 2500'
         WHEN bw.budget_range = 'acima_de_2.500' THEN 'Acima de 2500'
+        WHEN bw.budget_range = 'intermediação_1' THEN 'Intermediação 1'
+        WHEN bw.budget_range = 'intermediação_2' THEN 'Intermediação 2'
+        WHEN bw.budget_range = 'absorção_de_custo' THEN 'Absorção de custo'
         ELSE NULL
     END AS budgeting_window,
     CASE
