@@ -1,5 +1,6 @@
 SELECT
     id AS id_user,
+    country_id AS id_country,
     REV AS rev,
     rEVTYPE AS rev_type,
     bairro AS neighborhood,
@@ -64,6 +65,7 @@ SELECT
     enviadoAppECardiffEm_MOD AS mod_ts_app_ecardiff_sent,
     googleId AS id_google,
     googleId_MOD AS mod_id_google,
+    country_id_MOD AS mod_id_country,
     accountKitId AS id_account_kit,
     accountKitId_MOD AS mod_id_account_kit,
     dadosVendedor_id AS id_sales_rep,

@@ -1,5 +1,6 @@
 SELECT
     id,
+    country_id AS id_country,
     active AS is_active,
     bairro AS neighborhood,
     cep AS zip_code,

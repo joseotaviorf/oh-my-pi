@@ -4,6 +4,9 @@ columns:
   id_user:
     lineage:
       - datalake_ebdb_raw.usuario_aud.id
+  id_country:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.country_id
   rev:
     lineage:
       - datalake_ebdb_raw.usuario_aud.rev
@@ -196,6 +199,9 @@ columns:
   mod_id_google:
     lineage:
       - datalake_ebdb_raw.usuario_aud.googleid_mod
+  mod_id_country:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.country_id_MOD
   id_account_kit:
     lineage:
       - datalake_ebdb_raw.usuario_aud.accountkitid

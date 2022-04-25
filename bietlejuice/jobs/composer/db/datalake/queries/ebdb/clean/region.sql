@@ -1,8 +1,12 @@
 SELECT
     id,
+    state_id AS id_state,
+    regiaoPai_id AS id_parent_region,
     nome AS name,
+    slug,
     nivel AS level,
-    regiaoPai_id as id_parent_region,
+    lat,
+    lng,
     criadaEm AS ts_created,
     atualizadoEm AS ts_updated
 FROM

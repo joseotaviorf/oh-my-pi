@@ -4,15 +4,27 @@ columns:
   id:
     lineage:
       - datalake_ebdb_raw.regiao.id
-  name:
+  id_state:
     lineage:
-      - datalake_ebdb_raw.regiao.nome
-  level:
-    lineage:
-      - datalake_ebdb_raw.regiao.nivel
+      - datalake_ebdb_raw.regiao.state_id
   id_parent_region:
     lineage:
       - datalake_ebdb_raw.regiao.regiaopai_id
+  name:
+    lineage:
+      - datalake_ebdb_raw.regiao.nome
+  slug:
+    lineage:
+      - datalake_ebdb_raw.regiao.slug
+  level:
+    lineage:
+      - datalake_ebdb_raw.regiao.nivel
+  lat:
+    lineage:
+      - datalake_ebdb_raw.regiao.lat
+  lng:
+    lineage:
+      - datalake_ebdb_raw.regiao.lng
   ts_created:
     lineage:
       - datalake_ebdb_raw.regiao.criadaem

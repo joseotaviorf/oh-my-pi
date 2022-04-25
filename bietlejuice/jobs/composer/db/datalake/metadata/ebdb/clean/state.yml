@@ -4,6 +4,9 @@ columns:
   id:
     lineage:
       - datalake_ebdb_raw.estado.id
+  id_country:
+    lineage:
+      - datalake_ebdb_raw.estado.country_id
   abbreviation:
     lineage:
       - datalake_ebdb_raw.estado.abreviacao

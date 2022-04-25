@@ -4,6 +4,9 @@ columns:
   id:
     lineage:
       - datalake_ebdb_raw.usuario.id
+  id_country:
+    lineage:
+      - datalake_ebdb_raw.usuario.country_id
   is_active:
     lineage:
       - datalake_ebdb_raw.usuario.active
