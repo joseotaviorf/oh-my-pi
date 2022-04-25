@@ -307,11 +307,6 @@ demand_targets_2021:
     sheet_name: demand_targets_2021
     clean_table_name: demand_targets_2021
 
-demand_targets_replanning:
-    sheet_id: 1124r_Z75Q7dreEbYKMnD_79NYO4cU7BKZyd7s14MZbo
-    sheet_name: demand_targets_replanning
-    clean_table_name: demand_targets_replanning
-
 entry_agreements_discounts_forms:
     sheet_id: 19WtCrggLFO61vUJ8yOTFiikOLuXXWVcPzHk0grKcgbI
     sheet_name: agreements_discounts_answer_forms

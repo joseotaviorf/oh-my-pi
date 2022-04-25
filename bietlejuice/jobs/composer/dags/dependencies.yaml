@@ -379,7 +379,6 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.gsheets:create-clean-tof-supply-targets-external-table
   - bietlejuice.wololo:create-clean-prospect-external-table
   # performance_marketing_metrics_demand
-  - bietlejuice.gsheets:create-clean-demand-targets-replanning-external-table
   - bietlejuice.gsheets:create-clean-mkt-cost-per-source-external-table
   - bietlejuice.gsheets:create-clean-rental-ntp-source-targets-external-table
   - bietlejuice.gsheets:create-clean-rental-flows-targets-external-table

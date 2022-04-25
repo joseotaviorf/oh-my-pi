@@ -1,3 +1,4 @@
+---
 database_name: datalake_gsheets_clean
 table_name: demand_targets_replanning
 columns:
@@ -49,9 +50,9 @@ columns:
   visits_completed_target:
     lineage:
       - datalake_gsheets_raw.demand_targets_replanning.visits_completed_target
-  week_start:
+  dt_week_started:
     lineage:
       - datalake_gsheets_raw.demand_targets_replanning.week_start
-  date:
+  dt_target:
     lineage:
       - datalake_gsheets_raw.demand_targets_replanning.date

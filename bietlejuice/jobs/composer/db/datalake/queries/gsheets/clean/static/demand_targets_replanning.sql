@@ -15,7 +15,7 @@ SELECT
     offer_sent_target,
     visits_booked_target,
     visits_completed_target,
-    week_start,
-    date
+    TO_DATE(week_start, 'yyyy-MM-dd') AS dt_week_started,
+    TO_DATE(date, 'yyyy-MM-dd') AS dt_target
 FROM
     datalake_gsheets_raw.demand_targets_replanning
