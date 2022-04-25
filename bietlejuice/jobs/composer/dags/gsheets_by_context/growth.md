@@ -35,5 +35,6 @@ This pipeline produces the following output tables:
     - `offline_manual_costs`
     - `offline_manual_share_city_group`
     - `offline_manual_share_cost_center`
+    - `targets_casa_mineira_nbp`
 
 </details>
