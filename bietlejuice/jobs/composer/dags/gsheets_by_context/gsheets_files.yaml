@@ -54,6 +54,12 @@ department_control:
 # GROWTH SHEETS
 ###################
 
+affiliate_pro_registration:
+    sheet_id: 196BCLJ7rwRAgb50IEdYB_b4KGnilleeCU8WMKghxddY
+    sheet_name: affiliate_pro
+    clean_table_name: affiliate_pro_registration
+    sheet_context: growth
+
 historic_national_costs:
     sheet_id: 1mcTp6mmjNBpsaEiwn1ZepnhkyGozDEC5HAmVWeeArGA
     sheet_name: historic_national_costs

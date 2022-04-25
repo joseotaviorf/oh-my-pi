@@ -20,6 +20,7 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output tables:
 
 1. Data lake raw:
+    - `affiliate_pro_registration`
     - `historic_national_costs`
     - `manual_cost_engagement`
     - `manual_cost_engagement_history`
@@ -28,6 +29,7 @@ This pipeline produces the following output tables:
     - `offline_manual_share_cost_center`
     - `tradecom_configuration`
 2. Data lake clean:
+    - `affiliate_pro_registration`
     - `affiliates_national_costs_history`
     - `affiliates_manual_cost_engagement`
     - `affiliates_manual_cost_engagement_history`
