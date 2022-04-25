@@ -1,0 +1,76 @@
+---
+database_name: datalake_gsheets_clean
+table_name: offline_manual_costs
+columns:
+  invoice_number:
+    lineage:
+      - datalake_gsheets_raw.offline_manual_costs.invoice_number
+  id_rule_city_group_rent:
+    lineage:
+      - datalake_gsheets_raw.offline_manual_costs.id_rule_city_group_rent
+  id_rule_city_group_sale:
+    lineage:
+      - datalake_gsheets_raw.offline_manual_costs.id_rule_city_group_sale
+  action:
+    lineage:
+      - datalake_gsheets_raw.offline_manual_costs.action
+  business_context:
+    lineage:
+      - datalake_gsheets_raw.offline_manual_costs.business_context
+  campaign_name:
+    lineage:
+      - datalake_gsheets_raw.offline_manual_costs.campaign_name
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.offline_manual_costs.city_group
+  cnpj:
+    lineage:
+      - datalake_gsheets_raw.offline_manual_costs.cnpj
+  cost:
+    lineage:
+      - datalake_gsheets_raw.offline_manual_costs.cost
+  cost_category:
+    lineage:
+      - datalake_gsheets_raw.offline_manual_costs.cost_category
+  cost_center:
+    lineage:
+      - datalake_gsheets_raw.offline_manual_costs.cost_center
+  cost_subcategory:
+    lineage:
+      - datalake_gsheets_raw.offline_manual_costs.cost_subcategory
+  description:
+    lineage:
+      - datalake_gsheets_raw.offline_manual_costs.description
+  email:
+    lineage:
+      - datalake_gsheets_raw.offline_manual_costs.email
+  entry_type:
+    lineage:
+      - datalake_gsheets_raw.offline_manual_costs.entry_type
+  team:
+    lineage:
+      - datalake_gsheets_raw.offline_manual_costs.team
+  vendor_name:
+    lineage:
+      - datalake_gsheets_raw.offline_manual_costs.vendor_name
+  has_city_group_share_1:
+    lineage:
+      - datalake_gsheets_raw.offline_manual_costs.has_city_group_share_1
+  has_city_group_share_2:
+    lineage:
+      - datalake_gsheets_raw.offline_manual_costs.has_city_group_share_2
+  has_cost_center_share:
+    lineage:
+      - datalake_gsheets_raw.offline_manual_costs.has_cost_center_share
+  dt_invoice:
+    lineage:
+      - datalake_gsheets_raw.offline_manual_costs.dt_invoice
+  dt_service_ended:
+    lineage:
+      - datalake_gsheets_raw.offline_manual_costs.dt_service_ended
+  dt_service_started:
+    lineage:
+      - datalake_gsheets_raw.offline_manual_costs.dt_service_started
+  ts_entry:
+    lineage:
+      - datalake_gsheets_raw.offline_manual_costs.ts_entry

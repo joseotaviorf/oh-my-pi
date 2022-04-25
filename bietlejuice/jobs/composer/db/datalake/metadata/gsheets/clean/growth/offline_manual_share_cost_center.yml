@@ -1,0 +1,13 @@
+---
+database_name: datalake_gsheets_clean
+table_name: offline_manual_share_cost_center
+columns:
+  id_rule_cost_center:
+    lineage:
+      - datalake_gsheets_raw.offline_manual_share_cost_center.id_rule_cost_center
+  cost_center:
+    lineage:
+      - datalake_gsheets_raw.offline_manual_share_cost_center.cost_center
+  share:
+    lineage:
+      - datalake_gsheets_raw.offline_manual_share_cost_center.share

@@ -23,11 +23,17 @@ This pipeline produces the following output tables:
     - `historic_national_costs`
     - `manual_cost_engagement`
     - `manual_cost_engagement_history`
+    - `offline_manual_costs`
+    - `offline_manual_share_city_group`
+    - `offline_manual_share_cost_center`
     - `tradecom_configuration`
 2. Data lake clean:
     - `affiliates_national_costs_history`
     - `affiliates_manual_cost_engagement`
     - `affiliates_manual_cost_engagement_history`
     - `affiliates_cost_tradecom_configuration`
+    - `offline_manual_costs`
+    - `offline_manual_share_city_group`
+    - `offline_manual_share_cost_center`
 
 </details>
