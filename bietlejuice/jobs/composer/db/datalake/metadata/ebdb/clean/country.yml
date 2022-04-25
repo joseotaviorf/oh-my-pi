@@ -1,0 +1,24 @@
+database_name: datalake_ebdb_clean
+table_name: country
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.country.id
+  code:
+    lineage:
+      - datalake_ebdb_raw.country.code
+  name:
+    lineage:
+      - datalake_ebdb_raw.country.name
+  default_locale:
+    lineage:
+      - datalake_ebdb_raw.country.default_locate
+  default_timezone:
+    lineage:
+      - datalake_ebdb_raw.country.default_timezone
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.country.created_at
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.country.updated_at

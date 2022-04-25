@@ -65,6 +65,7 @@ Produces the following output tables:
     `contract_version`
     `conversion_lead`
     `conversion_lead_aud`
+    `country`
     `device`
     `doorman_affiliate_data`
     `doorman_affiliate_occupation`
