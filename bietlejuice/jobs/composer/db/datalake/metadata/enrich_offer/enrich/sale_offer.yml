@@ -57,6 +57,9 @@ columns:
   pendency_type:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.pendency_type
+  opportunities_of_the_week:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.opportunities_of_the_week
   team_lead_name:
     lineage:
       - datalake_gsheets.sale_hub_offer.team_lead_name

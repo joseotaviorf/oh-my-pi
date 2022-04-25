@@ -3,6 +3,7 @@ CREATE TABLE sale.dim_sale_agreement (
     sk_offer VARCHAR PRIMARY KEY,
     pendency VARCHAR,
     pendency_type VARCHAR,
+    opportunities_of_the_week VARCHAR,
     sale_agreement_status VARCHAR,
     offer_flow VARCHAR,
     business_unit VARCHAR,

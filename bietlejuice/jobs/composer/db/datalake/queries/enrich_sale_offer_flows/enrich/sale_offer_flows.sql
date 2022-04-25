@@ -188,11 +188,36 @@ ccv_flow AS (
         ON ccv_flow.id_ccv_flow = lucf.id_ccv_flow
         AND ccv_flow.ts_updated = lucf.ts_last_updated
 ),
+-- SALES FLOWS DETAILS CTE
+last_update_details AS (
+    SELECT
+        id_sales_flow,
+        MAX(ts_updated) AS ts_last_updated
+    FROM datalake_sales_flow_clean.sales_flow_details
+    GROUP BY 1
+),
+sales_flow_details AS (
+    SELECT
+        sfd.id,
+        sfd.id_sales_flow,
+        opportunities_of_the_week,
+        isolve_link,
+        google_drive_link,
+        ts_seller_fup,
+        ts_buyer_fup,
+        ts_last_updated
+    FROM
+        datalake_sales_flow_clean.sales_flow_details AS sfd
+    INNER JOIN
+        last_update_details AS lud
+        ON lud.ts_last_updated = sfd.ts_updated
+        AND sfd.id_sales_flow = lud.id_sales_flow
+),
 -- PENDENCY CTE
 last_update_pendency AS (
     SELECT
         id_sales_flow,
-        MAX(ts_updated) as ts_last_updated
+        MAX(ts_updated) AS ts_last_updated
     FROM datalake_sales_flow_clean.sales_flow_pendency
     GROUP BY 1
 ),
@@ -204,9 +229,9 @@ pendency AS (
         type,
         ts_last_updated
     FROM
-        datalake_sales_flow_clean.sales_flow_pendency as sfp
+        datalake_sales_flow_clean.sales_flow_pendency AS sfp
     INNER JOIN
-        last_update_pendency as lup
+        last_update_pendency AS lup
         ON lup.ts_last_updated = sfp.ts_updated
         AND sfp.id_sales_flow = lup.id_sales_flow
 ),
@@ -502,6 +527,7 @@ SELECT
     sfp.pendency,
     sfp.type as pendency_type,
     mg.bank AS financing_bank,
+    sfd.opportunities_of_the_week,
     CASE
         WHEN sf.flow_step = 'CANCELED_ON_NEGOTIATION'
         THEN 'Canceladas em negociação'
@@ -686,6 +712,9 @@ LEFT JOIN
 LEFT JOIN
     pendency AS sfp
         ON sfp.id_sales_flow = off.id_sales_flow
+LEFT JOIN
+    sales_flow_details AS sfd
+        ON sfd.id_sales_flow = off.id_sales_flow
 WHERE
     tag.label IS NULL
     OR tag.label NOT LIKE '%#offertestedeproduto%'

@@ -2,6 +2,7 @@ SELECT
   eso.id_offer AS sk_offer,
   eso.pendency,
   eso.pendency_type,
+  eso.opportunities_of_the_week,
   eso.sale_agreement_status,
   eso.offer_flow,
   eso.business_unit,

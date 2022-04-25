@@ -8,6 +8,9 @@ columns:
   pendency:
     lineage:
       - datalake_offer.sale_offer.pendency
+  opportunities_of_the_week:
+    lineage:
+      - datalake_offer.sale_offer.opportunities_of_the_week
   pendency_type:
     lineage:
       - datalake_offer.sale_offer.pendency_type

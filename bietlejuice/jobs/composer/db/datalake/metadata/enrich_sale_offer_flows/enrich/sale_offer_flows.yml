@@ -83,6 +83,9 @@ columns:
   financing_bank:
     lineage:
       - datalake_sales_flow_clean.mortgage.bank
+  opportunities_of_the_week:
+    lineage:
+      - datalake_sales_flow_clean.sales_flow_details.opportunities_of_the_week
   flow_step:
     lineage:
       - datalake_sales_flow_clean.sales_flow.flow_step

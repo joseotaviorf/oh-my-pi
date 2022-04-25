@@ -1662,6 +1662,7 @@ bietlejuice.enrich_sale_offer_flows:
   - bietlejuice.sales_flow:load-clean-payment
   - bietlejuice.sales_flow:load-clean-sales-flow
   - bietlejuice.sales_flow:load-clean-sales-flow-aud
+  - bietlejuice.sales_flow:load-clean-sales-flow-details
   - bietlejuice.sales_flow:load-clean-sales-flow-pendency
   - bietlejuice.sales_flow:load-clean-sales-flow-tag
   - bietlejuice.sales_flow:load-clean-specialist
