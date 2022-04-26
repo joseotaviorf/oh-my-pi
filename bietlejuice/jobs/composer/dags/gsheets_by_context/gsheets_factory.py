@@ -157,7 +157,7 @@ class GsheetsDAGFactory:
             },
             start_date=self.MAIN_START_DATE,
             schedule_interval=main_schedule_interval,
-            doc_md=BaseDAG.get_dag_doc(dag_context).format(
+            doc_md=BaseDAG.get_dag_doc(f"gsheets_by_context/{dag_context}").format(
                 chart_url=self.doc_md_chart_url, dag_id=dag_id
             ),
         )

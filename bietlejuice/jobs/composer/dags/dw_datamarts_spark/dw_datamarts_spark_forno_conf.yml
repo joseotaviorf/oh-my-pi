@@ -1,0 +1,14 @@
+---
+## TEMPLATE
+# dags:
+#   <context>:
+#     cluster_name: <cluster_name>
+#       # Optional. By default, databricks_default_cluster
+#       # Eg: databricks_memory_optimized_cluster
+#     owner: <dag_owner>
+#       # Mandatory.
+#       # Eg: Data ForSale
+
+dags:
+  for_sale:
+    owner: Data ForSale

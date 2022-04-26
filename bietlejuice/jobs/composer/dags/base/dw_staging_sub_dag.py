@@ -50,7 +50,12 @@ class DWStagingSubDAG(BaseSubDAG):
         self.cluster_config_params = cluster_config_params
 
     def build_subdag(
-        self, sub_dag_name, table_name, slugged_table_name, test_ods_migration
+        self,
+        sub_dag_name,
+        table_name,
+        slugged_table_name,
+        test_ods_migration,
+        tree_path="",
     ):
         sub_dag = BaseSubDAG(
             sub_dag_name=sub_dag_name,
@@ -73,6 +78,7 @@ class DWStagingSubDAG(BaseSubDAG):
                         self.relative_query_path,
                         table_name,
                         str(self.cluster_config_params),
+                        tree_path,
                     ],
                 }
             },

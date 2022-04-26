@@ -31,6 +31,7 @@ if __name__ == "__main__":
         type=str,
         help="custom config parameters to be set in spark cluster",
     )
+    parser.add_argument("tree_path", type=str, help="path to reach the query place")
 
     args = parser.parse_args()
 
@@ -40,19 +41,22 @@ if __name__ == "__main__":
     relative_query_path = args.relative_query_path
     table_name = args.table_name
     cluster_config_params = json.loads(args.cluster_config_params)
+    tree_path = args.tree_path
 
     logger.info(
         f"m={JOB_NAME}, env={env}, dw_bucket={dw_bucket},  dw_schema={dw_schema}, "
-        + f"relative_query_path={relative_query_path}, table_name={table_name} msg=Job execution started"
+        + f"relative_query_path={relative_query_path}, table_name={table_name}, tree_path={tree_path} msg=Job execution started"
     )
 
     schema_database_name, schema_database_location = DWMetastoreService.get_layer_info(
         env, dw_schema, dw_bucket, "staging"
     )
 
-    query = FileService.get_query_from_file_name(
-        f"{QUERIES_DATALAKE_PATH}{relative_query_path}/dw/{table_name}.sql"
+    query_path = f"{QUERIES_DATALAKE_PATH}{relative_query_path}/dw/{tree_path}/{table_name}.sql".replace(
+        "//", "/"
     )
+
+    query = FileService.get_query_from_file_name(query_path)
 
     table_loader_pipeline = FullTableLoaderPipeline(
         database_name=schema_database_name,
