@@ -1,0 +1,19 @@
+---
+database_name: datalake_monopoly
+table_name: sale
+columns:
+  id_sale:
+    lineage:
+      - datalake_monopoly_clean.sale.id
+  id_external_offer:
+    lineage:
+      - datalake_monopoly_clean.sale.id_external_offer
+  id_outcome:
+    lineage:
+      - datalake_monopoly_clean.outcome_status_log.id_outcome
+  dt_occurence:
+    lineage:
+      - datalake_monopoly_clean.outcome_status_log.dt_occurence
+  ts_created:
+    lineage:
+      - datalake_monopoly_clean.sale.ts_created

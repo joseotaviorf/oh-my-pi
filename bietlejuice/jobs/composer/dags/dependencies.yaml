@@ -1368,6 +1368,10 @@ bietlejuice.enrich_marketing_manual_daily_costs:
   - bietlejuice.marketing_manual_daily_costs:load-clean-marketing-costs-name-convention-shared-costs
   - bietlejuice.marketing_manual_daily_costs:load-clean-marketing-costs-manual-shared-costs
 
+bietlejuice.enrich_monopoly:
+  - bietlejuice.monopoly:load-clean-sale
+  - bietlejuice.monopoly:load-clean-outcome-status-log
+
 bietlejuice.enrich_nps_answer_drivers:
   - bietlejuice.enrich_tracksale:load-enrich-answer
   - bietlejuice.ebdb:create-clean-house-in-data-lake
