@@ -4,7 +4,7 @@ table_name: performance_marketing_metrics_demand
 columns:
   dt_event:
     lineage:
-      - datalake_gsheets_clean.demand_targets_replanning.date
+      - datalake_gsheets_clean.demand_targets_replanning.dt_target
       - datalake_gsheets_clean.mkt_cost_per_source.date
       - datalake_gsheets_clean.rental_flows_targets.date
       - datalake_gsheets_clean.rental_ntp_source_targets.dt_target
@@ -13,7 +13,7 @@ columns:
       - dw_public.dim_date.date      
   ts_event:
     lineage:
-      - datalake_gsheets_clean.demand_targets_replanning.date
+      - datalake_gsheets_clean.demand_targets_replanning.dt_target
       - datalake_gsheets_clean.mkt_cost_per_source.date
       - datalake_gsheets_clean.rental_flows_targets.date
       - datalake_gsheets_clean.rental_ntp_source_targets.dt_target

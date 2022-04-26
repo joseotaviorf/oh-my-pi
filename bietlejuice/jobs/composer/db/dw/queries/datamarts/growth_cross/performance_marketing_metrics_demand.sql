@@ -172,7 +172,7 @@ demand_daily_spent AS (
 ),
 target_sheets AS (
     SELECT
-        NULLIF(str.date, '')::date AS dt_event,
+        str.dt_target AS dt_event,
         NULLIF(str.city_group, '') AS city_group,
         'Tenants PWA' AS mkt_origin,
         NULLIF(str.mkt_channel, '') AS mkt_channel,
@@ -186,7 +186,7 @@ target_sheets AS (
     FROM
         datalake_gsheets_clean_prod.demand_targets_replanning AS str
     WHERE
-        NULLIF(str.date, '')::date < DATE('2021-08-01')
+        str.dt_target < DATE('2021-08-01')
 
     UNION ALL
 
