@@ -1,10 +1,12 @@
 ---
+em_casa:
+  origin: 'emcasa'
 loft:
   origin: 'loft'
 olx:
   origin: 'olx'
 viva_real:
   origin: 'vivareal'
-em_casa:
-  origin: 'emcasa'
+zap_imoveis:
+  origin: 'zapimoveis'
 partition_cols: ["city", "year", "month", "day"]
