@@ -16,9 +16,15 @@ columns:
   amount:
     lineage:
       - datalake_monopoly_raw.income_status_log.amount
+  dt_expiration:
+    lineage:
+      - datalake_monopoly_raw.income_status_log.expiration_date
   dt_due:
     lineage:
       - datalake_monopoly_raw.income_status_log.due_date
+  ts_occurrence:
+    lineage:
+      - datalake_monopoly_raw.income_status_log.occurrence_date
   ts_created:
     lineage:
       - datalake_monopoly_raw.income_status_log.created_at
