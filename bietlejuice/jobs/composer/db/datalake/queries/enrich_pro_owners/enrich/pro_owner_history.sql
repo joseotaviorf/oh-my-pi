@@ -1,8 +1,9 @@
 WITH aud_ts AS (
-  SELECT 
+  SELECT /*+ RANGE_JOIN(aud, 50000) */
     aud.id_user AS id_owner,
     aud.id_account_manager,
     aud.is_active,
+    LAG(aud.is_active) OVER (PARTITION BY aud.id_user ORDER BY aud.rev) AS previous_status,
     FROM_UNIXTIME(ure.ts_revision/1000) AS ts_event
   FROM 
     datalake_ebdb_clean.user_pro_owner_aud AS aud
@@ -16,14 +17,9 @@ aud_events AS (
     aud.id_account_manager,
     aud.is_active,
     aud.ts_event,
-    MIN(aud_ts.ts_event) AS ts_next_event
+    LEAD(aud.ts_event, 1) OVER (PARTITION BY aud.id_owner  ORDER BY aud.ts_event) AS ts_next_event
   FROM 
     aud_ts AS aud
-  LEFT JOIN 
-    aud_ts
-      ON aud_ts.id_owner = aud.id_owner
-      AND aud_ts.ts_event > aud.ts_event
-  GROUP BY 1,2,3,4
 ),
 pro_owner_dates AS (
   SELECT 
@@ -38,28 +34,33 @@ pro_owner_dates AS (
       ON aud_ts.id_owner = aud.id_owner
       AND aud_ts.is_active != aud.is_active
       AND aud_ts.ts_event > aud.ts_event
-  GROUP BY 1,2,3
+  WHERE 
+      aud.previous_status != aud.is_active
+      OR aud.previous_status IS NULL
+  GROUP BY 
+    1,2,3
 ),
 account_manager AS (
   SELECT 
     aud.id_owner,
     aud.id_account_manager,
-    aud.ts_event AS ts_account_manager_started,
+    MIN(aud.ts_event) AS ts_account_manager_started,
     MIN(aud_ts.ts_event) AS ts_account_manager_ended
   FROM 
     aud_ts AS aud
   LEFT JOIN 
     aud_ts
       ON aud_ts.id_owner = aud.id_owner
-        AND aud_ts.ts_event > aud.ts_event
-  GROUP BY 1,2,3
+      AND aud_ts.id_account_manager != aud.id_account_manager
+      AND aud_ts.ts_event > aud.ts_event
+  GROUP BY 
+    1,2
 )
 SELECT DISTINCT
   at.id_owner,
   aud.id_account_manager,
   aud.is_active AS is_pro_owner,
   aud.id_account_manager IS NOT NULL AS is_expert,
-  at.ts_event,
   pod.ts_pro_owner_started,
   pod.ts_pro_owner_ended,
   am.ts_account_manager_started,
@@ -84,4 +85,4 @@ LEFT JOIN
     AND at.ts_event >= am.ts_account_manager_started 
     AND at.ts_event < COALESCE(am.ts_account_manager_ended, CURRENT_TIMESTAMP())
 WHERE
-    DATE(at.ts_event) <= DATE('{year}-{month}-{day}')
+  DATE(at.ts_event) <= DATE('{year}-{month}-{day}')
