@@ -37,7 +37,8 @@ if __name__ == "__main__":
 
     # setup
     db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
-    metastore_service = SparkMetastoreService(SparkClient())
+    spark_client = SparkClient()
+    metastore_service = SparkMetastoreService(spark_client)
     s3_loader = S3Loader()
     spark_metastore_loader = SparkMetastoreLoader(metastore_service)
 
@@ -47,7 +48,7 @@ if __name__ == "__main__":
 
     conn_config_json = dbutils.secrets.get(scope="quintoandar", key=DatabaseEnum.EBDB)
     conn_config = json.loads(conn_config_json)
-    mysql_consumer = MySqlConsumer(conn_config, SparkClient())
+    mysql_consumer = MySqlConsumer(conn_config, spark_client)
 
     # create database if not exists
     database_name = db_info["db_raw_databricks"]
@@ -56,11 +57,9 @@ if __name__ == "__main__":
     metastore_service.create_database(database_name)
     df = mysql_consumer.get_data_from_query(query, table_name=table_name)
 
-    # load
-    s3_loader.load_full_table(
+    s3_loader.load_df(
         df=df,
-        database_name=database_name,
-        table_name=table_name,
+        s3_path=f"{database_location}{table_name}",
         format_options=format_options,
         database_location=database_location,
     )
