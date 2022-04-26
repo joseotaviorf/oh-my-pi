@@ -6,10 +6,10 @@ WITH
                 pb.sk_user AS sk_user,
                 pb.year_month AS year_month,
                 pb.affiliate_type AS affiliate_type,
-                NVL(SUM((pb.promotional_bonus/pb.total_listings*pb.cnt_first_conversion_rent_only)),0) AS bonus_rent_only,
-                NVL(SUM((pb.promotional_bonus/pb.total_listings)*(pb.cnt_first_conversion_sale_only)),0) AS bonus_sale_only,
-                NVL(SUM(((pb.promotional_bonus/pb.total_listings)*(pb.cnt_first_conversion_hybrid))/2),0) AS bonus_hybrid_rent,
-                NVL(SUM(((pb.promotional_bonus/pb.total_listings)*(pb.cnt_first_conversion_hybrid))/2),0) AS bonus_hybrid_sale,
+                NVL(SUM((pb.promotional_bonus/NULLIF(pb.total_listings, 0))*(pb.cnt_first_conversion_rent_only)),0) AS bonus_rent_only,
+                NVL(SUM((pb.promotional_bonus/NULLIF(pb.total_listings, 0))*(pb.cnt_first_conversion_sale_only)),0) AS bonus_sale_only,
+                NVL(SUM(((pb.promotional_bonus/NULLIF(pb.total_listings, 0))*(pb.cnt_first_conversion_hybrid))/2),0) AS bonus_hybrid_rent,
+                NVL(SUM(((pb.promotional_bonus/NULLIF(pb.total_listings, 0))*(pb.cnt_first_conversion_hybrid))/2),0) AS bonus_hybrid_sale,
                 NVL(SUM(pb.promotional_bonus),0) AS promotional_bonus
             FROM
                 datamarts.performance_marketing_cluster_promotional_bonus pb
