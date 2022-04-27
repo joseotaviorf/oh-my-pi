@@ -34,6 +34,16 @@ WITH data_sources AS (
         so.dt_house_registry_ended,
         COALESCE(sof.dt_sale_key_delivered, m.dt_sale_key_delivered) AS dt_sale_key_delivered,
         so.dt_sale_transacton_paid,
+        CASE 
+            WHEN so.current_payment_method LIKE 'FINANCED%'
+                AND CONCAT(so.dt_sale_agreement_signed, COALESCE(sof.dt_legal_analysis_ended, m.dt_legal_analysis_ended), COALESCE(sof.dt_credit_analysis_ended, m.dt_credit_analysis_ended)) IS NOT NULL
+                    THEN DATE(GREATEST(so.dt_sale_agreement_signed, COALESCE(sof.dt_legal_analysis_ended, m.dt_legal_analysis_ended), COALESCE(sof.dt_credit_analysis_ended, m.dt_credit_analysis_ended)))
+            WHEN so.current_payment_method LIKE 'CASH%'
+                AND CONCAT(so.dt_sale_agreement_signed, COALESCE(sof.dt_legal_analysis_ended, m.dt_legal_analysis_ended)) IS NOT NULL
+                    THEN DATE(GREATEST(so.dt_sale_agreement_signed, COALESCE(sof.dt_legal_analysis_ended, m.dt_legal_analysis_ended)))
+            ELSE NULL
+        END AS dt_payment_allowed,
+        ms.dt_occurence AS dt_down_payment,
         so.ts_updated
     FROM
         datalake_offer.sale_offer so
@@ -43,6 +53,9 @@ WITH data_sources AS (
     LEFT JOIN
         datalake_sale_offer_flows.sale_offer_flows AS sof
             ON so.id_offer = sof.id_offer
+    LEFT JOIN
+        datalake_monopoly.sale AS ms
+            ON ms.id_external_offer = so.id_offer
     WHERE
         so.dt_sale_agreement_signed IS NOT NULL
 )
@@ -114,6 +127,8 @@ SELECT
     dt_house_registry_ended,
     dt_sale_key_delivered,
     dt_sale_transacton_paid,
+    dt_payment_allowed,
+    dt_down_payment,
     ts_updated,
     CURRENT_TIMESTAMP() AS ts_load
 FROM

@@ -74,6 +74,12 @@ columns:
   sk_sale_transaction_paid_date:
     lineage:
       - datalake_sale_closing_flows.closing_flow.dt_sale_transacton_paid
+  sk_payment_allowed_date:
+    lineage:
+      - datalake_sale_closing_flows.closing_flow.dt_payment_allowed
+  sk_down_payment_date:
+    lineage:
+      - datalake_sale_closing_flows.closing_flow.dt_down_payment
   id_closing_specialist:
     lineage:
       - datalake_sale_closing_flows.closing_flow.id_closing_specialist

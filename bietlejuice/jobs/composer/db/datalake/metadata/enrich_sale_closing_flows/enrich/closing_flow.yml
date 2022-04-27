@@ -257,6 +257,16 @@ columns:
   dt_sale_transacton_paid:
     lineage:
       - datalake_offer.sale_offer.dt_sale_transacton_paid
+  dt_payment_allowed:
+    lineage:
+      - datalake_firestore.monday.dt_credit_analysis_ended
+      - datalake_firestore.monday.dt_legal_analysis_ended
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_sale_offer_flows.sale_offer_flows.dt_credit_analysis_ended
+      - datalake_sale_offer_flows.sale_offer_flows.dt_legal_analysis_ended
+  dt_down_payment:
+    lineage:
+      - datalake_monopoly.sale.dt_occurence
   ts_updated:
     lineage:
       - datalake_offer.sale_offer.ts_updated

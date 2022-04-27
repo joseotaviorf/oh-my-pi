@@ -23,6 +23,8 @@ SELECT
   COALESCE(CAST(REPLACE(SUBSTRING(dt_house_registry_ended,1, 10),'-','') AS BIGINT), -1) AS sk_house_registry_ended_date,
   COALESCE(CAST(REPLACE(SUBSTRING(dt_sale_key_delivered,1, 10),'-','') AS BIGINT), -1) AS sk_sale_key_delivered_date,
   COALESCE(CAST(REPLACE(SUBSTRING(dt_sale_transacton_paid,1, 10),'-','') AS BIGINT), -1) AS sk_sale_transaction_paid_date,
+  COALESCE(CAST(REPLACE(SUBSTRING(dt_payment_allowed,1, 10),'-','') AS BIGINT), -1) AS sk_payment_allowed_date,
+  COALESCE(CAST(REPLACE(SUBSTRING(dt_down_payment,1, 10),'-','') AS BIGINT), -1) AS sk_down_payment_date,
   --
   id_closing_specialist,
   id_legal_risk_analyst,

@@ -1518,6 +1518,7 @@ bietlejuice.enrich_robin_hood:
 
 bietlejuice.enrich_sale_closing_flows:
   - bietlejuice.enrich_firestore:load-enrich-monday
+  - bietlejuice.enrich_monopoly:load-enrich-sale
   - bietlejuice.enrich_offer:load-enrich-sale-offer
   - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-flows
 
