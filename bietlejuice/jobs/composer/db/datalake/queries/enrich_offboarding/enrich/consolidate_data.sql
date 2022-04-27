@@ -139,7 +139,7 @@ SELECT DISTINCT
     DATEDIFF(ong.ts_analyst_annulment_input, ong.dt_termination) AS ldt_td_erc,
     DATEDIFF(ia.dt_completed_date, ong.ts_analyst_annulment_input) AS ldt_erc_an_vt_end,
     DATEDIFF(ia.dt_completed_date, ong.dt_termination) AS ldt_td_an_vt2,
-    DATEDIFF(ong.dt_termination,NOW()) AS today_td,
+    DATEDIFF(NOW(),ong.dt_termination) AS today_td,
     tkt_v2.num_ticket_satisfied AS num_ticket_v2_satisfied,
     tkt_v2.num_ticket_neutral AS num_ticket_v2_neutral,
     tkt_v2.num_ticket_dissatisfied AS num_ticket_v2_dissatisfied,
@@ -151,7 +151,10 @@ SELECT DISTINCT
     ong.is_b2b,
     ong.is_repair_tenant_duty,
     ong.is_workflow,
-    ong.dt_last_inspection_synched AS dt_inspected,
+    CASE
+        WHEN ong.dt_last_inspection_synched > ong.dt_termination THEN ong.dt_last_inspection_synched
+        ELSE NULL
+    END AS dt_inspected,
     ia.dt_completed_date AS dt_insp_analysis_completed,
     CASE
         WHEN base_tkt.group_name = 'QualiVisOrça [OFF] [POS] [BACK]'
