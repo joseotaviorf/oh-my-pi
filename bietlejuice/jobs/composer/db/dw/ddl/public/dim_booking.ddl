@@ -47,7 +47,7 @@ create table if not exists public.dim_booking
   media_source varchar(255) encode lzo,
   adjust_network varchar(255) encode lzo,
   utm_source varchar(255) encode lzo,
-  utm_medium varchar(255) encode lzo,
+  utm_medium varchar(1024) encode lzo,
   utm_campaign varchar(2000) encode lzo,
   utm_content varchar(255) encode lzo,
   utm_term varchar(255) encode lzo,
