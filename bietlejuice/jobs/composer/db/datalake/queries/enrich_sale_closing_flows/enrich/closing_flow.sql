@@ -36,11 +36,11 @@ WITH data_sources AS (
         so.dt_sale_transacton_paid,
         CASE 
             WHEN so.current_payment_method LIKE 'FINANCED%'
-                AND CONCAT(so.dt_sale_agreement_signed, COALESCE(sof.dt_legal_analysis_ended, m.dt_legal_analysis_ended), COALESCE(sof.dt_credit_analysis_ended, m.dt_credit_analysis_ended)) IS NOT NULL
-                    THEN DATE(GREATEST(so.dt_sale_agreement_signed, COALESCE(sof.dt_legal_analysis_ended, m.dt_legal_analysis_ended), COALESCE(sof.dt_credit_analysis_ended, m.dt_credit_analysis_ended)))
+                AND CONCAT(ms.dt_occurence, COALESCE(sof.dt_legal_analysis_ended, m.dt_legal_analysis_ended), COALESCE(sof.dt_credit_analysis_ended, m.dt_credit_analysis_ended)) IS NOT NULL
+                    THEN DATE(GREATEST(ms.dt_occurence, COALESCE(sof.dt_legal_analysis_ended, m.dt_legal_analysis_ended), COALESCE(sof.dt_credit_analysis_ended, m.dt_credit_analysis_ended)))
             WHEN so.current_payment_method LIKE 'CASH%'
-                AND CONCAT(so.dt_sale_agreement_signed, COALESCE(sof.dt_legal_analysis_ended, m.dt_legal_analysis_ended)) IS NOT NULL
-                    THEN DATE(GREATEST(so.dt_sale_agreement_signed, COALESCE(sof.dt_legal_analysis_ended, m.dt_legal_analysis_ended)))
+                AND CONCAT(ms.dt_occurence, COALESCE(sof.dt_legal_analysis_ended, m.dt_legal_analysis_ended)) IS NOT NULL
+                    THEN DATE(GREATEST(ms.dt_occurence, COALESCE(sof.dt_legal_analysis_ended, m.dt_legal_analysis_ended)))
             ELSE NULL
         END AS dt_payment_allowed,
         ms.dt_occurence AS dt_down_payment,

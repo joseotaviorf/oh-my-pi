@@ -261,7 +261,7 @@ columns:
     lineage:
       - datalake_firestore.monday.dt_credit_analysis_ended
       - datalake_firestore.monday.dt_legal_analysis_ended
-      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_monopoly.sale.dt_occurence
       - datalake_sale_offer_flows.sale_offer_flows.dt_credit_analysis_ended
       - datalake_sale_offer_flows.sale_offer_flows.dt_legal_analysis_ended
   dt_down_payment:
