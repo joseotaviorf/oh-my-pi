@@ -347,6 +347,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         table_name,
         partitions=None,
         is_incremental=False,
+        has_create_external_table_task=True,
         cluster_config_params=None,
         extra_query_template_params=None,
         schema="",  # TODO: Remove schema param after dags are all in pattern
@@ -377,6 +378,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type partitions: list[str]
         :param is_incremental: if this table uses incremental load type
         :type is_incremental: bool
+        :param has_create_external_table_task: if this table is going to be loaded into Athena
+        :type has_create_external_table_task: bool
         :param cluster_config_params: custom config parameters to be set in spark cluster
         :type cluster_config_params: dict
         :param extra_query_template_params: filter parameters applied to
@@ -416,27 +419,6 @@ class DatalakeTaskGroup(BaseTaskGroup):
                         str(extra_query_template_params),
                         schema,
                         tree_path,
-                    ],
-                }
-            },
-            execution_timeout=timedelta(hours=self.execution_timeout_hours),
-        )
-
-        create_external_table_task = QuintoAndarDatabricksSubmitRunOperator(
-            dag=self.dag,
-            task_id=f"create-{layer.value}-{slugged_table_name}-external-table",
-            json={
-                "spark_python_task": {
-                    "python_file": f"{self.spark_jobs_path}/create_external_table.py",
-                    "parameters": [
-                        self.env,
-                        self.datalake_bucket,
-                        self.athena_query_result_location,
-                        layer.value,
-                        target_database_base_name,
-                        table_name,
-                        str(partitions),
-                        is_incremental,
                     ],
                 }
             },
@@ -484,9 +466,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
             sync_metastore_table_structure_task,
             sync_metastore_table_partitions_task,
         )
-        load_table_task.set_downstream(create_external_table_task)
 
-        final_tasks = [create_external_table_task, sync_metastore_table_partitions_task]
+        final_tasks = [sync_metastore_table_partitions_task]
 
         if FileService.metadata_file_exists(
             self.relative_query_path, layer.value, table_name
@@ -519,11 +500,34 @@ class DatalakeTaskGroup(BaseTaskGroup):
                 propagate_table_metadata_task,
                 bypass_task,
             )
-            final_tasks = [
-                create_external_table_task,
-                sync_metastore_table_partitions_task,
-                bypass_task,
-            ]
+
+            final_tasks = [sync_metastore_table_partitions_task, bypass_task]
+
+        if has_create_external_table_task:
+            create_external_table_task = QuintoAndarDatabricksSubmitRunOperator(
+                dag=self.dag,
+                task_id=f"create-{layer.value}-{slugged_table_name}-external-table",
+                json={
+                    "spark_python_task": {
+                        "python_file": f"{self.spark_jobs_path}/create_external_table.py",
+                        "parameters": [
+                            self.env,
+                            self.datalake_bucket,
+                            self.athena_query_result_location,
+                            layer.value,
+                            target_database_base_name,
+                            table_name,
+                            str(partitions),
+                            is_incremental,
+                        ],
+                    }
+                },
+                execution_timeout=timedelta(hours=self.execution_timeout_hours),
+            )
+
+            load_table_task.set_downstream(create_external_table_task)
+
+            final_tasks = [create_external_table_task] + final_tasks
 
         quality_tasks = []
         if FileService.data_quality_tests_file_exists(
@@ -566,6 +570,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         table_name,
         partitions=None,
         is_incremental=False,
+        has_create_external_table_task=True,
         cluster_config_params=None,
         extra_query_template_params=None,
         schema="",
@@ -587,6 +592,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type partitions: list[str]
         :param is_incremental: if this table uses incremental load type
         :type is_incremental: bool
+        :param has_create_external_table_task: if this table is going to be loaded into Athena
+        :type has_create_external_table_task: bool
         :param cluster_config_params: custom config parameters to be set in spark cluster
         :type cluster_config_params: dict
         :param extra_query_template_params: filter parameters applied to
@@ -606,6 +613,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             table_name,
             partitions,
             is_incremental,
+            has_create_external_table_task,
             cluster_config_params,
             extra_query_template_params,
             schema,
@@ -620,6 +628,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         table_name,
         partitions=None,
         is_incremental=False,
+        has_create_external_table_task=True,
         cluster_config_params=None,
         extra_query_template_params=None,
         schema="",
@@ -640,6 +649,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type partitions: list[str]
         :param is_incremental: if this table uses incremental load type
         :type is_incremental: bool
+        :param has_create_external_table_task: if this table is going to be loaded into Athena
+        :type has_create_external_table_task: bool
         :param cluster_config_params: custom config parameters to be set in spark cluster
         :type cluster_config_params: dict
         :param extra_query_template_params: filter parameters applied to
@@ -658,6 +669,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             table_name,
             partitions,
             is_incremental,
+            has_create_external_table_task,
             cluster_config_params,
             extra_query_template_params,
             schema,
