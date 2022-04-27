@@ -1,2 +1,39 @@
 database_name: datalake_gsheets_raw
 table_name: sale_nbp_source_targets
+columns:
+  city_group:
+    tags:
+      - Public
+  context:
+    tags:
+      - Public
+  mkt_origin:
+    tags:
+      - Public
+  mkt_channel:
+    tags:
+      - Public
+  mkt_medium:
+    tags:
+      - Public
+  mkt_source:
+    tags:
+      - Public
+  nbp_target:
+    tags:
+      - Public
+  rbp_target:
+    tags:
+      - Public
+  week_start:
+    tags:
+      - Public
+  month:
+    tags:
+      - Public
+  year:
+    tags:
+      - Public
+  date:
+    tags:
+      - Public

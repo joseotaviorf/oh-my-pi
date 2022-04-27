@@ -1,6 +1,7 @@
 SELECT
     city_group,
     context,
+    mkt_origin,
     mkt_channel,
     mkt_medium,
     mkt_source,
