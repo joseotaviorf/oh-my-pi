@@ -1,0 +1,37 @@
+---
+database_name: datalake_hubspot_clean
+table_name: owner
+columns:
+  id_owner:
+    lineage:
+      - datalake_hubspot_raw.owner.id
+  properties:
+    lineage:
+      - datalake_hubspot_raw.owner.properties
+  properties_with_history:
+    lineage:
+      - datalake_hubspot_raw.owner.properties_with_history
+  associations:
+    lineage:
+      - datalake_hubspot_raw.owner.associations
+  is_archived:
+    lineage:
+      - datalake_hubspot_raw.owner.archived
+  ts_archived:
+    lineage:
+      - datalake_hubspot_raw.owner.archived_at
+  ts_created:
+    lineage:
+      - datalake_hubspot_raw.owner.created_at
+  ts_updated:
+    lineage:
+      - datalake_hubspot_raw.owner.updated_at
+  year:
+    lineage:
+      - datalake_hubspot_raw.owner.year
+  month:
+    lineage:
+      - datalake_hubspot_raw.owner.month
+  day:
+    lineage:
+      - datalake_hubspot_raw.owner.day

@@ -1,0 +1,37 @@
+---
+database_name: datalake_hubspot_clean
+table_name: deal_pipeline
+columns:
+  id_pipeline:
+    lineage:
+      - datalake_hubspot_raw.deal_pipeline.id
+  label:
+    lineage:
+      - datalake_hubspot_raw.deal_pipeline.label
+  stages:
+    lineage:
+      - datalake_hubspot_raw.deal_pipeline.stages
+  display_order:
+    lineage:
+      - datalake_hubspot_raw.deal_pipeline.display_order
+  is_archived:
+    lineage:
+      - datalake_hubspot_raw.deal_pipeline.archived
+  ts_archived:
+    lineage:
+      - datalake_hubspot_raw.deal_pipeline.archived_at
+  ts_created:
+    lineage:
+      - datalake_hubspot_raw.deal_pipeline.created_at
+  ts_updated:
+    lineage:
+      - datalake_hubspot_raw.deal_pipeline.updated_at
+  year:
+    lineage:
+      - datalake_hubspot_raw.deal_pipeline.year
+  month:
+    lineage:
+      - datalake_hubspot_raw.deal_pipeline.month
+  day:
+    lineage:
+      - datalake_hubspot_raw.deal_pipeline.day

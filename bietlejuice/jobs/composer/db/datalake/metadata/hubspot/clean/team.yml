@@ -1,0 +1,16 @@
+---
+database_name: datalake_hubspot_clean
+table_name: team
+columns:
+  id_team:
+    lineage:
+      - datalake_hubspot_raw.team.id
+  team_name:
+    lineage:
+      - datalake_hubspot_raw.team.name
+  user_ids:
+    lineage:
+      - datalake_hubspot_raw.team.user_ids
+  secondary_user_ids:
+    lineage:
+      - datalake_hubspot_raw.team.secondary_user_ids

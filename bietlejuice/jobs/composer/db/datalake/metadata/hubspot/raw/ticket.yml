@@ -1,0 +1,12 @@
+---
+database_name: datalake_hubspot_raw
+table_name: ticket
+columns:
+  properties:
+    tags:
+      - PII
+      - Confidential
+  properties_with_history:
+    tags:
+      - PII
+      - Confidential

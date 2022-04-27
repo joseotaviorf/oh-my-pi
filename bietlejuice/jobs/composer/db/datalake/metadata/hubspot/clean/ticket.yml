@@ -1,0 +1,37 @@
+---
+database_name: datalake_hubspot_clean
+table_name: ticket
+columns:
+  id_ticket:
+    lineage:
+      - datalake_hubspot_raw.ticket.id
+  properties:
+    lineage:
+      - datalake_hubspot_raw.ticket.properties
+  properties_with_history:
+    lineage:
+      - datalake_hubspot_raw.ticket.properties_with_history
+  associations:
+    lineage:
+      - datalake_hubspot_raw.ticket.associations
+  is_archived:
+    lineage:
+      - datalake_hubspot_raw.ticket.archived
+  ts_archived:
+    lineage:
+      - datalake_hubspot_raw.ticket.archived_at
+  ts_created:
+    lineage:
+      - datalake_hubspot_raw.ticket.created_at
+  ts_updated:
+    lineage:
+      - datalake_hubspot_raw.ticket.updated_at
+  year:
+    lineage:
+      - datalake_hubspot_raw.ticket.year
+  month:
+    lineage:
+      - datalake_hubspot_raw.ticket.month
+  day:
+    lineage:
+      - datalake_hubspot_raw.ticket.day

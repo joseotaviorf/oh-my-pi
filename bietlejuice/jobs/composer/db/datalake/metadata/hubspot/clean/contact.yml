@@ -1,0 +1,37 @@
+---
+database_name: datalake_hubspot_clean
+table_name: contact
+columns:
+  id_contact:
+    lineage:
+      - datalake_hubspot_raw.contact.id
+  properties:
+    lineage:
+      - datalake_hubspot_raw.contact.properties
+  properties_with_history:
+    lineage:
+      - datalake_hubspot_raw.contact.properties_with_history
+  associations:
+    lineage:
+      - datalake_hubspot_raw.contact.associations
+  is_archived:
+    lineage:
+      - datalake_hubspot_raw.contact.archived
+  ts_archived:
+    lineage:
+      - datalake_hubspot_raw.contact.archived_at
+  ts_created:
+    lineage:
+      - datalake_hubspot_raw.contact.created_at
+  ts_updated:
+    lineage:
+      - datalake_hubspot_raw.contact.updated_at
+  year:
+    lineage:
+      - datalake_hubspot_raw.contact.year
+  month:
+    lineage:
+      - datalake_hubspot_raw.contact.month
+  day:
+    lineage:
+      - datalake_hubspot_raw.contact.day
