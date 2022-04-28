@@ -156,7 +156,7 @@ class MySqlConsumer(DBConsumer):
         """
         Gets the results of a query in a MySql database.
         :param query: Query content
-        :param table_name: Name of the table relevant to the query
+        :param table_name: Name of the table relevant to the query # TODO this param could be removed
         :return: A Spark DataFrame with the query results
         """
         df = self.spark_client.get_data_from_external_source(
