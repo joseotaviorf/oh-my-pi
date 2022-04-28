@@ -1,0 +1,61 @@
+---
+database_name: datalake_airtable_clean
+table_name: jira_tickets
+columns:
+  id_agent:
+    lineage:
+      - datalake_airtable_raw.jira_tickets.id_do_corretor
+  id_ql_agent:
+    lineage:
+      - datalake_airtable_raw.jira_tickets.ql_id_do_agente
+  id_issue:
+    lineage:
+      - datalake_airtable_raw.jira_tickets.issue_key
+  activated_sale:
+    lineage:
+      - datalake_airtable_raw.jira_tickets.ativados_sale
+  description:
+    lineage:
+      - datalake_airtable_raw.jira_tickets.descricao
+  open_in_jira:
+    lineage:
+      - datalake_airtable_raw.jira_tickets.open_in_jira
+  ql_agent_complete_name:
+    lineage:
+      - datalake_airtable_raw.jira_tickets.ql_nome_completo_do_corretor
+  ql_agent_line:
+    lineage:
+      - datalake_airtable_raw.jira_tickets.ql_seguimento_do_corretor
+  ql_agent_region:
+    lineage:
+      - datalake_airtable_raw.jira_tickets.ql_regiao_de_atuacao
+  ql_agent_type:
+    lineage:
+      - datalake_airtable_raw.jira_tickets.ql_tipo_agent
+  ql_deaccreditation_reason:
+    lineage:
+      - datalake_airtable_raw.jira_tickets.ql_tipo_de_solicitacao
+  responsible:
+    lineage:
+      - datalake_airtable_raw.jira_tickets.responsavel
+  summary:
+    lineage:
+      - datalake_airtable_raw.jira_tickets.resumo
+  dt_created:
+    lineage:
+      - datalake_airtable_raw.jira_tickets.created
+  dt_deaccreditated:
+    lineage:
+      - datalake_airtable_raw.jira_tickets.data_descredenciamento
+  dt_deaccreditation_return:
+    lineage:
+      - datalake_airtable_raw.jira_tickets.data_retorno_descred
+  year:
+    lineage:
+      - datalake_airtable_raw.jira_tickets.year
+  month:
+    lineage:
+      - datalake_airtable_raw.jira_tickets.month
+  day:
+    lineage:
+      - datalake_airtable_raw.jira_tickets.day

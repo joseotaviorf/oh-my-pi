@@ -1,0 +1,12 @@
+---
+tables:
+  activated:
+    base_id: app1Xchm7V2ypMlBQ
+    table_id: tblXIVyaK8QFpjLdy
+  jira_tickets:
+    base_id: app1Xchm7V2ypMlBQ
+    table_id: tblZl2bbgWIJpvhA3
+partition_cols:
+  - year
+  - month
+  - day
