@@ -5,9 +5,15 @@ columns:
   bonus_salary:
     lineage:
       - datalake_gsheets_raw.dados_docato.13o
+  bonus_salary_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.13o1
   judgment:
     lineage:
       - datalake_gsheets_raw.dados_docato.acordao
+  judgment_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.acordao1
   agreement_in:
     lineage:
       - datalake_gsheets_raw.dados_docato.acordo_em
@@ -17,12 +23,21 @@ columns:
   hazard_pay:
     lineage:
       - datalake_gsheets_raw.dados_docato.adicional_de_periculosidade
+  hazard_pay_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.adicional_de_periculosidade1
   night_surcharge:
     lineage:
       - datalake_gsheets_raw.dados_docato.adicional_noturno
+  night_surcharge_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.adicional_noturno1
   advance_notice:
     lineage:
       - datalake_gsheets_raw.dados_docato.aviso_previo
+  advance_notice_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.aviso_previo1
   position_held:
     lineage:
       - datalake_gsheets_raw.dados_docato.cargo_exercido
@@ -35,9 +50,15 @@ columns:
   function_desviation:
     lineage:
       - datalake_gsheets_raw.dados_docato.desvio_de_funcao
+  function_desviation_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.desvio_de_funcao1
   commissions_difference:
     lineage:
       - datalake_gsheets_raw.dados_docato.diferenca_em_comissoes
+  commissions_difference_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.diferenca_em_comissoes1
   distribuition:
     lineage:
       - datalake_gsheets_raw.dados_docato.distribuicao
@@ -50,66 +71,123 @@ columns:
   vacations:
     lineage:
       - datalake_gsheets_raw.dados_docato.ferias_13
+  vacations_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.ferias_131
   cct_gratification:
     lineage:
       - datalake_gsheets_raw.dados_docato.gratificacao_cct
+  cct_gratification_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.gratificacao_cct1
   succumbence_fees:
     lineage:
       - datalake_gsheets_raw.dados_docato.honorarios_sucumbencia
+  succumbence_fees_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.honorarios_sucumbencia1
   overtime_8_44:
     lineage:
       - datalake_gsheets_raw.dados_docato.hora_extra_8a44a
+  overtime_8_44_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.hora_extra_8a44a1
   working_hours_overtime:
     lineage:
       - datalake_gsheets_raw.dados_docato.hora_extra_intrajornada
+  working_hours_overtime_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.hora_extra_intrajornada1
   reduced_nighttime_overtime:
     lineage:
       - datalake_gsheets_raw.dados_docato.hora_extra_noturna_reduzida
+  reduced_nighttime_overtime_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.hora_extra_noturna_reduzida1
   compensation_material_damage:
     lineage:
       - datalake_gsheets_raw.dados_docato.indenizacao_dano_material
+  compensation_material_damage_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.indenizacao_dano_material1
   compensation_moral_damage:
     lineage:
       - datalake_gsheets_raw.dados_docato.indenizacao_dano_moral
+  compensation_moral_damage_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.indenizacao_dano_moral1
   compensation_pregnant_stability:
     lineage:
       - datalake_gsheets_raw.dados_docato.indenizacao_estabilidade_gestante
+  compensation_pregnant_stability_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.indenizacao_estabilidade_gestante1
   judge:
     lineage:
       - datalake_gsheets_raw.dados_docato.juiz
-  sunday_holliday_labor:
+  sunday_holiday_labor:
     lineage:
       - datalake_gsheets_raw.dados_docato.labor_domingos_e_feriados_100
+  sunday_holiday_labor_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.labor_domingos_e_feriados_1001
   fine_467_clt:
     lineage:
       - datalake_gsheets_raw.dados_docato.multa_467_clt
+  fine_467_clt_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.multa_467_clt1
   fine_477_clt:
     lineage:
       - datalake_gsheets_raw.dados_docato.multa_477_clt
+  fine_477_clt_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.multa_477_clt1
   fine_cct:
     lineage:
       - datalake_gsheets_raw.dados_docato.multa_cct
+  fine_cct_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.multa_cct1
   judicial_process:
     lineage:
       - datalake_gsheets_raw.dados_docato.processo
   employment_relationship_recognition:
     lineage:
       - datalake_gsheets_raw.dados_docato.reconhecimento_de_vinculo_empregaticio
-  undue_discounts_repeat:
+  employment_relationship_recognition_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.reconhecimento_de_vinculo_empregaticio1
+  repeat_undue_discounts:
     lineage:
       - datalake_gsheets_raw.dados_docato.repeticao_descontos_indevidos
+  repeat_undue_discounts_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.repeticao_descontos_indevidos1
   joint_or_subsidiary_liability:
     lineage:
       - datalake_gsheets_raw.dados_docato.responsabilidade_solidaria_ou_subsidiaria
+  joint_or_subsidiary_liability_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.responsabilidade_solidaria_ou_subsidiaria1
   ctps_retification:
     lineage:
       - datalake_gsheets_raw.dados_docato.retificacao_ctps
+  ctps_retification_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.retificacao_ctps1
   rsr:
     lineage:
       - datalake_gsheets_raw.dados_docato.rsr
+  rsr_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.rsr1
   minimum_wage_in_month_without_commissions_payment:
     lineage:
       - datalake_gsheets_raw.dados_docato.salario_minimo_nos_meses_que_nao_houve_pagamento_de_comissoes
+  minimum_wage_in_month_without_commissions_payment_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.salario_minimo_nos_meses_que_nao_houve_pagamento_de_comissoes1
   status:
     lineage:
       - datalake_gsheets_raw.dados_docato.status

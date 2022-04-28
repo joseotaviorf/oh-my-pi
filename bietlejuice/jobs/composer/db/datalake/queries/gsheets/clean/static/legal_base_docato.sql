@@ -1,44 +1,112 @@
 SELECT
     13o AS bonus_salary,
+    13o1 AS bonus_salary_second_instance,
     acordao AS judgment,
+    acordao1 AS judgment_second_instance,
     acordo_em AS agreement_in,
     acordo_sem_vinculo AS no_strings_attached_agreement,
     adicional_de_periculosidade AS hazard_pay,
+    adicional_de_periculosidade1 AS hazard_pay_second_instance,
     adicional_noturno AS night_surcharge,
+    adicional_noturno1 AS night_surcharge_second_instance,
     aviso_previo AS advance_notice,
+    aviso_previo1 AS advance_notice_second_instance,
     cargo_exercido AS position_held,
     comarca AS county,
     desembargador_relator AS judge_rapporteur,
     desvio_de_funcao AS function_desviation,
+    desvio_de_funcao1 AS function_desviation_second_instance,
     diferenca_em_comissoes AS commissions_difference,
-    distribuicao AS distribuition,
+    diferenca_em_comissoes1 AS commissions_difference_second_instance, 
+    CASE 
+        WHEN 
+            SUBSTRING(distribuicao FROM 4 FOR 3) = 'Jan' 
+                THEN TO_DATE(concat(SUBSTRING(distribuicao FROM 1 FOR 2),'-01-', SUBSTRING(distribuicao FROM 8 FOR 4)), 'dd-MM-yyyy')
+        WHEN 
+            SUBSTRING(distribuicao FROM 4 FOR 3) = 'Feb' 
+                THEN TO_DATE(concat(SUBSTRING(distribuicao FROM 1 FOR 2),'-02-', SUBSTRING(distribuicao FROM 8 FOR 4)), 'dd-MM-yyyy')
+        WHEN 
+            SUBSTRING(distribuicao FROM 4 FOR 3) = 'Mar' 
+                THEN TO_DATE(concat(SUBSTRING(distribuicao FROM 1 FOR 2),'-03-', SUBSTRING(distribuicao FROM 8 FOR 4)), 'dd-MM-yyyy')
+        WHEN 
+            SUBSTRING(distribuicao FROM 4 FOR 3) = 'Apr' 
+                THEN TO_DATE(concat(SUBSTRING(distribuicao FROM 1 FOR 2),'-04-', SUBSTRING(distribuicao FROM 8 FOR 4)), 'dd-MM-yyyy')
+        WHEN 
+            SUBSTRING(distribuicao FROM 4 FOR 3) = 'May' 
+                THEN TO_DATE(concat(SUBSTRING(distribuicao FROM 1 FOR 2),'-05-', SUBSTRING(distribuicao FROM 8 FOR 4)), 'dd-MM-yyyy')
+        WHEN 
+            SUBSTRING(distribuicao FROM 4 FOR 3) = 'Jun' 
+                THEN TO_DATE(concat(SUBSTRING(distribuicao FROM 1 FOR 2),'-06-', SUBSTRING(distribuicao FROM 8 FOR 4)), 'dd-MM-yyyy')
+        WHEN 
+            SUBSTRING(distribuicao FROM 4 FOR 3) = 'Jul' 
+                THEN TO_DATE(concat(SUBSTRING(distribuicao FROM 1 FOR 2),'-07-', SUBSTRING(distribuicao FROM 8 FOR 4)), 'dd-MM-yyyy')
+        WHEN 
+            SUBSTRING(distribuicao FROM 4 FOR 3) = 'Aug' 
+                THEN TO_DATE(concat(SUBSTRING(distribuicao FROM 1 FOR 2),'-08-', SUBSTRING(distribuicao FROM 8 FOR 4)), 'dd-MM-yyyy')
+        WHEN 
+            SUBSTRING(distribuicao FROM 4 FOR 3) = 'Sep' 
+                THEN TO_DATE(concat(SUBSTRING(distribuicao FROM 1 FOR 2),'-09-', SUBSTRING(distribuicao FROM 8 FOR 4)), 'dd-MM-yyyy')
+        WHEN 
+            SUBSTRING(distribuicao FROM 4 FOR 3) = 'Oct' 
+                THEN TO_DATE(concat(SUBSTRING(distribuicao FROM 1 FOR 2),'-10-', SUBSTRING(distribuicao FROM 8 FOR 4)), 'dd-MM-yyyy')
+        WHEN 
+            SUBSTRING(distribuicao FROM 4 FOR 3) = 'Nov' 
+                THEN TO_DATE(concat(SUBSTRING(distribuicao FROM 1 FOR 2),'-11-', SUBSTRING(distribuicao FROM 8 FOR 4)), 'dd-MM-yyyy')
+        WHEN 
+            SUBSTRING(distribuicao FROM 4 FOR 3) = 'Dec' 
+                THEN TO_DATE(concat(SUBSTRING(distribuicao FROM 1 FOR 2),'-12-', SUBSTRING(distribuicao FROM 8 FOR 4)), 'dd-MM-yyyy')
+        ELSE null
+    END AS distribuition,
     duracao_processual AS procedural_duration,
     duracao_processual_ate_sentenca AS procedural_duration_until_sentencing,
     ferias_13 AS vacations,
+    ferias_131 AS vacations_second_instance,
     gratificacao_cct AS cct_gratification,
+    gratificacao_cct1 AS cct_gratification_second_instance,
     honorarios_sucumbencia AS succumbence_fees,
+    honorarios_sucumbencia1 AS succumbence_fees_second_instance,
     hora_extra_8a44a AS overtime_8_44,
+    hora_extra_8a44a1 AS overtime_8_44_second_instance,
     hora_extra_intrajornada AS working_hours_overtime,
+    hora_extra_intrajornada1 AS working_hours_overtime_second_instance,
     hora_extra_noturna_reduzida AS reduced_nighttime_overtime,
+    hora_extra_noturna_reduzida1 AS reduced_nighttime_overtime_second_instance,
     CASE 
         WHEN houve_reversao_da_sentenca = 'Sim' THEN True
         ELSE False
     END AS is_sentence_reverted,
+    CASE 
+        WHEN houve_reversao_da_sentenca1 = 'Sim' THEN True
+        ELSE False
+    END AS is_sentence_reverted_second_instance,
     indenizacao_dano_material AS compensation_material_damage,
+    indenizacao_dano_material1 AS compensation_material_damage_second_instance,
     indenizacao_dano_moral AS compensation_moral_damage,
+    indenizacao_dano_moral1 AS compensation_moral_damage_second_instance,
     indenizacao_estabilidade_gestante AS compensation_pregnant_stability,
+    indenizacao_estabilidade_gestante1 AS compensation_pregnant_stability_second_instance,
     juiz AS judge,
-    labor_domingos_e_feriados_100 AS sunday_holliday_labor,
+    labor_domingos_e_feriados_100 AS sunday_holiday_labor,
+    labor_domingos_e_feriados_1001 AS sunday_holiday_labor_second_instance,
     multa_467_clt AS fine_467_clt,
+    multa_467_clt1 AS fine_467_clt_second_instance,
     multa_477_clt AS fine_477_clt,
+    multa_477_clt1 AS fine_477_clt_second_instance,
     multa_cct AS fine_cct,
+    multa_cct1 AS fine_cct_second_instance,
     processo AS judicial_process,
     reconhecimento_de_vinculo_empregaticio AS employment_relationship_recognition,
-    repeticao_descontos_indevidos AS undue_discounts_repeat,
+    reconhecimento_de_vinculo_empregaticio1 AS employment_relationship_recognition_second_instance,
+    repeticao_descontos_indevidos AS repeat_undue_discounts,
+    repeticao_descontos_indevidos1 AS repeat_undue_discounts_second_instance,
     responsabilidade_solidaria_ou_subsidiaria AS joint_or_subsidiary_liability,
+    responsabilidade_solidaria_ou_subsidiaria1 AS joint_or_subsidiary_liability_second_instance,
     retificacao_ctps AS ctps_retification,
+    retificacao_ctps1 AS ctps_retification_second_instance,
     rsr AS rsr,
+    rsr1 AS rsr_second_instance,
     salario_minimo_nos_meses_que_nao_houve_pagamento_de_comissoes AS minimum_wage_in_month_without_commissions_payment,
+    salario_minimo_nos_meses_que_nao_houve_pagamento_de_comissoes1 AS minimum_wage_in_month_without_commissions_payment_second_instance,
     status,
     segmento AS segment,
     sentenca AS verdict,
