@@ -1,6 +1,6 @@
 SELECT
     CAST(house_id AS BIGINT) AS id_house,
-    job_id_fl AS id_photo_job,
+    CAST(job_id_fl AS BIGINT) AS id_photo_job,
     analisado_por AS analyzed_by,
     user_sender_final AS final_user_sender,
     classificacao_final AS final_classification,
