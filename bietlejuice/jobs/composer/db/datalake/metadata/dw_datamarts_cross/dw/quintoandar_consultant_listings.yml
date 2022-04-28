@@ -9,10 +9,13 @@ columns:
   id_house:
     lineage:
       - datalake_big_agent.house.details
-      - datalake_ebdb_clean.house_aud.id_house
   sk_quintoandar_consultant:
     lineage:
       - datalake_big_agent.agent.details
+  mkt_origin_ciq:
+    lineage:
+      - dw_public.fact_house_listing_flows.mkt_origin
+      - dw_sale.fact_listing_flows.mkt_origin
   type_big_agent:
     lineage:
       - datalake_big_agent.program.name

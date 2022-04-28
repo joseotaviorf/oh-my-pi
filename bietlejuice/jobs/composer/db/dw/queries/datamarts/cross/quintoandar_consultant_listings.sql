@@ -34,7 +34,7 @@ base_tempo_rent AS (
         CASE 
             WHEN ts_status_start<=DATEADD('day',30,ts_publication) THEN DATEDIFF('day', ts_status_start, 
                 CASE 
-                    WHEN ts_status_end<= DATEADD('day',30,ts_publication) THEN 
+                    WHEN ts_status_end<= DATEADD('day',30,ts_publication) OR  ts_status_end IS NULL THEN 
                         CASE 
                             WHEN sk_status_end_date=-1 THEN GETDATE() 
                             ELSE ts_status_end 
@@ -52,9 +52,10 @@ base_tempo_rent AS (
 base_tempo_publicado_rent AS (
     SELECT 
         sk_house_listing,
+        ts_publication,
         SUM(tempo) AS tempo_publicado_for_rent
     FROM base_tempo_rent
-    GROUP BY 1
+    GROUP BY 1,2
 ), 
 
 base_tempo_sale AS (
@@ -65,7 +66,7 @@ base_tempo_sale AS (
         CASE 
             WHEN ts_status_started<=DATEADD('day',30,dd.date) THEN DATEDIFF('day', ts_status_started, 
                 CASE 
-                    WHEN ts_status_ended<= DATEADD('day',30,dd.date) THEN 
+                    WHEN ts_status_ended<= DATEADD('day',30,dd.date) OR ts_status_ended IS NULL THEN 
                         CASE 
                             WHEN sk_status_end_date=-1 THEN GETDATE() 
                             ELSE ts_status_ended 
@@ -83,9 +84,10 @@ base_tempo_sale AS (
 base_tempo_publicado_sale AS (
     SELECT 
         sk_sale_listing,
+        first_publication,
         SUM(tempo) AS tempo_publicado_for_sale
     FROM base_tempo_sale
-    GROUP BY 1
+    GROUP BY 1,2
 ),
 supply_sale AS (
     SELECT 
@@ -259,9 +261,13 @@ quintoandar_consultant_listings AS (
         qclu.type_big_agent,
         qclu.businesscontext,
         CASE 
-            WHEN btpr.tempo_publicado_for_rent>=15 AND btps.tempo_publicado_for_sale>=15 THEN 'hibrido'
-            WHEN btpr.tempo_publicado_for_rent>=15 AND (btps.tempo_publicado_for_sale<15 OR btps.tempo_publicado_for_sale IS NULL) THEN 'rent only'
-            WHEN (btpr.tempo_publicado_for_rent<15 OR btpr.tempo_publicado_for_rent IS NULL) AND btps.tempo_publicado_for_sale>=15 THEN 'sale only'
+            WHEN btpr.tempo_publicado_for_rent>=15 AND btps.tempo_publicado_for_sale>=15 AND DATE_TRUNC('MONTH',lcs.dt_sale)=DATE_TRUNC('MONTH',lcr.dt_rent) THEN 'hibrido'
+            WHEN btpr.tempo_publicado_for_rent>=15 AND btps.tempo_publicado_for_sale>=15 AND DATE_TRUNC('MONTH',lcs.dt_sale)>DATE_TRUNC('MONTH',lcr.dt_rent) THEN 'migrado para FS'
+            WHEN btpr.tempo_publicado_for_rent>=15 AND btps.tempo_publicado_for_sale>=15 AND DATE_TRUNC('MONTH',lcs.dt_sale)<DATE_TRUNC('MONTH',lcr.dt_rent) THEN 'migrado para FR'
+            WHEN btpr.tempo_publicado_for_rent>=15 AND btps.tempo_publicado_for_sale IS NULL THEN 'rent only'
+            WHEN btpr.tempo_publicado_for_rent IS NULL AND btps.tempo_publicado_for_sale>=15 THEN 'sale only'
+            WHEN btpr.tempo_publicado_for_rent>=15 AND btps.tempo_publicado_for_sale<15 THEN 'rent only - menos que 15 dias em sale'
+            WHEN btpr.tempo_publicado_for_rent<15 AND btps.tempo_publicado_for_sale>=15 THEN ' sale only - menos de 15 dias em rent'
             WHEN btpr.tempo_publicado_for_rent<15 AND btps.tempo_publicado_for_sale<15 THEN 'hibrido - menos de 15 dias publicado'
             WHEN btpr.tempo_publicado_for_rent IS NULL AND btps.tempo_publicado_for_sale IS NULL THEN 'aguardando publicacao'
             WHEN btpr.tempo_publicado_for_rent<15 AND btps.tempo_publicado_for_sale IS NULL THEN 'rent only - menos que 15 dias'
