@@ -1,2 +1,3 @@
+---
 database_name: datalake_casa_mineira_google_ads_raw
-table_name: ads_performance_report
+table_name: keywords_performance

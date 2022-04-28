@@ -987,10 +987,10 @@ bietlejuice.enrich_buyer_prospect:
 bietlejuice.enrich_casa_mineira_consolidated_marketing_metrics:
   - bietlejuice.casa_mineira_criteo_campaigns:load-clean-criteo-campaigns
   - bietlejuice.casa_mineira_facebook_insights:load-clean-facebook-insights
-  - bietlejuice.casa_mineira_google_ads:load-clean-ads-performance-report
-  - bietlejuice.casa_mineira_google_ads:load-clean-campaigns-performance-report
-  - bietlejuice.casa_mineira_google_ads:load-clean-keywords-performance-report
-  - bietlejuice.casa_mineira_google_ads:load-clean-videos-performance-report
+  - bietlejuice.casa_mineira_google_ads:load-clean-ads-performance
+  - bietlejuice.casa_mineira_google_ads:load-clean-campaigns-performance
+  - bietlejuice.casa_mineira_google_ads:load-clean-keywords-performance
+  - bietlejuice.casa_mineira_google_ads:load-clean-videos-performance
   - bietlejuice.casa_mineira_lifull_campaigns:load-clean-mitula-campaigns
   - bietlejuice.casa_mineira_lifull_campaigns:load-clean-trovit-campaigns
   - bietlejuice.casa_mineira_rtb_campaigns:load-clean-rtb-campaigns

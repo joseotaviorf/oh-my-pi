@@ -5,7 +5,7 @@ WITH campaign_reports AS (
         ad_group_name,
         report_type
     FROM
-        datalake_casa_mineira_google_ads_clean.ads_performance_report
+        datalake_casa_mineira_google_ads_clean.ads_performance
     WHERE
         dt_loaded = DATE('{year}-{month}-{day}')
 
@@ -17,7 +17,7 @@ WITH campaign_reports AS (
         ad_group_name,
         report_type
     FROM
-        datalake_casa_mineira_google_ads_clean.keywords_performance_report
+        datalake_casa_mineira_google_ads_clean.keywords_performance
     WHERE
         dt_loaded = DATE('{year}-{month}-{day}')
 
@@ -29,7 +29,7 @@ WITH campaign_reports AS (
         NULL AS ad_group_name,
         report_type
     FROM
-        datalake_casa_mineira_google_ads_clean.campaigns_performance_report
+        datalake_casa_mineira_google_ads_clean.campaigns_performance
     WHERE
         dt_loaded = DATE('{year}-{month}-{day}')
 
@@ -41,7 +41,7 @@ WITH campaign_reports AS (
         ad_group_name,
         report_type
     FROM
-        datalake_casa_mineira_google_ads_clean.videos_performance_report
+        datalake_casa_mineira_google_ads_clean.videos_performance
     WHERE
         dt_loaded = DATE('{year}-{month}-{day}')
 ),
@@ -94,7 +94,7 @@ keywords_metrics AS (
         SUM(impressions) AS impressions,
         SUM(clicks) AS clicks
     FROM
-        datalake_casa_mineira_google_ads_clean.keywords_performance_report gkpr
+        datalake_casa_mineira_google_ads_clean.keywords_performance gkpr
     JOIN
         report_type_mapping rtm
             ON rtm.campaign_name = gkpr.campaign_name
@@ -145,7 +145,7 @@ ads_metrics AS (
         SUM(impressions) AS impressions,
         SUM(clicks) AS clicks
     FROM
-        datalake_casa_mineira_google_ads_clean.ads_performance_report gapr
+        datalake_casa_mineira_google_ads_clean.ads_performance gapr
     JOIN
         report_type_mapping rtm
             ON rtm.campaign_name = gapr.campaign_name
@@ -182,7 +182,7 @@ campaigns_metrics AS (
         SUM(impressions) AS impressions,
         SUM(clicks) AS clicks
     FROM
-        datalake_casa_mineira_google_ads_clean.campaigns_performance_report gcpr
+        datalake_casa_mineira_google_ads_clean.campaigns_performance gcpr
     JOIN
         report_type_mapping rtm
             ON rtm.campaign_name = gcpr.campaign_name
@@ -215,7 +215,7 @@ videos_metrics AS (
         SUM(impressions) AS impressions,
         SUM(clicks) AS clicks
     FROM
-        datalake_casa_mineira_google_ads_clean.videos_performance_report gvpr
+        datalake_casa_mineira_google_ads_clean.videos_performance gvpr
     JOIN
         report_type_mapping rtm
             ON rtm.campaign_name = gvpr.campaign_name
