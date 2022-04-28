@@ -1,5 +1,5 @@
 SELECT
-    sk_inspector,
+    CAST(sk_inspector AS BIGINT) AS id_inspector,
     agenda_type,
     beneficiary_document,
     beneficiary_name,
