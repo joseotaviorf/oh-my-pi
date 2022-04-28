@@ -1,0 +1,55 @@
+---
+database_name: datalake_google_ads_clean
+table_name: keywords_performance
+columns:
+  id_keyword:
+    lineage:
+      - datalake_google_ads_raw.keywords_performance.adGroupCriterion
+  id_external_customer:
+    lineage:
+      - datalake_google_ads_raw.keywords_performance.customer
+  id_ad_group:
+    lineage:
+      - datalake_google_ads_raw.keywords_performance.adGroup
+  id_campaign:
+    lineage:
+      - datalake_google_ads_raw.keywords_performance.campaign
+  campaign_name:
+    lineage:
+      - datalake_google_ads_raw.keywords_performance.campaign
+  ad_group_name:
+    lineage:
+      - datalake_google_ads_raw.keywords_performance.adGroup
+  clicks:
+    lineage:
+      - datalake_google_ads_raw.keywords_performance.adGroup
+  cost:
+    lineage:
+      - datalake_google_ads_raw.keywords_performance.metrics
+  device:
+    lineage:
+      - datalake_google_ads_raw.keywords_performance.segments
+  impressions:
+    lineage:
+      - datalake_google_ads_raw.keywords_performance.metrics
+  match_type:
+    lineage:
+      - datalake_google_ads_raw.keywords_performance.adGroupCriterion
+  criteria:
+    lineage:
+      - datalake_google_ads_raw.keywords_performance.adGroupCriterion
+  account_descriptive_name:
+    lineage:
+      - datalake_google_ads_raw.keywords_performance.customer
+  account_snake_case:
+    lineage:
+      - datalake_google_ads_raw.keywords_performance.account_snake_case
+  report_type:
+    lineage:
+      - datalake_google_ads_raw.keywords_performance.report_type
+  dt_loaded:
+    lineage:
+      - datalake_google_ads_raw.keywords_performance.segments
+  dt_created:
+    lineage:
+      - datalake_google_ads_raw.keywords_performance.dt_created

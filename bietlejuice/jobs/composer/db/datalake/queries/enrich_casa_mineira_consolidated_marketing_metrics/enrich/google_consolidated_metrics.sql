@@ -83,11 +83,11 @@ keywords_metrics AS (
         NULL AS utm_content,
         gkpr.campaign_name AS utm_campaign,
         SUM(CASE
-            WHEN device = 'Computers' THEN cost/1000000
+            WHEN device = 'DESKTOP' THEN cost/1000000
             ELSE 0
         END) AS desktop_cost,
         SUM(CASE
-            WHEN device IN ('Mobile devices with full browsers', 'Tablets with full browsers') THEN cost/1000000
+            WHEN device IN ('MOBILE', 'TABLET') THEN cost/1000000
             ELSE 0
         END) AS mobile_cost,
         SUM(cost/1000000) AS total_cost,
@@ -106,6 +106,23 @@ keywords_metrics AS (
         1,2,3,4,5,6,7,8
 ),
 
+-- TEMPORARY CTE UNTIL THIS GSHEETS IS UDPATED
+ad_type_flags AS (
+    SELECT
+        flag,
+        report_type,
+        CASE
+            WHEN ad_type = 'Responsive search ad' THEN 'RESPONSIVE_SEARCH_AD'
+            WHEN ad_type = 'Expanded dynamic search ad' THEN 'EXPANDED_DYNAMIC_SEARCH_AD'
+            WHEN ad_type = 'Responsive display ad' THEN 'RESPONSIVE_DISPLAY_AD'
+            WHEN ad_type = 'Gmail ad' THEN 'GMAIL_AD'
+            WHEN ad_type = 'Call only ad' THEN 'CALL_AD'
+            WHEN ad_type = 'Image ad' THEN 'IMAGE_AD'
+            ELSE ad_type
+        END AS ad_type
+    FROM datalake_gsheets_clean.marketing_costs_google_ad_type_flags
+),
+
 ads_metrics AS (
     SELECT
         INT(REPLACE(gapr.dt_loaded, '-', '')) AS id_date,
@@ -117,11 +134,11 @@ ads_metrics AS (
         STRING(id_ad) AS utm_content,
         gapr.campaign_name AS utm_campaign,
         SUM(CASE
-            WHEN device = 'Computers' THEN cost/1000000
+            WHEN device = 'DESKTOP' THEN cost/1000000
             ELSE 0
         END) AS desktop_cost,
         SUM(CASE
-            WHEN device IN ('Mobile devices with full browsers', 'Tablets with full browsers') THEN cost/1000000
+            WHEN device IN ('MOBILE', 'TABLET') THEN cost/1000000
             ELSE 0
         END) AS mobile_cost,
         SUM(cost/1000000) AS total_cost,
@@ -135,7 +152,7 @@ ads_metrics AS (
             AND rtm.ad_group_name = gapr.ad_group_name
             AND rtm.report_type = 'AD_PERFORMANCE_REPORT'
     LEFT JOIN
-        datalake_gsheets_clean.marketing_costs_google_ad_type_flags ad_types
+        ad_type_flags ad_types
             ON ad_types.ad_type = gapr.ad_type
     WHERE
         dt_loaded = DATE('{year}-{month}-{day}')
@@ -154,11 +171,11 @@ campaigns_metrics AS (
         NULL AS utm_content,
         gcpr.campaign_name AS utm_campaign,
         SUM(CASE
-            WHEN device = 'Computers' THEN cost/1000000
+            WHEN device = 'DESKTOP' THEN cost/1000000
             ELSE 0
         END) AS desktop_cost,
         SUM(CASE
-            WHEN device IN ('Mobile devices with full browsers', 'Tablets with full browsers') THEN cost/1000000
+            WHEN device IN ('MOBILE', 'TABLET') THEN cost/1000000
             ELSE 0
         END) AS mobile_cost,
         SUM(cost/1000000) AS total_cost,
@@ -187,11 +204,11 @@ videos_metrics AS (
         NULL AS utm_content,
         gvpr.campaign_name AS utm_campaign,
         SUM(CASE
-            WHEN device = 'Computers' THEN cost/1000000
+            WHEN device = 'DESKTOP' THEN cost/1000000
             ELSE 0
         END) AS desktop_cost,
         SUM(CASE
-            WHEN device IN ('Mobile devices with full browsers', 'Tablets with full browsers') THEN cost/1000000
+            WHEN device IN ('MOBILE', 'TABLET') THEN cost/1000000
             ELSE 0
         END) AS mobile_cost,
         SUM(cost/1000000) AS total_cost,

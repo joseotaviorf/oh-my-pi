@@ -1,0 +1,3 @@
+---
+database_name: datalake_google_ads_raw
+table_name: ads_performance

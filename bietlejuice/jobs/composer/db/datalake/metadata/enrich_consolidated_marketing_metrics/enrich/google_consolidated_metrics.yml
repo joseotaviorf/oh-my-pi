@@ -4,69 +4,69 @@ table_name: google_consolidated_metrics
 columns:
   id_date:
     lineage:
-      - datalake_google_ads_clean.ads_performance_report.dt_loaded
-      - datalake_google_ads_clean.campaigns_performance_report.dt_loaded
-      - datalake_google_ads_clean.keywords_performance_report.dt_loaded
-      - datalake_google_ads_clean.videos_performance_report.dt_loaded
+      - datalake_google_ads_clean.ads_performance.dt_loaded
+      - datalake_google_ads_clean.campaigns_performance.dt_loaded
+      - datalake_google_ads_clean.keywords_performance.dt_loaded
+      - datalake_google_ads_clean.videos_performance.dt_loaded
   campaign_name:
     lineage:
-      - datalake_google_ads_clean.ads_performance_report.campaign_name
-      - datalake_google_ads_clean.campaigns_performance_report.campaign_name
-      - datalake_google_ads_clean.keywords_performance_report.campaign_name
-      - datalake_google_ads_clean.videos_performance_report.campaign_name
+      - datalake_google_ads_clean.ads_performance.campaign_name
+      - datalake_google_ads_clean.campaigns_performance.campaign_name
+      - datalake_google_ads_clean.keywords_performance.campaign_name
+      - datalake_google_ads_clean.videos_performance.campaign_name
   account_name:
     lineage:
-      - datalake_google_ads_clean.ads_performance_report.account_descriptive_name
-      - datalake_google_ads_clean.campaigns_performance_report.account_descriptive_name
-      - datalake_google_ads_clean.keywords_performance_report.account_descriptive_name
-      - datalake_google_ads_clean.videos_performance_report.account_descriptive_name
+      - datalake_google_ads_clean.ads_performance.account_descriptive_name
+      - datalake_google_ads_clean.campaigns_performance.account_descriptive_name
+      - datalake_google_ads_clean.keywords_performance.account_descriptive_name
+      - datalake_google_ads_clean.videos_performance.account_descriptive_name
   report_type:
     lineage:
-      - datalake_google_ads_clean.ads_performance_report.report_type
-      - datalake_google_ads_clean.campaigns_performance_report.report_type
-      - datalake_google_ads_clean.keywords_performance_report.report_type
-      - datalake_google_ads_clean.videos_performance_report.report_type
+      - datalake_google_ads_clean.ads_performance.report_type
+      - datalake_google_ads_clean.campaigns_performance.report_type
+      - datalake_google_ads_clean.keywords_performance.report_type
+      - datalake_google_ads_clean.videos_performance.report_type
   ad_type:
     lineage:
       - datalake_gsheets_clean.marketing_costs_google_ad_type_flags.flag
   utm_term:
     lineage:
-      - datalake_google_ads_clean.ads_performance_report.ad_group_name
-      - datalake_google_ads_clean.keywords_performance_report.criteria
-      - datalake_google_ads_clean.keywords_performance_report.match_type
+      - datalake_google_ads_clean.ads_performance.ad_group_name
+      - datalake_google_ads_clean.keywords_performance.criteria
+      - datalake_google_ads_clean.keywords_performance.match_type
   utm_content:
     lineage:
-      - datalake_google_ads_clean.ads_performance_report.id_ad
+      - datalake_google_ads_clean.ads_performance.id_ad
   utm_campaign:
     lineage:
-      - datalake_google_ads_clean.ads_performance_report.campaign_name
+      - datalake_google_ads_clean.ads_performance.campaign_name
   desktop_cost:
     lineage:
-      - datalake_google_ads_clean.ads_performance_report.cost
-      - datalake_google_ads_clean.campaigns_performance_report.cost
-      - datalake_google_ads_clean.keywords_performance_report.cost
-      - datalake_google_ads_clean.videos_performance_report.cost
+      - datalake_google_ads_clean.ads_performance.cost
+      - datalake_google_ads_clean.campaigns_performance.cost
+      - datalake_google_ads_clean.keywords_performance.cost
+      - datalake_google_ads_clean.videos_performance.cost
   mobile_cost:
     lineage:
-      - datalake_google_ads_clean.ads_performance_report.cost
-      - datalake_google_ads_clean.campaigns_performance_report.cost
-      - datalake_google_ads_clean.keywords_performance_report.cost
-      - datalake_google_ads_clean.videos_performance_report.cost
+      - datalake_google_ads_clean.ads_performance.cost
+      - datalake_google_ads_clean.campaigns_performance.cost
+      - datalake_google_ads_clean.keywords_performance.cost
+      - datalake_google_ads_clean.videos_performance.cost
   total_cost:
     lineage:
-      - datalake_google_ads_clean.ads_performance_report.cost
-      - datalake_google_ads_clean.campaigns_performance_report.cost
-      - datalake_google_ads_clean.keywords_performance_report.cost
-      - datalake_google_ads_clean.videos_performance_report.cost
+      - datalake_google_ads_clean.ads_performance.cost
+      - datalake_google_ads_clean.campaigns_performance.cost
+      - datalake_google_ads_clean.keywords_performance.cost
+      - datalake_google_ads_clean.videos_performance.cost
   impressions:
     lineage:
-      - datalake_google_ads_clean.ads_performance_report.impressions
-      - datalake_google_ads_clean.campaigns_performance_report.impressions
-      - datalake_google_ads_clean.keywords_performance_report.impressions
-      - datalake_google_ads_clean.videos_performance_report.impressions
+      - datalake_google_ads_clean.ads_performance.impressions
+      - datalake_google_ads_clean.campaigns_performance.impressions
+      - datalake_google_ads_clean.keywords_performance.impressions
+      - datalake_google_ads_clean.videos_performance.impressions
   clicks:
     lineage:
-      - datalake_google_ads_clean.ads_performance_report.clicks
-      - datalake_google_ads_clean.campaigns_performance_report.clicks
-      - datalake_google_ads_clean.keywords_performance_report.clicks
-      - datalake_google_ads_clean.videos_performance_report.clicks
+      - datalake_google_ads_clean.ads_performance.clicks
+      - datalake_google_ads_clean.campaigns_performance.clicks
+      - datalake_google_ads_clean.keywords_performance.clicks
+      - datalake_google_ads_clean.videos_performance.clicks

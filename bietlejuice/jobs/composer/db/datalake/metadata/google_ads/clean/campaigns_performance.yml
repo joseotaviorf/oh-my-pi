@@ -1,0 +1,52 @@
+---
+database_name: datalake_google_ads_clean
+table_name: campaigns_performance
+columns:
+  id_external_customer:
+    lineage:
+      - datalake_google_ads_raw.campaigns_performance.customer
+  id_campaign:
+    lineage:
+      - datalake_google_ads_raw.campaigns_performance.campaign
+  campaign_name:
+    lineage:
+      - datalake_google_ads_raw.campaigns_performance.campaign
+  clicks:
+    lineage:
+      - datalake_google_ads_raw.campaigns_performance.metrics
+  cost:
+    lineage:
+      - datalake_google_ads_raw.campaigns_performance.metrics
+  month:
+    lineage:
+      - datalake_google_ads_raw.campaigns_performance.segments
+  week:
+    lineage:
+      - datalake_google_ads_raw.campaigns_performance.segments
+  year:
+    lineage:
+      - datalake_google_ads_raw.campaigns_performance.segments
+  device:
+    lineage:
+      - datalake_google_ads_raw.campaigns_performance.segments
+  impressions:
+    lineage:
+      - datalake_google_ads_raw.campaigns_performance.metrics
+  account_descriptive_name:
+    lineage:
+      - datalake_google_ads_raw.campaigns_performance.customer
+  labels:
+    lineage:
+      - datalake_google_ads_raw.campaigns_performance.campaign
+  report_type:
+    lineage:
+      - datalake_google_ads_raw.campaigns_performance.report_type
+  account_snake_case:
+    lineage:
+      - datalake_google_ads_raw.campaigns_performance.account_snake_case
+  dt_loaded:
+    lineage:
+      - datalake_google_ads_raw.campaigns_performance.segments
+  dt_created:
+    lineage:
+      - datalake_google_ads_raw.campaigns_performance.dt_created

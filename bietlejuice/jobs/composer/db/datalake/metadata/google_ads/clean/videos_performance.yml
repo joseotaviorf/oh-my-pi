@@ -1,0 +1,49 @@
+---
+database_name: datalake_google_ads_clean
+table_name: videos_performance
+columns:
+  id_external_customer:
+    lineage:
+      - datalake_google_ads_raw.videos_performance.customer
+  id_video:
+    lineage:
+      - datalake_google_ads_raw.videos_performance.video
+  id_ad_group:
+    lineage:
+      - datalake_google_ads_raw.videos_performance.adGroup
+  id_campaign:
+    lineage:
+      - datalake_google_ads_raw.videos_performance.campaign
+  ad_group_name:
+    lineage:
+      - datalake_google_ads_raw.videos_performance.adGroup
+  campaign_name:
+    lineage:
+      - datalake_google_ads_raw.videos_performance.campaign
+  clicks:
+    lineage:
+      - datalake_google_ads_raw.videos_performance.metrics
+  cost:
+    lineage:
+      - datalake_google_ads_raw.videos_performance.metrics
+  device:
+    lineage:
+      - datalake_google_ads_raw.videos_performance.segments
+  impressions:
+    lineage:
+      - datalake_google_ads_raw.videos_performance.metrics
+  account_descriptive_name:
+    lineage:
+      - datalake_google_ads_raw.videos_performance.customer
+  account_snake_case:
+    lineage:
+      - datalake_google_ads_raw.videos_performance.account_snake_case
+  report_type:
+    lineage:
+      - datalake_google_ads_raw.videos_performance.report_type
+  dt_loaded:
+    lineage:
+      - datalake_google_ads_raw.videos_performance.segments
+  dt_created:
+    lineage:
+      - datalake_google_ads_raw.videos_performance.dt_created
