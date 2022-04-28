@@ -607,11 +607,11 @@ bietlejuice.dw_crm:
 bietlejuice.dw_keys_tracking:
   - bietlejuice.enrich_ebdb_listing:load-enrich-agents-with-keys
 
-bietlejuice.dw_lead_tracking:
+# bietlejuice.dw_lead_tracking:
   # - bietlejuice.autodialer:load-clean-task-references
   # - bietlejuice.autodialer:load-clean-task-reference-inbound-event-histories
-  - bietlejuice.ebdb:create-clean-lead-in-data-lake
-  - bietlejuice.enrich_crm:load-enrich-tasks
+  # - bietlejuice.ebdb:create-clean-lead-in-data-lake
+  # - bietlejuice.enrich_crm:load-enrich-tasks
 
 bietlejuice.dw_lead:
   - bietlejuice.enrich_lead:load-enrich-lead
