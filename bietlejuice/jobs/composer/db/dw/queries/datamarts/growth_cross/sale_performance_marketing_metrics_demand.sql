@@ -297,7 +297,7 @@ targets AS (
         NULL::TIMESTAMP AS ts_status_end,
         bp.city_group,
         NULL::TEXT AS flow_event,
-        'Tenants PWA' AS mkt_origin,
+        bp.mkt_origin,
         bp.mkt_channel,
         bp.mkt_medium,
         bp.mkt_source,
