@@ -73,7 +73,6 @@ This pipeline produces the following output tables:
     - `deduplicate_batch_listings_forsale`
     - `demand_channel_share`
     - `demand_retention_ab_tests`
-    - `demand_targets_2021`
     - `demand_targets_replanning`
     - `department_control`
     - `department_schedule`
@@ -202,7 +201,6 @@ This pipeline produces the following output tables:
     - `tqc_leads`
     - `tqc_registered_agents`
     - `tracking_catalog_event_properties`
-    - `tracking_catalog_projects`
     - `tv_ads`
     - `unit_economics_amortization_curve`
     - `visits_fup_history`

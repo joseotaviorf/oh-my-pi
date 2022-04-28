@@ -21,9 +21,13 @@ This pipeline produces the following output tables:
 
 1. Data lake raw:
     - `carteira_ciq`
+    - `events_aud`
     - `user_properties`
+    - `tracking_catalog_projects`
 2. Data lake clean:
     - `ciq_wallet`
+    - `tracking_catalog_events_aud`
     - `tracking_catalog_user_properties`
+    - `tracking_catalog_projects`
 
 </details>

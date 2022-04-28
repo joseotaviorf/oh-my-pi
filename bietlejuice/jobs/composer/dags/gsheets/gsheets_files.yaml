@@ -878,11 +878,6 @@ tracking_catalog_event_properties:
     sheet_name: event_properties
     clean_table_name: tracking_catalog_event_properties
 
-tracking_catalog_projects:
-    sheet_id: 1vczbGi8fyT1AhuCkejL9xROs3d-87WToqUYBMAtoAKU
-    sheet_name: projects
-    clean_table_name: tracking_catalog_projects
-
 tv_ads:
     sheet_id: 1HEbApdK1ydVMbAPzmdmN5b850aCVVRhUyjLZp6Ny4kE
     sheet_name: base_clean
