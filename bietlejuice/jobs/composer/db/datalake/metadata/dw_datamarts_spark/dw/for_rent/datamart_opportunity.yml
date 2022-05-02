@@ -1,0 +1,31 @@
+---
+database_name: dw_datamarts
+table_name: datamart_opportunity
+columns:
+  sk_house_listing:
+    lineage:
+      - dw_public.fact_house_listing_flows.sk_house_listing
+  sk_opportunity_date:
+    lineage:
+      - dw_public.fact_house_listing_flows.sk_opportunity_date
+  sk_first_listing_date:
+    lineage:
+      - dw_public.fact_house_listing_flows.sk_first_listing_date
+  sk_region:
+    lineage:
+      - dw_public.fact_house_listing_flows.sk_region
+  sk_lead:
+    lineage:
+      - dw_public.fact_house_listing_flows.sk_lead
+  sk_first_photo_job:
+    lineage:
+      - dw_public.dim_photo_job.sk_photo_job
+  sk_last_photo_job:
+    lineage:
+      - dw_public.fact_house_listing_flows.sk_first_photo_job
+  creation_origin:
+    lineage:
+      - dw_public.dim_photo_job.creation_origin
+  days_opportunity_to_listing:
+    lineage:
+      - dw_public.fact_house_listing_flows.days_opportunity_to_listing

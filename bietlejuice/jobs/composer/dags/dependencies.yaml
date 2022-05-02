@@ -526,6 +526,11 @@ bietlejuice.dw_customer_support:
   - bietlejuice.gsheets.support_and_service:load-clean-support-agents-department
   - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
 
+bietlejuice.dw_datamarts_spark.for_rent:
+  - bietlejuice.dw_lead:load-dw-public-dim-lead
+  - bietlejuice.dw_listing_jobs:load-dw-public-dim-photo-job
+  - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows
+
 bietlejuice.dw_datamarts_spark.for_sale:
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings

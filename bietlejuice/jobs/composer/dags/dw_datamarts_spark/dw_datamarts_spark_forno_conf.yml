@@ -10,5 +10,7 @@
 #       # Eg: Data ForSale
 
 dags:
+  for_rent:
+    owner: Data ForRent
   for_sale:
     owner: Data ForSale
