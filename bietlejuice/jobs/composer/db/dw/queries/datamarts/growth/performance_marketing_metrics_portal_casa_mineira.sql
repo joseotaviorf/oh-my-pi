@@ -228,32 +228,25 @@ targets AS (
     WHERE dt_target BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND DATE_ADD('DAY', -1, CURRENT_DATE)
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22
 ),
-info_budget AS (
-    SELECT  
-        b.id_real_estate_agency::INT,
-        b.ts_created,
-        r.ts_disabled,
-        b.budget_value,
-        r.real_estate_agency_name,
-        uf.uf_initials,
-        ct.city_name,
-        LEAD(b.ts_created) OVER(PARTITION BY b.id_real_estate_agency ORDER BY b.ts_created) AS ts_next_change
-    FROM datalake_casa_mineira_portal_clean_prod.real_estate_agency_budget b
-        JOIN datalake_casa_mineira_portal_clean_prod.real_estate_agency r
-            ON r.id=b.id_real_estate_agency
-        LEFT JOIN datalake_casa_mineira_portal_clean_prod.city AS ct
-            ON r.id_city = ct.id
-        LEFT JOIN datalake_casa_mineira_portal_clean_prod.uf AS uf
-            ON ct.id_uf = uf.id
+aux_budget AS (
+    SELECT
+        dt_month_started AS dt_budget,
+        sk_real_estate_agency AS advertiser_id,
+        month_budget,
+        LEAD(dt_month_started) OVER(PARTITION BY sk_real_estate_agency ORDER BY dt_month_started) AS dt_next_change
+    FROM casa_mineira_portal.fact_real_estate_budget_flows
 ),
 budget as (
     SELECT
-        date AS dt,
-        id_real_estate_agency AS id_advertiser,
-        real_estate_agency_name AS advertiser,
-        uf_initials AS uf_advertiser,
-        city_name AS city_advertiser,
-        NULL::TEXT AS type_advertiser,
+        dd.date AS dt,
+        ab.advertiser_id AS id_advertiser,
+        dre.real_estate_agency_name AS advertiser,
+        dre.uf AS uf_advertiser,
+        dre.city AS city_advertiser,
+        CASE WHEN advertiser_id = 1 THEN 'CM'
+            WHEN advertiser_id = 164 THEN '5A'
+            ELSE 'Client'
+        END AS type_advertiser,
         NULL::TEXT AS business_context,
         NULL::TEXT AS uf_listing,
         NULL::TEXT AS city_listing,
@@ -261,7 +254,10 @@ budget as (
         NULL::TEXT AS mkt_channel,
         NULL::TEXT AS mkt_medium,
         NULL::TEXT AS mkt_source,
-        'portal' AS mkt_business,
+        CASE
+            WHEN advertiser_id = 1 THEN 'imobiliaria'
+            ELSE 'portal'
+        END AS mkt_business,
         NULL::TEXT AS city_group,
         NULL::TEXT AS utm_campaign,
         NULL::TEXT AS campaign_name,
@@ -270,13 +266,17 @@ budget as (
         NULL::TEXT AS id_house,
         NULL::TEXT AS id_prospect,
         NULL::TEXT AS contact_flow,
-        budget_value / (DATE_DIFF('DAY', month_start, month_end) + 1)::FLOAT AS budget_advertiser,
+        month_budget / (DATE_DIFF('DAY', dd.month_start, dd.month_end) + 1)::FLOAT AS budget_advertiser,
         NULL::FLOAT AS cost,
         NULL::FLOAT AS budget,
         NULL::FLOAT AS contact_flow_target
-    FROM info_budget b
-        JOIN dim_date
-            ON date BETWEEN ts_created::DATE AND COALESCE(ts_next_change::DATE, ts_disabled::DATE, CURRENT_DATE) - 1
+    FROM aux_budget AS ab
+    JOIN dim_date AS dd
+        ON dd.date BETWEEN dt_budget AND COALESCE(dt_next_change, CURRENT_DATE) - 1
+    LEFT JOIN casa_mineira_portal.dim_real_estate_agency AS dre
+        ON dre.sk_real_estate_agency = ab.advertiser_id
+    WHERE
+        month_budget IS NOT NULL
 )
 ---------------------------------------------------------
 -- UNION Costs, Results, Targets and Advertiser Budget --

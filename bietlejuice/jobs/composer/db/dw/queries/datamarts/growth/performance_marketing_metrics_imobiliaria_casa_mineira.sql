@@ -78,7 +78,7 @@ taxonomy_crm AS (
 ---------------------------------
 -- Query Events from Amplitude --
 ---------------------------------
-events AS (
+info_events AS (
     SELECT
         ts_event,
         JSON_EXTRACT_PATH_TEXT(event_properties, 'email_md5') AS email_md5,
@@ -92,12 +92,31 @@ events AS (
               THEN 'Branded'
             ELSE 'Outro'
         END AS branded,
-        JSON_EXTRACT_PATH_TEXT(user_properties , 'platform') AS app_type
+        JSON_EXTRACT_PATH_TEXT(user_properties , 'platform') AS app_type,
+        ROW_NUMBER() OVER(PARTITION BY JSON_EXTRACT_PATH_TEXT(event_properties, 'email_md5'), JSON_EXTRACT_PATH_TEXT(event_properties, 'house_id') ORDER BY ts_event) AS rn
     FROM
         datalake_casa_mineira_amplitude_clean_prod."329001_portal"
     WHERE
         event_type = 'receive_information_clicked'
         AND DATE(ts_event) BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND CURRENT_DATE
+),
+------------------------------------------------------
+-- Filter the first contact flow cohort from events --
+------------------------------------------------------
+events AS (
+    SELECT
+        ts_event,
+        email_md5,
+        id_house,
+        utm_source,
+        utm_medium,
+        utm_campaign,
+        branded,
+        app_type
+    FROM
+        info_events
+    WHERE
+        rn=1
 ),
 ----------------------------------------------------------------
 -- Query Contacts from the raw data Casa Mineira Portal Clean --
@@ -160,7 +179,7 @@ contacts as (
         id_flow,
         order_new_contact_flow
     FROM info_contact
-        WHERE id_origin != '18' AND id_origin::INT < 21
+        WHERE id_origin NOT IN ('12', '18', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32') AND id_origin::INT < 34
         AND DATE(date_add('hour', 3, ts_created)) BETWEEN DATE_ADD('YEAR', -1, CURRENT_DATE) AND DATE_ADD('DAY', -1, CURRENT_DATE)
 ),
 -----------------------------------------------------------------------------------------------------------

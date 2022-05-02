@@ -4,14 +4,14 @@ table_name: performance_marketing_metrics_portal_casa_mineira
 columns:
   dt:
     lineage:
-      - datalake_casa_mineira_marketing_costs.daily_costs.id_date
+      - datalake_casa_mineira_marketing_costs.daily_costs.dt
+      - datalake_casa_mineira_portal_clean.contact.ts_created
       - datalake_gsheets_clean.targets_portal_casa_mineira_cost_cf.dt_target
       - dw_public.dim_date.date
-      - datalake_casa_mineira_portal_clean.contact.ts_created
   id_advertiser:
     lineage:
-      - datalake_casa_mineira_portal_clean.real_estate_agency_budget.id_real_estate_agency
       - datalake_casa_mineira_portal_clean.real_estate_agency.id
+      - datalake_casa_mineira_portal_clean.real_estate_agency_budget.id_real_estate_agency
   advertiser:
     lineage:
       - datalake_casa_mineira_portal_clean.real_estate_agency.real_estate_agency_name
@@ -38,13 +38,13 @@ columns:
   mkt_medium:
     lineage:
       - datalake_casa_mineira_marketing_costs.daily_costs.mkt_medium
-      - datalake_gsheets_clean.targets_portal_casa_mineira_cost_cf.mkt_medium
       - datalake_gsheets_clean.taxonomy_portal_casa_mineira.mkt_medium
+      - datalake_gsheets_clean.targets_portal_casa_mineira_cost_cf.mkt_medium
   mkt_source:
     lineage:
       - datalake_casa_mineira_marketing_costs.daily_costs.mkt_source
-      - datalake_gsheets_clean.targets_portal_casa_mineira_cost_cf.mkt_source
       - datalake_gsheets_clean.taxonomy_portal_casa_mineira.mkt_source
+      - datalake_gsheets_clean.targets_portal_casa_mineira_cost_cf.mkt_source
   mkt_business:
     lineage:
       - datalake_casa_mineira_marketing_costs.daily_costs.funnel_side
@@ -52,15 +52,16 @@ columns:
     lineage:
       - datalake_casa_mineira_marketing_costs.daily_costs.city_group
       - datalake_casa_mineira_portal_clean.city.city_name
-  utm_campaign:
-    lineage:
-      - datalake_casa_mineira_amplitude_clean.329001_portal.event_properties
   campaign_name:
     lineage:
       - datalake_casa_mineira_marketing_costs.daily_costs.campaign_name
   id_house:
     lineage:
       - datalake_casa_mineira_portal_clean.contact.id_house
+  id_prospect:
+    lineage:
+      - datalake_casa_mineira_portal_clean.contact.email
   contact_flow:
     lineage:
       - datalake_casa_mineira_portal_clean.contact.id_house
+      - datalake_casa_mineira_portal_clean.contact.email

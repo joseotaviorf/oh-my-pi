@@ -4,12 +4,37 @@ table_name: casa_mineira_top_of_funnel_volumes_monthly
 columns:
   month_start:
     lineage:
-      - datalake_top_of_funnel_portal_cm.top_of_funnel_users_portal_casa_mineira.dt_event
-      - dw_datamarts_growth.portal_casa_mineira_advertiser_metrics.date
-      - dw_datamarts_growth.performance_marketing_metrics_portal_casa_mineira.dt
-      - datalake_gsheets_clean.targets_portal_casa_mineira_cost_cf.dt_target
-      - dw_datamarts_growth.performance_marketing_metrics_imobiliaria_casa_mineira.dt
       - datalake_gsheets_clean.targets_casa_mineira_tof_monthly.month_target
+      - datalake_gsheets_clean.targets_portal_casa_mineira_cost_cf.dt_target
+      - datalake_top_of_funnel_portal_cm.top_of_funnel_users_portal_casa_mineira.dt_event
+      - dw_datamarts_growth.performance_marketing_metrics_imobiliaria_casa_mineira.dt
+      - dw_casa_mineira_portal.fact_real_estate_budget_flows.dt_month_started
+      - dw_public.dim_date.date
+      - dw_public.dim_date.month_start
+  id_advertiser:
+    lineage:
+      - dw_casa_mineira_portal.dim_house.sk_real_estate_agency
+      - dw_casa_mineira_portal.fact_real_estate_budget_flows.sk_real_estate_agency
+      - dw_casa_mineira_portal.fact_real_estate_status.sk_real_estate_agency
+      - dw_datamarts_growth.performance_marketing_metrics_portal_casa_mineira.id_advertiser
+  advertiser:
+    lineage:
+      - dw_casa_mineira_portal.dim_real_estate_agency.real_estatte_agency_name
+      - dw_datamarts_growth.performance_marketing_metrics_portal_casa_mineira.advertiser
+  uf_advertiser:
+    lineage:
+      - dw_casa_mineira_portal.dim_real_estate_agency.uf
+      - dw_datamarts_growth.performance_marketing_metrics_portal_casa_mineira.uf_advertiser
+  city_advertiser:
+    lineage:
+      - dw_casa_mineira_portal.dim_real_estate_agency.city
+      - dw_datamarts_growth.performance_marketing_metrics_portal_casa_mineira.city_advertiser
+  type_advertiser:
+    lineage:
+      - dw_datamarts_growth.performance_marketing_metrics_portal_casa_mineira.type_advertiser
+  business_context:
+    lineage:
+      - dw_datamarts_growth.performance_marketing_metrics_portal_casa_mineira.business_context
   uf_listing:
     lineage:
       - datalake_top_of_funnel_portal_cm.top_of_funnel_users_portal_casa_mineira.uf_initials

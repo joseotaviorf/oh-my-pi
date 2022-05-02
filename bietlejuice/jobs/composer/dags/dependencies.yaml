@@ -221,9 +221,7 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.gsheets:create-clean-branding-where-is-plaquinha-external-table
   #market_share_by_sk_region
   - bietlejuice.ebdb:create-polygon-region-clean-external-table
-  # portal_casa_mineira_advertiser_metrics
-  - bietlejuice.casa_mineira_portal:create-clean-real-estate-agency-history-external-table
-  # portal_casa_mineira_advertiser_metrics, performance_marketing_metrics_*_casa_mineira
+  # performance_marketing_metrics_*_casa_mineira
   - bietlejuice.casa_mineira_portal:create-clean-house-external-table
   - bietlejuice.casa_mineira_portal:create-clean-city-external-table
   - bietlejuice.casa_mineira_portal:create-clean-real-estate-agency-budget-external-table

@@ -43,7 +43,6 @@ pipeline:
       depends_on:
         - performance_marketing_metrics_imobiliaria_casa_mineira
         - performance_marketing_metrics_portal_casa_mineira
-        - portal_casa_mineira_advertiser_metrics
   performance_marketing_metrics_portal_casa_mineira:
     dw:
       <<: *redshift_anchor
@@ -54,11 +53,6 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/growth/performance_marketing_metrics_supply.sql
       table: performance_marketing_metrics_supply
-  portal_casa_mineira_advertiser_metrics:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth/portal_casa_mineira_advertiser_metrics.sql
-      table: portal_casa_mineira_advertiser_metrics
   plaquinhas_houses:
     dw:
       <<: *redshift_anchor
@@ -102,7 +96,6 @@ pipeline:
       depends_on:
         - performance_marketing_metrics_imobiliaria_casa_mineira
         - performance_marketing_metrics_portal_casa_mineira
-        - portal_casa_mineira_advertiser_metrics
   listings_online_metrics:
     dw:
       <<: *athena_anchor

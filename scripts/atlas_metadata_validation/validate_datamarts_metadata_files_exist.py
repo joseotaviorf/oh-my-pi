@@ -39,7 +39,6 @@ SKIP_LIST = {
         "market_share_by_sk_region",
         "performance_marketing_metrics_portal_casa_mineira",
         "attribution_conversion_paths_demand",
-        "portal_casa_mineira_advertiser_metrics",
         "buyer_activation_events_combo",
         "unique_owners",
         "casa_mineira_top_of_funnel_volumes_weekly",
