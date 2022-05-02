@@ -568,6 +568,22 @@ business_rules AS (
         ds.pendency,
         ds.pendency_type,
         ds.opportunities_of_the_week,
+        CASE
+            WHEN COALESCE(vo_tags_from_salesflow, mo_tags_from_salesflow) LIKE "%no-protocolo%"
+                OR COALESCE(vo_tags_from_salesflow, mo_tags_from_salesflow) LIKE "%pre-analise-expansao%"
+                OR COALESCE(vo_tags_from_salesflow, mo_tags_from_salesflow) LIKE "%credito-andamento%"
+                OR COALESCE(vo_tags_from_salesflow, mo_tags_from_salesflow) LIKE "%credito-aprovado%"
+                OR COALESCE(vo_tags_from_salesflow, mo_tags_from_salesflow) LIKE "%credito-recusado%" THEN true 
+            ELSE false 
+        END AS has_credit_pre_analysis,
+        CASE
+            WHEN COALESCE(vo_tags_from_salesflow, mo_tags_from_salesflow) LIKE "%no-protocolo%" THEN true 
+            WHEN COALESCE(vo_dt_sale_agreement_created, mo_dt_sale_agreement_created) >= "2021-03-14"
+                AND current_payment_method = "FINANCED"
+                AND COALESCE(vo_financing_bank, mo_financing_bank) = "Itaú"
+                AND COALESCE(vo_credit_model, mo_credit_model) = "ATTA" THEN true 
+            ELSE false 
+        END AS has_payment_in_protocol,
         has_used_fgts_in_payment,
         has_used_negotiation_chat,
         last_discount_proposed,
@@ -804,6 +820,22 @@ SELECT
     id_vendas,
     id_pendency,
     pendency,
+    CASE
+        WHEN current_payment_method = "INSTANT_MORTGAGE" THEN (
+            CASE
+            WHEN has_payment_in_protocol = true
+                AND has_credit_pre_analysis = true THEN "CCV CAVG with Payment in Protocol with Credit Pre Analysis"
+            WHEN has_credit_pre_analysis = true THEN "CCV CAVG with Credit Pre Analysis"
+            END
+        )
+        WHEN has_payment_in_protocol = true
+            AND has_credit_pre_analysis = true THEN "CCV Payment in Protocol with Credit Pre Analysis"
+        WHEN has_payment_in_protocol = true THEN "CCV Payment in Protocol"
+        WHEN has_credit_pre_analysis = true THEN "CCV Credit Pre Analysis"
+        WHEN credit_model = "ATTA" THEN "Default CCV - 1.Inside Financing"
+        WHEN credit_model = "EXTERNAL" THEN "Default CCV - 2.External Financing"
+        ELSE "Default CCV - 3.Financing other status"
+    END AS ccv_type,
     pendency_type,
     opportunities_of_the_week,
     current_payment_method,
@@ -884,6 +916,8 @@ SELECT
     END AS days_offer_submitted_to_sale_agreement_signed,
     hours_booking_to_offer,
     hours_visit_to_offer,
+    has_credit_pre_analysis,
+    has_payment_in_protocol,
     has_used_fgts_in_payment,
     has_used_negotiation_chat,
     has_seller_debt_payments,

@@ -14,6 +14,9 @@ columns:
   pendency_type:
     lineage:
       - datalake_offer.sale_offer.pendency_type
+  ccv_type:
+    lineage:
+      - datalake_offer.sale_offer.ccv_type
   sale_agreement_status:
     lineage:
       - datalake_offer.sale_offer.sale_agreement_status
@@ -92,6 +95,12 @@ columns:
   tags_from_salesflow:
     lineage:
       - datalake_offer.sale_offer.tags_from_salesflow
+  has_credit_pre_analysis:
+    lineage:
+      - datalake_offer.sale_offer.has_credit_pre_analysis
+  has_payment_in_protocol:
+    lineage:
+      - datalake_offer.sale_offer.has_payment_in_protocol
   has_used_fgts_in_payment:
     lineage:
       - datalake_offer.sale_offer.has_used_fgts_in_payment
