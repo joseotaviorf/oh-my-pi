@@ -152,6 +152,7 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.ebdb:create-house-maintenance-condition-clean-external-table
   - bietlejuice.ebdb:create-house-visit-status-aud-clean-external-table
   - bietlejuice.ebdb:create-house-weekly-schedule-aud-clean-external-table
+  - bietlejuice.ebdb:create-house-weekly-schedule-clean-external-table
   - bietlejuice.ebdb:create-info-amenities-clean-external-table
   - bietlejuice.ebdb:create-info-condo-amenities-clean-external-table
   - bietlejuice.ebdb:create-listing-business-context-clean-external-table

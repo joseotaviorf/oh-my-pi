@@ -82,6 +82,11 @@ pipeline:
       <<: *redshift_anchor
       sql_file: dw/queries/datamarts/for_sale/sale_agents_weekly_performance.sql
       table: sale_agents_weekly_performance
+  sale_available_hours:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/for_sale/sale_available_hours.sql
+      table: sale_available_hours
   sale_ongoing_listings_casa_mineira:
     dw:
       <<: *redshift_anchor

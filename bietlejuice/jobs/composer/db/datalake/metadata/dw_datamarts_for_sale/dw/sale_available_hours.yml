@@ -1,0 +1,18 @@
+---
+database_name: dw_datamarts_for_sale
+table_name: sale_available_hours
+columns:
+  sk_house:
+    lineage:
+      - datalake_ebdb_clean.house_weekly_schedule.id_house
+      - datalake_ebdb_clean.house_weekly_schedule_aud.id_house
+      - datalake_ebdb_clean.house.id
+  sk_region:
+    lineage:
+      - dw_sale.fact_listing_status.sk_region
+  status_history:
+    lineage:
+      - dw_sale.fact_listing_status.status_history
+  week_start:
+    lineage:
+      - dw_public.dim_date.week_start
