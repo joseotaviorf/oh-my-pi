@@ -1,8 +1,8 @@
 WITH json_select AS(
     SELECT
         id AS id_house_platform,
-        CONCAT(id, 'VivaReal') AS id_house,
-        COALESCE(origin, 'VivaReal') AS platform,
+        CONCAT(id, 'ZapImoveis') AS id_house,
+        COALESCE(origin, 'ZapImoveis') AS platform,
         city,
         TO_JSON(address) AS address,
         TO_JSON(geolocation) AS geolocation,
@@ -16,8 +16,8 @@ WITH json_select AS(
         month,
         day
     FROM
-        datalake_crawlers_listings_clean.viva_real
-    WHERE 
+        datalake_crawlers_listings_clean.zap_imoveis
+    WHERE
         year = {year}
         AND month = {month}
         AND day = {day}

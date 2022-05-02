@@ -1,0 +1,9 @@
+---
+#weekday: 0 = monday
+tables:
+  - table_name: olx
+    weekday_run: 4
+  - table_name: viva_real
+    weekday_run: 2 
+  - table_name: zap_imoveis
+    weekday_run: 1

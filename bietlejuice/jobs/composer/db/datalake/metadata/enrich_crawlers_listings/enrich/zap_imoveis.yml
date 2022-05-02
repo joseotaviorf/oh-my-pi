@@ -1,0 +1,113 @@
+---
+database_name: datalake_crawlers_listings
+table_name: zap_imoveis
+columns:
+  id_house_platform:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.id
+  id_house:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.id
+  platform:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.origin
+  country:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.address
+  state:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.address
+  address_city:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.address
+      - datalake_crawlers_listings_clean.zap_imoveis.city
+  city:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.city
+  neighborhood:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.address
+  street:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.address
+  street_number:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.address
+  zip_code:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.address
+  latitude:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.geolocation
+  longitude:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.geolocation
+  listing_name:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.listing_name
+  total_area:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.house_info
+  amenities:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.house_info
+  bathrooms:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.house_info
+  bedrooms:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.house_info
+  floors:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.house_info
+  parking_spaces:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.house_info
+  suites:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.house_info
+  unit_type:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.house_info
+  usage_type:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.house_info
+  advertiser_name:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.contact_information
+  advertiser_phone:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.contact_information
+  condo_fee:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.price
+  iptu:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.price
+  price_rental:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.price
+  price_sale:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.price
+  is_for_rent:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.type
+  is_for_sale:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.type
+  ts_created:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.date_info
+  ts_updated:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.date_info
+  year:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.year
+  month:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.month
+  day:
+    lineage:
+      - datalake_crawlers_listings_clean.zap_imoveis.day

@@ -63,12 +63,6 @@ columns:
   usage_type:
     lineage:
       - datalake_crawlers_listings_clean.olx.house_info
-  is_for_rent:
-    lineage:
-      - datalake_crawlers_listings_clean.olx.type
-  is_for_sale:
-    lineage:
-      - datalake_crawlers_listings_clean.olx.type
   advertiser_name:
     lineage:
       - datalake_crawlers_listings_clean.olx.contact_information
@@ -87,6 +81,12 @@ columns:
   price_sale:
     lineage:
       - datalake_crawlers_listings_clean.olx.price
+  is_for_rent:
+    lineage:
+      - datalake_crawlers_listings_clean.olx.type
+  is_for_sale:
+    lineage:
+      - datalake_crawlers_listings_clean.olx.type
   ts_created:
     lineage:
       - datalake_crawlers_listings_clean.olx.date_info

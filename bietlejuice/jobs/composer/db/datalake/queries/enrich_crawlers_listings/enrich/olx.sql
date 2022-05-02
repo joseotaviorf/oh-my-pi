@@ -16,6 +16,10 @@ WITH json_select AS (
         day
     FROM
         datalake_crawlers_listings_clean.olx
+    WHERE 
+        year = {year}
+        AND month = {month}
+        AND day = {day}
 )
     SELECT
         id_house_platform,
@@ -28,7 +32,7 @@ WITH json_select AS (
                 THEN COALESCE(REGEXP_EXTRACT(GET_JSON_OBJECT(address,'$.city'), ', +(.*)'), city)
             ELSE COALESCE(GET_JSON_OBJECT(address,'$.city'), city)
         END AS address_city,
-        city AS city,
+        city,
         GET_JSON_OBJECT(address,'$.neighborhood') AS neighborhood,
         GET_JSON_OBJECT(address,'$.street') AS street,
         GET_JSON_OBJECT(address,'$.zip_code') AS zip_code,
@@ -42,13 +46,6 @@ WITH json_select AS (
         GET_JSON_OBJECT(house_info,'$.suites') AS suites,
         GET_JSON_OBJECT(house_info,'$.unit_type') AS unit_type,
         GET_JSON_OBJECT(house_info,'$.usage_type') AS usage_type,
-        CAST(GET_JSON_OBJECT(type,'$.rentable') AS BOOLEAN) AS is_for_rent,
-        CAST(GET_JSON_OBJECT(type,'$.buyable') AS BOOLEAN) AS is_for_sale,
-        CASE
-            WHEN GET_JSON_OBJECT(type,'$.rentable') = TRUE
-                AND GET_JSON_OBJECT(type,'$.buyable') = TRUE THEN TRUE
-            ELSE FALSE
-        END AS is_hybrid,
         GET_JSON_OBJECT(contact_information,'$.advertiser_name') AS advertiser_name,
         GET_JSON_OBJECT(contact_information,'$.advertiser_phone') AS advertiser_phone,
         CAST(COALESCE(price.rent.condo_fee, price.sale.condo_fee) AS INTEGER) AS condo_fee,
@@ -57,13 +54,16 @@ WITH json_select AS (
         CAST(price.sale.price AS INTEGER) AS price_sale,
         ROUND(price.rent.price/GET_JSON_OBJECT(house_info,'$.area'), 2) AS price_m2_rental,
         ROUND(price.sale.price/GET_JSON_OBJECT(house_info,'$.area'), 2) AS price_m2_sale,
+        CAST(GET_JSON_OBJECT(type,'$.rentable') AS BOOLEAN) AS is_for_rent,
+        CAST(GET_JSON_OBJECT(type,'$.buyable') AS BOOLEAN) AS is_for_sale,
+        CASE
+            WHEN GET_JSON_OBJECT(type,'$.rentable') = TRUE
+                AND GET_JSON_OBJECT(type,'$.buyable') = TRUE THEN TRUE
+            ELSE FALSE
+        END AS is_hybrid,
         GET_JSON_OBJECT(date_info,'$.created_at') AS ts_created,
         year,
         month,
         day
     FROM
         json_select
-    WHERE 
-        year = {year}
-        AND month = {month}
-        AND day = {day}

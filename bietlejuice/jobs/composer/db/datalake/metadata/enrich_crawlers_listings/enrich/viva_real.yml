@@ -20,7 +20,7 @@ columns:
   address_city:
     lineage:
       - datalake_crawlers_listings_clean.viva_real.address
-      - datalake_crawlers_listings_clean.olx.city
+      - datalake_crawlers_listings_clean.viva_real.city
   city:
     lineage:
       - datalake_crawlers_listings_clean.viva_real.city
@@ -30,7 +30,7 @@ columns:
   street:
     lineage:
       - datalake_crawlers_listings_clean.viva_real.address
-  st_number:
+  street_number:
     lineage:
       - datalake_crawlers_listings_clean.viva_real.address
   zip_code:
@@ -72,12 +72,6 @@ columns:
   usage_type:
     lineage:
       - datalake_crawlers_listings_clean.viva_real.house_info
-  is_for_rent:
-    lineage:
-      - datalake_crawlers_listings_clean.viva_real.type
-  is_for_sale:
-    lineage:
-      - datalake_crawlers_listings_clean.viva_real.type
   advertiser_name:
     lineage:
       - datalake_crawlers_listings_clean.viva_real.contact_information
@@ -96,6 +90,12 @@ columns:
   price_sale:
     lineage:
       - datalake_crawlers_listings_clean.viva_real.price
+  is_for_rent:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.type
+  is_for_sale:
+    lineage:
+      - datalake_crawlers_listings_clean.viva_real.type
   ts_created:
     lineage:
       - datalake_crawlers_listings_clean.viva_real.date_info
