@@ -1,0 +1,37 @@
+---
+database_name: datalake_gsheets_clean
+table_name: mra_historical
+columns:
+  anticipation_cost:
+    lineage:
+      - datalake_gsheets_raw.mra_historical.anticipation_cost
+  anticipation_fee:
+    lineage:
+      - datalake_gsheets_raw.mra_historical.anticipation_fee
+  anticipation_value:
+    lineage:
+      - datalake_gsheets_raw.mra_historical.anticipation_value
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.mra_historical.id_contract
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.mra_historical.id_house
+  id_owner:
+    lineage:
+      - datalake_gsheets_raw.mra_historical.id_owner
+  month:
+    lineage:
+      - datalake_gsheets_raw.mra_historical.month
+  rent_net_value:
+    lineage:
+      - datalake_gsheets_raw.mra_historical.rent_net_value
+  rent_value:
+    lineage:
+      - datalake_gsheets_raw.mra_historical.rent_value
+  status:
+    lineage:
+      - datalake_gsheets_raw.mra_historical.status
+  year:
+    lineage:
+      - datalake_gsheets_raw.mra_historical.year

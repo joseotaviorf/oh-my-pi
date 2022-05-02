@@ -31,6 +31,7 @@ This pipeline produces the following output tables:
     - `dados_docato`
     - `demand_targets_2020`
     - `de_para_cancelamento`
+    - `mra_historical`
     - `offline_and_branding_marketing_costs`
     - `rental_tof_daily_targets`
     - `supply_targets_2019`
@@ -51,6 +52,7 @@ This pipeline produces the following output tables:
     - `costs_allocation_relative_indexes`
     - `from_to_cancellation`
     - `legal_base_docato`
+    - `mra_historical`
     - `offline_and_branding_marketing_costs`
     - `rental_tof_daily_targets`
     - `supply_targets_2019`
