@@ -1,0 +1,58 @@
+---
+database_name: datalake_ebdb_agents
+table_name: agents_activations_suspensions_contracts_changes
+columns:
+  id_agent:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.id
+  id_work_contract:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.id_work_contract
+  id_previous_work_contract:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.id_work_contract
+  id_user_change:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.id_user
+  rev:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.rev_type
+  work_contract_name:
+    lineage:
+      - datalake_ebdb_clean.work_contract.contract_name
+  previous_work_contract_name:
+    lineage:
+      - datalake_ebdb_clean.work_contract.contract_name
+  agent_name:
+    lineage:
+      - datalake_ebdb_clean.user.name
+  agent_type:
+    lineage:
+      - datalake_ebdb_clean.agent_data_types.types
+  user_change_name:
+    lineage:
+      - datalake_ebdb_clean.user.name
+  user_change_email:
+    lineage:
+      - datalake_ebdb_clean.user.email
+  is_agent_active:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.is_active
+  has_changed_activated:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.is_active
+  ts_revision:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  year:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  month:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  day:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision

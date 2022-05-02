@@ -1,5 +1,8 @@
 ---
 tables:
+  - table_name: agents_activations_suspensions_contracts_changes
+    is_incremental: true
+    partitions: [year, month, day]
   - table_name: agent_business_context_history
     is_incremental: false
   - table_name: agent_contract

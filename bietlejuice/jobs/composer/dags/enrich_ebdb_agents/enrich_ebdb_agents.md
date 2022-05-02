@@ -19,9 +19,11 @@ Produces the following output tables, via full load:
 - `agents_review`
 - `agents_specific_weekly_schedule`
 - `agents_weekly_schedule_history`
+- `rating_label`
 - `slots_base_time`
 
 And via incremental load:
+- `agents_activations_suspensions_contracts_changes`
 - `agents_slots`
 - `agents_slots_hourly`
 
