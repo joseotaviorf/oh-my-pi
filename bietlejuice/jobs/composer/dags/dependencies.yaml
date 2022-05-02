@@ -292,6 +292,7 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
   # marketing_allocated_costs, rent_flow_interactions, rental_cohort_conversions, rental_marketplace_flows, sale_performance_marketing_metrics_demand
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
+  - bietlejuice.dw_house:load-quintoandar-dim-house-into-redshift
   # marketing_allocated_costs, performance_marketing_metrics_demand, pricing_rent_categorization, rent_flow_interactions,
   # rental_cohort_conversions, rental_marketplace_flows, tenant_prospect_status, tenant_prospect_activations, user_funnel
   - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift

@@ -25,10 +25,11 @@ buyer_prospect_status as (
 dim_house AS (
     SELECT
         id AS sk_house,
-        id_region AS sk_region
+        id_region AS sk_region,
+        CASE WHEN internal_admin_info LIKE '%[3P-%]%' THEN 'true' ELSE 'false' END AS is_3p
     FROM
         datalake_ebdb_clean_prod.house
-    GROUP BY 1,2
+    GROUP BY 1,2,3
 ),
 -----------------------------------------------------------
 -- Query bookings, offers and talk to agent full history --
@@ -38,6 +39,7 @@ events AS (
         fsf.sk_sale_flow,
         fsf.sk_buyer,
         fsf.sk_house,
+        dh.is_3p,
         fsf.sk_region,
         CASE WHEN fv.sk_user_creation = us.id_user_attendence_5a THEN 'Secretaria' ELSE db.mkt_origin END as mkt_origin,
         db.mkt_channel,
@@ -58,6 +60,8 @@ events AS (
             ON fsf.sk_sale_flow = fv.sk_sale_flow
         LEFT JOIN users_secretaria AS us  
             ON us.id_user_attendence_5a = fv.sk_user_creation
+        LEFT JOIN dim_house AS dh
+            ON fsf.sk_house = dh.sk_house
     WHERE
         db.sk_booking > 0
         AND db.visit_intent = 'SALE'
@@ -70,6 +74,7 @@ events AS (
         fsf.sk_sale_flow,
         fsf.sk_buyer,
         fsf.sk_house,
+        dh.is_3p,
         fsf.sk_region,
         o.mkt_origin,
         o.mkt_channel,
@@ -88,6 +93,8 @@ events AS (
             USING(sk_offer)
         JOIN sale.fact_sale_flows AS fsf
             ON fsf.sk_sale_flow = fo.sk_sale_flow
+        LEFT JOIN dim_house AS dh
+            ON fsf.sk_house = dh.sk_house
     --
     UNION ALL
     --
@@ -95,6 +102,7 @@ events AS (
         tenant_id || '_' || house_id AS sk_sale_flow,
         tenant_id::INT AS sk_buyer,
         house_id::INT AS id_house,
+        dh.is_3p,
         dh.sk_region,
         a.mkt_origin,
         a.mkt_channel,
@@ -139,6 +147,7 @@ sale_flows AS (
         evt.sk_sale_flow,
         evt.sk_buyer,
         evt.sk_house,
+        evt.is_3p,
         ROW_NUMBER() OVER(PARTITION BY evt.sk_sale_flow
                             ORDER BY evt.ts_event) AS sale_flow_order,
         ROW_NUMBER() OVER(PARTITION BY evt.sk_buyer
@@ -155,6 +164,7 @@ sale_funnel AS (
         fsf.sk_sale_flow,
         fo.sk_offer,
         fv.sk_booking,
+        dh.is_3p,
         dd_os.date AS dt_offer_submitted,
         dd_oa.date AS dt_offer_accepted,
         dd_ccv.date AS dt_sale_agreement_signed,
@@ -176,6 +186,8 @@ sale_funnel AS (
             ON fv.sk_booking_created_date = dd_vb.sk_date
         LEFT JOIN dim_date AS dd_vc
             ON fv.sk_visit_completed_date = dd_vc.sk_date
+        LEFT JOIN dim_house AS dh
+            ON fsf.sk_house = dh.sk_house
 ),
 sale_flows_funnel_events AS (
     SELECT
@@ -213,6 +225,7 @@ sale_flows_funnel_events AS (
         sf.sk_sale_flow,
         sf.sk_buyer,
         sf.sk_house,
+        sf.is_3p,
         funnel.sk_offer,
         funnel.sk_booking,
         funnel.dt_offer_submitted,
@@ -268,6 +281,7 @@ targets AS (
         NULL::TEXT AS sk_sale_flow,
         NULL::INT AS sk_buyer,
         NULL::INT AS sk_house,
+        NULL::TEXT AS is_3p,
         NULL::TEXT AS sk_offer,
         NULL::INT AS sk_booking,
         NULL::DATE AS dt_offer_submitted,
@@ -311,6 +325,7 @@ targets AS (
         NULL::TEXT AS sk_sale_flow,
         NULL::INT AS sk_buyer,
         NULL::INT AS sk_house,
+        NULL::TEXT AS is_3p,
         NULL::TEXT AS sk_offer,
         NULL::INT AS sk_booking,
         NULL::DATE AS dt_offer_submitted,
@@ -352,6 +367,7 @@ targets AS (
         NULL::TEXT AS sk_sale_flow,
         NULL::INT AS sk_buyer,
         NULL::INT AS sk_house,
+        NULL::TEXT AS is_3p,
         NULL::TEXT AS sk_offer,
         NULL::INT AS sk_booking,
         NULL::DATE AS dt_offer_submitted,
@@ -397,6 +413,7 @@ investment AS (
         NULL::TEXT AS sk_sale_flow,
         NULL::INT AS sk_buyer,
         NULL::INT AS sk_house,
+        NULL::TEXT AS is_3p,
         NULL::TEXT AS sk_offer,
         NULL::INT AS sk_booking,
         NULL::DATE AS dt_offer_submitted,
@@ -449,6 +466,7 @@ deactivations AS (
         NULL::TEXT AS sk_sale_flow,
         sk_buyer,
         NULL::INT AS sk_house,
+        NULL::TEXT AS is_3p,
         NULL::TEXT AS sk_offer,
         NULL::INT AS sk_booking,
         NULL::DATE AS dt_offer_submitted,

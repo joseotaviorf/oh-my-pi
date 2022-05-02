@@ -127,6 +127,15 @@ bps_weekly AS (
         sk_buyer
     from weekly_bp_status
 ),
+dim_house AS (
+    SELECT
+        id AS sk_house,
+        id_region AS sk_region,
+        CASE WHEN internal_admin_info LIKE '%[3P-%]%' THEN 'true' ELSE 'false' END AS is_3p
+    FROM
+        datalake_ebdb_clean_prod.house
+    GROUP BY 1,2,3
+),
 events AS (
     -------------------------
     -- Top of Funnel Users --
@@ -154,10 +163,13 @@ events AS (
         ui.mkt_channel,
         ui.mkt_medium,
         ui.mkt_source,
+        NULL::TEXT AS is_3p,
         COUNT(NULL) as marketing_cost,
         COUNT(NULL) as budget,
         COUNT(DISTINCT ui.id_tof_user) AS tof_users,
+        COUNT(DISTINCT (CASE WHEN dh.is_3p = 'true' THEN ui.id END)) AS tof_users_3p,
         COUNT(ui.id) AS tof_events,
+        COUNT(CASE WHEN dh.is_3p = 'true' THEN ui.id END) AS tof_events_3p,
         COUNT(NULL) AS active_buyer_prospects,
         COUNT(NULL) AS ongoing_churned_buyer_prospects,
         COUNT(NULL) AS retained_buyer_prospects,
@@ -185,9 +197,11 @@ events AS (
         datalake_top_of_funnel_demand_prod.user_interactions AS ui
         LEFT JOIN dim_region AS dr
             ON ui.sk_region::INT = dr.sk_region
+        LEFT JOIN dim_house AS dh
+            ON ui.id_house = dh.sk_house
     WHERE
         ui.dt_event >= DATE_TRUNC('WEEK', CURRENT_DATE - INTERVAL '104 WEEK')
-    GROUP BY 1,2,3,4,5,6,7,8,9,10
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11
     UNION ALL
     ----------------------------
     -- Buyer Prospects Stocks --
@@ -203,10 +217,13 @@ events AS (
         NULL::TEXT AS mkt_channel,
         NULL::TEXT AS mkt_medium,
         NULL::TEXT AS mkt_source,
+        NULL::TEXT AS is_3p,
         COUNT(NULL) as marketing_cost,
         COUNT(NULL) as budget,
         COUNT(NULL) AS tof_users,
+        COUNT(NULL) AS tof_users_3p,
         COUNT(NULL) AS tof_events,
+        COUNT(NULL) AS tof_events_3p,
         COUNT(DISTINCT CASE WHEN status_week_end = 'Active' THEN sk_buyer ELSE NULL END) AS active_buyer_prospects,
         COUNT(DISTINCT CASE WHEN status_week_end = 'Churned' THEN sk_buyer ELSE NULL END) AS ongoing_churned_buyer_prospects,
         COUNT(DISTINCT CASE WHEN status_week_start = 'Active' AND status_week_end != 'Churned' THEN sk_buyer ELSE NULL END) AS retained_buyer_prospects,
@@ -235,7 +252,7 @@ events AS (
     WHERE
         week_start >= DATE_TRUNC('WEEK', CURRENT_DATE - INTERVAL '104 WEEK')
         AND week_start < DATE_TRUNC('WEEK', CURRENT_DATE)
-    GROUP BY 1,2,3,4,5,6,7,8,9,10
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11
     UNION ALL
     -------------------------------------
     -- Sale Metrics, targets and costs --
@@ -259,10 +276,13 @@ events AS (
         pmmd.mkt_channel,
         pmmd.mkt_medium,
         pmmd.mkt_source,
+        pmmd.is_3p,
         SUM(pmmd.marketing_cost) as marketing_cost,
         SUM(pmmd.budget) as budget,
         COUNT(NULL) AS tof_users,
+        COUNT(NULL) AS tof_users_3p,
         COUNT(NULL) AS tof_events,
+        COUNT(NULL) AS tof_events_3p,
         COUNT(NULL) AS active_buyer_prospects,
         COUNT(NULL) AS ongoing_churned_buyer_prospects,
         COUNT(NULL) AS retained_buyer_prospects,
@@ -294,7 +314,7 @@ events AS (
             AND bps.week_start = DATE_TRUNC('WEEK', pmmd.dt_event)
     WHERE
         dt_event >= DATE_TRUNC('WEEK', CURRENT_DATE - INTERVAL '104 WEEK')
-    GROUP BY 1,2,3,4,5,6,7,8,9,10
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11
     UNION ALL
     -----------------------------
     -- Tenant Prospects Stocks --
@@ -310,10 +330,13 @@ events AS (
         NULL::TEXT AS mkt_channel,
         NULL::TEXT AS mkt_medium,
         NULL::TEXT AS mkt_source,
+        NULL::TEXT AS is_3p,
         COUNT(NULL) as marketing_cost,
         COUNT(NULL) as budget,
         COUNT(NULL) AS tof_users,
+        COUNT(NULL) AS tof_users_3p,
         COUNT(NULL) AS tof_events,
+        COUNT(NULL) AS tof_events_3p,
         COUNT(NULL) AS active_buyer_prospects,
         COUNT(NULL) AS ongoing_churned_buyer_prospects,
         COUNT(NULL) AS retained_buyer_prospects,
@@ -342,7 +365,7 @@ events AS (
     WHERE
         week_start >= DATE_TRUNC('WEEK', CURRENT_DATE - INTERVAL '104 WEEK')
         AND week_start < DATE_TRUNC('WEEK', CURRENT_DATE)
-    GROUP BY 1,2,3,4,5,6,7,8,9,10
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11
     UNION ALL
     -------------------------------------
     -- Rent Metrics, targets and costs --
@@ -366,10 +389,13 @@ events AS (
         pmmd.mkt_channel,
         pmmd.mkt_medium,
         pmmd.mkt_source,
+        NULL::TEXT AS is_3p,
         SUM(pmmd.marketing_cost) as marketing_cost,
         SUM(pmmd.budget) as budget,
         COUNT(NULL) AS tof_users,
+        COUNT(NULL) AS tof_users_3p,
         COUNT(NULL) AS tof_events,
+        COUNT(NULL) AS tof_events_3p,
         COUNT(NULL) AS active_buyer_prospects,
         COUNT(NULL) AS ongoing_churned_buyer_prospects,
         COUNT(NULL) AS retained_buyer_prospects,
@@ -420,10 +446,13 @@ events AS (
         END as mkt_channel,
         mkt_medium,
         mkt_source,
+        NULL::TEXT AS is_3p,
         COUNT(NULL) as marketing_cost,
         COUNT(NULL) as budget,
         COUNT(NULL) AS tof_users,
+        COUNT(NULL) AS tof_users_3p,
         COUNT(NULL) AS tof_events,
+        COUNT(NULL) AS tof_events_3p,
         COUNT(NULL) AS active_buyer_prospects,
         COUNT(NULL) AS ongoing_churned_buyer_prospects,
         COUNT(NULL) AS retained_buyer_prospects,
@@ -449,7 +478,7 @@ events AS (
         SUM(tof_users_target::FLOAT) AS tof_users_target
     FROM
         datalake_gsheets_clean_prod.rental_tof_weekly_targets
-    GROUP BY 1,2,3,4,5,6,7,8,9,10
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11
     UNION ALL
     ----------------------
     -- ToF Sale Targets --
@@ -476,10 +505,13 @@ events AS (
         END as mkt_channel,
         mkt_medium,
         mkt_source,
+        NULL::TEXT AS is_3p,
         COUNT(NULL) as marketing_cost,
         COUNT(NULL) as budget,
         COUNT(NULL) AS tof_users,
+        COUNT(NULL) AS tof_users_3p,
         COUNT(NULL) AS tof_events,
+        COUNT(NULL) AS tof_events_3p,
         COUNT(NULL) AS active_buyer_prospects,
         COUNT(NULL) AS ongoing_churned_buyer_prospects,
         COUNT(NULL) AS retained_buyer_prospects,
@@ -505,7 +537,7 @@ events AS (
         SUM(tof_users_target::FLOAT) AS tof_users_target
     FROM
         datalake_gsheets_clean_prod.sale_tof_weekly_targets
-    GROUP BY 1,2,3,4,5,6,7,8,9,10
+    GROUP BY 1,2,3,4,5,6,7,8,9,10,11
 )
 SELECT
     ROW_NUMBER() OVER() AS pkey,
@@ -522,10 +554,13 @@ SELECT
     mkt_medium,
     mkt_source,
     week_start,
+    is_3p,
     SUM(marketing_cost) as marketing_cost,
     SUM(budget) as budget,
     SUM(tof_users) AS tof_users,
+    SUM(tof_users_3p) AS tof_users_3p,
     SUM(tof_events) AS tof_events,
+    SUM(tof_events_3p) AS tof_events_3p,
     SUM(active_buyer_prospects) AS active_buyer_prospects,
     SUM(ongoing_churned_buyer_prospects) AS ongoing_churned_buyer_prospects,
     SUM(retained_buyer_prospects) AS retained_buyer_prospects,
@@ -551,4 +586,4 @@ SELECT
     SUM(tof_users_target) AS tof_users_target
 FROM
     events
-GROUP BY 2,3,4,5,6,7,8,9,10,11
+GROUP BY 2,3,4,5,6,7,8,9,10,11,12
