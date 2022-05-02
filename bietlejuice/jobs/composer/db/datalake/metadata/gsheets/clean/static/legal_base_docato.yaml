@@ -59,9 +59,6 @@ columns:
   commissions_difference_second_instance:
     lineage:
       - datalake_gsheets_raw.dados_docato.diferenca_em_comissoes1
-  distribuition:
-    lineage:
-      - datalake_gsheets_raw.dados_docato.distribuicao
   procedural_duration:
     lineage:
       - datalake_gsheets_raw.dados_docato.duracao_processual
@@ -206,6 +203,9 @@ columns:
   trt:
     lineage:
       - datalake_gsheets_raw.dados_docato.trt
+  dt_distribuition:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.distribuicao
   condemnation_judgment_value:
     lineage:
       - datalake_gsheets_raw.dados_docato.valor_condenacao_acordao

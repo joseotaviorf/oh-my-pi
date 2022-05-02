@@ -18,45 +18,6 @@ SELECT
     desvio_de_funcao1 AS function_desviation_second_instance,
     diferenca_em_comissoes AS commissions_difference,
     diferenca_em_comissoes1 AS commissions_difference_second_instance, 
-    CASE 
-        WHEN 
-            SUBSTRING(distribuicao FROM 4 FOR 3) = 'Jan' 
-                THEN TO_DATE(concat(SUBSTRING(distribuicao FROM 1 FOR 2),'-01-', SUBSTRING(distribuicao FROM 8 FOR 4)), 'dd-MM-yyyy')
-        WHEN 
-            SUBSTRING(distribuicao FROM 4 FOR 3) = 'Feb' 
-                THEN TO_DATE(concat(SUBSTRING(distribuicao FROM 1 FOR 2),'-02-', SUBSTRING(distribuicao FROM 8 FOR 4)), 'dd-MM-yyyy')
-        WHEN 
-            SUBSTRING(distribuicao FROM 4 FOR 3) = 'Mar' 
-                THEN TO_DATE(concat(SUBSTRING(distribuicao FROM 1 FOR 2),'-03-', SUBSTRING(distribuicao FROM 8 FOR 4)), 'dd-MM-yyyy')
-        WHEN 
-            SUBSTRING(distribuicao FROM 4 FOR 3) = 'Apr' 
-                THEN TO_DATE(concat(SUBSTRING(distribuicao FROM 1 FOR 2),'-04-', SUBSTRING(distribuicao FROM 8 FOR 4)), 'dd-MM-yyyy')
-        WHEN 
-            SUBSTRING(distribuicao FROM 4 FOR 3) = 'May' 
-                THEN TO_DATE(concat(SUBSTRING(distribuicao FROM 1 FOR 2),'-05-', SUBSTRING(distribuicao FROM 8 FOR 4)), 'dd-MM-yyyy')
-        WHEN 
-            SUBSTRING(distribuicao FROM 4 FOR 3) = 'Jun' 
-                THEN TO_DATE(concat(SUBSTRING(distribuicao FROM 1 FOR 2),'-06-', SUBSTRING(distribuicao FROM 8 FOR 4)), 'dd-MM-yyyy')
-        WHEN 
-            SUBSTRING(distribuicao FROM 4 FOR 3) = 'Jul' 
-                THEN TO_DATE(concat(SUBSTRING(distribuicao FROM 1 FOR 2),'-07-', SUBSTRING(distribuicao FROM 8 FOR 4)), 'dd-MM-yyyy')
-        WHEN 
-            SUBSTRING(distribuicao FROM 4 FOR 3) = 'Aug' 
-                THEN TO_DATE(concat(SUBSTRING(distribuicao FROM 1 FOR 2),'-08-', SUBSTRING(distribuicao FROM 8 FOR 4)), 'dd-MM-yyyy')
-        WHEN 
-            SUBSTRING(distribuicao FROM 4 FOR 3) = 'Sep' 
-                THEN TO_DATE(concat(SUBSTRING(distribuicao FROM 1 FOR 2),'-09-', SUBSTRING(distribuicao FROM 8 FOR 4)), 'dd-MM-yyyy')
-        WHEN 
-            SUBSTRING(distribuicao FROM 4 FOR 3) = 'Oct' 
-                THEN TO_DATE(concat(SUBSTRING(distribuicao FROM 1 FOR 2),'-10-', SUBSTRING(distribuicao FROM 8 FOR 4)), 'dd-MM-yyyy')
-        WHEN 
-            SUBSTRING(distribuicao FROM 4 FOR 3) = 'Nov' 
-                THEN TO_DATE(concat(SUBSTRING(distribuicao FROM 1 FOR 2),'-11-', SUBSTRING(distribuicao FROM 8 FOR 4)), 'dd-MM-yyyy')
-        WHEN 
-            SUBSTRING(distribuicao FROM 4 FOR 3) = 'Dec' 
-                THEN TO_DATE(concat(SUBSTRING(distribuicao FROM 1 FOR 2),'-12-', SUBSTRING(distribuicao FROM 8 FOR 4)), 'dd-MM-yyyy')
-        ELSE null
-    END AS distribuition,
     duracao_processual AS procedural_duration,
     duracao_processual_ate_sentenca AS procedural_duration_until_sentencing,
     ferias_13 AS vacations,
@@ -113,6 +74,7 @@ SELECT
     tempo_entre_a_demissao_e_a_distribuicao AS time_between_dismissal_and_distribution,
     tempo_entre_a_demissao_e_a_distribuicao_agrupado AS grouped_time_between_dismissal_and_distribution,
     trt,
+    TO_DATE(SUBSTRING(distribuicao FROM 0 FOR 11), 'dd MMM yyyy') AS dt_distribuition,
     CASE
         WHEN usuario_ativo_na_plataforma = 'Sim' THEN True
         ELSE False
