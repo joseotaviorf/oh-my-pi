@@ -42,7 +42,8 @@ def extend_incremental_params(params: dict, execution_date: str) -> dict:
 
     dt_started = datetime.strptime(execution_date, "%Y-%m-%d")
     dt_ended = (dt_started + timedelta(days=1)).strftime("%Y-%m-%d")
-    filter_by_formula = f"AND( LAST_MODIFIED_TIME() >= '{dt_started}', LAST_MODIFIED_TIME() < '{dt_ended}')"
+    filter_by_formula = f"""OR(AND( LAST_MODIFIED_TIME() >= '{dt_started}', LAST_MODIFIED_TIME() < '{dt_ended}'),
+                             AND( CREATED_TIME() >= '{dt_started}', CREATED_TIME() < '{dt_ended}'))"""
     params["filterByFormula"] = filter_by_formula
 
     return params
