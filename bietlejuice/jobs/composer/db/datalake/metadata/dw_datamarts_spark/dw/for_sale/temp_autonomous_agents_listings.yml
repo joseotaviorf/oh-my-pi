@@ -1,0 +1,61 @@
+---
+database_name: dw_datamarts
+table_name: temp_autonomous_agents_listings
+columns:
+  id_house:
+    lineage:
+      - dw_public.dim_house_listing.id_house
+  sk_house_listing:
+    lineage:
+      - dw_public.dim_house_listing.sk_house_listing
+  ts_house_create:
+    lineage:
+      - dw_public.dim_house_listing.ts_house_create
+  sk_partner:
+    lineage:
+      - datalake_ebdb_clean.partner.id
+  trade_name:
+    lineage:
+      - datalake_ebdb_clean.partner.trade_name
+  id_partner_agent_user:
+    lineage:
+      - dw_public.dim_partner_agent.id_user
+  ts_partner_agent_created:
+    lineage:
+      - dw_public.dim_partner_agent.ts_created
+  id_user_registrant:
+    lineage:
+      - datalake_ebdb_clean.house.id_user_registrant
+  sk_owner:
+    lineage:
+      - datalake_ebdb_clean.house.id_user
+  id_external:
+    lineage:
+      - datalake_ebdb_clean.house.id_external
+  version:
+    lineage:
+      - dw_public.dim_house_listing.version
+  status:
+    lineage:
+      - dw_public.dim_house_listing.status
+  house_status:
+    lineage:
+      - dw_public.dim_house_listing.house_status
+  ts_house_first_publication:
+    lineage:
+      - dw_public.dim_house_listing.ts_house_first_publication
+  ts_house_last_publication:
+    lineage:
+      - dw_public.dim_house_listing.ts_house_last_publication
+  ts_publication:
+    lineage:
+      - dw_public.dim_house_listing.ts_publication
+  ts_last_de_publication:
+    lineage:
+      - dw_public.dim_house_listing.ts_last_de_publication
+  listing_category_start:
+    lineage:
+      - dw_public.dim_house_listing.listing_category_start
+  is_last_version:
+    lineage:
+      - dw_public.dim_house_listing.is_last_version
