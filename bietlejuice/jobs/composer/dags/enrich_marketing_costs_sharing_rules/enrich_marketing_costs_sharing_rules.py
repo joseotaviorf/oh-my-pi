@@ -12,7 +12,7 @@ from airflow.operators.quintoandar_databricks import (
 import airflow.utils.helpers as airflow_helpers
 
 from bietlejuice.jobs.composer.base.pipeline import LayerEnum
-from bietlejuice.jobs.composer.base.airflow import BaseDAG
+from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
 
 
 def sync_metastore(table_name, table_task):
@@ -98,7 +98,7 @@ cost_types = ["online", "offline"]
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": BaseDAG.DEFAULT_OWNER,
+        "owner": DAGOwnerEnum.DATA_GROWTH,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
