@@ -210,6 +210,12 @@ sale_payment_concluded_targets:
     clean_table_name: sale_payment_concluded_targets
     sheet_context: for_sale
 
+sale_payments_tiers:
+    sheet_id: 12fdH_o4EQ1auA7ol3bRIAPBRcDuGcgh7k4-q2SuKeTo
+    sheet_name: all
+    clean_table_name: sale_payments_tiers
+    sheet_context: for_sale
+
 sale_supply_targets:
     sheet_id: 1D0ocZdAiabVBMg9lp3KTuACv5mgG7ninW3zdgXLuFiU
     sheet_name: sale_supply_targets

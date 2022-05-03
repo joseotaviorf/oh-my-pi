@@ -1,0 +1,25 @@
+---
+database_name: datalake_gsheets_clean
+table_name: sale_payments_tiers
+columns:
+  sk_user:
+    lineage:
+      - datalake_gsheets_raw.sale_payments_tiers.sk_user
+  sk_agent:
+    lineage:
+      - datalake_gsheets_raw.sale_payments_tiers.sk_agent
+  comission_percentage:
+    lineage:
+      - datalake_gsheets_raw.sale_payments_tiers.comission
+  tier:
+    lineage:
+      - datalake_gsheets_raw.sale_payments_tiers.tier
+  kind:
+    lineage:
+      - datalake_gsheets_raw.sale_payments_tiers.kind
+  dt_tier_start:
+    lineage:
+      - datalake_gsheets_raw.sale_payments_tiers.tier_start_date
+  dt_tier_end:
+    lineage:
+      - datalake_gsheets_raw.sale_payments_tiers.tier_end_date

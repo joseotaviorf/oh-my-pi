@@ -23,6 +23,7 @@ This pipeline produces the following output tables:
     - `sale_demand_targets`
     - `sale_ongoing_listings_targets`
     - `sale_payment_concluded_targets`
+    - `sale_payments_tiers`
     - `sale_supply_targets`
     - `sale_tof_daily_targets`
     - `sale_tof_monthly_targets`
@@ -33,6 +34,7 @@ This pipeline produces the following output tables:
     - `sale_demand_targets`
     - `sale_ongoing_listings_targets`
     - `sale_payment_concluded_targets`
+    - `sale_payments_tiers`
     - `sale_supply_targets`
     - `sale_tof_daily_targets`
     - `sale_tof_monthly_targets`
