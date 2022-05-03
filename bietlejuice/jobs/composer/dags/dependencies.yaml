@@ -1265,6 +1265,14 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.sauron:load-clean-session
   - bietlejuice.twilio_flex_insights:load-clean-conversation-time-metrics
 
+bietlejuice.enrich_dai_report:
+  - bietlejuice.ebdb:create-clean-contract-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.dw_house:load-quintoandar-dim-house-into-redshift
+  - bietlejuice.dw_sale_flows:load-sale-fact-sale-flows-into-redshift
+  - bietlejuice.dw_sale_offers:load-sale-dim-sale-agreement-into-redshift
+  - bietlejuice.dw_sale_offers:load-sale-fact-offers-into-redshift
+
 bietlejuice.enrich_invoice:
   - bietlejuice.ebdb:create-clean-affiliate-data-in-data-lake
   - bietlejuice.ebdb:create-clean-contract-in-data-lake

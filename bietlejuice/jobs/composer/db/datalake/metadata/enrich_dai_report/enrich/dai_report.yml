@@ -1,0 +1,60 @@
+---
+database_name: datalake_dai_report
+table_name: dai_report
+columns:
+  id_house:
+    lineage:
+      - dw_quintoandar.dim_house.sk_house
+      - datalake_ebdb_clean.house.id
+  dt_transaction:
+    lineage:
+      - dw_public.dim_date.date
+      - datalake_ebdb_clean.contract.ts_signed
+  transaction_amount:
+    lineage:
+      - dw_sale.dim_sale_agreement.sale_price_agreed
+      - datalake_ebdb_clean.contract.rent
+  address:
+    lineage:
+      - dw_quintoandar.dim_house.address
+      - datalake_ebdb_clean.house.address
+  address_number:
+    lineage:
+      - dw_quintoandar.dim_house.number
+      - datalake_ebdb_clean.house.number
+  address_complement:
+    lineage:
+      - dw_quintoandar.dim_house.complement
+      - datalake_ebdb_clean.house.complement
+  address_neighborhood:
+    lineage:
+      - dw_quintoandar.dim_house.neighborhood
+      - datalake_ebdb_clean.house.neighborhood
+  address_zipcode:
+    lineage:
+      - dw_quintoandar.dim_house.zipcode
+      - datalake_ebdb_clean.house.zipcode
+  useful_area:
+    lineage:
+      - dw_quintoandar.dim_house.total_area
+      - datalake_ebdb_clean.house.total_area
+  total_area:
+    lineage:
+      - dw_quintoandar.dim_house.total_area
+      - datalake_ebdb_clean.house.total_area
+  terrain_area:
+    lineage:
+      - dw_quintoandar.dim_house.land_area
+      - datalake_ebdb_clean.house.land_area
+  parking_slots:
+    lineage:
+      - dw_quintoandar.dim_house.parking_slots
+      - datalake_ebdb_clean.house.parking_slots
+  bedrooms:
+    lineage:
+      - dw_quintoandar.dim_house.bedrooms
+      - datalake_ebdb_clean.house.bedrooms
+  bathrooms:
+    lineage:
+      - dw_quintoandar.dim_house.bathrooms
+      - datalake_ebdb_clean.house.bathrooms

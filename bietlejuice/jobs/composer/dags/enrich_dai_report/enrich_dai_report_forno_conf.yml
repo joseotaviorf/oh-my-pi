@@ -1,0 +1,31 @@
+---
+query_export_xlsx:
+  "SELECT
+      id_house AS houseId,
+      dt_transaction AS transDate,
+      trasaction_type AS transType,
+      transaction_situation AS transSituation,
+      iptu AS iptuNumber,
+      transaction_amount AS transAmount,
+      address,
+      address_number AS addressNumber,
+      address_complement AS addressComplement,
+      address_neighborhood AS neighborhood,
+      address_zipcode AS zipcode,
+      house_type AS houseType,
+      useful_area AS usefulArea,
+      total_area AS totalArea,
+      construction_year AS constructionYear,
+      terrain_area AS terrainArea,
+      parking_slots AS qtyParkingLot,
+      bedrooms AS qtyDorms,
+      bathrooms AS qtyBaths
+  FROM
+      datalake_dai_report.dai_report;"
+format_options:
+  com.crealytics.spark.excel
+out_path:
+  "s3://5a-simba/dev/DAI/DAI_{}_{}.xlsx"
+cluster_extra_libs:
+  maven: 
+    coordinates: "com.crealytics:spark-excel_2.12:3.2.1_0.16.5-pre2"
