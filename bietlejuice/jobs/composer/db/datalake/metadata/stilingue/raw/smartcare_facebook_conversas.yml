@@ -1,0 +1,31 @@
+---
+database_name: datalake_stilingue_raw
+table_name: smartcare_facebook_conversas
+columns:
+  id:
+    tags:
+      - Confidential
+  id_page:
+    tags:
+      - Confidential
+  pages:
+    tags:
+      - Confidential
+  name:
+    tags:
+      - Confidential
+  username:
+    tags:
+      - Confidential
+  authors:
+    tags:
+      - Confidential
+  gender:
+    tags:
+      - Restricted
+  mentions:
+    tags:
+      - Confidential
+  location:
+    tags:
+      - Restricted
