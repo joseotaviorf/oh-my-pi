@@ -140,12 +140,6 @@ aux_regiao:
     clean_table_name: auxiliary_region
     sheet_context: for_rent
 
-demand_targets_2021:
-    sheet_id: 1l-KtlqNoMh_OgGc72Q5NyQz-IcBVLDo1kjJa5FzijqI
-    sheet_name: demand_targets_2021
-    clean_table_name: demand_targets_2021
-    sheet_context: for_rent
-
 demand_targets_2022:
     sheet_id: 1XL8xkxFzf4Zy-0ehrPR9HJc38_rtpVWsLRMNW6ORI8c
     sheet_name: demand_targets_2022
@@ -290,6 +284,12 @@ demand_targets_2020:
     sheet_id: 1rIFNs-Wy6glWjeclgUTUukjS2hJUu5BCSZh6N7Vy5dk
     sheet_name: demand_targets_2020
     clean_table_name: demand_targets_2020
+    sheet_context: static
+
+demand_targets_2021:
+    sheet_id: 1l-KtlqNoMh_OgGc72Q5NyQz-IcBVLDo1kjJa5FzijqI
+    sheet_name: demand_targets_2021
+    clean_table_name: demand_targets_2021
     sheet_context: static
 
 demand_targets_replanning:

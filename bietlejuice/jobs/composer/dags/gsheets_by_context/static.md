@@ -26,10 +26,11 @@ This pipeline produces the following output tables:
     - `autonomous_agent_payment_data_lead_origin`
     - `aux_agents_sale`
     - `demand_targets_2019`
+    - `demand_targets_2020`
+    - `demand_targets_2021`
     - `demand_targets_replanning`
     - `costs_allocation_relative_indexes`
     - `dados_docato`
-    - `demand_targets_2020`
     - `de_para_cancelamento`
     - `mra_historical`
     - `offline_and_branding_marketing_costs`
@@ -48,6 +49,7 @@ This pipeline produces the following output tables:
     - `aux_agents_sale`
     - `demand_targets_2019`
     - `demand_targets_2020`
+    - `demand_targets_2021`
     - `demand_targets_replanning`
     - `costs_allocation_relative_indexes`
     - `from_to_cancellation`

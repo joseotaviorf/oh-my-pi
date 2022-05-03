@@ -22,7 +22,6 @@ This pipeline produces the following output tables:
 1. Data lake raw:
     - `aux_agents`
     - `aux_regiao`
-    - `demand_targets_2021`
     - `demand_targets_2022`
     - `forecast_cohort_demanda`
     - `forecast_cohort_supply`
@@ -35,7 +34,6 @@ This pipeline produces the following output tables:
 2. Data lake clean:
     - `aux_agents`
     - `auxiliary_region`
-    - `demand_targets_2021`
     - `demand_targets_2022`
     - `rental_forecast_cohort_demand`
     - `rental_forecast_cohort_supply`
