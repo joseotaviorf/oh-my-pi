@@ -1,0 +1,229 @@
+---
+database_name: datalake_reclameaqui_clean
+table_name: tickets
+columns:
+  id:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.id
+  _id:
+    lineage:
+      - datalake_reclameaqui_raw.tickets._id
+  id_external:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.source_external_id
+  id_rule:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.rule_id
+  hugme_status:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.hugme_status
+  ra_status:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.ra_status
+  favorable_assessment:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.favorable_assessment
+  information_source:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.information_source
+  source:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.source
+  company:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.company
+  last_feeling:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.last_feeling
+  feed_type:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.feed_type
+  moderation:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.moderation
+  ra:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.ra
+  customer:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.customer
+  user:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.user
+  account:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.account
+  rafone:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.rafone
+  can_like:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.can_like
+  commentary:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.commentary
+  complaint_title:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.complaint_title
+  complaint_content:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.complaint_content
+  ra_reason:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.ra_reason
+  ra_feeling:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.ra_feeling
+  complaint_response_content:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.complaint_response_content
+  interactions_count:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.interactions_count
+  interactions_not_readed_count:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.interactions_not_readed_count
+  resolved_issue:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.resolved_issue
+  consumer_consideration:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.consumer_consideration
+  company_consideration:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.company_consideration
+  private_treatment_time:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.private_treatment_time
+  public_treatment_time:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.public_treatment_time
+  rating_time:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.rating_time
+  rating:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.rating
+  comments_count:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.comments_count
+  redistributions_count:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.redistributions_count
+  redistributions_reason:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.redistributions_reason
+  ticket_moderations_count:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.ticket_moderations_count
+  ticket_messages_count:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.ticket_messages_count
+  contact_us:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.contact_us
+  rating_without_response:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.rating_without_response
+  hugme_ticket_type:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.hugme_ticket_type
+  customer_interactions_count:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.customer_interactions_count
+  company_interactions_count:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.company_interactions_count
+  assignment_count:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.assignment_count
+  duplicate_ticket:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.duplicate_ticket
+  tags:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.tags
+  extra_data:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.extra_data
+  sticky_notes:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.sticky_notes
+  autos:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.autos
+  personalized_fields:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.personalized_fields
+  attached:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.attached
+  categories:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.categories
+  historical:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.historical
+  interactions:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.interactions
+  duplicate_tiqt:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.duplicate_tiqt
+  would_do_business_again:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.back_doing_business
+  is_active:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.active
+  is_filed:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.filed
+  is_requested_moderation:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.request_moderation
+  is_requested_evaluation:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.request_evaluation
+  is_frozen:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.frozen
+  ts_created:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.creation_date
+  ts_inserted:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.insertion_date
+  ts_complaint_response:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.complaint_response_date
+  ts_consumer_consideration:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.consumer_consideration_date
+  ts_company_consideration:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.company_consideration_date
+  ts_last_replica:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.last_replica_date
+  ts_last_modification:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.last_modification_date
+  ts_rating:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.rating_date
+  ts_closed:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.closed_date
+  ts_load:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.ts_load
+  year:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.year
+  month:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.month
+  day:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.day

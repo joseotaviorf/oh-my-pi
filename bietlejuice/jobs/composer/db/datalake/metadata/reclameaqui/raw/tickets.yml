@@ -1,0 +1,29 @@
+---
+database_name: datalake_reclameaqui_raw
+table_name: tickets
+columns:
+  customer:
+    tags:
+      - PII
+      - Confidential
+  user:
+    tags:
+      - PII
+  complaint_content:
+    tags:
+      - PII
+  complaint_company_response:
+    tags:
+      - PII
+  customer_considerations:
+    tags:
+      - PII
+  company_considerations:
+    tags:
+      - PII
+  sticky_notes:
+    tags:
+      - PII
+  historical:
+    tags:
+      - PII
