@@ -9,6 +9,7 @@ SELECT
     month,
     month_name,
     quarter,
+    brz_season,
     year,
     year_calendar_week,
     year_month,

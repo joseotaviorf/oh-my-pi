@@ -14,6 +14,7 @@ create table public.dim_date (
   working_days_in_month bigint,
   total_working_days_in_month bigint,
   brz_date string,
+  brz_season string,
   usa_date string,
   universal_date string,
   quarter string,
