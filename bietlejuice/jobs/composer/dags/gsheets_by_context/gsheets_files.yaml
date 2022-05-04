@@ -121,6 +121,28 @@ offline_manual_share_cost_center:
     sheet_context: growth
 
 #########################
+# GROWTH INTRA-DAY SHEETS
+#########################
+
+marketing_costs_manual_shared_costs:
+    sheet_id: 1YiFYgv-KTO8JydV5lO6HryZ8qnnN9wXSmPcGQ6KdmLI
+    sheet_name: rateio_manual
+    clean_table_name: marketing_costs_manual_shared_costs
+    sheet_context: growth_intraday
+
+marketing_costs_name_convention_shared_costs:
+    sheet_id: 1YiFYgv-KTO8JydV5lO6HryZ8qnnN9wXSmPcGQ6KdmLI
+    sheet_name: rateio_name_convention
+    clean_table_name: marketing_costs_name_convention_shared_costs
+    sheet_context: growth_intraday
+
+casa_mineira_marketing_manual_shared_costs:
+    sheet_id: 1IRBcIhdi7V0gXtvoImz7-sA5P38FALN_CgXcpAORzYY
+    sheet_name: rateio_manual
+    clean_table_name: casa_mineira_marketing_manual_shared_costs
+    sheet_context: growth_intraday
+
+#########################
 # BEDROCK SHEETS
 ###################
 
@@ -357,13 +379,13 @@ survival_estimation:
     sheet_name: survival_estimation
     clean_table_name: survival_estimation
     sheet_context: static
-    
+
 regional_inspection_q1_2022:
     sheet_id: 1ZSkD8Zucf8EFHAUweJiIk20VA3qAcuEshl_LtuOMX2E
     sheet_name: aux_regiao_regional_inspection
     clean_table_name: regional_inspection_q1_2022
     sheet_context: static
-    
+
 survival_estimation_new_version:
     sheet_id: 1hBZp2g6smNXBRFnITrihnwzztkFRr7q_IF5sSBgSQKo
     sheet_name: survival_estimation_new_version

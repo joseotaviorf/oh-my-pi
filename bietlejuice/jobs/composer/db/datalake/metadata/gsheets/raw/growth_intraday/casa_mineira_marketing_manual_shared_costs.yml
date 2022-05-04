@@ -1,0 +1,55 @@
+---
+database_name: datalake_gsheets_raw
+table_name: casa_mineira_marketing_manual_shared_costs
+columns:
+  side:
+    tags:
+      - Public
+  city_group:
+    tags:
+      - Public
+  account_name:
+    tags:
+      - Confidential
+  campaign_name:
+    tags:
+      - Confidential
+  ad_group_name:
+    tags:
+      - Public
+  utm_term:
+    tags:
+      - Public
+  utm_content:
+    tags:
+      - Public
+  mkt_business:
+    tags:
+      - Public
+  mkt_origin:
+    tags:
+      - Public
+  mkt_channel:
+    tags:
+      - Public
+  mkt_medium:
+    tags:
+      - Public
+  mkt_source:
+    tags:
+      - Public
+  cost:
+    tags:
+      - Confidential
+  cost_share_mobile:
+    tags:
+      - Confidential
+  cost_share_desktop:
+    tags:
+      - Confidential
+  cost_share_other:
+    tags:
+      - Confidential
+  dt:
+    tags:
+      - Public

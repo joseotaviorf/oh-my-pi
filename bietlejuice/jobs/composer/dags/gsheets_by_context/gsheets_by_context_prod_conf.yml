@@ -11,6 +11,9 @@ dags:
   growth:
     main_schedule_interval: 0 3 * * *
     dag_owner: Data Growth
+  growth_intraday:
+    main_schedule_interval: 0 10 * * *
+    dag_owner: Data Growth
   for_rent:
     main_schedule_interval: 0 3 * * *
     dag_owner: Data ForRent
@@ -23,5 +26,5 @@ dags:
   static:
     dag_owner: Data Engineering
   general:
-    dag_owner: Data Engineering
     main_schedule_interval: 0 3 * * *
+    dag_owner: Data Engineering

@@ -1,4 +1,4 @@
-## GSHEETS GROWTH
+## GSHEETS Growth
 
 ### Purpose
 
@@ -8,10 +8,10 @@ If you need information to understand how you can add your sheet, check our [Goo
 
 <details>
   <summary><strong> > DAG details (click to expand)</strong></summary>
-  
+
 ### Execution Interval
 
-This DAG does not have an automatic trigger. It is run manually when necessary.
+This DAG is trigged daily.
 
 More information about run time [here]({chart_url}{dag_id}).
 

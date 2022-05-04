@@ -145,11 +145,6 @@ casa_mineira_marketing_cost_taxonomy:
     sheet_name: casa_mineira_marketing_cost_taxonomy
     clean_table_name: casa_mineira_marketing_cost_taxonomy
 
-casa_mineira_marketing_manual_shared_costs:
-    sheet_id: 1IRBcIhdi7V0gXtvoImz7-sA5P38FALN_CgXcpAORzYY
-    sheet_name: rateio_manual
-    clean_table_name: casa_mineira_marketing_manual_shared_costs
-
 cod_locale:
     sheet_id: 1GhZCQssX1zQIj1wpv5hm6iK3_4Hb2EPH251OMyOLJmQ
     sheet_name: LOC (Cidade)

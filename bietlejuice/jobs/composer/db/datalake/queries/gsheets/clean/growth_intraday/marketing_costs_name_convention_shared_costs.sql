@@ -17,4 +17,4 @@ SELECT
     CAST(REPLACE(NULLIF(cost_share_other, ''), ',', '') AS FLOAT) AS cost_share_other,
     CAST(NULLIF(dt, '') AS DATE) AS dt_cost
 FROM
-    datalake_marketing_manual_daily_costs_raw.marketing_costs_name_convention_shared_costs
+    datalake_gsheets_raw.marketing_costs_name_convention_shared_costs

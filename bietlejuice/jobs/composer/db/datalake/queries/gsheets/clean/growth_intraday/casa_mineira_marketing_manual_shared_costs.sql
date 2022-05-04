@@ -15,6 +15,6 @@ SELECT
     CAST(NULLIF(cost_share_mobile, '') AS DOUBLE) AS cost_share_mobile,
     CAST(NULLIF(cost_share_desktop, '') AS DOUBLE) AS cost_share_desktop,
     CAST(NULLIF(cost_share_other, '') AS DOUBLE) AS cost_share_other,
-    DATE(NULLIF(dt, '')) AS dt
+    DATE(NULLIF(dt, '')) AS dt_cost
 FROM
     datalake_gsheets_raw.casa_mineira_marketing_manual_shared_costs
