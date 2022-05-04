@@ -1,10 +1,12 @@
 SELECT
     ccv,
+    os2ccv,
     cidade,
     deal_quali,
     offer_accepted,
     offer_sent,
     origem,
+    operacao,
     visit_booked,
     visit_completed,
     week,

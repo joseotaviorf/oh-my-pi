@@ -4,6 +4,9 @@ columns:
   ccv:
     lineage:
       - datalake_gsheets_raw.target_sale_cohort_demand.ccv
+  os2ccv:
+    lineage:
+      - datalake_gsheets_raw.target_sale_cohort_demand.os2ccv
   cidade:
     lineage:
       - datalake_gsheets_raw.target_sale_cohort_demand.cidade
@@ -19,6 +22,9 @@ columns:
   origem:
     lineage:
       - datalake_gsheets_raw.target_sale_cohort_demand.origem
+  operacao:
+    lineage:
+      - datalake_gsheets_raw.target_sale_cohort_demand.operacao
   visit_booked:
     lineage:
       - datalake_gsheets_raw.target_sale_cohort_demand.visit_booked
