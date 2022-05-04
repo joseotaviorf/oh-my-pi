@@ -1,0 +1,16 @@
+---
+database_name: datalake_gsheets_clean
+table_name: csat_refund_after_termination
+columns:
+  customer_experience_feedback:
+    lineage:
+      - datalake_gsheets_raw.csat_reembolso_pos_rescisao.experiencia_reembolso
+  improvement_suggestions:
+    lineage:
+      - datalake_gsheets_raw.csat_reembolso_pos_rescisao.sugestao_melhorias
+  satisfation_level:
+    lineage:
+      - datalake_gsheets_raw.csat_reembolso_pos_rescisao.nivel_satisfacao
+  ts_submitted:
+    lineage:
+      - datalake_gsheets_raw.csat_reembolso_pos_rescisao.timestamp

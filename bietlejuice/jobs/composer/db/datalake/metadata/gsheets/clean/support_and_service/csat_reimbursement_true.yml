@@ -1,0 +1,31 @@
+---
+database_name: datalake_gsheets_clean
+table_name: csat_reimbursement_true
+columns:
+  token:
+    lineage:
+      - datalake_gsheets_raw.csat_reembolso_true.token
+  cid:
+    lineage:
+      - datalake_gsheets_raw.csat_reembolso_true.cid
+  uid:
+    lineage:
+      - datalake_gsheets_raw.csat_reembolso_true.uid
+  type:
+    lineage:
+      - datalake_gsheets_raw.csat_reembolso_true.type
+  improvement_suggestions:
+    lineage:
+      - datalake_gsheets_raw.csat_reembolso_true.sugestao_melhorias
+  satisfation_level_description:
+    lineage:
+      - datalake_gsheets_raw.csat_reembolso_true.motivo_satisfacao
+  satisfation_level_reason:
+    lineage:
+      - datalake_gsheets_raw.csat_reembolso_true.token
+  satisfation_level:
+    lineage:
+      - datalake_gsheets_raw.csat_reembolso_true.nivel_satisfacao
+  ts_submitted:
+    lineage:
+      - datalake_gsheets_raw.csat_reembolso_true.submitted_at

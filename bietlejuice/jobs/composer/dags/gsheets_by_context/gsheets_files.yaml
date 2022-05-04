@@ -50,6 +50,18 @@ department_control:
     clean_table_name: department_control
     sheet_context: support_and_service
 
+csat_reembolso_true:
+    sheet_id: 1nwpNuMa0h4tChnJAc5unGT1NpuJMbY5mxIkIjx93wRE
+    sheet_name: reembolso_true
+    clean_table_name: csat_reimbursement_true
+    sheet_context: support_and_service
+
+csat_reembolso_pos_rescisao:
+    sheet_id: 1nwpNuMa0h4tChnJAc5unGT1NpuJMbY5mxIkIjx93wRE
+    sheet_name: reembolso_pos_rescisao
+    clean_table_name: csat_refund_after_termination
+    sheet_context: support_and_service
+
 #########################
 # GROWTH SHEETS
 ###################
