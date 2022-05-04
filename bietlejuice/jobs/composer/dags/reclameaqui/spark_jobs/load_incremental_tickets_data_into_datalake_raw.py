@@ -91,7 +91,7 @@ if __name__ == "__main__":
 
         df = spark_client.create_dataframe(data=response, schema=schema)
         df = df.withColumn("ts_load", to_timestamp(col("last_modification_date")))
-        df = df.where(f"ts_load = '{execution_date}'")
+        df = df.where(f"date(ts_load) = '{execution_date}'")
         df = (
             SparkDataFrameService()
             .input(df)
