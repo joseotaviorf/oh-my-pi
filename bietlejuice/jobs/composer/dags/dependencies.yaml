@@ -254,6 +254,13 @@ bietlejuice.dw_datamarts_growth:
   # performance_marketing_metrics_portal_casa_mineira, performance_marketing_metrics_imobiliaria_casa_mineira
   - bietlejuice.enrich_casa_mineira_marketing_automatic_daily_costs:create-enrich-daily-costs-external-table
   - bietlejuice.gsheets:create-clean-taxonomy-portal-casa-mineira-external-table
+  - bietlejuice.gsheets.growth:create-clean-targets-casa-mineira-nbp-external-table
+  - bietlejuice.casa_mineira_crm:load-clean-city
+  - bietlejuice.casa_mineira_crm:load-clean-house
+  - bietlejuice.casa_mineira_crm:load-clean-house-type
+  - bietlejuice.casa_mineira_crm:load-clean-neighborhood
+  - bietlejuice.casa_mineira_crm:load-clean-uf
+  - bietlejuice.casa_mineira_crm:load-clean-visit
   # performance_marketing_metrics_portal_casa_mineira
   - bietlejuice.casa_mineira_amplitude:create-clean-329001-portal-external-table
   - bietlejuice.casa_mineira_portal:create-clean-contact-external-table
