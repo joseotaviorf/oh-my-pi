@@ -1,0 +1,34 @@
+---
+database_name: datalake_survicate
+table_name: photo_surveys
+columns:
+  id_response:
+    lineage:
+      - datalake_survicate_clean.surveys.response_uuid
+  id_owner:
+    lineage:
+      - datalake_survicate_clean.surveys.page_url
+  satisfaction_rating:
+    lineage:
+      - datalake_survicate_clean.surveys.answers
+  improvement_tags:
+    lineage:
+      - datalake_survicate_clean.surveys.answers
+  user_comment:
+    lineage:
+      - datalake_survicate_clean.surveys.answers
+  ts_first_seen:
+    lineage:
+      - datalake_survicate_clean.surveys.ts_first_seen
+  ts_first_response:
+    lineage:
+      - datalake_survicate_clean.surveys.ts_first_response
+  year:
+    lineage:
+      - datalake_survicate_clean.surveys.year
+  month:
+    lineage:
+      - datalake_survicate_clean.surveys.month
+  day:
+    lineage:
+      - datalake_survicate_clean.surveys.day
