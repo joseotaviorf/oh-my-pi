@@ -10,4 +10,5 @@
 #     # If the datamart has no inner dependency, declare it as an empty object
 
 for_rent:
+  agents_activations_suspensions_contracts_changes: {}
   datamart_opportunity: {}
