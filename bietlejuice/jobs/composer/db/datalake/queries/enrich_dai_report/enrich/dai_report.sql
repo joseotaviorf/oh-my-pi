@@ -40,7 +40,7 @@ WITH for_sale AS (
             ON sa.sk_offer = fo.sk_offer
     WHERE
         dd.date BETWEEN TRUNC(ADD_MONTHS(CURRENT_DATE(), -1), "month") AND LAST_DAY(ADD_MONTHS(CURRENT_DATE(), -1))
-        AND dh.city IN ('Sao Paulo', 'São Paulo', 'são paulo', 'sao paulo')
+        AND LOWER(TRIM(dh.city)) IN ('são paulo', 'sao paulo')
         AND is_ccv_canceled = false
 ),
 for_rent AS (
@@ -76,7 +76,7 @@ for_rent AS (
             ON con.id_house = imo.id
     WHERE
         con.type = 'FullService'
-        AND imo.city = 'São Paulo'
+        AND LOWER(TRIM(imo.city)) IN ('são paulo', 'sao paulo')
         AND TO_DATE(con.ts_signed, 'YYYY-MM-DD') BETWEEN TRUNC(ADD_MONTHS(CURRENT_DATE(), -1), "month") AND LAST_DAY(ADD_MONTHS(CURRENT_DATE(), -1))
         AND con.status IN ('Ativo', 'Finalizado')
 )
