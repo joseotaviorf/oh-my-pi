@@ -35,6 +35,10 @@ WITH affiliates_full AS (
   LEFT JOIN
     datalake_ebdb_user.agent_data
       ON agent_data.id = u.id_agent
+  LEFT JOIN 
+    datalake_ebdb_clean.partner_agent pa
+      ON pa.id_user = u.id
+  WHERE pa.id_partner <> 7099
 ),
 region_ddd AS (
   SELECT DISTINCT
