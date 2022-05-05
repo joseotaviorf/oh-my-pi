@@ -1,0 +1,31 @@
+---
+database_name: datalake_documentation_metrics_clean
+table_name: columns_documentation_metrics
+columns:
+  layer:
+    lineage:
+      - datalake_documentation_metrics_clean.columns_metastore.layer
+  database_name:
+    lineage:
+      - datalake_documentation_metrics_clean.columns_metastore.database_name
+  table_name:
+    lineage:
+      - datalake_documentation_metrics_clean.columns_metastore.table_name
+  column_name:
+    lineage:
+      - datalake_documentation_metrics_clean.columns_metastore.column_name
+  has_description:
+    lineage:
+      - datalake_documentation_metrics_clean.columns_documentation.has_description
+  has_joins_with_column:
+    lineage:
+      - datalake_documentation_metrics_clean.columns_documentation.has_joins_with_column
+  year:
+    lineage:
+      - datalake_documentation_metrics_clean.columns_metastore.year
+  month:
+    lineage:
+      - datalake_documentation_metrics_clean.columns_metastore.month
+  day:
+    lineage:
+      - datalake_documentation_metrics_clean.columns_metastore.day
