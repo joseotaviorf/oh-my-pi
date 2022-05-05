@@ -1,0 +1,3 @@
+---
+database_name: datalake_documentation_metrics_raw
+table_name: columns_documentation

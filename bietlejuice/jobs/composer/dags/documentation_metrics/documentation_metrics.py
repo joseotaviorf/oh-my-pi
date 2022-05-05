@@ -36,7 +36,7 @@ BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/"
 
 CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_documentation_metrics_cluster", deserialize_json=True
+    "databricks_9_1_med_general_cluster", deserialize_json=True
 )
 CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][

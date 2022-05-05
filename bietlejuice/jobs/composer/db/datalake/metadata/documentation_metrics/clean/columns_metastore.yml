@@ -1,0 +1,25 @@
+---
+database_name: datalake_documentation_metrics_clean
+table_name: columns_metastore
+columns:
+  layer:
+    lineage:
+      - datalake_documentation_metrics_raw.columns_metastore.layer
+  database_name:
+    lineage:
+      - datalake_documentation_metrics_raw.columns_metastore.database_name
+  table_name:
+    lineage:
+      - datalake_documentation_metrics_raw.columns_metastore.table_name
+  column_name:
+    lineage:
+      - datalake_documentation_metrics_raw.columns_metastore.column_name
+  year:
+    lineage:
+      - datalake_documentation_metrics_raw.columns_metastore.year
+  month:
+    lineage:
+      - datalake_documentation_metrics_raw.columns_metastore.month
+  day:
+    lineage:
+      - datalake_documentation_metrics_raw.columns_metastore.day

@@ -1,7 +1,8 @@
 ---
 partition_cols: ["year", "month", "day"]
 table_names:
-  - tables_documentation_metrics
-  - columns_documentation_metrics
-  - categories_documentation_metrics
-  - lineage_and_tags_metrics
+  - categories_documentation
+  - columns_metastore
+  - dag_metadata
+  - lineage_and_tags
+  - columns_documentation

@@ -5,13 +5,6 @@ PARTITION_COLUMNS:
   - year
   - month
   - day
-DATABASES_MIGRATED_TO_COMPOSER:
-  - braze
-  - payment
-  - quintoandar
-  - sale
-  - teravoz
-  - tracksale
 DATABASE_SKIP_LIST:
   - bureaus
   - datalake_static_files_raw

@@ -28,19 +28,17 @@ from bietlejuice.jobs.composer.services.configuration_service import (
 )
 
 
-JOB_NAME = "load_categories_documentation_metrics_to_raw"
+JOB_NAME = "load_categories_documentation_to_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def get_categories_documentation_metrics(
-    bucket, prefix, migrated_databases, spark_client
-):
+def get_categories_documentation_metrics(bucket, prefix, spark_client):
     s3_client = boto3.client("s3")
     documentation_paths = get_documentation_paths_from_bucket(bucket, prefix, s3_client)
     documentation_contents = get_content_from_paths(
-        bucket, documentation_paths, migrated_databases, s3_client
+        bucket, documentation_paths, s3_client
     )
     documentation_df = create_dataframe_from_contents(
         documentation_contents, spark_client
@@ -72,7 +70,7 @@ def get_documentation_paths_from_bucket(bucket, prefix, s3_client):
     return documentation_paths
 
 
-def get_content_from_paths(bucket, documentation_paths, migrated_databases, s3_client):
+def get_content_from_paths(bucket, documentation_paths, s3_client):
     s3_objects = []
     for file_path in documentation_paths:
         file_object = s3_client.get_object(Bucket=bucket, Key=file_path)
@@ -82,18 +80,7 @@ def get_content_from_paths(bucket, documentation_paths, migrated_databases, s3_c
     for obj in s3_objects:
         documentation_contents.append(yaml.safe_load(obj))
 
-    for doc in documentation_contents:
-        doc["database_name"] = add_prefix_to_migrated_databases(
-            doc["database_name"], migrated_databases
-        )
-
     return documentation_contents
-
-
-def add_prefix_to_migrated_databases(database_name, migrated_databases):
-    if database_name in migrated_databases:
-        return f"dw_{database_name}"
-    return database_name
 
 
 def create_dataframe_from_contents(documentation_contents, spark_client):
@@ -164,8 +151,6 @@ if __name__ == "__main__":
     config_service = ConfigurationService(source)
     documentation_bucket = config_service.get_config("DOCUMENTATION_BUCKET")
     documentation_prefix = config_service.get_config("DOCUMENTATION_PATH")
-    migrated_databases = config_service.get_config("DATABASES_MIGRATED_TO_COMPOSER")
-    schemas_skip_list = config_service.get_config("DATABASE_SKIP_LIST")
     partition_cols = config_service.get_config("PARTITION_COLUMNS")
 
     s3_loader = S3Loader()
@@ -181,7 +166,7 @@ if __name__ == "__main__":
 
     # Creating metrics dataframe
     category_metrics_df = get_categories_documentation_metrics(
-        documentation_bucket, documentation_prefix, migrated_databases, spark_client
+        documentation_bucket, documentation_prefix, spark_client
     )
     category_metrics_df = (
         SparkDataFrameService()

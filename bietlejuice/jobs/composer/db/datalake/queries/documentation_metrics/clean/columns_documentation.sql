@@ -1,15 +1,16 @@
 SELECT
-    layer,
     database_name,
     table_name,
+    table_description,
+    owner,
     column_name,
-    value,
-    has_description,
+    column_description,
+    joins_with_column,
     year,
     month,
     day
 FROM
-    datalake_documentation_metrics_raw.categories_documentation_metrics
+    datalake_documentation_metrics_raw.columns_documentation
 WHERE
     year = {year}
     AND month = {month}

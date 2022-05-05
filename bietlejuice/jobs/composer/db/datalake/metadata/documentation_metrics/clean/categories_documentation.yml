@@ -1,0 +1,31 @@
+---
+database_name: datalake_documentation_metrics_clean
+table_name: categories_documentation
+columns:
+  layer:
+    lineage:
+      - datalake_documentation_metrics_raw.categories_documentation.layer
+  database_name:
+    lineage:
+      - datalake_documentation_metrics_raw.categories_documentation.database_name
+  table_name:
+    lineage:
+      - datalake_documentation_metrics_raw.categories_documentation.table_name
+  column_name:
+    lineage:
+      - datalake_documentation_metrics_raw.categories_documentation.column_name
+  value:
+    lineage:
+      - datalake_documentation_metrics_raw.categories_documentation.value
+  has_description:
+    lineage:
+      - datalake_documentation_metrics_raw.categories_documentation.has_description
+  year:
+    lineage:
+      - datalake_documentation_metrics_raw.categories_documentation.year
+  month:
+    lineage:
+      - datalake_documentation_metrics_raw.categories_documentation.month
+  day:
+    lineage:
+      - datalake_documentation_metrics_raw.categories_documentation.day

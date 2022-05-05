@@ -1,0 +1,28 @@
+---
+database_name: datalake_documentation_metrics_clean
+table_name: dag_metadata
+columns:
+  layer:
+    lineage:
+      - datalake_documentation_metrics_raw.dag_metadata.layer
+  dag_name:
+    lineage:
+      - datalake_documentation_metrics_raw.dag_metadata.dag_name
+  database_name:
+    lineage:
+      - datalake_documentation_metrics_raw.dag_metadata.database_name
+  has_lineage_from_product:
+    lineage:
+      - datalake_documentation_metrics_raw.dag_metadata.has_lineage_from_product
+  owner:
+    lineage:
+      - datalake_documentation_metrics_raw.dag_metadata.owner
+  year:
+    lineage:
+      - datalake_documentation_metrics_raw.dag_metadata.year
+  month:
+    lineage:
+      - datalake_documentation_metrics_raw.dag_metadata.month
+  day:
+    lineage:
+      - datalake_documentation_metrics_raw.dag_metadata.day

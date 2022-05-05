@@ -1,2 +1,3 @@
+---
 database_name: datalake_documentation_metrics_raw
-table_name: lineage_and_tags_metrics
+table_name: columns_metastore

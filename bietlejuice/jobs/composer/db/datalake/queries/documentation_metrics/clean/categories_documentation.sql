@@ -2,13 +2,14 @@ SELECT
     layer,
     database_name,
     table_name,
+    column_name,
+    value,
     has_description,
-    has_owner,
     year,
     month,
     day
 FROM
-    datalake_documentation_metrics_raw.tables_documentation_metrics
+    datalake_documentation_metrics_raw.categories_documentation
 WHERE
     year = {year}
     AND month = {month}

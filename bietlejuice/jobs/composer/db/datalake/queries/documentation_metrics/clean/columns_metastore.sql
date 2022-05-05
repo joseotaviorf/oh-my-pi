@@ -3,13 +3,11 @@ SELECT
     database_name,
     table_name,
     column_name,
-    has_description,
-    has_joins_with_column,
     year,
     month,
     day
 FROM
-    datalake_documentation_metrics_raw.columns_documentation_metrics
+    datalake_documentation_metrics_raw.columns_metastore
 WHERE
     year = {year}
     AND month = {month}

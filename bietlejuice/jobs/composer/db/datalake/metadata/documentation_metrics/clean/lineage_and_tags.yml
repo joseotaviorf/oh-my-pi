@@ -1,0 +1,25 @@
+---
+database_name: datalake_documentation_metrics_clean
+table_name: lineage_and_tags
+columns:
+  database_name:
+    lineage:
+      - datalake_documentation_metrics_raw.lineage_and_tags.database_name
+  table_name:
+    lineage:
+      - datalake_documentation_metrics_raw.lineage_and_tags.table_name
+  has_lineage:
+    lineage:
+      - datalake_documentation_metrics_raw.lineage_and_tags.has_lineage
+  has_tags:
+    lineage:
+      - datalake_documentation_metrics_raw.lineage_and_tags.has_tags
+  year:
+    lineage:
+      - datalake_documentation_metrics_raw.lineage_and_tags.year
+  month:
+    lineage:
+      - datalake_documentation_metrics_raw.lineage_and_tags.month
+  day:
+    lineage:
+      - datalake_documentation_metrics_raw.lineage_and_tags.day
