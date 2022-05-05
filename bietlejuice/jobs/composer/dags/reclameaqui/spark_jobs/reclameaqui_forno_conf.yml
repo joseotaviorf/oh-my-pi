@@ -4,13 +4,13 @@ tickets:
   partition_cols: ["year", "month", "day"]
   schema: |
     hugme_status STRUCT<name:STRING,id:string>,
-    ra_status STRUCT<name:STRING,id:string>,
-    favorable_assessment STRING,
-    information_source STRING,
-    source STRING,
-    company STRING,
-    last_feeling STRING,
-    feed_type STRING,
+    ra_status STRUCT<name:STRING,id:STRING>,
+    favorable_assessment STRUCT<description:STRING>,
+    information_source STRUCT<name:STRING>,
+    source STRUCT<name: STRING>,
+    company STRUCT<id:STRING, name:STRING>,
+    last_feeling STRUCT<name:STRING>,
+    feed_type STRUCT<name:STRING>,
     moderation STRUCT<
       request_date:STRING, 
       reason:STRING, 
@@ -19,11 +19,19 @@ tickets:
       response_date:STRING, 
       status:STRING
     >,
-    ra STRING,
+    ra STRUCT<
+      internal_process:STRING, 
+      deactivation_reason:STRING, 
+      blackfriday:STRING, 
+      replicas_count:STRING,
+      source_id:STRING, 
+      source_name:STRING, 
+      deactivation_date:STRING
+    >,
     customer STRING,
-    user STRING,
-    account STRING,
-    rafone STRING,
+    user STRUCT<id:STRING, name:STRING>,
+    account STRUCT<name:STRING>,
+    rafone STRUCT<status_id:STRING, expiration_date:STRING, status_name:STRING>,
     _id STRING,
     id STRING,
     source_external_id STRING,
@@ -72,12 +80,56 @@ tickets:
     duplicate_ticket STRING,
     tags STRING,
     extra_data STRING,
-    sticky_notes ARRAY<STRUCT<user:STRUCT<name:STRING>>>,
-    autos STRING,
+    sticky_notes ARRAY<
+      STRUCT<
+        user:STRUCT<name:STRING>,
+        content:STRING,
+        creation_date:STRING,
+        scheduled_date:STRING
+      >
+    >,
+    autos ARRAY<STRUCT<id:STRING,name:STRING,creation_date:STRING>>,
     personalized_fields STRING,
     attached STRING,
     categories STRING,
-    historical STRING,
-    interactions STRING,
+    historical ARRAY<
+      STRUCT<
+        user:STRUCT<name:STRING, email:STRING>,
+        auto:STRUCT<id:STRING,name:STRING>,
+        id:STRING,
+        creation_date:STRING,
+        type:STRUCT<id:STRING, name:STRING>
+      >
+    >,
+    interactions ARRAY<
+      STRUCT<
+        ticket_interaction_id:STRING,
+        ticket_interaction_name:STRING,
+        customer_id:STRING,
+        responsible_id:STRING,
+        responsible_name:STRING,
+        message:STRING,
+        privacy:STRING,
+        creation_date:STRING,
+        modification_date:STRING,
+        delivered:STRING,
+        readed:STRING,
+        visualized:STRING,
+        video:STRING,
+        picture:STRING,
+        details:ARRAY<
+          STRUCT<
+            ticket_detail_id:STRING,
+            ticket_detail_type_id:STRING,
+            name:STRING,
+            value:STRING,
+            code:STRING,
+            creation_date:STRING,
+            privacy:STRING,
+            modification_date:STRING
+          >
+        >
+      >
+    >,
     active STRING,
     duplicate_tiqt STRING
