@@ -42,57 +42,57 @@ pipeline:
       event: push
       branch: [ forno, master, hotfix/* ]
 
-  install-dependencies-ec2-forno:
-    group: ec2-install
-    image: drillster/drone-rsync
-    hosts: [ ssh.airflow.forno.quintoandar.com.br ]
-    user: airflow
-    source: .
-    target: ~/bi
-    include: [ 'requirements.txt', 'variables.json', 'githubcredentials.txt'  ]
-    exclude: [ '*' ]
-    args: '-vI'
-    script:
-      - git config --global credential.helper store
-      - export GH_TOKEN=$(cat ~/bi/githubcredentials.txt)
-      - echo "https://$GH_TOKEN:$GH_TOKEN@github.com" > ~/.git-credentials
-      - cd /var/www/airflow/
-      - AIRFLOW_GPL_UNIDECODE=yes airflow_venv/bin/pip install -I -Ur ~/bi/requirements.txt --extra-index-url https://quintoandar.github.io/python-package-server/
-      - airflow_venv/bin/airflow variables -i ~/bi/variables.json
-      - sudo find /var/www/airflow/dags/bietlejuice -name \*.pyc -delete
-      - sudo find /var/www/airflow/plugins -name \*.pyc -delete
-      - rm ~/bi/githubcredentials.txt
-    secrets:
-      - source: rsync_key
-        target: rsync_key
-    when:
-      event: push
-      branch: [ forno ]
+  # install-dependencies-ec2-forno:
+  #   group: ec2-install
+  #   image: drillster/drone-rsync
+  #   hosts: [ ssh.airflow.forno.quintoandar.com.br ]
+  #   user: airflow
+  #   source: .
+  #   target: ~/bi
+  #   include: [ 'requirements.txt', 'variables.json', 'githubcredentials.txt'  ]
+  #   exclude: [ '*' ]
+  #   args: '-vI'
+  #   script:
+  #     - git config --global credential.helper store
+  #     - export GH_TOKEN=$(cat ~/bi/githubcredentials.txt)
+  #     - echo "https://$GH_TOKEN:$GH_TOKEN@github.com" > ~/.git-credentials
+  #     - cd /var/www/airflow/
+  #     - AIRFLOW_GPL_UNIDECODE=yes airflow_venv/bin/pip install -I -Ur ~/bi/requirements.txt --extra-index-url https://quintoandar.github.io/python-package-server/
+  #     - airflow_venv/bin/airflow variables -i ~/bi/variables.json
+  #     - sudo find /var/www/airflow/dags/bietlejuice -name \*.pyc -delete
+  #     - sudo find /var/www/airflow/plugins -name \*.pyc -delete
+  #     - rm ~/bi/githubcredentials.txt
+  #   secrets:
+  #     - source: rsync_key
+  #       target: rsync_key
+  #   when:
+  #     event: push
+  #     branch: [ forno ]
 
-  install-dependencies-ec2-prod:
-    group: ec2-install
-    image: drillster/drone-rsync
-    hosts: [ ssh.airflow.quintoandar.com.br ]
-    user: airflow
-    source: .
-    target: ~/bi
-    include: [ 'requirements.txt', 'variables.json', 'githubcredentials.txt'   ]
-    exclude: [ '*' ]
-    args: '-vI'
-    script:
-      - git config --global credential.helper store
-      - export GH_TOKEN=$(cat ~/bi/githubcredentials.txt)
-      - echo "https://$GH_TOKEN:$GH_TOKEN@github.com" > ~/.git-credentials
-      - cd /var/www/airflow/
-      - AIRFLOW_GPL_UNIDECODE=yes airflow_venv/bin/pip install -I -Ur ~/bi/requirements.txt --extra-index-url https://quintoandar.github.io/python-package-server/
-      - airflow_venv/bin/airflow variables -i ~/bi/variables.json
-      - sudo find /var/www/airflow/dags/bietlejuice -name \*.pyc -delete
-      - sudo find /var/www/airflow/plugins -name \*.pyc -delete
-      - rm ~/bi/githubcredentials.txt
-    secrets: [ rsync_key ]
-    when:
-      event: push
-      branch: [ master, hotfix/* ]
+  # install-dependencies-ec2-prod:
+  #   group: ec2-install
+  #   image: drillster/drone-rsync
+  #   hosts: [ ssh.airflow.quintoandar.com.br ]
+  #   user: airflow
+  #   source: .
+  #   target: ~/bi
+  #   include: [ 'requirements.txt', 'variables.json', 'githubcredentials.txt'   ]
+  #   exclude: [ '*' ]
+  #   args: '-vI'
+  #   script:
+  #     - git config --global credential.helper store
+  #     - export GH_TOKEN=$(cat ~/bi/githubcredentials.txt)
+  #     - echo "https://$GH_TOKEN:$GH_TOKEN@github.com" > ~/.git-credentials
+  #     - cd /var/www/airflow/
+  #     - AIRFLOW_GPL_UNIDECODE=yes airflow_venv/bin/pip install -I -Ur ~/bi/requirements.txt --extra-index-url https://quintoandar.github.io/python-package-server/
+  #     - airflow_venv/bin/airflow variables -i ~/bi/variables.json
+  #     - sudo find /var/www/airflow/dags/bietlejuice -name \*.pyc -delete
+  #     - sudo find /var/www/airflow/plugins -name \*.pyc -delete
+  #     - rm ~/bi/githubcredentials.txt
+  #   secrets: [ rsync_key ]
+  #   when:
+  #     event: push
+  #     branch: [ master, hotfix/* ]
 
   load-jobs-ec2-forno:
     group: ec2-updated_jobs
