@@ -1,11 +1,11 @@
 SELECT
     CAST(COALESCE(r.id, ar.id) AS BIGINT) AS id,
+    c.id AS id_city,
+    mr.id AS id_macro_region,
+    CAST(st.id_country AS INTEGER) AS id_country,
     r.level,
     COALESCE(r.name, ar.neighbourhood) AS name,
-    mr.id AS id_macro_region,
     mr.name AS macro_region_name,
-    (r.level = 'Cidade') AS is_city,
-    c.id AS id_city,
     COALESCE(ar.city, c.name) AS city_name,
     ar.city_group,
     CAST(ar.ddd AS STRING) AS city_ddd,
@@ -23,6 +23,11 @@ SELECT
     ar.regional_deprecated,
     ar.regional_inspection,
     ar.tier,
+    CASE
+      WHEN st.id_country = 1 THEN 'Brazil'
+      WHEN st.id_country = 2 THEN 'Mexico'
+    END AS country_name,
+    (r.level = 'Cidade') AS is_city,
     r.ts_created,
     r.ts_updated
 FROM
@@ -33,6 +38,9 @@ LEFT JOIN
 LEFT JOIN
   datalake_ebdb_clean.region AS c
     ON c.id = mr.id_parent_region
+LEFT JOIN
+  datalake_ebdb_clean.state AS st
+    ON st.id = COALESCE(r.id_state, mr.id_state, c.id_state)
 LEFT JOIN
   datalake_gsheets_clean.auxiliary_region AS ar
     ON r.id = ar.id

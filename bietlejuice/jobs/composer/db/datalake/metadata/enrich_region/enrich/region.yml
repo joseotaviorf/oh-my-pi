@@ -5,6 +5,15 @@ columns:
     lineage:
       - datalake_ebdb_clean.region.id
       - datalake_gsheets_clean.auxiliary_region.id
+  id_city:
+    lineage:
+      - datalake_ebdb_clean.region.id
+  id_macro_region:
+    lineage:
+      - datalake_ebdb_clean.region.id
+  id_country:
+    lineage:
+      - datalake_ebdb_clean.state.id_country
   level:
     lineage:
       - datalake_ebdb_clean.region.level
@@ -12,18 +21,9 @@ columns:
     lineage:
       - datalake_ebdb_clean.region.name
       - datalake_gsheets_clean.auxiliary_region.neighbourhood
-  id_macro_region:
-    lineage:
-      - datalake_ebdb_clean.region.id
   macro_region_name:
     lineage:
       - datalake_ebdb_clean.region.name
-  is_city:
-    lineage:
-      - datalake_ebdb_clean.region.level
-  id_city:
-    lineage:
-      - datalake_ebdb_clean.region.id
   city_name:
     lineage:
       - datalake_ebdb_clean.region.name
@@ -62,6 +62,9 @@ columns:
   tier:
     lineage:
       - datalake_gsheets_clean.auxiliary_region.tier
+  is_city:
+    lineage:
+      - datalake_ebdb_clean.region.level
   ts_created:
     lineage:
       - datalake_ebdb_clean.region.ts_created
