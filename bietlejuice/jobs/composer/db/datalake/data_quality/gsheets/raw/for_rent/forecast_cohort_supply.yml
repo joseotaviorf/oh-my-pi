@@ -1,0 +1,7 @@
+---
+table_name: datalake_gsheets_raw.forecast_cohort_supply
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  week_start:
+    is_complete:
+      severity_level: Error

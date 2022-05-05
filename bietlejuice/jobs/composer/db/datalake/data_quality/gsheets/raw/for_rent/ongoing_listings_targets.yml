@@ -1,0 +1,18 @@
+---
+table_name: datalake_gsheets_raw.ongoing_listings_targets
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  business_context:
+    is_contained_in:
+      values:
+        - CIQ
+        - Core
+        - B2B
+        - CIQ_MANAGER
+        - CIQ_FULL
+  date:
+    is_complete:
+      severity_level: Error
+  week_start:
+    is_complete:
+      severity_level: Error

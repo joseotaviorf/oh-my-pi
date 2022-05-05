@@ -1,0 +1,16 @@
+---
+table_name: datalake_gsheets_raw.aux_agents
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  status:
+    is_contained_in:
+      values:
+        - Ativo
+        - inativo
+        - Descredenciado
+        - Suspenso

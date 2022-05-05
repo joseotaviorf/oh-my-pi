@@ -11,6 +11,9 @@ column_level_validations:
       severity_level: Error
     is_unique:
       severity_level: Error
+  city:
+    is_complete:
+      severity_level: Error
   regional:
     is_contained_in:
       values:
@@ -20,3 +23,6 @@ column_level_validations:
         - Norte
         - Vitória
         - RJPB
+  tier:
+    is_contained_in: # On the raw this column still as string.
+      values: ['1', '2', '3', '4']

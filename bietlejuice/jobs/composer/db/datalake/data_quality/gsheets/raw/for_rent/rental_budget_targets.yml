@@ -1,0 +1,7 @@
+---
+table_name: datalake_gsheets_raw.rental_budget_targets
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  month_start:
+    is_complete:
+      severity_level: Error

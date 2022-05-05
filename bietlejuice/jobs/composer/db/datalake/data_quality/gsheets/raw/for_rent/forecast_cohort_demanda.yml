@@ -1,0 +1,11 @@
+---
+table_name: datalake_gsheets_raw.forecast_cohort_demanda
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  week_start:
+    is_complete:
+      severity_level: Error
+  city_group:
+    is_contained_in:
+      values:
+        - RMSP
