@@ -2,9 +2,9 @@
 database_name: datalake_gsheets_clean
 table_name: associate_executive_bonus
 columns:
-  id_negotiation_executive:
+  id_associate_executive:
     lineage:
-      - datalake_gsheets_raw.negotiation_executive_bonus.id_negotiation_executive
+      - datalake_gsheets_raw.negotiation_executive_bonus.id_associate_executive
   id_hub:
     lineage:
       - datalake_gsheets_raw.negotiation_executive_bonus.id_hub

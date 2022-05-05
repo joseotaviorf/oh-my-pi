@@ -1,5 +1,5 @@
 SELECT
-    id_negotiation_executive,
+    id_associate_executive,
     id_hub,
     hub,
     associate_executive,
