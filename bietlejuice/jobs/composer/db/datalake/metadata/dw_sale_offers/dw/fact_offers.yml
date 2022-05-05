@@ -17,6 +17,9 @@ columns:
   sk_owner:
     lineage:
       - datalake_offer.sale_offer.id_owner
+  sk_business_unit:
+    lineage:
+      - datalake_offer.sale_offer.id_business_unit
   sk_region:
     lineage:
       - datalake_ebdb_clean.house.id_region
@@ -26,6 +29,12 @@ columns:
   sk_agent:
     lineage:
       - datalake_offer.sale_offer.id_agent
+  sk_user_agent:
+    lineage:
+      - datalake_offer.sale_offer.id_user_agent
+  sk_user_team_lead:
+    lineage:
+      - datalake_offer.sale_offer.id_user_team_lead
   sk_user_consultant:
     lineage:
       - datalake_offer.sale_offer.id_user_consultant

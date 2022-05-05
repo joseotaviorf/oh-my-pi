@@ -7,6 +7,7 @@ CREATE TABLE sale.dim_offer (
 	drop_reason_responsible VARCHAR,
 	payment_method VARCHAR,
 	business_unit VARCHAR,
+	business_unit_sales_flow VARCHAR,
 	offer_platform VARCHAR,
 	offer_flow VARCHAR,
 	agent_work_contract VARCHAR,

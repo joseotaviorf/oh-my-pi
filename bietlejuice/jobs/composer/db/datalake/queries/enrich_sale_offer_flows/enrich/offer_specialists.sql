@@ -49,6 +49,8 @@ SELECT
     cri.id_specialist AS id_real_estate_register_specialist,
     lr.id_user AS id_user_legal_risk_analyst,
     lr.id_specialist AS id_legal_risk_analyst,
+    ag.id_user AS id_user_agent,
+    ag.id_specialist AS id_agent,
     dm.specialist_name AS consultant_name,
     dm.email AS consultant_email,
     tl.specialist_name AS team_lead_name,
@@ -70,7 +72,9 @@ SELECT
     cri.specialist_name AS real_estate_register_specialist_name,
     cri.email AS real_estate_register_specialist_email,
     lr.specialist_name AS legal_risk_analyst_name,
-    lr.email AS legal_risk_analyst_email
+    lr.email AS legal_risk_analyst_email,
+    ag.specialist_name AS agent_name,
+    ag.email AS agent_email
 FROM
     offers_specialists AS o
 LEFT JOIN 
@@ -128,3 +132,8 @@ LEFT JOIN
     ON lr.id_sales_flow = o.id_sales_flow
     AND lr.kind = 'LEGAL_RISK'
     AND lr.row = 1
+LEFT JOIN
+    last_specialist AS ag
+    ON ag.id_sales_flow = o.id_sales_flow
+    AND ag.kind = 'AGENT'
+    AND ag.row = 1

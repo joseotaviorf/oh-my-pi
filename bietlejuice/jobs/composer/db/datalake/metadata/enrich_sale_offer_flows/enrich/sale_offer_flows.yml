@@ -74,9 +74,18 @@ columns:
   id_legal_risk_analyst:
     lineage:
       - datalake_sales_flow.offer_specialists.id_legal_risk_analyst
+  id_user_agent:
+    lineage:
+      - datalake_sales_flow.offer_specialists.id_user_agent
+  id_agent:
+    lineage:
+      - datalake_sales_flow.offer_specialists.id_agent
   id_pendency:
     lineage:
       - datalake_sales_flow_clean.sales_flow_pendency.id
+  id_hub:
+    lineage:
+      - datalake_sales_flow_clean.offer.id_hub
   pendency_type:
     lineage:
       - datalake_sales_flow_clean.sales_flow_pendency.type
@@ -185,6 +194,12 @@ columns:
   legal_risk_analyst_email:
     lineage:
       - datalake_sales_flow.offer_specialists.legal_risk_analyst_email
+  agent_name:
+    lineage:
+      - datalake_sales_flow.offer_specialists.agent_name
+  agent_email:
+    lineage:
+      - datalake_sales_flow.offer_specialists.agent_email
   closing_status:
     lineage:
       - datalake_sales_flow_clean.sales_flow.status_closing

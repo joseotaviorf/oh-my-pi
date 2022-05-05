@@ -23,6 +23,9 @@ columns:
   business_unit:
     lineage:
       - datalake_offer.sale_offer.business_unit
+  business_unit_sales_flow:
+    lineage:
+      - datalake_offer.sale_offer.business_unit_sales_flow
   offer_platform:
     lineage:
       - datalake_offer.sale_offer.offer_platform

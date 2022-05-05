@@ -34,6 +34,9 @@ columns:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.id_user_consultant
       - datalake_ebdb_user.user.id
+  id_user_agent:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.id_user_agent
   id_consultant:
     lineage:
       - datalake_firestore.monday.id_consultant
@@ -51,6 +54,9 @@ columns:
   id_pendency:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.id_pendency
+  id_business_unit:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.id_hub
   pendency:
     lineage:
       - datalake_sale_offer_flows.sale_offer_flows.pendency
@@ -80,6 +86,9 @@ columns:
     lineage:
       - datalake_ebdb_clean.work_contract.contract_name
       - datalake_gsheets.sale_hub_offer.offer_flow
+  business_unit_sales_flow:
+    lineage:
+      - datalake_hub_services_clean.business_unit.hub_name
   offer_platform:
     lineage:
       - datalake_gsheets.sale_hub_offer.offer_model

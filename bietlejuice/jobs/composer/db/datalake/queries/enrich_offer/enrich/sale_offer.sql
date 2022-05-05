@@ -281,9 +281,9 @@ data_sources AS (
         g.brokerage_fee,
         g.id_sale_flow,
         -- data from relation_booking_offer
-        rbo.id_user_agent,
+        rbo.id_user_agent AS rbo_id_user_agent,
         rbo.id_booking,
-        UPPER(rbo.agent_name) AS agent_name,
+        UPPER(rbo.agent_name) AS rbo_agent_name,
         COALESCE(rbo.flg_booking_before_offer,FALSE) AS flg_booking_before_offer,
         COALESCE(rbo.flg_visit_completed_before_offer,FALSE) AS flg_visit_completed_before_offer,
         rbo.hours_booking_to_offer,
@@ -295,7 +295,7 @@ data_sources AS (
         ohc.status AS ohc_status,
         ohc.offer_model AS ohc_offer_model,
         -- data from work_contract
-        wc.id_agent AS id_agent,
+        wc.id_agent AS wc_id_agent,
         wc.contract_name AS agent_work_contract,
         CASE
             WHEN wc.contract_name LIKE '%HUB%'
@@ -339,6 +339,11 @@ data_sources AS (
         vo.ts_signed AS vo_sale_agreement_signed_date,
         vo.id_user_consultant AS vo_id_user_consultant,
         vo.id_pendency,
+        vo.id_user_agent AS vo_id_user_agent,
+        vo.id_agent AS vo_id_agent,
+        du_vo.id_agent AS du_vo_id_agent,
+        vo.id_hub,
+        vo.agent_name AS vo_agent_name,
         vo.pendency,
         vo.pendency_type,
         vo.opportunities_of_the_week,
@@ -383,6 +388,7 @@ data_sources AS (
             WHEN vo.sk_team_lead IS NOT NULL
                 THEN 'ID_vendas_' || vo.sk_team_lead
             END AS vo_sk_team_lead,
+        vo.sk_user_team_lead AS vo_id_user_team_lead,
         -- data from monday
         mo.id_offer AS mo_id_offer,
         mo.offer_status AS monday_offer_status,
@@ -441,6 +447,10 @@ data_sources AS (
     LEFT JOIN
         datalake_sale_offer_flows.sale_offer_flows AS vo
             ON vo.id_offer = g.id
+    LEFT JOIN 
+        datalake_ebdb_user.user AS du_vo
+            ON vo.id_user_agent = du_vo.id 
+            AND vo.id_user_agent IS NOT NULL
     LEFT JOIN
         datalake_firestore.monday AS mo
             ON mo.id_offer = g.id
@@ -472,6 +482,7 @@ offer_flow AS (
         ohc_id_offer,
         ohc_offer_flow_detail,
         vo_id_offer,
+        id_hub,
         wc_hub_name_ajs,
         CASE
             WHEN ds.ohc_offer_flow IS NOT NULL
@@ -489,26 +500,39 @@ offer_flow AS (
         data_sources AS ds
 ),
 -- BUSINESS UNIT
+business_unit_by_hub_id(
+    SELECT
+        off.id_hub,
+        bu.hub_name,
+        bu.business_context,
+        ROW_NUMBER () OVER ( PARTITION BY bu.id ORDER BY bu.ts_updated DESC ) AS row
+    FROM 
+        offer_flow AS off
+    JOIN 
+        datalake_hub_services_clean.business_unit AS bu
+            ON off.id_hub = bu.id
+),
+
 business_unit AS (
   SELECT
     off.id_offer,
     off.ohc_id_offer,
-    REPLACE(UPPER(
-      CASE
-          WHEN offer_flow = 'CENTRAL' AND dr.city_group = 'Porto Alegre' THEN 'CENTRAL POA'
-          WHEN offer_flow = 'CENTRAL' AND dr.city_group = 'RMSP' THEN 'CENTRAL SP'
-          WHEN offer_flow = 'CENTRAL' AND dr.city_group = 'Rio de Janeiro' THEN 'CENTRAL RJ'
-          WHEN offer_flow = 'CENTRAL' THEN 'CENTRAL NO INFO'
-          WHEN offer_flow = 'HUB' THEN (CASE WHEN off.ohc_offer_flow_detail IS NULL AND off.vo_id_offer IS NOT NULL THEN off.wc_hub_name_ajs ELSE off.ohc_offer_flow_detail END)
-          ELSE offer_flow
-      END
+    REPLACE(UPPER(                    
+        CASE
+            WHEN offer_flow = 'CENTRAL' AND dr.city_group = 'Porto Alegre' THEN 'CENTRAL POA'
+            WHEN offer_flow = 'CENTRAL' AND dr.city_group = 'RMSP' THEN 'CENTRAL SP'
+            WHEN offer_flow = 'CENTRAL' AND dr.city_group = 'Rio de Janeiro' THEN 'CENTRAL RJ'
+            WHEN offer_flow = 'CENTRAL' THEN 'CENTRAL NO INFO'
+            WHEN offer_flow = 'HUB' THEN (CASE WHEN off.ohc_offer_flow_detail IS NULL AND off.vo_id_offer IS NOT NULL THEN off.wc_hub_name_ajs ELSE off.ohc_offer_flow_detail END)
+            ELSE offer_flow
+        END         
     ), '  ',' ') AS business_unit,
     offer_flow
-  FROM
-    offer_flow AS off
-  INNER JOIN
-    regions AS dr
-        ON dr.id_offer = COALESCE(off.id_offer,off.ohc_id_offer)
+    FROM
+        offer_flow AS off
+    INNER JOIN
+        regions AS dr
+            ON dr.id_offer = COALESCE(off.id_offer,off.ohc_id_offer)
 ),
 -- OFFERS PORTIFOLIO
 offer_portfolio AS (
@@ -561,10 +585,29 @@ business_rules AS (
         COALESCE(ds.id_house,ds.ohc_id_house) AS id_house,
         dr.id_owner AS id_owner,
         dr.id_region AS id_region,
-        ds.id_agent AS id_agent,
+        CASE
+            WHEN COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= '2021-11-01' 
+                THEN ds.vo_id_user_agent
+            ELSE
+                ds.rbo_id_user_agent
+        END AS id_user_agent,
+        CASE
+            WHEN COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= '2021-11-01' 
+                THEN ds.du_vo_id_agent
+            ELSE
+                ds.wc_id_agent
+        END AS id_agent,
         ds.id_booking,
         ds.id_vendas,
         ds.id_pendency,
+        ds.vo_id_user_team_lead AS id_user_team_lead,
+        ds.id_hub AS id_hub_sales_flow,
+        CASE
+            WHEN COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= '2021-11-01' 
+                THEN ds.vo_agent_name
+            ELSE
+                ds.rbo_agent_name
+        END AS agent_name,
         ds.pendency,
         ds.pendency_type,
         ds.opportunities_of_the_week,
@@ -598,10 +641,11 @@ business_rules AS (
         earnest_value,
         brokerage_fee,
         off.offer_flow,
-        bu.business_unit,
+        bu.business_unit,                
+        busf.hub_name AS hub_name_sales_flow,
+        busf.business_context AS business_context_sales_flow,
         ofp.offer_portfolio_start_date,
         COALESCE(vo_flow_step, monday_status) AS monday_status,
-        id_user_agent,
         CASE
             WHEN (vo_sk_team_lead IS NOT NULL
                 AND CURRENT_TIMESTAMP() >= ofp.offer_portfolio_start_date)
@@ -658,40 +702,59 @@ business_rules AS (
             CASE
                 WHEN off.offer_flow IN ('HUB','CENTRAL') THEN (
                         CASE
-                            WHEN (vo_sk_team_lead IS NOT NULL AND CURRENT_TIMESTAMP() >= ofp.offer_portfolio_start_date)
-                                AND COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= offer_portfolio_start_date
-                                    THEN ds.vo_team_lead_name
-                            ELSE COALESCE(ds.ohc_team_lead_name,ds.vo_team_lead_name)
+                            WHEN COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= '2021-11-01' 
+                                THEN ds.vo_team_lead_name
+                            ELSE
+                                CASE
+                                    WHEN (vo_sk_team_lead IS NOT NULL AND CURRENT_TIMESTAMP() >= ofp.offer_portfolio_start_date)
+                                        AND COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= offer_portfolio_start_date
+                                            THEN ds.vo_team_lead_name
+                                    ELSE COALESCE(ds.ohc_team_lead_name,ds.vo_team_lead_name)
+                                END
                         END)
                 ELSE ds.vo_team_lead_name
             END) AS team_lead_name,
         UPPER(
-            CASE
-                WHEN ds.ohc_id_offer IS NOT NULL
-                    THEN 'GSHEETS_[]'
-                ELSE COALESCE(ds.vo_id_consultant,ds.mo_id_consultant)
-            END
+            CASE 
+                WHEN COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= '2021-11-01'
+                    THEN ds.vo_id_consultant
+            ELSE
+                CASE
+                    WHEN ds.ohc_id_offer IS NOT NULL
+                        THEN 'GSHEETS_[]'
+                    ELSE COALESCE(ds.vo_id_consultant,ds.mo_id_consultant)
+                END
+            END 
         ) AS id_consultant,
         UPPER(
             CASE
-                WHEN ds.ohc_id_offer IS NOT NULL
-                    THEN NULL
-                ELSE COALESCE(ds.vo_id_user_consultant,ds.mo_id_user_consultant)
+                WHEN COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= '2021-11-01'
+                    THEN ds.vo_id_user_consultant
+            ELSE
+                CASE
+                    WHEN ds.ohc_id_offer IS NOT NULL
+                        THEN NULL
+                    ELSE COALESCE(ds.vo_id_user_consultant,ds.mo_id_user_consultant)
+                END
             END
         ) AS id_user_consultant,
         UPPER(
             CASE
                 WHEN off.offer_flow IN ('HUB','CENTRAL') THEN (
                     CASE
-                        WHEN (vo_sk_team_lead IS NOT NULL AND CURRENT_TIMESTAMP() >= ofp.offer_portfolio_start_date)
-                            AND COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= offer_portfolio_start_date
-                                THEN ds.vo_consultant_name
-                        ELSE COALESCE(ds.ohc_consultant_name,ds.vo_consultant_name)
+                        WHEN COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= '2021-11-01'
+                            THEN ds.vo_consultant_name
+                        ELSE
+                            CASE
+                                WHEN (vo_sk_team_lead IS NOT NULL AND CURRENT_TIMESTAMP() >= ofp.offer_portfolio_start_date)
+                                    AND COALESCE(ds.ts_offer_created, ds.ohc_offer_submitted_date) >= offer_portfolio_start_date
+                                        THEN ds.vo_consultant_name
+                                ELSE COALESCE(ds.ohc_consultant_name,ds.vo_consultant_name)
+                            END
                     END)
                 ELSE COALESCE(ds.mo_consultant_name, ds.vo_consultant_name)
             END
         )  AS consultant_name,
-        agent_name,
         sale_price,
         COALESCE(ds.first_price_offered_by_buyer, ds.mo_price_offered_by_buyer) AS first_price_offered_by_buyer,
         CASE
@@ -803,6 +866,11 @@ business_rules AS (
         offer_portfolio AS ofp
             ON ofp.id_offer = COALESCE(ds.id_offer,ds.ohc_id_offer)
                 OR ofp.id_offer = COALESCE(ds.id_offer,ds.ohc_id_offer)
+    LEFT JOIN
+        business_unit_by_hub_id AS busf
+            ON busf.id_hub = ds.id_hub
+            AND busf.row = 1
+            AND ds.id_hub IS NOT NULL
 )
 SELECT
     id_offer,
@@ -813,12 +881,15 @@ SELECT
     id_region,
     id_agent,
     id_team_lead,
+    id_user_team_lead,
     CAST(id_user_consultant AS BIGINT) AS id_user_consultant,
+    CAST(id_user_agent AS BIGINT) AS id_user_agent,
     id_consultant,
     id_booking,
     id_closing_specialist,
     id_vendas,
     id_pendency,
+    id_hub_sales_flow AS id_business_unit,
     pendency,
     CASE
         WHEN current_payment_method = "INSTANT_MORTGAGE" THEN (
@@ -845,6 +916,7 @@ SELECT
     agent_name,
     offer_flow,
     business_unit,
+    hub_name_sales_flow AS business_unit_sales_flow,
     offer_platform,
     offer_status,
     monday_status,
