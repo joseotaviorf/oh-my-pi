@@ -20,6 +20,20 @@ We incrementally load the following table into the Datalake Reverse bucket, for 
 - `lost_iq_visitas`
 - `lost_pp`
 - `lost_seller_unpublished`
+- `true_buyer_ccv_central`
+- `true_buyer_ccv_hub`
+- `true_buyer_ccv`
+- `true_buyer_registry`
+- `true_offboarding_iq`
+- `true_offboarding_pp`
+- `true_onboarding_iq`
+- `true_onboarding_pp`
+- `true_ongoing_iq`
+- `true_ongoing_pp`
+- `true_seller_ccv_central`
+- `true_seller_ccv_hub`
+- `true_seller_ccv`
+- `true_seller_registry`
 
 This pipeline also POST data to the Tracksale API (endpoint: `dispatches`) aiming to schedule NPS survey dispatches.
 

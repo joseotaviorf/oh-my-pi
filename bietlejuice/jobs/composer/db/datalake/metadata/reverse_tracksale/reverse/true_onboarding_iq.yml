@@ -1,0 +1,22 @@
+---
+database_name: datalake_tracksale_reverse
+table_name: true_onboarding_iq
+columns:
+  customer_name:
+    lineage:
+      - datalake_ebdb_clean.contract_person.name
+  customer_email:
+    lineage:
+      - datalake_ebdb_clean.contract_person.email
+  customer_phone:
+    lineage:
+      - datalake_ebdb_clean.contract_person.phone_number
+  customer_cpf:
+    lineage:
+      - datalake_ebdb_clean.contract_person.cpf
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.contract_person.cpf.id_user
+  id_driver:
+    lineage:
+      - dw_public.dim_contract.sk_contract

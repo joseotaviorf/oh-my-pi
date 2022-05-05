@@ -1,0 +1,22 @@
+---
+database_name: datalake_tracksale_reverse
+table_name: true_seller_ccv
+columns:
+  customer_name:
+    lineage:
+      - dw_public.dim_user.nome
+  customer_email:
+    lineage:
+      - dw_public.dim_user.email
+  customer_phone:
+    lineage:
+      - dw_public.dim_user.telefone_principal
+  customer_cpf:
+    lineage:
+      - dw_public.dim_user.cpf
+  id_user:
+    lineage:
+      - dw_public.dim_user.id
+  id_driver:
+    lineage:
+      - dw_sale.fact_offers.sk_offer
