@@ -39,6 +39,7 @@ WITH affiliates_full AS (
     datalake_ebdb_clean.partner_agent pa
       ON pa.id_user = u.id
   WHERE pa.id_partner <> 7099
+      OR pa.id_partner IS NULL
 ),
 region_ddd AS (
   SELECT DISTINCT
