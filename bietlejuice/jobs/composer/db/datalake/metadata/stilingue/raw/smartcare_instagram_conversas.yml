@@ -1,6 +1,6 @@
 ---
 database_name: datalake_stilingue_raw
-table_name: smartcare_facebook_conversas
+table_name: smartcare_instagram_conversas
 columns:
   id:
     tags:

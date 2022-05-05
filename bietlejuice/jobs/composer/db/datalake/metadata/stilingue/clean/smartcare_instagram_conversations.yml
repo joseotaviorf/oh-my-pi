@@ -1,0 +1,322 @@
+---
+database_name: datalake_stilingue_clean
+table_name: smartcare_instagram_conversations
+columns:
+  id:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas._id
+  id_page:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.page_id
+  id_interacted_page:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.interacted_page_id
+  id_post:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.post_id
+  id_operator:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.operator_id
+  id_talk:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.talk_id
+  id_sac_call:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.sac_call_id
+  id_root:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.root_id
+  id_replier:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.replier
+  uid:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.uid
+  pid:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.pid
+  pid_fb:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.fb_pid
+  uid_fb:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.fb_uid
+  pid_reply:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.reply_pid
+  id_long_updated:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.long_updated_at
+  id_long_posted:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.long_posted_at
+  id_crawled:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.crawled_at
+  nlp_text_hash:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.nlp_text_hash
+  channel:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.channel
+  primary_channel:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.primary_channel
+  pages:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.pages
+  title:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.title
+  name:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.name
+  operator_name:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.operator_name
+  username:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.username
+  replier_name:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.replier_name
+  authors:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.authors
+  groups:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.groups
+  gender:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.gender
+  image_url:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.image_url
+  user_image_url:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.user_image_url
+  user_url:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.user_url
+  post_user_image_url:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.post_user_image_url
+  post_url:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.post_url
+  url_content:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.url_content
+  text:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.text
+  text_header:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.text_header
+  text_append:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.text_append
+  hashtags:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.hashtags
+  sac_type:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.sac_type
+  type:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.type
+  status:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.status
+  interests:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.interests
+  attachments:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.attachments
+  themes:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.themes
+  group_polarity:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.group_polarity
+  update_time_ago:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.update_time_ago
+  features:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.features
+  spokesman:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.spokesman
+  order_by:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.order_by
+  favorability:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.favorability
+  tags:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.tags
+  lang:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.lang
+  theme_polarity:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.theme_polarity
+  mentions:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.mentions
+  spam:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.spam
+  location:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.location
+  emotion:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.emotion
+  receiver:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.receiver
+  shall_use_receiver:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.shall_use_receiver
+  customer_info:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.customer_info
+  anonymous_user:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.anonymous_user
+  videoplays:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.videoplays
+  reactions:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.reactions
+  reaction_like:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.reaction_like
+  reaction_love:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.reaction_love
+  reaction_sad:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.reaction_sad
+  reaction_pride:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.reaction_pride
+  reaction_angry:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.reaction_angry
+  reaction_total:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.reaction_total
+  reaction_wow:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.reaction_wow
+  reaction_haha:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.reaction_haha
+  reaction_thankful:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.reaction_thankful
+  valoration:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.valoration
+  footage:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.footage
+  shares:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.shares
+  max_shared_followers:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.max_shared_followers
+  sentiment:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.sentiment
+  impact:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.impact
+  interactions:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.interactions
+  comments:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.comments
+  hot:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.hot
+  followers:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.followers
+  critical_level:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.critical_level
+  fb_critical_level:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.fb_critical_level
+  AAA_score:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.AAA_score
+  dislikes:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.dislikes
+  likes:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.likes
+  is_replied:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.replied
+  is_dynamic_post:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.is_dynamic_post
+  is_hidden_by_user:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.hidden_by_user
+  is_page_comment:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.page_comment
+  is_root:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.is_root
+  is_verified:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.verified
+  is_hot_post:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.hot_post
+  is_favorited:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.favorite
+  is_max_shared_show_dossier:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.max_shared_show_dossier
+  is_from_integration:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.from_integration
+  is_ads:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.is_ads
+  is_hidden:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.is_hidden
+  ts_posted:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.posted_at
+  ts_metrics_updated:
+    lineage:
+      - datalake_stilingue_raw.smartcare_instagram_conversas.metrics_updated_at
+  ts_load:
+    lineage:
+      - datalake_stilingue_raw.smartcare_youtube_conversas.ts_load
+  year:
+    lineage:
+      - datalake_stilingue_raw.smartcare_youtube_conversas.year
+  month:
+    lineage:
+      - datalake_stilingue_raw.smartcare_youtube_conversas.month
+  day:
+    lineage:
+      - datalake_stilingue_raw.smartcare_youtube_conversas.day

@@ -112,7 +112,7 @@ SELECT
     month,
     day
 FROM
-    datalake_stilingue_raw.smartcare_facebook_conversas
+    datalake_stilingue_raw.smartcare_instagram_conversas
 WHERE
     year = {year}
     AND month = {month}

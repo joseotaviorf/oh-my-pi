@@ -23,3 +23,45 @@ tables:
     }
     clean_table_name: smartcare_facebook_conversations
     partition_cols: ["year", "month", "day"]
+
+  smartcare_instagram_conversas:
+    api_endpoint: SMARTCARE_CONVERSAS_JSON_KEYS
+    api_params: {
+      channels: instagram,
+      fanpages: 2284857279,
+      date_range: '{year}{month}{day}0000:{year}{month}{day}2359',
+    }
+    clean_table_name: smartcare_instagram_conversations
+    partition_cols: ["year", "month", "day"]
+
+  smartcare_twitter_conversas:
+    api_endpoint: SMARTCARE_CONVERSAS_JSON_KEYS
+    api_params: {
+      channels: twitter,
+      fanpages: 1588634718,
+      date_range: '{year}{month}{day}0000:{year}{month}{day}2359',
+    }
+    clean_table_name: smartcare_twitter_conversations
+    partition_cols: ["year", "month", "day"]
+
+  smartcare_youtube_conversas:
+    api_endpoint: SMARTCARE_CONVERSAS_JSON_KEYS
+    api_params: {
+      channels: youtube,
+      fanpages: UCT3oZCjZudZsL1QDVwZy_OA,
+      sac_type: posts:comentarios:inbox:postvisitantes:comentariosvisitantes:reviews:comentariosreview:mentions:comentariosmentions,
+      date_range: '{year}{month}{day}0000:{year}{month}{day}2359',
+    }
+    clean_table_name: smartcare_youtube_conversations
+    partition_cols: ["year", "month", "day"]
+
+  smartcare_linkedin_conversas:
+    api_endpoint: SMARTCARE_CONVERSAS_JSON_KEYS
+    api_params: {
+      channels: linkedin,
+      fanpages: urn:li:organization:2836850,
+      sac_type: inbox:comentarios:comentariosmentions:mentions:posts:comentariosreview:postvisitantes:reviews:comentariosvisitantes,
+      date_range: '{year}{month}{day}0000:{year}{month}{day}2359',
+    }
+    clean_table_name: smartcare_linkedin_conversations
+    partition_cols: ["year", "month", "day"]

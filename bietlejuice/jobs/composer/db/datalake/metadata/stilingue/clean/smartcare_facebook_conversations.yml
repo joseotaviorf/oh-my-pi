@@ -23,10 +23,10 @@ columns:
   id_sac_call:
     lineage:
       - datalake_stilingue_raw.smartcare_facebook_conversas.sac_call_id
-  BIGINT) id_root:
+  id_root:
     lineage:
       - datalake_stilingue_raw.smartcare_facebook_conversas.root_id
-  BIGINT) id_replier:
+  id_replier:
     lineage:
       - datalake_stilingue_raw.smartcare_facebook_conversas.replier
   uid:
