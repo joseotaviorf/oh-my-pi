@@ -2,8 +2,17 @@ WITH last_charge_created AS (
     SELECT 
         id,
         MAX(ts_created) AS ts_last_created
-    FROM datalake_rental_guarantee_clean.charge
+    FROM 
+        datalake_rental_guarantee_clean.charge
     GROUP BY 1
+),
+last_contract_guarantee_updated AS (
+    SELECT
+        id AS id_guarantee,
+        MAX(ts_updated) AS ts_last_updated
+    FROM
+        datalake_rental_guarantee_clean.guarantee
+    GROUP BY 1 
 ),
 charge_info AS (
     SELECT
@@ -45,10 +54,13 @@ guarantee AS (
     INNER JOIN 
         charge_info AS ci
             ON g.id = ci.id_guarantee
+    INNER JOIN
+        last_contract_guarantee_updated AS lcgu
+            ON lcgu.id_guarantee = g.id
+            AND g.ts_updated = lcgu.ts_last_updated
     WHERE
         g.id_contract_ebdb IS NOT NULL
         AND g.ts_paid IS NOT NULL
-        AND g.guarantee_status IN ('ACTIVE','CANCELED')
         AND ci.charge_status = 'CAPTURED' 
 )
 SELECT

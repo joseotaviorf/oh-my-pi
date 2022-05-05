@@ -8,15 +8,21 @@ columns:
   status:
     lineage:
       - datalake_kill_queue.reservation.status
-  installments:
-    lineage:
-      - datalake_kill_queue.reservation.installments
   cancellation_reason:
     lineage:
       - datalake_kill_queue.reservation.cancellation_reason
-  value:
+  total_installments:
+    lineage:
+      - datalake_kill_queue.reservation.installments
+  total_value:
     lineage:
       - datalake_kill_queue.reservation.value
-  ts_created:
+  accrual_month:
+    lineage:
+      - datalake_quintoandar.aux_date.month_start
+  dt_end_payment:
+    lineage:
+      - datalake_kill_queue.reservation.ts_created
+  dt_created:
     lineage:
       - datalake_kill_queue.reservation.ts_created

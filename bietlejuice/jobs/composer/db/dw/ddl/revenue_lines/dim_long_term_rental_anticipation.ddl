@@ -14,8 +14,8 @@ CREATE TABLE IF NOT EXISTS revenue_lines.dim_long_term_rental_anticipation
 	,accrual_year_month VARCHAR(255)
 	,dt_due DATE
 	,dt_paid DATE
-	,ts_created TIMESTAMP
-	,ts_signed TIMESTAMP
+	,dt_created DATE
+	,dt_signed DATE
 	,ts_load TIMESTAMP
 	,PRIMARY KEY (sk_long_term_rental_anticipation)
 )

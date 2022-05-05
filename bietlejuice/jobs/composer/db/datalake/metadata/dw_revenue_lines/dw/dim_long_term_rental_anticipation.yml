@@ -35,6 +35,12 @@ columns:
   invoice_paid_amount:
     lineage:
       - datalake_revenue_lines.long_term_rental_anticipation.invoice_paid_amount
+  invoice_theorical_fee:
+    lineage:
+      - datalake_revenue_lines.long_term_rental_anticipation.invoice_theorical_fee
+  invoice_paid_fee:
+    lineage:
+      - datalake_revenue_lines.long_term_rental_anticipation.invoice_paid_fee
   accrual_year_month:
     lineage:
       - datalake_revenue_lines.long_term_rental_anticipation.accrual_year_month
@@ -44,9 +50,9 @@ columns:
   dt_paid:
     lineage:
       - datalake_revenue_lines.long_term_rental_anticipation.dt_paid
-  ts_created:
+  dt_created:
     lineage:
-      - datalake_revenue_lines.long_term_rental_anticipation.ts_created
-  ts_signed:
+      - datalake_revenue_lines.long_term_rental_anticipation.dt_created
+  dt_signed:
     lineage:
-      - datalake_revenue_lines.long_term_rental_anticipation.ts_signed
+      - datalake_revenue_lines.long_term_rental_anticipation.dt_signed

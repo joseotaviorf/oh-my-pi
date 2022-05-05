@@ -58,10 +58,18 @@ SELECT
     ie.amount_brl_entry_due_amount AS invoice_theorical_amount,
     ie.amount_brl_entry_paid_amount AS invoice_paid_amount,
     DATE_FORMAT(ADD_MONTHS(DATE_TRUNC('month', li.ts_expected_due), -1), 'YYYYMM') AS accrual_year_month,
-    lra.ts_created,
-    lra.ts_signed,
+    CASE
+        WHEN ie.amount_brl_entry_due_amount IS NOT NULL 
+            THEN  li.interest_value 
+    END AS invoice_theorical_fee,
+    CASE
+        WHEN ie.amount_brl_entry_paid_amount IS NOT NULL 
+            THEN li.interest_value 
+    END AS invoice_paid_fee,    
     ie.dt_due,
-    ie.dt_paid
+    ie.dt_paid,
+    DATE(lra.ts_created) AS dt_created,
+    DATE(lra.ts_signed) AS dt_signed
 FROM 
     datalake_fastforward_clean.long_term_anticipation AS lra
 INNER JOIN 

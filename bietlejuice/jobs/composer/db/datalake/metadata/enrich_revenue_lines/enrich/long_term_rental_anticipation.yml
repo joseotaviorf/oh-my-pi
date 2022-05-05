@@ -22,25 +22,28 @@ columns:
       - datalake_fastforward_clean.long_term_anticipation.total_rent
   prod_theorical_amount:
     lineage:
-      - datalake_fastforward_clean.long_term_anticipation.prod_theorical_amount
+      - datalake_fastforward_clean.long_term_anticipation.installment_value
   prod_theorical_fee:
     lineage:
       - datalake_fastforward_clean.lra_installment.interest_value
-  invoice_theorical_amount:
-    lineage:
-      - datalake_fastforward_clean.lra_installment_option.months_anticipated
   accrual_year_month:
     lineage:
       - datalake_fastforward_clean.lra_installment.ts_expected_due
-  ts_created:
+  invoice_theorical_fee:
     lineage:
-      - datalake_fastforward_clean.long_term_anticipation.ts_created
-  ts_signed:
+      - datalake_fastforward_clean.lra_installment.interest_value
+  invoice_paid_fee:
     lineage:
-      - datalake_fastforward_clean.long_term_anticipation.ts_signed
+      - datalake_fastforward_clean.lra_installment.interest_value
   dt_due:
     lineage:
       - datalake_quintoandar.aux_date.date
   dt_paid:
     lineage:
       - datalake_quintoandar.aux_date.date
+  dt_created:
+    lineage:
+      - datalake_fastforward_clean.long_term_anticipation.ts_created
+  dt_signed:
+    lineage:
+      - datalake_fastforward_clean.long_term_anticipation.ts_signed

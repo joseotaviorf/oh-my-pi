@@ -11,15 +11,24 @@ columns:
   status:
     lineage:
       - datalake_revenue_lines.reservation.status
-  installments:
-    lineage:
-      - datalake_revenue_lines.reservation.installments
   cancellation_reason:
     lineage:
       - datalake_revenue_lines.reservation.cancellation_reason
-  value:
+  total_installments:
     lineage:
-      - datalake_revenue_lines.reservation.value
-  ts_created:
+      - datalake_revenue_lines.reservation.total_installments
+  monthly_value:
     lineage:
-      - datalake_revenue_lines.reservation.ts_created
+      - datalake_revenue_lines.reservation.monthly_value
+  total_value:
+    lineage:
+      - datalake_revenue_lines.reservation.total_value
+  accrual_month:
+    lineage:
+      - datalake_revenue_lines.reservation.accrual_month
+  dt_end_payment:
+    lineage:
+      - datalake_revenue_lines.reservation.dt_end_payment
+  dt_created:
+    lineage:
+      - datalake_revenue_lines.reservation.dt_created
