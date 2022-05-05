@@ -31,7 +31,7 @@ manual_costs AS (
         cost_share_mobile,
         cost_share_other
     FROM
-        datalake_gsheets_clean.marketing_costs_manual_shared_costs
+        datalake_gsheets_clean.marketing_manual_shared_costs
     WHERE
         DATE(dt_cost) >= DATE('2021-01-01') -- manual costs from before this date are included in historical partition
 ),
@@ -55,7 +55,7 @@ city_group_share_rules AS (
         cost_share_mobile,
         cost_share_other
     FROM
-        datalake_gsheets_clean.marketing_costs_name_convention_shared_costs s
+        datalake_gsheets_clean.marketing_name_convention_shared_costs s
     JOIN
         datalake_marketing_costs_sharing_rules.old_sharing_rules AS r 
             ON INT(REPLACE(dt_cost, '-', '')) = r.id_date

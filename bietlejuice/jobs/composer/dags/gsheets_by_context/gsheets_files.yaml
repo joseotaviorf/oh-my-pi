@@ -124,16 +124,16 @@ offline_manual_share_cost_center:
 # GROWTH INTRA-DAY SHEETS
 #########################
 
-marketing_costs_manual_shared_costs:
+marketing_manual_shared_costs:
     sheet_id: 1YiFYgv-KTO8JydV5lO6HryZ8qnnN9wXSmPcGQ6KdmLI
     sheet_name: rateio_manual
-    clean_table_name: marketing_costs_manual_shared_costs
+    clean_table_name: marketing_manual_shared_costs
     sheet_context: growth_intraday
 
-marketing_costs_name_convention_shared_costs:
+marketing_name_convention_shared_costs:
     sheet_id: 1YiFYgv-KTO8JydV5lO6HryZ8qnnN9wXSmPcGQ6KdmLI
     sheet_name: rateio_name_convention
-    clean_table_name: marketing_costs_name_convention_shared_costs
+    clean_table_name: marketing_name_convention_shared_costs
     sheet_context: growth_intraday
 
 casa_mineira_marketing_manual_shared_costs:

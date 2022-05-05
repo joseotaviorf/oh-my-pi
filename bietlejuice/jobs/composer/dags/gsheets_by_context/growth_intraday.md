@@ -21,11 +21,11 @@ This pipeline produces the following output tables:
 
 1. Data lake raw:
     - `casa_mineira_marketing_manual_shared_costs`
-    - `marketing_costs_manual_shared_costs`
-    - `marketing_costs_name_convention_shared_costs`
+    - `marketing_manual_shared_costs`
+    - `marketing_name_convention_shared_costs`
 2. Data lake clean:
     - `casa_mineira_marketing_manual_shared_costs`
-    - `marketing_costs_manual_shared_costs`
-    - `marketing_costs_name_convention_shared_costs`
+    - `marketing_manual_shared_costs`
+    - `marketing_name_convention_shared_costs`
 
 </details>

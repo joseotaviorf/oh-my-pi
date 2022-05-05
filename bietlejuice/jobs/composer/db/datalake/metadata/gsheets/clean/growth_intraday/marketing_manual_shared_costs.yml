@@ -1,0 +1,55 @@
+---
+database_name: datalake_gsheets_clean
+table_name: marketing_manual_shared_costs
+columns:
+  side:
+    lineage:
+      - datalake_gsheets_raw.marketing_manual_shared_costs.side
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.marketing_manual_shared_costs.city_group
+  account_name:
+    lineage:
+      - datalake_gsheets_raw.marketing_manual_shared_costs.account_name
+  campaign_name:
+    lineage:
+      - datalake_gsheets_raw.marketing_manual_shared_costs.campaign_name
+  ad_group_name:
+    lineage:
+      - datalake_gsheets_raw.marketing_manual_shared_costs.ad_group_name
+  utm_term:
+    lineage:
+      - datalake_gsheets_raw.marketing_manual_shared_costs.utm_term
+  utm_content:
+    lineage:
+      - datalake_gsheets_raw.marketing_manual_shared_costs.utm_content
+  mkt_business:
+    lineage:
+      - datalake_gsheets_raw.marketing_manual_shared_costs.mkt_business
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_raw.marketing_manual_shared_costs.mkt_origin
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_raw.marketing_manual_shared_costs.mkt_channel
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_raw.marketing_manual_shared_costs.mkt_medium
+  mkt_source:
+    lineage:
+      - datalake_gsheets_raw.marketing_manual_shared_costs.mkt_source
+  cost:
+    lineage:
+      - datalake_gsheets_raw.marketing_manual_shared_costs.cost
+  cost_share_mobile:
+    lineage:
+      - datalake_gsheets_raw.marketing_manual_shared_costs.cost_share_mobile
+  cost_share_desktop:
+    lineage:
+      - datalake_gsheets_raw.marketing_manual_shared_costs.cost_share_desktop
+  cost_share_other:
+    lineage:
+      - datalake_gsheets_raw.marketing_manual_shared_costs.cost_share_other
+  dt_cost:
+    lineage:
+      - datalake_gsheets_raw.marketing_manual_shared_costs.dt

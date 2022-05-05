@@ -1,6 +1,6 @@
 SELECT
-    NULLIF(rule_id, '') AS id_rule,
     NULLIF(side, '') AS side,
+    NULLIF(city_group, '') AS city_group,
     NULLIF(account_name, '') AS account_name,
     NULLIF(campaign_name, '') AS campaign_name,
     NULLIF(ad_group_name, '') AS ad_group_name,
@@ -17,4 +17,4 @@ SELECT
     CAST(REPLACE(NULLIF(cost_share_other, ''), ',', '') AS FLOAT) AS cost_share_other,
     CAST(NULLIF(dt, '') AS DATE) AS dt_cost
 FROM
-    datalake_gsheets_raw.marketing_costs_name_convention_shared_costs
+    datalake_gsheets_raw.marketing_manual_shared_costs
