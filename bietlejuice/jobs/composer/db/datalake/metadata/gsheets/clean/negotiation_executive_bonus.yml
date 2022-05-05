@@ -2,6 +2,12 @@
 database_name: datalake_gsheets_clean
 table_name: negotiation_executive_bonus
 columns:
+  id_negotiation_executive:
+    lineage:
+      - datalake_gsheets_raw.negotiation_executive_bonus.id_negotiation_executive
+  id_hub:
+    lineage:
+      - datalake_gsheets_raw.negotiation_executive_bonus.id_hub
   hub:
     lineage:
       - datalake_gsheets_raw.negotiation_executive_bonus.hub
@@ -11,3 +17,6 @@ columns:
   dt_bonus:
     lineage:
       - datalake_gsheets_raw.negotiation_executive_bonus.dt_bonus
+  dt_bonus_end:
+    lineage:
+      - datalake_gsheets_raw.negotiation_executive_bonus.dt_bonus_end

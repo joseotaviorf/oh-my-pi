@@ -1,4 +1,6 @@
 SELECT
+    id_cr,
+    id_hub,
     hub,
     CAST(bonus_fee AS FLOAT) AS bonus_fee,
     CAST(dt_opening AS DATE) AS dt_opening,
