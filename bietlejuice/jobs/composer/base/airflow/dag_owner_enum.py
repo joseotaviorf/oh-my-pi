@@ -13,3 +13,4 @@ class DAGOwnerEnum:
     DATA_BEDROCK = "Data Bedrock"
     DATA_AVAILABILITY = "Data Availability"
     DATA_GOVERNANCE = "Data Governance"
+    DATA_FINTECH = "Data Fintech"
