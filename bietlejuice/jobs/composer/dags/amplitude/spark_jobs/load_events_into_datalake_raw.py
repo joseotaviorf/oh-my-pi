@@ -74,6 +74,7 @@ if __name__ == "__main__":
         file_from_api = amplitude_export_api.get_event_data_files(start, end)
         if file_from_api:
             df = amplitude_events.create_raw_events_df(file_from_api, dataframe_service)
+            df = df.na.drop(subset=partition_cols)
             format_options = SparkTableStorageFormat.DEFAULT_RAW
             database_location = db_info["db_raw_path"]
             s3_loader.load_incremental_table(
@@ -93,7 +94,4 @@ if __name__ == "__main__":
                 database_location,
                 partition_cols,
                 force_recreate=False,
-            )
-            metastore_service.create_new_partitions_from_df(
-                database_name, table_name, df, partition_cols, parallelism=8
             )
