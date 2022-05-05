@@ -52,7 +52,7 @@ temp AS ( --Calculo do share por semana
         ddt.city_group,
         (
             sum(t.new_user_prospects) OVER (PARTITION BY ddt.week_start, ddt.city_group)::FLOAT/
-            sum(t.new_user_prospects) OVER (PARTITION BY ddt.week_start)::FLOAT
+            NULLIF(sum(t.new_user_prospects) OVER (PARTITION BY ddt.week_start)::FLOAT, 0)
         ) AS current_share
     FROM
         dim_distinct ddt

@@ -49,7 +49,7 @@ temp AS ( --Calculo do share por mes
         ddt.city_group,
         (
             sum(row_count) OVER (PARTITION BY ddt.year_month, ddt.city_group)::FLOAT/
-            sum(row_count) OVER (PARTITION BY ddt.year_month)::FLOAT
+            NULLIF(sum(row_count) OVER (PARTITION BY ddt.year_month)::FLOAT, 0)
            ) AS current_share
     FROM
         dim_distinct ddt

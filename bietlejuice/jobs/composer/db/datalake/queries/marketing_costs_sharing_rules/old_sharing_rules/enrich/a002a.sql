@@ -7,7 +7,7 @@ share AS (
         atr.city_group,
         (
             SUM(budget) OVER (PARTITION BY year_month, city_group)::FLOAT/
-            SUM(budget) OVER (PARTITION BY year_month)::FLOAT
+            NULLIF(SUM(budget) OVER (PARTITION BY year_month)::FLOAT, 0)
         ) AS share
     FROM
         datalake_raw.gsheets_marketing_affiliates_targets_replanning atr
