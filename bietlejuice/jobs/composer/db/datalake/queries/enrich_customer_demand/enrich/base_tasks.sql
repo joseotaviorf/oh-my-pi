@@ -38,7 +38,10 @@ crm_tasks AS (
     base_crm_analyst_info bca
       ON tarf.id_task = bca.id_task
   WHERE
-    tarf.type = 'RevisarPagamentosRescisao'
+    tarf.type IN (
+      'RevisarPagamentosRescisao',
+      'RescisaoPreVigencia'
+    )
     AND bca.action_type = 'CREATE'
     AND tarf.ts_started >= '2021-01-01'
 ),
