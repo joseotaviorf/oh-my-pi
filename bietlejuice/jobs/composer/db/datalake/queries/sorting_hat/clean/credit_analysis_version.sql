@@ -1,5 +1,7 @@
 SELECT
     id AS id_credit_analysis_version,
+    user_id AS id_user,
+    early_credit_analysis_id AS id_early_credit_analysis,
     created_at AS ts_created,
     updated_at AS ts_updated,
     level,
@@ -30,6 +32,8 @@ SELECT
     automatic_decision_reason,
     automatic_decision_reason_mod AS mod_automatic_decision_reason,
     bypass,
-    bypass_mod AS mod_bypass
+    bypass_mod AS mod_bypass,
+    user_id_mod AS mod_id_user,
+    early_credit_analysis_id_mod AS mod_id_early_credit_analysis
 FROM
     datalake_sorting_hat_raw.`creditanalysis_version`

@@ -4,6 +4,12 @@ columns:
   id_credit_analysis_version:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.id
+  id_user:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.user_id
+  id_early_credit_analysis:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.early_credit_analysis_id
   ts_created:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.created_at
@@ -97,3 +103,9 @@ columns:
   mod_bypass:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.bypass_mod
+  mod_id_user:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.user_id_mod
+  mod_id_early_credit_analysis:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis_version.early_credit_analysis_id_mod

@@ -13,6 +13,12 @@ columns:
   id_variant:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis.variant_id
+  id_user:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis.user_id
+  id_early_credit_analysis:
+    lineage:
+      - datalake_sorting_hat_raw.creditanalysis.early_credit_analysis_id
   level:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis.level
