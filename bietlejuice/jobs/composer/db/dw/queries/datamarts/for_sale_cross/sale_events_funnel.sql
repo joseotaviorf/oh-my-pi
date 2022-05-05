@@ -12,7 +12,7 @@ SELECT
     lf.mkt_origin,
     lf.mkt_channel,
     lf.sales_company,
-    CASE WHEN hp.sk_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
+    CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
     hp.partner AS supply_3p_partner,
     CASE
         WHEN lf.mkt_origin = 'B2B' OR lf.mkt_origin = 'CIQ' THEN lf.mkt_origin
@@ -43,9 +43,23 @@ LEFT JOIN
     dim_region dr
         ON dr.sk_region = lf.sk_region
 LEFT JOIN
-    datamarts.houses_3p AS hp
-    ON hp.sk_house = lf.sk_house_listing / 1000 
+    datalake_3p_prod.houses_3p AS hp
+    ON hp.id_house = lf.sk_house_listing / 1000 
 WHERE lf.origin_table = 'Sale'
+),
+agents_3p AS (
+    SELECT
+        ac.id_agent,
+        ac.id_user_agent,
+        ac.id_work_contract,
+        ac.ts_work_contract_started,
+        ac.ts_work_contract_ended,
+        NULLIF(wc."3p_partner", '') AS demand_3p_partner,
+        wc.is_3p_contract
+    FROM
+        datalake_ebdb_agents_prod.agent_contract AS ac
+    JOIN datalake_ebdb_work_contract_prod.work_contract AS wc
+        ON ac.id_work_contract = wc.id
 ),
 monday_adjusted AS (
 -- data from datalake_firestore_prod.monday
@@ -99,6 +113,8 @@ SELECT
     fv.is_hub_flow,
 	bur.business_unit AS hub_visit,
     dr.city_group,
+	COALESCE(ap.is_3p_contract, FALSE) AS is_3p_demand,
+	ap.demand_3p_partner,
     DATE(NULLIF(fv.sk_booking_created_date,-1)) AS dt_created,
     DATE(NULLIF(fv.sk_visit_completed_date,-1)) AS dt_completed,
     ROW_NUMBER() OVER (PARTITION BY fv.sk_booking ORDER BY COALESCE(bur.dt_coverage_ended,current_date) DESC ) AS order_booking
@@ -106,10 +122,16 @@ FROM
     sale.fact_visits fv
 JOIN dim_region dr
     ON fv.sk_region = dr.sk_region
+JOIN dim_booking AS db
+    ON db.sk_booking = fv.sk_booking
 LEFT JOIN sale.fact_business_unit_region bur
     ON bur.sk_region = fv.sk_region
     AND DATE(fv.sk_booking_created_date) BETWEEN DATE (bur.dt_coverage_started) 
     AND DATE(COALESCE(bur.dt_coverage_ended, current_date))
+LEFT JOIN
+	agents_3p AS ap
+	ON ap.id_agent = db.id_agent
+    AND db.dt_created BETWEEN ap.ts_work_contract_started AND COALESCE(ts_work_contract_ended, db.ts_load)
 ),
 sale_bookings AS (
 SELECT 
@@ -121,6 +143,8 @@ SELECT
     is_hub_flow,
     hub_visit,
     city_group,
+	is_3p_demand,
+	demand_3p_partner,
     dt_created,
     dt_completed,
     order_booking
@@ -274,6 +298,8 @@ SELECT
     COALESCE(sde.id_buyer, db.id_visitor) AS id_buyer,
 	COALESCE(sde.id_house, db.id_property) AS id_house,
     COALESCE(sde.id_agent, db.id_agent) AS id_agent,
+	COALESCE(db.is_3p_demand, FALSE) AS is_3p_demand,
+	db.demand_3p_partner,
 	sde.id_offer,
     sde.form_of_payment,
     sde.os_date AS dt_offer_sent,
@@ -314,9 +340,9 @@ sale_demand_classification AS (
 SELECT
     sdc.id_buyer,
 	sdc.id_house,
-    CASE WHEN ap.id_user IS NOT NULL THEN 1 ELSE 0 END AS is_3p_demand,
-    ap.partner AS demand_3p_partner,
-    CASE WHEN hp.sk_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
+    sdc.is_3p_demand::INT,
+    sdc.demand_3p_partner,
+    CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
     hp.partner AS supply_3p_partner,
     CASE
         WHEN COALESCE(sdr.city_group,sdc.city_group) NOT IN ('RMSP', 'Rio de Janeiro','Porto Alegre','Campinas') THEN 'Out of coverage area'
@@ -364,11 +390,8 @@ LEFT JOIN
     sale_demand_region sdr
         ON sdr.id_house::VARCHAR = sdc.id_house
 LEFT JOIN
-    datamarts.agents_3p AS ap
-    ON ap.id_agent = sdc.id_agent
-LEFT JOIN
-    datamarts.houses_3p AS hp
-    ON hp.sk_house = sdc.id_house
+    datalake_3p_prod.houses_3p AS hp
+    ON hp.id_house = sdc.id_house
 ),
 lead_ AS (
 SELECT
@@ -384,7 +407,7 @@ SELECT
     slf.is_3p_supply,
     slf.supply_3p_partner,
     0::INT AS is_3p_demand,
-    0::VARCHAR AS demand_3p_partner,
+    NULL::VARCHAR AS demand_3p_partner,
 	NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
@@ -440,7 +463,7 @@ SELECT
     slf.is_3p_supply,
     slf.supply_3p_partner,
     0::INT AS is_3p_demand,
-    0::VARCHAR AS demand_3p_partner,
+    NULL::VARCHAR AS demand_3p_partner,
     NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
@@ -496,7 +519,7 @@ SELECT
     slf.is_3p_supply,
     slf.supply_3p_partner,
     0::INT AS is_3p_demand,
-    0::VARCHAR AS demand_3p_partner,
+    NULL::VARCHAR AS demand_3p_partner,
     NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
@@ -552,7 +575,7 @@ SELECT
     slf.is_3p_supply,
     slf.supply_3p_partner,
     0::INT AS is_3p_demand,
-    0::VARCHAR AS demand_3p_partner,
+    NULL::VARCHAR AS demand_3p_partner,
     NULL AS first_origin_demand,
     NULL AS origin_before_offer,
     NULL AS origin_after_offer,
@@ -608,7 +631,7 @@ SELECT
     slf.is_3p_supply,
     slf.supply_3p_partner,
     0::INT AS is_3p_demand,
-    0::VARCHAR AS demand_3p_partner,
+    NULL::VARCHAR AS demand_3p_partner,
     NULL AS first_origin_demand,
     NULL AS origin_before_offer,
 	NULL AS origin_after_offer,
@@ -664,7 +687,7 @@ SELECT
     slf.is_3p_supply,
     slf.supply_3p_partner,
     0::INT AS is_3p_demand,
-    0::VARCHAR AS demand_3p_partner,
+    NULL::VARCHAR AS demand_3p_partner,
     NULL AS first_origin_demand,
 	NULL AS origin_before_offer,
 	NULL AS origin_after_offer,

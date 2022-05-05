@@ -45,4 +45,4 @@ columns:
       - dw_datamarts_cross.lead_listing_flows.funnel_drop_reason
   supply_3p_partner:
     lineage:
-      - dw_datamarts_cross.houses_3p.partner
+      - datalake_3p.houses_3p.partner

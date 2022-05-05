@@ -14,7 +14,7 @@ SELECT
 	lead_origin,
 	funnel_drop_reason,
 	hp.partner AS supply_3p_partner,
-	CASE WHEN hp.sk_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
+	CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
   	COUNT(lf.sk_lead_date) AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS qualifieds,
@@ -26,8 +26,8 @@ JOIN datamarts.lead_listing_flows lf
   AND lf.sk_lead_date > 0
 LEFT JOIN dim_region dr
   ON dr.sk_region = lf.sk_region
-LEFT JOIN datamarts.houses_3p AS hp
-  ON hp.sk_house = lf.sk_house_listing / 1000
+LEFT JOIN datalake_3p_prod.houses_3p AS hp
+  ON hp.id_house = lf.sk_house_listing / 1000
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
 ),
@@ -46,7 +46,7 @@ SELECT
 	lead_origin,
 	funnel_drop_reason,
 	hp.partner AS supply_3p_partner,
-	CASE WHEN hp.sk_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
+	CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
 	NULL::BIGINT AS leads,
 	COUNT(lf.sk_prospect_date) AS prospects, -- this count is done on the prospect date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
 	NULL::BIGINT AS qualifieds,
@@ -58,8 +58,8 @@ JOIN datamarts.lead_listing_flows lf
   AND lf.sk_prospect_date > 0
 LEFT JOIN dim_region dr
   ON dr.sk_region = lf.sk_region
-LEFT JOIN datamarts.houses_3p AS hp
-  ON hp.sk_house = lf.sk_house_listing / 1000
+LEFT JOIN datalake_3p_prod.houses_3p AS hp
+  ON hp.id_house = lf.sk_house_listing / 1000
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE-- filter data from 4 years ago
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
 ),
@@ -78,7 +78,7 @@ SELECT
 	lead_origin,
 	funnel_drop_reason,
 	hp.partner AS supply_3p_partner,
-	CASE WHEN hp.sk_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
+	CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	COUNT(lf.sk_qualified_date) AS qualifieds, -- this count is done on the qualified date because not all listings come FROM a lead, and maybe one lead brings multiple house listings
@@ -90,8 +90,8 @@ JOIN datamarts.lead_listing_flows lf
   AND lf.sk_qualified_date > 0
 LEFT JOIN dim_region dr
   ON dr.sk_region = lf.sk_region
-LEFT JOIN datamarts.houses_3p AS hp
-  ON hp.sk_house = lf.sk_house_listing / 1000
+LEFT JOIN datalake_3p_prod.houses_3p AS hp
+  ON hp.id_house = lf.sk_house_listing / 1000
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
 ),
@@ -110,7 +110,7 @@ SELECT
 	lead_origin,
 	funnel_drop_reason,
 	hp.partner AS supply_3p_partner,
-	CASE WHEN hp.sk_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
+	CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
 	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS qualifieds,
@@ -122,8 +122,8 @@ JOIN datamarts.lead_listing_flows lf
   AND lf.sk_opportunity_date > 0
 LEFT JOIN dim_region dr
   ON dr.sk_region = lf.sk_region
-LEFT JOIN datamarts.houses_3p AS hp
-  ON hp.sk_house = lf.sk_house_listing / 1000
+LEFT JOIN datalake_3p_prod.houses_3p AS hp
+  ON hp.id_house = lf.sk_house_listing / 1000
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
 ),
@@ -142,7 +142,7 @@ SELECT
 	lead_origin,
 	funnel_drop_reason,
 	hp.partner AS supply_3p_partner,
-	CASE WHEN hp.sk_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
+	CASE WHEN hp.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3p_supply,
   	NULL::BIGINT AS leads,
 	NULL::BIGINT AS prospects,
 	NULL::BIGINT AS qualifieds,
@@ -154,8 +154,8 @@ JOIN datamarts.lead_listing_flows lf
   AND lf.sk_first_listing_date > 0
 LEFT JOIN dim_region dr
   ON dr.sk_region = lf.sk_region
-LEFT JOIN datamarts.houses_3p AS hp
-  ON hp.sk_house = lf.sk_house_listing / 1000
+LEFT JOIN datalake_3p_prod.houses_3p AS hp
+  ON hp.id_house = lf.sk_house_listing / 1000
 WHERE dd."date" BETWEEN DATE_TRUNC('year',CURRENT_DATE) - INTERVAL '4 year' AND CURRENT_DATE -- filter data from 4 years ago
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
 ),

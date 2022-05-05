@@ -17,6 +17,9 @@ columns:
   city_group:
     lineage:
       - dw_public.dim_region.city_group
+  is_3p_demand:
+    lineage:
+      - datalake_ebdb_work_contract_prod.is_3p_contract
   lead_context:
     lineage:
       - dw_datamarts_cross.lead_listing_flows.mkt_origin
@@ -52,7 +55,7 @@ columns:
       - dw_sale.dim_offer.business_unit
   supply_3p_partner:
     lineage:
-      - dw_datamarts_cross.houses_3p.partner
+      - datalake_3p.houses_3p.partner
   demand_3p_partner:
     lineage:
-      - dw_datamarts_cross.agents_3p.partner
+      - datalake_ebdb_work_contract.work_contract.3p_partner
