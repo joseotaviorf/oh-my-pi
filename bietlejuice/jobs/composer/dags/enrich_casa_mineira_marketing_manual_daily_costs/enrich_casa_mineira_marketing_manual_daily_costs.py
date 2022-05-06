@@ -23,7 +23,7 @@ SOURCE = "casa_mineira_marketing_manual_daily_costs"
 CONTEXT = "casa_mineira_marketing_costs"
 DAG_NAME = f"enrich_{SOURCE}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-MAIN_START_DATE = datetime(2019, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
+MAIN_START_DATE = datetime(2021, 9, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = None
 
 config_service = ConfigurationService(SOURCE)
@@ -35,13 +35,9 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 spark_jobs_logs_path = config_service.get_config("spark_jobs_logs_path")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
-partition_cols = config_service.get_config("partition_cols")
-reports_list = config_service.get_config("reports_list")
-
 # cluster setup
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
 CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = spark_jobs_logs_path
-
 
 PARTITION_COLS = ["id_date", "flow_type"]
 
