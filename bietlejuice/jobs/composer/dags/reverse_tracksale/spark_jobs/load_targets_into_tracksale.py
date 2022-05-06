@@ -82,11 +82,15 @@ if __name__ == "__main__":
     spark_client = SparkClient()
     s3_consumer = S3Consumer(spark_client)
 
-    df = (
-        s3_consumer.get_data_from_file(path=path, format="parquet")
-        .filter("is_dispatched = false")
-        .collect()
-    )
+    try:
+        df = (
+            s3_consumer.get_data_from_file(path=path, format="parquet")
+            .filter("is_dispatched = false")
+            .collect()
+        )
+    except Exception as e:
+        logger.error("m=There's no data here yet, message_error={}".format(e))
+        df = []
 
     if len(df) > 0:
 

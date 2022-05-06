@@ -1,6 +1,6 @@
 import logging
 from argparse import ArgumentParser
-from pyspark.sql.functions import unix_timestamp, to_timestamp, when, count
+from pyspark.sql.functions import when, count, lit
 from pyspark.sql.window import Window as w
 from datetime import datetime, timedelta
 
@@ -83,16 +83,12 @@ if __name__ == "__main__":
         ).otherwise(False),
     ).dropDuplicates(["customer_name", "customer_email"])
 
-    column_create_date = "ts_load"
-    df = df.withColumn(
-        column_create_date,
-        to_timestamp(unix_timestamp(column_create_date, "MM/dd/yyyy")),
-    )
+    df = df.withColumn("column_create_date", lit(execution_date))
 
     df = (
         SparkDataFrameService()
         .input(df)
-        .create_year_month_day_columns_from_dataframe_column(column_create_date)
+        .create_year_month_day_columns_from_dataframe_column("column_create_date")
         .output()
     )
 
