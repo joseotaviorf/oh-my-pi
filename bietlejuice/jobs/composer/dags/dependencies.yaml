@@ -536,6 +536,17 @@ bietlejuice.dw_customer_support:
   - bietlejuice.gsheets.support_and_service:load-clean-support-agents-department
   - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
 
+bietlejuice.dw_datamarts_spark.cross:
+  - bietlejuice.dw_booking:load-dw-public-dim-booking
+  - bietlejuice.dw_datamarts_cross:create-talk-to-agent-in-datalake
+  - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer
+  - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
+  - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
+  - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows
+  - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+
 bietlejuice.dw_datamarts_spark.for_rent:
   - bietlejuice.dw_lead:load-dw-public-dim-lead
   - bietlejuice.dw_listing_jobs:load-dw-public-dim-photo-job

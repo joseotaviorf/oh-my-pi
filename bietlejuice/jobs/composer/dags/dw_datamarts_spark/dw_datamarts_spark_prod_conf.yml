@@ -10,6 +10,9 @@
 #       # Eg: Data ForSale
 
 dags:
+  cross:
+    owner: Data Engineering
+    cluster_name: databricks_9_1_med_general_cluster
   for_rent:
     owner: Data ForRent
   for_sale:
