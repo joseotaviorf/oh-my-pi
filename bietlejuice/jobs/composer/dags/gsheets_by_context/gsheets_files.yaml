@@ -62,6 +62,12 @@ csat_reembolso_pos_rescisao:
     clean_table_name: csat_refund_after_termination
     sheet_context: support_and_service
 
+ranking_rules:
+    sheet_id: 1NgN-C7CUZxXAVSnqyC8IUFCEo3d0ROwo8lYDLaAJAuo
+    sheet_name: Regras por time
+    clean_table_name: ranking_rules
+    sheet_context: support_and_service
+
 #########################
 # GROWTH SHEETS
 ###################

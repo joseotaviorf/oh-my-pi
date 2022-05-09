@@ -1,0 +1,40 @@
+---
+database_name: datalake_gsheets_clean
+table_name: ranking_rules
+columns:
+  id_group:
+    lineage:
+      - datalake_gsheets_raw.ranking_rules.grupo
+  type:
+    lineage:
+      - datalake_gsheets_raw.ranking_rules.caixa
+  responsible:
+    lineage:
+      - datalake_gsheets_raw.ranking_rules.responsavel
+  journey_step:
+    lineage:
+      - datalake_gsheets_raw.ranking_rules.etapa_da_jornada
+  resolution_weight:
+    lineage:
+      - datalake_gsheets_raw.ranking_rules.resolution_peso
+  sla_weight:
+    lineage:
+      - datalake_gsheets_raw.ranking_rules.sla_peso
+  productivity_weight:
+    lineage:
+      - datalake_gsheets_raw.ranking_rules.produtividade_peso
+  csat_weight:
+    lineage:
+      - datalake_gsheets_raw.ranking_rules.csat_peso
+  would_do_business_again_weight:
+    lineage:
+      - datalake_gsheets_raw.ranking_rules.indice_voltaria_a_fazer_negocio_peso
+  reclameaqui_note_weight:
+    lineage:
+      - datalake_gsheets_raw.ranking_rules.ra_nota_peso
+  solution_rate_weight:
+    lineage:
+      - datalake_gsheets_raw.ranking_rules.indice_solucao_peso
+  total:
+    lineage:
+      - datalake_gsheets_raw.ranking_rules.total
