@@ -805,26 +805,26 @@ supply_ciq_cost AS (
 ),
 supply_ciq_cost_comission AS (
     SELECT
-        data::DATE AS dt_cost,
+        NULLIF(data, '')::DATE AS dt_cost,
         co.city AS city_group,
         'Rental' AS business,
         'Supply' AS planning_mkt_level1,
         'Affiliates' AS planning_mkt_level2,
         'CIQ' AS planning_mkt_level3,
-        SUM(REPLACE(co.total_costs_ciq_full_for_rent, ',', '')::FLOAT) AS costs
+        SUM(REPLACE(NULLIF(co.total_costs_ciq_full_for_rent, ''), ',', '')::FLOAT) AS costs
     FROM
         datalake_gsheets_clean_prod.ciq_costs AS co
     GROUP BY 1,2,3,4,5,6
 ),
 supply_ciq_cost_comission_sale AS (
     SELECT
-        data::DATE AS dt_cost,
+        NULLIF(data, '')::DATE AS dt_cost,
         co.city AS city_group,
         'Sale' AS business,
         'Supply' AS planning_mkt_level1,
         'Affiliates' AS planning_mkt_level2,
         'CIQ' AS planning_mkt_level3,
-        SUM(REPLACE(co.total_costs_ciq_full_for_sale, ',', '')::FLOAT) AS costs
+        SUM(REPLACE(NULLIF(co.total_costs_ciq_full_for_sale, ''), ',', '')::FLOAT) AS costs
     FROM
         datalake_gsheets_clean_prod.ciq_costs AS co
     WHERE
