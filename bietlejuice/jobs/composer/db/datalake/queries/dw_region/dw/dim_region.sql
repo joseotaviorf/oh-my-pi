@@ -21,6 +21,7 @@ first_booking AS (
 SELECT
     CAST(r.id AS INT) AS sk_region,
     CAST(r.id AS INT) AS id, -- id_region,
+    r.id_country,
     CAST(r.id_macro_region AS INT) AS macro_id,
     CAST(r.id_city AS INT) AS city_id,
     r.level,
@@ -38,6 +39,7 @@ SELECT
     r.regional_deprecated,
     r.regional_inspection,
     r.tier,
+    r.country_name,
     CAST(fb.dt_first_booking AS TIMESTAMP) AS dt_first_booking, -- date
     fh.ts_first_house_created AS dt_first_property_created,
     r.ts_created AS dt_created,

@@ -2,6 +2,7 @@ drop table if exists public.dim_region;
 create table if not exists public.dim_region (
   sk_region integer primary key,
   id integer,
+  id_country integer,
   macro_id integer,
   city_id integer,
   level varchar,
@@ -19,6 +20,7 @@ create table if not exists public.dim_region (
   regional_deprecated varchar,
   regional_inspection varchar,
   tier integer,
+  country_name varchar,
   dt_first_booking timestamp,
   dt_first_property_created timestamp,
   dt_created timestamp without time zone,

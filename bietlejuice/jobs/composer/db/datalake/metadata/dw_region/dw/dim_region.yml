@@ -7,6 +7,9 @@ columns:
   id:
     lineage:
       - datalake_region.region.id
+  id_country:
+    lineage:
+      - datalake_region.region.id_country
   macro_id:
     lineage:
       - datalake_region.region.id_macro_region
@@ -58,6 +61,9 @@ columns:
   tier:
     lineage:
       - datalake_region.region.tier
+  country_name:
+    lineage:
+      - datalake_region.region.country_name
   dt_first_booking:
     lineage:
       - datalake_booking.booking.dt_booking
