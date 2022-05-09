@@ -1,0 +1,22 @@
+---
+database_name: datalake_ebdb_clean
+table_name: listing_rent_model_aud
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.listingrentmodel_aud.id
+  id_listing_business_context:
+    lineage:
+      - datalake_ebdb_raw.listingrentmodel_aud.listingBusinessContext_id
+  rev:
+    lineage:
+      - datalake_ebdb_raw.listingrentmodel_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.listingrentmodel_aud.revtype
+  rental_administrator:
+    lineage:
+      - datalake_ebdb_raw.listingrentmodel_aud.rentalAdministrator
+  mod_rental_administrator:
+    lineage:
+      - datalake_ebdb_raw.listingrentmodel_aud.rentalAdministrator_MOD

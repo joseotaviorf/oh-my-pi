@@ -1,0 +1,19 @@
+---
+database_name: datalake_ebdb_clean
+table_name: listing_rent_model
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.listingrentmodel.id
+  id_listing_business_context:
+    lineage:
+      - datalake_ebdb_raw.listingrentmodel.listingBusinessContext_id
+  rental_administrator:
+    lineage:
+      - datalake_ebdb_raw.listingrentmodel.rentalAdministrator
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.listingrentmodel.created_at
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.listingrentmodel.updated_at
