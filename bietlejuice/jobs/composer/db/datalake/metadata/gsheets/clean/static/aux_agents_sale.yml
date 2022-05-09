@@ -32,6 +32,9 @@ columns:
     dt_last_return_deaccreditation:
         lineage:
             - datalake_gsheets_raw.aux_agents_sale.data_last_retorno_descredenciamento
+    dt_last_suspension:
+        lineage:
+            - datalake_gsheets_raw.aux_agents_sale.data_last_suspensao
     dt_last_return_suspension:
         lineage:
             - datalake_gsheets_raw.aux_agents_sale.data_last_retorno_suspensao

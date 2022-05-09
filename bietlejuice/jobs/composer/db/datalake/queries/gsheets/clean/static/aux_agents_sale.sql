@@ -9,6 +9,7 @@ SELECT
     TO_DATE(data_ativacao, 'yyyy-MM-dd') AS dt_activation,
     TO_DATE(data_last_descredenciamento, 'yyyy-MM-dd') AS dt_last_deaccreditation,
     TO_DATE(data_last_retorno_descredenciamento, 'yyyy-MM-dd') AS dt_last_return_deaccreditation,
+    TO_DATE(data_last_suspensao, 'yyyy-MM-dd') AS dt_last_suspension,
     TO_DATE(data_last_retorno_suspensao, 'yyyy-MM-dd') AS dt_last_return_suspension,
     TO_DATE(semana_credenciamento, 'yyyy-MM-dd') AS dt_week_accreditation
 FROM
