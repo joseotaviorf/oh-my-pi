@@ -1,5 +1,5 @@
 WITH table_metastore AS (
-    SELECT
+    SELECT DISTINCT
         layer,
         database_name,
         table_name,
@@ -12,15 +12,8 @@ WITH table_metastore AS (
         year = {year}
         AND month = {month}
         AND day = {day}
-    GROUP BY
-        layer,
-        database_name,
-        table_name,
-        year,
-        month,
-        day
 ), table_documentation AS (
-    SELECT
+    SELECT DISTINCT
         database_name,
         table_name,
         table_description,
@@ -31,11 +24,6 @@ WITH table_metastore AS (
         year = {year}
         AND month = {month}
         AND day = {day}
-    GROUP BY
-        database_name,
-        table_name,
-        table_description,
-        owner
 )
 SELECT
     ms.layer,

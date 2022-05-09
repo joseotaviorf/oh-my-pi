@@ -22,7 +22,7 @@ WITH aggregated_dag_info AS (
     FROM
         aggregated_dag_info
 ), tables_metastore AS (
-    SELECT
+    SELECT DISTINCT
         layer,
         database_name,
         table_name,
@@ -35,13 +35,6 @@ WITH aggregated_dag_info AS (
         year = {year}
         AND month = {month}
         AND day = {day}
-    GROUP BY
-        layer,
-        database_name,
-        table_name,
-        year,
-        month,
-        day
 ), lineage_and_tags AS (
     SELECT
         database_name,
@@ -59,7 +52,6 @@ SELECT
     ms.layer,
     ms.database_name,
     ms.table_name,
-    di.owners,
     COALESCE(md.has_lineage, di.has_lineage_from_product, False) as has_lineage,
     COALESCE(md.has_tags, False) as has_tags,
     ms.year,

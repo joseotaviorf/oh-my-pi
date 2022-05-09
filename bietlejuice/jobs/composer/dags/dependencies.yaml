@@ -1752,3 +1752,10 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.gsheets.support_and_service:load-clean-department-control
+
+bietlejuice.enrich_documentation_metrics:
+  - bietlejuice.documentation_metrics:load-clean-categories-documentation
+  - bietlejuice.documentation_metrics:load-clean-columns-documentation
+  - bietlejuice.documentation_metrics:load-clean-columns-metastore
+  - bietlejuice.documentation_metrics:load-clean-dag-metadata
+  - bietlejuice.documentation_metrics:load-clean-lineage-and-tags
