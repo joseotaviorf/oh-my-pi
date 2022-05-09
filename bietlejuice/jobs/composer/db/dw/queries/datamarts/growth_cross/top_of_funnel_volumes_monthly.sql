@@ -172,7 +172,7 @@ events AS (
         COUNT(NULL) as marketing_cost,
         COUNT(NULL) as budget,
         COUNT(DISTINCT ui.id_tof_user) AS tof_users,
-        COUNT(DISTINCT (CASE WHEN dh.is_3p = 'true' THEN ui.id END)) AS tof_users_3p,
+        COUNT(DISTINCT (CASE WHEN dh.is_3p = 'true' THEN ui.id_tof_user END)) AS tof_users_3p,
         COUNT(ui.id) AS tof_events,
         COUNT(CASE WHEN dh.is_3p = 'true' THEN ui.id END) AS tof_events_3p,
         COUNT(NULL) AS active_buyer_prospects,
