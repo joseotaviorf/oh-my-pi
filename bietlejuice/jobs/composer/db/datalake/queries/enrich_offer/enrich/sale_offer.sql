@@ -249,7 +249,7 @@ aux_monday_users AS (
         ROW_NUMBER() OVER (PARTITION BY gmu.id_monday ORDER BY user_name) AS row
     FROM
         datalake_gsheets_clean.monday_users AS gmu
-    LEFT JOIN 
+    LEFT JOIN
         datalake_ebdb_user.user AS us
             ON gmu.user_email = us.email
 ),
@@ -416,6 +416,7 @@ data_sources AS (
         mo.payment_model AS mo_payment_model,
         mo.credit_status AS mo_credit_status,
         mo.notary_office_status AS mo_notary_office_status,
+        vo.notary_office_details AS vo_notary_office_details,
         mo.real_estate_register_office_status AS mo_real_estate_register_office_status,
         mo.early_keys_status AS mo_early_keys_status,
         mo.tags_from_salesflow as mo_tags_from_salesflow,
@@ -616,16 +617,16 @@ business_rules AS (
                 OR COALESCE(vo_tags_from_salesflow, mo_tags_from_salesflow) LIKE "%pre-analise-expansao%"
                 OR COALESCE(vo_tags_from_salesflow, mo_tags_from_salesflow) LIKE "%credito-andamento%"
                 OR COALESCE(vo_tags_from_salesflow, mo_tags_from_salesflow) LIKE "%credito-aprovado%"
-                OR COALESCE(vo_tags_from_salesflow, mo_tags_from_salesflow) LIKE "%credito-recusado%" THEN true 
-            ELSE false 
+                OR COALESCE(vo_tags_from_salesflow, mo_tags_from_salesflow) LIKE "%credito-recusado%" THEN true
+            ELSE false
         END AS has_credit_pre_analysis,
         CASE
-            WHEN COALESCE(vo_tags_from_salesflow, mo_tags_from_salesflow) LIKE "%no-protocolo%" THEN true 
+            WHEN COALESCE(vo_tags_from_salesflow, mo_tags_from_salesflow) LIKE "%no-protocolo%" THEN true
             WHEN COALESCE(vo_dt_sale_agreement_created, mo_dt_sale_agreement_created) >= "2021-03-14"
                 AND current_payment_method = "FINANCED"
                 AND COALESCE(vo_financing_bank, mo_financing_bank) = "Itaú"
-                AND COALESCE(vo_credit_model, mo_credit_model) = "ATTA" THEN true 
-            ELSE false 
+                AND COALESCE(vo_credit_model, mo_credit_model) = "ATTA" THEN true
+            ELSE false
         END AS has_payment_in_protocol,
         has_used_fgts_in_payment,
         has_used_negotiation_chat,
@@ -789,6 +790,7 @@ business_rules AS (
         COALESCE(vo_payment_model, mo_payment_model) AS payment_model,
         COALESCE(vo_credit_status, mo_credit_status) AS credit_status,
         COALESCE(vo_notary_office_status, mo_notary_office_status) AS notary_office_status,
+        vo_notary_office_details AS notary_office_details,
         COALESCE(vo_real_estate_register_office_status, mo_real_estate_register_office_status) AS real_estate_register_office_status,
         mo_early_keys_status AS early_keys_status,
         COALESCE(vo_tags_from_salesflow, mo_tags_from_salesflow) AS tags_from_salesflow,
@@ -930,6 +932,7 @@ SELECT
     payment_model,
     credit_status,
     notary_office_status,
+    notary_office_details,
     real_estate_register_office_status,
     early_keys_status,
     tags_from_salesflow,

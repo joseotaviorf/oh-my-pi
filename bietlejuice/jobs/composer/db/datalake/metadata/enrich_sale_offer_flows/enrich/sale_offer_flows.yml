@@ -224,10 +224,13 @@ columns:
   credit_status:
     lineage:
       - datalake_sales_flow_clean.mortgage.credit_status
-  notary_office_status:
+  real_estate_register_office_status:
     lineage:
       - datalake_sales_flow_clean.notary.status
-  real_estate_register_office_status:
+  notary_office_status:
+    lineage:
+      - datalake_sales_flow_clean.notary.status_notary_notes
+  notary_office_details:
     lineage:
       - datalake_sales_flow_clean.cash_payment.crn_details
   tags_from_salesflow:

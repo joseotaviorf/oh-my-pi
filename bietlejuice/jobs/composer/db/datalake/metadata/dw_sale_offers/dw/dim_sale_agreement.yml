@@ -89,6 +89,9 @@ columns:
   notary_office_status:
     lineage:
       - datalake_offer.sale_offer.notary_office_status
+  notary_office_details:
+    lineage:
+      - datalake_offer.sale_offer.notary_office_details
   real_estate_register_office_status:
     lineage:
       - datalake_offer.sale_offer.real_estate_register_office_status

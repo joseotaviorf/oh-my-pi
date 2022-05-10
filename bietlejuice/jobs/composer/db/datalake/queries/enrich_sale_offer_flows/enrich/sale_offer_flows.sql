@@ -310,6 +310,7 @@ cash_payment AS (
     SELECT
         cp.id_cash_payment,
         cp.id_payment,
+        cp.status_notary_notes,
         cp.crn_details,
         DATE(cp.ts_crn_started) AS dt_crn_started,
         DATE(cp.ts_crn_ended) AS dt_crn_ended
@@ -610,8 +611,9 @@ SELECT
     mg.status AS bank_analysis_status,
     p.status AS payment_status,
     mg.credit_status AS credit_status,
-    n.status AS notary_office_status,
-    cp.crn_details AS real_estate_register_office_status,
+    n.status AS real_estate_register_office_status,
+    cp.status_notary_notes AS notary_office_status,
+    cp.crn_details AS notary_office_details,
     tag.label AS tags_from_salesflow,
     off.sale_price AS sale_price_agreed,
     CASE

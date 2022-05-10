@@ -28,6 +28,7 @@ SELECT
   eso.payment_status,
   eso.credit_status,
   eso.notary_office_status,
+  eso.notary_office_details,
   eso.real_estate_register_office_status,
   eso.tags_from_salesflow,
   eso.has_credit_pre_analysis,

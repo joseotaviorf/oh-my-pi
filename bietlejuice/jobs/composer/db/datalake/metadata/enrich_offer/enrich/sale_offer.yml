@@ -141,6 +141,9 @@ columns:
     lineage:
       - datalake_firestore.monday.notary_office_status
       - datalake_sale_offer_flows.sale_offer_flows.notary_office_status
+  notary_office_details:
+    lineage:
+      - datalake_sale_offer_flows.sale_offer_flows.notary_office_details
   real_estate_register_office_status:
     lineage:
       - datalake_firestore.monday.real_estate_register_office_status
