@@ -18,5 +18,8 @@ dags:
   for_sale:
     owner: Data ForSale
     cluster_name: databricks_9_1_med_general_cluster
+  for_sale_cross:
+    owner: Data ForSale
+    cluster_name: databricks_9_1_med_general_cluster
   fintech_cross:
     owner: Data Fintech

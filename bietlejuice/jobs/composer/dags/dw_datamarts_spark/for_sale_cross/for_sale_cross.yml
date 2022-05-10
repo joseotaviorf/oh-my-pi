@@ -1,0 +1,13 @@
+---
+## TEMPLATE
+# <tree_path>: # This is the folder under which the datamart query will be found
+#   <datamart_name>:
+#     depends_on:
+#       # This is optional, only necessary for datamarts with inner dependencies
+#       - <datamart_dependency_name>
+#       - <datamart_2_dependency_name>
+#   <datamart_name>: {}
+#     # If the datamart has no inner dependency, declare it as an empty object
+
+for_sale_cross:
+  temp_supply_flows: {}

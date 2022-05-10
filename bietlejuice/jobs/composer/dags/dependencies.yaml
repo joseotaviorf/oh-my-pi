@@ -576,6 +576,15 @@ bietlejuice.dw_datamarts_spark.for_sale:
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
   - bietlejuice.enrich_amplitude_sale_visit_intent:load-enrich-amplitude-sale-visit-intent
 
+bietlejuice.dw_datamarts_spark.for_sale_cross:
+  - bietlejuice.dw_datamarts_cross:create-lead-listing-flows-in-datalake
+  - bietlejuice.dw_lead:load-dw-public-dim-lead
+  - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.rene_descartes:load-clean-lead-rejection
+  - bietlejuice.wololo:load-clean-context-discard
+  - bietlejuice.wololo:load-clean-conversion
+  - bietlejuice.wololo:load-clean-prospect
+
 bietlejuice.dw_house:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
 
