@@ -11,12 +11,20 @@ columns:
       - datalake_customer_support.call.id_user
       - datalake_customer_support.chat.id_user
       - datalake_customer_support.email.id_user
-  ts_ticket_started:
+  team:
+    lineage:
+      - datalake_gsheets_clean.department_control.team
+  ticket_recontact_list:
+    lineage:
+      - datalake_customer_support.call.id_ticket
+      - datalake_customer_support.chat.id_ticket
+      - datalake_customer_support.email.id_ticket
+  ts_started:
     lineage:
       - datalake_customer_support.call.ts_ticket_started
       - datalake_customer_support.chat.ts_ticket_started
       - datalake_customer_support.email.ts_ticket_started
-  ts_ticket_ended:
+  ts_closed:
     lineage:
       - datalake_customer_support.call.ts_ticket_ended
       - datalake_customer_support.chat.ts_ticket_ended
