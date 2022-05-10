@@ -27,6 +27,7 @@ This pipeline produces the following output tables:
     - `offline_manual_costs`
     - `offline_manual_share_city_group`
     - `offline_manual_share_cost_center`
+    - `mta_budget`
     - `tradecom_configuration`
 2. Data lake clean:
     - `affiliate_pro_registration`
@@ -38,5 +39,6 @@ This pipeline produces the following output tables:
     - `offline_manual_share_city_group`
     - `offline_manual_share_cost_center`
     - `targets_casa_mineira_nbp`
+    - `mta_budget_october_2020`
 
 </details>

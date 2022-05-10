@@ -122,7 +122,6 @@ This pipeline produces the following output tables:
     - `media_plan_current_quarter`
     - `mkt_cost_per_source`
     - `monday_users`
-    - `mta_budget_october_2020`
     - `negotiation_executive_bonus`
     - `negotiation_executive_correction`
     - `offer_fup_history`

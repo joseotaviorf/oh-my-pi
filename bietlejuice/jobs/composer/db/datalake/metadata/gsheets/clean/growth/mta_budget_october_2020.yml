@@ -1,3 +1,4 @@
+---
 database_name: datalake_gsheets_clean
 table_name: mta_budget_october_2020
 columns:
@@ -22,9 +23,9 @@ columns:
   is_blocked_budget:
     lineage:
       - datalake_gsheets_raw.mta_budget.is_blocked_budget
-  week_start:
+  dt_week_started:
     lineage:
       - datalake_gsheets_raw.mta_budget.week_start
-  month:
+  dt_month:
     lineage:
       - datalake_gsheets_raw.mta_budget.month

@@ -532,11 +532,6 @@ monday_users:
     sheet_name: depara_monday_id_name
     clean_table_name: monday_users
 
-mta_budget:
-    sheet_id: 16HF0DnPTkCIG8oexncHizjhmoGyAJapvGVeA46mUCa4
-    sheet_name: mta_budget
-    clean_table_name: mta_budget_october_2020
-
 offers_hub_central:
     sheet_id: 1uZpIFY-bhuxzS4LKl2jwFdBGdReQI7ifiYsewBIpKUE
     sheet_name: offers_hub_central
