@@ -8,6 +8,8 @@ SELECT
     flow_type,
     status_closing,
     status,
+    closing_canceled_reason,
+    is_canceled,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,

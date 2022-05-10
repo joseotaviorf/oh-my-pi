@@ -28,6 +28,12 @@ columns:
   status:
     lineage:
       - datalake_sales_flow_raw.sales_flow.status
+  closing_canceled_reason:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow.closing_canceled_reason
+  is_canceled:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow.is_canceled
   ts_created:
     lineage:
       - datalake_sales_flow_raw.sales_flow.created_at

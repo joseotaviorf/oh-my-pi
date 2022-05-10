@@ -19,6 +19,9 @@ columns:
   status:
     lineage:
       - datalake_sales_flow_raw.sales_flow_aud.status
+  closing_canceled_reason:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.closing_canceled_reason
   flow_step:
     lineage:
       - datalake_sales_flow_raw.sales_flow_aud.flow_step
@@ -37,6 +40,9 @@ columns:
   rev_end:
     lineage:
       - datalake_sales_flow_raw.sales_flow_aud.revend
+  is_canceled:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.is_canceled
   mod_id_buyer:
     lineage:
       - datalake_sales_flow_raw.sales_flow_aud.buyer_id_mod
@@ -52,6 +58,12 @@ columns:
   mod_status:
     lineage:
       - datalake_sales_flow_raw.sales_flow_aud.status_mod
+  mod_closing_canceled_reason:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.closing_canceled_reason_mod
+  mod_is_canceled:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.is_canceled_mod
   mod_flow_step:
     lineage:
       - datalake_sales_flow_raw.sales_flow_aud.flow_step_mod
