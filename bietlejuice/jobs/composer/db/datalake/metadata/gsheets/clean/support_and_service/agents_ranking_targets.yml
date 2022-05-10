@@ -1,3 +1,4 @@
+---
 database_name: datalake_gsheets_clean
 table_name: agents_ranking_targets
 columns:
@@ -13,18 +14,21 @@ columns:
   target_csat:
     lineage:
       - datalake_gsheets_raw.agents_ranking_targets.target_csat
-  target_frt:
+  target_sla:
     lineage:
-      - datalake_gsheets_raw.agents_ranking_targets.target_frt
+      - datalake_gsheets_raw.agents_ranking_targets.target_sla
   productivity_target:
     lineage:
       - datalake_gsheets_raw.agents_ranking_targets.productivity_target
-  ra_would_back_make_business_target:
+  ra_would_do_business_again_target:
     lineage:
-      - datalake_gsheets_raw.agents_ranking_targets.ra_would_back_make_business_target
+      - datalake_gsheets_raw.agents_ranking_targets.ra_would_do_business_again_target
   ra_target_score:
     lineage:
       - datalake_gsheets_raw.agents_ranking_targets.ra_target_score
+  ra_target_solution_rate:
+    lineage:
+      - datalake_gsheets_raw.agents_ranking_targets.ra_target_solution_rate
   dt_start:
     lineage:
       - datalake_gsheets_raw.agents_ranking_targets.start_date
