@@ -3,6 +3,7 @@ WITH aud_ts AS (
     aud.id_user AS id_owner,
     aud.id_account_manager,
     aud.is_active,
+    LAG(aud.id_account_manager) OVER (PARTITION BY aud.id_user ORDER BY aud.rev) AS previous_account_manager,
     LAG(aud.is_active) OVER (PARTITION BY aud.id_user ORDER BY aud.rev) AS previous_status,
     FROM_UNIXTIME(ure.ts_revision/1000) AS ts_event
   FROM 
@@ -20,6 +21,9 @@ aud_events AS (
     LEAD(aud.ts_event, 1) OVER (PARTITION BY aud.id_owner  ORDER BY aud.ts_event) AS ts_next_event
   FROM 
     aud_ts AS aud
+  WHERE
+    NOT (COALESCE(id_account_manager, -1) = COALESCE(previous_account_manager, -1)
+    AND COALESCE(is_active, false) = COALESCE(previous_status, false))
 ),
 pro_owner_dates AS (
   SELECT 
@@ -60,14 +64,19 @@ SELECT DISTINCT
   at.id_owner,
   aud.id_account_manager,
   aud.is_active AS is_pro_owner,
-  aud.id_account_manager IS NOT NULL AS is_expert,
+  CASE
+    WHEN aud.is_active = False 
+      OR aud.id_account_manager IS NULL THEN False
+    ELSE True
+  END AS is_expert,
+  aud.ts_event,
   pod.ts_pro_owner_started,
   pod.ts_pro_owner_ended,
   am.ts_account_manager_started,
   am.ts_account_manager_ended
 FROM 
   aud_ts AS at
-LEFT JOIN 
+JOIN 
   aud_events AS aud
     ON at.id_owner = aud.id_owner
     AND at.ts_event >= aud.ts_event 

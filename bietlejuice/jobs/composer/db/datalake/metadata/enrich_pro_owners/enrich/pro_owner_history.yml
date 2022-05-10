@@ -11,6 +11,9 @@ columns:
   is_pro_owner:
     lineage:
       - datalake_ebdb_clean.user_pro_owner_aud.is_active
+  ts_event:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
   ts_pro_owner_started:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
