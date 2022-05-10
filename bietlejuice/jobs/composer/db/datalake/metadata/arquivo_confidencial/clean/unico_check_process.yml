@@ -1,0 +1,48 @@
+database_name: datalake_arquivo_confidencial_clean
+table_name: unico_check_process
+columns:
+  id:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process.id
+  id_external:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process.external_id
+  id_process:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process.process_id
+  version:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process.version
+  external_source:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process.external_source
+  liveness:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process.attributes
+  face_match:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process.attributes
+  status:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process.attributes
+  score:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process.attributes
+  has_biometry:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process.attributes
+  ts_created:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process.created_at
+  ts_updated:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process.updated_at
+  year:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process.year
+  month:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process.month
+  day:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process.day

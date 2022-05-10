@@ -1,0 +1,51 @@
+database_name: datalake_arquivo_confidencial_clean
+table_name: unico_check_process_aud
+columns:
+  id:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process_aud.id
+  id_external:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process_aud.external_id
+  id_process:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process_aud.process_id
+  rev:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process_aud.rev
+  rev_type:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process_aud.revend
+  external_source:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process_aud.external_source
+  liveness:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process_aud.attributes
+  face_match:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process_aud.attributes
+  status:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process_aud.attributes
+  score:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process_aud.attributes
+  has_biometry:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process_aud.attributes
+  ts_created:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process_aud.created_at
+  year:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process_aud.year
+  month:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process_aud.month
+  day:
+    lineage:
+      - datalake_arquivo_confidencial_raw.unico_check_process_aud.day

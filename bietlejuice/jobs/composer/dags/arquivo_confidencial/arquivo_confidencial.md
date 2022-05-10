@@ -29,6 +29,8 @@ In datalake raw and clean, via incremental load:
 - `rev_info`
 - `unico_check_document`
 - `unico_check_document_aud`
+- `unico_check_process`
+- `unico_check_process_aud`
 
 ### Responsible Data Teams
 
