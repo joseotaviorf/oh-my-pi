@@ -358,7 +358,7 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.gsheets:create-clean-aux-check-photo-sender-external-table
   - bietlejuice.gsheets:create-clean-branding-where-is-plaquinha-external-table
   - bietlejuice.gsheets:create-clean-ciq-costs-external-table
-  - bietlejuice.gsheets:create-clean-costs-targets-external-table
+  - bietlejuice.gsheets.growth:create-clean-costs-targets-external-table
   - bietlejuice.gsheets:create-clean-daily-target-supply-rental-external-table
   - bietlejuice.gsheets:create-clean-offers-hub-central-external-table
   - bietlejuice.gsheets:create-clean-promotional-bonus-cluster-targets-external-table

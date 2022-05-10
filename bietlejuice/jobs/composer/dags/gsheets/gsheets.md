@@ -64,7 +64,6 @@ This pipeline produces the following output tables:
     - `cod_locale`
     - `contact_type_taxonomy`
     - `contract_attribution_models`
-    - `costs_targets`
     - `criteo_abtest_rj`
     - `credit_analysis_fraudsters`
     - `crm_iptu_wave4`

@@ -1,3 +1,4 @@
+---
 database_name: datalake_gsheets_clean
 table_name: costs_targets
 columns:
@@ -43,6 +44,6 @@ columns:
   month:
     lineage:
       - datalake_gsheets_raw.costs_targets.month
-  week:
+  dt_week:
     lineage:
       - datalake_gsheets_raw.costs_targets.week

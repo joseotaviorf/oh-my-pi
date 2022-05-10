@@ -72,6 +72,12 @@ ranking_rules:
 # GROWTH SHEETS
 ###################
 
+costs_targets:
+    sheet_id: 1g_HngmcykZuj-c5PfhGeBo0m969ipBEQ04Hy2diIns4
+    sheet_name: costs_targets
+    clean_table_name: costs_targets
+    sheet_context: growth
+
 affiliate_pro_registration:
     sheet_id: 196BCLJ7rwRAgb50IEdYB_b4KGnilleeCU8WMKghxddY
     sheet_name: affiliate_pro
@@ -100,6 +106,7 @@ targets_casa_mineira_nbp:
     sheet_id: 1lYMt9heU4DE5wCj_Nu25ClCI25wKWMMHKchzq6pnJl0
     sheet_name: NBP
     clean_table_name: targets_casa_mineira_nbp
+    sheet_context: growth
 
 mta_budget:
     sheet_id: 16HF0DnPTkCIG8oexncHizjhmoGyAJapvGVeA46mUCa4
