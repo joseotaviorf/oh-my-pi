@@ -11,6 +11,9 @@ columns:
   comission_percentage:
     lineage:
       - datalake_gsheets_raw.sale_payments_tiers.comission
+  additional_comission_percentage:
+    lineage:
+      - datalake_gsheets_raw.sale_payments_tiers.additional_comission
   tier:
     lineage:
       - datalake_gsheets_raw.sale_payments_tiers.tier

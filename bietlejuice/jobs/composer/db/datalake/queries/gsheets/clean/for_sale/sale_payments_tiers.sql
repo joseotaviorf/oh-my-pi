@@ -2,6 +2,7 @@ SELECT
     BIGINT(sk_user),
     BIGINT(sk_agent),
     CAST(REPLACE(comission, '%', '') AS FLOAT) AS comission_percentage,
+    CAST(REPLACE(additional_comission, '%', '') AS FLOAT) AS additional_comission_percentage,
     kind,
     tier,
     TO_DATE(tier_start_date, 'dd/MM/yyyy') AS dt_tier_start,
