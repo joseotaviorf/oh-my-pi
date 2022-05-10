@@ -36,7 +36,7 @@ def save_yml(file_path, yml_body):
 
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with open(filename, "w+") as f:
-        pyaml.dump(yml_body, f, sort_keys=False)
+        pyaml.dump(yml_body, f, sort_keys=False, explicit_start=True)
 
 
 if __name__ == "__main__":
