@@ -16,5 +16,3 @@ SELECT
     DAY(ts_load) AS day
 FROM
     dw_payment.fact_invoice_entries
-WHERE
-    DATE(ts_load) = DATE('{year}-{month}-{day}')

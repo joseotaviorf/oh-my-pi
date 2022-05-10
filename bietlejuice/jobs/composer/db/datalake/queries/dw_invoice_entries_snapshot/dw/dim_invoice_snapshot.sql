@@ -17,4 +17,4 @@ SELECT
 FROM 
     dw_payment.dim_invoice
 WHERE
-    DATE(ts_load) = DATE('{year}-{month}-{day}')
+    ts_load IS NOT NULL
