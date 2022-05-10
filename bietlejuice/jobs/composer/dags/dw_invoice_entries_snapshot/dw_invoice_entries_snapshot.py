@@ -1,9 +1,10 @@
 import os
 import pendulum
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from airflow.models import DAG, Variable
 from airflow.utils.helpers import chain
+
 from airflow.operators.python_operator import ShortCircuitOperator
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -20,7 +21,25 @@ from bietlejuice.jobs.composer.services.configuration_service import (
 
 
 def check_valid_run_date(dag_execution_date):
-    if datetime.strptime(dag_execution_date, "%Y-%m-%d").day in [3, 12]:
+    # get last day of the month
+    next_month = datetime.strptime(dag_execution_date, "%Y-%m-%d").date().replace(
+        day=28
+    ) + timedelta(days=4)
+    last_day_of_month = next_month - timedelta(next_month.day)
+
+    # check if it's a business day
+    if last_day_of_month.weekday() > 4:
+        last_business_day_of_month = last_day_of_month - timedelta(
+            days=last_day_of_month.weekday() - 4
+        )
+    else:
+        last_business_day_of_month = last_day_of_month
+
+    if datetime.strptime(dag_execution_date, "%Y-%m-%d").day in [
+        last_business_day_of_month.day,
+        3,
+        12,
+    ]:
         return True
 
 
