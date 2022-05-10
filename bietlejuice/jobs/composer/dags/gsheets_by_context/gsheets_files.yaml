@@ -78,6 +78,12 @@ ranking_rules:
 # GROWTH SHEETS
 ###################
 
+branding_where_is_plaquinha:
+    sheet_id: 1_jHpsbQx1J24l7TNxoMgHH-FgAgQMphVLW9_HVgQi-4
+    sheet_name: branding_where_is_plaquinha
+    clean_table_name: branding_where_is_plaquinha
+    sheet_context: growth
+
 costs_targets:
     sheet_id: 1g_HngmcykZuj-c5PfhGeBo0m969ipBEQ04Hy2diIns4
     sheet_name: costs_targets

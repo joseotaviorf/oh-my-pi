@@ -100,11 +100,6 @@ bbb22_giveaway_for_rent:
     sheet_name: users
     clean_table_name: bbb22_giveaway_rent_users
 
-branding_where_is_plaquinha:
-    sheet_id: 1_jHpsbQx1J24l7TNxoMgHH-FgAgQMphVLW9_HVgQi-4
-    sheet_name: branding_where_is_plaquinha
-    clean_table_name: branding_where_is_plaquinha
-
 braze_campaign_creative:
     sheet_id: 1i3Vlk5JcFinW5p0uGr3AJeL60KaVh9XkfhckVweGkSg
     sheet_name: campaign_dimensions

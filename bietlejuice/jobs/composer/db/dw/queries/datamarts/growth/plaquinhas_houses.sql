@@ -5,7 +5,7 @@ houses_w_plaquinhas AS (
 ---------------------------------------------------------
     SELECT
         p.id_house::BIGINT AS id_house,
-        date::DATE AS dt_plaquinha,
+        dt_plaquinha::DATE AS dt_plaquinha,
         installation_type,
         listing_type
     FROM

@@ -45,7 +45,6 @@ This pipeline produces the following output tables:
     - `base_hunter`
     - `bbb22_coupon_sale_users`
     - `bbb22_giveaway_rent_users`
-    - `branding_where_is_plaquinha`
     - `braze_campaign_creative`
     - `braze_canvas_creative`
     - `business_rules_bonus`

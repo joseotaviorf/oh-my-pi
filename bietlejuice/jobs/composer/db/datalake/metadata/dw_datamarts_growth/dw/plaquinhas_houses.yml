@@ -39,11 +39,11 @@ columns:
       - dw_public.dim_date.date
   dt_plaquinha_installed:
     lineage:
-      - datalake_gsheets_clean.branding_where_is_plaquinha.date
+      - datalake_gsheets_clean.branding_where_is_plaquinha.dt_plaquinha
       - dw_public.dim_photo_job.dt_photos_uploaded
   dt_plaquinha_installed_house:
     lineage:
-      - datalake_gsheets_clean.branding_where_is_plaquinha.date
+      - datalake_gsheets_clean.branding_where_is_plaquinha.dt_plaquinha
       - dw_public.dim_photo_job.dt_photos_uploaded
   new_installed_plaquinhas_target:
     lineage:

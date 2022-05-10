@@ -239,7 +239,7 @@ plaquinhas AS (
     SELECT
         p.id_house::BIGINT AS id_house,
         dr.city_group,
-        date::DATE AS dt_plaquinha
+        dt_plaquinha::DATE AS dt_plaquinha
     FROM
     	datalake_gsheets_clean_prod.branding_where_is_plaquinha p
     JOIN fact_house_listings fhl

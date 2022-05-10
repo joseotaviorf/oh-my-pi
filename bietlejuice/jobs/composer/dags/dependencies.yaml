@@ -219,7 +219,7 @@ bietlejuice.dw_datamarts_growth:
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
   - bietlejuice.dw_sale_listings:load-sale-fact-listing-status-into-redshift
   - bietlejuice.gsheets:create-clean-aux-check-photo-sender-external-table
-  - bietlejuice.gsheets:create-clean-branding-where-is-plaquinha-external-table
+  - bietlejuice.gsheets.growth:create-clean-branding-where-is-plaquinha-external-table
   #market_share_by_sk_region
   - bietlejuice.ebdb:create-polygon-region-clean-external-table
   # performance_marketing_metrics_*_casa_mineira
@@ -356,7 +356,7 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.enrich_top_of_funnel_demand:create-enrich-user-interactions-external-table
   - bietlejuice.gsheets:create-clean-affiliates-extra-user-bonus-external-table
   - bietlejuice.gsheets:create-clean-aux-check-photo-sender-external-table
-  - bietlejuice.gsheets:create-clean-branding-where-is-plaquinha-external-table
+  - bietlejuice.gsheets.growth:create-clean-branding-where-is-plaquinha-external-table
   - bietlejuice.gsheets:create-clean-ciq-costs-external-table
   - bietlejuice.gsheets.growth:create-clean-costs-targets-external-table
   - bietlejuice.gsheets:create-clean-daily-target-supply-rental-external-table

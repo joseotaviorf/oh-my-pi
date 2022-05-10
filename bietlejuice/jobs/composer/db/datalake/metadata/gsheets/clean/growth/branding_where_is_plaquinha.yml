@@ -1,3 +1,4 @@
+---
 database_name: datalake_gsheets_clean
 table_name: branding_where_is_plaquinha
 columns:
@@ -7,6 +8,12 @@ columns:
   plaquinha_type:
     lineage:
       - datalake_gsheets_raw.branding_where_is_plaquinha.plaquinha_type
-  date:
+  installation_type:
+    lineage:
+      - datalake_gsheets_raw.branding_where_is_plaquinha.installation_type
+  listing_type:
+    lineage:
+      - datalake_gsheets_raw.branding_where_is_plaquinha.listing_type
+  dt_plaquinha:
     lineage:
       - datalake_gsheets_raw.branding_where_is_plaquinha.date
