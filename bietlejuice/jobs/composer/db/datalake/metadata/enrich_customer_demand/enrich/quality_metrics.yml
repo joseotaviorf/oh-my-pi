@@ -1,0 +1,13 @@
+---
+database_name: datalake_customer_demand
+table_name: quality_metrics
+columns:
+  id_agent:
+    lineage:
+      - datalake_customer_demand.base_tasks.id_agent
+  type:
+    lineage:
+      - datalake_customer_demand.base_tasks.type
+  dt_metric_reference:
+    lineage:
+      - datalake_customer_demand.base_tasks.ts_csat_answer

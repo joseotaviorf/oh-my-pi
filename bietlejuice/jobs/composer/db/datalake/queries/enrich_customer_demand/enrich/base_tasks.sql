@@ -51,6 +51,8 @@ ticket_tasks AS (
       e.id_ticket,
       e.id_agent,
       e.department,
+      e.csat_score,
+      e.is_solved,
       e.tags,
       e.contact_theme_detail_tag,
       e.contact_theme_tag,
@@ -62,7 +64,9 @@ ticket_tasks AS (
         THEN CAST(GET_JSON_OBJECT(REPLACE(REPLACE(tf.custom_fields, '[', ''), ']', ''),'$.Data Orçamentação realizada ') AS TIMESTAMP)
         ELSE e.ts_ticket_started  
       END AS ts_started,
-      ts_ticket_solved AS ts_completed
+      ts_ticket_solved AS ts_completed,
+      ts_ticket_ended AS ts_closed,
+      ts_csat_first_response AS ts_csat_answer
     FROM
       datalake_customer_support.email e
     LEFT JOIN
@@ -124,12 +128,16 @@ ticket_tasks AS (
     t.id_ticket AS id_task,
     COALESCE(t.id_agent, '-1') AS id_agent,
     t.department AS type,
+    t.csat_score,
+    t.is_solved,
     CASE 
       WHEN t.department IN ('Proteção QuintoAndar [OFF] [POS] [BACK]', 'Rescisão - Despejo [OFF][POS][BACK]') THEN 21
       ELSE COALESCE(tds.sla_in_days,ts.sla_in_days, ujst.sla_in_days, tst.sla) 
     END AS sla_target,
     t.ts_started,
-    t.ts_completed
+    t.ts_completed,
+    t.ts_closed,
+    t.ts_csat_answer
   FROM
     ticket_started t
   LEFT JOIN
@@ -207,8 +215,12 @@ SELECT
   id_agent,
   type,
   sla_target,
+  NULL AS csat_score,
+  NULL AS is_solved,
   ts_started,
-  ts_completed
+  ts_completed,
+  ts_completed AS ts_closed,
+  NULL AS ts_csat_answer
 FROM
   crm_tasks
 UNION ALL
@@ -217,8 +229,12 @@ SELECT
   id_agent,
   type,
   sla_target,
+  csat_score,
+  is_solved,
   ts_started,
-  ts_completed
+  ts_completed,
+  ts_closed,
+  ts_csat_answer
 FROM
   ticket_tasks
 UNION ALL
@@ -227,7 +243,11 @@ SELECT
   id_agent,
   type,
   sla_target,
+  NULL AS csat_score,
+  NULL AS is_solved,
   ts_started,
-  ts_completed
+  ts_completed,
+  ts_completed AS ts_closed,
+  NULL AS ts_csat_answer
 FROM
   heimdall_tasks

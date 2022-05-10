@@ -107,12 +107,23 @@ solved_demand AS (
   FROM
     datalake_customer_demand.base_tasks
   GROUP BY 1,2,4
+),
+closed_demand AS (
+  SELECT
+    id_agent,
+    type,
+    COUNT(1) AS closed_demand,
+    DATE(ts_closed) AS dt_metric_reference
+  FROM
+    datalake_customer_demand.base_tasks
+  GROUP BY 1,2,4
 )
 SELECT
   id_agent,
   type,
   received_demand,
   solved_demand,
+  closed_demand,
   tickets_solved_in_time,
   tickets_not_solved_in_time,
   time_spent_on_tickets_solved_in_time,
@@ -126,7 +137,10 @@ FULL OUTER JOIN
     USING(id_agent, dt_metric_reference, type)
 FULL OUTER JOIN
   solved_demand
-    USING(id_agent, dt_metric_reference, type) 
+    USING(id_agent, dt_metric_reference, type)
+FULL OUTER JOIN
+  closed_demand
+    USING(id_agent, dt_metric_reference, type)
 WHERE
   dt_metric_reference IS NOT NULL
   AND type IS NOT NULL

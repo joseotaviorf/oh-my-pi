@@ -1,0 +1,27 @@
+---
+database_name: datalake_analyst_ranking
+table_name: analyst_metrics
+columns:
+  id_agent:
+    lineage:
+      - datalake_customer_demand.quality_metrics.id_agent
+      - datalake_customer_demand.demand_metrics.id_agent
+  department:
+    lineage:
+      - datalake_gsheets_clean.support_agents_department.department
+  dt_metric_reference:
+    lineage:
+      - datalake_customer_demand.quality_metrics.dt_metric_reference
+      - datalake_customer_demand.demand_metrics.dt_metric_reference
+  year:
+    lineage:
+      - datalake_customer_demand.quality_metrics.dt_metric_reference
+      - datalake_customer_demand.demand_metrics.dt_metric_reference
+  month:
+    lineage:
+      - datalake_customer_demand.quality_metrics.dt_metric_reference
+      - datalake_customer_demand.demand_metrics.dt_metric_reference
+  day:
+    lineage:
+      - datalake_customer_demand.quality_metrics.dt_metric_reference
+      - datalake_customer_demand.demand_metrics.dt_metric_reference

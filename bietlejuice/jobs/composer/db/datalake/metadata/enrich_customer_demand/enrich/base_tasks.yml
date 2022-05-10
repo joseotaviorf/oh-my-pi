@@ -20,6 +20,12 @@ columns:
     lineage:
       - datalake_gsheets_clean.taxonomy_sla.sla_in_days
       - datalake_gsheets_clean.tag_sla_target.sla
+  csat_score:
+    lineage:
+      - datalake_customer_support.email.csat_score
+  is_solved:
+    lineage:
+      - datalake_customer_support.email.is_solved
   ts_started:
     lineage:
       - datalake_heimdall.activity.ts_requested
@@ -31,3 +37,11 @@ columns:
       - datalake_heimdall.activity.ts_transition_created
       - datalake_customer_support.email.ts_ticket_solved
       - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_completed
+  ts_closed:
+    lineage:
+      - datalake_heimdall.activity.ts_transition_created
+      - datalake_customer_support.email.ts_ticket_closed
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_completed
+  ts_csat_answer:
+    lineage:
+      - datalake_customer_support.email.ts_csat_first_response

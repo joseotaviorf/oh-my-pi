@@ -46,6 +46,7 @@ CLUSTER_DESCRIPTION = Variable.get(
 INNER_DEPENDENCIES = {
     "demand_metrics": ["base_tasks"],
     "backlog_metrics": ["base_tasks"],
+    "quality_metrics": ["base_tasks"],
 }
 
 dag = DAG(
