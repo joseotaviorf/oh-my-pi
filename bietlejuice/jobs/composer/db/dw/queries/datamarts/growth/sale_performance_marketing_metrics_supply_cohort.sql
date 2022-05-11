@@ -176,7 +176,7 @@ costs_targets_results_combined AS (
     SUM(NULLIF(ct.monthly_budget, '')::FLOAT) AS budget
   FROM datalake_gsheets_clean_prod.costs_targets AS ct
   WHERE
-    business = 'Sales'
+    business = 'Sale'
     AND planning_mkt_level1 = 'Supply'
     AND planning_mkt_level2 = 'Landlords'
   GROUP BY 1,2,3,4,5,6,7,8,9,10
