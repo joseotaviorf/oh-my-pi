@@ -58,7 +58,7 @@ libraries_description = [
 
 
 def check_valid_run_date(dag_execution_date):
-    if datetime.strptime(dag_execution_date, "%Y-%m-%d").day == 10:
+    if datetime.strptime(dag_execution_date, "%Y-%m-%d").day + 1 == 10:
         return True
 
 
