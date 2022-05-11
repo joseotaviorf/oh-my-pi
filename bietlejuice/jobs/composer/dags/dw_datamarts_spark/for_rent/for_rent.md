@@ -14,6 +14,7 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 
 - `agents_activations_suspensions_contracts_changes`
 - `datamart_opportunity`
+- `house_available_hours`
 
 ### Responsible Data Engineering Team
 
