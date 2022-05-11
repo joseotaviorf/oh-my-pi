@@ -1,10 +1,11 @@
+---
 database_name: datalake_gsheets_clean
 table_name: mkt_cost_per_source
 columns:
   business:
     lineage:
       - datalake_gsheets_raw.mkt_cost_per_source.business
-  city:
+  city_group:
     lineage:
       - datalake_gsheets_raw.mkt_cost_per_source.city
   daily_value:
@@ -19,7 +20,10 @@ columns:
   mkt_source:
     lineage:
       - datalake_gsheets_raw.mkt_cost_per_source.mkt_source
-  week_start:
+  dt_event:
+    lineage:
+      - datalake_gsheets_raw.mkt_cost_per_source.date
+  dt_week_start:
     lineage:
       - datalake_gsheets_raw.mkt_cost_per_source.week_start
   month:
@@ -28,6 +32,3 @@ columns:
   year:
     lineage:
       - datalake_gsheets_raw.mkt_cost_per_source.year
-  date:
-    lineage:
-      - datalake_gsheets_raw.mkt_cost_per_source.date

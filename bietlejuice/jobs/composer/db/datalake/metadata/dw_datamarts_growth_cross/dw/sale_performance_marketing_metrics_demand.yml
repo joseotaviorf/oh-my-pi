@@ -13,7 +13,7 @@ columns:
       - dw_public.dim_booking.dt_created
       - dw_sale.dim_offer.ts_offer_submitted
       - dw_datamarts_cross.talk_to_agent.first_message_ts
-      - datalake_gsheets_clean.mkt_cost_per_source.date
+      - datalake_gsheets_clean.mkt_cost_per_source.dt_event
       - datalake_gsheets_clean.sale_nbp_source_targets.dt_target
       - datalake_gsheets_clean.sale_flows_targets.date
       - dw_public.dim_date.date
@@ -34,7 +34,7 @@ columns:
     lineage:
       - dw_public.dim_region.city_group
       - dw_datamarts_cross.buyer_prospect_status.city_group
-      - datalake_gsheets_clean.mkt_cost_per_source.city
+      - datalake_gsheets_clean.mkt_cost_per_source.city_group
       - datalake_gsheets_clean.sale_nbp_source_targets.city_group
       - datalake_gsheets_clean.sale_flows_targets.city_group
       - datalake_marketing_costs.daily_costs.city_group

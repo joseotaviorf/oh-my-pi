@@ -191,8 +191,8 @@ target_sheets AS (
     UNION ALL
 
     SELECT
-        NULLIF(cps.date, '')::date AS dt_event,
-        NULLIF(cps.city, '') AS city_group,
+        cps.dt_event,
+        cps.city_group,
         'Tenants PWA' AS mkt_origin,
         NULLIF(cps.mkt_channel, '') AS mkt_channel,
         NULLIF(cps.mkt_medium, '') AS mkt_medium,
@@ -201,11 +201,11 @@ target_sheets AS (
         NULL::FLOAT AS new_rent_flows_target,
         NULL::FLOAT AS new_tenant_prospects_target,
         NULL::FLOAT AS recovered_tenant_prospects_target,
-        NULLIF(REPLACE(cps.daily_value, ',',''), '')::FLOAT AS budget
+        cps.daily_value AS budget
     FROM datalake_gsheets_clean_prod.mkt_cost_per_source AS cps
     WHERE
         business = 'Rent'
-        AND NULLIF(cps.date, '')::date >= DATE('2021-08-01')
+        AND dt_event >= DATE('2021-08-01')
 
     UNION ALL
 

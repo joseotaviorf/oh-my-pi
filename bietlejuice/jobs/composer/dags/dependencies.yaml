@@ -387,7 +387,7 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.gsheets:create-clean-tof-supply-targets-external-table
   - bietlejuice.wololo:create-clean-prospect-external-table
   # performance_marketing_metrics_demand
-  - bietlejuice.gsheets:create-clean-mkt-cost-per-source-external-table
+  - bietlejuice.gsheets.growth:create-clean-mkt-cost-per-source-external-table
   - bietlejuice.gsheets:create-clean-rental-ntp-source-targets-external-table
   - bietlejuice.gsheets:create-clean-rental-flows-targets-external-table
   # - bietlejuice.gsheets:create-clean-provisioned-costs-import-external-table mysterious sheet that doesnt exist anymore, but is used in some datamarts

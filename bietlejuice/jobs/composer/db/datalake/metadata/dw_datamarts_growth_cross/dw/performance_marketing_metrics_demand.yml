@@ -5,16 +5,16 @@ columns:
   dt_event:
     lineage:
       - datalake_gsheets_clean.demand_targets_replanning.dt_target
-      - datalake_gsheets_clean.mkt_cost_per_source.date
+      - datalake_gsheets_clean.mkt_cost_per_source.dt_event
       - datalake_gsheets_clean.rental_flows_targets.date
       - datalake_gsheets_clean.rental_ntp_source_targets.dt_target
       - dw_datamarts_growth_cross.rent_flow_interactions.dt_event
       - dw_datamarts_growth_cross.tenant_prospect_status.ts_start
-      - dw_public.dim_date.date      
+      - dw_public.dim_date.date
   ts_event:
     lineage:
       - datalake_gsheets_clean.demand_targets_replanning.dt_target
-      - datalake_gsheets_clean.mkt_cost_per_source.date
+      - datalake_gsheets_clean.mkt_cost_per_source.dt_event
       - datalake_gsheets_clean.rental_flows_targets.date
       - datalake_gsheets_clean.rental_ntp_source_targets.dt_target
       - dw_datamarts_growth_cross.rent_flow_interactions.ts_event
@@ -39,7 +39,7 @@ columns:
     lineage:
       - datalake_marketing_costs.daily_costs.city_group
       - datalake_gsheets_clean.demand_targets_replanning.city_group
-      - datalake_gsheets_clean.mkt_cost_per_source.city
+      - datalake_gsheets_clean.mkt_cost_per_source.city_group
       - datalake_gsheets_clean.rental_flows_targets.city_group
       - datalake_gsheets_clean.rental_ntp_source_targets.city_group
       - dw_datamarts_growth_cross.tenant_prospect_status.city_group
@@ -69,7 +69,7 @@ columns:
     lineage:
       - datalake_gsheets_clean.rental_ntp_source_targets.mkt_source
       - datalake_gsheets_clean.mkt_cost_per_source.mkt_source
-      - datalake_gsheets_clean.demand_targets_replanning.mkt_source 
+      - datalake_gsheets_clean.demand_targets_replanning.mkt_source
       - datalake_marketing_costs.daily_costs.mkt_source
       - dw_datamarts_growth_cross.rent_flow_interactions.mkt_source
   utm_medium:

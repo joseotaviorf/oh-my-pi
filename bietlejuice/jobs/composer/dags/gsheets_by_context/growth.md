@@ -31,6 +31,7 @@ This pipeline produces the following output tables:
     - `historic_national_costs`
     - `manual_cost_engagement`
     - `manual_cost_engagement_history`
+    - `mkt_cost_per_source`
     - `offline_manual_costs`
     - `offline_manual_share_city_group`
     - `offline_manual_share_cost_center`
@@ -41,6 +42,7 @@ This pipeline produces the following output tables:
     - `affiliates_manual_cost_engagement`
     - `affiliates_manual_cost_engagement_history`
     - `affiliates_cost_tradecom_configuration`
+    - `mkt_cost_per_source`
     - `branding_where_is_plaquinha`
     - `costs_targets`
     - `mta_budget_october_2020`

@@ -118,7 +118,6 @@ This pipeline produces the following output tables:
     - `marketshare_units_and_tenants`
     - `marketshare_seasonality`
     - `media_plan_current_quarter`
-    - `mkt_cost_per_source`
     - `monday_users`
     - `negotiation_executive_bonus`
     - `negotiation_executive_correction`

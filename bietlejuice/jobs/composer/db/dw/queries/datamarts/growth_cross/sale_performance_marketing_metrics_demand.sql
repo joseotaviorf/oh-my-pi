@@ -258,14 +258,14 @@ sale_flows_funnel_events AS (
 --------------------------------------------------------------------------------------
 targets AS (
     SELECT
-        bd.date::DATE,
-        bd.date::TIMESTAMP AS ts_event,
+        bd.dt_event as date,
+        bd.dt_event::TIMESTAMP AS ts_event,
         NULL::TEXT AS status,
         NULL:: TEXT AS status_detail,
         NULL:: TEXT AS next_status,
         NULL::TIMESTAMP AS ts_status_start,
         NULL::TIMESTAMP AS ts_status_end,
-        bd.city AS city_group,
+        bd.city_group,
         NULL::TEXT AS flow_event,
         'Tenants PWA' AS mkt_origin,
         bd.mkt_channel,
@@ -291,7 +291,7 @@ targets AS (
         NULL::DATE AS dt_visit_completed,
         NULL::INT AS sale_flow_order,
         NULL::INT AS buyer_prospect_order,
-        REPLACE(bd.daily_value, ',', '')::FLOAT AS budget,
+        bd.daily_value AS budget,
         NULL::FLOAT AS new_buyer_prospects_target,
         NULL::FLOAT AS recovered_buyer_prospects_target,
         NULL::FLOAT AS sale_flows_target,

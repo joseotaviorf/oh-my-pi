@@ -522,11 +522,6 @@ offers_hub_central:
     sheet_name: offers_hub_central
     clean_table_name: offers_hub_central
 
-mkt_cost_per_source:
-    sheet_id: 1kHFTMdaRTYyLa6e6FY6G2i1UpCkivcpmxZvYqVrqe5o
-    sheet_name: mkt_cost_per_source
-    clean_table_name: mkt_cost_per_source
-
 negotiation_executive_bonus:
     sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
     sheet_name: negotiation_executive_bonus
