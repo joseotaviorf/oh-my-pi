@@ -51,7 +51,7 @@ if __name__ == "__main__":
     args = arg_parser.parse_args()
     path = f"../bietlejuice/jobs/composer/db/datalake/queries/"
 
-    dag_name_path = args.folder  # use "ebdb", "autodialer", for instance
+    dag_name_path = args.folder  # use "ebdb", "godfather", for instance
     table = args.table if args.table != None else '*'
     
     for file_path in glob.iglob(f"{path}{dag_name_path}/**/{table}.sql", recursive=True):

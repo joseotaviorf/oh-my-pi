@@ -77,7 +77,7 @@ class FileService:
         Return the SQL files for a given layer and tree_path (if specified)
 
         :param source: the source's directory name on db directory. E.g:
-         autodialer, godfather, oscar.
+         godfather, oscar.
         :param layer: the data lake layer
         :param tree_path: The rest of the path, used for full or incremental ingestions or specific contextual ingestions e:g crawlers listings
         :return: Tables SQL files list

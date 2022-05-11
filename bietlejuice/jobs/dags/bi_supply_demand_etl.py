@@ -664,16 +664,6 @@ docx_dep = S3KeySensor(
     dag=main_dag
 )
 
-autodialer_dep = S3KeySensor(
-    task_id="autodialer_dep",
-    poke_interval=3*60,
-    timeout=5*60*60,
-    aws_conn_id="aws_prod_data",
-    bucket_name='5a-datalake-prod',
-    bucket_key="dags_execution_logs/{execution_date}/{dependency_dag}.SUCCESS".format(execution_date=last_dep_execution_date, dependency_dag='bietlejuice.autodialer'),
-    dag=main_dag
-)
-
 rene_descartes_dep = S3KeySensor(
     task_id="rene_descartes_dep",
     poke_interval=3*60,
@@ -765,46 +755,46 @@ trigger_bi_growth_dag_task.set_upstream(
 
 # Marketing Dependencies Flow
 special_condition_dag.set_upstream(
-    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,autodialer_dep,rene_descartes_dep,godfather_dep,firestore_dep]
+    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,rene_descartes_dep,godfather_dep,firestore_dep]
 )
 
 lead_conversion_dag.set_upstream(
-    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,autodialer_dep,rene_descartes_dep,godfather_dep,firestore_dep]
+    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,rene_descartes_dep,godfather_dep,firestore_dep]
 )
 
 
 contract_dag.set_upstream(
-    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,autodialer_dep,rene_descartes_dep,godfather_dep,firestore_dep]
+    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,rene_descartes_dep,godfather_dep,firestore_dep]
 )
 
 house_dag.set_upstream(
-    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,autodialer_dep,rene_descartes_dep,godfather_dep,firestore_dep,enrich_ebdb_listing_dep]
+    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,rene_descartes_dep,godfather_dep,firestore_dep,enrich_ebdb_listing_dep]
 )
 
 region_dag.set_upstream(
-    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,autodialer_dep,rene_descartes_dep,godfather_dep,firestore_dep]
+    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,rene_descartes_dep,godfather_dep,firestore_dep]
 )
 
 user_dag.set_upstream(
-    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,autodialer_dep,rene_descartes_dep,godfather_dep,firestore_dep]
+    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,rene_descartes_dep,godfather_dep,firestore_dep]
 )
 
 condo_dag.set_upstream(
-    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,autodialer_dep,rene_descartes_dep,godfather_dep,firestore_dep]
+    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,rene_descartes_dep,godfather_dep,firestore_dep]
 )
 
 photo_job_dag.set_upstream(
-    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,autodialer_dep,rene_descartes_dep,godfather_dep,firestore_dep]
+    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,rene_descartes_dep,godfather_dep,firestore_dep]
 )
 
 lead_dag.set_upstream(
-    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,autodialer_dep,rene_descartes_dep,godfather_dep,firestore_dep]
+    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,rene_descartes_dep,godfather_dep,firestore_dep]
 )
 
 ods_fact_house_listing_status_task.set_upstream(
-    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,autodialer_dep,rene_descartes_dep,godfather_dep,firestore_dep]
+    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,rene_descartes_dep,godfather_dep,firestore_dep]
 )
 
 amplitude_partner_taxonomy.set_upstream(
-    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,autodialer_dep,rene_descartes_dep,godfather_dep,firestore_dep]
+    [amplitude_dep,enrich_amplitude_partner_taxonomy_dep,ebdb_dep,docx_dep,rene_descartes_dep,godfather_dep,firestore_dep]
 )
