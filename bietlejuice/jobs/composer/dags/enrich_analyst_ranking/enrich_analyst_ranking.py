@@ -3,17 +3,21 @@ from datetime import datetime
 
 import pendulum
 from airflow.models import DAG, Variable
+from airflow.utils.helpers import chain
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 
-from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
-from bietlejuice.jobs.composer.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum, BaseTaskGroup
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
+from bietlejuice.jobs.composer.base.airflow.helpers.task_flow_helper import (
+    TaskFlowHelper,
+)
+
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2021, 8, 24, 0, 0, 0, tzinfo=LOCAL_TZ)
@@ -72,17 +76,38 @@ datalake_task_group = DatalakeTaskGroup(
     athena_query_result_location=athena_query_result_bucket,
 )
 
-enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.ENRICH,
-    source_database_base_name=CONTEXT,
-    target_database_base_name=CONTEXT,
-    is_incremental=True,
-    partitions=PARTITION_COLS,
+enrich_task_groups = {}
+tables = config_service.get_config("tables")
+inner_dependencies = config_service.get_config("inner_dependencies")
+
+for table, configs in tables.items():
+    partitions = configs.get("partition_cols")
+    enrich_task_groups[table] = datalake_task_group.build_enrich_task_group(
+        table_name=table,
+        source_database_base_name=CONTEXT,
+        target_database_base_name=CONTEXT,
+        is_incremental=True,
+        partitions=partitions,
+    )
+
+
+(
+    task_groups_boundaries_without_inner_dependencies,
+    inner_dependencies_task_groups_boundaries,
+) = datalake_task_group.set_inner_dag_dependencies(
+    task_flow_helper=TaskFlowHelper(),
+    task_groups_boundaries=enrich_task_groups,
+    dag_inner_dependencies=inner_dependencies,
 )
 
-create_cluster_task.set_downstream(
-    DatalakeTaskGroup.all_first_tasks(enrich_task_groups)
+chain(
+    create_cluster_task,
+    BaseTaskGroup.all_first_tasks(task_groups_boundaries_without_inner_dependencies)
+    + BaseTaskGroup.first_tasks(inner_dependencies_task_groups_boundaries),
 )
-terminate_cluster_task.set_upstream(
-    DatalakeTaskGroup.all_last_tasks(enrich_task_groups)
+
+chain(
+    BaseTaskGroup.all_last_tasks(task_groups_boundaries_without_inner_dependencies)
+    + BaseTaskGroup.last_tasks(inner_dependencies_task_groups_boundaries),
+    terminate_cluster_task,
 )

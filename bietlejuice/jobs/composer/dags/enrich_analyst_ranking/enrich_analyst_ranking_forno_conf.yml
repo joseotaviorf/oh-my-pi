@@ -1,0 +1,8 @@
+---
+inner_dependencies:
+  ranking: ["analyst_metrics"]
+tables:
+  analyst_metrics:
+    partition_cols: ["year", "month", "day"]
+  ranking:
+    partition_cols: ["dt_ranking_week"]

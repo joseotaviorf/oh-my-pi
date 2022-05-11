@@ -1,0 +1,39 @@
+---
+database_name: datalake_analyst_ranking
+table_name: ranking
+columns:
+  id_agent:
+    lineage:
+      - datalake_analyst_ranking.analyst_metrics.id_agent
+  id_group:
+    lineage:
+      - datalake_gsheets_clean.agents_ranking_targets.id_group
+  department:
+    lineage:
+      - datalake_analyst_ranking.analyst_metrics.department
+  ranking_score:
+    lineage:
+      - datalake_gsheets_clean.agents_ranking_targets.productivity_target
+      - datalake_gsheets_clean.agents_ranking_targets.target_sla
+      - datalake_gsheets_clean.agents_ranking_targets.target_csat
+      - datalake_gsheets_clean.agents_ranking_targets.target_resolution
+      - datalake_gsheets_clean.agents_ranking_targets.ra_would_do_business_again_target
+      - datalake_gsheets_clean.agents_ranking_targets.ra_target_score
+      - datalake_gsheets_clean.agents_ranking_targets.ra_target_solution_rate
+      - datalake_gsheets_clean.ranking_rules.productivity_weight
+      - datalake_gsheets_clean.ranking_rules.sla_weight
+      - datalake_gsheets_clean.ranking_rules.csat_weight
+      - datalake_gsheets_clean.ranking_rules.resolution_weight
+      - datalake_gsheets_clean.ranking_rules.would_do_business_again_weight
+      - datalake_gsheets_clean.ranking_rules.reclameaqui_note_weight
+      - datalake_gsheets_clean.ranking_rules.solution_rate_weight
+      - datalake_analyst_ranking.analyst_metrics.closed_demand
+      - datalake_analyst_ranking.analyst_metrics.tickets_solved_in_time
+      - datalake_analyst_ranking.analyst_metrics.tickets_not_solved_in_time
+      - datalake_analyst_ranking.analyst_metrics.sum_csat_satisfied_score
+      - datalake_analyst_ranking.analyst_metrics.total_tickets_with_csat_score
+      - datalake_analyst_ranking.analyst_metrics.total_tickets_resolution
+      - datalake_analyst_ranking.analyst_metrics.total_tickets_answered_resolution
+  dt_ranking_week:
+    lineage:
+      - datalake_analyst_ranking.analyst_metrics.dt_metric_reference
