@@ -126,6 +126,12 @@ mta_budget:
     clean_table_name: mta_budget_october_2020
     sheet_context: growth
 
+rental_tof_weekly_targets:
+    sheet_id: 1M3yd-RpHMDwnEdWs18sf0oCEHDhmz_Y_9O4zSEcD1nU
+    sheet_name: rental_tof_weekly_targets
+    clean_table_name: rental_tof_weekly_targets
+    sheet_context: growth
+
 tradecom_configuration:
     sheet_id: 1Op2q1c9biiiTGBYd1Mai967yPFkIrHYOKUWaXFOovY4
     sheet_name: tradecom_configuration

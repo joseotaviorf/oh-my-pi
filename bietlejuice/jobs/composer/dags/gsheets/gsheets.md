@@ -157,7 +157,6 @@ This pipeline produces the following output tables:
     - `rental_ntp_source_targets`
     - `rental_rtp_targets`
     - `rental_tof_daily_targets`
-    - `rental_tof_weekly_targets`
     - `responses_action_line_ciq_full`
     - `retention_exclusivity_active_contact`
     - `sale_closing_ops_targets`

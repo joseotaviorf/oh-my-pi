@@ -1,9 +1,9 @@
-SELECT
+SELECT 
     city_group,
     mkt_channel,
     mkt_medium,
     mkt_source,
     CAST(replace(tof_users_target, ',', '') AS FLOAT) AS tof_users_target,
-    week_start
+    DATE(week_start) AS dt_week_started
 FROM
     datalake_gsheets_raw.rental_tof_weekly_targets

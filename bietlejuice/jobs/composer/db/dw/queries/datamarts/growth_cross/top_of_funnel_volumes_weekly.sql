@@ -433,7 +433,7 @@ events AS (
     -- ToF Rental Targets --
     ------------------------
     select
-        week_start::DATE,
+        dt_week_started::DATE,
         city_group,
         NULL::TEXT AS status_start,
         NULL::TEXT AS status_end,

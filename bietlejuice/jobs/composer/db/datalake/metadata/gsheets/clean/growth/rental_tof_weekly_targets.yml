@@ -1,3 +1,4 @@
+---
 database_name: datalake_gsheets_clean
 table_name: rental_tof_weekly_targets
 columns:
@@ -16,6 +17,6 @@ columns:
   tof_users_target:
     lineage:
       - datalake_gsheets_raw.rental_tof_weekly_targets.tof_users_target
-  week_start:
+  dt_week_started:
     lineage:
       - datalake_gsheets_raw.rental_tof_weekly_targets.week_start

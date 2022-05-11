@@ -652,11 +652,6 @@ rental_tof_daily_targets:
     sheet_name: rental_tof_daily_targets
     clean_table_name: rental_tof_daily_targets
 
-rental_tof_weekly_targets:
-    sheet_id: 1M3yd-RpHMDwnEdWs18sf0oCEHDhmz_Y_9O4zSEcD1nU
-    sheet_name: rental_tof_weekly_targets
-    clean_table_name: rental_tof_weekly_targets
-
 retencao_exclusividade_contato_ativo:
     sheet_id: 1VT9AgLJYbGq5ftcBvSY2C-M99bVmpnmO7XFeueh_fmI
     sheet_name: bases_cruzadas
