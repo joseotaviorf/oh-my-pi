@@ -148,7 +148,7 @@ costs_targets_results_combined AS (
   -- Supply ForSale Cost Targets --
   ---------------------------------
   SELECT
-    DATE(NULLIF(ct.dt_created, '')) AS lead_date,
+    ct.dt_created AS lead_date,
     COALESCE(NULLIF(ct.city_group, ''), 'Not Mapped')::TEXT AS city_group,
     CASE
       WHEN ct.planning_mkt_level3 = 'PWA - Paid'
