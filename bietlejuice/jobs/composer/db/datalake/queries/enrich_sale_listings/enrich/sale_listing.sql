@@ -78,7 +78,8 @@ FROM
      MIN(ts_first_event) AS ts_first_sale_flow,
      MIN(ts_first_booking_created) AS ts_first_booking,
      MIN(dt_sale_agreement_signed) AS dt_first_sale_agreement_signed,
-     MIN(dt_house_registry_ended) AS dt_house_registry_ended
+     MIN(dt_house_registry_ended) AS dt_house_registry_ended,
+     MIN(ts_first_offer_submitted) AS ts_first_offer_submitted
    FROM
      datalake_sale_flows.sale_flow
    GROUP BY 1
@@ -100,12 +101,14 @@ SELECT
   DATEDIFF(sf.ts_first_booking, lc.ts_first_publication) AS days_first_publication_to_first_booking,
   DATEDIFF(sf.dt_first_sale_agreement_signed, lc.ts_first_publication) AS days_first_publication_to_first_sale_agreement_signed,
   DATEDIFF(sf.dt_house_registry_ended, lc.ts_first_publication) AS days_first_publication_to_house_registry_ended,
+  DATEDIFF(sf.ts_first_offer_submitted, lc.ts_first_publication) AS days_first_publication_to_first_offer_submitted,
   lc.unpublications,
   lc.ts_first_publication,
   lc.ts_last_publication,
   lc.ts_first_depublication,
   lc.ts_last_depublication,
   sf.ts_first_sale_flow,
+  sf.ts_first_offer_submitted,
   sf.ts_first_booking,
   sf.dt_first_sale_agreement_signed,
   sf.dt_house_registry_ended,

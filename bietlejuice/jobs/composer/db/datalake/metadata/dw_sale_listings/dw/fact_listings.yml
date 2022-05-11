@@ -26,6 +26,9 @@ columns:
   sk_last_depublication_date:
     lineage:
       - datalake_sale_listings.sale_listing.ts_last_depublication
+  sk_first_offer_submitted_date:
+    lineage:
+      - datalake_sale_listings.sale_listing.ts_first_offer_submitted
   days_last_publication_to_depublication:
     lineage:
       - datalake_sale_listings.sale_listing.days_last_publication_to_depublication
@@ -47,6 +50,9 @@ columns:
   days_first_publication_to_house_registry_ended:
     lineage:
       - datalake_sale_listings.sale_listing.days_first_publication_to_house_registry_ended
+  days_first_publication_to_first_offer_submitted:
+    lineage:
+      - datalake_sale_listings.sale_listing.days_first_publication_to_first_offer_submitted  
   total_depublications:
     lineage:
       - datalake_sale_listings.sale_listing.unpublications
