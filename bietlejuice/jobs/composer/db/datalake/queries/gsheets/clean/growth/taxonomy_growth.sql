@@ -9,8 +9,8 @@ SELECT
     mkt_medium,
     mkt_origin,
     mkt_source,
-    is_agent_referral,
-    is_branded,
-    is_ops_direct_register
+    CAST(is_agent_referral AS BOOLEAN) AS is_agent_referral,
+    CAST(is_branded AS BOOLEAN) AS is_branded,
+    CAST(is_ops_direct_register AS BOOLEAN) AS is_ops_direct_register
 FROM
     datalake_gsheets_raw.taxonomy_growth

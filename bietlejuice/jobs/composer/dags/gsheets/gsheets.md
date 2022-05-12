@@ -183,7 +183,6 @@ This pipeline produces the following output tables:
     - `taxonomy_affiliates`
     - `taxonomy_crm_casa_mineira`
     - `taxonomy_demand`
-    - `taxonomy_growth`
     - `taxonomy_mkt_cost_new_test`
     - `taxonomy_mkt_cost`
     - `taxonomy_portal_casa_mineira`

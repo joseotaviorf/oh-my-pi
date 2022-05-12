@@ -792,11 +792,6 @@ taxonomy_demand:
     sheet_name: taxonomy_demand
     clean_table_name: taxonomy_demand
 
-taxonomy_growth:
-    sheet_id: 1kqsc1xCs4y9Q7HMBl5XiXaBPHsBYS0jA-PJi9Sgp_UY
-    sheet_name: taxonomy_growth
-    clean_table_name: taxonomy_growth
-
 taxonomy_portal_casa_mineira:
     sheet_id: 12_zyljMVOTLUvBSCen6QXSx23bXSd6krs8_fpxueqNU
     sheet_name: taxonomy_portal_casa_mineira
