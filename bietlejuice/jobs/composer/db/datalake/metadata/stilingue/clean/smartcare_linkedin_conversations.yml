@@ -167,7 +167,7 @@ columns:
   mentions:
     lineage:
       - datalake_stilingue_raw.smartcare_linkedin_conversas.mentions
-  spam:
+  is_spam:
     lineage:
       - datalake_stilingue_raw.smartcare_linkedin_conversas.spam
   location:

@@ -54,7 +54,6 @@ SELECT
     lang,
     theme_polarity,
     mentions,
-    spam,
     CASE 
         WHEN location == "" THEN NULL
         ELSE location
@@ -105,6 +104,7 @@ SELECT
     CAST(from_integration AS BOOLEAN) AS is_from_integration,
     CAST(is_ads AS BOOLEAN) AS is_ads,
     CAST(is_hidden AS BOOLEAN) AS is_hidden,
+    CAST(spam AS BOOLEAN) AS is_spam,
     TO_TIMESTAMP(posted_at, 'dd/MM/yyyy HH:mm') AS ts_posted,
     TO_TIMESTAMP(metrics_updated_at, 'dd/MM/yyyy HH:mm') AS ts_metrics_updated,
     CAST(ts_load AS TIMESTAMP) AS ts_load,

@@ -9,11 +9,10 @@ from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
+from airflow.utils.helpers import cross_downstream
 
-from bietlejuice.jobs.composer.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
-from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.services.configuration_service import (
     ConfigurationService,
 )
@@ -112,19 +111,20 @@ for TABLE_NAME, TABLE_DETAILS in TABLES.items():
             json.dumps(ENDPOINT_SCHEMA_EXCEPTIONS),
         ],
     )
-    raw_task_groups[TABLE_DETAILS["clean_table_name"]] = raw_task_group
 
-    create_cluster_task >> DatalakeTaskGroup.first_tasks(raw_task_group)
-    independent_tasks = DatalakeTaskGroup.independent_tasks(raw_task_group)
-    if independent_tasks:
-        terminate_cluster_task.set_upstream(independent_tasks)
+    clean_task_group = task_group.build_clean_task_group(
+        source_database_base_name=SOURCE,
+        target_database_base_name=SOURCE,
+        table_name=TABLE_DETAILS.get("clean_table_name"),
+        is_incremental=True if TABLE_DETAILS.get("partition_cols") else False,
+        partitions=TABLE_DETAILS.get("partition_cols"),
+    )
 
-clean_task_groups = task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.CLEAN,
-    source_database_base_name=SOURCE,
-    target_database_base_name=SOURCE,
-)
+    create_cluster_task.set_downstream(DatalakeTaskGroup.first_tasks(raw_task_group))
 
-TaskFlowHelper.chain_task_groups_via_common_table(raw_task_groups, clean_task_groups)
+    cross_downstream(
+        DatalakeTaskGroup.last_tasks(raw_task_group),
+        DatalakeTaskGroup.first_tasks(clean_task_group),
+    )
 
-terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
+    terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_group))
