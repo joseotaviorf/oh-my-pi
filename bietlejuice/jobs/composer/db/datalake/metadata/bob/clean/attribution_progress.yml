@@ -10,3 +10,9 @@ columns:
   status:
     lineage:
       - datalake_bob_raw.attribution_progress.status
+  ts_created:
+    lineage:
+      - datalake_bob_raw.attribution_progress.created_at
+  ts_updated:
+    lineage:
+      - datalake_bob_raw.attribution_progress.updated_at

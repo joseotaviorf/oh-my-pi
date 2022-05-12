@@ -25,3 +25,9 @@ columns:
   mod_status:
     lineage:
       - datalake_bob_raw.attribution_progress_aud.status_mod
+  ts_created:
+    lineage:
+      - datalake_bob_raw.attribution_progress_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_bob_raw.attribution_progress_aud.updated_at

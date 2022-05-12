@@ -6,5 +6,8 @@ SELECT
     status,
     house_draft_mod AS mod_id_house_draft,
     confirmation_attempts_mod AS mod_confirmation_attempts,
-    status_mod AS mod_status
-FROM datalake_bob_raw.attribution_progress_aud
+    status_mod AS mod_status,
+    created_at AS ts_created,
+    updated_at AS ts_updated
+FROM
+    datalake_bob_raw.attribution_progress_aud
