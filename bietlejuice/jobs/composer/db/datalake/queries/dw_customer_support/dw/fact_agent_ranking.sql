@@ -2,6 +2,7 @@ SELECT
   id_agent AS sk_agent,
   MD5(department) AS sk_department,
   id_group AS sk_group,
+  CAST(DATE_FORMAT(dt_ranking_week, 'yyyyMMdd') AS BIGINT) AS sk_date,
   multiplication_factor,
   ranking_score,
   ranking_quartile,

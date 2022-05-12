@@ -11,6 +11,9 @@ columns:
   sk_group:
     lineage:
       - datalake_analyst_ranking.ranking.id_group
+  sk_date:
+    lineage:
+      - datalake_analyst_ranking.ranking.dt_ranking_week
   multiplication_factor:
     lineage:
       - datalake_analyst_ranking.ranking.multiplication_factor
