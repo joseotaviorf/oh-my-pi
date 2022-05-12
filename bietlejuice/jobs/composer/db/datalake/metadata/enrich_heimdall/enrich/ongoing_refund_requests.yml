@@ -1,0 +1,62 @@
+---
+database_name: datalake_heimdall
+table_name: ongoing_refund_requests
+columns:
+  id_request:
+    lineage:
+      - datalake_heimdall.activity.id
+  id_expense:
+    lineage:
+      - datalake_heimdall.expenses.id
+  id_contract:
+    lineage:
+      - datalake_heimdall.activity.id_external_contract
+  request_status:
+    lineage:
+      - datalake_heimdall.activity.status
+  refund_type:
+    lineage:
+      - datalake_heimdall.activity.type
+  expense_type:
+    lineage:
+      - datalake_heimdall.expenses.text
+  expense_group:
+    lineage:
+      - datalake_heimdall.expenses.text
+  expense_agreement_channel:
+    lineage:
+      - datalake_heimdall.expenses.agreement_channel
+  expense_amount:
+    lineage:
+      - datalake_heimdall.expenses.amount
+  expense_recurrence_type:
+    lineage:
+      - datalake_heimdall.expenses.recurrence_type
+  current_installment:
+    lineage:
+      - datalake_heimdall.expenses.recurrence_current
+  total_installments:
+    lineage:
+      - datalake_heimdall.expenses.recurrence_total
+  expense_status:
+    lineage:
+      - datalake_heimdall.auditable_expenses.status
+  expense_rejection_reason:
+    lineage:
+      - datalake_heimdall.auditable_expenses.rejection_reason
+  expense_rejection_comment:
+    lineage:
+      - datalake_heimdall.auditable_expenses.rejection_comment
+  is_custom_expense:
+    lineage:
+      - datalake_heimdall.expenses.is_custom_text
+  days_requested_to_analyzed:
+    lineage:
+      - datalake_heimdall.activity.ts_transition_created
+      - datalake_heimdall.activity.ts_requested
+  ts_requested:
+    lineage:
+      - datalake_heimdall.activity.ts_requested
+  ts_analyzed:
+    lineage:
+      - datalake_heimdall.activity.ts_transition_created

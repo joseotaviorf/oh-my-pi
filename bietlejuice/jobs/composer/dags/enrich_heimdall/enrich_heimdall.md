@@ -18,6 +18,7 @@ Produces the following output table on Enrich layer (via full load):
 - `activity`
 - `auditable_expenses`
 - `expenses`
+- `ongoing_refund_requests`
 
 ### Responsible Data Engineering Team
 

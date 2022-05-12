@@ -1,0 +1,6 @@
+---
+inner_dependencies:
+  ongoing_refund_requests:
+    - activity
+    - auditable_expenses
+    - expenses
