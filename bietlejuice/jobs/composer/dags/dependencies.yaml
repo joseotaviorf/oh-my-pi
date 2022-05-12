@@ -1440,6 +1440,7 @@ bietlejuice.enrich_marketing_costs_sharing_rules:
   - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
   - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
   - bietlejuice.ebdb:create-partner-clean-external-table
+  - bietlejuice.dw_region:load-public-dim-region-into-redshift
 
 bietlejuice.enrich_marketing_manual_daily_costs:
   - bietlejuice.gsheets.growth_intraday:load-clean-marketing-name-convention-shared-costs

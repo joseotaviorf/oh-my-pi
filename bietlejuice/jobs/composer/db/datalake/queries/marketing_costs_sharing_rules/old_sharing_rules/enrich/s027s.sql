@@ -10,7 +10,7 @@ SELECT
     WHEN dr.city_group='São José do Rio Preto' THEN 0.03125
     WHEN dr.city_group='Ribeirão Preto' THEN 0.03125
     WHEN dr.city_group='Mogi das Cruzes' THEN 0.03125
-    WHEN dr.city_group='Itapecerica da Serra' THEN 0.03125
+    WHEN dr.city_group='RMSP' THEN 0.03125
     ELSE 0
   END AS share,
   'social' AS funnel_side
@@ -21,5 +21,5 @@ FROM
     AND dr.city_group IN (
       'Goiânia','Vitória','São José dos Campos',
       'São José do Rio Preto','Ribeirão Preto','Mogi das Cruzes',
-      'Itapecerica da Serra')
+      'RMSP')
 GROUP BY 1,2,3,4
