@@ -1,0 +1,23 @@
+SELECT
+  id_agent AS sk_agent,
+  MD5(department) AS sk_department,
+  CAST(DATE_FORMAT(dt_metric_reference, 'yyyyMMdd') AS BIGINT) AS sk_date,
+  closed_demand,
+  solved_demand,
+  tickets_solved_in_time,
+  tickets_not_solved_in_time,
+  sum_csat_satisfied_score,
+  sum_csat_dissatisfied_score,
+  total_tickets_resolution,
+  total_tickets_answered_resolution,
+  total_tickets_with_csat_score,
+  dt_metric_reference,
+  year,
+  month,
+  day
+FROM
+  datalake_analyst_ranking.analyst_metrics
+WHERE
+  year = {year}
+  AND month = {month}
+  AND day = {day}

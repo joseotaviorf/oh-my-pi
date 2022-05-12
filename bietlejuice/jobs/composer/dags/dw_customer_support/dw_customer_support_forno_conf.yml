@@ -1,3 +1,5 @@
 ---
-incremental_tables: []
+incremental_tables:
+  - fact_agent_ranking
+  - fact_agent_daily_productivity
 inner_dependencies: {}

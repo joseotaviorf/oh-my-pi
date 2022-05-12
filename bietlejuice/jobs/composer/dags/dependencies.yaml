@@ -524,16 +524,16 @@ bietlejuice.dw_chattermill:
   - bietlejuice.enrich_chattermill:load-enrich-responses
 
 bietlejuice.dw_customer_support:
-  # - bietlejuice.enrich_analyst_ranking:load-enrich-ranking
+  - bietlejuice.enrich_analyst_ranking:load-enrich-analyst-metrics
+  - bietlejuice.enrich_analyst_ranking:load-enrich-ranking
   - bietlejuice.enrich_customer_demand:load-enrich-backlog-metrics
   - bietlejuice.enrich_customer_demand:load-enrich-demand-metrics
   - bietlejuice.enrich_customer_support:load-enrich-call
   - bietlejuice.enrich_customer_support:load-enrich-csat
   - bietlejuice.enrich_customer_support:load-enrich-chat
   - bietlejuice.enrich_customer_support:load-enrich-email
-  # - bietlejuice.gsheets:load-clean-agents-ranking-targets
+  - bietlejuice.gsheets.support_and_service:load-clean-agents-ranking-targets
   - bietlejuice.gsheets.support_and_service:load-clean-department-control
-  # - bietlejuice.gsheets.support_and_service:load-clean-support-agents-department
   - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings
 
 bietlejuice.dw_datamarts_spark.cross:

@@ -3,17 +3,15 @@ CREATE TABLE IF NOT EXISTS customer_support.fact_agent_daily_productivity (
     sk_agent VARCHAR,
     sk_department VARCHAR,
     sk_date BIGINT,
-    total_csat_satisfied_score BIGINT,
-    total_csat_dissatisfied_score BIGINT,
-    total_tickets_with_csat_score BIGINT,
+    closed_demand BIGINT,
+    solved_demand BIGINT,
+    tickets_solved_in_time BIGINT,
+    tickets_not_solved_in_time BIGINT,
+    sum_csat_satisfied_score BIGINT,
+    sum_csat_dissatisfied_score BIGINT,
     total_tickets_resolution BIGINT,
     total_tickets_answered_resolution BIGINT,
-    total_tickets BIGINT,
-    total_tickets_with_taxonomy BIGINT,
-    total_minutes_resolution_time BIGINT,
-    total_crm_tasks_solved BIGINT,
-    agent_age_in_months INTEGER,
-    dt_metric_reference DATE,
-    ts_load TIMESTAMP
+    total_tickets_with_csat_score BIGINT,
+    dt_metric_reference DATE
 );
 ALTER TABLE customer_support.fact_agent_daily_productivity OWNER TO airflow;

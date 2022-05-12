@@ -1,0 +1,31 @@
+---
+database_name: dw_customer_support
+table_name: fact_agent_ranking
+columns:
+  sk_agent:
+    lineage:
+      - datalake_analyst_ranking.ranking.id_agent
+  sk_department:
+    lineage:
+      - datalake_analyst_ranking.ranking.department
+  sk_group:
+    lineage:
+      - datalake_analyst_ranking.ranking.id_group
+  multiplication_factor:
+    lineage:
+      - datalake_analyst_ranking.ranking.multiplication_factor
+  ranking_score:
+    lineage:
+      - datalake_analyst_ranking.ranking.ranking_score
+  ranking_quartile:
+    lineage:
+      - datalake_analyst_ranking.ranking.ranking_quartile
+  ranking_percent_position:
+    lineage:
+      - datalake_analyst_ranking.ranking.ranking_percent_position
+  ranking_position:
+    lineage:
+      - datalake_analyst_ranking.ranking.ranking_position
+  dt_ranking_week:
+    lineage:
+      - datalake_analyst_ranking.ranking.dt_ranking_week

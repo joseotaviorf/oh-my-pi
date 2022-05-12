@@ -16,15 +16,21 @@ columns:
   target_csat:
     lineage:
       - datalake_gsheets_clean.agents_ranking_targets.target_csat
-  target_frt:
+  target_sla:
     lineage:
-      - datalake_gsheets_clean.agents_ranking_targets.target_frt
+      - datalake_gsheets_clean.agents_ranking_targets.target_sla
   target_productivity:
     lineage:
       - datalake_gsheets_clean.agents_ranking_targets.productivity_target
-  target_reclameaqui_would_back_make_business:
+  target_ra_score:
     lineage:
-      - datalake_gsheets_clean.agents_ranking_targets.ra_would_back_make_business_target
+      - datalake_gsheets_clean.agents_ranking_targets.ra_target_score
+  target_ra_solution_rate:
+    lineage:
+      - datalake_gsheets_clean.agents_ranking_targets.ra_target_solution_rate
+  target_reclameaqui_would_do_business_again:
+    lineage:
+      - datalake_gsheets_clean.agents_ranking_targets.ra_would_do_business_again_target
   dt_start:
     lineage:
       - datalake_gsheets_clean.agents_ranking_targets.dt_start

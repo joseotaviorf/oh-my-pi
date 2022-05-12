@@ -3,47 +3,40 @@ table_name: fact_agent_daily_productivity
 columns:
   sk_agent:
     lineage:
-      - datalake_analyst_ranking.ranking.id_agent
+      - datalake_analyst_ranking.analyst_metrics.id_agent
   sk_department:
     lineage:
-      - datalake_gsheets_clean.support_agents_department.department
+      - datalake_analyst_ranking.analyst_metrics.department
   sk_date:
     lineage:
-      - datalake_analyst_ranking.ranking.dt
-  total_csat_satisfied_score:
+      - datalake_analyst_ranking.analyst_metrics.dt_metric_reference
+  closed_demand:
     lineage:
-      - datalake_analyst_ranking.ranking.sum_csat_satisfied_score
-  total_csat_dissatisfied_score:
+      - datalake_analyst_ranking.analyst_metrics.closed_demand
+  solved_demand:
     lineage:
-      - datalake_analyst_ranking.ranking.sum_csat_dissatisfied_score
-  total_tickets_with_csat_score:
+      - datalake_analyst_ranking.analyst_metrics.solved_demand
+  tickets_solved_in_time:
     lineage:
-      - datalake_analyst_ranking.ranking.total_tickets_with_csat_score
+      - datalake_analyst_ranking.analyst_metrics.tickets_solved_in_time
+  tickets_not_solved_in_time:
+    lineage:
+      - datalake_analyst_ranking.analyst_metrics.tickets_not_solved_in_time
+  sum_csat_satisfied_score:
+    lineage:
+      - datalake_analyst_ranking.analyst_metrics.sum_csat_satisfied_score
+  sum_csat_dissatisfied_score:
+    lineage:
+      - datalake_analyst_ranking.analyst_metrics.sum_csat_dissatisfied_score
   total_tickets_resolution:
     lineage:
-      - datalake_analyst_ranking.ranking.total_tickets_resolution
+      - datalake_analyst_ranking.analyst_metrics.total_tickets_resolution
   total_tickets_answered_resolution:
     lineage:
-      - datalake_analyst_ranking.ranking.total_tickets_answered_resolution
-  total_tickets:
+      - datalake_analyst_ranking.analyst_metrics.total_tickets_answered_resolution
+  total_tickets_with_csat_score:
     lineage:
-      - datalake_analyst_ranking.ranking.total_tickets
-  total_tickets_with_taxonomy:
-    lineage:
-      - datalake_analyst_ranking.ranking.total_tickets_with_taxonomy
-  total_minutes_resolution_time:
-    lineage:
-      - datalake_analyst_ranking.ranking.sum_ticket_resolution_time
-  avg_days_resolution_time:
-    lineage:
-      - datalake_analyst_ranking.ranking.sum_ticket_resolution_time
-      - datalake_analyst_ranking.ranking.total_tickets
-  total_crm_tasks_solved:
-    lineage:
-      - datalake_analyst_ranking.ranking.total_crm_tasks_solved
-  agent_age_in_months:
-    lineage:
-      - datalake_analyst_ranking.ranking.agent_age_in_months
+      - datalake_analyst_ranking.analyst_metrics.total_tickets_with_csat_score
   dt_metric_reference:
     lineage:
-      - datalake_analyst_ranking.ranking.dt
+      - datalake_analyst_ranking.analyst_metrics.dt_metric_reference

@@ -54,6 +54,7 @@ ranking_score AS (
     id_agent,
     id_group,
     department,
+    multiplication_factor,
     (productivity + sla + csat + resolution + ra_would_do_business_again + ra_score + ra_solution) * multiplication_factor AS ranking_score,
     dt_ranking_week
   FROM
@@ -63,6 +64,7 @@ SELECT
     id_agent,
     id_group,
     department,
+    multiplication_factor,
     ranking_score,
     CASE 
         WHEN PERCENT_RANK() OVER (PARTITION BY id_group ORDER BY ranking_score) < 0.25 THEN 'Q4'

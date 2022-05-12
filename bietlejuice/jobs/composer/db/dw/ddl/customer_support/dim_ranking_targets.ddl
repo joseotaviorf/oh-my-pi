@@ -5,9 +5,11 @@ CREATE TABLE IF NOT EXISTS customer_support.dim_ranking_targets (
     department VARCHAR,
     target_resolution FLOAT,
     target_csat FLOAT,
-    target_frt FLOAT,
+    target_sla FLOAT,
     target_productivity INTEGER,
-    target_reclameaqui_would_back_make_business FLOAT,
+    target_ra_score INTEGER,
+    target_ra_solution_rate FLOAT,
+    target_ra_would_do_business_again FLOAT,
     dt_start DATE,
     dt_end DATE,
     ts_load TIMESTAMP
