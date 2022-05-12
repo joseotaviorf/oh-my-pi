@@ -13,6 +13,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 This pipeline creates the following full tables in the schema `dw_datamarts` of data lake:
 
 - `funnel_credit_event_flows`
+- `credit_proposal_attribute`
 
 ### Responsible Data Engineering Team
 

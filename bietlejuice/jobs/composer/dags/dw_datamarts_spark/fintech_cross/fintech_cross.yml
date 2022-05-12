@@ -11,3 +11,4 @@
 
 fintech_cross:
   funnel_credit_event_flows: {}
+  credit_proposal_attribute: {}
