@@ -14,6 +14,12 @@ columns:
   negotiation_status:
     lineage:
       - datalake_retsuko.invoice.negotiation_status
+  closing_mode:
+    lineage:
+      - datalake_retsuko.invoice.closing_mode
+  paid_via:
+    lineage:
+      - datalake_retsuko.invoice.paid_via
   user:
     lineage:
       - datalake_retsuko.invoice.invoice_user

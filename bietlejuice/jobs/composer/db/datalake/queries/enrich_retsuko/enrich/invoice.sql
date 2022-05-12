@@ -4,6 +4,8 @@ WITH invoice_replace AS (
         REPLACE(i.purpose, '-', ' ') AS invoice_frequency,
         COALESCE(REPLACE(i.status, '-', ' '), 'not invoiceable') AS payment_status,
         i.negotiation_status,
+        i.closing_mode,
+        i.paid_via,
         MAX(CASE WHEN REPLACE(af.type, '-', ' ') LIKE '%contract%' AND REPLACE(at.type, '-', ' ') NOT LIKE '%contract%' THEN REPLACE(at.type, '-', ' ')
                 WHEN REPLACE(af.type, '-', ' ') NOT LIKE '%contract%' AND REPLACE(at.type, '-', ' ') LIKE '%contract%' THEN REPLACE(af.type, '-', ' ')
                 WHEN REPLACE(af.type, '-', ' ') LIKE '%contract%' AND REPLACE(at.type, '-', ' ') LIKE '%contract%' THEN 'contract'
@@ -19,13 +21,15 @@ WITH invoice_replace AS (
         ON e.id_from_account = af.id
     INNER JOIN datalake_retsuko_clean.account at 
         ON e.id_to_account = at.id
-    GROUP BY 1,2,3,4,6,7,8
+    GROUP BY 1,2,3,4,5,6,8,9,10
 )
 SELECT
     ir.id_invoice,
     ir.invoice_frequency,
     ir.payment_status,
     ir.negotiation_status,
+    ir.closing_mode,
+    ir.paid_via,
     ir.invoice_user,   
     ir.ts_sent,
     ir.ts_due,

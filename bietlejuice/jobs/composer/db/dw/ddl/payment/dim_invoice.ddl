@@ -4,6 +4,8 @@ CREATE TABLE if not exists payment.dim_invoice (
     frequency VARCHAR(50),
     payment_status VARCHAR(50),
     negotiation_status VARCHAR(255),
+    closing_mode VARCHAR(255),
+    paid_via VARCHAR(255),
     "user" VARCHAR(50),
     due_amount DECIMAL(13,2),
     paid_amount DECIMAL(13,2),
