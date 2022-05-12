@@ -11,10 +11,6 @@ columns:
   id_house:
     lineage:
       - datalake_offboarding.contract_termination.id_house
-  id_exit_inspection:
-    lineage:
-      - datalake_offboarding.contract_termination.sk_exit_inspection
-      - datalake_ebdb_listing_jobs.inspection.id
   status:
     lineage:
       - datalake_offboarding.contract_termination.status

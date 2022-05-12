@@ -54,8 +54,7 @@ flow AS (
                             'de_1.000_a_r__2.500', 'acima_de_2.500',
                             'intermediação_1','intermediação_2','absorção_de_custo'))
                 ) THEN 'V2 Off'
-            WHEN bw.id_contract IS NOT NULL 
-                AND bw.department = 'Rescisão - Despejo [OFF][POS][BACK]' THEN 'Despejo'
+            WHEN desp.id_contract IS NOT NULL THEN 'Despejo'
             WHEN ong.ts_analyst_annulment_input IS NOT NULL 
                 AND ong.is_repair_tenant_duty = FALSE 
                 AND ong.dt_termination >= '2021-09-29' THEN 'V2 Off' 
@@ -68,9 +67,73 @@ flow AS (
             ON npt.id_contract = ong.id_contract
             AND npt.group_name = 'Novo Off - Reparos [POS] [BACK]'
             AND npt.dt_created >= '2021-02-02'
+    LEFT JOIN
+        datalake_offboarding.tickets desp
+            ON desp.id_contract = ong.id_contract
+            AND desp.group_name = 'Rescisão - Despejo [OFF][POS][BACK]'
+            AND desp.is_activation_protection
     LEFT JOIN 
         datalake_offboarding.budgeting_window bw
             ON bw.id_contract = ong.id_contract
+),
+dt_tkts AS (
+    SELECT
+        tkt.id_contract,
+        MAX(
+            CASE
+                WHEN group_name = 'QualiVisOrça [OFF] [POS] [BACK]' 
+                    AND dt_created >= '2021-01-01' THEN dt_created
+                ELSE NULL
+            END
+        ) AS dt_created_budgeting_app,
+        MAX(
+            CASE
+                WHEN group_name = 'QualiVisOrça [OFF] [POS] [BACK]' 
+                    AND dt_created >= '2021-01-01' THEN dt_solved
+                ELSE NULL
+            END
+        ) AS dt_solved_budgeting_app,
+        MAX(
+            CASE
+                WHEN group_name = 'Prestadores Parceiros [REP] [POS] [BACK]'
+                    AND dt_created >= '2021-01-01' THEN dt_created
+                ELSE NULL
+            END
+        ) AS dt_created_budgeting,
+        MAX(
+            CASE
+                WHEN group_name = 'Prestadores Parceiros [REP] [POS] [BACK]'
+                    AND dt_created >= '2021-01-01' THEN dt_solved
+                ELSE NULL
+            END
+        ) AS dt_solved_budgeting,
+        MAX(
+            CASE
+                WHEN (flow.flow = 'New Repairs'
+                        AND group_name = 'Novo Off - Reparos [POS] [BACK]'
+                        AND dt_created >= '2021-02-02')
+                    OR (group_name = 'Proteção QuintoAndar [OFF] [POS] [BACK]'
+                        AND is_activation_protection) THEN dt_created
+                ELSE NULL
+            END
+        ) AS dt_ap_start,
+        MAX(
+            CASE
+                WHEN (flow.flow = 'New Repairs'
+                        AND group_name = 'Novo Off - Reparos [POS] [BACK]'
+                        AND dt_created >= '2021-02-02')
+                    OR (group_name = 'Proteção QuintoAndar [OFF] [POS] [BACK]'
+                        AND is_activation_protection) THEN dt_solved
+                ELSE NULL
+            END
+        ) AS dt_ap_solved
+    FROM
+        datalake_offboarding.tickets tkt
+    LEFT JOIN
+        flow
+            ON flow.id_contract = tkt.id_contract
+    GROUP BY
+        1
 )
 SELECT DISTINCT
     ong.id,
@@ -156,44 +219,18 @@ SELECT DISTINCT
         ELSE NULL
     END AS dt_inspected,
     ia.dt_completed_date AS dt_insp_analysis_completed,
+    dt_tkts.dt_created_budgeting_app,
+    dt_tkts.dt_solved_budgeting_app,
     CASE
-        WHEN base_tkt.group_name = 'QualiVisOrça [OFF] [POS] [BACK]'
-            AND base_tkt.dt_created >= '2021-01-01' THEN base_tkt.dt_created
-        ELSE NULL
-    END AS dt_created_budgeting_app,
-    CASE
-        WHEN base_tkt.group_name = 'QualiVisOrça [OFF] [POS] [BACK]'
-            AND base_tkt.dt_created >= '2021-01-01' THEN base_tkt.dt_solved
-        ELSE NULL
-    END AS dt_solved_budgeting_app,
-    CASE
-        WHEN base_tkt.group_name = 'Prestadores Parceiros [REP] [POS] [BACK]'
-            AND base_tkt.dt_created >= '2021-01-01'
-            AND base_tkt.dt_created >= ong.dt_termination THEN base_tkt.dt_created
+        WHEN dt_tkts.dt_created_budgeting >= ong.dt_termination THEN dt_tkts.dt_created_budgeting
         ELSE NULL
     END AS dt_created_budgeting,
     CASE
-        WHEN base_tkt.group_name = 'Prestadores Parceiros [REP] [POS] [BACK]'
-            AND base_tkt.dt_created >= '2021-01-01'
-            AND base_tkt.dt_solved >= ong.dt_termination THEN base_tkt.dt_solved
+        WHEN dt_tkts.dt_solved_budgeting >= ong.dt_termination THEN dt_tkts.dt_solved_budgeting
         ELSE NULL
     END AS dt_solved_budgeting,
-    CASE 
-        WHEN flow.flow = 'New Repairs' 
-            AND base_tkt.group_name = 'Novo Off - Reparos [POS] [BACK]'
-            AND base_tkt.dt_created >= '2021-02-02' THEN base_tkt.dt_created
-        WHEN base_tkt.group_name = 'Proteção QuintoAndar [OFF] [POS] [BACK]'
-            AND base_tkt.is_activation_protection THEN base_tkt.dt_created
-        ELSE NULL
-    END AS dt_ap_start,
-    CASE 
-        WHEN flow.flow = 'New Repairs' 
-            AND base_tkt.group_name = 'Novo Off - Reparos [POS] [BACK]'
-            AND base_tkt.dt_created >= '2021-02-02' THEN base_tkt.dt_solved
-        WHEN base_tkt.group_name = 'Proteção QuintoAndar [OFF] [POS] [BACK]'
-            AND base_tkt.is_activation_protection THEN base_tkt.dt_solved
-        ELSE NULL
-    END AS dt_ap_solved,
+    dt_tkts.dt_ap_start,
+    dt_tkts.dt_ap_solved,
     CASE 
         WHEN ong.ts_analyst_annulment_input >= ong.ts_termination_finished 
             AND ong.ts_analyst_annulment_input >= ia.dt_completed_date THEN ong.ts_analyst_annulment_input
@@ -220,9 +257,6 @@ LEFT JOIN
     datalake_offboarding.inspection_analysis ia 
         ON ia.id_contract = ong.id_contract 
         AND ia.contract_rank = 1
-LEFT JOIN
-    datalake_offboarding.tickets base_tkt
-        ON base_tkt.id_contract = ong.id_contract
 LEFT JOIN 
     datalake_offboarding.budgeting_window bw
         ON bw.id_contract = ong.id_contract
@@ -242,4 +276,7 @@ LEFT JOIN
 LEFT JOIN
     flow
         ON flow.id_contract = ong.id_contract
+LEFT JOIN
+    dt_tkts
+        ON dt_tkts.id_contract = ong.id_contract
         
