@@ -551,11 +551,16 @@ bietlejuice.dw_datamarts_spark.for_rent:
   - bietlejuice.dw_lead:load-dw-public-dim-lead
   - bietlejuice.dw_listing_jobs:load-dw-public-dim-photo-job
   - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows
+  - bietlejuice.ebdb:create-clean-access-authorization-type-in-data-lake
+  - bietlejuice.ebdb:create-clean-access-type-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-access-type-in-data-lake
   - bietlejuice.ebdb:create-clean-agent-data-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-agent-data-types-in-data-lake
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-house-weekly-schedule-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-house-weekly-schedule-in-data-lake
+  - bietlejuice.ebdb:create-clean-key-type-in-data-lake
+  - bietlejuice.ebdb:create-clean-occupant-type-in-data-lake
   - bietlejuice.ebdb:create-clean-user-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
   - bietlejuice.ebdb:create-clean-work-contract-in-data-lake
