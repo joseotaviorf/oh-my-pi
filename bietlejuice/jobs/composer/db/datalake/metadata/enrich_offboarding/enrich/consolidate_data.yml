@@ -92,6 +92,9 @@ columns:
   is_b2b:
     lineage:
       - datalake_offboarding.ongoing.is_b2b
+  is_contract_b2b:
+    lineage:
+      - datalake_offboarding.ongoing.is_contract_b2b
   is_repair_tenant_duty:
     lineage:
       - datalake_offboarding.ongoing.is_repair_tenant_duty

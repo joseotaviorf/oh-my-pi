@@ -47,7 +47,7 @@ utility_in_condominium AS (
     GROUP BY 
         id_termination
 ),
-customer_conversions AS (
+customer_conversions_with_multiple_answers AS (
     WITH all_customer_conversions AS (
         SELECT 
             id_customer,
@@ -139,6 +139,27 @@ customer_conversions AS (
         datalake_nps_answer_drivers.answer_drivers ansd
             ON cc.id_answer = ansd.id_answer
 ),
+customer_conversions_last_answers AS (
+    WITH last_answer AS (
+        SELECT 
+            id_contract, 
+            MAX(ts_created) AS max_ts_created,
+            MAX(ts_answer_sent_local) AS max_ts_answer_sent_local
+        FROM 
+            customer_conversions_with_multiple_answers
+        GROUP BY 
+            id_contract           
+    )
+    SELECT 
+        ccmulti.*
+    FROM 
+        customer_conversions_with_multiple_answers ccmulti
+    JOIN
+        last_answer
+            ON last_answer.id_contract = ccmulti.id_contract
+            AND last_answer.max_ts_created = ccmulti.ts_created
+            AND last_answer.max_ts_answer_sent_local = ccmulti.ts_answer_sent_local
+),
 campaign AS (
     SELECT 
         id,
@@ -175,7 +196,7 @@ total_nps AS (
     FROM 
         datalake_terminator_clean.termination AS term
     JOIN 
-        customer_conversions AS cc
+        customer_conversions_with_multiple_answers AS cc
             ON cc.id_contract = term.id_contract
     LEFT JOIN 
         campaign AS cmp
@@ -205,7 +226,7 @@ iq_nps AS (
     FROM 
         datalake_terminator_clean.termination term
     JOIN 
-        customer_conversions AS cc
+        customer_conversions_with_multiple_answers AS cc
             ON cc.id_contract = term.id_contract
     LEFT JOIN 
         campaign AS cmp
@@ -236,7 +257,7 @@ pp_nps AS (
     FROM 
         datalake_terminator_clean.termination term
     JOIN 
-        customer_conversions AS cc
+        customer_conversions_with_multiple_answers AS cc
             ON cc.id_contract = term.id_contract
     LEFT JOIN
         campaign AS cmp
@@ -338,6 +359,7 @@ contract_info AS (
         hl.id_house_listing,
         contract_b2b.b2b_type,
         contract_b2b.b2b_prime_type,
+        contract_b2b.is_contract_b2b,
         (hp.id_house_listing IS NOT NULL) OR contract_b2b.is_b2b AS is_b2b,
         ctr.dt_started AS dt_start,
         ctr.dt_entered AS dt_entrance,
@@ -367,14 +389,14 @@ house_region AS (
             ON ctrt.id_house = house.id
 )
 SELECT
-    term.id AS sk_termination,
-    aui.id_external AS sk_application_user,
-    term.id_contract AS sk_contract,
-    term.id_exit_inspection AS sk_exit_inspection,
+    term.id AS id_termination,
+    aui.id_external AS id_application_user,
+    term.id_contract,
+    term.id_exit_inspection,
     ci.id_house,
-    ci.id_house_listing AS sk_house_listing,
-    COALESCE(house.id_region, -1) AS sk_region,
-    tw.id_current_assignee AS sk_workflow_assignee,
+    ci.id_house_listing,
+    COALESCE(house.id_region, -1) AS id_region,
+    tw.id_current_assignee AS id_workflow_assignee,
     cc.id_nps_answer,
     cc.id_dispatch_lot,
     cc.score_category,
@@ -431,6 +453,7 @@ SELECT
         WHEN tf.ts_termination_finished > '2020-07-07' THEN DATEDIFF(tf.ts_termination_finished, term.dt_termination)
     END AS leadtime_vacancy_to_finish,
     ci.is_b2b,
+    ci.is_contract_b2b,
     (term.ts_created < ci.dt_start) AS is_before_contract_start, 
     term.has_exit_inspection,
     neg.has_landlord_comment AS has_repairs,
@@ -512,7 +535,7 @@ LEFT JOIN
     last_negotiation AS ln
         ON term.id = ln.id_termination
 LEFT JOIN 
-    customer_conversions AS cc
+    customer_conversions_last_answers AS cc
         ON cc.id_contract = term.id_contract
 LEFT JOIN 
     campaign AS cmp

@@ -2,28 +2,28 @@
 database_name: datalake_offboarding
 table_name: contract_termination
 columns:
-  sk_termination:
+  id_termination:
     lineage:
       - datalake_terminator_clean.termination.id
-  sk_application_user:
+  id_application_user:
     lineage:
       - datalake_terminator_clean.application_user.id_external
-  sk_contract:
+  id_contract:
     lineage:
       - datalake_terminator_clean.termination.id_contract
-  sk_exit_inspection:
+  id_exit_inspection:
     lineage:
       - datalake_terminator_clean.termination.id_exit_inspection
   id_house:
     lineage:
       - datalake_ebdb_contract.contract.id_house
-  sk_house_listing:
+  id_house_listing:
     lineage:
       - datalake_ebdb_listing.house_listing.id_house_listing
-  sk_region:
+  id_region:
     lineage:
       - datalake_ebdb_clean.house.id_region
-  sk_workflow_assignee:
+  id_workflow_assignee:
     lineage:
       - datalake_terminator_clean.termination_workflow.id_current_assignee
   cancellation_info:
@@ -160,6 +160,9 @@ columns:
   is_b2b:
     lineage:
       - datalake_ebdb_contract.contract_b2b.is_b2b
+  is_contract_b2b:
+    lineage:
+      - datalake_ebdb_contract.contract_b2b.is_contract_b2b
   is_before_contract_start:
     lineage:
       - datalake_terminator_clean.termination.ts_created

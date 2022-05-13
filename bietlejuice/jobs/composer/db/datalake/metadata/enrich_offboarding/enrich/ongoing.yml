@@ -4,10 +4,10 @@ table_name: ongoing
 columns:
   id:
     lineage:
-      - datalake_offboarding.contract_termination.sk_termination
+      - datalake_offboarding.contract_termination.id_termination
   id_contract:
     lineage:
-      - datalake_offboarding.contract_termination.sk_contract
+      - datalake_offboarding.contract_termination.id_contract
   id_house:
     lineage:
       - datalake_offboarding.contract_termination.id_house
@@ -38,6 +38,9 @@ columns:
   is_b2b:
     lineage:
       - datalake_offboarding.contract_termination.is_b2b
+  is_contract_b2b:
+    lineage:
+      - datalake_offboarding.contract_termination.is_contract_b2b
   dt_contract_started:
     lineage:
       - datalake_offboarding.contract_termination.dt_contract_started

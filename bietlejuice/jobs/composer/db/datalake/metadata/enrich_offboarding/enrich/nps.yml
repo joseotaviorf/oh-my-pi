@@ -4,23 +4,19 @@ table_name: nps
 columns:
   id_contract:
     lineage:
-      - datalake_nps_answer_drivers.answer_drivers.id_contract
+      - datalake_offboarding.contract_termination.id_contract
   id_nps_answer:
     lineage:
-      - datalake_tracksale.answer.id
-      - datalake_casa_mineira_tracksale.answer.id
+      - datalake_offboarding.contract_termination.id_nps_answer
   score:
     lineage:
-      - datalake_tracksale.answer.score_category
-      - datalake_casa_mineira_tracksale.answer.score_category
+      - datalake_offboarding.contract_termination.score_category
   customer_type:
     lineage:
-      - datalake_tracksale.campaign.customer_type
-      - datalake_casa_mineira_tracksale.campaign.customer_type
+      - datalake_offboarding.contract_termination.customer_type
   comment:
     lineage:
-      - datalake_tracksale.answer.nps_comment
-      - datalake_casa_mineira_tracksale.answer.nps_comment
+      - datalake_offboarding.contract_termination.nps_comment
   ldt_dt_termination_to_answer:
     lineage:
       - datalake_offboarding.contract_termination.ts_nps_answer_sent

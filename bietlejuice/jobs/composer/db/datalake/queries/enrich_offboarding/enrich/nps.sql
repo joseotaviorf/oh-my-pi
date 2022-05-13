@@ -16,7 +16,7 @@ WITH dispatch_attributes AS (
         datalake_casa_mineira_tracksale.dispatch_attributes
 )
 SELECT DISTINCT
-    ct.sk_contract AS id_contract,
+    ct.id_contract,
     ct.id_nps_answer,
     CASE
         WHEN ct.score_category = 'promoter' THEN 1

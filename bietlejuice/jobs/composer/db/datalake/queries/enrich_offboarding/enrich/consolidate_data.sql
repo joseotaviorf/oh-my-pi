@@ -52,7 +52,8 @@ flow AS (
                         'B2B Prime [OFF] [POS] [BACK]')
                         AND bw.budget_range IN ('até_750','de_r__750_a_r__1.000',
                             'de_1.000_a_r__2.500', 'acima_de_2.500',
-                            'intermediação_1','intermediação_2','absorção_de_custo'))
+                            'intermediação_1','intermediação_2','absorção_de_custo',
+                            'reparos_específicos'))
                 ) THEN 'V2 Off'
             WHEN desp.id_contract IS NOT NULL THEN 'Despejo'
             WHEN ong.ts_analyst_annulment_input IS NOT NULL 
@@ -134,7 +135,28 @@ dt_tkts AS (
             ON flow.id_contract = tkt.id_contract
     GROUP BY
         1
-)
+),
+insp_analysis AS (
+    WITH last_insp AS (
+        SELECT 
+            id_contract, 
+            MAX(ts_input) AS max_ts_input
+        FROM 
+            datalake_gsheets_clean.inspection_analysis_forms
+        GROUP BY 
+            id_contract      
+    )
+    SELECT 
+        iaf.*
+    FROM 
+        datalake_gsheets_clean.inspection_analysis_forms iaf
+    JOIN
+        last_insp
+            ON last_insp.id_contract = iaf.id_contract
+            AND last_insp.max_ts_input = iaf.ts_input
+    WHERE 
+        status NOT IN ('Isento na ferramenta','PP já comentou no laudo')
+)   
 SELECT DISTINCT
     ong.id,
     ong.id_contract,
@@ -150,6 +172,7 @@ SELECT DISTINCT
         WHEN bw.budget_range = 'intermediação_1' THEN 'Intermediação 1'
         WHEN bw.budget_range = 'intermediação_2' THEN 'Intermediação 2'
         WHEN bw.budget_range = 'absorção_de_custo' THEN 'Absorção de custo'
+        WHEN bw.budget_range = 'reparos_específicos' THEN 'Reparos específicos'
         ELSE NULL
     END AS budgeting_window,
     CASE
@@ -212,6 +235,7 @@ SELECT DISTINCT
     tkt_off.num_ticket_dissatisfied AS num_ticket_off_front_dissatisfied,
     bw.interaction_pp AS is_interaction_pp,
     ong.is_b2b,
+    ong.is_contract_b2b,
     ong.is_repair_tenant_duty,
     ong.is_workflow,
     CASE
@@ -264,9 +288,8 @@ LEFT JOIN
     datalake_offboarding.nps_agg
         ON nps_agg.id_contract = ong.id_contract
 LEFT JOIN
-    datalake_gsheets_clean.inspection_analysis_forms insp_analysis
+    insp_analysis
         ON insp_analysis.id_contract = ong.id_contract
-        AND insp_analysis.status NOT IN ('Isento na ferramenta','PP já comentou no laudo')
 LEFT JOIN
     tkt_V2
         ON tkt_v2.id_contract = ong.id_contract
@@ -279,4 +302,3 @@ LEFT JOIN
 LEFT JOIN
     dt_tkts
         ON dt_tkts.id_contract = ong.id_contract
-        
