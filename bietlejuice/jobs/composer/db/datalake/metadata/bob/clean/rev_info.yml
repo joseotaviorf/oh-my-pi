@@ -7,3 +7,12 @@ columns:
   ts_created:
     lineage:
       - datalake_bob_raw.revinfo.revtstmp
+  year:
+    lineage:
+      - datalake_bob_raw.revinfo.year
+  month:
+    lineage:
+      - datalake_bob_raw.revinfo.month
+  day:
+    lineage:
+      - datalake_bob_raw.revinfo.day

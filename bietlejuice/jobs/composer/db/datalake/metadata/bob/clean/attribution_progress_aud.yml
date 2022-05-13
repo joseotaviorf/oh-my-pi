@@ -31,3 +31,12 @@ columns:
   ts_updated:
     lineage:
       - datalake_bob_raw.attribution_progress_aud.updated_at
+  year:
+    lineage:
+      - datalake_bob_raw.attribution_progress_aud.year
+  month:
+    lineage:
+      - datalake_bob_raw.attribution_progress_aud.month
+  day:
+    lineage:
+      - datalake_bob_raw.attribution_progress_aud.day

@@ -94,3 +94,12 @@ columns:
   ts_updated:
     lineage:
       - datalake_bob_raw.house_draft_aud.updated_at
+  year:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.year
+  month:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.month
+  day:
+    lineage:
+      - datalake_bob_raw.house_draft_aud.day

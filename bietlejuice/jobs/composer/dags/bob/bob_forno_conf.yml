@@ -1,2 +1,32 @@
 ---
 lineage_product_database_name: boboconstrutor
+tables:
+  - table_name: attribution_progress_aud
+    extraction_type: incremental
+    date_filter_column: created_at
+  - table_name: attribution_progress
+    extraction_type: full
+  - table_name: house_draft_aud
+    extraction_type: incremental
+    date_filter_column: created_at
+  - table_name: house_draft
+    extraction_type: full
+  - table_name: location
+    extraction_type: full
+  - table_name: location_aud
+    extraction_type: full
+  - table_name: registrar
+    extraction_type: full
+  - table_name: registrar_aud
+    extraction_type: full
+  - table_name: revinfo
+    extraction_type: incremental
+    unixtime_measure: milliseconds
+    date_filter_column: revtstmp
+    clean_table_name: rev_info
+  - table_name: submission_progress
+    extraction_type: full
+  - table_name: submission_progress_aud
+    extraction_type: full
+
+partition_cols: ["year", "month", "day"]

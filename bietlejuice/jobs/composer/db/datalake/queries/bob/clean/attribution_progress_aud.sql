@@ -8,6 +8,13 @@ SELECT
     confirmation_attempts_mod AS mod_confirmation_attempts,
     status_mod AS mod_status,
     created_at AS ts_created,
-    updated_at AS ts_updated
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
 FROM
     datalake_bob_raw.attribution_progress_aud
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}

@@ -3,40 +3,46 @@ import pendulum
 from datetime import datetime
 
 from airflow.models import DAG, Variable
-from airflow.utils.helpers import chain, cross_downstream
+from airflow.utils.helpers import cross_downstream
 from airflow.operators.quintoandar_databricks import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 from bietlejuice.jobs.composer.base.airflow import BaseDAG, DAGOwnerEnum
-from bietlejuice.jobs.composer.base.pipeline import LayerEnum
 from bietlejuice.jobs.composer.dags.base.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.jobs.composer.services.configuration_service import (
+    ConfigurationService,
+)
 
 SOURCE = "bob"
 CONTEXT = SOURCE
 
 # dag vars
 DAG_ID = f"bietlejuice.{CONTEXT}"
-LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")  # use cron expressions in local time
+LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 7, 27, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 3 * * *"
 
+config_service = ConfigurationService(SOURCE)
+
 # airflow vars
 ENV = os.environ.get("ENVIRONMENT")
-DATALAKE_BUCKET = Variable.get("datalake_bucket")
-ATHENA_QUERY_RESULT_LOCATION = Variable.get("athena_query_result_location")
-ARTIFACTS_S3_BUCKET = Variable.get("artifacts_s3_bucket")
-DATABRICKS_BUCKET = Variable.get("databricks_s3_bucket")
-S3_PREFIX = Variable.get("databricks_bietlejuice_s3_prefix")
-DOC_MD_BASE_URL = Variable.get("DOC_MD_BASE_URL")
+datalake_bucket = config_service.get_config("datalake_bucket")
+athena_query_result_location = config_service.get_config("athena_query_results_bucket")
+s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
+doc_md_base_url = config_service.get_config("doc_md_chart_url")
+
 
 # spark and databricks vars
-BASE_SPARK_JOBS_PATH = f"{S3_PREFIX}/spark_jobs/base/"
-RAW_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/{CONTEXT}/load_bob_into_datalake.py"
-LOGS_OUTPUT_PATH = f"s3://{DATABRICKS_BUCKET}/logs/jobs/{CONTEXT}"
+logs_output_path = config_service.get_config("spark_jobs_logs_path")
+BASE_SPARK_JOBS_PATH = f"{s3_prefix}/spark_jobs/base/"
+RAW_SPARK_JOB_PATH = f"{s3_prefix}/spark_jobs/{CONTEXT}/load_{{extraction_type}}_{CONTEXT}_into_datalake.py"
 
 CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
+    "destination"
+] = f"{logs_output_path}{CONTEXT}"
+
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -48,7 +54,7 @@ dag = DAG(
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
     doc_md=BaseDAG.get_dag_doc(CONTEXT).format(
-        chart_url=DOC_MD_BASE_URL, dag_id=DAG_ID
+        chart_url=doc_md_base_url, dag_id=DAG_ID
     ),
 )
 
@@ -60,33 +66,54 @@ terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
     dag=dag, task_id="terminate-cluster"
 )
 
+tables = config_service.get_config("tables")
+partition_columns = config_service.get_config("partition_cols")
+
 task_group = DatalakeTaskGroup(
     dag=dag,
     env=ENV,
-    datalake_bucket=DATALAKE_BUCKET,
+    datalake_bucket=datalake_bucket,
     relative_query_path=CONTEXT,
     spark_jobs_path=BASE_SPARK_JOBS_PATH,
-    athena_query_result_location=ATHENA_QUERY_RESULT_LOCATION,
+    athena_query_result_location=athena_query_result_location,
 )
 
-raw_task_group = task_group.build_raw_task_group_for_all_tables(
-    source=SOURCE,
-    target_database_base_name=CONTEXT,
-    extraction_spark_job_file=RAW_SPARK_JOB_PATH,
-    raw_spark_job_extra_args=[SOURCE],
-)
+for table in tables:
+    table_name = table["table_name"]
+    extraction_type = table["extraction_type"]
+    clean_table_name = table.get("clean_table_name", table_name)
+    is_incremental = extraction_type == "incremental"
 
-clean_task_groups = task_group.build_task_group_from_sql_files(
-    layer=LayerEnum.CLEAN,
-    source_database_base_name=CONTEXT,
-    target_database_base_name=CONTEXT,
-)
+    parameters = [SOURCE, table_name]
+    if is_incremental:
+        parameters.append(table["date_filter_column"])
+        parameters.append(table.get("unixtime_measure", "date"))
+        parameters.append("{{ ds }}")
 
-chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))
+    raw_task_group = task_group.build_raw_task_group_for_single_table(
+        source=SOURCE,
+        target_database_base_name=CONTEXT,
+        table_name=table_name,
+        extraction_spark_job_file=RAW_SPARK_JOB_PATH.format(
+            extraction_type=extraction_type
+        ),
+        raw_spark_job_extra_args=parameters,
+    )
 
-cross_downstream(
-    DatalakeTaskGroup.last_tasks(raw_task_group),
-    DatalakeTaskGroup.all_first_tasks(clean_task_groups),
-)
+    partitions = partition_columns if is_incremental else None
+    clean_task_group = task_group.build_clean_task_group(
+        source_database_base_name=SOURCE,
+        target_database_base_name=SOURCE,
+        table_name=clean_table_name,
+        is_incremental=is_incremental,
+        partitions=partitions,
+    )
 
-terminate_cluster_task.set_upstream(DatalakeTaskGroup.all_last_tasks(clean_task_groups))
+    create_cluster_task.set_downstream(DatalakeTaskGroup.first_tasks(raw_task_group))
+
+    cross_downstream(
+        DatalakeTaskGroup.last_tasks(raw_task_group),
+        DatalakeTaskGroup.first_tasks(clean_task_group),
+    )
+
+    terminate_cluster_task.set_upstream(DatalakeTaskGroup.last_tasks(clean_task_group))
