@@ -28,7 +28,7 @@ SELECT
     fhs.month_end,
     fhs.order_status,
     fhs.status_history,
-    fhs.status_change_reason,
+    fhs.status_change_reason,   
     date_diff('week', dhl.ts_publication, fhs.week_start) as weeks_since_publication
 FROM 
     daily_published_and_suspended_listings fhs

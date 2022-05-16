@@ -1,0 +1,7 @@
+---
+tables:
+  - table_name: house_draft_aud
+    is_incremental: true
+    partitions: [year, month, day]
+  - table_name: house_draft
+    is_incremental: false

@@ -14,6 +14,8 @@ More information about run time [here]({chart_url}{dag_id}).
 
 This pipeline produces the following output tables in the enrich layer, via full load: 
     - `house_draft`
+  
+And through incremental load:
     - `house_draft_aud`
 
 ### Responsible Data Engineering Team

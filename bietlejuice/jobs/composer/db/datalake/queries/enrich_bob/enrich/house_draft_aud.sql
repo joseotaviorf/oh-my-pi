@@ -1,9 +1,17 @@
 WITH first_administrator_informations AS (
   SELECT
     id_house_draft, 
-    FROM_JSON(GET_JSON_OBJECT(administrators, '$.list'), 'array<string>')[0] AS first_administrator_informations
-  FROM datalake_bob_clean.house_draft_aud
-  WHERE GET_JSON_OBJECT(administrators, '$.list') IS NOT NULL 
+    FROM_JSON(GET_JSON_OBJECT(administrators, '$.list'), 'array<string>')[0] AS first_administrator_informations,
+    year,
+    month,
+    day
+  FROM
+    datalake_bob_clean.house_draft_aud
+  WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}
+    AND GET_JSON_OBJECT(administrators, '$.list') IS NOT NULL 
 )
 SELECT
     hda.id_house_draft,
@@ -66,7 +74,16 @@ SELECT
     mod_ts_updated,
     CAST(CAST(GET_JSON_OBJECT(details, '$.movingAvailability.movingDate') AS BIGINT) AS TIMESTAMP) AS ts_moved_out,
     ts_created,
-    ts_updated
-FROM datalake_bob_clean.house_draft_aud hda 
-LEFT JOIN first_administrator_informations fai
+    ts_updated,
+    hda.year,
+    hda.month,
+    hda.day
+FROM
+  datalake_bob_clean.house_draft_aud AS hda 
+LEFT JOIN
+  first_administrator_informations AS fai
     ON fai.id_house_draft = hda.id_house_draft
+WHERE
+  hda.year = {year}
+  AND hda.month = {month}
+  AND hda.day = {day}

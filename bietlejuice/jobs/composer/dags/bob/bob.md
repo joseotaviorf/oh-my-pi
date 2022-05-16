@@ -15,22 +15,21 @@ More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-1. In datalake raw:
-    - All tables available in source's database, except for Operationals.
-    
-
-2. In datalake clean:
-- `attribution_profess`
-- `attribution_profess_aud`
+1. In datalake raw and clean, via full load:
+- `attribution_progress`
 - `house_draft`
-- `house_draft_aud`
 - `location`
 - `location_aud`
 - `registrar`
 - `registrar_aud`
-- `rev_info`
 - `submission_progress`
 - `submission_progress_aud`
+
+
+1. In datalake raw and clean, via incremental load:
+ - `attribution_progress_aud`
+ - `house_draft_aud`
+ - `rev_info`
 
 ### Responsible Data Teams
 
