@@ -1,0 +1,32 @@
+---
+database_name: dw_datamarts
+table_name: buyer_activation_events_combo
+columns:
+  id_combo_event:
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+      - datalake_amplitude_clean.events.event_properties
+  id_user:
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+  id_house:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  sk_owner:
+    lineage:
+      - datalake_ebdb_clean.house.id_user
+  sk_region:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+  event_type:
+    lineage:
+      - datalake_amplitude_clean.events.event_type
+  user_full_name:
+    lineage:
+      - dw_public.dim_user.nome
+  phone:
+    lineage:
+      - dw_public.dim_user.telefone_principal
+  ts_secretaria_client_created:
+    lineage:
+      - datalake_casa_mineira_crm_clean.contact.ts_created

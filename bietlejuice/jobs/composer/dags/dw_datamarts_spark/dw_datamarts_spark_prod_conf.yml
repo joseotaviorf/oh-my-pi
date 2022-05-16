@@ -24,3 +24,6 @@ dags:
   fintech_cross:
     cluster_name: databricks_9_1_med_general_cluster
     owner: Data Fintech
+  growth:
+    owner: Data Growth
+    cluster_name: databricks_9_1_med_general_cluster
