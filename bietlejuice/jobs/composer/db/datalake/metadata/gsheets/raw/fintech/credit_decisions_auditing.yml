@@ -1,0 +1,12 @@
+---
+database_name: datalake_gsheets_raw
+table_name: credit_decisions_auditing
+columns:
+  comment:
+    tags:
+      - PII
+      - Confidential
+  feedbacks_to_leadership:
+    tags:
+      - PII
+      - Confidential

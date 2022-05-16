@@ -277,6 +277,16 @@ supply_targets_2022:
     sheet_context: for_rent
 
 #########################
+# FINTECH SHEETS
+###################
+
+credit_decisions_auditing:
+    sheet_id: 1odUQHHsg0ArW0ljK_ZHPw1S1lku4zQklkIr_EV9yEWA
+    sheet_name: credit_decisions_auditing
+    clean_table_name: credit_decisions_auditing
+    sheet_context: fintech
+
+#########################
 # FOR SALE SHEETS
 ###################
 

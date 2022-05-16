@@ -1,0 +1,131 @@
+---
+database_name: datalake_gsheets_clean
+table_name: credit_decisions_auditing
+columns:
+  id_proposal:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing.proposal_id
+  analyst_name:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing._analyst_name
+  audit_model:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing.modelo_auditoria
+  background_positive_confirmed:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing._background_e_cofirmacao_positiva
+  comment:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing._comment
+  credit_decision:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing._decisao_de_credito
+  feedbacks_to_leadership:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing._feedback_para_o_lider
+  full_financial_capacity:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing._capacidade_financeira_full
+  guarantee:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing.guarantee
+  hashtag:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing._hashtag
+  job_type:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing.jobtype
+  model_version:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing.versao_modelo
+  other_rules:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing._outras_regras
+  range:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing.range
+  reason:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing.reason
+  reject_reason:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing._motivo_de_recusa_rejected
+  responsible_analyst_name:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing._analista_responsavel
+  result:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing.result
+  risk_category:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing.risk_category
+  supervisor_name:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing._supervisor_name
+  type:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing.type
+  income:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing._renda
+  package:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing.package
+  background_score:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing._nota_background
+  decision_score:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing._nota_decisao
+  final_score:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing.nota
+  financial_capacity_score:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing._nota_capacidade_financeira
+  other_rules_score:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing._nota_outras_regras
+  reject_reason_score:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing._nota_motivo_de_recusa
+  rigor_factor:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing.fator_de_rigor
+  semaforo_de_risco_score:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing.semaforo_de_risco_amostra
+  weight_background:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing._peso_background
+  weight_financial_capacity:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing._peso_capacidade_financeira
+  weight_decision:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing._peso_decisao
+  weight_other_rules:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing._peso_outras_regras
+  weight_refuse_reasons:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing._peso_motivo_recusa
+  dt_analyzed:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing.data_analise
+  dt_audited:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing.data_auditoria
+  ts_created:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing.time
+  month:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing.mes
+  week:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing.semana
+  day:
+    lineage:
+      - datalake_gsheets_raw.credit_decisions_auditing.dia
+ 
