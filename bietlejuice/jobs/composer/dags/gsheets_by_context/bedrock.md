@@ -20,10 +20,12 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output tables:
 
 1. Data lake raw:
+    - `agents_payments`
     - `basic_access`
     - `people_data`
 
 2. Data lake clean:
+    - `agents_payments`
     - `people_basic_access`
     - `people_employees`
 

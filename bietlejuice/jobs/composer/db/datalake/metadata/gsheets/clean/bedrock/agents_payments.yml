@@ -1,0 +1,13 @@
+---
+database_name: datalake_gsheets_clean
+table_name: agents_payments
+columns:
+  id:
+    lineage:
+      - datalake_gsheets_raw.agents_payments.id
+  cpf:
+    lineage:
+      - datalake_gsheets_raw.agents_payments.cpf
+  partner_type:
+    lineage:
+      - datalake_gsheets_raw.agents_payments.partner_type

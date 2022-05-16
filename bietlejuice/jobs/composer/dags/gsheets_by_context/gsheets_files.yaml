@@ -200,16 +200,22 @@ casa_mineira_marketing_manual_shared_costs:
 # BEDROCK SHEETS
 ###################
 
-people_data:
-    sheet_id: 1bFPTfQjfxtl97QamwKK7ofmYOz7j8_hSLjUmOawF7xg
-    sheet_name: people_data
-    clean_table_name: people_employees
+agents_payments:
+    sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
+    sheet_name: agents_payments
+    clean_table_name: agents_payments
     sheet_context: bedrock
 
 basic_access:
     sheet_id: 1bFPTfQjfxtl97QamwKK7ofmYOz7j8_hSLjUmOawF7xg
     sheet_name: basic_access
     clean_table_name: people_basic_access
+    sheet_context: bedrock
+
+people_data:
+    sheet_id: 1bFPTfQjfxtl97QamwKK7ofmYOz7j8_hSLjUmOawF7xg
+    sheet_name: people_data
+    clean_table_name: people_employees
     sheet_context: bedrock
 
 #########################

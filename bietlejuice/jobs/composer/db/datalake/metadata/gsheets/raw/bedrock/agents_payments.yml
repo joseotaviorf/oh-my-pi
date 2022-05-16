@@ -1,0 +1,8 @@
+---
+database_name: datalake_gsheets_raw
+table_name: agents_payments
+columns:
+  cpf:
+    tags:
+      - PII
+      - Confidential
