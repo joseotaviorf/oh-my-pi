@@ -43,6 +43,9 @@ columns:
   status:
     lineage:
       - datalake_ebdb_raw.contrato.status
+  contract_rent_model:
+    lineage:
+      - datalake_ebdb_raw.contrato.contractRentModel
   house_number:
     lineage:
       - datalake_ebdb_raw.contrato.numimovel

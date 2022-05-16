@@ -13,6 +13,7 @@ SELECT
     observacao AS observation,
     valorAluguel AS rent,
     status,
+    contractRentModel AS contract_rent_model,
     numImovel AS house_number,
     diaMesCobranca AS billing_day_of_month,
     garantia AS guarantee_type,
