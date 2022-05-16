@@ -16,7 +16,7 @@ JOB_NAME = "load_robin_hood_into_datalake"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-BLOCK_LIST = ["schema_migrations", "accounting_entry_balance"]
+BLOCK_LIST = ["schema_migrations"]
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)

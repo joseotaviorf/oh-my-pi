@@ -17,11 +17,12 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output tables: 
 
 1. In data lake raw: 
-    - All tables available in source's database, except for `accounting_entry_balance` and operational table `schema_migrations`.
+    - All tables available in source's database, except for operational table `schema_migrations`.
 
 2. In data lake clean:
 
     - `accounting_entry`
+    - `accounting_entry_balance` 
     - `accounting_entry_source`
     - `financial_data`
     - `payee`
