@@ -1,0 +1,8 @@
+---
+table_name: datalake_gsheets_raw.ranking_rules
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  total:
+    is_contained_in:
+      values:
+        - "1.0"
