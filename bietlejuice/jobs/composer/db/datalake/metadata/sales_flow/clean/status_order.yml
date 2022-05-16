@@ -1,0 +1,31 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: status_order
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_raw.status_order.id
+  id_closing_type:
+    lineage:
+      - datalake_sales_flow_raw.status_order.closing_type_id
+  id_status:
+    lineage:
+      - datalake_sales_flow_raw.status_order.status_id
+  ordering:
+    lineage:
+      - datalake_sales_flow_raw.status_order.ordering
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.status_order.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.status_order.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.status_order.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.status_order.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.status_order.day

@@ -4,6 +4,7 @@ SELECT
     seller_id AS id_seller,
     house_id AS id_house,
     monday_id AS id_monday,
+    closing_type_id AS id_closing_type,
     flow_step,
     flow_type,
     status_closing,

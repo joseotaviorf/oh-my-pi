@@ -1,0 +1,49 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: status_aud
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_raw.status_aud.id
+  id_label:
+    lineage:
+      - datalake_sales_flow_raw.status_aud.label_id
+  id_parent:
+    lineage:
+      - datalake_sales_flow_raw.status_aud.parent_id
+  rev:
+    lineage:
+      - datalake_sales_flow_raw.status_aud.rev
+  rev_type:
+    lineage:
+      - datalake_sales_flow_raw.status_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_sales_flow_raw.status_aud.revend
+  key:
+    lineage:
+      - datalake_sales_flow_raw.status_aud.key
+  mod_id_label:
+    lineage:
+      - datalake_sales_flow_raw.status_aud.label_id_mod
+  mod_id_parent:
+    lineage:
+      - datalake_sales_flow_raw.status_aud.parent_id_mod
+  mod_key:
+    lineage:
+      - datalake_sales_flow_raw.status_aud.key_mod
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.status_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.status_aud.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.status_aud.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.status_aud.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.status_aud.day

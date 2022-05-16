@@ -1,0 +1,31 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: microstatus_order
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_raw.microstatus_order.id
+  id_status_order:
+    lineage:
+      - datalake_sales_flow_raw.microstatus_order.status_order_id
+  id_status:
+    lineage:
+      - datalake_sales_flow_raw.microstatus_order.status_id
+  ordering:
+    lineage:
+      - datalake_sales_flow_raw.microstatus_order.ordering
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.microstatus_order.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.microstatus_order.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.microstatus_order.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.microstatus_order.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.microstatus_order.day

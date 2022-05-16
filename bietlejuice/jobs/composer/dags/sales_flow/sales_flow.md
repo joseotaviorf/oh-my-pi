@@ -25,6 +25,8 @@ This pipeline produces, in **datalake raw and clean**, tables via incremental lo
 `cash_payment_aud`
 `ccv`
 `ccv_aud`
+`closing_type`
+`closing_type_aud`
 `ccv_flow`
 `ccv_flow_aud`
 `ccv_party`
@@ -39,6 +41,8 @@ This pipeline produces, in **datalake raw and clean**, tables via incremental lo
 `dilligence_appointment_aud`
 `house`
 `house_aud`
+`microstatus_order`
+`microstatus_order_aud`
 `mortgage`
 `mortgage_aud`
 `notary`
@@ -64,6 +68,12 @@ This pipeline produces, in **datalake raw and clean**, tables via incremental lo
 `sales_flow_tag_aud`
 `specialist`
 `specialist_aud`
+`status`
+`status_aud`
+`status_order`
+`status_order_aud`
+`status_record`
+`status_record_aud`
 `tag`
 `tag_aud`
 `user_sample`

@@ -1,0 +1,31 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: closing_type
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_raw.closing_type.id
+  id_label:
+    lineage:
+      - datalake_sales_flow_raw.closing_type.label_id
+  id_parent:
+    lineage:
+      - datalake_sales_flow_raw.closing_type.parent_id
+  key:
+    lineage:
+      - datalake_sales_flow_raw.closing_type.key
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.closing_type.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.closing_type.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.closing_type.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.closing_type.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.closing_type.day

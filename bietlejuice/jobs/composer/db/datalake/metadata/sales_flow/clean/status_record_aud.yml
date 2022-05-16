@@ -1,0 +1,55 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: status_record_aud
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_raw.status_order_aud.id
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_raw.status_order_aud.sales_flow_id
+  id_status:
+    lineage:
+      - datalake_sales_flow_raw.status_order_aud.status_id
+  rev:
+    lineage:
+      - datalake_sales_flow_raw.status_order_aud.rev
+  rev_type:
+    lineage:
+      - datalake_sales_flow_raw.status_order_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_sales_flow_raw.status_order_aud.revend
+  mod_id_sales_flow:
+    lineage:
+      - datalake_sales_flow_raw.status_order_aud.sales_flow_id_mod
+  mod_id_status:
+    lineage:
+      - datalake_sales_flow_raw.status_order_aud.status_id_mod
+  mod_ts_status_start:
+    lineage:
+      - datalake_sales_flow_raw.status_order_aud.status_start_date_mod
+  mod_ts_status_end:
+    lineage:
+      - datalake_sales_flow_raw.status_order_aud.status_end_date_mod
+  ts_status_start:
+    lineage:
+      - datalake_sales_flow_raw.status_order_aud.status_start_date
+  ts_status_end:
+    lineage:
+      - datalake_sales_flow_raw.status_order_aud.status_end_date
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.status_order_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.status_order_aud.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.status_order_aud.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.status_order_aud.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.status_order_aud.day

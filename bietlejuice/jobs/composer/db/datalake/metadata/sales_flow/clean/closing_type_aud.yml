@@ -1,0 +1,49 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: closing_type_aud
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_raw.closing_type_aud.id
+  id_label:
+    lineage:
+      - datalake_sales_flow_raw.closing_type_aud.label_id
+  id_parent:
+    lineage:
+      - datalake_sales_flow_raw.closing_type_aud.parent_id
+  rev:
+    lineage:
+      - datalake_sales_flow_raw.closing_type_aud.rev
+  rev_type:
+    lineage:
+      - datalake_sales_flow_raw.closing_type_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_sales_flow_raw.closing_type_aud.revend
+  key:
+    lineage:
+      - datalake_sales_flow_raw.closing_type_aud.key
+  mod_id_label:
+    lineage:
+      - datalake_sales_flow_raw.closing_type_aud.label_id_mod
+  mod_id_parent:
+    lineage:
+      - datalake_sales_flow_raw.closing_type_aud.parent_id_mod
+  mod_key:
+    lineage:
+      - datalake_sales_flow_raw.closing_type_aud.key_mod
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.closing_type_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.closing_type_aud.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.closing_type_aud.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.closing_type_aud.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.closing_type_aud.day

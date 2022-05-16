@@ -26,6 +26,10 @@ tables:
     extraction_type: incremental
   ccv_aud:
     extraction_type: incremental
+  closing_type:
+    extraction_type: incremental
+  closing_type_aud:
+    extraction_type: incremental
   ccv_flow:
     extraction_type: incremental
   ccv_flow_aud:
@@ -53,6 +57,10 @@ tables:
   house:
     extraction_type: incremental
   house_aud:
+    extraction_type: incremental
+  microstatus_order:
+    extraction_type: incremental
+  microstatus_order_aud:
     extraction_type: incremental
   mortgage:
     extraction_type: incremental
@@ -110,6 +118,18 @@ tables:
   specialist:
     extraction_type: incremental
   specialist_aud:
+    extraction_type: incremental
+  status:
+    extraction_type: incremental
+  status_aud:
+    extraction_type: incremental
+  status_order:
+    extraction_type: incremental
+  status_order_aud:
+    extraction_type: incremental
+  status_record:
+    extraction_type: incremental
+  status_record_aud:
     extraction_type: incremental
   tag:
     extraction_type: incremental

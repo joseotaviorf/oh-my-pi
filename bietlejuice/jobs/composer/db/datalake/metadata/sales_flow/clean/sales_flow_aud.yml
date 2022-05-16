@@ -55,15 +55,9 @@ columns:
   mod_id_monday:
     lineage:
       - datalake_sales_flow_raw.sales_flow_aud.monday_id_mod
-  mod_status:
+  mod_id_closing_type:
     lineage:
-      - datalake_sales_flow_raw.sales_flow_aud.status_mod
-  mod_closing_canceled_reason:
-    lineage:
-      - datalake_sales_flow_raw.sales_flow_aud.closing_canceled_reason_mod
-  mod_is_canceled:
-    lineage:
-      - datalake_sales_flow_raw.sales_flow_aud.is_canceled_mod
+      - datalake_sales_flow_raw.sales_flow_aud.closing_type_id_mod
   mod_flow_step:
     lineage:
       - datalake_sales_flow_raw.sales_flow_aud.flow_step_mod
@@ -73,6 +67,15 @@ columns:
   mod_status_closing:
     lineage:
       - datalake_sales_flow_raw.sales_flow_aud.status_closing_mod
+  mod_status:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.status_mod
+  mod_closing_canceled_reason:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.closing_canceled_reason_mod
+  mod_is_canceled:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_aud.is_canceled_mod
   ts_created:
     lineage:
       - datalake_sales_flow_raw.sales_flow_aud.created_at

@@ -1,0 +1,34 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: status_record
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_raw.status_record.id
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_raw.status_record.sales_flow_id
+  id_status:
+    lineage:
+      - datalake_sales_flow_raw.status_record.status_id
+  ts_status_start:
+    lineage:
+      - datalake_sales_flow_raw.status_record.status_start_date
+  ts_status_end:
+    lineage:
+      - datalake_sales_flow_raw.status_record.status_end_date
+  ts_created:
+    lineage:
+      - datalake_sales_flow_raw.status_record.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_raw.status_record.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.status_record.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.status_record.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.status_record.day
