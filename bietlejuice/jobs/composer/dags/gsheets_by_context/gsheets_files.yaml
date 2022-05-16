@@ -144,6 +144,12 @@ tradecom_configuration:
     clean_table_name: affiliates_cost_tradecom_configuration
     sheet_context: growth
 
+taxonomy_affiliates:
+    sheet_id: 1e3806Tog1avS6uVO6ACUqqcqRpwcJffDZhRvgE8A3V4
+    sheet_name: taxonomy_affiliates
+    clean_table_name: taxonomy_affiliates
+    sheet_context: growth
+
 taxonomy_growth:
     sheet_id: 1kqsc1xCs4y9Q7HMBl5XiXaBPHsBYS0jA-PJi9Sgp_UY
     sheet_name: taxonomy_growth

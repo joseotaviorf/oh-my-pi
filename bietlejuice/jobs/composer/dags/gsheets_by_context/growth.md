@@ -36,6 +36,7 @@ This pipeline produces the following output tables:
     - `offline_manual_share_city_group`
     - `offline_manual_share_cost_center`
     - `tradecom_configuration`
+    - `taxonomy_affiliates`
     - `taxonomy_growth`
 2. Data lake clean:
     - `affiliate_pro_registration`
@@ -51,6 +52,7 @@ This pipeline produces the following output tables:
     - `offline_manual_costs`
     - `offline_manual_share_city_group`
     - `offline_manual_share_cost_center`
+    - `taxonomy_affiliates`
     - `taxonomy_growth`
     - `targets_casa_mineira_nbp`
 

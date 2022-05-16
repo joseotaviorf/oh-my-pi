@@ -1,3 +1,4 @@
+---
 database_name: datalake_gsheets_clean
 table_name: taxonomy_affiliates
 columns:

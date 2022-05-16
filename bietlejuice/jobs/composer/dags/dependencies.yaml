@@ -920,7 +920,7 @@ bietlejuice.dw_user_affiliate:
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_ebdb_user:load-enrich-agent-data
   - bietlejuice.enrich_region:load-enrich-region
-  - bietlejuice.gsheets:load-clean-taxonomy-affiliates
+  - bietlejuice.gsheets.growth:load-clean-taxonomy-affiliates
 
 bietlejuice.dw_user_sales_rep:
   - bietlejuice.enrich_ebdb_user:load-enrich-user-sales-rep
@@ -1690,7 +1690,7 @@ bietlejuice.enrich_terminator:
 
 bietlejuice.enrich_top_of_funnel_affiliates:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-  - bietlejuice.gsheets:load-clean-taxonomy-affiliates
+  - bietlejuice.gsheets.growth:load-clean-taxonomy-affiliates
 
 bietlejuice.enrich_top_of_funnel_demand:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean

@@ -777,11 +777,6 @@ target_support_kpis:
     sheet_name: TARGET - S&S
     clean_table_name: target_support_kpis
 
-taxonomy_affiliates:
-    sheet_id: 1e3806Tog1avS6uVO6ACUqqcqRpwcJffDZhRvgE8A3V4
-    sheet_name: taxonomy_affiliates
-    clean_table_name: taxonomy_affiliates
-
 taxonomy_crm_casa_mineira:
     sheet_id: 12_zyljMVOTLUvBSCen6QXSx23bXSd6krs8_fpxueqNU
     sheet_name: taxonomy_crm_casa_mineira
