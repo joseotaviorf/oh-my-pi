@@ -109,3 +109,38 @@ SELECT
     last_year
 FROM
     base_date
+UNION ALL
+SELECT
+    -1 AS id_date,
+    NULL AS day,
+    NULL AS day_of_year,
+    NULL AS week_day,
+    NULL AS weekday_name,
+    NULL AS calendar_week,
+    NULL AS weekend,
+    NULL AS month,
+    NULL AS month_name,
+    NULL AS quarter,
+    NULL AS brz_season,
+    NULL AS year,
+    NULL AS year_calendar_week,
+    NULL AS year_month,
+    NULL AS year_quarter,
+    1 AS working_days_in_month,
+    1 AS total_working_days_in_month,
+    NULL AS is_brz_holiday,
+    NULL AS date,
+    NULL AS brz_date,
+    NULL AS usa_date,
+    NULL AS universal_date,
+    NULL AS week_start,
+    NULL AS week_end,
+    NULL AS month_start,
+    NULL AS month_end,
+    NULL AS last_day,
+    NULL AS last_week,
+    NULL AS last_2_weeks,
+    NULL AS last_4_weeks,
+    NULL AS last_month,
+    NULL AS last_quarter,
+    NULL AS last_year
