@@ -12,4 +12,5 @@
 for_sale:
   buyer_first_visit_intent: {}
   liquidity_by_sk_region: {}
+  repressed_demand_sale: {}
   temp_autonomous_agents_listings: {}

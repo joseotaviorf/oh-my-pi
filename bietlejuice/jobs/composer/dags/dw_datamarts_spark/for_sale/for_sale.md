@@ -14,6 +14,7 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 
 - `buyer_first_visit_intent`
 - `liquidity_by_sk_region`
+- `repressed_demand_sale`
 - `temp_autonomous_agents_listings`
 
 ### Responsible Data Engineering Team
