@@ -2,6 +2,8 @@ SELECT
     ccv,
     cidade,
     deal_quali,
+    dm_central,
+    operacao,
     new_buyer_prospect,
     origin,
     offer_accepted,

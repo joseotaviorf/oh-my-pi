@@ -10,6 +10,12 @@ columns:
   deal_quali:
     lineage:
       - datalake_gsheets_raw.sale_demand_targets.deal_quali
+  dm_central:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets.dm_central
+  operacao:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_targets.operacao
   new_buyer_prospect:
     lineage:
       - datalake_gsheets_raw.sale_demand_targets.new_buyer_prospect
