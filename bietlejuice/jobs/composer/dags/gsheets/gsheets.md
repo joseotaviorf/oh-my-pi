@@ -182,7 +182,6 @@ This pipeline produces the following output tables:
     - `target_supply_and_demand_autonomous_agent`
     - `taxonomy_crm_casa_mineira`
     - `taxonomy_demand`
-    - `taxonomy_mkt_cost_new_test`
     - `taxonomy_mkt_cost`
     - `taxonomy_portal_casa_mineira`
     - `taxonomy_sla`

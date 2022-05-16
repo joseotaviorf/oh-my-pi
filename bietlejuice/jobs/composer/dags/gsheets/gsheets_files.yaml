@@ -342,11 +342,6 @@ for_sale_invoices_20220225:
     sheet_name: bd_sap
     clean_table_name: for_sale_sap_invoices
 
-full_taxonomy_new_test:
-    sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
-    sheet_name: Full_Taxonomy_New_Test
-    clean_table_name: taxonomy_mkt_cost_new_test
-
 full_taxonomy:
     sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
     sheet_name: Full_Taxonomy

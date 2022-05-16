@@ -38,6 +38,7 @@ This pipeline produces the following output tables:
     - `tradecom_configuration`
     - `taxonomy_affiliates`
     - `taxonomy_growth`
+    - `full_taxonomy_new_test`
 2. Data lake clean:
     - `affiliate_pro_registration`
     - `affiliates_national_costs_history`
@@ -54,6 +55,7 @@ This pipeline produces the following output tables:
     - `offline_manual_share_cost_center`
     - `taxonomy_affiliates`
     - `taxonomy_growth`
+    - `taxonomy_mkt_cost_new_test`
     - `targets_casa_mineira_nbp`
 
 </details>
