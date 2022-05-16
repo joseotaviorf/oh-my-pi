@@ -63,6 +63,14 @@ traffic_sources_configs:
     - imovelweb.com.br
     - vivareal.com.br
     - zapimoveis.com.br
+    - wimoveis.com.br
+    - housi.com
+    - emcasa.com
+    - casamineira.com.br
+    - olx.com.br
+    - lopes.com.br
+    - netimoveis.com
+    - chavesnamao.com.br
   platforms:
     - desktopweb
   metrics:
