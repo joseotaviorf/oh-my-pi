@@ -21,6 +21,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   c.guarantee_type AS guarantee,
   c.type,
   c.status,
+  c.rental_administrator,
   c.paying_condo AS condo_payer,
   c.responsible_for_condo AS condo_responsible,
   c.paying_iptu AS iptu_payer,

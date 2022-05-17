@@ -8,6 +8,7 @@ create table public.dim_contract (
   guarantee varchar,
   type varchar,
   status varchar,
+  rental_administrator VARCHAR,
   condo_payer varchar,
   condo_responsible varchar,
   iptu_payer varchar,
