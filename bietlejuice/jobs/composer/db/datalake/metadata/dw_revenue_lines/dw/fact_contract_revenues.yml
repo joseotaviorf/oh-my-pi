@@ -1,0 +1,43 @@
+---
+database_name: dw_revenue_lines
+table_name: fact_contract_revenues
+columns:
+  sk_contract_revenue:
+    lineage:
+      - datalake_revenue_lines.contract_revenues.sk_contract
+  sk_late_payments_rent:
+    lineage:
+      - datalake_revenue_lines.contract_revenues.sk_late_payments_rent
+  sk_late_payments_condo:
+    lineage:
+      - datalake_revenue_lines.contract_revenues.sk_late_payments_condo
+  sk_month_rental_anticipation:
+    lineage:
+      - datalake_revenue_lines.contract_revenues.sk_month_rental_anticipation
+  sk_long_term_rental_anticipation:
+    lineage:
+      - datalake_revenue_lines.contract_revenues.sk_long_term_rental_anticipation
+  sk_brokerage_finance:
+    lineage:
+      - datalake_revenue_lines.contract_revenues.sk_brokerage_finance
+  sk_reservation:
+    lineage:
+      - datalake_revenue_lines.contract_revenues.sk_reservation
+  sk_credit_card_payment:
+    lineage:
+      - datalake_revenue_lines.contract_revenues.sk_credit_card_payment
+  sk_rental_guarantee:
+    lineage:
+      - datalake_revenue_lines.contract_revenues.sk_rental_guarantee
+  sk_rental_guarantee_charge:
+    lineage:
+      - datalake_revenue_lines.contract_revenues.sk_rental_guarantee_charge
+  sk_month_start:
+    lineage:
+      - datalake_revenue_lines.contract_revenues.sk_month_start
+  due_monthly_revenue:
+    lineage:
+      - datalake_revenue_lines.contract_revenues.due_monthly_revenue
+  paid_monthly_revenue:
+    lineage:
+      - datalake_revenue_lines.contract_revenues.paid_monthly_revenue

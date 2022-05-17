@@ -1,0 +1,38 @@
+---
+database_name: datalake_revenue_lines
+table_name: contract_revenues
+columns:
+  month_start:
+    lineage:
+      - dw_public.dim_date.month_start
+  id_contract:
+    lineage:
+      - datalake_ebdb_clean.contract.id
+  id_lpf_rent:
+    lineage:
+      - dw_payment.fact_invoice_entries.sk_invoice_entry
+  id_lpf_condo:
+    lineage:
+      - dw_payment.fact_invoice_entries.sk_invoice_entry
+  id_mra:
+    lineage:
+      - datalake_fastforward_clean.anticipation.id
+  id_lra:
+    lineage:
+      - datalake_fastforward_clean.long_term_anticipation.id
+  id_bfi:
+    lineage:
+      - datalake_owner_fees_clean.contract_brokerage_fee.id
+  id_reservation:
+    lineage:
+      - dw_public.dim_reservation.sk_reservation
+  id_ccp:
+    lineage:
+      - datalake_retsuko_clean.credit_card_payment.id
+  id_guarantee:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.id
+  id_guarantee_charge:
+    lineage:
+      - datalake_rental_guarantee_clean.charge.id
+      
