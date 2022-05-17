@@ -28,6 +28,9 @@ columns:
   status:
     lineage:
       - datalake_ebdb_clean.contract.status
+  rental_administrator:
+    lineage:
+      - datalake_ebdb_clean.contract.contract_rent_model
   paying_condo:
     lineage:
       - datalake_ebdb_clean.contract.paying_condo
