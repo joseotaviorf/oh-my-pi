@@ -30,6 +30,9 @@ ivr_events AS (
     MIN(ts_created_local) AS ts_first_event
   FROM
     datalake_bigfone_twilio.call_ivr_events
+  WHERE
+    -- CX's exclusive phone number to plaquinhas contacts
+    to_number IN ('+5511933058701', '+5531933007908', '+5540202507')
   GROUP BY
     1,2,3
 ),
@@ -43,6 +46,9 @@ flex_events AS (
     MIN(ts_created_local) AS ts_first_event
   FROM
     datalake_bigfone_twilio.call_flex_events
+  WHERE
+    -- CX's exclusive phone number to plaquinhas contacts
+    to_number IN ('+5511933058701', '+5531933007908', '+5540202507')
   GROUP BY
     1,2,3,4,5
 ),
@@ -54,12 +60,6 @@ phone_users_number AS (
     ivr_events AS ie
   FULL JOIN flex_events AS fe
     ON fe.id_call = ie.id_call
-  WHERE
-    COALESCE(ie.to_number, fe.to_number) IN (
-      '+5511933058701',
-      '+5531933007908',
-      '+5540202507'
-    ) -- CX's exclusive phone number to plaquinhas contacts
 ),
 chat_users_number AS (
   SELECT
@@ -85,6 +85,8 @@ contact_cx AS (
     datalake_ebdb_user.user AS user
     JOIN phone_users_number AS pn
       ON pn.from_phone_number = user.main_phone
+  WHERE
+    user.id > 0
   UNION ALL
   SELECT
     user.id AS id_user,
@@ -94,6 +96,8 @@ contact_cx AS (
     datalake_ebdb_user.user AS user
     JOIN chat_users_number AS cn
       ON cn.customer_phone = user.main_phone
+  WHERE
+    user.id > 0
   UNION ALL
   SELECT
     INT(id_user) AS id_user,
@@ -101,33 +105,36 @@ contact_cx AS (
     data_hora AS ts_event
   FROM
     datalake_gsheets_clean.users_cx_plaquinhas
+  WHERE
+    INT(id_user) > 0
 )
 
 SELECT
-DISTINCT id_user,
-  sk_contact AS id_contact,
-  event_name,
-  origem AS origin,
-  canal AS channel,
-  agent,
-  YEAR(ts_event) AS year,
-  MONTH(ts_event) AS month,
-  DAY(ts_event) AS day,
-  ts_event
-FROM contact_secretaria AS cs
-
-UNION ALL
-
-SELECT
-  DISTINCT id_user,
+DISTINCT
+  id_user,
   NULL AS id_contact,
   'Contact' AS event_name,
   'Placas' AS origin,
   canal AS channel,
   'CX' AS agent,
+  ts_event,
   YEAR(ts_event) AS year,
   MONTH(ts_event) AS month,
-  DAY(ts_event) AS day,
-  ts_event
+  DAY(ts_event) AS day
 FROM contact_cx AS cx
-WHERE id_user > 0
+
+UNION ALL
+
+SELECT
+DISTINCT
+  id_user,
+  sk_contact AS id_contact,
+  event_name,
+  origem AS origin,
+  canal AS channel,
+  agent,
+  ts_event,
+  YEAR(ts_event) AS year,
+  MONTH(ts_event) AS month,
+  DAY(ts_event) AS day
+FROM contact_secretaria AS cs

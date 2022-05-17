@@ -1,7 +1,7 @@
 ---
 partition_cols:
+  - origin
+  - channel
   - year
   - month
   - day
-  - origin
-  - channel
