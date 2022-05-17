@@ -1,0 +1,17 @@
+---
+database_name: dw_datamarts
+table_name: house_media
+columns:
+  id_house:
+    lineage:
+      - datalake_kodak_clean.video.id_external_domain
+      - datalake_kodak_clean.photo_sphere.id_external_domain
+  description_360_photos:
+    lineage:
+      - datalake_kodak_clean.photo_sphere.metadata
+  ts_video_last_updated:
+    lineage:
+      - datalake_kodak_clean.user_revision_entity.ts_revised
+  ts_360_photos_last_updated:
+    lineage:
+      - datalake_kodak_clean.user_revision_entity.ts_revised

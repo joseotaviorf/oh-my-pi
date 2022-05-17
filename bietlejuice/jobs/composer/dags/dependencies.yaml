@@ -612,6 +612,11 @@ bietlejuice.dw_datamarts_spark.for_sale_cross:
   - bietlejuice.wololo:load-clean-conversion
   - bietlejuice.wololo:load-clean-prospect
 
+bietlejuice.dw_datamarts_spark.support_and_service:
+  - bietlejuice.kodak:load-clean-photo-sphere
+  - bietlejuice.kodak:load-clean-user-revision-entity
+  - bietlejuice.kodak:load-clean-video
+
 bietlejuice.dw_house:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
 
