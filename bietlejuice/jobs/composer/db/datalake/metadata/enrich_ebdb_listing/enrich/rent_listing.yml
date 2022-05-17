@@ -1,0 +1,34 @@
+---
+database_name: datalake_ebdb_listing
+table_name: rent_listing
+columns:
+  id_listing_business_context:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.id
+  id_listing_rent_model:
+    lineage:
+      - datalake_ebdb_clean.listing_rent_model.id
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.id_house
+  rental_administrator:
+    lineage:
+      - datalake_ebdb_clean.listing_rent_model.rental_administrator
+  status:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.status
+  status_reason:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.status_reason
+  ts_first_publication:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_first_publication
+  ts_last_publication:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_last_publication
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_updated

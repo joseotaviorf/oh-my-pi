@@ -1228,6 +1228,7 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb:create-clean-key-type-in-data-lake
   - bietlejuice.ebdb:create-clean-listing-business-context-in-data-lake
   - bietlejuice.ebdb:create-clean-listing-business-context-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-listing-rent-model-in-data-lake
   - bietlejuice.ebdb:create-clean-local-in-data-lake
   - bietlejuice.ebdb:create-clean-map-region-in-data-lake
   - bietlejuice.ebdb:create-clean-occupant-type-in-data-lake

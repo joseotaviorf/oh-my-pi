@@ -19,6 +19,7 @@ Produces the following output tables:
 - `house_status_version_order`
 - `listing_business_context`
 - `portability`
+- `rent_listing`
 
 ### Responsible Data Engineering Team
 
