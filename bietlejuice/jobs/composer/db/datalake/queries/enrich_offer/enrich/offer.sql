@@ -77,6 +77,7 @@ firestore_offers as (
   instant_offer_firestore as (
       select distinct
         id_firestore,
+        type,
         is_instant_offer,
         ts_first_sent,
         ts_last_sent
@@ -89,7 +90,7 @@ firestore_offers as (
     bo_godfather.id,
     COALESCE(bo_godfather.ts_first_sent, io_firestore.ts_first_sent) AS ts_first_sent,
     COALESCE(bo_godfather.ts_last_sent, io_firestore.ts_last_sent) AS ts_last_sent,
-    bo_godfather.type,
+    io_firestore.type,
     io_firestore.is_instant_offer
   from offer_firestore o_firestore
   LEFT join datalake_godfather_clean.offer bo_godfather
@@ -114,7 +115,7 @@ select distinct
   offer.turn,
   offer.rejection_reason,
   offer.iteration,
-  coalesce(bus_offer.type, firestore.type, offer.type) as type,
+  coalesce(firestore.type, bus_offer.type, offer.type) as type,
   offer.rent as last_offered_rent,
   negotiation.first_rent_offered_by_tenant,
   negotiation.first_rent_offered_by_owner,
