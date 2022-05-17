@@ -549,6 +549,8 @@ bietlejuice.dw_datamarts_spark.cross:
 
 bietlejuice.dw_datamarts_spark.for_rent:
   - bietlejuice.dw_lead:load-dw-public-dim-lead
+  - bietlejuice.dw_listing:load-dw-public-dim-house-listing
+  - bietlejuice.dw_listing:load-dw-public-fact-house-listing-status
   - bietlejuice.dw_listing_jobs:load-dw-public-dim-photo-job
   - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows
   - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows
