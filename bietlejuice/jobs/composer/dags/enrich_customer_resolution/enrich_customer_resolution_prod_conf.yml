@@ -1,0 +1,9 @@
+---
+inner_dependencies:
+  customer_resolution_static: ["customer_resolution"]
+tables:
+  customer_resolution:
+    is_incremental: false
+  customer_resolution_static:
+    is_incremental: true
+    partition_cols: ["year", "month", "day"]

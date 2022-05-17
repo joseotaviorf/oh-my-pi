@@ -15,6 +15,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output table on Enrich layer:
 
 - `customer_resolution` (full load)
+- `customer_resolution_static` (incremental load)
 
 ### Responsible Data Team
 ​

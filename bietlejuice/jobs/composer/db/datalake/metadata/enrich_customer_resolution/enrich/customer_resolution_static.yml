@@ -1,0 +1,22 @@
+---
+database_name: datalake_customer_resolution
+table_name: customer_resolution_static
+columns:
+  id_ticket:
+    lineage:
+      - datalake_customer_resolution.customer_resolution.id_ticket
+  id_user:
+    lineage:
+      - datalake_customer_resolution.customer_resolution.id_user
+  team:
+    lineage:
+      - datalake_customer_resolution.customer_resolution.team
+  ticket_recontact_list:
+    lineage:
+      - datalake_customer_resolution.customer_resolution.ticket_recontact_list
+  ts_started:
+    lineage:
+      - datalake_customer_resolution.customer_resolution.ts_started
+  ts_closed:
+    lineage:
+      - datalake_customer_resolution.customer_resolution.ts_closed
