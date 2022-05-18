@@ -167,12 +167,12 @@ columns:
   duplicate_tiqt:
     lineage:
       - datalake_reclameaqui_raw.tickets.duplicate_tiqt
-  resolved_issue:
-    lineage:
-      - datalake_reclameaqui_raw.tickets.resolved_issue
   would_do_business_again:
     lineage:
       - datalake_reclameaqui_raw.tickets.back_doing_business
+  is_resolved_issue:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.resolved_issue
   is_active:
     lineage:
       - datalake_reclameaqui_raw.tickets.active
