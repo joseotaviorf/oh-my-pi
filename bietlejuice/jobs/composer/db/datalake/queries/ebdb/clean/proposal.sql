@@ -35,6 +35,7 @@ SELECT
     portability_id AS id_portability,
     rejectionReason AS rejection_reason,
     isTenantAutomaticSubmission AS is_tenant_auto_submission,
-    bypassPreAnalysis AS is_pre_analyze
+    bypassPreAnalysis AS is_pre_analyze,
+    dataVigencia AS ts_entrance
 FROM
     datalake_ebdb_raw.proposta

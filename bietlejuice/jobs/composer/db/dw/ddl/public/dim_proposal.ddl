@@ -51,6 +51,7 @@ create table public.dim_proposal (
   dt_credit_analysis_last_init timestamp,
   dt_credit_analysis_last_end timestamp,
   dt_tenant_doc_complete timestamp,
+  ts_entrance timestamp,
   dt_timestamp timestamp,
   ts_load timestamp
 );

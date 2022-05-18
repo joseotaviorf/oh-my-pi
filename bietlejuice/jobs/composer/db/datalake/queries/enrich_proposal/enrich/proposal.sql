@@ -190,7 +190,8 @@ select
     aud_analysis.ts_doc_analysis_last_approved,
     aud_analysis.ts_doc_analysis_first_rejected,
     aud_analysis.ts_doc_analysis_last_rejected,
-    rg.ts_paid AS ts_guarantee_paid
+    rg.ts_paid AS ts_guarantee_paid,
+    p.ts_entrance
 from datalake_ebdb_clean.proposal p
 left join aud_analysis
     on aud_analysis.id_aud = p.id

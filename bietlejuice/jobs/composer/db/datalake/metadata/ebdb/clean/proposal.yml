@@ -112,3 +112,6 @@ columns:
   is_pre_analyze:
     lineage:
       - datalake_ebdb_raw.proposta.bypasspreanalysis
+  ts_entrance:
+    lineage:
+      - datalake_ebdb_raw.proposta.dataVigencia

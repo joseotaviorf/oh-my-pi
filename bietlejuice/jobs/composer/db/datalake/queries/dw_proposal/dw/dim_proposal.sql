@@ -93,6 +93,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   p.dt_credit_analysis_last_init,
   p.dt_credit_analysis_last_end,
   p.ts_tenant_last_doc_complete AS dt_tenant_doc_complete,
+  p.ts_entrance,
   now() AS dt_timestamp,
   now() AS ts_load
 FROM datalake_proposal.proposal p

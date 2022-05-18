@@ -9,7 +9,6 @@ from bietlejuice.jobs.composer.services import FileService
 from bietlejuice.jobs.composer.base.spark import SparkTableStorageFormat
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
-from bietlejuice.jobs.composer.base.spark import SparkDataFrameService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
@@ -50,7 +49,6 @@ if __name__ == "__main__":
     # create
     # todo: use DatabricksConsumer to read data
     df = spark_client.get_records(query)
-    df = SparkDataFrameService(df).optimize_partition(250000).output()
     format_options = SparkTableStorageFormat.DEFAULT_CLEAN
     database_location = db_info["db_clean_path"]
     # create database if not exists

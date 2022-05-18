@@ -145,3 +145,6 @@ columns:
   dt_tenant_doc_complete:
     lineage:
       - datalake_proposal.proposal.ts_tenant_last_doc_complete
+  ts_entrance:
+    lineage:
+      - datalake_proposal.proposal.ts_entrance

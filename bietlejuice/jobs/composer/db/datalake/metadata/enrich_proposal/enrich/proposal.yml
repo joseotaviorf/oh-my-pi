@@ -142,3 +142,6 @@ columns:
   ts_guarantee_paid:
     lineage:
       - datalake_rental_guarantee_clean.guarantee.ts_paid
+  ts_entrance:
+    lineage:
+      - datalake_ebdb_clean.proposal.ts_entrance
