@@ -5,7 +5,7 @@ SELECT
     r.installments AS total_installments,
     CAST(r.value/r.installments AS DECIMAL(19,2)) AS monthly_value,
     CAST(r.value AS DECIMAL(19,2)) AS total_value,
-    DATE_FORMAT(dd.month_start,'YYYYMM') AS accrual_month,
+    DATE_FORMAT(dd.month_start,'yyyyMM') AS accrual_month,
     CASE
         WHEN r.installments <= 1 
             THEN DATE(r.ts_created)

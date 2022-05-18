@@ -148,11 +148,11 @@ INNER JOIN
 LEFT JOIN
     anticipation_fee AS af
         ON af.id_contract = bf.id_external 
-        AND DATE_FORMAT(dd.month_start, 'YYYYMM') = af.accrual_year_month
+        AND DATE_FORMAT(dd.month_start, 'yyyyMM') = af.accrual_year_month
 LEFT JOIN
     anticipation_amount AS aa
         ON aa.id_contract = bf.id_external 
-        AND DATE_FORMAT(dd.month_start, 'YYYYMM') = aa.accrual_year_month
+        AND DATE_FORMAT(dd.month_start, 'yyyyMM') = aa.accrual_year_month
 LEFT JOIN
     datalake_ebdb_clean.contract c
         ON c.id = bf.id_external

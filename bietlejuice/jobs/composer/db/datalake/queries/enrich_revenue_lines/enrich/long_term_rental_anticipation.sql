@@ -57,7 +57,7 @@ SELECT
     li.interest_value AS prod_theorical_fee,
     ie.amount_brl_entry_due_amount AS invoice_theorical_amount,
     ie.amount_brl_entry_paid_amount AS invoice_paid_amount,
-    DATE_FORMAT(ADD_MONTHS(DATE_TRUNC('month', li.ts_expected_due), -1), 'YYYYMM') AS accrual_year_month,
+    DATE_FORMAT(ADD_MONTHS(DATE_TRUNC('month', li.ts_expected_due), -1), 'yyyyMM') AS accrual_year_month,
     CASE
         WHEN ie.amount_brl_entry_due_amount IS NOT NULL 
             THEN  li.interest_value 
@@ -87,4 +87,4 @@ INNER JOIN
 LEFT JOIN
     invoice_entries ie
         ON ie.id_contract = c.id_external
-        AND ie.accrual_year_month = DATE_FORMAT(ADD_MONTHS(DATE_TRUNC('month', li.ts_expected_due), -1), 'YYYYMM')
+        AND ie.accrual_year_month = DATE_FORMAT(ADD_MONTHS(DATE_TRUNC('month', li.ts_expected_due), -1), 'yyyyMM')

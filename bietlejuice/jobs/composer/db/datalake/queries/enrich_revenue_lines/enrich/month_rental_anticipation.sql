@@ -129,7 +129,7 @@ INNER JOIN
 LEFT JOIN
     anticipation_fee AS af
         ON af.id_contract = c.id_external 
-        AND DATE_FORMAT(a.dt_reference, 'YYYYMM') = af.accrual_year_month
+        AND DATE_FORMAT(a.dt_reference, 'yyyyMM') = af.accrual_year_month
 LEFT JOIN
     anticipation_amount AS aa
         ON aa.id_contract = c.id_external 
