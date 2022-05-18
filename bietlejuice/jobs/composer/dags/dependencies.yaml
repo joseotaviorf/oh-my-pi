@@ -639,6 +639,7 @@ bietlejuice.dw_contract:
   - bietlejuice.enrich_ebdb_contract:load-enrich-ongoing-contracts
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_listing:load-enrich-portability
+  - bietlejuice.enrich_ebdb_listing:load-enrich-rent-listing
 
 bietlejuice.dw_credit_analysis:
   - bietlejuice.dw_rent_flow:load-dw-public-fact-listing-rent-flows

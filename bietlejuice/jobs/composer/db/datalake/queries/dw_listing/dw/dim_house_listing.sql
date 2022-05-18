@@ -116,6 +116,7 @@ house_listings AS (
         CAST(hl.ts_listing_version_start AS DATE) AS ts_publication,
         hl.ts_last_unpublished,
         hl.rent,
+        rl.rental_administrator,
         h.rent AS house_rent,
         h.neighborhood AS house_neighborhood,
         h.zipcode AS house_zipcode,
@@ -173,11 +174,15 @@ house_listings AS (
         END AS is_for_rent,
         COALESCE(lbc.is_for_sale, FALSE) AS is_for_sale,
         h.has_instant_offer_enabled
-    FROM datalake_ebdb_listing.house h
-    JOIN datalake_ebdb_listing.house_listing hl
-        ON hl.id_house = h.id
+    FROM
+        datalake_ebdb_listing.house AS h
+    JOIN
+        datalake_ebdb_listing.house_listing AS hl
+            ON hl.id_house = h.id
     LEFT JOIN lbc
         ON lbc.id_house = h.id
+    LEFT JOIN datalake_ebdb_listing.rent_listing AS rl
+        ON rl.id_house = lbc.id_house
     LEFT JOIN
         agents_with_keys AS awk
             ON hl.id_house_listing = awk.id_house_listing
@@ -191,6 +196,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.first_key_location,
     hl.status,
     CAST(hl.rent AS DECIMAL(14, 2)) AS rent,
+    IF(is_for_rent = TRUE, COALESCE(hl.rental_administrator, 'QUINTOANDAR'), rental_administrator) AS rental_administrator,
     CAST(hl.house_rent AS DECIMAL(14, 2)) AS house_rent,
     NULLIF(hl.house_neighborhood, '') AS house_neighborhood,
     hl.house_zipcode,

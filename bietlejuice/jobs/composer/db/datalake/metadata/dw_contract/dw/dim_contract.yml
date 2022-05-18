@@ -10,6 +10,9 @@ columns:
   rent:
     lineage:
       - datalake_ebdb_contract.contract.rent
+  rental_administrator:
+    lineage:
+      - datalake_ebdb_listing.rent_listing.rental_administrator
   first_rent_charged:
     lineage:
       - datalake_ebdb_contract.contract.first_rent_charged

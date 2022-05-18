@@ -9,6 +9,7 @@ create table if not exists public.dim_house_listing
  first_key_location varchar(256),
  status varchar(256),
  rent numeric(14,2),
+ rental_administrator VARCHAR,
  house_rent numeric(14,2),
  house_neighborhood varchar(256),
  house_zipcode varchar(256),
