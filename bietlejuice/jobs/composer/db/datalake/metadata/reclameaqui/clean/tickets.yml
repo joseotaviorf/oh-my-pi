@@ -83,9 +83,6 @@ columns:
   interactions_not_readed_count:
     lineage:
       - datalake_reclameaqui_raw.tickets.interactions_not_readed_count
-  resolved_issue:
-    lineage:
-      - datalake_reclameaqui_raw.tickets.resolved_issue
   consumer_consideration:
     lineage:
       - datalake_reclameaqui_raw.tickets.consumer_consideration
@@ -170,6 +167,9 @@ columns:
   duplicate_tiqt:
     lineage:
       - datalake_reclameaqui_raw.tickets.duplicate_tiqt
+  resolved_issue:
+    lineage:
+      - datalake_reclameaqui_raw.tickets.resolved_issue
   would_do_business_again:
     lineage:
       - datalake_reclameaqui_raw.tickets.back_doing_business

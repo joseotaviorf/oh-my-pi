@@ -26,7 +26,6 @@ SELECT
   complaint_response_content,
   interactions_count,
   interactions_not_readed_count,
-  resolved_issue,
   consumer_consideration,
   company_consideration,
   private_treatment_time,
@@ -55,6 +54,7 @@ SELECT
   historical,
   interactions,
   duplicate_tiqt,
+  CAST(resolved_issue AS BOOLEAN),
   CAST(back_doing_business AS BOOLEAN) AS would_do_business_again,
   CAST(active AS BOOLEAN) AS is_active,
   CAST(filed AS BOOLEAN) AS is_filed,
@@ -77,6 +77,6 @@ SELECT
 FROM
   datalake_reclameaqui_raw.tickets
 WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+  year = {year}
+  AND month = {month}
+  AND day = {day}
