@@ -212,35 +212,35 @@ booking_in_rented_house AS (
          WHEN c.status = 'Finalizado' THEN c.dt_termination END
     AND b.business_context = 'SALE'
 ),
+agent_contract_aud AS (
+  SELECT
+    adaud.id AS id_agent,
+    adaud.rev,
+    adaud.id_work_contract,
+    CAST(FROM_UNIXTIME(ure.ts_revision/1000) AS TIMESTAMP) + (ure.ts_revision % 1000) * INTERVAL 1 MILLISECONDS AS ts_revision,
+    LAG(adaud.id_work_contract) OVER (PARTITION BY adaud.id ORDER BY adaud.rev) AS previous_id_work_contract
+  FROM
+    datalake_ebdb_clean.agent_data_aud adaud
+  LEFT JOIN
+    datalake_ebdb_clean.user_revision_entity ure
+      ON ure.id = adaud.rev
+  WHERE
+    adaud.id_work_contract IS NOT NULL
+),
+agent_contract AS (
+  SELECT
+    id_agent,
+    id_work_contract,
+    ts_revision AS ts_work_contract_start,
+    LEAD(ts_revision) OVER (PARTITION BY id_agent ORDER BY rev) AS ts_work_contract_end
+  FROM
+    agent_contract_aud
+  WHERE
+    previous_id_work_contract <> id_work_contract
+    OR previous_id_work_contract IS NULL
+),
 -- Rule to identify bookings from agents that works in HUB flow
 booking_hub_agent AS (
-  WITH agent_contract_aud AS (
-    SELECT
-          adaud.id AS id_agent,
-          adaud.rev,
-          adaud.id_work_contract,
-          CAST(FROM_UNIXTIME(ure.ts_revision/1000) AS TIMESTAMP) + (ure.ts_revision % 1000) * INTERVAL 1 MILLISECONDS AS ts_revision,
-          LAG(adaud.id_work_contract) OVER (PARTITION BY adaud.id ORDER BY adaud.rev) AS previous_id_work_contract
-        FROM
-          datalake_ebdb_clean.agent_data_aud adaud
-        LEFT JOIN
-          datalake_ebdb_clean.user_revision_entity ure
-            ON ure.id = adaud.rev
-        WHERE
-          adaud.id_work_contract IS NOT NULL
-      )
-      , agent_contract AS (
-        SELECT
-          id_agent,
-          id_work_contract,
-          ts_revision AS ts_work_contract_start,
-          LEAD(ts_revision) OVER (PARTITION BY id_agent ORDER BY rev) AS ts_work_contract_end
-        FROM
-          agent_contract_aud
-        WHERE
-          previous_id_work_contract <> id_work_contract
-          OR previous_id_work_contract IS NULL
-      )
   SELECT
     b.id,
     wc.contract_name
@@ -257,6 +257,33 @@ booking_hub_agent AS (
     wc.contract_name LIKE 'HUB%'
     -- Date that the visits in HUB flow started
     AND CAST(b.ts_created AS DATE) >= '2021-07-19'
+),
+
+booking_3p_demand_agent AS (
+  SELECT
+    b.id,
+    wc.3p_partner AS partner_3p_demand
+  FROM
+    agent_contract ac
+  JOIN
+    datalake_ebdb_clean.booking AS b
+      ON b.ts_created BETWEEN ac.ts_work_contract_start AND COALESCE(ac.ts_work_contract_end, CURRENT_TIMESTAMP)
+      AND ac.id_agent = b.id_agent
+  JOIN
+    datalake_ebdb_work_contract.work_contract AS wc
+      ON wc.id = ac.id_work_contract
+  WHERE
+    is_3p_contract
+),
+
+aux_3p_supply AS (
+  SELECT
+    id,
+    partner_3p_supply
+  FROM
+    datalake_ebdb_listing.house
+  WHERE
+    is_3p_supply
 ),
 
 secretariat_users AS (
@@ -398,6 +425,8 @@ base_booking AS (
         NULL
     ) AS user_sale_booking_creator,
     bha.contract_name AS hub_agent_region,
+    b3pa.partner_3p_demand,
+    a3ps.partner_3p_supply,
     b.ts_visit_fup,
     b.ts_created,
     b.ts_updated,
@@ -416,6 +445,8 @@ base_booking AS (
     b.is_closed,
     b.is_agent_fixed,
     IF(bha.id IS NOT NULL, TRUE, FALSE) AS is_hub_flow,
+    IF(b3pa.id IS NOT NULL, TRUE, FALSE) AS is_3p_demand,
+    IF(a3ps.id IS NOT NULL, TRUE, FALSE) AS is_3p_supply,
     IF(fud.visit_type = 'VIDEO', TRUE, FALSE) AS is_virtual_visit,
     e.is_successful AS is_entrance_successful,
     (b.status = 'Cancelado') AS is_canceled,
@@ -480,6 +511,12 @@ base_booking AS (
   LEFT JOIN
     booking_hub_agent AS bha
       ON bha.id = b.id
+  LEFT JOIN
+    booking_3p_demand_agent AS b3pa
+      ON b3pa.id = b.id
+  LEFT JOIN
+    aux_3p_supply AS a3ps
+      ON a3ps.id = b.id_house
   LEFT JOIN
     datalake_ebdb_clean.user AS ua
       ON ua.id_agent = b.id_agent

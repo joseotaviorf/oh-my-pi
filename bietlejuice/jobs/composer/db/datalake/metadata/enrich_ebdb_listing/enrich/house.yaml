@@ -1,3 +1,4 @@
+---
 database_name: datalake_ebdb_listing
 table_name: house
 columns:
@@ -200,6 +201,9 @@ columns:
     lineage:
       - datalake_ebdb_clean.house.admin_info
   internal_admin_info:
+    lineage:
+      - datalake_ebdb_clean.house.internal_admin_info
+  partner_3p_supply:
     lineage:
       - datalake_ebdb_clean.house.internal_admin_info
   photo_booking_historic:

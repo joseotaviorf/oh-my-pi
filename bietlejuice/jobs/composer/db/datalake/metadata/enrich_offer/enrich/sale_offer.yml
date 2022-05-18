@@ -1,3 +1,4 @@
+---
 database_name: datalake_offer
 table_name: sale_offer
 columns:
@@ -182,6 +183,12 @@ columns:
     lineage:
       - datalake_firestore.monday.diligence_appointment_reason
       - datalake_sale_offer_flows.sale_offer_flows.diligence_appointment_reason
+  partner_3p_supply:
+    lineage:
+      - datalake_booking.booking.partner_3p_supply
+  partner_3p_demand:
+    lineage:
+      - datalake_booking.booking.partner_3p_demand
   current_payment_method:
     lineage:
       - datalake_firestore.sale_offer.current_payment_method
@@ -300,6 +307,12 @@ columns:
     lineage:
       - datalake_firestore.monday.is_ccv_canceled
       - datalake_sale_offer_flows.sale_offer_flows.is_ccv_canceled
+  is_3p_supply:
+    lineage:
+      - datalake_booking.booking.is_3p_supply
+  is_3p_demand:
+    lineage:
+      - datalake_booking.booking.is_3p_demand
   dt_offer_accepted:
     lineage:
       - datalake_firestore.monday.dt_accepted

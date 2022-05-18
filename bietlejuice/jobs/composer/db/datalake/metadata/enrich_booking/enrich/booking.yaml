@@ -125,6 +125,12 @@ columns:
       - datalake_ebdb_clean.visit_origin.name
       - datalake_ebdb_clean.booking_status_change.reason_enum
       - datalake_ebdb_clean.appointment_change_reason_category.name
+  partner_3p_demand:
+    lineage:
+      - datalake_ebdb_work_contract.work_contract.3p_partner
+  partner_3p_supply:
+    lineage:
+      - datalake_ebdb_listing.house
   ts_visit_fup:
     lineage:
       - datalake_ebdb_clean.booking.ts_visit_fup

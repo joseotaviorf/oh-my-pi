@@ -1015,7 +1015,9 @@ bietlejuice.enrich_booking:
   - bietlejuice.ebdb:create-clean-visit-origin-in-data-lake
   - bietlejuice.ebdb:create-clean-visitor-in-data-lake
   - bietlejuice.ebdb:create-clean-user-in-data-lake
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_user:load-enrich-user
+  - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.gsheets:load-clean-secretariat-hierarchy
 

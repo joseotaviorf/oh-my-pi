@@ -102,6 +102,7 @@ select
   h.listing_type,
   h.admin_info,
   h.internal_admin_info,
+  NULLIF(REGEXP_EXTRACT(h.internal_admin_info, '(?<=\\[3P\\-)(.+?)(?=\\])'), '') AS partner_3p_supply,
   h.photo_booking_historic,
   h.ts_affiliate_lead_payment_calculated,
   h.has_service_bathroom,
@@ -145,6 +146,7 @@ select
   h.sale_price,
   h.is_for_rent,
   h.is_for_sale,
+  COALESCE(h.internal_admin_info LIKE '%[3P-%]%', FALSE) AS is_3p_supply,
   (coalesce(h.announced_by, h.id_announced_by)
     is not null) as is_imovel_v3,
   state.abbreviation as state_abbreviation,
