@@ -1,0 +1,43 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: installment
+columns:
+  id:
+    lineage:
+      - datalake_trato_feito_raw.installment.id
+  id_external:
+    lineage:
+      - datalake_trato_feito_raw.installment.external_id
+  id_negotiation:
+    lineage:
+      - datalake_trato_feito_raw.installment.negotiation_id
+  id_bill:
+    lineage:
+      - datalake_trato_feito_raw.installment.bill_id
+  status:
+    lineage:
+      - datalake_trato_feito_raw.installment.status
+  adm_fee_amount:
+    lineage:
+      - datalake_trato_feito_raw.installment.adm_fee_amount
+  installment_fee_amount:
+    lineage:
+      - datalake_trato_feito_raw.installment.installment_fee_amount
+  debts_fee_amount:
+    lineage:
+      - datalake_trato_feito_raw.installment.debts_fee_amount
+  discount_amount:
+    lineage:
+      - datalake_trato_feito_raw.installment.discount_amount
+  total_amount:
+    lineage:
+      - datalake_trato_feito_raw.installment.total_amount
+  dt_due:
+    lineage:
+      - datalake_trato_feito_raw.installment.due_date
+  ts_created:
+    lineage:
+      - datalake_trato_feito_raw.installment.created_at
+  ts_updated:
+    lineage:
+      - datalake_trato_feito_raw.installment.updated_at

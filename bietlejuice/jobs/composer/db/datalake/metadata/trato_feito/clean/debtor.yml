@@ -1,0 +1,16 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: debtor
+columns:
+  id:
+    lineage:
+      - datalake_trato_feito_raw.debtor.id
+  origin:
+    lineage:
+      - datalake_trato_feito_raw.debtor.origin
+  type:
+    lineage:
+      - datalake_trato_feito_raw.debtor.type
+  ts_created:
+    lineage:
+      - datalake_trato_feito_raw.debtor.created_at

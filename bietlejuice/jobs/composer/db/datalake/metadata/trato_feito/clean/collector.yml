@@ -1,0 +1,16 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: collector
+columns:
+  id:
+    lineage:
+      - datalake_trato_feito_raw.collector.id
+  code:
+    lineage:
+      - datalake_trato_feito_raw.collector.code
+  name:
+    lineage:
+      - datalake_trato_feito_raw.collector.name
+  ts_created:
+    lineage:
+      - datalake_trato_feito_raw.collector.created_at

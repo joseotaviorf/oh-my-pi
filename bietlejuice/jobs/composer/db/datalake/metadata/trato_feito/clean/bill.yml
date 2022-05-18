@@ -1,0 +1,31 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: bill
+columns:
+  id:
+    lineage:
+      - datalake_trato_feito_raw.bill.id
+  id_external:
+    lineage:
+      - datalake_trato_feito_raw.bill.external_id
+  id_debtor:
+    lineage:
+      - datalake_trato_feito_raw.bill.debtor_id
+  id_debtor_external:
+    lineage:
+      - datalake_trato_feito_raw.bill.debtor_external_id
+  status:
+    lineage:
+      - datalake_trato_feito_raw.bill.status
+  amount:
+    lineage:
+      - datalake_trato_feito_raw.bill.amount
+  dt_due:
+    lineage:
+      - datalake_trato_feito_raw.bill.due_date
+  ts_created:
+    lineage:
+      - datalake_trato_feito_raw.bill.created_at
+  ts_updated:
+    lineage:
+      - datalake_trato_feito_raw.bill.updated_at

@@ -1,0 +1,37 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: debt
+columns:
+  id:
+    lineage:
+      - datalake_trato_feito_raw.debt.id
+  id_external:
+    lineage:
+      - datalake_trato_feito_raw.debt.external_id
+  id_negotiation:
+    lineage:
+      - datalake_trato_feito_raw.debt.negotiation_id
+  interest_fee_amount:
+    lineage:
+      - datalake_trato_feito_raw.debt.interest_fee_amount
+  original_amount:
+    lineage:
+      - datalake_trato_feito_raw.debt.original_amount
+  fine_fee_amount:
+    lineage:
+      - datalake_trato_feito_raw.debt.fine_fee_amount
+  discount_amount:
+    lineage:
+      - datalake_trato_feito_raw.debt.discount_amount
+  dt_due:
+    lineage:
+      - datalake_trato_feito_raw.debt.due_date
+  dt_offset:
+    lineage:
+      - datalake_trato_feito_raw.debt.offset_at
+  ts_created:
+    lineage:
+      - datalake_trato_feito_raw.debt.created_at
+  ts_updated:
+    lineage:
+      - datalake_trato_feito_raw.debt.updated_at
