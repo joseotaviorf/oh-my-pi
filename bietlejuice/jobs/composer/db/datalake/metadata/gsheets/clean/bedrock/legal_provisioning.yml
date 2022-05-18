@@ -1,0 +1,61 @@
+---
+database_name: datalake_gsheets_clean
+table_name: legal_provisioning
+columns:
+  status:
+    lineage:
+      - datalake_gsheets_raw.legal_provisioning.status
+  provider:
+    lineage:
+      - datalake_gsheets_raw.legal_provisioning.prestador
+  responsible:
+    lineage:
+      - datalake_gsheets_raw.legal_provisioning.responsavel
+  cost_center:
+    lineage:
+      - datalake_gsheets_raw.legal_provisioning.centro_de_custo
+  expense_type:
+    lineage:
+      - datalake_gsheets_raw.legal_provisioning.tipo_de_despesa
+  description:
+    lineage:
+      - datalake_gsheets_raw.legal_provisioning.breve_descricao
+  invoice_number:
+    lineage:
+      - datalake_gsheets_raw.legal_provisioning.no_da_nf
+  installments_quantity:
+    lineage:
+      - datalake_gsheets_raw.legal_provisioning.qtde_de_parcelas
+  frequency:
+    lineage:
+      - datalake_gsheets_raw.legal_provisioning.frequencia
+  solicitation_number:
+    lineage:
+      - datalake_gsheets_raw.legal_provisioning.n_solicitacao
+  documentation:
+    lineage:
+      - datalake_gsheets_raw.legal_provisioning.doc
+  month_competence:
+    lineage:
+      - datalake_gsheets_raw.legal_provisioning.competencia
+  is_launch_in_legal:
+    lineage:
+      - datalake_gsheets_raw.legal_provisioning.lancado_em_legal
+  expense_value:
+    lineage:
+      - datalake_gsheets_raw.legal_provisioning.valor_da_despesa
+  invoice_total_value:
+    lineage:
+      - datalake_gsheets_raw.legal_provisioning.valor_total_da_nfs
+  balance_to_pay_value:
+    lineage:
+      - datalake_gsheets_raw.legal_provisioning.saldo_a_pagar
+  dt_launch:
+    lineage:
+      - datalake_gsheets_raw.legal_provisioning.data_lancto
+  dt_estimated_due:
+    lineage:
+      - datalake_gsheets_raw.legal_provisioning.data_estimada_vencto
+  dt_hiring:
+    lineage:
+      - datalake_gsheets_raw.legal_provisioning.data_da_contratacao

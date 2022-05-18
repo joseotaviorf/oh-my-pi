@@ -218,6 +218,12 @@ basic_access:
     clean_table_name: people_basic_access
     sheet_context: bedrock
 
+legal_provisioning:
+    sheet_id: 1qCDmrAxByngIj790UKiLz3X30rgRoxb1lr3E_00eJxI
+    sheet_name: just_data
+    clean_table_name: legal_provisioning
+    sheet_context: bedrock
+
 people_data:
     sheet_id: 1bFPTfQjfxtl97QamwKK7ofmYOz7j8_hSLjUmOawF7xg
     sheet_name: people_data
