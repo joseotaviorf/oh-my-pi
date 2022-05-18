@@ -163,10 +163,10 @@ columns:
       - datalake_gsheets_raw.dados_docato.repeticao_descontos_indevidos1
   joint_or_subsidiary_liability:
     lineage:
-      - datalake_gsheets_raw.dados_docato.responsabilidade_solidaria_ou_subsidiaria
+      - datalake_gsheets_raw.dados_docato.responsabilidade_deferido_ou_deferido
   joint_or_subsidiary_liability_second_instance:
     lineage:
-      - datalake_gsheets_raw.dados_docato.responsabilidade_solidaria_ou_subsidiaria1
+      - datalake_gsheets_raw.dados_docato.responsabilidade_deferido_ou_deferido1
   ctps_retification:
     lineage:
       - datalake_gsheets_raw.dados_docato.retificacao_ctps
@@ -203,6 +203,117 @@ columns:
   trt:
     lineage:
       - datalake_gsheets_raw.dados_docato.trt
+  employer_mandatory_training:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.treinamento_obrigatorio_pelo_empregador
+  employer_mandatory_training_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.treinamento_obrigatorio_pelo_empregador1
+  seller_broker_ranking:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.ranqueamento_de_vendedorescorretores
+  seller_broker_ranking_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.ranqueamento_de_vendedorescorretores1
+  appraisals_by_the_contractor:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.avaliacoes_pelo_contratante
+  appraisals_by_the_contractor_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.avaliacoes_pelo_contratante1
+  imposing_sales_targets:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.imposicao_de_metas_de_vendas
+  imposing_sales_targets_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.imposicao_de_metas_de_vendas1
+  freedom_to_negotiate_commissions:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.liberdade_para_negociar_comissoes
+  freedom_to_negotiate_commissions_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.liberdade_para_negociar_comissoes1
+  company_management_over_the_complainant:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.ha_gerenciasupervisao_da_empresa_sobre_o_reclamante
+  company_management_over_the_complainant_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.ha_gerenciasupervisao_da_empresa_sobre_o_reclamante1
+  penalties_for_fouls:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.ha_penalidades_por_faltas_perda_comissao
+  penalties_for_fouls_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.ha_penalidades_por_faltas_perda_comissao1
+  wearing_uniform_badge:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.uso_de_uniformecracha
+  wearing_uniform_badge_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.uso_de_uniformecracha1
+  schedule_freedom:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.liberdade_de_agenda
+  schedule_freedom_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.liberdade_de_agenda1
+  obligation_to_attend_the_sales_booth:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.obrigacao_de_comparecimento_em_estande_de_vendas
+  obligation_to_attend_the_sales_booth_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.obrigacao_de_comparecimento_em_estande_de_vendas1
+  commission_paid_in_case_of_buyer_default:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.comissao_paga_em_caso_de_inadimplencia_do_comprador
+  commission_paid_in_case_of_buyer_default_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.comissao_paga_em_caso_de_inadimplencia_do_comprador1
+  creci_after_the_service_provision:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.creci_depois_do_contrato_de_prestacao_de_servico
+  creci_after_the_service_provision_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.creci_depois_do_contrato_de_prestacao_de_servico1
+  charge_for_sales_reports:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.ha_cobranca_de_relatorios_de_vendas
+  charge_for_sales_reports_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.ha_cobranca_de_relatorios_de_vendas1
+  service_provision_contract_in_the_union:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.registro_do_contrato_de_prestacao_de_servico_no_sindicato
+  service_provision_contract_in_the_union_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.registro_do_contrato_de_prestacao_de_servico_no_sindicato1
+  selection_process_for_seller_broker:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.ha_processo_seletivo_de_vendedorescorretores
+  selection_process_for_seller_broker_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.ha_processo_seletivo_de_vendedorescorretores1
+  employment_termination_rules_application_in_the_contract:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.ha_aplicacao_de_regras_de_rescisao_trabalhista_no_contrato
+  employment_termination_rules_application_in_the_contract_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.ha_aplicacao_de_regras_de_rescisao_trabalhista_no_contrato1
+  minimum_monthly_guarantee_value:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.garantia_de_valor_minimo_mensal
+  minimum_monthly_guarantee_value_second_instance:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.garantia_de_valor_minimo_mensal1
+  defendant_segment:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.segmentos_reclamada
+  dt_admission:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.admissao
+  dt_resignation:
+    lineage:
+      - datalake_gsheets_raw.dados_docato.demissao
   dt_distribuition:
     lineage:
       - datalake_gsheets_raw.dados_docato.distribuicao
