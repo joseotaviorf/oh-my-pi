@@ -3,6 +3,7 @@ SELECT
     c.id AS id_city,
     mr.id AS id_macro_region,
     CAST(st.id_country AS INTEGER) AS id_country,
+    ct.code AS country_code,
     r.level,
     COALESCE(r.name, ar.neighbourhood) AS name,
     mr.name AS macro_region_name,
@@ -41,6 +42,9 @@ LEFT JOIN
 LEFT JOIN
   datalake_ebdb_clean.state AS st
     ON st.id = COALESCE(r.id_state, mr.id_state, c.id_state)
+JOIN
+  datalake_ebdb_clean.country AS ct
+    ON st.id_country = ct.id
 LEFT JOIN
   datalake_gsheets_clean.auxiliary_region AS ar
     ON r.id = ar.id

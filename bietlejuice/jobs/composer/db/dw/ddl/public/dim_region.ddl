@@ -5,6 +5,7 @@ create table if not exists public.dim_region (
   id_country integer,
   macro_id integer,
   city_id integer,
+  country_code VARCHAR,
   level varchar,
   name varchar,
   macro_name varchar,

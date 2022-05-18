@@ -24,6 +24,7 @@ SELECT
     r.id_country,
     CAST(r.id_macro_region AS INT) AS macro_id,
     CAST(r.id_city AS INT) AS city_id,
+    r.country_code,
     r.level,
     r.name,
     r.macro_region_name AS macro_name,

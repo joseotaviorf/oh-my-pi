@@ -16,6 +16,9 @@ columns:
   city_id:
     lineage:
       - datalake_region.region.id_city
+  country_code:
+    lineage:
+      - datalake_region.region.country_code
   level:
     lineage:
       - datalake_region.region.level

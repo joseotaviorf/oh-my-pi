@@ -1568,6 +1568,7 @@ bietlejuice.enrich_quinto_messenger:
   - bietlejuice.quinto_messenger:load-clean-task-event
 
 bietlejuice.enrich_region:
+  - bietlejuice.ebdb:create-clean-country-in-data-lake
   - bietlejuice.ebdb:create-clean-region-in-data-lake
   - bietlejuice.ebdb:create-clean-state-in-data-lake
   - bietlejuice.gsheets.for_rent:load-clean-auxiliary-region
