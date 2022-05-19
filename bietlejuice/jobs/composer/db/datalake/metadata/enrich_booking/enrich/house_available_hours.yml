@@ -1,0 +1,74 @@
+---
+database_name: datalake_booking
+table_name: house_available_hours
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.house.id
+      - datalake_ebdb_clean.house_weekly_schedule.id_house
+      - datalake_ebdb_clean.house_weekly_schedule_aud.id_house
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.id_user    
+  day_of_week:
+    lineage:
+      - datalake_ebdb_clean.house_weekly_schedule.weekday
+      - datalake_ebdb_clean.house_weekly_schedule_aud.weekday
+  hours_available_08to09:
+    lineage:
+      - datalake_ebdb_clean.house_weekly_schedule.is_available_between_08_and_09
+      - datalake_ebdb_clean.house_weekly_schedule_aud.is_available_between_08_and_09
+  hours_available_09to10:
+    lineage:
+      - datalake_ebdb_clean.house_weekly_schedule.is_available_between_09_and_10
+      - datalake_ebdb_clean.house_weekly_schedule_aud.is_available_between_09_and_10
+  hours_available_10to11:
+    lineage:
+      - datalake_ebdb_clean.house_weekly_schedule.is_available_between_10_and_11
+      - datalake_ebdb_clean.house_weekly_schedule_aud.is_available_between_10_and_11
+  hours_available_11to12:
+    lineage:
+      - datalake_ebdb_clean.house_weekly_schedule.is_available_between_11_and_12
+      - datalake_ebdb_clean.house_weekly_schedule_aud.is_available_between_11_and_12
+  hours_available_12to13:
+    lineage:
+      - datalake_ebdb_clean.house_weekly_schedule.is_available_between_12_and_13
+      - datalake_ebdb_clean.house_weekly_schedule_aud.is_available_between_12_and_13
+  hours_available_13to14:
+    lineage:
+      - datalake_ebdb_clean.house_weekly_schedule.is_available_between_13_and_14
+      - datalake_ebdb_clean.house_weekly_schedule_aud.is_available_between_13_and_14
+  hours_available_14to15:
+    lineage:
+      - datalake_ebdb_clean.house_weekly_schedule.is_available_between_14_and_15
+      - datalake_ebdb_clean.house_weekly_schedule_aud.is_available_between_14_and_15
+  hours_available_15to16:
+    lineage:
+      - datalake_ebdb_clean.house_weekly_schedule.is_available_between_15_and_16
+      - datalake_ebdb_clean.house_weekly_schedule_aud.is_available_between_15_and_16
+  hours_available_16to17:
+    lineage:
+      - datalake_ebdb_clean.house_weekly_schedule.is_available_between_16_and_17
+      - datalake_ebdb_clean.house_weekly_schedule_aud.is_available_between_16_and_17
+  hours_available_17to18:
+    lineage:
+      - datalake_ebdb_clean.house_weekly_schedule.is_available_between_17_and_18
+      - datalake_ebdb_clean.house_weekly_schedule_aud.is_available_between_17_and_18
+  hours_available_18to19:
+    lineage:
+      - datalake_ebdb_clean.house_weekly_schedule.is_available_between_18_and_19
+      - datalake_ebdb_clean.house_weekly_schedule_aud.is_available_between_18_and_19
+  hours_available_19to20:
+    lineage:
+      - datalake_ebdb_clean.house_weekly_schedule.is_available_between_19_and_20
+      - datalake_ebdb_clean.house_weekly_schedule_aud.is_available_between_19_and_20
+  dt_available_started:
+    lineage:
+      - datalake_ebdb_clean.house.dt_creation
+      - datalake_ebdb_clean.house_weekly_schedule.ts_created
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+  dt_available_ended:
+    lineage:
+      - datalake_ebdb_clean.house.dt_creation
+      - datalake_ebdb_clean.house_weekly_schedule.ts_created
+      - datalake_ebdb_clean.user_revision_entity.ts_revision

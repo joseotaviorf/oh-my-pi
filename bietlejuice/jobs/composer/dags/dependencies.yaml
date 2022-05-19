@@ -1004,18 +1004,21 @@ bietlejuice.enrich_bob:
   - bietlejuice.bob:load-clean-house-draft
 
 bietlejuice.enrich_booking:
+  - bietlejuice.ebdb:create-clean-appointment-change-reason-category-in-data-lake
   - bietlejuice.ebdb:create-clean-agent-data-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-booking-in-data-lake
   - bietlejuice.ebdb:create-clean-booking-aud-in-data-lake
-  - bietlejuice.ebdb:create-clean-follow-up-details-in-data-lake
-  - bietlejuice.ebdb:create-clean-entrance-in-data-lake
   - bietlejuice.ebdb:create-clean-booking-status-change-in-data-lake
-  - bietlejuice.ebdb:create-clean-appointment-change-reason-category-in-data-lake
+  - bietlejuice.ebdb:create-clean-entrance-in-data-lake
+  - bietlejuice.ebdb:create-clean-follow-up-details-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-weekly-schedule-aud-in-data-lake
+  - bietlejuice.ebdb:create-clean-house-weekly-schedule-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
   - bietlejuice.ebdb:create-clean-visit-in-data-lake
   - bietlejuice.ebdb:create-clean-visit-origin-in-data-lake
   - bietlejuice.ebdb:create-clean-visitor-in-data-lake
-  - bietlejuice.ebdb:create-clean-user-in-data-lake
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract

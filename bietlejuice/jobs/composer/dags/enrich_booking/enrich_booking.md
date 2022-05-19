@@ -17,6 +17,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 Produces the following output table, via full load:
 
 - `booking`
+- `house_available_hours`
 
 ### Responsible Data Teams
 
