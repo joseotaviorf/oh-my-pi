@@ -160,7 +160,7 @@ last_classified_email_lead AS (
     WHERE
         rw_email_desc = 1
 ),
-aux_all_leads AS (
+aux_all_leads_classified AS (
     SELECT
         uc.id_user,
         uc.id_secretariat_client,
@@ -179,7 +179,7 @@ aux_all_leads AS (
         first_classified_email_lead AS fcel
             ON fcel.email = uc.email
 ),
-all_leads AS (
+all_leads_classified AS (
     SELECT
         a.*,
         CASE 
@@ -192,7 +192,7 @@ all_leads AS (
             NULLIF(id_first_classified_lead||'_lc', '_lc')
         ) AS id_lead
     FROM
-        aux_all_leads AS a
+        aux_all_leads_classified AS a
     LEFT JOIN
         last_classified_phone_lead AS lcpl
             ON a.phone_number = lcpl.phone_number
@@ -200,12 +200,112 @@ all_leads AS (
         last_classified_email_lead AS lcel
             ON a.email = lcel.email
 ),
+hub_leads_numbered_by_contact AS (
+    SELECT
+        id_visitor,
+        phone_number,
+        email,
+        ROW_NUMBER() OVER (PARTITION BY phone_number ORDER BY ts_first_visit_lead_intent) AS rw_phone_asc,
+        ROW_NUMBER() OVER (PARTITION BY phone_number ORDER BY ts_last_visit_lead_intent) AS rw_phone_desc,
+        ROW_NUMBER() OVER (PARTITION BY email ORDER BY ts_first_visit_lead_intent) AS rw_email_asc,
+        ROW_NUMBER() OVER (PARTITION BY email ORDER BY ts_last_visit_lead_intent) AS rw_email_desc,
+        ts_first_visit_lead_intent,
+        ts_last_visit_lead_intent
+    FROM
+        datalake_sale_lead_flows.hub_services_lead_flow
+),
+first_hub_phone_lead AS (
+    SELECT
+        id_visitor,
+        phone_number,
+        ts_first_visit_lead_intent
+    FROM
+        hub_leads_numbered_by_contact
+    WHERE
+        rw_phone_asc = 1
+),
+last_hub_phone_lead AS (
+    SELECT
+        id_visitor,
+        phone_number,
+        ts_last_visit_lead_intent
+    FROM
+        hub_leads_numbered_by_contact
+    WHERE
+        rw_phone_desc = 1
+),
+first_hub_email_lead AS (
+    SELECT
+        id_visitor,
+        email,
+        ts_first_visit_lead_intent
+    FROM
+        hub_leads_numbered_by_contact
+    WHERE
+        rw_phone_asc = 1
+),
+last_hub_email_lead AS (
+    SELECT
+        id_visitor,
+        email,
+        ts_last_visit_lead_intent
+    FROM
+        hub_leads_numbered_by_contact
+    WHERE
+        rw_phone_desc = 1
+),
+aux_all_leads AS (
+    SELECT
+        alc.id_user,
+        alc.id_lead AS id_aux_lead,
+        alc.id_secretariat_client,
+        CASE 
+            WHEN LEAST(fhel.ts_first_visit_lead_intent, fhpl.ts_first_visit_lead_intent) = fhel.ts_first_visit_lead_intent
+                THEN fhel.id_visitor
+            ELSE fhpl.id_visitor 
+        END AS id_first_hub_lead,
+        alc.id_first_classified_lead,
+        alc.id_last_classified_lead,
+        COALESCE(fhel.email, alc.email) AS email,
+        COALESCE(fhpl.phone_number, alc.phone_number) AS phone_number
+    FROM 
+        all_leads_classified AS alc
+    FULL OUTER JOIN
+        first_hub_phone_lead AS fhpl
+            ON fhpl.phone_number = alc.phone_number
+    FULL OUTER JOIN
+        first_hub_email_lead AS fhel
+            ON fhel.email = alc.email
+),
+all_leads AS (
+    SELECT
+        a.*,
+        CASE 
+            WHEN GREATEST(lhel.ts_last_visit_lead_intent, lhpl.ts_last_visit_lead_intent) = lhel.ts_last_visit_lead_intent
+                THEN lhel.id_visitor 
+            ELSE lhpl.id_visitor 
+        END AS id_last_hub_lead,
+        COALESCE(
+            a.id_aux_lead,
+            NULLIF(id_first_hub_lead||'_hb', '_hb')
+        ) AS id_lead
+    FROM
+        aux_all_leads AS a
+    LEFT JOIN
+        last_hub_phone_lead AS lhpl
+            ON a.phone_number = lhpl.phone_number
+    LEFT JOIN
+        last_hub_email_lead AS lhel
+            ON a.email = lhel.email
+),
 unique_leads AS (
     SELECT DISTINCT
         u.id_user,
         u.id_secretariat_client,
         u.id_first_classified_lead,
         U.id_last_classified_lead,
+        u.id_first_hub_lead,
+        u.id_last_hub_lead,
         u.id_lead
     FROM 
         all_leads AS u
@@ -279,22 +379,44 @@ last_classified_leads AS (
         datalake_sale_lead_flows.classified_lead_flow AS c
             ON c.id_classified_lead = uu.id_last_classified_lead
 ),
+first_hub_leads AS (
+    SELECT 
+        uu.id_lead,
+        h.*,
+        ROW_NUMBER() OVER (PARTITION BY uu.id_lead ORDER BY h.ts_first_visit_lead_intent) AS rw_asc
+    FROM
+        unique_leads AS uu
+    JOIN
+        datalake_sale_lead_flows.hub_services_lead_flow AS h
+        ON h.id_visitor = uu.id_first_hub_lead
+),
+last_hub_leads AS (
+    SELECT
+        uu.id_lead,
+        h.*,
+        ROW_NUMBER() OVER (PARTITION BY uu.id_lead ORDER BY h.ts_last_visit_lead_intent DESC) AS rw_desc
+    FROM
+        unique_leads AS uu
+    JOIN
+        datalake_sale_lead_flows.hub_services_lead_flow AS h
+            ON h.id_visitor = uu.id_last_hub_lead
+),
 final_base AS (
     SELECT 
         uu.id_lead,
         uu.id_user,
         COALESCE(fcm_cp.id_secretariat_client, fcm_bk.id_secretariat_client) AS id_secretariat_client,
         fcl.id_classified_lead,
-        hb.id_visitor AS id_visitor_hub_service,
+        fhb.id_visitor AS id_visitor_hub_service,
         fcl.id_region AS id_region_classified,
-        CASE LEAST(fcm_cp.ts_first_contact_prospect, hb.ts_first_contact_prospect)
-            WHEN fcm_cp.ts_first_contact_prospect THEN COALESCE(fcm_cp.id_first_region_contact_prospect, hb.id_first_contact_prospect_region)
-            ELSE COALESCE(hb.id_first_contact_prospect_region, fcm_cp.id_first_region_contact_prospect)
+        CASE LEAST(fcm_cp.ts_first_contact_prospect, fhb.ts_first_contact_prospect)
+            WHEN fcm_cp.ts_first_contact_prospect THEN COALESCE(fcm_cp.id_first_region_contact_prospect, fhb.id_first_contact_prospect_region)
+            ELSE COALESCE(fhb.id_first_contact_prospect_region, fcm_cp.id_first_region_contact_prospect)
         END AS id_region_contact_prospect,
         fcm_bk.id_first_region_booking AS id_region_booking_cm,
         qa.id_region_first_visit_intent AS id_region_visit_intent,
         qa.id_region_first_booking AS id_region_booking_5a,
-        CASE LEAST(fcl.ts_intent, fcm_cp.ts_first_contact_prospect, qa.ts_first_visit_scheduling_event, qa.ts_first_booking_created, qa.ts_first_offer_submitted, fcm_o.ts_first_offer_submitted, hb.ts_first_visit_lead_intent)
+        CASE LEAST(fcl.ts_intent, fcm_cp.ts_first_contact_prospect, qa.ts_first_visit_scheduling_event, qa.ts_first_booking_created, qa.ts_first_offer_submitted, fcm_o.ts_first_offer_submitted, fhb.ts_first_visit_lead_intent)
             WHEN fcl.ts_intent THEN fcl.id_region
             WHEN fcm_cp.ts_first_contact_prospect
                 THEN COALESCE(fcm_cp.id_first_region_contact_prospect,fcm_bk.id_first_region_booking, qa.id_region_first_visit_intent, qa.id_region_first_booking, fcl.id_region)
@@ -302,59 +424,59 @@ final_base AS (
             WHEN qa.ts_first_booking_created THEN qa.id_region_first_booking
             WHEN qa.ts_first_offer_submitted THEN qa.id_region_first_offer
             WHEN fcm_o.ts_first_offer_submitted THEN fcm_o.id_first_region_offer
-            WHEN hb.ts_first_visit_lead_intent THEN hb.id_first_region
+            WHEN fhb.ts_first_visit_lead_intent THEN fhb.id_first_region
         END AS id_first_region,
-        CASE LEAST(fcl.ts_intent, fcm_cp.ts_first_contact_prospect, qa.ts_first_visit_scheduling_event, qa.ts_first_booking_created, qa.ts_first_offer_submitted, fcm_o.ts_first_offer_submitted, hb.ts_first_visit_lead_intent)
+        CASE LEAST(fcl.ts_intent, fcm_cp.ts_first_contact_prospect, qa.ts_first_visit_scheduling_event, qa.ts_first_booking_created, qa.ts_first_offer_submitted, fcm_o.ts_first_offer_submitted, fhb.ts_first_visit_lead_intent)
             WHEN fcl.ts_intent THEN fcl.id_house
             WHEN fcm_cp.ts_first_contact_prospect
                 THEN COALESCE(fcm_cp.id_first_house_5a_secretariat_contact, fcm_bk.id_first_house_5a_booking, qa.id_house_first_visit_intent, qa.id_house_first_booking, fcl.id_house)
             WHEN qa.ts_first_visit_scheduling_event THEN qa.id_house_first_visit_intent
             WHEN qa.ts_first_booking_created THEN qa.id_house_first_booking
             WHEN qa.ts_first_offer_submitted THEN qa.id_house_first_offer
-            WHEN hb.ts_first_visit_lead_intent THEN hb.id_first_house
+            WHEN fhb.ts_first_visit_lead_intent THEN fhb.id_first_house
         END AS id_first_house,
         qa.id_house_first_sale_agreement AS id_first_house_sale_agreement,
-        CASE LEAST(fcl.ts_intent, fcm_cp.ts_first_contact_prospect, hb.ts_first_contact_prospect, qa.ts_first_visit_scheduling_event, qa.ts_first_booking_created, LEAST(qa.ts_first_offer_submitted,fcm_o.ts_first_offer_submitted))
+        CASE LEAST(fcl.ts_intent, fcm_cp.ts_first_contact_prospect, fhb.ts_first_contact_prospect, qa.ts_first_visit_scheduling_event, qa.ts_first_booking_created, LEAST(qa.ts_first_offer_submitted,fcm_o.ts_first_offer_submitted))
             WHEN fcl.ts_intent THEN 'Classified'
-            WHEN LEAST(fcm_cp.ts_first_contact_prospect, hb.ts_first_contact_prospect) THEN 'Secretariat'
+            WHEN LEAST(fcm_cp.ts_first_contact_prospect, fhb.ts_first_contact_prospect) THEN 'Secretariat'
             WHEN qa.ts_first_visit_scheduling_event THEN 'Visit_scheduling_event'
             WHEN qa.ts_first_booking_created THEN 'Booking'
             WHEN LEAST(qa.ts_first_offer_submitted, fcm_o.ts_first_offer_submitted) THEN 'Offer_submitted'
         END AS first_touch,
         fcl.origin_partner AS first_classified_partner,
-        CASE LEAST(qa.ts_first_visit_scheduling_event, fcm_cp.ts_first_contact_prospect, hb.ts_first_visit_lead_intent)
+        CASE LEAST(qa.ts_first_visit_scheduling_event, fcm_cp.ts_first_contact_prospect, fhb.ts_first_visit_lead_intent)
             WHEN qa.ts_first_visit_scheduling_event THEN qa.first_business_unit_region_intent_lead
             WHEN fcm_cp.ts_first_contact_prospect THEN fcm_cp.first_business_unit_region_intent_lead
-            WHEN hb.ts_first_visit_lead_intent THEN hb.first_business_unit_hub_name
+            WHEN fhb.ts_first_visit_lead_intent THEN fhb.first_business_unit_hub_name
         END AS first_business_unit_region_intent_lead,
-        CASE GREATEST(qa.ts_last_visit_scheduling_event, lcm_cp.ts_last_contact_prospect, hb.ts_last_visit_lead_intent)
+        CASE GREATEST(qa.ts_last_visit_scheduling_event, lcm_cp.ts_last_contact_prospect, lhb.ts_last_visit_lead_intent)
             WHEN qa.ts_last_visit_scheduling_event THEN qa.last_business_unit_region_intent_lead
             WHEN lcm_cp.ts_last_contact_prospect THEN lcm_cp.last_business_unit_region_intent_lead
-            WHEN hb.ts_last_visit_lead_intent THEN hb.last_business_unit_hub_name
+            WHEN lhb.ts_last_visit_lead_intent THEN lhb.last_business_unit_hub_name
         END AS last_business_unit_region_intent_lead,
         CASE 
             WHEN LEAST(qa.ts_first_booking_created, fcm_bk.ts_first_booking_created) = qa.ts_first_booking_created 
                 THEN qa.first_business_unit_region_new_buyer_prospect
             ELSE fcm_bk.first_business_unit_region_new_buyer_prospect
         END AS first_business_unit_region_new_buyer_prospect,
-        CASE LEAST(hb.ts_first_contact_prospect, fcm_cp.ts_first_contact_prospect)
-            WHEN hb.ts_first_contact_prospect THEN hb.first_contact_prospect_city_name
+        CASE LEAST(fhb.ts_first_contact_prospect, fcm_cp.ts_first_contact_prospect)
+            WHEN fhb.ts_first_contact_prospect THEN fhb.first_contact_prospect_city_name
             ELSE fcm_cp.first_city_contact_prospect
         END AS first_city_contact_prospect,
-        COALESCE(CASE LEAST(hb.ts_first_contact_prospect, fcm_cp.ts_first_contact_prospect)
-            WHEN hb.ts_first_contact_prospect THEN hb.first_contact_prospect_origin
+        COALESCE(CASE LEAST(fhb.ts_first_contact_prospect, fcm_cp.ts_first_contact_prospect)
+            WHEN fhb.ts_first_contact_prospect THEN fhb.first_contact_prospect_origin
             ELSE fcm_cp.first_secretariat_contact_origin
         END, 'NOT_SENT_SV') AS first_contact_prospect_origin,
-        COALESCE(CASE GREATEST(hb.ts_last_contact_prospect, lcm_cp.ts_last_contact_prospect)
-            WHEN hb.ts_last_contact_prospect THEN hb.last_contact_prospect_origin
+        COALESCE(CASE GREATEST(lhb.ts_last_contact_prospect, lcm_cp.ts_last_contact_prospect)
+            WHEN lhb.ts_last_contact_prospect THEN lhb.last_contact_prospect_origin
             ELSE lcm_cp.last_secretariat_contact_origin
         END, 'NOT_SENT_SV') AS last_contact_prospect_origin,
-        CASE LEAST(hb.ts_first_contact_prospect, fcm_cp.ts_first_contact_prospect)
-            WHEN hb.ts_first_contact_prospect THEN hb.first_contact_prospect_midia
+        CASE LEAST(fhb.ts_first_contact_prospect, fcm_cp.ts_first_contact_prospect)
+            WHEN fhb.ts_first_contact_prospect THEN fhb.first_contact_prospect_midia
             ELSE fcm_cp.first_secretariat_contact_media
         END AS first_contact_prospect_media,
-        CASE GREATEST(hb.ts_last_contact_prospect, lcm_cp.ts_last_contact_prospect)
-            WHEN hb.ts_last_contact_prospect THEN hb.last_contact_prospect_midia
+        CASE GREATEST(lhb.ts_last_contact_prospect, lcm_cp.ts_last_contact_prospect)
+            WHEN lhb.ts_last_contact_prospect THEN lhb.last_contact_prospect_midia
             ELSE lcm_cp.last_secretariat_contact_media
         END AS last_contact_prospect_media,
         fcm_bk.first_city_booking AS first_city_booking_cm,
@@ -402,13 +524,13 @@ final_base AS (
             ELSE
                 'not_mapped'
         END AS further_funnel_step,          
-        GREATEST(uu.casa_mineira_has_secretariat_contact_created, hb.has_secretariat_contact_created) AS has_secretariat_contact_created,
+        GREATEST(uu.casa_mineira_has_secretariat_contact_created, fhb.has_secretariat_contact_created) AS has_secretariat_contact_created,
         CASE
-            WHEN COALESCE(fcm_cp.ts_first_contact_prospect, hb.ts_first_contact_prospect) IS NOT NULL 
+            WHEN COALESCE(fcm_cp.ts_first_contact_prospect, fhb.ts_first_contact_prospect) IS NOT NULL 
             AND UNIX_TIMESTAMP(DATE_TRUNC('Minute', qa.ts_first_booking_created)) < 
-            UNIX_TIMESTAMP(DATE_TRUNC('Minute', LEAST(fcm_cp.ts_first_contact_prospect, hb.ts_first_contact_prospect))) + 4 * 60
+            UNIX_TIMESTAMP(DATE_TRUNC('Minute', LEAST(fcm_cp.ts_first_contact_prospect, fhb.ts_first_contact_prospect))) + 4 * 60
                 THEN TRUE
-            WHEN COALESCE(fcm_cp.ts_first_contact_prospect, hb.ts_first_contact_prospect) IS NOT NULL
+            WHEN COALESCE(fcm_cp.ts_first_contact_prospect, fhb.ts_first_contact_prospect) IS NOT NULL
                 THEN FALSE
         END AS has_booking_before_secretariat_contact,
         COALESCE(GREATEST(qa.has_first_booking, uu.casa_mineira_has_first_booking), FALSE) AS has_first_booking,
@@ -422,8 +544,8 @@ final_base AS (
         (COALESCE(qa.total_visits_completed, 0) + COALESCE(uu.casa_mineira_total_visits_completed, 0)) AS total_visits_completed,
         (COALESCE(qa.total_offer_submitted, 0) + COALESCE(uu.casa_mineira_total_offers_submitted, 0)) AS total_offer_submitted,
         (COALESCE(qa.total_sale_agreement_signed, 0) + COALESCE(uu.casa_mineira_total_sale_agreements_signed, 0)) AS total_sale_agreement_signed,
-        hb.ts_first_talk_to_secretariat,
-        hb.ts_last_talk_to_secretariat,
+        fhb.ts_first_talk_to_secretariat,
+        lhb.ts_last_talk_to_secretariat,
         LEAST(
             fcl.ts_intent,
             fcm_cp.ts_first_contact_prospect,
@@ -431,7 +553,7 @@ final_base AS (
             qa.ts_first_booking_created,
             qa.ts_first_offer_submitted,
             fcm_o.ts_first_offer_submitted,
-            hb.ts_first_visit_lead_intent,
+            fhb.ts_first_visit_lead_intent,
             qa.ts_first_tta_message_sent
         ) AS ts_first_visit_lead_intent,
         GREATEST(
@@ -441,11 +563,11 @@ final_base AS (
             qa.ts_last_booking_created,
             qa.ts_last_offer_submitted,
             lcm_o.ts_last_offer_submitted,
-            hb.ts_last_visit_lead_intent,
+            lhb.ts_last_visit_lead_intent,
             qa.ts_last_tta_message_sent
         ) AS ts_last_visit_lead_intent,
-        LEAST(fcm_cp.ts_first_contact_prospect, hb.ts_first_contact_prospect) AS ts_first_contact_prospect,
-        GREATEST(lcm_cp.ts_last_contact_prospect, hb.ts_last_contact_prospect) AS ts_last_contact_prospect,
+        LEAST(fcm_cp.ts_first_contact_prospect, fhb.ts_first_contact_prospect) AS ts_first_contact_prospect,
+        GREATEST(lcm_cp.ts_last_contact_prospect, lhb.ts_last_contact_prospect) AS ts_last_contact_prospect,
         fcl.ts_intent AS ts_first_classified_intent,
         lcl.ts_intent AS ts_last_classified_intent,
         qa.ts_first_visit_scheduling_event,
@@ -479,8 +601,13 @@ final_base AS (
         datalake_sale_lead_flows.quintoandar_lead_flow AS qa
             ON qa.id_user = uu.id_user
     LEFT JOIN
-        datalake_sale_lead_flows.hub_services_lead_flow AS hb
-            ON hb.id_external = qa.id_user
+        first_hub_leads AS fhb
+            ON fhb.id_lead = uu.id_lead
+            AND fhb.rw_asc = 1
+    LEFT JOIN 
+        last_hub_leads AS lhb
+            ON lhb.id_lead = uu.id_lead
+            AND lhb.rw_desc = 1
     LEFT JOIN
         first_classified_leads AS fcl
             ON fcl.id_lead = uu.id_lead
