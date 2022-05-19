@@ -14,6 +14,30 @@ columns:
   sk_date:
     lineage:
       - datalake_analyst_ranking.ranking.dt_ranking_week
+  agent_age_in_months:
+    lineage:
+      - datalake_analyst_ranking.ranking.agent_age_in_months
+  productivity_achievement:
+    lineage:
+      - datalake_analyst_ranking.ranking.productivity_achievement
+  sla_achievement:
+    lineage:
+      - datalake_analyst_ranking.ranking.sla_achievement
+  csat_achievement:
+    lineage:
+      - datalake_analyst_ranking.ranking.csat_achievement
+  resolution_achievement:
+    lineage:
+      - datalake_analyst_ranking.ranking.resolution_achievement
+  ra_would_do_business_again_achievement:
+    lineage:
+      - datalake_analyst_ranking.ranking.ra_would_do_business_again_achievement
+  ra_score_achievement:
+    lineage:
+      - datalake_analyst_ranking.ranking.ra_score_achievement
+  ra_solutionra_solution_achievement:
+    lineage:
+      - datalake_analyst_ranking.ranking.ra_solutionra_solution_achievement
   multiplication_factor:
     lineage:
       - datalake_analyst_ranking.ranking.multiplication_factor

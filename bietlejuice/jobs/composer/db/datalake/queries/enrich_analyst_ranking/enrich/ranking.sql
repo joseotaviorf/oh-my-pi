@@ -2,6 +2,7 @@ WITH agents_metrics AS (
   SELECT
     id_agent,
     department,
+    MIN(agent_age_in_months) AS agent_age_in_months,
     SUM(COALESCE(closed_demand,0)) AS closed_demand,
     SUM(COALESCE(tickets_solved_in_time,0)) AS tickets_solved_in_time,
     SUM(COALESCE(tickets_not_solved_in_time,0)) AS tickets_not_solved_in_time,
@@ -24,6 +25,7 @@ weekly_achiev AS (
     id_agent,
     art.id_group,
     department,
+    agent_age_in_months,
     CASE
       WHEN productivity_weight <> 0 THEN 1
       WHEN (closed_demand/productivity_target) >= 1 THEN 1
@@ -31,13 +33,20 @@ weekly_achiev AS (
       WHEN (closed_demand/productivity_target) BETWEEN 0.6 AND 0.8 THEN 0.75
       WHEN (closed_demand/productivity_target) < 0.6 THEN 0
     END AS multiplication_factor,
-    COALESCE((closed_demand/productivity_target) * productivity_weight , 0) AS productivity,
-    COALESCE(((tickets_solved_in_time/(tickets_solved_in_time + tickets_not_solved_in_time))/target_sla) * sla_weight , 0) AS sla,
-    COALESCE(((sum_csat_satisfied_score/total_tickets_with_csat_score)/target_csat) * csat_weight , 0) AS csat,
-    COALESCE(((total_tickets_resolution/total_tickets_answered_resolution)/target_resolution) * resolution_weight , 0) AS resolution,
-    COALESCE((ra_would_do_business_again/ra_would_do_business_again_target) * would_do_business_again_weight , 0) AS ra_would_do_business_again,
-    COALESCE((ra_score/ra_target_score) * reclameaqui_note_weight , 0) AS ra_score,
-    COALESCE((ra_solution/ra_target_solution_rate) * solution_rate_weight , 0) AS ra_solution,
+    resolution_weight,
+    sla_weight,
+    productivity_weight,
+    csat_weight,
+    would_do_business_again_weight,
+    reclameaqui_note_weight,
+    solution_rate_weight,
+    COALESCE((closed_demand/productivity_target), 0) AS productivity_achievement,
+    COALESCE(((tickets_solved_in_time/(tickets_solved_in_time + tickets_not_solved_in_time))/target_sla), 0) AS sla_achievement,
+    COALESCE(((sum_csat_satisfied_score/total_tickets_with_csat_score)/target_csat), 0) AS csat_achievement,
+    COALESCE(((total_tickets_resolution/total_tickets_answered_resolution)/target_resolution), 0) AS resolution_achievement,
+    COALESCE((ra_would_do_business_again/ra_would_do_business_again_target), 0) AS ra_would_do_business_again_achievement,
+    COALESCE((ra_score/ra_target_score) , 0) AS ra_score_achievement,
+    COALESCE((ra_solution/ra_target_solution_rate) , 0) AS ra_solutionra_solution_achievement,
     dt_ranking_week
   FROM
     agents_metrics am
@@ -54,8 +63,24 @@ ranking_score AS (
     id_agent,
     id_group,
     department,
+    agent_age_in_months,
     multiplication_factor,
-    (productivity + sla + csat + resolution + ra_would_do_business_again + ra_score + ra_solution) * multiplication_factor AS ranking_score,
+    productivity_achievement,
+    sla_achievement,
+    csat_achievement,
+    resolution_achievement,
+    ra_would_do_business_again_achievement,
+    ra_score_achievement,
+    ra_solutionra_solution_achievement,
+    (
+      (productivity_achievement * productivity_weight)
+      + (sla_achievement * sla_weight)
+      + (csat_achievement * csat_weight)
+      + (resolution_achievement * resolution_weight)
+      + (ra_would_do_business_again_achievement * would_do_business_again_weight)
+      + (ra_score_achievement * reclameaqui_note_weight)
+      + (ra_solutionra_solution_achievement * solution_rate_weight)
+    ) * multiplication_factor AS ranking_score,
     dt_ranking_week
   FROM
     weekly_achiev
@@ -64,6 +89,14 @@ SELECT
     id_agent,
     id_group,
     department,
+    agent_age_in_months,
+    productivity_achievement,
+    sla_achievement,
+    csat_achievement,
+    resolution_achievement,
+    ra_would_do_business_again_achievement,
+    ra_score_achievement,
+    ra_solutionra_solution_achievement,
     multiplication_factor,
     ranking_score,
     CASE 

@@ -11,6 +11,37 @@ columns:
   department:
     lineage:
       - datalake_analyst_ranking.analyst_metrics.department
+  agent_age_in_months:
+    lineage:
+      - datalake_analyst_ranking.analyst_metrics.agent_age_in_months
+  productivity_achievement:
+    lineage:
+      - datalake_analyst_ranking.analyst_metrics.closed_demand
+      - datalake_gsheets_clean.agents_ranking_targets.productivity_target
+  sla_achievement:
+    lineage:
+      - datalake_analyst_ranking.analyst_metrics.tickets_solved_in_time
+      - datalake_analyst_ranking.analyst_metrics.tickets_not_solved_in_time
+      - datalake_gsheets_clean.agents_ranking_targets.target_sla
+  csat_achievement:
+    lineage:
+      - datalake_analyst_ranking.analyst_metrics.sum_csat_satisfied_score
+      - datalake_analyst_ranking.analyst_metrics.total_tickets_with_csat_score
+      - datalake_gsheets_clean.agents_ranking_targets.target_csat
+  resolution_achievement:
+    lineage:
+      - datalake_analyst_ranking.analyst_metrics.total_tickets_resolution
+      - datalake_analyst_ranking.analyst_metrics.total_tickets_answered_resolution
+      - datalake_gsheets_clean.agents_ranking_targets.target_resolution
+  ra_would_do_business_again_achievement:
+    lineage:
+      - datalake_gsheets_clean.agents_ranking_targets.ra_would_do_business_again_target
+  ra_score_achievement:
+    lineage:
+      - datalake_gsheets_clean.agents_ranking_targets.ra_target_score
+  ra_solutionra_solution_achievement:
+    lineage:
+      - datalake_gsheets_clean.agents_ranking_targets.ra_target_solution_rate
   ranking_score:
     lineage:
       - datalake_gsheets_clean.agents_ranking_targets.productivity_target
