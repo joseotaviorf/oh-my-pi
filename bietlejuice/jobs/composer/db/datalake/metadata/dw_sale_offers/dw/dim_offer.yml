@@ -44,6 +44,12 @@ columns:
   agent_name:
     lineage:
       - datalake_offer.sale_offer.agent_name
+  partner_3p_supply:
+    lineage:
+      - datalake_offer.sale_offer.partner_3p_supply
+  partner_3p_demand:
+    lineage:
+      - datalake_offer.sale_offer.partner_3p_demand
   sale_price:
     lineage:
       - datalake_offer.sale_offer.sale_price
@@ -95,6 +101,12 @@ columns:
   is_branded:
     lineage:
       - datalake_amplitude_offer.sale_offer_raw_events.branded
+  is_3p_supply:
+    lineage:
+      - datalake_offer.sale_offer.is_3p_supply
+  is_3p_demand:
+    lineage:
+      - datalake_offer.sale_offer.is_3p_demand
   has_used_fgts_in_payment:
     lineage:
       - datalake_offer.sale_offer.has_used_fgts_in_payment

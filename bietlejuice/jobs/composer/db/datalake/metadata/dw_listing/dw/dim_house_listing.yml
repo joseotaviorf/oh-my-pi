@@ -1,3 +1,4 @@
+---
 database_name: dw_public
 table_name: dim_house_listing
 columns:
@@ -136,6 +137,9 @@ columns:
   house_unpublished_reason:
     lineage:
       - datalake_ebdb_listing.house.unpublished_reason
+  partner_3p_supply:
+    lineage:
+      - datalake_ebdb_listing.house.partner_3p_supply
   listing_category_start:
     lineage:
       - datalake_ebdb_listing.house_listing.listing_category
@@ -157,6 +161,9 @@ columns:
   house_predicted_price:
     lineage:
       - datalake_ebdb_listing.house.predicted_price
+  is_3p_supply:
+    lineage:
+      - datalake_ebdb_listing.house.is_3p_supply
   dt_last_exclusive_opted_in:
     lineage:
       - datalake_ebdb_listing.house_listing.dt_last_exclusive_opted_in

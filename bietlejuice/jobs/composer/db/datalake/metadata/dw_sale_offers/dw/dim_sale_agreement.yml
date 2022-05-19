@@ -98,6 +98,12 @@ columns:
   tags_from_salesflow:
     lineage:
       - datalake_offer.sale_offer.tags_from_salesflow
+  partner_3p_supply:
+    lineage:
+      - datalake_offer.sale_offer.partner_3p_supply
+  partner_3p_demand:
+    lineage:
+      - datalake_offer.sale_offer.partner_3p_demand
   has_credit_pre_analysis:
     lineage:
       - datalake_offer.sale_offer.has_credit_pre_analysis
@@ -113,6 +119,12 @@ columns:
   is_ccv_canceled:
     lineage:
       - datalake_offer.sale_offer.is_ccv_canceled
+  is_3p_supply:
+    lineage:
+      - datalake_offer.sale_offer.is_3p_supply
+  is_3p_demand:
+    lineage:
+      - datalake_offer.sale_offer.is_3p_demand
   ts_sale_agreement_signed:
     lineage:
       - datalake_offer.sale_offer.dt_sale_agreement_signed

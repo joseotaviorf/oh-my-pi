@@ -1,3 +1,4 @@
+---
 database_name: dw_public
 table_name: dim_booking
 columns:
@@ -127,6 +128,12 @@ columns:
   user_sale_booking_creator:
     lineage:
       - datalake_booking.booking.user_sale_booking_creator
+  partner_3p_supply:
+    lineage:
+      - datalake_booking.booking.partner_3p_supply
+  partner_3p_demand:
+    lineage:
+      - datalake_booking.booking.partner_3p_demand
   app_type:
     lineage:
       - datalake_amplitude_visit.amplitude_visit.app_type
@@ -183,6 +190,12 @@ columns:
     lineage:
       - datalake_gsheets_clean.taxonomy_demand.id
       - datalake_gsheets_clean.taxonomy_demand.platform
+  is_3p_supply:
+    lineage:
+      - datalake_booking.booking.is_3p_supply
+  is_3p_demand:
+    lineage:
+      - datalake_booking.booking.is_3p_demand
   dt_visit_follow_up:
     lineage:
       - datalake_booking.booking.ts_visit_fup

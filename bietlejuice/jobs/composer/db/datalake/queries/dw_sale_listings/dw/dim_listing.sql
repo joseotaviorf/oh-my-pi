@@ -8,6 +8,8 @@ SELECT
   hrs.registration_abandoned_reason,
   lbc.status_reason AS unpublished_reason,
   lbc.short_url,
+  h.partner_3p_supply,
+  h.is_3p_supply,
   sl.is_for_rent,
   sl.has_active_rental_contract,
   sl.has_house_been_rented,
@@ -21,7 +23,7 @@ SELECT
 FROM
   datalake_ebdb_listing.listing_business_context AS lbc
 JOIN
-  datalake_ebdb_clean.house AS h
+  datalake_ebdb_listing.house AS h
     ON h.id = lbc.id_house
 JOIN
   datalake_sale_listings.sale_listing AS sl

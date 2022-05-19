@@ -9,6 +9,8 @@ CREATE TABLE sale.dim_listing (
 	registration_abandoned_reason VARCHAR,
 	unpublished_reason VARCHAR,
 	short_url VARCHAR,
+	partner_3p_supply VARCHAR,
+	is_3p_supply BOOLEAN,
 	is_for_rent BOOLEAN,
 	has_active_rental_contract BOOLEAN,
 	has_house_been_rented BOOLEAN,

@@ -79,6 +79,8 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   b.troublesome_entrance_problem AS troublesome_entrance,
   b.checkin_status,
   b.user_sale_booking_creator,
+  b.partner_3p_supply,
+  b.partner_3p_demand,
   src.app_type,
   -- TODO [ODS] review this rule
   COALESCE(src.media_source, "Unknown") AS media_source,
@@ -96,6 +98,8 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   CASE WHEN td.id IS NULL THEN 'Not Mapped' ELSE td.mkt_medium END AS mkt_medium,
   CASE WHEN td.id IS NULL THEN 'Not Mapped' ELSE td.mkt_source END AS mkt_source,
   CASE WHEN td.id IS NULL THEN 'Not Mapped' ELSE td.mkt_platform END AS mkt_platform,
+  b.is_3p_supply,
+  b.is_3p_demand,
   b.ts_visit_fup AS dt_visit_follow_up,
   b.ts_visit_follow_up_local_tz AS ts_visit_follow_up_local,
   b.ts_booking_utc AS dt_scheduling,

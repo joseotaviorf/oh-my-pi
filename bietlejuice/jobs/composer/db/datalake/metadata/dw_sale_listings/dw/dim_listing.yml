@@ -29,6 +29,12 @@ columns:
   short_url:
     lineage:
       - datalake_ebdb_listing.listing_business_context.short_url
+  partner_3p_supply:
+    lineage:
+      - datalake_ebdb_listing.house.partner_3p_supply
+  is_3p_supply:
+    lineage:
+      - datalake_ebdb_listing.house.is_3p_supply
   is_for_rent:
     lineage:
       - datalake_sale_listings.sale_listing.is_for_rent

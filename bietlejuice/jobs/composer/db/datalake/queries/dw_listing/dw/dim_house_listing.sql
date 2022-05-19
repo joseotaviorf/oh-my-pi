@@ -148,6 +148,7 @@ house_listings AS (
         h.ts_updated AS ts_house_update,
         h.registration_abandoned_reason AS registration_abandoned_reason,
         h.unpublished_reason AS house_unpublished_reason,
+        h.partner_3p_supply,
         hl.listing_category,
         hl.is_last_version,
         hl.is_exclusive,
@@ -173,7 +174,8 @@ house_listings AS (
             ELSE COALESCE(lbc.is_for_rent, FALSE)
         END AS is_for_rent,
         COALESCE(lbc.is_for_sale, FALSE) AS is_for_sale,
-        h.has_instant_offer_enabled
+        h.has_instant_offer_enabled,
+        h.is_3p_supply
     FROM
         datalake_ebdb_listing.house AS h
     JOIN
@@ -224,7 +226,8 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.house_iptu_type,
     hl.registration_abandoned_reason,
     hl.house_unpublished_reason,
-    hl.listing_category as listing_category_start,
+    hl.partner_3p_supply,
+    hl.listing_category AS listing_category_start,
     hl.who_is_living,
     hl.key_type,
     hl.key_location,
@@ -250,6 +253,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     hl.is_iorent_active,
     hl.is_for_rent,
     hl.is_for_sale,
+    hl.is_3p_supply,
     hl.dt_last_exclusive_opted_in,
     hl.dt_last_exclusive_opted_out,
     hl.dt_last_originals_opted_in,
@@ -261,7 +265,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
     CAST(hl.ts_publication AS TIMESTAMP) AS ts_publication,
     hl.ts_house_first_publication,
     hl.ts_house_last_publication,
-    hl.ts_last_unpublished as ts_last_de_publication,
+    hl.ts_last_unpublished AS ts_last_de_publication,
     hl.ts_house_create,
     hl.ts_house_update,
     NOW() AS ts_load
