@@ -1,6 +1,9 @@
 database_name: datalake_gsheets_clean
 table_name: daily_target_supply_rental
 columns:
+  id_date:
+    lineage:
+      - datalake_gsheets_raw.base_supply_souce_for_rent.date
   concat_cost:
     lineage:
       - datalake_gsheets_raw.base_supply_souce_for_rent.concat_cost
@@ -40,7 +43,7 @@ columns:
   tier:
     lineage:
       - datalake_gsheets_raw.base_supply_souce_for_rent.tier
-  week_start:
+  dt_week_started:
     lineage:
       - datalake_gsheets_raw.base_supply_souce_for_rent.week_start
   quarter:
@@ -52,3 +55,6 @@ columns:
   month:
     lineage:
       - datalake_gsheets_raw.base_supply_souce_for_rent.month
+  dt_target:
+    lineage:
+      - datalake_gsheets_raw.base_supply_souce_for_rent.date

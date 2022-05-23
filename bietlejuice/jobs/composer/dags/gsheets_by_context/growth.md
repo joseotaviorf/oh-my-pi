@@ -22,6 +22,7 @@ This pipeline produces the following output tables:
 1. Data lake raw:
     - `branding_where_is_plaquinha`
     - `costs_targets`
+    - `base_supply_souce_for_rent`
     - `historic_national_costs`
     - `manual_cost_engagement`
     - `manual_cost_engagement_history`
@@ -46,6 +47,7 @@ This pipeline produces the following output tables:
     - `affiliates_manual_cost_engagement`
     - `affiliates_manual_cost_engagement_history`
     - `affiliates_cost_tradecom_configuration`
+    - `daily_target_supply_rental`
     - `mkt_cost_per_source`
     - `branding_where_is_plaquinha`
     - `costs_targets`

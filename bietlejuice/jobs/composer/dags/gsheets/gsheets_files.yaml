@@ -80,11 +80,6 @@ base_hunter:
     sheet_name: Página1
     clean_table_name: base_hunter
 
-base_supply_souce_for_rent:
-    sheet_id: 1Gxp4StsJFhnqI5ogSHzlTaSPiDJF6kmQMXPSjK3dBUM
-    sheet_name: Base_Supply_Souce_For_Rent
-    clean_table_name: daily_target_supply_rental
-
 base_supply_souce_for_sale:
     sheet_id: 1UO0kxwf-fXm6nhSFSZg3GTGFF61ZAJiRlAqI-FAr-GE
     sheet_name: Base_Supply_Souce_For_Sale

@@ -66,7 +66,6 @@ This pipeline produces the following output tables:
     - `criteo_abtest_rj`
     - `credit_analysis_fraudsters`
     - `crm_iptu_wave4`
-    - `daily_target_supply_rental`
     - `daily_target_supply_sale`
     - `deduplicate_batch_listings_forsale`
     - `demand_channel_share`

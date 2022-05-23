@@ -1204,7 +1204,7 @@ costs_targets_results_combined AS (
     -- Supply ForRental Funnel Targets - NEW --
     -------------------------------------------
     SELECT
-        TO_CHAR(DATE(NULLIF(str.date, NULL)), 'YYYYMMDD')::INT AS sk_date,
+        str.id_date AS sk_date,
         COALESCE(NULLIF(str.city_group, ''),'Not Mapped')::TEXT AS city_group,
         str.supply_origin AS mkt_origin,
         str.supply_channel AS mkt_channel,
@@ -1239,15 +1239,15 @@ costs_targets_results_combined AS (
         SUM(0::FLOAT) AS opportunities_target_sale,
         SUM(0::FLOAT) AS first_listings_target_sale,
         SUM(0::FLOAT) AS budget_sale,
-        SUM(CAST(REPLACE(str.prospects,',','') AS FLOAT8)) AS prospects_target_rental,
-        SUM(CAST(REPLACE(str.qualifieds,',','') AS FLOAT8)) AS qualifieds_target_rental,
+        SUM(str.prospects) AS prospects_target_rental,
+        SUM(str.qualifieds) AS qualifieds_target_rental,
         SUM(0::FLOAT) AS opportunities_target_rental,
         SUM(0::FLOAT) AS first_listings_target_rental,
-        SUM(CAST(REPLACE(str.cost_per_source,',','') AS FLOAT8)) AS budget_rental
+        SUM(str.cost_per_source) AS budget_rental
     FROM
         datalake_gsheets_clean_prod.daily_target_supply_rental str
     WHERE
-        str.date >= '2021-04-01'
+        str.dt_target >= DATE('2021-04-01')
     GROUP BY
         1,2,3,4,5,6,7,8,9,10
 
