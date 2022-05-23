@@ -1,0 +1,19 @@
+---
+table_name: accounts_payable
+gdrive_root_folder_id: "0BwY7ZypFBL1mR1RfWklGLUx4R0E"
+columns_to_read:
+        - Competência
+        - Pagamento
+        - Valor Bruto
+        - "# Doc. / NF"
+        - Fornecedor
+        - Cost And Profit Center
+        - Revenue and Cost Elements
+cluster_extra_libs:
+        - whl: "{artifacts_s3_bucket}/gsheets-api-client-python/quintoandar_gsheets_api_client-0.3.0-py2.py3-none-any.whl"
+        - pypi:
+                  package: "google-api-python-client==2.48.0"
+        - pypi:
+                  package: "pandas==1.3.5"
+        - pypi:
+                  package: "openpyxl==3.0.10"

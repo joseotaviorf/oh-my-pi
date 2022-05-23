@@ -1,0 +1,34 @@
+---
+database_name: datalake_payable_accounts_transactions_clean
+table_name: accounts_payable
+columns:
+  account_balance:
+    lineage:
+      - datalake_payable_accounts_transactions_raw.accounts_payable.saldo_total
+  accrual_year_month:
+    lineage:
+      - datalake_payable_accounts_transactions_raw.accounts_payable.competencia
+  bank_description:
+    lineage:
+      - datalake_payable_accounts_transactions_raw.accounts_payable.banco
+  dt_paid:
+    lineage:
+      - datalake_payable_accounts_transactions_raw.accounts_payable.pagamento
+  nf_file_description:
+    lineage:
+      - datalake_payable_accounts_transactions_raw.accounts_payable._doc_nf
+  paid_amount:
+    lineage:
+      - datalake_payable_accounts_transactions_raw.accounts_payable.valor_bruto
+  payment_reason:
+    lineage:
+      - datalake_payable_accounts_transactions_raw.accounts_payable.revenue_and_cost_elements
+  payment_source:
+    lineage:
+      - datalake_payable_accounts_transactions_raw.accounts_payable.cost_and_profit_center
+  supplier_description:
+    lineage:
+      - datalake_payable_accounts_transactions_raw.accounts_payable.fornecedor
+  ts_load:
+    lineage:
+      - datalake_payable_accounts_transactions_raw.accounts_payable.ts_load

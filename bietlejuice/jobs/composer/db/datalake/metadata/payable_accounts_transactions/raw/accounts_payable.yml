@@ -1,0 +1,3 @@
+---
+database_name: datalake_cap_clean
+table_name: accounts_payable
