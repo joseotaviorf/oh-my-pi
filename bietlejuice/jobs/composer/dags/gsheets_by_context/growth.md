@@ -26,6 +26,7 @@ This pipeline produces the following output tables:
     - `manual_cost_engagement`
     - `manual_cost_engagement_history`
     - `mta_budget`
+    - `rental_tof_daily_targets`
     - `rental_tof_weekly_targets`
     - `affiliate_pro_registration`
     - `historic_national_costs`
@@ -49,6 +50,7 @@ This pipeline produces the following output tables:
     - `branding_where_is_plaquinha`
     - `costs_targets`
     - `mta_budget_october_2020`
+    - `rental_tof_daily_targets`
     - `rental_tof_weekly_targets`
     - `offline_manual_costs`
     - `offline_manual_share_city_group`

@@ -34,7 +34,7 @@ This pipeline produces the following output tables:
     - `de_para_cancelamento`
     - `mra_historical`
     - `offline_and_branding_marketing_costs`
-    - `rental_tof_daily_targets`
+    - `rental_tof_monthly_targets`
     - `supply_targets_2019`
     - `supply_targets_2020`
     - `supply_targets_2021`
@@ -56,7 +56,7 @@ This pipeline produces the following output tables:
     - `legal_base_docato`
     - `mra_historical`
     - `offline_and_branding_marketing_costs`
-    - `rental_tof_daily_targets`
+    - `rental_tof_monthly_targets`
     - `supply_targets_2019`
     - `supply_targets_2020`
     - `supply_targets_2021`

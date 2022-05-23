@@ -47,7 +47,7 @@ columns:
   dt_event:
     lineage:
       - datalake_gsheets_clean.sale_tof_daily_targets.date
-      - datalake_gsheets_clean.rental_tof_daily_targets.date
+      - datalake_gsheets_clean.rental_tof_daily_targets.dt_target
       - dw_datamarts_growth_cross.performance_marketing_metrics_demand.dt_event
       - dw_datamarts_growth_cross.sale_performance_marketing_metrics_demand.dt_event
       - datalake_top_of_funnel_demand.user_interactions.dt_event

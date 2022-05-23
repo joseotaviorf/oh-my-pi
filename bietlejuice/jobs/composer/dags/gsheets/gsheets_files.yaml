@@ -637,11 +637,6 @@ rental_rtp_targets:
     sheet_name: rental_rtp_targets
     clean_table_name: rental_rtp_targets
 
-rental_tof_daily_targets:
-    sheet_id: 1rUa1jyrjcbkZP_33O-7vZH376O16zkGI7FcFVAZkDSo
-    sheet_name: rental_tof_daily_targets
-    clean_table_name: rental_tof_daily_targets
-
 retencao_exclusividade_contato_ativo:
     sheet_id: 1VT9AgLJYbGq5ftcBvSY2C-M99bVmpnmO7XFeueh_fmI
     sheet_name: bases_cruzadas

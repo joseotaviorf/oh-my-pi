@@ -1,3 +1,4 @@
+---
 database_name: datalake_gsheets_clean
 table_name: rental_tof_daily_targets
 columns:
@@ -16,15 +17,15 @@ columns:
   mkt_source:
     lineage:
       - datalake_gsheets_raw.rental_tof_daily_targets.mkt_source
-  dia:
+  day:
     lineage:
       - datalake_gsheets_raw.rental_tof_daily_targets.dia
-  week_start:
+  dt_week_started:
     lineage:
       - datalake_gsheets_raw.rental_tof_daily_targets.week_start
   month:
     lineage:
       - datalake_gsheets_raw.rental_tof_daily_targets.month
-  date:
+  dt_target:
     lineage:
       - datalake_gsheets_raw.rental_tof_daily_targets.date
