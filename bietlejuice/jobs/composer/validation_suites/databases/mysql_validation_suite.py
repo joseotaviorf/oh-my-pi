@@ -9,9 +9,21 @@ from bietlejuice.jobs.composer.consumers.db_consumers import MySqlConsumer
 class MySQLValidationSuite(DatabaseValidationSuitesExecutor):
     REPOSITORY_CONSUMER_CLASS = MySqlConsumer
 
+    def validate_arquivo_confidencial(self):
+        db_consumer = self.REPOSITORY_CONSUMER_CLASS(
+            self.auth[DatabaseEnum.ARQUIVO_CONFIDENCIAL], SparkClient()
+        )
+        self._validate_connection(db_consumer)
+
     def validate_ebdb(self):
         db_consumer = self.REPOSITORY_CONSUMER_CLASS(
             self.auth[DatabaseEnum.EBDB], SparkClient()
+        )
+        self._validate_connection(db_consumer)
+
+    def validate_kill_queue(self):
+        db_consumer = self.REPOSITORY_CONSUMER_CLASS(
+            self.auth[DatabaseEnum.KILL_QUEUE], SparkClient()
         )
         self._validate_connection(db_consumer)
 
