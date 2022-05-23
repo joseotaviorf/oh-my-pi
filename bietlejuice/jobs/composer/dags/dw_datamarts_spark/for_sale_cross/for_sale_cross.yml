@@ -10,4 +10,5 @@
 #     # If the datamart has no inner dependency, declare it as an empty object
 
 for_sale_cross:
+  sale_cohort_conversions: {}
   temp_supply_flows: {}

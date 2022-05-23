@@ -604,9 +604,21 @@ bietlejuice.dw_datamarts_spark.for_sale:
   - bietlejuice.enrich_amplitude_sale_visit_intent:load-enrich-amplitude-sale-visit-intent
 
 bietlejuice.dw_datamarts_spark.for_sale_cross:
+  - bietlejuice.dw_booking:load-dw-public-dim-booking
+  - bietlejuice.dw_business_unit_region:load-dw-sale-fact-business-unit-region
   - bietlejuice.dw_datamarts_cross:create-lead-listing-flows-in-datalake
+  - bietlejuice.dw_datamarts_cross:create-quintoandar-consultant-listings-in-datalake
+  - bietlejuice.dw_datamarts_cross:create-talk-to-agent-in-datalake
   - bietlejuice.dw_lead:load-dw-public-dim-lead
   - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows
+  - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer
+  - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
+  - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
+  - bietlejuice.enrich_3p:load-enrich-houses-3p
+  - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract
+  - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
+  - bietlejuice.enrich_firestore:load-enrich-monday
   - bietlejuice.rene_descartes:load-clean-lead-rejection
   - bietlejuice.wololo:load-clean-context-discard
   - bietlejuice.wololo:load-clean-conversion

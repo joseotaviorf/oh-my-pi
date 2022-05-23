@@ -1,0 +1,61 @@
+---
+database_name: dw_datamarts
+table_name: sale_cohort_conversions
+columns:
+  week_start:
+    lineage:
+      - dw_public.dim_date.week_start
+  date:
+    lineage:
+      - dw_public.dim_date.date
+  month:
+    lineage:
+      - dw_public.dim_date.month
+  quarter:
+    lineage:
+      - dw_public.dim_date.quarter
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
+  demand_3p_partner:
+    lineage:
+      - datalake_ebdb_work_contract.work_contract.3p_partner
+  is_3p_demand:
+    lineage:
+      - datalake_ebdb_work_contract.work_contract.is_3p_contract
+  lead_context:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.mkt_origin
+  mkt_campaign_context:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.lead_context_origin
+  mkt_origin:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.mkt_origin
+  mkt_channel:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.mkt_channel
+  sales_company:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.sales_company
+  lead_processing_operation:
+    lineage:
+      - dw_datamarts_cross.lead_listing_flows.sourcing_ops
+  first_origin_demand:
+    lineage:
+      - dw_sale.fact_sale_flows.first_event
+  origin_before_offer:
+    lineage:
+      - dw_sale.fact_sale_flows.higher_intent_before_offer
+  origin_after_offer:
+    lineage:
+      - dw_sale.fact_sale_flows.higher_intent_after_offer
+  hub_visit:
+    lineage:
+      - dw_sale.fact_business_unit_region.business_unit
+  hub_offer:
+    lineage:
+      - dw_sale.dim_offer.business_unit
+  supply_3p_partner:
+    lineage:
+      - datalake_3p.houses_3p.partner
