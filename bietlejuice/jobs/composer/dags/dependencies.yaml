@@ -585,6 +585,12 @@ bietlejuice.dw_datamarts_spark.fintech_cross:
 
 bietlejuice.dw_datamarts_spark.for_sale:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.casa_mineira_crm:load-clean-city
+  - bietlejuice.casa_mineira_crm:load-clean-house
+  - bietlejuice.casa_mineira_crm:load-clean-house_status
+  - bietlejuice.casa_mineira_crm:load-clean-neighborhood
+  - bietlejuice.casa_mineira_crm:load-clean-revisions
+  - bietlejuice.casa_mineira_crm:load-clean-uf
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_listing:load-dw-public-dim-house-listing
   - bietlejuice.dw_listing:load-dw-public-fact-house-listings
