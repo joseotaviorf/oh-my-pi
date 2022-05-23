@@ -15,9 +15,9 @@ More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
-- In datalake raw and clean, via full load:
+In datalake raw and clean, via full load:
 
-  - `accounts_payable`
+- `accounts_payable`
 
 ### Responsible Data Teams
 
