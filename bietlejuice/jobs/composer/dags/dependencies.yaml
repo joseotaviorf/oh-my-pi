@@ -1477,7 +1477,6 @@ bietlejuice.enrich_marketing_costs_sharing_rules:
   - bietlejuice.dw_booking:load-public-dim-booking-into-redshift
   - bietlejuice.dw_rent_flow:load-public-fact-listing-rent-flows-into-redshift
   - bietlejuice.dw_offer:load-public-dim-offer-into-redshift
-  - bietlejuice.dw_datamarts_cross:load-talk-to-agent-into-redshift
   - bietlejuice.dw_listing:load-public-fact-house-listings-into-redshift
   - bietlejuice.ebdb:create-partner-clean-external-table
   - bietlejuice.dw_region:load-public-dim-region-into-redshift
