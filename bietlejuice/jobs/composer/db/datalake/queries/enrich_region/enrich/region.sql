@@ -42,7 +42,7 @@ LEFT JOIN
 LEFT JOIN
   datalake_ebdb_clean.state AS st
     ON st.id = COALESCE(r.id_state, mr.id_state, c.id_state)
-LEFT JOIN
+JOIN
   datalake_ebdb_clean.country AS ct
     ON st.id_country = ct.id
 LEFT JOIN
