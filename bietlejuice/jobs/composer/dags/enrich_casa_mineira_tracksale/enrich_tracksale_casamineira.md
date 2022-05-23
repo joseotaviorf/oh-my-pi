@@ -28,6 +28,6 @@ This pipeline produces the following output tables on the enrich layer:
 
 ### Responsible Data Team
 ​
-For any questions or concerns about this DAG, please contact the Data Engineering or Data Analytics team responsible listed in the [DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
+For any questions or concerns about this DAG, please contact the Dag Owner Team.
 
 </details>

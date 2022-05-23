@@ -3,6 +3,9 @@
 ### Purpose
 This DAG imports, via API extraction, the tables for Jira, our platform for managing project lifecycles.
 
+<details>
+  <summary><strong> > DAG details (click to expand)</strong></summary>
+
 ### Execution Interval
 This DAG is triggered daily. 
 
@@ -15,8 +18,9 @@ This pipeline produces, in datalake raw and clean, all the tables available in t
 - `issues` (incremental load)
 
 ### Responsible Data Engineering Team
-For any questions or concerns about this DAG, please contact the Data Engineering Team responsible listed in the 
-[DAG owners](https://www.notion.so/productquintoandar/DAG-Owners-01810df413074722b014ac1cf033b7bd).
+For any questions or concerns about this DAG, please contact the Dag Owner Team.
 
 ### Additional Information
 - [JIRA API doc](https://jira.readthedocs.io/en/master/api.html)
+
+</details>
