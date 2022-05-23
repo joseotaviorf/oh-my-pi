@@ -1,5 +1,5 @@
 ---
-database_name: dw_datamarts_for_sale_cross
+database_name: dw_datamarts
 table_name: sale_events_funnel
 columns:
   week_start:

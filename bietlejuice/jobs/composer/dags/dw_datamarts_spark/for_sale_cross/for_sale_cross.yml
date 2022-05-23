@@ -11,4 +11,5 @@
 
 for_sale_cross:
   sale_cohort_conversions: {}
+  sale_events_funnel: {}
   temp_supply_flows: {}
