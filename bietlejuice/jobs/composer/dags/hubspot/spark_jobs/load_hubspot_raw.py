@@ -14,6 +14,9 @@ from bietlejuice.jobs.composer.base.spark import (
     SparkDataFrameService,
 )
 from bietlejuice.jobs.composer.clients.db_clients import SparkClient
+from bietlejuice.jobs.composer.dags.hubspot.spark_jobs.hubspot_encoder import (
+    HubSpotEncoder,
+)
 from bietlejuice.jobs.composer.dags.hubspot.spark_jobs.schemas import HubSpotSchemaEnum
 from bietlejuice.jobs.composer.pipeline import (
     IncrementalTableLoaderPipeline,
@@ -76,10 +79,18 @@ def get_integration_method(table_name, hubspot_client):
     """Returns the method used to call the api given the table name and hubspot client"""
 
     methods = {
-        "contact": hubspot_client.crm.contacts.get_all,
-        "company": hubspot_client.crm.companies.get_all,
-        "deal": hubspot_client.crm.deals.get_all,
-        "ticket": hubspot_client.crm.tickets.get_all,
+        "contact": lambda **kwargs: fetch_all(
+            hubspot_client.crm.contacts.basic_api, **kwargs
+        ),
+        "company": lambda **kwargs: fetch_all(
+            hubspot_client.crm.companies.basic_api, **kwargs
+        ),
+        "deal": lambda **kwargs: fetch_all(
+            hubspot_client.crm.deals.basic_api, **kwargs
+        ),
+        "ticket": lambda **kwargs: fetch_all(
+            hubspot_client.crm.tickets.basic_api, **kwargs
+        ),
         "deal_pipeline": hubspot_client.crm.pipelines.pipelines_api.get_all,
         "ticket_pipeline": hubspot_client.crm.pipelines.pipelines_api.get_all,
         "owner": hubspot_client.crm.owners.get_all,
@@ -102,11 +113,11 @@ def get_tables(config_service):
 
     table_results = {}
     for table_name, table_configs in tables.items():
-        kwargs = {}
-        if "properties" in table_configs:
-            kwargs["properties"] = table_configs["properties"]
-        if "object_type" in table_configs:
-            kwargs["object_type"] = table_configs["object_type"]
+        kwargs = {
+            arg_name: arg_val
+            for arg_name, arg_val in table_configs.items()
+            if arg_name != "is_incremental"
+        }
 
         table_results[table_name] = {
             "content": get_integration_method(table_name, hubspot_client)(**kwargs),
@@ -114,6 +125,26 @@ def get_tables(config_service):
         }
 
     return table_results
+
+
+def fetch_all(base_api_client, **kwargs):
+    """
+    Given a base api client, returns the table contents.
+    This function already exists in HubSpot client, but the paging is fixed as 100, which is above
+    the limit to get the history.
+    """
+
+    results = []
+    after = None
+
+    while True:
+        page = base_api_client.get_page(after=after, limit=50, **kwargs)
+        results.extend(page.results)
+        if page.paging is None:
+            break
+        after = page.paging.next.after
+
+    return results
 
 
 def transform_tables_into_dataframes(tables):
@@ -151,7 +182,9 @@ def transform_object_table_into_dataframe(table_content):
 
     schema = HubSpotSchemaEnum.OBJECT_SCHEMA
     table_dict = list(map(lambda x: x.to_dict(), table_content))
-    unnested_table_dict = JsonService.transform_json_list_terms(table_dict)
+    unnested_table_dict = JsonService.transform_json_list_terms(
+        table_dict, cls=HubSpotEncoder
+    )
     return spark_client.create_dataframe(unnested_table_dict, schema)
 
 

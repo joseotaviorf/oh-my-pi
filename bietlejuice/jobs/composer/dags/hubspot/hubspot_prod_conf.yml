@@ -82,6 +82,8 @@ tables:
       - hubspot_owner_id
       - hubspot_team_id
       - quantidade_de_imoveis_a_venda
+    properties_with_history:
+      - hs_lead_status
   contact:
     is_incremental: true
     properties:
@@ -121,6 +123,8 @@ tables:
       - num_associated_deals
       - hs_lead_status
       - hubspot_owner_id
+    properties_with_history:
+      - hs_lead_status
   deal:
     is_incremental: true
     properties:
@@ -168,6 +172,9 @@ tables:
       - volume_de_vendas_mensais__vgv_r__
       - quantidade_de_imoveis_a_venda
       - quantidade_de_imoveis_para_locacao
+    properties_with_history:
+      - dealstage
+      - pipeline
   ticket:
     is_incremental: true
     properties:
@@ -185,6 +192,9 @@ tables:
       - hubspot_owner_id
       - subject
       - tipo_de_onboarding
+    properties_with_history:
+      - hs_pipeline_stage
+      - hs_pipeline
   deal_pipeline:
     is_incremental: true
     object_type: deals
