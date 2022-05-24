@@ -16,33 +16,36 @@ columns:
   id_payee_account:
     lineage:
       - datalake_robin_hood_raw.payment_request.payee_account_id
-  dt_due:
+  id_next_attempt:
     lineage:
-      - datalake_robin_hood_raw.payment_request.due_date
+      - datalake_robin_hood_raw.payment_request.next_attempt_id
   due_amount:
     lineage:
       - datalake_robin_hood_raw.payment_request.due_amount
+  status:
+    lineage:
+      - datalake_robin_hood_raw.payment_request.status
+  dt_errored:
+    lineage:
+      - datalake_robin_hood_raw.payment_request.error_at
+  dt_scheduled:
+    lineage:
+      - datalake_robin_hood_raw.payment_request.scheduled_at
+  dt_due:
+    lineage:
+      - datalake_robin_hood_raw.payment_request.due_date
+  dt_paid:
+    lineage:
+      - datalake_robin_hood_raw.payment_request.paid_at
+  dt_chargedback:
+    lineage:
+      - datalake_robin_hood_raw.payment_request.chargeback_at
+  ts_canceled:
+    lineage:
+      - datalake_robin_hood_raw.payment_request.canceled_at
   ts_created:
     lineage:
       - datalake_robin_hood_raw.payment_request.created_at
   ts_updated:
     lineage:
       - datalake_robin_hood_raw.payment_request.updated_at
-  dt_scheduled:
-    lineage:
-      - datalake_robin_hood_raw.payment_request.scheduled_at
-  ts_canceled:
-    lineage:
-      - datalake_robin_hood_raw.payment_request.canceled_at
-  dt_paid:
-    lineage:
-      - datalake_robin_hood_raw.payment_request.paid_at
-  dt_errored:
-    lineage:
-      - datalake_robin_hood_raw.payment_request.error_at
-  dt_chargedback:
-    lineage:
-      - datalake_robin_hood_raw.payment_request.chargeback_at
-  status:
-    lineage:
-      - datalake_robin_hood_raw.payment_request.status

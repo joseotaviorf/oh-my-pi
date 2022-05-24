@@ -1,0 +1,58 @@
+---
+database_name: datalake_robin_hood
+table_name: accounting_entry
+columns:
+  id:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.id
+  id_external:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.id_external
+  id_source:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.id_source
+  id_payee:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.id_payee
+  id_lead:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.metadata
+  id_house:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.metadata
+  id_contract:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.metadata
+  cost_center_code:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.cost_center_code
+  source_bill_item:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.source_bill_item
+  description:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.description
+  type:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.type
+  locale:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.locale
+  due_amount:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.due_amount
+  accrual_year_month:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.accrual_year_month
+  accounting_year_month:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.accounting_year_month
+  dt_occurrence:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.dt_occurrence
+  ts_blocked:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.ts_blocked
+  ts_created:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.ts_created

@@ -1,15 +1,19 @@
-select
+SELECT
     id, 
-    external_id as id_external,
-    source_id as id_source,
+    external_id AS id_external,
+    source_id AS id_source,
+    payee_id AS id_payee,
     description,
-    accrual_year_month,
     source_bill_item,
-    payee_id as id_payee,
     due_amount,
-    timestamp(created_at) as ts_created,
     locale,
+    type,
     cost_center_code,
-    date(occurrence_date) as dt_occurrence
-from
+    accrual_year_month,
+    accounting_year_month,
+    metadata,
+    DATE(occurrence_date) AS dt_occurrence,
+    TIMESTAMP(blocked_at) AS ts_blocked,
+    TIMESTAMP(created_at) AS ts_created
+FROM
     datalake_robin_hood_raw.accounting_entry
