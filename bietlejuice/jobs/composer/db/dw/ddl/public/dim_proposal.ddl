@@ -2,6 +2,7 @@ drop table if exists public.dim_proposal;
 create table public.dim_proposal (
   sk_proposal integer primary key,
   id_proposal integer,
+  country_code VARCHAR,
   guarantee varchar(50),
   status varchar(50),
   status_doc_tenant varchar(50),

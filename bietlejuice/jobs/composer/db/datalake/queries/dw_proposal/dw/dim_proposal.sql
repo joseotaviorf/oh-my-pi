@@ -44,6 +44,7 @@ dti AS (
 SELECT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
   CAST(p.id AS INTEGER) AS sk_proposal,
   CAST(p.id AS INTEGER) AS id_proposal,
+  p.country_code,
   p.guarantee,
   p.status,
   p.tenant_documentation_status AS status_doc_tenant,
