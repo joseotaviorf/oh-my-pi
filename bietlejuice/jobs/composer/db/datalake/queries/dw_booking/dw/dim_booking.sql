@@ -46,6 +46,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   b.id_attendant,
   b.id_rent_flow AS id_rental_flow,
   CAST(b.id_rescheduled_booking AS INT) AS rescheduled_from_id,
+  b.country_code,
   b.visit_intent,
   b.buyer_intention,
   b.type,

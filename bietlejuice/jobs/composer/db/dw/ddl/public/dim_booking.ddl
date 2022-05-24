@@ -11,6 +11,7 @@ create table if not exists public.dim_booking
   id_attendant bigint encode az64,
   id_rental_flow bigint encode az64,
   rescheduled_from_id integer encode az64,
+  country_code VARCHAR,
   visit_intent varchar(100) encode lzo,
   buyer_intention varchar(100)   encode lzo,
   type varchar(255) encode lzo,

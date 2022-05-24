@@ -298,6 +298,7 @@ secretariat_users AS (
 base_booking AS (
   SELECT
     b.id,
+    hl.id_country,
     b.id_rescheduled_booking,
     b.id_visitor,
     b.id_visit,
@@ -315,6 +316,7 @@ base_booking AS (
     ) AS id_sale_flow,
     vo.id_real_estate_agent_rating,
     IF(b.business_context = 'SALE', vfa.id_fixed_agent,NULL) AS id_sale_fixed_agent,
+    hl.country_code,
     b.dt_booking,
     b.status,
     b.business_context AS visit_intent,
@@ -526,6 +528,9 @@ base_booking AS (
   LEFT JOIN
     datalake_ebdb_user.user AS u
       ON u.id = fba.id_user_creation
+  LEFT JOIN
+    datalake_ebdb_listing.house AS hl
+      ON b.id_house = hl.id
 )
 -- custom columns that need pre-calculated ones
 SELECT

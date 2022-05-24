@@ -32,6 +32,9 @@ columns:
   rescheduled_from_id:
     lineage:
       - datalake_booking.booking.id_rescheduled_booking
+  country_code:
+    lineage:
+      - datalake_booking.booking.country_code
   visit_intent:
     lineage:
       - datalake_booking.booking.visit_intent
