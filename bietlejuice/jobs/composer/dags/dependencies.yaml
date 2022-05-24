@@ -532,6 +532,7 @@ bietlejuice.dw_customer_support:
   - bietlejuice.enrich_customer_support:load-enrich-csat
   - bietlejuice.enrich_customer_support:load-enrich-chat
   - bietlejuice.enrich_customer_support:load-enrich-email
+  - bietlejuice.enrich_customer_resolution:load-enrich-customer-resolution-static
   - bietlejuice.gsheets.support_and_service:load-clean-agents-ranking-targets
   - bietlejuice.gsheets.support_and_service:load-clean-department-control
   - bietlejuice.zendesk_tickets:load-clean-satisfaction-ratings

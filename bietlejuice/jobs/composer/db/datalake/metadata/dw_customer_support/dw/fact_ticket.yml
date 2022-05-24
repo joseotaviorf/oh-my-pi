@@ -1,3 +1,4 @@
+---
 database_name: dw_customer_support
 table_name: fact_ticket
 columns:
@@ -95,6 +96,9 @@ columns:
       - datalake_customer_support.email.id_contract
       - datalake_customer_support.historical_call.id_contract
       - datalake_customer_support.historical_chat.id_contract
+  sk_main_session:
+    lineage:
+      - datalake_customer_resolution.customer_resolution_static.id_ticket
   csat_score:
     lineage:
       - datalake_customer_support.call.csat_rating
@@ -154,16 +158,6 @@ columns:
       - datalake_customer_support.call.back_ticket_list
       - datalake_customer_support.chat.back_ticket_list
       - datalake_customer_support.email.back_ticket_list
-  total_backoffice_minutes_time:
-    lineage:
-      - datalake_customer_support.call.total_backoffice_minutes_time
-      - datalake_customer_support.chat.total_backoffice_minutes_time
-      - datalake_customer_support.email.total_backoffice_minutes_time
-  total_minutes_front_to_open_back_ticket_time:
-    lineage:
-      - datalake_customer_support.call.total_minutes_front_to_open_back_ticket_time
-      - datalake_customer_support.chat.total_minutes_front_to_open_back_ticket_time
-      - datalake_customer_support.email.total_minutes_front_to_open_back_ticket_time
   resolution_survey:
     lineage:
       - datalake_customer_support.call.is_solved
@@ -234,6 +228,31 @@ columns:
       - datalake_customer_support.historical_chat.is_bot
       - datalake_customer_support.historical_chat.is_closed_by_merge
       - datalake_customer_support.historical_chat.front_or_back
+  is_ticket_session:
+    lineage:
+      - datalake_customer_resolution.customer_resolution_static.id_ticket
+      - datalake_customer_support.call.id_ticket
+      - datalake_customer_support.chat.id_ticket
+      - datalake_customer_support.email.id_ticket
+      - datalake_customer_support.historical_call.id_ticket
+      - datalake_customer_support.historical_chat.id_ticket
+  is_fcr_customer:
+    lineage:
+      - datalake_customer_resolution.customer_resolution_static.is_fcr
+      - datalake_customer_resolution.customer_resolution_static.id_ticket
+      - datalake_customer_support.call.id_ticket
+      - datalake_customer_support.chat.id_ticket
+      - datalake_customer_support.email.id_ticket
+      - datalake_customer_support.historical_call.id_ticket
+      - datalake_customer_support.historical_chat.id_ticket
+  is_recontact:
+    lineage:
+      - datalake_customer_resolution.customer_resolution_static.id_ticket
+      - datalake_customer_support.call.id_ticket
+      - datalake_customer_support.chat.id_ticket
+      - datalake_customer_support.email.id_ticket
+      - datalake_customer_support.historical_call.id_ticket
+      - datalake_customer_support.historical_chat.id_ticket
   has_transfers:
     lineage:
       - datalake_customer_support.call.has_transfers
@@ -260,6 +279,16 @@ columns:
     lineage:
       - datalake_customer_support.call.total_minutes_handling_time
       - datalake_customer_support.chat.total_minutes_handling_time
+  total_backoffice_minutes_time:
+    lineage:
+      - datalake_customer_support.call.total_backoffice_minutes_time
+      - datalake_customer_support.chat.total_backoffice_minutes_time
+      - datalake_customer_support.email.total_backoffice_minutes_time
+  total_minutes_front_to_open_back_ticket_time:
+    lineage:
+      - datalake_customer_support.call.total_minutes_front_to_open_back_ticket_time
+      - datalake_customer_support.chat.total_minutes_front_to_open_back_ticket_time
+      - datalake_customer_support.email.total_minutes_front_to_open_back_ticket_time
   ts_started:
     lineage:
       - datalake_customer_support.call.ts_ticket_started

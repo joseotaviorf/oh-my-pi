@@ -42,7 +42,7 @@ WITH call_tickets AS (
           AND is_closed_by_merge = FALSE
           AND (front_or_back = 'front' OR front_or_back IS NULL)
       THEN TRUE
-      WHEN is_solved IS NOT NULL 
+      WHEN is_solved IS NOT NULL
           AND is_bot = FALSE
           AND is_closed_by_merge = FALSE
           AND (front_or_back = 'front' OR front_or_back IS NULL)
@@ -59,7 +59,7 @@ WITH call_tickets AS (
       THEN TRUE
       WHEN is_solved IS NOT NULL
           AND is_bot = FALSE
-          AND is_closed_by_merge = FALSE 
+          AND is_closed_by_merge = FALSE
           AND (front_or_back = 'front' OR front_or_back IS NULL)
       THEN FALSE
       ELSE NULL
@@ -101,7 +101,7 @@ chat_tickets AS (
     MD5(first_department) AS sk_first_department,
     MD5(last_department) AS sk_main_department,
     MAX(id_user) AS sk_user,
-    id_contract AS sk_contract, 
+    id_contract AS sk_contract,
     'chat' AS channel,
     csat_score,
     status,
@@ -124,8 +124,8 @@ chat_tickets AS (
           AND is_closed_by_merge = FALSE
           AND (front_or_back = 'front' OR front_or_back IS NULL)
       THEN TRUE
-      WHEN is_solved IS NOT NULL 
-          AND is_bot = FALSE 
+      WHEN is_solved IS NOT NULL
+          AND is_bot = FALSE
           AND is_closed_by_merge = FALSE
           AND (front_or_back = 'front' OR front_or_back IS NULL)
       THEN FALSE
@@ -202,11 +202,11 @@ email_tickets AS (
     CASE
       WHEN is_solved = TRUE
           AND (back_ticket_list IS NULL OR is_open_back_ticket = FALSE)
-          AND is_bot = FALSE 
+          AND is_bot = FALSE
           AND is_closed_by_merge = FALSE
           AND (front_or_back = 'front' OR front_or_back IS NULL)
       THEN TRUE
-      WHEN is_solved IS NOT NULL 
+      WHEN is_solved IS NOT NULL
           AND is_bot = FALSE
           AND is_closed_by_merge = FALSE
           AND (front_or_back = 'front' OR front_or_back IS NULL)
@@ -216,12 +216,12 @@ email_tickets AS (
     CASE
       WHEN is_solved = TRUE
           AND back_ticket_list IS NULL
-          AND is_bot = FALSE 
+          AND is_bot = FALSE
           AND is_closed_by_merge = FALSE
           AND (front_or_back = 'front' OR front_or_back IS NULL)
       THEN TRUE
       WHEN is_solved IS NOT NULL
-          AND is_bot = FALSE 
+          AND is_bot = FALSE
           AND is_closed_by_merge = FALSE
           AND (front_or_back = 'front' OR front_or_back IS NULL)
       THEN FALSE
@@ -239,7 +239,7 @@ email_tickets AS (
     ts_ticket_ended AS ts_closed,
     ts_ticket_solved AS ts_solved,
     NOW() AS ts_load
-  FROM 
+  FROM
     datalake_customer_support.email
   GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38
 ),
@@ -319,7 +319,7 @@ historical_chat_tickets AS (
     MD5(first_department) AS sk_first_department,
     MD5(last_department) AS sk_main_department,
     MAX(id_user) AS sk_user,
-    id_contract AS sk_contract, 
+    id_contract AS sk_contract,
     'chat' AS channel,
     csat_score,
     status,
@@ -341,8 +341,8 @@ historical_chat_tickets AS (
         AND is_closed_by_merge = FALSE
         AND (front_or_back = 'front' OR front_or_back IS NULL)
       THEN TRUE
-      WHEN is_solved IS NOT NULL 
-        AND is_bot = FALSE 
+      WHEN is_solved IS NOT NULL
+        AND is_bot = FALSE
         AND is_closed_by_merge = FALSE
         AND (front_or_back = 'front' OR front_or_back IS NULL)
       THEN FALSE
@@ -377,28 +377,99 @@ historical_chat_tickets AS (
   FROM
     datalake_customer_support.historical_chat
   GROUP BY 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38
+),
+base_tickets AS (
+  SELECT
+    *
+  FROM
+    call_tickets
+  UNION ALL
+  SELECT
+    *
+  FROM
+    email_tickets
+  UNION ALL
+  SELECT
+    *
+  FROM
+    chat_tickets
+  UNION ALL
+  SELECT
+    *
+  FROM
+    historical_call_tickets
+  UNION ALL
+  SELECT
+    *
+  FROM
+    historical_chat_tickets
+),
+fcr_customer AS (
+  SELECT
+    CAST(id_ticket AS BIGINT) AS sk_main_session,
+    EXPLODE(ticket_recontact_list) AS recontact_ticket,
+    is_fcr AS is_fcr_customer
+  FROM
+    datalake_customer_resolution.customer_resolution_static
 )
-SELECT 
-  *
-FROM
-  call_tickets
-UNION ALL
-SELECT 
-  *
-FROM
-  email_tickets
-UNION ALL
-SELECT 
-  *
-FROM
-  chat_tickets
-UNION ALL
 SELECT
-  *
+    bt.sk_ticket,
+    bt.sk_taxonomy,
+    bt.sk_tags,
+    bt.sk_channel,
+    bt.sk_first_agent,
+    bt.sk_last_agent,
+    bt.sk_first_department,
+    bt.sk_main_department,
+    bt.sk_user,
+    bt.sk_contract,
+    fc.sk_main_session,
+    bt.channel,
+    bt.csat_score,
+    bt.status,
+    bt.first_department,
+    bt.main_department,
+    bt.total_departments,
+    bt.total_segments,
+    bt.full_resolution_time,
+    bt.front_or_back,
+    bt.last_back_ticket,
+    bt.back_tickets,
+    bt.resolution_survey,
+    bt.has_answered_csat,
+    bt.has_back_ticket,
+    bt.is_back_ticket_open,
+    bt.is_solved,
+    bt.is_fcr,
+    CASE
+      WHEN bt.sk_ticket = fc.sk_main_session
+      THEN TRUE
+      ELSE FALSE
+    END AS is_ticket_session,
+    CASE
+      WHEN bt.sk_ticket = fc.sk_main_session
+      THEN fc.is_fcr_customer
+    END AS is_fcr_customer,
+    CASE
+      WHEN bt.sk_ticket <> fc.sk_main_session
+      THEN TRUE
+      WHEN bt.sk_ticket = fc.sk_main_session
+      THEN FALSE
+    END AS is_recontact,
+    bt.has_transfers,
+    bt.total_minutes_reception_time,
+    bt.total_minutes_talk_time,
+    bt.total_minutes_queue_time,
+    bt.total_minutes_wrap_up_time,
+    bt.total_minutes_handling_time,
+    bt.total_backoffice_minutes_time,
+    bt.total_minutes_front_to_open_back_ticket_time,
+    bt.ts_started,
+    bt.ts_closed,
+    bt.ts_solved,
+    bt.ts_load
 FROM
-  historical_call_tickets
-UNION ALL
-SELECT 
-  *
-FROM
-  historical_chat_tickets
+  base_tickets AS bt
+LEFT JOIN
+  fcr_customer AS fc
+    ON bt.sk_ticket = fc.recontact_ticket
