@@ -5,6 +5,7 @@ create table if not exists public.dim_house_listing
  sk_autonomous_agent bigint,
  id_house bigint,
  short_id_house bigint,
+ country_code VARCHAR,
  version smallint,
  first_key_location varchar(256),
  status varchar(256),
