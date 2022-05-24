@@ -1251,6 +1251,7 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb:create-clean-access-type-in-data-lake
   - bietlejuice.ebdb:create-clean-access-type-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-condo-in-data-lake
+  - bietlejuice.ebdb:create-clean-country-in-data-lake
   - bietlejuice.ebdb:create-clean-house-in-data-lake
   - bietlejuice.ebdb:create-clean-house-agent-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-house-agent-key-tracking-aud-in-data-lake
@@ -1271,6 +1272,7 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb:create-clean-special-condition-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-state-in-data-lake
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
+  - bietlejuice.enrich_region:load-enrich-region
 
 bietlejuice.enrich_ebdb_listing_jobs:
   - bietlejuice.ebdb:create-clean-house-registration-status-aud-in-data-lake

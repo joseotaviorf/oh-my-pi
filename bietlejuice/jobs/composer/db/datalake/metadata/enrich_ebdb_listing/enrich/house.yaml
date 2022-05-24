@@ -5,12 +5,59 @@ columns:
   id:
     lineage:
       - datalake_ebdb_clean.house.id
+  id_country:
+    lineage:
+      - datalake_ebdb_clean.country.id
+      - datalake_region.region.id_country
+  id_state:
+    lineage:
+      - datalake_ebdb_clean.house.id_state
+  id_region:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.house.id_user
+  id_user_registrant:
+    lineage:
+      - datalake_ebdb_clean.house.id_user_registrant
+  id_external:
+    lineage:
+      - datalake_ebdb_clean.house.id_external
+  id_condo_parent:
+    lineage:
+      - datalake_ebdb_clean.house.id_condo_parent
   house_short_id:
     lineage:
       - datalake_ebdb_clean.house.id
   rent:
     lineage:
       - datalake_ebdb_clean.house.rent
+  country_code:
+    lineage:
+      - datalake_ebdb_clean.country.code
+      - datalake_region.region.country_code
+  state_abbreviation:
+    lineage:
+      - datalake_ebdb_clean.state.abbreviation
+  state_name:
+    lineage:
+      - datalake_ebdb_clean.state.name
+  region_city_name:
+    lineage:
+      - datalake_ebdb_clean.map_region.city_name
+  region_macro_name:
+    lineage:
+      - datalake_ebdb_clean.map_region.macro_name
+  region_name:
+    lineage:
+      - datalake_ebdb_clean.map_region.name
+  lat:
+    lineage:
+      - datalake_ebdb_clean.house.lat
+  lng:
+    lineage:
+      - datalake_ebdb_clean.house.lng
   neighborhood:
     lineage:
       - datalake_ebdb_clean.house.neighborhood
@@ -20,48 +67,33 @@ columns:
   city:
     lineage:
       - datalake_ebdb_clean.house.city
+  address:
+    lineage:
+      - datalake_ebdb_clean.house.address
   complement:
     lineage:
       - datalake_ebdb_clean.house.complement
   condo:
     lineage:
       - datalake_ebdb_clean.house.condo
-  id_condo_parent:
+  condo_name:
     lineage:
-      - datalake_ebdb_clean.house.id_condo_parent
-  dt_built:
+      - datalake_ebdb_clean.condo.name
+  closest_station_name:
     lineage:
-      - datalake_ebdb_clean.house.dt_built
-  has_elevator:
-    lineage:
-      - datalake_ebdb_clean.house.has_elevator
+      - datalake_ebdb_clean.local.name
   contact_email:
     lineage:
       - datalake_ebdb_clean.house.contact_email
   photo_session_email:
     lineage:
       - datalake_ebdb_clean.house.photo_session_email
-  address:
-    lineage:
-      - datalake_ebdb_clean.house.address
   conservation_status:
     lineage:
       - datalake_ebdb_clean.house.conservation_status
-  does_photographer_fill_information:
-    lineage:
-      - datalake_ebdb_clean.house.does_photographer_fill_information
   iptu:
     lineage:
       - datalake_ebdb_clean.house.iptu
-  lat:
-    lineage:
-      - datalake_ebdb_clean.house.lat
-  lng:
-    lineage:
-      - datalake_ebdb_clean.house.lng
-  is_furnished:
-    lineage:
-      - datalake_ebdb_clean.house.is_furnished
   finishing_level:
     lineage:
       - datalake_ebdb_clean.house.finishing_level
@@ -83,9 +115,6 @@ columns:
   register_percent_complete:
     lineage:
       - datalake_ebdb_clean.house.register_percent_complete
-  has_session_photos_email_preference:
-    lineage:
-      - datalake_ebdb_clean.house.has_session_photos_email_preference
   status:
     lineage:
       - datalake_ebdb_clean.house.status
@@ -107,33 +136,9 @@ columns:
   parking_slot_type:
     lineage:
       - datalake_ebdb_clean.house.parking_slot_type
-  is_verified:
-    lineage:
-      - datalake_ebdb_clean.house.is_verified
-  id_user:
-    lineage:
-      - datalake_ebdb_clean.house.id_user
   promotion_code:
     lineage:
       - datalake_ebdb_clean.house.promotion_code
-  is_quote_insurance_needed:
-    lineage:
-      - datalake_ebdb_clean.house.is_quote_insurance_needed
-  total_value:
-    lineage:
-      - datalake_ebdb_clean.house.total_value
-  dt_expiration:
-    lineage:
-      - datalake_ebdb_clean.house.dt_expiration
-  dt_first_publication:
-    lineage:
-      - datalake_ebdb_clean.house.dt_first_publication
-  has_owner_incomplete_listing_notification:
-    lineage:
-      - datalake_ebdb_clean.house.has_owner_incomplete_listing_notification
-  has_admin_incomplete_listing_notification:
-    lineage:
-      - datalake_ebdb_clean.house.has_admin_incomplete_listing_notification
   short_url:
     lineage:
       - datalake_ebdb_clean.house.short_url
@@ -146,9 +151,6 @@ columns:
   plan_accepted:
     lineage:
       - datalake_ebdb_clean.house.plan_accepted
-  has_price_adjustment_suggestion:
-    lineage:
-      - datalake_ebdb_clean.house.has_price_adjustment_suggestion
   lead_description:
     lineage:
       - datalake_ebdb_clean.house.lead_description
@@ -167,27 +169,12 @@ columns:
   references:
     lineage:
       - datalake_ebdb_clean.house.references
-  is_condo_price_included:
-    lineage:
-      - datalake_ebdb_clean.house.is_condo_price_included
-  has_manual_coordinates:
-    lineage:
-      - datalake_ebdb_clean.house.has_manual_coordinates
-  is_iptu_included:
-    lineage:
-      - datalake_ebdb_clean.house.is_iptu_included
-  is_follow_up_owner_upload_photos:
-    lineage:
-      - datalake_ebdb_clean.house.is_follow_up_owner_upload_photos
-  ts_first_verified:
-    lineage:
-      - datalake_ebdb_clean.house.ts_first_verified
   lead_collision_type:
     lineage:
       - datalake_ebdb_clean.house.lead_collision_type
-  ts_agent_lead_payment_calculated:
+  total_value:
     lineage:
-      - datalake_ebdb_clean.house.ts_agent_lead_payment_calculated
+      - datalake_ebdb_clean.house.total_value
   cover_image_name:
     lineage:
       - datalake_ebdb_clean.house.cover_image_name
@@ -209,15 +196,6 @@ columns:
   photo_booking_historic:
     lineage:
       - datalake_ebdb_clean.house.photo_booking_historic
-  ts_affiliate_lead_payment_calculated:
-    lineage:
-      - datalake_ebdb_clean.house.ts_affiliate_lead_payment_calculated
-  has_service_bathroom:
-    lineage:
-      - datalake_ebdb_clean.house.has_service_bathroom
-  has_service_bedroom:
-    lineage:
-      - datalake_ebdb_clean.house.has_service_bedroom
   default_neighborhood:
     lineage:
       - datalake_ebdb_clean.house.default_neighborhood
@@ -227,18 +205,9 @@ columns:
   iptu_type:
     lineage:
       - datalake_ebdb_clean.house.iptu_type
-  dt_availability_end:
-    lineage:
-      - datalake_ebdb_clean.house.dt_availability_end
   compare_price_with_average:
     lineage:
       - datalake_ebdb_clean.house.compare_price_with_average
-  is_warn_owner_of_visits_needed:
-    lineage:
-      - datalake_ebdb_clean.house.is_warn_owner_of_visits_needed
-  is_listing_notifying_owner_email_sent:
-    lineage:
-      - datalake_ebdb_clean.house.is_listing_notifying_owner_email_sent
   house_conversion_status:
     lineage:
       - datalake_ebdb_clean.house.house_conversion_status
@@ -251,72 +220,21 @@ columns:
   lat_lng:
     lineage:
       - datalake_ebdb_clean.house.lat_lng
-  ts_last_index_update:
-    lineage:
-      - datalake_ebdb_clean.house.ts_last_index_update
   title:
     lineage:
       - datalake_ebdb_clean.house.title
-  ts_suspension_end:
-    lineage:
-      - datalake_ebdb_clean.house.ts_suspension_end
-  id_external:
-    lineage:
-      - datalake_ebdb_clean.house.id_external
-  is_in_negotiation:
-    lineage:
-      - datalake_ebdb_clean.house.is_in_negotiation
-  is_in_external_negotiation:
-    lineage:
-      - datalake_ebdb_clean.house.is_in_external_negotiation
-  ts_external_negotiation_start:
-    lineage:
-      - datalake_ebdb_clean.house.ts_external_negotiation_start
   cardiff_rejection_reason:
     lineage:
       - datalake_ebdb_clean.house.cardiff_rejection_reason
-  ts_recapture:
-    lineage:
-      - datalake_ebdb_clean.house.ts_recapture
-  is_photographer_job_pending:
-    lineage:
-      - datalake_ebdb_clean.house.is_photographer_job_pending
-  has_requested_professional_photos:
-    lineage:
-      - datalake_ebdb_clean.house.has_requested_professional_photos
-  ts_last_confirmation_availability:
-    lineage:
-      - datalake_ebdb_clean.house.ts_last_confirmation_availability
   registry:
     lineage:
       - datalake_ebdb_clean.house.registry
   penalization_score:
     lineage:
       - datalake_ebdb_clean.house.penalization_score
-  is_receive_default_contract_copy_needed:
-    lineage:
-      - datalake_ebdb_clean.house.is_receive_default_contract_copy_needed
   rank_score:
     lineage:
       - datalake_ebdb_clean.house.rank_score
-  ts_last_publication:
-    lineage:
-      - datalake_ebdb_clean.house.ts_last_publication
-  is_visit_information_confirmed:
-    lineage:
-      - datalake_ebdb_clean.house.is_visit_information_confirmed
-  id_region:
-    lineage:
-      - datalake_ebdb_clean.house.id_region
-  dt_creation:
-    lineage:
-      - datalake_ebdb_clean.house.dt_creation
-  ts_updated:
-    lineage:
-      - datalake_ebdb_clean.house.ts_updated
-  id_user_registrant:
-    lineage:
-      - datalake_ebdb_clean.house.id_user_registrant
   total_area:
     lineage:
       - datalake_ebdb_clean.house.total_area
@@ -329,37 +247,6 @@ columns:
   sale_price:
     lineage:
       - datalake_ebdb_clean.house.sale_price
-  is_for_rent:
-    lineage:
-      - datalake_ebdb_clean.house.is_for_rent
-  is_for_sale:
-    lineage:
-      - datalake_ebdb_clean.house.is_for_sale
-  is_imovel_v3:
-    lineage:
-      - datalake_ebdb_clean.house.announced_by
-      - datalake_ebdb_clean.house.id_announced_by
-  state_abbreviation:
-    lineage:
-      - datalake_ebdb_clean.state.abbreviation
-  state_name:
-    lineage:
-      - datalake_ebdb_clean.state.name
-  region_city_name:
-    lineage:
-      - datalake_ebdb_clean.map_region.city_name
-  region_macro_name:
-    lineage:
-      - datalake_ebdb_clean.map_region.macro_name
-  region_name:
-    lineage:
-      - datalake_ebdb_clean.map_region.name
-  condo_name:
-    lineage:
-      - datalake_ebdb_clean.condo.name
-  closest_station_name:
-    lineage:
-      - datalake_ebdb_clean.local.name
   occupant_type:
     lineage:
       - datalake_ebdb_clean.occupant_type.name
@@ -372,9 +259,6 @@ columns:
   visit_restriction:
     lineage:
       - datalake_ebdb_clean.restriction_type.name
-  has_visit_restriction:
-    lineage:
-      - datalake_ebdb_clean.restriction_type.name
   registration_abandoned_reason:
     lineage:
       - datalake_ebdb_clean.house_registration_status.registration_abandoned_reason
@@ -383,6 +267,88 @@ columns:
       - datalake_ebdb_clean.house.status
       - datalake_ebdb_clean.house.unpublished_reason
       - datalake_ebdb_clean.user_revision_entity.reason
+  has_elevator:
+    lineage:
+      - datalake_ebdb_clean.house.has_elevator
+  does_photographer_fill_information:
+    lineage:
+      - datalake_ebdb_clean.house.does_photographer_fill_information
+  is_furnished:
+    lineage:
+      - datalake_ebdb_clean.house.is_furnished
+  has_session_photos_email_preference:
+    lineage:
+      - datalake_ebdb_clean.house.has_session_photos_email_preference
+  is_verified:
+    lineage:
+      - datalake_ebdb_clean.house.is_verified
+  is_quote_insurance_needed:
+    lineage:
+      - datalake_ebdb_clean.house.is_quote_insurance_needed
+  has_owner_incomplete_listing_notification:
+    lineage:
+      - datalake_ebdb_clean.house.has_owner_incomplete_listing_notification
+  has_admin_incomplete_listing_notification:
+    lineage:
+      - datalake_ebdb_clean.house.has_admin_incomplete_listing_notification
+  has_price_adjustment_suggestion:
+    lineage:
+      - datalake_ebdb_clean.house.has_price_adjustment_suggestion
+  is_condo_price_included:
+    lineage:
+      - datalake_ebdb_clean.house.is_condo_price_included
+  has_manual_coordinates:
+    lineage:
+      - datalake_ebdb_clean.house.has_manual_coordinates
+  is_iptu_included:
+    lineage:
+      - datalake_ebdb_clean.house.is_iptu_included
+  is_follow_up_owner_upload_photos:
+    lineage:
+      - datalake_ebdb_clean.house.is_follow_up_owner_upload_photos
+  has_service_bathroom:
+    lineage:
+      - datalake_ebdb_clean.house.has_service_bathroom
+  has_service_bedroom:
+    lineage:
+      - datalake_ebdb_clean.house.has_service_bedroom
+  is_warn_owner_of_visits_needed:
+    lineage:
+      - datalake_ebdb_clean.house.is_warn_owner_of_visits_needed
+  is_listing_notifying_owner_email_sent:
+    lineage:
+      - datalake_ebdb_clean.house.is_listing_notifying_owner_email_sent
+  is_in_negotiation:
+    lineage:
+      - datalake_ebdb_clean.house.is_in_negotiation
+  is_in_external_negotiation:
+    lineage:
+      - datalake_ebdb_clean.house.is_in_external_negotiation
+  is_photographer_job_pending:
+    lineage:
+      - datalake_ebdb_clean.house.is_photographer_job_pending
+  has_requested_professional_photos:
+    lineage:
+      - datalake_ebdb_clean.house.has_requested_professional_photos
+  is_receive_default_contract_copy_needed:
+    lineage:
+      - datalake_ebdb_clean.house.is_receive_default_contract_copy_needed
+  is_visit_information_confirmed:
+    lineage:
+      - datalake_ebdb_clean.house.is_visit_information_confirmed
+  is_for_rent:
+    lineage:
+      - datalake_ebdb_clean.house.is_for_rent
+  is_for_sale:
+    lineage:
+      - datalake_ebdb_clean.house.is_for_sale
+  is_imovel_v3:
+    lineage:
+      - datalake_ebdb_clean.house.announced_by
+      - datalake_ebdb_clean.house.id_announced_by
+  has_visit_restriction:
+    lineage:
+      - datalake_ebdb_clean.restriction_type.name
   is_exclusive:
     lineage:
       - datalake_ebdb_clean.house_special_condition.id_special_condition
@@ -404,3 +370,48 @@ columns:
   has_instant_offer_enabled:
     lineage:
       - datalake_ebdb_clean.instant_offer.is_enabled
+  dt_built:
+    lineage:
+      - datalake_ebdb_clean.house.dt_built
+  dt_expiration:
+    lineage:
+      - datalake_ebdb_clean.house.dt_expiration
+  dt_first_publication:
+    lineage:
+      - datalake_ebdb_clean.house.dt_first_publication
+  dt_availability_end:
+    lineage:
+      - datalake_ebdb_clean.house.dt_availability_end
+  dt_creation:
+    lineage:
+      - datalake_ebdb_clean.house.dt_creation
+  ts_first_verified:
+    lineage:
+      - datalake_ebdb_clean.house.ts_first_verified
+  ts_agent_lead_payment_calculated:
+    lineage:
+      - datalake_ebdb_clean.house.ts_agent_lead_payment_calculated
+  ts_affiliate_lead_payment_calculated:
+    lineage:
+      - datalake_ebdb_clean.house.ts_affiliate_lead_payment_calculated
+  ts_last_index_update:
+    lineage:
+      - datalake_ebdb_clean.house.ts_last_index_update
+  ts_suspension_end:
+    lineage:
+      - datalake_ebdb_clean.house.ts_suspension_end
+  ts_external_negotiation_start:
+    lineage:
+      - datalake_ebdb_clean.house.ts_external_negotiation_start
+  ts_recapture:
+    lineage:
+      - datalake_ebdb_clean.house.ts_recapture
+  ts_last_confirmation_availability:
+    lineage:
+      - datalake_ebdb_clean.house.ts_last_confirmation_availability
+  ts_last_publication:
+    lineage:
+      - datalake_ebdb_clean.house.ts_last_publication
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.house.ts_updated
