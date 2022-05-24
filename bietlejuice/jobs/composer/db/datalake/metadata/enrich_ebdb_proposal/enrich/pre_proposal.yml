@@ -4,6 +4,9 @@ columns:
   id:
     lineage:
       - datalake_ebdb_clean.pre_proposal.id
+  id_country:
+    lineage:
+      - datalake_ebdb_listing.house.id_country
   id_offer_context:
     lineage:
       - datalake_ebdb_clean.pre_proposal.id
@@ -13,6 +16,9 @@ columns:
   id_house:
     lineage:
       - datalake_ebdb_clean.pre_proposal.id_house
+  country_code:
+    lineage:
+      - datalake_ebdb_listing.house.country_code
   code:
     lineage:
       - datalake_ebdb_clean.pre_proposal.code

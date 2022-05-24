@@ -136,15 +136,17 @@ rental_guarantee_proposal AS (
     FROM
         datalake_rental_guarantee_clean.guarantee
 )
-select
+SELECT
     p.id,
     p.id_pre_proposal,
+    hl.id_country,
     p.id_offer,
+    hl.country_code,
     p.guarantee,
     p.motivation,
     p.rent_proposal,
     p.status,
-    shp.status as status_sorting_hat,
+    shp.status AS status_sorting_hat,
     p.tenant_documentation_status,
     p.owner_documentation_status,
     p.rejection_reason,
@@ -154,7 +156,7 @@ select
     p.has_tenant_accepted_contract,
     p.has_owner_accepted_contract,
     p.has_additive_term,
-    coalesce(aud_analysis.is_doc_reused, false) as is_doc_reused,
+    COALESCE(aud_analysis.is_doc_reused, FALSE) AS is_doc_reused,
     p.ts_to_scheduling,
     p.ts_proposal,
     p.ts_approved,
@@ -164,43 +166,51 @@ select
     p.ts_created,
     p.ts_updated,
     aud_analysis.ts_tenant_first_doc_sent,
-    if(aud_analysis.is_doc_reused, aud_analysis.added_rev_doc_row, null) as ts_tenant_auto_first_doc_sent,
+    IF(aud_analysis.is_doc_reused, aud_analysis.added_rev_doc_row, NULL) AS ts_tenant_auto_first_doc_sent,
     aud_analysis.ts_tenant_first_doc_complete,
     aud_analysis.ts_tenant_last_doc_complete,
     -- Dates related to credit analysis (these dates had their business rules changed on jan/2020 and are deprecated after 08/06/2020).
     aud_analysis.ts_credit_analysis_first_init,
-    aud_analysis.ts_credit_analysis_last_init as dt_credit_analysis_last_init,  -- Column to match ODS rules
-    case when cast(p.ts_created as date) < date('2020-01-02')
-        then coalesce(shp.ts_first_analyzed, aud_analysis.ts_credit_analysis_last_init)
-        else aud_analysis.ts_credit_analysis_last_init
-    end as ts_credit_analysis_last_init,
+    aud_analysis.ts_credit_analysis_last_init AS dt_credit_analysis_last_init,  -- Column to match ODS rules
+    CASE
+        WHEN CAST(p.ts_created AS DATE) < DATE('2020-01-02') THEN COALESCE(shp.ts_first_analyzed, aud_analysis.ts_credit_analysis_last_init)
+        ELSE aud_analysis.ts_credit_analysis_last_init
+    END AS ts_credit_analysis_last_init,
     aud_analysis.ts_credit_analysis_first_end,
-    aud_analysis.ts_credit_analysis_last_end as dt_credit_analysis_last_end,
-    case when cast(p.ts_created as date) < date('2020-01-02')
-        then coalesce(shp.ts_processed, aud_analysis.ts_credit_analysis_last_end, shp.ts_analyzed)
-        else aud_analysis.ts_credit_analysis_last_end
-    end as ts_credit_analysis_last_end,
+    aud_analysis.ts_credit_analysis_last_end AS dt_credit_analysis_last_end,
+    CASE
+        WHEN CAST(p.ts_created AS DATE) < DATE('2020-01-02') THEN COALESCE(shp.ts_processed, aud_analysis.ts_credit_analysis_last_end, shp.ts_analyzed)
+        ELSE aud_analysis.ts_credit_analysis_last_end
+    END AS ts_credit_analysis_last_end,
     aud_analysis.ts_credit_approved_last,
     aud_analysis.ts_credit_evaluation_first_init,
     aud_analysis.ts_credit_evaluation_last_init,
     aud_analysis.ts_credit_evaluation_first_negative,
     aud_analysis.ts_credit_evaluation_last_negative,
-    aud_guarantee.ts_processed as ts_guarantee,
+    aud_guarantee.ts_processed AS ts_guarantee,
     aud_analysis.ts_doc_analysis_first_approved,
     aud_analysis.ts_doc_analysis_last_approved,
     aud_analysis.ts_doc_analysis_first_rejected,
     aud_analysis.ts_doc_analysis_last_rejected,
     rg.ts_paid AS ts_guarantee_paid,
     p.ts_entrance
-from datalake_ebdb_clean.proposal p
-left join aud_analysis
-    on aud_analysis.id_aud = p.id
-left join aud_status
-    on aud_status.id_aud = p.id
-left join aud_guarantee
-    on aud_guarantee.id_aud = p.id
-left join sortinghat_proposal shp
-        on shp.id = p.id
+FROM
+    datalake_ebdb_clean.proposal AS p
+LEFT JOIN
+    aud_analysis
+        ON aud_analysis.id_aud = p.id
+LEFT JOIN
+    aud_status
+        ON aud_status.id_aud = p.id
+LEFT JOIN
+    aud_guarantee
+        ON aud_guarantee.id_aud = p.id
+LEFT JOIN
+    sortinghat_proposal AS shp
+        ON shp.id = p.id
 LEFT JOIN 
-    rental_guarantee_proposal rg 
+    rental_guarantee_proposal AS rg 
         ON p.id = rg.id_proposal
+LEFT JOIN
+    datalake_ebdb_listing.house AS hl
+        ON hl.id = p.id_house

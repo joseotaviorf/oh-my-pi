@@ -7,9 +7,15 @@ columns:
   id_pre_proposal:
     lineage:
       - datalake_ebdb_clean.proposal.id_pre_proposal
+  id_country:
+    lineage:
+      - datalake_ebdb_listing.house.id_country
   id_offer:
     lineage:
       - datalake_ebdb_clean.proposal.id_offer
+  country_code:
+    lineage:
+      - datalake_ebdb_listing.house.country_code
   guarantee:
     lineage:
       - datalake_ebdb_clean.proposal.guarantee

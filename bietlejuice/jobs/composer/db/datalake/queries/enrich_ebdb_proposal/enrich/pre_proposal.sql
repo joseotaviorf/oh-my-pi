@@ -50,9 +50,11 @@ special_conditions as (
 )
 select
   pp.id,
+  hl.id_country,
   (pp.id * 100) + 1 as id_offer_context,
   pp.id_user,
   pp.id_house,
+  hl.country_code,
   pp.code,
   pp.rejection_reason,
   pp.rent,
@@ -99,3 +101,6 @@ left join
 left join
   special_conditions sc
     on pp.id = sc.id_pre_proposal
+LEFT JOIN
+  datalake_ebdb_listing.house AS hl
+    ON hl.id = pp.id_house

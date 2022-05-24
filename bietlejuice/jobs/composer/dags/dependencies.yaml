@@ -1289,6 +1289,7 @@ bietlejuice.enrich_ebdb_proposal:
   - bietlejuice.ebdb:create-clean-pre-proposal-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-pre-proposal-condition-in-data-lake
   - bietlejuice.ebdb:create-clean-proposal-condition-in-data-lake
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
 
 bietlejuice.enrich_ebdb_rent_flow:
@@ -1582,6 +1583,7 @@ bietlejuice.enrich_pro_owners:
 bietlejuice.enrich_proposal:
   - bietlejuice.ebdb:create-clean-proposal-in-data-lake
   - bietlejuice.ebdb:create-clean-proposal-aud-in-data-lake
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
   - bietlejuice.sorting_hat:load-clean-proposal
   - bietlejuice.sorting_hat:load-clean-proposal-version
