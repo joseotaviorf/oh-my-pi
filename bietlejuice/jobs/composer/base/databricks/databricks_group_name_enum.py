@@ -13,3 +13,4 @@ class DatabricksGroupNameEnum:
     DATA_PRODUCTS = "data-products"
     SOFTWARE_ENGINEERS = "software-engineers"
     BUSINESS_ANALYSTS_CREDIT = "credit-team"
+    MLOPS = "mlops"
