@@ -466,7 +466,7 @@ status_closing_changes AS (
 onboarding AS (
     SELECT
         id AS id_sales_flow,
-        DATE(MAX(ts_updated)) AS dt_ended
+        DATE(MIN(ts_updated)) AS dt_ended
     FROM
         status_closing_changes
     WHERE
