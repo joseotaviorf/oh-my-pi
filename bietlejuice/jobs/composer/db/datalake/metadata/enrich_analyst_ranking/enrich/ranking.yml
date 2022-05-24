@@ -35,12 +35,17 @@ columns:
       - datalake_gsheets_clean.agents_ranking_targets.target_resolution
   ra_would_do_business_again_achievement:
     lineage:
+      - datalake_analyst_ranking.analyst_metrics.ra_would_do_business_again
+      - datalake_analyst_ranking.analyst_metrics.ra_total_tickets_rated
       - datalake_gsheets_clean.agents_ranking_targets.ra_would_do_business_again_target
   ra_score_achievement:
     lineage:
+      - datalake_analyst_ranking.analyst_metrics.ra_score_sum
       - datalake_gsheets_clean.agents_ranking_targets.ra_target_score
-  ra_solutionra_solution_achievement:
+  ra_solution_achievement:
     lineage:
+      - datalake_analyst_ranking.analyst_metrics.ra_solved_tickets
+      - datalake_analyst_ranking.analyst_metrics.ra_total_tickets_rated
       - datalake_gsheets_clean.agents_ranking_targets.ra_target_solution_rate
   ranking_score:
     lineage:
@@ -65,6 +70,10 @@ columns:
       - datalake_analyst_ranking.analyst_metrics.total_tickets_with_csat_score
       - datalake_analyst_ranking.analyst_metrics.total_tickets_resolution
       - datalake_analyst_ranking.analyst_metrics.total_tickets_answered_resolution
+      - datalake_analyst_ranking.analyst_metrics.ra_score_sum
+      - datalake_analyst_ranking.analyst_metrics.ra_would_do_business_again
+      - datalake_analyst_ranking.analyst_metrics.ra_solved_tickets
+      - datalake_analyst_ranking.analyst_metrics.ra_total_tickets_rated
   dt_ranking_week:
     lineage:
       - datalake_analyst_ranking.analyst_metrics.dt_metric_reference

@@ -10,14 +10,18 @@ WITH agents_metrics AS (
     SUM(COALESCE(total_tickets_with_csat_score,0)) AS total_tickets_with_csat_score,
     SUM(COALESCE(total_tickets_resolution,0)) AS total_tickets_resolution,
     SUM(COALESCE(total_tickets_answered_resolution,0)) AS total_tickets_answered_resolution,
-    SUM(COALESCE(NULL,0)) AS ra_would_do_business_again, --REPLACE HERE WITH REAL DATA
-    SUM(COALESCE(NULL,0)) AS ra_score, --REPLACE HERE WITH REAL DATA
-    SUM(COALESCE(NULL,0)) AS ra_solution, --REPLACE HERE WITH REAL DATA
+    SUM(COALESCE(ra_would_do_business_again,0)) AS ra_would_do_business_again,
+    CASE 
+      WHEN COALESCE(ra_total_tickets_rated,0) <> 0 THEN (SUM(ra_score_sum)/SUM(ra_total_tickets_rated))
+      ELSE 0 
+    END AS ra_score,
+    SUM(COALESCE(ra_solved_tickets,0)) AS ra_solved_tickets,
+    SUM(COALESCE(ra_total_tickets_rated,0)) AS ra_total_tickets_rated,
     DATE(DATE_TRUNC('week',am.dt_metric_reference)) AS dt_ranking_week
   FROM
     datalake_analyst_ranking.analyst_metrics am
   WHERE
-    DATE_TRUNC('week',am.dt_metric_reference) = DATE_TRUNC('week', '{year}-{month}-{day}')
+    DATE_TRUNC('week',am.dt_metric_reference) BETWEEN DATE_TRUNC('week', DATE('{year}-{month}-{day}') - INTERVAL 1 DAYS) AND DATE_TRUNC('week', '{year}-{month}-{day}')
   GROUP BY id_agent, department, DATE(DATE_TRUNC('week',am.dt_metric_reference))
 ),
 weekly_achiev AS (
@@ -44,9 +48,9 @@ weekly_achiev AS (
     COALESCE(((tickets_solved_in_time/(tickets_solved_in_time + tickets_not_solved_in_time))/target_sla), 0) AS sla_achievement,
     COALESCE(((sum_csat_satisfied_score/total_tickets_with_csat_score)/target_csat), 0) AS csat_achievement,
     COALESCE(((total_tickets_resolution/total_tickets_answered_resolution)/target_resolution), 0) AS resolution_achievement,
-    COALESCE((ra_would_do_business_again/ra_would_do_business_again_target), 0) AS ra_would_do_business_again_achievement,
+    COALESCE(((ra_would_do_business_again/ra_total_tickets_rated)/ra_would_do_business_again_target), 0) AS ra_would_do_business_again_achievement,
     COALESCE((ra_score/ra_target_score) , 0) AS ra_score_achievement,
-    COALESCE((ra_solution/ra_target_solution_rate) , 0) AS ra_solutionra_solution_achievement,
+    COALESCE(((ra_solved_tickets/ra_total_tickets_rated)/ra_target_solution_rate) , 0) AS ra_solution_achievement,
     dt_ranking_week
   FROM
     agents_metrics am
@@ -71,7 +75,7 @@ ranking_score AS (
     resolution_achievement,
     ra_would_do_business_again_achievement,
     ra_score_achievement,
-    ra_solutionra_solution_achievement,
+    ra_solution_achievement,
     (
       (productivity_achievement * productivity_weight)
       + (sla_achievement * sla_weight)
@@ -79,7 +83,7 @@ ranking_score AS (
       + (resolution_achievement * resolution_weight)
       + (ra_would_do_business_again_achievement * would_do_business_again_weight)
       + (ra_score_achievement * reclameaqui_note_weight)
-      + (ra_solutionra_solution_achievement * solution_rate_weight)
+      + (ra_solution_achievement * solution_rate_weight)
     ) * multiplication_factor AS ranking_score,
     dt_ranking_week
   FROM
@@ -96,7 +100,7 @@ SELECT
     resolution_achievement,
     ra_would_do_business_again_achievement,
     ra_score_achievement,
-    ra_solutionra_solution_achievement,
+    ra_solution_achievement,
     multiplication_factor,
     ranking_score,
     CASE 

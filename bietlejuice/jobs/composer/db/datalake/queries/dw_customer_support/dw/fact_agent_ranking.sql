@@ -10,7 +10,7 @@ SELECT
   resolution_achievement,
   ra_would_do_business_again_achievement,
   ra_score_achievement,
-  ra_solutionra_solution_achievement,
+  ra_solution_achievement,
   multiplication_factor,
   ranking_score,
   ranking_quartile,

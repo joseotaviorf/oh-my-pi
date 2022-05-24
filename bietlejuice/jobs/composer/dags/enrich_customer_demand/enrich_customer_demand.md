@@ -17,6 +17,7 @@ This pipeline produces the following output table on Enrich layer:
 - `base_tasks` (full load)
 - `demand_metrics` (full load)
 - `backlog_metrics` (full load)
+- `ra_data` (full load)
 
 ### Responsible Data Team
 ​

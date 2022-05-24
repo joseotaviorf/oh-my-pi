@@ -35,9 +35,9 @@ columns:
   ra_score_achievement:
     lineage:
       - datalake_analyst_ranking.ranking.ra_score_achievement
-  ra_solutionra_solution_achievement:
+  ra_solution_achievement:
     lineage:
-      - datalake_analyst_ranking.ranking.ra_solutionra_solution_achievement
+      - datalake_analyst_ranking.ranking.ra_solution_achievement
   multiplication_factor:
     lineage:
       - datalake_analyst_ranking.ranking.multiplication_factor

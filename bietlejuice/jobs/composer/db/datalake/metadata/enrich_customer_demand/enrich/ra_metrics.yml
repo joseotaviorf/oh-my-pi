@@ -1,0 +1,19 @@
+---
+database_name: datalake_customer_demand
+table_name: ra_metrics
+columns:
+  id_agent:
+    lineage:
+      - datalake_gsheets_clean.agents_control.id_assignee
+  ra_score_sum:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.rating
+  ra_would_do_business_again:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.would_do_business_again
+  ra_solved_tickets:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.is_resolved_issue
+  dt_metric_reference:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.ts_rating

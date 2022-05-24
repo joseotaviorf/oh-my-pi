@@ -12,6 +12,10 @@ CREATE TABLE IF NOT EXISTS customer_support.fact_agent_daily_productivity (
     total_tickets_resolution BIGINT,
     total_tickets_answered_resolution BIGINT,
     total_tickets_with_csat_score BIGINT,
+    ra_score_sum BIGINT,
+    ra_would_do_business_again BIGINT,
+    ra_solved_tickets BIGINT,
+    ra_total_tickets_rated BIGINT,
     dt_metric_reference DATE
 );
 ALTER TABLE customer_support.fact_agent_daily_productivity OWNER TO airflow;

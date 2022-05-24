@@ -37,6 +37,18 @@ columns:
   total_tickets_with_csat_score:
     lineage:
       - datalake_analyst_ranking.analyst_metrics.total_tickets_with_csat_score
+  ra_score_sum:
+    lineage:
+      - datalake_analyst_ranking.analyst_metrics.ra_score_sum
+  ra_would_do_business_again:
+    lineage:
+      - datalake_analyst_ranking.analyst_metrics.ra_would_do_business_again
+  ra_solved_tickets:
+    lineage:
+      - datalake_analyst_ranking.analyst_metrics.ra_solved_tickets
+  ra_total_tickets_rated:
+    lineage:
+      - datalake_analyst_ranking.analyst_metrics.ra_total_tickets_rated
   dt_metric_reference:
     lineage:
       - datalake_analyst_ranking.analyst_metrics.dt_metric_reference

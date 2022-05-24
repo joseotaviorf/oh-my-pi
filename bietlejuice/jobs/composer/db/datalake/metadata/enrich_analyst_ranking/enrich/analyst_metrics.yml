@@ -6,6 +6,7 @@ columns:
     lineage:
       - datalake_customer_demand.quality_metrics.id_agent
       - datalake_customer_demand.demand_metrics.id_agent
+      - datalake_customer_demand.ra_metrics.id_agent
   department:
     lineage:
       - datalake_gsheets_clean.support_agents_department.department
@@ -13,20 +14,25 @@ columns:
     lineage:
       - datalake_customer_demand.quality_metrics.dt_metric_reference
       - datalake_customer_demand.demand_metrics.dt_metric_reference
+      - datalake_customer_demand.ra_metrics.dt_metric_reference
       - datalake_gsheets_clean.agents_control.dt_start
   dt_metric_reference:
     lineage:
       - datalake_customer_demand.quality_metrics.dt_metric_reference
       - datalake_customer_demand.demand_metrics.dt_metric_reference
+      - datalake_customer_demand.ra_metrics.dt_metric_reference
   year:
     lineage:
       - datalake_customer_demand.quality_metrics.dt_metric_reference
       - datalake_customer_demand.demand_metrics.dt_metric_reference
+      - datalake_customer_demand.ra_metrics.dt_metric_reference
   month:
     lineage:
       - datalake_customer_demand.quality_metrics.dt_metric_reference
       - datalake_customer_demand.demand_metrics.dt_metric_reference
+      - datalake_customer_demand.ra_metrics.dt_metric_reference
   day:
     lineage:
       - datalake_customer_demand.quality_metrics.dt_metric_reference
       - datalake_customer_demand.demand_metrics.dt_metric_reference
+      - datalake_customer_demand.ra_metrics.dt_metric_reference
