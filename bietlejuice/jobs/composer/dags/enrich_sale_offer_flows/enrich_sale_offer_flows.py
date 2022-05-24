@@ -40,11 +40,18 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 inner_dependencies = config_service.get_config("inner_dependencies")
 
-CLUSTER_DESCRIPTION = Variable.get("databricks_default_cluster", deserialize_json=True)
-CLUSTER_DESCRIPTION["spark_env_vars"]["ENVIRONMENT"] = ENV
-CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"][
-    "destination"
-] = f"{spark_jobs_logs_path}{DAG_ID}"
+LOGS_OUTPUT_PATH = "s3://{}/logs/jobs/{}".format(
+    Variable.get("databricks_s3_bucket"), DAG_ID
+)
+
+CLUSTER_DESCRIPTION = Variable.get(
+    "databricks_9_1_med_general_cluster", deserialize_json=True
+)
+CLUSTER_DESCRIPTION["cluster_log_conf"]["s3"]["destination"] = LOGS_OUTPUT_PATH
+
+LIBRARIES_DESCRIPTION = Variable.get(
+    "bietlejuice_default_libraries", deserialize_json=True
+)
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -61,7 +68,10 @@ dag = DAG(
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, task_id="create-cluster", cluster_configuration=CLUSTER_DESCRIPTION
+    dag=dag,
+    task_id="create-cluster",
+    cluster_configuration=CLUSTER_DESCRIPTION,
+    libraries=LIBRARIES_DESCRIPTION,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(

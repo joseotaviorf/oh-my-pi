@@ -59,9 +59,9 @@ class IntegrationsValidator:
 
     @staticmethod
     def _load_suite_classes_from_module(
-        module: ModuleType
+        module: ModuleType,
     ) -> List[BaseValidationSuitesExecutor]:
-        """ Parses and loads the *Suite classes from module """
+        """Parses and loads the *Suite classes from module"""
         validation_suites_classes = []
         for class_name in dir(module):
             if class_name.endswith("Suite") and isclass(getattr(module, class_name)):
