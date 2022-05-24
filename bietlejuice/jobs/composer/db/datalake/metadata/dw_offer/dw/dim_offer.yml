@@ -24,6 +24,10 @@ columns:
     lineage:
       - datalake_offer.offer.id_house
       - datalake_ebdb_proposal.pre_proposal.id_house
+  country_code:
+    lineage:
+      - datalake_ebdb_proposal.pre_proposal.country_code
+      - datalake_offer.offer.country_code
   editing:
     lineage:
       - datalake_offer.offer.turn

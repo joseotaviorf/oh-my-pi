@@ -6,6 +6,7 @@ create table public.dim_offer (
   id_firestore varchar(255),
   id_user integer,
   id_property integer,
+  country_code VARCHAR,
   editing varchar,
   status varchar,
   rejection_reason varchar(255),
