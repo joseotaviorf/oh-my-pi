@@ -587,7 +587,7 @@ bietlejuice.dw_datamarts_spark.for_sale:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.casa_mineira_crm:load-clean-city
   - bietlejuice.casa_mineira_crm:load-clean-house
-  - bietlejuice.casa_mineira_crm:load-clean-house_status
+  - bietlejuice.casa_mineira_crm:load-clean-house-status
   - bietlejuice.casa_mineira_crm:load-clean-neighborhood
   - bietlejuice.casa_mineira_crm:load-clean-revisions
   - bietlejuice.casa_mineira_crm:load-clean-uf

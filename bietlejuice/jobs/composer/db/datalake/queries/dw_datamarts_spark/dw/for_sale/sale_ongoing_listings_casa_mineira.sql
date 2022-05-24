@@ -137,7 +137,7 @@ all_houses_listings AS (
               AND COALESCE(rg.dt_end_status_date::DATE, current_date -1))
     WHERE
         status = 'Publicado'
-        AND dd.date >= TO_DATE('20120101', 'yyyyMMdd'))
+        AND dd.date >= TO_DATE('20120101', 'yyyyMMdd')
 )
 SELECT 
     sk_region,
