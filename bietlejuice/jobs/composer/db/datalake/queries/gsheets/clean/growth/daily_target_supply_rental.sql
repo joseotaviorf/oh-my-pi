@@ -1,5 +1,5 @@
 SELECT
-    CAST(DATE_FORMAT(CAST(date AS DATE),'yyyymmdd') AS INTEGER) AS id_date,
+    CAST(DATE_FORMAT(CAST(date AS DATE),'yyyyMMdd') AS INTEGER) AS id_date,
     concat_cost,
     concat_prospects,
     concat_qualifieds,
