@@ -16,6 +16,8 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 - `datamart_opportunity`
 - `house_available_hours`
 - `house_weekly_entrance_info`
+- `ongoing_listed_suspended_listings`
+- `weekly_demand_metrics`
 
 ### Responsible Data Engineering Team
 

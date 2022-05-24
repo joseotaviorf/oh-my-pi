@@ -1,5 +1,5 @@
 WITH daily_published_and_suspended_listings AS (
-SELECT
+SELECT /*+ RANGE_JOIN(f, 19000) */
     f.sk_house_listing,
     f.status_history,
     f.status_change_reason,
