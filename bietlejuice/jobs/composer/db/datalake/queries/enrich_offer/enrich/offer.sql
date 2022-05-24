@@ -104,9 +104,11 @@ select distinct
   offer.id_firestore,
   -- TODO [ODS] bug in Product attaching the same firestore id to different godfather entries
   max(coalesce(offer.id_godfather, firestore.id)) over (partition by offer.id_firestore) as id_godfather,
+  hl.id_country,
   offer.id_client,
   offer.id_house,
   offer.id_rent_flow,
+  hl.country_code,
   offer.original_condo,
   offer.original_home_insurance,
   offer.original_iptu,
@@ -139,3 +141,6 @@ left join firestore_offers firestore
   on offer.id = firestore.id_offer
 left join offer_negotiation negotiation
   on negotiation.id_offer = offer.id
+LEFT JOIN
+    datalake_ebdb_listing.house AS hl
+        ON hl.id = offer.id_house

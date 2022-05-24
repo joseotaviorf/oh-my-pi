@@ -1541,6 +1541,7 @@ bietlejuice.enrich_offer:
   - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
   - bietlejuice.ebdb:create-clean-work-contract-in-data-lake
   - bietlejuice.enrich_booking:load-enrich-booking
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_ebdb_user_revision_entity:load-enrich-user-revision-entity
   - bietlejuice.enrich_firestore:load-enrich-monday
