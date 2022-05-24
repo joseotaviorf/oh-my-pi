@@ -2,6 +2,7 @@ drop table if exists public.dim_contract;
 create table public.dim_contract (
   sk_contract bigint primary key,
   id_contract bigint,
+  country_code VARCHAR,
   rent numeric(14,2),
   first_rent_charged numeric(14,2),
   day_month_due smallint,

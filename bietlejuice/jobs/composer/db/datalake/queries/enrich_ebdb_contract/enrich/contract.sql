@@ -141,10 +141,12 @@ first_rent AS (
   WHERE
     status_closing = 'ContratoAssinado' 
 )
-select
+SELECT
   c.id,
+  hl.id_country,
   c.id_proposal,
   c.id_house,
+  hl.country_code,
   c.rent,
   fre.first_rent AS first_rent_charged,
   c.billing_day_of_month,
@@ -164,12 +166,12 @@ select
   c.condo_price,
   c.iptu,
   c.tenant_service_fee,
-  (sfo.id_contract is not null) as is_tenant_service_fee_opt_out,
-  dt_last_tenant_service_fee_change as ts_tenant_service_fee_opt_out,
+  (sfo.id_contract IS NOT NULL) AS is_tenant_service_fee_opt_out,
+  dt_last_tenant_service_fee_change AS ts_tenant_service_fee_opt_out,
   c.signature_type,
   c.status_closing,
-  regexp_extract(cv.version_display_contract, '^v[^_]+', 0) as contract_version,
-  coalesce(oc.is_ongoing_contract, false) as is_ongoing_contract,
+  regexp_extract(cv.version_display_contract, '^v[^_]+', 0) AS contract_version,
+  COALESCE(oc.is_ongoing_contract, FALSE) AS is_ongoing_contract,
   cm.is_waiting_to_be_signed,
   cm.is_active_or_ended,
   cm.is_canceled,
@@ -184,24 +186,36 @@ select
   c.dt_entered,
   c.dt_termination,
   c.ts_signed,
-  c.ts_contract_expected_end as dt_contract_expected_end, -- TODO [ODS] rename col to dt_contract_expected_end in clean
+  c.ts_contract_expected_end AS dt_contract_expected_end, -- TODO [ODS] rename col to dt_contract_expected_end in clean
   c.ts_minuta_approved,
   c.ts_created,
   c.ts_updated
-from datalake_ebdb_clean.contract c
-left join contract_cancellation_reason ccr
-  on ccr.id_contract = c.id
-left join contract_analyst_annulment_date aad
-  on aad.id_contract = c.id
-left join ongoing_contracts oc
-	on oc.id_contract = c.id
-left join contract_metrics cm
-    on cm.id_contract = c.id
-left join datalake_ebdb_clean.contract_version cv
-	on  cv.id = c.id_contract_version
-left join datalake_ebdb_clean.full_contract fc
-    on fc.id = c.id
-left join tenant_service_fee_opt_out_info as sfo 
-  on c.id = sfo.id_contract
-LEFT JOIN first_rent fre
-  ON fre.id_contract = c.id
+FROM
+  datalake_ebdb_clean.contract AS c
+LEFT JOIN
+  contract_cancellation_reason AS ccr
+    ON ccr.id_contract = c.id
+LEFT JOIN
+  contract_analyst_annulment_date AS aad
+    ON aad.id_contract = c.id
+LEFT JOIN
+  ongoing_contracts AS oc
+	  ON oc.id_contract = c.id
+LEFT JOIN
+  contract_metrics AS cm
+    ON cm.id_contract = c.id
+LEFT JOIN
+  datalake_ebdb_clean.contract_version AS cv
+	  ON cv.id = c.id_contract_version
+LEFT JOIN
+  datalake_ebdb_clean.full_contract AS fc
+    ON fc.id = c.id
+LEFT JOIN
+  tenant_service_fee_opt_out_info AS sfo 
+    ON c.id = sfo.id_contract
+LEFT JOIN
+  first_rent AS fre
+    ON fre.id_contract = c.id
+LEFT JOIN
+  datalake_ebdb_listing.house AS hl
+    ON hl.id = c.id_house

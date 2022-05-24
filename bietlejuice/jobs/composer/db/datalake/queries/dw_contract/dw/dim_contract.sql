@@ -15,6 +15,7 @@ WITH house_b2b_portability AS ( -- TODO [ODS] Move to an enrich
 SELECT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
   c.id AS sk_contract,
   c.id AS id_contract,
+  c.country_code,
   CAST(c.rent AS DECIMAL(14, 2)) AS rent,
   CAST(c.first_rent_charged AS DECIMAL(14, 2)) AS first_rent_charged,
   CAST(c.billing_day_of_month AS SMALLINT) AS day_month_due,
