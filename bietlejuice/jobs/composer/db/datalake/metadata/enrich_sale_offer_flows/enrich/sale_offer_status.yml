@@ -1,0 +1,31 @@
+---
+database_name: datalake_sale_offer_flows
+table_name: sale_offer_status
+columns:
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_clean.status_record.id_sales_flow
+  id_firestore:
+    lineage:
+      - datalake_sales_flow_clean.offer.id_firestore
+  primary_closing_type_label:
+    lineage:
+      - datalake_sales_flow_clean.closing_type.key
+  secundary_closing_type_label:
+    lineage:
+      - datalake_sales_flow_clean.closing_type.key
+  macro_status_name:
+    lineage:
+      - datalake_sales_flow_clean.status.key
+  ordering:
+    lineage:
+      - datalake_sales_flow_clean.status_order.ordering
+  last_micro_status_name:
+    lineage:
+      - datalake_sales_flow_clean.status.key
+  ts_macro_status_start:
+    lineage:
+      - datalake_sales_flow_clean.status_record.ts_status_start
+  ts_macro_status_end:
+    lineage:
+      - datalake_sales_flow_clean.status_record.ts_status_end

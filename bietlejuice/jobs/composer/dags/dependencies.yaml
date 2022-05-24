@@ -1802,6 +1802,7 @@ bietlejuice.enrich_gsheets:
 bietlejuice.enrich_sale_offer_flows:
   - bietlejuice.sales_flow:load-clean-cash-payment
   - bietlejuice.sales_flow:load-clean-ccv-flow
+  - bietlejuice.sales_flow:load-clean-closing-type
   - bietlejuice.sales_flow:load-clean-diligence
   - bietlejuice.sales_flow:load-clean-diligence-appointment
   - bietlejuice.sales_flow:load-clean-house
@@ -1815,6 +1816,9 @@ bietlejuice.enrich_sale_offer_flows:
   - bietlejuice.sales_flow:load-clean-sales-flow-pendency
   - bietlejuice.sales_flow:load-clean-sales-flow-tag
   - bietlejuice.sales_flow:load-clean-specialist
+  - bietlejuice.sales_flow:load-clean-status
+  - bietlejuice.sales_flow:load-clean-status-order
+  - bietlejuice.sales_flow:load-clean-status-record
   - bietlejuice.sales_flow:load-clean-tag
 
 bietlejuice.reverse_tracksale:
