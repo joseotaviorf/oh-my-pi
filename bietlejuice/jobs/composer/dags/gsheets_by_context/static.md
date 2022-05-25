@@ -41,6 +41,8 @@ This pipeline produces the following output tables:
     - `survival_estimation`
     - `survival_estimation_new_version`
     - `users_cx_plaquinhas`
+    - `marketing_affiliates_targets_replanning`
+
 2. Data lake clean:
     - `affiliates_acquisition_targets`
     - `autonomous_agent_listing`
@@ -63,5 +65,6 @@ This pipeline produces the following output tables:
     - `survival_estimation`
     - `survival_estimation_new_version`
     - `users_cx_plaquinhas`
+    - `marketing_affiliates_targets_replanning`
 
 </details>

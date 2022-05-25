@@ -516,6 +516,12 @@ autonomous_agent_listing:
     clean_table_name: autonomous_agent_listing
     sheet_context: static
 
+marketing_affiliates_targets_replanning:
+    sheet_id: 1KHK1D92S6LbHfrp5nivOkUCOrBABBMqoT9uFuMr_Fag
+    sheet_name: marketing_affiliates_targets_replanning
+    clean_table_name: marketing_affiliates_targets_replanning
+    sheet_context: static
+
 #########################
 # GENERAL SHEETS
 ###################

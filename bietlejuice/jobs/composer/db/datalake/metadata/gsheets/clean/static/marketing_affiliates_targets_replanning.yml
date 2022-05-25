@@ -1,0 +1,25 @@
+---
+database_name: datalake_gsheets_clean
+table_name: marketing_affiliates_targets_replanning
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.marketing_affiliates_targets_replanning.city_group
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_raw.marketing_affiliates_targets_replanning.mkt_origin
+  mkt_vertical:
+    lineage:
+      - datalake_gsheets_raw.marketing_affiliates_targets_replanning.mkt_vertical
+  budget:
+    lineage:
+      - datalake_gsheets_raw.marketing_affiliates_targets_replanning.budget
+  prospects_target:
+    lineage:
+      - datalake_gsheets_raw.marketing_affiliates_targets_replanning.prospects_target
+  dt_week_started:
+    lineage:
+      - datalake_gsheets_raw.marketing_affiliates_targets_replanning.week_start
+  dt_target:
+    lineage:
+      - datalake_gsheets_raw.marketing_affiliates_targets_replanning.date
