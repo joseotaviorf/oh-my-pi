@@ -631,6 +631,25 @@ bietlejuice.dw_datamarts_spark.for_sale_cross:
   - bietlejuice.wololo:load-clean-conversion
   - bietlejuice.wololo:load-clean-prospect
 
+bietlejuice.dw_datamarts_spark.growth:
+  #casa_mineira_top_of_funnel_volumes_monthly
+  - bietlejuice.dw_casa_mineira_portal:load-dw-casa-mineira-portal-dim-house
+  - bietlejuice.dw_casa_mineira_portal:load-dw-casa-mineira-portal-dim-real-estate-agency
+  - bietlejuice.dw_casa_mineira_portal:load-dw-casa-mineira-portal-fact-real-estate-budget-flows
+  - bietlejuice.dw_casa_mineira_portal:load-dw-casa-mineira-portal-fact-real-estate-status
+  - bietlejuice.dw_datamarts_growth:create-performance-marketing-metrics-imobiliaria-casa-mineira-in-datalake
+  - bietlejuice.dw_datamarts_growth:create-performance-marketing-metrics-portal-casa-mineira-in-datalake
+  - bietlejuice.enrich_top_of_funnel_portal_cm:load-enrich-top-of-funnel-users-portal-casa-mineira
+  - bietlejuice.gsheets:load-clean-targets-casa-mineira-tof-monthly
+  - bietlejuice.gsheets:load-clean-targets-portal-casa-mineira-cost-cf
+  # buyer_activation_events_combo
+  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.casa_mineira_crm:load-clean-contact
+  - bietlejuice.dw_user:load-dw-public-dim-user
+  - bietlejuice.dw_listing:load-dw-public-dim-house-listing
+  - bietlejuice.dw_listing:load-public-fact-house-listings
+  - bietlejuice.ebdb:create-clean-house-in-data-lake
+
 bietlejuice.dw_datamarts_spark.support_and_service:
   - bietlejuice.kodak:load-clean-photo-sphere
   - bietlejuice.kodak:load-clean-user-revision-entity

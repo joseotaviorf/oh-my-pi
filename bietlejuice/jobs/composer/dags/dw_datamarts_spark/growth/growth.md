@@ -13,6 +13,7 @@ Daily. More information about run time [here]({chart_url}{dag_id}).
 This pipeline creates the tables in the schema `dw_datamart` of data lake and `datamarts` of DW:
 
 - buyer_activation_events_combo
+- casa_mineira_top_of_funnel_volumes_monthly
 
 ### Additional Information
 
