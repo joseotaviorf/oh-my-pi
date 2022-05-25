@@ -84,6 +84,12 @@ branding_where_is_plaquinha:
     clean_table_name: branding_where_is_plaquinha
     sheet_context: growth
 
+base_supply_souce_for_sale:
+    sheet_id: 1UO0kxwf-fXm6nhSFSZg3GTGFF61ZAJiRlAqI-FAr-GE
+    sheet_name: Base_Supply_Souce_For_Sale
+    clean_table_name: daily_target_supply_sale
+    sheet_context: growth
+
 base_supply_souce_for_rent:
     sheet_id: 1Gxp4StsJFhnqI5ogSHzlTaSPiDJF6kmQMXPSjK3dBUM
     sheet_name: Base_Supply_Souce_For_Rent

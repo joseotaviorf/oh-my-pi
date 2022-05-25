@@ -34,6 +34,7 @@ This pipeline produces the following output tables:
     - `manual_cost_engagement`
     - `manual_cost_engagement_history`
     - `mkt_cost_per_source`
+    - `base_supply_souce_for_sale`
     - `offline_manual_costs`
     - `offline_manual_share_city_group`
     - `offline_manual_share_cost_center`
@@ -51,6 +52,7 @@ This pipeline produces the following output tables:
     - `mkt_cost_per_source`
     - `branding_where_is_plaquinha`
     - `costs_targets`
+    - `daily_target_supply_sale`
     - `mta_budget_october_2020`
     - `rental_tof_daily_targets`
     - `rental_tof_weekly_targets`

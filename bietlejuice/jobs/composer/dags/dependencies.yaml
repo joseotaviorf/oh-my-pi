@@ -383,7 +383,7 @@ bietlejuice.dw_datamarts_growth_cross:
   # unique_performance_marketing_metrics_supply_coincident
   # - bietlejuice.enrich_marketing_manual_daily_costs:create-enrich-daily-costs-external-table
   - bietlejuice.enrich_top_of_funnel_supply:create-enrich-top-of-funnel-supply-external-table
-  - bietlejuice.gsheets:create-clean-daily-target-supply-sale-external-table
+  - bietlejuice.gsheets.growth:create-clean-daily-target-supply-sale-external-table
   - bietlejuice.gsheets:create-clean-tof-supply-targets-external-table
   - bietlejuice.wololo:create-clean-prospect-external-table
   # performance_marketing_metrics_demand
