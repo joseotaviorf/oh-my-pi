@@ -12,7 +12,7 @@ WITH agents_metrics AS (
     SUM(COALESCE(total_tickets_answered_resolution,0)) AS total_tickets_answered_resolution,
     SUM(COALESCE(ra_would_do_business_again,0)) AS ra_would_do_business_again,
     CASE 
-      WHEN COALESCE(ra_total_tickets_rated,0) <> 0 THEN (SUM(ra_score_sum)/SUM(ra_total_tickets_rated))
+      WHEN SUM(COALESCE(ra_total_tickets_rated,0)) <> 0 THEN (SUM(ra_score_sum)/SUM(ra_total_tickets_rated))
       ELSE 0 
     END AS ra_score,
     SUM(COALESCE(ra_solved_tickets,0)) AS ra_solved_tickets,
