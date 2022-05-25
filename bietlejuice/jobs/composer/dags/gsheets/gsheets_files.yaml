@@ -80,11 +80,6 @@ base_hunter:
     sheet_name: Página1
     clean_table_name: base_hunter
 
-base_supply_souce_for_sale:
-    sheet_id: 1UO0kxwf-fXm6nhSFSZg3GTGFF61ZAJiRlAqI-FAr-GE
-    sheet_name: Base_Supply_Souce_For_Sale
-    clean_table_name: daily_target_supply_sale
-
 bbb22_coupon_for_sale:
     sheet_id: 1ZnRK-EXvUVNneRtoyCZ0y1ET-Cc859JokFIEFZUfacQ
     sheet_name: users
