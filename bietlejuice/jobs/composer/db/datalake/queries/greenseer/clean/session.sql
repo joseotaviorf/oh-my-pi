@@ -4,6 +4,7 @@ SELECT
     language_code,
     memory,
     current_state,
+    DATE(DATE_TRUNC('month', beginning_timestamp)) AS dt_month_started,
     beginning_timestamp AS ts_started,
     end_timestamp AS ts_ended
 FROM

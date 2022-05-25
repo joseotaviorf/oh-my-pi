@@ -16,6 +16,9 @@ columns:
   current_state:
     lineage:
       - datalake_greenseer_raw.session.current_state
+  dt_month_started:
+    lineage:
+      - datalake_greenseer_raw.session.beginning_timestamp
   ts_started:
     lineage:
       - datalake_greenseer_raw.session.beginning_timestamp
