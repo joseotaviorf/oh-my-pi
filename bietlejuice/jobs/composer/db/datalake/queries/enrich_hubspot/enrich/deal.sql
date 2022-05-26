@@ -1,0 +1,63 @@
+WITH numbered_deal_history AS (
+    SELECT *,
+        ROW_NUMBER() OVER(PARTITION BY id_deal ORDER BY ts_updated DESC) AS rw
+    FROM
+        datalake_hubspot.deal_history
+)
+SELECT
+    id_deal,
+    id_stage,
+    id_pipeline,
+    id_hubspot_owner,
+    id_hubspot_team,
+    id_company,
+    id_stage_history,
+    id_pipeline_history,
+    deal_name,
+    state,
+    hs_priority,
+    partnership_model,
+    unqualification_reason,
+    gain_reason,
+    loss_reason,
+    product,
+    partner_agencies,
+    advertising_portals,
+    rental_guarantee_solutions,
+    financing_banks,
+    amount,
+    brokerage_fee,
+    platform_fee,
+    revenue_share_demand,
+    revenue_share_supply,
+    revenue_share_total,
+    monthly_average_new_rental_contracts,
+    num_managed_properties,
+    num_monthly_leads,
+    average_sale_property_ticket,
+    average_rent_property_ticket,
+    monthly_repayment_volume_in_real,
+    monthly_sale_volume_in_real,
+    num_properties_for_sale,
+    num_properties_for_rent,
+    has_property_advertisement_online,
+    has_crm,
+    is_correspondent_bank,
+    has_financing,
+    is_for_sale,
+    is_for_rent,
+    has_partnerships_with_other_agencies,
+    ts_closed,
+    ts_engagements_last_meeting_booked,
+    ts_hubspot_owner_assigned,
+    ts_notes_last_updated,
+    ts_created,
+    ts_updated,
+    year,
+    month,
+    day
+FROM
+    numbered_deal_history
+WHERE
+    rw = 1
+    AND NOT is_archived

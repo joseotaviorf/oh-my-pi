@@ -1,0 +1,80 @@
+SELECT
+    id_deal::BIGINT,
+    GET_JSON_OBJECT(properties, '$.dealstage')::BIGINT AS id_stage,
+    GET_JSON_OBJECT(properties, '$.pipeline')::BIGINT AS id_pipeline,
+    GET_JSON_OBJECT(properties, '$.hubspot_owner_id')::BIGINT AS id_hubspot_owner,
+    GET_JSON_OBJECT(properties, '$.hubspot_team_id')::BIGINT AS id_hubspot_team,
+    GET_JSON_OBJECT(associations, '$.companies.results[0].id')::BIGINT AS id_company,
+    FROM_JSON(
+        NULLIF(GET_JSON_OBJECT(properties_with_history, '$.dealstage'), '[]'),
+        'array<struct<
+            value:string,
+            timestamp:timestamp,
+            source_type:string,
+            source_id:string,
+            source_label:string,
+            updated_by_user_id:string
+        >>'
+    ) AS id_stage_history,
+    FROM_JSON(
+        NULLIF(GET_JSON_OBJECT(properties_with_history, '$.pipeline'), '[]'),
+        'array<struct<
+            value:string,
+            timestamp:timestamp,
+            source_type:string,
+            source_id:string,
+            source_label:string,
+            updated_by_user_id:string
+        >>'
+    ) AS id_pipeline_history,
+    GET_JSON_OBJECT(properties, '$.dealname') AS deal_name,
+    GET_JSON_OBJECT(properties, '$.estado') AS state,
+    GET_JSON_OBJECT(properties, '$.hs_priority') AS hs_priority,
+    GET_JSON_OBJECT(properties, '$.modelo_da_parceria') AS partnership_model,
+    GET_JSON_OBJECT(properties, '$.motivo_de_desqualificacao') AS unqualification_reason,
+    GET_JSON_OBJECT(properties, '$.motivo_de_ganho') AS gain_reason,
+    GET_JSON_OBJECT(properties, '$.motivo_de_perda') AS loss_reason,
+    GET_JSON_OBJECT(properties, '$.produtos') AS product,
+    SPLIT(NULLIF(GET_JSON_OBJECT(properties, '$.com_quais_imobiliarias_tem_parceria_'), ''), ';') AS partner_agencies,
+    SPLIT(NULLIF(GET_JSON_OBJECT(properties, '$.em_quais_portais_anuncia_'), ''), ';') AS advertising_portals,
+    SPLIT(NULLIF(GET_JSON_OBJECT(properties, '$.qual_a_solucao_empresa_de_garantia_locaticia_oferece_para_os_clientes_de_locacao___clonado_'), ''), ';') AS rental_guarantee_solutions,
+    SPLIT(NULLIF(GET_JSON_OBJECT(properties, '$.trabalha_com_financiamento__se_sim__quais_bancos_'), ''), ';') AS financing_banks,
+    GET_JSON_OBJECT(properties, '$.amount')::INT AS amount,
+    GET_JSON_OBJECT(properties, '$.taxa_de_corretagem')::DOUBLE AS brokerage_fee,
+    GET_JSON_OBJECT(properties, '$.taxa_de_plataforma')::DOUBLE AS platform_fee,
+    GET_JSON_OBJECT(properties, '$.revenue_share___demanda_')::INT AS revenue_share_demand,
+    GET_JSON_OBJECT(properties, '$.revenue_share___supply_')::INT AS revenue_share_supply,
+    GET_JSON_OBJECT(properties, '$.revenue_share_total')::INT AS revenue_share_total,
+    GET_JSON_OBJECT(properties, '$.qual_a_media_de_novos_contratos_de_locacao_mes_')::INT AS monthly_average_new_rental_contracts,
+    GET_JSON_OBJECT(properties, '$.qual_a_quantidade_de_imoveis_administrados_')::INT AS num_managed_properties,
+    GET_JSON_OBJECT(properties, '$.quantos_leads_recebem_por_mes')::INT AS num_monthly_leads,
+    GET_JSON_OBJECT(properties, '$.ticket_medio_de_imoveis_de_venda')::INT AS average_sale_property_ticket,
+    GET_JSON_OBJECT(properties, '$.ticket_medio_de_imoveis_para_locacao')::INT AS average_rent_property_ticket,
+    GET_JSON_OBJECT(properties, '$.volume_de_repasse_mensal__vgv_r__')::INT AS monthly_repayment_volume_in_real,
+    GET_JSON_OBJECT(properties, '$.volume_de_vendas_mensais__vgv_r__')::INT AS monthly_sale_volume_in_real,
+    GET_JSON_OBJECT(properties, '$.quantidade_de_imoveis_a_venda')::INT AS num_properties_for_sale,
+    GET_JSON_OBJECT(properties, '$.quantidade_de_imoveis_para_locacao')::INT AS num_properties_for_rent,
+    NULLIF(GET_JSON_OBJECT(properties, '$.anuncia_os_imoveis_online_'), '') = 'Sim' AS has_property_advertisement_online,
+    NULLIF(GET_JSON_OBJECT(properties, '$.utiliza_algum_crm_'), '') = 'Sim' AS has_crm,
+    NULLIF(GET_JSON_OBJECT(properties, '$.atua_como_correspondente_bancario_'), '') = 'Sim' AS is_correspondent_bank,
+    NULLIF(GET_JSON_OBJECT(properties, '$.trabalha_com_financiamento_'), '') = 'Sim' AS has_financing,
+    NULLIF(GET_JSON_OBJECT(properties, '$.trabalha_com_venda_e_locacao_'), '') LIKE '%Venda%' AS is_for_sale,
+    NULLIF(GET_JSON_OBJECT(properties, '$.trabalha_com_venda_e_locacao_'), '') LIKE '%Locação%' AS is_for_rent,
+    NULLIF(GET_JSON_OBJECT(properties, '$.trabalha_em_parceria_com_outras_imobiliarias_'), '') = 'Sim' AS has_partnerships_with_other_agencies,
+    is_archived,
+    GET_JSON_OBJECT(properties, '$.closedate')::TIMESTAMP AS ts_closed,
+    GET_JSON_OBJECT(properties, '$.engagements_last_meeting_booked')::TIMESTAMP AS ts_engagements_last_meeting_booked,
+    GET_JSON_OBJECT(properties, '$.hubspot_owner_assigneddate')::TIMESTAMP AS ts_hubspot_owner_assigned,
+    GET_JSON_OBJECT(properties, '$.notes_last_updated')::TIMESTAMP AS ts_notes_last_updated,
+    ts_archived,
+    ts_created,
+    ts_updated,
+    year,
+    month,
+    day
+FROM
+    datalake_hubspot_clean.deal
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}
