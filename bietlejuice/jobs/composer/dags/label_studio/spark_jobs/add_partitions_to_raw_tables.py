@@ -1,10 +1,10 @@
-from argparse import ArgumentParser
 import boto3
-import botocore.session
 import json
 import logging
 import re
 
+from argparse import ArgumentParser
+from botocore.credentials import RefreshableCredentials
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.jobs.composer.base.api.api_enum import APIEnum
@@ -72,6 +72,16 @@ def __filter_data_files(files_path_list):
             return file_path
 
 
+def __delete_objects(bucket_name, files_path_list):
+    """
+    Deletes all files from an s3 bucket folder.
+    @param bucket_name: str. S3 bucket name.
+    @param s3_folder_path: list of all the objects discovered under the folder.
+    """
+    for file_path in files_path_list:
+        s3_service.s3_resource.Object(bucket_name, file_path).delete()
+
+
 def __create_folder(bucket_name, objects_filter):
     """
     Create a folder in an s3 bucket.
@@ -98,6 +108,22 @@ def __verify_folder_exists(s3_service, s3_folder_path):
 
     if not files_path_list:
         __create_folder(bucket_name, objects_filter)
+    else:
+        __delete_objects(bucket_name, files_path_list[1:])
+
+
+def __refresh_aws_credentials():
+    """
+    This method uptade the boto3 session credentials.
+    @return: dict
+    """
+    credentials = boto3.Session().get_credentials()
+    return dict(
+        access_key=credentials._access_key,
+        secret_key=credentials._secret_key,
+        token=credentials._token,
+        expiry_time=credentials._expiry_time.isoformat(),
+    )
 
 
 DATABRICKS_SCOPE = "quintoandar"
@@ -118,14 +144,6 @@ if __name__ == "__main__":
     datalake_bucket = args.datalake_bucket
     source = args.source
     table_name = args.table_name
-
-    session = botocore.session.get_session()
-
-    aws_credentials = {
-        "aws_access_key_id": session.get_credentials().access_key,
-        "aws_secret_access_key": session.get_credentials().secret_key,
-        "aws_session_token": session.get_credentials().token,
-    }
 
     config_service = ConfigurationService(dag_name=source)
 
@@ -160,10 +178,12 @@ if __name__ == "__main__":
     )
     credentials = json.loads(json_credentials)
 
+    aws_credentials = boto3.Session().get_credentials()
+
     label_studio_connection_sync = LabelStudioConnectionSync(
         api_token=credentials["user_token"],
         config_service=config_service,
-        aws_credentials=aws_credentials,
+        aws_credentials=aws_credentials.get_frozen_credentials(),
         bucket_name=database_location.split("/")[2],
     )
 
@@ -175,6 +195,16 @@ if __name__ == "__main__":
         s3_folder_path = f"{database_location}sync/{project_name}"
 
         __verify_folder_exists(s3_service, s3_folder_path)
+
+        if aws_credentials.refresh_needed():
+            aws_credentials = RefreshableCredentials.create_from_metadata(
+                metadata=__refresh_aws_credentials(),
+                refresh_using=__refresh_aws_credentials,
+                method="sts-assume-role",
+            )
+            label_studio_connection_sync.refresh_aws_credentials(
+                aws_credentials=aws_credentials.get_frozen_credentials()
+            )
 
         # sync labelstudio data
         label_studio_connection_sync.sync_data_s3_storage(
