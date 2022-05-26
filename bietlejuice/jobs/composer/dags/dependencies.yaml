@@ -631,6 +631,11 @@ bietlejuice.dw_datamarts_spark.for_sale_cross:
   - bietlejuice.wololo:load-clean-conversion
   - bietlejuice.wololo:load-clean-prospect
 
+bietlejuice.dw_datamarts_spark.growth_cross:
+  - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.dw_contract:load-dw-public-dim-contract
+  - bietlejuice.gsheets.growth:create-clean-costs-targets-external-table
+
 bietlejuice.dw_datamarts_spark.growth:
   #casa_mineira_top_of_funnel_volumes_monthly
   - bietlejuice.dw_casa_mineira_portal:load-dw-casa-mineira-portal-dim-house

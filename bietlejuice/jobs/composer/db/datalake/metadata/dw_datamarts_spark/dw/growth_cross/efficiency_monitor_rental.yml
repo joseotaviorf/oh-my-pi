@@ -1,0 +1,15 @@
+---
+database_name: dw_datamarts
+table_name: efficiency_monitor_rental
+columns:
+  dt_month_start:
+    lineage:
+      - dim_contract.dt_start
+      - dim_contract.dt_entrance
+      - dw_datamarts.marketing_demand_supply_branding_costs.dt_cost
+      - datalake_gsheets_clean.costs_targets.dt_created
+  city_group:
+    lineage:
+      - dim_region.city_group
+      - dw_datamarts.marketing_demand_supply_branding_costs.city_group
+      - datalake_gsheets_clean.costs_targets.city_group
