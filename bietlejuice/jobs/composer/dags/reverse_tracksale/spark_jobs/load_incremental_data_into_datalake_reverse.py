@@ -67,47 +67,55 @@ if __name__ == "__main__":
         dfs3 = s3_consumer.get_data_from_file(path=path, format="parquet")
     except Exception as e:
         logger.error("m=There's no data here yet, message_error={}".format(e))
+        dfs3 = []
 
-    df = (
-        dfq.join(dfs3, (dfq.customer_email == dfs3.customer_email), how="left")
-        .withColumn(
-            "is_dispatched",
-            when(dfq.customer_email == dfs3.customer_email, True).otherwise(False),
+    if len(dfs3) > 0:
+        df = (
+            dfq.join(dfs3, (dfq.customer_email == dfs3.customer_email), how="left")
+            .withColumn(
+                "is_dispatched",
+                when(dfq.customer_email == dfs3.customer_email, True).otherwise(False),
+            )
+            .select(dfq["*"], "is_dispatched")
+            .where(col("customer_email").isNotNull())
         )
-        .select(dfq["*"], "is_dispatched")
-        .where(col("customer_email").isNotNull())
-    )
 
-    df = df.withColumn("column_create_date", lit(execution_date))
+        df = df.withColumn("column_create_date", lit(execution_date))
 
-    df = (
-        SparkDataFrameService()
-        .input(df)
-        .create_year_month_day_columns_from_dataframe_column("column_create_date")
-        .output()
-    )
+        df = (
+            SparkDataFrameService()
+            .input(df)
+            .create_year_month_day_columns_from_dataframe_column("column_create_date")
+            .output()
+        )
 
-    s3_data_path = datalake_bucket
-    db_info = DatalakeMetastoreService.get_db_info(environment, source, s3_data_path)
-    metastore_service = SparkMetastoreService(spark_client)
-    spark_metastore_loader = SparkMetastoreLoader(metastore_service)
-    s3_loader = S3Loader()
+        s3_data_path = datalake_bucket
+        db_info = DatalakeMetastoreService.get_db_info(
+            environment, source, s3_data_path
+        )
+        metastore_service = SparkMetastoreService(spark_client)
+        spark_metastore_loader = SparkMetastoreLoader(metastore_service)
+        s3_loader = S3Loader()
 
-    table_name = campaign_query
-    database_name = f"datalake_{source}_reverse"
-    format_options = SparkTableStorageFormat.DEFAULT_DW
-    database_location = s3_data_path
+        table_name = campaign_query
+        database_name = f"datalake_{source}_reverse"
+        format_options = SparkTableStorageFormat.DEFAULT_DW
+        database_location = s3_data_path
 
-    logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
-    metastore_service.create_database(database_name)
+        logger.info(
+            "m=__main__, msg=Creating database in Spark Metastore if not exists..."
+        )
+        metastore_service.create_database(database_name)
 
-    s3_loader.load_df(
-        df=df,
-        s3_path=f"{database_location}{table_name}",
-        format_options=format_options,
-        partitions=partition_cols,
-    )
+        s3_loader.load_df(
+            df=df,
+            s3_path=f"{database_location}{table_name}",
+            format_options=format_options,
+            partitions=partition_cols,
+        )
 
-    spark_metastore_loader.update_metastore(
-        df, database_name, table_name, format_options, database_location
-    )
+        spark_metastore_loader.update_metastore(
+            df, database_name, table_name, format_options, database_location
+        )
+    else:
+        pass
