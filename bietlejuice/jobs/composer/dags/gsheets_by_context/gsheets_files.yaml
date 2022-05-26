@@ -456,6 +456,12 @@ de_para_cancelamento:
     clean_table_name: from_to_cancellation
     sheet_context: static
 
+for_sale_segmentation_survey:
+    sheet_id: 1rpHRTqCaI1RtwH2OY4WStWGB9uj7YPaGQsJAL2EIaCo
+    sheet_name: responses
+    clean_table_name: for_sale_segmentation_survey_responses
+    sheet_context: static
+
 mra_historical:
     sheet_id: 1VS3SgHgFlqPJKxXMHsAgtUk0Xb6x2-Ey66I1iRmKAqI
     sheet_name: mra_historical

@@ -1,0 +1,14 @@
+database_name: datalake_gsheets_raw
+table_name: for_sale_segmentation_survey
+columns:
+  email:
+    tags:
+    - Confidential
+  age:
+    tags:
+    - PII
+    - Restricted
+  gender:
+    tags:
+    - PII
+    - Restricted

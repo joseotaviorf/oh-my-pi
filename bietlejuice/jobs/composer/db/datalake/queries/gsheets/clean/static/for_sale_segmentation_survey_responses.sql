@@ -1,0 +1,13 @@
+SELECT
+    email,
+    age,
+    gender,
+    city,
+    region,
+    people_living_with,
+    household_monthly_income,
+    marital_status,
+    segment,
+    audience_target
+FROM
+    datalake_gsheets_raw.for_sale_segmentation_survey 

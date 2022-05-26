@@ -1,0 +1,33 @@
+database_name: datalake_gsheets_clean
+table_name: for_sale_segmentation_survey_responses
+columns:
+  email:
+    lineage:
+      - datalake_gsheets_raw.for_sale_segmentation_survey_responses.email
+  age:
+    lineage:
+      - datalake_gsheets_raw.for_sale_segmentation_survey_responses.age
+  gender:
+    lineage:
+      - datalake_gsheets_raw.for_sale_segmentation_survey_responses.gender
+  city:
+    lineage:
+      - datalake_gsheets_raw.for_sale_segmentation_survey_responses.city
+  region:
+    lineage:
+      - datalake_gsheets_raw.for_sale_segmentation_survey_responses.region
+  people_living_with:
+    lineage:
+      - datalake_gsheets_raw.for_sale_segmentation_survey_responses.people_living_with
+  household_monthly_income:
+    lineage:
+      - datalake_gsheets_raw.for_sale_segmentation_survey_responses.household_monthly_income
+  marital_status:
+    lineage:
+      - datalake_gsheets_raw.for_sale_segmentation_survey_responses.marital_status
+  segment:
+    lineage:
+      - datalake_gsheets_raw.for_sale_segmentation_survey_responses.segment
+  audience_target:
+    lineage:
+      - datalake_gsheets_raw.for_sale_segmentation_survey_responses.audience_target

@@ -32,6 +32,7 @@ This pipeline produces the following output tables:
     - `costs_allocation_relative_indexes`
     - `dados_docato`
     - `de_para_cancelamento`
+    - `for_sale_segmentation_survey`
     - `mra_historical`
     - `offline_and_branding_marketing_costs`
     - `rental_tof_monthly_targets`
@@ -54,6 +55,7 @@ This pipeline produces the following output tables:
     - `demand_targets_2021`
     - `demand_targets_replanning`
     - `costs_allocation_relative_indexes`
+    - `for_sale_segmentation_survey_responses`
     - `from_to_cancellation`
     - `legal_base_docato`
     - `mra_historical`
