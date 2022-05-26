@@ -63,13 +63,14 @@ if __name__ == "__main__":
 
     path = f"{datalake_bucket}/{campaign_query}/year={execution_date.year}/month={execution_date.month}/day={execution_date.day}/"
 
+    registers_found = True
     try:
         dfs3 = s3_consumer.get_data_from_file(path=path, format="parquet")
     except Exception as e:
         logger.error("m=There's no data here yet, message_error={}".format(e))
-        dfs3 = []
+        registers_found = False
 
-    if len(dfs3) > 0:
+    if registers_found:
         df = (
             dfq.join(dfs3, (dfq.customer_email == dfs3.customer_email), how="left")
             .withColumn(
