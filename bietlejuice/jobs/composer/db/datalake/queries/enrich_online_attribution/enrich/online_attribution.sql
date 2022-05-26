@@ -1,6 +1,7 @@
 WITH conversions AS (
     SELECT
-        id_amplitude
+        id_amplitude,
+        id_user
     FROM
         datalake_amplitude_clean.170698_visit_schedule_confirmed_events
     WHERE 
@@ -9,7 +10,8 @@ WITH conversions AS (
         AND day = {day}
     UNION
     SELECT
-        id_amplitude
+        id_amplitude,
+        id_user
     FROM
         datalake_amplitude_clean.170698_debug_visit_schedule_confirmed_events
     WHERE 
@@ -18,7 +20,8 @@ WITH conversions AS (
         AND day = {day}
     UNION
     SELECT
-        id_amplitude AS id_amplitude
+        id_amplitude,
+        id_user
     FROM
         datalake_amplitude_clean.170698_offer_submitted_events
     WHERE 
@@ -28,82 +31,82 @@ WITH conversions AS (
 ),
 distinct_conversions AS (
     SELECT DISTINCT
-        id_amplitude
+        id_amplitude,
+        id_user
     FROM
         conversions
     WHERE
         id_amplitude IS NOT NULL
 ),
 ids_mapped_from_conversions AS (
-SELECT
-    amu.id_amplitude as id_amplitude,
-    cvs.id_amplitude AS merged_amplitude_id   
-FROM 
-    distinct_conversions AS cvs
-INNER JOIN 
-    datalake_amplitude_clean.170698_user_merge AS amu
-ON
-    cvs.id_amplitude = amu.id_amplitude_merged
-GROUP BY
-    amu.id_amplitude,
-    cvs.id_amplitude
-UNION 
-SELECT
-    id_amplitude,
-    NULL AS merged_amplitude_id
-FROM 
-    distinct_conversions
+    SELECT
+        cvs.id_user,
+        COALESCE(amu.id_amplitude,cvs.id_amplitude) AS id_amplitude,
+        COALESCE(amu.id_amplitude_merged,cvs.id_amplitude) AS merged_amplitude_id
+    FROM 
+        distinct_conversions AS cvs
+    JOIN 
+        datalake_amplitude_clean.170698_user_merge AS amu
+            ON cvs.id_amplitude = amu.id_amplitude_merged
+    GROUP BY 1,2,3
+    UNION
+    SELECT
+        id_user,
+        id_amplitude,
+        id_amplitude AS merged_amplitude_id
+    FROM
+        distinct_conversions
+    GROUP BY 1,2,3
 ),
 events_filtered AS (
-    SELECT
+    SELECT DISTINCT
         event_type_sanitized,
         event_type,
-		ts_event,
-		id_user,
-		COALESCE(imc.merged_amplitude_id, evt.id_amplitude) as id_amplitude,
-		id_session,
-		id_house,
-		id_firestore,
-		amplitude_platform,
-		visit_code,
-		entrance_uri,
-		uri_event_property,
-		web_medium,
-		web_source,
-		web_campaign,
-		web_content,
-		web_term,
-		web_last_medium,
-		web_last_source,
-		web_last_campaign,
-		web_last_content,
-		web_last_term,
-		adjust_app_version,
-		adjust_adgroup,
-		adjust_campaign,
-		adjust_city,
-		adjust_country,
-		adjust_creative,
-		adjust_impression_based,
-		adjust_reattributed_at,
-		adjust_installed_at,
-		adjust_is_organic,
-		adjust_tracking_enabled,
-		adjust_tracking_limited,
-		adjust_network,
-		web_platform,
-		app_platform,
-		gclid,
-		referrer,
+        ts_event,
+        COALESCE(imc.id_user, evt.id_user) AS id_user,
+        COALESCE(imc.merged_amplitude_id, evt.id_amplitude) AS id_amplitude,
+        id_session,
+        id_house,
+        id_firestore,
+        amplitude_platform,
+        visit_code,
+        entrance_uri,
+        uri_event_property,
+        web_medium,
+        web_source,
+        web_campaign,
+        web_content,
+        web_term,
+        web_last_medium,
+        web_last_source,
+        web_last_campaign,
+        web_last_content,
+        web_last_term,
+        adjust_app_version,
+        adjust_adgroup,
+        adjust_campaign,
+        adjust_city,
+        adjust_country,
+        adjust_creative,
+        adjust_impression_based,
+        adjust_reattributed_at,
+        adjust_installed_at,
+        adjust_is_organic,
+        adjust_tracking_enabled,
+        adjust_tracking_limited,
+        adjust_network,
+        web_platform,
+        app_platform,
+        gclid,
+        referrer,
         {year} as year,
         {month} as month,
         {day} as day
     FROM
         datalake_online_attribution.events_exploded AS evt
-    INNER JOIN
+    JOIN
         ids_mapped_from_conversions AS imc 
-    ON
-        imc.id_amplitude = evt.id_amplitude
+            ON imc.id_amplitude = evt.id_amplitude
     WHERE
       DATE(CONCAT_WS("-",evt.year, evt.month, evt.day)) > DATE('{year}-{month}-{day}') - INTERVAL '4' month
 ),
@@ -261,10 +264,9 @@ taxonomy_demand AS (
         td.Platform AS mkt_plataform
     FROM 
         datalake_gsheets_clean.taxonomy_demand AS td
-    INNER JOIN 
+    JOIN 
         taxonomy_min_ids AS td_min
-    ON 
-        td.id = td_min.id
+            ON td.id = td_min.id
 )
 SELECT
     ea.event_type_sanitized,
@@ -328,8 +330,7 @@ FROM
     events_online_attribution AS ea
 LEFT JOIN
     taxonomy_demand AS td
-ON 
-    LOWER(COALESCE(ea.utm_source, '')) = LOWER(COALESCE(td.utm_source, ''))
-    AND LOWER(COALESCE(ea.utm_medium, '')) = LOWER(COALESCE(td.utm_medium, ''))
-    AND LOWER(COALESCE(ea.branded, '')) = LOWER(COALESCE(td.branded, ''))
-    AND LOWER(COALESCE(ea.platform, '')) = LOWER(COALESCE(td.app_type, ''))
+        ON LOWER(COALESCE(ea.utm_source, '')) = LOWER(COALESCE(td.utm_source, ''))
+        AND LOWER(COALESCE(ea.utm_medium, '')) = LOWER(COALESCE(td.utm_medium, ''))
+        AND LOWER(COALESCE(ea.branded, '')) = LOWER(COALESCE(td.branded, ''))
+        AND LOWER(COALESCE(ea.platform, '')) = LOWER(COALESCE(td.app_type, ''))

@@ -60,7 +60,10 @@ SELECT
     id_amplitude,
     id_session,
     TRIM(event_properties.house_id) AS id_house,
-    TRIM(event_properties.offer_id) AS id_firestore,
+    TRIM(COALESCE(
+        event_properties.offer_id,
+        REGEXP_EXTRACT(event_properties.uri,'(?<=\/(offer|aluguel)\/).*?(?=\/)',0)
+    )) AS id_firestore,
     amplitude_platform,
     TRIM(event_properties.visit_code) AS visit_code,
     user_properties.entrance_uri AS entrance_uri,
