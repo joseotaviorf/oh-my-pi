@@ -1423,6 +1423,16 @@ bietlejuice.enrich_invoice:
   - bietlejuice.retsuko:load-clean-entry
   - bietlejuice.retsuko:load-clean-invoice
 
+bietlejuice.enrich_hubspot:
+  - bietlejuice.hubspot:load-clean-company
+  - bietlejuice.hubspot:load-clean-contact
+  - bietlejuice.hubspot:load-clean-deal
+  - bietlejuice.hubspot:load-clean-deal-pipeline
+  - bietlejuice.hubspot:load-clean-team
+  - bietlejuice.hubspot:load-clean-ticket
+  - bietlejuice.hubspot:load-clean-ticket-pipeline
+  - bietlejuice.hubspot:load-clean-owner
+
 bietlejuice.enrich_jira:
   - bietlejuice.jira:load-clean-issues
 

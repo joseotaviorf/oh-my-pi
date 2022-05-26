@@ -1,0 +1,80 @@
+---
+inner_dependencies:
+  company:
+    - company_history
+  company_status:
+    - company
+  contact:
+    - contact_history
+  contact_status:
+    - contact
+  deal:
+    - deal_history
+  deal_stage:
+    - deal
+  ticket:
+    - ticket_history
+  ticket_stage:
+    - ticket
+  pipeline:
+    - pipeline_history
+  stage:
+    - stage_history
+  owner:
+    - owner_history
+
+tables:
+  company:
+    is_incremental: false
+    partition_cols: ['year', 'month', 'day']
+  company_history:
+    is_incremental: true
+    partition_cols: ['year', 'month', 'day']
+  company_status:
+    is_incremental: false
+  contact:
+    is_incremental: false
+    partition_cols: ['year', 'month', 'day']
+  contact_history:
+    is_incremental: true
+    partition_cols: ['year', 'month', 'day']
+  contact_status:
+    is_incremental: false
+  deal:
+    is_incremental: false
+    partition_cols: ['year', 'month', 'day']
+  deal_history:
+    is_incremental: true
+    partition_cols: ['year', 'month', 'day']
+  deal_stage:
+    is_incremental: false
+  ticket:
+    is_incremental: false
+    partition_cols: ['year', 'month', 'day']
+  ticket_history:
+    is_incremental: true
+    partition_cols: ['year', 'month', 'day']
+  ticket_stage:
+    is_incremental: false
+  pipeline:
+    is_incremental: false
+    partition_cols: ['year', 'month', 'day']
+  pipeline_history:
+    is_incremental: false
+    partition_cols: ['year', 'month', 'day']
+  stage:
+    is_incremental: false
+    partition_cols: ['year', 'month', 'day']
+  stage_history:
+    is_incremental: false
+    partition_cols: ['year', 'month', 'day']
+  owner:
+    is_incremental: false
+    partition_cols: ['year', 'month', 'day']
+  owner_history:
+    is_incremental: true
+    partition_cols: ['year', 'month', 'day']
+  team:
+    is_incremental: false
+  team_user:
+    is_incremental: false
