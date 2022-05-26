@@ -28,7 +28,7 @@ talk_to_secretariat AS (
     ROW_NUMBER() OVER (PARTITION BY l.id_visitor ORDER BY l.ts_updated) AS rw_asc,
     ROW_NUMBER() OVER (PARTITION BY l.id_visitor ORDER BY l.ts_updated DESC) AS rw_desc
   FROM 
-    datalake_hub_services_clean.lead AS l
+    datalake_hub_services_clean.lead_aud AS l
   WHERE
     lead_type = 'TALK_TO_SECRETARIA'
 ),
@@ -60,11 +60,12 @@ contact_prospect AS (
     h.id_region,
     r.name AS region_name,
     h.city AS city_name,
+    is_secretariat,
     l.ts_created,
     ROW_NUMBER() OVER (PARTITION BY l.id_visitor ORDER BY l.ts_updated) AS rw_asc,
     ROW_NUMBER() OVER (PARTITION BY l.id_visitor ORDER BY l.ts_updated DESC) AS rw_desc
   FROM 
-    datalake_hub_services_clean.lead AS l
+    datalake_hub_services_clean.lead_aud AS l
   LEFT JOIN
     house AS h
       ON l.id_house = h.id
@@ -73,6 +74,8 @@ contact_prospect AS (
       ON h.id_region = r.id
   WHERE
     UPPER(lead_status) = 'SENT_TO_CASA_MINEIRA'
+    OR UPPER(lead_status) = 'PROCESSED' 
+    AND is_secretariat = true
 ),
 
 first_contact_prospect AS (
@@ -119,7 +122,7 @@ leads AS (
     ROW_NUMBER() OVER (PARTITION BY l.id_visitor ORDER BY l.ts_updated) AS rw_offer_asc,
     ROW_NUMBER() OVER (PARTITION BY l.id_visitor ORDER BY l.ts_updated DESC) AS rw_offer_desc
   FROM 
-    datalake_hub_services_clean.lead AS l
+    datalake_hub_services_clean.lead_aud AS l
   LEFT JOIN
     visitor AS v
       ON l.id_visitor = v.id

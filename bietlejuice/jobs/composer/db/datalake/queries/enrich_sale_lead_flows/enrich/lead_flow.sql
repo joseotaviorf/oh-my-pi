@@ -254,9 +254,9 @@ last_hub_email_lead AS (
     WHERE
         rw_phone_desc = 1
 ),
-aux_all_leads AS (
+aux_all_leads AS ( 
     SELECT
-        alc.id_user,
+        alc.id_user, 
         alc.id_lead AS id_aux_lead,
         alc.id_secretariat_client,
         CASE 
@@ -298,17 +298,48 @@ all_leads AS (
         last_hub_email_lead AS lhel
             ON a.email = lhel.email
 ),
-unique_leads AS (
+aux_unique_leads AS (
     SELECT DISTINCT
         u.id_user,
         u.id_secretariat_client,
         u.id_first_classified_lead,
-        U.id_last_classified_lead,
+        u.id_last_classified_lead,
         u.id_first_hub_lead,
         u.id_last_hub_lead,
         u.id_lead
     FROM 
         all_leads AS u
+),
+rw_filter_leads AS (
+    SELECT 
+      *,
+      ROW_NUMBER() OVER (PARTITION BY id_first_hub_lead ORDER BY id_user NULLS LAST, id_secretariat_client NULLS LAST, id_first_classified_lead NULLS LAST) AS rw_hb,
+      ROW_NUMBER() OVER (PARTITION BY id_first_classified_lead ORDER BY id_user NULLS LAST, id_secretariat_client NULLS LAST, id_first_hub_lead NULLS LAST) AS rw_cl
+    FROM 
+      aux_unique_leads
+),
+unique_leads AS (
+  SELECT
+      id_user,
+      id_secretariat_client,
+      id_first_classified_lead,
+      id_last_classified_lead,
+      id_first_hub_lead,
+      id_last_hub_lead,
+      id_lead
+  FROM
+      rw_filter_leads
+  WHERE
+      (id_user IS NOT NULL
+      OR id_secretariat_client IS NOT NULL)
+      OR (
+          id_first_classified_lead IS NOT NULL
+          AND rw_cl = 1
+      )
+      OR (
+          id_first_hub_lead IS NOT NULL
+          AND rw_hb = 1
+      )
 ),
 unique_deduplicated_leads AS (
     SELECT DISTINCT

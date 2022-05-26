@@ -4,7 +4,7 @@ table_name: hub_services_lead_flow
 columns:
   id_visitor:
     lineage:
-      - datalake_hub_services_clean.lead.id_visitor
+      - datalake_hub_services_clean.lead_aud.id_visitor
   id_external:
     lineage:
       - datalake_hub_services_clean.visitor.id_external
@@ -25,10 +25,10 @@ columns:
       - datalake_ebdb_clean.house.id_region
   id_first_business_unit:
     lineage:
-      - datalake_hub_services_clean.lead.id_business_unit
+      - datalake_hub_services_clean.lead_aud.id_business_unit
   id_last_business_unit:
     lineage:
-      - datalake_hub_services_clean.lead.id_business_unit
+      - datalake_hub_services_clean.lead_aud.id_business_unit
   email:
     lineage:
       - datalake_hub_services_clean.visitor.email
@@ -37,13 +37,13 @@ columns:
       - datalake_hub_services_clean.visitor.phone_number
   first_contact_prospect_type:
     lineage:
-      - datalake_hub_services_clean.lead.lead_type
+      - datalake_hub_services_clean.lead_aud.lead_type
   first_contact_prospect_midia:
     lineage:
-      - datalake_hub_services_clean.lead.lead_type
+      - datalake_hub_services_clean.lead_aud.lead_type
   last_contact_prospect_midia:
     lineage:
-      - datalake_hub_services_clean.lead.lead_type
+      - datalake_hub_services_clean.lead_aud.lead_type
   first_contact_prospect_region_name:
     lineage:
       - datalake_ebdb_clean.region.name
@@ -64,19 +64,19 @@ columns:
       - datalake_gsheets_clean.business_unit_region.business_unit
   ts_first_visit_lead_intent:
     lineage:
-      - datalake_hub_services_clean.lead.ts_created
+      - datalake_hub_services_clean.lead_aud.ts_created
   ts_last_visit_lead_intent:
     lineage:
-      - datalake_hub_services_clean.lead.ts_created
+      - datalake_hub_services_clean.lead_aud.ts_created
   ts_first_talk_to_secretariat:
     lineage:
-      - datalake_hub_services_clean.lead.ts_created
+      - datalake_hub_services_clean.lead_aud.ts_created
   ts_last_talk_to_secretariat:
     lineage:
-      - datalake_hub_services_clean.lead.ts_created
+      - datalake_hub_services_clean.lead_aud.ts_created
   ts_first_contact_prospect:
     lineage:
-      - datalake_hub_services_clean.lead.ts_created
+      - datalake_hub_services_clean.lead_aud.ts_created
   ts_last_contact_prospect:
     lineage:
-      - datalake_hub_services_clean.lead.ts_created
+      - datalake_hub_services_clean.lead_aud.ts_created
