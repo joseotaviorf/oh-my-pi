@@ -1,0 +1,75 @@
+---
+tables:
+  - table_name: address
+    date_filter_column: updated_at
+  - table_name: address_aud
+    date_filter_column: created_at
+  - table_name: company
+    date_filter_column: updated_at
+  - table_name: company_aud
+    date_filter_column: created_at
+  - table_name: company_draft
+    date_filter_column: updated_at
+  - table_name: company_draft_aud
+    date_filter_column: created_at
+  - table_name: company_user_account
+    date_filter_column: updated_at
+  - table_name: company_user_account_aud
+    date_filter_column: created_at
+  - table_name: contract
+    date_filter_column: updated_at
+  - table_name: contract_aud
+    date_filter_column: created_at
+  - table_name: contract_item
+    date_filter_column: updated_at
+  - table_name: contract_item_aud
+    date_filter_column: created_at
+  - table_name: contract_payment
+    date_filter_column: updated_at
+  - table_name: contract_payment_aud
+    date_filter_column: created_at
+  - table_name: contract_payment_hook_history
+    date_filter_column: updated_at
+  - table_name: contract_payment_hook_history_aud
+    date_filter_column: created_at
+  - table_name: contract_person
+    date_filter_column: updated_at
+  - table_name: contract_person_aud
+    date_filter_column: created_at
+  - table_name: contract_status_history
+    date_filter_column: updated_at
+  - table_name: contract_status_history_aud
+    date_filter_column: created_at
+  - table_name: credit_analysis
+    date_filter_column: updated_at
+  - table_name: credit_analysis_aud
+    date_filter_column: created_at
+  - table_name: income_document
+    date_filter_column: updated_at
+  - table_name: income_document_aud
+    date_filter_column: created_at
+  - table_name: person
+    date_filter_column: updated_at
+  - table_name: person_aud
+    date_filter_column: created_at
+  - table_name: profile_account
+    date_filter_column: updated_at
+  - table_name: profile_account_aud
+    date_filter_column: created_at
+  - table_name: property
+    date_filter_column: updated_at
+  - table_name: property_aud
+    date_filter_column: created_at
+  - table_name: revinfo
+    clean_table_name: rev_info
+    date_filter_column: timestamp
+    unixtime_measure: milliseconds
+  - table_name: user_account
+    date_filter_column: updated_at
+  - table_name: user_account_aud
+    date_filter_column: created_at
+  - table_name: user_sample
+    date_filter_column: updated_at
+  - table_name: user_sample_aud
+    date_filter_column: created_at
+partition_cols: ["year", "month", "day"]
