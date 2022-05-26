@@ -27,6 +27,7 @@ from bietlejuice.jobs.composer.services.configuration_service import (
 )
 from bietlejuice.jobs.composer.services.json_service import JsonService
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
+from pyspark.sql.functions import greatest, col
 
 JOB_NAME = "load_hubspot_raw"
 
@@ -116,13 +117,17 @@ def get_tables(config_service):
         kwargs = {
             arg_name: arg_val
             for arg_name, arg_val in table_configs.items()
-            if arg_name != "is_incremental"
+            if arg_name not in ("is_incremental", "bring_archived")
         }
-
+        get_table_function = get_integration_method(table_name, hubspot_client)
         table_results[table_name] = {
-            "content": get_integration_method(table_name, hubspot_client)(**kwargs),
+            "content": get_table_function(**kwargs),
             "is_incremental": table_configs["is_incremental"],
         }
+        if table_configs.get("bring_archived"):
+            table_results[table_name]["archived_content"] = get_table_function(
+                **kwargs, archived=True
+            )
 
     return table_results
 
@@ -162,6 +167,14 @@ def transform_tables_into_dataframes(tables):
             table_name, transform_object_table_into_dataframe
         )
         table["dataframe"] = transform_table_into_dataframe(table["content"])
+        if "archived_content" in table:
+            table["dataframe"] = (
+                table["dataframe"]
+                .unionAll(transform_table_into_dataframe(table["archived_content"]))
+                .withColumn(
+                    "updated_at", greatest(col("updated_at"), col("archived_at"))
+                )  # HubSpot doesn't change updated_at when it archives an object
+            )
 
 
 def transform_pipeline_table_into_dataframe(table_content):

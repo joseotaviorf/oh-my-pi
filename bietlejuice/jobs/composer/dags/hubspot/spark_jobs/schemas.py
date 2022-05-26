@@ -74,6 +74,7 @@ class HubSpotSchemaEnum:
                     )
                 ),
             ),
+            StructField("archived_at", TimestampType(), True),
         ]
     )
     OBJECT_SCHEMA = StructType(

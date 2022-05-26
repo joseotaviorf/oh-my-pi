@@ -5,6 +5,7 @@ custom_libraries:
 tables:
   company:
     is_incremental: true
+    bring_archived: true
     properties:
       - atuacao_da_imobiliaria
       - data_em_que_se_tornou_oportunidade
@@ -86,6 +87,7 @@ tables:
       - hs_lead_status
   contact:
     is_incremental: true
+    bring_archived: true
     properties:
       - hs_analytics_first_touch_converting_campaign
       - hs_analytics_last_touch_converting_campaign
@@ -129,6 +131,7 @@ tables:
       - company
   deal:
     is_incremental: true
+    bring_archived: true
     properties:
       - dealstage
       - engagements_last_meeting_booked
@@ -181,6 +184,7 @@ tables:
       - company
   ticket:
     is_incremental: true
+    bring_archived: true
     properties:
       - createdate
       - aceita_contato_comunicacao_com_os_corretores_
@@ -201,11 +205,15 @@ tables:
       - hs_pipeline
   deal_pipeline:
     is_incremental: true
+    bring_archived: false
     object_type: deals
   ticket_pipeline:
     is_incremental: true
+    bring_archived: false
     object_type: tickets
   team:
     is_incremental: false
+    bring_archived: false
   owner:
     is_incremental: true
+    bring_archived: true
