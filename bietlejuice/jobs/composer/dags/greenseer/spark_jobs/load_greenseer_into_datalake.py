@@ -9,6 +9,9 @@ from bietlejuice.jobs.composer.clients.db_clients import SparkClient
 from bietlejuice.jobs.composer.consumers.db_consumers import PostgresConsumer
 from bietlejuice.jobs.composer.loaders import S3Loader, SparkMetastoreLoader
 from bietlejuice.jobs.composer.services.metastore_services import SparkMetastoreService
+from bietlejuice.jobs.composer.services.configuration_service import (
+    ConfigurationService,
+)
 
 JOB_NAME = "load_greenseer_into_datalake"
 ALLOW_LIST = ["session"]
@@ -34,6 +37,9 @@ if __name__ == "__main__":
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
+
+    config_service = ConfigurationService(source)
+    max_records_per_file = config_service.get_config("max_records_per_file")
 
     conn_config_json = dbutils.secrets.get(
         scope="quintoandar", key=DatabaseEnum.GREENSEER
@@ -70,4 +76,5 @@ if __name__ == "__main__":
                 table.table_name.lower(),
                 format_options,
                 database_location,
+                max_records_per_file=max_records_per_file,
             )
