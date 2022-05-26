@@ -2,11 +2,15 @@
 database_name: datalake_hubspot_raw
 table_name: owner
 columns:
-  properties:
+  email:
     tags:
       - PII
       - Confidential
-  properties_with_history:
+  first_name:
+    tags:
+      - PII
+      - Confidential
+  last_name:
     tags:
       - PII
       - Confidential

@@ -150,15 +150,18 @@ def fetch_all(base_api_client, **kwargs):
 def transform_tables_into_dataframes(tables):
     """Transforms all tables in the dictionary into dataframes, assigning the result to the key "dataframe"."""
 
+    transformation_methods = {
+        "deal_pipeline": transform_pipeline_table_into_dataframe,
+        "ticket_pipeline": transform_pipeline_table_into_dataframe,
+        "team": transform_team_table_into_dataframe,
+        "owner": transform_owner_table_into_dataframe,
+    }
+
     for table_name, table in tables.items():
-        if "pipeline" in table_name:
-            table["dataframe"] = transform_pipeline_table_into_dataframe(
-                table["content"]
-            )
-        elif table_name == "team":
-            table["dataframe"] = transform_team_table_into_dataframe(table["content"])
-        else:
-            table["dataframe"] = transform_object_table_into_dataframe(table["content"])
+        transform_table_into_dataframe = transformation_methods.get(
+            table_name, transform_object_table_into_dataframe
+        )
+        table["dataframe"] = transform_table_into_dataframe(table["content"])
 
 
 def transform_pipeline_table_into_dataframe(table_content):
@@ -174,6 +177,14 @@ def transform_team_table_into_dataframe(table_content):
 
     schema = HubSpotSchemaEnum.TEAM_SCHEMA
     table_dict = table_content.to_dict()["results"]
+    return spark_client.create_dataframe(table_dict, schema)
+
+
+def transform_owner_table_into_dataframe(table_content):
+    """Receives the raw content of an owner table returned by the api consumer, and returns a Spark dataframe"""
+
+    schema = HubSpotSchemaEnum.OWNER_SCHEMA
+    table_dict = list(map(lambda x: x.to_dict(), table_content))
     return spark_client.create_dataframe(table_dict, schema)
 
 

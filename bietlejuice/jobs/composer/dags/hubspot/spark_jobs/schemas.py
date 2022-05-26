@@ -52,6 +52,30 @@ class HubSpotSchemaEnum:
             StructField("secondary_user_ids", ArrayType(StringType()), True),
         ]
     )
+    OWNER_SCHEMA = StructType(
+        [
+            StructField("id", StringType(), True),
+            StructField("email", StringType(), True),
+            StructField("first_name", StringType(), True),
+            StructField("last_name", StringType(), True),
+            StructField("user_id", IntegerType(), True),
+            StructField("created_at", TimestampType(), True),
+            StructField("updated_at", TimestampType(), True),
+            StructField("archived", BooleanType(), True),
+            StructField(
+                "teams",
+                ArrayType(
+                    StructType(
+                        [
+                            StructField("id", StringType(), True),
+                            StructField("name", StringType(), True),
+                            StructField("membership", StringType(), True),
+                        ]
+                    )
+                ),
+            ),
+        ]
+    )
     OBJECT_SCHEMA = StructType(
         [
             StructField("id", StringType(), True),

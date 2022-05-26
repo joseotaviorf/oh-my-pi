@@ -125,6 +125,8 @@ tables:
       - hubspot_owner_id
     properties_with_history:
       - hs_lead_status
+    associations:
+      - company
   deal:
     is_incremental: true
     properties:
@@ -175,6 +177,8 @@ tables:
     properties_with_history:
       - dealstage
       - pipeline
+    associations:
+      - company
   ticket:
     is_incremental: true
     properties:

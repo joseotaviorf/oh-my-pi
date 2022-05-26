@@ -1,8 +1,10 @@
 SELECT
     id AS id_owner,
-    properties,
-    properties_with_history,
-    associations,
+    user_id AS id_user,
+    email,
+    first_name,
+    last_name,
+    teams,
     archived AS is_archived,
     archived_at AS ts_archived,
     created_at AS ts_created,

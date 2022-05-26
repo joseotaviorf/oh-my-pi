@@ -5,15 +5,21 @@ columns:
   id_owner:
     lineage:
       - datalake_hubspot_raw.owner.id
-  properties:
+  id_user:
     lineage:
-      - datalake_hubspot_raw.owner.properties
-  properties_with_history:
+      - datalake_hubspot_raw.owner.user_id
+  email:
     lineage:
-      - datalake_hubspot_raw.owner.properties_with_history
-  associations:
+      - datalake_hubspot_raw.owner.email
+  first_name:
     lineage:
-      - datalake_hubspot_raw.owner.associations
+      - datalake_hubspot_raw.owner.first_name
+  last_name:
+    lineage:
+      - datalake_hubspot_raw.owner.last_name
+  teams:
+    lineage:
+      - datalake_hubspot_raw.owner.teams
   is_archived:
     lineage:
       - datalake_hubspot_raw.owner.archived
