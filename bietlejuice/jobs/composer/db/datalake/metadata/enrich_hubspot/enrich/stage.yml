@@ -1,0 +1,40 @@
+---
+database_name: datalake_hubspot
+table_name: stage
+columns:
+  id_stage:
+    lineage:
+      - datalake_hubspot.stage_history.id_stage
+  id_pipeline:
+    lineage:
+      - datalake_hubspot.stage_history.id_pipeline
+  label:
+    lineage:
+      - datalake_hubspot.stage_history.label
+  metadata:
+    lineage:
+      - datalake_hubspot.stage_history.metadata
+  display_order:
+    lineage:
+      - datalake_hubspot.stage_history.display_order
+  is_deal_stage:
+    lineage:
+      - datalake_hubspot.stage_history.is_deal_stage
+  is_ticket_stage:
+    lineage:
+      - datalake_hubspot.stage_history.is_ticket_stage
+  ts_created:
+    lineage:
+      - datalake_hubspot.stage_history.ts_created
+  ts_updated:
+    lineage:
+      - datalake_hubspot.stage_history.ts_updated
+  year:
+    lineage:
+      - datalake_hubspot.stage_history.year
+  month:
+    lineage:
+      - datalake_hubspot.stage_history.month
+  day:
+    lineage:
+      - datalake_hubspot.stage_history.day

@@ -1,0 +1,44 @@
+---
+database_name: datalake_hubspot
+table_name: pipeline_history
+columns:
+  id_pipeline:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.id_pipeline
+      - datalake_hubspot_clean.ticket_pipeline.id_pipeline
+  label:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.label
+      - datalake_hubspot_clean.ticket_pipeline.label
+  display_order:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.display_order
+      - datalake_hubspot_clean.ticket_pipeline.display_order
+  is_archived:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.is_archived
+      - datalake_hubspot_clean.ticket_pipeline.is_archived
+  ts_archived:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.ts_archived
+      - datalake_hubspot_clean.ticket_pipeline.ts_archived
+  ts_created:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.ts_created
+      - datalake_hubspot_clean.ticket_pipeline.ts_created
+  ts_updated:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.ts_updated
+      - datalake_hubspot_clean.ticket_pipeline.ts_updated
+  year:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.year
+      - datalake_hubspot_clean.ticket_pipeline.year
+  month:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.month
+      - datalake_hubspot_clean.ticket_pipeline.month
+  day:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.day
+      - datalake_hubspot_clean.ticket_pipeline.day

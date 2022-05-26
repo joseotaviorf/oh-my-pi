@@ -1,0 +1,16 @@
+---
+database_name: datalake_hubspot
+table_name: company_status
+columns:
+  id_company:
+    lineage:
+      - datalake_hubspot.company.id_company
+  lead_status:
+    lineage:
+      - datalake_hubspot.company.lead_status_history
+  ts_status_started:
+    lineage:
+      - datalake_hubspot.company.lead_status_history
+  ts_status_ended:
+    lineage:
+      - datalake_hubspot.company.lead_status_history

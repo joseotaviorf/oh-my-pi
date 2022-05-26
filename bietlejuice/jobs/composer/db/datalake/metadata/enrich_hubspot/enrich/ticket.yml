@@ -1,0 +1,64 @@
+---
+database_name: datalake_hubspot
+table_name: ticket
+columns:
+  id_ticket:
+    lineage:
+      - datalake_hubspot.ticket_history.id_ticket
+  id_stage:
+    lineage:
+      - datalake_hubspot.ticket_history.id_stage
+  id_pipeline:
+    lineage:
+      - datalake_hubspot.ticket_history.id_pipeline
+  id_hubspot_owner:
+    lineage:
+      - datalake_hubspot.ticket_history.id_hubspot_owner
+  id_stage_history:
+    lineage:
+      - datalake_hubspot.ticket_history.id_stage_history
+  id_pipeline_history:
+    lineage:
+      - datalake_hubspot.ticket_history.id_pipeline_history
+  content:
+    lineage:
+      - datalake_hubspot.ticket_history.content
+  subject:
+    lineage:
+      - datalake_hubspot.ticket_history.subject
+  onboarding_type:
+    lineage:
+      - datalake_hubspot.ticket_history.onboarding_type
+  field_sales:
+    lineage:
+      - datalake_hubspot.ticket_history.field_sales
+  has_accepted_contact_with_agents:
+    lineage:
+      - datalake_hubspot.ticket_history.has_accepted_contact_with_agents
+  dt_term_signed:
+    lineage:
+      - datalake_hubspot.ticket_history.dt_term_signed
+  dt_term_sent:
+    lineage:
+      - datalake_hubspot.ticket_history.dt_term_sent
+  dt_documents_received:
+    lineage:
+      - datalake_hubspot.ticket_history.dt_documents_received
+  dt_onboarding:
+    lineage:
+      - datalake_hubspot.ticket_history.dt_onboarding
+  ts_created:
+    lineage:
+      - datalake_hubspot.ticket_history.ts_created
+  ts_updated:
+    lineage:
+      - datalake_hubspot.ticket_history.ts_updated
+  year:
+    lineage:
+      - datalake_hubspot.ticket_history.year
+  month:
+    lineage:
+      - datalake_hubspot.ticket_history.month
+  day:
+    lineage:
+      - datalake_hubspot.ticket_history.day

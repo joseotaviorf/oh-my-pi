@@ -1,0 +1,229 @@
+---
+database_name: datalake_hubspot
+table_name: company
+columns:
+  id_company:
+    lineage:
+      - datalake_hubspot.company_history.id_company
+  id_hubspot_owner:
+    lineage:
+      - datalake_hubspot.company_history.id_hubspot_owner
+  id_hubspot_team:
+    lineage:
+      - datalake_hubspot.company_history.id_hubspot_team
+  fields_of_business:
+    lineage:
+      - datalake_hubspot.company_history.fields_of_business
+  address:
+    lineage:
+      - datalake_hubspot.company_history.address
+  zip_code:
+    lineage:
+      - datalake_hubspot.company_history.zip_code
+  city:
+    lineage:
+      - datalake_hubspot.company_history.city
+  state:
+    lineage:
+      - datalake_hubspot.company_history.state
+  country:
+    lineage:
+      - datalake_hubspot.company_history.country
+  domain:
+    lineage:
+      - datalake_hubspot.company_history.domain
+  e_mail:
+    lineage:
+      - datalake_hubspot.company_history.e_mail
+  hs_analytics_source:
+    lineage:
+      - datalake_hubspot.company_history.hs_analytics_source
+  hs_analytics_source_data_1:
+    lineage:
+      - datalake_hubspot.company_history.hs_analytics_source_data_1
+  hs_analytics_source_data_2:
+    lineage:
+      - datalake_hubspot.company_history.hs_analytics_source_data_2
+  industry:
+    lineage:
+      - datalake_hubspot.company_history.industry
+  inside_sales:
+    lineage:
+      - datalake_hubspot.company_history.inside_sales
+  life_cycle_stage:
+    lineage:
+      - datalake_hubspot.company_history.life_cycle_stage
+  mkt_campain:
+    lineage:
+      - datalake_hubspot.company_history.mkt_campain
+  mkt_channel:
+    lineage:
+      - datalake_hubspot.company_history.mkt_channel
+  mkt_content:
+    lineage:
+      - datalake_hubspot.company_history.mkt_content
+  mkt_medium:
+    lineage:
+      - datalake_hubspot.company_history.mkt_medium
+  mkt_origin:
+    lineage:
+      - datalake_hubspot.company_history.mkt_origin
+  mkt_source:
+    lineage:
+      - datalake_hubspot.company_history.mkt_source
+  discard_reason:
+    lineage:
+      - datalake_hubspot.company_history.discard_reason
+  unified_discard_reasons:
+    lineage:
+      - datalake_hubspot.company_history.unified_discard_reasons
+  name:
+    lineage:
+      - datalake_hubspot.company_history.name
+  lead_origin:
+    lineage:
+      - datalake_hubspot.company_history.lead_origin
+  phone:
+    lineage:
+      - datalake_hubspot.company_history.phone
+  partnership_type:
+    lineage:
+      - datalake_hubspot.company_history.partnership_type
+  first_conversion_event_name:
+    lineage:
+      - datalake_hubspot.company_history.first_conversion_event_name
+  hs_analytics_first_touch_converting_campaign:
+    lineage:
+      - datalake_hubspot.company_history.hs_analytics_first_touch_converting_campaign
+  crm:
+    lineage:
+      - datalake_hubspot.company_history.crm
+  partner_agencies:
+    lineage:
+      - datalake_hubspot.company_history.partner_agencies
+  advertising_portals:
+    lineage:
+      - datalake_hubspot.company_history.advertising_portals
+  rental_guarantee_solutions:
+    lineage:
+      - datalake_hubspot.company_history.rental_guarantee_solutions
+  real_estate_agency_focus:
+    lineage:
+      - datalake_hubspot.company_history.real_estate_agency_focus
+  financing_banks:
+    lineage:
+      - datalake_hubspot.company_history.financing_banks
+  cnpj:
+    lineage:
+      - datalake_hubspot.company_history.cnpj
+  creci:
+    lineage:
+      - datalake_hubspot.company_history.creci
+  products_of_interest:
+    lineage:
+      - datalake_hubspot.company_history.products_of_interest
+  lead_status:
+    lineage:
+      - datalake_hubspot.company_history.lead_status
+  lead_status_history:
+    lineage:
+      - datalake_hubspot.company_history.lead_status_history
+  num_associated_deals:
+    lineage:
+      - datalake_hubspot.company_history.num_associated_deals
+  num_associated_contacts:
+    lineage:
+      - datalake_hubspot.company_history.num_associated_contacts
+  monthly_average_new_rental_contracts:
+    lineage:
+      - datalake_hubspot.company_history.monthly_average_new_rental_contracts
+  num_managers:
+    lineage:
+      - datalake_hubspot.company_history.num_managers
+  num_managed_properties:
+    lineage:
+      - datalake_hubspot.company_history.num_managed_properties
+  num_monthly_leads:
+    lineage:
+      - datalake_hubspot.company_history.num_monthly_leads
+  average_sale_property_ticket:
+    lineage:
+      - datalake_hubspot.company_history.average_sale_property_ticket
+  average_rent_property_ticket:
+    lineage:
+      - datalake_hubspot.company_history.average_rent_property_ticket
+  monthly_repayment_volume_in_real:
+    lineage:
+      - datalake_hubspot.company_history.monthly_repayment_volume_in_real
+  monthly_sale_volume_in_real:
+    lineage:
+      - datalake_hubspot.company_history.monthly_sale_volume_in_real
+  num_real_estate_agents:
+    lineage:
+      - datalake_hubspot.company_history.num_real_estate_agents
+  num_properties_for_sale:
+    lineage:
+      - datalake_hubspot.company_history.num_properties_for_sale
+  num_properties_for_rent:
+    lineage:
+      - datalake_hubspot.company_history.num_properties_for_rent
+  has_crm:
+    lineage:
+      - datalake_hubspot.company_history.has_crm
+  has_property_advertisement_online:
+    lineage:
+      - datalake_hubspot.company_history.has_property_advertisement_online
+  is_correspondent_bank:
+    lineage:
+      - datalake_hubspot.company_history.is_correspondent_bank
+  is_lost:
+    lineage:
+      - datalake_hubspot.company_history.is_lost
+  has_financing:
+    lineage:
+      - datalake_hubspot.company_history.has_financing
+  is_for_sale:
+    lineage:
+      - datalake_hubspot.company_history.is_for_sale
+  is_for_rent:
+    lineage:
+      - datalake_hubspot.company_history.is_for_rent
+  has_partnerships_with_other_agencies:
+    lineage:
+      - datalake_hubspot.company_history.has_partnerships_with_other_agencies
+  is_natural_person:
+    lineage:
+      - datalake_hubspot.company_history.is_natural_person
+  is_juridical_person:
+    lineage:
+      - datalake_hubspot.company_history.is_juridical_person
+  ts_first_conversion:
+    lineage:
+      - datalake_hubspot.company_history.ts_first_conversion
+  ts_recent_deal_close:
+    lineage:
+      - datalake_hubspot.company_history.ts_recent_deal_close
+  ts_hubspot_owner_assigned:
+    lineage:
+      - datalake_hubspot.company_history.ts_hubspot_owner_assigned
+  ts_last_logged_call:
+    lineage:
+      - datalake_hubspot.company_history.ts_last_logged_call
+  ts_notes_last_updated:
+    lineage:
+      - datalake_hubspot.company_history.ts_notes_last_updated
+  ts_created:
+    lineage:
+      - datalake_hubspot.company_history.ts_created
+  ts_updated:
+    lineage:
+      - datalake_hubspot.company_history.ts_updated
+  year:
+    lineage:
+      - datalake_hubspot.company_history.year
+  month:
+    lineage:
+      - datalake_hubspot.company_history.month
+  day:
+    lineage:
+      - datalake_hubspot.company_history.day

@@ -1,0 +1,37 @@
+---
+database_name: datalake_hubspot
+table_name: owner
+columns:
+  id_owner:
+    lineage:
+      - datalake_hubspot.owner_history.id_owner
+  id_user:
+    lineage:
+      - datalake_hubspot.owner_history.id_user
+  email:
+    lineage:
+      - datalake_hubspot.owner_history.email
+  first_name:
+    lineage:
+      - datalake_hubspot.owner_history.first_name
+  last_name:
+    lineage:
+      - datalake_hubspot.owner_history.last_name
+  teams:
+    lineage:
+      - datalake_hubspot.owner_history.teams
+  ts_created:
+    lineage:
+      - datalake_hubspot.owner_history.ts_created
+  ts_updated:
+    lineage:
+      - datalake_hubspot.owner_history.ts_updated
+  year:
+    lineage:
+      - datalake_hubspot.owner_history.year
+  month:
+    lineage:
+      - datalake_hubspot.owner_history.month
+  day:
+    lineage:
+      - datalake_hubspot.owner_history.day

@@ -1,0 +1,136 @@
+---
+database_name: datalake_hubspot
+table_name: contact_history
+columns:
+  id_contact:
+    lineage:
+      - datalake_hubspot_clean.contact.id_contact
+  id_hubspot_owner:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  id_company:
+    lineage:
+      - datalake_hubspot_clean.contact.associations
+  hs_analytics_first_touch_converting_campaign:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  hs_analytics_last_touch_converting_campaign:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  hs_analytics_source:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  hs_analytics_source_data_1:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  hs_analytics_source_data_2:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  hs_latest_source_data_1:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  hs_latest_source_data_2:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  first_conversion_event_name:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  field_of_business:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  occupation:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  address:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  city:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  state:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  company:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  email:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  hs_email_domain:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  mobile_phone:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  phone:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  website:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  first_name:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  last_name:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  hs_marketable_status:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  life_cycle_stage:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  lead_origin_restricted_use:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  recent_conversion_event_name:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  lead_status:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  lead_status_history:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  num_conversion_events:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  num_associated_deals:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  is_enrolled_in_sequence:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  is_archived:
+    lineage:
+      - datalake_hubspot_clean.contact.is_archived
+  ts_first_conversion:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  ts_notes_last_updated:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  ts_notes_next_activity:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  ts_closed:
+    lineage:
+      - datalake_hubspot_clean.contact.properties
+  ts_archived:
+    lineage:
+      - datalake_hubspot_clean.contact.ts_archived
+  ts_created:
+    lineage:
+      - datalake_hubspot_clean.contact.ts_created
+  ts_updated:
+    lineage:
+      - datalake_hubspot_clean.contact.ts_updated
+  year:
+    lineage:
+      - datalake_hubspot_clean.contact.year
+  month:
+    lineage:
+      - datalake_hubspot_clean.contact.month
+  day:
+    lineage:
+      - datalake_hubspot_clean.contact.day

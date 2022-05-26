@@ -1,0 +1,34 @@
+---
+database_name: datalake_hubspot
+table_name: pipeline
+columns:
+  id_pipeline:
+    lineage:
+      - datalake_hubspot.pipeline_history.id_pipeline
+  label:
+    lineage:
+      - datalake_hubspot.pipeline_history.label
+  display_order:
+    lineage:
+      - datalake_hubspot.pipeline_history.display_order
+  is_deal_pipeline:
+    lineage:
+      - datalake_hubspot.pipeline_history.is_deal_pipeline
+  is_ticket_pipeline:
+    lineage:
+      - datalake_hubspot.pipeline_history.is_ticket_pipeline
+  ts_created:
+    lineage:
+      - datalake_hubspot.pipeline_history.ts_created
+  ts_updated:
+    lineage:
+      - datalake_hubspot.pipeline_history.ts_updated
+  year:
+    lineage:
+      - datalake_hubspot.pipeline_history.year
+  month:
+    lineage:
+      - datalake_hubspot.pipeline_history.month
+  day:
+    lineage:
+      - datalake_hubspot.pipeline_history.day

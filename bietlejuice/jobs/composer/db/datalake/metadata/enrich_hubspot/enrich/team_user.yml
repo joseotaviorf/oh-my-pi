@@ -1,0 +1,10 @@
+---
+database_name: datalake_hubspot
+table_name: team_user
+columns:
+  id_team:
+    lineage:
+      - datalake_hubspot_clean.team.id_team
+  id_user:
+    lineage:
+      - datalake_hubspot_clean.team.user_ids

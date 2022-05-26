@@ -1,0 +1,16 @@
+---
+database_name: datalake_hubspot
+table_name: contact_status
+columns:
+  id_contact:
+    lineage:
+      - datalake_hubspot.contact.id_contact
+  lead_status:
+    lineage:
+      - datalake_hubspot.contact.lead_status_history
+  ts_status_started:
+    lineage:
+      - datalake_hubspot.contact.lead_status_history
+  ts_status_ended:
+    lineage:
+      - datalake_hubspot.contact.lead_status_history

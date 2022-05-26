@@ -1,0 +1,19 @@
+---
+database_name: datalake_hubspot
+table_name: deal_stage
+columns:
+  id_deal:
+    lineage:
+      - datalake_hubspot.deal.id_deal
+  id_stage:
+    lineage:
+      - datalake_hubspot.deal.id_stage_history
+  id_pipeline:
+    lineage:
+      - datalake_hubspot.deal.id_pipeline_history
+  ts_stage_started:
+    lineage:
+      - datalake_hubspot.deal.id_stage_history
+  ts_stage_ended:
+    lineage:
+      - datalake_hubspot.deal.id_stage_history

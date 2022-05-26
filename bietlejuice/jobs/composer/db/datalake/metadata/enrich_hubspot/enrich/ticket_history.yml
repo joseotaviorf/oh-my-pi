@@ -1,0 +1,70 @@
+---
+database_name: datalake_hubspot
+table_name: ticket_history
+columns:
+  id_ticket:
+    lineage:
+      - datalake_hubspot_clean.ticket.id_ticket
+  id_stage:
+    lineage:
+      - datalake_hubspot_clean.ticket.properties
+  id_pipeline:
+    lineage:
+      - datalake_hubspot_clean.ticket.properties
+  id_hubspot_owner:
+    lineage:
+      - datalake_hubspot_clean.ticket.properties
+  id_stage_history:
+    lineage:
+      - datalake_hubspot_clean.ticket.properties_with_history
+  id_pipeline_history:
+    lineage:
+      - datalake_hubspot_clean.ticket.properties_with_history
+  content:
+    lineage:
+      - datalake_hubspot_clean.ticket.properties
+  subject:
+    lineage:
+      - datalake_hubspot_clean.ticket.properties
+  onboarding_type:
+    lineage:
+      - datalake_hubspot_clean.ticket.properties
+  field_sales:
+    lineage:
+      - datalake_hubspot_clean.ticket.properties
+  has_accepted_contact_with_agents:
+    lineage:
+      - datalake_hubspot_clean.ticket.properties
+  is_archived:
+    lineage:
+      - datalake_hubspot_clean.ticket.is_archived
+  dt_term_signed:
+    lineage:
+      - datalake_hubspot_clean.ticket.properties
+  dt_term_sent:
+    lineage:
+      - datalake_hubspot_clean.ticket.properties
+  dt_documents_received:
+    lineage:
+      - datalake_hubspot_clean.ticket.properties
+  dt_onboarding:
+    lineage:
+      - datalake_hubspot_clean.ticket.properties
+  ts_archived:
+    lineage:
+      - datalake_hubspot_clean.ticket.ts_archived
+  ts_created:
+    lineage:
+      - datalake_hubspot_clean.ticket.ts_created
+  ts_updated:
+    lineage:
+      - datalake_hubspot_clean.ticket.ts_updated
+  year:
+    lineage:
+      - datalake_hubspot_clean.ticket.year
+  month:
+    lineage:
+      - datalake_hubspot_clean.ticket.month
+  day:
+    lineage:
+      - datalake_hubspot_clean.ticket.day

@@ -1,0 +1,163 @@
+---
+database_name: datalake_hubspot
+table_name: deal_history
+columns:
+  id_deal:
+    lineage:
+      - datalake_hubspot_clean.deal.id_deal
+  id_stage:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  id_pipeline:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  id_hubspot_owner:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  id_hubspot_team:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  id_company:
+    lineage:
+      - datalake_hubspot_clean.deal.associations
+  id_stage_history:
+    lineage:
+      - datalake_hubspot_clean.deal.properties_with_history
+  id_pipeline_history:
+    lineage:
+      - datalake_hubspot_clean.deal.properties_with_history
+  deal_name:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  state:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  hs_priority:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  partnership_model:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  unqualification_reason:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  gain_reason:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  loss_reason:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  product:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  partner_agencies:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  advertising_portals:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  rental_guarantee_solutions:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  financing_banks:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  amount:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  brokerage_fee:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  platform_fee:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  revenue_share_demand:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  revenue_share_supply:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  revenue_share_total:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  monthly_average_new_rental_contracts:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  num_managed_properties:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  num_monthly_leads:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  average_sale_property_ticket:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  average_rent_property_ticket:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  monthly_repayment_volume_in_real:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  monthly_sale_volume_in_real:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  num_properties_for_sale:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  num_properties_for_rent:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  has_property_advertisement_online:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  has_crm:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  is_correspondent_bank:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  has_financing:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  is_for_sale:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  is_for_rent:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  has_partnerships_with_other_agencies:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  is_archived:
+    lineage:
+      - datalake_hubspot_clean.deal.is_archived
+  ts_closed:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  ts_engagements_last_meeting_booked:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  ts_hubspot_owner_assigned:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  ts_notes_last_updated:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+  ts_archived:
+    lineage:
+      - datalake_hubspot_clean.deal.ts_archived
+  ts_created:
+    lineage:
+      - datalake_hubspot_clean.deal.ts_created
+  ts_updated:
+    lineage:
+      - datalake_hubspot_clean.deal.ts_updated
+  year:
+    lineage:
+      - datalake_hubspot_clean.deal.year
+  month:
+    lineage:
+      - datalake_hubspot_clean.deal.month
+  day:
+    lineage:
+      - datalake_hubspot_clean.deal.day

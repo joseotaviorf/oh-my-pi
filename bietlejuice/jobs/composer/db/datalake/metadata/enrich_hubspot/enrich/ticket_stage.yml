@@ -1,0 +1,19 @@
+---
+database_name: datalake_hubspot
+table_name: ticket_stage
+columns:
+  id_ticket:
+    lineage:
+      - datalake_hubspot.ticket.id_ticket
+  id_stage:
+    lineage:
+      - datalake_hubspot.ticket.id_stage_history
+  id_pipeline:
+    lineage:
+      - datalake_hubspot.ticket.id_pipeline_history
+  ts_stage_started:
+    lineage:
+      - datalake_hubspot.ticket.id_stage_history
+  ts_stage_ended:
+    lineage:
+      - datalake_hubspot.deticketal.id_stage_history

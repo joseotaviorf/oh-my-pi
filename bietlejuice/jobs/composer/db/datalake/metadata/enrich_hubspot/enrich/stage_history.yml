@@ -1,0 +1,60 @@
+---
+database_name: datalake_hubspot
+table_name: stage_history
+columns:
+  id_stage:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.stages
+      - datalake_hubspot_clean.ticket_pipeline.stages
+  id_pipeline:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.id_pipeline
+      - datalake_hubspot_clean.ticket_pipeline.id_pipeline
+  label:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.stages
+      - datalake_hubspot_clean.ticket_pipeline.stages
+  metadata:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.stages
+      - datalake_hubspot_clean.ticket_pipeline.stages
+  display_order:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.stages
+      - datalake_hubspot_clean.ticket_pipeline.stages
+  is_deal_stage:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.stages
+      - datalake_hubspot_clean.ticket_pipeline.stages
+  is_ticket_stage:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.stages
+      - datalake_hubspot_clean.ticket_pipeline.stages
+  is_archived:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.stages
+      - datalake_hubspot_clean.ticket_pipeline.stages
+  ts_archived:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.stages
+      - datalake_hubspot_clean.ticket_pipeline.stages
+  ts_created:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.stages
+      - datalake_hubspot_clean.ticket_pipeline.stages
+  ts_updated:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.stages
+      - datalake_hubspot_clean.ticket_pipeline.stages
+  year:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.stages
+      - datalake_hubspot_clean.ticket_pipeline.stages
+  month:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.stages
+      - datalake_hubspot_clean.ticket_pipeline.stages
+  day:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.stages
+      - datalake_hubspot_clean.ticket_pipeline.stages
