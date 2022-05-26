@@ -29,6 +29,9 @@ columns:
   id_rental_flow:
     lineage:
       - datalake_booking.booking.id_rent_flow
+  id_user_cancellation:
+    lineage:
+      - datalake_booking.booking_cancellation.id_user_cancellation
   rescheduled_from_id:
     lineage:
       - datalake_booking.booking.id_rescheduled_booking
@@ -95,6 +98,9 @@ columns:
   reason:
     lineage:
       - datalake_booking.booking.last_status_change_reason
+  cancelled_by:
+    lineage:
+      - datalake_booking.booking_cancellation.cancelled_by
   cancellation_reason:
     lineage:
       - datalake_booking.booking.cancellation_reason

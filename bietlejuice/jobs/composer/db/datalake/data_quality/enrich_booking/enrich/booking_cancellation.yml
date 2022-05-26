@@ -1,0 +1,12 @@
+---
+table_name: datalake_booking.booking_cancellation
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_booking:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  cancelled_by:
+    has_completeness:
+      greater_than: 0.4

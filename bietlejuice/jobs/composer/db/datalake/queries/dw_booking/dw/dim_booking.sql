@@ -45,6 +45,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   b.id_agent,
   b.id_attendant,
   b.id_rent_flow AS id_rental_flow,
+  bc.id_user_cancellation,
   CAST(b.id_rescheduled_booking AS INT) AS rescheduled_from_id,
   b.country_code,
   b.visit_intent,
@@ -68,6 +69,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   b.status,
   b.slot_day AS slot_dia,
   SUBSTRING(b.last_status_change_reason, 1, 200) AS reason,
+  bc.cancelled_by,
   b.cancellation_reason,
   b.cancellation_reason_category,
   b.reason_category,
@@ -113,6 +115,9 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   NOW() AS ts_load
 FROM
   datalake_booking.booking AS b
+LEFT JOIN
+  datalake_booking.booking_cancellation AS bc
+    ON b.id = bc.id_booking
 LEFT JOIN
   datalake_ebdb_clean.visit AS v
     ON b.id_visit = v.id
