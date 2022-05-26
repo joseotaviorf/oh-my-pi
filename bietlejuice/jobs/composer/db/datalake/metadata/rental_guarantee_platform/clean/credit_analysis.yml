@@ -1,0 +1,49 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: credit_analysis
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis.id
+  id_contract:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis.contract_id
+  approved_value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis.approved_value
+  decision_text:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis.decision_text
+  status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis.status
+  request:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis.request
+  response:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis.response
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis.version
+  ts_request:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis.request_date
+  ts_response:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis.response_date
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis.updated_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis.day

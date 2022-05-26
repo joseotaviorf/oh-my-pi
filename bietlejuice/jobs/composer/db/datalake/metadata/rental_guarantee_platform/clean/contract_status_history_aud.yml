@@ -1,0 +1,49 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: contract_status_history_aud
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_status_history_aud.id
+  id_contract:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_status_history_aud.contract_id
+  id_edited_by_person:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_status_history_aud.edited_by_person
+  status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_status_history_aud.status
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_status_history_aud.version
+  rev:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_status_history_aud.rev
+  rev_end:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_status_history_aud.revend
+  rev_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_status_history_aud.revtype
+  mod_id_contract:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_status_history_aud.contract_id_mod
+  mod_id_edited_by_person:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_status_history_aud.mod_edited_by_person
+  mod_status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_status_history_aud.status_mod
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_status_history_aud.created_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_status_history_aud.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_status_history_aud.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_status_history_aud.day

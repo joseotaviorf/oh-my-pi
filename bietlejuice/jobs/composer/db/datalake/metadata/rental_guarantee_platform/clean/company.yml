@@ -1,0 +1,37 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: company
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company.id
+  uuid_company:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company.companyuuid
+  uuid_business_unit:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company.businessunituuid
+  uuid_product:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company.productuuid
+  status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company.status
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company.version
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company.updated_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company.day

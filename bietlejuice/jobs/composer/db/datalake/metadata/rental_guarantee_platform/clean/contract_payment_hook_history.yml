@@ -1,0 +1,37 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: contract_payment_hook_history
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_hook_history.id
+  id_payment:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_hook_history.payment_id
+  hook_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_hook_history.hook_type
+  hook_payload_response:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_hook_history.hook_payload_response
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_hook_history.version
+  ts_hook:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_hook_history.hook_date
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_hook_history.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_hook_history.updated_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_hook_history.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_hook_history.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_hook_history.day

@@ -1,0 +1,37 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: profile_account_aud
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.profile_account_aud.id
+  profile_name:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.profile_account_aud.name
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.profile_account_aud.version
+  rev:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.profile_account_aud.rev
+  rev_end:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.profile_account_aud.revend
+  rev_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.profile_account_aud.revtype
+  mod_profile_name:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.profile_account_aud.name_mod
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.profile_account_aud.created_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.profile_account_aud.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.profile_account_aud.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.profile_account_aud.day

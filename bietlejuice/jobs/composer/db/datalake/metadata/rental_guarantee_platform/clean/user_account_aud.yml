@@ -1,0 +1,49 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: user_account_aud
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.user_account_aud.id
+  uuid_person:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.user_account_aud.personuuid
+  email:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.user_account_aud.email
+  status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.user_account_aud.status
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.user_account_aud.version
+  rev:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.user_account_aud.rev
+  rev_end:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.user_account_aud.revend
+  rev_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.user_account_aud.revtype
+  mod_email:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.user_account_aud.email_mod
+  mod_uuid_person:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.user_account_aud.personuuid_mod
+  mod_status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.user_account_aud.status_mod
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.user_account_aud.created_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.user_account_aud.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.user_account_aud.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.user_account_aud.day

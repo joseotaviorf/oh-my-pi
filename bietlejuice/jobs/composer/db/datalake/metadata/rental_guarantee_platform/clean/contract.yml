@@ -1,0 +1,61 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: contract
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract.id
+  id_company:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract.company_id
+  id_property:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract.property_id
+  uuid_contract:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract.contractuuid
+  monthly_value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract.monthly_value
+  activation_value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract.activation_value
+  total_value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract.total_value
+  guarantee_value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract.guarantee_value
+  status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract.status
+  created_by:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract.createdby
+  service_tax:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract.service_tax
+  contract_duration_months:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract.contract_duration_months
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract.version
+  ts_sent_guarantee_term:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract.sent_guarantee_term_at
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract.updated_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract.day

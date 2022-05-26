@@ -1,0 +1,19 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: rev_info
+columns:
+  rev:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.revinfo.rev
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.revinfo.revtstmp
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.revinfo.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.revinfo.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.revinfo.day

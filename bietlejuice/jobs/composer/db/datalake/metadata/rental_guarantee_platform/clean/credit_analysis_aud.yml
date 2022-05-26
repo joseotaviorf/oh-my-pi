@@ -1,0 +1,79 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: credit_analysis_aud
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.id
+  id_contract:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.contract_id
+  approved_value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.approved_value
+  decision_text:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.decision_text
+  status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.status
+  request:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.request
+  response:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.response
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.version
+  rev:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.rev
+  rev_end:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.revend
+  rev_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.revtype
+  mod_id_contract:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.contract_id_mod
+  mod_approved_value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.approved_value_mod
+  mod_decision_text:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.decision_text_mod
+  mod_status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.status_mod
+  mod_request:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.request_mod
+  mod_response:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.response_mod
+  mod_ts_request:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.request_date_mod
+  mod_ts_response:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.response_date_mod
+  ts_request:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.request_date
+  ts_response:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.response_date
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.created_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.credit_analysis_aud.day

@@ -1,0 +1,85 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: address_aud
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address_aud.id
+  zip_code:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address_aud.zip_code
+  street:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address_aud.street
+  complement:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address_aud.complement
+  neighborhood:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address_aud.neighborhood
+  city:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address_aud.city
+  state:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address_aud.state
+  country:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address_aud.country
+  address_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address_aud.address_type
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address_aud.version
+  number:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address_aud.number
+  rev:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address_aud.rev
+  rev_end:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address_aud.revend
+  rev_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address_aud.revtype
+  mod_zip_code:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address_aud.zip_code_mod
+  mod_street:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address_aud.street_mod
+  mod_number:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address_aud.number_mod
+  mod_complement:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address_aud.complement_mod
+  mod_neighborhood:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address_aud.neighborhood_mod
+  mod_city:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address_aud.city_mod
+  mod_state:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address_aud.state_mod
+  mod_country:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address_aud.country_mod
+  mod_address_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address_aud.address_type_mod
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address_aud.created_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address_aud.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address_aud.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address_aud.day

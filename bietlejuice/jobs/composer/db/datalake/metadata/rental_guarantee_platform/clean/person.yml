@@ -1,0 +1,46 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: person
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person.id
+  id_address:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person.address_id
+  uuid_person:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person.personuuid
+  person_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person.person_type
+  person_name:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person.person_name
+  declared_income:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person.declared_income
+  is_contract_responsible:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person.contract_responsible
+  is_foreign:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person.is_foreign
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person.version
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person.updated_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person.day

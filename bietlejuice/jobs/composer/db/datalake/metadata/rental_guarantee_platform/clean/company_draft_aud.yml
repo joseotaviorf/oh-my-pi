@@ -1,0 +1,43 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: company_draft_aud
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_draft_aud.id
+  id_company:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_draft_aud.company_id
+  draft:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_draft_aud.draft
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_draft_aud.version
+  rev:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_draft_aud.rev
+  rev_end:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_draft_aud.revend
+  rev_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_draft_aud.revtype
+  mod_id_company:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_draft_aud.company_id_mod
+  mod_draft:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_draft_aud.draft_mod
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_draft_aud.created_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_draft_aud.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_draft_aud.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_draft_aud.day

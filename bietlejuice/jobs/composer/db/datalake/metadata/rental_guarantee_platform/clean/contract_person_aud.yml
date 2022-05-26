@@ -1,0 +1,43 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: contract_person_aud
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_person_aud.id
+  id_contract:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_person_aud.contract_id
+  id_person:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_person_aud.person_id
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_person_aud.version
+  rev:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_person_aud.rev
+  rev_end:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_person_aud.revend
+  rev_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_person_aud.revtype
+  mod_id_contract:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_person_aud.contract_id_mod
+  mod_id_person:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_person_aud.person_id_mod
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_person_aud.created_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_person_aud.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_person_aud.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_person_aud.day

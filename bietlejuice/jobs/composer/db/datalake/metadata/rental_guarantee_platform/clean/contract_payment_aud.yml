@@ -1,0 +1,109 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: contract_payment_aud
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.id
+  id_contract:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.contract_id
+  id_person:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.person_id
+  card_token:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.card_token
+  card_service_tax_value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.card_service_tax_value
+  card_guarantee_value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.card_guarantee_value
+  card_four_last_digits:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.card_four_last_digits
+  card_brand:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.card_brand
+  card_token_payload_response:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.card_token_payload_response
+  subscription_code:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.subscription_code
+  subscription_status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.subscription_status
+  hook_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.hook_type
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.version
+  rev:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.rev
+  rev_end:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.revend
+  rev_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.revtype
+  mod_id_contract:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.contract_id_mod
+  mod_id_person:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.person_id_mod
+  mod_card_token:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.card_token_mod
+  mod_card_service_tax_value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.card_service_tax_value_mod
+  mod_card_guarantee_value:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.card_guarantee_value_mod
+  mod_card_four_last_digits:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.card_four_last_digits_mod
+  mod_card_brand:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.card_brand_mod
+  mod_card_token_payload_response:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.card_token_payload_response_mod
+  mod_subscription_code:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.subscription_code_mod
+  mod_subscription_status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.subscription_status_mod
+  mod_hook_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.hook_type_mod
+  mod_ts_card_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.card_created_at_mod
+  mod_ts_subscription_status_last_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.subscription_status_last_update_mod
+  ts_card_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.card_created_at
+  ts_subscription_status_last_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.subscription_status_last_update
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.created_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.contract_payment_aud.day

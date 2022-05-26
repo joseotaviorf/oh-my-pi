@@ -1,0 +1,73 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: person_aud
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person_aud.id
+  id_address:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person_aud.address_id
+  uuid_person:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person_aud.personuuid
+  person_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person_aud.person_type
+  person_name:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person_aud.person_name
+  declared_income:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person_aud.declared_income
+  is_contract_responsible:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person_aud.contract_responsible
+  is_foreign:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person_aud.is_foreign
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person_aud.version
+  rev:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person_aud.rev
+  rev_end:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person_aud.revend
+  rev_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person_aud.revtype
+  mod_id_address:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person_aud.address_id_mod
+  mod_uuid_person:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person_aud.personuuid_mod
+  mod_person_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person_aud.person_type_mod
+  mod_is_contract_responsible:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person_aud.contract_responsible_mod
+  mod_person_name:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person_aud.person_name_mod
+  mod_declared_income:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person_aud.declared_income_mod
+  mod_is_foreign:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person_aud.is_foreign_mod
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person_aud.created_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person_aud.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person_aud.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.person_aud.day

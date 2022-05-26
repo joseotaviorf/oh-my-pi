@@ -1,0 +1,55 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: company_user_account_aud
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_user_account_aud.id
+  id_user_account:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_user_account_aud.user_account_id
+  id_profile_account:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_user_account_aud.profile_account_id
+  id_company:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_user_account_aud.company_id
+  is_active:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_user_account_aud.active
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_user_account_aud.version
+  rev:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_user_account_aud.rev
+  rev_end:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_user_account_aud.revend
+  rev_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_user_account_aud.revtype
+  mod_id_user_account:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_user_account_aud.user_account_id_mod
+  mod_id_profile_account:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_user_account_aud.profile_account_id_mod
+  mod_is_active:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_user_account_aud.active_mod
+  mod_id_company:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_user_account_aud.company_id_mod
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_user_account_aud.created_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_user_account_aud.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_user_account_aud.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.company_user_account_aud.day

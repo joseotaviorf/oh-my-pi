@@ -1,0 +1,34 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: user_account
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.user_account.id
+  uuid_person:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.user_account.personuuid
+  email:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.user_account.email
+  status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.user_account.status
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.user_account.version
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.user_account.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.user_account.updated_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.user_account.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.user_account.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.user_account.day

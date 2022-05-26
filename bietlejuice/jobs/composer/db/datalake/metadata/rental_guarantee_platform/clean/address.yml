@@ -1,0 +1,52 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: address
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address.id
+  zip_code:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address.zip_code
+  street:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address.street
+  complement:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address.complement
+  neighborhood:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address.neighborhood
+  city:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address.city
+  state:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address.state
+  country:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address.country
+  address_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address.address_type
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address.version
+  number:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address.number
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address.updated_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.address.day

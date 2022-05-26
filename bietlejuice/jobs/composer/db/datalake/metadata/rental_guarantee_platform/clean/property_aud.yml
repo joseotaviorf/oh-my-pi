@@ -1,0 +1,55 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: property_aud
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.property_aud.id
+  id_address:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.property_aud.address_id
+  type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.property_aud.type
+  identification:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.property_aud.identification
+  business_line:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.property_aud.business_line
+  version:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.property_aud.version
+  rev:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.property_aud.rev
+  rev_end:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.property_aud.revend
+  rev_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.property_aud.revtype
+  mod_id_address:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.property_aud.address_id_mod
+  mod_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.property_aud.type_mod
+  mod_identification:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.property_aud.identification_mod
+  mod_business_line:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.property_aud.business_line_mod
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.property_aud.created_at
+  year:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.property_aud.year
+  month:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.property_aud.month
+  day:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.property_aud.day
