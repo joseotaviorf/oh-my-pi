@@ -68,8 +68,4 @@ tables:
     date_filter_column: updated_at
   - table_name: user_account_aud
     date_filter_column: created_at
-  - table_name: user_sample
-    date_filter_column: updated_at
-  - table_name: user_sample_aud
-    date_filter_column: created_at
 partition_cols: ["year", "month", "day"]

@@ -48,8 +48,6 @@ Via **incremental load**:
     - `revinfo`
     - `user_account`
     - `user_account_aud`
-    - `user_sample`
-    - `user_sample_aud`
 
 This pipeline produces, in datalake_rental_guarantee_platform_clean:
 
@@ -86,8 +84,6 @@ Via **incremental load**:
     - `rev_info`
     - `user_account`
     - `user_account_aud`
-    - `user_sample`
-    - `user_sample_aud`
 
 ### Responsible Data Teams
 For any questions or concerns about this DAG and data, please contact the Data For Brokers team.
