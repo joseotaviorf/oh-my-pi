@@ -541,13 +541,30 @@ bietlejuice.dw_customer_support:
 bietlejuice.dw_datamarts_spark.cross:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_datamarts_cross:create-talk-to-agent-in-datalake
+  - bietlejuice.dw_listing:load-dw-public-fact-house-listing-status
+  - bietlejuice.dw_listing:load-dw-public-dim-house-listing
   - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows
+  - bietlejuice.dw_sale_listing_flow:load-dw-sale-dim-listing-flows
+  - bietlejuice.dw_sale_listing_flow:load-dw-sale-fact-listing-flows
+  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
   - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows
   - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
+  - bietlejuice.dw_user:load-dw-public-dim-partner
+  - bietlejuice.dw_user:load-dw-public-dim-partner-agent
+  - bietlejuice.ebdb:create-clean-house-aud-in-data-lake
   - bietlejuice.ebdb:create-clean-house-in-data-lake
+  - bietlejuice.ebdb:create-clean-listing-business-context-in-data-lake
+  - bietlejuice.ebdb:create-clean-user-revision-entity-in-data-lake
+  - bietlejuice.enrich_big_agent:load-enrich-agency
+  - bietlejuice.enrich_big_agent:load-enrich-agent
+  - bietlejuice.enrich_big_agent:load-enrich-enrollment
+  - bietlejuice.enrich_big_agent:load-enrich-house
+  - bietlejuice.enrich_big_agent:load-enrich-program
+  
 
 bietlejuice.dw_datamarts_spark.for_rent:
   - bietlejuice.dw_lead:load-dw-public-dim-lead
