@@ -1,0 +1,48 @@
+---
+tables:
+  - table_name: address
+    date_filter_column: updated_at
+  - table_name: address_aud
+    date_filter_column: created_at
+  - table_name: company
+    date_filter_column: updated_at
+  - table_name: company_aud
+    date_filter_column: created_at
+  - table_name: company_address
+    date_filter_column: updated_at
+  - table_name: company_address_aud
+    date_filter_column: created_at
+  - table_name: company_document
+    date_filter_column: updated_at
+  - table_name: company_document_aud
+    date_filter_column: created_at
+  - table_name: document
+    date_filter_column: updated_at
+  - table_name: document_aud
+    date_filter_column: created_at
+  - table_name: member_profile
+    date_filter_column: updated_at
+  - table_name: member_profile_aud
+    date_filter_column: created_at
+  - table_name: product
+    date_filter_column: updated_at
+  - table_name: product_aud
+    date_filter_column: created_at
+  - table_name: profile
+    date_filter_column: updated_at
+  - table_name: profile_aud
+    date_filter_column: created_at
+  - table_name: profile_hierarchy
+    date_filter_column: updated_at
+  - table_name: profile_hierarchy_aud
+    date_filter_column: created_at
+  - table_name: revinfo
+    clean_table_name: rev_info
+    date_filter_column: revtstmp
+    unixtime_measure: milliseconds
+  - table_name: user_requirements
+    date_filter_column: updated_at
+  - table_name: user_requirements_aud
+    date_filter_column: created_at
+
+partition_cols: ["year", "month", "day"]
