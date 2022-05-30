@@ -217,6 +217,9 @@ columns:
   tenant_service_fee:
     lineage:
       - datalake_ebdb_raw.contrato.tenantservicefee
+  is_exit_inspection_opted_out:
+    lineage:
+      - datalake_ebdb_raw.contrato.exitInspectionOptOut
   dt_started:
     lineage:
       - datalake_ebdb_raw.contrato.datainicio

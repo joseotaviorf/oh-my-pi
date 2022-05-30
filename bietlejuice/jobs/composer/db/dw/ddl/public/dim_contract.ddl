@@ -35,6 +35,7 @@ create table public.dim_contract (
   contract_plan varchar,
   is_ongoing_contract boolean,
   is_tenant_service_fee_opt_out boolean,
+  is_exit_inspection_opted_out boolean,
   dt_start date,
   dt_entrance date,
   dt_intended_end date,

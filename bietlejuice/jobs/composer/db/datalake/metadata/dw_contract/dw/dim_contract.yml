@@ -105,10 +105,13 @@ columns:
       - datalake_ebdb_contract.contract_b2b.contract_plan
   is_ongoing_contract:
     lineage:
-      - datalake_ebdb_contract.contract.contract_is_ongoing_contract
+      - datalake_ebdb_contract.contract.is_ongoing_contract
   is_tenant_service_fee_opt_out:
     lineage:
-      - datalake_ebdb_contract.contract.contract_is_tenant_service_fee_opt_out
+      - datalake_ebdb_contract.contract.is_tenant_service_fee_opt_out
+  is_exit_inspection_opted_out:
+    lineage:
+      - datalake_ebdb_contract.contract.is_exit_inspection_opted_out
   dt_start:
     lineage:
       - datalake_ebdb_contract.contract.dt_started

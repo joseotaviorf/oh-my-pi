@@ -48,6 +48,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   contract_b2b.contract_plan,
   c.is_ongoing_contract,
   c.is_tenant_service_fee_opt_out,
+  c.is_exit_inspection_opted_out,
   c.dt_started AS dt_start,
   c.dt_entered AS dt_entrance,
   c.dt_contract_expected_end AS dt_intended_end,

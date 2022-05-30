@@ -72,6 +72,7 @@ SELECT
     policy,
     estateAgentBrokerageShare AS agent_brokerage_share,
     tenantservicefee AS tenant_service_fee,
+    exitInspectionOptOut AS is_exit_inspection_opted_out,
     dataInicio AS dt_started,
     dataEntrada AS dt_entered,
     dataRescisao AS dt_termination,
