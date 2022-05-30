@@ -15,6 +15,8 @@ dags:
     cluster_name: databricks_9_1_med_general_cluster
   for_rent:
     owner: Data ForRent
+  for_rent_cross:
+    owner: Data ForRent
     cluster_name: databricks_9_1_med_general_cluster
   for_sale:
     owner: Data ForSale
