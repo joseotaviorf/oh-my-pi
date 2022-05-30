@@ -1,0 +1,52 @@
+---
+database_name: datalake_person_clean
+table_name: address
+columns:
+  id:
+    lineage:
+      - datalake_person_raw.address.id
+  id_person:
+    lineage:
+      - datalake_person_raw.address.person_id
+  country:
+    lineage:
+      - datalake_person_raw.address.country
+  state:
+    lineage:
+      - datalake_person_raw.address.state
+  city:
+    lineage:
+      - datalake_person_raw.address.city
+  neighborhood:
+    lineage:
+      - datalake_person_raw.address.neighborhood
+  address:
+    lineage:
+      - datalake_person_raw.address.address
+  zip_code:
+    lineage:
+      - datalake_person_raw.address.zip_code
+  complement:
+    lineage:
+      - datalake_person_raw.address.complement
+  number:
+    lineage:
+      - datalake_person_raw.address.number
+  version:
+    lineage:
+      - datalake_person_raw.address.version
+  ts_created:
+    lineage:
+      - datalake_person_raw.address.created_at
+  ts_updated:
+    lineage:
+      - datalake_person_raw.address.updated_at
+  year:
+    lineage:
+      - datalake_person_raw.address.year
+  month:
+    lineage:
+      - datalake_person_raw.address.month
+  day:
+    lineage:
+      - datalake_person_raw.address.day

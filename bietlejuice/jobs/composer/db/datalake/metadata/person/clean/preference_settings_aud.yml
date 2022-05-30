@@ -1,0 +1,49 @@
+---
+database_name: datalake_person_clean
+table_name: preference_settings_aud
+columns:
+  id:
+    lineage:
+      - datalake_person_raw.preference_settings_aud.id
+  id_person:
+    lineage:
+      - datalake_person_raw.preference_settings_aud.person_id
+  timezone:
+    lineage:
+      - datalake_person_raw.preference_settings_aud.timezone
+  language:
+    lineage:
+      - datalake_person_raw.preference_settings_aud.language
+  version:
+    lineage:
+      - datalake_person_raw.preference_settings_aud.version
+  rev:
+    lineage:
+      - datalake_person_raw.preference_settings_aud.rev
+  rev_end:
+    lineage:
+      - datalake_person_raw.preference_settings_aud.revend
+  rev_type:
+    lineage:
+      - datalake_person_raw.preference_settings_aud.revtype
+  mod_id_person:
+    lineage:
+      - datalake_person_raw.preference_settings_aud.person_id_mod
+  mod_timezone:
+    lineage:
+      - datalake_person_raw.preference_settings_aud.timezone_mod
+  mod_language:
+    lineage:
+      - datalake_person_raw.preference_settings_aud.language_mod
+  ts_created:
+    lineage:
+      - datalake_person_raw.preference_settings_aud.created_at
+  year:
+    lineage:
+      - datalake_person_raw.preference_settings_aud.year
+  month:
+    lineage:
+      - datalake_person_raw.preference_settings_aud.month
+  day:
+    lineage:
+      - datalake_person_raw.preference_settings_aud.day

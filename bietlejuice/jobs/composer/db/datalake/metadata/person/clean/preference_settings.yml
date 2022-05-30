@@ -1,0 +1,34 @@
+---
+database_name: datalake_person_clean
+table_name: preference_settings
+columns:
+  id:
+    lineage:
+      - datalake_person_raw.preference_settings.id
+  id_person:
+    lineage:
+      - datalake_person_raw.preference_settings.person_id
+  timezone:
+    lineage:
+      - datalake_person_raw.preference_settings.timezone
+  language:
+    lineage:
+      - datalake_person_raw.preference_settings.language
+  version:
+    lineage:
+      - datalake_person_raw.preference_settings.version
+  ts_created:
+    lineage:
+      - datalake_person_raw.preference_settings.created_at
+  ts_updated:
+    lineage:
+      - datalake_person_raw.preference_settings.updated_at
+  year:
+    lineage:
+      - datalake_person_raw.preference_settings.year
+  month:
+    lineage:
+      - datalake_person_raw.preference_settings.month
+  day:
+    lineage:
+      - datalake_person_raw.preference_settings.day

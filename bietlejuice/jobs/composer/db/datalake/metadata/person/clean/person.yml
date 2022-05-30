@@ -1,0 +1,37 @@
+---
+database_name: datalake_person_clean
+table_name: person
+columns:
+  id:
+    lineage:
+      - datalake_person_raw.person.id
+  uuid_person:
+    lineage:
+      - datalake_person_raw.person.personuuid
+  person_name:
+    lineage:
+      - datalake_person_raw.person.name
+  gender:
+    lineage:
+      - datalake_person_raw.person.gender
+  version:
+    lineage:
+      - datalake_person_raw.person.version
+  dt_birth:
+    lineage:
+      - datalake_person_raw.person.birth_date
+  ts_created:
+    lineage:
+      - datalake_person_raw.person.created_at
+  ts_updated:
+    lineage:
+      - datalake_person_raw.person.updated_at
+  year:
+    lineage:
+      - datalake_person_raw.person.year
+  month:
+    lineage:
+      - datalake_person_raw.person.month
+  day:
+    lineage:
+      - datalake_person_raw.person.day

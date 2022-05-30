@@ -1,0 +1,52 @@
+---
+database_name: datalake_person_clean
+table_name: identity_document
+columns:
+  id:
+    lineage:
+      - datalake_person_raw.identity_document.id
+  id_person:
+    lineage:
+      - datalake_person_raw.identity_document.person_id
+  identification_number:
+    lineage:
+      - datalake_person_raw.identity_document.identification_number
+  document_validation_status:
+    lineage:
+      - datalake_person_raw.identity_document.document_validation_status
+  document_type:
+    lineage:
+      - datalake_person_raw.identity_document.document_type
+  issuing_country:
+    lineage:
+      - datalake_person_raw.identity_document.issuing_country
+  extra_info:
+    lineage:
+      - datalake_person_raw.identity_document.extra_info
+  attachment_path:
+    lineage:
+      - datalake_person_raw.identity_document.attachment_path
+  document_name:
+    lineage:
+      - datalake_person_raw.identity_document.document_name
+  status:
+    lineage:
+      - datalake_person_raw.identity_document.status
+  version:
+    lineage:
+      - datalake_person_raw.identity_document.version
+  ts_created:
+    lineage:
+      - datalake_person_raw.identity_document.created_at
+  ts_updated:
+    lineage:
+      - datalake_person_raw.identity_document.updated_at
+  year:
+    lineage:
+      - datalake_person_raw.identity_document.year
+  month:
+    lineage:
+      - datalake_person_raw.identity_document.month
+  day:
+    lineage:
+      - datalake_person_raw.identity_document.day

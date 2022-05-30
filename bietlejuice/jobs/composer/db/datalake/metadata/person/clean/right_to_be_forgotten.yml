@@ -1,0 +1,28 @@
+---
+database_name: datalake_person_clean
+table_name: right_to_be_forgotten
+columns:
+  id:
+    lineage:
+      - datalake_person_raw.right_to_be_forgotten.id
+  id_person:
+    lineage:
+      - datalake_person_raw.right_to_be_forgotten.person_id
+  version:
+    lineage:
+      - datalake_person_raw.right_to_be_forgotten.version
+  ts_created:
+    lineage:
+      - datalake_person_raw.right_to_be_forgotten.created_at
+  ts_updated:
+    lineage:
+      - datalake_person_raw.right_to_be_forgotten.updated_at
+  year:
+    lineage:
+      - datalake_person_raw.right_to_be_forgotten.year
+  month:
+    lineage:
+      - datalake_person_raw.right_to_be_forgotten.month
+  day:
+    lineage:
+      - datalake_person_raw.right_to_be_forgotten.day

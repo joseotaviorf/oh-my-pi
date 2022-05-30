@@ -1,0 +1,55 @@
+---
+database_name: datalake_person_clean
+table_name: contact_info_aud
+columns:
+  id:
+    lineage:
+      - datalake_person_raw.contact_info_aud.id
+  id_person:
+    lineage:
+      - datalake_person_raw.contact_info_aud.person_id
+  contact_info:
+    lineage:
+      - datalake_person_raw.contact_info_aud.contact_info
+  category:
+    lineage:
+      - datalake_person_raw.contact_info_aud.category
+  contact_preferences:
+    lineage:
+      - datalake_person_raw.contact_info_aud.contact_preferences
+  version:
+    lineage:
+      - datalake_person_raw.contact_info_aud.version
+  rev:
+    lineage:
+      - datalake_person_raw.contact_info_aud.rev
+  rev_end:
+    lineage:
+      - datalake_person_raw.contact_info_aud.revend
+  rev_type:
+    lineage:
+      - datalake_person_raw.contact_info_aud.revtype
+  mod_id_person:
+    lineage:
+      - datalake_person_raw.contact_info_aud.person_id_mod
+  mod_contact_info:
+    lineage:
+      - datalake_person_raw.contact_info_aud.contact_info_mod
+  mod_category:
+    lineage:
+      - datalake_person_raw.contact_info_aud.category_mod
+  mod_contact_preferences:
+    lineage:
+      - datalake_person_raw.contact_info_aud.contact_preferences_mod
+  ts_created:
+    lineage:
+      - datalake_person_raw.contact_info_aud.created_at
+  year:
+    lineage:
+      - datalake_person_raw.contact_info_aud.year
+  month:
+    lineage:
+      - datalake_person_raw.contact_info_aud.month
+  day:
+    lineage:
+      - datalake_person_raw.contact_info_aud.day

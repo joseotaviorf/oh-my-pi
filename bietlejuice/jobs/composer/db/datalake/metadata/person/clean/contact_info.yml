@@ -1,0 +1,37 @@
+---
+database_name: datalake_person_clean
+table_name: contact_info
+columns:
+  id:
+    lineage:
+      - datalake_person_raw.contact_info.id
+  id_person:
+    lineage:
+      - datalake_person_raw.contact_info.person_id
+  contact_info:
+    lineage:
+      - datalake_person_raw.contact_info.contact_info
+  category:
+    lineage:
+      - datalake_person_raw.contact_info.category
+  contact_preferences:
+    lineage:
+      - datalake_person_raw.contact_info.contact_preferences
+  version:
+    lineage:
+      - datalake_person_raw.contact_info.version
+  ts_created:
+    lineage:
+      - datalake_person_raw.contact_info.created_at
+  ts_updated:
+    lineage:
+      - datalake_person_raw.contact_info.updated_at
+  year:
+    lineage:
+      - datalake_person_raw.contact_info.year
+  month:
+    lineage:
+      - datalake_person_raw.contact_info.month
+  day:
+    lineage:
+      - datalake_person_raw.contact_info.day

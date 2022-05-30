@@ -1,0 +1,22 @@
+---
+database_name: datalake_person_clean
+table_name: rev_info
+columns:
+  uuid_person:
+    lineage:
+      - datalake_person_raw.revinfo.personuuid
+  rev:
+    lineage:
+      - datalake_person_raw.revinfo.rev
+  ts_created:
+    lineage:
+      - datalake_person_raw.revinfo.revtstmp
+  year:
+    lineage:
+      - datalake_person_raw.revinfo.year
+  month:
+    lineage:
+      - datalake_person_raw.revinfo.month
+  day:
+    lineage:
+      - datalake_person_raw.revinfo.day
