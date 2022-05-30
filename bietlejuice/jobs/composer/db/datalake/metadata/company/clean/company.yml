@@ -1,0 +1,43 @@
+---
+database_name: datalake_company_clean
+table_name: company
+columns:
+  id:
+    lineage:
+      - datalake_company_raw.company.id
+  id_parent:
+    lineage:
+      - datalake_company_raw.company.parent_id
+  uuid_company:
+    lineage:
+      - datalake_company_raw.company.company_uuid
+  company_name:
+    lineage:
+      - datalake_company_raw.company.company_name
+  trade_name:
+    lineage:
+      - datalake_company_raw.company.trade_name
+  company_type:
+    lineage:
+      - datalake_company_raw.company.company_type
+  status:
+    lineage:
+      - datalake_company_raw.company.status
+  version:
+    lineage:
+      - datalake_company_raw.company.version
+  ts_created:
+    lineage:
+      - datalake_company_raw.company.created_at
+  ts_updated:
+    lineage:
+      - datalake_company_raw.company.updated_at
+  year:
+    lineage:
+      - datalake_company_raw.company.year
+  month:
+    lineage:
+      - datalake_company_raw.company.month
+  day:
+    lineage:
+      - datalake_company_raw.company.day

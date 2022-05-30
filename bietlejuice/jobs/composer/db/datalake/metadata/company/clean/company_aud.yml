@@ -1,0 +1,67 @@
+---
+database_name: datalake_company_clean
+table_name: company_aud
+columns:
+  id:
+    lineage:
+      - datalake_company_raw.company_aud.id
+  uuid_company:
+    lineage:
+      - datalake_company_raw.company_aud.company_uuid
+  id_parent:
+    lineage:
+      - datalake_company_raw.company_aud.parent_id
+  company_name:
+    lineage:
+      - datalake_company_raw.company_aud.company_name
+  trade_name:
+    lineage:
+      - datalake_company_raw.company_aud.trade_name
+  company_type:
+    lineage:
+      - datalake_company_raw.company_aud.company_type
+  status:
+    lineage:
+      - datalake_company_raw.company_aud.status
+  version:
+    lineage:
+      - datalake_company_raw.company_aud.version
+  rev:
+    lineage:
+      - datalake_company_raw.company_aud.rev
+  rev_end:
+    lineage:
+      - datalake_company_raw.company_aud.revend
+  rev_type:
+    lineage:
+      - datalake_company_raw.company_aud.revtype
+  mod_uuid_company:
+    lineage:
+      - datalake_company_raw.company_aud.company_uuid_mod
+  mod_id_parent:
+    lineage:
+      - datalake_company_raw.company_aud.parent_id_mod
+  mod_company_name:
+    lineage:
+      - datalake_company_raw.company_aud.company_name_mod
+  mod_trade_name:
+    lineage:
+      - datalake_company_raw.company_aud.trade_name_mod
+  mod_company_type:
+    lineage:
+      - datalake_company_raw.company_aud.company_type_mod
+  mod_status:
+    lineage:
+      - datalake_company_raw.company_aud.status_mod
+  ts_created:
+    lineage:
+      - datalake_company_raw.company_aud.created_at
+  year:
+    lineage:
+      - datalake_company_raw.company_aud.year
+  month:
+    lineage:
+      - datalake_company_raw.company_aud.month
+  day:
+    lineage:
+      - datalake_company_raw.company_aud.day

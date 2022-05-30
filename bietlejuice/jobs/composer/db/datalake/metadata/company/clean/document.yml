@@ -1,0 +1,49 @@
+---
+database_name: datalake_company_clean
+table_name: document
+columns:
+  id:
+    lineage:
+      - datalake_company_raw.document.id
+  uuid_company:
+    lineage:
+      - datalake_company_raw.document.company_uuid
+  identification_number:
+    lineage:
+      - datalake_company_raw.document.identification_number
+  document_validation_status:
+    lineage:
+      - datalake_company_raw.document.document_validation_status
+  document_type:
+    lineage:
+      - datalake_company_raw.document.document_type
+  attachment_path:
+    lineage:
+      - datalake_company_raw.document.attachment_path
+  extra_info:
+    lineage:
+      - datalake_company_raw.document.extra_info
+  document_name:
+    lineage:
+      - datalake_company_raw.document.document_name
+  status:
+    lineage:
+      - datalake_company_raw.document.status
+  version:
+    lineage:
+      - datalake_company_raw.document.version
+  ts_created:
+    lineage:
+      - datalake_company_raw.document.created_at
+  ts_updated:
+    lineage:
+      - datalake_company_raw.document.updated_at
+  year:
+    lineage:
+      - datalake_company_raw.document.year
+  month:
+    lineage:
+      - datalake_company_raw.document.month
+  day:
+    lineage:
+      - datalake_company_raw.document.day

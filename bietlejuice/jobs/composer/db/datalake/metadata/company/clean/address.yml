@@ -1,0 +1,52 @@
+---
+database_name: datalake_company_clean
+table_name: address
+columns:
+  id:
+    lineage:
+      - datalake_company_raw.address.id
+  uuid_company:
+    lineage:
+      - datalake_company_raw.address.company_uuid
+  public_area:
+    lineage:
+      - datalake_company_raw.address.public_area
+  country:
+    lineage:
+      - datalake_company_raw.address.country
+  state:
+    lineage:
+      - datalake_company_raw.address.state
+  city:
+    lineage:
+      - datalake_company_raw.address.city
+  neighborhood:
+    lineage:
+      - datalake_company_raw.address.neighborhood
+  zip_code:
+    lineage:
+      - datalake_company_raw.address.zip_code
+  number:
+    lineage:
+      - datalake_company_raw.address.number
+  complement:
+    lineage:
+      - datalake_company_raw.address.complement
+  version:
+    lineage:
+      - datalake_company_raw.address.version
+  ts_created:
+    lineage:
+      - datalake_company_raw.address.created_at
+  ts_updated:
+    lineage:
+      - datalake_company_raw.address.updated_at
+  year:
+    lineage:
+      - datalake_company_raw.address.year
+  month:
+    lineage:
+      - datalake_company_raw.address.month
+  day:
+    lineage:
+      - datalake_company_raw.address.day

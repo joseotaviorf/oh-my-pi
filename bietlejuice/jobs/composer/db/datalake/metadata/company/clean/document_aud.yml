@@ -1,0 +1,79 @@
+---
+database_name: datalake_company_clean
+table_name: document_aud
+columns:
+  id:
+    lineage:
+      - datalake_company_raw.document_aud.id
+  uuid_company:
+    lineage:
+      - datalake_company_raw.document_aud.company_uuid
+  identification_number:
+    lineage:
+      - datalake_company_raw.document_aud.identification_number
+  document_validation_status:
+    lineage:
+      - datalake_company_raw.document_aud.document_validation_status
+  document_type:
+    lineage:
+      - datalake_company_raw.document_aud.document_type
+  attachment_path:
+    lineage:
+      - datalake_company_raw.document_aud.attachment_path
+  extra_info:
+    lineage:
+      - datalake_company_raw.document_aud.extra_info
+  document_name:
+    lineage:
+      - datalake_company_raw.document_aud.document_name
+  status:
+    lineage:
+      - datalake_company_raw.document_aud.status
+  version:
+    lineage:
+      - datalake_company_raw.document_aud.version
+  rev:
+    lineage:
+      - datalake_company_raw.document_aud.rev
+  rev_end:
+    lineage:
+      - datalake_company_raw.document_aud.revend
+  rev_type:
+    lineage:
+      - datalake_company_raw.document_aud.revtype
+  mod_uuid_company:
+    lineage:
+      - datalake_company_raw.document_aud.company_uuid_mod
+  mod_identification_number:
+    lineage:
+      - datalake_company_raw.document_aud.identification_number_mod
+  mod_document_type:
+    lineage:
+      - datalake_company_raw.document_aud.document_type_mod
+  mod_attachment_path:
+    lineage:
+      - datalake_company_raw.document_aud.attachment_path_mod
+  mod_extra_info:
+    lineage:
+      - datalake_company_raw.document_aud.extra_info_mod
+  mod_document_validation_status:
+    lineage:
+      - datalake_company_raw.document_aud.document_validation_status_mod
+  mod_document_name:
+    lineage:
+      - datalake_company_raw.document_aud.document_name_mod
+  mod_status:
+    lineage:
+      - datalake_company_raw.document_aud.status_mod
+  ts_created:
+    lineage:
+      - datalake_company_raw.document_aud.created_at
+  year:
+    lineage:
+      - datalake_company_raw.document_aud.year
+  month:
+    lineage:
+      - datalake_company_raw.document_aud.month
+  day:
+    lineage:
+      - datalake_company_raw.document_aud.day

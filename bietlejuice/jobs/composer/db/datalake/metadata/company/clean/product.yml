@@ -1,0 +1,40 @@
+---
+database_name: datalake_company_clean
+table_name: product
+columns:
+  id:
+    lineage:
+      - datalake_company_raw.product.id
+  id_company:
+    lineage:
+      - datalake_company_raw.product.company_id
+  uuid_product:
+    lineage:
+      - datalake_company_raw.product.product_uuid
+  name:
+    lineage:
+      - datalake_company_raw.product.name
+  status:
+    lineage:
+      - datalake_company_raw.product.status
+  business_segment:
+    lineage:
+      - datalake_company_raw.product.business_segment
+  version:
+    lineage:
+      - datalake_company_raw.product.version
+  ts_created:
+    lineage:
+      - datalake_company_raw.product.created_at
+  ts_updated:
+    lineage:
+      - datalake_company_raw.product.updated_at
+  year:
+    lineage:
+      - datalake_company_raw.product.year
+  month:
+    lineage:
+      - datalake_company_raw.product.month
+  day:
+    lineage:
+      - datalake_company_raw.product.day

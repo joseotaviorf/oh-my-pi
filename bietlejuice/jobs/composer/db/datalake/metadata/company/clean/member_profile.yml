@@ -1,0 +1,37 @@
+---
+database_name: datalake_company_clean
+table_name: member_profile
+columns:
+  id:
+    lineage:
+      - datalake_company_raw.member_profile.id
+  id_profile:
+    lineage:
+      - datalake_company_raw.member_profile.profile_id
+  uuid_person:
+    lineage:
+      - datalake_company_raw.member_profile.person_uuid
+  id_product:
+    lineage:
+      - datalake_company_raw.member_profile.product_id
+  status:
+    lineage:
+      - datalake_company_raw.member_profile.status
+  version:
+    lineage:
+      - datalake_company_raw.member_profile.version
+  ts_created:
+    lineage:
+      - datalake_company_raw.member_profile.created_at
+  ts_updated:
+    lineage:
+      - datalake_company_raw.member_profile.updated_at
+  year:
+    lineage:
+      - datalake_company_raw.member_profile.year
+  month:
+    lineage:
+      - datalake_company_raw.member_profile.month
+  day:
+    lineage:
+      - datalake_company_raw.member_profile.day

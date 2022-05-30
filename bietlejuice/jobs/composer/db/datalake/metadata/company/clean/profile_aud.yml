@@ -1,0 +1,37 @@
+---
+database_name: datalake_company_clean
+table_name: profile_aud
+columns:
+  id:
+    lineage:
+      - datalake_company_raw.profile_aud.id
+  profile_name:
+    lineage:
+      - datalake_company_raw.profile_aud.profile_name
+  version:
+    lineage:
+      - datalake_company_raw.profile_aud.version
+  rev:
+    lineage:
+      - datalake_company_raw.profile_aud.rev
+  rev_end:
+    lineage:
+      - datalake_company_raw.profile_aud.revend
+  rev_type:
+    lineage:
+      - datalake_company_raw.profile_aud.revtype
+  mod_profile_name:
+    lineage:
+      - datalake_company_raw.profile_aud.profile_name_mod
+  ts_created:
+    lineage:
+      - datalake_company_raw.profile_aud.created_at
+  year:
+    lineage:
+      - datalake_company_raw.profile_aud.year
+  month:
+    lineage:
+      - datalake_company_raw.profile_aud.month
+  day:
+    lineage:
+      - datalake_company_raw.profile_aud.day

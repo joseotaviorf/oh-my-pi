@@ -1,0 +1,88 @@
+---
+database_name: datalake_company_clean
+table_name: address_aud
+columns:
+  id:
+    lineage:
+      - datalake_company_raw.address_aud.id
+  uuid_company:
+    lineage:
+      - datalake_company_raw.address_aud.company_uuid
+  public_area:
+    lineage:
+      - datalake_company_raw.address_aud.public_area
+  country:
+    lineage:
+      - datalake_company_raw.address_aud.country
+  state:
+    lineage:
+      - datalake_company_raw.address_aud.state
+  city:
+    lineage:
+      - datalake_company_raw.address_aud.city
+  neighborhood:
+    lineage:
+      - datalake_company_raw.address_aud.neighborhood
+  zip_code:
+    lineage:
+      - datalake_company_raw.address_aud.zip_code
+  number:
+    lineage:
+      - datalake_company_raw.address_aud.number
+  complement:
+    lineage:
+      - datalake_company_raw.address_aud.complement
+  version:
+    lineage:
+      - datalake_company_raw.address_aud.version
+  rev:
+    lineage:
+      - datalake_company_raw.address_aud.rev
+  rev_end:
+    lineage:
+      - datalake_company_raw.address_aud.revend
+  rev_type:
+    lineage:
+      - datalake_company_raw.address_aud.revtype
+  mod_uuid_company:
+    lineage:
+      - datalake_company_raw.address_aud.company_uuid_mod
+  mod_zip_code:
+    lineage:
+      - datalake_company_raw.address_aud.zip_code_mod
+  mod_public_area:
+    lineage:
+      - datalake_company_raw.address_aud.public_area_mod
+  mod_number:
+    lineage:
+      - datalake_company_raw.address_aud.number_mod
+  mod_complement:
+    lineage:
+      - datalake_company_raw.address_aud.complement_mod
+  mod_neighborhood:
+    lineage:
+      - datalake_company_raw.address_aud.neighborhood_mod
+  mod_city:
+    lineage:
+      - datalake_company_raw.address_aud.city_mod
+  mod_country:
+    lineage:
+      - datalake_company_raw.address_aud.country_mod
+  mod_state:
+    lineage:
+      - datalake_company_raw.address_aud.state_mod
+  ts_created:
+    lineage:
+      - datalake_company_raw.address_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_company_raw.address_aud.updated_at
+  year:
+    lineage:
+      - datalake_company_raw.address_aud.year
+  month:
+    lineage:
+      - datalake_company_raw.address_aud.month
+  day:
+    lineage:
+      - datalake_company_raw.address_aud.day

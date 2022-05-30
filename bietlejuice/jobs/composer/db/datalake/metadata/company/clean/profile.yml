@@ -1,0 +1,28 @@
+---
+database_name: datalake_company_clean
+table_name: profile
+columns:
+  id:
+    lineage:
+      - datalake_company_raw.profile.id
+  profile_name:
+    lineage:
+      - datalake_company_raw.profile.profile_name
+  version:
+    lineage:
+      - datalake_company_raw.profile.version
+  ts_created:
+    lineage:
+      - datalake_company_raw.profile.created_at
+  ts_updated:
+    lineage:
+      - datalake_company_raw.profile.updated_at
+  year:
+    lineage:
+      - datalake_company_raw.profile.year
+  month:
+    lineage:
+      - datalake_company_raw.profile.month
+  day:
+    lineage:
+      - datalake_company_raw.profile.day

@@ -1,0 +1,28 @@
+---
+database_name: datalake_company_clean
+table_name: company_address
+columns:
+  id_address:
+    lineage:
+      - datalake_company_raw.company_address.address_id
+  id_company:
+    lineage:
+      - datalake_company_raw.company_address.company_id
+  version:
+    lineage:
+      - datalake_company_raw.company_address.version
+  ts_created:
+    lineage:
+      - datalake_company_raw.company_address.created_at
+  ts_updated:
+    lineage:
+      - datalake_company_raw.company_address.updated_at
+  year:
+    lineage:
+      - datalake_company_raw.company_address.year
+  month:
+    lineage:
+      - datalake_company_raw.company_address.month
+  day:
+    lineage:
+      - datalake_company_raw.company_address.day

@@ -1,0 +1,43 @@
+---
+database_name: datalake_company_clean
+table_name: company_address_aud
+columns:
+  id_address:
+    lineage:
+      - datalake_company_raw.company_address_aud.address_id
+  id_company:
+    lineage:
+      - datalake_company_raw.company_address_aud.company_id
+  version:
+    lineage:
+      - datalake_company_raw.company_address_aud.version
+  rev:
+    lineage:
+      - datalake_company_raw.company_address_aud.rev
+  rev_end:
+    lineage:
+      - datalake_company_raw.company_address_aud.revend
+  rev_type:
+    lineage:
+      - datalake_company_raw.company_address_aud.revtype
+  mod_id_address:
+    lineage:
+      - datalake_company_raw.company_address_aud.address_id_mod
+  mod_id_subsidiary:
+    lineage:
+      - datalake_company_raw.company_address_aud.subsidiary_id_mod
+  ts_created:
+    lineage:
+      - datalake_company_raw.company_address_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_company_raw.company_address_aud.updated_at
+  year:
+    lineage:
+      - datalake_company_raw.company_address_aud.year
+  month:
+    lineage:
+      - datalake_company_raw.company_address_aud.month
+  day:
+    lineage:
+      - datalake_company_raw.company_address_aud.day

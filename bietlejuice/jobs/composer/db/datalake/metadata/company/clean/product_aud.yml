@@ -1,0 +1,58 @@
+---
+database_name: datalake_company_clean
+table_name: product_aud
+columns:
+  id:
+    lineage:
+      - datalake_company_raw.product_aud.id
+  id_company:
+    lineage:
+      - datalake_company_raw.product_aud.company_id
+  uuid_product:
+    lineage:
+      - datalake_company_raw.product_aud.product_uuid
+  name:
+    lineage:
+      - datalake_company_raw.product_aud.name
+  status:
+    lineage:
+      - datalake_company_raw.product_aud.status
+  business_segment:
+    lineage:
+      - datalake_company_raw.product_aud.business_segment
+  version:
+    lineage:
+      - datalake_company_raw.product_aud.version
+  rev:
+    lineage:
+      - datalake_company_raw.product_aud.rev
+  rev_end:
+    lineage:
+      - datalake_company_raw.product_aud.revend
+  rev_type:
+    lineage:
+      - datalake_company_raw.product_aud.revtype
+  mod_uuid_product:
+    lineage:
+      - datalake_company_raw.product_aud.product_uuid_mod
+  mod_name:
+    lineage:
+      - datalake_company_raw.product_aud.name_mod
+  mod_status:
+    lineage:
+      - datalake_company_raw.product_aud.status_mod
+  mod_business_segment:
+    lineage:
+      - datalake_company_raw.product_aud.business_segment_mod
+  ts_created:
+    lineage:
+      - datalake_company_raw.product_aud.created_at
+  year:
+    lineage:
+      - datalake_company_raw.product_aud.year
+  month:
+    lineage:
+      - datalake_company_raw.product_aud.month
+  day:
+    lineage:
+      - datalake_company_raw.product_aud.day

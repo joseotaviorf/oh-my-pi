@@ -1,0 +1,34 @@
+---
+database_name: datalake_company_clean
+table_name: profile_hierarchy
+columns:
+  id:
+    lineage:
+      - datalake_company_raw.profile_hierarchy.id
+  id_profile:
+    lineage:
+      - datalake_company_raw.profile_hierarchy.profile_id
+  id_product:
+    lineage:
+      - datalake_company_raw.profile_hierarchy.product_id
+  position_number:
+    lineage:
+      - datalake_company_raw.profile_hierarchy.position_number
+  version:
+    lineage:
+      - datalake_company_raw.profile_hierarchy.version
+  ts_created:
+    lineage:
+      - datalake_company_raw.profile_hierarchy.created_at
+  ts_updated:
+    lineage:
+      - datalake_company_raw.profile_hierarchy.updated_at
+  year:
+    lineage:
+      - datalake_company_raw.profile_hierarchy.year
+  month:
+    lineage:
+      - datalake_company_raw.profile_hierarchy.month
+  day:
+    lineage:
+      - datalake_company_raw.profile_hierarchy.day

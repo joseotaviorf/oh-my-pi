@@ -1,0 +1,28 @@
+---
+database_name: datalake_company_clean
+table_name: company_document
+columns:
+  id_document:
+    lineage:
+      - datalake_company_raw.company_document.document_id
+  id_company:
+    lineage:
+      - datalake_company_raw.company_document.company_id
+  version:
+    lineage:
+      - datalake_company_raw.company_document.version
+  ts_created:
+    lineage:
+      - datalake_company_raw.company_document.created_at
+  ts_updated:
+    lineage:
+      - datalake_company_raw.company_document.updated_at
+  year:
+    lineage:
+      - datalake_company_raw.company_document.year
+  month:
+    lineage:
+      - datalake_company_raw.company_document.month
+  day:
+    lineage:
+      - datalake_company_raw.company_document.day
