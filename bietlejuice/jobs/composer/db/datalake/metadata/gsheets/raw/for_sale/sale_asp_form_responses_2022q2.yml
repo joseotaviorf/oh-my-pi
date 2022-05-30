@@ -1,0 +1,12 @@
+---
+database_name: datalake_gsheets_raw
+table_name: sale_asp_form_responses_2022q2
+columns:
+  asp_email:
+    tags:
+      - PII
+      - Confidential
+  asp_responsavel:
+    tags:
+      - PII
+      - Confidential

@@ -20,6 +20,12 @@ More information about run time [here]({chart_url}{dag_id}).
 This pipeline produces the following output tables:
 
 1. Data lake raw:
+    - `sale_asp_form_responses_2022q1`
+    - `sale_asp_form_responses_2022q2`
+    - `sale_asp_tratatives_2022q1`
+    - `sale_asp_tratatives_2022q2_newlistings`
+    - `sale_asp_tratatives_2022q2_oldlistings`
+    - `sale_asp_groupsab_2022q2`
     - `sale_demand_targets`
     - `sale_ongoing_listings_targets`
     - `sale_payment_concluded_targets`
@@ -31,6 +37,12 @@ This pipeline produces the following output tables:
     - `target_sale_cohort_demand`
     - `target_sale_cohort_supply`
 2. Data lake clean:
+    - `sale_asp_form_responses_2022q1`
+    - `sale_asp_form_responses_2022q2`
+    - `sale_asp_tratatives_2022q1`
+    - `sale_asp_tratatives_2022q2_newlistings`
+    - `sale_asp_tratatives_2022q2_oldlistings`
+    - `sale_asp_groupsab_2022q2`
     - `sale_demand_targets`
     - `sale_ongoing_listings_targets`
     - `sale_payment_concluded_targets`

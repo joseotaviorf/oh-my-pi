@@ -1,0 +1,31 @@
+---
+database_name: datalake_gsheets_clean
+table_name: sale_asp_tratatives_2022q2_oldlistings
+columns:
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_tratatives_2022q2_oldlistings.id_house
+  asp_database:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_tratatives_2022q2_oldlistings.test_database
+  asp_responsavel:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_tratatives_2022q2_oldlistings.asp_responsavel
+  asp_list:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_tratatives_2022q2_oldlistings.listing
+  sale_price_listing:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_tratatives_2022q2_oldlistings.preco
+  sale_price_calculator:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_tratatives_2022q2_oldlistings.preco_calculadora
+  status_contact:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_tratatives_2022q2_oldlistings.status_contato
+  dt_effective_contact:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_tratatives_2022q2_oldlistings.data_contato_efetivo
+  dt_break_up:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_tratatives_2022q2_oldlistings.break_up_date

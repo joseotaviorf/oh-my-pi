@@ -1,0 +1,72 @@
+database_name: datalake_gsheets_clean
+table_name: sale_asp_form_responses_2022q2
+columns:
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q2.id_house
+  asp_list:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q2.asp_listing
+  email_asp:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q2.asp_email
+  assigned_asp:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q2.asp_responsavel
+  sale_price_listing:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q2.sale_price_listing
+  sale_price_calculator:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q2.sale_price_calculator
+  sale_price_after_change:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q2.preco_apos_alteracao
+  had_contact_with_owner:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q2.foi_possivel_contato_com_proprietario
+  has_action_book_new_photo_session:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q2.acao__agendar_nova_sessao_de_fotos
+  has_action_book_new_video_session:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q2.acao__agendar_nova_sessao_de_video
+  has_action_change_house_entrance:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q2.acao__alterar_condicao_de_entrada
+  has_action_change_available_visit_hours:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q2.acao__alterar_horarios_de_visita
+  has_action_change_listing_description:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q2.acao__ajustar_descritivo_do_anuncio
+  has_action_change_sale_price:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q2.acao__alterar_preco_do_imovel
+  has_action_make_lockbox_available:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q2.acao__disponibilizar_lockbox
+  has_action_make_outdoor_sign_available:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q2.acao__disponibilizar_plaquinhas
+  has_action_new_listing_to_be_sent_to_is_team:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q2.acao__enviar_para_is_novo_imovel_para_cadastro
+  has_any_action_been_taken:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q2.acao__alguma_acao_aplicada
+  has_phase_out_unpublish_listing:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q2.phase_out__despublicar_imovel
+  has_phase_out_suspend_listing:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q2.phase_our__suspender_imovel
+  has_phase_out_unpublish_or_suspend_listing:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q2.phase_out__teve_despublicacao_ou_suspensao
+  has_no_necessary_action:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q2.nenhuma_acao_necessaria
+  dt_form_entry:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q2.form_datetime

@@ -1,0 +1,26 @@
+database_name: datalake_gsheets_raw
+table_name: sale_asp_form_responses_2022q1
+columns:
+  endereco_de_email:
+    tags:
+      - Confidential
+  nome_do_responsavel:
+    tags:
+      - PII
+      - Confidential
+  asp_responsavel:
+    tags:
+      - PII
+      - Confidential
+  observacoes_pre_contato:
+    tags:
+      - PII
+      - Confidential
+  informacoes_com_o_proprietario:
+    tags:
+      - PII
+      - Confidential
+  observacoes_pos_contato:
+    tags:
+      - PII
+      - Confidential

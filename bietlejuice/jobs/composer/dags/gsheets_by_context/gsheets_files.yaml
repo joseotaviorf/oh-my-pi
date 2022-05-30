@@ -326,6 +326,42 @@ credit_decisions_auditing:
 # FOR SALE SHEETS
 ###################
 
+sale_asp_form_responses_2022q1:
+    sheet_id: 1p7LfY3u3kWXk6acGhmYfvvueBl1b3KS3wEmREm1GK0I
+    sheet_name: ASPFormResponses_GSheetsImport
+    clean_table_name: sale_asp_form_responses_2022q1
+    sheet_context: for_sale
+
+sale_asp_form_responses_2022q2:
+    sheet_id: 1nFOm0Om3tdfarg8C9fdxbrkxdkj6zjOxgtLVIzcMW6Y
+    sheet_name: GSheetsImport_BaseFormResponses_2022Q2
+    clean_table_name: sale_asp_form_responses_2022q2
+    sheet_context: for_sale
+
+sale_asp_tratatives_2022q1:
+    sheet_id: 1ZBNH-dphvE_Kgn5AzBouIuRoz8DbcpzpItpHlFIQK0o
+    sheet_name: ASPForSale_GSheetsImport
+    clean_table_name: sale_asp_tratatives_2022q1
+    sheet_context: for_sale
+
+sale_asp_tratatives_2022q2_newlistings:
+    sheet_id: 1nFOm0Om3tdfarg8C9fdxbrkxdkj6zjOxgtLVIzcMW6Y
+    sheet_name: GSheetsImport_BaseNewListings_2022Q2
+    clean_table_name: sale_asp_tratatives_2022q2_newlistings
+    sheet_context: for_sale
+
+sale_asp_tratatives_2022q2_oldlistings:
+    sheet_id: 1nFOm0Om3tdfarg8C9fdxbrkxdkj6zjOxgtLVIzcMW6Y
+    sheet_name: GSheetsImport_BaseOldListings_2022Q2
+    clean_table_name: sale_asp_tratatives_2022q2_oldlistings
+    sheet_context: for_sale
+
+sale_asp_groupsab_2022q2:
+    sheet_id: 1nFOm0Om3tdfarg8C9fdxbrkxdkj6zjOxgtLVIzcMW6Y
+    sheet_name: GSheetsImport_GruposAB_2022Q2
+    clean_table_name: sale_asp_groupsab_2022q2
+    sheet_context: for_sale
+
 sale_demand_targets:
     sheet_id: 1NlB0E3Gd7HFmgzvB8GIQte_i18SxV5Uw1A5lNihXd08
     sheet_name: sale_demand_targets

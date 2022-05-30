@@ -1,0 +1,13 @@
+---
+database_name: datalake_gsheets_clean
+table_name: sale_asp_tratatives_2022q1
+columns:
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_tratatives_2022q1.id_house
+  asp_responsavel:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_tratatives_2022q1.ASP_responsavel
+  grupo_sf:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_tratatives_2022q1.grupo_sf

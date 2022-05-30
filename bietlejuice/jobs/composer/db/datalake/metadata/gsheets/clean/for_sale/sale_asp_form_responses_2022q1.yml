@@ -1,0 +1,58 @@
+---
+database_name: datalake_gsheets_clean
+table_name: sale_asp_form_responses_2022q1
+columns:
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q1.id_house
+  asp_database:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q1.asp_database
+  asp_assignee_email:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q1.endereco_de_email
+  asp_assignee_name:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q1.asp_responsavel
+  sale_price_listing:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q1.preco_do_anuncio_no_momento_do_atendimento
+  sale_price_calculator:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q1.preco_da_calculadora
+  sale_price_after_change:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q1.preco_apos_alteracao
+  has_action_book_new_photo_session:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q1.acaooes_asp_agendar_nova_sessao_de_fotos
+  has_action_change_house_entrance:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q1.acaooes_asp_alterar_condicao_de_entrada
+  has_action_change_available_visit_hours:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q1.acaooes_asp_alterar_horarios_de_visita
+  has_action_change_sale_price:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q1.acaooes_asp_alterar_preco_do_imovel
+  has_action_change_listing_description:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q1.acao__incluir_ou_corrigir_info_do_anuncio
+  has_phase_out_unpublish_listing:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q1.acaooes_asp_despublicar_imovel
+  has_action_make_lockbox_available:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q1.acaooes_asp_disponibilizar_lockbox
+  has_action_new_listing_to_be_sent_to_is_team:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q1.acaooes_asp_enviar_para_is_novo_imovel_para_cadastro
+  has_phase_out_suspend_listing:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q1.acaooes_asp_suspender_imovel
+  has_no_necessary_action:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q1.acaooes_asp_nenhuma_acao_anuncio_esta_adequado
+  dt_form_entry:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_form_responses_2022q1.carimbo_de_datahora

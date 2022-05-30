@@ -1,0 +1,27 @@
+SELECT
+    INT(id_house) AS id_house,
+    '2022Q2' AS asp_database,
+    listing AS asp_list,
+    asp_email AS email_asp,
+    NULLIF(asp_responsavel, '') AS assigned_asp,
+    INT(preco_anuncio) AS sale_price_listing,
+    INT(preco_calculadora) AS sale_price_calculator, 
+    INT(NULLIF(preco_apos_alteracao,'')) AS sale_price_after_change,
+    NULLIF(foi_possivel_contato_com_proprietario,'') AS had_contact_with_manager,
+    CASE WHEN LENGTH(acao__agendar_nova_sessao_de_fotos) > 0 THEN TRUE ELSE FALSE END AS has_action_book_new_photo_session,
+    CASE WHEN LENGTH(acao__agendar_nova_sessao_de_video) > 0 THEN TRUE ELSE FALSE END AS has_action_book_new_video_session,
+    CASE WHEN LENGTH(acao__alterar_condicao_de_entrada) > 0 THEN TRUE ELSE FALSE END AS has_action_change_house_entrance,
+    CASE WHEN LENGTH(acao__alterar_horarios_de_visita) > 0 THEN TRUE ELSE FALSE END AS has_action_change_available_visit_hours,
+    CASE WHEN LENGTH(acao__ajustar_descritivo_do_anuncio) > 0 THEN TRUE ELSE FALSE END AS has_action_change_listing_description,
+    CASE WHEN LENGTH(acao__alterar_preco_do_imovel) > 0 THEN TRUE ELSE FALSE END AS has_action_change_sale_price,
+    CASE WHEN LENGTH(acao__disponibilizar_lockbox) > 0 THEN TRUE ELSE FALSE END AS has_action_make_lockbox_available,
+    CASE WHEN LENGTH(acao__disponibilizar_plaquinhas) > 0 THEN TRUE ELSE FALSE END AS has_action_make_outdoor_sign_available,
+    CASE WHEN LENGTH(acao__enviar_para_is_novo_imovel_para_cadastro) > 0 THEN TRUE ELSE FALSE END AS has_action_new_listing_to_be_sent_to_is_team,
+    CASE WHEN LENGTH(acao__alguma_acao_aplicada) > 0 THEN TRUE ELSE FALSE END AS has_any_action_been_taken,
+    CASE WHEN LENGTH(phase_out__despublicar_imovel) > 0 THEN TRUE ELSE FALSE END AS has_phase_out_unpublish_listing,
+    CASE WHEN LENGTH(phase_our__suspender_imovel) > 0 THEN TRUE ELSE FALSE END AS has_phase_out_suspend_listing,
+    CASE WHEN LENGTH(phase_out__teve_despublicacao_ou_suspensao) > 0 THEN TRUE ELSE FALSE END AS has_phase_out_unpublish_or_suspend_listing,
+    CASE WHEN LENGTH(nenhuma_acao_necessaria) > 0 THEN TRUE ELSE FALSE END AS has_no_necessary_action,
+    DATE(NULLIF(form_datetime,'')) AS dt_form_entry
+FROM
+    datalake_gsheets_raw.sale_asp_form_responses_2022q2

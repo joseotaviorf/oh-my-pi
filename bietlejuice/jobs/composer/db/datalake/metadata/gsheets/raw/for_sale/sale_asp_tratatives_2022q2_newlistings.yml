@@ -1,0 +1,8 @@
+---
+database_name: datalake_gsheets_raw
+table_name: sale_asp_tratatives_2022q2_newlistings
+columns:
+  asp_responsavel:
+    tags:
+      - PII
+      - Confidential

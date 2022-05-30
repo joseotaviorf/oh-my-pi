@@ -1,0 +1,19 @@
+---
+database_name: datalake_gsheets_clean
+table_name: sale_asp_groupsab_2022q2
+columns:
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_groupsab_2022q2.id_house
+  asp_database:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_groupsab_2022q2.test_database
+  asp_list:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_groupsab_2022q2.listings
+  groups_ab:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_groupsab_2022q2.group_ab
+  id_pair_match:
+    lineage:
+      - datalake_gsheets_raw.sale_asp_groupsab_2022q2.finalID
