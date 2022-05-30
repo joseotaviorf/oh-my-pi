@@ -6,6 +6,7 @@ WITH numbered_ticket_history AS (
 )
 SELECT
     id_ticket,
+    id_deal,
     id_stage,
     id_pipeline,
     id_hubspot_owner,

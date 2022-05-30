@@ -1,5 +1,6 @@
 SELECT
     id_ticket::BIGINT,
+    GET_JSON_OBJECT(associations, '$.deals.results[0].id')::BIGINT AS id_deal,
     GET_JSON_OBJECT(properties, '$.hs_pipeline_stage')::BIGINT AS id_stage,
     GET_JSON_OBJECT(properties, '$.hs_pipeline')::BIGINT AS id_pipeline,
     GET_JSON_OBJECT(properties, '$.hubspot_owner_id')::BIGINT AS id_hubspot_owner,

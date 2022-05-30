@@ -5,6 +5,9 @@ columns:
   id_ticket:
     lineage:
       - datalake_hubspot.ticket_history.id_ticket
+  id_deal:
+    lineage:
+      - datalake_hubspot.ticket_history.id_deal
   id_stage:
     lineage:
       - datalake_hubspot.ticket_history.id_stage

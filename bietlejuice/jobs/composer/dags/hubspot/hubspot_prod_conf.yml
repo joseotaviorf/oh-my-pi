@@ -203,6 +203,8 @@ tables:
     properties_with_history:
       - hs_pipeline_stage
       - hs_pipeline
+    associations:
+      - deal
   deal_pipeline:
     is_incremental: true
     bring_archived: false
