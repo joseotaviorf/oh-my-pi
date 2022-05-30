@@ -24,3 +24,4 @@ FROM
   datalake_analyst_ranking.ranking
 WHERE
   dt_ranking_week = DATE(DATE_TRUNC('week', '{year}-{month}-{day}'))
+  OR dt_ranking_week = DATE(DATE_TRUNC('week', DATE('{year}-{month}-{day}') - INTERVAL 1 DAY))

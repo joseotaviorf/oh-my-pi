@@ -22,6 +22,13 @@ SELECT
 FROM
   datalake_analyst_ranking.analyst_metrics
 WHERE
-  year = {year}
-  AND month = {month}
-  AND day = {day}
+  (
+    year = {year}
+    AND month = {month}
+    AND day = {day}
+  )
+  OR (
+    year = YEAR(DATE('{year}-{month}-{day}') - INTERVAL 1 DAY)
+    AND month = MONTH(DATE('{year}-{month}-{day}') - INTERVAL 1 DAY)
+    AND day = DAY(DATE('{year}-{month}-{day}') - INTERVAL 1 DAY)
+  )
