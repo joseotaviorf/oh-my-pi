@@ -1,0 +1,36 @@
+---
+tables:
+  - table_name: address
+    date_filter_column: updated_at
+  - table_name: address_aud
+    date_filter_column: created_at
+  - table_name: contact_info
+    date_filter_column: updated_at
+  - table_name: contact_info_aud
+    date_filter_column: created_at
+  - table_name: credential_reference
+    date_filter_column: updated_at
+  - table_name: credential_reference_aud
+    date_filter_column: created_at
+  - table_name: identity_document
+    date_filter_column: updated_at
+  - table_name: identity_document_aud
+    date_filter_column: created_at
+  - table_name: person
+    date_filter_column: updated_at
+  - table_name: person_aud
+    date_filter_column: created_at
+  - table_name: preference_settings
+    date_filter_column: updated_at
+  - table_name: preference_settings_aud
+    date_filter_column: created_at
+  - table_name: revinfo
+    clean_table_name: rev_info
+    date_filter_column: revtstmp
+    unixtime_measure: milliseconds
+  - table_name: right_to_be_forgotten
+    date_filter_column: updated_at
+  - table_name: right_to_be_forgotten_aud
+    date_filter_column: created_at
+
+partition_cols: ["year", "month", "day"]
