@@ -158,14 +158,6 @@ pipeline:
         - performance_marketing_metrics_demand
         - sale_performance_marketing_metrics_demand
         - tenant_prospect_status
-  unique_performance_marketing_metrics_supply_coincident:
-    dw:
-      <<: *redshift_anchor
-      sql_file: dw/queries/datamarts/growth_cross/unique_performance_marketing_metrics_supply_coincident.sql
-      table: unique_performance_marketing_metrics_supply_coincident
-      depends_on:
-        - performance_marketing_cluster_promotional_bonus_costs
-        - daily_target_volumes_supply
   unique_supply_events_funnel:
     dw:
       <<: *redshift_anchor
@@ -232,3 +224,8 @@ pipeline:
       table: plaquinhas_users_demand
       depends_on:
         - performance_marketing_metrics_demand
+  marketing_campaigns_costs_and_volumes:
+    dw:
+      <<: *redshift_anchor
+      sql_file: dw/queries/datamarts/growth_cross/marketing_campaigns_costs_and_volumes.sql
+      table: marketing_campaigns_costs_and_volumes

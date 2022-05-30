@@ -9,7 +9,7 @@ from bietlejuice.jobs.composer.services.git_service import GitService
 logger = QuintoAndarLogger("validate_datamarts_metadata_files_exist")
 
 DATAMARTS_DAG_REGEX = re.compile(
-    r"/dags/dw_datamarts/(?P<context>\w+)/(?P<dagname>\w+)\.py"
+    r"/dags/dw_datamarts/(?P<context>\w+)/(?P<dagname>\W+)\.py"
 )
 DATAMARTS_YAML_REGEX = re.compile(
     r"/dags/dw_datamarts/(?P<context>\w+)/(?P<dagname>\w+)_(:?forno|prod)_conf\.(:?yml|yaml)"
@@ -80,7 +80,6 @@ SKIP_LIST = {
         "rental_cohort_conversions",
         "sale_performance_marketing_metrics_demand",
         "inbound_attendance_leads_flows",
-        "unique_performance_marketing_metrics_supply_coincident",
         "top_of_funnel_volumes_weekly",
         "rental_marketplace_flows",
         "top_of_funnel_volumes_monthly",
@@ -110,6 +109,9 @@ SKIP_LIST = {
         "user_funnel",
         "sale_performance_marketing_metrics_supply_coincident",
         "indicaai_costs",
+    },
+    "dw_datamarts/growth_cross_blacklist": {
+        "unique_performance_marketing_metrics_supply_coincident"
     },
     "dw_datamarts/support_and_service": {
         "house_media",
