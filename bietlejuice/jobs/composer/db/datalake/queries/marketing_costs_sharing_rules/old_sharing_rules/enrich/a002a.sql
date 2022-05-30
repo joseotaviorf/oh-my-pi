@@ -10,9 +10,9 @@ share AS (
             NULLIF(SUM(budget) OVER (PARTITION BY year_month)::FLOAT, 0)
         ) AS share
     FROM
-        datalake_raw.gsheets_marketing_affiliates_targets_replanning atr
+        datalake_gsheets_clean_prod.marketing_affiliates_targets_replanning atr
         JOIN dim_date dd
-            ON DATE(NULLIF(atr.date, ''))= dd.date
+            ON atr.dt_target = dd.date
     ),
 dim_distinct AS (
     SELECT DISTINCT
